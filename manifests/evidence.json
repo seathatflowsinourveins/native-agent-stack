@@ -7989,8 +7989,8 @@
     },
     {
       "path": "docs/decisions/2026-09-22-codeql-first-analysis.md",
-      "sha256": "2966768eeb7aaa8a21f32036ef912606c314043c920855ca6e135e374d5582b7",
-      "bytes": 11627
+      "sha256": "e71a63db7692ddf497ebdcb6ec4c3e979f3afaf61944731efbee35c28f982b6b",
+      "bytes": 11943
     },
     {
       "path": "docs/direct-results.md",
@@ -13024,8 +13024,8 @@
     },
     {
       "path": "scripts/build_ecosystem.py",
-      "sha256": "d21d8d705f677ae6de0bec27673c556ec0147060d4ac724363d3a040972a4e94",
-      "bytes": 49314
+      "sha256": "0a84a2c596512eac0f7e470cd287b9dcbea2c0c2998e14e0f98a2f71160fd150",
+      "bytes": 49805
     },
     {
       "path": "scripts/catalog_decisions.py",
@@ -13274,8 +13274,8 @@
     },
     {
       "path": "tests/test_claude_repository_evidence.py",
-      "sha256": "5be1832a8c741cf5ee7b72c146ae88bd394a4ccb883a0adb8761773d6acf568a",
-      "bytes": 10940
+      "sha256": "bc84e4527cbbd894ad524981ee5c90230552a42cb53e7088699ee9a0d2730093",
+      "bytes": 11326
     },
     {
       "path": "tests/test_component_matrix.py",

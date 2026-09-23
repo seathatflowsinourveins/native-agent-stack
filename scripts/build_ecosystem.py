@@ -694,18 +694,26 @@ def build_data(root):
 
 
 class InlineScripts(HTMLParser):
-    """Bodies of attribute-less <script> elements, tokenized as a browser would
-    (tag case, end-tag whitespace/attributes), so the CSP hash covers what runs."""
+    """Bodies of attribute-less <script> elements (tag case, end-tag whitespace and
+    attributes handled like a browser). `opened` counts every script start tag so a
+    caller can require it to match the raw "<script" count: html.parser hides a script
+    inside a comment or a self-closing <script/> that a browser would still run."""
 
     def __init__(self, text):
         super().__init__(convert_charrefs=False)
-        self.bodies, self.body = [], None
+        self.bodies, self.body, self.opened, self.self_closed = [], None, 0, 0
         self.feed(text)
         self.close()
 
     def handle_starttag(self, tag, attrs):
         if tag == "script":
+            self.opened += 1
             self.body = None if attrs else []
+
+    def handle_startendtag(self, tag, attrs):
+        if tag == "script":
+            self.opened += 1
+            self.self_closed += 1
 
     def handle_data(self, data):
         if self.body is not None:
@@ -726,8 +734,10 @@ def render_from_data(data, root):
     body += 'No data leaves this page. Public source repository: <a href="'
     body += html.escape(data["repository_url"], quote=True) + '">native-agent-stack</a>.</p></noscript>'
     result = template.replace("@@DATA@@", encoded).replace("<!--@@BODY@@-->", body)
-    scripts = InlineScripts(result).bodies
-    require(len(scripts) == 1, "template must have one inline application script")
+    parsed = InlineScripts(result)
+    scripts = parsed.bodies
+    require(len(scripts) == 1 and not parsed.self_closed and parsed.opened == result.lower().count("<script"),
+            "template must have one inline application script")
     script_hash = base64.b64encode(hashlib.sha256(scripts[0].encode()).digest()).decode()
     return result.replace("@@SCRIPT_HASH@@", script_hash).encode("utf-8")
 
