@@ -1,0 +1,30 @@
+{
+  "limits": [
+    "Presence/threshold measurement only; no model, service, or GPU workload is actually run.",
+    "nvidia-smi absence yields gpu=null even when a GPU is present but the driver/tool is unavailable.",
+    ".wslconfig detection is a best-effort read of /mnt/<drive>/Users/*/.wslconfig; a non-default Windows user profile path or drive letter is not searched."
+  ],
+  "measured": {
+    "cores": 24,
+    "effective_ram_gb": 48.0,
+    "evidence_class": "native_proven",
+    "gpu": {
+      "evidence_class": "native_proven",
+      "name": "NVIDIA GeForce RTX 5090 Laptop GPU",
+      "vram_gb": 23.9
+    },
+    "is_wsl": true,
+    "platform": "wsl",
+    "ram_gb_proc_meminfo": 47.0,
+    "wslconfig_memory_gb": 48.0,
+    "wslconfig_source": "/mnt/c/Users/example/.wslconfig"
+  },
+  "profiles_source": "adoption/hardware-profiles.json",
+  "recommended": {
+    "ecosystem_bounded_run_memory_gb": 24.0,
+    "embedding_semantic_rag_tier": "full",
+    "local_generation_model_tier": "large-32b-q4",
+    "workflow_concurrency_cap": 16
+  },
+  "schema": "hardware-profile-report-v1"
+}

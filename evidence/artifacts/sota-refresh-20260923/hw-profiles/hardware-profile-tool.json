@@ -1,0 +1,30 @@
+{
+  "id": "sota-refresh-20260923-hw-profiles-hardware-profile-tool",
+  "component": "scripts/hardware_profile.py + adoption/hardware-profiles.json (new tool, no prior pin)",
+  "from_pin": null,
+  "to_version": "unreleased, added in this unit (claude/w2-hw-profiles-20260923)",
+  "release_published_at": null,
+  "preregistration": {
+    "written_at": "2026-09-23T00:15:00Z",
+    "expectation": "A stdlib-only script run on this WSL host will report cores=24 (from os.cpu_count()), an effective_ram_gb close to the .wslconfig memory=48GB setting rather than the smaller /proc/meminfo total, and an NVIDIA GPU with roughly 24 GB VRAM via nvidia-smi. From adoption/hardware-profiles.json's declared tiers, that should map to workflow_concurrency_cap=16 (min(16,24-2)), local_generation_model_tier='large-32b-q4' (>=20GB VRAM), embedding_semantic_rag_tier='full' (>=48GB effective RAM), and ecosystem_bounded_run_memory_gb=24.0 (48*0.5).",
+    "criteria": "python3 scripts/hardware_profile.py exits 0 and its JSON 'recommended' block matches every value above exactly; python3 -m unittest tests.test_hardware_profile passes all synthetic-input cases."
+  },
+  "acceptance_check_ref": "tests/test_hardware_profile.py (this unit's new suite); no prior acceptance check existed for this new tool.",
+  "commands": [
+    "python3 scripts/hardware_profile.py --out evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json",
+    "python3 -m unittest tests.test_hardware_profile -v"
+  ],
+  "results": [
+    "this-host.json measured: cores=24, ram_gb_proc_meminfo=47.0, wslconfig_memory_gb=48.0 (read from /mnt/c/Users/example/.wslconfig), effective_ram_gb=48.0, gpu={name: 'NVIDIA GeForce RTX 5090 Laptop GPU', vram_gb: 23.9}, is_wsl=true.",
+    "recommended: workflow_concurrency_cap=16, local_generation_model_tier='large-32b-q4', embedding_semantic_rag_tier='full', ecosystem_bounded_run_memory_gb=24.0 -- matches the preregistered expectation exactly.",
+    "unittest: 'Ran 16 tests in 0.040s / OK' (all synthetic-input cases pass)."
+  ],
+  "verdict": "qualified",
+  "evidence_class": "native_proven",
+  "limits": [
+    "Measured on exactly one host (this laptop); the 128GB WSL workstation and macOS entries in adoption/hardware-profiles.json are labelled_projection, not native_proven, until each is actually run.",
+    "nvidia-smi VRAM (23.9 GB reported) is slightly below the labelled '24 GB' in the task brief because nvidia-smi reports usable framebuffer memory, not the nominal marketing figure; this does not change the recommended tier (threshold is >=20GB).",
+    "No GPU/model workload is actually executed by this script; tiers are threshold recommendations, not measured throughput."
+  ],
+  "checked_at": "2026-09-23T00:30:00Z"
+}

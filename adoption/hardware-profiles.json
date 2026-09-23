@@ -1,0 +1,110 @@
+{
+  "$schema_id": "adoption/hardware-profiles.json",
+  "id": "hardware-profiles-20260923",
+  "description": "Declarative hardware-dependent layer tiers and per-host profiles for scripts/hardware_profile.py. Thresholds are sizing rules, not measurements; each host entry records where its numbers came from (native_proven measurement vs. labelled projection) per docs/acceptance-evidence-policy.md.",
+  "layers": {
+    "workflow_concurrency": {
+      "rule": "min(16, CPUs - reserved_cores), per agent-lab AGENTS.md's per-run concurrent-agent sizing",
+      "cap_default": 16,
+      "reserved_cores": 2
+    },
+    "local_generation_model": {
+      "description": "Local generation model tier by GPU VRAM (discrete NVIDIA) or unified memory (Apple Silicon). Tiers are conservative floors for a quantized (4-bit/8-bit) model plus KV cache headroom, not a specific model's exact footprint.",
+      "tiers": [
+        {"name": "cpu-only", "min_vram_gb": 0, "note": "No GPU/unified-memory tier met; CPU inference only, small models."},
+        {"name": "small-8b-q4", "min_vram_gb": 8, "note": "~7-8B parameter models at 4-bit quantization fit with headroom."},
+        {"name": "mid-14b-q4-or-8b-q8", "min_vram_gb": 12, "note": "~13-14B at 4-bit, or ~7-8B at 8-bit."},
+        {"name": "large-32b-q4", "min_vram_gb": 20, "note": "~30-32B at 4-bit quantization, e.g. a 24GB laptop GPU."},
+        {"name": "xl-70b-q4-or-32b-q8", "min_vram_gb": 40, "note": "~65-70B at 4-bit, or ~32B at 8-bit."},
+        {"name": "unified-70b-plus", "min_vram_gb": 48, "note": "Apple unified memory hosts with enough headroom for OS + app usage alongside a large model."}
+      ]
+    },
+    "embedding_semantic_rag": {
+      "description": "Fit for the SocratiCode embedding stack, a local Qdrant instance, and a local vLLM/embedding server sharing host RAM (docs/native-rag-runtime.md).",
+      "tiers": [
+        {"name": "unsupported", "min_ram_gb": 0, "note": "Below the floor for embedding + Qdrant + vLLM concurrently; run remote or sequentially."},
+        {"name": "light", "min_ram_gb": 16, "note": "Small collections, one service at a time."},
+        {"name": "standard", "min_ram_gb": 32, "note": "SocratiCode + Qdrant + a small local embedding model concurrently."},
+        {"name": "full", "min_ram_gb": 48, "note": "SocratiCode + Qdrant + vLLM serving an embedding or small generation model concurrently, per this project's configured local profile."},
+        {"name": "headroom", "min_ram_gb": 96, "note": "Large collections and multiple concurrent local services with headroom for the rest of the workflow."}
+      ]
+    },
+    "ecosystem_bounded_run": {
+      "description": "Memory ceiling passed to /home/example/codex-ecosystem/bin/ecosystem-bounded-run for heavy jobs, sized as a bounded fraction of effective host RAM so bounded jobs cannot exhaust the host.",
+      "fraction": 0.5,
+      "floor_gb": 2,
+      "ceiling_gb": 64
+    }
+  },
+  "hosts": [
+    {
+      "id": "this-host-20260923",
+      "label": "This host (measured)",
+      "evidence_class": "native_proven",
+      "evidence": "evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json",
+      "note": "Actual scripts/hardware_profile.py output for the host this unit ran on."
+    },
+    {
+      "id": "wsl-workstation-128gb-projected",
+      "label": "128 GB WSL workstation (labelled projection)",
+      "evidence_class": "labelled_projection",
+      "assumptions": {
+        "platform": "wsl",
+        "cores": 32,
+        "physical_ram_gb": 128,
+        "wslconfig_memory_gb": 100,
+        "gpu_vram_gb": 24
+      },
+      "sizing_arithmetic": {
+        "workflow_concurrency_cap": "min(16, 32 - 2) = 16",
+        "local_generation_model_tier": "vram_gb=24 >= 20 -> large-32b-q4",
+        "embedding_semantic_rag_tier": "ram_gb=100 >= 96 -> headroom",
+        "ecosystem_bounded_run_memory_gb": "max(2, 100*0.5)=50, min(50, 64) = 50"
+      },
+      "note": "Projected, not measured on this host; a fresh run of scripts/hardware_profile.py on that workstation is required before treating these numbers as native_proven."
+    },
+    {
+      "id": "macos-arm64-48gb-projected",
+      "label": "macOS arm64, 48 GB unified memory (labelled projection)",
+      "evidence_class": "labelled_projection",
+      "assumptions": {
+        "platform": "macos",
+        "arm64": true,
+        "cores": 12,
+        "unified_memory_gb": 48
+      },
+      "sizing_arithmetic": {
+        "workflow_concurrency_cap": "min(16, 12 - 2) = 10",
+        "local_generation_model_tier": "vram_gb(unified)=48 >= 48 -> unified-70b-plus",
+        "embedding_semantic_rag_tier": "ram_gb=48 >= 48 -> full",
+        "ecosystem_bounded_run_memory_gb": "max(2, 48*0.5)=24, min(24, 64) = 24"
+      },
+      "note": "Projected; a 48 GB Apple Silicon host still shares unified memory with the OS and every foreground app, so 'unified-70b-plus' assumes a mostly-idle host at generation time."
+    },
+    {
+      "id": "macos-arm64-64gb-projected",
+      "label": "macOS arm64, 64 GB unified memory (labelled projection)",
+      "evidence_class": "labelled_projection",
+      "assumptions": {
+        "platform": "macos",
+        "arm64": true,
+        "cores": 14,
+        "unified_memory_gb": 64
+      },
+      "sizing_arithmetic": {
+        "workflow_concurrency_cap": "min(16, 14 - 2) = 12",
+        "local_generation_model_tier": "vram_gb(unified)=64 >= 48 -> unified-70b-plus",
+        "embedding_semantic_rag_tier": "ram_gb=64 >= 48 -> full",
+        "ecosystem_bounded_run_memory_gb": "max(2, 64*0.5)=32, min(32, 64) = 32"
+      },
+      "note": "Projected; see macos-arm64-48gb-projected note on shared unified memory."
+    },
+    {
+      "id": "github-macos-15-arm64-runner",
+      "label": "GitHub-hosted macos-15 arm64 runner",
+      "evidence_class": "native_proven",
+      "evidence": "CI artifact from .github/workflows/hardware-profile-smoke.yml (macOS job); measured once that workflow runs, not committed by this unit.",
+      "note": "This unit authored the workflow that measures this host; it did not itself execute on a macOS runner, so no this-host-shaped JSON for it is checked in here."
+    }
+  ]
+}

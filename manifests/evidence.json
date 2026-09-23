@@ -7624,8 +7624,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "d793ce30b7f1cc307b7c0c60a9f5b410085cdbac3da403a1c4399317f3e1f5b7",
-      "bytes": 12918618
+      "sha256": "f5cb6c0c527d4a9f0d9c733bacb94253c94e468e8051118b261fae4b10ed8b72",
+      "bytes": 12921251
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -7699,8 +7699,8 @@
     },
     {
       "path": "docs/grand-catalog-handbook.md",
-      "sha256": "676be8056c875c0775f6de08c91509942cbac93a9aa28485656ff54c97d05586",
-      "bytes": 418783
+      "sha256": "cfb89d4aa7aabc669d4d2bc651f58ed7266cd0de2e001f083f2f026c6832ca98",
+      "bytes": 421377
     },
     {
       "path": "docs/harness-defaults.md",
@@ -11829,8 +11829,8 @@
     },
     {
       "path": "tests/test_workflow_security_coverage.py",
-      "sha256": "a99c55ea13b955fbde3caf00c70ed82067bfbefdb3d490044e091accb5bbb3f6",
-      "bytes": 3482
+      "sha256": "671d9df9688e979d259d74fd9ec68e6e649ae7584e3685eef20b110b07b85786",
+      "bytes": 4088
     },
     {
       "path": "tests/test_wsl_memory_maintenance.py",
@@ -12561,6 +12561,26 @@
       "path": "evidence/artifacts/layer-verdicts-20260922/packets/us-equities__data-quality-orchestration.json",
       "sha256": "cdbe255da0593b73f77e57bc8b887984a78e5233165f3a9fa27818d427708eeb",
       "bytes": 8782
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/hw-profiles/README.md",
+      "sha256": "07040efdcab39ee40f860ab83e9bf5a02f2071b16af8ac4a3f55802280287769",
+      "bytes": 4976
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json",
+      "sha256": "8547f34e55243cb7f8c525baadf9b2ecea6a0dc9d8406e8fc1290fdff16fca36",
+      "bytes": 1086
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/hw-profiles/mlx-lm-hash-lock.json",
+      "sha256": "96f135a94859e7843b879c45823028f8f261f8c61c774821a31f1ece725162e6",
+      "bytes": 5126
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/hw-profiles/hardware-profile-tool.json",
+      "sha256": "c03c4be173083ad5ffbc7ff7614b7b2f568536c650707e0ae1e85c1a8fcdc0bd",
+      "bytes": 2744
     }
   ],
   "convergence_records": [

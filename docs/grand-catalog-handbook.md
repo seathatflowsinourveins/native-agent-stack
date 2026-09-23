@@ -193,9 +193,14 @@ This handbook does not start services, create schedules or select paid hosting.
 
 ## Runtime workers, SDKs and research applications
 
-The agent-SDK layer's recorded winner is the `codex` component (Codex CLI and
-SDK, 0.155.1). The exercised programmatic research worker uses its **Python SDK**
-(`openai-codex`), explicitly selecting the native Codex binary. **OpenAI Agents SDK** and **Claude Agent
+The agent-SDK layer's recorded winner is the `codex` component. This name covers
+two distinct, separately versioned pins: the native **Codex CLI** binary
+(`codex-cli`, 0.155.1) and the **Codex Python SDK** package (`openai-codex`,
+0.154.0) that drives it programmatically. The exercised programmatic research
+worker uses the **Python SDK** (`openai-codex` 0.154.0), explicitly selecting
+the native Codex CLI binary (0.155.1) as its backing runtime; the two pins are
+not interchangeable and a version bump to one does not imply the other moved.
+**OpenAI Agents SDK** and **Claude Agent
 SDK** remain application-runtime candidates; the overturn condition is a matched
 three-arm worker comparison. The locked environment includes `openai-codex`,
 `openai`, `alpaca-py`, `duckdb` and `exchange-calendars`; the lock pins 36
@@ -329,10 +334,14 @@ destination's exact contracts.
 
 The path from simulation to paper to live is tracked as a
 [gate ladder](../catalogs/us-equities/gates-20260922.json) of 20 gates, each
-naming its owner, evidence class, receipt and machine-checkable flip condition.
-`python3 scripts/trading_gates.py --check` verifies the ladder arithmetically; a
-status changes only through a dated commit after the checker lists the gate as a
-flip candidate. On September 22:
+naming its owner, evidence class, receipt and machine-checkable flip condition,
+with one explicit exception: the `live-go` gate's status is `user_decision`
+(evidence class `none`, `flip_condition: null`) because it records the user's
+own authorization after every required paper and live gate is established, not
+a condition any checker can evaluate. `python3 scripts/trading_gates.py --check`
+verifies the other 19 gates' ladder arithmetically; a status changes only
+through a dated commit after the checker lists the gate as a flip candidate,
+except `live-go`, which only the user can flip. On September 22:
 
 | Rung | Established | Open |
 | --- | --- | --- |
@@ -342,6 +351,36 @@ flip candidate. On September 22:
 
 No rung is ready. Catalog inclusion does not authorize live configuration, paid
 data or hosting, or orders.
+
+## Hardware profiles
+
+`scripts/hardware_profile.py` (stdlib only) measures the current host — cores,
+RAM (`/proc/meminfo` on Linux/WSL, with the Windows-side `.wslconfig` memory
+value when readable; `sysctl hw.memsize`/`hw.ncpu`/`machdep.cpu.brand_string`
+and Apple Silicon detection on macOS) and, where present, GPU VRAM via
+`nvidia-smi` — and recommends a tier for each hardware-dependent layer from the
+declarative [`adoption/hardware-profiles.json`](../adoption/hardware-profiles.json):
+the workflow concurrency cap (`min(16, cores - 2)`, this project's per-run
+concurrent-agent sizing), the local generation model tier by VRAM or unified
+memory, the embedding/semantic-RAG fit (SocratiCode, Qdrant, vLLM), and the
+`ecosystem-bounded-run` memory ceiling. `tests/test_hardware_profile.py` covers
+the pure tier/threshold logic against synthetic (labelled) inputs.
+
+`adoption/hardware-profiles.json` records one measured entry per host actually
+run: this host (Intel Ultra 9 275HX laptop, WSL memory 48 GB, RTX 5090 Laptop
+24 GB VRAM; `evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json`,
+evidence class `native_proven`) and, once
+[`hardware-profile-smoke.yml`](../.github/workflows/hardware-profile-smoke.yml)
+runs, the GitHub-hosted `macos-15` arm64 runner. The 128 GB WSL workstation and
+the 48 GB / 64 GB macOS arm64 unified-memory hosts are recorded as
+`labelled_projection` entries with their sizing arithmetic shown inline, not as
+measurements; treat them as projections until a fresh run of the script on
+each host replaces them. That workflow also runs a tiny MLX generation smoke
+test (`mlx-community/Qwen2.5-0.5B-Instruct-4bit`, pinned by Hugging Face
+revision SHA) on the macOS runner using `mlx-lm` installed from a hash-locked,
+`uv pip compile --generate-hashes` requirements file
+(`tools/mlx-smoke/requirements.lock.txt`), recording tokens/s and peak memory
+as `native_proven` for that exact runner.
 
 ## Repository automation and releases
 
