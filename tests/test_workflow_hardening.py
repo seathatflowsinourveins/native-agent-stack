@@ -357,21 +357,61 @@ class VerdictReviewGateTests(unittest.TestCase):
         self.assertIn("fetch-depth: 0", checkout)
         self.assertRegex(self.job, r"timeout-minutes: \d+")
 
-    def test_base_sha_reaches_the_gate_through_env_only(self):
+    def run_script(self):
+        return step_block(self.job, "Require sealed cross-family review").split("run: |", 1)[1]
+
+    def test_event_values_reach_the_gate_through_env_only(self):
         gate = step_block(self.job, "Require sealed cross-family review")
-        self.assertIn("BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}", gate)
-        run = gate.split("run: |", 1)[1]
-        self.assertNotIn("${{", run, "no expression is interpolated into the shell script")
+        self.assertIn("EVENT_NAME: ${{ github.event_name }}", gate)
+        self.assertIn("PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}", gate)
+        self.assertIn("PUSH_BEFORE_SHA: ${{ github.event.before }}", gate)
+        self.assertNotIn("${{", self.run_script(), "no expression is interpolated into the shell script")
         self.assertNotIn("continue-on-error", gate)
+
+    def test_pull_request_base_is_the_merge_commits_first_parent_cross_checked(self):
+        # Review of #123, finding 5: the base is HEAD^1 of the checked-out merge commit; the payload's
+        # base.sha must be its ancestor; with neither available the job fails closed.
+        run = self.run_script()
+        pull_request = run.split("pull_request)", 1)[1].split(";;", 1)[0]
+        self.assertIn("first_parent=\"$(git rev-parse --verify --quiet 'HEAD^1^{commit}' || true)\"", pull_request)
+        self.assertIn('git merge-base --is-ancestor "$payload" "$first_parent"', pull_request)
+        self.assertIn('base="$first_parent"', pull_request)
+        self.assertRegex(pull_request, r"\n +else\n +echo \"::error::verdict-review-gate: neither the merge commit's "
+                                       r"first parent nor the payload base is available\"\n +exit 1\n +fi")
+        self.assertRegex(pull_request, r"is not an ancestor of the merge commit's first parent \$first_parent\"\n"
+                                       r" +exit 1\n")
+
+    def test_push_to_main_executes_the_gate_and_fails_closed_without_a_previous_commit(self):
+        # Review of #123, finding 2 (accepted residual): the push-to-main run re-checks after merge.
+        trigger = self.text.split("\non:\n", 1)[1].split("\n\n", 1)[0]
+        self.assertRegex(trigger, r"(?m)^  push:\n    branches: \[main\]$")
+        self.assertIsNone(block_if(self.job))
+        self.assertIsNone(block_if(step_block(self.job, "Require sealed cross-family review")))
+        run = self.run_script()
+        push = run.split("push)", 1)[1].split(";;", 1)[0]
+        self.assertIn('base="${PUSH_BEFORE_SHA:-}"', push)
+        self.assertIn('if [ -z "$base" ] || [ -z "${base//0/}" ]; then', push)
+        self.assertIn("exit 1", push)
+        # Every event reaches the gate invocation: no branch of the case exits 0 or skips it.
+        self.assertNotIn("exit 0", run)
+        self.assertTrue(run.rstrip().endswith('python3 "$gate" --root "$GITHUB_WORKSPACE" --base "$base" '
+                                              '| tee -a "$GITHUB_STEP_SUMMARY"'))
 
     def test_the_gate_that_runs_is_the_base_commits_copy(self):
         # Review of #123, finding 2: a pull request must not be judged by a gate it edited.
-        run = step_block(self.job, "Require sealed cross-family review").split("run: |", 1)[1]
+        run = self.run_script()
         self.assertIn('git worktree add --quiet --detach "$RUNNER_TEMP/gate-base" "$base"', run)
         self.assertIn('gate="$RUNNER_TEMP/gate-base/$gate"', run)
         self.assertIn('if git cat-file -e "$base:$gate"', run)
         self.assertIn('python3 "$gate" --root "$GITHUB_WORKSPACE" --base "$base"', run)
-        self.assertIn("set -o pipefail", run.split('python3 "$gate"', 1)[0])
+        self.assertIn("set -euo pipefail", run.split('python3 "$gate"', 1)[0])
+
+    def test_no_dangerous_trigger_is_added_for_the_residual(self):
+        # The accepted residual (the PR's own validate.yml can disable the job) is not closed with a
+        # privileged trigger: zizmor's dangerous-triggers audit runs with --no-config --no-ignores.
+        for workflow in WORKFLOWS.glob("*.yml"):
+            text = workflow.read_text(encoding="utf-8")
+            self.assertNotRegex(text, r"(?m)^\s*(pull_request_target|workflow_run):", workflow.name)
 
 
 class SupplyChainGateTests(unittest.TestCase):

@@ -680,13 +680,52 @@ Hosted and live results after merge. Evidence class: hosted runs and GitHub API 
   20260922 lane files. After the review, further real-checkout mutations also exit 1: a decoy
   landscape manifest with an unevidenced real-ledger edit, and a head that widens
   `GRANDFATHERED_RUN_IDS` judged by the base's gate.
+- **Second review of the gate (2026-09-23).** A second independent review raised six findings.
+  All six are closed here, and finding 2 is closed as an accepted residual.
+  - **Finding 1 (row rollback or deletion, medium).** Every `(catalog, layer_id)` row at the
+    base must still exist at the head, and there is one row per layer. The head row's run id may
+    not be older than the base row's; the grandfathered 20260922 is the oldest. A run id may
+    change only to the newest registered wave, and the row then needs the full new-wave
+    evidence. A row may not move from a new wave to grandfathered content.
+  - **Finding 3 (generator format changes, low).** Rows, wave documents and the registry are
+    compared on parsed values, and a frozen document's registry sha256 must match its reformatted
+    bytes. A pure reformat therefore passes and is not a verdict change for the trust-base rule.
+    `build_verdicts.py --check` still runs on it.
+  - **Finding 4 (trust base, low).** `TRUST_PATHS` adds `scripts/validate.py` (imported through
+    `scripts/host_receipts.py`), `tools/sota-convergence/lane-provenance.json` and
+    `adoption/host-receipt.schema.json`. A test derives the transitive repository imports of the
+    gate and its validators, and the rule inputs they read, from the modules themselves.
+  - **Finding 5 (base selection, low).** On `pull_request` the base is the checked-out merge
+    commit's first parent. The payload `base.sha` must be an ancestor of it, and the job fails
+    closed when neither is available. On a push to `main` the base is `github.event.before`, and
+    the job fails closed on an empty or all-zero value.
+  - **Finding 6 (alignment with the tooling owner's #124, low).** A row's packet is resolved
+    through its run-manifest entry (`packet_sha256`, `retained_packets`, `packets_sha256sums`),
+    not an assumed file name. A sealed packet a changed row relies on may carry no withheld key at
+    any depth. `lanes.run_manifest_sha256`, `lanes.adjudication_sha256` (bound also to the run
+    manifest's `adjudication`) and `lanes.single_lane_decision_sha256` are required and must
+    match. The names are #124's module constants, and a test compares them with
+    `scripts/landscape.py` once #124 defines them there.
+- **Accepted residual: the PR's own workflow can disable the job (finding 2, 2026-09-23).** A
+  `pull_request` run takes the job definition from the PR's `validate.yml`. A PR that edits the
+  `verdict-review-gate` job so that it no longer runs the base's gate is therefore not blocked by
+  this check.
+  - *Alternatives, all rejected.* A `pull_request_target` or `workflow_run` job would take its
+    definition from the base, but the repository's strict zizmor gate (`--no-config --no-ignores`,
+    `tests/test_workflow_hardening.py`) rejects these dangerous triggers. A ruleset "require
+    workflows" rule is available only to organizations, and this is a personal repository.
+    Required code-owner review would block the single maintainer, who cannot approve their own PR.
+  - *Mitigations in place.* They narrow the residual but do not close it. First, the job
+    executes the base branch's copy of the gate script, and that copy imports the base's trusted
+    modules. A PR that leaves the job running therefore cannot change the rules that judge it.
+    Second, the trust-base rule fails a PR that changes gate-trust files (which include
+    `validate.yml`) together with verdict data, as long as the job still runs the base's gate. To
+    get past it, a PR has to rewrite the job's own step, a visible edit of a workflow file.
+    Third, the push-to-`main` run re-checks after merge (asserted by
+    `tests/test_workflow_hardening.py`). It catches a merge judged against a stale base, but it
+    runs the merged commit's job, so it does not catch a PR that disabled that job.
+  - *Overturn.* The repository moves to an organization with required workflows, or GitHub offers
+    base-defined required checks for personal repositories.
 - **Overturn.** A merged PR that changes a verdict row without the sealed cross-family evidence
   while this check was required. The other trigger is a second maintainer joining, which would
-  make required approvals possible. The gate script comes from the base, but the job definition
-  comes from the PR (a `pull_request` workflow runs the PR's `validate.yml`). A PR that edits the
-  `verdict-review-gate` job itself so that it no longer runs the base's gate is therefore not closed
-  by this check: the trust-base rule only fires when the base's gate still runs. Closing that needs
-  a workflow the PR cannot edit, for example a ruleset-required workflow from another repository or
-  a `pull_request_target` job. Neither is adopted here: the first is documented for organization rulesets
-  (not checked for this user-owned repository) and the second is the pattern zizmor's dangerous-triggers audit rejects. Either one, once
-  qualified, would overturn this residual gap.
+  make required approvals possible. The accepted residual above has its own overturn.

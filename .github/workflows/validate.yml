@@ -133,14 +133,47 @@ jobs:
       - name: Require sealed cross-family review for changed verdict rows
         shell: bash
         env:
-          # The pull request's base, or the pushed range's previous commit on main.
-          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          EVENT_NAME: ${{ github.event_name }}
+          # Cross-check only: the base is the checked-out merge commit's first parent.
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          # The pushed range's previous commit on main.
+          PUSH_BEFORE_SHA: ${{ github.event.before }}
         run: |
-          base="${BASE_SHA:-}"
-          # A dispatch has no base and a branch-creating push has an all-zero one: compare with the parent.
-          if [ -z "$base" ] || [ -z "${base//0/}" ]; then
-            base="$(git rev-parse HEAD^)"
-          fi
+          set -euo pipefail
+          case "$EVENT_NAME" in
+            pull_request)
+              # actions/checkout checks out the PR merge commit; its first parent is the base-branch
+              # commit the PR is merged into, which is what the gate must compare with.
+              first_parent="$(git rev-parse --verify --quiet 'HEAD^1^{commit}' || true)"
+              payload="${PR_BASE_SHA:-}"
+              if [ -n "$first_parent" ] && [ -n "$payload" ]; then
+                if ! git merge-base --is-ancestor "$payload" "$first_parent"; then
+                  echo "::error::verdict-review-gate: the payload base $payload is not an ancestor of the merge commit's first parent $first_parent"
+                  exit 1
+                fi
+                base="$first_parent"
+              elif [ -n "$first_parent" ]; then
+                base="$first_parent"
+              elif [ -n "$payload" ]; then
+                base="$payload"
+              else
+                echo "::error::verdict-review-gate: neither the merge commit's first parent nor the payload base is available"
+                exit 1
+              fi
+              ;;
+            push)
+              base="${PUSH_BEFORE_SHA:-}"
+              # A branch-creating push has an all-zero before: there is no base to judge against.
+              if [ -z "$base" ] || [ -z "${base//0/}" ]; then
+                echo "::error::verdict-review-gate: the push has no previous commit (before is '$base'); failing closed"
+                exit 1
+              fi
+              ;;
+            *)
+              # workflow_dispatch has no base in its payload: compare with the parent.
+              base="$(git rev-parse --verify 'HEAD^1^{commit}')"
+              ;;
+          esac
           # The rules come from the base: run the base commit's gate (and the code it imports) against
           # this checkout, so a pull request cannot weaken the gate that judges it. Only the pull
           # request that adds the gate finds none at its base and runs its own copy.
@@ -151,7 +184,6 @@ jobs:
           else
             echo "verdict-review-gate: the base has no gate yet; running this checkout's copy (bootstrap)"
           fi
-          set -o pipefail
           python3 "$gate" --root "$GITHUB_WORKSPACE" --base "$base" | tee -a "$GITHUB_STEP_SUMMARY"
 
   secret-scan:

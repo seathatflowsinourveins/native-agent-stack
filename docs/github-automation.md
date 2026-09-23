@@ -934,8 +934,14 @@ so a PR that changes a layer verdict could merge with no review at all.
 [`scripts/verdict_review_gate.py`](../scripts/verdict_review_gate.py) on every
 pull request (no path filter, so it can be required) and on each push to
 `main`. The job has `contents: read`, starts with harden-runner in audit mode,
-and checks out full history without persisted credentials. The base sha
-reaches the script only through `env`. The job runs the base commit's copy of
+and checks out full history without persisted credentials. The event values
+reach the script only through `env`. On a pull request the base is the first
+parent of the checked-out merge commit (`git rev-parse HEAD^1`), and the
+payload's `pull_request.base.sha` must be its ancestor; if neither is
+available the job fails. On a push to `main` the base is
+`github.event.before`, and the job fails on an empty or all-zero value (a
+branch-creating push has no base). A manual dispatch compares with the
+parent. The job runs the base commit's copy of
 the script (from a detached worktree of the base) against the PR checkout, so a
 PR is judged by the rules it started from, not by rules it edits. Only the PR
 that adds the gate runs its own copy.
@@ -951,8 +957,8 @@ checks each row that is added or changed in `winners`, `platform_status`,
 when all of these hold at the head:
 
 - its wave document is registered in `layer-verdict-waves.json`;
-- its `run-manifest.json` is registered in `manifests/evidence.json` and
-  lists the row;
+- its `run-manifest.json` is registered in `manifests/evidence.json`, lists
+  the row and has the sha256 the row stores in `lanes.run_manifest_sha256`;
 - each sealed lane return exists, matches the row's `sealed_sha256` and is
   registered with that sha256, and the two lanes come from distinct model
   families;
@@ -961,24 +967,67 @@ when all of these hold at the head:
 - the row's winners equal the chosen lane's `winner_keys`, resolved through
   the wave's sealed packet, and carry the packet candidate's repository,
   recipe reference and pin and that lane's evidence class and `why_selected`.
-  With no sealed packet, the row fails closed until review finding 6 lands;
+  The packet is the one the row's run-manifest entry names by
+  `packet_sha256`, found through the manifest's `retained_packets` under
+  `<sealed_base>/packets/`. `packets/SHA256SUMS` must list it and equal the
+  manifest's `packets_sha256sums`. At no depth may the packet carry a withheld
+  key: `stars`, `forks`, `watchers`, any key ending in `_at` (except the
+  packet's own top-level `checked_at`), `latest`, `prerelease`,
+  `pin_behind_upstream`, `newcomer` and the other keys in the policy of the
+  tooling PR #124. Without a sealed packet, the row fails closed;
 - the published `alternatives` (on the fields the wave document publishes),
   `verdict_overturn_when` and `overturn_protocol` are the ones
   `record_verdicts.py` derives from the sealed returns. `open_gaps` is
   re-checked with the row but its text is not re-derived;
 - a recorded `disagree` row has an adjudication in which judges from both
-  lane families agree in both presentation orders with no refuting vote;
+  lane families agree in both presentation orders with no refuting vote. Its
+  sha256 is stored in `lanes.adjudication_sha256` and in the run-manifest
+  entry's `adjudication` `{outcome: sealed, sha256}`;
 - a recorded `codex_absent` row names a `docs/decisions/` record that carries
-  `single-lane-authorization: <catalog>/<layer_id>`.
+  `single-lane-authorization: <catalog>/<layer_id>`, and stores that record's
+  sha256 in `lanes.single_lane_decision_sha256`.
+
+If any of these `lanes` hashes is absent, the row fails.
+
+Every `(catalog, layer_id)` row at the base must still exist at the head, and
+there is one row per layer. The head row's run id may not be older than the
+base row's (run ids are dates, and the grandfathered 20260922 wave is the
+oldest). A row may not move from a new wave back to grandfathered content. A
+row may change its run id only to the newest registered wave, and it then
+needs all the new-wave evidence above.
+
+Rows, wave documents and the wave registry are compared by their parsed
+values, not their bytes. A pure formatting change of a generated wave
+document or ledger therefore passes, as long as `build_verdicts.py --check`
+passes and no row field value changes. A reformatted frozen wave document
+also needs its registry sha256 updated to the new bytes. Such a change is not
+a verdict change for the trust-base rule, so a generator format change can
+land together with its regenerated documents. Sealed artifacts count by their
+bytes.
+
+Any change of a row field value in a non-grandfathered wave needs a new
+recorded wave. The gate checks each value it re-derives against the wave's
+sealed returns, packet, adjudication and run manifest, so a changed value
+those files do not derive fails. Two kinds of change are checked instead of
+re-derived: a `platform_status` value must be the one the registered receipts
+derive, and `open_gaps` text is re-checked with the row. The gate does not
+stop a PR from rewriting the newest wave's sealed files together with their
+registrations, so a new recorded wave remains a rule for the author rather
+than a byte-level block.
 
 Every changed `platform_status` value must be the one
 `scripts/platform_status.py` derives; a change to `platform_status` alone
 needs nothing else. The newest registered
 wave is the only one that may change. A PR that changes a verdict row, a wave
 or a sealed verdict artifact fails if it also changes the gate's trust base
-(the gate script, `scripts/landscape.py`, `scripts/platform_status.py`, the
-modules they import, the `tools/sota-convergence` verdict tools or
-`validate.yml`), so a rules change lands on its own first. A base file that
+(`TRUST_PATHS`), so a rules change lands on its own first. The trust base is
+the gate script, every repository module the gate and its validators import
+(transitively, which brings in `scripts/validate.py` through
+`scripts/host_receipts.py`), the rule inputs they read (the lane-provenance
+registry `tools/sota-convergence/lane-provenance.json`, the host-receipt and
+lane-return schemas) and `validate.yml`. A test derives the imports and those
+paths from the modules themselves and fails if one is missing from the
+list. A base file that
 exists but cannot be read or parsed exits 2 instead of counting as absent.
 Whenever a row, a wave or a file under
 the sealed verdict artifacts, `catalogs/landscape/` or
@@ -988,6 +1037,13 @@ and `build_verdicts.py --check`. Run it locally with:
 ```sh
 python3 scripts/verdict_review_gate.py --base origin/main
 ```
+
+One residual is accepted. A pull request runs the job definition from its
+own `validate.yml`, so a PR that rewrites this job's step can disable the
+check for itself. No `pull_request_target` or `workflow_run` job is added,
+because the strict zizmor gate rejects those triggers, and ruleset-required
+workflows exist only for organizations. The decision record lists the
+mitigations and the overturn.
 
 `.github/main-ruleset.json` adds `verdict-review-gate` to the required checks.
 The coordinator applies it with the ruleset PUT above after this change

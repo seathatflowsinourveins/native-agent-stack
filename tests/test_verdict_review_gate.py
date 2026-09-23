@@ -79,6 +79,9 @@ class GateFixture(unittest.TestCase):
         self.git("init", "--quiet", "--initial-branch=main")
         self.registered, self.registered_overrides = set(), {}
         self.manifest_entries, self.new_wave = {}, False
+        # retained packet name -> sha256 (the run manifest's retained_packets); layer ids whose row is
+        # not bound to the run manifest (lanes.run_manifest_sha256 left out); a run-manifest override.
+        self.retained, self.unbound, self.manifest_overrides = {}, set(), {}
         self.manifest = {"schema_version": 1, "catalogs": dict(LEDGERS), "sources": {"repository_index": INDEX}}
         self.write(INDEX, dump({"aliases": {}, "records": [
             {"repository": c["repository"]} for c in PACKET["candidates"]] + [{"repository": ALTERNATIVE["repository"]}]}))
@@ -112,15 +115,23 @@ class GateFixture(unittest.TestCase):
 
     def flush(self):
         self.write(MANIFEST, dump(self.manifest))
+        if self.new_wave:
+            # The layout of #124's record_verdicts.run_manifest_document.
+            manifest = {
+                "schema_version": 1, "run_id": RUN, "sealed_base": SEALED,
+                "packets_sha256sums": "".join(f"{digest}  {name}\n" for name, digest in sorted(self.retained.items())),
+                "retained_packets": [{"name": name, "sha256": digest} for name, digest in sorted(self.retained.items())],
+                "packets": [self.manifest_entries[key] for key in sorted(self.manifest_entries)], "rejections": []}
+            manifest.update(self.manifest_overrides)
+            data = dump(manifest)
+            self.write(f"{SEALED}/run-manifest.json", data)
+            self.register(f"{SEALED}/run-manifest.json")
+            for row in self.ledger["foundation"]:
+                if row["lanes"].get("sealed_base") == SEALED and row["layer_id"] not in self.unbound:
+                    row["lanes"]["run_manifest_sha256"] = sha(data)
         for catalog, path in LEDGERS.items():
             self.write(path, dump({"schema_version": 2, "layers": self.ledger[catalog]}))
         self.write(REGISTRY, dump({"schema_version": 1, "waves": [self.waves[r] for r in sorted(self.waves)]}))
-        if self.new_wave:
-            self.write(f"{SEALED}/run-manifest.json", dump({
-                "schema_version": 1, "run_id": RUN, "sealed_base": SEALED,
-                "packets_sha256sums": f"{sha(dump(PACKET))}  foundation__beta.json\n",
-                "packets": [self.manifest_entries[key] for key in sorted(self.manifest_entries)], "rejections": []}))
-            self.register(f"{SEALED}/run-manifest.json")
         files = []
         for path in sorted(self.registered):
             data = (self.root / path).read_bytes()
@@ -162,13 +173,16 @@ class GateFixture(unittest.TestCase):
 
     def record(self, layer_id="beta", *, claude_keys=("c1",), codex_keys=("c1",), codex=True, codex_model=OPENAI,
                codex_packet=None, agreement=None, winners=None, judged=None, packets=True, single_lane=None,
-               register_lanes=True, in_run_manifest=True, register_wave=True, status="recorded"):
+               register_lanes=True, in_run_manifest=True, register_wave=True, status="recorded", packet=None):
         """Seal a new-wave (20260923) row the way record_verdicts.py would, then add it to the ledger."""
         self.new_wave = True
-        packet_bytes = dump(PACKET)
+        packet_bytes = dump(packet if packet is not None else PACKET)
+        packet_name = f"foundation__{layer_id}.json"
+        self.retained[packet_name] = sha(packet_bytes)
         if packets:
-            self.write(f"{SEALED}/packets/foundation__{layer_id}.json", packet_bytes)
-            self.write(f"{SEALED}/packets/SHA256SUMS", f"{sha(packet_bytes)}  foundation__{layer_id}.json\n".encode())
+            self.write(f"{SEALED}/packets/{packet_name}", packet_bytes)
+            self.write(f"{SEALED}/packets/SHA256SUMS", "".join(
+                f"{digest}  {name}\n" for name, digest in sorted(self.retained.items())).encode())
         run_id = f"foundation-{layer_id}-{RUN}"
         lanes = {"sealed_base": SEALED, "claude": {"run_id": "", "sealed_sha256": ""},
                  "codex": {"run_id": "", "sealed_sha256": ""}}
@@ -192,17 +206,22 @@ class GateFixture(unittest.TestCase):
             agreement = ("same_winner" if set(claude_keys) == set(codex_keys) else "disagree") if codex else "codex_absent"
         lanes["agreement"] = agreement
         chosen_keys, chosen_lane = claude_keys, "claude"
+        entry = {"catalog": "foundation", "layer_id": layer_id, "packet_sha256": sha(packet_bytes), "lanes": outcomes}
         if judged is not None:
             path = f"{SEALED}/adjudication/{run_id}.json"
             self.write(path, dump(judged))
             self.register(path)
+            # #124 binds a sealed adjudication by the row and by the run manifest.
+            lanes["adjudication_sha256"] = sha(dump(judged))
+            entry["adjudication"] = {"outcome": "sealed", "sha256": sha(dump(judged))}
             if judged.get("winner_lane") == "codex":
                 chosen_keys, chosen_lane = codex_keys, "codex"
         if single_lane is not None:
             lanes["single_lane_decision"] = single_lane
+            if (self.root / single_lane).is_file():
+                lanes["single_lane_decision_sha256"] = sha((self.root / single_lane).read_bytes())
         if in_run_manifest:
-            self.manifest_entries[layer_id] = {"catalog": "foundation", "layer_id": layer_id,
-                                               "packet_sha256": sha(packet_bytes), "lanes": outcomes}
+            self.manifest_entries[layer_id] = entry
         self.add_wave(RUN, b'{"wave": "20260923"}\n', register=register_wave)
         row = self.grandfathered_row(layer_id)
         recorded = status == "recorded"
@@ -437,7 +456,8 @@ class RecomputedAgreementTests(GateFixture):
 
     def test_new_wave_row_without_sealed_packets_fails_closed(self):
         self.record(packets=False)
-        self.assertFails(self.report(), "failing closed until review finding 6")
+        self.assertFails(self.report(), "are absent, so the row's winners cannot be resolved from the packet both "
+                                        "lanes judged; failing closed")
 
     def test_packet_not_listed_in_its_sha256sums_fails(self):
         self.record()
@@ -624,6 +644,295 @@ class PublishedFieldTests(GateFixture):
         self.assertEqual(report["changes"], [{"row": f"foundation/beta@{RUN}", "kind": "changed",
                                               "grandfathered": False}])
         self.assertPasses(report)  # re-checked against the sealed evidence; its text is not re-derived
+
+
+def moved_row(layer_id, run_id):
+    """A grandfathered-shaped row whose lanes name wave ``run_id`` (no sealed evidence behind it)."""
+    row = GateFixture.grandfathered_row(layer_id)
+    row["lanes"]["sealed_base"] = f"evidence/artifacts/layer-verdicts-{run_id}"
+    return row
+
+
+class RowContinuityTests(GateFixture):
+    """Review of #123, finding 1: rollback, deletion and moves between waves."""
+
+    def test_rollback_of_a_new_wave_row_to_its_20260922_content_fails(self):
+        self.record()
+        self.rebase()
+        self.ledger["foundation"][1] = self.grandfathered_row("beta")
+        report = self.report()
+        self.assertFails(report, f"the row moves from wave {RUN} back to the grandfathered wave 20260922")
+        self.assertEqual([change["grandfathered"] for change in report["changes"]], [True])
+
+    def test_deleted_grandfathered_row_fails(self):
+        del self.ledger["foundation"][0]
+        report = self.report()
+        self.assertFails(report, "the row present at the base is missing at the head")
+        self.assertEqual(report["removed"], ["foundation/alpha@20260922"])
+
+    def test_deleted_new_wave_row_fails(self):
+        self.record()
+        self.rebase()
+        del self.ledger["foundation"][1]
+        self.assertFails(self.report(), "the row present at the base is missing at the head")
+
+    def test_downgrade_to_an_older_non_grandfathered_wave_fails(self):
+        for run_id in ("20260923", "20260924"):
+            self.add_wave(run_id, f'{{"wave": "{run_id}"}}\n'.encode())
+        self.ledger["foundation"][0] = moved_row("alpha", "20260924")
+        self.rebase()
+        self.ledger["foundation"][0] = moved_row("alpha", "20260923")
+        self.assertFails(self.report(), "the row moves from wave 20260924 to the older wave 20260923")
+
+    def test_move_to_an_unregistered_wave_fails(self):
+        self.add_wave("20260923", b'{"wave": "20260923"}\n')
+        self.rebase()
+        self.ledger["foundation"][0] = moved_row("alpha", "20260925")
+        report = self.report()
+        self.assertFails(report, "the row moves from wave 20260922 to wave 20260925, which is not the newest "
+                                 "registered wave (20260923)")
+        self.assertIn("wave 20260925's document is not registered", self.messages(report))
+
+    def test_move_to_a_registered_wave_other_than_the_newest_fails(self):
+        for run_id in ("20260923", "20260924"):
+            self.add_wave(run_id, f'{{"wave": "{run_id}"}}\n'.encode())
+        self.rebase()
+        self.ledger["foundation"][0] = moved_row("alpha", "20260923")
+        self.assertFails(self.report(), "which is not the newest registered wave (20260924)")
+
+    def test_move_to_the_newest_wave_needs_the_full_new_wave_evidence(self):
+        self.ledger["foundation"][0] = moved_row("alpha", RUN)
+        self.add_wave(RUN, b'{"wave": "20260923"}\n')
+        report = self.report()
+        self.assertFails(report, f"the run manifest {SEALED}/run-manifest.json is missing")
+        self.assertNotIn("moves from wave", self.messages(report))
+
+    def test_move_to_the_newest_wave_with_the_full_evidence_passes(self):
+        del self.ledger["foundation"][0]
+        self.record("alpha")
+        self.assertPasses(self.report())
+
+    def test_two_rows_for_one_layer_fail(self):
+        self.record()
+        self.rebase()
+        self.ledger["foundation"].append(self.grandfathered_row("beta"))
+        self.assertFails(self.report(), "the head ledger holds 2 rows for this layer")
+
+
+class SemanticComparisonTests(GateFixture):
+    """Review of #123, finding 3: a pure formatting change of a generated document is not a value change."""
+
+    def reformat(self, path):
+        data = json.loads((self.root / path).read_bytes())
+        self.write(path, (json.dumps(data, indent=4) + "\n").encode())
+        return sha((self.root / path).read_bytes())
+
+    def test_reformatted_frozen_wave_document_with_its_registry_sha256_passes(self):
+        self.add_wave("20260923", b'{"wave": "20260923"}\n')
+        self.rebase()
+        path = "catalogs/sota-convergence/layer-verdicts-20260922.json"
+        self.waves["20260922"]["sha256"] = self.reformat(path)
+        report = self.report()
+        self.assertPasses(report)
+        self.assertFalse(report["waves_changed"])
+        self.assertIn(path, report["changed_paths"])
+        self.assertNotIn(path, report["value_changed_paths"])
+
+    def test_reformatted_frozen_wave_document_with_a_stale_registry_sha256_fails(self):
+        self.add_wave("20260923", b'{"wave": "20260923"}\n')
+        self.rebase()
+        self.reformat("catalogs/sota-convergence/layer-verdicts-20260922.json")
+        self.assertFails(self.report(), "the frozen wave 20260922's registry sha256")
+
+    def test_generator_format_change_with_regenerated_documents_passes_the_trust_rule(self):
+        row = self.record()
+        self.rebase()
+        self.write("tools/sota-convergence/build_verdicts.py", b"# new output format\n")
+        self.waves[RUN]["sha256"] = self.reformat(f"catalogs/sota-convergence/layer-verdicts-{RUN}.json")
+        self.flush()
+        self.reformat(LEDGERS["foundation"])
+        calls = []
+        report = gate.evaluate(self.root, self.base, self.root, validators=lambda root: calls.append(root) or [])
+        self.assertPasses(report)
+        self.assertEqual((report["changes"], report["waves_changed"]), ([], False))
+        self.assertEqual(calls, [self.root])  # build_verdicts.py --check still decides the reformat
+        self.assertEqual(row["verdict_status"], "recorded")
+
+    def test_generator_change_with_a_changed_wave_value_still_fails_the_trust_rule(self):
+        self.record()
+        self.rebase()
+        self.write("tools/sota-convergence/build_verdicts.py", b"# new output format\n")
+        self.add_wave(RUN, b'{"wave": "20260923", "edited": true}\n')
+        self.assertFails(self.report(), "also the gate's trust base (tools/sota-convergence/build_verdicts.py)")
+
+    def test_changed_row_value_is_a_change_whatever_the_formatting(self):
+        row = self.record()
+        self.rebase()
+        row["verdict_overturn_when"] = "never"
+        self.flush()
+        self.reformat(LEDGERS["foundation"])
+        report = gate.evaluate(self.root, self.base, self.root, validators=lambda _root: [])
+        self.assertFails(report, "verdict_overturn_when differs from the sealed claude lane return")
+
+
+class ToolingAlignmentTests(GateFixture):
+    """#124's names and bindings: packets through the run manifest, withheld keys, lane sha256 fields."""
+
+    def test_packet_not_listed_in_the_run_manifest_fails(self):
+        # The packet file sits at the conventional name, but the run manifest does not retain it:
+        # the packet is resolved through the manifest, not through an assumed file name.
+        self.record()
+        self.manifest_overrides["retained_packets"] = [{"name": "foundation__beta.json", "sha256": "6" * 64}]
+        self.assertFails(self.report(), "is not listed in the run manifest's retained_packets")
+
+    def test_retained_packet_name_that_is_not_a_plain_file_name_fails(self):
+        self.record()
+        self.manifest_overrides["retained_packets"] = [{"name": "../foundation__beta.json",
+                                                        "sha256": sha(dump(PACKET))}]
+        self.assertFails(self.report(), "is not a plain .json file name")
+
+    def test_run_manifest_without_retained_packets_fails(self):
+        self.record()
+        self.manifest_overrides["retained_packets"] = None
+        self.assertFails(self.report(), "the run manifest has no retained_packets list")
+
+    def test_packet_other_than_the_run_manifest_packet_sha256_fails(self):
+        self.record()
+        self.write(f"{SEALED}/packets/foundation__beta.json", dump({**PACKET, "extra": 1}))
+        self.assertFails(self.report(), "is not the run manifest's packet_sha256")
+
+    def test_sha256sums_other_than_the_run_manifest_text_fails(self):
+        self.record()
+        path = self.root / f"{SEALED}/packets/SHA256SUMS"
+        path.write_bytes(path.read_bytes() + f"{'c' * 64}  foundation__other.json\n".encode())
+        self.assertFails(self.report(), "SHA256SUMS is not the run manifest's packets_sha256sums")
+
+    def test_withheld_keys_in_the_sealed_packet_fail(self):
+        for layer_id, packet, label in (
+                ("stars", {**PACKET, "candidates": [{**PACKET["candidates"][0], "upstream": {"stars": 5}},
+                                                    PACKET["candidates"][1]]}, "candidates[].upstream.stars"),
+                ("pushed", {**PACKET, "candidates": [{**PACKET["candidates"][0],
+                                                      "upstream": {"meta": [{"pushed_at": "2026"}]}},
+                                                     PACKET["candidates"][1]]}, "candidates[].upstream.meta[].pushed_at"),
+                ("latest", {**PACKET, "latest": "2.0"}, "latest"),
+                ("prerelease", {**PACKET, "candidates": [{**PACKET["candidates"][0], "prerelease": True},
+                                                         PACKET["candidates"][1]]}, "candidates[].prerelease"),
+                ("behind", {**PACKET, "candidates": [{**PACKET["candidates"][0], "pin_behind_upstream": True},
+                                                     PACKET["candidates"][1]]}, "candidates[].pin_behind_upstream"),
+                ("newcomer", {**PACKET, "sota": {"newcomer": True}}, "sota.newcomer"),
+                ("forks", {**PACKET, "forks": 3, "watchers": 2}, "forks")):
+            with self.subTest(layer_id):
+                self.setUp()
+                self.record(packet=packet)
+                self.assertFails(self.report(), f"carries withheld keys ['{label}'"
+                                 if layer_id != "forks" else "carries withheld keys ['forks', 'watchers']")
+
+    def test_packet_own_checked_at_is_not_withheld(self):
+        self.record(packet={**PACKET, "checked_at": "2026-09-23"})
+        self.assertPasses(self.report())
+        self.assertEqual(gate.withheld_packet_keys({"checked_at": "x", "c": [{"checked_at": "y"}]}), ["c[].checked_at"])
+
+    def test_missing_run_manifest_sha256_fails(self):
+        self.record()
+        self.unbound.add("beta")
+        self.assertFails(self.report(), "lanes.run_manifest_sha256 is absent")
+
+    def test_wrong_run_manifest_sha256_fails(self):
+        row = self.record()
+        self.unbound.add("beta")
+        row["lanes"]["run_manifest_sha256"] = "b" * 64
+        self.assertFails(self.report(), f"lanes.run_manifest_sha256 {'b' * 64} is not the sha256 of {SEALED}/run-manifest.json")
+
+    def test_disagree_row_without_adjudication_sha256_fails(self):
+        row = self.record(claude_keys=("c1",), codex_keys=("c2",), judged=adjudication())
+        del row["lanes"]["adjudication_sha256"]
+        self.assertFails(self.report(), "lanes.adjudication_sha256 is absent")
+
+    def test_wrong_adjudication_sha256_fails(self):
+        row = self.record(claude_keys=("c1",), codex_keys=("c2",), judged=adjudication())
+        row["lanes"]["adjudication_sha256"] = "9" * 64
+        report = self.report()
+        self.assertFails(report, f"lanes.adjudication_sha256 {'9' * 64} is not the sha256 of {SEALED}/adjudication/")
+        self.assertIn("is not the sealed adjudication lanes.adjudication_sha256 names", self.messages(report))
+
+    def test_run_manifest_adjudication_other_than_the_row_fails(self):
+        self.record(claude_keys=("c1",), codex_keys=("c2",), judged=adjudication())
+        self.manifest_entries["beta"]["adjudication"] = {"outcome": "sealed", "sha256": "8" * 64}
+        self.assertFails(self.report(), "is not the sealed adjudication lanes.adjudication_sha256 names")
+
+    def test_adjudication_sha256_on_an_agreeing_row_fails(self):
+        row = self.record()
+        row["lanes"]["adjudication_sha256"] = "7" * 64
+        self.assertFails(self.report(), "lanes.adjudication_sha256 is only meaningful on a disagree row")
+
+    def test_single_lane_row_without_decision_sha256_fails(self):
+        self.decision("single-lane-authorization: foundation/beta\n")
+        row = self.record(codex=False, single_lane=DECISION)
+        del row["lanes"]["single_lane_decision_sha256"]
+        self.assertFails(self.report(), "lanes.single_lane_decision_sha256 is absent")
+
+    def test_names_match_the_tooling_owners_landscape_once_it_defines_them(self):
+        from scripts import landscape
+        for name in ("RETAINED_PACKETS_DIR", "POPULARITY_RECENCY_FIELDS", "POPULARITY_TOKENS",
+                     "UPSTREAM_RELEASE_FIELDS", "COPY_WITHHELD_FIELDS", "WITHHELD_KEY_TOKENS", "PACKET_OWN_KEYS",
+                     "SINGLE_LANE_DECISION_DIR"):
+            if hasattr(landscape, name):
+                self.assertEqual(getattr(gate, name), getattr(landscape, name), name)
+
+
+class TrustPathDerivationTests(unittest.TestCase):
+    """Review of #123, finding 4: TRUST_PATHS covers every repository module the gate and the validators
+    import (transitively) and the rule inputs they read, derived from the modules themselves."""
+
+    ROOT = Path(gate.__file__).resolve().parents[1]
+    ENTRY_POINTS = ("scripts/verdict_review_gate.py", "scripts/landscape.py", "scripts/platform_status.py",
+                    "scripts/host_receipts.py", "tools/sota-convergence/build_verdicts.py",
+                    "tools/sota-convergence/record_verdicts.py")
+
+    def local_imports(self, relative):
+        import ast
+        tree = ast.parse((self.ROOT / relative).read_text(encoding="utf-8"))
+        here = Path(relative).parent
+        found = set()
+        for node in ast.walk(tree):
+            names = []
+            if isinstance(node, ast.Import):
+                names = [alias.name for alias in node.names]
+            elif isinstance(node, ast.ImportFrom):
+                if node.level:
+                    base = here.joinpath(*(node.module or "").split(".")) if node.module else here
+                    names = [str(base).replace("/", ".")] + [f"{base}.{alias.name}".replace("/", ".")
+                                                             for alias in node.names]
+                else:
+                    names = [node.module] + [f"{node.module}.{alias.name}" for alias in node.names]
+            for name in names:
+                parts = name.split(".")
+                for directory in (Path("."), here, Path("tools/sota-convergence")):
+                    candidate = directory.joinpath(*parts).with_suffix(".py")
+                    if (self.ROOT / candidate).is_file():
+                        found.add(candidate.as_posix())
+        return found
+
+    def test_every_imported_repository_module_is_a_trust_path(self):
+        seen, queue = set(), list(self.ENTRY_POINTS)
+        while queue:
+            relative = queue.pop()
+            if relative in seen:
+                continue
+            seen.add(relative)
+            queue.extend(self.local_imports(relative) - seen)
+        self.assertIn("scripts/validate.py", seen)  # scripts/host_receipts.py imports it
+        self.assertEqual(sorted(seen - set(gate.TRUST_PATHS)), [])
+
+    def test_rule_inputs_the_modules_read_are_trust_paths(self):
+        from scripts import host_receipts, landscape
+        import record_verdicts
+        inputs = {landscape.LANE_PROVENANCE_REGISTRY, host_receipts.SCHEMA_RELATIVE_PATH,
+                  Path(record_verdicts.SCHEMA_PATH).resolve().relative_to(self.ROOT).as_posix()}
+        self.assertEqual(sorted(inputs - set(gate.TRUST_PATHS)), [])
+        self.assertIn("tools/sota-convergence/lane-provenance.json", gate.TRUST_PATHS)
+        for path in gate.TRUST_PATHS:
+            self.assertTrue((self.ROOT / path).is_file(), path)
 
 
 if __name__ == "__main__":
