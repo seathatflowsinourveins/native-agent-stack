@@ -5534,8 +5534,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "dc2c73456a714007ad282c12f73ca2700e5573cda3ddbd2ee50a7bf8248fc868",
-      "bytes": 4003
+      "sha256": "4fa841d2460b6d15669aa182b8c43453c232f0d7f680b1f78fa4f71893489238",
+      "bytes": 4133
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/strategies.py",
