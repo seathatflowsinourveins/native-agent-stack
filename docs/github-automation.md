@@ -682,9 +682,15 @@ artifact (`catalog-freshness-${{ github.run_id }}`, same run), force-creates
 4. only when `git ls-files` still tracks `docs/ecosystem/index.html`,
    **rewrite** it from the updated evidence (`scripts/build_ecosystem.py
    --write` -- this regenerates the file's actual content, not only its
-   registered hash), rehash it, and loop until `--check` passes -- if a
-   later change makes the explorer an untracked build artifact instead,
-   this whole step is skipped rather than failing.
+   registered hash), rehash it, and loop until `--check` passes. As of
+   ["Stop committing the generated explorer"](decisions/2026-09-23-generated-explorer-sorted-manifest.md)
+   the file is already `.gitignore`d on `main`, so this branch is currently
+   dead code in normal operation; it is kept (and still covered by its own
+   test, `TrackedExplorerSubprocessTests`) only so a future change that
+   tracks the explorer again does not silently reintroduce the stdout-
+   pollution bug ("H1" in
+   [the decision record](decisions/2026-09-23-bot-pr-dispatch.md)) this step
+   guards against.
 
 `propose`'s remaining steps then re-run `scripts/validate.py` and
 `scripts/host_receipts.py validate` on the result (its checkout uses
