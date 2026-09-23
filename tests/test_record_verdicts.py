@@ -20,7 +20,9 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from scripts.landscape import build_landscape, lane_winner_components, withhold_policy_labels
+from scripts.landscape import (
+    build_landscape, lane_winner_components, verify_sealed_waves, withhold_policy_labels,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 TOOL_DIR = ROOT / "tools" / "sota-convergence"
@@ -146,18 +148,19 @@ class PacketWriter:
     def __init__(self, work_dir: Path):
         self.packets_dir = work_dir / "packets"
         self.packets_dir.mkdir(parents=True, exist_ok=True)
-        self.sums = []
+        self.sums = {}
 
     def write(self, catalog, layer_id, packet) -> str:
         filename = f"{catalog}__{layer_id}.json"
         text = json.dumps(packet, sort_keys=True, indent=1) + "\n"
         (self.packets_dir / filename).write_text(text, encoding="utf-8")
         digest = hashlib.sha256(text.encode("utf-8")).hexdigest()
-        self.sums.append(f"{digest}  {filename}")
+        # One line per packet, as lane_packets.py writes it: a rebuilt packet replaces its line.
+        self.sums[filename] = f"{digest}  {filename}"
         return digest
 
     def flush(self):
-        (self.packets_dir / "SHA256SUMS").write_text("\n".join(self.sums) + "\n", encoding="utf-8")
+        (self.packets_dir / "SHA256SUMS").write_text("\n".join(self.sums.values()) + "\n", encoding="utf-8")
 
 
 def write_lane(work_dir: Path, lane: str, catalog: str, layer_id: str, data: dict):
@@ -1469,6 +1472,16 @@ class NewWaveFixture(RecordVerdictsFixture):
         super().setUp()
         prepare_new_wave_root(self)
 
+    def sealed_base(self):
+        return self.root / NEW_SEALED_BASE
+
+    def sealed_listing(self):
+        return {path.relative_to(self.root).as_posix(): path.read_bytes()
+                for path in sorted(self.sealed_base().rglob("*")) if path.is_file()}
+
+    def ledger_text(self):
+        return (self.root / record_verdicts.LEDGER_FILES["foundation"]).read_text(encoding="utf-8")
+
     def run_wave(self, **kwargs):
         output = io.StringIO()
         with contextlib.redirect_stdout(output):
@@ -1831,16 +1844,6 @@ class ReviewOf122Tests(NewWaveFixture):
     """Independent review of catalog #122 (2026-09-23), findings 1, 3, 5, 6 and 7, end to end: the
     recorder writes the wave and scripts/landscape.py re-checks it."""
 
-    def sealed_base(self):
-        return self.root / NEW_SEALED_BASE
-
-    def sealed_listing(self):
-        return {path.relative_to(self.root).as_posix(): path.read_bytes()
-                for path in sorted(self.sealed_base().rglob("*")) if path.is_file()}
-
-    def ledger_text(self):
-        return (self.root / record_verdicts.LEDGER_FILES["foundation"]).read_text(encoding="utf-8")
-
     def write_ledger_row(self, layer_id, change):
         path = self.root / record_verdicts.LEDGER_FILES["foundation"]
         document = json.loads(path.read_text(encoding="utf-8"))
@@ -2059,8 +2062,17 @@ class ReviewOf122Tests(NewWaveFixture):
 class ReviewOf124Tests(NewWaveFixture):
     """Automated review of catalog #124 (2026-09-23): landscape.py's wave reconstruction."""
 
-    def sealed_base(self):
-        return self.root / NEW_SEALED_BASE
+    def seal_then_tamper_sums(self, good, bad):
+        """Record the wave with a correct SHA256SUMS, then swap in ``bad`` as both the retained file
+        and the run manifest's copy: a wave sealed by other means, which landscape.py must reject."""
+        (self.work_dir / "packets" / "SHA256SUMS").write_text(good, encoding="utf-8")
+        code, output = self.run_wave()
+        self.assertEqual(code, 0, output)
+        manifest_file = self.sealed_base() / "run-manifest.json"
+        manifest = json.loads(manifest_file.read_text(encoding="utf-8"))
+        manifest["packets_sha256sums"] = bad
+        manifest_file.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+        (self.sealed_base() / "packets" / "SHA256SUMS").write_text(bad, encoding="utf-8")
 
     def test_a_retained_sha256sums_line_must_match_a_packet_no_lane_returned_for(self):
         # landscape.py:539: a wrong checksum line for a missing-only packet was sealed unchanged and
@@ -2071,22 +2083,40 @@ class ReviewOf124Tests(NewWaveFixture):
         lines = sums.read_text(encoding="utf-8").splitlines()
         sums.write_text("".join(("0" * 64 + line[64:] if line.endswith("wave-missing-layer.json") else line) + "\n"
                                 for line in lines), encoding="utf-8")
-        code, output = self.run_wave()
-        self.assertEqual(code, 0, output)
+        before_ledger, before_sealed = self.ledger_text(), self.sealed_listing()
+        # The recorder refuses before writing (re-review of #124), so no wave CI rejects is sealed.
+        with self.assertRaisesRegex(SystemExit, r"must list exactly the retained packets .*wave-missing-layer"):
+            self.run_wave()
+        self.assertEqual((self.ledger_text(), self.sealed_listing()), (before_ledger, before_sealed))
+        # landscape.py still rejects such a wave when it is sealed by other means.
+        self.seal_then_tamper_sums("".join(line + "\n" for line in lines), sums.read_text(encoding="utf-8"))
         with self.assertRaisesRegex(ValueError, r"must list exactly the retained packets .*wave-missing-layer"):
-            build_landscape(self.root)
+            verify_sealed_waves(self.root, {})
 
     def test_a_retained_sha256sums_must_list_every_retained_packet_once(self):
         self.both_lanes("wave-same-layer")
         self.build_packet_pair("foundation", "wave-missing-layer")
         sums = self.work_dir / "packets" / "SHA256SUMS"
-        kept = [line for line in sums.read_text(encoding="utf-8").splitlines()
-                if not line.endswith("wave-missing-layer.json")]
+        good = sums.read_text(encoding="utf-8")
+        kept = [line for line in good.splitlines() if not line.endswith("wave-missing-layer.json")]
         sums.write_text("\n".join(kept) + "\n", encoding="utf-8")
-        code, output = self.run_wave()
-        self.assertEqual(code, 0, output)
+        before_ledger, before_sealed = self.ledger_text(), self.sealed_listing()
+        with self.assertRaisesRegex(SystemExit, r"must list exactly the retained packets .*wave-missing-layer"):
+            self.run_wave()
+        self.assertEqual((self.ledger_text(), self.sealed_listing()), (before_ledger, before_sealed))
+        self.seal_then_tamper_sums(good, sums.read_text(encoding="utf-8"))
         with self.assertRaisesRegex(ValueError, r"must list exactly the retained packets .*wave-missing-layer"):
-            build_landscape(self.root)
+            verify_sealed_waves(self.root, {})
+
+    def test_a_duplicated_sha256sums_line_is_refused_before_writing(self):
+        self.both_lanes("wave-same-layer")
+        sums = self.work_dir / "packets" / "SHA256SUMS"
+        text = sums.read_text(encoding="utf-8")
+        sums.write_text(text + text.splitlines()[0] + "\n", encoding="utf-8")
+        before_sealed = self.sealed_listing()
+        with self.assertRaisesRegex(SystemExit, r"packets/SHA256SUMS lists foundation__wave-same-layer.json twice"):
+            self.run_wave()
+        self.assertEqual(self.sealed_listing(), before_sealed)
 
     def test_a_sealed_winner_key_must_name_an_adopted_candidate(self):
         # landscape.py:263: the reconstruction accepted a winner key naming a non-adopted candidate,

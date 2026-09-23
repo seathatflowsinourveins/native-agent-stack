@@ -96,7 +96,8 @@ from scripts.landscape import (  # noqa: E402
     RUN_MANIFEST_NAME, RETAINED_PACKETS_DIR, is_grandfathered_run, judge_adjudication,
     lane_model_issue, lane_provenance_issue, load_lane_provenance_registry,
     lane_provenance_registry_issue, registered_provenance_entry, claude_refutation_issue,
-    packet_component_id, single_lane_authorizes, single_lane_decision_path_issue, withheld_packet_keys,
+    packet_component_id, parse_retained_sha256sums, single_lane_authorizes, single_lane_decision_path_issue,
+    withheld_packet_keys,
 )
 # One platform-status rule for every caller (2026-09-23 peer audit, item 6): scripts/platform_status.py
 # (catalog PR #117) derives each platform's status from the host receipts and registered evidence;
@@ -1232,6 +1233,19 @@ def main(argv=None) -> int:
     if not grandfathered:
         manifest = run_manifest_document(work_dir, run_date, sealed_base, outcomes, rejections,
                                          failures=failures, only=only, previous=previous)
+        # The same rule landscape.py applies to a sealed wave, checked before anything is written: the
+        # retained SHA256SUMS lists exactly the retained packets with their actual sha256, including
+        # packets no lane returned for (re-review of catalog #124). Otherwise --write would seal a wave
+        # CI rejects, and a sealed wave is never re-recorded.
+        sums_issue, sums_listed = parse_retained_sha256sums(manifest["packets_sha256sums"])
+        retained_sha = {item["name"]: item["sha256"] for item in manifest["retained_packets"]}
+        if sums_issue is not None:
+            raise SystemExit(f"packets/SHA256SUMS {sums_issue}; rebuild it with lane_packets.py")
+        if sums_listed != retained_sha:
+            differing = sorted(name for name in set(sums_listed) | set(retained_sha)
+                               if sums_listed.get(name) != retained_sha.get(name))
+            raise SystemExit("packets/SHA256SUMS must list exactly the retained packets and their sha256 "
+                             f"(differs for {differing}); rebuild it with lane_packets.py")
         packets_dir = work_dir / "packets"
         for item in manifest["retained_packets"]:
             if only is not None and item["name"] not in only:
