@@ -7379,8 +7379,8 @@
     },
     {
       "path": "catalogs/us-equities/gates-20260922.json",
-      "sha256": "a3ffea5d7e8b91f2ac759bcd1b6beaf6d92edca18f3f21ac16193eff6e9fa164",
-      "bytes": 23836
+      "sha256": "ae246f11ae07619a675d65573b02085a064fdc9c860ffaf31860f7e6c626f1fc",
+      "bytes": 25306
     },
     {
       "path": "catalogs/us-equities/hosting-source-review.json",
@@ -7714,8 +7714,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "f5cc7d311fa7300ff15d8e18edf7ba48900e3cdd26ce4d405a88b35c1d10787a",
-      "bytes": 8547
+      "sha256": "261856a70c35569bfb917383fa69de47a8dfbfb4c4aa14b923187e8fd10ea19a",
+      "bytes": 9115
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -11984,8 +11984,8 @@
     },
     {
       "path": "tests/test_spy_parity.py",
-      "sha256": "80c9ce5016c48efe3a10e7ab23878506d343b9130f17fa9cdd47f4f467839f70",
-      "bytes": 51199
+      "sha256": "7b2ff836382c6004a3c52e4928ec460423af2b9a8c7b12c9e8575a3e4fd7c11b",
+      "bytes": 51829
     },
     {
       "path": "tests/test_stack_lifecycle.py",
@@ -13461,6 +13461,116 @@
       "path": "evidence/artifacts/sdk-runtime-coverage-20260922/gated-items-20260923.json",
       "sha256": "89bee2253800096417fbb03b0352cd1f701b49d2f28feb0ce015aaeeee75c160",
       "bytes": 13895
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/mapping-manifest-v2.json",
+      "sha256": "1b821d7ba42ea6121002a26a5082df08ed7a79f9a50b2edc9959503e1088ac67",
+      "bytes": 37153
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/PREREGISTRATION-v2.md",
+      "sha256": "4393a1b7d896b2f49c4091c18701bd08cfc72a8d313f0ad2a628e91db26d6f0c",
+      "bytes": 8223
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/probes/v2/nt_probe-div.observed.json",
+      "sha256": "af0423d12045c2f2fcd8b622e74cb349b58e2d7daa95be8b4ddee32277ccb086",
+      "bytes": 2742
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/probes/v2/nt_probe.py",
+      "sha256": "28a39f20b6a813702b9160ed7c4c71bfbe6bc105e081ddb2121471ad52404183",
+      "bytes": 4311
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/probes/v2/probe_gap_open.observed.json",
+      "sha256": "a96296816b18837a65799342db3e96bfa2c6f06e4756aa4a4673edb69fba565e",
+      "bytes": 3159
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/probes/v2/probe_gap_open.py",
+      "sha256": "31e309217b04fd79e5820c55cfaf10f99020cf21bf9833003ec4969dd68c738a",
+      "bytes": 4413
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/probes/v2/probe_oco-adaptive.observed.json",
+      "sha256": "0481620d334136f8df756bfc8b5f9ff45eb305a94b78a9a682a7eb12622a0367",
+      "bytes": 2544
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/probes/v2/probe_oco-default.observed.json",
+      "sha256": "3390402c2d430cda16aff7e373ef8e1b0d913fd2050c4cecfd635c8b6cc026a5",
+      "bytes": 2531
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/probes/v2/probe_oco.py",
+      "sha256": "4e66d20c9adfa13176a35e7785d07c062f1a4d029cac6e79cfcb90faa85744cb",
+      "bytes": 4280
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/probes/v2/probe_oco_full.observed.json",
+      "sha256": "12c2aa58db003b064ab78e51a275f519c0760dd89fb970453169223707342278",
+      "bytes": 3504
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/probes/v2/probe_oco_full.py",
+      "sha256": "a9d7ac9eff27c1b085e4a4bf85e6d4d1eda00a2868d1bf829587ea8b9f3a862b",
+      "bytes": 4281
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/probes/v2/probe_oco_moo_p4-adaptive-shift220.observed.json",
+      "sha256": "68ae2316c30dbcfa51cb363f8552f9fc3435b8499ed8066655a62d296b689d9b",
+      "bytes": 17420
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/probes/v2/probe_oco_moo_p4-adaptive.observed.json",
+      "sha256": "07778e2a408c77b7bd6a6dcfbc54fa4ae0b4f1180924a2e991fb775ee6d90ee1",
+      "bytes": 17292
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/probes/v2/probe_oco_moo_p4-default-shift220.observed.json",
+      "sha256": "5dec34cdb10af1fe377ae99d0f168f4d607f8ae23b3d7104c0277af26870ab14",
+      "bytes": 17525
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/probes/v2/probe_oco_moo_p4-default.observed.json",
+      "sha256": "884cf16ff0ac9653e6b65a04d34e73f87bd2c1b406f909714bd975763eda525f",
+      "bytes": 17354
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/probes/v2/probe_oco_moo_p4.py",
+      "sha256": "d51dff36abe593d6f438f4fde0f3443729e5462c14762a2008a76b891fe1089f",
+      "bytes": 8748
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/probes/v2/probe_sim_module_cash.observed.json",
+      "sha256": "afd061e125a761be0fb0b1548e3cde8fcc9e7326a1256e39fd58d7cd25e5fedf",
+      "bytes": 3300
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/probes/v2/probe_sim_module_cash.py",
+      "sha256": "e48870b2dece9eedf446ab6721c7294cbc4813251315cd74547cf800bc9f3d81",
+      "bytes": 4195
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/probes/v2/probe_sim_module_exdate.observed.json",
+      "sha256": "a0fa8868051d593421bcc71ef3e2d287373a94d3716937c06beb2465616efc4f",
+      "bytes": 6237
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/probes/v2/probe_sim_module_exdate.py",
+      "sha256": "eb5363800ade98fdea90387c92530b2b320681c7e3e709bfbd4dcd281ad9cc59",
+      "bytes": 8177
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/probes/v2/probe_sim_module_timer.observed.json",
+      "sha256": "854e8dba24b7d22a325d393a1bc73c46928fcf402918581478678fc707c255b3",
+      "bytes": 3513
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/probes/v2/probe_sim_module_timer.py",
+      "sha256": "f208abaadbed6f34b8ec7e69595cd8a6c97d14164208e6412e10d870d64c5482",
+      "bytes": 4266
     }
   ],
   "convergence_records": [
