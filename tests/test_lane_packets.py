@@ -940,6 +940,21 @@ class RegisteredReceiptsTests(LanePacketsFixture):
         self.assertEqual([(r["path"], r["matched_by"]) for r in candidate["registered_receipts"]],
                          [("evidence/receipts/a.json", "component_id")])
 
+    def test_label_bearing_receipts_are_left_out_of_blind_packets(self):
+        # Codex review of #145: a path such as native-session-defaults-20260920.json repeats the withheld id.
+        _packet, candidate = self.candidate()
+        component = candidate["component_id"]
+        self.receipts({"id": "native-session-defaults-20260920", "kind": "native_cli_e2e", "component_ids": [component],
+                       "path": "evidence/receipts/native-session-defaults-20260920.json"},
+                      {"id": "neutral-run-20260920", "kind": "native_cli_e2e", "component_ids": [component],
+                       "path": "evidence/receipts/neutral-run-20260920.json"})
+        packet, candidate = self.candidate(self.build(registered_receipts=True, withhold=True))
+        self.assertEqual([r["path"] for r in candidate["registered_receipts"]],
+                         ["evidence/receipts/neutral-run-20260920.json"])
+        self.assertTrue(any("selection role" in label for label in packet["withheld"]))
+        _packet, open_candidate = self.candidate(self.build(registered_receipts=True))
+        self.assertEqual(len(open_candidate["registered_receipts"]), 2)
+
     def test_default_build_is_unchanged(self):
         self.receipts({"id": "r1", "kind": "host_e2e", "component_ids": ["anything"], "path": "evidence/receipts/a.json"})
         self.assertEqual(self.build(), self.build(registered_receipts=False))
@@ -948,13 +963,13 @@ class RegisteredReceiptsTests(LanePacketsFixture):
 
     def test_withheld_packets_keep_kind_and_path_but_not_the_receipt_id(self):
         _packet, candidate = self.candidate()
-        self.receipts({"id": "native-session-defaults-20260920", "kind": "host_e2e",
+        self.receipts({"id": "native-session-run-20260920", "kind": "host_e2e",
                        "component_ids": [candidate["component_id"]], "path": "evidence/receipts/a.json"})
         packets = self.build(registered_receipts=True, withhold=True)
         packet, candidate = self.candidate(packets)
         self.assertEqual(candidate["registered_receipts"], [
             {"kind": "host_e2e", "path": "evidence/receipts/a.json", "matched_by": "component_id"}])
-        self.assertNotIn("native-session-defaults", "".join(packets.values()))
+        self.assertNotIn("native-session-run-20260920", "".join(packets.values()))
         for text in packets.values():
             document = json.loads(text)
             self.assertEqual(withheld_packet_keys(document), [])

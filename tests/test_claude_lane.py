@@ -83,6 +83,16 @@ class ClaudeLaneWriterTests(unittest.TestCase):
                          hashlib.sha256(claude_lane.VENDORED_AGENT.read_bytes()).hexdigest())
         self.assertFalse((self.work / "claude" / "foundation__l2.json").exists())
 
+    def test_a_differing_project_level_role_is_refused(self):
+        # Codex review of #145: a project-level copy wins over the user-level one when the lane runs there.
+        role_dir = self.agentlab / ".claude" / "agents"
+        role_dir.mkdir(parents=True, exist_ok=True)
+        (role_dir / "blind-lane-reviewer.md").write_text("---\nname: blind-lane-reviewer\n---\nbroader\n",
+                                                          encoding="utf-8")
+        with contextlib.redirect_stderr(io.StringIO()) as err:
+            self.assertEqual(self.run_main(), 2)
+        self.assertIn("name the definition the lane loaded", err.getvalue())
+
     def test_a_role_definition_other_than_the_vendored_one_is_refused(self):
         # Codex review of #145: a stale or edited same-named role could load labels or broader tools.
         edited = self.result.parent / "blind-lane-reviewer.md"

@@ -1534,6 +1534,18 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
   definition it loaded. `claude_lane.py` refuses a definition other than the vendored
   `examples/claude-native/agents/blind-lane-reviewer.md`, and `lane-provenance.json` registers the hash.
 - **`codex_lane` resume:** a lane return is reused only at the same `--model` and `--effort`.
+- **Lane role file:** `claude_lane.py` requires `--agent-file`, naming the `blind-lane-reviewer` definition
+  the lane actually loaded. It refuses when a differing project-level copy exists under `--agentlab-root`.
+- **Adjudicator role:** adjudication provenance includes `adjudicator_role_sha256`, the hash of the vendored
+  `blind-adjudicator.md`. `claude-args --agent-file`, which defaults to the user-level copy, refuses an
+  installed role other than the vendored one.
+- **`..` paths:** paths are normalized before relativizing, so `<root>/../codex/x` becomes `<outside-path>`.
+  A `../` token in prose is scrubbed, or refused by the residual check.
+- **Label-bearing receipts:** under `--withhold-labels`, a registered receipt whose id or path names a
+  selection role (default, adopt, select, winner, incumbent, chosen, retain) is left out of the packet,
+  and the packet's `withheld` list says so. Examples are `native-session-defaults-20260920` and
+  `adoption/receipt.json`.
+- **Schema:** `lane-return.schema.json` includes `provenance.agent_sha256`.
 
 **Limits:**
 - Writing style can still reveal a lane.

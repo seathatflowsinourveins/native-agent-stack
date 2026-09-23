@@ -35,6 +35,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import posixpath
 import re
 import shutil
 import sys
@@ -143,6 +144,7 @@ URL = re.compile(r"https?://\S+")
 ABSOLUTE_TEXT_PATH = re.compile(_PATH_START + r"/+[A-Za-z0-9_.]" + _PATH_CHARS + "*")
 HOME_TEXT_PATH = re.compile(r"(?:~|\$HOME\b|\$\{HOME\})(?:/" + _PATH_CHARS + r"*)?(?![\w])")
 HOST_PLACEHOLDER = re.compile(r"<host-path>(?:/" + _PATH_CHARS + "*)?")
+PARENT_TEXT_PATH = re.compile(_PATH_START + r"\.\.(?:/" + _PATH_CHARS + r"*)?(?![\w])")
 OUTSIDE = "<outside-path>"
 PACKET_TOKEN = "PACKET"
 # What must never remain in an input after scrubbing (checked by ``unscrubbed_paths``): an absolute path, a
@@ -154,6 +156,7 @@ RESIDUAL_PATTERNS = (
     re.compile(r"(?<![\w])~[\w.-]*/" + _PATH_CHARS + "*"),
     re.compile(r"\$HOME\b|\$\{HOME\}"),
     re.compile(r"<host-path>"),
+    re.compile(r"(?<![\w.])\.\./"),
 )
 
 
@@ -166,7 +169,8 @@ def _outside(path: str) -> str:
 def map_host_path(path: str, packets_dir: str, repo_roots=()) -> str:
     """One absolute path: PACKET under ``packets_dir``, repository-relative under a lane root, else
     the bare ``<outside-path>``."""
-    core = "/" + path.lstrip("/")
+    # Resolve . and .. first (Codex review of #145): /root/export/../codex/x must not become ../codex/x.
+    core = posixpath.normpath("/" + path.lstrip("/"))
     packets = str(packets_dir).rstrip("/")
     if core == packets or core.startswith(packets + "/"):
         return PACKET_TOKEN
@@ -206,6 +210,7 @@ def _scrub_segment(text: str, packets_dir: str, repo_roots) -> str:
 
     text = HOST_PLACEHOLDER.sub(outside, text)
     text = HOME_TEXT_PATH.sub(outside, text)
+    text = PARENT_TEXT_PATH.sub(outside, text)
     return ABSOLUTE_TEXT_PATH.sub(absolute, text)
 
 
@@ -807,7 +812,8 @@ def collect_claude(work_dir: Path, result, model: str, repo=None) -> list:
             if not input_changed:
                 # A leak reported on an input rebuilt since the snapshot is about the old content: discarded,
                 # so it cannot mark the rebuilt input as leaked.
-                leaks.append((name, order, input_path, {**leak, "family": "anthropic"}))
+                leaks.append((name, order, input_path, {**leak, "family": "anthropic",
+                                                        "input_sha256": judged_sha256}))
         if leak is not None:
             failure = LEAK
         elif not item:
@@ -908,11 +914,28 @@ def assemble_layer(work_dir: Path, entry: dict, leaked_inputs=frozenset()):
     return record, notes, [f"{name}.{order}.json" for order in leaked_orders]
 
 
+ADJUDICATOR_ROLE = "blind-adjudicator"
+VENDORED_ADJUDICATOR = HERE.parents[1] / "examples" / "claude-native" / "agents" / f"{ADJUDICATOR_ROLE}.md"
+DEFAULT_ADJUDICATOR_FILE = Path.home() / ".claude" / "agents" / f"{ADJUDICATOR_ROLE}.md"
+
+
 def adjudication_provenance() -> dict:
-    """What produced a record: this script, the prompt, both judgment schemas and the Claude family's workflow."""
+    """What produced a record: this script, the prompt, both judgment schemas, the Claude family's workflow and
+    the vendored blind-adjudicator role it runs as (claude-args refuses an installed role other than this)."""
     return {"adjudicate_py_sha256": sha256_file(Path(__file__).resolve()), "prompt_sha256": sha256_file(PROMPT_PATH),
             "judge_schema_sha256": sha256_file(JUDGE_SCHEMA), "refute_schema_sha256": sha256_file(REFUTE_SCHEMA),
-            "workflow_sha256": sha256_file(WORKFLOW_PATH)}
+            "workflow_sha256": sha256_file(WORKFLOW_PATH), "adjudicator_role_sha256": sha256_file(VENDORED_ADJUDICATOR)}
+
+
+def adjudicator_role_issue(agent_file: Path):
+    """None when the role definition the Claude judges will load is the vendored one (Codex review of #145):
+    a stale or edited copy could load project instructions or broader tools."""
+    if not Path(agent_file).is_file():
+        return f"adjudicate: role definition {agent_file} not found; install the vendored {ADJUDICATOR_ROLE}.md"
+    if sha256_file(Path(agent_file)) != sha256_file(VENDORED_ADJUDICATOR):
+        return (f"adjudicate: {agent_file} is not the vendored {VENDORED_ADJUDICATOR.name}; install the vendored "
+                "role before running the Claude judges")
+    return None
 
 
 def assemble(work_dir: Path, out_dir: Path, layers=None):
@@ -992,6 +1015,9 @@ def parse_args(argv=None):
     cargs.add_argument("--work-dir", required=True, type=Path)
     cargs.add_argument("--repo", required=True, type=Path)
     cargs.add_argument("--layers", default=None)
+    cargs.add_argument("--agent-file", type=Path, default=DEFAULT_ADJUDICATOR_FILE,
+                       help="The blind-adjudicator definition the Claude judges will load (default: the user-level "
+                            "copy; a project-level copy in the directory the workflow runs from wins over it).")
     collect = sub.add_parser("claude-collect", help="Write the Claude judgments from the workflow return.")
     collect.add_argument("--work-dir", required=True, type=Path)
     collect.add_argument("--result", required=True, type=Path)
@@ -1027,7 +1053,8 @@ def main(argv=None) -> int:
         return run_codex(args)
     if args.command == "claude-args":
         repo = args.repo.resolve()
-        refusal = refuse_roots("--repo", [repo]) or refuse_work_dir_inside(args.work_dir, repo)
+        refusal = (refuse_roots("--repo", [repo]) or refuse_work_dir_inside(args.work_dir, repo)
+                   or adjudicator_role_issue(args.agent_file))
         if refusal:
             print(refusal, file=sys.stderr)
             return 2

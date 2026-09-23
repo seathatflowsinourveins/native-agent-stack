@@ -501,9 +501,23 @@ def receipts_for(item: dict, component_id, index: dict, withhold: bool = False) 
             matched = [(entry, "repository") for entry in index["by_repository"][slug]["entries"]]
     result = []
     for entry, matched_by in sorted(matched, key=lambda pair: pair[0]["path"]):
+        if withhold and label_bearing_receipt(entry):
+            # The path would carry what the withheld id carried (Codex review of #145): left out of a blind
+            # packet; attach_registered_receipts counts it in the packet's withheld list.
+            continue
         fields = {"kind": entry["kind"], "path": entry["path"]} if withhold else dict(entry)
         result.append({**fields, "matched_by": matched_by})
     return result
+
+
+# A receipt id or file name that names a selection role (for example native-session-defaults-20260920,
+# adoption/receipt.json) repeats the incumbent label the blind packet withholds.
+LABEL_BEARING_RECEIPT = re.compile(r"default|adopt|select|winner|incumbent|chosen|retain", re.I)
+
+
+def label_bearing_receipt(entry: dict) -> bool:
+    return bool(LABEL_BEARING_RECEIPT.search(entry.get("id") or "")
+                or LABEL_BEARING_RECEIPT.search(entry.get("path") or ""))
 
 
 REGISTERED_RECEIPTS_NOTE = ("registered_receipts lists the receipts manifests/evidence.json registers for a "
@@ -527,6 +541,9 @@ def attach_registered_receipts(packet: dict, index: dict, withhold: bool = False
     if withhold:
         withheld = list(packet.get("withheld", []))
         withheld.extend(label for label in WITHHELD_RECEIPT_ID_LABELS if label not in withheld)
+        label = "registered_receipts[] whose id or path names a selection role (default, adopt, select, winner)"
+        if label not in withheld:
+            withheld.append(label)
         packet["withheld"] = withheld
     return packet
 

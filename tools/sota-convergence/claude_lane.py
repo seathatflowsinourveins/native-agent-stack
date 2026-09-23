@@ -103,6 +103,10 @@ def lane_provenance(agentlab_root: Path, workflow: str, sums: dict, agent_file: 
         raise ProvenanceError(f"{agentlab_root} is not a git checkout: {head.stderr.strip()}")
     if git(agentlab_root, "diff", "--quiet", "HEAD", "--", workflow).returncode != 0:
         raise ProvenanceError(f"{workflow} differs from HEAD in {agentlab_root}; commit it before recording")
+    project_role = agentlab_root / ".claude" / "agents" / f"{LANE_AGENT}.md"
+    if project_role.is_file() and project_role.read_bytes() != Path(agent_file).read_bytes():
+        # A lane run from the agent-lab checkout loads this copy, not the one named.
+        raise ProvenanceError(f"{project_role} differs from {agent_file}; name the definition the lane loaded")
     return {"workflow_path": workflow, "workflow_sha256": digest, "agentlab_commit": head.stdout.strip(),
             "agent_sha256": agent_sha256(agent_file)}
 
@@ -143,9 +147,10 @@ def parse_args(argv=None):
     parser.add_argument("--work-dir", type=Path, required=True, help="The lane_packets.py work dir.")
     parser.add_argument("--agentlab-root", type=Path, required=True, help="The agent-lab checkout the lane ran from.")
     parser.add_argument("--workflow", default=DEFAULT_WORKFLOW, help="Workflow path relative to --agentlab-root.")
-    parser.add_argument("--agent-file", type=Path, default=DEFAULT_AGENT_FILE,
-                        help=f"The {LANE_AGENT} definition the lane loaded (default: the user-level copy; a "
-                             "project-level copy in the directory the lane ran from wins over it).")
+    parser.add_argument("--agent-file", type=Path, required=True,
+                        help=f"The {LANE_AGENT} definition the lane actually loaded: a project-level copy in the "
+                             "directory the lane ran from wins over the user-level one, so name the loaded file "
+                             "(Codex review of #145).")
     parser.add_argument("--resolved-model", default=None,
                         help="Resolved child model name (e.g. claude-opus-5-5); default keeps the bound alias.")
     return parser.parse_args(argv)

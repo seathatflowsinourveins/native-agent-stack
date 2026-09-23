@@ -299,7 +299,8 @@ class AssembleTests(AdjudicateFixture):
                     "prompt_sha256": TOOL_DIR / "adjudication-prompt.md",
                     "judge_schema_sha256": TOOL_DIR / "adjudication-judge.schema.json",
                     "refute_schema_sha256": TOOL_DIR / "adjudication-refute.schema.json",
-                    "workflow_sha256": TOOL_DIR / "adjudication-lane.js"}
+                    "workflow_sha256": TOOL_DIR / "adjudication-lane.js",
+                    "adjudicator_role_sha256": adjudicate.VENDORED_ADJUDICATOR}
         self.assertEqual(record["provenance"], {key: hashlib.sha256(path.read_bytes()).hexdigest()
                                                 for key, path in expected.items()})
         self.assertEqual(self.assert_valid(record)["winner_lane"], "codex")
@@ -652,6 +653,42 @@ class SecondRereviewOf145Tests(AdjudicateFixture):
         self.assertEqual(code, 1)
         self.assertIsNone(record)
         self.assertIn("different provenance", err)
+
+
+class ThirdRereviewOf145Tests(AdjudicateFixture):
+    """Codex re-review of #145 (third round)."""
+
+    def test_parent_traversal_never_relativizes_into_a_sibling(self):
+        root = str(self.repo)
+        text = f"see {root}/../codex/return.json and ../codex/x.json"
+        scrubbed = adjudicate.scrub_text(text, str(self.work / "packets"), (root,))
+        self.assertNotIn("../", scrubbed)
+        self.assertNotIn("codex/return.json", scrubbed)
+        self.assertTrue(adjudicate.unscrubbed_paths({"why": "left ../codex/x.json"}))
+
+    def test_claude_args_refuses_an_installed_role_other_than_the_vendored_one(self):
+        self.inputs()
+        edited = self.base / "blind-adjudicator.md"
+        edited.write_text(adjudicate.VENDORED_ADJUDICATOR.read_text(encoding="utf-8") + "\nextra\n", encoding="utf-8")
+        code, err = quiet(adjudicate.main, ["claude-args", "--work-dir", str(self.work), "--repo", str(self.repo),
+                                            "--agent-file", str(edited)])
+        self.assertEqual(code, 2)
+        self.assertIn("is not the vendored", err)
+        code, _err = quiet(adjudicate.main, ["claude-args", "--work-dir", str(self.work), "--repo", str(self.repo),
+                                             "--agent-file", str(adjudicate.VENDORED_ADJUDICATOR)])
+        self.assertEqual(code, 0)
+        self.assertIn("adjudicator_role_sha256", adjudicate.adjudication_provenance())
+
+    def test_a_claude_leak_binds_to_the_snapshot_hash(self):
+        self.inputs()
+        adjudicate.claude_args(self.work, self.repo)
+        snapshot = json.loads((self.work / "adjudication-judgments" / "claude"
+                               / adjudicate.CLAUDE_ARGS_SNAPSHOT).read_text(encoding="utf-8"))["inputs"]
+        result = {"items": [{"name": NAME, "order": "AB", "packet_sha256": self.sha,
+                             "leak": {"stage": "judge", "text": "the Codex lane"}}]}
+        adjudicate.collect_claude(self.work, result, "claude-opus-5-5")
+        records = json.loads((self.work / "adjudication-judgments" / "claude" / "leaks.json").read_text())["leaks"]
+        self.assertEqual([record["input_sha256"] for record in records], [snapshot[f"{NAME}.AB"]])
 
 
 class InputScrubTests(AdjudicateFixture):
