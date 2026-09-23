@@ -691,6 +691,25 @@ def held_resume_matches_ledger(ledger, observation):
         raise SafetyError("held_resume_external_order")
 
 
+class LiveEventLog(list):
+    """The controller's event list that also appends each event to a JSON-lines file as
+    it happens (``--live-dir``), for a live view of decisions and intents. Observation
+    only: a write failure is counted and never interrupts trading."""
+
+    def __init__(self, path):
+        super().__init__()
+        self.path, self.write_errors = Path(path), 0
+        self.path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+
+    def append(self, event):
+        super().append(event)
+        try:
+            with self.path.open("a") as f:
+                f.write(json.dumps({"at": time.time(), **event}, default=str, sort_keys=True) + "\n")
+        except (OSError, TypeError, ValueError):
+            self.write_errors += 1
+
+
 class Controller:
     def __init__(self, ledger, close, *, market_open, clock=time.time):
         self.ledger, self.close, self.market_open, self.clock = ledger, close, market_open, clock
@@ -884,7 +903,8 @@ PROJECT_EQUITY_FLOOR_USD = 25000
 RECONCILE_EVERY_SECONDS = 30  # periodic broker snapshot and reconciliation during a run
 
 
-async def run_native(controller, policy_config, assets, trial_id, config, baseline_cash, *, account_fingerprint="simulation"):
+async def run_native(controller, policy_config, assets, trial_id, config, baseline_cash, *, account_fingerprint="simulation",
+                     log_directory=None):
     from native_adapter import build_node
     from native_strategy import AdaptiveStrategy
     # R5: use the same registry entries load_config already validated (and
@@ -918,7 +938,8 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
                 for a in assets]
     session_policy = validate_session_policy(config)
     session = build_node(port, metadata, [strategy], account_id="ALPACA-PAPER-" + account_fingerprint[:16],
-                         max_order_submit_rate="180/00:01:00", session_policy=session_policy)
+                         max_order_submit_rate="180/00:01:00", session_policy=session_policy,
+                         log_directory=log_directory)
     task = asyncio.create_task(session.run_async())
     started = time.monotonic()
     last_reconciliation = started
@@ -1367,6 +1388,10 @@ def main():
                          help="the exact bars/universe input file the promotion "
                               "gate validated (its hash must match --gate-result's "
                               "input_sha256); required for `paper`")
+    parser.add_argument("--live-dir", type=Path, default=None,
+                         help="optional directory for a live record of this run: events.jsonl "
+                              "(decisions and intents as they happen) and NautilusTrader's own "
+                              "JSON log under nautilus/; observation only")
     args = parser.parse_args()
     LAST_OUTPUT = args.output
     if not re.fullmatch(r"[a-z0-9-]{1,24}", args.trial):
@@ -1501,6 +1526,8 @@ def main():
                 if controller_market_open:
                     controller_close = extended_session_close(now_dt).astimezone(timezone.utc).timestamp()
             controller = Controller(ledger, controller_close, market_open=controller_market_open)
+            if args.live_dir is not None:
+                controller.events = LiveEventLog(args.live_dir / "events.jsonl")
             if args.command == "recover":
                 metadata = previous_metadata
                 if metadata["config_sha256"] != summary["config_sha256"]:
@@ -1553,7 +1580,8 @@ def main():
                 controller.port = fresh_port()
                 try:
                     outcome = await run_native(controller, policy_config, observation["assets"], args.trial,
-                                               config, metadata["baseline_cash"], account_fingerprint=fingerprint)
+                                               config, metadata["baseline_cash"], account_fingerprint=fingerprint,
+                                               log_directory=None if args.live_dir is None else args.live_dir / "nautilus")
                 except Exception as exc:
                     outcome = {"status": "needs_attention", "flat": False, "native_fill_events": 0,
                                "error_type": type(exc).__name__}

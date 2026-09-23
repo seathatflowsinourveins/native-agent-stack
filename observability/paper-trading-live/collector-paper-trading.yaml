@@ -1,0 +1,51 @@
+# Merge into the ecosystem OpenTelemetry Collector config (otelcol-contrib 0.161.0).
+# Paper-trading run records -> local Loki. Bodies are kept (they are the manifest);
+# account identifiers are redacted before export. Paths use the collector user's HOME.
+receivers:
+  file_log/paper_events:
+    include: ["${env:HOME}/.local/state/native-agent-stack/alpaca-paper/live/*/events.jsonl"]
+    start_at: beginning
+    storage: file_storage
+    include_file_name: true
+    include_file_path: false
+    max_log_size: 1MiB
+    operators:
+      - type: json_parser
+        on_error: send_quiet
+        parse_from: body
+        parse_to: attributes
+      - type: add
+        field: resource["service.name"]
+        value: adaptive-paper
+  file_log/paper_nautilus:
+    include: ["${env:HOME}/.local/state/native-agent-stack/alpaca-paper/live/*/nautilus/*.jsonl"]
+    start_at: beginning
+    storage: file_storage
+    include_file_name: true
+    include_file_path: false
+    max_log_size: 1MiB
+    operators:
+      - type: json_parser
+        on_error: send_quiet
+        parse_from: body
+        parse_to: attributes
+      - type: add
+        field: resource["service.name"]
+        value: nautilus-trader
+processors:
+  transform/paper_trading:
+    error_mode: ignore
+    log_statements:
+      - context: log
+        statements:
+          - replace_pattern(body, "ALPACA-PAPER-[0-9a-f]{8,64}", "ALPACA-PAPER-[redacted]")
+          - replace_pattern(body, "[0-9a-f]{64}", "[redacted]")
+          - replace_pattern(attributes["message"], "ALPACA-PAPER-[0-9a-f]{8,64}", "ALPACA-PAPER-[redacted]") where attributes["message"] != nil
+          - replace_pattern(attributes["message"], "[0-9a-f]{64}", "[redacted]") where attributes["message"] != nil
+          - delete_key(attributes, "color")
+service:
+  pipelines:
+    logs/paper_trading:
+      receivers: [file_log/paper_events, file_log/paper_nautilus]
+      processors: [memory_limiter, transform/paper_trading, batch]
+      exporters: [otlphttp/loki]
