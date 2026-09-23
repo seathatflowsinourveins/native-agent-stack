@@ -14726,6 +14726,21 @@
       "path": "tools/token-report/token_manifest.py",
       "sha256": "7b1c0511e9a56f587392309330e447bb190e5c819950892997a44065f2714e33",
       "bytes": 50793
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/container-build-start-resource-vs-native/Containerfile.app",
+      "sha256": "a6d7e672bd13eb34282a719f24bd2c93a9a30ac87dff05be2c06beee4d0c38a2",
+      "bytes": 612
+    },
+    {
+      "path": "evidence/artifacts/gap-wave3-20260923/hosting-services/container-build-start-resource-vs-native.json",
+      "sha256": "04a11387c3f7e6624cd27264d3ff3b62f460d6b8b16255bc94478b567365eebe",
+      "bytes": 15828
+    },
+    {
+      "path": "evidence/artifacts/gap-wave3-20260923/hosting-services/container-recovery-isolation-cpu-mem-vs-native.json",
+      "sha256": "863513c5fbe67c3efee86fd47d02106ffb46ae0169147d6dac0fad3bcef1e585",
+      "bytes": 12866
     }
   ],
   "convergence_records": [
