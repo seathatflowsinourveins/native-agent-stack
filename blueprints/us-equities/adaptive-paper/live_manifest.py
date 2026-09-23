@@ -59,9 +59,30 @@ def tail_jsonl(path, limit):
     return rows
 
 
+def activity(path):
+    """Latest modification among a file and its SQLite WAL, or 0 when absent (WAL-mode
+    writes advance ``-wal``, not the main file)."""
+    times = []
+    for candidate in (Path(path), Path(str(path) + "-wal")):
+        try:
+            times.append(candidate.stat().st_mtime)
+        except OSError:
+            pass
+    return max(times, default=0)
+
+
 def find_ledger(state_root):
-    ledgers = sorted(Path(state_root).glob("*/adaptive/ledger.sqlite3"), key=lambda p: p.stat().st_mtime)
+    ledgers = sorted(Path(state_root).glob("*/adaptive/ledger.sqlite3"), key=activity)
     return ledgers[-1] if ledgers else None
+
+
+def run_binding(live_dir):
+    """The ledger and kill switch a run recorded in ``run.json`` (runner --live-dir)."""
+    try:
+        binding = json.loads((Path(live_dir) / "run.json").read_text()) if live_dir else {}
+    except (OSError, ValueError):
+        return {}
+    return binding if isinstance(binding, dict) else {}
 
 
 def read_ledger(path):
@@ -116,10 +137,17 @@ def nautilus_log(live_dir, limit=80):
 
 
 def state(live_dir, state_root, stop_file):
-    events = tail_jsonl(Path(live_dir) / "events.jsonl", 5000) if live_dir else []
-    return {"generated_at": time.time(), "endpoint": "paper", "stop_present": Path(stop_file).exists(),
-            "live_dir": Path(live_dir).name if live_dir else None,
-            "ledger": read_ledger(find_ledger(state_root)), "events": summarize_events(events),
+    """``stop_file`` and the newest ledger under ``state_root`` apply only when the run
+    has not bound its own in ``run.json``."""
+    binding = run_binding(live_dir)
+    events_path = Path(live_dir) / "events.jsonl" if live_dir else None
+    events = tail_jsonl(events_path, 5000) if events_path else []
+    ledger_path = Path(binding["ledger"]) if binding.get("ledger") else find_ledger(state_root)
+    stop = Path(binding.get("stop_file") or stop_file)
+    age = time.time() - activity(events_path) if events_path and activity(events_path) else None
+    return {"generated_at": time.time(), "endpoint": "paper", "stop_present": stop.exists(),
+            "live_dir": Path(live_dir).name if live_dir else None, "bound_to_run": bool(binding.get("ledger")),
+            "events_age_seconds": age, "ledger": read_ledger(ledger_path), "events": summarize_events(events),
             "nautilus_log": nautilus_log(live_dir)}
 
 
@@ -127,6 +155,8 @@ def metrics(s):
     ledger, ev = s["ledger"], s["events"]
     out = ["# TYPE adaptive_paper_up gauge", "adaptive_paper_up 1",
            "# TYPE adaptive_paper_stop_present gauge", f"adaptive_paper_stop_present {int(s['stop_present'])}",
+           "# TYPE adaptive_paper_ledger_readable gauge", f"adaptive_paper_ledger_readable {int(bool(ledger.get('available')))}",
+           "# TYPE adaptive_paper_bound_to_run gauge", f"adaptive_paper_bound_to_run {int(bool(s.get('bound_to_run')))}",
            "# TYPE adaptive_paper_events gauge"]
     for kind, n in sorted(ev["counts"].items(), key=lambda kv: str(kv[0])):
         out.append(f'adaptive_paper_events{{type="{kind}"}} {n}')
@@ -137,6 +167,9 @@ def metrics(s):
     out.append("# TYPE adaptive_paper_regime gauge")
     for regime in ("trend", "range", "risk_off", "unavailable"):
         out.append(f'adaptive_paper_regime{{regime="{regime}"}} {int(latest.get("regime") == regime)}')
+    if s.get("events_age_seconds") is not None:
+        out += ["# TYPE adaptive_paper_events_age_seconds gauge",
+                f"adaptive_paper_events_age_seconds {round(float(s['events_age_seconds']), 3)}"]
     if latest.get("effective_leverage") is not None:
         out += ["# TYPE adaptive_paper_effective_leverage gauge",
                 f"adaptive_paper_effective_leverage {float(latest['effective_leverage'])}"]
@@ -189,7 +222,9 @@ const card=(k,v,cls)=>'<div class="card"><span class="muted">'+esc(k)+'</span><b
 document.getElementById("cards").innerHTML=[card("Decisions",(E.counts||{}).decision||0),card("Intents",(E.counts||{}).intent||0),
  card("Regime",(E.latest_decision||{}).regime||"-"),card("Cash delta USD",L.cash_delta_usd??"-"),card("Realized USD",L.realized_usd??"-"),
  card("Realized loss USD",L.realized_loss_usd??"-"),card("Halt",L.halted_reason||"none",L.halted_reason?"bad":"ok"),
- card("REST req/min",L.requests_last_minute??"-")].join("");
+ card("REST req/min",L.requests_last_minute??"-"),
+ card("Ledger",L.available?(s.bound_to_run?"bound to run":"newest (unbound)"):"UNREADABLE",L.available?"ok":"bad"),
+ card("Event stream age s",s.events_age_seconds==null?"-":s.events_age_seconds.toFixed(1),s.events_age_seconds>30?"bad":"")].join("");
 const d=E.latest_decision;document.getElementById("decision").innerHTML=d?("<div class='muted'>"+t(d.at)+" · leverage "+esc(d.effective_leverage)+"</div>"+
  "<div>targets <code>"+esc(JSON.stringify(d.targets))+"</code></div><div>exits <code>"+esc(JSON.stringify(d.exits))+"</code></div>"+
  "<div>signals <code>"+esc(JSON.stringify((d.signals||[]).slice(0,12)))+"</code></div>"):"no decision yet";
@@ -238,7 +273,11 @@ def serve(args):
 
 
 def newest_live_dir(root):
-    dirs = sorted((d for d in Path(root).glob("*") if d.is_dir()), key=lambda d: d.stat().st_mtime) if Path(root).is_dir() else []
+    """The run directory whose event stream or engine log changed last (appending to a
+    file does not change its directory's mtime)."""
+    def last_write(d):
+        return max([activity(d / "events.jsonl"), *(activity(f) for f in (d / "nautilus").glob("*.jsonl"))])
+    dirs = sorted((d for d in Path(root).glob("*") if d.is_dir()), key=last_write) if Path(root).is_dir() else []
     return dirs[-1] if dirs else None
 
 

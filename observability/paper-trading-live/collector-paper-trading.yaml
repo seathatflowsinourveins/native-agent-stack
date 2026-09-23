@@ -6,14 +6,24 @@ receivers:
     include: ["${env:HOME}/.local/state/native-agent-stack/alpaca-paper/live/*/events.jsonl"]
     start_at: beginning
     storage: file_storage
-    include_file_name: true
-    include_file_path: false
+    include_file_name: false
+    include_file_path: true
     max_log_size: 1MiB
     operators:
       - type: json_parser
         on_error: send_quiet
         parse_from: body
         parse_to: attributes
+        timestamp:
+          parse_from: attributes.at
+          layout_type: epoch
+          layout: s.us
+      - type: regex_parser
+        on_error: send_quiet
+        parse_from: attributes["log.file.path"]
+        regex: '/live/(?P<run>[a-z0-9-]{1,24})/'
+      - type: remove
+        field: attributes["log.file.path"]
       - type: add
         field: resource["service.name"]
         value: adaptive-paper
@@ -21,14 +31,24 @@ receivers:
     include: ["${env:HOME}/.local/state/native-agent-stack/alpaca-paper/live/*/nautilus/*.jsonl"]
     start_at: beginning
     storage: file_storage
-    include_file_name: true
-    include_file_path: false
+    include_file_name: false
+    include_file_path: true
     max_log_size: 1MiB
     operators:
       - type: json_parser
         on_error: send_quiet
         parse_from: body
         parse_to: attributes
+        timestamp:
+          parse_from: attributes.timestamp
+          layout_type: gotime
+          layout: '2006-01-02T15:04:05.999999999Z07:00'
+      - type: regex_parser
+        on_error: send_quiet
+        parse_from: attributes["log.file.path"]
+        regex: '/live/(?P<run>[a-z0-9-]{1,24})/'
+      - type: remove
+        field: attributes["log.file.path"]
       - type: add
         field: resource["service.name"]
         value: nautilus-trader

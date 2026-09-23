@@ -1528,6 +1528,12 @@ def main():
             controller = Controller(ledger, controller_close, market_open=controller_market_open)
             if args.live_dir is not None:
                 controller.events = LiveEventLog(args.live_dir / "events.jsonl")
+                # Binds this run's live record to its own ledger and kill switch for
+                # live_manifest.py (local state; the manifest never displays these paths).
+                import safety as _safety
+                (args.live_dir / "run.json").write_text(json.dumps(
+                    {"trial": args.trial, "ledger": str(state_dir / "ledger.sqlite3"),
+                     "stop_file": str(_safety.DEFAULT_STOP)}) + "\n")
             if args.command == "recover":
                 metadata = previous_metadata
                 if metadata["config_sha256"] != summary["config_sha256"]:
@@ -1589,6 +1595,8 @@ def main():
                     outcome["dropped_quotes"] = {
                         "by_reason": {str(k): int(v) for k, v in port_health.get("dropped_quotes", {}).items()},
                         "by_symbol": {str(k): int(v) for k, v in port_health.get("dropped_quotes_by_symbol", {}).items()}}
+                if isinstance(controller.events, LiveEventLog):
+                    outcome["live_event_write_errors"] = controller.events.write_errors
                 if ledger.positions() or ledger.unresolved():
                     controller.stop = True
                     # This CLI invocation cannot yet tell whether it is the

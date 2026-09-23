@@ -108,7 +108,49 @@ class ManifestTests(unittest.TestCase):
     def test_missing_sources_degrade_without_raising(self):
         st = lm.state(None, self.root / "absent", self.root / "STOP")
         self.assertEqual((st["ledger"], st["events"]["counts"], st["nautilus_log"]), ({"available": False}, {}, []))
-        lm.metrics(st)
+        text = lm.metrics(st)
+        self.assertIn("adaptive_paper_ledger_readable 0", text)
+        self.assertNotIn("adaptive_paper_cash_delta_usd", text)
+
+    def test_a_run_binding_selects_its_own_ledger_and_kill_switch(self):
+        other = self.root / ("cd" * 32) / "adaptive"
+        other.mkdir(parents=True)
+        ledger = s.Ledger(other / "ledger.sqlite3")
+        ledger.start_trial(NOW)
+        ledger.close()
+        os.utime(other / "ledger.sqlite3", (NOW + 10**6, NOW + 10**6))  # newer, but not this run's
+        unbound = lm.state(self.live, self.root, self.root / "STOP")
+        self.assertEqual((unbound["bound_to_run"], unbound["ledger"]["intent_statuses"]), (False, {}))
+        stop = self.root / "runner-STOP"
+        stop.write_text("hold")
+        (self.live / "run.json").write_text(json.dumps(
+            {"trial": "adaptive-test", "ledger": str(self.root / FINGERPRINT / "adaptive" / "ledger.sqlite3"),
+             "stop_file": str(stop)}))
+        bound = lm.state(self.live, self.root, self.root / "STOP")
+        self.assertEqual((bound["bound_to_run"], bound["ledger"]["intent_statuses"], bound["stop_present"]),
+                         (True, {"filled": 1}, True))
+        text = lm.metrics(bound)
+        self.assertIn("adaptive_paper_bound_to_run 1", text)
+        self.assertIn("adaptive_paper_ledger_readable 1", text)
+        self.assertRegex(text, r"adaptive_paper_events_age_seconds [0-9.]+")
+        self.assertNotIn(FINGERPRINT, json.dumps(bound["ledger"]))
+
+    def test_the_active_run_and_ledger_are_chosen_by_file_activity(self):
+        older = self.root / "live" / "adaptive-older"
+        older.mkdir()
+        (older / "events.jsonl").write_text("{}\n")
+        os.utime(self.live / "events.jsonl", (NOW, NOW))
+        os.utime(self.live / "nautilus" / "ADAPTIVE-001_x.jsonl", (NOW, NOW))
+        os.utime(older / "events.jsonl", (NOW + 60, NOW + 60))
+        os.utime(older, (NOW - 60, NOW - 60))
+        os.utime(self.live, (NOW + 120, NOW + 120))  # directory mtime alone would pick the stale run
+        self.assertEqual(lm.newest_live_dir(self.root / "live"), older)
+        db = self.root / FINGERPRINT / "adaptive" / "ledger.sqlite3"
+        os.utime(db, (NOW, NOW))
+        wal = Path(str(db) + "-wal")
+        wal.write_bytes(b"")
+        os.utime(wal, (NOW + 500, NOW + 500))
+        self.assertEqual(lm.activity(db), NOW + 500)
 
     def test_the_ledger_is_opened_read_only(self):
         path = self.root / FINGERPRINT / "adaptive" / "ledger.sqlite3"

@@ -10,7 +10,8 @@ talks to the broker or writes a ledger.
   Without `--live-dir` the run is unchanged.
 - `blueprints/us-equities/adaptive-paper/live_manifest.py` serves a loopback page, the
   same state as JSON and Prometheus `/metrics`, from that directory, the durable ledger
-  (`sqlite3` read-only) and the STOP file. Account ids, fingerprints and balances are not
+  (`sqlite3` read-only) and the STOP file, both bound to the run through the `run.json` the
+  runner writes (otherwise the most recently written ledger and `<state-root>/STOP`). Account ids, fingerprints and balances are not
   shown (NautilusTrader logs each AccountState with balances at INFO; `balances=[...]` and
   `margins=[...]` are redacted); the ledger carries deltas from its baseline. Ledger intent
   counts cover every trial in the ledger; decision and intent counts cover the run directory.
