@@ -43,10 +43,11 @@ BASE_RECEIPT = {
 }
 
 
-def entry(path, version, observed, shape_ok=True, identity_ok=True, result="pass"):
+def entry(path, version, observed, shape_ok=True, identity_ok=True, result="pass", host="synthetic-host",
+          stage="use"):
     """One per-receipt entry in host_receipts.build_summary()'s shape."""
     return {"path": path, "component_version": version, "observed_at_utc": observed, "shape_ok": shape_ok,
-            "platform_identity_ok": identity_ok, "result": result, "stage": "use"}
+            "platform_identity_ok": identity_ok, "result": result, "stage": stage, "host_id": host}
 
 
 def summary(**buckets):
@@ -98,6 +99,35 @@ class AssessTests(unittest.TestCase):
         self.assertEqual(row["flags"], ["pin_moved"])
         self.assertEqual(row["unbound"], [{"path": "old-pin.json", "component_version": "0.9.0",
                                            "observed_at_utc": "2026-10-29T00:00:00Z", "reason": "pin_moved"}])
+
+    def test_re_recording_at_the_new_pin_clears_pin_moved(self):
+        # The old receipt stays in the tree (update.md: receipts are not edited or deleted);
+        # once the same host has a newer receipt at the current pin the bucket is done.
+        report = self.assess(summary(widget={"linux-wsl2-x86_64": [
+            entry("old-pin.json", "0.9.0", "2026-10-01T00:00:00Z"),
+            entry("re-recorded.json", "1.0.0", "2026-10-28T00:00:00Z")]}), (["1.0.0"], "landscape_winner"))
+        row = report["rows"][0]
+        self.assertEqual((row["flags"], row["pin_moved_hosts"]), ([], []))
+        self.assertEqual([item["path"] for item in row["unbound"]], ["old-pin.json"])
+        self.assertEqual(report["status"], "current")
+
+    def test_pin_moved_names_each_host_and_stage_still_at_the_old_pin(self):
+        report = self.assess(summary(widget={"linux-wsl2-x86_64": [
+            entry("a-old.json", "0.9.0", "2026-10-01T00:00:00Z", host="host-a"),
+            entry("a-new.json", "1.0.0", "2026-10-28T00:00:00Z", host="host-a"),
+            entry("b-old.json", "0.9.0", "2026-10-02T00:00:00Z", host="host-b"),
+            entry("a-verify.json", "0.9.0", "2026-10-03T00:00:00Z", host="host-a", stage="verify")]}),
+            (["1.0.0"], "landscape_winner"))
+        row = report["rows"][0]
+        self.assertEqual(row["flags"], ["pin_moved"])
+        self.assertEqual(row["pin_moved_hosts"], ["host-a/verify", "host-b/use"])
+
+    def test_invalid_receipts_neither_raise_nor_clear_pin_moved(self):
+        report = self.assess(summary(widget={"linux-wsl2-x86_64": [
+            entry("old-pin.json", "0.9.0", "2026-10-01T00:00:00Z"),
+            entry("bad-new.json", "1.0.0", "2026-10-28T00:00:00Z", shape_ok=False)]}),
+            (["1.0.0"], "landscape_winner"))
+        self.assertEqual(report["rows"][0]["flags"], ["no_bound_receipt", "pin_moved"])
 
     def test_only_old_pin_receipts_means_no_bound_receipt_and_pin_moved(self):
         report = self.assess(summary(widget={"linux-wsl2-x86_64": [
@@ -211,6 +241,15 @@ class SyntheticTreeTests(unittest.TestCase):
         self.assertEqual(gadget_linux["latest_bound"]["age_days"], 90)
         self.assertEqual(rows[("macos-arm64", "gadget")]["flags"], [])
         self.assertEqual(report["flagged"], 2)
+
+    def test_re_recording_after_the_pin_bump_clears_the_bucket_end_to_end(self):
+        self.write_receipt("widget", "1.0.0", "2026-10-01T00:00:00Z")          # before the pin moved
+        self.write_receipt("widget", "2.0.0", "2026-10-28T00:00:00Z")          # same host, new pin
+        code, report = self.run_report()
+        self.assertEqual(code, 0)
+        row = report["rows"][0]
+        self.assertEqual((row["flags"], row["bound_receipts"], len(row["unbound"])), ([], 1, 1))
+        self.assertEqual(report["status"], "current")
 
     def test_out_writes_outside_the_checkout_and_is_refused_inside_it(self):
         self.write_receipt("gadget", "3.1.0", "2026-10-29T00:00:00Z")

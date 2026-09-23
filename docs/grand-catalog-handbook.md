@@ -307,7 +307,10 @@ Install profiles in the order of the generated
 `profiles`; start with the pinned checkout and portable validators (exact
 revision, intact hashes, explicit installation paths), and add shared skills
 and workers after the foundation profile (one bounded source/build/review task
-with owned changes). Each profile's destination acceptance:
+with owned changes). On macOS, `macos-arm64-foundation` takes
+`foundation-cpu`'s place at order 1 (the table lists it later because
+`foundation-cpu` comes first on Linux/WSL2). Each profile's destination
+acceptance:
 
 | Profile / action | Destination acceptance |
 | --- | --- |

@@ -5,9 +5,12 @@ Read-only. Per platform and component with at least one receipt under ``evidence
 this lists the latest receipt *bound* to a current pin and its age, and flags:
 
 - ``stale``: the latest bound receipt is older than ``--max-age-days`` (default 30);
-- ``pin_moved``: some receipts record a version that matches no current pin (a pin bump
-  retired them; re-record at the new pin, see adoption/update.md "Moving a host to a new
-  release");
+- ``pin_moved``: for at least one host and stage, that host's newest schema-valid receipt on this
+  platform records a version that matches no current pin (a pin bump retired it and the host
+  has not re-recorded at the new pin; see adoption/update.md "Moving a host to a new release").
+  Older receipts at a retired pin stay in the tree and stay listed under ``unbound``, but they
+  do not raise the flag once the same host has a newer receipt at the current pin, so the flag
+  clears when the host is done;
 - ``no_bound_receipt``: receipts exist but none matches a current pin;
 - ``no_current_pin``: neither a landscape winner nor ``manifests/stack.json`` gives a
   version, so binding cannot be judged.
@@ -96,7 +99,7 @@ def assess(summary: dict, pins_for, now: datetime, max_age_days: int) -> dict:
                     flags.append("no_bound_receipt")
                 elif age is None or age > max_age_days:
                     flags.append("stale")
-                if any(unbound_reason(entry, pins) == "pin_moved" for entry in unbound):
+                if moved_hosts(entries, pins):
                     flags.append("pin_moved")
             rows.append({
                 "platform_id": platform_id,
@@ -113,6 +116,7 @@ def assess(summary: dict, pins_for, now: datetime, max_age_days: int) -> dict:
                     "stage": latest.get("stage"),
                     "component_version": latest.get("component_version"),
                 },
+                "pin_moved_hosts": moved_hosts(entries, pins) if pins else [],
                 "unbound": [{"path": entry.get("path"), "component_version": entry.get("component_version"),
                              "observed_at_utc": entry.get("observed_at_utc"),
                              "reason": unbound_reason(entry, pins)} for entry in unbound],
@@ -128,6 +132,22 @@ def assess(summary: dict, pins_for, now: datetime, max_age_days: int) -> dict:
         "flagged": sum(1 for row in rows if row["flags"]),
         "status": "flagged" if any(row["flags"] for row in rows) else "current",
     }
+
+
+def moved_hosts(entries: list[dict], pins: list[str]) -> list[str]:
+    """``host_id/stage`` for each host and stage whose newest judgeable receipt is at a retired pin.
+
+    Only schema-valid receipts whose platform identity matches are judgeable; an invalid or
+    wrong-platform receipt neither raises nor clears the flag."""
+    newest: dict[tuple[str, str], dict] = {}
+    for entry in entries:
+        if not (entry.get("shape_ok") and entry.get("platform_identity_ok")):
+            continue
+        key = (str(entry.get("host_id")), str(entry.get("stage")))
+        order = (entry.get("observed_at_utc") or "", entry.get("path") or "")
+        if key not in newest or order > (newest[key].get("observed_at_utc") or "", newest[key].get("path") or ""):
+            newest[key] = entry
+    return sorted(f"{host}/{stage}" for (host, stage), entry in newest.items() if not is_bound(entry, pins))
 
 
 def unbound_reason(entry: dict, pins: list[str]) -> str:
@@ -151,6 +171,8 @@ def render_text(report: dict) -> str:
         flags = ", ".join(row["flags"]) or "ok"
         lines.append(f"{row['platform_id']}  {row['component_id']}: {latest_text}; pins {row['current_pins']} "
                      f"({row['pin_source']}); {row['bound_receipts']}/{row['receipts']} bound; {flags}")
+        if row["pin_moved_hosts"]:
+            lines.append(f"    re-record at the current pin: {', '.join(row['pin_moved_hosts'])}")
         for entry in row["unbound"]:
             lines.append(f"    unbound: {entry['path']} (version {entry['component_version']}, {entry['reason']})")
     return "\n".join(lines)

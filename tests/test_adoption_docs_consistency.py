@@ -11,12 +11,23 @@ cover. Each test below names the drift it stops:
 - every relative Markdown link (and ``#anchor`` into a Markdown file) in adoption/**/*.md,
   docs/next-host-stages.md and docs/contributing-evidence.md resolves;
 - every ``adoption/manifest.json`` profile id is a row of adoption/README.md's profile table,
-  and the row's pin columns equal the coverage computed from the pin files;
+  and the row's pin columns equal the coverage computed from the pin files; where the pinned
+  release's own pin files give a different coverage, the cell says so ("all 8 (7 of 8 at
+  `vT`)"), and any such note naming a tag this clone has is checked against that tag;
 - no documented command passes two flags from one argparse mutually exclusive group (read from
-  each script's own source, so a new group is covered without editing this file);
+  each script's own source, so a new group is covered without editing this file) or a pair
+  listed in ``EXCLUSIVE_IN_EFFECT`` (independent flags where one silently wins);
 - every script path those documents mention exists and is tracked at HEAD;
-- a new-host page that mentions a path the pinned release lacks (scripts/release_due.py's
-  ``due`` list) says so in the same section ("not in the pinned release").
+- a new-host page unit (a heading section or a top-level numbered step) that mentions a path the
+  pinned release lacks (scripts/release_due.py's ``due`` list) says "added after `<release_tag>`";
+- a new-host page that mentions an install input (bootstrap script or pin file) whose content
+  differs between the pinned release and HEAD says "changed after `<release_tag>`" in a unit
+  that mentions it. release_due.py only reports missing paths, so this is the check that sees
+  a changed script.
+
+The markers name the release they were written against, so they stay true in every later
+checkout: at a newer release they are history, and a re-pin needs no documentation edit for
+them (they may be dropped in any later PR).
 
 These are local consistency checks over repository text, not a run of any documented step.
 """
@@ -43,10 +54,17 @@ COMMAND_DOCS = LINK_DOCS
 CHECKOUT_PAGES = [ROOT / "adoption/bootstrap.md", ROOT / "adoption/platforms/linux-wsl2.md",
                   ROOT / "adoption/platforms/macos-arm64.md"]
 PIN_FILES = {"Linux pins": "adoption/pins-linux-x86_64.json", "macOS pins": "adoption/pins-macos-arm64.json"}
-DUE_MARKER = "not in the pinned release"
+TAG = r"v\d{4}\.\d{2}\.\d{2}(?:\.\d+)?"
+MARKER_RE = re.compile(rf"\b(added|changed) after `?({TAG})`?", re.I)
+COVERAGE_RE = re.compile(rf"^(all \d+|none of \d+|\d+ of \d+)(?: \((all \d+|none of \d+|\d+ of \d+) at `?({TAG})`?\))?$")
+HISTORICAL_TAG_RE = re.compile(rf"(?:\b(?:added|changed) after|\d+\)? at) `?{TAG}`?", re.I)
+INSTALL_INPUTS = ("adoption/bootstrap-linux.sh", "adoption/bootstrap-macos.sh",
+                  "adoption/pins-linux-x86_64.json", "adoption/pins-macos-arm64.json")
+# Independent store_true flags where one silently wins, so argparse cannot reject the pair.
+EXCLUSIVE_IN_EFFECT = {"component_matrix.py": [frozenset({"--write", "--check"})]}  # write_mode = write and not check
 
 HASH_RE = re.compile(r"(?<![0-9a-f])[0-9a-f]{40}(?![0-9a-f])")
-TAG_RE = re.compile(r"(?<![\w.])v\d{4}\.\d{2}\.\d{2}(?:\.\d+)?(?![\w.])")
+TAG_RE = re.compile(rf"(?<![\w.]){TAG}(?![\w.])")
 RELEASE_LABEL = re.compile(r"release[_ ](?:commit|tag)|attested release|pinned release", re.I)
 FENCE_RE = re.compile(r"^[ \t]*```.*?^[ \t]*```[ \t]*$", re.M | re.S)  # list items indent their fences
 LINK_RE = re.compile(r"\[(?:[^\]\\]|\\.)*\]\(\s*<?([^)\s>]+)>?(?:\s+\"[^\"]*\")?\s*\)")
@@ -69,6 +87,26 @@ def sections(text: str) -> list[str]:
     return re.split(r"(?m)^(?=#{1,6} )", text)
 
 
+def units(text: str) -> list[str]:
+    """Heading sections, each split again at top-level numbered steps (``1. ...`` at column 0), so
+    a marker in one step never covers another step of the same page."""
+    return [unit for section in sections(text) for unit in re.split(r"(?m)^(?=\d+\. )", section)]
+
+
+def show(commit: str, path: str) -> str | None:
+    result = rd.git("show", f"{commit}:{path}")
+    return result.stdout if result.returncode == 0 else None
+
+
+def resolve_commit(ref: str) -> str | None:
+    result = rd.git("rev-parse", "--verify", "--quiet", f"{ref}^{{commit}}")
+    return result.stdout.strip() if result.returncode == 0 else None
+
+
+def release_present() -> bool:
+    return rd.git("cat-file", "-e", f"{SOURCE['release_commit']}^{{commit}}").returncode == 0
+
+
 def github_slug(heading: str) -> str:
     text = re.sub(r"[`*]", "", heading.strip().lower())
     text = re.sub(r"\[([^\]]*)\]\([^)]*\)", r"\1", text)
@@ -81,9 +119,20 @@ def anchors(path: Path) -> set[str]:
     return {github_slug(match) for match in re.findall(r"(?m)^#{1,6} +(.+?)\s*#*\s*$", text)}
 
 
-def pin_ids(pin_file: str) -> set[str]:
-    pins = json.loads((ROOT / pin_file).read_text(encoding="utf-8"))
-    return {tool["id"] for tool in pins["tools"]}
+def pin_ids(pin_file: str, commit: str | None = None) -> set[str]:
+    text = (ROOT / pin_file).read_text(encoding="utf-8") if commit is None else show(commit, pin_file)
+    return {tool["id"] for tool in json.loads(text)["tools"]}
+
+
+def coverage_at(commit: str, profile_id: str, pin_file: str) -> str | None:
+    """Coverage of ``profile_id`` by ``pin_file`` as that commit's own manifest and pins give it."""
+    manifest, pins = show(commit, "adoption/manifest.json"), show(commit, pin_file)
+    if manifest is None or pins is None:
+        return None
+    profiles = {profile["id"]: profile["component_ids"] for profile in json.loads(manifest)["profiles"]}
+    if profile_id not in profiles:
+        return None
+    return coverage_text(profiles[profile_id], {tool["id"] for tool in json.loads(pins)["tools"]})
 
 
 def coverage_text(component_ids: list[str], pinned: set[str]) -> str:
@@ -160,11 +209,11 @@ def mutually_exclusive_violations(text: str, label: str) -> list[str]:
             if script is None:
                 continue
             flags = set(FLAG_RE.findall(segment[match.end():]))
-            for group in exclusive_groups(script):
+            for group in [*exclusive_groups(script), *EXCLUSIVE_IN_EFFECT.get(script.name, [])]:
                 clash = sorted(group & flags)
                 if len(clash) > 1:
                     found.append(f"{label}: `{segment.strip()}` combines {' and '.join(clash)} "
-                                 f"(mutually exclusive in {rel(script)})")
+                                 f"(mutually exclusive in effect in {rel(script)})")
     return found
 
 
@@ -179,6 +228,7 @@ class ReleasePinQuotesTests(unittest.TestCase):
         for block in paragraphs(text):
             if not RELEASE_LABEL.search(block):
                 continue
+            block = HISTORICAL_TAG_RE.sub("", block)  # "added after `vT`" names the tag it was written against
             errors += [f"{label}: quotes release commit {value}, manifest pins {SOURCE['release_commit']}"
                        for value in HASH_RE.findall(block) if value != SOURCE["release_commit"]]
             errors += [f"{label}: quotes release tag {value}, manifest pins {SOURCE['release_tag']}"
@@ -194,6 +244,11 @@ class ReleasePinQuotesTests(unittest.TestCase):
         stale = ("This checks out `source.release_tag` (`v2000.01.01`) at `source.release_commit` "
                  f"(`{'b' * 40}`).")
         self.assertEqual(len(self.pin_quote_errors(stale, "mutant")), 2)
+
+    def test_historical_markers_are_not_pin_quotes(self):
+        text = ("The pinned release is `source.release_tag`; this step was added after `v2000.01.01` "
+                "and the script changed after v2000.01.01.")
+        self.assertEqual(self.pin_quote_errors(text, "ok"), [])
 
     def test_checkout_pages_derive_the_pin_from_the_manifest(self):
         for path in CHECKOUT_PAGES:
@@ -245,18 +300,63 @@ class ProfileTableTests(unittest.TestCase):
     def test_every_manifest_profile_is_a_table_row(self):
         self.assertEqual(sorted(self.table), sorted(profile["id"] for profile in MANIFEST["profiles"]))
 
+    def cell_errors(self, profile_id: str, component_ids: list[str], column: str, cell: str,
+                    release_commit: str | None) -> list[str]:
+        """``cell`` is HEAD's coverage, plus "(X at `vT`)" when the pinned release (or another tag
+        this clone has) differs. ``release_commit`` None means the pinned release is not in this
+        clone, so only HEAD's part and the note's form are checked."""
+        pin_file = PIN_FILES[column]
+        label = f"{profile_id} {column}"
+        match = COVERAGE_RE.match(cell)
+        if match is None:
+            return [f"{label}: {cell!r} is not 'all N', 'none of N' or 'X of N', optionally '(X of N at `vT`)'"]
+        head, noted, noted_tag = match.groups()
+        errors = []
+        expected_head = coverage_text(component_ids, pin_ids(pin_file))
+        if head != expected_head:
+            errors.append(f"{label}: table says {head!r}, {pin_file} gives {expected_head!r}")
+        if release_commit is not None:
+            at_release = coverage_at(release_commit, profile_id, pin_file)
+            if at_release is not None and at_release != expected_head and (noted, noted_tag) != (at_release, SOURCE["release_tag"]):
+                errors.append(f"{label}: the pinned release {SOURCE['release_tag']} gives {at_release!r}; "
+                              f"the cell must end '({at_release} at `{SOURCE['release_tag']}`)'")
+        if noted_tag is not None:
+            commit = release_commit if noted_tag == SOURCE["release_tag"] else resolve_commit(noted_tag)
+            actual = coverage_at(commit, profile_id, pin_file) if commit else None
+            if actual is not None and actual != noted:
+                errors.append(f"{label}: note says {noted!r} at {noted_tag}, that tag gives {actual!r}")
+        return errors
+
     def test_pin_columns_match_the_pin_files(self):
+        release_commit = SOURCE["release_commit"] if release_present() else None
         errors = []
         for profile in MANIFEST["profiles"]:
             row = self.table.get(profile["id"])
             if row is None:
                 continue
-            for column, pin_file in PIN_FILES.items():
-                expected = coverage_text(profile["component_ids"], pin_ids(pin_file))
-                actual = row[self.header.index(column)]
-                if actual != expected:
-                    errors.append(f"{profile['id']} {column}: table says {actual!r}, {pin_file} gives {expected!r}")
+            for column in PIN_FILES:
+                errors += self.cell_errors(profile["id"], profile["component_ids"], column,
+                                           row[self.header.index(column)], release_commit)
         self.assertEqual(errors, [])
+
+    def test_the_cell_check_rejects_wrong_and_missing_release_notes(self):
+        if not release_present():
+            self.skipTest(f"release commit {SOURCE['release_commit']} is not in this clone")
+        commit, tag = SOURCE["release_commit"], SOURCE["release_tag"]
+        for profile in MANIFEST["profiles"]:
+            for column, pin_file in PIN_FILES.items():
+                head = coverage_text(profile["component_ids"], pin_ids(pin_file))
+                at_release = coverage_at(commit, profile["id"], pin_file)
+                if at_release is None or at_release == head:
+                    continue
+                with self.subTest(profile=profile["id"], column=column):
+                    args = (profile["id"], profile["component_ids"], column)
+                    self.assertEqual(self.cell_errors(*args, f"{head} ({at_release} at `{tag}`)", commit), [])
+                    self.assertEqual(len(self.cell_errors(*args, head, commit)), 1)          # note missing
+                    self.assertEqual(len(self.cell_errors(*args, f"{head} ({head} at `{tag}`)", commit)), 2)
+                    self.assertEqual(len(self.cell_errors(*args, "junk", commit)), 1)
+                return
+        self.skipTest("no profile's coverage differs between the pinned release and HEAD")
 
     def test_coverage_text_forms(self):
         self.assertEqual(coverage_text(["a", "b"], {"a", "b"}), "all 2")
@@ -276,6 +376,7 @@ class ExclusiveFlagTests(unittest.TestCase):
 
     def test_the_check_rejects_the_combined_forms(self):
         for mutant in ("re-runs `new_host_grand_list.py --write --check` in that copy",
+                       "`python3 scripts/component_matrix.py --check --write`",
                        "```sh\npython3 scripts/new_host_grand_list.py \\\n  --check --write\n```",
                        "`python3 scripts/release_due.py --strict --strict-if-repinned origin/main`"):
             with self.subTest(mutant=mutant):
@@ -313,33 +414,77 @@ class ScriptPathTests(unittest.TestCase):
 
 
 class UnreleasedStepMarkerTests(unittest.TestCase):
-    """A page a host follows at the pinned tag marks steps the tag cannot run yet."""
+    """A page a host follows at the pinned tag marks steps the tag cannot run as documented."""
 
     PAGES = [ROOT / "adoption/bootstrap.md", *sorted(ROOT.glob("adoption/platforms/*.md"))]
 
-    def unmarked(self, text: str, due: set[str], label: str) -> list[str]:
+    @staticmethod
+    def marked(unit: str, kind: str, tag: str) -> bool:
+        return any(found_kind.lower() == kind and found_tag == tag for found_kind, found_tag in MARKER_RE.findall(unit))
+
+    def unmarked(self, text: str, due: set[str], label: str, tag: str) -> list[str]:
         errors = []
-        for section in sections(text):
-            mentioned = sorted(due & rd.referenced([section]))
-            if mentioned and DUE_MARKER not in section.lower():
-                heading = section.splitlines()[0] if section.strip() else "(top)"
-                errors.append(f"{label} section {heading!r} uses {', '.join(mentioned)} without "
-                              f"saying \"{DUE_MARKER}\"")
+        for unit in units(text):
+            mentioned = sorted(due & rd.referenced([unit]))
+            if mentioned and not self.marked(unit, "added", tag):
+                heading = unit.strip().splitlines()[0] if unit.strip() else "(top)"
+                errors.append(f"{label} unit {heading[:70]!r} uses {', '.join(mentioned)} without "
+                              f"saying \"added after `{tag}`\"")
         return errors
 
-    def test_sections_using_unreleased_paths_say_so(self):
-        if rd.git("cat-file", "-e", f"{SOURCE['release_commit']}^{{commit}}").returncode:
+    def unmarked_changes(self, text: str, changed: list[str], label: str, tag: str) -> list[str]:
+        errors = []
+        for path in changed:
+            names = (path, Path(path).name)
+            mentioning = [unit for unit in units(text) if any(name in unit for name in names)]
+            if mentioning and not any(self.marked(unit, "changed", tag) for unit in mentioning):
+                errors.append(f"{label} mentions {path}, which changed after {tag}, but no unit that "
+                              f"mentions it says \"changed after `{tag}`\"")
+        return errors
+
+    def require_release(self):
+        if not release_present():
             self.skipTest(f"release commit {SOURCE['release_commit']} is not in this clone")
+
+    def test_units_using_unreleased_paths_say_so(self):
+        self.require_release()
         due = set(rd.due(SOURCE["release_commit"]))
         errors = [error for path in self.PAGES
-                  for error in self.unmarked(path.read_text(encoding="utf-8"), due, rel(path))]
+                  for error in self.unmarked(path.read_text(encoding="utf-8"), due, rel(path), SOURCE["release_tag"])]
         self.assertEqual(errors, [])
 
-    def test_the_check_rejects_an_unmarked_section(self):
+    def test_pages_mentioning_a_changed_install_input_say_so(self):
+        self.require_release()
+        changed = [path for path in INSTALL_INPUTS
+                   if show(SOURCE["release_commit"], path) != (ROOT / path).read_text(encoding="utf-8")]
+        errors = [error for path in self.PAGES
+                  for error in self.unmarked_changes(path.read_text(encoding="utf-8"), changed, rel(path),
+                                                     SOURCE["release_tag"])]
+        self.assertEqual(errors, [])
+
+    def test_the_check_rejects_an_unmarked_unit(self):
+        due = {"tools/adoption/render_launchd.py"}
         text = "## Services\n\nRun `tools/adoption/render_launchd.py`.\n\n## Other\n\nNothing due here.\n"
-        self.assertEqual(len(self.unmarked(text, {"tools/adoption/render_launchd.py"}, "mutant")), 1)
-        marked = text.replace("Run ", "Not in the pinned release: run ")
-        self.assertEqual(self.unmarked(marked, {"tools/adoption/render_launchd.py"}, "ok"), [])
+        self.assertEqual(len(self.unmarked(text, due, "mutant", "v2000.01.01")), 1)
+        marked = text.replace("Run ", "Added after `v2000.01.01`: run ")
+        self.assertEqual(self.unmarked(marked, due, "ok", "v2000.01.01"), [])
+        # A marker naming an older release does not cover a path still missing from the current one.
+        self.assertEqual(len(self.unmarked(marked, due, "mutant", "v2000.02.01")), 1)
+
+    def test_a_marker_in_one_numbered_step_does_not_cover_another(self):
+        due = {"tools/adoption/render_launchd.py"}
+        text = ("# Bootstrap\n\n**Step 0.** Steps marked added after `v2000.01.01` wait for a release.\n\n"
+                "1. Install.\n\n5. **Services.** Run `tools/adoption/render_launchd.py`.\n")
+        self.assertEqual(len(self.unmarked(text, due, "mutant", "v2000.01.01")), 1)
+
+    def test_the_check_rejects_an_undisclosed_install_change(self):
+        text = ("## Install\n\nRun `adoption/bootstrap-macos.sh`.\n\n## Usage\n\n"
+                "`bootstrap-macos.sh --plan` prints the pins.\n")
+        changed = ["adoption/bootstrap-macos.sh"]
+        self.assertEqual(len(self.unmarked_changes(text, changed, "mutant", "v2000.01.01")), 1)
+        disclosed = text.replace("prints the pins.", "prints the pins (changed after `v2000.01.01`).")
+        self.assertEqual(self.unmarked_changes(disclosed, changed, "ok", "v2000.01.01"), [])
+        self.assertEqual(self.unmarked_changes("## Other\n\nNo mention.\n", changed, "ok", "v2000.01.01"), [])
 
 
 if __name__ == "__main__":

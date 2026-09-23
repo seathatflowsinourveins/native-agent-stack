@@ -10,7 +10,7 @@ archive):
 ```sh
 git clone https://github.com/seathatflowsinourveins/native-agent-stack.git
 cd native-agent-stack
-python3 scripts/release_due.py   # on the default branch: steps main documents that the pinned release lacks
+python3 scripts/release_due.py   # on the default branch (added after v2026.09.23): steps main documents that the pinned release lacks
 tag="$(python3 -c "import json;print(json.load(open('adoption/manifest.json'))['source']['release_tag'])")"
 commit="$(python3 -c "import json;print(json.load(open('adoption/manifest.json'))['source']['release_commit'])")"
 git checkout "$tag"
@@ -21,8 +21,8 @@ That checkout target is `adoption/manifest.json` `source.release_tag` (or a
 later tag), confirmed at `source.release_commit` and published with SLSA
 build provenance by `.github/workflows/publish-catalog.yml`. Read both values
 before the checkout, as above: the release's own manifest names the release
-before it. `scripts/release_due.py` itself is not in the pinned release yet,
-so it runs on the default branch; nothing else on this page needs a newer
+before it. `scripts/release_due.py` itself was added after `v2026.09.23`, so
+it runs on the default branch; nothing else on this page needs a newer
 release. Do
 **not** check out `source.baseline_commit`: that field predates `adoption/`
 and `tools/adoption/` entirely and is never a checkout target (Codex

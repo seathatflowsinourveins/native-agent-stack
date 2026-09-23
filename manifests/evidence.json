@@ -3129,8 +3129,8 @@
     },
     {
       "path": "README.md",
-      "sha256": "d313bc50b5b7036c40fa55fe0c30179fb42791acbed8d34040adbbcb23ed74df",
-      "bytes": 22625
+      "sha256": "5fc4f760395c2e8a7412e7352a546a9fb2eeb457babddb1c7bf05f7e96ff4da0",
+      "bytes": 22841
     },
     {
       "path": "SECURITY.md",
@@ -3139,8 +3139,8 @@
     },
     {
       "path": "adoption/README.md",
-      "sha256": "2ef0cbfebfa1ae738bfb2f3dccd5b59c804ff18eb8144d95fa508660f2fb7d72",
-      "bytes": 14769
+      "sha256": "87101a069cd70cefcde02fa05d1fbc1ef32851dd816e75508fd16a24e25e6431",
+      "bytes": 15085
     },
     {
       "path": "adoption/bootstrap-linux.sh",
@@ -3154,8 +3154,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "53986f09a6c2e6e24cb36218ea017bfafab517fd4942e380d7b05ba2bb764798",
-      "bytes": 11104
+      "sha256": "e2ffbfe79eab35c127fb4c665bb2e846af297088b5ebe5aca3079de9672b8c97",
+      "bytes": 12570
     },
     {
       "path": "adoption/host-receipt.schema.json",
@@ -3249,13 +3249,13 @@
     },
     {
       "path": "adoption/platforms/linux-wsl2.md",
-      "sha256": "4c0a6fd74ecf0f4bfd4ea9d40a838ec37c6bcfb2fdd17994d86ea090e7d62dbe",
-      "bytes": 5819
+      "sha256": "48ef17810bea18c3f7f1acbf5157abb928e8d1abff27a1076c4efa9bd8a1bf4c",
+      "bytes": 5842
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
-      "sha256": "4b68d3111733a068d2b98c161d00eaf14720278a240a4f02ff2e059fa12e5c9e",
-      "bytes": 37184
+      "sha256": "147a8e6e573498708368ff43275f5e636eafb3e79886fe5b905289dfcb587aef",
+      "bytes": 38879
     },
     {
       "path": "adoption/pre-login-observation.json",
@@ -3324,8 +3324,8 @@
     },
     {
       "path": "adoption/update.md",
-      "sha256": "0bf2bf558e9c4bc5f8d6391e0c9d699b8a5270834d28768c96e9a121adb60c4d",
-      "bytes": 15263
+      "sha256": "eb01b8486799e3a42f392e957de6cc6d5b031d1738bcb9d90992a49e01bcc270",
+      "bytes": 16395
     },
     {
       "path": "blueprints/blind-catalog-convergence/README.md",
@@ -9025,8 +9025,8 @@
     },
     {
       "path": "docs/grand-catalog-handbook.md",
-      "sha256": "05f35cb514807e1212eb7f4dd8671904a9d508017b7fe4e93ca3f9faddbfb351",
-      "bytes": 425924
+      "sha256": "0a6e88cc5c4776c433eb4af0414e30b970388204bb9e1d36ac73ce22f3db6eec",
+      "bytes": 426080
     },
     {
       "path": "docs/harness-defaults.md",
@@ -9155,8 +9155,8 @@
     },
     {
       "path": "docs/next-host-stages.md",
-      "sha256": "bc075e53669e4e7333f9b306b365c3549e6bf4421b8afd05d066f34744176ce7",
-      "bytes": 5564
+      "sha256": "79e80e86204ac1d036d289bd4fc9a76d43e3f5428cdd282f3572694b3a719292",
+      "bytes": 5922
     },
     {
       "path": "docs/paper-lane-policy.md",
@@ -14445,8 +14445,8 @@
     },
     {
       "path": "scripts/receipt_staleness.py",
-      "sha256": "87c467454b055d25ea8d60ac10c3fd314b13574e54a57dad0ef0b4a956925049",
-      "bytes": 9444
+      "sha256": "690130c9950c918d40032cbe0010af2f54638822ef839ea4af10f70d34cf0891",
+      "bytes": 10835
     },
     {
       "path": "scripts/recount-tokens.cjs",
@@ -14600,8 +14600,8 @@
     },
     {
       "path": "tests/test_adoption_docs_consistency.py",
-      "sha256": "e3c40b83b481106564ec4c8cd8542b65e8de1b924f541df8cd8606ee2a222fd5",
-      "bytes": 17639
+      "sha256": "1e98f6a6027b53623b4ad62e0f3a22e2fd7adbcf3011132a9aeb42f31d0b1f4c",
+      "bytes": 26779
     },
     {
       "path": "tests/test_adoption_guarded_runners.py",
@@ -14915,8 +14915,8 @@
     },
     {
       "path": "tests/test_receipt_staleness.py",
-      "sha256": "7d913e7d81fd2807b9e01ede482f8d45de87a32be7fa613db9ec679a71f78480",
-      "bytes": 13776
+      "sha256": "038e623034fabe19bf762a4a7d46504ea70ebf8707f50feadc6480fb447c85b3",
+      "bytes": 16252
     },
     {
       "path": "tests/test_release_pin_contents.py",

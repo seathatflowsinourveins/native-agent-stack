@@ -30,7 +30,14 @@ the default branch, not from the host's pinned checkout: the pinned tag may
 predate `scripts/release_due.py`, and only the default branch's manifest names
 the current pin (a release's own manifest names the release before it).
 
+`HOST_CHECKOUT` is the pinned clone this host installed from; `RUN_DIR` is a
+scratch directory for the default-branch clone, which steps 3.4 and 4 reuse
+for recording (never record in `$HOST_CHECKOUT`: switching it to a branch of
+`main` moves the install checkout off its tag).
+
 ```sh
+HOST_CHECKOUT="$HOME/code/native-agent-stack"   # the pinned clone; use this host's own path
+RUN_DIR="$(mktemp -d)"
 git clone https://github.com/seathatflowsinourveins/native-agent-stack.git "$RUN_DIR/catalog-main"
 cd "$RUN_DIR/catalog-main"
 python3 scripts/release_due.py
@@ -42,8 +49,8 @@ gh release list --repo seathatflowsinourveins/native-agent-stack --limit 5
 If the default branch pins a different tag than the host's checkout, a re-pin
 has landed: move the host (steps 3 and 4). `release_due.py` printing
 `"status": "release_due"` means main documents steps that no release has yet (a
-release is due, not yet cut); those steps stay marked "not in the pinned
-release" on the pages that use them. A published release that main does not pin
+release is due, not yet cut); the pages that use them mark those steps "added
+after `<release_tag>`". A published release that main does not pin
 yet is not a target; wait for its re-pin PR.
 
 **2. How the coordinator cuts and re-pins a release.** This is the maintainer
@@ -76,8 +83,13 @@ flow, recorded so a host can check what it receives.
    `release_due.py --strict-if-repinned origin/main`, which is strict because
    the pinned commit changed, and `tests/test_release_pin_contents.py` checks
    that the tag resolves to the pinned commit and that the release's own
-   documents reference only paths it contains. In the same PR remove the "not
-   in the pinned release" notes for paths the new release now contains.
+   documents reference only paths it contains. The "added after `vT`" and
+   "changed after `vT`" notes and the "(X at `vT`)" pin-coverage notes name the
+   release they were written against, so they stay true at the new tag and
+   the re-pin PR does not have to edit them;
+   `tests/test_adoption_docs_consistency.py` then requires notes only for
+   what the new release still lacks or runs differently, naming the new tag.
+   Stale history notes can be dropped in any later PR.
 
 **3. What the host re-runs after moving.** Receipts bind to the component
 version they recorded, so a pin change retires them for that component.
@@ -99,22 +111,27 @@ git checkout "$tag"
 2. If `adoption/templates/` changed, render again and compare before
    overwriting ([bootstrap step 4](bootstrap.md), `render_config.py --check`).
 3. Rerun `python3 scripts/adoption_status.py --profile <id> --json`.
-4. Record a new receipt with `python3 scripts/host_receipts.py record` for every
-   component whose pin changed (in the pin files, `manifests/stack.json`, or a
+4. In the default-branch clone from step 1 (`cd "$RUN_DIR/catalog-main"`, on the
+   branch step 4 creates), record a new receipt with
+   `python3 scripts/host_receipts.py record` for every component whose pin changed (in the pin files, `manifests/stack.json`, or a
    winner's `pin` in `catalogs/landscape/*.json`). A receipt counts toward a
    winner's status only while its `tool_versions` entry equals the winner's
    current pin, so older receipts stop counting until they are re-recorded.
-   `python3 scripts/receipt_staleness.py` on the default branch lists them
-   (`pin_moved`, `no_bound_receipt`), plus bound receipts older than 30 days
-   (`stale`, `--max-age-days` to change the window).
+   `python3 scripts/receipt_staleness.py` on the default branch lists them:
+   `pin_moved` names each host and stage whose newest receipt is still at a
+   retired pin (it clears once that host records at the current pin, even
+   though the old receipt stays), `no_bound_receipt` a bucket with none at the
+   current pin, and `stale` a latest bound receipt older than 30 days
+   (`--max-age-days` to change the window).
    [`receipt-staleness.yml`](../.github/workflows/receipt-staleness.yml) runs
    the same report weekly and uploads it as an artifact; it never fails on a
    flag and writes nothing to the repository.
 
 **4. How the receipts reach the catalog.** Follow
 [the host evidence contribution guide](../docs/contributing-evidence.md): record
-on a branch of current `main` (`git fetch origin && git switch -c <branch>
-origin/main`), re-read and scan the receipts, and before opening the PR rebase
+in the default-branch clone from step 1, not in `$HOST_CHECKOUT`, on a branch
+of current `main` (`cd "$RUN_DIR/catalog-main" && git fetch origin && git
+switch -c <branch> origin/main`), re-read and scan the receipts, and before opening the PR rebase
 onto `origin/main` and rerun
 
 ```sh

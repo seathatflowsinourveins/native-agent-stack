@@ -39,9 +39,13 @@ The workstation and macOS tiers are labelled projections in
 
 ## macOS (64 GB) next steps
 
-1. Pinned clone, then `adoption/bootstrap-macos.sh` (Homebrew prerequisites and darwin pins are in
-   the pinned release; the launchd agents and the embedding acceptance script are on `main` only until
-   the next re-pin, as the [macOS page](../adoption/platforms/macos-arm64.md) marks).
+1. Pinned clone, then `adoption/bootstrap-macos.sh`. The Homebrew prerequisite install, the
+   `socraticode`, darwin-binary and embedding-model pins, the launchd agents and the embedding
+   acceptance script all came in #94, after `v2026.09.23`: at that tag the script brews only `jq`
+   and installs 7 of the 8 `macos-arm64-foundation` components, and the launchd and embedding steps
+   run from a default-branch clone, as the [macOS page](../adoption/platforms/macos-arm64.md) marks.
+   A release cut after #94 and re-pinned ([moving a host to a new release](../adoption/update.md#moving-a-host-to-a-new-release))
+   removes these differences.
 2. `python3 scripts/hardware_profile.py` and the MLX smoke; record the measured profile.
 3. `macos-arm64-foundation` profile; re-qualify any local model on MLX or llama.cpp Metal: a vLLM
    result on CUDA does not transfer.
