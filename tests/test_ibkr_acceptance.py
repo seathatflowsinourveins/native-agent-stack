@@ -56,6 +56,8 @@ class FakeProbe(IBAPI.ProbeState):
         self.client_version = "fake"
 
     def connect(self, host, port, client_id):
+        if self.connected == "raises":
+            raise ConnectionRefusedError(111, "Connection refused to 127.0.0.1:4002")
         if self.connected:
             self.managedAccounts(self.accounts)
 
@@ -63,7 +65,7 @@ class FakeProbe(IBAPI.ProbeState):
         pass
 
     def isConnected(self):
-        return self.connected
+        return self.connected is True
 
     def disconnect(self):
         self.disconnected = True
@@ -205,6 +207,15 @@ class IbapiMain(unittest.TestCase):
     def test_not_connected(self):
         code, receipt = run_main(FakeProbe(connected=False))
         self.assertEqual((code, receipt["status"]), (2, "not_connected"))
+
+    def test_socket_error_from_connect_is_not_connected(self):
+        code, receipt = run_main(FakeProbe(connected="raises"))
+        self.assertEqual((code, receipt["status"]), (2, "not_connected"))
+        self.assertEqual(receipt["observed"]["errors"][0]["text"], "ConnectionRefusedError: [Errno 111] Connection refused to <ip>")
+
+    def test_error_text_redacts_ids_endpoints_and_paths(self):
+        self.assertEqual(IBAPI.redact("acct DU1234567 at 192.168.1.5:4002 log /opt/ibc/logs/x.log or C:\\Jts\\x.log"),
+                         "acct <account-id> at <ip> log <path> or <path>")
 
     def test_existing_position_blocks(self):
         code, receipt = run_main(FakeProbe(positions=1))

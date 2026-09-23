@@ -37,6 +37,13 @@ QUOTE_AGE_RESOLUTION_S = 2.0
 REQUESTS = ("accounts", "time", "positions", "orders", "summary", "contract", "mktdata", "history")
 # IBKR account ids: paper DU/DF, live U/F, and I for some institutional forms.
 ACCOUNT_ID = re.compile(r"\b(?:D?[UF]|I)\d{5,}\b")
+IPV4 = re.compile(r"\b\d{1,3}(?:\.\d{1,3}){3}(?::\d+)?\b")
+ABS_PATH = re.compile(r"(?:[A-Za-z]:\\|/)(?:[\w.-]+[/\\])+[\w.-]*")
+
+
+def redact(text: str) -> str:
+    """Strip account ids, IPv4 endpoints and absolute paths from IB message text."""
+    return ABS_PATH.sub("<path>", IPV4.sub("<ip>", ACCOUNT_ID.sub("<account-id>", text)))
 
 
 def account_scope(accounts_list: str) -> tuple[int, bool]:
@@ -137,7 +144,7 @@ class ProbeState:
 
     def error(self, reqId, errorTime, errorCode, errorString, advancedOrderRejectJson=""):
         # ibapi 10.45 signature: (reqId, errorTime, errorCode, errorString, advancedOrderRejectJson)
-        text = ACCOUNT_ID.sub("<account-id>", (errorString or "")[:160])
+        text = redact(errorString or "")[:160]
         entry = {"reqId": reqId, "code": errorCode, "text": text}
         (self.r["info"] if is_info(errorCode) else self.r["errors"]).append(entry)
 
@@ -221,8 +228,12 @@ def main(argv=None, probe_factory=None, contract_factory=None) -> int:
     p = (probe_factory or build_probe)()
     receipt["ibapi_version"] = getattr(p, "client_version", None)
     deadline = time.monotonic() + a.deadline_seconds
-    p.connect(a.host, a.port, a.client_id)
-    threading.Thread(target=p.run, daemon=True).start()
+    try:
+        p.connect(a.host, a.port, a.client_id)
+    except OSError as exc:  # ibapi reports socket errors itself; this covers any that escape
+        p.r["errors"].append({"reqId": -1, "code": None, "text": redact(f"{type(exc).__name__}: {exc}")[:160]})
+    if p.isConnected():
+        threading.Thread(target=p.run, daemon=True).start()
 
     def wait(key, seconds):
         return p.done[key].wait(max(0.0, min(seconds, deadline - time.monotonic())))

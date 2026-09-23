@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import gc
 import hashlib
 import inspect
 import json
@@ -107,6 +108,12 @@ async def collect(host, port, client_id, end, timeout):
             entry["error"] = f"{type(exc).__name__}: {str(exc)[:200]}"
         entry["elapsed_s"] = round(time.monotonic() - started, 3)
         out["bars"].append(entry)
+    # Drop the Rust-backed client while its event loop is still running: letting
+    # interpreter shutdown drop it aborted the process (a tokio worker's
+    # non-unwinding panic) in 2 of 6 observed runs, and in 0 of 8 with this drop.
+    del client, provider
+    gc.collect()
+    await asyncio.sleep(0.5)
     return out
 
 

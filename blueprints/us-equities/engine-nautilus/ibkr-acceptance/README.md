@@ -13,7 +13,8 @@ native paper stock orders, which are blocked upstream (see "Blockers").
 Both probes are read-only. Neither calls an order method (a source test checks
 this), both refuse a port other than the paper defaults 4002 (IB Gateway) and
 7497 (TWS), both refuse to write the gate's flip receipt `receipt.json`, and
-neither records account ids or balances.
+neither records account ids or balances; account ids, IPv4 endpoints and
+absolute paths in IB message text are redacted.
 
 - `ibapi_probe.py` (official IB API client, `ibapi` 10.45.1): paper-account
   check (every managed account starts with `DU`, else disconnect before any
@@ -25,14 +26,18 @@ neither records account ids or balances.
   orders, and a quote no older than `plan.json`'s 900 s limit (IB times have
   one-second resolution, so down to -2 s counts as current). Account ids are
   not hashed either: a paper id is `DU` plus a few digits, so its hash is
-  reversible; id-shaped text in IB error messages is redacted.
+  reversible.
 - `nautilus_probe.py` (NautilusTrader 2.0.0rc5
   `HistoricalInteractiveBrokersClient`): SPY instrument resolution and
   historical bars through the native adapter. The rc5 Python surface has no
   managed-account query outside a full `TradingNode`, so it runs only on a
   passed `ibapi_probe.py` receipt for the same host and port written at most
   300 s earlier. The Rust-backed client needs an asyncio loop on the calling
-  thread and cannot be moved to a worker thread.
+  thread and cannot be moved to a worker thread. It is dropped inside that
+  loop: left to interpreter shutdown, it aborted the process (a tokio worker's
+  non-unwinding panic, exit 134) in 2 of 6 observed runs, after the receipt was
+  written; with the drop, 0 of 8 study runs aborted
+  (`evidence/attempts/20260923T1500Z-nautilus-teardown-abort-study.json`).
 
 `plan.json` is the step-1 plan written before the first run (file time
 2026-09-22T22:01:09Z) and kept verbatim. It predeclares the paper ports, the
@@ -44,13 +49,24 @@ receipt lists every deviation. Every attempt is retained in
 
 ## Usage
 
-With a signed-in paper IB Gateway on this host, run the two probes back to back:
+Two isolated environments, created with the same uv recipe as
+`engine-nautilus/README.md` (the `trading-nautilus` adoption profile):
 
 ```
-IBAPI_PY=~/.local/share/codex-ecosystem/tools/ibkr-lane-20260922/bin/python   # ibapi 10.45.1
-NT_PY=~/.local/share/codex-ecosystem/tools/adaptive-paper-20260921/bin/python  # nautilus_trader 2.0.0rc5
-"$IBAPI_PY" ibapi_probe.py --receipt ibapi.json
-"$NT_PY" nautilus_probe.py --ibapi-receipt ibapi.json --receipt nautilus.json
+uv venv --python /usr/bin/python3.12 "$IBAPI_ENV"
+uv pip install --python "$IBAPI_ENV/bin/python" --index-url https://pypi.org/simple nautilus-ibapi==10.45.1
+uv venv --python /usr/bin/python3.12 "$NAUTILUS_ENV"
+uv pip install --python "$NAUTILUS_ENV/bin/python" --index-url https://pypi.org/simple --pre nautilus_trader==2.0.0rc5
+```
+
+`nautilus-ibapi` is the PyPI distribution of IB's official TWS API Python
+client used by NautilusTrader (import name `ibapi`; its project URLs point to
+IB's tws-api; version 10.45.1 in the published run). With a signed-in
+paper IB Gateway on this host, run the two probes back to back:
+
+```
+"$IBAPI_ENV/bin/python" ibapi_probe.py --receipt ibapi.json
+"$NAUTILUS_ENV/bin/python" nautilus_probe.py --ibapi-receipt ibapi.json --receipt nautilus.json
 ```
 
 Exit codes: `0` passed; `1` incomplete, failed or instrument only; `2` not

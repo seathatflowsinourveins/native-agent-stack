@@ -6,11 +6,11 @@
   "host": "127.0.0.1",
   "port": 4002,
   "client_id": 76,
-  "generated_at": "2026-09-23T14:58:25.349024+00:00",
+  "generated_at": "2026-09-23T14:56:48.428218+00:00",
   "paper_check": {
     "ibapi_receipt": {
-      "sha256": "af4d968cf9d6508883b53ac80f1532d3b888188000c6173fbd3f725447f56756",
-      "generated_at": "2026-09-23T14:58:23.612901+00:00"
+      "sha256": "1856e3c2af1c97553cc6fe08ef135729ffe3ca97f1e0a15882f7547a8f55c720",
+      "generated_at": "2026-09-23T14:56:46.222588+00:00"
     }
   },
   "status": "passed",
@@ -24,7 +24,7 @@
       "conId": 756733,
       "primaryExchange": "ARCA",
       "currency": "USD",
-      "elapsed_s": 0.002
+      "elapsed_s": 0.02
     },
     "bars": [
       {
@@ -34,7 +34,7 @@
         "count": 5,
         "first": "SPY.ARCA-1-DAY-LAST-EXTERNAL,759.50,761.67,749.60,754.05,37772236,1789603199999999999",
         "last": "SPY.ARCA-1-DAY-LAST-EXTERNAL,774.04,775.14,772.57,773.38,20070509,1790121599999999999",
-        "elapsed_s": 0.126
+        "elapsed_s": 0.316
       },
       {
         "spec": "5-MINUTE-LAST",
@@ -43,7 +43,7 @@
         "count": 390,
         "first": "SPY.ARCA-5-MINUTE-LAST-EXTERNAL,759.50,759.71,759.14,759.21,725714,1789565700000000000",
         "last": "SPY.ARCA-5-MINUTE-LAST-EXTERNAL,774.36,774.36,773.29,773.44,1620113,1790107200000000000",
-        "elapsed_s": 0.15
+        "elapsed_s": 0.145
       }
     ]
   },
