@@ -1,0 +1,5814 @@
+{
+ "schema_version": 1,
+ "id": "catalog-freshness-20260923",
+ "checked_at": "2026-09-23",
+ "scope": "Dated per-layer SOTA repository convergence for the foundation (20 layers) and the US-equities trading destination (12 consolidated layers). Selections are the catalogs' reviewed defaults confirmed against current upstream metadata; new names are labelled keep_but_compare or targeted_candidate only, never promoted. Inclusion is not installation, E2E or superiority.",
+ "method": {
+  "baseline": "extract_layers.py over catalogs/foundation/{manifest,decisions}.json, manifests/stack.json and the catalogs/us-equities layer files, consolidated into 12 trading layers (taxonomy below)",
+  "freshness": "authenticated GitHub REST metadata for 469 repositories, observed 2026-09-23T05:27:37Z to 2026-09-23T05:29:12Z (fetched_this_run=469, retained_from_prior_runs=0): stars, pushed_at, latest release/tag, head, license, archived, rename",
+  "review": "review lanes from a lanes.json record (schema: lanes[].result.layers[], lanes[].proposals[]); every proposed change adversarially verified (votes[].refuted); one completeness critic",
+  "rule": "evidence, not agreement or recency; a newer release is information, not a reason to upgrade"
+ },
+ "taxonomy": {
+  "market-data-reference": [
+   "market-data",
+   "reference",
+   "corporate-actions",
+   "market-calendars",
+   "timezones",
+   "news",
+   "macro-data",
+   "fundamentals",
+   "alternative-data",
+   "sec",
+   "vintage-data",
+   "point-in-time-joins",
+   "stream-ingestion",
+   "raw-ingestion",
+   "ingestion",
+   "event-stream",
+   "data-adapters"
+  ],
+  "identity-provenance": [
+   "provenance",
+   "data-lineage",
+   "data-versioning",
+   "object-store-versioning",
+   "versioned-store",
+   "data-branches",
+   "reproducibility",
+   "model-lineage",
+   "metadata-events",
+   "index-freshness",
+   "snapshot-store",
+   "replay-log"
+  ],
+  "storage-compute": [
+   "columnar-compute",
+   "columnar-database",
+   "columnar-interchange",
+   "parquet",
+   "lakehouse-table",
+   "local-store",
+   "time-series-database",
+   "distributed-compute",
+   "analytics-serving",
+   "desktop-analytics",
+   "feature-store",
+   "schema-contracts",
+   "schema-normalization",
+   "structured-artifacts"
+  ],
+  "data-quality-orchestration": [
+   "data-quality",
+   "data-orchestration",
+   "durable-jobs",
+   "host-capacity",
+   "managed-compute",
+   "packaging"
+  ],
+  "research-factors-ml": [
+   "factor-research",
+   "factor-evaluation",
+   "feature-extraction",
+   "feature-transforms",
+   "financial-ml",
+   "financial-nlp",
+   "forecasting",
+   "foundation-forecasting",
+   "time-series",
+   "time-series-research",
+   "time-series-evaluation",
+   "econometrics",
+   "statistical-baselines",
+   "volatility",
+   "tail-risk",
+   "labeling",
+   "supervised-learning",
+   "online-learning",
+   "reinforcement-learning",
+   "neural-research",
+   "ml-research",
+   "model-selection",
+   "model-serving",
+   "model-sdk",
+   "research-framework",
+   "research-platform",
+   "research-demos",
+   "research-interface",
+   "research-orchestration",
+   "research-validation",
+   "research-workflows",
+   "single-instrument-research",
+   "vectorized-research",
+   "exploration",
+   "document-research",
+   "document-ingestion",
+   "document-retrieval",
+   "rag-pipeline",
+   "financial-agents",
+   "financial-research-agent",
+   "financial-research-skills"
+  ],
+  "backtesting-engine": [
+   "backtesting",
+   "execution-engine",
+   "legacy-engine",
+   "portfolio-backtesting",
+   "cost-aware-simulation",
+   "execution-experiment"
+  ],
+  "execution-broker": [
+   "execution",
+   "broker-adapter",
+   "broker-sdk",
+   "conditional-broker",
+   "legacy-broker-adapter",
+   "reconciliation"
+  ],
+  "portfolio-risk": [
+   "portfolio-optimization",
+   "portfolio-research",
+   "performance-evaluation",
+   "legacy-metrics"
+  ],
+  "evaluation-experiments": [
+   "evaluation",
+   "agent-evaluation",
+   "experiment-tracking",
+   "progressive-evaluation",
+   "validation-reporting"
+  ],
+  "agents-models-workers": [
+   "native-workers",
+   "agent-orchestration",
+   "agent-protocol",
+   "sdk",
+   "routing",
+   "memory-retrieval",
+   "durable-memory",
+   "continuity",
+   "handoff",
+   "code-rag",
+   "code-retrieval",
+   "token-efficiency",
+   "tool-output",
+   "vector-storage"
+  ],
+  "observability-hosting": [
+   "observability",
+   "hosting",
+   "recovery",
+   "backup",
+   "sandbox"
+  ],
+  "security-supply-chain": [
+   "security",
+   "sbom",
+   "secrets",
+   "vulnerability-analysis"
+  ]
+ },
+ "foundation": [
+  {
+   "layer": "native-clients",
+   "title": "Native clients",
+   "components": [
+    {
+     "id": "ai-memory",
+     "repository": "https://github.com/akitaonrails/ai-memory",
+     "pin": "2.3.2",
+     "upstream": {
+      "latest": "v2.4.0",
+      "released_at": "2026-09-21",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 8125,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": true,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "claude-code",
+     "repository": "https://github.com/anthropics/claude-code",
+     "pin": "2.1.278",
+     "upstream": {
+      "latest": "v2.1.280",
+      "released_at": "2026-09-22",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 147692,
+      "license": null,
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": true,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "codex",
+     "repository": "https://github.com/openai/codex",
+     "pin": "0.155.1",
+     "upstream": {
+      "latest": "rust-v0.156.1",
+      "released_at": "2026-09-23",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 126032,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": true,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "context-mode",
+     "repository": "https://github.com/mksglu/context-mode",
+     "pin": "1.0.169",
+     "upstream": {
+      "latest": "v1.0.169",
+      "released_at": "2026-06-29",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 23969,
+      "license": "NOASSERTION",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "qmd",
+     "repository": "https://github.com/tobi/qmd/releases/tag/v2.8.3",
+     "pin": "2.8.3",
+     "upstream": {
+      "latest": "v2.8.3",
+      "released_at": "2026-08-16",
+      "prerelease": false,
+      "pushed_at": "2026-09-09",
+      "stars": 29968,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "rtk",
+     "repository": "https://github.com/rtk-ai/rtk/releases/tag/v0.49.0",
+     "pin": "0.49.0",
+     "upstream": {
+      "latest": "v0.49.0",
+      "released_at": "2026-09-11",
+      "prerelease": false,
+      "pushed_at": "2026-09-21",
+      "stars": 81470,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    }
+   ],
+   "alternatives_keep_but_compare": [],
+   "candidates": [],
+   "open_gaps": []
+  },
+  {
+   "layer": "instructions-skills",
+   "title": "Instructions and skills",
+   "components": [
+    {
+     "id": "affaan-m/ECC",
+     "repository": "https://github.com/affaan-m/ECC",
+     "pin": "dd6ee538aee0f548d4a6b520118f875431fd749e",
+     "upstream": {
+      "latest": "v2.2.1",
+      "released_at": "2026-09-08",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 265589,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": null,
+     "pin_comparison": "not_compared",
+     "pin_comparison_reason": "unversioned",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "ai-memory",
+     "repository": "https://github.com/akitaonrails/ai-memory",
+     "pin": "2.3.2",
+     "upstream": {
+      "latest": "v2.4.0",
+      "released_at": "2026-09-21",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 8125,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": true,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "claude-code",
+     "repository": "https://github.com/anthropics/claude-code",
+     "pin": "2.1.278",
+     "upstream": {
+      "latest": "v2.1.280",
+      "released_at": "2026-09-22",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 147692,
+      "license": null,
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": true,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "codex",
+     "repository": "https://github.com/openai/codex",
+     "pin": "0.155.1",
+     "upstream": {
+      "latest": "rust-v0.156.1",
+      "released_at": "2026-09-23",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 126032,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": true,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "context-mode",
+     "repository": "https://github.com/mksglu/context-mode",
+     "pin": "1.0.169",
+     "upstream": {
+      "latest": "v1.0.169",
+      "released_at": "2026-06-29",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 23969,
+      "license": "NOASSERTION",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "davila7/claude-code-templates",
+     "repository": "https://github.com/davila7/claude-code-templates",
+     "pin": "c840d6f626be7ba418da60aeb0f2080413562451",
+     "upstream": {
+      "latest": "v1.29.6",
+      "released_at": "2026-09-17",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 31205,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": null,
+     "pin_comparison": "not_compared",
+     "pin_comparison_reason": "unversioned",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "qmd",
+     "repository": "https://github.com/tobi/qmd/releases/tag/v2.8.3",
+     "pin": "2.8.3",
+     "upstream": {
+      "latest": "v2.8.3",
+      "released_at": "2026-08-16",
+      "prerelease": false,
+      "pushed_at": "2026-09-09",
+      "stars": 29968,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "rtk",
+     "repository": "https://github.com/rtk-ai/rtk/releases/tag/v0.49.0",
+     "pin": "0.49.0",
+     "upstream": {
+      "latest": "v0.49.0",
+      "released_at": "2026-09-11",
+      "prerelease": false,
+      "pushed_at": "2026-09-21",
+      "stars": 81470,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "shanraisshan/claude-code-best-practice",
+     "repository": "https://github.com/shanraisshan/claude-code-best-practice",
+     "pin": "15969ed2471a177d938c889255d2f23f07e4742a",
+     "upstream": {
+      "latest": null,
+      "released_at": null,
+      "prerelease": null,
+      "pushed_at": "2026-09-23",
+      "stars": 66252,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": null,
+     "pin_comparison": "not_compared",
+     "pin_comparison_reason": "unversioned",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "skills-ref",
+     "repository": "https://github.com/agentskills/agentskills",
+     "pin": "0.1.0",
+     "upstream": {
+      "latest": null,
+      "released_at": null,
+      "prerelease": null,
+      "pushed_at": "2026-08-09",
+      "stars": 25610,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": null,
+     "pin_comparison": "not_compared",
+     "pin_comparison_reason": "unversioned",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "tavily-cli",
+     "repository": "https://github.com/tavily-ai/tavily-cli",
+     "pin": "0.1.8",
+     "upstream": {
+      "latest": null,
+      "released_at": null,
+      "prerelease": null,
+      "pushed_at": "2026-09-21",
+      "stars": 18,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": null,
+     "pin_comparison": "not_compared",
+     "pin_comparison_reason": "unversioned",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    }
+   ],
+   "alternatives_keep_but_compare": [],
+   "candidates": [],
+   "open_gaps": []
+  },
+  {
+   "layer": "workers",
+   "title": "Workers and task ownership",
+   "components": [
+    {
+     "id": "beads",
+     "repository": "https://github.com/gastownhall/beads",
+     "pin": "1.3.0",
+     "upstream": {
+      "latest": "v1.3.0",
+      "released_at": "2026-09-15",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 27374,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "claude-code",
+     "repository": "https://github.com/anthropics/claude-code",
+     "pin": "2.1.278",
+     "upstream": {
+      "latest": "v2.1.280",
+      "released_at": "2026-09-22",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 147692,
+      "license": null,
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": true,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "codex",
+     "repository": "https://github.com/openai/codex",
+     "pin": "0.155.1",
+     "upstream": {
+      "latest": "rust-v0.156.1",
+      "released_at": "2026-09-23",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 126032,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": true,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "codex-for-claude",
+     "repository": "https://github.com/openai/codex-plugin-cc/tree/v1.0.6",
+     "pin": "1.0.6 @ db52e28f4d9ded852ab3942cea316258ae4ef346",
+     "upstream": {
+      "latest": "v1.0.6",
+      "released_at": "2026-07-08",
+      "prerelease": false,
+      "pushed_at": "2026-07-08",
+      "stars": 33495,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "systemd",
+     "repository": "https://github.com/systemd/systemd",
+     "pin": "255.4-1ubuntu8.17",
+     "upstream": {
+      "latest": "v262",
+      "released_at": "2026-09-22",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 16713,
+      "license": "GPL-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": null,
+     "pin_comparison": "not_compared",
+     "pin_comparison_reason": "os_package_pin",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "worktrunk",
+     "repository": "https://github.com/max-sixty/worktrunk",
+     "pin": "0.79.0",
+     "upstream": {
+      "latest": "v0.79.0",
+      "released_at": "2026-09-21",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 8349,
+      "license": "NOASSERTION",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    }
+   ],
+   "alternatives_keep_but_compare": [],
+   "candidates": [],
+   "open_gaps": []
+  },
+  {
+   "layer": "isolation",
+   "title": "Isolation",
+   "components": [
+    {
+     "id": "apple-container",
+     "repository": "https://github.com/apple/container",
+     "pin": "1.4.1",
+     "upstream": {
+      "latest": "1.4.1",
+      "released_at": "2026-09-09",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 50128,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "sandbox-runtime",
+     "repository": "https://github.com/anthropics/sandbox-runtime",
+     "pin": "0.0.77",
+     "upstream": {
+      "latest": "v0.0.77",
+      "released_at": "2026-09-18",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 5304,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "worktrunk",
+     "repository": "https://github.com/max-sixty/worktrunk",
+     "pin": "0.79.0",
+     "upstream": {
+      "latest": "v0.79.0",
+      "released_at": "2026-09-21",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 8349,
+      "license": "NOASSERTION",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    }
+   ],
+   "alternatives_keep_but_compare": [],
+   "candidates": [],
+   "open_gaps": []
+  },
+  {
+   "layer": "code-navigation",
+   "title": "Code navigation",
+   "components": [
+    {
+     "id": "ast-grep",
+     "repository": "https://github.com/ast-grep/ast-grep/releases/tag/0.45.3",
+     "pin": "0.45.3",
+     "upstream": {
+      "latest": "0.45.3",
+      "released_at": "2026-08-31",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 16004,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "codebase-memory-mcp",
+     "repository": "https://github.com/DeusData/codebase-memory-mcp/releases/tag/v0.11.0",
+     "pin": "0.11.0",
+     "upstream": {
+      "latest": "v0.11.0",
+      "released_at": "2026-09-15",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 44232,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "jcodemunch-mcp",
+     "repository": "https://github.com/jgravelle/jcodemunch-mcp",
+     "pin": "1.108.319",
+     "upstream": {
+      "latest": "v1.108.319",
+      "released_at": "2026-09-16",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 2711,
+      "license": "NOASSERTION",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "mcp-inspector",
+     "repository": "https://github.com/modelcontextprotocol/inspector",
+     "pin": "2.7.0",
+     "upstream": {
+      "latest": "2.7.0",
+      "released_at": "2026-09-16",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 10930,
+      "license": null,
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "mcporter",
+     "repository": "https://github.com/openclaw/mcporter/tree/v0.13.13",
+     "pin": "0.13.13",
+     "upstream": {
+      "latest": "v0.14.0",
+      "released_at": "2026-09-22",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 5023,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": true,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "qdrant",
+     "repository": "https://github.com/qdrant/qdrant",
+     "pin": "1.19.1",
+     "upstream": {
+      "latest": "v1.19.1",
+      "released_at": "2026-09-04",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 34757,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "repomix",
+     "repository": "https://github.com/yamadashy/repomix/releases/tag/v1.18.1",
+     "pin": "1.18.1",
+     "upstream": {
+      "latest": "v1.18.1",
+      "released_at": "2026-09-21",
+      "prerelease": false,
+      "pushed_at": "2026-09-21",
+      "stars": 28468,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "serena",
+     "repository": "https://github.com/oraios/serena",
+     "pin": "2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+     "upstream": {
+      "latest": "v1.7.0",
+      "released_at": "2026-08-09",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 29732,
+      "license": "NOASSERTION",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": null,
+     "pin_comparison": "not_compared",
+     "pin_comparison_reason": "commit_pinned",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "socraticode",
+     "repository": "https://github.com/giancarloerra/SocratiCode",
+     "pin": "1.14.0",
+     "upstream": {
+      "latest": "v1.14.0",
+      "released_at": "2026-09-16",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 3318,
+      "license": "AGPL-3.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "toon",
+     "repository": "https://github.com/toon-format/toon/releases/tag/v4.1.1",
+     "pin": "4.1.1",
+     "upstream": {
+      "latest": "v4.1.1",
+      "released_at": "2026-08-05",
+      "prerelease": false,
+      "pushed_at": "2026-09-03",
+      "stars": 25417,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    }
+   ],
+   "alternatives_keep_but_compare": [],
+   "candidates": [],
+   "open_gaps": []
+  },
+  {
+   "layer": "document-retrieval",
+   "title": "Documents and ingestion",
+   "components": [
+    {
+     "id": "context-hub",
+     "repository": "https://github.com/andrewyng/context-hub",
+     "pin": "0.1.4",
+     "upstream": {
+      "latest": "v0.1.4",
+      "released_at": "2026-04-27",
+      "prerelease": false,
+      "pushed_at": "2026-05-31",
+      "stars": 13982,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "markitdown",
+     "repository": "https://github.com/microsoft/markitdown/releases/tag/v0.1.7",
+     "pin": "0.1.7",
+     "upstream": {
+      "latest": "v0.1.8",
+      "released_at": "2026-09-21",
+      "prerelease": false,
+      "pushed_at": "2026-09-21",
+      "stars": 186506,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": true,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "poppler",
+     "repository": "https://github.com/tsdgeos/poppler_mirror",
+     "pin": "26.09.0",
+     "upstream": {
+      "latest": null,
+      "released_at": null,
+      "prerelease": null,
+      "pushed_at": "2026-09-13",
+      "stars": 61,
+      "license": "GPL-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": null,
+     "pin_comparison": "not_compared",
+     "pin_comparison_reason": "unversioned",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "qmd",
+     "repository": "https://github.com/tobi/qmd/releases/tag/v2.8.3",
+     "pin": "2.8.3",
+     "upstream": {
+      "latest": "v2.8.3",
+      "released_at": "2026-08-16",
+      "prerelease": false,
+      "pushed_at": "2026-09-09",
+      "stars": 29968,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    }
+   ],
+   "alternatives_keep_but_compare": [],
+   "candidates": [],
+   "open_gaps": []
+  },
+  {
+   "layer": "semantic-rag",
+   "title": "Semantic code retrieval",
+   "components": [
+    {
+     "id": "ai-memory",
+     "repository": "https://github.com/akitaonrails/ai-memory",
+     "pin": "2.3.2",
+     "upstream": {
+      "latest": "v2.4.0",
+      "released_at": "2026-09-21",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 8125,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": true,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "huggingface-hub-native",
+     "repository": "https://github.com/huggingface/huggingface_hub",
+     "pin": "1.32.0",
+     "upstream": {
+      "latest": "v1.32.0",
+      "released_at": "2026-09-17",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 3924,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "qdrant",
+     "repository": "https://github.com/qdrant/qdrant",
+     "pin": "1.19.1",
+     "upstream": {
+      "latest": "v1.19.1",
+      "released_at": "2026-09-04",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 34757,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "restic",
+     "repository": "https://github.com/restic/restic",
+     "pin": "0.19.1",
+     "upstream": {
+      "latest": "v0.19.1",
+      "released_at": "2026-07-05",
+      "prerelease": false,
+      "pushed_at": "2026-09-20",
+      "stars": 36195,
+      "license": "BSD-2-Clause",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "socraticode",
+     "repository": "https://github.com/giancarloerra/SocratiCode",
+     "pin": "1.14.0",
+     "upstream": {
+      "latest": "v1.14.0",
+      "released_at": "2026-09-16",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 3318,
+      "license": "AGPL-3.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "vllm",
+     "repository": "https://github.com/vllm-project/vllm",
+     "pin": "0.25.0",
+     "upstream": {
+      "latest": "v0.30.0",
+      "released_at": "2026-09-22",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 92466,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": true,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    }
+   ],
+   "alternatives_keep_but_compare": [],
+   "candidates": [],
+   "open_gaps": []
+  },
+  {
+   "layer": "durable-memory",
+   "title": "Durable memory",
+   "components": [
+    {
+     "id": "ai-memory",
+     "repository": "https://github.com/akitaonrails/ai-memory",
+     "pin": "2.3.2",
+     "upstream": {
+      "latest": "v2.4.0",
+      "released_at": "2026-09-21",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 8125,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": true,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "claude-code",
+     "repository": "https://github.com/anthropics/claude-code",
+     "pin": "2.1.278",
+     "upstream": {
+      "latest": "v2.1.280",
+      "released_at": "2026-09-22",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 147692,
+      "license": null,
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": true,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "codex",
+     "repository": "https://github.com/openai/codex",
+     "pin": "0.155.1",
+     "upstream": {
+      "latest": "rust-v0.156.1",
+      "released_at": "2026-09-23",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 126032,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": true,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "qdrant",
+     "repository": "https://github.com/qdrant/qdrant",
+     "pin": "1.19.1",
+     "upstream": {
+      "latest": "v1.19.1",
+      "released_at": "2026-09-04",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 34757,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "restic",
+     "repository": "https://github.com/restic/restic",
+     "pin": "0.19.1",
+     "upstream": {
+      "latest": "v0.19.1",
+      "released_at": "2026-07-05",
+      "prerelease": false,
+      "pushed_at": "2026-09-20",
+      "stars": 36195,
+      "license": "BSD-2-Clause",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    }
+   ],
+   "alternatives_keep_but_compare": [],
+   "candidates": [],
+   "open_gaps": []
+  },
+  {
+   "layer": "web-research",
+   "title": "Web research",
+   "components": [
+    {
+     "id": "agent-browser",
+     "repository": "https://github.com/vercel-labs/agent-browser/releases/tag/v0.38.1",
+     "pin": "0.38.1",
+     "upstream": {
+      "latest": "v0.38.1",
+      "released_at": "2026-09-16",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 43081,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "openresearch",
+     "repository": "https://github.com/alphaXiv/OpenResearch",
+     "pin": "0.2.7",
+     "upstream": {
+      "latest": "v0.2.9",
+      "released_at": "2026-09-23",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 5580,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": true,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "playwright-cli",
+     "repository": "https://github.com/microsoft/playwright-cli",
+     "pin": "0.1.21; Playwright 1.64.0-alpha-1789764292000",
+     "upstream": {
+      "latest": "v0.1.21",
+      "released_at": "2026-09-18",
+      "prerelease": false,
+      "pushed_at": "2026-09-18",
+      "stars": 13505,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "tavily-cli",
+     "repository": "https://github.com/tavily-ai/tavily-cli",
+     "pin": "0.1.8",
+     "upstream": {
+      "latest": null,
+      "released_at": null,
+      "prerelease": null,
+      "pushed_at": "2026-09-21",
+      "stars": 18,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": null,
+     "pin_comparison": "not_compared",
+     "pin_comparison_reason": "unversioned",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    }
+   ],
+   "alternatives_keep_but_compare": [],
+   "candidates": [],
+   "open_gaps": []
+  },
+  {
+   "layer": "token-efficiency",
+   "title": "Context and usage efficiency",
+   "components": [
+    {
+     "id": "ccusage",
+     "repository": "https://github.com/ccusage/ccusage",
+     "pin": "20.0.24",
+     "upstream": {
+      "latest": "v20.0.24",
+      "released_at": "2026-09-21",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 18697,
+      "license": "NOASSERTION",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "context-mode",
+     "repository": "https://github.com/mksglu/context-mode",
+     "pin": "1.0.169",
+     "upstream": {
+      "latest": "v1.0.169",
+      "released_at": "2026-06-29",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 23969,
+      "license": "NOASSERTION",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "headroom",
+     "repository": "https://github.com/headroomlabs-ai/headroom",
+     "pin": "0.37.0",
+     "upstream": {
+      "latest": "v0.38.0",
+      "released_at": "2026-09-21",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 73553,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": true,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "jcodemunch-mcp",
+     "repository": "https://github.com/jgravelle/jcodemunch-mcp",
+     "pin": "1.108.319",
+     "upstream": {
+      "latest": "v1.108.319",
+      "released_at": "2026-09-16",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 2711,
+      "license": "NOASSERTION",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "qmd",
+     "repository": "https://github.com/tobi/qmd/releases/tag/v2.8.3",
+     "pin": "2.8.3",
+     "upstream": {
+      "latest": "v2.8.3",
+      "released_at": "2026-08-16",
+      "prerelease": false,
+      "pushed_at": "2026-09-09",
+      "stars": 29968,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "repomix",
+     "repository": "https://github.com/yamadashy/repomix/releases/tag/v1.18.1",
+     "pin": "1.18.1",
+     "upstream": {
+      "latest": "v1.18.1",
+      "released_at": "2026-09-21",
+      "prerelease": false,
+      "pushed_at": "2026-09-21",
+      "stars": 28468,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "rtk",
+     "repository": "https://github.com/rtk-ai/rtk/releases/tag/v0.49.0",
+     "pin": "0.49.0",
+     "upstream": {
+      "latest": "v0.49.0",
+      "released_at": "2026-09-11",
+      "prerelease": false,
+      "pushed_at": "2026-09-21",
+      "stars": 81470,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "toon",
+     "repository": "https://github.com/toon-format/toon/releases/tag/v4.1.1",
+     "pin": "4.1.1",
+     "upstream": {
+      "latest": "v4.1.1",
+      "released_at": "2026-08-05",
+      "prerelease": false,
+      "pushed_at": "2026-09-03",
+      "stars": 25417,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    }
+   ],
+   "alternatives_keep_but_compare": [],
+   "candidates": [],
+   "open_gaps": []
+  },
+  {
+   "layer": "quality-evaluation",
+   "title": "Quality and evaluation",
+   "components": [
+    {
+     "id": "difftastic",
+     "repository": "https://github.com/Wilfred/difftastic/releases/tag/0.71.0",
+     "pin": "0.71.0",
+     "upstream": {
+      "latest": "0.71.0",
+      "released_at": "2026-09-18",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 25923,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "fastapi",
+     "repository": "https://github.com/fastapi/fastapi",
+     "pin": "0.141.1",
+     "upstream": {
+      "latest": "0.141.1",
+      "released_at": "2026-07-29",
+      "prerelease": false,
+      "pushed_at": "2026-09-18",
+      "stars": 102544,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "gitleaks",
+     "repository": "https://github.com/gitleaks/gitleaks",
+     "pin": "8.30.1",
+     "upstream": {
+      "latest": "v8.30.1",
+      "released_at": "2026-03-21",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 29437,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "nextjs",
+     "repository": "https://github.com/vercel/next.js",
+     "pin": "16.3.5",
+     "upstream": {
+      "latest": "v16.3.6",
+      "released_at": "2026-09-22",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 142408,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": true,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "playwright-test",
+     "repository": "https://github.com/microsoft/playwright",
+     "pin": "1.63.0",
+     "upstream": {
+      "latest": "v1.63.0",
+      "released_at": "2026-09-04",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 96536,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "postgresql",
+     "repository": "https://github.com/postgres/postgres",
+     "pin": "18.6",
+     "upstream": {
+      "latest": null,
+      "released_at": null,
+      "prerelease": null,
+      "pushed_at": "2026-09-22",
+      "stars": 22179,
+      "license": "NOASSERTION",
+      "archived": false,
+      "renamed_to": null,
+      "latest_flag": {
+       "tag": "release-6-3",
+       "reason": "tag_listing_only_not_version_shaped"
+      }
+     },
+     "pin_behind_upstream": null,
+     "pin_comparison": "not_compared",
+     "pin_comparison_reason": "unversioned",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "promptfoo",
+     "repository": "https://github.com/promptfoo/promptfoo",
+     "pin": "0.123.1",
+     "upstream": {
+      "latest": "0.123.1",
+      "released_at": "2026-09-18",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 25380,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "react",
+     "repository": "https://github.com/react/react",
+     "pin": "19.3.0",
+     "upstream": {
+      "latest": "v19.3.0",
+      "released_at": "2026-09-09",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 250659,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "shellcheck",
+     "repository": "https://github.com/koalaman/shellcheck/releases/tag/v0.11.0",
+     "pin": "0.11.0",
+     "upstream": {
+      "latest": "v0.11.0",
+      "released_at": "2025-08-04",
+      "prerelease": false,
+      "pushed_at": "2026-09-21",
+      "stars": 40072,
+      "license": "GPL-3.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "skills-ref",
+     "repository": "https://github.com/agentskills/agentskills",
+     "pin": "0.1.0",
+     "upstream": {
+      "latest": null,
+      "released_at": null,
+      "prerelease": null,
+      "pushed_at": "2026-08-09",
+      "stars": 25610,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": null,
+     "pin_comparison": "not_compared",
+     "pin_comparison_reason": "unversioned",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "syft",
+     "repository": "https://github.com/anchore/syft",
+     "pin": "1.52.0",
+     "upstream": {
+      "latest": "v1.52.0",
+      "released_at": "2026-09-17",
+      "prerelease": false,
+      "pushed_at": "2026-09-18",
+      "stars": 9601,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "zizmor",
+     "repository": "https://github.com/zizmorcore/zizmor",
+     "pin": "1.30.1",
+     "upstream": {
+      "latest": "v1.30.1",
+      "released_at": "2026-09-09",
+      "prerelease": false,
+      "pushed_at": "2026-09-21",
+      "stars": 6559,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    }
+   ],
+   "alternatives_keep_but_compare": [],
+   "candidates": [],
+   "open_gaps": []
+  },
+  {
+   "layer": "ci-supply-chain",
+   "title": "CI and supply chain",
+   "components": [
+    {
+     "id": "gitleaks",
+     "repository": "https://github.com/gitleaks/gitleaks",
+     "pin": "8.30.1",
+     "upstream": {
+      "latest": "v8.30.1",
+      "released_at": "2026-03-21",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 29437,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "qmd",
+     "repository": "https://github.com/tobi/qmd/releases/tag/v2.8.3",
+     "pin": "2.8.3",
+     "upstream": {
+      "latest": "v2.8.3",
+      "released_at": "2026-08-16",
+      "prerelease": false,
+      "pushed_at": "2026-09-09",
+      "stars": 29968,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "repomix",
+     "repository": "https://github.com/yamadashy/repomix/releases/tag/v1.18.1",
+     "pin": "1.18.1",
+     "upstream": {
+      "latest": "v1.18.1",
+      "released_at": "2026-09-21",
+      "prerelease": false,
+      "pushed_at": "2026-09-21",
+      "stars": 28468,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "rtk",
+     "repository": "https://github.com/rtk-ai/rtk/releases/tag/v0.49.0",
+     "pin": "0.49.0",
+     "upstream": {
+      "latest": "v0.49.0",
+      "released_at": "2026-09-11",
+      "prerelease": false,
+      "pushed_at": "2026-09-21",
+      "stars": 81470,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "syft",
+     "repository": "https://github.com/anchore/syft",
+     "pin": "1.52.0",
+     "upstream": {
+      "latest": "v1.52.0",
+      "released_at": "2026-09-17",
+      "prerelease": false,
+      "pushed_at": "2026-09-18",
+      "stars": 9601,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "toon",
+     "repository": "https://github.com/toon-format/toon/releases/tag/v4.1.1",
+     "pin": "4.1.1",
+     "upstream": {
+      "latest": "v4.1.1",
+      "released_at": "2026-08-05",
+      "prerelease": false,
+      "pushed_at": "2026-09-03",
+      "stars": 25417,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "zizmor",
+     "repository": "https://github.com/zizmorcore/zizmor",
+     "pin": "1.30.1",
+     "upstream": {
+      "latest": "v1.30.1",
+      "released_at": "2026-09-09",
+      "prerelease": false,
+      "pushed_at": "2026-09-21",
+      "stars": 6559,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    }
+   ],
+   "alternatives_keep_but_compare": [],
+   "candidates": [],
+   "open_gaps": []
+  },
+  {
+   "layer": "scheduling-supervision",
+   "title": "Scheduling and supervision",
+   "components": [
+    {
+     "id": "beads",
+     "repository": "https://github.com/gastownhall/beads",
+     "pin": "1.3.0",
+     "upstream": {
+      "latest": "v1.3.0",
+      "released_at": "2026-09-15",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 27374,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "claude-code",
+     "repository": "https://github.com/anthropics/claude-code",
+     "pin": "2.1.278",
+     "upstream": {
+      "latest": "v2.1.280",
+      "released_at": "2026-09-22",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 147692,
+      "license": null,
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": true,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "codex",
+     "repository": "https://github.com/openai/codex",
+     "pin": "0.155.1",
+     "upstream": {
+      "latest": "rust-v0.156.1",
+      "released_at": "2026-09-23",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 126032,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": true,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "dagu",
+     "repository": "https://github.com/dagucloud/dagu",
+     "pin": "2.16.6",
+     "upstream": {
+      "latest": "v2.17.0",
+      "released_at": "2026-09-21",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 4062,
+      "license": "GPL-3.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": true,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "systemd",
+     "repository": "https://github.com/systemd/systemd",
+     "pin": "255.4-1ubuntu8.17",
+     "upstream": {
+      "latest": "v262",
+      "released_at": "2026-09-22",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 16713,
+      "license": "GPL-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": null,
+     "pin_comparison": "not_compared",
+     "pin_comparison_reason": "os_package_pin",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    }
+   ],
+   "alternatives_keep_but_compare": [],
+   "candidates": [],
+   "open_gaps": []
+  },
+  {
+   "layer": "hosting-services",
+   "title": "Application and service hosting",
+   "components": [
+    {
+     "id": "apple-container",
+     "repository": "https://github.com/apple/container",
+     "pin": "1.4.1",
+     "upstream": {
+      "latest": "1.4.1",
+      "released_at": "2026-09-09",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 50128,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "fastapi",
+     "repository": "https://github.com/fastapi/fastapi",
+     "pin": "0.141.1",
+     "upstream": {
+      "latest": "0.141.1",
+      "released_at": "2026-07-29",
+      "prerelease": false,
+      "pushed_at": "2026-09-18",
+      "stars": 102544,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "mcp-inspector",
+     "repository": "https://github.com/modelcontextprotocol/inspector",
+     "pin": "2.7.0",
+     "upstream": {
+      "latest": "2.7.0",
+      "released_at": "2026-09-16",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 10930,
+      "license": null,
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "mcporter",
+     "repository": "https://github.com/openclaw/mcporter/tree/v0.13.13",
+     "pin": "0.13.13",
+     "upstream": {
+      "latest": "v0.14.0",
+      "released_at": "2026-09-22",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 5023,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": true,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "nextjs",
+     "repository": "https://github.com/vercel/next.js",
+     "pin": "16.3.5",
+     "upstream": {
+      "latest": "v16.3.6",
+      "released_at": "2026-09-22",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 142408,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": true,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "omniroute",
+     "repository": "https://github.com/diegosouzapw/OmniRoute",
+     "pin": "3.8.50",
+     "upstream": {
+      "latest": "v3.8.50",
+      "released_at": "2026-08-26",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 69362,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "postgresql",
+     "repository": "https://github.com/postgres/postgres",
+     "pin": "18.6",
+     "upstream": {
+      "latest": null,
+      "released_at": null,
+      "prerelease": null,
+      "pushed_at": "2026-09-22",
+      "stars": 22179,
+      "license": "NOASSERTION",
+      "archived": false,
+      "renamed_to": null,
+      "latest_flag": {
+       "tag": "release-6-3",
+       "reason": "tag_listing_only_not_version_shaped"
+      }
+     },
+     "pin_behind_upstream": null,
+     "pin_comparison": "not_compared",
+     "pin_comparison_reason": "unversioned",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "react",
+     "repository": "https://github.com/react/react",
+     "pin": "19.3.0",
+     "upstream": {
+      "latest": "v19.3.0",
+      "released_at": "2026-09-09",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 250659,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    }
+   ],
+   "alternatives_keep_but_compare": [],
+   "candidates": [],
+   "open_gaps": []
+  },
+  {
+   "layer": "recovery-portability",
+   "title": "Recovery and portability",
+   "components": [
+    {
+     "id": "ai-memory",
+     "repository": "https://github.com/akitaonrails/ai-memory",
+     "pin": "2.3.2",
+     "upstream": {
+      "latest": "v2.4.0",
+      "released_at": "2026-09-21",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 8125,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": true,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "claude-code",
+     "repository": "https://github.com/anthropics/claude-code",
+     "pin": "2.1.278",
+     "upstream": {
+      "latest": "v2.1.280",
+      "released_at": "2026-09-22",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 147692,
+      "license": null,
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": true,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "codex",
+     "repository": "https://github.com/openai/codex",
+     "pin": "0.155.1",
+     "upstream": {
+      "latest": "rust-v0.156.1",
+      "released_at": "2026-09-23",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 126032,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": true,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "dagu",
+     "repository": "https://github.com/dagucloud/dagu",
+     "pin": "2.16.6",
+     "upstream": {
+      "latest": "v2.17.0",
+      "released_at": "2026-09-21",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 4062,
+      "license": "GPL-3.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": true,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "qdrant",
+     "repository": "https://github.com/qdrant/qdrant",
+     "pin": "1.19.1",
+     "upstream": {
+      "latest": "v1.19.1",
+      "released_at": "2026-09-04",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 34757,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "restic",
+     "repository": "https://github.com/restic/restic",
+     "pin": "0.19.1",
+     "upstream": {
+      "latest": "v0.19.1",
+      "released_at": "2026-07-05",
+      "prerelease": false,
+      "pushed_at": "2026-09-20",
+      "stars": 36195,
+      "license": "BSD-2-Clause",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "systemd",
+     "repository": "https://github.com/systemd/systemd",
+     "pin": "255.4-1ubuntu8.17",
+     "upstream": {
+      "latest": "v262",
+      "released_at": "2026-09-22",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 16713,
+      "license": "GPL-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": null,
+     "pin_comparison": "not_compared",
+     "pin_comparison_reason": "os_package_pin",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    }
+   ],
+   "alternatives_keep_but_compare": [],
+   "candidates": [],
+   "open_gaps": []
+  },
+  {
+   "layer": "observation-inference",
+   "title": "Observation and optional inference",
+   "components": [
+    {
+     "id": "agentsview",
+     "repository": "https://github.com/kenn-io/agentsview/releases/tag/v0.43.0",
+     "pin": "0.43.0",
+     "upstream": {
+      "latest": "v0.44.0",
+      "released_at": "2026-09-21",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 5968,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": true,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "alertmanager",
+     "repository": "https://github.com/prometheus/alertmanager",
+     "pin": "0.34.1",
+     "upstream": {
+      "latest": "v0.34.1",
+      "released_at": "2026-09-17",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 8626,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "ccusage",
+     "repository": "https://github.com/ccusage/ccusage",
+     "pin": "20.0.24",
+     "upstream": {
+      "latest": "v20.0.24",
+      "released_at": "2026-09-21",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 18697,
+      "license": "NOASSERTION",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "claude-code",
+     "repository": "https://github.com/anthropics/claude-code",
+     "pin": "2.1.278",
+     "upstream": {
+      "latest": "v2.1.280",
+      "released_at": "2026-09-22",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 147692,
+      "license": null,
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": true,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "claude-hud",
+     "repository": "https://github.com/jarrodwatts/claude-hud/releases/tag/v0.8.0",
+     "pin": "0.8.0",
+     "upstream": {
+      "latest": "v0.8.0",
+      "released_at": "2026-08-18",
+      "prerelease": false,
+      "pushed_at": "2026-09-19",
+      "stars": 28118,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "grafana",
+     "repository": "https://github.com/grafana/grafana",
+     "pin": "13.2.2",
+     "upstream": {
+      "latest": "v13.2.2",
+      "released_at": "2026-09-15",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 76865,
+      "license": "AGPL-3.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "huggingface-hub-native",
+     "repository": "https://github.com/huggingface/huggingface_hub",
+     "pin": "1.32.0",
+     "upstream": {
+      "latest": "v1.32.0",
+      "released_at": "2026-09-17",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 3924,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "llama-cpp",
+     "repository": "https://github.com/ggml-org/llama.cpp",
+     "pin": "b11057 (0.4.1-dev)",
+     "upstream": {
+      "latest": "v0.4.1",
+      "released_at": "2026-09-14",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 129249,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "loki",
+     "repository": "https://github.com/grafana/loki",
+     "pin": "3.7.8",
+     "upstream": {
+      "latest": "v3.7.8",
+      "released_at": "2026-09-17",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 28935,
+      "license": "AGPL-3.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "ntfy",
+     "repository": "https://github.com/binwiederhier/ntfy",
+     "pin": "2.28.0",
+     "upstream": {
+      "latest": "v2.28.0",
+      "released_at": "2026-08-27",
+      "prerelease": false,
+      "pushed_at": "2026-09-15",
+      "stars": 34377,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "omniroute",
+     "repository": "https://github.com/diegosouzapw/OmniRoute",
+     "pin": "3.8.50",
+     "upstream": {
+      "latest": "v3.8.50",
+      "released_at": "2026-08-26",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 69362,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "opentelemetry-collector-contrib",
+     "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+     "pin": "0.161.0",
+     "upstream": {
+      "latest": "v0.161.0",
+      "released_at": "2026-09-15",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 4949,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "otel-tui",
+     "repository": "https://github.com/ymtdzzz/otel-tui",
+     "pin": "0.7.5",
+     "upstream": {
+      "latest": "v0.7.5",
+      "released_at": "2026-09-12",
+      "prerelease": false,
+      "pushed_at": "2026-09-21",
+      "stars": 1088,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "prometheus",
+     "repository": "https://github.com/prometheus/prometheus",
+     "pin": "3.14.0",
+     "upstream": {
+      "latest": "v3.14.0",
+      "released_at": "2026-08-18",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 66182,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "vllm",
+     "repository": "https://github.com/vllm-project/vllm",
+     "pin": "0.25.0",
+     "upstream": {
+      "latest": "v0.30.0",
+      "released_at": "2026-09-22",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 92466,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": true,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    }
+   ],
+   "alternatives_keep_but_compare": [],
+   "candidates": [],
+   "open_gaps": []
+  },
+  {
+   "layer": "agent-sdks",
+   "title": "Agent SDKs and runtime workers",
+   "components": [
+    {
+     "id": "codex",
+     "repository": "https://github.com/openai/codex",
+     "pin": "0.155.1",
+     "upstream": {
+      "latest": "rust-v0.156.1",
+      "released_at": "2026-09-23",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 126032,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": true,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    }
+   ],
+   "alternatives_keep_but_compare": [],
+   "candidates": [],
+   "open_gaps": []
+  },
+  {
+   "layer": "mcp-surfaces",
+   "title": "MCP servers and client surfaces",
+   "components": [
+    {
+     "id": "mcp-inspector",
+     "repository": "https://github.com/modelcontextprotocol/inspector",
+     "pin": "2.7.0",
+     "upstream": {
+      "latest": "2.7.0",
+      "released_at": "2026-09-16",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 10930,
+      "license": null,
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "mcporter",
+     "repository": "https://github.com/openclaw/mcporter/tree/v0.13.13",
+     "pin": "0.13.13",
+     "upstream": {
+      "latest": "v0.14.0",
+      "released_at": "2026-09-22",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 5023,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": true,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    }
+   ],
+   "alternatives_keep_but_compare": [],
+   "candidates": [],
+   "open_gaps": []
+  },
+  {
+   "layer": "secrets-credentials",
+   "title": "Secrets and credentials",
+   "components": [
+    {
+     "id": "gitleaks",
+     "repository": "https://github.com/gitleaks/gitleaks",
+     "pin": "8.30.1",
+     "upstream": {
+      "latest": "v8.30.1",
+      "released_at": "2026-03-21",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 29437,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "syft",
+     "repository": "https://github.com/anchore/syft",
+     "pin": "1.52.0",
+     "upstream": {
+      "latest": "v1.52.0",
+      "released_at": "2026-09-17",
+      "prerelease": false,
+      "pushed_at": "2026-09-18",
+      "stars": 9601,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "zizmor",
+     "repository": "https://github.com/zizmorcore/zizmor",
+     "pin": "1.30.1",
+     "upstream": {
+      "latest": "v1.30.1",
+      "released_at": "2026-09-09",
+      "prerelease": false,
+      "pushed_at": "2026-09-21",
+      "stars": 6559,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    }
+   ],
+   "alternatives_keep_but_compare": [],
+   "candidates": [],
+   "open_gaps": []
+  },
+  {
+   "layer": "git-github-automation",
+   "title": "Git practice and GitHub automation",
+   "components": [
+    {
+     "id": "codex",
+     "repository": "https://github.com/openai/codex",
+     "pin": "0.155.1",
+     "upstream": {
+      "latest": "rust-v0.156.1",
+      "released_at": "2026-09-23",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 126032,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": true,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "codex-for-claude",
+     "repository": "https://github.com/openai/codex-plugin-cc/tree/v1.0.6",
+     "pin": "1.0.6 @ db52e28f4d9ded852ab3942cea316258ae4ef346",
+     "upstream": {
+      "latest": "v1.0.6",
+      "released_at": "2026-07-08",
+      "prerelease": false,
+      "pushed_at": "2026-07-08",
+      "stars": 33495,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "difftastic",
+     "repository": "https://github.com/Wilfred/difftastic/releases/tag/0.71.0",
+     "pin": "0.71.0",
+     "upstream": {
+      "latest": "0.71.0",
+      "released_at": "2026-09-18",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 25923,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "playwright-test",
+     "repository": "https://github.com/microsoft/playwright",
+     "pin": "1.63.0",
+     "upstream": {
+      "latest": "v1.63.0",
+      "released_at": "2026-09-04",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 96536,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "promptfoo",
+     "repository": "https://github.com/promptfoo/promptfoo",
+     "pin": "0.123.1",
+     "upstream": {
+      "latest": "0.123.1",
+      "released_at": "2026-09-18",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 25380,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "shellcheck",
+     "repository": "https://github.com/koalaman/shellcheck/releases/tag/v0.11.0",
+     "pin": "0.11.0",
+     "upstream": {
+      "latest": "v0.11.0",
+      "released_at": "2025-08-04",
+      "prerelease": false,
+      "pushed_at": "2026-09-21",
+      "stars": 40072,
+      "license": "GPL-3.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "worktrunk",
+     "repository": "https://github.com/max-sixty/worktrunk",
+     "pin": "0.79.0",
+     "upstream": {
+      "latest": "v0.79.0",
+      "released_at": "2026-09-21",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 8349,
+      "license": "NOASSERTION",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    }
+   ],
+   "alternatives_keep_but_compare": [],
+   "candidates": [],
+   "open_gaps": []
+  }
+ ],
+ "trading": [
+  {
+   "layer": "market-data-reference",
+   "entries": [
+    {
+     "id": "data-alpaca-py",
+     "repository": "https://github.com/alpacahq/alpaca-py",
+     "decision": "default",
+     "pin": "v0.44.0; source cc4cb3b7ba50ae250e621983c2779047fb16bb28",
+     "upstream": {
+      "latest": "v0.44.0",
+      "released_at": "2026-08-11",
+      "prerelease": false,
+      "pushed_at": "2026-09-18",
+      "stars": 1528,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "data-edgartools",
+     "repository": "https://github.com/dgunning/edgartools",
+     "decision": "default",
+     "pin": "v5.58.0; source abe44344c56cf4bfb5443e0debca7e39342f6e7a",
+     "upstream": {
+      "latest": "v5.58.0",
+      "released_at": "2026-09-11",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 2738,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "native_proven",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "data-exchange-calendars",
+     "repository": "https://github.com/gerrymanoim/exchange_calendars",
+     "decision": "default",
+     "pin": "4.13.2; source dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a",
+     "upstream": {
+      "latest": "4.13.2",
+      "released_at": "2026-03-10",
+      "prerelease": false,
+      "pushed_at": "2026-09-15",
+      "stars": 667,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "native_proven",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "data-databento",
+     "repository": "https://github.com/databento/databento-python",
+     "decision": "conditional",
+     "pin": "v0.86.0; source e675ef30369f5ee9f68b04606080c519adf3be69",
+     "upstream": {
+      "latest": "v0.87.0",
+      "released_at": "2026-09-22",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 302,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": true,
+     "pin_comparison": "compared",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "data-dlt",
+     "repository": "https://github.com/dlt-hub/dlt",
+     "decision": "conditional",
+     "pin": "1.30.0; source a2f4a21e22e5c266278271b6591c70dbc485aea8",
+     "upstream": {
+      "latest": "1.30.0",
+      "released_at": "2026-08-11",
+      "prerelease": false,
+      "pushed_at": "2026-09-21",
+      "stars": 5883,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "data-feast",
+     "repository": "https://github.com/feast-dev/feast",
+     "decision": "conditional",
+     "pin": "v0.66.0; source 1d5be950cf718a674cb01eaf0fd0ad6f0a4c6335",
+     "upstream": {
+      "latest": "v0.66.0",
+      "released_at": "2026-08-21",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 7304,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "data-fredapi",
+     "repository": "https://github.com/mortada/fredapi",
+     "decision": "conditional",
+     "pin": "v0.5.2; source bf7cc8fdb03b12f8224bbb1bf66381b9d21c6d6d",
+     "upstream": {
+      "latest": "v0.5.2",
+      "released_at": "2024-05-05",
+      "prerelease": false,
+      "pushed_at": "2026-01-28",
+      "stars": 1658,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "data-gdeltdoc",
+     "repository": "https://github.com/alex9smith/gdelt-doc-api",
+     "decision": "conditional",
+     "pin": "1.12.0; source f2e500144b0a6090d63723f94453b32717e5fd23",
+     "upstream": {
+      "latest": "1.12.0",
+      "released_at": "2025-04-03",
+      "prerelease": false,
+      "pushed_at": "2025-04-22",
+      "stars": 232,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "data-kafka",
+     "repository": "https://github.com/apache/kafka",
+     "decision": "conditional",
+     "pin": "4.3.1; source 26b251a451ce941d3d7a55e6487bcb7f16b5ad48",
+     "upstream": {
+      "latest": null,
+      "released_at": null,
+      "prerelease": null,
+      "pushed_at": "2026-09-23",
+      "stars": 33788,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null,
+      "latest_flag": {
+       "tag": "show",
+       "reason": "tag_listing_only_not_version_shaped"
+      }
+     },
+     "pin_behind_upstream": null,
+     "pin_comparison": "not_compared",
+     "pin_comparison_reason": "unversioned",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "data-massive",
+     "repository": "https://github.com/massive-com/client-python",
+     "decision": "conditional",
+     "pin": "v2.8.0; source 3c247d78c603fc13d274fda1aa26749e7c8c3710",
+     "upstream": {
+      "latest": "v2.8.0",
+      "released_at": "2026-05-26",
+      "prerelease": false,
+      "pushed_at": "2026-07-09",
+      "stars": 1512,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "data-questdb",
+     "repository": "https://github.com/questdb/questdb",
+     "decision": "conditional",
+     "pin": "10.0.1; source 7a391566ac827e0d8c269b91f2415c16b0a32a84",
+     "upstream": {
+      "latest": "10.0.1",
+      "released_at": "2026-08-24",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 17341,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    }
+   ],
+   "alternatives_keep_but_compare": [],
+   "candidates": [],
+   "open_gaps": []
+  },
+  {
+   "layer": "identity-provenance",
+   "entries": [
+    {
+     "id": "data-dvc",
+     "repository": "https://github.com/treeverse/dvc",
+     "decision": "default",
+     "pin": "3.67.1; source 356dfa03278058b02df42124f243c2c345329dae",
+     "upstream": {
+      "latest": "3.67.1",
+      "released_at": "2026-03-31",
+      "prerelease": false,
+      "pushed_at": "2026-09-21",
+      "stars": 15882,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "foundation-socraticode",
+     "repository": "https://github.com/giancarloerra/SocratiCode",
+     "decision": "default",
+     "pin": "v1.14.0",
+     "upstream": {
+      "latest": "v1.14.0",
+      "released_at": "2026-09-16",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 3318,
+      "license": "AGPL-3.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "native_proven",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "cosign",
+     "repository": "https://github.com/sigstore/cosign",
+     "decision": "conditional",
+     "pin": "v3.1.3",
+     "upstream": {
+      "latest": "v3.1.3",
+      "released_at": "2026-08-06",
+      "prerelease": false,
+      "pushed_at": "2026-09-21",
+      "stars": 6319,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "data-arcticdb",
+     "repository": "https://github.com/man-group/ArcticDB",
+     "decision": "conditional",
+     "pin": "v6.26.0; source e620d8572a1e62c9ec07df8cbc8f5c432cd84325",
+     "upstream": {
+      "latest": "v6.26.0",
+      "released_at": "2026-09-14",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 2520,
+      "license": "NOASSERTION",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "data-iceberg",
+     "repository": "https://github.com/apache/iceberg",
+     "decision": "conditional",
+     "pin": "Apache Iceberg 1.11.0; PyIceberg 0.12.0; source 6976e020b894f6a6777704df2b8c4458cb291ae9",
+     "upstream": {
+      "latest": "apache-iceberg-1.11.0",
+      "released_at": "2026-05-20",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 9265,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "data-kafka",
+     "repository": "https://github.com/apache/kafka",
+     "decision": "conditional",
+     "pin": "4.3.1; source 26b251a451ce941d3d7a55e6487bcb7f16b5ad48",
+     "upstream": {
+      "latest": null,
+      "released_at": null,
+      "prerelease": null,
+      "pushed_at": "2026-09-23",
+      "stars": 33788,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null,
+      "latest_flag": {
+       "tag": "show",
+       "reason": "tag_listing_only_not_version_shaped"
+      }
+     },
+     "pin_behind_upstream": null,
+     "pin_comparison": "not_compared",
+     "pin_comparison_reason": "unversioned",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "data-mlflow",
+     "repository": "https://github.com/mlflow/mlflow",
+     "decision": "conditional",
+     "pin": "v3.16.1; source 32792afe5b0183fce10532d3a023f5cfa8612d09",
+     "upstream": {
+      "latest": "v3.16.1",
+      "released_at": "2026-09-17",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 28107,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "data-openlineage",
+     "repository": "https://github.com/OpenLineage/OpenLineage",
+     "decision": "conditional",
+     "pin": "1.53.0; source 8ad5c14c63fbab63fedd8ff42f9a208d86ad07fe",
+     "upstream": {
+      "latest": "1.53.0",
+      "released_at": "2026-09-01",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 2669,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    }
+   ],
+   "alternatives_keep_but_compare": [],
+   "candidates": [],
+   "open_gaps": []
+  },
+  {
+   "layer": "storage-compute",
+   "entries": [
+    {
+     "id": "data-duckdb",
+     "repository": "https://github.com/duckdb/duckdb",
+     "decision": "default",
+     "pin": "v1.5.5; source d8cdaa33fda8df955cc76ef58a280f68f4cd43fa",
+     "upstream": {
+      "latest": "v1.5.5",
+      "released_at": "2026-07-22",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 41653,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "native_proven",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "data-pandera",
+     "repository": "https://github.com/unionai-oss/pandera",
+     "decision": "default",
+     "pin": "v0.33.1; source 62f55e2dccf0a199cfe4d6ce3eda0c1d29e2e4e6",
+     "upstream": {
+      "latest": "v0.33.1",
+      "released_at": "2026-09-01",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 4463,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "data-arrow",
+     "repository": "https://github.com/apache/arrow",
+     "decision": "conditional",
+     "pin": "apache-arrow-25.0.1; source beccec0d0c451b7aa3e4530416ac431b3c035c69",
+     "upstream": {
+      "latest": "apache-arrow-25.0.1",
+      "released_at": "2026-08-10",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 17151,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "data-clickhouse",
+     "repository": "https://github.com/ClickHouse/ClickHouse",
+     "decision": "conditional",
+     "pin": "v26.8.7.19-lts; source f29d27def7ee0adb10e7e2fff080ba204054dd4b",
+     "upstream": {
+      "latest": "v26.9.2.8-stable",
+      "released_at": "2026-09-22",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 50027,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": true,
+     "pin_comparison": "compared",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "data-dlt",
+     "repository": "https://github.com/dlt-hub/dlt",
+     "decision": "conditional",
+     "pin": "1.30.0; source a2f4a21e22e5c266278271b6591c70dbc485aea8",
+     "upstream": {
+      "latest": "1.30.0",
+      "released_at": "2026-08-11",
+      "prerelease": false,
+      "pushed_at": "2026-09-21",
+      "stars": 5883,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "data-feast",
+     "repository": "https://github.com/feast-dev/feast",
+     "decision": "conditional",
+     "pin": "v0.66.0; source 1d5be950cf718a674cb01eaf0fd0ad6f0a4c6335",
+     "upstream": {
+      "latest": "v0.66.0",
+      "released_at": "2026-08-21",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 7304,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "data-iceberg",
+     "repository": "https://github.com/apache/iceberg",
+     "decision": "conditional",
+     "pin": "Apache Iceberg 1.11.0; PyIceberg 0.12.0; source 6976e020b894f6a6777704df2b8c4458cb291ae9",
+     "upstream": {
+      "latest": "apache-iceberg-1.11.0",
+      "released_at": "2026-05-20",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 9265,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "data-questdb",
+     "repository": "https://github.com/questdb/questdb",
+     "decision": "conditional",
+     "pin": "10.0.1; source 7a391566ac827e0d8c269b91f2415c16b0a32a84",
+     "upstream": {
+      "latest": "10.0.1",
+      "released_at": "2026-08-24",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 17341,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "foundation-toon",
+     "repository": "https://github.com/toon-format/toon",
+     "decision": "conditional",
+     "pin": "v4.1.1",
+     "upstream": {
+      "latest": "v4.1.1",
+      "released_at": "2026-08-05",
+      "prerelease": false,
+      "pushed_at": "2026-09-03",
+      "stars": 25417,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "native_proven",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "ray-serve",
+     "repository": "https://github.com/ray-project/ray",
+     "decision": "conditional",
+     "pin": "ray-2.58.0",
+     "upstream": {
+      "latest": "ray-2.58.0",
+      "released_at": "2026-08-23",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 43903,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    }
+   ],
+   "alternatives_keep_but_compare": [],
+   "candidates": [],
+   "open_gaps": []
+  },
+  {
+   "layer": "data-quality-orchestration",
+   "entries": [
+    {
+     "id": "data-pandera",
+     "repository": "https://github.com/unionai-oss/pandera",
+     "decision": "default",
+     "pin": "v0.33.1; source 62f55e2dccf0a199cfe4d6ce3eda0c1d29e2e4e6",
+     "upstream": {
+      "latest": "v0.33.1",
+      "released_at": "2026-09-01",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 4463,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "dagu",
+     "repository": "https://github.com/dagucloud/dagu",
+     "decision": "conditional",
+     "pin": "v2.16.6",
+     "upstream": {
+      "latest": "v2.17.0",
+      "released_at": "2026-09-21",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 4062,
+      "license": "GPL-3.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": true,
+     "pin_comparison": "compared",
+     "evidence_level": "native_proven",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "modal",
+     "repository": "https://github.com/modal-labs/modal-client",
+     "decision": "conditional",
+     "pin": "Python modal1.5.5; source be5f129326efe4864d666d263d249214bd9b4ed2",
+     "upstream": {
+      "latest": "v1.3.1",
+      "released_at": null,
+      "prerelease": null,
+      "pushed_at": "2026-09-22",
+      "stars": 516,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "temporal",
+     "repository": "https://github.com/temporalio/temporal",
+     "decision": "conditional",
+     "pin": "server v1.32.0; CLI1.9.1; Python SDK1.33.0",
+     "upstream": {
+      "latest": "v1.32.0",
+      "released_at": "2026-09-11",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 23249,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    }
+   ],
+   "alternatives_keep_but_compare": [],
+   "candidates": [],
+   "open_gaps": []
+  },
+  {
+   "layer": "research-factors-ml",
+   "entries": [
+    {
+     "id": "data-edgartools",
+     "repository": "https://github.com/dgunning/edgartools",
+     "decision": "default",
+     "pin": "v5.58.0; source abe44344c56cf4bfb5443e0debca7e39342f6e7a",
+     "upstream": {
+      "latest": "v5.58.0",
+      "released_at": "2026-09-11",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 2738,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "native_proven",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "foundation-markitdown",
+     "repository": "https://github.com/microsoft/markitdown",
+     "decision": "default",
+     "pin": "v0.1.7",
+     "upstream": {
+      "latest": "v0.1.8",
+      "released_at": "2026-09-21",
+      "prerelease": false,
+      "pushed_at": "2026-09-21",
+      "stars": 186506,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": true,
+     "pin_comparison": "compared",
+     "evidence_level": "native_proven",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "foundation-qmd",
+     "repository": "https://github.com/tobi/qmd",
+     "decision": "default",
+     "pin": "v2.8.3",
+     "upstream": {
+      "latest": "v2.8.3",
+      "released_at": "2026-08-16",
+      "prerelease": false,
+      "pushed_at": "2026-09-09",
+      "stars": 29968,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "native_proven",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "vllm",
+     "repository": "https://github.com/vllm-project/vllm",
+     "decision": "default",
+     "pin": "active0.25.0 (702f4814fe54fabff350d43cb753ae3e47c0c276); latest0.29.0",
+     "upstream": {
+      "latest": "v0.30.0",
+      "released_at": "2026-09-22",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 92466,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": true,
+     "pin_comparison": "compared",
+     "evidence_level": "native_proven",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "alphalens-reloaded",
+     "repository": "https://github.com/stefan-jansen/alphalens-reloaded",
+     "decision": "conditional",
+     "pin": "0.4.6",
+     "upstream": {
+      "latest": "0.4.5",
+      "released_at": "2025-07-23",
+      "prerelease": false,
+      "pushed_at": "2025-12-15",
+      "stars": 653,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "arch",
+     "repository": "https://github.com/bashtage/arch",
+     "decision": "conditional",
+     "pin": "8.0.0",
+     "upstream": {
+      "latest": "v8.0.0",
+      "released_at": "2025-10-21",
+      "prerelease": false,
+      "pushed_at": "2026-09-20",
+      "stars": 1574,
+      "license": "NOASSERTION",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "chronos",
+     "repository": "https://github.com/amazon-science/chronos-forecasting",
+     "decision": "conditional",
+     "pin": "2.3.2",
+     "upstream": {
+      "latest": "v2.3.2",
+      "released_at": "2026-09-08",
+      "prerelease": false,
+      "pushed_at": "2026-09-17",
+      "stars": 5896,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "data-arcticdb",
+     "repository": "https://github.com/man-group/ArcticDB",
+     "decision": "conditional",
+     "pin": "v6.26.0; source e620d8572a1e62c9ec07df8cbc8f5c432cd84325",
+     "upstream": {
+      "latest": "v6.26.0",
+      "released_at": "2026-09-14",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 2520,
+      "license": "NOASSERTION",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "data-river",
+     "repository": "https://github.com/online-ml/river",
+     "decision": "conditional",
+     "pin": "0.26.1; source 64285b9dd6c606804753235fe992bcf25b9856ee",
+     "upstream": {
+      "latest": "0.26.1",
+      "released_at": "2026-08-21",
+      "prerelease": false,
+      "pushed_at": "2026-09-21",
+      "stars": 6108,
+      "license": "BSD-3-Clause",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "data-sktime",
+     "repository": "https://github.com/sktime/sktime",
+     "decision": "conditional",
+     "pin": "v1.1.0; source 918fa838d99eb3703fe9bc963891619608aa35b4",
+     "upstream": {
+      "latest": "v1.2.0",
+      "released_at": "2026-09-22",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 10031,
+      "license": "BSD-3-Clause",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": true,
+     "pin_comparison": "compared",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "data-statsforecast",
+     "repository": "https://github.com/Nixtla/statsforecast",
+     "decision": "conditional",
+     "pin": "v2.1.1; source 264166ec0ddbfd481ee8e0b71e5ca42d2c0676fc",
+     "upstream": {
+      "latest": "v2.1.1",
+      "released_at": "2026-07-16",
+      "prerelease": false,
+      "pushed_at": "2026-09-21",
+      "stars": 4913,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "data-tsfresh",
+     "repository": "https://github.com/blue-yonder/tsfresh",
+     "decision": "conditional",
+     "pin": "v0.21.2; source 6aa24fdef7e3c3f48b19482535693f5796f2b598",
+     "upstream": {
+      "latest": "v0.21.2",
+      "released_at": "2026-05-31",
+      "prerelease": false,
+      "pushed_at": "2026-07-06",
+      "stars": 9428,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "deerflow",
+     "repository": "https://github.com/bytedance/deer-flow",
+     "decision": "conditional",
+     "pin": "stable v2.0.0; discovery commit 42334f26d7025d905678f9075b079fc65f9beaf9 (2.1.0-rc0)",
+     "upstream": {
+      "latest": "v2.0.0",
+      "released_at": "2026-06-25",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 82878,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "native_proven",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "foundation-docling",
+     "repository": "https://github.com/docling-project/docling",
+     "decision": "conditional",
+     "pin": "v2.129.0",
+     "upstream": {
+      "latest": "v2.130.0",
+      "released_at": "2026-09-22",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 67646,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": true,
+     "pin_comparison": "compared",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "foundation-haystack",
+     "repository": "https://github.com/deepset-ai/haystack",
+     "decision": "conditional",
+     "pin": "v3.1.1",
+     "upstream": {
+      "latest": "v3.1.1",
+      "released_at": "2026-09-03",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 26580,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "foundation-sentence-transformers",
+     "repository": "https://github.com/huggingface/sentence-transformers",
+     "decision": "conditional",
+     "pin": "v6.1.0",
+     "upstream": {
+      "latest": "v6.1.0",
+      "released_at": "2026-09-18",
+      "prerelease": false,
+      "pushed_at": "2026-09-21",
+      "stars": 19110,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "qlib",
+     "repository": "https://github.com/microsoft/qlib",
+     "decision": "conditional",
+     "pin": "0.9.7",
+     "upstream": {
+      "latest": "v0.9.7",
+      "released_at": "2025-08-15",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 48766,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "ray-serve",
+     "repository": "https://github.com/ray-project/ray",
+     "decision": "conditional",
+     "pin": "ray-2.58.0",
+     "upstream": {
+      "latest": "ray-2.58.0",
+      "released_at": "2026-08-23",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 43903,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "scikit-learn",
+     "repository": "https://github.com/scikit-learn/scikit-learn",
+     "decision": "conditional",
+     "pin": "1.9.1",
+     "upstream": {
+      "latest": "1.9.1",
+      "released_at": "2026-09-11",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 67347,
+      "license": "BSD-3-Clause",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "skfolio",
+     "repository": "https://github.com/skfolio/skfolio",
+     "decision": "conditional",
+     "pin": "1.2.9; WalkForward source c99fcf71349e2df4a7a1033ee85ca2e9ced9abee",
+     "upstream": {
+      "latest": "v1.3.0",
+      "released_at": "2026-09-20",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 2431,
+      "license": "BSD-3-Clause",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": true,
+     "pin_comparison": "compared",
+     "evidence_level": "native_proven",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "statsmodels",
+     "repository": "https://github.com/statsmodels/statsmodels",
+     "decision": "conditional",
+     "pin": "0.15.0",
+     "upstream": {
+      "latest": "v0.15.0",
+      "released_at": "2026-08-27",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 11643,
+      "license": "BSD-3-Clause",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "timesfm",
+     "repository": "https://github.com/google-research/timesfm",
+     "decision": "conditional",
+     "pin": "v3.0.0",
+     "upstream": {
+      "latest": "v3.0.0",
+      "released_at": "2026-08-28",
+      "prerelease": false,
+      "pushed_at": "2026-09-15",
+      "stars": 33514,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    }
+   ],
+   "alternatives_keep_but_compare": [],
+   "candidates": [],
+   "open_gaps": []
+  },
+  {
+   "layer": "backtesting-engine",
+   "entries": [
+    {
+     "id": "lean",
+     "repository": "https://github.com/QuantConnect/Lean",
+     "decision": "default",
+     "pin": "985ef30ad3ac774218c5ac516b4cb0aa2655730f",
+     "upstream": {
+      "latest": "v2.4.0.1",
+      "released_at": "2017-08-08",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 21730,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": null,
+     "pin_comparison": "not_compared",
+     "pin_comparison_reason": "unversioned",
+     "evidence_level": "native_proven",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "nautilustrader",
+     "repository": "https://github.com/nautechsystems/nautilus_trader",
+     "decision": "default",
+     "pin": "2.0.0rc5 (tag v2.0.0rc5; source pin from evidence/receipts/native-nautilus-v2-20260920.json \u2014 commit 1b0a49d2792a9432a3aca3fcb617ce7a630d905e)",
+     "upstream": {
+      "latest": "v1.231.0",
+      "released_at": "2026-08-02",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 29282,
+      "license": "LGPL-3.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "native_proven",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "cvxportfolio",
+     "repository": "https://github.com/cvxgrp/cvxportfolio",
+     "decision": "conditional",
+     "pin": "1.5.1",
+     "upstream": {
+      "latest": "1.5.1",
+      "released_at": "2025-07-06",
+      "prerelease": false,
+      "pushed_at": "2026-04-27",
+      "stars": 1292,
+      "license": "GPL-3.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    }
+   ],
+   "alternatives_keep_but_compare": [],
+   "candidates": [],
+   "open_gaps": []
+  },
+  {
+   "layer": "execution-broker",
+   "entries": [
+    {
+     "id": "adaptive-paper-alpaca-adapter",
+     "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
+     "decision": "default",
+     "pin": "7e7eefe28315f3de3aa4dc75cc8b6524f70829cb (blueprints/us-equities/adaptive-paper)",
+     "upstream": {
+      "latest": "v2026.09.22.1",
+      "released_at": null,
+      "prerelease": null,
+      "pushed_at": "2026-09-23",
+      "stars": 0,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": null,
+     "pin_comparison": "not_compared",
+     "pin_comparison_reason": "unversioned",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "alpaca-py",
+     "repository": "https://github.com/alpacahq/alpaca-py",
+     "decision": "default",
+     "pin": "0.44.0",
+     "upstream": {
+      "latest": "v0.44.0",
+      "released_at": "2026-08-11",
+      "prerelease": false,
+      "pushed_at": "2026-09-18",
+      "stars": 1528,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "data-alpaca-py",
+     "repository": "https://github.com/alpacahq/alpaca-py",
+     "decision": "default",
+     "pin": "v0.44.0; source cc4cb3b7ba50ae250e621983c2779047fb16bb28",
+     "upstream": {
+      "latest": "v0.44.0",
+      "released_at": "2026-08-11",
+      "prerelease": false,
+      "pushed_at": "2026-09-18",
+      "stars": 1528,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "lean-alpaca",
+     "repository": "https://github.com/QuantConnect/Lean.Brokerages.Alpaca",
+     "decision": "default",
+     "pin": "1973f6165bee212acf656ed2f9cb0af86d4f2a18",
+     "upstream": {
+      "latest": null,
+      "released_at": null,
+      "prerelease": null,
+      "pushed_at": "2026-09-22",
+      "stars": 18,
+      "license": null,
+      "archived": false,
+      "renamed_to": null,
+      "latest_flag": {
+       "tag": "18122",
+       "reason": "tag_listing_only_not_version_shaped"
+      }
+     },
+     "pin_behind_upstream": null,
+     "pin_comparison": "not_compared",
+     "pin_comparison_reason": "unversioned",
+     "evidence_level": "native_proven",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "nautilus-ibkr-adapter",
+     "repository": "https://github.com/nautechsystems/nautilus_trader",
+     "decision": "default",
+     "pin": "2.0.0rc5 (tag v2.0.0rc5; source pin from evidence/receipts/native-nautilus-v2-20260920.json \u2014 commit 1b0a49d2792a9432a3aca3fcb617ce7a630d905e)",
+     "upstream": {
+      "latest": "v1.231.0",
+      "released_at": "2026-08-02",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 29282,
+      "license": "LGPL-3.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    }
+   ],
+   "alternatives_keep_but_compare": [],
+   "candidates": [],
+   "open_gaps": []
+  },
+  {
+   "layer": "portfolio-risk",
+   "entries": [
+    {
+     "id": "quantstats",
+     "repository": "https://github.com/ranaroussi/quantstats",
+     "decision": "default",
+     "pin": "0.0.81",
+     "upstream": {
+      "latest": "v0.0.81",
+      "released_at": "2026-01-13",
+      "prerelease": false,
+      "pushed_at": "2026-07-20",
+      "stars": 7651,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "cvxportfolio",
+     "repository": "https://github.com/cvxgrp/cvxportfolio",
+     "decision": "conditional",
+     "pin": "1.5.1",
+     "upstream": {
+      "latest": "1.5.1",
+      "released_at": "2025-07-06",
+      "prerelease": false,
+      "pushed_at": "2026-04-27",
+      "stars": 1292,
+      "license": "GPL-3.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "empyrical-reloaded",
+     "repository": "https://github.com/stefan-jansen/empyrical-reloaded",
+     "decision": "conditional",
+     "pin": "0.5.12",
+     "upstream": {
+      "latest": "0.5.12",
+      "released_at": "2025-06-01",
+      "prerelease": false,
+      "pushed_at": "2025-12-12",
+      "stars": 122,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "skfolio",
+     "repository": "https://github.com/skfolio/skfolio",
+     "decision": "conditional",
+     "pin": "1.2.9; WalkForward source c99fcf71349e2df4a7a1033ee85ca2e9ced9abee",
+     "upstream": {
+      "latest": "v1.3.0",
+      "released_at": "2026-09-20",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 2431,
+      "license": "BSD-3-Clause",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": true,
+     "pin_comparison": "compared",
+     "evidence_level": "native_proven",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    }
+   ],
+   "alternatives_keep_but_compare": [],
+   "candidates": [],
+   "open_gaps": []
+  },
+  {
+   "layer": "evaluation-experiments",
+   "entries": [
+    {
+     "id": "inspect-ai",
+     "repository": "https://github.com/UKGovernmentBEIS/inspect_ai",
+     "decision": "default",
+     "pin": "inspect-ai0.3.266; source ec4dfc6953784dc45b79de3147530c89868c6e26",
+     "upstream": {
+      "latest": null,
+      "released_at": null,
+      "prerelease": null,
+      "pushed_at": "2026-09-23",
+      "stars": 2846,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null,
+      "latest_flag": {
+       "tag": "release/2025-11-28",
+       "reason": "tag_listing_only_not_version_shaped"
+      }
+     },
+     "pin_behind_upstream": null,
+     "pin_comparison": "not_compared",
+     "pin_comparison_reason": "unversioned",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "data-mlflow",
+     "repository": "https://github.com/mlflow/mlflow",
+     "decision": "conditional",
+     "pin": "v3.16.1; source 32792afe5b0183fce10532d3a023f5cfa8612d09",
+     "upstream": {
+      "latest": "v3.16.1",
+      "released_at": "2026-09-17",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 28107,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "data-river",
+     "repository": "https://github.com/online-ml/river",
+     "decision": "conditional",
+     "pin": "0.26.1; source 64285b9dd6c606804753235fe992bcf25b9856ee",
+     "upstream": {
+      "latest": "0.26.1",
+      "released_at": "2026-08-21",
+      "prerelease": false,
+      "pushed_at": "2026-09-21",
+      "stars": 6108,
+      "license": "BSD-3-Clause",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "foundation-agent-retrieval-bench",
+     "repository": "https://github.com/eyuansu62/agent-retrieval-bench",
+     "decision": "conditional",
+     "pin": "v0.2.1",
+     "upstream": {
+      "latest": "v0.2.1",
+      "released_at": "2026-07-26",
+      "prerelease": false,
+      "pushed_at": "2026-08-04",
+      "stars": 8,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "foundation-mteb",
+     "repository": "https://github.com/embeddings-benchmark/mteb",
+     "decision": "conditional",
+     "pin": "2.21.0",
+     "upstream": {
+      "latest": "2.21.6",
+      "released_at": "2026-09-21",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 3433,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": true,
+     "pin_comparison": "compared",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "mlflow",
+     "repository": "https://github.com/mlflow/mlflow",
+     "decision": "conditional",
+     "pin": "v3.16.1",
+     "upstream": {
+      "latest": "v3.16.1",
+      "released_at": "2026-09-17",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 28107,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "phoenix",
+     "repository": "https://github.com/Arize-ai/phoenix",
+     "decision": "conditional",
+     "pin": "arize-phoenix-v20.14.0",
+     "upstream": {
+      "latest": "@arizeai/phoenix-mcp@4.3.13",
+      "released_at": "2026-09-22",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 11583,
+      "license": "NOASSERTION",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    }
+   ],
+   "alternatives_keep_but_compare": [],
+   "candidates": [],
+   "open_gaps": []
+  },
+  {
+   "layer": "agents-models-workers",
+   "entries": [
+    {
+     "id": "codex-native-sdk",
+     "repository": "https://github.com/openai/codex",
+     "decision": "default",
+     "pin": "CLI rust-v0.155.1; Python openai-codex 0.154.0",
+     "upstream": {
+      "latest": "rust-v0.156.1",
+      "released_at": "2026-09-23",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 126032,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": true,
+     "pin_comparison": "compared",
+     "evidence_level": "native_proven",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "foundation-ai-memory",
+     "repository": "https://github.com/akitaonrails/ai-memory",
+     "decision": "default",
+     "pin": "v2.3.1",
+     "upstream": {
+      "latest": "v2.4.0",
+      "released_at": "2026-09-21",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 8125,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": true,
+     "pin_comparison": "compared",
+     "evidence_level": "native_proven",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "foundation-context-mode",
+     "repository": "https://github.com/mksglu/context-mode",
+     "decision": "default",
+     "pin": "v1.0.169",
+     "upstream": {
+      "latest": "v1.0.169",
+      "released_at": "2026-06-29",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 23969,
+      "license": "NOASSERTION",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "native_proven",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "foundation-qdrant",
+     "repository": "https://github.com/qdrant/qdrant",
+     "decision": "default",
+     "pin": "v1.19.1",
+     "upstream": {
+      "latest": "v1.19.1",
+      "released_at": "2026-09-04",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 34757,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "native_proven",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "foundation-rtk",
+     "repository": "https://github.com/rtk-ai/rtk",
+     "decision": "default",
+     "pin": "v0.49.0",
+     "upstream": {
+      "latest": "v0.49.0",
+      "released_at": "2026-09-11",
+      "prerelease": false,
+      "pushed_at": "2026-09-21",
+      "stars": 81470,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "native_proven",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "foundation-serena",
+     "repository": "https://github.com/oraios/serena",
+     "decision": "default",
+     "pin": "v1.7.0",
+     "upstream": {
+      "latest": "v1.7.0",
+      "released_at": "2026-08-09",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 29732,
+      "license": "NOASSERTION",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "native_proven",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "foundation-socraticode",
+     "repository": "https://github.com/giancarloerra/SocratiCode",
+     "decision": "default",
+     "pin": "v1.14.0",
+     "upstream": {
+      "latest": "v1.14.0",
+      "released_at": "2026-09-16",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 3318,
+      "license": "AGPL-3.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "native_proven",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "vllm",
+     "repository": "https://github.com/vllm-project/vllm",
+     "decision": "default",
+     "pin": "active0.25.0 (702f4814fe54fabff350d43cb753ae3e47c0c276); latest0.29.0",
+     "upstream": {
+      "latest": "v0.30.0",
+      "released_at": "2026-09-22",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 92466,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": true,
+     "pin_comparison": "compared",
+     "evidence_level": "native_proven",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "codex-acp",
+     "repository": "https://github.com/agentclientprotocol/codex-acp",
+     "decision": "conditional",
+     "pin": "v1.12.0",
+     "upstream": {
+      "latest": "v1.13.0",
+      "released_at": "2026-09-22",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 399,
+      "license": "NOASSERTION",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": true,
+     "pin_comparison": "compared",
+     "evidence_level": "native_proven",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "deerflow",
+     "repository": "https://github.com/bytedance/deer-flow",
+     "decision": "conditional",
+     "pin": "stable v2.0.0; discovery commit 42334f26d7025d905678f9075b079fc65f9beaf9 (2.1.0-rc0)",
+     "upstream": {
+      "latest": "v2.0.0",
+      "released_at": "2026-06-25",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 82878,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "native_proven",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "foundation-agent-retrieval-bench",
+     "repository": "https://github.com/eyuansu62/agent-retrieval-bench",
+     "decision": "conditional",
+     "pin": "v0.2.1",
+     "upstream": {
+      "latest": "v0.2.1",
+      "released_at": "2026-07-26",
+      "prerelease": false,
+      "pushed_at": "2026-08-04",
+      "stars": 8,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "foundation-codebase-memory-mcp",
+     "repository": "https://github.com/DeusData/codebase-memory-mcp",
+     "decision": "conditional",
+     "pin": "v0.11.0",
+     "upstream": {
+      "latest": "v0.11.0",
+      "released_at": "2026-09-15",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 44232,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "native_proven",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "foundation-graphiti",
+     "repository": "https://github.com/getzep/graphiti",
+     "decision": "conditional",
+     "pin": "v0.30.2",
+     "upstream": {
+      "latest": "v0.30.2",
+      "released_at": "2026-09-08",
+      "prerelease": false,
+      "pushed_at": "2026-09-21",
+      "stars": 31085,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "foundation-pageindex",
+     "repository": "https://github.com/VectifyAI/PageIndex",
+     "decision": "conditional",
+     "pin": "v0.2.18",
+     "upstream": {
+      "latest": "v0.2.19",
+      "released_at": "2026-09-21",
+      "prerelease": false,
+      "pushed_at": "2026-09-21",
+      "stars": 35809,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": true,
+     "pin_comparison": "compared",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "foundation-pgvector",
+     "repository": "https://github.com/pgvector/pgvector",
+     "decision": "conditional",
+     "pin": "v0.8.6 documented tag; reviewed HEAD efa08fda9ec485d80292d0487a77939c087dedcc",
+     "upstream": {
+      "latest": "v0.8.6",
+      "released_at": null,
+      "prerelease": null,
+      "pushed_at": "2026-09-22",
+      "stars": 23128,
+      "license": "NOASSERTION",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "foundation-repomix",
+     "repository": "https://github.com/yamadashy/repomix",
+     "decision": "conditional",
+     "pin": "v1.18.0",
+     "upstream": {
+      "latest": "v1.18.1",
+      "released_at": "2026-09-21",
+      "prerelease": false,
+      "pushed_at": "2026-09-21",
+      "stars": 28468,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": true,
+     "pin_comparison": "compared",
+     "evidence_level": "native_proven",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "foundation-toon",
+     "repository": "https://github.com/toon-format/toon",
+     "decision": "conditional",
+     "pin": "v4.1.1",
+     "upstream": {
+      "latest": "v4.1.1",
+      "released_at": "2026-08-05",
+      "prerelease": false,
+      "pushed_at": "2026-09-03",
+      "stars": 25417,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "native_proven",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "langgraph",
+     "repository": "https://github.com/langchain-ai/langgraph",
+     "decision": "conditional",
+     "pin": "langgraph 1.2.11; separately released langgraph SDK0.4.4",
+     "upstream": {
+      "latest": "1.2.12",
+      "released_at": "2026-09-21",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 42158,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": true,
+     "pin_comparison": "compared",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "omniroute",
+     "repository": "https://github.com/diegosouzapw/OmniRoute",
+     "decision": "conditional",
+     "pin": "v3.8.50",
+     "upstream": {
+      "latest": "v3.8.50",
+      "released_at": "2026-08-26",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 69362,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "native_proven",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    }
+   ],
+   "alternatives_keep_but_compare": [],
+   "candidates": [],
+   "open_gaps": []
+  },
+  {
+   "layer": "observability-hosting",
+   "entries": [
+    {
+     "id": "alertmanager",
+     "repository": "https://github.com/prometheus/alertmanager",
+     "decision": "default",
+     "pin": "v0.34.1",
+     "upstream": {
+      "latest": "v0.34.1",
+      "released_at": "2026-09-17",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 8626,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "native_proven",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "grafana",
+     "repository": "https://github.com/grafana/grafana",
+     "decision": "default",
+     "pin": "v13.2.2",
+     "upstream": {
+      "latest": "v13.2.2",
+      "released_at": "2026-09-15",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 76865,
+      "license": "AGPL-3.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "native_proven",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "loki",
+     "repository": "https://github.com/grafana/loki",
+     "decision": "default",
+     "pin": "v3.7.8",
+     "upstream": {
+      "latest": "v3.7.8",
+      "released_at": "2026-09-17",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 28935,
+      "license": "AGPL-3.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "native_proven",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "ntfy",
+     "repository": "https://github.com/binwiederhier/ntfy",
+     "decision": "default",
+     "pin": "v2.28.0",
+     "upstream": {
+      "latest": "v2.28.0",
+      "released_at": "2026-08-27",
+      "prerelease": false,
+      "pushed_at": "2026-09-15",
+      "stars": 34377,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "native_proven",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "opentelemetry-collector",
+     "repository": "https://github.com/open-telemetry/opentelemetry-collector",
+     "decision": "default",
+     "pin": "v0.161.0",
+     "upstream": {
+      "latest": "v0.161.0",
+      "released_at": "2026-09-14",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 7588,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "native_proven",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "opentelemetry-collector-contrib",
+     "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+     "decision": "default",
+     "pin": "v0.161.0",
+     "upstream": {
+      "latest": "v0.161.0",
+      "released_at": "2026-09-15",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 4949,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "native_proven",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "prometheus",
+     "repository": "https://github.com/prometheus/prometheus",
+     "decision": "default",
+     "pin": "v3.14.0",
+     "upstream": {
+      "latest": "v3.14.0",
+      "released_at": "2026-08-18",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 66182,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "native_proven",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "restic",
+     "repository": "https://github.com/restic/restic",
+     "decision": "default",
+     "pin": "v0.19.1; publisher-signed linux/amd64 release asset",
+     "upstream": {
+      "latest": "v0.19.1",
+      "released_at": "2026-07-05",
+      "prerelease": false,
+      "pushed_at": "2026-09-20",
+      "stars": 36195,
+      "license": "BSD-2-Clause",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "native_proven",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "sandbox-runtime",
+     "repository": "https://github.com/anthropics/sandbox-runtime",
+     "decision": "default",
+     "pin": "v0.0.77",
+     "upstream": {
+      "latest": "v0.0.77",
+      "released_at": "2026-09-18",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 5304,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "native_proven",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "e2b",
+     "repository": "https://github.com/e2b-dev/E2B",
+     "decision": "conditional",
+     "pin": "e2b@2.51.0",
+     "upstream": {
+      "latest": "e2b@2.51.0",
+      "released_at": "2026-09-18",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 13926,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "mlflow",
+     "repository": "https://github.com/mlflow/mlflow",
+     "decision": "conditional",
+     "pin": "v3.16.1",
+     "upstream": {
+      "latest": "v3.16.1",
+      "released_at": "2026-09-17",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 28107,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "modal",
+     "repository": "https://github.com/modal-labs/modal-client",
+     "decision": "conditional",
+     "pin": "Python modal1.5.5; source be5f129326efe4864d666d263d249214bd9b4ed2",
+     "upstream": {
+      "latest": "v1.3.1",
+      "released_at": null,
+      "prerelease": null,
+      "pushed_at": "2026-09-22",
+      "stars": 516,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "opensandbox",
+     "repository": "https://github.com/opensandbox-group/OpenSandbox",
+     "decision": "conditional",
+     "pin": "server/v0.2.3; Python SDK0.1.16",
+     "upstream": {
+      "latest": "release-1.1.0",
+      "released_at": "2026-09-21",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 15471,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": true,
+     "pin_comparison": "compared",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "phoenix",
+     "repository": "https://github.com/Arize-ai/phoenix",
+     "decision": "conditional",
+     "pin": "arize-phoenix-v20.14.0",
+     "upstream": {
+      "latest": "@arizeai/phoenix-mcp@4.3.13",
+      "released_at": "2026-09-22",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 11583,
+      "license": "NOASSERTION",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    }
+   ],
+   "alternatives_keep_but_compare": [],
+   "candidates": [],
+   "open_gaps": []
+  },
+  {
+   "layer": "security-supply-chain",
+   "entries": [
+    {
+     "id": "gitleaks",
+     "repository": "https://github.com/gitleaks/gitleaks",
+     "decision": "default",
+     "pin": "v8.30.1",
+     "upstream": {
+      "latest": "v8.30.1",
+      "released_at": "2026-03-21",
+      "prerelease": false,
+      "pushed_at": "2026-09-23",
+      "stars": 29437,
+      "license": "MIT",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "native_proven",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "syft",
+     "repository": "https://github.com/anchore/syft",
+     "decision": "default",
+     "pin": "v1.52.0",
+     "upstream": {
+      "latest": "v1.52.0",
+      "released_at": "2026-09-17",
+      "prerelease": false,
+      "pushed_at": "2026-09-18",
+      "stars": 9601,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "native_proven",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "cosign",
+     "repository": "https://github.com/sigstore/cosign",
+     "decision": "conditional",
+     "pin": "v3.1.3",
+     "upstream": {
+      "latest": "v3.1.3",
+      "released_at": "2026-08-06",
+      "prerelease": false,
+      "pushed_at": "2026-09-21",
+      "stars": 6319,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "grype",
+     "repository": "https://github.com/anchore/grype",
+     "decision": "conditional",
+     "pin": "v0.119.0",
+     "upstream": {
+      "latest": "v0.119.0",
+      "released_at": "2026-09-17",
+      "prerelease": false,
+      "pushed_at": "2026-09-21",
+      "stars": 12916,
+      "license": "Apache-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "native_proven",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    },
+    {
+     "id": "openbao",
+     "repository": "https://github.com/openbao/openbao",
+     "decision": "conditional",
+     "pin": "v2.6.2",
+     "upstream": {
+      "latest": "v2.6.2",
+      "released_at": "2026-08-18",
+      "prerelease": false,
+      "pushed_at": "2026-09-22",
+      "stars": 7462,
+      "license": "MPL-2.0",
+      "archived": false,
+      "renamed_to": null
+     },
+     "pin_behind_upstream": false,
+     "pin_comparison": "compared",
+     "evidence_level": "source_review",
+     "review_status": "not_individually_reviewed",
+     "review_note": null,
+     "evidence": []
+    }
+   ],
+   "alternatives_keep_but_compare": [],
+   "candidates": [],
+   "open_gaps": []
+  }
+ ],
+ "lane_groupings": [],
+ "citation_review": {
+  "general": []
+ },
+ "critic": null,
+ "lane_calls": {},
+ "lane_limits": {},
+ "reconciliations": [
+  {
+   "layer": "backtesting-engine",
+   "kind": "selected_destination",
+   "repository": "https://github.com/nautechsystems/nautilus_trader",
+   "pin": "2.0.0rc5 (prerelease tag v2.0.0rc5, source 1b0a49d2792a9432a3aca3fcb617ce7a630d905e)",
+   "source": "catalogs/us-equities/runtime-target.json#/engine and docs/foundation-rd-readiness.md",
+   "note": "The engines-strategies card still records lean=default and nautilustrader=alternative at 1.231.0; the runtime target, the adaptive-paper practice and the equity replay run on 2.0.0rc5. GitHub's latest non-prerelease is still v1.231.0; 2.0.0 final has not shipped. LEAN remains the frozen historical comparator (the SPY/LEAN parity replay completed BLOCKED with four failed checks on the two unsupported mappings; not parity acceptance).",
+   "upstream": {
+    "latest": "v1.231.0",
+    "released_at": "2026-08-02",
+    "prerelease": false,
+    "pushed_at": "2026-09-23",
+    "stars": 29282,
+    "license": "LGPL-3.0",
+    "archived": false,
+    "renamed_to": null
+   }
+  },
+  {
+   "layer": "execution-broker",
+   "kind": "selected_paths",
+   "paths": [
+    {
+     "broker": "ibkr",
+     "path": "NautilusTrader native IBKR adapter (crates/adapters/interactive_brokers)",
+     "acceptance": "not_established"
+    },
+    {
+     "broker": "alpaca",
+     "path": "custom deterministic Python adapter in blueprints/us-equities/adaptive-paper on alpaca-py 0.44.0",
+     "acceptance": "bounded paper smoke and adaptive practice receipts; continuous operation and native fault cases unqualified"
+    }
+   ],
+   "source": "catalogs/us-equities/runtime-target.json#/broker_boundaries",
+   "note": "trading-by-layer has no IBKR entry at default/conditional (ib-async is alternative); lean-alpaca is the LEAN-era default and is retained as reference only."
+  },
+  {
+   "layer": "code-navigation",
+   "kind": "in_use_not_pinned",
+   "repository": "https://github.com/BurntSushi/ripgrep",
+   "pin": "ripgrep 14.1.0 (/usr/bin/rg, Ubuntu package)",
+   "source": "agent-lab AGENTS.md mandates rg; docs/foundation-closure-20260921.md names it first",
+   "note": "Not a manifests/stack.json component; recorded here so the provenance gap the critic found is visible.",
+   "upstream": {
+    "latest": null,
+    "released_at": null,
+    "prerelease": null,
+    "pushed_at": null,
+    "stars": null,
+    "license": null,
+    "archived": null,
+    "renamed_to": null
+   }
+  },
+  {
+   "layer": "backtesting-engine",
+   "kind": "card_reconciled",
+   "repository": "https://github.com/nautechsystems/nautilus_trader",
+   "pin": "2.0.0rc5 (tag v2.0.0rc5, source 1b0a49d2792a9432a3aca3fcb617ce7a630d905e)",
+   "source": "catalogs/us-equities/engines-strategies.json#/entries (id nautilustrader)",
+   "note": "Closes the gap the first entry recorded: engines-strategies.json now sets nautilustrader=default at 2.0.0rc5 with role 'selected destination runtime (runtime-target.json)'. lean stays default with role reframed to 'frozen historical comparator (oracle), not the runtime'. SPY/LEAN parity gate G-a (retained-equity-replay) is recorded as reported_execution_blocked_review_incomplete in runtime-target.json next_acceptance: the retained comparison summary records a completed BLOCKED replay with four failed checks on the unsupported distributions_and_cash and market_on_open_proxy mappings; not parity acceptance, and the per-check total is not retained in this repository. The dividend SimulationModule needed to close it is owned by the separate parity worktree, not this card.",
+   "upstream": {
+    "latest": "v1.231.0",
+    "released_at": "2026-08-02",
+    "prerelease": false,
+    "pushed_at": "2026-09-23",
+    "stars": 29282,
+    "license": "LGPL-3.0",
+    "archived": false,
+    "renamed_to": null
+   }
+  },
+  {
+   "layer": "execution-broker",
+   "kind": "card_added",
+   "repository": "https://github.com/nautechsystems/nautilus_trader",
+   "pin": "2.0.0rc5 (tag v2.0.0rc5, source 1b0a49d2792a9432a3aca3fcb617ce7a630d905e)",
+   "source": "catalogs/us-equities/engines-strategies.json#/entries (id nautilus-ibkr-adapter)",
+   "note": "New card for the native IBKR socket adapter at the same selected engine pin, evidence_level source_review, local_broker_acceptance not_established (runtime-target.json). IBKR is selected live-primary, unaccepted.",
+   "upstream": {
+    "latest": "v1.231.0",
+    "released_at": "2026-08-02",
+    "prerelease": false,
+    "pushed_at": "2026-09-23",
+    "stars": 29282,
+    "license": "LGPL-3.0",
+    "archived": false,
+    "renamed_to": null
+   }
+  },
+  {
+   "layer": "execution-broker",
+   "kind": "card_added",
+   "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
+   "pin": "7e7eefe28315f3de3aa4dc75cc8b6524f70829cb (blueprints/us-equities/adaptive-paper)",
+   "source": "catalogs/us-equities/engines-strategies.json#/entries (id adaptive-paper-alpaca-adapter); blueprints/us-equities/adaptive-paper/receipt.json",
+   "note": "New card for the custom deterministic Alpaca adapter used by the adaptive-paper lane, evidence_level source_review, citing the synthetic capacity fixture in-repo (180 fills / 90 round trips in 60.4282s at 178.7246 submissions/minute, zero broker connections; receipt.json native_capacity block). No live broker fills claimed.",
+   "upstream": {
+    "latest": "v2026.09.22.1",
+    "released_at": null,
+    "prerelease": null,
+    "pushed_at": "2026-09-23",
+    "stars": 0,
+    "license": "MIT",
+    "archived": false,
+    "renamed_to": null
+   }
+  },
+  {
+   "layer": "market-data-reference",
+   "kind": "stack_component_added",
+   "repository": "https://github.com/gerrymanoim/exchange_calendars",
+   "pin": "4.13.2",
+   "source": "manifests/stack.json",
+   "note": "pending: produced by a sibling unit in the same wave. exchange_calendars 4.13.2 was not present in manifests/stack.json at recording time (checked 2026-09-22); this entry only reserves the reconciliation row.",
+   "upstream": {
+    "latest": "4.13.2",
+    "released_at": "2026-03-10",
+    "prerelease": false,
+    "pushed_at": "2026-09-15",
+    "stars": 667,
+    "license": "Apache-2.0",
+    "archived": false,
+    "renamed_to": null
+   }
+  },
+  {
+   "layer": "security-supply-chain",
+   "kind": "scan_recorded",
+   "repository": "https://github.com/nautechsystems/nautilus_trader",
+   "pin": "2.0.0rc5",
+   "source": "blueprints/us-equities/supply-chain/scan-nautilus-rc5-20260922/receipt.json",
+   "note": "pending: produced by a sibling unit in the same wave. The 2026-09-22 grype/syft scan of the rc5 dependency tree and the local Alpaca adapter had not landed at recording time; see the grype card's limitations in catalogs/us-equities/agents-operations.json.",
+   "upstream": {
+    "latest": "v1.231.0",
+    "released_at": "2026-08-02",
+    "prerelease": false,
+    "pushed_at": "2026-09-23",
+    "stars": 29282,
+    "license": "LGPL-3.0",
+    "archived": false,
+    "renamed_to": null
+   }
+  },
+  {
+   "layer": "observability-hosting",
+   "kind": "alert_rules_added",
+   "repository": "not_applicable",
+   "pin": "not_yet_pinned",
+   "source": "observability/backends/broker-path-rules-receipt.json",
+   "note": "pending: produced by a sibling unit in the same wave. The broker-path alert-rules receipt was not present at recording time.",
+   "upstream": {
+    "latest": null,
+    "released_at": null,
+    "prerelease": null,
+    "pushed_at": null,
+    "stars": null,
+    "license": null,
+    "archived": null,
+    "renamed_to": null
+   }
+  },
+  {
+   "layer": "security-supply-chain",
+   "kind": "decision_recorded",
+   "repository": "not_applicable",
+   "pin": "not_yet_pinned",
+   "source": "agent-lab docs/decisions/2026-09-22-broker-credential-handling.md",
+   "note": "Broker credential handling decision, cross-repository pointer into agent-lab. That path did not exist in the agent-lab checkout at recording time (checked 2026-09-22; only 0001-agent-coordination.md and 2026-09-22-leverage-schedule-and-entitlement.md were present under agent-lab docs/decisions/). This entry records the intended source only, not confirmed content.",
+   "upstream": {
+    "latest": null,
+    "released_at": null,
+    "prerelease": null,
+    "pushed_at": null,
+    "stars": null,
+    "license": null,
+    "archived": null,
+    "renamed_to": null
+   }
+  },
+  {
+   "layer": "data-quality-orchestration",
+   "kind": "gate_wired",
+   "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
+   "pin": "not_yet_pinned",
+   "source": "blueprints/us-equities/data/promotion_gate.py",
+   "note": "pending: produced by a sibling unit in the same wave. promotion_gate.py was not present under blueprints/us-equities/data/ at recording time.",
+   "upstream": {
+    "latest": "v2026.09.22.1",
+    "released_at": null,
+    "prerelease": null,
+    "pushed_at": "2026-09-23",
+    "stars": 0,
+    "license": "MIT",
+    "archived": false,
+    "renamed_to": null
+   }
+  },
+  {
+   "layer": "execution-broker",
+   "kind": "gate_ladder_recorded",
+   "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
+   "pin": "not_yet_pinned",
+   "source": "catalogs/us-equities/gates-20260922.json",
+   "note": "pending: produced by the coordinator in the same wave. catalogs/us-equities/gates-20260922.json was not present at recording time.",
+   "upstream": {
+    "latest": "v2026.09.22.1",
+    "released_at": null,
+    "prerelease": null,
+    "pushed_at": "2026-09-23",
+    "stars": 0,
+    "license": "MIT",
+    "archived": false,
+    "renamed_to": null
+   }
+  }
+ ],
+ "counts": {
+  "foundation_layers": 20,
+  "trading_layers": 12,
+  "trading_layers_note": "trading_layers counts only taxonomy layers with at least one selected entry, unlike foundation_layers (which counts every row); trading[] itself always has one row per taxonomy id, so len(manifest[\"trading\"]) can exceed trading_layers whenever a taxonomy layer happens to have zero selected entries",
+  "components_confirmed": 0,
+  "pins_behind_upstream": 51,
+  "candidates_total": 0,
+  "pins_behind_upstream_unique_components": 25,
+  "pins_behind_note": "components with a commit-pinned version (a parenthetical hash), a non-GitHub repository, or an OS-distribution package pin (matched by an -Nubuntu/-Ndeb/+debN pin suffix, or by id via --os-package-ids, e.g. systemd even though its own repository is on GitHub) are excluded from the pin-vs-upstream comparison rather than counted either way",
+  "pins_not_compared": 20,
+  "pins_not_compared_by_reason": {
+   "commit_pinned": 1,
+   "os_package_pin": 3,
+   "unversioned": 16
+  },
+  "pins_not_compared_note": "rows whose pin the generator could not compare with upstream (the exclusions above, plus a pin or upstream latest with no parseable version, reason unversioned) carry pin_behind_upstream null and pin_comparison not_compared, never a definite false",
+  "candidates_by_disposition": {},
+  "lane_groupings": 0,
+  "lane_grouping_candidates": 0,
+  "lane_groupings_note": "every foundation/trading-scoped count above (candidates_total, candidates_by_disposition, components_confirmed, pins_behind_upstream, pins_behind_upstream_unique_components) is computed from all_rows = manifest['foundation'] + manifest['trading'] only, and so excludes lane_groupings[].selected rows the same way it excludes lane_groupings[].candidates; candidates inside lane_groupings (a review-lane grouping id outside the foundation/taxonomy baseline, e.g. an awesome-list survey) are counted only in lane_grouping_candidates; counts.citation_review (computed below, by apply_citation_review) is the same way scoped -- its rows_flagged/attached only ever count a foundation/trading row, never a lane_groupings[].selected row, since apply_citation_review only walks manifest['foundation'] and manifest['trading']",
+  "citation_review": {
+   "findings_in_artifact": 0,
+   "findings": 0,
+   "out_of_scope": 0,
+   "attached": 0,
+   "rows_flagged": 0,
+   "general": 0
+  }
+ }
+}

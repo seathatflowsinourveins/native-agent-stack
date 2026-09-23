@@ -1,0 +1,17 @@
+# OSV-Scanner configuration for .github/workflows/security-scan.yml, passed with
+# --config so it applies to every lockfile in .github/osv-scanner-lockfiles.json.
+#
+# Ignore policy: an [[IgnoredVulns]] entry needs `id`, a concrete `reason` and an
+# `ignoreUntil` date at most 90 days after it is added; an expired entry stops
+# applying and the scan fails again. tests/test_osv_lockfile_coverage.py enforces
+# the fields and the 90-day bound. Each entry is also listed, with its evidence,
+# in docs/decisions/2026-09-22-github-automation-closure.md.
+#
+# No entry as of 2026-09-22: with --no-resolve the base-commit scan found only the
+# six tools/mlx-smoke/requirements.lock.txt advisories (mlx 0.29.3, transformers
+# 5.0.0rc1), which are fixed by relocking, not ignored.
+#
+# [[IgnoredVulns]]
+# id = "GHSA-xxxx-xxxx-xxxx"
+# ignoreUntil = 2026-12-21
+# reason = "Why the vulnerable code is unreachable here, with the evidence path."

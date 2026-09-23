@@ -1,15 +1,16 @@
 {
   "schema_version": 1,
-  "reviewed_at": "2026-09-20",
+  "reviewed_at": "2026-09-22",
   "purpose": "Selected GitHub automation with source-backed suitability and bounded observed results; not a count of repositories or an instruction to activate optional tools.",
   "handbook": "docs/github-automation.md",
   "resolution_record": "docs/tasks/2026-09-20-automation-resolution.md",
   "ownership": {
     "github_workflows": "GitHub automation maintainer; one coordinated writer per upgrade batch",
-    "action_pin_proposals": "Dependabot: weekly Monday 09:00 UTC, grouped minor/patch, two open version PRs, no auto-merge",
+    "action_pin_proposals": "Dependabot: weekly Monday 09:00 UTC, grouped minor/patch, two open version PRs, 7-day cooldown, no auto-merge",
     "upstream_research": "Existing active Codex task Maintain native foundation and trading catalogs, daily 09:00 America/New_York; sole scheduled source-review owner",
-    "publication": "Maintainer dispatch on main only; no schedule or deployment",
-    "runtime_acceptance": "Native foundation task and independently qualified domain work; action upgrades do not rewrite runtime receipts"
+    "publication": "Maintainer dispatch on main (attested workflow artifacts) or a coordinator-created v* tag (admin-only tag creation ruleset), which also creates an immutable GitHub Release",
+    "runtime_acceptance": "Native foundation task and independently qualified domain work; action upgrades do not rewrite runtime receipts",
+    "security_updates": "Dependabot security updates (repository setting, enabled 2026-09-22) for alerted lock files; each PR still passes the ordinary required checks"
   },
   "active_baseline": {
     "source_revision": "d0fe136c218fedff93c93ac674e302ae19b2d924",
@@ -17,7 +18,8 @@
     "ruleset": "https://github.com/seathatflowsinourveins/native-agent-stack/rules/23739774",
     "required_checks": [
       "validate",
-      "token-report"
+      "token-report",
+      "secret-scan"
     ],
     "check_source_app_id": 15368,
     "bypass_actors": [],
@@ -33,7 +35,48 @@
       35541330440,
       35541327481
     ],
-    "dependabot_observation": "Initial scans succeeded, no minor/patch update matched the group, and two separate major proposals opened. Their reviewed-file hash failures correctly blocked integration."
+    "dependabot_observation": "Initial scans succeeded, no minor/patch update matched the group, and two separate major proposals opened. Their reviewed-file hash failures correctly blocked integration.",
+    "target_required_checks": [
+      "validate",
+      "token-report",
+      "secret-scan",
+      "dependency-review",
+      "osv-scanner"
+    ],
+    "target_ruleset_file": ".github/main-ruleset.json",
+    "target_ruleset_status": "Committed target, applied by the coordinator after this change merges: adds dependency-review and osv-scanner, keeps strict up-to-date checks off (with auto-merge and no merge queue, strict mode stalls every open PR whenever main moves; overturn: a main failure traced to two PRs merging close together), a CodeQL code_scanning rule (security alerts high_or_higher, alerts errors) and squash-only merges. required_signatures is not in the target (keep-but-compare): on 2026-09-23 it blocked agent-lab PRs #19/#20 with unsigned branch commits despite GitHub-signed squash merges. required_checks above is the live state read on 2026-09-22.",
+    "tag_rulesets": {
+      "23829417": {
+        "file": ".github/tag-ruleset.json",
+        "rules": [
+          "deletion",
+          "non_fast_forward",
+          "update"
+        ],
+        "bypass_actors": []
+      },
+      "23859358": {
+        "file": ".github/tag-creation-ruleset.json",
+        "rules": [
+          "creation"
+        ],
+        "bypass_actors": [
+          "RepositoryRole 5 (admin), always"
+        ]
+      }
+    },
+    "repository_settings_20260922": {
+      "evidence": "Coordinator before/after GETs, 2026-09-22 ~23:35 EDT; recorded in docs/decisions/2026-09-22-github-automation-closure.md",
+      "actions_sha_pinning_required": true,
+      "merge_methods": "squash only; auto-merge on; delete branch on merge",
+      "immutable_releases": true,
+      "dependabot_security_updates": "enabled",
+      "private_vulnerability_reporting": true,
+      "codeql_default_setup": "configured; GET repos/seathatflowsinourveins/native-agent-stack/code-scanning/default-setup at 2026-09-23T04:47:34Z: languages actions, csharp, go, javascript, javascript-typescript, python, rust, typescript; query_suite default; schedule weekly; updated_at 2026-09-23T04:40:46Z; first run 35815088202; first-analysis alerts resolved in #104 (docs/decisions/2026-09-22-codeql-first-analysis.md)",
+      "secret_scanning": "enabled with push protection; non-provider patterns and validity checks not available free on this plan"
+    },
+    "dependabot_weekly_run": 35583086998,
+    "dependabot_weekly_observation": "Monday 2026-09-21 09:24 UTC run succeeded and opened no PR; a nonempty minor/patch group is still unobserved."
   },
   "interfaces": [
     {
@@ -50,7 +93,8 @@
       "pin_record": ".github/requirements-ci.lock",
       "source": "https://docs.zizmor.sh/usage/",
       "command": "zizmor --offline --no-config --no-ignores --no-progress --persona regular --strict-collection --format json .github/workflows",
-      "selection": "Reuse the existing locked security analyzer; independent of actionlint and execution evidence."
+      "selection": "Reuse the existing locked security analyzer; independent of actionlint and execution evidence. Offline regular persona gates every PR in validate.yml; security-scan.yml's zizmor-online job adds the online audits on push/schedule/dispatch and uploads SARIF (category zizmor) without failing on findings.",
+      "online_command": "GH_TOKEN=<github.token> zizmor --no-config --no-ignores --no-exit-codes --persona regular --strict-collection --format sarif .github/workflows"
     },
     {
       "repository": "actions/setup-python",
@@ -113,7 +157,7 @@
       "pin_record": "blueprints/convergence-practice/wsl-native-tools/pins.json",
       "source": "https://github.com/gitleaks/gitleaks/releases/tag/v8.30.1",
       "command": "gitleaks git . --redact --no-banner --report-format json; gitleaks dir . --redact --no-banner",
-      "selection": "Reused already-pinned secret scanner (same pins.json entry the WSL native-tools profile uses). Added as validate.yml's secret-scan job: git-history and working-tree modes, redacted JSON report uploaded always(), no fail threshold decided yet.",
+      "selection": "Reused already-pinned secret scanner (same pins.json entry the WSL native-tools profile uses). validate.yml's secret-scan job (required check) scans git history and the working tree, fails on any detection, and uploads the redacted JSON report always(). Kept alongside GitHub secret scanning because non-provider patterns and validity checks are not available free here.",
       "workflow": ".github/workflows/validate.yml#secret-scan"
     },
     {
@@ -122,7 +166,7 @@
       "archive_sha256": "caeedb81fb0491615f1ebd1761e4145d41ee86dd2cc7bf80669f9f5ad9d6133d",
       "source": "https://github.com/anchore/syft/releases/download/v1.52.0/syft_1.52.0_checksums.txt",
       "command": "syft scan dir:<venv> -o spdx-json=... -o cyclonedx-json=...",
-      "selection": "SBOM generator for supply-chain.yml's sbom-vuln job; SPDX and CycloneDX outputs for the reproduced nautilus_trader install venv. Report-only, 90-day artifact retention.",
+      "selection": "SBOM generator for supply-chain.yml's sbom-vuln job; SPDX and CycloneDX outputs for the reproduced nautilus_trader install venv, scanned by grype's high-severity gate. 90-day artifact retention.",
       "workflow": ".github/workflows/supply-chain.yml#sbom-vuln"
     },
     {
@@ -130,9 +174,40 @@
       "version": "0.119.0",
       "archive_sha256": "3fa2dc4b924621ab65404cf08d0b8438d896d80ab949c9d5a4ca283c36004c9b",
       "source": "https://github.com/anchore/grype/releases/download/v0.119.0/grype_0.119.0_checksums.txt",
-      "command": "grype sbom:<spdx-json> -o json; grype db status",
-      "selection": "Vulnerability scanner for supply-chain.yml's sbom-vuln job, run against syft's SBOM output. Tracks upstream's latest release rather than a fixed version because it ships its own matching logic, not just a data feed; re-checked whenever the workflow's own path changes. No --fail-on threshold; report-only.",
+      "command": "grype db update; grype db status; grype sbom:<spdx-json> --config .grype.yaml --fail-on high -o json",
+      "selection": "Vulnerability scanner for supply-chain.yml's sbom-vuln job, run against syft's SBOM output. Fixed, checksum-verified pin; the database is fetched per run. Gate: --fail-on high with reviewed ignores in .grype.yaml (none on 2026-09-22: run 35799579095 had 0 Critical, 0 High, 5 Medium, 1 Low, all pip 25.0.1). Lower severities are reported only.",
       "workflow": ".github/workflows/supply-chain.yml#sbom-vuln"
+    },
+    {
+      "repository": "google/osv-scanner",
+      "version": "2.6.0",
+      "binary_sha256": "ca69b3d3cd08f889a49dc0a383122f71cc528b83803671df5fd874d97485b108",
+      "source": "https://github.com/google/osv-scanner/releases/download/v2.6.0/osv-scanner_SHA256SUMS",
+      "command": "osv-scanner scan source --config .github/osv-scanner.toml --no-resolve --lockfile=<parser>:<path> ... (every entry in .github/osv-scanner-lockfiles.json)",
+      "selection": "PR check (security-scan.yml osv-scanner job), required in the target main ruleset once applied, over the 37 lockfiles listed in .github/osv-scanner-lockfiles.json; 2 manifests are covered by their sibling locks and one reasoned test-fixture exclusion is listed; fails on any vulnerability not in .github/osv-scanner.toml [[IgnoredVulns]] (id, reason, ignoreUntil <= 90 days; none on 2026-09-22). Push/schedule/dispatch also upload SARIF (category osv-scanner). tests/test_osv_lockfile_coverage.py fails when a tracked lockfile is missing from the inventory.",
+      "workflow": ".github/workflows/security-scan.yml#osv-scanner"
+    },
+    {
+      "repository": "github/codeql-action",
+      "version": "4.38.1",
+      "revision": "1c5b675653bb5c22dbe9b12b556ec555138e09fd",
+      "source": "https://github.com/github/codeql-action/releases/tag/v4.38.1",
+      "command": "github/codeql-action/upload-sarif (sarif_file, category)",
+      "selection": "SARIF upload only, for OSV-Scanner, zizmor online and Scorecard; each uploading job alone holds security-events: write. CodeQL analysis itself is GitHub's default setup (repository setting), not a workflow here."
+    },
+    {
+      "repository": "github/codeql (default setup)",
+      "version": "GitHub-managed bundle (codeql-bundle-v2.27.1 latest on 2026-09-22)",
+      "source": "https://docs.github.com/en/code-security/code-scanning/enabling-code-scanning/configuring-default-setup-for-code-scanning",
+      "selection": "Repository-setting code scanning, free for public repositories; languages actions, csharp, go, javascript, javascript-typescript, python, rust, typescript (default-setup GET at 2026-09-23T04:47:34Z); default query suite; weekly plus push/PR. First analysis of 168a3a8 (run 35815088202): 8 results (python 6, javascript-typescript 2, actions 0, csharp 0), 10 open high alerts after 796f759, resolved in #104 (docs/decisions/2026-09-22-codeql-first-analysis.md). The target main ruleset's code_scanning rule blocks PRs at high_or_higher security alerts and error alerts.",
+      "floating_version_note": "The CodeQL bundle is GitHub-managed and not pinned by this repository; accepted for a repository setting that runs outside our workflows (closure record)."
+    },
+    {
+      "repository": "actions/download-artifact",
+      "version": "8.0.1",
+      "revision": "3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c",
+      "source": "https://github.com/actions/download-artifact/releases/tag/v8.0.1",
+      "selection": "publish-catalog.yml release job downloads the two attested artifacts by ID from the publish job (digest-mismatch: error), then re-checks their SHA-256 before gh release create."
     }
   ],
   "scheduled_report_only_lanes": [
@@ -144,19 +219,12 @@
       "required_check": false
     },
     {
-      "workflow": ".github/workflows/supply-chain.yml",
-      "job": "sbom-vuln",
-      "schedule": "29 7 * * 1",
-      "purpose": "SBOM (syft) + vulnerability scan (grype) of the reproduced native-foundation-e2e.yml nautilus_trader install venv. Report-only, no fail threshold; 90-day artifact retention.",
-      "required_check": false
-    },
-    {
       "repository": "seathatflowsinourveins/native-agent-stack",
-      "version": "publish-catalog.yml@2026-09-22",
+      "version": "publish-catalog.yml@2026-09-22-release",
       "source": ".github/workflows/publish-catalog.yml",
       "command": "git push origin v<version> (tag push) or gh workflow run publish-catalog.yml",
-      "selection": "Publication job now also triggers on push: tags: ['v*'] (job condition startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main'), alongside the existing trusted-main workflow_dispatch. Adds a SHA-checked syft 1.52.0 SBOM (native-agent-stack-<sha>.spdx.json, predicate-type https://spdx.dev/Document) with its own actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 attestation, verified in-run with gh attestation verify and uploaded next to the archive with a matched digest, alongside the existing archive attestation.",
-      "acceptance": "docs/github-automation.md 'Publication on tags': tag push is coordinator-only (protected by the main ruleset and GitHub tag push permissions); job-level permissions (contents: read, id-token: write, attestations: write) unchanged."
+      "selection": "Publication job now also triggers on push: tags: ['v*'] (job condition startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main'), alongside the existing trusted-main workflow_dispatch. Adds a SHA-checked syft 1.52.0 SBOM (native-agent-stack-<sha>.spdx.json, predicate-type https://spdx.dev/Document) with its own actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 attestation, verified in-run with gh attestation verify and uploaded next to the archive with a matched digest, alongside the existing archive attestation. A tag-only release job (needs publish; job permissions contents: write only) downloads both attested artifacts by ID, re-checks them against the digests the publish job attested, and runs gh release create <tag> <archive> <sbom> --verify-tag, which gh 2.101.0 sequences as draft, upload, publish so the immutable release is published with its assets; it then confirms isImmutable and both asset digests.",
+      "acceptance": "docs/github-automation.md 'Publication on tags': v* tag creation is admin-only (tag creation ruleset 23859358); the publish job keeps contents: read, id-token: write, attestations: write; only the release job has contents: write. No hosted tag run of the release job yet."
     },
     {
       "repository": "seathatflowsinourveins/native-agent-stack",
@@ -165,6 +233,48 @@
       "command": "bash adoption/bootstrap-linux.sh --profile foundation-cpu (run inside the bootstrap-linux job on ubuntu-24.04)",
       "selection": "New job bootstrap-linux (20-minute timeout) exercises adoption/bootstrap-linux.sh's real pinned-download/SHA-256-verify/isolated-prefix install path for the foundation-cpu profile from adoption/pins-linux-x86_64.json, on push to main, on pull requests touching adoption/** or blueprints/convergence-practice/wsl-native-tools/pins.json, weekly (Monday 06:47 UTC), and on manual dispatch.",
       "acceptance": "In-run scripts/adoption_status.py --profile foundation-cpu --json assertion that every required command is present, plus direct codex/claude/uv/node --version checks; workflow header records this as synthetic/local-integration evidence on a disposable runner, not a second-machine developer-laptop acceptance."
+    },
+    {
+      "workflow": ".github/workflows/security-scan.yml",
+      "job": "zizmor-online",
+      "schedule": "37 5 * * 3",
+      "purpose": "Runs off PRs (push/schedule/dispatch) with zizmor's online audits and uploads SARIF (category zizmor) without failing on findings; validate.yml keeps the offline zizmor PR gate.",
+      "required_check": false
+    },
+    {
+      "workflow": ".github/workflows/scorecard.yml",
+      "job": "analysis",
+      "schedule": "13 5 * * 1",
+      "purpose": "OpenSSF Scorecard, publish_results false; SARIF uploaded to code scanning (job-scoped security-events: write) and kept as a 5-day artifact.",
+      "required_check": false
+    }
+  ],
+  "security_gate_lanes": [
+    {
+      "workflow": ".github/workflows/supply-chain.yml",
+      "job": "sbom-vuln",
+      "schedule": "29 7 * * 1",
+      "purpose": "SBOM (syft) + vulnerability scan (grype) of the reproduced native-foundation-e2e.yml nautilus_trader install venv. Gate: --fail-on high with reviewed .grype.yaml ignores (none on 2026-09-22); lower severities reported only; 90-day artifact retention. Path-filtered on PRs, so not a required check.",
+      "required_check": false,
+      "target_required_check": false
+    },
+    {
+      "workflow": ".github/workflows/security-scan.yml",
+      "job": "osv-scanner",
+      "schedule": "37 5 * * 3",
+      "purpose": "Runs on every PR and on push/schedule/dispatch, failing on any unignored vulnerability in the lockfiles listed in .github/osv-scanner-lockfiles.json (a reasoned excluded list names the deliberately vulnerable grype fixture); off PRs it also uploads SARIF (category osv-scanner).",
+      "required_check": false,
+      "target_required_check": true,
+      "required_check_context": "osv-scanner"
+    },
+    {
+      "workflow": ".github/workflows/dependency-review.yml",
+      "job": "dependency-review",
+      "schedule": null,
+      "purpose": "PR-only dependency review with fail-on-severity: high (warn-only removed 2026-09-22).",
+      "required_check": false,
+      "target_required_check": true,
+      "required_check_context": "dependency-review"
     }
   ],
   "selected_upgrade_qualification": {
@@ -240,18 +350,34 @@
       "version": "44.104.0",
       "revision": "6a1a69c3efdfb3dbb534b970f08b7f49524cec8b",
       "source": "https://github.com/renovatebot/renovate/tree/6a1a69c3efdfb3dbb534b970f08b7f49524cec8b",
-      "decision": "Custom catalog managers are a future option; no demonstrated independent gap beyond the existing catalog owner. Dependabot alone owns Action pin proposals."
+      "decision": "Custom catalog managers are a future option; no demonstrated independent gap beyond the existing catalog owner. Dependabot alone owns Action pin proposals. Re-checked 2026-09-22: still deferred; Dependabot security updates cover alerted locks and no custom-manager gap is demonstrated."
     },
     {
       "repository": "dependabot/dependabot-core",
       "ecosystem": "pip",
       "source": "https://docs.github.com/en/code-security/reference/supply-chain-security/dependabot-options-reference",
-      "decision": "Not activated for this repository's Python pins. Dependabot's pip ecosystem discovers ordinary requirements/lock files by name; the checksum lock actually used is .github/requirements-ci.lock, a name it does not recognize, and four of five pinned CI binaries (actionlint, gitleaks, syft, grype) are curl-downloaded release tarballs with no manifest it parses at all. catalog-freshness.yml's pin-drift table covers actionlint, gitleaks, syft and grype (plus zizmor and nautilus_trader) against each tool's latest upstream release; grype 0.119.0 is a fixed, checksum-verified pin in supply-chain.yml (GRYPE_VERSION plus a SHA-256 archive checksum), like the others, and only its vulnerability database is fetched fresh per run (docs/github-automation.md, \"Secret and supply-chain scanning\"; corrected 2026-09-22 after the Codex cross-family review). Precondition to revisit: rename .github/requirements-ci.lock to a Dependabot-discoverable name."
+      "decision": "Pip version updates not activated. Dependabot security updates (repository setting) were enabled 2026-09-22 and opened #97 (mlx 0.29.3 -> 0.29.4) and #98 (transformers 5.0.0rc1 -> 5.10.1) against tools/mlx-smoke/requirements.lock.txt; both failed macos-profile (runs 35815152321, 35815162857) because that lock is uv-compiled with hashes and an --exclude-newer cutoff from requirements.in and hardware-profile-smoke.yml recompiles and diffs it. The fix landed as a reviewed relock instead (#99). A pip version-update entry would repeat that failure weekly for every uv-compiled lock, and the curl-downloaded CI binaries still have no manifest Dependabot parses; catalog-freshness.yml's pin-drift table covers those. Overturn: a Dependabot pip/uv PR that passes the repository's recompile-and-diff check on a real lock.",
+      "updated": "2026-09-22"
     },
     {
-      "repository": "github/codeql-action",
-      "source": "https://docs.github.com/en/code-security/code-scanning/introduction-to-code-scanning/about-code-scanning-with-codeql",
-      "decision": "Not activated. Default CodeQL setup needs security-events: write (every workflow here is contents: read only) and pins no exact CodeQL bundle version by default, violating this repository's no-floating-pin practice. The scannable surface is stdlib-only Python and a handful of .mjs files with no served application, input boundary or authentication code. Re-evaluate on a served application path (e.g. a hosted dashboard)."
+      "repository": "Socket Security GitHub app",
+      "source": "https://socket.dev",
+      "decision": "Installed (free), advisory PR checks only; not a required check. Overturn: remove if its PR alerts add nothing beyond dependency-review across the next 10 PRs."
+    },
+    {
+      "repository": "GitHub merge queue",
+      "source": "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/managing-a-merge-queue",
+      "decision": "Unavailable: merge queues need an organization-owned public repository (or Enterprise Cloud private); this is a personal repository. Without a queue, strict up-to-date checks stay off (docs/decisions/2026-09-22-github-automation-closure.md section 10); every required check still runs on each PR and on push to main. Overturn: a main failure traced to two PRs merging close together."
+    },
+    {
+      "repository": "GitHub secret scanning non-provider patterns and validity checks",
+      "source": "https://docs.github.com/en/code-security/secret-scanning/enabling-secret-scanning-features/enabling-validity-checks-for-your-repository",
+      "decision": "Not available free for this public personal repository (Secret Protection is a paid Team/Enterprise product); gitleaks secret-scan stays the required gate alongside free provider-pattern scanning and push protection."
+    },
+    {
+      "repository": "step-security/harden-runner block mode",
+      "source": "https://github.com/step-security/harden-runner",
+      "decision": "Stays egress-policy: audit on every hardened job; block mode needs a per-job allow-list backed by several audit runs."
     }
   ],
   "research_acceptance": {
@@ -262,11 +388,38 @@
     "improvement_claim": "No session/lifetime savings, provider-usage reduction or improved research reliability is claimed from these CI changes."
   },
   "remaining_unverified": [
-    "Weekly Dependabot timing and nonempty minor/patch grouping",
+    "Nonempty Dependabot minor/patch grouping (weekly run 35583086998 on 2026-09-21 found no update)",
     "Actual superseded-PR cancellation under overlapping runs",
     "Additional operating systems and self-hosted runner compatibility",
     "Native research improvement over the declared baseline",
-    "Future publication artifacts after the named qualified commit"
+    "Future publication artifacts after the named qualified commit",
+    "First hosted runs of security-scan.yml (PR, push, schedule), the Scorecard SARIF upload and publish-catalog.yml's release job on a v* tag",
+    "Application of the target main ruleset (coordinator, after merge) and a PR blocked by its code_scanning rule",
+    "required_signatures: add only after every writer signs commits (registered signing key, commit.gpgsign=true) and one signed PR is observed merging under the rule"
   ],
-  "rollback": "Revert the setup action pins, compatibility workflow and matching reviewed hashes through a PR if qualification regresses. Disable only the manual publisher to stop issuance; preserve historical attestations. Revert Dependabot config to stop future update proposals. Keep required integrity checks and the single research owner intact."
+  "rollback": "Revert the setup action pins, compatibility workflow and matching reviewed hashes through a PR if qualification regresses. Disable only the manual publisher to stop issuance; preserve historical attestations. Revert Dependabot config to stop future update proposals. Keep required integrity checks and the single research owner intact. Remove security-scan.yml or drop dependency-review/osv-scanner from the ruleset to stop those gates; revert .grype.yaml/--fail-on to return sbom-vuln to report-only; delete the release job to stop release creation (published immutable releases stay).",
+  "closure_record": "docs/decisions/2026-09-22-github-automation-closure.md",
+  "superseded_decisions": [
+    {
+      "repository": "github/codeql-action",
+      "superseded": "2026-09-22",
+      "previous_decision": "Not activated (security-events: write requirement, floating bundle, no served application).",
+      "replacement": "CodeQL default setup configured as a repository setting (first run 35815088202); on 168a3a8 it returned 8 results that zizmor cannot see (py/bad-tag-filter 3, js/xss-through-dom 2, py/clear-text-storage-sensitive-data 1, py/clear-text-logging-sensitive-data 1, py/incomplete-url-substring-sanitization 1) and 0 actions results. The floating GitHub-managed bundle is accepted because it runs outside this repository's workflows.",
+      "record": "docs/decisions/2026-09-22-github-automation-closure.md"
+    },
+    {
+      "repository": "actions/dependency-review-action",
+      "superseded": "2026-09-22",
+      "previous_decision": "warn-only: true, not a required check.",
+      "replacement": "fail-on-severity: high and a required check in the target main ruleset.",
+      "record": "docs/decisions/2026-09-22-github-automation-closure.md"
+    },
+    {
+      "repository": "anchore/grype",
+      "superseded": "2026-09-22",
+      "previous_decision": "Report-only; threshold decision pending.",
+      "replacement": "--fail-on high with a reviewed .grype.yaml (no ignores needed on 2026-09-22).",
+      "record": "docs/decisions/2026-09-22-github-automation-closure.md"
+    }
+  ]
 }

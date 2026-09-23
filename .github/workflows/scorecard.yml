@@ -1,10 +1,11 @@
 name: OpenSSF Scorecard (report-only)
 
 # Report-only supply-chain scorecard: publish_results is false (no publication
-# to the public api.scorecard.dev dataset or badge), and no GitHub Advanced
-# Security surface (Security tab / code-scanning alerts) is used. Results are
-# retained only as a workflow artifact. See
-# docs/decisions/2026-09-22-actions-hardening.md for the evidence and scope.
+# to the public api.scorecard.dev dataset or badge). Results go to code
+# scanning through github/codeql-action/upload-sarif (the analysis job alone
+# holds security-events: write) and stay a workflow artifact; a low check score
+# never fails the job. See docs/decisions/2026-09-22-actions-hardening.md and
+# docs/decisions/2026-09-22-github-automation-closure.md for the evidence and scope.
 
 on:
   schedule:
@@ -26,6 +27,7 @@ jobs:
     timeout-minutes: 15
     permissions:
       contents: read
+      security-events: write # upload the Scorecard SARIF to code scanning; this job only
     steps:
       - name: Harden the runner (audit-only network egress)
         uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
@@ -35,7 +37,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - name: Run OpenSSF Scorecard (no publish, no Advanced Security)
+      - name: Run OpenSSF Scorecard (no publish)
         uses: ossf/scorecard-action@2d1146689b8cda280b9bc96326124645441f03bc # v2.4.4
         with:
           results_file: results.sarif
@@ -48,3 +50,7 @@ jobs:
           path: results.sarif
           if-no-files-found: error
           retention-days: 5
+      - name: Upload Scorecard SARIF to code scanning
+        uses: github/codeql-action/upload-sarif@1c5b675653bb5c22dbe9b12b556ec555138e09fd # v4.38.1
+        with:
+          sarif_file: results.sarif
