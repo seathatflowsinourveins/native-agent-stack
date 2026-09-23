@@ -12564,13 +12564,38 @@
     },
     {
       "path": "evidence/artifacts/sota-refresh-20260923/obs-compare/README.md",
-      "sha256": "8c68442f07309bc1672964db1277e0168a169248a257e9e6376522ca293216d0",
-      "bytes": 5697
+      "sha256": "e1590ceffe6e4cdfe0221567dbc986424f21c186a0cb2de1fa49360951b0c284",
+      "bytes": 10698
     },
     {
       "path": "evidence/artifacts/sota-refresh-20260923/obs-compare/observability-hosting-comparison.json",
-      "sha256": "1daba1d9bd2e9def88a326fb483744f01e9e75c8df994752208e058c6283a252",
-      "bytes": 19671
+      "sha256": "0ca838709a2de76e7a895e0f9cf0e3271198edd042fa0830d3d418c7a5dc2488",
+      "bytes": 32256
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/obs-compare/fixround-preregistration.md",
+      "sha256": "20cbe6c6fe1a44ed7440cf51e7166611f7330c4ff1ca72fec5bb5c53479a9465",
+      "bytes": 3053
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/obs-compare/logs-fixround/egress-default-firstattempt-raced.log",
+      "sha256": "7a1954b351d1014a5678c20644972f2f78b605d48f0e5f6f08de26bf49d9097a",
+      "bytes": 4384
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/obs-compare/logs-fixround/egress-allowlisted.log",
+      "sha256": "19ba0ae0e2d5463fd9488dc64535bfe9e82f7493ed59720383e6476de8ed58bf",
+      "bytes": 5774
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/obs-compare/logs-fixround/egress-default-retry.log",
+      "sha256": "e6b96f1f0a010432d5084f47356d18de5db09f5ddd77667f102e95fc2cca4120",
+      "bytes": 4501
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/obs-compare/logs-fixround/egress-allowlisted-otherhost-denied.log",
+      "sha256": "cadcbf90c7303f28c406bab26a124c89b1794a9626a14b487201d945d29a2a7f",
+      "bytes": 5895
     }
   ],
   "convergence_records": [
