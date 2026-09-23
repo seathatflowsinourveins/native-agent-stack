@@ -8425,8 +8425,8 @@
     },
     {
       "path": "catalogs/landscape/new-host-grand-list.json",
-      "sha256": "ea65fb0a70f21c62344a33906a082903559d6915c72bb9ed3883bad1fa5825ed",
-      "bytes": 72329
+      "sha256": "d71dc13073c6689426c301187245b424430118248b5c5db2eea53d5b60868ad8",
+      "bytes": 72634
     },
     {
       "path": "catalogs/landscape/research-state.json",
@@ -9140,13 +9140,13 @@
     },
     {
       "path": "docs/new-host-grand-list.md",
-      "sha256": "cfc6de1e1dfe96ca2cdfe32fa983208793f3b18813f689238d495631ce29e006",
-      "bytes": 13604
+      "sha256": "b7cc444877cfa3cef897b69c2834abf1ddf52619c639780d81f8ad3be61345ca",
+      "bytes": 13605
     },
     {
       "path": "docs/new-workstation-runtime-profile-20260922.md",
-      "sha256": "da5dd61a96155dd73c9c1e2166ff9977e68231dfc0b0200aea5f0f845fb33499",
-      "bytes": 15978
+      "sha256": "b92e8574a165c9ec0b481cca654494c9521a7c47900b1b2023b1b93c3c809ee9",
+      "bytes": 16474
     },
     {
       "path": "docs/next-host-stages.md",
