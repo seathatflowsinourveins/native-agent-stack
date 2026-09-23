@@ -1,0 +1,921 @@
+{
+  "alerts_fired": [
+    {
+      "name": "ex_date_1576818000000000000",
+      "ts_event_ns": 1576818000000000000
+    },
+    {
+      "name": "ex_date_1584676800000000000",
+      "ts_event_ns": 1584676800000000000
+    }
+  ],
+  "alerts_registered": [
+    {
+      "alert_time_ns": 1576818000000000000,
+      "name": "ex_date_1576818000000000000"
+    },
+    {
+      "alert_time_ns": 1584676800000000000,
+      "name": "ex_date_1584676800000000000"
+    }
+  ],
+  "attribution_evidence": {
+    "converted_rows_sha256": "6c6fcf4ae2b6d26521d0e0218501d94f7fcfa7571e902309f0f83ac2a68845cc",
+    "file": "converted-rows.private.json",
+    "note": "compare.py refuses a --bars file whose digest differs, and re-hashes its own re-derivation under --lean-data against this value. Under v2 the rows are evidence for the per-event gap and open-price checks, never for an attribution.",
+    "serialization": "json.dumps(rows, indent=2, sort_keys=True, default=str) + newline"
+  },
+  "buying_power_and_latch_note": "one_zero requests 1x with no leverage and no adaptive rule, so empty lists are the expected observation, not evidence of margin-model equivalence.",
+  "buying_power_events": [],
+  "case": "one_zero",
+  "case_configuration": {
+    "account_type": "CASH",
+    "bar_adaptive_high_low_ordering": false,
+    "bar_execution": true,
+    "currency": "USD",
+    "determinism_note": "one_zero configures no stochastic fill, fee or latency model; the seed is recorded and applied but no sampled component is exercised.",
+    "entry_decision_date": "2019-12-31",
+    "exit_decision_date": "2020-04-29",
+    "fee_model": null,
+    "fee_usd": "0",
+    "fill_model": null,
+    "frozen_account": false,
+    "id": "one_zero",
+    "initial_cash_usd": "100000",
+    "instrument": {
+      "bar_type": "SPY.SIM-1-HOUR-LAST-EXTERNAL",
+      "currency": "USD",
+      "instrument_id": "SPY.SIM",
+      "lot_size": 1,
+      "price_increment": "0.0001",
+      "price_precision": 4,
+      "size_precision": 0,
+      "symbol": "SPY",
+      "venue": "SIM"
+    },
+    "latency_model": null,
+    "oms_type": "NETTING",
+    "reject_stop_orders": true,
+    "seed": 20260922,
+    "sizing_buffer": "0.98",
+    "slippage": "0",
+    "support_contingent_orders": true,
+    "target": "1",
+    "use_random_ids": false,
+    "venue_modules": [
+      "DistributionModule"
+    ],
+    "window": {
+      "end": "2020-04-30",
+      "start": "2019-12-02",
+      "symbol": "SPY"
+    }
+  },
+  "cash_ledger": [
+    {
+      "cash": "100000.00",
+      "delta": "0.00",
+      "kind": "distribution",
+      "utc_seconds": 1576818000
+    },
+    {
+      "cash": "1631.6800",
+      "delta": "-98368.3200",
+      "kind": "fill",
+      "utc_seconds": 1577977200
+    },
+    {
+      "cash": "2060.3200",
+      "delta": "428.64",
+      "kind": "distribution",
+      "utc_seconds": 1584676800
+    },
+    {
+      "cash": "90734.0800",
+      "delta": "88673.7600",
+      "kind": "fill",
+      "utc_seconds": 1588255200
+    }
+  ],
+  "classification": "local historical replay on retained bundled sample data; not an unchanged upstream test, a point-in-time dataset or any broker execution",
+  "conversion": {
+    "declared_short_sessions": {
+      "2019-12-24": 4
+    },
+    "extra_session_dates": [],
+    "full_session_rows": 7,
+    "hour_rows": 725,
+    "missing_session_dates": [],
+    "partial_sessions": {
+      "2019-12-24": 4
+    },
+    "sessions": 104
+  },
+  "derived_distributions_v1_rule": [
+    {
+      "ex_date": "2019-12-20",
+      "per_share": "1.57",
+      "utc_seconds": 1576818000
+    },
+    {
+      "ex_date": "2020-03-20",
+      "per_share": "1.41",
+      "utc_seconds": 1584676800
+    }
+  ],
+  "distribution_ledger": [
+    {
+      "amount": "0.00",
+      "engine_posted": true,
+      "ex_date": "2019-12-20",
+      "per_share": "1.57",
+      "quantity": "0",
+      "source": "DistributionModule.process",
+      "ts_event_ns": 1576818000000000000,
+      "utc_seconds": 1576818000
+    },
+    {
+      "amount": "428.64",
+      "engine_posted": true,
+      "ex_date": "2020-03-20",
+      "per_share": "1.41",
+      "quantity": "304",
+      "source": "DistributionModule.process",
+      "ts_event_ns": 1584676800000000000,
+      "utc_seconds": 1584676800
+    }
+  ],
+  "distribution_module": {
+    "acknowledgements": [
+      {
+        "ex_dates": [
+          "2019-12-20"
+        ],
+        "outcomes": [
+          {
+            "applied": true,
+            "error": null
+          }
+        ]
+      },
+      {
+        "ex_dates": [
+          "2020-03-20"
+        ],
+        "outcomes": [
+          {
+            "applied": true,
+            "error": null
+          }
+        ]
+      }
+    ],
+    "calls_at_event_instants_ns": [
+      1576818000000000000,
+      1584676800000000000
+    ],
+    "class": "DistributionModule",
+    "derived_events_equal_preregistered_window_events": true,
+    "emissions": [
+      {
+        "amount": "0.00",
+        "currency": "USD",
+        "eligible_quantity": 0,
+        "ex_date": "2019-12-20",
+        "ex_instant_ns": 1576818000000000000,
+        "factor_row_date": "2019-12-19",
+        "on_time": true,
+        "per_share": "1.57",
+        "positions_seen": 0,
+        "ts_now_ns": 1576818000000000000
+      },
+      {
+        "amount": "428.64",
+        "currency": "USD",
+        "eligible_quantity": 304,
+        "ex_date": "2020-03-20",
+        "ex_instant_ns": 1584676800000000000,
+        "factor_row_date": "2020-03-19",
+        "on_time": true,
+        "per_share": "1.41",
+        "positions_seen": 1,
+        "ts_now_ns": 1584676800000000000
+      }
+    ],
+    "errors": [],
+    "events": [
+      {
+        "calendar_plus_one": "2019-12-20",
+        "ex_date": "2019-12-20",
+        "ex_instant_ns": 1576818000000000000,
+        "ex_instant_utc_seconds": 1576818000,
+        "factor_row_date": "2019-12-19",
+        "per_share": "1.57",
+        "pf0": "0.9736767",
+        "pf1": "0.9784638",
+        "ref0": "320.9"
+      },
+      {
+        "calendar_plus_one": "2020-03-20",
+        "ex_date": "2020-03-20",
+        "ex_instant_ns": 1584676800000000000,
+        "ex_instant_utc_seconds": 1584676800,
+        "factor_row_date": "2020-03-19",
+        "per_share": "1.41",
+        "pf0": "0.9784638",
+        "pf1": "0.9842156",
+        "ref0": "240.51"
+      }
+    ],
+    "pending_at_end": [],
+    "process_calls": 877,
+    "resets": 0,
+    "source": "distribution_module.py",
+    "source_sha256": "eefee070b0dbe6ad3a1e68755ca959b5fff081fad61af8b84902a438996b126b",
+    "venue_module_count": 1
+  },
+  "dividend_cash_usd": "428.64",
+  "engine": {
+    "extension_sha256": {
+      "_libnautilus.cpython-312-x86_64-linux-gnu.so": "a53dd5a24fe77f4c66169af84ee9c7e292018010922e3dce9a8b6c9f7f3b7021"
+    },
+    "package": "nautilus_trader",
+    "python": "3.12.3",
+    "upstream_commit_pin": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+    "version": "2.0.0rc5"
+  },
+  "evidence_class": "HIST",
+  "external_distribution_cross_check": [
+    {
+      "amount": "0.00",
+      "engine_posted": false,
+      "ex_date": "2019-12-20",
+      "per_share": "1.57",
+      "quantity": "0",
+      "utc_seconds": 1576818000
+    },
+    {
+      "amount": "428.64",
+      "engine_posted": false,
+      "ex_date": "2020-03-20",
+      "per_share": "1.41",
+      "quantity": "304",
+      "utc_seconds": 1584676800
+    }
+  ],
+  "fees_usd": "0.00",
+  "fills": [
+    {
+      "client_order_id": "O-1-STOP",
+      "currency": "USD",
+      "fee": "0.00",
+      "fill_source": "native_oco_leg",
+      "instrument_id": "SPY.SIM",
+      "leg": "STOP_MARKET",
+      "market_on_open_proxy": "preregistered",
+      "order_list_id": "OL-1",
+      "order_ref": 1,
+      "price": "323.5800",
+      "quantity": 304,
+      "side": "BUY",
+      "submitted_session": "2019-12-31",
+      "trigger_price": "321.8601",
+      "ts_event_ns": 1577977200000000000,
+      "utc_seconds": 1577977200,
+      "venue_order_id": "SIM-1-1"
+    },
+    {
+      "client_order_id": "O-2-STOP",
+      "currency": "USD",
+      "fee": "0.00",
+      "fill_source": "native_oco_leg",
+      "instrument_id": "SPY.SIM",
+      "leg": "STOP_MARKET",
+      "market_on_open_proxy": "preregistered",
+      "order_list_id": "OL-2",
+      "order_ref": 2,
+      "price": "291.6900",
+      "quantity": -304,
+      "side": "SELL",
+      "submitted_session": "2020-04-29",
+      "trigger_price": "293.2099",
+      "ts_event_ns": 1588255200000000000,
+      "utc_seconds": 1588255200,
+      "venue_order_id": "SIM-1-3"
+    }
+  ],
+  "final_quantity": "0",
+  "frozen_plan": {
+    "case": {
+      "adaptive": false,
+      "fee_usd": "0",
+      "id": "one_zero",
+      "reject": false,
+      "slippage": "0",
+      "target": "1"
+    },
+    "path": "blueprints/us-equities/historical-simulation/plan.json",
+    "sha256": "60959a050a3b004abf5346d376930b3b2f563096c725dc96e5427703ea203632"
+  },
+  "gate": "G-a",
+  "harness_commit": {
+    "source": "declared by the operator on the command line; the isolated run cannot read Git, so local_source_sha256 is the binding record",
+    "value": "8c4d7e777f285bbbbc9a4eecc2a47e745a407b24"
+  },
+  "id": "spy-parity-one-zero-v2",
+  "inputs": {
+    "data_root": "/data",
+    "decoded": [
+      "equity/usa/hour/spy.zip",
+      "equity/usa/daily/spy.zip",
+      "equity/usa/map_files/spy.csv",
+      "equity/usa/factor_files/spy.csv"
+    ],
+    "forward_filled_rows": 0,
+    "map_rows": [
+      {
+        "date": "1998-01-02",
+        "exchange": "P",
+        "ticker": "spy"
+      },
+      {
+        "date": "2050-12-31",
+        "exchange": "P",
+        "ticker": "spy"
+      }
+    ],
+    "price_encoding": "integer deci-cents / 10000, raw normalization",
+    "session_source": "retained LEAN daily spy.zip rows in window",
+    "sha256": {
+      "alternative/interest-rate/usa/interest-rate.csv": "1d0e6f2ab20e61a4330e8a38735bc73cde4034e7293a45d23b5ebdc6467f7899",
+      "equity/usa/daily/spy.zip": "aaa1febad0cb8f91011212c92ff7caac6d4d6415a3b7f73c4b98c438db4274ad",
+      "equity/usa/factor_files/spy.csv": "ad53e292de2e7076ff36721e1dcffd1db0d04fe6813b59aeece8620fb0d4cec1",
+      "equity/usa/hour/spy.zip": "27af83adec03a3dff2bfda0d4edc077a5085f83a8b71f4ac156af3480e2e99d4",
+      "equity/usa/map_files/spy.csv": "4765f330a156d4b0c521c094abf9747c4c7ccaf8e10c15ca50db16887d36d3cf"
+    },
+    "volume_encoding": "integer shares"
+  },
+  "intents": [
+    {
+      "decision_equity": "100000.0000",
+      "decision_price": "321.8600",
+      "kind": "intent",
+      "order_ref": 1,
+      "quantity": 304,
+      "reason": "entry",
+      "session_date": "2019-12-31",
+      "target": "1",
+      "ts_event_ns": 1577826000000000000,
+      "utc_seconds": 1577826000
+    },
+    {
+      "decision_equity": "90767.5200",
+      "decision_price": "293.2100",
+      "kind": "intent",
+      "order_ref": 2,
+      "quantity": -304,
+      "reason": "exit",
+      "session_date": "2020-04-29",
+      "target": "0",
+      "ts_event_ns": 1588190400000000000,
+      "utc_seconds": 1588190400
+    }
+  ],
+  "isolation": {
+    "argv": [
+      "/repo/blueprints/us-equities/engine-nautilus/spy-parity/run.py",
+      "--lean-data",
+      "/data",
+      "--out",
+      "/out/native",
+      "--harness-commit",
+      "8c4d7e777f285bbbbc9a4eecc2a47e745a407b24"
+    ],
+    "cwd": "/repo",
+    "environment_names": [
+      "LANG",
+      "OMP_NUM_THREADS",
+      "OPENBLAS_NUM_THREADS",
+      "PATH",
+      "PWD",
+      "PYTHONDONTWRITEBYTECODE"
+    ],
+    "network_interfaces": [
+      [
+        1,
+        "lo"
+      ]
+    ]
+  },
+  "latch_events": [],
+  "limitations": [
+    "The market-on-open proxy equals LEAN's MarketOnOpenFill only inside the manifest's faithfulness_domain (open differs from the decision close by at least one tick, the quantity fits the open tick and the fill does not overdraw the CASH account); compare.py checks each event.",
+    "The DistributionModule posts cash only; bar prices stay raw-normalized. Payable dates, withholding and short-position debits are outside one_zero.",
+    "Bundled sample bytes are not an entitled, point-in-time or market-wide dataset."
+  ],
+  "local_source_sha256": {
+    "compare.py": "e88546a0fd9e8592113f6b393d66ea5d9760401138bac7b7957f40b3c64c952e",
+    "convert.py": "08cba0a2aac938e9306935f91c2889b181dfc880b532b5943e0ccda395592c65",
+    "distribution_module.py": "eefee070b0dbe6ad3a1e68755ca959b5fff081fad61af8b84902a438996b126b",
+    "fixture_strategy.py": "cb6830320e8aace88b370bc1c4aac53c95c825ee539861756d4f79e83037c4ee",
+    "mapping-manifest-v2.json": "1b821d7ba42ea6121002a26a5082df08ed7a79f9a50b2edc9959503e1088ac67",
+    "mapping-manifest.json": "43f510494a970d235f27e5676120ee749b45eb6b060cf74f0b768374b8177909",
+    "run.py": "9e70b39545aaebee39f091247fe0a402b5c8075c3b1634eec8b1d488c7478cee",
+    "tolerances.json": "c8bc72317fb4de83f2b0b7e71888828c7dd15a5a7eb2f60b68f87d54e751c15a"
+  },
+  "mapping_manifest": {
+    "path": "mapping-manifest-v2.json",
+    "schema_version": 2,
+    "sha256": "1b821d7ba42ea6121002a26a5082df08ed7a79f9a50b2edc9959503e1088ac67"
+  },
+  "native_account_event_rows": [
+    {
+      "free": "100000.00",
+      "locked": "0.00",
+      "reported": true,
+      "total": "100000.00",
+      "ts_event_ns": 1575298800000000000
+    },
+    {
+      "free": "100000.00",
+      "locked": "0.00",
+      "reported": true,
+      "total": "100000.00",
+      "ts_event_ns": 1576818000000000000
+    },
+    {
+      "free": "2154.53",
+      "locked": "97845.47",
+      "reported": false,
+      "total": "100000.00",
+      "ts_event_ns": 1577826000000000000
+    },
+    {
+      "free": "0.00",
+      "locked": "100000.00",
+      "reported": false,
+      "total": "100000.00",
+      "ts_event_ns": 1577826000000000000
+    },
+    {
+      "free": "0.00",
+      "locked": "1631.68",
+      "reported": false,
+      "total": "1631.68",
+      "ts_event_ns": 1577977200000000000
+    },
+    {
+      "free": "1631.68",
+      "locked": "0.00",
+      "reported": false,
+      "total": "1631.68",
+      "ts_event_ns": 1577977200000000000
+    },
+    {
+      "free": "2060.32",
+      "locked": "0.00",
+      "reported": true,
+      "total": "2060.32",
+      "ts_event_ns": 1584676800000000000
+    },
+    {
+      "free": "1756.32",
+      "locked": "304.00",
+      "reported": false,
+      "total": "2060.32",
+      "ts_event_ns": 1588190400000000000
+    },
+    {
+      "free": "1452.32",
+      "locked": "608.00",
+      "reported": false,
+      "total": "2060.32",
+      "ts_event_ns": 1588190400000000000
+    },
+    {
+      "free": "90430.08",
+      "locked": "304.00",
+      "reported": false,
+      "total": "90734.08",
+      "ts_event_ns": 1588255200000000000
+    },
+    {
+      "free": "90734.08",
+      "locked": "0.00",
+      "reported": false,
+      "total": "90734.08",
+      "ts_event_ns": 1588255200000000000
+    }
+  ],
+  "native_end_cash_usd": "90734.08",
+  "observed_utc": "2026-09-23T02:53:40.574318+00:00",
+  "oco_pairs": [
+    {
+      "decision_session": "2019-12-31",
+      "legs": [
+        {
+          "client_order_id": "O-1-STOP",
+          "contingency_type": "OCO",
+          "expected_trigger_price": "321.8601",
+          "linked_order_ids": [
+            "O-1-MIT"
+          ],
+          "order_list_id": "OL-1",
+          "order_type": "STOP_MARKET",
+          "quantity": 304,
+          "reduce_only": false,
+          "side": "BUY",
+          "time_in_force": "GTC",
+          "trigger_price": "321.8601",
+          "trigger_type": "DEFAULT"
+        },
+        {
+          "client_order_id": "O-1-MIT",
+          "contingency_type": "OCO",
+          "expected_trigger_price": "321.8599",
+          "linked_order_ids": [
+            "O-1-STOP"
+          ],
+          "order_list_id": "OL-1",
+          "order_type": "MARKET_IF_TOUCHED",
+          "quantity": 304,
+          "reduce_only": false,
+          "side": "BUY",
+          "time_in_force": "GTC",
+          "trigger_price": "321.8599",
+          "trigger_type": "DEFAULT"
+        }
+      ],
+      "order_list_id": "OL-1",
+      "order_ref": 1,
+      "reference_close": "321.8600",
+      "submitted_clock_ns": 1577826000000000000,
+      "submitted_ts_event_ns": 1577826000000000000
+    },
+    {
+      "decision_session": "2020-04-29",
+      "legs": [
+        {
+          "client_order_id": "O-2-STOP",
+          "contingency_type": "OCO",
+          "expected_trigger_price": "293.2099",
+          "linked_order_ids": [
+            "O-2-MIT"
+          ],
+          "order_list_id": "OL-2",
+          "order_type": "STOP_MARKET",
+          "quantity": 304,
+          "reduce_only": false,
+          "side": "SELL",
+          "time_in_force": "GTC",
+          "trigger_price": "293.2099",
+          "trigger_type": "DEFAULT"
+        },
+        {
+          "client_order_id": "O-2-MIT",
+          "contingency_type": "OCO",
+          "expected_trigger_price": "293.2101",
+          "linked_order_ids": [
+            "O-2-STOP"
+          ],
+          "order_list_id": "OL-2",
+          "order_type": "MARKET_IF_TOUCHED",
+          "quantity": 304,
+          "reduce_only": false,
+          "side": "SELL",
+          "time_in_force": "GTC",
+          "trigger_price": "293.2101",
+          "trigger_type": "DEFAULT"
+        }
+      ],
+      "order_list_id": "OL-2",
+      "order_ref": 2,
+      "reference_close": "293.2100",
+      "submitted_clock_ns": 1588190400000000000,
+      "submitted_ts_event_ns": 1588190400000000000
+    }
+  ],
+  "order_events": [
+    {
+      "client_order_id": "O-1-STOP",
+      "event": "OrderInitialized",
+      "leg": "STOP_MARKET",
+      "order_list_id": "OL-1",
+      "order_ref": 1,
+      "ts_event_ns": 1577826000000000000
+    },
+    {
+      "client_order_id": "O-1-MIT",
+      "event": "OrderInitialized",
+      "leg": "MARKET_IF_TOUCHED",
+      "order_list_id": "OL-1",
+      "order_ref": 1,
+      "ts_event_ns": 1577826000000000000
+    },
+    {
+      "client_order_id": "O-1-STOP",
+      "event": "OrderSubmitted",
+      "leg": "STOP_MARKET",
+      "order_list_id": "OL-1",
+      "order_ref": 1,
+      "ts_event_ns": 1577826000000000000
+    },
+    {
+      "client_order_id": "O-1-MIT",
+      "event": "OrderSubmitted",
+      "leg": "MARKET_IF_TOUCHED",
+      "order_list_id": "OL-1",
+      "order_ref": 1,
+      "ts_event_ns": 1577826000000000000
+    },
+    {
+      "client_order_id": "O-1-STOP",
+      "event": "OrderAccepted",
+      "leg": "STOP_MARKET",
+      "order_list_id": "OL-1",
+      "order_ref": 1,
+      "ts_event_ns": 1577826000000000000
+    },
+    {
+      "client_order_id": "O-1-MIT",
+      "event": "OrderAccepted",
+      "leg": "MARKET_IF_TOUCHED",
+      "order_list_id": "OL-1",
+      "order_ref": 1,
+      "ts_event_ns": 1577826000000000000
+    },
+    {
+      "client_order_id": "O-1-STOP",
+      "event": "OrderFilled",
+      "last_px": "323.5800",
+      "last_qty": "304",
+      "leg": "STOP_MARKET",
+      "order_list_id": "OL-1",
+      "order_ref": 1,
+      "ts_event_ns": 1577977200000000000
+    },
+    {
+      "client_order_id": "O-1-MIT",
+      "event": "OrderCanceled",
+      "leg": "MARKET_IF_TOUCHED",
+      "order_list_id": "OL-1",
+      "order_ref": 1,
+      "reason": "",
+      "ts_event_ns": 1577977200000000000
+    },
+    {
+      "client_order_id": "O-2-STOP",
+      "event": "OrderInitialized",
+      "leg": "STOP_MARKET",
+      "order_list_id": "OL-2",
+      "order_ref": 2,
+      "ts_event_ns": 1588190400000000000
+    },
+    {
+      "client_order_id": "O-2-MIT",
+      "event": "OrderInitialized",
+      "leg": "MARKET_IF_TOUCHED",
+      "order_list_id": "OL-2",
+      "order_ref": 2,
+      "ts_event_ns": 1588190400000000000
+    },
+    {
+      "client_order_id": "O-2-STOP",
+      "event": "OrderSubmitted",
+      "leg": "STOP_MARKET",
+      "order_list_id": "OL-2",
+      "order_ref": 2,
+      "ts_event_ns": 1588190400000000000
+    },
+    {
+      "client_order_id": "O-2-MIT",
+      "event": "OrderSubmitted",
+      "leg": "MARKET_IF_TOUCHED",
+      "order_list_id": "OL-2",
+      "order_ref": 2,
+      "ts_event_ns": 1588190400000000000
+    },
+    {
+      "client_order_id": "O-2-STOP",
+      "event": "OrderAccepted",
+      "leg": "STOP_MARKET",
+      "order_list_id": "OL-2",
+      "order_ref": 2,
+      "ts_event_ns": 1588190400000000000
+    },
+    {
+      "client_order_id": "O-2-MIT",
+      "event": "OrderAccepted",
+      "leg": "MARKET_IF_TOUCHED",
+      "order_list_id": "OL-2",
+      "order_ref": 2,
+      "ts_event_ns": 1588190400000000000
+    },
+    {
+      "client_order_id": "O-2-STOP",
+      "event": "OrderFilled",
+      "last_px": "291.6900",
+      "last_qty": "304",
+      "leg": "STOP_MARKET",
+      "order_list_id": "OL-2",
+      "order_ref": 2,
+      "ts_event_ns": 1588255200000000000
+    },
+    {
+      "client_order_id": "O-2-MIT",
+      "event": "OrderCanceled",
+      "leg": "MARKET_IF_TOUCHED",
+      "order_list_id": "OL-2",
+      "order_ref": 2,
+      "reason": "",
+      "ts_event_ns": 1588255200000000000
+    }
+  ],
+  "preregistered_mappings": [
+    "decision_visibility",
+    "distributions_and_cash",
+    "market_on_open_proxy"
+  ],
+  "preregistration": {
+    "path": "PREREGISTRATION-v2.md",
+    "sha256": "4393a1b7d896b2f49c4091c18701bd08cfc72a8d313f0ad2a628e91db26d6f0c"
+  },
+  "preregistration_deviations": [
+    {
+      "deviation": "The replay ran before any independent review of the harness changes. The review is owned by the peer session that owns the gate rows; no review record exists in this receipt.",
+      "effect": "The comparison result stands as measured, but the precondition is unmet until that review is retained; a PASS here does not by itself move any mapping or gate.",
+      "id": "review_before_first_run",
+      "sealed_text": "acceptance_criteria.preconditions[0]: the harness changes are implemented and independently reviewed before the first v2 run; the review record is retained."
+    },
+    {
+      "deviation": "Both fields stay as sealed because the manifest must not be edited; they no longer describe the tree once this receipt exists.",
+      "effect": "A later dated manifest revision must record the run; the rows stay 'preregistered'.",
+      "id": "sealed_status_fields_not_updated",
+      "sealed_text": "mapping-manifest-v2.json run_status 'preregistered_not_run' and harness_changes_required.implemented false."
+    },
+    {
+      "deviation": "The module never posts a late event and records the error; the runner then refuses the run after engine.run() returns, before any receipt is written, instead of stopping the engine mid-run (an exception inside process() is not guaranteed to propagate out of the pinned engine).",
+      "effect": "Same outcome for publication: no receipt exists for a run with a late emission.",
+      "id": "late_emission_refusal_is_post_run",
+      "sealed_text": "distributions_and_cash.mechanism_rules.timing: a late emission is a module error that aborts the run."
+    },
+    {
+      "deviation": "The v2 results are published as receipt-v2.json and verdict-v2.json; the v1 receipt.json and verdict.json are kept unchanged.",
+      "effect": "The gate row reading verdict.json is untouched by this run.",
+      "id": "v2_output_paths",
+      "sealed_text": "Neither README.md nor mapping-manifest-v2.json names paths for the v2 receipt and verdict; the manifest keeps v1 bound to verdict.json."
+    },
+    {
+      "deviation": "compare.py binds the receipt's 'HIST' to the first token of that annotated value.",
+      "effect": "None on the result.",
+      "id": "manifest_evidence_class_token",
+      "sealed_text": "mapping-manifest-v2.json evidence_class 'HIST (for the future replay); ...'."
+    },
+    {
+      "deviation": "The engine logs at INFO (v1 used ERROR-only stdout) into a captured file, drained with a sentinel line, so the scan is demonstrably non-empty and complete.",
+      "effect": "None on execution; more log text is kept privately with its sha256.",
+      "id": "engine_log_level_info",
+      "sealed_text": "acceptance_criteria.market_on_open_proxy[4]: no ERROR-level engine log line in either run."
+    },
+    {
+      "deviation": "The documented bwrap command gains --harness-commit, because the isolated run cannot read Git; local_source_sha256 remains the binding record.",
+      "effect": "None on execution.",
+      "id": "operator_declared_commit",
+      "sealed_text": "README.md replay command."
+    }
+  ],
+  "reconciled_end_cash_usd": "90734.0800",
+  "runs": [
+    {
+      "bars_seen": 725,
+      "buying_power_events": [],
+      "dividend_cash_usd": "428.64",
+      "engine_log_scan": {
+        "error_line_sha256": [],
+        "error_lines": 0,
+        "lines": 227,
+        "lines_by_level": {
+          "INFO": 223
+        },
+        "negative_cash_lines": 0
+      },
+      "engine_log_sha256": "6f185eb5465122b297918f0fcdbdfbe55d0a6003c099d272eb4ebdd1525ee37e",
+      "fees_usd": "0.00",
+      "final_quantity": "0",
+      "final_state_checked": true,
+      "label": "run-1",
+      "latch_events": [],
+      "native_account_events": 11,
+      "native_end_cash_usd": "90734.08",
+      "normalized_economic_sha256": "50ec18ec8eae12857e53968b53fdcc34bad1d1e4d6df81651008db30fbd60b36",
+      "open_orders": 0,
+      "open_positions": 0,
+      "pending_intent": null,
+      "processed_bars": 725,
+      "raw_report_sha256": {
+        "account": "7ad013a2e2d4e04ecd7b21f64fd332f32447a144180503de84dcc68033917b80",
+        "fills": "f83274ff65565cd0c0e589f3745126779bc1c4fa3c8018b4bafdd618ebd76d71",
+        "positions": "e00de8e693d62c0476b17fecfb9a2371c118472a8aac7386acfefeb75beef691"
+      },
+      "raw_reports_json_sha256": "0a2a77383f0fe3d91101613ff8dda5760ee071d0b1725dc713385989b8347c43",
+      "reconciled_end_cash_usd": "90734.0800",
+      "run_integrity_checked": true,
+      "strategy_callback_errors": []
+    },
+    {
+      "bars_seen": 725,
+      "buying_power_events": [],
+      "dividend_cash_usd": "428.64",
+      "engine_log_scan": {
+        "error_line_sha256": [],
+        "error_lines": 0,
+        "lines": 227,
+        "lines_by_level": {
+          "INFO": 223
+        },
+        "negative_cash_lines": 0
+      },
+      "engine_log_sha256": "152a081fb07c72da76bbce9094866e4fc1c6abf6306a9274a08ede28aa0a6a6d",
+      "fees_usd": "0.00",
+      "final_quantity": "0",
+      "final_state_checked": true,
+      "label": "run-2",
+      "latch_events": [],
+      "native_account_events": 11,
+      "native_end_cash_usd": "90734.08",
+      "normalized_economic_sha256": "50ec18ec8eae12857e53968b53fdcc34bad1d1e4d6df81651008db30fbd60b36",
+      "open_orders": 0,
+      "open_positions": 0,
+      "pending_intent": null,
+      "processed_bars": 725,
+      "raw_report_sha256": {
+        "account": "7ad013a2e2d4e04ecd7b21f64fd332f32447a144180503de84dcc68033917b80",
+        "fills": "aa793016bf4a6439b7f2b4b4309e1aa7222c403be1f6556824560790f1753682",
+        "positions": "f651dc19060e3bc4ad8e28af6e3b4c3affa9677936ca30df41b89a6ed66b6fa5"
+      },
+      "raw_reports_json_sha256": "ca04897d39709c3aee55973895bf2c4fcaa9c49cff0ff499ee09851e68761bc6",
+      "reconciled_end_cash_usd": "90734.0800",
+      "run_integrity_checked": true,
+      "strategy_callback_errors": []
+    }
+  ],
+  "schema_version": 2,
+  "superseded_manifest": {
+    "carried_rows": [
+      "instrument_identity",
+      "raw_data_decoding",
+      "sessions_and_time",
+      "costs_and_rounding",
+      "margin_and_adaptive_state"
+    ],
+    "path": "mapping-manifest.json",
+    "sha256": "43f510494a970d235f27e5676120ee749b45eb6b060cf74f0b768374b8177909"
+  },
+  "tolerances": {
+    "limits": {
+      "cash_usd_abs": "0.01",
+      "dividend_usd_abs": "0",
+      "end_cash_usd_abs": "0.01",
+      "event_seconds_abs": "0",
+      "fees_usd_abs": "0",
+      "fill_price_usd_abs": "0",
+      "fill_quantity_abs": "0",
+      "final_quantity_abs": "0"
+    },
+    "path": "tolerances.json",
+    "sha256": "c8bc72317fb4de83f2b0b7e71888828c7dd15a5a7eb2f60b68f87d54e751c15a",
+    "status": "default"
+  },
+  "two_run_determinism": {
+    "applied_id_fields": [
+      "init_id",
+      "event_id"
+    ],
+    "declared_id_fields": [
+      "client_order_id",
+      "venue_order_id",
+      "init_id",
+      "event_id",
+      "last_trade_id",
+      "trade_id",
+      "position_id",
+      "account_id",
+      "trader_id",
+      "strategy_id",
+      "order_list_id",
+      "exec_spawn_id"
+    ],
+    "normalization_rule": "Only freshly generated UUID4 identities are replaced by their ordinal, after format validation. Timing, prices, quantities, fees, distributions, transitions and decision order are never normalized.",
+    "normalized_economic_sha256_equal": true,
+    "raw_field_paths_differing": [
+      "fills[0].init_id",
+      "fills[1].init_id",
+      "positions[0].events[0].event_id",
+      "positions[0].events[1].event_id"
+    ],
+    "raw_report_sha256_equal": false,
+    "undeclared_differing_fields": []
+  },
+  "two_run_records_equal": true,
+  "unsupported_mappings": []
+}

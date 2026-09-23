@@ -13486,6 +13486,16 @@
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/distribution_module.py",
       "sha256": "eefee070b0dbe6ad3a1e68755ca959b5fff081fad61af8b84902a438996b126b",
       "bytes": 10088
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/receipt-v2.json",
+      "sha256": "8e751148ee88a4bb40e6634c6e1b2a36a998c6c78be0fa01f3cee1dd38a5f3b8",
+      "bytes": 28724
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/verdict-v2.json",
+      "sha256": "788f64636619faba667805ee5c00c9003826de658c4c20dc0759239adf69b19b",
+      "bytes": 28827
     }
   ],
   "convergence_records": [
