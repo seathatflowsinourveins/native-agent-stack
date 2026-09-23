@@ -331,7 +331,12 @@ against `blueprints/convergence-practice/wsl-native-tools/pins.json`,
 `components[name=gitleaks].archive.sha256`,
 `551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb`) in `git`
 mode (full history, `fetch-depth: 0`) and `dir` mode (working tree), both
-`--redact`. The redacted JSON report is uploaded with `if: always()` so a
+`--redact`. Since 2026-09-23 the `git` mode passes `--log-opts="HEAD"`, so it
+scans the history of what the run would land: a pull request's merge commit,
+or `main` on push. gitleaks' default scans every fetched ref, and with
+`fetch-depth: 0` that includes every other open branch, so one branch's
+finding failed every pull request (PR #116's branch failed PR #117). Each
+branch is still scanned by its own pull request's run. The redacted JSON report is uploaded with `if: always()` so a
 failed scan still leaves the report retrievable; it never prints a matched
 secret to the job log. Unlike `sbom-vuln` below, this job fails on any
 detection (no `--exit-code` override, so gitleaks' non-zero default stands)
@@ -613,7 +618,8 @@ unrestricted default-log-opts scan of this shared, concurrently used repository
 currently reports one residual finding attributable to a different, active
 sibling branch (not an ancestor of this branch and not a path this unit owns),
 which the `.gitleaks.toml` header records as a coordinator decision pending
-resolution before merge, not something this unit can fix. Local scans on this
+resolution before merge, not something this unit can fix. The coordinator resolved it on 2026-09-23 by
+making CI scan only `--log-opts="HEAD"` (see above). Local scans on this
 host go through the guarded `gitleaks` launcher (memory-capped, one scan per
 user); do not raise its limits to retry a failed scan.
 
