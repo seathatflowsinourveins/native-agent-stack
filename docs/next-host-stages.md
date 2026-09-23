@@ -22,10 +22,29 @@ The workstation and macOS tiers are labelled projections in
 
 ## Workstation (WSL2) next steps
 
-1. Windows side: raise `.wslconfig` memory from WSL's default of half the physical RAM, using the
-   [workstation runtime profile](new-workstation-runtime-profile-20260922.md) (it proposes
-   `memory=96GB processors=60 swap=16GB`; the hardware profiles assume 100 GB for the `headroom` tier,
-   which 96 GB would just miss; the owners reconcile the value), then `wsl --shutdown` once.
+1. Windows side: set `%UserProfile%\.wslconfig` to the decided workstation profile, then
+   `wsl --shutdown` once:
+
+   ```ini
+   [wsl2]
+   memory=112GB
+   processors=60
+   swap=16GB
+   networkingMode=mirrored
+   [experimental]
+   autoMemoryReclaim=gradual
+   sparseVhd=true
+   ```
+
+   Decided 2026-09-23 (user decision, evidence in the upgrade manifest below): the workstation's main
+   work is the native LLM ecosystem, the foundation and the north star, so WSL gets about 88% of the
+   128 GB and Windows keeps 16 GB. On the measured laptop (63.4 GB physical, WSL capped at 48 GB)
+   Windows outside WSL held about 24 GB with 9 GB free, and commit charge was 85.7 of 99.7 GB, so a
+   cap near the full 128 GB would leave Windows paging under load. `autoMemoryReclaim=gradual` returns
+   idle Linux cache to Windows. After setup, re-measure under full load; raise toward 116-120 GB only
+   if Windows keeps more than 12 GB free. This replaces the 96 GB proposal in the
+   [workstation runtime profile](new-workstation-runtime-profile-20260922.md), which under the
+   profiles' own arithmetic would just miss the `headroom` tier.
 2. Pinned clone at the release tag, then `adoption/bootstrap-linux.sh` (bootstrap step 0 onward).
 3. `python3 scripts/hardware_profile.py --record-host <host-id>` (`<host-id>` like
    `wsl-workstation-20261015`); this writes the measured report and adds the entry to the
@@ -59,7 +78,7 @@ The manifest is
 
 | Item | Verdict | Evidence in one line |
 | --- | --- | --- |
-| Workstation WSL memory above the 64 GB default | Needed at setup | The `headroom` tier needs about 96 GB visible |
+| Workstation WSL memory: 112 GB (decided) | Needed at setup | `headroom` tier needs about 96 GB visible; Windows keeps 16 GB (measured Windows-side use about 24 GB on the laptop) |
 | CPU limit in `ecosystem-bounded-run` | Needed now (software) | Unlimited Gitleaks scans were 72% of measured CPU, up to 8.4 cores |
 | Retention for per-wave state and caches | Needed now (software) | About 65 GiB of wave caches and state with no retention rule |
 | GPU memory above 24 GB | Not needed now | Median GPU use 6.5%; embedder plus 8B worker peaked at 20,217 of 24,463 MiB |
