@@ -12569,8 +12569,8 @@
     },
     {
       "path": "evidence/artifacts/sota-refresh-20260923/obs-compare/observability-hosting-comparison.json",
-      "sha256": "edca4be547d8011ce7c11377b1bd82713fe86c8ac95c50176e58fefc9ea3b4e7",
-      "bytes": 34957
+      "sha256": "3baa597c122ed91bf95f4c16d00a01f7f048119e439ae024972b595511b0a1bf",
+      "bytes": 36369
     },
     {
       "path": "evidence/artifacts/sota-refresh-20260923/obs-compare/fixround-preregistration.md",
