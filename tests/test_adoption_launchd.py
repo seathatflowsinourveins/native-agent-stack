@@ -387,12 +387,33 @@ class LaunchdAgentsScriptStructureTests(unittest.TestCase):
         self.assertIn("printf 'unknown\\n'", self.text)
 
     def test_install_waits_for_unloaded_after_a_successful_bootout(self):
+        # Round 3i: the wait now lives in the shared bootout_and_wait
+        # helper (also absorbing EINPROGRESS), called from cmd_install's
+        # own body rather than polling inline.
         body = _shell_functions(self.text, "cmd_install")
-        self.assertIn("wait_until_unloaded", body)
+        self.assertIn("bootout_and_wait", body)
+        self.assertIn("wait_until_unloaded", _shell_functions(self.text, "bootout_and_wait"))
 
     def test_remove_waits_for_unloaded_after_a_successful_bootout(self):
         body = _shell_functions(self.text, "cmd_remove")
-        self.assertIn("wait_until_unloaded", body)
+        self.assertIn("bootout_and_wait", body)
+        self.assertIn("wait_until_unloaded", _shell_functions(self.text, "bootout_and_wait"))
+
+    def test_bootout_and_wait_absorbs_einprogress_instead_of_refusing_outright(self):
+        # Round 3i (Codex Medium): the pinned Homebrew cli.rb @ 8e3a5dc0a7
+        # retries on Errno::EINPROGRESS (Darwin 36) rather than treating it
+        # as a bootout failure; bootout_and_wait must do the same, not
+        # refuse on any nonzero bootout exit unconditionally.
+        body = _shell_functions(self.text, "bootout_and_wait")
+        self.assertIn('"$bootout_status" != 36', body)
+        # Never uses a command substitution to call itself out -- a global
+        # result variable, so a signal during launchctl bootout is never
+        # swallowed by a subshell (verified empirically; see the function's
+        # own comment, which names the avoided pattern only in prose).
+        code_only = "\n".join(
+            line for line in self.text.splitlines() if not line.strip().startswith("#")
+        )
+        self.assertNotIn("$(bootout_and_wait", code_only)
 
     def test_remove_deletes_only_the_labels_own_plist_never_component_data_or_logs(self):
         # Every `rm` in the script targets exactly the copied unit-
@@ -1379,6 +1400,174 @@ class LaunchdAgentsScriptBehaviorTests(unittest.TestCase):
                     retry = self._run(["remove", "--label", "com.native-stack.qdrant"], env=env)
                     self.assertEqual(retry.returncode, 0, retry.stdout + retry.stderr)
                     self.assertFalse(dest_plist.exists())
+
+    def test_a_hard_linked_alias_of_dest_plist_is_never_loaded_here(self):
+        # Round 3i Codex Medium (finding 1): `-ef` compares device+inode,
+        # so a DISTINCT hard-linked filename sharing dest_plist's own
+        # inode incorrectly compared equal, letting remove bootout and
+        # delete dest_plist for a label that is actually loaded from an
+        # unrelated, merely hard-linked, path. canonical_plist_path
+        # (string comparison of resolved paths, never inode identity)
+        # must treat these as loaded_elsewhere: a hard link has no stored
+        # "canonical name" to resolve to, so neither `cd -P` nor python3's
+        # os.path.realpath ever collapses it the way `-ef` did.
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            eco_root = tmp_path / "eco"
+            fake_home = tmp_path / "home"
+            fake_home.mkdir()
+            log = tmp_path / "launchctl.log"
+            log.touch()
+            working_shim = self._launchctl_shim(tmp_path, log)
+            env = {
+                **os.environ,
+                "PATH": f"{working_shim}{os.pathsep}{os.environ['PATH']}",
+                "ECO_INSTALL_ROOT": str(eco_root),
+                "HOME": str(fake_home),
+            }
+            self.assertEqual(self._run(["render"], env=env).returncode, 0)
+            first_install = self._run(["install", "--label", "com.native-stack.qdrant"], env=env)
+            self.assertEqual(first_install.returncode, 0, first_install.stdout + first_install.stderr)
+            launch_agents_dir = fake_home / "Library" / "LaunchAgents"
+            dest_plist = launch_agents_dir / "com.native-stack.qdrant.plist"
+            original_content = dest_plist.read_bytes()
+
+            # A DISTINCT filename, hard-linked to dest_plist's own inode --
+            # existing, real files, both genuinely present on disk.
+            hardlink_alias = launch_agents_dir / "decoy-hardlink.plist"
+            os.link(dest_plist, hardlink_alias)
+            self.assertTrue(hardlink_alias.samefile(dest_plist), "setup: must genuinely share an inode")
+
+            takeover_shim = tmp_path / "takeover-shim"
+            takeover_shim.mkdir()
+            (takeover_shim / "launchctl").write_text(
+                "#!/bin/sh\n"
+                f'printf "%s\\n" "launchctl $*" >> {str(log)!r}\n'
+                'case "$1" in\n'
+                f'  print) echo "path = {hardlink_alias}"; exit 0 ;;\n'
+                "  bootout) echo BOOTOUT_CALLED >&2; exit 0 ;;\n"
+                "  *) exit 0 ;;\n"
+                "esac\n"
+            )
+            (takeover_shim / "launchctl").chmod(0o755)
+            remove_env = {**env, "PATH": f"{takeover_shim}{os.pathsep}{env['PATH']}"}
+            remove_result = self._run(["remove", "--label", "com.native-stack.qdrant"], env=remove_env)
+            self.assertNotEqual(remove_result.returncode, 0, remove_result.stdout + remove_result.stderr)
+            self.assertIn("it is loaded from somewhere other than", remove_result.stderr)
+            self.assertNotIn("BOOTOUT_CALLED", remove_result.stderr,
+                              "a distinct hard-linked alias must never be treated as loaded_here")
+            self.assertTrue(dest_plist.is_file())
+            self.assertEqual(dest_plist.read_bytes(), original_content)
+
+            # install must refuse identically for the same reason.
+            install_result = self._run(["install", "--label", "com.native-stack.qdrant"], env=remove_env)
+            self.assertNotEqual(install_result.returncode, 0, install_result.stdout + install_result.stderr)
+            self.assertNotIn("BOOTOUT_CALLED", install_result.stderr)
+
+    def test_retry_converges_while_an_earlier_runs_teardown_is_still_asynchronously_in_progress(self):
+        # Round 3i Codex Medium (finding 2): an interrupted run's own
+        # bootout can leave launchd genuinely tearing the label down --
+        # not yet finished -- when a clean retry begins. The retry's OWN
+        # bootout call then observes that in-progress teardown (real
+        # launchctl: EINPROGRESS, Darwin errno 36; the pinned Homebrew
+        # cli.rb @ 8e3a5dc0a7 retries on exactly this) rather than a
+        # settled state. bootout_and_wait must absorb that and keep
+        # polling (reusing wait_until_unloaded) until it actually
+        # resolves, never refuse outright on the retry's own bootout
+        # call. Unlike _matrix_binary_shim's bootout-signal case (which
+        # clears the loaded marker synchronously, before signalling, and
+        # so cannot model this at all -- Codex's own point about that
+        # shim), teardown here only actually completes after a bounded
+        # number of TOTAL print polls, shared across BOTH the interrupted
+        # run and the retry, modelling a real asynchronous teardown that
+        # keeps progressing on its own regardless of which process asks.
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            eco_root = tmp_path / "eco"
+            fake_home = tmp_path / "home"
+            fake_home.mkdir()
+            log = tmp_path / "launchctl.log"
+            log.touch()
+            working_shim = self._launchctl_shim(tmp_path, log)
+            env = {
+                **os.environ,
+                "PATH": f"{working_shim}{os.pathsep}{os.environ['PATH']}",
+                "ECO_INSTALL_ROOT": str(eco_root),
+                "HOME": str(fake_home),
+            }
+            self.assertEqual(self._run(["render"], env=env).returncode, 0)
+            first_install = self._run(["install", "--label", "com.native-stack.qdrant"], env=env)
+            self.assertEqual(first_install.returncode, 0, first_install.stdout + first_install.stderr)
+            launch_agents_dir = fake_home / "Library" / "LaunchAgents"
+            dest_plist = launch_agents_dir / "com.native-stack.qdrant.plist"
+
+            for signal_name in ("TERM", "INT"):
+                with self.subTest(signal=signal_name):
+                    async_shim = tmp_path / f"async-teardown-{signal_name}-shim"
+                    async_shim.mkdir()
+                    (async_shim / "launchctl").write_text(
+                        "#!/bin/sh\n"
+                        f'printf "%s\\n" "launchctl $*" >> {str(log)!r}\n'
+                        'case "$1" in\n'
+                        '  bootstrap)\n'
+                        '    label="$(basename "$3" .plist)"\n'
+                        f'    echo "$3" > "{working_shim!s}/$label.loaded.marker"\n'
+                        f'    rm -f "{async_shim!s}/teardown-started" "{async_shim!s}/poll-count"\n'
+                        "    exit 0 ;;\n"
+                        '  print)\n'
+                        f'    if [ -f "{async_shim!s}/teardown-started" ]; then\n'
+                        f'      count_file="{async_shim!s}/poll-count"\n'
+                        '      count=0\n'
+                        '      [ -f "$count_file" ] && count="$(cat "$count_file")"\n'
+                        '      count=$((count + 1))\n'
+                        '      echo "$count" > "$count_file"\n'
+                        '      if [ "$count" -ge 3 ]; then\n'
+                        f'        rm -f "{working_shim!s}/com.native-stack.qdrant.loaded.marker"\n'
+                        '        exit 113\n'
+                        "      fi\n"
+                        f'      echo "path = {dest_plist}"\n'
+                        "      exit 0\n"
+                        "    fi\n"
+                        '    label="$(basename "$2")"\n'
+                        f'    marker="{working_shim!s}/$label.loaded.marker"\n'
+                        '    if [ -f "$marker" ]; then echo "path = $(cat "$marker")"; exit 0; else exit 113; fi ;;\n'
+                        '  bootout)\n'
+                        f'    if [ -f "{async_shim!s}/teardown-started" ]; then\n'
+                        "      exit 36\n"
+                        "    fi\n"
+                        f'    touch "{async_shim!s}/teardown-started"\n'
+                        f'    kill -{signal_name} "$PPID"\n'
+                        "    sleep 0.3\n"
+                        "    exit 0 ;;\n"
+                        '  enable) exit 0 ;;\n'
+                        '  *) exit 0 ;;\n'
+                        "esac\n"
+                    )
+                    (async_shim / "launchctl").chmod(0o755)
+                    async_env = {
+                        **env,
+                        "PATH": f"{async_shim}{os.pathsep}{env['PATH']}",
+                        "WAIT_UNTIL_UNLOADED_ATTEMPTS": "3",
+                        "WAIT_UNTIL_UNLOADED_INTERVAL": "0",
+                    }
+                    interrupted = self._run(["install", "--label", "com.native-stack.qdrant"], env=async_env)
+                    self.assertNotEqual(interrupted.returncode, 0, interrupted.stdout + interrupted.stderr)
+                    # The interrupted run's own bootout initiated teardown
+                    # but never itself reached wait_until_unloaded (the
+                    # signal fired right after that one call) -- no print
+                    # poll happened yet, so teardown is still 0/3 complete.
+                    self.assertTrue((async_shim / "teardown-started").exists())
+                    self.assertFalse((async_shim / "poll-count").exists())
+
+                    # A clean retry: its own bootout call observes the
+                    # ALREADY in-progress teardown (EINPROGRESS) and must
+                    # poll through to convergence, not refuse outright.
+                    retry = self._run(["install", "--label", "com.native-stack.qdrant"], env=async_env)
+                    self.assertEqual(retry.returncode, 0, retry.stdout + retry.stderr)
+                    self.assertIn("Installed", retry.stdout)
+                    invocations = log.read_text()
+                    self.assertIn("launchctl bootout", invocations)
+                    self.assertTrue(dest_plist.is_file())
 
 
 if __name__ == "__main__":

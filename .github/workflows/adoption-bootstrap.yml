@@ -141,6 +141,39 @@ jobs:
             exit 1
           fi
           sw_vers | tee sw_vers.txt
+      # Round 3i (Codex Medium, cache-ordering finding): the cache key is
+      # DERIVED from the pin's own sha256 (read here, once, into a step
+      # output), never a literal hardcoded hash string, so a changed pin --
+      # a different sha256 -- always misses the cache and downloads fresh,
+      # rather than silently restoring a stale cached file under a reused
+      # key. Read before restoring the cache, and before the bootstrap step
+      # that verifies it, so both can reference the exact same value.
+      - name: Read the pinned embedding model's sha256
+        id: embed-model-pin
+        shell: bash
+        run: |
+          set -euo pipefail
+          sha256="$(jq -r '.models[0].sha256' adoption/pins-macos-arm64.json)"
+          if [ -z "$sha256" ] || [ "$sha256" = "null" ]; then
+            echo "adoption/pins-macos-arm64.json's models[0].sha256 is missing or null." >&2
+            exit 1
+          fi
+          echo "sha256=$sha256" >> "$GITHUB_OUTPUT"
+      # Restored BEFORE the bootstrap step below, not after (round 3i,
+      # Codex Medium): a cache restore that ran AFTER bootstrap's own
+      # checksum verification could silently overwrite the just-verified
+      # model with stale cached bytes, with nothing left to re-check them.
+      # Restoring first means bootstrap's own install_embed_model always
+      # has the last word: fetch() (adoption/bootstrap-macos.sh) checks
+      # the destination's existing checksum before ever trusting it, and
+      # transparently re-downloads and re-verifies on any mismatch --
+      # exactly the same path a genuine cache miss takes, so a restored
+      # cache is never treated any differently from a fresh download.
+      - name: Restore the cached pinned embedding model
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ runner.temp }}/eco/state/models/embeddinggemma-300M-Q8_0.gguf
+          key: macos-embed-model-${{ steps.embed-model-pin.outputs.sha256 }}
       - name: Run the macOS bootstrap into a disposable prefix
         shell: bash
         run: |
@@ -224,16 +257,13 @@ jobs:
           bash adoption/launchd/launchd-agents.sh lint
       # Round 3h (2026-09-23 readiness audit): the llama-embed launchd
       # agent's template ran with no model argument at all, so nothing had
-      # ever proven the endpoint serves the pinned model correctly. Cached
-      # by its own sha256 (adoption/pins-macos-arm64.json's models[0]), not
-      # a version tag, so a changed pin -- a different hash -- always misses
-      # the cache and re-downloads, rather than silently reusing a stale
-      # cached file under a reused key.
-      - name: Cache the pinned embedding model
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        with:
-          path: ${{ runner.temp }}/eco/state/models/embeddinggemma-300M-Q8_0.gguf
-          key: macos-embed-model-b5ce9d77a3fc4b3b39ccb5643c36777911cc4eb46a66962eadfa3f5f60490d63
+      # ever proven the endpoint serves the pinned model correctly. The
+      # model itself is downloaded, verified and (round 3i) cached earlier
+      # in this job, well before this step -- see "Restore the cached
+      # pinned embedding model" and "Run the macOS bootstrap into a
+      # disposable prefix" above, and that step's own comment for why the
+      # cache restore must run BEFORE bootstrap's own checksum
+      # verification, never after.
       - name: Bootstrap the llama-embed launchd agent, run the embedding acceptance check, then boot it out
         shell: bash
         run: |
@@ -424,7 +454,7 @@ jobs:
   # No account sign-in, no live provider call.
   validate-macos:
     runs-on: macos-15
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - name: Harden the runner (audit-only network egress)
         uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
@@ -449,6 +479,92 @@ jobs:
         run: python3 scripts/landscape.py --root .
       - name: Check offline ecosystem explorer rebuild
         run: python3 scripts/build_ecosystem.py --check
+      # Round 3i (2026-09-23 peer-update-audit gap, adoption_macos, medium):
+      # the catalog's own recording and verdict scripts had never actually
+      # run on macOS CI, or against macOS's own system Python, at all --
+      # every prior gating job for them (validate.yml, catalog-freshness.yml)
+      # runs on ubuntu-24.04 only. See "Recording and verdict scripts" in
+      # adoption/platforms/macos-arm64.md.
+      - name: Validate host receipts
+        run: python3 scripts/host_receipts.py validate
+      - name: Check the component matrix
+        run: python3 scripts/component_matrix.py --check
+      - name: Check the new-host grand list
+        run: python3 scripts/new_host_grand_list.py --check
+      - name: Check the layer-verdicts join
+        run: python3 tools/sota-convergence/build_verdicts.py --check
+      - name: Validate declared convergence evidence
+        run: python3 scripts/validate_convergence.py --all-recorded --root . --json
+      - name: Report any new-machine paths main documents but the pinned release lacks
+        # Report only (no --strict): this never fails the job. It surfaces
+        # release-pin drift; cutting and re-pinning a release is a separate,
+        # deliberate maintainer action, not something this smoke performs.
+        run: python3 scripts/release_due.py
+      # Installs this profile so the recording smoke below has a real,
+      # already-pinned component (codex) to record a receipt for -- the same
+      # bootstrap step the bootstrap-macos job runs, reused here rather than
+      # duplicated with different logic.
+      - name: Run the macOS bootstrap into a disposable prefix (recording-script smoke)
+        shell: bash
+        run: |
+          set -euo pipefail
+          export ECO_INSTALL_ROOT="$RUNNER_TEMP/eco"
+          bash adoption/bootstrap-macos.sh --profile macos-arm64-foundation --skip-system-packages
+      # Round 3i, minimum-Python-version test (declared in adoption/
+      # bootstrap.md and adoption/platforms/macos-arm64.md's "Recording and
+      # verdict scripts": Python 3.9 or newer): runs the SAME recording smoke
+      # first against the manifest-pinned Python line (already set up above),
+      # then again against the runner's own system /usr/bin/python3 if -- and
+      # only if -- it meets that floor, skipping with a message otherwise.
+      # Every write happens inside a THROWAWAY copy of the checkout
+      # ($RUNNER_TEMP/rec, recreated fresh for each interpreter), never the
+      # real one, so nothing from this step is ever committed.
+      - name: 'Recording smoke: record a real receipt in a throwaway checkout copy'
+        shell: bash
+        run: |
+          set -euo pipefail
+          export PATH="$RUNNER_TEMP/eco/bin:$PATH"
+          min_version="3.9"
+          rec_dir="$RUNNER_TEMP/rec"
+
+          run_smoke() {
+            local python_bin="$1" label="$2"
+            rm -rf "$rec_dir"
+            mkdir -p "$rec_dir"
+            cp -R "$GITHUB_WORKSPACE/." "$rec_dir/"
+            echo "-- recording smoke with $label ($("$python_bin" --version 2>&1)) --"
+            (
+              cd "$rec_dir"
+              "$python_bin" scripts/host_receipts.py record \
+                --host-id ci-macos15-smoke-20260923 \
+                --platform-id macos-arm64 \
+                --component-id codex \
+                --stage install \
+                --evidence-class native_proven \
+                --from-stack-commands
+              "$python_bin" scripts/host_receipts.py validate
+              "$python_bin" scripts/component_matrix.py --write
+              "$python_bin" scripts/component_matrix.py --check
+              "$python_bin" scripts/new_host_grand_list.py --write
+              "$python_bin" scripts/new_host_grand_list.py --check
+            )
+            rm -rf "$rec_dir"
+          }
+
+          run_smoke python3 "the manifest-pinned Python line (actions/setup-python)"
+
+          system_python3="/usr/bin/python3"
+          if [ -x "$system_python3" ]; then
+            system_version="$("$system_python3" -c 'import sys; print("%d.%d" % sys.version_info[:2])')"
+            meets_min="$("$system_python3" -c "import sys; minimum = tuple(int(part) for part in '$min_version'.split('.')); print(1 if sys.version_info[:2] >= minimum else 0)")"
+            if [ "$meets_min" = "1" ]; then
+              run_smoke "$system_python3" "the runner's own system /usr/bin/python3 ($system_version)"
+            else
+              echo "System /usr/bin/python3 ($system_version) is below the declared minimum ($min_version) for scripts/host_receipts.py and friends; skipping the system-Python recording smoke."
+            fi
+          else
+            echo "No /usr/bin/python3 present on this runner; skipping the system-Python recording smoke."
+          fi
       - name: Gate on the adoption test modules
         run: >-
           python3 -m unittest

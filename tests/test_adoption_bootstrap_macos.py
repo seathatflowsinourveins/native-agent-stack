@@ -2313,6 +2313,165 @@ EMBED_REFERENCE_PATH = ROOT / "evidence" / "artifacts" / "macos-embed-reference-
     / "macos-embed-reference-20260923.json"
 
 
+WORKFLOW_PATH = ROOT / ".github" / "workflows" / "adoption-bootstrap.yml"
+
+
+class CIEmbedModelCacheOrderTests(unittest.TestCase):
+    """Round 3i (Codex Medium): the cache restore must run BEFORE
+    bootstrap's own checksum verification (a restore running after could
+    silently overwrite the just-verified model with stale cached bytes,
+    with nothing left to re-check them), and its key must be DERIVED from
+    the pin's own sha256, never a literal hardcoded hash string (which
+    would keep matching a stale cache entry after the pin itself
+    changed)."""
+
+    def setUp(self):
+        import yaml
+        with WORKFLOW_PATH.open() as handle:
+            self.workflow = yaml.safe_load(handle)
+        self.steps = self.workflow["jobs"]["bootstrap-macos"]["steps"]
+
+    def _step_index(self, name_substring: str) -> int:
+        for index, step in enumerate(self.steps):
+            if name_substring in step.get("name", ""):
+                return index
+        self.fail(f"no step with {name_substring!r} in its name")
+
+    def test_the_sha256_read_step_precedes_the_cache_restore(self):
+        read_index = self._step_index("Read the pinned embedding model's sha256")
+        cache_index = self._step_index("Restore the cached pinned embedding model")
+        self.assertLess(read_index, cache_index,
+                         "the pin's sha256 must be read before the cache step that keys on it")
+        read_step = self.steps[read_index]
+        self.assertEqual(read_step.get("id"), "embed-model-pin")
+        # Reads the pin file itself, not a hardcoded value.
+        self.assertIn("pins-macos-arm64.json", read_step["run"])
+        self.assertIn("models[0].sha256", read_step["run"])
+
+    def test_the_cache_restore_precedes_the_bootstrap_step(self):
+        cache_index = self._step_index("Restore the cached pinned embedding model")
+        bootstrap_index = self._step_index("Run the macOS bootstrap into a disposable prefix")
+        self.assertLess(cache_index, bootstrap_index,
+                         "restoring the cache after bootstrap's own checksum verification could "
+                         "silently overwrite the just-verified model with unverified stale bytes")
+
+    def test_the_cache_key_is_derived_from_the_pin_not_a_literal_hash(self):
+        cache_index = self._step_index("Restore the cached pinned embedding model")
+        cache_step = self.steps[cache_index]
+        self.assertEqual(cache_step["uses"].split("@")[0], "actions/cache")
+        key = cache_step["with"]["key"]
+        self.assertIn("${{ steps.embed-model-pin.outputs.sha256 }}", key)
+        # No literal 64-hex-char sha256 anywhere in the key: a changed pin
+        # must always produce a different, freshly-derived key.
+        self.assertIsNone(re.search(r"(?<![{}.a-zA-Z0-9])[0-9a-f]{64}(?![0-9a-f])", key), key)
+        # The cache step's own PATH must still be the exact destination
+        # install_embed_model (adoption/bootstrap-macos.sh) writes to.
+        self.assertEqual(
+            cache_step["with"]["path"],
+            "${{ runner.temp }}/eco/state/models/embeddinggemma-300M-Q8_0.gguf",
+        )
+
+    def test_only_one_cache_step_exists_not_a_leftover_duplicate(self):
+        cache_steps = [step for step in self.steps if "Cache the pinned embedding model" in step.get("name", "")
+                       or "Restore the cached pinned embedding model" in step.get("name", "")]
+        self.assertEqual(len(cache_steps), 1, cache_steps)
+
+    def test_bootstrap_re_verifies_any_cached_file_via_fetch(self):
+        # Confirms the invariant the step ordering above depends on:
+        # install_embed_model (called unconditionally by bootstrap-macos.sh)
+        # routes through fetch(), whose own existing-destination check is a
+        # checksum match, not a bare existence check -- so a cache restore
+        # that lands a WRONG file at the destination is transparently
+        # re-downloaded and re-verified, on the exact same path a genuine
+        # cache miss already takes, never silently trusted.
+        text = SCRIPT_PATH.read_text()
+        fetch_body = re.search(r"(?ms)^fetch\(\) \{\n.*?^\}\n", text)
+        self.assertIsNotNone(fetch_body, "fetch() not found")
+        self.assertIn('shasum -a 256 --check --status', fetch_body.group(0))
+        self.assertIn("install_embed_model", text)
+
+
+class CIRecordingToolingSmokeTests(unittest.TestCase):
+    """Round 3i (2026-09-23 peer-update-audit gap, adoption_macos, medium):
+    the catalog's own recording and verdict scripts had never run on macOS
+    CI or against macOS's own system Python. Structural checks only -- the
+    steps themselves only ever run on a real macos-15 runner; see
+    adoption/platforms/macos-arm64.md's "Recording and verdict scripts"."""
+
+    def setUp(self):
+        import yaml
+        with WORKFLOW_PATH.open() as handle:
+            self.workflow = yaml.safe_load(handle)
+        self.steps = self.workflow["jobs"]["validate-macos"]["steps"]
+
+    def _step_index(self, name_substring: str) -> int:
+        for index, step in enumerate(self.steps):
+            if name_substring in step.get("name", ""):
+                return index
+        self.fail(f"no step with {name_substring!r} in its name")
+
+    def test_every_recording_and_verdict_script_is_gated(self):
+        run_text = "\n".join(step.get("run", "") for step in self.steps)
+        for expected in (
+            "scripts/host_receipts.py validate",
+            "scripts/component_matrix.py --check",
+            "scripts/new_host_grand_list.py --check",
+            "tools/sota-convergence/build_verdicts.py --check",
+            "scripts/validate_convergence.py --all-recorded",
+            "scripts/release_due.py",
+        ):
+            self.assertIn(expected, run_text, expected)
+
+    def test_release_due_is_report_only_never_strict(self):
+        step = self.steps[self._step_index(
+            "Report any new-machine paths main documents but the pinned release lacks")]
+        self.assertNotIn("--strict", step["run"])
+
+    def test_bootstrap_precedes_the_recording_smoke(self):
+        bootstrap_index = self._step_index("Run the macOS bootstrap into a disposable prefix "
+                                            "(recording-script smoke)")
+        smoke_index = self._step_index("Recording smoke: record a real receipt")
+        self.assertLess(bootstrap_index, smoke_index)
+
+    def test_the_recording_smoke_uses_a_throwaway_copy_never_the_real_checkout(self):
+        step = self.steps[self._step_index("Recording smoke: record a real receipt")]
+        run_text = step["run"]
+        self.assertIn("rec_dir=\"$RUNNER_TEMP/rec\"", run_text)
+        self.assertIn("rm -rf \"$rec_dir\"", run_text)
+        # host_receipts.py record/component_matrix.py --write/new_host_grand_
+        # list.py --write all run with cwd inside $rec_dir, never $GITHUB_
+        # WORKSPACE -- the subshell `cd "$rec_dir"` wrapping them is what
+        # keeps every write there, never in the real checkout.
+        self.assertIn('cd "$rec_dir"', run_text)
+
+    def test_the_recording_smoke_uses_native_proven_and_a_valid_host_id(self):
+        step = self.steps[self._step_index("Recording smoke: record a real receipt")]
+        run_text = step["run"]
+        self.assertIn("--evidence-class native_proven", run_text)
+        self.assertIn("--from-stack-commands", run_text)
+        host_id_match = re.search(r"--host-id\s+([A-Za-z0-9-]+)", run_text)
+        self.assertIsNotNone(host_id_match, "no --host-id found")
+        # scripts/host_receipts.py's own HOST_ID_PATTERN: lowercase/digits/
+        # hyphens, ending in an 8-digit date.
+        self.assertRegex(host_id_match.group(1), r"^[a-z0-9-]+-[0-9]{8}$")
+
+    def test_the_recording_smoke_runs_against_both_pinned_and_system_python(self):
+        step = self.steps[self._step_index("Recording smoke: record a real receipt")]
+        run_text = step["run"]
+        self.assertIn('run_smoke python3 "the manifest-pinned Python line', run_text)
+        self.assertIn("/usr/bin/python3", run_text)
+        self.assertIn("meets_min", run_text)
+        # A below-minimum system Python is skipped, not failed.
+        self.assertIn("skipping the system-Python recording smoke", run_text)
+
+    def test_the_minimum_python_version_is_39_everywhere_it_is_declared(self):
+        step = self.steps[self._step_index("Recording smoke: record a real receipt")]
+        self.assertIn('min_version="3.9"', step["run"])
+        for doc_path in (ROOT / "adoption" / "bootstrap.md", PAGE_PATH):
+            text = doc_path.read_text()
+            self.assertIn("Python 3.9", text, doc_path)
+
+
 class EmbedAcceptanceScriptTests(unittest.TestCase):
     """tools/adoption/embed_acceptance.py (round 3h) against a local stdlib
     HTTP server standing in for llama-server, and the real, committed
@@ -2420,6 +2579,97 @@ class EmbedAcceptanceScriptTests(unittest.TestCase):
         self.assertEqual(self.reference["model"]["hf_revision"], model["hf_revision"])
         self.assertEqual(self.reference["dimension"], 768)
         self.assertEqual(self.reference["acceptance"]["threshold"], 0.99)
+
+    def _raw_socket_server(self, handle_connection):
+        """A minimal raw-socket TCP server for transport-level failure
+        modes http.server.BaseHTTPRequestHandler cannot easily produce
+        (an incomplete body relative to its own declared Content-Length,
+        or a stall mid-body): `handle_connection(conn)` gets the accepted
+        connection and is responsible for reading the request and writing
+        whatever raw bytes it wants, then closing (or not) the socket
+        itself."""
+        import socket
+        import threading
+
+        server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        server_socket.bind(("127.0.0.1", 0))
+        server_socket.listen(1)
+        port = server_socket.getsockname()[1]
+
+        def serve_once():
+            try:
+                conn, _ = server_socket.accept()
+            except OSError:
+                return
+            try:
+                handle_connection(conn)
+            finally:
+                try:
+                    conn.close()
+                except OSError:
+                    pass
+
+        thread = threading.Thread(target=serve_once, daemon=True)
+        thread.start()
+        self.addCleanup(server_socket.close)
+        return f"http://127.0.0.1:{port}"
+
+    def test_an_incomplete_response_body_reports_json_not_a_traceback(self):
+        # Round 3i (Codex Low): the server declares Content-Length: 1000
+        # but sends only a handful of body bytes, then closes the
+        # connection -- http.client.IncompleteRead, which the pre-fix
+        # except clause (urllib.error.URLError only) did not catch,
+        # leaving stdout empty and the process exiting via an uncaught
+        # traceback instead of the documented JSON failure contract.
+        def handle(conn):
+            conn.recv(65536)  # drain the request; its content is irrelevant here
+            conn.sendall(
+                b"HTTP/1.1 200 OK\r\n"
+                b"Content-Type: application/json\r\n"
+                b"Content-Length: 1000\r\n"
+                b"\r\n"
+                b'{"data"'
+            )
+            # Closes here (the `finally` in _raw_socket_server), well
+            # short of the promised 1000 bytes.
+
+        url = self._raw_socket_server(handle)
+        result = self._run(url, extra_args=["--timeout", "5"])
+        self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertEqual(result.stderr, "",
+                          "an incomplete response must be a reported JSON result, not a traceback")
+        payload = json.loads(result.stdout)
+        self.assertFalse(payload["passed"])
+        self.assertIn("incomplete", payload["error"])
+
+    def test_a_stalled_response_body_times_out_and_reports_json_not_a_traceback(self):
+        # Round 3i (Codex Low): the server sends valid headers (urlopen's
+        # own connect-phase succeeds) and a partial body, then stalls
+        # indefinitely without closing the connection -- a bare
+        # TimeoutError from response.read() itself, past urlopen's own
+        # initial connection, which URLError alone did not catch.
+        import time
+
+        def handle(conn):
+            conn.recv(65536)
+            conn.sendall(
+                b"HTTP/1.1 200 OK\r\n"
+                b"Content-Type: application/json\r\n"
+                b"Content-Length: 1000\r\n"
+                b"\r\n"
+                b'{"data"'
+            )
+            time.sleep(5)  # far longer than this test's own --timeout
+
+        url = self._raw_socket_server(handle)
+        result = self._run(url, extra_args=["--timeout", "1"])
+        self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertEqual(result.stderr, "",
+                          "a stalled response must be a reported JSON result, not a traceback")
+        payload = json.loads(result.stdout)
+        self.assertFalse(payload["passed"])
+        self.assertIn("timed out", payload["error"])
 
 
 class PlatformPageTests(unittest.TestCase):

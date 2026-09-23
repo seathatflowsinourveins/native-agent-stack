@@ -221,6 +221,50 @@ That is not a workstation acceptance:
 Until a real Mac produces a receipt, this profile stays
 `status: drafted_not_accepted` with `evidence_ref: null`.
 
+## Recording and verdict scripts
+
+A 2026-09-23 peer-update-audit gap (`adoption_macos`, medium): the catalog's
+own recording and verdict scripts (`scripts/host_receipts.py`,
+`scripts/component_matrix.py`, `scripts/new_host_grand_list.py`,
+`tools/sota-convergence/build_verdicts.py`, `scripts/validate_convergence.py`,
+`scripts/release_due.py`) had never actually run on macOS CI or against
+macOS's own system Python -- every existing gating job for them
+(`.github/workflows/validate.yml`, `.github/workflows/catalog-freshness.yml`)
+runs on `ubuntu-24.04` only. A future macOS host recording evidence with
+these exact scripts, on macOS's own BSD userland and system `git`, was
+entirely unexercised.
+
+Fixed (round 3i): `adoption-bootstrap.yml`'s `validate-macos` job (`macos-15`)
+now runs all six scripts as gating checks, then a **recording smoke**: it
+installs this profile (the same bootstrap step `bootstrap-macos` runs),
+records a real `host_receipts.py record` receipt for a cheap, already-
+installed component (`codex`, `--from-stack-commands`, `--evidence-class
+native_proven` -- a green hosted job is real execution for exactly what it
+ran, never a workstation acceptance receipt; see "What a hosted run proves"
+above) inside a **throwaway copy** of the checkout (`$RUNNER_TEMP/rec`, never
+the real one, so nothing is ever committed from this step), then re-runs
+`host_receipts.py validate`, `component_matrix.py --write --check` and
+`new_host_grand_list.py --write --check` in that same copy. This proves the
+recording path works under macOS Python, BSD userland and the system `git`,
+never that this ONE receipt establishes any platform-status change (it does
+not carry `second_physical_machine: true`, and it is discarded with the
+throwaway copy at the end of the job).
+
+**Minimum Python version: 3.9**, declared in
+[`adoption/bootstrap.md`](../bootstrap.md) and tested directly, not merely
+declared: the recording smoke above runs once against the manifest-pinned
+Python line (`python@3.13` via `actions/setup-python`) and once against the
+runner's own **system** `/usr/bin/python3` (macOS ships 3.9.6 there by
+default on every macOS 15 image observed so far, which is exactly this
+floor -- a version this project's own bootstrap already flags as below the
+`python@3.13` this profile's prerequisites require, in "Prerequisites"
+above). If a runner's system Python were ever below 3.9, that second run is
+skipped with a message rather than failing the job; the CI log states
+whichever happened. This is still hosted-runner evidence, not a workstation
+observation: it establishes that these scripts run under a real macOS
+Python 3.9 interpreter as installed by Apple on this runner image, not that
+every real Mac's system Python matches it forever.
+
 ## Embedding backend decision
 
 **These are two separate embedding spaces by design, not two ports serving

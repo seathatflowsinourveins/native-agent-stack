@@ -191,6 +191,50 @@ selected_labels() {
 #                    unresponsive, ...).
 # Callers must never take a destructive or ownership-claiming action on
 # loaded_elsewhere or unknown, in EITHER install or remove.
+#
+# Round 3i (Codex Medium): resolves symlinks in a path's PARENT directory
+# only, then reattaches the path's own final component unresolved -- never
+# requires the path itself to exist. This is deliberately NOT `-ef`
+# (device+inode comparison): two DISTINCT hard-linked filenames sharing the
+# same inode are two different names for the same data, but they are not
+# the same NAME, and launchctl_label_state must never treat a label loaded
+# from a hard-linked alias of dest_plist as loaded_here -- `-ef` collapsed
+# that distinction (reproduced: an unmodified classifier reported
+# loaded_here for a distinct hard link, letting remove below bootout an
+# elsewhere-loaded label). Resolving only the parent directory (not the
+# final component) is what keeps a SYMLINKED ANCESTOR comparing equal to
+# its real target (what launchctl itself may report) while still keeping
+# two hard-linked leaf names distinct: neither `cd -P` nor python3's
+# os.path.realpath ever collapses a hard link's own pathname the way
+# device+inode identity does, since a hard link has no stored "canonical
+# name" to resolve to in the first place.
+canonical_plist_path() {
+  local target="$1"
+  local dir base resolved_dir
+  dir="$(dirname -- "$target")"
+  base="$(basename -- "$target")"
+  if resolved_dir="$(cd -P -- "$dir" 2>/dev/null && pwd -P)"; then
+    printf '%s/%s\n' "$resolved_dir" "$base"
+    return
+  fi
+  # The parent directory does not exist (unusual: $launch_agents_dir is
+  # always created first, but never crash on it) -- python3's
+  # os.path.realpath tolerates a non-existent path entirely, matching
+  # adoption/bootstrap-macos.sh's own canonical_path for the same reason.
+  if command -v python3 >/dev/null 2>&1; then
+    local resolved
+    resolved="$(python3 -c 'import os, sys
+print(os.path.realpath(sys.argv[1]))' "$target" 2>/dev/null)" && [[ -n "$resolved" ]] && {
+      printf '%s\n' "$resolved"
+      return
+    }
+  fi
+  # Neither worked: the original, unresolved path is still a meaningful
+  # comparison (it still correctly distinguishes two hard-linked names --
+  # only a symlinked ancestor would go undetected here).
+  printf '%s\n' "$target"
+}
+
 launchctl_label_state() {
   local label="$1" dest_plist="$2"
   local print_output print_status
@@ -206,7 +250,8 @@ launchctl_label_state() {
   fi
   local loaded_path
   loaded_path="$(printf '%s\n' "$print_output" | sed -n 's/^[[:space:]]*path = //p' | head -n 1)"
-  if [[ -n "$loaded_path" ]] && [[ "$loaded_path" -ef "$dest_plist" ]]; then
+  if [[ -n "$loaded_path" ]] \
+     && [[ "$(canonical_plist_path "$loaded_path")" == "$(canonical_plist_path "$dest_plist")" ]]; then
     printf 'loaded_here\n'
   else
     printf 'loaded_elsewhere\n'
@@ -236,6 +281,54 @@ wait_until_unloaded() {
     [[ "$attempts_left" -gt 0 ]] || return 1
     sleep "$interval"
   done
+}
+
+# Round 3i (Codex Medium): a `launchctl bootout` that returns nonzero
+# because teardown is ALREADY under way -- EINPROGRESS, Darwin errno 36 --
+# is not a genuine failure: something (this run's own retry of an earlier
+# interrupted attempt, or another process entirely) already started
+# tearing this label down and simply has not finished yet. The pinned
+# Homebrew implementation this project converges on
+# (Library/Homebrew/services/cli.rb @ 8e3a5dc0a7, around line 311) checks
+# exactly `exit_status == Errno::EINPROGRESS::Errno` for the identical
+# reason, then keeps waiting rather than treating it as a failure.
+# Reproduced without this fix: an interrupted run's own bootout leaves
+# teardown in progress, and a clean retry's bootout call returns
+# EINPROGRESS, which an unconditional `if ! launchctl bootout` refused
+# outright -- abandoning the in-progress teardown with no wait and no
+# reload ever attempted, leaving the service stopped until a human
+# notices. This project's offline harness cannot independently confirm
+# launchctl surfaces exactly 36 as its own raw process exit status (no
+# real launchd to observe); this is source-supported inference from
+# Homebrew's own pinned source, not a native observation. Shared by
+# cmd_install and cmd_remove so both benefit identically; sets the global
+# bootout_and_wait_result to one of "ok", "bootout_failed" or
+# "wait_timeout" so each caller reports in its own already-established
+# wording. Deliberately NOT `result="$(bootout_and_wait ...)"`: a bash
+# command substitution forks a subshell, and empirically (verified with a
+# real SIGINT against a shimmed launchctl) a signal delivered while a
+# foreign command runs INSIDE that subshell is silently swallowed there --
+# it never reaches this script's own INT/TERM/HUP traps at all, unlike a
+# signal during a directly-called (non-substituted) foreign command. Using
+# a plain function call plus a global result variable keeps bootout_and_
+# wait running in the SAME process as its caller, preserving the exact
+# signal-deferral behavior every other step in this script already
+# depends on.
+bootout_and_wait_result=""
+bootout_and_wait() {
+  local label="$1"
+  local bootout_status=0
+  launchctl bootout "gui/$(id -u)/$label" || bootout_status=$?
+  if [[ "$bootout_status" != 0 ]] && [[ "$bootout_status" != 36 ]]; then
+    bootout_and_wait_result="bootout_failed"
+    return 1
+  fi
+  if ! wait_until_unloaded "$label"; then
+    bootout_and_wait_result="wait_timeout"
+    return 1
+  fi
+  bootout_and_wait_result="ok"
+  return 0
 }
 
 # Round 3g: the ONLY thing an interrupted run needs cleaned up is its own
@@ -432,19 +525,24 @@ cmd_install() {
         # because the label is already bootstrapped (launchctl error 5).
         # Unload it first, so the fresh bootstrap further down actually
         # applies.
-        if ! launchctl bootout "gui/$(id -u)/$label"; then
-          printf 'Refusing to install %s: it is currently loaded and launchctl bootout failed; leaving it running, unmodified.\n' \
-            "$label" >&2
-          exit 1
-        fi
         # Never bootstrap the new content over a service that never
         # actually stopped. Round 3f finding 4 (delayed teardown) no longer
         # has a "trust one transitional read" failure mode to fix here:
         # this IS the one and only check, made before the rename, not a
-        # later reconcile re-deriving what already happened.
-        if ! wait_until_unloaded "$label"; then
-          printf 'Refusing to install %s: launchctl bootout succeeded but the service did not report unloaded (launchctl print never returned 113) within the bounded wait; leaving it as is.\n' \
-            "$label" >&2
+        # later reconcile re-deriving what already happened. bootout_and_
+        # wait also absorbs EINPROGRESS (round 3i) rather than refusing on
+        # it outright.
+        if ! bootout_and_wait "$label"; then
+          case "$bootout_and_wait_result" in
+            bootout_failed)
+              printf 'Refusing to install %s: it is currently loaded and launchctl bootout failed; leaving it running, unmodified.\n' \
+                "$label" >&2
+              ;;
+            *)
+              printf 'Refusing to install %s: launchctl bootout succeeded but the service did not report unloaded (launchctl print never returned 113) within the bounded wait; leaving it as is.\n' \
+                "$label" >&2
+              ;;
+          esac
           exit 1
         fi
         ;;
@@ -521,18 +619,23 @@ cmd_remove() {
     state="$(launchctl_label_state "$label" "$dest_plist")"
     case "$state" in
       loaded_here)
-        if ! launchctl bootout "gui/$(id -u)/$label"; then
-          # Kept, not deleted: a failed bootout means the plist can still
-          # reload at the next login, so a retry (or remove again) needs to
-          # find it right where it was.
-          printf '%s: launchctl bootout failed; %s was NOT removed (it can still reload at the next login). Retry remove, or inspect launchctl print gui/%s/%s.\n' \
-            "$label" "$dest_plist" "$(id -u)" "$label" >&2
-          failed_count=$((failed_count + 1))
-          continue
-        fi
-        if ! wait_until_unloaded "$label"; then
-          printf '%s: launchctl bootout succeeded but the service did not report unloaded (launchctl print never returned 113) within the bounded wait; %s was NOT removed. Retry remove, or inspect launchctl print gui/%s/%s.\n' \
-            "$label" "$dest_plist" "$(id -u)" "$label" >&2
+        # bootout_and_wait absorbs EINPROGRESS (round 3i) rather than
+        # refusing on it outright: teardown already under way, from this
+        # or an earlier interrupted run, is not a genuine bootout failure.
+        if ! bootout_and_wait "$label"; then
+          case "$bootout_and_wait_result" in
+            bootout_failed)
+              # Kept, not deleted: a failed bootout means the plist can
+              # still reload at the next login, so a retry (or remove
+              # again) needs to find it right where it was.
+              printf '%s: launchctl bootout failed; %s was NOT removed (it can still reload at the next login). Retry remove, or inspect launchctl print gui/%s/%s.\n' \
+                "$label" "$dest_plist" "$(id -u)" "$label" >&2
+              ;;
+            *)
+              printf '%s: launchctl bootout succeeded but the service did not report unloaded (launchctl print never returned 113) within the bounded wait; %s was NOT removed. Retry remove, or inspect launchctl print gui/%s/%s.\n' \
+                "$label" "$dest_plist" "$(id -u)" "$label" >&2
+              ;;
+          esac
           failed_count=$((failed_count + 1))
           continue
         fi

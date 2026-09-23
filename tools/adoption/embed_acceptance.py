@@ -37,6 +37,7 @@ numbers.
 from __future__ import annotations
 
 import argparse
+import http.client
 import json
 import math
 import sys
@@ -66,6 +67,26 @@ def post_json(url: str, body: dict, timeout: float) -> dict:
         with urllib.request.urlopen(request, timeout=timeout) as response:
             raw = response.read()
     except urllib.error.URLError as exc:
+        raise AcceptanceError(f"request to {url} failed: {exc}") from exc
+    except TimeoutError as exc:
+        # Round 3i (Codex Low): urlopen's own connect-phase timeout is
+        # wrapped in URLError above, but a stall during response.read()
+        # itself -- the connection opened, then the body never finished
+        # arriving within `timeout` -- raises a bare TimeoutError instead,
+        # which URLError does not catch.
+        raise AcceptanceError(f"request to {url} timed out reading the response: {exc}") from exc
+    except http.client.IncompleteRead as exc:
+        # The server closed the connection before sending the number of
+        # bytes its own Content-Length header promised (a crash, a
+        # container being torn down mid-response, ...). Neither URLError
+        # nor TimeoutError catches this; http.client raises it directly.
+        raise AcceptanceError(f"response from {url} was incomplete: {exc}") from exc
+    except OSError as exc:
+        # A catch-all for any other transport-level failure (a reset
+        # connection, DNS resolution failing in a way urllib does not wrap
+        # in URLError, ...) that would otherwise escape as a bare
+        # traceback and leave stdout empty, violating this script's own
+        # documented JSON-failure contract.
         raise AcceptanceError(f"request to {url} failed: {exc}") from exc
     try:
         return json.loads(raw)

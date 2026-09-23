@@ -3018,8 +3018,8 @@
     },
     {
       "path": ".github/workflows/adoption-bootstrap.yml",
-      "sha256": "07bd394e0e78c303a0de0cd0a5ba37bdff998d92e0d56a4a85e4771b383acf27",
-      "bytes": 23200
+      "sha256": "7b7ee9e26d3c7ddcef29086da63cc7036197d2eb3e990f6a36d51af9d05300e1",
+      "bytes": 29800
     },
     {
       "path": ".github/workflows/catalog-freshness.yml",
@@ -3128,8 +3128,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "96e67ed5862cc074f6acf932fcc997bda8ffd4966a746e63347cb9625968e452",
-      "bytes": 8501
+      "sha256": "28345f156fda89e1ec2588e112af5da99b0023c35c6906664610eb6eddb7be35",
+      "bytes": 9571
     },
     {
       "path": "adoption/host-receipt.schema.json",
@@ -3168,8 +3168,8 @@
     },
     {
       "path": "adoption/launchd/launchd-agents.sh",
-      "sha256": "f20b5a8ab5522c37c14d1cb451d0555c5d857074bc14e76eeb8b4718acc2fd31",
-      "bytes": 28907
+      "sha256": "df0a996336d4bfa5a99dcbbc917cf84d8f147ae87127009ee109f9d944f21cc3",
+      "bytes": 34098
     },
     {
       "path": "adoption/lifecycle.md",
@@ -3228,8 +3228,8 @@
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
-      "sha256": "5f6d3e43595502049f943da43f17f700c4b3b1e4b3164dd1e7665c1779e464e6",
-      "bytes": 28675
+      "sha256": "3457251d0f2b2916ad7043e48c8b152dcbb901364c1052faaa204323f7a9c8c1",
+      "bytes": 31434
     },
     {
       "path": "adoption/pre-login-observation.json",
@@ -14319,8 +14319,8 @@
     },
     {
       "path": "tests/test_adoption_bootstrap_macos.py",
-      "sha256": "1ca445bb48a9d42530c1a66a2fe68b28db134d609b02ccc89eb2f06375de2ffb",
-      "bytes": 137179
+      "sha256": "48b5e8943744ae21ed0ae76dd11dbcb7db31e2ce54b29a00cd0ca92a6e858717",
+      "bytes": 149849
     },
     {
       "path": "tests/test_adoption_contract.py",
@@ -14334,8 +14334,8 @@
     },
     {
       "path": "tests/test_adoption_launchd.py",
-      "sha256": "034a9dbc91910f3929cb7e995da830a7895e3242412136e9797ce778fdee298a",
-      "bytes": 75087
+      "sha256": "6afbaf2c74a2826cd9b7dbcd49e03c9a5f272f72a7a02463bb02318615380454",
+      "bytes": 86412
     },
     {
       "path": "tests/test_adoption_status.py",
@@ -14729,8 +14729,8 @@
     },
     {
       "path": "tools/adoption/embed_acceptance.py",
-      "sha256": "d69f73eb2aacc6165dde092c2a00274815bb71e420585fab1560d283f55be73d",
-      "bytes": 6886
+      "sha256": "b567a3ce64d66f0798bd5fc73cf78d8a12074d583177c204d5465050873258b1",
+      "bytes": 8209
     },
     {
       "path": "tools/adoption/render_config.py",
