@@ -1,6 +1,6 @@
 {
   "schema": "spy-parity-v2-replay-history/1",
-  "note": "Every v2 execution of the harness on the frozen SPY inputs, in time order, enumerated from the retained private output directories of the implementing session. run.py copies this list into each new receipt under preconditions.prior_v2_replays; after a run, the operator appends that run here before the next one. Runs whose output directory was not retained cannot be enumerated from disk; none is known. The sealed probes under probes/v2 are preregistration evidence recorded in mapping-manifest-v2.json and are not listed here. Receipt hashes name private files that are not published.",
+  "note": "Every v2 execution of the harness on the frozen SPY inputs, in time order, enumerated from the retained private output directories of the implementing session. run.py copies this list into each new receipt under preconditions.prior_v2_replays; after a run, the operator appends that run here before the next one. Runs whose output directory was not retained cannot be enumerated from disk; none is known. The sealed probes under probes/v2 are preregistration evidence recorded in mapping-manifest-v2.json and are not listed here. Receipt hashes name private files that are not published. Every replay listed is superseded; none was reviewed before it ran. harness_local_source_sha256, where present, is the replay's reviewed-harness file set as run.py hashed it; compare.py fails a run whose reviewed files equal any listed replay's, and re-hashes this file at comparison time, accepting only an append-only extension of the list the run recorded.",
   "replays": [
     {"id": "dev1-dev5", "observed_utc": ["2026-09-23T02:48:29.014822+00:00", "2026-09-23T02:48:29.660935+00:00", "2026-09-23T02:48:30.271356+00:00", "2026-09-23T02:48:30.869954+00:00", "2026-09-23T02:48:31.471769+00:00"],
      "harness": "uncommitted working tree whose harness files hash as at db8bad7 (run.py 8fc9f4272e0a..., fixture_strategy.py cb6830320e8a..., distribution_module.py eefee070b0db..., compare.py e88546a0fd9e...)",
@@ -37,6 +37,7 @@
      "isolation": "documented bwrap two-run replay (loopback only, cleared environment, read-only harness and data mounts)",
      "outcome": "published as receipt-v2.json with verdict-v2.json FAIL: 96/96 execution checks pass, precondition_review fails because no retained review preceded the run",
      "receipt_sha256": ["c1bd4b8acee7e7f21a800bf745f793fc6c1e8970390c68143dd1c9e12f4042ba"],
-     "reviewed_before_run": false, "status": "published; to be superseded by the first run from a reviewed harness"}
+     "harness_local_source_sha256": {"compare.py": "598bffafe5ae875fb97a95d2a5234bf713ccbac6d3e33b01e94d1eb1f656e74b", "convert.py": "08cba0a2aac938e9306935f91c2889b181dfc880b532b5943e0ccda395592c65", "distribution_module.py": "eefee070b0dbe6ad3a1e68755ca959b5fff081fad61af8b84902a438996b126b", "fixture_strategy.py": "59649ac50f26c8b6090dc976e4ec0b3b7e2121cc214674f6c122fbbca9b143f1", "run.py": "b2c0cf6e704779053babb6e62ed5ace0c16ea00df79a54d34ec8f04cc499aac4"},
+     "reviewed_before_run": false, "status": "superseded: the 2026-09-23 pre-run review changed the harness after this run (compare.py and run.py), so no run from f079f6c can qualify; this is the only replay known from f079f6c"}
   ]
 }

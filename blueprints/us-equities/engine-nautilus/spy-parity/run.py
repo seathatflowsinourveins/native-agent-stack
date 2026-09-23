@@ -76,12 +76,19 @@ PREREGISTRATION_DEVIATIONS = [
     {"id": "first_v2_run_preceded_review",
      "sealed_text": "acceptance_criteria.preconditions[0]: '... before the first v2 run'.",
      "deviation": "Read literally, no run can meet this any more: the first v2 replays on the frozen "
-                  "data ran before any review (preconditions.prior_v2_replays). compare.py evaluates "
-                  "the reading the 2026-09-23 independent review proposed: the qualifying run is the "
-                  "first run from a harness whose exact files were reviewed before that run, with "
-                  "every earlier replay published as superseded.",
-     "effect": "Whether that reading satisfies the preregistration is for the gate owner; if it "
-               "does not, v2 cannot pass and a new dated preregistration is required."},
+                  "data ran before any review (preconditions.prior_v2_replays). The reading the "
+                  "2026-09-23 independent review proposed is that the qualifying run is the first run "
+                  "from a harness whose exact files were reviewed before that run, with every earlier "
+                  "replay published as superseded. compare.py applies that reading only when the gate "
+                  "owner has accepted this deviation: while any recorded earlier replay has "
+                  "reviewed_before_run other than true, precondition_review fails unless "
+                  "deviation-acceptance-v2.json (schema_version 1: deviation_id, accepted_by, "
+                  "accepted_utc, reviewed_harness_local_source_sha256, statement) existed at run time "
+                  "(preconditions.deviation_acceptance), is unchanged at comparison time, names this "
+                  "deviation, binds exactly the reviewed harness files that ran and is dated before "
+                  "started_utc. The harness never writes that file.",
+     "effect": "Without the gate owner's acceptance no v2 run can pass, and a new dated "
+               "preregistration is required."},
     {"id": "sealed_status_fields_not_updated",
      "sealed_text": "mapping-manifest-v2.json run_status 'preregistered_not_run' and "
                     "harness_changes_required.implemented false.",
@@ -110,9 +117,22 @@ PREREGISTRATION_DEVIATIONS = [
      "sealed_text": "acceptance_criteria.preconditions[1]: the five frozen inputs hash-match at run "
                     "and at comparison time.",
      "deviation": "compare.py --bars has no data root, so it cannot re-hash the frozen inputs; it "
-                  "reports that precondition check SKIPPED, which leaves the comparison incomplete. "
-                  "The v2 verdict is published from --lean-data, which re-hashes them.",
+                  "reports that precondition check SKIPPED, and under v2 any skipped check makes the "
+                  "verdict FAIL. The v2 verdict is published from --lean-data, which re-hashes them.",
      "effect": "--bars can no longer produce a v2 PASS; the README mode table describes v1."},
+    {"id": "isolation_partially_observed",
+     "sealed_text": "acceptance_criteria.preconditions[2]: isolation as v1 (bwrap --unshare-all, "
+                    "cleared environment, read-only mounts, no network).",
+     "deviation": "The run records, and compare.py checks, what the process can observe of that "
+                  "isolation from inside: the network interfaces, the environment names and the "
+                  "values of the documented variables, python -I (sys.flags.isolated), read-only "
+                  "mounts for the harness source, the data root and the interpreter prefix, a user "
+                  "namespace uid_map other than the initial one, and bwrap as pid 1 of the pid "
+                  "namespace. The ipc, uts and cgroup namespace links are recorded but cannot be "
+                  "compared with the host's from inside, and mounts other than those three are not "
+                  "individually observed.",
+     "effect": "An ipc, uts or cgroup namespace left shared, or a writable mount outside the three "
+               "observed, would not be detected; those rest on the documented bwrap command."},
     {"id": "v2_output_paths",
      "sealed_text": "Neither README.md nor mapping-manifest-v2.json names paths for the v2 receipt "
                     "and verdict; the manifest keeps v1 bound to verdict.json.",
@@ -142,6 +162,16 @@ REVIEWED_HARNESS_FILES = ("convert.py", "fixture_strategy.py", "distribution_mod
                           "compare.py")
 REPLAY_HISTORY = "replay-history-v2.json"
 REPLAY_HISTORY_SCHEMA = "spy-parity-v2-replay-history/1"
+DEVIATION_ACCEPTANCE = "deviation-acceptance-v2.json"
+DEVIATION_ACCEPTANCE_FIELDS = ("schema_version", "deviation_id", "accepted_by", "accepted_utc",
+                               "reviewed_harness_local_source_sha256", "statement")
+# The values the documented bwrap replay sets. A value is recorded only when it
+# equals the documented one; any other value (for example a host PATH naming a
+# home directory) is replaced by UNDOCUMENTED_VALUE and fails compare.py.
+ISOLATED_ENVIRONMENT_VALUES = {"LANG": "C.UTF-8", "PATH": "/usr/bin:/bin",
+                               "PYTHONDONTWRITEBYTECODE": "1", "OPENBLAS_NUM_THREADS": "1",
+                               "OMP_NUM_THREADS": "1"}
+UNDOCUMENTED_VALUE = "<differs from the documented value; not recorded>"
 LOG_LEVEL_RE = re.compile(r"\[(TRACE|DEBUG|INFO|WARN|WARNING|ERROR)\]")
 
 WINDOW = {"symbol": "SPY", "start": "2019-12-02", "end": "2020-04-30"}
@@ -297,9 +327,98 @@ def load_replay_history() -> dict:
     return {"path": REPLAY_HISTORY, "sha256": digest(path), "replays": history["replays"]}
 
 
+def load_deviation_acceptance() -> dict | None:
+    """The gate owner's acceptance of ``first_v2_run_preceded_review``, if present.
+
+    The harness never writes this file. When it exists at run time the receipt
+    records its path, sha256 and fields; compare.py judges it.
+    """
+    path = SOURCE / DEVIATION_ACCEPTANCE
+    if not path.is_file():
+        return None
+    blob = path.read_bytes()
+    record = json.loads(blob.decode("utf-8"))
+    if not isinstance(record, dict) or sorted(record) != sorted(DEVIATION_ACCEPTANCE_FIELDS):
+        raise ValueError("deviation_acceptance_schema")
+    return {"path": str(path.relative_to(REPO)), "sha256": hashlib.sha256(blob).hexdigest(), **record}
+
+
 def read_only_mount(path) -> bool:
     """Whether ``path`` sits on a read-only mount, as the kernel reports it."""
     return bool(os.statvfs(path).f_flag & os.ST_RDONLY)
+
+
+def _proc_text(path: str):
+    try:
+        return Path(path).read_text()
+    except OSError:
+        return None
+
+
+def isolation_evidence(data_root: Path) -> dict:
+    """What the process can observe of its own isolation (compare.py checks it).
+
+    Records no interpreter path and no environment value other than a documented
+    one, so a personal path or secret cannot enter the receipt.
+    """
+    links = {}
+    try:
+        for name in sorted(os.listdir("/proc/self/ns")):
+            links[name] = os.readlink("/proc/self/ns/" + name)
+    except OSError:
+        links = None
+    pid1 = _proc_text("/proc/1/comm")
+    return {"network_interfaces": socket.if_nameindex(),
+            "environment_names": sorted(os.environ),
+            "environment_values": {k: (v if os.environ[k] == v else UNDOCUMENTED_VALUE)
+                                   for k, v in ISOLATED_ENVIRONMENT_VALUES.items() if k in os.environ},
+            "argv": sys.argv, "cwd": os.getcwd(),
+            "python_flags_isolated": sys.flags.isolated,
+            "read_only": {"harness_source": read_only_mount(SOURCE),
+                          "data_root": read_only_mount(data_root),
+                          "python_prefix": read_only_mount(sys.prefix)},
+            "namespaces": {"uid_map": _proc_text("/proc/self/uid_map"), "pid": os.getpid(),
+                           "pid1_comm": pid1.strip() if pid1 is not None else None,
+                           "links": links},
+            "unobserved": "ipc, uts and cgroup namespace separation cannot be compared with the "
+                          "host from inside; see deviation isolation_partially_observed."}
+
+
+def undeclared_differences(raw_differences) -> list:
+    """Differing raw field paths whose leaf is not a normalized generated-id field."""
+    return sorted({d for d in raw_differences
+                   if d.rsplit(".", 1)[-1].split("[")[0] not in APPLIED_ID_FIELDS})
+
+
+def sizing_limitation(intents, distribution_ledger) -> str:
+    """The v1 sizing-rule limitation, with this run's own figures.
+
+    Derived from the intents and the posted distribution ledger: each intent's
+    decision_equity leaves out distribution cash the engine posted before it.
+    """
+    posted = [(int(d["utc_seconds"]), Decimal(str(d["amount"]))) for d in distribution_ledger
+              if d.get("engine_posted") is True]
+    parts, undersized = [], []
+    for intent in intents:
+        before = sum((amount for when, amount in posted if when <= int(intent["utc_seconds"])),
+                     Decimal(0))
+        if before == 0:
+            continue
+        equity = Decimal(str(intent["decision_equity"]))
+        parts.append("the " + str(intent.get("reason")) + " intent records decision_equity "
+                     + str(equity) + ", which leaves out " + str(before) + " of engine-posted "
+                     "distributions (" + str(equity + before) + " with them)")
+        if Decimal(str(intent.get("target", "0"))) != 0:
+            undersized.append(str(intent.get("reason")))
+    text = ("The unchanged v1 sizing rule sizes from the strategy's own fill-driven cash, which "
+            "leaves out engine-posted distribution cash")
+    text += (": " + "; ".join(parts) + ". " if parts else
+             ": no intent of this run follows a nonzero posted distribution. ")
+    text += ("Intents sized after a posted distribution are under-sized: " + ", ".join(undersized)
+             + "." if undersized else
+             "No nonzero-target intent follows a posted distribution, so this run's quantities are "
+             "unaffected; a case that sizes after an ex-date would be under-sized.")
+    return text
 
 
 def scan_engine_log(text: str) -> dict:
@@ -609,6 +728,7 @@ def main():
 
     frozen_plan = check_frozen_plan()
     review = load_review_record(args.review_record)
+    acceptance = load_deviation_acceptance()
     history = load_replay_history()
     manifest_v2, manifest = load_bound_manifests()
     extension = check_engine_binary(manifest_v2)
@@ -630,8 +750,7 @@ def main():
     runs = [run_once(conversion["rows"], events, args.out / label, label)
             for label in ("run-1", "run-2")]
     raw_differences = field_differences(runs[0]["_raw_reports"], runs[1]["_raw_reports"])
-    undeclared = sorted({d for d in raw_differences
-                         if d.rsplit(".", 1)[-1].split("[")[0] not in APPLIED_ID_FIELDS})
+    undeclared = undeclared_differences(raw_differences)
     determinism = {
         "normalized_economic_sha256_equal":
             runs[0]["normalized_economic_sha256"] == runs[1]["normalized_economic_sha256"],
@@ -743,14 +862,14 @@ def main():
         "buying_power_and_latch_note": "one_zero requests 1x with no leverage and no adaptive rule, so "
                                        "empty lists are the expected observation, not evidence of "
                                        "margin-model equivalence.",
-        "isolation": {"network_interfaces": socket.if_nameindex(),
-                      "environment_names": sorted(os.environ),
-                      "argv": sys.argv, "cwd": os.getcwd(),
-                      "read_only": {"harness_source": read_only_mount(SOURCE),
-                                    "data_root": read_only_mount(args.lean_data)}},
+        "isolation": isolation_evidence(args.lean_data),
         "preconditions": {
             "review": review,
             "review_note": "None means no retained independent review preceded this run.",
+            "deviation_acceptance": acceptance,
+            "deviation_acceptance_note": "None means deviation-acceptance-v2.json (the gate owner's "
+                                         "acceptance of first_v2_run_preceded_review) was absent at "
+                                         "run time.",
             "prior_v2_replays": history,
         },
         "preregistration_deviations": PREREGISTRATION_DEVIATIONS,
@@ -762,11 +881,7 @@ def main():
             "The DistributionModule posts cash only; bar prices stay raw-normalized. Payable dates, "
             "withholding and short-position debits are outside one_zero.",
             "Bundled sample bytes are not an entitled, point-in-time or market-wide dataset.",
-            "The unchanged v1 sizing rule sizes from the strategy's own fill-driven cash, which "
-            "leaves out engine-posted distribution cash: the exit intent records decision_equity "
-            "90767.52 where LEAN's portfolio value includes the 428.64 distribution (91196.16). "
-            "one_zero is unaffected (exit target 0; the entry precedes any distribution); a case "
-            "that sizes after an ex-date would be under-sized.",
+            sizing_limitation(primary["intents"], primary["distribution_ledger"]),
             "Each OCO leg's harness submission fields are the strategy's own record; compare.py "
             "judges the native OCO structure from engine_at_accept and engine_final, the order as "
             "the engine's cache serializes it at OrderAccepted and at run end.",

@@ -11,6 +11,7 @@ from decimal import Decimal
 from pathlib import Path
 import tempfile
 import unittest
+import uuid
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -669,8 +670,22 @@ class OracleSchemaTests(unittest.TestCase):
             COMPARE.oracle_case({"cases": [case]}, "one_zero")
 
 
+def _rebound_to_current_harness(receipt):
+    """The published receipt with its harness hashes replaced by the files on disk.
+
+    The published receipt-v2.json ran the f079f6c harness, which the 2026-09-23
+    pre-run review round changed; V2PublishedResultTests pins exactly which files
+    differ. The binding machinery is exercised against a copy rebound to the
+    current files, never by editing the published receipt.
+    """
+    receipt = json.loads(json.dumps(receipt))
+    for name in receipt["local_source_sha256"]:
+        receipt["local_source_sha256"][name] = hashlib.sha256((SOURCE / name).read_bytes()).hexdigest()
+    return receipt
+
+
 class BindingTests(unittest.TestCase):
-    """Binding checks against the published v2 receipt and the files on disk.
+    """Binding checks against the published v2 receipt (rebound) and the files on disk.
 
     The v1 receipt stays bound to the pre-v2 harness; see V1ReceiptProvenanceTests.
     """
@@ -678,7 +693,7 @@ class BindingTests(unittest.TestCase):
     MANIFEST_PATH = SOURCE / "mapping-manifest-v2.json"
 
     def setUp(self):
-        self.receipt = json.loads(RECEIPT_V2.read_text())
+        self.receipt = _rebound_to_current_harness(json.loads(RECEIPT_V2.read_text()))
 
     def test_bind_accepts_the_files_the_receipt_recorded(self):
         limits, manifest = COMPARE.bind(self.receipt, SOURCE / "tolerances.json", self.MANIFEST_PATH)
@@ -1058,7 +1073,7 @@ def _pair(ref, quantity, close, ts):
         leg["engine_final"] = dict(view, status="FILLED" if filled else "CANCELED",
                                    filled_qty=str(abs(quantity)) if filled else "0")
     return {"order_ref": ref, "order_list_id": "OL-%d" % ref, "reference_close": str(close),
-            "submitted_ts_event_ns": ts * 10 ** 9, "legs": legs}
+            "submitted_ts_event_ns": ts * 10 ** 9, "submitted_clock_ns": ts * 10 ** 9, "legs": legs}
 
 
 def _events(ref, decision_ts, fill_ts, fill_px, quantity, filled="STOP"):
@@ -1094,8 +1109,9 @@ def _v2_receipt(**overrides):
     receipt["order_events"] = (_events(1, ENTRY_INTENT_TS, ENTRY_FILL_TS, "323.5800", 304)
                                + _events(2, EXIT_INTENT_TS, EXIT_FILL_TS, "291.6900", -304))
     scan = {"lines": 227, "error_lines": 0, "negative_cash_lines": 0}
-    receipt["runs"] = [{"label": "run-1", "strategy_callback_errors": [], "engine_log_scan": scan},
-                       {"label": "run-2", "strategy_callback_errors": [], "engine_log_scan": scan}]
+    receipt["runs"] = [{"label": label, "strategy_callback_errors": [], "engine_log_scan": scan,
+                        "normalized_economic_sha256": "e" * 64} for label in ("run-1", "run-2")]
+    receipt["two_run_determinism"] = {"undeclared_differing_fields": []}
     emissions = [{"ex_date": "2019-12-20", "ex_instant_ns": DIVIDEND_ZERO_TS * 10 ** 9,
                   "ts_now_ns": DIVIDEND_ZERO_TS * 10 ** 9, "on_time": True, "eligible_quantity": 0,
                   "per_share": "1.57", "amount": "0.00"},
@@ -1121,12 +1137,22 @@ def _v2_receipt(**overrides):
                          "extension_sha256": dict(MANIFEST_V2["engine"]["extension_sha256"])}
     receipt["isolation"] = {"network_interfaces": [[1, "lo"]],
                             "environment_names": sorted(COMPARE.ISOLATED_ENVIRONMENT),
-                            "read_only": {"harness_source": True, "data_root": True}}
+                            "environment_values": dict(COMPARE.ISOLATED_ENVIRONMENT_VALUES),
+                            "python_flags_isolated": 1,
+                            "read_only": {"harness_source": True, "data_root": True,
+                                          "python_prefix": True},
+                            # As observed in a bwrap --unshare-all sandbox on this host.
+                            "namespaces": {"uid_map": "      1000          0          1\n",
+                                           "pid": 2, "pid1_comm": "bwrap"}}
     receipt["local_source_sha256"] = dict(SYNTHETIC_REVIEW["reviewed_local_source_sha256"])
     receipt["started_utc"] = "2026-09-23T06:00:00+00:00"
     receipt["preconditions"] = {
         "review": {"path": "synthetic/review.json", "sha256": SYNTHETIC_REVIEW_SHA256},
-        "prior_v2_replays": {"replays": [{"id": "earlier", "reviewed_before_run": False}]}}
+        "deviation_acceptance": {"path": ACCEPTANCE_PATH, "sha256": SYNTHETIC_ACCEPTANCE_SHA256},
+        "prior_v2_replays": {"sha256": SYNTHETIC_HISTORY_SHA256,
+                             "replays": [dict(r) for r in SYNTHETIC_HISTORY["replays"]]}}
+    receipt["preregistration_deviations"] = [{"id": "review_before_first_run"},
+                                             {"id": COMPARE.ACCEPTED_DEVIATION}]
     receipt.update(overrides)
     return receipt
 
@@ -1136,8 +1162,32 @@ SYNTHETIC_REVIEW = {"schema": COMPARE.REVIEW_RECORD_SCHEMA, "reviewer": "synthet
                     "reviewed_local_source_sha256": {f: "a" * 64 for f in COMPARE.REVIEWED_HARNESS_FILES},
                     "unresolved_findings": 0}
 SYNTHETIC_REVIEW_SHA256 = "b" * 64
+# Synthetic stand-in for the gate owner's acceptance; the real file is never
+# written by the harness or these tests.
+ACCEPTANCE_PATH = "blueprints/us-equities/engine-nautilus/spy-parity/" + COMPARE.DEVIATION_ACCEPTANCE
+SYNTHETIC_ACCEPTANCE = {"schema_version": 1, "deviation_id": "first_v2_run_preceded_review",
+                        "accepted_by": "synthetic gate owner",
+                        "accepted_utc": "2026-09-23T05:30:00+00:00",
+                        "reviewed_harness_local_source_sha256":
+                            dict(SYNTHETIC_REVIEW["reviewed_local_source_sha256"]),
+                        "statement": "synthetic acceptance for tests"}
+SYNTHETIC_ACCEPTANCE_SHA256 = "f" * 64
+SYNTHETIC_HISTORY = {"schema": "spy-parity-v2-replay-history/1",
+                     "replays": [{"id": "earlier", "reviewed_before_run": False}]}
+SYNTHETIC_HISTORY_SHA256 = "9" * 64
 MET_PRECONDITIONS = {"inputs_rehashed_at_comparison": True,
-                     "review_record": {"sha256": SYNTHETIC_REVIEW_SHA256, "content": SYNTHETIC_REVIEW}}
+                     "review_record": {"sha256": SYNTHETIC_REVIEW_SHA256, "content": SYNTHETIC_REVIEW},
+                     "deviation_acceptance": {"sha256": SYNTHETIC_ACCEPTANCE_SHA256,
+                                              "content": SYNTHETIC_ACCEPTANCE},
+                     "replay_history": {"sha256": SYNTHETIC_HISTORY_SHA256,
+                                        "content": SYNTHETIC_HISTORY}}
+
+
+def _context(**changes):
+    """MET_PRECONDITIONS with deep-copied records and the given keys replaced."""
+    context = json.loads(json.dumps(MET_PRECONDITIONS))
+    context.update(changes)
+    return context
 
 
 def _v2(receipt, bars=V2_BARS, manifest=EFFECTIVE_V2, preconditions=MET_PRECONDITIONS):
@@ -1171,10 +1221,12 @@ class V2ControlTests(unittest.TestCase):
         self.assertEqual(verdict["blocking_mappings"], [])
         self.assertIn("market_on_open_proxy", verdict["rejected_attributions"])
 
-    def test_missing_bars_leave_the_v2_comparison_incomplete(self):
+    def test_missing_bars_fail_the_v2_comparison(self):
+        """PREREGISTRATION-v2.md lists any skipped check as a falsifier: FAIL, not incomplete."""
         verdict = _v2(_v2_receipt(), bars=None)
         self.assertEqual(verdict["failed"], 0)
-        self.assertEqual(verdict["verdict"], "BLOCKED-INCOMPLETE")
+        self.assertTrue(verdict["skipped"])
+        self.assertEqual(verdict["verdict"], "FAIL")
         self.assertFalse(verdict["complete"])
 
 
@@ -1418,6 +1470,10 @@ class V2PreconditionTests(unittest.TestCase):
         self.assertTrue(verdict["preregistration_qualifying"])
         self.assertTrue(all(status == "PASS" for status in verdict["preconditions"].values()))
         self.assertEqual(verdict["prior_v2_replays"], 1)
+        self.assertEqual(verdict["prior_v2_replays_reviewed_before_run"], 0)
+        self.assertTrue(verdict["deviation_acceptance_recorded"])
+        self.assertIn(COMPARE.ACCEPTED_DEVIATION, verdict["preregistration_deviations"])
+        self.assertEqual(verdict["verdict"], "PASS")
 
     def test_a_run_with_no_review_record_fails_even_when_execution_passes(self):
         receipt = _v2_receipt()
@@ -1458,11 +1514,11 @@ class V2PreconditionTests(unittest.TestCase):
                 self.assertIn(("precondition_review", "record_sha256_at_comparison"),
                               _failing_fields(verdict))
 
-    def test_bars_mode_cannot_rehash_inputs_so_the_comparison_is_incomplete(self):
+    def test_bars_mode_cannot_rehash_inputs_so_the_comparison_fails(self):
         context = dict(MET_PRECONDITIONS, inputs_rehashed_at_comparison=False)
         verdict = _v2(_v2_receipt(), preconditions=context)
         self.assertEqual(verdict["failed"], 0)
-        self.assertEqual(verdict["verdict"], "BLOCKED-INCOMPLETE")
+        self.assertEqual(verdict["verdict"], "FAIL")
         self.assertFalse(verdict["preregistration_qualifying"])
 
     def test_inputs_engine_and_isolation_are_checked(self):
@@ -1529,9 +1585,15 @@ class V2RunnerRecordTests(unittest.TestCase):
         history = RUN.load_replay_history()
         ids = [r["id"] for r in history["replays"]]
         for expected in ("dev1-dev5", "dev9", "late-emission-experiment", "bwrap-db8bad7",
-                         "bwrap-8c4d7e7"):
+                         "bwrap-8c4d7e7", "bwrap-f079f6c"):
             self.assertIn(expected, ids)
         self.assertFalse(any(r["reviewed_before_run"] for r in history["replays"]))
+        # Every replay from f079f6c (the harness the pre-run review changed) is superseded.
+        from_f079f6c = [r for r in history["replays"] if "f079f6c" in r["harness"]]
+        self.assertTrue(from_f079f6c)
+        self.assertTrue(all(r["status"].startswith("superseded") for r in from_f079f6c))
+        self.assertEqual(history["sha256"], hashlib.sha256((SOURCE / RUN.REPLAY_HISTORY).read_bytes())
+                         .hexdigest())
 
     def test_engine_order_view_refuses_a_missing_field_and_attaches_per_leg(self):
         snapshot = {field: None for field in FIXTURE.ENGINE_ORDER_FIELDS}
@@ -1567,7 +1629,19 @@ class V2PublishedResultTests(unittest.TestCase):
                          hashlib.sha256((SOURCE / "PREREGISTRATION-v2.md").read_bytes()).hexdigest())
         self.assertEqual(self.receipt["tolerances"]["sha256"], MANIFEST_V2["tolerances"]["sha256"])
         self.assertEqual(self.receipt["unsupported_mappings"], [])
-        COMPARE.check_local_sources(self.receipt)
+
+    # The published receipt ran the f079f6c harness; the 2026-09-23 pre-run
+    # review round changed exactly these files, so the receipt is superseded.
+    CHANGED_SINCE_PUBLISHED_RUN = {"compare.py", "run.py"}
+
+    def test_published_receipt_is_superseded_only_by_the_review_fix_files(self):
+        changed = {name for name, recorded in self.receipt["local_source_sha256"].items()
+                   if hashlib.sha256((SOURCE / name).read_bytes()).hexdigest() != recorded}
+        self.assertEqual(changed, self.CHANGED_SINCE_PUBLISHED_RUN)
+        entry = next(r for r in RUN.load_replay_history()["replays"] if r["id"] == "bwrap-f079f6c")
+        self.assertTrue(entry["status"].startswith("superseded"))
+        self.assertEqual(entry["harness_local_source_sha256"],
+                         {f: self.receipt["local_source_sha256"][f] for f in RUN.REVIEWED_HARNESS_FILES})
 
     def test_published_v2_receipt_reconciles_without_bars(self):
         oracle = COMPARE.oracle_case(json.loads(LEAN_RECEIPT.read_text()), self.receipt["case"])
@@ -1581,9 +1655,12 @@ class V2PublishedResultTests(unittest.TestCase):
                 self.assertEqual(published[check["key"]], "PASS", check["key"])
 
     def test_receipt_carries_the_declared_deviations(self):
-        self.assertEqual(self.receipt["preregistration_deviations"], RUN.PREREGISTRATION_DEVIATIONS)
-        self.assertIn("review_before_first_run",
-                      [d["id"] for d in self.receipt["preregistration_deviations"]])
+        recorded = [d["id"] for d in self.receipt["preregistration_deviations"]]
+        current = [d["id"] for d in RUN.PREREGISTRATION_DEVIATIONS]
+        self.assertIn("review_before_first_run", recorded)
+        # The review-fix round only added a deviation; none was withdrawn.
+        self.assertEqual([i for i in current if i in recorded], recorded)
+        self.assertEqual(sorted(set(current) - set(recorded)), ["isolation_partially_observed"])
 
     def test_receipt_lists_every_earlier_replay(self):
         recorded = self.receipt["preconditions"]["prior_v2_replays"]["replays"]
@@ -1610,6 +1687,371 @@ class V2PublishedResultTests(unittest.TestCase):
             self.assertFalse(self.verdict["preregistration_qualifying"])
             self.assertIn("precondition_review.retained_record_before_run",
                           [k.split("#")[0] for k in self.verdict["unattributed_failures"]])
+
+
+class V2DeviationAcceptanceTests(unittest.TestCase):
+    """precondition_review: earlier unreviewed replays need the gate owner's acceptance."""
+
+    def _verdict(self, receipt=None, **context):
+        return _v2(receipt or _v2_receipt(), preconditions=_context(**context))
+
+    def test_present_valid_acceptance_qualifies(self):
+        verdict = self._verdict()
+        self.assertEqual(_failing_fields(verdict), set())
+        self.assertTrue(verdict["preregistration_qualifying"])
+        self.assertEqual(verdict["verdict"], "PASS")
+
+    def test_absent_acceptance_fails_while_an_earlier_replay_was_unreviewed(self):
+        receipt = _v2_receipt()
+        receipt["preconditions"]["deviation_acceptance"] = None
+        verdict = self._verdict(receipt, deviation_acceptance=None)
+        self.assertEqual(_failing_fields(verdict),
+                         {("precondition_review", "deviation_acceptance_before_run")})
+        self.assertEqual(verdict["verdict"], "FAIL")
+        self.assertFalse(verdict["preregistration_qualifying"])
+        self.assertEqual(verdict["execution_checks"]["fail"], 0)
+        self.assertFalse(verdict["deviation_acceptance_recorded"])
+
+    def test_an_acceptance_absent_at_run_time_but_present_later_does_not_count(self):
+        receipt = _v2_receipt()
+        receipt["preconditions"]["deviation_acceptance"] = None
+        verdict = self._verdict(receipt)
+        self.assertIn(("precondition_review", "deviation_acceptance_before_run"),
+                      _failing_fields(verdict))
+
+    def test_no_acceptance_is_needed_when_every_earlier_replay_was_reviewed(self):
+        receipt = _v2_receipt()
+        receipt["preconditions"]["deviation_acceptance"] = None
+        receipt["preconditions"]["prior_v2_replays"]["replays"][0]["reviewed_before_run"] = True
+        history = {"schema": SYNTHETIC_HISTORY["schema"],
+                   "replays": receipt["preconditions"]["prior_v2_replays"]["replays"]}
+        verdict = self._verdict(receipt, deviation_acceptance=None,
+                                replay_history={"sha256": SYNTHETIC_HISTORY_SHA256, "content": history})
+        self.assertEqual(_failing_fields(verdict), set())
+        self.assertTrue(verdict["preregistration_qualifying"])
+
+    def test_wrong_hash_acceptance_fails(self):
+        wrong = dict(SYNTHETIC_ACCEPTANCE, reviewed_harness_local_source_sha256=dict(
+            SYNTHETIC_ACCEPTANCE["reviewed_harness_local_source_sha256"], **{"run.py": "c" * 64}))
+        verdict = self._verdict(deviation_acceptance={"sha256": SYNTHETIC_ACCEPTANCE_SHA256,
+                                                      "content": wrong})
+        self.assertEqual(_failing_fields(verdict), {
+            ("precondition_review", "deviation_acceptance.reviewed_harness_is_the_harness_that_ran")})
+        self.assertFalse(verdict["preregistration_qualifying"])
+        # The file changed since the run recorded it: its content is not read at all.
+        verdict = self._verdict(deviation_acceptance={"sha256": "d" * 64, "content": SYNTHETIC_ACCEPTANCE})
+        self.assertEqual(_failing_fields(verdict), {
+            ("precondition_review", "deviation_acceptance.sha256_at_comparison"),
+            ("precondition_review", "deviation_acceptance.content")})
+
+    def test_late_dated_acceptance_fails(self):
+        for stamp in ("2026-09-23T06:00:00+00:00", "2026-09-23T07:00:00+00:00",
+                      "2026-09-23T05:30:00", "not a date"):
+            with self.subTest(accepted_utc=stamp):
+                late = dict(SYNTHETIC_ACCEPTANCE, accepted_utc=stamp)
+                verdict = self._verdict(deviation_acceptance={"sha256": SYNTHETIC_ACCEPTANCE_SHA256,
+                                                              "content": late})
+                self.assertEqual(_failing_fields(verdict), {
+                    ("precondition_review", "deviation_acceptance.accepted_before_run_started")})
+                self.assertEqual(verdict["verdict"], "FAIL")
+
+    def test_acceptance_schema_identity_and_declaration(self):
+        cases = {
+            "deviation_acceptance.deviation_id": dict(SYNTHETIC_ACCEPTANCE, deviation_id="other"),
+            "deviation_acceptance.schema_version": dict(SYNTHETIC_ACCEPTANCE, schema_version=2),
+            "deviation_acceptance.accepted_by": dict(SYNTHETIC_ACCEPTANCE, accepted_by=" "),
+            "deviation_acceptance.statement": dict(SYNTHETIC_ACCEPTANCE, statement=None),
+            "deviation_acceptance.fields": dict(SYNTHETIC_ACCEPTANCE, extra="x"),
+        }
+        for field, content in cases.items():
+            with self.subTest(field=field):
+                verdict = self._verdict(deviation_acceptance={"sha256": SYNTHETIC_ACCEPTANCE_SHA256,
+                                                              "content": content})
+                self.assertIn(("precondition_review", field), _failing_fields(verdict))
+        receipt = _v2_receipt(preregistration_deviations=[{"id": "review_before_first_run"}])
+        self.assertIn(("precondition_review", "deviation_acceptance.deviation_declared_in_receipt"),
+                      _failing_fields(self._verdict(receipt)))
+        receipt = _v2_receipt()
+        receipt["preconditions"]["deviation_acceptance"]["path"] = "elsewhere.json"
+        self.assertIn(("precondition_review", "deviation_acceptance.path"),
+                      _failing_fields(self._verdict(receipt)))
+
+    def test_the_harness_does_not_ship_an_acceptance(self):
+        self.assertFalse((SOURCE / COMPARE.DEVIATION_ACCEPTANCE).exists())
+        self.assertIsNone(RUN.load_deviation_acceptance())
+        self.assertEqual(COMPARE.DEVIATION_ACCEPTANCE_FIELDS, RUN.DEVIATION_ACCEPTANCE_FIELDS)
+        self.assertEqual(COMPARE.REPLAY_HISTORY, RUN.REPLAY_HISTORY)
+        self.assertIn(COMPARE.ACCEPTED_DEVIATION, [d["id"] for d in RUN.PREREGISTRATION_DEVIATIONS])
+
+
+class V2ReplayHistoryTests(unittest.TestCase):
+    """The replay history is re-hashed at comparison time and may only grow."""
+
+    def test_an_appended_replay_is_accepted_and_an_edit_or_omission_fails(self):
+        grown = {"schema": SYNTHETIC_HISTORY["schema"],
+                 "replays": SYNTHETIC_HISTORY["replays"] + [{"id": "this-run", "reviewed_before_run": True}]}
+        verdict = _v2(_v2_receipt(), preconditions=_context(
+            replay_history={"sha256": "8" * 64, "content": grown}))
+        self.assertEqual(_failing_fields(verdict), set())
+        for label, record in (
+                ("edited", {"sha256": "8" * 64, "content": {"replays": [{"id": "earlier",
+                                                                         "reviewed_before_run": True}]}}),
+                ("omitted", {"sha256": "8" * 64, "content": {"replays": []}}),
+                ("rewritten_same_length", {"sha256": "8" * 64, "content": SYNTHETIC_HISTORY}),
+                ("missing", None)):
+            with self.subTest(label=label):
+                verdict = _v2(_v2_receipt(), preconditions=_context(replay_history=record))
+                self.assertIn(("precondition_review", "replay_history_at_comparison"),
+                              _failing_fields(verdict))
+
+    def test_a_receipt_without_the_history_fails(self):
+        receipt = _v2_receipt()
+        del receipt["preconditions"]["prior_v2_replays"]
+        self.assertIn(("precondition_review", "prior_v2_replays_recorded"),
+                      _failing_fields(_v2(receipt)))
+
+    def test_a_run_of_a_harness_an_earlier_replay_already_ran_fails(self):
+        receipt = _v2_receipt()
+        replay = receipt["preconditions"]["prior_v2_replays"]["replays"][0]
+        replay["harness_local_source_sha256"] = dict(SYNTHETIC_REVIEW["reviewed_local_source_sha256"])
+        history = {"replays": receipt["preconditions"]["prior_v2_replays"]["replays"]}
+        verdict = _v2(receipt, preconditions=_context(
+            replay_history={"sha256": SYNTHETIC_HISTORY_SHA256, "content": history}))
+        self.assertEqual(_failing_fields(verdict),
+                         {("precondition_review", "no_prior_replay_ran_the_reviewed_harness")})
+
+    def test_precondition_context_reads_the_history_and_the_recorded_acceptance_path(self):
+        receipt = _v2_receipt()
+        receipt["preconditions"]["deviation_acceptance"] = None
+        context = COMPARE.precondition_context(receipt, EFFECTIVE_V2, None, Path("/data"))
+        self.assertTrue(context["inputs_rehashed_at_comparison"])
+        self.assertIsNone(context["deviation_acceptance"])
+        self.assertEqual(context["replay_history"]["sha256"],
+                         hashlib.sha256((SOURCE / COMPARE.REPLAY_HISTORY).read_bytes()).hexdigest())
+        self.assertEqual(context["replay_history"]["content"]["schema"], RUN.REPLAY_HISTORY_SCHEMA)
+
+
+class V2SubmissionInstantTests(unittest.TestCase):
+    """The submission instant is judged from the engine clock and the engine's events."""
+
+    def test_the_probe_observed_acceptance_at_the_decision_bar(self):
+        base, step = 1_600_000_000_000_000_000, 3_600_000_000_000
+        seen = 0
+        for path in sorted((SOURCE / "probes/v2").glob("probe_oco_moo_p4-*.observed.json")):
+            for result in json.loads(path.read_text())["observed_stdout"]["results"]:
+                for event in result["events"]:
+                    if event["event"] == "OrderAccepted" and event["order"] in ("stop", "mit"):
+                        seen += 1
+                        self.assertEqual(event["ts_event"], base + step, path.name)
+        self.assertEqual(seen, 96)
+
+    def test_a_later_submission_that_keeps_the_decision_row_stamp_fails(self):
+        receipt = _v2_receipt()
+        later = (ENTRY_INTENT_TS + 60) * 10 ** 9
+        pair = receipt["oco_pairs"][0]
+        self.assertEqual(pair["submitted_ts_event_ns"], ENTRY_INTENT_TS * 10 ** 9)
+        pair["submitted_clock_ns"] = later
+        for event in receipt["order_events"]:
+            if event["client_order_id"].startswith("O-1-") and event["event"] in (
+                    "OrderSubmitted", "OrderAccepted"):
+                event["ts_event_ns"] = later
+        self.assertEqual(_failing_fields(_v2(receipt)), {
+            ("entry_oco", "submitted_clock_ns"), ("entry_oco", "legs_submitted_at_decision_ts"),
+            ("entry_oco", "legs_accepted_at_decision_ts")})
+
+    def test_one_late_leg_or_a_missing_clock_fails(self):
+        receipt = _v2_receipt()
+        receipt["order_events"][13]["ts_event_ns"] += 1  # O-2-MIT OrderAccepted
+        self.assertEqual((receipt["order_events"][13]["client_order_id"],
+                          receipt["order_events"][13]["event"]), ("O-2-MIT", "OrderAccepted"))
+        self.assertEqual(_failing_fields(_v2(receipt)), {("exit_oco", "legs_accepted_at_decision_ts")})
+        receipt = _v2_receipt()
+        del receipt["oco_pairs"][1]["submitted_clock_ns"]
+        self.assertEqual(_failing_fields(_v2(receipt)), {("exit_oco", "submitted_clock_ns")})
+
+
+def _swap_filled_leg(receipt, pair_index, ref):
+    """Make the MIT leg the filled one (events and engine_final), keeping price and instant."""
+    for event in receipt["order_events"]:
+        if event.get("client_order_id") == "O-%d-STOP" % ref and event["event"] == "OrderFilled":
+            event["client_order_id"] = "O-%d-MIT" % ref
+        elif event.get("client_order_id") == "O-%d-MIT" % ref and event["event"] == "OrderCanceled":
+            event["client_order_id"] = "O-%d-STOP" % ref
+    legs = receipt["oco_pairs"][pair_index]["legs"]
+    legs[0]["engine_final"], legs[1]["engine_final"] = (
+        dict(legs[0]["engine_final"], status="CANCELED", filled_qty="0"),
+        dict(legs[1]["engine_final"], status="FILLED", filled_qty=legs[1]["engine_final"]["quantity"]))
+
+
+class V2FilledLegTests(unittest.TestCase):
+    """mechanism_rules.fill_rule_by_open names the leg that fills at the open."""
+
+    def test_rule_table(self):
+        close = Decimal("100.0000")
+        cases = {(304, "100.0001"): "STOP_MARKET", (304, "99.9999"): "MARKET_IF_TOUCHED",
+                 (-304, "99.9999"): "STOP_MARKET", (-304, "100.0001"): "MARKET_IF_TOUCHED",
+                 (304, "100.0000"): None, (-304, "100.0000"): None}
+        for (quantity, tested_open), wanted in cases.items():
+            with self.subTest(quantity=quantity, open=tested_open):
+                self.assertEqual(COMPARE.expected_filled_leg(quantity, close, Decimal(tested_open)),
+                                 wanted)
+
+    def test_the_mit_leg_filling_a_buy_on_a_gap_up_fails(self):
+        receipt = _v2_receipt()
+        _swap_filled_leg(receipt, 0, 1)
+        verdict = _v2(receipt)
+        self.assertEqual(_failing_fields(verdict), {("entry_oco", "filled_leg_by_open_rule")})
+        self.assertEqual(_check(verdict, "entry_oco", "filled_leg_by_open_rule")["observed"],
+                         "MARKET_IF_TOUCHED")
+        self.assertEqual(verdict["verdict"], "FAIL")
+
+    def test_the_mit_leg_filling_a_sell_on_a_gap_down_fails(self):
+        receipt = _v2_receipt()
+        _swap_filled_leg(receipt, 1, 2)
+        self.assertEqual(_failing_fields(_v2(receipt)), {("exit_oco", "filled_leg_by_open_rule")})
+
+    def test_the_published_receipt_filled_the_stop_leg_both_times(self):
+        receipt = json.loads(RECEIPT_V2.read_text())
+        fills = [e for e in receipt["order_events"] if e["event"] == "OrderFilled"]
+        self.assertEqual([f["client_order_id"] for f in fills], ["O-1-STOP", "O-2-STOP"])
+
+
+class V2OrderStreamUniquenessTests(unittest.TestCase):
+    """One pair per intent, four distinct legs, and nothing else in the order stream."""
+
+    def test_duplicate_order_ref_fails(self):
+        receipt = _v2_receipt()
+        receipt["oco_pairs"][1]["order_ref"] = 1
+        self.assertIn(("oco_pairs", "order_refs_unique_and_equal_to_intents"),
+                      _failing_fields(_v2(receipt)))
+
+    def test_duplicate_leg_ids_fail(self):
+        receipt = _v2_receipt()
+        receipt["oco_pairs"][1]["legs"][0]["client_order_id"] = "O-1-STOP"
+        self.assertIn(("oco_orders", "distinct_client_order_ids"), _failing_fields(_v2(receipt)))
+
+    def test_an_order_outside_the_pairs_fails_and_its_denial_counts(self):
+        receipt = _v2_receipt()
+        receipt["order_events"].append({"event": "OrderDenied", "client_order_id": "O-9-EXTRA",
+                                        "ts_event_ns": ENTRY_INTENT_TS * 10 ** 9, "reason": "x"})
+        self.assertEqual(_failing_fields(_v2(receipt)), {
+            ("order_events", "client_order_ids_beyond_the_legs"),
+            ("order_events", "denied_or_rejected")})
+
+    def test_non_integral_final_quantity_is_refused_not_truncated(self):
+        with self.assertRaisesRegex(ValueError, "non_integral_final_quantity:0.5"):
+            _v2(_v2_receipt(final_quantity="0.5"))
+
+
+class V2DeterminismTests(unittest.TestCase):
+    """Two-run determinism is recomputed from the runs, not read from the boolean."""
+
+    def test_recomputed_from_the_runs(self):
+        cases = {
+            "hashes_differ": lambda r: r["runs"][1].update(normalized_economic_sha256="d" * 64),
+            "boolean_disagrees": lambda r: r.update(two_run_records_equal=False),
+            "undeclared_field": lambda r: r["two_run_determinism"].update(
+                undeclared_differing_fields=["fills[0].price"]),
+            "no_determinism_record": lambda r: r.pop("two_run_determinism"),
+            "three_runs": lambda r: r["runs"].append(dict(r["runs"][0], label="run-3")),
+            "malformed_hash": lambda r: [run.update(normalized_economic_sha256="x") for run in r["runs"]],
+        }
+        for label, mutate in cases.items():
+            with self.subTest(case=label):
+                receipt = _v2_receipt()
+                mutate(receipt)
+                self.assertIn(("two_run_determinism", "normalized_economic_sha256"),
+                              _failing_fields(_v2(receipt)))
+
+    def test_published_receipt_is_deterministic_by_recomputation(self):
+        ok, detail = COMPARE.v2_determinism(json.loads(RECEIPT_V2.read_text()))
+        self.assertTrue(ok, detail)
+
+    def test_normalize_replaces_only_validated_generated_ids(self):
+        # Generated at test time: the publication scan refuses literal UUIDs.
+        first, second = str(uuid.uuid4()), str(uuid.uuid4())
+        record = {"fills": [{"init_id": first, "client_order_id": "O-1-STOP", "trade_id": second},
+                            {"init_id": second, "event_id": first}],
+                  "positions": [{"events": [{"event_id": first}]}]}
+        counters = {}
+        out = RUN.normalize(record, counters)
+        self.assertEqual(out["fills"][0], {"init_id": "init_id#1", "client_order_id": "O-1-STOP",
+                                           "trade_id": second})
+        self.assertEqual(out["fills"][1], {"init_id": "init_id#2", "event_id": "event_id#1"})
+        self.assertEqual(out["positions"][0]["events"][0]["event_id"], "event_id#1")
+        self.assertEqual(RUN.APPLIED_ID_FIELDS, ("init_id", "event_id"))
+        for bad in ("not-a-uuid", first[:14] + "1" + first[15:], first.upper()):
+            with self.subTest(value=bad), self.assertRaisesRegex(ValueError,
+                                                                 "unexpected_generated_id_format:init_id"):
+                RUN.normalize({"init_id": bad}, {})
+        self.assertEqual(RUN.normalize({"init_id": None, "price": "1.00"}, {}),
+                         {"init_id": None, "price": "1.00"})
+
+    def test_field_differences_and_the_undeclared_excusal(self):
+        left = {"fills": [{"init_id": "a", "price": "1"}], "positions": [{"events": [{"event_id": "x"}]}],
+                "rows": [1, 2]}
+        right = {"fills": [{"init_id": "b", "price": "2"}], "positions": [{"events": [{"event_id": "y"}]}],
+                 "rows": [1], "extra": 1}
+        found = RUN.field_differences(left, right)
+        self.assertEqual(found, ["extra", "fills[0].init_id", "fills[0].price",
+                                 "positions[0].events[0].event_id", "rows[len]"])
+        self.assertEqual(RUN.undeclared_differences(found), ["extra", "fills[0].price", "rows[len]"])
+        self.assertEqual(RUN.field_differences({"a": [1]}, {"a": [1]}), [])
+        published = json.loads(RECEIPT_V2.read_text())["two_run_determinism"]
+        self.assertEqual(RUN.undeclared_differences(published["raw_field_paths_differing"]),
+                         published["undeclared_differing_fields"])
+
+
+class V2VerdictRuleTests(unittest.TestCase):
+    def test_a_correct_fill_on_an_open_equal_close_bar_raises_no_attribution(self):
+        bars = [dict(b) for b in V2_BARS]
+        bars[1].update(c="323.5800")
+        verdict = _v2(_v2_receipt(), bars)
+        self.assertEqual(verdict["rejected_attributions"], [])
+        self.assertEqual(verdict["verdict"], "PASS")
+
+    def test_isolation_evidence_is_checked(self):
+        cases = {
+            "python_isolated_flag": lambda i: i.update(python_flags_isolated=0),
+            "read_only_mounts": lambda i: i["read_only"].update(python_prefix=False),
+            "user_namespace": lambda i: i["namespaces"].update(uid_map="0 0 4294967295\n"),
+            "pid_namespace_pid1": lambda i: i["namespaces"].update(pid1_comm="systemd"),
+            "environment_values": lambda i: i["environment_values"].update(PATH="/opt/x/bin:/usr/bin"),
+        }
+        for field, mutate in cases.items():
+            with self.subTest(field=field):
+                receipt = _v2_receipt()
+                mutate(receipt["isolation"])
+                self.assertEqual(_failing_fields(_v2(receipt)), {("precondition_engine", field)})
+        receipt = _v2_receipt()
+        del receipt["isolation"]["namespaces"]
+        self.assertIn(("precondition_engine", "user_namespace"), _failing_fields(_v2(receipt)))
+
+    def test_runner_isolation_record_holds_no_undocumented_value(self):
+        """Only documented values are recorded, so an unisolated run leaks no personal path."""
+        self.assertEqual(RUN.ISOLATED_ENVIRONMENT_VALUES, COMPARE.ISOLATED_ENVIRONMENT_VALUES)
+        record = RUN.isolation_evidence(SOURCE)
+        self.assertEqual(set(record["read_only"]), {"harness_source", "data_root", "python_prefix"})
+        self.assertNotIn("python_prefix_path", record)
+        for name, value in record["environment_values"].items():
+            self.assertIn(value, (RUN.ISOLATED_ENVIRONMENT_VALUES[name], RUN.UNDOCUMENTED_VALUE))
+        self.assertIn("uid_map", record["namespaces"])
+        self.assertIsInstance(record["python_flags_isolated"], int)
+
+    def test_sizing_limitation_is_derived_from_the_intents(self):
+        receipt = json.loads(RECEIPT_V2.read_text())
+        text = RUN.sizing_limitation(receipt["intents"], receipt["distribution_ledger"])
+        self.assertIn("exit intent records decision_equity 90767.5200", text)
+        self.assertIn("leaves out 428.64", text)
+        self.assertIn("(91196.1600 with them)", text)
+        self.assertIn("quantities are unaffected", text)
+        self.assertNotIn("entry intent", text)
+        # A nonzero-target intent after a posted distribution is named as under-sized.
+        intents = [dict(receipt["intents"][1], reason="rebalance", target="1", quantity=10)]
+        self.assertIn("under-sized: rebalance",
+                      RUN.sizing_limitation(intents, receipt["distribution_ledger"]))
+        self.assertIn("no intent of this run follows",
+                      RUN.sizing_limitation(receipt["intents"][:1], receipt["distribution_ledger"]))
 
 if __name__ == "__main__":
     unittest.main()

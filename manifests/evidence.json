@@ -6114,13 +6114,13 @@
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/README.md",
-      "sha256": "a2968f01d9132fec8c6536ab44ade9c2e517e997eca8650f9ad3b80fcd8ae042",
-      "bytes": 10546
+      "sha256": "b602088d17c274cc68ae0d0b3fa91915bd4fe80e430e6ecce437f5d12a982af2",
+      "bytes": 11838
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/compare.py",
-      "sha256": "598bffafe5ae875fb97a95d2a5234bf713ccbac6d3e33b01e94d1eb1f656e74b",
-      "bytes": 53191
+      "sha256": "c70386f869e45bcdc54602100991235a450d2a5854445d98ffe45b849454a5ec",
+      "bytes": 67588
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/convert.py",
@@ -6174,8 +6174,8 @@
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/run.py",
-      "sha256": "b2c0cf6e704779053babb6e62ed5ace0c16ea00df79a54d34ec8f04cc499aac4",
-      "bytes": 44770
+      "sha256": "c3917c2f6446ffb1bcfe411cc2339ffc1f804a87904ed3a1f1a67e51817ad2f2",
+      "bytes": 51307
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/tolerances.json",
@@ -11984,8 +11984,8 @@
     },
     {
       "path": "tests/test_spy_parity.py",
-      "sha256": "cb61ef1101488abb6d1788d36234230d788c5d98e46853f3290ddd3f38fc6cb3",
-      "bytes": 92414
+      "sha256": "42ed094f038422f17d2ecf23f5448577e84bf3a93772eb19a00a51c15adbda0c",
+      "bytes": 118805
     },
     {
       "path": "tests/test_stack_lifecycle.py",
@@ -13499,8 +13499,8 @@
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/replay-history-v2.json",
-      "sha256": "6f14792485c02e586bd9ca06c1a19fa597f292a355a64afd33e5e36114637f5b",
-      "bytes": 5038
+      "sha256": "b5fc00f9f381b2cf458e2e0620e27a1194df18b79ad7b98eb39abaafdc905c2d",
+      "bytes": 5975
     }
   ],
   "convergence_records": [
