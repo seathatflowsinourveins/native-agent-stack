@@ -3199,8 +3199,8 @@
     },
     {
       "path": "adoption/manifest.json",
-      "sha256": "2bbb4408db54578c8e0c73371de48b37564fd7511928472bc7ea9a1516b344e9",
-      "bytes": 18281
+      "sha256": "0a026357bcb877635e0d6d5c46d8782c3caf68462b70c3e1c759c36cd2995813",
+      "bytes": 18283
     },
     {
       "path": "adoption/paired/README.md",
