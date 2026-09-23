@@ -1401,6 +1401,48 @@ class LaunchdAgentsScriptBehaviorTests(unittest.TestCase):
                     self.assertEqual(retry.returncode, 0, retry.stdout + retry.stderr)
                     self.assertFalse(dest_plist.exists())
 
+    def test_canonical_plist_path_resolves_symlinks_but_never_hard_links(self):
+        # Round 3i follow-up (Codex Medium): only the parent directory was
+        # resolved, so a symlinked plist leaf reported by launchctl under its
+        # resolved target compared as loaded_elsewhere. The leaf must follow
+        # symlinks (relative and absolute, chained), a hard link must stay a
+        # distinct path, and a symlink loop must terminate.
+        func = _shell_functions(SCRIPT_PATH.read_text(encoding="utf-8"), "canonical_plist_path")
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            real_dir = tmp_path / "real"
+            real_dir.mkdir()
+            agents = tmp_path / "agents"
+            agents.mkdir()
+            real = real_dir / "com.native-stack.qdrant.plist"
+            real.write_text("<plist/>")
+            absolute_link = agents / "abs.plist"
+            absolute_link.symlink_to(real)
+            relative_link = agents / "rel.plist"
+            relative_link.symlink_to(Path("..") / "real" / real.name)
+            chained_link = agents / "chain.plist"
+            chained_link.symlink_to(absolute_link)
+            hard_link = agents / "hard.plist"
+            os.link(real, hard_link)
+            loop_a, loop_b = agents / "loop-a.plist", agents / "loop-b.plist"
+            loop_a.symlink_to(loop_b)
+            loop_b.symlink_to(loop_a)
+
+            def canon(path):
+                result = subprocess.run(
+                    ["bash", "-c", func + '\ncanonical_plist_path "$1"', "canon", str(path)],
+                    capture_output=True, text=True, timeout=30,
+                )
+                self.assertEqual(result.returncode, 0, result.stderr)
+                return result.stdout.strip()
+
+            expected = canon(real)
+            self.assertEqual(expected, str(real.resolve()))
+            for link in (absolute_link, relative_link, chained_link):
+                self.assertEqual(canon(link), expected, f"{link.name} must resolve to its target")
+            self.assertNotEqual(canon(hard_link), expected, "a hard link must stay a distinct path")
+            self.assertTrue(canon(loop_a))  # terminates, and prints something to compare
+
     def test_a_hard_linked_alias_of_dest_plist_is_never_loaded_here(self):
         # Round 3i Codex Medium (finding 1): `-ef` compares device+inode,
         # so a DISTINCT hard-linked filename sharing dest_plist's own

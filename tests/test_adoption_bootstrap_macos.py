@@ -2615,6 +2615,30 @@ class EmbedAcceptanceScriptTests(unittest.TestCase):
         self.addCleanup(server_socket.close)
         return f"http://127.0.0.1:{port}"
 
+    @staticmethod
+    def _drain_http_request(conn):
+        """Read the whole request (headers, then Content-Length body bytes).
+        A single recv() can return only part of it; closing a socket with
+        unread request bytes makes the kernel send RST instead of FIN, so the
+        client sees ECONNRESET rather than the IncompleteRead under test."""
+        data = b""
+        while b"\r\n\r\n" not in data:
+            chunk = conn.recv(65536)
+            if not chunk:
+                return
+            data += chunk
+        head, _, body = data.partition(b"\r\n\r\n")
+        length = 0
+        for line in head.split(b"\r\n")[1:]:
+            name, _, value = line.partition(b":")
+            if name.strip().lower() == b"content-length":
+                length = int(value.strip() or 0)
+        while len(body) < length:
+            chunk = conn.recv(65536)
+            if not chunk:
+                return
+            body += chunk
+
     def test_an_incomplete_response_body_reports_json_not_a_traceback(self):
         # Round 3i (Codex Low): the server declares Content-Length: 1000
         # but sends only a handful of body bytes, then closes the
@@ -2622,8 +2646,10 @@ class EmbedAcceptanceScriptTests(unittest.TestCase):
         # except clause (urllib.error.URLError only) did not catch,
         # leaving stdout empty and the process exiting via an uncaught
         # traceback instead of the documented JSON failure contract.
+        import socket
+
         def handle(conn):
-            conn.recv(65536)  # drain the request; its content is irrelevant here
+            self._drain_http_request(conn)  # its content is irrelevant here
             conn.sendall(
                 b"HTTP/1.1 200 OK\r\n"
                 b"Content-Type: application/json\r\n"
@@ -2631,8 +2657,9 @@ class EmbedAcceptanceScriptTests(unittest.TestCase):
                 b"\r\n"
                 b'{"data"'
             )
-            # Closes here (the `finally` in _raw_socket_server), well
-            # short of the promised 1000 bytes.
+            # Half-close (FIN, not RST) well short of the promised 1000
+            # bytes; the `finally` in _raw_socket_server then closes.
+            conn.shutdown(socket.SHUT_WR)
 
         url = self._raw_socket_server(handle)
         result = self._run(url, extra_args=["--timeout", "5"])
@@ -2652,7 +2679,7 @@ class EmbedAcceptanceScriptTests(unittest.TestCase):
         import time
 
         def handle(conn):
-            conn.recv(65536)
+            self._drain_http_request(conn)
             conn.sendall(
                 b"HTTP/1.1 200 OK\r\n"
                 b"Content-Type: application/json\r\n"

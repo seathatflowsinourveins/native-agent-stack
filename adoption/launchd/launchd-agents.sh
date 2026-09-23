@@ -208,15 +208,32 @@ selected_labels() {
 # os.path.realpath ever collapses a hard link's own pathname the way
 # device+inode identity does, since a hard link has no stored "canonical
 # name" to resolve to in the first place.
+#
+# Round 3i follow-up (Codex): the LEAF is resolved too when it is itself a
+# symlink (launchctl may report a symlinked plist by its resolved target), by
+# following readlink one hop at a time and re-resolving the parent each time.
+# Hard links are still never collapsed (they are not symlinks), and a symlink
+# loop stops after 40 hops and compares unresolved, i.e. as loaded_elsewhere.
 canonical_plist_path() {
   local target="$1"
-  local dir base resolved_dir
-  dir="$(dirname -- "$target")"
-  base="$(basename -- "$target")"
-  if resolved_dir="$(cd -P -- "$dir" 2>/dev/null && pwd -P)"; then
-    printf '%s/%s\n' "$resolved_dir" "$base"
+  local dir base resolved_dir link hops=0
+  while :; do
+    dir="$(dirname -- "$target")"
+    base="$(basename -- "$target")"
+    resolved_dir="$(cd -P -- "$dir" 2>/dev/null && pwd -P)" || break
+    target="$resolved_dir/$base"
+    if [[ -L "$target" && "$hops" -lt 40 ]]; then
+      link="$(readlink "$target")" || break
+      case "$link" in
+        /*) target="$link" ;;
+        *) target="$resolved_dir/$link" ;;
+      esac
+      hops=$((hops + 1))
+      continue
+    fi
+    printf '%s\n' "$target"
     return
-  fi
+  done
   # The parent directory does not exist (unusual: $launch_agents_dir is
   # always created first, but never crash on it) -- python3's
   # os.path.realpath tolerates a non-existent path entirely, matching
