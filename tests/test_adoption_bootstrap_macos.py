@@ -678,6 +678,53 @@ def _shell_functions(text: str, *names: str) -> str:
     return "".join(blocks)
 
 
+def _signal_and_wait_for_exit(signal_name: str, indent: str = "    ", target_var: str = "ADOPTION_SCRIPT_PID") -> str:
+    """Round 3k: a fault-injection shim's real-command-then-signal tail.
+
+    Signals `target_var` -- the harness's own top-level PID, exported as
+    `ADOPTION_SCRIPT_PID` right after its `set -Eeuo pipefail` (see
+    _run_install_npm), never `$PPID` (that half is genuinely
+    load-independent: see tests/test_adoption_launchd.py's
+    SignalShimMechanismProofTests.test_ppid_inside_a_command_substitution_
+    subshell_is_not_the_script for a deterministic, no-load reproduction).
+
+    Round 3k's FIRST draft of this helper also polled `kill -0 "$target"`
+    in a loop, waiting for the target to have fully exited before this
+    shim itself returns. That design was WRONG and is not used: this shim
+    is always the target's own SYNCHRONOUS foreground child (exactly how
+    real npm/mv/ln are invoked), so the target cannot possibly exit --
+    its own `wait()` cannot return -- while still blocked waiting for THIS
+    shim to finish. A shim that waits for the target to disappear before
+    it disappears itself is circular, not a handshake; it does not fail
+    loudly either, since its own 30s bound always fires (proven directly:
+    every affected test took ~30-63s per run in this project's first
+    commit of this helper, passing only because the shim's own timeout
+    path, not a real interruption, produced a nonzero exit the assertions
+    happened to accept as "not 0").
+
+    What actually determines correctness, confirmed by direct, repeated
+    (bash 5.2, this host, 10/10 both with and without an added sleep)
+    testing: bash defers running a trapped signal's handler until whatever
+    is CURRENTLY in the foreground finishes -- here, this shim itself --
+    and then services it immediately afterward, before the script's own
+    next line, regardless of how long that takes. Ordering is therefore
+    already guaranteed by bash's synchronous foreground-child execution
+    model alone, once the signal reaches the right PID (the fix above).
+    This tail still sleeps briefly (0.5s, comfortably above the 0.2-0.3s
+    this project's earlier rounds used) purely as defensive margin for the
+    real `kill()` syscall's effect to be recorded before this process
+    image goes away -- not to "win a race" against the trap, which this
+    shim structurally cannot observe completing. Same helper (and the
+    same design) as tests/test_adoption_launchd.py's own copy.
+    """
+    p = indent
+    return (
+        f'{p}target="${target_var}"\n'
+        f'{p}kill -{signal_name} "$target"\n'
+        f'{p}sleep 0.5\n'
+    )
+
+
 class LlamaWrapperQuotingTests(unittest.TestCase):
     """Local integration check of the generated llama-server wrapper.
 
@@ -1188,6 +1235,11 @@ class PlatformDependencyInstallTests(unittest.TestCase):
         harness = tmp_path / "install-npm-e2e-harness.sh"
         harness.write_text(
             "set -Eeuo pipefail\n"
+            # Round 3k: exported for this harness's own fault-injection
+            # shims (npm/mv/ln) to signal deterministically -- see
+            # _signal_and_wait_for_exit's own comment for why, never
+            # $PPID.
+            + 'export ADOPTION_SCRIPT_PID="$$"\n'
             + _shell_functions(SCRIPT_PATH.read_text(), "canonical_path", "prune_old_version",
                                 "npm_package_name", "install_platform_dependency", "install_npm", "cleanup")
             # The script-level pending_migration_prefix/_dest globals and the
@@ -1218,7 +1270,13 @@ class PlatformDependencyInstallTests(unittest.TestCase):
             + "}\n"
             + f'install_npm {id_} {version} {wrapper_url} {wrapper_sha256} {ignore_scripts}\n'
         )
-        result = subprocess.run(["bash", str(harness)], capture_output=True, text=True, timeout=60,
+        # Round 3k: 90s, not 60s -- a fault-injection shim's own bounded
+        # wait for the script to react to a signal (_signal_and_wait_for_
+        # exit) can itself take up to 30s under real CPU load before it
+        # gives up; this must stay comfortably above npm install's own
+        # time plus that 30s so a genuine slow-but-eventual pass is never
+        # mistaken for a hang.
+        result = subprocess.run(["bash", str(harness)], capture_output=True, text=True, timeout=90,
                                  env={**os.environ, **(extra_env or {})})
         return result, eco_root
 
@@ -1863,21 +1921,18 @@ class PlatformDependencyInstallTests(unittest.TestCase):
                         'case "$dest" in\n'
                         "  *.migrating.*)\n"
                         '    /bin/mv "$@" || exit $?\n'
-                        f'    kill -{signal_name} "$PPID"\n'
-                        # Stay alive briefly after sending the signal: the
-                        # parent bash is blocked in wait() for THIS process,
-                        # and a signal delivered while it is still blocked
-                        # there reliably interrupts that wait immediately;
-                        # if this shim exited instantly instead, bash's
-                        # wait() could already be returning (child exited
-                        # normally) around the same moment the kernel is
-                        # still only queuing the signal, letting bash race
-                        # ahead through the rest of the flip -- successfully
-                        # -- before ever servicing it, which would make this
-                        # test flaky rather than a reliable reproduction of
-                        # the coordinator's exact "signal mid-swap" scenario.
-                        "    sleep 0.2\n"
-                        "    exit 0\n"
+                        # Round 3k: was a fixed `kill; sleep 0.2; exit 0`,
+                        # meant to keep this shim alive long enough for
+                        # bash's blocking wait() on it to be reliably
+                        # interrupted by the signal rather than by this
+                        # process's own ordinary exit. Reproduced under
+                        # real CPU load: that race is exactly what went
+                        # wrong (the run's own return code came back 0, as
+                        # if never interrupted). _signal_and_wait_for_exit
+                        # removes the race instead of tuning its odds: it
+                        # blocks until the parent has actually exited.
+                        + _signal_and_wait_for_exit(signal_name, indent="    ")
+                        + "    exit 0\n"
                         "    ;;\n"
                         "esac\n"
                         'exec /bin/mv "$@"\n'
@@ -2041,9 +2096,8 @@ class PlatformDependencyInstallTests(unittest.TestCase):
                         "#!/bin/sh\n"
                         'if [ "$1" = "install" ]; then\n'
                         f'  {real_npm} "$@" || exit $?\n'
-                        f'  kill -{signal_name} "$PPID"\n'
-                        "  sleep 0.3\n"
-                        "  exit 0\n"
+                        + _signal_and_wait_for_exit(signal_name, indent="  ")
+                        + "  exit 0\n"
                         "fi\n"
                         f'exec {real_npm} "$@"\n'
                     )
@@ -2179,9 +2233,8 @@ class PlatformDependencyInstallTests(unittest.TestCase):
                         f'case "$dest" in\n'
                         f"  {stage_dir}/*-link.*)\n"
                         '    /bin/ln "$@" || exit $?\n'
-                        f'    kill -{signal_name} "$PPID"\n'
-                        "    sleep 0.3\n"
-                        "    exit 0\n"
+                        + _signal_and_wait_for_exit(signal_name, indent="    ")
+                        + "    exit 0\n"
                         "    ;;\n"
                         "esac\n"
                         'exec /bin/ln "$@"\n'

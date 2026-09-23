@@ -8,6 +8,11 @@
 # mapfile, no associative arrays, no ${var,,}.
 set -Eeuo pipefail
 
+# Round 3k: see the identical export in adoption/launchd/launchd-agents.sh
+# for why (offline fault-injection tests only; no production path reads
+# this).
+export ADOPTION_SCRIPT_PID="$$"
+
 usage() {
   printf '%s\n' \
     'Usage: bash bootstrap-macos.sh --profile <id> [--skip-system-packages]' \

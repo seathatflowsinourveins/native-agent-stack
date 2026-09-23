@@ -918,7 +918,7 @@
         "prometheus",
         "loki"
       ],
-      "claim": "After native sign-in restored readiness, the freshly reproduced SDK completed a real LEAN backtest→Dagu→DuckDB→GPT-6 Astra→Claude Opus 5 prepared-packet research workflow; both native reports passed structural citation/value/unit/scope checks and the accepted Astra report was bound into Claude's prompt by verified hashes.",
+      "claim": "After native sign-in restored readiness, the freshly reproduced SDK completed a real LEAN backtest\u2192Dagu\u2192DuckDB\u2192GPT-6 Astra\u2192Claude Opus 5 prepared-packet research workflow; both native reports passed structural citation/value/unit/scope checks and the accepted Astra report was bound into Claude's prompt by verified hashes.",
       "limitations": [
         "This validates a bounded historical simulation research workflow on the authoring host, not a profitable strategy, current market source, broker execution or unattended production service.",
         "The two reported model tasks used no model tools. Their native hooks and telemetry remain separate evidence; this does not repeat every MCP, memory or GPU-RAG behavior.",
@@ -1900,7 +1900,7 @@
       "component_ids": [
         "ai-memory"
       ],
-      "claim": "Mac arm64 synthetic2.3.1→2.3.2 migration, scoped exact reads/FTS, reserved and Unicode paths, restart and no-capture checks passed.",
+      "claim": "Mac arm64 synthetic2.3.1\u21922.3.2 migration, scoped exact reads/FTS, reserved and Unicode paths, restart and no-capture checks passed.",
       "limitations": [
         "Separate synthetic store and explicit no-model policy only; no production migration claimed by this receipt.",
         "OS filesystem/network confinement was not established; failed restricted-sandbox attempt retained. Native execution succeeded without security overrides; Gatekeeper assessment rejected the ad-hoc distribution.",
@@ -3144,8 +3144,8 @@
     },
     {
       "path": "adoption/bootstrap-macos.sh",
-      "sha256": "257f6756f5bec1e8eaf7bfec0fa0c93f96f2b1c347dee04534f2d3eab96ccfc0",
-      "bytes": 54524
+      "sha256": "8ba075d10dcc78f21cab79e351f92d3cf0a3fbc4534dd7091fe5cc70e173e58e",
+      "bytes": 54713
     },
     {
       "path": "adoption/bootstrap.md",
@@ -3189,8 +3189,8 @@
     },
     {
       "path": "adoption/launchd/launchd-agents.sh",
-      "sha256": "1a7508626e59509ee97bfc2517463ba9ed771f5279ca5cfa7abc119403deba3e",
-      "bytes": 37066
+      "sha256": "8d607da363de3a92552e76c88043fc0576168a015e5f30898d07ee3cf4839e6e",
+      "bytes": 37719
     },
     {
       "path": "adoption/lifecycle.md",
@@ -14780,8 +14780,8 @@
     },
     {
       "path": "tests/test_adoption_bootstrap_macos.py",
-      "sha256": "aeeb644b53e0ab0075ed97596d6a625ed156c26612971b3bdd1ff28cacea40a0",
-      "bytes": 159726
+      "sha256": "c8cf7eb0033a177c6e8c61b32bccf73fe7b213175557010f1bdbaedc72060eb3",
+      "bytes": 162832
     },
     {
       "path": "tests/test_adoption_contract.py",
@@ -14795,8 +14795,8 @@
     },
     {
       "path": "tests/test_adoption_launchd.py",
-      "sha256": "78f2190610770ff7af561886dbb63ea0e70c2afae2e100c9405109e4107f4b0f",
-      "bytes": 97478
+      "sha256": "fb7628306bc39870b174b3c91123e5cf7b76f48e40649451dd30da253e60c2dd",
+      "bytes": 108761
     },
     {
       "path": "tests/test_adoption_status.py",
