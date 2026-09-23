@@ -26,6 +26,19 @@ rejection or callback failure), the per-event ``moo_proxy_no_gap`` and
 ``moo_proxy_not_open`` checks against the converted bars, the ERROR-level engine
 log scan, and the DistributionModule's emissions, acknowledgements and reported
 ``AccountState`` rows. Engine-posted distributions are part of native cash.
+
+The v2 preconditions are checks too, because the sealed verdict rule requires
+"every check above" to pass: a retained independent review of exactly the files
+that ran, completed before the run (``precondition_review``); the sealed
+manifest, tolerance sheet and five frozen inputs at run time and, with
+``--lean-data`` only, re-hashed at comparison time (``precondition_hashes``);
+the engine pin and the run's isolation (``precondition_engine``). An unmet
+precondition is a FAIL even when every execution check passes; the verdict
+reports ``preregistration_qualifying`` and the execution checks separately. A
+v2 receipt is refused unless it is bound to the sealed manifest and
+preregistration by their sha256 pinned below, and the OCO structure is judged
+from the engine's own order records (``engine_at_accept``/``engine_final``),
+never from the harness's submission strings.
 """
 from __future__ import annotations
 
@@ -48,6 +61,17 @@ V2_CONFIGURATION_FIELDS = ("seed", "account_type", "use_random_ids", "fill_model
                            "window", "oms_type", "latency_model", "bar_execution",
                            "bar_adaptive_high_low_ordering", "reject_stop_orders",
                            "support_contingent_orders", "frozen_account")
+# The sealed v2 preregistration. A v2 receipt bound to any other file is refused.
+SEALED_V2_MANIFEST_SHA256 = "1b821d7ba42ea6121002a26a5082df08ed7a79f9a50b2edc9959503e1088ac67"
+SEALED_V2_PREREGISTRATION_SHA256 = "4393a1b7d896b2f49c4091c18701bd08cfc72a8d313f0ad2a628e91db26d6f0c"
+REVIEW_RECORD_SCHEMA = "spy-parity-v2-harness-review/1"
+REVIEWED_HARNESS_FILES = ("convert.py", "fixture_strategy.py", "distribution_module.py", "run.py",
+                          "compare.py")
+# The documented bwrap replay clears the environment and sets exactly these
+# (PWD is added by the shell-less exec).
+ISOLATED_ENVIRONMENT = {"LANG", "PATH", "PYTHONDONTWRITEBYTECODE", "OPENBLAS_NUM_THREADS",
+                        "OMP_NUM_THREADS", "PWD"}
+PRECONDITION_PREFIX = "precondition_"
 V2_SOURCES = ("convert.py", "fixture_strategy.py", "distribution_module.py", "run.py",
               "compare.py", "mapping-manifest.json", "mapping-manifest-v2.json", "tolerances.json")
 
@@ -255,6 +279,13 @@ def bind(receipt: dict, tolerances_path: Path, manifest_path: Path, oracle_path=
     if digest(manifest_path) != receipt["mapping_manifest"]["sha256"]:
         raise ValueError("mapping_manifest_sha256_mismatch")
     if is_v2(manifest):
+        if digest(manifest_path) != SEALED_V2_MANIFEST_SHA256 or \
+                receipt["mapping_manifest"]["sha256"] != SEALED_V2_MANIFEST_SHA256:
+            raise ValueError("v2_receipt_not_bound_to_the_sealed_manifest")
+        prereg = Path(manifest_path).parent / "PREREGISTRATION-v2.md"
+        if receipt.get("preregistration", {}).get("sha256") != SEALED_V2_PREREGISTRATION_SHA256 or \
+                not prereg.is_file() or digest(prereg) != SEALED_V2_PREREGISTRATION_SHA256:
+            raise ValueError("v2_receipt_not_bound_to_the_sealed_preregistration")
         if digest(tolerances_path) != manifest["tolerances"]["sha256"]:
             raise ValueError("tolerances_sha256_disagrees_with_manifest")
         if receipt.get("schema_version") != 2:
@@ -352,18 +383,52 @@ def _skip(checks, key, field, reason):
                             "blocked_by": None, "reason": reason})
 
 
+def _maybe_decimal(value):
+    """A Decimal for a numeric engine field, or None when it is absent or not numeric."""
+    try:
+        return _decimal(value) if value is not None else None
+    except ArithmeticError:
+        return None
+
+
 def _oco_structure_ok(pair, side: str, quantity: int) -> bool:
+    """The native OCO structure as the engine's cache recorded each accepted leg.
+
+    Judged only from ``engine_at_accept`` (``order.to_dict()`` of the order read
+    back from the engine's cache at OrderAccepted), never from the harness's own
+    submission strings; a leg without that engine record fails.
+    """
     legs = pair.get("legs", [])
     if len(legs) != 2:
         return False
     ids = [leg["client_order_id"] for leg in legs]
     for leg, sibling in zip(legs, reversed(ids)):
-        if (leg["side"] != side or int(leg["quantity"]) != abs(quantity)
-                or leg["contingency_type"] != "OCO" or leg["order_list_id"] != pair["order_list_id"]
-                or leg["time_in_force"] != "GTC" or leg["trigger_type"] != "DEFAULT"
-                or leg["reduce_only"] is not False or leg["linked_order_ids"] != [sibling]):
+        view = leg.get("engine_at_accept")
+        if not isinstance(view, dict):
+            return False
+        if (view.get("client_order_id") != leg["client_order_id"]
+                or view.get("type") != leg.get("order_type") or view.get("status") != "ACCEPTED"
+                or view.get("side") != side or _maybe_decimal(view.get("quantity")) != abs(quantity)
+                or view.get("contingency_type") != "OCO"
+                or view.get("order_list_id") != pair["order_list_id"]
+                or view.get("time_in_force") != "GTC" or view.get("trigger_type") != "DEFAULT"
+                or view.get("is_reduce_only") is not False
+                or view.get("linked_order_ids") != [sibling]
+                or _maybe_decimal(view.get("trigger_price")) is None
+                or _maybe_decimal(view.get("trigger_price")) != _maybe_decimal(leg.get("trigger_price"))):
             return False
     return True
+
+
+def _engine_final_statuses(pair, filled_id) -> dict:
+    """Each leg's terminal status and filled quantity from the engine's cache at run end."""
+    found = {}
+    for leg in pair.get("legs", []):
+        view = leg.get("engine_final")
+        role = "filled" if leg["client_order_id"] == filled_id else "sibling"
+        found[role] = (view.get("status"), str(_maybe_decimal(view.get("filled_qty")))) \
+            if isinstance(view, dict) else None
+    return found
 
 
 def v2_oco_checks(checks, receipt: dict, expected: dict, bars) -> None:
@@ -438,6 +503,11 @@ def v2_oco_checks(checks, receipt: dict, expected: dict, bars) -> None:
                       and cancels[0]["ts_event_ns"] == fill["ts_event_ns"])
         _exact(checks, name, "sibling_canceled_at_fill_instant", fill["ts_event_ns"],
                cancels[0]["ts_event_ns"] if cancels else None, ok=sibling_ok)
+        final = _engine_final_statuses(pair, fill["client_order_id"])
+        _exact(checks, name, "engine_final_status",
+               {"filled": ("FILLED", str(abs(quantity))), "sibling": ("CANCELED", "0")},
+               final, ok=final == {"filled": ("FILLED", str(abs(quantity))),
+                                   "sibling": ("CANCELED", "0")})
         if close is not None and tested is not None:
             _exact(checks, name, "fill_in_tested_bar", tested["ts_event_ns"], fill["ts_event_ns"])
             gap = abs(Decimal(tested["o"]) - close)
@@ -504,13 +574,98 @@ def v2_distribution_checks(checks, receipt: dict, manifest: dict, limits: dict) 
             delta = Decimal(rows[j]["total"]) - Decimal(rows[j - 1]["total"])
         _exact(checks, name, "reported_account_state_delta", Decimal(got["amount"]), delta,
                ok=delta is not None and delta == Decimal(got["amount"]))
+    # Engine-observed: after the initial state, every reported AccountState sits
+    # at an emission instant with exactly the emitted delta, so no other module
+    # or source adjusted the account.
+    emitted = {int(e["ts_now_ns"]): Decimal(e["amount"]) for e in emissions}
+    unexplained = []
+    for j, row in enumerate(rows):
+        if not row["reported"] or j == 0:
+            continue
+        delta = Decimal(row["total"]) - Decimal(rows[j - 1]["total"])
+        if emitted.get(int(row["ts_event_ns"])) != delta:
+            unexplained.append(int(row["ts_event_ns"]))
+    _exact(checks, "distribution_module", "unexplained_reported_account_states", [], unexplained)
     ledger = receipt.get("distribution_ledger", [])
     _exact(checks, "distribution_ledger", "engine_posted", True,
            bool(ledger) and len(ledger) == len(predictions)
            and all(d.get("engine_posted") is True for d in ledger))
 
 
-def compare(receipt: dict, oracle: dict, limits: dict, manifest=None, bars=None) -> dict:
+def _parse_utc(text):
+    from datetime import datetime
+    try:
+        value = datetime.fromisoformat(str(text).replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    return value if value.tzinfo is not None else None
+
+
+def v2_precondition_checks(checks, receipt: dict, manifest: dict, context: dict) -> None:
+    """acceptance_criteria.preconditions, evaluated as checks.
+
+    ``context`` carries what only the comparison run can observe: whether the
+    frozen inputs were re-hashed now (``--lean-data``) and the review record as
+    it is on disk now (``{"sha256", "content"}`` or ``None``).
+    """
+    # [0] Independent review of exactly these harness files, before this run.
+    review = (receipt.get("preconditions") or {}).get("review")
+    name = PRECONDITION_PREFIX + "review"
+    if not review:
+        _exact(checks, name, "retained_record_before_run", "a retained review record",
+               "absent: no independent review preceded this run", ok=False)
+    else:
+        on_disk = context.get("review_record")
+        disk_sha = on_disk.get("sha256") if on_disk else None
+        _exact(checks, name, "record_sha256_at_comparison", review.get("sha256"), disk_sha)
+        content = on_disk.get("content") if on_disk and disk_sha == review.get("sha256") else None
+        if not isinstance(content, dict):
+            _exact(checks, name, "record_content", "readable", "absent", ok=False)
+        else:
+            _exact(checks, name, "schema", REVIEW_RECORD_SCHEMA, content.get("schema"))
+            reviewed = content.get("reviewed_local_source_sha256") or {}
+            recorded = receipt.get("local_source_sha256", {})
+            differing = sorted(f for f in REVIEWED_HARNESS_FILES
+                               if not reviewed.get(f) or reviewed.get(f) != recorded.get(f))
+            _exact(checks, name, "reviewed_files_are_the_files_that_ran", [], differing)
+            completed = _parse_utc(content.get("completed_utc"))
+            started = _parse_utc(receipt.get("started_utc"))
+            _exact(checks, name, "completed_before_run_started",
+                   "< " + str(receipt.get("started_utc")), content.get("completed_utc"),
+                   ok=completed is not None and started is not None and completed < started)
+            _exact(checks, name, "unresolved_findings", 0, content.get("unresolved_findings"))
+    # [1] Sealed files and frozen inputs, at run time and at comparison time.
+    name = PRECONDITION_PREFIX + "hashes"
+    _exact(checks, name, "sealed_manifest_sha256", SEALED_V2_MANIFEST_SHA256,
+           receipt["mapping_manifest"]["sha256"])
+    _exact(checks, name, "tolerances_sha256", manifest["tolerances"]["sha256"],
+           receipt["tolerances"]["sha256"])
+    frozen = manifest["inputs"]["frozen_sha256"]
+    _exact(checks, name, "inputs_at_run", "frozen_sha256 of the manifest",
+           "equal" if receipt["inputs"]["sha256"] == frozen else "differs",
+           ok=receipt["inputs"]["sha256"] == frozen)
+    if context.get("inputs_rehashed_at_comparison"):
+        _exact(checks, name, "inputs_at_comparison", "re-hashed equal", "re-hashed equal")
+    else:
+        _skip(checks, name, "inputs_at_comparison",
+              "Only --lean-data re-hashes the five frozen inputs at comparison time.")
+    # [2] Engine pin and isolation.
+    name = PRECONDITION_PREFIX + "engine"
+    _exact(checks, name, "version", manifest["engine"]["version"], receipt["engine"]["version"])
+    _exact(checks, name, "extension_sha256", manifest["engine"]["extension_sha256"],
+           receipt["engine"].get("extension_sha256"))
+    isolation = receipt.get("isolation", {})
+    interfaces = [list(i) for i in isolation.get("network_interfaces", [])]
+    _exact(checks, name, "network_interfaces", [[1, "lo"]], interfaces)
+    extra = sorted(set(isolation.get("environment_names", [])) - ISOLATED_ENVIRONMENT)
+    _exact(checks, name, "environment_beyond_cleared_set", [], extra)
+    mounts = isolation.get("read_only") or {}
+    _exact(checks, name, "read_only_mounts", {"data_root": True, "harness_source": True},
+           {"data_root": mounts.get("data_root"), "harness_source": mounts.get("harness_source")})
+
+
+def compare(receipt: dict, oracle: dict, limits: dict, manifest=None, bars=None,
+            preconditions=None) -> dict:
     """Compare reviewed economic keys. Returns a machine-readable verdict."""
     observed, expected = receipt_case(receipt), oracle
     if observed["case"] != expected["id"]:
@@ -648,6 +803,7 @@ def compare(receipt: dict, oracle: dict, limits: dict, manifest=None, bars=None)
                              "blocked_by": None})
 
     if is_v2(manifest):
+        v2_precondition_checks(checks, receipt, manifest, preconditions or {})
         v2_oco_checks(checks, receipt, expected, bars if evidence_available else None)
         v2_run_checks(checks, receipt)
         v2_distribution_checks(checks, receipt, manifest, limits)
@@ -684,7 +840,21 @@ def compare(receipt: dict, oracle: dict, limits: dict, manifest=None, bars=None)
         outcome = "BLOCKED-INCOMPLETE"
     else:
         outcome = "PASS"
-    return {"case": expected["id"], "checks": checks, "failed": len(failures),
+    summary = {}
+    if is_v2(manifest):
+        pre = [c for c in checks if c["id"].startswith(PRECONDITION_PREFIX)]
+        rest = [c for c in checks if not c["id"].startswith(PRECONDITION_PREFIX)]
+        history = (receipt.get("preconditions") or {}).get("prior_v2_replays") or {}
+        summary = {
+            "preconditions": {c["key"]: c["status"] for c in pre},
+            "preregistration_qualifying": bool(pre) and all(c["status"] == "PASS" for c in pre),
+            "execution_checks": {status.lower(): sum(1 for c in rest if c["status"] == status)
+                                 for status in ("PASS", "FAIL", "SKIPPED")},
+            "prior_v2_replays": len(history.get("replays", [])),
+            "prior_v2_replays_reviewed_before_run": sum(
+                1 for r in history.get("replays", []) if r.get("reviewed_before_run")),
+        }
+    return {**summary, "case": expected["id"], "checks": checks, "failed": len(failures),
             "skipped": skipped, "verdict": outcome, "complete": not (skipped or rejected),
             "blocking_mappings": blocked, "unattributed_failures": unattributed,
             "rejected_attributions": sorted(set(rejected)),
@@ -694,10 +864,36 @@ def compare(receipt: dict, oracle: dict, limits: dict, manifest=None, bars=None)
             "manifest_schema_version": manifest.get("schema_version", 1) if manifest else None,
             "note": ("Mapping manifest v2 declares no unsupported row for this case, so no failure "
                      "can be attributed: any failing check is FAIL, and a skipped check or rejected "
-                     "attribution leaves the comparison incomplete." if is_v2(manifest) else
+                     "attribution leaves the comparison incomplete. The preconditions are checks "
+                     "under the sealed verdict rule, so an unmet precondition fails the comparison "
+                     "even when every execution check passes; preregistration_qualifying and "
+                     "execution_checks report the two separately." if is_v2(manifest) else
                      "A failure is BLOCKED only when a measured deviation matches a mapping the bound "
                      "manifest declares unsupported. Any residue stays an unattributed FAIL, and a "
                      "skipped check or rejected attribution leaves the comparison incomplete.")}
+
+
+def precondition_context(receipt: dict, manifest: dict, bars_path, lean_data) -> dict:
+    """What only this comparison run can observe for the v2 preconditions.
+
+    Inputs count as re-hashed only when the bars were re-derived from
+    ``--lean-data``: ``load_bars`` then verified the five input hashes against
+    the receipt, and the receipt's against the manifest is a separate check.
+    """
+    context = {"inputs_rehashed_at_comparison": bars_path is None and lean_data is not None,
+               "review_record": None}
+    review = (receipt.get("preconditions") or {}).get("review")
+    if is_v2(manifest) and review and review.get("path"):
+        path = SOURCE.parents[3] / review["path"]
+        if path.is_file():
+            blob = path.read_bytes()
+            try:
+                content = json.loads(blob.decode("utf-8"))
+            except ValueError:
+                content = None
+            context["review_record"] = {"sha256": hashlib.sha256(blob).hexdigest(),
+                                        "content": content}
+    return context
 
 
 def main() -> int:
@@ -727,7 +923,8 @@ def main() -> int:
     limits, manifest = bind(receipt, args.tolerances, args.manifest, args.oracle, args.plan)
     oracle = oracle_case(json.loads(args.oracle.read_text()), receipt["case"])
     bars = load_bars(args.bars, args.lean_data, receipt, manifest)
-    verdict = compare(receipt, oracle, limits, manifest, bars)
+    verdict = compare(receipt, oracle, limits, manifest, bars,
+                      precondition_context(receipt, manifest, args.bars, args.lean_data))
 
     for check in verdict["checks"]:
         suffix = "" if not check["blocked_by"] else "  blocked_by=" + check["blocked_by"]

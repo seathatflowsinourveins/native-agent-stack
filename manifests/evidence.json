@@ -6119,8 +6119,8 @@
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/compare.py",
-      "sha256": "e88546a0fd9e8592113f6b393d66ea5d9760401138bac7b7957f40b3c64c952e",
-      "bytes": 41750
+      "sha256": "598bffafe5ae875fb97a95d2a5234bf713ccbac6d3e33b01e94d1eb1f656e74b",
+      "bytes": 53191
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/convert.py",
@@ -6129,8 +6129,8 @@
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/fixture_strategy.py",
-      "sha256": "cb6830320e8aace88b370bc1c4aac53c95c825ee539861756d4f79e83037c4ee",
-      "bytes": 21254
+      "sha256": "59649ac50f26c8b6090dc976e4ec0b3b7e2121cc214674f6c122fbbca9b143f1",
+      "bytes": 23733
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/mapping-manifest.json",
@@ -6174,8 +6174,8 @@
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/run.py",
-      "sha256": "9e70b39545aaebee39f091247fe0a402b5c8075c3b1634eec8b1d488c7478cee",
-      "bytes": 37260
+      "sha256": "b2c0cf6e704779053babb6e62ed5ace0c16ea00df79a54d34ec8f04cc499aac4",
+      "bytes": 44770
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/tolerances.json",
@@ -11984,8 +11984,8 @@
     },
     {
       "path": "tests/test_spy_parity.py",
-      "sha256": "ccdf7d5e2fb4267ae91d9cd3909e3d60c69c22a04a12beabc0d44bf7bcb5f00d",
-      "bytes": 78633
+      "sha256": "cb61ef1101488abb6d1788d36234230d788c5d98e46853f3290ddd3f38fc6cb3",
+      "bytes": 92414
     },
     {
       "path": "tests/test_stack_lifecycle.py",
@@ -13496,6 +13496,11 @@
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/verdict-v2.json",
       "sha256": "788f64636619faba667805ee5c00c9003826de658c4c20dc0759239adf69b19b",
       "bytes": 28827
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/replay-history-v2.json",
+      "sha256": "8409f4ce5426d888e2769cec491ba08169406f11fec17022a3022b27e8c7ee79",
+      "bytes": 4358
     }
   ],
   "convergence_records": [

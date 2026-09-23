@@ -73,6 +73,39 @@ def oco_triggers(quantity: int, close: Decimal, tick: Decimal = TICK) -> dict:
     return {STOP_MARKET: close - tick, MARKET_IF_TOUCHED: close + tick}
 
 
+ENGINE_ORDER_FIELDS = ("client_order_id", "type", "side", "quantity", "status", "trigger_price",
+                       "trigger_type", "time_in_force", "is_reduce_only", "contingency_type",
+                       "order_list_id", "linked_order_ids", "filled_qty")
+
+
+def engine_order_view(snapshot: dict) -> dict:
+    """The structural fields of an order as the engine's cache serializes it.
+
+    ``snapshot`` is ``order.to_dict()`` of the order read back from the engine's
+    cache, never the harness's own submission record. A missing field refuses.
+    """
+    missing = [field for field in ENGINE_ORDER_FIELDS if field not in snapshot]
+    if missing:
+        raise ValueError("engine_order_view_missing:" + ",".join(missing))
+    view = {field: snapshot[field] for field in ENGINE_ORDER_FIELDS}
+    view["linked_order_ids"] = [str(i) for i in (view["linked_order_ids"] or [])]
+    return view
+
+
+def attach_engine_views(oco_pairs, at_accept: dict, final: dict) -> list:
+    """Each OCO leg with the engine's cache view at OrderAccepted and at run end.
+
+    The leg's other fields are the harness's submission record; ``compare.py``
+    judges the native OCO structure only from these engine views.
+    """
+    attached = []
+    for pair in oco_pairs:
+        legs = [{**leg, "engine_at_accept": at_accept.get(leg["client_order_id"]),
+                 "engine_final": final.get(leg["client_order_id"])} for leg in pair["legs"]]
+        attached.append({**pair, "legs": legs})
+    return attached
+
+
 def check_decision_bar_is_session_final(rows, index: int) -> None:
     """The pair must rest when the next session's first bar is processed."""
     row = rows[index]
@@ -247,6 +280,7 @@ def build_strategy(equity_id, bar_type_str, rows, case, ex_instants_ns=()):
             self.cash = initial_cash
             self.order_ref = 0
             self.submitted = {}
+            self.accepted_orders = {}
             self.bars_seen = 0
             self.last_session = None
 
@@ -299,6 +333,11 @@ def build_strategy(equity_id, bar_type_str, rows, case, ex_instants_ns=()):
 
         def _decide(self, row):
             price = Decimal(row["c"])
+            # The unchanged v1 sizing rule. self.cash moves only on fills, so it
+            # leaves out cash the DistributionModule posts: one_zero's exit
+            # decision_equity is 428.64 below LEAN's portfolio value. The exit
+            # target is 0 and the entry precedes any distribution, so one_zero
+            # is unaffected; a case that sizes after an ex-date would not be.
             equity = self.cash + self.position * price
             wanted = (target_quantity(equity, target, buffer, price)
                       if row["session_date"] == case["entry_decision_date"] else 0)
@@ -374,6 +413,14 @@ def build_strategy(equity_id, bar_type_str, rows, case, ex_instants_ns=()):
                 record["last_qty"] = str(event.last_qty)
                 record["last_px"] = str(event.last_px)
             self.order_events.append(record)
+            if name == "OrderAccepted":
+                # Read the accepted order back from the engine's cache so the
+                # OCO structure is judged from the engine's record, not from
+                # the strings this strategy wrote when it built the order.
+                order = self.cache.order(event.client_order_id)
+                if order is None:
+                    raise ValueError("accepted_order_not_in_cache:" + client_order_id)
+                self.accepted_orders[client_order_id] = engine_order_view(order.to_dict())
             if name in ("OrderDenied", "OrderRejected"):
                 self.buying_power_events.append({**record, "reason": reason})
             if name != "OrderFilled":

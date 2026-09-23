@@ -1046,6 +1046,17 @@ def _pair(ref, quantity, close, ts):
              "order_list_id": "OL-%d" % ref,
              "linked_order_ids": [ids["MARKET_IF_TOUCHED" if t == "STOP_MARKET" else "STOP_MARKET"]]}
             for t in ("STOP_MARKET", "MARKET_IF_TOUCHED")]
+    for leg in legs:
+        view = {"client_order_id": leg["client_order_id"], "type": leg["order_type"], "side": side,
+                "quantity": str(abs(quantity)), "status": "ACCEPTED",
+                "trigger_price": leg["trigger_price"], "trigger_type": "DEFAULT",
+                "time_in_force": "GTC", "is_reduce_only": False, "contingency_type": "OCO",
+                "order_list_id": "OL-%d" % ref, "linked_order_ids": list(leg["linked_order_ids"]),
+                "filled_qty": "0"}
+        filled = leg["order_type"] == "STOP_MARKET"
+        leg["engine_at_accept"] = view
+        leg["engine_final"] = dict(view, status="FILLED" if filled else "CANCELED",
+                                   filled_qty=str(abs(quantity)) if filled else "0")
     return {"order_ref": ref, "order_list_id": "OL-%d" % ref, "reference_close": str(close),
             "submitted_ts_event_ns": ts * 10 ** 9, "legs": legs}
 
@@ -1072,7 +1083,8 @@ def _v2_receipt(**overrides):
                      {"utc_seconds": DIVIDEND_TS, "ts_event_ns": DIVIDEND_TS * 10 ** 9,
                       "ex_date": "2020-03-20", "per_share": "1.41", "quantity": "304",
                       "amount": "428.64", "engine_posted": True}]
-    receipt = _receipt(MATCHED_FILLS, "428.64", distributions)
+    # Copies: a test that edits a fill must never change the shared constant.
+    receipt = _receipt([dict(f) for f in MATCHED_FILLS], "428.64", distributions)
     receipt["native_end_cash_usd"] = receipt["reconciled_end_cash_usd"]
     receipt["schema_version"] = 2
     receipt["intents"] = [dict(i, order_ref=n + 1, ts_event_ns=i["utc_seconds"] * 10 ** 9)
@@ -1102,12 +1114,34 @@ def _v2_receipt(**overrides):
         {"ts_event_ns": ENTRY_FILL_TS * 10 ** 9, "reported": False, "total": "1631.68"},
         {"ts_event_ns": DIVIDEND_TS * 10 ** 9, "reported": True, "total": "2060.32"},
         {"ts_event_ns": EXIT_FILL_TS * 10 ** 9, "reported": False, "total": "90734.08"}]
+    receipt["mapping_manifest"] = {"sha256": COMPARE.SEALED_V2_MANIFEST_SHA256}
+    receipt["tolerances"] = {"sha256": MANIFEST_V2["tolerances"]["sha256"]}
+    receipt["inputs"] = {"sha256": dict(MANIFEST_V2["inputs"]["frozen_sha256"])}
+    receipt["engine"] = {"version": MANIFEST_V2["engine"]["version"],
+                         "extension_sha256": dict(MANIFEST_V2["engine"]["extension_sha256"])}
+    receipt["isolation"] = {"network_interfaces": [[1, "lo"]],
+                            "environment_names": sorted(COMPARE.ISOLATED_ENVIRONMENT),
+                            "read_only": {"harness_source": True, "data_root": True}}
+    receipt["local_source_sha256"] = dict(SYNTHETIC_REVIEW["reviewed_local_source_sha256"])
+    receipt["started_utc"] = "2026-09-23T06:00:00+00:00"
+    receipt["preconditions"] = {
+        "review": {"path": "synthetic/review.json", "sha256": SYNTHETIC_REVIEW_SHA256},
+        "prior_v2_replays": {"replays": [{"id": "earlier", "reviewed_before_run": False}]}}
     receipt.update(overrides)
     return receipt
 
 
-def _v2(receipt, bars=V2_BARS, manifest=EFFECTIVE_V2):
-    return COMPARE.compare(receipt, ORACLE, TOLERANCES, manifest, bars)
+SYNTHETIC_REVIEW = {"schema": COMPARE.REVIEW_RECORD_SCHEMA, "reviewer": "synthetic",
+                    "completed_utc": "2026-09-23T05:00:00+00:00", "reviewed_commit": "0" * 40,
+                    "reviewed_local_source_sha256": {f: "a" * 64 for f in COMPARE.REVIEWED_HARNESS_FILES},
+                    "unresolved_findings": 0}
+SYNTHETIC_REVIEW_SHA256 = "b" * 64
+MET_PRECONDITIONS = {"inputs_rehashed_at_comparison": True,
+                     "review_record": {"sha256": SYNTHETIC_REVIEW_SHA256, "content": SYNTHETIC_REVIEW}}
+
+
+def _v2(receipt, bars=V2_BARS, manifest=EFFECTIVE_V2, preconditions=MET_PRECONDITIONS):
+    return COMPARE.compare(receipt, ORACLE, TOLERANCES, manifest, bars, preconditions)
 
 
 def _failing_fields(verdict):
@@ -1204,9 +1238,29 @@ class V2MarketOnOpenBoundaryTests(unittest.TestCase):
 
     def test_a_strategy_level_pair_without_native_links_fails(self):
         receipt = _v2_receipt()
-        receipt["oco_pairs"][0]["legs"][0]["linked_order_ids"] = []
+        receipt["oco_pairs"][0]["legs"][0]["engine_at_accept"]["linked_order_ids"] = []
         failing = _failing_fields(_v2(receipt))
         self.assertIn(("entry_oco", "oco_structure"), failing)
+
+    def test_oco_structure_is_judged_from_the_engine_record_not_the_harness_strings(self):
+        # Harness strings that claim OCO do not help when the engine's record disagrees.
+        receipt = _v2_receipt()
+        receipt["oco_pairs"][0]["legs"][1]["engine_at_accept"]["contingency_type"] = "NO_CONTINGENCY"
+        self.assertIn(("entry_oco", "oco_structure"), _failing_fields(_v2(receipt)))
+        # A leg with no engine record at all fails, whatever the harness wrote.
+        receipt = _v2_receipt()
+        receipt["oco_pairs"][1]["legs"][0]["engine_at_accept"] = None
+        self.assertIn(("exit_oco", "oco_structure"), _failing_fields(_v2(receipt)))
+        # The harness strings alone are no longer read: corrupting them changes nothing.
+        receipt = _v2_receipt()
+        receipt["oco_pairs"][0]["legs"][0].update(contingency_type="X", time_in_force="X",
+                                                  trigger_type="X", reduce_only=True)
+        self.assertEqual(_failing_fields(_v2(receipt)), set())
+
+    def test_engine_final_status_must_show_one_fill_and_one_cancel(self):
+        receipt = _v2_receipt()
+        receipt["oco_pairs"][0]["legs"][1]["engine_final"]["status"] = "ACCEPTED"
+        self.assertIn(("entry_oco", "engine_final_status"), _failing_fields(_v2(receipt)))
 
     def test_an_error_log_line_fails(self):
         receipt = _v2_receipt()
@@ -1330,6 +1384,14 @@ class V2DistributionBoundaryTests(unittest.TestCase):
         self.assertIn(("distribution_2", "acknowledged_applied"), failing)
         self.assertIn(("distribution_2", "reported_account_state_delta"), failing)
 
+    def test_a_reported_account_state_no_emission_explains_fails(self):
+        receipt = _v2_receipt()
+        rows = receipt["native_account_event_rows"]
+        rows.insert(3, {"ts_event_ns": (DIVIDEND_TS - 3600) * 10 ** 9, "reported": True,
+                        "total": "1700.00"})
+        failing = _failing_fields(_v2(receipt))
+        self.assertIn(("distribution_module", "unexplained_reported_account_states"), failing)
+
     def test_an_unposted_ledger_fails_under_v2(self):
         receipt = _v2_receipt()
         for entry in receipt["distribution_ledger"]:
@@ -1346,6 +1408,149 @@ class V2DistributionBoundaryTests(unittest.TestCase):
         self.assertEqual([d["engine_posted"] for d in ledger], [True, False])
         self.assertEqual([d["amount"] for d in ledger], ["0.00", "428.64"])
         self.assertEqual([d["utc_seconds"] for d in ledger], [DIVIDEND_ZERO_TS, DIVIDEND_TS])
+
+
+class V2PreconditionTests(unittest.TestCase):
+    """acceptance_criteria.preconditions are checks: an unmet one fails the comparison."""
+
+    def test_met_preconditions_qualify(self):
+        verdict = _v2(_v2_receipt())
+        self.assertTrue(verdict["preregistration_qualifying"])
+        self.assertTrue(all(status == "PASS" for status in verdict["preconditions"].values()))
+        self.assertEqual(verdict["prior_v2_replays"], 1)
+
+    def test_a_run_with_no_review_record_fails_even_when_execution_passes(self):
+        receipt = _v2_receipt()
+        receipt["preconditions"]["review"] = None
+        verdict = _v2(receipt)
+        self.assertEqual(verdict["verdict"], "FAIL")
+        self.assertFalse(verdict["preregistration_qualifying"])
+        self.assertEqual(verdict["execution_checks"]["fail"], 0)
+        self.assertEqual(_failing_fields(verdict),
+                         {("precondition_review", "retained_record_before_run")})
+        self.assertEqual(COMPARE.compare(receipt, ORACLE, TOLERANCES, EFFECTIVE_V2, V2_BARS)["verdict"],
+                         "FAIL")
+
+    def test_review_record_must_cover_the_files_that_ran_before_the_run(self):
+        cases = {
+            "reviewed_files_are_the_files_that_ran":
+                lambda r, c: r["local_source_sha256"].update({"run.py": "c" * 64}),
+            "completed_before_run_started":
+                lambda r, c: c.update(completed_utc="2026-09-23T07:00:00+00:00"),
+            "unresolved_findings": lambda r, c: c.update(unresolved_findings=1),
+        }
+        for field, mutate in cases.items():
+            with self.subTest(field=field):
+                receipt = _v2_receipt()
+                content = json.loads(json.dumps(SYNTHETIC_REVIEW))
+                mutate(receipt, content)
+                context = {"inputs_rehashed_at_comparison": True,
+                           "review_record": {"sha256": SYNTHETIC_REVIEW_SHA256, "content": content}}
+                verdict = _v2(receipt, preconditions=context)
+                self.assertIn(("precondition_review", field), _failing_fields(verdict))
+                self.assertEqual(verdict["verdict"], "FAIL")
+
+    def test_a_review_record_changed_or_missing_at_comparison_time_fails(self):
+        for record in ({"sha256": "d" * 64, "content": SYNTHETIC_REVIEW}, None):
+            with self.subTest(record=bool(record)):
+                verdict = _v2(_v2_receipt(), preconditions={"inputs_rehashed_at_comparison": True,
+                                                            "review_record": record})
+                self.assertIn(("precondition_review", "record_sha256_at_comparison"),
+                              _failing_fields(verdict))
+
+    def test_bars_mode_cannot_rehash_inputs_so_the_comparison_is_incomplete(self):
+        context = dict(MET_PRECONDITIONS, inputs_rehashed_at_comparison=False)
+        verdict = _v2(_v2_receipt(), preconditions=context)
+        self.assertEqual(verdict["failed"], 0)
+        self.assertEqual(verdict["verdict"], "BLOCKED-INCOMPLETE")
+        self.assertFalse(verdict["preregistration_qualifying"])
+
+    def test_inputs_engine_and_isolation_are_checked(self):
+        cases = {
+            ("precondition_hashes", "inputs_at_run"):
+                lambda r: r["inputs"]["sha256"].update({"equity/usa/hour/spy.zip": "0" * 64}),
+            ("precondition_engine", "extension_sha256"):
+                lambda r: r["engine"].update(extension_sha256={"x": "0" * 64}),
+            ("precondition_engine", "network_interfaces"):
+                lambda r: r["isolation"].update(network_interfaces=[[1, "lo"], [2, "eth0"]]),
+            ("precondition_engine", "environment_beyond_cleared_set"):
+                lambda r: r["isolation"]["environment_names"].append("HOME"),
+            ("precondition_engine", "read_only_mounts"):
+                lambda r: r["isolation"]["read_only"].update(data_root=False),
+        }
+        for key, mutate in cases.items():
+            with self.subTest(check=key):
+                receipt = _v2_receipt()
+                mutate(receipt)
+                self.assertIn(key, _failing_fields(_v2(receipt)))
+
+    def test_a_v2_receipt_bound_to_another_v2_manifest_is_refused(self):
+        receipt = json.loads(RECEIPT_V2.read_text())
+        with tempfile.TemporaryDirectory() as tmp:
+            other = Path(tmp) / "mapping-manifest-v2.json"
+            altered = dict(MANIFEST_V2, drafted_utc_date="1999-01-01")
+            other.write_text(json.dumps(altered))
+            for name in ("mapping-manifest.json", "PREREGISTRATION-v2.md"):
+                (Path(tmp) / name).write_bytes((SOURCE / name).read_bytes())
+            receipt["mapping_manifest"]["sha256"] = hashlib.sha256(other.read_bytes()).hexdigest()
+            with self.assertRaisesRegex(ValueError, "v2_receipt_not_bound_to_the_sealed_manifest"):
+                COMPARE.bind(receipt, SOURCE / "tolerances.json", other)
+
+    def test_the_pins_are_the_sealed_files(self):
+        self.assertEqual(COMPARE.SEALED_V2_MANIFEST_SHA256,
+                         hashlib.sha256((SOURCE / "mapping-manifest-v2.json").read_bytes()).hexdigest())
+        self.assertEqual(COMPARE.SEALED_V2_PREREGISTRATION_SHA256,
+                         hashlib.sha256((SOURCE / "PREREGISTRATION-v2.md").read_bytes()).hexdigest())
+        self.assertEqual(COMPARE.REVIEWED_HARNESS_FILES, RUN.REVIEWED_HARNESS_FILES)
+        self.assertEqual(COMPARE.REVIEW_RECORD_SCHEMA, RUN.REVIEW_RECORD_SCHEMA)
+
+
+class V2RunnerRecordTests(unittest.TestCase):
+    """Pure runner helpers behind the review, replay-history and engine-view records."""
+
+    def test_review_record_must_be_inside_the_checkout_and_well_formed(self):
+        self.assertIsNone(RUN.load_review_record(None))
+        with tempfile.TemporaryDirectory() as tmp:
+            outside = Path(tmp) / "review.json"
+            outside.write_text(json.dumps(SYNTHETIC_REVIEW))
+            with self.assertRaisesRegex(ValueError, "review_record_outside_checkout"):
+                RUN.load_review_record(outside)
+        with tempfile.TemporaryDirectory(dir=SOURCE) as tmp:
+            record = Path(tmp) / "review.json"
+            record.write_text(json.dumps(dict(SYNTHETIC_REVIEW, schema="other")))
+            with self.assertRaisesRegex(ValueError, "review_record_schema"):
+                RUN.load_review_record(record)
+            record.write_text(json.dumps(SYNTHETIC_REVIEW))
+            loaded = RUN.load_review_record(record)
+            self.assertEqual(loaded["sha256"], hashlib.sha256(record.read_bytes()).hexdigest())
+            self.assertTrue(loaded["path"].startswith("blueprints/us-equities/engine-nautilus/spy-parity/"))
+
+    def test_replay_history_lists_every_earlier_replay(self):
+        history = RUN.load_replay_history()
+        ids = [r["id"] for r in history["replays"]]
+        for expected in ("dev1-dev5", "dev9", "late-emission-experiment", "bwrap-db8bad7",
+                         "bwrap-8c4d7e7"):
+            self.assertIn(expected, ids)
+        self.assertFalse(any(r["reviewed_before_run"] for r in history["replays"]))
+
+    def test_engine_order_view_refuses_a_missing_field_and_attaches_per_leg(self):
+        snapshot = {field: None for field in FIXTURE.ENGINE_ORDER_FIELDS}
+        snapshot.update(client_order_id="O-1-STOP", linked_order_ids=["O-1-MIT"])
+        self.assertEqual(FIXTURE.engine_order_view(snapshot)["linked_order_ids"], ["O-1-MIT"])
+        with self.assertRaisesRegex(ValueError, "engine_order_view_missing:contingency_type"):
+            FIXTURE.engine_order_view({k: v for k, v in snapshot.items() if k != "contingency_type"})
+        pairs = [{"legs": [{"client_order_id": "O-1-STOP"}, {"client_order_id": "O-1-MIT"}]}]
+        attached = FIXTURE.attach_engine_views(pairs, {"O-1-STOP": {"a": 1}}, {"O-1-MIT": {"b": 2}})
+        self.assertEqual(attached[0]["legs"][0]["engine_at_accept"], {"a": 1})
+        self.assertIsNone(attached[0]["legs"][0]["engine_final"])
+        self.assertEqual(attached[0]["legs"][1]["engine_final"], {"b": 2})
+        self.assertNotIn("engine_at_accept", pairs[0]["legs"][0])
+
+    def test_declared_deviations_cover_the_review_findings(self):
+        ids = [d["id"] for d in RUN.PREREGISTRATION_DEVIATIONS]
+        for expected in ("review_before_first_run", "first_v2_run_preceded_review",
+                         "venue_module_count_not_engine_observable", "bars_mode_cannot_rehash_inputs"):
+            self.assertIn(expected, ids)
 
 
 class V2PublishedResultTests(unittest.TestCase):
@@ -1367,9 +1572,11 @@ class V2PublishedResultTests(unittest.TestCase):
     def test_published_v2_receipt_reconciles_without_bars(self):
         oracle = COMPARE.oracle_case(json.loads(LEAN_RECEIPT.read_text()), self.receipt["case"])
         verdict = COMPARE.compare(self.receipt, oracle, TOLERANCES, EFFECTIVE_V2, None)
-        self.assertEqual(verdict["failed"], 0)
+        self.assertEqual(verdict["execution_checks"]["fail"], 0)
         published = {c["key"]: c["status"] for c in self.verdict["checks"]}
         for check in verdict["checks"]:
+            if check["id"].startswith(COMPARE.PRECONDITION_PREFIX):
+                continue
             if check["status"] != "SKIPPED" and check["key"] in published:
                 self.assertEqual(published[check["key"]], "PASS", check["key"])
 
@@ -1377,6 +1584,12 @@ class V2PublishedResultTests(unittest.TestCase):
         self.assertEqual(self.receipt["preregistration_deviations"], RUN.PREREGISTRATION_DEVIATIONS)
         self.assertIn("review_before_first_run",
                       [d["id"] for d in self.receipt["preregistration_deviations"]])
+
+    def test_receipt_lists_every_earlier_replay(self):
+        recorded = self.receipt["preconditions"]["prior_v2_replays"]["replays"]
+        current = RUN.load_replay_history()["replays"]
+        self.assertEqual(recorded, current[:len(recorded)])
+        self.assertIn("bwrap-8c4d7e7", [r["id"] for r in recorded])
 
     def test_published_verdict_records_the_comparison_it_claims(self):
         self.assertEqual(self.verdict["manifest_schema_version"], 2)
@@ -1387,7 +1600,16 @@ class V2PublishedResultTests(unittest.TestCase):
                          sum(1 for c in self.verdict["checks"] if c["status"] == "FAIL"))
         self.assertEqual(self.verdict["verdict"],
                          "PASS" if self.verdict["failed"] == 0 else "FAIL")
-
+        pre = [c for c in self.verdict["checks"] if c["id"].startswith(COMPARE.PRECONDITION_PREFIX)]
+        self.assertTrue(pre)
+        self.assertEqual(self.verdict["preregistration_qualifying"],
+                         all(c["status"] == "PASS" for c in pre))
+        # A run no retained review preceded can never be published as a PASS.
+        if not self.receipt["preconditions"]["review"]:
+            self.assertEqual(self.verdict["verdict"], "FAIL")
+            self.assertFalse(self.verdict["preregistration_qualifying"])
+            self.assertIn("precondition_review.retained_record_before_run",
+                          [k.split("#")[0] for k in self.verdict["unattributed_failures"]])
 
 if __name__ == "__main__":
     unittest.main()

@@ -54,18 +54,34 @@ VENUE = {"oms_type": "NETTING", "account_type": "CASH", "use_random_ids": False,
          "bar_adaptive_high_low_ordering": False, "reject_stop_orders": True,
          "support_contingent_orders": True, "frozen_account": False}
 NEGATIVE_CASH_TEXT = "Cash account balance would become negative"
-# Declared before the published run and copied verbatim into the receipt. None
-# changes a sealed file, a tolerance, an input or a LEAN-side value; each is a
-# point where the sealed text could not be followed literally or left a choice.
+# Copied verbatim into every receipt. The first version of this list was written
+# after the unisolated development replays and the db8bad7 bwrap replay had run
+# and their results were known (replay-history-v2.json lists every replay); the
+# 2026-09-23 review-fix round revised it. None changes a sealed file, a tolerance,
+# an input or a LEAN-side value; each is a point where the sealed text could not
+# be followed literally or left a choice.
 PREREGISTRATION_DEVIATIONS = [
     {"id": "review_before_first_run",
      "sealed_text": "acceptance_criteria.preconditions[0]: the harness changes are implemented and "
                     "independently reviewed before the first v2 run; the review record is retained.",
-     "deviation": "The replay ran before any independent review of the harness changes. The review "
-                  "is owned by the peer session that owns the gate rows; no review record exists "
-                  "in this receipt.",
-     "effect": "The comparison result stands as measured, but the precondition is unmet until that "
-               "review is retained; a PASS here does not by itself move any mapping or gate."},
+     "deviation": "No independent review preceded any replay in preconditions.prior_v2_replays. "
+                  "compare.py evaluates this precondition as a check: unless preconditions.review "
+                  "names a retained review record whose sha256 still matches at comparison time, "
+                  "whose reviewed harness file hashes equal this run's local_source_sha256, whose "
+                  "completion precedes started_utc and which leaves no finding unresolved, the check "
+                  "fails and, under the sealed verdict rule, so does the comparison.",
+     "effect": "A run without a qualifying review record is published with verdict FAIL and "
+               "preregistration_qualifying false even when every execution check passes; it moves "
+               "no mapping and no gate."},
+    {"id": "first_v2_run_preceded_review",
+     "sealed_text": "acceptance_criteria.preconditions[0]: '... before the first v2 run'.",
+     "deviation": "Read literally, no run can meet this any more: the first v2 replays on the frozen "
+                  "data ran before any review (preconditions.prior_v2_replays). compare.py evaluates "
+                  "the reading the 2026-09-23 independent review proposed: the qualifying run is the "
+                  "first run from a harness whose exact files were reviewed before that run, with "
+                  "every earlier replay published as superseded.",
+     "effect": "Whether that reading satisfies the preregistration is for the gate owner; if it "
+               "does not, v2 cannot pass and a new dated preregistration is required."},
     {"id": "sealed_status_fields_not_updated",
      "sealed_text": "mapping-manifest-v2.json run_status 'preregistered_not_run' and "
                     "harness_changes_required.implemented false.",
@@ -80,11 +96,29 @@ PREREGISTRATION_DEVIATIONS = [
                   "instead of stopping the engine mid-run (an exception inside process() is not "
                   "guaranteed to propagate out of the pinned engine).",
      "effect": "Same outcome for publication: no receipt exists for a run with a late emission."},
+    {"id": "venue_module_count_not_engine_observable",
+     "sealed_text": "acceptance_criteria.distributions_and_cash[0]: the venue has exactly one module, "
+                    "a DistributionModule instance.",
+     "deviation": "The pinned engine exposes no accessor for a venue's modules. venue_module_count is "
+                  "the length of the modules list the runner passed to add_venue (harness "
+                  "configuration, labelled as such). compare.py adds the engine-observed check that "
+                  "every reported AccountState after the initial one sits at a DistributionModule "
+                  "emission instant with exactly the emitted delta.",
+     "effect": "A second cash-posting module would surface as an unexplained reported AccountState; "
+               "a second module that posts nothing would not be detected."},
+    {"id": "bars_mode_cannot_rehash_inputs",
+     "sealed_text": "acceptance_criteria.preconditions[1]: the five frozen inputs hash-match at run "
+                    "and at comparison time.",
+     "deviation": "compare.py --bars has no data root, so it cannot re-hash the frozen inputs; it "
+                  "reports that precondition check SKIPPED, which leaves the comparison incomplete. "
+                  "The v2 verdict is published from --lean-data, which re-hashes them.",
+     "effect": "--bars can no longer produce a v2 PASS; the README mode table describes v1."},
     {"id": "v2_output_paths",
      "sealed_text": "Neither README.md nor mapping-manifest-v2.json names paths for the v2 receipt "
                     "and verdict; the manifest keeps v1 bound to verdict.json.",
-     "deviation": "The v2 results are published as receipt-v2.json and verdict-v2.json; the v1 "
-                  "receipt.json and verdict.json are kept unchanged.",
+     "deviation": "The v2 results are published as receipt-v2.json and verdict-v2.json, and the "
+                  "replay list as replay-history-v2.json; the v1 receipt.json and verdict.json are "
+                  "kept unchanged.",
      "effect": "The gate row reading verdict.json is untouched by this run."},
     {"id": "manifest_evidence_class_token",
      "sealed_text": "mapping-manifest-v2.json evidence_class 'HIST (for the future replay); ...'.",
@@ -99,9 +133,15 @@ PREREGISTRATION_DEVIATIONS = [
     {"id": "operator_declared_commit",
      "sealed_text": "README.md replay command.",
      "deviation": "The documented bwrap command gains --harness-commit, because the isolated run "
-                  "cannot read Git; local_source_sha256 remains the binding record.",
+                  "cannot read Git, and --review-record when a retained review record exists; "
+                  "local_source_sha256 remains the binding record.",
      "effect": "None on execution."},
 ]
+REVIEW_RECORD_SCHEMA = "spy-parity-v2-harness-review/1"
+REVIEWED_HARNESS_FILES = ("convert.py", "fixture_strategy.py", "distribution_module.py", "run.py",
+                          "compare.py")
+REPLAY_HISTORY = "replay-history-v2.json"
+REPLAY_HISTORY_SCHEMA = "spy-parity-v2-replay-history/1"
 LOG_LEVEL_RE = re.compile(r"\[(TRACE|DEBUG|INFO|WARN|WARNING|ERROR)\]")
 
 WINDOW = {"symbol": "SPY", "start": "2019-12-02", "end": "2020-04-30"}
@@ -222,6 +262,44 @@ def distribution_events(data_root: Path) -> list:
         (Path(data_root) / "equity/usa/factor_files/spy.csv").read_text())
     return DISTRIBUTION.derive_events(factor_rows, daily_sessions(data_root),
                                       WINDOW["start"], WINDOW["end"])
+
+
+def load_review_record(path) -> dict | None:
+    """The retained independent-review record named on the command line, if any.
+
+    It must sit inside this checkout so compare.py can re-hash it later. The
+    receipt records its path, sha256 and declared fields; compare.py judges it.
+    """
+    if path is None:
+        return None
+    resolved = Path(path).resolve()
+    if REPO not in resolved.parents:
+        raise ValueError("review_record_outside_checkout")
+    blob = resolved.read_bytes()
+    record = json.loads(blob.decode("utf-8"))
+    if record.get("schema") != REVIEW_RECORD_SCHEMA:
+        raise ValueError("review_record_schema")
+    for field in ("reviewer", "completed_utc", "reviewed_commit", "reviewed_local_source_sha256",
+                  "unresolved_findings"):
+        if field not in record:
+            raise ValueError("review_record_missing:" + field)
+    return {"path": str(resolved.relative_to(REPO)), "sha256": hashlib.sha256(blob).hexdigest(),
+            **{k: record[k] for k in ("reviewer", "completed_utc", "reviewed_commit",
+                                      "reviewed_local_source_sha256", "unresolved_findings")}}
+
+
+def load_replay_history() -> dict:
+    """Every earlier v2 replay on the frozen inputs, copied into the receipt."""
+    path = SOURCE / REPLAY_HISTORY
+    history = json.loads(path.read_text())
+    if history.get("schema") != REPLAY_HISTORY_SCHEMA or not isinstance(history.get("replays"), list):
+        raise ValueError("replay_history_schema")
+    return {"path": REPLAY_HISTORY, "sha256": digest(path), "replays": history["replays"]}
+
+
+def read_only_mount(path) -> bool:
+    """Whether ``path`` sits on a read-only mount, as the kernel reports it."""
+    return bool(os.statvfs(path).f_flag & os.ST_RDONLY)
 
 
 def scan_engine_log(text: str) -> dict:
@@ -348,8 +426,8 @@ def run_once(rows, events, out: Path, label: str) -> dict:
     from nautilus_trader.backtest import BacktestEngine
     from nautilus_trader.common import LogColor, LogLevel, logger_flush, logger_log
     from nautilus_trader.config import BacktestEngineConfig, LoggerConfig
-    from nautilus_trader.model import (AccountType, Currency, Equity, InstrumentId, Money,
-                                       OmsType, Price, Quantity, Symbol, Venue)
+    from nautilus_trader.model import (AccountType, ClientOrderId, Currency, Equity, InstrumentId,
+                                       Money, OmsType, Price, Quantity, Symbol, Venue)
 
     random.seed(SEED)
     out.mkdir(mode=0o700, parents=True, exist_ok=False)
@@ -363,11 +441,12 @@ def run_once(rows, events, out: Path, label: str) -> dict:
     strategy_class = FIXTURE.build_strategy(equity.id, INSTRUMENT["bar_type"], rows, CASE,
                                             [e["ex_instant_ns"] for e in events])
     module = DISTRIBUTION.build_module(events, INSTRUMENT["instrument_id"], INSTRUMENT["currency"])
+    modules = [module]
     log_path = out / "engine.log"
     # Bound before the try so an engine failure surfaces as itself, never as a
     # NameError from the post-run block, and never masked by dispose().
     strategy = raw = reports = result = native_events = None
-    open_positions = open_orders = None
+    open_positions = open_orders = final_views = None
     failure = None
     with CapturedOutput(log_path):
         engine = BacktestEngine(BacktestEngineConfig(
@@ -377,7 +456,7 @@ def run_once(rows, events, out: Path, label: str) -> dict:
                              getattr(AccountType, VENUE["account_type"]),
                              [Money(Decimal(CASE["initial_cash_usd"]), usd)], base_currency=usd,
                              fill_model=VENUE["fill_model"], fee_model=VENUE["fee_model"],
-                             latency_model=VENUE["latency_model"], modules=[module],
+                             latency_model=VENUE["latency_model"], modules=modules,
                              reject_stop_orders=VENUE["reject_stop_orders"],
                              support_contingent_orders=VENUE["support_contingent_orders"],
                              use_random_ids=VENUE["use_random_ids"],
@@ -400,6 +479,12 @@ def run_once(rows, events, out: Path, label: str) -> dict:
             native_events = account_events(engine.cache.account_for_venue(venue), usd)
             open_positions = len(engine.cache.positions_open())
             open_orders = len(engine.cache.orders_open())
+            final_views = {}
+            for client_order_id in strategy.submitted:
+                order = engine.cache.order(ClientOrderId(client_order_id))
+                if order is None:
+                    raise ValueError("submitted_order_not_in_cache:" + client_order_id)
+                final_views[client_order_id] = FIXTURE.engine_order_view(order.to_dict())
         except BaseException as error:  # noqa: BLE001 - the original failure is re-raised
             failure = error
             raise
@@ -424,7 +509,7 @@ def run_once(rows, events, out: Path, label: str) -> dict:
                 time.sleep(0.01)
 
     log_scan = scan_engine_log(log_path.read_text(encoding="utf-8", errors="replace"))
-    if strategy is None or raw is None or result is None:
+    if strategy is None or raw is None or result is None or final_views is None:
         raise ValueError("engine_run_incomplete:" + label)
     if module.errors:
         # A late emission or an unapplied adjustment is a module error; the
@@ -438,15 +523,16 @@ def run_once(rows, events, out: Path, label: str) -> dict:
         [{"ex_date": e["ex_date"], "utc_seconds": e["ex_instant_utc_seconds"],
           "per_share": e["per_share"]} for e in events], strategy.fills)
     cash = FIXTURE.cash_ledger(Decimal(CASE["initial_cash_usd"]), strategy.fills, ledger)
+    oco_pairs = FIXTURE.attach_engine_views(strategy.oco_pairs, strategy.accepted_orders, final_views)
     native_balances = [str(number(row["total"])) for row in raw["account"]]
     module_record = {"class": type(module).__name__, "process_calls": module.process_calls,
-                     "resets": module.resets,
+                     "resets": module.resets, "venue_module_count": len(modules),
                      "calls_at_event_instants_ns": module.calls_at_event_instants,
                      "emissions": module.emissions, "acknowledgements": module.acknowledgements,
                      "errors": module.errors, "pending_at_end": [e["ex_date"] for e in module.pending]}
     counters = {}
     economic = {"intents": strategy.intents, "fills": strategy.fills,
-                "oco_pairs": strategy.oco_pairs,
+                "oco_pairs": oco_pairs,
                 "order_events": normalize(strategy.order_events, counters),
                 "native_account_totals": native_balances,
                 "native_account_events": native_events,
@@ -472,7 +558,7 @@ def run_once(rows, events, out: Path, label: str) -> dict:
         "fees_usd": str(sum((Decimal(f["fee"]) for f in strategy.fills), Decimal(0))),
         "intents": strategy.intents,
         "fills": strategy.fills,
-        "oco_pairs": strategy.oco_pairs,
+        "oco_pairs": oco_pairs,
         "order_events": strategy.order_events,
         "alerts_registered": strategy.alerts_registered,
         "alerts_fired": strategy.alerts_fired,
@@ -506,11 +592,15 @@ def main():
                         help="Retained LEAN Data root holding the frozen SPY inputs")
     parser.add_argument("--out", type=Path, required=True, help="Fresh private output directory")
     parser.add_argument("--tolerances", type=Path, default=SOURCE / "tolerances.json")
+    parser.add_argument("--review-record", type=Path, default=None,
+                        help="Retained independent-review record (JSON, schema " + REVIEW_RECORD_SCHEMA +
+                             ") inside this checkout; compare.py judges it")
     parser.add_argument("--harness-commit", default=None,
                         help="Commit of the checkout being run, recorded as declared by the operator "
                              "(the isolated run cannot read Git); local_source_sha256 binds the files")
     args = parser.parse_args()
 
+    started_utc = datetime.now(timezone.utc).isoformat()
     installed = importlib.metadata.version("nautilus_trader")
     if installed != "2.0.0rc5":
         raise ValueError("native_version_mismatch:" + installed)
@@ -518,6 +608,8 @@ def main():
     args.out.mkdir(mode=0o700, parents=True, exist_ok=False)
 
     frozen_plan = check_frozen_plan()
+    review = load_review_record(args.review_record)
+    history = load_replay_history()
     manifest_v2, manifest = load_bound_manifests()
     extension = check_engine_binary(manifest_v2)
     check_bound_inputs(manifest_v2, args.tolerances)
@@ -563,6 +655,7 @@ def main():
         "evidence_class": EVIDENCE_CLASS,
         "classification": "local historical replay on retained bundled sample data; not an unchanged "
                           "upstream test, a point-in-time dataset or any broker execution",
+        "started_utc": started_utc,
         "observed_utc": datetime.now(timezone.utc).isoformat(),
         "harness_commit": {"value": args.harness_commit,
                            "source": "declared by the operator on the command line; the isolated run "
@@ -592,7 +685,11 @@ def main():
                                 if (SOURCE / name).is_file()},
         "distribution_module": {"class": module_class_name(), "source": "distribution_module.py",
                                 "source_sha256": digest(SOURCE / "distribution_module.py"),
-                                "venue_module_count": 1,
+                                "venue_module_count": primary["distribution_module"]["venue_module_count"],
+                                "venue_module_count_source":
+                                    "length of the modules list passed to add_venue (harness "
+                                    "configuration); the pinned engine exposes no accessor for a "
+                                    "venue's modules",
                                 "events": events,
                                 "derived_events_equal_preregistered_window_events":
                                     derived_projection == preregistered_events,
@@ -648,7 +745,14 @@ def main():
                                        "margin-model equivalence.",
         "isolation": {"network_interfaces": socket.if_nameindex(),
                       "environment_names": sorted(os.environ),
-                      "argv": sys.argv, "cwd": os.getcwd()},
+                      "argv": sys.argv, "cwd": os.getcwd(),
+                      "read_only": {"harness_source": read_only_mount(SOURCE),
+                                    "data_root": read_only_mount(args.lean_data)}},
+        "preconditions": {
+            "review": review,
+            "review_note": "None means no retained independent review preceded this run.",
+            "prior_v2_replays": history,
+        },
         "preregistration_deviations": PREREGISTRATION_DEVIATIONS,
         "limitations": [
             "The market-on-open proxy equals LEAN's MarketOnOpenFill only inside the manifest's "
@@ -658,6 +762,14 @@ def main():
             "The DistributionModule posts cash only; bar prices stay raw-normalized. Payable dates, "
             "withholding and short-position debits are outside one_zero.",
             "Bundled sample bytes are not an entitled, point-in-time or market-wide dataset.",
+            "The unchanged v1 sizing rule sizes from the strategy's own fill-driven cash, which "
+            "leaves out engine-posted distribution cash: the exit intent records decision_equity "
+            "90767.52 where LEAN's portfolio value includes the 428.64 distribution (91196.16). "
+            "one_zero is unaffected (exit target 0; the entry precedes any distribution); a case "
+            "that sizes after an ex-date would be under-sized.",
+            "Each OCO leg's harness submission fields are the strategy's own record; compare.py "
+            "judges the native OCO structure from engine_at_accept and engine_final, the order as "
+            "the engine's cache serializes it at OrderAccepted and at run end.",
         ],
     }
     save(args.out / "receipt.json", receipt)
