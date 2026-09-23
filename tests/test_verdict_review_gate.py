@@ -39,6 +39,11 @@ INDEX = "catalogs/us-equities/decision-index.json"
 ALTERNATIVE = {"name": "Alt", "repository": "https://github.com/example/alt", "disposition": "rejected",
                "why_not_default": "fixture alternative", "evidence_class": "source_review", "evidence_refs": []}
 PROTOCOL = {"metric": "fixture metric", "arms": [], "fixture_paths": []}
+# The gate's message, or the one scripts/landscape.run_manifest_row_issue reports first once the
+# tooling owner's #124 binds the run manifest's adjudication there too.
+MANIFEST_ADJUDICATION_MISMATCH = (r"is not the sealed adjudication lanes\.adjudication_sha256 names"
+                                  r"|sealed adjudication of foundation/beta .* differs from the row's "
+                                  r"lanes\.adjudication_sha256")
 
 
 def sha(data: bytes) -> str:
@@ -853,12 +858,14 @@ class ToolingAlignmentTests(GateFixture):
         row["lanes"]["adjudication_sha256"] = "9" * 64
         report = self.report()
         self.assertFails(report, f"lanes.adjudication_sha256 {'9' * 64} is not the sha256 of {SEALED}/adjudication/")
-        self.assertIn("is not the sealed adjudication lanes.adjudication_sha256 names", self.messages(report))
+        self.assertRegex(self.messages(report), MANIFEST_ADJUDICATION_MISMATCH)
 
     def test_run_manifest_adjudication_other_than_the_row_fails(self):
         self.record(claude_keys=("c1",), codex_keys=("c2",), judged=adjudication())
         self.manifest_entries["beta"]["adjudication"] = {"outcome": "sealed", "sha256": "8" * 64}
-        self.assertFails(self.report(), "is not the sealed adjudication lanes.adjudication_sha256 names")
+        report = self.report()
+        self.assertEqual(report["status"], "failed", report)
+        self.assertRegex(self.messages(report), MANIFEST_ADJUDICATION_MISMATCH)
 
     def test_adjudication_sha256_on_an_agreeing_row_fails(self):
         row = self.record()

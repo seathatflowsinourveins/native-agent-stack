@@ -913,7 +913,8 @@ def row_continuity_violations(base_rows, head_rows, head_waves):
                                "run id never goes back")
                 elif after != newest:
                     message = (f"the row moves from wave {before} to wave {after}, which is not the newest "
-                               f"registered wave ({newest}); a row moves only to the newest registered wave")
+                               f"registered wave ({newest or 'no new wave is registered'}); a row moves only to "
+                               "the newest registered wave")
                 else:
                     continue
                 violations.append({"row": label(base_key), "message": message})

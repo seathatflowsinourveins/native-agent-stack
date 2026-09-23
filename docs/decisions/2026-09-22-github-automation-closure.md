@@ -706,6 +706,28 @@ Hosted and live results after merge. Evidence class: hosted runs and GitHub API 
     manifest's `adjudication`) and `lanes.single_lane_decision_sha256` are required and must
     match. The names are #124's module constants, and a test compares them with
     `scripts/landscape.py` once #124 defines them there.
+- **Measured (second review, 2026-09-23).** `tests/test_verdict_review_gate.py` has 92
+  synthetic-fixture tests (61 before), and `tests/test_workflow_hardening.py` has 7
+  `VerdictReviewGateTests`. The new negative controls cover a rollback to 20260922 content, a
+  deleted grandfathered or new-wave row, a downgrade to an older non-grandfathered wave, a move
+  to an unregistered wave or to a registered wave that is not the newest, two rows for one layer,
+  a stale frozen-document sha256, a missing or wrong `run_manifest_sha256`, `adjudication_sha256`
+  or `single_lane_decision_sha256`, a packet missing from the run manifest, a packet or
+  SHA256SUMS other than the run manifest's, and seven withheld-key packets. Positive controls
+  cover a pure reformat with its sha256 updated and a generator change together with its
+  regenerated documents. Real-checkout mutations were run in a scratch worktree with
+  `--base HEAD` and then restored:
+  - deleting `foundation/workers` exits 1;
+  - rolling it back from a committed 20260923 base to its 20260922 content exits 1;
+  - downgrading it from 20260924 to 20260923 exits 1;
+  - moving it to an unregistered 20260925 wave exits 1;
+  - reformatting both real ledgers exits 0, with `scripts/landscape.py` and
+    `build_verdicts.py --check` run and passing.
+
+  With #124's `scripts/landscape.py` and `tools/sota-convergence/` (origin
+  `claude/verdict-integrity-2-20260923` at 238c754) overlaid in a scratch worktree, the 92 tests
+  also pass, including the constant-name comparison. This is a local integration check of the
+  unmerged branch, not of its merged form.
 - **Accepted residual: the PR's own workflow can disable the job (finding 2, 2026-09-23).** A
   `pull_request` run takes the job definition from the PR's `validate.yml`. A PR that edits the
   `verdict-review-gate` job so that it no longer runs the base's gate is therefore not blocked by
