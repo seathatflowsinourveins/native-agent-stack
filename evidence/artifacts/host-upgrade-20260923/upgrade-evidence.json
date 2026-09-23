@@ -22,10 +22,16 @@
    "id": "wslconfig-workstation-memory",
    "kind": "configuration",
    "target": "128 GB WSL workstation",
-   "change": "Raise WSL memory from its default (half of physical RAM, 64 GB). The workstation runtime profile (docs/new-workstation-runtime-profile-20260922.md) proposes memory=96GB processors=60 swap=16GB.",
+   "change": "Set .wslconfig memory=112GB processors=60 swap=16GB, [experimental] autoMemoryReclaim=gradual sparseVhd=true (WSL's default is half of physical RAM, 64 GB).",
    "verdict": "needed_at_setup",
    "cost": "none",
-   "evidence": "adoption/hardware-profiles.json wsl-workstation-128gb-projected assumes wslconfig_memory_gb 100 and its 'headroom' semantic-RAG tier needs ram_gb >= 96; with the profiles' own arithmetic (about 1 GB of VM overhead) 96GB would show about 95 GB and miss that tier. The two records need reconciling by their owner; this manifest does not choose the value."
+   "evidence": "adoption/hardware-profiles.json wsl-workstation-128gb-projected previously assumed wslconfig_memory_gb 100 (the runtime profile's 96GB proposal would show about 95 GB under the profiles' own arithmetic and just miss the 'headroom' semantic-RAG tier's ram_gb >= 96); the decision below sets it to 112 GB instead. adoption/hardware-profiles.json wsl-workstation-128gb-projected is the hardware-profiles owner's record of that value (catalog PR #125); this manifest states the decision, not the profiles entry's exact fields. Measured on the laptop host 2026-09-23 (Windows CIM counters through WSL interop, aggregate only): 63.4 GB physical, WSL working set 30.5 GB under a 48 GB cap, 9.0 GB free, about 24 GB used by Windows outside WSL (kernel, GPU driver, memory compression, desktop and applications), commit charge 85.7 of 99.7 GB. A cap near 128 GB would leave Windows paging under load; re-measure on the workstation under full load and raise toward 116-120 GB only if Windows keeps more than 12 GB free.",
+   "decision": {
+    "date": "2026-09-23",
+    "by": "user",
+    "value": "memory=112GB",
+    "basis": "The workstation's main work is the native LLM ecosystem, foundation and north star; WSL takes about 88% of 128 GB and Windows keeps 16 GB."
+   }
   },
   {
    "id": "bounded-run-cpu-limit",
@@ -98,5 +104,5 @@
    "source": "https://huggingface.co/XiaomiMiMo/MiMo-V2.6-Pro-RL"
   }
  ],
- "summary": "Needed now: two software changes (bounded-run CPU limit, wave retention). Needed at setup: a larger WSL memory setting on the workstation (value to reconcile between the runtime profile and the hardware profiles). No hardware purchase is justified by the measured load; GPU memory is the upgrade to buy first if a selected local model outgrows 24 GB."
+ "summary": "Needed now: two software changes (bounded-run CPU limit, wave retention). Needed at setup: the workstation's WSL memory setting (decided: 112 GB). No hardware purchase is justified by the measured load; GPU memory is the upgrade to buy first if a selected local model outgrows 24 GB."
 }

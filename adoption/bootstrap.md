@@ -21,7 +21,9 @@ git checkout "$tag"
 if test "$(git rev-parse HEAD)" = "$commit"; then echo "at $tag ($commit)"; else echo "error: $tag is not the pinned release commit $commit" >&2; false; fi
 ```
 This checks out `adoption/manifest.json` `source.release_tag` (or a later tag)
-and confirms it resolves to `source.release_commit`, published with SLSA build
+and confirms it resolves to `source.release_commit` (read from the manifest you actually
+cloned, never from a commit pasted into prose, which a later re-pin would leave
+stale), published with SLSA build
 provenance by `.github/workflows/publish-catalog.yml`. `scripts/release_due.py`
 was added after `v2026.09.23`, so it runs here, on the default branch, before
 the checkout. After checkout, follow the documents in your checkout.

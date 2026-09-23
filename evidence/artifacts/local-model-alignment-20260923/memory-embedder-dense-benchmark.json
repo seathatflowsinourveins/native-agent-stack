@@ -1,0 +1,149 @@
+{
+ "schema_version": 1,
+ "id": "memory-embedder-dense-benchmark-20260923",
+ "date": "2026-09-23",
+ "evidence_class": "local_integration on one WSL2 x86_64 host (RTX 5090 Laptop 24 GB); one run per arm; dense cosine retrieval only",
+ "question": "Which current local embedding model best retrieves durable-memory pages when each model is used exactly as its publisher specifies?",
+ "corpus": "a sealed snapshot of the host's ai-memory store: 130 latest pages (decisions, sessions, logs), sha256-locked",
+ "queries": {
+  "q1": "40 queries (32 answerable, 8 no-answer) from the first round; single annotator",
+  "q2": "40 new queries written without title words, 6 answered only deep inside long pages, 10 in-topic no-answer; judged blind by two annotators",
+  "q2_agreement": {
+   "answerable_vs_no_answer_agree": "36/40",
+   "excluded_disputed": 4,
+   "mean_jaccard_shared_answerable": 0.765,
+   "share_of_queries_sharing_a_grade2_page": 0.933
+  },
+  "merged_gold_rule": "relevant = union of both annotators; grade 2 only when both gave 2; disputed queries excluded",
+  "scored_answerable": 62
+ },
+ "arms": [
+  {
+   "arm": "nemotron-1b",
+   "model": "nvidia/Nemotron-3-Embed-1B-BF16",
+   "revision": "c0c9fea",
+   "license": "OpenMDW-1.1",
+   "setup": "vLLM 0.25.0 /v2/embed with input_type query|document and truncate END (applies the publisher's saved query:/passage: prompts), mean pooling, L2 norm, max length 32768"
+  },
+  {
+   "arm": "qwen3-0.6b",
+   "model": "Qwen/Qwen3-Embedding-0.6B",
+   "license": "Apache-2.0",
+   "setup": "queries 'Instruct: {task}\\nQuery:{query}', plain documents, last-token pooling, L2 norm, max length 8192"
+  },
+  {
+   "arm": "qwen3-4b",
+   "model": "Qwen/Qwen3-Embedding-4B",
+   "license": "Apache-2.0",
+   "setup": "as qwen3-0.6b"
+  },
+  {
+   "arm": "granite-r2",
+   "model": "ibm-granite/granite-embedding-english-r2",
+   "license": "Apache-2.0",
+   "setup": "plain text per model card"
+  },
+  {
+   "arm": "minilm (reference only, not eligible)",
+   "model": "sentence-transformers/all-MiniLM-L6-v2",
+   "license": "Apache-2.0",
+   "setup": "plain text, 256 word pieces"
+  }
+ ],
+ "ways": {
+  "full": "each page up to the model's max length, longer pages chunked identically for every arm and scored by best chunk",
+  "ai-memory-fed": "each page head-truncated to 8000 bytes, as ai-memory 2.3.2/2.4.0 sends it"
+ },
+ "results": [
+  {
+   "arm": "granite-r2",
+   "eligible_to_win": true,
+   "full_ndcg10": 0.8187,
+   "full_recall5": 0.9677,
+   "full_pages_ok": true,
+   "fed_ndcg10": 0.8289,
+   "fed_recall5": 0.9677,
+   "fed_pages_ok": true
+  },
+  {
+   "arm": "minilm",
+   "eligible_to_win": false,
+   "full_ndcg10": 0.7128,
+   "full_recall5": 0.871,
+   "full_pages_ok": true,
+   "fed_ndcg10": 0.7314,
+   "fed_recall5": 0.871,
+   "fed_pages_ok": true
+  },
+  {
+   "arm": "nemotron-1b",
+   "eligible_to_win": true,
+   "full_ndcg10": 0.8584,
+   "full_recall5": 0.9677,
+   "full_pages_ok": true,
+   "fed_ndcg10": 0.8686,
+   "fed_recall5": 0.9839,
+   "fed_pages_ok": true
+  },
+  {
+   "arm": "qwen3-0.6b",
+   "eligible_to_win": true,
+   "full_ndcg10": 0.8201,
+   "full_recall5": 0.9355,
+   "full_pages_ok": true,
+   "fed_ndcg10": 0.8071,
+   "fed_recall5": 0.9355,
+   "fed_pages_ok": true
+  },
+  {
+   "arm": "qwen3-4b",
+   "eligible_to_win": true,
+   "full_ndcg10": 0.8117,
+   "full_recall5": 0.9677,
+   "full_pages_ok": true,
+   "fed_ndcg10": 0.7991,
+   "fed_recall5": 0.9677,
+   "fed_pages_ok": true
+  }
+ ],
+ "preregistered_rule": "the eligible arm with the highest mean nDCG@10 over Q1+Q2 in the full way; runner-up named if within 0.02",
+ "rule_outcome": "nemotron-1b highest in both ways (full 0.858, fed 0.869); margin over the MiniLM reference +0.146 (full) and +0.137 (fed)",
+ "independent_verification": {
+  "reviewer": "evidence-reviewer (Opus/high), separate agent",
+  "verdict": "partially_confirmed",
+  "paired_bootstrap_95ci_full_ndcg_lead": {
+   "vs_qwen3-0.6b": [
+    -0.013,
+    0.088
+   ],
+   "vs_granite-r2": [
+    -0.002,
+    0.081
+   ],
+   "vs_qwen3-4b": [
+    -0.008,
+    0.101
+   ],
+   "vs_minilm": [
+    0.085,
+    0.213
+   ]
+  },
+  "notes": [
+   "The lead over MiniLM is solid; the lead over the other current models is within noise (on Q1 alone granite-r2 scores higher).",
+   "The metric named recall@5 is 'any relevant page in the top 5'.",
+   "Only the final lock of three survived; file times and the command log support the order; two protocol amendments (CPU thread cap, GPU for sentence-transformers arms) were relocked before their runs.",
+   "Prefixes and input_type are shown by the harness code; the vLLM servers ran without request logging.",
+   "q29 and q30 have no annotator overlap because annotator 1's only gold page is outside the 130-page corpus; they are scored on annotator 2's pages."
+  ]
+ },
+ "skipped": [
+  "nvidia/Nemotron-3-Embed-8B-BF16 (VRAM margin on a shared host)",
+  "Alibaba-NLP/UEmbed-2B",
+  "google/embeddinggemma-300m (gated)"
+ ],
+ "limits": [
+  "one host, one run per arm",
+  "Q1 had one annotator; Q2 annotator 1 also wrote the queries"
+ ]
+}

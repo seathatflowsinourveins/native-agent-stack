@@ -176,6 +176,45 @@
     "evidence_class": {
       "enum": ["native_proven", "local_integration", "synthetic"]
     },
+    "qualified_models": {
+      "type": "array",
+      "description": "Local model weights qualified on this host's runtime (for example vllm, mlx-lm, llama.cpp), recorded with scripts/host_receipts.py record --qualified-model. Optional; distinct from tool_versions, which is the runtime component's own version.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["model_id", "revision", "runtime", "runtime_version", "bars", "result"],
+        "properties": {
+          "model_id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Model identifier, e.g. a Hugging Face repo id"
+          },
+          "revision": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Pinned revision/commit of the model weights"
+          },
+          "runtime": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Serving/inference runtime, e.g. vllm, mlx-lm, llama.cpp"
+          },
+          "runtime_version": {
+            "type": "string",
+            "minLength": 1
+          },
+          "bars": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 400,
+            "description": "Short text summary of the qualification bars this model met (e.g. tool-call accuracy, task pass rate)"
+          },
+          "result": {
+            "enum": ["pass", "fail"]
+          }
+        }
+      }
+    },
     "reviews": {
       "type": "array",
       "minItems": 1,

@@ -1,0 +1,6 @@
+start 2026-09-23T16:46:59Z trial=adaptive-20260923g config_sha256=3587653104e68fdfc9bbb9170825c611abcf7e2e1be1004327a056031c34555a
+{"row_count": 480, "coverage_problems": {}, "sessions_range": ["2026-08-25", "2026-09-22"], "snapshot_sha256": "75e67c5dc345d67cec42945dabbbe8a83d6f4d29322262808e38b67b0891a397"}
+{"status": "pass", "row_count": 480}
+trading stream websocket error, restarting  connection: sent 1000 (OK); then received 1000 (OK)
+{"status": "passed", "flat": true, "native_fill_events": 4}
+end 2026-09-23T16:52:05Z runner_rc=0

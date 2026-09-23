@@ -7,6 +7,7 @@ limit/DAY orders only; unknown submission outcomes freeze and stop the node.
 from __future__ import annotations
 
 import asyncio
+import hashlib
 from datetime import datetime, timezone
 from decimal import Decimal
 import importlib.metadata
@@ -172,6 +173,12 @@ class NativeSession:
             self.handle.stop()
 
 
+def fill_trade_id(broker_order_id, cumulative_qty):
+    """Deterministic per-fill TradeId. Nautilus allows at most 36 characters and an
+    Alpaca order id is a 36-character UUID, so the id is a digest of both parts."""
+    return TradeId(hashlib.sha256(f"{broker_order_id}:cum:{cumulative_qty}".encode()).hexdigest()[:36])
+
+
 class AlpacaDataClient(MarketDataClient):
     def __init__(self, session, **kwargs):
         super().__init__(venue=VENUE, **kwargs)
@@ -311,7 +318,7 @@ class AlpacaExecutionClient(ExecutionClient):
             if last_px <= 0 or last_px != last_px.quantize(Decimal(1).scaleb(-ins.price_precision)):
                 raise ValueError("cumulative_fill_precision_requires_reconciliation")
             self.generate_order_filled(order, broker_id, None,
-                TradeId(row["id"] + ":cum:" + str(filled)), shares(delta), Price.from_str(str(last_px)),
+                fill_trade_id(row["id"], filled), shares(delta), Price.from_str(str(last_px)),
                 USD, Money(0, USD), LiquiditySide.NO_LIQUIDITY_SIDE, stamp)
             prior["qty"], prior["value"] = filled, value
         if not prior["terminal"]:
