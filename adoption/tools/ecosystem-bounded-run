@@ -70,9 +70,11 @@ read -r have_tasks < "/sys/fs/cgroup$cgroup/pids.max" || refuse "pids.max is not
 # (a shell builtin such as cd with no file would otherwise fail after the start).
 case $1 in
   */*) if [ ! -f "$1" ] || [ ! -x "$1" ]; then refuse "command not found: $1"; fi ;;
-  *) found=; old_ifs=$IFS; IFS=:
-     for dir in $PATH; do [ -f "${dir:-.}/$1" ] && [ -x "${dir:-.}/$1" ] && { found=1; break; }; done
-     IFS=$old_ifs; [ -n "$found" ] || refuse "command not found: $1" ;;
+  *) found=; old_ifs=$IFS; IFS=:; set -f
+     # A trailing empty PATH entry means the current directory, as for exec.
+     case $PATH in *:) search_path="$PATH." ;; *) search_path=$PATH ;; esac
+     for dir in $search_path; do [ -f "${dir:-.}/$1" ] && [ -x "${dir:-.}/$1" ] && { found=1; break; }; done
+     set +f; IFS=$old_ifs; [ -n "$found" ] || refuse "command not found: $1" ;;
 esac
 : > "$marker" || refuse "cannot record the start"
 exec "$@"

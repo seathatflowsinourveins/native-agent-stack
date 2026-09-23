@@ -588,6 +588,7 @@ class BoundedRunSetupRefusalTests(unittest.TestCase):
         self.assertEqual(result.returncode, 78, result.stdout + result.stderr)
         self.assertIn("was not started", result.stderr)
 
+    @unittest.skipUnless(CONTAINMENT_AVAILABLE, "needs a native systemd --user scope")
     def test_builtin_without_an_executable_file_is_refused_with_78(self):
         # `cd` is a shell builtin with no file on PATH; exec cannot run it, so the
         # runner must refuse before the start marker rather than return 127.
