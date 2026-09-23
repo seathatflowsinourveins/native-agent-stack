@@ -33,6 +33,11 @@ class RepoKeyTests(unittest.TestCase):
         self.assertEqual(g.repo_key("https://github.com/openai/codex-plugin-cc/tree/v1.0.6"), "openai/codex-plugin-cc")
         self.assertEqual(g.repo_key("https://github.com/Owner/Repo.git"), "owner/repo")
 
+    def test_only_the_github_host_counts(self):
+        self.assertIsNone(g.github_repo("https://evil.example/github.com/owner/repo"))
+        self.assertIsNone(g.github_repo("https://github.com.evil.example/owner/repo"))
+        self.assertEqual(g.github_repo("https://github.com/cli/cli/releases/download/v2.101.0/gh.tar.gz"), "cli/cli")
+
 
 class BuildTests(unittest.TestCase):
     @classmethod

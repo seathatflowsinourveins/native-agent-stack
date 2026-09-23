@@ -30,6 +30,7 @@ import json
 import re
 import sys
 from pathlib import Path
+from urllib.parse import urlparse
 
 try:
     from . import host_receipts
@@ -60,13 +61,23 @@ def load(rel: str):
     return json.loads((ROOT / rel).read_text(encoding="utf-8"))
 
 
+def github_repo(url):
+    """owner/name for a URL whose host is exactly github.com, else None."""
+    if not isinstance(url, str):
+        return None
+    parsed = urlparse(url.strip())
+    if parsed.scheme not in ("http", "https") or (parsed.hostname or "").lower() not in ("github.com", "www.github.com"):
+        return None
+    parts = [part for part in parsed.path.split("/") if part]
+    if len(parts) < 2:
+        return None
+    return (parts[0] + "/" + re.sub(r"\.git$", "", parts[1])).lower()
+
+
 def repo_key(url) -> str:
     if not isinstance(url, str):
         return ""
-    m = re.search(r"github\.com/([^/\s#?]+)/([^/\s#?]+)", url)
-    if not m:
-        return url.strip().rstrip("/").lower()
-    return (m.group(1) + "/" + re.sub(r"\.git$", "", m.group(2))).lower()
+    return github_repo(url) or url.strip().rstrip("/").lower()
 
 
 def manifest_index(manifest: dict) -> dict:
@@ -105,10 +116,10 @@ def pinned_tools() -> dict:
     for platform, rel in PIN_FILES.items():
         tools = [tool for tool in load(rel).get("tools", []) if isinstance(tool, dict)]
         out[platform] = {"ids": {tool.get("id") for tool in tools},
-                         "repos": {repo_key(tool.get("url")) for tool in tools if "github.com/" in str(tool.get("url"))},
+                         "repos": {github_repo(tool.get("url")) for tool in tools if github_repo(tool.get("url"))},
                          "versions": {tool.get("id"): tool.get("version") for tool in tools},
-                         "repo_versions": {repo_key(tool.get("url")): tool.get("version") for tool in tools
-                                           if "github.com/" in str(tool.get("url"))}}
+                         "repo_versions": {github_repo(tool.get("url")): tool.get("version") for tool in tools
+                                           if github_repo(tool.get("url"))}}
     return out
 
 
