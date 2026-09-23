@@ -25,8 +25,13 @@ actual order result until a subsequent open-session receipt says otherwise.
 SPY,QQQ,IWM,DIA represent tradable US index proxies. The explicit24-name universe
 includes liquid stocks from the requested watchlist, subject to fresh native
 asset/quote qualification. The user-provided market table is not an executable
-price feed. Foreign indices, penny-stock extremes, shorting, predictive catalyst
-pre-positioning and leverage above1x remain unqualified.
+price feed. Foreign indices, penny-stock extremes, shorting and predictive catalyst
+pre-positioning remain unqualified. Leverage above 1x is unqualified until a
+validated `leverage-schedule-v1-20260922` policy (see README-safety.md) is
+present in config, a preflight-proven account multiplier at least equal to the
+requested leverage has been confirmed, and this ladder's gate rows
+(`leverage-ladder-1x/2x/4x` in `catalogs/us-equities/gates-20260922.json`) each
+show `needs_attention == 0`.
 
 The allocator uses one portfolio owner across all families, explicit cost
 hurdles, an exposure reserve below the ledger cap, a cooldown and minimum hold.

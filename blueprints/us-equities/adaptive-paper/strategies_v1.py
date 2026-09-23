@@ -24,6 +24,7 @@ import math
 import statistics
 
 from exits import DEFAULT_PLAN, ExitContext
+from leverage import LEVERAGE_POLICY_VERSION
 
 # Quotes may arrive up to this far ahead of the caller's `now` (clock skew
 # across processes/threads) and still count as fresh; anything further ahead
@@ -135,6 +136,14 @@ class PolicyConfig:
     # cancel/resubmit), relying entirely on that resting order's own
     # eventual fill/expire/recovery path.
     exit_replace_enabled: bool = False
+    # G-e: opt-in leverage-schedule id (leverage.LEVERAGE_POLICY_VERSION),
+    # threaded through by strategies.AdaptivePolicy/runner.load_config only
+    # when a validated leverage_policy config block is present. None (every
+    # shipped default) keeps max_leverage bounded at <=2 below, exactly as
+    # before G-e; a string is never consulted by the generic numeric-bounds
+    # check further down (isinstance(v, (float, int)) excludes str), so its
+    # presence changes nothing about that loop.
+    leverage_policy_id: str | None = None
 
     def __post_init__(self):
         if (not self.symbols or len(set(self.symbols)) != len(self.symbols)
@@ -169,9 +178,39 @@ class PolicyConfig:
                 or self.exit_replace_min_interval_seconds < 0
                 or self.exit_replace_min_interval_seconds > 3600):
             raise ValueError("invalid_policy_number")
+        if self.leverage_policy_id is not None and self.leverage_policy_id != LEVERAGE_POLICY_VERSION:
+            raise ValueError("invalid_policy_bounds")
+        _max_leverage_bound = 4 if self.leverage_policy_id == LEVERAGE_POLICY_VERSION else 2
+        # N1-0 (2026-09-22 leverage fix round 2): F2 (round 1) widened this
+        # bound to 100 for every config, not only under the opt-in leverage
+        # policy, which loosened the default (no leverage_policy_id) path
+        # a config with no leverage_policy block and max_order_quantity
+        # between 11 and 100 used to be refused here (runner.py's load_config
+        # passes max_order_quantity straight through as max_shares) and,
+        # after F2, was silently accepted instead. Gate the widened ceiling
+        # the same way as _max_leverage_bound just above: 100 only under the
+        # canonical leverage policy, 10 (the original, pre-F2 bound)
+        # otherwise. Every shipped default config (config.json,
+        # config-sip.json) uses max_order_quantity=1, so this does not
+        # change their runtime behavior; only a hypothetical no-policy
+        # config with max_order_quantity in [11, 100] is affected.
+        _max_shares_bound = 100 if self.leverage_policy_id == LEVERAGE_POLICY_VERSION else 10
         if (self.warmup_samples < 4 or self.history < self.warmup_samples
-                or self.max_leverage > 2 or self.gross_cap > self.capital * self.max_leverage
-                or self.max_positions > len(self.symbols) or self.max_shares > 10
+                or self.max_leverage > _max_leverage_bound or self.gross_cap > self.capital * self.max_leverage
+                # F2: matches safety.RiskLimits' own max_order_qty<=100 bound
+                # and effective_max_order_qty's hard 100-share ceiling
+                # (safety.py:132,198) -- this cap was 10 (well below that
+                # ceiling) until F2, which silently undercut
+                # max_order_qty_mode="notional" for any symbol priced so
+                # that max_order_notional_usd/price > 10 (e.g. a rung config
+                # whose max_order_notional_usd assumes a >10-share fill at
+                # that price never reaches it; see config-leverage-*.json's
+                # notes and tests/test_adaptive_paper_runner.py's
+                # LeverageRungConfigConsistencyTests for the corresponding
+                # per-rung sizing). Only reachable at 100 under the leverage
+                # policy (see _max_shares_bound above, N1-0); the default
+                # (no leverage_policy_id) path keeps the original 10 bound.
+                or self.max_positions > len(self.symbols) or self.max_shares > _max_shares_bound
                 or self.minimum_price >= self.maximum_price
                 or self.min_hold_seconds >= self.max_hold_seconds
                 or self.stop_min_bps > self.stop_max_bps or self.trailing_min_bps > self.trailing_max_bps
@@ -364,7 +403,8 @@ class AdaptivePolicy:
         return features, complete, risk_off, regime, signals
 
     def _decide_core(self, now: float, *, allow_entries: bool, force_exit: bool,
-                      force_exit_reason: str = "trial_end") -> Decision:
+                      force_exit_reason: str = "trial_end", leverage_ceiling: float | None = None,
+                      pending_buy_notional_usd: float = 0.0) -> Decision:
         c = self.config
         features, complete, risk_off, regime, signals = self._regime_and_signals(now)
         targets, exits = {}, {}
@@ -392,8 +432,30 @@ class AdaptivePolicy:
         # Only a fully warmed trending basket can use the configured ceiling;
         # other regimes reduce it. The independent ledger remains authoritative.
         leverage = min(c.max_leverage, 1 if regime == "range" else c.max_leverage) if regime not in ("risk_off", "unavailable") else 0
+        if leverage_ceiling is not None:
+            leverage = min(leverage, leverage_ceiling)
         budget = max(0, min(c.gross_cap, c.capital * leverage) - c.max_order_notional)
-        used = sum(self.latest[s].ask * float(qty) for s, qty in targets.items() if s in self.latest)
+        # LEV-RI-A / CX-P1 (2026-09-22 leverage fix round 1): `targets` only
+        # reflects symbols this tick kept unchanged -- a same-tick exit
+        # decision removes a symbol from `targets` even though the position
+        # is still physically held until the sell fills, and an earlier
+        # tick's still-resting, unfilled buy order never reaches
+        # `self.holdings` at all (sync_positions syncs only from filled
+        # broker positions). Both are capital already committed, so a
+        # leveraged rung's budget must count every current holding
+        # regardless of this tick's exit decision, plus the caller-supplied
+        # notional of any still-resting unfilled buy order
+        # (native_strategy._leverage_inputs' ledger-sourced
+        # pending_buy_notional_usd, threaded through strategies.AdaptivePolicy
+        # .decide). Left byte-identical (targets-only, no pending term) on
+        # the non-leveraged path to preserve the golden-equivalence contract
+        # documented in strategies.py's module docstring.
+        if leverage_ceiling is not None:
+            used = sum(self.latest[s].ask * float(holding.quantity)
+                       for s, holding in self.holdings.items() if s in self.latest)
+            used += pending_buy_notional_usd
+        else:
+            used = sum(self.latest[s].ask * float(qty) for s, qty in targets.items() if s in self.latest)
         if allow_entries and complete and not force_exit and not risk_off:
             for signal in signals:
                 s = signal.symbol

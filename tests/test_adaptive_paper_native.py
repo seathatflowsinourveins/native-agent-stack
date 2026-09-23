@@ -3,6 +3,7 @@ import asyncio
 from decimal import Decimal
 import importlib.util
 from pathlib import Path
+import tempfile
 import time
 import unittest
 
@@ -233,6 +234,132 @@ class NativeIntegration(unittest.TestCase):
         self.assertEqual(ins.size_precision, 0)
         with self.assertRaisesRegex(ValueError, "fractional_shares_unsupported"):
             ADAPTER.shares("0.5")
+
+
+if NATIVE:
+    ENGINE = Path(__file__).resolve().parents[1] / "blueprints/us-equities/adaptive-paper"
+    import sys as _sys
+    if str(ENGINE) not in _sys.path:
+        _sys.path.insert(0, str(ENGINE))
+    from native_strategy import AdaptiveStrategy
+    from strategies import AdaptivePolicy, PolicyConfig
+    from safety import Ledger, RiskLimits, Quote, DEFAULT_STOP
+    import leverage as lev
+
+    class _LeverageFixtureStrategy(AdaptiveStrategy):
+        """positions() needs a live nautilus cache/trader wiring this test
+        never sets up (no LiveNode is started); override with a plain dict
+        so the rest of AdaptiveStrategy's own (non-nautilus) logic --
+        _leverage_inputs, rebalance()'s decide()/event_sink wiring -- can be
+        exercised directly and cheaply. Defined at module level (not nested
+        inside LeverageStrategyTests) so this module still imports cleanly
+        without nautilus_trader installed -- a class body referencing
+        AdaptiveStrategy would otherwise raise NameError at import time,
+        before @unittest.skipUnless ever gets a chance to skip anything."""
+        def __init__(self, *a, held=None, **kw):
+            super().__init__(*a, **kw)
+            self._held = held or {}
+
+        def positions(self):
+            return self._held
+
+
+@unittest.skipUnless(NATIVE, "requires pinned combined native runtime")
+class LeverageStrategyTests(unittest.TestCase):
+    """G-e E5: AdaptiveStrategy._leverage_inputs / rebalance() leverage-inputs
+    wiring, and the decision event's opt-in "leverage_ceiling" key."""
+
+    RTH_NOW = 1772550000.0  # 2026-03-03 15:00 UTC = 10:00 ET (RTH), 2026 calendar
+
+    def leverage_policy(self, max_leverage="4"):
+        config = {"max_leverage": max_leverage, "capital_usd": "10000",
+                 "max_gross_exposure_usd": str(10000 * int(max_leverage)), "leverage_policy": lev.CANONICAL_V1_BLOCK}
+        session_policy = {"overnight_holds": False, "overnight_gross_multiple": Decimal("1.0")}
+        return lev.validate_leverage_policy(config, session_policy)
+
+    def make_ledger(self, leverage_policy=None, tmp=None):
+        limits = RiskLimits(capital_usd=Decimal("10000"),
+                            max_gross_exposure_usd=Decimal("40000") if leverage_policy else Decimal("5000"),
+                            leverage=leverage_policy)
+        ledger = Ledger(Path(tmp) / "lev.sqlite3", limits)
+        ledger.start_trial(self.RTH_NOW)
+        return ledger
+
+    def make_strategy(self, *, with_policy, tmp, held=None, account_multiplier=None):
+        leverage_policy = self.leverage_policy() if with_policy else None
+        ledger = self.make_ledger(leverage_policy, tmp)
+        config = PolicyConfig(symbols=("SPY", "QQQ", "IWM", "DIA", "AAPL", "MSFT"), max_positions=6,
+                              capital=10000, gross_cap=40000 if with_policy else 5000,
+                              max_leverage=4.0 if with_policy else 1.0,
+                              leverage_policy_id=lev.LEVERAGE_POLICY_VERSION if with_policy else None)
+        policy = AdaptivePolicy(config, leverage_policy=leverage_policy)
+        events = []
+        strategy = _LeverageFixtureStrategy(policy, ledger, "t1", event_sink=events.append,
+                                            account_multiplier=account_multiplier, held=held,
+                                            clock=lambda: self.RTH_NOW)
+        strategy.started = True
+        strategy.enabled = True
+        return strategy, ledger, events
+
+    def test_leverage_inputs_reports_rth_session_and_zero_drawdown(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            strategy, ledger, _ = self.make_strategy(with_policy=True, tmp=tmp)
+            inputs = strategy._leverage_inputs(self.RTH_NOW)
+            self.assertEqual(inputs.session, "RTH")
+            self.assertEqual(inputs.drawdown_fraction, Decimal("0"))
+            self.assertFalse(inputs.kill_switch)
+            ledger.close()
+
+    def test_leverage_inputs_kill_switch_from_stop_file(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            strategy, ledger, _ = self.make_strategy(with_policy=True, tmp=tmp)
+            stop = Path(tmp) / "STOP"
+            stop.write_text("halt")
+            strategy.stop_file = stop
+            self.assertTrue(strategy._leverage_inputs(self.RTH_NOW).kill_switch)
+            ledger.close()
+
+    def test_leverage_inputs_kill_switch_from_halted_reason(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            strategy, ledger, _ = self.make_strategy(with_policy=True, tmp=tmp)
+            ledger.freeze("manual_halt_for_test")
+            self.assertTrue(strategy._leverage_inputs(self.RTH_NOW).kill_switch)
+            ledger.close()
+
+    def test_leverage_inputs_carries_account_multiplier(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            strategy, ledger, _ = self.make_strategy(with_policy=True, tmp=tmp, account_multiplier=Decimal("2"))
+            self.assertEqual(strategy._leverage_inputs(self.RTH_NOW).account_multiplier, Decimal("2"))
+            ledger.close()
+
+    def test_rebalance_decision_event_has_no_leverage_key_by_default(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            strategy, ledger, events = self.make_strategy(with_policy=False, tmp=tmp)
+            strategy.rebalance(self.RTH_NOW)
+            decision_events = [e for e in events if e.get("type") == "decision"]
+            self.assertTrue(decision_events)
+            self.assertNotIn("leverage_ceiling", decision_events[-1])
+            ledger.close()
+
+    def test_rebalance_decision_event_has_leverage_ceiling_under_policy(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            strategy, ledger, events = self.make_strategy(with_policy=True, tmp=tmp)
+            strategy.rebalance(self.RTH_NOW)
+            decision_events = [e for e in events if e.get("type") == "decision"]
+            self.assertTrue(decision_events)
+            self.assertIn("leverage_ceiling", decision_events[-1])
+            ledger.close()
+
+    def test_stop_file_gives_decided_ceiling_of_zero(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            strategy, ledger, events = self.make_strategy(with_policy=True, tmp=tmp)
+            stop = Path(tmp) / "STOP"
+            stop.write_text("halt")
+            strategy.stop_file = stop
+            strategy.rebalance(self.RTH_NOW)
+            decision_events = [e for e in events if e.get("type") == "decision"]
+            self.assertEqual(decision_events[-1]["leverage_ceiling"], 0.0)
+            ledger.close()
 
 
 if __name__ == "__main__":

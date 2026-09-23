@@ -161,12 +161,22 @@ def normalize_trading_status(raw):
             "ts_ns": timestamp_ns(raw.get("t", raw.get("timestamp")))}
 
 
-def normalize_account(raw):
+def normalize_account(raw, *, include_margin=False):
     result = {key: decimal_string(raw[key]) for key in ("cash", "equity", "buying_power")}
     for key in ("status", "currency", "trading_blocked", "account_blocked", "trade_suspended_by_user",
                 "shorting_enabled", "pattern_day_trader"):
         if key in raw:
             result[key] = raw[key]
+    # G-e: only read for a leverage-policy preflight/reconciliation call
+    # (runner.py sets include_margin=True exactly when config has a
+    # validated _leverage_policy). False (every default call site) keeps
+    # this function's return keys byte-identical to before G-e.
+    if include_margin:
+        for key in ("multiplier", "daytrading_buying_power", "regt_buying_power"):
+            if key in raw:
+                result[key] = decimal_string(raw[key])
+        if "daytrade_count" in raw:
+            result["daytrade_count"] = raw["daytrade_count"]
     return result
 
 
@@ -293,7 +303,8 @@ def _sdk_client(api_key, secret_key, before_request, observer=None, *, data=Fals
     return client
 
 
-def preflight(api_key, secret_key, symbols, *, feed="iex", before_request, request_observer=None):
+def preflight(api_key, secret_key, symbols, *, feed="iex", before_request, request_observer=None,
+              include_margin=False):
     """Read-only native SDK preflight; callback is synchronous in this helper."""
     from alpaca.data.enums import DataFeed
     from alpaca.data.requests import StockLatestQuoteRequest
@@ -304,7 +315,7 @@ def preflight(api_key, secret_key, symbols, *, feed="iex", before_request, reque
     data = _sdk_client(api_key, secret_key, before_request, request_observer, data=True, read_only=True, lock=lock)
     try:
         raw_account = trading.get_account()
-        account = normalize_account(raw_account)
+        account = normalize_account(raw_account, include_margin=include_margin)
         import hashlib
         identity = hashlib.sha256(str(raw_account["id"]).encode()).hexdigest()
         clock = trading.get_clock()
@@ -425,8 +436,12 @@ class AlpacaPaperTransport:
                  sink_observation, queue_size=1024, quote_timeout=5.0, start_timeout=15.0,
                  order_update_timeout=10.0, request_observer=None, history_start=None,
                  max_snapshot_pages=20, required_quote_symbols=None, feed="iex",
-                 extended_hours_allowed=False):
+                 extended_hours_allowed=False, include_margin=False):
         self.extended_hours_allowed = bool(extended_hours_allowed)
+        # G-e: forwarded to normalize_account on every snapshot() call.
+        # False (every default construction) keeps snapshot()'s account
+        # keys byte-identical to before G-e.
+        self.include_margin = bool(include_margin)
         self.feed = data_feed(feed)
         self.data_ws = data_stream_url(self.feed)
         self.symbols = _symbols(symbols)
@@ -815,7 +830,7 @@ class AlpacaPaperTransport:
     async def snapshot(self):
         async with self._operation_lock:
             def collect():
-                account = normalize_account(self._client.get_account())
+                account = normalize_account(self._client.get_account(), include_margin=self.include_margin)
                 positions = [{"symbol": p["symbol"], "qty": decimal_string(p["qty"]),
                               "avg_entry_price": decimal_string(p["avg_entry_price"])}
                              for p in self._client.get_all_positions()]

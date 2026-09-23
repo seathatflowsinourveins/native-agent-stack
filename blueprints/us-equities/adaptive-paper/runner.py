@@ -20,6 +20,7 @@ import shlex
 import signal
 import time
 
+from leverage import LeveragePolicyError, next_lower_rung_ceiling, validate_leverage_policy
 from safety import Ledger, Quote, RiskLimits, SafetyError, account_lock_fingerprint, DEFAULT_STOP
 from sessions import (DEFAULT_SESSION_POLICY, SessionKind, boundary_receipt, extended_session_close,
                      must_end_flat, session_at, validate_session_policy)
@@ -275,14 +276,33 @@ def load_config(path, *, registry_path=None):
     c = json.loads(Path(path).read_text())
     if c["feed"] not in DATA_FEEDS:
         raise ValueError("unqualified_data_feed")
+    # G-e: leverage above 1x is refused exactly as before UNLESS a
+    # "leverage_policy" block is present, in which case it is deferred to
+    # validate_leverage_policy below (which raises its own, more specific
+    # LeveragePolicyError reason codes) instead of the blanket refusal
+    # here. Every shipped config as of bdd04ca has no "leverage_policy"
+    # key, so `lev_block_present` is False and this condition is
+    # byte-identical to before G-e for both of them.
+    lev_block_present = "leverage_policy" in c
     if (c["endpoint"] != "https://paper-api.alpaca.markets"
-            or c["catalyst_orders_enabled"] is not False or Decimal(c["max_leverage"]) > 1):
+            or c["catalyst_orders_enabled"] is not False
+            or (Decimal(c["max_leverage"]) > 1 and not lev_block_present)):
         raise ValueError("unqualified_lane_configuration")
     # Single consolidated session-policy gate (replaces the previous ad-hoc
     # regular_session_only/extended_hours_enabled check in place here); with
     # the default config (no "sessions" block, or one matching today's
     # defaults) this enforces exactly the same invariant as before.
     session_policy = validate_session_policy(c)
+    # G-e: opt-in leverage-schedule validation. Absent (every shipped
+    # config) -> leverage stays None and every downstream private key/kwarg
+    # below is skipped entirely, so the rest of load_config's output is
+    # byte-identical to before G-e. Present -> validate_leverage_policy
+    # raises its own LeveragePolicyError (a ValueError) reason code on any
+    # defect; a passing block is threaded through as "_leverage_policy" and
+    # into RiskLimits.leverage / PolicyConfig.leverage_policy_id below.
+    leverage = validate_leverage_policy(c, session_policy) if lev_block_present else None
+    if leverage is not None:
+        c["_leverage_policy"] = leverage
     # G-f round 5: the entire gap-risk hook is opt-in. "sessions.gap_stop"
     # is optional and, when absent (every shipped config), "enabled"
     # defaults to False -- validate_session_policy's own "sessions" block
@@ -329,16 +349,28 @@ def load_config(path, *, registry_path=None):
                       max_submits_per_minute=c["max_submit_requests_per_minute"],
                       quote_max_age_seconds=c["quote_max_age_seconds"], trial_seconds=c["duration_seconds"],
                       cleanup_seconds=c["cleanup_seconds"], min_entry_close_seconds=c["min_entry_close_seconds"],
-                      overnight_gross_multiple=session_policy["overnight_gross_multiple"])
+                      overnight_gross_multiple=session_policy["overnight_gross_multiple"],
+                      **({"leverage": leverage} if leverage is not None else {}))
     policy = PolicyConfig(symbols=tuple(c["symbols"]), benchmarks=tuple(c["benchmarks"]),
                           max_positions=c["max_held_symbols"], capital=float(c["capital_usd"]),
                           gross_cap=float(c["max_gross_exposure_usd"]), max_leverage=float(c["max_leverage"]),
                           max_shares=c["max_order_quantity"], max_spread_bps=float(c["max_spread_bps"]),
+                          # CX-P2 (2026-09-22 leverage fix round 1): PolicyConfig's
+                          # own order-notional cap used to silently keep its
+                          # 1000 default regardless of this config's
+                          # max_order_notional_usd (RiskLimits already
+                          # receives it above) -- a leveraged rung's larger
+                          # configured per-order sizing (2000/4000) never
+                          # reached strategies_v1._decide_core's allocation
+                          # clamp, so entries could never actually size up
+                          # to what the rung's ledger-side cap would allow.
+                          max_order_notional=float(c["max_order_notional_usd"]),
                           warmup_samples=c["warmup_samples"], warmup_seconds=c["warmup_seconds"],
                           minimum_edge_bps=c["minimum_edge_bps"], quote_age_seconds=c["quote_max_age_seconds"],
                           min_hold_seconds=c["min_hold_seconds"], max_hold_seconds=c["max_hold_seconds"],
                           stop_bps=c["stop_bps"], take_profit_bps=c["take_profit_bps"], trailing_bps=c["trailing_bps"],
-                          gap_stop_enabled=gap_stop_enabled, exit_replace_enabled=exit_replace_enabled)
+                          gap_stop_enabled=gap_stop_enabled, exit_replace_enabled=exit_replace_enabled,
+                          **({"leverage_policy_id": leverage.version} if leverage is not None else {}))
     if set(c["strategy_scope"]) != set(AdaptivePolicy.families):
         raise ValueError("unsupported_strategy_scope")
     return c, risk, policy
@@ -422,6 +454,31 @@ def _check_promotion_gate(gate_result_path, snapshot_path):
         raise SafetyError("promotion_gate_mismatch")
 
 
+def _check_margin_entitlement(account, config, lev, session_policy):
+    """G-e: only called (from validate_preflight, below) when
+    ``config.get("_leverage_policy")`` is set -- i.e. `account` was fetched
+    with ``include_margin=True`` (see transport.normalize_account/preflight).
+    Raises ``SafetyError`` with a bounded reason code on any missing field
+    or insufficient broker entitlement; never raises for the default,
+    non-leverage path (validate_preflight never calls this function then).
+    """
+    need = lev.max_leverage
+    if any(key not in account for key in ("multiplier", "daytrading_buying_power", "regt_buying_power")):
+        raise SafetyError("account_margin_fields_missing")
+    if account.get("pattern_day_trader") is True and Decimal(account["equity"]) < 25000:
+        raise SafetyError("account_restricted")
+    mult = Decimal(account["multiplier"])
+    if not mult.is_finite() or mult < need:
+        raise SafetyError("account_multiplier_below_requested_leverage")
+    if Decimal(account["daytrading_buying_power"]) < Decimal(config["max_gross_exposure_usd"]):
+        raise SafetyError("account_daytrading_buying_power_insufficient")
+    if session_policy["overnight_holds"]:
+        overnight_cap = Decimal(config["capital_usd"]) * lev.overnight_max_leverage
+        if Decimal(account["regt_buying_power"]) < overnight_cap:
+            raise SafetyError("account_regt_buying_power_insufficient")
+    return mult
+
+
 def validate_preflight(observation, config, *, require_open, allow_existing=False,
                        allow_existing_positions=None, session_policy=None,
                        mode=None, gate_result_path=None, snapshot_path=None):
@@ -450,6 +507,26 @@ def validate_preflight(observation, config, *, require_open, allow_existing=Fals
             or (not allow_existing and (Decimal(account["cash"]) < Decimal(config["capital_usd"])
             or Decimal(account["equity"]) < 25000))):
         raise SafetyError("account_not_ready")
+    # G-e: margin-entitlement preflight, only under a validated leverage
+    # policy (config["_leverage_policy"], set by load_config). Runs after
+    # the ordinary account-restriction checks above (which apply
+    # unconditionally, leverage or not) and before every other guard below,
+    # so a preflight that later fails a session/window/universe check under
+    # the policy still surfaces the more actionable margin-entitlement
+    # reason first when both would fail. config is mutated in place with
+    # the broker-proven multiplier ("_account_multiplier", a private key,
+    # same pattern as load_config's "_registry_entries") so main() can
+    # thread it into AdaptiveStrategy/the "margin" preflight summary
+    # without a second, duplicate broker-account check.
+    leverage_policy = config.get("_leverage_policy")
+    if leverage_policy is not None and not allow_existing:
+        # ``allow_existing`` (--command recover) only ever submits sells
+        # (recovery.recover, recovery.py:168, "buy_submissions": 0) --
+        # broker margin/DTBP/multiplier entitlement gates new buys, so it
+        # must not block a sell-only recovery from flattening an
+        # over-leveraged position. README-safety.md: sells and exits are
+        # never refused by the leverage ceiling.
+        config["_account_multiplier"] = _check_margin_entitlement(account, config, leverage_policy, session_policy)
     server = clock["timestamp_ns"] / 1e9
     close = clock["next_close_ns"] / 1e9
     if abs(clock["received_at_ns"] / 1e9 - server) > .25:
@@ -685,6 +762,48 @@ class Controller:
         return port
 
 
+def _leverage_achievement_step(state, *, dt_seconds, achieved_leverage, ceiling, next_lower_ceiling):
+    """F2 (residual review, reachability): one pure state-update step of the
+    per-run achieved-leverage receipt, factored out (D1 pattern) so it is
+    directly testable without driving run_native's full tick loop.
+
+    `state` is the previous return value of this function (or
+    `_INITIAL_LEVERAGE_ACHIEVEMENT_STATE`); `achieved_leverage` is this
+    tick's gross exposure / equity (mark-to-market, not the fixed-capital
+    denominator `peak_effective_leverage` already in `outcome["leverage"]`
+    uses); `ceiling` is the policy layer's ceiling in force this tick;
+    `next_lower_ceiling` is `leverage.next_lower_rung_ceiling(config's
+    max_leverage)` (None for the 1x rung, which has no lower rung).
+    `dt_seconds` is the wall-clock gap since the previous tick this function
+    was called for (0 on the first call).
+
+    Records: the peak achieved leverage seen so far, the ceiling that was in
+    force at the tick that peak was recorded (a receipt with a high peak but
+    a ceiling that never actually allowed it would itself be suspicious),
+    and the cumulative time spent with achieved leverage above the
+    next-lower rung's own ceiling -- evidence a '4x' run actually needed 4x
+    and did not merely stay inside 2x's proportional room the whole time.
+    Attributes the whole `dt_seconds` gap to "above" when THIS tick's
+    achieved leverage exceeds the threshold (a per-tick approximation, not a
+    continuous integral); ticks are ~0.1s apart in practice so the error is
+    bounded by the tick cadence.
+    """
+    peak = state["peak_achieved_leverage"]
+    ceiling_at_peak = state["ceiling_at_peak"]
+    if achieved_leverage > peak:
+        peak = achieved_leverage
+        ceiling_at_peak = ceiling
+    seconds_above = state["seconds_above_next_lower_rung_ceiling"]
+    if next_lower_ceiling is not None and dt_seconds > 0 and achieved_leverage > next_lower_ceiling:
+        seconds_above += dt_seconds
+    return {"peak_achieved_leverage": peak, "ceiling_at_peak": ceiling_at_peak,
+            "seconds_above_next_lower_rung_ceiling": seconds_above}
+
+
+_INITIAL_LEVERAGE_ACHIEVEMENT_STATE = {"peak_achieved_leverage": Decimal("0"), "ceiling_at_peak": Decimal("0"),
+                                       "seconds_above_next_lower_rung_ceiling": 0.0}
+
+
 async def run_native(controller, policy_config, assets, trial_id, config, baseline_cash, *, account_fingerprint="simulation"):
     from native_adapter import build_node
     from native_strategy import AdaptiveStrategy
@@ -698,9 +817,11 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
     if registry_entries is None:
         registry_entries = load_registry(Path(config.get("_registry_path", SOURCE / "registry.json")))
     pool, selector = strategy_pool_and_selector(config, registry_entries)
-    policy = AdaptivePolicy(policy_config, strategy_pool=pool, selector=selector)
+    leverage_policy = config.get("_leverage_policy")
+    policy = AdaptivePolicy(policy_config, strategy_pool=pool, selector=selector, leverage_policy=leverage_policy)
     strategy = AdaptiveStrategy(policy, controller.ledger, trial_id,
-                                event_sink=controller.events.append, transport=controller.port)
+                                event_sink=controller.events.append, transport=controller.port,
+                                account_multiplier=config.get("_account_multiplier"))
     # Capture actual streaming quotes before native conversion. Every native
     # strategy event still arrives through the data engine's ordinary path.
     port = controller.port
@@ -741,6 +862,30 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
     # session calendar to compute it at all.
     last_session_kind = (session_at(datetime.fromtimestamp(time.time(), timezone.utc)).kind
                         if (session_policy["overnight_holds"] or session_policy["extended_hours"]) else None)
+    # G-e receipt tracking (only meaningful/consulted when leverage_policy is
+    # not None; harmless, unread overhead otherwise). peak_gross_exposure_usd
+    # observes the ledger's own accounted FILLED-position gross exposure
+    # each tick -- EH-1 (2026-09-22 leverage fix round 1): the ledger's raw
+    # `accounting().gross_exposure_usd` is `gross + pending`
+    # (safety.Ledger._state), i.e. it also counts every still-resting,
+    # unfilled buy intent, so using it directly here used to let a run's
+    # "achieved" leverage/margin figures reflect capital that was never
+    # actually deployed into a filled position. peak_pending_buy_notional_usd
+    # records that unfilled-order notional separately instead of folding it
+    # into the achieved-exposure figures.
+    # ceiling_changes records the policy layer's last_leverage_ceiling only
+    # on an actual change, not every tick.
+    peak_gross_exposure_usd = Decimal("0")
+    peak_pending_buy_notional_usd = Decimal("0")
+    ceiling_changes = []
+    last_recorded_ceiling = None
+    # F2 (residual review, reachability): the achieved-leverage receipt.
+    # next_lower_ceiling is fixed for the whole run (the rung the loaded
+    # config's own max_leverage sits at does not change mid-run); None for
+    # the 1x rung, which has no lower rung to compare against.
+    achievement_state = _INITIAL_LEVERAGE_ACHIEVEMENT_STATE
+    next_lower_ceiling = next_lower_rung_ceiling(leverage_policy.max_leverage) if leverage_policy is not None else None
+    last_achievement_tick = None
     try:
         while time.monotonic() - started < config["duration_seconds"] + config["cleanup_seconds"]:
             now = time.time()
@@ -807,6 +952,52 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
             if strategy.started:
                 strategy.cancel_expired(now, config["order_timeout_seconds"], all_entries=force_exit)
                 strategy.rebalance(now, force_exit=force_exit)
+                if leverage_policy is not None:
+                    acct_now = controller.ledger.accounting()
+                    # EH-1: filled_gross_exposure_usd excludes every
+                    # not-yet-filled buy intent's notional (acct_now.gross_
+                    # exposure_usd includes it; acct_now.pending_buy_
+                    # notional_usd is exactly that included amount -- see
+                    # safety.Ledger._state) so peak_gross_exposure_usd,
+                    # achieved_leverage_now and broker_margin_used below only
+                    # ever reflect capital actually deployed into a filled
+                    # position, never a resting or partially-filled order.
+                    filled_gross_exposure_usd = acct_now.gross_exposure_usd - acct_now.pending_buy_notional_usd
+                    peak_gross_exposure_usd = max(peak_gross_exposure_usd, filled_gross_exposure_usd)
+                    peak_pending_buy_notional_usd = max(peak_pending_buy_notional_usd,
+                                                        acct_now.pending_buy_notional_usd)
+                    current_ceiling = policy.last_leverage_ceiling
+                    # F2: gross-to-equity, mark-to-market (equity moves with
+                    # realized+unrealized pnl each tick) -- distinct from
+                    # peak_gross_exposure_usd/capital below, which is fixed
+                    # to starting capital and cannot fall from paper losses.
+                    equity_now = (controller.ledger.limits.capital_usd + acct_now.realized_pnl_usd
+                                 + acct_now.unrealized_pnl_usd)
+                    achieved_leverage_now = (filled_gross_exposure_usd / equity_now
+                                             if equity_now > 0 else Decimal("0"))
+                    dt = 0.0 if last_achievement_tick is None else max(0.0, now - last_achievement_tick)
+                    achievement_state = _leverage_achievement_step(
+                        achievement_state, dt_seconds=dt, achieved_leverage=achieved_leverage_now,
+                        ceiling=current_ceiling if current_ceiling is not None else Decimal("0"),
+                        next_lower_ceiling=next_lower_ceiling)
+                    last_achievement_tick = now
+                    if current_ceiling != last_recorded_ceiling:
+                        # G-e receipt (S6): regime is read back from this
+                        # tick's own decision event (controller.events),
+                        # rather than re-deriving it, so a throttled tick
+                        # (no fresh decision -> no event appended) simply
+                        # keeps the last known ceiling change unlogged for
+                        # regime rather than guessing.
+                        last_event = controller.events[-1] if controller.events else {}
+                        try:
+                            observed_session = session_at(datetime.fromtimestamp(now, timezone.utc)).kind.value
+                        except ValueError:
+                            observed_session = None
+                        ceiling_changes.append({
+                            "t": now, "session": observed_session, "regime": last_event.get("regime"),
+                            "drawdown_fraction": str(acct_now.drawdown_usd / controller.ledger.limits.max_drawdown_usd),
+                            "ceiling": str(current_ceiling)})
+                        last_recorded_ceiling = current_ceiling
             if force_exit and not controller.ledger.unresolved() and not controller.ledger.positions() and not strategy.pending:
                 break
             await asyncio.sleep(.1)
@@ -838,6 +1029,43 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
                                  "overnight_holds": session_policy["overnight_holds"]},
               "boundary_receipts": boundary_receipts,
               "elapsed_seconds": time.monotonic() - started}
+    if leverage_policy is not None:
+        capital = Decimal(config["capital_usd"])
+        peak_effective_leverage = (peak_gross_exposure_usd / capital) if capital else Decimal("0")
+        outcome["leverage"] = {
+            "policy_version": leverage_policy.version,
+            "config_max_leverage": str(leverage_policy.max_leverage),
+            "account_multiplier": (str(config["_account_multiplier"])
+                                   if config.get("_account_multiplier") is not None else None),
+            "peak_gross_exposure_usd": str(peak_gross_exposure_usd),
+            # EH-1: the peak notional of not-yet-filled buy intents seen
+            # this run, tracked separately from peak_gross_exposure_usd
+            # above (which is now filled-position-only) rather than folded
+            # into it.
+            "peak_pending_buy_notional_usd": str(peak_pending_buy_notional_usd),
+            "peak_effective_leverage": str(peak_effective_leverage),
+            "ceiling_changes": ceiling_changes,
+            "broker_cash_at_start": str(baseline_cash),
+            "broker_margin_used": peak_gross_exposure_usd > Decimal(str(baseline_cash)),
+            # F2 (residual review, 2026-09-22, reachability): the achieved
+            # (not merely permitted) leverage this run actually reached,
+            # gross-to-equity and mark-to-market -- unlike
+            # peak_effective_leverage above (fixed-capital-denominated), this
+            # falls if paper losses shrink equity. This is a receipt only:
+            # no gate row in catalogs/us-equities/gates-20260922.json
+            # currently reads peak_achieved_leverage or
+            # seconds_above_next_lower_rung_ceiling, so a rung's gate row
+            # CAN still flip to established on a receipt whose achieved
+            # exposure never exceeded a lower rung's own ceiling -- see
+            # README-safety.md's Leverage schedule section (2026-09-22
+            # leverage fix round 2, N1-1) and the rung configs' notes for
+            # what this field establishes and does not establish (achieved
+            # exposure may stay below the cap; a rung sets the safety
+            # envelope, not a target).
+            "next_lower_rung_ceiling": (str(next_lower_ceiling) if next_lower_ceiling is not None else None),
+            "peak_achieved_leverage": str(achievement_state["peak_achieved_leverage"]),
+            "ceiling_at_peak_achieved_leverage": str(achievement_state["ceiling_at_peak"]),
+            "seconds_above_next_lower_rung_ceiling": achievement_state["seconds_above_next_lower_rung_ceiling"]}
     outcome["status"] = _run_native_status(reconciliation, session.errors, strategy.native_fills,
                                            outcome, session_policy, time.time())
     return outcome
@@ -1063,9 +1291,14 @@ def main():
         attempts.append({"timestamp": time.time(), "kind": kind})
         if len(attempts) > 50:
             raise SafetyError("preflight_request_bound")
+    # G-e: only a validated leverage policy widens the preflight account
+    # read to include margin fields (transport.normalize_account); the
+    # default (no "leverage_policy" block) preflight is unchanged.
+    include_margin = config.get("_leverage_policy") is not None
     try:
         observation = preflight(key, secret, config["symbols"], feed=config["feed"],
-                                before_request=observe_request, request_observer=responses.append)
+                                before_request=observe_request, request_observer=responses.append,
+                                include_margin=include_margin)
     except TransportError as exc:
         result = {"status": "not_started", "stage": "preflight", "reason": str(exc),
                   "feed": config["feed"], "orders_submitted": 0, "http": responses,
@@ -1080,6 +1313,16 @@ def main():
         try:
             validate_preflight(observation, config, require_open=True, session_policy=session_policy)
             summary["status"] = "ready"
+            # G-e: only set once validate_preflight's margin-entitlement
+            # check (above) has already passed under the policy.
+            leverage_policy = config.get("_leverage_policy")
+            if leverage_policy is not None:
+                summary["margin"] = {
+                    "multiplier": str(config["_account_multiplier"]),
+                    "daytrading_buying_power": observation["account"]["daytrading_buying_power"],
+                    "regt_buying_power": observation["account"]["regt_buying_power"],
+                    "requested_max_leverage": str(leverage_policy.max_leverage),
+                    "policy_version": leverage_policy.version}
         except SafetyError as exc:
             summary.update(status="not_ready", reason=str(exc))
         save(args.output, summary)
@@ -1116,6 +1359,18 @@ def main():
         save(args.output, summary)
         print(json.dumps({"status": "not_started", "reason": str(exc), "orders_submitted": 0}))
         return 2
+    leverage_policy = config.get("_leverage_policy")
+    # G-e/LEV-RI-1: --command recover skips _check_margin_entitlement (it is
+    # sell-only, see validate_preflight above), so config["_account_multiplier"]
+    # is never set on that path -- report the "margin" summary only when the
+    # broker-proven multiplier actually exists.
+    if leverage_policy is not None and config.get("_account_multiplier") is not None:
+        summary["margin"] = {
+            "multiplier": str(config["_account_multiplier"]),
+            "daytrading_buying_power": observation["account"]["daytrading_buying_power"],
+            "regt_buying_power": observation["account"]["regt_buying_power"],
+            "requested_max_leverage": str(leverage_policy.max_leverage),
+            "policy_version": leverage_policy.version}
     fingerprint = observation["account_identity_sha256"]
     with account_lock_fingerprint(fingerprint):
         state_dir = args.state_root / fingerprint / "adaptive"
@@ -1196,7 +1451,8 @@ def main():
                     quote_timeout=config["quote_max_age_seconds"], feed=config["feed"],
                     required_quote_symbols=needed if recovering and needed else config["benchmarks"],
                     history_start=datetime.fromtimestamp(metadata["started_at"], timezone.utc),
-                    extended_hours_allowed=session_policy["extended_hours"]))
+                    extended_hours_allowed=session_policy["extended_hours"],
+                    include_margin=leverage_policy is not None))
             for sig in (signal.SIGINT, signal.SIGTERM):
                 signal.signal(sig, lambda *_: setattr(controller, "stop", True))
             async def execute():

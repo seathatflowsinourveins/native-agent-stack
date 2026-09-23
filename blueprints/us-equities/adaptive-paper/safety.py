@@ -27,6 +27,7 @@ _HERE = str(Path(__file__).resolve().parent)
 if _HERE not in sys.path:
     sys.path.insert(0, _HERE)
 from sessions import SessionKind, session_at as _session_at  # noqa: E402
+from leverage import LeveragePolicy  # noqa: E402
 
 D = Decimal
 ZERO = D(0)
@@ -105,13 +106,28 @@ class RiskLimits:
     cleanup_seconds: int = 120
     min_entry_close_seconds: int = 300
     overnight_gross_multiple: Decimal = D("1.0")
+    # G-e: the opt-in leverage-schedule policy (leverage.py). None (every
+    # shipped default) keeps every check below byte-identical to before
+    # G-e: the gross-exposure bound is capital_usd (1x), exactly as it was.
+    # A validated LeveragePolicy widens that bound to
+    # capital_usd * leverage.max_leverage (<=4x) and, when
+    # apply_overnight_cap, additionally bounds the overnight gross cap by
+    # capital_usd * leverage.overnight_max_leverage (<=2x, Reg T). This
+    # field is never part of the generic numeric-bounds loop above/below
+    # (it is neither Decimal/int nor a caller-supplied string) and is
+    # dropped from frozen_json() when None, so the persisted meta.limits
+    # bytes for the default path are unchanged (see Ledger.__init__).
+    leverage: LeveragePolicy | None = None
 
     def __post_init__(self):
         for field in ("capital_usd", "max_gross_exposure_usd", "max_order_notional_usd",
                       "max_order_qty", "max_gross_loss_usd", "max_drawdown_usd", "max_spread_bps",
                       "overnight_gross_multiple"):
             object.__setattr__(self, field, decimal(getattr(self, field)))
-        if (self.capital_usd > D("1000000") or self.max_gross_exposure_usd > self.capital_usd
+        if self.leverage is not None and not isinstance(self.leverage, LeveragePolicy):
+            raise SafetyError("risk_limit_out_of_bounds")
+        leverage_multiple = self.leverage.max_leverage if self.leverage is not None else D("1")
+        if (self.capital_usd > D("1000000") or self.max_gross_exposure_usd > self.capital_usd * leverage_multiple
                 or self.max_order_notional_usd > min(self.max_gross_exposure_usd, D("10000"))
                 or self.max_order_qty > 100 or self.max_order_qty != self.max_order_qty.to_integral_value()
                 or self.max_gross_loss_usd > self.capital_usd / 10
@@ -121,7 +137,10 @@ class RiskLimits:
                 # above (zero=False, the default) already refuses a
                 # non-positive overnight_gross_multiple before this
                 # __post_init__ body ever reaches this check.
-                or self.overnight_gross_multiple > D("2.0")):
+                or self.overnight_gross_multiple > D("2.0")
+                or (self.leverage is not None and self.leverage.max_leverage > D("4"))
+                or (self.leverage is not None and self.leverage.apply_overnight_cap
+                    and self.overnight_gross_exposure_cap_usd() > self.capital_usd * self.leverage.overnight_max_leverage)):
             raise SafetyError("risk_limit_out_of_bounds")
         caps = {"max_held_symbols": 50, "max_outstanding_orders": 100,
                 "max_rest_per_minute": 200, "max_submits_per_minute": 180,
@@ -184,6 +203,18 @@ class RiskLimits:
         RiskLimits-enforced <=2.0x bound on overnight_gross_multiple, and with
         the default multiple of 1.0 this equals the ordinary intraday cap."""
         return self.max_gross_exposure_usd * self.overnight_gross_multiple
+
+    def frozen_json(self):
+        """The exact bytes persisted to `meta.limits` (see Ledger.__init__)
+        and compared byte-for-byte against a mismatched reopen. `leverage`
+        (None on every default/pre-G-e path) is dropped from the dict
+        entirely rather than serialized as null, so the persisted bytes for
+        every existing on-disk ledger, and for every config without a
+        `leverage_policy` block, are unchanged from before G-e."""
+        d = asdict(self)
+        if d["leverage"] is None:
+            del d["leverage"]
+        return json.dumps(d, default=str, sort_keys=True)
 
 
 def evaluate_gap_risk(prior_close, session_open, stop_bps):
@@ -352,7 +383,7 @@ class Ledger:
                     client_id TEXT, payload TEXT NOT NULL);
                 CREATE TABLE IF NOT EXISTS trials(trial_id TEXT PRIMARY KEY, started_at REAL NOT NULL);
             """)
-            frozen = json.dumps(asdict(self.limits), default=str, sort_keys=True)
+            frozen = self.limits.frozen_json()
             with self._transaction():
                 previous = self._get("limits")
                 if previous is not None and previous != frozen:
@@ -637,6 +668,25 @@ class Ledger:
             return self.limits.overnight_gross_exposure_cap_usd()
         return self.limits.max_gross_exposure_usd
 
+    def _leverage_envelope(self, now, state):
+        """The ledger-layer leverage ceiling at `now` (only ever consulted
+        when `self.limits.leverage is not None`): the regime-independent
+        upper bound over every session's schedule row, further reduced by
+        the drawdown ladder and (when applicable) the overnight cap. Fails
+        closed (0) for a timestamp outside the frozen session calendar,
+        the same fail-closed contract as an unclassifiable session in
+        leverage.LeveragePolicy.envelope/ceiling -- the policy layer
+        (strategies.py) never even observes an unclassifiable session
+        (native_strategy._leverage_inputs already sets session=None for
+        one, which also ceilings to 0), so this is deliberately at least
+        as strict as, never looser than, the policy layer."""
+        try:
+            kind = _session_at(datetime.fromtimestamp(now, tz=timezone.utc)).kind.value
+        except ValueError:
+            return ZERO
+        drawdown_fraction = state.drawdown_usd / self.limits.max_drawdown_usd
+        return self.limits.leverage.envelope(session=kind, drawdown_fraction=drawdown_fraction)
+
     def _refresh_risk(self, now=None):
         # now=None (e.g. record_order's optional timestamp) falls back to the
         # ordinary intraday cap, the same behaviour as before D2; when now is
@@ -714,9 +764,17 @@ class Ledger:
                     mark = self.db.execute("SELECT at FROM marks WHERE symbol=?", (held,)).fetchone()
                     if mark is None or not -0.25 <= now - mark[0] <= self.limits.quote_max_age_seconds:
                         raise SafetyError("held_position_mark_stale")
-                equity = self.limits.capital_usd + state.realized_pnl_usd + state.unrealized_pnl_usd
-                if state.gross_exposure_usd + qty * price > min(self._effective_gross_cap(now), equity):
-                    raise SafetyError("aggregate_exposure_cap_exceeded")
+                if self.limits.leverage is not None:
+                    envelope = self._leverage_envelope(now, state)
+                    if envelope <= 0:
+                        raise SafetyError("leverage_ceiling_zero")
+                    equity = self.limits.capital_usd + state.realized_pnl_usd + state.unrealized_pnl_usd
+                    if state.gross_exposure_usd + qty * price > min(self._effective_gross_cap(now), equity * envelope):
+                        raise SafetyError("aggregate_exposure_cap_exceeded")
+                else:
+                    equity = self.limits.capital_usd + state.realized_pnl_usd + state.unrealized_pnl_usd
+                    if state.gross_exposure_usd + qty * price > min(self._effective_gross_cap(now), equity):
+                        raise SafetyError("aggregate_exposure_cap_exceeded")
                 exposed = set(self._positions()) | {r[0] for r in self.db.execute(
                     "SELECT symbol FROM intents WHERE side='buy' AND status NOT IN ('filled','canceled','expired','rejected','not_sent','broker_refused')")}
                 if len(exposed | {symbol}) > self.limits.max_held_symbols:
@@ -767,9 +825,17 @@ class Ledger:
                     mark = self.db.execute("SELECT at FROM marks WHERE symbol=?", (symbol,)).fetchone()
                     if mark is None or not -0.25 <= now - mark[0] <= self.limits.quote_max_age_seconds:
                         raise SafetyError("held_position_mark_stale")
-                equity = self.limits.capital_usd + state.realized_pnl_usd + state.unrealized_pnl_usd
-                if state.gross_exposure_usd > min(self._effective_gross_cap(now), equity):
-                    raise SafetyError("aggregate_exposure_cap_exceeded")
+                if self.limits.leverage is not None:
+                    envelope = self._leverage_envelope(now, state)
+                    if envelope <= 0:
+                        raise SafetyError("leverage_ceiling_zero")
+                    equity = self.limits.capital_usd + state.realized_pnl_usd + state.unrealized_pnl_usd
+                    if state.gross_exposure_usd > min(self._effective_gross_cap(now), equity * envelope):
+                        raise SafetyError("aggregate_exposure_cap_exceeded")
+                else:
+                    equity = self.limits.capital_usd + state.realized_pnl_usd + state.unrealized_pnl_usd
+                    if state.gross_exposure_usd > min(self._effective_gross_cap(now), equity):
+                        raise SafetyError("aggregate_exposure_cap_exceeded")
                 if state.held_symbols > self.limits.max_held_symbols:
                     raise SafetyError("held_symbol_cap_reached")
             else:

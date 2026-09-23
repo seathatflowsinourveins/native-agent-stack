@@ -671,5 +671,190 @@ class SafetyTests(unittest.TestCase):
         self.reserve()
 
 
+class LeverageRiskLimitsTests(unittest.TestCase):
+    """G-e: RiskLimits.leverage / frozen_json() byte-identity and bounds."""
+
+    PINNED_DEFAULT_FROZEN_JSON = (
+        '{"capital_usd": "10000", "cleanup_seconds": 120, "max_drawdown_usd": "25", '
+        '"max_gross_exposure_usd": "5000", "max_gross_loss_usd": "25", "max_held_symbols": 10, '
+        '"max_order_notional_usd": "1000", "max_order_qty": "1", "max_order_qty_mode": "fixed", '
+        '"max_outstanding_orders": 20, "max_rest_per_minute": 200, "max_spread_bps": "15", '
+        '"max_submits_per_minute": 180, "min_entry_close_seconds": 300, "overnight_gross_multiple": "1", '
+        '"quote_max_age_seconds": 3, "trial_seconds": 300}')
+
+    def leverage_policy(self, max_leverage="4", overnight_holds=False):
+        import leverage as lev
+        block = lev.CANONICAL_V1_BLOCK
+        capital, gross_multiple = D("10000"), min(D(max_leverage), D("2")) if overnight_holds else D(max_leverage)
+        config = {"max_leverage": max_leverage, "capital_usd": "10000",
+                  "max_gross_exposure_usd": str(int(capital * gross_multiple)), "leverage_policy": block}
+        session_policy = {"overnight_holds": overnight_holds, "overnight_gross_multiple": D("1.0")}
+        return lev.validate_leverage_policy(config, session_policy)
+
+    def test_default_frozen_json_matches_pinned_bdd04ca_literal(self):
+        self.assertEqual(s.RiskLimits().frozen_json(), self.PINNED_DEFAULT_FROZEN_JSON)
+
+    def test_ledger_opens_with_pre_change_meta_limits_bytes(self):
+        db = Path(tempfile.mkdtemp()) / "pre.sqlite3"
+        ledger = s.Ledger(db)  # writes the current (== pre-G-e for the default) frozen bytes
+        ledger.close()
+        reopened = s.Ledger(db)  # must not raise persisted_risk_limits_differ
+        reopened.close()
+
+    def test_risklimits_refuses_gross_above_capital_without_leverage_unchanged(self):
+        with self.assertRaises(s.SafetyError):
+            s.RiskLimits(max_gross_exposure_usd=D("10001"))  # capital_usd default is 10000
+
+    def test_risklimits_with_2x_policy_accepts_exactly_2x_refuses_above(self):
+        policy = self.leverage_policy("2")
+        ok = s.RiskLimits(max_gross_exposure_usd=D("20000"), max_order_notional_usd=D("2000"),
+                          leverage=policy)
+        self.assertEqual(ok.max_gross_exposure_usd, D("20000"))
+        with self.assertRaises(s.SafetyError):
+            s.RiskLimits(max_gross_exposure_usd=D("20000.01"), max_order_notional_usd=D("2000"), leverage=policy)
+
+    def test_risklimits_refuses_leverage_above_4(self):
+        import leverage as lev
+        bad = replace(self.leverage_policy("4"), max_leverage=D("4.5"))
+        with self.assertRaises(s.SafetyError):
+            s.RiskLimits(max_gross_exposure_usd=D("20000"), max_order_notional_usd=D("2000"), leverage=bad)
+
+
+class LeverageLedgerTests(unittest.TestCase):
+    """G-e: reserve_intent/validate_pending under a validated leverage policy.
+
+    RTH timestamp 1772550000.0 = 2026-03-03 15:00 UTC (10:00 ET), a
+    classified RTH tick in sessions.py's frozen 2026 calendar.
+    """
+    RTH_NOW = 1772550000.0
+
+    def tearDown(self):
+        tmp = getattr(self, "tmp", None)
+        if tmp is not None:
+            tmp.cleanup()
+
+    def leverage_policy(self, max_leverage="4"):
+        import leverage as lev
+        capital = D("10000")
+        config = {"max_leverage": max_leverage, "capital_usd": "10000",
+                  "max_gross_exposure_usd": str(int(capital * D(max_leverage))),
+                  "leverage_policy": lev.CANONICAL_V1_BLOCK}
+        session_policy = {"overnight_holds": False, "overnight_gross_multiple": D("1.0")}
+        return lev.validate_leverage_policy(config, session_policy)
+
+    def make_ledger(self, max_leverage="4", **overrides):
+        policy = self.leverage_policy(max_leverage)
+        capital = D("10000")
+        kwargs = dict(capital_usd=capital, max_gross_exposure_usd=capital * D(max_leverage),
+                     max_order_notional_usd=D("10000"), max_order_qty=D("100"),
+                     max_drawdown_usd=D("100"), max_gross_loss_usd=D("100"), leverage=policy)
+        kwargs.update(overrides)
+        limits = s.RiskLimits(**kwargs)
+        self.tmp = tempfile.TemporaryDirectory()
+        ledger = s.Ledger(Path(self.tmp.name) / "lev.sqlite3", limits)
+        ledger.start_trial(self.RTH_NOW)
+        return ledger
+
+    def quote(self, symbol="SPY", bid="50", ask="50.02", at=None):
+        return s.Quote(symbol, bid, ask, self.RTH_NOW if at is None else at)
+
+    def test_reserve_intent_under_2x_admits_to_equity_times_2_refuses_beyond(self):
+        ledger = self.make_ledger("2")
+        # equity == capital == 10000; envelope == 2 -> cap 20000.
+        ledger.reserve_intent("b1", "SPY", "buy", "100", "50.02", quote=self.quote(),
+                              now=self.RTH_NOW, market_open=True, session_close=self.RTH_NOW + 3600)
+        ledger.reserve_intent("b2", "QQQ", "buy", "100", "50.02", quote=self.quote("QQQ"),
+                              now=self.RTH_NOW, market_open=True, session_close=self.RTH_NOW + 3600)
+        # 2 x 5002 = 10004; a third same-size order would push gross past 20000.
+        ledger.reserve_intent("b3", "DIA", "buy", "100", "50.02", quote=self.quote("DIA"),
+                              now=self.RTH_NOW, market_open=True, session_close=self.RTH_NOW + 3600)
+        # 3 x 5002 = 15006, still under 20000; a 4th pushes to 20008 > 20000.
+        with self.assertRaisesRegex(s.SafetyError, "aggregate_exposure_cap_exceeded"):
+            ledger.reserve_intent("b4", "IWM", "buy", "100", "50.02", quote=self.quote("IWM"),
+                                  now=self.RTH_NOW, market_open=True, session_close=self.RTH_NOW + 3600)
+        ledger.close()
+
+    def test_order_notional_cap_still_binds_tighter_than_envelope(self):
+        ledger = self.make_ledger("4", max_order_notional_usd=D("500"))
+        with self.assertRaisesRegex(s.SafetyError, "order_size_cap_exceeded"):
+            ledger.reserve_intent("b1", "SPY", "buy", "100", "50.02", quote=self.quote(),
+                                  now=self.RTH_NOW, market_open=True, session_close=self.RTH_NOW + 3600)
+        ledger.close()
+
+    def test_ladder_zero_blocks_buy_but_sells_and_no_risk_halt(self):
+        ledger = self.make_ledger("4")
+        ledger.reserve_intent("b1", "SPY", "buy", "2", "50.02", quote=self.quote(),
+                              now=self.RTH_NOW, market_open=True, session_close=self.RTH_NOW + 3600)
+        ledger.record_order("b1", "broker-b1", "filled", "2", "50.02")
+        # Peak at bid=60 (unrealized ~+20), then mark down to bid=15
+        # (unrealized ~-70) -> drawdown ~90 (fraction 0.9 of
+        # max_drawdown_usd=100), inside the ladder's zero step
+        # (>=0.75, canonical) but still below the hard 1.0 drawdown_cap_reached halt.
+        ledger.mark_to_market([s.Quote("SPY", "60", "60.02", self.RTH_NOW + 1)], self.RTH_NOW + 1)
+        low = ledger.mark_to_market([s.Quote("SPY", "15", "15.02", self.RTH_NOW + 2)], self.RTH_NOW + 2)
+        self.assertGreaterEqual(low.drawdown_usd, D("75"))
+        self.assertLess(low.drawdown_usd, D("100"))
+        self.assertIsNone(low.halted_reason)  # below the hard drawdown_cap_reached halt
+        with self.assertRaisesRegex(s.SafetyError, "leverage_ceiling_zero"):
+            ledger.reserve_intent("b2", "QQQ", "buy", "1", "50.02", quote=self.quote("QQQ"),
+                                  now=self.RTH_NOW + 2, market_open=True, session_close=self.RTH_NOW + 3600)
+        # A sell of the held position is still admitted (never gated by leverage).
+        sold = ledger.reserve_intent("s1", "SPY", "sell", "1", "15.00",
+                                     quote=s.Quote("SPY", "15", "15.02", self.RTH_NOW + 2),
+                                     now=self.RTH_NOW + 2, market_open=True, session_close=self.RTH_NOW + 3600)
+        self.assertEqual(sold.side, "sell")
+        self.assertIsNone(ledger.accounting().halted_reason)
+        ledger.close()
+
+    def test_validate_pending_refuses_after_ladder_stepdown(self):
+        ledger = self.make_ledger("4")
+        ledger.reserve_intent("b1", "SPY", "buy", "2", "50.02", quote=self.quote(),
+                              now=self.RTH_NOW, market_open=True, session_close=self.RTH_NOW + 3600)
+        ledger.record_order("b1", "broker-b1", "filled", "2", "50.02")
+        # Reserve a second buy while the ladder is still fully open.
+        ledger.reserve_intent("b2", "QQQ", "buy", "1", "50.02", quote=self.quote("QQQ"),
+                              now=self.RTH_NOW + 1, market_open=True, session_close=self.RTH_NOW + 3600)
+        # Drive drawdown to the ladder's zero step (>=0.75, <1.0) before validate_pending.
+        ledger.mark_to_market([s.Quote("SPY", "60", "60.02", self.RTH_NOW + 2)], self.RTH_NOW + 2)
+        ledger.mark_to_market([s.Quote("SPY", "15", "15.02", self.RTH_NOW + 3),
+                               s.Quote("QQQ", "50", "50.02", self.RTH_NOW + 3)], self.RTH_NOW + 3)
+        with self.assertRaisesRegex(s.SafetyError, "leverage_ceiling_zero"):
+            ledger.validate_pending("b2", quote=self.quote("QQQ", at=self.RTH_NOW + 3), now=self.RTH_NOW + 3,
+                                    market_open=True, session_close=self.RTH_NOW + 3600)
+        ledger.close()
+
+    def test_stop_file_and_halts_still_bind_under_policy(self):
+        ledger = self.make_ledger("4")
+        stop = Path(self.tmp.name) / "STOP"
+        stop.write_text("halt")
+        with self.assertRaisesRegex(s.SafetyError, "stop_blocks_entry"):
+            ledger.reserve_intent("b1", "SPY", "buy", "1", "50.02", quote=self.quote(),
+                                  now=self.RTH_NOW, market_open=True, session_close=self.RTH_NOW + 3600,
+                                  stop_file=stop)
+        stop.unlink()
+        ledger.close()
+
+    def test_timestamp_outside_calendar_fails_closed_under_policy_default_unaffected(self):
+        ledger = self.make_ledger("4")
+        outside = 1_800_000_000.0  # year 2027, outside the frozen 2026 calendar
+        ledger2_root = Path(self.tmp.name) / "outside.sqlite3"
+        outside_ledger = s.Ledger(ledger2_root, replace(s.RiskLimits(), leverage=self.leverage_policy("4"),
+                                                        max_gross_exposure_usd=D("40000")))
+        outside_ledger.start_trial(outside - 10)
+        with self.assertRaisesRegex(s.SafetyError, "leverage_ceiling_zero"):
+            outside_ledger.reserve_intent("b1", "SPY", "buy", "1", "50.02",
+                                          quote=s.Quote("SPY", "50", "50.02", outside),
+                                          now=outside, market_open=True, session_close=outside + 3600)
+        outside_ledger.close()
+        # The default (no leverage) path falls back to the ordinary cap and is unaffected.
+        default_ledger = s.Ledger(Path(self.tmp.name) / "outside_default.sqlite3")
+        default_ledger.start_trial(outside - 10)
+        default_ledger.reserve_intent("b1", "SPY", "buy", "1", "50.02",
+                                      quote=s.Quote("SPY", "50", "50.02", outside),
+                                      now=outside, market_open=True, session_close=outside + 3600)
+        default_ledger.close()
+        ledger.close()
+
+
 if __name__ == "__main__":
     unittest.main()
