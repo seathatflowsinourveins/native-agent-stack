@@ -1002,6 +1002,23 @@ def packet_name(catalog: str, layer_id: str) -> str:
     return f"{catalog}__{layer_id}.json"
 
 
+def wave_input_names(work_dir: Path) -> set:
+    """Packet file names with an input in the work dir: a packets/ file or a lane return file."""
+    names = set()
+    for directory in (work_dir / "packets", *(work_dir / lane for lane in LANES)):
+        if directory.is_dir():
+            names |= {path.name for path in directory.glob("*__*.json") if path.is_file()}
+    return names
+
+
+def missing_append_inputs(work_dir: Path, only) -> list:
+    """The --append-rows names without any packet or lane input in the work dir (review of catalog
+    #124): such a row would otherwise be dropped silently while --write reported success."""
+    if only is None:
+        return []
+    return sorted(only - wave_input_names(work_dir))
+
+
 def wave_packet_names(work_dir: Path, only=None) -> set:
     """The packets of this run: the packets/ files, the SHA256SUMS names and any lane file without a
     packet; restricted to ``only`` (a set of packet file names) under --append-rows."""
@@ -1154,6 +1171,10 @@ def main(argv=None) -> int:
                          f"({sealed_base} or {WAVE_REGISTRY}); it is frozen -- record under a new --run-id")
     append_rows = parse_append_rows(args.append_rows)
     only = {packet_name(catalog, layer_id) for catalog, layer_id in append_rows} if append_rows else None
+    absent_inputs = missing_append_inputs(work_dir, only)
+    if absent_inputs:
+        raise SystemExit(f"--append-rows names rows with no packet or lane input in {work_dir}: "
+                         + ", ".join(name[:-len(".json")].replace("__", "/", 1) for name in absent_inputs))
     manifest_path = root / sealed_base / RUN_MANIFEST_NAME
     previous = None
     if not grandfathered and manifest_path.is_file():

@@ -479,6 +479,9 @@ def main(argv=None) -> int:
             break
 
         if not succeeded:
+            # A stale return (e.g. one rejected for an older packet hash) must
+            # not survive, so record_verdicts.py records this `failed` reason.
+            out_path.unlink(missing_ok=True)
             failures.append((catalog, layer_id, f"failed after retry: {last_failure}"))
 
     if args.jobs > 1:

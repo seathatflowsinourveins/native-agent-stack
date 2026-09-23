@@ -20,7 +20,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from scripts.landscape import build_landscape, withhold_policy_labels
+from scripts.landscape import build_landscape, lane_winner_components, withhold_policy_labels
 
 ROOT = Path(__file__).resolve().parents[1]
 TOOL_DIR = ROOT / "tools" / "sota-convergence"
@@ -1933,6 +1933,23 @@ class ReviewOf122Tests(NewWaveFixture):
             self.assertEqual(self.run_main(write=False, check=True, run_id=NEW_RUN,
                                            extra=["--append-rows", "foundation/wave-append-layer"]), 0)
 
+    def test_append_rows_naming_a_row_without_work_dir_inputs_fails(self):
+        # Review of catalog #124 (record_verdicts.py:1026): a named row with no packet or lane file in
+        # the work dir was dropped silently while --write reported success.
+        catalog = self.both_lanes("wave-same-layer")
+        code, output = self.run_wave()
+        self.assertEqual(code, 0, output)
+        before_ledger, before_sealed = self.ledger_text(), self.sealed_listing()
+        work_temp = tempfile.TemporaryDirectory()
+        self.addCleanup(work_temp.cleanup)
+        self.work_dir = Path(work_temp.name).resolve()
+        self.packets = PacketWriter(self.work_dir)
+        self.both_lanes("wave-append-layer")
+        with self.assertRaisesRegex(SystemExit, "no packet or lane input .*: foundation/wave-failed-layer$"):
+            self.run_wave(extra=["--append-rows", "foundation/wave-append-layer,foundation/wave-failed-layer"])
+        self.assertEqual((self.ledger_text(), self.sealed_listing()), (before_ledger, before_sealed))
+        self.assertEqual(catalog, "foundation")
+
     # Finding 5 -------------------------------------------------------------------------------
     def test_a_claude_return_whose_final_was_refuted_or_unknown_is_rejected(self):
         refuted = copy.deepcopy(UNREFUTED)
@@ -2037,6 +2054,52 @@ class ReviewOf122Tests(NewWaveFixture):
         self.assertEqual(entry["lanes"]["codex"], {"outcome": "failed", "reasons": ["failed after retry: timed out"]})
         self.assertEqual(entry["lanes"]["claude"]["outcome"], "sealed")
         build_landscape(self.root)
+
+
+class ReviewOf124Tests(NewWaveFixture):
+    """Automated review of catalog #124 (2026-09-23): landscape.py's wave reconstruction."""
+
+    def sealed_base(self):
+        return self.root / NEW_SEALED_BASE
+
+    def test_a_retained_sha256sums_line_must_match_a_packet_no_lane_returned_for(self):
+        # landscape.py:539: a wrong checksum line for a missing-only packet was sealed unchanged and
+        # passed CI, because only the text was compared with the manifest's copy.
+        self.both_lanes("wave-same-layer")
+        self.build_packet_pair("foundation", "wave-missing-layer")
+        sums = self.work_dir / "packets" / "SHA256SUMS"
+        lines = sums.read_text(encoding="utf-8").splitlines()
+        sums.write_text("".join(("0" * 64 + line[64:] if line.endswith("wave-missing-layer.json") else line) + "\n"
+                                for line in lines), encoding="utf-8")
+        code, output = self.run_wave()
+        self.assertEqual(code, 0, output)
+        with self.assertRaisesRegex(ValueError, r"must list exactly the retained packets .*wave-missing-layer"):
+            build_landscape(self.root)
+
+    def test_a_retained_sha256sums_must_list_every_retained_packet_once(self):
+        self.both_lanes("wave-same-layer")
+        self.build_packet_pair("foundation", "wave-missing-layer")
+        sums = self.work_dir / "packets" / "SHA256SUMS"
+        kept = [line for line in sums.read_text(encoding="utf-8").splitlines()
+                if not line.endswith("wave-missing-layer.json")]
+        sums.write_text("\n".join(kept) + "\n", encoding="utf-8")
+        code, output = self.run_wave()
+        self.assertEqual(code, 0, output)
+        with self.assertRaisesRegex(ValueError, r"must list exactly the retained packets .*wave-missing-layer"):
+            build_landscape(self.root)
+
+    def test_a_sealed_winner_key_must_name_an_adopted_candidate(self):
+        # landscape.py:263: the reconstruction accepted a winner key naming a non-adopted candidate,
+        # which record_verdicts.validate_lane_return refuses.
+        packet = make_packet("foundation", "wave-same-layer", [
+            make_candidate("c1", "wave-same-layer", "c1"),
+            make_candidate("c3", "wave-same-layer", "c3", adopted=False)])
+        issue, components = lane_winner_components({"winner_keys": ["c3"]}, packet)
+        self.assertIsNone(components)
+        self.assertRegex(issue, r"not adopted candidates")
+        issue, components = lane_winner_components({"winner_keys": ["c1"]}, packet)
+        self.assertIsNone(issue)
+        self.assertEqual(len(components), 1)
 
 
 class CheckedAtDefaultTests(NewWaveFixture):

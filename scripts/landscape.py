@@ -8,7 +8,7 @@ from collections import Counter, defaultdict
 from datetime import date
 import hashlib
 import json
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 import re
 from urllib.parse import urlsplit
 
@@ -260,6 +260,10 @@ def lane_winner_components(sealed_return, packet):
     unknown = [key for key in keys if key not in candidates]
     if unknown:
         return f"winner_keys {unknown} are not candidates of the retained packet", None
+    not_adopted = [key for key in keys if candidates[key].get("adopted") is not True]
+    if not_adopted:
+        # The lane contract forbids a non-adopted winner (record_verdicts.validate_lane_return).
+        return f"winner_keys {not_adopted} are not adopted candidates of the retained packet", None
     return None, {(packet_component_id(candidates[key]), candidates[key].get("repository")) for key in keys}
 
 
@@ -498,6 +502,27 @@ def sha256_of(root, relative):
     return hashlib.sha256(path.read_bytes()).hexdigest() if path.is_file() else None
 
 
+def parse_retained_sha256sums(text):
+    """(issue, {packet name: sha256}) of a retained packets/SHA256SUMS text in sha256sum format
+    ("<hash>  <name>", keyed by the bare file name after an optional leading "*", as
+    record_verdicts.parse_sha256sums reads it). A malformed or duplicated line is an issue, not skipped."""
+    if not isinstance(text, str):
+        return "is not text", {}
+    listed = {}
+    for line in text.splitlines():
+        if not line.strip():
+            continue
+        parts = line.strip().split(None, 1)
+        digest = parts[0].lower() if parts else ""
+        if len(parts) != 2 or not SHA256_TEXT.fullmatch(digest):
+            return f"has a malformed line {line!r}", {}
+        name = PurePosixPath(parts[1].strip().lstrip("*")).name
+        if name in listed:
+            return f"lists {name} twice", {}
+        listed[name] = digest
+    return None, listed
+
+
 def verify_sealed_waves(root, wave_refs):
     """Wave-level checks of every non-grandfathered sealed folder (evidence/artifacts/
     layer-verdicts-<run-id>/) under ``root``: its run manifest lists the retained packets and their
@@ -537,6 +562,13 @@ def verify_sealed_waves(root, wave_refs):
         sums_file = folder / sums_relative
         require(sums_file.is_file() and sums_file.read_text(encoding="utf-8") == manifest.get("packets_sha256sums"),
                 f"wave {wave}: {sums_relative} must be retained and equal the run manifest's packets_sha256sums")
+        # The retained SHA256SUMS must list exactly the retained packets with their actual hashes,
+        # including packets no lane returned for (review of catalog #124).
+        sums_issue, sums_listed = parse_retained_sha256sums(manifest.get("packets_sha256sums"))
+        require(sums_issue is None, f"wave {wave}: {sums_relative} {sums_issue}")
+        require(sums_listed == retained_sha,
+                f"wave {wave}: {sums_relative} must list exactly the retained packets and their sha256 "
+                f"(differs for {sorted(name for name in set(sums_listed) | set(retained_sha) if sums_listed.get(name) != retained_sha.get(name))})")
         referenced.add(sums_relative)
         for name, digest in retained_sha.items():
             relative = f"{RETAINED_PACKETS_DIR}/{name}"

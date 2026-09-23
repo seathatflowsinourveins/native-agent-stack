@@ -89,6 +89,22 @@ class ClaudeLaneWriterTests(unittest.TestCase):
         self.assertIn("A cited path is missing.", failures[0]["reason"])
         self.assertIn("lost", failures[1]["reason"])
 
+    def test_a_prior_return_is_removed_when_its_layer_now_fails_or_is_lost(self):
+        # Review of catalog #124 (claude_lane.py:148): a valid return from an earlier run must not
+        # survive a later run whose final is null or whose packet is lost, or record_verdicts.py
+        # would seal the stale return.
+        out_dir = self.work / "claude"
+        out_dir.mkdir(parents=True)
+        stale = {"schema_version": 1, "lane": "claude", "note": "earlier run"}
+        for name in ("foundation__l2.json", "us-equities__l3.json"):
+            (out_dir / name).write_text(json.dumps(stale), encoding="utf-8")
+        self.assertEqual(self.run_main(), 0)
+        self.assertFalse((out_dir / "foundation__l2.json").exists())
+        self.assertFalse((out_dir / "us-equities__l3.json").exists())
+        self.assertTrue((out_dir / "foundation__l1.json").exists())
+        failures = json.loads((out_dir / "failures.json").read_text(encoding="utf-8"))["failures"]
+        self.assertEqual(len(failures), 2)
+
     def test_uncommitted_or_unvendored_workflow_bytes_are_refused(self):
         with self.workflow.open("a", encoding="utf-8") as handle:
             handle.write("// local edit\n")

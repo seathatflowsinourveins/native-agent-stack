@@ -14369,8 +14369,8 @@
     },
     {
       "path": "scripts/landscape.py",
-      "sha256": "40c76b6f3da2a274c7e6ee836750e0df7d712f0271036b70bbb96b8b662bb423",
-      "bytes": 85948
+      "sha256": "f9b06d2605fe66feae35928fb7d135dd93221f8b07b36a2a4092510d2dd5c4ac",
+      "bytes": 87819
     },
     {
       "path": "scripts/native_token_ci.py",

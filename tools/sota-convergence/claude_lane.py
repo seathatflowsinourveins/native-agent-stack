@@ -142,6 +142,9 @@ def main(argv=None) -> int:
     for layer in result.get("layers") or []:
         name = f"{layer['catalog']}__{layer['layer_id']}.json"
         if not isinstance(layer.get("final"), dict):
+            # A prior run's return for this layer must not survive this run's
+            # failure, or record_verdicts.py would seal the stale return.
+            (out_dir / name).unlink(missing_ok=True)
             without_final.append(name)
             failures.append({"catalog": layer["catalog"], "layer_id": layer["layer_id"],
                              "reason": failure_reason(layer)})
@@ -152,6 +155,7 @@ def main(argv=None) -> int:
     for lost in result.get("lost") or []:
         catalog, _, layer_id = str(lost).partition("/")
         if catalog and layer_id:
+            (out_dir / f"{catalog}__{layer_id}.json").unlink(missing_ok=True)
             failures.append({"catalog": catalog, "layer_id": layer_id,
                              "reason": "lost: the workflow returned no result for this packet"})
     failures_path = out_dir / FAILURES_NAME
