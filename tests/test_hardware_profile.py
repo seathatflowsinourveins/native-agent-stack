@@ -10,7 +10,12 @@ evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json, not
 asserted on here since it is host-dependent.
 """
 
+import argparse
+import contextlib
+import hashlib
+import io
 import json
+import tempfile
 from pathlib import Path
 import sys
 import unittest
@@ -300,6 +305,164 @@ class BuildReportOnRealPlatformSmokeTest(unittest.TestCase):
         self.assertEqual(report["schema"], "hardware-profile-report-v1")
         self.assertIn("workflow_concurrency_cap", report["recommended"])
         self.assertGreaterEqual(report["recommended"]["workflow_concurrency_cap"], 1)
+
+
+class ValidateHostsTests(unittest.TestCase):
+    """scripts/hardware_profile.py's hosts[] structural check, independent of --record-host."""
+
+    def test_real_shipped_hosts_pass(self):
+        profiles_path = ROOT / "adoption" / "hardware-profiles.json"
+        with profiles_path.open("r", encoding="utf-8") as handle:
+            profiles = json.load(handle)
+        self.assertEqual(hp.validate_hosts(profiles, ROOT), [])
+
+    def test_missing_required_key_is_an_error(self):
+        profiles = {"hosts": [{"id": "widget-20260101", "label": "x"}]}  # no evidence_class
+        errors = hp.validate_hosts(profiles)
+        self.assertTrue(any("missing required key" in e for e in errors))
+
+    def test_unknown_evidence_class_is_an_error(self):
+        profiles = {"hosts": [{"id": "widget-20260101", "label": "x", "evidence_class": "guess"}]}
+        errors = hp.validate_hosts(profiles)
+        self.assertTrue(any("evidence_class" in e for e in errors))
+
+    def test_duplicate_id_is_an_error(self):
+        profiles = {"hosts": [
+            {"id": "widget-projected", "label": "a", "evidence_class": "labelled_projection"},
+            {"id": "widget-projected", "label": "b", "evidence_class": "labelled_projection"},
+        ]}
+        errors = hp.validate_hosts(profiles)
+        self.assertTrue(any("duplicate id" in e for e in errors))
+
+    def test_projected_id_must_end_in_projected(self):
+        profiles = {"hosts": [{"id": "widget-workstation", "label": "x", "evidence_class": "labelled_projection"}]}
+        errors = hp.validate_hosts(profiles)
+        self.assertTrue(any("must end in '-projected'" in e for e in errors))
+
+    def test_measured_native_proven_id_must_match_yyyymmdd_convention(self):
+        profiles = {"hosts": [{
+            "id": "not-dated", "label": "x", "evidence_class": "native_proven",
+            "evidence": "evidence/artifacts/hw-profiles/not-dated/profile.json",
+        }]}
+        errors = hp.validate_hosts(profiles)
+        self.assertTrue(any("must match" in e for e in errors))
+
+    def test_native_proven_prose_evidence_is_not_held_to_the_measured_id_pattern(self):
+        # Mirrors the shipped github-macos-15-arm64-runner entry: native_proven, but its
+        # evidence is a citation, not a .json report path --record-host would write.
+        profiles = {"hosts": [{
+            "id": "github-macos-15-arm64-runner", "label": "x", "evidence_class": "native_proven",
+            "evidence": "GitHub Actions run 1 (some workflow): a citation, not a file path.",
+        }]}
+        self.assertEqual(hp.validate_hosts(profiles), [])
+
+    def test_measured_missing_evidence_file_is_an_error_when_root_given(self):
+        profiles = {"hosts": [{
+            "id": "widget-20260101", "label": "x", "evidence_class": "native_proven",
+            "evidence": "evidence/artifacts/hw-profiles/widget-20260101/profile.json",
+        }]}
+        with tempfile.TemporaryDirectory() as tmp:
+            errors = hp.validate_hosts(profiles, Path(tmp))
+        self.assertTrue(any("file not found" in e for e in errors))
+
+    def test_hosts_not_a_list_is_an_error(self):
+        self.assertEqual(hp.validate_hosts({"hosts": "nope"}), ["hosts: expected a list"])
+
+
+def _init_record_host_root(root: Path) -> None:
+    (root / "adoption").mkdir(parents=True)
+    (root / "adoption" / "hardware-profiles.json").write_text(
+        json.dumps(SYNTHETIC_PROFILES), encoding="utf-8")
+    (root / "manifests").mkdir()
+    (root / "manifests" / "evidence.json").write_text(
+        json.dumps({"schema_version": 1, "files": []}), encoding="utf-8")
+
+
+class RecordHostTests(unittest.TestCase):
+    """scripts/hardware_profile.py --record-host: the one thing this module writes."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.root = Path(self.tmp.name)
+        _init_record_host_root(self.root)
+
+    def _record(self, host_id="widget-laptop-20260101", label=None, build_report_return=None):
+        args = argparse.Namespace(record_host=host_id, label=label, root=self.root)
+        buffer = io.StringIO()
+        patched = build_report_return or {
+            "schema": "hardware-profile-report-v1", "profiles_source": "adoption/hardware-profiles.json",
+            "measured": {"cores": 8, "effective_ram_gb": 32.0, "evidence_class": "native_proven"},
+            "recommended": {"workflow_concurrency_cap": 6}, "limits": [],
+        }
+        with mock.patch.object(hp, "build_report", return_value=patched):
+            with contextlib.redirect_stdout(buffer):
+                exit_code = hp.cmd_record_host(args)
+        return exit_code, buffer.getvalue()
+
+    def test_rejects_malformed_host_id(self):
+        exit_code, output = self._record(host_id="not-a-valid-id")
+        self.assertEqual(exit_code, 2, output)
+
+    def test_writes_registered_evidence_and_hosts_entry(self):
+        exit_code, output = self._record()
+        self.assertEqual(exit_code, 0, output)
+
+        evidence_path = self.root / "evidence" / "artifacts" / "hw-profiles" / "widget-laptop-20260101" / "profile.json"
+        self.assertTrue(evidence_path.is_file())
+        written = json.loads(evidence_path.read_text(encoding="utf-8"))
+        self.assertEqual(written["measured"]["cores"], 8)
+
+        evidence_manifest = json.loads((self.root / "manifests" / "evidence.json").read_text(encoding="utf-8"))
+        registered = {f["path"]: f for f in evidence_manifest["files"]}
+        relative = "evidence/artifacts/hw-profiles/widget-laptop-20260101/profile.json"
+        self.assertIn(relative, registered)
+        self.assertEqual(registered[relative]["sha256"], hashlib.sha256(evidence_path.read_bytes()).hexdigest())
+
+        profiles = json.loads((self.root / "adoption" / "hardware-profiles.json").read_text(encoding="utf-8"))
+        entry = next(h for h in profiles["hosts"] if h["id"] == "widget-laptop-20260101")
+        self.assertEqual(entry["evidence_class"], "native_proven")
+        self.assertEqual(entry["evidence"], relative)
+        self.assertEqual(hp.validate_hosts(profiles, self.root), [])
+
+    def test_rerecording_the_same_host_updates_in_place_without_duplicating(self):
+        self._record()
+        exit_code, output = self._record(label="Updated label")
+        self.assertEqual(exit_code, 0, output)
+        profiles = json.loads((self.root / "adoption" / "hardware-profiles.json").read_text(encoding="utf-8"))
+        matches = [h for h in profiles["hosts"] if h["id"] == "widget-laptop-20260101"]
+        self.assertEqual(len(matches), 1)
+        self.assertEqual(matches[0]["label"], "Updated label")
+
+    def test_existing_host_fields_are_preserved_across_a_rerecord(self):
+        self._record()
+        profiles = json.loads((self.root / "adoption" / "hardware-profiles.json").read_text(encoding="utf-8"))
+        entry = next(h for h in profiles["hosts"] if h["id"] == "widget-laptop-20260101")
+        entry["extra_field"] = "kept"
+        (self.root / "adoption" / "hardware-profiles.json").write_text(json.dumps(profiles), encoding="utf-8")
+
+        self._record()
+        profiles = json.loads((self.root / "adoption" / "hardware-profiles.json").read_text(encoding="utf-8"))
+        entry = next(h for h in profiles["hosts"] if h["id"] == "widget-laptop-20260101")
+        self.assertEqual(entry["extra_field"], "kept")
+
+    def test_personal_windows_path_in_measured_output_is_sanitized(self):
+        # Built from parts, never as one literal string: a literal personal-looking path in
+        # this test's own source would itself trip the repository's PRIVATE_CONTENT scan
+        # (see tests/test_host_receipts.py's home-path tests for the same technique).
+        a_personal_windows_path = "/" + "mnt" + "/" + "c" + "/" + "Users" + "/" + "realname" + "/" + ".wslconfig"
+        report = {
+            "schema": "hardware-profile-report-v1", "profiles_source": "adoption/hardware-profiles.json",
+            "measured": {"wslconfig_source": a_personal_windows_path, "evidence_class": "native_proven"},
+            "recommended": {}, "limits": [],
+        }
+        exit_code, output = self._record(build_report_return=report)
+        self.assertEqual(exit_code, 0, output)
+        evidence_path = self.root / "evidence" / "artifacts" / "hw-profiles" / "widget-laptop-20260101" / "profile.json"
+        text = evidence_path.read_text(encoding="utf-8")
+        self.assertNotIn("realname", text)
+        for _description, pattern in hp.PRIVATE_CONTENT:
+            self.assertIsNone(pattern.search(text))
 
 
 if __name__ == "__main__":

@@ -34,8 +34,27 @@ import subprocess
 import sys
 from pathlib import Path
 
+try:
+    from . import host_receipts
+    from .validate import PRIVATE_CONTENT
+except ImportError:  # running as a plain script, not a package
+    import host_receipts
+    from validate import PRIVATE_CONTENT
+
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_PROFILES_PATH = ROOT / "adoption" / "hardware-profiles.json"
+HW_PROFILE_EVIDENCE_DIR = "evidence/artifacts/hw-profiles"
+
+# adoption/hardware-profiles.json hosts[] structural rules. A "measured" native_proven entry
+# is one whose evidence names a .json report (what --record-host itself writes); it takes the
+# same <name>-<yyyymmdd> id convention as scripts/host_receipts.py's HOST_ID_PATTERN. A
+# native_proven entry whose evidence is prose (for example a hosted-CI-run citation predating
+# --record-host, such as the shipped github-macos-15-arm64-runner entry) is not held to that
+# pattern. A labelled_projection entry's id must end "-projected".
+HOST_ENTRY_REQUIRED = {"id", "label", "evidence_class"}
+HOST_EVIDENCE_CLASSES = {"native_proven", "labelled_projection"}
+PROJECTED_HOST_ID_PATTERN = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*-projected$")
+MEASURED_HOST_ID_PATTERN = host_receipts.HOST_ID_PATTERN
 
 
 def _load_profiles(path: Path) -> dict:
@@ -338,12 +357,127 @@ def build_report(profiles: dict) -> dict:
     }
 
 
+def validate_hosts(profiles: dict, root: Path | None = None) -> list[str]:
+    """Structural checks on adoption/hardware-profiles.json ``hosts[]``: required keys, a
+    known ``evidence_class``, no duplicate id, the id convention for entries this script
+    itself can write, and (when ``root`` is given) that a measured entry's evidence file
+    actually exists. Returns human-readable error strings; an empty list means ``hosts[]``
+    is well formed. Read-only: this never edits ``hosts[]``, ``--record-host`` does."""
+    errors: list[str] = []
+    hosts = profiles.get("hosts")
+    if not isinstance(hosts, list):
+        return ["hosts: expected a list"]
+    seen_ids: set[str] = set()
+    for index, host in enumerate(hosts):
+        label = f"hosts[{index}]"
+        if not isinstance(host, dict):
+            errors.append(f"{label}: expected an object")
+            continue
+        missing = HOST_ENTRY_REQUIRED - host.keys()
+        if missing:
+            errors.append(f"{label}: missing required key(s) {sorted(missing)}")
+            continue
+        host_id = host.get("id")
+        if not isinstance(host_id, str) or not host_id:
+            errors.append(f"{label}.id: expected a nonempty string")
+            host_id = None
+        elif host_id in seen_ids:
+            errors.append(f"{label}.id: duplicate id {host_id!r}")
+        else:
+            seen_ids.add(host_id)
+        evidence_class = host.get("evidence_class")
+        if evidence_class not in HOST_EVIDENCE_CLASSES:
+            errors.append(f"{label}.evidence_class: must be one of {sorted(HOST_EVIDENCE_CLASSES)}")
+        elif evidence_class == "labelled_projection":
+            if host_id is not None and not PROJECTED_HOST_ID_PATTERN.fullmatch(host_id):
+                errors.append(f"{label}.id: labelled_projection host id {host_id!r} must end in '-projected'")
+        elif evidence_class == "native_proven":
+            evidence = host.get("evidence")
+            if isinstance(evidence, str) and evidence.endswith(".json"):
+                if host_id is not None and not MEASURED_HOST_ID_PATTERN.fullmatch(host_id):
+                    errors.append(f"{label}.id: measured host id {host_id!r} must match "
+                                  f"{MEASURED_HOST_ID_PATTERN.pattern!r} ('<name>-<yyyymmdd>', "
+                                  "scripts/hardware_profile.py --record-host)")
+                if root is not None and not (root / evidence).is_file():
+                    errors.append(f"{label}.evidence: file not found: {evidence}")
+    return errors
+
+
+def assert_no_private_content(text: str, label: str) -> None:
+    for description, pattern in PRIVATE_CONTENT:
+        if pattern.search(text):
+            raise SystemExit(f"hardware_profile: {label} contains possible {description} after sanitizing; refusing to write")
+
+
+def cmd_record_host(args: argparse.Namespace) -> int:
+    """Measure this host, write the report to
+    ``evidence/artifacts/hw-profiles/<host_id>/profile.json``, register that file in
+    ``manifests/evidence.json`` and add or update a ``native_proven`` entry for it in
+    ``adoption/hardware-profiles.json`` ``hosts[]`` (existing entry fields are kept, only
+    ``id``/``label``/``evidence_class``/``evidence``/``note`` are set). This is the one
+    thing this otherwise read-only module writes."""
+    root = args.root.resolve()
+    host_id = args.record_host
+    if not MEASURED_HOST_ID_PATTERN.fullmatch(host_id):
+        print(f"error: --record-host {host_id!r} must match {MEASURED_HOST_ID_PATTERN.pattern!r} "
+              "('<name>-<yyyymmdd>')")
+        return 2
+
+    profiles_path = root / "adoption" / "hardware-profiles.json"
+    profiles = _load_profiles(profiles_path)
+    report = build_report(profiles)
+    report_text = host_receipts.sanitize(json.dumps(report, indent=2, sort_keys=True) + "\n")
+    assert_no_private_content(report_text, f"measured report for {host_id}")
+
+    relative_evidence = f"{HW_PROFILE_EVIDENCE_DIR}/{host_id}/profile.json"
+    evidence_path = root / relative_evidence
+    evidence_path.parent.mkdir(parents=True, exist_ok=True)
+    evidence_path.write_text(report_text, encoding="utf-8")
+    host_receipts.register_file(root, relative_evidence)
+
+    hosts = profiles.setdefault("hosts", [])
+    existing_index = next((i for i, h in enumerate(hosts) if isinstance(h, dict) and h.get("id") == host_id), None)
+    entry = dict(hosts[existing_index]) if existing_index is not None else {}
+    entry.update({
+        "id": host_id,
+        "label": args.label or entry.get("label") or f"{host_id} (measured)",
+        "evidence_class": "native_proven",
+        "evidence": relative_evidence,
+        "note": entry.get("note") or ("Actual scripts/hardware_profile.py output for this host, "
+                                       "written by scripts/hardware_profile.py --record-host."),
+    })
+    if existing_index is not None:
+        hosts[existing_index] = entry
+    else:
+        hosts.append(entry)
+
+    profiles_text = host_receipts.sanitize(json.dumps(profiles, indent=2, ensure_ascii=False) + "\n")
+    assert_no_private_content(profiles_text, "adoption/hardware-profiles.json")
+    hosts_errors = validate_hosts(json.loads(profiles_text), root)
+    if hosts_errors:
+        print("error: hosts[] would not validate after recording:\n" + "\n".join(f"- {e}" for e in hosts_errors))
+        return 1
+    profiles_path.write_text(profiles_text, encoding="utf-8")
+
+    print(json.dumps({"status": "recorded", "host_id": host_id, "evidence": relative_evidence}, sort_keys=True))
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--profiles", type=Path, default=DEFAULT_PROFILES_PATH,
                          help="Path to the declarative hardware-profiles.json")
     parser.add_argument("--out", type=Path, default=None, help="Write JSON here instead of stdout")
+    parser.add_argument("--record-host", metavar="HOST_ID", default=None,
+                         help="Write the measured report to evidence/artifacts/hw-profiles/<HOST_ID>/profile.json "
+                              "and add/update this host in adoption/hardware-profiles.json hosts[] "
+                              "(evidence_class native_proven). HOST_ID must match '<name>-<yyyymmdd>'.")
+    parser.add_argument("--label", default=None, help="--record-host: hosts[] label (default: '<host_id> (measured)')")
+    parser.add_argument("--root", type=Path, default=ROOT, help="Repository root (--record-host only)")
     args = parser.parse_args(argv)
+
+    if args.record_host:
+        return cmd_record_host(args)
 
     profiles = _load_profiles(args.profiles)
     report = build_report(profiles)
