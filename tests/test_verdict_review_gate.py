@@ -1033,12 +1033,16 @@ class SealedWinnerBindingTests(GateFixture):
 
     def with_receipt(self, component_id, version):
         """Patch platform_status's context with one qualifying linux receipt for ``component_id`` at
-        ``version`` (an independently reviewed native_proven install pass on a second machine)."""
+        ``version`` (an independently reviewed native_proven install pass on a second machine), and
+        write and register its file, so it is base-trusted when a rebase() follows (fifth review)."""
         real = gate.platform_evidence.load_context
+        path = f"evidence/hosts/second-host/{component_id}.json"
         receipt = {"shape_ok": True, "platform_identity_ok": True, "component_version": version,
                    "evidence_class": "native_proven", "stage": "install", "result": "pass",
                    "second_physical_machine": True, "review_state": "agree", "host_id": "second-host",
-                   "observed_at_utc": "2026-09-23T00:00:00Z", "path": f"evidence/hosts/second-host/{component_id}.json"}
+                   "observed_at_utc": "2026-09-23T00:00:00Z", "path": path}
+        self.write(path, dump({"component_id": component_id, "tool_versions": {component_id: version}}))
+        self.register(path)
 
         def load(root):
             summary = {"components": {component_id: {"platforms": {"linux-wsl2-x86_64": {"receipts": [receipt]}}}}}
@@ -1068,9 +1072,66 @@ class SealedWinnerBindingTests(GateFixture):
                       "'conditional'", self.messages(report))
 
     def test_sealed_evidence_refs_citing_registered_evidence_pass(self):
+        # The cited evidence is at the base, registered with its sha256, before the row is recorded.
         self.unrelated_evidence()
+        self.rebase()
         self.record(evidence_class="native_proven", evidence_refs=[self.UNRELATED], linux="accepted")
         self.assertPasses(self.report())
+
+    def test_sealed_citation_to_evidence_added_with_the_row_fails(self):
+        # Fifth review: the sealed citation resolves only because the same PR adds and registers the file.
+        self.unrelated_evidence()
+        self.record(evidence_class="native_proven", evidence_refs=[self.UNRELATED], linux="accepted")
+        self.assertFails(self.report(), "platform_status.linux-wsl2-x86_64 changed to 'accepted', which the head's "
+                                        "evidence derives, but only 'conditional'")
+
+    def test_sealed_citation_absent_at_recording_added_later_cannot_raise_the_status(self):
+        # Fifth review (G1 remainder): the sealed claude return cites evidence/new.json, which did not
+        # exist when the row was recorded (record_verdicts.py dropped it, so the row's refs are []).
+        # A PR adds and registers it, copies it into evidence_refs and raises linux to 'accepted':
+        # build_winners at the head now writes that ref, and the head's registry registers it.
+        new = "evidence/new.json"
+        row = self.record(evidence_class="native_proven", evidence_refs=[new], linux="conditional")
+        row["winners"][0]["evidence_refs"] = []
+        self.rebase()
+        self.write(new, b'{"new": true}\n')
+        self.register(new)
+        row["winners"][0]["evidence_refs"] = [new]
+        row["winners"][0]["platform_status"]["linux-wsl2-x86_64"] = "accepted"
+        report = self.report()
+        self.assertEqual(report["changes"][0]["kind"], "changed")
+        self.assertFails(report, "changed to 'accepted', which the head's evidence derives, but only 'conditional'")
+        self.assertIn(f"unregistered there: ['{new}']", self.messages(report))
+        self.assertNotIn("are not the sealed claude lane's winner_evidence_refs", self.messages(report))
+
+    def test_sealed_citation_whose_file_is_at_the_base_raises_the_status(self):
+        # The positive twin: the file the sealed return cites is already at the base and registered.
+        new = "evidence/new.json"
+        self.write(new, b'{"new": true}\n')
+        self.register(new)
+        row = self.record(evidence_class="native_proven", evidence_refs=[new], linux="conditional")
+        self.rebase()
+        row["winners"][0]["platform_status"]["linux-wsl2-x86_64"] = "accepted"
+        self.assertPasses(self.report())
+
+    def test_cited_evidence_rewritten_in_the_same_pull_request_cannot_raise_the_status(self):
+        new = "evidence/new.json"
+        self.write(new, b'{"new": true}\n')
+        self.register(new)
+        row = self.record(evidence_class="native_proven", evidence_refs=[new], linux="conditional")
+        self.rebase()
+        self.write(new, b'{"new": "rewritten"}\n')
+        row["winners"][0]["platform_status"]["linux-wsl2-x86_64"] = "accepted"
+        self.assertFails(self.report(), "which the head's evidence derives, but only 'conditional'")
+
+    def test_base_file_the_base_does_not_register_cannot_raise_the_status(self):
+        new = "evidence/new.json"
+        self.write(new, b'{"new": true}\n')
+        row = self.record(evidence_class="native_proven", evidence_refs=[new], linux="conditional")
+        self.rebase()
+        self.register(new)
+        row["winners"][0]["platform_status"]["linux-wsl2-x86_64"] = "accepted"
+        self.assertFails(self.report(), "which the head's evidence derives, but only 'conditional'")
 
     def test_pin_added_where_the_packet_has_none_fails(self):
         self.with_receipt("comp-two", "9.9")
@@ -1101,8 +1162,8 @@ class SealedWinnerBindingTests(GateFixture):
     def test_pin_the_base_candidates_already_carry_binds_its_receipt(self):
         candidates = [{"repository": PACKET["candidates"][1]["repository"], "source_pin": "9.9"}]
         self.ledger["foundation"][0]["candidates"] = candidates
-        self.rebase()
         self.with_receipt("comp-two", "9.9")
+        self.rebase()
         del self.ledger["foundation"][0]
         row = self.record("alpha", claude_keys=("c2",), codex_keys=("c2",),
                           winners=[winner("comp-two", linux="accepted", pin="9.9")])
@@ -1122,12 +1183,24 @@ class SealedWinnerBindingTests(GateFixture):
 
     def test_platform_only_upgrade_a_receipt_at_the_sealed_pin_supports_passes(self):
         row = self.record()
+        self.with_receipt("comp-one", "1.0")
+        self.rebase()
+        row["winners"][0]["platform_status"]["linux-wsl2-x86_64"] = "accepted"
+        report = self.report()
+        self.assertEqual(report["changes"][0]["kind"], "platform_status")
+        self.assertPasses(report)
+
+    def test_receipt_added_in_the_same_pull_request_cannot_raise_the_status(self):
+        # Fifth review: the receipt lands with the status raise; it must be at the base first.
+        row = self.record()
         self.rebase()
         self.with_receipt("comp-one", "1.0")
         row["winners"][0]["platform_status"]["linux-wsl2-x86_64"] = "accepted"
         report = self.report()
         self.assertEqual(report["changes"][0]["kind"], "platform_status")
-        self.assertPasses(report)
+        self.assertFails(report, "changed to 'accepted', which the head's evidence derives, but only "
+                                 "'not_established'")
+        self.assertIn("evidence/hosts/second-host/comp-one.json", self.messages(report))
 
     def test_winner_with_a_key_build_winners_does_not_write_fails(self):
         row = self.record()
@@ -1230,6 +1303,73 @@ class BaseTreeReadTests(GateFixture):
             code = gate.main(["--root", str(self.root), "--base", self.base])
         self.assertEqual(code, 2, output.getvalue())
         self.assertIn("cannot list", output.getvalue())
+
+
+class MergeBaseTests(GateFixture):
+    """Fifth review (round-three low re-checked): merge_base falls back to the base only when git
+    reports no common history, and any other git failure exits 2."""
+
+    def test_git_failure_finding_the_merge_base_raises(self):
+        real = gate.git
+
+        def failing(root, *args, check=True):
+            if args and args[0] == "merge-base":
+                return subprocess.CompletedProcess(args, 128, b"", b"fatal: stubbed failure")
+            return real(root, *args, check=check)
+
+        with mock.patch.object(gate, "git", failing):
+            with self.assertRaises(gate.RevisionError):
+                gate.merge_base(self.root, self.base, self.base)
+            with contextlib.redirect_stdout(io.StringIO()) as output:
+                code = gate.main(["--root", str(self.root), "--base", self.base])
+        self.assertEqual(code, 2, output.getvalue())
+        self.assertIn("git merge-base", output.getvalue())
+
+    def test_unrelated_history_compares_with_the_base_itself(self):
+        self.git("checkout", "--quiet", "--orphan", "unrelated")
+        self.git("commit", "--quiet", "--allow-empty", "-m", "unrelated root")
+        unrelated = self.git("rev-parse", "HEAD")
+        self.assertEqual(gate.merge_base(self.root, self.base, unrelated), self.base)
+
+
+class SotaManifestFreezeTests(GateFixture):
+    """Fifth review: a registered wave's SOTA manifest (the source of its published sota_components)
+    is frozen, the newest wave's included."""
+
+    NEWEST = f"catalogs/sota-convergence/manifest-{RUN}.json"
+
+    def registered_wave(self):
+        self.write(self.NEWEST, dump({"foundation": [{"id": "beta", "components": [{"pin": "1.0",
+                                                                                    "review_status": "reviewed"}]}]}))
+        row = self.record()
+        self.rebase()
+        return row
+
+    def test_newest_wave_manifest_edited_fails(self):
+        self.registered_wave()
+        self.write(self.NEWEST, dump({"foundation": [{"id": "beta", "components": [{"pin": "1.0",
+                                                                                    "review_status": "accepted"}]}]}))
+        self.assertFails(self.report(), f"the SOTA manifest {self.NEWEST} registered by wave {RUN} was changed")
+
+    def test_newest_wave_manifest_pointer_moved_fails(self):
+        self.registered_wave()
+        other = "catalogs/sota-convergence/manifest-other.json"
+        self.write(other, b'{"foundation": []}\n')
+        self.waves[RUN]["manifest"] = other
+        self.assertFails(self.report(), f"the registered SOTA manifest of wave {RUN} moved from {self.NEWEST}")
+
+    def test_grandfathered_wave_manifest_edited_fails(self):
+        path = "catalogs/sota-convergence/manifest-20260922.json"
+        self.write(path, b'{"foundation": []}\n')
+        self.rebase()
+        self.write(path, b'{"foundation": [{"id": "alpha"}]}\n')
+        self.assertFails(self.report(), f"the SOTA manifest {path} registered by wave 20260922 was changed")
+
+    def test_reformatted_newest_wave_manifest_passes(self):
+        self.registered_wave()
+        data = json.loads((self.root / self.NEWEST).read_bytes())
+        self.write(self.NEWEST, json.dumps(data).encode())
+        self.assertPasses(self.report())
 
 
 class TrustPathDerivationTests(unittest.TestCase):

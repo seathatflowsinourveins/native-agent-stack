@@ -918,7 +918,7 @@
         "prometheus",
         "loki"
       ],
-      "claim": "After native sign-in restored readiness, the freshly reproduced SDK completed a real LEAN backtest→Dagu→DuckDB→GPT-6 Astra→Claude Opus 5 prepared-packet research workflow; both native reports passed structural citation/value/unit/scope checks and the accepted Astra report was bound into Claude's prompt by verified hashes.",
+      "claim": "After native sign-in restored readiness, the freshly reproduced SDK completed a real LEAN backtest\u2192Dagu\u2192DuckDB\u2192GPT-6 Astra\u2192Claude Opus 5 prepared-packet research workflow; both native reports passed structural citation/value/unit/scope checks and the accepted Astra report was bound into Claude's prompt by verified hashes.",
       "limitations": [
         "This validates a bounded historical simulation research workflow on the authoring host, not a profitable strategy, current market source, broker execution or unattended production service.",
         "The two reported model tasks used no model tools. Their native hooks and telemetry remain separate evidence; this does not repeat every MCP, memory or GPU-RAG behavior.",
@@ -1900,7 +1900,7 @@
       "component_ids": [
         "ai-memory"
       ],
-      "claim": "Mac arm64 synthetic2.3.1→2.3.2 migration, scoped exact reads/FTS, reserved and Unicode paths, restart and no-capture checks passed.",
+      "claim": "Mac arm64 synthetic2.3.1\u21922.3.2 migration, scoped exact reads/FTS, reserved and Unicode paths, restart and no-capture checks passed.",
       "limitations": [
         "Separate synthetic store and explicit no-model policy only; no production migration claimed by this receipt.",
         "OS filesystem/network confinement was not established; failed restricted-sandbox attempt retained. Native execution succeeded without security overrides; Gatekeeper assessment rejected the ad-hoc distribution.",
@@ -3068,8 +3068,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "a44f6bd360da5dd752f127da518ab57d1e67017c7a25886c28b46322b67c8353",
-      "bytes": 13484
+      "sha256": "eb7c38b23d9bb1e9cdf6876276272e471075741bfaf99628e7274d4e7ff60538",
+      "bytes": 13584
     },
     {
       "path": ".gitignore",
@@ -8809,8 +8809,8 @@
     },
     {
       "path": "docs/decisions/2026-09-22-github-automation-closure.md",
-      "sha256": "e069029f7a7f34bbf1e741cb0326b234dfe583c8b98989b34d86bba3d1a0ff76",
-      "bytes": 61211
+      "sha256": "b72e7cd2881ed25655ed2b61b137487db2c5138fd54fe5d2f3578a6ae45a187d",
+      "bytes": 66350
     },
     {
       "path": "docs/direct-results.md",
@@ -8919,8 +8919,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "100b1208f0b7f9fa4b07cb10f2a6048852688ff956c5cc4cd8ef1b378ad1fea2",
-      "bytes": 75264
+      "sha256": "51d606d853b7846a881509a82b97e8e7ce02a189239be6b2649206a0dcb68462",
+      "bytes": 76282
     },
     {
       "path": "docs/grand-catalog-handbook.md",
@@ -14369,8 +14369,8 @@
     },
     {
       "path": "scripts/verdict_review_gate.py",
-      "sha256": "c4967421f2ee5ffe713376f2b4017c7d15c6908ce4b6caea1f4dd1e82f3c4fb4",
-      "bytes": 77289
+      "sha256": "1ed4662927acfcbd09ea3113f8679cdaafe30c1c200a280081a71407cf743ba1",
+      "bytes": 87270
     },
     {
       "path": "scripts/verify_nautilus_ci.py",

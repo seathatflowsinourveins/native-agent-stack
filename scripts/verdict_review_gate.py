@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Required PR check: a changed layer-verdict row merges only with its sealed cross-family review.
+"""Required PR check: a changed layer-verdict row must be consistent with the sealed cross-family review its wave registers.
 
 The catalog has a single human maintainer, so required approvals cannot be the control
 (docs/decisions/2026-09-22-github-automation-closure.md, "verdict-review-gate (2026-09-23)").
@@ -51,24 +51,32 @@ them with the base's canonical repository index must give the same result as wit
 changed ``platform_status`` value must be what ``scripts/platform_status.py`` ``platform_status()``
 derives for the winner's sealed pin and evidence_refs (fourth review, G1): the packet candidate's pin,
 else a pin the base's row candidates already carry, else ``unpinned``, and the chosen lane's
-``winner_evidence_refs``. A row whose only change is ``platform_status`` needs nothing else. A changed
+``winner_evidence_refs``. A changed value may also claim no more than the same derivation gives from
+only the evidence refs and host receipts that are already at the base with the same bytes and
+registered there with that sha256 (fifth review): evidence or a receipt that raises a status lands in
+its own earlier pull request, like a single-lane authorization. A row whose only change is
+``platform_status`` needs nothing else. A changed
 grandfathered row is reported and passes here (``build_verdicts.py --check`` freezes it). Every
 row of the base keeps a row at the head whose run id is not older, never moves from a new wave back
 to the grandfathered one and changes only to the newest registered wave (review of #123, finding 1).
 Every wave registry entry at the base except the newest, and every grandfathered entry, must be
-unchanged at the head, with its document (review finding 4). Rows, wave documents and the registry
+unchanged at the head, with its document (review finding 4). The SOTA manifest every base entry
+registers (``manifest``), the newest included, must keep its pointer and its parsed value at the head
+(fifth review): a registered wave's published ``sota_components`` come from it. Rows, wave documents and the registry
 are compared on parsed values without duplicate keys, so a pure reformat is not a change
 (finding 3). When a row, a wave or any path under
 ``VERDICT_PATHSPECS`` changed, ``scripts/landscape.py`` and ``tools/sota-convergence/build_verdicts.py
 --check`` then run on the head.
 
-The gate's own rules are trusted only from the base: CI runs the base commit's copy of this script
+The sealed files are self-attested: the gate checks that a row is consistent with the sealed returns
+its wave registers and that their declared model families differ, not that a cross-family review
+actually ran (the decision record's accepted residual). The gate's own rules are trusted only from the base: CI runs the base commit's copy of this script
 against the head checkout (``--root``), and a change to a verdict row, wave or sealed artifact fails
 when the same comparison also changes a ``TRUST_PATHS`` file, so a weakening of the rules has to land
 (and be seen) in its own pull request first. Exit 0 prints one line when nothing of that changed;
 otherwise every violation is printed with its row key and the exit code is 1 (2 for an unresolvable
 revision, an unreadable or malformed base or head ledger, manifest or wave registry, or a git
-command that fails while listing the changed paths or a base tree).
+command that fails while listing the changed paths or a base tree, or while finding the merge base).
 """
 
 from __future__ import annotations
@@ -169,11 +177,15 @@ HEAD_DATA_BINDINGS = (
     ("catalogs/landscape/", "the ledgers (compared with the base row by row) and the landscape manifest "
      "(must name build_verdicts.LEDGER_FILES; its repository index is compared with the base's)"),
     ("catalogs/sota-convergence/", "the wave registry and documents (registered by sha256; every wave but the "
-     "newest frozen)"),
+     "newest frozen) and each registered wave's SOTA manifest (frozen, the newest included)"),
     (SEALED_BASE_PREFIX, "sealed lane returns, packets, adjudications and run manifests (bound by the row's "
      "sha256 fields and manifests/evidence.json)"),
-    ("manifests/evidence.json", "the evidence registration the sealed files and receipts are checked against"),
-    ("evidence/hosts/", "host receipts (platform_status derives from receipts bound to the sealed pin)"),
+    ("manifests/evidence.json", "the evidence registration the sealed files and receipts are checked against (a "
+     "raised platform_status also against the base's)"),
+    ("evidence/", "evidence files a sealed citation names (a raised platform_status needs them byte-identical at "
+     "the base and registered there)"),
+    ("evidence/hosts/", "host receipts (platform_status derives from receipts bound to the sealed pin; a raised "
+     "value only from receipts byte-identical at the base and registered there)"),
     (SINGLE_LANE_DECISION_DIR, "single-lane authorizations (must be byte-identical at the base)"),
     ("catalogs/us-equities/decision-index.json", "the canonical repository index (the derived alternatives and "
      "status must be the same with the base's index)"),
@@ -219,12 +231,26 @@ def resolve(root, revision):
 
 
 def merge_base(root, base, head):
+    """The merge base of ``base`` and ``head``; ``base`` itself when they share no history (git exits 1
+    with no output, as for unrelated or cut-off histories: comparing with the base tip then reports
+    more changes, not fewer). Any other git failure raises RevisionError (exit 2), not a fallback."""
     result = git(root, "merge-base", base, head, check=False)
-    return result.stdout.decode().strip() if result.returncode == 0 and result.stdout.strip() else base
+    if result.returncode == 0 and result.stdout.strip():
+        return result.stdout.decode().strip()
+    if result.returncode == 1 and not result.stdout.strip():
+        return base
+    raise RevisionError(f"git merge-base {base[:12]} {head[:12]} failed (exit {result.returncode}): "
+                        f"{result.stderr.decode(errors='replace').strip()}")
 
 
 def sha256(data):
     return hashlib.sha256(data).hexdigest()
+
+
+def git_blob_id(data, length):
+    """The git object id of a blob holding ``data`` (sha1, or sha256 for a 64-hex object format)."""
+    digest = hashlib.sha256 if length == 64 else hashlib.sha1
+    return digest(b"blob %d\0" % len(data) + data).hexdigest()
 
 
 class Side:
@@ -256,6 +282,24 @@ class Side:
         except ValueError:
             return None
         return target.read_bytes() if target.is_file() else None
+
+    def blob_ids(self, paths):
+        """{path: git blob id} of every path of ``paths`` that is a blob in this commit's tree, from one
+        ``git ls-tree`` (a failing listing raises ReadError)."""
+        paths = sorted({path for path in paths if isinstance(path, str) and path})
+        if self.commit is None or not paths:
+            return {}
+        listing = git(self.root, "ls-tree", "-z", "--full-tree", self.commit, "--", *paths, check=False)
+        if listing.returncode != 0:
+            raise ReadError(f"cannot list {len(paths)} evidence path(s) at {self.commit[:12]}: "
+                            f"{listing.stderr.decode(errors='replace').strip()}")
+        found = {}
+        for entry in listing.stdout.split(b"\0"):
+            meta, _tab, name = entry.partition(b"\t")
+            fields = meta.split()
+            if len(fields) == 3 and fields[1] == b"blob":
+                found[name.decode(errors="replace")] = fields[2].decode()
+        return found
 
     def json(self, path):
         """The parsed file, None when absent; a file that exists but is not JSON (or repeats an object key) raises ReadError."""
@@ -983,10 +1027,68 @@ class RowCheck:
 UNBOUND_WINNER = {"pin": "unpinned", "evidence_refs": []}
 
 
-def platform_status_violations(key, old, new, context, sealed_bindings):
+class BaseTrust:
+    """Which evidence files a raised platform_status may rest on (fifth review): a file that is at the
+    base with the same bytes as at the head and that the base's manifests/evidence.json registers with
+    that sha256. A sealed winner_evidence_refs citation is normalized against the head, and host
+    receipts are read from the head, so without this a pull request could add (and register) the file
+    a sealed citation names, or a receipt, and raise a status in the same comparison."""
+
+    def __init__(self, base, head):
+        self.base, self.head, self.cache, self._base_registry = base, head, {}, None
+
+    def base_registry(self):
+        if self._base_registry is None:
+            document = self.base.json("manifests/evidence.json") if self.base is not None else None
+            files = document.get("files") if isinstance(document, dict) else None
+            self._base_registry = {record["path"]: record.get("sha256") for record in files or []
+                                   if isinstance(record, dict) and isinstance(record.get("path"), str)}
+        return self._base_registry
+
+    def trusted(self, paths):
+        """The subset of ``paths`` that is base-trusted as above."""
+        paths = {path for path in paths if isinstance(path, str)}
+        missing = sorted(path for path in paths if path not in self.cache)
+        if missing:
+            blobs = self.base.blob_ids(missing) if self.base is not None else {}
+            registry = self.base_registry() if blobs else {}
+            for path in missing:
+                data = self.head.read(path) if path in blobs else None
+                self.cache[path] = (data is not None and blobs[path] == git_blob_id(data, len(blobs[path]))
+                                    and registry.get(path) == sha256(data))
+        return {path for path in paths if self.cache[path]}
+
+    def context(self, context, evidence_refs, component_id=None, platform_id=None):
+        """(the StatusContext restricted to base-trusted receipts and evidence refs, the untrusted
+        registered refs and ``component_id``'s untrusted ``platform_id`` receipts) for a winner citing
+        ``evidence_refs``."""
+        receipts = {entry.get("path") for component in (context.summary.get("components") or {}).values()
+                    if isinstance(component, dict)
+                    for bucket in (component.get("platforms") or {}).values() if isinstance(bucket, dict)
+                    for entry in bucket.get("receipts") or [] if isinstance(entry, dict)}
+        refs = {ref.split("#", 1)[0] for ref in evidence_refs or [] if isinstance(ref, str)}
+        refs = {path for path in refs if path in context.registered_paths}
+        trusted = self.trusted(receipts | refs)
+        summary = {**context.summary, "components": {
+            component_id: {**component, "platforms": {
+                platform_id: {**bucket, "receipts": [entry for entry in bucket.get("receipts") or []
+                                                     if isinstance(entry, dict) and entry.get("path") in trusted]}
+                if isinstance(bucket, dict) else bucket
+                for platform_id, bucket in (component.get("platforms") or {}).items()}}
+            if isinstance(component, dict) else component
+            for component_id, component in (context.summary.get("components") or {}).items()}}
+        restricted = platform_evidence.StatusContext(summary=summary, registered_paths=frozenset(refs & trusted))
+        own = {entry.get("path") for entry in platform_evidence._platform_receipts(context.summary, component_id,
+                                                                                  platform_id)}
+        return restricted, sorted(((own & receipts) | refs) - trusted - {None})
+
+
+def platform_status_violations(key, old, new, context, sealed_bindings, trust=None):
     """Every changed platform value must be the one platform_status() derives for the winner's
     SEALED pin and evidence_refs (fourth review, G1), never the head winner's own: a winner whose
-    sealed evidence cannot be resolved is derived as unpinned with no evidence_refs."""
+    sealed evidence cannot be resolved is derived as unpinned with no evidence_refs. With ``trust``
+    (a BaseTrust), the value may also rank no higher than the derivation from base-trusted evidence
+    refs and receipts alone (fifth review)."""
     violations = []
     old_winners = {winner.get("component_id"): winner for winner in old.get("winners") or [] if isinstance(winner, dict)}
     for winner in new.get("winners") or []:
@@ -1005,6 +1107,21 @@ def platform_status_violations(key, old, new, context, sealed_bindings):
                     f"{declared.get(platform)!r} but scripts/platform_status.py derives {derived.status!r} "
                     f"({derived.reason}) from the registered receipts bound to the sealed pin "
                     f"{sealed.get('pin')!r} and evidence_refs {sealed.get('evidence_refs')!r}")})
+                continue
+            if trust is None:
+                continue
+            restricted, untrusted = trust.context(context, sealed.get("evidence_refs"), winner.get("component_id"),
+                                                  platform)
+            supported = platform_evidence.platform_status(platform, sealed, restricted)
+            rank = platform_evidence.STATUS_RANK
+            if rank.get(declared.get(platform), len(rank)) > rank[supported.status]:
+                violations.append({"row": label(key), "message": (
+                    f"winner {winner.get('component_id')}: platform_status.{platform} changed to "
+                    f"{declared.get(platform)!r}, which the head's evidence derives, but only {supported.status!r} "
+                    f"({supported.reason}) follows from the evidence refs and host receipts already at the base "
+                    f"with the same bytes and registered there with that sha256 (not at the base, changed or "
+                    f"unregistered there: {untrusted}); land the evidence or receipt in its own pull request "
+                    "first")})
     return violations
 
 
@@ -1079,6 +1196,33 @@ def wave_freeze_violations(base, head, base_waves, head_waves):
                                f"{head_entry.get('sha256')} is not the sha256 of its document {path}"})
         if isinstance(path, str) and not same_document:
             violations.append({"row": where, "message": f"the frozen wave document {path} was rewritten"})
+    return violations
+
+
+def registered_manifest(run_id, entry):
+    """The SOTA manifest a registry entry names (build_verdicts.py's default when it names none)."""
+    manifest = entry.get("manifest") if isinstance(entry, dict) else None
+    return manifest or f"catalogs/sota-convergence/manifest-{run_id}.json"
+
+
+def sota_manifest_violations(base, head, base_waves, head_waves):
+    """Fifth review: build_verdicts.py publishes each row's ``sota_components`` (pin, upstream,
+    review_status, pin_behind_upstream) from the SOTA manifest its wave registers, and the newest
+    wave's document may be regenerated. So the manifest every base registry entry names, the newest
+    included, keeps its pointer and its parsed value at the head. A wave registered first in this
+    comparison brings its manifest with it (the recorded residual)."""
+    violations = []
+    for run_id, entry in sorted(base_waves.items()):
+        path = registered_manifest(run_id, entry)
+        head_entry = head_waves.get(run_id)
+        if head_entry is not None and registered_manifest(run_id, head_entry) != path:
+            violations.append({"row": f"wave {run_id}", "message": (
+                f"the registered SOTA manifest of wave {run_id} moved from {path} to "
+                f"{registered_manifest(run_id, head_entry)}; a registered wave's manifest is frozen")})
+        if not json_equivalent(base.read(path), head.read(path)):
+            violations.append({"row": f"wave {run_id}", "message": (
+                f"the SOTA manifest {path} registered by wave {run_id} was changed; its published "
+                "sota_components come from it, so a registered wave's manifest is frozen (record a new wave)")})
     return violations
 
 
@@ -1195,7 +1339,7 @@ def evaluate(root, base, head_root=None, *, validators=run_repo_validators):
     changes, violations = [], []
     registered = evidence_files(head_root)
     base_by_layer = {key[:2]: row for key, row in base_rows.items()}
-    context = None
+    context, trust = None, BaseTrust(base_side, head_side)
     for key, row in sorted(head_rows.items(), key=lambda item: tuple(map(str, item[0]))):
         kind = change_kind(base_rows.get(key), row)
         if kind is None:
@@ -1215,10 +1359,11 @@ def evaluate(root, base, head_root=None, *, validators=run_repo_validators):
         # the winner's sealed pin and evidence_refs derive.
         context = context or platform_evidence.load_context(head_root)
         violations.extend(platform_status_violations(key, base_rows.get(key) or {}, row, context,
-                                                     check.sealed_bindings))
+                                                     check.sealed_bindings, trust))
     removed = [label(key) for key in sorted(set(base_rows) - set(head_rows), key=lambda k: tuple(map(str, k)))]
     violations.extend(row_continuity_violations(base_rows, head_rows, head_waves))
     violations.extend(wave_freeze_violations(base_side, head_side, base_waves, head_waves))
+    violations.extend(sota_manifest_violations(base_side, head_side, base_waves, head_waves))
     # Compared on parsed values (finding 3): a regenerated wave document or registry that only
     # changes formatting (and the document sha256 it records) is not a wave change.
     waves_changed = ({run_id: registry_values(entry) for run_id, entry in base_waves.items()}

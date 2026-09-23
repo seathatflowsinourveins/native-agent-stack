@@ -1036,15 +1036,24 @@ counts as a row change and triggers the checks above, but its text is not
 re-derived), and the wave document's `title`, `group`, `overturn_when` (the
 handbook fallback) and `checked_at`, which are layer metadata outside
 `VERDICT_FIELDS`. A frozen wave's document is compared whole, so these fields
-cannot change there. The gate does not stop a PR from rewriting the newest
-wave's sealed files together with their registrations, so a new recorded
-wave remains a rule for the author rather than a byte-level block.
+cannot change there. Each row's published `sota_components` come from the
+SOTA manifest the wave's registry entry names. The manifest every base
+registry entry names, the newest included, must keep its pointer and parsed
+value, but a wave registered for the first time brings its manifest with it
+unbound. The gate does not stop a PR from rewriting the newest wave's sealed
+files together with their registrations, so a new recorded wave remains a
+rule for the author rather than a byte-level block. The sealed files are
+self-attested: the gate shows that a row is consistent with the lane returns
+its wave registers and that their declared families differ, not that a
+cross-family review ran (the decision record's accepted residual).
 
 Rows, wave documents, the registry and sealed files are parsed without
 duplicate object keys: a duplicate is not equivalent to anything and fails a
 frozen document comparison, and a ledger, landscape manifest or registry with
-one exits 2. A git command that fails while listing changed paths also exits
-2 instead of counting as "no changed paths".
+one exits 2. A git command that fails while listing changed paths, reading a
+base tree or finding the merge base also exits 2 instead of counting as "no
+changed paths" (the merge base falls back to the given base only when git
+reports no common history).
 
 Every changed `platform_status` value must be the one
 `scripts/platform_status.py` derives for the winner's sealed pin and
@@ -1052,7 +1061,12 @@ evidence refs, not for the head winner's own values: the chosen lane's
 `winner_evidence_refs`, and the packet pin, else a pin the base's row
 candidates already carry, else `unpinned` (which binds no receipt). A PR can
 therefore neither cite an unrelated registered file nor introduce a pin that
-matches some receipt to raise a status. A change to `platform_status` alone
+matches some receipt to raise a status. A changed value may also rank no
+higher than the same derivation from only the cited evidence files and host
+receipts that are already at the base with the same bytes and registered
+there with that sha256. Evidence or a receipt that raises a status therefore
+lands in its own earlier PR, as a single-lane authorization does; a lower
+value is not held to the base. A change to `platform_status` alone
 needs nothing else; its row is still resolved against the sealed evidence for
 that pin and those refs. The newest registered
 wave is the only one that may change. A PR that changes a verdict row, a wave

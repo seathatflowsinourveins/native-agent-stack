@@ -831,6 +831,63 @@ Hosted and live results after merge. Evidence class: hosted runs and GitHub API 
   wave itself: its placeholder wave document and its lane returns have no lane provenance. That
   exit code is therefore not evidence for these findings. The evidence is the gate's own
   violation list.
+- **Fifth review of the gate (2026-09-23).** A fifth independent review of the fourth-round
+  change raised one medium and three low findings. The medium and two lows are closed; the third
+  low is an accepted residual (below).
+  - **Sealed citation resolved at the head (medium, the rest of G1).** A sealed
+    `winner_evidence_refs` citation counts only if the cited file exists, and
+    `platform_status` accepts it when `manifests/evidence.json` registers it. Both were read at
+    the head. A citation to a file that did not exist when the row was recorded (so
+    `record_verdicts.py` dropped it) could be made to count by a PR that adds and registers the
+    file, copies it into the row's `evidence_refs` and raises linux to `accepted`. The row's
+    `evidence_refs` still follow `build_winners` at the head. But a changed `platform_status`
+    value may now rank no higher than what `platform_status()` derives from evidence refs that
+    are already at the base with the same bytes (`git ls-tree` blob id) and registered there with
+    that sha256. Negative controls: the citation's file added with the raise, the file added with
+    the row, the cited file rewritten in the same PR, and a base file the base does not register.
+    Positive: the cited file already at the base.
+  - **Same-PR host receipts (low).** Receipts are read from the head, so a receipt added in the
+    PR that raises a status supported it. The same base rule now applies to receipts: a raised
+    value is derived again from only the receipts at the base with the same bytes and registered
+    there. This follows the G2 principle: evidence that raises a status lands in its own earlier
+    PR. A lower or unchanged value is not held to the base. Negative control: the qualifying
+    receipt added with the raise. Positive: the receipt at the base.
+  - **`sota_components` (low).** `build_verdicts.py` publishes each row's `sota_components` from
+    the SOTA manifest the wave's registry entry names, and the newest wave's document may be
+    regenerated, so its manifest could be edited. The manifest every base registry entry names,
+    the newest included, must now keep its pointer and its parsed value. Negative controls: the
+    newest wave's manifest edited, its pointer moved, the grandfathered manifest edited.
+    Positive: a pure reformat. *Residual:* a wave registered for the first time in a PR brings
+    its manifest with it, and nothing binds that manifest to the sealed packets built from it.
+    Proposed fix for the tooling owner (`tools/sota-convergence/record_verdicts.py`, #124's run
+    manifest): record the SOTA manifest's path and sha256 in `run-manifest.json`, which the gate
+    would then compare with the registry entry.
+  - **Self-attested sealed files (low).** Recorded as the accepted residual below. The
+    overturn line and the `validate.yml` comment now describe a consistency check.
+  - *Round-three lows, re-checked again.* `merge_base()` falls back to the given base only when
+    `git merge-base` exits 1 with no output (no common history; comparing with the base tip then
+    reports more changes, not fewer). Any other failure exits 2 (`MergeBaseTests`). Duplicate
+    JSON keys: the new base-registry read uses `unique_json`. The free-form published fields
+    residual now also names `sota_components` of a newly registered wave, above. The
+    name-alignment test is unchanged: it asserts #124's pinned literals unconditionally, and the
+    comparison with `scripts/landscape.py` skips with its reason until #124 defines the names.
+- **Accepted residual: sealed lane returns are self-attested (fifth review, 2026-09-23).** The
+  gate checks consistency, not provenance. A sealed lane return must match the row's
+  `sealed_sha256` and be registered in the head's `manifests/evidence.json`, which the PR can
+  edit. Its model family is the one the return declares. `scripts/landscape.py` checks that its
+  provenance names a `workflow_path` and sha256 listed in `lane-provenance.json`, not that the
+  return came from that run. A PR that writes its own lane returns (a new wave, or a rewrite of
+  the newest wave with its registrations) and declares a `codex` family passes. The gate does
+  not show that a cross-family review happened.
+  - *Alternatives.* Lane returns produced and attested in CI (GitHub artifact attestations of
+    the lane run), signed returns verified against a key outside the repository, or a
+    base-registered list of lane-return hashes, so each wave's returns land in their own earlier
+    PR. None is adopted. The lanes run on local native clients, not in CI. A signing key would
+    have to live outside the repository and the single maintainer's own sessions. A base
+    hash list moves the same self-attestation one PR earlier.
+  - *Overturn.* The lane runs move into CI with attested outputs, or a second maintainer or
+    external reviewer can countersign a wave. Either makes the provenance checkable and would
+    replace this residual with a verification step.
 - **Accepted residual: the PR's own workflow can disable the job (finding 2, 2026-09-23).** A
   `pull_request` run takes the job definition from the PR's `validate.yml`. A PR that edits the
   `verdict-review-gate` job so that it no longer runs the base's gate is therefore not blocked by
@@ -851,6 +908,7 @@ Hosted and live results after merge. Evidence class: hosted runs and GitHub API 
     runs the merged commit's job, so it does not catch a PR that disabled that job.
   - *Overturn.* The repository moves to an organization with required workflows, or GitHub offers
     base-defined required checks for personal repositories.
-- **Overturn.** A merged PR that changes a verdict row without the sealed cross-family evidence
-  while this check was required. The other trigger is a second maintainer joining, which would
+- **Overturn.** A merged PR whose changed verdict row is inconsistent with the sealed evidence
+  its wave registers, while this check was required (the gate checks consistency; the
+  self-attestation residual above bounds what that shows). The other trigger is a second maintainer joining, which would
   make required approvals possible. The accepted residual above has its own overturn.
