@@ -16,6 +16,13 @@ REPO = HERE.parents[2]
 _PATH_SAFETY_SPEC = importlib.util.spec_from_file_location("path_safety", REPO / "scripts/path_safety.py")
 _path_safety = importlib.util.module_from_spec(_PATH_SAFETY_SPEC)
 _PATH_SAFETY_SPEC.loader.exec_module(_path_safety)
+# Every executable source this runtime actually loads: frozen alongside the
+# corpus/plan at prepare() time and re-compared against the live files at
+# run() time, so a change to any of them -- including the shared symlink-
+# safety helper safe() now depends on -- trips 'runtime source changed
+# after freeze' instead of silently running different code than reviewed.
+RUNTIME_SOURCES = {'experiment.py': HERE/'experiment.py', 'run_codex.py': HERE/'run_codex.py',
+                   'path_safety.py': REPO/'scripts/path_safety.py'}
 CORPUS = [
     'blueprints/us-equities/identity-readiness/README.md',
     'blueprints/us-equities/authenticated-data/README.md',
@@ -308,8 +315,8 @@ def prepare(out, qmd, runtime_path, qmd_package, sdk_python, codex_bin, claude_b
         for condition in ['full', 'focused']:
             docs = documents if condition == 'full' else [next(d for d in documents if d['id']==i) for i in ids]
             write(out/'prompts'/(task+'-'+condition+'.txt'), prompt(task, docs).encode())
-    for name in ['experiment.py', 'run_codex.py']:
-        write(out/name, (HERE/name).read_bytes())
+    for name, path in RUNTIME_SOURCES.items():
+        write(out/name, path.read_bytes())
     helpers = {'supervisor.py': REPO/'blueprints/us-equities/research-runtime/run_worker.py', 'worker-policy.md': REPO/'blueprints/us-equities/workers/policy.md'}
     for name, path in helpers.items():
         write(out/name, path.read_bytes())
@@ -343,8 +350,8 @@ def run(out, expected_freeze, provider, task, condition, sdk_python, codex_bin, 
     if sha(freeze_raw) != expected_freeze:
         raise ValueError('freeze anchor mismatch')
     freeze = json.loads(freeze_raw);verify_files(out, freeze['files'])
-    for name in ['experiment.py','run_codex.py']:
-        if (out/name).read_bytes() != (HERE/name).read_bytes():
+    for name, path in RUNTIME_SOURCES.items():
+        if (out/name).read_bytes() != path.read_bytes():
             raise ValueError('runtime source changed after freeze')
     plan = json.loads((out/'plan.json').read_bytes())
     actual_runtime={'sdk_python':str(sdk_python),'codex_bin':str(codex_bin),'claude_bin':str(claude_bin),'codex_home':str(codex_home),'workspace':str(workspace),'path':runtime_path}

@@ -253,8 +253,13 @@ def run(work):
         device_help = command('qemu-block-device-help', ['qemu-system-x86_64', '-device', 'virtio-blk-pci,help'])
         verify_block_device_help((device_help.stdout + device_help.stderr).decode())
         command('runner-packages', ['dpkg-query', '-W', 'qemu-system-x86', 'qemu-utils', 'cloud-image-utils', 'ubuntu-cloudimage-keyring'])
+        # scripts/path_safety.py is a host-side-only dependency of run()'s own
+        # symlink-ancestor check, never shipped to the guest -- tracked here
+        # (not in source_paths, which is copied into payload/) so a changed
+        # helper still shows up in repository_inputs.
         inputs = sorted(set(source_paths + [p for p in HERE.iterdir() if p.is_file()] +
-                            [ROOT / '.github/workflows/native-service-reboot.yml', ROOT / 'tests/test_service_reboot.py']))
+                            [ROOT / '.github/workflows/native-service-reboot.yml', ROOT / 'tests/test_service_reboot.py',
+                             ROOT / 'scripts/path_safety.py']))
         frozen = {'repository_inputs': {str(p.relative_to(ROOT)): digest(p) for p in inputs},
                   'payload_hashes': {p.name: digest(p) for p in payload.iterdir()},
                   'image_sha256': digest(image_path), 'dagu_archive_sha256': digest(archive),
