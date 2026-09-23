@@ -33,11 +33,13 @@ from selector import (
     SelectorConfig,
     StrategySpec,
 )
+from leverage import LeverageInputs, LeveragePolicy
 
 __all__ = [
     "AdaptivePolicy", "AdaptivePolicyV1", "PolicyConfig", "Sample", "Signal",
     "Decision", "Holding", "limit_price", "Decimal", "QUOTE_FUTURE_TOLERANCE_SECONDS",
     "DecisionInputs", "OperationalStatus", "RegimeSelector", "SelectorConfig", "StrategySpec",
+    "LeverageInputs", "LeveragePolicy",
 ]
 
 # Kept importable under this name too, for callers/tests that want the
@@ -59,7 +61,7 @@ class AdaptivePolicy(_AdaptivePolicyV1):
     """
 
     def __init__(self, config: PolicyConfig, strategy_pool: tuple[StrategySpec, ...] = (),
-                 selector: RegimeSelector | None = None):
+                 selector: RegimeSelector | None = None, leverage_policy: LeveragePolicy | None = None):
         strategy_pool = tuple(strategy_pool)
         if selector is not None and not strategy_pool:
             # A selector with nothing to select would gate allow_entries on
@@ -67,10 +69,20 @@ class AdaptivePolicy(_AdaptivePolicyV1):
             # silently blocking all entries. Fail loudly at construction
             # instead of producing a policy that never trades.
             raise ValueError("selector requires a non-empty strategy_pool")
+        # G-e: leverage_policy and config.leverage_policy_id must agree --
+        # neither "a validated policy with no id recorded on the config"
+        # nor "an id recorded with no policy object supplied" is a state
+        # runner.py's load_config (the only production constructor path)
+        # can produce; catching the mismatch here fails loudly for a
+        # malformed direct construction instead.
+        if (leverage_policy is None) != (config.leverage_policy_id is None):
+            raise ValueError("leverage_policy_config_mismatch")
         super().__init__(config)
         self.strategy_pool = strategy_pool
         self.selector = selector
         self.last_selector_decision = None
+        self.leverage_policy = leverage_policy
+        self.last_leverage_ceiling = None
 
     def _evaluate_pool(self, regime: str, risk_off: bool, signals: tuple[Signal, ...]):
         """Synthetic, deterministic candidate scoring for the shipped
@@ -91,9 +103,10 @@ class AdaptivePolicy(_AdaptivePolicyV1):
         return candidate.id, confidence, 0.0
 
     def decide(self, now: float, *, allow_entries: bool = True, force_exit: bool = False,
-               operational: OperationalStatus | None = None) -> Decision | None:
+               operational: OperationalStatus | None = None,
+               leverage_inputs: LeverageInputs | None = None) -> Decision | None:
         c = self.config
-        if not self.strategy_pool and self.selector is None:
+        if not self.strategy_pool and self.selector is None and self.leverage_policy is None:
             # Exact original path: no wrapper computation, no extra reads.
             return super().decide(now, allow_entries=allow_entries, force_exit=force_exit)
 
@@ -139,5 +152,28 @@ class AdaptivePolicy(_AdaptivePolicyV1):
         else:
             force_exit_reason = "trial_end"
 
+        ceiling = None
+        pending_buy_notional_usd = 0.0
+        if self.leverage_policy is not None:
+            if leverage_inputs is None:
+                # Fail closed: with no observed session/drawdown/kill-switch
+                # inputs this tick, authorize no new risk rather than reuse
+                # a stale ceiling or fall back to the unbounded default.
+                ceiling = 0.0
+            else:
+                ceiling = float(self.leverage_policy.ceiling(
+                    session=leverage_inputs.session, regime=regime,
+                    drawdown_fraction=leverage_inputs.drawdown_fraction,
+                    kill_switch=leverage_inputs.kill_switch,
+                    account_multiplier=leverage_inputs.account_multiplier))
+                # LEV-RI-A (2026-09-22 leverage fix round 1): net out the
+                # notional of every still-resting, unfilled buy order from
+                # this tick's leveraged budget -- see
+                # strategies_v1._decide_core's own comment at the
+                # leverage_ceiling-gated `used` computation.
+                pending_buy_notional_usd = float(leverage_inputs.pending_buy_notional_usd)
+            self.last_leverage_ceiling = ceiling
+
         return self._decide_core(now, allow_entries=entries_allowed, force_exit=force_exit,
-                                  force_exit_reason=force_exit_reason)
+                                  force_exit_reason=force_exit_reason, leverage_ceiling=ceiling,
+                                  pending_buy_notional_usd=pending_buy_notional_usd)

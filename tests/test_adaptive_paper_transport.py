@@ -622,5 +622,39 @@ class ConfiguredQuoteFeed(unittest.TestCase):
         client.assert_not_called()
 
 
+class LeverageNormalizeAccountTests(unittest.TestCase):
+    """G-e E8: normalize_account's opt-in include_margin flag (pure, no SDK)."""
+
+    def raw_account(self, **overrides):
+        raw = {"cash": "10000", "equity": "30000", "buying_power": "10000",
+              "status": "ACTIVE", "currency": "USD", "trading_blocked": False,
+              "account_blocked": False, "trade_suspended_by_user": False,
+              "shorting_enabled": True, "pattern_day_trader": False,
+              "multiplier": "4", "daytrading_buying_power": "40000",
+              "regt_buying_power": "20000", "daytrade_count": 0}
+        raw.update(overrides)
+        return raw
+
+    def test_default_returns_exact_pre_change_key_set(self):
+        result = t.normalize_account(self.raw_account())
+        expected_keys = {"cash", "equity", "buying_power", "status", "currency", "trading_blocked",
+                         "account_blocked", "trade_suspended_by_user", "shorting_enabled", "pattern_day_trader"}
+        self.assertEqual(set(result), expected_keys)
+
+    def test_include_margin_true_adds_margin_keys(self):
+        result = t.normalize_account(self.raw_account(), include_margin=True)
+        self.assertEqual(result["multiplier"], "4")
+        self.assertEqual(result["daytrading_buying_power"], "40000")
+        self.assertEqual(result["regt_buying_power"], "20000")
+        self.assertEqual(result["daytrade_count"], 0)
+
+    def test_include_margin_true_missing_fields_omitted_not_erroring(self):
+        raw = self.raw_account()
+        del raw["multiplier"]
+        result = t.normalize_account(raw, include_margin=True)
+        self.assertNotIn("multiplier", result)
+        self.assertEqual(result["daytrading_buying_power"], "40000")
+
+
 if __name__ == "__main__":
     unittest.main()

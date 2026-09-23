@@ -10,6 +10,7 @@ from nautilus_trader.config import StrategyConfig
 from nautilus_trader.model import (ClientOrderId, InstrumentId, OrderSide, Price,
                                   Quantity, StrategyId, TimeInForce)
 from exits import REASON_PRICE_RULE
+from leverage import LeverageInputs
 from safety import DEFAULT_STOP, SafetyError, evaluate_gap_risk
 from sessions import SessionKind, previous_trading_day, session_at
 from strategies import AdaptivePolicy, OperationalStatus, QUOTE_FUTURE_TOLERANCE_SECONDS, limit_price
@@ -21,13 +22,20 @@ class AdaptiveStrategy(Strategy):
                                 order_id_tag="A", log_events=False, log_commands=False, manage_stop=False))
 
     def __init__(self, policy: AdaptivePolicy, ledger, trial_id: str, *, event_sink=None,
-                 transport=None, stop_file=None, clock=time.time):
+                 transport=None, stop_file=None, clock=time.time, account_multiplier=None):
         self.policy = policy
         self.ledger = ledger
         self.trial_id = trial_id
         self.event_sink = event_sink or (lambda event: None)
         self.transport = transport
         self.stop_file = stop_file
+        # G-e: the broker-proven margin multiplier (runner.py's config
+        # "_account_multiplier", only ever set after preflight has checked
+        # multiplier >= requested leverage -- see runner._check_margin_
+        # entitlement). None outside the leverage policy; consulted only by
+        # _leverage_inputs below, and only when self.policy.leverage_policy
+        # is not None (rebalance() only builds leverage_inputs then).
+        self.account_multiplier = account_multiplier
         # D2 (round 6): a single clock, mirroring runner.Controller's own
         # `clock=time.time` constructor convention, so rebalance()'s
         # default `now` and on_order_canceled's ack-time `now` (which has
@@ -634,6 +642,29 @@ class AdaptiveStrategy(Strategy):
             reconciled=reason != "recovery_only",
             state_fresh=state_fresh)
 
+    def _leverage_inputs(self, now) -> LeverageInputs:
+        """G-e: only called from rebalance() when self.policy.leverage_policy
+        is not None. `session` is None for a timestamp outside the frozen
+        session calendar (LeverageInputs consumers fail closed to 0 on an
+        unclassifiable session, the same contract as safety.Ledger's own
+        independent envelope check). `kill_switch` is deliberately broader
+        than OperationalStatus.kill_switch above: it also trips on ANY
+        halted_reason (not just a non-recovery_only one) and on a frozen or
+        not-ready transport, since a leverage entry must stop on strictly
+        more conditions than the ordinary rotation kill switch.
+        """
+        try:
+            session = session_at(datetime.fromtimestamp(now, timezone.utc)).kind.value
+        except ValueError:
+            session = None
+        acct = self.ledger.accounting()
+        reason = self.ledger.halted_reason()
+        health = getattr(self.transport, "health", {}) if self.transport is not None else {}
+        kill = (Path(self.stop_file or DEFAULT_STOP).exists() or reason is not None
+                or bool(health.get("frozen")) or health.get("ready") is False)
+        return LeverageInputs(session, acct.drawdown_usd / self.ledger.limits.max_drawdown_usd, kill,
+                              self.account_multiplier, acct.pending_buy_notional_usd)
+
     def rebalance(self, now=None, *, force_exit=False):
         """Called on the native owner loop, never a socket thread."""
         now = self._clock() if now is None else now
@@ -641,8 +672,16 @@ class AdaptiveStrategy(Strategy):
         for client_id in list(self.pending):
             self._finish_if_terminal(client_id)
         operational = self._operational_status(now) if self.policy.selector is not None else None
+        decide_kwargs = {"operational": operational}
+        # getattr, not a direct attribute access: self.policy is not always
+        # a real strategies.AdaptivePolicy instance -- a duck-typed test
+        # double (predating G-e) providing only the narrower pre-G-e
+        # interface (config/latest/selector/decide/...) must still work
+        # unchanged, with leverage treated as absent.
+        if getattr(self.policy, "leverage_policy", None) is not None:
+            decide_kwargs["leverage_inputs"] = self._leverage_inputs(now)
         decision = self.policy.decide(now, allow_entries=self.enabled, force_exit=force_exit,
-                                       operational=operational)
+                                       **decide_kwargs)
         if decision is None or not self.started:
             return None
         # If this tick's selector decision liquidates (FLATTEN_BEFORE_SWITCH),
@@ -668,12 +707,15 @@ class AdaptiveStrategy(Strategy):
         # or not -- can be included in that same event below, instead of
         # needing a separate event type.
         gap_stop_symbols = self._gap_risk_stop_symbols(now, held)
-        self.event_sink({"type": "decision", "timestamp": now, "regime": decision.regime,
-                         "targets": decision.targets, "exits": decision.exits,
-                         "effective_leverage": decision.effective_leverage,
-                         "signals": [{"symbol": s.symbol, "family": s.family,
-                                      "edge_bps": s.edge_bps, "score": s.score} for s in decision.signals],
-                         "gap_bps": {symbol: str(bps) for symbol, bps in self._gap_bps.items()}})
+        decision_event = {"type": "decision", "timestamp": now, "regime": decision.regime,
+                          "targets": decision.targets, "exits": decision.exits,
+                          "effective_leverage": decision.effective_leverage,
+                          "signals": [{"symbol": s.symbol, "family": s.family,
+                                       "edge_bps": s.edge_bps, "score": s.score} for s in decision.signals],
+                          "gap_bps": {symbol: str(bps) for symbol, bps in self._gap_bps.items()}}
+        if getattr(self.policy, "leverage_policy", None) is not None:
+            decision_event["leverage_ceiling"] = self.policy.last_leverage_ceiling
+        self.event_sink(decision_event)
         # Exits consume capacity before fresh entries; one outstanding order per
         # symbol also prevents sell-before-entry-terminal and oversell races.
         # A D5 gap-risk stop forces a full exit even if the ordinary decision

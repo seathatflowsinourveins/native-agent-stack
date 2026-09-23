@@ -265,7 +265,7 @@
         "pointer": "/needs_attention",
         "equals": 0
       },
-      "note": "leverage-schedule-v1-20260922 (agent-lab docs/decisions/2026-09-22-leverage-schedule-and-entitlement.md): 1x -> 2x -> 4x, each with its own receipt and zero needs_attention before the next rung; paper stays at 200 requests/minute."
+      "note": "Leverage policy leverage-schedule-v1-20260922 implemented (SYN, opt-in; receipt block leverage_schedule_v1 in blueprints/us-equities/adaptive-paper/receipt.json; rung config config-leverage-1x.json); receipts record achieved peak leverage and time above the next-lower rung, and a rung establishes the envelope at its cap. No paper rung has run; the 1x adaptive trial comes first. leverage-schedule-v1-20260922 (agent-lab docs/decisions/2026-09-22-leverage-schedule-and-entitlement.md): 1x -> 2x -> 4x, each with its own receipt and zero needs_attention before the next rung; paper stays at 200 requests/minute."
     },
     {
       "id": "leverage-ladder-2x",
@@ -282,7 +282,7 @@
         "pointer": "/needs_attention",
         "equals": 0
       },
-      "note": "Requires leverage-ladder-1x established first."
+      "note": "Leverage policy leverage-schedule-v1-20260922 implemented (SYN, opt-in; receipt block leverage_schedule_v1 in blueprints/us-equities/adaptive-paper/receipt.json; rung config config-leverage-2x.json); receipts record achieved peak leverage and time above the next-lower rung, and a rung establishes the envelope at its cap. No paper rung has run; the 1x adaptive trial comes first. Requires leverage-ladder-1x established first."
     },
     {
       "id": "leverage-ladder-4x",
@@ -299,7 +299,7 @@
         "pointer": "/needs_attention",
         "equals": 0
       },
-      "note": "Requires leverage-ladder-2x established first; kill switch => 0 leverage."
+      "note": "Leverage policy leverage-schedule-v1-20260922 implemented (SYN, opt-in; receipt block leverage_schedule_v1 in blueprints/us-equities/adaptive-paper/receipt.json; rung config config-leverage-4x.json); receipts record achieved peak leverage and time above the next-lower rung, and a rung establishes the envelope at its cap. No paper rung has run; the 1x adaptive trial comes first. Requires leverage-ladder-2x established first; kill switch => 0 leverage."
     },
     {
       "id": "native-fault-behaviour",

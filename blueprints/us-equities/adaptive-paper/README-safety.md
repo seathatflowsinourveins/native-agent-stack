@@ -134,6 +134,108 @@ a fresh trial or reset request history to hide unresolved state. Identify the
 actual recovery adapter: a direct SDK fractional exit does not establish that a
 whole-share native engine adapter supports fractional execution.
 
+## Leverage schedule (opt-in, `leverage-schedule-v1-20260922`)
+
+The default lane stays 1x: `runner.load_config` refuses `max_leverage > 1`
+unless a config's top-level `leverage_policy` block validates against
+`leverage.py`'s `validate_leverage_policy`. With no such block (both shipped
+configs, `config.json`/`config-sip.json`), every path in this document is
+unchanged -- `RiskLimits.leverage` is `None`, the persisted `meta.limits`
+bytes are byte-identical to before this policy existed, and the buy-side
+gross-exposure check is the original `min(effective_gross_cap, equity)`.
+
+Under a validated policy (`config-leverage-1x/2x/4x.json`), the effective
+ceiling for new entries is `min(schedule[session][regime],
+drawdown_ladder(drawdown_fraction), overnight_max_leverage if the session
+policy allows overnight holds, the broker-proven account multiplier,
+config `max_leverage` <= 4)`. Every existing hard ceiling in this document
+(`max_order_notional_usd`, `max_gross_exposure_usd`, `max_gross_loss_usd`,
+`max_drawdown_usd`, held-symbol and outstanding-order caps, STOP and
+`halted_reason`) is unchanged and independent of it. The leverage ceiling
+gates entries only: sells and exits are never refused by it, and it never
+raises a risk halt or forces liquidation on its own -- a ladder step to 0
+(from accumulated drawdown) blocks new buys with `leverage_ceiling_zero`
+while leaving existing holdings to the unchanged stop/take-profit/trailing/
+time-decay/portfolio-rotation exit chain. `Ledger._leverage_envelope` is the
+independent, regime-unaware ledger-layer ceiling `reserve_intent`/
+`validate_pending` enforce even if the policy layer (`strategies.py`) were
+somehow bypassed; it fails closed (0) for a timestamp outside the frozen
+session calendar. See `leverage.py`'s module docstring for the full
+schedule/ladder contract and
+`agent-lab/docs/decisions/2026-09-22-leverage-schedule-and-entitlement.md`
+for the design record. Leverage above 1x is paper-only, requires a
+preflight-proven account multiplier at least equal to the requested
+leverage (`runner._check_margin_entitlement`), and remains unqualified
+until each rung's `leverage-ladder-1x/2x/4x` gate row shows
+`needs_attention == 0`.
+
+F2 (2026-09-22 residual review, reachability): a rung's `max_leverage`,
+schedule cells and drawdown ladder establish the safety **envelope** in
+force at that cap -- the most a run is permitted to reach -- not a target a
+run is guaranteed to hit. `strategies_v1._decide_core`'s entry budget
+(`min(gross_cap, capital*leverage) - max_order_notional`) and its inverse-
+volatility allocation do not by construction force achieved exposure up to
+the configured ceiling, so a "4x" run can complete, and its gate row can
+show `needs_attention == 0`, without its gross-to-equity exposure ever
+having exceeded the 2x rung's own ceiling; the `README.md`/config-note
+claim that every rung "gets the same proportional room to run" described
+only the drawdown/loss caps' dollar-fraction scaling, not achieved
+exposure, and has been corrected in the rung configs' `notes` accordingly.
+Every leveraged run's `outcome`/receipt (`leverage_policy is not None`)
+now separately records what was actually achieved: `outcome["leverage"]`
+gains `peak_achieved_leverage` (peak gross exposure / mark-to-market
+equity, distinct from the existing fixed-capital-denominated
+`peak_effective_leverage`), `ceiling_at_peak_achieved_leverage` (the
+policy-layer ceiling in force at that peak), `next_lower_rung_ceiling`
+(`leverage.next_lower_rung_ceiling(config max_leverage)`; `None` for the
+1x rung) and `seconds_above_next_lower_rung_ceiling` (cumulative wall-clock
+time the run's achieved leverage spent above the next-lower rung's own
+ceiling, computed per-tick by `runner._leverage_achievement_step`). These
+fields are absent from every default-path (no `leverage_policy` block, or
+`leverage_policy is None`) outcome, exactly like the rest of
+`outcome["leverage"]`; they do not change `leverage.py`'s
+`CANONICAL_V1_BLOCK` schedule/ladder or `strategies_v1._decide_core`'s
+sizing math, which stay a ceiling, not a target, per
+`agent-lab/docs/decisions/2026-09-22-leverage-schedule-and-entitlement.md`.
+A rung's gate row is not, by itself, evidence that the rung's exposure was
+ever achieved -- that evidence is this recorded achieved-leverage receipt.
+No gate row in `catalogs/us-equities/gates-20260922.json` currently reads
+`peak_achieved_leverage`/`seconds_above_next_lower_rung_ceiling`, so a gate
+row can still flip to established on a receipt whose achieved exposure never
+exceeded a lower rung's own ceiling; the rung configs' `notes` have been
+corrected to say so instead of claiming the opposite.
+
+2026-09-22 leverage fix round 1 (LEV-RI-A/CX-P1/EH-1/CX-P2, all `major`/
+`blocker` findings against G-e/F2): `strategies_v1._decide_core`'s
+leveraged-rung entry budget (`leverage_ceiling is not None`) now counts
+every current holding's notional regardless of this tick's own exit
+decision (a same-tick take-profit/stop/trailing/portfolio-rotation exit
+removes a symbol from `targets` immediately, even though the position is
+still physically held until its sell order actually fills -- CX-P1), plus
+the caller-supplied notional of any still-resting, unfilled buy order
+(`LeverageInputs.pending_buy_notional_usd`, sourced from the ledger's own
+`AccountState.pending_buy_notional_usd` and threaded through
+`native_strategy._leverage_inputs` -> `strategies.AdaptivePolicy.decide` --
+LEV-RI-A); previously `used` only summed this tick's own `targets`, so a
+symbol still awaiting a fill or a sale from an earlier or the same tick was
+invisible to the leveraged budget, letting a rung's aggregate exposure climb
+past its regime ceiling (`leverage.LeveragePolicy.envelope` is deliberately
+regime-independent -- see its docstring -- so this was the only enforcement
+of the regime-specific part). The non-leveraged path (`leverage_ceiling is
+None`, e.g. both default configs) is unchanged (`used` stays `targets`-only)
+to preserve the golden-equivalence contract. `outcome["leverage"]`'s
+`peak_gross_exposure_usd`/`peak_achieved_leverage`/`broker_margin_used` now
+measure filled-position exposure only (`AccountState.gross_exposure_usd`
+minus its own `pending_buy_notional_usd`, which used to be folded in
+uncredited -- EH-1); the peak pending-buy notional observed is recorded
+separately as `peak_pending_buy_notional_usd`. `runner.load_config`'s
+`PolicyConfig` construction now also passes `max_order_notional` from the
+config's own `max_order_notional_usd` instead of silently keeping
+`PolicyConfig`'s 1000 default regardless of a rung's configured 2000/4000
+(CX-P2), so entries can actually size up to what each rung's own
+`max_order_notional_usd`/ledger-side cap allows.
+
 Run `python3 -m unittest discover -s tests -p test_adaptive_paper_safety.py -v` for
 the synthetic local failure cases. These checks establish local state invariants,
 not native broker throughput, fault behavior, order fills, or strategy quality.
+`tests/test_adaptive_paper_leverage.py` covers `leverage.py` itself.
