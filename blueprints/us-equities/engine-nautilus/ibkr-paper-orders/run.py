@@ -655,7 +655,7 @@ class RunContext:
             return
         try:
             self.on_change()
-        except OSError as exc:
+        except Exception as exc:  # noqa: BLE001 - persistence must never interrupt trading
             if len(self.errors) < 20:
                 self.errors.append(redact(f"provisional receipt write failed: {type(exc).__name__}")[:200])
 
@@ -753,6 +753,7 @@ class RunContext:
         self.cleanup = {"triggered": True, "reason": redact(reason)[:200], "kind": kind,
                         "started_at": ns_to_iso(now_ns), "deadline_ns": deadline, "cancels_requested": 0,
                         "flatten_orders": 0, "ended_at": None, "end_reason": None}
+        self.changed()
 
     def summary(self) -> dict:
         cleanup = dict(self.cleanup) if self.cleanup else {"triggered": False}
@@ -949,6 +950,7 @@ def build_strategy_class():
                                              "at": ns_to_iso(st["last_ns"])})
             if self.ctx.cleanup and where != "C2":
                 self.ctx.cleanup["cancels_requested"] += 1
+            self.ctx.changed()
             if action == "cancel":
                 self.cancel_order(order)
 
@@ -1303,7 +1305,9 @@ def build_strategy_class():
                 cid = self._submit("cleanup", f"X{self._flatten_n}", "SELL", price, qty)
             except BudgetError as exc:
                 ctx.errors.append(f"cleanup budget: {exc}")
-                self._finish("cleanup_budget_exhausted")
+                # A notional refusal leaves the position for a manual flatten; name it apart
+                # from running out of the order budget.
+                self._finish("cleanup_notional_refused" if "notional" in str(exc) else "cleanup_budget_exhausted")
                 return
             ctx.cleanup["flatten_orders"] += 1
             if self._orders[cid].is_closed:
@@ -1327,6 +1331,7 @@ def build_strategy_class():
                 ctx.cleanup["ended_at"] = ns_to_iso(self._now())
                 ctx.cleanup["end_reason"] = reason
             ctx.node["finish_reason"] = reason
+            ctx.changed()
             try:
                 self.clock.cancel_timer("ibpo-watchdog")
             except Exception:  # noqa: BLE001
@@ -1772,6 +1777,7 @@ def cmd_run(a, check_fn=run_check, node_fn=run_node, now_fn=None, sleep_fn=time.
                     receipt["error"] = redact(f"node: {type(exc).__name__}: {exc}")[:200]  # never a pass
                 else:
                     receipt["interrupted"] = True
+            ctx.changed()  # the node phase is over: persist its end state before the flat proof
         finally:
             # Whenever orders may have been submitted, the independent official-ibapi flat
             # proof runs, whatever ended the node phase.

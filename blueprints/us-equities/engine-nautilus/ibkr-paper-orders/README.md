@@ -301,12 +301,18 @@ or wide quote leaves the run incomplete instead of paying up.
 
 - The run refuses before connecting (`refused_unpinned_runtime`, exit 3, versions recorded) unless the imported
   NautilusTrader and ibapi are exactly the plan's `engine.version` and `engine.ibapi_version` (1.231.0 and 10.45.1).
-- The provisional `cleanup_required` receipt now carries the full run state and is rewritten after every case change,
-  order, event and fill. A kill mid-run therefore leaves the orders and fills on disk, not only the run prefix.
+- The provisional `cleanup_required` receipt now carries the full run state. It is rewritten after every case change,
+  order, event, fill, cancel request, cleanup start and finish, and once more when the node phase ends. A kill mid-run
+  therefore leaves that state on disk, not only the run prefix. The writes are atomic replaces without fsync, so a
+  killed process is covered but a host crash is not guaranteed to keep the latest write.
 - `max_notional_per_order_usd` binds every order path. The C4 flatten and cleanup sells pass their limit price to the
   budget as the entries do; a reservation without a price is refused.
 - A fill whose commission is missing, or zero (1.231.0 maps an unreported IB commission to 0), sets
-  `roundtrip.commission_unresolved`, and the run cannot be `passed`.
+  `roundtrip.commission_unresolved`, and the run cannot be `passed`. The gate cannot tell that substituted zero from
+  a genuinely free trade, so an account on a zero-commission plan (IBKR Lite, for example) always ends `incomplete`.
+  This paper account reports about 1 USD per fill.
+- A notional refusal during cleanup finishes as `cleanup_notional_refused`, not `cleanup_budget_exhausted`, because
+  the position is left for a manual flatten.
 - The exact bytes behind the committed receipts are retained in `evidence/harness/`, named by the first 12 hex digits
   of their SHA-256:
   - `run.py.9f6c08f1835f` is the harness of both regular-session receipts, from `c23525e6`;

@@ -246,6 +246,23 @@ class Budget(unittest.TestCase):
         ctx = RUN.RunContext(PLAN, "NTP-T")
         self.assertEqual(ctx.budget.max_notional, Decimal(str(PLAN["bounds"]["max_notional_per_order_usd"])))
 
+    def test_state_changes_persist_and_a_failing_writer_never_raises(self):
+        ctx = RUN.RunContext(PLAN, "NTP-T")
+        writes = []
+        ctx.on_change = lambda: writes.append(json.dumps(ctx.summary()))
+        ctx.begin("C1", 0)
+        ctx.start_cleanup("C1_step_timeout", "incomplete", 0)
+        self.assertIn('"triggered": true', writes[-1])  # the cleanup start itself is on disk
+        before = len(writes)
+        ctx.end_case("C1", "failed", "again", 0)  # already ended: no change, no write
+        self.assertEqual(len(writes), before)
+
+        def broken():
+            raise ValueError("not serializable")
+        ctx.on_change = broken
+        ctx.add_fill("C3", "NTP-T-C3", "BUY", "768.01", 1, "1", "USD", 0)  # must not raise
+        self.assertTrue(any("provisional receipt write failed" in e for e in ctx.errors))
+
     def test_unresolved_commission_blocks_passed(self):
         def ctx_with(commission):
             ctx = RUN.RunContext(PLAN, "NTP-T")
