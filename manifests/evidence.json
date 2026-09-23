@@ -27600,8 +27600,8 @@
     },
     {
       "path": "observability/grand-dashboard/state.json",
-      "sha256": "9891a15026b14f9722b34e10192feb8f8e35b1f2a41c45ac2276c959f09d40ad",
-      "bytes": 10888
+      "sha256": "90827450efd0a4ab2736e3c7d32cf5060d6504350f24d43a0572c5364bd2bc35",
+      "bytes": 11257
     },
     {
       "path": "observability/native-data/README.md",
