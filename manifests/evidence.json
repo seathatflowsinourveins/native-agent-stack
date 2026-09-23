@@ -6400,8 +6400,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/runner.py",
-      "sha256": "549a326fec0f7b88fac793b3c8f74b7acdba87fccb585370dd0cfc020d46617f",
-      "bytes": 93430
+      "sha256": "a3ab831f81847d27df4d9e28288ed66a5b5d1bc8966738fad59f2d472fc0b4a2",
+      "bytes": 93731
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/safety.py",
@@ -6425,7 +6425,7 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "00e9490c28f7c7a1e46588bbdc425062d0746dba5718a431de29d3f560d7888e",
+      "sha256": "7b8bc74f73cef276a383326532e3884e0f935741613da64538ba8f3260d4ba32",
       "bytes": 4661
     },
     {
@@ -6440,8 +6440,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/transport.py",
-      "sha256": "e1a2d1ebd72397b81d66fe73144f58e01f6700a710b266c25f4a25764d678a89",
-      "bytes": 45132
+      "sha256": "106dc582d6cf59825bc78a6b83a324db7f557943c677f959b48a497e345cf725",
+      "bytes": 46098
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/trials/20260923-interrupted/README.md",
@@ -6475,8 +6475,13 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/trials/20260923b-needs-attention/README.md",
-      "sha256": "3bc91eea9c638218d4664a5aa30b1f9540eab3786239a8b5fd25e2c878cc75d7",
-      "bytes": 1409
+      "sha256": "5b005a150eb4c73b75602b92046d35887123b4eb4679b81705c994b9bc19f63e",
+      "bytes": 1953
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923b-needs-attention/frozen-1e2c96a.SHA256SUMS",
+      "sha256": "72fd0de9ed1c489f42b2846b26af48be01a7c614d464735fd09a17f72404d5b3",
+      "bytes": 5986
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/trials/20260923b-needs-attention/gate-result.json",
@@ -6495,8 +6500,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/trials/20260923b-needs-attention/observations.json",
-      "sha256": "49a4570a314069e22d3897358763e71c278814912aa69a8f565613c020c9ec09",
-      "bytes": 2025
+      "sha256": "914a0f9257802dbaefd7280507e79ee03d5d7ac7c73bc5c4a9510bf531944804",
+      "bytes": 2339
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/trials/20260923b-needs-attention/paper-output.json",
@@ -6517,6 +6522,61 @@
       "path": "blueprints/us-equities/adaptive-paper/trials/20260923b-needs-attention/scheduled-trial.log",
       "sha256": "1eabfc9cacc3835354aac77a3cbd1e20dd4a305c3de33cf9d6805fb4de583e04",
       "bytes": 549
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923b-needs-attention/transport-isolation-1e2c96a.json",
+      "sha256": "92e33d2899f6ca293ada7190bbc309bb3263f4caf2c7347bd9788e08015a781f",
+      "bytes": 1085
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923b-needs-attention/transport_isolation_check.py",
+      "sha256": "03273129a52283b0ddb08e765b8ec5ac25c12ae8c8aa935c830e89003cb31d6f",
+      "bytes": 3530
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923c-reconcile-refusal/README.md",
+      "sha256": "81e0b2a6aeaa86a18d78bf928693c1ff7cb5ce9447f5407bc7a8de1a908c55d4",
+      "bytes": 1529
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923c-reconcile-refusal/diag-d-paper-output.json",
+      "sha256": "f73d249eeb88aee4dae6c73aff6874fd0b71d1eadbd1b71471713ff6d2385af3",
+      "bytes": 9042
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923c-reconcile-refusal/diag-d-stderr-traceback.txt",
+      "sha256": "ba3517b29a572d26faa8694b8896f13fc025b05dfe740f6bad49a3c2cdf78344",
+      "bytes": 582
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923c-reconcile-refusal/frozen-796e3d1.SHA256SUMS",
+      "sha256": "3206ebc74aa386f0a116439b79e0f113fc5f7eb53a62d40c23a1920668e0af16",
+      "bytes": 41428
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923c-reconcile-refusal/trace_runner.py",
+      "sha256": "06ed1093b965813a659501f0b294ff3b17e7df13ead875b2f9e3868f3cbae77d",
+      "bytes": 528
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923c-reconcile-refusal/trial-c-gate-result.json",
+      "sha256": "f235d1dfd5de06a2ef57a9b16ee55635742e0cc7be72acaf61b968892c45450f",
+      "bytes": 1479
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923c-reconcile-refusal/trial-c-ingest-receipt.json",
+      "sha256": "fcad7e9aa509ce5980b49a642b14058050aaf9fa1a7617f8413c9690c50c60df",
+      "bytes": 630
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923c-reconcile-refusal/trial-c-paper-output.json",
+      "sha256": "a14f8b99bf8e6bef153431eb0b4777c4b88c936a0efc6c4538602a2933821ab7",
+      "bytes": 9042
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923c-reconcile-refusal/trial-c-scheduled-trial.log",
+      "sha256": "386fe84724195883ef94e5015f1360da4f8dab264628edf47f77c150c6b545f9",
+      "bytes": 550
     },
     {
       "path": "blueprints/us-equities/alpaca-historical/README.md",
@@ -8695,8 +8755,8 @@
     },
     {
       "path": "catalogs/us-equities/gates-20260922.json",
-      "sha256": "05b34add0f2d2edd7db4bd021a67f6e70e641170cd82f3ea090930bfce454b61",
-      "bytes": 31631
+      "sha256": "1627ae58fe4aae96314917e363ebd372dc2a53d0a2bd32c3437002d07b349b22",
+      "bytes": 31963
     },
     {
       "path": "catalogs/us-equities/hosting-source-review.json",
@@ -14600,8 +14660,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_runner.py",
-      "sha256": "e0c853db9ad432e3d7103ca2f0f87caca2dd4e94461cc588f673414390141eef",
-      "bytes": 124974
+      "sha256": "97c7e567cbfede5db1c4202fa801565c2abd4bb6eb669fc8fc8a9f1d3fcb984f",
+      "bytes": 126426
     },
     {
       "path": "tests/test_adaptive_paper_safety.py",
@@ -14615,8 +14675,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_transport.py",
-      "sha256": "0c204ffc2669476996b974bef23b06409c11e81b79d9389e806150576729ed02",
-      "bytes": 37615
+      "sha256": "dee97a3893139cf562c1833bb216706b93fa92e5069f7fe55a7f93195460e8cf",
+      "bytes": 40013
     },
     {
       "path": "tests/test_adoption_bootstrap.py",

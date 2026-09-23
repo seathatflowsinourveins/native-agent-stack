@@ -113,7 +113,10 @@ class Normalization(unittest.TestCase):
             with self.subTest(changes=changes), self.assertRaises(t.InvalidQuote) as caught:
                 t.normalize_quote({**base, **changes})
             self.assertEqual(caught.exception.reason, reason)
-        for changes in ({"bp": "-1"}, {"t": None}, {"bs": -1}, {"ap": "NaN"}):
+        # Malformed data, or an untradable quote that is also malformed or halt-flagged, fails closed.
+        for changes in ({"bp": "-1"}, {"t": None}, {"bs": -1}, {"ap": "NaN"}, {"bp": 0, "t": None},
+                        {"bp": 0, "bs": -1}, {"bp": "101", "c": ["H"]}, {"ap": 0, "halted": True},
+                        {"S": None}):
             with self.subTest(changes=changes), self.assertRaises(t.TransportError) as caught:
                 t.normalize_quote({**base, **changes})
             self.assertNotIsInstance(caught.exception, t.InvalidQuote)
@@ -468,6 +471,45 @@ class AsyncTransport(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(self.port.health["dropped_quotes"], {"crossed": 1, "one_sided": 1})
         self.assertEqual([q["bid"] for q in seen], ["100.01"])
         self.assertTrue(self.port.ready)
+
+    async def test_dropped_quote_keeps_the_last_valid_quote_and_its_age(self):
+        self.port._on_quote = lambda quote: None
+        self.port._enqueue("quote", self._stream_quote())
+        await self._drain()
+        seen_at = self.port._quote_seen["SPY"]
+        self.port._enqueue("quote", self._stream_quote(bp="100.05", ap="100.04"))
+        await self._drain()
+        self.assertEqual(self.port._quote_values["SPY"]["bid"], "100.01")
+        self.assertEqual(self.port._quote_seen["SPY"], seen_at)
+        self.assertEqual(self.port.health["dropped_quotes_by_symbol"], {"SPY": 1})
+        # Only crossed quotes after that: freshness still expires and the watchdog marks it stale.
+        self.port._quote_seen["SPY"] = time.monotonic() - self.port.quote_timeout - 1
+        self.port._ever_ready = True
+        self.port._enqueue("quote", self._stream_quote(bp="100.05", ap="100.04"))
+        await self._drain()
+        task = asyncio.create_task(self.port._watchdog())
+        await asyncio.sleep(0.02)
+        task.cancel()
+        await asyncio.gather(task, return_exceptions=True)
+        self.assertIn("quote_stale", self.port.health["reasons"])
+        self.assertFalse(self.port.ready)
+
+    async def test_halted_or_unsubscribed_invalid_quote_fails_closed(self):
+        for changes in ({"bp": "100.05", "ap": "100.04", "c": ["H"]}, {"S": "TSLA", "bp": "100.05", "ap": "100.04"}):
+            with self.subTest(changes=changes):
+                self.port._reasons.clear()
+                self.port._on_quote = lambda quote: None
+                self.port._enqueue("quote", self._stream_quote(**changes))
+                await self._drain()
+                self.assertIn("callback_failure", self.port.health["reasons"])
+
+    async def test_queued_quotes_do_not_block_reconciliation_but_order_events_do(self):
+        self.port._enqueue("quote", self._stream_quote())
+        self.port._enqueue("quote", self._stream_quote())
+        self.port.mark_reconciled()
+        self.port._enqueue("order", {"event": "new", "order": {}})
+        with self.assertRaises(t.TransportError):
+            self.port.mark_reconciled()
 
     async def test_malformed_streamed_quote_still_fails_the_transport(self):
         self.port._on_quote = lambda quote: None

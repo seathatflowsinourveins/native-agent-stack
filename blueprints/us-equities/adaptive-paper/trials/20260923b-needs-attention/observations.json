@@ -4,7 +4,8 @@
   "note": "Observations by the operating Claude session around the 2026-09-23 11:27 ET 1x trial; engine outputs are the other files here.",
   "build": {
     "frozen_commit": "1e2c96a (Codex branch: legacy ledger compatibility + interrupted-trial reporting + stop diagnostics, built on 41d39b3)",
-    "verification": "all 49 files of the frozen copy byte-compared with git archive 1e2c96a: 0 mismatches"
+    "verification": "all 49 files of the frozen copy byte-compared with git archive 1e2c96a: 0 mismatches",
+    "committed_hash_list": "frozen-1e2c96a.SHA256SUMS"
   },
   "launch": {
     "utc": "2026-09-23T15:27:37Z",
@@ -13,10 +14,11 @@
   "transport_isolation_check": {
     "utc": "2026-09-23T15:26:28Z",
     "result": "AlpacaPaperTransport started alone with SIP quotes for SPY/QQQ/IWM/DIA stayed ready with no health reasons for 25 s (12,425 quotes); the 'trading stream websocket error, restarting ... sent 1000' line appeared only when stop() closed the streams",
-    "conclusion": "that log line is a shutdown artifact, not the stop cause of either 2026-09-23 run"
+    "conclusion": "that log line is a shutdown artifact, not the stop cause of either 2026-09-23 run",
+    "committed_output": "transport-isolation-1e2c96a.json (script transport_isolation_check.py)"
   },
   "stop_cause": "paper-output.json decision_exit: reason transport_gap after 25.86 s; transport_health.reasons [callback_failure] with callback_failure {stage: quote_normalization, exception_type: TransportError}",
-  "mechanism": "transport.normalize_quote raised TransportError('invalid quote') on a crossed quote (bid > ask); the consume loop turned it into callback_failure, a non-stale reason, so runner.py stopped the run",
+  "mechanism": "recorded: callback_failure at stage quote_normalization, exception_type TransportError (normalize_quote raised); most likely cause, not recorded by the run: a crossed quote (bid > ask), the only rejection class in the committed quote-validity measurements; the consume loop turned it into callback_failure, a non-stale reason, so runner.py stopped the run",
   "quote_samples": {
     "first_sample_utc": "2026-09-23T15:30Z",
     "first_sample": "60 s, 24 symbols + benchmarks, SIP: 9 of 56,855 quotes rejected, all crossed (TSLA 5, AAPL 2, META 1, INTC 1); example AAPL bid 336.23 / ask 336.21 across exchanges Q/V (not retained verbatim; see the committed measurements)",

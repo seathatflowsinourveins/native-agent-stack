@@ -113,6 +113,25 @@ class IntegratedRunner(unittest.TestCase):
             self.assertEqual(port.stopped, 1)
             ledger.close()
 
+    def test_run_output_records_dropped_quote_counts_from_the_transport(self):
+        config, _, _ = load_config(SOURCE / "config.json")
+        config.update(duration_seconds=1, cleanup_seconds=2, order_timeout_seconds=1)
+        with tempfile.TemporaryDirectory() as root:
+            ledger = Ledger(Path(root) / "journal.db", RiskLimits(trial_seconds=1, cleanup_seconds=2))
+            ledger.start_trial(time.time())
+            controller = Controller(ledger, time.time() + 3600, market_open=True)
+            policy = PolicyConfig(symbols=("SPY", "QQQ", "IWM", "DIA"), max_positions=4, warmup_samples=4,
+                                  warmup_seconds=.06, sample_seconds=.02, rebalance_seconds=.02,
+                                  min_hold_seconds=.05, max_hold_seconds=.4, cooldown_seconds=.05)
+            port = SimulatedPort(controller, policy.symbols, price=lambda symbol, tick: Decimal("100"))
+            port.health.update(dropped_quotes={"crossed": 2, "one_sided": 1}, dropped_quotes_by_symbol={"SPY": 3})
+            controller.port = port
+            result = asyncio.run(run_native(controller, policy, [{"symbol": s} for s in policy.symbols],
+                                            "fixture", config, "100000"))
+            self.assertEqual(result["dropped_quotes"], {"by_reason": {"crossed": 2, "one_sided": 1},
+                                                        "by_symbol": {"SPY": 3}})
+            ledger.close()
+
     def test_default_policy_run_native_never_calls_session_at_and_survives_2028(self):
         """S3 regression: last_session_kind used to be computed
         unconditionally, before the try block, on every paper run --
