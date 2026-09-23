@@ -183,8 +183,8 @@ locally with `GH_TOKEN` set and no `--offline`, using
   runs the curl-installed OSV-Scanner binary on every event, PRs included
   (job-level permissions apply whether or not the upload step runs). It was
   never the only holder: `git show <c>:.github/workflows/security-scan.yml |
-  grep -c 'security-events: write'` returns 2 at `a9e5180`, `e4737e5`,
-  `da000f8`, `ad72b16` and `4e4aab0` (`zizmor-online`, later
+  grep -c 'security-events: write'` returns 2 at `e4737e5`, `da000f8`,
+  `ad72b16`, `4e4aab0` and the squash merge `4970ba0` (`zizmor-online`, later
   `zizmor-sarif-upload`, held it too). Now both scan jobs are `contents: read`,
   and the two upload jobs hold the write scope and run no shell step or
   installed tool (`tests/test_workflow_hardening.py`
@@ -256,16 +256,22 @@ locally with `GH_TOKEN` set and no `--offline`, using
   5-day workflow artifact and, in the same job, through
   `github/codeql-action/upload-sarif@1c5b675653bb5c22dbe9b12b556ec555138e09fd`
   (v4.38.1). The upload step and its job-scoped `security-events: write` were
-  added on `main` in commit `4970ba0` (PR #108), matching the example workflow
-  in `ossf/scorecard-action`'s README at the pinned SHA
-  `2d1146689b8cda280b9bc96326124645441f03bc`: the action writes the local
-  SARIF file named by `results_file`, and the caller uploads it with
-  `github/codeql-action/upload-sarif`; the action does not upload to code
-  scanning itself. Observed upload: `gh api
-  repos/seathatflowsinourveins/native-agent-stack/code-scanning/analyses` lists
-  Scorecard analyses for commit `4970ba0` in the categories
-  `supply-chain/branch-protection` (1 result), `supply-chain/local` (5) and
-  `supply-chain/online-scm` (3), read 2026-09-23. `analysis` is the only job in
+  added on `main` in commit `4970ba0` (PR #108). The layout matches the example
+  that `ossf/scorecard-action`'s README (pinned SHA
+  `2d1146689b8cda280b9bc96326124645441f03bc`, section "Workflow Example") links:
+  `ossf/scorecard` `.github/workflows/scorecard-analysis.yml` at
+  `d13ba3f3355b958d5d62edc47282a2e7ed9fa7c1`, where the action writes
+  `results_file: results.sarif` and the same job, holding `security-events:
+  write`, uploads it with `github/codeql-action/upload-sarif`. The README's
+  Inputs table (`results_file`, `results_format`) and its list of approved
+  steps say the same, and its private-repository snippet marks
+  `security-events: write` as "Required when publishing results (badge / API /
+  code scanning)". Observed upload: `gh api --paginate
+  "repos/seathatflowsinourveins/native-agent-stack/code-scanning/analyses?ref=refs/heads/main&per_page=100"`
+  lists Scorecard analyses for commit `4970ba0`: `supply-chain/branch-protection`
+  (1 result, analysis 1823007546), `supply-chain/local` (5, 1823007605) and
+  `supply-chain/online-scm` (3, 1823007675), with `osv-scanner` (0, 1823007099)
+  and `zizmor` (0, 1823008464) on the same commit, read 2026-09-23. `analysis` is the only job in
   the workflow and the only one with `security-events: write`
   (`tests/test_workflow_hardening.py` `ScorecardTests`). Unlike the two
   security-scan uploads, it is not split: `ossf/scorecard-action` itself takes
@@ -459,7 +465,7 @@ locally with `GH_TOKEN` set and no `--offline`, using
   Request Alerts" checks passed on #97 and #98. It is not required.
   **Overturn:** remove it if its PR alerts add nothing beyond
   dependency-review across the next 10 PRs.
-- **harden-runner stays audit** on 20 of 24 ubuntu jobs (measured 2026-09-23
+- **harden-runner stays audit** on 21 of 25 ubuntu jobs (measured 2026-09-23
   at HEAD, counting every job across `.github/workflows/*.yml` whose
   `runs-on` is a literal `ubuntu-` label with `tests/test_workflow_hardening.py`'s
   own job/first-step parser); the other 4 are hash-frozen exemptions

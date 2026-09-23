@@ -50,12 +50,14 @@ def first_step(job_text):
 
 
 def step_block(job_text, name_fragment):
-    """The text of the step whose ``name:`` line contains ``name_fragment``, from right
-    after that fragment through the next step boundary (or the end of the job). Unlike
-    slicing a fixed number of lines after the marker, this does not assume ``if:`` (or
-    any other key) sits at a particular line offset within the step."""
-    after = job_text.split(name_fragment, 1)[1]
-    return after.split("\n      - name:", 1)[0]
+    """The whole text of the step whose ``name:`` line contains ``name_fragment``: from
+    that step's ``      - `` list-item line (so keys written before ``name:``, such as a
+    leading ``- if:``, are included) through the next step boundary or the end of the job."""
+    lines = job_text.splitlines()
+    hit = next(i for i, line in enumerate(lines) if name_fragment in line and re.search(r"\bname:", line))
+    start = next(i for i in range(hit, -1, -1) if re.match(r"^      - ", lines[i]))
+    end = next((i for i in range(hit + 1, len(lines)) if re.match(r"^      - ", lines[i])), len(lines))
+    return "\n".join(lines[start:end])
 
 
 def block_if(block_text):
@@ -64,20 +66,20 @@ def block_if(block_text):
     search) and resolved however it is written: a plain one-line scalar, or a ``>``/``|``
     folded or literal block scalar whose value spans the following more-indented lines.
     Returns ``None`` if the block has no ``if:`` key of its own."""
-    match = re.search(r"(?m)^([ \t]*)if:[ \t]*(.*)$", block_text)
+    match = re.search(r"(?m)^([ \t]*(?:- )?)if:[ \t]*(.*)$", block_text)
     if not match:
         return None
-    indent, value = match.group(1), match.group(2).strip()
-    if not value or value[0] in ">|":
-        lines = []
-        for line in block_text[match.end():].splitlines():
-            if not line.strip():
-                continue
-            if len(line) - len(line.lstrip(" \t")) <= len(indent):
-                break
-            lines.append(line.strip())
-        value = " ".join(lines)
-    return value
+    indent, value = len(match.group(1)), match.group(2).strip()
+    folded = not value or value[0] in ">|"
+    parts = [] if folded else [value]
+    # Plain scalars can continue on more-indented lines too, so always collect them.
+    for line in block_text[match.end():].splitlines():
+        if not line.strip():
+            continue
+        if len(line) - len(line.lstrip(" \t")) <= indent or re.match(r"^\s*[\w-]+:(\s|$)", line):
+            break
+        parts.append(line.strip())
+    return " ".join(parts)
 
 
 def permission_blocks(text):

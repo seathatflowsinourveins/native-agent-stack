@@ -8679,8 +8679,8 @@
     },
     {
       "path": "docs/decisions/2026-09-22-github-automation-closure.md",
-      "sha256": "61eeba713e1cd0d2c119a2ad1f4d7aaba1db909dbb3f6ea23974e8456fc12d03",
-      "bytes": 41114
+      "sha256": "0eace745964cb3dd3c83a0dd4f5334ff192da9a44b0b857e606e6a77c0fd9c78",
+      "bytes": 41656
     },
     {
       "path": "docs/direct-results.md",
@@ -8789,8 +8789,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "39168bbf22f59e006acda136e58d17b4148523ace5f95533022f43001d14a4cf",
-      "bytes": 64262
+      "sha256": "0480471e3546be71ac48189079fa479bc278e54d80aa1f978e9fa7d1092d087b",
+      "bytes": 64405
     },
     {
       "path": "docs/grand-catalog-handbook.md",
@@ -9119,8 +9119,8 @@
     },
     {
       "path": "evidence/artifacts/blind-comparison-20260923/README.md",
-      "sha256": "a0ba0e2e59f91d19903376b73ad4ecefa9946006a26a2ac3cd8c6dcb98113a87",
-      "bytes": 1590
+      "sha256": "c23f365c29c8443242af0a9244d9a311226c631530d69c5e9f2486521e4d0e31",
+      "bytes": 1655
     },
     {
       "path": "evidence/artifacts/blind-comparison-20260923/battery_catalog.py",

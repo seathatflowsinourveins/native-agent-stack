@@ -4,8 +4,8 @@ Comparison artifacts for the blind evaluation recorded in
 [`docs/decisions/2026-09-22-github-automation-closure.md`](../../../docs/decisions/2026-09-22-github-automation-closure.md#blind-comparison-2026-09-23)
 ("Blind comparison (2026-09-23)"). Every file below is copied unchanged from
 the coordinator's comparison run except `judgments-cmp-a-20260923.redacted.json`,
-whose every absolute path under `/tmp` or `/home` was replaced with the literal
-`<scratch>`. `SEALED-KEY.json`, arm checkouts, `*.diff` files and battery JSON
+whose absolute scratch-directory prefix (under `/tmp`) was replaced with
+`<scratch>/`, keeping each file name (2 occurrences; every other byte is unchanged). `SEALED-KEY.json`, arm checkouts, `*.diff` files and battery JSON
 files are deliberately not copied here.
 
 | File | sha256 |
