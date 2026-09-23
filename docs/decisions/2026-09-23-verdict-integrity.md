@@ -90,7 +90,7 @@ on the base (`tests/test_landscape.py`, `tests/test_record_verdicts.py` `ReviewO
    overwrites a sealed file with other bytes. Rows store `lanes.run_manifest_sha256` and, when an
    adjudication was sealed for them, `lanes.adjudication_sha256`; `landscape.py` verifies both and
    rejects any file under a new wave's sealed folder that no row and not the run manifest references.
-10. **Claude refutation (finding 5).** The lane (agent-lab `6aab001`, vendored sha256 `2eb9c10d…`,
+10. **Claude refutation (finding 5).** The lane (agent-lab `6aab001`, merged on codex/native-expansion as `e6953e5` via agent-lab #33, vendored sha256 `2eb9c10d…`,
     registered in `lane-provenance.json`) seals a final only when both lens votes on it returned
     unrefuted and returns a per-layer `refutation` summary; `claude_lane.py` copies it into the
     return, the lane-return schema gains it (`codex_lane.py` drops it from the Codex strict copy), and
@@ -145,7 +145,7 @@ and `test_a_layer_verdicts_folder_no_row_can_name_is_rejected`, `tests/test_reco
   sealed return.
 - *Stray wave folders (low).* A `layer-verdicts-<id>` folder whose id is not alphanumeric is now
   rejected instead of skipped.
-- *Kept deliberately: a proposal after a failed revision.* The lane (agent-lab `6aab001`) still seals
+- *Kept deliberately: a proposal after a failed revision.* The lane (agent-lab `6aab001`, merged as `e6953e5`) still seals
   a never-refuted proposal when the revision ran only for a major finding and that revision is then
   refuted or comes back unknown. The lens prompts define such a major finding as not refuting the
   winner (for example a stronger non-adopted candidate missing from `challenger_preferred`). Both

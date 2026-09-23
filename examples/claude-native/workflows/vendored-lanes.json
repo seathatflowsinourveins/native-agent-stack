@@ -1,14 +1,14 @@
 {
  "files": [
   {
-   "agentlab_commit": "6aab00194d40b28d78ef7bffb1c61bd0734c5676",
+   "agentlab_commit": "e6953e50e2e80c381a182003d20e1340db304b16",
    "path": "layer-verdict-lane.js",
    "records_in_its_return": "model {name: 'opus', effort: 'high'} and, per layer, refutation {status, final_source, proposal_status, revision_status, votes} (both lens votes are required on the sealed object; final is null when it was refuted or a vote is missing); tools/sota-convergence/claude_lane.py writes <work-dir>/claude/<catalog>__<layer_id>.json from the workflow result, copying refutation and adding model.family 'anthropic', the resolved model name (--resolved-model, for example claude-opus-5-5 from child-usage.mjs) and provenance {workflow_path, workflow_sha256, agentlab_commit}, refusing workflow bytes that are uncommitted or differ from this SHA256SUMS entry, and lists every layer without a final in <work-dir>/claude/failures.json",
    "sha256": "2eb9c10d40db7dd058376d03c973c55433b30d6e0d86f72e563da6627d8e7fbb",
    "source_path": ".claude/workflows/layer-verdict-lane.js",
    "source_repository": "agent-lab",
    "supersedes_sha256": "5cbf6becbc9cc5d15a070afebab322df895242b76f62a85a1aa620960984dd4a",
-   "verified_identical_at_agentlab_commit": "6aab00194d40b28d78ef7bffb1c61bd0734c5676"
+   "verified_identical_at_agentlab_commit": "e6953e50e2e80c381a182003d20e1340db304b16"
   }
  ],
  "schema_version": 1,
