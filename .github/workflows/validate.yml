@@ -53,6 +53,8 @@ jobs:
           "$RUNNER_TEMP/actionlint/actionlint" -color
       - name: Validate manifests and evidence integrity
         run: python3 scripts/validate.py
+      - name: Validate host evidence contribution receipts
+        run: python3 scripts/host_receipts.py validate
       - name: Validate catalog evidence and coverage joins
         run: python3 scripts/validate_catalogs.py
       - name: Validate general foundation capability claims

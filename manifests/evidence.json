@@ -2983,8 +2983,8 @@
     },
     {
       "path": ".github/pull_request_template.md",
-      "sha256": "b3196c10719125959ffa1decf5c2924a3e7d938db5ab1f7373a192e62557fcce",
-      "bytes": 1293
+      "sha256": "74da954045c961a0867f77dc4e7a1315c82ab34b4f061a54f70e351dbf4b827e",
+      "bytes": 1818
     },
     {
       "path": ".github/requirements-ci.lock",
@@ -3053,8 +3053,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "a376703bdb6e31ebe30f38e57f56e14f3250e286824b7d4525b7b2be7e8b0987",
-      "bytes": 7244
+      "sha256": "71c6378af2c489d3be3f7047da49e3af7f31d5768d03a4f251e046ce150fd8cc",
+      "bytes": 7358
     },
     {
       "path": ".gitignore",
@@ -3093,8 +3093,8 @@
     },
     {
       "path": "adoption/README.md",
-      "sha256": "0e5b5bac62a5f67a42bb4bc6126829a21fd937f310b1f5784122238f6fb3f3ae",
-      "bytes": 12480
+      "sha256": "88914966634f28081d9423bb520a1987c0d1fa2e82960504f5b203bd3a8292db",
+      "bytes": 12888
     },
     {
       "path": "adoption/bootstrap-linux.sh",
@@ -7629,8 +7629,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "693c295e2e2e6d7d20443ecd0ef3e18d8404450f1687c0e0ff7933019b1da66e",
-      "bytes": 12918618
+      "sha256": "401acf7e546b7af5369073729fbc06de3a9f7775a4a72817bffc43566e4eeb01",
+      "bytes": 12919033
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -13081,6 +13081,76 @@
       "path": "tests/test_delisting_coverage.py",
       "sha256": "c33b6dd7b33691dcac0ec84db6c600f8777abb06f6fce6d992b7f5fa2d277af5",
       "bytes": 24344
+    },
+    {
+      "path": "evidence/hosts/wsl-authoring-20260923/wsl-authoring-20260923--rtk--use--20260923.json",
+      "sha256": "2a0525ce9efbf9939166429115035a57d039255add089ed7d4503047d4f3f9fb",
+      "bytes": 1326
+    },
+    {
+      "path": "evidence/hosts/wsl-authoring-20260923/wsl-authoring-20260923--shellcheck--use--20260923.json",
+      "sha256": "053a1f5efe9e216db40a082f14e01e7113ced352e7a15171b39f890bb39370e6",
+      "bytes": 1262
+    },
+    {
+      "path": "evidence/hosts/wsl-authoring-20260923/wsl-authoring-20260923--difftastic--use--20260923.json",
+      "sha256": "74bc7ec7f616c7bf2fc9551ceae4d9a6e61ae0bfd0312f34c7c94da74f690419",
+      "bytes": 1889
+    },
+    {
+      "path": "adoption/host-receipt.schema.json",
+      "sha256": "1775f8010fc774cc213afae1e1da679cba95e48034d755e0edca19422204220d",
+      "bytes": 5313
+    },
+    {
+      "path": "scripts/host_receipts.py",
+      "sha256": "9778d5737cacc30ab0ae50feb0c21787b73a4ef8a981f32bde027dc43fe7f7ad",
+      "bytes": 30215
+    },
+    {
+      "path": "tests/test_host_receipts.py",
+      "sha256": "ceccb1e3f64b9d5a21e7b3ce858bf0c606913c42495d0a03aa412831a2fcf42e",
+      "bytes": 14487
+    },
+    {
+      "path": "tests/fixtures/host-receipts/valid.json",
+      "sha256": "e339257259f8c7616083b5befa772945377f328078ede861345ba12d43bf2797",
+      "bytes": 1042
+    },
+    {
+      "path": "tests/fixtures/host-receipts/wrong-platform.json",
+      "sha256": "a9b24a022c5bd2edf654ebddd8d6077bf2fc2aebe797191afebe416f63fe8782",
+      "bytes": 1041
+    },
+    {
+      "path": "tests/fixtures/host-receipts/unknown-component.json",
+      "sha256": "6baec4155038143def6b8014b071e8f6f237380ff195aa2d8a6f791b0e33969d",
+      "bytes": 1096
+    },
+    {
+      "path": "tests/fixtures/host-receipts/home-path-in-excerpt.json",
+      "sha256": "ca1f6125a57e5095c729410e445f279f674231ed1f379621ffa5c0fafea38f8a",
+      "bytes": 1086
+    },
+    {
+      "path": "tests/fixtures/host-receipts/pass-with-nonzero-exit.json",
+      "sha256": "6bc8befb4681e120aa8cf4d9a82acc6c6a6ae15b0f5421bb3ad802a5b0f6ae05",
+      "bytes": 1068
+    },
+    {
+      "path": "tests/fixtures/host-receipts/unregistered-file.json",
+      "sha256": "e339257259f8c7616083b5befa772945377f328078ede861345ba12d43bf2797",
+      "bytes": 1042
+    },
+    {
+      "path": "tests/fixtures/host-receipts/id-path-mismatch.json",
+      "sha256": "e339257259f8c7616083b5befa772945377f328078ede861345ba12d43bf2797",
+      "bytes": 1042
+    },
+    {
+      "path": "docs/contributing-evidence.md",
+      "sha256": "ea03454e1f6758e7dbedf06aaa1846d91f40ea68189fa7ae454a906a5472ef7b",
+      "bytes": 8890
     }
   ],
   "convergence_records": [
