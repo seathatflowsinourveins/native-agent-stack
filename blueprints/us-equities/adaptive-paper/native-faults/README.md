@@ -2,17 +2,31 @@
 
 Gate: `native-fault-behaviour` in `catalogs/us-equities/gates-20260922.json`
 (receipt path `blueprints/us-equities/adaptive-paper/native-faults/receipt.json`).
-This directory holds the harness, its frozen `plan.json` and this note. **No
-receipt exists yet**: the harness has not been run against the Alpaca paper
-broker in this change. Its only evidence so far is the offline suite
-`tests/test_native_faults_min.py`, a local synthetic fixture with a fake
-transport. That suite drives the real `runner.Controller` and `safety.Ledger`.
+This directory holds the harness, its frozen `plan.json`, this note and the
+first live receipt `receipt.json`. The offline suite
+`tests/test_native_faults_min.py` is a local synthetic fixture with a fake
+transport; it drives the real `runner.Controller` and `safety.Ledger`.
 
 **With the current engine a live run cannot reach `native_faults_passed`.**
 C04 is refused by the Ledger before any POST is sent, and C05 short-circuits
 on a client-id lookup without sending a DELETE. A live run therefore yields
 partial native evidence only (C01 and C02), with the best status
 `native_faults_incomplete`.
+
+The one live run (2026-09-23 14:20:24Z, from a read-only `git archive` of the
+harness commit; harness, plan and engine source hashes in the receipt match
+this tree) went exactly that way:
+
+| Case | Outcome | Evidence class | Broker requests |
+|---|---|---|---|
+| C01 accept resting buy (SPY 1 @ 384.58, bid 769.16) | passed | native_paper | submit 200, `pending_new` |
+| C02 cancel resting | passed | native_paper | cancel 204 plus six reads 200, `canceled` |
+| C05 cancel again | passed | engine_short_circuit | one read 200, no DELETE; the order was found terminal by client id |
+| C04 definitive rejection (307.6601) | unobserved | none | none; refused before send, `invalid_price_increment` |
+
+Cleanup proved flat with zero open orders by `runner.reconcile` (cash delta
+0.00). One POST was reserved out of the four allowed. Status:
+`native_faults_incomplete`, so the gate stays `not_established`.
 
 ## Run
 
@@ -94,7 +108,7 @@ Bounds:
 - The price reference is the engine's streamed quote bid. The engine transport
   has no last-trade read.
 
-## Expected outcome from source reading (not yet observed)
+## Expected outcome from source reading (confirmed by the 2026-09-23 run)
 
 - **C04 will be `unobserved`.** `Ledger.reserve_intent` refuses any price of
   at least $1 that is not on a whole cent (`invalid_price_increment`), so no
