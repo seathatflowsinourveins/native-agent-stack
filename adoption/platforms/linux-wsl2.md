@@ -18,7 +18,8 @@ That checkout target is `adoption/manifest.json` `source.release_tag`
 SLSA build provenance by `.github/workflows/publish-catalog.yml`). Do
 **not** check out `source.baseline_commit`: that field predates `adoption/`
 and `tools/adoption/` entirely and is never a checkout target (Codex
-cross-family review finding, `codex-review-64`);
+cross-family review finding, `codex-review-72`; `codex-review-64` is the
+separate promotion-gate cross-family review finding);
 [`scripts/adoption_status.py`](../../scripts/adoption_status.py) uses
 `baseline_commit` only as the comparison point for its
 `baseline_matches`/`baseline_differs` `git` result, never as something a

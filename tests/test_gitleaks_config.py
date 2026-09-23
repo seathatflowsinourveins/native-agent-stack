@@ -228,10 +228,13 @@ class GitleaksConfigContextRestrictionTests(unittest.TestCase):
             )
 
     def test_c4_narrative_commit_id_and_unrelated_api_key_sharing_one_line_the_api_key_is_still_detected(self):
-        r"""Second-round Codex cross-family review finding (codex-review-72,
-        .gitleaks.toml prose-narrative allowlist, duplicated under both
-        rules that match it -- see .gitleaks.toml's "[[rules]] id" lines):
-        whole-line anchoring (test_c2 above) is not enough for this
+        r"""Second-round finding from the Opus evidence review of this
+        branch (fix round 2; not codex-review-72, which is a different,
+        step-0 shallow-clone finding -- see .gitleaks.toml's header comment
+        for the attribution correction), .gitleaks.toml prose-narrative
+        allowlist, duplicated under both rules that match it -- see
+        .gitleaks.toml's "[[rules]] id" lines): whole-line anchoring
+        (test_c2 above) is not enough for this
         allowlist, because its `.*?`/
         `.*` (any char, including `"`) can cross the closing quote of the
         JSON string holding the commit reference and reach a SECOND
@@ -272,6 +275,60 @@ class GitleaksConfigContextRestrictionTests(unittest.TestCase):
                 HEX64, secrets,
                 f"the api_key finding co-located with an allowlisted commit-narrative field on "
                 f"the same line must still be detected, got: {findings}",
+            )
+
+    def test_c5_narrative_commit_id_and_unrelated_secret_inside_the_SAME_string_is_still_detected(self):
+        r"""Third-round finding from the blind Codex cross-family review of
+        PR #83: test_c4 above proved the round-2 fix closes a SECOND
+        key:value pair sharing the line, but a single JSON string value that
+        itself narrates both a commit id AND an unrelated secret-shaped
+        substring -- no second key:value pair, nothing outside the string
+        for `(?:[^"\\]|\\.)*` to stop at -- was still exempted in full. This
+        is the shape from the actual finding:
+        `"detail": "pinned commit <40-hex>; password=<64-hex>"`. The round-3
+        fix rebuilds the free-text portions of the narrative allowlist regex
+        so an unmarked run of 8+ hex-valid characters (mixing in at least one
+        a-f/A-F letter, the shape a real hex secret has) can never appear
+        anywhere in the string unless it is the one recognized 40-hex
+        commit/tree id directly preceded by its context marker; see
+        .gitleaks.toml's header comment for the full grammar and its
+        documented residual (all-decimal) gap."""
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp)
+            allow_dir = target / "evidence" / "artifacts" / "blind-catalog-convergence-20260921"
+            allow_dir.mkdir(parents=True)
+            (allow_dir / "claude-coverage-review.json").write_text(
+                "{\n"
+                f'  "detail": "pinned commit {HEX40}; password={HEX64}"\n'
+                "}\n"
+            )
+            findings = self._scan(target)
+            secrets = {f["Secret"] for f in findings}
+            self.assertIn(
+                HEX64, secrets,
+                f"a secret-shaped value inside the SAME JSON string as an allowlisted commit "
+                f"reference must still be detected, got: {findings}",
+            )
+
+    def test_c6_narrative_commit_id_and_colon_separated_secret_inside_the_SAME_string_is_still_detected(self):
+        """Same round-3 finding, the second reported shape: a colon-separated
+        `key: <hex>` secret (rather than `key=<hex>`) after the commit
+        reference, still inside the same JSON string value."""
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp)
+            allow_dir = target / "evidence" / "artifacts" / "blind-catalog-convergence-20260921"
+            allow_dir.mkdir(parents=True)
+            (allow_dir / "screening-ledger.json").write_text(
+                "{\n"
+                f'  "detail": "commit {HEX40} api_key: {HEX64}"\n'
+                "}\n"
+            )
+            findings = self._scan(target)
+            secrets = {f["Secret"] for f in findings}
+            self.assertIn(
+                HEX64, secrets,
+                f"a colon-separated secret-shaped value inside the SAME JSON string as an "
+                f"allowlisted commit reference must still be detected, got: {findings}",
             )
 
     def test_exit_code_zero_flag_always_returns_zero_even_with_findings(self):
@@ -316,25 +373,43 @@ class GitleaksConfigContextRestrictionTests(unittest.TestCase):
 
 class GitleaksNarrativeAllowlistRegexTests(unittest.TestCase):
     """Pure-regex regression coverage for the prose-narrative commit-id
-    allowlist (codex-review-72), independent of the installed gitleaks
-    binary or its per-user lock -- gitleaks's own `generic-api-key` rule
-    never fires on these two files' CURRENT content in the first place (no
-    field name here matches its own access/auth/api/credential/creds/key/
-    password/secret/token keyword list), so an end-to-end `dir`-mode
-    positive control using only real file content would be vacuous; this
-    tests the allowlist regex itself directly against real lines plus a
-    constructed mixed line, complementing test_c4's end-to-end proof above
-    (which uses a fixture line engineered to also satisfy the base rule)."""
+    allowlist, independent of the installed gitleaks binary or its per-user
+    lock -- gitleaks's own `generic-api-key` rule never fires on these two
+    files' CURRENT content in the first place (no field name here matches
+    its own access/auth/api/credential/creds/key/password/secret/token
+    keyword list), so an end-to-end `dir`-mode positive control using only
+    real file content would be vacuous; this tests the allowlist regex
+    itself directly against real lines plus constructed adversarial lines,
+    complementing test_c4/test_c5/test_c6's end-to-end proofs above (which
+    use fixture lines engineered to also satisfy the base rule). Two fix
+    rounds are covered: round 2 (a second key:value pair sharing the
+    physical line -- from the Opus evidence review of this branch, not
+    codex-review-72) and round 3 (a secret-shaped substring inside the SAME
+    JSON string as the commit reference -- from the blind Codex
+    cross-family review of PR #83)."""
 
     NARRATIVE_FILES = (
         ROOT / "evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json",
         ROOT / "evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger.json",
     )
-    # The allowlist regex exactly as it read before the codex-review-72 fix,
-    # frozen here for comparison; .gitleaks.toml no longer contains this form.
+    # The allowlist regex exactly as it read before the round-2 (Opus
+    # evidence review) fix, frozen here for comparison; .gitleaks.toml no
+    # longer contains this form.
     PRE_FIX_REGEX = (
         r'''(?i)^\s*"[A-Za-z0-9_]+":\s*".*?(?:@\s*|\b(?:pin|pinned|commit|tree|'''
         r'''source_pin|source_commit|source)\b[\sa-zA-Z0-9_./:,\-]{0,25})[0-9a-f]{40}\b.*"\s*,?\s*$'''
+    )
+    # The allowlist regex exactly as it read after the round-2 fix but
+    # before the round-3 (Codex review of PR #83) fix: closes the
+    # second-key:value-pair case (PRE_FIX_REGEX above) but still exempts a
+    # secret-shaped substring inside the SAME JSON string as the commit
+    # reference, because its trailing `(?:[^"\\]|\\.)*` allows ANY character
+    # run (including another hex-looking run) up to the closing quote.
+    # .gitleaks.toml no longer contains this form either.
+    ROUND_2_REGEX = (
+        r'''(?i)^\s*"[A-Za-z0-9_]+":\s*"(?:[^"\\]|\\.)*?(?:@\s*|\b(?:pin|pinned|commit|tree|'''
+        r'''source_pin|source_commit|source)\b[\sa-zA-Z0-9_./:,\-]{0,25})[0-9a-f]{40}\b'''
+        r'''(?:[^"\\]|\\.)*"\s*,?\s*$'''
     )
 
     def _current_allowlist_regexes(self):
@@ -391,6 +466,87 @@ class GitleaksNarrativeAllowlistRegexTests(unittest.TestCase):
             real_matches_before, 0,
             "the two narrative files must contain at least one real line the pre-fix regex "
             "matched, or this comparison is not exercising real content",
+        )
+
+    def test_round3_fixed_regex_rejects_same_string_secret_but_keeps_every_real_narrative_match(self):
+        """Round-3 (Codex review of PR #83) coverage, pure Python `re`
+        (RE2-compatible: the fix uses no lookaround or backreferences, so
+        match/reject decisions are engine-invariant; the installed gitleaks
+        binary's own agreement is separately confirmed by test_c5/test_c6
+        above and by the HEAD-ancestry/working-tree re-scans recorded in
+        .gitleaks.toml's header comment)."""
+        regexes = self._current_allowlist_regexes()
+        current = re.compile(regexes[0])
+        round_2 = re.compile(self.ROUND_2_REGEX)
+
+        # Reuse the module-level HEX64 constant rather than a new local
+        # variable named with a credential-like substring ("secret"/"key"/
+        # etc.): a bare `local_name = "<hex>"` assignment in THIS source
+        # file (not a synthetic fixture) is itself scanned by gitleaks, and
+        # a "secret"-named local would trip generic-api-key on this file.
+        hexid = "1bf6df330b056ef93ab283083afdcce642387949"
+        same_string_equals = f'  "detail": "pinned commit {hexid}; password={HEX64}"'
+        same_string_colon = f'  "detail": "commit {hexid} api_key: {HEX64}"'
+        same_string_reversed = f'  "detail": "password={HEX64}; pinned commit {hexid}"'
+        same_string_no_space_colon = f'  "detail": "commit {hexid} api_key:{HEX64}"'
+        same_string_uppercase = f'  "detail": "commit {hexid} api_key: {HEX64.upper()}"'
+
+        for adversarial, label in (
+            (same_string_equals, "trailing = separator"),
+            (same_string_colon, "trailing : separator"),
+            (same_string_reversed, "reversed order (secret first)"),
+            (same_string_no_space_colon, "colon with no following space"),
+            (same_string_uppercase, "uppercase hex secret"),
+        ):
+            with self.subTest(label=label):
+                self.assertTrue(
+                    round_2.match(adversarial),
+                    f"sanity check: the round-2 regex must match this same-string line ({label}); "
+                    "it is the round-3 reported bug",
+                )
+                self.assertFalse(
+                    current.match(adversarial),
+                    f"the round-3 fixed regex must not exempt a secret-shaped substring inside the "
+                    f"SAME JSON string as the commit reference ({label})",
+                )
+
+        real_matches_before = 0
+        for path in self.NARRATIVE_FILES:
+            for line in path.read_text().splitlines():
+                if round_2.match(line):
+                    real_matches_before += 1
+                    self.assertTrue(
+                        current.match(line),
+                        f"round-3 fixed regex regressed a real, previously-allowlisted narrative "
+                        f"line: {line[:160]}",
+                    )
+        self.assertGreater(
+            real_matches_before, 0,
+            "the two narrative files must contain at least one real line the round-2 regex "
+            "matched, or this comparison is not exercising real content",
+        )
+
+    def test_round3_documented_residual_gap_all_decimal_secret_is_not_closed(self):
+        """The round-3 fix caps any UNMARKED hex-valid run mixing in an a-f/A-F
+        letter at 7 characters, but leaves an all-decimal (no letter) run of
+        any length unrestricted -- closing that too would break real lines
+        that cite plain dates/star counts/byte sizes inline (see
+        .gitleaks.toml's header comment). Pins the documented residual gap so
+        a future tightening attempt that accidentally reintroduces it (or
+        silently over-tightens and breaks real lines) is caught either way."""
+        regexes = self._current_allowlist_regexes()
+        current = re.compile(regexes[0])
+        hexid = "1bf6df330b056ef93ab283083afdcce642387949"
+        # Named without a credential-like substring for the same reason as
+        # the constant reuse above (this low-entropy, pure-decimal value did
+        # not actually trip gitleaks's own scan of this file, but keeping
+        # the naming convention consistent avoids relying on that).
+        all_decimal_digits = "1234567890123456789012345678901234567890"
+        same_string_decimal = f'  "detail": "commit {hexid} password={all_decimal_digits}"'
+        self.assertTrue(
+            current.match(same_string_decimal),
+            "documented residual gap: an all-decimal secret-shaped run adjacent to a real "
+            "commit reference in the same string is still exempted",
         )
 
 

@@ -3063,8 +3063,8 @@
     },
     {
       "path": ".gitleaks.toml",
-      "sha256": "1a16211e2271db8dfeee648506f4bbd5c1274654b0a3bf3b664581bce01b2000",
-      "bytes": 24118
+      "sha256": "b4140521ab4c77f1bb5f792254f57492e8ab20e85dd3d8c32a8c5e307d6162bb",
+      "bytes": 28593
     },
     {
       "path": "AGENTS.md",
@@ -3083,8 +3083,8 @@
     },
     {
       "path": "README.md",
-      "sha256": "1ef2a912917e32b6fd7cc874d9c0e48df6d25748e318488db30394a0bb8b76c1",
-      "bytes": 21797
+      "sha256": "0f5f1f53b515cea04adab0d6f2b7aa56864e831634720fbe7ada47adc3200238",
+      "bytes": 21875
     },
     {
       "path": "SECURITY.md",
@@ -3173,8 +3173,8 @@
     },
     {
       "path": "adoption/platforms/linux-wsl2.md",
-      "sha256": "94dbbe4bd59497b5001b5fb407f775102d5ebbfcb9d9392cf1c25cba7ec8f668",
-      "bytes": 4803
+      "sha256": "807a025fa6a46ce5e78fddedc6f4664f5291558fd7a231bcbe8240169a22835b",
+      "bytes": 4881
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
@@ -5999,8 +5999,8 @@
     },
     {
       "path": "blueprints/us-equities/data/promotion_gate.py",
-      "sha256": "38e1fc7642ae3e81ae4c93ee5e9d11cd48159cc0a9d9c29f0d9dc626b320efa5",
-      "bytes": 20192
+      "sha256": "7d17138fada87b79944a1a532289fb50add61b2661a30a762933d6cabe0403fd",
+      "bytes": 21800
     },
     {
       "path": "blueprints/us-equities/data/receipt.json",
@@ -7624,7 +7624,7 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "cca3732863be6eae196a11cb46f99c1d8cab643c20344ed3c64ca58a31478722",
+      "sha256": "1c71e08a4b07f6b252bd246e0c3dec547c056a90ab109ef9e2ffd127c4a4e1e2",
       "bytes": 12921432
     },
     {
@@ -11514,8 +11514,8 @@
     },
     {
       "path": "tests/test_adoption_contract.py",
-      "sha256": "54b0b3567c35a390bd0ef7306d4c998e84e460d5b590f37dfbe4a50ac501a012",
-      "bytes": 11337
+      "sha256": "94080a3440e85dcf11ce1dcdb2435d0a358e7abd2e4273d100effd67d1670d05",
+      "bytes": 19178
     },
     {
       "path": "tests/test_adoption_guarded_runners.py",
@@ -11634,8 +11634,8 @@
     },
     {
       "path": "tests/test_gitleaks_config.py",
-      "sha256": "b5413c3dbadaedbfb9930b3be81e0029139e210f70d97a89917555127802f170",
-      "bytes": 25045
+      "sha256": "84832096310d51d71d60bbccaadbc55d5ec8584579fe842bf84deaf77b9237c2",
+      "bytes": 33946
     },
     {
       "path": "tests/test_gpu_inference.py",
@@ -12114,8 +12114,8 @@
     },
     {
       "path": "tests/test_promotion_gate_codex_review.py",
-      "sha256": "263657b9256901e1cefb7ea81e1d8eeed645f9e96568c1c7db562312a74f5700",
-      "bytes": 17243
+      "sha256": "ac1a31d28a737ca208d58595173e2f57ef43828088dc0c4e286de3c95f76d4ab",
+      "bytes": 20781
     },
     {
       "path": "blueprints/us-equities/data/fixtures/null-index-session.csv",

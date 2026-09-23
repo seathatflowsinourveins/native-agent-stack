@@ -154,7 +154,16 @@ def _volume_cell_fails(raw_value) -> bool:
                 return True
             dec = decimal.Decimal(repr(raw_value))
         else:
-            text = str(raw_value).strip()
+            # `str.strip()` with no argument strips Unicode whitespace (e.g.
+            # U+00A0 NBSP, U+3000 ideographic space), not just ASCII
+            # whitespace. `pd.to_numeric` does not accept those code points
+            # as leading/trailing padding, so a cell like " 5" or
+            # "5 " used to `strip()` down to a canonical-looking "5",
+            # pass this check, and then become NaN (silently coerced to 0 by
+            # `_prepare()`) once actually parsed downstream (Codex
+            # cross-family review of PR #83). Strip only the ASCII
+            # whitespace characters CSV/text numeric literals actually use.
+            text = str(raw_value).strip(" \t\n\r\f\v")
             # Decimal also accepts underscores and non-ASCII digits, which
             # pd.to_numeric and ordinary readers reject; accept only canonical
             # ASCII numeric text.
@@ -322,8 +331,21 @@ def _summarize(failure_cases, row_count: int, extra_failures: dict | None = None
         checks.append({"name": name, "status": "fail", "detail": _detail(entry["count"], entry["indices"])})
     unmapped = sorted(set(failing) - set(CHECK_NAMES))
     if unmapped:
+        # Mirror the recognized-check counting above: the same row index can
+        # fail more than one unrecognized check (e.g. two synthetic pandera
+        # identifiers both attached to row 3), and summing each check's
+        # already-deduplicated `count` double-counts that row while
+        # `indices` (a set union) counts it once, so `count` and `indices`
+        # disagreed and could report a distinct-row count higher than the
+        # true number of distinct failing rows (Codex cross-family review of
+        # PR #83). Deduplicate row indices once across ALL unmapped checks
+        # together, the same way a single check dedupes indices across its
+        # own failure-case rows; only the count of index-less failures still
+        # cannot be deduplicated (there is no row identity to compare), so
+        # those are summed per check as before.
         indices = sorted({index for name in unmapped for index in failing[name]["indices"]})
-        count = sum(failing[name]["count"] for name in unmapped)
+        null_total = sum(failing[name]["count"] - len(failing[name]["indices"]) for name in unmapped)
+        count = len(indices) + null_total
         checks.append({"name": "unmapped_failures", "status": "fail",
                         "detail": f"unrecognized pandera check identifiers {unmapped}; " + _detail(count, indices)})
     return checks

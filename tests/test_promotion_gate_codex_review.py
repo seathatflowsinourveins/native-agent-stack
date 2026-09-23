@@ -196,6 +196,50 @@ class SummarizeDuplicateIndexPurePython(unittest.TestCase):
         self.assertIn("row index unavailable", detail)
 
 
+class SummarizeUnmappedDuplicateIndexPurePython(unittest.TestCase):
+    """Finding (round 3, PR #83): the `unmapped_failures` synthetic check
+    summed each unrecognized pandera check's already-deduplicated `count`
+    across ALL unrecognized checks, while its `indices` list only unioned
+    (deduplicated) row indices across those same checks. The same row index
+    failing two different unrecognized check identifiers was therefore
+    counted twice in `count` but once in `indices`, unlike every recognized
+    check above, which dedupes indices within itself. `count` must dedupe
+    row indices across every unrecognized check the same way."""
+
+    def _failure_cases(self, rows):
+        return SummarizeNullIndexPurePython._FakeFailureCases(rows)
+
+    def test_same_row_failing_two_unmapped_checks_counted_once(self):
+        rows = [
+            {"check": "synthetic_check_a", "index": 3},
+            {"check": "synthetic_check_b", "index": 3},
+            {"check": "synthetic_check_a", "index": 5},
+        ]
+        checks = g._summarize(self._failure_cases(rows), row_count=6)
+        by_name = {c["name"]: c for c in checks}
+        self.assertIn("unmapped_failures", by_name)
+        detail = by_name["unmapped_failures"]["detail"]
+        # Distinct rows affected: {3, 5} -> 2, not 3 (the buggy sum of each
+        # check's own count: 2 for synthetic_check_a + 1 for
+        # synthetic_check_b).
+        self.assertIn("2 of 6 rows failed", detail)
+        self.assertIn("example row indices [3, 5]", detail)
+        self.assertNotIn("row index unavailable", detail)
+
+    def test_unmapped_null_index_counts_still_sum_per_check(self):
+        # Index-less failures cannot be deduplicated against each other (no
+        # row identity to compare), so those still add up across checks.
+        rows = [
+            {"check": "synthetic_check_a", "index": None},
+            {"check": "synthetic_check_b", "index": None},
+        ]
+        checks = g._summarize(self._failure_cases(rows), row_count=2)
+        by_name = {c["name"]: c for c in checks}
+        detail = by_name["unmapped_failures"]["detail"]
+        self.assertIn("2 of 2 rows failed", detail)
+        self.assertIn("row index unavailable", detail)
+
+
 class VolumeDecimalPurePython(unittest.TestCase):
     """Finding 2, pure stdlib: `_volume_cell_fails` must Decimal-parse the
     exact raw string form, not a lossy float conversion, and must not
@@ -213,7 +257,15 @@ class VolumeDecimalPurePython(unittest.TestCase):
 
     def test_non_canonical_numeric_text_fails(self):
         # Decimal parses these; pd.to_numeric turns them into NaN.
-        for text in ("1_000", "\u0661\u0662\u0663", "1 000", "Infinity", "NaN", "0x10"):
+        # NBSP (U+00A0) and the fullwidth digit "5" preceded by an
+        # ideographic space (U+3000) are Unicode whitespace/digit-adjacent
+        # code points that a bare `str.strip()` (with no argument) removes,
+        # which used to leave a canonical-looking numeric string behind and
+        # pass this check even though `pd.to_numeric` cannot parse the
+        # original text and silently turns it into NaN downstream (Codex
+        # cross-family review of PR #83).
+        for text in ("1_000", "\u0661\u0662\u0663", "1 000", "Infinity", "NaN", "0x10",
+                     "\u00a05", "5\u00a0", "\u30005"):
             with self.subTest(text=text):
                 self.assertTrue(g._volume_cell_fails(text))
         for text in ("0", "1000", "1000.0", "1e3", "+5"):
@@ -296,6 +348,19 @@ class FixtureGateRuns(unittest.TestCase):
         self.assertIn("example row indices [0, 1]", by_name["volume_integral_non_negative"]["detail"])
         self.assertTrue(all(c["status"] == "pass" for name, c in by_name.items()
                              if name != "volume_integral_non_negative"), by_name)
+
+    def test_nbsp_volume_fixture_fails_closed(self):
+        """Finding (round 3, PR #83): a `volume` cell padded with a
+        non-breaking space (U+00A0) rather than ASCII whitespace must still
+        fail `volume_integral_non_negative` through the real CLI/CSV path,
+        not silently become 0 via `pd.to_numeric`'s NaN coercion."""
+        code, result = self._run("nbsp-volume.csv")
+        self.assertEqual(code, 1)
+        self.assertEqual(result["status"], "fail")
+        self.assertEqual(result["row_count"], 1)
+        by_name = {c["name"]: c for c in result["checks"]}
+        self.assertEqual(by_name["volume_integral_non_negative"]["status"], "fail")
+        self.assertIn("example row indices [0]", by_name["volume_integral_non_negative"]["detail"])
 
     def test_int64_dtype_cell_is_exact_and_passes(self):
         """`raw_frame['volume']` values already read by pandas as int64 (a

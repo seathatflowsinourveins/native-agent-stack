@@ -13,6 +13,35 @@ class AdoptionContractTests(unittest.TestCase):
         self.adoption = json.loads((ROOT / 'adoption/manifest.json').read_text())
         self.stack = json.loads((ROOT / 'manifests/stack.json').read_text())
 
+    def _require_commit(self, commit_ish: str, label: str) -> None:
+        """Skip (not fail) the calling test when `commit_ish` is not present
+        as a commit object in this clone.
+
+        Codex review of PR #83, round 3: CI's shallow clone does not carry
+        every commit this test's `git cat-file -e <sha>:<path>` calls need --
+        the path can genuinely exist on disk in the checked-out working tree
+        while the COMMIT OBJECT itself (a different, non-checked-out sha, e.g.
+        an older `source.release_commit`/`source.baseline_commit` pin) is
+        simply absent from a shallow history. A missing commit object makes
+        `git cat-file -e <sha>:<path>` fail regardless of whether the path
+        would actually be present there, which either wrongly fails the
+        positive assertions (release_commit contains adoption/) or wrongly
+        PASSES the negative one (baseline_commit does NOT contain adoption/)
+        for the wrong reason. Skip with an explicit message naming the
+        missing object instead of asserting either way; the fetch depth is
+        left alone (deepening it here would hide the real shallow-clone
+        constraint rather than test around it)."""
+        result = subprocess.run(
+            ['git', 'cat-file', '-e', f'{commit_ish}^{{commit}}'],
+            cwd=str(ROOT), capture_output=True, text=True,
+        )
+        if result.returncode != 0:
+            self.skipTest(
+                f'{label} ({commit_ish}) is not present as a commit object in this clone '
+                f'(git cat-file -e {commit_ish}^{{commit}} failed: {result.stderr.strip()}); '
+                'likely a shallow clone that does not carry this commit'
+            )
+
     def test_every_component_has_a_confined_recipe(self):
         components = {item['id'] for item in self.stack['components']}
         self.assertEqual(set(self.adoption['recipe_map']), components)
@@ -132,6 +161,7 @@ class AdoptionContractTests(unittest.TestCase):
             self.assertEqual(tag.stdout.strip(), source['release_commit'],
                              'source.release_tag must resolve to source.release_commit')
 
+        self._require_commit(source['release_commit'], 'source.release_commit')
         for path in ('adoption/bootstrap.md', 'tools/adoption/render_config.py'):
             result = subprocess.run(
                 ['git', 'cat-file', '-e', f"{source['release_commit']}:{path}"],
@@ -145,6 +175,7 @@ class AdoptionContractTests(unittest.TestCase):
         # The pre-adoption baseline_commit is the actual regression case: it must
         # NOT contain these paths, confirming step 0's fix was necessary in the
         # first place (this is checking real git history, not a synthetic fixture).
+        self._require_commit(source['baseline_commit'], 'source.baseline_commit')
         for path in ('adoption', 'tools/adoption'):
             result = subprocess.run(
                 ['git', 'cat-file', '-e', f"{source['baseline_commit']}:{path}"],
@@ -156,6 +187,65 @@ class AdoptionContractTests(unittest.TestCase):
                 f"{path}; if this now passes, baseline_commit is no longer a reason to avoid "
                 "checking it out in step 0 and this test (and the doc fix it guards) should be reviewed",
             )
+
+    def test_require_commit_skips_when_the_commit_object_is_absent(self):
+        """Codex review of PR #83, round 3: `_require_commit` must SKIP (not
+        fail, not silently pass through to an assertion that could pass for
+        the wrong reason) when a commit object is genuinely absent from this
+        clone -- e.g. CI's shallow clone, where `source.release_commit` or
+        `source.baseline_commit` can be older than the shallow fetch depth
+        even though their paths exist fine in the checked-out working tree."""
+        bogus_sha = '0000000000000000000000000000000000dead'
+        verify = subprocess.run(
+            ['git', 'cat-file', '-e', f'{bogus_sha}^{{commit}}'],
+            cwd=str(ROOT), capture_output=True, text=True,
+        )
+        self.assertNotEqual(
+            verify.returncode, 0,
+            'sanity check: this synthetic sha must not actually resolve in this repo, '
+            'or this test is not exercising the missing-object path',
+        )
+        with self.assertRaises(unittest.SkipTest) as ctx:
+            self._require_commit(bogus_sha, 'source.release_commit')
+        self.assertIn(bogus_sha, str(ctx.exception))
+        self.assertIn('source.release_commit', str(ctx.exception))
+
+    def test_require_commit_does_not_skip_for_a_present_commit(self):
+        """The positive path: a commit object this clone actually has (HEAD
+        itself always qualifies) must not be skipped."""
+        head = subprocess.run(
+            ['git', 'rev-parse', 'HEAD'], cwd=str(ROOT), capture_output=True, text=True, check=True,
+        ).stdout.strip()
+        self._require_commit(head, 'HEAD')  # must not raise/skip
+
+    def test_baseline_commit_warning_cites_the_step_zero_finding_not_the_promotion_gate_one(self):
+        """Codex review of PR #83, round 3: README.md's "Start here" step 0
+        and adoption/platforms/linux-wsl2.md's baseline_commit warning cited
+        `codex-review-64` for the step-0/baseline_commit checkout finding,
+        but that finding is `codex-review-72` (see this file's own
+        `test_bootstrap_step_zero_...` docstring above); `codex-review-64`
+        is the separate promotion-gate cross-family review finding cited
+        correctly elsewhere (blueprints/us-equities/data/README.md), which
+        this test must not touch."""
+        for doc in (ROOT / 'README.md', ROOT / 'adoption/platforms/linux-wsl2.md'):
+            text = doc.read_text()
+            start = text.index('baseline_commit')
+            window = text[max(0, start - 200):start + 400]
+            self.assertIn(
+                'codex-review-72', window,
+                f'{doc.relative_to(ROOT)}: the baseline_commit checkout warning must cite '
+                'codex-review-72 (the step-0 finding), not codex-review-64 (the promotion-gate '
+                f'finding); nearby text: {window!r}',
+            )
+        # Positive control: the promotion-gate doc's own codex-review-64
+        # citations are a different finding and must be left alone.
+        gate_readme = (ROOT / 'blueprints/us-equities/data/README.md').read_text()
+        self.assertIn(
+            'codex-review-64', gate_readme,
+            'blueprints/us-equities/data/README.md must keep its codex-review-64 citations '
+            '(the promotion-gate finding); this test asserts the fix stayed scoped to the '
+            'baseline_commit/step-0 citation only',
+        )
 
     def test_no_doc_entry_point_checks_out_the_pre_adoption_baseline(self):
         """Second-round Codex cross-family review finding (codex-review-72):
@@ -170,31 +260,73 @@ class AdoptionContractTests(unittest.TestCase):
         predates `adoption/` and `tools/adoption/`, so nothing after that
         checkout works. Scan every doc entry point, not just the first 1500
         characters of one file, for the literal checkout-target pattern."""
-        checkout_target_pattern = re.compile(
-            r"git checkout \"\$\(python3 -c \"import json;print\(json\.load\(open\('adoption/manifest\.json'\)\)"
-            r"\['source'\]\['baseline_commit'\]\)\"\)\""
+        # Codex review of PR #83, round 3: the original scan only covered
+        # README.md + adoption/**/*.md and one EXACT command string (the
+        # literal `python3 -c "import json;print(...)"` form). Broaden to
+        # every doc surface a reader could actually follow (README.md,
+        # adoption/**, recipes/**, docs/**/*.md) and to ANY line that pairs
+        # a checkout-like verb (`git checkout`/`git switch`) with a
+        # `baseline_commit` reference, regardless of whether the extraction
+        # is written with `python3 -c`, `jq`, or something else -- while
+        # still excluding a line that explicitly WARNS against doing this
+        # (e.g. "Do **not** check out `source.baseline_commit`" describes
+        # the hazard in prose, using "check out" not the literal
+        # `git checkout`/`git switch` verb, so it is naturally excluded; a
+        # future doc that quotes the broken command INSIDE a warning is
+        # still excluded via the explicit negation-word check below).
+        checkout_verb = re.compile(r'git\s+(?:checkout|switch)\b', re.IGNORECASE)
+        negation = re.compile(
+            r'\b(?:do\s+not|does\s+not|must\s+not|should\s+not|never|'
+            r'not\s+a\s+checkout\s+target|is\s+never\s+a\s+checkout\s+target)\b',
+            re.IGNORECASE,
         )
-        candidate_docs = [ROOT / 'README.md'] + sorted((ROOT / 'adoption').rglob('*.md'))
+        candidate_docs = (
+            [ROOT / 'README.md']
+            + sorted((ROOT / 'adoption').rglob('*.md'))
+            + sorted((ROOT / 'recipes').rglob('*.md'))
+            + sorted((ROOT / 'docs').rglob('*.md'))
+        )
         offenders = []
         for doc in candidate_docs:
-            text = doc.read_text()
-            if checkout_target_pattern.search(text):
-                offenders.append(str(doc.relative_to(ROOT)))
+            if not doc.exists():
+                continue
+            for lineno, line in enumerate(doc.read_text().splitlines(), start=1):
+                if 'baseline_commit' not in line:
+                    continue
+                if not checkout_verb.search(line):
+                    continue
+                if negation.search(line):
+                    continue
+                offenders.append(f'{doc.relative_to(ROOT)}:{lineno}: {line.strip()[:200]}')
         self.assertEqual(
             offenders, [],
-            f"these docs still tell a reader to `git checkout` "
+            f"these doc lines still tell a reader to `git checkout`/`git switch` "
             f"source.baseline_commit (a revision with no adoption/ or "
             f"tools/adoption/ directory) instead of source.release_tag: {offenders}",
         )
-        # A positive control: the pattern above must actually match the
-        # known-broken form, so a change to the doc's exact wording doesn't
-        # silently make this test vacuous.
-        broken_example = (
+        # Positive controls: the scan above must actually catch the known-broken
+        # form (with either extraction style) and must still exclude an explicit
+        # warning that happens to use the real checkout verb, so a change to the
+        # scan's own logic doesn't silently make it vacuous either way.
+        broken_python_example = (
             'git checkout "$(python3 -c "import json;'
             "print(json.load(open('adoption/manifest.json'))"
             "['source']['baseline_commit'])\")\""
         )
-        self.assertRegex(broken_example, checkout_target_pattern)
+        broken_jq_example = (
+            "git checkout \"$(jq -r '.source.baseline_commit' adoption/manifest.json)\""
+        )
+        warning_with_real_verb_example = (
+            'Do **not** run `git checkout "$(...baseline_commit...)"`: '
+            'baseline_commit is never a checkout target.'
+        )
+        self.assertTrue(checkout_verb.search(broken_python_example) and 'baseline_commit' in broken_python_example
+                         and not negation.search(broken_python_example))
+        self.assertTrue(checkout_verb.search(broken_jq_example) and 'baseline_commit' in broken_jq_example
+                         and not negation.search(broken_jq_example))
+        self.assertTrue(checkout_verb.search(warning_with_real_verb_example)
+                         and 'baseline_commit' in warning_with_real_verb_example
+                         and negation.search(warning_with_real_verb_example))
 
 
 if __name__ == '__main__':
