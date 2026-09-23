@@ -27745,8 +27745,8 @@
     },
     {
       "path": "tests/test_adoption_bootstrap_macos.py",
-      "sha256": "fd7d98ddf0aa84e9c5b4d67d0cf9213d412928cf7b222db47d49ad5ad9767a11",
-      "bytes": 165020
+      "sha256": "adb957701308abd587555a3161791e4c53ab56747aa768b594f03d5d15949e36",
+      "bytes": 165300
     },
     {
       "path": "tests/test_adoption_contract.py",
@@ -27760,8 +27760,8 @@
     },
     {
       "path": "tests/test_adoption_launchd.py",
-      "sha256": "fb7628306bc39870b174b3c91123e5cf7b76f48e40649451dd30da253e60c2dd",
-      "bytes": 108761
+      "sha256": "f50a8f8e3106e0ec34151dff4ac549c60e19f1109e3555fab7fad689af5f34c2",
+      "bytes": 111506
     },
     {
       "path": "tests/test_adoption_status.py",

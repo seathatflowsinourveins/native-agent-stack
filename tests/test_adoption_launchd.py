@@ -254,6 +254,56 @@ class SignalShimMechanismProofTests(unittest.TestCase):
                         reached.exists(),
                         "the trap must preempt the script's next line, not run after it")
 
+    def test_the_actual_helper_through_a_subshell_uses_the_fixed_target_not_ppid(self):
+        # Codex P2 (#146): the two tests above each build their OWN shim
+        # script by hand, so neither would notice a regression in
+        # _signal_and_wait_for_exit ITSELF -- the class would still pass
+        # even if the real fix were reverted. This one runs the ACTUAL
+        # helper's generated text (not a hand-written stand-in) as the
+        # shim, through the same non-optimizable command-substitution
+        # subshell as test_ppid_inside_a_command_substitution_subshell_is_
+        # not_the_script above, against a script that exports
+        # ADOPTION_SCRIPT_PID exactly like the real product scripts do.
+        # Manually confirmed while writing this commit: temporarily
+        # changing _signal_and_wait_for_exit's own `target_var` default
+        # back to "PPID" makes this exact test fail (marker never
+        # created); the default was restored to "ADOPTION_SCRIPT_PID"
+        # before committing.
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            marker = tmp_path / "trap-ran"
+            shim_dir = tmp_path / "shim"
+            shim_dir.mkdir()
+            (shim_dir / "fake-tool").write_text(
+                "#!/bin/sh\n" + _signal_and_wait_for_exit("TERM", indent="")
+            )
+            (shim_dir / "fake-tool").chmod(0o755)
+            script = tmp_path / "target.sh"
+            script.write_text(
+                "set -Eeuo pipefail\n"
+                'export ADOPTION_SCRIPT_PID="$$"\n'
+                f'trap \'touch {str(marker)!r}; exit 143\' TERM\n'
+                # Identical non-optimizable shape to the subshell test
+                # above -- a function that inspects $? after calling
+                # fake-tool, so bash cannot exec-replace the subshell with
+                # fake-tool directly (which would hide a $PPID regression
+                # by leaving fake-tool's own $PPID equal to the script's).
+                'run_it() { fake-tool; local rc=$?; return "$rc"; }\n'
+                'x="$(run_it)"\n'
+                "sleep 5\n"  # only ever reached if the trap never fired
+            )
+            script.chmod(0o755)
+            result = subprocess.run(
+                ["bash", str(script)],
+                capture_output=True, text=True, timeout=15,
+                env={**os.environ, "PATH": f"{shim_dir}{os.pathsep}{os.environ['PATH']}"},
+            )
+            self.assertTrue(
+                marker.exists(),
+                "the real helper's default target must reach the script "
+                f"through a subshell: rc={result.returncode} "
+                f"stdout={result.stdout!r} stderr={result.stderr!r}")
+
 
 class TemplateRenderAndSchemaTests(unittest.TestCase):
     def setUp(self):

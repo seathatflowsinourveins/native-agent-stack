@@ -1964,16 +1964,20 @@ class PlatformDependencyInstallTests(unittest.TestCase):
                         'case "$dest" in\n'
                         "  *.migrating.*)\n"
                         '    /bin/mv "$@" || exit $?\n'
-                        # Round 3k: was a fixed `kill; sleep 0.2; exit 0`,
-                        # meant to keep this shim alive long enough for
-                        # bash's blocking wait() on it to be reliably
-                        # interrupted by the signal rather than by this
-                        # process's own ordinary exit. Reproduced under
-                        # real CPU load: that race is exactly what went
-                        # wrong (the run's own return code came back 0, as
-                        # if never interrupted). _signal_and_wait_for_exit
-                        # removes the race instead of tuning its odds: it
-                        # blocks until the parent has actually exited.
+                        # Round 3k: was a fixed `kill -SIG "$PPID"; sleep
+                        # 0.2; exit 0`, wrong on two counts fixed since --
+                        # see _signal_and_wait_for_exit's own docstring for
+                        # both. What this line now does: signal
+                        # ADOPTION_SCRIPT_PID (never $PPID), then pause
+                        # briefly (0.5s, a fixed defensive margin, not a
+                        # wait for anything specific) before this shim
+                        # itself returns. It does NOT block until the
+                        # parent has exited -- this shim is the parent's
+                        # own synchronous foreground child, so the parent
+                        # cannot exit while still waiting on it; ordering
+                        # is guaranteed instead by bash servicing the
+                        # pending trap immediately once this shim (its
+                        # current foreground child) naturally returns.
                         + _signal_and_wait_for_exit(signal_name, indent="    ")
                         + "    exit 0\n"
                         "    ;;\n"
