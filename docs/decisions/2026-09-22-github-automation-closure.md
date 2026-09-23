@@ -1016,12 +1016,13 @@ Hosted and live results after merge. Evidence class: hosted runs and GitHub API 
 - **One withheld-key policy (2026-09-23, after #135 merged).**
   - *Trigger.* The tooling owner (agent-lab-17) is adding `gap_receipts` and
     `gap_receipts_note` to `scripts/landscape.py` `TOP_LEVEL_WITHHELD_KEYS` in blind-lanes round
-    2. Those receipts are checks run against the previous winner; 111 of 249 quote gap text word
-    for word.
+    2. By the tooling owner's count, those receipts are checks run against the previous winner,
+    and 111 of 249 quote gap text word for word.
   - *Problem.* The gate kept its own copy of `withheld_packet_keys`, written before #124 merged.
-    That copy had already drifted: it lacked the top-level `current_choice`, `decision` and
-    `rationale` keys, the disposition labels on candidate copies, a non-null `review_status`, the
-    requirement-gated `archived`/`license` keys and the `withheld[]` policy-label check.
+    It lacked the top-level `current_choice`, `decision` and `rationale` keys, the disposition
+    labels on candidate copies and a non-null `review_status`. It also deliberately left the
+    requirement-gated `archived`/`license` keys and the `withheld[]` policy-label check to
+    `scripts/landscape.py`, as its comment said.
   - *Not a bypass in CI.* Every verdict-changing PR also runs `scripts/landscape.py` as a
     validator, and the trust-base rule keeps that file at the base's copy.
   - *Change.* The gate now imports the base's `scripts/landscape.withheld_packet_keys`, so its own
@@ -1031,8 +1032,14 @@ Hosted and live results after merge. Evidence class: hosted runs and GitHub API 
     `--withhold-labels` packet does. Each of these fails: a top-level `decision`, `rationale` or
     `current_choice`; a copy's `disposition` or non-null `review_status`; a `withheld[]` list
     missing one label.
-  - *Mutation check.* Against the previous copy, all six subtests fail, and so does the identity
-    assertion.
+  - *Mutation check (coordinator, local).* With `origin/main`'s gate restored, the identity
+    assertion fails. With that assertion also removed, all six subtests fail.
+  - *Independent review (evidence-reviewer, Opus/high): pass.*
+    - A synthetic comparison found no key or packet that the old copy flags and the landscape
+      policy does not: 1,721 keys and 97,781 packets.
+    - The import resolves to the base worktree's `landscape.py` in the job.
+    - The dropped constant pins are not a weakening. A landscape rules change lands as its own
+      trust-base PR.
   - *Alternatives.* Keeping the copy and adding the two keys would leave the other five
     differences and the drift. Relying on the validator alone would drop the gate's earlier,
     specific message.
