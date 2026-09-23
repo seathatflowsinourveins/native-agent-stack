@@ -1,0 +1,111 @@
+{
+ "schema_version": 1,
+ "id": "sdk-runtime-coverage-20260922-gated-items",
+ "date": "2026-09-23",
+ "ledger": "catalogs/sota-convergence/sdk-runtime-coverage-20260922.json",
+ "scope": "Execution of the items the 2026-09-22 SDK/harness/runtime coverage left gated on an account, consent, device or model endpoint, and the follow-ups those runs opened. One WSL2 x86_64 host; pinned versions; bounded runner; native Claude and Codex logins with the API-key variables unset. Each unit was preregistered (protocol, expected results and a sha256 lock, amendments locked before the runs they govern), with the post-hoc exceptions stated per item, and independently verified by an evidence reviewer against raw logs; the corrections that change meaning are carried per item and the complete lists stay with the local receipts. Sanitised: local paths, session identifiers and account details removed.",
+ "evidence_class": "local_integration on one WSL2 x86_64 host; one run per arm unless stated; not upstream E2E and not macOS",
+ "items": [
+  {
+   "slug": "anthropics/claude-code-action",
+   "category": "dispatch-frameworks",
+   "outcome": "resolved (CI arm and local arm); routine arm blocked on user consent",
+   "supported": "Workflow on a private scratch repository with actions pinned by commit (zizmor 0 findings), setup-token secret, model pinned: smoke reply OK in 1 turn; allow control (Read permitted) returned the README's first line with 0 permission denials; with Read still available and a settings-level deny rule Read(./README.md) passed through the action's settings input, the run succeeded with permission_denials = 1 naming Read and no README text. Local arm (transient systemd-run, --restricted, no tools) replied OK. The repository secret was deleted after the runs.",
+   "not_run": "Arm D (a one-off cloud routine): the account has no GitHub connection, so a routine cannot clone the repository, and routines cannot be deleted through the API; recorded as blocked on user consent by the preregistered rule.",
+   "corrections": [
+    "An earlier deny probe that removed Read with --disallowedTools could never show a denial and one at --max-turns 1 could not fit a tool call; both superseded by the settings-level deny rule.",
+    "Every CI run also recorded a small Haiku request alongside the pinned model."
+   ]
+  },
+  {
+   "slug": "swe-agent/mini-swe-agent (key-free local model endpoint, shared with pydantic-ai)",
+   "category": "coding-harnesses",
+   "outcome": "resolved: Qwen/Qwen3-8B-AWQ qualifies at the bar; the prior round's 7B models did not",
+   "supported": "Prior round (2026-09-22): Qwen2.5-7B-Instruct-AWQ 20/20 valid tool calls but 3/5 exact-content mini-swe-agent tasks; Qwen2.5-Coder-7B-Instruct-AWQ 4/5 tasks but 1/20 tool calls (its tool-call format does not match the hermes parser). Follow-up with vLLM 0.29.0, --tool-call-parser hermes (the Qwen3 chat templates emit <tool_call>{json}</tool_call>), thinking disabled through the chat-template kwarg, the same 20-call fixture, the same five mini-swe-agent 2.4.6 text-based tasks and config (temperature 0, max_tokens 512, step_limit 15, 120 s per task), the client inside srt 0.0.77 with NO_PROXY cleared: Qwen/Qwen3-8B-AWQ at revision 4da05a8e 20/20 tool calls (bar 19) and 4/5 tasks (bar 4), qualifies; Qwen/Qwen3-4B-Instruct-2507 at cdbee75f 20/20 and 3/5, not qualified. strace of the client tree shows only the loopback server port; the co-resident embedder answered 263/263 health checks across both serving windows; GPU peak 20,217 of 24,463 MiB; weights deleted after the runs. Secondary pydantic-ai probe on the 8B model: the reference probe's own sentinel check failed twice (the model paraphrased the tool result, although the tool call and tool result reached the server), and a second (newer) probe with an arbitrary code sentinel passed twice.",
+   "corrections": [
+    "The candidate selection was decided before its lock (post-hoc); the serve protocol was locked before any download or serve.",
+    "The first candidate research proposed the qwen3 XML parser; the installed parser reads only <function=..><parameter=..> XML, so hermes was locked instead.",
+    "The 8B passes at exactly the 4/5 bar on one run, and both models returned identical tool calls on the 20 fixture prompts, so the fixture does not separate them.",
+    "The serves wrote about 92 MB of vLLM compile cache in the user cache directory; removed afterwards.",
+    "nvidia-smi could not list GPU processes on this WSL2 build; contention was judged from continuous memory samplers.",
+    "No lock-check lines appear in the command log (only in the download driver logs); the GPU preflight process check compared nothing (empty pid file); the /tokenize check for disabled thinking was not run (it rests on the launch flag and the absence of <think> in trajectories)."
+   ]
+  },
+  {
+   "slug": "awslabs/cli-agent-orchestrator",
+   "category": "coding-harnesses",
+   "version": "v2.5.1 (d98243e)",
+   "outcome": "resolved: a hook-free Claude worker without changing host settings",
+   "supported": "Same fixed task (acceptEdits, one file with exact content), strace -f -e execve started as the parent of cao-server, detector built from the exact hook commands in the user settings, only successful execve counted. Arm A (plain worker) 9 hook executions; arm B (a PATH-shadow wrapper adding --setting-sources/--settings) 9, because CAO's tmux pane is a login shell whose profile puts the host claude launcher first on PATH; arm C (.claude/settings.local.json with {\"disableAllHooks\": true} in the worker's own working directory, plain launcher) 0 hook executions, exact content written, native login. The official settings documentation states that disableAllHooks applies to the merged hook set, with a managed-policy carve-out that does not apply on this host.",
+   "corrections": [
+    "Arms A and B are post-hoc: the runner amendment they used was locked after they ran; arm C's amendment was locked with every script hash before it ran.",
+    "The detector covers hooks in the user settings file, not plugin hooks; strace truncates arguments, so exact argv equality between arms is unverified.",
+    "Each arm left a project entry in the user's Claude state file and history lines; transcripts and session directories attributed to the arms were removed."
+   ]
+  },
+  {
+   "slug": "anthropics/claude-agent-sdk-typescript",
+   "category": "agent-sdks",
+   "version": "0.3.280 (registry integrity matched)",
+   "outcome": "resolved with one residual listing",
+   "supported": "Arm A: settingSources [], tools ['Read','Write'], settings.disableClaudeAiConnectors: no MCP servers, no hooks, apiKeySource none, but 18 bundled skills, 5 agents, 2 plugins and analytics on. Arm B adds settings.disableBundledSkills (sdk.d.ts) and the documented DISABLE_TELEMETRY and CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC, plus DISABLE_ERROR_REPORTING and CLAUDE_CODE_DISABLE_EXPLORE_PLAN_AGENTS (found only as binary strings): skills 1 (doctor, whose model invocation is disabled), agents 3, plugins 0, analytics disabled. A probe with exactly arm B's tools asking for the doctor skill and four agents (Explore, general-purpose, statusline-setup, claude) produced 0 skill or agent tool uses. Process-scoped strace (connect/sendto/sendmsg): arm B's only external destination was an address registered to Anthropic, PBC (RDAP); arm A also reached a Google-registered address, unclassified.",
+   "corrections": [
+    "The locked bar 'arm B init lists no skills' is FAILED because doctor is still listed, although it is unreachable.",
+    "An earlier reachability probe granted Skill and Task, which let a general-purpose agent run; it was withdrawn and re-run with arm B's exact tools.",
+    "An earlier network comparison polled host-wide sockets and could not attribute connections to the SDK; replaced by process-scoped tracing. DNS query names are not captured (sendmmsg not traced).",
+    "The hand-typed append timestamps for the network amendments sort after the runs they govern, although the file times show the lock was written first; three governing scripts were hashed only afterwards (post-hoc). The reachability re-run was locked with its script hashes before it ran."
+   ]
+  },
+  {
+   "slug": "anthropics/claude-agent-sdk-python",
+   "category": "agent-sdks",
+   "version": "0.2.157 (wheel sha256 equals the PyPI record)",
+   "outcome": "resolved",
+   "supported": "query() on the native Claude login with ANTHROPIC_API_KEY, ANTHROPIC_AUTH_TOKEN and OPENAI_API_KEY unset: init apiKeySource none, result ok. No paid API key was needed on this host.",
+   "contradicts": "catalogs/landscape/gap-resolution-20260922.json, layer agent-sdks, the gap whose blocker reads 'Testing these requires a live Claude Agent SDK run against a paid Anthropic API': the blocker's premise does not hold on this host (the SDK ran on the native login), while that gap's own questions (stop_task, billing cessation, exactly-once) stay untested."
+  },
+  {
+   "slug": "trailofbits/coop",
+   "category": "sandbox-worker-runtimes",
+   "version": "v0.6.0 (sha256 and SLSA attestation verified)",
+   "outcome": "compared; incumbent srt retained by the preregistered rule; persistence check armed",
+   "supported": "Firecracker v1.17.0 guest after kvm group membership. Preregistered fixture, 5 fresh instances per arm: both arms kept every file intact; srt denied all 8 probes, coop 5 (it allows outbound TCP, DNS and sudo in the guest by design); median wall time srt 0.45 s, coop 10.9 s. A Claude-in-guest smoke through coop's credential proxy succeeded. Baseline for the persistence question (instance up, echo ok, destroy, devices root:kvm 0660) passed on the current boot; a one-shot check runs on the first boot after a WSL restart.",
+   "corrections": [
+    "coop setup's chroot build regrouped /dev/kvm, /dev/vhost-net and /dev/vhost-vsock to the input group (the guest's kvm gid equals the host's input gid); restored to root:kvm 0660.",
+    "The persistence guard first compared boot ids with cmp -s, which treats /proc files as differing (size 0), so the post phase ran once on the same boot; those logs are marked invalid and the guard compares strings."
+   ],
+   "not_run": "Persistence after a WSL restart (needs the user to restart WSL)."
+  },
+  {
+   "slug": "snyk/agent-scan",
+   "category": "protocol-sdks",
+   "version": "0.6.4 (checksum verified); Snyk CLI 1.1307.3 (sha256 verified)",
+   "outcome": "local arm resolved; Snyk-connected arm time-gated",
+   "supported": "Local arm under unshare -rn (no network): the 14 agent-lab skills with a SKILL.md plus two synthetic controls; no findings; skills-ref validated 14/14; guarded Gitleaks found nothing. A parent/leaf path defect silently drops a control passed next to its parent.",
+   "not_run": "The Snyk-connected arm (synthetic controls only, so no project content leaves the host) returned the public tier's daily usage limit at 22:22-22:27Z (an earlier round), 23:11Z and 00:06Z (2026-09-22/23); two runs at 00:05Z and 00:06Z failed locally because the CLI forwards every flag, including a retry limit, to the extension. The locked amendment scheduling the retry cites a 23:3xZ attempt that the logs do not show. One further attempt is scheduled about 24 hours after the 23:11Z block; a further block classifies the arm as gated on the account tier."
+  },
+  {
+   "slug": "guarded runners (ecosystem-bounded-run, gitleaks-guarded) host copies",
+   "category": "isolation",
+   "outcome": "resolved by the owner lane",
+   "supported": "The Codex lane that owns the host copies ported this catalog's PR #82 script fixes (in-scope memory/pids check with refusal 78, setup failure mapped to 78 with workload exit codes passed through, exec-equivalent lookup); the host runner is byte-identical to adoption/tools/ecosystem-bounded-run at 7407bf3. The catalog's guarded-runner tests pointed at the host copies: 20 of 26 pass, of which six (the live-task query tests) exercise the test file's own mocked helper rather than the host scripts; the 6 failures exercise the portable path resolution and no-personal-path rules that the host gitleaks wrapper deliberately does not follow. A real bounded run showed MemoryMax 6 GiB and pids.max 256 inside the scope.",
+   "contradicts": "catalogs/landscape/gap-resolution-20260922.json, layer isolation, the gaps whose blockers say sandbox-runtime (srt) is not present in the environment: srt 0.0.77 is installed on this host's ecosystem PATH and was exercised by the model-endpoint and coop comparisons above.",
+   "corrections": [
+    "Codex's first report counted four ported fixes; three are script fixes, and the fourth (the strict live-task query) exists only in the catalog's tests."
+   ]
+  },
+  {
+   "slug": "claude setup-token revocation",
+   "category": "secrets-credentials",
+   "outcome": "not documented",
+   "supported": "Fetched primary pages (Claude Code authentication, the docs.claude.com CLI authentication page, the support site): none states where a token minted by claude setup-token is listed or revoked; the only documented revocation is /logout for the active login."
+  }
+ ],
+ "workflow_runs": "Selection and first executions in earlier 2026-09-22 workflows; follow-ups in two 2026-09-23 workflows whose executors mostly stopped or declined (workflow stages treat authorization text in their prompts as script output), then ordinary background workers (Sonnet) for the gated runs and separate evidence reviewers (Opus/high) for each result.",
+ "limits": [
+  "One host, one run per arm; small n, descriptive not statistical.",
+  "Undocumented environment variables found only as binary strings are weak evidence and may change without notice.",
+  "nvidia-smi --query-compute-apps returns nothing on this WSL2 build; GPU contention was judged from continuous memory and embedder samplers.",
+  "No macOS execution."
+ ]
+}

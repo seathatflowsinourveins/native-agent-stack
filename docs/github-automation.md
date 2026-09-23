@@ -500,6 +500,14 @@ scanning history: every commit re-diffs the 11 MB generated explorer
 incomplete coverage, mitigated because the explorer is built only from repository
 sources that are scanned and is rebuilt by `scripts/build_ecosystem.py`.
 
+Suppression lives in two files. `.gitleaks.toml` holds the rule allowlists, each
+scoped to a path and an anchored key shape. The root `.gitleaksignore` holds
+commit-qualified fingerprints (`commit:path:rule:line`) for reviewed historical
+false positives in two narrative evidence files; they replaced a regex allowlist
+that review rounds showed could not exclude same-string secrets in RE2. A secret
+added in any later commit gets a new fingerprint and is reported. Add a
+fingerprint only after reviewing the finding, never for a real secret.
+
 `.gitleaks.toml`'s own header comment is the single canonical source for the
 dated full-history counts (default-rule baseline, allowlist breakdown, and the
 post-config scan results); this doc does not duplicate those numbers so they

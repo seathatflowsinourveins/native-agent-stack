@@ -1,0 +1,52 @@
+{
+  "id": "sota-refresh-20260923-pins-tools-agentsview",
+  "component": "agentsview",
+  "repo": "https://github.com/kenn-io/agentsview",
+  "from_pin": "v0.43.0",
+  "to_version": "v0.44.0",
+  "release_published_at": "2026-09-21T13:56:12Z",
+  "release_resolved_via": "gh api repos/kenn-io/agentsview/releases/latest --jq '{tag:.tag_name, published_at:.published_at}'",
+  "preregistration": {
+    "written_at": "2026-09-22T20:30:40-04:00",
+    "written_at_note": "Set from the av_old_help.txt file mtime (20:30:40.71-04:00); finalized alongside the receipt after the run, not strictly prior.",
+    "expectation": "The v0.44.0 linux_amd64 release asset's sha256 matches the published SHA256SUMS entry, and both --version and the first line of --help report the new version with unchanged wording ('local web viewer for AI agent sessions') matching the retained 0.43.0 version-help receipt's shape.",
+    "criteria": "sha256 of downloaded tarball equals the value in the release's SHA256SUMS file; --version exits 0 and reports v0.44.0; --help exits 0 and its first stdout line only differs from the retained receipt by the version number."
+  },
+  "acceptance_check_ref": "evidence/artifacts/claude-upstream-checks-20260921/results.json component id=agentsview (evidence_class: version-help; pin v0.43.0 commands: --version, `--help` first-line-only)",
+  "commands": [
+    "curl -sL -o agentsview_0.44.0_linux_amd64.tar.gz https://github.com/kenn-io/agentsview/releases/download/v0.44.0/agentsview_0.44.0_linux_amd64.tar.gz",
+    "curl -sL -o SHA256SUMS https://github.com/kenn-io/agentsview/releases/download/v0.44.0/SHA256SUMS",
+    "sha256sum agentsview_0.44.0_linux_amd64.tar.gz && grep linux_amd64 SHA256SUMS",
+    "tar xzf agentsview_0.44.0_linux_amd64.tar.gz -C extracted",
+    "bash -o pipefail -c 'agentsview --version; rc=$?; exit $rc'  # retained 0.43.0 binary on PATH",
+    "bash -o pipefail -c './extracted/agentsview --version; rc=$?; exit $rc'",
+    "bash -o pipefail -c 'agentsview --help > av_old_help.txt 2>&1; rc=$?; sed -n \"1p\" av_old_help.txt; exit $rc'  # retained 0.43.0 binary on PATH",
+    "bash -o pipefail -c './extracted/agentsview --help > av_new_help.txt 2>&1; rc=$?; sed -n \"1p\" av_new_help.txt; exit $rc'",
+    "diff av_old_help.txt av_new_help.txt"
+  ],
+  "results": {
+    "sha256_downloaded": "037ea7a46d52e06b20363b4aa7cd7f28e32f31d8215803d6e9a0c96bac5818e3",
+    "sha256_published": "037ea7a46d52e06b20363b4aa7cd7f28e32f31d8215803d6e9a0c96bac5818e3",
+    "sha256_match": true,
+    "old_0_43_0_version_exit": 0,
+    "old_0_43_0_version": "agentsview v0.43.0 (commit 9be7745ad1906ee24e04eb05bb86c872ef0939a1, built 2026-09-14T02:30:01Z)",
+    "new_0_44_0_version_exit": 0,
+    "new_0_44_0_version": "agentsview v0.44.0 (commit 413a87f7bfbd67b2815b1119ac51abc1efbeeaba, built 2026-09-21T12:48:49Z)",
+    "old_0_43_0_help_exit": 0,
+    "old_0_43_0_help_line1": "agentsview v0.43.0 - local web viewer for AI agent sessions",
+    "new_0_44_0_help_exit": 0,
+    "new_0_44_0_help_line1": "agentsview v0.44.0 - local web viewer for AI agent sessions",
+    "help_line1_diff": "First line differs only by version number, matching the retained receipt's version-help scope (evidence/artifacts/claude-upstream-checks-20260921/results.json:1051-1084, id=agentsview). Both av_old_help.txt (0.43.0) and av_new_help.txt (0.44.0) are copied (not moved -- the originals remained in the ephemeral session /tmp) into $HOME/.cache/sota-refresh-20260923/pins-tools/agentsview/ with their exact original bytes (sha256 6b749c0448188537cfc8891ceefcea9f42ca15bf4a5f99ea68f128a1af7cd406 and c54e7d9fb8e0ac4e45ead1abbd846d180c96389596033e06322c820103908987 respectively, mtime 2026-09-22T20:30:40-04:00 for both). They are additionally committed to this repository at evidence/artifacts/sota-refresh-20260923/pins-tools/raw/av_old_help.txt and raw/av_new_help.txt (cp -p, mtime preserved), with one line each rewritten: agentsview's own --help text contains a built-in example config value for sync_include_cwd_prefixes using a home-directory-shaped placeholder baked into the tool's help output (username 'me', not a path from this host), rewritten to this repository's 'example' placeholder convention; sha256 after that rewrite is 34e1ece9fd92f99d355eaba761796140fc7f0e672bc764600078448033561380 (old) and c2c7d42049d5097c8615765add6b9590cebc280cd6e42a7de6a3f5d1c5847e5e (new). Both sides of the diff are independently re-verifiable from a stored file; the committed raw/ copies differ from the cache-prefix originals only in that one placeholder line.",
+    "help_full_body_diff": "The full --help bodies (beyond line 1, which is outside the retained receipt's captured scope) are NOT identical: 0.44.0 adds a `clickhouse` command group (push/serve/service/status), an `export conversations` and `export range` subcommand, an `insight` command group (generate/get/list), and new CLINE_DIR/CODEBUDDY_DIR environment variables not present in 0.43.0's --help. This is new functional surface, not a wording-only change, and is reported here since it goes beyond what the preregistered criteria (first-line wording match) checked."
+  },
+  "verdict": "qualified",
+  "evidence_class": "native_proven",
+  "limits": [
+    "Matches the retained receipt's evidence class exactly (version-help): did not run a full sync/serve E2E against real session data, matching the scope of the accepted prior receipt rather than exceeding it.",
+    "Did not install the binary onto PATH; ran it from an extracted directory under the unit-owned cache prefix.",
+    "0.44.0 adds new subcommands (clickhouse push/serve/service/status, export conversations/range, insight generate/get/list) beyond what --version/--help first-line parity checks; none of these were exercised functionally, so this receipt does not qualify the new surface, only confirms the previously-accepted version-help check still passes.",
+    "Both av_old_help.txt (0.43.0) and av_new_help.txt (0.44.0) are now stored under the cache prefix and committed to this repository's evidence/artifacts/sota-refresh-20260923/pins-tools/raw/ directory with sha256 and mtime recorded in results.help_line1_diff; the full-body diff recorded in results.help_full_body_diff is independently re-verifiable from these stored files."
+  ],
+  "checked_at": "2026-09-22T20:30:40-04:00",
+  "checked_at_note": "Set from the later of av_old_help.txt (20:30:40.71-04:00) and av_new_help.txt (20:30:40.76-04:00) file mtimes -- av_new_help.txt is the actual last check for this component and both now exist as stored files; a prior version of this note cited only the older capture. The two mtimes round to the same displayed second (20:30:40-04:00)."
+}

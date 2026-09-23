@@ -1,0 +1,46 @@
+{
+  "id": "sota-refresh-20260923-pins-mem-markitdown",
+  "component": "markitdown",
+  "repository": "https://github.com/microsoft/markitdown",
+  "from_pin": "0.1.7",
+  "to_version": "0.1.8",
+  "release_published_at": "2026-09-21T21:22:51Z",
+  "fix_round": {
+    "reason": "Review found the first pass converted this worktree's README.md (21362 bytes) instead of either the retained receipt's original conversion fixture or the retained upstream directive fixture fixtures/greeting.html (results.json:4553), yet still called the verdict a reproduction.",
+    "corrective_action": "Re-ran markitdown 0.1.8 (same isolated venv) against fixtures/greeting.html, which exists at this exact relative path in this worktree (474 bytes, a static HTML fixture used elsewhere in this repo's own e2e checks) and is the fixture the retained receipt's install_conformance check names by that exact path. Kept the README.md conversion as a secondary, explicitly-labelled non-identical check for the >=100-byte assertion class only."
+  },
+  "preregistration": {
+    "written_at": "2026-09-23T00:40:00Z",
+    "note": "Written before the fix-round commands below (the first pass's 00:26:30Z preregistration was written concurrently with, essentially indistinguishable in time from, its own results and is superseded here).",
+    "expectation": "0.1.8 (already installed in the isolated uv venv from the first pass) converts fixtures/greeting.html -- the retained receipt's named upstream-directive fixture (results.json:4553) -- to non-empty Markdown text with exit 0, and separately reproduces the >=100-byte assertion class on a local document (this worktree's README.md, not byte-identical to the original fixture but the same command shape and assertion).",
+    "criteria": "pass for the identical-fixture leg: `markitdown fixtures/greeting.html` exits 0 and produces plausible extracted text (the fixture's visible strings: 'Local browser command check', 'Name', 'Greet', 'Ready'). pass for the byte-threshold leg: README.md conversion exits 0 and produces >=100 bytes. fail: non-zero exit on either, or missing expected text from the greeting.html conversion."
+  },
+  "acceptance_check_ref": "evidence/artifacts/claude-repository-evidence-20260921/results.json (component id=markitdown, commands: `markitdown --version` asserted contains \"0.1.7\"; `markitdown README.md > ... && wc -c` asserted int >= 100, observed 2191; install_conformance at results.json:4553 names `markitdown fixtures/greeting.html -o ...` as the upstream-directive fixture)",
+  "isolation": {
+    "prefix": "$HOME/.cache/sota-refresh-20260923/pins-mem/venvs/markitdown-0.1.8",
+    "install": "uv venv + uv pip install markitdown==0.1.8 into a unit-owned venv, never the shared tools/markitdown-0.1.7 uv-tool prefix the current pin uses"
+  },
+  "commands": [
+    "gh api repos/microsoft/markitdown/releases/latest",
+    "uv venv $HOME/.cache/sota-refresh-20260923/pins-mem/venvs/markitdown-0.1.8 --python 3.13",
+    "ecosystem-bounded-run uv pip install --python <venv>/bin/python markitdown==0.1.8",
+    "<venv>/bin/markitdown --version",
+    "<venv>/bin/markitdown fixtures/greeting.html -o $TMP/greeting.md",
+    "<venv>/bin/markitdown README.md > $TMP/readme.md && wc -c < $TMP/readme.md"
+  ],
+  "results": {
+    "latest_release": "tag_name=v0.1.8, published_at=2026-09-21T21:22:51Z.",
+    "install": "uv pip install succeeded (markitdown==0.1.8 plus dependencies: magika 0.6.3, markdownify 1.2.3, onnxruntime 1.30.0, etc.).",
+    "version_check": "`markitdown --version` -> `markitdown 0.1.8`. Assertion 'contains \"0.1.8\"' passed.",
+    "greeting_html_conversion_check": "`markitdown fixtures/greeting.html -o greeting.md` exit 0, produced 76 bytes of output containing the fixture's visible text ('Local browser command check' as an H1, 'Ready' as body text). This is the exact retained upstream-directive fixture named at results.json:4553 (same relative path, same 474-byte input), so this leg is a byte-identical-fixture reproduction, not merely 'same class'. 76 bytes is below the unrelated README fixture's >=100-byte threshold, which is expected: greeting.html is a much smaller source document (474 bytes vs. a multi-KB README) and the assertion for this leg is 'exits 0 and produces the fixture's expected text', not the byte-count threshold.",
+    "readme_conversion_check": "`markitdown README.md` (this worktree's README, NOT byte-identical to the original run's README, kept only as a secondary check for the >=100-byte assertion class) produced 21363 bytes of output, exit 0. Assertion 'int gte 100' passed (retained receipt observed 2191 bytes on a different README; both satisfy the same threshold, but this leg alone would not have been a valid fixture reproduction, which is why greeting_html_conversion_check above was added)."
+  },
+  "verdict": "qualified",
+  "evidence_class": "native_proven",
+  "limits": [
+    "The greeting.html leg reproduces the retained receipt's named upstream-directive fixture exactly (same path, same bytes); the README leg is a same-assertion-class but non-identical-fixture supplementary check only, and is labelled as such rather than counted as the primary reproduction.",
+    "Only the commands the retained receipt recorded (version, HTML/Markdown conversion(s)) were re-run; markitdown's broader PDF/Office/OCR surface remains out of scope per the retained receipt's own noted boundary.",
+    "No network document sources or credentials were used; local-only conversion."
+  ],
+  "checked_at": "2026-09-23T00:40:30Z"
+}

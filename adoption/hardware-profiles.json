@@ -1,0 +1,179 @@
+{
+  "$schema_id": "adoption/hardware-profiles.json",
+  "id": "hardware-profiles-20260923",
+  "description": "Declarative hardware-dependent layer tiers and per-host profiles for scripts/hardware_profile.py. Thresholds are sizing rules, not measurements; each host entry records where its numbers came from (native_proven measurement vs. labelled projection) per docs/acceptance-evidence-policy.md.",
+  "layers": {
+    "workflow_concurrency": {
+      "rule": "min(16, CPUs - reserved_cores), per agent-lab AGENTS.md's per-run concurrent-agent sizing",
+      "cap_default": 16,
+      "reserved_cores": 2
+    },
+    "local_generation_model": {
+      "description": "Local generation model tier by GPU VRAM (discrete NVIDIA) or unified memory (Apple Silicon). Tiers are conservative floors for a quantized (4-bit/8-bit) model plus KV cache headroom, not a specific model's exact footprint.",
+      "macos_unified_gpu_working_set_fraction": 0.6,
+      "macos_unified_gpu_working_set_fraction_note": "Labelled assumption, not a measurement: macOS reserves unified memory for the OS, foreground apps, and (on this project's configured local profile) a concurrent embedding/semantic-RAG stack, and caps the Metal working set below total RAM. 0.6 is a conservative floor, not Apple's documented default (undocumented and version-dependent); treat the resulting vram_gb as an upper bound on what a generation model can reliably claim, not a guarantee.",
+      "tiers": [
+        {
+          "name": "cpu-only",
+          "min_vram_gb": 0,
+          "note": "No GPU/unified-memory tier met; CPU inference only, small models."
+        },
+        {
+          "name": "small-8b-q4",
+          "min_vram_gb": 8,
+          "note": "~7-8B parameter models at 4-bit quantization fit with headroom."
+        },
+        {
+          "name": "mid-14b-q4-or-8b-q8",
+          "min_vram_gb": 12,
+          "note": "~13-14B at 4-bit, or ~7-8B at 8-bit."
+        },
+        {
+          "name": "large-32b-q4",
+          "min_vram_gb": 20,
+          "note": "~30-32B at 4-bit quantization, e.g. a 24GB laptop GPU."
+        },
+        {
+          "name": "xl-70b-q4-or-32b-q8",
+          "min_vram_gb": 40,
+          "note": "~65-70B at 4-bit, or ~32B at 8-bit."
+        },
+        {
+          "name": "unified-70b-plus",
+          "min_vram_gb": 48,
+          "note": "Apple unified memory hosts with enough headroom for OS + app usage alongside a large model."
+        }
+      ]
+    },
+    "embedding_semantic_rag": {
+      "description": "Fit for the SocratiCode embedding stack, a local Qdrant instance, and a local vLLM/embedding server sharing host RAM (docs/native-rag-runtime.md).",
+      "tiers": [
+        {
+          "name": "unsupported",
+          "min_ram_gb": 0,
+          "note": "Below the floor for embedding + Qdrant + vLLM concurrently; run remote or sequentially."
+        },
+        {
+          "name": "light",
+          "min_ram_gb": 16,
+          "note": "Small collections, one service at a time."
+        },
+        {
+          "name": "standard",
+          "min_ram_gb": 32,
+          "note": "SocratiCode + Qdrant + a small local embedding model concurrently."
+        },
+        {
+          "name": "full",
+          "min_ram_gb": 48,
+          "note": "SocratiCode + Qdrant + vLLM serving an embedding or small generation model concurrently, per this project's configured local profile."
+        },
+        {
+          "name": "headroom",
+          "min_ram_gb": 96,
+          "note": "Large collections and multiple concurrent local services with headroom for the rest of the workflow."
+        }
+      ]
+    },
+    "ecosystem_bounded_run": {
+      "description": "Suggested override values for the ECOSYSTEM_JOB_MEMORY_HIGH and ECOSYSTEM_JOB_MEMORY_MAX environment variables read by /home/example/codex-ecosystem/bin/ecosystem-bounded-run, which passes them straight through as systemd MemoryHigh/MemoryMax (wrapper defaults 4G/6G). Those defaults are the WSL-stability containment floor from docs/tasks/2026-09-22-wsl-stability-fix.md; this rule only raises the ceiling for hosts with RAM headroom, is bounded well below total RAM, and is never applied automatically -- exporting the two named variables is a deliberate per-host choice.",
+      "default_high_gb": 4,
+      "default_max_gb": 6,
+      "max_fraction_of_ram": 0.25,
+      "high_to_max_ratio": 0.667,
+      "ceiling_max_gb": 32
+    }
+  },
+  "hosts": [
+    {
+      "id": "this-host-20260923",
+      "label": "This host (measured)",
+      "evidence_class": "native_proven",
+      "evidence": "evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json",
+      "note": "Actual scripts/hardware_profile.py output for the host this unit ran on."
+    },
+    {
+      "id": "wsl-workstation-128gb-projected",
+      "label": "128 GB WSL workstation (labelled projection)",
+      "evidence_class": "labelled_projection",
+      "assumptions": {
+        "platform": "wsl",
+        "cores": 32,
+        "physical_ram_gb": 128,
+        "wslconfig_memory_gb": 100,
+        "ram_gb_proc_meminfo_projected": 99,
+        "gpu_vram_gb": 24
+      },
+      "sizing_arithmetic": {
+        "workflow_concurrency_cap": "min(16, 32 - 2) = 16",
+        "local_generation_model_tier": "vram_gb=24 >= 20 -> large-32b-q4",
+        "effective_ram_gb": "script prefers measured /proc/meminfo over .wslconfig's configured ceiling; projected proc_meminfo=99 (wslconfig_memory_gb=100 minus ~1GB VM overhead, as observed on this-host-20260923: wslconfig=48 -> meminfo=47)",
+        "embedding_semantic_rag_tier": "ram_gb=99 >= 96 -> headroom",
+        "ecosystem_job_memory_max_gb": "max(6, round(99*0.25,1)=24.8), min(24.8, 32) = 24.8",
+        "ecosystem_job_memory_high_gb": "round(24.8*0.667,1) = 16.5"
+      },
+      "note": "Projected, not measured on this host; a fresh run of scripts/hardware_profile.py on that workstation is required before treating these numbers as native_proven."
+    },
+    {
+      "id": "macos-arm64-48gb-projected",
+      "label": "macOS arm64, 48 GB unified memory (labelled projection)",
+      "evidence_class": "labelled_projection",
+      "assumptions": {
+        "platform": "macos",
+        "arm64": true,
+        "cores": 12,
+        "unified_memory_gb": 48
+      },
+      "sizing_arithmetic": {
+        "workflow_concurrency_cap": "min(16, 12 - 2) = 10",
+        "local_generation_model_tier": "vram_gb(unified)=round(48*0.6,1)=28.8 >= 20 -> large-32b-q4",
+        "embedding_semantic_rag_tier": "ram_gb=48 >= 48 -> full",
+        "concurrent_use_warning": "set: unified memory is shared between the large-32b-q4 generation budget and the full RAG tier budget; this host cannot run both at their tier ceiling concurrently without separate verification",
+        "ecosystem_job_memory_max_gb": "max(6, round(48*0.25,1)=12.0), min(12.0, 32) = 12.0",
+        "ecosystem_job_memory_high_gb": "round(12.0*0.667,1) = 8.0"
+      },
+      "note": "Projected; a 48 GB Apple Silicon host still shares unified memory with the OS, every foreground app, and (per the concurrent_use_warning) the semantic-RAG stack, so the generation tier is scaled by the labelled macos_unified_gpu_working_set_fraction (0.6) rather than treating all 48 GB as usable VRAM."
+    },
+    {
+      "id": "macos-arm64-64gb-projected",
+      "label": "macOS arm64, 64 GB unified memory (labelled projection)",
+      "evidence_class": "labelled_projection",
+      "assumptions": {
+        "platform": "macos",
+        "arm64": true,
+        "cores": 14,
+        "unified_memory_gb": 64
+      },
+      "sizing_arithmetic": {
+        "workflow_concurrency_cap": "min(16, 14 - 2) = 12",
+        "local_generation_model_tier": "vram_gb(unified)=round(64*0.6,1)=38.4 >= 20 -> large-32b-q4",
+        "embedding_semantic_rag_tier": "ram_gb=64 >= 48 -> full",
+        "concurrent_use_warning": "set: same shared-pool caveat as macos-arm64-48gb-projected",
+        "ecosystem_job_memory_max_gb": "max(6, round(64*0.25,1)=16.0), min(16.0, 32) = 16.0",
+        "ecosystem_job_memory_high_gb": "round(16.0*0.667,1) = 10.7"
+      },
+      "note": "Projected; see macos-arm64-48gb-projected note on shared unified memory and the working-set fraction."
+    },
+    {
+      "id": "github-macos-15-arm64-runner",
+      "label": "GitHub-hosted macos-15 arm64 runner",
+      "evidence_class": "native_proven",
+      "evidence": "GitHub Actions run 35808320867 (hardware-profile-smoke.yml on PR #87, 2026-09-23): scripts/hardware_profile.py on macos-15 measured Apple M1 (Virtual), 3 cores, 7.0 GB unified memory, arm64; the MLX smoke (mlx-community/Qwen2.5-0.5B-Instruct-4bit at revision a5339a4131f135d0fdc6a5c8b5bbed2753bbe0f3, hash-locked mlx-lm) generated 32 tokens from a 6-token prompt, peak memory 0.288 GB, 1.30 s end to end, reported generation rate 146.57 tokens/s. Artifacts: evidence/artifacts/sota-refresh-20260923/hw-profiles/hosted-run-35808320867/.",
+      "note": "A disposable 7 GB virtualized M1 runner, not a 48/64 GB workstation: it proves the macOS code path, the arm64 hash-locked MLX install and Metal generation, not the unified-memory tiers, which stay labelled projections.",
+      "measured": {
+        "cpu_brand": "Apple M1 (Virtual)",
+        "cores": 3,
+        "unified_memory_gb": 7.0,
+        "arm64": true,
+        "mlx_smoke": {
+          "model": "mlx-community/Qwen2.5-0.5B-Instruct-4bit",
+          "revision": "a5339a4131f135d0fdc6a5c8b5bbed2753bbe0f3",
+          "generation_tokens": 32,
+          "tokens_per_second": 146.57,
+          "elapsed_seconds": 1.3029,
+          "peak_memory_gb": 0.288
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "id": "sota-refresh-20260923-hw-profiles-mlx-lm-hash-lock",
+  "component": "mlx-lm (tools/mlx-smoke/requirements.lock.txt pin) plus .github/workflows/hardware-profile-smoke.yml's macOS job (uv install/venv/pip-install sequencing); this is a fix-round receipt superseding the first mlx-lm-hash-lock.json after an independent Opus review found a blocker (venv activation breaks uv discovery) and two major findings (unreproducible redundant-compile diff; unverified uv download) in that job",
+  "from_pin": "0.30.2 (unchanged; only the workflow's use of uv and the compile invocation changed)",
+  "to_version": "0.30.2",
+  "release_published_at": "unchanged from the prior receipt: ml-explore/mlx-lm's newest tagged GitHub release remains v0.31.3 (published 2026-04-22T07:43:57Z); uv's resolver still does not select it for aarch64-apple-darwin / Python 3.12",
+  "preregistration": {
+    "written_at": "2026-09-23T00:45:00Z",
+    "written_after_fix_note": "Written after implementing the review's three fixes below and before re-running the local (non-macOS) parts of the acceptance check; the macOS job itself still cannot be executed from this Linux worktree, so its blocker fix is verified by static re-inspection of the exact commands, not by an actual run.",
+    "expectation": "(1) Blocker fix: the macOS job's uv install, venv creation and pip install steps no longer activate the venv or call `python3 -m uv`; instead uv is a standalone downloaded binary invoked directly ($UV), and `uv pip install --python <venv>/bin/python3 --require-hashes ...` targets the venv's interpreter without needing it active or needing uv importable inside it. (2) Reproducibility fix: both the committed lock generation and the CI job's diff-check recompile now pass `--exclude-newer 2026-09-23T00:00:00Z`, so a transitive dependency publishing a new release after that cutoff cannot change the resolved set and fail the diff on an unrelated PR; re-running the exact same compile command with this flag must still produce a lock file byte-identical to the committed one (no version changes at this cutoff). (3) Unverified-download fix: uv is now downloaded from the same GitHub Releases host as validate.yml's Linux job, verified against a SHA-256 fetched independently from GitHub's own published checksum file for the aarch64-apple-darwin archive, using shasum -a 256 --check (the macOS-native equivalent of validate.yml's sha256sum --check).",
+    "criteria": "actionlint and zizmor --offline stay clean on the edited workflow; a local (Linux) `uv pip compile ... --exclude-newer 2026-09-23T00:00:00Z --no-header` re-run of tools/mlx-smoke/requirements.in is byte-identical to the committed tools/mlx-smoke/requirements.lock.txt, run twice to confirm determinism; the downloaded uv-aarch64-apple-darwin.tar.gz's SHA-256 matches the value now embedded in the workflow, fetched independently from https://github.com/astral-sh/uv/releases/download/0.12.17/uv-aarch64-apple-darwin.tar.gz.sha256."
+  },
+  "acceptance_check_ref": "This unit's own prior mlx-lm-hash-lock.json receipt (git history) recorded the original pin and the reproducibility bug this review caught a second, more serious instance of; forward acceptance is still the macOS job in .github/workflows/hardware-profile-smoke.yml, not yet executed (requires a macos-15 runner; no macOS host available in this worktree).",
+  "commands": [
+    "curl -fsSL https://github.com/astral-sh/uv/releases/download/0.12.17/uv-aarch64-apple-darwin.tar.gz.sha256 (fetched the checksum file GitHub publishes for that exact archive)",
+    "curl -fsSL --retry 3 https://github.com/astral-sh/uv/releases/download/0.12.17/uv-aarch64-apple-darwin.tar.gz --output uv-mac.tar.gz && sha256sum uv-mac.tar.gz (confirmed the fetched checksum matches the actual archive bytes)",
+    "uv pip compile tools/mlx-smoke/requirements.in --python-platform aarch64-apple-darwin --python-version 3.12 --generate-hashes --no-header --exclude-newer 2026-09-23T00:00:00Z -o <tmp>/lock1.txt (run once)",
+    "uv pip compile ... (identical command) -o <tmp>/lock2.txt (run again, from repo root, path matching CI's invocation)",
+    "diff -q <tmp>/lock1.txt <tmp>/lock2.txt; diff -q <tmp>/lock3.txt tools/mlx-smoke/requirements.lock.txt (reproducibility and no-drift checks)",
+    "pip download equivalent via curl+tar of the mlx_lm 0.30.2 sdist from PyPI, to inspect mlx_lm/utils.py's load() signature and mlx_lm/generate.py's stream_generate/GenerationResponse fields directly (confirms load() accepts revision= and stream_generate yields generation_tps/peak_memory/generation_tokens, used to fix run_smoke.py's tokens/s measurement -- a separate review finding)",
+    "curl -fsSL https://huggingface.co/api/models/mlx-community/Qwen2.5-0.5B-Instruct-4bit/revision/a5339a4131f135d0fdc6a5c8b5bbed2753bbe0f3 (confirmed the pinned revision SHA exists for that exact model)",
+    "actionlint .github/workflows/hardware-profile-smoke.yml",
+    "zizmor --offline --no-config --no-ignores --no-progress --persona regular --strict-collection --format json .github/workflows/hardware-profile-smoke.yml"
+  ],
+  "results": [
+    "GitHub's published SHA-256 for uv-aarch64-apple-darwin.tar.gz (0.12.17) is 85f00cbdc6dd3e97eba4c31b4d014375a9fdfe8f570023b84e5102fc3456896b; `sha256sum` on the actually-downloaded archive matched exactly. This value is now the UV_SHA256 embedded in the workflow.",
+    "`uv pip compile ... --exclude-newer 2026-09-23T00:00:00Z --no-header` (from repo root, matching tools/mlx-smoke/requirements.in's path as CI invokes it) is byte-identical across two independent runs and byte-identical to the already-committed tools/mlx-smoke/requirements.lock.txt: adding --exclude-newer changed no resolved version at this cutoff date, only froze the resolution against future churn.",
+    "mlx_lm/utils.py (0.30.2 sdist, inspected directly): `def load(path_or_hf_repo, tokenizer_config=None, model_config=None, adapter_path=None, lazy=False, return_config=False, revision=None)` -- confirms load() accepts revision= as used by run_smoke.py.",
+    "mlx_lm/generate.py (same sdist): `stream_generate` yields `GenerationResponse` with `prompt_tokens`, `generation_tokens`, `generation_tps`, `peak_memory` (GB, /1e9) computed from mlx-lm's own generation-loop timing -- used to replace run_smoke.py's prior wall-clock-divided-by-re-encoded-text estimate (labelled an 'upper-bound estimate' in the code comment it replaces) with mlx-lm's own reported throughput and peak memory.",
+    "Hugging Face's revision API confirms sha a5339a4131f135d0fdc6a5c8b5bbed2753bbe0f3 exists for mlx-community/Qwen2.5-0.5B-Instruct-4bit (lastModified 2024-09-18T18:39:51.000Z) -- the pinned revision in the workflow is a real, resolvable commit, not a typo.",
+    "actionlint: clean (no output, exit 0) on the edited workflow.",
+    "zizmor --offline ...: `[]` (no findings) on the edited workflow."
+  ],
+  "verdict": "not_comparable",
+  "evidence_class": "local_integration",
+  "limits": [
+    "All three review-driven fixes to the macOS job (no venv activation, --exclude-newer, verified uv download) are verified by static re-inspection, a byte-identity check run on Linux targeting the macOS platform via uv's --python-platform cross-resolution, and offline zizmor/actionlint -- none of this is an actual execution of the macOS job itself. The blocker finding ('uv cannot be imported inside an activated venv without system-site-packages') was diagnosed from mlx-lm/uv's own documented behavior and the exact commands in the prior workflow, not reproduced by running the old workflow to observe the failure.",
+    "'not_comparable' because there is still no prior, distinct mlx-lm version pin in this repository to compare 0.30.2 against; this receipt fixes how the pin is applied and verified, not the pin itself.",
+    "The mlx_lm source inspection used the sdist downloaded directly from PyPI on this (Linux, x86_64) host; mlx_lm itself was not imported or executed anywhere, since it depends on Apple's mlx package (macOS/Metal only)."
+  ],
+  "checked_at": "2026-09-23T00:52:00Z"
+}

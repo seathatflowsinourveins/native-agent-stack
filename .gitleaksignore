@@ -1,0 +1,81 @@
+# Exact per-finding fingerprints for reviewed historical false positives, read
+# by gitleaks by default from this file at the repo root (`-i`/
+# `--gitleaks-ignore-path` defaults to "."; see `gitleaks --help`).
+#
+# This replaces the prior in-config regex allowlist ("Git commit/tree ids
+# referenced in blind-catalog-convergence review narrative", duplicated under
+# the `generic-api-key` and `sourcegraph-access-token` rules in
+# .gitleaks.toml) after four review rounds (Codex cross-family review of PR
+# #83; the Opus evidence review of this branch, not codex-review-72; a
+# further blind Codex cross-family review of PR #83; a blind Opus/Codex
+# evidence review of that round-3 fix) each found the prose-narrative regex
+# allowlist leaky in a new way:
+#   - round 2: an unrelated key:value pair sharing the physical line was
+#     wrongly exempted.
+#   - round 3: a secret-shaped substring inside the SAME JSON string as the
+#     commit reference was still exempted.
+#   - round 4: the widened marker-hex length window re-exempted a marker word
+#     used as ordinary prose (e.g. "source"/"pinned") immediately followed by
+#     an unrelated 41-64-char hex secret.
+#   - a final review (codex-review-83b) found the marker's
+#     `[\sa-zA-Z0-9_./:,\-]{0,25}` separator can itself absorb leading hex
+#     characters (so `"detail": "source <64hex>"` still passes as a false
+#     "short abbreviated hash" match), and that a non-hex-shaped secret
+#     sharing the same JSON string as a real commit/pin/tree/source reference
+#     remains exempted in full (documented as an open residual, not closed,
+#     in the round-3/round-4 regexes this file replaces).
+# RE2 (gitleaks' regex engine) has no lookaround or backreferences, so a
+# regex-based fix cannot close these gaps: an allowlist rule that exempts
+# "a commit id preceded by a marker word, anywhere in the string" cannot also
+# assert "and nothing else non-hex/non-decimal shares that string" without a
+# negative lookahead RE2 does not support.
+#
+# Fingerprints below are exact `commit:path:rule:line` entries (gitleaks' own
+# git-mode fingerprint format), generated once, by hand, against each of this
+# repository's own reviewed narrative lines. A fingerprint only matches its
+# exact commit, so any secret added in a LATER commit -- even on the exact
+# same line number in the same file -- has a different fingerprint and is
+# still detected; this is strictly narrower than the regex allowlist it
+# replaces, which matched by shape/context on any commit that touched a
+# matching line.
+#
+# Generated 2026-09-22 with the guarded, memory-capped `gitleaks` launcher on
+# PATH (never the underlying binary, never with raised limits) using a scratch
+# copy of .gitleaks.toml with both narrative-allowlist `[[rules.allowlists]]`
+# blocks removed, confirming every remaining finding fell inside the two
+# narrative files before any fingerprint was recorded here:
+#   gitleaks git . --config <scratch-config-without-narrative-allowlists> \
+#     --max-target-megabytes 2 --redact --no-banner --exit-code 0 \
+#     --log-opts=HEAD --report-format json --report-path git.json
+#   gitleaks dir . --config <scratch-config-without-narrative-allowlists> \
+#     --max-target-megabytes 2 --redact --no-banner --exit-code 0 \
+#     --report-format json --report-path dir.json
+# (git.json: 15 findings / 14 unique fingerprints, all in the two narrative
+# files below; dir.json: 0 findings.)
+#
+# Rule: add a fingerprint here ONLY for a reviewed false positive (a narrative
+# reference to a commit/tree id, never an actual live credential). Never add a
+# fingerprint for a real secret. A finding for a real secret must be rotated
+# and removed from history, not ignored.
+#
+# Another branch may add its own .gitleaksignore entries for an unrelated
+# finding; this file is kept easy to merge -- one fingerprint per line,
+# grouped under a comment naming the source file.
+
+# evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json
+6568523f27e718a86251d041106c53e765a8325d:evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json:sourcegraph-access-token:338
+6568523f27e718a86251d041106c53e765a8325d:evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json:sourcegraph-access-token:424
+6568523f27e718a86251d041106c53e765a8325d:evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json:sourcegraph-access-token:462
+6568523f27e718a86251d041106c53e765a8325d:evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json:sourcegraph-access-token:468
+6568523f27e718a86251d041106c53e765a8325d:evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json:sourcegraph-access-token:525
+6568523f27e718a86251d041106c53e765a8325d:evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json:sourcegraph-access-token:682
+6568523f27e718a86251d041106c53e765a8325d:evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json:sourcegraph-access-token:1439
+6568523f27e718a86251d041106c53e765a8325d:evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json:sourcegraph-access-token:1445
+6568523f27e718a86251d041106c53e765a8325d:evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json:sourcegraph-access-token:2567
+6568523f27e718a86251d041106c53e765a8325d:evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json:sourcegraph-access-token:2915
+6568523f27e718a86251d041106c53e765a8325d:evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json:sourcegraph-access-token:2950
+
+# evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger.json
+6568523f27e718a86251d041106c53e765a8325d:evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger.json:sourcegraph-access-token:9360
+6568523f27e718a86251d041106c53e765a8325d:evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger.json:sourcegraph-access-token:10815
+6568523f27e718a86251d041106c53e765a8325d:evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger.json:sourcegraph-access-token:10890
