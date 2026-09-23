@@ -113,6 +113,17 @@ def gap_counts_by_layer(gap_crosswalk_doc: dict | None) -> dict[tuple[str, str],
     return counts
 
 
+def open_gap_counts_by_layer(gap_crosswalk_doc: dict | None) -> dict[tuple[str, str], int]:
+    """Open gaps of any category (the crosswalk's status "open"), so a layer whose only open gap
+    waits on a login, hardware or a user decision is not shown as having none."""
+    counts: dict[tuple[str, str], int] = {}
+    for layer in (gap_crosswalk_doc or {}).get("layers", []) or []:
+        if isinstance(layer, dict) and isinstance(layer.get("catalog"), str) and isinstance(layer.get("layer_id"), str):
+            counts[(layer["catalog"], layer["layer_id"])] = sum(
+                1 for gap in layer.get("gaps", []) or [] if isinstance(gap, dict) and gap.get("status") == "open")
+    return counts
+
+
 def repository_to_component_id(stack_doc: dict | None) -> dict[str, str]:
     mapping: dict[str, str] = {}
     for component in (stack_doc or {}).get("components", []) or []:
@@ -218,7 +229,7 @@ def build_alternative(alternative: dict, repo_to_component: dict[str, str], rece
 
 def build_row(root: Path, catalog: str, layer: dict, decisions: dict[str, list[dict]],
               gap_counts: dict[tuple[str, str], int], receipts_summary: dict,
-              repo_to_component: dict[str, str]):
+              repo_to_component: dict[str, str], open_gap_counts: dict[tuple[str, str], int] | None = None):
     layer_id = layer.get("layer_id")
     independent_review = classify_independent_review(layer)
     adjudication_ref = find_adjudication_ref(root, catalog, layer_id, layer)
@@ -251,6 +262,7 @@ def build_row(root: Path, catalog: str, layer: dict, decisions: dict[str, list[d
         "independent_review": independent_review,
         "adjudication_ref": adjudication_ref,
         "open_executable_now_gaps": gap_counts.get((catalog, layer_id)),
+        "open_gaps": (open_gap_counts or {}).get((catalog, layer_id)),
         "winners": winners,
         "alternatives": alternatives,
     }
@@ -265,6 +277,7 @@ def build_document(root: Path):
     decisions = decisions_by_component(decisions_doc)
     gap_doc = load_optional(root, GAP_CROSSWALK_FILE)
     gap_counts = gap_counts_by_layer(gap_doc)
+    open_gap_counts = open_gap_counts_by_layer(gap_doc)
     stack_doc = load_optional(root, STACK_FILE)
     repo_to_component = repository_to_component_id(stack_doc)
     receipts_summary = host_receipts.build_summary(root)
@@ -279,7 +292,7 @@ def build_document(root: Path):
             if not isinstance(layer, dict):
                 continue
             row, row_flip_violations = build_row(
-                root, catalog, layer, decisions, gap_counts, receipts_summary, repo_to_component,
+                root, catalog, layer, decisions, gap_counts, receipts_summary, repo_to_component, open_gap_counts,
             )
             rows.append(row)
             flip_violations.extend(row_flip_violations)

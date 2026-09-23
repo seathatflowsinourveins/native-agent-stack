@@ -6,7 +6,7 @@ entry or component it uses instead of repeating its command. Read
 native verification tiers; this page only sequences the steps for a machine
 that has never run this stack.
 
-**Step 0, before anything below: get the catalog at its attested release tag.**
+**Step 0, before anything below: get the catalog at its attested release tag.** After checkout, follow the documents in your checkout: main may already describe steps that are not released yet (`python3 scripts/release_due.py` lists them).
 ```sh
 git clone https://github.com/seathatflowsinourveins/native-agent-stack.git
 cd native-agent-stack

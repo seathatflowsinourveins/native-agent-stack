@@ -37,6 +37,7 @@
       "independent_review": "dual_lane_same_winner",
       "layer_id": "agent-sdks",
       "open_executable_now_gaps": 12,
+      "open_gaps": 14,
       "title": "Agent SDKs and runtime workers",
       "verdict_status": "recorded",
       "winners": [
@@ -123,6 +124,7 @@
       "independent_review": "dual_lane_same_winner",
       "layer_id": "ci-supply-chain",
       "open_executable_now_gaps": 9,
+      "open_gaps": 14,
       "title": "CI and supply chain",
       "verdict_status": "recorded",
       "winners": [
@@ -261,6 +263,7 @@
       "independent_review": "dual_lane_adjudicated",
       "layer_id": "code-navigation",
       "open_executable_now_gaps": 2,
+      "open_gaps": 5,
       "title": "Code navigation",
       "verdict_status": "recorded",
       "winners": [
@@ -329,6 +332,7 @@
       "independent_review": "dual_lane_adjudicated",
       "layer_id": "document-retrieval",
       "open_executable_now_gaps": 5,
+      "open_gaps": 7,
       "title": "Documents and ingestion",
       "verdict_status": "recorded",
       "winners": [
@@ -507,6 +511,7 @@
       "independent_review": "dual_lane_same_winner",
       "layer_id": "durable-memory",
       "open_executable_now_gaps": 9,
+      "open_gaps": 13,
       "title": "Durable memory",
       "verdict_status": "recorded",
       "winners": [
@@ -581,6 +586,7 @@
       "independent_review": "dual_lane_same_winner",
       "layer_id": "git-github-automation",
       "open_executable_now_gaps": 11,
+      "open_gaps": 12,
       "title": "Git practice and GitHub automation",
       "verdict_status": "recorded",
       "winners": [
@@ -747,6 +753,7 @@
       "independent_review": "dual_lane_same_winner",
       "layer_id": "hosting-services",
       "open_executable_now_gaps": 6,
+      "open_gaps": 14,
       "title": "Application and service hosting",
       "verdict_status": "recorded",
       "winners": [
@@ -959,6 +966,7 @@
       "independent_review": "dual_lane_adjudicated",
       "layer_id": "instructions-skills",
       "open_executable_now_gaps": 10,
+      "open_gaps": 12,
       "title": "Instructions and skills",
       "verdict_status": "recorded",
       "winners": [
@@ -1099,6 +1107,7 @@
       "independent_review": "dual_lane_same_winner",
       "layer_id": "isolation",
       "open_executable_now_gaps": 16,
+      "open_gaps": 19,
       "title": "Isolation",
       "verdict_status": "recorded",
       "winners": [
@@ -1187,6 +1196,7 @@
       "independent_review": "dual_lane_same_winner",
       "layer_id": "mcp-surfaces",
       "open_executable_now_gaps": 12,
+      "open_gaps": 14,
       "title": "MCP servers and client surfaces",
       "verdict_status": "recorded",
       "winners": [
@@ -1303,6 +1313,7 @@
       "independent_review": "dual_lane_same_winner",
       "layer_id": "native-clients",
       "open_executable_now_gaps": 9,
+      "open_gaps": 14,
       "title": "Native clients",
       "verdict_status": "recorded",
       "winners": [
@@ -1462,6 +1473,7 @@
       "independent_review": "dual_lane_adjudicated",
       "layer_id": "observation-inference",
       "open_executable_now_gaps": 8,
+      "open_gaps": 11,
       "title": "Observation and optional inference",
       "verdict_status": "recorded",
       "winners": [
@@ -1626,6 +1638,7 @@
       "independent_review": "dual_lane_same_winner",
       "layer_id": "quality-evaluation",
       "open_executable_now_gaps": 9,
+      "open_gaps": 11,
       "title": "Quality and evaluation",
       "verdict_status": "recorded",
       "winners": [
@@ -1742,6 +1755,7 @@
       "independent_review": "dual_lane_same_winner",
       "layer_id": "recovery-portability",
       "open_executable_now_gaps": 4,
+      "open_gaps": 12,
       "title": "Recovery and portability",
       "verdict_status": "recorded",
       "winners": [
@@ -1862,6 +1876,7 @@
       "independent_review": "dual_lane_same_winner",
       "layer_id": "scheduling-supervision",
       "open_executable_now_gaps": 5,
+      "open_gaps": 13,
       "title": "Scheduling and supervision",
       "verdict_status": "recorded",
       "winners": [
@@ -1982,6 +1997,7 @@
       "independent_review": "dual_lane_same_winner",
       "layer_id": "secrets-credentials",
       "open_executable_now_gaps": 5,
+      "open_gaps": 9,
       "title": "Secrets and credentials",
       "verdict_status": "recorded",
       "winners": [
@@ -2064,6 +2080,7 @@
       "independent_review": "dual_lane_same_winner",
       "layer_id": "semantic-rag",
       "open_executable_now_gaps": 10,
+      "open_gaps": 12,
       "title": "Semantic code retrieval",
       "verdict_status": "recorded",
       "winners": [
@@ -2231,6 +2248,7 @@
       "independent_review": "dual_lane_adjudicated",
       "layer_id": "token-efficiency",
       "open_executable_now_gaps": 4,
+      "open_gaps": 6,
       "title": "Context and usage efficiency",
       "verdict_status": "recorded",
       "winners": [
@@ -2397,6 +2415,7 @@
       "independent_review": "dual_lane_adjudicated",
       "layer_id": "web-research",
       "open_executable_now_gaps": 7,
+      "open_gaps": 9,
       "title": "Web research",
       "verdict_status": "recorded",
       "winners": [
@@ -2582,6 +2601,7 @@
       "independent_review": "dual_lane_adjudicated",
       "layer_id": "workers",
       "open_executable_now_gaps": 7,
+      "open_gaps": 8,
       "title": "Workers and task ownership",
       "verdict_status": "recorded",
       "winners": [
@@ -2800,6 +2820,7 @@
       "independent_review": "dual_lane_same_winner",
       "layer_id": "agents-models-workers",
       "open_executable_now_gaps": 9,
+      "open_gaps": 15,
       "title": "Agents, models and workers",
       "verdict_status": "recorded",
       "winners": [
@@ -2928,6 +2949,7 @@
       "independent_review": "dual_lane_same_winner",
       "layer_id": "backtesting-engine",
       "open_executable_now_gaps": 8,
+      "open_gaps": 12,
       "title": "Backtesting engine",
       "verdict_status": "recorded",
       "winners": [
@@ -3013,6 +3035,7 @@
       "independent_review": "dual_lane_adjudicated",
       "layer_id": "data-quality-orchestration",
       "open_executable_now_gaps": 6,
+      "open_gaps": 9,
       "title": "Data quality and orchestration",
       "verdict_status": "recorded",
       "winners": [
@@ -3133,6 +3156,7 @@
       "independent_review": "dual_lane_adjudicated",
       "layer_id": "evaluation-experiments",
       "open_executable_now_gaps": 8,
+      "open_gaps": 10,
       "title": "Evaluation and experiments",
       "verdict_status": "recorded",
       "winners": [
@@ -3232,6 +3256,7 @@
       "independent_review": "pending_lanes",
       "layer_id": "execution-broker",
       "open_executable_now_gaps": 0,
+      "open_gaps": 1,
       "title": "Execution and broker adapters",
       "verdict_status": "pending_lanes",
       "winners": []
@@ -3293,6 +3318,7 @@
       "independent_review": "dual_lane_adjudicated",
       "layer_id": "identity-provenance",
       "open_executable_now_gaps": 2,
+      "open_gaps": 5,
       "title": "Identity, provenance and lineage",
       "verdict_status": "recorded",
       "winners": [
@@ -3398,6 +3424,7 @@
       "independent_review": "dual_lane_same_winner",
       "layer_id": "market-data-reference",
       "open_executable_now_gaps": 8,
+      "open_gaps": 17,
       "title": "Market data and reference",
       "verdict_status": "recorded",
       "winners": [
@@ -3497,6 +3524,7 @@
       "independent_review": "pending_lanes",
       "layer_id": "observability-hosting",
       "open_executable_now_gaps": 1,
+      "open_gaps": 1,
       "title": "Observability and hosting",
       "verdict_status": "pending_lanes",
       "winners": []
@@ -3530,6 +3558,7 @@
       "independent_review": "dual_lane_same_winner",
       "layer_id": "portfolio-risk",
       "open_executable_now_gaps": 10,
+      "open_gaps": 13,
       "title": "Portfolio and risk",
       "verdict_status": "recorded",
       "winners": [
@@ -3712,6 +3741,7 @@
       "independent_review": "dual_lane_same_winner",
       "layer_id": "research-factors-ml",
       "open_executable_now_gaps": 9,
+      "open_gaps": 16,
       "title": "Research, factors and ML",
       "verdict_status": "recorded",
       "winners": [
@@ -3797,6 +3827,7 @@
       "independent_review": "dual_lane_same_winner",
       "layer_id": "security-supply-chain",
       "open_executable_now_gaps": 12,
+      "open_gaps": 16,
       "title": "Security and supply chain",
       "verdict_status": "recorded",
       "winners": [
@@ -3977,6 +4008,7 @@
       "independent_review": "dual_lane_same_winner",
       "layer_id": "storage-compute",
       "open_executable_now_gaps": 5,
+      "open_gaps": 11,
       "title": "Storage and compute",
       "verdict_status": "recorded",
       "winners": [

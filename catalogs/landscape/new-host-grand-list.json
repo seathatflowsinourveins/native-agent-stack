@@ -203,6 +203,7 @@
       "verdict_status": "recorded",
       "independent_review": "dual_lane_same_winner",
       "open_executable_now_gaps": 12,
+      "open_gaps": 14,
       "winners": [
         {
           "component_id": "codex",
@@ -241,6 +242,7 @@
       "verdict_status": "recorded",
       "independent_review": "dual_lane_same_winner",
       "open_executable_now_gaps": 9,
+      "open_gaps": 14,
       "winners": [
         {
           "component_id": "zizmor",
@@ -321,6 +323,7 @@
       "verdict_status": "recorded",
       "independent_review": "dual_lane_adjudicated",
       "open_executable_now_gaps": 2,
+      "open_gaps": 5,
       "winners": [
         {
           "component_id": "serena",
@@ -355,6 +358,7 @@
       "verdict_status": "recorded",
       "independent_review": "dual_lane_adjudicated",
       "open_executable_now_gaps": 5,
+      "open_gaps": 7,
       "winners": [
         {
           "component_id": "qmd",
@@ -437,6 +441,7 @@
       "verdict_status": "recorded",
       "independent_review": "dual_lane_same_winner",
       "open_executable_now_gaps": 9,
+      "open_gaps": 13,
       "winners": [
         {
           "component_id": "ai-memory",
@@ -475,6 +480,7 @@
       "verdict_status": "recorded",
       "independent_review": "dual_lane_same_winner",
       "open_executable_now_gaps": 11,
+      "open_gaps": 12,
       "winners": [
         {
           "component_id": "worktrunk",
@@ -555,6 +561,7 @@
       "verdict_status": "recorded",
       "independent_review": "dual_lane_same_winner",
       "open_executable_now_gaps": 6,
+      "open_gaps": 14,
       "winners": [
         {
           "component_id": "fastapi",
@@ -635,6 +642,7 @@
       "verdict_status": "recorded",
       "independent_review": "dual_lane_adjudicated",
       "open_executable_now_gaps": 10,
+      "open_gaps": 12,
       "winners": [
         {
           "component_id": "affaan-m/ECC",
@@ -715,6 +723,7 @@
       "verdict_status": "recorded",
       "independent_review": "dual_lane_same_winner",
       "open_executable_now_gaps": 16,
+      "open_gaps": 19,
       "winners": [
         {
           "component_id": "worktrunk",
@@ -772,6 +781,7 @@
       "verdict_status": "recorded",
       "independent_review": "dual_lane_same_winner",
       "open_executable_now_gaps": 12,
+      "open_gaps": 14,
       "winners": [
         {
           "component_id": "mcporter",
@@ -832,6 +842,7 @@
       "verdict_status": "recorded",
       "independent_review": "dual_lane_same_winner",
       "open_executable_now_gaps": 9,
+      "open_gaps": 14,
       "winners": [
         {
           "component_id": "claude-code",
@@ -897,6 +908,7 @@
       "verdict_status": "recorded",
       "independent_review": "dual_lane_adjudicated",
       "open_executable_now_gaps": 8,
+      "open_gaps": 11,
       "winners": [
         {
           "component_id": "opentelemetry-collector-contrib",
@@ -983,6 +995,7 @@
       "verdict_status": "recorded",
       "independent_review": "dual_lane_same_winner",
       "open_executable_now_gaps": 9,
+      "open_gaps": 11,
       "winners": [
         {
           "component_id": "promptfoo",
@@ -1040,6 +1053,7 @@
       "verdict_status": "recorded",
       "independent_review": "dual_lane_same_winner",
       "open_executable_now_gaps": 4,
+      "open_gaps": 12,
       "winners": [
         {
           "component_id": "restic",
@@ -1099,6 +1113,7 @@
       "verdict_status": "recorded",
       "independent_review": "dual_lane_same_winner",
       "open_executable_now_gaps": 5,
+      "open_gaps": 13,
       "winners": [
         {
           "component_id": "dagu",
@@ -1160,6 +1175,7 @@
       "verdict_status": "recorded",
       "independent_review": "dual_lane_same_winner",
       "open_executable_now_gaps": 5,
+      "open_gaps": 9,
       "winners": [
         {
           "component_id": "gitleaks",
@@ -1194,6 +1210,7 @@
       "verdict_status": "recorded",
       "independent_review": "dual_lane_same_winner",
       "open_executable_now_gaps": 10,
+      "open_gaps": 12,
       "winners": [
         {
           "component_id": "socraticode",
@@ -1283,6 +1300,7 @@
       "verdict_status": "recorded",
       "independent_review": "dual_lane_adjudicated",
       "open_executable_now_gaps": 4,
+      "open_gaps": 6,
       "winners": [
         {
           "component_id": "rtk",
@@ -1365,6 +1383,7 @@
       "verdict_status": "recorded",
       "independent_review": "dual_lane_adjudicated",
       "open_executable_now_gaps": 7,
+      "open_gaps": 9,
       "winners": [
         {
           "component_id": "tavily-cli",
@@ -1445,6 +1464,7 @@
       "verdict_status": "recorded",
       "independent_review": "dual_lane_adjudicated",
       "open_executable_now_gaps": 7,
+      "open_gaps": 8,
       "winners": [
         {
           "component_id": "claude-code",
@@ -1506,6 +1526,7 @@
       "verdict_status": "recorded",
       "independent_review": "dual_lane_same_winner",
       "open_executable_now_gaps": 9,
+      "open_gaps": 15,
       "winners": [
         {
           "component_id": "codex-native-sdk",
@@ -1593,6 +1614,7 @@
       "verdict_status": "recorded",
       "independent_review": "dual_lane_same_winner",
       "open_executable_now_gaps": 8,
+      "open_gaps": 12,
       "winners": [
         {
           "component_id": "nautilustrader",
@@ -1654,6 +1676,7 @@
       "verdict_status": "recorded",
       "independent_review": "dual_lane_adjudicated",
       "open_executable_now_gaps": 6,
+      "open_gaps": 9,
       "winners": [
         {
           "component_id": "dagu",
@@ -1713,6 +1736,7 @@
       "verdict_status": "recorded",
       "independent_review": "dual_lane_adjudicated",
       "open_executable_now_gaps": 8,
+      "open_gaps": 10,
       "winners": [
         {
           "component_id": "foundation-agent-retrieval-bench",
@@ -1793,6 +1817,7 @@
       "verdict_status": "pending_lanes",
       "independent_review": "pending_lanes",
       "open_executable_now_gaps": 0,
+      "open_gaps": 1,
       "winners": []
     },
     {
@@ -1803,6 +1828,7 @@
       "verdict_status": "recorded",
       "independent_review": "dual_lane_adjudicated",
       "open_executable_now_gaps": 2,
+      "open_gaps": 5,
       "winners": [
         {
           "component_id": "data-dvc",
@@ -1837,6 +1863,7 @@
       "verdict_status": "recorded",
       "independent_review": "dual_lane_same_winner",
       "open_executable_now_gaps": 8,
+      "open_gaps": 17,
       "winners": [
         {
           "component_id": "data-alpaca-py",
@@ -1924,6 +1951,7 @@
       "verdict_status": "pending_lanes",
       "independent_review": "pending_lanes",
       "open_executable_now_gaps": 1,
+      "open_gaps": 1,
       "winners": []
     },
     {
@@ -1934,6 +1962,7 @@
       "verdict_status": "recorded",
       "independent_review": "dual_lane_same_winner",
       "open_executable_now_gaps": 10,
+      "open_gaps": 13,
       "winners": [
         {
           "component_id": "skfolio",
@@ -1970,6 +1999,7 @@
       "verdict_status": "recorded",
       "independent_review": "dual_lane_same_winner",
       "open_executable_now_gaps": 9,
+      "open_gaps": 16,
       "winners": [
         {
           "component_id": "skfolio",
@@ -2031,6 +2061,7 @@
       "verdict_status": "recorded",
       "independent_review": "dual_lane_same_winner",
       "open_executable_now_gaps": 12,
+      "open_gaps": 16,
       "winners": [
         {
           "component_id": "grype",
@@ -2111,6 +2142,7 @@
       "verdict_status": "recorded",
       "independent_review": "dual_lane_same_winner",
       "open_executable_now_gaps": 5,
+      "open_gaps": 11,
       "winners": [
         {
           "component_id": "data-duckdb",

@@ -12,6 +12,8 @@ from pathlib import Path
 
 from scripts import new_host_grand_list as g
 
+ROOT = Path(__file__).resolve().parents[1]
+
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -96,3 +98,16 @@ class FreshnessTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class OpenGapCountTests(unittest.TestCase):
+    """The grid shows 'executable now / all open' gaps: a layer whose only open gap needs a login,
+    hardware or a user decision must not read as having none (readiness audit, 2026-09-23)."""
+
+    def test_execution_broker_shows_its_login_gated_gap(self):
+        data = json.loads((ROOT / "catalogs/landscape/new-host-grand-list.json").read_text(encoding="utf-8"))
+        layer = next(l for l in data["layers"] if l["layer_id"] == "execution-broker")
+        self.assertGreaterEqual(layer["open_gaps"], layer["open_executable_now_gaps"])
+        page = (ROOT / "docs/new-host-grand-list.md").read_text(encoding="utf-8")
+        self.assertIn("Open gaps (executable now / all)", page)
+        self.assertIn(f"{layer['open_executable_now_gaps']} / {layer['open_gaps']} |", page)
