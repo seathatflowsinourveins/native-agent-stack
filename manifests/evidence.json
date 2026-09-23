@@ -7523,6 +7523,11 @@
       "bytes": 19759
     },
     {
+      "path": "catalogs/landscape/new-host-grand-list.json",
+      "sha256": "45b4d440e0ac10921a59ae55d5e24338048cc07d8f06f391d5cfe6930e7f596b",
+      "bytes": 66065
+    },
+    {
       "path": "catalogs/landscape/research-state.json",
       "sha256": "f47edec17a486e4e3de14bc2e3ef3a6224f3cf09b3830cb336b16bc6480050e1",
       "bytes": 21131
@@ -7954,8 +7959,8 @@
     },
     {
       "path": "docs/contributing-evidence.md",
-      "sha256": "1bd7ca8e5b4f2a22adfd4d54df87a8ae8329198359c181c542b0498d896bd576",
-      "bytes": 12263
+      "sha256": "fbb657f5a195ae110cc32fb6d63e720d0a2a8324e31b2b73036f693e2647ab7b",
+      "bytes": 12429
     },
     {
       "path": "docs/convergence-architecture.md",
@@ -8206,6 +8211,11 @@
       "path": "docs/native-workflow-writing-recovery-20260921.md",
       "sha256": "34913f4a9c9818584927ba8fd8d5b8dbaee9da255e19c37e5600ecea82d115e5",
       "bytes": 12760
+    },
+    {
+      "path": "docs/new-host-grand-list.md",
+      "sha256": "5ec5dfbed18881662c35c3b63399273fe042f60c9479edc6666873131023e5b5",
+      "bytes": 13002
     },
     {
       "path": "docs/new-workstation-runtime-profile-20260922.md",
@@ -9299,8 +9309,8 @@
     },
     {
       "path": "evidence/artifacts/host-upgrade-20260923/upgrade-evidence.json",
-      "sha256": "488fca7753634d9c8cc5e08ffce560c1787a9db3afde13e012272234177e0674",
-      "bytes": 5451
+      "sha256": "cd9556bc60f2e4ce534cfd9fb00feb1b2fd694dc092f76fe177fe346f1d3d5fc",
+      "bytes": 6596
     },
     {
       "path": "evidence/artifacts/layer-verdicts-20260922/adjudication-inputs/adjudication-key.json",

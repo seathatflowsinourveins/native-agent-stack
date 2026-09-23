@@ -492,11 +492,11 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "e2e_state": "not_established",
-              "bootstrap_pinned": false
+              "bootstrap_pinned": true
             },
             "macos-arm64": {
               "e2e_state": "untested",
-              "bootstrap_pinned": false
+              "bootstrap_pinned": true
             }
           }
         },
@@ -1019,11 +1019,11 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "e2e_state": "conditional",
-              "bootstrap_pinned": false
+              "bootstrap_pinned": true
             },
             "macos-arm64": {
               "e2e_state": "untested",
-              "bootstrap_pinned": false
+              "bootstrap_pinned": true
             }
           }
         }
@@ -1446,16 +1446,20 @@
           "upstream_latest": "v2.4.0",
           "pin_behind_upstream": true,
           "manifest_joined": true,
-          "install_profiles": [],
-          "recipe": null,
+          "install_profiles": [
+            "foundation-cpu",
+            "recovery",
+            "macos-arm64-foundation"
+          ],
+          "recipe": "recipes/README.md",
           "platforms": {
             "linux-wsl2-x86_64": {
               "e2e_state": "accepted",
-              "bootstrap_pinned": false
+              "bootstrap_pinned": true
             },
             "macos-arm64": {
               "e2e_state": "untested",
-              "bootstrap_pinned": false
+              "bootstrap_pinned": true
             }
           }
         },
@@ -1467,8 +1471,11 @@
           "upstream_latest": "v1.14.0",
           "pin_behind_upstream": false,
           "manifest_joined": true,
-          "install_profiles": [],
-          "recipe": null,
+          "install_profiles": [
+            "semantic-rag",
+            "macos-arm64-foundation"
+          ],
+          "recipe": "recipes/README.md",
           "platforms": {
             "linux-wsl2-x86_64": {
               "e2e_state": "accepted",
@@ -1499,8 +1506,10 @@
           "upstream_latest": "v1.231.0",
           "pin_behind_upstream": false,
           "manifest_joined": true,
-          "install_profiles": [],
-          "recipe": null,
+          "install_profiles": [
+            "trading-nautilus"
+          ],
+          "recipe": "blueprints/us-equities/engine-nautilus/README.md",
           "platforms": {
             "linux-wsl2-x86_64": {
               "e2e_state": "accepted",
@@ -1725,8 +1734,11 @@
           "upstream_latest": "v0.44.0",
           "pin_behind_upstream": false,
           "manifest_joined": true,
-          "install_profiles": [],
-          "recipe": null,
+          "install_profiles": [
+            "research-runtime",
+            "trading-nautilus"
+          ],
+          "recipe": "blueprints/us-equities/order-contract/README.md",
           "platforms": {
             "linux-wsl2-x86_64": {
               "e2e_state": "accepted",
@@ -1746,8 +1758,10 @@
           "upstream_latest": "v5.58.0",
           "pin_behind_upstream": false,
           "manifest_joined": true,
-          "install_profiles": [],
-          "recipe": null,
+          "install_profiles": [
+            "research-runtime"
+          ],
+          "recipe": "blueprints/us-equities/catalyst-provenance/README.md",
           "platforms": {
             "linux-wsl2-x86_64": {
               "e2e_state": "accepted",
@@ -1767,8 +1781,10 @@
           "upstream_latest": "4.13.2",
           "pin_behind_upstream": false,
           "manifest_joined": true,
-          "install_profiles": [],
-          "recipe": null,
+          "install_profiles": [
+            "research-runtime"
+          ],
+          "recipe": "blueprints/us-equities/data/README.md",
           "platforms": {
             "linux-wsl2-x86_64": {
               "e2e_state": "accepted",
@@ -1866,8 +1882,10 @@
           "upstream_latest": "v5.58.0",
           "pin_behind_upstream": false,
           "manifest_joined": true,
-          "install_profiles": [],
-          "recipe": null,
+          "install_profiles": [
+            "research-runtime"
+          ],
+          "recipe": "blueprints/us-equities/catalyst-provenance/README.md",
           "platforms": {
             "linux-wsl2-x86_64": {
               "e2e_state": "accepted",
@@ -1972,8 +1990,10 @@
           "upstream_latest": "v1.5.5",
           "pin_behind_upstream": false,
           "manifest_joined": true,
-          "install_profiles": [],
-          "recipe": null,
+          "install_profiles": [
+            "research-runtime"
+          ],
+          "recipe": "blueprints/us-equities/data/README.md",
           "platforms": {
             "linux-wsl2-x86_64": {
               "e2e_state": "accepted",
@@ -1994,6 +2014,8 @@
       "us-equities": 12
     },
     "winners": 66,
+    "winner_count_unit": "layer-winner pairs (a component that wins several layers counts once per layer)",
+    "distinct_components": 55,
     "pins_behind_upstream": [
       "ai-memory",
       "claude-code",
@@ -2023,16 +2045,22 @@
     "bootstrap_pinned": {
       "linux-wsl2-x86_64": [
         "ai-memory",
+        "candidate:astral-sh-uv",
+        "candidate:cli-cli",
         "claude-code",
         "codex",
+        "foundation-ai-memory",
         "mcporter",
         "qmd",
         "rtk"
       ],
       "macos-arm64": [
         "ai-memory",
+        "candidate:astral-sh-uv",
+        "candidate:cli-cli",
         "claude-code",
         "codex",
+        "foundation-ai-memory",
         "mcporter",
         "qdrant"
       ]

@@ -32,8 +32,10 @@ import sys
 from pathlib import Path
 
 try:
+    from . import host_receipts
     from .validate import PRIVATE_CONTENT
 except ImportError:  # running as a plain script, not a package
+    import host_receipts
     from validate import PRIVATE_CONTENT
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -45,6 +47,13 @@ PIN_FILES = {"linux-wsl2-x86_64": "adoption/pins-linux-x86_64.json", "macos-arm6
 LEDGERS = {"foundation": "catalogs/landscape/foundation.json", "us-equities": "catalogs/landscape/us-equities.json"}
 # Bootstrap pin ids that name the same component under a different id.
 PIN_ALIASES = {"claude-code": {"claude-code", "claude"}, "llama-cpp": {"llama-cpp", "llama.cpp"}}
+# Ledger/matrix component ids that appear under a different id in adoption/manifest.json profiles.
+ADOPTION_IDS = {
+    "nautilustrader": "nautilus-trader", "data-alpaca-py": "alpaca-py", "data-duckdb": "duckdb",
+    "data-edgartools": "edgartools", "data-exchange-calendars": "exchange-calendars",
+    "foundation-ai-memory": "ai-memory", "foundation-socraticode": "socraticode",
+    "candidate:cli-cli": "gh", "candidate:astral-sh-uv": "uv",
+}
 
 
 def load(rel: str):
@@ -91,10 +100,23 @@ def profile_index(adoption: dict) -> dict:
 
 
 def pinned_tools() -> dict:
+    """Per platform: the pinned tool ids and the GitHub repositories their artifacts come from."""
     out = {}
     for platform, rel in PIN_FILES.items():
-        out[platform] = {tool.get("id") for tool in load(rel).get("tools", []) if isinstance(tool, dict)}
+        tools = [tool for tool in load(rel).get("tools", []) if isinstance(tool, dict)]
+        out[platform] = {"ids": {tool.get("id") for tool in tools},
+                         "repos": {repo_key(tool.get("url")) for tool in tools if "github.com/" in str(tool.get("url"))}}
     return out
+
+
+def adoption_id(component_id: str) -> str:
+    return ADOPTION_IDS.get(component_id, strip_candidate(component_id))
+
+
+def is_pinned(component_id: str, repository, pins_for_platform: dict) -> bool:
+    bare = adoption_id(component_id)
+    names = PIN_ALIASES.get(bare, {bare})
+    return bool(names & pins_for_platform["ids"]) or (bool(repository) and repo_key(repository) in pins_for_platform["repos"])
 
 
 def ledger_decisions() -> dict:
@@ -127,13 +149,12 @@ def build() -> dict:
             bare = strip_candidate(cid)
             m = (mindex.get((row["layer_id"], "id", cid)) or mindex.get((row["layer_id"], "id", bare))
                  or mindex.get((row["layer_id"], "repo", repo_key(winner.get("repository")))) or {})
-            names = PIN_ALIASES.get(bare, {bare})
             platforms = {}
             for platform in PLATFORMS:
                 state = (winner.get("platforms") or {}).get(platform) or {}
                 platforms[platform] = {
                     "e2e_state": state.get("e2e_state"),
-                    "bootstrap_pinned": bool(names & pins[platform]),
+                    "bootstrap_pinned": is_pinned(cid, winner.get("repository"), pins[platform]),
                 }
             winners.append({
                 "component_id": cid,
@@ -143,8 +164,8 @@ def build() -> dict:
                 "upstream_latest": m.get("upstream_latest"),
                 "pin_behind_upstream": m.get("pin_behind_upstream"),
                 "manifest_joined": bool(m),
-                "install_profiles": [p["profile"] for p in profiles.get(bare, [])],
-                "recipe": recipes.get(bare),
+                "install_profiles": [p["profile"] for p in profiles.get(adoption_id(cid), [])],
+                "recipe": recipes.get(adoption_id(cid)),
                 "platforms": platforms,
             })
         layers.append({
@@ -179,6 +200,8 @@ def build() -> dict:
         "layers": {"foundation": sum(1 for l in layers if l["catalog"] == "foundation"),
                    "us-equities": sum(1 for l in layers if l["catalog"] == "us-equities")},
         "winners": len(winners_all),
+        "winner_count_unit": "layer-winner pairs (a component that wins several layers counts once per layer)",
+        "distinct_components": len({adoption_id(w["component_id"]) for w in winners_all}),
         "pins_behind_upstream": sorted({w["component_id"] for w in winners_all if w["pin_behind_upstream"] is True}),
         "not_joined_to_manifest": sorted({w["component_id"] for w in winners_all if not w["manifest_joined"]}),
         "e2e_accepted": {p: sum(1 for w in winners_all if w["platforms"][p]["e2e_state"] == "accepted") for p in PLATFORMS},
@@ -232,11 +255,12 @@ def render_md(data: dict) -> str:
         "Do not edit by hand; run `python3 scripts/new_host_grand_list.py --write`. It selects nothing: winners and "
         "verdicts change only through the lane re-record, pins only through their qualification.",
         "",
-        f"Layers: {s['layers']['foundation']} foundation, {s['layers']['us-equities']} trading. Winners: {s['winners']}. "
-        f"Accepted end to end: {s['e2e_accepted']['linux-wsl2-x86_64']} on WSL2, {s['e2e_accepted']['macos-arm64']} on macOS. "
-        f"Pinned behind upstream: {len(s['pins_behind_upstream'])}. Components a new host still has to prove: "
+        f"Layers: {s['layers']['foundation']} foundation, {s['layers']['us-equities']} trading. Winners: {s['winners']} "
+        f"layer-winner pairs ({s['distinct_components']} distinct components). Pairs accepted end to end: "
+        f"{s['e2e_accepted']['linux-wsl2-x86_64']} on WSL2, {s['e2e_accepted']['macos-arm64']} on macOS. Distinct "
+        f"components pinned behind upstream: {len(s['pins_behind_upstream'])}. Pairs a new host still has to prove: "
         f"{s['needs_host']['linux-wsl2-x86_64']} on WSL2, {s['needs_host']['macos-arm64']} on macOS "
-        "(see the `needs_host` lists in `catalogs/landscape/component-evidence-matrix.json`).",
+        "(the `needs_host` lists in `catalogs/landscape/component-evidence-matrix.json`).",
         "",
         "## How to set up a host",
         "",
@@ -281,7 +305,13 @@ def render_md(data: dict) -> str:
                 lines.append(f"| {head} | `{w['component_id']}` | {pin} | {md_cell(w['evidence_class'])} | {cells[0]} | {cells[1]} | "
                              f"{md_cell(', '.join(w['install_profiles']))} | {gaps} |")
     lines += ["", "\"pinned\" means the platform's bootstrap installs the tool from a pinned, checksummed artifact. "
-              "An E2E state of `accepted` is scoped to the recorded host; a new host proves its own."]
+              "An E2E state of `accepted` is scoped to the recorded host; a new host proves its own.",
+              "", "## How to update this page", "",
+              "Generated, not hand-edited. After any change to the component evidence matrix (host receipts, "
+              "decisions, verdict re-records), the layer ledgers, `" + MANIFEST + "`, `adoption/manifest.json`, the "
+              "bootstrap pin files or `adoption/hardware-profiles.json`, run "
+              "`python3 scripts/component_matrix.py --write` and then `python3 scripts/new_host_grand_list.py --write`, "
+              "and commit the outputs. `--check` runs in CI."]
     if s["not_joined_to_manifest"]:
         lines += ["", "Winners without a manifest row (no upstream comparison shown): "
                   + ", ".join("`" + c + "`" for c in s["not_joined_to_manifest"]) + "."]
@@ -304,11 +334,13 @@ def main(argv=None) -> int:
     if args.write:
         for rel, text in outputs.items():
             (ROOT / rel).write_text(text, encoding="utf-8")
+            host_receipts.register_file(ROOT, rel)
         print(json.dumps({"status": "written", "layers": len(data["layers"]), "winners": data["summary"]["winners"]}))
         return 0
     stale = [rel for rel, text in outputs.items() if not (ROOT / rel).is_file() or (ROOT / rel).read_text(encoding="utf-8") != text]
     if stale:
-        print("stale or missing: " + ", ".join(stale) + "; run python3 scripts/new_host_grand_list.py --write", file=sys.stderr)
+        print("stale or missing: " + ", ".join(stale) + "; run python3 scripts/component_matrix.py --write, then "
+              "python3 scripts/new_host_grand_list.py --write", file=sys.stderr)
         return 1
     print(json.dumps({"status": "passed", "layers": len(data["layers"]), "winners": data["summary"]["winners"]}))
     return 0

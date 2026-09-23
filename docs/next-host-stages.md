@@ -10,7 +10,7 @@ measured load justifies. The per-layer list of what to install is generated in
 
 | Host | Role | Why |
 | --- | --- | --- |
-| 128 GB WSL workstation (RTX 4090, 24 GB) | Primary always-on host for the shared local services (embedder, Qdrant, ai-memory, observability) and the north-star engine and paper lanes | Same CUDA/vLLM stack as the measured host, so today's model results transfer; projected tiers `large-32b-q4` generation, `headroom` semantic RAG, concurrency cap 16 |
+| 128 GB WSL workstation (RTX 4090, 24 GB) | Primary always-on host for the shared local services (embedder, Qdrant, ai-memory, observability) and the north-star engine and paper lanes | Same CUDA/vLLM software stack as the measured host, but a different GPU generation: requalify each model there before pinning (as [`new-workstation-runtime-profile-20260922.md`](new-workstation-runtime-profile-20260922.md) says); projected tiers `large-32b-q4` generation, `headroom` semantic RAG, concurrency cap 16 |
 | RTX 5090 Laptop, 48 GB WSL (measured host) | Development host; stays the reference for measured evidence | `native_proven` profile; the tiers above were measured here |
 | macOS arm64, 64 GB | Portable host and the macOS acceptance lane (MLX / llama.cpp Metal) | Projected `large-32b-q4` from about 38 GB of shared memory; no macOS workstation run exists, so acceptance is the open item |
 
@@ -20,8 +20,10 @@ The workstation and macOS tiers are labelled projections in
 
 ## Workstation (WSL2) next steps
 
-1. Windows side: set `.wslconfig` `memory=100GB` (WSL defaults to half of physical RAM), then
-   `wsl --shutdown` once.
+1. Windows side: raise `.wslconfig` memory from WSL's default of half the physical RAM, using the
+   [workstation runtime profile](new-workstation-runtime-profile-20260922.md) (it proposes
+   `memory=96GB processors=60 swap=16GB`; the hardware profiles assume 100 GB for the `headroom` tier,
+   which 96 GB would just miss; the owners reconcile the value), then `wsl --shutdown` once.
 2. Pinned clone at the release tag, then `adoption/bootstrap-linux.sh` (bootstrap step 0 onward).
 3. `python3 scripts/hardware_profile.py`; add the measured entry to the hardware profiles.
 4. Profiles in order: `foundation-cpu`, `research-runtime`, `observability`, `semantic-rag`,
@@ -50,22 +52,23 @@ The manifest is
 
 | Item | Verdict | Evidence in one line |
 | --- | --- | --- |
-| Workstation `.wslconfig` memory about 100 GB | Needed at setup | The `headroom` tier needs about 96 GB visible |
+| Workstation WSL memory above the 64 GB default | Needed at setup | The `headroom` tier needs about 96 GB visible |
 | CPU limit in `ecosystem-bounded-run` | Needed now (software) | Unlimited Gitleaks scans were 72% of measured CPU, up to 8.4 cores |
-| Retention for per-wave state and caches | Needed now (software) | About 93 GB with no retention rule |
-| GPU memory above 24 GB | Not needed now | Median GPU use 6.5%; embedder plus 8B worker peaked at 20.2 of 24 GB |
+| Retention for per-wave state and caches | Needed now (software) | About 65 GiB of wave caches and state with no retention rule |
+| GPU memory above 24 GB | Not needed now | Median GPU use 6.5%; embedder plus 8B worker peaked at 20,217 of 24,463 MiB |
 | 256 GB RAM on the workstation | Not needed now | No selected model needs RAM offload; candidates are unverified here |
-| Laptop RAM, disk, MacBook | Not needed | 24-26 GB RAM free under full load; 827 GB disk free |
+| Laptop RAM, disk, MacBook | Not needed | 24-26 GiB RAM free under full load; 827 GB disk free |
 
 If a selected local model later outgrows 24 GB, buy GPU memory first (a 48 or 96 GB workstation card
 or a second GPU); system RAM only helps mixture-of-experts models served partly from RAM.
-Trillion-parameter checkpoints (for example MiMo-V2.6-Pro-RL, about 1 TB of weights) are hosted-API
-models for every listed host.
+Trillion-parameter checkpoints are hosted-API models for every listed host (for example
+[MiMo-V2.6-Pro-RL](https://huggingface.co/XiaomiMiMo/MiMo-V2.6-Pro-RL): 1.02 trillion parameters by
+the Hugging Face API, about 1 TB stored).
 
-## Local model slots (in progress)
+## Local model slots
 
 Code embeddings use Nemotron-3-Embed-1B (July 2026). The memory embedder is still
-all-MiniLM-L6-v2 (2022); a preregistered comparison against Nemotron-3-Embed-1B and a small current
-embedder is running on isolated copies of the memory store. The key-free local worker Qwen3-8B-AWQ
-qualified at its bar on 2026-09-23 and is served on demand. Layer verdicts change only through the
-lane re-record, not through this page.
+all-MiniLM-L6-v2 (2022), a known gap; replacing it needs a matched retrieval comparison and the
+lane re-record. The key-free local worker Qwen3-8B-AWQ qualified once on 2026-09-23 (20/20 tool
+calls, 4/5 tasks) and is not served; serving it on demand is a recommendation, not a setup step.
+Layer verdicts change only through the lane re-record, not through this page.

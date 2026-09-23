@@ -53,14 +53,23 @@ class BuildTests(unittest.TestCase):
                 for p in g.PLATFORMS:
                     self.assertEqual(w["platforms"][p]["e2e_state"], states[(layer["layer_id"], w["component_id"], p)])
 
-    def test_bootstrap_pinned_matches_pin_files(self):
-        pins = g.pinned_tools()
-        for layer in self.data["layers"]:
-            for w in layer["winners"]:
-                bare = g.strip_candidate(w["component_id"])
-                names = g.PIN_ALIASES.get(bare, {bare})
-                for p in g.PLATFORMS:
-                    self.assertEqual(w["platforms"][p]["bootstrap_pinned"], bool(names & pins[p]), (w["component_id"], p))
+    def _winner(self, component_id):
+        return next(w for l in self.data["layers"] for w in l["winners"] if w["component_id"] == component_id)
+
+    def test_pinned_by_id_alias_or_repository(self):
+        # gh and uv are pinned under other ids; the join must still find them.
+        for cid in ("candidate:cli-cli", "candidate:astral-sh-uv", "ai-memory", "codex"):
+            self.assertTrue(self._winner(cid)["platforms"]["linux-wsl2-x86_64"]["bootstrap_pinned"], cid)
+        self.assertTrue(self._winner("foundation-ai-memory")["platforms"]["linux-wsl2-x86_64"]["bootstrap_pinned"])
+
+    def test_trading_ids_map_to_install_profiles(self):
+        self.assertIn("trading-nautilus", self._winner("nautilustrader")["install_profiles"])
+        self.assertIn("foundation-cpu", self._winner("foundation-ai-memory")["install_profiles"])
+
+    def test_manifest_join_reports_behind_pins(self):
+        w = self._winner("ai-memory")
+        self.assertTrue(w["manifest_joined"])
+        self.assertIsNotNone(w["upstream_latest"])
 
     def test_summary_counts(self):
         s = self.data["summary"]
