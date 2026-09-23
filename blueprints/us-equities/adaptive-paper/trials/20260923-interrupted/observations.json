@@ -1,0 +1,53 @@
+{
+  "kind": "operator_observations",
+  "evidence_class": "local_operator_observation",
+  "note": "Observations recorded by the operating Claude session around the 2026-09-23 1x trial. They are not produced by the engine; the engine outputs are the other files in this directory.",
+  "timer_stop": {
+    "source": "systemd user journal (host name redacted)",
+    "lines": [
+      "Sep 23 09:39:24 <host> systemd[336]: Stopped adaptive-paper-trial-20260923-frozen.timer - Adaptive paper trial 1x from frozen 41d39b3 (bounded, one run).",
+      "Sep 23 09:39:24 <host> systemd[336]: adaptive-paper-trial-20260923-frozen.timer: Failed to open /run/user/<uid>/systemd/transient/adaptive-paper-trial-20260923-frozen.timer: No such file or directory"
+    ],
+    "actor": "unidentified: no Claude session transcript on the host holds the stop command"
+  },
+  "pre_relaunch_account_check": {
+    "utc": "2026-09-23T14:10Z",
+    "method": "read-only alpaca-py TradingClient get_orders(after 13:00Z)/get_all_positions via the runner's credential loader",
+    "orders_since_13Z": 0,
+    "open_orders": 0,
+    "positions": 0
+  },
+  "relaunch": {
+    "utc": "2026-09-23T14:11:05Z",
+    "how": "systemd-run --user transient service adaptive-paper-trial-20260923-frozen running scheduled_trial.sh from the read-only git archive of 41d39b3 (its SHA256SUMS verified OK), fresh STATE_ROOT, OUT_DIR with the run-once lock",
+    "result_files": [
+      "scheduled-trial.log",
+      "ingest-receipt.json",
+      "gate-result.json",
+      "paper-output.json"
+    ]
+  },
+  "stop_mechanism_source": "blueprints/us-equities/adaptive-paper/runner.py at 41d39b3 lines 812-816: any transport-health reason without 'stale' sets controller.stop (serious gap); transport.py adds '<channel>_disconnected' on a stream disconnect",
+  "clock_offset": {
+    "measured_utc": "2026-09-23T14:24Z (about 13 minutes after the run, not during it)",
+    "method": "SNTP query from the WSL guest",
+    "servers": [
+      {
+        "host": "time.google.com",
+        "offset_s": -0.06,
+        "rtt_s": 0.027
+      },
+      {
+        "host": "time.windows.com",
+        "offset_s": -0.057,
+        "rtt_s": 0.053
+      },
+      {
+        "host": "time.cloudflare.com",
+        "result": "timed out"
+      }
+    ],
+    "comparison": "the transport's quote guard allows -0.25 s; the 2026-09-22 clock fault was +0.64 s"
+  },
+  "universe_csv": "universe-daily.csv (480 SIP daily bars) is not republished; its sha256 is snapshot_sha256 in ingest-receipt.json"
+}
