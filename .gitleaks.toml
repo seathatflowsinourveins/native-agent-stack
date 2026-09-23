@@ -106,6 +106,11 @@
 # and reaching 0 on the default (all-refs) command may still require either
 # `--log-opts="HEAD"` or another branch's own fix -- unchanged from before,
 # and still a coordinator decision, not resolved by this unit.
+# Resolved 2026-09-23 by the coordinator: CI's secret-scan job now passes
+# --log-opts="HEAD", scanning the ancestry of what the run would land (a pull
+# request's merge commit, or main on push). The all-refs default had let
+# open PR #116's branch fail PR #117's required check; each branch is still
+# scanned by its own pull request's run.
 #
 # Before the whole-line-anchoring fix above, the same `--log-opts="HEAD"` command
 # (anchored to a single line only, pre-fix) additionally flagged two corpus_files

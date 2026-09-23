@@ -3068,8 +3068,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "4e391eabbddabc78f0633f124a54c9334ba4769b3af1efc124c1b04a6ed12e92",
-      "bytes": 8415
+      "sha256": "f46572f4e6e9bd058fa800a211c4703c0f109ee76434ec86615bb9a226f096ad",
+      "bytes": 8716
     },
     {
       "path": ".gitignore",
@@ -3078,8 +3078,8 @@
     },
     {
       "path": ".gitleaks.toml",
-      "sha256": "992903854d0ccd3fac56efe3e75c1b25b8e6cf2443191adb40ccd283b0ac84fc",
-      "bytes": 22666
+      "sha256": "9e0519773005b847ebc9fa1e8935765e93b74259fd7c8a4f15a4721cb7271107",
+      "bytes": 23008
     },
     {
       "path": ".gitleaksignore",
@@ -8789,8 +8789,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "08d203319ab4e8e56905b5b6d29a16ef5799d9cdbd328b89f50d865cefdb70db",
-      "bytes": 62715
+      "sha256": "0291d8ebdb209f293896bae915ca74a25ae024c6d239a6d5cd90a3cac009f5fc",
+      "bytes": 63228
     },
     {
       "path": "docs/grand-catalog-handbook.md",
