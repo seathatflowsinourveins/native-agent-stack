@@ -30,10 +30,12 @@ HERE = Path(__file__).resolve().parent
 STATE_ROOT = Path.home() / ".local/state/native-agent-stack/alpaca-paper"
 TAIL_BYTES = 2_000_000
 ACCOUNT_ID = re.compile(r"ALPACA-PAPER-[0-9a-f]{8,64}|\b[0-9a-f]{64}\b|\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b")
+# NautilusTrader logs every AccountState at INFO with the account's balances and margins.
+BALANCES = re.compile(r"(balances|margins)=\[[^\]]*\]")
 
 
 def redact(text):
-    return ACCOUNT_ID.sub("[redacted]", str(text))
+    return ACCOUNT_ID.sub("[redacted]", BALANCES.sub(r"\1=[redacted]", str(text)))
 
 
 def tail_jsonl(path, limit):
@@ -73,19 +75,22 @@ def read_ledger(path):
             intents = [dict(r) for r in db.execute(
                 "SELECT client_id, symbol, side, qty, limit_price, status, filled_qty, average_price "
                 "FROM intents ORDER BY rowid DESC LIMIT 200")]
+            # every trial this ledger has run, not only the latest 200 rows shown
+            intent_statuses = dict(db.execute("SELECT status, COUNT(*) FROM intents GROUP BY status").fetchall())
             positions = [dict(r) for r in db.execute("SELECT symbol, qty, cost_basis FROM positions")]
             events = [{"kind": r["kind"], "client_id": r["client_id"]} for r in db.execute(
                 "SELECT kind, client_id FROM events ORDER BY id DESC LIMIT 50")]
             requests = db.execute("SELECT COUNT(*) FROM requests WHERE at > ?", (time.time() - 60,)).fetchone()[0]
         finally:
             db.close()
-    except sqlite3.Error as exc:
+        limits = json.loads(meta["limits"]) if meta.get("limits") else None
+        trial_start = float(meta.get("trial_start") or 0)
+    except (sqlite3.Error, ValueError) as exc:
         return {"available": False, "error": type(exc).__name__}
-    trial_start = float(meta.get("trial_start") or 0)
     return {"available": True, "trial_id": meta.get("trial_id"), "halted_reason": meta.get("halted_reason") or None,
             "cash_delta_usd": meta.get("cash_delta"), "realized_usd": meta.get("realized"),
             "realized_loss_usd": meta.get("realized_loss"), "peak_pnl_usd": meta.get("peak_pnl"),
-            "limits": json.loads(meta["limits"]) if meta.get("limits") else None,
+            "limits": limits, "intent_statuses": intent_statuses,
             "requests_last_minute": requests, "intents": intents, "positions": positions, "events": events,
             "trial_start": trial_start}
 
@@ -139,9 +144,8 @@ def metrics(s):
         for key in ("cash_delta_usd", "realized_usd", "realized_loss_usd", "peak_pnl_usd"):
             if ledger.get(key) is not None:
                 out += [f"# TYPE adaptive_paper_{key} gauge", f"adaptive_paper_{key} {float(ledger[key])}"]
-        statuses = collections.Counter(i["status"] for i in ledger["intents"])
         out.append("# TYPE adaptive_paper_ledger_intents gauge")
-        for status, n in sorted(statuses.items()):
+        for status, n in sorted(ledger["intent_statuses"].items()):
             out.append(f'adaptive_paper_ledger_intents{{status="{status}"}} {n}')
         out += ["# TYPE adaptive_paper_open_positions gauge",
                 f"adaptive_paper_open_positions {sum(1 for p in ledger['positions'] if float(p['qty']))}",
@@ -207,17 +211,24 @@ def serve(args):
             return
 
         def do_GET(self):
-            live_dir = args.live_dir or newest_live_dir(args.state_root / "live")
-            if self.path in ("/", "/index.html"):
-                body, ctype = PAGE.encode(), "text/html; charset=utf-8"
-            elif self.path == "/api/state":
-                body, ctype = json.dumps(state(live_dir, args.state_root, stop_file), default=str).encode(), "application/json"
-            elif self.path == "/metrics":
-                body, ctype = metrics(state(live_dir, args.state_root, stop_file)).encode(), "text/plain; version=0.0.4"
-            else:
+            if self.headers.get("Host", "").split(":")[0] not in ("127.0.0.1", "localhost"):
+                self.send_error(403)  # loopback names only (DNS rebinding)
+                return
+            if self.path not in ("/", "/index.html", "/api/state", "/metrics"):
                 self.send_error(404)
                 return
-            self.send_response(200)
+            code = 200
+            try:
+                live_dir = args.live_dir or newest_live_dir(args.state_root / "live")
+                if self.path == "/api/state":
+                    body, ctype = json.dumps(state(live_dir, args.state_root, stop_file), default=str).encode(), "application/json"
+                elif self.path == "/metrics":
+                    body, ctype = metrics(state(live_dir, args.state_root, stop_file)).encode(), "text/plain; version=0.0.4"
+                else:
+                    body, ctype = PAGE.encode(), "text/html; charset=utf-8"
+            except (OSError, ValueError, KeyError, TypeError) as exc:
+                code, body, ctype = 500, json.dumps({"error": type(exc).__name__}).encode(), "application/json"
+            self.send_response(code)
             self.send_header("Content-Type", ctype)
             self.send_header("Cache-Control", "no-store")
             self.end_headers()

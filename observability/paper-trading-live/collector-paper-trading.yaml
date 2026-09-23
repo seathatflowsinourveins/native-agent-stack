@@ -1,6 +1,6 @@
 # Merge into the ecosystem OpenTelemetry Collector config (otelcol-contrib 0.161.0).
 # Paper-trading run records -> local Loki. Bodies are kept (they are the manifest);
-# account identifiers are redacted before export. Paths use the collector user's HOME.
+# account identifiers and AccountState balances/margins are redacted before export. Paths use the collector user's HOME.
 receivers:
   file_log/paper_events:
     include: ["${env:HOME}/.local/state/native-agent-stack/alpaca-paper/live/*/events.jsonl"]
@@ -38,6 +38,8 @@ processors:
     log_statements:
       - context: log
         statements:
+          - replace_pattern(body, "(balances|margins)=\\[[^\\]]*\\]", "$$1=[redacted]")
+          - replace_pattern(attributes["message"], "(balances|margins)=\\[[^\\]]*\\]", "$$1=[redacted]") where attributes["message"] != nil
           - replace_pattern(body, "ALPACA-PAPER-[0-9a-f]{8,64}", "ALPACA-PAPER-[redacted]")
           - replace_pattern(body, "[0-9a-f]{64}", "[redacted]")
           - replace_pattern(attributes["message"], "ALPACA-PAPER-[0-9a-f]{8,64}", "ALPACA-PAPER-[redacted]") where attributes["message"] != nil

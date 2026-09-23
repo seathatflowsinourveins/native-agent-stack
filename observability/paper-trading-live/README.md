@@ -11,7 +11,9 @@ talks to the broker or writes a ledger.
 - `blueprints/us-equities/adaptive-paper/live_manifest.py` serves a loopback page, the
   same state as JSON and Prometheus `/metrics`, from that directory, the durable ledger
   (`sqlite3` read-only) and the STOP file. Account ids, fingerprints and balances are not
-  shown; the ledger carries deltas from its baseline.
+  shown (NautilusTrader logs each AccountState with balances at INFO; `balances=[...]` and
+  `margins=[...]` are redacted); the ledger carries deltas from its baseline. Ledger intent
+  counts cover every trial in the ledger; decision and intent counts cover the run directory.
 - `collector-paper-trading.yaml`: two `file_log` receivers (run events, NautilusTrader
   log) and a pipeline into Loki that keeps bodies and redacts account identifiers. The
   ecosystem's privacy transform is not used here because it blanks bodies.

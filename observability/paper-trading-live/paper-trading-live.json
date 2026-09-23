@@ -658,7 +658,7 @@
     {
       "id": 15,
       "type": "timeseries",
-      "title": "Ledger intents by status",
+      "title": "Ledger intents by status (all trials) and run intents by strategy",
       "datasource": {
         "type": "prometheus",
         "uid": "ecosystem-prometheus"

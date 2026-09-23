@@ -68,7 +68,10 @@ class ManifestTests(unittest.TestCase):
         (self.live / "events.jsonl").write_text("".join(json.dumps(e) + "\n" for e in events) + "{truncated")
         (self.live / "nautilus" / "ADAPTIVE-001_x.jsonl").write_text(json.dumps(
             {"timestamp": "2026-09-23T18:00:00Z", "level": "INFO", "component": "ExecEngine",
-             "message": f"Submit order account ALPACA-PAPER-{FINGERPRINT[:16]} id {FINGERPRINT}"}) + "\n")
+             "message": f"Submit order account ALPACA-PAPER-{FINGERPRINT[:16]} id {FINGERPRINT}"}) + "\n" + json.dumps(
+            {"timestamp": "2026-09-23T18:00:01Z", "level": "INFO", "component": "nautilus_portfolio::portfolio",
+             "message": "Updated AccountState(account_id=ALPACA-PAPER, balances=[AccountBalance(total=123456.78 USD, "
+                        "locked=0.00 USD, free=123456.78 USD)], margins=[MarginBalance(initial=1.00 USD)], event_id=x)"}) + "\n")
 
     def tearDown(self):
         self.tmp.cleanup()
@@ -87,7 +90,10 @@ class ManifestTests(unittest.TestCase):
         text = json.dumps(st)
         self.assertNotIn(FINGERPRINT, text)
         self.assertNotIn(FINGERPRINT[:16], text)
-        self.assertIn("[redacted]", st["nautilus_log"][0]["message"])
+        self.assertIn("[redacted]", st["nautilus_log"][1]["message"])
+        self.assertNotIn("123456.78", text)
+        self.assertIn("balances=[redacted]", st["nautilus_log"][0]["message"])
+        self.assertIn("margins=[redacted]", st["nautilus_log"][0]["message"])
 
     def test_metrics_are_prometheus_text(self):
         text = lm.metrics(lm.state(self.live, self.root, self.root / "STOP"))
