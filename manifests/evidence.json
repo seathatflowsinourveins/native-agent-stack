@@ -14454,8 +14454,8 @@
     },
     {
       "path": "tests/test_workflow_hardening.py",
-      "sha256": "03c2823650b85de9e1d07c100a4083877ca798092d5ba785b6681667940b8352",
-      "bytes": 9031
+      "sha256": "0b22ae44add64fdb32f892352f526fac76ba7a279192d886e51a1d769300ac9b",
+      "bytes": 17753
     },
     {
       "path": "tests/test_workflow_security.py",
