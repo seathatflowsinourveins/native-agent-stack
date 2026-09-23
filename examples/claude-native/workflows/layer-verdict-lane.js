@@ -27,6 +27,8 @@ const CALLER_MODEL = a.model !== undefined && !(a.model && typeof a.model === 'o
 // A caller-supplied launch identity is echoed unchanged (catalog Codex review of #145): the collector requires it
 // to name the export and evidence-tree digest it records, so a result from another launch cannot be relabelled.
 const LAUNCH = a.launch && typeof a.launch === 'object' && !Array.isArray(a.launch) ? a.launch : null
+// The echoed identity must name the repository the agents actually read (Codex review of #42).
+if (a.launch !== undefined && (!LAUNCH || LAUNCH.repo !== REPO)) issues.push('launch must be an object whose repo equals repo')
 if (CALLER_MODEL) log('args.model ' + JSON.stringify(CALLER_MODEL) + ' is not applied: every agent() call binds ' + JSON.stringify(MODEL))
 if (issues.length) { for (const i of issues) log('argument issue: ' + i); return { status: 'incomplete', argument_issues: issues } }
 const PACKET = [
