@@ -272,7 +272,7 @@ class LaunchdAgentsScriptStructureTests(unittest.TestCase):
         # backup is left behind after a successful run, which the OLD,
         # wrong-location code also satisfied via its own cleanup).
         self.assertIn('backup_plist="$state_dir/backups/$label.plist.backup.$$"', self.text)
-        self.assertIn("trap cleanup_pending_backup EXIT", self.text)
+        self.assertIn("trap cleanup_install_state EXIT", self.text)
 
     def test_install_gates_its_pre_reinstall_load_check_on_ownership(self):
         # L2, structural: the print/bootout probe before a reinstall must be
@@ -309,6 +309,7 @@ class LaunchdAgentsScriptStructureTests(unittest.TestCase):
             'rm -f -- "$dest_plist"',
             'rm -f -- "$backup_plist"',
             'rm -f -- "$pending_backup_plist"',
+            'rm -f -- "$pending_dest_tmp"',
         )
         for rm_line in rm_lines:
             self.assertTrue(any(target in rm_line for target in allowed_targets), rm_line)
@@ -935,6 +936,99 @@ class LaunchdAgentsScriptBehaviorTests(unittest.TestCase):
             if state_backups.exists():
                 self.assertEqual(list(state_backups.iterdir()), [],
                                   "a completed run must not leave a backup file behind")
+
+    def test_a_failed_copy_into_the_destination_never_truncates_it_and_the_backup_is_restored(self):
+        # Codex round-3c Medium, differential injection against 35980b3 vs
+        # 5310fe5: a `cp` straight into dest_plist can truncate it and then
+        # fail (disk full, an interrupted write); `set -e` then exits before
+        # any of cmd_install's own restore branches run, and the round-3b
+        # trap deleted the backup instead of restoring it -- so 5310fe5 lost
+        # both the live plist's own content AND its only recovery copy,
+        # where the pre-N1 script at least kept the backup. This fix writes
+        # to a same-directory temp file first, so a failed `cp` here never
+        # reaches dest_plist at all, and the trap now restores the backup
+        # onto dest_plist rather than merely deleting it.
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            eco_root = tmp_path / "eco"
+            fake_home = tmp_path / "home"
+            fake_home.mkdir()
+            log = tmp_path / "launchctl.log"
+            log.touch()
+            working_shim = self._launchctl_shim(tmp_path, log)
+            env = {
+                **os.environ,
+                "PATH": f"{working_shim}{os.pathsep}{os.environ['PATH']}",
+                "ECO_INSTALL_ROOT": str(eco_root),
+                "HOME": str(fake_home),
+            }
+            self.assertEqual(self._run(["render"], env=env).returncode, 0)
+            first_install = self._run(["install", "--label", "com.native-stack.qdrant"], env=env)
+            self.assertEqual(first_install.returncode, 0, first_install.stdout + first_install.stderr)
+            launch_agents_dir = fake_home / "Library" / "LaunchAgents"
+            dest_plist = launch_agents_dir / "com.native-stack.qdrant.plist"
+            original_content = dest_plist.read_bytes()
+
+            # Real cp, except: a destination that is a bare *.plist file
+            # directly under a LaunchAgents directory -- the fixed script no
+            # longer ever copies directly there (it writes to a same-
+            # directory "*.new.*" temp file and renames it into place
+            # instead), but the pre-fix design's `cp -- "$source_plist"
+            # "$dest_plist"` copied straight there -- writes partial content,
+            # then fails, simulating a disk-full or otherwise interrupted
+            # copy. This is the same differential-injection shape Codex used
+            # against 35980b3 vs 5310fe5: on the fixed script this shim never
+            # fires at all (proving the vulnerable copy path is gone, not
+            # merely patched around); on the pre-fix script it reproduces
+            # the truncation exactly. Every other cp call (the backup copy,
+            # and the fixed script's own copy into its "*.new.*" temp file)
+            # is unaffected.
+            failing_cp_shim = tmp_path / "failing-cp-shim"
+            failing_cp_shim.mkdir()
+            (failing_cp_shim / "cp").write_text(
+                "#!/bin/sh\n"
+                # Only the DESTINATION (the last argument) is checked -- this
+                # script always invokes `cp -- SOURCE DEST`, and the backup
+                # copy's own SOURCE is dest_plist itself, which would
+                # otherwise false-positive-match this same pattern if every
+                # argument were checked instead.
+                'dest=""\n'
+                'for arg in "$@"; do dest="$arg"; done\n'
+                'case "$dest" in\n'
+                "  */LaunchAgents/*.plist)\n"
+                '    printf \'PARTIAL\' > "$dest"\n'
+                "    echo 'cp: injected failure for testing' >&2\n"
+                "    exit 1\n"
+                "    ;;\n"
+                "esac\n"
+                'exec /bin/cp "$@"\n'
+            )
+            (failing_cp_shim / "cp").chmod(0o755)
+            reinstall_env = {**env, "PATH": f"{failing_cp_shim}{os.pathsep}{env['PATH']}"}
+            reinstall = self._run(["install", "--label", "com.native-stack.qdrant"], env=reinstall_env)
+            # The fixed script never copies directly to dest_plist any more
+            # (it copies to a "*.new.*" temp file and renames that into
+            # place instead), so this injection -- aimed at the OLD
+            # vulnerable destination -- never fires at all here, and the
+            # reinstall succeeds cleanly. That the shim's own injected
+            # failure message never appears is the direct proof the
+            # vulnerable copy path is gone, not merely patched around; see
+            # this same test run against the pre-fix script (round 3c
+            # commit message) for the reproduction of the actual regression.
+            self.assertEqual(reinstall.returncode, 0, reinstall.stdout + reinstall.stderr)
+            self.assertNotIn("cp: injected failure for testing", reinstall.stderr)
+            # The live plist's own definition is intact and unchanged.
+            self.assertTrue(dest_plist.is_file())
+            self.assertNotEqual(dest_plist.read_bytes(), b"PARTIAL")
+            self.assertEqual(dest_plist.read_bytes(), original_content)
+            # No stray "*.new.*" temp file, and no leftover backup, either.
+            leftover_tmp = [p.name for p in launch_agents_dir.iterdir() if ".new." in p.name]
+            self.assertEqual(leftover_tmp, [], leftover_tmp)
+            state_backups = eco_root / "state" / "launchd" / "backups"
+            if state_backups.exists():
+                self.assertEqual(list(state_backups.iterdir()), [], "a successful reinstall must not leave a backup behind")
+            state_file = eco_root / "state" / "launchd" / "enabled-labels.txt"
+            self.assertIn("com.native-stack.qdrant", state_file.read_text().split())
 
     def test_remove_on_an_unloaded_owned_label_cleans_up_without_calling_bootout(self):
         # Low finding: bootout always fails on a label that is owned but not

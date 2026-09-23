@@ -165,17 +165,35 @@ forget_enabled_label() {
 # inside ~/Library/LaunchAgents itself: that directory is scanned and
 # auto-loaded by launchd at login, so a stray file an interrupted run left
 # there is a real hazard, not just clutter. cmd_install clears
-# pending_backup_plist as soon as it no longer needs the backup (restored, or
-# the install it protected against completed either way); this EXIT trap is
-# the safety net for whatever premature exit -- a signal, an unexpected
-# error elsewhere -- would otherwise leave it behind.
+# pending_backup_plist/pending_backup_dest as soon as it no longer needs the
+# backup (restored, or the install it protected against completed either
+# way); this EXIT trap is the safety net for whatever premature exit --
+# `set -e` on a failing command install's own explicit branches never got to
+# handle, a signal, an unexpected error elsewhere -- would otherwise leave
+# pending. It RESTORES pending_backup_dest from pending_backup_plist (never
+# merely deletes the backup, a round-3c regression: a failing `cp` straight
+# into dest_plist could truncate it and then exit via set -e before any of
+# cmd_install's own restore branches ran, and the old trap deleted the one
+# copy that could have recovered it) before removing the backup file itself.
+# pending_dest_tmp is cmd_install's own same-directory staging file for the
+# rename-into-place below (N1 round 3c): a failed `cp` into IT never touches
+# dest_plist at all, so this only ever needs to delete a leftover partial
+# write, never restore anything from it.
 pending_backup_plist=""
-cleanup_pending_backup() {
+pending_backup_dest=""
+pending_dest_tmp=""
+cleanup_install_state() {
+  if [[ -n "$pending_dest_tmp" && -e "$pending_dest_tmp" ]]; then
+    rm -f -- "$pending_dest_tmp"
+  fi
   if [[ -n "$pending_backup_plist" && -e "$pending_backup_plist" ]]; then
+    if [[ -n "$pending_backup_dest" ]]; then
+      cp -- "$pending_backup_plist" "$pending_backup_dest" 2>/dev/null || true
+    fi
     rm -f -- "$pending_backup_plist"
   fi
 }
-trap cleanup_pending_backup EXIT
+trap cleanup_install_state EXIT
 
 # L4: launchctl bootout can return success before the service's own teardown
 # has actually finished (real launchd; not something an offline shim can
@@ -310,13 +328,14 @@ cmd_install() {
     # (file and, best effort, its loaded state) instead of destroying a
     # config that was working before this reinstall was attempted. The
     # backup lives under this script's own state_dir, never inside
-    # ~/Library/LaunchAgents (N1; see cleanup_pending_backup above).
+    # ~/Library/LaunchAgents (N1; see cleanup_install_state above).
     local backup_plist=""
     if [[ "$dest_existed" == 1 ]]; then
       mkdir -p "$state_dir/backups"
       backup_plist="$state_dir/backups/$label.plist.backup.$$"
       cp -- "$dest_plist" "$backup_plist"
       pending_backup_plist="$backup_plist"
+      pending_backup_dest="$dest_plist"
     fi
 
     # A re-run on an owned label that is still loaded (e.g. reinstalling
@@ -358,17 +377,38 @@ cmd_install() {
       fi
     fi
 
-    cp -- "$source_plist" "$dest_plist"
+    # Codex round-3c Medium: `cp -- "$source_plist" "$dest_plist"` (the
+    # previous design) wrote directly into the live destination, so a copy
+    # that failed partway (disk full, an interrupted write) could truncate
+    # it and then exit via `set -e` before any of this function's own
+    # restore branches below ever ran -- and the EXIT trap only deleted the
+    # backup instead of restoring it. Writing to a same-directory temp file
+    # first and renaming it into place means a failed `cp` here never
+    # touches dest_plist at all (`mv -f` on the same filesystem is a single
+    # rename, so the only remaining failure window is between the two
+    # dest_tmp writes above finishing and this rename, vanishingly small and
+    # -- unlike the direct-write design -- never destructive: dest_plist
+    # keeps its old content until the rename actually happens). If it fails
+    # or the process dies before pending_dest_tmp is cleared, the trap
+    # deletes the orphaned partial file; dest_plist itself was never at
+    # risk.
+    local dest_tmp="$dest_plist.new.$$"
+    pending_dest_tmp="$dest_tmp"
+    cp -- "$source_plist" "$dest_tmp"
+    mv -f -- "$dest_tmp" "$dest_plist"
+    pending_dest_tmp=""
     if launchctl bootstrap "gui/$(id -u)" "$dest_plist"; then
       if [[ -n "$backup_plist" ]]; then
         rm -f -- "$backup_plist"
         pending_backup_plist=""
+        pending_backup_dest=""
       fi
       record_enabled_label "$label"
       printf 'Installed and bootstrapped %s (%s)\n' "$label" "$dest_plist"
     elif [[ -n "$backup_plist" ]]; then
       mv -f -- "$backup_plist" "$dest_plist"
       pending_backup_plist=""
+      pending_backup_dest=""
       launchctl bootstrap "gui/$(id -u)" "$dest_plist" >/dev/null 2>&1 || true
       printf 'launchctl bootstrap failed for %s; restored the previous %s (best-effort reloaded).\n' \
         "$label" "$dest_plist" >&2

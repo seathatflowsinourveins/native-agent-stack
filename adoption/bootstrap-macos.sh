@@ -684,12 +684,13 @@ install_npm() {
     # already-populated final_prefix would otherwise leave a window where
     # the wrapper's newly-updated files point at whatever platform
     # dependency npm's own install just auto-fetched, unverified, before
-    # install_platform_dependency's fix-up below replaces it. mv onto the
-    # same filesystem is a single atomic rename, so the live final_prefix is
-    # always either the old, complete install or the new one, never a
-    # partially verified one in between; bin_dir's existing symlinks (from a
-    # prior install of this same id/version, if any) keep resolving to a
-    # real, fully verified prefix throughout.
+    # install_platform_dependency's fix-up below replaces it. The swap below
+    # is recoverable, not atomic (round 3c correction: an earlier version of
+    # this comment overclaimed atomicity) -- see its own comment for exactly
+    # what is and is not guaranteed if the final `mv` itself fails; bin_dir's
+    # existing symlinks (from a prior install of this same id/version, if
+    # any) keep resolving to a real, fully verified prefix throughout every
+    # outcome the swap can have.
     prefix="$stage_dir/${id}-${version}-staged"
     rm -rf -- "$prefix"
   fi
@@ -707,24 +708,40 @@ install_npm() {
   if [[ "$has_platform_dependency" == 1 ]]; then
     install_platform_dependency "$id" "$prefix" "$ignore_scripts"
     # Rename the old prefix aside, move the staged one in, then delete the
-    # old one -- NOT `rm -rf "$final_prefix"` followed by `mv`, which (fixed
-    # here; found by Codex's own failure injection) left a real window where
+    # old one -- NOT `rm -rf "$final_prefix"` followed by `mv`, which (round
+    # 3b; found by Codex's own failure injection) left a real window where
     # final_prefix did not exist at all if this process died between the two:
     # every bin_dir symlink into it, and the old, previously fully verified
-    # install, would both be gone with nothing to replace them yet. `mv` on
-    # the same filesystem (stage_dir is always under ecosystem_root, so this
-    # always holds) is a single rename(2) per call, so final_prefix is never
-    # missing for longer than the gap between two such renames, and -- unlike
-    # the old design -- a crash in that gap leaves the old install fully
-    # intact and recoverable at final_prefix.previous.$$, never silently
-    # deleted with nothing in its place.
+    # install, would both be gone with nothing to replace them yet.
+    #
+    # This is RECOVERABLE, not atomic (round 3c: Codex's own failure
+    # injection on round 3b's version showed the second `mv` itself failing
+    # left final_prefix absent with broken bin_dir symlinks and no rollback
+    # -- the earlier comment's "atomic" framing was wrong). A genuinely
+    # atomic swap would need a versioned directory plus a single symlink
+    # flip (bin_dir symlinking to a stable "current" link rather than
+    # directly into tools/<id>-<version>), a larger restructuring this fix
+    # does not make. What this DOES guarantee: if the second `mv` below
+    # fails (disk full, a permission error, ...), the previous, fully
+    # verified install is moved straight back into final_prefix before this
+    # function returns, so final_prefix -- and every bin_dir symlink into it
+    # -- is never left missing; only the newly staged prefix (still on disk
+    # under stage_dir, not deleted) is lost in that case, never the
+    # previously working one bin_dir already pointed at.
     local previous_prefix=""
     if [[ -e "$final_prefix" ]]; then
       previous_prefix="${final_prefix}.previous.$$"
       rm -rf -- "$previous_prefix"
       mv -- "$final_prefix" "$previous_prefix"
     fi
-    mv -- "$prefix" "$final_prefix"
+    if ! mv -- "$prefix" "$final_prefix"; then
+      if [[ -n "$previous_prefix" ]]; then
+        mv -- "$previous_prefix" "$final_prefix" || true
+      fi
+      printf 'Failed to move the newly installed %s into place at %s; restored the previous install (if any) rather than leaving it absent (fail closed).\n' \
+        "$id" "$final_prefix" >&2
+      exit 1
+    fi
     [[ -n "$previous_prefix" ]] && rm -rf -- "$previous_prefix"
     prefix="$final_prefix"
   fi

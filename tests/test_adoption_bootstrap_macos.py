@@ -1279,6 +1279,79 @@ class PlatformDependencyInstallTests(unittest.TestCase):
             self.assertEqual(content.returncode, 0, content.stdout + content.stderr)
             self.assertEqual(content.stdout.strip(), "VERIFIED_CONTENT")
 
+    def test_a_failed_final_move_restores_the_previous_prefix_rather_than_leaving_it_absent(self):
+        # Codex round-3c Medium, failure injection: renaming the live prefix
+        # aside succeeds, but the subsequent move of the newly staged, fully
+        # verified prefix into place fails (disk full, a permission error,
+        # ...). Without a rollback, final_prefix -- and every bin_dir
+        # symlink into it -- would be left absent even though the previous,
+        # fully verified install still exists on disk under a
+        # "*.previous.*" name. This proves the live prefix is restored to
+        # place instead of being left missing.
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            pins_path = self._pins_fixture(tmp_path, {
+                "id": "codexlike", "version": "1.0.0", "kind": "npm",
+                "url": "https://registry.npmjs.org/fixture-codex-like/-/fixture-codex-like-1.0.0.tgz",
+                "sha256": self.codex_like_sha256, "checksum_source": "npm_registry_integrity_crosscheck",
+                "checksum_ref": "test", "install_note": "test",
+                "platform_dependency": self._platform_dependency_pin(),
+            })
+            first, eco_root = self._run_install_npm(
+                tmp_path, pins_path, "codexlike", "1.0.0", self.codex_like_tarball, self.codex_like_sha256,
+                npm_package="fixture-codex-like")
+            self.assertEqual(first.returncode, 0, first.stdout + first.stderr)
+            final_prefix = eco_root / "tools" / "codexlike-1.0.0"
+            wrapper_dir = final_prefix / "lib" / "node_modules" / "fixture-codex-like"
+            self.assertTrue(wrapper_dir.is_dir())
+
+            # Real mv, except: fails when its SOURCE (not destination) is
+            # the staged prefix -- exactly install_npm's second move, `mv --
+            # "$prefix" "$final_prefix"` where $prefix is "*-staged" -- so
+            # the first move (renaming the OLD final_prefix aside) still
+            # succeeds normally, matching a genuine mid-swap failure rather
+            # than one that never got this far.
+            failing_mv_shim = tmp_path / "failing-mv-shim"
+            failing_mv_shim.mkdir()
+            (failing_mv_shim / "mv").write_text(
+                "#!/bin/sh\n"
+                'for arg in "$@"; do\n'
+                '  case "$arg" in\n'
+                "    *-staged)\n"
+                "      echo 'mv: injected failure for testing' >&2\n"
+                "      exit 1\n"
+                "      ;;\n"
+                "  esac\n"
+                "done\n"
+                'exec /bin/mv "$@"\n'
+            )
+            (failing_mv_shim / "mv").chmod(0o755)
+
+            second, _ = self._run_install_npm(
+                tmp_path, pins_path, "codexlike", "1.0.0", self.codex_like_tarball, self.codex_like_sha256,
+                npm_package="fixture-codex-like",
+                extra_env={"PATH": f"{failing_mv_shim}{os.pathsep}{os.environ['PATH']}"})
+            self.assertNotEqual(second.returncode, 0, second.stdout + second.stderr)
+            self.assertIn("restored the previous install", second.stderr)
+            # The live prefix was never left absent: it still exists, and
+            # require.resolve (standing in for every bin_dir symlink into
+            # it) still reaches the ORIGINAL, fully verified content, not
+            # silently gone.
+            self.assertTrue(final_prefix.is_dir(), "final_prefix must not be left absent after a failed move")
+            content = subprocess.run(
+                ["node", "-e",
+                 'const p = require.resolve("widget-darwin-arm64/package.json", {paths: [process.argv[1]]});'
+                 'const fs = require("fs"), path = require("path");'
+                 'process.stdout.write(fs.readFileSync(path.join(path.dirname(p), "native-bin"), "utf8").trim());',
+                 str(wrapper_dir)],
+                capture_output=True, text=True, timeout=30,
+            )
+            self.assertEqual(content.returncode, 0, content.stdout + content.stderr)
+            self.assertEqual(content.stdout.strip(), "VERIFIED_CONTENT")
+            # No "*.previous.*" leftover either: the rollback moved it back.
+            leftover_previous = [p.name for p in (eco_root / "tools").iterdir() if ".previous." in p.name]
+            self.assertEqual(leftover_previous, [], leftover_previous)
+
     def test_install_npm_passes_ignore_scripts_only_when_the_pin_sets_it(self):
         with tempfile.TemporaryDirectory() as tmp:
             tmp_path = Path(tmp)
