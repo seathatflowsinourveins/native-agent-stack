@@ -3053,8 +3053,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "520d9ae235032d6e1c13ae912a7cfaae5ace7d417165d84e633274431311a46c",
-      "bytes": 8023
+      "sha256": "2f4b59872ee901522f26656032fc6022d046e224e9739f9ba1f8a0a16aa87fba",
+      "bytes": 8138
     },
     {
       "path": ".gitignore",
@@ -9296,6 +9296,11 @@
       "path": "evidence/artifacts/hf-memory-models-20260921/native-results.json",
       "sha256": "01263899ad06977b5fc855f9667f2c29bdffd13d2036705485b24bb7095c5e50",
       "bytes": 17286
+    },
+    {
+      "path": "evidence/artifacts/host-upgrade-20260923/upgrade-evidence.json",
+      "sha256": "488fca7753634d9c8cc5e08ffce560c1787a9db3afde13e012272234177e0674",
+      "bytes": 5451
     },
     {
       "path": "evidence/artifacts/layer-verdicts-20260922/adjudication-inputs/adjudication-key.json",
