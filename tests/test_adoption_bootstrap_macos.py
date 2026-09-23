@@ -34,9 +34,11 @@ VALID_CHECKSUM_SOURCES = {
     "npm_registry_integrity_crosscheck",
 }
 PROFILE_ID = "macos-arm64-foundation"
-# socraticode ships no pinned darwin-arm64 release archive in this draft; it is
-# documented as skipped and is deliberately absent from required_commands.
-DOCUMENTED_SKIPS = {"socraticode"}
+# Every macos-arm64-foundation component now has a pin (socraticode's npm pin
+# closed the last gap); documented_unpinned_ids in the script is empty and
+# this set stays empty as the corresponding test-side mechanism, so a future
+# undocumented gap is still caught instead of silently reusing a stale list.
+DOCUMENTED_SKIPS = set()
 SHELLCHECK = shutil.which("shellcheck")
 
 
@@ -274,15 +276,32 @@ class ScriptStructureTests(unittest.TestCase):
 
     def test_brew_prerequisite_install_precedes_the_presence_check(self):
         # Item 4 mirror: on Linux the apt block moved ahead of the
-        # curl/git/tar/jq presence check; here the brew jq install does.
-        brew_index = self.text.index("brew install jq")
+        # curl/git/tar/jq presence check; here the brew formula loop does.
+        brew_declare_index = self.text.index(
+            "brew_formulae=(jq python@3.13 ripgrep coreutils restic shellcheck)")
         check_index = self.text.index(
             "for required in curl git tar shasum unzip jq mktemp")
         self.assertLess(
-            brew_index, check_index,
-            "the brew jq install must run before the prerequisite presence check")
+            brew_declare_index, check_index,
+            "the brew formula loop must run before the prerequisite presence check")
         self.assertIn("Missing prerequisites: %s", self.text)
         self.assertIn("exit 4", self.text)
+
+    def test_brew_formula_loop_installs_only_what_is_missing_bash_32_safe(self):
+        # brew list --versions is the presence oracle (not command -v: several
+        # formulae install commands under a different name), guarded exactly
+        # like every other empty-array expansion in this script, and gated on
+        # skip_system==0 && plan_mode==0 so --plan and --skip-system-packages
+        # never invoke brew.
+        self.assertIn('brew list --versions "$formula"', self.text)
+        self.assertIn('brew install "${missing_formulae[@]}"', self.text)
+        self.assertIn('if [[ "$skip_system" == 0 && "$plan_mode" == 0 ]]; then', self.text)
+
+    def test_plan_mode_lists_the_brew_formulae_it_would_install(self):
+        self.assertIn(
+            'printf \'plan brew formulae (installed only if brew list --versions reports them missing): %s\\n\' "${brew_formulae[*]}"',
+            self.text,
+        )
 
     def test_llama_server_is_installed_as_a_wrapper_not_a_bare_symlink(self):
         self.assertIn("DYLD_LIBRARY_PATH", self.text)
@@ -526,6 +545,196 @@ class LlamaWrapperQuotingTests(unittest.TestCase):
             self.assertEqual(run.stdout.splitlines(), [f"{prefix}/llama-server", prefix])
 
 
+class PlatformDependencyVerificationTests(unittest.TestCase):
+    """verify_platform_dependency and install_npm's --ignore-scripts wiring,
+    extracted verbatim from the script and run with a fixture pins file and a
+    fake `.package-lock.json` / fake `npm`, so no network or real npm install
+    is used. No macOS host ran any of this.
+
+    Fake integrity/hash values below are assembled from concatenated string
+    parts rather than written as single literals, so a fixture value shaped
+    like a real secret/hash never appears as one contiguous token in this
+    source file.
+    """
+
+    def _pins_fixture(self, tmp_path: Path, tool: dict) -> Path:
+        pins_path = tmp_path / "pins-fixture.json"
+        pins_path.write_text(json.dumps({
+            "schema_version": 1, "reviewed_at": "2026-09-23", "platform": "macos-arm64",
+            "source": "test fixture", "tools": [tool],
+        }))
+        return pins_path
+
+    def _run_verify(self, tmp_path: Path, pins_path: Path, dep_id: str, prefix: Path):
+        harness = tmp_path / "verify-harness.sh"
+        harness.write_text(
+            "set -Eeuo pipefail\n"
+            + _shell_functions(SCRIPT_PATH.read_text(), "verify_platform_dependency")
+            + f'pins_path={json.dumps(str(pins_path))}\n'
+            + f'verify_platform_dependency {dep_id} {json.dumps(str(prefix))}\n'
+        )
+        return subprocess.run(["bash", str(harness)], capture_output=True, text=True, timeout=30)
+
+    def test_passes_when_lock_entry_matches_the_pin(self):
+        # Assembled, not a single literal, per the fixture-value convention above.
+        fake_integrity = "sha512-" + "".join(["QUJD", "MTIz", "eHl6"]) + "=="
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            prefix = tmp_path / "tools" / "widget-1.0.0"
+            lock_dir = prefix / "lib" / "node_modules"
+            lock_dir.mkdir(parents=True)
+            (lock_dir / ".package-lock.json").write_text(json.dumps({
+                "packages": {"node_modules/@scope/widget-darwin-arm64": {
+                    "version": "1.0.0-darwin-arm64", "integrity": fake_integrity,
+                }},
+            }))
+            pins_path = self._pins_fixture(tmp_path, {
+                "id": "widget", "version": "1.0.0", "kind": "npm", "url": "https://registry.npmjs.org/widget/-/widget-1.0.0.tgz",
+                "sha256": "0" * 64, "checksum_source": "npm_registry_integrity_crosscheck",
+                "checksum_ref": "test", "install_note": "test",
+                "platform_dependency": {
+                    "name": "@scope/widget-darwin-arm64", "resolved_package": "@scope/widget",
+                    "version": "1.0.0-darwin-arm64", "integrity": fake_integrity,
+                },
+            })
+            result = self._run_verify(tmp_path, pins_path, "widget", prefix)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("Verified platform dependency", result.stdout)
+
+    def test_fails_closed_on_integrity_mismatch(self):
+        pinned_integrity = "sha512-" + "".join(["QUJD", "MTIz", "eHl6"]) + "=="
+        installed_integrity = "sha512-" + "".join(["ZGlm", "ZmVy", "ZW50"]) + "=="
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            prefix = tmp_path / "tools" / "widget-1.0.0"
+            lock_dir = prefix / "lib" / "node_modules"
+            lock_dir.mkdir(parents=True)
+            (lock_dir / ".package-lock.json").write_text(json.dumps({
+                "packages": {"node_modules/@scope/widget-darwin-arm64": {
+                    "version": "1.0.0-darwin-arm64", "integrity": installed_integrity,
+                }},
+            }))
+            pins_path = self._pins_fixture(tmp_path, {
+                "id": "widget", "version": "1.0.0", "kind": "npm", "url": "https://registry.npmjs.org/widget/-/widget-1.0.0.tgz",
+                "sha256": "0" * 64, "checksum_source": "npm_registry_integrity_crosscheck",
+                "checksum_ref": "test", "install_note": "test",
+                "platform_dependency": {
+                    "name": "@scope/widget-darwin-arm64", "resolved_package": "@scope/widget",
+                    "version": "1.0.0-darwin-arm64", "integrity": pinned_integrity,
+                },
+            })
+            result = self._run_verify(tmp_path, pins_path, "widget", prefix)
+            self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+            self.assertIn("Refusing widget", result.stderr)
+            self.assertIn("platform dependency @scope/widget-darwin-arm64", result.stderr)
+
+    def test_falls_back_to_package_json_integrity_when_no_lockfile(self):
+        fake_integrity = "sha512-" + "".join(["cGtn", "aW50", "ZWdy"]) + "=="
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            prefix = tmp_path / "tools" / "widget-1.0.0"
+            pkg_dir = prefix / "lib" / "node_modules" / "@scope" / "widget-darwin-arm64"
+            pkg_dir.mkdir(parents=True)
+            (pkg_dir / "package.json").write_text(json.dumps({
+                "name": "@scope/widget", "version": "1.0.0-darwin-arm64", "_integrity": fake_integrity,
+            }))
+            pins_path = self._pins_fixture(tmp_path, {
+                "id": "widget", "version": "1.0.0", "kind": "npm", "url": "https://registry.npmjs.org/widget/-/widget-1.0.0.tgz",
+                "sha256": "0" * 64, "checksum_source": "npm_registry_integrity_crosscheck",
+                "checksum_ref": "test", "install_note": "test",
+                "platform_dependency": {
+                    "name": "@scope/widget-darwin-arm64", "resolved_package": "@scope/widget",
+                    "version": "1.0.0-darwin-arm64", "integrity": fake_integrity,
+                },
+            })
+            result = self._run_verify(tmp_path, pins_path, "widget", prefix)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_fails_closed_when_neither_lockfile_nor_package_json_exist(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            prefix = tmp_path / "tools" / "widget-1.0.0"
+            (prefix / "lib" / "node_modules").mkdir(parents=True)
+            pins_path = self._pins_fixture(tmp_path, {
+                "id": "widget", "version": "1.0.0", "kind": "npm", "url": "https://registry.npmjs.org/widget/-/widget-1.0.0.tgz",
+                "sha256": "0" * 64, "checksum_source": "npm_registry_integrity_crosscheck",
+                "checksum_ref": "test", "install_note": "test",
+                "platform_dependency": {
+                    "name": "@scope/widget-darwin-arm64", "resolved_package": "@scope/widget",
+                    "version": "1.0.0-darwin-arm64", "integrity": "sha512-" + "x" * 20 + "==",
+                },
+            })
+            result = self._run_verify(tmp_path, pins_path, "widget", prefix)
+            self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+            self.assertIn("fail closed", result.stderr)
+
+    def test_is_a_no_op_when_the_pin_has_no_platform_dependency(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            prefix = tmp_path / "tools" / "plain-1.0.0"
+            prefix.mkdir(parents=True)
+            pins_path = self._pins_fixture(tmp_path, {
+                "id": "plain", "version": "1.0.0", "kind": "npm", "url": "https://registry.npmjs.org/plain/-/plain-1.0.0.tgz",
+                "sha256": "0" * 64, "checksum_source": "npm_registry_integrity_crosscheck",
+                "checksum_ref": "test", "install_note": "test",
+            })
+            result = self._run_verify(tmp_path, pins_path, "plain", prefix)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertEqual(result.stdout.strip(), "")
+
+    def test_install_npm_passes_ignore_scripts_only_when_the_pin_sets_it(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            for ignore_scripts, expect_flag in (("true", True), ("false", False)):
+                with self.subTest(ignore_scripts=ignore_scripts):
+                    case_dir = tmp_path / ignore_scripts
+                    eco_root = case_dir / "eco"
+                    (eco_root / "downloads").mkdir(parents=True)
+                    (eco_root / "tools").mkdir(parents=True)
+                    npm_log = case_dir / "npm-invocations.log"
+                    npm_shim_dir = case_dir / "npm-shim"
+                    npm_shim_dir.mkdir(parents=True)
+                    fake_npm = npm_shim_dir / "npm"
+                    fake_npm.write_text(
+                        "#!/bin/sh\n"
+                        f'printf "%s\\n" "$*" >> {json.dumps(str(npm_log))}\n'
+                        'for arg in "$@"; do\n'
+                        '  case "$arg" in\n'
+                        '    --prefix) expect_prefix=1 ;;\n'
+                        '    *) if [ "${expect_prefix:-0}" = 1 ]; then mkdir -p "$arg/bin"; expect_prefix=0; fi ;;\n'
+                        '  esac\n'
+                        'done\n'
+                    )
+                    fake_npm.chmod(0o755)
+                    archive = eco_root / "downloads" / "placeholder.tgz"
+                    archive.write_text("placeholder")
+                    pins_path = self._pins_fixture(case_dir, {
+                        "id": "widget", "version": "1.0.0", "kind": "npm",
+                        "url": "https://registry.npmjs.org/widget/-/widget-1.0.0.tgz",
+                        "sha256": "0" * 64, "checksum_source": "npm_registry_integrity_crosscheck",
+                        "checksum_ref": "test", "install_note": "test",
+                    })
+                    harness = case_dir / "install-npm-harness.sh"
+                    harness.write_text(
+                        "set -Eeuo pipefail\n"
+                        + _shell_functions(SCRIPT_PATH.read_text(), "npm_package_name",
+                                           "verify_platform_dependency", "install_npm")
+                        + "fetch() { :; }\n"
+                        + f'pins_path={json.dumps(str(pins_path))}\n'
+                        + f'ecosystem_root={json.dumps(str(eco_root))}\n'
+                        + f'bin_dir={json.dumps(str(eco_root / "bin"))}\n'
+                        + f'cache_dir={json.dumps(str(eco_root / "downloads"))}\n'
+                        + f'install_npm widget 1.0.0 https://registry.npmjs.org/widget/-/widget-1.0.0.tgz unused {ignore_scripts}\n'
+                    )
+                    result = subprocess.run(
+                        ["bash", str(harness)], capture_output=True, text=True, timeout=30,
+                        env={**os.environ, "PATH": f"{npm_shim_dir}{os.pathsep}{os.environ['PATH']}"},
+                    )
+                    self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+                    logged = npm_log.read_text() if npm_log.exists() else ""
+                    self.assertEqual("--ignore-scripts" in logged, expect_flag, logged)
+
+
 class UnpinnedComponentFailClosedTests(unittest.TestCase):
     """A selected component with no pin at all fails closed (exit 3) before
     anything is installed, and in --plan mode too, unless it is named in
@@ -624,12 +833,14 @@ class UnpinnedComponentFailClosedTests(unittest.TestCase):
         self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
         self.assertIn("--allow-unpinned requires", result.stderr)
 
-    def test_the_documented_socraticode_skip_needs_no_flag(self):
-        # The shipped profile selects socraticode, which this draft leaves
-        # unpinned on purpose; it is carried in the script's documented-skip
-        # list, so the shipped --plan stays exit 0 while still echoing it.
-        self.assertIn("documented_unpinned_ids=(socraticode)",
-                      SCRIPT_PATH.read_text())
+    def test_socraticode_is_pinned_so_the_shipped_profile_needs_no_documented_skip(self):
+        # socraticode used to be a documented, unpinned skip; it now has a
+        # reviewed npm pin (adoption/pins-macos-arm64.json), so the empty
+        # documented_unpinned_ids stays a mechanism with nothing to exempt,
+        # and the shipped --plan reaches exit 0 with no "Allowed unpinned"
+        # line at all -- not because socraticode is silently skipped, but
+        # because every selected component actually has a pin.
+        self.assertIn("documented_unpinned_ids=()", SCRIPT_PATH.read_text())
         with tempfile.TemporaryDirectory() as tmp:
             tmp_path = Path(tmp)
             eco_root = tmp_path / "eco"
@@ -642,8 +853,8 @@ class UnpinnedComponentFailClosedTests(unittest.TestCase):
                      "ECO_INSTALL_ROOT": str(eco_root)},
             )
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-            self.assertIn("Allowed unpinned components", result.stdout)
-            self.assertIn("socraticode", result.stdout.split("\n")[0])
+            self.assertNotIn("Allowed unpinned components", result.stdout)
+            self.assertRegex(result.stdout, r"(?m)^plan socraticode\s")
 
 
 class PrerequisitesBeforeAndAfterBrewTests(unittest.TestCase):

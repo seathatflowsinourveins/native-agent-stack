@@ -20,16 +20,21 @@ first real qualification run; neither has one yet.
 
 ## Prerequisites
 
-Homebrew, for the formulae this profile still leaves floating:
+Homebrew, for six formulae this profile still leaves floating: jq,
+python@3.13, ripgrep, coreutils, restic and shellcheck. As of this draft,
+[`adoption/bootstrap-macos.sh`](../bootstrap-macos.sh) installs these itself
+(the equivalent of running the command below), one `brew list --versions
+<formula>` check per formula, installing only the ones actually missing —
+manually running it first is no longer required, only still possible:
 
 ```sh
 brew install jq python@3.13 ripgrep coreutils restic shellcheck
 ```
 
-`brew install python@3.13` is not optional: a fresh Mac's `python3` is **3.9**
-from the Command Line Tools, below the Python 3.13 the `acceptance_target` in
-[`adoption/manifest.json`](../manifest.json) requires, and macOS ships no
-system Python that can satisfy it.
+`brew install python@3.13` (part of the formula list above) is not optional:
+a fresh Mac's `python3` is **3.9** from the Command Line Tools, below the
+Python 3.13 the `acceptance_target` in [`adoption/manifest.json`](../manifest.json)
+requires, and macOS ships no system Python that can satisfy it.
 
 `node`, `uv`, `gh`, `llama.cpp` and Qdrant are **no longer Homebrew formulae**
 in this draft: they are SHA-256 pinned upstream release archives installed by
@@ -83,14 +88,14 @@ acceptance — remains unrun.
 | 3 | A selected component has no pin at all in [`adoption/pins-macos-arm64.json`](../pins-macos-arm64.json) and was not named in `--allow-unpinned`. Checked before anything is installed, and in `--plan` too; `--allow-unpinned <id,id,...>` skips the named ids instead and echoes them to the run log. |
 | 4 | A prerequisite (`curl`, `git`, `tar`, `shasum`, `unzip`, `jq`, `mktemp`) is still missing after the Homebrew step. With `--skip-system-packages` no `brew install` is attempted and the check lists what is missing. |
 
-`socraticode` is the one selected component this draft leaves unpinned (below);
-the script carries it as a documented skip, so the shipped profile needs no
-`--allow-unpinned`. Exit codes 3 and 4 and the `--allow-unpinned` flag mirror
-[`adoption/bootstrap-linux.sh`](../bootstrap-linux.sh). Two differences are
-disclosed rather than hidden: this script carries
-`documented_unpinned_ids=(socraticode)`, a built-in skip list the Linux script
-does not have, so an unpinned `socraticode` never trips the exit-3 refusal here;
-and `--plan` is macOS-only.
+Every selected `macos-arm64-foundation` component, including `socraticode`
+(below), now has a pin, so the shipped profile needs no `--allow-unpinned`.
+Exit codes 3 and 4 and the `--allow-unpinned` flag mirror
+[`adoption/bootstrap-linux.sh`](../bootstrap-linux.sh). One difference is
+disclosed rather than hidden: the script keeps a `documented_unpinned_ids=()`
+mechanism the Linux script does not have — a built-in skip list, currently
+empty, so a future undocumented gap still trips the exit-3 refusal instead of
+silently reusing a stale skip; `--plan` is also macOS-only.
 
 ### darwin-arm64 pinned release archives
 
@@ -117,18 +122,33 @@ machine-readable copy with each `checksum_source` and `checksum_ref` is
 | `ai-memory` | 2.3.2 | `ai-memory-macos-aarch64.tar.gz` | `e0f07ad28938f3ed98a5feb21d11917245d77501764e0005049e7d9c1c16f28a` | `publisher_checksum_sidecar` |
 | `llama-cpp` | b11057 | `llama-b11057-bin-macos-arm64.tar.gz` | `443eadead90d44c3925b7163012430b2df4934df881cf72a4d94fc71d1380da1` | `github_release_asset_digest_plus_local_rehash` |
 | `qdrant` | 1.19.1 | `qdrant-aarch64-apple-darwin.tar.gz` | `e060209dfefc9d977ddcec48521349f505f8fd1ce21f2a3db444140870522fe4` | `github_release_asset_digest_plus_local_rehash` |
+| `socraticode` | 1.14.0 | `socraticode-1.14.0.tgz` | `3dbb106c876be4214048289cef31094eb0e48e97007fb90180270edc4eed7c46` | `npm_registry_integrity_crosscheck` |
 
-Not pinned here: `socraticode` (no darwin-arm64 release archive reviewed for
-this draft — it is skipped by the bootstrap with a printed note and is not a
-`required_command` of the profile), and `gitleaks`, `syft` and `dagu`, which
-are not in the `macos-arm64-foundation` component list.
+`socraticode` is installed with `--ignore-scripts` (the pin's own
+`ignore_scripts: true` field, read by the script's `install_npm`), the same
+convention [`recipes/README.md`](../../recipes/README.md#paths-pins-and-installation-conventions)
+documents for the Linux recipe; it has no `adoption/pins-linux-x86_64.json`
+entry of its own there, only that documented manual recipe. Not in this table:
+`gitleaks`, `syft` and `dagu`, which are not in the `macos-arm64-foundation`
+component list.
 
-Two pins are only partly covered by their hash. The `@openai/codex` and
-`@anthropic-ai/claude-code` npm tarballs are byte-identical to the Linux pins,
-but on Apple Silicon npm additionally resolves `@openai/codex-darwin-arm64` and
-`@anthropic-ai/claude-code-darwin-arm64` — the packages carrying the real
-binaries — **unpinned** at install time. Record their resolved versions and
-integrity from the host's `npm ls` output at first install.
+Two pins carry an additional `platform_dependency`, not covered by the hash
+above. The `@openai/codex` and `@anthropic-ai/claude-code` npm tarballs are
+byte-identical to the Linux pins, but on Apple Silicon npm additionally
+resolves `@openai/codex-darwin-arm64` and `@anthropic-ai/claude-code-darwin-arm64`
+— the packages carrying the real binaries. Each one's name, version and npm
+`dist.integrity` (read 2026-09-23) is recorded as that tool's
+`platform_dependency` in `adoption/pins-macos-arm64.json`, and
+`adoption/bootstrap-macos.sh`'s `verify_platform_dependency` checks it against
+the host's own npm lockfile (`$prefix/lib/node_modules/.package-lock.json`, or
+the package's own `package.json` `_integrity`) immediately after `npm
+install`, refusing (exit 1) on any drift instead of only noting it. Unlike the
+`@anthropic-ai/claude-code-darwin-arm64` package, `@openai/codex-darwin-arm64`
+is not itself a published package name: `npm view @openai/codex@0.155.1
+optionalDependencies` shows it as an `npm:` alias to
+`@openai/codex@0.155.1-darwin-arm64`, the same `@openai/codex` package name at
+a platform-suffixed version, and the pin's `resolved_package`/`version`
+fields record that distinction.
 
 `llama-server` is a profile `required_command`, so llama.cpp is pinned rather
 than left to `brew install llama.cpp`. The macOS asset holds every executable
@@ -255,6 +275,26 @@ Each plist needs `RunAtLoad` set and its own `EnvironmentVariables.PATH` entry
 launchd agent only with `launchctl bootout gui/$(id -u) <plist path>`,
 mirroring the systemd `disable --now` rule: only if this qualification run
 itself enabled it, and keep its data directories.
+
+Templates for the three agents this profile's components need — Qdrant,
+ai-memory, and the llama.cpp Metal embedding server — are drafted at
+[`adoption/launchd/com.native-stack.qdrant.plist.template`](../launchd/com.native-stack.qdrant.plist.template),
+[`adoption/launchd/com.native-stack.ai-memory.plist.template`](../launchd/com.native-stack.ai-memory.plist.template)
+and
+[`adoption/launchd/com.native-stack.llama-embed.plist.template`](../launchd/com.native-stack.llama-embed.plist.template),
+using the same `${NAME}` placeholder convention as
+[`adoption/templates/`](../templates/)'s Claude/Codex configs. Render them
+with [`tools/adoption/render_launchd.py`](../../tools/adoption/render_launchd.py)
+(`--host <name>` against an `adoption/hosts/<name>.json` value file such as
+[`adoption/hosts/macos-example.json`](../hosts/macos-example.json), or
+`--set KEY=VALUE`), and drive the rendered plists with
+[`adoption/launchd/launchd-agents.sh`](../launchd/launchd-agents.sh)'s five
+subcommands: `render`, `lint` (`plutil -lint`, or a `plistlib` fallback where
+`plutil` is unavailable), `install` (`launchctl bootstrap`), `status`
+(`launchctl print`) and `remove` (`launchctl bootout`, only for a label the
+script's own state file recorded as enabled, never deleting data). None of
+the three agents has been bootstrapped, kickstarted or booted out on any Mac,
+hosted or otherwise; this stays true after this update.
 
 ## Qdrant collections
 

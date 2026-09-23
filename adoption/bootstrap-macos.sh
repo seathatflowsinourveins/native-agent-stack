@@ -21,10 +21,9 @@ usage() {
     'null sha256 refuses to install (fail closed). A selected component with' \
     'no pin at all also fails closed (exit 3) before installing anything, and' \
     'in --plan mode too, unless it is named in --allow-unpinned, in which case' \
-    'it is skipped and echoed to the run log; socraticode, documented on' \
-    'adoption/platforms/macos-arm64.md as having no reviewed darwin-arm64' \
-    'archive in this draft, is skipped the same way without the flag.' \
-    'Uses Homebrew only for a missing jq prerequisite, installed before the' \
+    'it is skipped and echoed to the run log.' \
+    'Installs any of jq, python@3.13, ripgrep, coreutils, restic and' \
+    'shellcheck that brew list --versions reports missing, before the' \
     'curl/git/tar/jq presence check unless --skip-system-packages is given,' \
     'in which case that check lists what is missing and exits 4.' \
     'Never edits a shell profile.' \
@@ -93,16 +92,36 @@ done
 command -v sw_vers >/dev/null || { printf 'Cannot identify the macOS release (sw_vers missing).\n' >&2; exit 1; }
 macos_version="$(sw_vers -productVersion)"
 
-# jq is the only prerequisite Homebrew may supply here; everything else ships
-# with macOS or the Command Line Tools. Like the Linux apt block, this install
-# runs *before* the presence check below, so a Mac that has no jq yet satisfies
-# that check without a second run. shasum replaces Linux sha256sum.
-if [[ "$skip_system" == 0 && "$plan_mode" == 0 ]] && ! command -v jq >/dev/null; then
+# Homebrew supplies six formulae this profile still leaves floating: jq (a
+# script prerequisite), python@3.13 (a fresh Mac's system python3 is 3.9, below
+# the acceptance_target in adoption/manifest.json), ripgrep, coreutils, restic
+# and shellcheck. Like the Linux apt block, this install runs *before* the
+# presence check below, so a Mac missing any of them yet satisfies that check
+# without a second run. `brew list --versions <formula>` is the presence
+# oracle, not `command -v`: several of these formulae (python@3.13, coreutils)
+# install commands under a different name than the formula, so a name-based
+# check would under- or over-report what is actually installed. shasum
+# replaces Linux sha256sum.
+brew_formulae=(jq python@3.13 ripgrep coreutils restic shellcheck)
+if [[ "$skip_system" == 0 && "$plan_mode" == 0 ]]; then
   command -v brew >/dev/null || {
-    printf 'Homebrew is required to install the missing jq prerequisite; install it from https://brew.sh or rerun with --skip-system-packages.\n' >&2
+    printf 'Homebrew is required to install the missing prerequisite formulae (%s); install it from https://brew.sh or rerun with --skip-system-packages.\n' \
+      "${brew_formulae[*]}" >&2
     exit 1
   }
-  brew install jq
+  missing_formulae=()
+  missing_formula_count=0
+  for formula in "${brew_formulae[@]}"; do
+    if ! brew list --versions "$formula" >/dev/null 2>&1; then
+      missing_formulae+=("$formula")
+      missing_formula_count=$((missing_formula_count + 1))
+    fi
+  done
+  if [[ "$missing_formula_count" -gt 0 ]]; then
+    brew install "${missing_formulae[@]}"
+  fi
+elif [[ "$skip_system" == 0 && "$plan_mode" == 1 ]]; then
+  printf 'plan brew formulae (installed only if brew list --versions reports them missing): %s\n' "${brew_formulae[*]}"
 fi
 
 missing_prerequisites=()
@@ -142,13 +161,15 @@ done < <(printf '%s' "$component_ids_json" | jq -r '.[]')
 # anything and before --plan prints a single line: install_pin's own
 # "no pin -> skip" path only ever reaches components allowed here.
 #
-# socraticode has no reviewed darwin-arm64 release archive in this draft and is
-# documented as skipped on adoption/platforms/macos-arm64.md (it is not a
-# required_command of this profile), so it is allowed by default exactly like
-# an explicit --allow-unpinned id: skipped, echoed, never installed. The Linux
-# script needs no such list because every component it selects is pinned.
-documented_unpinned_ids=(socraticode)
-allowed_unpinned_ids=("${documented_unpinned_ids[@]}" ${allow_unpinned_ids[@]+"${allow_unpinned_ids[@]}"})
+# socraticode now has a reviewed npm pin (adoption/pins-macos-arm64.json), the
+# same --ignore-scripts convention recipes/README.md documents for Linux, so no
+# selected component is exempted from a pin by default any more.
+# documented_unpinned_ids stays as the mechanism --allow-unpinned itself uses,
+# now empty, so a future undocumented gap still fails closed instead of
+# silently reusing a stale skip list. The Linux script needs no such list
+# because every component it selects is pinned.
+documented_unpinned_ids=()
+allowed_unpinned_ids=(${documented_unpinned_ids[@]+"${documented_unpinned_ids[@]}"} ${allow_unpinned_ids[@]+"${allow_unpinned_ids[@]}"})
 all_selected_ids=(node uv gh)
 for selected_id in ${component_ids[@]+"${component_ids[@]}"}; do
   case "$selected_id" in
@@ -185,14 +206,6 @@ if [[ "$unpinned_count" -gt 0 ]]; then
     exit 3
   fi
   printf 'Allowed unpinned components (documented skip or --allow-unpinned): %s\n' "${unpinned_ids[*]}"
-fi
-
-# Homebrew formulae float; the version record below is the retained evidence.
-if [[ "$skip_system" == 0 && "$plan_mode" == 0 ]]; then
-  command -v brew >/dev/null || {
-    printf 'Homebrew is required for the system prerequisites; install it from https://brew.sh or rerun with --skip-system-packages.\n' >&2
-    exit 1
-  }
 fi
 
 ecosystem_root="${ECO_INSTALL_ROOT:-$HOME/.local/share/codex-ecosystem}"
@@ -375,8 +388,53 @@ npm_package_name() {
   printf '%s\n' "$rest"
 }
 
+# codex and claude-code each carry a platform_dependency in
+# pins-macos-arm64.json: the darwin-arm64 optional dependency npm itself
+# resolves and installs at `npm install` time (the real native binary), which
+# is not covered by this tool's own sha256 archive check above. This verifies,
+# after npm has already resolved and installed it, that the name/version/
+# integrity actually placed on disk match what was reviewed there, and fails
+# closed rather than only noting drift in a log. npm >=7 writes a lockfile at
+# $prefix/lib/node_modules/.package-lock.json; older npm instead writes an
+# `_integrity` field into the installed package's own package.json, so both
+# are checked. A component with no platform_dependency pin is a silent no-op.
+verify_platform_dependency() {
+  local id="$1" prefix="$2"
+  local dep
+  dep="$(jq -c --arg id "$id" '.tools[] | select(.id == $id) | .platform_dependency // empty' "$pins_path")"
+  [[ -n "$dep" && "$dep" != "null" ]] || return 0
+  local dep_name dep_version dep_integrity
+  dep_name="$(jq -r '.name' <<<"$dep")"
+  dep_version="$(jq -r '.version' <<<"$dep")"
+  dep_integrity="$(jq -r '.integrity' <<<"$dep")"
+  local lock_path="$prefix/lib/node_modules/.package-lock.json"
+  local actual_version="" actual_integrity=""
+  if [[ -f "$lock_path" ]]; then
+    actual_version="$(jq -r --arg name "$dep_name" '.packages["node_modules/" + $name].version // empty' "$lock_path")"
+    actual_integrity="$(jq -r --arg name "$dep_name" '.packages["node_modules/" + $name].integrity // empty' "$lock_path")"
+  fi
+  if [[ -z "$actual_integrity" ]]; then
+    local pkg_json="$prefix/lib/node_modules/$dep_name/package.json"
+    if [[ -f "$pkg_json" ]]; then
+      actual_version="$(jq -r '.version // empty' "$pkg_json")"
+      actual_integrity="$(jq -r '._integrity // empty' "$pkg_json")"
+    fi
+  fi
+  if [[ -z "$actual_integrity" ]]; then
+    printf 'Refusing %s: platform dependency %s has no lock entry or package.json _integrity under %s (fail closed).\n' \
+      "$id" "$dep_name" "$prefix" >&2
+    exit 1
+  fi
+  if [[ "$actual_version" != "$dep_version" || "$actual_integrity" != "$dep_integrity" ]]; then
+    printf 'Refusing %s: platform dependency %s pinned as %s (%s) but installed as %s (%s).\n' \
+      "$id" "$dep_name" "$dep_version" "$dep_integrity" "$actual_version" "$actual_integrity" >&2
+    exit 1
+  fi
+  printf 'Verified platform dependency %s@%s (%s)\n' "$dep_name" "$actual_version" "$actual_integrity"
+}
+
 install_npm() {
-  local id="$1" version="$2" url="$3" sha256="$4"
+  local id="$1" version="$2" url="$3" sha256="$4" ignore_scripts="${5:-false}"
   command -v npm >/dev/null || { printf 'npm is required to install %s; install node first.\n' "$id" >&2; exit 1; }
   local archive="$cache_dir/${id}-${version}.tgz"
   fetch "$url" "$sha256" "$archive"
@@ -384,7 +442,12 @@ install_npm() {
   mkdir -p "$prefix"
   local package
   package="$(npm_package_name "$url")"
-  npm install --global --no-audit --no-fund --prefix "$prefix" "$archive" >/dev/null
+  local npm_install_args=(--global --no-audit --no-fund --prefix "$prefix")
+  if [[ "$ignore_scripts" == "true" ]]; then
+    npm_install_args+=(--ignore-scripts)
+  fi
+  npm install "${npm_install_args[@]}" "$archive" >/dev/null
+  verify_platform_dependency "$id" "$prefix"
   local linked=0 executable
   if [[ -d "$prefix/bin" ]]; then
     for executable in "$prefix/bin"/*; do
@@ -404,12 +467,13 @@ install_pin() {
     printf 'No pin for component %s in %s; skipping.\n' "$id" "$pins_path" >&2
     return 0
   fi
-  local version kind url sha256 note
+  local version kind url sha256 note ignore_scripts
   version="$(jq -r '.version' <<<"$entry")"
   kind="$(jq -r '.kind' <<<"$entry")"
   url="$(jq -r '.url' <<<"$entry")"
   sha256="$(jq -r '.sha256' <<<"$entry")"
   note="$(jq -r '.install_note' <<<"$entry")"
+  ignore_scripts="$(jq -r '.ignore_scripts // false' <<<"$entry")"
   if [[ "$sha256" == "null" || -z "$sha256" ]]; then
     printf 'Refusing to install %s %s: pin has no verified sha256 (%s)\n' "$id" "$version" "$note" >&2
     exit 1
@@ -424,7 +488,7 @@ install_pin() {
     gh-zip) install_gh_zip "$version" "$url" "$sha256" ;;
     llama-cpp-tarball) install_llama_cpp "$version" "$url" "$sha256" ;;
     *-tarball) install_single_binary_tarball "$id" "$version" "$url" "$sha256" ;;
-    *-npm) install_npm "$id" "$version" "$url" "$sha256" ;;
+    *-npm) install_npm "$id" "$version" "$url" "$sha256" "$ignore_scripts" ;;
     *) printf 'Unknown pin kind %s for %s.\n' "$kind" "$id" >&2; exit 1 ;;
   esac
   printf 'Installed %s %s (%s)\n' "$id" "$version" "$kind"

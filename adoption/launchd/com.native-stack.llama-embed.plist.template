@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Drafted, not run: no launchd agent from this directory has been
+  bootstrapped, kickstarted or booted out on any Mac (adoption/platforms/
+  macos-arm64.md, "What a hosted run proves"). Render with
+  tools/adoption/render_launchd.py before use; lint with
+  adoption/launchd/launchd-agents.sh lint before ever bootstrapping it.
+
+  Runs the 24 GB default from adoption/platforms/macos-arm64.md's "Embedding
+  backend decision": llama-server given an embedding flag and a port flag of
+  8232, serving embeddinggemma-300M-Q8_0 (768 dimensions), a distinct port
+  from the Linux/WSL2 RAG endpoint at 8231, so a macOS host never presents a
+  768-dim response where 2048-dim is expected. Invokes the bin/llama-server
+  wrapper adoption/bootstrap-macos.sh installs (it exports DYLD_LIBRARY_PATH
+  itself, see the llama-cpp install_note in adoption/pins-macos-arm64.json),
+  so this plist carries no DYLD_LIBRARY_PATH of its own. The model file
+  argument is an open item: no documented flag names one yet, so none is
+  guessed here (see adoption/platforms/macos-arm64.md's embedding acceptance
+  test, which is unrun).
+-->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.native-stack.llama-embed</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>${ECO_ROOT}/bin/llama-server</string>
+        <string>--embedding</string>
+        <string>--port</string>
+        <string>8232</string>
+    </array>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/opt/homebrew/bin:${ECO_ROOT}/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+    </dict>
+    <key>StandardOutPath</key>
+    <string>${ECO_ROOT}/state/logs/com.native-stack.llama-embed.out.log</string>
+    <key>StandardErrorPath</key>
+    <string>${ECO_ROOT}/state/logs/com.native-stack.llama-embed.err.log</string>
+</dict>
+</plist>

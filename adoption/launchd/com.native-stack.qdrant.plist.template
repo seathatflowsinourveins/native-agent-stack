@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Drafted, not run: no launchd agent from this directory has been
+  bootstrapped, kickstarted or booted out on any Mac (adoption/platforms/
+  macos-arm64.md, "What a hosted run proves"). Render with
+  tools/adoption/render_launchd.py before use; lint with
+  adoption/launchd/launchd-agents.sh lint before ever bootstrapping it.
+
+  Mirrors the systemd user-scoped unit this profile's Linux/WSL2 host runs
+  for qdrant (adoption/lifecycle.md, recipes/README.md's qdrant row: the
+  qdrant binary given a config-path flag and disable-telemetry flag),
+  invoking the same bin/qdrant symlink adoption/bootstrap-macos.sh places on
+  PATH so this plist survives a version bump without editing.
+-->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.native-stack.qdrant</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>${ECO_ROOT}/bin/qdrant</string>
+        <string>--config-path</string>
+        <string>${ECO_ROOT}/config/qdrant.yaml</string>
+        <string>--disable-telemetry</string>
+    </array>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/opt/homebrew/bin:${ECO_ROOT}/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+    </dict>
+    <key>StandardOutPath</key>
+    <string>${ECO_ROOT}/state/logs/com.native-stack.qdrant.out.log</string>
+    <key>StandardErrorPath</key>
+    <string>${ECO_ROOT}/state/logs/com.native-stack.qdrant.err.log</string>
+</dict>
+</plist>

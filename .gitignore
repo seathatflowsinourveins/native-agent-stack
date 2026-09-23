@@ -15,3 +15,4 @@ node_modules/
 *.jsonl
 adoption/hosts/*.json
 !adoption/hosts/example.json
+!adoption/hosts/macos-example.json
