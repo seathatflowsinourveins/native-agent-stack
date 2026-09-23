@@ -55,27 +55,14 @@
     },
     {
       "id": "claude-code",
-      "version": "2.1.278",
-      "kind": "npm",
-      "url": "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-2.1.278.tgz",
-      "sha256": "08c6dfcf3dafcfd30e09b2926c596e274f0fa20844a5801ada7f1c8e6227157e",
-      "checksum_source": "npm_registry_integrity_crosscheck",
-      "checksum_ref": "npm view @anthropic-ai/claude-code@2.1.278 dist.integrity = sha512-mfNRqC0GaEXqmP97NiwJBeYBmRuqe2VzgLUreUUaEhyJxJWx2Z6ClW1tBOncGNNXdhj6EY4LPvUIWP+oq311CA== (2026-09-22); the tarball was re-downloaded and sha256sum matched adoption/pins-linux-x86_64.json exactly",
-      "install_note": "Identical bytes to the linux-x86_64 pin. npm additionally resolves '@anthropic-ai/claude-code-darwin-arm64@2.1.278' on Apple Silicon for the native binary; see platform_dependency below for its pinned identity. This wrapper's own postinstall (install.cjs) calls require.resolve for that platform package and copies/hard-links from wherever THAT resolves into its own bin/claude.exe -- so adoption/bootstrap-macos.sh's install_npm installs this wrapper with --ignore-scripts first (deferring that postinstall), install_platform_dependency then overwrites the unverified nested copy npm auto-fetched with the independently SHA-256-verified tarball at the exact path Node's own require.resolve finds, and only then does install_npm run `npm rebuild` to trigger the deferred postinstall, now against the verified copy. Confirmed end to end against a real npm install of a fixture that mimics install.cjs's exact copy-on-postinstall shape (tests.PlatformDependencyInstallTests.test_claude_code_like_wrapper_postinstall_copies_the_verified_dependency): running the postinstall before this fix-up, or skipping --ignore-scripts, lets it copy the unverified bytes once, irrecoverably, before this script regains control. Set DISABLE_AUTOUPDATER=1 so the pinned version stays pinned.",
-      "platform_dependency": {
-        "name": "@anthropic-ai/claude-code-darwin-arm64",
-        "resolved_package": "@anthropic-ai/claude-code-darwin-arm64",
-        "version": "2.1.278",
-        "url": "https://registry.npmjs.org/@anthropic-ai/claude-code-darwin-arm64/-/claude-code-darwin-arm64-2.1.278.tgz",
-        "sha256": "934a258c59e90ed6ba768d0d46502d3163607dec949845650af80e5f1228330c",
-        "integrity": "sha512-Jgl//CpT1KR1N8uxAN0CmkFu3eESU7GYzPOwdGH1pCENysJqYgo2LwsIrTol+EequNMrTG3kkrNW9mIoS8eWLg==",
-        "checksum_ref": "unlike the codex alias, '@anthropic-ai/claude-code-darwin-arm64' IS a standalone published package; npm view @anthropic-ai/claude-code-darwin-arm64@2.1.278 dist.tarball/dist.integrity read 2026-09-23 gives the url/integrity above. The tarball was independently downloaded to a scratch directory and sha256- and sha512-hashed, both matching (sha512 matches dist.integrity exactly).",
-        "postinstall_binary_check": {
-          "platform_file": "claude",
-          "wrapper_file": "bin/claude.exe",
-          "note": "`tar -tzf` on the downloaded tarball (read 2026-09-23) lists exactly package/claude, package/package.json, package/LICENSE.md, package/README.md -- matching install.cjs's own BINARY_NAME='claude' and PLATFORMS['darwin-arm64'].bin. adoption/bootstrap-macos.sh's install_platform_dependency compares this file against $wrapper_dir/bin/claude.exe (install.cjs's own copy/hardlink destination) with `cmp` after npm rebuild, fail closed on any difference."
-        }
-      }
+      "version": "2.1.280",
+      "kind": "native",
+      "url": "https://downloads.claude.ai/claude-code-releases/2.1.280/darwin-arm64/claude",
+      "sha256": "387a5c5dcdbb815085edf0baf79591f9d8894efe922bceaf3d75b1b08055229d",
+      "checksum_source": "manifest_crosscheck",
+      "checksum_ref": "https://downloads.claude.ai/claude-code-releases/2.1.280/manifest.json (fetched 2026-09-23) lists platforms.darwin-arm64.checksum = 387a5c5dcdbb815085edf0baf79591f9d8894efe922bceaf3d75b1b08055229d; the darwin-arm64 binary itself was independently downloaded (207.2 MiB, matching manifest.size 217254576 bytes reported by the server) and sha256-hashed on this (Linux) host, and the recomputed digest matches the manifest exactly. A manifest.json.sig sidecar exists but this host has no published Anthropic public key or documented verification procedure to check it against, so the manifest's signature itself is UNVERIFIED; treat this pin as byte-verified against the served artifact, not signature-verified. Superseded the prior npm-wrapper + platform_dependency pin (2.1.278, DISABLE_AUTOUPDATER=1): the native installer is now the reference path, matching the linux-x86_64 pin and ~/codex-ecosystem/bin/bootstrap-linux.sh's own claude-code step.",
+      "install_note": "Fetch the binary, verify its sha256, then run `\"$bin\" install 2.1.280`, mirroring pins-linux-x86_64.json's claude-code entry (adoption/bootstrap-macos.sh's own *-native case does this). The installed binary self-manages ~/.local/share/claude/versions and the ~/.local/bin/claude launcher and auto-updates on the latest channel from there; this pin is a floor, not a ceiling, and no DISABLE_AUTOUPDATER opt-out is set. This drops the old npm platform_dependency entirely; the native binary needs no nested @anthropic-ai/claude-code-darwin-arm64 package or install.cjs postinstall copy step.",
+      "bin": "claude"
     },
     {
       "id": "mcporter",

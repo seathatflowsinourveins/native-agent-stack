@@ -1,0 +1,37 @@
+{
+  "_comment": "User-scope MCP server templates for `claude mcp add --scope user`, drafted 2026-09-23 from the live host's ~/.claude.json mcpServers block (names, commands, args and env var NAMES only -- no credentials, tokens or host-specific secret values). ${HOME} and ${ECO_ROOT} are placeholders in this template's own convention (adoption/templates/*.template.*): render or substitute them for the target host before use; do not commit a rendered copy with literal paths back into this file.",
+  "mcpServers": {
+    "ai-memory": {
+      "type": "http",
+      "url": "http://127.0.0.1:49374/mcp"
+    },
+    "jcodemunch": {
+      "type": "stdio",
+      "command": "${ECO_ROOT}/bin/jcodemunch-mcp",
+      "args": [],
+      "env": {
+        "CODE_INDEX_PATH": "${HOME}/.code-index",
+        "JCODEMUNCH_SHARE_SAVINGS": "0"
+      }
+    },
+    "serena": {
+      "type": "stdio",
+      "command": "${ECO_ROOT}/bin/serena-context",
+      "args": [
+        "start-mcp-server",
+        "--transport",
+        "stdio",
+        "--project-from-cwd",
+        "--context",
+        "claude-code",
+        "--enable-web-dashboard",
+        "true",
+        "--open-web-dashboard",
+        "false",
+        "--enable-gui-log-window",
+        "false"
+      ],
+      "env": {}
+    }
+  }
+}

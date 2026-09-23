@@ -442,8 +442,8 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "e2e_state": "conditional",
-              "bootstrap_pinned": false,
-              "bootstrap_version": null
+              "bootstrap_pinned": true,
+              "bootstrap_version": "0.1.7"
             },
             "macos-arm64": {
               "e2e_state": "untested",
@@ -906,12 +906,12 @@
             "linux-wsl2-x86_64": {
               "e2e_state": "accepted",
               "bootstrap_pinned": true,
-              "bootstrap_version": "2.1.278"
+              "bootstrap_version": "2.1.280"
             },
             "macos-arm64": {
               "e2e_state": "untested",
               "bootstrap_pinned": true,
-              "bootstrap_version": "2.1.278"
+              "bootstrap_version": "2.1.280"
             }
           }
         },
@@ -1442,8 +1442,8 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "e2e_state": "conditional",
-              "bootstrap_pinned": false,
-              "bootstrap_version": null
+              "bootstrap_pinned": true,
+              "bootstrap_version": "0.1.8"
             },
             "macos-arm64": {
               "e2e_state": "untested",
@@ -1465,8 +1465,8 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "e2e_state": "conditional",
-              "bootstrap_pinned": false,
-              "bootstrap_version": null
+              "bootstrap_pinned": true,
+              "bootstrap_version": "0.38.1"
             },
             "macos-arm64": {
               "e2e_state": "untested",
@@ -1488,8 +1488,8 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "e2e_state": "conditional",
-              "bootstrap_pinned": false,
-              "bootstrap_version": null
+              "bootstrap_pinned": true,
+              "bootstrap_version": "0.2.7"
             },
             "macos-arm64": {
               "e2e_state": "untested",
@@ -1528,12 +1528,12 @@
             "linux-wsl2-x86_64": {
               "e2e_state": "conditional",
               "bootstrap_pinned": true,
-              "bootstrap_version": "2.1.278"
+              "bootstrap_version": "2.1.280"
             },
             "macos-arm64": {
               "e2e_state": "untested",
               "bootstrap_pinned": true,
-              "bootstrap_version": "2.1.278"
+              "bootstrap_version": "2.1.280"
             }
           }
         },
@@ -2281,15 +2281,19 @@
     },
     "bootstrap_pinned": {
       "linux-wsl2-x86_64": [
+        "agent-browser",
         "ai-memory",
         "candidate:astral-sh-uv",
         "candidate:cli-cli",
         "claude-code",
         "codex",
         "foundation-ai-memory",
+        "markitdown",
         "mcporter",
+        "openresearch",
         "qmd",
-        "rtk"
+        "rtk",
+        "tavily-cli"
       ],
       "macos-arm64": [
         "ai-memory",

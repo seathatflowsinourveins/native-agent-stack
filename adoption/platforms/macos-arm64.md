@@ -198,7 +198,7 @@ machine-readable copy with each `checksum_source` and `checksum_ref` is
 | `uv` | 0.12.17 | `uv-aarch64-apple-darwin.tar.gz` | `85f00cbdc6dd3e97eba4c31b4d014375a9fdfe8f570023b84e5102fc3456896b` | `publisher_checksum_sidecar` |
 | `gh` | 2.101.0 | `gh_2.101.0_macOS_arm64.zip` | `e4303e39d8f07141c4bad4b99b01079f05029c59b27076e8fbc825c985ecdd8b` | `publisher_checksum_file` |
 | `codex` | 0.155.1 | `codex-0.155.1.tgz` | `fded5b71797aaaf9b1c3229c0e2747b53b39887ef25f36ec7196f6d511db1a66` | `npm_registry_integrity_crosscheck` |
-| `claude-code` | 2.1.278 | `claude-code-2.1.278.tgz` | `08c6dfcf3dafcfd30e09b2926c596e274f0fa20844a5801ada7f1c8e6227157e` | `npm_registry_integrity_crosscheck` |
+| `claude-code` | 2.1.280 | `darwin-arm64/claude` (native, not npm) | `387a5c5dcdbb815085edf0baf79591f9d8894efe922bceaf3d75b1b08055229d` | `manifest_crosscheck` |
 | `mcporter` | 0.13.13 | `mcporter-0.13.13.tgz` | `ccab169473a3f863fcadf833eff5023f40eb8600dcfe3b7b92678d876765601d` | `npm_registry_integrity_crosscheck` |
 | `context-mode` | 1.0.169 | `context-mode-1.0.169.tgz` | `09c41e4cf77b21566c76b8ea2fdbd7f3d823055fee2f02c2166fd5bb575daf2c` | `npm_registry_integrity_crosscheck` |
 | `ai-memory` | 2.3.2 | `ai-memory-macos-aarch64.tar.gz` | `e0f07ad28938f3ed98a5feb21d11917245d77501764e0005049e7d9c1c16f28a` | `publisher_checksum_sidecar` |
@@ -219,20 +219,18 @@ bootstrap. Not in this table:
 `gitleaks`, `syft` and `dagu`, which are not in the `macos-arm64-foundation`
 component list.
 
-Two pins carry an additional `platform_dependency`, not covered by the hash
-above. The `@openai/codex` and `@anthropic-ai/claude-code` npm tarballs are
-byte-identical to the Linux pins, but on Apple Silicon npm additionally
-resolves `@openai/codex-darwin-arm64` and `@anthropic-ai/claude-code-darwin-arm64`
-— the packages carrying the real binaries. A `npm install` of the wrapper
-alone auto-fetches this platform package too, unverified (measured directly:
-`--omit=optional`, `--no-optional` and `NPM_CONFIG_OMIT=optional` do not
-suppress it, and this install path has no lockfile to omit from in the first
-place). `adoption/bootstrap-macos.sh`'s `install_platform_dependency` does
-not trust that fetch or try to read it back: each pin instead records the
-platform package's own `name`, `resolved_package`, `version` and independent
-`sha256` (plus, for `claude-code`, a `postinstall_binary_check` naming the
-exact files its `install.cjs` postinstall copies from it), and the function
-(1) installs the wrapper with `--ignore-scripts`, deferring its lifecycle
+One pin, `codex`, still carries an additional `platform_dependency`, not
+covered by the hash above. The `@openai/codex` npm tarball is byte-identical
+to the Linux pin, but on Apple Silicon npm additionally resolves
+`@openai/codex-darwin-arm64` — the package carrying the real binary. A `npm
+install` of the wrapper alone auto-fetches this platform package too,
+unverified (measured directly: `--omit=optional`, `--no-optional` and
+`NPM_CONFIG_OMIT=optional` do not suppress it, and this install path has no
+lockfile to omit from in the first place). `adoption/bootstrap-macos.sh`'s
+`install_platform_dependency` does not trust that fetch or try to read it
+back: the pin instead records the platform package's own `name`,
+`resolved_package`, `version` and independent `sha256`, and the function (1)
+installs the wrapper with `--ignore-scripts`, deferring its lifecycle
 scripts; (2) asks Node's own `require.resolve`, scoped to the wrapper's
 directory, exactly where it would resolve this dependency from, trusting and
 deleting that path only when it is an EXACT canonicalized-path match for the
@@ -243,17 +241,29 @@ the prefix otherwise; (3) extracts the independently sha256-verified tarball
 there instead; (4) re-verifies resolution, the resolved package.json's
 `version` against the pin, and its `name` against `resolved_package`, fail
 closed (exit 1) on any mismatch; and (5) runs `npm rebuild` for the wrapper
-so its deferred lifecycle scripts run against the now-verified copy, then
-(when the pin names one) confirms the `postinstall_binary_check` files are
-byte-identical. Every path this compares is canonicalized first
-(`canonical_path`, in the script), because Node realpath-resolves symlinks
-by default when it locates a module and a real Mac's `/var` is a symlink to
-`/private/var`. Unlike the `@anthropic-ai/claude-code-darwin-arm64` package,
-`@openai/codex-darwin-arm64` is not itself a published package name: `npm
-view @openai/codex@0.155.1 optionalDependencies` shows it as an `npm:` alias
-to `@openai/codex@0.155.1-darwin-arm64`, the same `@openai/codex` package
-name at a platform-suffixed version, and the pin's `resolved_package`/
-`version` fields record that distinction.
+so its deferred lifecycle scripts run against the now-verified copy. Every
+path this compares is canonicalized first (`canonical_path`, in the script),
+because Node realpath-resolves symlinks by default when it locates a module
+and a real Mac's `/var` is a symlink to `/private/var`. `@openai/codex-darwin-arm64`
+is not itself a published package name: `npm view @openai/codex@0.155.1
+optionalDependencies` shows it as an `npm:` alias to
+`@openai/codex@0.155.1-darwin-arm64`, the same `@openai/codex` package name
+at a platform-suffixed version, and the pin's `resolved_package`/`version`
+fields record that distinction.
+
+**2026-09-23: `claude-code` moved off this npm + `platform_dependency` +
+postinstall-copy design entirely.** It is now a `kind: native` pin (see the
+table above): `adoption/bootstrap-macos.sh`'s `install_native` downloads the
+per-version `darwin-arm64/claude` binary directly from
+`downloads.claude.ai`, verifies its sha256 against the pin, and runs `"$bin"
+install 2.1.280`, exactly mirroring `adoption/pins-linux-x86_64.json`'s own
+`claude-code` pin and `~/codex-ecosystem/bin/bootstrap-linux.sh`'s
+existing claude-code step. There is no more nested platform package, no
+`install.cjs` postinstall to defer, and no `postinstall_binary_check`; the
+native binary manages its own version directory and launcher and keeps
+auto-updating on the latest channel afterward. Both claude-code pins
+(this page's and `adoption/pins-linux-x86_64.json`'s) changed after `v2026.09.23`;
+at that tag they are npm pins.
 
 `llama-server` is a profile `required_command`, so llama.cpp is pinned rather
 than left to `brew install llama.cpp`. The macOS asset holds every executable

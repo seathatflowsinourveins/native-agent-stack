@@ -3139,18 +3139,18 @@
     },
     {
       "path": "adoption/bootstrap-linux.sh",
-      "sha256": "5a7310884ab3d805202b207cf9e1e30a98991ed807e135700ae747c546c8dd45",
-      "bytes": 14909
+      "sha256": "7ffa94c2a654c2ceb2fe0ab56ac6bc7cce8e44b135ac10f824ce257ac2b294ae",
+      "bytes": 18084
     },
     {
       "path": "adoption/bootstrap-macos.sh",
-      "sha256": "257f6756f5bec1e8eaf7bfec0fa0c93f96f2b1c347dee04534f2d3eab96ccfc0",
-      "bytes": 54524
+      "sha256": "4de962dbcd13ea7878c17c24562aad582980ebf47f687e7ed8049e3ab7d8e511",
+      "bytes": 57933
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "a4d772f2572c0725815f56052eb808e52d1423ea918db1754a715d6d840ac797",
-      "bytes": 12910
+      "sha256": "795403e602aa2f0638790629e5d10b10377e4a004bb3afe3be2f7c94de2fe4be",
+      "bytes": 16600
     },
     {
       "path": "adoption/host-receipt.schema.json",
@@ -3234,23 +3234,23 @@
     },
     {
       "path": "adoption/pins-linux-x86_64.json",
-      "sha256": "3607fc8278cd32c89f706e8dfb452c1d369b14162184cfa41e03db70f3b07593",
-      "bytes": 6757
+      "sha256": "31a96d867d084d1b399f5d6da71544b04a842cbb016bfe56d41235e7cdca4c8c",
+      "bytes": 11269
     },
     {
       "path": "adoption/pins-macos-arm64.json",
-      "sha256": "c5f6d5bb506a53c575f24d6b358a12fb8705cfa6609d3b88a8c6003769169287",
-      "bytes": 19197
+      "sha256": "b393868aee89534bf3986470c11584463116b8748d433da3fb2ac25a067956eb",
+      "bytes": 17677
     },
     {
       "path": "adoption/platforms/linux-wsl2.md",
-      "sha256": "1d7cfdc6cdc6157c3727c0f386e8acaad7046b099d0dbccf8827e76203c4c4ca",
-      "bytes": 5929
+      "sha256": "c26ba0ed11ba0ebcade4ba0f86183244b9e04375c2e1a6820dd39ca6eaf3c620",
+      "bytes": 6206
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
-      "sha256": "ba2c02333308f6c142f61de986e515307988ef670cb0b2928e2acbc771a3db14",
-      "bytes": 39768
+      "sha256": "920ba6279fee6ac61a59385e52b9c95df90d952c891267c1b02a281ace3ad3d8",
+      "bytes": 40322
     },
     {
       "path": "adoption/pre-login-observation.json",
@@ -3289,8 +3289,8 @@
     },
     {
       "path": "adoption/templates/claude.settings.template.json",
-      "sha256": "27a407a56b49a51baba04040de5ca9516fdc985ff07694635aadd11ffac61ba2",
-      "bytes": 5508
+      "sha256": "a85d53f83852b289a1dafd1767b863bd22f4d6f24a15b4bbbf0588e665b44b55",
+      "bytes": 6480
     },
     {
       "path": "adoption/templates/codex.config.template.toml",
@@ -8650,8 +8650,8 @@
     },
     {
       "path": "catalogs/landscape/new-host-grand-list.json",
-      "sha256": "31c127d82da4690b256c5d483a05fe8af59c2955e08f888412d525c3c3247d32",
-      "bytes": 75364
+      "sha256": "a9170e7561003ef37b33d85dec97926371c5ea8d8545c4ed565c5032deec1fdb",
+      "bytes": 75466
     },
     {
       "path": "catalogs/landscape/research-state.json",
@@ -9070,8 +9070,8 @@
     },
     {
       "path": "docs/community-native-practice.md",
-      "sha256": "73414dff430d441288ac7440cb8d8bfc7e0fbfc4bc0be805b2a171f61b6f49b7",
-      "bytes": 8089
+      "sha256": "9f2187980fb7d8619f711d00771e591038d7685fcbbd3230914648e73b1020c0",
+      "bytes": 19528
     },
     {
       "path": "docs/comparison-progress-20260922.md",
@@ -9365,8 +9365,8 @@
     },
     {
       "path": "docs/new-host-grand-list.md",
-      "sha256": "8b6c807bd90d7f5bd49d15e926e1a0e307d0fd1c416ddaafbd763fabd70c0cb4",
-      "bytes": 14833
+      "sha256": "bf0afa11ebd1e9b041ab066eed974277b1139595f4f63e941767b74ce0a20d4f",
+      "bytes": 14902
     },
     {
       "path": "docs/new-workstation-runtime-profile-20260922.md",
@@ -14145,8 +14145,8 @@
     },
     {
       "path": "examples/claude-native/CLAUDE.md",
-      "sha256": "53e1ddd5b917928547ccadb2793e36ebec3f4b3ea8164d8555d873eb72510e97",
-      "bytes": 4513
+      "sha256": "b4f083809afa233db0cd7bcc7e94f30d921de85cbc9a7d08a9b9d061a8b5bf9f",
+      "bytes": 5055
     },
     {
       "path": "examples/claude-native/agents/evidence-reviewer.md",
@@ -14620,13 +14620,13 @@
     },
     {
       "path": "recipes/claude-native-profile.md",
-      "sha256": "34d95772ef91ec33963ef92ea7bb9adc79fd34a7cdbfa533fd54dd6a04fefbcb",
-      "bytes": 15034
+      "sha256": "b494154dddde7c415711c03b4ed4d44e5fde95f0a02d1b1349f65b5859095856",
+      "bytes": 16440
     },
     {
       "path": "recipes/claude-native-ultracode.md",
-      "sha256": "954d8d9e4d5fbb30316ad511d0701d1978c1fa13629aa7111e104ae4552e130f",
-      "bytes": 13670
+      "sha256": "1333f3519a190e73b5bfadd37808164ccefebabe88617f2107f1b47c73a912e5",
+      "bytes": 14403
     },
     {
       "path": "recipes/native-upgrades-20260921.md",
@@ -14835,13 +14835,13 @@
     },
     {
       "path": "tests/test_adoption_bootstrap.py",
-      "sha256": "db7670bd987511cd3ae52747a5886c99e16858fba064fd716add1e643d7e0028",
-      "bytes": 22810
+      "sha256": "c1a74467b813530f08be6ae0fa22625cd4918c91e3e2672b91f46c7be0d226d6",
+      "bytes": 26131
     },
     {
       "path": "tests/test_adoption_bootstrap_macos.py",
-      "sha256": "aeeb644b53e0ab0075ed97596d6a625ed156c26612971b3bdd1ff28cacea40a0",
-      "bytes": 159726
+      "sha256": "747420333a546becb4504a993bcda06bc514a82dae0183f78c6029bcee7c6f2b",
+      "bytes": 161914
     },
     {
       "path": "tests/test_adoption_contract.py",
@@ -14964,6 +14964,11 @@
       "bytes": 58693
     },
     {
+      "path": "tests/test_effort_default_guard.py",
+      "sha256": "b8a63c2cca3304c730c96b9185bd9dce580eef97fb8949481fb0f4febf896fb3",
+      "bytes": 10546
+    },
+    {
       "path": "tests/test_execution_realism.py",
       "sha256": "556bcaecd191d5ec52674b882905f3d7d1a147e3614b6a0a65c1dd9d7327129f",
       "bytes": 3691
@@ -15032,6 +15037,11 @@
       "path": "tests/test_ibkr_acceptance.py",
       "sha256": "2c0f09c5fd86a0125e775fdcd5363a6d25a8f2ff521802a3c6b489b9b21492e7",
       "bytes": 15483
+    },
+    {
+      "path": "tests/test_install_claude_profile.py",
+      "sha256": "b01a05e900adecedb804d9a96903d0c3a3534a86e43a4390c215e8a791eb0f14",
+      "bytes": 13050
     },
     {
       "path": "tests/test_job_recovery.py",
