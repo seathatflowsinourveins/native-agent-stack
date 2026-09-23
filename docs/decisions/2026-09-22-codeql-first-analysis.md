@@ -14,11 +14,11 @@ future work.
 
 | # | Rule | Location (re-located at 796f759) | Classification | Action | Evidence |
 |---|------|------------------------------------|-----------------|--------|----------|
-| 1 | `js/xss-through-dom` | `docs/ecosystem/template.html:145` (`link()` sets `node.href = url`) | Defense in depth (build-side `public_url()` in `scripts/build_ecosystem.py:121-133` is the primary control: it already allows only credential-free `https:` URLs with no userinfo/loopback host into the catalog data the template renders, and `tests/test_ecosystem_manifest.py:256-271,799-802` assert `javascript:` URLs are stripped before the template ever sees them) | Fixed: added `safeHref(url)` helper that parses the URL and only assigns `href` when the protocol is `http:`/`https:`, else `about:blank`; this is a second, independent barrier at the DOM-write site in case a future data source bypasses `public_url()` | `tests/test_ecosystem_manifest.py::test_safe_href_allowlists_http_https_and_rejects_other_schemes` runs the committed helper (extracted verbatim from `template.html`, not reimplemented) under Node and asserts `javascript:`, `data:`, `vbscript:`, `file:`, and `mailto:` all resolve to `about:blank` while `https:`/`http:`/protocol-relative/relative URLs pass through unchanged; `--check` deterministic rebuild of the template |
+| 1 | `js/xss-through-dom` | `docs/ecosystem/template.html:145` (`link()` sets `node.href = url`) | Defense in depth (build-side filtering is the primary control: `public_url()` in `scripts/build_ecosystem.py` admits only credential-free `https:` source links, and `loopback_url()` admits only explicit `http://` links to this PC's loopback dashboards; neither admits a `javascript:`/`data:` scheme, and `tests/test_ecosystem_manifest.py` asserts `javascript:` URLs are stripped before the template sees them) | Fixed: added `safeHref(url)` helper that parses the URL and only assigns `href` when the protocol is `http:`/`https:`, else `about:blank`; this is a second, independent barrier at the DOM-write site in case a future data source bypasses `public_url()` | `tests/test_ecosystem_manifest.py::test_safe_href_allowlists_http_https_and_rejects_other_schemes` runs the committed helper (extracted verbatim from `template.html`, not reimplemented) under Node and asserts `javascript:`, `data:`, `vbscript:`, `file:`, and `mailto:` all resolve to `about:blank` while `https:`/`http:`/protocol-relative/relative URLs pass through unchanged; `--check` deterministic rebuild of the template |
 | 2 | `js/xss-through-dom` | `docs/ecosystem/template.html:512` (`screenshot.src = "data:image/png;base64," + artifact.content_base64`) | False positive | Dismissed (not changed) | The `data:image/png;base64,` scheme prefix is a fixed source-code literal; the appended payload cannot alter the outer URI scheme, so there is no attacker-controllable sink. See `codeql-dismissals.json` entry #2. |
-| 3 | `py/bad-tag-filter` | `scripts/build_ecosystem.py:704` (`re.findall(r"<script>(.*?)</script>", result, re.S)`) | Real defect | Fixed: added `re.I` so an injected uppercase `<SCRIPT>` tag is still counted/hashed into the page's inline-script CSP hash instead of silently bypassing the `require(len(scripts) == 1)` guard | `python -m unittest tests/test_ecosystem_manifest.py`; `scripts/build_ecosystem.py --check` |
-| 4 | `py/bad-tag-filter` | `tests/test_claude_repository_evidence.py:147` (script-body extraction for the CSP `script-src 'sha256-...'` assertion) | Real defect (test asserts a real security property: the page admits only its own script) | Fixed: added `re.I` so the test still catches an uppercase `<SCRIPT>` tag the CSP hash would otherwise miss | `python -m unittest tests/test_claude_repository_evidence.py` |
-| 5 | `py/bad-tag-filter` | `tests/test_ecosystem_manifest.py:231` (extracts the template's single inline script for a Node harness) | Real defect (robustness of the "exactly one inline script" precondition) | Fixed: added `re.I` | `python -m unittest tests/test_ecosystem_manifest.py` |
+| 3 | `py/bad-tag-filter` | `scripts/build_ecosystem.py` `render_from_data()` (`re.findall(r"<script>(.*?)</script>", result, re.S)`) | Robustness, not an exploitable defect: the regex reads the repository's own template, and embedded data is `<`-escaped so it cannot open or close a tag | Fixed: replaced the regex with `InlineScripts`, a stdlib `html.parser.HTMLParser` that tokenizes as a browser does (tag case, `</script >`, end-tag attributes), so the CSP hash always covers the script that runs | Coordinator check: on the real generated page the parser and the old regex return the identical single body; `InlineScripts('<SCRIPT>x()</script >')` returns `['x()']`; `scripts/build_ecosystem.py --check`; unit tests |
+| 4 | `py/bad-tag-filter` | `tests/test_claude_repository_evidence.py` CSP assertion (script-body extraction) | Robustness of a test that asserts a real property (the page admits only its own hashed script) | Fixed: `ExecutableScripts` stdlib parser (excludes `type="application/json"` blocks) instead of the regex | Same equality check on `docs/ecosystem/claude-repository-evidence.html`; `python -m unittest tests.test_claude_repository_evidence` |
+| 5 | `py/bad-tag-filter` | `tests/test_ecosystem_manifest.py` Node harness (extracts the template's single inline script) | Robustness | Fixed: the test's existing `Page` parser now also collects attribute-less script bodies (`inline_scripts`) | Template equality check; `python -m unittest tests.test_ecosystem_manifest` |
 | 6 | `py/clear-text-storage-sensitive-data` | `tests/test_validate.py:225` (`write_binary` fixture helper) | False positive / test-only | Dismissed (not changed) | Writes a synthetic, string-concatenation-built fake Hugging Face token to disk specifically to verify the validator's own secret scanner detects and rejects it; not a real credential. See `codeql-dismissals.json` entry #6. |
 | 7 | `py/clear-text-logging-sensitive-data` | `blueprints/convergence-practice/wsl-restore/run.py:147` (`print(json.dumps({'status':report['status'],'commands':len(report['commands']),'checks':len(report['checks'])}))`) | False positive | Dismissed (not changed) | The printed sink only carries `report['status']` and two `len()` counts. CodeQL's taint path reaches it through `report`, which accumulates command records from `call()`; `call()`'s `password=` keyword only ever stores a `Path` to a 0600 password *file* (`--password-file`) in `argv`/`report`, never file contents — `private_key()` writes the random password bytes directly to that file and never returns or logs them. The finding is a keyword-name match on `password`, not a flow of secret bytes to the print. See `codeql-dismissals.json` entry #7. |
 | 8 | `py/incomplete-url-substring-sanitization` | `tests/test_lifecycle_capture.py:103` (mock `Routed.get` used `"sec.gov" in url`) | Real defect (small, test-scoped) | Fixed: replaced the substring check with `urlparse(url).hostname` compared exactly (`== "sec.gov"` or `.endswith(".sec.gov")`), preserving the test's intent of distinguishing SEC-origin URLs from other publishers | `python -m unittest tests/test_lifecycle_capture.py` |
@@ -28,13 +28,15 @@ future work.
 ## Alternatives considered
 
 - **Dismiss all 10 as "used in tests".** Rejected for alerts #1, #3, #4, #5, #8: each has a small, idiomatic
-  fix (URL-scheme allowlisting, case-insensitive tag regex, exact hostname comparison) that keeps the
+  fix (URL-scheme allowlisting, stdlib HTML tokenizer, exact hostname comparison) that keeps the
   flagged code's or test's intent and removes the actual gap, per the project's preference for a code fix
   over dismissal when the fix is small.
-- **Replace the `<script>` regex scan with a real HTML parser (e.g. `html.parser`).** Considered for alerts
-  #3-#5; deferred as unnecessary scope expansion — the only requirement is "does not miss an uppercase
-  `<SCRIPT>` tag that a browser would still execute", which `re.I` alone satisfies without introducing a new
-  dependency into a build script and two test modules.
+- **Add `re.I` to the `<script>` regexes (first pass).** Superseded: `py/bad-tag-filter` also flags patterns
+  that miss browser-accepted end-tag variants such as `</script >`, so case-insensitivity alone would likely
+  leave the three alerts open. The stdlib `html.parser` (no new dependency; the tests already used it) removes
+  the heuristic instead of chasing it.
+- **Dismiss #3-#5 as false positives.** Rejected: the parser replacement is small, keeps exact behaviour on the
+  real pages, and needs no dismissal.
 - **Rename the `password=` parameter in `run.py`'s `call()` to sidestep CodeQL's naming heuristic.** Rejected:
   this would only game the scanner's keyword match, not fix or clarify anything; the dismissal correctly
   records why the flow is safe instead.
@@ -72,10 +74,9 @@ lacked an executed, repeatable check of the committed `safeHref` helper. All thr
   `https:`/`http:`/protocol-relative/relative URLs pass through unchanged.
 
 The reviewer's rerun also flagged a skipped-test-count mismatch (337 claimed vs. 338 observed) on the full
-`python -m unittest discover` run. Re-running the full suite three times after this pass (once before and
-twice after the fixes above) consistently reports `Ran 2496 tests ... OK (skipped=338)` — the count is
-deterministic on this host; the original claim of 337 in the prior handoff was simply a transcription slip,
-not a flake, since every independent observation since (including the reviewer's own rerun) agrees on 338.
+`python -m unittest discover` run. A second independent rerun of three consecutive runs showed the skip count
+itself varies between runs on this host (environment-dependent skips), so neither number is a fixed
+property; every run reported 0 failures and 0 errors, which is the acceptance signal.
 
 `manifests/evidence.json`'s `sha256`/`bytes` entries for the two files this pass edited
 (`tests/test_ecosystem_manifest.py`, this decision doc) were refreshed via `host_receipts.register_file()`

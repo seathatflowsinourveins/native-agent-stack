@@ -7,6 +7,7 @@ import argparse
 import base64
 import hashlib
 import html
+from html.parser import HTMLParser
 import json
 from pathlib import Path
 import re
@@ -692,6 +693,30 @@ def build_data(root):
             "inputs": sorted(inputs.values(), key=lambda row: row["path"]), **curated}
 
 
+class InlineScripts(HTMLParser):
+    """Bodies of attribute-less <script> elements, tokenized as a browser would
+    (tag case, end-tag whitespace/attributes), so the CSP hash covers what runs."""
+
+    def __init__(self, text):
+        super().__init__(convert_charrefs=False)
+        self.bodies, self.body = [], None
+        self.feed(text)
+        self.close()
+
+    def handle_starttag(self, tag, attrs):
+        if tag == "script":
+            self.body = None if attrs else []
+
+    def handle_data(self, data):
+        if self.body is not None:
+            self.body.append(data)
+
+    def handle_endtag(self, tag):
+        if tag == "script" and self.body is not None:
+            self.bodies.append("".join(self.body))
+            self.body = None
+
+
 def render_from_data(data, root):
     template = safe_file(root, TEMPLATE).read_text(encoding="utf-8")
     require(template.count("@@DATA@@") == 1, "template must have one embedded data marker")
@@ -701,7 +726,7 @@ def render_from_data(data, root):
     body += 'No data leaves this page. Public source repository: <a href="'
     body += html.escape(data["repository_url"], quote=True) + '">native-agent-stack</a>.</p></noscript>'
     result = template.replace("@@DATA@@", encoded).replace("<!--@@BODY@@-->", body)
-    scripts = re.findall(r"<script>(.*?)</script>", result, re.S | re.I)
+    scripts = InlineScripts(result).bodies
     require(len(scripts) == 1, "template must have one inline application script")
     script_hash = base64.b64encode(hashlib.sha256(scripts[0].encode()).digest()).decode()
     return result.replace("@@SCRIPT_HASH@@", script_hash).encode("utf-8")

@@ -20,6 +20,8 @@ class Page(HTMLParser):
     def __init__(self, text):
         super().__init__()
         self.scripts = []
+        self.inline_scripts = []
+        self.inline = None
         self.external_assets = []
         self.data = ""
         self.elements = {}
@@ -33,6 +35,7 @@ class Page(HTMLParser):
         if tag == "script":
             self.scripts.append(attrs)
             self.reading_data = attrs.get("id") == "ecosystem-data"
+            self.inline = None if attrs else []
         if tag in {"script", "img", "iframe", "link"}:
             url = attrs.get("src", attrs.get("href", ""))
             if url and not url.startswith("data:"):
@@ -41,10 +44,15 @@ class Page(HTMLParser):
     def handle_endtag(self, tag):
         if tag == "script":
             self.reading_data = False
+            if self.inline is not None:
+                self.inline_scripts.append("".join(self.inline))
+                self.inline = None
 
     def handle_data(self, data):
         if self.reading_data:
             self.data += data
+        if self.inline is not None:
+            self.inline.append(data)
 
 
 class EcosystemManifestTests(unittest.TestCase):
@@ -228,7 +236,7 @@ process.stdout.write(JSON.stringify({nodes, errors, renderAttempts, navigations}
              ["injected renderer failure"], 1),
         ):
             with self.subTest(label=label):
-                script, = re.findall(r"<script>(.*?)</script>", html_text, re.S | re.I)
+                script, = Page(html_text).inline_scripts
                 result = subprocess.run(["node", "-e", harness], input=json.dumps({
                     "script": script, "data": payload}), capture_output=True, text=True, timeout=10)
                 self.assertEqual(result.returncode, 0, result.stderr)

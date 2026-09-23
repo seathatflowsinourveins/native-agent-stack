@@ -7989,8 +7989,8 @@
     },
     {
       "path": "docs/decisions/2026-09-22-codeql-first-analysis.md",
-      "sha256": "cf928a9df8cbcea6950ccd2e4b03679525ce773e479a2f1dba5656491dd5a910",
-      "bytes": 11201
+      "sha256": "2966768eeb7aaa8a21f32036ef912606c314043c920855ca6e135e374d5582b7",
+      "bytes": 11627
     },
     {
       "path": "docs/direct-results.md",
@@ -13024,8 +13024,8 @@
     },
     {
       "path": "scripts/build_ecosystem.py",
-      "sha256": "91972ba3d96c5275202c8f7629c6e532466f4f923dfe2c3ef1b6103fb6f0aab8",
-      "bytes": 48553
+      "sha256": "d21d8d705f677ae6de0bec27673c556ec0147060d4ac724363d3a040972a4e94",
+      "bytes": 49314
     },
     {
       "path": "scripts/catalog_decisions.py",
@@ -13274,8 +13274,8 @@
     },
     {
       "path": "tests/test_claude_repository_evidence.py",
-      "sha256": "95b752a950ee8d6310ff5ec3b698bf0b0db7d421d6d227851604f0f2aa08896b",
-      "bytes": 10276
+      "sha256": "5be1832a8c741cf5ee7b72c146ae88bd394a4ccb883a0adb8761773d6acf568a",
+      "bytes": 10940
     },
     {
       "path": "tests/test_component_matrix.py",
@@ -13304,8 +13304,8 @@
     },
     {
       "path": "tests/test_ecosystem_manifest.py",
-      "sha256": "cf68419d2b8874dc15ea5a359d331f7fbb890199d711acf5b3e281f892ebdfeb",
-      "bytes": 58403
+      "sha256": "9468971db76fab5c185d1710f4d19e06d1b2a2c80121c65dc916023579cafdfd",
+      "bytes": 58693
     },
     {
       "path": "tests/test_execution_realism.py",

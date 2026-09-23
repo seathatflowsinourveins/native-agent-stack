@@ -2,10 +2,34 @@
 
 import base64
 import hashlib
+from html.parser import HTMLParser
 import json
 from pathlib import Path
 import re
 import unittest
+
+
+class ExecutableScripts(HTMLParser):
+    """Bodies of <script> elements a browser would run (JSON data blocks excluded)."""
+
+    def __init__(self, text):
+        super().__init__(convert_charrefs=False)
+        self.bodies, self.body = [], None
+        self.feed(text)
+        self.close()
+
+    def handle_starttag(self, tag, attrs):
+        if tag == "script":
+            self.body = None if dict(attrs).get("type") == "application/json" else []
+
+    def handle_data(self, data):
+        if self.body is not None:
+            self.body.append(data)
+
+    def handle_endtag(self, tag):
+        if tag == "script" and self.body is not None:
+            self.bodies.append("".join(self.body))
+            self.body = None
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -144,7 +168,7 @@ class ClaudeRepositoryEvidenceTests(unittest.TestCase):
         self.assertIn("connect-src 'none'", policy)
         script_src = policy.split("script-src", 1)[1].split(";", 1)[0]
         self.assertNotIn("unsafe", script_src)
-        bodies = [body for attrs, body in re.findall(r"<script([^>]*)>(.*?)</script>", page, re.S | re.I) if "application/json" not in attrs]
+        bodies = ExecutableScripts(page).bodies
         self.assertEqual(len(bodies), 1)
         expected = "'sha256-" + base64.b64encode(hashlib.sha256(bodies[0].encode("utf-8")).digest()).decode("ascii") + "'"
         self.assertEqual(script_src.split(), [expected])
