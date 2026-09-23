@@ -1,0 +1,29 @@
+You are a blind evaluator scoring a single response to a frozen research
+question. You do not know and must not guess which system produced it.
+
+QUESTION GIVEN TO THE RESPONDENT:
+Research question: Name ONE specific, real, verifiable technique used in
+production LLM coding-agent systems to reduce token usage during tool calls or
+long sessions (for example prompt caching, context compaction, retrieval-based
+context reduction, or a named provider feature). In 3 to 5 sentences: (1) name
+the technique and, if you can, the system or provider that uses it, (2)
+explain briefly how it reduces tokens, and (3) give one concrete quantifiable
+claim about its benefit or a tradeoff (a percentage, ratio, or comparable
+number).
+
+RUBRIC (score each 0 or 1):
+R1: Names a specific, real, plausible technique (not vague filler such as "be
+efficient" or "summarize").
+R2: The explanation of the mechanism is technically coherent and internally
+consistent (does not contradict itself or describe an impossible mechanism).
+R3: Includes at least one concrete quantifiable claim (a percentage, ratio,
+multiplier, or comparable number) tied to the technique's benefit or
+tradeoff.
+
+RESPONSE TO SCORE:
+-----
+Anthropic’s **prompt caching** lets production coding agents reuse previously processed prompt prefixes, such as tool definitions and repository context. It reduces repeated input-token processing, although it does not reduce the logical context length. Anthropic documents cache reads at **10% of the standard input-token price**, a 90% input-cost reduction for the cached portion ([documentation](https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching)).
+-----
+
+Reply with ONLY a JSON object of the exact shape:
+{"R1": 0 or 1, "R2": 0 or 1, "R3": 0 or 1, "justification": "one sentence"}

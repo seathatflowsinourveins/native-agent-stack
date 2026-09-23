@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "id": "sdk-vs-cli-resume-comparison",
+  "date": "2026-09-23",
+  "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+  "layer_ids": ["native-clients"],
+  "gap_refs": [
+    {"layer_id": "native-clients", "gap_index": 12}
+  ],
+  "purpose": "Gap 12: neither SDK candidate has a retained same-task comparison preserving the required native account and recovery boundaries. This check installs the Claude Agent SDK into a fresh, version-pinned prefix separate from the wave-2 prefix, then runs the SAME frozen research task (blueprints/gap-wave3-20260923/native-clients-research-task/task-prompt.txt, identical to the gap-2/8 check) through the Claude Agent SDK and through native `claude -p`, N=2 each, on the same account and Bash-only tool scope, plus one resume call per arm using a distinct follow-up prompt that requires recalling specific content from the first turn -- a genuine resume test, not a repeat of the same task.",
+  "preregistered": "Frozen before any SDK/CLI run in this check (reusing the gap-2/8 task and rubric, which were frozen before that check ran): the same task-prompt.txt and rubric.json, plus a new resume-followup-prompt.txt (blueprints/gap-wave3-20260923/native-clients-research-task/) written before any resume call, asking the model to restate the technique name and classify its own previous quantifiable number -- a question answerable only by actually recalling the prior turn, not by re-deriving a generic answer. Expectation stated before running: if resume succeeds, the follow-up answer will correctly name 'prompt caching' and correctly classify the cited number as a cache-read discount percentage; a resume that silently starts a fresh context (no real continuity) would instead produce a generic or refused answer, or a different technique. Usage and blind-judge quality (same rubric, same judge protocol as gap 2/8) are compared per arm on the 2 main runs only (the resume outputs are compared qualitatively for continuity, not re-judged on the R1-R3 quality rubric, since the resume prompt is a different, much shorter recall task) to keep this check's claude -p budget inside the unit's shared 16-call limit alongside gap 2/8.",
+  "commands": [
+    {
+      "cmd": "uv venv + uv pip install claude-agent-sdk into a NEW prefix (~/.local/share/codex-ecosystem/tools/claude-agent-sdk-0.2.158-w3/.venv, separate from the wave-2 prefix claude-agent-sdk-w2)",
+      "exit": 0,
+      "duration_s": 4.0,
+      "output_excerpt": "claude-agent-sdk 0.2.158 installed (same version as wave-2's prefix; PyPI has not published a newer release since).",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "SDK main run 1: flock ~/codex-ecosystem/state/gap-wave3-20260923/claude.lock -- <new-prefix venv python3> blueprints/gap-wave3-20260923/native-clients-sdk-vs-cli/sdk-task.py --mode main (ClaudeAgentOptions(allowed_tools=['Bash'], effort='medium')) ; sleep 20",
+      "exit": 0,
+      "duration_s": 33.0,
+      "output_excerpt": "is_error=False, output_tokens=546, session recorded locally (only a truncated sha256 of the session id is kept in this receipt).",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "SDK main run 2 (independent fresh session): same as above --mode main ; sleep 20",
+      "exit": 0,
+      "duration_s": 33.0,
+      "output_excerpt": "is_error=False, output_tokens=624, independent session.",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "SDK resume: --mode resume --resume-id-file <run-1's local session-id file> (ClaudeAgentOptions(resume=<run-1 session id>)), prompt = resume-followup-prompt.txt ; sleep 20",
+      "exit": 0,
+      "duration_s": 28.0,
+      "output_excerpt": "is_error=False, session_id_sha256_12 matched run-1's exactly, confirming same-thread continuity. Answer correctly restated 'prompt caching' and correctly classified the cited number as 'a cache-read discount percentage: a cache read costs 10% of the base input price, about a 90% saving'.",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "CLI main run 1: flock ~/codex-ecosystem/state/gap-wave3-20260923/claude.lock claude -p \"<task-prompt.txt>\" --output-format json --effort medium --allowedTools Bash ; sleep 20",
+      "exit": 0,
+      "duration_s": 21.0,
+      "output_excerpt": "is_error=False, output_tokens=587, total_cost_usd=0.1795822.",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "CLI main run 2 (independent fresh session): same as above ; sleep 20",
+      "exit": 0,
+      "duration_s": 21.0,
+      "output_excerpt": "is_error=False, output_tokens=564, total_cost_usd=0.026006 (much cheaper than run 1: the system-prompt prefix was likely still warm in Anthropic's cache from run 1, only ~1 minute earlier, so the second call's cache_creation_input_tokens dropped to 272 against 62670 cache_read_input_tokens).",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "CLI resume: claude -p \"<resume-followup-prompt.txt>\" --resume <run-1's session id> --output-format json --effort medium --allowedTools Bash ; sleep 20",
+      "exit": 0,
+      "duration_s": 21.0,
+      "output_excerpt": "is_error=False, session_id in the result event matched run-1's exactly (sha256-truncated comparison). Answer correctly restated 'prompt caching' and correctly classified the cited number as 'a cache-read discount percentage: cache reads cost 10% of the base input price, a 90% discount', and separately identified the 1.25x figure as the tradeoff multiplier, not the main benefit claim.",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "4x blind claude -p judge calls on the 2 SDK + 2 CLI main-run outputs only (same rubric/protocol as gap 2/8), packet order randomized (python random.seed(271828) over [sdk_run1,sdk_run2,cli_run1,cli_run2] giving cli_run1,cli_run2,sdk_run1,sdk_run2), identity stripped ; sleep 20 each",
+      "exit": 0,
+      "duration_s": 92.0,
+      "output_excerpt": "All 4 judge calls exited 0. All 4 outputs scored R1=1, R2=1, R3=1 (3/3, ceiling) -- consistent with the gap-2/8 check's ceiling result on the same task.",
+      "output_sha256": "n/a"
+    }
+  ],
+  "tool_versions": {
+    "claude": "2.1.280 (Claude Code)",
+    "claude-agent-sdk": "0.2.158"
+  },
+  "installs": [
+    {"name": "claude-agent-sdk", "version": "0.2.158", "prefix": "~/.local/share/codex-ecosystem/tools/claude-agent-sdk-0.2.158-w3", "source_url": "https://pypi.org/project/claude-agent-sdk/", "sha256": "not recorded (installed via uv pip from PyPI index, no single wheel hash captured)"}
+  ],
+  "model_calls": [
+    {"client": "claude-agent-sdk query() (main, N=2)", "model": "claude-opus-5-5[1m] (SDK default, options.effort='medium')", "effort": "medium", "count": 2, "input_tokens": 8, "output_tokens": 1170, "cache_creation_input_tokens": 31549, "cache_read_input_tokens": 80895},
+    {"client": "claude-agent-sdk query() (resume, N=1)", "model": "claude-opus-5-5[1m]", "effort": "medium", "count": 1, "input_tokens": 2, "output_tokens": 156, "cache_creation_input_tokens": 3007, "cache_read_input_tokens": 29201},
+    {"client": "claude -p (main, N=2)", "model": "claude-opus-5-5[1m]", "effort": "medium", "count": 2, "input_tokens": 8, "output_tokens": 1151, "cache_creation_input_tokens": 20173, "cache_read_input_tokens": 105761, "total_cost_usd": 0.2055882},
+    {"client": "claude -p (resume, N=1)", "model": "claude-opus-5-5[1m]", "effort": "medium", "count": 1, "input_tokens": 2, "output_tokens": 110, "cache_creation_input_tokens": 2417, "cache_read_input_tokens": 31657, "total_cost_usd": 0.2074576},
+    {"client": "claude -p (blind judge, N=4)", "model": "claude-opus-5-5[1m]", "effort": "medium", "count": 4, "input_tokens": "see raw_artifacts (not summed here to avoid conflating judge-call cost with research-call cost)", "output_tokens": "see raw_artifacts"}
+  ],
+  "result": "The Claude Agent SDK, run through native Claude Code auth (no API key) with an allowed_tools=['Bash'] restriction and options.effort='medium', successfully completed the same frozen research task as native `claude -p` under matched settings, with the SDK's resume(=<prior session id>) option correctly continuing the same thread: the resumed SDK call's returned session id hashed identically to the original run's, and its answer correctly recalled and restated the specific technique and specific number given in the prior turn rather than re-deriving a generic answer. Native `claude -p --resume <session-id>` showed the identical pattern. Both arms therefore demonstrate working, verifiable same-thread resume with actual content continuity (not just a non-erroring resume flag), on this account and tool scope -- this directly settles the 'SDK resume was previously only source-reviewed, never exercised' half of gap 12 noted in the wave-2 receipt's limitations. Quality: the blind judge scored all 4 main-run outputs (2 SDK, 2 CLI) 3/3, a ceiling effect consistent with the same finding on the same task in the gap-2/8 check -- a valid null result for this bounded task, not evidence the SDK and CLI paths are equivalent on harder tasks. Usage: the SDK's main-run mean output_tokens (585) and mean combined context (input+cache_creation+cache_read, ~55.7k) were close to claude -p's main-run mean output_tokens (575.5) and mean combined context (~62.97k); the SDK path's mean combined context was somewhat lower, but both CLI main runs' costs differed nearly 7x from each other (run 1 $0.180 vs run 2 $0.026) due to an apparent cache-warmth effect between the two back-to-back CLI calls, so a clean per-call cost comparison between the SDK and CLI paths is not reliable from N=2 with this much between-call variance. The SDK path exposes no native total_cost_usd field at all (unlike claude -p), so cost comparison for the SDK arm is not possible from native usage; only claude -p's cost could be reported.",
+  "settles_gap": "partially",
+  "verdict_impact": {
+    "could_change_verdict": false,
+    "direction": "supports_incumbent",
+    "explanation": "Materially advances gap 12: it replaces the wave-2 receipt's source-review-only finding on SDK resume/session_id fields with an actually-exercised, same-task, matched-tool-scope comparison against native claude -p, including a genuine resume continuity test for both arms (not merely a non-erroring resume call, but a follow-up question only answerable by real context recall, correctly answered by both arms). Does not fully settle gap 12: quality is a ceiling-effect null result on this one bounded task (same caveat as gap 2/8), N=2 main runs per arm is small, the SDK path has no native cost field so no full cost comparison is possible, and the observed ~7x cost swing between the CLI arm's own two back-to-back runs shows this task/account state is too cache-sensitive for a small-N cost comparison to be trusted without more trials or explicit cache-state control."
+  },
+  "evidence_class": "native_proven",
+  "limitations": [
+    "N=2 main runs + 1 resume per arm is small; the CLI arm's own two main runs differed in cost by nearly 7x due to an apparent cache-warmth effect between back-to-back calls, so per-call cost/usage means reported here should be read as indicative, not precise, at this N.",
+    "The SDK path exposes no native total_cost_usd field, so no dollar-cost comparison between the SDK and CLI arms is possible from native usage alone; only claude -p's cost is reported.",
+    "Quality is a ceiling-effect null result (all 4 judged outputs scored 3/3 on the same rubric as gap 2/8, for the same reason: this bounded recall task was not hard enough to discriminate quality). This does not establish SDK/CLI quality equivalence on harder or more open-ended tasks.",
+    "The resume follow-up prompt was judged only qualitatively for correct-recall-vs-generic-answer (both arms passed), not re-scored on the R1-R3 rubric, since it is a different and much shorter task than the main research question; this is a design choice made to conserve the shared claude -p budget, not an oversight.",
+    "Only one resume hop was tested per arm (a single follow-up turn); multi-hop resume chains, resume after a long delay, resume across a host restart, or resume of a session that hit a tool-permission denial are not tested here.",
+    "The SDK was exercised through this check's own minimal script (options.effort='medium', allowed_tools=['Bash'], resume=<id>); it does not exercise MCP tools, hooks, subagents, or other SDK surface area beyond what the wave-2 receipt already covered as install/single-tool-call evidence.",
+    "This unit stopped all further claude -p and SDK calls after this check: five_hour rate-limit utilization on the shared account had climbed to allowed_warning 0.96 by the last judge call (never reaching a 429/blocked state, so no calls were abandoned mid-run), and the unit's own 16-call claude -p budget (judge calls included, shared with gap 2/8) was exactly exhausted by this point; both are recorded here as the reason no additional SDK/CLI trials were attempted, not as an error."
+  ],
+  "raw_artifacts": [
+    {"path": "~/codex-ecosystem/state/gap-wave3-20260923/native-clients/raw/sdk/sdk_run1.json", "sha256": "b855188a6a0a28576a6b476d15f559363f290719ad93f6bd696bef12194edf6f"},
+    {"path": "~/codex-ecosystem/state/gap-wave3-20260923/native-clients/raw/sdk/sdk_run2.json", "sha256": "d4efc527533c38140828f8876825408c41c6366ff4d8b18fb3a6149a29672c46"},
+    {"path": "~/codex-ecosystem/state/gap-wave3-20260923/native-clients/raw/sdk/sdk_resume.json", "sha256": "a4232809528e1ea7f40d919ede7625479484b0d038509abfa7783607b1a8c082"},
+    {"path": "~/codex-ecosystem/state/gap-wave3-20260923/native-clients/raw/cli-arm/cli_run1.json", "sha256": "2ca820ffad1eb4eff9a6ba506e5a77ac671c5faf295a203d950acb6bd99e3224"},
+    {"path": "~/codex-ecosystem/state/gap-wave3-20260923/native-clients/raw/cli-arm/cli_run2.json", "sha256": "a17d5bc78e78e8a816303ccdbbf7b2117937857eeb1b954bb76b1e21e8203d84"},
+    {"path": "~/codex-ecosystem/state/gap-wave3-20260923/native-clients/raw/cli-arm/cli_resume.json", "sha256": "9cb0bf46d0230e11cacf546a716aa2a420e64ba279c06eb285064fb0fbddd39f"},
+    {"path": "~/codex-ecosystem/state/gap-wave3-20260923/native-clients/raw/judge/judge-cli_run1.json", "sha256": "fd409b34ff27fb696cf28e3a037613226d39b2d1aebd69cb462ece6bc5c61ba2"},
+    {"path": "~/codex-ecosystem/state/gap-wave3-20260923/native-clients/raw/judge/judge-cli_run2.json", "sha256": "646b0e1d7c002d319480309eb776d20e3741d4d6ab7a66d0ae603f493fc682c7"},
+    {"path": "~/codex-ecosystem/state/gap-wave3-20260923/native-clients/raw/judge/judge-sdk_run1.json", "sha256": "5c5d7a7f2a4a56f4c0705b1791f588c7d5a41f1e67b77bb4dac57347c875d599"},
+    {"path": "~/codex-ecosystem/state/gap-wave3-20260923/native-clients/raw/judge/judge-sdk_run2.json", "sha256": "8d0c1109ee8146e54c2c9eef73979114c82fb7fc2537d37cb14f4f0e19d45840"},
+    {"path": "blueprints/gap-wave3-20260923/native-clients-sdk-vs-cli/main-runs-summary.json", "sha256": "see manifests/evidence.json files[] entry"}
+  ],
+  "per_gap_settles": {
+    "native-clients:12": "partially"
+  }
+}

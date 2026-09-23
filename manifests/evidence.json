@@ -5908,6 +5908,166 @@
       "bytes": 236
     },
     {
+      "path": "blueprints/gap-wave3-20260923/native-clients-research-task/extract-summary.json",
+      "sha256": "3ca8f07fcd60e4e650828cd878347bb47de05f8ca4de4ef5e71dd9bfbeb7fb1d",
+      "bytes": 9361
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/native-clients-research-task/extract.py",
+      "sha256": "7fca83183672c8a8b81d95ffb566a26cc0dc1bf36c15fc1f0111e642efdd3f10",
+      "bytes": 3366
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/native-clients-research-task/judge-packets/run1_codex.txt",
+      "sha256": "a0722b99b15baf6ba4fca366e95d706a732b41418cf39a20d926d4e56d75bf81",
+      "bytes": 461
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/native-clients-research-task/judge-packets/run2_claude.txt",
+      "sha256": "c746515c8e9b126f32e6411bda33afe26a168b852355720b1bda654885e50148",
+      "bytes": 811
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/native-clients-research-task/judge-packets/run3_codex.txt",
+      "sha256": "96d15170f0b7d9a616c82bbdb2c5141f7bc052b8db326f2ab7669b2b6223bac3",
+      "bytes": 473
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/native-clients-research-task/judge-packets/run4_codex.txt",
+      "sha256": "b483cfb0edb2c8f54872e6b3ae09faa92fbc28a85bcba76cca575c98068a9326",
+      "bytes": 471
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/native-clients-research-task/judge-packets/run5_claude.txt",
+      "sha256": "95f848571557cd7fef0ae70264b24814a7bf602cc4a4e7fde4b2555f74d6f35a",
+      "bytes": 978
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/native-clients-research-task/judge-packets/run6_claude.txt",
+      "sha256": "87280a2948b0d81c10a7b9eb6626dad1f35fd81c9e7df64f7e07b38609776d31",
+      "bytes": 1036
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/native-clients-research-task/judge-prompt-template.txt",
+      "sha256": "d0b0095b1799a5abfc3992cf5a564f3be27bf22c321b91c61c2b5c39e8206dcc",
+      "bytes": 1335
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/native-clients-research-task/judge-runs/judge-run1_codex.prompt.txt",
+      "sha256": "446fe973ecc4d32ff859be4c245b1c6f7bcf70844e0cafaeb4d01f06f10a7d70",
+      "bytes": 1786
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/native-clients-research-task/judge-runs/judge-run2_claude.prompt.txt",
+      "sha256": "3c223fc2e77c81bf4c32c15183b7afa94862dba48a90b1900c604d7a5fe836d6",
+      "bytes": 2136
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/native-clients-research-task/judge-runs/judge-run3_codex.prompt.txt",
+      "sha256": "7516eee276036d9a949c68eeaf143d02a5c725fb6f2df3ba00d72f9aed03eb65",
+      "bytes": 1798
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/native-clients-research-task/judge-runs/judge-run4_codex.prompt.txt",
+      "sha256": "84f7cc77db9ce5c0103788c110e6147f1c51e5d8af203d4924e7264c88d29878",
+      "bytes": 1796
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/native-clients-research-task/judge-runs/judge-run5_claude.prompt.txt",
+      "sha256": "615c33b23d06014b4403f3bc41bbbc95bf35ee84fc5c6d8a82bd6177667d0fe0",
+      "bytes": 2303
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/native-clients-research-task/judge-runs/judge-run6_claude.prompt.txt",
+      "sha256": "a045abb050bdd15507f8b05f55673862513d908bd887fc0be158c1c26b042042",
+      "bytes": 2361
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/native-clients-research-task/resume-followup-prompt.txt",
+      "sha256": "fca8312b97533253270bc3e79802f62ac3200f64dbea95a93877397b4e9348be",
+      "bytes": 319
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/native-clients-research-task/rubric.json",
+      "sha256": "753ed0c3535bd09c6050d4ea00db0bcd2bd513620796ccb5227c7f69344a21ee",
+      "bytes": 2428
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/native-clients-research-task/run-arm.sh",
+      "sha256": "dd27995e562a73ac33615fec907211f33648ec578f00c75766c8f7d38be5d317",
+      "bytes": 1068
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/native-clients-research-task/run-judge.sh",
+      "sha256": "da21d88ad8096c97c5fd6e6bf07e46026c127739b370dbf8332a274ec94389dd",
+      "bytes": 501
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/native-clients-research-task/run-order.json",
+      "sha256": "f1d823a0120cd8ba0f42135021c2889f56c44435ff32e2d9ad97c188cb2aa1a7",
+      "bytes": 677
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/native-clients-research-task/task-prompt.txt",
+      "sha256": "dbde6c33aa7b8132161cc13b77a705f551c0c8addf5c8353530c65a8cca82422",
+      "bytes": 789
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/native-clients-research-task/task.md",
+      "sha256": "0fb848fd68936fc6dd11ff17dc665ae14878d1e7aea826504dd3c3c9e10a1c37",
+      "bytes": 1976
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/native-clients-sdk-vs-cli/judge-packets/cli_run1.txt",
+      "sha256": "b9bfe4e2bfe79473bc2e319693938cc9342db10923ce73c0443f0298c3aa6c9f",
+      "bytes": 872
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/native-clients-sdk-vs-cli/judge-packets/cli_run2.txt",
+      "sha256": "a2f4c18bc9ff70301e306f0e32b2fb5e4e2cc71a7bd2a0f09dfea01b749c5a28",
+      "bytes": 995
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/native-clients-sdk-vs-cli/judge-packets/sdk_run1.txt",
+      "sha256": "0301b2517377325c2a98a340887fca7a3d4609aab6288c9a1de5acf802e2e17f",
+      "bytes": 954
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/native-clients-sdk-vs-cli/judge-packets/sdk_run2.txt",
+      "sha256": "efbf29549ef15bec9a8dea80058060d7a7e2927d6f3d643e99c57cbe0d35e39f",
+      "bytes": 1033
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/native-clients-sdk-vs-cli/judge-runs/judge-cli_run1.prompt.txt",
+      "sha256": "8cf69affb5076405b3c6d2e441169efb28e9d0ce03bb3eabe9bfe58584fb1023",
+      "bytes": 2197
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/native-clients-sdk-vs-cli/judge-runs/judge-cli_run2.prompt.txt",
+      "sha256": "530f27e2f72b21907e89ba69165bad53e4949f26f99743791e8cf43b29590f0b",
+      "bytes": 2320
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/native-clients-sdk-vs-cli/judge-runs/judge-sdk_run1.prompt.txt",
+      "sha256": "8b2a923f0ab799f462786cbd859b52aa4efaacd6b84e137dfe009c3f7a526785",
+      "bytes": 2279
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/native-clients-sdk-vs-cli/judge-runs/judge-sdk_run2.prompt.txt",
+      "sha256": "f9519d38e4be91967931f047ce346755df390924193dbf6a2dcd3ead599c396d",
+      "bytes": 2358
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/native-clients-sdk-vs-cli/main-runs-summary.json",
+      "sha256": "c1522f4dc3c6bc898f1be4bfc1085b4b6faeb2dd47a8e33dd94dc8e0cd1ab5bc",
+      "bytes": 8173
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/native-clients-sdk-vs-cli/sdk-task.py",
+      "sha256": "fc5807b8bf09b464c686eb9919f6cd02f7952b3ae21bec63117cfcfad99493e2",
+      "bytes": 2630
+    },
+    {
       "path": "blueprints/memory-lifecycle-probe/README.md",
       "sha256": "c50ba6b05cba66095a357f1185429761b251462b9b91d1d23a51532b317bc042",
       "bytes": 9126
@@ -10091,6 +10251,16 @@
       "path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/watcher-kill-restart-recovery.json",
       "sha256": "1702356a6e2ee2db38b4bf38daa8a7caf14df71efb802635153616a8d7e2e120",
       "bytes": 19163
+    },
+    {
+      "path": "evidence/artifacts/gap-wave3-20260923/native-clients/arm-comparison-research-task.json",
+      "sha256": "cfe2fc527568ebcf8c5fb0b63d8b79dec79a60531a9a88f87c4f09d54985c2ed",
+      "bytes": 13910
+    },
+    {
+      "path": "evidence/artifacts/gap-wave3-20260923/native-clients/sdk-vs-cli-resume-comparison.json",
+      "sha256": "dfee39ff26aace7e4fd22c92cc7eac9640739aa5c1d3ebe129502399f56656ef",
+      "bytes": 15067
     },
     {
       "path": "evidence/artifacts/harness-rules-convergence-20260922/codex-agent-roles-source.json",

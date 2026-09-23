@@ -1,0 +1,160 @@
+{
+  "sdk_run1": {
+    "arm": "sdk",
+    "result": "The technique is **prompt caching**, specifically Anthropic's prompt caching for the Claude API, which Claude Code uses. An agent resends the same long prefix on every tool-call turn: system prompt, tool definitions, and earlier conversation. Caching lets the API store that prefix at marked `cache_control` breakpoints and reuse it on later requests, so the unchanged part is not billed or processed as fresh input. Anthropic's published pricing bills a cache read at 10% of the base input-token price, about a 90% saving on the reused prefix. The tradeoff is on writes: storing the prefix costs 1.25\u00d7 the base input price with the default 5-minute lifetime, or 2\u00d7 with the 1-hour option. Caching also only helps when the prefix stays byte-for-byte identical and is reused before it expires.\n\nThese figures come from my knowledge of Anthropic's documentation, not from a source I checked in this session. The only tool I ran was the timestamp command.\n\nTIMESTAMP: 2026-09-23T05:06:56Z",
+    "usage": {
+      "input_tokens": 4,
+      "cache_creation_input_tokens": 29201,
+      "cache_read_input_tokens": 26965,
+      "output_tokens": 546,
+      "output_tokens_details": {
+        "thinking_tokens": 105
+      },
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 29201,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "not_available",
+      "iterations": [
+        {
+          "input_tokens": 2,
+          "output_tokens": 446,
+          "cache_read_input_tokens": 26965,
+          "cache_creation_input_tokens": 2236,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 2236
+          },
+          "type": "message"
+        }
+      ],
+      "speed": "standard"
+    },
+    "is_error": false,
+    "session_hash": "4b9e8a99312b"
+  },
+  "sdk_run2": {
+    "arm": "sdk",
+    "result": "**Technique:** Anthropic's prompt caching for the Claude API. Claude Code uses it to reuse the large, repeated prefix of each request: the system prompt, tool definitions and earlier conversation turns. **How it reduces tokens:** you mark a stable prefix as cacheable, and later requests that start with the exact same prefix read it from the cache instead of processing it again. Only the new suffix, such as the latest tool result or user message, is billed at the full input rate. **Benefit:** Anthropic's documentation prices cache reads at about 10% of the base input-token price, roughly a 90% saving on the cached part. It announced up to about 85% lower latency for long prompts. **Tradeoff:** writing to the default 5-minute cache costs about 1.25\u00d7 the base input price, and changing anything early in the prefix (for example, editing tool definitions mid-session) invalidates the cache. I gave these figures from memory because you limited me to a single Bash command, so I didn't check them against current documentation.\n\nTIMESTAMP: 2026-09-23T05:07:31Z",
+    "usage": {
+      "input_tokens": 4,
+      "cache_creation_input_tokens": 2348,
+      "cache_read_input_tokens": 53930,
+      "output_tokens": 624,
+      "output_tokens_details": {
+        "thinking_tokens": 169
+      },
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 2348,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "not_available",
+      "iterations": [
+        {
+          "input_tokens": 2,
+          "output_tokens": 412,
+          "cache_read_input_tokens": 26965,
+          "cache_creation_input_tokens": 2348,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 2348
+          },
+          "type": "message"
+        }
+      ],
+      "speed": "standard"
+    },
+    "is_error": false,
+    "session_hash": "4a8f783f3d08"
+  },
+  "cli_run1": {
+    "arm": "cli",
+    "result": "One technique is **prompt caching** in Anthropic's Claude API. Claude Code uses it on every turn of a long session. The API stores the processed form of a prompt prefix that doesn't change, such as the system prompt, tool definitions and earlier conversation turns, so later requests with the same prefix read it from cache instead of processing it again. It doesn't shrink the context window: it cuts the cost and time of the repeated part, which in an agent loop is most of the input. Anthropic's pricing puts cache reads at 10% of the base input-token price, a 90% discount. The tradeoff is that a cache write costs 1.25\u00d7 base input for the default 5-minute lifetime, so it only pays off if the prefix is reused before the cache expires. These figures are from my own knowledge; I didn't check them against current Anthropic docs, as the one-tool limit ruled that out.\n\nTIMESTAMP: 2026-09-23T05:08:41Z",
+    "usage": {
+      "input_tokens": 4,
+      "cache_creation_input_tokens": 19901,
+      "cache_read_input_tokens": 43091,
+      "output_tokens": 587,
+      "output_tokens_details": {
+        "thinking_tokens": 178
+      },
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 19901,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "not_available",
+      "iterations": [
+        {
+          "input_tokens": 2,
+          "output_tokens": 308,
+          "cache_read_input_tokens": 31335,
+          "cache_creation_input_tokens": 322,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 322
+          },
+          "type": "message"
+        }
+      ],
+      "speed": "standard"
+    },
+    "cost": 0.1795822,
+    "is_error": false,
+    "session_hash": "7bfcefcdad7f"
+  },
+  "cli_run2": {
+    "arm": "cli",
+    "result": "One technique is **prompt caching** in the Anthropic Messages API, which Claude Code uses across long agent sessions. You mark a stable prompt prefix, such as the system prompt, tool definitions and earlier conversation turns, with `cache_control` breakpoints. Later requests that start with the same prefix read it from the cache instead of processing it again at full price. The context window stays the same size, but most of the input tokens a coding agent re-sends on each tool-call turn become cheap cache reads. By Anthropic's published pricing, cache reads cost 10% of the base input-token price (a 90% discount), and Anthropic's launch announcement claimed latency drops of up to 85% for long prompts. The tradeoff is that writing to the cache costs 25% more than normal input for the default 5-minute lifetime, so caching only pays off when the prefix is reused before it expires. I answered from memory and did not re-check these figures against current documentation in this session.\n\nTIMESTAMP: 2026-09-23T05:09:15Z",
+    "usage": {
+      "input_tokens": 4,
+      "cache_creation_input_tokens": 272,
+      "cache_read_input_tokens": 62670,
+      "output_tokens": 564,
+      "output_tokens_details": {
+        "thinking_tokens": 128
+      },
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 272,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "not_available",
+      "iterations": [
+        {
+          "input_tokens": 2,
+          "output_tokens": 335,
+          "cache_read_input_tokens": 31335,
+          "cache_creation_input_tokens": 272,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 272
+          },
+          "type": "message"
+        }
+      ],
+      "speed": "standard"
+    },
+    "cost": 0.026006,
+    "is_error": false,
+    "session_hash": "2e8d058faf7b"
+  }
+}

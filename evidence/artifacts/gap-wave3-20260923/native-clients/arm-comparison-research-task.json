@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "id": "arm-comparison-research-task",
+  "date": "2026-09-23",
+  "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+  "layer_ids": ["native-clients"],
+  "gap_refs": [
+    {"layer_id": "native-clients", "gap_index": 2},
+    {"layer_id": "native-clients", "gap_index": 8}
+  ],
+  "purpose": "Gap 2: the wave-2/prior research task was one run per client with no matched baseline, establishing neither a quality ranking nor a causal token difference. Gap 8: no matched execution establishes comparative model quality or causal provider savings across candidate clients. This check runs one frozen, bounded research task N=3 per client (`claude -p` vs `codex exec`) in counterbalanced order, blind-judges each of the 6 outputs against a rubric frozen before any run, and reports per-arm token/cost usage from each client's own native usage fields.",
+  "preregistered": "Frozen and committed to the worktree BEFORE any arm ran: blueprints/gap-wave3-20260923/native-clients-research-task/task.md (verbatim prompt, matched Bash-only tool scope, medium effort for both clients), rubric.json (R1-R3 blind-judged 0/1 criteria plus a mechanical, non-judged R4 TIMESTAMP check), and run-order.json (a seeded-random counterbalanced order, python random.seed(20260923) over ['claude']*3+['codex']*3, shuffled to codex,claude,codex,codex,claude,claude -- deliberately not blocked by client, unlike the wave-2 skill-arm-ab check where one arm always ran first and confounded cache-warmth with the arm variable). Expected discriminating signal, stated before running: if one client's arm scores materially higher mean R1+R2+R3 with separated spread, that is evidence of a quality difference; if scores are indistinguishable, that is a valid null result to report, not evidence to discard. A second, short, distinct task was considered and explicitly not run (task.md), to keep the claude -p call budget (16 total for this unit, judge calls included) within bounds alongside gap 12's SDK-vs-CLI comparison.",
+  "commands": [
+    {
+      "cmd": "6x (counterbalanced order codex,claude,codex,codex,claude,claude) via blueprints/gap-wave3-20260923/native-clients-research-task/run-arm.sh: flock ~/codex-ecosystem/state/gap-wave3-20260923/{claude,codex}.lock -- claude -p \"<frozen prompt>\" --output-format json --effort medium --allowedTools Bash ; sleep 20  |  codex exec --json -c model_reasoning_effort=medium -s workspace-write - < <(frozen prompt) (codex arm waited while >=2 concurrent `codex exec` processes were running, per binding rules; none were observed, so no wait was needed)",
+      "exit": 0,
+      "duration_s": 172.0,
+      "output_excerpt": "All 6 calls exited 0. All 6 answers named Anthropic prompt caching as the technique and included a valid TIMESTAMP line (mechanical R4 pass on all 6). Extracted usage and stripped judge packets via blueprints/gap-wave3-20260923/native-clients-research-task/extract.py.",
+      "output_sha256": "n/a (see raw_artifacts for the 6 individual run hashes)"
+    },
+    {
+      "cmd": "6x blind claude -p judge calls (blueprints/gap-wave3-20260923/native-clients-research-task/run-judge.sh), one per output, packet order randomized (python random.seed(31415) over the 6 labels, giving run6_claude,run2_claude,run1_codex,run4_codex,run3_codex,run5_claude), client identity and TIMESTAMP stripped from each packet: flock ~/codex-ecosystem/state/gap-wave3-20260923/claude.lock claude -p \"<rubric+stripped answer>\" --output-format json --effort medium --allowedTools \"\" ; sleep 20",
+      "exit": 0,
+      "duration_s": 149.0,
+      "output_excerpt": "All 6 judge calls exited 0 and returned parseable JSON. Every one of the 6 outputs scored R1=1, R2=1, R3=1 (3/3, ceiling) -- see result for the honest null-result interpretation.",
+      "output_sha256": "n/a (see raw_artifacts for the 6 individual judge-run hashes)"
+    }
+  ],
+  "tool_versions": {
+    "claude": "2.1.280 (Claude Code)",
+    "codex": "codex-cli 0.155.1"
+  },
+  "installs": [],
+  "model_calls": [
+    {"client": "claude -p (research arm)", "model": "claude-opus-5-5[1m]", "effort": "medium", "count": 3, "input_tokens": 12, "output_tokens": 1765, "cache_creation_input_tokens": 87210, "cache_read_input_tokens": 156440},
+    {"client": "codex exec (research arm)", "model": "gpt-6-astra (this host's ~/.codex/config.toml default model; not overridden by -m, only -c model_reasoning_effort=medium was passed to override the config default of 'ultra'; the codex --json event stream itself does not echo a model field, so this is read from config, not confirmed per-call)", "effort": "medium (overrides config default 'ultra' via -c)", "count": 3, "input_tokens": 148830, "output_tokens": 944, "cached_input_tokens": 87680, "reasoning_output_tokens": 373},
+    {"client": "claude -p (blind judge)", "model": "claude-opus-5-5[1m]", "effort": "medium", "count": 6, "input_tokens": "not separately summed (6 independent judge calls; each call's own usage is in its raw artifact, not aggregated here to avoid double-counting against the research-arm totals above)", "output_tokens": "see raw_artifacts"}
+  ],
+  "result": "All 6 research-task outputs (3 claude -p, 3 codex exec) independently converged on the same technique, Anthropic prompt caching, described coherently and with a concrete quantifiable figure (the 10%-of-base-price cache-read discount, ~90% saving) in every single run. The blind judge (client identity and TIMESTAMP stripped, packet order randomized) scored all 6 outputs 3/3 on R1/R2/R3 -- a clean ceiling effect. This is an honest, valid null result on quality for this specific bounded task: it does not show one client producing higher-quality output than the other, because the task was not hard enough to discriminate between them at medium effort. It does NOT establish that the two clients are equal in quality generally; it establishes only that on this one bounded research-recall task, both converged to essentially the same correct answer. Token usage, which the two clients report in structurally different, non-directly-comparable schemas, differed substantially: claude -p's per-turn 'new' input_tokens field stayed at 4 (because the ~80k-token system-prompt/tool-definition prefix, inflated by this repository's own CLAUDE.md/AGENTS.md instruction files being loaded, is charged separately as cache_creation_input_tokens/cache_read_input_tokens, averaging ~29k creation + ~52k read per call), while codex exec's single 'input_tokens' field already reports the full per-turn context inclusive of its own cached_input_tokens sub-component, averaging ~49.6k per call with a smaller, ~29.2k cached component. Comparing claude's 'input_tokens: 4' against codex's 'input_tokens: ~49.6k' at face value would be a schema-mismatch artifact, not a real ~12,000x difference; the fairer combined-context figures (claude ~4 + ~29k + ~52k =~81.2k mean; codex ~49.6k mean) still show claude's total per-turn context transfer as roughly 1.6x codex's on this task, but that gap is confounded by this repository's large project-instruction system prompt (loaded automatically for claude -p in this cwd) versus codex's smaller default system context, not a client-intrinsic property. Output length differed too: claude's mean output_tokens (588) exceeded codex's mean output_tokens (315) by roughly 1.9x, while codex additionally reports reasoning_output_tokens (mean 124) as a distinct sub-field claude does not expose the same way (claude's thinking tokens are folded into output_tokens_details.thinking_tokens, itself a component of the total output_tokens already counted). Only claude -p exposes a native total_cost_usd figure (mean $0.2548 per research call at this account's list pricing); codex exec's native usage event carries no cost field on this host/config, so no direct dollar comparison is possible from native usage alone -- this is itself evidence that a same-currency cost comparison across these two clients is not available from native tooling without an external, independently-priced conversion, which this unit did not attempt.",
+  "settles_gap": "partially",
+  "verdict_impact": {
+    "could_change_verdict": false,
+    "direction": "inconclusive",
+    "explanation": "Advances gap 2 and gap 8 by replacing the prior single-run-per-client, no-baseline evidence with a matched N=3-per-client, counterbalanced-order, blind-judged comparison and native per-arm usage. Does not fully settle either gap: quality is a genuine ceiling-effect null result on this one bounded task (not evidence of equal quality generally, and not evidence the task was well-chosen to discriminate quality -- a harder or more open-ended task might separate the arms), and the token/cost comparison is confounded by the two clients' structurally different usage-reporting schemas and by this repository's outsized default system prompt inflating claude's context relative to codex's. Labeled diagnostic per the unit's own instruction, not universal."
+  },
+  "evidence_class": "native_proven",
+  "limitations": [
+    "N=3 per arm is small; a single frozen task with a 3-point ceiling-prone rubric could not discriminate quality between the two clients on this occasion (all 6 outputs scored 3/3). A harder task, a finer-grained rubric, or more trials might reveal a difference this design cannot detect.",
+    "Only one frozen task was run (the optional second task was explicitly skipped to conserve this unit's shared 16-call claude -p budget across gap 2/8 and gap 12); this cannot establish a general ranking across task types.",
+    "The two clients report native usage in structurally different, non-directly-comparable schemas (see result); the 'combined context' figures computed here are the best available same-unit comparison but are still confounded by this repository's large default system prompt inflating claude -p's per-call context relative to codex exec's.",
+    "No dollar-cost comparison is possible: codex exec's native usage event carries no cost field on this host/config; only claude -p's total_cost_usd is available, and it reflects this account's list pricing, not necessarily a directly comparable rate to any codex/OpenAI billing.",
+    "The blind judge is itself a single claude -p call per output (not cross-checked by a second independent judge or human rater); a judge systematically biased toward or against a particular writing style could affect all 6 scores in the same direction without being detected by this design, though the ceiling effect here makes that concern moot for this run.",
+    "Order was counterbalanced but not fully Latin-square balanced across all 6! possible orderings; a single seeded-random order was used, recorded and followed exactly, but residual cache-state or time-of-day effects across the ~3-minute run window cannot be fully ruled out.",
+    "This receipt reports the sum of the 3-run research-arm usage per client in model_calls; the 6 individual blind-judge calls' usage is not summed into a combined total (to avoid conflating judge-call cost with research-call cost) and is only available per-call in the out-of-repo raw artifacts referenced below.",
+    "The codex exec model_calls entry names 'gpt-6-astra' from this host's ~/.codex/config.toml default, not from a per-call model field in the --json event stream (the stream does not echo one); the actual resolved model for these 3 calls is read from config, not independently confirmed per call."
+  ],
+  "raw_artifacts": [
+    {"path": "~/codex-ecosystem/state/gap-wave3-20260923/native-clients/raw/run1_codex.json", "sha256": "3e7b0675dee3137e59b17c1787c9556078a3e2586e33b2f44ccbb634b8e0b47d"},
+    {"path": "~/codex-ecosystem/state/gap-wave3-20260923/native-clients/raw/run2_claude.json", "sha256": "25f5895c7f155593c17a71e209a52fda1bf1c3e0cc420c05136cb660eb77d488"},
+    {"path": "~/codex-ecosystem/state/gap-wave3-20260923/native-clients/raw/run3_codex.json", "sha256": "3b1d14c8fbc87be68688f5fb32814bdccb722c24d401bb3e2f3735582fd2a5ee"},
+    {"path": "~/codex-ecosystem/state/gap-wave3-20260923/native-clients/raw/run4_codex.json", "sha256": "1b565ac817db5443df85d87809a2077bd6954068c27c43693d78cda108a8ff56"},
+    {"path": "~/codex-ecosystem/state/gap-wave3-20260923/native-clients/raw/run5_claude.json", "sha256": "9ecb47388d409bc8db9d8ba0fdfb60cf7666c2a2d1e920802498fc9ec1de002f"},
+    {"path": "~/codex-ecosystem/state/gap-wave3-20260923/native-clients/raw/run6_claude.json", "sha256": "67d85c2421565d835d813ecebdb49da159fbc0b1823278eb8442ac681f7ec01a"},
+    {"path": "~/codex-ecosystem/state/gap-wave3-20260923/native-clients/raw/judge/judge-run1_codex.json", "sha256": "4f002dcbd36ba666428e82b76b42184ff678dd80197e89e27a16687cd834d70c"},
+    {"path": "~/codex-ecosystem/state/gap-wave3-20260923/native-clients/raw/judge/judge-run2_claude.json", "sha256": "42a0354fa47a8ec7e5ddb76ae7ae851a7736e3a0137098ff9a4907904e326756"},
+    {"path": "~/codex-ecosystem/state/gap-wave3-20260923/native-clients/raw/judge/judge-run3_codex.json", "sha256": "8563586473cc1c3b2f5c98eb0b209fcb3926e2ddf25a1483bf581dec636d508e"},
+    {"path": "~/codex-ecosystem/state/gap-wave3-20260923/native-clients/raw/judge/judge-run4_codex.json", "sha256": "0d6a29c4c9d8bd9cee0e9fb26b08faf1857419c92b9b78598bac3f821597507e"},
+    {"path": "~/codex-ecosystem/state/gap-wave3-20260923/native-clients/raw/judge/judge-run5_claude.json", "sha256": "55bd162e311c5cd3cf9df4ba0314a92e5f40c75b884e3bf91dcac952829219e1"},
+    {"path": "~/codex-ecosystem/state/gap-wave3-20260923/native-clients/raw/judge/judge-run6_claude.json", "sha256": "abf838eeddbb1fa6c644025b0730b097cf3c7c6cb5b137fdcaec8893de6b985b"},
+    {"path": "blueprints/gap-wave3-20260923/native-clients-research-task/extract-summary.json", "sha256": "see manifests/evidence.json files[] entry"}
+  ],
+  "per_gap_settles": {
+    "native-clients:2": "partially",
+    "native-clients:8": "partially"
+  }
+}

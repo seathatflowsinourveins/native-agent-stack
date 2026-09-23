@@ -1,0 +1,177 @@
+{
+  "run1_codex": {
+    "answer": "Anthropic\u2019s **prompt caching**, used by Claude Code, reuses previously processed prompt prefixes across calls. This reduces repeated input processing and token charges during coding sessions, although it does not reduce the context\u2019s token count. Anthropic prices cache reads at **10% of the standard input-token price**, a 90% reduction for the cached portion ([official documentation](https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching)).\n\nTIMESTAMP: 2026-09-23T04:59:12Z",
+    "input_tokens": 48678,
+    "output_tokens": 315,
+    "cached_input_tokens": 31104,
+    "reasoning_output_tokens": 120,
+    "raw_sha256": "3e7b0675dee3137e59b17c1787c9556078a3e2586e33b2f44ccbb634b8e0b47d",
+    "raw_bytes": 1436,
+    "timestamp_line_present": true,
+    "timestamp_value": "2026-09-23T04:59:12Z",
+    "arm": "codex",
+    "label": "run1_codex"
+  },
+  "run2_claude": {
+    "answer": "The technique is **prompt caching**, a feature of Anthropic's Claude API that Claude Code relies on during long agentic sessions. The system prompt, tool definitions and earlier conversation turns stay the same from one tool call to the next. Once written to cache, that shared prefix is read back on later requests instead of being processed again, so each turn fully processes only the new tokens after the last cache breakpoint. According to Anthropic's pricing documentation, cache reads cost 10% of the base input-token price, a 90% discount. The tradeoff is that cache writes cost 1.25\u00d7 the base price with the default 5-minute TTL, so caching only pays off when a prefix is reused. I answered from memory and did not check the current docs in this session, because you allowed only the one Bash command.\n\nTIMESTAMP: 2026-09-23T04:59:30Z",
+    "input_tokens": 4,
+    "output_tokens": 475,
+    "cache_creation_input_tokens": 29336,
+    "cache_read_input_tokens": 52453,
+    "total_cost_usd": 0.2546946,
+    "rate_limit_events": [
+      {
+        "status": "allowed_warning",
+        "resetsAt": 1790582400,
+        "rateLimitType": "seven_day",
+        "utilization": 0.5,
+        "isUsingOverage": false,
+        "unifiedWindows": {
+          "five_hour": {
+            "utilization": 0.84,
+            "resetsAt": 1790151000
+          },
+          "seven_day": {
+            "utilization": 0.5,
+            "resetsAt": 1790582400
+          }
+        }
+      }
+    ],
+    "is_error": false,
+    "raw_sha256": "25f5895c7f155593c17a71e209a52fda1bf1c3e0cc420c05136cb660eb77d488",
+    "raw_bytes": 18061,
+    "timestamp_line_present": true,
+    "timestamp_value": "2026-09-23T04:59:30Z",
+    "arm": "claude",
+    "label": "run2_claude"
+  },
+  "run3_codex": {
+    "answer": "Anthropic\u2019s **prompt caching**, supported by the production coding agent Aider, reuses repeated prompt prefixes such as instructions and repository context. It reduces repeated input processing during tool calls and long sessions, rather than shortening the logical context. Anthropic\u2019s published cache-read rate is **10% of standard input-token pricing**, a **90% cost reduction for cached input tokens**; uncached tokens and cache writes still incur separate charges.\n\nTIMESTAMP: 2026-09-23T05:00:27Z",
+    "input_tokens": 50317,
+    "output_tokens": 380,
+    "cached_input_tokens": 24832,
+    "reasoning_output_tokens": 197,
+    "raw_sha256": "3b1d14c8fbc87be68688f5fb32814bdccb722c24d401bb3e2f3735582fd2a5ee",
+    "raw_bytes": 1432,
+    "timestamp_line_present": true,
+    "timestamp_value": "2026-09-23T05:00:27Z",
+    "arm": "codex",
+    "label": "run3_codex"
+  },
+  "run4_codex": {
+    "answer": "Anthropic\u2019s **prompt caching** lets production coding agents reuse previously processed prompt prefixes, such as tool definitions and repository context. It reduces repeated input-token processing, although it does not reduce the logical context length. Anthropic documents cache reads at **10% of the standard input-token price**, a 90% input-cost reduction for the cached portion ([documentation](https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching)).\n\nTIMESTAMP: 2026-09-23T05:00:45Z",
+    "input_tokens": 49835,
+    "output_tokens": 249,
+    "cached_input_tokens": 31744,
+    "reasoning_output_tokens": 56,
+    "raw_sha256": "1b565ac817db5443df85d87809a2077bd6954068c27c43693d78cda108a8ff56",
+    "raw_bytes": 1415,
+    "timestamp_line_present": true,
+    "timestamp_value": "2026-09-23T05:00:45Z",
+    "arm": "codex",
+    "label": "run4_codex"
+  },
+  "run5_claude": {
+    "answer": "**Technique: prompt caching.** Anthropic offers it in the Claude API, and Claude Code uses it so each turn of a long agent session reuses the same starting prompt (system prompt, tool definitions and earlier conversation). The API stores that unchanged starting prompt, marked with `cache_control` breakpoints. Later requests that begin with the identical text read it from the cache instead of processing it again, so only the new tool results and messages cost full price. By Anthropic's published pricing, a cache read costs 10% of the base input-token price, which is a 90% saving on the reused part. The tradeoff is that writing to the 5-minute cache costs 1.25\u00d7 the base price (2\u00d7 for the 1-hour cache), so it only pays off when the start of the prompt stays the same and is reused before the cache expires.\n\nThese figures come from my knowledge of Anthropic's documentation; I didn't check the live pricing page in this session because you allowed only the one command.\n\nTIMESTAMP: 2026-09-23T05:01:01Z",
+    "input_tokens": 4,
+    "output_tokens": 583,
+    "cache_creation_input_tokens": 29353,
+    "cache_read_input_tokens": 52462,
+    "total_cost_usd": 0.2569924,
+    "rate_limit_events": [
+      {
+        "status": "allowed_warning",
+        "resetsAt": 1790582400,
+        "rateLimitType": "seven_day",
+        "utilization": 0.51,
+        "isUsingOverage": false,
+        "unifiedWindows": {
+          "five_hour": {
+            "utilization": 0.85,
+            "resetsAt": 1790151000
+          },
+          "seven_day": {
+            "utilization": 0.51,
+            "resetsAt": 1790582400
+          }
+        }
+      },
+      {
+        "status": "allowed_warning",
+        "resetsAt": 1790582400,
+        "rateLimitType": "seven_day",
+        "utilization": 0.51,
+        "isUsingOverage": false,
+        "unifiedWindows": {
+          "five_hour": {
+            "utilization": 0.86,
+            "resetsAt": 1790151000
+          },
+          "seven_day": {
+            "utilization": 0.51,
+            "resetsAt": 1790582400
+          }
+        }
+      }
+    ],
+    "is_error": false,
+    "raw_sha256": "9ecb47388d409bc8db9d8ba0fdfb60cf7666c2a2d1e920802498fc9ec1de002f",
+    "raw_bytes": 20690,
+    "timestamp_line_present": true,
+    "timestamp_value": "2026-09-23T05:01:01Z",
+    "arm": "claude",
+    "label": "run5_claude"
+  },
+  "run6_claude": {
+    "answer": "One technique is **prompt caching** in the Anthropic Messages API, which Claude Code uses automatically for its system prompt, tool definitions and conversation history. You mark a stable prefix (tools, system prompt, earlier turns) with a `cache_control` breakpoint, and later requests reuse the cached prefix instead of reprocessing it. This doesn't cut how many tokens you send, but it makes the repeated tokens much cheaper and faster, and a long agent session repeats almost everything on every tool call. Anthropic's documentation prices cache reads at 10% of the base input-token rate, which it describes as up to a 90% cost reduction and up to an 85% latency reduction for long prompts. The tradeoff is that cache writes cost 1.25\u00d7 the base rate with the default 5-minute lifetime, or 2\u00d7 with the 1-hour lifetime, so caching loses money on a prefix that is rarely reused before it expires.\n\nThese figures come from memory of Anthropic's docs; I didn't check them against the current pricing page because only Bash was allowed.\n\nTIMESTAMP: 2026-09-23T05:01:41Z",
+    "input_tokens": 4,
+    "output_tokens": 707,
+    "cache_creation_input_tokens": 28521,
+    "cache_read_input_tokens": 51525,
+    "total_cost_usd": 0.252629,
+    "rate_limit_events": [
+      {
+        "status": "allowed_warning",
+        "resetsAt": 1790582400,
+        "rateLimitType": "seven_day",
+        "utilization": 0.51,
+        "isUsingOverage": false,
+        "unifiedWindows": {
+          "five_hour": {
+            "utilization": 0.86,
+            "resetsAt": 1790151000
+          },
+          "seven_day": {
+            "utilization": 0.51,
+            "resetsAt": 1790582400
+          }
+        }
+      },
+      {
+        "status": "allowed_warning",
+        "resetsAt": 1790582400,
+        "rateLimitType": "seven_day",
+        "utilization": 0.51,
+        "isUsingOverage": false,
+        "unifiedWindows": {
+          "five_hour": {
+            "utilization": 0.87,
+            "resetsAt": 1790151000
+          },
+          "seven_day": {
+            "utilization": 0.51,
+            "resetsAt": 1790582400
+          }
+        }
+      }
+    ],
+    "is_error": false,
+    "raw_sha256": "67d85c2421565d835d813ecebdb49da159fbc0b1823278eb8442ac681f7ec01a",
+    "raw_bytes": 21275,
+    "timestamp_line_present": true,
+    "timestamp_value": "2026-09-23T05:01:41Z",
+    "arm": "claude",
+    "label": "run6_claude"
+  }
+}
