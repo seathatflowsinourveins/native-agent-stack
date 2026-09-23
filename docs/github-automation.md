@@ -952,15 +952,17 @@ when all of these hold at the head:
 - the agreement recomputed from the two sealed returns equals the recorded
   one;
 - the row's winners equal the chosen lane's `winner_keys`, resolved through
-  the wave's sealed packet. With no sealed packet, the row fails closed until
-  review finding 6 lands;
+  the wave's sealed packet, and carry that lane's evidence class and
+  `why_selected` and the packet's pin. With no sealed packet, the row fails
+  closed until review finding 6 lands;
 - a recorded `disagree` row has an adjudication in which judges from both
   lane families agree in both presentation orders with no refuting vote;
 - a recorded `codex_absent` row names a `docs/decisions/` record that carries
   `single-lane-authorization: <catalog>/<layer_id>`.
 
-A change to `platform_status` alone passes only when
-`scripts/platform_status.py` derives the new value. The newest registered
+Every changed `platform_status` value must be the one
+`scripts/platform_status.py` derives; a change to `platform_status` alone
+needs nothing else. The newest registered
 wave is the only one that may change. Whenever a row, a wave or a file under
 the sealed verdict artifacts, `catalogs/landscape/` or
 `catalogs/sota-convergence/` changes, the job also runs `scripts/landscape.py`

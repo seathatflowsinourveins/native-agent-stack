@@ -29,7 +29,8 @@ SEALED = f"evidence/artifacts/layer-verdicts-{RUN}"
 ANTHROPIC = {"name": "claude-opus-4-5", "family": "anthropic", "effort": "high"}
 OPENAI = {"name": "gpt-5.2", "family": "openai", "effort": "high"}
 PACKET = {"catalog": "foundation", "layer_id": "beta", "candidates": [
-    {"key": "c1", "component_id": "comp-one", "repository": "https://github.com/example/one", "adopted": True},
+    {"key": "c1", "component_id": "comp-one", "repository": "https://github.com/example/one", "adopted": True,
+     "pin": "1.0"},
     {"key": "c2", "component_id": "comp-two", "repository": "https://github.com/example/two", "adopted": True},
 ]}
 COMPONENTS = {"c1": "comp-one", "c2": "comp-two"}
@@ -169,7 +170,8 @@ class GateFixture(unittest.TestCase):
             sealed.append(("codex", codex_keys, codex_model, codex_packet or sha(packet_bytes)))
         for lane, keys, model, packet_sha in sealed:
             data = dump({"schema_version": 1, "lane": lane, "catalog": "foundation", "layer_id": layer_id,
-                         "packet_sha256": packet_sha, "model": model, "winner_keys": list(keys)})
+                         "packet_sha256": packet_sha, "model": model, "winner_keys": list(keys),
+                         "winner_evidence_class": "source_review", "why_selected": "fixture"})
             path = f"{SEALED}/{lane}/{run_id}.json"
             self.write(path, data)
             if register_lanes:
@@ -391,6 +393,32 @@ class RecomputedAgreementTests(GateFixture):
         self.record(claude_keys=("c1",), codex_keys=("c2",), judged=adjudication(), winners=[winner("comp-two")])
         self.assertFails(self.report(), "row winners ['comp-two'] are not the claude lane's winner_keys resolved "
                                         "through the sealed packet (['comp-one'])")
+
+    def test_winner_evidence_class_edited_after_recording_fails(self):
+        row = self.record()
+        self.rebase()
+        row["winners"][0]["evidence_class"] = "native_proven"
+        self.assertFails(self.report(), "evidence_class 'native_proven' is not the claude lane's winner_evidence_class")
+
+    def test_winner_why_selected_edited_after_recording_fails(self):
+        row = self.record()
+        self.rebase()
+        row["winners"][0]["why_selected"] = "rewritten"
+        self.assertFails(self.report(), "why_selected differs from the sealed claude lane return")
+
+    def test_winner_pin_other_than_the_sealed_packet_fails(self):
+        row = self.record()
+        self.rebase()
+        row["winners"][0]["pin"] = "2.0"
+        self.assertFails(self.report(), "winner comp-one: pin '2.0' is not the sealed packet's '1.0'")
+
+    def test_pending_row_carrying_winners_fails(self):
+        self.record(claude_keys=("c1",), codex_keys=("c2",), status="pending_lanes")
+        self.assertFails(self.report(), "a 'pending_lanes' row carries winners")
+
+    def test_added_row_declaring_more_than_the_receipts_derive_fails(self):
+        self.record(winners=[winner("comp-one", linux="accepted")])
+        self.assertFails(self.report(), "platform_status.linux-wsl2-x86_64 changed to 'accepted'")
 
     def test_new_wave_row_without_sealed_packets_fails_closed(self):
         self.record(packets=False)

@@ -642,21 +642,22 @@ Hosted and live results after merge. Evidence class: hosted runs and GitHub API 
   - a registered wave document and a registered run manifest that lists the row;
   - registered, hash-matching sealed returns from two distinct model families;
   - an agreement that matches the one recomputed from the two sealed returns, and winners that
-    match the chosen lane's keys resolved through the sealed packet. With no sealed packet the row
-    fails closed until finding 6 lands;
+    match the chosen lane's keys resolved through the sealed packet, with that lane's evidence
+    class and `why_selected` and the packet's pin. With no sealed packet the row fails closed until
+    finding 6 lands;
   - for a `disagree` row, an adjudication in which judges from both lane families agree in both
     presentation orders with no refuting vote. A third-family judge is recorded but not required;
   - for a `codex_absent` row, a `docs/decisions/` record that carries
     `single-lane-authorization: <catalog>/<layer_id>`.
 
-  A change to `platform_status` alone passes only when `scripts/platform_status.py` derives it.
+  Every changed `platform_status` value must be the one `scripts/platform_status.py` derives.
   Every base wave entry except the newest must be unchanged. `.github/main-ruleset.json` adds the
   check. The coordinator applies the ruleset after merge, and until then the check reports but
   does not block.
-- **Measured.** `tests/test_verdict_review_gate.py` has 40 synthetic-fixture tests. They cover the
+- **Measured.** `tests/test_verdict_review_gate.py` has 45 synthetic-fixture tests. They cover the
   negative controls (missing, stale or unregistered lane files, same-family lanes, adjudications
   that are missing, one-order, one-family or refuted, a row missing from its run manifest, an
-  unregistered wave, a declared platform upgrade, a relabelled agreement, mismatched packets,
+  unregistered wave, a declared platform upgrade, edited winner fields, a relabelled agreement, mismatched packets,
   swapped winners, missing packets, the single-lane path rules and a rewritten earlier wave) and
   the positive controls. Two mutations of the real checkout both exit 1 and were then restored:
   moving `foundation/workers` into an unsealed 20260923 wave, and deleting one of its sealed

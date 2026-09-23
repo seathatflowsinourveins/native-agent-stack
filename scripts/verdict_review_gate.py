@@ -30,8 +30,9 @@ For each changed row outside ``GRANDFATHERED_RUN_IDS`` it requires, at the head:
   ``single-lane-authorization: <catalog>/<layer_id>`` (and matching
   ``lanes.single_lane_decision_sha256`` when the row stores one; review finding 2).
 
-A row whose only change is a winner's ``platform_status`` passes when
-``scripts/platform_status.py`` ``platform_status()`` derives each changed value. A changed
+Each winner's ``evidence_class``, ``why_selected`` and packet ``pin`` must be the chosen lane's, and
+every changed ``platform_status`` value must be what ``scripts/platform_status.py``
+``platform_status()`` derives; a row whose only change is ``platform_status`` needs nothing else. A changed
 grandfathered row is reported and passes here (``build_verdicts.py --check`` freezes it). Every
 wave registry entry at the base except the newest, and every grandfathered entry, must be
 unchanged at the head, with its document (review finding 4). When a row, a wave or any path under
@@ -66,6 +67,7 @@ from scripts.landscape import (  # noqa: E402
 from scripts import platform_status as platform_evidence  # noqa: E402
 from scripts.catalog_decisions import safe_file  # noqa: E402
 from scripts.host_receipts import evidence_files  # noqa: E402
+from build_manifest import sanitize_value  # noqa: E402
 from build_verdicts import LEDGER_FILES, WAVE_REGISTRY  # noqa: E402
 from record_verdicts import derive_component_id, parse_sha256sums  # noqa: E402
 
@@ -314,6 +316,8 @@ class RowCheck:
                       f"({packet_sha256})")
             candidates = None
         if status != "recorded":
+            if self.row.get("winners"):
+                self.fail(f"a {status!r} row carries winners; only a recorded verdict names winners")
             return
         chosen = None
         if agreement == "same_winner":
@@ -331,11 +335,29 @@ class RowCheck:
         if unknown:
             self.fail(f"the {chosen} lane's winner_keys {unknown} are not candidates of the sealed packet")
             return
-        actual = sorted(winner.get("component_id") for winner in self.row.get("winners") or []
-                        if isinstance(winner, dict))
+        winners = [winner for winner in self.row.get("winners") or [] if isinstance(winner, dict)]
+        actual = sorted(str(winner.get("component_id")) for winner in winners)
         if actual != expected:
             self.fail(f"row winners {actual} are not the {chosen} lane's winner_keys resolved through the sealed "
                       f"packet ({expected})")
+            return
+        self.check_winner_fields(returns[chosen], chosen, winners, candidates)
+
+    def check_winner_fields(self, sealed_return, lane, winners, candidates):
+        """The fields record_verdicts.build_winners copies from the chosen lane and the packet."""
+        pins = {derive_component_id(candidates[key]): candidates[key].get("pin")
+                for key in sealed_return.get("winner_keys") or [] if key in candidates}
+        why_selected = sanitize_value(sealed_return.get("why_selected"))
+        for winner in winners:
+            component_id = winner.get("component_id")
+            if winner.get("evidence_class") != sealed_return.get("winner_evidence_class"):
+                self.fail(f"winner {component_id}: evidence_class {winner.get('evidence_class')!r} is not the {lane} "
+                          f"lane's winner_evidence_class {sealed_return.get('winner_evidence_class')!r}")
+            if winner.get("why_selected") != why_selected:
+                self.fail(f"winner {component_id}: why_selected differs from the sealed {lane} lane return")
+            if pins.get(component_id) and winner.get("pin") != pins[component_id]:
+                self.fail(f"winner {component_id}: pin {winner.get('pin')!r} is not the sealed packet's "
+                          f"{pins[component_id]!r}")
 
     def check_wave(self, run_id):
         entry = self.waves.get(run_id)
@@ -576,10 +598,11 @@ def evaluate(root, base, head_root=None, *, validators=run_repo_validators):
         changes.append({"row": label(key), "kind": kind, "grandfathered": grandfathered})
         if grandfathered:
             continue
-        if kind == "platform_status":
-            context = context or platform_evidence.load_context(head_root)
-            violations.extend(platform_status_violations(key, base_rows[key], row, context))
-        else:
+        # Every changed platform value of a non-grandfathered row must be the one the receipts derive;
+        # a change to platform_status alone needs nothing else.
+        context = context or platform_evidence.load_context(head_root)
+        violations.extend(platform_status_violations(key, base_rows.get(key) or {}, row, context))
+        if kind != "platform_status":
             RowCheck(head_side, key, row, registered, head_waves, violations).run()
     removed = [label(key) for key in sorted(set(base_rows) - set(head_rows), key=lambda k: tuple(map(str, k)))]
     violations.extend(wave_freeze_violations(base_side, head_side, base_waves, head_waves))

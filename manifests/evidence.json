@@ -8809,8 +8809,8 @@
     },
     {
       "path": "docs/decisions/2026-09-22-github-automation-closure.md",
-      "sha256": "704b3ea8eb3ec482f50826b844fe00582828e67caad3a8da465e9636be3888ca",
-      "bytes": 45152
+      "sha256": "60fff522e8e0010d5adeaea17b075b526c93b4e0c26f07c5774b2a4104e89316",
+      "bytes": 45249
     },
     {
       "path": "docs/direct-results.md",
@@ -8919,8 +8919,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "cc9174f2f9fa9e89b651c5a9c84db044db84a07a5d501cea31c7c12e94bd6829",
-      "bytes": 67000
+      "sha256": "3ee6b21868e049120d17bf51e6fff2fc37171eee3092d831979e7f3d93bbca7e",
+      "bytes": 67123
     },
     {
       "path": "docs/grand-catalog-handbook.md",
@@ -14369,8 +14369,8 @@
     },
     {
       "path": "scripts/verdict_review_gate.py",
-      "sha256": "a7be06debe104b13161a081eab8ac3a375ede70fe8207457f86f4e764d043720",
-      "bytes": 33679
+      "sha256": "a134ae32dfe4f258c998b9d760801a4370da5dc747dd9d50814000424718fe9c",
+      "bytes": 35522
     },
     {
       "path": "scripts/verify_nautilus_ci.py",
