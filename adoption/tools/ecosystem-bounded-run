@@ -35,7 +35,8 @@ case $job_max in
 esac
 job_max_count=${job_max%[KMGT]}
 (( ${#job_max_count} <= 18 && (job_max_count >> (62 - job_shift)) == 0 )) || fail 'memory limits must be positive finite sizes'
-job_page=$(/usr/bin/getconf PAGESIZE) && [[ "$job_page" =~ ^[1-9][0-9]*$ ]] || fail 'cannot read the page size; command was not started'
+job_page=$(/usr/bin/getconf PAGESIZE) || fail 'cannot read the page size; command was not started'
+[[ "$job_page" =~ ^[1-9][0-9]*$ ]] || fail 'cannot read the page size; command was not started'
 job_max_bytes=$(( (job_max_count << job_shift) / job_page * job_page ))
 
 # A scope inherits the caller's working directory, environment and standard IO.
@@ -68,7 +69,7 @@ read -r have_tasks < "/sys/fs/cgroup$cgroup/pids.max" || refuse "pids.max is not
 # executable file; a bare name must be an executable file in a PATH directory
 # (a shell builtin such as cd with no file would otherwise fail after the start).
 case $1 in
-  */*) [ -f "$1" ] && [ -x "$1" ] || refuse "command not found: $1" ;;
+  */*) if [ ! -f "$1" ] || [ ! -x "$1" ]; then refuse "command not found: $1"; fi ;;
   *) found=; old_ifs=$IFS; IFS=:
      for dir in $PATH; do [ -f "${dir:-.}/$1" ] && [ -x "${dir:-.}/$1" ] && { found=1; break; }; done
      IFS=$old_ifs; [ -n "$found" ] || refuse "command not found: $1" ;;

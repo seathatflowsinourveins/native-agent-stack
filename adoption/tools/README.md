@@ -24,7 +24,7 @@ the VM and take the whole session down; the scope kills the job instead.
 - `ecosystem-bounded-run` was byte-for-byte identical to its source at copy
   time. On 2026-09-22 a cross-family review fix changed this repository's copy
   (see "Divergence in `ecosystem-bounded-run`" below), so it now hashes to
-  `67f1df1e6fa89057e1e1e4dd699741637ef8627436e4cf4b6b411321a881decb`; the
+  `f9a73f4ebf0d5cb56fb6a379c9566646eb03c7642c9471bb1c6e3b58d1ef58b5`; the
   `7680fe11…` value above identifies the unmodified source only.
 - `gitleaks-guarded` differs from its source on two lines only (see below), so
   the copy in this repository hashes to
