@@ -3108,7 +3108,7 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "ce2e77f4d7578dd5804ec922d553678f719f67487de54d889164c5e5f0db431c",
+      "sha256": "9720a7c6b8886ff2129f27eef3dca2240d58ad9f51af101caa5f14e83d3b2748",
       "bytes": 8343
     },
     {
@@ -3128,7 +3128,7 @@
     },
     {
       "path": "adoption/manifest.json",
-      "sha256": "69f013fd49c01a65dd59e14f94eefa6571f13b488dfaf54fe8347cbbfc42bfb6",
+      "sha256": "cfdcffc32b5c512a24b6836aee64093da1a21bce0cf52bed5ca8ed101255456c",
       "bytes": 18192
     },
     {
@@ -5999,8 +5999,8 @@
     },
     {
       "path": "blueprints/us-equities/data/promotion_gate.py",
-      "sha256": "a6189cd081d59d8e221eba5231a03491030dec764a47942f3cbb4db50f39a7e2",
-      "bytes": 19803
+      "sha256": "38e1fc7642ae3e81ae4c93ee5e9d11cd48159cc0a9d9c29f0d9dc626b320efa5",
+      "bytes": 20192
     },
     {
       "path": "blueprints/us-equities/data/receipt.json",
@@ -7084,8 +7084,8 @@
     },
     {
       "path": "catalogs/foundation/automation.json",
-      "sha256": "a1cd24f9ec9ed4e90443650dd445bc9f78526720ec33371772ed0040eb3e7d13",
-      "bytes": 20074
+      "sha256": "02e67345699b58977505f02988758b1728f6d40041dfe53ad58b4bbfab7e6c1e",
+      "bytes": 19875
     },
     {
       "path": "catalogs/foundation/community-practice-20260920.json",
@@ -7624,8 +7624,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "d793ce30b7f1cc307b7c0c60a9f5b410085cdbac3da403a1c4399317f3e1f5b7",
-      "bytes": 12918618
+      "sha256": "cca3732863be6eae196a11cb46f99c1d8cab643c20344ed3c64ca58a31478722",
+      "bytes": 12921432
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -7694,8 +7694,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "b7c2b6adc67ad8a262a1bd54c65711d8e57e035bd886f84177d36e9fa0911506",
-      "bytes": 31448
+      "sha256": "e56528af1cac64439b63e360614af80dc10032db758b98e9b0b803c0109bd28f",
+      "bytes": 36076
     },
     {
       "path": "docs/grand-catalog-handbook.md",
@@ -11514,8 +11514,8 @@
     },
     {
       "path": "tests/test_adoption_contract.py",
-      "sha256": "141c9d5815d168147627da652f725ab5532467f6e10b77dd9aab79874c695fcf",
-      "bytes": 10945
+      "sha256": "54b0b3567c35a390bd0ef7306d4c998e84e460d5b590f37dfbe4a50ac501a012",
+      "bytes": 11337
     },
     {
       "path": "tests/test_adoption_guarded_runners.py",
@@ -12114,8 +12114,8 @@
     },
     {
       "path": "tests/test_promotion_gate_codex_review.py",
-      "sha256": "782370297740ec117d98dc8ae7307b4564946751cf75ca08bb568fad3b5db55c",
-      "bytes": 16770
+      "sha256": "263657b9256901e1cefb7ea81e1d8eeed645f9e96568c1c7db562312a74f5700",
+      "bytes": 17243
     },
     {
       "path": "blueprints/us-equities/data/fixtures/null-index-session.csv",
