@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "reviewed_at": "2026-09-20",
+  "platform": "linux-x86_64",
+  "components": [
+    {
+      "name": "gitleaks",
+      "version": "8.30.1",
+      "repository": "gitleaks/gitleaks",
+      "release_url": "https://github.com/gitleaks/gitleaks/releases/tag/v8.30.1",
+      "release_published_at": "2026-03-21T02:17:58Z",
+      "source_commit": "83d9cd684c87d95d656c1458ef04895a7f1cbd8e",
+      "license": "MIT",
+      "license_url": "https://raw.githubusercontent.com/gitleaks/gitleaks/83d9cd684c87d95d656c1458ef04895a7f1cbd8e/LICENSE",
+      "license_sha256": "e3884b252b3bfc045e55be43a34d1e80da070bc6f804ac95bf4660e97d62ebc6",
+      "archive": {
+        "name": "gitleaks_8.30.1_linux_x64.tar.gz",
+        "url": "https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_linux_x64.tar.gz",
+        "sha256": "551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb"
+      },
+      "checksums": {
+        "name": "gitleaks_8.30.1_checksums.txt",
+        "url": "https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_checksums.txt",
+        "sha256": "061476c21adaf5441516f96f185c1a4706a83cd6329b9b38762271b3d4a52fae"
+      },
+      "executable": "gitleaks"
+    },
+    {
+      "name": "worktrunk",
+      "version": "0.79.0",
+      "repository": "max-sixty/worktrunk",
+      "release_url": "https://github.com/max-sixty/worktrunk/releases/tag/v0.79.0",
+      "release_published_at": "2026-09-21T01:01:42Z",
+      "source_commit": "5ba6f148e8505c20794f2d8bc706aa4f26335c95",
+      "license": "MIT OR Apache-2.0",
+      "license_url": "https://raw.githubusercontent.com/max-sixty/worktrunk/5ba6f148e8505c20794f2d8bc706aa4f26335c95/LICENSE",
+      "license_sha256": "eda019abe602c101e9d9c2d7723aa4c4cb2b1ae0e0e0915c37976d5c1d3bb632",
+      "archive": {
+        "name": "worktrunk-x86_64-unknown-linux-musl.tar.xz",
+        "url": "https://github.com/max-sixty/worktrunk/releases/download/v0.79.0/worktrunk-x86_64-unknown-linux-musl.tar.xz",
+        "sha256": "b8c190b1d652370ef9f6b8f4694a2d6831b5b22f4b789f047612aad32764c6cf"
+      },
+      "checksums": {
+        "name": "worktrunk-x86_64-unknown-linux-musl.tar.xz.sha256",
+        "url": "https://github.com/max-sixty/worktrunk/releases/download/v0.79.0/worktrunk-x86_64-unknown-linux-musl.tar.xz.sha256",
+        "sha256": "e0cb1c7a0e68dd30a814aa147d43d8bdae613881827078f48c63d31b086e66b2"
+      },
+      "executable": "wt"
+    }
+  ]
+}

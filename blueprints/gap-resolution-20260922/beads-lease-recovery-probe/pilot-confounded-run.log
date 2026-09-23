@@ -1,0 +1,37 @@
+wait-start: 2026-09-22T22:49:14+00:00
+wait-end: 2026-09-22T22:54:44+00:00
+=== reclaim after ~330s wait ===
+Debug: loaded config from <HOME>/.beads/config.yaml
+Debug: merged config from <HOME>/.config/bd/config.yaml
+Debug: merged config from /tmp/beads-gap-probe/.beads/config.yaml
+Debug: loaded config from <HOME>/.beads/config.yaml
+Debug: merged config from <HOME>/.config/bd/config.yaml
+Debug: merged config from /tmp/beads-gap-probe/.beads/config.yaml
+{
+  "count": 0,
+  "reclaimed": null,
+  "schema_version": 1,
+  "scoped": true
+}
+=== show after reclaim attempt ===
+[
+  {
+    "id": "beads-gap-probe-3cg",
+    "title": "worker-crash-probe",
+    "description": "scratch issue for lease-recovery test",
+    "status": "in_progress",
+    "priority": 2,
+    "issue_type": "task",
+    "assignee": "probe-worker",
+    "owner": "probe@example.com",
+    "created_at": "2026-09-22T22:48:42Z",
+    "created_by": "probe",
+    "updated_at": "2026-09-22T22:48:45Z",
+    "started_at": "2026-09-22T22:48:45Z",
+    "dependent_count": 0,
+    "dependency_count": 0,
+    "comment_count": 0,
+    "revision": "-8866523492055217324"
+  }
+]
+DONE

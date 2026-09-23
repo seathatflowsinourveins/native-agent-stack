@@ -1,0 +1,72 @@
++ date -u +%FT%TZ
+2026-09-23T00:06:32Z
++ ~/.local/share/codex-ecosystem/tools/dvc-3.67.1-20260922/bin/dvc --version
+3.67.1
++ git --version
+git version 2.43.0
++ python3.13 --version
+Python 3.13.15
++ cd ~/code/nas-wt-gapint/blueprints/us-equities/nanosecond-replay
++ python3.13 replay.py materialize --source fixture.json --output ~/codex-ecosystem/state/gap-resolution-20260922/storage-market/dvc-rerun/work/materialized
+Traceback (most recent call last):
+  File "~/code/nas-wt-gapint/blueprints/us-equities/nanosecond-replay/replay.py", line 192, in <module>
+    raise SystemExit(main())
+                     ~~~~^^
+  File "~/code/nas-wt-gapint/blueprints/us-equities/nanosecond-replay/replay.py", line 182, in main
+    result = materialize(args.source, args.output) if args.command == "materialize" else select(
+             ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/code/nas-wt-gapint/blueprints/us-equities/nanosecond-replay/replay.py", line 85, in materialize
+    import duckdb
+ModuleNotFoundError: No module named 'duckdb'
++ cd ~/codex-ecosystem/state/gap-resolution-20260922/storage-market/dvc-rerun/work
++ mkdir repo
++ cp -a materialized repo/materialized
+cp: cannot stat 'materialized': No such file or directory
++ git init -q
++ git config user.email gap-resolution@local
++ git config user.name gap-resolution
++ ~/.local/share/codex-ecosystem/tools/dvc-3.67.1-20260922/bin/dvc init -q
++ ~/.local/share/codex-ecosystem/tools/dvc-3.67.1-20260922/bin/dvc add materialized
+ERROR: output 'materialized' does not exist: [Errno 2] No such file or directory: '~/codex-ecosystem/state/gap-resolution-20260922/storage-market/dvc-rerun/work/materialized'
++ find materialized -type f
++ sort
++ xargs sha256sum
++ tee ~/codex-ecosystem/state/gap-resolution-20260922/storage-market/dvc-rerun/pre-delete.sha256
+find: ‘materialized’: No such file or directory
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  -
++ rm -rf materialized
++ ~/.local/share/codex-ecosystem/tools/dvc-3.67.1-20260922/bin/dvc status
+There are no data or pipelines tracked in this project yet.
+See <https://dvc.org/doc/start> to get started!
++ ~/.local/share/codex-ecosystem/tools/dvc-3.67.1-20260922/bin/dvc checkout
++ find materialized -type f
++ sort
++ xargs sha256sum
++ tee ~/codex-ecosystem/state/gap-resolution-20260922/storage-market/dvc-rerun/post-checkout.sha256
+find: ‘materialized’: No such file or directory
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  -
++ diff ~/codex-ecosystem/state/gap-resolution-20260922/storage-market/dvc-rerun/pre-delete.sha256 ~/codex-ecosystem/state/gap-resolution-20260922/storage-market/dvc-rerun/post-checkout.sha256
++ echo dvc_arm_diff_exit=0
+dvc_arm_diff_exit=0
++ cd ~/code/nas-wt-gapint/blueprints/us-equities/nanosecond-replay
++ python3.13 replay.py materialize --source fixture.json --output ~/codex-ecosystem/state/gap-resolution-20260922/storage-market/dvc-rerun/work/rematerialized
+Traceback (most recent call last):
+  File "~/code/nas-wt-gapint/blueprints/us-equities/nanosecond-replay/replay.py", line 192, in <module>
+    raise SystemExit(main())
+                     ~~~~^^
+  File "~/code/nas-wt-gapint/blueprints/us-equities/nanosecond-replay/replay.py", line 182, in main
+    result = materialize(args.source, args.output) if args.command == "materialize" else select(
+             ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/code/nas-wt-gapint/blueprints/us-equities/nanosecond-replay/replay.py", line 85, in materialize
+    import duckdb
+ModuleNotFoundError: No module named 'duckdb'
++ cd ~/codex-ecosystem/state/gap-resolution-20260922/storage-market/dvc-rerun/work/rematerialized
+~/codex-ecosystem/state/gap-resolution-20260922/storage-market/dvc-rerun/run.sh: line 29: cd: ~/codex-ecosystem/state/gap-resolution-20260922/storage-market/dvc-rerun/work/rematerialized: No such file or directory
++ tee ~/codex-ecosystem/state/gap-resolution-20260922/storage-market/dvc-rerun/baseline-rematerialize.sha256
++ diff ~/codex-ecosystem/state/gap-resolution-20260922/storage-market/dvc-rerun/pre-delete.sha256 ~/codex-ecosystem/state/gap-resolution-20260922/storage-market/dvc-rerun/baseline-rematerialize.sha256
+1d0
+< e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  -
++ echo baseline_arm_diff_exit=1
+baseline_arm_diff_exit=1
++ date -u +%FT%TZ
+2026-09-23T00:06:34Z

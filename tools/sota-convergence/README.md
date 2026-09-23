@@ -120,6 +120,19 @@ default reconciliation file. No step here calls a model.
    python3 tools/sota-convergence/build_verdicts.py --check --root .
    ```
 
+   `--run-id` (default `20260922`) makes a later wave rerunnable without
+   disturbing the sealed 2026-09-22 record: it feeds the `id` field
+   (`layer-verdicts-<run-id>`) and the defaults for `--manifest`
+   (`catalogs/sota-convergence/manifest-<run-id>.json`) and `--out`
+   (`catalogs/sota-convergence/layer-verdicts-<run-id>.json`); either can
+   still be overridden directly. Omitting `--run-id` reproduces today's
+   `catalogs/sota-convergence/layer-verdicts-20260922.json` and
+   `docs/grand-catalog-handbook.md` byte for byte.
+
+   ```sh
+   python3 tools/sota-convergence/build_verdicts.py --write --root . --run-id 20260923
+   ```
+
 ## Rules encoded in `build_manifest.py`
 
 - **Pin-vs-upstream** (`classify_pin`): a component/entry only counts as
@@ -549,7 +562,11 @@ python3 tools/sota-convergence/lane_packets.py --root . --out /path/to/work-dir 
 
 No network access; every input is already checked into `catalogs/` and
 `adoption/`. Each candidate is matched to a `catalogs/sota-convergence/
-manifest-20260922.json` component/entry by normalized GitHub slug
+manifest-20260922.json` component/entry by normalized GitHub slug (override
+the dated manifest joined in with `--manifest <path>`, e.g. to match a later
+`build_verdicts.py --manifest`/`--run-id` run so the packets and the verdict
+catalog agree on the pins; default `catalogs/sota-convergence/
+manifest-20260922.json` reproduces the 2026-09-22 packets byte for byte)
 (`build_manifest.github_repo_slug` -- lowercase `owner/repo`, `.git`/
 `/tree/...`/`/releases/tag/...` stripped); a candidate without a `repository`,
 or whose repository is not a GitHub URL, never matches, and a matched
@@ -613,6 +630,45 @@ python3 tools/sota-convergence/record_verdicts.py \
 rejects both together and rejects neither) -- there is no silent default
 mode.
 
+`--run-id` (default `20260922`) reruns the pipeline on a new date without
+disturbing the sealed 2026-09-22 record: it is the trailing component of
+each recorded `run_id` (`<catalog>-<layer_id>-<run-id>`) and of the sealed
+directory (`evidence/artifacts/layer-verdicts-<run-id>/`). Pass the same
+`--run-id` to `--check` as was used for `--write`. A row recorded under a
+non-default `--run-id` also carries `lanes.sealed_base` (e.g.
+`evidence/artifacts/layer-verdicts-20260923`) so `scripts/landscape.py`
+resolves its sealed files from the row itself, not from a hardcoded
+constant; a row recorded (or never re-recorded) under the default omits
+`sealed_base` and `scripts/landscape.py` falls back to the sealed
+2026-09-22 directory, so every already-checked-in row stays valid and the
+default run's output is unaffected byte for byte. `--run-id` is validated
+against the same character class `scripts/landscape.py` requires of
+`lanes.<lane>.sealed_base` (`[0-9A-Za-z]+`; no `-`, `/` or `..`) before any
+sealed file is written, in both `record_verdicts.py` and
+`build_verdicts.py`'s own `--run-id` -- a malformed value is rejected up
+front rather than surfacing only when `scripts/landscape.py` runs later.
+
+```sh
+python3 tools/sota-convergence/record_verdicts.py \
+  --root . --work-dir /path/to/work-dir --checked-at YYYY-MM-DD \
+  --run-id 20260923 --write
+```
+
+**A later wave's `--check` needs its own CI step.** `build_verdicts.py
+--check`'s defaults (and CI's `validate.yml` step, which always calls it with
+no `--run-id`) only ever recompute and compare the default 2026-09-22
+catalog/handbook -- they do not know about a later wave's ledger rows or its
+own `catalogs/sota-convergence/layer-verdicts-<run-id>.json`. Once a later
+wave is recorded (`record_verdicts.py --run-id <new> --write`), verify it
+with the matching `build_verdicts.py --check --run-id <new>`; the checked-in
+`layer-verdicts-20260922.json`/handbook section stay a frozen snapshot of
+the rows as they stood before the later wave's `record_verdicts.py --write`
+touched them (its own rows carry `lanes.sealed_base`, so a mismatch there is
+expected, not a break, once a `record_verdicts.py --write` for a later wave
+has run against this checkout). A CI update to also run
+`build_verdicts.py --check --run-id <new>` for an active later wave is not
+included here.
+
 - **Per-lane validation, never aborts the run.** For every layer with at
   least one `<work-dir>/{claude,codex}/<catalog>__<layer_id>.json` file, each
   present lane file is checked against the full lane-return contract (schema
@@ -646,8 +702,9 @@ mode.
   (`sort_keys=True, indent=1` + newline -- the same convention every
   generator here uses, subject to the same `build_manifest.py`
   leak defense) and written to
-  `evidence/artifacts/layer-verdicts-20260922/<lane>/<catalog>-<layer_id>-20260922.json`;
-  its sha256 becomes the row's `lanes.<lane>.sealed_sha256`.
+  `evidence/artifacts/layer-verdicts-<run-id>/<lane>/<catalog>-<layer_id>-<run-id>.json`
+  (`<run-id>` from `--run-id`, default `20260922`); its sha256 becomes the
+  row's `lanes.<lane>.sealed_sha256`.
 - **Derived winner `pin`** (never taken from the lane): the packet's own
   manifest-joined `pin`, else the winning candidate's real v1 pin text if
   any -- the ledger's actual `candidates[]` schema carries this as
@@ -665,7 +722,7 @@ mode.
   "judgments": [{"claude_position": "A"|"B", "preferred_position": "A"|"B",
   "preferred_lane", "refuting_votes"}, ...]}`) names (the file itself is
   retained at
-  `evidence/artifacts/layer-verdicts-20260922/adjudication/<run_id>.json`).
+  `evidence/artifacts/layer-verdicts-<run-id>/adjudication/<run_id>.json`).
   The tool enforces the counterbalanced rule: the judgments must include
   both presentation orders (Claude's return shown as A and as B), each
   `preferred_lane` must follow from its positions, and `winner_lane` must be
@@ -718,6 +775,88 @@ python3 tools/sota-convergence/build_verdicts.py --write --root .
 python3 scripts/landscape.py --root .
 python3 scripts/validate.py
 ```
+
+## Blind checkout
+
+`blind_checkout.py` -- no network, no model call. Given `--source` (an
+existing git checkout), `--rev` and a `--dest` that does not yet exist, it
+runs `git worktree add --detach <dest> <rev>` and then mutates files only
+inside `<dest>`, so a lane can review candidates without seeing what a
+previous run (or the checked-in ledger) already chose.
+
+```sh
+python3 tools/sota-convergence/blind_checkout.py \
+  --source . --rev HEAD --dest /path/to/blind-checkout
+# ... run the blind lane against /path/to/blind-checkout ...
+git worktree remove --force /path/to/blind-checkout
+```
+
+It removes outright: `evidence/artifacts/layer-verdicts-*/` (recursively),
+`catalogs/sota-convergence/layer-verdicts-*.json`,
+`docs/grand-catalog-handbook.md`, `docs/ecosystem/index.html` and
+`docs/ecosystem/manifest.json`. In the two landscape ledgers
+(`catalogs/landscape/{foundation,us-equities}.json`) it resets every row's
+layer-verdict schema v2 fields to `pending_lanes` with empty
+`winners`/`alternatives`/`open_gaps`, a pending `lanes` object, an empty
+`verdict_overturn_when` and an empty `overturn_protocol`
+(`{"fixture_paths": [], "metric": "", "arms": []}`) -- keeping
+`requirement`/`evidence_refs`/`overturn_when`. `open_gaps` and
+`overturn_protocol` reset alongside `winners`/`alternatives` because
+`record_verdicts.process_row` writes them from the same lanes' returns, and
+an `open_gaps` entry or an `overturn_protocol.arms` value routinely names a
+lane's winner or a disagreement between the lanes by name. It also removes
+the v1 label fields `current_choice`, `decision`, `rationale` (row level) and
+`disposition`, `rationale`, `review_status` (each `candidates[]` entry).
+Every other JSON file under `catalogs/` has `selection`, `decision`,
+`disposition`, `current_choice` and `review_status` removed wherever they
+appear, regardless of value; under `blueprints/` the same five keys are
+removed only when the value is itself a label -- a closed-vocabulary string
+(the closed-vocabulary labels in `blind_checkout.LABEL_VALUES`, for example `selected`, `retain`, `confirmed_default`,
+`selected_destination`, `adopt_within_scope`, `reject_evidence`, `defer`,
+`advisory_supported`/`advisory_contradicted`/`advisory_insufficient` and
+their `... retained; reviewer concurs` forms, `qualified_within_isolated_
+synthetic_scope`, `retain_2.3.1_pending_functional_acceptance`,
+`source-reviewed-not-executed`, `language alternative only`, etc.), free
+text stating a selection (contains "selected", or matches "keep ...
+selected"), or free text that opens with "retain"/"adopt"/"reject"/"defer"
+(case-insensitively, at a word boundary -- e.g. `"Retain current catalog
+pin..."`) -- a mapping/rule value or an unrelated data or procedural value
+(e.g. `"top_20"`, or `"Submission is deferred by session, not by bar
+count..."`, which does not open with the decision verb) under one of those
+keys is left alone. Longer free text is classified by review into
+`LABEL_TEXT_SHA256` (stripped) and `DATA_VALUE_SHA256` (kept, including one
+corpus methodology statement the "selected" rule would otherwise catch), keyed by
+the sha256 of the exact string. `tests/test_blind_checkout.py` fails when a value
+under these keys in this repository's `blueprints/` is neither a label by rule
+nor classified, so each new value gets a decision when it first appears.
+
+`<dest>/BLIND-MANIFEST.json` lists every removed file and every stripped
+JSON path together with its old value's **HMAC-SHA256** (never a plain
+unsalted `sha256`, and never the value itself) -- a small closed vocabulary
+of label strings would otherwise let a lane dictionary-attack an unsalted
+hash straight back to the original value. The key is a fresh random 32
+bytes generated per run and is never written under `<dest>`;
+`blind_checkout.py`'s CLI writes it to `<dest>.hmac-key` (a sibling of
+`<dest>`, not inside the worktree handed to a lane) so an operator can
+verify a hash later, or pass `hmac_key=` explicitly to `run_blind_checkout`/
+`strip_worktree` when two runs' hashes must be directly comparable. `--rev`
+is resolved to a full commit SHA (`git rev-parse <rev>^{commit}`) before the
+worktree is created, and the manifest records that resolved SHA plus the
+originally requested `--rev` string as `rev`/`requested_rev` -- it never
+records `--source`'s absolute host path.
+
+This tool never removes the worktree it creates; the caller does that with
+`git worktree remove --force <dest>` once the blind lane has finished.
+Two caveats it does not itself close: the destination is a `git worktree` of
+`--source` and so shares that repository's object store -- `git log`/
+`git diff`/`git show HEAD:<path>` run inside `<dest>` can still recover a
+stripped value from history, so a lane given raw `git` access (rather than
+just the working tree) is not actually blind; deny the lane `git`, or export
+with `git archive` instead of handing over the worktree, if that matters.
+The manifest's per-field hashes, even keyed, still let an operator (who also
+holds the key) map every stripped path to its class of change; they are an
+audit trail for the operator, not something to hand the blind lane
+unfiltered.
 
 ## Codex lane
 

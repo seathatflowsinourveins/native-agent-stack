@@ -1,0 +1,159 @@
+{
+  "schema_version": 1,
+  "id": "dvc-arm-restore-compare",
+  "date": "2026-09-22",
+  "layer_ids": [
+    "identity-provenance"
+  ],
+  "gap_refs": [
+    {
+      "layer_id": "identity-provenance",
+      "gap_index": 0
+    },
+    {
+      "layer_id": "identity-provenance",
+      "gap_index": 1
+    }
+  ],
+  "purpose": "Execute the overturn_protocol's 'baseline + DVC 3.67.1' arm end to end in a scratch repo over the fixture data materialized by the project's own baseline tooling (blueprints/us-equities/nanosecond-replay/replay.py materialize), comparing restore fidelity after deletion with the baseline arm (project hash-manifest alone, no restore mechanism), to close identity-provenance gap 0 (DVC never installed/run) and gap 1 (does a DVC-tracked snapshot preserve the project hash-manifest contract, i.e. snapshot_sha256 and per-file hashes, after a restore).",
+  "preregistered": "If DVC 3.67.1 can init/add/checkout the materialized fixture and, after the tracked directory is deleted, `dvc checkout` restores files whose sha256 exactly matches the pre-delete sha256 (including the manifest's own recorded snapshot_sha256/per-file hashes in snapshot.json), that settles gap 1's byte-identical-restore metric for the DVC arm. If the baseline arm's own scripts (replay.py, temporal_snapshot.py) contain no restore/backup/checkout logic, that establishes the baseline arm has zero restore capability of its own (only fail-closed detection via hash mismatch), which is the comparison basis the overturn_protocol asks for. A restore that does not match the pre-delete hashes, or a DVC failure, would refute the DVC arm as a fix for gap 0/1.",
+  "commands": [
+    {
+      "cmd": "cd blueprints/us-equities/nanosecond-replay && rm -rf \"$SCRATCH/materialized\" && python3.13 replay.py materialize --source fixture.json --output \"$SCRATCH/materialized\"   # cwd=.../nanosecond-replay; materializes the project's own fixture into source.json/observations.parquet/universe.parquet/snapshot.json with recorded snapshot_sha256 and per-file sha256",
+      "exit": 0,
+      "duration_s": 0.3,
+      "output_excerpt": "{\"snapshot_sha256\": \"b4167728eed625e160b0c801bea5713075bc8a94f3a628efdff592227ad7e8a1\", \"source_sha256\": \"40aeafbc144eb39ebd017af449d6d136f5539caf484ebd8b310bb4fbf213eb5d\", \"counts\": {\"observations\": 5, \"universe\": 2}}",
+      "output_sha256": "n/a-short-console-capture"
+    },
+    {
+      "cmd": "uv venv --python \"$PY313\" --no-python-downloads --seed \"$DVC_PREFIX\" && uv pip install --python \"$DVC_PREFIX/bin/python3.13\" dvc==3.67.1 && \"$DVC_PREFIX/bin/dvc\" --version",
+      "exit": 0,
+      "duration_s": 1.9,
+      "output_excerpt": "Creating virtual environment with seed packages at: .../tools/dvc-3.67.1-20260922\n + pip==26.2.1\n... + dvc==3.67.1 (+ ~59 transitive deps)\n3.67.1",
+      "output_sha256": "n/a-short-console-capture"
+    },
+    {
+      "cmd": "rm -rf \"$REPO\" && mkdir -p \"$REPO\" && cp -a \"$SCRATCH/materialized\" \"$REPO/materialized\" && chmod -R u+w \"$REPO/materialized\" && cd \"$REPO\" && git init -q && git config user.email gap-resolution@local && git config user.name gap-resolution && \"$DVC\" init -q && \"$DVC\" add materialized && git add materialized.dvc .gitignore .dvc && git commit -q -m 'track materialized fixture' && \"$DVC\" status && find materialized -type f | sort | xargs sha256sum > /tmp/pre-delete.sha256   # note: replay.py materializes files read-only (mode 0o400/dir 0o700), so cp -a + chmod -R u+w was required before `git add`/`dvc add` would accept the tree; this step was executed but omitted from the previous version of this receipt",
+      "exit": 0,
+      "duration_s": 0.9,
+      "output_excerpt": "To track the changes with git, run:\n\n\tgit add materialized.dvc .gitignore\n\nData and pipelines are up to date.\n0cf15579cd80a02b1c5411bdda50483808e2b2948126da659ecca596bb3821f3  materialized/observations.parquet\nb4167728eed625e160b0c801bea5713075bc8a94f3a628efdff592227ad7e8a1  materialized/snapshot.json\n40aeafbc144eb39ebd017af449d6d136f5539caf484ebd8b310bb4fbf213eb5d  materialized/source.json\nb0785843154bdabb234de6ef9b105ee937c40703d4aa87343b7dfae9b07a2c2c  materialized/universe.parquet",
+      "output_sha256": "n/a-short-console-capture"
+    },
+    {
+      "cmd": "cd \"$REPO\" && mv /tmp/pre-delete.sha256 \"$SCRATCHPAD/pre-delete.sha256\" && rm -rf materialized && \"$DVC\" status && \"$DVC\" checkout && find materialized -type f | sort | xargs sha256sum > \"$SCRATCHPAD/post-checkout.sha256\" && diff \"$SCRATCHPAD/pre-delete.sha256\" \"$SCRATCHPAD/post-checkout.sha256\"; echo diff_exit=$?",
+      "exit": 0,
+      "duration_s": 0.4,
+      "output_excerpt": "materialized.dvc:\n\tchanged outs:\n\t\tdeleted:            materialized\nA       materialized/\ndiff_exit=0   # no output from diff: post-checkout tree is byte-identical to pre-delete tree, including the manifest's own snapshot_sha256/per-file hashes",
+      "output_sha256": "n/a-short-console-capture"
+    },
+    {
+      "cmd": "cd blueprints/us-equities && grep -niE 'restore|backup|checkout|recover' nanosecond-replay/replay.py point-in-time/temporal_snapshot.py; echo exit=$?   # cwd=/home/example/code/nas-wt-gap-storage-market/blueprints/us-equities (relative paths); baseline-arm restore-capability check by static inspection only -- this does NOT execute or attempt the baseline's own `replay.py materialize` regeneration path after deletion, so it is not a run-time comparison against the baseline arm, only a keyword search of its two scripts",
+      "exit": 1,
+      "duration_s": 0.05,
+      "output_excerpt": "(no matches; grep exit 1 means 'no lines matched', not a command failure)",
+      "output_sha256": "n/a-short-console-capture"
+    }
+  ],
+  "tool_versions": {
+    "dvc": "3.67.1",
+    "git": "system git, see `git --version` on host",
+    "python": "3.13.15"
+  },
+  "installs": [
+    {
+      "name": "dvc",
+      "version": "3.67.1",
+      "prefix": "/home/example/.local/share/codex-ecosystem/tools/dvc-3.67.1-20260922",
+      "source_url": "PyPI (uv default index)",
+      "sha256": "not individually recorded; installed via `uv pip install dvc==3.67.1` without --require-hashes (no pre-existing lock file for dvc's own dependency tree); dvc --version confirmed 3.67.1 post-install"
+    }
+  ],
+  "result": "SUPERSEDED 2026-09-23 by coordinator_rerun (live capture, same outcome for the DVC arm, plus an executed baseline-arm comparison). Original text follows. DVC 3.67.1 init/add/status/checkout executed end to end in a new scratch repo (git+dvc) over the project's own materialized fixture output, in a new, never-before-existing prefix. After deleting the tracked directory, `dvc checkout` restored all 4 files (source.json, observations.parquet, universe.parquet, snapshot.json) byte-identical to the pre-delete state (sha256 diff empty, including the manifest's own recorded snapshot_sha256/per-file hashes in snapshot.json). Separately, grepping the baseline-arm scripts (replay.py, temporal_snapshot.py) for restore/backup/checkout/recover logic found zero matches. That grep alone is NOT a run-time comparison against the baseline arm: the baseline can in fact regenerate the materialized directory from the git-tracked fixture.json via `replay.py materialize` (that is exactly command 1 above), so a delete-then-rematerialize baseline-arm run, timed and hash-compared the same way the DVC arm was, was never executed here and is a real gap in this comparison, not merely a documented absence of restore-labelled code. The grep only shows the baseline scripts contain no *named* restore/backup/checkout/recover routine; it does not show the baseline cannot regenerate the data by another route. Services/processes added by the DVC arm: 1 additional CLI tool (dvc, no background daemon) plus a local `.dvc/cache` content-addressed store; no network remote was configured (fully local scratch repo). License: DVC is Apache-2.0 (per PyPI project metadata for dvc 3.67.1).",
+  "settles_gap": "partially",
+  "verdict_impact": {
+    "could_change_verdict": true,
+    "direction": "supports_incumbent",
+    "explanation": "DVC (data-dvc) is catalogs/landscape/us-equities.json's identity-provenance winners[0] (evidence_class source_review, layer decision keep_but_compare); a successful, measured DVC run is evidence FOR that already-adopted candidate, not against it -- an earlier version of this receipt incorrectly recorded direction as refutes_incumbent, which is corrected here. Gap 0 (DVC's native_workflow was 'Prospective/UNEXECUTED') is settled true: DVC is now executed here with a measured byte-identical file-level restore. Gap 1 is settled only partially: this run confirms file-level sha256 identity of the restored materialized/ directory (source.json, observations.parquet, universe.parquet, snapshot.json, including the manifest's own snapshot_sha256), but the overturn_protocol metric for gap 1 also requires (a) the per-cutoff selection/SQL hashes recorded by the baseline regression suite (tests.test_nanosecond_replay, tests.test_point_in_time) to be reproduced equal when those tests are pointed at data restored through the DVC arm, and (b) confirmation that DVC checkout preserves the baseline's fail-closed rejection of unknown-availability inputs (the expected exit_code 2 cases). Neither (a) nor (b) was tested in this run; only raw file hashes were compared, and no baseline-arm regeneration run was executed for comparison (see result field). This receipt therefore promotes DVC's evidence toward measured for the narrow byte-identical-restore claim but does not by itself close gap 1 or the whole layer decision; PyIceberg and ArcticDB arms remain unrun and gap 4/5 (real licensed universe, remote licensing terms) stay open and needs_paid_entitlement."
+  },
+  "evidence_class": "native_proven",
+  "limitations": [
+    "Tested on a small synthetic fixture (5 observation rows, 2 universe rows), not at the scale of a real historical dataset; DVC's restore performance/fidelity at scale was not measured.",
+    "No remote (S3/GCS/etc.) was configured; only local cache-based checkout was tested, so remote-storage restore fidelity and gap 5's licensing-terms question for a private DVC remote remain untested and are recorded separately as needs_paid_entitlement (not in this unit's scope).",
+    "PyIceberg 0.12.0 and ArcticDB v6.26.0 arms from the same overturn_protocol were not run; this receipt speaks only to the DVC arm.",
+    "dvc's own dependency tree was installed without --require-hashes (no pre-existing lock covers DVC's ~60 transitive dependencies); only the top-level dvc==3.67.1 pin was verified via `dvc --version`.",
+    "The 'comparison with the baseline arm' claimed in earlier wording of this receipt was never actually executed as a run-time comparison: only a static grep of the baseline scripts for restore-related keywords was performed, which found zero matches but does not account for the baseline's ability to regenerate the snapshot from the git-tracked fixture.json via `replay.py materialize`. No delete-then-rematerialize baseline-arm run was performed or timed for comparison against the DVC arm's restore.",
+    "The overturn_protocol metric's per-cutoff selection/SQL-hash equality and exit_code-2 unknown-availability-rejection preservation (both required for gap 1) were not tested against DVC-restored data in this run; only whole-file sha256 identity was checked.",
+    "The `preregistered` field above was written after these commands had already been run and their results were known (all commands executed 2026-09-22T22:50-22:52Z; this receipt file was written afterward), so it is a post-hoc restatement of the expected outcome rather than a true blind prediction recorded before execution; it should not be read as independent confirmation that the outcome was predicted in advance.",
+    "The raw_artifacts log below (dvc-arm-restore-compare.log) was authored with the Write tool after the commands ran, as a transcript reconstructed to match the real command outputs, not a live stdout/stderr capture; its content was cross-checked against the agent's own tool-call transcript (workflow run wf_84016761-f5f, subagent agent-a7b629952600b4eab, tool_use/tool_result entries) and matches, but it is not itself raw captured output. The pre-delete.sha256 and post-checkout.sha256 files were real command outputs (see the commands array) but were not independently preserved outside that reconstructed log, so their sha256 cannot be verified from a standalone raw file.",
+    "evidence_class native_proven now rests on coordinator_rerun's live-captured raw files; the first run's reconstructed log is kept for history only."
+  ],
+  "raw_artifacts": [
+    {
+      "path": "<scratch>/redacted-session-scratchpad/scratchpad/dvc-arm-restore-compare.log",
+      "sha256": "4860ebd717a6963a90242eb6300db658242c65450baf585f67d0f594fb92cf67",
+      "note": "post-hoc reconstructed transcript, not a live capture; see limitations"
+    },
+    {
+      "path": "<scratch>/redacted-session-scratchpad/scratchpad/pre-delete.sha256",
+      "sha256": "not independently hashed; embedded only in dvc-arm-restore-compare.log"
+    },
+    {
+      "path": "<scratch>/redacted-session-scratchpad/scratchpad/post-checkout.sha256",
+      "sha256": "not independently hashed; embedded only in dvc-arm-restore-compare.log"
+    }
+  ],
+  "coordinator_rerun": {
+    "date": "2026-09-23",
+    "reason": "Finding from the Codex blind review of PR #81 (gpt-6-astra, read-only, 2026-09-22): native_proven rested on a transcript written after the run, and the pre/post hash files were not kept. The coordinator re-ran the DVC arm with live capture (tee of set -x output) and added the baseline-arm run that the first receipt only grepped for.",
+    "preregistered": "Written into run.sh before it ran: the DVC arm passes if the post-checkout sha256 list equals the pre-delete list; the baseline arm passes if a second `replay.py materialize` from the git-tracked fixture.json gives the same per-file sha256. Amended once before the second attempt only to use the SDK venv (the first attempt's python3.13 lacked duckdb and materialized nothing; its log is kept).",
+    "tool_versions": {
+      "dvc": "3.67.1",
+      "git": "2.43.0",
+      "python": "3.13.15 (SDK venv from adoption/sdk/requirements-linux-x86_64-py313.lock, duckdb 1.5.5)"
+    },
+    "observed": {
+      "dvc_arm_diff_exit": 0,
+      "baseline_arm_diff_exit": 1,
+      "baseline_arm_difference": "observations.parquet, source.json and universe.parquet are byte-identical; snapshot.json differs only in ingested_at, so each materialization has a new snapshot_sha256 (9122163b… vs 2f0a2d18…)."
+    },
+    "result": "DVC checkout after deletion restored all four files byte-identically, including snapshot.json, so a caller-held snapshot_sha256 still verifies. Re-materializing from the fixture reproduces the three data files but not the manifest: ingested_at is the local materialization time, so the digest changes and `replay.py select --snapshot-sha256 <old digest>` would refuse the regenerated snapshot. On this narrow metric DVC restores what the baseline cannot; the gap-1 SQL-hash and exit-code-2 checks are still untested.",
+    "raw_artifacts": [
+      {
+        "path": "evidence/artifacts/gap-resolution-20260922/identity-provenance/dvc-rerun-20260923/run.sh",
+        "sha256": "9ffc50916a0659e5fc40f197481a4a1a061caccb4037ef58fb59ae5a07ac8f74",
+        "source_sha256": "350d7b51d8a03c5f9bc743cd15cd45891e69069d998593dddde58ee946d3d932",
+        "note": "published copy: home directory, user and host names replaced"
+      },
+      {
+        "path": "evidence/artifacts/gap-resolution-20260922/identity-provenance/dvc-rerun-20260923/run.log",
+        "sha256": "849d4976b620097d4485631edfd1a1ccc815e41bc59262d5742c54bc29d0c9ed",
+        "source_sha256": "4fae8cfa7817d5fc432323f62442a092d8b9d00d6a769c147524fe2db6bea328",
+        "note": "published copy: home directory, user and host names replaced"
+      },
+      {
+        "path": "evidence/artifacts/gap-resolution-20260922/identity-provenance/dvc-rerun-20260923/attempt1-no-duckdb.log",
+        "sha256": "f6bc06a983d019aa29d6b691358675014af409fe163abd419daebab4d533c6c7",
+        "source_sha256": "a25638a6416c26cea32192ba5a6b6437ec18d8d8adc1bec2ec54fe4eda9a08f1",
+        "note": "published copy: home directory, user and host names replaced"
+      },
+      {
+        "path": "evidence/artifacts/gap-resolution-20260922/identity-provenance/dvc-rerun-20260923/pre-delete.sha256",
+        "sha256": "2587cf9eb0a5ed4d58d143a78b4f021b55316b3cb164008755533b2b94053e20",
+        "source_sha256": "2587cf9eb0a5ed4d58d143a78b4f021b55316b3cb164008755533b2b94053e20",
+        "note": "published copy: home directory, user and host names replaced"
+      },
+      {
+        "path": "evidence/artifacts/gap-resolution-20260922/identity-provenance/dvc-rerun-20260923/post-checkout.sha256",
+        "sha256": "2587cf9eb0a5ed4d58d143a78b4f021b55316b3cb164008755533b2b94053e20",
+        "source_sha256": "2587cf9eb0a5ed4d58d143a78b4f021b55316b3cb164008755533b2b94053e20",
+        "note": "published copy: home directory, user and host names replaced"
+      },
+      {
+        "path": "evidence/artifacts/gap-resolution-20260922/identity-provenance/dvc-rerun-20260923/baseline-rematerialize.sha256",
+        "sha256": "ec83af1d007da173948734fcd5c8217bb40f3267a845b1bec52fe579235950e2",
+        "source_sha256": "ec83af1d007da173948734fcd5c8217bb40f3267a845b1bec52fe579235950e2",
+        "note": "published copy: home directory, user and host names replaced"
+      }
+    ]
+  }
+}

@@ -1,0 +1,92 @@
+{
+  "version": "2.3.2",
+  "data_dir": "~/codex-ecosystem/state/gap-resolution-20260922/recovery/app-state/rerun-isolated/restored2~/codex-ecosystem/state/gap-resolution-20260922/recovery/app-state/ai-memory-copy",
+  "bind": "127.0.0.1:49412",
+  "db_path": "~/codex-ecosystem/state/gap-resolution-20260922/recovery/app-state/rerun-isolated/restored2~/codex-ecosystem/state/gap-resolution-20260922/recovery/app-state/ai-memory-copy/db/memory.sqlite",
+  "counts": {
+    "pages_latest": 117,
+    "pages_all": 393,
+    "sessions": 175,
+    "observations": 139312
+  },
+  "derived": {
+    "pages_rows": 393,
+    "pages_fts_rows": 393,
+    "observations_rows": 139312,
+    "observations_fts_rows": 139312,
+    "latest_pages_missing_embeddings": 0,
+    "latest_pages_unembeddable": 0,
+    "typed_links_from_latest_pages": [
+      [
+        "fixes",
+        1
+      ]
+    ],
+    "embed_failures_unresolved": 0,
+    "embed_failures_recovered": 0,
+    "embedding_rows": 293,
+    "embedding_triples": [
+      {
+        "provider": "local",
+        "model": "all-MiniLM-L6-v2",
+        "dim": 384,
+        "count": 293
+      }
+    ],
+    "links_from_latest_pages": 108,
+    "unresolved_links_from_latest_pages": 103,
+    "stale_links_from_latest_pages": 0
+  },
+  "storage": {
+    "page_size": 4096,
+    "page_count": 51558,
+    "freelist_count": 318,
+    "database_bytes": 211181568,
+    "reclaimable_bytes": 1302528,
+    "data_dir_free_bytes": 893379395584
+  },
+  "providers": {
+    "llm": {
+      "status": "unknown",
+      "provider": "codex",
+      "model": "gpt-5.6-luna",
+      "dim": null,
+      "last_call_at": null,
+      "last_success_at": null,
+      "last_error_at": null,
+      "last_error_status": null,
+      "last_error_message": null,
+      "retry_hint": null
+    },
+    "llm_candidates": [],
+    "embedding": {
+      "status": "unknown",
+      "provider": "local",
+      "model": "all-MiniLM-L6-v2",
+      "dim": 384,
+      "last_call_at": null,
+      "last_success_at": null,
+      "last_error_at": null,
+      "last_error_status": null,
+      "last_error_message": null,
+      "retry_hint": null
+    }
+  },
+  "spool": {
+    "pending": 5,
+    "oldest_age_ms": 2840210,
+    "retries_total": 0
+  },
+  "capture_mode": "allowlist",
+  "ingest": {
+    "accepted": 0,
+    "dropped_by_policy": 0,
+    "shed_saturated": 0,
+    "shed_rate_limited": 0,
+    "last_persisted_ms": null
+  },
+  "client": {
+    "server_url": "http://127.0.0.1:49412",
+    "auth": false
+  }
+}
