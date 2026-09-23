@@ -6,7 +6,7 @@ upstream install, use and statistics commands, versioned sources, returned resul
 baseline comparisons and lifecycle limits for each tool. The
 offline HTML (`ecosystem/index.html#efficiency`, generated with
 `python3 scripts/build_ecosystem.py --write` -- not committed, or download it
-from a `publish-catalog.yml` release artifact) embeds this guide and those rows;
+from a `publish-catalog.yml` workflow artifact (7-day retention, `workflow_dispatch`/`v*`-tag runs only)) embeds this guide and those rows;
 its Setup view contains all 66 selected components across ten layers. The broader
 512-repository catalog includes alternatives and references, not 512 installations.
 

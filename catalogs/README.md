@@ -9,7 +9,7 @@ For the full rows, use the [landscape ledger](landscape/README.md), its frozen
 snapshot [layer-verdicts-20260922.json](sota-convergence/layer-verdicts-20260922.json)
 or the offline comparison view (`docs/ecosystem/index.html#landscape`,
 generated with `python3 scripts/build_ecosystem.py --write` -- not committed,
-or download it from a `publish-catalog.yml` release artifact). The
+or download it from a `publish-catalog.yml` workflow artifact (7-day retention, `workflow_dispatch`/`v*`-tag runs only)). The
 [trading gate ladder](us-equities/gates-20260922.json) tracks the sim → paper →
 live gates.
 

@@ -69,6 +69,18 @@ jobs:
           cp docs/ecosystem/index.html "$explorer"
           cd "$PUBLICATION_DIR"
           sha256sum "$(basename "$explorer")" | tee -a archive.sha256
+      - name: Scan the built explorer for private content before attesting it
+        shell: bash
+        run: |
+          set -euo pipefail
+          # The build step above regenerates docs/ecosystem/index.html fresh
+          # every run and it is gitignored (see
+          # docs/decisions/2026-09-23-generated-explorer-sorted-manifest.md),
+          # so "Validate the catalog and recorded evidence" above never saw
+          # this exact file: scan_publication() only walks git-tracked/listed
+          # paths. Scan the actual artifact that gets uploaded and attested.
+          explorer="$PUBLICATION_DIR/native-agent-stack-${GITHUB_SHA}.explorer.html"
+          python3 scripts/validate.py --scan-file "$explorer" 2>&1 | tee -a "$PUBLICATION_DIR/validation.log"
       - name: Fetch and SHA-checked-verify syft
         shell: bash
         run: |

@@ -22,7 +22,7 @@ alternative installations retain separate scope.
 
 The offline HTML setup guide (`ecosystem/index.html`, generated with
 `python3 scripts/build_ecosystem.py --write` -- not committed, or download it
-from a `publish-catalog.yml` release artifact) brings the selected stack,
+from a `publish-catalog.yml` workflow artifact (7-day retention, `workflow_dispatch`/`v*`-tag runs only)) brings the selected stack,
 layer/profile filters, native recipes, lifecycle stages and baseline choices
 together. Its historical results do not become a new PC's acceptance. Use the
 [lifecycle guide](../adoption/lifecycle.md) for installation ownership, restart,

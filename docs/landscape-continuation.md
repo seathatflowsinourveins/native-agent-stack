@@ -2,7 +2,7 @@
 
 Open the generated grand catalog (`ecosystem/index.html#landscape`; build it
 with `python3 scripts/build_ecosystem.py --write` -- it is not committed, or
-download it from a `publish-catalog.yml` release artifact). The source
+download it from a `publish-catalog.yml` workflow artifact (7-day retention, `workflow_dispatch`/`v*`-tag runs only)). The source
 template is a build input; use its recovery link if opened directly. The current
 [manifest](../catalogs/landscape/manifest.json) joins foundation and US-equities
 choices. The [research queue](../catalogs/landscape/research-state.json) carries

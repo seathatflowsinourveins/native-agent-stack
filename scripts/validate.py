@@ -105,6 +105,35 @@ def is_supported_pdf_framing(content: bytes) -> bool:
             and re.search(rb"/(?:Encrypt|Prev)\b", content) is None)
 
 
+def scan_file_for_private_content(path: Path) -> list[str]:
+    """Scan one file's bytes for PRIVATE_CONTENT patterns directly.
+
+    `Validator.scan_publication()` only inspects paths returned by
+    `publication_paths()`, which is git-tracked-and-listed paths (or a
+    filesystem walk for a non-Git archive root). A generated, gitignored
+    artifact -- e.g. `docs/ecosystem/index.html`, rebuilt fresh by
+    `scripts/build_ecosystem.py --write` in CI right before it is uploaded
+    and attested -- is neither, so it is invisible to that scan even when
+    `--root` points at the repository. Callers that publish a built artifact
+    must scan it explicitly with this function (or `--scan-file`) before
+    attesting/uploading it.
+    """
+    findings: list[str] = []
+    try:
+        raw = path.read_bytes()
+    except OSError as error:
+        return [f"{path}: cannot read file ({type(error).__name__})"]
+    try:
+        content = raw.decode("utf-8")
+    except UnicodeError:
+        content = raw.decode("latin-1")
+    for description, pattern in PRIVATE_CONTENT:
+        if pattern.search(content):
+            # Never echo matched credentials or personal paths.
+            findings.append(f"{path}: contains possible {description}")
+    return findings
+
+
 class Validator:
     def __init__(self, root: Path):
         self.root = root.resolve()
@@ -421,7 +450,22 @@ def validate(root: Path) -> dict[str, int]:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[1])
+    parser.add_argument(
+        "--scan-file", action="append", default=[], type=Path, metavar="PATH",
+        help="Scan an arbitrary file (repeatable) for PRIVATE_CONTENT patterns and "
+             "exit 1 on a match, independent of --root's git-tracked publication scan. "
+             "Use this for a generated, gitignored artifact (e.g. a freshly built "
+             "docs/ecosystem/index.html) that scan_publication() never walks.")
     args = parser.parse_args()
+    if args.scan_file:
+        findings = []
+        for file_path in args.scan_file:
+            findings.extend(scan_file_for_private_content(file_path))
+        if findings:
+            print("Private-content scan failed:\n" + "\n".join(findings))
+            return 1
+        print(json.dumps({"status": "passed", "scanned_files": len(args.scan_file)}, sort_keys=True))
+        return 0
     try:
         summary = validate(args.root)
     except InvalidPublication as error:

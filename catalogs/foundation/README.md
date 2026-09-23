@@ -11,7 +11,7 @@ choice is retained, what happened to named alternatives, and what evidence would
 change the decision. Open Choices & alternatives
 (`docs/ecosystem/index.html#landscape`, generated with
 `python3 scripts/build_ecosystem.py --write` -- not committed, or download it
-from a `publish-catalog.yml` release artifact) for the searchable offline view.
+from a `publish-catalog.yml` workflow artifact (7-day retention, `workflow_dispatch`/`v*`-tag runs only)) for the searchable offline view.
 
 The catalog references 61 selected components through 51 capability decisions. Its
 registered evidence references are listed per capability. These are coverage counts, not a

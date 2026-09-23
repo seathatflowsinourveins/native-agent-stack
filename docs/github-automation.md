@@ -501,7 +501,8 @@ As of 2026-09-23 (`docs/decisions/2026-09-23-generated-explorer-sorted-manifest.
 `docs/ecosystem/index.html` is generated locally with
 `python3 scripts/build_ecosystem.py --write` and is no longer committed: it is
 `.gitignore`d, and `publish-catalog.yml` builds and publishes it as its own attested
-release artifact instead. `gitleaks dir .` (working-tree mode) therefore has nothing
+workflow artifact instead (7-day retention, `workflow_dispatch`/`v*`-tag runs
+only). `gitleaks dir .` (working-tree mode) therefore has nothing
 generated left to skip in the current tree, and a `gitleaks git .` scan of any commit
 made after this change has nothing generated to skip either. The size-based skip
 remains an **incomplete-coverage boundary only for the repository's existing git
@@ -511,6 +512,19 @@ history**: every commit before this change still carries the old committed
 `--max-target-megabytes 2` itself is kept as a general guard against any other
 oversized file that might be committed in the future, not specifically for the
 explorer any more.
+
+Gitleaks' size-based skip only ever applied to *git* scanning, and never covered
+the published artifact itself (gitleaks never saw a gitignored file at all,
+regardless of size). A fix round on 2026-09-22 found that the built,
+soon-to-be-attested explorer therefore went through neither `validate.py`'s
+private-content scan (`scan_publication()` only walks git-tracked/listed
+paths) nor gitleaks before publication -- the same class of finding that
+`validation-attempts.json` recorded against the committed file once already.
+`publish-catalog.yml` now runs `python3 scripts/validate.py --scan-file
+"$explorer"` (the same `PRIVATE_CONTENT` patterns `scan_publication()` uses,
+applied directly to the built file's bytes) immediately after building the
+explorer and before attesting/uploading it, closing that gap without a
+gitleaks scan of a moving, in-memory build artifact.
 
 Suppression lives in two files. `.gitleaks.toml` holds the rule allowlists, each
 scoped to a path and an anchored key shape. The root `.gitleaksignore` holds

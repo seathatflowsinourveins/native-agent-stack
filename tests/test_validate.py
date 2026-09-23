@@ -7,12 +7,16 @@ from pathlib import Path
 import shutil
 import struct
 import subprocess
+import sys
 import tempfile
 import unittest
 from unittest.mock import patch
 import zlib
 
-from scripts.validate import InvalidPublication, validate
+from scripts.validate import InvalidPublication, scan_file_for_private_content, validate
+
+ROOT = Path(__file__).resolve().parents[1]
+VALIDATE_SCRIPT = ROOT / "scripts/validate.py"
 
 
 class PublicationValidationTests(unittest.TestCase):
@@ -460,6 +464,96 @@ class PublicationValidationTests(unittest.TestCase):
                 self.evidence["files"] = self.evidence["files"][:2]
                 self.add_reviewed_pdf(raw=raw)
                 self.assert_invalid("unsupported PDF framing")
+
+
+class ScanFileForPrivateContentTests(unittest.TestCase):
+    """`scan_publication()` only walks git-tracked/listed paths; a generated,
+    gitignored artifact built fresh right before publication (e.g.
+    `docs/ecosystem/index.html` in `publish-catalog.yml`) needs its own
+    direct scan. Covers `scan_file_for_private_content()` and the
+    `--scan-file` CLI mode that wraps it."""
+
+    def setUp(self):
+        self.temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temporary.cleanup)
+        self.root = Path(self.temporary.name)
+
+    def write(self, name: str, content: str) -> Path:
+        path = self.root / name
+        path.write_text(content, encoding="utf-8")
+        return path
+
+    def test_clean_file_reports_no_findings(self):
+        path = self.write("explorer.html", "<html><body>hello</body></html>")
+        self.assertEqual(scan_file_for_private_content(path), [])
+
+    def test_personal_home_path_is_reported(self):
+        # Built from parts (as the existing PRIVATE_CONTENT tests above do) so
+        # this test's own source text, once committed, is not itself a
+        # contiguous match for the pattern under test.
+        path = self.write("explorer.html", "<html>/" + "home" + "/private-person/project</html>")
+        findings = scan_file_for_private_content(path)
+        self.assertEqual(len(findings), 1)
+        self.assertIn("personal home path", findings[0])
+
+    def test_github_token_is_reported(self):
+        token = "gh" + "p_" + "a" * 36
+        path = self.write("explorer.html", f"<html>{token}</html>")
+        findings = scan_file_for_private_content(path)
+        self.assertEqual(len(findings), 1)
+        self.assertIn("GitHub token", findings[0])
+
+    def test_missing_file_is_reported_not_raised(self):
+        findings = scan_file_for_private_content(self.root / "missing.html")
+        self.assertEqual(len(findings), 1)
+        self.assertIn("cannot read file", findings[0])
+
+    def test_non_utf8_bytes_are_still_scanned_as_latin1(self):
+        secret = ("hf" + "_" + "a" * 32).encode()
+        path = self.root / "explorer.html"
+        # 0xFF is an invalid UTF-8 start byte (forces the latin-1 fallback);
+        # 0x00 keeps a non-word byte before "hf_" so \b still matches under
+        # latin-1 decoding (some high latin-1 bytes are themselves letters).
+        path.write_bytes(b"\xff\x00" + secret)
+        findings = scan_file_for_private_content(path)
+        self.assertEqual(len(findings), 1)
+        self.assertIn("Hugging Face token", findings[0])
+
+    def run_cli(self, *args):
+        return subprocess.run(
+            [sys.executable, str(VALIDATE_SCRIPT), *args],
+            capture_output=True, text=True, check=False, cwd=str(ROOT),
+        )
+
+    def test_cli_scan_file_passes_on_a_clean_file(self):
+        path = self.write("explorer.html", "<html>nothing sensitive here</html>")
+        result = self.run_cli("--scan-file", str(path))
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        report = json.loads(result.stdout)
+        self.assertEqual(report, {"status": "passed", "scanned_files": 1})
+
+    def test_cli_scan_file_fails_on_a_planted_secret_without_echoing_it(self):
+        secret = ("sk-ant-" + "b" * 30)
+        path = self.write("explorer.html", f"<html>{secret}</html>")
+        result = self.run_cli("--scan-file", str(path))
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("API secret", result.stdout)
+        self.assertNotIn(secret, result.stdout)
+
+    def test_cli_scan_file_does_not_require_git_tracking_or_root(self):
+        # The whole point: an untracked/gitignored file outside any --root
+        # publication enumeration must still be scannable directly.
+        path = self.write("untracked-explorer.html", "<html>clean</html>")
+        self.assertFalse((self.root / ".git").exists())
+        result = self.run_cli("--scan-file", str(path))
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_cli_scan_file_supports_multiple_files(self):
+        clean = self.write("a.html", "<html>clean</html>")
+        secret = ("sk-ant-" + "c" * 30)
+        dirty = self.write("b.html", f"<html>{secret}</html>")
+        result = self.run_cli("--scan-file", str(clean), "--scan-file", str(dirty))
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
 
 
 if __name__ == "__main__":

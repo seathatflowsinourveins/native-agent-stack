@@ -28,7 +28,7 @@ the [landscape manifest](../catalogs/landscape/manifest.json).
 
 Use the offline explorer (`ecosystem/index.html`, generated with
 `python3 scripts/build_ecosystem.py --write` -- not committed, or download it
-from a `publish-catalog.yml` release artifact) for every candidate, alternative
+from a `publish-catalog.yml` workflow artifact (7-day retention, `workflow_dispatch`/`v*`-tag runs only)) for every candidate, alternative
 and evidence file. Its counts come from the canonical identity index;
 candidate-layer rows are not distinct repositories. Public stars and awesome
 lists are discovery sources, not installation commands or proof of quality, and

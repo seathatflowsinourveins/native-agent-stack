@@ -2,7 +2,7 @@
 
 Open the offline comparison view (`docs/ecosystem/index.html#landscape`; it is
 generated, not committed -- build it with `python3 scripts/build_ecosystem.py
---write`, or download it from a `publish-catalog.yml` release artifact) for
+--write`, or download it from a `publish-catalog.yml` workflow artifact (7-day retention, `workflow_dispatch`/`v*`-tag runs only)) for
 the requirement, current choice, named competitors, evidence and reopening
 condition in **all 20 foundation layers and the 12-layer US-equities trading
 taxonomy** (`catalogs/sota-convergence/manifest-20260922.json#/taxonomy`).

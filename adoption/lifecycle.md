@@ -8,7 +8,7 @@ The matrix covers every selected component. The broader
 alternatives and research identities. Current counts are generated in the
 HTML catalog (`docs/ecosystem/index.html`, generated with
 `python3 scripts/build_ecosystem.py --write` -- not committed, download it
-from a `publish-catalog.yml` release artifact otherwise); installing every
+from a `publish-catalog.yml` workflow artifact (7-day retention, `workflow_dispatch`/`v*`-tag runs only) otherwise); installing every
 alternative is not a prerequisite for the selected workflow.
 
 An accepted stage means the linked dated operation passed within its stated
