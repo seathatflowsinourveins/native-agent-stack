@@ -1793,6 +1793,38 @@ class V2DeviationAcceptanceTests(unittest.TestCase):
         self.assertIn(COMPARE.ACCEPTED_DEVIATION, [d["id"] for d in RUN.PREREGISTRATION_DEVIATIONS])
 
 
+class V2GateClosureTests(unittest.TestCase):
+    """The dividend-sim-module closure receipt and the dated mapping-status revision
+    are tied to the qualifying verdict and receipt, not free-standing claims."""
+
+    def test_closure_receipt_matches_the_preregistered_schema_and_the_verdict(self):
+        receipt = json.loads((SOURCE / "dividend-module-receipt.json").read_text())
+        self.assertEqual((receipt["schema_version"], receipt["status"]), (1, "closed"))
+        self.assertEqual(receipt["mappings_closed"], ["market_on_open_proxy", "distributions_and_cash"])
+        evidence = receipt["evidence"]
+        self.assertEqual(evidence["verdict_sha256"], hashlib.sha256((SOURCE / "verdict-v2.json").read_bytes()).hexdigest())
+        self.assertEqual(evidence["receipt_sha256"], hashlib.sha256((SOURCE / "receipt-v2.json").read_bytes()).hexdigest())
+        verdict = json.loads((SOURCE / "verdict-v2.json").read_text())
+        self.assertEqual((verdict["verdict"], verdict["preregistration_qualifying"], verdict["failed"]), ("PASS", True, 0))
+        self.assertEqual(evidence["execution_checks"], verdict["execution_checks"])
+
+    def test_dated_revision_resolves_every_v2_row_only_on_the_qualifying_verdict(self):
+        revision = json.loads((SOURCE / "mapping-status-20260923.json").read_text())
+        receipt = json.loads((SOURCE / "dividend-module-receipt.json").read_text())
+        self.assertEqual(receipt["mapping_resolution"]["sha256"],
+                         hashlib.sha256((SOURCE / "mapping-status-20260923.json").read_bytes()).hexdigest())
+        self.assertEqual(revision["revises"]["sha256"],
+                         hashlib.sha256((SOURCE / "mapping-manifest-v2.json").read_bytes()).hexdigest())
+        self.assertEqual(set(revision["mapping_status"]), {m["id"] for m in MANIFEST_V2["mappings"]})
+        for row_id, row in revision["mapping_status"].items():
+            with self.subTest(row=row_id):
+                self.assertEqual((row["was"], row["now"]), ("preregistered", "resolved"))
+        self.assertEqual(revision["evidence"]["verdict_sha256"],
+                         hashlib.sha256((SOURCE / "verdict-v2.json").read_bytes()).hexdigest())
+        # The sealed v2 manifest itself still reads preregistered: the revision never edits it.
+        self.assertTrue(all(m["status"] == "preregistered" for m in MANIFEST_V2["mappings"]))
+
+
 class V2ReplayHistoryTests(unittest.TestCase):
     """The replay history is re-hashed at comparison time and may only grow."""
 

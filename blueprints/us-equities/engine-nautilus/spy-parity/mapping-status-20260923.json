@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "id": "spy-parity-mapping-status-20260923",
+  "revised_utc_date": "2026-09-23",
+  "revises": {
+    "path": "blueprints/us-equities/engine-nautilus/spy-parity/mapping-manifest-v2.json",
+    "sha256": "1b821d7ba42ea6121002a26a5082df08ed7a79f9a50b2edc9959503e1088ac67"
+  },
+  "rule": "mapping-manifest-v2.json status_vocabulary: a preregistered row 'becomes resolved only after a v2 replay meets every criterion in acceptance_criteria'; its verdict rule: 'Only then may market_on_open_proxy and distributions_and_cash be moved to resolved in a later dated manifest revision.' The sealed v2 file and the hash-bound v1 file are not edited. decision_visibility is resolved under the general status rule (its validation checks, causality and look_ahead_fill, passed), not under the verdict-rule clause, which names only the other two rows.",
+  "mapping_status": {
+    "decision_visibility": {
+      "was": "preregistered",
+      "now": "resolved"
+    },
+    "market_on_open_proxy": {
+      "was": "preregistered",
+      "now": "resolved"
+    },
+    "distributions_and_cash": {
+      "was": "preregistered",
+      "now": "resolved"
+    }
+  },
+  "evidence": {
+    "verdict": "blueprints/us-equities/engine-nautilus/spy-parity/verdict-v2.json",
+    "verdict_sha256": "1816835f9cf2ea2fa3134e4f5c44a57dc48158499efc7d1fc649e0ed715c9fcd",
+    "receipt": "blueprints/us-equities/engine-nautilus/spy-parity/receipt-v2.json",
+    "receipt_sha256": "f881ee3208317c9f954639c5229a7c1e2c785b196d6ea7cfbac1e1d3088f041c",
+    "verdict_value": "PASS",
+    "preregistration_qualifying": true,
+    "failed": 0,
+    "skipped": [],
+    "execution_checks": {
+      "fail": 0,
+      "pass": 106,
+      "skipped": 0
+    }
+  },
+  "scope": "one_zero case only; the proxy is not a general market-on-open equivalent when the open equals the prior close; other cases need a new dated preregistration"
+}

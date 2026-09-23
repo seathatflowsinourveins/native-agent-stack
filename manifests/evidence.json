@@ -6324,8 +6324,8 @@
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/dividend-module-receipt.json",
-      "sha256": "15989bb7a6b7e27b4dc6a93a225e149cc2684c31aabf66706f4b20f2bc8497fc",
-      "bytes": 2352
+      "sha256": "660f3260a8bdd717b59a2d67209a706ea5ec02aa65538ef7ef977fb9d1ebcbd2",
+      "bytes": 2924
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/fixture_strategy.py",
@@ -6341,6 +6341,11 @@
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/mapping-manifest.json",
       "sha256": "43f510494a970d235f27e5676120ee749b45eb6b060cf74f0b768374b8177909",
       "bytes": 19081
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/mapping-status-20260923.json",
+      "sha256": "519b6d56207c27945db1bda33e22a4098a0ad3063edf40c0ed293271d9ae66bf",
+      "bytes": 1894
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/probes/dividend-symbol-scan.json",
@@ -7739,8 +7744,8 @@
     },
     {
       "path": "catalogs/us-equities/gates-20260922.json",
-      "sha256": "81519110e396691edba60fa165fbad207adf5fbf8ed4d7a5b4f5369285552cc3",
-      "bytes": 27399
+      "sha256": "cdffd15ba27c092792c1dd709bbb86c7a12b2881efea8977b802adc25a87a54d",
+      "bytes": 27680
     },
     {
       "path": "catalogs/us-equities/hosting-source-review.json",
@@ -13504,8 +13509,8 @@
     },
     {
       "path": "tests/test_spy_parity.py",
-      "sha256": "76fa0b2bdafb81a802dca863c738c18d8c027c85bf143b2b18004aa4426d38f0",
-      "bytes": 119532
+      "sha256": "f210e6f4fc1ff37173fc42e84ace878245e3448f03a2d1bee93d4be04ae6ab5e",
+      "bytes": 121917
     },
     {
       "path": "tests/test_stack_lifecycle.py",

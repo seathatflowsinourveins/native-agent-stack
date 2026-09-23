@@ -1,6 +1,15 @@
 {
   "schema_version": 1,
   "status": "closed",
+  "mappings_closed": [
+    "market_on_open_proxy",
+    "distributions_and_cash"
+  ],
+  "mapping_resolution": {
+    "revision": "blueprints/us-equities/engine-nautilus/spy-parity/mapping-status-20260923.json",
+    "sha256": "519b6d56207c27945db1bda33e22a4098a0ad3063edf40c0ed293271d9ae66bf",
+    "declared_deviation": "The gate note (2026-09-22) asked for both ids to read resolved in mapping-manifest.json (v1). v1 is hash-bound to the retained BLOCKED verdict and v2 is sealed, so the resolution is recorded in the dated revision the v2 manifest itself prescribes."
+  },
   "gate": "dividend-sim-module",
   "closed_on_utc_date": "2026-09-23",
   "mechanisms": {
