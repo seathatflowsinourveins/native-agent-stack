@@ -58,6 +58,54 @@ class GapResolutionLedgerTests(unittest.TestCase):
         self.assertNotRegex(text, r"/home/(?!example/)")
         self.assertNotIn("/tmp/claude-", text)
 
+    def test_status_matches_receipts_unless_a_coordinator_note_says_why(self):
+        ladder = {True: "settled", "true": "settled", "partially": "advanced", False: "not_settled", "false": "not_settled", "no": "not_settled"}
+        by_path = {r["path"]: r for r in self.doc["receipts"]}
+        rank = {"not_settled": 0, "advanced": 1, "settled": 2}
+        for layer in self.doc["layers"]:
+            for gap in layer["gaps"]:
+                if not gap["receipts"]:
+                    continue
+                values = []
+                for path in gap["receipts"]:
+                    raw = by_path[path]["settles_gap"]
+                    key = raw if not isinstance(raw, str) else raw.split(" ")[0].strip().lower()
+                    self.assertIn(key, ladder, f"unknown settles_gap {raw!r} in {path}")
+                    values.append(ladder[key])
+                expected = max(values, key=rank.get)
+                with self.subTest(layer=layer["layer_id"], gap=gap["index"]):
+                    if gap["status"] != expected:
+                        self.assertTrue(gap.get("coordinator_note"), "status differs from receipts without a coordinator note")
+
+    def test_source_text_matches_the_source_revision(self):
+        import hashlib
+        import subprocess
+        rev = self.doc["source_revision"]
+        texts = {}
+        for rel, digest in self.doc["source_files_sha256"].items():
+            try:
+                raw = subprocess.run(["git", "-C", str(ROOT), "show", f"{rev}:{rel}"], capture_output=True, check=True).stdout
+            except (OSError, subprocess.CalledProcessError):
+                self.skipTest(f"{rev} is not in this checkout's history (shallow clone)")
+            self.assertEqual(hashlib.sha256(raw).hexdigest(), digest, rel)
+            catalog = rel.rsplit("/", 1)[1].removesuffix(".json")
+            for row in json.loads(raw)["layers"]:
+                texts[(catalog, row["layer_id"])] = row.get("open_gaps", [])
+        for layer in self.doc["layers"]:
+            source = texts[(layer["catalog"], layer["layer_id"])]
+            self.assertEqual([g["index"] for g in layer["gaps"]], list(range(len(source))), layer["layer_id"])
+            for gap in layer["gaps"]:
+                self.assertEqual(gap["source_text"], source[gap["index"]], (layer["layer_id"], gap["index"]))
+
+    def test_no_host_paths_in_receipts_or_blueprints(self):
+        import re
+        pattern = re.compile(r"/home/(?!example/)|/tmp/claude-|-home-[a-z]+-code-")
+        for base in ("evidence/artifacts/gap-resolution-20260922", "blueprints/gap-resolution-20260922"):
+            for path in (ROOT / base).rglob("*"):
+                if path.is_file() and path.suffix in {".json", ".sh", ".py", ".md", ".txt"}:
+                    with self.subTest(path=str(path.relative_to(ROOT))):
+                        self.assertIsNone(pattern.search(path.read_text(encoding="utf-8", errors="replace")))
+
 
 if __name__ == "__main__":
     unittest.main()

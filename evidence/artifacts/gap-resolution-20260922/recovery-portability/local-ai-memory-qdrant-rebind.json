@@ -144,7 +144,7 @@
     "qdrant": "1.19.1, pinned at /home/example/.local/share/codex-ecosystem/bin/qdrant (pre-existing, not installed by this check)"
   },
   "installs": [],
-  "result": "ai-memory: a read-only copy of the live 371 MiB data dir was restic-backed-up and restored byte-for-byte (restic check --read-data reported no errors). A disposable `ai-memory serve` instance bound to 127.0.0.1:49399 started cleanly against the restored copy with no migration errors (schema already at the binary's current version 64) and served MCP over HTTP. Reads against the restored data (CLI status/search, which access the SQLite store directly) reproduced the pre-backup baseline exactly for pages_latest (117), pages_all (393) and sessions (175), and the fixed 'handoff' query returned byte-identical top-3 ranked results (same paths, titles, snippets and FTS5 rank scores) before and after the round trip; the observations count grew slightly post-restore (139312 -> 139377) which is attributable to the disposable instance's own startup/scheduled-maintenance activity after rebind, not to data loss. Qdrant: a snapshot of the live 'socraticode_metadata' collection (4 points) was created through the Qdrant HTTP API (a read-only operation against the collection) and downloaded to scratch with a matching sha256 checksum. A disposable Qdrant 1.19.1 process, started with scratch storage/snapshot paths and HTTP port 26333 (no gRPC), recovered the restic-restored snapshot into a new collection 'socraticode_metadata_restored' reporting points_count 4 (equal to the live count at snapshot time) and status 'green'. A deterministic payload-filter search (collectionName=codegraph_7c79759d30d0) returned exactly the same point id (REDACTED-POINT-ID-1) with its full payload intact as observed on the live collection before the snapshot. Both disposable processes were terminated with SIGTERM and confirmed absent from the process list; the live ai-memory service and the live Qdrant collection list were unaffected throughout (live qdrant-agent-lab.service still shows exactly its original 9 collections with no new/renamed entries), and the snapshot file created on the live Qdrant server was deleted afterward as cleanup.",
+  "result": "CORRECTED 2026-09-23: the ai-memory reads below went to the live server, not the copies; the coordinator_rerun block replaces them with isolated reads, which pass. Original text follows. ai-memory: a read-only copy of the live 371 MiB data dir was restic-backed-up and restored byte-for-byte (restic check --read-data reported no errors). A disposable `ai-memory serve` instance bound to 127.0.0.1:49399 started cleanly against the restored copy with no migration errors (schema already at the binary's current version 64) and served MCP over HTTP. Reads against the restored data (CLI status/search, which access the SQLite store directly) reproduced the pre-backup baseline exactly for pages_latest (117), pages_all (393) and sessions (175), and the fixed 'handoff' query returned byte-identical top-3 ranked results (same paths, titles, snippets and FTS5 rank scores) before and after the round trip; the observations count grew slightly post-restore (139312 -> 139377) which is attributable to the disposable instance's own startup/scheduled-maintenance activity after rebind, not to data loss. Qdrant: a snapshot of the live 'socraticode_metadata' collection (4 points) was created through the Qdrant HTTP API (a read-only operation against the collection) and downloaded to scratch with a matching sha256 checksum. A disposable Qdrant 1.19.1 process, started with scratch storage/snapshot paths and HTTP port 26333 (no gRPC), recovered the restic-restored snapshot into a new collection 'socraticode_metadata_restored' reporting points_count 4 (equal to the live count at snapshot time) and status 'green'. A deterministic payload-filter search (collectionName=codegraph_7c79759d30d0) returned exactly the same point id (REDACTED-POINT-ID-1) with its full payload intact as observed on the live collection before the snapshot. Both disposable processes were terminated with SIGTERM and confirmed absent from the process list; the live ai-memory service and the live Qdrant collection list were unaffected throughout (live qdrant-agent-lab.service still shows exactly its original 9 collections with no new/renamed entries), and the snapshot file created on the live Qdrant server was deleted afterward as cleanup.",
   "settles_gap": "partially",
   "verdict_impact": {
     "could_change_verdict": true,
@@ -160,7 +160,8 @@
     "Only one collection and one ai-memory workspace/project scope were exercised; broader multi-collection or multi-tenant restore behavior is untested.",
     "restic repository password was a fixed test string ('gap-resolution-20260922-test'), acceptable for a disposable scratch repo but not representative of production secret handling.",
     "No reboot or power-loss fault injection was performed (out of scope for this check, tracked separately under open_gaps[2]'s remaining needs_hardware items).",
-    "Absolute paths recorded above have the host username normalized to this repo's publication-hygiene placeholder (scripts/validate.py PRIVATE_CONTENT rules). ai-memory session-path and Qdrant point identifiers were redacted to REDACTED-*-ID placeholders (raw UUID-format identifiers are flagged by the same rule); the unredacted values were compared byte-for-byte during execution and are retained only in the scratch artifacts referenced under raw_artifacts, outside this repo."
+    "Absolute paths recorded above have the host username normalized to this repo's publication-hygiene placeholder (scripts/validate.py PRIVATE_CONTENT rules). ai-memory session-path and Qdrant point identifiers were redacted to REDACTED-*-ID placeholders (raw UUID-format identifiers are flagged by the same rule); the unredacted values were compared byte-for-byte during execution and are retained only in the scratch artifacts referenced under raw_artifacts, outside this repo.",
+    "The first run's ai-memory status/search evidence is void (it read the live store); only coordinator_rerun establishes the ai-memory read comparison. The disposable servers' own start-up is from the first run."
   ],
   "raw_artifacts": [
     {
@@ -195,5 +196,141 @@
       "path": "/home/example/codex-ecosystem/state/gap-resolution-20260922/recovery/app-state/disposable-qdrant.log",
       "sha256": "b9750366929c1acef3a9b833bf7b93c5e4523bcad96ae4939d7758cff7d8dbfc"
     }
-  ]
+  ],
+  "coordinator_rerun": {
+    "date": "2026-09-23",
+    "reason": "Finding from the Codex blind review of PR #81 (gpt-6-astra, read-only, 2026-09-22), confirmed by the retained raw files: the first run's `ai-memory status` and `ai-memory search` calls passed only --data-dir, and the CLI sends those calls to the server at its default server_url (the live server, 127.0.0.1:49374). baseline-status.json reports data_dir ~/.local/share/ai-memory and restored-status.json logs server_url=http://127.0.0.1:49374, so both 'reads' queried the live store. They compared the live store with itself and established nothing about the restore.",
+    "method": "Restore the same restic snapshot again into a new target; diff it against the pre-backup copy; start two disposable servers (a copy of the pre-backup copy on 127.0.0.1:49411, the fresh restore on 127.0.0.1:49412); send every client read to its own server with AI_MEMORY_SERVER_URL; accept a read only when the status output's data_dir and bind name that arm's directory and port.",
+    "commands": [
+      "restic -r <state>/repo snapshots --json; restic -r <state>/repo check --read-data; restic -r <state>/repo restore latest --target <run>/restored2",
+      "diff -r <state>/ai-memory-copy <run>/restored2/.../ai-memory-copy",
+      "cp -a <state>/ai-memory-copy <run>/baseline-dir",
+      "ai-memory serve --transport http --bind 127.0.0.1:49411 --data-dir <run>/baseline-dir --allow-insecure-no-auth --no-watcher &",
+      "ai-memory serve --transport http --bind 127.0.0.1:49412 --data-dir <run>/restored2/.../ai-memory-copy --allow-insecure-no-auth --no-watcher &",
+      "AI_MEMORY_SERVER_URL=http://127.0.0.1:<port> ai-memory status --data-dir <arm dir> --json   # per arm",
+      "AI_MEMORY_SERVER_URL=http://127.0.0.1:<port> ai-memory search handoff --data-dir <arm dir> --workspace agent-lab --project agent-lab --limit 3 --json   # per arm"
+    ],
+    "exit_codes": {
+      "snapshots": 0,
+      "check_read_data": 0,
+      "restore": 0,
+      "diff": 0,
+      "baseline_status": 0,
+      "baseline_search": 0,
+      "restored_status": 0,
+      "restored_search": 0
+    },
+    "observed": {
+      "restic_check": "no errors were found (14/14 packs read)",
+      "diff_lines": 0,
+      "baseline": {
+        "data_dir_is_own_arm": true,
+        "bind": "127.0.0.1:49411",
+        "counts": {
+          "pages_latest": 117,
+          "pages_all": 393,
+          "sessions": 175,
+          "observations": 139312
+        },
+        "top3_sha256": "eb69f65b761bdee5b4a4e654c6e57b16e4c7a92a9c58cda3b0464406c4dce760",
+        "top3_count": 3
+      },
+      "restored": {
+        "data_dir_is_own_arm": true,
+        "bind": "127.0.0.1:49412",
+        "counts": {
+          "pages_latest": 117,
+          "pages_all": 393,
+          "sessions": 175,
+          "observations": 139312
+        },
+        "top3_sha256": "eb69f65b761bdee5b4a4e654c6e57b16e4c7a92a9c58cda3b0464406c4dce760",
+        "top3_count": 3
+      },
+      "top3_equal_in_order": true,
+      "top3_note": "The page paths are session identifiers, so only a hash of the ordered list is published."
+    },
+    "result": "The fresh restore is byte-identical to the pre-backup copy (diff -r: no output, exit 0). Each disposable server answered for its own directory. Counts are equal (pages_latest 117, pages_all 393, sessions 175, observations 139312), and the top three 'handoff' results are the same pages in the same order. The first run's 'observations slightly higher' was the live store growing, not server bookkeeping.",
+    "raw_artifacts": [
+      {
+        "path": "evidence/artifacts/gap-resolution-20260922/recovery-portability/ai-memory-isolated-rerun-20260923/rerun-isolated.sh",
+        "sha256": "c50f93b29facad95d66a528d82699e0089c20888d39b3a5271af9e5c332aae16",
+        "source_sha256": "6d15f355bcfe1e184d521d0a804bcc2143bbdf09615317500e2b30de018e67bc",
+        "note": "published copy: home directory, user and host names replaced"
+      },
+      {
+        "path": "evidence/artifacts/gap-resolution-20260922/recovery-portability/ai-memory-isolated-rerun-20260923/steps.log",
+        "sha256": "8684fd08ed48bcba1815e479a0b53d79dcb175746c561f5f5c31cae0e33d74e3",
+        "source_sha256": "fad553c958c41dcaa963564d98a4019517688a44e8b8c3d49f57377030d16e88",
+        "note": "published copy: home directory, user and host names replaced"
+      },
+      {
+        "path": "evidence/artifacts/gap-resolution-20260922/recovery-portability/ai-memory-isolated-rerun-20260923/versions.txt",
+        "sha256": "cbf4b3fd8a992d165bc76a525789d864d893a67e39e281420290eadf644f3c2c",
+        "source_sha256": "cbf4b3fd8a992d165bc76a525789d864d893a67e39e281420290eadf644f3c2c",
+        "note": "published copy: home directory, user and host names replaced"
+      },
+      {
+        "path": "evidence/artifacts/gap-resolution-20260922/recovery-portability/ai-memory-isolated-rerun-20260923/check.log",
+        "sha256": "6911e7079976150688f7c959007c83e4d37631ee7b85da1591b29052d439587c",
+        "source_sha256": "6911e7079976150688f7c959007c83e4d37631ee7b85da1591b29052d439587c",
+        "note": "published copy: home directory, user and host names replaced"
+      },
+      {
+        "path": "evidence/artifacts/gap-resolution-20260922/recovery-portability/ai-memory-isolated-rerun-20260923/restore.log",
+        "sha256": "40a59d2491fcc087ef7b059afd06e26d82b75f5c07da684d405a8ff19a3e9d11",
+        "source_sha256": "01a7bce999690d63cf343864e3b3f56238275e578a0aeeb3a476df21e81a9e0c",
+        "note": "published copy: home directory, user and host names replaced"
+      },
+      {
+        "path": "evidence/artifacts/gap-resolution-20260922/recovery-portability/ai-memory-isolated-rerun-20260923/baseline-status.json",
+        "sha256": "1746bdc05e6ec374cb2cc23f595dcd9571235654d6f6a4ae64b593d537905399",
+        "source_sha256": "821be4b811fc1ef169a06989c900fed21c78d81db87a49d4a91467082641db56",
+        "note": "published copy: home directory, user and host names replaced"
+      },
+      {
+        "path": "evidence/artifacts/gap-resolution-20260922/recovery-portability/ai-memory-isolated-rerun-20260923/restored-status.json",
+        "sha256": "24a01f6fad40fd38248531a416498d1836b2fb32faf1e1176f85865ecbbc7369",
+        "source_sha256": "bb494a11198caf121fb0fcb8fa0e1fe3db0af573e30a636d390010a2287fec73",
+        "note": "published copy: home directory, user and host names replaced"
+      },
+      {
+        "path": "evidence/artifacts/gap-resolution-20260922/recovery-portability/ai-memory-isolated-rerun-20260923/baseline-status.err.txt",
+        "sha256": "2c272888ecb9b28bb1298a6d2550cc2b8df2a3160c28a6a9e57f1c7008d197e4",
+        "source_sha256": "6e790012dd78840df7e32f8cf4cd192722fd4e593e72f28804b1b4f02c3d0f9a",
+        "note": "published copy: home directory, user and host names replaced"
+      },
+      {
+        "path": "evidence/artifacts/gap-resolution-20260922/recovery-portability/ai-memory-isolated-rerun-20260923/restored-status.err.txt",
+        "sha256": "87a5ba6ffb2ea1f6d0fecb4c4883bfb2bc03865a6788f3a4578e5622b6f7a4aa",
+        "source_sha256": "e1a18228b024ca77a018730f23447fbc75be44d444811b603340b123ece6835e",
+        "note": "published copy: home directory, user and host names replaced"
+      },
+      {
+        "path": "~/codex-ecosystem/state/gap-resolution-20260922/recovery/app-state/rerun-isolated/baseline-search.json",
+        "sha256": "b12fcd64a3e08e8bdacc39f8e622f0e691bd432ef0815d762b2f3666a580b953",
+        "note": "kept on the host only: contains memory page text"
+      },
+      {
+        "path": "~/codex-ecosystem/state/gap-resolution-20260922/recovery/app-state/rerun-isolated/restored-search.json",
+        "sha256": "b12fcd64a3e08e8bdacc39f8e622f0e691bd432ef0815d762b2f3666a580b953",
+        "note": "kept on the host only: contains memory page text"
+      },
+      {
+        "path": "~/codex-ecosystem/state/gap-resolution-20260922/recovery/app-state/rerun-isolated/snapshots.json",
+        "sha256": "dc660af3705ed51869f9762c697d68c5d90e595d130d5b7f98382e3107dda189",
+        "note": "kept on the host only: names the host user"
+      },
+      {
+        "path": "~/codex-ecosystem/state/gap-resolution-20260922/recovery/app-state/rerun-isolated/baseline-server.log",
+        "sha256": "e0e0012f5fb980d4da1d09598a6be05eeea0a3fdc27586f609fc702380c29f03",
+        "note": "kept on the host only"
+      },
+      {
+        "path": "~/codex-ecosystem/state/gap-resolution-20260922/recovery/app-state/rerun-isolated/restored-server.log",
+        "sha256": "3fa342edfb4886f42e2e71d098382180f5ab29502a12b414896d68681bb65ad8",
+        "note": "kept on the host only"
+      }
+    ]
+  }
 }

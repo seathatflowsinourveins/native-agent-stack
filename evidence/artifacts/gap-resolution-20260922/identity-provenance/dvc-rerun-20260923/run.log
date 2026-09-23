@@ -1,0 +1,99 @@
++ date -u +%FT%TZ
+2026-09-23T00:06:47Z
++ ~/.local/share/codex-ecosystem/tools/dvc-3.67.1-20260922/bin/dvc --version
+3.67.1
++ git --version
+git version 2.43.0
++ ~/.local/share/codex-ecosystem/tools/sdk-env-baseline-20260922/bin/python3.13 --version
+Python 3.13.15
++ cd ~/code/nas-wt-gapint/blueprints/us-equities/nanosecond-replay
++ ~/.local/share/codex-ecosystem/tools/sdk-env-baseline-20260922/bin/python3.13 replay.py materialize --source fixture.json --output ~/codex-ecosystem/state/gap-resolution-20260922/storage-market/dvc-rerun/work/materialized
+{
+  "snapshot_sha256": "9122163bb4d4a14c3177268d4515c0eba9425992870d46f158c2d2507a78cc99",
+  "source_sha256": "40aeafbc144eb39ebd017af449d6d136f5539caf484ebd8b310bb4fbf213eb5d",
+  "counts": {
+    "observations": 5,
+    "universe": 2
+  },
+  "synthetic": true,
+  "pandas_version": "3.0.6",
+  "duckdb_version": "1.5.5"
+}
++ cd ~/codex-ecosystem/state/gap-resolution-20260922/storage-market/dvc-rerun/work
++ mkdir repo
++ cp -a materialized repo/materialized
++ chmod -R u+w repo/materialized
++ cd repo
++ git init -q
++ git config user.email gap-resolution@local
++ git config user.name gap-resolution
++ ~/.local/share/codex-ecosystem/tools/dvc-3.67.1-20260922/bin/dvc init -q
++ ~/.local/share/codex-ecosystem/tools/dvc-3.67.1-20260922/bin/dvc add materialized
+
+To track the changes with git, run:
+
+	git add materialized.dvc .gitignore
+
+To enable auto staging, run:
+
+	dvc config core.autostage true
++ git add materialized.dvc .gitignore .dvc
++ git commit -q -m 'track materialized fixture'
++ find materialized -type f
++ sort
++ xargs sha256sum
++ tee ~/codex-ecosystem/state/gap-resolution-20260922/storage-market/dvc-rerun/pre-delete.sha256
+0cf15579cd80a02b1c5411bdda50483808e2b2948126da659ecca596bb3821f3  materialized/observations.parquet
+9122163bb4d4a14c3177268d4515c0eba9425992870d46f158c2d2507a78cc99  materialized/snapshot.json
+40aeafbc144eb39ebd017af449d6d136f5539caf484ebd8b310bb4fbf213eb5d  materialized/source.json
+b0785843154bdabb234de6ef9b105ee937c40703d4aa87343b7dfae9b07a2c2c  materialized/universe.parquet
++ rm -rf materialized
++ ~/.local/share/codex-ecosystem/tools/dvc-3.67.1-20260922/bin/dvc status
+materialized.dvc:
+	changed outs:
+		deleted:            materialized
++ ~/.local/share/codex-ecosystem/tools/dvc-3.67.1-20260922/bin/dvc checkout
+A       materialized/
++ find materialized -type f
++ sort
++ xargs sha256sum
++ tee ~/codex-ecosystem/state/gap-resolution-20260922/storage-market/dvc-rerun/post-checkout.sha256
+0cf15579cd80a02b1c5411bdda50483808e2b2948126da659ecca596bb3821f3  materialized/observations.parquet
+9122163bb4d4a14c3177268d4515c0eba9425992870d46f158c2d2507a78cc99  materialized/snapshot.json
+40aeafbc144eb39ebd017af449d6d136f5539caf484ebd8b310bb4fbf213eb5d  materialized/source.json
+b0785843154bdabb234de6ef9b105ee937c40703d4aa87343b7dfae9b07a2c2c  materialized/universe.parquet
++ diff ~/codex-ecosystem/state/gap-resolution-20260922/storage-market/dvc-rerun/pre-delete.sha256 ~/codex-ecosystem/state/gap-resolution-20260922/storage-market/dvc-rerun/post-checkout.sha256
++ echo dvc_arm_diff_exit=0
+dvc_arm_diff_exit=0
++ cd ~/code/nas-wt-gapint/blueprints/us-equities/nanosecond-replay
++ ~/.local/share/codex-ecosystem/tools/sdk-env-baseline-20260922/bin/python3.13 replay.py materialize --source fixture.json --output ~/codex-ecosystem/state/gap-resolution-20260922/storage-market/dvc-rerun/work/rematerialized
+{
+  "snapshot_sha256": "2f0a2d18fbcd4a462c2ea22c45ff3075b7fe741e55405abe40dac587525553fb",
+  "source_sha256": "40aeafbc144eb39ebd017af449d6d136f5539caf484ebd8b310bb4fbf213eb5d",
+  "counts": {
+    "observations": 5,
+    "universe": 2
+  },
+  "synthetic": true,
+  "pandas_version": "3.0.6",
+  "duckdb_version": "1.5.5"
+}
++ cd ~/codex-ecosystem/state/gap-resolution-20260922/storage-market/dvc-rerun/work/rematerialized
++ tee ~/codex-ecosystem/state/gap-resolution-20260922/storage-market/dvc-rerun/baseline-rematerialize.sha256
++ find . -type f
++ sort
++ xargs sha256sum
++ sed 's#  \./#  materialized/#'
+0cf15579cd80a02b1c5411bdda50483808e2b2948126da659ecca596bb3821f3  materialized/observations.parquet
+2f0a2d18fbcd4a462c2ea22c45ff3075b7fe741e55405abe40dac587525553fb  materialized/snapshot.json
+40aeafbc144eb39ebd017af449d6d136f5539caf484ebd8b310bb4fbf213eb5d  materialized/source.json
+b0785843154bdabb234de6ef9b105ee937c40703d4aa87343b7dfae9b07a2c2c  materialized/universe.parquet
++ diff ~/codex-ecosystem/state/gap-resolution-20260922/storage-market/dvc-rerun/pre-delete.sha256 ~/codex-ecosystem/state/gap-resolution-20260922/storage-market/dvc-rerun/baseline-rematerialize.sha256
+2c2
+< 9122163bb4d4a14c3177268d4515c0eba9425992870d46f158c2d2507a78cc99  materialized/snapshot.json
+---
+> 2f0a2d18fbcd4a462c2ea22c45ff3075b7fe741e55405abe40dac587525553fb  materialized/snapshot.json
++ echo baseline_arm_diff_exit=1
+baseline_arm_diff_exit=1
++ date -u +%FT%TZ
+2026-09-23T00:06:49Z

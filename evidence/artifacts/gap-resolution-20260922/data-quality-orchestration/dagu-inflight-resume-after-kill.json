@@ -2,9 +2,14 @@
   "schema_version": 1,
   "id": "dagu-inflight-resume-after-kill",
   "date": "2026-09-22",
-  "layer_ids": ["data-quality-orchestration"],
+  "layer_ids": [
+    "data-quality-orchestration"
+  ],
   "gap_refs": [
-    {"layer_id": "data-quality-orchestration", "gap_index": 0}
+    {
+      "layer_id": "data-quality-orchestration",
+      "gap_index": 0
+    }
   ],
   "purpose": "Directly test whether a Dagu-run in-flight step RESUMES (continues from where it was interrupted) after the run process is killed mid-step, as opposed to only preserving completed-step history, using the pinned dagu-2.16.6 binary against a disposable DAGU_HOME/data directory and a disposable two-step DAG (never the live dagu-equities service).",
   "preregistered": "Design formed before execution: start a background 'longstep' step that writes a timestamped STARTED_MARKER then sleeps 20s before writing FINISHED_MARKER, wait for STARTED_MARKER to appear (confirming the process is mid-step), then SIGKILL the whole dagu process group. Then attempt recovery two ways: (a) re-issue `dagu start` with the SAME --run-id, (b) the documented `dagu retry --run-id`. Expectation: Dagu has no intra-step checkpointing, so if the interrupted step re-executes at all it will restart from its beginning (a NEW STARTED_MARKER timestamp), demonstrating that only completed-step (not in-flight-step) state is preserved across a kill -- this would settle the gap by confirming step-granularity-only recovery. If instead the step were skipped or resumed without re-running its sleep, that would refute this expectation and be a materially different (stronger) result for Dagu. A secondary, unplanned-for possibility being watched for but not specifically predicted: that retry could be refused entirely due to stale run-state bookkeeping.",
@@ -31,13 +36,16 @@
       "output_sha256": null
     }
   ],
-  "tool_versions": {"dagu": "2.16.6", "python3": "3.12.3"},
+  "tool_versions": {
+    "dagu": "2.16.6",
+    "python3": "3.12.3"
+  },
   "installs": [],
   "result": "The Dagu-run process was confirmed mid-step (STARTED_MARKER present, FINISHED_MARKER absent) before being SIGKILLed and reaped. Within the roughly 1-2 second window between the kill and the two recovery attempts, neither `dagu start --run-id <same>` nor the documented `dagu retry --run-id` could get the run moving again: both were refused with 'already exists' / 'already running... socket=/tmp/@dagu_inflight_0fca6b.sock', and `dagu history --run-id ... --format json` still reported status 'running' after the kill and after both recovery attempts. So, within the short window actually tested, the answer to the preregistered question is the stronger-than-base-hypothesis result: not only does the interrupted step fail to resume mid-step (expected), the run also could not be moved via either documented immediate-recovery command in that window. This receipt does NOT establish, and an earlier version of it incorrectly claimed, that the run is 'permanently' or 'indefinitely' stuck: a static inspection of the pinned dagu-2.16.6 binary's own embedded config schema (see the third command above) documents a `lock_stale_threshold` (default 30s) and a process-heartbeat `stale_threshold` (default 90s) that govern when Dagu itself would consider the held lock/heartbeat dead. Neither threshold had elapsed within the ~1-2s window tested here, and no retry was attempted after either threshold, so whether a later retry, a manual `dagu stop`, or manual deletion of the stale socket file would succeed remains untested and unresolved by this check -- consistent with the run's own raw retry_stderr, which only names the socket path and does not itself establish the refusal's cause (fixed-lock-presence vs. not-yet-stale heartbeat vs. persisted history status).",
   "settles_gap": "partially",
   "verdict_impact": {
     "could_change_verdict": true,
-    "direction": "refutes_incumbent",
+    "direction": "inconclusive",
     "explanation": "The layer's prior accepted evidence established only that Dagu preserves COMPLETED run history across a graceful restart; this check adds native evidence that an UNCLEAN kill (SIGKILL, not the graceful `stop` used by the existing job-recovery fixture) leaves the run non-resumable via either documented immediate-recovery command within the ~1-2s window actually tested. That narrower, correctly-scoped claim (no immediate/automatic resume or restart after an unclean kill) still refutes an implicit assumption that in-flight steps checkpoint or auto-resume, and is directly relevant to the 'in-flight step resume' condition named in the overturn_protocol. It does NOT establish, and this receipt no longer claims, that recovery is permanently or indefinitely impossible: the pinned binary documents a 30s lock-stale / 90s heartbeat-stale threshold that this test's ~1-2s window never reached, and a manual `dagu stop` or stale-socket-file cleanup path was not tried. Confidence in Dagu's crash-recovery robustness is narrowed by the immediate-recovery-failure finding alone; the 'permanently stuck' framing in an earlier version of this receipt was not supported by the evidence collected and has been removed rather than corroborated by a further kill/retry run."
   },
   "evidence_class": "native_proven",
@@ -50,7 +58,20 @@
     "This exercises Dagu's local single-process lock semantics only, not any distributed/coordinator-mode recovery path."
   ],
   "raw_artifacts": [
-    {"path": "private session scratch directory (fixture stdout capture, retained outside the repository; personal path and session identifier withheld from publication)", "sha256": "a43425d11a89f0c6221110616a0cfe092a418e95e338ebeda0b146f8828e411a"},
-    {"path": "private session scratch directory (fixture-internal result.json, retained outside the repository; personal path and session identifier withheld from publication)", "sha256": "106dd5c6b19a396cc4f8f6f581cc30de2a6cbdc67e8d943a837f6d25735c8a1a"}
-  ]
+    {
+      "path": "private session scratch directory (fixture stdout capture, retained outside the repository; personal path and session identifier withheld from publication)",
+      "sha256": "a43425d11a89f0c6221110616a0cfe092a418e95e338ebeda0b146f8828e411a"
+    },
+    {
+      "path": "private session scratch directory (fixture-internal result.json, retained outside the repository; personal path and session identifier withheld from publication)",
+      "sha256": "106dd5c6b19a396cc4f8f6f581cc30de2a6cbdc67e8d943a837f6d25735c8a1a"
+    }
+  ],
+  "coordinator_correction": {
+    "date": "2026-09-23",
+    "field": "verdict_impact.direction",
+    "from": "refutes_incumbent",
+    "to": "inconclusive",
+    "reason": "Codex blind review of PR #81 (gpt-6-astra, read-only, 2026-09-22): recovery was tried only 1-2 s after SIGKILL, before Dagu's documented 30 s lock and 90 s heartbeat thresholds, and the catalog never claimed immediate recovery. The observation stands; it does not refute the incumbent."
+  }
 }

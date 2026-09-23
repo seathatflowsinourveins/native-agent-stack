@@ -14,7 +14,7 @@ ccusage --version
 ccusage claude daily --json --offline --no-cost > "$OUT/daily.json"
 ccusage claude session --json --offline --no-cost > "$OUT/session.json"
 
-WF_JOURNAL_DIR=/home/example/.claude/projects/-home-seath-code-agent-lab/EXAMPLE-CLAUDE-SESSION-ID/subagents/workflows/wf_76e829b6-778
+WF_JOURNAL_DIR=/home/example/.claude/projects/<project-slug>/EXAMPLE-CLAUDE-SESSION-ID/subagents/workflows/wf_76e829b6-778
 node /home/example/code/agent-lab/.claude/workflows/child-usage.mjs "$WF_JOURNAL_DIR" > "$OUT/child-usage-mjs-wf_76e829b6-778.json"
 
 python3 - "$OUT" <<'PYEOF'

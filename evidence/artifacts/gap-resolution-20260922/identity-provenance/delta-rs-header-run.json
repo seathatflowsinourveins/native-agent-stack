@@ -53,6 +53,6 @@
     "The `preregistered` field above was written after these commands had already been run and their results (`0 1`) were known, so it is a post-hoc restatement of the expected outcome rather than a true blind prediction recorded before execution."
   ],
   "raw_artifacts": [
-    {"path": "/tmp/claude-1000/-home-seath-code-agent-lab/redacted-session-scratchpad/scratchpad/delta-rs-header-run.out", "sha256": "a79122992d53d358e6bbbbb98883d64fa0c15df3bcb08ff7b65a0580870af424"}
+    {"path": "<scratch>/redacted-session-scratchpad/scratchpad/delta-rs-header-run.out", "sha256": "a79122992d53d358e6bbbbb98883d64fa0c15df3bcb08ff7b65a0580870af424"}
   ]
 }
