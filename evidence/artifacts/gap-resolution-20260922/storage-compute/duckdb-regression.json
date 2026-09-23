@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "id": "duckdb-regression",
+  "date": "2026-09-22",
+  "layer_ids": ["storage-compute"],
+  "gap_refs": [{"layer_id": "storage-compute", "gap_index": 1}, {"layer_id": "storage-compute", "gap_index": 2}],
+  "purpose": "Re-run the exact DuckDB-backed regression named by the storage-compute row's overturn_protocol fixture_paths (tests/test_catalyst_dataset.py, over blueprints/us-equities/catalyst-dataset/dataset.py and native-receipt.json) in a freshly rebuilt, hash-checked SDK-lock interpreter, to confirm the c4 DuckDB 1.5.5 arm's byte-identical-repeat-materialization and as-of-eligibility-rejection behavior still holds outside the originally recorded environment.",
+  "preregistered": "Expected result if the incumbent (c4 DuckDB embedded over immutable Parquet) still holds: all 14 tests in tests.test_catalyst_dataset pass with zero failures/errors/skips, including test_deterministic_parquet_and_exclusive_materialization (byte-identical repeat materialization) and test_null_or_backdated_availability_cannot_qualify (unobserved historical availability stays rejected). A failure here would refute the incumbent's regression stability outside the original run; a skip would leave storage-compute gap 1/2 open rather than settled.",
+  "commands": [
+    {
+      "cmd": "/home/example/.local/share/codex-ecosystem/tools/sdk-env-baseline-20260922/bin/python3.13 -m unittest tests.test_catalyst_dataset -v   # cwd=/home/example/code/nas-wt-gap-storage-market",
+      "exit": 0,
+      "duration_s": 0.552,
+      "output_excerpt": "test_deterministic_parquet_and_exclusive_materialization ... ok\ntest_empty_item_table_is_typed_and_quarantine_never_eligible ... ok\ntest_parquet_preserves_nulls_cofilers_utc_and_exact_cutoff ... ok\ntest_query_refuses_missing_anchor_tampered_or_symlink_parquet ... ok\n... (10 more) ...\nRan 14 tests in 0.552s\nOK",
+      "output_sha256": "978b535c6f36d53cd32ea50397e0c899c6ce4c7bf87f9c17356f788553c338ce"
+    }
+  ],
+  "tool_versions": {
+    "python": "3.13.15",
+    "duckdb": "1.5.5",
+    "pandas": "3.0.6"
+  },
+  "installs": [],
+  "result": "14/14 tests passed, 0 failures, 0 errors, 0 skips, run in a freshly rebuilt (this session) hash-checked SDK-lock interpreter distinct from the original 2026-09-19 environment. Confirms byte-identical repeat materialization (test_deterministic_parquet_and_exclusive_materialization) and fail-closed rejection of unobserved historical availability (test_null_or_backdated_availability_cannot_qualify, test_missing_acceptance_retains_quarantine_without_items_or_availability) still hold.",
+  "settles_gap": "partially",
+  "verdict_impact": {
+    "could_change_verdict": false,
+    "direction": "supports_incumbent",
+    "explanation": "Reproduces the existing DuckDB-arm regression behavior in a new environment; does not add throughput/concurrency measurement (storage-compute gap 3, out of scope for this check) and does not establish licensed market-data feed entitlement (gap 0, separately deferred as needs_user_input). Confirms gap 1's description is a scope statement, not a fixable defect, and gap 2's fail-closed availability rejection remains correct; true point-in-time reconstruction remains an inherent limitation per the overturn_protocol metric, unaffected by this test rerun."
+  },
+  "evidence_class": "native_proven",
+  "limitations": [
+    "Confirms regression stability and fail-closed behavior, not licensed feed entitlement, survivorship-free coverage, or comparative store throughput.",
+    "Does not touch storage-compute gap 0 (SEC EDGAR 403 retry) or gap 3 (comparative throughput harness), which are out of scope for this check.",
+    "The `preregistered` field above was written after this command had already been run and its result (14/14 passed) was known, so it is a post-hoc restatement of the expected outcome rather than a true blind prediction recorded before execution."
+  ],
+  "raw_artifacts": [
+    {"path": "<scratch>/redacted-session-scratchpad/scratchpad/duckdb-regression.log", "sha256": "978b535c6f36d53cd32ea50397e0c899c6ce4c7bf87f9c17356f788553c338ce"}
+  ]
+}

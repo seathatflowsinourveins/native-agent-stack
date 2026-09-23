@@ -1,0 +1,224 @@
+{
+  "blocked_transport_audit_events": [],
+  "cases": {
+    "basic_limit_int_qty": {
+      "content_type_header": "application/json",
+      "fields_dict": {
+        "limit_price": 100.1,
+        "qty": 2.0,
+        "side": "buy",
+        "symbol": "SPY",
+        "time_in_force": "day",
+        "type": "limit"
+      },
+      "fields_repr": {
+        "limit_price": "100.1",
+        "qty": "2.0",
+        "side": "<OrderSide.BUY: 'buy'>",
+        "symbol": "'SPY'",
+        "time_in_force": "<TimeInForce.DAY: 'day'>",
+        "type": "<OrderType.LIMIT: 'limit'>"
+      },
+      "literal_wire_body_byte_length": 107,
+      "literal_wire_body_sha256": "fa832fa7ee430a5612695141e8d66e92a7f2ab0425f4d5721c5da3b66aa788be",
+      "literal_wire_body_utf8": "{\"symbol\": \"SPY\", \"qty\": 2.0, \"side\": \"buy\", \"type\": \"limit\", \"time_in_force\": \"day\", \"limit_price\": 100.1}",
+      "rejected": false,
+      "stage": "wire_body"
+    },
+    "fractional_qty_decimal": {
+      "content_type_header": "application/json",
+      "fields_dict": {
+        "limit_price": 100.1,
+        "qty": 0.5,
+        "side": "buy",
+        "symbol": "SPY",
+        "time_in_force": "day",
+        "type": "limit"
+      },
+      "fields_repr": {
+        "limit_price": "100.1",
+        "qty": "0.5",
+        "side": "<OrderSide.BUY: 'buy'>",
+        "symbol": "'SPY'",
+        "time_in_force": "<TimeInForce.DAY: 'day'>",
+        "type": "<OrderType.LIMIT: 'limit'>"
+      },
+      "literal_wire_body_byte_length": 107,
+      "literal_wire_body_sha256": "4ff0f02ce4b89d56ffdd1091847424c00aae369413e02cb6f27881e8f7005d0e",
+      "literal_wire_body_utf8": "{\"symbol\": \"SPY\", \"qty\": 0.5, \"side\": \"buy\", \"type\": \"limit\", \"time_in_force\": \"day\", \"limit_price\": 100.1}",
+      "rejected": false,
+      "stage": "wire_body"
+    },
+    "large_qty": {
+      "content_type_header": "application/json",
+      "fields_dict": {
+        "limit_price": 100.1,
+        "qty": 1000000.0,
+        "side": "buy",
+        "symbol": "SPY",
+        "time_in_force": "day",
+        "type": "limit"
+      },
+      "fields_repr": {
+        "limit_price": "100.1",
+        "qty": "1000000.0",
+        "side": "<OrderSide.BUY: 'buy'>",
+        "symbol": "'SPY'",
+        "time_in_force": "<TimeInForce.DAY: 'day'>",
+        "type": "<OrderType.LIMIT: 'limit'>"
+      },
+      "literal_wire_body_byte_length": 113,
+      "literal_wire_body_sha256": "7d2602637036d940a3eb20f5e2b2455755e07b2dec6da2ea1f77071f1291844b",
+      "literal_wire_body_utf8": "{\"symbol\": \"SPY\", \"qty\": 1000000.0, \"side\": \"buy\", \"type\": \"limit\", \"time_in_force\": \"day\", \"limit_price\": 100.1}",
+      "rejected": false,
+      "stage": "wire_body"
+    },
+    "negative_qty": {
+      "content_type_header": "application/json",
+      "fields_dict": {
+        "limit_price": 100.1,
+        "qty": -1.0,
+        "side": "buy",
+        "symbol": "SPY",
+        "time_in_force": "day",
+        "type": "limit"
+      },
+      "fields_repr": {
+        "limit_price": "100.1",
+        "qty": "-1.0",
+        "side": "<OrderSide.BUY: 'buy'>",
+        "symbol": "'SPY'",
+        "time_in_force": "<TimeInForce.DAY: 'day'>",
+        "type": "<OrderType.LIMIT: 'limit'>"
+      },
+      "literal_wire_body_byte_length": 108,
+      "literal_wire_body_sha256": "9292019bfe1bcedafea4d2117721377713cb73d5348db4200e28e30232d52e5f",
+      "literal_wire_body_utf8": "{\"symbol\": \"SPY\", \"qty\": -1.0, \"side\": \"buy\", \"type\": \"limit\", \"time_in_force\": \"day\", \"limit_price\": 100.1}",
+      "rejected": false,
+      "stage": "wire_body"
+    },
+    "notional_only_market": {
+      "content_type_header": "application/json",
+      "fields_dict": {
+        "notional": 500.0,
+        "side": "buy",
+        "symbol": "SPY",
+        "time_in_force": "day",
+        "type": "market"
+      },
+      "fields_repr": {
+        "notional": "500.0",
+        "side": "<OrderSide.BUY: 'buy'>",
+        "symbol": "'SPY'",
+        "time_in_force": "<TimeInForce.DAY: 'day'>",
+        "type": "<OrderType.MARKET: 'market'>"
+      },
+      "literal_wire_body_byte_length": 93,
+      "literal_wire_body_sha256": "00f51503db61e86641da1abbf86ab5292e150b145c584e12fa8424c6cef24002",
+      "literal_wire_body_utf8": "{\"symbol\": \"SPY\", \"notional\": 500.0, \"side\": \"buy\", \"type\": \"market\", \"time_in_force\": \"day\"}",
+      "rejected": false,
+      "stage": "wire_body"
+    },
+    "notional_subpenny": {
+      "content_type_header": "application/json",
+      "fields_dict": {
+        "notional": 500.005,
+        "side": "buy",
+        "symbol": "SPY",
+        "time_in_force": "day",
+        "type": "market"
+      },
+      "fields_repr": {
+        "notional": "500.005",
+        "side": "<OrderSide.BUY: 'buy'>",
+        "symbol": "'SPY'",
+        "time_in_force": "<TimeInForce.DAY: 'day'>",
+        "type": "<OrderType.MARKET: 'market'>"
+      },
+      "literal_wire_body_byte_length": 95,
+      "literal_wire_body_sha256": "234de73103b45ef7e7e7af03d2abb2b91c32adb7e5b45b0d42f8c29d16ac1de5",
+      "literal_wire_body_utf8": "{\"symbol\": \"SPY\", \"notional\": 500.005, \"side\": \"buy\", \"type\": \"market\", \"time_in_force\": \"day\"}",
+      "rejected": false,
+      "stage": "wire_body"
+    },
+    "qty_python_float_input": {
+      "content_type_header": "application/json",
+      "fields_dict": {
+        "limit_price": 100.1,
+        "qty": 2.5,
+        "side": "buy",
+        "symbol": "SPY",
+        "time_in_force": "day",
+        "type": "limit"
+      },
+      "fields_repr": {
+        "limit_price": "100.1",
+        "qty": "2.5",
+        "side": "<OrderSide.BUY: 'buy'>",
+        "symbol": "'SPY'",
+        "time_in_force": "<TimeInForce.DAY: 'day'>",
+        "type": "<OrderType.LIMIT: 'limit'>"
+      },
+      "literal_wire_body_byte_length": 107,
+      "literal_wire_body_sha256": "b51660cd5064edd7741f96da95dd38f800a54fdb3c1bf367c98e7cf17bef27b0",
+      "literal_wire_body_utf8": "{\"symbol\": \"SPY\", \"qty\": 2.5, \"side\": \"buy\", \"type\": \"limit\", \"time_in_force\": \"day\", \"limit_price\": 100.1}",
+      "rejected": false,
+      "stage": "wire_body"
+    },
+    "subpenny_limit_price": {
+      "content_type_header": "application/json",
+      "fields_dict": {
+        "limit_price": 100.105,
+        "qty": 1.0,
+        "side": "buy",
+        "symbol": "SPY",
+        "time_in_force": "day",
+        "type": "limit"
+      },
+      "fields_repr": {
+        "limit_price": "100.105",
+        "qty": "1.0",
+        "side": "<OrderSide.BUY: 'buy'>",
+        "symbol": "'SPY'",
+        "time_in_force": "<TimeInForce.DAY: 'day'>",
+        "type": "<OrderType.LIMIT: 'limit'>"
+      },
+      "literal_wire_body_byte_length": 109,
+      "literal_wire_body_sha256": "8c8aeb2e6cde1d6360e78620fcd57d3d4cc10dfd2cd54106431fa666fb1b8cb5",
+      "literal_wire_body_utf8": "{\"symbol\": \"SPY\", \"qty\": 1.0, \"side\": \"buy\", \"type\": \"limit\", \"time_in_force\": \"day\", \"limit_price\": 100.105}",
+      "rejected": false,
+      "stage": "wire_body"
+    },
+    "zero_qty": {
+      "content_type_header": "application/json",
+      "fields_dict": {
+        "limit_price": 100.1,
+        "qty": 0.0,
+        "side": "buy",
+        "symbol": "SPY",
+        "time_in_force": "day",
+        "type": "limit"
+      },
+      "fields_repr": {
+        "limit_price": "100.1",
+        "qty": "0.0",
+        "side": "<OrderSide.BUY: 'buy'>",
+        "symbol": "'SPY'",
+        "time_in_force": "<TimeInForce.DAY: 'day'>",
+        "type": "<OrderType.LIMIT: 'limit'>"
+      },
+      "literal_wire_body_byte_length": 107,
+      "literal_wire_body_sha256": "37d65a2091b3aa578b0ef501c64b10ffc5a33dd95edfbe32566142dfbbc47740",
+      "literal_wire_body_utf8": "{\"symbol\": \"SPY\", \"qty\": 0.0, \"side\": \"buy\", \"type\": \"limit\", \"time_in_force\": \"day\", \"limit_price\": 100.1}",
+      "rejected": false,
+      "stage": "wire_body"
+    }
+  },
+  "clients_constructed": 1,
+  "orders_submitted": 0,
+  "python_version": "3.12.3",
+  "requests_version": "2.34.2",
+  "scope": "Offline literal-wire-byte capture via requests.PreparedRequest.prepare_body (the identical function alpaca-py's own _request/post path invokes for non-GET/DELETE methods); TradingClient constructed with placeholder credentials 'k'/'s' only to confirm no alternate private serialization method exists; no HTTP connection is opened, no provider-valid order is claimed accepted.",
+  "sdk": "alpaca-py",
+  "version": "0.44.0"
+}
