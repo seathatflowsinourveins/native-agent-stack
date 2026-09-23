@@ -871,8 +871,8 @@ class PlatformDependencyInstallTests(unittest.TestCase):
         harness = tmp_path / "install-npm-e2e-harness.sh"
         harness.write_text(
             "set -Eeuo pipefail\n"
-            + _shell_functions(SCRIPT_PATH.read_text(), "canonical_path", "npm_package_name",
-                                "install_platform_dependency", "install_npm", "cleanup")
+            + _shell_functions(SCRIPT_PATH.read_text(), "canonical_path", "prune_old_version",
+                                "npm_package_name", "install_platform_dependency", "install_npm", "cleanup")
             # The script-level pending_migration_prefix/_dest globals and the
             # EXIT trap that uses them (round 3d) are NOT part of any single
             # extracted function -- without registering the same trap here,
@@ -881,6 +881,9 @@ class PlatformDependencyInstallTests(unittest.TestCase):
             + 'pending_migration_prefix=""\n'
             + 'pending_migration_dest=""\n'
             + "trap cleanup EXIT\n"
+            + "trap 'exit 130' INT\n"
+            + "trap 'exit 143' TERM\n"
+            + "trap 'exit 129' HUP\n"
             + f'pins_path={json.dumps(str(pins_path))}\n'
             + f'ecosystem_root={json.dumps(str(eco_root))}\n'
             + f'bin_dir={json.dumps(str(eco_root / "bin"))}\n'
@@ -1303,6 +1306,115 @@ class PlatformDependencyInstallTests(unittest.TestCase):
             self.assertEqual(content.returncode, 0, content.stdout + content.stderr)
             self.assertEqual(content.stdout.strip(), "VERIFIED_CONTENT")
 
+    def _reinstall_with_previous_target(self, adversarial_target_maker):
+        """First install normally, then repoint final_prefix's symlink at an
+        adversarial target, then reinstall. adversarial_target_maker(eco_root)
+        returns (assertion_path, symlink_target): assertion_path is what the
+        test checks survives; symlink_target is what final_prefix.symlink_to
+        is actually given (a Path, absolute or relative -- the relative "../"
+        case passes a relative one directly, matching a real relative symlink
+        target rather than one Python has already resolved to absolute).
+        Returns (reinstall_result, eco_root, assertion_path).
+        """
+        tmp = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, tmp, ignore_errors=True)
+        tmp_path = Path(tmp)
+        pins_path = self._codex_like_pins(tmp_path)
+        first, eco_root = self._run_install_npm(
+            tmp_path, pins_path, "codexlike", "1.0.0", self.codex_like_tarball, self.codex_like_sha256,
+            npm_package="fixture-codex-like")
+        self.assertEqual(first.returncode, 0, first.stdout + first.stderr)
+        final_prefix = eco_root / "tools" / "codexlike-1.0.0"
+        self.assertTrue(final_prefix.is_symlink())
+
+        assertion_path, symlink_target = adversarial_target_maker(eco_root)
+        final_prefix.unlink()
+        final_prefix.symlink_to(symlink_target)
+
+        second, eco_root2 = self._run_install_npm(
+            tmp_path, pins_path, "codexlike", "1.0.0", self.codex_like_tarball, self.codex_like_sha256,
+            npm_package="fixture-codex-like")
+        return second, eco_root, assertion_path
+
+    @unittest.skipUnless(NPM, "native npm unavailable")
+    def test_prune_never_deletes_an_external_target(self):
+        # Codex round-3e High: previous_versioned (final_prefix's own
+        # readlink() text) is unverified and, before this fix, was handed
+        # straight to `rm -rf`. An external target -- entirely outside
+        # tools/ -- must survive a reinstall untouched.
+        def make_external(eco_root):
+            external = eco_root.parent / "external-target"
+            external.mkdir()
+            (external / "sentinel").write_text("do not delete me\n")
+            return external, external
+
+        result, eco_root, external = self._reinstall_with_previous_target(make_external)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("not pruned for safety", result.stderr)
+        self.assertTrue(external.is_dir(), "an external target must never be deleted")
+        self.assertEqual((external / "sentinel").read_text(), "do not delete me\n")
+        final_prefix = eco_root / "tools" / "codexlike-1.0.0"
+        self.assertTrue(final_prefix.is_symlink())
+        self.assertNotEqual(final_prefix.resolve(), external.resolve())
+
+    @unittest.skipUnless(NPM, "native npm unavailable")
+    def test_prune_never_deletes_a_relative_dotdot_target(self):
+        # Codex round-3e High: a relative "../" symlink target that resolves
+        # OUTSIDE tools/ must be rejected the same way an absolute external
+        # target is, not trusted merely because its literal text looks
+        # "under" tools/ before resolution.
+        def make_dotdot(eco_root):
+            outside = eco_root.parent / "outside-via-dotdot"
+            outside.mkdir()
+            (outside / "sentinel").write_text("do not delete me\n")
+            # tools/codexlike-1.0.0 is two levels under eco_root's parent
+            # (eco_root/tools/<name>), so "../../outside-via-dotdot" -- a
+            # literal relative symlink target, not one Python has already
+            # resolved to absolute -- reaches it from there.
+            return outside, Path("..") / ".." / "outside-via-dotdot"
+
+        result, eco_root, outside = self._reinstall_with_previous_target(make_dotdot)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("not pruned for safety", result.stderr)
+        self.assertTrue(outside.is_dir(), "a relative ../ target must never be deleted")
+        self.assertEqual((outside / "sentinel").read_text(), "do not delete me\n")
+
+    @unittest.skipUnless(NPM, "native npm unavailable")
+    def test_prune_never_deletes_a_directory_with_a_non_matching_name(self):
+        # Codex round-3e High: a target that IS directly under tools/ but
+        # whose name does not match "<id>-<version>-<stamp>" (a different
+        # tool's own versioned directory, say) must never be deleted either
+        # -- being in the right PLACE is not enough on its own.
+        def make_wrong_name(eco_root):
+            wrong = eco_root / "tools" / "some-other-tool-9.9.9"
+            wrong.mkdir()
+            (wrong / "sentinel").write_text("do not delete me\n")
+            return wrong, wrong
+
+        result, eco_root, wrong = self._reinstall_with_previous_target(make_wrong_name)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("not pruned for safety", result.stderr)
+        self.assertTrue(wrong.is_dir(), "a non-matching name must never be deleted")
+        self.assertEqual((wrong / "sentinel").read_text(), "do not delete me\n")
+
+    @unittest.skipUnless(NPM, "native npm unavailable")
+    def test_prune_never_hangs_or_deletes_on_a_symlink_loop(self):
+        # Codex round-3e High: a symlink loop (final_prefix's previous
+        # target resolving through a cycle) must never hang canonical_path
+        # and must never end up deleting anything -- it simply fails every
+        # ownership/name check and is left alone.
+        def make_loop(eco_root):
+            loop_a = eco_root / "tools" / "loop-a"
+            loop_b = eco_root / "tools" / "loop-b"
+            loop_a.symlink_to(loop_b)
+            loop_b.symlink_to(loop_a)
+            return loop_a, loop_a
+
+        result, eco_root, loop_a = self._reinstall_with_previous_target(make_loop)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("not pruned for safety", result.stderr)
+        self.assertTrue(loop_a.is_symlink(), "a symlink loop's own links must never be deleted")
+
     def _codex_like_pins(self, tmp_path: Path) -> Path:
         return self._pins_fixture(tmp_path, {
             "id": "codexlike", "version": "1.0.0", "kind": "npm",
@@ -1395,73 +1507,80 @@ class PlatformDependencyInstallTests(unittest.TestCase):
             self.assertEqual(leftover_links, [], leftover_links)
 
     @unittest.skipUnless(NPM, "native npm unavailable")
-    def test_sigterm_between_the_one_time_migration_and_the_flip_restores_the_real_directory(self):
-        # Codex round-3d Medium 1, step-table step 2, SIGTERM injection: a
-        # process signaled after the one-time migration (moving a real,
-        # pre-3d final_prefix aside) but before the atomic flip completes
-        # must not leave final_prefix absent. The top-level cleanup() trap
-        # must restore it. kill -TERM is sent from a shimmed mv, exactly at
-        # the migration step, matching the coordinator's required method.
-        with tempfile.TemporaryDirectory() as tmp:
-            tmp_path = Path(tmp)
-            pins_path = self._codex_like_pins(tmp_path)
-            first, eco_root = self._run_install_npm(
-                tmp_path, pins_path, "codexlike", "1.0.0", self.codex_like_tarball, self.codex_like_sha256,
-                npm_package="fixture-codex-like")
-            self.assertEqual(first.returncode, 0, first.stdout + first.stderr)
-            final_prefix = eco_root / "tools" / "codexlike-1.0.0"
-            self._downgrade_final_prefix_to_a_real_directory(eco_root, final_prefix)
-            self.assertTrue(final_prefix.is_dir() and not final_prefix.is_symlink())
-            wrapper_dir = final_prefix / "lib" / "node_modules" / "fixture-codex-like"
-            original_content = self._resolved_content(wrapper_dir)
+    def test_signal_between_the_one_time_migration_and_the_flip_restores_the_real_directory(self):
+        # Codex round-3d Medium 1 / round-3e method (a shared helper looping
+        # over steps x signals): a process signaled after the one-time
+        # migration (moving a real, pre-3d final_prefix aside) but before
+        # the atomic flip completes must not leave final_prefix absent. The
+        # top-level cleanup() trap must restore it. Round 3e also explicitly
+        # traps INT/TERM/HUP script-wide (not relying on the default,
+        # untrapped disposition), so both SIGTERM and SIGINT are exercised
+        # here, sent from a shimmed mv exactly at the migration step.
+        for signal_name in ("TERM", "INT"):
+            with self.subTest(signal=signal_name):
+                with tempfile.TemporaryDirectory() as tmp:
+                    tmp_path = Path(tmp)
+                    pins_path = self._codex_like_pins(tmp_path)
+                    first, eco_root = self._run_install_npm(
+                        tmp_path, pins_path, "codexlike", "1.0.0", self.codex_like_tarball, self.codex_like_sha256,
+                        npm_package="fixture-codex-like")
+                    self.assertEqual(first.returncode, 0, first.stdout + first.stderr)
+                    final_prefix = eco_root / "tools" / "codexlike-1.0.0"
+                    self._downgrade_final_prefix_to_a_real_directory(eco_root, final_prefix)
+                    self.assertTrue(final_prefix.is_dir() and not final_prefix.is_symlink())
+                    wrapper_dir = final_prefix / "lib" / "node_modules" / "fixture-codex-like"
+                    original_content = self._resolved_content(wrapper_dir)
 
-            # Real mv, except: for the migration move specifically (its
-            # DESTINATION is the only "*.migrating.*" path this script ever
-            # names), perform the real move, then SIGTERM the parent script
-            # -- simulating a kill or crash landing exactly between the
-            # migration succeeding and the flip that follows it.
-            sigterm_mv_shim = tmp_path / "sigterm-mv-shim"
-            sigterm_mv_shim.mkdir()
-            (sigterm_mv_shim / "mv").write_text(
-                "#!/bin/sh\n"
-                'dest=""\n'
-                'for arg in "$@"; do dest="$arg"; done\n'
-                'case "$dest" in\n'
-                "  *.migrating.*)\n"
-                '    /bin/mv "$@" || exit $?\n'
-                '    kill -TERM "$PPID"\n'
-                # Stay alive briefly after sending the signal: the parent
-                # bash is blocked in wait() for THIS process, and a signal
-                # delivered while it is still blocked there reliably
-                # interrupts that wait immediately; if this shim exited
-                # instantly instead, bash's wait() could already be
-                # returning (child exited normally) around the same moment
-                # the kernel is still only queuing the signal, letting bash
-                # race ahead through the rest of the flip -- successfully --
-                # before ever servicing it, which would make this test flaky
-                # rather than a reliable reproduction of the coordinator's
-                # exact "signal mid-swap" scenario.
-                "    sleep 0.2\n"
-                "    exit 0\n"
-                "    ;;\n"
-                "esac\n"
-                'exec /bin/mv "$@"\n'
-            )
-            (sigterm_mv_shim / "mv").chmod(0o755)
+                    # Real mv, except: for the migration move specifically
+                    # (its DESTINATION is the only "*.migrating.*" path this
+                    # script ever names), perform the real move, then send
+                    # the signal to the parent script -- simulating a kill
+                    # or crash landing exactly between the migration
+                    # succeeding and the flip that follows it.
+                    signal_mv_shim = tmp_path / f"signal-mv-shim-{signal_name}"
+                    signal_mv_shim.mkdir()
+                    (signal_mv_shim / "mv").write_text(
+                        "#!/bin/sh\n"
+                        'dest=""\n'
+                        'for arg in "$@"; do dest="$arg"; done\n'
+                        'case "$dest" in\n'
+                        "  *.migrating.*)\n"
+                        '    /bin/mv "$@" || exit $?\n'
+                        f'    kill -{signal_name} "$PPID"\n'
+                        # Stay alive briefly after sending the signal: the
+                        # parent bash is blocked in wait() for THIS process,
+                        # and a signal delivered while it is still blocked
+                        # there reliably interrupts that wait immediately;
+                        # if this shim exited instantly instead, bash's
+                        # wait() could already be returning (child exited
+                        # normally) around the same moment the kernel is
+                        # still only queuing the signal, letting bash race
+                        # ahead through the rest of the flip -- successfully
+                        # -- before ever servicing it, which would make this
+                        # test flaky rather than a reliable reproduction of
+                        # the coordinator's exact "signal mid-swap" scenario.
+                        "    sleep 0.2\n"
+                        "    exit 0\n"
+                        "    ;;\n"
+                        "esac\n"
+                        'exec /bin/mv "$@"\n'
+                    )
+                    (signal_mv_shim / "mv").chmod(0o755)
 
-            second, _ = self._run_install_npm(
-                tmp_path, pins_path, "codexlike", "1.0.0", self.codex_like_tarball, self.codex_like_sha256,
-                npm_package="fixture-codex-like",
-                extra_env={"PATH": f"{sigterm_mv_shim}{os.pathsep}{os.environ['PATH']}"})
-            self.assertNotEqual(second.returncode, 0, second.stdout + second.stderr)
-            # The trap restored the real directory: it exists again, is
-            # still a real directory (not a dangling migrating name, not
-            # absent), and its content is exactly what it was before.
-            self.assertTrue(final_prefix.is_dir(), "final_prefix must not be left absent after SIGTERM")
-            self.assertFalse(final_prefix.is_symlink(), "the restored copy is the original real directory")
-            self.assertEqual(self._resolved_content(wrapper_dir), original_content)
-            leftover_migrating = [p.name for p in (eco_root / "tools").iterdir() if ".migrating." in p.name]
-            self.assertEqual(leftover_migrating, [], leftover_migrating)
+                    second, _ = self._run_install_npm(
+                        tmp_path, pins_path, "codexlike", "1.0.0", self.codex_like_tarball, self.codex_like_sha256,
+                        npm_package="fixture-codex-like",
+                        extra_env={"PATH": f"{signal_mv_shim}{os.pathsep}{os.environ['PATH']}"})
+                    self.assertNotEqual(second.returncode, 0, second.stdout + second.stderr)
+                    # The trap restored the real directory: it exists again,
+                    # is still a real directory (not a dangling migrating
+                    # name, not absent), and its content is exactly what it
+                    # was before.
+                    self.assertTrue(final_prefix.is_dir(), "final_prefix must not be left absent after the signal")
+                    self.assertFalse(final_prefix.is_symlink(), "the restored copy is the original real directory")
+                    self.assertEqual(self._resolved_content(wrapper_dir), original_content)
+                    leftover_migrating = [p.name for p in (eco_root / "tools").iterdir() if ".migrating." in p.name]
+                    self.assertEqual(leftover_migrating, [], leftover_migrating)
 
     @unittest.skipUnless(NPM, "native npm unavailable")
     def test_a_failed_migration_rollback_keeps_the_previous_copy_and_reports_the_manual_command(self):
@@ -1566,11 +1685,14 @@ class PlatformDependencyInstallTests(unittest.TestCase):
                     harness = case_dir / "install-npm-harness.sh"
                     harness.write_text(
                         "set -Eeuo pipefail\n"
-                        + _shell_functions(SCRIPT_PATH.read_text(), "canonical_path", "npm_package_name",
-                                           "install_platform_dependency", "install_npm", "cleanup")
+                        + _shell_functions(SCRIPT_PATH.read_text(), "canonical_path", "prune_old_version",
+                                           "npm_package_name", "install_platform_dependency", "install_npm", "cleanup")
                         + 'pending_migration_prefix=""\n'
                         + 'pending_migration_dest=""\n'
                         + "trap cleanup EXIT\n"
+                        + "trap 'exit 130' INT\n"
+                        + "trap 'exit 143' TERM\n"
+                        + "trap 'exit 129' HUP\n"
                         + "fetch() { :; }\n"
                         + f'pins_path={json.dumps(str(pins_path))}\n'
                         + f'ecosystem_root={json.dumps(str(eco_root))}\n'

@@ -265,27 +265,42 @@ class LaunchdAgentsScriptStructureTests(unittest.TestCase):
         self.assertIn("is_enabled_label", self.text)
         self.assertIn("was not enabled by this script", self.text)
 
-    def test_install_backup_lives_beside_dest_plist_for_an_atomic_restore(self):
-        # N1, structural (round 3d correction): the backup must be in the
-        # SAME DIRECTORY as dest_plist, not this script's own state_dir --
-        # `mv` across a filesystem boundary silently falls back to a non-
-        # atomic copy-then-unlink, and ECO_INSTALL_ROOT (state_dir's parent)
-        # may legitimately be a different mounted volume than $HOME. Its
-        # name never ends in ".plist" (never auto-loaded by launchd), and
-        # the trap restores it by rename, never by `cp`.
-        self.assertIn('backup_plist="$dest_plist.backup.$$"', self.text)
-        self.assertIn("trap cleanup_install_state EXIT", self.text)
-        self.assertIn('mv -f -- "$pending_backup_plist" "$pending_backup_dest"', self.text)
-        self.assertNotIn('cp -- "$pending_backup_plist"', self.text)
+    def test_install_backup_lives_beside_dest_plist_as_a_hard_link(self):
+        # N1 (same directory, round 3d) + round 3e (Codex High #2): the
+        # backup is a HARD LINK, not `cp` -- it either exists completely or
+        # not at all, so a partial copy can never overwrite the intact
+        # original. Same directory as dest_plist (never this script's own
+        # state_dir): a restore-by-rename is only genuinely atomic when
+        # guaranteed to be on the same filesystem. Its name never ends in
+        # ".plist" (never auto-loaded by launchd), and reconcile_install
+        # restores it by rename, never by `cp`.
+        self.assertIn('backup_plist="$dest_plist.bak"', self.text)
+        self.assertIn('ln -- "$dest_plist" "$backup_plist"', self.text)
+        self.assertNotIn('cp -- "$dest_plist" "$backup_plist"', self.text)
+        self.assertIn("trap reconcile_install EXIT", self.text)
+        self.assertIn('mv -f -- "$backup_plist" "$dest_plist"', self.text)
 
-    def test_install_records_whether_a_reload_is_owed_and_the_trap_attempts_it(self):
-        # round 3d, structural: was_loaded must be recorded (right after a
-        # successful bootout, not merely "was loaded") so that restoring the
-        # backup from any exit path -- not just the explicit bootstrap-
-        # failure branch -- also reloads the service, never just its file.
-        self.assertIn("pending_backup_reload_needed=1", self.text)
-        self.assertIn('if [[ "$pending_backup_reload_needed" == 1 ]]; then', self.text)
-        self.assertIn('launchctl bootstrap "gui/$(id -u)" "$pending_backup_dest"', self.text)
+    def test_install_reconciles_from_actual_state_not_recorded_markers(self):
+        # Round 3e: replaces round 3d's pending_backup_reload_needed marker
+        # (set once, at bootout time, then trusted for the rest of the run)
+        # with re-deriving loaded state from launchctl print itself, every
+        # time reconcile_install runs -- so a marker that went stale (the
+        # exact class of bug rounds 3b-3d each individually patched) cannot
+        # recur by construction: there is no marker left to go stale.
+        self.assertNotIn("pending_backup_reload_needed", self.text)
+        self.assertNotIn("pending_backup_plist", self.text)
+        self.assertIn('"$dest_plist" -ef "$backup_plist"', self.text)
+        self.assertIn('launchctl print "gui/$(id -u)/$label"', self.text)
+
+    def test_int_term_hup_are_trapped_to_defer_to_a_completed_step(self):
+        # Round 3e (Codex Medium #5 boundary case): explicitly trapping
+        # INT/TERM/HUP -- not leaving them at their default disposition --
+        # makes bash defer acting on a caught signal until the current
+        # foreign command finishes, so the EXIT handler (reconcile_install)
+        # never observes a step still in flight.
+        self.assertIn("trap 'exit 130' INT", self.text)
+        self.assertIn("trap 'exit 143' TERM", self.text)
+        self.assertIn("trap 'exit 129' HUP", self.text)
 
     def test_install_gates_its_pre_reinstall_load_check_on_ownership(self):
         # L2, structural: the print/bootout probe before a reinstall must be
@@ -309,10 +324,10 @@ class LaunchdAgentsScriptStructureTests(unittest.TestCase):
         # Every `rm` in the script targets exactly the copied unit-definition
         # file this script itself placed under ~/Library/LaunchAgents (on a
         # successful bootout, on removing an already-unloaded label, or on
-        # rolling back a failed bootstrap during install), or the install
-        # subcommand's own temporary backup of that same file (now under
-        # state_dir, N1) via either its explicit cleanup or the EXIT trap's
-        # safety net; none may ever target state/logs, state/qdrant, or the
+        # rolling back a failed bootstrap during install), or install's own
+        # backup_plist (a hard link beside dest_plist, round 3e) via either
+        # cmd_install's explicit cleanup or reconcile_install's convergence;
+        # none may ever target state/logs, state/qdrant, or the
         # enabled-labels state file.
         self.assertNotIn("rm -rf", self.text)
         rm_lines = [line.strip() for line in self.text.splitlines() if re.search(r"\brm\b", line)]
@@ -321,8 +336,6 @@ class LaunchdAgentsScriptStructureTests(unittest.TestCase):
             'rm -f -- "$launch_agents_dir/$label.plist"',
             'rm -f -- "$dest_plist"',
             'rm -f -- "$backup_plist"',
-            'rm -f -- "$pending_backup_plist"',
-            'rm -f -- "$pending_dest_tmp"',
         )
         for rm_line in rm_lines:
             self.assertTrue(any(target in rm_line for target in allowed_targets), rm_line)
@@ -557,19 +570,23 @@ class LaunchdAgentsScriptBehaviorTests(unittest.TestCase):
 
             invocations = log.read_text()
             self.assertEqual(invocations.count("launchctl bootstrap"), 4)
-            # cmd_install's own pre-reinstall print check is gated on
-            # is_enabled_label (L2): it never probes a label that is not yet
-            # owned, so every install in this cycle skips it (the default
-            # install's two labels, the explicit llama-embed install, and
-            # the reinstall after the unowned-file test are all fresh/
-            # unowned at the moment install runs). Only cmd_remove (mid-test
-            # forget, and the final remove) and cmd_status's own explicit
-            # print call ever reach launchctl print here: 1 + 1 + 1 = 3. The
-            # refused install (an unowned destination) never reaches even
-            # that gate, and the trailing no-op remove never reaches its
-            # print or bootout call either (the label is no longer enabled
-            # by that point).
-            self.assertEqual(invocations.count("launchctl print"), 3)
+            # cmd_install's own pre-reinstall print check (L2) is gated on
+            # was_already_enabled: it never probes a label that was not yet
+            # owned before this run, so every install in this cycle skips
+            # THAT specific call (the default install's two labels, the
+            # explicit llama-embed install, and the reinstall after the
+            # unowned-file test are all fresh/unowned at the moment install
+            # runs). reconcile_install's OWN print call (round 3e: it
+            # re-derives loaded state itself, once per label, for every
+            # successful install too, not only a failing one) still runs
+            # for each of those four: 2 (default) + 1 (llama-embed) + 1
+            # (the reinstall) = 4. Add cmd_remove's own print (mid-test
+            # forget, and the final remove) and cmd_status's explicit call:
+            # 4 + 1 + 1 + 1 = 7. The refused install (an unowned
+            # destination) never reaches even the ownership gate, and the
+            # trailing no-op remove never reaches its print or bootout call
+            # either (the label is no longer enabled by that point).
+            self.assertEqual(invocations.count("launchctl print"), 7)
             self.assertEqual(invocations.count("launchctl bootout"), 2,
                               "one for the mid-test forget, one for the final remove; "
                               "the trailing no-op remove must not invoke bootout again")
@@ -629,12 +646,17 @@ class LaunchdAgentsScriptBehaviorTests(unittest.TestCase):
             state_file = eco_root / "state" / "launchd" / "enabled-labels.txt"
             self.assertIn("com.native-stack.qdrant", state_file.read_text().split())
 
-    def test_install_removes_the_orphan_when_bootstrap_fails(self):
-        # Medium finding: cp ran before launchctl bootstrap, so a failed
-        # bootstrap left an unowned plist under ~/Library/LaunchAgents that
-        # would load at the next login, and neither a retry (the ownership
-        # check) nor remove (never touches an unrecorded label) could ever
-        # reach it again.
+    def test_a_persistently_failing_bootstrap_reports_needs_attention_and_a_retry_converges(self):
+        # Round 3e: the previous design deleted the just-written plist on any
+        # bootstrap failure ("removes the orphan"). Idempotent convergence
+        # does the opposite on purpose: the plist stays on disk (nothing to
+        # restore to, since this is a fresh install with no backup), install
+        # reports non-convergence and names the retry command, and record_
+        # enabled_label already ran, so a later retry (not a fresh install,
+        # by ownership) can find and finish it. This is also true when the
+        # ORIGINAL bug's root cause -- unrecorded ownership after a failed
+        # bootstrap blocking every future retry -- is checked directly: it
+        # is recorded regardless of outcome now, by design.
         with tempfile.TemporaryDirectory() as tmp:
             tmp_path = Path(tmp)
             eco_root = tmp_path / "eco"
@@ -642,7 +664,9 @@ class LaunchdAgentsScriptBehaviorTests(unittest.TestCase):
             fake_home.mkdir()
             failing_shim = tmp_path / "failing-shim"
             failing_shim.mkdir()
-            (failing_shim / "launchctl").write_text("#!/bin/sh\ncase \"$1\" in\n  bootstrap) exit 1 ;;\n  *) exit 0 ;;\nesac\n")
+            (failing_shim / "launchctl").write_text(
+                "#!/bin/sh\ncase \"$1\" in\n  bootstrap) exit 1 ;;\n  print) exit 113 ;;\n  *) exit 0 ;;\nesac\n"
+            )
             (failing_shim / "launchctl").chmod(0o755)
             env = {
                 **os.environ,
@@ -653,14 +677,15 @@ class LaunchdAgentsScriptBehaviorTests(unittest.TestCase):
             self.assertEqual(self._run(["render"], env=env).returncode, 0)
             install_result = self._run(["install", "--label", "com.native-stack.qdrant"], env=env)
             self.assertNotEqual(install_result.returncode, 0, install_result.stdout + install_result.stderr)
-            self.assertIn("bootstrap failed", install_result.stderr)
+            self.assertIn("needs attention", install_result.stderr)
             launch_agents_dir = fake_home / "Library" / "LaunchAgents"
-            self.assertFalse((launch_agents_dir / "com.native-stack.qdrant.plist").exists())
+            self.assertTrue((launch_agents_dir / "com.native-stack.qdrant.plist").is_file(),
+                             "the plist stays on disk; there is nothing to restore to and a retry reuses it")
             state_file = eco_root / "state" / "launchd" / "enabled-labels.txt"
             enabled = state_file.read_text().split() if state_file.exists() else []
-            self.assertNotIn("com.native-stack.qdrant", enabled)
-            # A retry with a working launchctl succeeds cleanly, proving the
-            # rollback did not leave anything behind that would block it.
+            self.assertIn("com.native-stack.qdrant", enabled,
+                           "ownership is recorded regardless of outcome, so a retry is never refused as unowned")
+            # A retry with a working launchctl converges cleanly.
             working_shim = self._launchctl_shim(tmp_path, tmp_path / "working-launchctl.log")
             working_env = {**env, "PATH": f"{working_shim}{os.pathsep}{os.environ['PATH']}"}
             retry = self._run(["install", "--label", "com.native-stack.qdrant"], env=working_env)
@@ -710,8 +735,13 @@ class LaunchdAgentsScriptBehaviorTests(unittest.TestCase):
             )
             reinstall = self._run(["install", "--label", "com.native-stack.qdrant"], env=env)
             self.assertNotEqual(reinstall.returncode, 0, reinstall.stdout + reinstall.stderr)
-            self.assertIn("bootstrap failed", reinstall.stderr)
-            self.assertIn("restored", reinstall.stderr)
+            # This shim's own bootstrap never succeeds for ANY content, so
+            # reconcile_install's own reload-the-restored-original attempt
+            # also fails here -- an honest "needs attention", not a false
+            # "restored" success claim -- but the restore itself (the part
+            # this finding is actually about: never delete a destination
+            # that already existed) still happened.
+            self.assertIn("restored the previous plist", reinstall.stderr)
             # The destination is restored to its original content, never
             # deleted (it existed and was owned before this reinstall).
             self.assertTrue(dest_plist.is_file())
@@ -725,15 +755,17 @@ class LaunchdAgentsScriptBehaviorTests(unittest.TestCase):
 
     def test_install_never_boots_out_a_currently_loaded_label_it_does_not_own(self):
         # L2 (Opus round-3 verification / Codex round-3 Medium): without a
-        # destination plist yet (a fresh install attempt), a label that
-        # happens to already be loaded by something else entirely -- not
-        # this script -- must never be torn down just because install's own
-        # pre-reinstall unload check ran unconditionally on every load-check
-        # hit. Only a label this script itself recorded as enabled may ever
-        # reach launchctl bootout here. bootstrap fails as real launchctl
-        # would on an already-loaded label (error 5), so install correctly
-        # reports a failure without having destroyed anything it does not
-        # own.
+        # destination plist yet (a fresh install attempt), install must
+        # never call launchctl bootout for that label -- only a label this
+        # script ALREADY owned before this run (was_already_enabled) may
+        # ever reach it, gated on a snapshot taken before record_enabled_
+        # label makes is_enabled_label true for the rest of this same run
+        # (round 3e; recording ownership now happens immediately, unlike
+        # the previous design, so a plain is_enabled_label re-check right
+        # before the bootout gate would otherwise always pass). bootstrap
+        # and reconcile_install's own retry both fail here (a stand-in for
+        # a persistent launchd-side rejection), so install correctly
+        # reports non-convergence without ever having torn anything down.
         with tempfile.TemporaryDirectory() as tmp:
             tmp_path = Path(tmp)
             eco_root = tmp_path / "eco"
@@ -747,7 +779,7 @@ class LaunchdAgentsScriptBehaviorTests(unittest.TestCase):
                 "#!/bin/sh\n"
                 f'printf "%s\\n" "launchctl $*" >> {str(log)!r}\n'
                 'case "$1" in\n'
-                '  print) exit 0 ;;\n'
+                '  print) exit 113 ;;\n'
                 '  bootstrap) exit 5 ;;\n'
                 '  bootout) exit 0 ;;\n'
                 '  *) exit 0 ;;\n'
@@ -763,11 +795,10 @@ class LaunchdAgentsScriptBehaviorTests(unittest.TestCase):
             self.assertEqual(self._run(["render"], env=env).returncode, 0)
             install_result = self._run(["install", "--label", "com.native-stack.qdrant"], env=env)
             self.assertNotEqual(install_result.returncode, 0, install_result.stdout + install_result.stderr)
+            self.assertIn("needs attention", install_result.stderr)
             invocations = log.read_text()
             self.assertNotIn("bootout", invocations,
                               "install must never bootout a label it does not own, even if it is loaded")
-            launch_agents_dir = fake_home / "Library" / "LaunchAgents"
-            self.assertFalse((launch_agents_dir / "com.native-stack.qdrant.plist").exists())
 
     def test_install_refuses_when_print_fails_with_neither_loaded_nor_not_found(self):
         # L5 (Opus + Codex round-3): install's own pre-reinstall load check
@@ -944,7 +975,7 @@ class LaunchdAgentsScriptBehaviorTests(unittest.TestCase):
             # the backup-then-cleanup path end to end.
             reinstall = self._run(["install", "--label", "com.native-stack.qdrant"], env=env)
             self.assertEqual(reinstall.returncode, 0, reinstall.stdout + reinstall.stderr)
-            leftover = [p.name for p in launch_agents_dir.iterdir() if "backup" in p.name]
+            leftover = [p.name for p in launch_agents_dir.iterdir() if ".bak" in p.name]
             self.assertEqual(leftover, [], leftover)
 
     def test_a_failed_copy_into_the_destination_never_truncates_it_and_the_backup_is_restored(self):
@@ -1031,10 +1062,10 @@ class LaunchdAgentsScriptBehaviorTests(unittest.TestCase):
             self.assertTrue(dest_plist.is_file())
             self.assertNotEqual(dest_plist.read_bytes(), b"PARTIAL")
             self.assertEqual(dest_plist.read_bytes(), original_content)
-            # No stray "*.new.*" temp file, and no leftover backup, either.
-            leftover_tmp = [p.name for p in launch_agents_dir.iterdir() if ".new." in p.name]
+            # No stray "*.new" temp file, and no leftover backup, either.
+            leftover_tmp = [p.name for p in launch_agents_dir.iterdir() if p.name.endswith(".new")]
             self.assertEqual(leftover_tmp, [], leftover_tmp)
-            leftover_backup = [p.name for p in launch_agents_dir.iterdir() if "backup" in p.name]
+            leftover_backup = [p.name for p in launch_agents_dir.iterdir() if ".bak" in p.name]
             self.assertEqual(leftover_backup, [], leftover_backup)
             state_file = eco_root / "state" / "launchd" / "enabled-labels.txt"
             self.assertIn("com.native-stack.qdrant", state_file.read_text().split())
@@ -1044,9 +1075,10 @@ class LaunchdAgentsScriptBehaviorTests(unittest.TestCase):
         # required method: kill -TERM from a shim at the chosen step): "an
         # error or SIGTERM after the rename... but before reload restores
         # the plist but leaves the service unloaded." A signal landing
-        # exactly there must be caught by the trap, which restores
-        # dest_plist from its backup AND reloads it (was_loaded /
-        # pending_backup_reload_needed), never just the file.
+        # exactly there must be caught by the EXIT trap, whose
+        # reconcile_install re-derives loaded state from launchctl print
+        # itself (round 3e: state-based, not a was_loaded marker) and
+        # reloads the restored plist, never just putting the file back.
         with tempfile.TemporaryDirectory() as tmp:
             tmp_path = Path(tmp)
             eco_root = tmp_path / "eco"
@@ -1069,10 +1101,10 @@ class LaunchdAgentsScriptBehaviorTests(unittest.TestCase):
             original_content = dest_plist.read_bytes()
 
             # Real mv, except: for the rename-into-place specifically
-            # (recognized by its SOURCE, the only "*.new.*" path this
-            # script ever moves FROM -- never confused with the trap's own
-            # restore, whose source is "*.backup.*"), perform the real
-            # move, then SIGTERM the parent script.
+            # (recognized by its SOURCE, the only "*.new" path this script
+            # ever moves FROM -- never confused with reconcile_install's own
+            # restore, whose source is "*.bak"), perform the real move,
+            # then SIGTERM the parent script.
             sigterm_mv_shim = tmp_path / "sigterm-mv-shim"
             sigterm_mv_shim.mkdir()
             (sigterm_mv_shim / "mv").write_text(
@@ -1083,7 +1115,7 @@ class LaunchdAgentsScriptBehaviorTests(unittest.TestCase):
                 '  if [ -z "$src" ]; then src="$arg"; fi\n'
                 "done\n"
                 'case "$src" in\n'
-                "  *.new.*)\n"
+                "  *.new)\n"
                 '    /bin/mv "$@" || exit $?\n'
                 '    kill -TERM "$PPID"\n'
                 "    sleep 0.3\n"
@@ -1105,14 +1137,15 @@ class LaunchdAgentsScriptBehaviorTests(unittest.TestCase):
             # ran, not merely that the file was put back.
             self.assertEqual(invocations.count("launchctl bootstrap"), 2, invocations)
             self.assertGreaterEqual(invocations.count("launchctl bootout"), 1, invocations)
-            leftover_backup = [p.name for p in launch_agents_dir.iterdir() if "backup" in p.name]
+            leftover_backup = [p.name for p in launch_agents_dir.iterdir() if ".bak" in p.name]
             self.assertEqual(leftover_backup, [], leftover_backup)
 
     def test_a_failed_rollback_keeps_the_backup_and_reports_the_manual_command(self):
-        # round 3d, Codex finding: "a failed rollback mv... reaches the same
-        # fallback" -- if the trap's OWN restore mv also fails, the backup
-        # must never be silently deleted. It must survive on disk, with the
-        # exact manual `mv` command reported, exit nonzero.
+        # Codex round-3d/3e finding: "a failed rollback mv... reaches the
+        # same fallback" -- if reconcile_install's own restore mv also
+        # fails, the backup must never be silently deleted. It must survive
+        # on disk, with the exact manual `mv` command reported, exit
+        # nonzero.
         with tempfile.TemporaryDirectory() as tmp:
             tmp_path = Path(tmp)
             eco_root = tmp_path / "eco"
@@ -1151,9 +1184,9 @@ class LaunchdAgentsScriptBehaviorTests(unittest.TestCase):
                 "esac\n"
             )
             (broken_shim / "launchctl").chmod(0o755)
-            # ...and the trap's own restore mv fails too (recognized by its
-            # SOURCE, the only "*.backup.*" path this script ever moves
-            # FROM).
+            # ...and reconcile_install's own restore mv fails too
+            # (recognized by its SOURCE, the only "*.bak" path this script
+            # ever moves FROM).
             (broken_shim / "mv").write_text(
                 "#!/bin/sh\n"
                 'src=""\n'
@@ -1162,7 +1195,7 @@ class LaunchdAgentsScriptBehaviorTests(unittest.TestCase):
                 '  if [ -z "$src" ]; then src="$arg"; fi\n'
                 "done\n"
                 'case "$src" in\n'
-                "  *.backup.*)\n"
+                "  *.bak)\n"
                 "    echo 'mv: injected rollback failure for testing' >&2\n"
                 "    exit 1\n"
                 "    ;;\n"
@@ -1173,11 +1206,106 @@ class LaunchdAgentsScriptBehaviorTests(unittest.TestCase):
             reinstall_env = {**env, "PATH": f"{broken_shim}{os.pathsep}{env['PATH']}"}
             reinstall = self._run(["install", "--label", "com.native-stack.qdrant"], env=reinstall_env)
             self.assertNotEqual(reinstall.returncode, 0, reinstall.stdout + reinstall.stderr)
-            self.assertIn("Restore it manually with: mv -f --", reinstall.stderr)
-            backups = [p for p in launch_agents_dir.iterdir() if "backup" in p.name]
+            self.assertIn("needs attention", reinstall.stderr)
+            self.assertIn("converges it", reinstall.stderr)
+            backups = [p for p in launch_agents_dir.iterdir() if ".bak" in p.name]
             self.assertEqual(len(backups), 1, backups)
             self.assertEqual(backups[0].read_bytes(), original_content)
             self.assertIn(backups[0].name, reinstall.stderr)
+
+    def _signal_shim(self, tmp_path, binary, match_role, match_suffix, signal_name):
+        """A shim for `binary` that performs the real action, then sends
+        `signal_name` to $PPID, when the invocation's `match_role` ("src" or
+        "dest", picked from the positional args after skipping -f/--) ends
+        with `match_suffix`. Used to inject a signal at a NAMED step of
+        cmd_install (round 3e: "test every row ... with a helper that loops
+        over steps x signals")."""
+        shim_dir = tmp_path / f"signal-{binary}-{match_suffix.strip('.')}-{signal_name}-shim"
+        shim_dir.mkdir()
+        if match_role == "src":
+            picker = ('check=""\n'
+                       'for arg in "$@"; do\n'
+                       '  case "$arg" in -f|--) continue ;; esac\n'
+                       '  if [ -z "$check" ]; then check="$arg"; fi\n'
+                       "done\n")
+        else:
+            picker = 'check=""\nfor arg in "$@"; do check="$arg"; done\n'
+        (shim_dir / binary).write_text(
+            "#!/bin/sh\n"
+            + picker
+            + 'case "$check" in\n'
+            + f"  *{match_suffix})\n"
+            + f'    /bin/{binary} "$@" || exit $?\n'
+            + f'    kill -{signal_name} "$PPID"\n'
+            + "    sleep 0.3\n"
+            + "    exit 0\n"
+            + "    ;;\n"
+            + "esac\n"
+            + f'exec /bin/{binary} "$@"\n'
+        )
+        (shim_dir / binary).chmod(0o755)
+        return shim_dir
+
+    def test_every_step_x_signal_still_converges_on_a_retry(self):
+        # Round 3e (coordinator, explicit method): test every row under a
+        # signal, using a shared helper that loops over steps x signals,
+        # rather than one bespoke script per case. Each combination below
+        # interrupts install mid-step (real work already done for that
+        # step, via _signal_shim's own real-command-then-signal design) and
+        # asserts the ONE universal guarantee idempotent convergence makes
+        # regardless of exactly where it was interrupted: a retry with a
+        # working launchctl always converges, and nothing was silently lost
+        # along the way (the label stays owned, and if the original plist's
+        # content is still recoverable -- untouched, or via its backup --
+        # it is still exactly the original bytes up to that point).
+        matrix = [
+            ("ln", "dest", ".bak", "TERM"),
+            ("ln", "dest", ".bak", "INT"),
+            ("mv", "src", ".new", "TERM"),
+            ("mv", "src", ".new", "INT"),
+        ]
+        for binary, role, suffix, signal_name in matrix:
+            with self.subTest(binary=binary, suffix=suffix, signal=signal_name):
+                with tempfile.TemporaryDirectory() as tmp:
+                    tmp_path = Path(tmp)
+                    eco_root = tmp_path / "eco"
+                    fake_home = tmp_path / "home"
+                    fake_home.mkdir()
+                    log = tmp_path / "launchctl.log"
+                    log.touch()
+                    working_shim = self._launchctl_shim(tmp_path, log)
+                    env = {
+                        **os.environ,
+                        "PATH": f"{working_shim}{os.pathsep}{os.environ['PATH']}",
+                        "ECO_INSTALL_ROOT": str(eco_root),
+                        "HOME": str(fake_home),
+                    }
+                    self.assertEqual(self._run(["render"], env=env).returncode, 0)
+                    first_install = self._run(["install", "--label", "com.native-stack.qdrant"], env=env)
+                    self.assertEqual(first_install.returncode, 0, first_install.stdout + first_install.stderr)
+                    launch_agents_dir = fake_home / "Library" / "LaunchAgents"
+                    dest_plist = launch_agents_dir / "com.native-stack.qdrant.plist"
+                    original_content = dest_plist.read_bytes()
+
+                    signal_shim = self._signal_shim(tmp_path, binary, role, suffix, signal_name)
+                    signalled_env = {**env, "PATH": f"{signal_shim}{os.pathsep}{env['PATH']}"}
+                    interrupted = self._run(["install", "--label", "com.native-stack.qdrant"], env=signalled_env)
+                    self.assertNotEqual(interrupted.returncode, 0, interrupted.stdout + interrupted.stderr)
+                    # Still owned regardless of where the signal landed:
+                    # record_enabled_label already ran before any of these
+                    # steps.
+                    state_file = eco_root / "state" / "launchd" / "enabled-labels.txt"
+                    self.assertIn("com.native-stack.qdrant", state_file.read_text().split())
+                    # dest_plist itself always still exists, still holding
+                    # either the original content (untouched, or already
+                    # restored) or the new content -- never truncated, never
+                    # missing.
+                    self.assertTrue(dest_plist.is_file())
+
+                    retry = self._run(["install", "--label", "com.native-stack.qdrant"], env=env)
+                    self.assertEqual(retry.returncode, 0, retry.stdout + retry.stderr)
+                    leftover_bak = [p.name for p in launch_agents_dir.iterdir() if ".bak" in p.name]
+                    self.assertEqual(leftover_bak, [], leftover_bak)
 
     def test_remove_on_an_unloaded_owned_label_cleans_up_without_calling_bootout(self):
         # Low finding: bootout always fails on a label that is owned but not
