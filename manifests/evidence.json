@@ -2986,12 +2986,13 @@
         "claude-code",
         "codex"
       ],
-      "claim": "Bounded native market refresh and broker reconciliation traced split same-account paper histories; crossed-quote invalidation and append-only consolidation qualified locally while original-lane paper acceptance remains conditional.",
+      "claim": "Native research and broker activity proof consolidated14same-account histories into the original ledger. A reviewed paper trial stopped after1.17seconds with0orders; cash-matched recovery passed. Changed equal-time conflict quarantine passed95focused checks and native Claude/Codex review; five-minute acceptance remains open.",
       "limitations": [
-        "No new afternoon entry trial yet; historical fills in other configurations do not establish original-lane five-minute acceptance.",
+        "The failed afternoon trial and separate146.76second concurrent run are not five-minute acceptance; historical different-config fills remain separate.",
         "Native LiveNode and mocked HTTP checks are local fixtures; strategy profitability, all-family execution and broker throughput remain unqualified.",
-        "Account-wide STOP is retained until reviewed original-ledger consolidation and fresh broker/activity proof pass.",
-        "Original configuration, 200REST/minute and180all-submission ceilings remain; no live trading, added leverage, paid features or catalyst orders."
+        "The next changed trial requires current source/catalog checks and the original account lock, configuration and all risk/request/order history.",
+        "Original configuration,200REST/minute and180all-submission ceilings remain; no live trading, added leverage, paid features or catalyst orders.",
+        "Generated dashboard HTML is excluded from the scoped secret scan; its scan coverage is incomplete."
       ],
       "path": "evidence/receipts/adaptive-paper-heartbeat-20260923-pm.json"
     }
@@ -5465,8 +5466,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/README.md",
-      "sha256": "1cef6c97989ae37d07efce9c6428aa1566865ac4e0d336906d5c2f254426fbef",
-      "bytes": 18751
+      "sha256": "4d501bff373f6ff3d47f6614d2c3628f98e0b5fac9ba387ed645de795987a087",
+      "bytes": 19855
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/adaptive_policy_v1.receipt.json",
@@ -5550,8 +5551,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/runner.py",
-      "sha256": "4f0dc781ef408290d923be78186d2205be8de20274208d09a95a2d2c600a42d9",
-      "bytes": 85395
+      "sha256": "b20dd72b6930d8f5b84a68664b4c39c55dd6ddb022e99eb301d874098e7a0a6f",
+      "bytes": 85456
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/safety.py",
@@ -5575,7 +5576,7 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "5776114276f194034c632f872248c7b5a3e90a43e56cf4789d491c45ee813e48",
+      "sha256": "add75bfdb4601f553ee853c3eb0e15a0d77f14b6203f36dcd3d393f44f509793",
       "bytes": 4624
     },
     {
@@ -5590,8 +5591,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/transport.py",
-      "sha256": "db5ff05603e4e162467e8175a2bd2269c499343d59bb7ba609e1c93b6ac6b46c",
-      "bytes": 51430
+      "sha256": "644807e596ed24378e2581e4cc16f6c4cd3edc162ac858c34081c51144fee004",
+      "bytes": 52204
     },
     {
       "path": "blueprints/us-equities/alpaca-historical/README.md",
@@ -7480,8 +7481,8 @@
     },
     {
       "path": "catalogs/us-equities/runtime-target.json",
-      "sha256": "16f8a82bd01e15762d510f11e8ecefd0cc852659fd2e663056f7ce15b29f0998",
-      "bytes": 9467
+      "sha256": "e0a4b99494d0c3a7e49f5793fdcd16d0d58de94e21bbee53e9c3727965246f13",
+      "bytes": 9503
     },
     {
       "path": "catalogs/us-equities/security-identity-review.json",
@@ -7665,8 +7666,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "1f255d7ac72c591f13ec9103387a3b3f96da367f08bf23af1ad9a9bbf17fdce0",
-      "bytes": 12921448
+      "sha256": "073c988e9e6095008ec1d81f49d532c68be12bf66fe6ea32a51b4063fb0ae675",
+      "bytes": 12922603
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -11505,8 +11506,8 @@
     },
     {
       "path": "observability/grand-dashboard/state.json",
-      "sha256": "9ab154ada4de69592e3986c1f1d74bf45f9ec191f6a314ce44c552323f280ee4",
-      "bytes": 10497
+      "sha256": "afb95cea200c011065a847570d6077e4dec9644d54aa525d884b8de89f63f905",
+      "bytes": 10480
     },
     {
       "path": "observability/native-data/README.md",
@@ -13095,13 +13096,13 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/heartbeat-20260923-pm.json",
-      "sha256": "a31765bf7fe9d5dee24163d8e1665540d66b7306663b8eea37611597b6f5375a",
-      "bytes": 11389
+      "sha256": "b6520cf792666b3775e5e9ef7404900f253bc8663be4c2fbaacb6b59f40e3c02",
+      "bytes": 20559
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/heartbeat-20260923-pm.md",
-      "sha256": "10b0c08f843bd0ec9e2693c5ee55424cc5f4bb7718620624889a9e7ef1581f3b",
-      "bytes": 6072
+      "sha256": "97b32a0b5692efd334e2efee1b8123a658a2ea8de7a4b8685c30d07f7fc5d42f",
+      "bytes": 10451
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/ledger_consolidation.py",
@@ -13110,8 +13111,8 @@
     },
     {
       "path": "evidence/receipts/adaptive-paper-heartbeat-20260923-pm.json",
-      "sha256": "22084ebe7fc6dbfae940b11e00f0d16d75fbac4b6871a10b5bfc8be3b598f4df",
-      "bytes": 1203
+      "sha256": "153839e569e52816fe0e548f049a81bc7bd4417a22d5b8fb99ded292f74276ae",
+      "bytes": 1453
     },
     {
       "path": "tests/test_adaptive_paper_ledger_consolidation.py",
@@ -13120,8 +13121,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_quote_quarantine.py",
-      "sha256": "eafe76b12a0c563c235aa05fd6213403985143e343ccea609844f25de60ee39d",
-      "bytes": 20511
+      "sha256": "e134f5246d0bbd4409de8bc8ded2029b3dfaad0245638f3cf2f4458fb2639c22",
+      "bytes": 32158
     }
   ],
   "convergence_records": [

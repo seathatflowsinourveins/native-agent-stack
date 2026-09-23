@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "recorded_at_utc": "2026-09-23T18:42:28Z",
+  "recorded_at_utc": "2026-09-23T19:20:00Z",
   "meaning": "Recorded checkpoint combining preserved paper/simulation records with current foundation source review and separate Workflow/context-policy records. Linked receipts retain their own dates and acceptance scopes; emitter freshness is separate from task acceptance.",
   "lanes": [
     {
@@ -14,7 +14,7 @@
       "kind": "lane",
       "id": "paper",
       "title": "Dedicated Alpaca paper account",
-      "state": "quote guard reviewed / original history consolidated / flat cash minus1.10 / next trial pending checks",
+      "state": "original history consolidated / 1.17s trial stopped / zero orders / flat cash minus1.10",
       "evidence_ref": "blueprints/us-equities/adaptive-paper/heartbeat-20260923-pm.json"
     },
     {
@@ -30,7 +30,7 @@
       "kind": "gate",
       "id": "alpaca-paper-operational",
       "title": "Alpaca bounded paper lifecycle",
-      "state": "history repair and recovery passed / STOP retained until trial prerequisites pass",
+      "state": "changed quote quarantine reviewed / 95 focused tests passed / next trial checks",
       "evidence_ref": "blueprints/us-equities/adaptive-paper/heartbeat-20260923-pm.json"
     },
     {

@@ -3,7 +3,7 @@
   "date": "2026-09-23",
   "phase": "afternoon",
   "kind": "native_paper_heartbeat",
-  "status": "reviewed_ready_for_bounded_paper_trial",
+  "status": "changed_trial_ready_after_review",
   "base_commit": "54ad06c3a1a671d8582e945404958a07ab472745",
   "config_sha256": "77244c396c407d20f7b21f0e9e8ad9a2c4803ad663247ac210076a47ebbc7eb3",
   "account_scope": "Original private Alpaca paper account ledger and lock; no new state root.",
@@ -32,7 +32,30 @@
     },
     "stop_present": true,
     "separate_ledger_timer": "remains inactive",
-    "entry_hold_reason": "Separately created same-account ledgers omit order, realized-loss and request history from the original ledger."
+    "entry_hold_reason": "Owned recovery passed and changed quote source review closed; release owned STOP only for the next frozen trial after current checks.",
+    "concurrent_run": {
+      "source_commit": "fbda2409bb072ef48baa8379ae114d1a51669c0f",
+      "trial": "adaptive-20260923-e2e",
+      "started_at": "2026-09-23T18:56:25Z",
+      "ended_at": "2026-09-23T18:58:56Z",
+      "elapsed_seconds": 146.75833432699437,
+      "reported_status": "completed_no_signals",
+      "accepted": false,
+      "reason": "Interrupted before300seconds and lacked reviewed executable-cache/tombstone guards.",
+      "orders_submitted": 0,
+      "native_fill_events": 0,
+      "roundtrips": 0,
+      "native_quotes": 65777,
+      "crossed_quotes_dropped": 3,
+      "recovery": {
+        "status": "passed",
+        "positions": 0,
+        "open_orders": 0,
+        "cash_match": true,
+        "cash_delta_from_original_baseline_usd": "-1.10"
+      },
+      "scheduler": "inactive; Restart=no; no paper timers observed at19:00UTC"
+    }
   },
   "research": {
     "feed": "iex",
@@ -67,7 +90,38 @@
       "DIA": -0.652
     },
     "strategy_interpretation": "Weaker day-return breadth than morning, using the same prior closes. This does not establish any of the five rolling-window strategy selections; IEX research remains separate from SIP execution.",
-    "artifact_sha256": "0c44116576bac87c37a48c08babfe15b09ddfab34a41c3895d618af0acb86f8e"
+    "artifact_sha256": "0c44116576bac87c37a48c08babfe15b09ddfab34a41c3895d618af0acb86f8e",
+    "late_refresh": {
+      "observed_at": "2026-09-23T19:07:21.655684Z",
+      "artifact_file_sha256": "9dad4d19442fc2c0a5a5b6fc1f57dbfddd596165afb0d880323c64f05953c708",
+      "news_items": 50,
+      "new_article_ids": 8,
+      "common_article_ids": 42,
+      "changed_common_revisions": 0,
+      "publication_range": [
+        "2026-09-23T11:37:57Z",
+        "2026-09-23T18:46:47Z"
+      ],
+      "snapshots": 24,
+      "positive": 6,
+      "negative": 18,
+      "fresh": 24,
+      "fresh_with_spread_at_most_15bps": 14,
+      "stale": [],
+      "benchmarks_change_from_prior_close_pct": {
+        "DIA": -0.649708,
+        "IWM": -1.643683,
+        "QQQ": -0.858274,
+        "SPY": -0.678139
+      },
+      "http_statuses": [
+        200,
+        200
+      ],
+      "engine_eligible": false,
+      "times": "Per-item publication, update, availability and observation times preserved in private source artifact; no changed common revisions observed.",
+      "interpretation": "Some benchmark losses narrowed and breadth improved5/19to6/18. Day returns remain separate from the five rolling-window policy families; no strategy formulas, catalyst orders or risk limits changed."
+    }
   },
   "promotion_gate": {
     "status": "reused_same_session_input",
@@ -81,11 +135,11 @@
   "qualification": {
     "status": "passed_focused_native_checks_and_independent_reviews",
     "contract": [
-      "Only a configured symbol with otherwise valid fresh native-compatible fields may enter crossed-only quarantine.",
+      "Configured symbols with otherwise valid fresh native-compatible fields may enter crossed-quote or equal-timestamp-conflict quarantine.",
       "Invalidate executable caches and retain exact-nanosecond tombstones before yielding; reject queued stale/equal-time recovery.",
       "Release only on a strictly newer fresh valid quote within the existing timeout; preserve valid historical windows and ledger valuations.",
       "Block affected entries and dependent benchmark admissions; recheck reservation and before-POST races.",
-      "Affected holdings or unresolved/native pending orders retain the whole-feed stop and recovery behavior; malformed data remain fatal.",
+      "Affected holdings or unresolved/nativepending orders retain the whole-feed stop and recovery behavior. Malformed conflicts remain fatal; halted conflicts/requalification cannot release quarantine, and identical stored halted duplicates retain baseline entry-blocking behavior.",
       "No numeric limits, configuration bytes, account history or strategy formulas change."
     ],
     "tests": {
@@ -150,7 +204,7 @@
       }
     },
     "limitations": [
-      "Equal-time conflict frequency in opted-in native entry remains unmeasured; conservative stop may interrupt a trial.",
+      "The first reviewed native trial failed after1.17seconds on equal-time conflict. Changed quarantine source is qualified locally; its next paper acceptance remains conditional.",
       "Benchmark invalidation before port.submit is outside decision-time synchronization coverage.",
       "Exact-plan retry is idempotent; a caller restart after COMMIT requires reading the stored consolidation receipt before any new action."
     ],
@@ -159,11 +213,122 @@
       "timestamp_fix": "378c694059972da663bdde2d2160401f38515271",
       "recovery_activities": "ea338f1307e76a141a24071f2f69c7b3a1b4aab4",
       "consolidation_final": "7908a7d34b1371b1a8820e17a0335652e7906347"
+    },
+    "equal_timestamp_followup": {
+      "status": "passed_focused_native_checks_and_independent_claude_codex_reviews",
+      "candidate_commit": "ea1d929454e99091c9679dddffb7f152acdf49ed",
+      "integrated_commit": "7c7b13ca",
+      "source_hashes": {
+        "blueprints/us-equities/adaptive-paper/transport.py": "644807e596ed24378e2581e4cc16f6c4cd3edc162ac858c34081c51144fee004",
+        "blueprints/us-equities/adaptive-paper/runner.py": "b20dd72b6930d8f5b84a68664b4c39c55dd6ddb022e99eb301d874098e7a0a6f",
+        "tests/test_adaptive_paper_quote_quarantine.py": "e134f5246d0bbd4409de8bc8ded2029b3dfaad0245638f3cf2f4458fb2639c22"
+      },
+      "contract": "Otherwise-valid fresh equal-time conflicts use the existing executable-cache invalidation, exact-ns tombstone and permanent intent-version contract. Only strictly newer fresh valid quotes release. Held/unresolved/nativepending exposure remains fatal; no-handler recovery and numeric limits unchanged.",
+      "counters": "crossed_invalidations and timestamp_conflict_invalidations count events; invalidated counts quarantine episodes.",
+      "tests": {
+        "author": {
+          "run": 93,
+          "passed": 93,
+          "skipped": 0,
+          "seconds": 6.147
+        },
+        "independent": {
+          "run": 93,
+          "passed": 93,
+          "skipped": 0,
+          "initial_seconds": 6.006,
+          "final_two_seconds": 0.524
+        },
+        "combined": {
+          "run": 586,
+          "passed": 585,
+          "skipped": 1,
+          "seconds": 53.81,
+          "skip_reason": "exchange_calendars absent in shared native engine runtime",
+          "scope": "Before the final identical-halted-duplicate condition; final95focused suite and3independent regressions verify that narrow correction."
+        },
+        "final_focused": {
+          "run": 95,
+          "passed": 95,
+          "skipped": 0,
+          "seconds": 6.172
+        },
+        "final_independent_regressions": {
+          "run": 3,
+          "passed": 3,
+          "skipped": 0,
+          "seconds": 0.85
+        }
+      },
+      "codex_review": "No supported findings; original source and actual LiveNode/mocked boundary fixtures inspected independently.",
+      "claude_review": {
+        "requested_agent": "evidence-reviewer",
+        "requested_model": "opus",
+        "requested_effort": "high",
+        "resolved_model": "claude-opus-5-5",
+        "effort_observed": "not independently observable inside reviewer",
+        "initial": "13turn cap; retained without verdict",
+        "continued": "Low-severity halted-duplicate availability regression found",
+        "closure": "3turn success: finding fixed atd5ceaadb; no further actionable findings. Read-only source review; no tests or broker calls by reviewer.",
+        "usage": "Retained native modelUsage is cumulative across this resumed review session; do not sum invocation snapshots or interpret list costs as billing."
+      },
+      "final_candidate_commit": "d5ceaadb1f43d9b9ff73ec43fbc53eb7cd3e2240",
+      "final_integrated_commit": "11f99f18",
+      "benchmark_post_submission_boundary": "A benchmark conflict after another symbol POST starts does not trigger affected-symbol exposure stop; order stays owned/attempted and duplicate ID is lookup-only/reconcilable. Dependent entries are blocked until strictly newer benchmark recovery. Covered by mocked fixture, not native broker fault acceptance."
     }
   },
-  "attempts": [],
+  "attempts": [
+    {
+      "trial": "adaptive-20260923-pm",
+      "source_commit": "3b252cc18b62e1e0e532d73b130167d288b3c5b8",
+      "status": "needs_attention",
+      "exit_code": 3,
+      "elapsed_seconds": 1.1716536029998679,
+      "decision_elapsed_seconds": 0.7514465679996647,
+      "duration_completed": false,
+      "reason": "transport_gap",
+      "transport_reasons": [
+        "callback_failure",
+        "quote_timestamp_conflict"
+      ],
+      "callback_symbol": "SPY",
+      "orders_submitted": 0,
+      "native_fill_events": 0,
+      "filled_orders": 0,
+      "roundtrips": 0,
+      "native_quotes": 135,
+      "run_recorded_rest_reads": 8,
+      "run_recorded_submissions": 0,
+      "run_recorded_cancels": 0,
+      "quarantine": {
+        "invalidated": 1,
+        "released": 1,
+        "older_ignored": 0,
+        "exposure_escalations": 0,
+        "active": [],
+        "limitation": "Aggregate causes are not separated; cannot infer a crossed-quote recovery from these counts."
+      },
+      "trial_cash_delta_usd": "0",
+      "trial_realized_pnl_usd": "0",
+      "reconciliation": {
+        "positions": 0,
+        "open_orders": 0,
+        "cash_match": true,
+        "cash_delta_from_original_baseline_usd": "-1.10"
+      },
+      "recovery": {
+        "status": "passed",
+        "errors": [],
+        "native_engine_resumed": false,
+        "positions": 0,
+        "open_orders": 0,
+        "cash_match": true,
+        "cash_delta_from_original_baseline_usd": "-1.10"
+      }
+    }
+  ],
   "limitations": [
-    "No afternoon entry trial has run yet; the next trial is conditional on required catalog/source checks and a fresh broker session.",
+    "The reviewed afternoon trial stopped before300seconds with0orders. Its flat recovery does not establish five-minute acceptance.",
     "Morning interrupted trials remain separate failures with flat recovery.",
     "Broker throughput, strategy profitability and all-family native order execution remain unqualified.",
     "No live trading, added leverage, paid features or catalyst-order signals."
@@ -191,7 +356,7 @@
     "original_ledger_reconciliation_reads_added": 6,
     "native_fault_requests": 19,
     "additional_request_only_diagnostic_roots": 4,
-    "limitation": "Counts describe separate historical runs and a dated proof, not a completed import or this heartbeat's entry trial. Final locked snapshots must include newer diagnostics and all reconciliation requests.",
+    "limitation": "The initial audit was preliminary. Subsequent locked consolidation and fresh broker/activity proof applied14external histories to the original ledger; historical different-config runs remain distinct from this heartbeat's failed0order entry trial.",
     "roundtrips": 14,
     "profitable_episodes": 4,
     "losing_episodes": 10,
@@ -317,5 +482,64 @@
       "native_engine_resumed": false
     }
   },
-  "orders_submitted_this_heartbeat": 0
+  "orders_submitted_this_heartbeat": 0,
+  "required_checks": {
+    "source_commit": "3b252cc18b62e1e0e532d73b130167d288b3c5b8",
+    "validate": "passed69components2022hashes4profiles142receipts",
+    "catalogs": "passed",
+    "foundation": "passed",
+    "convergence": "passed",
+    "dashboard_tests": {
+      "run": 15,
+      "passed": 15
+    },
+    "generated_html_sha256": "1f255d7ac72c591f13ec9103387a3b3f96da367f08bf23af1ad9a9bbf17fdce0",
+    "secret_scan": {
+      "full_range": "terminated exit143 at about4.1GiB RSS",
+      "scoped": "passed7commits129866bytes",
+      "excluded_paths": [
+        "docs/ecosystem/index.html"
+      ],
+      "coverage": "incomplete for excluded generated HTML; no guard limits raised"
+    }
+  },
+  "timestamp_shadow": {
+    "mode": "read_only_market_data",
+    "feed": "sip",
+    "status": "completed",
+    "started_at": "2026-09-23T19:04:49.052528+00:00",
+    "observed_at": "2026-09-23T19:05:04.183047+00:00",
+    "sample_seconds": 15.017766102013411,
+    "max_seconds": 15,
+    "max_quotes": 50000,
+    "config_sha256": "77244c396c407d20f7b21f0e9e8ad9a2c4803ad663247ac210076a47ebbc7eb3",
+    "counts": {
+      "received": 5712,
+      "crossed": 0,
+      "halted": 0,
+      "equal_timestamp": 55,
+      "equal_timestamp_conflicts": 51,
+      "otherwise_valid_conflicts": 51,
+      "exact_duplicates": 4
+    },
+    "conflict_fields": {
+      "bid_size": 31,
+      "ask_size": 18,
+      "bid": 5,
+      "ask": 1
+    },
+    "conflict_symbols": {
+      "SPY": 27,
+      "PG": 2,
+      "DIA": 2,
+      "IWM": 17,
+      "JPM": 3
+    },
+    "raw_timestamp_types": {
+      "Timestamp": 5712
+    },
+    "orders_submitted": 0,
+    "raw_payloads_retained": false,
+    "classification_scope": "Comparisons use normalized executable quote fields; exact_duplicates means identical normalized quotes, not byte-identical raw SIP messages. Venue, tape and nonhalt conditions are outside this comparison."
+  }
 }

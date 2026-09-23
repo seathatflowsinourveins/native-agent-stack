@@ -8,12 +8,13 @@
     "claude-code",
     "codex"
   ],
-  "claim": "Bounded native market refresh and broker reconciliation traced split same-account paper histories; crossed-quote invalidation and append-only consolidation qualified locally while original-lane paper acceptance remains conditional.",
+  "claim": "Native research and broker activity proof consolidated14same-account histories into the original ledger. A reviewed paper trial stopped after1.17seconds with0orders; cash-matched recovery passed. Changed equal-time conflict quarantine passed95focused checks and native Claude/Codex review; five-minute acceptance remains open.",
   "limitations": [
-    "No new afternoon entry trial yet; historical fills in other configurations do not establish original-lane five-minute acceptance.",
+    "The failed afternoon trial and separate146.76second concurrent run are not five-minute acceptance; historical different-config fills remain separate.",
     "Native LiveNode and mocked HTTP checks are local fixtures; strategy profitability, all-family execution and broker throughput remain unqualified.",
-    "Account-wide STOP is retained until reviewed original-ledger consolidation and fresh broker/activity proof pass.",
-    "Original configuration, 200REST/minute and180all-submission ceilings remain; no live trading, added leverage, paid features or catalyst orders."
+    "The next changed trial requires current source/catalog checks and the original account lock, configuration and all risk/request/order history.",
+    "Original configuration,200REST/minute and180all-submission ceilings remain; no live trading, added leverage, paid features or catalyst orders.",
+    "Generated dashboard HTML is excluded from the scoped secret scan; its scan coverage is incomplete."
   ],
   "native_evidence": "blueprints/us-equities/adaptive-paper/heartbeat-20260923-pm.json",
   "source_review": "blueprints/us-equities/adaptive-paper/heartbeat-20260923-pm.md"

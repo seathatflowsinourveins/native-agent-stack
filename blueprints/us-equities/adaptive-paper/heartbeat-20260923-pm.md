@@ -16,8 +16,9 @@ one canceled SPY buy with zero fills. No unknown order remains untraced in that
 dated observation.
 
 The original ledger lacked these later trades and losses. The account-wide STOP
-therefore holds entries pending reviewed append-only history consolidation and
-fresh reconciliation. Source ledgers and failed receipts stay intact. Zero-order
+held entries during reviewed append-only history consolidation and fresh
+reconciliation, which subsequently passed. Source ledgers and failed receipts
+stay intact. Zero-order
 diagnostic ledgers also contribute request history. Consolidation must retain
 partial fills, cumulative loss and the offset account peak, preserve original
 limits and baseline, and be idempotent/transactional. The separately used larger
@@ -29,8 +30,8 @@ nontrade fees can be created the following day, so a current proof does not
 establish the eventual absence of later charges.
 
 These historical runs are separate from this heartbeat's submission count.
-No new afternoon entry trial is claimed here. A flat account or a successful
-history import does not convert any interrupted run into five-minute acceptance.
+A flat account or a successful history import does not convert an interrupted
+run into five-minute acceptance. The bounded attempts below remain separate.
 
 ## Crossed quotes and native review
 
@@ -47,8 +48,9 @@ are reused as separate bounded changes.
 
 Native Claude identified an unnecessary recovery-port liveness change for valid
 same-timestamp quote updates; the correction preserves its previous behavior.
-The opted-in native entry path conservatively stops on conflicting equal-time
-quotes; collision frequency is unmeasured and that choice can stop a trial early.
+The first reviewed native entry path conservatively stopped on conflicting
+equal-time quotes. This occurred in the actual trial below; a separate read-only
+sample measured that category and prompted a bounded qualification followup.
 The fixed-share limit-order path uses the submitted limit price in the pinned
 [Nautilus RiskEngine source](https://github.com/nautechsystems/nautilus_trader/blob/v2.0.0rc5/crates/risk/src/engine/mod.rs#L1503),
 while its quote-sized/market-order cache behavior is outside this qualification.
@@ -73,6 +75,62 @@ flat position rows/stale marks are archived as provenance. Limits, baseline,
 halt and STOP were preserved. Original-ledger recovery then passed with zero
 unresolved orders and cash-1.10USD matched. Neither action submitted an order.
 
+## Native trial followup
+
+A different one-shot scheduler released the shared hold and launched source
+`fbda2409` at18:56:25UTC. It used the original ledger and correct configuration,
+but retained executable quotes after crossed data. Independent exact-source
+offline reproduction confirmed that gap. The run ended18:58:56UTC after146.758s,
+with65777quotes,3crossed quotes dropped and zero orders/fills/roundtrips. Its
+`completed_no_signals` label is not five-minute acceptance. A fresh recovery
+through reviewed source passed with no positions/open orders and matched cash.
+The service became inactive; no paper timer remained. The shared hold was
+restored, and the foundation task was notified to leave this account writer idle.
+
+After these checks, the coordinator ran frozen reviewed`3b252cc1` once, trial
+`adaptive-20260923-pm`. It correctly reported`needs_attention` after1.17165s:
+SPY`quote_timestamp_conflict`,135native quotes, zero submissions/fills/roundtrips,
+eight recorded run reads and no cancel requests. Aggregate quarantine counters
+were invalidated1/released1; their causes were not separated, so they do not
+prove crossed-quote recovery. A fresh owned recovery passed, flat and cash-matched
+at the original baseline minus1.10USD; incremental trial P&L was zero. STOP was
+restored pending safe conflict handling and independent review. Neither this
+failure nor its flat recovery qualifies five-minute acceptance.
+
+A separate19:04:49–19:05:04UTC read-only SIP sample measured5712quotes in15.0178s:
+55equal-timestamp pairs,51otherwise valid fresh conflicts and4identical normalized
+quotes. Raw message equality, venue, tape and nonhalt condition differences were
+not measured by this normalized executable-field comparison.
+No crossed quote or halt was observed. Conflicting field counts were bid-size31,
+ask-size18,bid-price5,ask-price1; fields can overlap. All5712raw timestamps were
+MessagePack Timestamp values, preserved at nanosecond precision. The
+[Alpaca quote schema](https://docs.alpaca.markets/us/docs/real-time-stock-pricing-data)
+specifies nanosecond timestamps. These observations support testing safe
+invalidation and strictly-newer requalification; they do not justify executing
+either conflicting quote or silently retaining an old executable price.
+
+The changed quarantine handles otherwise-valid equal-time conflicts through the
+same exact-nanosecond tombstone and permanent intent-version path. Claude found
+and closed a low-severity availability regression for identical halted duplicates;
+these retain baseline behavior while halted conflicts/requalification stay fatal.
+The final95focused tests passed in6.172s; independent final regressions passed
+3checks in0.850s, after independent91plus2checks on the first candidate. The
+combined586test suite passed585with one optional calendar skip in53.810s before
+that narrow halted-duplicate correction. Native Claude read original source and
+closed its finding at`d5ceaadb`; it did not execute tests or broker calls.
+
+A benchmark conflict after another symbol's POST starts retains per-symbol
+exposure handling: it does not automatically stop that whole feed, but the order
+remains owned/attempted, a duplicate client ID is lookup-only, and dependent
+entries wait for strictly newer benchmark recovery. A mocked accepted-POST/fill
+fixture now checks this boundary; native broker fault acceptance remains separate.
+
+Required pretrial source/catalog/foundation/convergence checks and15dashboard
+tests passed for`3b252cc1`. The full-range guarded secret scan was terminated
+at about4.1GiB RSS(exit143); seven commits excluding generated dashboard HTML
+passed,129866bytes scanned. That excluded HTML has incomplete scan coverage;
+no guard limits were raised.
+
 ## Market research
 
 The bounded17:38:37UTC refresh returned50news items and24IEX snapshots through
@@ -87,6 +145,14 @@ used by trend momentum, range breakout, mean reversion, relative strength and
 defensive cash. All five retain their existing formulas and numeric risk rules.
 Catalyst rankings remain advisory; no catalyst orders or automatic leverage
 were enabled. IEX research is separate from the SIP execution feed.
+
+A second19:07:21UTC bounded refresh returned50items and24snapshots via two200
+responses. Eight article IDs were new;42common revisions were unchanged.
+Publication times spanned11:37:57–18:46:47UTC; each item retains its separate
+update and observation times. Breadth was6positive/18negative, all24quotes fresh,
+and14within15bps. Benchmark losses narrowed to SPY-0.678/QQQ-0.858/IWM-1.644/
+DIA-0.650percent. These are dated research observations, not executable strategy
+signals; the rolling-window families and advisory-only catalyst boundary remain.
 
 The480row/24symbol daily data snapshot through September22 and its12passing
 promotion checks remain reusable because the input hash is unchanged. That

@@ -1,6 +1,6 @@
 # Adaptive equity research and paper practice
 
-Latest measured follow-up: [September 23 afternoon report](heartbeat-20260923-pm.md) and [receipt](heartbeat-20260923-pm.json). Crossed-quote handling passed focused checks and independent review. Separately created same-account histories were consolidated into the original ledger; fresh proof and recovery matched a flat account with cash-1.10USD. The next five-minute trial remains conditional on current checks. The [morning heartbeat](heartbeat-20260923.md) retains both interrupted attempts; these are not five-minute acceptance. Earlier receipts remain dated historical evidence.
+Latest measured follow-up: [September 23 afternoon report](heartbeat-20260923-pm.md) and [receipt](heartbeat-20260923-pm.json). Same-account histories were consolidated into the original ledger; fresh proof and recovery matched a flat account with cash-1.10USD. The reviewed afternoon trial stopped after1.17seconds on conflicting equal-time quotes, with zero orders. Its changed quarantine followup passed95focused tests and native Claude/Codex review; the next trial remains conditional on current checks. The [morning heartbeat](heartbeat-20260923.md) retains both earlier interrupted attempts; these are not five-minute acceptance.
 
 This lane wires five deterministic policy families into NautilusTrader2.0.0rc5
 `LiveNode`, with the official Alpaca SDK0.44.0 carrying quotes, order updates and
@@ -12,7 +12,7 @@ Current operational status belongs in the latest dated heartbeat receipt; review
 The local capacity fixture is synthetic. It does not establish broker throughput
 or strategy profitability. Subsequent native trials in another checkout produced
 paper fills, but used separate account ledgers and different configuration bytes.
-Their histories require reconciliation; they do not qualify this frozen lane.
+Their histories were consolidated with provenance; they do not qualify this frozen lane.
 
 ## Policies and portfolio behavior
 
@@ -132,6 +132,21 @@ Stream authentication/subscription acknowledgement, queue integrity, per-symbol
 freshness and connection generations are observed explicitly. Models never own
 numeric risk, request budgets, order retries or liquidation rules. SDK automatic
 HTTP retries and redirects are disabled; only explicit paper endpoints are allowed.
+
+The opted-in entry transport quarantines fresh, otherwise valid crossed quotes
+and conflicting equal-time quotes. It invalidates transport, controller, native
+session and policy executable caches before yielding; valuation marks and order
+ownership remain intact. Exact nanosecond tombstones reject equal/older re-entry.
+Only a strictly newer fresh valid quote can release the symbol within3seconds.
+Affected held, unresolved or native-pending exposure keeps the whole-feed stop;
+malformed/unknown/compound-invalid conflicts remain fatal. Halted conflicts or
+halted requalification cannot release quarantine; a valid stored halted quote
+and its identical duplicate retain the baseline behavior that blocks entries.
+Permanent
+intent versions protect unsent order boundaries even if a quote recovers before
+POST. Benchmark invalidation before`port.submit` remains outside decision-time
+synchronization coverage. Reason counters count invalidation events; aggregate
+`invalidated` counts episodes. Local checks do not establish broker throughput.
 
 The current native Equity model is whole-share-only. An actual fractional fill
 freezes the native node and preserves its exact quantity. A separate bounded
