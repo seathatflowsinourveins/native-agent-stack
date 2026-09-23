@@ -5914,13 +5914,13 @@
     },
     {
       "path": "blueprints/gap-wave3-20260923/forced-skill-ab/scored-results.json",
-      "sha256": "5b0a039f1e9ae729c20aebda428c0bf1b17a494b3dd4e22e8444aa5c4d917726",
-      "bytes": 2440
+      "sha256": "a94c29379c9a0185916333a26f245c8b3f758c05767776bc4b95fb56c03de7c3",
+      "bytes": 2887
     },
     {
       "path": "blueprints/gap-wave3-20260923/typesafe-extended/cases.json",
-      "sha256": "3982ee7129e46300bcf8b44407d73aaf42254a100079c42e5bfe5a208b6d85e2",
-      "bytes": 13435
+      "sha256": "7adef5c4578f4636a1596ff3e67f5dab43c051f6015c1d0e477f071579168462",
+      "bytes": 16076
     },
     {
       "path": "blueprints/memory-lifecycle-probe/README.md",
@@ -10109,13 +10109,13 @@
     },
     {
       "path": "evidence/artifacts/gap-wave3-20260923/instructions-skills/forced-skill-arm-ab.json",
-      "sha256": "135406a38c2ecbe39f7310ec0be70071c5882f3c213f0977e67a0e71825e545d",
-      "bytes": 14872
+      "sha256": "64cd19ab64d8b2aa464b8e93cf1e06b4e3525fa6ee1504f9b5add9bde80553d6",
+      "bytes": 17731
     },
     {
       "path": "evidence/artifacts/gap-wave3-20260923/instructions-skills/typesafe-extended-label-set.json",
-      "sha256": "37f82fd0163a8805452986339e61c7242f5ae62fba2534de01dd1e49eda2c83b",
-      "bytes": 13612
+      "sha256": "50494d641afaec49f351c5952a4fb4d0c06b017e3ac91d6ebd65378c729fcd01",
+      "bytes": 21655
     },
     {
       "path": "evidence/artifacts/harness-rules-convergence-20260922/codex-agent-roles-source.json",
