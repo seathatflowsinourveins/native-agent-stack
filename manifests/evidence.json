@@ -6164,7 +6164,7 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "04f8c39895920cb8207e1d8058f114ada15e0fd7f608d628ef04d67a38e60a9a",
+      "sha256": "7c7320fabf108ab4dba63e65953268ffc0101f8e01c369feb45ceff00ebeed1b",
       "bytes": 4661
     },
     {
@@ -13989,8 +13989,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_recovery.py",
-      "sha256": "d10af6928bf3ba946c82e632e545ee9eb53a1feea275b2e20a818c283eb1b6aa",
-      "bytes": 17817
+      "sha256": "fb2997f89293ec7e6de8436cec6f79d1948aa44fe3ee6c64f02cf4341650509c",
+      "bytes": 18355
     },
     {
       "path": "tests/test_adaptive_paper_runner.py",
