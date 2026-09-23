@@ -14,8 +14,10 @@ from urllib.parse import urlsplit
 
 try:
     from .catalog_decisions import canonical, identity, load, safe_file
+    from . import platform_status as platform_evidence
 except ImportError:
     from catalog_decisions import canonical, identity, load, safe_file
+    import platform_status as platform_evidence
 
 MANIFEST = "catalogs/landscape/manifest.json"
 DISPOSITIONS = {
@@ -38,8 +40,13 @@ PLATFORM_KEYS = {"linux-wsl2-x86_64", "macos-arm64"}
 PLATFORM_STATUSES = {"accepted", "conditional", "not_established", "untested"}
 PLATFORM_ALLOWED = {
     "linux-wsl2-x86_64": {"accepted", "conditional", "not_established"},
-    "macos-arm64": {"untested"},
+    "macos-arm64": {"accepted", "conditional", "not_established", "untested"},
 }
+# Platforms whose declared status may not outrank what scripts/platform_status.py derives
+# from the host receipts and registered evidence. Linux joins once the layer rows are
+# re-recorded through that same function (13 Linux "accepted" rows at 38847e5 cite no
+# registered evidence/ file and would derive "conditional").
+ENFORCED_PLATFORMS = {"macos-arm64"}
 OVERTURN_MARKERS = ("fixtures/", "blueprints/", "tests/", "python3 ", "node ")
 
 
@@ -74,7 +81,8 @@ def https_url(value):
         return False
 
 
-def validate_verdict_row(row, key, *, root, identities, aliases, evidence, recipe_map, sota_pins):
+def validate_verdict_row(row, key, *, root, identities, aliases, evidence, recipe_map, sota_pins,
+                          status_context=None):
     """Layer-verdict schema v2 checks for a single landscape row. ``evidence``
     is the confined evidence()/track() helper already bound to this run; a
     winner/alternative's ``evidence_refs`` may be an empty list (schema v2
@@ -166,6 +174,9 @@ def validate_verdict_row(row, key, *, root, identities, aliases, evidence, recip
             require(value in PLATFORM_ALLOWED[platform],
                     str(key) + ".winner.platform_status." + platform + " must be one of "
                     + ", ".join(sorted(PLATFORM_ALLOWED[platform])))
+            if platform in ENFORCED_PLATFORMS and status_context is not None:
+                error = platform_evidence.declared_status_error(platform, value, winner, status_context)
+                require(error is None, str(key) + ".winner " + str(winner.get("component_id")) + ": " + str(error))
 
     alternatives = row.get("alternatives")
     require(isinstance(alternatives, list), str(key) + ".alternatives must be a list")
@@ -262,6 +273,8 @@ def build_landscape(root, manifest_path=MANIFEST, *, read=None, track=None, file
                 result.append({"path": value, "url": file_url(value)})
         return result
 
+    status_context = platform_evidence.load_context(root)
+
     documents = manifest["catalogs"]
     require(set(documents) == {"foundation", "us-equities"}, "landscape must cover both catalogs")
     layers, seen, decision_pointers = [], set(), {}
@@ -288,7 +301,8 @@ def build_landscape(root, manifest_path=MANIFEST, *, read=None, track=None, file
                 require(group is None, str(key) + ".group is only used for trading rows")
             validate_verdict_row(row, key, root=root, identities=identities, aliases=aliases,
                                   evidence=evidence, recipe_map=recipe_map,
-                                  sota_pins=sota_pins_by_layer.get(key[1], {}))
+                                  sota_pins=sota_pins_by_layer.get(key[1], {}),
+                                  status_context=status_context)
             source_links = evidence(row.get("evidence_refs"), str(key))
             candidates, candidate_ids = [], set()
             require(isinstance(row.get("candidates"), list) and row["candidates"], "layer needs candidates")
