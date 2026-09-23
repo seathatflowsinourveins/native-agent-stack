@@ -1,0 +1,34 @@
+{
+  "schema": "spy-parity-v2-harness-review/1",
+  "reviewer": "sota-workflow-resolution (independent of the implementer session): Claude Opus 5.5 evidence-reviewer lenses plus one read-only Codex cross-family review (gpt-6-astra, high)",
+  "completed_utc": "2026-09-23T03:55:06+00:00",
+  "reviewed_commit": "cc4503fb85b488ab9ac56fbb0144c411290eee79",
+  "reviewed_local_source_sha256": {
+    "convert.py": "08cba0a2aac938e9306935f91c2889b181dfc880b532b5943e0ccda395592c65",
+    "fixture_strategy.py": "59649ac50f26c8b6090dc976e4ec0b3b7e2121cc214674f6c122fbbca9b143f1",
+    "distribution_module.py": "eefee070b0dbe6ad3a1e68755ca959b5fff081fad61af8b84902a438996b126b",
+    "run.py": "c3917c2f6446ffb1bcfe411cc2339ffc1f804a87904ed3a1f1a67e51817ad2f2",
+    "compare.py": "c70386f869e45bcdc54602100991235a450d2a5854445d98ffe45b849454a5ec"
+  },
+  "unresolved_findings": 0,
+  "review_rounds": [
+    {
+      "commit": "f079f6c",
+      "outcome": "not accepted unchanged: 5 required changes (review precondition gating, engine-event submission instants, filled-leg identity, pair/leg uniqueness, strict final_quantity) and recommended changes"
+    },
+    {
+      "commit": "cc4503fb85b488ab9ac56fbb0144c411290eee79",
+      "outcome": "accepted for the qualifying run with no code change; all required and recommended items verified resolved; spy-parity tests 177/177 OK under system python3 and the rc5 interpreter"
+    }
+  ],
+  "accepted_limitations": [
+    "replay_history_at_comparison treats any run-time replay list that is a prefix of the on-disk history as append-only, so a run fed a truncated history would not require the acceptance; mitigated operationally: the run uses the committed six-entry history and the receipt's prior_v2_replays is checked after the run",
+    "no_prior_replay_ran_the_reviewed_harness skips history entries without harness_local_source_sha256; mitigated operationally: this run is appended with its full hashes, so no retry from cc4503f can qualify",
+    "gate-owner authorship of deviation-acceptance-v2.json cannot be verified in code; the authoring session and commit are recorded in the handoff",
+    "fill_quantity truncates last_qty with int(); a fractional fill still fails engine_final_status, so there is no false PASS path"
+  ],
+  "rejected_findings": [
+    "ts_event_ns vs utc_seconds cross-check (both derived from the same row)",
+    "native balances never matched end to end (end cash is reconciled against the rebuilt ledger)"
+  ]
+}
