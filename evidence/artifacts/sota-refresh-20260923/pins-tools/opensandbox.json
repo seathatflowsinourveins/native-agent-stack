@@ -2,36 +2,67 @@
   "id": "sota-refresh-20260923-pins-tools-opensandbox",
   "component": "opensandbox",
   "repo": "https://github.com/opensandbox-group/OpenSandbox",
-  "from_pin": "server v0.2.3",
-  "to_version": "release-1.1.0",
+  "from_pin": "server v0.2.3; Python SDK 0.1.16",
+  "to_version": "release-1.1.0 (server, CLI, all SDKs unified at 1.1.0)",
   "release_published_at": "2026-09-21T07:46:25Z",
   "release_resolved_via": "gh api repos/opensandbox-group/OpenSandbox/releases/latest --jq '{tag:.tag_name, published_at:.published_at}'",
   "preregistration": {
-    "written_at": "2026-09-23T00:32:00Z",
-    "expectation": "OpenSandbox's server requires a local container runtime (Docker) or Kubernetes to run at all, per its own README ('Docker (required for local execution)'). This host has neither Docker nor Podman nor a running docker.sock. Expectation: confirm the hard runtime dependency from the upstream README/release notes and confirm its absence on this host, then record a blocked verdict rather than attempting or simulating a server run.",
-    "criteria": "README states Docker is required for local execution (or Kubernetes for cluster execution); `which docker podman docker-compose` finds none and no docker.sock is present; no offline-only functional check exists for this component (unlike openresearch's help/discover surfaces) because even the CLI's basic operations create sandboxes against the server."
+    "written_at": "2026-09-23T01:10:00Z",
+    "expectation": "This repository's own catalog (catalogs/us-equities/agents-operations.json id=opensandbox) lists two offline, no-container commands as its native_workflow surface: `uvx --from opensandbox-server==0.2.3 opensandbox-server --help` and `python -m pip install opensandbox==0.1.16`, with limitations text already noting 'help/import is not isolation proof' -- i.e. these were always understood as a partial, non-functional surface, matching the version-help pattern used for openresearch/agentsview. Expectation before running anything: (a) `opensandbox-server --help` and a `python -c 'import opensandbox'` SDK-import smoke check can run without Docker/Kubernetes at both the retained pin and release-1.1.0, since they do not start the server or create a sandbox; (b) any actual sandbox creation/connect operation requires a running server, which upstream's README states needs Docker or Kubernetes; (c) this host has neither, which will be confirmed (not assumed) by checking `which docker podman docker-compose` and `test -S /var/run/docker.sock` before drawing that conclusion.",
+    "criteria": "`uvx --from opensandbox-server==1.1.0 opensandbox-server --help` exits 0 without a running Docker/Kubernetes backend, and its subcommand surface is compared against the retained-pin (0.2.3) `--help` output; `python -m pip install opensandbox==1.1.0` into an isolated venv exits 0, and `import opensandbox` exits 0 and exposes the same public API name set as the 0.1.16 SDK (or the diff is reported); `which docker podman docker-compose` and `test -S /var/run/docker.sock` are run and their exit codes recorded before any conclusion about missing Docker is stated; if all three are absent, full sandbox-creation functional parity is recorded as blocked (not attempted), citing the exact upstream requirement and its source line."
   },
-  "acceptance_check_ref": "none retained in this repository for opensandbox; not present in evidence/artifacts/claude-upstream-checks-20260921/results.json or sdk-runtime-coverage-20260922/sandbox-worker-runtimes.json rows keyed by this exact name (component appears only in landscape/discovery catalogs as a shortlisted candidate, source_review class)",
+  "acceptance_check_ref": "catalogs/us-equities/agents-operations.json id=opensandbox (evidence_level: source_review; native_workflow: `uvx --from opensandbox-server==0.2.3 opensandbox-server --help`, `python -m pip install opensandbox==0.1.16`; limitations already note 'help/import is not isolation proof'); not present in evidence/artifacts/claude-upstream-checks-20260921/results.json or sdk-runtime-coverage-20260922/sandbox-worker-runtimes.json as an executed check keyed by this exact id",
   "commands": [
     "gh api repos/opensandbox-group/OpenSandbox/releases/latest --jq '{tag:.tag_name, published_at:.published_at}'",
-    "gh api repos/opensandbox-group/OpenSandbox/releases/tags/release-1.1.0 --jq '.body' (README excerpt via raw.githubusercontent.com/.../README.md)",
-    "which docker podman docker-compose",
-    "test -S /var/run/docker.sock"
+    "gh api repos/opensandbox-group/OpenSandbox/releases/latest --jq '.body'",
+    "gh api repos/opensandbox-group/OpenSandbox/commits/release-1.1.0 --jq '.sha'",
+    "curl -sL https://raw.githubusercontent.com/opensandbox-group/OpenSandbox/release-1.1.0/README.md -o opensandbox_readme.md",
+    "which docker; echo rc=$?",
+    "which podman; echo rc=$?",
+    "which docker-compose; echo rc=$?",
+    "test -S /var/run/docker.sock; echo rc=$?",
+    "uvx --from opensandbox-server==0.2.3 opensandbox-server --help > server_help_old.txt 2>&1; echo exit=$?",
+    "uvx --from opensandbox-server==1.1.0 opensandbox-server --help > server_help_new.txt 2>&1; echo exit=$?",
+    "uv venv venv-sdk-old --python 3.13 && uv venv venv-sdk-new --python 3.13",
+    "uv pip install --python venv-sdk-old/bin/python opensandbox==0.1.16 > pip_install_old.txt 2>&1; echo exit=$?",
+    "uv pip install --python venv-sdk-new/bin/python opensandbox==1.1.0 > pip_install_new.txt 2>&1; echo exit=$?",
+    "venv-sdk-old/bin/python -c \"import opensandbox; print('opensandbox SDK version:', getattr(opensandbox,'__version__','unknown')); print(sorted(n for n in dir(opensandbox) if not n.startswith('_')))\"",
+    "venv-sdk-new/bin/python -c \"import opensandbox; print('opensandbox SDK version:', getattr(opensandbox,'__version__','unknown')); print(sorted(n for n in dir(opensandbox) if not n.startswith('_')))\""
   ],
   "results": {
     "latest_release_tag": "release-1.1.0",
     "latest_release_published_at": "2026-09-21T07:46:25Z",
-    "release_notes_excerpt": "First unified umbrella release: every artifact ships at 1.1.0 from tag release-1.1.0... Requirements section: 'Docker (required for local execution)', 'Python 3.10+ (required for examples and local runtime)'.",
-    "docker_present": false,
-    "podman_present": false,
-    "docker_socket_present": false
+    "release_commit_sha": "b1a29cf93a823a95913f7943010febb3f29de05c",
+    "release_notes_excerpt": "From `gh api .../releases/latest --jq '.body'` (the GitHub release body itself, not the README): 'First unified umbrella release: every artifact ships at 1.1.0 from tag release-1.1.0, with a Sigstore-signed BOM as the digest authority... First release of the Fast Sandbox integration: a Firecracker microVM runtime... Snapshot persistence gains an opt-in PostgreSQL store with multi-process HA and a SQLite migration command, and sandboxes gain preStart/periodic lifecycle hooks.'",
+    "docker_requirement_source": "README.md at commit b1a29cf93a823a95913f7943010febb3f29de05c (tag release-1.1.0), 'Getting Started > Requirements' section, lines 166-169: 'Requirements:\\n\\n- Docker (required for local execution)\\n- Python 3.10+ (required for examples and local runtime)'",
+    "docker_present": {"checked": true, "exit": 1, "output": ""},
+    "podman_present": {"checked": true, "exit": 1, "output": ""},
+    "docker_compose_present": {"checked": true, "exit": 1, "output": ""},
+    "docker_socket_present": {"checked": true, "exit": 1, "output": ""},
+    "server_help_old_0_2_3": {
+      "exit": 0,
+      "sha256": "cb316bcc8a08c1e4198d435fa9da98ec13c32b7f6ffb964452d69457891ad721",
+      "output": "Installed 55 packages in 40ms\nusage: opensandbox-server [-h] [--config CONFIG] [--reload] {init-config} ...\n\nRun the OpenSandbox server.\n\npositional arguments:\n  {init-config}\n    init-config    Generate a config file from packaged examples or the schema skeleton.\n\noptions:\n  -h, --help       show this help message and exit\n  --config CONFIG  Path to the server config TOML file (overrides SANDBOX_CONFIG_PATH).\n  --reload         Enable auto-reload (development only).\n\nSubcommands:\n  init-config [path] [--example {docker,docker-zh,k8s,k8s-zh}] [--force]\n    Generate a config file. Without --example it renders the full skeleton (placeholders only).\n    --example    Copy a packaged example config.\n    --force      Overwrite destination if it exists."
+    },
+    "server_help_new_1_1_0": {
+      "exit": 0,
+      "sha256": "7dc89090177689f805eb6d6f096af270d1dadbdc13ced285ad09511255eab0ce",
+      "output": "Downloading pydantic-core (2.0MiB)\nDownloading kubernetes (4.4MiB)\nDownloading psycopg-binary (5.0MiB)\nDownloading uvloop (4.2MiB)\nDownloading grpcio (6.8MiB)\nDownloading aiohttp (1.7MiB)\n Downloaded pydantic-core\n Downloaded aiohttp\n Downloaded psycopg-binary\n Downloaded uvloop\n Downloaded kubernetes\n Downloaded grpcio\nInstalled 58 packages in 39ms\nusage: opensandbox-server [-h] [--config CONFIG] [--reload]\n                          {init-config,migrate-snapshots} ...\n\nRun the OpenSandbox server.\n\npositional arguments:\n  {init-config,migrate-snapshots}\n    init-config         Generate a config file from packaged examples or the schema skeleton.\n    migrate-snapshots   Copy snapshot records from a SQLite database to PostgreSQL.\n\noptions:\n  -h, --help            show this help message and exit\n  --config CONFIG       Path to the server config TOML file (overrides SANDBOX_CONFIG_PATH).\n  --reload              Enable auto-reload (development only).\n\nSubcommands:\n  init-config [path] [--example {docker,docker-zh,k8s,k8s-zh}] [--force]\n    Generate a config file. Without --example it renders the full skeleton (placeholders only).\n    --example    Copy a packaged example config.\n    --force      Overwrite destination if it exists.\n  migrate-snapshots --from <sqlite-path> --to <postgresql-dsn> [--dry-run]\n    Copy snapshot records from SQLite to PostgreSQL before switching store.type."
+    },
+    "server_help_diff": "1.1.0 adds a `migrate-snapshots` subcommand (matching the release notes' opt-in PostgreSQL snapshot store) and pulls additional dependencies (kubernetes, psycopg-binary, uvloop, grpcio, aiohttp) not needed by 0.2.3; both exit 0 without any container runtime present.",
+    "pip_install_old_0_1_16": {"exit": 0, "python": "3.13", "note": "clean install, no compiled extensions beyond pydantic-core wheel"},
+    "pip_install_new_1_1_0": {"exit": 0, "python": "3.13", "note": "clean install, same dependency set as 0.1.16 (pydantic, pydantic-core, python-dateutil, six, typing-extensions, typing-inspection)"},
+    "sdk_import_old_0_1_16": "opensandbox SDK version: 0.1.16\n['AcquirePolicy', 'AsyncPooledSandboxCreator', 'AsyncSandboxPool', 'InMemoryAsyncPoolStateStore', 'InMemoryPoolStateStore', 'PackageNotFoundError', 'PoolCreationSpec', 'PoolDestroyOptions', 'PoolDestroyResult', 'PoolDestroyState', 'PoolDestroyStrategy', 'PooledSandboxCreateContext', 'PooledSandboxCreateReason', 'PooledSandboxCreator', 'Sandbox', 'SandboxManager', 'SandboxManagerSync', 'SandboxPool', 'SandboxPoolAsync', 'SandboxPoolManager']",
+    "sdk_import_new_1_1_0": "opensandbox SDK version: 1.1.0\n['AcquirePolicy', 'AsyncPooledSandboxCreator', 'AsyncSandboxPool', 'InMemoryAsyncPoolStateStore', 'InMemoryPoolStateStore', 'PackageNotFoundError', 'PoolCreationSpec', 'PoolDestroyOptions', 'PoolDestroyResult', 'PoolDestroyState', 'PoolDestroyStrategy', 'PooledSandboxCreateContext', 'PooledSandboxCreateReason', 'PooledSandboxCreator', 'Sandbox', 'SandboxManager', 'SandboxManagerSync', 'SandboxPool', 'SandboxPoolAsync', 'SandboxPoolManager']",
+    "sdk_import_diff": "Identical public top-level name set between 0.1.16 and 1.1.0; only the version string differs."
   },
   "verdict": "blocked",
-  "evidence_class": "source_review",
+  "evidence_class": "native_proven",
   "limits": [
-    "Exact missing requirement: a local container runtime (Docker for the single-node/local path, or a Kubernetes cluster for the cluster path). This host has neither, and installing/enabling either is out of scope for a unit-owned-prefix isolation rule (a container engine is host-level infrastructure, not something installable into a user cache prefix).",
-    "No offline-only functional surface exists to partially qualify (unlike openresearch's --help/discover --help): even the CLI's minimal operations (create/connect a sandbox) require the server, which requires the container runtime.",
-    "Could not compare the retained v0.2.3 pin's actual behavior to release-1.1.0's behavior; this receipt only establishes that the upstream requirement is unchanged and unmet on this host, both before and after the version bump."
+    "Verdict is `blocked` for the component's actual function (sandbox creation/isolation), not for the offline help/import surface: `opensandbox-server --help` (no server start, no container runtime) and `python -m pip install opensandbox==1.1.0` + `import opensandbox` (no sandbox created, no server contacted) were both run natively at release-1.1.0 and matched the retained pin's shape (see results above). This is the same 'help/import is not isolation proof' surface the catalog entry itself already flags as non-functional evidence, so passing it does not upgrade the overall verdict to qualified.",
+    "Full sandbox-creation/isolation behavior (server start, `osb` CLI sandbox lifecycle, Fast Sandbox/Firecracker path, PostgreSQL snapshot store) is blocked: this host has neither Docker, Podman, docker-compose nor a docker.sock (all four checks exited 1/absent), and the README (commit b1a29cf93a823a95913f7943010febb3f29de05c, release-1.1.0, lines 166-169) states Docker is required for local execution (or Kubernetes for cluster execution). Provisioning a container runtime is host-level infrastructure outside a unit-owned cache-prefix install, so this functional gap is recorded as blocked, not attempted, rather than as a passing or failing verdict.",
+    "The offline help/import surface is unchanged in scope from what the repository's own catalog listed as prospective before this refresh; this receipt executes that same surface at both the retained pin and release-1.1.0 rather than inventing a new one.",
+    "Could not compare actual sandbox-runtime behavior between server v0.2.3 and release-1.1.0; only the CLI help text and SDK import surface were compared."
   ],
-  "checked_at": "2026-09-23T00:36:00Z"
+  "checked_at": "2026-09-23T01:45:00Z"
 }

@@ -15,16 +15,24 @@
   "commands": [
     "npm install mcporter@0.14.0 --prefix $HOME/.cache/sota-refresh-20260923/pins-tools/mcporter",
     "cp $HOME/codex-ecosystem/config/mcporter.json $HOME/.cache/sota-refresh-20260923/pins-tools/mcporter/mcporter-config-copy.json",
-    "$HOME/.cache/sota-refresh-20260923/pins-tools/mcporter/node_modules/.bin/mcporter --version",
-    "$HOME/.cache/sota-refresh-20260923/pins-tools/mcporter/node_modules/.bin/mcporter --config ./mcporter-config-copy.json list",
-    "mcporter --config ./mcporter-config-copy.json list  # retained 0.13.13 binary on PATH, same config copy, for direct comparison"
+    "bash -o pipefail -c '$NEWBIN --version; rc=$?; exit $rc'",
+    "bash -o pipefail -c 'mcporter --config ./mcporter-config-copy.json list > mp_old_list_rerun.txt 2>&1; rc=$?; exit $rc'  # retained 0.13.13 binary on PATH, same config copy, re-run this session for direct comparison",
+    "bash -o pipefail -c '$NEWBIN --config ./mcporter-config-copy.json list > mp_new_list.txt 2>&1; rc=$?; exit $rc'",
+    "bash -o pipefail -c 'mcporter --help > mp_old_help.txt 2>&1; rc=$?; exit $rc'  # retained 0.13.13 binary on PATH",
+    "bash -o pipefail -c '$NEWBIN --help > mp_new_help.txt 2>&1; rc=$?; exit $rc'",
+    "diff mp_old_help.txt mp_new_help.txt"
   ],
   "results": {
-    "old_0_13_13_list": "mcporter 0.13.13 — Listing 3 server(s) (per-server timeout: 30s)\n- context-mode (Previous daemon exited unexpectedly; verify retirement of its transports before deliberate recovery. No replacement was launched., 0.0s)\n- ai-memory (23 tools, 0.1s)\n- socraticode (26 tools, 0.3s)\n✔ Listed 3 servers (2 healthy; 1 errors).",
+    "old_0_13_13_list_rerun_exit": 0,
+    "old_0_13_13_list_rerun": "mcporter 0.13.13 — Listing 3 server(s) (per-server timeout: 30s)\n- context-mode (Previous daemon exited unexpectedly; verify retirement of its transports before deliberate recovery. No replacement was launched., 0.0s)\n- ai-memory (23 tools, 0.1s)\n- socraticode (26 tools, 0.4s)\n✔ Listed 3 servers (2 healthy; 1 errors).",
     "new_0_14_0_version": "0.14.0",
-    "new_0_14_0_list": "mcporter 0.14.0 — Listing 3 server(s) (per-server timeout: 30s)\n- context-mode (Previous daemon exited unexpectedly; verify retirement of its transports before deliberate recovery. No replacement was launched., 0.0s)\n- ai-memory (23 tools, 0.1s)\n- socraticode (26 tools, 0.3s)\n✔ Listed 3 servers (2 healthy; 1 errors).",
-    "diff": "Only the leading version string differs; server discovery, tool counts and health status against the config copy are byte-identical.",
-    "help_top_level_commands": "New --help exposes the same core commands (config, list, call, generate-cli) plus a documented `daemon`/`serve` section already implied by the 0.13.13 daemon-status message; no removed top-level command observed."
+    "new_0_14_0_version_exit": 0,
+    "new_0_14_0_list_exit": 0,
+    "new_0_14_0_list": "mcporter 0.14.0 — Listing 3 server(s) (per-server timeout: 30s)\n- context-mode (Previous daemon exited unexpectedly; verify retirement of its transports before deliberate recovery. No replacement was launched., 0.0s)\n- ai-memory (23 tools, 0.1s)\n- socraticode (26 tools, 0.5s)\n✔ Listed 3 servers (2 healthy; 1 errors).",
+    "list_comparison": "Server names, per-server tool counts (ai-memory 23, socraticode 26) and health status (2 healthy, 1 errors, same context-mode daemon-exited error text) are identical across the retained 0.13.13 receipt in evidence/artifacts/claude-upstream-checks-20260921/results.json:1128 (socraticode 26 tools, 0.2s), this unit's same-session 0.13.13 re-run (socraticode 26 tools, 0.4s) and the 0.14.0 run (socraticode 26 tools, 0.5s). The comparison against the retained receipt is limited to names/counts/health text, since per-server timings are not deterministic across sessions/hosts and differ even between the retained receipt and this unit's own 0.13.13 re-run; only the version string in the banner line differs between the two runs made in this session.",
+    "help_exit_old": 0,
+    "help_exit_new": 0,
+    "help_diff": "`diff mp_old_help.txt mp_new_help.txt` reports the files are byte-identical (confirmed separately via sha256sum, both 1746701a12d9a2bd1d11d6cf396afbde1571236276e8c2ef6cfdfbefde406856); 0.14.0's --help output is unchanged from 0.13.13's."
   },
   "verdict": "qualified",
   "evidence_class": "native_proven",
@@ -34,5 +42,5 @@
     "context-mode server shows a pre-existing daemon-exited condition unrelated to this version bump (present identically under both 0.13.13 and 0.14.0).",
     "Used a copy of the live mcporter.json (no secrets present in that file; only a loopback baseUrl and local command paths) rather than the live file, per isolation rule."
   ],
-  "checked_at": "2026-09-23T00:35:00Z"
+  "checked_at": "2026-09-23T02:20:00Z"
 }

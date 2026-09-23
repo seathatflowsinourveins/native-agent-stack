@@ -5,30 +5,119 @@ receipts where one exists, run natively on this host under an isolated cache
 prefix (`$HOME/.cache/sota-refresh-20260923/pins-tools/`; nothing was
 installed onto PATH, `~/.config`, or any live service).
 
+This is the fix round after an independent Opus review of the first pass.
+Every finding below was investigated and resolved by re-running the affected
+checks with corrected commands and honest, verbatim evidence; see "Fix round
+changes" for what changed and why.
+
 | component | from | to | published_at | verdict | evidence class | receipt |
 |---|---|---|---|---|---|---|
 | mcporter | 0.13.13 | v0.14.0 | 2026-09-22T09:54:57Z | qualified | native_proven | [mcporter.json](mcporter.json) |
 | agentsview | v0.43.0 | v0.44.0 | 2026-09-21T13:56:12Z | qualified | native_proven | [agentsview.json](agentsview.json) |
 | openresearch | v0.2.7 | v0.2.8 | 2026-09-22T03:20:42Z | qualified | native_proven | [openresearch.json](openresearch.json) |
 | langgraph | 1.2.11 | 1.2.12 | 2026-09-21T14:43:28Z | qualified | local_integration | [langgraph.json](langgraph.json) |
-| opensandbox | server v0.2.3 | release-1.1.0 | 2026-09-21T07:46:25Z | blocked | source_review | [opensandbox.json](opensandbox.json) |
+| opensandbox | server v0.2.3 | release-1.1.0 | 2026-09-21T07:46:25Z | blocked | native_proven (partial offline surface); functional core blocked | [opensandbox.json](opensandbox.json) |
 
-## Notes
+## Fix round changes
+
+- **langgraph (major)**: `smoke_test.py` is now stored in this repository at
+  [langgraph-smoke-test/smoke_test.py](langgraph-smoke-test/smoke_test.py)
+  (sha256 `8405ef4086b1ab134658027ed156d9a62a8a3b454a7ad39584a162945bfae646`,
+  listed in `manifests/evidence.json`), not only in the unit's `.cache/`
+  prefix. Full raw stdout for each venv (starting at `langgraph version:
+  ...`, matching the script's actual print order) plus each run's exit code
+  is recorded at
+  [langgraph-smoke-test/out_1.2.11.txt](langgraph-smoke-test/out_1.2.11.txt)
+  and
+  [langgraph-smoke-test/out_1.2.12.txt](langgraph-smoke-test/out_1.2.12.txt)
+  and quoted verbatim (not edited) in `langgraph.json`. The test now also
+  builds a second, checkpointed graph using
+  `langgraph.checkpoint.memory.InMemorySaver` -- the exact import this
+  repository's own catalog names
+  (`catalogs/us-equities/agents-operations.json` id=langgraph,
+  `catalogs/us-equities/architecture/foundation.json` acceptance_gate) -- and
+  exercises an `interrupt()` / `Command(resume=...)` pause-and-resume cycle
+  on a single `thread_id`, checking `get_state()` and
+  `get_state_history()`. Both venvs pass identically except that 1.2.12's
+  `Interrupt` repr gained a `response_schema=None` field. `acceptance_check_ref`
+  now cites the exact catalog lines and states plainly which catalog-named
+  gaps (persistent non-memory checkpointer, `LANGGRAPH_STRICT_MSGPACK`,
+  upstream `uv sync --frozen --group test --no-dev`) this receipt still does
+  not close.
+- **opensandbox (major)**: this repository's own catalog
+  (`catalogs/us-equities/agents-operations.json` id=opensandbox) already
+  lists an offline `opensandbox-server --help` command and a
+  `pip install opensandbox` SDK-import command as its native_workflow
+  surface, explicitly noting "help/import is not isolation proof" -- i.e.
+  these were always meant to be run without Docker, the same way
+  openresearch/agentsview's version-help checks run without a search key.
+  The fix round actually runs both at release-1.1.0 (`opensandbox-server`
+  0.2.3 vs 1.1.0 via `uvx`, `opensandbox` SDK 0.1.16 vs 1.1.0 via `uv pip
+  install` + `import opensandbox`) and records full output, exit codes and a
+  diff: the server `--help` gained a `migrate-snapshots` subcommand matching
+  the release's PostgreSQL snapshot-store feature; the SDK's importable name
+  set is identical. The overall verdict stays `blocked` because the
+  component's actual function (sandbox creation/isolation) still cannot be
+  exercised on this host, but the receipt no longer claims "no offline
+  surface exists" -- it names and runs the one the catalog already
+  specified, then still blocks on the functional core.
+- **opensandbox (minor, preregistration timing/attribution)**: the
+  preregistration text no longer states the Docker-absence conclusion before
+  it was checked; the `which docker podman docker-compose` and `test -S
+  /var/run/docker.sock` commands are now listed with their exact exit codes
+  (all 1/absent) recorded in `results`, run before the conclusion is drawn.
+  The release-notes quote is now correctly attributed and separated:
+  `release_notes_excerpt` is the GitHub release body itself (`gh api
+  .../releases/latest --jq '.body'`), and the Docker requirement is
+  separately attributed to `README.md` at the resolved commit
+  `b1a29cf93a823a95913f7943010febb3f29de05c` (tag `release-1.1.0`), lines
+  166-169, fetched via `raw.githubusercontent.com`.
+- **mcporter (minor)**: the receipt no longer claims the 0.14.0 `list`
+  output "matched retained 0.13.13 receipt byte-for-byte aside from version
+  string." It now says plainly that per-server timings are not deterministic
+  (the retained receipt shows socraticode at 0.2s; this unit's own re-run of
+  0.13.13 in the same session shows 0.4s, and 0.14.0 shows 0.5s) and that the
+  byte-identical claim applies only to server names, tool counts and
+  health/error text against the retained receipt, plus a full byte-for-byte
+  comparison against a same-session 0.13.13 re-run. `mcporter --help` is now
+  an actual listed command for both versions, with exit codes recorded and a
+  `diff`/sha256 confirming the full --help output (not just a prose summary)
+  is byte-identical between 0.13.13 and 0.14.0.
+- **agentsview / openresearch (minor, exit codes and pipefail)**: all
+  `--help | head -1` pipelines are now run as `bash -o pipefail -c '...; rc=$?;
+  ...; exit $rc'`, matching the retained receipts' own command shape, and
+  every command's exit code is recorded in `results` (previously none were).
+  `old_0_43_0_version`/`old_0_2_7_version` now have matching `--version`
+  commands listed in `commands`. openresearch's `discover_subcommand_tree`
+  narrative is replaced with a real `orx discover --help` capture from both
+  versions, sha256-hashed and diffed (identical), and the preregistration no
+  longer claims this will be "byte-identical to the retained pin's output"
+  since the retained receipt (`evidence/artifacts/claude-upstream-checks-20260921/results.json`
+  id=openresearch) only captured `--version` and the first `--help` line,
+  never `discover --help`; the receipt now says plainly this is a
+  same-session v0.2.7-vs-v0.2.8 comparison, not a retained-receipt
+  comparison. agentsview's full `--help` body diff (beyond line 1) is also
+  now recorded and shows 0.44.0 adds `clickhouse`, `export conversations`,
+  `export range` and `insight` subcommands plus new environment variables --
+  new functional surface not exercised by this version-help-scoped receipt,
+  called out explicitly in `limits`.
+
+## Notes (carried from the original pass, still accurate)
 
 - **mcporter**: installed the npm package `mcporter@0.14.0` into an isolated
   prefix (no linux_x86_64 GitHub-release binary exists for this version; the
   project ships as an npm package plus darwin tarballs). Ran `list` against a
   **copy** of `$HOME/codex-ecosystem/config/mcporter.json` (never the
-  live file); output is byte-identical to the retained 0.13.13 receipt aside
-  from the version string. That config copy carries only a loopback baseUrl
-  and local command paths, no stored secrets.
+  live file). That config copy carries only a loopback baseUrl and local
+  command paths, no stored secrets.
 - **agentsview**: downloaded the linux_amd64 release tarball, verified its
   sha256 against the release's published `SHA256SUMS`, and compared
-  `--version`/`--help` to the retained version-help receipt; matched.
+  `--version`/`--help` to the retained version-help receipt; matched on the
+  scope the retained receipt covers (line 1).
 - **openresearch**: downloaded the musl linux CLI tarball, verified its
   sha256 against the release's `.sha256` sidecar, and compared
-  `--version`/`--help`/`discover --help` (offline, no key needed) to the
-  retained pin; matched. Functional search subcommands
+  `--version`/`--help`/`discover --help` (offline, no key needed) between
+  0.2.7 and 0.2.8; matched. Functional search subcommands
   (`discover keyword/embedding/openalex/biorxiv`, `paper`, `login`) need a
   stored alphaXiv/OpenAlex account or key this unit was not given, so they
   were not run and are recorded as not attempted, not as passing.
@@ -37,21 +126,26 @@ installed onto PATH, `~/.config`, or any live service).
   `uv`-managed venvs (system Python's `venv` module could not run
   `ensurepip` without `apt install python3.12-venv`, which was out of scope
   for an unprivileged unit-owned install; `uv venv` avoided that dependency)
-  and ran an identical from-scratch StateGraph build/compile/invoke/stream
-  smoke test on 1.2.11 and 1.2.12; both passed identically. Labeled
+  and ran an extended build/compile/invoke/stream + checkpointer
+  pause-resume smoke test on 1.2.11 and 1.2.12; both passed identically
+  (exit 0) aside from a minor `Interrupt` repr addition in 1.2.12. Labeled
   `local_integration`, not `native_proven`, since there is no retained
-  receipt to re-run for comparison.
+  receipt to re-run for comparison, and the upstream `uv sync --frozen
+  --group test --no-dev` test suite was not run.
 - **opensandbox**: the upstream README states Docker is required for local
   execution (or Kubernetes for cluster execution); this host has neither
-  Docker, Podman, nor a docker.sock, and provisioning a container runtime is
-  host-level infrastructure outside a unit-owned cache-prefix install.
-  Recorded `blocked` with the exact missing requirement; no credential or
-  broker contact was needed to reach this determination.
+  Docker, Podman, docker-compose, nor a docker.sock (all checked, all
+  absent/exit 1), and provisioning a container runtime is host-level
+  infrastructure outside a unit-owned cache-prefix install. The catalog's
+  own offline help/import surface was run and matched (see above); the
+  overall verdict remains `blocked` for the component's actual function. No
+  credential or broker contact was needed to reach this determination.
 
 ## Isolation
 
 All installs live under `$HOME/.cache/sota-refresh-20260923/pins-tools/`
-(npm prefix, extracted release tarballs, two `uv` venvs). No binary on PATH
-was replaced, no live config was edited, no systemd unit or shell profile was
-touched, and no long-running process was left behind (no daemons/servers were
-started for any of these five checks).
+(npm prefix, extracted release tarballs, four `uv` venvs: two for the
+langgraph graph smoke test, two for the opensandbox SDK import check). No
+binary on PATH was replaced, no live config was edited, no systemd unit or
+shell profile was touched, and no long-running process was left behind (no
+daemons/servers were started for any of these five checks).
