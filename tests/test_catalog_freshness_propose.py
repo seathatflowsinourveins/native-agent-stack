@@ -400,78 +400,142 @@ class IsGitTrackedTests(unittest.TestCase):
         self.assertTrue(fp.is_git_tracked(self.root, "docs/index.html"))
 
 
+def _init_scratch_git(path: Path) -> None:
+    git_env = ["-c", "user.email=scratch@example.invalid", "-c", "user.name=scratch"]
+    subprocess.run(["git", "init", "-q"], cwd=path, check=True)
+    subprocess.run(["git", *git_env, "add", "-A"], cwd=path, check=True)
+    subprocess.run(["git", *git_env, "commit", "-q", "-m", "scratch snapshot"], cwd=path, check=True)
+
+
+def _run_propose_cli(scratch: Path, artifact_dir: Path, checked_at="2026-09-23T00:00:00Z"):
+    return subprocess.run(
+        ["python3", "scripts/freshness_propose.py", "--artifact-dir", str(artifact_dir),
+         "--run-url", "https://example.invalid/run/1", "--checked-at-utc", checked_at],
+        cwd=scratch, capture_output=True, text=True, timeout=180,
+    )
+
+
+def _make_artifact(scratch: Path, name: str, rows=("gitleaks",)) -> Path:
+    artifact_dir = scratch / name
+    artifact_dir.mkdir(exist_ok=True)
+    (artifact_dir / "drift.md").write_text(_drift_md(list(rows)), encoding="utf-8")
+    (artifact_dir / "manifest-20260923.json").write_text(
+        json.dumps({"foundation": [], "trading": [], "counts": {}}), encoding="utf-8",
+    )
+    return artifact_dir
+
+
 @unittest.skipUnless(shutil.which("git"), "git is required to build the scratch checkout")
 class RebuildExplorerSubprocessTests(unittest.TestCase):
-    """A real subprocess invocation of scripts/freshness_propose.py's CLI against a
-    throwaway, git-tracked copy of this repository, with docs/ecosystem/index.html
-    tracked -- the exact path H1 broke (build_ecosystem.py's own stdout leaking into
-    main()'s single-JSON-document stdout, making `json.load` fail with "Extra data").
-    Uses a plain filesystem copy plus a fresh, single-commit git history (fast: under
-    a second), which is sufficient for is_git_tracked() and scripts/validate.py, but
-    is NOT real project history -- host_receipts.py validate (which resolves existing
-    receipts' pinned commits) is intentionally not run against this scratch copy.
+    """Real subprocess invocations of scripts/freshness_propose.py's CLI against a
+    throwaway, git-tracked copy of this repository, guarding the H1 fix
+    (build_ecosystem.py's own stdout leaking into main()'s single-JSON-document
+    stdout, making `json.load` fail with "Extra data").
+
+    docs/ecosystem/index.html is untracked and .gitignore'd on main
+    (docs/decisions/2026-09-23-generated-explorer-sorted-manifest.md), so a
+    plain copy of this repository has it absent -- that is the default,
+    normal-case fixture below. `TrackedExplorerSubprocessTests` (a separate
+    class) additionally builds and tracks the file inside its own scratch
+    copy, to keep exercising rebuild_explorer()'s branch even though it is
+    currently unreachable from a checkout of main.
+
+    Uses a plain filesystem copy plus a fresh, single-commit git history
+    (fast: well under a second), which is sufficient for is_git_tracked() and
+    scripts/validate.py, but is NOT real project history -- host_receipts.py
+    validate (which resolves existing receipts' pinned commits) is
+    intentionally not run against either scratch copy.
     """
 
     @classmethod
     def setUpClass(cls):
-        cls.scratch = Path(tempfile.mkdtemp(prefix="freshness-explorer-scratch-"))
+        cls.scratch = Path(tempfile.mkdtemp(prefix="freshness-default-scratch-"))
         shutil.copytree(
             ROOT, cls.scratch, dirs_exist_ok=True,
             ignore=shutil.ignore_patterns(".git", "__pycache__", "*.pyc", ".pytest_cache"),
         )
-        git_env = ["-c", "user.email=scratch@example.invalid", "-c", "user.name=scratch"]
-        subprocess.run(["git", "init", "-q"], cwd=cls.scratch, check=True)
-        subprocess.run(["git", *git_env, "add", "-A"], cwd=cls.scratch, check=True)
-        subprocess.run(["git", *git_env, "commit", "-q", "-m", "scratch snapshot"], cwd=cls.scratch, check=True)
-        assert fp.is_git_tracked(cls.scratch, fp.EXPLORER_PATH), \
-            "fixture setup assumption failed: docs/ecosystem/index.html must be tracked in the scratch copy"
+        _init_scratch_git(cls.scratch)
+        assert not fp.is_git_tracked(cls.scratch, fp.EXPLORER_PATH), \
+            "fixture setup assumption failed: docs/ecosystem/index.html must NOT be tracked by default"
 
     @classmethod
     def tearDownClass(cls):
         shutil.rmtree(cls.scratch, ignore_errors=True)
 
-    def _run_cli(self, artifact_dir, checked_at="2026-09-23T00:00:00Z"):
-        return subprocess.run(
-            ["python3", "scripts/freshness_propose.py", "--artifact-dir", str(artifact_dir),
-             "--run-url", "https://example.invalid/run/1", "--checked-at-utc", checked_at],
-            cwd=self.scratch, capture_output=True, text=True, timeout=180,
-        )
+    def test_main_stdout_is_exactly_one_json_document(self):
+        artifact_dir = _make_artifact(self.scratch, "artifact-h1")
+        result = _run_propose_cli(self.scratch, artifact_dir, checked_at="2026-09-23T01:00:00Z")
+        self.assertEqual(result.returncode, 0, result.stderr[-3000:])
+        parsed = json.loads(result.stdout)  # raises json.JSONDecodeError("Extra data", ...) if H1 regresses
+        self.assertFalse(parsed["rehashed_explorer"])  # the default, untracked-explorer path
+        self.assertEqual(parsed["component_ids"], ["gitleaks"])
 
-    def _make_artifact(self, name="artifact-in"):
-        artifact_dir = self.scratch / name
-        artifact_dir.mkdir(exist_ok=True)
-        (artifact_dir / "drift.md").write_text(_drift_md(["gitleaks"]), encoding="utf-8")
-        (artifact_dir / "manifest-20260923.json").write_text(
-            json.dumps({"foundation": [], "trading": [], "counts": {}}), encoding="utf-8",
+    def test_general_publication_validator_passes_after_the_run(self):
+        artifact_dir = _make_artifact(self.scratch, "artifact-validate")
+        result = _run_propose_cli(self.scratch, artifact_dir, checked_at="2026-09-23T02:00:00Z")
+        self.assertEqual(result.returncode, 0, result.stderr[-3000:])
+        checked = subprocess.run(
+            ["python3", "scripts/validate.py"], cwd=self.scratch, capture_output=True, text=True, timeout=60,
         )
-        return artifact_dir
+        self.assertEqual(checked.returncode, 0, checked.stdout + checked.stderr)
+
+
+@unittest.skipUnless(shutil.which("git"), "git is required to build the scratch checkout")
+class TrackedExplorerSubprocessTests(unittest.TestCase):
+    """The non-default edge case, kept for forward compatibility: if
+    docs/ecosystem/index.html were ever tracked again, rebuild_explorer()'s
+    --write/register/--check loop must still work and must still keep
+    main()'s stdout to exactly one JSON document (H1). This path is dead
+    code on the current main (the file is .gitignore'd there), which is why
+    it is a separate, explicitly-labeled class rather than the default
+    fixture above.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        cls.scratch = Path(tempfile.mkdtemp(prefix="freshness-tracked-scratch-"))
+        shutil.copytree(
+            ROOT, cls.scratch, dirs_exist_ok=True,
+            ignore=shutil.ignore_patterns(".git", "__pycache__", "*.pyc", ".pytest_cache"),
+        )
+        built = subprocess.run(
+            ["python3", "scripts/build_ecosystem.py", "--write"],
+            cwd=cls.scratch, capture_output=True, text=True, timeout=120,
+        )
+        assert built.returncode == 0, f"fixture setup could not build the explorer: {built.stdout + built.stderr}"
+        # .gitignore (copied along with everything else) excludes this file on main
+        # (docs/decisions/2026-09-23-generated-explorer-sorted-manifest.md); force-add
+        # it here specifically, to simulate the "if it were tracked again" case this
+        # class exists to keep exercising.
+        git_env = ["-c", "user.email=scratch@example.invalid", "-c", "user.name=scratch"]
+        subprocess.run(["git", "init", "-q"], cwd=cls.scratch, check=True)
+        subprocess.run(["git", *git_env, "add", "-A"], cwd=cls.scratch, check=True)
+        subprocess.run(["git", *git_env, "add", "-f", str(fp.EXPLORER_PATH)], cwd=cls.scratch, check=True)
+        subprocess.run(["git", *git_env, "commit", "-q", "-m", "scratch snapshot"], cwd=cls.scratch, check=True)
+        assert fp.is_git_tracked(cls.scratch, fp.EXPLORER_PATH), \
+            "fixture setup assumption failed: docs/ecosystem/index.html must be tracked in this scratch copy"
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls.scratch, ignore_errors=True)
 
     def test_main_stdout_is_exactly_one_json_document_with_tracked_explorer(self):
-        artifact_dir = self._make_artifact("artifact-h1")
-        result = self._run_cli(artifact_dir, checked_at="2026-09-23T01:00:00Z")
+        artifact_dir = _make_artifact(self.scratch, "artifact-h1-tracked")
+        result = _run_propose_cli(self.scratch, artifact_dir, checked_at="2026-09-23T03:00:00Z")
         self.assertEqual(result.returncode, 0, result.stderr[-3000:])
         parsed = json.loads(result.stdout)  # raises json.JSONDecodeError("Extra data", ...) if H1 regresses
         self.assertTrue(parsed["rehashed_explorer"])
         self.assertEqual(parsed["component_ids"], ["gitleaks"])
 
     def test_explorer_check_passes_after_the_run(self):
-        artifact_dir = self._make_artifact("artifact-check")
-        result = self._run_cli(artifact_dir, checked_at="2026-09-23T02:00:00Z")
+        artifact_dir = _make_artifact(self.scratch, "artifact-check-tracked")
+        result = _run_propose_cli(self.scratch, artifact_dir, checked_at="2026-09-23T04:00:00Z")
         self.assertEqual(result.returncode, 0, result.stderr[-3000:])
         check = subprocess.run(
             ["python3", "scripts/build_ecosystem.py", "--check"],
-            cwd=self.scratch, capture_output=True, text=True, timeout=60,
+            cwd=self.scratch, capture_output=True, text=True, timeout=120,
         )
         self.assertEqual(check.returncode, 0, check.stdout + check.stderr)
-
-    def test_general_publication_validator_passes_after_the_run(self):
-        artifact_dir = self._make_artifact("artifact-validate")
-        result = self._run_cli(artifact_dir, checked_at="2026-09-23T03:00:00Z")
-        self.assertEqual(result.returncode, 0, result.stderr[-3000:])
-        checked = subprocess.run(
-            ["python3", "scripts/validate.py"], cwd=self.scratch, capture_output=True, text=True, timeout=60,
-        )
-        self.assertEqual(checked.returncode, 0, checked.stdout + checked.stderr)
 
 
 class CatalogFreshnessWorkflowTextTests(unittest.TestCase):
