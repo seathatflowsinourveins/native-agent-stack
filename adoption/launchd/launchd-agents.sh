@@ -46,12 +46,9 @@ usage() {
     '      loaded from any OTHER path or its load state cannot be' \
     '      confirmed. Never deletes the component'"'"'s own data or logs.' \
     '' \
-    'Labels (no trailing .plist): com.native-stack.qdrant and' \
-    'com.native-stack.ai-memory are the default set for install/status/remove' \
-    'when no --label is given; com.native-stack.llama-embed is left out of' \
-    'that default until a model argument exists (adoption/platforms/' \
-    'macos-arm64.md), but render/lint always cover it, and an explicit' \
-    '--label com.native-stack.llama-embed still installs it.'
+    'Labels (no trailing .plist): com.native-stack.qdrant,' \
+    'com.native-stack.ai-memory and com.native-stack.llama-embed are the' \
+    'default set for install/status/remove when no --label is given.'
 }
 
 script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd -P)"
@@ -68,13 +65,15 @@ default_render_dir="$state_dir/rendered"
 launch_agents_dir="$HOME/Library/LaunchAgents"
 
 all_labels=(com.native-stack.qdrant com.native-stack.ai-memory com.native-stack.llama-embed)
-# llama-embed needs a model file argument this draft does not have yet (see
-# adoption/platforms/macos-arm64.md); it stays a valid --label (still in
-# all_labels, above, for validation) but is left out of the default set for
-# install/status/remove until that exists. render/lint are unaffected: they
-# iterate every rendered template, not this list, so llama-embed can still
-# be previewed and lint-checked by default.
-default_labels=(com.native-stack.qdrant com.native-stack.ai-memory)
+# Round 3j (Codex P2 review thread 1): llama-embed used to be left out of
+# the default install/status/remove set because it needed a model file
+# argument this draft did not have yet. Round 3h's install_embed_model
+# (adoption/bootstrap-macos.sh) downloads and sha256-verifies that model
+# unconditionally, and the template's -m flag names it via
+# EMBED_MODEL_PATH above, so there is no longer a reason to leave it out
+# of the default set -- an explicit --label was the only way to reach it
+# before this.
+default_labels=(com.native-stack.qdrant com.native-stack.ai-memory com.native-stack.llama-embed)
 
 [[ $# -ge 1 ]] || { usage >&2; exit 2; }
 subcommand="$1"
@@ -429,18 +428,43 @@ cmd_lint() {
     printf 'Nothing rendered yet at %s; run the render subcommand first.\n' "$render_dir" >&2
     exit 1
   }
-  local plutil_bin failure_count=0 checked_count=0 plist
+  local plutil_bin failure_count=0 checked_count=0 plist expected_label actual_label
   plutil_bin="$(command -v plutil || true)"
   for plist in "$render_dir"/*.plist; do
     [[ -e "$plist" ]] || continue
     checked_count=$((checked_count + 1))
     if [[ -n "$plutil_bin" ]]; then
-      "$plutil_bin" -lint "$plist" || failure_count=$((failure_count + 1))
+      if ! "$plutil_bin" -lint "$plist"; then
+        failure_count=$((failure_count + 1))
+        continue
+      fi
     elif python3 -c 'import plistlib, sys
 with open(sys.argv[1], "rb") as handle:
     plistlib.load(handle)' "$plist"; then
       printf '%s: OK (python3 plistlib fallback; plutil unavailable on this host)\n' "$plist"
     else
+      failure_count=$((failure_count + 1))
+      continue
+    fi
+    # Round 3j (Codex P2 thread 7): the rendered filename IS the label
+    # every other subcommand addresses this plist by (dest_plist ==
+    # "$launch_agents_dir/$label.plist", and --label/selected_labels
+    # match it exactly); launchd itself also expects the plist's own
+    # Label key to agree with its filename. A mismatch here -- a rendered
+    # template whose Label was edited without renaming the file, or vice
+    # versa -- would install and bootstrap under one label while the file
+    # on disk claims another, silently. Only reached once the file has
+    # already passed syntax lint above, so plist_value's own plutil/
+    # plistlib fallback can trust it parses.
+    # Pure bash parameter expansion (never an external basename call): the
+    # rest of cmd_lint has no dependency beyond plutil-or-python3, and this
+    # keeps it that way.
+    expected_label="${plist##*/}"
+    expected_label="${expected_label%.plist}"
+    actual_label="$(plist_value "$plist" Label)"
+    if [[ "$actual_label" != "$expected_label" ]]; then
+      printf '%s: Label %s does not match its own filename (expected %s).\n' \
+        "$plist" "$actual_label" "$expected_label" >&2
       failure_count=$((failure_count + 1))
     fi
   done
@@ -516,18 +540,6 @@ cmd_install() {
       exit 1
     fi
 
-    # Every directory this plist writes into or runs from comes from ITS
-    # OWN declared StandardOutPath/StandardErrorPath/WorkingDirectory, never
-    # this shell's ECO_INSTALL_ROOT: a plist rendered with --host against a
-    # different host's value file can point anywhere, and launchd does not
-    # create missing parent directories for any of the three on its own.
-    for key in StandardOutPath StandardErrorPath; do
-      declared_path="$(plist_value "$source_plist" "$key")"
-      [[ -n "$declared_path" ]] && mkdir -p "$(dirname -- "$declared_path")"
-    done
-    declared_path="$(plist_value "$source_plist" WorkingDirectory)"
-    [[ -n "$declared_path" ]] && mkdir -p "$declared_path"
-
     # Step 2: stateless ownership. "Ours" means this label, loaded from
     # dest_plist's own path if it is loaded at all -- never a historical
     # ownership record, and never any successful `launchctl print` whose
@@ -586,6 +598,24 @@ cmd_install() {
         ;;
     esac
 
+    # Round 3j (Codex P2 thread 2): moved here, AFTER the ownership check
+    # above, not before it -- on loaded_elsewhere or unknown, install must
+    # touch nothing at all (both branches already exit 1 above), and
+    # creating these directories before that check ran meant a refused
+    # install still left new, empty directories behind under whatever this
+    # plist declares, even for a label this run has no business touching.
+    # Every directory this plist writes into or runs from comes from ITS
+    # OWN declared StandardOutPath/StandardErrorPath/WorkingDirectory, never
+    # this shell's ECO_INSTALL_ROOT: a plist rendered with --host against a
+    # different host's value file can point anywhere, and launchd does not
+    # create missing parent directories for any of the three on its own.
+    for key in StandardOutPath StandardErrorPath; do
+      declared_path="$(plist_value "$source_plist" "$key")"
+      [[ -n "$declared_path" ]] && mkdir -p "$(dirname -- "$declared_path")"
+    done
+    declared_path="$(plist_value "$source_plist" WorkingDirectory)"
+    [[ -n "$declared_path" ]] && mkdir -p "$declared_path"
+
     # Step 3: rename into place -- a single same-directory rename(2), never
     # a partial-copy state a signal or a disk-full error could leave
     # behind. Cleared immediately after: from here on there is nothing left
@@ -613,11 +643,23 @@ cmd_install() {
 }
 
 cmd_status() {
-  local label
+  # Round 3j (Codex P2 thread 8): status used to always exit 0, even when
+  # every requested label's launchctl print failed -- absent (exit 113)
+  # or launchd itself unavailable (any other nonzero exit) both silently
+  # reported success to a caller checking only the exit code, never its
+  # printed output. Any nonzero print (not just 113) counts, matching how
+  # cmd_remove already treats "not confidently loaded" for the same call.
+  local label print_status failed_count=0
   while IFS= read -r label; do
     printf -- '-- %s --\n' "$label"
-    launchctl print "gui/$(id -u)/$label" || printf '%s: launchctl print exited %s\n' "$label" "$?"
+    print_status=0
+    launchctl print "gui/$(id -u)/$label" || print_status=$?
+    if [[ "$print_status" != 0 ]]; then
+      printf '%s: launchctl print exited %s\n' "$label" "$print_status"
+      failed_count=$((failed_count + 1))
+    fi
   done < <(selected_labels)
+  [[ "$failed_count" -eq 0 ]]
 }
 
 # Round 3g: brew services' own `stop` (cli.rb @ 8e3a5dc0a7, roughly lines

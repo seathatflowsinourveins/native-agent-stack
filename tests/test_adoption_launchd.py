@@ -127,6 +127,23 @@ class TemplateRenderAndSchemaTests(unittest.TestCase):
         self.assertIn("--port", arguments)
         self.assertEqual(arguments[arguments.index("--port") + 1], "8232")
 
+    def test_ai_memory_scopes_to_the_selected_native_recipe_workspace_and_project(self):
+        # Round 3j (Codex P2 thread 5): matches the selected native
+        # recipe's own serve invocation exactly, recipes/README.md:244
+        # ("ai-memory serve --transport http --enable-web --bind
+        # 127.0.0.1:49374 --workspace local --project native-agent-stack")
+        # and docs/foundation-stack.md:51-52's identical workspace/project
+        # scope; without these two flags this agent would serve with no
+        # workspace or project scope at all.
+        rendered = string.Template(self.templates["com.native-stack.ai-memory.plist"].read_text()) \
+            .substitute(FIXTURE_VALUES)
+        data = plistlib.loads(rendered.encode("utf-8"))
+        arguments = data["ProgramArguments"]
+        self.assertIn("--workspace", arguments)
+        self.assertEqual(arguments[arguments.index("--workspace") + 1], "local")
+        self.assertIn("--project", arguments)
+        self.assertEqual(arguments[arguments.index("--project") + 1], "native-agent-stack")
+
     def test_llama_embed_names_the_model_file_via_m_flag(self):
         # Round 3h (2026-09-23 readiness audit defect): the template used to
         # run llama-server with no model argument at all -- KeepAlive would
@@ -282,6 +299,16 @@ class LaunchdAgentsScriptStructureTests(unittest.TestCase):
     def test_declares_the_five_subcommands(self):
         for subcommand in ("render", "lint", "install", "status", "remove"):
             self.assertIn(f"cmd_{subcommand.replace('-', '_')}", self.text)
+
+    def test_llama_embed_is_in_the_default_label_set(self):
+        # Round 3j (Codex P2 thread 1): the model download/verification
+        # llama-embed needed is unconditional since round 3h, so there is
+        # no longer a reason to leave it out of the default install/
+        # status/remove set (an explicit --label was the only way to
+        # reach it before this).
+        default_match = re.search(r"^default_labels=\(([^)]*)\)", self.text, re.M)
+        self.assertIsNotNone(default_match, "default_labels=(...) not found")
+        self.assertIn("com.native-stack.llama-embed", default_match.group(1).split())
 
     def test_lint_prefers_plutil_and_falls_back_to_plistlib(self):
         self.assertIn("plutil", self.text)
@@ -536,6 +563,61 @@ class LaunchdAgentsScriptBehaviorTests(unittest.TestCase):
         self.assertEqual(result.returncode, 2)
         self.assertIn("Unknown --label", result.stderr)
 
+    def test_status_exits_nonzero_when_a_requested_service_is_absent(self):
+        # Round 3j (Codex P2 thread 8): status used to always exit 0, even
+        # when a requested label's own launchctl print reported "Could not
+        # find service" (113) -- a caller checking only the exit code
+        # never saw the absence.
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            shim = tmp_path / "shim"
+            shim.mkdir()
+            (shim / "launchctl").write_text(
+                "#!/bin/sh\ncase \"$1\" in\n  print) exit 113 ;;\n  *) exit 0 ;;\nesac\n"
+            )
+            (shim / "launchctl").chmod(0o755)
+            env = {**os.environ, "PATH": f"{shim}{os.pathsep}{os.environ['PATH']}"}
+            result = self._run(["status", "--label", "com.native-stack.qdrant"], env=env)
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("launchctl print exited 113", result.stdout)
+
+    def test_status_exits_nonzero_when_launchd_itself_is_unavailable(self):
+        # Any other nonzero launchctl print exit (permission, launchd
+        # itself unresponsive, ...) must also fail status, not just 113.
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            shim = tmp_path / "shim"
+            shim.mkdir()
+            (shim / "launchctl").write_text(
+                "#!/bin/sh\ncase \"$1\" in\n  print) exit 5 ;;\n  *) exit 0 ;;\nesac\n"
+            )
+            (shim / "launchctl").chmod(0o755)
+            env = {**os.environ, "PATH": f"{shim}{os.pathsep}{os.environ['PATH']}"}
+            result = self._run(["status", "--label", "com.native-stack.qdrant"], env=env)
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("launchctl print exited 5", result.stdout)
+
+    def test_status_exits_zero_when_every_requested_service_is_loaded(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            eco_root = tmp_path / "eco"
+            fake_home = tmp_path / "home"
+            fake_home.mkdir()
+            log = tmp_path / "launchctl.log"
+            log.touch()
+            working_shim = self._launchctl_shim(tmp_path, log)
+            env = {
+                **os.environ,
+                "PATH": f"{working_shim}{os.pathsep}{os.environ['PATH']}",
+                "ECO_INSTALL_ROOT": str(eco_root),
+                "HOME": str(fake_home),
+            }
+            self.assertEqual(self._run(["render"], env=env).returncode, 0)
+            self.assertEqual(
+                self._run(["install", "--label", "com.native-stack.qdrant"], env=env).returncode, 0)
+            result = self._run(["status", "--label", "com.native-stack.qdrant"], env=env)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
     def _render_only_dir(self, tmp_path: Path) -> Path:
         eco_root = tmp_path / "eco"
         result = self._run(["render"], env={**os.environ, "ECO_INSTALL_ROOT": str(eco_root)})
@@ -576,7 +658,20 @@ class LaunchdAgentsScriptBehaviorTests(unittest.TestCase):
             shim = tmp_path / "plutil-shim"
             shim.mkdir()
             (shim / "plutil").write_text(
-                f'#!/bin/sh\nprintf "%s\\n" "plutil $*" >> {str(log)!r}\nexit 0\n'
+                "#!/bin/sh\n"
+                f'printf "%s\\n" "plutil $*" >> {str(log)!r}\n'
+                # -extract Label raw -o - PATH: round 3j's Label-vs-
+                # filename check calls this via plist_value; answer with
+                # the filename's own stem (this fixture's Label always
+                # equals it) rather than nothing, so this shim does not
+                # itself manufacture a false mismatch.
+                'if [ "$1" = "-extract" ]; then\n'
+                '  path="$6"\n'
+                '  base="${path##*/}"\n'
+                '  printf "%s" "${base%.plist}"\n'
+                '  exit 0\n'
+                'fi\n'
+                "exit 0\n"
             )
             (shim / "plutil").chmod(0o755)
             result = subprocess.run(
@@ -589,6 +684,28 @@ class LaunchdAgentsScriptBehaviorTests(unittest.TestCase):
             invocations = log.read_text()
             self.assertEqual(invocations.count("plutil -lint"), 3, invocations)
 
+    def test_lint_rejects_a_label_that_does_not_match_its_own_filename(self):
+        # Round 3j (Codex P2 thread 7): the rendered filename is the exact
+        # label every other subcommand addresses this plist by, and
+        # launchd itself expects the plist's own Label key to agree with
+        # its filename. A syntactically valid plist whose Label was
+        # edited without renaming the file (or vice versa) must fail
+        # lint, not just pass plutil's/plistlib's own syntax check.
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            rendered_dir = self._render_only_dir(tmp_path)
+            qdrant_plist = rendered_dir / "com.native-stack.qdrant.plist"
+            data = plistlib.loads(qdrant_plist.read_bytes())
+            self.assertEqual(data["Label"], "com.native-stack.qdrant")
+            data["Label"] = "com.native-stack.wrong-label"
+            qdrant_plist.write_bytes(plistlib.dumps(data))
+
+            result = self._run(["lint", "--dir", str(rendered_dir)], env={**os.environ})
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("com.native-stack.wrong-label", result.stderr)
+            self.assertIn("does not match its own filename", result.stderr)
+            self.assertIn("com.native-stack.qdrant", result.stderr)
+            self.assertIn("1 of 3 rendered plist(s) failed lint", result.stderr)
 
     def test_full_render_lint_install_status_remove_cycle_offline(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -618,22 +735,17 @@ class LaunchdAgentsScriptBehaviorTests(unittest.TestCase):
             install_result = self._run(["install"], env=env)
             self.assertEqual(install_result.returncode, 0, install_result.stdout + install_result.stderr)
             launch_agents_dir = fake_home / "Library" / "LaunchAgents"
-            # llama-embed is left out of the default install set until a
-            # model argument exists; only qdrant and ai-memory install here.
-            for label in ("com.native-stack.qdrant", "com.native-stack.ai-memory"):
+            # Round 3j: llama-embed is in the default install set now (the
+            # model download/verification it needed is unconditional since
+            # round 3h), so all three install here without an explicit
+            # --label.
+            for label in ("com.native-stack.qdrant", "com.native-stack.ai-memory", "com.native-stack.llama-embed"):
                 self.assertTrue((launch_agents_dir / f"{label}.plist").is_file(), label)
-            self.assertFalse((launch_agents_dir / "com.native-stack.llama-embed.plist").exists())
             self.assertTrue((eco_root / "state" / "logs").is_dir())
             self.assertTrue((eco_root / "state" / "qdrant").is_dir())
             # No stray "*.new.<pid>" temp file left behind by a completed install.
             leftover_temp = [p.name for p in launch_agents_dir.iterdir() if ".new." in p.name]
             self.assertEqual(leftover_temp, [], leftover_temp)
-
-            # An explicit --label still installs llama-embed even though the
-            # default set skips it.
-            explicit_install = self._run(["install", "--label", "com.native-stack.llama-embed"], env=env)
-            self.assertEqual(explicit_install.returncode, 0, explicit_install.stdout + explicit_install.stderr)
-            self.assertTrue((launch_agents_dir / "com.native-stack.llama-embed.plist").is_file())
 
             # Reinstalling an already-loaded label unloads it first, then
             # loads the fresh content (brew-services semantics: no
@@ -836,6 +948,51 @@ class LaunchdAgentsScriptBehaviorTests(unittest.TestCase):
             second_install = self._run(["install", "--label", "com.native-stack.qdrant"], env=env)
             self.assertNotEqual(second_install.returncode, 0, second_install.stdout + second_install.stderr)
             self.assertNotIn("bootout", log.read_text())
+
+    def test_install_creates_no_directories_when_it_refuses_on_loaded_elsewhere_or_unknown(self):
+        # Round 3j (Codex P2 thread 2): directory creation for the plist's
+        # own declared StandardOutPath/StandardErrorPath/WorkingDirectory
+        # used to run BEFORE the ownership check, so a refused install
+        # (loaded_elsewhere or unknown) still left new, empty directories
+        # behind. Moved to run only after that check passes; a refusal
+        # must touch nothing at all, matching the documented contract.
+        for state, print_body in (
+            ("loaded_elsewhere", 'echo "path = /some/other/unrelated.plist"; exit 0'),
+            ("unknown", "exit 5"),
+        ):
+            with self.subTest(state=state):
+                with tempfile.TemporaryDirectory() as tmp:
+                    tmp_path = Path(tmp)
+                    eco_root = tmp_path / "eco"
+                    fake_home = tmp_path / "home"
+                    fake_home.mkdir()
+                    shim = tmp_path / f"shim-{state}"
+                    shim.mkdir()
+                    (shim / "launchctl").write_text(
+                        "#!/bin/sh\n"
+                        'case "$1" in\n'
+                        f'  print) {print_body} ;;\n'
+                        "  *) exit 0 ;;\n"
+                        "esac\n"
+                    )
+                    (shim / "launchctl").chmod(0o755)
+                    env = {
+                        **os.environ,
+                        "PATH": f"{shim}{os.pathsep}{os.environ['PATH']}",
+                        "ECO_INSTALL_ROOT": str(eco_root),
+                        "HOME": str(fake_home),
+                    }
+                    self.assertEqual(self._run(["render"], env=env).returncode, 0)
+                    install_result = self._run(["install", "--label", "com.native-stack.qdrant"], env=env)
+                    self.assertNotEqual(install_result.returncode, 0,
+                                        install_result.stdout + install_result.stderr)
+                    # qdrant's own template declares StandardOutPath/
+                    # StandardErrorPath under state/logs and WorkingDirectory
+                    # under state/qdrant; neither must exist after a refusal.
+                    self.assertFalse((eco_root / "state" / "logs").exists(),
+                                     "a refused install must create no directories at all")
+                    self.assertFalse((eco_root / "state" / "qdrant").exists(),
+                                     "a refused install must create no directories at all")
 
     def test_install_refuses_when_print_fails_with_neither_loaded_nor_not_found(self):
         # Round 3g stateless-ownership rule, named test (unknown touches

@@ -876,6 +876,89 @@ class EmbeddingModelInstallTests(unittest.TestCase):
                               "plan mode must never touch the network or the filesystem")
 
 
+class QdrantConfigProvisionTests(unittest.TestCase):
+    """provision_qdrant_config (round 3j Codex P2 thread 4), extracted
+    verbatim and run standalone -- no real qdrant binary involved, only
+    the config file this profile's launchd plist has nowhere else to get
+    one from on a clean host."""
+
+    def _run_provision(self, tmp_path: Path, eco_root: Path, plan_mode: str = "0"):
+        harness = tmp_path / "harness.sh"
+        harness.write_text(
+            "set -Eeuo pipefail\n"
+            + _shell_functions(SCRIPT_PATH.read_text(), "provision_qdrant_config")
+            + f'ecosystem_root={json.dumps(str(eco_root))}\n'
+            + f"plan_mode={plan_mode}\n"
+            + "provision_qdrant_config\n"
+        )
+        return subprocess.run(["bash", str(harness)], capture_output=True, text=True, timeout=30)
+
+    def test_provisions_a_default_config_matching_the_selected_linux_recipe_shape(self):
+        import yaml
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            eco_root = tmp_path / "eco"
+            result = self._run_provision(tmp_path, eco_root)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            config_path = eco_root / "config" / "qdrant.yaml"
+            self.assertTrue(config_path.is_file())
+            data = yaml.safe_load(config_path.read_text())
+            # Mirrors examples/qdrant.yaml.example exactly: storage under
+            # $ECO_ROOT/state (never inside a version-pinned tools/<id>-
+            # <version> directory a later bump can replace wholesale),
+            # loopback bind, and port 16333 -- the same port
+            # adoption/hosts/macos-example.json's QDRANT_URL and
+            # recipes/README.md's qdrant row both name.
+            self.assertEqual(data["storage"]["storage_path"], str(eco_root / "state" / "qdrant" / "storage"))
+            self.assertEqual(data["storage"]["snapshots_path"], str(eco_root / "state" / "qdrant" / "snapshots"))
+            self.assertEqual(data["service"]["host"], "127.0.0.1")
+            self.assertEqual(data["service"]["http_port"], 16333)
+            self.assertIsNone(data["service"]["grpc_port"])
+            self.assertFalse(data["service"]["enable_cors"])
+            self.assertFalse(data["cluster"]["enabled"])
+            self.assertTrue(data["telemetry_disabled"])
+            self.assertTrue((eco_root / "state" / "qdrant" / "storage").is_dir())
+            self.assertTrue((eco_root / "state" / "qdrant" / "snapshots").is_dir())
+
+    def test_never_overwrites_an_existing_config(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            eco_root = tmp_path / "eco"
+            config_dir = eco_root / "config"
+            config_dir.mkdir(parents=True)
+            config_path = config_dir / "qdrant.yaml"
+            custom_config = "service:\n  host: 127.0.0.1\n  http_port: 26333\n# a person's own edited config\n"
+            config_path.write_text(custom_config)
+
+            result = self._run_provision(tmp_path, eco_root)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("left as is", result.stdout)
+            self.assertEqual(config_path.read_text(), custom_config,
+                              "an existing config must never be overwritten by the default")
+
+    def test_plan_mode_reports_without_writing(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            eco_root = tmp_path / "eco"
+            result = self._run_provision(tmp_path, eco_root, plan_mode="1")
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("plan", result.stdout)
+            self.assertFalse((eco_root / "config" / "qdrant.yaml").exists(),
+                              "plan mode must never touch the filesystem")
+
+    def test_plan_mode_reports_an_existing_config_would_be_left_alone(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            eco_root = tmp_path / "eco"
+            config_dir = eco_root / "config"
+            config_dir.mkdir(parents=True)
+            (config_dir / "qdrant.yaml").write_text("# already here\n")
+            result = self._run_provision(tmp_path, eco_root, plan_mode="1")
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("existing", result.stdout)
+            self.assertEqual((config_dir / "qdrant.yaml").read_text(), "# already here\n")
+
+
 class RealNpmLockfileEvidenceTests(unittest.TestCase):
     """Regression evidence for the finding that motivated
     install_platform_dependency's design (Codex/Opus review, 2026-09-23):
@@ -2482,6 +2565,50 @@ class CIRecordingToolingSmokeTests(unittest.TestCase):
         for doc_path in (ROOT / "adoption" / "bootstrap.md", PAGE_PATH):
             text = doc_path.read_text()
             self.assertIn("Python 3.9", text, doc_path)
+
+
+class CIWorkflowTriggerPathsTests(unittest.TestCase):
+    """Round 3j (Codex P2 thread 6): the push/pull_request paths triggers
+    must include every input the macOS jobs actually consume, not just
+    adoption/** and tools/adoption/** -- a change to, say,
+    scripts/host_receipts.py would otherwise never re-run this workflow
+    at all, even though validate-macos's recording-tooling gate and
+    recording smoke both depend on it directly."""
+
+    def setUp(self):
+        try:
+            import yaml
+        except ImportError:
+            self.skipTest("PyYAML not installed; these structural workflow checks run where it is")
+        with WORKFLOW_PATH.open() as handle:
+            self.workflow = yaml.safe_load(handle)
+        # "on" is a YAML 1.1 boolean keyword; PyYAML's SafeLoader parses
+        # the bare "on:" key as the Python value True, not the string "on".
+        self.triggers = self.workflow[True]
+
+    def test_every_macos_job_input_is_a_trigger_path(self):
+        for expected in (
+            "evidence/artifacts/macos-embed-reference-20260923/**",
+            "scripts/host_receipts.py",
+            "scripts/component_matrix.py",
+            "scripts/new_host_grand_list.py",
+            "tools/sota-convergence/build_verdicts.py",
+            "scripts/platform_status.py",
+            "scripts/validate_convergence.py",
+            "scripts/release_due.py",
+            "scripts/landscape.py",
+            "manifests/evidence.json",
+        ):
+            self.assertIn(expected, self.triggers["push"]["paths"], expected)
+            self.assertIn(expected, self.triggers["pull_request"]["paths"], expected)
+
+    def test_push_and_pull_request_trigger_on_the_same_paths(self):
+        # Both lists are maintained by hand, in parallel, right next to
+        # each other in the workflow file; asserting they stay identical
+        # means an edit to one path list that misses the other (a PR that
+        # never re-runs this workflow, or a push trigger with a stale
+        # list) is caught here rather than discovered as a silent gap.
+        self.assertEqual(self.triggers["push"]["paths"], self.triggers["pull_request"]["paths"])
 
 
 class EmbedAcceptanceScriptTests(unittest.TestCase):

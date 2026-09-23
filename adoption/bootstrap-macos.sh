@@ -946,6 +946,59 @@ install_embed_model() {
   printf 'Installed embedding model %s (%s bytes, sha256 verified) at %s\n' "$id" "$size" "$destination"
 }
 
+# Round 3j (Codex P2 thread 4, "the most important one"): nothing on a
+# clean host ever created $ECO_ROOT/config/qdrant.yaml -- the plist
+# template's own --config-path points there
+# (adoption/launchd/com.native-stack.qdrant.plist.template), but the only
+# thing that ever wrote it was the hosted CI step's own disposable file,
+# never this bootstrap. A fresh install_pin-installed qdrant binary would
+# have nothing to load its --config-path from at all. Mirrors the selected
+# Linux recipe's own reviewed shape byte-for-byte
+# (examples/qdrant.yaml.example, recipes/README.md "Local semantic code
+# search": loopback bind, telemetry and gRPC disabled, storage outside any
+# binary prefix): storage under $ECO_ROOT/state/qdrant (never inside
+# tools/<id>-<version>, which install_npm-style installs can replace
+# wholesale on a later version bump), 127.0.0.1, and port 16333 -- the
+# same port this profile's own QDRANT_URL host value
+# (adoption/hosts/macos-example.json) and recipes/README.md both name.
+# Never overwrites an existing file: a config a person has already tuned
+# (a different port, cluster settings, an API key) is never silently
+# replaced by this default.
+provision_qdrant_config() {
+  local config_path="$ecosystem_root/config/qdrant.yaml"
+  if [[ "$plan_mode" == 1 ]]; then
+    if [[ -e "$config_path" ]]; then
+      printf 'plan qdrant-config  (existing)  yaml      %s (left as is)\n' "$config_path"
+    else
+      printf 'plan qdrant-config  (default)   yaml      %s (would be written)\n' "$config_path"
+    fi
+    return 0
+  fi
+  if [[ -e "$config_path" ]]; then
+    printf 'Existing %s left as is (never overwritten by this default).\n' "$config_path"
+    return 0
+  fi
+  mkdir -p "$ecosystem_root/config" "$ecosystem_root/state/qdrant/storage" "$ecosystem_root/state/qdrant/snapshots"
+  cat > "$config_path.partial" <<EOF
+# Provisioned by adoption/bootstrap-macos.sh's provision_qdrant_config
+# (round 3j); mirrors examples/qdrant.yaml.example. Edit freely -- once
+# this file exists, this bootstrap never overwrites or removes it again.
+storage:
+  storage_path: $ecosystem_root/state/qdrant/storage
+  snapshots_path: $ecosystem_root/state/qdrant/snapshots
+service:
+  host: 127.0.0.1
+  http_port: 16333
+  grpc_port: null
+  enable_cors: false
+cluster:
+  enabled: false
+telemetry_disabled: true
+EOF
+  mv -- "$config_path.partial" "$config_path"
+  printf 'Provisioned default qdrant config at %s\n' "$config_path"
+}
+
 install_pin() {
   local id="$1"
   local entry
@@ -1000,6 +1053,12 @@ done
 # needs it. install_embed_model handles plan_mode internally, the same way
 # install_pin does.
 install_embed_model
+
+# Round 3j: likewise unconditional -- qdrant is always in this profile's
+# default component set, and its own launchd plist has nowhere else to
+# get a config from. provision_qdrant_config handles plan_mode internally
+# and never overwrites an existing file.
+provision_qdrant_config
 
 if [[ "$plan_mode" == 1 ]]; then
   printf 'Plan only for profile %s on macOS %s: nothing was downloaded or installed.\n' "$profile_id" "$macos_version"

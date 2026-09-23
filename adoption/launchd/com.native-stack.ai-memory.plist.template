@@ -13,6 +13,17 @@
   adoption/bootstrap-macos.sh places on PATH. Hooks install, MCP
   registration and any managed run remain separate macOS steps with no
   receipt yet (adoption/pins-macos-arm64.json, ai-memory install_note).
+  Round 3j (Codex P2 thread 5): the workspace flag (local) and project
+  flag (native-agent-stack) below match the exact selected native
+  recipe's own serve invocation, quoting recipes/README.md:244: ai-memory
+  serve with a transport flag of http, an enable-web flag, a bind flag of
+  127.0.0.1:49374, a workspace flag of local and a project flag of
+  native-agent-stack (docs/foundation-stack.md:51-52 documents the same
+  workspace/project scope). Without these two flags, this agent would
+  serve with no workspace or project scope at all, unlike every other
+  documented ai-memory invocation in this project: write-page, search and
+  read-page all pass this same workspace/project pair too
+  (recipes/README.md:263-267).
 -->
 <plist version="1.0">
 <dict>
@@ -28,6 +39,10 @@
         <string>http</string>
         <string>--bind</string>
         <string>${AI_MEMORY_URL}</string>
+        <string>--workspace</string>
+        <string>local</string>
+        <string>--project</string>
+        <string>native-agent-stack</string>
     </array>
     <key>RunAtLoad</key>
     <true/>

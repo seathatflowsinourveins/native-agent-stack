@@ -3039,8 +3039,8 @@
     },
     {
       "path": ".github/workflows/adoption-bootstrap.yml",
-      "sha256": "d97fc5c08288c6dae0ba2ae74d12764d5e16087973022b0e319a7fec104ce4d8",
-      "bytes": 30073
+      "sha256": "6943e9be5b85f83eed08dcef0fabf2e25f3a4dde385af86be454d9acf7dfbf9e",
+      "bytes": 31324
     },
     {
       "path": ".github/workflows/catalog-freshness.yml",
@@ -3144,8 +3144,8 @@
     },
     {
       "path": "adoption/bootstrap-macos.sh",
-      "sha256": "34e0d78936ffb7521cf9bae2a462886db2f6994155a0e4a67b4bd535c3501218",
-      "bytes": 51796
+      "sha256": "257f6756f5bec1e8eaf7bfec0fa0c93f96f2b1c347dee04534f2d3eab96ccfc0",
+      "bytes": 54524
     },
     {
       "path": "adoption/bootstrap.md",
@@ -3174,8 +3174,8 @@
     },
     {
       "path": "adoption/launchd/com.native-stack.ai-memory.plist.template",
-      "sha256": "779b345c263ac517976476ed21cee8dd908b773cb351b1ab642566c83f0046db",
-      "bytes": 1856
+      "sha256": "be1278a7d2134d771fa041a74c898a78127b42adf799e27f951c11fdb6749545",
+      "bytes": 2730
     },
     {
       "path": "adoption/launchd/com.native-stack.llama-embed.plist.template",
@@ -3189,8 +3189,8 @@
     },
     {
       "path": "adoption/launchd/launchd-agents.sh",
-      "sha256": "57886ee6cc3f9f5e182fdb204dff373fcb05a909d22acb593b63fbe2ac366f2d",
-      "bytes": 34784
+      "sha256": "1a7508626e59509ee97bfc2517463ba9ed771f5279ca5cfa7abc119403deba3e",
+      "bytes": 37066
     },
     {
       "path": "adoption/lifecycle.md",
@@ -3249,8 +3249,8 @@
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
-      "sha256": "fc596ef833249b681beab8160255f4bb97f912c094d9e7eb2783e6888dac74e0",
-      "bytes": 31658
+      "sha256": "f01728afc16ae7e2c8a0ee64918bac7f93794025eeef9a91eaddf2c1fb9c535c",
+      "bytes": 32991
     },
     {
       "path": "adoption/pre-login-observation.json",
@@ -14580,8 +14580,8 @@
     },
     {
       "path": "tests/test_adoption_bootstrap_macos.py",
-      "sha256": "de2839f07e9311706c40e15b1a718a41bb9dc0ffdb04468d3b14e7d3957b0ccc",
-      "bytes": 151637
+      "sha256": "338e3907e6d5cb3053b7d0b7af82378b0c8a1829dc64bf64ffcacb6e478d544e",
+      "bytes": 158390
     },
     {
       "path": "tests/test_adoption_contract.py",
@@ -14595,8 +14595,8 @@
     },
     {
       "path": "tests/test_adoption_launchd.py",
-      "sha256": "0c95cc427060e199df169eb2704f7bd0e85e08dfd806c2dd6d561a9b78865b1c",
-      "bytes": 88648
+      "sha256": "78f2190610770ff7af561886dbb63ea0e70c2afae2e100c9405109e4107f4b0f",
+      "bytes": 97478
     },
     {
       "path": "tests/test_adoption_status.py",
@@ -14970,8 +14970,8 @@
     },
     {
       "path": "tests/test_workflow_hardening.py",
-      "sha256": "0b22ae44add64fdb32f892352f526fac76ba7a279192d886e51a1d769300ac9b",
-      "bytes": 17753
+      "sha256": "3085c8952788857a4178b4692f7327f71f675feb062689d5b751baba024f28a0",
+      "bytes": 23081
     },
     {
       "path": "tests/test_workflow_security.py",

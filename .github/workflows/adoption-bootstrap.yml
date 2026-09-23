@@ -18,6 +18,18 @@ on:
       - 'scripts/landscape.py'
       - 'scripts/build_ecosystem.py'
       - 'scripts/adoption_status.py'
+      # Round 3j (Codex P2 thread 6): every input validate-macos's
+      # recording-tooling gate and recording smoke actually consume, not
+      # only adoption/** and tools/adoption/**.
+      - 'evidence/artifacts/macos-embed-reference-20260923/**'
+      - 'scripts/host_receipts.py'
+      - 'scripts/component_matrix.py'
+      - 'scripts/new_host_grand_list.py'
+      - 'tools/sota-convergence/build_verdicts.py'
+      - 'scripts/platform_status.py'
+      - 'scripts/validate_convergence.py'
+      - 'scripts/release_due.py'
+      - 'manifests/evidence.json'
       - 'blueprints/convergence-practice/wsl-native-tools/pins.json'
       - '.github/workflows/adoption-bootstrap.yml'
   pull_request:
@@ -31,6 +43,15 @@ on:
       - 'scripts/landscape.py'
       - 'scripts/build_ecosystem.py'
       - 'scripts/adoption_status.py'
+      - 'evidence/artifacts/macos-embed-reference-20260923/**'
+      - 'scripts/host_receipts.py'
+      - 'scripts/component_matrix.py'
+      - 'scripts/new_host_grand_list.py'
+      - 'tools/sota-convergence/build_verdicts.py'
+      - 'scripts/platform_status.py'
+      - 'scripts/validate_convergence.py'
+      - 'scripts/release_due.py'
+      - 'manifests/evidence.json'
       - 'blueprints/convergence-practice/wsl-native-tools/pins.json'
       - '.github/workflows/adoption-bootstrap.yml'
   schedule:
@@ -339,14 +360,20 @@ jobs:
             echo "qdrant binary absent at $ECO_INSTALL_ROOT/bin/qdrant after a bootstrap that selects it; failing." >&2
             exit 1
           fi
-          mkdir -p "$RUNNER_TEMP/qdrant-smoke-storage" "$ECO_INSTALL_ROOT/config"
-          # Disposable smoke config for this run only, not a shipped default.
-          printf 'storage:\n  storage_path: %s\nservice:\n  http_port: 6333\n' \
-            "$RUNNER_TEMP/qdrant-smoke-storage" > "$ECO_INSTALL_ROOT/config/qdrant.yaml"
+          # Round 3j (Codex P2 thread 4): the bootstrap step above already
+          # provisioned $ECO_INSTALL_ROOT/config/qdrant.yaml via
+          # provision_qdrant_config (adoption/bootstrap-macos.sh) -- storage
+          # under state/qdrant, loopback, port 16333 -- so this step no
+          # longer writes its own disposable config; it uses that one,
+          # unmodified, exactly the config a real install would use.
+          if [ ! -f "$ECO_INSTALL_ROOT/config/qdrant.yaml" ]; then
+            echo "$ECO_INSTALL_ROOT/config/qdrant.yaml absent after a bootstrap that provisions it; failing." >&2
+            exit 1
+          fi
           bash adoption/launchd/launchd-agents.sh install --label com.native-stack.qdrant
           healthy=0
           for _ in $(seq 1 15); do
-            if curl --fail --silent --show-error http://127.0.0.1:6333/ >"$RUNNER_TEMP/qdrant-health.json"; then
+            if curl --fail --silent --show-error http://127.0.0.1:16333/ >"$RUNNER_TEMP/qdrant-health.json"; then
               healthy=1
               break
             fi
@@ -354,11 +381,11 @@ jobs:
           done
           bash adoption/launchd/launchd-agents.sh remove --label com.native-stack.qdrant
           if [ "$healthy" -ne 1 ]; then
-            echo "qdrant launchd agent never answered http://127.0.0.1:6333/ within 15s." >&2
+            echo "qdrant launchd agent never answered http://127.0.0.1:16333/ within 15s." >&2
             exit 1
           fi
           cat "$RUNNER_TEMP/qdrant-health.json"
-          echo "qdrant launchd agent answered http://127.0.0.1:6333/ (bootstrapped, health-checked, then booted out)."
+          echo "qdrant launchd agent answered http://127.0.0.1:16333/ (bootstrapped, health-checked, then booted out)."
       - name: Collect the artifact payload
         if: always()
         shell: bash

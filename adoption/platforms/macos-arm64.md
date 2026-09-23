@@ -182,44 +182,69 @@ binary, instead of a bare symlink.
 ## What a hosted run proves
 
 The `platform_profiles` row for `macos-arm64` names a hosted smoke job
-(`.github/workflows/adoption-bootstrap.yml`, job `bootstrap-macos`) whose status
-is `green_on_hosted_runner`. It has run green twice: run `35753384567` at head
-`585032a` (the macOS job passed; that run's `validate` job failed for an
-unrelated ShellCheck code), and run `35753801691` at head `9d9ce2b` (job
-`106834376649`, runner label `macos-15`, GitHub-hosted image provisioner
-`20260828.587`, macOS 15.7.9 build 24G830, Python 3.13.15), which is the run
-recorded in
-[`evidence/receipts/adoption-macos-hosted-smoke-20260922.json`](../../evidence/receipts/adoption-macos-hosted-smoke-20260922.json).
-Its bounded claim is native operation of this script on a **GitHub-hosted macOS
-arm64 runner** — that the pinned assets download, verify against these
-SHA-256 values, extract and report versions on Apple Silicon.
+(`.github/workflows/adoption-bootstrap.yml`, jobs `bootstrap-macos`,
+`bootstrap-macos-brew` and `validate-macos`) whose status is
+`green_on_hosted_runner`. The current run is **`35875188590`** at head
+`75a6e0d` (PR #94, `workflow_dispatch`, runner label `macos-15`, macOS
+15.7.9 build 24G830), every job green, recorded in
+[`evidence/receipts/adoption-macos-hosted-smoke-20260923.json`](../../evidence/receipts/adoption-macos-hosted-smoke-20260923.json).
+Earlier runs (`35753384567`/`585032a`, `35753801691`/`9d9ce2b`, both
+recorded in the retired 2026-09-22 receipt) predate the round-3g through
+3i redesign covered here and are superseded by this one; they are not
+cited further below.
 
-**Both of those runs predate the 2026-09-23 fix round** (the
-`install_platform_dependency` redesign, the `allowed_unpinned_ids` bash 3.2
-fix, the brew formula loop's install-order change, and the launchd agents):
-run `35812470345` on PR #94, at the code before that round, failed
-`bootstrap-macos` and `bootstrap-macos-brew` in their bootstrap step and
-`validate-macos` on three tests (the exact platform_dependency, bash 3.2 and
-plutil/plistlib findings this round fixed, plus a `git_revision` symlink
-portability finding in `scripts/adoption_status.py` fixed the same round).
-Neither `35753384567`/`585032a` nor `35753801691`/`9d9ce2b` re-ran after this
-round's fixes, so they establish only that an earlier version of this script
-once ran green on a hosted runner, not that the current one does; a fresh
-hosted run is what would establish that.
-That is not a workstation acceptance:
+This run's bounded claim is still hosted-runner evidence,
+**not a workstation acceptance**:
+
+- `bootstrap-macos`: `adoption/bootstrap-macos.sh --profile
+  macos-arm64-foundation` installed the full pinned `darwin-arm64` set
+  into a disposable `ECO_INSTALL_ROOT`, including the pinned
+  `embeddinggemma-300M-Q8_0` model (sha256 checked) and a provisioned
+  `config/qdrant.yaml` (round 3j).
+- **launchd genuinely ran**, for the first time: `launchd-agents.sh`
+  rendered, linted, bootstrapped and booted out both the `qdrant` and
+  `llama-embed` LaunchAgents on this runner. `qdrant` reported health
+  version `1.19.1`. This is still bounded to the runner's own GUI domain
+  for the duration of one job -- persistence across logins, reboots and
+  real user sessions was not observed, and it is not evidence for any
+  other Mac.
+- **The embedding acceptance ran and passed**: dimension 768, cosine
+  **0.99944** against the Linux CPU reference vector
+  (`evidence/artifacts/macos-embed-reference-20260923/`), threshold 0.99.
+  The `llama-server` startup log itself reports `layer 0 is assigned to
+  device MTL0 but Flash Attention is assigned to device CPU` -- **Metal
+  device `MTL0` did engage** on this specific hosted run, for the layers
+  it covers, with flash attention still on CPU. This is one hosted run's
+  own log line, not a claim that every hosted run (or every real Mac)
+  engages Metal identically, and it is still bounded to whatever GPU a
+  GitHub-hosted macOS runner happens to expose that day, not a real
+  Mac's own dedicated GPU under real load.
+- `bootstrap-macos-brew`: the Homebrew prerequisite path (installing the
+  six floating formulae without `--skip-system-packages`) completed.
+- `validate-macos`: every validator, the adoption test modules (238
+  tests, `OK`), and (round 3i) a real `host_receipts.py record`/
+  `validate`/`component_matrix`/`new_host_grand_list` recording smoke in
+  a throwaway checkout copy all passed -- **on both `actions/setup-python`
+  3.13.15 and the runner's own system `/usr/bin/python3` 3.9.6**, the
+  exact two-interpreter claim "Recording and verdict scripts" above
+  describes. The non-gating full `python3 -m unittest` ran 2929 tests
+  with 29 failures and 95 errors (recorded as an artifact, not claimed as
+  passing); most trace to macOS's symlinked temp directories
+  (`/var/folders`, `/tmp` resolving to `/private/...`) tripping
+  repository path-containment checks written against Linux's own
+  symlink layout, plus Linux-only tests not yet skipped on macOS -- a
+  tracked follow-up, not a claim these pass on macOS today.
+
+Still bounded, exactly as before:
 
 - A hosted runner is not this profile's target Mac; hardware, memory (24/48 GB),
   installed Homebrew state and the user's own account are all different.
-- launchd remains unrun. No agent in the table below has been bootstrapped,
-  kickstarted or booted out on any Mac, hosted or otherwise.
-- The embedding acceptance below (port 8232, 768-dimension response, ≥ 0.99
-  cosine against a Linux reference vector, now captured -- see "Acceptance
-  test for the 24 GB default" below) remains unrun on any Mac; a hosted
-  runner step exists (round 3h, `.github/workflows/adoption-bootstrap.yml`)
-  but a sandboxed CPU-only runner is exactly the context where Metal may be
-  unavailable, so it establishes the endpoint and the model, not the Metal
-  backend.
 - Native sign-in for Codex, Claude and GitHub cannot happen on a hosted runner.
+- No `macos-arm64` `platform_status` is changed by this receipt (the
+  matrix/verdict machinery this same run's `validate-macos` job now gates
+  on requires a receipt with `host.second_physical_machine: true` plus an
+  independent, non-self review -- neither of which a hosted runner can
+  ever provide by construction).
 
 Until a real Mac produces a receipt, this profile stays
 `status: drafted_not_accepted` with `evidence_ref: null`.
