@@ -252,7 +252,7 @@ class GuardedSession:
             kind = "data_read"
         else:
             reads = {"/v2/account", "/v2/clock", "/v2/positions", "/v2/orders",
-                     "/v2/orders:by_client_order_id"}
+                     "/v2/orders:by_client_order_id", "/v2/account/activities"}
             asset = path.startswith("/v2/assets/") and SYMBOL.fullmatch(path[len("/v2/assets/"):])
             order_id = path.startswith("/v2/orders/") and UUID.fullmatch(path[len("/v2/orders/"):])
             allowed = ((method == "GET" and (path in reads or asset or order_id))
@@ -670,13 +670,15 @@ class AlpacaPaperTransport:
         if crossed:
             self._invalidate_quote(symbol, ts_ns)
             return None
-        if ts_ns == previous_ns:
+        # Recovery does not opt into quarantine: retain its base behavior for
+        # valid equal-time updates (e.g. changed displayed size). Opt-in native
+        # consumers keep the conservative conflict stop and strict tombstone.
+        if ts_ns == previous_ns and self._quarantine_handler is not None:
             if symbol in self._quote_quarantined or quote == self._quote_values.get(symbol):
                 return None
             # Equal-time executable disagreements are an integrity failure,
             # not a new recoverable quote category.
-            if self._quarantine_handler is not None:
-                self._invalidate_quote(symbol, ts_ns)
+            self._invalidate_quote(symbol, ts_ns)
             self.freeze_health("quote_timestamp_conflict")
             raise TransportError("equal timestamp quote conflict")
         with self._state_lock:

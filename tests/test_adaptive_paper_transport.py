@@ -111,6 +111,25 @@ class Normalization(unittest.TestCase):
 
 @unittest.skipUnless(HAS_SDK, "requires isolated reviewed alpaca-py runtime")
 class HTTPBoundary(unittest.TestCase):
+    def test_account_activities_allows_only_exact_budgeted_paper_get(self):
+        self.session.read_only = True
+        params = {"page_size": 100, "page_token": "fixture-page-id", "after": "2026-09-21T00:00:00Z"}
+        with patch.object(self.session._session, "request", return_value=response([])) as request:
+            self.session.request("GET", t.PAPER_URL + "/v2/account/activities", params=params)
+            self.budget.assert_called_once_with("read")
+            self.assertEqual(request.call_args.kwargs["params"], params)
+            self.assertEqual(request.call_args.kwargs["timeout"], (5, 5))
+            self.assertFalse(request.call_args.kwargs["allow_redirects"])
+            self.session.read_only = False  # method/path protection also applies to the writable client
+            for method, url in (("POST", t.PAPER_URL + "/v2/account/activities"),
+                                ("DELETE", t.PAPER_URL + "/v2/account/activities"),
+                                ("GET", "https://api.alpaca.markets/v2/account/activities"),
+                                ("GET", t.PAPER_URL + "/v2/account/activities/FILL")):
+                with self.subTest(method=method, url=url), self.assertRaises(t.TransportError):
+                    self.session.request(method, url)
+            self.assertEqual(request.call_count, 1)
+            self.assertEqual(self.budget.call_count, 1)
+
     def setUp(self):
         self.budget = Mock(return_value=None)
         self.observer = Mock()

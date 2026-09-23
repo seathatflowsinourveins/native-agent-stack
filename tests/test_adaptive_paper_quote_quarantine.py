@@ -269,6 +269,28 @@ class Quarantine(unittest.IsolatedAsyncioTestCase):
         await self.push(raw(self.ns + 1, bp="101"))
         self.assertTrue(self.port.health["frozen"])
 
+    async def test_recovery_port_same_timestamp_size_update_preserves_confirmed_owned_exit(self):
+        from test_adaptive_paper_transport import response, order
+        self.port._quarantine_handler = None  # production recovery retains its original quote path
+        quote = self.controller.quotes["AAPL"]
+        self.ledger.reserve_intent("owned-before-recovery", "AAPL", "buy", "1", "100.01", quote=quote,
+            now=time.time(), market_open=True, session_close=time.time() + 3600)
+        self.ledger.record_order("owned-before-recovery", "owned-broker", "filled", "1", "100.01")
+        await self.push(raw(self.ns, bs="101"))
+        self.assertFalse(self.port.health["frozen"])
+        self.assertEqual(self.port._quote_values["AAPL"]["bid_size"], "101")
+        payload = order(client_order_id="owned-recovery-exit", symbol="AAPL", side="sell", limit_price="100",
+                        status="filled", filled_qty="1", filled_avg_price="100")
+        with patch.object(self.port._client._session._session, "request", return_value=response(payload)) as wire:
+            result = await self.port.submit({"client_order_id": "owned-recovery-exit", "symbol": "AAPL",
+                                "side": "sell", "qty": "1", "limit_price": "100"})
+        self.assertEqual(wire.call_count, 1)
+        self.assertEqual(wire.call_args.args[0], "POST")
+        self.assertEqual(result["status"], "filled")
+        self.assertEqual(self.ledger.positions(), {})
+        self.assertEqual(self.ledger.unresolved(), [])
+        self.assertFalse(self.port.health["frozen"])
+
     async def test_callback_failure_remains_fatal_after_transport_tombstone(self):
         def failed(symbol, ts):
             raise RuntimeError("private fixture message")
