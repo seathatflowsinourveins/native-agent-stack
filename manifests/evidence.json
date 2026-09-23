@@ -6953,6 +6953,136 @@
       "bytes": 12245
     },
     {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/README.md",
+      "sha256": "9efbc9a8e92990810234bb72395c2369e9ee850180b23c6d299fea45c9e5fb11",
+      "bytes": 5955
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/attempts/20260923T131151Z-handrolled-protocol-probe.json",
+      "sha256": "69ffa707d3d010771c86b7eb9cc81f2fb949fa547a8df5c3f39e7cc1a6493250",
+      "bytes": 399
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/attempts/20260923T131436Z-handrolled-protocol-probe.json",
+      "sha256": "e4c1b6f79e47e7d668b4e2e306f60c528d2b46bcc0f6b396ea465ccce421ea0b",
+      "bytes": 399
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/attempts/20260923T131604Z-ibapi-draft.json",
+      "sha256": "b65b78cf11ca90923854f6de052aa17b0356b4153ea9392d47e658c1147c0c9b",
+      "bytes": 2054
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/attempts/20260923T131653Z-ibapi-draft.json",
+      "sha256": "1cea3a50c2bb1e5c319ec8c50ed99b39ea16f69f7a5c67068ecc084ecab25388",
+      "bytes": 2015
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/attempts/20260923T1318Z-nautilus-adhoc.json",
+      "sha256": "75a662ade64629576411456d83c12739cca95f18578af04b0141f8cf713927db",
+      "bytes": 1416
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/attempts/20260923T132358Z-ibapi.json",
+      "sha256": "b420214bf6e6dadbc0cada74f82fff85fb9246fe5fb7e1c2833cccc6c89dfa72",
+      "bytes": 2074
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/attempts/20260923T132430Z-nautilus.json",
+      "sha256": "560ddef43cd0a6770daa48b8364b01554db2a5c68587aa2cbca513adc8353eeb",
+      "bytes": 413
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/attempts/20260923T141300Z-ibapi.json",
+      "sha256": "44dfaa71dabe3585aeb4045d7db7a5514ca3e76ef5981ad1a4767891bbb62d69",
+      "bytes": 1938
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/attempts/20260923T141311Z-nautilus.json",
+      "sha256": "a79d229be850078af872ccd9f5283c77f2f5b858debdd1758ad22c8f967a6414",
+      "bytes": 1449
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/attempts/20260923T142801Z-ibapi.json",
+      "sha256": "5868870f113516c2f33fc8816586f063aa44f4d2927acb41a1f2f731529bcb05",
+      "bytes": 2059
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/attempts/20260923T142803Z-nautilus.json",
+      "sha256": "b12856dac1c55f40461466ac66278d96eb562740c2d9fbfeca1bf2431408e182",
+      "bytes": 1855
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/attempts/20260923T142819Z-ibapi.json",
+      "sha256": "40b37c9686610ffa7535dd49232c63670a8dda56d5d99963da1561849ff8b4f8",
+      "bytes": 2060
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/attempts/20260923T142821Z-nautilus.json",
+      "sha256": "590c97af75bfba8800ae8fcaeb692a03d43bfaacc2f05de684afb773ec4e7d1c",
+      "bytes": 1854
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/attempts/20260923T143249Z-ibapi.json",
+      "sha256": "ccd3ace1a4c8df3dc7280b81cfac97bf1bfb199e7056cf5bc35196aa7edd95ed",
+      "bytes": 2061
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/attempts/20260923T143251Z-nautilus.json",
+      "sha256": "6d1e3e1ae0f13d9610598e285b8fc721b856704cd28f2bd537ba3b5930eb9b64",
+      "bytes": 1641
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/attempts/20260923T143550Z-ibapi.json",
+      "sha256": "1e991754850b1ad18b5f8b6caf6510e57c4dc8d3c2ee7eaad6c09d67ac30a008",
+      "bytes": 2060
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/attempts/20260923T143552Z-nautilus.json",
+      "sha256": "639aa343318e757056d122c0bbdf31b42d4f6074160b1425e33d1c6ef55e25fb",
+      "bytes": 1643
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/attempts/20260923T145646Z-ibapi.json",
+      "sha256": "1856e3c2af1c97553cc6fe08ef135729ffe3ca97f1e0a15882f7547a8f55c720",
+      "bytes": 2059
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/attempts/20260923T145648Z-nautilus.json",
+      "sha256": "be8435ea49732968be587483121f715a1a947d23e46ad5247b4eed42d4444a1a",
+      "bytes": 1642
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/attempts/20260923T1500Z-nautilus-teardown-abort-study.json",
+      "sha256": "b1a242a8d25c2322e6f7cc086fd30a0a6727795e3960e2dce82d3f70d0ba8430",
+      "bytes": 2466
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/ibapi-readonly-20260923.json",
+      "sha256": "af4d968cf9d6508883b53ac80f1532d3b888188000c6173fbd3f725447f56756",
+      "bytes": 2060
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/nautilus-readonly-20260923.json",
+      "sha256": "cc9c87daf3cfe58f8a4882b71a19cdc8dc0b5b6c44a36d125c6f3d617720c780",
+      "bytes": 1642
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/ibapi_probe.py",
+      "sha256": "01af076abb97adeece6041770141b59cd21453148475cf486c4ee12a1047f5ca",
+      "bytes": 13001
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/nautilus_probe.py",
+      "sha256": "06fff32db6e55b471da4408661e428d471e756264d734e4116fe9526c34d1305",
+      "bytes": 8362
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/plan.json",
+      "sha256": "edd7fba5a0e5167499eb3f4d2874125f4d50427bed939f01e4375b7e0726b57c",
+      "bytes": 2741
+    },
+    {
       "path": "blueprints/us-equities/engine-nautilus/observe_quickstart.py",
       "sha256": "b5cb94472619f6cd5432b7e410f4657fcf8db966fada9032c7dc188739565d30",
       "bytes": 2625
@@ -8424,8 +8554,8 @@
     },
     {
       "path": "catalogs/us-equities/gates-20260922.json",
-      "sha256": "cdffd15ba27c092792c1dd709bbb86c7a12b2881efea8977b802adc25a87a54d",
-      "bytes": 27680
+      "sha256": "08aa93b30790b5534d4ce4246849fc24bb395465283b04cb20c3229340cd1750",
+      "bytes": 28656
     },
     {
       "path": "catalogs/us-equities/hosting-source-review.json",
@@ -13273,6 +13403,11 @@
       "bytes": 3678
     },
     {
+      "path": "evidence/receipts/ibkr-readonly-acceptance-20260923.json",
+      "sha256": "0d32534357501c011298420c07161c59940929cabd00a9b71d5d7817126f88c9",
+      "bytes": 17126
+    },
+    {
       "path": "evidence/receipts/mac-memory-patch-20260920.json",
       "sha256": "b8d09fda1ad56976d57d938af0eb7076223c79e39b2261ef4521413b15d8a0f1",
       "bytes": 893
@@ -14521,6 +14656,11 @@
       "path": "tests/test_host_receipts.py",
       "sha256": "5a11f68bee22d1311375cacf88c68683c66e815f229fc30f2ee3290056905fe1",
       "bytes": 60927
+    },
+    {
+      "path": "tests/test_ibkr_acceptance.py",
+      "sha256": "2c0f09c5fd86a0125e775fdcd5363a6d25a8f2ff521802a3c6b489b9b21492e7",
+      "bytes": 15483
     },
     {
       "path": "tests/test_job_recovery.py",

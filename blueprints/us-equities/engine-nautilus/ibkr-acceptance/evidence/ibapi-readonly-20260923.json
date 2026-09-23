@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "gate_id": "ibkr-local-acceptance",
+  "step": "acceptance-plan 5.1 read-only",
+  "client": "ibapi (official IB API client)",
+  "host": "127.0.0.1",
+  "port": 4002,
+  "client_id": 73,
+  "deadline_seconds": 90.0,
+  "generated_at": "2026-09-23T14:58:23.612901+00:00",
+  "ibapi_version": "10.45.1",
+  "status": "passed",
+  "evidence_class": "native_paper_readonly",
+  "existing_state": {
+    "positions": 0,
+    "open_orders": 0
+  },
+  "observed": {
+    "account_count": 1,
+    "paper_accounts": true,
+    "server_time_epoch": 1790175503,
+    "positions": 0,
+    "open_orders": 0,
+    "summary_tags": [
+      "AccountType",
+      "BuyingPower",
+      "NetLiquidation",
+      "TotalCashValue"
+    ],
+    "account_type": "INDIVIDUAL",
+    "spy_contract": {
+      "conId": 756733,
+      "secType": "STK",
+      "currency": "USD",
+      "exchange": "SMART",
+      "primaryExchange": "ARCA",
+      "longName": "SS SPDR S&P 500 ETF TRUST-US",
+      "tradingHoursSample": "20260923:0400-20260923:2000;20260924:040"
+    },
+    "market_data_type": "REALTIME",
+    "spy_quote": {
+      "last_trade_epoch": 1790175503,
+      "last": 770.105,
+      "first_tick_local_epoch": 1790175504.2161767,
+      "bid": 770.1,
+      "ask": 770.11
+    },
+    "history": {
+      "bars": 96,
+      "first": "1790083800",
+      "last": "1790175300"
+    },
+    "errors": [],
+    "info": [
+      {
+        "reqId": -1,
+        "code": 2104,
+        "text": "Market data farm connection is OK:usfarm"
+      },
+      {
+        "reqId": -1,
+        "code": 2106,
+        "text": "HMDS data farm connection is OK:ushmds"
+      },
+      {
+        "reqId": -1,
+        "code": 2158,
+        "text": "Sec-def data farm connection is OK:secdefil"
+      }
+    ],
+    "server_minus_local_s": -0.686,
+    "quote_age_s": 0.531,
+    "max_quote_age_s": 900.0
+  },
+  "requests_completed": {
+    "accounts": true,
+    "time": true,
+    "positions": true,
+    "orders": true,
+    "summary": true,
+    "contract": true,
+    "mktdata": true,
+    "history": true
+  },
+  "exit_code": 0
+}
