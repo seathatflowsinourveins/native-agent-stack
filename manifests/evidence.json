@@ -3068,8 +3068,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "2f4b59872ee901522f26656032fc6022d046e224e9739f9ba1f8a0a16aa87fba",
-      "bytes": 8138
+      "sha256": "4e391eabbddabc78f0633f124a54c9334ba4769b3af1efc124c1b04a6ed12e92",
+      "bytes": 8415
     },
     {
       "path": ".gitignore",
@@ -3103,8 +3103,8 @@
     },
     {
       "path": "README.md",
-      "sha256": "32aa91b40225b9663a9ecdff2a434036c547accde3b15c7b1783a1d63dc70711",
-      "bytes": 21873
+      "sha256": "53bfed4eaa4eda921c81bbd44ac334d36119c9eb23508cfe73814e6f3ad3d715",
+      "bytes": 22036
     },
     {
       "path": "SECURITY.md",
@@ -3128,8 +3128,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "f111297e0e34fff084cb0399fd04c9183f841d835d848c241a5357f46dc939a5",
-      "bytes": 8341
+      "sha256": "96e67ed5862cc074f6acf932fcc997bda8ffd4966a746e63347cb9625968e452",
+      "bytes": 8501
     },
     {
       "path": "adoption/host-receipt.schema.json",
@@ -14153,6 +14153,11 @@
       "bytes": 1634
     },
     {
+      "path": "scripts/release_due.py",
+      "sha256": "3afdb6947b54c1fec4f7f7b9bbb4b525a1d9a33a84a2efa996515ba396694497",
+      "bytes": 5649
+    },
+    {
       "path": "scripts/trading_gates.py",
       "sha256": "12b4d1442ef05617366274c99917784c883609a290f897d3009b3df63e9c7dc6",
       "bytes": 10010
@@ -14584,8 +14589,8 @@
     },
     {
       "path": "tests/test_release_pin_contents.py",
-      "sha256": "c8921f269d8a24de76bcdc1ac976dcbb367de910aff6186225b42969c633c98e",
-      "bytes": 3626
+      "sha256": "170320841953c442ec85a1617b895624cba2979643abc2f9854bf7eeb9533fe2",
+      "bytes": 3752
     },
     {
       "path": "tests/test_render_config.py",

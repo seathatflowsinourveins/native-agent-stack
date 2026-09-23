@@ -1,67 +1,73 @@
-"""The release a new machine checks out must contain everything the new-machine steps call.
+"""The release a new machine checks out must be self-consistent, and main must say when a new one is due.
 
-Step 0 of README.md "Start here" and adoption/bootstrap.md check out adoption/manifest.json
-source.release_tag. A reader follows the new-machine documents as written on main (README "Start
-here", adoption/bootstrap.md, adoption/README.md, adoption/platforms/*.md, docs/next-host-stages.md,
-docs/contributing-evidence.md), so every repository path they reference must exist at
-source.release_commit. When this fails, cut a new release tag and
-re-pin source.release_tag/release_commit (see docs/grand-catalog-handbook.md), or move the new step
-behind a release that has it. Found by the cross-session readiness audit on 2026-09-23: main pinned
-v2026.09.22.1 while its steps referenced scripts added later.
+Step 0 checks out adoption/manifest.json source.release_tag; the reader then follows the documents in
+that checkout. So the pinned release must contain every path its own new-machine documents reference
+(hard test). Main's documents may already describe unreleased steps; scripts/release_due.py reports
+those paths, and is strict only on a re-pin (validate.yml) or before cutting a release, so a feature
+PR that documents a new script is not blocked. Found by the cross-session readiness audit on
+2026-09-23: main pinned v2026.09.22.1 while its steps referenced scripts added later.
 """
 from __future__ import annotations
 
 import json
-import re
-import subprocess
+import os
 import unittest
 from pathlib import Path
 
+from scripts import release_due as rd
+
 ROOT = Path(__file__).resolve().parents[1]
-PATH_RE = re.compile(r"\b((?:scripts|tools|adoption|docs|recipes|catalogs)/[A-Za-z0-9_./-]+\.(?:py|sh|md|json|toml))\b")
-
-
-def start_here_section(text: str) -> str:
-    match = re.search(r"^## Start here\n(.*?)(?=^## |\Z)", text, re.M | re.S)
-    return match.group(1) if match else ""
-
-
-# The documents a new machine follows after step 0 (all read from main as written).
-NEW_HOST_DOCS = ("adoption/bootstrap.md", "adoption/README.md", "docs/next-host-stages.md",
-                 "docs/contributing-evidence.md")
-
-
-def referenced_paths() -> set[str]:
-    sources = [start_here_section((ROOT / "README.md").read_text(encoding="utf-8"))]
-    docs = [ROOT / d for d in NEW_HOST_DOCS] + sorted((ROOT / "adoption/platforms").glob("*.md"))
-    sources += [d.read_text(encoding="utf-8") for d in docs if d.exists()]
-    return {m for text in sources for m in PATH_RE.findall(text)}
+IN_CI = os.environ.get("GITHUB_ACTIONS") == "true"
 
 
 class ReleasePinContentsTests(unittest.TestCase):
-    def test_start_here_section_exists_and_references_paths(self):
-        self.assertTrue(start_here_section((ROOT / "README.md").read_text(encoding="utf-8")).strip())
-        self.assertIn("adoption/bootstrap.md", referenced_paths())
+    def setUp(self):
+        self.tag, self.commit = rd.pin((ROOT / "adoption/manifest.json").read_text(encoding="utf-8"))
+        if rd.git("cat-file", "-e", f"{self.commit}^{{commit}}").returncode:
+            if IN_CI:  # validate.yml checks out full history, so absence there is a real failure
+                self.fail(f"release commit {self.commit} ({self.tag}) is not in the CI clone")
+            self.skipTest(f"release commit {self.commit} ({self.tag}) is not in this clone")
 
-    def test_pinned_release_contains_every_path_the_new_machine_steps_reference(self):
-        source = json.loads((ROOT / "adoption/manifest.json").read_text(encoding="utf-8"))["source"]
-        commit, tag = source["release_commit"], source["release_tag"]
-        if subprocess.run(["git", "-C", str(ROOT), "cat-file", "-e", f"{commit}^{{commit}}"],
-                          capture_output=True).returncode:
-            self.skipTest(f"release commit {commit} ({tag}) is not in this clone")
-        tagged = subprocess.run(["git", "-C", str(ROOT), "rev-parse", "--verify", "--quiet", f"{tag}^{{commit}}"],
-                                capture_output=True, text=True)
-        if tagged.returncode == 0:
-            self.assertEqual(tagged.stdout.strip(), commit, f"{tag} must resolve to source.release_commit")
-        missing = []
-        for rel in sorted(referenced_paths()):
-            if not (ROOT / rel).exists():
-                continue  # a path that does not exist on main either is not a callable step
-            if subprocess.run(["git", "-C", str(ROOT), "cat-file", "-e", f"{commit}:{rel}"],
-                              capture_output=True).returncode:
-                missing.append(rel)
-        self.assertEqual(missing, [], f"{tag} ({commit[:7]}) lacks paths the new-machine steps reference; "
-                                      "cut a new release tag and re-pin adoption/manifest.json source.release_tag/release_commit")
+    def test_tag_resolves_to_the_pinned_commit(self):
+        tagged = rd.git("rev-parse", "--verify", "--quiet", f"{self.tag}^{{commit}}")
+        if tagged.returncode:
+            if IN_CI:
+                self.fail(f"{self.tag} is not in the CI clone")
+            self.skipTest(f"{self.tag} is not in this clone")
+        self.assertEqual(tagged.stdout.strip(), self.commit)
+
+    def test_pinned_release_is_self_consistent(self):
+        paths = rd.commit_paths(self.commit)
+        self.assertIn("adoption/bootstrap.md", paths)
+        missing = sorted(p for p in paths if not rd.ignored(p) and not rd.at_commit(self.commit, p))
+        self.assertEqual(missing, [], f"{self.tag}'s own new-machine documents reference paths it does not contain")
+
+    def test_release_due_report_runs_and_is_not_strict_by_default(self):
+        self.assertEqual(rd.main([]), 0)
+        self.assertIsInstance(rd.due(self.commit), list)
+
+    def test_an_old_pin_would_be_reported_as_due(self):
+        old = "bdd04ca50eb781f8366c955f481479b7a7f57cbd"  # v2026.09.22.1, before host receipts and hardware profiles
+        if rd.git("cat-file", "-e", f"{old}^{{commit}}").returncode:
+            self.skipTest("v2026.09.22.1 is not in this clone")
+        self.assertIn("scripts/component_matrix.py", rd.due(old))
+
+
+class ReleaseDueUnitTests(unittest.TestCase):
+    def test_path_pattern_covers_templates_workflows_and_tests(self):
+        text = ("run adoption/launchd/agent.plist.template and .github/workflows/validate.yml, "
+                "tests/test_x.py, tools/adoption/render_launchd.py, docs/notes.txt")
+        self.assertEqual(rd.referenced([text]), {
+            "adoption/launchd/agent.plist.template", ".github/workflows/validate.yml", "tests/test_x.py",
+            "tools/adoption/render_launchd.py", "docs/notes.txt"})
+
+    def test_start_here_section_is_extracted(self):
+        self.assertIn("adoption/bootstrap.md", rd.referenced([rd.start_here_section(
+            (ROOT / "README.md").read_text(encoding="utf-8"))]))
+
+    def test_pin_parses_the_manifest_source(self):
+        tag, commit = rd.pin(json.dumps({"source": {"release_tag": "vX", "release_commit": "a" * 40}}))
+        self.assertEqual((tag, commit), ("vX", "a" * 40))
 
 
 if __name__ == "__main__":
