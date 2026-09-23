@@ -2326,7 +2326,12 @@ class CIEmbedModelCacheOrderTests(unittest.TestCase):
     changed)."""
 
     def setUp(self):
-        import yaml
+        # PyYAML is optional here, as in tests/test_workflow_hardening.py; the
+        # Linux validate job has it, so these structural checks still run in CI.
+        try:
+            import yaml
+        except ImportError:
+            self.skipTest("PyYAML not installed; these structural workflow checks run where it is")
         with WORKFLOW_PATH.open() as handle:
             self.workflow = yaml.safe_load(handle)
         self.steps = self.workflow["jobs"]["bootstrap-macos"]["steps"]
@@ -2399,7 +2404,14 @@ class CIRecordingToolingSmokeTests(unittest.TestCase):
     adoption/platforms/macos-arm64.md's "Recording and verdict scripts"."""
 
     def setUp(self):
-        import yaml
+        # PyYAML is optional in this repository (tests/test_workflow_hardening.py
+        # skips the same way): the setup-python interpreter on the macos-15
+        # validate job has no PyYAML, while the Linux validate job does, so these
+        # structural checks still run in CI there.
+        try:
+            import yaml
+        except ImportError:
+            self.skipTest("PyYAML not installed; these structural workflow checks run where it is")
         with WORKFLOW_PATH.open() as handle:
             self.workflow = yaml.safe_load(handle)
         self.steps = self.workflow["jobs"]["validate-macos"]["steps"]
