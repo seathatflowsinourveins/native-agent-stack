@@ -18,6 +18,116 @@ python3 scripts/validate_catalogs.py
 
 Preserve uncommitted work. Fetch and review remote changes before selecting a new revision; never use a destructive reset to “refresh” a working machine. Read the relevant gate and native recipe, then inspect only its local prerequisites. A new host starts with unknown account, activation and acceptance state even when the checkout validates.
 
+## Moving a host to a new release
+
+A host installs from the release pinned in `adoption/manifest.json`
+`source.release_tag`/`source.release_commit` ([bootstrap step 0](bootstrap.md)).
+Main moves ahead of that pin; a coordinator cuts a new release and re-pins, and
+each host then moves to it on its own schedule.
+
+**1. Learn whether a newer release exists.** Run the check from a fresh clone of
+the default branch, not from the host's pinned checkout: the pinned tag may
+predate `scripts/release_due.py`, and only the default branch's manifest names
+the current pin (a release's own manifest names the release before it).
+
+```sh
+git clone https://github.com/seathatflowsinourveins/native-agent-stack.git "$RUN_DIR/catalog-main"
+cd "$RUN_DIR/catalog-main"
+python3 scripts/release_due.py
+python3 -c "import json;print(json.load(open('adoption/manifest.json'))['source']['release_tag'])"
+git -C "$HOST_CHECKOUT" describe --tags --exact-match   # the tag this host installed from
+gh release list --repo seathatflowsinourveins/native-agent-stack --limit 5
+```
+
+If the default branch pins a different tag than the host's checkout, a re-pin
+has landed: move the host (steps 3 and 4). `release_due.py` printing
+`"status": "release_due"` means main documents steps that no release has yet (a
+release is due, not yet cut); those steps stay marked "not in the pinned
+release" on the pages that use them. A published release that main does not pin
+yet is not a target; wait for its re-pin PR.
+
+**2. How the coordinator cuts and re-pins a release.** This is the maintainer
+flow, recorded so a host can check what it receives.
+
+1. Tag a validated `main` commit `vYYYY.MM.DD` (or `vYYYY.MM.DD.N`) and push the
+   tag. [`publish-catalog.yml`](../.github/workflows/publish-catalog.yml) runs on
+   `v*` tags: its `publish` job validates the commit, builds the `git archive`
+   and an SPDX SBOM, attests both with SLSA provenance and uploads them; its
+   `release` job (tag pushes only) re-checks both files against the attested
+   digests, creates the GitHub Release with both attached at creation, and
+   fails unless the published release is immutable and carries exactly those
+   digests.
+2. Verify the published files (the release notes print these commands with
+   the exact values):
+   ```sh
+   gh attestation verify native-agent-stack-<commit>.tar.gz \
+     --repo seathatflowsinourveins/native-agent-stack \
+     --signer-workflow seathatflowsinourveins/native-agent-stack/.github/workflows/publish-catalog.yml \
+     --source-ref refs/tags/<tag> --source-digest <commit>
+   gh release verify-asset <tag> native-agent-stack-<commit>.tar.gz \
+     --repo seathatflowsinourveins/native-agent-stack
+   ```
+   [`docs/catalog-provenance.md`](../docs/catalog-provenance.md) covers the
+   attestation model and detached-bundle verification.
+3. Open a re-pin PR that sets `source.release_tag` and `source.release_commit`
+   (and `updated_at`) in `adoption/manifest.json` and re-registers its hash in
+   `manifests/evidence.json`. `python3 scripts/release_due.py --strict` must
+   print `"status": "current"`; `validate.yml` runs
+   `release_due.py --strict-if-repinned origin/main`, which is strict because
+   the pinned commit changed, and `tests/test_release_pin_contents.py` checks
+   that the tag resolves to the pinned commit and that the release's own
+   documents reference only paths it contains. In the same PR remove the "not
+   in the pinned release" notes for paths the new release now contains.
+
+**3. What the host re-runs after moving.** Receipts bind to the component
+version they recorded, so a pin change retires them for that component.
+
+```sh
+cd "$HOST_CHECKOUT"
+git status --short                 # keep local work; never reset it away
+git fetch --tags origin
+old="$(git rev-parse HEAD)"
+tag="$(git show origin/HEAD:adoption/manifest.json | python3 -c "import json,sys;print(json.load(sys.stdin)['source']['release_tag'])")"
+git diff --stat "$old" "$tag" -- adoption/pins-linux-x86_64.json adoption/pins-macos-arm64.json \
+  adoption/manifest.json adoption/templates manifests/stack.json catalogs/landscape
+git checkout "$tag"
+```
+
+1. If a pin file or `adoption/manifest.json` profile changed, rerun the
+   bootstrap for each profile this host installed
+   ([bootstrap step 2](bootstrap.md)); it installs the new pinned versions.
+2. If `adoption/templates/` changed, render again and compare before
+   overwriting ([bootstrap step 4](bootstrap.md), `render_config.py --check`).
+3. Rerun `python3 scripts/adoption_status.py --profile <id> --json`.
+4. Record a new receipt with `python3 scripts/host_receipts.py record` for every
+   component whose pin changed (in the pin files, `manifests/stack.json`, or a
+   winner's `pin` in `catalogs/landscape/*.json`). A receipt counts toward a
+   winner's status only while its `tool_versions` entry equals the winner's
+   current pin, so older receipts stop counting until they are re-recorded.
+   `python3 scripts/receipt_staleness.py` on the default branch lists them
+   (`pin_moved`, `no_bound_receipt`), plus bound receipts older than 30 days
+   (`stale`, `--max-age-days` to change the window).
+   [`receipt-staleness.yml`](../.github/workflows/receipt-staleness.yml) runs
+   the same report weekly and uploads it as an artifact; it never fails on a
+   flag and writes nothing to the repository.
+
+**4. How the receipts reach the catalog.** Follow
+[the host evidence contribution guide](../docs/contributing-evidence.md): record
+on a branch of current `main` (`git fetch origin && git switch -c <branch>
+origin/main`), re-read and scan the receipts, and before opening the PR rebase
+onto `origin/main` and rerun
+
+```sh
+python3 scripts/component_matrix.py --write
+python3 scripts/new_host_grand_list.py --write
+python3 scripts/host_receipts.py validate
+python3 scripts/validate.py
+```
+
+then open the PR with the template's "Host evidence" section and ask for an
+independent review. Receipts recorded before the move stay in the tree as dated
+evidence; they are not edited or deleted.
+
 ## Refresh sources with native commands
 
 Set `STAR_OWNER` to the intended public account and `PRIVATE_RUN_DIR` to a new private directory outside Git. Native GitHub CLI uses its own login; do not export its tokens into scripts.
@@ -78,7 +188,9 @@ The current entry point is the [20-layer research queue](../catalogs/landscape/r
 and its [continuation protocol](../docs/landscape-continuation.md). Choose one
 recorded gap. For the north star, [runtime-target.json](../catalogs/us-equities/runtime-target.json)
 governs the selected Nautilus destination and separate IBKR/Alpaca acceptance.
-SPY/LEAN dividend/cash parity and native broker fault cases remain open. The
+SPY/LEAN parity and the dividend module are established (the simulation rung
+is ready by `python3 scripts/trading_gates.py --check`); native broker fault
+cases and the paper and live gates remain open. The
 older catalyst plans below retain data/research context and do not override
 these current engine and broker boundaries.
 

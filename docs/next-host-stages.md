@@ -4,7 +4,9 @@ Dated 2026-09-23. This page says which machine does what, what to run on each, a
 measured load justifies. The per-layer list of what to install is generated in
 [`new-host-grand-list.md`](new-host-grand-list.md); the step-by-step install is
 [`adoption/bootstrap.md`](../adoption/bootstrap.md); recording what ran is
-[`contributing-evidence.md`](contributing-evidence.md).
+[`contributing-evidence.md`](contributing-evidence.md); moving a set-up host to a
+later release is
+[moving a host to a new release](../adoption/update.md#moving-a-host-to-a-new-release).
 
 ## Machine roles (recommendation, not a measurement)
 
@@ -37,8 +39,9 @@ The workstation and macOS tiers are labelled projections in
 
 ## macOS (64 GB) next steps
 
-1. Pinned clone, then `adoption/bootstrap-macos.sh` (the macOS clean-install work in progress adds
-   Homebrew prerequisites, launchd agents and darwin pins).
+1. Pinned clone, then `adoption/bootstrap-macos.sh` (Homebrew prerequisites and darwin pins are in
+   the pinned release; the launchd agents and the embedding acceptance script are on `main` only until
+   the next re-pin, as the [macOS page](../adoption/platforms/macos-arm64.md) marks).
 2. `python3 scripts/hardware_profile.py` and the MLX smoke; record the measured profile.
 3. `macos-arm64-foundation` profile; re-qualify any local model on MLX or llama.cpp Metal: a vLLM
    result on CUDA does not transfer.

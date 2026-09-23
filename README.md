@@ -11,7 +11,8 @@ results and failures. Source quality, native operation and comparative superiori
 remain separate claims.
 
 The [current token practice and measured results](docs/token-practice.md) connect
-68 selected component records to the 540-repository grand catalog, upstream
+every selected component record (69 on 2026-09-23; `python3 scripts/validate.py`
+prints the current count) to the 844-repository grand catalog, upstream
 installation recipes and scoped native evidence. The latest wave attaches fresh
 Claude/Codex results, ten dashboard screenshots and four qualified upgrades.
 Earlier 52-component studies retain their original boundaries and mixed results.
@@ -32,7 +33,7 @@ The **[current landscape comparison](catalogs/landscape/README.md)** adds
 **365 candidate decisions across all 20 foundation and 12 trading layers**.
 Each layer explains the requirement, current selection, alternatives, evidence
 limits and what would change the choice. Fresh primary-source metadata covers
-all 68 selected components and **343 public stars**. The comparison preserves
+all 69 selected components and **343 public stars**. The comparison preserves
 all 152 historical domain cards and keeps untested candidates distinct from
 observed failures. Use **Choices & alternatives** in the offline HTML or download
 its combined JSON manifest. The [selected skill practice](docs/native-skill-practice-20260921.md)
@@ -62,8 +63,8 @@ analysis. [Ten-source review and current star delta](catalogs/convergence-practi
 The **[US-equities grand catalog](catalogs/us-equities/README.md)** now covers
 **147 unique repositories in 152 layer decision cards**, **20 model entries**,
 and its retained **342-star coverage ledger**. Its current combined index includes
-**540 repository identities**, including the fresh 343-public-star snapshot and
-197 identities beyond it,
+**844 repository identities**, including the 342 public stars and
+502 identities beyond them (`python3 scripts/catalog_decisions.py --check` prints the current counts),
 with typed, validated pointers to decisions and evidence. The latest
 [architecture research wave](catalogs/us-equities/architecture/README.md) adds
 source reviews, awesome-list coverage and official Alpaca constraints.
@@ -155,7 +156,7 @@ Each receipt records its host, upstream commands, failures and remaining scope.
 
 ## What is here
 
-- **68 component records** across native clients, context, retrieval, memory, collaboration, browser work, verification, isolation, usage accounting, research hosting, backtesting, backup, dependency inventory and local observability; adoption scope remains receipt-specific. The [native saturation matrix](docs/token-native-saturation.md) records current role boundaries; the original token study retains its 52-component scope.
+- **69 component records** (on 2026-09-23; `python3 scripts/validate.py` prints the current count) across native clients, context, retrieval, memory, collaboration, browser work, verification, isolation, usage accounting, research hosting, backtesting, backup, dependency inventory and local observability; adoption scope remains receipt-specific. The [native saturation matrix](docs/token-native-saturation.md) records current role boundaries; the original token study retains its 52-component scope.
 - **19 researched alternatives** with adoption decisions, model requirements and prospective commands.
 - A [six-candidate portability comparison](adoption/research.md), with 41 selected primary source files and a native uv adoption decision.
 - **Four extended catalog layers** covering foundations/memory/RAG, agents/hosting/operations, data, and strategy/engine research; source review remains distinct from native execution.
@@ -187,8 +188,8 @@ The public source fixture removes personal path literals and independently recou
 
 ## Start here
 
-0. Clone the catalog and check out the attested release tag: `git clone https://github.com/seathatflowsinourveins/native-agent-stack.git && cd native-agent-stack`, then `git checkout "$(python3 -c "import json;print(json.load(open('adoption/manifest.json'))['source']['release_tag'])")"` — the `adoption/manifest.json` `source.release_tag` field (`v2026.09.23` or a later tag, at `source.release_commit`, published with SLSA build provenance by `.github/workflows/publish-catalog.yml`). Do **not** check out `source.baseline_commit`: that field predates `adoption/` and `tools/adoption/` entirely and is never a checkout target (Codex cross-family review finding, `codex-review-72`; `codex-review-64` is the separate promotion-gate cross-family review finding); `scripts/adoption_status.py` uses it only as the comparison point for its `baseline_matches`/`baseline_differs` `git` result. See [`adoption/bootstrap.md`](adoption/bootstrap.md) step 0 for the full detail, including `gh attestation verify` for a downloaded release archive.
-   After checkout, follow the documents in your checkout: main may already describe steps that are not released yet (`python3 scripts/release_due.py` lists them).
+0. Clone the catalog and check out the attested release tag: `git clone https://github.com/seathatflowsinourveins/native-agent-stack.git && cd native-agent-stack`, run `python3 scripts/release_due.py` on the default branch (it lists steps main documents that the pinned release lacks; the tag may predate the script), then `git checkout "$(python3 -c "import json;print(json.load(open('adoption/manifest.json'))['source']['release_tag'])")"` — the `adoption/manifest.json` `source.release_tag` field (or a later tag, at `source.release_commit`, published with SLSA build provenance by `.github/workflows/publish-catalog.yml`). Do **not** check out `source.baseline_commit`: that field predates `adoption/` and `tools/adoption/` entirely and is never a checkout target (Codex cross-family review finding, `codex-review-72`; `codex-review-64` is the separate promotion-gate cross-family review finding); `scripts/adoption_status.py` uses it only as the comparison point for its `baseline_matches`/`baseline_differs` `git` result. See [`adoption/bootstrap.md`](adoption/bootstrap.md) step 0 for the full detail, including `gh attestation verify` for a downloaded release archive.
+   After checkout, follow the documents in your checkout; steps that need a newer release are marked "not in the pinned release". To move a host to a later release, see [adoption/update.md](adoption/update.md#moving-a-host-to-a-new-release).
 1. Start with [new-machine adoption](adoption/README.md), the [continuation manifest](adoption/manifest.json) and [future update protocol](adoption/update.md). The SDK now has a native uv hash lock and fresh-prefix acceptance; historical results remain scoped to their original host.
 2. Follow the [native installation and workflows](recipes/README.md). Choose the profile appropriate to your project; use your own native client login and project paths.
 3. Adopt the inactive [examples](examples/) deliberately. They contain no credentials, blanket trust settings or active machine-specific configuration.
@@ -237,12 +238,14 @@ codex login   # and/or: claude
 current state: `{"id": "macos-arm64", "status": "drafted_not_accepted",
 "evidence_ref": null}`, with the hosted smoke job carried in its own
 `hosted_smoke` field: `{"workflow": ".github/workflows/adoption-bootstrap.yml",
-"job": "bootstrap-macos", "status": "green_on_hosted_runner"}`. That job ran
-green: run `35753801691` at head `9d9ce2b` on a GitHub-hosted `macos-15` arm64
-runner (macOS 15.7.9 build 24G830, Python 3.13.15) installed the pinned
-darwin-arm64 components and reported the `macos-arm64-foundation` profile
-`prerequisites_present` with no missing command
-([`evidence/receipts/adoption-macos-hosted-smoke-20260922.json`](evidence/receipts/adoption-macos-hosted-smoke-20260922.json)).
+"job": "bootstrap-macos", "status": "green_on_hosted_runner"}` and its `run_id`
+and `receipt`. The current run is `35875188590` at head `75a6e0d` on a
+GitHub-hosted `macos-15` arm64 runner (macOS 15.7.9 build 24G830): it installed
+the pinned darwin-arm64 components, bootstrapped and booted out the `qdrant` and
+`llama-embed` LaunchAgents, passed the embedding acceptance against the Linux
+reference vector (cosine 0.99944) and ran the recording smoke
+([`evidence/receipts/adoption-macos-hosted-smoke-20260923.json`](evidence/receipts/adoption-macos-hosted-smoke-20260923.json);
+the earlier run `35753801691` is in `previous_receipt`).
 Explicit claim boundary: that run is native operation on a GitHub-hosted macOS
 arm64 runner, not acceptance on a user's own Mac; the green hosted-runner smoke
 run does not substitute for it, which is why the profile stays

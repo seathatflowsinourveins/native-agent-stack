@@ -15,11 +15,65 @@ and `evidence_ref: null`. `adoption/manifest.json` `supported_platforms` stays
 Linux/x86_64/Python 3.13 only; this profile does not change that. The `macos-arm64-foundation`
 adoption profile lists the components this page assumes.
 
+## Get the catalog
+
+Clone the catalog and check out its attested release tag before any step
+below ([`adoption/bootstrap.md`](../bootstrap.md) step 0 has the detail,
+including `gh attestation verify` for a downloaded release archive). A fresh
+Mac's `/usr/bin/python3` is 3.9 from the Command Line Tools; that is enough for
+these one-liners and `scripts/release_due.py`.
+
+```sh
+git clone https://github.com/seathatflowsinourveins/native-agent-stack.git
+cd native-agent-stack
+python3 scripts/release_due.py   # on the default branch: steps main documents that the pinned release lacks
+tag="$(python3 -c "import json;print(json.load(open('adoption/manifest.json'))['source']['release_tag'])")"
+commit="$(python3 -c "import json;print(json.load(open('adoption/manifest.json'))['source']['release_commit'])")"
+git checkout "$tag"
+test "$(git rev-parse HEAD)" = "$commit" && echo "at $tag ($commit)"
+```
+
+Read both values before the checkout, as above: the release's own manifest
+names the release before it. Sections below that use a path in
+`release_due.py`'s `due` list say "not in the pinned release"; until the next
+re-pin, those steps need a checkout of `main` (a separate clone, never the
+pinned one you install from), and a result from them is main-only evidence.
+
+## Ordered steps for a new macOS host
+
+1. Prerequisites and target hardware (the next two sections), then
+   `python3 scripts/hardware_profile.py` to measure this Mac against
+   [`adoption/hardware-profiles.json`](../hardware-profiles.json).
+2. `bash adoption/bootstrap-macos.sh --profile macos-arm64-foundation`
+   (usage and exit codes below). Use `macos-arm64-foundation`, not
+   `foundation-cpu`: `qmd` and `rtk` have no macOS pin, so `foundation-cpu`
+   exits 3 here.
+3. Native sign-in and config rendering: [`adoption/bootstrap.md`](../bootstrap.md)
+   steps 3–4 (Codex, Claude and GitHub device flows; `tools/adoption/render_config.py`
+   with this host's own `adoption/hosts/<host>.json`).
+4. launchd services and the embedding acceptance ("launchd services" and
+   "Embedding backend decision" below). Both are not in the pinned release;
+   run them from a `main` checkout until the next re-pin.
+5. `python3 scripts/adoption_status.py --profile macos-arm64-foundation --json`,
+   then the per-host receipt ([`adoption/bootstrap.md`](../bootstrap.md) steps 6–7).
+6. Contribute what ran: record host receipts with `scripts/host_receipts.py`
+   (`--platform-id macos-arm64`, and `--second-physical-machine` on a real Mac
+   workstation) from a branch of current `main`, refresh the generated matrix
+   and grand list, and open a PR, following
+   [`docs/contributing-evidence.md`](../../docs/contributing-evidence.md).
+7. When a newer release is pinned, follow
+   [moving a host to a new release](../update.md#moving-a-host-to-a-new-release).
+
 ## Target hardware
 
 Apple Silicon with **24 GB unified memory** as the default target, with a
-**recorded 48 GB upgrade path** (below). Both sizes are candidates for a
-first real qualification run; neither has one yet.
+**recorded 48 GB upgrade path** (below) that also covers larger machines. The
+64 GB Mac that [`docs/next-host-stages.md`](../../docs/next-host-stages.md)
+plans for is the labelled projection `macos-arm64-64gb-projected` in
+[`adoption/hardware-profiles.json`](../hardware-profiles.json) (about 38 GB of
+unified memory as the generation budget, `full` semantic-RAG tier, both drawn
+from one shared pool); for this page's embedding choice it follows the 48 GB
+rules. None of these sizes has a real qualification run yet.
 
 ## Prerequisites
 
@@ -271,8 +325,10 @@ native_proven` -- a green hosted job is real execution for exactly what it
 ran, never a workstation acceptance receipt; see "What a hosted run proves"
 above) inside a **throwaway copy** of the checkout (`$RUNNER_TEMP/rec`, never
 the real one, so nothing is ever committed from this step), then re-runs
-`host_receipts.py validate`, `component_matrix.py --write --check` and
-`new_host_grand_list.py --write --check` in that same copy. This proves the
+`host_receipts.py validate`, `component_matrix.py --write`, then
+`component_matrix.py --check`, and `new_host_grand_list.py --write`, then
+`new_host_grand_list.py --check` (separate invocations: `--write` and
+`--check` are mutually exclusive) in that same copy. This proves the
 recording path works under macOS Python, BSD userland and the system `git`,
 never that this ONE receipt establishes any platform-status change (it does
 not carry `second_physical_machine: true`, and it is discarded with the
@@ -292,6 +348,11 @@ whichever happened. This is still hosted-runner evidence, not a workstation
 observation: it establishes that these scripts run under a real macOS
 Python 3.9 interpreter as installed by Apple on this runner image, not that
 every real Mac's system Python matches it forever.
+
+`scripts/release_due.py` is not in the pinned release; that does not block a
+host, because recording runs on a branch of current `main`
+([`docs/contributing-evidence.md`](../../docs/contributing-evidence.md) step 1)
+and step 0 runs the check on the default branch before the checkout.
 
 ## Embedding backend decision
 
@@ -359,7 +420,8 @@ deterministic before ever comparing across hosts). This is a Linux-side
 capture, never a macOS observation, and it does not by itself establish
 what a real Mac's Metal backend would return. The one command a real Mac
 (or the hosted CI step below) runs against a live `llama-server` on port
-8232 is:
+8232 is (not in the pinned release: `tools/adoption/embed_acceptance.py` is on
+`main` only until the next re-pin):
 
 ```sh
 python3 tools/adoption/embed_acceptance.py http://127.0.0.1:8232 \
@@ -391,7 +453,7 @@ pass/fail with nothing to inspect.
 
 Linux/WSL2 uses `systemd --user`; macOS has no such manager. Table below
 mirrors [`adoption/lifecycle.md`](../lifecycle.md#native-client-integration-and-process-lifecycle)'s
-systemd table for the launchd equivalent — drafted, not run:
+systemd table for the launchd equivalent — drafted, not run on a Mac workstation:
 
 | systemd --user (Linux/WSL2) | launchd (macOS, drafted) |
 | --- | --- |
@@ -428,9 +490,16 @@ currently loaded from that same destination path, rename into place,
 `launchctl enable` + `launchctl bootstrap`), `status` (`launchctl print`) and
 `remove` (bootout, then delete the plist, again only ever acting on a label
 confirmed loaded from its own destination path, or not loaded at all with a
-file present to clean up). None of the three agents has been bootstrapped,
-kickstarted or booted out on any Mac, hosted or otherwise; this stays true
-after this update.
+file present to clean up). On the hosted runner (run `35875188590`, "What a
+hosted run proves" above) `launchd-agents.sh` bootstrapped and booted out the
+`qdrant` and `llama-embed` agents; `ai-memory` has not run, and none of the
+three has run on a Mac workstation.
+
+**Not in the pinned release.** The three templates, `launchd-agents.sh`,
+`tools/adoption/render_launchd.py`, `adoption/hosts/macos-example.json` and
+`tests/test_adoption_launchd.py` are on `main` only (`python3
+scripts/release_due.py` lists them); a host at the pinned tag runs this
+section from a `main` checkout until the next re-pin.
 
 **2026-09-23 decision: brew-services semantics, no backup or reconcile.**
 

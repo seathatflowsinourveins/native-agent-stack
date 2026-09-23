@@ -60,7 +60,13 @@ machine (`host.second_physical_machine: true`), independently reviewed.
    [`manifests/stack.json`](../manifests/stack.json) `components[]` that have
    plain-string `commands` you can actually run) to decide which components
    most need a receipt from your host and platform.
-3. **Record.** Run the recorder from the repository root:
+3. **Record.** Run the recorder from the repository root. Who you are decides
+   one flag: inside a Claude Code session `$CLAUDE_CODE_SESSION_ID` is the
+   identity and `--identity` is refused (exit 2); a Codex session, a human
+   shell or CI has no such variable and must pass `--identity` with a random
+   per-session token.
+
+   From a Claude Code session:
 
    ```sh
    python3 scripts/host_receipts.py record \
@@ -69,7 +75,21 @@ machine (`host.second_physical_machine: true`), independently reviewed.
      --component-id <a manifests/stack.json component id> \
      --stage use \
      --evidence-class native_proven \
-     --identity <random-per-session-token> \
+     --from-stack-commands
+   ```
+
+   From a Codex session, a human shell or CI (generate the token once per
+   session and reuse it; a new token per command is a new identity each time):
+
+   ```sh
+   identity="$(python3 -c 'import secrets; print(secrets.token_hex(16))')"
+   python3 scripts/host_receipts.py record \
+     --host-id <your-host-id-yyyymmdd> \
+     --platform-id <linux-wsl2-x86_64|macos-arm64> \
+     --component-id <a manifests/stack.json component id> \
+     --stage use \
+     --evidence-class native_proven \
+     --identity "$identity" \
      --from-stack-commands
    ```
 
@@ -267,22 +287,41 @@ for running them.
   next re-record writes it. `scripts/landscape.py` and
   `scripts/component_matrix.py --check` (both run in CI) reject a declared
   `macos-arm64` status that claims more than the receipts support; a weaker,
-  not-yet-re-recorded status is allowed. `accepted` needs a recorded receipt
-  for that `component_id` that is `result: pass`,
-  `evidence_class: native_proven`, stage `use` or `install`, bound to the
-  winner's current pin, independently reviewed (step 8) with no standing
-  dissent, declares `host.second_physical_machine: true`, and has
-  `host.os`/`host.architecture` consistent with `adoption/manifest.json`'s
-  `platform_profiles[]` entry for that platform id. A `native_proven` fail at
-  `use` or `install` that is the latest receipt for its host and stage blocks
-  `accepted`, whatever its review, until that host records a later pass.
-  `conditional` needs a pin-bound, non-`synthetic` pass from a declared
-  second physical machine with no standing dissent; `not_established` means
-  pin-bound receipts exist but none is such a pass. A receipt recorded
-  and reviewed entirely on a single WSL host, with `second_physical_machine`
-  left at its default `false`, cannot make a winner `accepted`. The Linux
-  rule, and when CI starts enforcing it, is described in that module's
-  docstring.
+  not-yet-re-recorded status is allowed.
+
+  A *qualifying* receipt, on either platform, is one for that `component_id`
+  that is `result: pass`, `evidence_class: native_proven`, stage `use` or
+  `install`, bound to the winner's current pin, independently reviewed (step
+  8) with no standing dissent, declares `host.second_physical_machine: true`,
+  and has `host.os`/`host.architecture` consistent with
+  `adoption/manifest.json`'s `platform_profiles[]` entry for that platform id.
+  A `native_proven` fail at `use` or `install` that is the latest receipt for
+  its host and stage is *blocking*, whatever its review, until that host
+  records a later pass. The two platforms then differ:
+
+  - **`macos-arm64`.** `accepted` needs a qualifying receipt and no blocking
+    fail; there is no other route. `conditional` needs a pin-bound,
+    non-`synthetic` pass from a declared second physical machine with no
+    standing dissent; `not_established` means pin-bound receipts exist but
+    none is such a pass; otherwise `untested`. A receipt recorded and reviewed
+    entirely on a single host, with `second_physical_machine` left at its
+    default `false`, cannot make a macOS winner `accepted`.
+  - **`linux-wsl2-x86_64`.** `accepted` needs a qualifying receipt, or a
+    winner whose own `evidence_class` is `native_proven` or
+    `measured_comparison` and whose `evidence_refs` cite at least one
+    `evidence/` file registered in `manifests/evidence.json` (not a sealed
+    layer-verdict packet, lane return or adjudication), and in both cases no
+    blocking fail. The second route needs no host receipt and no second
+    physical machine, so a single WSL host's receipt is not what makes a
+    Linux winner `accepted`; it can only add a passing receipt (towards
+    `conditional`) or a blocking fail. Otherwise `conditional` or
+    `not_established`, as that module's docstring lists.
+
+  CI currently enforces the derived ceiling on every platform for rows a new
+  wave records, but only on `macos-arm64` for the older grandfathered rows:
+  `ENFORCED_PLATFORMS` in [`scripts/landscape.py`](../scripts/landscape.py)
+  and the comment above it say Linux joins that set when the grandfathered
+  rows are re-recorded.
 - **`adoption/manifest.json` `platform_profiles[].status`.** This is a
   separate field, owned by another unit, and moving a platform from
   `drafted_not_accepted` to `accepted` is presently a maintainer judgment

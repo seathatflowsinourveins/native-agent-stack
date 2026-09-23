@@ -6,16 +6,28 @@ entry or component it uses instead of repeating its command. Read
 native verification tiers; this page only sequences the steps for a machine
 that has never run this stack.
 
-**Step 0, before anything below: get the catalog at its attested release tag.** After checkout, follow the documents in your checkout: main may already describe steps that are not released yet (`python3 scripts/release_due.py` lists them).
+**Step 0, before anything below: get the catalog at its attested release tag.**
+Read the pin and run the release check on the default branch, before the
+checkout: the release's own `adoption/manifest.json` names the release before
+it (a commit cannot contain its own hash), and the pinned tag may predate
+`scripts/release_due.py` itself.
 ```sh
 git clone https://github.com/seathatflowsinourveins/native-agent-stack.git
 cd native-agent-stack
-git checkout "$(python3 -c "import json;print(json.load(open('adoption/manifest.json'))['source']['release_tag'])")"
+python3 scripts/release_due.py   # on the default branch: steps main documents that the pinned release lacks
+tag="$(python3 -c "import json;print(json.load(open('adoption/manifest.json'))['source']['release_tag'])")"
+commit="$(python3 -c "import json;print(json.load(open('adoption/manifest.json'))['source']['release_commit'])")"
+git checkout "$tag"
+test "$(git rev-parse HEAD)" = "$commit" && echo "at $tag ($commit)"
 ```
-This checks out `adoption/manifest.json` `source.release_tag`
-(`v2026.09.23`, or a later tag) at `source.release_commit`
-(`bdd04ca50eb781f8366c955f481479b7a7f57cbd`), published with SLSA build
-provenance by `.github/workflows/publish-catalog.yml`. Do **not** check out
+This checks out `adoption/manifest.json` `source.release_tag` (or a later tag)
+and confirms it resolves to `source.release_commit`, published with SLSA build
+provenance by `.github/workflows/publish-catalog.yml`. After checkout, follow
+the documents in your checkout. A path in `release_due.py`'s `due` list is
+documented on main but not in your checkout; the pages here mark those steps
+"not in the pinned release" and they wait for the next re-pin (see
+[moving a host to a new release](update.md#moving-a-host-to-a-new-release)).
+Do **not** check out
 `source.baseline_commit`: that field records the parent publication
 immediately *before* this `adoption/` directory (and `tools/adoption/`) were
 added, so every step below it on this page would fail with a missing file
@@ -36,7 +48,8 @@ Read the platform page for the chosen
 [`platform_profiles`](manifest.json) entry before starting:
 [Linux/WSL2 x86_64](platforms/linux-wsl2.md) (`status: accepted`) or
 [macOS arm64](platforms/macos-arm64.md) (`status: drafted_not_accepted` —
-nothing on that page has been executed on a Mac; see
+nothing on that page has been executed on a Mac workstation, only on a
+GitHub-hosted macOS runner; see
 [the acceptance evidence policy](../docs/acceptance-evidence-policy.md)).
 
 1. **Host prerequisites.** Confirm the OS/architecture matches a
@@ -61,6 +74,17 @@ nothing on that page has been executed on a Mac; see
    null `sha256`) — installs the selected profile's components
    using each entry's `recipe_map` path. Inspect the script before running it
    on a new host; it installs only what the chosen `--profile` selects.
+
+   The scripts install only components that have a pin in
+   [`pins-linux-x86_64.json`](pins-linux-x86_64.json) or
+   [`pins-macos-arm64.json`](pins-macos-arm64.json). Today that covers
+   `foundation-cpu` on Linux/WSL2 and `macos-arm64-foundation` on macOS in
+   full; every other profile is partly or wholly unpinned (the "Linux pins" and
+   "macOS pins" columns of [the profile table](README.md#choose-a-small-starting-profile)).
+   For those, the script exits 3 before installing anything; install each
+   unpinned component through its `recipe_map` page (the SDK lock for
+   `research-runtime`) instead of naming the whole profile in
+   `--allow-unpinned`, which would skip it rather than install it.
 
 3. **Native sign-in.** Neither client's credentials transfer between machines
    (`adoption/manifest.json` `policy.authentication_transfer: native_login_on_target_only`).
@@ -115,8 +139,9 @@ nothing on that page has been executed on a Mac; see
    process-lifecycle guide in [`adoption/lifecycle.md`](lifecycle.md#native-client-integration-and-process-lifecycle):
    `systemctl --user` on Linux/WSL2 (owned units only; never stop the shared
    MCPorter daemon to "clean up" another component), `launchctl` on macOS
-   (table in [the macOS page](platforms/macos-arm64.md#launchd-services); not
-   yet exercised on a Mac). For the portable guarded runner wrappers used by
+   (table in [the macOS page](platforms/macos-arm64.md#launchd-services); run
+   only on a hosted runner, not yet on a Mac workstation, and its launchd
+   templates are not in the pinned release). For the portable guarded runner wrappers used by
    these services, see `adoption/tools/README.md`.
 
 6. **Prerequisite report.** `python3 scripts/adoption_status.py --profile <id> --json`

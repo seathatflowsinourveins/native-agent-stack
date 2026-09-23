@@ -10,12 +10,20 @@ archive):
 ```sh
 git clone https://github.com/seathatflowsinourveins/native-agent-stack.git
 cd native-agent-stack
-git checkout "$(python3 -c "import json;print(json.load(open('adoption/manifest.json'))['source']['release_tag'])")"
+python3 scripts/release_due.py   # on the default branch: steps main documents that the pinned release lacks
+tag="$(python3 -c "import json;print(json.load(open('adoption/manifest.json'))['source']['release_tag'])")"
+commit="$(python3 -c "import json;print(json.load(open('adoption/manifest.json'))['source']['release_commit'])")"
+git checkout "$tag"
+test "$(git rev-parse HEAD)" = "$commit" && echo "at $tag ($commit)"
 ```
 
-That checkout target is `adoption/manifest.json` `source.release_tag`
-(`v2026.09.23` or a later tag, at `source.release_commit`, published with
-SLSA build provenance by `.github/workflows/publish-catalog.yml`). Do
+That checkout target is `adoption/manifest.json` `source.release_tag` (or a
+later tag), confirmed at `source.release_commit` and published with SLSA
+build provenance by `.github/workflows/publish-catalog.yml`. Read both values
+before the checkout, as above: the release's own manifest names the release
+before it. `scripts/release_due.py` itself is not in the pinned release yet,
+so it runs on the default branch; nothing else on this page needs a newer
+release. Do
 **not** check out `source.baseline_commit`: that field predates `adoption/`
 and `tools/adoption/` entirely and is never a checkout target (Codex
 cross-family review finding, `codex-review-72`; `codex-review-64` is the
@@ -82,6 +90,12 @@ itself evidence the WSL UVA gap closed.
    never stop the shared MCPorter daemon to clean up another component.
 5. Run `python3 scripts/adoption_status.py --profile <id> --json` and record
    the per-host receipt (`adoption/bootstrap.md` steps 6–7).
+6. Contribute what ran: record host receipts with `scripts/host_receipts.py`
+   from a branch of current `main`, refresh the generated matrix and grand
+   list, and open a PR, following
+   [`docs/contributing-evidence.md`](../../docs/contributing-evidence.md).
+7. When a newer release is pinned, follow
+   [moving a host to a new release](../update.md#moving-a-host-to-a-new-release).
 
 ## Boundaries
 

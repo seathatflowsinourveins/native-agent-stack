@@ -1,0 +1,59 @@
+name: Receipt staleness report
+
+# Report-only: lists host receipts older than the window or no longer bound to the current
+# winner pin (scripts/receipt_staleness.py) and uploads the report as an artifact. It writes
+# nothing to the repository, opens nothing and never fails on a flagged receipt.
+on:
+  schedule:
+    - cron: '23 6 * * 1'
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - scripts/receipt_staleness.py
+      - tests/test_receipt_staleness.py
+      - .github/workflows/receipt-staleness.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  report:
+    name: Receipt staleness report
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - name: Harden the runner (audit-only network egress)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.13'
+          check-latest: false
+      - name: Run the report's unit tests
+        run: python3 -m unittest tests.test_receipt_staleness -v
+      - name: Build the staleness report (report only)
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/receipt-staleness"
+          python3 scripts/receipt_staleness.py --json --out "$RUNNER_TEMP/receipt-staleness/receipt-staleness.json" > /dev/null
+          python3 scripts/receipt_staleness.py --out "$RUNNER_TEMP/receipt-staleness/receipt-staleness.txt" | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: Upload the report
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: receipt-staleness-${{ github.run_id }}
+          path: ${{ runner.temp }}/receipt-staleness/
+          if-no-files-found: error
+          retention-days: 30
