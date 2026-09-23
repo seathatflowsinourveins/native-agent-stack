@@ -545,7 +545,8 @@ class LeakTests(AdjudicateFixture):
         self.assertIn("leak recorded for the input", err)
         assembled = json.loads((self.work / "adjudication-leaks.json").read_text(encoding="utf-8"))
         self.assertEqual(len(assembled["leaks"]), 2)
-        self.assertEqual(assembled["leaks"][0]["inputs"]["AB"], str(self.work / "adjudication-inputs" / f"{NAME}.AB.json"))
+        # Basenames only (Codex review of #145): the work-dir layout is not retained.
+        self.assertEqual(assembled["leaks"][0]["inputs"]["AB"], f"{NAME}.AB.json")
         self.assertEqual(assembled["split_layers"][0]["leaked_inputs"], [f"{NAME}.AB.json", f"{NAME}.BA.json"])
         self.assertIn("split: a leak is recorded", assembled["split_layers"][0]["reason"])
 
@@ -1064,6 +1065,70 @@ class NinthRereviewOf145Tests(AdjudicateFixture):
         for prose in ("a +/- 2% band", "and/or", "A / B", "3/4 of runs"):
             self.assertEqual(adjudicate.scrub_text(prose, str(self.work / "packets")), prose)
             self.assertEqual(adjudicate.unscrubbed_paths([prose]), [], prose)
+
+
+class TenthRereviewOf145Tests(AdjudicateFixture):
+    """Round-10 review of #145: collection is bound to the snapshotted repository, each Codex worker rechecks
+    the indexed input, and an assembled adjudication names the lane returns it compared."""
+
+    JUDGE = NinthRereviewOf145Tests.JUDGE
+    REFUTE = NinthRereviewOf145Tests.REFUTE
+
+    def test_claude_collect_refuses_another_repository(self):
+        self.inputs()
+        args = adjudicate.claude_args(self.work, self.repo)
+        result = {"snapshot_id": args["snapshot_id"], "items": []}
+        with self.assertRaisesRegex(ValueError, "is not the claude-args repository"):
+            adjudicate.collect_claude(self.work, result, "claude-opus-5-5", "/")
+        with self.assertRaisesRegex(ValueError, "is not the claude-args repository"):
+            adjudicate.collect_claude(self.work, dict(result, repo=str(self.base)), "claude-opus-5-5")
+        self.assertEqual(len(adjudicate.collect_claude(self.work, result, "claude-opus-5-5", str(self.repo))), 2)
+
+    def run_codex_with_input_checks(self, check_results):
+        checks = iter(check_results)
+        call = mock.Mock(side_effect=[(self.JUDGE, "gpt-6-astra", [0], None, None),
+                                      (self.REFUTE, "gpt-6-astra", [0], None, None)] * 2)
+        real = adjudicate.inputs_changed
+
+        def inputs_changed(index, stems):
+            value = next(checks, None)
+            return real(index, stems) if value is None else ([stems[0]] if value else [])
+
+        with mock.patch.object(adjudicate, "inputs_changed", side_effect=inputs_changed), \
+                mock.patch.object(adjudicate, "run_codex_call", call), \
+                mock.patch.object(adjudicate.shutil, "which", return_value="/usr/bin/codex"):
+            code, err = quiet(adjudicate.main, ["codex", "--work-dir", str(self.work), "--repo", str(self.repo),
+                                                "--model", "gpt-6-astra", "--jobs", "1"])
+        return code, err, call
+
+    def test_a_worker_never_judges_an_input_changed_after_scheduling(self):
+        self.inputs()
+        # scheduling AB, scheduling BA, then AB's worker start sees a change.
+        code, err, call = self.run_codex_with_input_checks([False, False, True, False, False])
+        self.assertEqual(code, 1)
+        self.assertIn("the input changed after `inputs` built it", err)
+        self.assertEqual(call.call_count, 2, "only the unchanged order is judged")
+
+    def test_an_input_changed_during_the_call_voids_the_judgment(self):
+        self.inputs()
+        code, err, _call = self.run_codex_with_input_checks([False, False, False, True, False, False])
+        self.assertEqual(code, 1)
+        self.assertIn("the input changed during the call", err)
+
+    def test_assemble_refuses_lane_returns_changed_after_inputs_and_names_the_ones_it_compared(self):
+        self.inputs()
+        for lane in ("claude", "codex"):
+            for order in adjudicate.ORDERS:
+                self.judgment(lane, order, "claude")
+        code, err, record = self.assemble()
+        self.assertEqual(code, 0, err)
+        self.assertEqual(record["lane_returns_sha256"],
+                         {lane: adjudicate.sha256_file(self.work / lane / f"{NAME}.json") for lane in ("claude", "codex")})
+        self.write_return("codex", "c2", limits=["rerun after inputs"])
+        code, err, record = self.assemble()
+        self.assertEqual(code, 1)
+        self.assertIn("the codex lane return changed after `inputs`", err)
+        self.assertIsNone(record)
 
 
 @unittest.skipUnless(os.access(FAKE_BIN / "codex", os.X_OK), "fake codex fixture is not executable")

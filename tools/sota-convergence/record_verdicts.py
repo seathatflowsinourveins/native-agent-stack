@@ -835,6 +835,15 @@ def process_row(row: dict, root: Path, catalog: str, layer_id: str, work_dir: Pa
                                          grandfathered=grandfathered,
                                          packet_sha256=sha256sums.get(packet_filename))
         adjudication_text = None
+        if adjudication is not None and not grandfathered:
+            # The adjudication must have compared exactly the lane returns sealed here (Codex review of #145):
+            # a lane rerun after assemble would otherwise inherit a winner_lane its judges never saw.
+            current = {lane: hashlib.sha256(lane_paths[lane].read_bytes()).hexdigest() for lane in LANES}
+            if adjudication["raw"].get("lane_returns_sha256") != current:
+                rejections.append({"catalog": catalog, "layer_id": layer_id, "lane": "adjudication",
+                                   "reason": "the adjudication's lane_returns_sha256 does not name the lane "
+                                             "returns being sealed; rerun adjudicate inputs and assemble"})
+                adjudication = None
         if adjudication is not None:
             try:
                 adjudication_text = sealed_text(adjudication["raw"])

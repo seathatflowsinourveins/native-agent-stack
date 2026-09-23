@@ -1,7 +1,7 @@
 export const meta = {
   name: 'layer-verdict-lane',
   description: 'Run the Claude lane of the layer-verdict convergence: for every stripped layer packet an Opus proposer selects the winner set on retained evidence, two Opus refuters (evidence lens, challenger lens) attack it, one revision round follows any refutation or major finding and both lenses re-check the revision; a layer seals a final object only when both votes on it returned and neither refuted it, otherwise final is null and refutation.status says refuted or unknown; the script writes nothing and never promotes a candidate - the record tool applies the rules',
-  whenToUse: 'After tools/sota-convergence/lane_packets.py wrote the packets: args = {repo: "<catalog checkout>", packets: [{catalog, layer_id, path, sha256}], prompt: "<lane-prompt.md text with {PACKET_PATH} {REPO_ROOT} {LANE} placeholders>", model?: {name: "opus", effort: "high"} (optional; a different value is logged and returned as caller_model, never applied, because every agent() call binds that literal)}',
+  whenToUse: 'After tools/sota-convergence/lane_packets.py wrote the packets: args = {repo: "<catalog checkout>", packets: [{catalog, layer_id, path, sha256}], prompt: "<lane-prompt.md text with {PACKET_PATH} {REPO_ROOT} {LANE} placeholders>", model?: {name: "opus", effort: "high"} (optional; a different value is logged and returned as caller_model, never applied, because every agent() call binds that literal), launch?: {repo, repo_tree_sha256, ...} (optional; returned unchanged as launch so the collector can bind the result to the export it was launched on)}',
   phases: [
     { title: 'Propose', detail: 'blind-lane-reviewer per packet, Opus high, Read/Glob/Grep only, no skills or project instructions', model: 'opus' },
     { title: 'Refute', detail: 'evidence lens + challenger lens per proposal, blind-lane-reviewer, Opus high', model: 'opus' },
@@ -24,6 +24,9 @@ if (!packets.length) issues.push('packets must be a nonempty array of {catalog, 
 const MODEL = { name: 'opus', effort: 'high' }
 // A caller-supplied model is not applied (it cannot be); it is logged and returned as caller_model so the record stays truthful.
 const CALLER_MODEL = a.model !== undefined && !(a.model && typeof a.model === 'object' && a.model.name === MODEL.name && a.model.effort === MODEL.effort) ? a.model : null
+// A caller-supplied launch identity is echoed unchanged (catalog Codex review of #145): the collector requires it
+// to name the export and evidence-tree digest it records, so a result from another launch cannot be relabelled.
+const LAUNCH = a.launch && typeof a.launch === 'object' && !Array.isArray(a.launch) ? a.launch : null
 if (CALLER_MODEL) log('args.model ' + JSON.stringify(CALLER_MODEL) + ' is not applied: every agent() call binds ' + JSON.stringify(MODEL))
 if (issues.length) { for (const i of issues) log('argument issue: ' + i); return { status: 'incomplete', argument_issues: issues } }
 const PACKET = [
@@ -101,4 +104,4 @@ const out = results.filter(Boolean)
 const lost = packets.filter((p) => !out.find((r) => r.catalog === p.catalog && r.layer_id === p.layer_id)).map((p) => `${p.catalog}/${p.layer_id}`)
 const count = (st) => out.filter((r) => r.refutation && r.refutation.status === st).length
 log(`layers: ${out.length} returned, ${out.filter((r) => r.revised).length} revised, ${out.filter((r) => r.final).length} sealed (${out.filter((r) => r.final_source === 'revision').length} from a revision), ${count('refuted')} refuted, ${count('unknown')} unknown (${out.filter((r) => !r.proposal).length} without a proposal), ${lost.length} lost`)
-return { lane: 'claude', refutation_counts: { unrefuted: count('unrefuted'), refuted: count('refuted'), unknown: count('unknown') }, model: MODEL, caller_model: CALLER_MODEL, model_note: 'model is the literal alias/effort bound by every agent() call in this lane, not an observed identity; read the resolved model per child from node .claude/workflows/child-usage.mjs --latest (on Claude Code >= 2.1.280 the opus alias resolves to claude-opus-5-5)', layers: out, lost }
+return { lane: 'claude', launch: LAUNCH, refutation_counts: { unrefuted: count('unrefuted'), refuted: count('refuted'), unknown: count('unknown') }, model: MODEL, caller_model: CALLER_MODEL, model_note: 'model is the literal alias/effort bound by every agent() call in this lane, not an observed identity; read the resolved model per child from node .claude/workflows/child-usage.mjs --latest (on Claude Code >= 2.1.280 the opus alias resolves to claude-opus-5-5)', layers: out, lost }

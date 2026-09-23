@@ -16,9 +16,11 @@ adding the two runner-owned fields a new-wave Claude return must carry
 - ``provenance`` is ``{workflow_path, workflow_sha256, agentlab_commit, agent_sha256, repo_tree_sha256}``:
   the workflow path relative to the agent-lab checkout, the sha256 of those
   bytes, that checkout's ``HEAD``, the lane role's sha256, and the digest of the
-  evidence tree (``--repo``) the lane read. ``--repo-tree-sha256`` is that digest
-  taken before the lane launched; the script refuses (exit 2) when the tree no
-  longer matches it, so a return is bound to one set of evidence bytes. The script refuses (exit 2) when the
+  evidence tree (``--repo``) the lane read. The workflow echoes the caller's
+  ``args.launch`` as ``launch``; the script refuses (exit 2) unless it is
+  ``{repo, repo_tree_sha256}`` naming ``--repo`` and that tree's current digest,
+  so a result from another launch, or over a tree changed since launch, is never
+  recorded. The script refuses (exit 2) when the
   workflow file differs from ``HEAD`` or its sha256 is not the vendored
   ``examples/claude-native/workflows/SHA256SUMS`` entry, so a return always
   names bytes a catalog-only host can rerun.
@@ -147,6 +149,24 @@ def failure_reason(layer: dict) -> str:
     return f"no final: refutation status {status}" + (f"; {'; '.join(reasons)}" if reasons else "")
 
 
+def launch_tree(result: dict, repo: Path) -> str:
+    """The evidence-tree digest the result was launched on (Codex review of #145): the workflow echoes the
+    caller's args.launch, which prepare wrote as {repo, repo_tree_sha256}; it must name ``repo`` and that tree's
+    current digest."""
+    launch = result.get("launch") if isinstance(result, dict) else None
+    if not (isinstance(launch, dict) and isinstance(launch.get("repo"), str)
+            and isinstance(launch.get("repo_tree_sha256"), str)):
+        raise ProvenanceError("the workflow result carries no launch {repo, repo_tree_sha256}; launch the lane with "
+                              "args.launch so its result names the export it read")
+    if launch["repo"] != str(repo):
+        raise ProvenanceError(f"the result was launched on {launch['repo']!r}, not --repo {str(repo)!r}")
+    current = tree_sha256(repo)
+    if current != launch["repo_tree_sha256"]:
+        raise ProvenanceError(f"the evidence tree under --repo is {current}, not the launch digest "
+                              f"{launch['repo_tree_sha256']}; it changed after launch, so rerun on a fixed export")
+    return current
+
+
 def parse_args(argv=None):
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--result", type=Path, required=True, help="The workflow's returned JSON object.")
@@ -159,9 +179,6 @@ def parse_args(argv=None):
                              "(Codex review of #145).")
     parser.add_argument("--repo", type=Path, required=True,
                         help="The blind export the lane read (the workflow args' repo).")
-    parser.add_argument("--repo-tree-sha256", required=True,
-                        help="codex_lane.tree_sha256 of --repo taken before the lane launched; the returns are "
-                             "refused when the tree changed since (Codex review of #145).")
     parser.add_argument("--resolved-model", default=None,
                         help="Resolved child model name (e.g. claude-opus-5-5); default keeps the bound alias.")
     return parser.parse_args(argv)
@@ -171,15 +188,11 @@ def main(argv=None) -> int:
     args = parse_args(argv)
     try:
         provenance = lane_provenance(args.agentlab_root.resolve(), args.workflow, vendored_sums(), args.agent_file)
-        current_tree = tree_sha256(args.repo.resolve())
-        if current_tree != args.repo_tree_sha256:
-            raise ProvenanceError(f"the evidence tree under --repo is {current_tree}, not the launch digest "
-                                  f"{args.repo_tree_sha256}; it changed while the lane ran, so rerun on a fixed export")
-        provenance["repo_tree_sha256"] = current_tree
+        result = json.loads(args.result.read_text(encoding="utf-8"))
+        provenance["repo_tree_sha256"] = launch_tree(result, args.repo.resolve())
     except ProvenanceError as error:
         print(error, file=sys.stderr)
         return 2
-    result = json.loads(args.result.read_text(encoding="utf-8"))
     out_dir = args.work_dir / "claude"
     out_dir.mkdir(parents=True, exist_ok=True)
     written, without_final, failures = [], [], []

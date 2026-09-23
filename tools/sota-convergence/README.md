@@ -1573,11 +1573,20 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
   symlink's text); `scripts/landscape.py` requires it on new-wave returns.
   - `codex_lane` hashes the tree at launch and again after its calls. If the tree changed, it sets that run's
     returns aside as `<name>.json.tree-changed`, and a resume against another export reruns.
-  - `claude_lane.py` needs `--repo` and `--repo-tree-sha256`, the digest taken before the lane launched, and
-    refuses (exit 2) when the tree changed.
+  - `claude_lane.py` needs `--repo`. The workflow echoes the caller's `args.launch` (vendored bytes from
+    agent-lab #42), and the script refuses (exit 2) unless that launch is `{repo, repo_tree_sha256}` naming
+    `--repo` and the tree's current digest (round 10).
   - `adjudicate codex` recomputes its provenance after the calls and voids that run's judgments when it
     changed. `claude-collect` recomputes it from the `claude-args` snapshot, which now records `prompt_path`
     and `repo`.
+- **Bindings added in round 10:**
+  - `claude-collect` uses the repository the `claude-args` snapshot validated. A `--repo` override or a
+    returned `repo` must name it exactly.
+  - Each Codex worker rechecks the indexed input hash when it starts and after its calls.
+  - `inputs` records each lane return file's sha256. `assemble` refuses a layer whose lane return changed
+    since then, and writes `lane_returns_sha256` into the record; `record_verdicts.py` refuses a new-wave
+    adjudication whose `lane_returns_sha256` does not name the lane returns it seals.
+  - Leak records keep input basenames only.
 - **Audit roots (round 9):** the Codex adjudication audit allows `<work-dir>/adjudication-packets/`.
 - **Leak text (round 9):** a reported leak's text has every path form the input scrubbing removes replaced by
   `<outside-path>`, and is capped at 400 characters, before it is stored in `leaks.json`,

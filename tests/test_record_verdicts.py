@@ -185,6 +185,12 @@ def counterbalanced(winner_lane, why="The retained receipt decides it.", evidenc
 
 
 def write_adjudication(adjudications_dir: Path, catalog: str, layer_id: str, data: dict):
+    """Like adjudicate.py assemble, the record names the lane return files it compared (their current bytes,
+    when both are already written under the work dir beside ``adjudications_dir``)."""
+    lanes = {lane: adjudications_dir.parent / lane / f"{catalog}__{layer_id}.json" for lane in ("claude", "codex")}
+    if "lane_returns_sha256" not in data and all(path.is_file() for path in lanes.values()):
+        data = dict(data, lane_returns_sha256={lane: hashlib.sha256(path.read_bytes()).hexdigest()
+                                               for lane, path in lanes.items()})
     adjudications_dir.mkdir(parents=True, exist_ok=True)
     (adjudications_dir / f"{catalog}__{layer_id}.json").write_text(json.dumps(data, indent=1), encoding="utf-8")
 
@@ -1584,6 +1590,20 @@ class NewWaveLaneIdentityTests(NewWaveFixture):
         self.assertEqual(row["verdict_status"], "recorded")
         self.assertEqual(row["winners"][0]["component_id"], "wave-crossfamily-layer-c1")
         build_landscape(self.root)
+
+    def test_an_adjudication_of_other_lane_returns_is_rejected(self):
+        # Codex review of #145: a lane rerun after assemble must not inherit the old winner_lane.
+        catalog = self.both_lanes("wave-crossfamily-layer", codex_winner="c2")
+        adjudications = self.work_dir / "adjudications"
+        write_adjudication(adjudications, catalog, "wave-crossfamily-layer", cross_family("claude", self.digest))
+        codex_file = self.work_dir / "codex" / f"{catalog}__wave-crossfamily-layer.json"
+        data = json.loads(codex_file.read_text(encoding="utf-8"))
+        data["why_selected"] = data.get("why_selected", "") + " (rerun after assemble)"
+        codex_file.write_text(json.dumps(data, indent=1), encoding="utf-8")
+        code, output = self.run_wave(adjudications=adjudications)
+        self.assertEqual(code, 1, output)
+        self.assertIn("lane_returns_sha256 does not name the lane returns being sealed", output)
+        self.assertNotEqual(self.load_row(catalog, "wave-crossfamily-layer")["verdict_status"], "recorded")
 
     def test_judgments_without_judge_identity_are_rejected(self):
         catalog = self.both_lanes("wave-nojudge-layer", codex_winner="c2")

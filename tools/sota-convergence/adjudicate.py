@@ -376,7 +376,10 @@ def build_inputs(work_dir: Path, layers=None, repo_roots=()) -> dict:
             snapshot_packet.parent.mkdir(parents=True, exist_ok=True)
             snapshot_packet.write_bytes(packet_path.read_bytes())
         entry = {"layer": name, "packet_path": str(snapshot_packet), "packet_sha256": packet_sha256,
-                 "components": {lane: components_list(components[lane]) for lane in FAMILIES}}
+                 "components": {lane: components_list(components[lane]) for lane in FAMILIES},
+                 # The lane return files these inputs were built from (Codex review of #145): assemble and
+                 # record_verdicts.py refuse the adjudication for any other returns.
+                 "lane_returns_sha256": {lane: sha256_file(path) for lane, path in paths.items()}}
         if components["claude"] == components["codex"]:
             entry["agreement"] = "agree"
             index["layers"].append(entry)
@@ -692,6 +695,11 @@ def run_codex(args) -> int:
         stem = f"{name}.{order}"
         leak = None
         judged_sha256 = sha256_file(Path(input_path))
+        if inputs_changed(index, [stem]):
+            # Rebuilt or edited after the scheduling check (Codex review of #145): never judge unindexed bytes.
+            with lock:
+                failures.append((stem, "the input changed after `inputs` built it; rerun inputs"))
+            return
         # Both orders' content before the call: a leak suppresses both, bound to what was judged.
         both_sha256 = layer_input_hashes(index, name)
         judge, judge_model, judge_codes, failure, judge_leak = run_codex_call(
@@ -720,6 +728,9 @@ def run_codex(args) -> int:
                              "packet_sha256": packet_sha256}]):
             # The packet copy changed while the judges ran: nothing they returned counts.
             judge, refuter, leak, failure = None, None, None, "the packet snapshot changed during the call"
+        elif inputs_changed(index, [stem]):
+            # The input changed while the judges read it (Codex review of #145).
+            judge, refuter, leak, failure = None, None, None, "the input changed during the call; rerun inputs"
         # The configured --model first, as codex_lane.py records it; the event stream only reports.
         model = args.model or judge_model or "unknown"
         write_json(out_path, judgment_record(
@@ -831,7 +842,8 @@ def record_leaks(path: Path, index: dict, leaks) -> list:
                       "inputs_sha256": both_by_name,
                       "family": leak.get("family"), "stage": leak.get("stage"),
                       "text": redact_leak_text(leak.get("text")),
-                      "inputs": inputs.get(name, {})}
+                      # Basenames only (Codex review of #145): the indexed paths expose the work-dir layout.
+                      "inputs": {order_key: Path(str(path)).name for order_key, path in inputs.get(name, {}).items()}}
             if (record["input"], record["input_sha256"], record["family"], record["stage"]) in seen:
                 continue
             seen.add((record["input"], record["input_sha256"], record["family"], record["stage"]))
@@ -910,7 +922,7 @@ def packets_changed(items) -> list:
     return changed
 
 
-def collect_claude(work_dir: Path, result, model: str, repo=None) -> list:
+def collect_claude(work_dir: Path, result, model: str, repo_override=None) -> list:
     """Write the Claude family's judgment files from the workflow return; returns the missing (stem, reason)."""
     work_dir = Path(work_dir).resolve()
     if not (isinstance(model, str) and FAMILY_MODEL_PATTERNS["anthropic"].fullmatch(model)):
@@ -922,7 +934,6 @@ def collect_claude(work_dir: Path, result, model: str, repo=None) -> list:
     for item in (result.get("items") if isinstance(result, dict) else None) or []:
         if isinstance(item, dict) and item.get("order") in ORDERS and isinstance(item.get("name"), str):
             returned[(item["name"], item["order"])] = item
-    repo = repo or (result.get("repo") if isinstance(result, dict) else None)
     missing, leaks = [], []
     index = load_index(work_dir)
     leaked_inputs = recorded_leaks(work_dir)
@@ -935,6 +946,13 @@ def collect_claude(work_dir: Path, result, model: str, repo=None) -> list:
         raise ValueError(f"adjudicate: the workflow result's snapshot_id {returned_id!r} is not the current "
                          f"claude-args snapshot {snapshot_doc.get('snapshot_id')!r}; rerun the workflow with "
                          "the current claude-args output")
+    # The repository is the one claude-args validated and snapshotted (Codex review of #145); an override or a
+    # returned value must name it exactly, since assemble relativizes paths under it.
+    repo = snapshot_doc.get("repo")
+    for label, value in (("--repo", repo_override), ("the workflow result's repo",
+                                                     result.get("repo") if isinstance(result, dict) else None)):
+        if value is not None and str(value) != repo:
+            raise ValueError(f"adjudicate: {label} {str(value)!r} is not the claude-args repository {repo!r}")
     snapshot = snapshot_doc.get("inputs") or {}
     snapshot_provenance = snapshot_doc.get("provenance")
     # The evidence tree and code the workflow's judges read must still be what claude-args hashed (Codex
@@ -1141,7 +1159,17 @@ def assemble(work_dir: Path, out_dir: Path, layers=None):
         name = entry["layer"]
         if layers and name not in layers and name.split("__", 1)[1] not in layers:
             continue
+        indexed_returns = entry.get("lane_returns_sha256") or {}
+        changed_returns = [lane for lane in FAMILIES if not (work_dir / lane / f"{name}.json").is_file()
+                           or indexed_returns.get(lane) != sha256_file(work_dir / lane / f"{name}.json")]
+        if changed_returns:
+            # A lane was rerun after `inputs` (Codex review of #145): the judges compared other returns.
+            issues.append((name, f"the {', '.join(changed_returns)} lane return changed after `inputs`; rerun "
+                                 "inputs and adjudicate the current returns"))
+            (out_dir / f"{name}.json").unlink(missing_ok=True)
+            continue
         record, notes, leaked = assemble_layer(work_dir, entry, leaked_inputs)
+        record["lane_returns_sha256"] = {lane: indexed_returns[lane] for lane in FAMILIES}
         for note in notes:
             print(f"adjudicate: {name}: {note}", file=sys.stderr)
         if leaked:
