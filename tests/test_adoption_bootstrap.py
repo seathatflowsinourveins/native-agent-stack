@@ -7,8 +7,10 @@ behavior are exercised via `bash -c`, using a stub HOME and no real download.
 
 import json
 from pathlib import Path
+import platform
 import re
 import subprocess
+import sys
 import tempfile
 import unittest
 
@@ -18,6 +20,15 @@ SCRIPT_PATH = ROOT / "adoption/bootstrap-linux.sh"
 MANIFEST_PATH = ROOT / "adoption/manifest.json"
 WORKFLOW_PATH = ROOT / ".github/workflows/adoption-bootstrap.yml"
 PUBLISH_WORKFLOW_PATH = ROOT / ".github/workflows/publish-catalog.yml"
+
+# bootstrap-linux.sh refuses to run at all off Linux x86_64 (its own guard,
+# "This verified asset set targets x86_64 Linux, not Windows/Git Bash or ARM.");
+# tests that exercise behaviour past that guard only make sense on that platform.
+# adoption/bootstrap-macos.sh is the separate, already-covered macOS path.
+LINUX_X86_64_ONLY = unittest.skipUnless(
+    sys.platform.startswith("linux") and platform.machine() == "x86_64",
+    "bootstrap-linux.sh targets Linux x86_64 only",
+)
 GITHUB_AUTOMATION_DOC_PATH = ROOT / "docs/github-automation.md"
 
 SHA256_HEX = re.compile(r"[0-9a-f]{64}\Z")
@@ -124,6 +135,7 @@ class ScriptBehaviorTests(unittest.TestCase):
         self.assertEqual(result.returncode, 2)
         self.assertIn("--profile", result.stderr)
 
+    @LINUX_X86_64_ONLY
     def test_unknown_profile_exits_nonzero(self):
         result = subprocess.run(
             ["bash", str(SCRIPT_PATH), "--profile", "not-a-real-profile", "--skip-system-packages"],
@@ -134,6 +146,7 @@ class ScriptBehaviorTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("Unknown or empty profile", result.stderr)
 
+    @LINUX_X86_64_ONLY
     def test_null_hash_pin_is_refused_before_any_download(self):
         with tempfile.TemporaryDirectory() as tmp:
             tmp_path = Path(tmp)
@@ -224,6 +237,7 @@ class UnpinnedComponentFailClosedTests(unittest.TestCase):
             env={**os.environ, "ECO_INSTALL_ROOT": str(eco_root)},
         )
 
+    @LINUX_X86_64_ONLY
     def test_unpinned_component_exits_3_before_installing_anything(self):
         with tempfile.TemporaryDirectory() as tmp:
             tmp_path = Path(tmp)
@@ -243,6 +257,7 @@ class UnpinnedComponentFailClosedTests(unittest.TestCase):
                 "no tool files should have been installed before the refusal",
             )
 
+    @LINUX_X86_64_ONLY
     def test_allow_unpinned_covering_every_gap_proceeds_and_is_logged(self):
         with tempfile.TemporaryDirectory() as tmp:
             tmp_path = Path(tmp)
@@ -261,6 +276,7 @@ class UnpinnedComponentFailClosedTests(unittest.TestCase):
                 "no pin exists for any selected component, so nothing should install",
             )
 
+    @LINUX_X86_64_ONLY
     def test_partial_allow_unpinned_still_fails_closed_on_the_rest(self):
         with tempfile.TemporaryDirectory() as tmp:
             tmp_path = Path(tmp)
@@ -282,6 +298,7 @@ class InstallRootCanonicalHomeTests(unittest.TestCase):
     ("$HOME/.", a symlink to HOME, "$HOME/../<home>") must be refused before
     bin/, tools/ or downloads/ are created in HOME (cross-family review P2)."""
 
+    @LINUX_X86_64_ONLY
     def test_install_root_that_resolves_to_home_is_refused(self):
         import os
         with tempfile.TemporaryDirectory() as tmp:
@@ -321,6 +338,7 @@ class SystemPackagesBeforePrerequisiteCheckTests(unittest.TestCase):
             "the apt-get install step must run before the curl/git/tar/jq presence check",
         )
 
+    @LINUX_X86_64_ONLY
     def test_skip_system_packages_with_missing_tool_lists_it_and_exits_4(self):
         # Exercise the real check logic (not just source order) by prepending a
         # stub PATH directory that shadows `jq` with nothing, so the presence
