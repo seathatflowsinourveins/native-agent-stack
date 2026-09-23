@@ -7,10 +7,13 @@ import json
 from pathlib import Path
 import re
 import stat
-import tempfile
 
 HERE = Path(__file__).resolve().parent
 BASELINE = HERE.parent / 'wsl-restore'
+_PATH_SAFETY_SPEC = importlib.util.spec_from_file_location(
+    "path_safety", HERE.parents[2] / "scripts/path_safety.py")
+_path_safety = importlib.util.module_from_spec(_PATH_SAFETY_SPEC)
+_PATH_SAFETY_SPEC.loader.exec_module(_path_safety)
 OBJECT = re.compile(r'(?:config|data/[0-9a-f]{2}/[0-9a-f]{64}|(?:index|keys|snapshots)/[0-9a-f]{64})\Z')
 
 
@@ -73,22 +76,12 @@ def decode_repository(bundle, expected, target):
     if set(decoded) != set(indexed):
         raise ValueError('missing ciphertext object')
     target = Path(target).absolute()
-    # See blueprints/us-equities/alpaca-historical/collect.py:safe_path --
-    # only the system's own symlinked temp-directory boundary (macOS's
-    # /tmp -> /private/tmp, /var -> /private/var, ...) is tolerated; every
-    # component below it (or, outside the temp tree, from the filesystem
-    # root) must still be symlink-free.
-    tmp_root = Path(tempfile.gettempdir())
-    try:
-        remainder = target.relative_to(tmp_root)
-        candidate = tmp_root.resolve()
-    except ValueError:
-        remainder = target.relative_to(target.anchor)
-        candidate = Path(target.anchor)
-    for part in remainder.parts:
-        candidate /= part
-        if candidate.is_symlink():
-            raise ValueError('repository target traverses a symlink')
+    if '..' in target.parts:
+        raise ValueError('repository target traverses a symlink')
+    # See scripts/path_safety.py: a symlink is tolerated only when it is a
+    # trusted OS-level boundary link (root-owned, not group/world-writable,
+    # e.g. macOS's /tmp -> /private/tmp); $TMPDIR grants no exemption.
+    _path_safety.refuse_untrusted_symlinks(target, 'repository target traverses a symlink')
     target.mkdir(mode=0o700)  # Existing targets, including symlinks, are refused.
     for name, raw in decoded.items():
         path = target / name

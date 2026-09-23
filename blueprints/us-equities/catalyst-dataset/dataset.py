@@ -10,13 +10,15 @@ import inspect
 import json
 from pathlib import Path
 import re
-import tempfile
 
 HERE = Path(__file__).resolve().parent
 STRICT_PATH = HERE.parent / "catalyst-provenance/catalyst.py"
 SPEC = importlib.util.spec_from_file_location("strict_catalyst", STRICT_PATH)
 strict = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(strict)
+_PATH_SAFETY_SPEC = importlib.util.spec_from_file_location("path_safety", HERE.parents[2] / "scripts/path_safety.py")
+_path_safety = importlib.util.module_from_spec(_PATH_SAFETY_SPEC)
+_PATH_SAFETY_SPEC.loader.exec_module(_path_safety)
 MAX_JSON = 20 * 1024 * 1024
 EDGAR_VERSION = "5.58.0"
 DUCKDB_VERSION = "1.5.5"
@@ -35,26 +37,10 @@ def sha(raw):
 
 
 def safe_path(path):
-    path = Path(path).absolute()
-    if ".." in path.parts:
-        raise ValueError("symlink_or_parent_traversal_refused")
-    # See blueprints/us-equities/alpaca-historical/collect.py:safe_path --
-    # only the system's own symlinked temp-directory boundary (macOS's
-    # /tmp -> /private/tmp, /var -> /private/var, ...) is tolerated; every
-    # component below it (or, outside the temp tree, from the filesystem
-    # root) must still be symlink-free.
-    tmp_root = Path(tempfile.gettempdir())
-    try:
-        remainder = path.relative_to(tmp_root)
-        candidate = tmp_root.resolve()
-    except ValueError:
-        remainder = path.relative_to(path.anchor)
-        candidate = Path(path.anchor)
-    for part in remainder.parts:
-        candidate /= part
-        if candidate.is_symlink():
-            raise ValueError("symlink_or_parent_traversal_refused")
-    return path
+    # See scripts/path_safety.py: a symlink is tolerated only when it is a
+    # trusted OS-level boundary link (root-owned, not group/world-writable,
+    # e.g. macOS's /tmp -> /private/tmp); $TMPDIR grants no exemption.
+    return _path_safety.refuse_untrusted_symlinks(path, "symlink_or_parent_traversal_refused")
 
 
 def read_bytes(path, cap=MAX_JSON):

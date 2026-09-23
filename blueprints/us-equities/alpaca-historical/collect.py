@@ -9,12 +9,12 @@ from datetime import date, datetime, timezone
 from decimal import Decimal
 import hashlib
 import importlib.metadata
+import importlib.util
 import inspect
 import json
 import os
 from pathlib import Path
 import re
-import tempfile
 import time
 from uuid import UUID
 from urllib.parse import parse_qs, urlsplit
@@ -23,6 +23,10 @@ from zoneinfo import ZoneInfo
 HERE = Path(__file__).resolve().parent
 MAX_BODY = 8 * 1024 * 1024
 UTC = timezone.utc
+
+_PATH_SAFETY_SPEC = importlib.util.spec_from_file_location("path_safety", HERE.parents[2] / "scripts/path_safety.py")
+_path_safety = importlib.util.module_from_spec(_PATH_SAFETY_SPEC)
+_PATH_SAFETY_SPEC.loader.exec_module(_path_safety)
 
 
 def sha(raw):
@@ -50,28 +54,10 @@ def strict_json(raw):
 
 
 def safe_path(path):
-    path = Path(path).absolute()
-    if ".." in path.parts:
-        raise ValueError("symlink_or_parent_traversal_refused")
-    # Only the system's own symlinked temp-directory boundary (macOS's
-    # /tmp -> /private/tmp, /var -> /private/var, ...) is tolerated: resolve
-    # that one boundary once, then require every component below it (or,
-    # for a path outside the temp tree, every component from the filesystem
-    # root) to be symlink-free -- exactly like the original check, just
-    # anchored so a legitimate system boundary doesn't get walked as if it
-    # were an injected symlink.
-    tmp_root = Path(tempfile.gettempdir())
-    try:
-        remainder = path.relative_to(tmp_root)
-        candidate = tmp_root.resolve()
-    except ValueError:
-        remainder = path.relative_to(path.anchor)
-        candidate = Path(path.anchor)
-    for part in remainder.parts:
-        candidate /= part
-        if candidate.is_symlink():
-            raise ValueError("symlink_or_parent_traversal_refused")
-    return path
+    # See scripts/path_safety.py: a symlink is tolerated only when it is a
+    # trusted OS-level boundary link (root-owned, not group/world-writable,
+    # e.g. macOS's /tmp -> /private/tmp); $TMPDIR grants no exemption.
+    return _path_safety.refuse_untrusted_symlinks(path, "symlink_or_parent_traversal_refused")
 
 
 def read(path):

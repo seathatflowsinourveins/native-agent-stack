@@ -58,6 +58,20 @@ class EvidenceGuards(unittest.TestCase):
         link = self.root / 'alias'; link.symlink_to(self.root, target_is_directory=True)
         with self.assertRaises(ValueError): app.owned_root(link)
 
+    def test_owned_root_refuses_a_symlinked_parent_that_resolves_to_tmp(self):
+        # Round-2 security review: /tmp/x -> /tmp lets path.parent.resolve()
+        # equal Path('/tmp').resolve() even though path.parent is NOT
+        # literally /tmp -- and /tmp/x can be repointed elsewhere after this
+        # check and before the root is actually used (TOCTOU). Must fail on
+        # c1f30cb (path.parent.resolve() != Path('/tmp').resolve()) and pass
+        # now that path.parent must literally be /tmp or its resolved form.
+        alias = Path('/tmp') / ('native-offhost-app-alias.' + str(os.getpid()))
+        self.addCleanup(lambda: alias.unlink() if alias.is_symlink() else None)
+        alias.symlink_to('/tmp')
+        victim = alias / self.root.name
+        with self.assertRaises(ValueError):
+            app.owned_root(victim)
+
     def test_password_requires_regular_0600_file(self):
         trial = app.Trial(self.root, 'test'); private = self.root / 'private'; private.mkdir()
         path = private / 'password'; path.write_text('public-unit-test-fixture\n'); path.chmod(0o644)

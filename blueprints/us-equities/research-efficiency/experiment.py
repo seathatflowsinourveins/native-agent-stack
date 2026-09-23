@@ -9,11 +9,13 @@ import os
 from pathlib import Path
 import re
 import subprocess
-import tempfile
 import time
 
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[2]
+_PATH_SAFETY_SPEC = importlib.util.spec_from_file_location("path_safety", REPO / "scripts/path_safety.py")
+_path_safety = importlib.util.module_from_spec(_PATH_SAFETY_SPEC)
+_PATH_SAFETY_SPEC.loader.exec_module(_path_safety)
 CORPUS = [
     'blueprints/us-equities/identity-readiness/README.md',
     'blueprints/us-equities/authenticated-data/README.md',
@@ -79,24 +81,10 @@ def write(path, raw):
 
 
 def safe(path):
-    path = Path(path).absolute()
-    # See blueprints/us-equities/alpaca-historical/collect.py:safe_path --
-    # only the system's own symlinked temp-directory boundary (macOS's
-    # /tmp -> /private/tmp, /var -> /private/var, ...) is tolerated; every
-    # component below it (or, outside the temp tree, from the filesystem
-    # root) must still be symlink-free.
-    tmp_root = Path(tempfile.gettempdir())
-    try:
-        remainder = path.relative_to(tmp_root)
-        candidate = tmp_root.resolve()
-    except ValueError:
-        remainder = path.relative_to(path.anchor)
-        candidate = Path(path.anchor)
-    for part in remainder.parts:
-        candidate /= part
-        if candidate.is_symlink():
-            raise ValueError('symlink refused')
-    return path
+    # See scripts/path_safety.py: a symlink is tolerated only when it is a
+    # trusted OS-level boundary link (root-owned, not group/world-writable,
+    # e.g. macOS's /tmp -> /private/tmp); $TMPDIR grants no exemption.
+    return _path_safety.refuse_untrusted_symlinks(path, 'symlink refused')
 
 
 def verify_files(root, entries):

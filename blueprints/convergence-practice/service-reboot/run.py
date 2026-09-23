@@ -3,6 +3,7 @@
 import argparse
 from datetime import datetime, timezone
 import hashlib
+import importlib.util
 import io
 import json
 import os
@@ -13,12 +14,14 @@ import signal
 import socket
 import subprocess
 import tarfile
-import tempfile
 import time
 import urllib.request
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[2]
+_PATH_SAFETY_SPEC = importlib.util.spec_from_file_location("path_safety", ROOT / "scripts/path_safety.py")
+_path_safety = importlib.util.module_from_spec(_PATH_SAFETY_SPEC)
+_PATH_SAFETY_SPEC.loader.exec_module(_path_safety)
 MARKER = 'NATIVE_REBOOT_OBSERVER '
 GUEST_ARCHIVE = ('sudo /usr/bin/tar --exclude=./dagu-home/data/auth '
                  '-C /var/lib/service-reboot -czf - .')
@@ -146,22 +149,10 @@ def audit_guest(guest, observations, host, frozen):
 def run(work):
     if not work.is_absolute() or work.exists() or work.is_symlink():
         raise ValueError('--work must be a new absolute path without symlink ancestors')
-    # See blueprints/us-equities/alpaca-historical/collect.py:safe_path --
-    # only the system's own symlinked temp-directory boundary (macOS's
-    # /tmp -> /private/tmp, /var -> /private/var, ...) is tolerated; every
-    # component below it (or, outside the temp tree, from the filesystem
-    # root) must still be symlink-free.
-    tmp_root = Path(tempfile.gettempdir())
-    try:
-        remainder = work.relative_to(tmp_root)
-        candidate = tmp_root.resolve()
-    except ValueError:
-        remainder = work.relative_to(work.anchor)
-        candidate = Path(work.anchor)
-    for part in remainder.parts:
-        candidate /= part
-        if candidate.is_symlink():
-            raise ValueError('--work must be a new absolute path without symlink ancestors')
+    # See scripts/path_safety.py: a symlink is tolerated only when it is a
+    # trusted OS-level boundary link (root-owned, not group/world-writable,
+    # e.g. macOS's /tmp -> /private/tmp); $TMPDIR grants no exemption.
+    _path_safety.refuse_untrusted_symlinks(work, '--work must be a new absolute path without symlink ancestors')
     # Execution is intentionally unavailable on an existing desktop host.
     if os.environ.get('GITHUB_ACTIONS') != 'true' or os.environ.get('RUNNER_ENVIRONMENT') != 'github-hosted':
         raise ValueError('Execution requires the declared disposable GitHub-hosted runner')
