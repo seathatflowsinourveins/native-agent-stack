@@ -1,0 +1,57 @@
+mcporter — Model Context Protocol CLI & generator
+
+Usage: mcporter <command> [options]
+
+Core commands
+  list      List configured servers (add --schema for tool docs)
+    usage: mcporter list [name] [--schema] [--json]
+  call      Call a tool by selector (server.tool) or HTTP URL; key=value flags supported
+    usage: mcporter call <selector> [key=value ...]
+  resource  List or read MCP resources exposed by a server
+    usage: mcporter resource <server> [uri]
+  auth      Complete OAuth for a server without listing tools
+    usage: mcporter auth <server | url> [--reset]
+  vault     Seed or clear OAuth credentials non-interactively
+    usage: mcporter vault set <server> --tokens-file <path>
+  record    Capture MCP JSON-RPC traffic to NDJSON
+    usage: mcporter record <session-name> [--server <name>] [-- <command>]
+  replay    Replay recorded MCP JSON-RPC traffic deterministically
+    usage: mcporter replay <session-name> [--server <name>] [-- <command>]
+
+Generator & tooling
+  generate-cli  Emit a standalone CLI (supports HTTP, stdio, and inline commands)
+    usage: mcporter generate-cli --server <name> | --command <ref> [options]
+  inspect-cli   Show metadata and regen instructions for a generated CLI
+    usage: mcporter inspect-cli <path> [--json]
+  emit-ts       Generate TypeScript client/types for a server
+    usage: mcporter emit-ts <server> --mode client|types [options]
+
+Configuration
+  config  Inspect or edit config files (list, get, add, remove, import, login, logout)
+    usage: mcporter config <command> [options]
+
+Daemon
+  daemon  Manage the keep-alive daemon (start | status | stop | restart)
+    usage: mcporter daemon <subcommand>
+  serve   Expose daemon-managed keep-alive servers as one MCP server
+    usage: mcporter serve [--servers a,b,c] [--stdio | --http <port>]
+
+
+Global flags
+  --config <path>                   Path to mcporter.json (defaults to ./config/mcporter.json)
+  --root <path>                     Working directory for stdio servers
+  --log-level <debug|info|warn|error>Adjust CLI logging (defaults to warn)
+  --oauth-timeout <ms>              Time to wait for browser-based OAuth before giving up (default 300000)
+
+Quick start
+  mcporter list
+    # show configured servers
+  mcporter list linear --schema
+    # view Linear tool docs
+  mcporter call linear.list_issues limit:5
+    # invoke a tool with key=value arguments
+  mcporter generate-cli --command https://host/mcp --compile ./my-cli
+    # build a standalone CLI/binary
+
+Run `mcporter <command> --help` for detailed flags.
+mcporter auto-loads servers from ./config/mcporter.json and editor imports (Cursor, Claude, Codex, etc.).

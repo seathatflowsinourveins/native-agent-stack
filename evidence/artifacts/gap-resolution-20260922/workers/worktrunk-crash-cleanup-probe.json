@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "id": "worktrunk-crash-cleanup-probe",
+  "date": "2026-09-22",
+  "layer_ids": ["workers", "git-github-automation"],
+  "gap_refs": [
+    { "layer_id": "workers", "gap_index": 5 },
+    { "layer_id": "git-github-automation", "gap_index": 3 }
+  ],
+  "purpose": "Test whether killing worktrunk (pinned 0.79.0) and native `git worktree` mid-operation leaves orphaned/half-registered state, and whether each tool's own removal/prune path recovers cleanly, per gap-triage.json workers gap 5 and git-github-automation gap 3 ('Worktrunk crash cleanup without deleting unrelated or dirty state is not established'). Applies the critic's correction for check_id worktrunk-crash-cleanup-probe verbatim: `wt switch --create <branch> --base=main --no-hooks --no-cd --format=json` (not bare `wt switch <branch>`, which fails on a nonexistent branch and would test nothing), `wt list --format=json` (not `--json`), and an absolute owned scratch path (/tmp/wtcrash-scratch) rather than a relative evidence/ path. Ran 5 create-then-SIGKILL trials against wt and, as the native comparison point, 5 against `git worktree add ... -b <branch>` in a matched second repo, then probed worktree/branch registration and attempted `wt remove` / `git worktree remove` + `git worktree prune` on every killed branch.",
+  "preregistered": "If SIGKILL sent immediately after Popen() returns (no delay) leaves worktrunk in a state with a registered-but-broken worktree entry (visible in `wt list --format=json` or a stray .git/worktrees/<branch> directory) while `git worktree add` under an identical kill leaves an analogous stray entry, that would demonstrate real crash-orphan state and let `wt remove`/prune vs `git worktree remove`/prune be compared as a matched recovery arm, settling the gap in whichever tool's direction recovers cleanly. If instead the kill lands before either tool has written any on-disk worktree registration (i.e. .git/worktrees never gets created for either), no orphan state is produced by this trial design, cleanup commands can only be exercised against already-clean/nonexistent targets, and the check would be recorded as inconclusive for the crash-orphan question specifically, while still reporting whatever the remove/prune commands actually did.",
+  "preregistration_timing": "post_hoc: no timestamped file predating the raw artifacts exists in this repository or under $HOME/codex-ecosystem/state/gap-resolution-20260922/ (raw output crash-probe-out/ was written 2026-09-22T18:36:54 -0400 / 22:36:54Z; this receipt, its blueprints, and its manifests/evidence.json registration all first appear together in commit 87b3f9e, after the raw output). The text above states the trial design's decision rule honestly, and its 'inconclusive' branch does match what was observed, but it cannot be demonstrated to have been written before the result was known. Treat 'preregistered' here as a description of the intended decision rule recorded alongside the result, not as evidence the outcome was predicted in advance of running the probe.",
+  "commands": [
+    { "cmd": "for branch in probe-1..5: Popen(['wt','switch','--create',branch,'--base=main','--no-hooks','--no-cd','--format=json'], cwd=/tmp/wtcrash-scratch/wt-repo); immediate SIGKILL", "exit": 137, "duration_s": null, "output_excerpt": "kill_latency_s per trial: 0.0025, 0.0043, 0.0094, 0.0014, 0.0096 (wt); process killed before Popen's caller observed any stdout", "output_sha256": "94f832d856a1e9c2252075889e639f8f7343ef958736d1ab6717f56ed6ed3b06" },
+    { "cmd": "for branch in gprobe-1..5: Popen(['git','worktree','add','../owned-'+branch,'-b',branch], cwd=/tmp/wtcrash-scratch/git-repo); immediate SIGKILL", "exit": 137, "duration_s": null, "output_excerpt": "kill_latency_s per trial: 0.0044, 0.0118, 0.0080, 0.0013, 0.0030 (git); same trials.jsonl file, tool=git rows", "output_sha256": "94f832d856a1e9c2252075889e639f8f7343ef958736d1ab6717f56ed6ed3b06" },
+    { "cmd": "wt list --format=json (wt-repo, after all 5 wt kills)", "exit": 0, "duration_s": null, "output_excerpt": "schema=2, collected={ci:false,summary:false}, items=[{branch:main, worktree.path=/tmp/wtcrash-scratch/wt-repo, main:true}] -- no probe-1..5 entries", "output_sha256": "db36e239aa40067e87c9112fbb9f5fa2acf747f8e53b84fe346bbddf897b01e2" },
+    { "cmd": "git -C wt-repo worktree list --porcelain; find wt-repo/.git/worktrees", "exit": 1, "duration_s": null, "output_excerpt": "worktree list --porcelain shows only main; find: '.../wt-repo/.git/worktrees': No such file or directory", "output_sha256": null },
+    { "cmd": "git -C git-repo worktree list --porcelain; find git-repo/.git/worktrees", "exit": 1, "duration_s": null, "output_excerpt": "worktree list --porcelain shows only main; find: '.../git-repo/.git/worktrees': No such file or directory", "output_sha256": null },
+    { "cmd": "wt remove probe-1..5 --foreground --no-hooks --format=json (recovery attempt on the killed branches)", "exit": 1, "duration_s": null, "output_excerpt": "'✗ No branch named probe-N' for all 5, exit_for_probe-N=1 each", "output_sha256": "7953d60a50b129f4cc4bd1e37c9afcea2e302d1c011e5880eed948235945cb13" },
+    { "cmd": "git worktree remove ../owned-gprobe-1..5 (recovery attempt on the killed branches)", "exit": 128, "duration_s": null, "output_excerpt": "'fatal: .../git-repo-owned-gprobe-N is not a working tree' for all 5, exit_for_gprobe-N=128 each", "output_sha256": "83ba398d265538ef48370f79d6678cc04bac289ec3f342b1f3974e9b4e97f5b6" },
+    { "cmd": "git worktree prune (both repos); wt list --format=json (wt-repo, post-recovery-attempts)", "exit": 0, "duration_s": null, "output_excerpt": "prune produced no output (nothing to prune); post-attempt wt list byte-identical to pre-attempt list", "output_sha256": "db36e239aa40067e87c9112fbb9f5fa2acf747f8e53b84fe346bbddf897b01e2" }
+  ],
+  "tool_versions": {
+    "worktrunk": "wt v0.79.0",
+    "git": "git version 2.43.0"
+  },
+  "installs": [],
+  "result": {
+    "trial_count": { "wt": 5, "git": 5 },
+    "kill_latency_s": { "wt": [0.002481222152709961, 0.004276275634765625, 0.009388923645019531, 0.001440286636352539, 0.009557723999023438], "git": [0.004439353942871094, 0.011786222457885742, 0.00799083709716796, 0.0012786388397216797, 0.0029804706573486328] },
+    "post_kill_state": {
+      "wt_repo": { "git_worktree_list": ["main"], "wt_list_items": ["main"], "dot_git_worktrees_dir_exists": false, "status_porcelain_empty": true },
+      "git_repo": { "git_worktree_list": ["main"], "dot_git_worktrees_dir_exists": false, "status_porcelain_empty": true }
+    },
+    "recovery_attempts": {
+      "wt_remove_on_killed_branches": "5/5 exit 1, 'No branch named <branch>' (branch was never registered; nothing to remove)",
+      "git_worktree_remove_on_killed_branches": "5/5 exit 128, 'is not a working tree' (worktree was never registered; nothing to remove)",
+      "git_worktree_prune": "no-op, no output, no state changed",
+      "final_state_matches_pre_kill_state": true
+    },
+    "live_confirmation": "Re-inspected /tmp/wtcrash-scratch/{git-repo,wt-repo} directly while writing this receipt (not a re-run of the probe): both repos still show only branch 'main' at the same recorded commits (git-repo 9c5224e0..., wt-repo d57bf04c...), consistent with the retained post-kill/post-recovery-attempt files."
+  },
+  "settles_gap": false,
+  "verdict_impact": {
+    "could_change_verdict": false,
+    "direction": "inconclusive",
+    "explanation": "Kill latency was 1-12ms in every trial for both tools -- fast enough that neither wt nor native `git worktree add` had written any on-disk worktree registration (.git/worktrees/<branch>) before the SIGKILL landed, in all 10 trials. This is a genuine, honestly-recorded result, not a null run, but it answers a narrower question than the gap asks: it shows that an at-spawn kill leaves NO orphaned registration for either tool (both recovery paths then correctly report 'nothing to remove'), which is a mild positive signal but does NOT exercise the harder case the gap actually names -- a kill after the tool has begun writing worktree metadata but before it finishes. That harder case needs a probe redesigned to delay the kill until a filesystem signal (e.g. inotify on .git/worktrees or a lockfile) confirms in-progress state, which this run does not attempt (see limitations); this receipt does not itself change the layer's keep_but_compare selection.",
+    "corrected_from": { "settles_gap": "partially" },
+    "correction_note": "FIX ROUND 2026-09-22: settles_gap corrected from 'partially' to false per reviewer finding. The kill landed before either tool had written any on-disk worktree registration in 10/10 trials, so the probe never exercised the mid-write crash state the gap asks about; an at-spawn kill leaving no orphan state is uninformative about crash cleanup for any program (nothing had happened yet to clean up), so neither workers gap 5 nor git-github-automation gap 3 is even partly settled by this run. direction 'inconclusive' was already correct and is unchanged."
+  },
+  "evidence_class": "native_proven",
+  "limitations": [
+    "Kill timing (Popen() return -> immediate SIGKILL, no delay or filesystem-event wait) was too fast in all 10/10 trials to capture genuine mid-write crash state for either tool; the crash-orphan question in the gap remains open pending a redesigned probe that delays the kill until partial on-disk state is observed.",
+    "Only 5 trials per tool on a single synthetic repo; not a statistical claim about kill-timing distribution.",
+    "Per the acceptance rule for this wave, this check was run once and is reported as-is; it was not re-run with a longer delay to try to produce orphaned state, since that would be re-running to fish for a different outcome rather than reporting this trial design's actual result.",
+    "Comparison between wt and native `git worktree` is only meaningful for the 'nothing to remove' path exercised here; no conclusion is drawn about which tool is safer under genuine partial-write crash conditions.",
+    "An at-exec (Popen-return) kill happens before either program has done any tool-specific work, so it cannot discriminate wt's crash-cleanup behavior from git's, or from any other program's: killing anything at that exact point leaves no state to clean up. This probe therefore does not settle either gap; it only establishes the kill-latency floor and confirms the recovery commands behave sanely against already-nonexistent targets.",
+    "The 'preregistered' text is recorded post-hoc alongside the raw output and this receipt in the same commit, not in an earlier timestamped file; see preregistration_timing above."
+  ],
+  "raw_artifacts": [
+    { "path": "$HOME/codex-ecosystem/state/gap-resolution-20260922/worktrunk/crash-probe-out/trials.jsonl", "sha256": "94f832d856a1e9c2252075889e639f8f7343ef958736d1ab6717f56ed6ed3b06" },
+    { "path": "$HOME/codex-ecosystem/state/gap-resolution-20260922/worktrunk/crash-probe-out/wt-list-after-kills.json", "sha256": "db36e239aa40067e87c9112fbb9f5fa2acf747f8e53b84fe346bbddf897b01e2" },
+    { "path": "$HOME/codex-ecosystem/state/gap-resolution-20260922/worktrunk/crash-probe-out/wt-list-after-remove-attempts.json", "sha256": "db36e239aa40067e87c9112fbb9f5fa2acf747f8e53b84fe346bbddf897b01e2" },
+    { "path": "$HOME/codex-ecosystem/state/gap-resolution-20260922/worktrunk/crash-probe-out/wt-remove-attempts.log", "sha256": "7953d60a50b129f4cc4bd1e37c9afcea2e302d1c011e5880eed948235945cb13" },
+    { "path": "$HOME/codex-ecosystem/state/gap-resolution-20260922/worktrunk/crash-probe-out/git-remove-attempts.log", "sha256": "83ba398d265538ef48370f79d6678cc04bac289ec3f342b1f3974e9b4e97f5b6" },
+    { "path": "/tmp/wtcrash-scratch/git-repo (live scratch repo, unmodified since the recorded run)" },
+    { "path": "/tmp/wtcrash-scratch/wt-repo (live scratch repo, unmodified since the recorded run)" }
+  ]
+}

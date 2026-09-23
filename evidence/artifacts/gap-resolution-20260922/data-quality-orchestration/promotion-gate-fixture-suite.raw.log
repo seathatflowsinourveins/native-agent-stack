@@ -1,0 +1,29 @@
+test_bad_fixture_fails_the_expected_named_checks (tests.test_promotion_gate.FixtureGateRuns.test_bad_fixture_fails_the_expected_named_checks) ... ok
+test_empty_snapshot_fails_closed_via_rows_present (tests.test_promotion_gate.FixtureGateRuns.test_empty_snapshot_fails_closed_via_rows_present)
+Regression (finding 1): a 0-row snapshot with every required ... ok
+test_fractional_negative_volume_fails_closed_via_volume_integral_non_negative (tests.test_promotion_gate.FixtureGateRuns.test_fractional_negative_volume_fails_closed_via_volume_integral_non_negative)
+Regression (finding 2): before the fix, a raw volume of -0.5 was ... ok
+test_good_fixture_passes_every_named_check (tests.test_promotion_gate.FixtureGateRuns.test_good_fixture_passes_every_named_check) ... ok
+test_invalid_calendar_fails_closed (tests.test_promotion_gate.FixtureGateRuns.test_invalid_calendar_fails_closed) ... ok
+test_missing_input_fails_closed_with_exception_class (tests.test_promotion_gate.FixtureGateRuns.test_missing_input_fails_closed_with_exception_class) ... ok
+test_null_price_cell_fails_closed_via_unmapped_failures (tests.test_promotion_gate.FixtureGateRuns.test_null_price_cell_fails_closed_via_unmapped_failures)
+Regression: pandera's own `not_nullable` failure identifier is not ... ok
+test_prepare_never_raises_on_invalid_raw_volume (tests.test_promotion_gate.FixtureGateRuns.test_prepare_never_raises_on_invalid_raw_volume)
+`_prepare()`'s coercion must not itself raise on a fractional/NaN/ ... ok
+test_raw_volume_failure_indices_flags_fractional_negative_before_coercion (tests.test_promotion_gate.FixtureGateRuns.test_raw_volume_failure_indices_flags_fractional_negative_before_coercion)
+Regression (finding 2): a raw volume of -0.5 must be flagged ... ok
+test_unsupported_format_fails_closed (tests.test_promotion_gate.FixtureGateRuns.test_unsupported_format_fails_closed) ... ok
+test_check_names_are_fixed_and_cover_the_declared_rules (tests.test_promotion_gate.PurePythonParsing.test_check_names_are_fixed_and_cover_the_declared_rules) ... ok
+test_duckdb_spec_without_table_is_rejected (tests.test_promotion_gate.PurePythonParsing.test_duckdb_spec_without_table_is_rejected) ... ok
+test_duckdb_table_name_pattern_rejects_injection_attempt (tests.test_promotion_gate.PurePythonParsing.test_duckdb_table_name_pattern_rejects_injection_attempt) ... ok
+test_snapshot_path_for_duckdb_spec (tests.test_promotion_gate.PurePythonParsing.test_snapshot_path_for_duckdb_spec) ... ok
+test_snapshot_path_for_plain_file (tests.test_promotion_gate.PurePythonParsing.test_snapshot_path_for_plain_file) ... ok
+test_summarize_with_no_failures_marks_every_check_pass (tests.test_promotion_gate.PurePythonParsing.test_summarize_with_no_failures_marks_every_check_pass) ... ok
+test_summarize_with_zero_row_count_fails_rows_present_only (tests.test_promotion_gate.PurePythonParsing.test_summarize_with_zero_row_count_fails_rows_present_only)
+Regression (finding 1): before the fix, a 0-row snapshot with no ... ok
+test_write_result_is_atomic_and_readable (tests.test_promotion_gate.PurePythonParsing.test_write_result_is_atomic_and_readable) ... ok
+
+----------------------------------------------------------------------
+Ran 18 tests in 7.221s
+
+OK

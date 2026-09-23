@@ -1,0 +1,196 @@
+agentsview v0.44.0 - local web viewer for AI agent sessions
+
+Syncs session data from supported AI coding agents into SQLite,
+serves analytics, and exposes a session browser via local web UI.
+
+Usage:
+  agentsview [flags]
+  agentsview <command> [flags]
+
+Core Commands:
+  daemon                 Manage the background server
+  daemon restart         Restart the background server
+  daemon start           Start the background server
+  daemon status          Show background server status
+  daemon stop            Stop the background server
+  health                 Show session health and signals
+  projects               List projects with session counts
+  prune                  Delete sessions matching filters
+  serve                  Start the web UI and sync server
+  serve restart          Restart the writable SQLite background daemon
+  serve status           Show whether a server is running and where to reach it
+  serve stop             Stop the server, including sync and file watchers
+  sync                   Refresh session data and exit
+
+Data Commands:
+  clickhouse             ClickHouse sync and serve commands
+  clickhouse push        Push local data to ClickHouse
+  clickhouse serve       Serve from ClickHouse (read-only)
+  clickhouse service     Install and manage the clickhouse push --watch background service
+  clickhouse status      Show CLICKHOUSE sync status
+  db                     Maintain the local archive
+  db adopt-machine       Assign historical local machine keys to this installation
+  db compact             Reclaim free SQLite pages and truncate the WAL
+  db migrate             Move retained inline tool-result images into the asset store
+  db strip               Remove retained inline tool-result images
+  duckdb                 DuckDB sync and serve commands
+  duckdb push            Push local data to DuckDB
+  duckdb quack           Quack remote protocol commands
+  duckdb serve           Serve from DuckDB (read-only)
+  duckdb status          Show DuckDB sync status
+  embeddings             Manage the semantic search embedding index
+  embeddings activate    Activate an embedding generation
+  embeddings build       Build or refresh the embedding index
+  embeddings list        List embedding generations
+  embeddings retire      Retire an embedding generation
+  export                 Export local archive data
+  export conversations   Export stored conversation text and changes
+  export day             Export all closed UTC reporting hours for a date
+  export digest          Export reporting digests for a UTC date range
+  export hour            Export one closed UTC reporting hour
+  export range           Discover the available UTC reporting date range
+  export sessions        Export session summaries from the local archive
+  export status          Show export evidence backfill status
+  import                 Import conversations
+  insight                Generate and inspect stored Activity Insights
+  insight generate       Generate and store a new insight via the daemon
+  insight get            Get one stored insight
+  insight list           List stored insights
+  mcp                    Run an MCP server exposing read-only session retrieval tools
+  mcp status             List running HTTP MCP listeners
+  parse-diff             Re-parse session files and diff against the archive
+  pg                     PostgreSQL sync and serve commands
+  pg push                Push local data to PostgreSQL
+  pg serve               Serve from PostgreSQL (read-only)
+  pg service             Install and manage the pg push --watch background service
+  pg status              Show PG sync status
+  pg vectors             Inspect and drop PostgreSQL vector generations
+  raw-sync               Capture and upload provider-owned raw session sources
+  raw-sync status        Show durable laptop raw-sync status
+  raw-sync watch         Continuously capture and upload raw session sources
+  recall                 Build and inspect recalled knowledge from past sessions
+  recall brief           Write a task briefing from accepted entries
+  recall extract         Extract recall entries from session transcripts
+  recall get             Get one accepted recall entry
+  recall import          Import reviewed accepted entries
+  recall list            List accepted entries
+  recall query           Query accepted entries
+  recall stats           Summarize accepted entries
+  secrets                Scan for and list detected secret leaks
+  secrets list           List detected secret findings (redacted by default)
+  secrets scan           Run a full-ruleset scan (definite + candidate rules) and persist findings
+  session                Programmatic access to session data
+  session export         Stream the raw source JSONL for a session (local only)
+  session get            Get session metadata and signals
+  session list           List sessions with filters
+  session messages       Show a window of messages from a session
+  session search         Search message and tool content across sessions
+  session sync           Parse and insert a single session into the database
+  session tool-calls     List tool calls made during a session
+  session usage          Show token usage and cost estimate for a session
+  session watch          Stream NDJSON events as the session updates
+  stats                  Window-scoped workspace analytics (v1 schema)
+  token-use              Show token usage for a session (JSON)
+
+Usage Commands:
+  activity               Activity and concurrency reporting
+  activity report        Activity report over a date range
+  capture                Capture one non-interactive agent execution
+  capture report         Recover or replay a one-shot usage result
+  capture run            Run and report one exact non-interactive execution
+  usage                  Token cost tracking and reporting
+  usage cursor           Ingest Cursor admin usage events
+  usage daily            Daily cost summary
+  usage statusline       One-line cost summary for today
+
+Other Commands:
+  completion             Generate the autocompletion script for the specified shell
+  doctor                 Collect support diagnostics
+  doctor sync            Diagnose startup sync decisions
+  openapi                Print OpenAPI 3.1 schema
+  skills                 Install and list AgentsView skills for coding-agent harnesses
+  skills install         Install AgentsView skill files for coding-agent harnesses
+  skills list            List AgentsView skill files and their install state
+  update                 Check for and install updates
+  version                Show version information
+
+
+Flags:
+  -h, --help      help for agentsview
+  -v, --version   Show version information
+Environment variables:
+  CLAUDE_PROJECTS_DIR     Claude Code projects directory
+  CODEX_SESSIONS_DIR      Codex sessions directory
+  COPILOT_DIR             Copilot sessions or exported JetBrains Copilot directory
+  GEMINI_DIR              Gemini CLI directory
+  OPENCODE_DIR            OpenCode data directory
+  CLINE_DIR               Cline sessions directory
+  CURSOR_PROJECTS_DIR     Cursor projects directory
+  IFLOW_DIR               iFlow projects directory
+  AMP_DIR                 Amp threads directory
+  ZED_DIR                 Zed data directory
+  QWEN_PROJECTS_DIR       Qwen Code projects directory
+  QWENPAW_DIR             QwenPaw workspaces directory
+  OMP_DIR                 OhMyPi sessions directory
+  DEEPSEEK_TUI_SESSIONS_DIR
+                          DeepSeek TUI sessions directory
+  DEEPSEEK_HARNESS_SESSIONS_DIR
+                          DeepSeek Harness sessions directory
+  DSH_HOME                DeepSeek Harness home directory
+  QCLAW_DIR               QClaw agents directory
+  WORKBUDDY_PROJECTS_DIR  WorkBuddy projects directory
+  CODEBUDDY_DIR           CodeBuddy data directory
+  PIEBALD_DIR             Piebald data directory
+  AGENTSVIEW_DATA_DIR     Data directory (database, config)
+  AGENTSVIEW_PG_URL       PostgreSQL connection URL for sync
+  AGENTSVIEW_PG_MACHINE   Machine name for PG sync
+  AGENTSVIEW_PG_SCHEMA    PG schema name (default "agentsview")
+  AGENTSVIEW_DUCKDB_PATH  DuckDB mirror database path
+  AGENTSVIEW_DUCKDB_URL   Quack connection URL for DuckDB serve
+  AGENTSVIEW_DUCKDB_TOKEN Quack authentication token
+  AGENTSVIEW_DUCKDB_MACHINE
+                          Machine name for DuckDB sync
+
+Watcher excludes:
+  Add "watch_exclude_patterns" to ~/.agentsview/config.toml
+  to skip directory names/patterns while recursively watching roots.
+  Example:
+  watch_exclude_patterns = [".git", "node_modules", ".next", "dist"]
+
+Session cwd filter:
+  Add "sync_include_cwd_prefixes" to ~/.agentsview/config.toml to
+  ingest only sessions whose working directory is under one of the
+  listed paths. Sessions without a recorded cwd are skipped while
+  the filter is set. Applies to local sync only. Example:
+  sync_include_cwd_prefixes = ["/home/example/work"]
+
+Multiple directories:
+  Add arrays to ~/.agentsview/config.toml to scan multiple locations:
+  [agents.claude]
+  dirs = ["/path/one", "/path/two"]
+  [agents.codex]
+  dirs = ["/codex/a", "/codex/b"]
+  When set, these override default directories. Environment variables
+  override config file arrays.
+
+Remote hosts:
+  Add a [[remote_hosts]] array to ~/.agentsview/config.toml so that
+  "agentsview sync" (no --host) also syncs each configured host:
+  [[remote_hosts]]
+  host = "devbox1"
+  transport = "ssh" # optional; default
+  user = "jesse"  # optional
+  port = 22        # optional
+  Requires key-based (passwordless) SSH to each host.
+
+  For daemon-backed HTTP sync over a private network such as Tailscale:
+  [[remote_hosts]]
+  host = "devbox1"
+  transport = "http"
+  url = "http://devbox1.tailnet.ts.net:8080"
+  token = "remote-token" # required; remote daemon auth_token
+  Each host must be unique.
+
+  Top-level daemon_idle_timeout = "0s" keeps serve --background nodes alive.
+
+Data stored in ~/.agentsview/ by default.

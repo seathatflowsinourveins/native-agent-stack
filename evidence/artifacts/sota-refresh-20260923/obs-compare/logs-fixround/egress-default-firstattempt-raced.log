@@ -1,0 +1,50 @@
+[SandboxDebug] No config found at <host-home>/.srt-settings.json, using default config
+[SandboxDebug] Initializing sandbox...
+[SandboxDebug] [SeccompFilter] Looking for apply-seccomp binary for architecture: x64
+[SandboxDebug] [SeccompFilter] Found apply-seccomp binary: <host-home>/.local/share/codex-ecosystem/tools/sandbox-runtime-0.0.77/lib/node_modules/@anthropic-ai/sandbox-runtime/vendor/seccomp/x64/apply-seccomp (x64)
+[SandboxDebug] mux: HTTP backend listening on /tmp/srt-mux-3877298-0.sock
+[SandboxDebug] Mux proxy (HTTP+SOCKS) listening on localhost:58038
+[SandboxDebug] Starting HTTP bridge: socat UNIX-LISTEN:/tmp/claude-http-e11e0b7bc69ee78d.sock,fork,reuseaddr TCP:localhost:58038,keepalive,keepidle=10,keepintvl=5,keepcnt=3
+[SandboxDebug] Linux bridges ready after 3 attempts
+[SandboxDebug] Network infrastructure initialized
+[SandboxDebug] Command string mode (-c): curl -sS -m 8 -o /dev/null -w "HTTPSTATUS:%{http_code} EXIT:%{exitcode}\n" https://example.com
+[SandboxDebug] {
+  "allowedHosts": []
+}
+[SandboxDebug] [Sandbox Linux] Applying seccomp filter for Unix socket blocking
+[SandboxDebug] [Sandbox Linux] Processing write path: /dev/stdout -> /dev/stdout
+[SandboxDebug] [Sandbox Linux] Skipping /dev path: /dev/stdout
+[SandboxDebug] [Sandbox Linux] Processing write path: /dev/stderr -> /dev/stderr
+[SandboxDebug] [Sandbox Linux] Skipping /dev path: /dev/stderr
+[SandboxDebug] [Sandbox Linux] Processing write path: /dev/null -> /dev/null
+[SandboxDebug] [Sandbox Linux] Skipping /dev path: /dev/null
+[SandboxDebug] [Sandbox Linux] Processing write path: /dev/tty -> /dev/tty
+[SandboxDebug] [Sandbox Linux] Skipping /dev path: /dev/tty
+[SandboxDebug] [Sandbox Linux] Processing write path: /dev/dtracehelper -> /dev/dtracehelper
+[SandboxDebug] [Sandbox Linux] Skipping /dev path: /dev/dtracehelper
+[SandboxDebug] [Sandbox Linux] Processing write path: /dev/autofs_nowait -> /dev/autofs_nowait
+[SandboxDebug] [Sandbox Linux] Skipping /dev path: /dev/autofs_nowait
+[SandboxDebug] [Sandbox Linux] Processing write path: /tmp/claude -> /tmp/claude
+[SandboxDebug] [Sandbox Linux] Skipping non-existent write path: /tmp/claude
+[SandboxDebug] [Sandbox Linux] Processing write path: /private/tmp/claude -> /private/tmp/claude
+[SandboxDebug] [Sandbox Linux] Skipping non-existent write path: /private/tmp/claude
+[SandboxDebug] [Sandbox Linux] Processing write path: <host-home>/.npm/_logs -> <host-home>/.npm/_logs
+[SandboxDebug] [Sandbox Linux] Processing write path: <host-home>/.claude/debug -> <host-home>/.claude/debug
+[SandboxDebug] [Sandbox Linux] Skipping non-existent deny path not within allowed paths: <owned-worktree>/.gitconfig
+[SandboxDebug] [Sandbox Linux] Skipping non-existent deny path not within allowed paths: <owned-worktree>/.gitmodules
+[SandboxDebug] [Sandbox Linux] Skipping non-existent deny path not within allowed paths: <owned-worktree>/.bashrc
+[SandboxDebug] [Sandbox Linux] Skipping non-existent deny path not within allowed paths: <owned-worktree>/.bash_profile
+[SandboxDebug] [Sandbox Linux] Skipping non-existent deny path not within allowed paths: <owned-worktree>/.zshrc
+[SandboxDebug] [Sandbox Linux] Skipping non-existent deny path not within allowed paths: <owned-worktree>/.zprofile
+[SandboxDebug] [Sandbox Linux] Skipping non-existent deny path not within allowed paths: <owned-worktree>/.profile
+[SandboxDebug] [Sandbox Linux] Skipping non-existent deny path not within allowed paths: <owned-worktree>/.ripgreprc
+[SandboxDebug] [Sandbox Linux] Skipping non-existent deny path not within allowed paths: <owned-worktree>/.mcp.json
+[SandboxDebug] [Sandbox Linux] Skipping non-existent deny path not within allowed paths: <owned-worktree>/.vscode
+[SandboxDebug] [Sandbox Linux] Skipping non-existent deny path not within allowed paths: <owned-worktree>/.idea
+[SandboxDebug] [Sandbox Linux] Skipping non-existent deny path not within allowed paths: <owned-worktree>/.claude/commands
+[SandboxDebug] [Sandbox Linux] Skipping non-existent deny path not within allowed paths: <owned-worktree>/.claude/agents
+[SandboxDebug] [Sandbox Linux] Wrapped command with bwrap (network, filesystem, seccomp(unix-block) restrictions)
+curl: (7) Failed to connect to localhost port 3128 after 0 ms: Couldn't connect to server
+HTTPSTATUS:000 EXIT:7
+[SandboxDebug] Sent SIGTERM to HTTP bridge process
+[SandboxDebug] Sent SIGTERM to SOCKS bridge process

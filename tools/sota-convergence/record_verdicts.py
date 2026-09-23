@@ -89,12 +89,33 @@ from scripts.landscape import (  # noqa: E402
 from scripts.catalog_decisions import identity, canonical, load, safe_file  # noqa: E402
 
 LANES = ("claude", "codex")
-# Frozen to the 2026-09-22 wave, exactly like scripts/landscape.py's own
-# sealed-path template (validate_verdict_row) and build_verdicts.py's own
+# Default run id for the sealed 2026-09-22 wave, exactly like
+# scripts/landscape.py's own sealed-path template (validate_verdict_row,
+# derived from the row's own lanes.<lane>.run_id) and build_verdicts.py's own
 # "-20260922" output names -- not derived from --checked-at, which only sets
-# the per-row checked_at date.
+# the per-row checked_at date. A later run passes ``--run-id`` (see
+# parse_args/main) to write a new dated wave without touching this sealed
+# one; these two module-level names stay as the defaults so the checked-in
+# 2026-09-22 fixtures and tests that reference record_verdicts.VERDICT_DATE /
+# record_verdicts.SEALED_BASE keep working unchanged.
 VERDICT_DATE = "20260922"
-SEALED_BASE = "evidence/artifacts/layer-verdicts-20260922"
+SEALED_BASE = f"evidence/artifacts/layer-verdicts-{VERDICT_DATE}"
+
+# Same character class scripts/landscape.py requires of lanes.<lane>.sealed_base
+# (re.fullmatch(r"evidence/artifacts/layer-verdicts-[0-9A-Za-z]+", ...)); checked at
+# argument parsing so a run-id containing "-", "/" or ".." is rejected before any
+# sealed file is written, rather than surfacing only when landscape.py runs later.
+RUN_ID_PATTERN = re.compile(r"[0-9A-Za-z]+")
+
+
+def validate_run_id(run_id: str) -> str:
+    if not RUN_ID_PATTERN.fullmatch(run_id):
+        raise SystemExit(f"--run-id must match {RUN_ID_PATTERN.pattern!r} (got {run_id!r})")
+    return run_id
+
+
+def sealed_base_for(run_date: str) -> str:
+    return f"evidence/artifacts/layer-verdicts-{run_date}"
 
 
 SCHEMA_PATH = Path(__file__).resolve().parent / "lane-return.schema.json"
@@ -593,7 +614,7 @@ def sealed_text(data: dict) -> str:
 
 def process_row(row: dict, root: Path, catalog: str, layer_id: str, work_dir: Path, checked_at: str,
                  adjudications_dir, identities: set, aliases: dict, sha256sums: dict, rejections: list,
-                 lane_roots=()) -> list:
+                 lane_roots=(), run_date: str = VERDICT_DATE, sealed_base: str = SEALED_BASE) -> list:
     """Mutate ``row`` in place with whatever the valid lane returns for this
     layer establish; return the list of (absolute path, text) sealed/
     adjudication files this row's processing needs written. Returns an empty
@@ -634,7 +655,7 @@ def process_row(row: dict, root: Path, catalog: str, layer_id: str, work_dir: Pa
     if not valid:
         return []
 
-    run_id = f"{catalog}-{layer_id}-{VERDICT_DATE}"
+    run_id = f"{catalog}-{layer_id}-{run_date}"
     sealed_writes = []
     lanes_field = {"claude": {"run_id": "", "sealed_sha256": ""}, "codex": {"run_id": "", "sealed_sha256": ""}}
     for lane in list(valid):
@@ -646,7 +667,7 @@ def process_row(row: dict, root: Path, catalog: str, layer_id: str, work_dir: Pa
             del valid[lane]
             continue
         lanes_field[lane] = {"run_id": run_id, "sealed_sha256": hashlib.sha256(text.encode("utf-8")).hexdigest()}
-        sealed_writes.append((root / SEALED_BASE / lane / f"{run_id}.json", text))
+        sealed_writes.append((root / sealed_base / lane / f"{run_id}.json", text))
     if not valid:
         return []
 
@@ -714,13 +735,13 @@ def process_row(row: dict, root: Path, catalog: str, layer_id: str, work_dir: Pa
             chosen_lane = adjudication["winner_lane"]
             for gap in valid[chosen_lane].get("open_gaps") or []:
                 add_gap(gap)
-            adjudication_relative = f"{SEALED_BASE}/adjudication/{run_id}.json"
-            sealed_writes.append((root / SEALED_BASE / "adjudication" / f"{run_id}.json", adjudication_text))
+            adjudication_relative = f"{sealed_base}/adjudication/{run_id}.json"
+            sealed_writes.append((root / sealed_base / "adjudication" / f"{run_id}.json", adjudication_text))
             add_gap(f"lanes disagreed: {ids_text}; adjudicated by {adjudication_relative}")
             verdict_status = "recorded"
         elif adjudication is not None and adjudication["winner_lane"] is None:
-            adjudication_relative = f"{SEALED_BASE}/adjudication/{run_id}.json"
-            sealed_writes.append((root / SEALED_BASE / "adjudication" / f"{run_id}.json", adjudication_text))
+            adjudication_relative = f"{sealed_base}/adjudication/{run_id}.json"
+            sealed_writes.append((root / sealed_base / "adjudication" / f"{run_id}.json", adjudication_text))
             tally = adjudication["tally"]
             add_gap(f"lanes disagreed: {ids_text}; the counterbalanced adjudication did not agree "
                     f"(claude {tally['claude']}, codex {tally['codex']}, {adjudication['refuted']} refuted; "
@@ -773,6 +794,13 @@ def process_row(row: dict, root: Path, catalog: str, layer_id: str, work_dir: Pa
     row["verdict_overturn_when"] = sanitize_value(verdict_overturn_when)
     row["overturn_protocol"] = sanitize_value(overturn_protocol)
     row["lanes"] = {"claude": lanes_field["claude"], "codex": lanes_field["codex"], "agreement": agreement}
+    # Recorded only when this run's sealed base differs from the default 2026-09-22
+    # wave (scripts/landscape.py falls back to that default when the key is absent),
+    # so a --run-id-less run stays byte-for-byte identical to the sealed ledger; a
+    # later wave's rows carry the base a reader (or landscape.py's own verifier)
+    # needs to find their sealed files under evidence/artifacts/layer-verdicts-<run-id>/.
+    if sealed_base != SEALED_BASE:
+        row["lanes"]["sealed_base"] = sealed_base
     row["checked_at"] = checked_at
 
     assert_no_leak(json.dumps({
@@ -788,6 +816,11 @@ def parse_args(argv=None):
     parser.add_argument("--root", type=Path, default=REPO_ROOT)
     parser.add_argument("--work-dir", type=Path, required=True)
     parser.add_argument("--checked-at", default="2026-09-22")
+    parser.add_argument("--run-id", default=VERDICT_DATE,
+                        help="Run id suffix for a new wave's run_id (<catalog>-<layer_id>-<run-id>) and its "
+                             "sealed evidence directory (evidence/artifacts/layer-verdicts-<run-id>/); default "
+                             "reproduces the sealed 2026-09-22 wave byte for byte. Pass the same value to "
+                             "--check as was used for --write.")
     parser.add_argument("--adjudications", type=Path, default=None)
     parser.add_argument("--lane-repo-root", action="append", default=[], metavar="PATH",
                         help="Absolute checkout path a lane was given as its repository root; sources_read "
@@ -814,6 +847,8 @@ def main(argv=None) -> int:
 
     identities, aliases = load_canonical_index(root)
     sha256sums = parse_sha256sums(work_dir / "packets" / "SHA256SUMS")
+    run_date = validate_run_id(args.run_id)
+    sealed_base = sealed_base_for(run_date)
 
     rejections: list = []
     sealed_writes: list = []
@@ -826,7 +861,8 @@ def main(argv=None) -> int:
         for row in document.get("layers", []):
             sealed_writes.extend(process_row(
                 row, root, catalog, row["layer_id"], work_dir, args.checked_at, args.adjudications,
-                identities, aliases, sha256sums, rejections, tuple(args.lane_repo_root)))
+                identities, aliases, sha256sums, rejections, tuple(args.lane_repo_root),
+                run_date=run_date, sealed_base=sealed_base))
         new_text = json.dumps(document, indent=2, ensure_ascii=False) + "\n"
         ledger_outputs[catalog] = (path, new_text, new_text != original_text)
 

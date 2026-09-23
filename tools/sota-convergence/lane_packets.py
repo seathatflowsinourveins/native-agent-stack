@@ -66,7 +66,17 @@ LEDGER_FILES = {
     "foundation": "catalogs/landscape/foundation.json",
     "us-equities": "catalogs/landscape/us-equities.json",
 }
-SOTA_MANIFEST_PATH = "catalogs/sota-convergence/manifest-20260922.json"
+DEFAULT_MANIFEST_RUN_ID = "20260922"
+
+
+def default_sota_manifest_path(run_id: str) -> str:
+    return f"catalogs/sota-convergence/manifest-{run_id}.json"
+
+
+# Kept as a module-level constant for existing callers/tests; default_sota_manifest_path(DEFAULT_MANIFEST_RUN_ID)
+# reproduces the same path. build_all_packets/main take an explicit --manifest override so a later run can join
+# a differently-dated manifest without editing this default.
+SOTA_MANIFEST_PATH = default_sota_manifest_path(DEFAULT_MANIFEST_RUN_ID)
 ADOPTION_MANIFEST_PATH = "adoption/manifest.json"
 FOUNDATION_DECISIONS_PATH = "catalogs/foundation/decisions.json"
 PACKET_SCHEMA_VERSION = 1
@@ -377,11 +387,15 @@ def withhold_labels(packet: dict) -> dict:
 
 
 def build_all_packets(root: Path, *, catalogs: list, seed: str, checked_at: str,
-                      trading_candidates: str = "ledger", withhold: bool = False) -> dict:
+                      trading_candidates: str = "ledger", withhold: bool = False,
+                      manifest: str = None) -> dict:
     """Returns {filename: serialized packet text}, fully built and leak-
-    checked in memory before any file is written."""
+    checked in memory before any file is written. ``manifest`` overrides the
+    dated sota manifest joined in (default reproduces the 2026-09-22
+    packets); pass the same value used for build_verdicts.py's --manifest so
+    the packets and the verdict catalog agree on the pins."""
     rules = load_rules()
-    sota_doc = load_json(root / SOTA_MANIFEST_PATH)
+    sota_doc = load_json(root / (manifest or SOTA_MANIFEST_PATH))
     sota_index = sota_layer_index(sota_doc)
     recipe_map = load_json(root / ADOPTION_MANIFEST_PATH).get("recipe_map", {})
     decisions_doc = load_json(root / FOUNDATION_DECISIONS_PATH)
@@ -430,6 +444,11 @@ def parse_args(argv=None):
     parser.add_argument("--catalog", choices=sorted(LEDGER_FILES), default=None,
                          help="Build packets for one catalog only; default builds both.")
     parser.add_argument("--checked-at", default=DEFAULT_CHECKED_AT)
+    parser.add_argument("--manifest", type=Path, default=None,
+                        help="Override the dated sota manifest joined in (default "
+                             "catalogs/sota-convergence/manifest-20260922.json, reproducing the 2026-09-22 "
+                             "packets). Pass the same --manifest given to build_verdicts.py for the same run "
+                             "so packets and verdicts agree on the pins.")
     parser.add_argument("--withhold-labels", action="store_true",
                         help="Drop decision-bearing labels (candidate and SOTA-component review_status, decision "
                              "selection and review_status) from every ledger-built packet; manifest-built trading "
@@ -448,7 +467,8 @@ def main(argv=None) -> int:
     catalogs = [args.catalog] if args.catalog else sorted(LEDGER_FILES)
 
     packets = build_all_packets(root, catalogs=catalogs, seed=str(args.seed), checked_at=args.checked_at,
-                                trading_candidates=args.trading_candidates, withhold=args.withhold_labels)
+                                trading_candidates=args.trading_candidates, withhold=args.withhold_labels,
+                                manifest=str(args.manifest) if args.manifest else None)
 
     out_dir = args.out / "packets"
     out_dir.mkdir(parents=True, exist_ok=True)

@@ -1,0 +1,9 @@
+# Recompiled with `--exclude-newer 2026-09-23T00:00:00Z` and `--no-header`
+# (see .github/workflows/hardware-profile-smoke.yml, where both the committed
+# lock generation and the CI diff-check recompile pass the same cutoff; the
+# lock file itself carries no header comment) so CI's redundant-compile-and-diff
+# check stays deterministic over time: without a cutoff, any transitive
+# dependency publishing a new release after this file was generated would
+# make uv resolve a different set and fail the diff on every unrelated pull
+# request.
+mlx-lm==0.30.2

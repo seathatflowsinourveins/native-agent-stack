@@ -1,0 +1,76 @@
+{
+ "confusion_truth_to_pred": {
+  "not_addressed->not_addressed": 120,
+  "not_addressed->partially": 30,
+  "partially->not_addressed": 8,
+  "partially->partially": 15,
+  "partially->settles": 1,
+  "settles->partially": 4,
+  "settles->settles": 1
+ },
+ "threshold_p_addressed": {
+  "0.05": {
+   "tp": 29,
+   "fn": 0,
+   "fp": 92,
+   "tn": 58
+  },
+  "0.1": {
+   "tp": 28,
+   "fn": 1,
+   "fp": 78,
+   "tn": 72
+  },
+  "0.2": {
+   "tp": 27,
+   "fn": 2,
+   "fp": 62,
+   "tn": 88
+  },
+  "0.3": {
+   "tp": 27,
+   "fn": 2,
+   "fp": 50,
+   "tn": 100
+  },
+  "0.5": {
+   "tp": 21,
+   "fn": 8,
+   "fp": 34,
+   "tn": 116
+  }
+ },
+ "blocker_agreement": {
+  "agree": 117,
+  "total": 256
+ },
+ "blocker_pairs": {
+  "executable_now->executable_now": 73,
+  "catalog_edit->executable_now": 47,
+  "not_actionable->executable_now": 41,
+  "catalog_edit->catalog_edit": 19,
+  "needs_paid_entitlement->executable_now": 14,
+  "needs_hardware->needs_hardware": 13,
+  "needs_user_decision->executable_now": 7,
+  "not_actionable->not_actionable": 6,
+  "needs_paid_entitlement->needs_paid_entitlement": 5,
+  "needs_hardware->executable_now": 4,
+  "needs_user_decision->catalog_edit": 3,
+  "executable_now->needs_hardware": 3,
+  "time_gated->executable_now": 2,
+  "not_actionable->needs_user_decision": 2,
+  "executable_now->not_actionable": 2,
+  "not_actionable->needs_paid_entitlement": 2,
+  "needs_user_login->executable_now": 2,
+  "executable_now->needs_user_decision": 2,
+  "needs_paid_entitlement->catalog_edit": 1,
+  "catalog_edit->needs_user_decision": 1,
+  "not_actionable->catalog_edit": 1,
+  "needs_paid_entitlement->needs_user_login": 1,
+  "executable_now->catalog_edit": 1,
+  "needs_hardware->not_actionable": 1,
+  "needs_user_login->needs_user_login": 1,
+  "executable_now->needs_user_login": 1,
+  "not_actionable->time_gated": 1
+ }
+}
