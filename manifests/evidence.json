@@ -12564,23 +12564,53 @@
     },
     {
       "path": "evidence/artifacts/sota-refresh-20260923/pins-runtime/README.md",
-      "sha256": "06fedf002a7f07b096179ae2068f644d87fb40d59c04e242e4ec552312e11634",
-      "bytes": 5731
+      "sha256": "bff8a812408f99885b336c10af837fd32b0128b47abf6166ce999e0012fd35c5",
+      "bytes": 7941
     },
     {
       "path": "evidence/artifacts/sota-refresh-20260923/pins-runtime/dagu.json",
-      "sha256": "2364497a2a73c173d06527a336e414f3a77d9ae148a187143fa5c4d0a67d5010",
-      "bytes": 8520
+      "sha256": "8b145ad3b1b9e92679fc0d14d4149242837baf7f97a750edef1f0d03b8df790d",
+      "bytes": 13243
     },
     {
       "path": "evidence/artifacts/sota-refresh-20260923/pins-runtime/skfolio.json",
-      "sha256": "512bf7694c4fdcb4135c15c0daa3fe5256c9de7ea73b7a93b3092534271aee40",
-      "bytes": 6489
+      "sha256": "207dc0eeb86d02f545e9246cda0d82e9bb85c54944a2f3b763d5bb330a5f7602",
+      "bytes": 7659
     },
     {
       "path": "evidence/artifacts/sota-refresh-20260923/pins-runtime/clickhouse.json",
-      "sha256": "d55429bb783d8428dc113dd5287a85d27aeff786380c4367ee795088f9c434aa",
-      "bytes": 6498
+      "sha256": "744506b67444c6dd5dab530d694c38b8185c77e15b5d6c81e3ea1c9ac2c30805",
+      "bytes": 7434
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-runtime/patched-harnesses/skfolio-run-optimizer-130.py",
+      "sha256": "9a1810dbe75d3baa077fbc5d805e29fe52ee8daf19e2983ee4a1d4b186815d8a",
+      "bytes": 6323
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-runtime/patched-harnesses/dagu-job-recovery-run-2170.py",
+      "sha256": "cc86cdff72b36ef571274caea73ad33815aab4a122132ef689248feb933bd307",
+      "bytes": 9790
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-runtime/patched-harnesses/dagu-job-recovery-run-2170.diff",
+      "sha256": "4d8acf4adc13fbfb0b9bff0acf766d3777e3a65f48d7b1b8ddcf916f0652a977",
+      "bytes": 2876
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-runtime/patched-harnesses/dagu-inflight-resume-after-kill-fixture-v2.diff",
+      "sha256": "1b2e84ee54f8deae69d20cc3cfba02bcad10fd7d186eed90abf2bfd7dfdad5da",
+      "bytes": 2652
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-runtime/patched-harnesses/dagu-inflight-resume-after-kill-fixture-v2.py",
+      "sha256": "1d5aeeff13e19a86b1d8086b941cdb3d24384b39bb3659e59cc3dc17aba049aa",
+      "bytes": 7864
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-runtime/patched-harnesses/skfolio-run-optimizer-130.diff",
+      "sha256": "7c6762730c2cbe0b95278393407a7b97926df1b13e5a6bb4ced7cab26134d8f9",
+      "bytes": 825
     }
   ],
   "convergence_records": [

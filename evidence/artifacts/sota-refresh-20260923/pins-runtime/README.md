@@ -28,14 +28,28 @@ Two checks:
    because that window is inside both of Dagu's documented thresholds (30s
    `lock_stale_threshold`, 90s heartbeat `stale_threshold`). Rerun on 2.17.0 with a
    **120s hold** past the kill before attempting recovery, plus the original
-   immediate post-kill history/ps capture: both `dagu start --run-id <same>` and
-   `dagu retry --run-id` were still refused (`already exists` / `already running...
-   socket=/tmp/@dagu_inflight_<hash>.sock`) and `dagu history` still reported
-   `running` 2m31s after the kill. This settles the question conclusively for
-   2.17.0 (past both documented thresholds, not just the previously-tested 1-2s
-   window): Dagu does not self-heal a SIGKILLed run within this window either. No
-   regression is claimed relative to 2.16.6, since 2.16.6 was never tested at a
-   120s hold.
+   immediate post-kill history/ps capture: `dagu retry --run-id` was still refused
+   (`already running... socket=/tmp/@dagu_inflight_<hash>.sock`) and `dagu history`
+   still reported `running` 2m31s after the kill. **CORRECTED (this fix round):** an
+   earlier draft of this README claimed this "conclusively" settled PR #81's
+   self-healing question; that is retracted. No `dagu scheduler` process was ever
+   started in this fixture, and Dagu's documented self-healing path is
+   scheduler-driven zombie detection (a 45s zombie-detection interval times 3
+   consecutive stale checks, on top of the 90s heartbeat threshold -- roughly 225s
+   of scheduler uptime, per the 2.17.0 binary's own `--help` text), which this test
+   never exercised. Separately, the `dagu start --run-id <same>` refusal
+   (`already exists`) is a duplicate-run-ID error, not a staleness signal, and was
+   previously misread as threshold-relevant. What is actually established: without
+   a scheduler running, a manual `retry` on a SIGKILLed run is still refused 120s
+   post-kill. Whether a running scheduler's zombie detection would recover the run
+   (at 120s or at the ~225s the documented mechanism needs) remains **untested and
+   inconclusive**, the same status PR #81 recorded -- not settled by this rerun. See
+   `dagu.json`'s `correction_note` and revised `limits` for the full detail. The
+   patched harness copies used for both dagu checks are committed under
+   [`patched-harnesses/`](patched-harnesses/) with hashes and diffs against the
+   tracked/PR #81 originals; an earlier, non-completing first attempt at the
+   job-recovery rerun (work dir `recovery-2170-1790122973`, no `result.json`
+   produced) is disclosed in `dagu.json` rather than omitted.
 
 ## ClickHouse v26.8.7.19-lts -> v26.9.2.8-stable -- not_comparable (native_proven)
 
@@ -58,9 +72,18 @@ post-round-trip aggregation matched the pre-write aggregation exactly for both t
 symbols. Verdict is `not_comparable` (no prior receipt to compare against), not
 `qualified`, and this smoke test does not itself qualify ClickHouse for the
 storage-compute layer's real acceptance bar (throughput/concurrency/immutable-ledger
-semantics remain untested). One operational note: `clickhouse local --queries-file`
-hung indefinitely on this host for an undiagnosed reason; `--query` (inline SQL) was
-used instead and worked immediately.
+semantics remain untested). **CORRECTED (this fix round):** the receipt's recorded
+command text previously did not match what actually ran (it showed a relative
+`./usr/bin/clickhouse` path and a `bars.parquet` relative path passed via `-n
+--query`); the binary actually used lives at the versioned extraction path
+`extracted/clickhouse-common-static-26.9.2.8/usr/bin/clickhouse`, and the query was
+run via `--queries-file` against the retained `work/smoke.sql` (absolute paths),
+producing `work/run.log`; both are retained verbatim and match the reported output
+exactly, so only the recorded command text was wrong, not the result. One remaining
+operational note: an initial `--queries-file` attempt against a different scratch
+path hung indefinitely for an undiagnosed reason and was killed; it was not
+reproduced once the SQL and output were kept under the clickhouse `work/` prefix
+used for the retained run.
 
 ## skfolio 1.2.9 -> v1.3.0 -- qualified (native_proven)
 
@@ -72,9 +95,14 @@ receipt `evidence/artifacts/gap-resolution-20260922/portfolio-risk/skf_walkforwa
 was rerun in a fresh venv against skfolio 1.3.0, against the SAME frozen
 SPY/QQQ/IWM `lean-985ef30` inputs (plan.json sha256 verified unchanged) and the
 same 252/63/6/`reduce_test=True` WalkForward split. Both MeanRisk and
-HierarchicalRiskParity optimizers reproduced the 1.2.9 receipt's numbers exactly:
-development Sharpe approximations 0.778/0.846, reserved-segment weights and Sharpe
-1.940 (SPY-concentrated MeanRisk) and 1.871 (diversified HRP). `inputs_unchanged=true`.
+HierarchicalRiskParity optimizers reproduced the 1.2.9 receipt's numbers to
+reported precision (the 1.2.9 receipt rounded to 3 decimals; the 1.3.0 rerun is
+full-precision and matches after rounding, not bit-for-bit): development Sharpe
+approximations 0.778/0.846, reserved-segment weights and Sharpe 1.940
+(SPY-concentrated MeanRisk) and 1.871 (diversified HRP). `inputs_unchanged=true`.
+The patched harness copy used is committed under
+[`patched-harnesses/skfolio-run-optimizer-130.py`](patched-harnesses/skfolio-run-optimizer-130.py)
+with its diff against the PR #81 branch original.
 
 ## Not attempted / blocked
 
