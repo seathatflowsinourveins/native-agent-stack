@@ -403,6 +403,28 @@ def validate_hosts(profiles: dict, root: Path | None = None) -> list[str]:
     return errors
 
 
+def sanitize_values(value):
+    """Recursively rebuild ``value`` (a JSON-decoded structure), running
+    ``host_receipts.sanitize()`` over every string that is a dict *value* or list *item* --
+    walking the object the way ``host_receipts.iter_receipt_strings()`` does, but never
+    sanitizing a dict *key*. ``host_receipts.sanitize()`` replaces every occurrence of $USER
+    in the text it is given; $USER is often a short, common word ("ram", "gpu", "cores",
+    "max", "mac", "runner", ...) that legitimately appears inside a JSON *key* this or a
+    prior --record-host run wrote (``effective_ram_gb``, ``gpu``, ``cores``,
+    ``ecosystem_job_memory_max_gb``, an id like ``github-macos-15-arm64-runner``, or a field
+    kept from a re-recorded entry). Sanitizing the serialized text as one blob -- even of
+    only the new report or entry -- corrupts those key names instead of just redacting
+    anything personal in a value; numbers, booleans, ``None`` and every key pass through
+    unchanged."""
+    if isinstance(value, str):
+        return host_receipts.sanitize(value)
+    if isinstance(value, dict):
+        return {key: sanitize_values(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [sanitize_values(item) for item in value]
+    return value
+
+
 def assert_no_private_content(text: str, label: str) -> None:
     for description, pattern in PRIVATE_CONTENT:
         if pattern.search(text):
@@ -429,7 +451,8 @@ def cmd_record_host(args: argparse.Namespace) -> int:
     profiles_path = root / "adoption" / "hardware-profiles.json"
     profiles = _load_profiles(profiles_path)
     report = build_report(profiles)
-    report_text = host_receipts.sanitize(json.dumps(report, indent=2, sort_keys=True) + "\n")
+    sanitized_report = sanitize_values(report)
+    report_text = json.dumps(sanitized_report, indent=2, sort_keys=True) + "\n"
     assert_no_private_content(report_text, f"measured report for {host_id}")
 
     relative_evidence = f"{HW_PROFILE_EVIDENCE_DIR}/{host_id}/profile.json"
@@ -445,13 +468,12 @@ def cmd_record_host(args: argparse.Namespace) -> int:
         "note": entry.get("note") or ("Actual scripts/hardware_profile.py output for this host, "
                                        "written by scripts/hardware_profile.py --record-host."),
     })
-    # Sanitize only this one entry's own serialized text (the fields this call sets: id,
-    # label, evidence, note), never the whole document. host_receipts.sanitize() replaces
-    # every occurrence of $USER in the text it is given, and $USER is often a short, common
-    # word ("mac", "runner", ...) that legitimately appears inside unrelated pre-existing
-    # hosts[] entries (for example "github-macos-15-arm64-runner"); sanitizing the whole
-    # document would corrupt those instead of just redacting anything personal in the new one.
-    entry = json.loads(host_receipts.sanitize(json.dumps(entry, ensure_ascii=False)))
+    # Sanitize only this one entry's own decoded string VALUES (never its keys, including
+    # any kept from a re-recorded entry -- see sanitize_values()), and never the rest of the
+    # document: an unrelated hosts[] entry (for example "github-macos-15-arm64-runner")
+    # would otherwise be corrupted by a whole-document sanitize instead of just redacting
+    # anything personal in this one.
+    entry = sanitize_values(entry)
     if existing_index is not None:
         hosts[existing_index] = entry
     else:

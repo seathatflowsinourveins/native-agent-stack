@@ -510,6 +510,64 @@ class RecordHostTests(unittest.TestCase):
                                  f"USER={fake_user} corrupted the layers config")
                 hp.recommend({"cores": 8, "effective_ram_gb": 32.0, "gpu": None}, after)
 
+    def test_new_report_and_entry_keys_survive_every_fake_user(self):
+        # The new report's and entry's OWN keys must never be renamed either -- not just
+        # unrelated pre-existing content. host_receipts.sanitize() over the *whole*
+        # serialized report/entry text previously renamed "effective_ram_gb" and
+        # "ram_gb_proc_meminfo" to "effective_<user>_gb"/"<user>_gb_proc_meminfo" under
+        # USER=ram, and the bare "gpu"/"cores" keys to "<user>" under USER=gpu/USER=cores --
+        # after which the grand list silently dropped RAM or cores for that host.
+        report = {
+            "schema": "hardware-profile-report-v1", "profiles_source": "adoption/hardware-profiles.json",
+            "measured": {
+                "cores": 8, "effective_ram_gb": 32.0, "ram_gb_proc_meminfo": 32.0,
+                "gpu": {"name": "synthetic-gpu", "vram_gb": 24.0}, "evidence_class": "native_proven",
+            },
+            "recommended": {"ecosystem_job_memory_max_gb": 6.0, "workflow_concurrency_cap": 6},
+            "limits": [],
+        }
+        for fake_user in ("ram", "max", "gpu", "cores", "runner", "mac"):
+            with self.subTest(user=fake_user):
+                self.setUp()
+                with mock.patch.dict("os.environ", {"USER": fake_user}, clear=False):
+                    exit_code, output = self._record(build_report_return=report)
+                self.assertEqual(exit_code, 0, output)
+
+                evidence_path = (self.root / "evidence" / "artifacts" / "hw-profiles"
+                                 / "widget-laptop-20260101" / "profile.json")
+                written = json.loads(evidence_path.read_text(encoding="utf-8"))
+                self.assertIn("cores", written["measured"], f"USER={fake_user} renamed 'cores'")
+                self.assertIn("effective_ram_gb", written["measured"], f"USER={fake_user} renamed 'effective_ram_gb'")
+                self.assertIn("ram_gb_proc_meminfo", written["measured"],
+                              f"USER={fake_user} renamed 'ram_gb_proc_meminfo'")
+                self.assertIn("gpu", written["measured"], f"USER={fake_user} renamed 'gpu'")
+                self.assertIn("vram_gb", written["measured"]["gpu"], f"USER={fake_user} renamed 'vram_gb'")
+                self.assertIn("ecosystem_job_memory_max_gb", written["recommended"],
+                              f"USER={fake_user} renamed 'ecosystem_job_memory_max_gb'")
+
+                profiles = json.loads((self.root / "adoption" / "hardware-profiles.json").read_text(encoding="utf-8"))
+                entry = next(h for h in profiles["hosts"] if h["id"] == "widget-laptop-20260101")
+                for key in ("id", "label", "evidence_class", "evidence", "note"):
+                    self.assertIn(key, entry, f"USER={fake_user} renamed entry key {key!r}")
+
+    def test_a_preserved_entry_key_colliding_with_user_survives_a_rerecord(self):
+        # A field kept from a prior entry (something this call never itself sets) must also
+        # keep its own key name across a re-record, even when it collides with $USER.
+        self._record()
+        profiles = json.loads((self.root / "adoption" / "hardware-profiles.json").read_text(encoding="utf-8"))
+        entry = next(h for h in profiles["hosts"] if h["id"] == "widget-laptop-20260101")
+        entry["sizing_arithmetic"] = {"ecosystem_job_memory_max_gb": "max(6, round(32*0.25,1)) = 8.0"}
+        (self.root / "adoption" / "hardware-profiles.json").write_text(json.dumps(profiles), encoding="utf-8")
+
+        with mock.patch.dict("os.environ", {"USER": "max"}, clear=False):
+            exit_code, output = self._record(label="re-recorded")
+        self.assertEqual(exit_code, 0, output)
+
+        profiles = json.loads((self.root / "adoption" / "hardware-profiles.json").read_text(encoding="utf-8"))
+        entry = next(h for h in profiles["hosts"] if h["id"] == "widget-laptop-20260101")
+        self.assertIn("ecosystem_job_memory_max_gb", entry["sizing_arithmetic"],
+                      "USER=max renamed a key preserved from the prior entry")
+
     def test_validates_before_any_write_so_a_preexisting_bad_entry_blocks_cleanly(self):
         # A structural error in a hosts[] entry this call never touches must still fail the
         # whole record (validate_hosts checks the whole array) -- and must do so before any
