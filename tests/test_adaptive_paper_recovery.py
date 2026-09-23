@@ -370,6 +370,7 @@ class RecoveryTests(unittest.TestCase):
         result = self.recover()
         self.assertLess(time.monotonic() - began, 1.5)
         self.assertIn("recovery_deadline_reached", result["errors"])
+        self.assertEqual(result["order_deadline_seconds"], 1)
         self.assertFalse(result["flat"])
         self.assertIsNone(result["reconciliation"])
 
