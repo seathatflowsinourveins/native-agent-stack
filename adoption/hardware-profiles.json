@@ -10,6 +10,8 @@
     },
     "local_generation_model": {
       "description": "Local generation model tier by GPU VRAM (discrete NVIDIA) or unified memory (Apple Silicon). Tiers are conservative floors for a quantized (4-bit/8-bit) model plus KV cache headroom, not a specific model's exact footprint.",
+      "macos_unified_gpu_working_set_fraction": 0.6,
+      "macos_unified_gpu_working_set_fraction_note": "Labelled assumption, not a measurement: macOS reserves unified memory for the OS, foreground apps, and (on this project's configured local profile) a concurrent embedding/semantic-RAG stack, and caps the Metal working set below total RAM. 0.6 is a conservative floor, not Apple's documented default (undocumented and version-dependent); treat the resulting vram_gb as an upper bound on what a generation model can reliably claim, not a guarantee.",
       "tiers": [
         {"name": "cpu-only", "min_vram_gb": 0, "note": "No GPU/unified-memory tier met; CPU inference only, small models."},
         {"name": "small-8b-q4", "min_vram_gb": 8, "note": "~7-8B parameter models at 4-bit quantization fit with headroom."},
@@ -30,10 +32,12 @@
       ]
     },
     "ecosystem_bounded_run": {
-      "description": "Memory ceiling passed to /home/example/codex-ecosystem/bin/ecosystem-bounded-run for heavy jobs, sized as a bounded fraction of effective host RAM so bounded jobs cannot exhaust the host.",
-      "fraction": 0.5,
-      "floor_gb": 2,
-      "ceiling_gb": 64
+      "description": "Suggested override values for the ECOSYSTEM_JOB_MEMORY_HIGH and ECOSYSTEM_JOB_MEMORY_MAX environment variables read by /home/example/codex-ecosystem/bin/ecosystem-bounded-run, which passes them straight through as systemd MemoryHigh/MemoryMax (wrapper defaults 4G/6G). Those defaults are the WSL-stability containment floor from docs/tasks/2026-09-22-wsl-stability-fix.md; this rule only raises the ceiling for hosts with RAM headroom, is bounded well below total RAM, and is never applied automatically -- exporting the two named variables is a deliberate per-host choice.",
+      "default_high_gb": 4,
+      "default_max_gb": 6,
+      "max_fraction_of_ram": 0.25,
+      "high_to_max_ratio": 0.667,
+      "ceiling_max_gb": 32
     }
   },
   "hosts": [
@@ -53,13 +57,16 @@
         "cores": 32,
         "physical_ram_gb": 128,
         "wslconfig_memory_gb": 100,
+        "ram_gb_proc_meminfo_projected": 99,
         "gpu_vram_gb": 24
       },
       "sizing_arithmetic": {
         "workflow_concurrency_cap": "min(16, 32 - 2) = 16",
         "local_generation_model_tier": "vram_gb=24 >= 20 -> large-32b-q4",
-        "embedding_semantic_rag_tier": "ram_gb=100 >= 96 -> headroom",
-        "ecosystem_bounded_run_memory_gb": "max(2, 100*0.5)=50, min(50, 64) = 50"
+        "effective_ram_gb": "script prefers measured /proc/meminfo over .wslconfig's configured ceiling; projected proc_meminfo=99 (wslconfig_memory_gb=100 minus ~1GB VM overhead, as observed on this-host-20260923: wslconfig=48 -> meminfo=47)",
+        "embedding_semantic_rag_tier": "ram_gb=99 >= 96 -> headroom",
+        "ecosystem_job_memory_max_gb": "max(6, round(99*0.25,1)=24.8), min(24.8, 32) = 24.8",
+        "ecosystem_job_memory_high_gb": "round(24.8*0.667,1) = 16.5"
       },
       "note": "Projected, not measured on this host; a fresh run of scripts/hardware_profile.py on that workstation is required before treating these numbers as native_proven."
     },
@@ -75,11 +82,13 @@
       },
       "sizing_arithmetic": {
         "workflow_concurrency_cap": "min(16, 12 - 2) = 10",
-        "local_generation_model_tier": "vram_gb(unified)=48 >= 48 -> unified-70b-plus",
+        "local_generation_model_tier": "vram_gb(unified)=round(48*0.6,1)=28.8 >= 20 -> large-32b-q4",
         "embedding_semantic_rag_tier": "ram_gb=48 >= 48 -> full",
-        "ecosystem_bounded_run_memory_gb": "max(2, 48*0.5)=24, min(24, 64) = 24"
+        "concurrent_use_warning": "set: unified memory is shared between the large-32b-q4 generation budget and the full RAG tier budget; this host cannot run both at their tier ceiling concurrently without separate verification",
+        "ecosystem_job_memory_max_gb": "max(6, round(48*0.25,1)=12.0), min(12.0, 32) = 12.0",
+        "ecosystem_job_memory_high_gb": "round(12.0*0.667,1) = 8.0"
       },
-      "note": "Projected; a 48 GB Apple Silicon host still shares unified memory with the OS and every foreground app, so 'unified-70b-plus' assumes a mostly-idle host at generation time."
+      "note": "Projected; a 48 GB Apple Silicon host still shares unified memory with the OS, every foreground app, and (per the concurrent_use_warning) the semantic-RAG stack, so the generation tier is scaled by the labelled macos_unified_gpu_working_set_fraction (0.6) rather than treating all 48 GB as usable VRAM."
     },
     {
       "id": "macos-arm64-64gb-projected",
@@ -93,18 +102,20 @@
       },
       "sizing_arithmetic": {
         "workflow_concurrency_cap": "min(16, 14 - 2) = 12",
-        "local_generation_model_tier": "vram_gb(unified)=64 >= 48 -> unified-70b-plus",
+        "local_generation_model_tier": "vram_gb(unified)=round(64*0.6,1)=38.4 >= 20 -> large-32b-q4",
         "embedding_semantic_rag_tier": "ram_gb=64 >= 48 -> full",
-        "ecosystem_bounded_run_memory_gb": "max(2, 64*0.5)=32, min(32, 64) = 32"
+        "concurrent_use_warning": "set: same shared-pool caveat as macos-arm64-48gb-projected",
+        "ecosystem_job_memory_max_gb": "max(6, round(64*0.25,1)=16.0), min(16.0, 32) = 16.0",
+        "ecosystem_job_memory_high_gb": "round(16.0*0.667,1) = 10.7"
       },
-      "note": "Projected; see macos-arm64-48gb-projected note on shared unified memory."
+      "note": "Projected; see macos-arm64-48gb-projected note on shared unified memory and the working-set fraction."
     },
     {
       "id": "github-macos-15-arm64-runner",
       "label": "GitHub-hosted macos-15 arm64 runner",
-      "evidence_class": "native_proven",
-      "evidence": "CI artifact from .github/workflows/hardware-profile-smoke.yml (macOS job); measured once that workflow runs, not committed by this unit.",
-      "note": "This unit authored the workflow that measures this host; it did not itself execute on a macOS runner, so no this-host-shaped JSON for it is checked in here."
+      "evidence_class": "pending",
+      "evidence": "None yet: this entry becomes native_proven only after a CI artifact from .github/workflows/hardware-profile-smoke.yml (macOS job) actually runs.",
+      "note": "This unit authored and offline-validated the workflow that will measure this host; it did not itself execute on a macOS runner, so this entry carries no measured values and must not be read as native_proven until the workflow runs at least once."
     }
   ]
 }

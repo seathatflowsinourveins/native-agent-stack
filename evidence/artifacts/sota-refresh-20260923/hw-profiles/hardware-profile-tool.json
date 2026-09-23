@@ -1,30 +1,34 @@
 {
   "id": "sota-refresh-20260923-hw-profiles-hardware-profile-tool",
-  "component": "scripts/hardware_profile.py + adoption/hardware-profiles.json (new tool, no prior pin)",
+  "component": "scripts/hardware_profile.py + adoption/hardware-profiles.json (new tool, no prior pin; this is a fix-round receipt superseding the first hardware-profile-tool.json after an independent Opus review)",
   "from_pin": null,
-  "to_version": "unreleased, added in this unit (claude/w2-hw-profiles-20260923)",
+  "to_version": "unreleased, added in this unit (claude/w2-hw-profiles-20260923), revised after review",
   "release_published_at": null,
   "preregistration": {
-    "written_at": "2026-09-23T00:15:00Z",
-    "expectation": "A stdlib-only script run on this WSL host will report cores=24 (from os.cpu_count()), an effective_ram_gb close to the .wslconfig memory=48GB setting rather than the smaller /proc/meminfo total, and an NVIDIA GPU with roughly 24 GB VRAM via nvidia-smi. From adoption/hardware-profiles.json's declared tiers, that should map to workflow_concurrency_cap=16 (min(16,24-2)), local_generation_model_tier='large-32b-q4' (>=20GB VRAM), embedding_semantic_rag_tier='full' (>=48GB effective RAM), and ecosystem_bounded_run_memory_gb=24.0 (48*0.5).",
-    "criteria": "python3 scripts/hardware_profile.py exits 0 and its JSON 'recommended' block matches every value above exactly; python3 -m unittest tests.test_hardware_profile passes all synthetic-input cases."
+    "written_at": "2026-09-23T00:45:00Z",
+    "written_after_fix_note": "Written after implementing the review's fixes and before re-running the checks below, not before the fix itself; this is an honest amendment round, not the original preregistration (see mlx-lm-hash-lock.json for the same disclosure pattern this receipt follows).",
+    "expectation": "After the fixes below, a run on this WSL host will report effective_ram_gb from /proc/meminfo (47.0), not the .wslconfig ceiling (48.0), which moves embedding_semantic_rag_tier from 'full' to 'standard' (>=32, <48). cpu_brand will be populated from /proc/cpuinfo ('Intel(R) Core(TM) Ultra 9 275HX') instead of asserted. ecosystem_bounded_run output will report named ecosystem_job_memory_high_gb/ecosystem_job_memory_max_gb (not a single unnamed ceiling), sized as max(default_max_gb=6, round(ram*0.25,1)) capped at 32, i.e. 11.8/7.9 on this host. local_generation_model_tier stays 'large-32b-q4' (discrete GPU path is unaffected by the macOS unified-memory fraction fix). tests.test_hardware_profile passes, including new coverage for detect_nvidia_gpu (mocked _run), measure_macos (mocked _run), the WSL RAM-source precedence (_effective_ram_gb), and multi-.wslconfig ambiguity (_find_all_wslconfigs).",
+    "criteria": "python3 scripts/hardware_profile.py exits 0 and its JSON 'recommended'/'measured' blocks match every value above exactly; python3 -m unittest tests.test_hardware_profile passes all cases (33, up from 16)."
   },
-  "acceptance_check_ref": "tests/test_hardware_profile.py (this unit's new suite); no prior acceptance check existed for this new tool.",
+  "acceptance_check_ref": "tests/test_hardware_profile.py (this unit's suite, extended in this fix round); prior receipt (this file's previous revision, git history) recorded the pre-fix behavior this review found wrong.",
   "commands": [
-    "python3 scripts/hardware_profile.py --out evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json",
+    "python3 scripts/hardware_profile.py",
+    "python3 scripts/hardware_profile.py --out evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json (then the Windows username in wslconfig_source was redacted to 'example'; see this-host.json's _redaction_note)",
     "python3 -m unittest tests.test_hardware_profile -v"
   ],
   "results": [
-    "this-host.json measured: cores=24, ram_gb_proc_meminfo=47.0, wslconfig_memory_gb=48.0 (read from /mnt/c/Users/example/.wslconfig), effective_ram_gb=48.0, gpu={name: 'NVIDIA GeForce RTX 5090 Laptop GPU', vram_gb: 23.9}, is_wsl=true.",
-    "recommended: workflow_concurrency_cap=16, local_generation_model_tier='large-32b-q4', embedding_semantic_rag_tier='full', ecosystem_bounded_run_memory_gb=24.0 -- matches the preregistered expectation exactly.",
-    "unittest: 'Ran 16 tests in 0.040s / OK' (all synthetic-input cases pass)."
+    "this-host.json (post-fix) measured: cores=24, cpu_brand='Intel(R) Core(TM) Ultra 9 275HX' (now actually read from /proc/cpuinfo, not asserted), ram_gb_proc_meminfo=47.0, wslconfig_memory_gb=48.0 (wslconfig_memory_gb_evidence_class='source_review'), effective_ram_gb=47.0 (effective_ram_gb_source='proc_meminfo'), wslconfig_other_candidates=[] (only one Windows user profile found), gpu={name: 'NVIDIA GeForce RTX 5090 Laptop GPU', vram_gb: 23.9}, is_wsl=true.",
+    "recommended (post-fix): workflow_concurrency_cap=16 (unchanged), local_generation_model_tier='large-32b-q4' (unchanged; discrete GPU path), embedding_semantic_rag_tier='standard' (changed from 'full': 47.0 < 48 threshold), concurrent_use_warning=null (only set for the macOS unified-memory path), ecosystem_job_memory_max_gb=11.8, ecosystem_job_memory_high_gb=7.9 (replacing the single unnamed ecosystem_bounded_run_memory_gb=24.0 field) -- matches the preregistered expectation exactly.",
+    "unittest: 'Ran 33 tests in 0.114s / OK' (16 original synthetic-input cases plus 17 new: DetectNvidiaGpuTests x4, MeasureMacosTests x3, EffectiveRamGbTests x3, CpuinfoParsingTests x2, WslConfigAmbiguityTests x3, plus 2 additional RecommendTests cases for the concurrent_use_warning and discrete-GPU paths)."
   ],
   "verdict": "qualified",
   "evidence_class": "native_proven",
   "limits": [
-    "Measured on exactly one host (this laptop); the 128GB WSL workstation and macOS entries in adoption/hardware-profiles.json are labelled_projection, not native_proven, until each is actually run.",
-    "nvidia-smi VRAM (23.9 GB reported) is slightly below the labelled '24 GB' in the task brief because nvidia-smi reports usable framebuffer memory, not the nominal marketing figure; this does not change the recommended tier (threshold is >=20GB).",
-    "No GPU/model workload is actually executed by this script; tiers are threshold recommendations, not measured throughput."
+    "Measured on exactly one host (this laptop); the 128GB WSL workstation and macOS entries in adoption/hardware-profiles.json remain labelled_projection, not native_proven, until each is actually run.",
+    "The macos_unified_gpu_working_set_fraction (0.6) is a labelled, conservative assumption, not a measurement -- no macOS host was available in this worktree to measure actual Metal working-set behavior.",
+    "The ecosystem_job_memory_high_gb/max_gb sizing rule (max_fraction_of_ram=0.25, ceiling_max_gb=32) is this unit's own bounded-fraction judgment call reacting to the review's finding that the old rule (half of RAM, unnamed) was four times the wrapper's own MemoryMax default; it is not validated against an actual WSL-stability stress test at the new ceiling.",
+    "No GPU/model workload is actually executed by this script; tiers are threshold recommendations, not measured throughput.",
+    "_find_all_wslconfigs's multi-user ambiguity fix only reports the other candidates found; it still picks the alphabetically-first one automatically rather than requiring an explicit choice, since no signal (e.g. the active WSL distro's owning Windows user) is read to disambiguate without invoking a Windows binary."
   ],
-  "checked_at": "2026-09-23T00:30:00Z"
+  "checked_at": "2026-09-23T00:50:00Z"
 }

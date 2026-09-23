@@ -48,19 +48,32 @@ def _read_meminfo_total_kib(text: str) -> int | None:
     return int(match.group(1)) if match else None
 
 
+def _read_cpuinfo_model(text: str) -> str | None:
+    match = re.search(r"^model name\s*:\s*(.+)$", text, re.MULTILINE)
+    return match.group(1).strip() if match else None
+
+
 def detect_wsl(release_text: str) -> bool:
     return "microsoft" in release_text.lower() or "wsl" in release_text.lower()
 
 
-def _find_wslconfig() -> Path | None:
-    """Best-effort, read-only search for the Windows-side .wslconfig.
+def _find_all_wslconfigs(users_dirs: "list[Path] | None" = None) -> list[Path]:
+    """Best-effort, read-only search for every Windows-side .wslconfig.
 
     WSL exposes the Windows filesystem at /mnt/<drive>; USERPROFILE/WSLENV
     are not reliably forwarded, so this checks the conventional mount points
     without following symlinks outside them or invoking any Windows binary.
+    Returns every match found (sorted), since a multi-user Windows PC can
+    have more than one profile with its own .wslconfig, and picking the
+    alphabetically-first one is a guess, not a measurement.
+
+    `users_dirs` overrides the candidate `Users` directories for testing;
+    defaults to the conventional /mnt/c/Users and /mnt/C/Users mount points.
     """
-    for drive in ("c", "C"):
-        users_dir = Path(f"/mnt/{drive}/Users")
+    if users_dirs is None:
+        users_dirs = [Path("/mnt/c/Users"), Path("/mnt/C/Users")]
+    found = []
+    for users_dir in users_dirs:
         if not users_dir.is_dir():
             continue
         try:
@@ -70,8 +83,14 @@ def _find_wslconfig() -> Path | None:
         for entry in entries:
             candidate = entry / ".wslconfig"
             if candidate.is_file():
-                return candidate
-    return None
+                found.append(candidate)
+    return found
+
+
+def _find_wslconfig() -> Path | None:
+    """Best-effort pick of a single Windows-side .wslconfig (first match)."""
+    found = _find_all_wslconfigs()
+    return found[0] if found else None
 
 
 def _parse_wslconfig_memory_gb(text: str) -> float | None:
@@ -115,6 +134,22 @@ def detect_nvidia_gpu() -> dict | None:
     return {"name": name, "vram_gb": round(vram_mib / 1024.0, 1), "evidence_class": "native_proven"}
 
 
+def _effective_ram_gb(ram_gb_proc_meminfo: float | None, wsl_config_memory_gb: float | None) -> tuple[float | None, str]:
+    """Pick the RAM value tier arithmetic should use, and say where it came from.
+
+    /proc/meminfo is the kernel-visible total actually available inside the
+    WSL VM (native_proven, measured on this host); .wslconfig's memory=
+    setting is only the Windows-side configured ceiling, read from a config
+    file this script did not generate (source_review, per the module
+    docstring). WSL2's actual allocation can be at or below that ceiling, so
+    tier arithmetic prefers the measured value; the config value is only used
+    as a fallback when /proc/meminfo could not be read at all.
+    """
+    if ram_gb_proc_meminfo is not None:
+        return ram_gb_proc_meminfo, "proc_meminfo"
+    return wsl_config_memory_gb, "wslconfig"
+
+
 def measure_linux(profiles: dict) -> dict:
     cores = os.cpu_count() or 1
     meminfo_path = Path("/proc/meminfo")
@@ -124,6 +159,11 @@ def measure_linux(profiles: dict) -> dict:
         if kib is not None:
             ram_gb = round(kib / (1024.0 * 1024.0), 1)
 
+    cpu_brand = None
+    cpuinfo_path = Path("/proc/cpuinfo")
+    if cpuinfo_path.is_file():
+        cpu_brand = _read_cpuinfo_model(cpuinfo_path.read_text(encoding="utf-8"))
+
     version_text = ""
     version_path = Path("/proc/version")
     if version_path.is_file():
@@ -132,28 +172,35 @@ def measure_linux(profiles: dict) -> dict:
 
     wsl_config_memory_gb = None
     wsl_config_source = None
+    wsl_config_other_candidates = []
     if is_wsl:
-        wslconfig = _find_wslconfig()
-        if wslconfig is not None:
+        candidates = _find_all_wslconfigs()
+        if candidates:
+            wslconfig = candidates[0]
             try:
                 text = wslconfig.read_text(encoding="utf-8", errors="replace")
             except OSError:
                 text = ""
             wsl_config_memory_gb = _parse_wslconfig_memory_gb(text)
             wsl_config_source = str(wslconfig)
+            wsl_config_other_candidates = [str(p) for p in candidates[1:]]
 
     gpu = detect_nvidia_gpu()
 
-    effective_ram_gb = wsl_config_memory_gb if (is_wsl and wsl_config_memory_gb) else ram_gb
+    effective_ram_gb, effective_ram_gb_source = _effective_ram_gb(ram_gb, wsl_config_memory_gb)
 
     return {
         "platform": "wsl" if is_wsl else "linux",
         "cores": cores,
+        "cpu_brand": cpu_brand,
         "ram_gb_proc_meminfo": ram_gb,
         "is_wsl": is_wsl,
         "wslconfig_memory_gb": wsl_config_memory_gb,
+        "wslconfig_memory_gb_evidence_class": "source_review" if wsl_config_memory_gb is not None else None,
         "wslconfig_source": wsl_config_source,
+        "wslconfig_other_candidates": wsl_config_other_candidates,
         "effective_ram_gb": effective_ram_gb,
+        "effective_ram_gb_source": effective_ram_gb_source,
         "gpu": gpu,
         "evidence_class": "native_proven",
     }
@@ -197,32 +244,62 @@ def recommend(measured: dict, profiles: dict) -> dict:
     concurrency = min(cap, max(1, cores - concurrency_rule["reserved_cores"]))
 
     ram_gb = measured.get("effective_ram_gb")
+    gen_layer = profiles["layers"]["local_generation_model"]
     vram_gb = None
+    is_unified = False
     gpu = measured.get("gpu")
     if gpu:
         vram_gb = gpu.get("vram_gb")
     elif measured.get("unified_memory_gb") is not None:
-        vram_gb = measured.get("unified_memory_gb")
+        is_unified = True
+        # Apple unified memory is shared with the OS, foreground apps, and
+        # anything else running concurrently (e.g. the semantic-RAG stack
+        # below); macOS also caps the Metal working set well under total
+        # RAM. Treating 100% of unified memory as usable VRAM overstates
+        # what a generation model can actually claim, so scale it by a
+        # declared, labelled working-set fraction instead of the raw total.
+        working_set_fraction = gen_layer.get("macos_unified_gpu_working_set_fraction", 1.0)
+        vram_gb = round(measured.get("unified_memory_gb") * working_set_fraction, 1)
 
-    gen_tiers = profiles["layers"]["local_generation_model"]["tiers"]
+    gen_tiers = gen_layer["tiers"]
     gen_tier = _pick_tier(gen_tiers, vram_gb, "vram_gb")
 
     rag_tiers = profiles["layers"]["embedding_semantic_rag"]["tiers"]
     rag_tier = _pick_tier(rag_tiers, ram_gb, "ram_gb")
 
-    bounded_run_rule = profiles["layers"]["ecosystem_bounded_run"]
-    bounded_run_mem_gb = None
-    if ram_gb is not None:
-        bounded_run_mem_gb = round(
-            max(bounded_run_rule["floor_gb"], ram_gb * bounded_run_rule["fraction"]), 1
+    concurrent_use_warning = None
+    if is_unified and gen_tier and rag_tier and rag_tier.get("min_ram_gb", 0) > 0:
+        concurrent_use_warning = (
+            "Unified memory is one pool shared by the local generation model and the "
+            "embedding/semantic-RAG stack; the local_generation_model_tier and "
+            "embedding_semantic_rag_tier budgets below are sequential-use capacity "
+            "estimates, not a verified concurrent-use budget. Running both near their "
+            "tier ceiling at the same time on this host is not accounted for here."
         )
-        bounded_run_mem_gb = min(bounded_run_mem_gb, bounded_run_rule["ceiling_gb"])
+
+    bounded_run_rule = profiles["layers"]["ecosystem_bounded_run"]
+    job_memory_high_gb = None
+    job_memory_max_gb = None
+    if ram_gb is not None:
+        job_memory_max_gb = max(
+            bounded_run_rule["default_max_gb"],
+            round(ram_gb * bounded_run_rule["max_fraction_of_ram"], 1),
+        )
+        job_memory_max_gb = min(job_memory_max_gb, bounded_run_rule["ceiling_max_gb"])
+        job_memory_high_gb = round(job_memory_max_gb * bounded_run_rule["high_to_max_ratio"], 1)
 
     return {
         "workflow_concurrency_cap": concurrency,
         "local_generation_model_tier": gen_tier["name"] if gen_tier else "cpu-only",
         "embedding_semantic_rag_tier": rag_tier["name"] if rag_tier else "unsupported",
-        "ecosystem_bounded_run_memory_gb": bounded_run_mem_gb,
+        "concurrent_use_warning": concurrent_use_warning,
+        # Suggested overrides for the ECOSYSTEM_JOB_MEMORY_HIGH / _MAX env vars
+        # read by ecosystem-bounded-run (systemd MemoryHigh/MemoryMax). The
+        # wrapper's own defaults (4G/6G) are the WSL-stability containment
+        # floor; these are a bounded-fraction ceiling suggestion for hosts
+        # with more RAM headroom, never applied automatically.
+        "ecosystem_job_memory_high_gb": job_memory_high_gb,
+        "ecosystem_job_memory_max_gb": job_memory_max_gb,
     }
 
 
@@ -249,7 +326,14 @@ def build_report(profiles: dict) -> dict:
             "Presence/threshold measurement only; no model, service, or GPU workload is actually run.",
             "nvidia-smi absence yields gpu=null even when a GPU is present but the driver/tool is unavailable.",
             ".wslconfig detection is a best-effort read of /mnt/<drive>/Users/*/.wslconfig; a non-default "
-            "Windows user profile path or drive letter is not searched.",
+            "Windows user profile path or drive letter is not searched, and on a multi-user Windows PC the "
+            "alphabetically-first profile with a .wslconfig is used (see wslconfig_other_candidates for the rest).",
+            "WSL effective_ram_gb uses /proc/meminfo (native_proven) rather than .wslconfig's configured "
+            "ceiling (source_review); wslconfig_memory_gb is still reported for visibility.",
+            "macOS unified-memory VRAM is scaled by a declared, labelled macos_unified_gpu_working_set_fraction "
+            "(adoption/hardware-profiles.json), not measured Metal working-set behavior on this run.",
+            "The local generation and embedding/semantic-RAG tiers on a unified-memory host are independent, "
+            "sequential-use budgets; see concurrent_use_warning when both are non-trivial on the same host.",
         ],
     }
 

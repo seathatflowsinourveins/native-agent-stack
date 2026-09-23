@@ -355,32 +355,53 @@ data or hosting, or orders.
 ## Hardware profiles
 
 `scripts/hardware_profile.py` (stdlib only) measures the current host — cores,
-RAM (`/proc/meminfo` on Linux/WSL, with the Windows-side `.wslconfig` memory
-value when readable; `sysctl hw.memsize`/`hw.ncpu`/`machdep.cpu.brand_string`
-and Apple Silicon detection on macOS) and, where present, GPU VRAM via
-`nvidia-smi` — and recommends a tier for each hardware-dependent layer from the
-declarative [`adoption/hardware-profiles.json`](../adoption/hardware-profiles.json):
-the workflow concurrency cap (`min(16, cores - 2)`, this project's per-run
+CPU model (`/proc/cpuinfo` on Linux/WSL, `machdep.cpu.brand_string` on
+macOS), RAM (`/proc/meminfo` on Linux/WSL; the Windows-side `.wslconfig`
+memory value is also read when reachable but only used as a fallback when
+`/proc/meminfo` itself cannot be read, since the kernel-visible total is the
+measured, `native_proven` value and the config file is `source_review`;
+`sysctl hw.memsize`/`hw.ncpu` and Apple Silicon detection on macOS) and, where
+present, GPU VRAM via `nvidia-smi` — and recommends a tier for each
+hardware-dependent layer from the declarative
+[`adoption/hardware-profiles.json`](../adoption/hardware-profiles.json): the
+workflow concurrency cap (`min(16, cores - 2)`, this project's per-run
 concurrent-agent sizing), the local generation model tier by VRAM or unified
-memory, the embedding/semantic-RAG fit (SocratiCode, Qdrant, vLLM), and the
-`ecosystem-bounded-run` memory ceiling. `tests/test_hardware_profile.py` covers
-the pure tier/threshold logic against synthetic (labelled) inputs.
+memory (Apple unified memory is scaled by a declared, labelled GPU
+working-set fraction before comparison, not treated as 100% usable VRAM,
+since it is shared with the OS and any concurrent embedding/semantic-RAG
+service — a `concurrent_use_warning` is set when both are non-trivial on the
+same unified-memory host), the embedding/semantic-RAG fit (SocratiCode,
+Qdrant, vLLM), and suggested `ECOSYSTEM_JOB_MEMORY_HIGH`/`ECOSYSTEM_JOB_MEMORY_MAX`
+override values for `ecosystem-bounded-run` (its own defaults, 4G/6G, remain
+the WSL-stability containment floor; this is a bounded-fraction ceiling
+suggestion for hosts with headroom, never applied automatically).
+`tests/test_hardware_profile.py` covers the pure tier/threshold logic, CSV/
+sysctl parsing (via mocked subprocess output) and the WSL RAM-source
+precedence against synthetic (labelled) inputs.
 
 `adoption/hardware-profiles.json` records one measured entry per host actually
-run: this host (Intel Ultra 9 275HX laptop, WSL memory 48 GB, RTX 5090 Laptop
-24 GB VRAM; `evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json`,
-evidence class `native_proven`) and, once
+run: this host (measured: `Intel(R) Core(TM) Ultra 9 275HX`, 24 cores, WSL
+`/proc/meminfo` 47 GB against a configured `.wslconfig` ceiling of 48 GB, RTX
+5090 Laptop GPU reporting 23.9 GB VRAM via `nvidia-smi` against the "24 GB"
+marketing figure;
+`evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json`,
+evidence class `native_proven`), and a `github-macos-15-arm64-runner` entry
+still marked `pending` (not `native_proven`) because
 [`hardware-profile-smoke.yml`](../.github/workflows/hardware-profile-smoke.yml)
-runs, the GitHub-hosted `macos-15` arm64 runner. The 128 GB WSL workstation and
-the 48 GB / 64 GB macOS arm64 unified-memory hosts are recorded as
+has authored-and-offline-validated coverage (zizmor/actionlint clean) but has
+not yet executed on a hosted macOS runner. The 128 GB WSL workstation and the
+48 GB / 64 GB macOS arm64 unified-memory hosts are recorded as
 `labelled_projection` entries with their sizing arithmetic shown inline, not as
 measurements; treat them as projections until a fresh run of the script on
 each host replaces them. That workflow also runs a tiny MLX generation smoke
 test (`mlx-community/Qwen2.5-0.5B-Instruct-4bit`, pinned by Hugging Face
 revision SHA) on the macOS runner using `mlx-lm` installed from a hash-locked,
-`uv pip compile --generate-hashes` requirements file
-(`tools/mlx-smoke/requirements.lock.txt`), recording tokens/s and peak memory
-as `native_proven` for that exact runner.
+`uv pip compile --generate-hashes --exclude-newer` requirements file
+(`tools/mlx-smoke/requirements.lock.txt`; the exclusion date keeps the CI
+job's redundant-compile-and-diff check deterministic as new transitive
+releases publish), recording tokens/s and peak memory straight from
+`mlx_lm.generate.stream_generate`'s own `GenerationResponse` as `native_proven`
+for that exact runner, once it actually runs.
 
 ## Repository automation and releases
 

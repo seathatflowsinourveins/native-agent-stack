@@ -8,8 +8,12 @@ it is not exercised on Linux.
 
 Evidence class: native_proven for the tokens/s and peak-memory numbers it
 prints, measured on the exact runner it executes on (e.g. GitHub's macos-15
-arm64 hosted runner). It performs real network access to Hugging Face to fetch
-the pinned model revision; there is no offline mode.
+arm64 hosted runner). tokens_per_second and peak_memory_gb come straight from
+mlx_lm.generate.stream_generate's GenerationResponse (generation_tps,
+peak_memory), mlx-lm's own generation-loop timing, not a wall-clock estimate
+that also bills model load/tokenizer setup/prompt prefill against a re-encoded
+output length. It performs real network access to Hugging Face to fetch the
+pinned model revision; there is no offline mode.
 """
 
 from __future__ import annotations
@@ -30,27 +34,32 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     try:
-        import mlx.core as mx
-        from mlx_lm import load, generate
+        from mlx_lm import load
+        from mlx_lm.generate import stream_generate
     except ImportError as exc:  # pragma: no cover - exercised only on macOS CI
         print(f"mlx-lm/mlx unavailable: {exc}", file=sys.stderr)
         return 1
 
     model, tokenizer = load(args.model, tokenizer_config={}, revision=args.revision)
 
+    # stream_generate's GenerationResponse reports generation_tps and
+    # peak_memory (GB, decimal 1e9) directly from mlx-lm's own generation
+    # loop timing (mlx_lm/generate.py); this is what mlx-lm itself considers
+    # the tokens/s and peak memory for a run, not a wall-clock estimate that
+    # also includes model load, tokenizer setup, and prompt prefill divided
+    # by a re-encoded output length.
     start = time.perf_counter()
-    text = generate(
-        model, tokenizer, prompt=args.prompt, max_tokens=args.max_tokens, verbose=False,
-    )
+    text = ""
+    response = None
+    for response in stream_generate(
+        model, tokenizer, prompt=args.prompt, max_tokens=args.max_tokens,
+    ):
+        text += response.text
     elapsed = time.perf_counter() - start
 
-    # generate() consumes the prompt plus up to max_tokens generated tokens;
-    # report generated-token throughput using the requested ceiling as an
-    # upper-bound estimate when the exact generated count is not exposed by
-    # this mlx-lm version's return type (a plain string).
-    generated_tokens = len(tokenizer.encode(text)) if isinstance(text, str) else args.max_tokens
-    tokens_per_second = generated_tokens / elapsed if elapsed > 0 else 0.0
-    peak_memory_gb = round(mx.get_peak_memory() / (1024.0 ** 3), 3) if hasattr(mx, "get_peak_memory") else None
+    if response is None:
+        print("mlx-lm generated no tokens", file=sys.stderr)
+        return 1
 
     report = {
         "schema": "mlx-smoke-report-v1",
@@ -60,8 +69,10 @@ def main(argv: list[str] | None = None) -> int:
         "max_tokens": args.max_tokens,
         "output_text": text,
         "elapsed_seconds": round(elapsed, 4),
-        "tokens_per_second": round(tokens_per_second, 2),
-        "peak_memory_gb": peak_memory_gb,
+        "prompt_tokens": response.prompt_tokens,
+        "generation_tokens": response.generation_tokens,
+        "tokens_per_second": round(response.generation_tps, 2),
+        "peak_memory_gb": round(response.peak_memory, 3),
         "evidence_class": "native_proven",
     }
     with open(args.out, "w", encoding="utf-8") as handle:

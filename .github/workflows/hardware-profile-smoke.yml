@@ -8,6 +8,7 @@ on:
       - adoption/hardware-profiles.json
       - tools/mlx-smoke/requirements.in
       - tools/mlx-smoke/requirements.lock.txt
+      - tools/mlx-smoke/run_smoke.py
       - .github/workflows/hardware-profile-smoke.yml
   workflow_dispatch:
 
@@ -71,28 +72,40 @@ jobs:
           cat "$RUNNER_TEMP/hw-profile/macos-15.json"
       - name: Run the unit tests for the script
         run: python3 -m unittest tests.test_hardware_profile -v
-      - name: Install uv (pinned by requirements-frozen resolver, no PATH replacement)
-        run: python3 -m pip install --user "uv==0.12.17"
+      - name: Install uv (verified download, isolated prefix, no PATH replacement)
+        env:
+          UV_VERSION: '0.12.17'
+          # https://github.com/astral-sh/uv/releases/download/0.12.17/uv-aarch64-apple-darwin.tar.gz.sha256
+          UV_SHA256: 85f00cbdc6dd3e97eba4c31b4d014375a9fdfe8f570023b84e5102fc3456896b
+        run: |
+          mkdir -p "$RUNNER_TEMP/uv"
+          curl --fail --silent --show-error --location --retry 3 \
+            "https://github.com/astral-sh/uv/releases/download/${UV_VERSION}/uv-aarch64-apple-darwin.tar.gz" \
+            --output "$RUNNER_TEMP/uv/archive.tar.gz"
+          printf '%s  %s\n' "$UV_SHA256" "$RUNNER_TEMP/uv/archive.tar.gz" | shasum -a 256 --check
+          tar -xzf "$RUNNER_TEMP/uv/archive.tar.gz" -C "$RUNNER_TEMP/uv" --strip-components=1
+          "$RUNNER_TEMP/uv/uv" --version
+          echo "UV=$RUNNER_TEMP/uv/uv" >> "$GITHUB_ENV"
       - name: Verify the hash-locked mlx-lm requirements resolve for this platform
         run: |
-          python3 -m uv pip compile tools/mlx-smoke/requirements.in \
+          "$UV" pip compile tools/mlx-smoke/requirements.in \
             --python-platform aarch64-apple-darwin --python-version 3.12 --generate-hashes \
-            --no-header -o "$RUNNER_TEMP/hw-profile/requirements.lock.check.txt"
+            --no-header --exclude-newer 2026-09-23T00:00:00Z \
+            -o "$RUNNER_TEMP/hw-profile/requirements.lock.check.txt"
           diff -u tools/mlx-smoke/requirements.lock.txt "$RUNNER_TEMP/hw-profile/requirements.lock.check.txt"
       - name: Create an isolated virtual environment for the smoke test
-        run: python3 -m uv venv "$RUNNER_TEMP/mlx-smoke-venv"
+        run: $UV venv "$RUNNER_TEMP/mlx-smoke-venv"
       - name: Install the hash-locked mlx-lm requirements into the isolated venv
         run: |
-          source "$RUNNER_TEMP/mlx-smoke-venv/bin/activate"
-          python3 -m uv pip install --require-hashes -r tools/mlx-smoke/requirements.lock.txt
+          "$UV" pip install --python "$RUNNER_TEMP/mlx-smoke-venv/bin/python3" \
+            --require-hashes -r tools/mlx-smoke/requirements.lock.txt
       - name: Run the tiny MLX generation smoke test (pinned model revision)
         env:
           MLX_MODEL: mlx-community/Qwen2.5-0.5B-Instruct-4bit
           MLX_MODEL_REVISION: a5339a4131f135d0fdc6a5c8b5bbed2753bbe0f3
         run: |
-          source "$RUNNER_TEMP/mlx-smoke-venv/bin/activate"
           mkdir -p "$RUNNER_TEMP/hw-profile"
-          python3 tools/mlx-smoke/run_smoke.py \
+          "$RUNNER_TEMP/mlx-smoke-venv/bin/python3" tools/mlx-smoke/run_smoke.py \
             --model "$MLX_MODEL" --revision "$MLX_MODEL_REVISION" \
             --prompt "Say hello in five words." --max-tokens 32 \
             --out "$RUNNER_TEMP/hw-profile/mlx-smoke-macos-15.json"

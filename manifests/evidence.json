@@ -7624,8 +7624,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "f5cb6c0c527d4a9f0d9c733bacb94253c94e468e8051118b261fae4b10ed8b72",
-      "bytes": 12921251
+      "sha256": "1cb2427753f884a2f8a49f96b96a97dae2027297106460f8e4627632db968a90",
+      "bytes": 12922700
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -7699,8 +7699,8 @@
     },
     {
       "path": "docs/grand-catalog-handbook.md",
-      "sha256": "cfb89d4aa7aabc669d4d2bc651f58ed7266cd0de2e001f083f2f026c6832ca98",
-      "bytes": 421377
+      "sha256": "a9a0518d06139065cf6dce3dfd85b6f53caccb57cbd6bbcb95fb84c5cf6a9a88",
+      "bytes": 422803
     },
     {
       "path": "docs/harness-defaults.md",
@@ -12564,23 +12564,28 @@
     },
     {
       "path": "evidence/artifacts/sota-refresh-20260923/hw-profiles/README.md",
-      "sha256": "07040efdcab39ee40f860ab83e9bf5a02f2071b16af8ac4a3f55802280287769",
-      "bytes": 4976
+      "sha256": "2b47948c30992c408810d62a4f45054b3e29bd0c8cea4974f4bdb69755f37323",
+      "bytes": 7949
     },
     {
       "path": "evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json",
-      "sha256": "8547f34e55243cb7f8c525baadf9b2ecea6a0dc9d8406e8fc1290fdff16fca36",
-      "bytes": 1086
+      "sha256": "3a6a9a83e4e43eca8b95e70f41dafe15cceb3c6a759b8092ce3553b0e37f4cb6",
+      "bytes": 2344
     },
     {
       "path": "evidence/artifacts/sota-refresh-20260923/hw-profiles/mlx-lm-hash-lock.json",
-      "sha256": "96f135a94859e7843b879c45823028f8f261f8c61c774821a31f1ece725162e6",
-      "bytes": 5126
+      "sha256": "8d1583c5c2a0817d6747b3c8742028bd262e7620e2591e439c9cb4752469d5d2",
+      "bytes": 8093
     },
     {
       "path": "evidence/artifacts/sota-refresh-20260923/hw-profiles/hardware-profile-tool.json",
-      "sha256": "c03c4be173083ad5ffbc7ff7614b7b2f568536c650707e0ae1e85c1a8fcdc0bd",
-      "bytes": 2744
+      "sha256": "66d3e5cf6da09d0c0fc3f1707f12eb31162732b54d7288280df05c5b3156ac1d",
+      "bytes": 5174
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/hw-profiles/review-findings-response.json",
+      "sha256": "374ace11ba2553bd19e5702569e3024310c415eb65003a4c91506565c1b76b75",
+      "bytes": 8316
     }
   ],
   "convergence_records": [
