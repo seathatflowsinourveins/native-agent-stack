@@ -3168,8 +3168,8 @@
     },
     {
       "path": "adoption/launchd/launchd-agents.sh",
-      "sha256": "666cba03fbef211cbc21b31fa69d235987ec6d6877e8af34ab8e166db3dd8316",
-      "bytes": 38310
+      "sha256": "ef33fe03a054f91d47701080ba875144a9fb609d6e17ac78d9dc865267c9be38",
+      "bytes": 28554
     },
     {
       "path": "adoption/lifecycle.md",
@@ -3228,8 +3228,8 @@
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
-      "sha256": "44fed2be99131e9de39329e57b994e58618ca40553d51d189b43c6751960d3cf",
-      "bytes": 24032
+      "sha256": "4d56bcfc57602f16d9ebaebc0a3d38a6fea116b19f860bf59e4f6fd89d4ea4a0",
+      "bytes": 26962
     },
     {
       "path": "adoption/pre-login-observation.json",
@@ -14324,8 +14324,8 @@
     },
     {
       "path": "tests/test_adoption_launchd.py",
-      "sha256": "5c3998d082d5e59e3249e7157a022d4a5435f74423f69ba638640d5a074e33ea",
-      "bytes": 126174
+      "sha256": "5f70d5dff779ec01b1424bb2007efc0cdf670ea7f691c181e1763ab6f050e0fa",
+      "bytes": 73847
     },
     {
       "path": "tests/test_adoption_status.py",

@@ -321,31 +321,77 @@ with [`tools/adoption/render_launchd.py`](../../tools/adoption/render_launchd.py
 `--set KEY=VALUE`), and drive the rendered plists with
 [`adoption/launchd/launchd-agents.sh`](../launchd/launchd-agents.sh)'s five
 subcommands: `render`, `lint` (`plutil -lint`, or a `plistlib` fallback where
-`plutil` is unavailable), `install` (`launchctl bootstrap`), `status`
-(`launchctl print`) and `remove` (`launchctl bootout`, only for a label the
-script's own state file recorded as enabled, never deleting data). None of
-the three agents has been bootstrapped, kickstarted or booted out on any Mac,
-hosted or otherwise; this stays true after this update.
+`plutil` is unavailable), `install` (stage, lint, bootout the label if it is
+currently loaded from that same destination path, rename into place,
+`launchctl enable` + `launchctl bootstrap`), `status` (`launchctl print`) and
+`remove` (bootout, then delete the plist, again only ever acting on a label
+confirmed loaded from its own destination path, or not loaded at all with a
+file present to clean up). None of the three agents has been bootstrapped,
+kickstarted or booted out on any Mac, hosted or otherwise; this stays true
+after this update.
+
+**2026-09-23 decision: brew-services semantics, no backup or reconcile.**
+
+- **Chosen:** stateless, path-verified ownership with no backup, no
+  rollback and no ownership file -- the same model Homebrew's own
+  `brew services` uses. In **Homebrew/brew
+  `Library/Homebrew/services/cli.rb` @ `8e3a5dc0a7`** (2026-09-07): `stop`
+  boots a service out and then removes its service file (`stop`, roughly
+  lines 229-247); `install_service_file` writes a temp file, removes the
+  old service file and installs the new one (roughly lines 523-560), then
+  `launchctl_load` calls `launchctl enable` followed by `launchctl
+  bootstrap` (roughly lines 460-468); there is no backup, no rollback and
+  no ownership file anywhere in that flow -- recovery is re-running the
+  command. `launchd-agents.sh` now works the same way: "ours" means the
+  label is one of this script's own AND, if it is currently loaded at all,
+  the `path =` line `launchctl print` reports names this script's own
+  destination plist, never a stored ownership record.
+- **Rejected:** the transactional backup/reconcile design (round 3b
+  through round 3f: a hard-linked backup plus a `reconcile_install`
+  function, registered as both an explicit post-install step and the
+  script's `EXIT` trap, that tried to converge whatever state a signal or
+  a failure left behind). Every one of five successive review rounds found
+  a NEW recovery defect in that machinery that the previous round's fix
+  had not covered -- a partial copy overwriting the original, a reload
+  never attempted at a bootout/reload boundary, a retry that could delete
+  the only good backup, a tri-state `launchctl print` collapsed to a
+  binary check, an unrelated service sharing a label getting recorded as
+  owned, and a delayed teardown read as "nothing to do" -- which is
+  itself the pattern that motivated retiring the whole approach rather
+  than patching a sixth defect into it.
+- **Would overturn this:** a real-Mac observation where re-running
+  `install` (or `remove`) does not converge from a state an earlier,
+  interrupted run left behind -- the one guarantee this design depends on,
+  parallel to what `brew services` itself relies on -- or a new
+  requirement to preserve a plist a person edited locally by hand (this
+  design has no backup, so a local edit to a plist under
+  `~/Library/LaunchAgents` is silently overwritten by the next `install`,
+  exactly like `brew services` would overwrite it too).
+
+Recovering a previous plist after a change is therefore no longer this
+script's job: reproduce it from git history (`adoption/launchd/*.plist.
+template`) plus whatever host value file (`adoption/hosts/<name>.json` or
+`--set`) produced it, and render + install again.
 
 **Untested boundary for real-Mac acceptance: asynchronous launchd teardown was
-modelled, not observed natively.** `launchd-agents.sh`'s `reconcile_install`
-assumes a `launchctl bootout` that returns success can still leave the old
-instance tearing down for a bounded time afterward -- a `launchctl print`
-moments later can keep reporting it loaded during that window -- and re-polls
-(reusing the same bounded `wait_until_unloaded` helper the main install path
-uses) rather than trusting one such read and declaring convergence with zero
-reload attempts. This is source-supported inference from `launchctl(1)`'s own
-documented behavior (a real Mac's `man launchctl`; `bootout` and `bootstrap`
-are documented as asynchronous relative to the daemon's own teardown/startup)
-and the shimmed/simulated evidence in `tests/test_adoption_launchd.py` (a
-mock `launchctl` models the delayed-loaded
-window with a bounded call counter), never a native observation of an actual
-delayed teardown on real launchd: no Mac, hosted or otherwise, has produced a
-`launchctl bootout` whose corresponding `launchctl print` stayed loaded for
-any measured, non-zero duration afterward. A real Mac run should specifically
-try to reproduce that window (e.g. a service with a slow `KeepAlive` shutdown
-path) rather than assume the bounded re-poll alone is proof it converges
-correctly there.
+modelled, not observed natively.** Both `install`'s bootout gate and
+`remove` assume a `launchctl bootout` that returns success can still leave
+the old instance tearing down for a bounded time afterward -- a `launchctl
+print` moments later can keep reporting it loaded during that window -- and
+poll (`wait_until_unloaded`, a bounded, sleep-based loop) rather than
+trusting one such read and proceeding immediately. This is source-supported
+inference from `launchctl(1)`'s own documented behavior (a real Mac's `man
+launchctl`; `bootout` and `bootstrap` are documented as asynchronous
+relative to the daemon's own teardown/startup) and the shimmed/simulated
+evidence in `tests/test_adoption_launchd.py` (a mock `launchctl` models a
+delayed-loaded window with a bounded call counter, and real bash `SIGTERM`/
+`SIGINT` injection exercises the deferred-signal path), never a native
+observation of an actual delayed teardown on real launchd: no Mac, hosted
+or otherwise, has produced a `launchctl bootout` whose corresponding
+`launchctl print` stayed loaded for any measured, non-zero duration
+afterward. A real Mac run should specifically try to reproduce that window
+(e.g. a service with a slow `KeepAlive` shutdown path) rather than assume
+the bounded poll alone is proof it behaves correctly there.
 
 ## Qdrant collections
 
