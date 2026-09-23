@@ -4,7 +4,10 @@ Per [the acceptance evidence policy](../../docs/acceptance-evidence-policy.md),
 this page is `source_review` evidence plus one hosted-runner execution: upstream
 documentation and release metadata were read, and the bootstrap script has a
 native execution receipt from a GitHub-hosted macOS arm64 runner
-([`evidence/receipts/adoption-macos-hosted-smoke-20260922.json`](../../evidence/receipts/adoption-macos-hosted-smoke-20260922.json),
+([`evidence/receipts/adoption-macos-hosted-smoke-20260923.json`](../../evidence/receipts/adoption-macos-hosted-smoke-20260923.json):
+launchd agents, the embedding acceptance against the Linux reference vector,
+and the recording smoke; earlier
+[`adoption-macos-hosted-smoke-20260922.json`](../../evidence/receipts/adoption-macos-hosted-smoke-20260922.json);
 "What a hosted run proves" below), but no command below has an execution receipt
 from a Mac workstation. `platform_profiles` entry `macos-arm64` in
 [`adoption/manifest.json`](../manifest.json) has `status: drafted_not_accepted`

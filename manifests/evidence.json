@@ -2973,6 +2973,27 @@
         "The rebuilt manifest and drift table are read from this run's own catalog-freshness workflow artifact; this receipt does not independently re-fetch upstream sources."
       ],
       "path": "evidence/receipts/catalog-freshness-20260923.json"
+    },
+    {
+      "id": "adoption-macos-hosted-smoke-20260923",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "codex",
+        "claude-code",
+        "context-mode",
+        "ai-memory",
+        "mcporter",
+        "llama-cpp",
+        "qdrant"
+      ],
+      "claim": "On a GitHub-hosted macOS arm64 runner (label macos-15, macOS 15.7.9 build 24G830), adoption-bootstrap run 35875188590 at head 75a6e0d, the PR #94 branch, passed every job. bootstrap-macos: adoption/bootstrap-macos.sh --profile macos-arm64-foundation installed the pinned darwin-arm64 set into a disposable ECO_INSTALL_ROOT, including the pinned embeddinggemma-300M-Q8_0 model (sha256 checked). launchd-agents.sh rendered, linted, bootstrapped and booted out the qdrant and llama-embed LaunchAgents. qdrant health reported 1.19.1. The llama-embed embedding acceptance passed: dimension 768, cosine 0.99944 against the Linux CPU reference vector evidence/artifacts/macos-embed-reference-20260923/, threshold 0.99. The llama.cpp startup log assigns layers to Metal device MTL0, with flash attention on CPU. bootstrap-macos-brew: the Homebrew prerequisite path completed. validate-macos: validators, the adoption test modules (238 tests OK) and a real host_receipts.py record/validate/component_matrix/new_host_grand_list smoke in a throwaway checkout copy passed, on setup-python 3.13.15 and on the runner's system /usr/bin/python3 3.9.6.",
+      "limitations": [
+        "This is native operation on a GitHub-hosted macOS arm64 runner only. It is not acceptance on a user's Mac workstation, which must record its own receipt with host_receipts.py and --second-physical-machine plus an independent review.",
+        "platform_profiles[macos-arm64] stays drafted_not_accepted. No macos-arm64 platform_status is changed by this receipt.",
+        "The launchd agents ran for the duration of one job in the runner's GUI domain. Persistence across logins, reboots and user sessions was not observed.",
+        "The non-gating full python3 -m unittest on this runner ran 2929 tests with 29 failures and 95 errors, recorded as an artifact. Most failures come from macOS's symlinked temp directories (/var/folders and /tmp resolve to /private/...) tripping repository path-containment checks, plus Linux-only tests not skipped on macOS. They are tracked as a follow-up and not claimed as passing."
+      ],
+      "path": "evidence/receipts/adoption-macos-hosted-smoke-20260923.json"
     }
   ],
   "files": [
@@ -3178,8 +3199,8 @@
     },
     {
       "path": "adoption/manifest.json",
-      "sha256": "f15170e3376a66bc98425489ac6b2c2b1bc0213b9692ccba810849e0bfa908e6",
-      "bytes": 18190
+      "sha256": "1269f880b74d0260437bee256e2545b47c45c379385870aeba5a7dc8cdcb833c",
+      "bytes": 18281
     },
     {
       "path": "adoption/paired/README.md",
@@ -3228,8 +3249,8 @@
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
-      "sha256": "3457251d0f2b2916ad7043e48c8b152dcbb901364c1052faaa204323f7a9c8c1",
-      "bytes": 31434
+      "sha256": "fc596ef833249b681beab8160255f4bb97f912c094d9e7eb2783e6888dac74e0",
+      "bytes": 31658
     },
     {
       "path": "adoption/pre-login-observation.json",
@@ -13121,6 +13142,11 @@
       "path": "evidence/receipts/adoption-macos-hosted-smoke-20260922.json",
       "sha256": "2548ce67040bf68b0cead4fccc7f8fd22aa7eb06d975e13475dad605c0c17a57",
       "bytes": 4713
+    },
+    {
+      "path": "evidence/receipts/adoption-macos-hosted-smoke-20260923.json",
+      "sha256": "7908cd187f86f2898be31860584502e71ab16b7a9978069cc9bf071158566a65",
+      "bytes": 4676
     },
     {
       "path": "evidence/receipts/alpaca-paper-e2e-20260921.json",

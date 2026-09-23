@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "id": "adoption-macos-hosted-smoke-20260923",
+  "kind": "native_cli_e2e",
+  "recorded_at_utc": "2026-09-23T14:50:00Z",
+  "component_ids": [
+    "codex",
+    "claude-code",
+    "context-mode",
+    "ai-memory",
+    "mcporter",
+    "llama-cpp",
+    "qdrant"
+  ],
+  "claim": "On a GitHub-hosted macOS arm64 runner (label macos-15, macOS 15.7.9 build 24G830), adoption-bootstrap run 35875188590 at head 75a6e0d, the PR #94 branch, passed every job. bootstrap-macos: adoption/bootstrap-macos.sh --profile macos-arm64-foundation installed the pinned darwin-arm64 set into a disposable ECO_INSTALL_ROOT, including the pinned embeddinggemma-300M-Q8_0 model (sha256 checked). launchd-agents.sh rendered, linted, bootstrapped and booted out the qdrant and llama-embed LaunchAgents. qdrant health reported 1.19.1. The llama-embed embedding acceptance passed: dimension 768, cosine 0.99944 against the Linux CPU reference vector evidence/artifacts/macos-embed-reference-20260923/, threshold 0.99. The llama.cpp startup log assigns layers to Metal device MTL0, with flash attention on CPU. bootstrap-macos-brew: the Homebrew prerequisite path completed. validate-macos: validators, the adoption test modules (238 tests OK) and a real host_receipts.py record/validate/component_matrix/new_host_grand_list smoke in a throwaway checkout copy passed, on setup-python 3.13.15 and on the runner's system /usr/bin/python3 3.9.6.",
+  "limitations": [
+    "This is native operation on a GitHub-hosted macOS arm64 runner only. It is not acceptance on a user's Mac workstation, which must record its own receipt with host_receipts.py and --second-physical-machine plus an independent review.",
+    "platform_profiles[macos-arm64] stays drafted_not_accepted. No macos-arm64 platform_status is changed by this receipt.",
+    "The launchd agents ran for the duration of one job in the runner's GUI domain. Persistence across logins, reboots and user sessions was not observed.",
+    "The non-gating full python3 -m unittest on this runner ran 2929 tests with 29 failures and 95 errors, recorded as an artifact. Most failures come from macOS's symlinked temp directories (/var/folders and /tmp resolve to /private/...) tripping repository path-containment checks, plus Linux-only tests not skipped on macOS. They are tracked as a follow-up and not claimed as passing."
+  ],
+  "data": {
+    "workflow": ".github/workflows/adoption-bootstrap.yml",
+    "run_id": "35875188590",
+    "run_url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/35875188590",
+    "run_attempt": 1,
+    "event": "workflow_dispatch",
+    "head_sha": "75a6e0d1e51d41c5cc304cbca002e5a1458b7ee7",
+    "jobs": {
+      "bootstrap-macos": 107229159315,
+      "bootstrap-macos-brew": 107229159562,
+      "validate-macos": 107229159596,
+      "bootstrap-linux": 107229159643
+    },
+    "runner_label": "macos-15",
+    "macos_product_version": "15.7.9",
+    "macos_build": "24G830",
+    "embed_acceptance": {
+      "passed": true,
+      "dimension_expected": 768,
+      "dimension_actual": 768,
+      "cosine": 0.9994414291030561,
+      "threshold": 0.99,
+      "url": "http://127.0.0.1:8232/v1/embeddings"
+    },
+    "embed_backend_observation": "llama-embed-startup.log: 'layer 0 is assigned to device MTL0 but Flash Attention is assigned to device CPU'",
+    "recording_smoke_pythons": [
+      "3.13.15 (actions/setup-python)",
+      "3.9.6 (/usr/bin/python3)"
+    ],
+    "adoption_test_modules": "Ran 238 tests, OK (skipped=20)",
+    "full_suite_non_gating": "Ran 2929 tests; FAILED (failures=29, errors=95, skipped=417)",
+    "artifact_sha256": {
+      "embed-acceptance-result.json": "ad88dbb62fbccc5bed06b88795a34e089c8f56c12bcdd4ffea2e9c1abb6e2a14",
+      "installed-versions.txt": "0459f7020e6136576c62e373c2b28571c27854af17845605c4304351de6d32c3",
+      "llama-embed-startup.log": "dcddb675749bd4fa4a4515bc7ca5ab43e0bc662eeb0c0ef2a9329b38daa8f1e1",
+      "qdrant-health.json": "296d9cab8a5c873e0807bf20804b61d437fc18d11ee3c671463af2eb302ee38f",
+      "status.json": "b595d4cba4185186acb25b2055df6dbb1e07e888aa0637811cf0133085237d09",
+      "sw_vers.txt": "31fd674ddb951680692d7b68cafdeab5baa6b3e82aae843269dad73b53f25fc5"
+    },
+    "full_suite_log_sha256": "dcfeb5b74cbd31ab6b6758e6957998f1a7a077fc8d14f91436b7f1e45ca4d195"
+  },
+  "host_scope": {
+    "profile": "github-hosted-macos-15-arm64",
+    "platform": "macOS 15 arm64 (GitHub-hosted runner)",
+    "identity": "GitHub Actions runner; no personal host",
+    "import_limit": "This records hosted-runner execution only. Importing it does not qualify installation or behaviour on a user's Mac or on any Linux host."
+  }
+}
