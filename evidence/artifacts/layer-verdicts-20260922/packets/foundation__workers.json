@@ -1,0 +1,572 @@
+{
+ "candidates": [
+  {
+   "adopted": false,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/hosting-source-review.json",
+    "docs/foundation-rd-readiness.md"
+   ],
+   "key": "c1",
+   "name": "Temporal",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": "catalogs/us-equities/hosting-source-review.json",
+   "repository": "https://github.com/temporalio/temporal",
+   "review_status": null,
+   "upstream": null
+  },
+  {
+   "adopted": true,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "catalogs/landscape/candidate-quality-review.json",
+    "docs/candidate-quality-review-20260921.md",
+    "evidence/artifacts/catalog-quality-review-20260921/sources.json",
+    "https://raw.githubusercontent.com/langchain-ai/deepagents/c9926b1a96d204309d0b211701b288ce3bb4244b/README.md"
+   ],
+   "key": "c2",
+   "name": "Deep Agents",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": "catalogs/landscape/candidate-quality-review.json",
+   "repository": "https://github.com/langchain-ai/deepagents",
+   "review_status": null,
+   "upstream": null
+  },
+  {
+   "adopted": true,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": "mixed",
+   "evidence_refs": [
+    "catalogs/landscape/candidate-quality-review.json",
+    "docs/candidate-quality-review-20260921.md",
+    "evidence/artifacts/catalog-quality-review-20260921/sources.json",
+    "https://raw.githubusercontent.com/bytedance/deer-flow/656db1223dda8883a09e7fde23f89da3a1a7a7dc/README.md",
+    "catalogs/us-equities/agents-operations.json",
+    "blueprints/us-equities/deerflow/native-receipt.json",
+    "blueprints/us-equities/deerflow/research-receipt.json"
+   ],
+   "key": "c3",
+   "name": "DeerFlow",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": "catalogs/landscape/candidate-quality-review.json",
+   "repository": "https://github.com/bytedance/deer-flow",
+   "review_status": null,
+   "upstream": null
+  },
+  {
+   "adopted": true,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "catalogs/landscape/candidate-quality-review.json",
+    "docs/candidate-quality-review-20260921.md",
+    "evidence/artifacts/catalog-quality-review-20260921/sources.json",
+    "https://raw.githubusercontent.com/OpenHands/software-agent-sdk/9bc452ebf6b0093c531f25394c5ba5e9817ff910/README.md"
+   ],
+   "key": "c4",
+   "name": "OpenHands SDK",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": "catalogs/landscape/candidate-quality-review.json",
+   "repository": "https://github.com/OpenHands/software-agent-sdk",
+   "review_status": null,
+   "upstream": null
+  },
+  {
+   "adopted": true,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "catalogs/landscape/candidate-quality-review.json",
+    "docs/candidate-quality-review-20260921.md",
+    "evidence/artifacts/catalog-quality-review-20260921/sources.json",
+    "https://raw.githubusercontent.com/microsoft/agent-framework/98a982a147212424d766ed993e6ecda13abe5faf/README.md"
+   ],
+   "key": "c5",
+   "name": "Microsoft Agent Framework",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": "catalogs/landscape/candidate-quality-review.json",
+   "repository": "https://github.com/microsoft/agent-framework",
+   "review_status": null,
+   "upstream": null
+  },
+  {
+   "adopted": true,
+   "component_id": "beads",
+   "decisions": [
+    {
+     "capability": "Persist selected project claims and task dependencies",
+     "evidence_scope": "Native Beads persisted task claims and dependency transitions in the selected fixture.",
+     "id": "dependency-task-queue",
+     "limitations": [
+      "A queue is not worker cancellation, distributed lease correctness or restored task-effect acceptance."
+     ],
+     "next_gap": "Test the selected queue restart/recovery boundary before unattended reliance."
+    }
+   ],
+   "evidence_kind": "native_execution",
+   "evidence_refs": [
+    "catalogs/foundation/decisions.json"
+   ],
+   "key": "c6",
+   "name": "Beads",
+   "pin": "1.3.0",
+   "pin_behind_upstream": false,
+   "recipe_ref": "recipes/README.md",
+   "repository": "https://github.com/gastownhall/beads",
+   "review_status": null,
+   "upstream": {
+    "archived": false,
+    "latest": "v1.3.0",
+    "license": "MIT",
+    "prerelease": false,
+    "pushed_at": "2026-09-21",
+    "released_at": "2026-09-15",
+    "renamed_to": null,
+    "stars": 27362
+   }
+  },
+  {
+   "adopted": true,
+   "component_id": "worktrunk",
+   "decisions": [
+    {
+     "capability": "Practice native Git worktrees and GitHub review automation with owned tooling",
+     "evidence_scope": "Reuses the existing worktrunk/difftastic/codex-for-claude inventory and acceptance evidence; no new execution was run to freeze this taxonomy layer.",
+     "id": "git-github-automation-practice",
+     "limitations": [
+      "gh CLI has no separate manifests/stack.json inventory entry in this catalog; it is used as the native GitHub client, not a newly qualified component here.",
+      "The codex-for-claude bridge's use stage is partial_acceptance, not full integration."
+     ],
+     "next_gap": "Qualify gh CLI's own lifecycle evidence as a distinct component and a changed review-bridge version before extending acceptance."
+    },
+    {
+     "capability": "Create and retire bounded native Git worktrees",
+     "evidence_scope": "Native listing and disposable create/list/remove passed; dirty removal was refused without loss.",
+     "id": "owned-worktrees",
+     "limitations": [
+      "Worktrees isolate edits, not permissions, accounts, global settings or shared services."
+     ],
+     "next_gap": "Prove any required crash cleanup without deleting unrelated or dirty state."
+    }
+   ],
+   "evidence_kind": "measured_comparison",
+   "evidence_refs": [
+    "docs/full-stack-convergence.md",
+    "docs/token-native-saturation.md"
+   ],
+   "key": "c7",
+   "name": "Worktrunk",
+   "pin": "0.79.0",
+   "pin_behind_upstream": false,
+   "recipe_ref": "recipes/native-upgrades-20260921.md",
+   "repository": "https://github.com/max-sixty/worktrunk",
+   "review_status": null,
+   "upstream": {
+    "archived": false,
+    "latest": "v0.79.0",
+    "license": "NOASSERTION",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "released_at": "2026-09-21",
+    "renamed_to": null,
+    "stars": 8334
+   }
+  },
+  {
+   "adopted": true,
+   "component_id": "codex-for-claude",
+   "decisions": [
+    {
+     "capability": "Use the scoped native companion backend when explicitly selected",
+     "evidence_scope": "One read-only native bridge backend task passed.",
+     "id": "companion-backend",
+     "limitations": [
+      "The backend result is narrower than complete plugin integration; native account allowance and interactive activation remain separate."
+     ],
+     "next_gap": "Qualify the intended outer plugin invocation before calling full integration accepted."
+    },
+    {
+     "capability": "Practice native Git worktrees and GitHub review automation with owned tooling",
+     "evidence_scope": "Reuses the existing worktrunk/difftastic/codex-for-claude inventory and acceptance evidence; no new execution was run to freeze this taxonomy layer.",
+     "id": "git-github-automation-practice",
+     "limitations": [
+      "gh CLI has no separate manifests/stack.json inventory entry in this catalog; it is used as the native GitHub client, not a newly qualified component here.",
+      "The codex-for-claude bridge's use stage is partial_acceptance, not full integration."
+     ],
+     "next_gap": "Qualify gh CLI's own lifecycle evidence as a distinct component and a changed review-bridge version before extending acceptance."
+    }
+   ],
+   "evidence_kind": "mixed",
+   "evidence_refs": [
+    "evidence/receipts/foundation-rd-20260921.json",
+    "recipes/claude-codex-foreground-review.md"
+   ],
+   "key": "c8",
+   "name": "Codex for Claude companion",
+   "pin": "1.0.6 @ db52e28f4d9ded852ab3942cea316258ae4ef346",
+   "pin_behind_upstream": false,
+   "recipe_ref": "recipes/README.md",
+   "repository": "https://github.com/openai/codex-plugin-cc",
+   "review_status": null,
+   "upstream": {
+    "archived": false,
+    "latest": "v1.0.6",
+    "license": "Apache-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-07-08",
+    "released_at": "2026-07-08",
+    "renamed_to": null,
+    "stars": 33467
+   }
+  },
+  {
+   "adopted": true,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "catalogs/landscape/candidate-quality-review.json",
+    "docs/candidate-quality-review-20260921.md",
+    "evidence/artifacts/catalog-quality-review-20260921/sources.json",
+    "https://raw.githubusercontent.com/OpenHands/OpenHands/2f8539de2fafbde5226c7e41c0d0aa7bea2533fa/README.md"
+   ],
+   "key": "c9",
+   "name": "OpenHands Agent Canvas",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": "catalogs/landscape/candidate-quality-review.json",
+   "repository": "https://github.com/OpenHands/OpenHands",
+   "review_status": null,
+   "upstream": null
+  },
+  {
+   "adopted": true,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "docs/foundation-closure-20260921.md",
+    "docs/foundation-rd-readiness.md"
+   ],
+   "key": "c10",
+   "name": "LangGraph",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": "docs/foundation-closure-20260921.md",
+   "repository": "https://github.com/langchain-ai/langgraph",
+   "review_status": null,
+   "upstream": null
+  },
+  {
+   "adopted": true,
+   "component_id": "codex",
+   "decisions": [
+    {
+     "capability": "Select the native agent SDK/runtime used by programmatic workers",
+     "evidence_scope": "Reuses the existing native Codex CLI/SDK inventory and acceptance evidence; no new execution was run to freeze this taxonomy layer.",
+     "id": "agent-sdk-runtime-selection",
+     "limitations": [
+      "Claude Agent SDK, OpenHands SDK, Temporal and LangGraph remain unqualified candidates here; their version metadata is source review only, not fresh execution."
+     ],
+     "next_gap": "The SDK table in docs/foundation-closure-20260921.md lines 78-84 has not been revisited by any lane since 2026-09-21; qualify a concrete application need before promoting Claude Agent SDK, OpenHands SDK, Temporal or LangGraph."
+    },
+    {
+     "capability": "Use the scoped native companion backend when explicitly selected",
+     "evidence_scope": "One read-only native bridge backend task passed.",
+     "id": "companion-backend",
+     "limitations": [
+      "The backend result is narrower than complete plugin integration; native account allowance and interactive activation remain separate."
+     ],
+     "next_gap": "Qualify the intended outer plugin invocation before calling full integration accepted."
+    },
+    {
+     "capability": "Route native Claude Workflow stages to lean task-matched project agents with explicit model, effort and deferred named tool lanes, and size each workflow to its task",
+     "evidence_scope": "On one identical task the provider-returned first prompt fell from 42,396 tokens (default child) to 12,164 (named MCP grants behind ToolSearch) and 8,048 (source-scout); eight native review-changes runs, two readiness audits, one builder run and one Codex cross-family review are retained as sanitized receipts; the portable copies were adopted into a scratch project and run natively under the full host profile with the observational layer recorded; the project-only profile was not qualified (provider errors, then a permission-layer refusal of the Workflow tool).",
+     "id": "lean-workflow-child-routing",
+     "limitations": [
+      "First-prompt figures bound one tiny task on one host and model; they are not a savings rate.",
+      "Haiku is not routed on one packet and one Opus verifier (Sonnet 14/14 lane rows, Haiku 9/14 with a misattributed quote).",
+      "The review workflow's strict accepted status was never returned during the deployment; the gate was fix-and-commit after independent review.",
+      "Local suites are stubbed or synthetic; only the native runs and the Prometheus deltas are provider evidence. Per-session scoping of the exported metric is unavailable by design (the collector keeps no session id on metrics), so observational deltas are host-wide time windows with concurrent activity declared.",
+      "Codex agent examples inherit model and effort and have no end-to-end run of their own.",
+      "The project-only settings profile is not qualified: three provider errors and, with the coordinator model pinned, a permission-layer refusal of the Workflow tool; headless runs need a loaded settings source whose permission mode or allow rule covers the Workflow tool."
+     ],
+     "next_gap": "Overturn only on evidence: Haiku after a repeat trial with no unanchored citation on two distinct extraction packets; the unrestricted guideline if recorded runs exceed their independent units or pause on fan-out rate limits; a one-hour child cache class only for a child that idles more than five minutes between requests; the Codex agent examples after a task-level run of their own."
+    },
+    {
+     "capability": "Maintain useful scoped memory across native Codex and Claude",
+     "evidence_scope": "Nine current repository sources reviewed; native learning, scheduler admission, unchanged upstream tests and real client outcome capture are recorded separately. Existing code/document/context retrieval remain complementary layers.",
+     "id": "native-memory-learning-maintenance",
+     "limitations": [
+      "Scheduler covers all store scopes, with a per-project limit and once-per-session claims; current deployment has one adopted project.",
+      "Assistant excerpts are sanitized and capped, not complete transcripts. Claude prompt capture remains opted out.",
+      "Model review rejected insufficient evidence; scheduler admission did not establish learned-write quality. Exact memory lifetime token savings remain unknown.",
+      "Alternative systems are research candidates, not installed or locally benchmarked winners."
+     ],
+     "next_gap": "Evaluate real subsequent learned proposals and representative retrieval quality before changing the accepted memory of record."
+    },
+    {
+     "capability": "Resolve persistent native command and MCP environments",
+     "evidence_scope": "Fresh native processes resolved selected commands/MCP servers and Claude startup hooks; restarted Desktop source retrieval has its own dated receipt.",
+     "id": "native-process-defaults",
+     "limitations": [
+      "Configuration presence does not prove an already-running task hot-reloaded it.",
+      "The Linux/WSL and Desktop process/configuration boundaries remain distinct."
+     ],
+     "next_gap": "Collect the specific new-host or changed-session activation evidence; do not copy account stores."
+    },
+    {
+     "capability": "Resume the same native session after an owned interruption",
+     "evidence_scope": "Codex on Mac and Claude on WSL resumed the same session to finish an unchanged single checkpoint; later bounded source tasks also retained continuations.",
+     "id": "native-session-resume",
+     "limitations": [
+      "Individual session continuation does not establish arbitrary worker crash, provider cancellation or whole-host recovery.",
+      "Resumed cumulative usage must not be added again to earlier included totals."
+     ],
+     "next_gap": "The separate native-child-interruption-recovery decision covers one abrupt writing-worker failure with a single local effect; qualify changed effects or another host before extending acceptance."
+    },
+    {
+     "capability": "Use native client tools to retrieve exact project evidence",
+     "evidence_scope": "Both signed-in native clients completed the bounded source-retrieval tasks; the final receipt also retains scoped continuation and observation results.",
+     "id": "native-source-tasks",
+     "limitations": [
+      "Earlier refused MCP calls, Claude format failures and source-host account limits remain recorded.",
+      "Successful retrieval does not qualify every installed tool, all prompts, another PC or complete causal token savings."
+     ],
+     "next_gap": "Verify changed native process/tool activation on the intended host; retain failed attempts."
+    }
+   ],
+   "evidence_kind": "native_execution",
+   "evidence_refs": [
+    "docs/full-stack-convergence.md",
+    "docs/foundation-rd-readiness.md"
+   ],
+   "key": "c11",
+   "name": "Codex native workers",
+   "pin": "0.155.1",
+   "pin_behind_upstream": false,
+   "recipe_ref": "recipes/README.md",
+   "repository": "https://github.com/openai/codex",
+   "review_status": null,
+   "upstream": {
+    "archived": false,
+    "latest": "rust-v0.155.1",
+    "license": "Apache-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "released_at": "2026-09-18",
+    "renamed_to": null,
+    "stars": 125923
+   }
+  },
+  {
+   "adopted": true,
+   "component_id": "claude-code",
+   "decisions": [
+    {
+     "capability": "Render the configured HUD in a native Claude terminal",
+     "evidence_scope": "The retained foundation-closure native PTY observations show configured claude-hud 0.8.0 in Claude 2.1.278 before and after a bounded review, including model, project, context and usage fields. This catalog reconciliation reuses those observations without a new terminal or model run. Earlier onboarding and effort-overlay attempts remain retained.",
+     "id": "interactive-hud-boundary",
+     "limitations": [
+      "Evidence for the visible statusline is the original coordinator's screen observations and independent installed-plugin audit, separate from the native context export.",
+      "Not every HUD statistic, exact billing reconciliation, Windows Terminal dropdown interaction, automatic compaction or new-host activation was qualified."
+     ],
+     "next_gap": "Verify target-host activation or a specific untested statistic only when that capability is needed; reuse the accepted recorded rendering scope."
+    },
+    {
+     "capability": "Route native Claude Workflow stages to lean task-matched project agents with explicit model, effort and deferred named tool lanes, and size each workflow to its task",
+     "evidence_scope": "On one identical task the provider-returned first prompt fell from 42,396 tokens (default child) to 12,164 (named MCP grants behind ToolSearch) and 8,048 (source-scout); eight native review-changes runs, two readiness audits, one builder run and one Codex cross-family review are retained as sanitized receipts; the portable copies were adopted into a scratch project and run natively under the full host profile with the observational layer recorded; the project-only profile was not qualified (provider errors, then a permission-layer refusal of the Workflow tool).",
+     "id": "lean-workflow-child-routing",
+     "limitations": [
+      "First-prompt figures bound one tiny task on one host and model; they are not a savings rate.",
+      "Haiku is not routed on one packet and one Opus verifier (Sonnet 14/14 lane rows, Haiku 9/14 with a misattributed quote).",
+      "The review workflow's strict accepted status was never returned during the deployment; the gate was fix-and-commit after independent review.",
+      "Local suites are stubbed or synthetic; only the native runs and the Prometheus deltas are provider evidence. Per-session scoping of the exported metric is unavailable by design (the collector keeps no session id on metrics), so observational deltas are host-wide time windows with concurrent activity declared.",
+      "Codex agent examples inherit model and effort and have no end-to-end run of their own.",
+      "The project-only settings profile is not qualified: three provider errors and, with the coordinator model pinned, a permission-layer refusal of the Workflow tool; headless runs need a loaded settings source whose permission mode or allow rule covers the Workflow tool."
+     ],
+     "next_gap": "Overturn only on evidence: Haiku after a repeat trial with no unanchored citation on two distinct extraction packets; the unrestricted guideline if recorded runs exceed their independent units or pause on fan-out rate limits; a one-hour child cache class only for a child that idles more than five minutes between requests; the Codex agent examples after a task-level run of their own."
+    },
+    {
+     "capability": "Resume the same native child and reconcile a local effect after interruption",
+     "evidence_scope": "One native inherited-tool child completed cancellation, same-child continuation, abrupt parent-runtime failure, automatic systemd descendant cleanup and same-parent/same-child finalization with an unchanged checkpoint and one local effect.",
+     "id": "native-child-interruption-recovery",
+     "limitations": [
+      "One synthetic local task on this WSL host; not general worker reliability or an OS sandbox.",
+      "Not host/user-manager crash, independent-host recovery, remote provider cancellation, cessation of billing or distributed exactly-once effects.",
+      "Restricted Bash-only role incompatibility and every original failure remain retained; only this inherited role is accepted.",
+      "The successful run did not request ls, so the exact rewrite permission diagnosis is deterministic evidence rather than an exercised native approval success.",
+      "Native usage views overlap; initial SIGKILL has no terminal record. Complete parent/child/retry usage, billing and savings remain unknown."
+     ],
+     "next_gap": "Reuse the accepted same-host fixture while inputs match; qualify changed application effects or an independent host only when that scope is required."
+    },
+    {
+     "capability": "Maintain useful scoped memory across native Codex and Claude",
+     "evidence_scope": "Nine current repository sources reviewed; native learning, scheduler admission, unchanged upstream tests and real client outcome capture are recorded separately. Existing code/document/context retrieval remain complementary layers.",
+     "id": "native-memory-learning-maintenance",
+     "limitations": [
+      "Scheduler covers all store scopes, with a per-project limit and once-per-session claims; current deployment has one adopted project.",
+      "Assistant excerpts are sanitized and capped, not complete transcripts. Claude prompt capture remains opted out.",
+      "Model review rejected insufficient evidence; scheduler admission did not establish learned-write quality. Exact memory lifetime token savings remain unknown.",
+      "Alternative systems are research candidates, not installed or locally benchmarked winners."
+     ],
+     "next_gap": "Evaluate real subsequent learned proposals and representative retrieval quality before changing the accepted memory of record."
+    },
+    {
+     "capability": "Resolve persistent native command and MCP environments",
+     "evidence_scope": "Fresh native processes resolved selected commands/MCP servers and Claude startup hooks; restarted Desktop source retrieval has its own dated receipt.",
+     "id": "native-process-defaults",
+     "limitations": [
+      "Configuration presence does not prove an already-running task hot-reloaded it.",
+      "The Linux/WSL and Desktop process/configuration boundaries remain distinct."
+     ],
+     "next_gap": "Collect the specific new-host or changed-session activation evidence; do not copy account stores."
+    },
+    {
+     "capability": "Resume the same native session after an owned interruption",
+     "evidence_scope": "Codex on Mac and Claude on WSL resumed the same session to finish an unchanged single checkpoint; later bounded source tasks also retained continuations.",
+     "id": "native-session-resume",
+     "limitations": [
+      "Individual session continuation does not establish arbitrary worker crash, provider cancellation or whole-host recovery.",
+      "Resumed cumulative usage must not be added again to earlier included totals."
+     ],
+     "next_gap": "The separate native-child-interruption-recovery decision covers one abrupt writing-worker failure with a single local effect; qualify changed effects or another host before extending acceptance."
+    },
+    {
+     "capability": "Use native client tools to retrieve exact project evidence",
+     "evidence_scope": "Both signed-in native clients completed the bounded source-retrieval tasks; the final receipt also retains scoped continuation and observation results.",
+     "id": "native-source-tasks",
+     "limitations": [
+      "Earlier refused MCP calls, Claude format failures and source-host account limits remain recorded.",
+      "Successful retrieval does not qualify every installed tool, all prompts, another PC or complete causal token savings."
+     ],
+     "next_gap": "Verify changed native process/tool activation on the intended host; retain failed attempts."
+    },
+    {
+     "capability": "Replay and resume a native Claude Workflow after selected-worker stop and graceful coordinator exit",
+     "evidence_scope": "Existing local invoice fixture: selected reviewer stop retained a failed child and null result; replay reused completed implementation, graceful native exit cleaned observed processes, and same-session resume integrated the repair while preserving later user edits. Independent 29 visible and seven hidden checks passed.",
+     "id": "native-workflow-graceful-recovery",
+     "limitations": [
+      "This is a local integration fixture, not an unchanged upstream product test or general reliability benchmark.",
+      "The separate writing comparison passed code checks but both arms retained procedural failures; the Workflow arm used more reported tokens.",
+      "Recovery native cumulative usage exceeds deduplicated persisted usage by 205701 tokens; complete accounting remains unresolved.",
+      "Hard crash, physical-host reboot, remote provider cancellation and external exactly-once effects are unqualified."
+     ],
+     "next_gap": "Reuse the accepted graceful-recovery fixture; qualify a representative application or a different failure/effect boundary only when required."
+    },
+    {
+     "capability": "Implement a bounded repair through an owned native child",
+     "evidence_scope": "One foreground native Opus child repaired the owned file; twelve frozen tests and independent exhaustive checks passed.",
+     "id": "owned-native-child",
+     "limitations": [
+      "One successful child task does not establish arbitrary delegation quality, crash recovery or total workflow efficiency."
+     ],
+     "next_gap": "Use the separately recorded native-child-interruption-recovery decision for its accepted inherited-role fixture; qualify a different task or effect before extending that claim."
+    }
+   ],
+   "evidence_kind": "native_execution",
+   "evidence_refs": [
+    "docs/foundation-convergence-20260921.md",
+    "catalogs/foundation/decisions.json"
+   ],
+   "key": "c12",
+   "name": "Claude native workers",
+   "pin": "2.1.278",
+   "pin_behind_upstream": false,
+   "recipe_ref": "recipes/claude-native-profile.md",
+   "repository": "https://github.com/anthropics/claude-code",
+   "review_status": null,
+   "upstream": {
+    "archived": false,
+    "latest": "v2.1.278",
+    "license": null,
+    "prerelease": false,
+    "pushed_at": "2026-09-21",
+    "released_at": "2026-09-19",
+    "renamed_to": null,
+    "stars": 147597
+   }
+  }
+ ],
+ "catalog": "foundation",
+ "checked_at": "2026-09-22",
+ "enums": {
+  "disposition": [
+   "conditional",
+   "measured_tradeoff",
+   "observed_failure",
+   "out_of_scope",
+   "overlap",
+   "selected",
+   "unqualified"
+  ],
+  "evidence_class": [
+   "local_integration",
+   "measured_comparison",
+   "native_proven",
+   "source_review",
+   "synthetic"
+  ]
+ },
+ "existing_overturn_when": "A real task needs durable multi-host state, approval waits or effect recovery beyond native workers, and one challenger passes frozen cancellation, replay, ownership and integration cases.",
+ "group": null,
+ "layer_id": "workers",
+ "limitations": [
+  "Graceful native Workflow resume is separate from the systemd child-crash fixture; neither transfers every hard-crash guarantee to the other.",
+  "The restricted reviewer tool profile is not the accepted inherited-tool lane. The older companion backend acceptance does not certify every outer plugin invocation.",
+  "Native model/effort settings are inherited and returned identities recorded. Skill propagation is not a universal runtime/model ranking; account scopes and failed read paths remain evidence.",
+  "The September 21 New York / September 22 UTC source refresh adds Deep Agents, OpenHands SDK/Agent Canvas, Microsoft Agent Framework and DeerFlow comparisons. It does not install them or establish a head-to-head worker winner; historical DeerFlow adapter evidence applies only to its recorded revision."
+ ],
+ "requirement": "Delegate bounded independent work, preserve owned edits and actual failed results, and integrate only after relevant review.",
+ "rules": [
+  "Judge from retained evidence. Open the evidence_refs of every adopted candidate (bounded: the referenced file or its relevant section) and record every path you opened in sources_read. Do not rely on memory of the repositories.",
+  "The winner set is 1-3 adopted candidates (adopted == true) that best satisfy the requirement on the evidence. why_selected must cite at least one evidence path and state what was actually observed (native execution, measured comparison, local integration, synthetic fixture or source review), not what the project claims.",
+  "Every adopted non-winner candidate appears in alternatives with a why_not_default that states the concrete evidence gap or trade-off; add non-adopted candidates only with the same standard.",
+  "If a non-adopted candidate would satisfy the requirement better on the evidence, do not select it: record it in challenger_preferred with the comparison (a fixtures/, blueprints/ or tests/ path, or a python3/node command) that would establish it. Agreement between lanes never promotes; only an executed comparison can.",
+  "overturn_when names the concrete check that would change the verdict (a fixtures/, blueprints/ or tests/ path or a runnable python3/node command). open_gaps lists what the evidence does not establish. limits lists what you could not read or verify. Do not invent paths, numbers or results; leave evidence_refs empty rather than guess."
+ ],
+ "schema_version": 1,
+ "sota_components_not_in_candidates": [
+  {
+   "id": "systemd",
+   "pin": "255.4-1ubuntu8.17",
+   "pin_behind_upstream": false,
+   "repository": "https://github.com/systemd/systemd",
+   "review_status": null,
+   "upstream": {
+    "archived": false,
+    "latest": "v262",
+    "license": "GPL-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "released_at": "2026-09-22",
+    "renamed_to": null,
+    "stars": 16713
+   }
+  }
+ ],
+ "title": "Workers and task ownership",
+ "withheld": [
+  "current_choice",
+  "decision",
+  "rationale",
+  "candidates[].disposition",
+  "candidates[].rationale",
+  "candidates[].review_status",
+  "candidates[].decisions[].selection",
+  "candidates[].decisions[].review_status",
+  "sota_components_not_in_candidates[].review_status"
+ ]
+}

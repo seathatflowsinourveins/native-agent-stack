@@ -1,0 +1,93 @@
+{
+ "alternatives": [
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [],
+   "key": "c1",
+   "name": "openbao",
+   "repository": "https://github.com/openbao/openbao",
+   "why_not_default": "The packet supplies no native service configuration, secret lifecycle execution, or worker authorization-denial receipt. Its referenced pinned README could not be retrieved. Secret storage alone would not establish that research workers lack broker execution authority."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "https://github.com/sigstore/cosign/blob/v3.1.3/README.md",
+    "blueprints/us-equities/supply-chain/receipt.json",
+    "blueprints/us-equities/supply-chain/scan-nautilus-rc5-20260922/receipt.json"
+   ],
+   "key": "c5",
+   "name": "cosign",
+   "repository": "https://github.com/sigstore/cosign",
+   "why_not_default": "The pinned README documents artifact signing and verification, but both retained scanner installation receipts explicitly report that signature verification was not performed. No executed exact-identity verification or tampered-artifact rejection supports default adoption. Source: [pinned README](https://github.com/sigstore/cosign/blob/v3.1.3/README.md)."
+  }
+ ],
+ "catalog": "us-equities",
+ "challenger_preferred": null,
+ "lane": "codex",
+ "layer_id": "security-supply-chain",
+ "limits": [
+  "The OpenBao v2.6.2 README failed retrieval through the supplied GitHub URL, its raw equivalent, and the plain-view variant; its contents were not verified.",
+  "This verdict reviews historical native execution receipts. No scanner, service, signature verification, or test suite was executed during this review.",
+  "Private raw SBOMs, vulnerability reports, and the Gitleaks report were not opened or independently checked against their recorded hashes.",
+  "Upstream metadata freshness and installed binary identity were not independently revalidated."
+ ],
+ "model": {
+  "effort": "high",
+  "name": "gpt-6-astra"
+ },
+ "open_gaps": [
+  "Python metadata inventory excludes complete bundled native-library, host OS, external interpreter, and broker-side coverage.",
+  "The September 22 Grype scan covers the 21-package Nautilus runtime and two declared adapter pins. It does not establish vulnerability coverage of the separate 36-package SDK inventoried on September 19, despite the broader wording in the supply-chain README.",
+  "Zero vulnerability matches against the recorded database do not establish runtime safety, unpublished-vulnerability absence, or future database results.",
+  "The retained Gitleaks receipt covers 22 commits; it does not establish current full-history cleanliness or detection of every secret type.",
+  "Checksum matching does not establish artifact signer identity or build provenance; native Cosign verification remains unestablished.",
+  "Secret issuance, rotation, revocation, and denial of broker execution authority to research workers remain unestablished by these candidates' receipts.",
+  "The selected tools do not establish the group's process supervision, telemetry completeness, or recoverable-state requirements."
+ ],
+ "overturn_protocol": {
+  "arms": [
+   "Replay the pinned Syft inventory workflow on the explicitly scoped SDK and runtime targets, retaining package metadata and both output formats.",
+   "Replay Grype against those exact SBOMs and a recorded database snapshot, retaining complete findings and dispositions.",
+   "Execute the Gitleaks synthetic detection controls and scoped history check in tests/test_gitleaks_config.py; skipped tests or missing reports do not establish acceptance.",
+   "Evaluate any replacement on identical targets and controls; require executed comparative evidence before changing the winner set."
+  ],
+  "fixture_paths": [
+   "blueprints/us-equities/supply-chain/README.md",
+   "blueprints/us-equities/supply-chain/scan-nautilus-rc5-20260922/receipt.json",
+   "tests/test_supply_chain_scan.py",
+   "tests/test_gitleaks_config.py"
+  ],
+  "metric": "Installed-metadata and SBOM tuple agreement; complete native command results and finding dispositions; secret positive-control detection and benign-control suppression; explicit target, database, and excluded-scope recording. Receipt consistency tests alone cannot establish native acceptance."
+ },
+ "overturn_when": "Reconsider the set if native replay of blueprints/us-equities/supply-chain/README.md and the commands in blueprints/us-equities/supply-chain/scan-nautilus-rc5-20260922/receipt.json shows inventory omissions or incomplete vulnerability results, or execution of tests/test_gitleaks_config.py demonstrates a detection regression. Replace a selected tool only after an alternative passes the same scoped comparison. tests/test_supply_chain_scan.py checks receipt consistency and cannot alone promote an alternative.",
+ "packet_sha256": "293ea175742eb97699ea43ef89811fef52ae9962bc3a1d270ca130809fec39b8",
+ "schema_version": 1,
+ "sources_read": [
+  "<host-path>/us-equities__security-supply-chain.json",
+  "<host-path>/SKILL.md",
+  "blueprints/us-equities/supply-chain/receipt.json",
+  "blueprints/us-equities/supply-chain/scan-nautilus-rc5-20260922/receipt.json",
+  "blueprints/us-equities/supply-chain/README.md",
+  "evidence/receipts/runtime-tools.json",
+  "tests/test_supply_chain_scan.py",
+  "tests/test_gitleaks_config.py",
+  "tests/test_security_identity.py",
+  "https://github.com/anchore/grype/blob/v0.119.0/README.md",
+  "https://github.com/anchore/syft/blob/v1.52.0/README.md",
+  "https://github.com/sigstore/cosign/blob/v3.1.3/README.md"
+ ],
+ "why_selected": "Select Syft, Grype, and Gitleaks as complementary defaults for the layer's SBOM, vulnerability-analysis, and secret-scanning scope. Retained native execution in blueprints/us-equities/supply-chain/receipt.json records Syft inventorying 36 Python packages, with all package tuples agreeing across output formats and installed metadata, and unchanged source fingerprints. blueprints/us-equities/supply-chain/scan-nautilus-rc5-20260922/receipt.json records successful Syft and Grype commands for 21 installed runtime packages and two declared adapter pins, with zero matches against the recorded September 22 database. evidence/receipts/runtime-tools.json records a native Gitleaks history scan of 22 commits with zero findings and full redaction. These are bounded historical observations, not comparative superiority or complete security acceptance.",
+ "winner_evidence_class": "native_proven",
+ "winner_evidence_refs": [
+  "blueprints/us-equities/supply-chain/receipt.json",
+  "blueprints/us-equities/supply-chain/scan-nautilus-rc5-20260922/receipt.json",
+  "evidence/receipts/runtime-tools.json"
+ ],
+ "winner_keys": [
+  "c4",
+  "c2",
+  "c3"
+ ]
+}

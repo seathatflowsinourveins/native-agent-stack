@@ -23,6 +23,7 @@ import subprocess
 import tempfile
 import time
 import unittest
+from unittest import mock
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -35,12 +36,12 @@ SHELLCHECK = shutil.which("shellcheck")
 # Built from fragments so this file can never match its own acceptance grep.
 PERSONAL_HOME = re.compile("/(?:" + "home" + "|" + "Users" + ")/[A-Za-z0-9_.-]+")
 # The shipped scripts do NOT carry ``set -Eeuo pipefail``. Both open with the
-# literal line ``set -euo pipefail``, and they are copied byte-for-byte from
-# their source, so this asserts the bytes actually shipped rather than the
-# stricter line. Neither script installs an ERR trap, which is what makes the
-# absent ``-E`` behaviourally inert, and that inertness is asserted below rather
-# than assumed; adding ``-E`` here would break the byte-fidelity guarantee the
-# provenance section records. The README evidence paragraph states the same
+# literal line ``set -euo pipefail``, and they are kept as close to their source
+# as the README provenance section records (only the listed divergences), so
+# this asserts the bytes actually shipped rather than the stricter line. Neither
+# script installs an ERR trap, which is what makes the absent ``-E``
+# behaviourally inert, and that inertness is asserted below rather than
+# assumed; adding ``-E`` here would be an unrecorded divergence from the source. The README evidence paragraph states the same
 # divergence. A future upstream sync that does adopt ``-E`` must update this
 # line deliberately.
 STRICT_MODE_LINE = "set -euo pipefail"
@@ -95,6 +96,35 @@ def _run(argv, **kwargs):
         argv, stdin=subprocess.DEVNULL, capture_output=True, text=True,
         timeout=120, check=False, **kwargs,
     )
+
+
+def _live_tasks(unit, cgroup_path, cgroup_root=Path("/sys/fs/cgroup")):
+    """Live task count for one unit, or 0 only when that is demonstrated.
+
+    Returns systemd's TasksCurrent when the query succeeds with a number.
+    When systemd reports no number (``[not set]`` once the unit is gone), 0 is
+    returned only if the job's own cgroup directory has also disappeared, so
+    nothing can still be running in it. A failed query, or a missing number for
+    a cgroup that still exists, raises AssertionError instead of being read as
+    "holds no tasks".
+    """
+    shown = _run(["systemctl", "--user", "show", unit,
+                  "-p", "TasksCurrent", "-p", "LoadState", "-p", "ControlGroup"])
+    if shown.returncode != 0:
+        raise AssertionError(
+            f"systemctl --user show {unit} failed with exit {shown.returncode}: "
+            f"{(shown.stderr or shown.stdout).strip()!r}; its task count is unknown")
+    properties = dict(line.split("=", 1) for line in shown.stdout.splitlines()
+                      if "=" in line)
+    tasks = properties.get("TasksCurrent", "")
+    if tasks.isdigit():
+        return int(tasks)
+    leaf = Path(f"{cgroup_root}{cgroup_path}")
+    if not leaf.exists():
+        return 0
+    raise AssertionError(
+        f"{unit} reported TasksCurrent={tasks!r} while its cgroup {leaf} still "
+        f"exists; properties were {properties!r}")
 
 
 class GuardedRunnerStructureTests(unittest.TestCase):
@@ -335,17 +365,11 @@ class BoundedRunContainmentTests(unittest.TestCase):
                 return None, listing
             time.sleep(0.05)
 
-    def _live_tasks(self, unit):
-        """TasksCurrent for one unit; None when systemd no longer reports it."""
-        shown = _run(["systemctl", "--user", "show", unit,
-                      "-p", "TasksCurrent", "--value"]).stdout
-        tasks = next((f for f in shown.split() if f.isdigit()), None)
-        return None if tasks is None else int(tasks)
-
     def _run_self_reporting_job(self, tmp):
         """Run one job that records, from inside itself, where it is contained.
 
-        Returns the transient scope unit name the job actually ran in.
+        Returns the transient scope unit name the job actually ran in and the
+        cgroup v2 path it reported for itself.
         """
         cgroup_oracle = tmp / "job-cgroup"
         unit_oracle = tmp / "job-unit-properties"
@@ -419,7 +443,7 @@ class BoundedRunContainmentTests(unittest.TestCase):
             f"{unit} kernel limits were {limits!r}, not the documented "
             f"MemoryMax=6G / TasksMax=256",
         )
-        return unit
+        return unit, job_path
 
     def test_containment_or_refusal(self):
         if CONTAINMENT_AVAILABLE:
@@ -432,7 +456,7 @@ class BoundedRunContainmentTests(unittest.TestCase):
             self.assertEqual(succeeding.returncode, 0, succeeding.stdout + succeeding.stderr)
 
             with tempfile.TemporaryDirectory() as tmp:
-                unit = self._run_self_reporting_job(Path(tmp))
+                unit, job_path = self._run_self_reporting_job(Path(tmp))
             print(f"[branch] job ran inside {unit} with MemoryMax="
                   f"{EXPECTED_MEMORY_MAX} and pids.max={EXPECTED_TASKS_MAX}")
 
@@ -441,7 +465,7 @@ class BoundedRunContainmentTests(unittest.TestCase):
             # matters after the job returns is that no *process* survives it.
             settled, listing = self._wait_for_release(unit)
             if settled is None:
-                tasks_left = self._live_tasks(unit)
+                tasks_left = _live_tasks(unit, job_path)
                 self.assertFalse(
                     tasks_left,
                     f"{unit} still holds {tasks_left} live task(s) after the "
@@ -462,6 +486,186 @@ class BoundedRunContainmentTests(unittest.TestCase):
                     oracle.exists(),
                     "the command ran even though containment was unavailable",
                 )
+
+
+
+def _instrumented_runner(tmp, launcher_body):
+    """A copy of the runner whose only change is the systemd-run it calls.
+
+    The shipped runner names /usr/bin/systemd-run absolutely, so a stand-in
+    launcher can only be reached by rewriting that one path in a scratch copy.
+    """
+    launcher = tmp / "systemd-run-stand-in"
+    launcher.write_text("#!/usr/bin/env bash\n" + launcher_body, encoding="utf-8")
+    launcher.chmod(0o755)
+    text = BOUNDED_RUN.read_text(encoding="utf-8")
+    assert text.count("/usr/bin/systemd-run") == 1, "expected exactly one launcher path"
+    runner = tmp / "ecosystem-bounded-run"
+    runner.write_text(text.replace("/usr/bin/systemd-run", str(launcher)),
+                      encoding="utf-8")
+    runner.chmod(0o755)
+    return runner
+
+
+# Passes every argument through to the real launcher except the four resource
+# properties, so a real transient scope is created with no memory or task cap.
+# That is the state systemd leaves a scope in when an ancestor does not
+# delegate the memory or pids controller: the unit starts, the limit is masked.
+_DROP_LIMITS = (
+    "args=()\n"
+    "for arg in \"$@\"; do\n"
+    "  case $arg in\n"
+    "    --property=MemoryHigh=*|--property=MemoryMax=*|"
+    "--property=MemorySwapMax=*|--property=TasksMax=*) ;;\n"
+    "    *) args+=(\"$arg\") ;;\n"
+    "  esac\n"
+    "done\n"
+    "exec /usr/bin/systemd-run \"${args[@]}\"\n"
+)
+# Skips systemd-run's own options and runs the command directly: no scope.
+_NO_SCOPE = (
+    "while [[ $# -gt 0 && $1 != -- ]]; do shift; done\n"
+    "shift\n"
+    "exec \"$@\"\n"
+)
+# What /usr/bin/systemd-run printed and returned on this host when pointed at a
+# stale user-bus socket (probed 2026-09-22 with systemd 255): exit 1.
+_STALE_BUS = (
+    "printf 'Failed to connect to bus: Connection refused\\n' >&2\n"
+    "exit 1\n"
+)
+
+
+class BoundedRunSetupRefusalTests(unittest.TestCase):
+    """Local integration check: 78 means the command was not started.
+
+    A launcher failure, or a scope whose kernel limits are not the requested
+    ones, must refuse with 78 and never run the command; a command that did run
+    keeps its own exit status.
+    """
+
+    def _assert_refused(self, result, oracle):
+        self.assertEqual(result.returncode, 78, result.stdout + result.stderr)
+        self.assertIn("was not started", result.stderr)
+        self.assertFalse(oracle.exists(), "the command ran although it was refused")
+
+    def test_launcher_setup_failure_is_refused_with_78(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp = Path(tmp)
+            runner = _instrumented_runner(tmp, _STALE_BUS)
+            oracle = tmp / "command-ran"
+            result = _run([str(runner), "sh", "-c", f"touch {oracle}"])
+            self._assert_refused(result, oracle)
+
+    def test_command_run_outside_any_scope_is_refused_with_78(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp = Path(tmp)
+            runner = _instrumented_runner(tmp, _NO_SCOPE)
+            oracle = tmp / "command-ran"
+            result = _run([str(runner), "sh", "-c", f"touch {oracle}"])
+            self._assert_refused(result, oracle)
+
+    @unittest.skipUnless(CONTAINMENT_AVAILABLE, "needs a native systemd --user scope")
+    def test_scope_without_the_requested_kernel_limits_is_refused_with_78(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp = Path(tmp)
+            runner = _instrumented_runner(tmp, _DROP_LIMITS)
+            oracle = tmp / "command-ran"
+            result = _run([str(runner), "sh", "-c", f"touch {oracle}"])
+            self._assert_refused(result, oracle)
+
+    @unittest.skipUnless(CONTAINMENT_AVAILABLE, "needs a native systemd --user scope")
+    def test_workload_exit_statuses_are_preserved(self):
+        for status in (1, 78, 127):
+            with self.subTest(status=status):
+                result = _run([str(BOUNDED_RUN), "sh", "-c", f"exit {status}"])
+                self.assertEqual(result.returncode, status, result.stderr)
+                self.assertNotIn("was not started", result.stderr)
+
+    @unittest.skipUnless(CONTAINMENT_AVAILABLE, "needs a native systemd --user scope")
+    def test_missing_command_is_refused_with_78(self):
+        result = _run([str(BOUNDED_RUN), "ecosystem-bounded-run-no-such-command"])
+        self.assertEqual(result.returncode, 78, result.stdout + result.stderr)
+        self.assertIn("was not started", result.stderr)
+
+    @unittest.skipUnless(CONTAINMENT_AVAILABLE, "needs a native systemd --user scope")
+    def test_builtin_without_an_executable_file_is_refused_with_78(self):
+        # `cd` is a shell builtin with no file on PATH; exec cannot run it, so the
+        # runner must refuse before the start marker rather than return 127.
+        result = _run([str(BOUNDED_RUN), "cd", "/"])
+        self.assertEqual(result.returncode, 78, result.stdout + result.stderr)
+        self.assertIn("command not found: cd", result.stderr)
+
+    def test_builtin_name_with_an_executable_file_still_runs(self):
+        result = _run([str(BOUNDED_RUN), "true"])
+        if CONTAINMENT_AVAILABLE:
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        else:
+            self.assertEqual(result.returncode, 78, result.stdout + result.stderr)
+
+    @unittest.skipUnless(CONTAINMENT_AVAILABLE, "needs a native systemd --user scope")
+    def test_non_default_and_unaligned_limits_are_verified_and_run(self):
+        # 1000001K is not a whole number of pages; the kernel stores
+        # memory.max rounded down to a page, which the check must allow.
+        with tempfile.TemporaryDirectory() as tmp:
+            oracle = Path(tmp) / "limits"
+            environment = {k: v for k, v in os.environ.items()
+                           if not k.startswith("ECOSYSTEM_JOB_")}
+            environment.update(ECOSYSTEM_JOB_MEMORY_HIGH="512M",
+                               ECOSYSTEM_JOB_MEMORY_MAX="1000001K",
+                               ECOSYSTEM_JOB_TASKS_MAX="64")
+            script = ('p=$(cut -d: -f3 /proc/self/cgroup); '
+                      f'cat "/sys/fs/cgroup$p/memory.max" "/sys/fs/cgroup$p/pids.max" > {oracle}')
+            result = _run([str(BOUNDED_RUN), "sh", "-c", script], env=environment)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            page = os.sysconf("SC_PAGE_SIZE")
+            self.assertEqual(oracle.read_text(encoding="utf-8").split(),
+                             [str(1000001 * 1024 // page * page), "64"])
+
+
+class LiveTaskQueryTests(unittest.TestCase):
+    """Structural check of the post-run task probe; systemctl is stubbed."""
+
+    UNIT = "ecosystem-job-1-1-1.scope"
+
+    def _query(self, returncode, stdout, cgroup_exists, stderr=""):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            if cgroup_exists:
+                (root / "user.slice" / self.UNIT).mkdir(parents=True)
+            shown = subprocess.CompletedProcess([], returncode, stdout, stderr)
+            with mock.patch(f"{__name__}._run", return_value=shown):
+                return _live_tasks(self.UNIT, f"/user.slice/{self.UNIT}", root)
+
+    def test_failed_query_is_not_read_as_no_tasks(self):
+        with self.assertRaises(AssertionError):
+            self._query(1, "", cgroup_exists=True,
+                        stderr="Failed to connect to bus: Connection refused")
+
+    def test_failed_query_fails_even_when_the_cgroup_is_gone(self):
+        with self.assertRaises(AssertionError):
+            self._query(1, "", cgroup_exists=False)
+
+    def test_unreported_count_for_a_live_cgroup_fails(self):
+        with self.assertRaises(AssertionError):
+            self._query(0, "TasksCurrent=[not set]\nLoadState=loaded\nControlGroup=/x\n",
+                        cgroup_exists=True)
+
+    def test_explicit_zero_is_accepted(self):
+        self.assertEqual(
+            self._query(0, "TasksCurrent=0\nLoadState=loaded\nControlGroup=\n",
+                        cgroup_exists=True), 0)
+
+    def test_live_count_is_returned(self):
+        self.assertEqual(
+            self._query(0, "TasksCurrent=2\nLoadState=loaded\nControlGroup=/x\n",
+                        cgroup_exists=True), 2)
+
+    def test_unit_and_cgroup_both_gone_count_as_zero(self):
+        # What systemd 255 printed for a collected unit on this host.
+        self.assertEqual(
+            self._query(0, "ControlGroup=\nTasksCurrent=[not set]\nLoadState=not-found\n",
+                        cgroup_exists=False), 0)
 
 
 if __name__ == "__main__":

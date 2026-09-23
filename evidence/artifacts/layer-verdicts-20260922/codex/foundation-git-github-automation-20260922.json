@@ -1,0 +1,76 @@
+{
+ "alternatives": [
+  {
+   "disposition": "conditional",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "catalogs/foundation/decisions.json",
+    "evidence/receipts/token-practice-gap-followup-20260920.json"
+   ],
+   "key": "c3",
+   "name": "Codex for Claude review bridge",
+   "repository": "https://github.com/openai/codex-plugin-cc",
+   "why_not_default": "Native launch, status and result operations passed for one read-only backend task. Outer Claude delegation and complete parent/child review interaction remain unexercised; this partial acceptance does not replace worktree ownership, GitHub PR operations or structural diffs."
+  }
+ ],
+ "catalog": "foundation",
+ "challenger_preferred": null,
+ "lane": "codex",
+ "layer_id": "git-github-automation",
+ "limits": [
+  "This verdict reviews retained records; no native tools or hosted GitHub operations were rerun.",
+  "Private raw operation captures referenced by the retained functional receipt were unavailable for independent inspection.",
+  "Upstream metadata and current installed versions were not independently reverified."
+ ],
+ "model": {
+  "effort": "high",
+  "name": "gpt-6-astra"
+ },
+ "open_gaps": [
+  "GitHub CLI has no separate component inventory or lifecycle qualification; its selection rests on source review of documented integration and recorded operations.",
+  "No matched end-to-end comparison establishes superiority across worktree creation, structural review, PR handling and cleanup.",
+  "Worktrunk's disposable lifecycle used disabled hooks; crash recovery and permission isolation are not established.",
+  "Difftastic's small Python fixture does not establish semantic review accuracy across languages.",
+  "The GitHub automation guide retains contradictory applied-versus-pending ruleset passages; its latest dated section reports application, but live state was not checked.",
+  "The review bridge's outer plugin invocation remains unqualified."
+ ],
+ "overturn_protocol": {
+  "arms": [
+   "Selected worktrunk, GitHub CLI and difftastic workflow",
+   "An explicitly pinned challenger workflow performing the same owned-worktree, structural-review and GitHub PR task"
+  ],
+  "fixture_paths": [
+   "fixtures/before.py",
+   "fixtures/after.py"
+  ],
+  "metric": "Correct identification of the changed greeting, successful PR review/check handling, preservation of dirty and unrelated work, complete owned-worktree cleanup, and measured elapsed time under matched conditions."
+ },
+ "overturn_when": "Reconsider the affected selection if an executed matched workflow using fixtures/before.py and fixtures/after.py demonstrates a selected-tool correctness or lifecycle failure that a challenger avoids, or equivalent correctness with lower measured task time. The comparison must include actual GitHub PR operations and dirty-work preservation; fixture output or lane agreement alone is insufficient.",
+ "packet_sha256": "c459066115c3c4c19fe91aae102376e64a4a4ab9d007f6e41fd3527978164eec",
+ "schema_version": 1,
+ "sources_read": [
+  "<host-path>/foundation__git-github-automation.json",
+  "<host-path>/SKILL.md",
+  "catalogs/foundation/decisions.json",
+  "docs/github-automation.md",
+  "blueprints/token-native-focus/saturation-audit.json",
+  "evidence/receipts/token-native-retained-functional-20260920.json",
+  "evidence/receipts/portable-cli-artifacts.json",
+  "evidence/receipts/token-practice-gap-followup-20260920.json",
+  "fixtures/before.py",
+  "fixtures/after.py"
+ ],
+ "why_selected": "The three candidates cover the requirement's complementary functions. Native execution retained in evidence/receipts/token-native-retained-functional-20260920.json records worktrunk create/select/list/remove passing in a disposable repository, leaving only its original worktree. evidence/receipts/portable-cli-artifacts.json records actual difftastic output and a corrected --exit-code invocation returning the expected 1; the initial exit-0 mismatch was a command expectation error. Source review of docs/github-automation.md supports gh as the GitHub interface and records successful attestation verification and rules API observations, but does not independently qualify its complete PR lifecycle. Accordingly, the whole winner set receives the weaker source_review classification.",
+ "winner_evidence_class": "source_review",
+ "winner_evidence_refs": [
+  "catalogs/foundation/decisions.json",
+  "docs/github-automation.md",
+  "evidence/receipts/token-native-retained-functional-20260920.json",
+  "evidence/receipts/portable-cli-artifacts.json"
+ ],
+ "winner_keys": [
+  "c4",
+  "c2",
+  "c1"
+ ]
+}

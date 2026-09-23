@@ -1,0 +1,172 @@
+{
+ "alternatives": [
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "https://github.com/dlt-hub/dlt/blob/a2f4a21e22e5c266278271b6591c70dbc485aea8/README.md"
+   ],
+   "key": "c1",
+   "name": "data-dlt",
+   "repository": "https://github.com/dlt-hub/dlt",
+   "why_not_default": "Reviewed schema-contract and incremental-loading examples; no retained execution establishes exact financial values, late-revision capture or immutable snapshot replay."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "https://github.com/apache/iceberg/blob/6976e020b894f6a6777704df2b8c4458cb291ae9/README.md"
+   ],
+   "key": "c2",
+   "name": "data-iceberg",
+   "repository": "https://github.com/apache/iceberg",
+   "why_not_default": "Reviewed shared analytical-table design; no retained append, concurrent-writer, snapshot recovery or cross-engine comparison establishes an advantage over the executed local Parquet path."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "https://github.com/ray-project/ray/blob/ray-2.58.0/README.rst"
+   ],
+   "key": "c3",
+   "name": "ray-serve",
+   "repository": "https://github.com/ray-project/ray",
+   "why_not_default": "Reviewed distributed tasks and serving interfaces; no executed workload demonstrates a local-compute bottleneck, distributed speedup or recoverable failure handling."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "https://github.com/questdb/questdb/blob/7a391566ac827e0d8c269b91f2415c16b0a32a84/README.md"
+   ],
+   "key": "c5",
+   "name": "QuestDB",
+   "repository": "https://github.com/questdb/questdb",
+   "why_not_default": "Reviewed temporal SQL and ingestion capabilities; no retained comparison verifies correction semantics, exact financial roundtrips or a concurrency benefit sufficient to justify a server."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "https://github.com/ClickHouse/ClickHouse/blob/f29d27def7ee0adb10e7e2fff080ba204054dd4b/README.md"
+   ],
+   "key": "c6",
+   "name": "ClickHouse",
+   "repository": "https://github.com/ClickHouse/ClickHouse",
+   "why_not_default": "The referenced README establishes analytical-database positioning only; retained evidence contains no matching snapshot-integrity acceptance or measured workload advantage."
+  },
+  {
+   "disposition": "overlap",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "https://github.com/apache/arrow/blob/beccec0d0c451b7aa3e4530416ac431b3c035c69/README.md"
+   ],
+   "key": "c7",
+   "name": "data-arrow",
+   "repository": "https://github.com/apache/arrow",
+   "why_not_default": "Reviewed typed interchange and Parquet readers/writers. The executed DuckDB path already covers local Parquet IO; no separate Arrow execution demonstrates additional required interoperability or precision guarantees."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "https://github.com/unionai-oss/pandera/blob/62f55e2dccf0a199cfe4d6ce3eda0c1d29e2e4e6/README.md"
+   ],
+   "key": "c8",
+   "name": "Pandera",
+   "repository": "https://github.com/unionai-oss/pandera",
+   "why_not_default": "Reviewed dataframe validation examples; no retained application integration establishes rejection of unknown historical availability, ambiguous identity or corporate-action units."
+  },
+  {
+   "disposition": "measured_tradeoff",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "evidence/receipts/component-history.json",
+    "evidence/receipts/portable-cli-artifacts.json"
+   ],
+   "key": "c10",
+   "name": "foundation-toon",
+   "repository": "https://github.com/toon-format/toon",
+   "why_not_default": "Retained native encode/decode preserved fixture JSON. One nested fixture expanded from 69 to 94 tokens and retained its original representation. Serialization evidence does not establish analytical storage, provenance or historical eligibility."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "https://github.com/feast-dev/feast/blob/1d5be950cf718a674cb01eaf0fd0ad6f0a4c6335/README.md"
+   ],
+   "key": "c11",
+   "name": "data-feast",
+   "repository": "https://github.com/feast-dev/feast",
+   "why_not_default": "Reviewed historical feature retrieval and offline/online store architecture; no retained execution establishes revision-aware source availability, financial precision or training/serving parity on this workload."
+  }
+ ],
+ "catalog": "us-equities",
+ "challenger_preferred": null,
+ "lane": "codex",
+ "layer_id": "storage-compute",
+ "limits": [
+  "Historical receipts were inspected; native workloads and comparisons were not rerun.",
+  "Context-mode local-file access was blocked by its configured project root; local evidence was successfully read through the permitted native shell.",
+  "Upstream READMEs were inspected as source-review evidence, not executed acceptance.",
+  "The non-adopted DBHub candidate supplies no evidence references establishing superiority."
+ ],
+ "model": {
+  "effort": "high",
+  "name": "gpt-6-astra"
+ },
+ "open_gaps": [
+  "No candidate establishes the complete shared acquisition, licensing, identity and historical-eligibility requirement.",
+  "DuckDB native evidence covers bundled simulation events; financial availability, amendment and decimal-boundary checks use artificial fixtures.",
+  "The referenced SEC attempt failed with HTTP 403 and produced no live source payload or Parquet dataset; later acquisition results mentioned in the packet were not independently inspected.",
+  "No retained comparison measures representative data volumes, concurrent writers/readers, latency, recovery or operational cost across storage candidates.",
+  "Immutable-file guards, hashes and exact decimals do not establish original historical publication, complete corporate actions or survivorship-free universes."
+ ],
+ "overturn_protocol": {
+  "arms": [
+   "Current DuckDB/Parquet path",
+   "Candidate storage or compute implementation consuming identical frozen records and enforcing identical availability and integrity rules"
+  ],
+  "fixture_paths": [
+   "tests/test_financial_data.py",
+   "blueprints/us-equities/data/summarize_backtest.py"
+  ],
+  "metric": "Require exact decimal and cutoff equivalence, rejection of unknown/conflicting availability and tampered artifacts, preserved immutable outputs, then measure latency, throughput, memory, concurrency and recovery on the same declared workload."
+ },
+ "overturn_when": "Overturn after an executed candidate comparison using tests/test_financial_data.py and blueprints/us-equities/data/summarize_backtest.py preserves their decimal, cutoff, integrity and replay contracts while closing a demonstrated capacity or recovery gap. Run python3 -m unittest tests.test_financial_data in the pinned research environment with both DuckDB integration tests executed; a skipped or baseline-only run cannot promote a challenger.",
+ "packet_sha256": "b8b9f461da9a3538c0b9dc1b2c023f2e390b4c178781ef3f29a739520a4508b9",
+ "schema_version": 1,
+ "sources_read": [
+  "<host-path>/us-equities__storage-compute.json",
+  "<host-path>/SKILL.md",
+  "https://github.com/dlt-hub/dlt/blob/a2f4a21e22e5c266278271b6591c70dbc485aea8/README.md",
+  "https://github.com/apache/iceberg/blob/6976e020b894f6a6777704df2b8c4458cb291ae9/README.md",
+  "https://github.com/ray-project/ray/blob/ray-2.58.0/README.rst",
+  "https://github.com/duckdb/duckdb/blob/d8cdaa33fda8df955cc76ef58a280f68f4cd43fa/README.md",
+  "https://github.com/questdb/questdb/blob/7a391566ac827e0d8c269b91f2415c16b0a32a84/README.md",
+  "https://github.com/ClickHouse/ClickHouse/blob/f29d27def7ee0adb10e7e2fff080ba204054dd4b/README.md",
+  "https://github.com/apache/arrow/blob/beccec0d0c451b7aa3e4530416ac431b3c035c69/README.md",
+  "https://github.com/unionai-oss/pandera/blob/62f55e2dccf0a199cfe4d6ce3eda0c1d29e2e4e6/README.md",
+  "https://github.com/feast-dev/feast/blob/1d5be950cf718a674cb01eaf0fd0ad6f0a4c6335/README.md",
+  "blueprints/us-equities/data/receipt.json",
+  "blueprints/us-equities/data/summarize_backtest.py",
+  "blueprints/us-equities/workers/requirements.txt",
+  "blueprints/us-equities/financial-data/receipt.json",
+  "blueprints/us-equities/research-runtime/receipt.json",
+  "evidence/receipts/component-history.json",
+  "evidence/receipts/portable-cli-artifacts.json",
+  "tests/test_financial_data.py"
+ ],
+ "why_selected": "Select DuckDB for the storage/compute scope. Retained native execution in blueprints/us-equities/data/receipt.json records six bundled LEAN simulation events, three distinct orders and a hashed Parquet output reread by blueprints/us-equities/data/summarize_backtest.py. blueprints/us-equities/research-runtime/receipt.json records a subsequent successful packet/Parquet workflow. Separately, blueprints/us-equities/financial-data/receipt.json records synthetic-fixture exact DECIMAL(38,12) roundtrips and conservative availability checks. These demonstrate a working bounded analytical path; application code supplies provenance and rejection rules. Other adopted storage/compute candidates have source review only, while TOON's native serialization evidence addresses a narrower artifact concern.",
+ "winner_evidence_class": "native_proven",
+ "winner_evidence_refs": [
+  "blueprints/us-equities/data/receipt.json",
+  "blueprints/us-equities/data/summarize_backtest.py",
+  "blueprints/us-equities/workers/requirements.txt",
+  "blueprints/us-equities/financial-data/receipt.json",
+  "blueprints/us-equities/research-runtime/receipt.json"
+ ],
+ "winner_keys": [
+  "c4"
+ ]
+}

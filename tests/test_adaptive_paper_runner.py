@@ -860,7 +860,7 @@ def _paper_ready_config(symbols=("SPY",)):
             "sessions": {"extended_hours": False, "overnight_holds": False, "overnight_gross_multiple": "1.0"}}
 
 
-def _full_gate_result(*, status="pass", row_count=4, checks_status="pass", input_sha256=None):
+def _full_gate_result(*, status="pass", row_count=1, checks_status="pass", input_sha256=None):
     """A gate-result.json body with the full contract `_check_promotion_gate`
     now requires (status, input_sha256, row_count, checks, versions,
     checked_at) -- shaped like a real `promotion_gate.py` output, not the
@@ -869,7 +869,8 @@ def _full_gate_result(*, status="pass", row_count=4, checks_status="pass", input
         "status": status,
         "input_sha256": input_sha256,
         "row_count": row_count,
-        "checks": [{"name": "rows_present", "status": checks_status, "detail": "ok"}],
+        "checks": [{"name": name, "status": checks_status, "detail": "ok"}
+                   for name in sorted(runner_module._GATE_CHECK_NAMES)],
         "versions": {"pandera": "0.33.1"},
         "checked_at": "2026-09-22T00:00:00+00:00",
     }
@@ -902,6 +903,84 @@ class PromotionGatePreflight(unittest.TestCase):
         gate_path = self.root / "gate-result.json"
         gate_path.write_text(json.dumps(_full_gate_result(**fields)))
         return gate_path
+
+    def _write_raw_gate(self, body):
+        gate_path = self.root / "gate-result.json"
+        gate_path.write_text(json.dumps(body))
+        return gate_path
+
+    def test_complete_gate_result_is_accepted(self):
+        gate_path = self._write_gate(input_sha256=self.snapshot_hash)
+        self._call(gate_result_path=gate_path, snapshot_path=self.snapshot)
+
+    def test_gate_result_without_the_named_checks_is_incomplete(self):
+        # The blind review's reproduction: an unnamed passing check, null versions and
+        # checked_at, matching hash of a header-only CSV.
+        body = {"status": "pass", "input_sha256": self.snapshot_hash, "row_count": 1,
+                "checks": [{"status": "pass"}], "versions": None, "checked_at": None}
+        with self.assertRaisesRegex(SafetyErrorAlways, "promotion_gate_incomplete"):
+            self._call(gate_result_path=self._write_raw_gate(body), snapshot_path=self.snapshot)
+
+    def test_gate_result_missing_one_named_check_is_incomplete(self):
+        body = _full_gate_result(input_sha256=self.snapshot_hash)
+        body["checks"] = [c for c in body["checks"] if c["name"] != "volume_integral_non_negative"]
+        with self.assertRaisesRegex(SafetyErrorAlways, "promotion_gate_incomplete"):
+            self._call(gate_result_path=self._write_raw_gate(body), snapshot_path=self.snapshot)
+
+    def test_gate_result_with_duplicate_or_unknown_check_is_incomplete(self):
+        for extra in ({"name": "rows_present", "status": "pass"}, {"name": "made_up_check", "status": "pass"}):
+            body = _full_gate_result(input_sha256=self.snapshot_hash)
+            body["checks"].append(extra)
+            with self.subTest(extra=extra["name"]):
+                with self.assertRaisesRegex(SafetyErrorAlways, "promotion_gate_incomplete"):
+                    self._call(gate_result_path=self._write_raw_gate(body), snapshot_path=self.snapshot)
+
+    def test_non_string_check_name_is_refused_cleanly(self):
+        body = _full_gate_result(input_sha256=self.snapshot_hash)
+        body["checks"][0] = {"name": ["rows_present"], "status": "pass"}
+        with self.assertRaisesRegex(SafetyErrorAlways, "promotion_gate_incomplete"):
+            self._call(gate_result_path=self._write_raw_gate(body), snapshot_path=self.snapshot)
+
+    def test_naive_or_date_only_checked_at_and_empty_versions_are_incomplete(self):
+        for field, value in (("checked_at", "2026-09-22"), ("checked_at", "20260922"),
+                             ("checked_at", "2026-09-22T10:00:00"), ("versions", {"pandera": None}),
+                             ("versions", {"pandera": ""})):
+            body = _full_gate_result(input_sha256=self.snapshot_hash)
+            body[field] = value
+            with self.subTest(field=field, value=value):
+                with self.assertRaisesRegex(SafetyErrorAlways, "promotion_gate_incomplete"):
+                    self._call(gate_result_path=self._write_raw_gate(body), snapshot_path=self.snapshot)
+
+    def test_csv_row_count_must_match_the_snapshot_rows(self):
+        gate_path = self._write_gate(input_sha256=self.snapshot_hash, row_count=4)
+        with self.assertRaisesRegex(SafetyErrorAlways, "promotion_gate_mismatch"):
+            self._call(gate_result_path=gate_path, snapshot_path=self.snapshot)
+
+    def test_unmapped_failures_entry_is_reported_as_such(self):
+        body = _full_gate_result(input_sha256=self.snapshot_hash, status="fail")
+        body["checks"].append({"name": "unmapped_failures", "status": "fail",
+                               "detail": "unrecognized pandera check identifiers ['not_nullable']"})
+        with self.assertRaisesRegex(SafetyErrorAlways, "promotion_gate_unmapped_failures"):
+            self._call(gate_result_path=self._write_raw_gate(body), snapshot_path=self.snapshot)
+
+    def test_null_or_empty_versions_and_checked_at_are_incomplete(self):
+        for field, value in (("versions", None), ("versions", {}), ("checked_at", None),
+                             ("checked_at", ""), ("checked_at", "not-a-time")):
+            body = _full_gate_result(input_sha256=self.snapshot_hash)
+            body[field] = value
+            with self.subTest(field=field, value=value):
+                with self.assertRaisesRegex(SafetyErrorAlways, "promotion_gate_incomplete"):
+                    self._call(gate_result_path=self._write_raw_gate(body), snapshot_path=self.snapshot)
+
+    def test_runner_check_names_match_the_gate_module(self):
+        import ast
+        source = (Path(runner_module.__file__).resolve().parents[1] / "data" / "promotion_gate.py").read_text()
+        names = None
+        for node in ast.parse(source).body:
+            if isinstance(node, ast.Assign) and any(getattr(t, "id", None) == "CHECK_NAMES" for t in node.targets):
+                names = ast.literal_eval(node.value)
+        self.assertIsNotNone(names, "promotion_gate.CHECK_NAMES not found")
+        self.assertEqual(frozenset(names), runner_module._GATE_CHECK_NAMES)
 
     def test_mode_none_is_unaffected_by_missing_gate_arguments(self):
         # Every pre-existing preflight/recover call site omits mode/gate args.

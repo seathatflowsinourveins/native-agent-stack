@@ -1,28 +1,15 @@
 {
  "alternatives": [
   {
-   "disposition": "conditional",
+   "disposition": "unqualified",
    "evidence_class": "source_review",
    "evidence_refs": [
-    "catalogs/us-equities/runtime-target.json"
+    "evidence/receipts/native-nautilus-v2-20260920.json"
    ],
    "key": "c7",
-   "name": "NautilusTrader (native IBKR socket adapter)",
+   "name": "NautilusTrader Interactive Brokers adapter",
    "repository": "https://github.com/nautechsystems/nautilus_trader",
-   "why_not_default": "This is a broker-specific boundary inside the selected destination, and runtime-target.json names it the IBKR selected_path (lines 46-49). It has no local broker evidence: local_broker_acceptance is \"not_established\". Its limitation says adapter installation does not establish socket access, paper order behavior, cancellation races or reconnect reconciliation. The packet's limitations for c7 add that no local paper or live session has been run against this adapter. Its only evidence_ref is external documentation (nautilustrader.io), which this lane did not open. It stays conditional on a first IBKR paper session with reconciliation. It is untested, not failed."
-  },
-  {
-   "disposition": "overlap",
-   "evidence_class": "native_proven",
-   "evidence_refs": [
-    "blueprints/us-equities/adaptive-paper/receipt.json",
-    "blueprints/us-equities/paper-e2e-20260921/readiness.json",
-    "blueprints/us-equities/paper-e2e-20260921/paper-receipt.json"
-   ],
-   "key": "c1",
-   "name": "alpaca-py (data role, commit pin)",
-   "repository": "https://github.com/alpacahq/alpaca-py",
-   "why_not_default": "Same repository and release as c4: pin v0.44.0 at source cc4cb3b7ba50ae250e621983c2779047fb16bb28. That commit is also broker_sdk.upstream_pin in adaptive-paper/receipt.json and the sdk source_commit in paper-e2e-20260921/readiness.json line 6. The observed paper smoke therefore applies equally to c1's SDK. Its role is historical/streaming data plus paper SDK, which duplicates c4 in this execution layer, so it is recorded as an overlap rather than a separate winner. Its own evidence_ref is an external GitHub README that was not opened."
+   "why_not_default": "Its only evidence is source review: the packet's evidence_ref is the nautilustrader.io IBKR integration page, which I could not open. evidence/receipts/native-nautilus-v2-20260920.json (limitations, line 12) records \"No IBKR Gateway/TWS authentication, data entitlement, adapter connectivity or Alpaca integration acceptance\". It also says the pinned engine run was an offline synthetic EURUSD quickstart. The packet card says local_broker_acceptance is not_established and no paper or live session has been run. The adapter is untested, not failed. It stays the intended IBKR boundary, but on this evidence it cannot be a default that is qualified for execution."
   },
   {
    "disposition": "conditional",
@@ -33,27 +20,18 @@
    "key": "c6",
    "name": "LEAN Alpaca brokerage",
    "repository": "https://github.com/QuantConnect/Lean.Brokerages.Alpaca",
-   "why_not_default": "blueprints/us-equities/engine/resolution-receipt.json shows native dotnet builds of the pinned adapter (1973f616...). The unmodified build had exit 0 with 2 advisory pairs; the source-integrated build had exit 0 with 0 advisory pairs. Its remaining_external_boundary is \"not_exercised_requires_operator_entitlement_and_broker_authorization\", with broker_orders_submitted 0. The bundled backtest used a brokerage_model that is \"Unchanged upstream default; not Alpaca\". The native class covers compilation only, not initialization, connectivity or reconciliation. The adapter serves the legacy LEAN runtime, not the selected Nautilus destination, and the LEAN oracle requirement does not depend on this brokerage."
+   "why_not_default": "blueprints/us-equities/engine/resolution-receipt.json shows the pinned adapter (1973f616) was only built with native dotnet, not run against a broker. The unmodified build exited 0 with 11 warnings and still resolved 2 advisory pairs (DotNetZip 1.16.0, System.Drawing.Common 4.7.0). The source-integrated build exited 0 with 0 advisory pairs. remaining_external_boundary is \"not_exercised_requires_operator_entitlement_and_broker_authorization\" with broker_orders_submitted 0; Initialize calls ValidateSubscription, which needs QuantConnect product 347 entitlement. It belongs to the preserved prior LEAN oracle, not the selected Nautilus destination. It would become relevant only with entitlement and separately authorized paper access."
   },
   {
-   "disposition": "unqualified",
-   "evidence_class": "source_review",
-   "evidence_refs": [],
-   "key": "c2",
-   "name": "hkuds/vibe-trading",
-   "repository": "https://github.com/HKUDS/Vibe-Trading",
-   "why_not_default": "Not adopted, with no retained evidence_refs, pin or upstream metadata. The packet note describes a proposed comparison against the existing Alpaca lifecycle cases, not an executed result. Nothing establishes that it beats the current adapter."
-  },
-  {
-   "disposition": "unqualified",
-   "evidence_class": "source_review",
+   "disposition": "overlap",
+   "evidence_class": "local_integration",
    "evidence_refs": [
-    "blueprints/us-equities/order-contract/README.md"
+    "blueprints/us-equities/adaptive-paper/receipt.json"
    ],
-   "key": "c3",
-   "name": "pydantic/pydantic",
-   "repository": "https://github.com/pydantic/pydantic",
-   "why_not_default": "Not adopted, with no retained evidence_refs. The packet note proposes a strict typed order-intent schema but records no run. blueprints/us-equities/order-contract/README.md already describes a dependency-free offline boundary that rejects unknown fields, floats, booleans, duplicate keys and fractional quantities, with nine focused tests reported passed. Nothing retained shows malformed intents that this boundary accepts and a pydantic schema would reject."
+   "key": "c1",
+   "name": "alpaca-py (data component entry)",
+   "repository": "https://github.com/alpacahq/alpaca-py",
+   "why_not_default": "Same repository and the same v0.44.0 source pin (cc4cb3b7) as winner c4. The adaptive-paper receipt's broker_sdk block pins that exact commit. This entry is catalogued for the historical/streaming data role; its data-side limitations (IEX vs SIP, symbol asof, corporate actions) belong to the data layer, not execution. It adds no separate execution evidence beyond c4."
   }
  ],
  "catalog": "us-equities",
@@ -61,71 +39,63 @@
  "lane": "claude",
  "layer_id": "execution-broker",
  "limits": [
-  "External evidence_refs were not opened because this lane reads local files only: the alpaca-py README at cc4cb3b7 and v0.44.0 (c1, c4), the Lean.Brokerages.Alpaca README at 1973f616 (c6) and the nautilustrader.io IBKR integration page (c7).",
-  "No commands or tests were run. The suite counts are quoted from the receipts. tests/test_alpaca_paper.py contains 32 'def test_' matches, while runtime-target.json and the paper-e2e README record 27 lifecycle tests. I could not check which tests were run or whether they pass now.",
-  "The receipt names evidence/receipts/native-nautilus-v2-20260920.json and adaptive-paper/source-hashes.json but I did not open them, and no source hashes were recomputed.",
-  "paper-receipt.json itself records only SDK source-file hashes, with no version field. The alpaca-py 0.44.0 / cc4cb3b7 attribution comes from readiness.json line 6 in the same trial directory. The link between the readiness observation and the order-writing process rests on that shared trial directory and the hash match; I did not independently re-verify it.",
-  "Revision-round corrections from the independent refuters, re-read against source:\n- why_selected no longer calls c5 the only broker-specific boundary in the destination. c7 is one too, per runtime-target.json lines 46-49 and packet line 196.\n- The overturn command now includes runner.py's required --env-file/--output and the paper-mode --gate-result/--snapshot (runner.py lines 1023-1036).\n- The c4 paper evidence is now qualified as also covering c1's identical SDK commit, and readiness.json was added as the version source.",
-  "No TypeSafe inference was supplied or run. All dispositions are this lane's own source review; no provider judgment was retained.",
-  "Model: claude-opus-5-5[1m] as the client exposes it; the fixed output name is 'opus', effort 'high'. Skill path: <host-path>/SKILL.md."
+  "I could not open the upstream evidence_refs for c1, c4, c6 and c7: the alpaca-py README at cc4cb3b7 and v0.44.0, the Lean.Brokerages.Alpaca README at 1973f616, and the nautilustrader.io IBKR integration page. The task restricted reads to the repository and no web tool was used, so those URLs are unverified.",
+  "No commands were run. Every pass/fail count above is documented-as-done in retained receipts, not observed now.",
+  "The adaptive-paper README says receipt.json counts are stale: the full suite was 895 in the receipt against 1,084 today. The later changes_since blocks report 1,729 tests from unittest discover, which I did not reproduce.",
+  "The paper receipt cites 27 synthetic tests. tests/test_alpaca_paper.py now contains 32 test definitions by grep count. I did not verify which are the 27 lifecycle cases the packet notes refer to.",
+  "runtime-target.json, which governs the current destination according to the packet limitations, was not opened. Its local_broker_acceptance not_established value is taken from the packet card only.",
+  "The packet sets c5's evidence_kind to source_review and c4's to source_review. My classification (local_integration for c5; a bounded native paper smoke for the SDK behind c4) comes from my own reading of the retained receipts. It is not a provider judgment.",
+  "Actual model identifier: Opus 5.5 (claude-opus-5-5[1m]), as exposed by the client. Requested model name and effort were copied from the fixed values. Skill used: typesafe-ai at <host-path>/typesafe-ai; no TypeSafe inference was supplied or called."
  ],
  "model": {
   "effort": "high",
   "name": "claude-opus-5-5"
  },
  "open_gaps": [
-  "The Nautilus-integrated adaptive Alpaca adapter (c5) has placed no broker order. broker_readiness is \"not_started\", and native_capacity used broker_connections 0 and paper_orders 0 (adaptive-paper/receipt.json).",
-  "The only observed paper orders (2 writes, one SPY roundtrip) went through blueprints/us-equities/alpaca-paper/paper_runner.py, not through the Nautilus LiveNode path.",
-  "No native in-flight fault has been exercised: partial fill, cancel, reject, disconnect, crash or an uncertain order. The paper-e2e README reports 27 synthetic lifecycle tests for these paths, and runtime-target.json lists in-flight native failure cases as open.",
-  "IBKR local broker acceptance is not_established (runtime-target.json lines 46-49), so no IBKR paper session exists.",
-  "alpaca-py 0.44.0 serializes qty and limit_price as floats and drops advanced_instructions (order-contract/README.md). Exact decimal preservation at the wire has not been established.",
-  "Continuous operation, Elite 1000/minute throughput, SIP entitlement and the LEAN SPY dividend/cash parity are not established. runtime-target.json reports the latest parity comparison as BLOCKED.",
-  "The G-f cancel-then-replace and gap-risk stop features are opt-in SYN only, with no broker-observed receipt (receipt.json changes_since_g_f_round8).",
-  "The adaptive paper command is additionally gated on a passing promotion-gate result (receipt.json; runner.py lines 1029-1036). No retained evidence shows that gate passing for a paper trial."
+  "The adaptive Nautilus+Alpaca adapter (c5) has no broker-observed order. The receipt records broker_readiness not_started with orders_submitted 0. The only actual paper orders came from the separate one-SPY runner (blueprints/us-equities/alpaca-paper/paper_runner.py).",
+  "No native partial-fill, cancellation, rejection, disconnect, crash or in-flight ambiguous submission was induced against a broker. The paper receipt limitations say these paths have only synthetic test evidence, and recovery covered only a completed trial.",
+  "Cancel-then-replace, the gap-risk stop and overnight holds are opt-in SYN features with no broker-observed receipt (receipt.json changes_since_g_f_round8 limitations).",
+  "IBKR execution (c7) has no socket connection, paper session or reconciliation evidence.",
+  "Continuous operation, SIP-feed execution, Elite 1000/minute throughput and live trading are unqualified.",
+  "Historical-to-paper signal parity and the SPY/LEAN cash-parity oracle are still planned. No strategy profitability follows from any receipt read here.",
+  "alpaca-py serializes quantities and prices as floats and drops unknown/advanced fields (order-contract README). The exact-decimal envelope is not wire round-tripped.",
+  "Non-adopted HKUDS/Vibe-Trading and pydantic/pydantic have no retained evidence in this packet (empty evidence_refs). Their proposed comparisons are unexecuted, so neither can be preferred or rejected."
  ],
  "overturn_protocol": {
   "arms": [
-   "c5 adaptive-paper-alpaca-adapter over c4 alpaca-py 0.44.0 (current)",
-   "c7 Nautilus native IBKR adapter in an IBKR paper session",
-   "c2 vibe-trading sdk_order_gate/reconciliation without order authority",
-   "c3 pydantic strict order-intent schema over the order-contract fixtures"
+   "c5 adaptive-paper Nautilus+alpaca-py adapter (current)",
+   "c7 Nautilus IBKR adapter on an equivalent paper session",
+   "HKUDS/Vibe-Trading sdk_order_gate/reconciliation without order authority",
+   "pydantic strict order-intent schema in place of the hand-written order-contract checks"
   ],
   "fixture_paths": [
    "tests/test_alpaca_paper.py",
    "tests/test_adaptive_paper_safety.py",
    "tests/test_adaptive_paper_recovery.py",
-   "tests/test_adaptive_paper_transport.py",
    "tests/test_order_contract.py",
-   "blueprints/us-equities/paper-e2e-20260921/paper-receipt.json",
-   "blueprints/us-equities/adaptive-paper/receipt.json"
+   "blueprints/us-equities/adaptive-paper/runner.py"
   ],
-  "metric": "Failures on the same frozen lifecycle cases (ambiguous submit, duplicate/restart, partial/cancel, stale/clock/risk, request budget, ownership, kill), plus reconciliation pass/fail, duplicate-write count and cash-delta match in a bounded paper trial."
+  "metric": "Count of failed lifecycle cases on the same frozen inputs and failure contract (ambiguous submit, duplicate/restart, partial/cancel, stale quote/clock, request budget, ownership, kill/STOP), plus pass/fail of fresh cash/position reconciliation after a bounded open-session paper trial"
  },
- "overturn_when": "Reopen the choice in any of these cases:\n- A bounded regular-session paper trial of the adaptive lane fails fresh cash/position reconciliation, submits duplicate writes, or breaches its frozen numeric limits. The trial is python3 blueprints/us-equities/adaptive-paper/runner.py paper, then recover, with the required --env-file (the broker credential file) and --output. The paper command also needs a passing, hash-matched --gate-result and --snapshot from blueprints/us-equities/data/promotion_gate.py.\n- tests/test_alpaca_paper.py, tests/test_adaptive_paper_safety.py, tests/test_adaptive_paper_recovery.py or tests/test_adaptive_paper_transport.py fails in the pinned runtime.\n- An IBKR paper session through the Nautilus adapter (c7) passes ownership, partial/cancel/reconnect and reconciliation cases with evidence that exceeds the Alpaca lane. That would promote c7 into the winner set.\n- A challenger records fewer failures on the same lifecycle fixtures: the c2 sdk_order_gate/reconciliation, or a c3 strict schema over tests/test_order_contract.py.",
+ "overturn_when": "Any of the following would change this verdict:\n- An open-session adaptive paper trial run through blueprints/us-equities/adaptive-paper/runner.py (paper, then recover) fails ownership, fresh cash/position reconciliation or numeric-risk enforcement.\n- Induced partial-fill, cancel-race, stream-loss or ambiguous-submit faults in that runner (currently covered only by tests/test_adaptive_paper_safety.py and tests/test_adaptive_paper_recovery.py) are not handled.\n- The Nautilus IBKR adapter (c7) passes the same ownership, reconciliation and partial/cancel/reconnect cases in a real paper session while c5 does not.\n- A non-adopted challenger (HKUDS/Vibe-Trading's order gate, or a pydantic strict order-intent schema) is executed against the existing lifecycle cases in tests/test_alpaca_paper.py and tests/test_order_contract.py and produces fewer failures than the current deterministic adapter and hand-written boundary.",
  "packet_sha256": "a12fbdd9a124a2850009e3fb0dadc6aadd77c4b0284c8a69f0c65c81120f2b74",
  "schema_version": 1,
  "sources_read": [
   "<host-path>/us-equities__execution-broker.json",
   "blueprints/us-equities/adaptive-paper/receipt.json",
   "blueprints/us-equities/adaptive-paper/README.md",
-  "blueprints/us-equities/adaptive-paper/runner.py (lines 1018-1039)",
   "blueprints/us-equities/engine/resolution-receipt.json",
   "blueprints/us-equities/order-contract/README.md",
   "blueprints/us-equities/paper-e2e-20260921/paper-receipt.json",
-  "blueprints/us-equities/paper-e2e-20260921/readiness.json (lines 1-15)",
-  "blueprints/us-equities/paper-e2e-20260921/README.md (lines 1-15)",
-  "catalogs/us-equities/runtime-target.json (lines 40-134 plus grep for ibkr/alpaca)",
-  "tests/test_alpaca_paper.py (grep count only)",
-  "<host-path>/SKILL.md (preloaded skill body)"
+  "evidence/receipts/native-nautilus-v2-20260920.json (lines 1-40)",
+  "tests/test_alpaca_paper.py (test-definition count only)"
  ],
- "why_selected": "Picked on retained evidence, not on project claims.\n\nc5 (adaptive-paper-alpaca-adapter) is one of two broker-specific execution boundaries in the selected NautilusTrader 2.0.0rc5 destination; c7, the native IBKR adapter, is the other. c5 is the only one with retained local-integration evidence inside that destination. c7 has local_broker_acceptance \"not_established\" (catalogs/us-equities/runtime-target.json lines 46-49).\n\nWhat the c5 receipt shows (blueprints/us-equities/adaptive-paper/receipt.json):\n- Engine NautilusTrader 2.0.0rc5 (pin 1b0a49d2...) with alpaca-py 0.44.0 (pin cc4cb3b7...).\n- Status \"local_integration_passed_new_broker_trial_pending\".\n- Full repository suite: run 895 / passed 893 / skipped 2.\n- 42 unchanged upstream Nautilus adapter-template tests passed; the receipt says these are \"not Alpaca broker E2E\".\n- native_capacity is a synthetic-broker run: 180 submissions, 90 roundtrips, broker_connections 0, paper_orders 0.\n- broker_readiness is \"not_started\" (regular_session_window_unavailable).\n- The later changes_since blocks are evidence class SYN; the last reports \"Ran 1729 tests / OK (skipped=5)\".\n\nblueprints/us-equities/adaptive-paper/README.md describes c5's deterministic risk and ledger boundaries: fsynced SQLite intents, stable IDs, no blind retry, a shared 200/minute budget with a 180/minute submission ceiling, and a whole-share native Equity model.\n\nc4 is alpaca-py 0.44.0, the SDK that carries c5's quotes, order updates and paper REST requests. c1 has the same repository and commit and is recorded as an overlap. This SDK is the only one with observed paper order execution:\n- blueprints/us-equities/paper-e2e-20260921/readiness.json line 6 records sdk alpaca-py 0.44.0 at source_commit cc4cb3b7ba50ae250e621983c2779047fb16bb28.\n- blueprints/us-equities/paper-e2e-20260921/paper-receipt.json (evidence_kind native_alpaca_paper) records 2 write attempts: an SPY buy filled at 770.70 and a sell filled at 770.62, with realized_gross_pnl_usd \"-0.08\".\n- A separate fresh reconciliation made 5 GETs: positions 0, open_orders 0, cash_delta_usd \"-0.08\", which matches the reported PnL.\n- Completed-trial recovery made 0 additional writes.\n- catalogs/us-equities/runtime-target.json names this receipt as the Alpaca native_paper_receipt.\n\nThat smoke ran through blueprints/us-equities/alpaca-paper/paper_runner.py, not through Nautilus. It is native evidence for the SDK path, not for the c5 adapter.\n\nThe winner set's weakest class is local_integration (c5).",
+ "why_selected": "c5 is selected because it is the only adopted candidate whose retained evidence places a broker-specific boundary inside the selected NautilusTrader 2.0.0rc5 destination. c4 (alpaca-py 0.44.0) is selected as the official SDK that carries c5's transport. It is also the only adopted broker component with a retained broker-observed paper order result.\n\nWhat the retained evidence shows, from my reading of the receipts (I did not re-run anything):\n\nc5 (adaptive-paper-alpaca-adapter):\n- blueprints/us-equities/adaptive-paper/receipt.json records status \"local_integration_passed_new_broker_trial_pending\" and pins NautilusTrader 1b0a49d2 and alpaca-py cc4cb3b7.\n- The same receipt records 42 unchanged upstream Nautilus adapter-template tests passed, scoped \"not Alpaca broker E2E\".\n- It records a full repository suite of 895 run, 893 passed and 2 skipped.\n- It records a wall-clock native-engine capacity fixture with a synthetic broker: 180 submissions, 90 roundtrips, broker_connections 0 and paper_orders 0.\n- The execution_contract block holds the deterministic numeric risk limits: 5000 USD gross exposure, 1000 USD order notional, 25 USD loss/drawdown, 200/180 per-minute request budgets and 1x maximum leverage. It also records a durable SQLite intent/fill/request journal and reconciliation-based recovery.\n- blueprints/us-equities/adaptive-paper/README.md (Lifecycle and native boundaries) describes fsync-before-send reservations, stable IDs, an account lock, a flat-start requirement and snapshot reconciliation. It says ambiguous POSTs are never blindly retried.\n- The later changes_since* blocks are all labelled evidence class SYN and are explicitly \"not a new broker E2E\".\n- broker_readiness is \"not_started\" (regular_session_window_unavailable).\n\nc4 (alpaca-py):\n- blueprints/us-equities/paper-e2e-20260921/paper-receipt.json records a native Alpaca paper SPY long-to-flat trial through the SDK, with SDK source hashes for alpaca/trading/client.py.\n- It observed 2 write attempts, both filled, and a realized gross PnL of -0.08 USD.\n- A separate fresh read-only reconciliation passed with positions 0, open orders 0 and a cash delta of -0.08 matching the PnL.\n- Completed-trial recovery made 0 additional writes.\n- blueprints/us-equities/order-contract/README.md records a network-isolated native probe of alpaca-py 0.44.0 serialization. The SDK uses float fields and silently drops advanced_instructions and unknown fields, which is why the project wraps it in a strict offline boundary.\n\nEvidence class: the winner set is local_integration, the weaker of the two. c5 has only local integration and synthetic evidence. The one native paper result belongs to a separate runner (blueprints/us-equities/alpaca-paper/paper_runner.py), not to c5.",
  "winner_evidence_class": "local_integration",
  "winner_evidence_refs": [
   "blueprints/us-equities/adaptive-paper/receipt.json",
   "blueprints/us-equities/adaptive-paper/README.md",
   "blueprints/us-equities/paper-e2e-20260921/paper-receipt.json",
-  "blueprints/us-equities/paper-e2e-20260921/readiness.json",
-  "catalogs/us-equities/runtime-target.json",
   "blueprints/us-equities/order-contract/README.md"
  ],
  "winner_keys": [

@@ -1,0 +1,85 @@
+{
+ "alternatives": [
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "https://github.com/cvxgrp/cvxportfolio/blob/1.5.1/README.rst"
+   ],
+   "key": "c2",
+   "name": "cvxportfolio",
+   "repository": "https://github.com/cvxgrp/cvxportfolio",
+   "why_not_default": "The pinned README contains portfolio optimization and cost-aware simulation examples, inspected through its raw-source URL. No retained execution, equity-accounting comparison against LEAN, or broker-boundary qualification accompanies this candidate. It remains a potential portfolio-research complement."
+  }
+ ],
+ "catalog": "us-equities",
+ "challenger_preferred": null,
+ "lane": "codex",
+ "layer_id": "backtesting-engine",
+ "limits": [
+  "Reviewed retained public receipts; did not rerun engines or verify private raw reports, historical data bytes, or broker sessions.",
+  "The GitHub cvxportfolio evidence URL failed through the web tool; its pinned raw.githubusercontent.com equivalent was successfully read.",
+  "The external independent parity-review record is not retained or hash-pinned in this checkout; its reported review count was not independently verified.",
+  "Non-adopted candidates have no retained evidence references in the packet, so none establishes a superior replacement."
+ ],
+ "model": {
+  "effort": "high",
+  "name": "gpt-6-astra"
+ },
+ "open_gaps": [
+  "SPY one_zero parity remains BLOCKED: four failed checks concern entry/exit prices and ending cash. Native ending cash differs from LEAN by -655.12 USD, explained by fill-price differences and unposted distributions.",
+  "Nautilus equity evidence is a local integration over 15 retained AAPL bars with synthetic close fills, unlimited modeled depth, and known corporate-action dates excluded.",
+  "Stressed costs, margin, adaptive state, realistic liquidity, and broader corporate-action semantics remain unqualified.",
+  "Causal historical availability, point-in-time universes, independent strategy validation, financing-inclusive performance, and deployable profitability are not established.",
+  "Broker-specific native failure recovery, IBKR acceptance, and continuous paper operation remain open; separate Alpaca receipts do not establish Nautilus adapter acceptance."
+ ],
+ "overturn_protocol": {
+  "arms": [
+   "Pinned NautilusTrader 2.0.0rc5 replay with supported native semantics or a newly preregistered mapping",
+   "Frozen LEAN one_zero historical oracle"
+  ],
+  "fixture_paths": [
+   "blueprints/us-equities/engine-nautilus/spy-parity/README.md",
+   "blueprints/us-equities/engine-nautilus/spy-parity/compare.py",
+   "blueprints/us-equities/engine-nautilus/spy-parity/mapping-manifest.json",
+   "blueprints/us-equities/engine-nautilus/spy-parity/tolerances.json"
+  ],
+  "metric": "Require a complete PASS with no skipped or failed checks: exact event times, quantities, fill prices, fees and distributions; cash and ending balances within 0.01 USD; exact final quantity and repeatable normalized economics. Do not widen tolerances after observing failures."
+ },
+ "overturn_when": "Execute the replay and comparison described in blueprints/us-equities/engine-nautilus/spy-parity/README.md using compare.py and the frozen tolerances.json. A complete PASS would remove the current equity-parity qualification. Continued failure after supported mapping work, or another engine passing the same frozen comparison while Nautilus fails, would justify reopening the destination choice; preserve LEAN as oracle throughout.",
+ "packet_sha256": "65b272aa624920fb0d86c6edff7d29a20085cff423608f026ce1f5795b948159",
+ "schema_version": 1,
+ "sources_read": [
+  "<host-path>/us-equities__backtesting-engine.json",
+  "<host-path>/SKILL.md",
+  "<host-path>/RTK.md",
+  "https://github.com/cvxgrp/cvxportfolio/blob/1.5.1/README.rst",
+  "https://raw.githubusercontent.com/cvxgrp/cvxportfolio/1.5.1/README.rst",
+  "blueprints/us-equities/engine/receipt.json",
+  "blueprints/us-equities/engine/README.md",
+  "blueprints/us-equities/engine/resolution-receipt.json",
+  "evidence/receipts/native-nautilus-v2-20260920.json",
+  "catalogs/us-equities/runtime-target.json",
+  "blueprints/us-equities/engine-nautilus/equity-replay/receipt.json",
+  "blueprints/us-equities/engine-nautilus/spy-parity/verdict.json",
+  "evidence/artifacts/comparison-progress-20260922/summary.json",
+  "blueprints/us-equities/engine-nautilus/spy-parity/README.md",
+  "blueprints/us-equities/engine-nautilus/spy-parity/mapping-manifest.json",
+  "blueprints/us-equities/engine-nautilus/spy-parity/tolerances.json",
+  "blueprints/us-equities/engine-nautilus/spy-parity/compare.py"
+ ],
+ "why_selected": "Select NautilusTrader as the qualified destination and LEAN as the retained oracle. evidence/receipts/native-nautilus-v2-20260920.json records native execution of the unchanged synthetic FX quickstart twice with exact decimal cash reconciliation. blueprints/us-equities/engine-nautilus/equity-replay/receipt.json adds local AAPL integration with repeatable baseline/stress economics and independently recomputed cash transitions. blueprints/us-equities/engine/receipt.json records LEAN's unchanged bundled sample completing with 3,943 data points and three simulated orders; resolution-receipt.json records the patched build preserving its order hash. The measured comparison in blueprints/us-equities/engine-nautilus/spy-parity/verdict.json remains BLOCKED with four failures, so this selection preserves the required architecture without claiming accepted equity parity.",
+ "winner_evidence_class": "local_integration",
+ "winner_evidence_refs": [
+  "evidence/receipts/native-nautilus-v2-20260920.json",
+  "catalogs/us-equities/runtime-target.json",
+  "blueprints/us-equities/engine-nautilus/equity-replay/receipt.json",
+  "blueprints/us-equities/engine-nautilus/spy-parity/verdict.json",
+  "blueprints/us-equities/engine/receipt.json",
+  "blueprints/us-equities/engine/resolution-receipt.json"
+ ],
+ "winner_keys": [
+  "c5",
+  "c4"
+ ]
+}

@@ -1,0 +1,751 @@
+{
+ "candidate_source": "sota_manifest_layer_entries",
+ "candidates": [
+  {
+   "adopted": true,
+   "card_limitations": [
+    "Native proof is one encode/decode fixture roundtrip, not generalized token savings. Not universally smaller than JSON, especially nested or irregular records. Not an order-message protocol replacement."
+   ],
+   "component_id": "foundation-toon",
+   "decisions": [],
+   "evidence_kind": "native_proven",
+   "evidence_refs": [
+    "evidence/receipts/component-history.json",
+    "evidence/receipts/portable-cli-artifacts.json"
+   ],
+   "key": "c1",
+   "name": "foundation-toon",
+   "pin": "v4.1.1",
+   "pin_behind_upstream": false,
+   "recipe_ref": "evidence/receipts/component-history.json",
+   "repository": "https://github.com/toon-format/toon",
+   "review_status": null,
+   "role": "Compact structured serialization",
+   "upstream": {
+    "archived": false,
+    "latest": "v4.1.1",
+    "license": "MIT",
+    "prerelease": false,
+    "pushed_at": "2026-09-03",
+    "released_at": "2026-08-05",
+    "renamed_to": null,
+    "stars": 25409
+   }
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "Vectorless does not mean zero model tokens; tree construction and reasoning have cost. Publisher benchmark is not this system\u2019s finance evaluation."
+   ],
+   "component_id": "foundation-pageindex",
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "https://github.com/VectifyAI/PageIndex/blob/9a8dd6658278fec90347e8ac3388a205305667a3/README.md",
+    "https://github.com/VectifyAI/PageIndex/releases/tag/v0.2.18"
+   ],
+   "key": "c2",
+   "name": "foundation-pageindex",
+   "pin": "v0.2.18",
+   "pin_behind_upstream": true,
+   "recipe_ref": null,
+   "repository": "https://github.com/VectifyAI/PageIndex",
+   "review_status": null,
+   "role": "Document-tree reasoning retrieval",
+   "upstream": {
+    "archived": false,
+    "latest": "v0.2.19",
+    "license": "MIT",
+    "prerelease": false,
+    "pushed_at": "2026-09-21",
+    "released_at": "2026-09-21",
+    "renamed_to": null,
+    "stars": 35804
+   }
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "GitHub latest sdk==0.4.4 is a different package; core graph pin comes from PyPI.",
+    "InMemorySaver loses state on restart; checkpoints are not a durable broker ledger.",
+    "Import command is installation smoke only, not a working agent."
+   ],
+   "component_id": "langgraph",
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "https://github.com/langchain-ai/langgraph/blob/sdk==0.4.4/README.md"
+   ],
+   "key": "c3",
+   "name": "langgraph",
+   "pin": "langgraph 1.2.11; separately released langgraph SDK0.4.4",
+   "pin_behind_upstream": true,
+   "recipe_ref": null,
+   "repository": "https://github.com/langchain-ai/langgraph",
+   "review_status": null,
+   "role": "Explicit agent-state graph and checkpoints",
+   "upstream": {
+    "archived": false,
+    "latest": "1.2.12",
+    "license": "MIT",
+    "prerelease": false,
+    "pushed_at": "2026-09-21",
+    "released_at": "2026-09-21",
+    "renamed_to": null,
+    "stars": 42132
+   }
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "Current upstream0.29.0 installed and CLI passed, but GPU startup failed with UVA unavailable on the recorded WSL host. Active0.25.0 restored.",
+    "The0.25pin is compatible, not latest; do not generalize host failure to all Linux.",
+    "This catalog adds no model, inference or serving benchmark."
+   ],
+   "component_id": "vllm",
+   "decisions": [],
+   "evidence_kind": "native_proven",
+   "evidence_refs": [
+    "evidence/receipts/vllm-compatibility.json",
+    "evidence/receipts/desktop-direct-rag.json"
+   ],
+   "key": "c4",
+   "name": "vllm",
+   "pin": "active0.25.0 (702f4814fe54fabff350d43cb753ae3e47c0c276); latest0.29.0",
+   "pin_behind_upstream": true,
+   "recipe_ref": "recipes/README.md",
+   "repository": "https://github.com/vllm-project/vllm",
+   "review_status": null,
+   "role": "Existing local GPU serving runtime",
+   "upstream": {
+    "archived": false,
+    "latest": "v0.30.0",
+    "license": "Apache-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "released_at": "2026-09-22",
+    "renamed_to": null,
+    "stars": 92429
+   }
+  },
+  {
+   "adopted": false,
+   "card_limitations": [],
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": null,
+   "evidence_refs": [],
+   "key": "c5",
+   "name": "loopx-project/loopx",
+   "newcomer": true,
+   "note": "A long-running bounded research worker that survives restarts and quota exhaustion under LoopX where the current coordinator loses state, with gate semantics kept strictly out of broker-action authority.",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": null,
+   "repository": "https://github.com/loopx-project/loopx",
+   "review_status": null,
+   "role": null,
+   "upstream": null
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "Latest GitHub release v3.8.50 differs from default development branch release/v3.8.51; do not label development head installed.",
+    "Native /v1/responses is documented, but gateway Astra was unverified; historical exact Opus and local Qwen evidence is dated.",
+    "Codex executor strips max_output_tokens; this is not an enforceable gateway token budget.",
+    "Thinking passthrough and optional sessionAffinityTtlMs preserve different semantics; affinity is not a cost proof.",
+    "Response caching, compression and extra memory/skill injection remain off for the baseline; headline reduction claims are not measured savings.",
+    "Subsequent supported CODEX_CLIENT_VERSION alignment and native login enabled an exact Astra text response; 136 tokens reported for completed request only, prior submitted failed usage unknown."
+   ],
+   "component_id": "omniroute",
+   "decisions": [],
+   "evidence_kind": "native_proven",
+   "evidence_refs": [
+    "blueprints/us-equities/routing/health-receipt.json",
+    "blueprints/us-equities/routing/README.md",
+    "blueprints/us-equities/routing/astra-receipt.json"
+   ],
+   "key": "c6",
+   "name": "omniroute",
+   "pin": "v3.8.50",
+   "pin_behind_upstream": false,
+   "recipe_ref": "docs/foundation-stack.md",
+   "repository": "https://github.com/diegosouzapw/OmniRoute",
+   "review_status": null,
+   "role": "Optional explicit provider gateway",
+   "upstream": {
+    "archived": false,
+    "latest": "v3.8.50",
+    "license": "MIT",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "released_at": "2026-08-26",
+    "renamed_to": null,
+    "stars": 69169
+   }
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "Lifecycle capture is bounded sanitized observations, not complete transcripts. Durable writes require explicit intent; recalled prose cannot authorize actions."
+   ],
+   "component_id": "foundation-ai-memory",
+   "decisions": [],
+   "evidence_kind": "native_proven",
+   "evidence_refs": [
+    "evidence/receipts/native-memory.json",
+    "evidence/receipts/desktop-direct-rag.json",
+    "evidence/receipts/component-history.json"
+   ],
+   "key": "c7",
+   "name": "ai-memory",
+   "pin": "v2.3.1",
+   "pin_behind_upstream": true,
+   "recipe_ref": "evidence/receipts/native-memory.json",
+   "repository": "https://github.com/akitaonrails/ai-memory",
+   "review_status": null,
+   "role": "Cross-harness project memory and handoffs",
+   "upstream": {
+    "archived": false,
+    "latest": "v2.4.0",
+    "license": "MIT",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "released_at": "2026-09-21",
+    "renamed_to": null,
+    "stars": 8014
+   }
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "Compression omits implementation detail and is not adequate evidence for correctness."
+   ],
+   "component_id": "foundation-repomix",
+   "decisions": [],
+   "evidence_kind": "native_proven",
+   "evidence_refs": [
+    "evidence/receipts/component-history.json",
+    "evidence/receipts/portable-cli-artifacts.json"
+   ],
+   "key": "c8",
+   "name": "foundation-repomix",
+   "pin": "v1.18.0",
+   "pin_behind_upstream": true,
+   "recipe_ref": "evidence/receipts/component-history.json",
+   "repository": "https://github.com/yamadashy/repomix",
+   "review_status": null,
+   "role": "Selected-file handoff bundles",
+   "upstream": {
+    "archived": false,
+    "latest": "v1.18.1",
+    "license": "MIT",
+    "prerelease": false,
+    "pushed_at": "2026-09-21",
+    "released_at": "2026-09-21",
+    "renamed_to": null,
+    "stars": 28461
+   }
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "Installed development snapshot differs from latest stable v1.7.0. Static correctness still requires original source inspection."
+   ],
+   "component_id": "foundation-serena",
+   "decisions": [],
+   "evidence_kind": "native_proven",
+   "evidence_refs": [
+    "evidence/receipts/native-context-memory.json",
+    "evidence/receipts/component-history.json"
+   ],
+   "key": "c9",
+   "name": "Serena",
+   "pin": "v1.7.0",
+   "pin_behind_upstream": false,
+   "recipe_ref": "evidence/receipts/native-context-memory.json",
+   "repository": "https://github.com/oraios/serena",
+   "review_status": null,
+   "role": "Language-server symbol and reference retrieval",
+   "upstream": {
+    "archived": false,
+    "latest": "v1.7.0",
+    "license": "NOASSERTION",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "released_at": "2026-08-09",
+    "renamed_to": null,
+    "stars": 29712
+   }
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "No GitHub release object; v0.8.6 is the documented tag. Build is not database extension activation.",
+    "Adds no benefit to current Qdrant code index unless a specific SQL integration need is established."
+   ],
+   "component_id": "foundation-pgvector",
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "https://github.com/pgvector/pgvector/blob/efa08fda9ec485d80292d0487a77939c087dedcc/README.md"
+   ],
+   "key": "c10",
+   "name": "foundation-pgvector",
+   "pin": "v0.8.6 documented tag; reviewed HEAD efa08fda9ec485d80292d0487a77939c087dedcc",
+   "pin_behind_upstream": false,
+   "recipe_ref": null,
+   "repository": "https://github.com/pgvector/pgvector",
+   "review_status": null,
+   "role": "Vector search inside PostgreSQL",
+   "upstream": {
+    "archived": false,
+    "latest": "v0.8.6",
+    "license": "NOASSERTION",
+    "prerelease": null,
+    "pushed_at": "2026-09-10",
+    "released_at": null,
+    "renamed_to": null,
+    "stars": 23121
+   }
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "Counters estimate context reduction, not provider billing savings.",
+    "Restart acceptance proves 11 direct Desktop Context Mode tools and correlated parent logs. The historical ephemeral SDK ctx_execute_file scope/new-registration approval caveat remains separate."
+   ],
+   "component_id": "foundation-context-mode",
+   "decisions": [],
+   "evidence_kind": "native_proven",
+   "evidence_refs": [
+    "evidence/receipts/native-context-memory.json",
+    "evidence/receipts/artifact-reductions.json",
+    "evidence/receipts/component-history.json",
+    "blueprints/us-equities/workers/receipt.json",
+    "observability/restart-receipt.json"
+   ],
+   "key": "c11",
+   "name": "Context Mode",
+   "pin": "v1.0.169",
+   "pin_behind_upstream": false,
+   "recipe_ref": "evidence/receipts/native-context-memory.json",
+   "repository": "https://github.com/mksglu/context-mode",
+   "review_status": null,
+   "role": "Execute large outputs locally and retrieve bounded relevant results",
+   "upstream": {
+    "archived": false,
+    "latest": "v1.0.169",
+    "license": "NOASSERTION",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "released_at": "2026-06-29",
+    "renamed_to": null,
+    "stars": 23936
+   }
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "AGPL obligations or commercial license apply to relevant deployments. The lmstudio setting in this profile targets local vLLM; it does not require LM Studio.",
+    "Embedding dimension/model changes require deliberate reindexing; no automatic linked-project expansion."
+   ],
+   "component_id": "foundation-socraticode",
+   "decisions": [],
+   "evidence_kind": "native_proven",
+   "evidence_refs": [
+    "evidence/receipts/native-rag.json",
+    "evidence/receipts/desktop-direct-rag.json",
+    "evidence/receipts/artifact-reductions.json",
+    "evidence/receipts/component-history.json",
+    "evidence/receipts/vllm-compatibility.json"
+   ],
+   "key": "c12",
+   "name": "SocratiCode",
+   "pin": "v1.14.0",
+   "pin_behind_upstream": false,
+   "recipe_ref": "evidence/receipts/native-rag.json",
+   "repository": "https://github.com/giancarloerra/SocratiCode",
+   "review_status": null,
+   "role": "Automatic semantic code indexing and graph context",
+   "upstream": {
+    "archived": false,
+    "latest": "v1.14.0",
+    "license": "AGPL-3.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "released_at": "2026-09-16",
+    "renamed_to": null,
+    "stars": 3318
+   }
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "RTK estimated token counters are not native provider usage or an independent quality benchmark."
+   ],
+   "component_id": "foundation-rtk",
+   "decisions": [],
+   "evidence_kind": "native_proven",
+   "evidence_refs": [
+    "evidence/receipts/native-context-memory.json",
+    "evidence/receipts/artifact-reductions.json",
+    "evidence/receipts/component-history.json"
+   ],
+   "key": "c13",
+   "name": "RTK",
+   "pin": "v0.49.0",
+   "pin_behind_upstream": false,
+   "recipe_ref": "evidence/receipts/native-context-memory.json",
+   "repository": "https://github.com/rtk-ai/rtk",
+   "review_status": null,
+   "role": "Compact supported CLI output",
+   "upstream": {
+    "archived": false,
+    "latest": "v0.49.0",
+    "license": "Apache-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-21",
+    "released_at": "2026-09-11",
+    "renamed_to": null,
+    "stars": 81419
+   }
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "A static call graph cannot resolve every dynamic runtime dependency."
+   ],
+   "component_id": "foundation-codebase-memory-mcp",
+   "decisions": [],
+   "evidence_kind": "native_proven",
+   "evidence_refs": [
+    "evidence/receipts/native-cli-gaps.json",
+    "evidence/receipts/component-history.json",
+    "evidence/receipts/desktop-cli-workflows.json"
+   ],
+   "key": "c14",
+   "name": "foundation-codebase-memory-mcp",
+   "pin": "v0.11.0",
+   "pin_behind_upstream": false,
+   "recipe_ref": "evidence/receipts/native-cli-gaps.json",
+   "repository": "https://github.com/DeusData/codebase-memory-mcp",
+   "review_status": null,
+   "role": "Static code graph fallback",
+   "upstream": {
+    "archived": false,
+    "latest": "v0.11.0",
+    "license": "MIT",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "released_at": "2026-09-15",
+    "renamed_to": null,
+    "stars": 44144
+   }
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "Canonical repository is getzep/graphiti. Temporal graph assertions still require source timestamps and correction history.",
+    "Default examples use model API credentials; no graph deployment or extraction accuracy proof here."
+   ],
+   "component_id": "foundation-graphiti",
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "https://github.com/getzep/graphiti/blob/de8eb5b896c05ed1b5b329d4cb52015446d65e21/README.md",
+    "https://github.com/getzep/graphiti/releases/tag/v0.30.2"
+   ],
+   "key": "c15",
+   "name": "Graphiti",
+   "pin": "v0.30.2",
+   "pin_behind_upstream": false,
+   "recipe_ref": null,
+   "repository": "https://github.com/getzep/graphiti",
+   "review_status": null,
+   "role": "Temporal knowledge graph for sourced relationships",
+   "upstream": {
+    "archived": false,
+    "latest": "v0.30.2",
+    "license": "Apache-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-21",
+    "released_at": "2026-09-08",
+    "renamed_to": null,
+    "stars": 31076
+   }
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "Installed code search does not imply a financial-doc corpus exists. Enforce as-of/source/tenant metadata in future corpora."
+   ],
+   "component_id": "foundation-qdrant",
+   "decisions": [],
+   "evidence_kind": "native_proven",
+   "evidence_refs": [
+    "evidence/receipts/native-rag.json"
+   ],
+   "key": "c16",
+   "name": "Qdrant",
+   "pin": "v1.19.1",
+   "pin_behind_upstream": false,
+   "recipe_ref": "evidence/receipts/native-rag.json",
+   "repository": "https://github.com/qdrant/qdrant",
+   "review_status": null,
+   "role": "Local dense/sparse vector index",
+   "upstream": {
+    "archived": false,
+    "latest": "v1.19.1",
+    "license": "Apache-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "released_at": "2026-09-04",
+    "renamed_to": null,
+    "stars": 34752
+   }
+  },
+  {
+   "adopted": false,
+   "card_limitations": [],
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": null,
+   "evidence_refs": [],
+   "key": "c17",
+   "name": "gastownhall/beads",
+   "newcomer": true,
+   "note": "A multi-unit trading task where dependency-aware ready/blocked state measurably reduces rework versus the current coordinator, with initialization confined to non-instruction files.",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": null,
+   "repository": "https://github.com/gastownhall/beads",
+   "review_status": null,
+   "role": null,
+   "upstream": null
+  },
+  {
+   "adopted": false,
+   "card_limitations": [],
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": null,
+   "evidence_refs": [],
+   "key": "c18",
+   "name": "jdx/mise",
+   "newcomer": true,
+   "note": "A reproduction of the Nautilus and research runtimes from a single mise config that matches the recorded interpreter and package pins exactly, with no machine-wide bootstrap.",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": null,
+   "repository": "https://github.com/jdx/mise",
+   "review_status": null,
+   "role": null,
+   "upstream": null
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "Predecessor zed-industries/codex-acp directs new installs here.",
+    "Do not map an advertised model choice to present quota availability.",
+    "One real embedded ACP research prompt completed; no full planner/UI or persistent DeerFlow service was accepted.",
+    "ACP 1.12.0 mode ID read-only maps to workspaceWrite/on-request, not strict filesystem read-only. Use the official native SDK for enforced read-only research."
+   ],
+   "component_id": "codex-acp",
+   "decisions": [],
+   "evidence_kind": "native_proven",
+   "evidence_refs": [
+    "blueprints/us-equities/deerflow/native-receipt.json",
+    "blueprints/us-equities/deerflow/research-receipt.json"
+   ],
+   "key": "c19",
+   "name": "codex-acp",
+   "pin": "v1.12.0",
+   "pin_behind_upstream": false,
+   "recipe_ref": "blueprints/us-equities/deerflow/native-receipt.json",
+   "repository": "https://github.com/agentclientprotocol/codex-acp",
+   "review_status": null,
+   "role": "ACP adapter to native Codex app-server",
+   "upstream": {
+    "archived": false,
+    "latest": "v1.12.0",
+    "license": "NOASSERTION",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "released_at": "2026-09-15",
+    "renamed_to": null,
+    "stars": 397
+   }
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "CLI0.155.1 and Python SDK0.154.0 are distinct pins; released SDK otherwise chooses its bundled runtime.",
+    "Native research task passed, but configured model/provider are not independent per-request attestation.",
+    "Context Mode ctx_execute_file workspace failed in ephemeral SDK plugin transport; custom registration required approval and remained blocked. Failed-turn usage is retained.",
+    "A turn-stream deadline is not a full-process timeout or a provider spending cap."
+   ],
+   "component_id": "codex-native-sdk",
+   "decisions": [],
+   "evidence_kind": "native_proven",
+   "evidence_refs": [
+    "blueprints/us-equities/workers/receipt.json",
+    "blueprints/us-equities/workers/policy.md"
+   ],
+   "key": "c20",
+   "name": "codex-native-sdk",
+   "pin": "CLI rust-v0.155.1; Python openai-codex 0.154.0",
+   "pin_behind_upstream": false,
+   "recipe_ref": "blueprints/us-equities/workers/receipt.json",
+   "repository": "https://github.com/openai/codex",
+   "review_status": null,
+   "role": "Native Codex CLI and Python app-server SDK",
+   "upstream": {
+    "archived": false,
+    "latest": "rust-v0.155.1",
+    "license": "Apache-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "released_at": "2026-09-18",
+    "renamed_to": null,
+    "stars": 125923
+   }
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "Latest stable release is v2.0.0 (2026-06-25); examined development commit reports backend2.1.0-rc0 and includes newer integration surfaces.",
+    "Do not reuse raw native OAuth stores through its separate model-provider adapters.",
+    "No standing service, production scheduler or provider-token saving demonstrated.",
+    "One real embedded ACP research prompt completed; no full planner/UI or persistent DeerFlow service was accepted.",
+    "ACP 1.12.0 mode ID read-only maps to workspaceWrite/on-request, not strict filesystem read-only. Use the official native SDK for enforced read-only research."
+   ],
+   "component_id": "deerflow",
+   "decisions": [],
+   "evidence_kind": "native_proven",
+   "evidence_refs": [
+    "blueprints/us-equities/deerflow/native-receipt.json",
+    "blueprints/us-equities/deerflow/research-receipt.json"
+   ],
+   "key": "c21",
+   "name": "deerflow",
+   "pin": "stable v2.0.0; discovery commit 42334f26d7025d905678f9075b079fc65f9beaf9 (2.1.0-rc0)",
+   "pin_behind_upstream": false,
+   "recipe_ref": "blueprints/us-equities/deerflow/native-receipt.json",
+   "repository": "https://github.com/bytedance/deer-flow",
+   "review_status": null,
+   "role": "Optional research application and subagent host",
+   "upstream": {
+    "archived": false,
+    "latest": "v2.0.0",
+    "license": "MIT",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "released_at": "2026-06-25",
+    "renamed_to": null,
+    "stars": 82848
+   }
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "427 examples across 25 repositories are not a financial-document benchmark. Large-project concentration and no-gold cases affect interpretation.",
+    "No benchmark download/evaluation performed; freezing source and budgets is required."
+   ],
+   "component_id": "foundation-agent-retrieval-bench",
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "https://github.com/eyuansu62/agent-retrieval-bench/blob/07014c986f3deadb1548c62b32c0ffbe6a81465d/README.md",
+    "https://github.com/eyuansu62/agent-retrieval-bench/releases/tag/v0.2.1"
+   ],
+   "key": "c22",
+   "name": "foundation-agent-retrieval-bench",
+   "pin": "v0.2.1",
+   "pin_behind_upstream": false,
+   "recipe_ref": null,
+   "repository": "https://github.com/eyuansu62/agent-retrieval-bench",
+   "review_status": null,
+   "role": "File-level agent retrieval evaluation",
+   "upstream": {
+    "archived": false,
+    "latest": "v0.2.1",
+    "license": "MIT",
+    "prerelease": false,
+    "pushed_at": "2026-08-04",
+    "released_at": "2026-07-26",
+    "renamed_to": null,
+    "stars": 8
+   }
+  }
+ ],
+ "catalog": "us-equities",
+ "checked_at": "2026-09-22",
+ "enums": {
+  "disposition": [
+   "conditional",
+   "measured_tradeoff",
+   "observed_failure",
+   "out_of_scope",
+   "overlap",
+   "selected",
+   "unqualified"
+  ],
+  "evidence_class": [
+   "local_integration",
+   "measured_comparison",
+   "native_proven",
+   "source_review",
+   "synthetic"
+  ]
+ },
+ "existing_overturn_when": "Run a preregistered, representative held-out financial/document and code retrieval set at the same context budget; replace or supplement a lane only if a candidate improves source/answer fidelity, abstention and measured task cost while preserving isolation, exact source recovery and native client behavior.",
+ "group": "foundation-memory",
+ "layer_id": "agents-models-workers",
+ "layer_scope_terms": [
+  "native-workers",
+  "agent-orchestration",
+  "agent-protocol",
+  "sdk",
+  "routing",
+  "memory-retrieval",
+  "durable-memory",
+  "continuity",
+  "handoff",
+  "code-rag",
+  "code-retrieval",
+  "token-efficiency",
+  "tool-output",
+  "vector-storage"
+ ],
+ "limitations": [
+  "Twelve curated queries are a bounded diagnostic, not an independent holdout or a complete financial RAG evaluation. Exact-source recall at three was 8/12; misses remain recorded.",
+  "The eight native answer invocations form four within-provider task comparisons; two Claude full-context answers missed the word protocol and one focused Codex answer scored 9.5 versus 10. These are not general or causal savings results.",
+  "Same-host encrypted restore preserved application state, but independent key recovery, off-host durability and new-host client rebinding remain unqualified.",
+  "Alternative memory and RAG repositories below were generally source-reviewed, not run head-to-head. A source-only candidate has not failed.",
+  "Current primary-source review corrects manual-only, Claude-only and cloud-only exclusions. No matched memory benchmark or new installation was run; automatic capture, local providers and published scores remain source claims until exercised on the selected profile.",
+  "The us-equities catalog also tags entries for this taxonomy layer under agents-operations (10); foundation-memory (28) was picked as the primary group by entry count."
+ ],
+ "requirement": "Keep durable project knowledge, exact code and dated financial sources retrievable across native clients, with source recovery, explicit project scope and measurable retrieval quality.",
+ "requirement_note": "The requirement, limitations and existing_overturn_when text is shared by this layer's group; judge fit against the layer title and layer_scope_terms.",
+ "rules": [
+  "Judge from retained evidence. Open the evidence_refs of every adopted candidate (bounded: the referenced file or its relevant section) and record every path you opened in sources_read. Do not rely on memory of the repositories.",
+  "The winner set is 1-3 adopted candidates (adopted == true) that best satisfy the requirement on the evidence. why_selected must cite at least one evidence path and state what was actually observed (native execution, measured comparison, local integration, synthetic fixture or source review), not what the project claims.",
+  "Every adopted non-winner candidate appears in alternatives with a why_not_default that states the concrete evidence gap or trade-off; add non-adopted candidates only with the same standard.",
+  "If a non-adopted candidate would satisfy the requirement better on the evidence, do not select it: record it in challenger_preferred with the comparison (a fixtures/, blueprints/ or tests/ path, or a python3/node command) that would establish it. Agreement between lanes never promotes; only an executed comparison can.",
+  "overturn_when names the concrete check that would change the verdict (a fixtures/, blueprints/ or tests/ path or a runnable python3/node command). open_gaps lists what the evidence does not establish. limits lists what you could not read or verify. Do not invent paths, numbers or results; leave evidence_refs empty rather than guess."
+ ],
+ "schema_version": 1,
+ "sota_components_not_in_candidates": [],
+ "title": "Agents, models and workers",
+ "withheld": [
+  "current_choice",
+  "decision",
+  "rationale",
+  "candidates[].disposition",
+  "candidates[].rationale",
+  "candidates[].card_rationale",
+  "candidates[].card_decision",
+  "candidates[].review_status"
+ ]
+}

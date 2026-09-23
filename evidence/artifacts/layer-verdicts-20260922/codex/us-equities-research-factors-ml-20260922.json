@@ -1,0 +1,318 @@
+{
+ "alternatives": [
+  {
+   "disposition": "conditional",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "evidence/receipts/native-cli-gaps.json",
+    "evidence/receipts/component-history.json",
+    "evidence/receipts/desktop-cli-workflows.json"
+   ],
+   "key": "c1",
+   "name": "foundation-qmd",
+   "repository": "https://github.com/tobi/qmd",
+   "why_not_default": "Native BM25 search/get succeeded on engineering documentation. The receipts do not measure financial-document retrieval quality, historical availability filtering or factor evaluation."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [],
+   "key": "c2",
+   "name": "data-arcticdb",
+   "repository": "https://github.com/man-group/ArcticDB",
+   "why_not_default": "The pinned README could not be retrieved. No retained execution reference establishes revision-preserving financial research storage or historical availability semantics."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [],
+   "key": "c3",
+   "name": "data-sktime",
+   "repository": "https://github.com/sktime/sktime",
+   "why_not_default": "The pinned README could not be retrieved, and no candidate receipt demonstrates chronological equity evaluation. Skfolio has retained execution on a frozen control study."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "https://raw.githubusercontent.com/stefan-jansen/alphalens-reloaded/f0a07c22d554e4b4036983cc80320b432714fe7e/README.md"
+   ],
+   "key": "c4",
+   "name": "alphalens-reloaded",
+   "repository": "https://github.com/stefan-jansen/alphalens-reloaded",
+   "why_not_default": "The pinned README documents factor returns, IC and turnover diagnostics, but there is no executed comparison on retained causal equity inputs. Forward-return construction and tear sheets alone do not establish net portfolio results."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "https://github.com/amazon-science/chronos-forecasting/blob/v2.3.2/README.md"
+   ],
+   "key": "c5",
+   "name": "chronos",
+   "repository": "https://github.com/amazon-science/chronos-forecasting",
+   "why_not_default": "The pinned README supplies forecasting interfaces and generic benchmark claims; no retained equity inference, chronological comparison or cost-adjusted forecast result establishes superiority."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [],
+   "key": "c6",
+   "name": "data-tsfresh",
+   "repository": "https://github.com/blue-yonder/tsfresh",
+   "why_not_default": "The pinned README could not be retrieved. No execution receipt demonstrates causal feature windows, fold-local selection or incremental financial predictive value."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "blueprints/us-equities/deerflow/native-receipt.json",
+    "blueprints/us-equities/deerflow/research-receipt.json"
+   ],
+   "key": "c7",
+   "name": "deerflow",
+   "repository": "https://github.com/bytedance/deer-flow",
+   "why_not_default": "One embedded native evidence-review prompt returned correct receipt counts. Full research orchestration, durable recovery and comparative research quality remain untested; the recorded ACP read-only mode did not enforce strict filesystem read-only access."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "evidence/receipts/vllm-compatibility.json",
+    "evidence/receipts/desktop-direct-rag.json"
+   ],
+   "key": "c8",
+   "name": "vllm",
+   "repository": "https://github.com/vllm-project/vllm",
+   "why_not_default": "Restored 0.25.0 supported a successful code-retrieval call after 0.29.0 failed GPU startup with UVA unavailable on the recorded host. This establishes bounded serving compatibility, not financial-model quality or a research comparison."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "https://github.com/deepset-ai/haystack/releases/tag/v3.1.1"
+   ],
+   "key": "c9",
+   "name": "foundation-haystack",
+   "repository": "https://github.com/deepset-ai/haystack",
+   "why_not_default": "The release page was accessible, but the pinned README was unavailable. No retained financial corpus pipeline, retrieval-quality comparison or historical-information gate was executed."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "https://raw.githubusercontent.com/online-ml/river/64285b9dd6c606804753235fe992bcf25b9856ee/README.md"
+   ],
+   "key": "c10",
+   "name": "data-river",
+   "repository": "https://github.com/online-ml/river",
+   "why_not_default": "The README demonstrates sequential prediction and immediate updates on a phishing dataset. It does not establish delayed financial-label handling, correction/restart behavior or cost-adjusted equity performance."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [],
+   "key": "c12",
+   "name": "data-statsforecast",
+   "repository": "https://github.com/Nixtla/statsforecast",
+   "why_not_default": "The pinned README could not be retrieved, and the packet supplies no native equity forecast or rolling baseline comparison."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "https://github.com/docling-project/docling/blob/890dd42d017497c955a56a1d2cfc3f0af5bc2aa9/README.md",
+    "https://github.com/docling-project/docling/releases/tag/v2.129.0"
+   ],
+   "key": "c14",
+   "name": "foundation-docling",
+   "repository": "https://github.com/docling-project/docling",
+   "why_not_default": "Source review identifies document conversion and table/OCR interfaces, but no retained financial table, unit or filing extraction comparison was executed. EdgarTools has narrower filing-specific native acceptance."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [],
+   "key": "c15",
+   "name": "arch",
+   "repository": "https://github.com/bashtage/arch",
+   "why_not_default": "The pinned README could not be retrieved. The packet supplies no executed volatility, bootstrap or multiple-comparison analysis on retained research results."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "https://raw.githubusercontent.com/ray-project/ray/ray-2.58.0/README.rst"
+   ],
+   "key": "c17",
+   "name": "ray-serve",
+   "repository": "https://github.com/ray-project/ray",
+   "why_not_default": "The README describes distributed compute and serving interfaces. No retained workload demonstrates a scaling bottleneck, distributed performance advantage or failover acceptance for this research layer."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "https://github.com/google-research/timesfm/blob/v3.0.0/README.md"
+   ],
+   "key": "c18",
+   "name": "timesfm",
+   "repository": "https://github.com/google-research/timesfm",
+   "why_not_default": "No equity inference or cost-aware comparison was retained. The pinned README also distinguishes the restricted 3.0 pretrained weights from earlier weights, requiring model-specific deployment qualification."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "evidence/receipts/component-history.json",
+    "evidence/receipts/portable-cli-artifacts.json"
+   ],
+   "key": "c19",
+   "name": "foundation-markitdown",
+   "repository": "https://github.com/microsoft/markitdown",
+   "why_not_default": "Native HTML conversion and heading preservation were observed. Financial extraction fidelity, PDF/Office behavior and historical filing provenance were not established."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [],
+   "key": "c20",
+   "name": "statsmodels",
+   "repository": "https://github.com/statsmodels/statsmodels",
+   "why_not_default": "The pinned README could not be retrieved. No retained candidate execution establishes equity regression diagnostics, dependence-aware inference or incremental predictive value."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "https://github.com/huggingface/sentence-transformers/releases/tag/v6.1.0"
+   ],
+   "key": "c21",
+   "name": "foundation-sentence-transformers",
+   "repository": "https://github.com/huggingface/sentence-transformers",
+   "why_not_default": "The release notes describe input-handling changes, including changes that can affect embeddings or scores. The pinned README was unavailable, and no financial retrieval benchmark or current serving compatibility comparison was retained."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "blueprints/us-equities/research-evaluation/receipt.json"
+   ],
+   "key": "c22",
+   "name": "scikit-learn",
+   "repository": "https://github.com/scikit-learn/scikit-learn",
+   "why_not_default": "The evaluation receipt records its installed version, but does not establish an independently exercised predictive baseline or fold-local preprocessing comparison. The candidate's pinned README was unavailable."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "https://github.com/microsoft/qlib/blob/v0.9.7/README.md"
+   ],
+   "key": "c24",
+   "name": "Qlib",
+   "repository": "https://github.com/microsoft/qlib",
+   "why_not_default": "The README describes financial research workflows and datasets covering US and China markets. No retained US-equity execution demonstrates causal data handling, matching cost semantics or reconciliation with the selected execution destination."
+  }
+ ],
+ "catalog": "us-equities",
+ "challenger_preferred": null,
+ "lane": "codex",
+ "layer_id": "research-factors-ml",
+ "limits": [
+  "This verdict reviews retained receipts and bounded source sections; it does not rerun native libraries, models, acquisitions or broker execution.",
+  "Context-mode file access was incorrectly scoped to its plugin directory. Permitted read-only shell access was used for local evidence.",
+  "The pinned README references for c2, c3, c6, c9, c11, c12, c15, c20, c21 and c22 remained unavailable through both GitHub and raw-source web access. Shell retrieval also failed DNS resolution. Their attempted original references are listed in sources_read; they are not claimed as successfully reviewed source contents.",
+  "GitHub blob failures for c4, c10, c17 and c23 were recovered through raw URLs at the same revisions.",
+  "Private raw logs, datasets and installed runtime environments were not accessed or independently reverified. Public receipt assertions remain historical evidence.",
+  "Upstream release metadata was not comprehensively refreshed. Readable README examples and release notes are source review, not executed acceptance."
+ ],
+ "model": {
+  "effort": "high",
+  "name": "gpt-6-astra"
+ },
+ "open_gaps": [
+  "No winner establishes a complete factor/ML pipeline through NautilusTrader, broker-specific execution, deterministic risk enforcement and independently reconciled accounting.",
+  "Skfolio acceptance covers chronological splitting in a project-local raw-price label study. It excludes dividend-inclusive returns, financing, realistic fills, capacity and portfolio cash reconciliation.",
+  "The reserved 2021Q1 segment has been inspected and cannot become a fresh untouched holdout. The selected momentum20 diagnostic was below equalweight on the reported reserved mean net cost-proxy label.",
+  "EdgarTools acquisition and parsing do not establish original historical information availability, complete filing narratives, a point-in-time security universe or predictive catalyst quality.",
+  "No retained comparison establishes superiority among the forecasting, feature-extraction, econometric or financial-NLP alternatives.",
+  "The non-adopted candidates c13 and c16 have no evidence_refs. Their packet notes do not establish an executed defect-finding or forecast-superiority comparison.",
+  "The broad-universe protocol records historical availability, identity and survivorship assumptions. Its reserved period must not be reused as untouched for a newly designed challenger."
+ ],
+ "overturn_protocol": {
+  "arms": [
+   "Current skfolio WalkForward evaluation with the frozen cash, equalweight and momentum controls.",
+   "An adopted alternative evaluator using identical input hashes, decision times, label intervals, training-only selection and cost assumptions.",
+   "For filing ingestion, EdgarTools and a proposed alternative on identical retained filing bytes and historical/current-observation cutoffs."
+  ],
+  "fixture_paths": [
+   "blueprints/us-equities/research-evaluation/plan.json",
+   "blueprints/us-equities/research-evaluation/evaluate.py",
+   "blueprints/us-equities/catalyst-provenance/receipt.json",
+   "blueprints/us-equities/catalyst-provenance/access-resolution.json",
+   "blueprints/us-equities/broad-universe/protocol.json"
+  ],
+  "metric": "First require matching input hashes, selections and label outputs, no training label exit at or after its evaluation cutoff, and correct filing quarantine/availability decisions. Replace a component only after an executed comparison demonstrates a reproducible correctness or capability advantage under those constraints. Any predictive promotion additionally requires a newly preregistered chronological evaluation with cost-adjusted excess over matched controls and dependence-aware uncertainty."
+ },
+ "overturn_when": "Reopen this selection if an executed comparison against blueprints/us-equities/research-evaluation/evaluate.py under blueprints/us-equities/research-evaluation/plan.json exposes a temporal or numeric defect, or an alternative preserves its exact information contract while demonstrating a measured capability advantage. Reopen the filing choice if the retained cases in blueprints/us-equities/catalyst-provenance/receipt.json and blueprints/us-equities/catalyst-provenance/access-resolution.json reveal incorrect parsing or availability decisions that another implementation resolves. Forecast superiority requires a separately frozen comparison based on blueprints/us-equities/broad-universe/protocol.json; lane agreement alone is insufficient.",
+ "packet_sha256": "1a8113b9db33a65c1d227250e4715b3fa60adf4d54f7c9142ac8d340d0bce312",
+ "schema_version": 1,
+ "sources_read": [
+  "<host-path>/RTK.md",
+  "<host-path>/SKILL.md",
+  "<host-path>/us-equities__research-factors-ml.json",
+  "evidence/receipts/native-cli-gaps.json",
+  "evidence/receipts/component-history.json",
+  "evidence/receipts/desktop-cli-workflows.json",
+  "evidence/receipts/vllm-compatibility.json",
+  "evidence/receipts/desktop-direct-rag.json",
+  "evidence/receipts/portable-cli-artifacts.json",
+  "blueprints/us-equities/deerflow/native-receipt.json",
+  "blueprints/us-equities/deerflow/research-receipt.json",
+  "blueprints/us-equities/catalyst-provenance/receipt.json",
+  "blueprints/us-equities/catalyst-provenance/access-resolution.json",
+  "blueprints/us-equities/research-evaluation/receipt.json",
+  "blueprints/us-equities/research-evaluation/plan.json",
+  "blueprints/us-equities/research-evaluation/evaluate.py",
+  "blueprints/us-equities/broad-universe/protocol.json",
+  "https://github.com/man-group/ArcticDB/blob/e620d8572a1e62c9ec07df8cbc8f5c432cd84325/README.md",
+  "https://github.com/sktime/sktime/blob/918fa838d99eb3703fe9bc963891619608aa35b4/README.md",
+  "https://github.com/stefan-jansen/alphalens-reloaded/blob/f0a07c22d554e4b4036983cc80320b432714fe7e/README.md",
+  "https://github.com/amazon-science/chronos-forecasting/blob/v2.3.2/README.md",
+  "https://github.com/blue-yonder/tsfresh/blob/6aa24fdef7e3c3f48b19482535693f5796f2b598/README.md",
+  "https://github.com/deepset-ai/haystack/blob/b717d00654af0dc405e5cec35546d734c832042f/README.md",
+  "https://github.com/deepset-ai/haystack/releases/tag/v3.1.1",
+  "https://github.com/online-ml/river/blob/64285b9dd6c606804753235fe992bcf25b9856ee/README.md",
+  "https://github.com/dgunning/edgartools/blob/abe44344c56cf4bfb5443e0debca7e39342f6e7a/README.md",
+  "https://github.com/Nixtla/statsforecast/blob/264166ec0ddbfd481ee8e0b71e5ca42d2c0676fc/README.md",
+  "https://github.com/docling-project/docling/blob/890dd42d017497c955a56a1d2cfc3f0af5bc2aa9/README.md",
+  "https://github.com/docling-project/docling/releases/tag/v2.129.0",
+  "https://github.com/bashtage/arch/blob/v8.0.0/README.md",
+  "https://github.com/ray-project/ray/blob/ray-2.58.0/README.rst",
+  "https://github.com/google-research/timesfm/blob/v3.0.0/README.md",
+  "https://github.com/statsmodels/statsmodels/blob/v0.15.0/README.md",
+  "https://github.com/huggingface/sentence-transformers/blob/f3864a53cfafb40a6f03f029ce96da70591e9931/README.md",
+  "https://github.com/huggingface/sentence-transformers/releases/tag/v6.1.0",
+  "https://github.com/scikit-learn/scikit-learn/blob/1.9.1/README.rst",
+  "https://github.com/skfolio/skfolio/blob/v1.2.8/README.rst",
+  "https://github.com/microsoft/qlib/blob/v0.9.7/README.md",
+  "https://raw.githubusercontent.com/stefan-jansen/alphalens-reloaded/f0a07c22d554e4b4036983cc80320b432714fe7e/README.md",
+  "https://raw.githubusercontent.com/online-ml/river/64285b9dd6c606804753235fe992bcf25b9856ee/README.md",
+  "https://raw.githubusercontent.com/ray-project/ray/ray-2.58.0/README.rst",
+  "https://raw.githubusercontent.com/skfolio/skfolio/v1.2.8/README.rst"
+ ],
+ "why_selected": "Select skfolio for chronological research validation and EdgarTools for filing research inputs, following the layer scope rather than treating these libraries as execution engines. blueprints/us-equities/research-evaluation/receipt.json records native skfolio 1.2.9 execution producing 20 development folds, 21 frozen selections and 6605 candidate records; the retained fold records place every training exit before its evaluation cutoff. Inspection of blueprints/us-equities/research-evaluation/evaluate.py confirms that project-local code invokes WalkForward using the frozen splitter specification. This is native library execution within a local raw-price label study, not evidence of profitable portfolio execution. blueprints/us-equities/catalyst-provenance/receipt.json records native parsing of a pinned real filing fixture and preserves the initial acquisition failure. blueprints/us-equities/catalyst-provenance/access-resolution.json subsequently records successful native acquisition of 371 index entries representing 360 unique accessions. Its separate project-local provenance adapter excluded all five sampled headers at the historical cutoff and admitted them only after current observation. These bounded executions most directly support reproducible research validation and filing ingestion among the supplied candidates; they do not demonstrate comparative alpha.",
+ "winner_evidence_class": "native_proven",
+ "winner_evidence_refs": [
+  "blueprints/us-equities/research-evaluation/receipt.json",
+  "blueprints/us-equities/research-evaluation/plan.json",
+  "blueprints/us-equities/research-evaluation/evaluate.py",
+  "blueprints/us-equities/catalyst-provenance/receipt.json",
+  "blueprints/us-equities/catalyst-provenance/access-resolution.json"
+ ],
+ "winner_keys": [
+  "c23",
+  "c11"
+ ]
+}

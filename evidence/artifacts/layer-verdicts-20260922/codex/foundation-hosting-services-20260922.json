@@ -1,0 +1,168 @@
+{
+ "alternatives": [
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/agents-operations.json"
+   ],
+   "key": "c3",
+   "name": "Modal",
+   "repository": "https://github.com/modal-labs/modal-client",
+   "why_not_default": "No cloud workload was executed. Separate account, compute budget, region, durable storage and workload-cost acceptance remain unqualified; the demonstrated requirement is local application hosting."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/landscape/hosting-practice.json",
+    "docs/hosting-container-practice.md"
+   ],
+   "key": "c4",
+   "name": "Docker Compose",
+   "repository": "https://github.com/docker/compose",
+   "why_not_default": "Declarative service packaging has no retained matched lifecycle comparison against the qualified native application. Engine selection, persistent state and recovery still require workload execution."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/agents-operations.json"
+   ],
+   "key": "c5",
+   "name": "BentoML",
+   "repository": "https://github.com/bentoml/BentoML",
+   "why_not_default": "No supplied model service, model call or cloud deployment was executed. Model packaging does not establish reproduction of this typed UI/API/database application."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/landscape/hosting-practice.json",
+    "docs/hosting-container-practice.md"
+   ],
+   "key": "c7",
+   "name": "Docker Engine / Moby",
+   "repository": "https://github.com/moby/moby",
+   "why_not_default": "The retained review establishes no matched reproduction or recovery advantage for this workload. Rootless configuration documentation is not deployment acceptance; the application's separate container attempt does not qualify Moby."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/landscape/hosting-practice.json",
+    "docs/hosting-container-practice.md"
+   ],
+   "key": "c8",
+   "name": "Podman / Quadlet",
+   "repository": "https://github.com/podman-container-tools/podman",
+   "why_not_default": "No workload execution qualifies image compatibility, networking, persistent volumes or restart behavior. The documented systemd integration supports a prospective trial, not a measured improvement over the native application."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "adoption/research.json"
+   ],
+   "key": "c9",
+   "name": "Dev Containers CLI",
+   "repository": "https://github.com/devcontainers/cli",
+   "why_not_default": "No container was built or executed. Its Feature lock omits base images and application dependencies, while daemon access, mounted state and account integration add unqualified operational boundaries."
+  },
+  {
+   "disposition": "out_of_scope",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/landscape/hosting-practice.json",
+    "docs/hosting-container-practice.md"
+   ],
+   "key": "c10",
+   "name": "Dockerized IB Gateway",
+   "repository": "https://github.com/gnzsnz/ib-gateway-docker",
+   "why_not_default": "This broker-specific supporting service does not host the typed application. Image identity, native sign-in, session restart, API connectivity and broker reconciliation remain unqualified in the retained review."
+  },
+  {
+   "disposition": "overlap",
+   "evidence_class": "local_integration",
+   "evidence_refs": [
+    "catalogs/foundation/decisions.json",
+    "blueprints/convergence-practice/application-delivery/receipt.json"
+   ],
+   "key": "c11",
+   "name": "React",
+   "repository": "https://github.com/react/react",
+   "why_not_default": "React participates in the successful Next.js browser workflow and remains an application dependency. It provides no separately demonstrated hosting or persistent-service capability beyond the selected Next.js component."
+  }
+ ],
+ "catalog": "foundation",
+ "challenger_preferred": null,
+ "lane": "codex",
+ "layer_id": "hosting-services",
+ "limits": [
+  "This verdict reviews retained evidence; no application, database, container or provider workload was rerun.",
+  "Private raw logs referenced by hashes in the application receipt were not opened or independently verified.",
+  "Pinned Docker Compose, Moby and Dockerized IB Gateway README URLs were attempted but could not be fetched. Their assessment relies on the retained local source reviews.",
+  "Successful upstream documentation reads establish documented capabilities only, not workload acceptance. Mutable documentation was not treated as historical execution evidence."
+ ],
+ "model": {
+  "effort": "high",
+  "name": "gpt-6-astra"
+ },
+ "open_gaps": [
+  "Independent-host backup restoration, host-loss recovery and production authentication are not established.",
+  "The accepted database configuration uses loopback and local trust and omits TLS, ICU, readline and zlib; it does not qualify a production database profile.",
+  "No matched native-versus-container application comparison establishes deployment, recovery, isolation or operating-cost superiority.",
+  "Cloud hosting, remote-team access, GPU compatibility, production load and paid-provider acceptance remain unqualified.",
+  "The retained TypeScript generator incompatibility and initial container bind failure remain failures of their specific attempted configurations.",
+  "The WSL recipe records clean-build and TIME-WAIT issues with explicit recovery procedures; successful execution does not imply every historical recipe invocation succeeds unchanged."
+ ],
+ "overturn_protocol": {
+  "arms": [
+   "Selected locked Next.js/FastAPI/PostgreSQL application using owned native processes",
+   "The same application and assertions deployed through Docker Engine with Docker Compose",
+   "The same application and assertions deployed through Podman with Quadlet"
+  ],
+  "fixture_paths": [
+   "blueprints/convergence-practice/application-delivery/acceptance-plan.json",
+   "blueprints/convergence-practice/application-delivery/backend/test_api.py",
+   "blueprints/convergence-practice/wsl-application/README.md"
+  ],
+  "metric": "Require unchanged API and browser assertions, exact row/history equality after database and application restart, owned-process cleanup and explicit account/state boundaries. Compare clean reproduction failures and recovery effort; an alternative must close a demonstrated deployment gap without weakening these checks."
+ },
+ "overturn_when": "Change the verdict when an executed matched comparison using blueprints/convergence-practice/application-delivery/acceptance-plan.json and the restart procedure in blueprints/convergence-practice/wsl-application/README.md shows that another deployment arm preserves every application assertion and exact persisted state while resolving a demonstrated reproduction, isolation or recovery gap. Catalog agreement or source review alone is insufficient.",
+ "packet_sha256": "b7bdd2da5305350a165a49f29d8a9cb354b7fc86ed03d9c0f08d32a0a946caa2",
+ "schema_version": 1,
+ "sources_read": [
+  "<host-path>/foundation__hosting-services.json",
+  "<host-path>/SKILL.md",
+  "catalogs/foundation/decisions.json",
+  "catalogs/us-equities/agents-operations.json",
+  "catalogs/landscape/hosting-practice.json",
+  "docs/hosting-container-practice.md",
+  "adoption/research.json",
+  "blueprints/convergence-practice/application-delivery/README.md",
+  "blueprints/convergence-practice/application-delivery/receipt.json",
+  "blueprints/convergence-practice/application-delivery/acceptance-plan.json",
+  "blueprints/convergence-practice/wsl-application/README.md",
+  "https://github.com/docker/compose/blob/5f94fb0aa42a2cd1248c6e6c7fafb87546b9c8de/README.md",
+  "https://github.com/moby/moby/blob/464cd50c3d9e92877d56940ea160de6fca7bea23/README.md",
+  "https://docs.docker.com/engine/security/rootless/",
+  "https://github.com/podman-container-tools/podman/blob/04f3aa430e6df81bea059978bc5bafbc846ba3e7/README.md",
+  "https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html",
+  "https://github.com/gnzsnz/ib-gateway-docker/blob/e19aa0bebe5d0ddd55c6d0e25549380f9c7d1bf7/README.md",
+  "https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/docs/integrations/interactive_brokers.md"
+ ],
+ "why_selected": "Select FastAPI, Next.js and PostgreSQL as the demonstrated API, UI service and persistent-state stack. blueprints/convergence-practice/application-delivery/receipt.json records native execution of the project-local integration on synthetic data: locked setup, 12 passing API checks, browser create/update, production build, exact record equality after database/application restart and owned-process cleanup. blueprints/convergence-practice/wsl-application/README.md separately records the WSL run, including migration reversal and exact row/history persistence. These are local integration results using real upstream runtimes, not unchanged upstream test-suite acceptance. React remains the Next.js application's dependency. The hosting reviews supply no executed comparison establishing a better container or cloud default.",
+ "winner_evidence_class": "local_integration",
+ "winner_evidence_refs": [
+  "catalogs/foundation/decisions.json",
+  "blueprints/convergence-practice/application-delivery/receipt.json",
+  "blueprints/convergence-practice/application-delivery/acceptance-plan.json",
+  "blueprints/convergence-practice/wsl-application/README.md"
+ ],
+ "winner_keys": [
+  "c1",
+  "c2",
+  "c6"
+ ]
+}

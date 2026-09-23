@@ -1,43 +1,30 @@
 {
  "alternatives": [
   {
-   "disposition": "measured_tradeoff",
+   "disposition": "conditional",
    "evidence_class": "measured_comparison",
    "evidence_refs": [
-    "evidence/artifacts/comparison-progress-20260922/worker-receipts-followup.json",
     "evidence/artifacts/comparison-progress-20260922/summary.json",
-    "docs/comparison-progress-20260922.md",
-    "docs/foundation-closure-20260921.md",
-    "evidence/artifacts/foundation-closure-20260921/source-observations.json"
+    "evidence/artifacts/comparison-progress-20260922/worker-receipts-followup.json",
+    "catalogs/sota-convergence/sdk-runtime-coverage-20260922.json",
+    "evidence/artifacts/sdk-runtime-coverage-20260922/probes-20260922.json",
+    "docs/foundation-closure-20260921.md"
    ],
    "key": "c3",
    "name": "Claude Agent SDK",
    "repository": "https://github.com/anthropics/claude-agent-sdk-python",
-   "why_not_default": "Correction: c3 does have native execution in a retained matched run. The earlier round said 'no native run and no matched comparison'; that was wrong. The worker comparison's arms were native Claude CLI, 'Codex SDK via native_worker.py' and 'Claude Agent SDK' (summary.json lines 140-144; docs/comparison-progress-20260922.md line 29). In worker-receipts-followup.json, arm C replays S1 and S2 are 'success' with reported_completeness 1 (lines 177-216). That matches arm B (Codex), whose replays are 'completed' with completeness 1. On the cancel case, C3 returned 'interrupted', exit_code 130, usage 'unavailable_after_interrupt' (lines 217-238). B3 returned 'no_receipt', exit_signal SIGINT, usage 'not_requested' (lines 152-176). So on this one observation, c3 returned a cancellation record where c4 returned none. This is an unranked trade-off, not a win. The comparison is 'unresolved', publication_eligible false, 'Two judging rounds refuted claims; no arm accepted as a winner and no SDK adoption follows' (summary.json lines 133-151). Recovery is unrun and artifact acceptance lacks a pinned judge (followup line 244). Neither interruption record proves zero provider consumption (line 243). 'No worker or SDK becomes a new accepted default' (comparison-progress lines 56-57). The installation is still not qualified as a default: foundation-closure line 82 says 'not newly installed or qualified' (registry Python 0.2.157, GitHub 0.2.156, TypeScript 0.3.278), and lines 88-96 require effective settingSources and SDK stop_task semantics to be tested. The version of c3 that ran in the comparison is not recorded in the public index I read."
+   "why_not_default": "This correction replaces my earlier 'source review only' description. c3 was measured, as arm C in the executed workers comparison (evidence/artifacts/comparison-progress-20260922/summary.json lines 132-157). Its two replays succeeded with reported_completeness 1, and its cancel was interrupted with usage unavailable (worker-receipts-followup.json lines 177-238). That is comparable to Codex arm B, but the comparison is 'unresolved' and publication-ineligible, and 'no SDK adoption follows'. catalogs/sota-convergence/sdk-runtime-coverage-20260922.json line 3907 (judge prose) says the Python SDK 0.2.157 login probe was executed. It also says the SDK 'was still recorded as measured-but-not-adopted' because the add-candidate condition 'A or B fails' was not met. That is second-hand; its primary source is outside this repository. The TypeScript sibling probe shows one partial advantage over the c4 receipt: a resumed session with the same session_id (evidence/artifacts/sdk-runtime-coverage-20260922/probes-20260922.json lines 235-237). The same probe's review found isolation overstated: the session loaded the host's settings and tools and left a transcript and memory rows behind. Pin mismatch: registry 0.2.157 against GitHub release 0.2.156 (docs/foundation-closure-20260921.md line 82)."
   },
   {
    "disposition": "conditional",
    "evidence_class": "source_review",
    "evidence_refs": [
-    "docs/foundation-closure-20260921.md",
-    "evidence/artifacts/foundation-closure-20260921/source-observations.json",
-    "evidence/artifacts/comparison-progress-20260922/summary.json"
+    "docs/foundation-closure-20260921.md"
    ],
    "key": "c1",
    "name": "OpenHands SDK",
    "repository": "https://github.com/openhands/software-agent-sdk",
-   "why_not_default": "docs/foundation-closure-20260921.md line 86 (1.49.2, pinned at commit 856d99d4) says 'Conditional for remote/container workers; does not improve the current local review merely by installation'. Its scope, remote isolated worker environments, is narrower than the current local worker need. The only evidence is version metadata (source-observations.json). It was not an arm in the 2026-09-22 worker comparison (summary.json lines 140-144), and no installation, run or comparison is recorded."
-  },
-  {
-   "disposition": "unqualified",
-   "evidence_class": "source_review",
-   "evidence_refs": [
-    "docs/foundation-closure-20260921.md"
-   ],
-   "key": "c2",
-   "name": "LangGraph",
-   "repository": "https://github.com/langchain-ai/langgraph",
-   "why_not_default": "Not adopted. docs/foundation-closure-20260921.md line 85 (1.2.11, pinned at commit ed384f3a) says 'Deferred unless building an application needing these semantics' (explicit state and checkpoints). No retained application needs graph checkpoints, and no execution is recorded."
+   "why_not_default": "The only evidence is source review. docs/foundation-closure-20260921.md line 86 pins 1.49.2 at commit 856d99d4 and calls it 'Conditional for remote/container workers; does not improve the current local review merely by installation.' The retained evidence has no install, native run or comparison arm for it. It was not among the three arms of the workers comparison. Its benefit, remote or container isolation, addresses a need no current local worker has declared."
   },
   {
    "disposition": "out_of_scope",
@@ -48,7 +35,18 @@
    "key": "c5",
    "name": "Temporal",
    "repository": "https://github.com/temporalio/temporal",
-   "why_not_default": "Not adopted. docs/foundation-closure-20260921.md line 84 (Temporal Python 1.33.0) says 'Deferred until required; adds a service and distinct effect/recovery semantics'. It is a durable workflow engine for work across several hosts, not a per-worker agent SDK. Line 64 assigns scheduling and supervision to Dagu and Linux user services: 'Avoid multiple independent retry owners for one effect'. This corrects the earlier citation of lines 94-96, which concern worker recovery not establishing SDK cancellation. No execution is recorded."
+   "why_not_default": "Not adopted. docs/foundation-closure-20260921.md line 84 (Temporal Python 1.33.0) says 'Deferred until required; adds a service and distinct effect/recovery semantics.' Temporal is a durable workflow runtime, not an agent SDK that gives a worker structured events or custom tools. Its evidence is source review only."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "docs/foundation-closure-20260921.md"
+   ],
+   "key": "c2",
+   "name": "LangGraph",
+   "repository": "https://github.com/langchain-ai/langgraph",
+   "why_not_default": "Not adopted. docs/foundation-closure-20260921.md line 85 (1.2.11, commit ed384f3a) says 'Deferred unless building an application needing these semantics' (explicit state and checkpoints). Its evidence is source review only, with no native run. It would add a framework layer over provider clients rather than the native SDK path."
   }
  ],
  "catalog": "foundation",
@@ -56,69 +54,73 @@
  "lane": "claude",
  "layer_id": "agent-sdks",
  "limits": [
-  "I could not run commands. No SDK was installed or run, and no comparison or test was executed in this review.",
-  "No TypeSafe inference results were supplied by the coordinator. All dispositions are my own source review. The refuters' findings were treated as claims to check: each was re-verified against the cited original files above, and I accepted them where the source supported them. The packet withheld the prior current_choice, decision and rationale, so no provider judgment was retained.",
-  "The per-arm receipts, closure.mjs and raw native output are in the source host's private seal (worker-receipts-followup.json line 24). I read only the sanitized public index and summary, and the version of the Claude Agent SDK used in arm C was not visible.",
-  "Not opened: blueprints/us-equities/README.md (the refuter cited its line 62), blueprints/us-equities/workers/receipt.json, native_worker.py, adoption/paired/receipt.json, observability/followup-receipt.json and worker-classifier-correction.json.",
-  "Model: the fixed value 'claude-opus-5' is copied as required. The client reports the actual runtime model as claude-opus-5-5[1m] (Opus 5.5). Skill path: <host-path>/SKILL.md."
+  "I could not run commands. No receipt, hash, test or comparison was re-executed. All dispositions come from my own review of retained files. No TypeSafe inference results were supplied, and no provider judgment was used. The refuters' findings were treated as claims and checked against in-repo sources.",
+  "The refuter cited <host-path>/2026-09-22-executed-comparisons.md and <host-path>/executed-comparison-practice-20260922.md, which are outside my authorized read root, so I did not open them. The figures reported from them (seal 0034d6c7 medians of 215 s and 201 s, per-arm scores, the 3/3-refuted gate count and the Python SDK 0.2.157 login-probe details) are unverified second-hand. The in-repo sanitized index shows the seal prefix 0034d6c75037ad1c in receipt paths, the arm statuses and the unresolved closure, but not those medians or scores.",
+  "The workers comparison's arm-to-SDK mapping (A native Claude CLI, B Codex SDK, C Claude Agent SDK) is inferred from summary.json lines 140-144 and the limits text in worker-receipts-followup.json lines 241-245. The raw per-arm receipts are private and were not read.",
+  "I did not read the blueprints/convergence-practice/worker-recovery README or its receipts. I cite that fixture only as the offline recovery stage exercised by tests/test_worker_recovery.py.",
+  "I opened no upstream repositories. Version and pin metadata is copied as written in the retained docs.",
+  "Skill path: <host-path>/SKILL.md. The actual runtime model exposed by the client is claude-opus-5-5[1m]. The model field carries the fixed packet value opus/high."
  ],
  "model": {
   "effort": "high",
   "name": "claude-opus-5-5"
  },
  "open_gaps": [
-  "Codex SDK session resume is not shown. Retained SDK runs cover thread_start/thread.turn/turn.run (blueprints/us-equities/workers/README.md lines 39-41; observability/session-e2e.md line 28). A grep for 'resume' in blueprints/us-equities/workers returned no matches. foundation-closure line 83 describes a start/run/resume interface only as merit.",
-  "Codex SDK cancellation: in the matched run, B3 has arm_status 'no_receipt', SIGINT and usage 'not_requested' (worker-receipts-followup.json lines 152-176). workers/README.md lines 47-50 say the turn deadline is not a provider spending cap or proof of remote cancellation.",
-  "The matched worker comparison is unresolved: recovery unrun, no pinned artifact judge, two judging rounds refuted, publication_eligible false (summary.json lines 133-151). No quality ranking of c3 against c4 follows.",
-  "The executed SDK version is openai-codex 0.154.0 (bundling CLI 0.154.0), not 0.155.1. The npm @openai/codex-sdk 0.155.1 (source-observations.json) has no recorded execution. The packet's pin 0.155.1 is the native CLI version.",
-  "Custom tools: the retained Codex SDK runs used Context Mode MCP tools (workers/README.md line 7; session-e2e.md line 29). No SDK-defined custom tool is shown for any arm.",
-  "Claude Agent SDK effective settingSources, SDK stop_task cancellation, provider billing cessation and distributed exactly-once effects are untested (foundation-closure lines 88-96). An untested capability has not failed.",
-  "Correction: decisions.json next_gap cites 'docs/foundation-closure-20260921.md lines 78-84'. The SDK table is at lines 80-86 (rows 82-86).",
-  "Correction: the evidence/receipts/token-practice-coverage-20260920.json codex row is a 'historical_inventory' (line 4) and 'not 52 fresh end-to-end passes' (line 62). It is withdrawn as SDK evidence.",
-  "The packet's c4 decisions include rows unrelated to agent SDK selection (lean-workflow-child-routing, native-memory-learning-maintenance, native-process-defaults and others). native-session-resume concerns native client sessions, not the SDK.",
-  "All SDK executions are on one WSL host. adoption/sdk/README.md line 24 says the fresh-prefix acceptance 'is another prefix on the same WSL host, not a physical second-machine deployment'."
+  "The only executed Codex SDK vs Claude Agent SDK comparison is unresolved and publication-ineligible, with 'no arm accepted as a winner' (evidence/artifacts/comparison-progress-20260922/summary.json lines 133-151). Recovery was not run and artifact acceptance has no pinned judge.",
+  "The Codex cancel submission has no native returned receipt: arm_status no_receipt, usage not_requested (worker-receipts-followup.json lines 152-176). Claude Agent SDK interruption reports usage as unavailable. Neither shows actual provider consumption.",
+  "c4 isolation is unverified. The SDK overlays env onto the parent environment, and read-only permissions do not make inherited MCP servers or hooks read-only (blueprints/us-equities/workers/README.md lines 53-57; receipt.json line 110). The recorded tool events came from the host's Context Mode server.",
+  "native_worker.py line 77 creates ephemeral threads, so the c4 integration has not shown multi-turn resume. Custom-tool registration through the SDK is also unobserved. The 'start/run/resume' wording in the foundation closure is a project description, not an observation.",
+  "In the c4 receipt, two of three native turns failed their extraction task, blocked by the project root and by approval policy (receipt.json lines 132-220).",
+  "The receipt's actual research prompt is private (research-prompt.txt, distributed false, receipt.json lines 126-130). blueprints/us-equities/workers/research-task.md is a blank template, so that receipt cannot be reproduced from repository fixtures.",
+  "Version skew: the receipt records openai-codex 0.154.0 against native 0.155.1, while the packet pin is 0.155.1. The foundation closure asks for a version change to be qualified before promotion.",
+  "The foundation decision's evidence_ids cite only token-practice-coverage-20260920, not the us-equities worker receipt or the workers comparison (catalogs/foundation/decisions.json lines 2838-2840). Its next_gap cites SDK table lines 78-84, but the table is at lines 80-86 of docs/foundation-closure-20260921.md.",
+  "The only evidence for OpenHands (remote/container), LangGraph (checkpoints) and Temporal (durable replay) is source review."
  ],
  "overturn_protocol": {
   "arms": [
-   "c4 Codex SDK: Python openai-codex 0.154.0 driving native Codex 0.155.1 via --codex-bin (existing integration)",
-   "c3 Claude Agent SDK, with explicit effective settingSources and stop_task semantics tested",
-   "native Claude CLI (baseline arm of the existing comparison)",
-   "c1 OpenHands SDK 1.49.2 (only if the task needs a remote or container worker)"
+   "c4 Codex SDK (Python openai-codex with native Codex) via blueprints/us-equities/workers/native_worker.py",
+   "c3 Claude Agent SDK (Python) on native login with explicit settingSources, a tool allowlist and scoped transcript/memory",
+   "native Claude CLI control arm as in the sealed comparison",
+   "c1 OpenHands SDK only if a remote or container worker requirement is declared"
   ],
   "fixture_paths": [
-   "blueprints/us-equities/workers/README.md",
-   "blueprints/convergence-practice/worker-recovery/README.md"
+   "blueprints/us-equities/workers/native_worker.py",
+   "blueprints/convergence-practice/worker-recovery/stage.py",
+   "tests/test_worker_recovery.py",
+   "evidence/artifacts/comparison-progress-20260922/worker-receipts-followup.json"
   ],
-  "metric": "Use the same task set as the 2026-09-22 worker comparison: replays S1/S2, cancel S3, plus the unrun recovery case. For each arm, measure reported structural completeness, returned cancellation receipt and status, correct resume/recovery against a behaviour oracle, a working custom-tool call, and complete provider usage including failed attempts. A pinned artifact judge and publication_eligible true are required. No promotion on version metadata, refuted judgments or agreement between lanes."
+  "metric": "Under the re-preregistered sealed workers protocol, with the same task set for every arm: replay status and reported structural completeness; cancel outcome, with usage reported rather than unavailable or not_requested; recovery-case pass rate (currently not run); an artifact-acceptance score from a pinned judge; post-run isolation verified for both arms (no inherited host settings, tools, MCP servers or hooks beyond those allowed, and no leftover transcript or memory rows); wall-clock duration and provider-reported total tokens. Report every failed or blocked submission."
  },
- "overturn_when": "The verdict changes if a rerun of the matched three-arm worker comparison turns out better for c3. The rerun must use the native_worker.py run path in blueprints/us-equities/workers/README.md (lines 27-36) for c4 and the Claude Agent SDK arm for c3. It must also execute the recovery case under blueprints/convergence-practice/worker-recovery/README.md and judge artifact acceptance with a pinned judge, both of which are unrun per worker-receipts-followup.json line 244. The result must be publication-eligible and show c3 matching c4 on replay completion while beating it on cancel/resume session control and complete provider usage. The c4 verdict is also reopened if either of the following happens:\n- A Codex SDK resume or cancellation test at the promoted SDK version fails.\n- A version change (openai-codex 0.154.0 to a newer release, or a switch to the npm @openai/codex-sdk) is promoted without its own native run.\nThe synthetic suite tests/fixtures/codex-lane/ (fake codex binary) cannot confirm or overturn native SDK behaviour.",
- "packet_sha256": "e43b68efe44580681c91bb1dd8119948e5a09520c7d5f2317b310ffcb4391a27",
+ "overturn_when": "The verdict changes only through a re-preregistered rerun of the sealed three-arm workers comparison, not a new ad-hoc run. That comparison is recorded as unresolved in evidence/artifacts/comparison-progress-20260922/summary.json lines 132-157; its runner is outside this repository. The rerun must close the gaps recorded there: run recovery, pin an artifact judge, and apply the same isolation check to both arms. c3 replaces c4 as the default only if the closure resolves with arm C ahead of arm B on replay correctness, cancel/usage completeness and recovery. It must also pass post-run isolation (no host settings, tools or hooks beyond those allowed, and no leftover transcript or memory rows) at comparable provider usage. The recovery stage's offline precondition is python3 -m unittest tests.test_worker_recovery, which exercises blueprints/convergence-practice/worker-recovery/stage.py. It launches no agent and cannot overturn the verdict alone. python3 -m unittest tests.test_native_worker_fixture is also offline replay only. Separately, a declared remote or container worker need (OpenHands SDK), graph-checkpoint need (LangGraph) or durable multi-host replay need (Temporal) would reopen the layer.",
+ "packet_sha256": "0535214c13287c263717eb2fc05e10a7628e267ccd7820c06f6cc276c2e3a762",
  "schema_version": 1,
  "sources_read": [
-  "<host-path>/foundation__agent-sdks.json",
-  "docs/foundation-closure-20260921.md (lines 58-99 this round; lines 1-110 earlier round)",
-  "catalogs/foundation/decisions.json (earlier round, lines 2798-2850; decision text also in packet)",
-  "evidence/artifacts/foundation-closure-20260921/source-observations.json (earlier round, lines 8-23)",
-  "evidence/receipts/token-practice-coverage-20260920.json (lines 1-6 and grep line 62 this round; lines 160-184 earlier)",
-  "tests/test_codex_lane.py (earlier round, lines 1-40)",
-  "evidence/artifacts/comparison-progress-20260922/worker-receipts-followup.json (full)",
-  "evidence/artifacts/comparison-progress-20260922/summary.json (lines 125-159)",
-  "docs/comparison-progress-20260922.md (full)",
-  "observability/session-e2e.md (lines 1-45)",
-  "blueprints/us-equities/workers/README.md (lines 1-60; grep 'resume' in directory: no matches)",
-  "adoption/sdk/README.md (full)",
-  "adoption/paired/README.md (lines 1-40)",
-  "<host-path>/SKILL.md (skill body injected in context)"
+  "<host-path>/foundation__agent-sdks.json (candidate keys/adopted/repository, grep)",
+  "docs/foundation-closure-20260921.md (lines 60-104, prior round)",
+  "catalogs/foundation/decisions.json (lines 2823-2848)",
+  "evidence/receipts/token-practice-coverage-20260920.json (lines 160-184, prior round)",
+  "evidence/artifacts/sdk-runtime-coverage-20260922/probes-20260922.json (lines 193-344, prior round)",
+  "evidence/artifacts/sdk-runtime-coverage-20260922/agent-sdks.json (grep only)",
+  "blueprints/us-equities/workers/README.md (lines 1-65)",
+  "blueprints/us-equities/workers/receipt.json (lines 1-222)",
+  "blueprints/us-equities/workers/research-task.md",
+  "blueprints/us-equities/workers/native_worker.py (grep: line 77)",
+  "evidence/artifacts/comparison-progress-20260922/worker-receipts-followup.json",
+  "evidence/artifacts/comparison-progress-20260922/summary.json (lines 128-159 plus grep)",
+  "catalogs/sota-convergence/sdk-runtime-coverage-20260922.md (lines 115-154)",
+  "catalogs/sota-convergence/sdk-runtime-coverage-20260922.json (lines 3890-3919)",
+  "tests/test_native_worker_fixture.py (prior round)",
+  "tests/test_worker_recovery.py (lines 1-40)",
+  "<host-path>/SKILL.md (preloaded via skill invocation)"
  ],
- "why_selected": "c4 (Codex SDK/CLI) is the only adopted candidate whose SDK interface has several retained native executions on this host, and it is the existing working integration. What was observed, from my own source review of the retained records:\n(a) observability/session-e2e.md line 28 records 'Official Codex SDK `thread.turn(...).run()` | `completed`, Astra/OpenAI, 12,493 ms'. Line 30 records native SDK usage of input 40,369 and total 40,518.\n(b) blueprints/us-equities/workers/README.md lines 3-7 say the official Python Codex SDK ran with the native Codex 0.155.1 binary and the task completed in 58,410 ms with Context Mode tool calls. Lines 39-41 name the SDK surface used: CodexClient.initialize, model_list, account/rateLimits/read, AsyncCodex.thread_start, thread.read, thread.turn and turn.run.\n(c) adoption/paired/README.md line 15: 'Official Codex SDK, native GPT-6 Astra | Completed in 14,953 ms'.\n(d) In the three-arm worker comparison (arm B, 'Codex SDK via native_worker.py'), evidence/artifacts/comparison-progress-20260922/worker-receipts-followup.json lines 113-151 show replays S1 and S2 'completed' with reported_completeness 1.\ndocs/foundation-closure-20260921.md lines 78 and 83 set the scope: 'Existing Codex SDK integration remains accepted only within its recorded tests' and 'Retain existing working integration; qualify a version change before promotion'. catalogs/foundation/decisions.json (agent-sdk-runtime-selection) keeps the selection 'conditional' with review_status 'source_review' for this taxonomy freeze.\nCorrections to my earlier round:\n- The executed SDK is the Python package openai-codex 0.154.0, which bundles CLI 0.154.0 and is run against the separately accepted native Codex 0.155.1 through --codex-bin (adoption/sdk/README.md line 5). The pin 0.155.1 is the CLI version. The npm @openai/codex-sdk 0.155.1 in source-observations.json has no recorded execution.\n- The historical token-practice inventory row is no longer used as SDK evidence (its line 4 says 'historical_inventory' and line 62 says it is not fresh E2E passes).\nThe native_proven class applies only to the start/turn/run interface on this WSL host. Resume, cancellation and custom (non-MCP) tools are not shown for the SDK. On the one matched run, c4's cancellation returned no receipt (see alternatives), and that comparison is unresolved with no arm accepted.",
+ "why_selected": "c4 (Codex SDK/CLI) stays the default because it is the incumbent, with a native integration on record. It did not win a comparison. My own source review found these observations.\n(1) Native end-to-end run. blueprints/us-equities/workers/receipt.json (kind native_model_e2e, 2026-09-19) records the Python openai-codex 0.154.0 SDK driving native Codex 0.155.1. One research task finished with run.status \"completed\", duration_ms 58410 and configured_model \"gpt-6-astra\". The run returned per-turn usage (totalTokens 135311, lines 40-47) and the exact result fields (lines 51-58). It also returned structured tool events (lines 59-85): four Context Mode calls completed and one ctx_execute_file call failed. The same receipt records two more native turns (lines 132-220). Both had extraction_task_succeeded false, one blocked by the project root and one by approval policy. Across all three turns the total is 204091 tokens, with successful_research_tasks 1 and blocked_file_extraction_tasks 2. blueprints/us-equities/workers/README.md lines 39-45 name the upstream SDK calls used.\n(2) Executed three-arm workers comparison. evidence/artifacts/comparison-progress-20260922/summary.json lines 132-157 record 9 submissions across three arms: native Claude CLI, the Codex SDK via native_worker.py, and the Claude Agent SDK. The result is \"unresolved\" and publication_eligible is false, with the note \"no arm accepted as a winner and no SDK adoption follows\". worker-receipts-followup.json lines 112-238 add detail. Codex arm B completed both replays with reported_completeness 1. Its cancel submission ended no_receipt/SIGINT with usage not_requested. Claude Agent SDK arm C also succeeded on both replays with completeness 1, and its cancel was interrupted with usage unavailable. Recovery was not run and no artifact judge was pinned. So the comparison neither overturns nor confirms c4.\n(3) Activation record. catalogs/foundation/decisions.json lines 2831-2841 set selection \"conditional\" and review_status \"source_review\", with the activation text \"Use the Codex CLI/SDK for existing supported start/run/resume workflows\". The decision's evidence_ids point only to token-practice-coverage-20260920; the link to the us-equities receipt is mine, not the decision's.\nTwo limits apply. First, native_worker.py line 77 sets ephemeral=True, so this integration does not show resume. Second, README lines 53-57 say inherited MCP servers and hooks are not made read-only, so c4 isolation is unverified.",
  "winner_evidence_class": "native_proven",
  "winner_evidence_refs": [
-  "observability/session-e2e.md",
+  "blueprints/us-equities/workers/receipt.json",
   "blueprints/us-equities/workers/README.md",
-  "adoption/paired/README.md",
-  "adoption/sdk/README.md",
+  "blueprints/us-equities/workers/native_worker.py",
+  "evidence/artifacts/comparison-progress-20260922/summary.json",
   "evidence/artifacts/comparison-progress-20260922/worker-receipts-followup.json",
-  "docs/foundation-closure-20260921.md",
   "catalogs/foundation/decisions.json"
  ],
  "winner_keys": [
