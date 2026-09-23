@@ -13013,6 +13013,51 @@
       "bytes": 68
     },
     {
+      "path": "catalogs/landscape/gap-crosswalk-92bb279.json",
+      "sha256": "bb354c43a6d318c26eaeb889baa30b8006c23a0f3de2e6dfc123d999ad1726b8",
+      "bytes": 614862
+    },
+    {
+      "path": "docs/gap-crosswalk-92bb279.md",
+      "sha256": "700288195fa9074314eb2d17a5948c7c39bde2cafc9e79652e0fe59dc0118a4d",
+      "bytes": 75512
+    },
+    {
+      "path": "tools/sota-convergence/gap_crosswalk.py",
+      "sha256": "012d515016a61a1b7c78d47fa79fb80eb69ba5f7215a204cc69f09dfeb6f4c00",
+      "bytes": 25258
+    },
+    {
+      "path": "tests/test_gap_crosswalk.py",
+      "sha256": "af5b008bbe49ad5493aac73568405442ff05d5d921b9655e2ff2caa0e8801876",
+      "bytes": 5678
+    },
+    {
+      "path": "evidence/artifacts/gap-crosswalk-92bb279/PREREGISTRATION.md",
+      "sha256": "0bfbb8fdc99ae114645f31da2c899626f8bc7a224f2f4189c79615d232e0014a",
+      "bytes": 1906
+    },
+    {
+      "path": "evidence/artifacts/gap-crosswalk-92bb279/eval-score.json",
+      "sha256": "21fa1e08e671d2cb26e831c120c7d353c1c1802690916960e5803ab3a272028b",
+      "bytes": 1815
+    },
+    {
+      "path": "evidence/artifacts/gap-crosswalk-92bb279/review-results.json",
+      "sha256": "d0218e01fea4e22f0009098a4224d1406a76cb5a27bdd0abd81d3702e46479e3",
+      "bytes": 242607
+    },
+    {
+      "path": "evidence/artifacts/gap-crosswalk-92bb279/typesafe-eval.json",
+      "sha256": "9a884962639d4c2166aa776a0c9c9afb67b92f29fa54542d9f28f6866b9776de",
+      "bytes": 439688
+    },
+    {
+      "path": "evidence/artifacts/gap-crosswalk-92bb279/typesafe-current.json",
+      "sha256": "8004e97dee541070839195bcadf4ac21432acfc488ad20044a6eb65b8df70435",
+      "bytes": 520806
+    },
+    {
       "path": "blueprints/us-equities/delisting-coverage/README.md",
       "sha256": "7c34f1ce12f763d0546fd71251816773cb6a232fc72c73d1c20f390884054143",
       "bytes": 13331
