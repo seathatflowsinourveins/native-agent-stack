@@ -385,11 +385,13 @@ run: this host (measured: `Intel(R) Core(TM) Ultra 9 275HX`, 24 cores, WSL
 5090 Laptop GPU reporting 23.9 GB VRAM via `nvidia-smi` against the "24 GB"
 marketing figure;
 `evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json`,
-evidence class `native_proven`), and a `github-macos-15-arm64-runner` entry
-still marked `pending` (not `native_proven`) because
+evidence class `native_proven`), and the GitHub-hosted `macos-15` runner
+(measured by
 [`hardware-profile-smoke.yml`](../.github/workflows/hardware-profile-smoke.yml)
-has authored-and-offline-validated coverage (zizmor/actionlint clean) but has
-not yet executed on a hosted macOS runner. The 128 GB WSL workstation and the
+run 35808320867: Apple M1 (Virtual), 3 cores, 7 GB unified memory; an MLX
+Qwen2.5-0.5B-Instruct-4bit smoke generated 32 tokens at a reported 146.6
+tokens/s with 0.29 GB peak memory; `native_proven` for the macOS code path and
+the arm64 MLX install, not for workstation-sized memory tiers). The 128 GB WSL workstation and the
 48 GB / 64 GB macOS arm64 unified-memory hosts are recorded as
 `labelled_projection` entries with their sizing arithmetic shown inline, not as
 measurements; treat them as projections until a fresh run of the script on

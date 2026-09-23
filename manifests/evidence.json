@@ -7629,8 +7629,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "ca4ff889cff29257e941c73415cf5b02d29fbfec354c817f0676e64c33d8558f",
-      "bytes": 12922700
+      "sha256": "ab353661d629b9634ebcbdfb2182e766cad9832f4a6cd10d4c9adfeadb3e7ce8",
+      "bytes": 12922828
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -7704,8 +7704,8 @@
     },
     {
       "path": "docs/grand-catalog-handbook.md",
-      "sha256": "a9a0518d06139065cf6dce3dfd85b6f53caccb57cbd6bbcb95fb84c5cf6a9a88",
-      "bytes": 422803
+      "sha256": "c98c9ac0c764b48c23faa3b60c2c3ac44bcebff8a32a92f71738637aef7f15da",
+      "bytes": 422929
     },
     {
       "path": "docs/harness-defaults.md",
@@ -13321,6 +13321,21 @@
       "path": "evidence/artifacts/sota-refresh-20260923/hw-profiles/review-findings-response-round2.json",
       "sha256": "5a27f214812ff65b880ee53678efb8902595ca3f35ae446e9204f0c4de32b3ff",
       "bytes": 4315
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/hw-profiles/hosted-run-35808320867/macos-15.json",
+      "sha256": "58bd75c92b4101c730575839ba6b3d09c3ea9fc97d53dd29b6e0ec788e52150b",
+      "bytes": 1673
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/hw-profiles/hosted-run-35808320867/ubuntu-24.04.json",
+      "sha256": "43e5e61a2440ba31c7f41cb33060f53ee74472a23bb46cdbf87637e967122595",
+      "bytes": 1905
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/hw-profiles/hosted-run-35808320867/mlx-smoke-macos-15.json",
+      "sha256": "ff8fe53101eee030b01d7e6124ff92949d82b42a6c7fa5f53b1e7ea1fa47f727",
+      "bytes": 541
     }
   ],
   "convergence_records": [

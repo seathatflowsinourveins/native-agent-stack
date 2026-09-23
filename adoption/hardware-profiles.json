@@ -13,22 +13,66 @@
       "macos_unified_gpu_working_set_fraction": 0.6,
       "macos_unified_gpu_working_set_fraction_note": "Labelled assumption, not a measurement: macOS reserves unified memory for the OS, foreground apps, and (on this project's configured local profile) a concurrent embedding/semantic-RAG stack, and caps the Metal working set below total RAM. 0.6 is a conservative floor, not Apple's documented default (undocumented and version-dependent); treat the resulting vram_gb as an upper bound on what a generation model can reliably claim, not a guarantee.",
       "tiers": [
-        {"name": "cpu-only", "min_vram_gb": 0, "note": "No GPU/unified-memory tier met; CPU inference only, small models."},
-        {"name": "small-8b-q4", "min_vram_gb": 8, "note": "~7-8B parameter models at 4-bit quantization fit with headroom."},
-        {"name": "mid-14b-q4-or-8b-q8", "min_vram_gb": 12, "note": "~13-14B at 4-bit, or ~7-8B at 8-bit."},
-        {"name": "large-32b-q4", "min_vram_gb": 20, "note": "~30-32B at 4-bit quantization, e.g. a 24GB laptop GPU."},
-        {"name": "xl-70b-q4-or-32b-q8", "min_vram_gb": 40, "note": "~65-70B at 4-bit, or ~32B at 8-bit."},
-        {"name": "unified-70b-plus", "min_vram_gb": 48, "note": "Apple unified memory hosts with enough headroom for OS + app usage alongside a large model."}
+        {
+          "name": "cpu-only",
+          "min_vram_gb": 0,
+          "note": "No GPU/unified-memory tier met; CPU inference only, small models."
+        },
+        {
+          "name": "small-8b-q4",
+          "min_vram_gb": 8,
+          "note": "~7-8B parameter models at 4-bit quantization fit with headroom."
+        },
+        {
+          "name": "mid-14b-q4-or-8b-q8",
+          "min_vram_gb": 12,
+          "note": "~13-14B at 4-bit, or ~7-8B at 8-bit."
+        },
+        {
+          "name": "large-32b-q4",
+          "min_vram_gb": 20,
+          "note": "~30-32B at 4-bit quantization, e.g. a 24GB laptop GPU."
+        },
+        {
+          "name": "xl-70b-q4-or-32b-q8",
+          "min_vram_gb": 40,
+          "note": "~65-70B at 4-bit, or ~32B at 8-bit."
+        },
+        {
+          "name": "unified-70b-plus",
+          "min_vram_gb": 48,
+          "note": "Apple unified memory hosts with enough headroom for OS + app usage alongside a large model."
+        }
       ]
     },
     "embedding_semantic_rag": {
       "description": "Fit for the SocratiCode embedding stack, a local Qdrant instance, and a local vLLM/embedding server sharing host RAM (docs/native-rag-runtime.md).",
       "tiers": [
-        {"name": "unsupported", "min_ram_gb": 0, "note": "Below the floor for embedding + Qdrant + vLLM concurrently; run remote or sequentially."},
-        {"name": "light", "min_ram_gb": 16, "note": "Small collections, one service at a time."},
-        {"name": "standard", "min_ram_gb": 32, "note": "SocratiCode + Qdrant + a small local embedding model concurrently."},
-        {"name": "full", "min_ram_gb": 48, "note": "SocratiCode + Qdrant + vLLM serving an embedding or small generation model concurrently, per this project's configured local profile."},
-        {"name": "headroom", "min_ram_gb": 96, "note": "Large collections and multiple concurrent local services with headroom for the rest of the workflow."}
+        {
+          "name": "unsupported",
+          "min_ram_gb": 0,
+          "note": "Below the floor for embedding + Qdrant + vLLM concurrently; run remote or sequentially."
+        },
+        {
+          "name": "light",
+          "min_ram_gb": 16,
+          "note": "Small collections, one service at a time."
+        },
+        {
+          "name": "standard",
+          "min_ram_gb": 32,
+          "note": "SocratiCode + Qdrant + a small local embedding model concurrently."
+        },
+        {
+          "name": "full",
+          "min_ram_gb": 48,
+          "note": "SocratiCode + Qdrant + vLLM serving an embedding or small generation model concurrently, per this project's configured local profile."
+        },
+        {
+          "name": "headroom",
+          "min_ram_gb": 96,
+          "note": "Large collections and multiple concurrent local services with headroom for the rest of the workflow."
+        }
       ]
     },
     "ecosystem_bounded_run": {
@@ -113,9 +157,23 @@
     {
       "id": "github-macos-15-arm64-runner",
       "label": "GitHub-hosted macos-15 arm64 runner",
-      "evidence_class": "pending",
-      "evidence": "None yet: this entry becomes native_proven only after a CI artifact from .github/workflows/hardware-profile-smoke.yml (macOS job) actually runs.",
-      "note": "This unit authored and offline-validated the workflow that will measure this host; it did not itself execute on a macOS runner, so this entry carries no measured values and must not be read as native_proven until the workflow runs at least once."
+      "evidence_class": "native_proven",
+      "evidence": "GitHub Actions run 35808320867 (hardware-profile-smoke.yml on PR #87, 2026-09-23): scripts/hardware_profile.py on macos-15 measured Apple M1 (Virtual), 3 cores, 7.0 GB unified memory, arm64; the MLX smoke (mlx-community/Qwen2.5-0.5B-Instruct-4bit at revision a5339a4131f135d0fdc6a5c8b5bbed2753bbe0f3, hash-locked mlx-lm) generated 32 tokens from a 6-token prompt, peak memory 0.288 GB, 1.30 s end to end, reported generation rate 146.57 tokens/s. Artifacts: evidence/artifacts/sota-refresh-20260923/hw-profiles/hosted-run-35808320867/.",
+      "note": "A disposable 7 GB virtualized M1 runner, not a 48/64 GB workstation: it proves the macOS code path, the arm64 hash-locked MLX install and Metal generation, not the unified-memory tiers, which stay labelled projections.",
+      "measured": {
+        "cpu_brand": "Apple M1 (Virtual)",
+        "cores": 3,
+        "unified_memory_gb": 7.0,
+        "arm64": true,
+        "mlx_smoke": {
+          "model": "mlx-community/Qwen2.5-0.5B-Instruct-4bit",
+          "revision": "a5339a4131f135d0fdc6a5c8b5bbed2753bbe0f3",
+          "generation_tokens": 32,
+          "tokens_per_second": 146.57,
+          "elapsed_seconds": 1.3029,
+          "peak_memory_gb": 0.288
+        }
+      }
     }
   ]
 }
