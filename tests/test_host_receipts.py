@@ -806,5 +806,24 @@ class FlipRuleGatingTests(unittest.TestCase):
         self.assertEqual(profiles["linux-wsl2-x86_64"], {"os": "linux", "architecture": "x86_64"})
 
 
+
+class JsonEqualityTests(unittest.TestCase):
+    """A boolean must not satisfy a numeric const or enum (Python treats True == 1)."""
+
+    def test_boolean_does_not_equal_numeric_const(self):
+        errors = []
+        hr.validate_against_schema(True, {"const": 1}, "schema_version", errors)
+        self.assertTrue(errors)
+
+    def test_numeric_const_still_matches(self):
+        errors = []
+        hr.validate_against_schema(1, {"const": 1}, "schema_version", errors)
+        self.assertEqual(errors, [])
+
+    def test_boolean_does_not_match_numeric_enum(self):
+        errors = []
+        hr.validate_against_schema(False, {"enum": [0, 1]}, "x", errors)
+        self.assertTrue(errors)
+
 if __name__ == "__main__":
     unittest.main()

@@ -173,13 +173,20 @@ def _schema_type_ok(instance, type_name: str) -> bool:
     return True  # pragma: no cover - every type used in the schema is listed above
 
 
+def _json_equal(a, b) -> bool:
+    """JSON equality: unlike Python ``==``, a boolean never equals a number (True != 1)."""
+    if isinstance(a, bool) or isinstance(b, bool):
+        return isinstance(a, bool) and isinstance(b, bool) and a == b
+    return a == b
+
+
 def validate_against_schema(instance, schema: dict, path: str, errors: list[str]) -> None:
     """Validate ``instance`` against ``schema`` (a JSON Schema object or subschema),
     appending human-readable messages to ``errors``. Supports exactly
     SCHEMA_SUPPORTED_KEYWORDS; see the module comment above."""
-    if "const" in schema and instance != schema["const"]:
+    if "const" in schema and not _json_equal(instance, schema["const"]):
         errors.append(f"{path}: must equal {schema['const']!r}")
-    if "enum" in schema and instance not in schema["enum"]:
+    if "enum" in schema and not any(_json_equal(instance, v) for v in schema["enum"]):
         errors.append(f"{path}: must be one of {schema['enum']!r}")
     if "type" in schema and not _schema_type_ok(instance, schema["type"]):
         errors.append(f"{path}: must be of type {schema['type']!r}")

@@ -12779,13 +12779,13 @@
     },
     {
       "path": "scripts/host_receipts.py",
-      "sha256": "0e75f2863a6a21c6baf8798731952305aef804a97ef6590378f6f712c0580c79",
-      "bytes": 40136
+      "sha256": "7a91dd66b9a8cb0776b86451bd415e7f466c55e498750970fe5f6abc8af33d6a",
+      "bytes": 40442
     },
     {
       "path": "tests/test_host_receipts.py",
-      "sha256": "88408598c06f3c5e64e2f6cb59b7b024fc8ec10e292614583ea58f500fc424c5",
-      "bytes": 39671
+      "sha256": "83253137b32036271fd606db087cb023a7b548c76307f71adf8d817dfe594b9f",
+      "bytes": 40362
     },
     {
       "path": "tests/fixtures/host-receipts/valid.json",
