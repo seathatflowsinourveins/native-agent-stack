@@ -154,6 +154,49 @@ def strip_candidate(component_id: str) -> str:
     return component_id.split(":", 1)[1] if component_id.startswith("candidate:") else component_id
 
 
+def build_hosts(hw: dict) -> list[dict]:
+    """``adoption/hardware-profiles.json`` ``hosts[]``, joined with the measured tiers a
+    ``native_proven`` entry's ``.json`` evidence file recommends. Fails loudly (raises
+    ``SystemExit``) when such an entry names an evidence file that does not exist, instead of
+    silently emitting ``measured_tiers: null``; a ``native_proven`` entry whose evidence is
+    prose (for example a hosted-CI-run citation, not a report path) is not held to that check.
+
+    Every host's own ``measured`` block (arbitrary shape -- a plain hardware_profile.py
+    measurement, or something like a hosted runner's ``measured.mlx_smoke``) is carried
+    through so it reaches the generated JSON and Markdown. That block can live directly on
+    the ``hosts[]`` entry (as the shipped ``github-macos-15-arm64-runner`` entry has it) or,
+    for an entry ``scripts/hardware_profile.py --record-host`` wrote, only in the evidence
+    file's own ``measured`` key (that command does not copy it onto the entry): an entry's
+    own ``measured`` wins when both are present, else the evidence file's is used."""
+    hosts = []
+    for host in hw.get("hosts", []):
+        tiers = None
+        measured = host.get("measured")
+        evidence = host.get("evidence")
+        if host.get("evidence_class") == "native_proven" and isinstance(evidence, str) and evidence.endswith(".json"):
+            path = ROOT / evidence
+            if not path.is_file():
+                raise SystemExit(
+                    f"new_host_grand_list: hosts[] entry {host.get('id')!r} is native_proven and names "
+                    f"evidence file {evidence!r}, which does not exist; record it (scripts/hardware_profile.py "
+                    "--record-host) or fix the evidence path in adoption/hardware-profiles.json instead of "
+                    "leaving a dangling reference")
+            evidence_doc = json.loads(path.read_text(encoding="utf-8"))
+            tiers = evidence_doc.get("recommended")
+            if measured is None:
+                measured = evidence_doc.get("measured")
+        hosts.append({
+            "id": host.get("id"),
+            "label": host.get("label"),
+            "evidence_class": host.get("evidence_class"),
+            "assumptions": host.get("assumptions"),
+            "measured_tiers": tiers,
+            "measured": measured,
+            "sizing_arithmetic": host.get("sizing_arithmetic"),
+        })
+    return hosts
+
+
 def build() -> dict:
     matrix = load("catalogs/landscape/component-evidence-matrix.json")
     mindex = manifest_index(load(MANIFEST))
@@ -165,6 +208,7 @@ def build() -> dict:
     hw = load("adoption/hardware-profiles.json")
 
     layers = []
+    qualified_models = []
     for row in matrix["rows"]:
         winners = []
         for winner in row.get("winners", []):
@@ -180,6 +224,11 @@ def build() -> dict:
                     "bootstrap_pinned": is_pinned(cid, winner.get("repository"), pins[platform]),
                     "bootstrap_version": bootstrap_pin(cid, winner.get("repository"), pins[platform]),
                 }
+                for qm in state.get("qualified_models") or []:
+                    qualified_models.append({
+                        "catalog": row["catalog"], "layer_id": row["layer_id"], "component_id": cid,
+                        "platform": platform, **qm,
+                    })
             winners.append({
                 "component_id": cid,
                 "repository": winner.get("repository"),
@@ -204,21 +253,10 @@ def build() -> dict:
             "winners": winners,
         })
 
-    hosts = []
-    for host in hw.get("hosts", []):
-        tiers = None
-        if host.get("evidence_class") == "native_proven" and isinstance(host.get("evidence"), str) and host["evidence"].endswith(".json"):
-            path = ROOT / host["evidence"]
-            if path.is_file():
-                tiers = json.loads(path.read_text(encoding="utf-8")).get("recommended")
-        hosts.append({
-            "id": host.get("id"),
-            "label": host.get("label"),
-            "evidence_class": host.get("evidence_class"),
-            "assumptions": host.get("assumptions"),
-            "measured_tiers": tiers,
-            "sizing_arithmetic": host.get("sizing_arithmetic"),
-        })
+    hosts = build_hosts(hw)
+
+    qualified_models.sort(key=lambda q: (q["catalog"], q["layer_id"], q["component_id"], q["platform"],
+                                         q.get("model_id") or "", q.get("receipt_path") or ""))
 
     winners_all = [w for layer in layers for w in layer["winners"]]
     summary = {
@@ -250,24 +288,72 @@ def build() -> dict:
                         for i, p in enumerate(adoption.get("profiles", []), start=1)],
         "hosts": hosts,
         "layers": layers,
+        "qualified_models": qualified_models,
         "summary": summary,
     }
 
 
 def tier_value(value):
     """Reduce a labelled-projection arithmetic string to its result, e.g.
-    'vram_gb=24 >= 20 -> large-32b-q4' -> 'large-32b-q4'; 'min(16, 32 - 2) = 16' -> '16'."""
+    'vram_gb=24 >= 20 -> large-32b-q4' -> 'large-32b-q4'; 'min(16, 32 - 2) = 16' -> '16';
+    'min(16, 60 - 2) = 16 (nproc inside WSL is the .wslconfig processors=60)' -> '16' (a
+    trailing parenthetical explanatory note, itself possibly containing '=', is dropped
+    first; catalog PR #125 finding). A string with no trailing note still takes the result
+    after the *last* '=' (for example 'max(6, round(...)=24.8), min(24.8, 32) = 24.8' ->
+    '24.8', or 'cap = min(16, 30)' -> 'min(16, 30)': that trailing '(...)' is glued directly
+    onto a preceding token with no space, so it is part of the result expression itself, not
+    a separate note, and must not be dropped)."""
     if not isinstance(value, str):
         return value
     if "->" in value:
         return value.rsplit("->", 1)[1].strip()
-    if "=" in value:
-        return value.rsplit("=", 1)[1].strip()
-    return value
+    core = value
+    stripped = core.rstrip()
+    if stripped.endswith(")"):
+        depth = 0
+        open_index = None
+        for index in range(len(stripped) - 1, -1, -1):
+            if stripped[index] == ")":
+                depth += 1
+            elif stripped[index] == "(":
+                depth -= 1
+                if depth == 0:
+                    open_index = index
+                    break
+        # Only a trailing "(...)" set off by a space (e.g. "16 (nproc ...)") is a separate
+        # explanatory note to drop; one glued directly to a preceding token (e.g.
+        # "min(16, 30)", no space before "(") is part of the expression and stays.
+        if open_index is not None and open_index > 0 and stripped[open_index - 1] == " ":
+            core = stripped[:open_index].rstrip()
+    if "=" in core:
+        return core.rsplit("=", 1)[1].strip()
+    return core
 
 
 def md_cell(value) -> str:
     return str(value if value not in (None, "") else "—").replace("|", "\\|").replace("\n", " ")
+
+
+def measured_cell(measured) -> str | None:
+    """Compact one-line summary of a hosts[] entry's ``measured`` block (arbitrary shape:
+    a plain hardware_profile.py measurement, or something like the GitHub-hosted macOS
+    runner's ``measured.mlx_smoke`` sub-object), or None when there is nothing measured."""
+    if not isinstance(measured, dict) or not measured:
+        return None
+    parts = []
+    for key in ("cpu_brand", "cores", "unified_memory_gb", "effective_ram_gb"):
+        if measured.get(key) not in (None, ""):
+            parts.append(f"{key}={measured[key]}")
+    smoke = measured.get("mlx_smoke")
+    if isinstance(smoke, dict) and smoke:
+        smoke_bits = [f"{smoke['model']}@{smoke['revision'][:7]}" if smoke.get("model") and smoke.get("revision")
+                      else smoke.get("model")]
+        if smoke.get("tokens_per_second") is not None:
+            smoke_bits.append(f"{smoke['tokens_per_second']} tok/s")
+        if smoke.get("generation_tokens") is not None:
+            smoke_bits.append(f"{smoke['generation_tokens']} tokens")
+        parts.append("mlx_smoke: " + ", ".join(str(b) for b in smoke_bits if b))
+    return "; ".join(parts) if parts else None
 
 
 def gap_cell(layer: dict) -> str:
@@ -307,14 +393,31 @@ def render_md(data: dict) -> str:
     ]
     for p in data["setup_order"]:
         lines.append(f"| {p['order']} | `{p['profile']}`: {md_cell(p['label'])} | {', '.join('`' + c + '`' for c in p['component_ids'])} |")
-    lines += ["", "## Hosts and hardware tiers", "", "| Host | Evidence | Generation tier | Semantic-RAG tier | Concurrency cap |", "| --- | --- | --- | --- | --- |"]
+    lines += ["", "## Hosts and hardware tiers", "",
+              "| Host | Evidence | Generation tier | Semantic-RAG tier | Concurrency cap | Measured |",
+              "| --- | --- | --- | --- | --- | --- |"]
     for h in data["hosts"]:
         t = h.get("measured_tiers") or {}
         a = h.get("sizing_arithmetic") or {}
         gen = t.get("local_generation_model_tier") or tier_value(a.get("local_generation_model_tier"))
         rag = t.get("embedding_semantic_rag_tier") or tier_value(a.get("embedding_semantic_rag_tier"))
         cap = t.get("workflow_concurrency_cap") or tier_value(a.get("workflow_concurrency_cap"))
-        lines.append(f"| {md_cell(h['label'])} | {md_cell(h['evidence_class'])} | {md_cell(gen)} | {md_cell(rag)} | {md_cell(cap)} |")
+        lines.append(f"| {md_cell(h['label'])} | {md_cell(h['evidence_class'])} | {md_cell(gen)} | {md_cell(rag)} | "
+                     f"{md_cell(cap)} | {md_cell(measured_cell(h.get('measured')))} |")
+    lines += ["", "## Qualified local models", "",
+              "Locally-run model weights a host receipt recorded qualifying on a runtime component's winner row "
+              "(`scripts/host_receipts.py record --qualified-model`). This is per-host, per-runtime evidence, not a "
+              "verdict: it never marks anything `accepted` by itself, and the platform-status flip rule "
+              "(`scripts/platform_status.py`) still governs whether that runtime's own row may claim more.", "",
+              "| Model | Revision | Runtime | Version | Host | Platform | Result | Receipt |",
+              "| --- | --- | --- | --- | --- | --- | --- | --- |"]
+    if not data["qualified_models"]:
+        lines.append("| — | — | — | — | — | — | — | — |")
+    else:
+        for q in data["qualified_models"]:
+            lines.append(f"| {md_cell(q.get('model_id'))} | {md_cell(q.get('revision'))} | {md_cell(q.get('runtime'))} "
+                         f"| {md_cell(q.get('runtime_version'))} | {md_cell(q.get('host_id'))} | {md_cell(q.get('platform'))} "
+                         f"| {md_cell(q.get('result'))} | {md_cell(q.get('receipt_path'))} |")
     for catalog, title in (("foundation", "Foundation layers"), ("us-equities", "Trading layers (north star)")):
         lines += ["", f"## {title}", "",
                   "| Layer | Decision | Winner | Pin (upstream) | Evidence | WSL2 | macOS | Installed by | Open gaps (executable now / all) |",
