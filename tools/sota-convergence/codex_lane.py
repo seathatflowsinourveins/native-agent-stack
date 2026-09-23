@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run the Codex lane of the 2026-09-22 layer-verdict convergence.
+"""Run the Codex lane of the layer-verdict convergence.
 
 For each packet under ``<work-dir>/packets/`` (written by ``lane_packets.py``)
 without a valid ``<work-dir>/codex/<catalog>__<layer_id>.json`` already on
@@ -8,7 +8,8 @@ absolute path, the repository root and ``LANE=codex``, then run
 
     codex exec --sandbox read-only --skip-git-repo-check --ephemeral \
         -C <repo> --output-schema <schema> -o <out.tmp> --json \
-        -c model_reasoning_effort=<effort> <prompt>
+        -c model_reasoning_effort=<effort> \
+        --ignore-user-config -c features.hooks=false -c features.plugin_hooks=false <prompt>
 
 capturing the JSON event stream to
 ``<work-dir>/codex/events/<catalog>__<layer_id>.jsonl`` and a usage row per
@@ -207,7 +208,7 @@ def fill_prompt(template: str, packet_path: Path, repo_root: Path) -> str:
 
 
 def build_command(repo_root: Path, schema_path: Path, out_tmp: Path, effort: str, prompt_text: str,
-                  model: str = None) -> list:
+                  model: str = None, isolation=()) -> list:
     return [
         "codex", "exec",
         *(["-m", model] if model else []),
@@ -219,8 +220,22 @@ def build_command(repo_root: Path, schema_path: Path, out_tmp: Path, effort: str
         "-o", str(out_tmp),
         "--json",
         "-c", f"model_reasoning_effort={effort}",
+        *isolation,
         prompt_text,
     ]
+
+
+# Flags that keep a lane child blind (2026-09-23 re-record): memory stores and code indexes can return
+# the incumbent verdicts or the catalog's selection labels. ``--ignore-user-config`` skips
+# ``$CODEX_HOME/config.toml`` (auth still uses ``CODEX_HOME``), so the user's MCP servers, plugins,
+# profiles and project trust do not load, and with no trust no project ``.codex/config.toml`` loads
+# either; lifecycle hooks are turned off as well. Measured with codex-cli 0.155.1 from the agent-lab
+# checkout (RUST_LOG=info): a default ``codex exec`` initialized seven MCP servers (ai-memory,
+# SocratiCode, jCodeMunch, Serena, context-mode and two built-in OpenAI servers); with these flags only
+# the two built-in ones (plugin-runtime, OpenAI Developers MCP) initialized. Per-server
+# ``mcp_servers.<name>.enabled=false`` overrides are not used: on a server the loaded config does not
+# define, codex rejects the partial table ("invalid transport").
+ISOLATION_ARGS = ("--ignore-user-config", "-c", "features.hooks=false", "-c", "features.plugin_hooks=false")
 
 
 def run_attempt(cmd: list, timeout: float) -> dict:
@@ -407,7 +422,7 @@ def main(argv=None) -> int:
         for catalog, layer_id, packet_path, packet_sha256, out_path in pending:
             prompt_text = fill_prompt(template, packet_path.resolve(), repo)
             tmp_out = codex_dir / f"{catalog}__{layer_id}.out.tmp"
-            cmd = build_command(repo, strict_display, tmp_out, args.effort, prompt_text, args.model)
+            cmd = build_command(repo, strict_display, tmp_out, args.effort, prompt_text, args.model, ISOLATION_ARGS)
             print(shlex.join(cmd))
         return 0
 
@@ -427,7 +442,8 @@ def main(argv=None) -> int:
         catalog, layer_id, packet_path, packet_sha256, out_path = item
         prompt_text = fill_prompt(template, packet_path.resolve(), repo)
         tmp_out = codex_dir / f"{catalog}__{layer_id}.out.tmp"
-        cmd = build_command(repo, strict_schema_path.resolve(), tmp_out, args.effort, prompt_text, args.model)
+        cmd = build_command(repo, strict_schema_path.resolve(), tmp_out, args.effort, prompt_text, args.model,
+                            ISOLATION_ARGS)
         events_path = events_dir / f"{catalog}__{layer_id}.jsonl"
         events_path.write_text("", encoding="utf-8")
 

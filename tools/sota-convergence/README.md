@@ -1143,7 +1143,8 @@ shared lane prompt (`lane-prompt.md`, placeholders `{PACKET_PATH}`
 ```sh
 codex exec --sandbox read-only --skip-git-repo-check --ephemeral \
   -C <repo> --output-schema <schema> -o <out.tmp> --json \
-  -c model_reasoning_effort=<effort> <filled prompt>
+  -c model_reasoning_effort=<effort> \
+  --ignore-user-config -c features.hooks=false -c features.plugin_hooks=false <filled prompt>
 ```
 
 capturing the full JSON event stream to
@@ -1180,6 +1181,25 @@ python3 tools/sota-convergence/codex_lane.py \
 python3 tools/sota-convergence/codex_lane.py \
   --work-dir /path/to/work-dir --repo . --dry-run   # prints the command per pending layer, writes nothing
 ```
+
+**Blind children (2026-09-23 re-record).** Every `codex exec` runs with `--ignore-user-config`, which
+skips `$CODEX_HOME/config.toml`; auth still uses `CODEX_HOME`. It also runs with lifecycle hooks off
+(`features.hooks`, `features.plugin_hooks`). Memory stores and code indexes can return the incumbent
+verdicts or the catalog's selection labels, and without the user config none of the user's MCP servers,
+plugins or profiles load. Project trust lives in that config, so no project `.codex/config.toml` loads
+either.
+
+Measured with codex-cli 0.155.1 from the agent-lab checkout at `RUST_LOG=info`:
+- A default `codex exec` initialized seven MCP servers: ai-memory, SocratiCode, jCodeMunch, Serena,
+  context-mode and two built-in OpenAI servers.
+- With these flags, only the two built-in servers initialized: plugin-runtime and OpenAI Developers MCP.
+
+Per-server `mcp_servers.<name>.enabled=false` overrides are not used. On a server the loaded config does
+not define, codex rejects the partial table ("invalid transport").
+
+Rule 6 of `lane-prompt.md` states the same boundary for both lanes: only the packet and files under the
+repository root. The boundary is configuration plus instruction, not a sandbox: `--sandbox read-only`
+still lets a child read any host path. So give the lanes a `blind_checkout.py` export without `.git`.
 
 `--prompt` and `--schema` override the default `lane-prompt.md` /
 `lane-return.schema.json` paths (both otherwise resolved next to

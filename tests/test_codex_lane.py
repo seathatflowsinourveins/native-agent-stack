@@ -542,3 +542,25 @@ class PromptFillTests(CodexLaneFixture):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class BlindIsolationTests(CodexLaneFixture):
+    """2026-09-23 re-record: every lane child ignores the user config and runs without hooks, in a real run
+    and in the dry run's printed commands alike."""
+
+    def test_every_attempt_ignores_the_user_config_and_hooks(self):
+        self.write_packet("foundation", "native-clients")
+        self.assertEqual(self.run_lane(), 0)
+        argv = self.argv_calls()[0]
+        overrides = [argv[index + 1] for index, arg in enumerate(argv) if arg == "-c"]
+        self.assertIn("--ignore-user-config", argv)
+        self.assertIn("features.hooks=false", overrides)
+        self.assertIn("features.plugin_hooks=false", overrides)
+        self.assertLess(argv.index("--ignore-user-config"), len(argv) - 1, "the flags precede the prompt")
+
+    def test_the_dry_run_prints_the_same_flags(self):
+        self.write_packet("foundation", "native-clients")
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(io.StringIO()):
+            self.assertEqual(self.run_lane(["--dry-run"]), 0)
+        self.assertIn("--ignore-user-config -c features.hooks=false -c features.plugin_hooks=false", out.getvalue())
