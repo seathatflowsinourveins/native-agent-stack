@@ -1,0 +1,10 @@
+trading stream websocket error, restarting  connection: sent 1000 (OK); then received 1000 (OK)
+Traceback (most recent call last):
+  File "<scratch>/trace_runner.py", line 9, in traced
+    return await original(*a, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<adaptive-paper>/runner.py", line 893, in run_native
+    port.mark_reconciled()
+  File "<adaptive-paper>/transport.py", line 537, in mark_reconciled
+    raise TransportError("streams are not ready for reconciliation acknowledgement")
+transport.TransportError: streams are not ready for reconciliation acknowledgement

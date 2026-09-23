@@ -1,0 +1,327 @@
+{
+  "kind": "streamed_quote_validity",
+  "feed": "sip",
+  "symbols": [
+    "AAPL",
+    "AMD",
+    "AMZN",
+    "ARM",
+    "ASTS",
+    "AVGO",
+    "COIN",
+    "CRWD",
+    "CRWV",
+    "DIA",
+    "GOOGL",
+    "INTC",
+    "IWM",
+    "JNJ",
+    "JPM",
+    "META",
+    "MSFT",
+    "MU",
+    "NVDA",
+    "PG",
+    "QQQ",
+    "SNDK",
+    "SPY",
+    "TSLA"
+  ],
+  "config_sha256": "3587653104e68fdfc9bbb9170825c611abcf7e2e1be1004327a056031c34555a",
+  "script_sha256": "52f6a9ea1e449c99979be17424178d484f1bf50ce47600daf1a98099d183f560",
+  "requested_window_seconds": 60.0,
+  "observed_window_seconds": 60.067,
+  "started_unix": 1790180945.611,
+  "transport_sha256": "fe10f01bfe05880da08625fb5280a26ca51d05cf2262687fb0cde1caa32af8c5",
+  "counts": {
+    "total": 32419,
+    "crossed": 36
+  },
+  "rejected_by_symbol": {
+    "GOOGL": 6,
+    "IWM": 25,
+    "SPY": 5
+  },
+  "examples": [
+    {
+      "S": "GOOGL",
+      "bp": 339.15,
+      "ap": 339.14,
+      "bs": 40,
+      "as": 520,
+      "bx": "Q",
+      "ax": "P",
+      "c": [
+        "R"
+      ],
+      "z": "C",
+      "t": "Timestamp(seconds=1790180946, nanoseconds=486073232)"
+    },
+    {
+      "S": "GOOGL",
+      "bp": 338.98,
+      "ap": 338.97,
+      "bs": 40,
+      "as": 40,
+      "bx": "P",
+      "ax": "Z",
+      "c": [
+        "R"
+      ],
+      "z": "C",
+      "t": "Timestamp(seconds=1790180961, nanoseconds=798826785)"
+    },
+    {
+      "S": "GOOGL",
+      "bp": 338.98,
+      "ap": 338.97,
+      "bs": 40,
+      "as": 80,
+      "bx": "P",
+      "ax": "Q",
+      "c": [
+        "R"
+      ],
+      "z": "C",
+      "t": "Timestamp(seconds=1790180961, nanoseconds=798874715)"
+    },
+    {
+      "S": "GOOGL",
+      "bp": 338.95,
+      "ap": 338.94,
+      "bs": 200,
+      "as": 80,
+      "bx": "K",
+      "ax": "Q",
+      "c": [
+        "R"
+      ],
+      "z": "C",
+      "t": "Timestamp(seconds=1790180961, nanoseconds=801621513)"
+    },
+    {
+      "S": "GOOGL",
+      "bp": 338.95,
+      "ap": 338.94,
+      "bs": 120,
+      "as": 80,
+      "bx": "K",
+      "ax": "Q",
+      "c": [
+        "R"
+      ],
+      "z": "C",
+      "t": "Timestamp(seconds=1790180961, nanoseconds=801662016)"
+    },
+    {
+      "S": "GOOGL",
+      "bp": 338.95,
+      "ap": 338.94,
+      "bs": 40,
+      "as": 80,
+      "bx": "K",
+      "ax": "Q",
+      "c": [
+        "R"
+      ],
+      "z": "C",
+      "t": "Timestamp(seconds=1790180961, nanoseconds=801699649)"
+    },
+    {
+      "S": "IWM",
+      "bp": 283.17,
+      "ap": 283.16,
+      "bs": 40,
+      "as": 40,
+      "bx": "M",
+      "ax": "P",
+      "c": [
+        "R"
+      ],
+      "z": "B",
+      "t": "Timestamp(seconds=1790180981, nanoseconds=584731898)"
+    },
+    {
+      "S": "IWM",
+      "bp": 283.17,
+      "ap": 283.16,
+      "bs": 40,
+      "as": 40,
+      "bx": "M",
+      "ax": "P",
+      "c": [
+        "R"
+      ],
+      "z": "B",
+      "t": "Timestamp(seconds=1790180981, nanoseconds=585919788)"
+    },
+    {
+      "S": "IWM",
+      "bp": 283.17,
+      "ap": 283.16,
+      "bs": 40,
+      "as": 40,
+      "bx": "M",
+      "ax": "P",
+      "c": [
+        "R"
+      ],
+      "z": "B",
+      "t": "Timestamp(seconds=1790180981, nanoseconds=586090245)"
+    },
+    {
+      "S": "IWM",
+      "bp": 283.17,
+      "ap": 283.16,
+      "bs": 40,
+      "as": 40,
+      "bx": "M",
+      "ax": "P",
+      "c": [
+        "R"
+      ],
+      "z": "B",
+      "t": "Timestamp(seconds=1790180981, nanoseconds=586205453)"
+    },
+    {
+      "S": "IWM",
+      "bp": 283.17,
+      "ap": 283.16,
+      "bs": 40,
+      "as": 120,
+      "bx": "M",
+      "ax": "P",
+      "c": [
+        "R"
+      ],
+      "z": "B",
+      "t": "Timestamp(seconds=1790180981, nanoseconds=586245559)"
+    },
+    {
+      "S": "IWM",
+      "bp": 283.17,
+      "ap": 283.16,
+      "bs": 40,
+      "as": 40,
+      "bx": "M",
+      "ax": "P",
+      "c": [
+        "R"
+      ],
+      "z": "B",
+      "t": "Timestamp(seconds=1790180981, nanoseconds=586250849)"
+    },
+    {
+      "S": "IWM",
+      "bp": 283.17,
+      "ap": 283.16,
+      "bs": 40,
+      "as": 40,
+      "bx": "M",
+      "ax": "P",
+      "c": [
+        "R"
+      ],
+      "z": "B",
+      "t": "Timestamp(seconds=1790180981, nanoseconds=586335795)"
+    },
+    {
+      "S": "IWM",
+      "bp": 283.17,
+      "ap": 283.16,
+      "bs": 40,
+      "as": 120,
+      "bx": "M",
+      "ax": "P",
+      "c": [
+        "R"
+      ],
+      "z": "B",
+      "t": "Timestamp(seconds=1790180981, nanoseconds=586381132)"
+    },
+    {
+      "S": "IWM",
+      "bp": 283.17,
+      "ap": 283.16,
+      "bs": 40,
+      "as": 40,
+      "bx": "M",
+      "ax": "P",
+      "c": [
+        "R"
+      ],
+      "z": "B",
+      "t": "Timestamp(seconds=1790180981, nanoseconds=586381132)"
+    },
+    {
+      "S": "IWM",
+      "bp": 283.17,
+      "ap": 283.16,
+      "bs": 40,
+      "as": 40,
+      "bx": "M",
+      "ax": "P",
+      "c": [
+        "R"
+      ],
+      "z": "B",
+      "t": "Timestamp(seconds=1790180981, nanoseconds=586466112)"
+    },
+    {
+      "S": "IWM",
+      "bp": 283.17,
+      "ap": 283.16,
+      "bs": 40,
+      "as": 120,
+      "bx": "M",
+      "ax": "P",
+      "c": [
+        "R"
+      ],
+      "z": "B",
+      "t": "Timestamp(seconds=1790180981, nanoseconds=586496136)"
+    },
+    {
+      "S": "IWM",
+      "bp": 283.17,
+      "ap": 283.16,
+      "bs": 40,
+      "as": 40,
+      "bx": "M",
+      "ax": "P",
+      "c": [
+        "R"
+      ],
+      "z": "B",
+      "t": "Timestamp(seconds=1790180981, nanoseconds=586516167)"
+    },
+    {
+      "S": "IWM",
+      "bp": 283.17,
+      "ap": 283.16,
+      "bs": 40,
+      "as": 40,
+      "bx": "M",
+      "ax": "P",
+      "c": [
+        "R"
+      ],
+      "z": "B",
+      "t": "Timestamp(seconds=1790180981, nanoseconds=755628207)"
+    },
+    {
+      "S": "IWM",
+      "bp": 283.17,
+      "ap": 283.16,
+      "bs": 40,
+      "as": 40,
+      "bx": "M",
+      "ax": "P",
+      "c": [
+        "R"
+      ],
+      "z": "B",
+      "t": "Timestamp(seconds=1790180981, nanoseconds=755768600)"
+    }
+  ]
+}
