@@ -271,3 +271,22 @@ field), today's window comes from the contract's `tradingHours` instead of
 outside 09:30-16:00; only these two predeclared plans can be selected. After-hours
 liquidity is thinner: the same quote-age limit and marketable offset apply, so a stale
 or wide quote leaves the run incomplete instead of paying up.
+
+### After-hours run, 2026-09-23 (read-only frozen copy of `c5468df1`, hashes in `evidence/frozen-c5468df1.SHA256SUMS`)
+
+- 18:58 ET, `run --plan plan-post.json`, `evidence/receipt-20260923-post-incomplete.json`: **incomplete** (exit 1,
+  81.8 s), ended flat. The pre-run check passed: paper account, 0 positions, 0 open orders. Today's SPY `tradingHours`
+  were `0400-2000`, giving the window 16:00-19:50.
+  - C1: a resting BUY at 383.99 was accepted outside regular hours.
+  - C2: that order was cancelled.
+  - C3: a marketable BUY filled at 768.01 (limit 768.06).
+  - C4: the SELL at 767.93 did not fill within the 45 s step (`C4_step_timeout`).
+  - Cleanup cancelled C4 and flattened. The first retry (X1, 767.93) did not fill and was cancelled. The second (X2,
+    767.93) filled at 767.96.
+  - Round trip: realized -2.07 USD including about 2.02 USD commission, within the 5 USD bound. 5 of 6 orders used.
+  - Flat proof passed: 0 positions, 0 open orders.
+  - The node log has no IB warning 399 or 2109, which would mean `outsideRth` was ignored. The receipt and log carry no
+    account id.
+- What it shows: NautilusTrader 1.231.0's IB engine places, cancels and fills paper stock orders after hours with
+  `outsideRth`, and the harness cleans up on a timeout. The C4 timeout is thin after-hours liquidity against a fixed
+  45 s step. The plan is unchanged; a changed step or offset would need a new predeclared plan.
