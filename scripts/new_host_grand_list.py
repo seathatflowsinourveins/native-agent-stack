@@ -300,23 +300,31 @@ def tier_value(value):
     trailing parenthetical explanatory note, itself possibly containing '=', is dropped
     first; catalog PR #125 finding). A string with no trailing note still takes the result
     after the *last* '=' (for example 'max(6, round(...)=24.8), min(24.8, 32) = 24.8' ->
-    '24.8'), unchanged from before."""
+    '24.8', or 'cap = min(16, 30)' -> 'min(16, 30)': that trailing '(...)' is glued directly
+    onto a preceding token with no space, so it is part of the result expression itself, not
+    a separate note, and must not be dropped)."""
     if not isinstance(value, str):
         return value
     if "->" in value:
         return value.rsplit("->", 1)[1].strip()
     core = value
-    if core.rstrip().endswith(")"):
-        core = core.rstrip()
+    stripped = core.rstrip()
+    if stripped.endswith(")"):
         depth = 0
-        for index in range(len(core) - 1, -1, -1):
-            if core[index] == ")":
+        open_index = None
+        for index in range(len(stripped) - 1, -1, -1):
+            if stripped[index] == ")":
                 depth += 1
-            elif core[index] == "(":
+            elif stripped[index] == "(":
                 depth -= 1
                 if depth == 0:
-                    core = core[:index].rstrip()
+                    open_index = index
                     break
+        # Only a trailing "(...)" set off by a space (e.g. "16 (nproc ...)") is a separate
+        # explanatory note to drop; one glued directly to a preceding token (e.g.
+        # "min(16, 30)", no space before "(") is part of the expression and stays.
+        if open_index is not None and open_index > 0 and stripped[open_index - 1] == " ":
+            core = stripped[:open_index].rstrip()
     if "=" in core:
         return core.rsplit("=", 1)[1].strip()
     return core

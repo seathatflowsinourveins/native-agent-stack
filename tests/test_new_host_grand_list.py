@@ -46,6 +46,14 @@ class TierValueTests(unittest.TestCase):
         self.assertEqual(
             g.tier_value("max(6, round(99*0.25,1)=24.8), min(24.8, 32) = 24.8"), "24.8")
 
+    def test_trailing_parens_glued_to_a_token_are_part_of_the_result_not_a_note(self):
+        # "min(16, 30)" is glued directly onto its own text with no space before "(", so it
+        # is the result itself, not a separate explanatory note to drop -- unlike a genuine
+        # trailing note, which is always set off by a space (the case above).
+        self.assertEqual(g.tier_value("cap = min(16, 30)"), "min(16, 30)")
+        # And the two combine correctly: a real trailing note after a parenthesized result.
+        self.assertEqual(g.tier_value("cap = min(16, 30) (a trailing note)"), "min(16, 30)")
+
 
 class RepoKeyTests(unittest.TestCase):
     def test_release_and_tree_urls_share_a_key(self):
