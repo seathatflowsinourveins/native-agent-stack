@@ -10,10 +10,13 @@ optional sleep to exercise the timeout path. Modules are loaded by file path
 pattern already used by test_layer_verdicts.py.
 """
 import contextlib
+import hashlib
 import importlib.util
 import io
 import json
 import os
+import re
+import shlex
 import tempfile
 import unittest
 from pathlib import Path
@@ -261,7 +264,8 @@ class CodexLaneTests(CodexLaneFixture):
         packet_sha256 = hashlib.sha256(packet_path.read_bytes()).hexdigest()
         codex_dir = self.work_dir / "codex"
         codex_dir.mkdir()
-        existing = canned_return(packet_sha256=packet_sha256)
+        existing = canned_return(packet_sha256=packet_sha256,
+                                 provenance=codex_lane.lane_provenance(FIXTURE_PROMPT))
         out_path = codex_dir / "foundation__native-clients.json"
         out_path.write_text(json.dumps(existing, sort_keys=True, indent=1) + "\n", encoding="utf-8")
         before = out_path.read_text(encoding="utf-8")
@@ -270,6 +274,26 @@ class CodexLaneTests(CodexLaneFixture):
         self.assertEqual(exit_code, 0)
         self.assertEqual(self.argv_calls(), [], "the fake codex must never be invoked for an already-valid layer")
         self.assertEqual(out_path.read_text(encoding="utf-8"), before)
+
+    def test_a_return_from_older_lane_code_or_prompt_reruns_instead_of_being_skipped(self):
+        """PR #141 review (P1): the skip ignored provenance, so a return from older lane code or an older
+        prompt was skipped forever and then rejected by record_verdicts.py."""
+        packet_path = self.write_packet("foundation", "native-clients")
+        packet_sha256 = hashlib.sha256(packet_path.read_bytes()).hexdigest()
+        current = codex_lane.lane_provenance(FIXTURE_PROMPT)
+        out_path = self.out_path("foundation", "native-clients")
+        out_path.parent.mkdir()
+        stale = (None, {**current, "codex_lane_py_sha256": "1" * 64}, {**current, "prompt_sha256": "2" * 64})
+        for index, provenance in enumerate(stale, start=1):
+            existing = canned_return(packet_sha256=packet_sha256)
+            if provenance is not None:
+                existing["provenance"] = provenance
+            out_path.write_text(json.dumps(existing), encoding="utf-8")
+            self.assertEqual(self.run_lane(), 0)
+            self.assertEqual(len(self.argv_calls()), index, f"stale provenance {provenance} must rerun")
+            self.assertEqual(json.loads(out_path.read_text(encoding="utf-8"))["provenance"], current)
+        self.assertTrue(codex_lane.existing_output_is_valid(out_path, "foundation", "native-clients",
+                                                             packet_sha256, current))
 
     def test_timeout_handling_retries_once_then_fails(self):
         self.write_packet("foundation", "native-clients")
@@ -623,6 +647,54 @@ class BlindIsolationTests(CodexLaneFixture):
         self.assertTrue(any("runs git" in reasons for reasons in flagged.values()))
         self.assertIn("blind audit flags 1 layer(s)", err.getvalue())
 
+    def audit_paths(self, *commands):
+        events = self.work_dir / "audit-events.jsonl"
+        events.write_text("".join(json.dumps({"type": "item.completed", "item": {
+            "type": "command_execution", "command": command}}) + "\n" for command in commands), encoding="utf-8")
+        report = codex_lane.blind_audit(events, [str(self.repo), str(self.work_dir / "packets")])
+        return {item["command"]: [reason.split(": ", 1)[1] for reason in item["reasons"]
+                                  if reason.startswith("path outside")]
+                for item in report["flagged_commands"]}
+
+    def test_only_a_segment_executable_under_a_system_prefix_is_exempt(self):
+        """PR #141 review (P2): every /usr/ or /bin/ path was exempt, which hid data reads such as
+        /bin/cat /usr/local/share/prior-verdict.json."""
+        repo = self.repo
+        flagged = self.audit_paths(
+            "/bin/cat /usr/local/share/prior-verdict.json",
+            "/bin/bash -lc '/usr/bin/sed -n 1,20p /usr/share/doc/verdicts.txt'",
+            f"/bin/bash -lc 'cat {repo}/a.json | /usr/bin/head -5 && /usr/bin/python3 {repo}/x.py || /bin/true; /usr/bin/wc -l {repo}/b'",
+            f"/bin/bash -lc 'rg -n x {repo} 2>/dev/null'",
+            "/bin/bash -lc 'cat /bin/prior-verdicts'",
+            "/bin/bash -lc \"ls /usr/local/lib/verdicts\"",
+            "/bin/sh -c '/home/example/bin/tool --flag'",
+            "/usr/bin/env python3 -c 'print(1)'",
+        )
+        self.assertEqual(flagged, {
+            "/bin/cat /usr/local/share/prior-verdict.json": ["/usr/local/share/prior-verdict.json"],
+            "/bin/bash -lc '/usr/bin/sed -n 1,20p /usr/share/doc/verdicts.txt'": ["/usr/share/doc/verdicts.txt"],
+            "/bin/bash -lc 'cat /bin/prior-verdicts'": ["/bin/prior-verdicts"],
+            "/bin/bash -lc \"ls /usr/local/lib/verdicts\"": ["/usr/local/lib/verdicts"],
+            "/bin/sh -c '/home/example/bin/tool --flag'": ["/home/example/bin/tool"],
+        })
+
+
+
+class DocumentedCommandTests(unittest.TestCase):
+    """PR #141 review (P2): the README's codex exec block omitted -c web_search="disabled"."""
+
+    def test_the_readme_command_block_carries_every_isolation_argument(self):
+        readme = (TOOL_DIR / "README.md").read_text(encoding="utf-8")
+        blocks = [block for block in re.findall(r"```sh\n(.*?)```", readme, re.S) if block.startswith("codex exec")]
+        self.assertEqual(len(blocks), 1, "exactly one documented codex exec command block")
+        argv = shlex.split(blocks[0].replace("\\\n", " "))
+        isolation = list(codex_lane.ISOLATION_ARGS)
+        self.assertTrue(any(argv[index:index + len(isolation)] == isolation for index in range(len(argv))),
+                        f"{argv} must contain {isolation} in order")
+        docstring = shlex.split(codex_lane.__doc__.split("then run", 1)[1].split("capturing", 1)[0]
+                                .replace("\\\n", " "))
+        self.assertTrue(any(docstring[index:index + len(isolation)] == isolation for index in range(len(docstring))),
+                        f"the module docstring {docstring} must contain {isolation} in order")
 
 
 if __name__ == "__main__":

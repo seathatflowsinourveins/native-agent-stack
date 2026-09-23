@@ -814,25 +814,103 @@ class RecursiveWithheldKeyTests(unittest.TestCase):
 
 class RegisteredReceiptsTests(LanePacketsFixture):
     """2026-09-23 re-record: --registered-receipts attaches each component's registered receipts, so a
-    lane can open and cite a native receipt its ledger row never named."""
+    lane can open and cite a native receipt its ledger row never named. PR #142 re-review: a repository
+    match must not attach one component's receipts to another component that shares its repository."""
 
-    def receipts(self, *entries):
+    def receipts(self, *entries, stack=()):
         self.write("manifests/evidence.json", {"schema_version": 1, "files": [], "convergence_records": [],
                                                "receipts": [dict(entry, claim="c", limitations=[]) for entry in entries]})
+        self.write("manifests/stack.json", {"components": [{"id": cid, "repository": repo} for cid, repo in stack]})
+
+    def candidate(self, packets=None, name="Widget One"):
+        packet = self.packet("foundation", "layer-a", packets)
+        return packet, next(c for c in packet["candidates"] if c["name"] == name)
+
+    def add_manifest_component(self, component_id, repository, layer="layer-a"):
+        manifest = self.read(lane_packets.SOTA_MANIFEST_PATH)
+        row = next(row for row in manifest["foundation"] if row["layer"] == layer)
+        row["components"].append({"id": component_id, "repository": repository, "pin": "0.1.0", "upstream": None,
+                                  "review_status": "candidate", "pin_behind_upstream": False})
+        self.write(lane_packets.SOTA_MANIFEST_PATH, manifest)
 
     def test_candidates_carry_their_registered_receipts_sorted_by_path(self):
-        packet = self.packet("foundation", "layer-a")
-        component = next(c["component_id"] for c in packet["candidates"] if c.get("component_id"))
+        _packet, candidate = self.candidate()
+        component = candidate["component_id"]
         self.receipts({"id": "r2", "kind": "native_cli_e2e", "component_ids": [component], "path": "evidence/receipts/b.json"},
                       {"id": "r1", "kind": "host_e2e", "component_ids": [component, "other"], "path": "evidence/receipts/a.json"},
                       {"id": "r3", "kind": "native_cli_e2e", "component_ids": ["unrelated"], "path": "evidence/receipts/c.json"})
-        packet = self.packet("foundation", "layer-a", self.build(registered_receipts=True))
-        candidate = next(c for c in packet["candidates"] if c.get("component_id") == component)
+        packet, candidate = self.candidate(self.build(registered_receipts=True))
         self.assertEqual(candidate["registered_receipts"], [
-            {"id": "r1", "kind": "host_e2e", "path": "evidence/receipts/a.json"},
-            {"id": "r2", "kind": "native_cli_e2e", "path": "evidence/receipts/b.json"}])
+            {"id": "r1", "kind": "host_e2e", "path": "evidence/receipts/a.json", "matched_by": "component_id"},
+            {"id": "r2", "kind": "native_cli_e2e", "path": "evidence/receipts/b.json", "matched_by": "component_id"}])
         self.assertTrue(all("registered_receipts" in c for c in packet["candidates"]))
         self.assertIn("registered_receipts lists", packet["registered_receipts_note"])
+
+    def test_a_receipt_in_the_stack_id_space_matches_by_repository_when_nothing_else_shares_it(self):
+        # manifests/stack.json names nautilus-trader where the sota manifest says nautilustrader.
+        self.receipts({"id": "r9", "kind": "native_cli_e2e", "component_ids": ["stack-widget"],
+                       "path": "evidence/receipts/z.json"},
+                      stack=[("stack-widget", "https://github.com/Acme/Widget-One.git")])
+        _packet, candidate = self.candidate(self.build(registered_receipts=True))
+        self.assertEqual(candidate["registered_receipts"], [
+            {"id": "r9", "kind": "native_cli_e2e", "path": "evidence/receipts/z.json", "matched_by": "repository"}])
+
+    def test_two_manifest_ids_sharing_one_repository_get_nothing_by_repository(self):
+        # The execution-broker packet gave nautilus-ibkr-adapter all six NautilusTrader engine receipts,
+        # and codex-native-sdk got every Codex CLI receipt.
+        self.add_manifest_component("widget-one-adapter", "https://github.com/acme/widget-one")
+        self.receipts({"id": "r9", "kind": "native_cli_e2e", "component_ids": ["stack-widget"],
+                       "path": "evidence/receipts/z.json"},
+                      stack=[("stack-widget", "https://github.com/acme/widget-one")])
+        packet, candidate = self.candidate(self.build(registered_receipts=True))
+        self.assertEqual(candidate["registered_receipts"], [])
+        self.assertNotIn("evidence/receipts/z.json", json.dumps(packet))
+
+    def aliases(self, mapping):
+        self.write("tools/sota-convergence/receipt-component-aliases.json", {"schema_version": 1, "aliases": mapping})
+
+    def test_an_alias_attaches_receipts_where_a_shared_repository_cannot(self):
+        # nautechsystems/nautilus_trader serves nautilustrader and nautilus-ibkr-adapter; the explicit alias
+        # nautilus-trader -> nautilustrader reaches the engine only.
+        _packet, candidate = self.candidate()
+        self.add_manifest_component("widget-one-adapter", candidate["repository"])
+        self.receipts({"id": "r9", "kind": "native_cli_e2e", "component_ids": ["stack-widget"],
+                       "path": "evidence/receipts/z.json"},
+                      stack=[("stack-widget", candidate["repository"])])
+        self.aliases({"stack-widget": candidate["component_id"]})
+        packet, candidate = self.candidate(self.build(registered_receipts=True))
+        self.assertEqual(candidate["registered_receipts"], [
+            {"id": "r9", "kind": "native_cli_e2e", "path": "evidence/receipts/z.json", "matched_by": "alias"}])
+        adapter = [c for c in packet["sota_components_not_in_candidates"] if c["id"] == "widget-one-adapter"]
+        self.assertTrue(adapter and adapter[0]["registered_receipts"] == [], adapter)
+
+    def test_an_alias_between_different_repositories_is_refused(self):
+        _packet, candidate = self.candidate()
+        self.receipts({"id": "r9", "kind": "native_cli_e2e", "component_ids": ["stack-widget"],
+                       "path": "evidence/receipts/z.json"},
+                      stack=[("stack-widget", "https://github.com/other/thing")])
+        self.aliases({"stack-widget": candidate["component_id"]})
+        with self.assertRaisesRegex(ValueError, "do not share one repository"):
+            self.build(registered_receipts=True)
+
+    def test_two_stack_ids_sharing_one_repository_get_nothing_by_repository(self):
+        self.receipts({"id": "r9", "kind": "native_cli_e2e", "component_ids": ["stack-widget"],
+                       "path": "evidence/receipts/z.json"},
+                      stack=[("stack-widget", "https://github.com/acme/widget-one"),
+                             ("stack-widget-plugin", "https://github.com/acme/widget-one")])
+        _packet, candidate = self.candidate(self.build(registered_receipts=True))
+        self.assertEqual(candidate["registered_receipts"], [])
+
+    def test_an_id_match_suppresses_every_repository_match(self):
+        _packet, candidate = self.candidate()
+        self.receipts({"id": "r1", "kind": "host_e2e", "component_ids": [candidate["component_id"]],
+                       "path": "evidence/receipts/a.json"},
+                      {"id": "r9", "kind": "native_cli_e2e", "component_ids": ["stack-widget"],
+                       "path": "evidence/receipts/z.json"},
+                      stack=[("stack-widget", "https://github.com/acme/widget-one")])
+        _packet, candidate = self.candidate(self.build(registered_receipts=True))
+        self.assertEqual([(r["path"], r["matched_by"]) for r in candidate["registered_receipts"]],
+                         [("evidence/receipts/a.json", "component_id")])
 
     def test_default_build_is_unchanged(self):
         self.receipts({"id": "r1", "kind": "host_e2e", "component_ids": ["anything"], "path": "evidence/receipts/a.json"})
@@ -840,13 +918,23 @@ class RegisteredReceiptsTests(LanePacketsFixture):
         for text in self.build().values():
             self.assertNotIn("registered_receipts", text)
 
-    def test_withheld_packets_keep_the_receipts(self):
-        packet = self.packet("foundation", "layer-a")
-        component = next(c["component_id"] for c in packet["candidates"] if c.get("component_id"))
-        self.receipts({"id": "r1", "kind": "host_e2e", "component_ids": [component], "path": "evidence/receipts/a.json"})
-        packet = self.packet("foundation", "layer-a", self.build(registered_receipts=True, withhold=True))
-        candidate = next(c for c in packet["candidates"] if c.get("component_id") == component)
-        self.assertEqual([r["id"] for r in candidate["registered_receipts"]], ["r1"])
+    def test_withheld_packets_keep_kind_and_path_but_not_the_receipt_id(self):
+        _packet, candidate = self.candidate()
+        self.receipts({"id": "native-session-defaults-20260920", "kind": "host_e2e",
+                       "component_ids": [candidate["component_id"]], "path": "evidence/receipts/a.json"})
+        packets = self.build(registered_receipts=True, withhold=True)
+        packet, candidate = self.candidate(packets)
+        self.assertEqual(candidate["registered_receipts"], [
+            {"kind": "host_e2e", "path": "evidence/receipts/a.json", "matched_by": "component_id"}])
+        self.assertNotIn("native-session-defaults", "".join(packets.values()))
+        for text in packets.values():
+            document = json.loads(text)
+            self.assertEqual(withheld_packet_keys(document), [])
+            for label in ("candidates[].registered_receipts[].id",
+                          "sota_components_not_in_candidates[].registered_receipts[].id"):
+                self.assertIn(label, document["withheld"])
+        for text in self.build(registered_receipts=True).values():
+            self.assertNotIn("registered_receipts[].id", json.dumps(json.loads(text)["withheld"]))
 
 
 if __name__ == "__main__":

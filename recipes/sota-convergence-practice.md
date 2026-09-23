@@ -77,8 +77,16 @@ python3 tools/sota-convergence/lane_packets.py --root . --out "$WORK_DIR"
 
 # 2. Claude lane -- the agent-lab saved workflow, run per packet; each
 #    return is written to "$WORK_DIR/claude/<catalog>__<layer_id>.json".
-# 3. Codex lane -- a separate account/quota, resumable.
-python3 tools/sota-convergence/codex_lane.py --work-dir "$WORK_DIR" --repo .
+# 3. Codex lane -- a separate account/quota, resumable. It runs on a blind
+#    export placed outside every repository: codex_lane.py refuses a --repo
+#    below any .git (exit 2), since git history recovers every stripped label.
+#    BLIND_DIR must not be inside any repository.
+python3 tools/sota-convergence/blind_checkout.py --source . --rev HEAD \
+  --dest "$BLIND_DIR/checkout" --export "$BLIND_DIR/export"
+python3 tools/sota-convergence/codex_lane.py --work-dir "$WORK_DIR" --repo "$BLIND_DIR/export"
+git worktree remove --force "$BLIND_DIR/checkout"
+#    A deliberately non-blind run passes --allow-git-history instead:
+#    python3 tools/sota-convergence/codex_lane.py --work-dir "$WORK_DIR" --repo . --allow-git-history
 
 # 4. Record: validate every lane file (a rejected file is reported and
 #    treated as absent, never aborts the run), seal the accepted ones, and

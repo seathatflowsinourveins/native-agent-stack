@@ -1,0 +1,13 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "title": "Blind adjudication refutation (one judgment)",
+ "description": "refuted is true only when the retained evidence shows the judge's pick is wrong or rests on a path that does not show what the judge says.",
+ "type": "object",
+ "additionalProperties": false,
+ "properties": {
+  "refuted": {"type": "boolean"},
+  "reason": {"type": "string"},
+  "evidence_refs": {"type": "array", "items": {"type": "string"}}
+ },
+ "required": ["refuted", "reason", "evidence_refs"]
+}

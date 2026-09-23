@@ -222,6 +222,13 @@ def normalized(value):
     return json.loads(json.dumps(sanitize_value(value), sort_keys=True))
 
 
+def same_json(left, right) -> bool:
+    """Type-strict equality of two JSON values: Python's ``==`` treats 1, 1.0 and True as equal, so a
+    type-only rewrite of a number or boolean in a frozen row would otherwise pass (the #135 gate compares
+    frozen documents the same way)."""
+    return json.dumps(left, sort_keys=True) == json.dumps(right, sort_keys=True)
+
+
 def build_document(root: Path, checked_at: str, *, run_id: str = DEFAULT_RUN_ID, manifest: str = None) -> dict:
     sota_doc = load_json(root / (manifest or default_manifest(run_id)))
     sota_index = sota_layer_index(sota_doc)
@@ -466,7 +473,7 @@ def check_frozen_rows(root: Path, run_id: str, wave: dict, rows: list, text: str
         entry = published.get((catalog, row["layer_id"]))
         if entry is None:
             problems.append(f"{catalog}/{row['layer_id']} names wave {run_id} but is absent from {wave['path']}")
-        elif normalized(build_verdict_row(row, sota_index.get(row["layer_id"], []))) != entry:
+        elif not same_json(normalized(build_verdict_row(row, sota_index.get(row["layer_id"], []))), entry):
             problems.append(f"{catalog}/{row['layer_id']} names wave {run_id} but differs from its frozen "
                             f"entry in {wave['path']} (re-record it under a new --run-id instead)")
     return problems

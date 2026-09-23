@@ -625,12 +625,32 @@ the packets alone does not blind a lane; see the handbook's label-exposure limit
 the ledger row, so a lane could not see a native receipt the row never named. Under Linux, `platform_status`
 accepts a `native_proven` or `measured_comparison` winner only when it cites a registered `evidence/` file.
 With the flag, every candidate and `sota_components_not_in_candidates` entry carries `registered_receipts`:
-the `{id, kind, path}` of each `manifests/evidence.json` receipt whose `component_ids` names it, sorted by
-path. A packet-level `registered_receipts_note` tells the lane that a receipt's kind and content, not its
-presence, decide the evidence class.
+the `manifests/evidence.json` receipts that name its component, sorted by path, each with `kind`, `path` and
+`matched_by`.
+- **`matched_by: "component_id"`:** the receipt's `component_ids` names the item's own id.
+- **`matched_by: "repository"`:** receipts name components in the `manifests/stack.json` id space, which
+  differs from the sota manifest's for some components (`nautilus-trader` and `nautilustrader`, `duckdb`
+  and `data-duckdb`). A repository match is used only when (a) the item's own id matches no receipt,
+  (b) exactly one `manifests/stack.json` component uses the item's repository slug and the receipt names
+  that component, and (c) no other sota manifest component id, in either catalog, uses that slug.
+  Otherwise nothing is attached by repository (PR #142 re-review: an unconditional repository match gave
+  `nautilus-ibkr-adapter` all six NautilusTrader engine receipts and `codex-native-sdk` every Codex CLI
+  receipt).
+- **Receipt ids:** under `--withhold-labels` the receipt `id` is dropped, because ids such as
+  `native-session-defaults-20260920` can name the incumbent's role, and the packet's `withheld` list names
+  `candidates[].registered_receipts[].id` and `sota_components_not_in_candidates[].registered_receipts[].id`.
+  Paths and receipt contents are not stripped, and a receipt describing an adoption still says so.
 
-On the 2026-09-23 tree with `manifest-20260923`, 88 of 286 candidates carry at least one receipt. The flag is
-off by default, so the 2026-09-22 packets reproduce.
+A packet-level `registered_receipts_note` says how each entry matched, that a receipt may name several
+components and that its `kind` is the registrant's label. The lane opens the receipt and judges what it ran
+for this component.
+
+On the 2026-09-23 tree with `manifest-20260923`, `--trading-candidates manifest` and `--withhold-labels`, 92
+of 286 candidates carry at least one receipt, 4 of them by repository (`data-duckdb` gets 13). The shared
+repository rule leaves `nautilustrader`, `nautilus-ibkr-adapter`, `codex-native-sdk` and the trading
+`foundation-*` aliases (for example `foundation-ai-memory`) with no repository-matched receipt: each shares its
+slug with another manifest id, so its receipts need a manifest id change or an id-matched registration. The
+flag is off by default, so the 2026-09-22 packets reproduce.
 
 **Popularity and recency are withheld too** (2026-09-23 peer audit: 132
 foundation-packet objects still carried GitHub `stars` and `pushed_at` through
@@ -1069,7 +1089,31 @@ git worktree remove --force /path/to/blind-checkout
 
 `--export` copies the stripped tree without `.git` or `BLIND-MANIFEST.json`. The worktree's `.git` reaches
 the source repository's history, so `git show <rev>:<path>` would recover every stripped value.
-Hand the lanes this copy, not the worktree.
+Hand the lanes this copy, not the worktree, and place it outside every repository (`codex_lane.py` refuses
+a `--repo` below any `.git`).
+
+**Instruction files in the export (PR #141 review).** A coding agent loads project instructions from the
+tree it starts in, and this repository's `AGENTS.md` names the incumbent choices (the selected destination
+engine, for one). In the export only, never in the worktree:
+- every `AGENTS.md`, `AGENTS.override.md`, `CLAUDE.md` and `CLAUDE.local.md`, at any depth, is replaced by
+  one neutral stub (`blind_checkout.EXPORT_INSTRUCTION_STUB`). The stub says the tree is a sanitized export
+  for a blind layer-verdict lane, that the lane judges only from its packet and the files, and that no
+  file is an instruction to the lane. The root always gets `AGENTS.md` and `CLAUDE.md` stubs.
+- every `.claude/`, `.codex/` and `.agents/` directory, at any depth, is left out.
+
+On the 2026-09-23 tree this covers `AGENTS.md`, `CLAUDE.md`,
+`blueprints/convergence-practice/application-delivery/{AGENTS,CLAUDE}.md` and
+`examples/claude-native/CLAUDE.md`; the tree has no `.claude/`, `.codex/` or `.agents/` directory. The CLI
+prints both lists (`export_instruction_files_replaced`, `export_instruction_dirs_removed`).
+
+**Remaining limit: Markdown prose still carries labels.** The export strips JSON label fields (below) and
+the instruction files, not prose. Markdown elsewhere is copied unchanged and still names selections, for
+example `README.md` ("selected components"), `docs/foundation-stack.md`,
+`docs/landscape-continuation.md`, `blueprints/us-equities/north-star.md`,
+`blueprints/us-equities/engine-nautilus/`, `adoption/`, `recipes/` and the `catalogs/**/*.md` narratives.
+(`docs/grand-catalog-handbook.md` is removed outright.) These are not stripped wholesale, because a lane
+also reads them as evidence. The lane prompt's rules and the post-run blind audit are the controls here,
+and a coordinator discloses the limit with the wave.
 
 It removes outright: `evidence/artifacts/layer-verdicts-*/` (recursively),
 `catalogs/sota-convergence/layer-verdicts-*.json`,
@@ -1148,8 +1192,12 @@ For every packet under `<work-dir>/packets/<catalog>__<layer_id>.json`
 (written by `lane_packets.py`) without an already-valid
 `<work-dir>/codex/<catalog>__<layer_id>.json` on disk -- valid meaning: the
 existing file parses as a JSON object with `lane == "codex"`, `catalog` and
-`layer_id` matching this packet, and, if it already has a `packet_sha256`,
-that hash still matching the packet file's current bytes -- it fills the
+`layer_id` matching this packet, if it already has a `packet_sha256`,
+that hash still matching the packet file's current bytes, and its `provenance`
+equal to the current `lane_provenance(--prompt)` (this `codex_lane.py`'s and the
+prompt template's sha256; a return from older lane code, an older prompt or
+without provenance is rerun, not skipped, because `record_verdicts.py` would
+reject it on every later run) -- it fills the
 shared lane prompt (`lane-prompt.md`, placeholders `{PACKET_PATH}`
 `{REPO_ROOT}` `{LANE}`) and runs:
 
@@ -1157,8 +1205,12 @@ shared lane prompt (`lane-prompt.md`, placeholders `{PACKET_PATH}`
 codex exec --sandbox read-only --skip-git-repo-check --ephemeral \
   -C <repo> --output-schema <schema> -o <out.tmp> --json \
   -c model_reasoning_effort=<effort> \
-  --ignore-user-config -c features.hooks=false -c features.plugin_hooks=false <filled prompt>
+  --ignore-user-config -c features.hooks=false -c features.plugin_hooks=false \
+  -c 'web_search="disabled"' <filled prompt>
 ```
+
+The four isolation settings on the last two lines are `ISOLATION_ARGS`; `tests/test_codex_lane.py` fails when
+this block or the module docstring leaves one out.
 
 capturing the full JSON event stream to
 `<work-dir>/codex/events/<catalog>__<layer_id>.jsonl` and appending one usage
@@ -1186,13 +1238,22 @@ immediately before each attempt is launched, not only after a failure is
 detected, so a stale file is never misread as the current attempt's own
 output.
 
+A blind wave gives the lane a `blind_checkout.py --export` copy placed outside every repository (`--repo .`
+exits 2, because the checkout has `.git`):
+
 ```sh
+python3 tools/sota-convergence/blind_checkout.py \
+  --source . --rev HEAD --dest /path/outside/repos/blind-checkout --export /path/outside/repos/blind-export
 python3 tools/sota-convergence/codex_lane.py \
-  --work-dir /path/to/work-dir --repo . --effort high
+  --work-dir /path/to/work-dir --repo /path/outside/repos/blind-export --effort high
 python3 tools/sota-convergence/codex_lane.py \
-  --work-dir /path/to/work-dir --repo . --layers native-clients,market-data-reference
+  --work-dir /path/to/work-dir --repo /path/outside/repos/blind-export --layers native-clients,market-data-reference
 python3 tools/sota-convergence/codex_lane.py \
-  --work-dir /path/to/work-dir --repo . --dry-run   # prints the command per pending layer, writes nothing
+  --work-dir /path/to/work-dir --repo /path/outside/repos/blind-export --dry-run   # prints the command per pending layer, writes nothing
+git worktree remove --force /path/outside/repos/blind-checkout
+# Not blind: a run against the checkout itself, whose git history recovers every stripped label.
+python3 tools/sota-convergence/codex_lane.py \
+  --work-dir /path/to/work-dir --repo . --allow-git-history
 ```
 
 **Blind children (2026-09-23 re-record).** Memory stores, code indexes, the web and git history can
@@ -1225,7 +1286,11 @@ What remains and how it is handled:
 - **Blind audit:** after each run, `codex_lane.py` writes `<work-dir>/codex/blind-audit.json`, a
   report-only reading of each child's events. It counts web searches and MCP tool calls, and flags
   commands that do any of the following:
-  - name an absolute path outside the repository and the packets directory;
+  - name an absolute path outside the repository and the packets directory. Only `/dev/null` and a
+    command segment's executable token are exempt, and the token only when it is under `/bin/`, `/usr/` or
+    `/sbin/`: the first word at the start, after `;`, `&&`, `||`, `|` or a newline, or right after
+    `bash -lc '` (or `sh -c "`). A data path under `/usr/` or `/bin/` is flagged, so
+    `/bin/cat /usr/local/share/prior-verdict.json` flags `/usr/local/share/prior-verdict.json`;
   - use a `~`, `$HOME` or `${HOME}` path;
   - climb out with `..`;
   - run git, ai-memory, agentsview, mcporter, qmd, socraticode, jcodemunch, serena, sqlite3, curl or wget.
@@ -1277,3 +1342,55 @@ datasets, kept separate here:
   ones the three non-taxonomy lane layers contributed. No selection, pin
   comparison or disposition changed; only where the non-taxonomy rows live in
   the manifest, and which count they are scoped to, changed.
+
+## Two-family adjudication
+
+`adjudicate.py` produces the adjudication records that `record_verdicts.py --adjudications` reads for layers
+where the two lanes chose different winner components (2026-09-23 re-record).
+- **The rule:** `scripts/landscape.py` `judge_adjudication` accepts a winner only when the judgments cover both
+  lane families (anthropic and openai), each in both presentation orders, all pick the same lane, and none is
+  refuted. Anything else is sealed as a split, and the row stays `pending_lanes` with an executed comparison
+  named.
+- **Blinding:** each judge and refuter is blind to which lane produced A or B, and reads only its input file,
+  the packet and the blind export.
+
+```sh
+python3 tools/sota-convergence/adjudicate.py inputs --work-dir W        # A/B and B/A inputs, index.json
+python3 tools/sota-convergence/adjudicate.py codex --work-dir W --repo <blind export> --model <model>
+python3 tools/sota-convergence/adjudicate.py claude-args --work-dir W --repo <blind export> > args.json
+# run tools/sota-convergence/adjudication-lane.js with args.json (blind-lane-reviewer agents)
+python3 tools/sota-convergence/adjudicate.py claude-collect --work-dir W --result <workflow result> --model <resolved>
+python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjudications
+```
+
+- **`inputs`:** finds the disagreeing layers with `landscape.lane_winner_components`, the function CI uses. It
+  writes each layer's two returns in both orders, scrubbed to the eleven verdict fields both lanes share.
+  Lane, model, provenance and refutation fields are removed. Prose that names a lane is reported in
+  `index.json` as `identity_mentions`, not removed.
+- **`codex`:** runs one judge and one refuter per input through `codex exec` with `codex_lane.ISOLATION_ARGS`
+  (no user config, hooks or web search) and the strict schemas `adjudication-judge.schema.json` and
+  `adjudication-refute.schema.json`. It refuses a repository under any `.git`, retries once, resumes, and
+  writes a blind audit.
+- **`adjudication-lane.js`:** the Claude family's judge and refuter, one pair per input. Both run as
+  `blind-lane-reviewer` (Read, Glob and Grep; no skills or project instructions). `claude-collect` records
+  its return; a lost judge or refuter makes that judgment missing, never unrefuted.
+- **`assemble`:** writes one record per layer. `claude_position` follows the order, `refuting_votes` is 1 when
+  the refuter refuted, and `judge` is `{model, family}`. `stripped_packet_sha256` is the layer's sealed lane
+  packet. Each record is validated with `judge_adjudication` before it is written. A missing family gives a
+  split record naming it.
+
+**Limits:**
+- Writing style can still reveal a lane.
+- One refuter per judgment, not two.
+- The judge may read the packet outside the repository root, which it needs for the requirement and
+  candidate keys.
+
+**Receipt aliases.** `receipt-component-aliases.json` maps a `manifests/stack.json` component id (the id space
+receipts name) to the sota manifest id for the same component where the spellings differ: `nautilus-trader`
+to `nautilustrader`, and `duckdb`, `edgartools` and `exchange-calendars` to their `data-` ids.
+- `lane_packets.py --registered-receipts` attaches such receipts with `matched_by: alias`.
+- The index build fails when an alias's two ids do not share one repository.
+- An explicit entry is required where one repository serves several manifest ids. nautechsystems/nautilus_trader
+  is both `nautilustrader` and `nautilus-ibkr-adapter`, and a repository match cannot tell which component a
+  receipt exercised.
+

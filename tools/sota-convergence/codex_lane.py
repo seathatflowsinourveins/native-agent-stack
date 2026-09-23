@@ -9,7 +9,8 @@ absolute path, the repository root and ``LANE=codex``, then run
     codex exec --sandbox read-only --skip-git-repo-check --ephemeral \
         -C <repo> --output-schema <schema> -o <out.tmp> --json \
         -c model_reasoning_effort=<effort> \
-        --ignore-user-config -c features.hooks=false -c features.plugin_hooks=false <prompt>
+        --ignore-user-config -c features.hooks=false -c features.plugin_hooks=false \
+        -c 'web_search="disabled"' <prompt>
 
 capturing the JSON event stream to
 ``<work-dir>/codex/events/<catalog>__<layer_id>.jsonl`` and a usage row per
@@ -175,13 +176,19 @@ def discover_packets(work_dir: Path, layers: "set[str] | None") -> list:
     return found
 
 
-def existing_output_is_valid(out_path: Path, catalog: str, layer_id: str, packet_sha256: str) -> bool:
+def existing_output_is_valid(out_path: Path, catalog: str, layer_id: str, packet_sha256: str,
+                             provenance: dict = None) -> bool:
     """Resumable-skip check: the file must parse as a JSON object already
     forced onto this lane and this exact packet. A present-but-different
     ``packet_sha256`` (the packet changed since the file was written) is
     treated as invalid so the layer reruns; a missing ``packet_sha256`` on an
     otherwise-matching old file is not itself disqualifying -- a rerun would
-    only fill it in, so there is nothing to gain by discarding the file."""
+    only fill it in, so there is nothing to gain by discarding the file.
+
+    ``provenance`` is the current ``lane_provenance(prompt_path)``: when given, the file's own
+    ``provenance`` must equal it field for field. A return written by older lane code or from an older
+    prompt (or one without provenance) is stale: record_verdicts.py rejects it, so skipping it would
+    leave the layer rejected on every later run (PR #141 review). It reruns instead."""
     if not out_path.exists():
         return False
     try:
@@ -197,6 +204,10 @@ def existing_output_is_valid(out_path: Path, catalog: str, layer_id: str, packet
     existing_hash = data.get("packet_sha256")
     if existing_hash and existing_hash != packet_sha256:
         return False
+    if provenance is not None:
+        existing = data.get("provenance")
+        if not isinstance(existing, dict) or any(existing.get(key) != value for key, value in provenance.items()):
+            return False
     return True
 
 
@@ -253,7 +264,36 @@ ABSOLUTE_PATH = re.compile(r"(?<![\w.~}-])(/[^\s'\"|;&<>()`]+)")
 HOME_PATH = re.compile(r"(?:~|\$HOME|\$\{HOME\})(?:/[^\s'\"|;&<>()`]*)?")
 PARENT_PATH = re.compile(r"(?:^|[\s'\"=:])((?:[^\s'\"|;&<>()`]*/)?\.\.(?:/[^\s'\"|;&<>()`]*)?)")
 ROOT_PATH = re.compile(r"(?:^|[\s'\"=])/(?=$|[\s'\";&|)])")
-SYSTEM_PREFIXES = ("/bin/", "/usr/", "/dev/null")
+# Only the executable token of a command segment is exempt, and only when it is a system executable: the
+# first word at the start, after ``;``, ``&&``, ``||``, ``|`` or a newline, or right after ``bash -lc '``
+# (``sh -c "`` and the like). Every other absolute path outside the roots is flagged, a ``/usr/...`` or
+# ``/bin/...`` data path included -- ``/bin/cat /usr/local/share/prior-verdict.json`` reads data (PR #141
+# review). ``/dev/null`` stays exempt wherever it appears.
+EXECUTABLE_TOKEN = re.compile(r"(?:^|;|&&|\|\||\||\n|\b(?:ba|z|da)?sh\s+-l?c\s+['\"])\s*(?=/)")
+SYSTEM_EXECUTABLE_PREFIXES = ("/bin/", "/usr/", "/sbin/")
+EXEMPT_PATHS = ("/dev/null",)
+
+
+def executable_token_starts(command: str) -> set:
+    """Offsets where a command segment's executable token begins, when that token is an absolute path."""
+    return {match.end() for match in EXECUTABLE_TOKEN.finditer(command)}
+
+
+def outside_paths(command: str, allowed_roots) -> list:
+    """Absolute paths in ``command`` outside ``allowed_roots``, except /dev/null and a segment's system
+    executable token."""
+    executables = executable_token_starts(command)
+    found = []
+    for match in ABSOLUTE_PATH.finditer(command):
+        path = match.group(1)
+        if path in EXEMPT_PATHS:
+            continue
+        if match.start(1) in executables and path.startswith(SYSTEM_EXECUTABLE_PREFIXES):
+            continue
+        if any(path == root or path.startswith(root.rstrip("/") + "/") for root in allowed_roots):
+            continue
+        found.append(path)
+    return found
 
 
 def blind_audit(events_path: Path, allowed_roots) -> dict:
@@ -280,9 +320,7 @@ def blind_audit(events_path: Path, allowed_roots) -> dict:
             report["commands"] += 1
             command = item.get("command") if isinstance(item.get("command"), str) else ""
             reasons = [f"path outside the repository and packets: {path}"
-                       for path in ABSOLUTE_PATH.findall(command)
-                       if not path.startswith(SYSTEM_PREFIXES)
-                       and not any(path == root or path.startswith(root.rstrip("/") + "/") for root in allowed_roots)]
+                       for path in outside_paths(command, allowed_roots)]
             reasons += ["names the filesystem root /"] if ROOT_PATH.search(command) else []
             reasons += [f"home-relative path: {path}" for path in HOME_PATH.findall(command)]
             reasons += [f"path climbs out of the working directory: {path}" for path in PARENT_PATH.findall(command)]
@@ -473,11 +511,12 @@ def main(argv=None) -> int:
     events_dir = codex_dir / "events"
     usage_path = codex_dir / "usage.jsonl"
 
+    provenance = lane_provenance(prompt_path)
     pending = []
     for catalog, layer_id, packet_path in packets:
         packet_sha256 = sha256_file(packet_path)
         out_path = codex_dir / f"{catalog}__{layer_id}.json"
-        if existing_output_is_valid(out_path, catalog, layer_id, packet_sha256):
+        if existing_output_is_valid(out_path, catalog, layer_id, packet_sha256, provenance):
             continue
         pending.append((catalog, layer_id, packet_path, packet_sha256, out_path))
 
@@ -499,7 +538,6 @@ def main(argv=None) -> int:
 
     events_dir.mkdir(parents=True, exist_ok=True)
     strict_schema_path = write_strict_schema(schema_path, codex_dir)
-    provenance = lane_provenance(prompt_path)
     usage_lock = threading.Lock()
     failures: list = []
 

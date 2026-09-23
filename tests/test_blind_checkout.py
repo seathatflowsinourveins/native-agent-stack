@@ -399,6 +399,51 @@ class ExportTests(BlindCheckoutFixture):
                                  "--export", str(export)])
         self.assertFalse(self.dest.exists())
 
+    def test_the_export_replaces_every_project_instruction_file_and_leaves_the_worktree_alone(self):
+        """PR #141 review (P1): AGENTS.md and CLAUDE.md were copied unchanged, so a Codex child started with
+        -C <export> read the incumbent choices (AGENTS.md names the selected destination engine)."""
+        label = "NautilusTrader is the selected destination."
+        instruction_files = ("AGENTS.md", "CLAUDE.md", "docs/sub/AGENTS.md", "examples/native/CLAUDE.md",
+                             "docs/sub/AGENTS.override.md", "CLAUDE.local.md")
+        for relative in instruction_files:
+            self.write(relative, f"# Instructions\n\n{label}\n")
+        self.write(".claude/settings.json", {"note": label})
+        self.write(".codex/config.toml", f"# {label}\n")
+        self.write(".agents/skills/pick/SKILL.md", f"# {label}\n")
+        self.write("docs/sub/.claude/agents/judge.md", f"# {label}\n")
+        git(["add", "-A"], self.source)
+        git(["commit", "-q", "-m", "instructions"], self.source)
+        export = self.dest.parent / "export"
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            self.assertEqual(blind_checkout.main(["--source", str(self.source), "--rev", "HEAD",
+                                                  "--dest", str(self.dest), "--export", str(export)]), 0)
+        self.addCleanup(lambda: git(["worktree", "remove", "--force", str(self.dest)], self.source))
+        for relative in instruction_files:
+            self.assertEqual((export / relative).read_text(encoding="utf-8"), blind_checkout.EXPORT_INSTRUCTION_STUB,
+                             relative)
+            self.assertIn(label, (self.dest / relative).read_text(encoding="utf-8"), "the worktree is unchanged")
+        for relative in (".claude", ".codex", ".agents", "docs/sub/.claude"):
+            self.assertFalse((export / relative).exists(), relative)
+            self.assertTrue((self.dest / relative).exists(), relative)
+        exported_text = "".join(path.read_text(encoding="utf-8") for path in export.rglob("*") if path.is_file())
+        self.assertNotIn("selected destination", exported_text)
+        self.assertEqual((export / "docs/keep-me.md").read_text(encoding="utf-8"), "# Keep this one\n")
+        printed = json.loads(out.getvalue())
+        self.assertEqual(printed["export_instruction_files_replaced"], sorted(instruction_files))
+        self.assertEqual(printed["export_instruction_dirs_removed"],
+                         [".agents", ".claude", ".codex", "docs/sub/.claude"])
+
+    def test_an_export_without_instruction_files_still_gets_the_root_stubs(self):
+        export = self.dest.parent / "export"
+        self.run_checkout()
+        self.addCleanup(self.remove_worktree)
+        result = blind_checkout.export_tree(self.dest, export)
+        self.assertEqual(result, {"replaced_instruction_files": ["AGENTS.md", "CLAUDE.md"],
+                                  "removed_instruction_dirs": []})
+        self.assertEqual((export / "AGENTS.md").read_text(encoding="utf-8"), blind_checkout.EXPORT_INSTRUCTION_STUB)
+        self.assertFalse((self.dest / "AGENTS.md").exists())
+
 
 if __name__ == "__main__":
     unittest.main()
