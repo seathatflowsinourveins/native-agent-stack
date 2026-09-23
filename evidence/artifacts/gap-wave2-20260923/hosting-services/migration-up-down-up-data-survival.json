@@ -1,0 +1,46 @@
+{
+ "schema_version": 1,
+ "id": "migration-up-down-up-data-survival",
+ "date": "2026-09-23",
+ "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+ "layer_ids": ["hosting-services"],
+ "gap_refs": [{"layer_id": "hosting-services", "gap_index": 2}],
+ "purpose": "Seed representative rows, run Alembic migrate up, down and up on the single existing revision (0001), and compare per-table row counts and content checksums before and after, narrowing open_gaps[hosting-services][2] ('Migration reversal proves schema reversal only, not user-data recovery or production-safe rollback').",
+ "preregistered": "If the schema (table/column set) is identical before seeding and after the up/down/up cycle, but the row counts and checksums of the seeded data differ (specifically: drop to zero, since revision 0001's downgrade() is DROP TABLE), that is a decisive, executed confirmation that migration reversal is schema-only and does not preserve user data -- refining the existing claim from 'recorded observation' to 'measured before/after comparison'. If seeded data instead survived the cycle, that would refute the existing documented limitation and must be reported as such, not suppressed.",
+ "commands": [
+  {"cmd": "createdb ledger_migration_check; DATABASE_URL=...ledger_migration_check uv run --frozen alembic upgrade head", "exit": 0, "duration_s": 0.3, "output_excerpt": "revision 0001 applied; tables runs, run_events, alembic_version created", "output_sha256": "n/a-short-output-not-separately-captured-verbatim; drawn from the paired contemporaneous summary transcript"},
+  {"cmd": "psql ...ledger_migration_check -c \"INSERT INTO runs ...; INSERT INTO run_events ...;\" (2 runs, 2 run_events seeded)", "exit": 0, "duration_s": 0.1, "output_excerpt": "INSERT 0 2 / INSERT 0 2", "output_sha256": "n/a-short-output-not-separately-captured-verbatim; drawn from the paired contemporaneous summary transcript"},
+  {"cmd": "psql ...ledger_migration_check -t -c 'SELECT count(*) FROM runs;' -c 'SELECT count(*) FROM run_events;' -c \"SELECT md5(...) FROM runs t;\" -c \"SELECT md5(...) FROM run_events t;\"", "exit": 0, "duration_s": 0.1, "output_excerpt": "BEFORE: runs=2, run_events=2; runs md5=16f20d0a44e227e7c59bdb5e23218215; run_events md5=60ceb0bf5157092c104c8b09c5d4b460", "output_sha256": "n/a-short-output-not-separately-captured-verbatim; drawn from the paired contemporaneous summary transcript"},
+  {"cmd": "DATABASE_URL=...ledger_migration_check uv run --frozen alembic upgrade head (idempotent no-op, already at head)", "exit": 0, "duration_s": 0.2, "output_excerpt": "no output, no schema change", "output_sha256": "n/a-short-output-not-separately-captured-verbatim; drawn from the paired contemporaneous summary transcript"},
+  {"cmd": "DATABASE_URL=...ledger_migration_check uv run --frozen alembic downgrade base", "exit": 0, "duration_s": 0.2, "output_excerpt": "revision 0001 downgrade() executed: DROP TABLE run_events; DROP TABLE runs;", "output_sha256": "n/a-short-output-not-separately-captured-verbatim; drawn from the paired contemporaneous summary transcript"},
+  {"cmd": "DATABASE_URL=...ledger_migration_check uv run --frozen alembic upgrade head", "exit": 0, "duration_s": 0.2, "output_excerpt": "revision 0001 upgrade() executed: CREATE TABLE runs (...); CREATE TABLE run_events (...); both empty", "output_sha256": "n/a-short-output-not-separately-captured-verbatim; drawn from the paired contemporaneous summary transcript"},
+  {"cmd": "psql ...ledger_migration_check -c '\\dt' -t -c 'SELECT count(*) FROM runs;' -c 'SELECT count(*) FROM run_events;'", "exit": 0, "duration_s": 0.1, "output_excerpt": "AFTER up/down/up: tables runs, run_events, alembic_version all present; runs=0, run_events=0", "output_sha256": "n/a-short-output-not-separately-captured-verbatim; drawn from the paired contemporaneous summary transcript"}
+ ],
+ "tool_versions": {
+  "alembic": "1.20.0, from the app's uv.lock",
+  "postgresql": "18.6, the hardened build from the paired hardened-postgres-tls-scram receipt, reused as the target database server for this check"
+ },
+ "installs": [],
+ "model_calls": [],
+ "result": "After upgrade->downgrade->upgrade, the same three tables (runs, run_events, alembic_version) are present, verified only by table name via `\\dt`; column types, defaults and constraints were not independently re-diffed after the cycle, so exact column/constraint-level schema equivalence is not established by this check, only table-name presence. The seeded application data does not survive: row counts go from 2 runs / 2 run_events before the cycle to 0 / 0 after, because the single migration revision (0001_run_ledger.py)'s downgrade() is a DROP TABLE, not a data-preserving transformation. This is a measured before/after comparison (row counts plus full-row md5 checksums) rather than a documentation-only claim, and it confirms -- it does not close or refute -- the existing recorded limitation: 'Downgrade drops both application tables; this proves schema reversal, not user-data recovery or production-safe rollback.' The gap's underlying limitation (no user-data recovery, no production-safe rollback) still holds exactly as before this check; nothing here reduces it.",
+ "settles_gap": "partially",
+ "verdict_impact": {
+  "could_change_verdict": false,
+  "direction": "not_applicable",
+  "explanation": "Converts open_gaps[2] from an inspection-only claim into a measured before/after comparison, which improves evidentiary rigor for the same, already-known limitation (migration reversal is schema-only, not user-data recovery), but the measurement confirms the limitation rather than closing it: rollback still destroys data and no production-safe rollback exists. Since the underlying limitation is unchanged and no production-safe rollback capability was added or found, this neither supports nor refutes the hosting-services selection; it does not change the verdict. Alembic/PostgreSQL remain retained regardless of this result."
+ },
+ "evidence_class": "native_proven",
+ "limitations": [
+  "Only one migration revision exists in this application (0001); a multi-revision reversal graph with intermediate data-preserving transformations was not exercised because none exists yet in this codebase.",
+  "The seeded rows were minimal synthetic fixtures (2 runs, 2 run_events), not a realistic production data volume or shape.",
+  "This measures the CURRENT downgrade() implementation's behavior; it does not by itself imply that no data-preserving downgrade could ever be written for this schema, only that the one that exists today destroys data on reversal.",
+  "Ran on a database created solely for this check (ledger_migration_check), separate from the ledger_test database used by the app's own pytest suite and from the restore-fidelity check in the paired backup-restore-app-rebuild receipt, to avoid interfering with either.",
+  "'Same structure' post-cycle was verified only via `\\dt` (table names present); column definitions, types, defaults, indexes and constraints were not independently re-diffed before vs. after the cycle, so this check does not establish byte-identical schema structure, only that the same table names exist.",
+  "settles_gap is 'partially', not true: this check improves the rigor of the existing claim (measured rather than inspected) but does not close open_gaps[2] -- the gap's core limitation (no user-data recovery, no production-safe rollback) remains fully open after this check, exactly as it was documented before it.",
+  "The raw_artifacts transcript (gap2-migration-reversal.txt) is a contemporaneous author-written summary produced after the command sequence completed, not a captured verbatim terminal transcript. No independently retained raw log (e.g. a postgres server log with statement logging enabled) corroborates the reported row counts and md5 checksums; the default postgres log_statement setting does not log DDL/DML, so those numeric claims rest solely on this summary transcript and this receipt's own text, with no separate raw capture.",
+  "The 'preregistered' text above was written together with this receipt after the command sequence had already run to completion (receipt file timestamp is later than the recorded command timestamps), not authored and fixed before execution; it functions as a contemporaneous restatement of intended success/failure criteria, not a verified ex-ante commitment, and should be weighted accordingly."
+ ],
+ "raw_artifacts": [
+  {"path": "~/codex-ecosystem/state/gap-wave2-20260923/hosting-services/transcripts/gap2-migration-reversal.txt", "sha256": "13525e5a1605d1276e15bdfce777f7472345f16a504a3e24ed74e0d43af99331"}
+ ]
+}

@@ -1,0 +1,13 @@
+diff --git a/fixtures/js_before.js b/fixtures/js_after.js
+index fe3c63b..186bf26 100644
+--- a/fixtures/js_before.js
++++ b/fixtures/js_after.js
+@@ -3,5 +3,8 @@ function getDiscount(total, isMember) {
+   if (total > 100) {
+     discount = 10;
+   }
++  if (isMember) {
++    discount += 5;
++  }
+   return discount;
+ }

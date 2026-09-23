@@ -1,0 +1,26 @@
+You are reviewing a code diff blind, with no knowledge of which tool produced it.
+
+Below is the ENTIRE output of a diff tool comparing a 'before' and 'after' version of a small rust function. Do not assume anything about the code beyond what is shown.
+
+--- DIFF START ---
+diff --git a/fixtures/rs_before.rs b/fixtures/rs_after.rs
+index 6b9090a..ad815f2 100644
+--- a/fixtures/rs_before.rs
++++ b/fixtures/rs_after.rs
+@@ -2,5 +2,8 @@ fn clamp(value: i32, max: i32) -> i32 {
+     if value > max {
+         return max;
+     }
++    if value < 0 {
++        return 0;
++    }
+     value
+ }
+
+--- DIFF END ---
+
+Question: Does this diff clearly show the following change: Does the diff clearly show a NEW `if value < 0` block being added, distinct from the existing `if value > max` block?
+
+Answer with EXACTLY this format, two lines:
+ANSWER: YES or NO
+EXPLANATION: one sentence, based only on the diff text shown above, describing what you can see changed.

@@ -1,0 +1,123 @@
+{
+  "schema_version": 1,
+  "id": "held-out-recall-benchmark",
+  "date": "2026-09-23",
+  "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+  "layer_ids": ["semantic-rag"],
+  "gap_refs": [
+    {"layer_id": "semantic-rag", "gap_index": 0},
+    {"layer_id": "semantic-rag", "gap_index": 5},
+    {"layer_id": "semantic-rag", "gap_index": 8},
+    {"layer_id": "semantic-rag", "gap_index": 13}
+  ],
+  "purpose": "Build and seal a held-out conceptual-code question set over ~/code/agent-lab with gold file spans (gap 13), then score Recall@5 and MRR for the incumbent embedder (live vLLM Nemotron-3-Embed-1B, 127.0.0.1:8231) against a genuinely different, free, locally-served alternative embedder (BAAI/bge-small-en-v1.5, served from the isolated vLLM 0.30.0 prefix) over identical chunking and identical top-k, to settle whether the compatibility-only evidence in native-rag.json / hf-memory-model-qualification.md (gap 0, gap 8) generalizes to a measured retrieval-quality comparison, and whether at least one alternative embedder now has a local quality/latency qualification against the incumbent (gap 5).",
+  "preregistered": "Write >=30 questions from actually reading agent-lab source files (not filenames), with 1-based file:line gold spans, disjoint from fixtures/rag-note.md. Seal the question set (sha256) before any retrieval run. Chunk the repo identically for both arms (fixed line window/overlap, same include dirs). Index each arm's chunks into its own disposable-Qdrant collection using that arm's own embedding endpoint and a fixed passage/query prefix convention documented for that model. Score Recall@5 (line-range overlap >=1 line with any gold span, top-5) and MRR for both arms with one script applying the same overlap rule. A result where the alternative embedder is close to or exceeds the incumbent's Recall@5/MRR would refute the incumbent-only quality claim (supports_incumbent=false); a result where the incumbent is clearly ahead supports keeping the incumbent as the qualified choice pending a further latency/cost tradeoff study. No re-run planned regardless of outcome; a run-time architectural mismatch (context-length limit on one arm) is recorded as a limitation, not smoothed over by re-chunking after seeing scores.",
+  "commands": [
+    {
+      "cmd": "nvidia-smi --query-gpu=memory.used,memory.free,memory.total --format=csv; ps aux | grep vllm",
+      "exit": 0,
+      "duration_s": 1,
+      "output_excerpt": "5456MiB used / 18682MiB free / 24463MiB total before this unit's own servers; only the permitted live 0.25.0 Nemotron service (port 8231, PID 399) was running; no other GPU job present.",
+      "output_sha256": null
+    },
+    {
+      "cmd": "pinned qdrant 1.19.1 (~/.local/share/codex-ecosystem/bin/qdrant) started with a disposable config on a new port (26333/26334), storage under ~/codex-ecosystem/state/gap-wave2-20260923/rag-bench/qdrant-storage",
+      "exit": 0,
+      "duration_s": 3,
+      "output_excerpt": "GET /collections -> {\"result\":{\"collections\":[]},\"status\":\"ok\"}",
+      "output_sha256": null
+    },
+    {
+      "cmd": "Authored blueprints/gap-wave2-20260923/rag-bench-eval/questions.json (35 questions, gold spans over tools/, .claude/workflows/, docs/ files actually read) and sealed it before any retrieval run",
+      "exit": 0,
+      "duration_s": 0,
+      "output_excerpt": "sha256(questions.json) = 4c96addb7bea3edfe5e0289ffffa0092600dc9f3e17b32ae0778ff31f93345b4; sealed_at 2026-09-23T00:42:37Z; corpus_head_sha (agent-lab, read-only, unmodified) = c042ea75e96b66e6ab9abdbf38f4ac4e7e3ca385",
+      "output_sha256": "4c96addb7bea3edfe5e0289ffffa0092600dc9f3e17b32ae0778ff31f93345b4"
+    },
+    {
+      "cmd": "python3 blueprints/gap-wave2-20260923/rag-bench-eval/chunk.py --repo ~/code/agent-lab --out <state>/chunks.jsonl (WINDOW=20 lines, OVERLAP=5 lines, dirs tools/,.claude/workflows/,tests/,docs/, exts .py/.mjs/.js/.md)",
+      "exit": 0,
+      "duration_s": 1,
+      "output_excerpt": "2485 chunks from 242 files (~36K lines). Window was set to 20/5 (reduced from an initial 40/10 trial) before any embedding/retrieval run, once bge-small-en-v1.5's 512-token native limit was discovered via a direct probe -- so both arms could be indexed on identical chunk boundaries. sha256 7d6f84ce9ddcf9df3553cb9e1306bcd0bd1529b7bdc055be3ef7dfd4d8314c8d",
+      "output_sha256": "7d6f84ce9ddcf9df3553cb9e1306bcd0bd1529b7bdc055be3ef7dfd4d8314c8d"
+    },
+    {
+      "cmd": "python3 index_arm.py --chunks <scratch>/gap-wave2-20260923/rag-bench/chunks.jsonl --embed-url http://127.0.0.1:8231/v1/embeddings --model nvidia/Nemotron-3-Embed-1B-BF16 --dim 2048 --passage-prefix 'passage: ' --qdrant-url http://127.0.0.1:26333 --collection arm_a_nemotron_incumbent",
+      "exit": 1,
+      "duration_s": 42,
+      "output_excerpt": "2479/2485 chunks embedded (6 oversized docs/tasks/*.md chunks exceeded the 4096-token max_model_len and were skipped per-item; none of the 6 skipped chunks belong to any gold-span file). index_build_seconds=48.09. CORRECTED (fix round): index_arm.py exits 1 whenever `errors` is non-empty (script lines 83-84); this run had 6 per-item errors, so its true exit code was 1, not 0 as originally recorded here. The prior receipt's '0' was a transcription error, not a re-run; the underlying chunks_embedded/errors counts above are unchanged and were already correctly reported.",
+      "output_sha256": "54d34cf4fec1e987053e5bc2341236bc19b336f8663522e487128ad8d295be02"
+    },
+    {
+      "cmd": "BAAI/bge-small-en-v1.5 served under vLLM 0.30.0 (isolated prefix ~/.local/share/codex-ecosystem/tools/vllm-0.30.0) via `vllm serve BAAI/bge-small-en-v1.5 --runner pooling --convert embed --served-model-name bge-small-en-v1.5 --port 8236 --max-model-len 512 --gpu-memory-utilization 0.10 --enforce-eager`, under ecosystem-bounded-run",
+      "exit": 0,
+      "duration_s": 48,
+      "output_excerpt": "Application startup complete; resolved architecture BertModel; embedding dim confirmed 384 via one live POST. Weights downloaded from the public HF repo BAAI/bge-small-en-v1.5, revision (snapshot) 5c38ec7c405ec4b44b94cc5a9bb96e735b38267a, model.safetensors sha256 3c9f31665447c8911517620762200d2245a2518d6e7208acc78cd9db317e21ad, ~127MB (well under the 3GB/unit download cap). Installed into the existing isolated vllm-0.30.0 prefix per this unit's explicit permission to reuse it on a new port; no existing pinned install or bin/ symlink was touched.",
+      "output_sha256": null
+    },
+    {
+      "cmd": "python3 index_arm.py --chunks <scratch>/gap-wave2-20260923/rag-bench/chunks.jsonl --embed-url http://127.0.0.1:8236/v1/embeddings --model bge-small-en-v1.5 --dim 384 --passage-prefix '' --qdrant-url http://127.0.0.1:26333 --collection arm_b_bge_small",
+      "exit": 1,
+      "duration_s": 35,
+      "output_excerpt": "1760/2485 chunks embedded; 725 chunks (mostly denser code/JSON files) exceeded bge-small's native 512-token context and were skipped per-item after per-batch retry isolated the offenders. 3 of 35 gold-span files (child-usage.mjs, token_manifest.py, toon-artifact.py) lost SOME (not all) of their chunks to this limit -- a real architectural difference from the incumbent's 4096-token window, not a script bug (confirmed live: a 20-line/1857-char code chunk alone returns HTTP 400 'maximum context length is 512 tokens... requested ... at least 513'). CORRECTED (fix round): with 725 per-item errors this run also exited 1 per index_arm.py lines 83-84, not 0 as originally recorded; the chunks_embedded/errors counts were already correct and are unchanged. index_build_seconds=35.26.",
+      "output_sha256": "a60fab8e9b4f89321fe6254dd41db37919a67d82304f490dc12cdbfe133e4538"
+    },
+    {
+      "cmd": "python3 eval_arm.py --collection arm_a_nemotron_incumbent --query-prefix 'query: ' (35 sealed questions, top-5, line-overlap scoring)",
+      "exit": 0,
+      "duration_s": 2,
+      "output_excerpt": "recall_at_5=0.9714285714285714 (34/35 hits), mrr=0.8533333333333334, mean_query_latency_s=0.03267530713762556",
+      "output_sha256": "d054f81ecc447d3ac35c197905d7e63fc937a9aa34534a2b8fc74565d81e78b0"
+    },
+    {
+      "cmd": "python3 eval_arm.py --collection arm_b_bge_small --query-prefix ''",
+      "exit": 0,
+      "duration_s": 1,
+      "output_excerpt": "recall_at_5=0.7714285714285715 (27/35 hits), mrr=0.5923809523809523, mean_query_latency_s=0.01840552602495466",
+      "output_sha256": "32ce966304d1af846081b02332e0ee53b60a33706a9bccf1366c6c6122937143"
+    }
+  ],
+  "tool_versions": {
+    "qdrant": "1.19.1 (pinned binary ~/.local/share/codex-ecosystem/bin/qdrant)",
+    "vllm_incumbent": "0.25.0 (live production service, untouched, read-only /v1/embeddings calls only)",
+    "vllm_alternative": "0.30.0 (isolated prefix, this unit started/stopped its own server on port 8236)",
+    "python": "system python3",
+    "bge_model": "BAAI/bge-small-en-v1.5, HF snapshot 5c38ec7c405ec4b44b94cc5a9bb96e735b38267a"
+  },
+  "installs": [
+    {
+      "name": "BAAI/bge-small-en-v1.5 (HF model weights, not a tool prefix)",
+      "version": "snapshot 5c38ec7c405ec4b44b94cc5a9bb96e735b38267a",
+      "prefix": "~/.cache/huggingface/hub/models--BAAI--bge-small-en-v1.5 (HF cache used by the existing isolated vllm-0.30.0 prefix; no existing pinned tool install or bin/ symlink was touched)",
+      "source_url": "https://huggingface.co/BAAI/bge-small-en-v1.5",
+      "sha256": "3c9f31665447c8911517620762200d2245a2518d6e7208acc78cd9db317e21ad"
+    }
+  ],
+  "model_calls": [],
+  "result": "Measured, on this sealed 35-question set over agent-lab's tools/.claude/workflows/tests/docs code: incumbent Nemotron-3-Embed-1B (2048-dim, 4096-token context) Recall@5=0.971, MRR=0.853; alternative bge-small-en-v1.5 (384-dim, 512-token context) Recall@5=0.771, MRR=0.592. The incumbent embedder outperforms this free alternative on both metrics on this corpus and question set. A material contributor to the alternative's lower score is its much smaller native context window, which forced per-item chunk loss (725/2485 chunks, including partial loss on 3 of 35 gold-span files) that the incumbent did not suffer (6/2485 lost, none gold-span files) -- this is a genuine capability difference between the two models, not solely a retrieval-quality difference, and is reported as such rather than folded into the headline numbers.",
+  "settles_gap": "partially",
+  "verdict_impact": {
+    "could_change_verdict": true,
+    "direction": "supports_incumbent",
+    "explanation": "This is the first held-out, cross-model, line-span-scored retrieval benchmark run for this layer (settling the executable_now next_check for gaps 0, 8, 13, and giving gap 5 a local quality/latency qualification for one alternative embedder). It supports keeping Nemotron-3-Embed-1B as the qualified choice on this evidence, but only partially settles gap 5 ('Nemotron 8B and other embedders') since the alternative served here is bge-small-en-v1.5, not Nemotron 8B, and only one alternative (not a sweep) was measured; gap 0/8's broader 'quality, not just compatibility' question is now measured for one alternative and could change again with a stronger or larger-context alternative embedder."
+  },
+  "evidence_class": "native_proven",
+  "limitations": [
+    "One alternative embedder only (bge-small-en-v1.5), not Nemotron 8B named in gap 5's text; Nemotron 8B was not available/served in this unit due to time budget.",
+    "bge-small-en-v1.5's 512-token context caused real, differential chunk loss vs the incumbent's 4096-token context; the reported Recall@5/MRR gap is not attributable to embedding quality alone.",
+    "35 questions is a modest sample; individual question hit/miss can shift Recall@5 by ~2.9 percentage points each.",
+    "Corpus is a fixed slice of agent-lab (tools/, .claude/workflows/, tests/, docs/, 4 extensions); not the whole repository or other repositories.",
+    "Mean query latency figures are single-run wall-clock on a shared host under this unit's own load; not a controlled throughput benchmark.",
+    "Questions were authored by the same agent running the benchmark, from real code reading; no independent human or second-model review of question/gold-span correctness was obtained given this unit's time budget.",
+    "CORRECTED (fix round): only the sealed question set (blueprints/gap-wave2-20260923/rag-bench-eval/questions.json, sha256 sealed at 2026-09-23T00:42:37Z, SEALED_AT.txt) is independently timestamped ahead of the first retrieval run (chunking started ~00:50:45Z). The 'preregistered' field's text in this receipt was finalized when this receipt file was written (mtime ~01:02:08Z, after all commands including the eval runs at ~00:53:46Z had already completed) and was not itself sealed or externally timestamped before the runs; its content should be read as this unit's contemporaneous restatement of intent, not as independently verifiable ex-ante preregistration beyond the question-set seal itself.",
+    "CORRECTED (fix round): a large majority (at minimum ~19/35 by a conservative regex re-check of this receipt's own questions.json against the actual defined name at each gold span, and up to ~31-32/35 by a looser check for any identifier-like token in the question text) of the 35 sealed questions name the exact function/constant identifier defined at (or very near) the gold span, so this benchmark substantially measures identifier-lookup recall for both arms, not solely conceptual/paraphrased-code recall independent of naming; gap-13's settles_gap is kept 'partially' (not fully settled) for this reason among others."
+  ],
+  "raw_artifacts": [
+    {"path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/raw/arm_a_nemotron_incumbent_eval.json", "sha256": "d054f81ecc447d3ac35c197905d7e63fc937a9aa34534a2b8fc74565d81e78b0"},
+    {"path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/raw/arm_b_bge_small_eval.json", "sha256": "32ce966304d1af846081b02332e0ee53b60a33706a9bccf1366c6c6122937143"},
+    {"path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/raw/arm_a_index_result.json", "sha256": "54d34cf4fec1e987053e5bc2341236bc19b336f8663522e487128ad8d295be02"},
+    {"path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/raw/arm_b_index_result.json", "sha256": "a60fab8e9b4f89321fe6254dd41db37919a67d82304f490dc12cdbfe133e4538"},
+    {"path": "blueprints/gap-wave2-20260923/rag-bench-eval/questions.json", "sha256": "4c96addb7bea3edfe5e0289ffffa0092600dc9f3e17b32ae0778ff31f93345b4"},
+    {"path": "<scratch>/gap-wave2-20260923/rag-bench/chunks.jsonl", "sha256": "7d6f84ce9ddcf9df3553cb9e1306bcd0bd1529b7bdc055be3ef7dfd4d8314c8d"}
+  ]
+}

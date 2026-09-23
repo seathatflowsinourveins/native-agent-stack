@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "id": "ecc-trigger-activation-test",
+  "date": "2026-09-23",
+  "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+  "layer_ids": ["instructions-skills"],
+  "gap_refs": [
+    {"layer_id": "instructions-skills", "gap_index": 3}
+  ],
+  "purpose": "Gap 3: ECC's on-demand-guidance decision records selection 'optional', review_status 'source_review', use stage 'not_applicable'; only installation, hash and Claude discovery are established, with no task-triggered activation or Codex discovery cited. Run a native `claude -p` task matching the search-first skill's trigger description and a `codex exec` discovery check.",
+  "preregistered": "Before running: (1) a claude -p prompt closely paraphrasing search-first's own description ('Search for existing tools, libraries, and patterns before writing custom code') with the Skill tool explicitly allowed will either invoke the Skill tool for search-first (settling task-triggered activation as true) or proceed directly with ordinary Read/Grep tools without invoking Skill (settling activation as not-observed for this close-paraphrase prompt, a negative but decisive result, not proof activation never happens under any prompt); (2) a codex exec prompt asking the model to introspect its own startup skill list will show whether Codex's discovery surface (distinct from Claude's) includes the two ECC skill names at all, settling the 'no Codex discovery is cited' half of the gap.",
+  "commands": [
+    {
+      "cmd": "flock ~/codex-ecosystem/state/gap-wave2-20260923/claude.lock claude -p \"I need to add exponential-backoff retry logic to an HTTP client used in this project. Before writing any custom code, search for existing tools, libraries and patterns already available for this, then summarize what you found in 3 bullet points. Do not edit any files.\" --output-format stream-json --verbose --effort medium --allowedTools Read,Grep,Glob,Skill --disallowedTools Edit,Write,Bash,NotebookEdit",
+      "exit": 0,
+      "duration_s": 14.2,
+      "output_excerpt": "No 'Skill' tool_use event appears anywhere in the transcript. The model went directly to Grep (retry/backoff/tenacity patterns, HTTP client import patterns) then Read (two matched files), then answered in prose that requests/urllib3's built-in Retry class already covers this without a new dependency. search-first and iterative-retrieval appear only in the init event's flat discovered-skills list, never as an invoked tool_use.name.",
+      "output_sha256": "03c8a9eead26e7d9c0cfa29d9350424cdc7a3809771736ccee54eec98a63040f"
+    },
+    {
+      "cmd": "flock ~/codex-ecosystem/state/gap-wave2-20260923/codex.lock codex exec --sandbox read-only --skip-git-repo-check \"List every skill name you can see was discovered for this session ... and say explicitly whether ECC's search-first or iterative-retrieval skills are among them.\" --json",
+      "exit": 0,
+      "duration_s": 6.5,
+      "output_excerpt": "Codex answered: 'I can see 30 skills in this session's startup context', listing them including 'search-first' and 'iterative-retrieval', and explicitly confirmed 'Yes, both search-first and iterative-retrieval are present. The startup catalog does not explicitly label their provenance as ECC.' No commands/tools were run to produce this answer (self-report from context).",
+      "output_sha256": "d525b1c1abd829cb003ad40def4766ab4b927b7c33f7efb56b702b959fe87535"
+    }
+  ],
+  "tool_versions": {"claude": "2.1.280 (claude-opus-5-5[1m])", "codex": "0.155.1"},
+  "installs": [],
+  "model_calls": [
+    {"client": "claude", "model": "claude-opus-5-5[1m]", "effort": "medium (flag passed; reported thinkingTokens 178, provider effort resolution not separately exposed in stream-json)", "count": 1, "input_tokens": 8, "output_tokens": 1988},
+    {"client": "codex", "model": "unspecified/default (not set via a flag in this call)", "effort": "unspecified (no --effort or -c model_reasoning_effort passed)", "count": 1, "input_tokens": 21210, "output_tokens": 483}
+  ],
+  "result": "Claude side: for a prompt that closely paraphrases search-first's own trigger description, with the Skill tool explicitly available and allowed, the session did NOT invoke the Skill tool for search-first (or any skill) -- it solved the task directly with Grep/Read. This is decisive negative evidence for this specific close-paraphrase prompt: session-start discovery (skill name visible) is not the same as task-triggered activation (skill body loaded and used), and this run shows discovery without activation. Codex side: a fresh `codex exec` session explicitly lists 30 discovered skill names at startup, including both `search-first` and `iterative-retrieval` by name, confirming Codex-side discovery of the two ECC skills (previously uncited). Codex noted the startup catalog does not label their ECC provenance.",
+  "settles_gap": "partially",
+  "verdict_impact": {
+    "could_change_verdict": false,
+    "direction": "inconclusive",
+    "explanation": "Codex discovery of the two ECC skills is now newly established (closes that specific sub-claim of gap 3). Task-triggered activation in Claude is now tested once and found NOT to occur for a close-paraphrase prompt with the tool explicitly allowed -- this is a real negative result for this prompt, but a single N=1 trial with one phrasing cannot establish that ECC skills never activate under any trigger; catalogs/foundation/decisions.json's existing 'use stage not_applicable' framing is not contradicted, and if anything this run is mildly consistent with it, though the sample is too small to update review_status from source_review."
+  },
+  "evidence_class": "native_proven",
+  "limitations": [
+    "N=1 trial per client; only one prompt phrasing was tried against search-first, and iterative-retrieval's trigger (subagent context refinement) was not separately trial-tested at all in this check.",
+    "The claude -p call's --effort medium flag was passed but the stream-json output does not expose a resolved provider-side effort field to confirm it was honored as requested; recorded as observed, not verified.",
+    "The codex exec call did not pass an explicit model/effort flag (the unit instructions cap effort at low/medium 'unless stated'; this call left it at CLI default rather than stating one, which is a process gap in this check, noted rather than hidden).",
+    "Not invoking the Skill tool does not prove the skill's guidance had zero influence on the model's approach (e.g. via description-level priming from the flat discovery list); this check can only observe tool-invocation events, not internal weighting."
+  ],
+  "raw_artifacts": [
+    {"path": "~/codex-ecosystem/state/gap-wave2-20260923/instructions-skills/runs/gap3-trigger-test.jsonl", "sha256": "03c8a9eead26e7d9c0cfa29d9350424cdc7a3809771736ccee54eec98a63040f"},
+    {"path": "~/codex-ecosystem/state/gap-wave2-20260923/instructions-skills/runs/gap3-codex-discovery.jsonl", "sha256": "d525b1c1abd829cb003ad40def4766ab4b927b7c33f7efb56b702b959fe87535"}
+  ]
+}

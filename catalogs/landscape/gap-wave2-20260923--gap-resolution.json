@@ -1,0 +1,1736 @@
+{
+ "schema_version": 1,
+ "id": "gap-wave2-20260923--gap-resolution",
+ "wave": "gap-wave2-20260923",
+ "owner": "gap-resolution",
+ "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+ "crosswalk": "catalogs/landscape/gap-crosswalk-92bb279.json",
+ "crosswalk_sha256": "bb354c43a6d318c26eaeb889baa30b8006c23a0f3de2e6dfc123d999ad1726b8",
+ "rule": "status is the best credit over the receipts naming the gap; settles_gap true/partially/false credit settled/advanced/not_settled, but a receipt naming several gaps credits each at most advanced; not_run means no receipt names the gap. No verdict changes here.",
+ "counts": {
+  "advanced": 54,
+  "not_run": 3,
+  "not_settled": 3,
+  "settled": 9
+ },
+ "layers": [
+  {
+   "catalog": "foundation",
+   "layer_id": "native-clients",
+   "gaps": [
+    {
+     "index": 0,
+     "text": "Codex resume ran on macOS with codex-cli 0.155.0-alpha.9.2 (native-recovery/receipt.json native_version and platform), not on the pinned 0.155.1 or on WSL. Same-thread resume is not established for the pinned version on this host.",
+     "next_check": "On WSL with the pinned codex-cli 0.155.1 (confirm with `codex --version`), rerun the native-recovery trial: `codex exec` a bounded task, then `codex exec resume <thread-id>` (or `codex resume <thread-id>`), and record native_version, platform and same-thread continuity in a new receipt.",
+     "status": "advanced",
+     "receipts": [
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/native-clients/codex-resume-pinned-build.json",
+       "credit": "advanced"
+      }
+     ]
+    },
+    {
+     "index": 1,
+     "text": "Claude resume ran with only Bash available and MCP tools denied (native-recovery/claude/README.md lines 40-43), using an explicit claude-opus-5/ultracode scoped to that trial (claude/receipt.json limitations). Resume with the full MCP tool set, and with the default model, is not established.",
+     "next_check": "Rerun the Claude recovery trial with the default model (no --model) and the project MCP set loaded (`claude -p ... --output-format json`, then `claude --resume <session-id> -p ...`), and confirm that an MCP tool call succeeds after resume.",
+     "status": "advanced",
+     "receipts": [
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/native-clients/claude-resume-mcp-toolset.json",
+       "credit": "advanced"
+      }
+     ]
+    },
+    {
+     "index": 2,
+     "text": "The research task was one run per client with no matched baseline (native-client-results.json limitations; docs/full-stack-convergence.md line 37). It establishes neither a model-quality ranking nor a causal token difference between the clients.",
+     "next_check": "Run the frozen research task N>=3 times per client with matched prompt, tool scope and effort, and record per-run tokens from native usage plus blind-judged quality. Report the variance; do not report a single ranking.",
+     "status": "not_run",
+     "receipts": []
+    },
+    {
+     "index": 5,
+     "text": "The readiness rows (claude --version, codex --version, codex login status) are zero-exit checks, not functional E2E (claude-upstream-checks-20260921.json limitations).",
+     "next_check": "Run `claude -p 'Reply with OK' --output-format json` and `codex exec --json 'Reply with OK'`, and retain the result, model and usage fields as functional readiness rows next to the version checks.",
+     "status": "advanced",
+     "receipts": [
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/native-clients/claude-resume-mcp-toolset.json",
+       "credit": "advanced"
+      },
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/native-clients/codex-resume-pinned-build.json",
+       "credit": "advanced"
+      }
+     ]
+    },
+    {
+     "index": 7,
+     "text": "The Claude Agent SDK and OpenAI Agents SDK have no install, account or tool execution evidence.",
+     "next_check": "In a fresh uv prefix, pin and install `claude-agent-sdk` and `openai-agents`, run each SDK's upstream minimal tool-use example (Claude SDK through native Claude Code auth; OpenAI Agents through an OpenAI-compatible endpoint such as local vLLM if no API key is authorized), and record versions, exit codes and the tool result.",
+     "status": "advanced",
+     "receipts": [
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/native-clients/agent-sdk-install-and-tool-use.json",
+       "credit": "advanced"
+      }
+     ]
+    },
+    {
+     "index": 8,
+     "text": "No matched execution establishes comparative model quality or causal provider savings across the candidates.",
+     "next_check": "Run a frozen multi-task set across the candidate clients with matched settings and repeated trials, blind-judge the outputs, and record native usage per arm. Label the result diagnostic, not universal.",
+     "status": "not_run",
+     "receipts": []
+    },
+    {
+     "index": 10,
+     "text": "The Codex recovery experiment used a different recorded build from the later source-retrieval task; it does not establish recovery on every release.",
+     "next_check": "Repeat the Codex resume trial on the build now pinned (the same run as gap 0) and record the build next to the prior alpha result.",
+     "status": "advanced",
+     "receipts": [
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/native-clients/codex-resume-pinned-build.json",
+       "credit": "advanced"
+      }
+     ]
+    },
+    {
+     "index": 12,
+     "text": "Neither SDK candidate has a retained same-task comparison preserving the required native account and recovery boundaries.",
+     "next_check": "Run the frozen research task through the Claude Agent SDK and through native `claude -p` with the same account and tool scope, including one resume, and compare usage, output quality and recovery behaviour.",
+     "status": "not_run",
+     "receipts": []
+    },
+    {
+     "index": 13,
+     "text": "MCPorter's referenced readiness output includes a Context Mode daemon error; version and listing success do not establish functional bridge recovery.",
+     "next_check": "Repair or restart the Context Mode daemon, then run `mcporter list context-mode` and one `mcporter call context-mode.<tool>` (and repeat after a daemon restart). Retain stdout and stderr to show that the daemon error is gone and the bridge recovers.",
+     "status": "settled",
+     "receipts": [
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/native-clients/mcporter-context-mode-bridge-recovery.json",
+       "credit": "settled"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "instructions-skills",
+   "gaps": [
+    {
+     "index": 0,
+     "text": "No retained fixture measures skill-arm task performance. catalog-cases.json covers claim classification, and test-contract.cjs checks only the gate and parser contract on cases.json, so the overturn trial needs a new frozen case set.",
+     "next_check": "Freeze a new labeled task case set (separate from catalog-cases.json and cases.json), then run matched with-skill and without-skill arms via native `claude -p` and `codex exec`, scoring task quality against the frozen labels and recording provider usage per arm.",
+     "status": "advanced",
+     "receipts": [
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/instructions-skills/frozen-skill-arm-ab.json",
+       "credit": "advanced"
+      }
+     ]
+    },
+    {
+     "index": 1,
+     "text": "No winner has a measured improvement in task quality or provider cost. community-practice-20260920.json records none, and native-practice.json lines 53, 93 and 149 say the same.",
+     "next_check": "Run a matched A/B on the frozen case set for each winner (ECC, OpenAI skills, TypeSafe) versus a no-skill baseline, recording task-quality scores and full provider usage including failed attempts, and update native-practice.json lines 53, 93 and 149 only if a measured difference appears.",
+     "status": "advanced",
+     "receipts": [
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/instructions-skills/frozen-skill-arm-ab.json",
+       "credit": "advanced"
+      }
+     ]
+    },
+    {
+     "index": 2,
+     "text": "Record conflict: the foundation closure's layer row (docs/foundation-closure-20260921.md line 53) names ECC, Anthropic skills and Agent Skills, not TypeSafe or the OpenAI skills. Line 26 says the Claude sync already exposes selected official Anthropic skills, but no receipt for that sync (pins, hashes, discovery) was found in the files read.",
+     "next_check": "Rerun the Claude skill sync, record the source pins, SKILL.md sha256 values and the `claude` initialization skill listing as a receipt, then reconcile docs/foundation-closure-20260921.md line 53 with the adjudicated winner set (ECC, OpenAI skills, TypeSafe; skills-ref as supporting tool).",
+     "status": "advanced",
+     "receipts": [
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/instructions-skills/skill-sync-and-closure-reconciliation.json",
+       "credit": "advanced"
+      }
+     ]
+    },
+    {
+     "index": 3,
+     "text": "ECC: the canonical on-demand-guidance decision still records selection 'optional', review_status 'source_review' and use stage 'not_applicable' (decisions.json lines 246-247 and 276-279). Only installation, hash and Claude discovery are established (native-claude-profile-20260920.json lines 27-41). No task-triggered activation or Codex discovery is cited.",
+     "next_check": "Run a native `claude -p` task whose description matches an ECC skill trigger and record whether the skill body is loaded, and run `codex exec` in the project to record whether Codex discovers the ECC skills; update decisions.json lines 246-279 from the results.",
+     "status": "advanced",
+     "receipts": [
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/instructions-skills/ecc-trigger-activation-test.json",
+       "credit": "advanced"
+      }
+     ]
+    },
+    {
+     "index": 4,
+     "text": "Discovery is client-level, not worker-level. Claude's initialization listed all three native-practice skills (native-receipt.json lines 199-203), but the worker context did not list them and read TypeSafe from disk (lines 277-284). Full body preload is not established (line 205).",
+     "next_check": "Dispatch one lean workflow child (e.g. semantic-evidence-reviewer) with the typesafe-ai skill declared and record whether its initial context lists the skill and contains the full SKILL.md body without a disk Read, compared with a child that does not declare it.",
+     "status": "not_settled",
+     "receipts": [
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/instructions-skills/worker-skill-declaration-documented-behavior.json",
+       "credit": "not_settled"
+      }
+     ]
+    },
+    {
+     "index": 5,
+     "text": "gh-fix-ci has been run only on the clean-check path. Failing-log extraction, repair quality and native agent activation are unqualified (native-practice.json lines 89-124).",
+     "next_check": "Create a disposable repository/branch with a seeded failing CI job, invoke gh-fix-ci through a native agent session, and record failing-log extraction, the proposed repair, whether the rerun passes, and whether the skill activated natively.",
+     "status": "advanced",
+     "receipts": [
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/instructions-skills/gh-fix-ci-failing-path-trial.json",
+       "credit": "advanced"
+      }
+     ]
+    },
+    {
+     "index": 6,
+     "text": "security-best-practices has installation and discovery only. Finding quality and false-positive control are unmeasured. Its references name FastAPI 0.128.x and Next.js 16.1.x, while the foundation pins are 0.141.1 and 16.3.5 (native-practice.json line 146).",
+     "next_check": "Run security-best-practices on a labeled seeded-vulnerability fixture (FastAPI 0.141.1 and Next.js 16.3.5 apps with known true and false positives), score precision and recall, and check whether upstream references have been updated beyond 0.128.x/16.1.x.",
+     "status": "advanced",
+     "receipts": [
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/instructions-skills/security-best-practices-reference-drift.json",
+       "credit": "advanced"
+      }
+     ]
+    },
+    {
+     "index": 7,
+     "text": "The TypeSafe 7/8 result covers eight selected cases. C4 disagrees with its frozen label, and the comparison baseline is weak literal containment, not a native coding-agent baseline.",
+     "next_check": "Extend the frozen label set beyond eight cases, re-examine C4's label, and run TypeSafe against a native `claude -p`/`codex exec` baseline arm on the same cases, reporting per-arm accuracy and cost.",
+     "status": "advanced",
+     "receipts": [
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/instructions-skills/frozen-skill-arm-ab.json",
+       "credit": "advanced"
+      }
+     ]
+    },
+    {
+     "index": 8,
+     "text": "The packet pins for c4 (dd6ee538) and c5 (15969ed2) differ from the reviewed pins in the evidence (ECC 2b6e8397, Shan bde3f031), so the current heads have not been source-reviewed.",
+     "next_check": "Run `git diff 2b6e8397..dd6ee538` on ECC and `git diff bde3f031..15969ed2` on the Shan repository, source-review the changed selected skill files, and record the result against the packet pins.",
+     "status": "settled",
+     "receipts": [
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/instructions-skills/ecc-shan-pin-diff.json",
+       "credit": "settled"
+      }
+     ]
+    },
+    {
+     "index": 9,
+     "text": "c7 (claude-code-templates) has no source review of a selected file in the referenced evidence.",
+     "next_check": "Check out claude-code-templates at the packet pin, source-review the selected file(s) the candidate would supply, and record pin, path, sha256 and findings as evidence.",
+     "status": "settled",
+     "receipts": [
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/instructions-skills/claude-code-templates-source-review.json",
+       "credit": "settled"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "semantic-rag",
+   "gaps": [
+    {
+     "index": 0,
+     "text": "No held-out or cross-model retrieval-quality benchmark exists. native-rag.json shows one real question answered correctly, and hf-memory-model-qualification.md shows four upstream examples ranked first. Both establish compatibility, not quality.",
+     "next_check": "Build a sealed held-out question set over this project's code with gold spans. Run Recall@k and MRR for the incumbent Nemotron-3-Embed-1B/Qdrant index against at least one alternative embedder served locally.",
+     "status": "advanced",
+     "receipts": [
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/held-out-recall-benchmark.json",
+       "credit": "advanced"
+      }
+     ]
+    },
+    {
+     "index": 1,
+     "text": "SocratiCode index/watcher recovery is not_established (catalogs/foundation/decisions.json, project-semantic-index lifecycle). Restores are established only for Qdrant snapshot/query state: same-host, and a hosted job with synthetic state and local-integration composition.",
+     "next_check": "Kill the SocratiCode indexer/watcher mid-index, restart it, edit a file, and verify that the watcher reindexes and that a query returns the updated span. Compare the Qdrant point counts before and after.",
+     "status": "advanced",
+     "receipts": [
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/watcher-kill-restart-recovery.json",
+       "credit": "advanced"
+      }
+     ]
+    },
+    {
+     "index": 5,
+     "text": "Nemotron 8B and other embedders have no local quality, latency or serving qualification.",
+     "next_check": "Serve Nemotron 8B embed (or another free embedder that fits the available VRAM) from the isolated vLLM prefix. Measure startup, latency and quality on the gap-0 held-out set against the incumbent 1B model.",
+     "status": "advanced",
+     "receipts": [
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/held-out-recall-benchmark.json",
+       "credit": "advanced"
+      }
+     ]
+    },
+    {
+     "index": 6,
+     "text": "No token-saving or provider-cost measurement supports this layer.",
+     "next_check": "Run matched native Claude tasks with and without SocratiCode retrieval (fixed prompts, fresh sessions, several repeats) and compare provider token counters with `ccusage claude session --json`.",
+     "status": "advanced",
+     "receipts": [
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/socraticode-token-comparison.json",
+       "credit": "advanced"
+      }
+     ]
+    },
+    {
+     "index": 7,
+     "text": "No sealed representative conceptual-code benchmark establishes comparative recall, grounded answer accuracy, cross-project isolation, latency or resource superiority.",
+     "next_check": "Create a sealed conceptual-code benchmark with gold answers and a second-project decoy index. Score SocratiCode against scoped rg/QMD baselines on recall, grounded accuracy, cross-project leakage and latency.",
+     "status": "advanced",
+     "receipts": [
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/socraticode-vs-baselines.json",
+       "credit": "advanced"
+      }
+     ]
+    },
+    {
+     "index": 8,
+     "text": "Four paired upstream retrieval examples establish embedding compatibility, not cross-model or domain quality.",
+     "next_check": "Extend the gap-0 held-out benchmark with domain questions and at least two embedders, and report per-model retrieval quality.",
+     "status": "advanced",
+     "receipts": [
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/held-out-recall-benchmark.json",
+       "credit": "advanced"
+      }
+     ]
+    },
+    {
+     "index": 9,
+     "text": "SocratiCode full-service restart/recovery and native-client rebinding remain unestablished; Qdrant recovery does not qualify the entire retrieval stack.",
+     "next_check": "Restart the SocratiCode service and its Qdrant/vLLM dependencies. Confirm that the native Claude/Codex MCP clients reconnect and answer a query without manual reconfiguration, and record the index state before and after.",
+     "status": "advanced",
+     "receipts": [
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/qdrant-restart-reconnect.json",
+       "credit": "advanced"
+      }
+     ]
+    },
+    {
+     "index": 10,
+     "text": "Hosted recovery used synthetic state within one administrative domain; production recovery, atomic cross-application snapshots and lost-account/key recovery remain unqualified.",
+     "next_check": "Take a coordinated snapshot of Qdrant, the SocratiCode state and ai-memory, restore it into a fresh local prefix, and verify consistent query results. Record lost-key/account recovery as still unqualified.",
+     "status": "advanced",
+     "receipts": [
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/coordinated-snapshot-restore.json",
+       "credit": "advanced"
+      }
+     ]
+    },
+    {
+     "index": 11,
+     "text": "The vLLM 0.29.0 failure is host-specific. The packet's newer 0.30.0 release has no retained runtime acceptance here.",
+     "next_check": "Run the same acceptance checks used for 0.25.0 (embedding service under SocratiCode indexing and the native-rag question) against the isolated 0.30.0 prefix.",
+     "status": "advanced",
+     "receipts": [
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/vllm-0.30.0-acceptance-batch.json",
+       "credit": "advanced"
+      }
+     ]
+    },
+    {
+     "index": 12,
+     "text": "code-memory's deployment advantage and source-level freshness concerns require executed comparisons.",
+     "next_check": "Install a pinned code-memory in a new prefix. On the same frozen query set, measure deployment steps and resources, then time freshness after a source edit, against SocratiCode.",
+     "status": "advanced",
+     "receipts": [
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/code-memory-comparison.json",
+       "credit": "advanced"
+      }
+     ]
+    },
+    {
+     "index": 13,
+     "text": "fixtures/rag-note.md is a small seed fixture, not a held-out conceptual-code evaluation set.",
+     "next_check": "Author and seal a held-out conceptual-code question set with gold file spans, kept separate from fixtures/rag-note.md, and use it in the gap-0 and gap-7 benchmarks.",
+     "status": "advanced",
+     "receipts": [
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/held-out-recall-benchmark.json",
+       "credit": "advanced"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "ci-supply-chain",
+   "gaps": [
+    {
+     "index": 0,
+     "text": "No retained zizmor negative control shows it rejecting over-broad workflow permissions. The unsafe fixture declares contents: read, and the tests assert only template-injection and unpinned-uses. The scoped-permissions axis rests on configuration and source review (docs/catalog-provenance.md lines 20-24; automation.json line 254), not on native analyzer execution.",
+     "next_check": "Add a fixture workflow with permissions: write-all (and a job-level contents: write without need). Run zizmor on it and assert an excessive-permissions finding in the test.",
+     "status": "settled",
+     "receipts": [
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/ci-supply-chain/zizmor-negative-control.json",
+       "credit": "settled"
+      }
+     ]
+    },
+    {
+     "index": 1,
+     "text": "The hosted 0/1/0 attestation qualification is for run 35541322881 at d0fe136c (2026-09-20). On 2026-09-22, publish-catalog.yml added a tag trigger, a changed job condition, a Syft SBOM step and a second attest step (automation.json lines 153-159). The sources I read record no hosted run of the current workflow bytes, so neither the archive attestation nor the SBOM attestation is re-qualified.",
+     "next_check": "Dispatch or tag-trigger publish-catalog.yml at the current commit. Then run gh attestation verify on both the archive and the Syft SBOM attestation, and record the run ID and commit.",
+     "status": "settled",
+     "receipts": [
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/ci-supply-chain/publish-catalog-dispatch-attestation.json",
+       "credit": "settled"
+      }
+     ]
+    },
+    {
+     "index": 2,
+     "text": "The hosted sbom-vuln job in supply-chain.yml has no recorded run ID. Syft's native inventory evidence comes from a local run on one host against one SDK prefix, not whole-host or whole-runtime coverage.",
+     "next_check": "Run gh run list --workflow supply-chain.yml, then gh run view for the sbom-vuln job, to record a run ID (dispatch one if none exists). Run syft on additional runtime prefixes/host paths and compare package counts with the single-prefix baseline.",
+     "status": "advanced",
+     "receipts": [
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/ci-supply-chain/supply-chain-hosted-run-and-wider-syft.json",
+       "credit": "advanced"
+      }
+     ]
+    },
+    {
+     "index": 3,
+     "text": "The Syft install checked checksums only. Signature and build provenance were not verified (blueprints/us-equities/supply-chain/README.md lines 51-52).",
+     "next_check": "Verify the installed Syft release: cosign verify-blob on the checksums file with its published signature/certificate, and gh attestation verify on the release asset for repo anchore/syft.",
+     "status": "advanced",
+     "receipts": [
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/ci-supply-chain/syft-signature-verification-and-wider-scan.json",
+       "credit": "advanced"
+      }
+     ]
+    },
+    {
+     "index": 5,
+     "text": "Offline zizmor analysis at the regular persona does not cover online advisories, secrets or provenance (ci-security README lines 48-52).",
+     "next_check": "Run GH_TOKEN=$(gh auth token) zizmor --persona=auditor .github/workflows without --offline, and record the online-only audit findings (known-vulnerable-actions, impostor-commit, ref-confusion).",
+     "status": "advanced",
+     "receipts": [
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/ci-supply-chain/zizmor-online-audit.json",
+       "credit": "advanced"
+      }
+     ]
+    },
+    {
+     "index": 7,
+     "text": "\"Reproducible changes\" is not established end to end. Static checks execute no job, and hosted runs qualify only their named commits.",
+     "next_check": "Rebuild the catalog archive locally at the attested commit d0fe136c and compare its sha256 with the attestation subject digest from run 35541322881. Repeat for the current commit after its hosted run.",
+     "status": "advanced",
+     "receipts": [
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/ci-supply-chain/archive-reproducibility.json",
+       "credit": "advanced"
+      }
+     ]
+    },
+    {
+     "index": 9,
+     "text": "Syft's installed-package inventory excludes external interpreters, host libraries and complete vendored-native-library discovery; its release signature was not verified.",
+     "next_check": "Verify the Syft release signature with cosign/gh attestation. Run syft on the system interpreter prefixes and /usr/lib, and report which external interpreters and native libraries appear or remain missing.",
+     "status": "advanced",
+     "receipts": [
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/ci-supply-chain/syft-signature-verification-and-wider-scan.json",
+       "credit": "advanced"
+      }
+     ]
+    },
+    {
+     "index": 12,
+     "text": "Complete dependency locking and ongoing update ownership are not established across every runtime; Dependabot's scheduled timing and grouped-update behavior remain unobserved.",
+     "next_check": "Enumerate every runtime in the stack manifest, check each for a hash-pinned lockfile (uv.lock/package-lock/requirements with hashes) and an assigned updater, and record the unlocked runtimes.",
+     "status": "advanced",
+     "receipts": [
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/ci-supply-chain/lockfile-audit.json",
+       "credit": "advanced"
+      }
+     ]
+    },
+    {
+     "index": 13,
+     "text": "The Grype scan establishes a dated zero-match result, not vulnerability absence, positive-detection sensitivity or remediation quality.",
+     "next_check": "Run grype on a pinned fixture SBOM or directory containing a package version with a published CVE, and assert that grype reports that match.",
+     "status": "settled",
+     "receipts": [
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/ci-supply-chain/grype-known-cve-fixture.json",
+       "credit": "settled"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "hosting-services",
+   "gaps": [
+    {
+     "index": 0,
+     "text": "Recovery is not_established for nextjs, react, fastapi and postgresql (catalogs/foundation/decisions.json lines 1695-1772). No backup/independent-host restore acceptance exists (application-delivery/README.md lines 135-137).",
+     "next_check": "pg_dump the synthetic database and restore it into a fresh PGDATA and prefix. Rebuild the Next.js/React/FastAPI app from lockfiles into a new directory and rerun the application acceptance against the restored database.",
+     "status": "advanced",
+     "receipts": [
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/hosting-services/backup-restore-app-rebuild.json",
+       "credit": "advanced"
+      }
+     ]
+    },
+    {
+     "index": 2,
+     "text": "Migration reversal proves schema reversal only, not user-data recovery or production-safe rollback (README lines 150-152).",
+     "next_check": "Seed representative rows, then run migrate up, down and up. Compare per-table row counts and content checksums before and after to test user-data survival.",
+     "status": "advanced",
+     "receipts": [
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/hosting-services/migration-up-down-up-data-survival.json",
+       "credit": "advanced"
+      }
+     ]
+    },
+    {
+     "index": 3,
+     "text": "No container lane (Docker/Compose, Podman/Quadlet, Dev Containers) has been run against this workload, so native versus container is unmeasured (docs/hosting-container-practice.md lines 5-6).",
+     "next_check": "Install pinned Podman (or Docker Engine) and run the same application and PostgreSQL workload in containers with the unchanged acceptance script. Record build and start time, pass/fail and resource use against the native run.",
+     "status": "not_settled",
+     "receipts": [
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/hosting-services/podman-rootless-feasibility-and-native-comparison.json",
+       "credit": "not_settled"
+      }
+     ]
+    },
+    {
+     "index": 4,
+     "text": "The candidate list omits Dagu/systemd, which hosting-practice.json cites as the retained service-supervision lanes (line 6). This packet does not establish their fit to the application's supervision.",
+     "next_check": "Define a Dagu DAG and a systemd --user unit for the FastAPI and PostgreSQL processes. Kill each process and verify restart, logging and health-check recovery.",
+     "status": "settled",
+     "receipts": [
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/hosting-services/systemd-run-supervision-kill-restart.json",
+       "credit": "settled"
+      }
+     ]
+    },
+    {
+     "index": 9,
+     "text": "The accepted database configuration uses loopback and local trust and omits TLS, ICU, readline and zlib; it does not qualify a production database profile.",
+     "next_check": "Rebuild the pinned PostgreSQL with --with-openssl --with-icu --with-readline --with-zlib. Enable scram-sha-256 and a self-signed TLS certificate on loopback, then rerun the application acceptance.",
+     "status": "advanced",
+     "receipts": [
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/hosting-services/hardened-postgres-tls-scram.json",
+       "credit": "advanced"
+      }
+     ]
+    },
+    {
+     "index": 10,
+     "text": "No matched native-versus-container application comparison establishes deployment, recovery, isolation or operating-cost superiority.",
+     "next_check": "Run the identical acceptance, backup/restore and kill-recovery scripts natively and under Podman/Compose. Compare pass rates, recovery time, isolation boundaries and CPU/memory.",
+     "status": "not_settled",
+     "receipts": [
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/hosting-services/podman-rootless-feasibility-and-native-comparison.json",
+       "credit": "not_settled"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "recovery-portability",
+   "gaps": [
+    {
+     "index": 1,
+     "text": "The uv lock covers only the 36-distribution Python SDK graph. Native client archives, npm tools, the OS/interpreter, the GPU stack, services and models keep separate recipes and acceptance (adoption/receipt.json line 147; AUDIT.md line 38). The clean-install audit did not qualify Context Mode, ai-memory or MCPorter (blueprints/catalog-clean-install/README.md lines 43-46).",
+     "next_check": "In fresh prefixes, install pinned Context Mode, ai-memory and MCPorter from their recipes with no shared cache, and run each tool's acceptance (a version check plus one functional call).",
+     "status": "advanced",
+     "receipts": [
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/recovery-portability/clean-prefix-context-mode-ai-memory-mcporter.json",
+       "credit": "advanced"
+      }
+     ]
+    },
+    {
+     "index": 6,
+     "text": "UID/GID, timestamps, ACL/xattrs, sparse files, links, Windows filesystems and long-term retention remain unqualified for Restic (packet line 92).",
+     "next_check": "Extend fixture.py's manifest with mtime/atime and a file chowned to a different UID/GID (via sudo), run `restic restore --sparse` and compare allocated blocks with `du`, then rerun the ext4 and drvfs round trips and diff.",
+     "status": "advanced",
+     "receipts": [
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/recovery-portability/restic-mtime-sparse-uid-extension.json",
+       "credit": "advanced"
+      }
+     ]
+    },
+    {
+     "index": 8,
+     "text": "No measured comparison exists between Restic and Litestream, or between uv and mise. The alternatives are known from source review only.",
+     "next_check": "Install pinned Litestream and mise in fresh prefixes. Run a matched SQLite backup/restore (a copy of the ai-memory store) with restic and Litestream, and a matched SDK-graph install with uv and mise, recording time, size, exit codes and restore fidelity.",
+     "status": "advanced",
+     "receipts": [
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/recovery-portability/restic-vs-litestream-uv-vs-mise.json",
+       "credit": "advanced"
+      }
+     ]
+    },
+    {
+     "index": 10,
+     "text": "uv's observed clean-prefix installs reused the existing host and package cache. The hash-locked SDK reproduction commands in adoption/research.json are source-reviewed recipes, not executions from that research pass.",
+     "next_check": "Execute the adoption/research.json hash-locked recipe in a fresh prefix with an empty cache (`UV_CACHE_DIR=$(mktemp -d) uv sync --locked`, or `--no-cache`) and record exit codes and the resolved distribution count.",
+     "status": "advanced",
+     "receipts": [
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/recovery-portability/uv-fresh-cache-sdk-graph-sync.json",
+       "credit": "advanced"
+      }
+     ]
+    },
+    {
+     "index": 14,
+     "text": "No executed comparison establishes that an alternative improves installation or recovery for the selected workload.",
+     "next_check": "The same matched restic-vs-Litestream and uv-vs-mise runs as gap 8, reporting whether either alternative improves install or recovery time and fidelity on the selected workload.",
+     "status": "advanced",
+     "receipts": [
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/recovery-portability/restic-vs-litestream-uv-vs-mise.json",
+       "credit": "advanced"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "secrets-credentials",
+   "gaps": [
+    {
+     "index": 0,
+     "text": "No executed evidence shows that sign-ins and credentials actually stay off the checkout. That half of the requirement rests on a policy value (adoption/manifest.json line 428) and on decisions.json's activation text; it is source review only.",
+     "next_check": "For each native credential path (Claude, Codex, gh, the TypeSafe env file, broker env), check path-only that it resolves outside the checkout. Run `git check-ignore` and `git ls-files` for the known credential filenames, then run a guarded `gitleaks dir .` on the worktree.",
+     "status": "advanced",
+     "receipts": [
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/secrets-credentials/credential-path-containment.json",
+       "credit": "advanced"
+      }
+     ]
+    },
+    {
+     "index": 2,
+     "text": "The gitleaks native receipt covers one Linux/WSL2 host with synthetic inert fixtures. It does not qualify other hosts, real-history completeness, or a publication-pipeline run.",
+     "next_check": "Run a guarded `gitleaks git --log-opts=HEAD` with blob-size reporting so any silently skipped blobs are listed. Separately, trigger a gitleaks CI job on a branch through `gh workflow run` as the publication-pipeline run. A second host remains needs_hardware.",
+     "status": "advanced",
+     "receipts": [
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/secrets-credentials/gitleaks-headancestry-and-ci-pipeline.json",
+       "credit": "advanced"
+      }
+     ]
+    },
+    {
+     "index": 5,
+     "text": "OpenBao has no install, query or comparison evidence, and no fixture exists yet to compare it against the native-login policy.",
+     "next_check": "Install a pinned OpenBao release in a new prefix and start `bao server -dev`. Build a fixture that stores and reads a dummy credential. Compare leak surface and setup steps against the native-login policy, with a gitleaks dir scan and a check that the credential never enters the checkout.",
+     "status": "advanced",
+     "receipts": [
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/secrets-credentials/openbao-lifecycle-comparison.json",
+       "credit": "advanced"
+      }
+     ]
+    },
+    {
+     "index": 6,
+     "text": "Gitleaks detects exposure; the evidence does not establish enforcement that all native sign-ins and credentials remain outside the checkout.",
+     "next_check": "Configure a guarded gitleaks pre-commit hook (`gitleaks git --pre-commit --staged`) and show that it blocks a commit containing a synthetic credential file in a scratch branch, while a clean commit passes.",
+     "status": "advanced",
+     "receipts": [
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/secrets-credentials/gitleaks-precommit-enforcement.json",
+       "credit": "advanced"
+      }
+     ]
+    },
+    {
+     "index": 8,
+     "text": "The configuration records clean branch-ancestry and working-tree scans but a residual synthetic finding on another branch in the default all-refs scan.",
+     "next_check": "Add the fingerprint of the 34fc51b tests/test_lane_packets.py:255 finding to .gitleaksignore, with a comment recording that it is synthetic and outside this branch's ancestry. Rerun the guarded default all-refs `gitleaks git . --config .gitleaks.toml --max-target-megabytes 2` and confirm 0 findings.",
+     "status": "settled",
+     "receipts": [
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/secrets-credentials/gitleaksignore-allrefs-clean.json",
+       "credit": "settled"
+      }
+     ]
+    },
+    {
+     "index": 9,
+     "text": "The configured size limit excludes oversized generated explorer HTML.",
+     "next_check": "Split docs/ecosystem/index.html into chunks under 2MB and scan each with the guarded `gitleaks stdin`, or scan the generator's source inputs instead. Record the coverage either way.",
+     "status": "advanced",
+     "receipts": [
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/secrets-credentials/gitleaks-html-chunk-coverage.json",
+       "credit": "advanced"
+      }
+     ]
+    },
+    {
+     "index": 10,
+     "text": "No operational OpenBao comparison or multi-host credential lifecycle acceptance is retained.",
+     "next_check": "Run the OpenBao dev-server comparison fixture from gap 5, including a credential rotation and revocation cycle on this host. Multi-host lifecycle remains needs_hardware.",
+     "status": "advanced",
+     "receipts": [
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/secrets-credentials/openbao-lifecycle-comparison.json",
+       "credit": "advanced"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "git-github-automation",
+   "gaps": [
+    {
+     "index": 0,
+     "text": "gh CLI has no manifests/stack.json inventory entry and no lifecycle stage (decisions.json lines 2971-2982). The only gh-attributed dated result is `gh attestation verify` exit 0 on 2026-09-20 (docs/github-automation.md lines 128-132). The ruleset GET (lines 180-183) is undated. The 2026-09-22 comparison (lines 359-366) is recorded as 'through the GitHub API', with no client named.",
+     "next_check": "Record `gh --version`. Run a dated `gh api repos/<owner>/native-agent-stack/rulesets` and `gh attestation verify` on the current host, then add a manifests/stack.json gh entry with a lifecycle stage that cites them.",
+     "status": "advanced",
+     "receipts": [
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/git-github-automation/gh-inventory-baseline.json",
+       "credit": "advanced"
+      }
+     ]
+    },
+    {
+     "index": 1,
+     "text": "No gh PR operation (create/review/merge) result is recorded. PR automation is therefore unestablished for every candidate. The gh-aw agentic workflow candidate is public preview and not activated (docs/github-automation.md lines 138-157).",
+     "next_check": "On a scratch branch, run `gh pr create`, `gh pr review --comment`, `gh pr merge --squash` (or close) and `gh pr view --json`. Record exit codes and the resulting PR state.",
+     "status": "advanced",
+     "receipts": [
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/git-github-automation/gh-pr-flow.json",
+       "credit": "advanced"
+      }
+     ]
+    },
+    {
+     "index": 3,
+     "text": "c3's outer review evidence is one foreground review of a local branch diff covering three files. Workflow background polling, same-workspace concurrency, the earlier aborted attempt's cause and Codex usage/model/effort remain unqualified (native-review.json lines 111-114 and 136-142).",
+     "next_check": "Run the installed /codex:review lane in background mode, and as two concurrent invocations in the same workspace, on a multi-file branch diff. Record polling behaviour, exit status and the Codex session's model, effort and usage.",
+     "status": "advanced",
+     "receipts": [
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/git-github-automation/codex-review-lane.json",
+       "credit": "advanced"
+      }
+     ]
+    },
+    {
+     "index": 4,
+     "text": "No new execution was run to freeze this layer (decisions.json line 2970). Winner evidence is dated 2026-09-20/21 and was not recertified on the current host (saturation-audit.json current_host_recertified_by_this_audit false for worktrunk and difftastic).",
+     "next_check": "Rerun the frozen difftastic before.py/after.py acceptance fixture with the pinned difft 0.71.0 on the current host and record the receipt alongside the worktrunk 0.79.0 recertification.",
+     "status": "advanced",
+     "receipts": [
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/git-github-automation/difftastic-fixture-rerun-4.json",
+       "credit": "advanced"
+      }
+     ]
+    },
+    {
+     "index": 5,
+     "text": "Worktrunk crash cleanup without deleting unrelated or dirty state is not established (decisions.json line 507).",
+     "next_check": "Rerun the crash probe with SIGKILL delayed until .git/worktrees/<name> or the target dir appears (inotifywait). Keep an unrelated dirty worktree present, then verify `wt remove`/`git worktree prune` preserve it and clean only the orphan.",
+     "status": "advanced",
+     "receipts": [
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/git-github-automation/worktrunk-crash-cleanup-probe-5.json",
+       "credit": "advanced"
+      }
+     ]
+    },
+    {
+     "index": 6,
+     "text": "No matched comparison of any winner against a challenger exists for this layer. Selection rests on scoped acceptance, not on a measured comparison.",
+     "next_check": "Run the frozen create/list/remove/dirty-refuse plan with native `git worktree` as the challenger. Run a second structural-diff tool over the same 231077d..bdd04ca range. Score both against the same pass criteria.",
+     "status": "advanced",
+     "receipts": [
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/git-github-automation/worktree-and-diff-challenger-6.json",
+       "credit": "advanced"
+      }
+     ]
+    },
+    {
+     "index": 7,
+     "text": "GitHub CLI has no separate component inventory or lifecycle qualification; its selection rests on source review of documented integration and recorded operations.",
+     "next_check": "Record `gh --version` plus dated gh ruleset GET, attestation verify and PR create/merge results, then add the gh component to manifests/stack.json with a lifecycle stage citing them.",
+     "status": "advanced",
+     "receipts": [
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/git-github-automation/gh-inventory-baseline.json",
+       "credit": "advanced"
+      }
+     ]
+    },
+    {
+     "index": 8,
+     "text": "No matched end-to-end comparison establishes superiority across worktree creation, structural review, PR handling and cleanup.",
+     "next_check": "Script one change through worktree create, structural diff review, gh PR create/merge and cleanup twice, once with worktrunk+difftastic and once with native git worktree plus git diff. Compare steps, failures, elapsed time and residual state.",
+     "status": "advanced",
+     "receipts": [
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/git-github-automation/worktree-e2e-comparison-8.json",
+       "credit": "advanced"
+      }
+     ]
+    },
+    {
+     "index": 9,
+     "text": "Worktrunk's disposable lifecycle used disabled hooks; crash recovery and permission isolation are not established.",
+     "next_check": "Run the worktrunk plan with project hooks enabled. Run a delayed-SIGKILL crash probe. Check that a worktree created under a restricted user or umask cannot write outside its owned path.",
+     "status": "advanced",
+     "receipts": [
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/git-github-automation/worktrunk-hooks-umask-crash-9.json",
+       "credit": "advanced"
+      }
+     ]
+    },
+    {
+     "index": 10,
+     "text": "Difftastic's small Python fixture does not establish semantic review accuracy across languages.",
+     "next_check": "Assemble paired before/after files in several languages with known semantic edits. Run difft 0.71.0 and git diff on each and have a blind reviewer score whether each tool surfaces the intended changes.",
+     "status": "advanced",
+     "receipts": [
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/git-github-automation/difftastic-multilang-scoring-10.json",
+       "credit": "advanced"
+      }
+     ]
+    },
+    {
+     "index": 11,
+     "text": "The GitHub automation guide retains contradictory applied-versus-pending ruleset passages; its latest dated section reports application, but live state was not checked.",
+     "next_check": "Run a dated `gh api repos/<owner>/native-agent-stack/rulesets` (and `/rules/branches/main`), then correct the contradictory applied-versus-pending passages in docs/github-automation.md.",
+     "status": "settled",
+     "receipts": [
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/git-github-automation/ruleset-doc-correction.json",
+       "credit": "settled"
+      }
+     ]
+    },
+    {
+     "index": 12,
+     "text": "The review bridge's outer plugin invocation remains unqualified.",
+     "next_check": "Invoke /codex:review from a native Claude session on a branch diff, in foreground and background. Record exit status and output, and reconcile the result with evidence/receipts/foundation-rd-20260921.json.",
+     "status": "advanced",
+     "receipts": [
+      {
+       "path": "evidence/artifacts/gap-wave2-20260923/git-github-automation/codex-review-lane.json",
+       "credit": "advanced"
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "receipts": [
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/ci-supply-chain/archive-reproducibility.json",
+   "id": "archive-reproducibility",
+   "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+   "gap_refs": [
+    [
+     "ci-supply-chain",
+     7
+    ]
+   ],
+   "settles_gap": "partially",
+   "direction": "supports_incumbent",
+   "evidence_class": "native_proven",
+   "model_calls": 0
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/ci-supply-chain/grype-known-cve-fixture.json",
+   "id": "grype-known-cve-fixture",
+   "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+   "gap_refs": [
+    [
+     "ci-supply-chain",
+     13
+    ]
+   ],
+   "settles_gap": true,
+   "direction": "supports_incumbent",
+   "evidence_class": "native_proven",
+   "model_calls": 0
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/ci-supply-chain/lockfile-audit.json",
+   "id": "lockfile-audit",
+   "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+   "gap_refs": [
+    [
+     "ci-supply-chain",
+     12
+    ]
+   ],
+   "settles_gap": "partially",
+   "direction": "refutes_incumbent",
+   "evidence_class": "local_integration",
+   "model_calls": 0
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/ci-supply-chain/publish-catalog-dispatch-attestation.json",
+   "id": "publish-catalog-dispatch-attestation",
+   "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+   "gap_refs": [
+    [
+     "ci-supply-chain",
+     1
+    ]
+   ],
+   "settles_gap": true,
+   "direction": "supports_incumbent",
+   "evidence_class": "native_proven",
+   "model_calls": 0
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/ci-supply-chain/supply-chain-hosted-run-and-wider-syft.json",
+   "id": "supply-chain-hosted-run-and-wider-syft",
+   "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+   "gap_refs": [
+    [
+     "ci-supply-chain",
+     2
+    ]
+   ],
+   "settles_gap": "partially",
+   "direction": "inconclusive",
+   "evidence_class": "native_proven",
+   "model_calls": 0
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/ci-supply-chain/syft-signature-verification-and-wider-scan.json",
+   "id": "syft-signature-verification-and-wider-scan",
+   "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+   "gap_refs": [
+    [
+     "ci-supply-chain",
+     3
+    ],
+    [
+     "ci-supply-chain",
+     9
+    ]
+   ],
+   "settles_gap": "partially",
+   "direction": "supports_incumbent",
+   "evidence_class": "native_proven",
+   "model_calls": 0
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/ci-supply-chain/zizmor-negative-control.json",
+   "id": "zizmor-negative-control",
+   "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+   "gap_refs": [
+    [
+     "ci-supply-chain",
+     0
+    ]
+   ],
+   "settles_gap": true,
+   "direction": "supports_incumbent",
+   "evidence_class": "native_proven",
+   "model_calls": 0
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/ci-supply-chain/zizmor-online-audit.json",
+   "id": "zizmor-online-audit",
+   "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+   "gap_refs": [
+    [
+     "ci-supply-chain",
+     5
+    ]
+   ],
+   "settles_gap": "partially",
+   "direction": "inconclusive",
+   "evidence_class": "native_proven",
+   "model_calls": 0
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/git-github-automation/codex-review-lane.json",
+   "id": "codex-review-lane",
+   "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+   "gap_refs": [
+    [
+     "git-github-automation",
+     3
+    ],
+    [
+     "git-github-automation",
+     12
+    ]
+   ],
+   "settles_gap": "partially",
+   "direction": "inconclusive",
+   "evidence_class": "native_proven",
+   "model_calls": 4
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/git-github-automation/difftastic-fixture-rerun-4.json",
+   "id": "difftastic-fixture-rerun-4",
+   "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+   "gap_refs": [
+    [
+     "git-github-automation",
+     4
+    ]
+   ],
+   "settles_gap": "partially",
+   "direction": "supports_incumbent",
+   "evidence_class": "native_proven",
+   "model_calls": 0
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/git-github-automation/difftastic-multilang-scoring-10.json",
+   "id": "difftastic-multilang-scoring-10",
+   "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+   "gap_refs": [
+    [
+     "git-github-automation",
+     10
+    ]
+   ],
+   "settles_gap": "partially",
+   "direction": "inconclusive",
+   "evidence_class": "native_proven",
+   "model_calls": 8
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/git-github-automation/gh-inventory-baseline.json",
+   "id": "gh-inventory-baseline",
+   "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+   "gap_refs": [
+    [
+     "git-github-automation",
+     0
+    ],
+    [
+     "git-github-automation",
+     7
+    ]
+   ],
+   "settles_gap": "partially",
+   "direction": "supports_incumbent",
+   "evidence_class": "native_proven",
+   "model_calls": 0
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/git-github-automation/gh-pr-flow.json",
+   "id": "gh-pr-flow",
+   "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+   "gap_refs": [
+    [
+     "git-github-automation",
+     1
+    ]
+   ],
+   "settles_gap": "partially",
+   "direction": "supports_incumbent",
+   "evidence_class": "native_proven",
+   "model_calls": 0
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/git-github-automation/ruleset-doc-correction.json",
+   "id": "ruleset-doc-correction",
+   "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+   "gap_refs": [
+    [
+     "git-github-automation",
+     11
+    ]
+   ],
+   "settles_gap": true,
+   "direction": "supports_incumbent",
+   "evidence_class": "native_proven",
+   "model_calls": 0
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/git-github-automation/worktree-and-diff-challenger-6.json",
+   "id": "worktree-and-diff-challenger-6",
+   "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+   "gap_refs": [
+    [
+     "git-github-automation",
+     6
+    ]
+   ],
+   "settles_gap": "partially",
+   "direction": "inconclusive",
+   "evidence_class": "native_proven",
+   "model_calls": 0
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/git-github-automation/worktree-e2e-comparison-8.json",
+   "id": "worktree-e2e-comparison-8",
+   "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+   "gap_refs": [
+    [
+     "git-github-automation",
+     8
+    ]
+   ],
+   "settles_gap": "partially",
+   "direction": "inconclusive",
+   "evidence_class": "native_proven",
+   "model_calls": 0
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/git-github-automation/worktrunk-crash-cleanup-probe-5.json",
+   "id": "worktrunk-crash-cleanup-probe-5",
+   "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+   "gap_refs": [
+    [
+     "git-github-automation",
+     5
+    ]
+   ],
+   "settles_gap": "partially",
+   "direction": "inconclusive",
+   "evidence_class": "native_proven",
+   "model_calls": 0
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/git-github-automation/worktrunk-hooks-umask-crash-9.json",
+   "id": "worktrunk-hooks-umask-crash-9",
+   "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+   "gap_refs": [
+    [
+     "git-github-automation",
+     9
+    ]
+   ],
+   "settles_gap": "partially",
+   "direction": "inconclusive",
+   "evidence_class": "native_proven",
+   "model_calls": 0
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/hosting-services/backup-restore-app-rebuild.json",
+   "id": "backup-restore-app-rebuild",
+   "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+   "gap_refs": [
+    [
+     "hosting-services",
+     0
+    ]
+   ],
+   "settles_gap": "partially",
+   "direction": "supports_incumbent",
+   "evidence_class": "native_proven",
+   "model_calls": 0
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/hosting-services/hardened-postgres-tls-scram.json",
+   "id": "hardened-postgres-tls-scram",
+   "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+   "gap_refs": [
+    [
+     "hosting-services",
+     9
+    ]
+   ],
+   "settles_gap": "partially",
+   "direction": "supports_incumbent",
+   "evidence_class": "native_proven",
+   "model_calls": 0
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/hosting-services/migration-up-down-up-data-survival.json",
+   "id": "migration-up-down-up-data-survival",
+   "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+   "gap_refs": [
+    [
+     "hosting-services",
+     2
+    ]
+   ],
+   "settles_gap": "partially",
+   "direction": "not_applicable",
+   "evidence_class": "native_proven",
+   "model_calls": 0
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/hosting-services/podman-rootless-feasibility-and-native-comparison.json",
+   "id": "podman-rootless-feasibility-and-native-comparison",
+   "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+   "gap_refs": [
+    [
+     "hosting-services",
+     3
+    ],
+    [
+     "hosting-services",
+     10
+    ]
+   ],
+   "settles_gap": false,
+   "direction": "inconclusive",
+   "evidence_class": "native_proven",
+   "model_calls": 0
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/hosting-services/systemd-run-supervision-kill-restart.json",
+   "id": "systemd-run-supervision-kill-restart",
+   "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+   "gap_refs": [
+    [
+     "hosting-services",
+     4
+    ]
+   ],
+   "settles_gap": true,
+   "direction": "supports_incumbent",
+   "evidence_class": "native_proven",
+   "model_calls": 0
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/instructions-skills/claude-code-templates-source-review.json",
+   "id": "claude-code-templates-source-review",
+   "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+   "gap_refs": [
+    [
+     "instructions-skills",
+     9
+    ]
+   ],
+   "settles_gap": true,
+   "direction": "supports_incumbent",
+   "evidence_class": "source_review",
+   "model_calls": 0
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/instructions-skills/ecc-shan-pin-diff.json",
+   "id": "ecc-shan-pin-diff",
+   "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+   "gap_refs": [
+    [
+     "instructions-skills",
+     8
+    ]
+   ],
+   "settles_gap": true,
+   "direction": "supports_incumbent",
+   "evidence_class": "source_review",
+   "model_calls": 0
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/instructions-skills/ecc-trigger-activation-test.json",
+   "id": "ecc-trigger-activation-test",
+   "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+   "gap_refs": [
+    [
+     "instructions-skills",
+     3
+    ]
+   ],
+   "settles_gap": "partially",
+   "direction": "inconclusive",
+   "evidence_class": "native_proven",
+   "model_calls": 2
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/instructions-skills/frozen-skill-arm-ab.json",
+   "id": "frozen-skill-arm-ab",
+   "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+   "gap_refs": [
+    [
+     "instructions-skills",
+     0
+    ],
+    [
+     "instructions-skills",
+     1
+    ],
+    [
+     "instructions-skills",
+     7
+    ]
+   ],
+   "settles_gap": "partially",
+   "direction": "inconclusive",
+   "evidence_class": "native_proven",
+   "model_calls": 12
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/instructions-skills/gh-fix-ci-failing-path-trial.json",
+   "id": "gh-fix-ci-failing-path-trial",
+   "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+   "gap_refs": [
+    [
+     "instructions-skills",
+     5
+    ]
+   ],
+   "settles_gap": "partially",
+   "direction": "supports_incumbent",
+   "evidence_class": "native_proven",
+   "model_calls": 1
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/instructions-skills/security-best-practices-reference-drift.json",
+   "id": "security-best-practices-reference-drift",
+   "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+   "gap_refs": [
+    [
+     "instructions-skills",
+     6
+    ]
+   ],
+   "settles_gap": "partially",
+   "direction": "inconclusive",
+   "evidence_class": "source_review",
+   "model_calls": 0
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/instructions-skills/skill-sync-and-closure-reconciliation.json",
+   "id": "skill-sync-and-closure-reconciliation",
+   "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+   "gap_refs": [
+    [
+     "instructions-skills",
+     2
+    ]
+   ],
+   "settles_gap": "partially",
+   "direction": "supports_incumbent",
+   "evidence_class": "native_proven",
+   "model_calls": 1
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/instructions-skills/worker-skill-declaration-documented-behavior.json",
+   "id": "worker-skill-declaration-documented-behavior",
+   "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+   "gap_refs": [
+    [
+     "instructions-skills",
+     4
+    ]
+   ],
+   "settles_gap": false,
+   "direction": "not_applicable",
+   "evidence_class": "source_review",
+   "model_calls": 0
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/native-clients/agent-sdk-install-and-tool-use.json",
+   "id": "agent-sdk-install-and-tool-use",
+   "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+   "gap_refs": [
+    [
+     "native-clients",
+     7
+    ]
+   ],
+   "settles_gap": "partially",
+   "direction": "supports_incumbent",
+   "evidence_class": "native_proven",
+   "model_calls": 1
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/native-clients/claude-resume-mcp-toolset.json",
+   "id": "claude-resume-mcp-toolset",
+   "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+   "gap_refs": [
+    [
+     "native-clients",
+     1
+    ],
+    [
+     "native-clients",
+     5
+    ]
+   ],
+   "settles_gap": "partially",
+   "direction": "supports_incumbent",
+   "evidence_class": "native_proven",
+   "model_calls": 2
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/native-clients/codex-resume-pinned-build.json",
+   "id": "codex-resume-pinned-build",
+   "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+   "gap_refs": [
+    [
+     "native-clients",
+     0
+    ],
+    [
+     "native-clients",
+     10
+    ],
+    [
+     "native-clients",
+     5
+    ]
+   ],
+   "settles_gap": "partially",
+   "direction": "supports_incumbent",
+   "evidence_class": "native_proven",
+   "model_calls": 2
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/native-clients/mcporter-context-mode-bridge-recovery.json",
+   "id": "mcporter-context-mode-bridge-recovery",
+   "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+   "gap_refs": [
+    [
+     "native-clients",
+     13
+    ]
+   ],
+   "settles_gap": true,
+   "direction": "supports_incumbent",
+   "evidence_class": "native_proven",
+   "model_calls": 0
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/recovery-portability/clean-prefix-context-mode-ai-memory-mcporter.json",
+   "id": "clean-prefix-context-mode-ai-memory-mcporter",
+   "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+   "gap_refs": [
+    [
+     "recovery-portability",
+     1
+    ]
+   ],
+   "settles_gap": "partially",
+   "direction": "supports_incumbent",
+   "evidence_class": "native_proven",
+   "model_calls": 0
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/recovery-portability/restic-mtime-sparse-uid-extension.json",
+   "id": "restic-mtime-sparse-uid-extension",
+   "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+   "gap_refs": [
+    [
+     "recovery-portability",
+     6
+    ]
+   ],
+   "settles_gap": "partially",
+   "direction": "supports_incumbent",
+   "evidence_class": "native_proven",
+   "model_calls": 0
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/recovery-portability/restic-vs-litestream-uv-vs-mise.json",
+   "id": "restic-vs-litestream-uv-vs-mise",
+   "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+   "gap_refs": [
+    [
+     "recovery-portability",
+     8
+    ],
+    [
+     "recovery-portability",
+     14
+    ]
+   ],
+   "settles_gap": "partially",
+   "direction": "supports_incumbent",
+   "evidence_class": "measured_comparison",
+   "model_calls": 0
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/recovery-portability/uv-fresh-cache-sdk-graph-sync.json",
+   "id": "uv-fresh-cache-sdk-graph-sync",
+   "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+   "gap_refs": [
+    [
+     "recovery-portability",
+     10
+    ]
+   ],
+   "settles_gap": "partially",
+   "direction": "supports_incumbent",
+   "evidence_class": "native_proven",
+   "model_calls": 0
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/secrets-credentials/credential-path-containment.json",
+   "id": "credential-path-containment-20260923",
+   "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+   "gap_refs": [
+    [
+     "secrets-credentials",
+     0
+    ]
+   ],
+   "settles_gap": "partially",
+   "direction": "supports_incumbent",
+   "evidence_class": "native_proven",
+   "model_calls": 0
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/secrets-credentials/gitleaks-headancestry-and-ci-pipeline.json",
+   "id": "gitleaks-headancestry-and-ci-pipeline-20260923",
+   "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+   "gap_refs": [
+    [
+     "secrets-credentials",
+     2
+    ]
+   ],
+   "settles_gap": "partially",
+   "direction": "inconclusive",
+   "evidence_class": "native_proven",
+   "model_calls": 0
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/secrets-credentials/gitleaks-html-chunk-coverage.json",
+   "id": "gitleaks-html-chunk-coverage-20260923",
+   "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+   "gap_refs": [
+    [
+     "secrets-credentials",
+     9
+    ]
+   ],
+   "settles_gap": "partially",
+   "direction": "inconclusive",
+   "evidence_class": "native_proven",
+   "model_calls": 0
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/secrets-credentials/gitleaks-precommit-enforcement.json",
+   "id": "gitleaks-precommit-enforcement-20260923",
+   "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+   "gap_refs": [
+    [
+     "secrets-credentials",
+     6
+    ]
+   ],
+   "settles_gap": "partially",
+   "direction": "supports_incumbent",
+   "evidence_class": "native_proven",
+   "model_calls": 0
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/secrets-credentials/gitleaksignore-allrefs-clean.json",
+   "id": "gitleaksignore-allrefs-clean-20260923",
+   "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+   "gap_refs": [
+    [
+     "secrets-credentials",
+     8
+    ]
+   ],
+   "settles_gap": true,
+   "direction": "supports_incumbent",
+   "evidence_class": "native_proven",
+   "model_calls": 0
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/secrets-credentials/openbao-lifecycle-comparison.json",
+   "id": "openbao-lifecycle-comparison-20260923",
+   "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+   "gap_refs": [
+    [
+     "secrets-credentials",
+     5
+    ],
+    [
+     "secrets-credentials",
+     10
+    ]
+   ],
+   "settles_gap": "partially",
+   "direction": "inconclusive",
+   "evidence_class": "native_proven",
+   "model_calls": 0
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/code-memory-comparison.json",
+   "id": "code-memory-comparison",
+   "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+   "gap_refs": [
+    [
+     "semantic-rag",
+     12
+    ]
+   ],
+   "settles_gap": "partially",
+   "direction": "inconclusive",
+   "evidence_class": "native_proven",
+   "model_calls": 0
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/coordinated-snapshot-restore.json",
+   "id": "coordinated-snapshot-restore",
+   "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+   "gap_refs": [
+    [
+     "semantic-rag",
+     10
+    ]
+   ],
+   "settles_gap": "partially",
+   "direction": "supports_incumbent",
+   "evidence_class": "native_proven",
+   "model_calls": 0
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/held-out-recall-benchmark.json",
+   "id": "held-out-recall-benchmark",
+   "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+   "gap_refs": [
+    [
+     "semantic-rag",
+     0
+    ],
+    [
+     "semantic-rag",
+     5
+    ],
+    [
+     "semantic-rag",
+     8
+    ],
+    [
+     "semantic-rag",
+     13
+    ]
+   ],
+   "settles_gap": "partially",
+   "direction": "supports_incumbent",
+   "evidence_class": "native_proven",
+   "model_calls": 0
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/qdrant-restart-reconnect.json",
+   "id": "qdrant-restart-reconnect",
+   "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+   "gap_refs": [
+    [
+     "semantic-rag",
+     9
+    ]
+   ],
+   "settles_gap": "partially",
+   "direction": "supports_incumbent",
+   "evidence_class": "native_proven",
+   "model_calls": 0
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/socraticode-token-comparison.json",
+   "id": "socraticode-token-comparison",
+   "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+   "gap_refs": [
+    [
+     "semantic-rag",
+     6
+    ]
+   ],
+   "settles_gap": "partially",
+   "direction": "inconclusive",
+   "evidence_class": "measured_comparison",
+   "model_calls": 6
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/socraticode-vs-baselines.json",
+   "id": "socraticode-vs-baselines",
+   "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+   "gap_refs": [
+    [
+     "semantic-rag",
+     7
+    ]
+   ],
+   "settles_gap": "partially",
+   "direction": "inconclusive",
+   "evidence_class": "native_proven",
+   "model_calls": 0
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/vllm-0.30.0-acceptance-batch.json",
+   "id": "vllm-0.30.0-acceptance-batch",
+   "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+   "gap_refs": [
+    [
+     "semantic-rag",
+     11
+    ]
+   ],
+   "settles_gap": "partially",
+   "direction": "supports_incumbent",
+   "evidence_class": "native_proven",
+   "model_calls": 0
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/watcher-kill-restart-recovery.json",
+   "id": "watcher-kill-restart-recovery",
+   "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+   "gap_refs": [
+    [
+     "semantic-rag",
+     1
+    ]
+   ],
+   "settles_gap": "partially",
+   "direction": "inconclusive",
+   "evidence_class": "native_proven",
+   "model_calls": 0
+  }
+ ]
+}

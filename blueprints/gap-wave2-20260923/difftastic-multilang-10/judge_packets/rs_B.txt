@@ -1,0 +1,23 @@
+You are reviewing a code diff blind, with no knowledge of which tool produced it.
+
+Below is the ENTIRE output of a diff tool comparing a 'before' and 'after' version of a small rust function. Do not assume anything about the code beyond what is shown.
+
+--- DIFF START ---
+fixtures/rs_after.rs --- Rust
+2 2     if value > max {
+3 3         return max;
+4 4     }
+. 5     if value < 0 {
+. 6         return 0;
+. 7     }
+5 8     value
+6 9 }
+
+
+--- DIFF END ---
+
+Question: Does this diff clearly show the following change: Does the diff clearly show a NEW `if value < 0` block being added, distinct from the existing `if value > max` block?
+
+Answer with EXACTLY this format, two lines:
+ANSWER: YES or NO
+EXPLANATION: one sentence, based only on the diff text shown above, describing what you can see changed.

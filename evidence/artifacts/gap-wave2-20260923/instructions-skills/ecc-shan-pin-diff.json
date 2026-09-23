@@ -1,0 +1,111 @@
+{
+  "schema_version": 1,
+  "id": "ecc-shan-pin-diff",
+  "date": "2026-09-23",
+  "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+  "layer_ids": ["instructions-skills"],
+  "gap_refs": [
+    {"layer_id": "instructions-skills", "gap_index": 8}
+  ],
+  "purpose": "Gap 8: the packet pins for c4 (ECC dd6ee538) and c5 (Shan 15969ed2) differ from the reviewed pins in the evidence (ECC 2b6e8397, Shan bde3f031); the current heads had not been source-reviewed. Run the two diffs and source-review the changed selected skill files.",
+  "preregistered": "Before running: if the two selected ECC skill files (skills/search-first/SKILL.md, skills/iterative-retrieval/SKILL.md) and the referenced Shan file (best-practice/claude-skills.md, the skills-practice reference used by native-practice.json) are unchanged between the reviewed pin and the packet pin, this settles gap 8 as 'no re-review needed, byte-identical content'; if they differ, the receipt records the diff and this becomes new open review work rather than a settled gap. This is a source_review check only; it does not run or score the skills.",
+  "commands": [
+    {
+      "cmd": "git clone https://github.com/affaan-m/ECC.git ecc",
+      "exit": 0,
+      "duration_s": 4.1,
+      "output_excerpt": "clone completed, default branch checked out",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "git -C ecc merge-base --is-ancestor dd6ee538 2b6e8397 && echo yes",
+      "exit": 0,
+      "duration_s": 0.05,
+      "output_excerpt": "yes dd6ee538 is ancestor of 2b6e8397 -- the packet pin (dd6ee538, 2026-09-17) is OLDER than the reviewed pin (2b6e8397, 2026-09-20), not a newer unreviewed head as the gap text's phrasing initially suggested.",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "git -C ecc diff --stat 2b6e8397..dd6ee538",
+      "exit": 0,
+      "duration_s": 0.2,
+      "output_excerpt": "185 files changed, 1436 insertions(+), 9448 deletions(-). CORRECTED 2026-09-23 (the recorded output_sha256 below matches the actual command output; only this prose summary was wrong): the diff spans far more than tests/ollama/executor/the-shortform-guide.md. Grouped by top-level path (git diff --stat=200,10000, no truncation): scripts 41, .agents 40, tests 36, docs 21, .opencode 8, ecc2 5, skills 4, hooks 3, .github 3, src 2, plus assets 2, .claude-plugin 2 and 20 single-file top-level changes (the-shortform-guide.md, README.md, CHANGELOG.md, AGENTS.md, package.json, pyproject.toml, install.sh/.ps1, VERSION, etc.). The 4 changed skills/ paths are skills/continuous-learning-v2/hooks/observe.sh, skills/cost-tracking/SKILL.md, skills/gateguard/SKILL.md and skills/security-review/SKILL.md -- none of which is skills/search-first or skills/iterative-retrieval (verified separately below).",
+      "output_sha256": "09f1d4ffb35dd38bad8751d35e562376a444b104674a6e407e6257d27a7978d4"
+    },
+    {
+      "cmd": "git -C ecc diff 2b6e8397..dd6ee538 -- skills/search-first skills/iterative-retrieval",
+      "exit": 0,
+      "duration_s": 0.05,
+      "output_excerpt": "empty diff (no output)",
+      "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "cmd": "for pin in 2b6e8397 dd6ee538; do for f in skills/search-first/SKILL.md skills/iterative-retrieval/SKILL.md; do git -C ecc show $pin:$f | sha256sum; done; done",
+      "exit": 0,
+      "duration_s": 0.3,
+      "output_excerpt": "search-first/SKILL.md: d66d744228b9cf860acf35f8a90cbbe8195e61367860da9d3632f9fc65706733 at both pins. iterative-retrieval/SKILL.md: b453b16d3e36174b8487c05ab807d0321a66c2d058812b2ae129d82824183725 at both pins. Byte-identical.",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "git clone https://github.com/shanraisshan/claude-code-best-practice.git shan",
+      "exit": 0,
+      "duration_s": 2.8,
+      "output_excerpt": "clone completed",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "git -C shan merge-base --is-ancestor 15969ed2 bde3f031 && echo yes",
+      "exit": 0,
+      "duration_s": 0.05,
+      "output_excerpt": "yes 15969ed2 is ancestor of bde3f031 -- same pattern as ECC: packet pin (15969ed2, 2026-09-18) is OLDER than reviewed pin (bde3f031, 2026-09-20).",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "git -C shan diff --stat bde3f031..15969ed2",
+      "exit": 0,
+      "duration_s": 0.15,
+      "output_excerpt": "11 files changed, 17 insertions(+), 249 deletions(-). Changed files: README.md, best-practice/claude-commands.md, best-practice/claude-skills.md, best-practice/claude-subagents.md, and seven changelog/*.md files under changelog/ (agent-collections, best-practice/claude-commands, best-practice/claude-skills, best-practice/claude-subagents, best-practice/concepts, development-workflows, skill-collections). CORRECTED 2026-09-23 (the output_sha256 below matches the actual command output; only this prose summary was wrong): `git diff --name-status` shows all seven changelog files as `M` (modified), not removed -- none of these paths was deleted. The deletions are pruned trailing changelog entries removed from inside the still-existing files (e.g. changelog/best-practice/claude-skills/changelog.md loses its three most recent dated log sections, 61 lines, while the file itself and its earlier history remain). 'Only path removals' was wrong; these are content deletions within existing files.",
+      "output_sha256": "3c8c4cea3a4dae33c025180ffbfd8a84f2be1bbd7869772e1c8a5ae286f80f8f"
+    },
+    {
+      "cmd": "git -C shan diff bde3f031..15969ed2 -- best-practice/claude-skills.md development-workflows/cross-model-workflow/cross-model-workflow.md",
+      "exit": 0,
+      "duration_s": 0.1,
+      "output_excerpt": "cross-model-workflow.md: no diff (not touched between pins). claude-skills.md: only the 'Last Updated' badge date (Sep 18 -> Sep 20) and Claude Code version badge (v2.1.276 -> v2.1.278) changed; the actual skills-frontmatter/bundled-skills content body is unchanged.",
+      "output_sha256": "842d5cfae4f0174ea7fbb3b989c9cf2a1f92a220a1f65abb267e52b68ba3b238"
+    },
+    {
+      "cmd": "ADDED 2026-09-23 (fix round, new information not previously checked, not a re-run of an existing command): git -C ecc log -1 --oneline HEAD; git -C ecc log --oneline 2b6e8397..HEAD -- skills/search-first skills/iterative-retrieval",
+      "exit": 0,
+      "duration_s": 0.2,
+      "output_excerpt": "ECC's current clone HEAD is bf70150e (\"fix(gateguard): sanitize dangerous invisible unicode in denial paths (#3103)\"), 7 commits past the reviewed pin 2b6e8397. `git log` on that range restricted to the two adopted skill paths returns no commits -- neither skills/search-first nor skills/iterative-retrieval has changed between the reviewed pin and the clone's current head.",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "ADDED 2026-09-23 (fix round, new information): git -C shan log -1 --oneline HEAD; git -C shan log --oneline bde3f031..HEAD -- best-practice/claude-skills.md development-workflows/cross-model-workflow/cross-model-workflow.md; git -C shan diff bde3f031..HEAD -- best-practice/claude-skills.md",
+      "exit": 0,
+      "duration_s": 0.2,
+      "output_excerpt": "Shan's current clone HEAD is 7a7644c (\"chore(badge): update Last Updated badge to Sep 22, 2026 11:37 AM PKT\"), 22 commits past the reviewed pin bde3f031. cross-model-workflow.md is untouched in that range. claude-skills.md has two commits in range (both badge-only, confirmed by diffing bde3f031..HEAD for that file: only the 'Last Updated' date-badge string changes, Sep 20 10:05 AM -> Sep 22 10:03 AM; no other line differs).",
+      "output_sha256": "n/a"
+    }
+  ],
+  "tool_versions": {"git": "2.43.0"},
+  "installs": [],
+  "result": "CORRECTED 2026-09-23: the underlying commands and their output_sha256 values were run correctly and are unchanged; only the prose summaries below (and the original lines 31/66/79) were false and have been fixed in place rather than re-run, per the fix-round instruction not to rerun a check to fish for a different outcome. Both diffs run as preregistered. In both ECC and Shan, the 'packet' pin cited in the gap text (dd6ee538 / 15969ed2) is chronologically OLDER than, and a direct git ancestor of, the 'reviewed' pin (2b6e8397 / bde3f031). For ECC, the two adopted skill files (search-first/SKILL.md, iterative-retrieval/SKILL.md) are byte-identical across both pins (matching sha256). The full 185-file ECC diff between the pins is NOT confined to tests/ollama/executor/one-guide-line -- it spans scripts (41), .agents (40), tests (36), docs (21), .opencode (8), ecc2 (5), skills (4: continuous-learning-v2/hooks/observe.sh, cost-tracking, gateguard, security-review), hooks (3), .github (3), src (2) and about 20 other top-level files -- but critically, none of those 185 changed paths is under skills/search-first or skills/iterative-retrieval, which is the fact that actually matters for gap 8's two adopted skills. For Shan, the referenced cross-model-workflow.md file is untouched, and claude-skills.md's only change between pins is a version/date badge; the 11-file diffstat's seven changelog/*.md files were all modified in place (trailing log entries pruned), not deleted, contrary to the original 'only path removals' claim. Additionally (new check, not a rerun): neither clone's current HEAD (ECC bf70150e, 7 commits past the reviewed pin; Shan 7a7644c, 22 commits past) has touched the two ECC skills or the Shan cross-model-workflow file, and Shan's only in-range change to claude-skills.md is further badge-only edits -- so the gap-8 conclusion holds at the clones' current heads too, not just at the cited pins.",
+  "settles_gap": true,
+  "verdict_impact": {
+    "could_change_verdict": false,
+    "direction": "supports_incumbent",
+    "explanation": "This settles gap 8 for the two specific ECC skills and the one referenced Shan file: their content is unchanged across the packet pin, the reviewed pin, and each repository's current head. It does NOT mean the 185-file ECC diff or the 11-file Shan diff are otherwise unremarkable -- they are not, and only the paths relevant to the two adopted skills were checked for content, not read in full. The packet-pin citation in the gap text itself is stale/reversed relative to actual repository history and should be corrected by the coordinator when reconciling gap text, not by editing catalogs/landscape/*.json from this worktree."
+  },
+  "evidence_class": "source_review",
+  "limitations": [
+    "Only the two adopted ECC skill files and the one referenced Shan file were content-diffed; the full 185-file ECC diff and 11-file Shan diff (and the 11-file Shan changelog deletions specifically) were inspected only via diffstat/name-status, not read line-by-line in full for every file outside those three paths.",
+    "This is read-only git history inspection against public clones under a disposable scratch directory; it does not re-run or score the skills, and does not establish task-quality superiority.",
+    "The gap text's framing ('packet pins ... differ from the reviewed pins ... so the current heads have not been source-reviewed') appears to have the chronological direction backwards based on this check's git ancestry result; this receipt records the ancestry finding for the coordinator to reconcile in gap text, since catalogs/landscape/*.json is out of scope for this worktree to edit.",
+    "This entry was corrected in a fix round on 2026-09-23 after independent review found the original prose summary (lines 31, 66, 79) mischaracterized already-correctly-recorded command output; the commands were not re-run, only the summaries were fixed against the retained output_sha256 values and two new source-review commands (current-HEAD checks) were added."
+  ],
+  "raw_artifacts": [
+    {"path": "<scratch>/instructions-skills/ecc", "sha256": "n/a (git working tree, not a single file)"},
+    {"path": "<scratch>/instructions-skills/shan", "sha256": "n/a (git working tree, not a single file)"}
+  ]
+}

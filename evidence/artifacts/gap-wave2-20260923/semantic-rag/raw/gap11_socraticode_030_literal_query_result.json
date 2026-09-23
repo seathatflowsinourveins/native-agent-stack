@@ -1,0 +1,123 @@
+{
+  "steps": [
+    {
+      "step": "codebase_index",
+      "response": {
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "Indexing started in the background for: ~/code/agent-lab\n\nIMPORTANT: Indexing is now running asynchronously.\nCall codebase_status to check progress. Keep calling it periodically until progress reaches 100%.\nOnce complete, you can use codebase_search to query the indexed codebase."
+            }
+          ]
+        },
+        "jsonrpc": "2.0",
+        "id": 2
+      }
+    },
+    {
+      "step": "codebase_status",
+      "response": {
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "Project: ~/code/agent-lab\nCollection: gapw2rb2fix_codebase_72cfa87c5abf\nStatus: green\nIndexed chunks: 0\n\n\u26a0 Full index in progress\n  Phase: generating embeddings (batch 1/3)\n  Progress: 224/1242 chunks embedded (18%)\n  Batches: 0/3 completed (113/113 files)\n  Elapsed: 4s\n\nFile watcher: disabled (SOCRATICODE_WATCHER=off)\n  Warning: another MCP process is watching this project. Set SOCRATICODE_WATCHER=off for every process that uses this checkout.\n\nCode graph: pending \u2014 will be auto-built after indexing completes"
+            }
+          ]
+        },
+        "jsonrpc": "2.0",
+        "id": 3
+      }
+    },
+    {
+      "step": "codebase_status",
+      "response": {
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "Project: ~/code/agent-lab\nCollection: gapw2rb2fix_codebase_72cfa87c5abf\nStatus: green\nIndexed chunks: 0\n\n\u26a0 Full index in progress\n  Phase: generating embeddings (batch 1/3)\n  Progress: 544/1242 chunks embedded (44%)\n  Batches: 0/3 completed (113/113 files)\n  Elapsed: 8s\n\nFile watcher: disabled (SOCRATICODE_WATCHER=off)\n  Warning: another MCP process is watching this project. Set SOCRATICODE_WATCHER=off for every process that uses this checkout.\n\nCode graph: pending \u2014 will be auto-built after indexing completes"
+            }
+          ]
+        },
+        "jsonrpc": "2.0",
+        "id": 4
+      }
+    },
+    {
+      "step": "codebase_status",
+      "response": {
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "Project: ~/code/agent-lab\nCollection: gapw2rb2fix_codebase_72cfa87c5abf\nStatus: green\nIndexed chunks: 743\n\n\u26a0 Full index in progress\n  Phase: generating embeddings (batch 2/3)\n  Progress: 743/1242 chunks embedded (60%)\n  Batches: 1/3 completed (113/113 files)\n  Elapsed: 12s\n\nFile watcher: disabled (SOCRATICODE_WATCHER=off)\n  Warning: another MCP process is watching this project. Set SOCRATICODE_WATCHER=off for every process that uses this checkout.\n\nCode graph: pending \u2014 will be auto-built after indexing completes"
+            }
+          ]
+        },
+        "jsonrpc": "2.0",
+        "id": 5
+      }
+    },
+    {
+      "step": "codebase_status",
+      "response": {
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "Project: ~/code/agent-lab\nCollection: gapw2rb2fix_codebase_72cfa87c5abf\nStatus: green\nIndexed chunks: 743\n\n\u26a0 Full index in progress\n  Phase: generating embeddings (batch 2/3)\n  Progress: 999/1242 chunks embedded (80%)\n  Batches: 1/3 completed (113/113 files)\n  Elapsed: 16s\n\nFile watcher: disabled (SOCRATICODE_WATCHER=off)\n  Warning: another MCP process is watching this project. Set SOCRATICODE_WATCHER=off for every process that uses this checkout.\n\nCode graph: pending \u2014 will be auto-built after indexing completes"
+            }
+          ]
+        },
+        "jsonrpc": "2.0",
+        "id": 6
+      }
+    },
+    {
+      "step": "codebase_status",
+      "response": {
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "Project: ~/code/agent-lab\nCollection: gapw2rb2fix_codebase_72cfa87c5abf\nStatus: green\nIndexed chunks: 1242\n\n\u26a0 Full index in progress\n  Phase: building code graph\n  Progress: 1242/1242 chunks embedded (100%)\n  Batches: 3/3 completed (113/113 files)\n  Elapsed: 20s\n\nFile watcher: disabled (SOCRATICODE_WATCHER=off)\n  Warning: another MCP process is watching this project. Set SOCRATICODE_WATCHER=off for every process that uses this checkout.\n\nCode graph: building now..."
+            }
+          ]
+        },
+        "jsonrpc": "2.0",
+        "id": 7
+      }
+    },
+    {
+      "step": "codebase_status",
+      "response": {
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "Project: ~/code/agent-lab\nCollection: gapw2rb2fix_codebase_72cfa87c5abf\nStatus: green\nIndexed chunks: 1242\n\nLast operation: Full index \u2014 completed\n  Files: 113, Chunks: 1242\n  1s ago (took 22.9s)\n\nFile watcher: disabled (SOCRATICODE_WATCHER=off)\n  Warning: another MCP process is watching this project. Set SOCRATICODE_WATCHER=off for every process that uses this checkout.\n\nCode graph: 99 files, 73 edges\n  Last built: 3s ago (cached in memory)"
+            }
+          ]
+        },
+        "jsonrpc": "2.0",
+        "id": 8
+      }
+    }
+  ],
+  "final_status": "Project: ~/code/agent-lab\nCollection: gapw2rb2fix_codebase_72cfa87c5abf\nStatus: green\nIndexed chunks: 1242\n\nLast operation: Full index \u2014 completed\n  Files: 113, Chunks: 1242\n  1s ago (took 22.9s)\n\nFile watcher: disabled (SOCRATICODE_WATCHER=off)\n  Warning: another MCP process is watching this project. Set SOCRATICODE_WATCHER=off for every process that uses this checkout.\n\nCode graph: 99 files, 73 edges\n  Last built: 3s ago (cached in memory)",
+  "query": "collect agent usage totals separately for native Linux and Desktop configuration homes",
+  "search_response": {
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "Search results for \"collect agent usage totals separately for native Linux and Desktop configuration homes\" (5 matches):\n\n\n\u26a0 WARNING: File watching is disabled in this process, but another active watcher can still update the shared index.\n  Set SOCRATICODE_WATCHER=off for every MCP process that uses this checkout.\n--- tools/ecosystem/linux-usage-report.cjs (lines 2-39) [javascript] score: 0.7000 ---\n// Offline ccusage adapter. Scope only parser children; never change agent homes.\nconst fs = require('node:fs');\nconst path = require('node:path');\nconst os = require('node:os');\nconst crypto = require('node:crypto');\nconst {spawnSync} = require('node:child_process');\nconst bundle = path.resolve(__dirname, '..');\nconst fields = ['inputTokens','cacheReadTokens','cacheCreationTokens','outputTokens','reasoningOutputTokens','totalTokens'];\nfunction counters(value) {\n  if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('Missing upstream totals.');\n  const row = Object.fromEntries(fields.map(field => {\n    const n = value[field];\n    if (n === undefined || n === null) return [field, null];\n    if (!Number.isSafeInteger(n) || n < 0) throw new Error('Invalid upstream counter.');\n    return [field, n];\n  }));\n  if (Object.values(row).every(n => n === null)) throw new Error('Unavailable counters.');\n  return row;\n}\nfunction installation(bundleRoot = bundle) {\n  if (process.platform !== 'linux') throw new Error('Run in the native Linux environment.');\n  const record = JSON.parse(fs.readFileSync(path.join(bundleRoot,'state/linux-efficiency-installation.json'),'utf8'));\n  if (record.platform !== 'Linux') throw new Error('Expected the Linux installation manifest.');\n  return record;\n}\nfunction nativeEnvironment(original = process.env) {\n  // Desktop intentionally uses a shared Windows home. Only these explicitly\n  // Linux-native child processes select the separate Linux accounts and logs.\n  const env = {...original, CODEX_HOME:path.join(os.homedir(), '.codex')};\n  // Claude's unset default also uses ~/.claude.json; setting the equivalent\n  // directory explicitly changes where that account/project file is resolved.\n  delete env.CLAUDE_CONFIG_DIR;\n  return env;\n}\nfunction directoryExists(p) {\n  try { return fs.statSync(p).isDirectory(); } catch { return false; }\n}\nfunction sourcesFor(scope, options = {}) {\n\n\n--- tools/ecosystem/linux-usage-report.cjs (lines 128-150) [javascript] score: 0.6250 ---\nif (require.main === module) {\n  try {\n    const options = {};\n    const args=process.argv.slice(2);\n    for(let i=0;i<args.length;i++) {\n      const key={'--scope':'scope','--desktop-home':'desktopHome','--bundle':'bundleRoot','--output':'output'}[args[i]];\n      if(key) {if(!args[i+1] || args[i+1].startsWith('--')) throw new Error(args[i]+' requires a value.');options[key]=args[++i];}\n      else if(!['--check','--json','--help'].includes(args[i])) throw new Error('Unknown option: '+args[i]);\n    }\n    if(args.includes('--help')) {\n      console.log('Usage: ecosystem-usage [--scope native|desktop|all] [--desktop-home /absolute/home] [--output /path/report.json] [--json] [--check]\\nDefault scope is native. --bundle /path/ecosystem resolves the installation manifest when running this source copy. No model calls or cost estimates.');\n    } else if (args.includes('--check')) {\n      sourcesFor(options.scope || 'native',options);\n      const installed=installation(options.bundleRoot); const parser=installed.npm.find(x=>x.name==='ccusage');\n      if (!fs.statSync(path.join(parser.prefix,parser.entry)).isFile()) throw new Error('Missing usage parser.');\n      console.log('Linux usage parser is available; no model call or log collection performed.');\n    } else {\n      const r=collect(options); console.log(args.includes('--json') ? JSON.stringify(r,null,2) : 'Updated '+r.scope+' usage snapshot. Available parsers: '+r.reports.filter(x=>x.available).map(x=>x.agent).join(', '));\n      if(!r.complete) process.exitCode=1;\n    }\n  } catch(error) {console.error(error.message);process.exitCode=1;}\n}\nmodule.exports={collect,counters,installation,nativeEnvironment,sourcesFor,runParser,overlaps};\n\n--- tools/ecosystem/linux-usage-report.test.cjs (lines 139-154) [javascript] score: 0.5000 ---\n  writeLog(path.join(f.nativeHome,'.config','claude','projects','fixture','copy.jsonl'),[claude]);\n  const r=collect({...f,scope:'all',installed:real});\n  assert.equal(r.complete,true,JSON.stringify(r));\n  const codex=r.reports.find(x=>x.agent==='codex');\n  assert.deepEqual(codex.totals,{inputTokens:540,cacheReadTokens:60,cacheCreationTokens:0,outputTokens:80,reasoningOutputTokens:9,totalTokens:680});\n  assert.equal(r.reports.find(x=>x.agent==='claude').totals.totalTokens,100);\n  assert.equal(r.reports.find(x=>x.agent==='claude').totals.reasoningOutputTokens,null);\n  const desktop=r.coverage.find(x=>x.id==='desktop-codex');\n  assert.equal(desktop.sessions.some(row=>row.sessionId==='worker'),true);\n  assert.equal(desktop.sessions.some(row=>row.sessionId==='reviewer'),true);\n  // Session view retains path identities; daily view removes the copied event.\n  assert.equal(desktop.sessions.length,4);\n  assert.equal(desktop.session_view_totals.totalTokens,790);\n  assert.deepEqual(r.deduplication.overlap[0].same_session_ids,['shared']);\n  assert.equal(r.coverage.find(x=>x.id==='native-codex').session_view_totals.totalTokens,110);\n});\n\n--- tools/ecosystem/linux-usage-report.cjs (lines 40-65) [javascript] score: 0.4500 ---\n  if (!['native','desktop','all'].includes(scope)) throw new Error('Scope must be native, desktop, or all.');\n  const home = options.nativeHome || os.homedir();\n  const sources = [];\n  if (scope !== 'desktop') sources.push({id:'native-codex',agent:'codex',roots:[path.join(home,'.codex')]});\n  if (scope !== 'native') sources.push({id:'desktop-codex',agent:'codex',roots:[options.desktopHome || '/mnt/c/Users/example/.codex']});\n  if (scope !== 'desktop') sources.push({id:'native-claude',agent:'claude',roots:[path.join(options.xdgConfigHome || process.env.XDG_CONFIG_HOME || path.join(home,'.config'),'claude'),path.join(home,'.claude')]});\n  for (const source of sources) {\n    // ccusage uses commas as separators. Reject an ambiguous path rather than\n    // silently broadening a requested scope. Canonicalize aliases before parsing.\n    source.roots = [...new Set(source.roots.map(root => {\n      if (!path.isAbsolute(root) || root.includes(',')) throw new Error('Usage roots must be absolute paths without commas.');\n      return directoryExists(root) ? fs.realpathSync(root) : root;\n    }))];\n    source.usage_directories = source.roots.flatMap(root => {\n      if (source.agent === 'claude') return [path.join(root,'projects')].filter(directoryExists);\n      const dirs = ['sessions','archived_sessions'].map(name => path.join(root,name)).filter(directoryExists);\n      return dirs.length ? dirs : [root].filter(directoryExists);\n    });\n  }\n  return sources;\n}\nfunction runParser(installed, source, view, run = spawnSync) {\n  const parser = installed.npm.find(item => item.name === 'ccusage');\n  if (!parser || parser.version !== '20.0.23') throw new Error('Validate scope and deduplication behavior before using a different ccusage version.');\n  const started_at = new Date().toISOString();\n  const variable = source.agent === 'codex' ? 'CODEX_HOME' : 'CLAUDE_CONFIG_DIR';\n\n\n--- tools/ecosystem/linux-usage-report.test.cjs (lines 76-83) [javascript] score: 0.4333 ---\n\ntest('default collect scope stays native even under a Desktop caller',t=>{\n  const f=fixture(t),calls=[];\n  const r=collect({...f,installed,run:(exe,args,options)=>{calls.push(options.env);return response(args[2]);}});\n  assert.equal(r.scope,'native');\n  assert.equal(r.coverage.length,2);\n  assert.equal(calls.some(env=>env.CODEX_HOME.includes(f.desktopHome)),false);\n});\n"
+        }
+      ]
+    },
+    "jsonrpc": "2.0",
+    "id": 9
+  }
+}

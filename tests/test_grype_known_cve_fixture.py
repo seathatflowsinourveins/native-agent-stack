@@ -1,0 +1,79 @@
+"""Positive-detection sensitivity check for gap ci-supply-chain[13].
+
+The retained Grype receipt (blueprints/us-equities/supply-chain/scan-nautilus-
+rc5-20260922/receipt.json) establishes a dated zero-match result against a
+production dependency set. A zero-match result alone does not establish that
+Grype would actually catch a real, published vulnerability if one were
+present (positive-detection sensitivity), nor does it say anything about
+absence of vulnerabilities in general (which no scanner can prove).
+
+This test runs the installed grype (skipped if absent, matching the existing
+zizmor tests' pattern) against a small, pinned fixture directory containing
+requirements.txt with urllib3==1.26.4, which has a long-published,
+well-known CVE (CVE-2021-33503, a catastrophic-backtracking ReDoS in
+urllib3's URL-authority regex, GHSA-q2q7-5pp4-w6pg), and asserts grype
+reports that exact match. This does not establish vulnerability absence
+elsewhere; it only establishes that grype's positive-detection path works
+end to end on this host with this database.
+"""
+
+import json
+import shutil
+import subprocess
+import unittest
+from pathlib import Path
+
+
+ROOT = Path(__file__).resolve().parents[1]
+GRYPE = shutil.which("grype")
+FIXTURE_DIR = ROOT / "blueprints/gap-wave2-20260923/grype-known-cve-fixture"
+EXPECTED_GHSA = "GHSA-q2q7-5pp4-w6pg"
+EXPECTED_CVE = "CVE-2021-33503"
+EXPECTED_PACKAGE = "urllib3"
+EXPECTED_VERSION = "1.26.4"
+
+
+@unittest.skipUnless(GRYPE, "native grype unavailable; CI installs the pinned scanner")
+class GrypeKnownCveFixtureTests(unittest.TestCase):
+    def test_fixture_declares_the_expected_vulnerable_pin(self) -> None:
+        text = (FIXTURE_DIR / "requirements.txt").read_text(encoding="utf-8")
+        self.assertIn(f"{EXPECTED_PACKAGE}=={EXPECTED_VERSION}", text)
+
+    def test_grype_detects_the_published_cve_in_the_fixture(self) -> None:
+        result = subprocess.run(
+            [GRYPE, f"dir:{FIXTURE_DIR}", "-o", "json"],
+            capture_output=True, text=True, timeout=120, check=False,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr[:2000])
+        try:
+            payload = json.loads(result.stdout)
+        except json.JSONDecodeError:
+            self.fail(f"grype did not return JSON: {result.stderr[:2000]}")
+
+        matches = payload.get("matches", [])
+        self.assertTrue(matches, "expected at least one match against the fixture")
+
+        target = None
+        for match in matches:
+            artifact = match.get("artifact", {})
+            if artifact.get("name") != EXPECTED_PACKAGE:
+                continue
+            vuln_id = match.get("vulnerability", {}).get("id")
+            related_ids = {
+                r.get("id") for r in match.get("relatedVulnerabilities", [])
+            }
+            if vuln_id == EXPECTED_GHSA or EXPECTED_CVE in related_ids:
+                target = match
+                break
+
+        self.assertIsNotNone(
+            target,
+            f"expected a match for {EXPECTED_GHSA} ({EXPECTED_CVE}) on "
+            f"{EXPECTED_PACKAGE}=={EXPECTED_VERSION}; got "
+            f"{[(m['vulnerability']['id'], m['artifact']['name'], m['artifact']['version']) for m in matches]}",
+        )
+        self.assertEqual(target["artifact"]["version"], EXPECTED_VERSION)
+
+
+if __name__ == "__main__":
+    unittest.main()

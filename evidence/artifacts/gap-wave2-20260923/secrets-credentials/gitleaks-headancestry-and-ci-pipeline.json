@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "id": "gitleaks-headancestry-and-ci-pipeline-20260923",
+  "date": "2026-09-23",
+  "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+  "layer_ids": ["secrets-credentials"],
+  "gap_refs": [
+    {"layer_id": "secrets-credentials", "gap_index": 2}
+  ],
+  "purpose": "Gap 2 says the existing gitleaks evidence covers only one Linux/WSL2 host with synthetic fixtures, and neither real-history completeness nor a publication-pipeline run. This re-runs a guarded, verbose, HEAD-ancestry-restricted `gitleaks git` scan on this host (with explicit attention to any skipped-blob message), and separately dispatches the actual validate.yml secret-scan CI job on main via `gh workflow run` as the publication-pipeline run.",
+  "preregistered": "ORIGINAL (2026-09-23, before the first `gitleaks git` and `gh workflow run` commands below): `gitleaks git . --log-opts=HEAD --config .gitleaks.toml --max-target-megabytes 2 --redact --no-banner -v` restricted to this branch's own ancestry produces 0 findings (matching .gitleaks.toml's prior 376-commit measurement, allowing for commit-count drift since this is a shared, actively-committed branch) and its stderr log is inspected for any 'skip'-shaped message indicating a silently-dropped oversized blob; none is expected to appear for in-ancestry commits since docs/ecosystem/index.html was only added/grown after prior commits. Separately, `gh workflow run validate.yml --ref main` is expected to queue a real GitHub Actions run of the secret-scan job (which pins gitleaks 8.30.1 itself, independent of this host's guarded binary), and that job's git-history and working-tree steps are expected to report a commit/byte count and a leaks-found line, recorded verbatim regardless of outcome. This is the first publication-pipeline execution recorded for this gap; a clean result would supply real-history completeness (via -v skip-message inspection) and the publication-pipeline part gap 2 says is missing, without extending scanning to another host (still needs_hardware for Mac). [Caveat added in the fix round below: this original text, like the other five receipts in this unit, was authored after its own raw command output already existed rather than strictly before execution -- see limitations.] FIX-ROUND CORRECTION (preregistered before the debug-level rerun below, per raw_artifacts gap2-fixround-prereg.txt, written before that command ran): a review finding showed `-v`/`--verbose` is 'show verbose output from scan', a distinct flag from `-l`/`--log-level` (default \"info\"), and that .gitleaks.toml's own prior receipt (gitleaks-repo-history-scan.json) already recorded that git-mode prints no explicit per-blob skip message at all, at any verbosity setting the earlier unit used, so the original run's absence-of-skip-message was not evidence of completeness. docs/ecosystem/index.html is confirmed 12918618 bytes at both b75b8b1 and 92bb279, both ancestors of this branch's HEAD, and the CI run's own working-tree (`gitleaks dir`) step logged a WRN skip line for exactly this file at the same 2MB cap. Expectation: re-running `gitleaks git . --log-opts=HEAD --config .gitleaks.toml --max-target-megabytes 2 --redact --no-banner --log-level debug` will either (a) show a DBG/WRN line naming docs/ecosystem/index.html as skipped due to size, confirming its content is not scanned in git-mode either, which would retract the original completeness claim; or (b) show no such line, which would leave the question open rather than settle it, since dir-mode and git-mode traverse content differently. Either result requires retracting the original 'not... in a way that triggered a skip message' inference, since that inference rested on the wrong flag.",
+  "commands": [
+    {
+      "cmd": "gitleaks git . --log-opts=HEAD --config .gitleaks.toml --max-target-megabytes 2 --redact --no-banner -v --report-format json --report-path <state>/gitleaks-runs/gap2-head-ancestry.json",
+      "exit": 0,
+      "duration_s": 40.2,
+      "output_excerpt": "398 commits scanned.\nscanned ~971096856 bytes (971.10 MB) in 40.2s\nno leaks found",
+      "output_sha256": "f33667e80fc28eedacc8388d67faa0704055d69d33f57e07bb9b82b7b2e9f229"
+    },
+    {
+      "cmd": "gh workflow run validate.yml --ref main -R seathatflowsinourveins/native-agent-stack",
+      "exit": 0,
+      "duration_s": 0.8,
+      "output_excerpt": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/35808252012",
+      "output_sha256": "workflow-run-url-not-hashed"
+    },
+    {
+      "cmd": "gh run view 35808252012 -R seathatflowsinourveins/native-agent-stack --json status,conclusion,jobs (polled to completion)",
+      "exit": 0,
+      "duration_s": 180.0,
+      "output_excerpt": "status: completed, conclusion: success; job 'secret-scan': completed success",
+      "output_sha256": "run-status-not-hashed"
+    },
+    {
+      "cmd": "gh run view 35808252012 -R seathatflowsinourveins/native-agent-stack --log | grep -A3 'Scan git history|scanned ~|leaks found'",
+      "exit": 0,
+      "duration_s": 2.0,
+      "output_excerpt": "523 commits scanned. / scanned ~1375505022 bytes (1.38 GB) in 2m37s / no leaks found  --  [working tree] scanned ~41657517 bytes (41.66 MB) in 2.62s / no leaks found",
+      "output_sha256": "ci-log-excerpt-not-hashed",
+      "fix_round_note": "The original grep pattern here omitted 'skip'/'skipping', which dropped a contradicting line from the excerpt. Re-run below with -i skip to record it."
+    },
+    {
+      "cmd": "gh run view 35808252012 -R seathatflowsinourveins/native-agent-stack --log | grep -i skip",
+      "exit": 0,
+      "duration_s": 2.0,
+      "output_excerpt": "secret-scan\tScan working tree for secrets\t...WRN skipping file: too large max_size=2MB, size=12MB path=docs/ecosystem/index.html",
+      "output_sha256": "ci-log-skip-grep-not-hashed",
+      "fix_round_note": "Fix-round addition: this CI-log skip line was omitted from the original excerpt above, and directly contradicts this receipt's original 'no skip message anywhere' completeness claim -- CI's gitleaks dir (working-tree) step did skip this exact file at the same cap."
+    },
+    {
+      "cmd": "gitleaks git . --log-opts=HEAD --config .gitleaks.toml --max-target-megabytes 2 --redact --no-banner --log-level debug --report-format json --report-path <state>/gitleaks-runs/gap2-head-ancestry-debug.json",
+      "exit": 1,
+      "duration_s": 38.1,
+      "output_excerpt": "400 commits scanned. / scanned ~971155937 bytes (971.16 MB) in 38.1s / leaks found: 4 / 12104 DBG lines 'skipping fragment: size commit=... max-size=2 path=docs/ecosystem/index.html rule-id=... size=12' across many distinct in-ancestry commits; 0 lines matching 'too large'/'max_size' (the dir-mode WRN wording never appears in git mode, at any log level).",
+      "output_sha256": "0a828a0ca80edd2c89ea53d69084820e5847224cc405c14209334b98aebff914",
+      "fix_round_note": "Corrected procedure per the review finding: --log-level debug (not -v) is the flag that actually gates skip-message visibility in gitleaks. Preregistered in gap2-fixround-prereg.txt before this command ran. Exit 1 / leaks found:4 is a real, separate, benign result explained in 'result' below (redaction-placeholder strings in this unit's own e932de5 commit, fixed in the follow-up d58ec57 commit); it is not part of the skip-message question and was not filtered out or re-run to change it."
+    }
+  ],
+  "tool_versions": {"gitleaks": "8.30.1 (both local and CI-pinned, independently installed)", "git": "2.43.0", "gh": "installed"},
+  "installs": [],
+  "model_calls": [],
+  "result": "RETRACTED CLAIM (fix round): the original receipt asserted that the absence of a 'skip'-shaped line in the `-v` run's stderr was 'the direct evidence requested for gap 2's verbose skipped-blob reporting, not an inference'. That is false and is retracted. `-v`/`--verbose` is 'show verbose output from scan', a different flag from `-l`/`--log-level` (default \"info\"); the prior receipt gap-resolution-20260922/secrets-credentials/gitleaks-repo-history-scan.json already recorded that git-mode prints no explicit per-blob skip message regardless of verbosity, so the `-v` run's silence proved nothing about completeness. docs/ecosystem/index.html is confirmed 12918618 bytes at both b75b8b1 and 92bb279 (both ancestors of this branch's HEAD via `git merge-base --is-ancestor`), so the file's oversized content was in-ancestry the whole time; the original claim that it was 'not... introduced, at its current size, into any commit this branch's HEAD-ancestry scan walked' is also false. HEAD-ancestry local scan (original, unmodified): 398 commits scanned (~971 MB), 40.2s, exit 0, 'no leaks found' -- this factual result stands, only the completeness inference drawn from it is retracted. CORRECTED EVIDENCE (fix round): re-running the same HEAD-ancestry scan with `--log-level debug` (400 commits now, ~971 MB, 38.1s, exit 1) produced 12104 DBG lines of the shape 'skipping fragment: size commit=<sha> max-size=2 path=docs/ecosystem/index.html rule-id=<rule> size=12' spread across many distinct in-ancestry commits -- i.e. gitleaks git DOES silently skip this oversized blob's content, per rule, at every commit where it is present in this branch's own ancestry; that skip is simply invisible at the info log level `-v` uses, and is not reported via the dir-mode 'skipping file: too large' WRN wording at any log level in git mode (0 matches for 'too large'/'max_size' anywhere in this debug run). This directly answers gap 2's next_check ('blob-size reporting so any silently skipped blobs are listed') and, unlike the retracted original claim, the correct answer is that the blob IS silently skipped, not that it was never encountered. Some commits also produced 134 'Taking longer than 5s to inspect fragment ... path=docs/ecosystem/index.html' DBG lines, indicating gitleaks does still spend time on parts of this file at some commits; this receipt does not fully characterize which sub-fragments are and are not skipped, only that oversized-content skipping demonstrably occurs and was undetectable in the original run. The debug run's exit 1 / 'leaks found: 4' is a separate, unrelated, benign result: all 4 findings are on commit e932de5 (this unit's own first commit) in this unit's own draft receipt files (gitleaks-html-chunk-coverage.json, openbao-lifecycle-comparison.json), matching the literal placeholder string 'REDACTED' against a generic secret-shaped rule and a code-search-vendor access-token-shaped rule (rule ids intentionally not spelled out verbatim in this sentence, since gitleaks' own keyword pre-filter for that vendor name triggers on its literal presence anywhere in a scanned file, which would otherwise cause this very receipt to be flagged; see the raw debug-run JSON report for the exact rule ids); the follow-up commit d58ec57 ('Redact secret-shaped strings and avoid a gitleaks keyword false-positive...') already replaced these with 'REDACTED-DUMMY-V1'-style strings at HEAD, so this is expected git-history retention of an already-fixed synthetic false positive, not a new or live secret; not investigated further since it is outside gap 2's scope. Publication-pipeline run (original, unmodified): `gh workflow run validate.yml --ref main` queued run 35808252012, which completed 'success' overall and for the secret-scan job; its git-history step (git mode) scanned 523 commits (~1.38 GB) with 'no leaks found', and its working-tree step (dir mode) logged 'WRN skipping file: too large max_size=2MB, size=12MB path=docs/ecosystem/index.html' before also reporting 'no leaks found' for what it did scan -- this CI skip line was present in the raw log the whole time but omitted from the original receipt's excerpt (whose grep pattern did not include 'skip'); it independently corroborates, in dir mode, the same oversized-content-skip behavior the corrected debug rerun found in git mode. Commit count (398/400) differs from .gitleaks.toml's previously recorded 376 and this unit's own companion gap 8 all-refs count, consistent with .gitleaks.toml's own statement that this shared, concurrently-committed repository does not have a stable commit count across runs; not re-run to chase a matching number.",
+  "settles_gap": "partially",
+  "verdict_impact": {
+    "could_change_verdict": false,
+    "direction": "inconclusive",
+    "explanation": "This now genuinely supplies gap 2's 'blob-size reporting so any silently skipped blobs are listed' next_check (docs/ecosystem/index.html is shown, with named commits, to have its content silently skipped by `gitleaks git` at every in-ancestry commit, visible only at --log-level debug) and the publication-pipeline run (CI run 35808252012, success, with its own independent dir-mode skip confirmation). Direction is 'inconclusive' rather than 'supports_incumbent' because the corrected result is a genuine coverage limitation of the current gitleaks git-mode setup (oversized blob content is never scanned in history, only silently skipped, and that skip is invisible below debug log level), not a clean pass; it neither argues for replacing gitleaks nor closes the completeness question, it documents a specific, previously-undetected gap in what the existing setup actually covers. It does not settle gap 2: a second host (Mac) remains untested and stays needs_hardware, matching the existing gap text."
+  },
+  "evidence_class": "native_proven",
+  "limitations": [
+    "FIX ROUND: the original receipt's central completeness claim (absence of a skip message = proof of no skip) was false and is retracted above; readers relying on an earlier copy of this file should treat its 'result' and 'verdict_impact' as superseded by this version.",
+    "This receipt's own 'preregistered' text, including the fix-round addition, was authored in the same working session as (though the fix-round prereg was written to a separate raw_artifacts file before its command ran) the commands it describes; see the companion cross-receipt limitation on preregistration timing recorded in this unit's other five receipts and gap-wave2-20260923/secrets-credentials/PREREGISTRATION-NOTE.md.",
+    "The debug-level rerun's 12104 'skipping fragment' DBG lines and 134 'Taking longer than 5s' DBG lines were not individually reconciled against gitleaks' internal fragment-decoding logic; this receipt reports their existence and rule/commit attribution, not a full explanation of gitleaks' internal chunking behavior for oversized files in git mode.",
+    "The 4 findings in the debug rerun (commit e932de5, this unit's own draft receipts, literal 'REDACTED' placeholder strings) are judged benign by direct inspection and by the existence of the follow-up d58ec57 redaction commit, not by a second independent reviewer.",
+    "The CI run (35808252012) is main-branch history only (git fetch-depth 0 on main), not this feature branch's own history; it is real publication-pipeline evidence but scoped to main, not to the branch this unit worked on.",
+    "Commit counts continue to drift run-to-run (398/400 here vs 376 previously vs 523 in CI) because this is a shared, actively-committed repository; per AGENTS.md this was not re-run to chase a stable count.",
+    "Still only one host (this WSL host, plus GitHub's ubuntu-24.04 CI runner) has ever run gitleaks against this repository; Mac acceptance remains untested and is out of scope for local execution here (needs_hardware)."
+  ],
+  "raw_artifacts": [
+    {"path": "~/codex-ecosystem/state/gap-wave2-20260923/secrets-credentials/gitleaks-runs/gap2-head-ancestry.json", "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"},
+    {"path": "~/codex-ecosystem/state/gap-wave2-20260923/secrets-credentials/gitleaks-runs/gap2-head-ancestry.stderr.log", "sha256": "f33667e80fc28eedacc8388d67faa0704055d69d33f57e07bb9b82b7b2e9f229"},
+    {"path": "~/codex-ecosystem/state/gap-wave2-20260923/secrets-credentials/gitleaks-runs/gap2-fixround-prereg.txt", "sha256": "74af5ed265e3eb8cd17d2ce91cf76114bfbdfed3b69975e5dd3b869580834623"},
+    {"path": "~/codex-ecosystem/state/gap-wave2-20260923/secrets-credentials/gitleaks-runs/gap2-head-ancestry-debug.json", "sha256": "3085c757e65cbec364e31c4a19ecbdaf6b887dea49632bc29d843565da764f0e"},
+    {"path": "~/codex-ecosystem/state/gap-wave2-20260923/secrets-credentials/gitleaks-runs/gap2-head-ancestry-debug.stderr.log", "sha256": "0a828a0ca80edd2c89ea53d69084820e5847224cc405c14209334b98aebff914"}
+  ]
+}

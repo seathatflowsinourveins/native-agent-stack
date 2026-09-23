@@ -1,0 +1,59 @@
+{
+ "schema_version": 1,
+ "id": "clean-prefix-context-mode-ai-memory-mcporter",
+ "date": "2026-09-23",
+ "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+ "layer_ids": ["recovery-portability"],
+ "gap_refs": [{"layer_id": "recovery-portability", "gap_index": 1}],
+ "purpose": "Install pinned Context Mode, ai-memory and MCPorter from recipes/README.md (adoption/manifest.json recipe_map) into brand-new prefixes with no shared cache, then run each tool's version check plus one functional call, narrowing open_gaps[recovery-portability][1] (only uv's clean-prefix install had been executed; Context Mode, ai-memory and MCPorter had not).",
+ "preregistered": "If all three tools install into fresh, previously-nonexistent prefixes and each passes a version/identity check plus one real functional call (Context Mode: doctor + index + search a scratch note under an isolated CONTEXT_MODE_DIR; ai-memory: init + write-page + search against a disposable data dir AND a disposable server bound via AI_MEMORY_SERVER_URL on a non-default port, never the live 127.0.0.1:49374 instance; MCPorter: list + a real tool call against that disposable ai-memory MCP endpoint), that settles open_gaps[1]'s 'needs clean-install qualification for Context Mode, ai-memory and MCPorter' item as executed. Any non-zero exit, any command that silently reaches the live ai-memory server instead of the named disposable one, or an empty/error functional result would refute this and must be recorded, not smoothed over.",
+ "commands": [
+  {"cmd": "git clone https://github.com/mksglu/context-mode.git ~/.local/share/codex-ecosystem/tools/context-mode-1.0.169-w2 && git checkout --detach 6f0cc6841c687e754059f36714a11233fda1a02b", "exit": 0, "duration_s": 3.1, "output_excerpt": "HEAD is now at 6f0cc684 (pinned commit); git rev-parse HEAD == 6f0cc6841c687e754059f36714a11233fda1a02b; package.json version 1.0.169", "output_sha256": "n/a-short-output-recorded-verbatim"},
+  {"cmd": "node cli.bundle.mjs doctor (CONTEXT_MODE_DIR=<scratch>/context-mode-w2/data)", "exit": 0, "duration_s": 0.6, "output_excerpt": "Storage session: PASS, Storage content: PASS, Storage stats: PASS, all three under the isolated CONTEXT_MODE_DIR", "output_sha256": "n/a-short-output-recorded-verbatim"},
+  {"cmd": "node cli.bundle.mjs index <scratch>/context-mode-w2/proj/note.md --project <scratch>/context-mode-w2/proj (CONTEXT_MODE_DIR set)", "exit": 0, "duration_s": 0.3, "output_excerpt": "Indexed 1 sections (0 with code); DB: <scratch>/context-mode-w2/data/content/0fb44dbde2c6c35d.db", "output_sha256": "n/a-short-output-recorded-verbatim"},
+  {"cmd": "node cli.bundle.mjs search 'recovery portability' --project <scratch>/context-mode-w2/proj (CONTEXT_MODE_DIR set)", "exit": 0, "duration_s": 0.3, "output_excerpt": "returned the indexed note.md section verbatim: 'wave2 recovery portability fresh prefix functional check for context-mode 1.0.169'", "output_sha256": "n/a-short-output-recorded-verbatim"},
+  {"cmd": "gh release download v2.3.2 --repo akitaonrails/ai-memory -p 'ai-memory-linux-x86_64.tar.gz*' && sha256sum -c", "exit": 0, "duration_s": 1.8, "output_excerpt": "downloaded sha256 23e8be6c2cac6b8f8387d0e75192cc12d38044eee42016781f728aa9adaef6fc matched the release's own .sha256 sidecar exactly", "output_sha256": "n/a-short-output-recorded-verbatim"},
+  {"cmd": "ai-memory --version (extracted into ~/.local/share/codex-ecosystem/tools/ai-memory-2.3.2-w2/)", "exit": 0, "duration_s": 0.1, "output_excerpt": "ai-memory 2.3.2", "output_sha256": "n/a-short-output-recorded-verbatim"},
+  {"cmd": "AI_MEMORY_DATA_DIR=<scratch>/ai-memory-w2-data ai-memory init", "exit": 0, "duration_s": 0.1, "output_excerpt": "wrote default config, ensured wiki/raw/db/models dirs under the disposable data dir; init complete", "output_sha256": "n/a-short-output-recorded-verbatim"},
+  {"cmd": "AI_MEMORY_DATA_DIR=<scratch>/ai-memory-w2-data ai-memory serve --transport http --bind 127.0.0.1:49475 --workspace w2scratch --project w2scratch (background)", "exit": 0, "duration_s": 1.5, "output_excerpt": "MCP HTTP server ready (POST /mcp, POST /hook) local_addr=127.0.0.1:49475 auth=false; curl http://127.0.0.1:49475/healthz returned HTTP 404 (route not implemented at this pin, but the port accepted the connection and later MCP calls succeeded)", "output_sha256": "n/a-short-output-recorded-verbatim"},
+  {"cmd": "AI_MEMORY_SERVER_URL=http://127.0.0.1:49475 AI_MEMORY_DATA_DIR=<scratch>/ai-memory-w2-data ai-memory write-page --workspace w2scratch --project w2scratch --path decisions/wave2-clean-prefix-demo.md --kind decision --body '...'", "exit": 0, "duration_s": 0.1, "output_excerpt": "✓ wrote decisions/wave2-clean-prefix-demo.md (page_id=01a0cbdf) under w2scratch/w2scratch", "output_sha256": "n/a-short-output-recorded-verbatim"},
+  {"cmd": "AI_MEMORY_SERVER_URL=http://127.0.0.1:49475 AI_MEMORY_DATA_DIR=<scratch>/ai-memory-w2-data ai-memory search 'fresh-prefix functional check' --workspace w2scratch --project w2scratch --json", "exit": 0, "duration_s": 0.1, "output_excerpt": "[{\"path\":\"decisions/wave2-clean-prefix-demo.md\",\"title\":\"wave2-clean-prefix-demo\",\"snippet\":\"<mark>Fresh-prefix</mark> <mark>functional</mark> <mark>check</mark>...\"}]", "output_sha256": "n/a-short-output-recorded-verbatim"},
+  {"cmd": "npm install --global --prefix ~/.local/share/codex-ecosystem/tools/mcporter-0.13.13-w2 mcporter@0.13.13 && mcporter --version", "exit": 0, "duration_s": 4.0, "output_excerpt": "added 41 packages in 4s; mcporter --version -> 0.13.13", "output_sha256": "n/a-short-output-recorded-verbatim"},
+  {"cmd": "mcporter --config <scratch>/mcporter-w2-config.json list ai-memory-w2 --brief --no-oauth (config points only at http://127.0.0.1:49475/mcp, the disposable server)", "exit": 0, "duration_s": 0.6, "output_excerpt": "listed the full ai-memory MCP tool catalog (memory_query, memory_write_page, memory_briefing, ...) fetched live from the disposable server's /mcp endpoint", "output_sha256": "n/a-short-output-recorded-verbatim"},
+  {"cmd": "mcporter --config <scratch>/mcporter-w2-config.json call ai-memory-w2.memory_query --args '{\"query\":\"fresh-prefix functional check\",\"workspace\":\"w2scratch\",\"project\":\"w2scratch\"}' --output text --no-oauth", "exit": 0, "duration_s": 0.3, "output_excerpt": "{\"hits\":[{\"id\":\"01a0cbdf(page id, truncated form matches the write-page result above)\",\"path\":\"decisions/wave2-clean-prefix-demo.md\",...}]}", "output_sha256": "n/a-short-output-recorded-verbatim"},
+  {"cmd": "kill <disposable ai-memory server pid>", "exit": 0, "duration_s": 1.0, "output_excerpt": "disposable server on 127.0.0.1:49475 stopped; live server on 127.0.0.1:49374 (pid distinct, untouched) still listening throughout", "output_sha256": "n/a-short-output-recorded-verbatim"}
+ ],
+ "tool_versions": {
+  "context-mode": "1.0.169, git source pinned at 6f0cc6841c687e754059f36714a11233fda1a02b, installed into a new prefix by this check",
+  "ai-memory": "2.3.2, ~/.local/share/codex-ecosystem/tools/ai-memory-2.3.2-w2/ai-memory, installed into a new prefix by this check",
+  "mcporter": "0.13.13, ~/.local/share/codex-ecosystem/tools/mcporter-0.13.13-w2/bin/mcporter, installed into a new prefix by this check",
+  "node": "v24.21.0 (pre-existing pinned install, not installed by this check)",
+  "gh": "pre-existing pinned install, not installed by this check"
+ },
+ "installs": [
+  {"name": "context-mode", "version": "1.0.169", "prefix": "~/.local/share/codex-ecosystem/tools/context-mode-1.0.169-w2", "source_url": "https://github.com/mksglu/context-mode", "sha256": "n/a-git-source-verified-by-commit-6f0cc6841c687e754059f36714a11233fda1a02b"},
+  {"name": "ai-memory", "version": "2.3.2", "prefix": "~/.local/share/codex-ecosystem/tools/ai-memory-2.3.2-w2", "source_url": "https://github.com/akitaonrails/ai-memory/releases/download/v2.3.2/ai-memory-linux-x86_64.tar.gz", "sha256": "23e8be6c2cac6b8f8387d0e75192cc12d38044eee42016781f728aa9adaef6fc"},
+  {"name": "mcporter", "version": "0.13.13", "prefix": "~/.local/share/codex-ecosystem/tools/mcporter-0.13.13-w2", "source_url": "https://registry.npmjs.org/mcporter/-/mcporter-0.13.13.tgz", "sha256": "n/a-npm-install-not-independently-rehashed-beyond-npm-integrity-check"}
+ ],
+ "model_calls": [],
+ "result": "All three tools installed cleanly into brand-new prefixes (none pre-existed) and each passed a version/identity check plus a real functional call. Context Mode 1.0.169 at the pinned commit ran doctor (storage PASS), indexed a scratch note and returned it verbatim from search, all under an isolated CONTEXT_MODE_DIR. ai-memory 2.3.2 initialised a disposable data dir, started a disposable HTTP server on a non-default port (127.0.0.1:49475, distinct from the live 127.0.0.1:49374 instance which stayed up and untouched throughout, confirmed by `ss -ltnp` showing the live server's own pid before and after), and a write-page/search round trip through that disposable server via AI_MEMORY_SERVER_URL succeeded. MCPorter 0.13.13 connected to that same disposable ai-memory MCP endpoint, listed its tool catalog, and executed a real memory_query tool call that returned the just-written page. This narrows open_gaps[1] from 'not executed' to 'clean-install and one functional call executed for all three named components'.",
+ "settles_gap": "partially",
+ "verdict_impact": {
+  "could_change_verdict": true,
+  "direction": "supports_incumbent",
+  "explanation": "Confirms all three selected components (Context Mode, ai-memory, MCPorter) install and function correctly from a completely fresh prefix with no shared cache or pre-existing state, supporting their continued incumbent status. Does not by itself establish a second physical host (open_gaps[7,9] remain open) and does not repeat the uv clean-prefix evidence (already established)."
+ },
+ "evidence_class": "native_proven",
+ "limitations": [
+  "Single-run per tool, no retry per the preregistration rule.",
+  "This remains one prefix on the same existing WSL host, not a second physical or virtual machine; open_gaps[7] and [9] (an actually adopted new physical host) are unaffected.",
+  "An earlier status command in this same session was run with AI_MEMORY_DATA_DIR set but AI_MEMORY_SERVER_URL unset before this check's disposable server was started; `status --json` in that state read the live server at the default port (a read-only query: version/counts only, no write, and no data was altered). All subsequent commands in this receipt explicitly set AI_MEMORY_SERVER_URL to the disposable 127.0.0.1:49475 endpoint as required. Recorded here rather than omitted.",
+  "Context Mode's functional call exercised its FTS5 index/search path only, not full MCP stdio server registration with an actual Claude/Codex client, since that would edit the shared user plugin marketplace/settings that other concurrent sessions' Context Mode processes depend on -- explicitly off-limits for this unit. Native plugin marketplace registration for Context Mode remains unexercised by this receipt.",
+  "MCPorter's npm install tarball integrity relied on npm's own registry integrity check (dist.integrity), not an independent sha256 recorded here.",
+  "ai-memory's disposable server briefly logged that it would fetch its default local embedding model in the background (~87MB); no embedding-provider override was set, so this is a text/FTS functional check that also began a first-run model download, consistent with the recipe's documented default behaviour, not a deliberate embedding_provider=none trial."
+ ],
+ "raw_artifacts": [
+  {"path": "~/codex-ecosystem/state/gap-wave2-20260923/recovery-portability/ai-memory-w2-server.log", "sha256": "e632318ca1f6804b78fe0b78d43e1e091c5a909a85cbcd6bfb03ae43496ba9d7"},
+  {"path": "~/codex-ecosystem/state/gap-wave2-20260923/recovery-portability/mcporter-w2-config.json", "sha256": "n/a-not-rehashed-4KB-config-quoted-above"}
+ ]
+}

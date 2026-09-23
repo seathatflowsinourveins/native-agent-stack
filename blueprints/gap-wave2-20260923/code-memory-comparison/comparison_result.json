@@ -1,0 +1,2184 @@
+{
+  "spawn_and_initialize_s": 0.71,
+  "index_codebase_call_s": 16.67,
+  "index_result": {
+    "jsonrpc": "2.0",
+    "id": 2,
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\n  \"status\": \"ok\",\n  \"directory\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project\",\n  \"performance\": {\n    \"total_time_seconds\": 1.91,\n    \"files_per_second\": 209.9,\n    \"total_files_processed\": 402\n  },\n  \"code\": {\n    \"files_newly_indexed\": 402,\n    \"files_unchanged\": 0,\n    \"total_indexed_files\": 402,\n    \"total_symbols\": 2768,\n    \"total_references\": 6270\n  },\n  \"documentation\": {\n    \"files_newly_indexed\": 0,\n    \"files_unchanged\": 0,\n    \"total_indexed_files\": 402,\n    \"total_chunks\": 0,\n    \"docstrings_extracted\": 807\n  },\n  \"details\": {\n    \"code\": [\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_100.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_10.py\",\n        \"symbols_indexed\": 6,\n        \"references_indexed\": 12,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_101.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_1.py\",\n        \"symbols_indexed\": 6,\n        \"references_indexed\": 12,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/alpha.py\",\n        \"symbols_indexed\": 6,\n        \"references_indexed\": 25,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_102.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_103.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_104.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/beta.py\",\n        \"symbols_indexed\": 2,\n        \"references_indexed\": 5,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_105.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_109.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_11.py\",\n        \"symbols_indexed\": 6,\n        \"references_indexed\": 12,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_106.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_107.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_110.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_108.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_112.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_113.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_114.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_115.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_118.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_111.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_117.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_119.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_12.py\",\n        \"symbols_indexed\": 6,\n        \"references_indexed\": 12,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_116.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_121.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_120.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_124.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_125.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_123.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_122.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_127.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_13.py\",\n        \"symbols_indexed\": 6,\n        \"references_indexed\": 12,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_130.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_131.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_128.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_132.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_134.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_133.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_136.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_135.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_138.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_139.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_14.py\",\n        \"symbols_indexed\": 6,\n        \"references_indexed\": 12,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_140.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_141.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_126.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_129.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_142.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_145.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_146.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_137.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_147.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_149.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_148.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_150.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_15.py\",\n        \"symbols_indexed\": 6,\n        \"references_indexed\": 12,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_151.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_152.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_154.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_153.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_156.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_155.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_157.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_158.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_159.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_143.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_144.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_160.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_161.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_16.py\",\n        \"symbols_indexed\": 6,\n        \"references_indexed\": 12,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_162.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_166.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_163.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_164.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_167.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_169.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_168.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_17.py\",\n        \"symbols_indexed\": 6,\n        \"references_indexed\": 12,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_165.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_172.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_170.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_171.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_175.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_174.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_177.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_173.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_179.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_176.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_180.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_18.py\",\n        \"symbols_indexed\": 6,\n        \"references_indexed\": 12,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_182.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_184.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_178.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_185.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_183.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_181.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_186.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_188.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_190.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_19.py\",\n        \"symbols_indexed\": 6,\n        \"references_indexed\": 12,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_192.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_189.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_187.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_191.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_193.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_196.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_197.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_194.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_2.py\",\n        \"symbols_indexed\": 6,\n        \"references_indexed\": 12,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_199.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_195.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_198.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_20.py\",\n        \"symbols_indexed\": 6,\n        \"references_indexed\": 12,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_203.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_200.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_201.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_202.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_206.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_207.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_204.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_205.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_209.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_208.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_210.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_21.py\",\n        \"symbols_indexed\": 6,\n        \"references_indexed\": 12,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_212.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_213.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_214.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_216.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_218.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_219.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_22.py\",\n        \"symbols_indexed\": 6,\n        \"references_indexed\": 12,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_220.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_221.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_222.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_211.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_217.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_215.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_223.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_225.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_224.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_226.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_227.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_23.py\",\n        \"symbols_indexed\": 6,\n        \"references_indexed\": 12,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_228.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_229.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_231.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_230.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_233.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_232.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_235.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_236.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_234.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_237.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_239.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_24.py\",\n        \"symbols_indexed\": 6,\n        \"references_indexed\": 12,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_238.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_243.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_242.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_240.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_241.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_244.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_245.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_248.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_246.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_247.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_25.py\",\n        \"symbols_indexed\": 6,\n        \"references_indexed\": 12,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_249.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_251.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_253.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_254.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_250.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_255.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_258.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_252.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_256.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_257.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_26.py\",\n        \"symbols_indexed\": 6,\n        \"references_indexed\": 12,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_261.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_262.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_259.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_263.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_260.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_264.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_265.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_268.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_266.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_27.py\",\n        \"symbols_indexed\": 6,\n        \"references_indexed\": 12,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_270.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_272.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_271.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_269.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_267.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_273.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_275.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_276.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_274.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_277.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_279.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_280.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_278.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_281.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_282.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_28.py\",\n        \"symbols_indexed\": 6,\n        \"references_indexed\": 12,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_286.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_284.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_283.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_287.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_29.py\",\n        \"symbols_indexed\": 6,\n        \"references_indexed\": 12,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_290.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_285.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_291.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_293.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_294.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_295.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_296.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_297.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_298.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_299.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_3.py\",\n        \"symbols_indexed\": 6,\n        \"references_indexed\": 12,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_289.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_288.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_30.py\",\n        \"symbols_indexed\": 6,\n        \"references_indexed\": 12,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_302.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_303.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_292.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_304.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_301.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_305.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_300.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_306.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_309.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_308.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_31.py\",\n        \"symbols_indexed\": 6,\n        \"references_indexed\": 12,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_312.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_313.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_310.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_311.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_307.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_316.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_315.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_314.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_32.py\",\n        \"symbols_indexed\": 6,\n        \"references_indexed\": 12,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_318.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_319.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_320.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_321.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_323.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_317.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_322.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_325.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_324.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_327.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_33.py\",\n        \"symbols_indexed\": 6,\n        \"references_indexed\": 12,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_329.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_328.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_332.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_326.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_331.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_330.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_335.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_336.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_337.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_333.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_339.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_338.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_34.py\",\n        \"symbols_indexed\": 6,\n        \"references_indexed\": 12,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_341.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_334.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_340.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_343.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_345.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_346.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_347.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_349.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_348.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_35.py\",\n        \"symbols_indexed\": 6,\n        \"references_indexed\": 12,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_342.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_350.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_351.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_353.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_344.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_354.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_355.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_357.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_358.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_359.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_352.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_36.py\",\n        \"symbols_indexed\": 6,\n        \"references_indexed\": 12,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_356.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_361.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_360.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_362.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_363.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_367.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_364.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_369.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_37.py\",\n        \"symbols_indexed\": 6,\n        \"references_indexed\": 12,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_370.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_371.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_368.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_365.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_372.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_366.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_374.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_376.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_375.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_377.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_379.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_373.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_378.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_38.py\",\n        \"symbols_indexed\": 6,\n        \"references_indexed\": 12,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_382.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_380.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_384.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_383.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_385.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_386.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_387.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_389.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_39.py\",\n        \"symbols_indexed\": 6,\n        \"references_indexed\": 12,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_388.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_391.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_390.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_381.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_393.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_394.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_396.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_392.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_397.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_398.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_4.py\",\n        \"symbols_indexed\": 6,\n        \"references_indexed\": 12,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_40.py\",\n        \"symbols_indexed\": 6,\n        \"references_indexed\": 12,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_399.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_400.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_41.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_395.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_43.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_46.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_44.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_42.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_48.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_47.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_49.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_50.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_5.py\",\n        \"symbols_indexed\": 6,\n        \"references_indexed\": 12,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_51.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_54.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_53.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_52.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_45.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_57.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_55.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_56.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_6.py\",\n        \"symbols_indexed\": 6,\n        \"references_indexed\": 12,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_61.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_60.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_62.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_59.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_64.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_66.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_58.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_65.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_63.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_7.py\",\n        \"symbols_indexed\": 6,\n        \"references_indexed\": 12,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_67.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_69.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_72.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_71.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_68.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_73.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_74.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_76.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_77.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_70.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_79.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_78.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_75.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_80.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_8.py\",\n        \"symbols_indexed\": 6,\n        \"references_indexed\": 12,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_81.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_83.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_82.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_84.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_85.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_88.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_89.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_86.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_90.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_9.py\",\n        \"symbols_indexed\": 6,\n        \"references_indexed\": 12,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_93.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_94.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_95.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_96.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_92.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_98.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_99.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_97.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_87.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      },\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_91.py\",\n        \"symbols_indexed\": 7,\n        \"references_indexed\": 16,\n        \"skipped\": false\n      }\n    ],\n    \"docs\": []\n  }\n}"
+        }
+      ],
+      "structuredContent": {
+        "result": {
+          "status": "ok",
+          "directory": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project",
+          "performance": {
+            "total_time_seconds": 1.91,
+            "files_per_second": 209.9,
+            "total_files_processed": 402
+          },
+          "code": {
+            "files_newly_indexed": 402,
+            "files_unchanged": 0,
+            "total_indexed_files": 402,
+            "total_symbols": 2768,
+            "total_references": 6270
+          },
+          "documentation": {
+            "files_newly_indexed": 0,
+            "files_unchanged": 0,
+            "total_indexed_files": 402,
+            "total_chunks": 0,
+            "docstrings_extracted": 807
+          },
+          "details": {
+            "code": [
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_100.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_10.py",
+                "symbols_indexed": 6,
+                "references_indexed": 12
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_101.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_1.py",
+                "symbols_indexed": 6,
+                "references_indexed": 12
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/alpha.py",
+                "symbols_indexed": 6,
+                "references_indexed": 25
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_102.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_103.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_104.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/beta.py",
+                "symbols_indexed": 2,
+                "references_indexed": 5
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_105.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_109.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_11.py",
+                "symbols_indexed": 6,
+                "references_indexed": 12
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_106.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_107.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_110.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_108.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_112.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_113.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_114.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_115.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_118.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_111.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_117.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_119.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_12.py",
+                "symbols_indexed": 6,
+                "references_indexed": 12
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_116.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_121.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_120.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_124.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_125.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_123.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_122.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_127.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_13.py",
+                "symbols_indexed": 6,
+                "references_indexed": 12
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_130.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_131.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_128.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_132.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_134.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_133.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_136.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_135.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_138.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_139.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_14.py",
+                "symbols_indexed": 6,
+                "references_indexed": 12
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_140.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_141.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_126.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_129.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_142.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_145.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_146.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_137.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_147.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_149.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_148.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_150.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_15.py",
+                "symbols_indexed": 6,
+                "references_indexed": 12
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_151.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_152.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_154.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_153.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_156.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_155.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_157.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_158.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_159.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_143.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_144.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_160.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_161.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_16.py",
+                "symbols_indexed": 6,
+                "references_indexed": 12
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_162.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_166.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_163.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_164.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_167.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_169.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_168.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_17.py",
+                "symbols_indexed": 6,
+                "references_indexed": 12
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_165.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_172.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_170.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_171.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_175.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_174.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_177.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_173.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_179.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_176.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_180.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_18.py",
+                "symbols_indexed": 6,
+                "references_indexed": 12
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_182.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_184.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_178.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_185.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_183.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_181.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_186.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_188.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_190.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_19.py",
+                "symbols_indexed": 6,
+                "references_indexed": 12
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_192.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_189.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_187.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_191.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_193.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_196.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_197.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_194.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_2.py",
+                "symbols_indexed": 6,
+                "references_indexed": 12
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_199.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_195.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_198.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_20.py",
+                "symbols_indexed": 6,
+                "references_indexed": 12
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_203.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_200.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_201.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_202.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_206.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_207.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_204.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_205.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_209.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_208.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_210.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_21.py",
+                "symbols_indexed": 6,
+                "references_indexed": 12
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_212.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_213.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_214.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_216.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_218.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_219.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_22.py",
+                "symbols_indexed": 6,
+                "references_indexed": 12
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_220.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_221.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_222.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_211.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_217.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_215.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_223.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_225.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_224.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_226.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_227.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_23.py",
+                "symbols_indexed": 6,
+                "references_indexed": 12
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_228.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_229.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_231.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_230.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_233.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_232.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_235.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_236.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_234.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_237.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_239.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_24.py",
+                "symbols_indexed": 6,
+                "references_indexed": 12
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_238.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_243.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_242.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_240.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_241.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_244.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_245.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_248.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_246.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_247.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_25.py",
+                "symbols_indexed": 6,
+                "references_indexed": 12
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_249.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_251.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_253.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_254.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_250.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_255.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_258.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_252.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_256.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_257.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_26.py",
+                "symbols_indexed": 6,
+                "references_indexed": 12
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_261.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_262.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_259.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_263.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_260.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_264.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_265.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_268.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_266.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_27.py",
+                "symbols_indexed": 6,
+                "references_indexed": 12
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_270.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_272.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_271.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_269.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_267.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_273.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_275.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_276.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_274.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_277.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_279.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_280.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_278.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_281.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_282.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_28.py",
+                "symbols_indexed": 6,
+                "references_indexed": 12
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_286.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_284.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_283.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_287.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_29.py",
+                "symbols_indexed": 6,
+                "references_indexed": 12
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_290.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_285.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_291.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_293.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_294.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_295.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_296.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_297.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_298.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_299.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_3.py",
+                "symbols_indexed": 6,
+                "references_indexed": 12
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_289.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_288.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_30.py",
+                "symbols_indexed": 6,
+                "references_indexed": 12
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_302.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_303.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_292.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_304.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_301.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_305.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_300.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_306.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_309.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_308.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_31.py",
+                "symbols_indexed": 6,
+                "references_indexed": 12
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_312.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_313.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_310.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_311.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_307.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_316.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_315.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_314.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_32.py",
+                "symbols_indexed": 6,
+                "references_indexed": 12
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_318.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_319.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_320.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_321.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_323.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_317.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_322.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_325.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_324.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_327.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_33.py",
+                "symbols_indexed": 6,
+                "references_indexed": 12
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_329.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_328.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_332.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_326.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_331.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_330.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_335.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_336.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_337.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_333.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_339.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_338.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_34.py",
+                "symbols_indexed": 6,
+                "references_indexed": 12
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_341.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_334.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_340.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_343.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_345.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_346.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_347.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_349.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_348.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_35.py",
+                "symbols_indexed": 6,
+                "references_indexed": 12
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_342.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_350.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_351.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_353.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_344.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_354.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_355.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_357.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_358.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_359.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_352.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_36.py",
+                "symbols_indexed": 6,
+                "references_indexed": 12
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_356.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_361.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_360.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_362.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_363.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_367.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_364.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_369.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_37.py",
+                "symbols_indexed": 6,
+                "references_indexed": 12
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_370.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_371.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_368.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_365.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_372.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_366.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_374.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_376.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_375.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_377.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_379.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_373.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_378.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_38.py",
+                "symbols_indexed": 6,
+                "references_indexed": 12
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_382.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_380.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_384.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_383.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_385.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_386.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_387.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_389.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_39.py",
+                "symbols_indexed": 6,
+                "references_indexed": 12
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_388.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_391.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_390.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_381.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_393.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_394.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_396.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_392.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_397.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_398.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_4.py",
+                "symbols_indexed": 6,
+                "references_indexed": 12
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_40.py",
+                "symbols_indexed": 6,
+                "references_indexed": 12
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_399.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_400.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_41.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_395.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_43.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_46.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_44.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_42.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_48.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_47.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_49.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_50.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_5.py",
+                "symbols_indexed": 6,
+                "references_indexed": 12
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_51.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_54.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_53.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_52.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_45.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_57.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_55.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_56.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_6.py",
+                "symbols_indexed": 6,
+                "references_indexed": 12
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_61.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_60.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_62.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_59.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_64.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_66.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_58.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_65.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_63.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_7.py",
+                "symbols_indexed": 6,
+                "references_indexed": 12
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_67.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_69.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_72.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_71.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_68.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_73.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_74.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_76.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_77.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_70.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_79.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_78.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_75.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_80.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_8.py",
+                "symbols_indexed": 6,
+                "references_indexed": 12
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_81.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_83.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_82.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_84.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_85.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_88.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_89.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_86.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_90.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_9.py",
+                "symbols_indexed": 6,
+                "references_indexed": 12
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_93.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_94.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_95.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_96.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_92.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_98.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_99.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_97.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_87.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              },
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/file_91.py",
+                "symbols_indexed": 7,
+                "references_indexed": 16
+              }
+            ],
+            "docs": []
+          }
+        }
+      },
+      "isError": false
+    }
+  },
+  "stats_after_index": {
+    "jsonrpc": "2.0",
+    "id": 3,
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\n  \"status\": \"ok\",\n  \"indexed\": true,\n  \"counts\": {\n    \"symbols\": 2768,\n    \"files\": 402,\n    \"doc_chunks\": 807,\n    \"doc_files\": 402,\n    \"references\": 6270,\n    \"symbol_embeddings\": 2768,\n    \"doc_embeddings\": 807\n  },\n  \"distributions\": {\n    \"symbol_kinds\": {\n      \"method\": 1566,\n      \"class\": 1202\n    },\n    \"file_extensions\": {\n      \".py\": 402\n    }\n  },\n  \"freshness\": {\n    \"last_code_indexed\": \"2026-09-22T22:45:34.665859\",\n    \"last_doc_indexed\": \"2026-09-22T22:45:34.665859\"\n  },\n  \"embedding\": {\n    \"model\": \"sentence-transformers/all-MiniLM-L6-v2\",\n    \"dimension\": 384,\n    \"device\": \"cuda\"\n  },\n  \"database\": {\n    \"size_mb\": 6.14,\n    \"journal_mode\": \"wal\",\n    \"wal_exists\": true,\n    \"wal_size_mb\": 4.55\n  }\n}"
+        }
+      ],
+      "structuredContent": {
+        "result": {
+          "status": "ok",
+          "indexed": true,
+          "counts": {
+            "symbols": 2768,
+            "files": 402,
+            "doc_chunks": 807,
+            "doc_files": 402,
+            "references": 6270,
+            "symbol_embeddings": 2768,
+            "doc_embeddings": 807
+          },
+          "distributions": {
+            "symbol_kinds": {
+              "method": 1566,
+              "class": 1202
+            },
+            "file_extensions": {
+              ".py": 402
+            }
+          },
+          "freshness": {
+            "last_code_indexed": "2026-09-22T22:45:34.665859",
+            "last_doc_indexed": "2026-09-22T22:45:34.665859"
+          },
+          "embedding": {
+            "model": "sentence-transformers/all-MiniLM-L6-v2",
+            "dimension": 384
+          },
+          "database": {
+            "size_mb": 6.14,
+            "journal_mode": "wal",
+            "wal_exists": true,
+            "wal_size_mb": 4.55
+          }
+        }
+      },
+      "isError": false
+    }
+  },
+  "search_before_edit": {
+    "jsonrpc": "2.0",
+    "id": 4,
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "Error executing tool search_code: 1 validation error for search_codeArguments\nsearch_type\n  Field required [type=missing, input_value={'query': 'divide functio...ag-ops/scratch-project'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.12/v/missing"
+        }
+      ],
+      "isError": true
+    }
+  },
+  "edited_file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/beta.py",
+  "reindex_after_edit_call_s": 0.1,
+  "reindex_result": {
+    "jsonrpc": "2.0",
+    "id": 5,
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\n  \"status\": \"ok\",\n  \"directory\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project\",\n  \"performance\": {\n    \"total_time_seconds\": 0.08,\n    \"files_per_second\": 5118.8,\n    \"total_files_processed\": 402\n  },\n  \"code\": {\n    \"files_newly_indexed\": 1,\n    \"files_unchanged\": 401,\n    \"total_indexed_files\": 402,\n    \"total_symbols\": 3,\n    \"total_references\": 10\n  },\n  \"documentation\": {\n    \"files_newly_indexed\": 0,\n    \"files_unchanged\": 0,\n    \"total_indexed_files\": 402,\n    \"total_chunks\": 0,\n    \"docstrings_extracted\": 1\n  },\n  \"details\": {\n    \"code\": [\n      {\n        \"file\": \"~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/beta.py\",\n        \"symbols_indexed\": 3,\n        \"references_indexed\": 10,\n        \"skipped\": false\n      }\n    ],\n    \"docs\": []\n  }\n}"
+        }
+      ],
+      "structuredContent": {
+        "result": {
+          "status": "ok",
+          "directory": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project",
+          "performance": {
+            "total_time_seconds": 0.08,
+            "files_per_second": 5118.8,
+            "total_files_processed": 402
+          },
+          "code": {
+            "files_newly_indexed": 1,
+            "files_unchanged": 401,
+            "total_indexed_files": 402,
+            "total_symbols": 3,
+            "total_references": 10
+          },
+          "documentation": {
+            "files_newly_indexed": 0,
+            "files_unchanged": 0,
+            "total_indexed_files": 402,
+            "total_chunks": 0,
+            "docstrings_extracted": 1
+          },
+          "details": {
+            "code": [
+              {
+                "file": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/scratch-project/beta.py",
+                "symbols_indexed": 3,
+                "references_indexed": 10
+              }
+            ],
+            "docs": []
+          }
+        }
+      },
+      "isError": false
+    }
+  },
+  "search_after_edit": {
+    "jsonrpc": "2.0",
+    "id": 6,
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "Error executing tool search_code: 1 validation error for search_codeArguments\nsearch_type\n  Field required [type=missing, input_value={'query': 'CMFRESH2026 fr...ag-ops/scratch-project'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.12/v/missing"
+        }
+      ],
+      "isError": true
+    }
+  }
+}

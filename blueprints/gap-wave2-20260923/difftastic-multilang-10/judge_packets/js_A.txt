@@ -1,0 +1,23 @@
+You are reviewing a code diff blind, with no knowledge of which tool produced it.
+
+Below is the ENTIRE output of a diff tool comparing a 'before' and 'after' version of a small javascript function. Do not assume anything about the code beyond what is shown.
+
+--- DIFF START ---
+fixtures/js_after.js --- JavaScript
+3  3   if (total > 100) {
+4  4     discount = 10;
+5  5   }
+.  6   if (isMember) {
+.  7     discount += 5;
+.  8   }
+6  9   return discount;
+7 10 }
+
+
+--- DIFF END ---
+
+Question: Does this diff clearly show the following change: Does the diff clearly show a new `if (isMember)` block adding 5 to discount, as an ADDITION rather than a modification of the existing `if (total > 100)` block?
+
+Answer with EXACTLY this format, two lines:
+ANSWER: YES or NO
+EXPLANATION: one sentence, based only on the diff text shown above, describing what you can see changed.

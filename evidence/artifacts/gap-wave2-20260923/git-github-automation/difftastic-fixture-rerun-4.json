@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "id": "difftastic-fixture-rerun-4",
+  "date": "2026-09-23",
+  "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+  "layer_ids": ["git-github-automation"],
+  "gap_refs": [{ "layer_id": "git-github-automation", "gap_index": 4 }],
+  "purpose": "Rerun the exact frozen difftastic before.py/after.py acceptance command (`difft --exit-code --color never fixtures/before.py fixtures/after.py`, first recorded in evidence/receipts/portable-cli-artifacts.json) with the pinned difft 0.71.0 binary on the current host, to recertify the layer's original acceptance fixture the same way worktrunk 0.79.0 was recertified in evidence/artifacts/gap-resolution-20260922/git-github-automation/worktrunk-0-79-0-requalify.json, per gap_index 4's next_check.",
+  "preregistered": "If `difft --exit-code --color never fixtures/before.py fixtures/after.py` on this host, with fixtures/before.py and fixtures/after.py matching their previously recorded sha256 (6724464b...205fb60 and 7808434...778e54), exits 1 (a diff exists) and prints a syntax-aware Python-labelled report naming the changed line, this reproduces the frozen fixture's expected behavior on the current host and settles the 'not recertified on the current host' complaint for difftastic specifically (worktrunk was already recertified separately). It does not by itself address gap 6/8 (no challenger comparison) or gap 10 (no multi-language, multi-fixture accuracy claim). If the exit code, fixture hashes, or parse mode (fallback to Text) differ from expectation, that is recorded as a recertification failure, not retried.",
+  "commands": [
+    { "cmd": "difft --version", "exit": 0, "duration_s": null, "output_excerpt": "Difftastic 0.71.0 / Revision: b7d119e 2026-09-18 / Toolchain: 1.85.0 / System: linux x86_64", "output_sha256": "e4ab21f4a1cd6bf764172bcf15e51f75246faaca045719e5e95970040358879e" },
+    { "cmd": "sha256sum fixtures/before.py fixtures/after.py", "exit": 0, "duration_s": null, "output_excerpt": "6724464b3eb5cc16b761ca03ef2c278c28d1e8cd4af7788b449beda3b205fb60  fixtures/before.py; 7808434453a0975ee01a5eae460e8866b78f9b3a8401f93f2b905b1f3a778e54  fixtures/after.py", "output_sha256": null },
+    { "cmd": "difft --exit-code --color never fixtures/before.py fixtures/after.py", "exit": 1, "duration_s": null, "output_excerpt": "fixtures/after.py --- Python\\n1 def greeting(name):\\n2     return \"Hello, \" + name + \"!\"", "output_sha256": "2043cb5ed29de8293af163b3d110897433345cf474f6ce714363af93e00cfa70" }
+  ],
+  "tool_versions": { "difft": "Difftastic 0.71.0" },
+  "installs": [],
+  "model_calls": [],
+  "result": {
+    "exit_code": 1,
+    "expected_exit_code": 1,
+    "matched_expected": true,
+    "fixture_hashes_matched_prior_receipt": true,
+    "parse_mode": "structural (labelled 'Python', shows the single changed return line, not a raw text fallback)",
+    "comparison_to_prior_receipt": "evidence/receipts/portable-cli-artifacts.json lines 31-41 recorded that difft WITHOUT --exit-code exits 0 by default and that adding --exit-code was expected to produce 1; this rerun uses --exit-code and reproduces exit 1 on the current host, consistent with that prior explanation."
+  },
+  "settles_gap": "partially",
+  "verdict_impact": {
+    "could_change_verdict": false,
+    "direction": "supports_incumbent",
+    "explanation": "Confirms the pinned difft 0.71.0 binary still reproduces the frozen single-fixture acceptance behavior (structural parse, correct --exit-code) on the current host, closing the 'not recertified on the current host' complaint specific to difftastic. It does not establish a matched comparison (gap 6/8, addressed separately in this wave) or multi-language accuracy (gap 10, addressed separately in this wave), so it only partially settles the family of open difftastic gaps and gap_index 4 narrowly (current-host recertification) is fully addressed while the broader single-fixture-pair complaint stays open pending gap 10's work."
+  },
+  "evidence_class": "native_proven",
+  "limitations": [
+    "Single fixture pair only, exactly as gap 4's text anticipates; scale and multi-language coverage are addressed separately by difftastic-larger-fixture.json (gap 4, prior wave) and by this wave's difftastic-multilang-scoring-10.json (gap 10).",
+    "Confirms recertification, not superiority over any challenger; gap 6/8 comparisons are separate receipts in this wave."
+  ],
+  "raw_artifacts": [
+    { "path": "~/codex-ecosystem/state/gap-wave2-20260923/worktree-diff/difft-rerun-4/stdout.txt", "sha256": "2043cb5ed29de8293af163b3d110897433345cf474f6ce714363af93e00cfa70" },
+    { "path": "~/codex-ecosystem/state/gap-wave2-20260923/worktree-diff/difft-rerun-4/stderr.txt", "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855" },
+    { "path": "~/codex-ecosystem/state/gap-wave2-20260923/worktree-diff/difft-rerun-4/version.txt", "sha256": "e4ab21f4a1cd6bf764172bcf15e51f75246faaca045719e5e95970040358879e" }
+  ]
+}

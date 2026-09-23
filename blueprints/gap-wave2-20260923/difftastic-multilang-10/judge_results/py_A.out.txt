@@ -1,0 +1,2 @@
+ANSWER: YES
+EXPLANATION: The diff replaces the line "if age > 18:" with "if age >= 18:", showing the operator changed from '>' to '>='.

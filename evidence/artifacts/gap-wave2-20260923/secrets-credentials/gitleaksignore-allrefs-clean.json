@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "id": "gitleaksignore-allrefs-clean-20260923",
+  "date": "2026-09-23",
+  "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+  "layer_ids": [
+    "secrets-credentials"
+  ],
+  "gap_refs": [
+    {
+      "layer_id": "secrets-credentials",
+      "gap_index": 8
+    }
+  ],
+  "purpose": "Gap 8 says the configuration records clean branch-ancestry and working-tree scans but a residual synthetic finding on another branch in the default all-refs scan (34fc51b, tests/test_lane_packets.py:255, confirmed not an ancestor of this branch's HEAD). This adds a new .gitleaksignore fingerprinting that exact finding, with a comment recording why, and reruns the guarded default all-refs `gitleaks git .` to confirm it now reaches 0 findings without editing .gitleaks.toml (owned by another PR) or the sibling branch.",
+  "preregistered": "[Fix-round caveat: this text was authored in the same working session as the commands below, after related output already existed, not strictly before running them; see PREREGISTRATION-NOTE.md and the matching limitations entry. The underlying commands, exit codes, and output were not re-run or altered.] Expected: a `.gitleaksignore` containing the fingerprint `34fc51beaf24114fe266f73b2e36ae8176c8a521:tests/test_lane_packets.py:generic-api-key:255` (taken verbatim from the prior gitleaks-repo-history-scan.json receipt's JSON report Fingerprint field) causes gitleaks' default `-i .` gitleaksignore lookup to suppress that one entry. A subsequent `gitleaks git . --config .gitleaks.toml --max-target-megabytes 2 --redact --no-banner` with default (all-refs) log-opts is expected to report 0 findings and exit 0, where the prior unignored run reported exactly 1 finding (this exact fingerprint) and exit 1. Run once, verbatim result recorded either way.",
+  "commands": [
+    {
+      "cmd": "printf '<comment lines>\\n34fc51beaf24114fe266f73b2e36ae8176c8a521:tests/test_lane_packets.py:generic-api-key:255\\n' > .gitleaksignore",
+      "exit": 0,
+      "duration_s": 0.01,
+      "output_excerpt": "file created, 1 fingerprint line plus explanatory comment header",
+      "output_sha256": "927810f7e678d82ac045690d8b42abcc890e2836bc52d532ab3d9d5af6b48268"
+    },
+    {
+      "cmd": "gitleaks git . --config .gitleaks.toml --max-target-megabytes 2 --redact --no-banner --report-format json --report-path <state>/gitleaks-runs/gap8-allrefs-with-ignore.json",
+      "exit": 0,
+      "duration_s": 56.6,
+      "output_excerpt": "721 commits scanned.\nscanned ~1570088624 bytes (1.57 GB) in 56.6s\nno leaks found",
+      "output_sha256": "70d87803351a1414b52cea4a739d4dacf9b0ddb98ab5e56985ef3d91cf74cec4"
+    }
+  ],
+  "tool_versions": {
+    "gitleaks": "8.30.1",
+    "git": "2.43.0"
+  },
+  "installs": [],
+  "model_calls": [],
+  "result": "Adding a `.gitleaksignore` with the exact fingerprint of the previously-confirmed out-of-ancestry synthetic finding (34fc51beaf24114fe266f73b2e36ae8176c8a521:tests/test_lane_packets.py:generic-api-key:255, verified in the companion evidence/artifacts/gap-resolution-20260922/secrets-credentials/gitleaks-repo-history-scan.json receipt to be a synthetic unit-test literal, not a real credential, and independently confirmed via `git merge-base --is-ancestor` to be reachable only from sibling branches claude/gc-pr5-packets and claude/grand-catalog-pr5, never this branch's own ancestry) makes the guarded default (all-refs) `gitleaks git .` scan report 0 findings: 721 commits scanned (~1.57 GB), 56.6s, exit 0, 'no leaks found'. This is the same command form .gitleaks.toml documents as the repository's published/CI acceptance command (no --log-opts restriction); it now reaches 0 findings by itself, without needing the `--log-opts=\"HEAD\"` restriction or the sibling branch's own fix.",
+  "settles_gap": true,
+  "verdict_impact": {
+    "could_change_verdict": false,
+    "direction": "supports_incumbent",
+    "explanation": "This closes the specific residual-finding coverage gap gap 8 names: the published, unrestricted-log-opts acceptance command now reaches 0 findings on this branch, via a scoped .gitleaksignore entry rather than a change to the sibling branch or to .gitleaks.toml. Does not change the underlying verdict (gitleaks remains the selected secret-scanning tool); it removes one specific, already-classified-as-synthetic residual finding from the default acceptance command's output."
+  },
+  "evidence_class": "native_proven",
+  "limitations": [
+    "This receipt reuses the prior receipt's classification of the ignored finding as synthetic/benign (a unit-test literal string in tests/test_lane_packets.py); it does not re-derive that classification from scratch, only re-verifies that the fingerprint suppresses it and that the scan is otherwise clean.",
+    "This is a shared, actively-committed repository; a future commit on any reachable ref could introduce a new default-log-opts finding this .gitleaksignore entry would not cover (it is scoped to this one exact fingerprint only, not a broader suppression).",
+    "Per this unit's scope, .gitleaks.toml itself was not edited (owned by another PR); if that file's own committed narrative (lines 51-66) about the published acceptance command not reaching 0 findings is meant to be updated to reflect this fix, that edit is proposed to the coordinator, not made here.",
+    "The commit count (721) again differs from every prior default-log-opts measurement (542, 615) in this shared repository; consistent with .gitleaks.toml's own statement that this count is not a stable invariant here.",
+    "FIX ROUND: this receipt's `preregistered` field was written in the same working session as its results rather than strictly before running the commands; see PREREGISTRATION-NOTE.md in this same directory. The underlying commands, exit codes, and output were not re-run or altered."
+  ],
+  "raw_artifacts": [
+    {
+      "path": "~/codex-ecosystem/state/gap-wave2-20260923/secrets-credentials/gitleaks-runs/gap8-allrefs-with-ignore.json",
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+    },
+    {
+      "path": "~/codex-ecosystem/state/gap-wave2-20260923/secrets-credentials/gitleaks-runs/gap8-allrefs.stderr.log",
+      "sha256": "70d87803351a1414b52cea4a739d4dacf9b0ddb98ab5e56985ef3d91cf74cec4"
+    }
+  ]
+}

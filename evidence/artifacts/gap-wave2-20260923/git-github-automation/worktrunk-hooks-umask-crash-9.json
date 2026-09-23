@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "id": "worktrunk-hooks-umask-crash-9",
+  "date": "2026-09-23",
+  "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+  "layer_ids": ["git-github-automation"],
+  "gap_refs": [{ "layer_id": "git-github-automation", "gap_index": 9 }],
+  "purpose": "Address gap_index 9's next_check's three parts: (1) run the worktrunk plan with project hooks ENABLED (every prior fixture in this catalog used --no-hooks); (2) run a delayed-SIGKILL crash probe (satisfied by the shared receipt worktrunk-crash-cleanup-probe-5.json, cross-referenced here rather than duplicated, since gap 5's crash probe uses the same worktrunk binary and the crosswalk records both gaps sharing this cross_layer_checks pairing); (3) check that a worktree created under a restricted umask cannot write outside its owned path.",
+  "preregistered": "If a project .config/wt.toml declaring pre-start and pre-remove hooks causes `wt switch --create` (with --yes, no --no-hooks) to leave a pre-start marker file inside the new worktree, and `wt remove` to leave a pre-remove marker file in the parent directory, that demonstrates hooks-enabled lifecycle actually executes hooks (not merely that --no-hooks suppresses them, which was already known). If a worktree created under umask 0o077 has zero files/directories with any group or other permission bit set, and every created path resolves (via Path.resolve()) under either the scratch base directory or the pinned worktrunk installation prefix (i.e. none escape to a shared/system location), that settles the umask-isolation half of gap 9. The crash-probe half is settled by gap 5's already-preregistered, already-executed receipt (worktrunk-crash-cleanup-probe-5.json), not re-run here. Any hook that fails to fire, or any file with group/other bits set, or any escaped path, is recorded as a failure for that sub-check specifically, not retried.",
+  "commands": [
+    { "cmd": "python3 blueprints/gap-wave2-20260923/worktree-crash-cleanup-5-9/hooks_and_umask_probe.py --base $SCRATCH/hooks-umask-9", "exit": 0, "duration_s": null, "output_excerpt": "status=passed; pre_start_hook_ran=true pre_remove_hook_ran=true worktree_and_branch_removed=true; umask_used=0o077 files_checked=4 any_group_or_other_permission_bits_set=false escaped_owned_path=[] (sample modes: .config 0o700, fixture.txt 0o600, .git 0o600, .config/wt.toml 0o600)", "output_sha256": "062b94058e5986e3ddb99b5cdbfe5c4b5f360b7c8f295dd3d550b007fa4d4f09" }
+  ],
+  "tool_versions": { "git": "git version 2.43.0", "wt": "wt v0.79.0" },
+  "installs": [],
+  "model_calls": [],
+  "result": {
+    "hooks_enabled": {
+      "pre_start_hook_ran": true,
+      "pre_remove_hook_ran": true,
+      "approval_prompt_observed_without_--yes": "on the first dry run (not the preregistered final run), `wt switch --create` refused with 'Cannot prompt for approval in non-interactive environment' until --yes was added -- a genuine, useful finding: hooks are gated behind an explicit non-interactive approval flag by default, which is a real safety property worth recording even though it required correcting the command before the final preregistered run.",
+      "worktree_and_branch_removed_after_force_remove": true,
+      "note": "Removal after the hooked run required --force because the pre-start hook's own marker file was left untracked inside the worktree, which correctly triggered the same dirty-refusal behavior already verified in the --no-hooks fixtures; --force was used deliberately here since this check's purpose is the hook lifecycle, not dirty-refusal (already covered by worktrunk-0-79-0-requalify.json and gap 5's probe)."
+    },
+    "umask_restricted_creation": {
+      "umask_used": "0o077",
+      "files_checked": 4,
+      "any_group_or_other_permission_bits_set": false,
+      "escaped_owned_path": [],
+      "conclusion": "Every created file/dir was 0600/0700 (owner-only) and every path resolved inside the scratch base or the pinned worktrunk install prefix; no write escaped the worktree's owned path under a restrictive umask.",
+      "scope_correction": "CORRECTED (fix round, 2026-09-23): this only establishes that the PERMISSION MODES on the (small, 4-entry) set of paths the script found via `tree2.rglob('*')` were owner-only, and that those SAME found paths resolve() under an allowed prefix. hooks_and_umask_probe.py (lines 86-97) never attempts a write to any location OUTSIDE tree2, and 'escaped_owned_path' can only ever be non-empty via a symlink inside tree2 pointing elsewhere -- it is not a test of whether the worktree process COULD write outside its own directory (e.g. via an absolute path, a hook's own command, or `..` traversal). 'no write escaped the worktree's owned path' as originally stated overclaims what this check can show; the check demonstrates local permission-mode hygiene on 4 created files, not enforced path/write isolation."
+    },
+    "crash_probe": {
+      "settled_by": "evidence/artifacts/gap-wave2-20260923/git-github-automation/worktrunk-crash-cleanup-probe-5.json",
+      "summary": "Two delayed-SIGKILL trials (admin-dir-appears, working-file-checked-out) both recovered the worktree admin-dir/registration cleanly (self-heal or wt remove) without touching an unrelated dirty worktree. CORRECTED (fix round, 2026-09-23): that receipt was itself found to falsely claim the crash-target-1 branch was also cleaned up; it now records settles_gap='partially' because a post-hoc check found an orphaned `crash-target-1` branch left behind with no owning worktree. This crash_probe leg therefore does not fully settle either gap 5 or gap 9's crash-recovery sub-check; see the referenced receipt for the corrected detail."
+    }
+  },
+  "settles_gap": "partially",
+  "verdict_impact": {
+    "could_change_verdict": false,
+    "direction": "inconclusive",
+    "explanation": "Real command execution confirms one of gap 9's three specific complaints cleanly: hooks fire correctly (pre-start and pre-remove markers both observed) and are gated by a sensible non-interactive-approval safety default -- this part is settled. CORRECTED (fix round, 2026-09-23): the other two parts are not fully settled. The crash-recovery sub-check is 'settled by' worktrunk-crash-cleanup-probe-5.json, which itself now records only partial settlement (an orphaned branch was left behind by the crash it probed, missed by that probe's own narrow branch-blind check). The permission-isolation sub-check only shows the 4 files the script happened to create were owner-only mode and resolved to allowed prefixes; it never tries a write outside the worktree's owned path, so 'no write escaped' is an overclaim relative to what was tested. Net: hooks-firing is native_proven and settled; crash recovery and permission isolation are each only partially established."
+  },
+  "evidence_class": "native_proven",
+  "limitations": [
+    "Umask check covers files created directly by `wt switch --create` (git init/checkout output) only; it does not cover files a hook script itself might create with a different, explicit mode (this fixture's hook only runs `touch`, which respects umask).",
+    "Hooks check exercises a single static command (`touch`) per hook; more complex hook scripts (network calls, multi-step shell) are not exercised.",
+    "The non-interactive approval-prompt behavior was discovered incidentally on a preliminary dry run of the script (before hardcoding --yes), not as its own preregistered trial; it is reported as an observation for completeness, not scored pass/fail.",
+    "Single-trial synthetic fixture; no concurrent multi-agent hook execution or hook failure (non-zero exit) scenario was tested.",
+    "CORRECTED (fix round, 2026-09-23): the umask/permission-isolation check only inspects paths already found inside the new worktree (`tree2.rglob('*')`, 4 files) for owner-only mode and non-escaping resolve(); it never attempts an actual write to a path outside the worktree, so it cannot demonstrate enforced write isolation, only permission-mode hygiene on the files that happened to be created. A prior, unrecorded dry run of the hooks-enabled command failed for a different reason (missing --yes) before the final command was corrected and run; that prior run's output was not captured or retained, only its cause is described in the receipt text.",
+    "CORRECTED (fix round, 2026-09-23): the crash-probe leg is settled_by a receipt that itself was found to overclaim (see worktrunk-crash-cleanup-probe-5.json); this receipt's settles_gap and direction have been downgraded accordingly rather than re-running any check."
+  ],
+  "raw_artifacts": [
+    { "path": "~/codex-ecosystem/state/gap-wave2-20260923/worktree-diff/hooks-umask-9/receipt.json", "sha256": "062b94058e5986e3ddb99b5cdbfe5c4b5f360b7c8f295dd3d550b007fa4d4f09" }
+  ]
+}
