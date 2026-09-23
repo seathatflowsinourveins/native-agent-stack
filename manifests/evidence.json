@@ -11459,6 +11459,21 @@
       "bytes": 16887
     },
     {
+      "path": "evidence/artifacts/local-model-alignment-20260923/ai-memory-embedder-deployment.json",
+      "sha256": "42bc5f959c8cbcb0710da2705d468256e1a1decc0bd5e6b4da534795f3a724a9",
+      "bytes": 3089
+    },
+    {
+      "path": "evidence/artifacts/local-model-alignment-20260923/memory-embedder-dense-benchmark.json",
+      "sha256": "2cd52de4f6c9916d42df6e40784c6b50f1cd301b153fc0520bd97469f100c9d6",
+      "bytes": 4973
+    },
+    {
+      "path": "evidence/artifacts/local-model-alignment-20260923/memory-embedder-hybrid-retrieval.json",
+      "sha256": "3838703be411c2e8c546cd8a3a59a603024a8c88c2bb3fea6b2f3cb05eb54cdc",
+      "bytes": 3921
+    },
+    {
       "path": "evidence/artifacts/macos-embed-reference-20260923/macos-embed-reference-20260923.json",
       "sha256": "c07177bccb5cc2eabaab8910616cce33f2b49fd76f048411a47d3e83fd7c164a",
       "bytes": 20209

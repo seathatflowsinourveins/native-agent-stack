@@ -1,0 +1,44 @@
+{
+ "schema_version": 1,
+ "id": "ai-memory-embedder-deployment-20260923",
+ "date": "2026-09-23",
+ "time_utc": "16:47-16:49",
+ "evidence_class": "native_proven for this one WSL2 host's live service configuration; not a release or pin change",
+ "change": "The host's live ai-memory now embeds with nvidia/Nemotron-3-Embed-1B-BF16 (2048 dimensions) through the resident local vLLM embedding service that also serves SocratiCode, with the publisher's query:/passage: prefixes, instead of the built-in all-MiniLM-L6-v2 (384 dimensions).",
+ "pin_deviation": {
+  "catalog_pin": "ai-memory 2.3.2 (stock release)",
+  "running": "ai-memory 2.3.2 plus the query/document prefix patch proposed upstream",
+  "upstream_pr": "https://github.com/akitaonrails/ai-memory/pull/859",
+  "binary_sha256": "e26a701446c76fc930996e6ff79d8d6c8986d409e01f559648107f7c60dc47a2",
+  "why_2_3_2_based": "stock 2.3.2 binaries invoked by the Claude and Codex hooks abort on a store migrated to the 2.4.0 schema (refinery abort_missing), so the patch was applied to 2.3.2 to keep the schema unchanged",
+  "review": [
+   "three review rounds of the upstream patch by an independent Claude reviewer and a Codex cross-family reviewer, all findings fixed",
+   "an independent deploy-safety review of the 2.3.2 cherry-pick (three hunks dropped because they touch 2.4.0-only features)",
+   "tests on the 2.3.2 base: llm 270/0, mcp 444/0, consolidate+wiki 409/0, cli-lib and cli suite with the same pre-existing failures as stock"
+  ]
+ },
+ "configuration": {
+  "embedding_provider": "openai-compat",
+  "embedding_base_url": "http://127.0.0.1:8231/v1",
+  "embedding_model": "nvidia/Nemotron-3-Embed-1B-BF16",
+  "embedding_dim": 2048,
+  "embedding_query_prefix": "query: ",
+  "embedding_document_prefix": "passage: ",
+  "stored_identity": "nvidia/Nemotron-3-Embed-1B-BF16+dp1-707ad539ebca7d87",
+  "embedding_service": "vLLM 0.25.0 with --max-model-len raised from 4096 to 8192 through a systemd drop-in"
+ },
+ "observed_after": {
+  "embedding_rows": 149,
+  "latest_pages_missing": 0,
+  "provider_status": "ok",
+  "hook_capture": "observations continued to increase after the restart",
+  "live_query": "memory_query returned hits with all four retrieval streams active",
+  "code_search": "SocratiCode search returned results after the embedding service restart"
+ },
+ "rollback": "a backup and the previous configuration were saved before the change; rollback removes the two systemd drop-ins, restores the configuration, restarts both services and re-embeds with the built-in model. A stock ai-memory serve must not be started against the store without that re-embed: it ignores the prefixed identity for vector search and its re-embed would overwrite the prefixed vectors.",
+ "follow_up": "When upstream releases the prefix support, move the service and hook binaries to that release together and return to a stock pin.",
+ "related_evidence": [
+  "evidence/artifacts/local-model-alignment-20260923/memory-embedder-dense-benchmark.json",
+  "evidence/artifacts/local-model-alignment-20260923/memory-embedder-hybrid-retrieval.json"
+ ]
+}

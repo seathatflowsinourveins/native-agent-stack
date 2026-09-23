@@ -1,0 +1,85 @@
+{
+ "schema_version": 1,
+ "id": "memory-embedder-hybrid-retrieval-20260923",
+ "date": "2026-09-23",
+ "evidence_class": "local_integration on one WSL2 x86_64 host; one run per arm; isolated ai-memory servers on restored copies of a sealed store snapshot",
+ "question": "Does the dense result hold through ai-memory's own hybrid retrieval (FTS5 + entity + graph + vector, RRF) as agents call it (MCP memory_query)?",
+ "queries": "the merged Q1+Q2 set of the dense benchmark: 76 queries, 62 answerable",
+ "arms": {
+  "A": "ai-memory 2.3.2, local all-MiniLM-L6-v2 (the configuration running before the change)",
+  "A2": "ai-memory 2.4.0 + prefix patch, local all-MiniLM-L6-v2 (isolates the version change)",
+  "B": "ai-memory 2.4.0 + prefix patch, openai-compat Nemotron-3-Embed-1B-BF16 with query:/passage: prefixes, vLLM max-model-len 8192",
+  "B4k": "as B with max-model-len 4096 (the resident service's setting at the time)"
+ },
+ "results": [
+  {
+   "arm": "A_all-MiniLM-L6-v2_2.3.2_incumbent",
+   "ndcg_at_10": 0.6294,
+   "recall_at_5_hit": 0.8548,
+   "recall_at_5_hit_count": "53/62",
+   "recall_at_5_share": 0.7585,
+   "mrr": 0.5882,
+   "pages_embedded": "130/130"
+  },
+  {
+   "arm": "A2_all-MiniLM-L6-v2_2.4.0_patched_version_effect",
+   "ndcg_at_10": 0.6294,
+   "recall_at_5_hit": 0.8548,
+   "recall_at_5_hit_count": "53/62",
+   "recall_at_5_share": 0.7585,
+   "mrr": 0.5882,
+   "pages_embedded": "130/130"
+  },
+  {
+   "arm": "B_Nemotron-3-Embed-1B_2.4.0_patched_prefixed_8192ctx",
+   "ndcg_at_10": 0.7074,
+   "recall_at_5_hit": 0.8871,
+   "recall_at_5_hit_count": "55/62",
+   "recall_at_5_share": 0.7933,
+   "mrr": 0.6893,
+   "pages_embedded": "130/130, 0 failures"
+  },
+  {
+   "arm": "B4k_Nemotron-3-Embed-1B_2.4.0_patched_prefixed_4096ctx_matches_live_cap",
+   "ndcg_at_10": 0.6668,
+   "recall_at_5_hit": 0.8387,
+   "recall_at_5_hit_count": "52/62",
+   "recall_at_5_share": 0.7449,
+   "mrr": 0.6547,
+   "pages_embedded": "121/130, 9 failures (context-length 400s, same 9 session pages c1's arm B also lost)"
+  }
+ ],
+ "preregistered_rule": "switch the embedder to B only if B's nDCG@10 is at least 0.03 above A's, B's top-5 hit rate is not lower, and B embeds 130/130 pages; if B4k fails a page that B does not, the resident service's max-model-len must be raised with the switch",
+ "rule_outcome": "all three conditions met (nDCG@10 +0.078, top-5 hits 55/62 vs 53/62, 130/130); B4k embedded 121/130 (nine pages over 4096 tokens), so max-model-len 8192 is required; A2 equals A, so the version change alone has no effect",
+ "independent_verification": {
+  "reviewer": "evidence-reviewer (Opus/high), separate agent",
+  "verdict": "metrics and isolation confirmed; decision holds under the locked rule",
+  "paired_bootstrap_B_minus_A_ndcg10": {
+   "delta": 0.078,
+   "ci95": [
+    0.0367,
+    0.1282
+   ],
+   "resamples": 20000,
+   "p_below_0_03": 0.01
+  },
+  "paired_bootstrap_B4k_minus_A_ndcg10_ci95": [
+   -0.009,
+   0.085
+  ],
+  "per_query": "B wins 20, loses 4, ties 38",
+  "retrieval_config": "RRF k=60, equal lane weights, all four streams active in every arm",
+  "notes": [
+   "protocol.lock was rewritten after arms A and A2 ran and the earlier locks were not kept; the order rests on file times and the command log",
+   "the command log was written by hand rather than by the logging wrapper",
+   "the prefix count was taken before the queries ran; the full request log shows 337/337 prefixed requests for B (260 passage, 77 query), none double-prefixed",
+   "no port audit file was kept; a later check found no temporary server bound and the resident services unchanged",
+   "the arm servers had an LLM provider configured for consolidation; no provider call appears in their logs and the setting was identical across arms"
+  ]
+ },
+ "limits": [
+  "62 answerable queries; the top-5 hit difference is two queries",
+  "one run per arm",
+  "MCP round-trip latency includes a CLI process spawn per query"
+ ]
+}
