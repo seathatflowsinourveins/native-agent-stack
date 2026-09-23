@@ -54,6 +54,54 @@ VENUE = {"oms_type": "NETTING", "account_type": "CASH", "use_random_ids": False,
          "bar_adaptive_high_low_ordering": False, "reject_stop_orders": True,
          "support_contingent_orders": True, "frozen_account": False}
 NEGATIVE_CASH_TEXT = "Cash account balance would become negative"
+# Declared before the published run and copied verbatim into the receipt. None
+# changes a sealed file, a tolerance, an input or a LEAN-side value; each is a
+# point where the sealed text could not be followed literally or left a choice.
+PREREGISTRATION_DEVIATIONS = [
+    {"id": "review_before_first_run",
+     "sealed_text": "acceptance_criteria.preconditions[0]: the harness changes are implemented and "
+                    "independently reviewed before the first v2 run; the review record is retained.",
+     "deviation": "The replay ran before any independent review of the harness changes. The review "
+                  "is owned by the peer session that owns the gate rows; no review record exists "
+                  "in this receipt.",
+     "effect": "The comparison result stands as measured, but the precondition is unmet until that "
+               "review is retained; a PASS here does not by itself move any mapping or gate."},
+    {"id": "sealed_status_fields_not_updated",
+     "sealed_text": "mapping-manifest-v2.json run_status 'preregistered_not_run' and "
+                    "harness_changes_required.implemented false.",
+     "deviation": "Both fields stay as sealed because the manifest must not be edited; they no "
+                  "longer describe the tree once this receipt exists.",
+     "effect": "A later dated manifest revision must record the run; the rows stay 'preregistered'."},
+    {"id": "late_emission_refusal_is_post_run",
+     "sealed_text": "distributions_and_cash.mechanism_rules.timing: a late emission is a module error "
+                    "that aborts the run.",
+     "deviation": "The module never posts a late event and records the error; the runner then "
+                  "refuses the run after engine.run() returns, before any receipt is written, "
+                  "instead of stopping the engine mid-run (an exception inside process() is not "
+                  "guaranteed to propagate out of the pinned engine).",
+     "effect": "Same outcome for publication: no receipt exists for a run with a late emission."},
+    {"id": "v2_output_paths",
+     "sealed_text": "Neither README.md nor mapping-manifest-v2.json names paths for the v2 receipt "
+                    "and verdict; the manifest keeps v1 bound to verdict.json.",
+     "deviation": "The v2 results are published as receipt-v2.json and verdict-v2.json; the v1 "
+                  "receipt.json and verdict.json are kept unchanged.",
+     "effect": "The gate row reading verdict.json is untouched by this run."},
+    {"id": "manifest_evidence_class_token",
+     "sealed_text": "mapping-manifest-v2.json evidence_class 'HIST (for the future replay); ...'.",
+     "deviation": "compare.py binds the receipt's 'HIST' to the first token of that annotated value.",
+     "effect": "None on the result."},
+    {"id": "engine_log_level_info",
+     "sealed_text": "acceptance_criteria.market_on_open_proxy[4]: no ERROR-level engine log line in "
+                    "either run.",
+     "deviation": "The engine logs at INFO (v1 used ERROR-only stdout) into a captured file, drained "
+                  "with a sentinel line, so the scan is demonstrably non-empty and complete.",
+     "effect": "None on execution; more log text is kept privately with its sha256."},
+    {"id": "operator_declared_commit",
+     "sealed_text": "README.md replay command.",
+     "deviation": "The documented bwrap command gains --harness-commit, because the isolated run "
+                  "cannot read Git; local_source_sha256 remains the binding record.",
+     "effect": "None on execution."},
+]
 LOG_LEVEL_RE = re.compile(r"\[(TRACE|DEBUG|INFO|WARN|WARNING|ERROR)\]")
 
 WINDOW = {"symbol": "SPY", "start": "2019-12-02", "end": "2020-04-30"}
@@ -601,6 +649,7 @@ def main():
         "isolation": {"network_interfaces": socket.if_nameindex(),
                       "environment_names": sorted(os.environ),
                       "argv": sys.argv, "cwd": os.getcwd()},
+        "preregistration_deviations": PREREGISTRATION_DEVIATIONS,
         "limitations": [
             "The market-on-open proxy equals LEAN's MarketOnOpenFill only inside the manifest's "
             "faithfulness_domain (open differs from the decision close by at least one tick, the "

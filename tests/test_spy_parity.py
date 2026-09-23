@@ -1373,6 +1373,11 @@ class V2PublishedResultTests(unittest.TestCase):
             if check["status"] != "SKIPPED" and check["key"] in published:
                 self.assertEqual(published[check["key"]], "PASS", check["key"])
 
+    def test_receipt_carries_the_declared_deviations(self):
+        self.assertEqual(self.receipt["preregistration_deviations"], RUN.PREREGISTRATION_DEVIATIONS)
+        self.assertIn("review_before_first_run",
+                      [d["id"] for d in self.receipt["preregistration_deviations"]])
+
     def test_published_verdict_records_the_comparison_it_claims(self):
         self.assertEqual(self.verdict["manifest_schema_version"], 2)
         self.assertEqual(self.verdict["attribution_evidence"], "converted bars")

@@ -6174,8 +6174,8 @@
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/run.py",
-      "sha256": "8fc9f4272e0ada6b0308f92edf47274ad987b039aef6a46361c6121662829cb3",
-      "bytes": 33603
+      "sha256": "9e70b39545aaebee39f091247fe0a402b5c8075c3b1634eec8b1d488c7478cee",
+      "bytes": 37260
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/tolerances.json",
@@ -11984,8 +11984,8 @@
     },
     {
       "path": "tests/test_spy_parity.py",
-      "sha256": "11bf2025ad126e3056f5910b0b35c4f369451254cdd66bfe6bf680a84e76cadb",
-      "bytes": 78337
+      "sha256": "ccdf7d5e2fb4267ae91d9cd3909e3d60c69c22a04a12beabc0d44bf7bcb5f00d",
+      "bytes": 78633
     },
     {
       "path": "tests/test_stack_lifecycle.py",
