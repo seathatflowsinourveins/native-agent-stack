@@ -12969,8 +12969,8 @@
     },
     {
       "path": "scripts/build_ecosystem.py",
-      "sha256": "c5f1bf3b0d3c52ac49fe1625c027dced4fdc580dc1a5ad084a4a743de1b41d4a",
-      "bytes": 47588
+      "sha256": "509702872ed8346185ba8c92e654bf257fe970c5e3161d261422713fac48682b",
+      "bytes": 48387
     },
     {
       "path": "scripts/catalog_decisions.py",

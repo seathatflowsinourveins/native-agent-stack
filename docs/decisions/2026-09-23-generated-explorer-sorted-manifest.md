@@ -130,11 +130,12 @@ this is repository-maintenance/CI scope only.
 - GitHub Pages is not enabled for this repository (`GET
   repos/seathatflowsinourveins/native-agent-stack/pages` returns 404), so no
   live site depended on the committed file.
-- `rtk proxy python3 scripts/build_ecosystem.py --check` run twice against
-  the real repository state after this change reported the identical
-  `output_sha256` both times (`9d9981d7d2c967a2b0218970b29467fab06fc8e37bc6bf279e44c876dc71dcf6`,
-  12,926,840 bytes) -- the explorer build is deterministic from this
-  source tree.
+- `python3 scripts/build_ecosystem.py --check` builds once in-process and once in a
+  separate interpreter with a different `PYTHONHASHSEED`, and requires identical bytes.
+  Run three times on the final branch head (including once with `PYTHONHASHSEED=7`),
+  it reported the same `output_sha256` each time (`86cb0f85d7c96a3da51fb22cb63ee897bbceb0b9b346e5bb86789e098664c615`, 12,929,289
+  bytes; `input_sha256` `30bfe38d7eb2f3ebc2d8a1da8fe3b31ec3d797a32103a49ba418f2a34efcc5d2`). The digest changes whenever an input
+  document changes, which is expected: it describes this tree, not a pinned value.
 - `tests/test_ecosystem_manifest.py` (46 tests, `python3 -m unittest`) and
   `tests/test_host_receipts.py::RegisterFileSortTests` pass locally against
   this change.

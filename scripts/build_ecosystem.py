@@ -11,6 +11,9 @@ import json
 from pathlib import Path
 import re
 import tempfile
+import os
+import subprocess
+import sys
 from urllib.parse import quote, urlsplit
 
 try:
@@ -720,17 +723,22 @@ def check(root):
     byte-identical output. docs/ecosystem/index.html is no longer committed,
     so --check has nothing checked-in to compare against; this instead
     verifies the build is deterministic from the current repository state."""
-    built = []
     with tempfile.TemporaryDirectory() as first, tempfile.TemporaryDirectory() as second:
-        for directory in (first, second):
-            data = build_data(root)
-            result = render_from_data(data, root)
-            (Path(directory) / "index.html").write_bytes(result)
-            built.append(((Path(directory) / "index.html").read_bytes(), data))
-    (first_bytes, first_data), (second_bytes, second_data) = built
+        data = build_data(root)
+        (Path(first) / "index.html").write_bytes(render_from_data(data, root))
+        first_bytes = (Path(first) / "index.html").read_bytes()
+        # The second build runs in a separate interpreter with a different hash seed, so
+        # set/dict-order nondeterminism that one process would hide still fails the check.
+        target = Path(second) / "index.html"
+        proc = subprocess.run(
+            [sys.executable, str(Path(__file__).resolve()), "--root", str(root), "--render-to", str(target)],
+            env=dict(os.environ, PYTHONHASHSEED="1" if os.environ.get("PYTHONHASHSEED") != "1" else "2"),
+            capture_output=True, text=True, check=False)
+        require(proc.returncode == 0, f"second-process explorer build failed: {(proc.stdout + proc.stderr)[-400:]}")
+        second_bytes = target.read_bytes()
     require(first_bytes == second_bytes,
-            "explorer build is not deterministic across two independent builds")
-    return first_bytes, input_digest(first_data)
+            "explorer build is not deterministic across two independent builds (separate processes and hash seeds)")
+    return first_bytes, input_digest(data)
 
 
 def main(argv=None):
@@ -739,9 +747,13 @@ def main(argv=None):
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--write", action="store_true", help="Rebuild the public HTML (writes it locally; not committed)")
     mode.add_argument("--check", action="store_true", help="Check deterministic rebuild (default)")
+    mode.add_argument("--render-to", type=Path, help=argparse.SUPPRESS)  # used by --check for the second-process build
     args = parser.parse_args(argv)
     try:
         root = args.root.resolve()
+        if args.render_to:
+            args.render_to.write_bytes(render(root))
+            return 0
         if args.write:
             result = render(root)
             safe_file(root, OUTPUT).write_bytes(result)
