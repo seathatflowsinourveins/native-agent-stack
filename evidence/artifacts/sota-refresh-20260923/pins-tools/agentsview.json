@@ -1,0 +1,41 @@
+{
+  "id": "sota-refresh-20260923-pins-tools-agentsview",
+  "component": "agentsview",
+  "repo": "https://github.com/kenn-io/agentsview",
+  "from_pin": "v0.43.0",
+  "to_version": "v0.44.0",
+  "release_published_at": "2026-09-21T13:56:12Z",
+  "release_resolved_via": "gh api repos/kenn-io/agentsview/releases/latest --jq '{tag:.tag_name, published_at:.published_at}'",
+  "preregistration": {
+    "written_at": "2026-09-23T00:24:00Z",
+    "expectation": "The v0.44.0 linux_amd64 release asset's sha256 matches the published SHA256SUMS entry, and both --version and the first line of --help report the new version with unchanged wording ('local web viewer for AI agent sessions') matching the retained 0.43.0 version-help receipt's shape.",
+    "criteria": "sha256 of downloaded tarball equals the value in the release's SHA256SUMS file; --version exits 0 and reports v0.44.0; --help exits 0 and its first stdout line only differs from the retained receipt by the version number."
+  },
+  "acceptance_check_ref": "evidence/artifacts/claude-upstream-checks-20260921/results.json component id=agentsview (evidence_class: version-help; pin v0.43.0 commands: --version, `--help` first-line-only)",
+  "commands": [
+    "curl -sL -o agentsview_0.44.0_linux_amd64.tar.gz https://github.com/kenn-io/agentsview/releases/download/v0.44.0/agentsview_0.44.0_linux_amd64.tar.gz",
+    "curl -sL -o SHA256SUMS https://github.com/kenn-io/agentsview/releases/download/v0.44.0/SHA256SUMS",
+    "sha256sum agentsview_0.44.0_linux_amd64.tar.gz && grep linux_amd64 SHA256SUMS",
+    "tar xzf agentsview_0.44.0_linux_amd64.tar.gz -C extracted",
+    "extracted/agentsview --version",
+    "extracted/agentsview --help | head -1",
+    "agentsview --help | head -1  # retained 0.43.0 binary on PATH, for direct comparison"
+  ],
+  "results": {
+    "sha256_downloaded": "037ea7a46d52e06b20363b4aa7cd7f28e32f31d8215803d6e9a0c96bac5818e3",
+    "sha256_published": "037ea7a46d52e06b20363b4aa7cd7f28e32f31d8215803d6e9a0c96bac5818e3",
+    "sha256_match": true,
+    "old_0_43_0_version": "agentsview v0.43.0 (commit 9be7745ad1906ee24e04eb05bb86c872ef0939a1, built 2026-09-14T02:30:01Z)",
+    "new_0_44_0_version": "agentsview v0.44.0 (commit 413a87f7bfbd67b2815b1119ac51abc1efbeeaba, built 2026-09-21T12:48:49Z)",
+    "old_0_43_0_help_line1": "agentsview v0.43.0 - local web viewer for AI agent sessions",
+    "new_0_44_0_help_line1": "agentsview v0.44.0 - local web viewer for AI agent sessions",
+    "diff": "Only the version number differs; wording and exit codes unchanged."
+  },
+  "verdict": "qualified",
+  "evidence_class": "native_proven",
+  "limits": [
+    "Matches the retained receipt's evidence class exactly (version-help): did not run a full sync/serve E2E against real session data, matching the scope of the accepted prior receipt rather than exceeding it.",
+    "Did not install the binary onto PATH; ran it from an extracted directory under the unit-owned cache prefix."
+  ],
+  "checked_at": "2026-09-23T00:35:00Z"
+}

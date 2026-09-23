@@ -1,0 +1,44 @@
+{
+  "id": "sota-refresh-20260923-pins-tools-openresearch",
+  "component": "openresearch",
+  "repo": "https://github.com/alphaXiv/OpenResearch",
+  "from_pin": "v0.2.7",
+  "to_version": "v0.2.8",
+  "release_published_at": "2026-09-22T03:20:42Z",
+  "release_resolved_via": "gh api repos/alphaXiv/OpenResearch/releases/latest --jq '{tag:.tag_name, published_at:.published_at}'",
+  "preregistration": {
+    "written_at": "2026-09-23T00:25:00Z",
+    "expectation": "The v0.2.8 x86_64-unknown-linux-musl asset's sha256 matches its published .sha256 sidecar; --version and the first --help line report v0.2.8 with unchanged wording ('OpenResearch CLI'); the offline `discover --help` subcommand tree (keyword/embedding/openalex/biorxiv) is unchanged since it needs no API key to enumerate.",
+    "criteria": "sha256 match; --version/--help exit 0 with unchanged wording besides the version; `orx discover --help` output is byte-identical to the retained pin's output aside from any version string. Any command that would need a live search key (discover keyword/embedding/openalex/biorxiv actually run, or `login`) is not executed and is recorded as offline-only/blocked, not attempted."
+  },
+  "acceptance_check_ref": "evidence/artifacts/claude-upstream-checks-20260921/results.json component id=openresearch (evidence_class: version-help; pin v0.2.7 commands: --version, `--help` first-line-only)",
+  "commands": [
+    "curl -sL -o orx.tar.xz https://github.com/alphaXiv/OpenResearch/releases/download/v0.2.8/openresearch-cli-x86_64-unknown-linux-musl.tar.xz",
+    "curl -sL -o orx.tar.xz.sha256 https://github.com/alphaXiv/OpenResearch/releases/download/v0.2.8/openresearch-cli-x86_64-unknown-linux-musl.tar.xz.sha256",
+    "sha256sum orx.tar.xz && cat orx.tar.xz.sha256",
+    "tar xJf orx.tar.xz -C extracted",
+    "extracted/openresearch-cli-x86_64-unknown-linux-musl/orx --version",
+    "extracted/openresearch-cli-x86_64-unknown-linux-musl/orx --help | head -1",
+    "extracted/openresearch-cli-x86_64-unknown-linux-musl/orx discover --help",
+    "orx --help | head -1  # retained 0.2.7 binary on PATH, for direct comparison",
+    "orx discover --help  # retained 0.2.7 binary, for direct comparison"
+  ],
+  "results": {
+    "sha256_downloaded": "7887889e8d6efd52972a6a72181fe6a8aaee1a432decded0f7d46fdd4ae37d3d",
+    "sha256_published": "7887889e8d6efd52972a6a72181fe6a8aaee1a432decded0f7d46fdd4ae37d3d",
+    "sha256_match": true,
+    "old_0_2_7_version": "orx 0.2.7",
+    "new_0_2_8_version": "orx 0.2.8",
+    "old_0_2_7_help_line1": "OpenResearch CLI",
+    "new_0_2_8_help_line1": "OpenResearch CLI",
+    "discover_subcommand_tree": "Identical between 0.2.7 and 0.2.8: keyword, embedding, openalex, biorxiv, with the same --no-telemetry flag and help text.",
+    "not_run": "discover keyword/embedding/openalex/biorxiv, paper, login, ssh-key, instance, compute -- these need a stored search/compute key or network account state this unit does not hold; recorded as offline-only, not attempted."
+  },
+  "verdict": "qualified",
+  "evidence_class": "native_proven",
+  "limits": [
+    "Only offline/no-credential subcommands (--version, --help, discover --help) were exercised; any functional search (discover keyword/embedding/openalex/biorxiv) needs a stored alphaXiv/OpenAlex key or account this unit was not given, so search-functional parity is source_review only (unchanged CLI surface), not native_proven.",
+    "Matches the retained receipt's evidence class exactly (version-help)."
+  ],
+  "checked_at": "2026-09-23T00:35:00Z"
+}

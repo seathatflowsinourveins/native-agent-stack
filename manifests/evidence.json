@@ -12561,6 +12561,36 @@
       "path": "evidence/artifacts/layer-verdicts-20260922/packets/us-equities__data-quality-orchestration.json",
       "sha256": "cdbe255da0593b73f77e57bc8b887984a78e5233165f3a9fa27818d427708eeb",
       "bytes": 8782
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-tools/README.md",
+      "sha256": "046f9b29694844e2f56335f967ae23d3373c79ce5c284abf4e9bb4413ba86183",
+      "bytes": 3661
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-tools/opensandbox.json",
+      "sha256": "016e159257956d49d614dd76a6f384210712c7634ae31e545fd57f7aab6fdb5a",
+      "bytes": 3424
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-tools/langgraph.json",
+      "sha256": "46d86421ee7efb32243ff569005841624766edab60b2eb5ee04682a1501afd11",
+      "bytes": 3278
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-tools/openresearch.json",
+      "sha256": "c050b8de3847bb5dea5c8f0fa805c3cf1bf96fd9087bb81df376d074a5a8b397",
+      "bytes": 3535
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-tools/mcporter.json",
+      "sha256": "a1fdd67e3e28b96bedd71676aeaf2e127694eef87e36225876a3f07fd9592a00",
+      "bytes": 3916
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-tools/agentsview.json",
+      "sha256": "8ca178822db91fd43dc4ecb79f31f8a11d23415eed769cff0471c6e6698f7475",
+      "bytes": 2994
     }
   ],
   "convergence_records": [

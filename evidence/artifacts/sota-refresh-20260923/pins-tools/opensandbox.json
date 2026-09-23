@@ -1,0 +1,37 @@
+{
+  "id": "sota-refresh-20260923-pins-tools-opensandbox",
+  "component": "opensandbox",
+  "repo": "https://github.com/opensandbox-group/OpenSandbox",
+  "from_pin": "server v0.2.3",
+  "to_version": "release-1.1.0",
+  "release_published_at": "2026-09-21T07:46:25Z",
+  "release_resolved_via": "gh api repos/opensandbox-group/OpenSandbox/releases/latest --jq '{tag:.tag_name, published_at:.published_at}'",
+  "preregistration": {
+    "written_at": "2026-09-23T00:32:00Z",
+    "expectation": "OpenSandbox's server requires a local container runtime (Docker) or Kubernetes to run at all, per its own README ('Docker (required for local execution)'). This host has neither Docker nor Podman nor a running docker.sock. Expectation: confirm the hard runtime dependency from the upstream README/release notes and confirm its absence on this host, then record a blocked verdict rather than attempting or simulating a server run.",
+    "criteria": "README states Docker is required for local execution (or Kubernetes for cluster execution); `which docker podman docker-compose` finds none and no docker.sock is present; no offline-only functional check exists for this component (unlike openresearch's help/discover surfaces) because even the CLI's basic operations create sandboxes against the server."
+  },
+  "acceptance_check_ref": "none retained in this repository for opensandbox; not present in evidence/artifacts/claude-upstream-checks-20260921/results.json or sdk-runtime-coverage-20260922/sandbox-worker-runtimes.json rows keyed by this exact name (component appears only in landscape/discovery catalogs as a shortlisted candidate, source_review class)",
+  "commands": [
+    "gh api repos/opensandbox-group/OpenSandbox/releases/latest --jq '{tag:.tag_name, published_at:.published_at}'",
+    "gh api repos/opensandbox-group/OpenSandbox/releases/tags/release-1.1.0 --jq '.body' (README excerpt via raw.githubusercontent.com/.../README.md)",
+    "which docker podman docker-compose",
+    "test -S /var/run/docker.sock"
+  ],
+  "results": {
+    "latest_release_tag": "release-1.1.0",
+    "latest_release_published_at": "2026-09-21T07:46:25Z",
+    "release_notes_excerpt": "First unified umbrella release: every artifact ships at 1.1.0 from tag release-1.1.0... Requirements section: 'Docker (required for local execution)', 'Python 3.10+ (required for examples and local runtime)'.",
+    "docker_present": false,
+    "podman_present": false,
+    "docker_socket_present": false
+  },
+  "verdict": "blocked",
+  "evidence_class": "source_review",
+  "limits": [
+    "Exact missing requirement: a local container runtime (Docker for the single-node/local path, or a Kubernetes cluster for the cluster path). This host has neither, and installing/enabling either is out of scope for a unit-owned-prefix isolation rule (a container engine is host-level infrastructure, not something installable into a user cache prefix).",
+    "No offline-only functional surface exists to partially qualify (unlike openresearch's --help/discover --help): even the CLI's minimal operations (create/connect a sandbox) require the server, which requires the container runtime.",
+    "Could not compare the retained v0.2.3 pin's actual behavior to release-1.1.0's behavior; this receipt only establishes that the upstream requirement is unchanged and unmet on this host, both before and after the version bump."
+  ],
+  "checked_at": "2026-09-23T00:36:00Z"
+}
