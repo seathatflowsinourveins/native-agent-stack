@@ -101,6 +101,18 @@ LANES = ("claude", "codex")
 VERDICT_DATE = "20260922"
 SEALED_BASE = f"evidence/artifacts/layer-verdicts-{VERDICT_DATE}"
 
+# Same character class scripts/landscape.py requires of lanes.<lane>.sealed_base
+# (re.fullmatch(r"evidence/artifacts/layer-verdicts-[0-9A-Za-z]+", ...)); checked at
+# argument parsing so a run-id containing "-", "/" or ".." is rejected before any
+# sealed file is written, rather than surfacing only when landscape.py runs later.
+RUN_ID_PATTERN = re.compile(r"[0-9A-Za-z]+")
+
+
+def validate_run_id(run_id: str) -> str:
+    if not RUN_ID_PATTERN.fullmatch(run_id):
+        raise SystemExit(f"--run-id must match {RUN_ID_PATTERN.pattern!r} (got {run_id!r})")
+    return run_id
+
 
 def sealed_base_for(run_date: str) -> str:
     return f"evidence/artifacts/layer-verdicts-{run_date}"
@@ -835,7 +847,7 @@ def main(argv=None) -> int:
 
     identities, aliases = load_canonical_index(root)
     sha256sums = parse_sha256sums(work_dir / "packets" / "SHA256SUMS")
-    run_date = args.run_id
+    run_date = validate_run_id(args.run_id)
     sealed_base = sealed_base_for(run_date)
 
     rejections: list = []

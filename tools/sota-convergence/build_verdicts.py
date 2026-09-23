@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -32,6 +33,20 @@ if str(HERE) not in sys.path:
 # build_manifest.py, which owns the host-path/secret-marker leak contract for
 # every generator under tools/sota-convergence/.
 from build_manifest import assert_no_leak, sanitize_value  # noqa: E402
+
+# Same character class scripts/landscape.py requires of lanes.<lane>.sealed_base
+# (re.fullmatch(r"evidence/artifacts/layer-verdicts-[0-9A-Za-z]+", ...)) and
+# record_verdicts.RUN_ID_PATTERN enforces on its own --run-id -- kept here as an
+# equivalent, separately-defined check rather than an import, since
+# record_verdicts.py already imports LEDGER_FILES from this module and an import
+# the other way would be circular.
+RUN_ID_PATTERN = re.compile(r"[0-9A-Za-z]+")
+
+
+def validate_run_id(run_id: str) -> str:
+    if not RUN_ID_PATTERN.fullmatch(run_id):
+        raise SystemExit(f"--run-id must match {RUN_ID_PATTERN.pattern!r} (got {run_id!r})")
+    return run_id
 
 MARKER_BEGIN = "<!-- verdicts:begin -->"
 MARKER_END = "<!-- verdicts:end -->"
@@ -325,9 +340,10 @@ def main(argv=None) -> int:
     args = parse_args(argv)
     root = args.root.resolve()
     write_mode = bool(args.write) and not args.check
+    run_id = validate_run_id(args.run_id)
     manifest = args.manifest.as_posix() if args.manifest else None
 
-    document = build_document(root, args.checked_at, run_id=args.run_id, manifest=manifest)
+    document = build_document(root, args.checked_at, run_id=run_id, manifest=manifest)
     # Sanitize once and render both outputs from the sanitized copy: the
     # handbook markdown table is built directly from field values (e.g.
     # overturn_when), so it needs the same host-path/secret-marker redaction
@@ -339,7 +355,7 @@ def main(argv=None) -> int:
     new_handbook_text = update_handbook(handbook_text, render_handbook_section(sanitized_document))
     assert_no_leak(new_handbook_text)
 
-    out_path = root / (args.out.as_posix() if args.out else default_out(args.run_id))
+    out_path = root / (args.out.as_posix() if args.out else default_out(run_id))
 
     if write_mode:
         out_path.parent.mkdir(parents=True, exist_ok=True)

@@ -55,7 +55,11 @@ def ledger_row(**overrides):
                           "disposition": "conditional", "why_not_default": "Not the default.",
                           "evidence_class": "source_review", "source": "lane:claude"}],
         "verdict_overturn_when": "fixtures/x.json changes and the new candidate passes.",
-        "overturn_protocol": {"fixture_paths": [], "metric": "", "arms": []},
+        # Non-empty in the fixture, since a lane-written value here is exactly what a
+        # blind checkout must not leave a prior selection recoverable from.
+        "open_gaps": ["codex lane preferred https://github.com/example/other; claude preferred Codex"],
+        "overturn_protocol": {"fixture_paths": ["fixtures/x.json"], "metric": "pass/fail",
+                              "arms": ["Codex (selected winner)", "https://github.com/example/other"]},
         "lanes": {"claude": {"run_id": "foundation-native-clients-20260922", "sealed_sha256": "a" * 64},
                   "codex": {"run_id": "foundation-native-clients-20260922", "sealed_sha256": "b" * 64},
                   "agreement": "same_winner"},
@@ -97,6 +101,26 @@ class BlindCheckoutFixture(unittest.TestCase):
             "current_choice": "keep NautilusTrader selected for now",  # states a selection -> stripped
             "mapping_rule": {"decision": {"if": "condition", "then": "branch"}},  # a rule structure -> kept
             "nested": {"disposition": "conditional"},  # a label, nested -> stripped
+            # Real repository label strings (the closed enum, and free text stating a
+            # retain/adopt/reject/defer decision) -> all stripped, each under an actual
+            # stripped key name ("decision"/"disposition"/"selection"), nested so each
+            # gets its own object.
+            "case_adopt": {"decision": "adopt_within_scope"},
+            "case_defer": {"decision": "defer"},
+            "case_reject": {"disposition": "reject_evidence"},
+            "case_retain_prose_1": {"decision": "Retain current catalog pin. No WSL installation or "
+                                    "native qualification in this backup lane; scan publication on "
+                                    "the already-qualified Mac tool."},
+            "case_retain_prose_2": {"decision": "retain installed offline request baseline; reject "
+                                    "advanced fields locally"},
+            "case_language_alt": {"decision": "language alternative only"},
+            "case_retain_selection": {"selection": "Retain the smallest coherent set that meets "
+                                      "requirements. Compare challengers against incumbents and "
+                                      "preserve rejected/deferred candidates."},
+            # A procedural/data string that happens to contain "retain"/"defer" mid-sentence, not
+            # as an opening decision verb -> kept (this is a rule, not a selection).
+            "case_rule_kept": {"decision": "Submission is deferred by session, not by bar count, so "
+                              "an early close cannot pull the order into the decision session."},
         })
         self.write("evidence/artifacts/layer-verdicts-20260922/claude/foundation-native-clients-20260922.json",
                     {"lane": "claude"})
@@ -155,6 +179,11 @@ class LedgerV2ResetTests(BlindCheckoutFixture):
         self.assertEqual(row["verdict_overturn_when"], "")
         self.assertEqual(row["lanes"], {"claude": {"run_id": "", "sealed_sha256": ""},
                                         "codex": {"run_id": "", "sealed_sha256": ""}, "agreement": "pending"})
+        # open_gaps and overturn_protocol are also lane-written v2 fields (record_verdicts.process_row);
+        # a non-empty open_gaps entry or overturn_protocol.arms names the prior winner/disagreement
+        # just as directly as winners/alternatives, so both reset to empty too.
+        self.assertEqual(row["open_gaps"], [])
+        self.assertEqual(row["overturn_protocol"], {"fixture_paths": [], "metric": "", "arms": []})
         # Requirement and evidence are not v2 fields and stay.
         self.assertEqual(row["requirement"], "Run coding tasks.")
         self.assertEqual(row["evidence_refs"], ["docs/x.md"])
@@ -205,6 +234,20 @@ class BlueprintLabelExceptionTests(BlindCheckoutFixture):
         self.assertEqual(document["selection"], "top_20")
         # A mapping/rule structure under a stripped-elsewhere key name is left alone.
         self.assertEqual(document["mapping_rule"], {"decision": {"if": "condition", "then": "branch"}})
+        # Real repository label strings, enumerated in the extended vocabulary/patterns.
+        self.assertNotIn("decision", document["case_adopt"])
+        self.assertNotIn("decision", document["case_defer"])
+        self.assertNotIn("disposition", document["case_reject"])
+        self.assertNotIn("decision", document["case_retain_prose_1"])
+        self.assertNotIn("decision", document["case_retain_prose_2"])
+        self.assertNotIn("decision", document["case_language_alt"])
+        self.assertNotIn("selection", document["case_retain_selection"])
+        # A procedural rule string that is not itself a selection is kept even though it
+        # contains "deferred" mid-sentence (it does not open with the decision verb).
+        self.assertIn("decision", document["case_rule_kept"])
+        self.assertEqual(document["case_rule_kept"]["decision"],
+                         "Submission is deferred by session, not by bar count, so an early close "
+                         "cannot pull the order into the decision session.")
 
 
 class ManifestTests(BlindCheckoutFixture):
@@ -218,6 +261,8 @@ class ManifestTests(BlindCheckoutFixture):
         serialized = json.dumps(on_disk)
         self.assertNotIn("Codex", serialized)  # a stripped rationale/current_choice value
         self.assertNotIn("selected_destination", serialized)
+        self.assertNotIn("example/other", serialized)  # a stripped overturn_protocol arm
+        self.assertNotIn("preferred", serialized)  # a stripped open_gaps entry
         for entry in on_disk["stripped_fields"]:
             self.assertIn("path", entry)
             self.assertRegex(entry["old_sha256"], r"^[a-f0-9]{64}$")
@@ -227,23 +272,67 @@ class ManifestTests(BlindCheckoutFixture):
         self.assertTrue(any(path.endswith("/current_choice") for path in paths))
         self.assertTrue(any("/candidates/0/disposition" in path for path in paths))
 
+    def test_manifest_records_resolved_rev_not_source_host_path(self):
+        manifest = self.run_checkout()
+        self.addCleanup(self.remove_worktree)
+        on_disk = json.loads((self.dest / "BLIND-MANIFEST.json").read_text(encoding="utf-8"))
+        self.assertNotIn("source", on_disk)
+        self.assertNotIn(str(self.source), json.dumps(on_disk))
+        self.assertEqual(on_disk["requested_rev"], "HEAD")
+        self.assertRegex(on_disk["rev"], r"^[0-9a-f]{40}$")
+        head_sha = subprocess.run(["git", "rev-parse", "HEAD"], cwd=str(self.source), check=True,
+                                  capture_output=True, text=True).stdout.strip()
+        self.assertEqual(on_disk["rev"], head_sha)
+
+    def test_hmac_key_is_not_written_under_dest(self):
+        manifest = self.run_checkout()
+        self.addCleanup(self.remove_worktree)
+        self.assertIn("hmac_key_hex", manifest)
+        serialized = json.dumps(json.loads((self.dest / "BLIND-MANIFEST.json").read_text(encoding="utf-8")))
+        self.assertNotIn(manifest["hmac_key_hex"], serialized)
+        for path in self.dest.rglob("*"):
+            if path.is_file():
+                self.assertNotIn(manifest["hmac_key_hex"], path.read_text(encoding="utf-8", errors="ignore"))
+
 
 class IdempotenceTests(BlindCheckoutFixture):
     def test_stripping_an_already_blind_worktree_finds_nothing_left_to_strip(self):
         self.run_checkout()
         self.addCleanup(self.remove_worktree)
-        second_pass = blind_checkout.strip_worktree(self.dest)
+        second_pass = blind_checkout.strip_worktree(self.dest, hmac_key=b"\x00" * 32)
         self.assertEqual(second_pass["removed_files"], [])
         self.assertEqual(second_pass["stripped_fields"], [])
 
-    def test_running_blind_checkout_twice_from_the_same_source_rev_is_stable(self):
+    def test_running_blind_checkout_twice_from_the_same_source_rev_has_the_same_shape(self):
+        # Each call draws its own random HMAC key by default, so old_sha256 values are not
+        # expected to match across the two -- only which paths were removed/stripped, and
+        # the resolved rev, are stable for the same source/rev.
         first = self.run_checkout()
         self.addCleanup(self.remove_worktree)
         second_dest = self.dest.parent / "dest2"
         second = self.run_checkout(dest=second_dest)
         self.addCleanup(lambda: self.remove_worktree(second_dest))
         self.assertEqual(first["removed_files"], second["removed_files"])
-        self.assertEqual(first["stripped_fields"], second["stripped_fields"])
+        self.assertEqual([entry["path"] for entry in first["stripped_fields"]],
+                         [entry["path"] for entry in second["stripped_fields"]])
+        self.assertEqual(first["rev"], second["rev"])
+        self.assertNotEqual(first.get("hmac_key_hex"), second.get("hmac_key_hex"))
+
+    def test_explicit_hmac_key_reproduces_the_same_hashes(self):
+        key = b"\x01" * 32
+        first = self.run_checkout()
+        self.addCleanup(self.remove_worktree)
+        second_dest = self.dest.parent / "dest2"
+        blind_checkout.run_blind_checkout(self.source, "HEAD", second_dest, hmac_key=key)
+        self.addCleanup(lambda: self.remove_worktree(second_dest))
+        # first used a random key, so re-derive its hashes with the same explicit key by
+        # re-running against a third dest with that key and comparing to the second run.
+        third_dest = self.dest.parent / "dest3"
+        third = blind_checkout.run_blind_checkout(self.source, "HEAD", third_dest, hmac_key=key)
+        self.addCleanup(lambda: self.remove_worktree(third_dest))
+        second_manifest = json.loads((second_dest / "BLIND-MANIFEST.json").read_text(encoding="utf-8"))
+        self.assertEqual(second_manifest["stripped_fields"], third["stripped_fields"])
+        self.assertNotEqual(third["stripped_fields"], first["stripped_fields"])
 
 
 if __name__ == "__main__":

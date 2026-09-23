@@ -38,24 +38,65 @@ What is stripped, and how each strip is recorded in
   wherever they appear, at any nesting depth, regardless of their value.
 - **Every JSON file under ``blueprints/``**: the same five keys are removed
   only when the value itself is a label from a closed selection vocabulary
-  (``is_label_value`` below) -- a string equal to one of a short fixed set
-  (``default``, ``selected``, ``conditional``, ``optional``, ``candidate``,
-  ``trial``, ``retain``, ``keep_but_compare``, ``adjust``,
-  ``confirmed_default``, ``selected_destination``), or a string that itself
-  states a selection (contains "selected", or matches "keep ... selected").
-  A mapping/rule structure under one of these keys, or an unrelated data
-  value such as ``"top_20"``, is left untouched.
+  (``is_label_value``/``LABEL_VALUES`` below, enumerated from every string
+  value actually found under these keys in ``blueprints/`` -- not just an
+  illustrative subset), or a string that itself states a selection: it
+  contains "selected", matches "keep ... selected", or opens with
+  "retain"/"adopt"/"reject"/"defer" (case-insensitively, at a word boundary
+  -- e.g. ``"Retain current catalog pin..."``, ``"retain installed offline
+  request baseline; reject advanced fields locally"``). A mapping/rule
+  structure under one of these keys, or an unrelated data or procedural
+  value such as ``"top_20"`` or ``"Submission is deferred by session, not by
+  bar count..."``, is left untouched.
+- **The lane-derived v2 verdict fields ``open_gaps`` and
+  ``overturn_protocol``** on every ledger row (``PENDING_LANES`` below):
+  these two are written from the lanes' own sealed returns exactly like
+  ``winners``/``alternatives`` (record_verdicts.process_row), and
+  ``open_gaps`` entries and ``overturn_protocol.arms`` routinely name a
+  lane's winner or a disagreement between the lanes by name -- so they are
+  reset to ``[]`` and ``{"fixture_paths": [], "metric": "", "arms": []}``
+  alongside the other pending-lanes fields, not left in place.
 
 Nothing here re-derives, judges or replaces a stripped value; this is a
 mechanical redaction pass over a detached worktree, run once per blind
 review.
+
+Each stripped value's hash is HMAC-SHA256 keyed by a random 32-byte key
+generated fresh for this run (never a plain unsalted ``sha256(value)``): a
+small closed vocabulary of label strings would otherwise let a lane
+dictionary-attack ``old_sha256`` straight back to the original value. The
+key is never written under ``<dest>`` -- ``run_blind_checkout`` returns it
+(``hmac_key_hex``) and ``main`` writes it to ``<dest>.hmac-key`` next to
+(not inside) the worktree, for an operator who wants to verify a hash
+later; pass the same key explicitly (``hmac_key=bytes.fromhex(...)``) to
+reproduce another run's hashes for comparison, or omit it for a fresh
+random key per call (two calls against the same source/rev then agree on
+every ``removed_files``/``stripped_fields`` *path* but not on
+``old_sha256``, since each drew its own key).
+
+``rev`` is resolved to a full commit SHA (``git rev-parse <rev>^{commit}``,
+from ``--source``) before the worktree is created, and the manifest records
+that resolved SHA plus the originally requested ``rev`` string -- not
+``--source``'s absolute host path, which the manifest never carries.
+
+Caveats this tool does not itself close (documented, not solved, here):
+the destination is a ``git worktree`` of
+``--source``, so it shares that repository's object store -- ``git log``,
+``git diff`` or ``git show HEAD:<path>`` run inside ``<dest>`` can still
+recover every stripped value from history; a lane given raw git access
+(rather than just the working tree) is not blind. Run this only into a
+lane sandbox that denies ``git`` (or export the worktree with
+``git archive`` instead of handing over the worktree itself) if that
+matters for the review.
 """
 from __future__ import annotations
 
 import argparse
 import hashlib
+import hmac
 import json
 import re
+import secrets
 import shutil
 import subprocess
 from pathlib import Path
@@ -87,6 +128,13 @@ PENDING_LANES = {
     "lanes": {"claude": {"run_id": "", "sealed_sha256": ""},
               "codex": {"run_id": "", "sealed_sha256": ""}, "agreement": "pending"},
     "verdict_overturn_when": "",
+    # open_gaps and overturn_protocol are also written by record_verdicts.process_row
+    # from the lanes' own returns (a losing/disagreeing lane's alternative, why a
+    # winner was or was not recorded, or which arm a lane's overturn protocol names)
+    # -- both are v2 verdict fields that name a prior selection just as directly as
+    # winners/alternatives, so they reset the same way.
+    "open_gaps": [],
+    "overturn_protocol": {"fixture_paths": [], "metric": "", "arms": []},
 }
 
 REMOVE_GLOBS = (
@@ -97,17 +145,42 @@ REMOVE_GLOBS = (
     "docs/ecosystem/manifest.json",
 )
 
+# Enumerated from every string value of selection/decision/disposition/current_choice/
+# review_status under blueprints/ in this repository (not just the illustrative set in
+# the module docstring): the short closed-vocabulary enum labels, plus the handful of
+# free-text values that state a retain/adopt/reject/defer selection outright rather
+# than recording a rule, a plan or a data value (e.g. "top_20", "all_events", or a
+# procedural "Divide by 10,000 exactly ..." rule stay -- they are not selections).
 LABEL_VALUES = frozenset({
     "default", "selected", "conditional", "optional", "candidate", "trial",
     "retain", "keep_but_compare", "adjust", "confirmed_default", "selected_destination",
+    "adopt_within_scope", "reject_evidence", "defer",
+    "advisory_supported", "advisory_contradicted", "advisory_insufficient",
+    "advisory_supported retained; reviewer concurs",
+    "advisory_contradicted retained; reviewer concurs",
+    "advisory_insufficient retained; reviewer concurs",
+    "qualified_within_isolated_synthetic_scope",
+    "retain_2.3.1_pending_functional_acceptance",
+    "source-reviewed-not-executed",
+    "language alternative only",
 })
 _SELECTED_WORD = re.compile(r"selected", re.IGNORECASE)
 _KEEP_SELECTED = re.compile(r"\bkeep\b.*\bselected\b", re.IGNORECASE)
+# Free text stating a retain/adopt/reject/defer decision typically opens with that verb
+# (e.g. "Retain current catalog pin...", "retain installed offline request baseline;
+# reject advanced fields locally", "adopt_within_scope"); a rule or plan sentence about
+# unrelated subject matter does not start this way, so this prefix check does not
+# reach into procedural/data strings such as "Submission is deferred by session...".
+_RETAIN_ADOPT_REJECT_DEFER_PREFIX = re.compile(r"^(retain|adopt|reject|defer)\b", re.IGNORECASE)
 
 
-def sha256_of(value) -> str:
+def hmac_sha256_of(value, key: bytes) -> str:
+    """Keyed hash of ``value``, used instead of a plain ``sha256(value)`` so a
+    label drawn from a small closed vocabulary cannot be dictionary-attacked
+    back to its original string from the manifest alone -- the key is never
+    written under ``<dest>`` (see ``run_blind_checkout``/``main``)."""
     text = json.dumps(value, sort_keys=True, ensure_ascii=False)
-    return hashlib.sha256(text.encode("utf-8")).hexdigest()
+    return hmac.new(key, text.encode("utf-8"), hashlib.sha256).hexdigest()
 
 
 def is_label_value(value) -> bool:
@@ -121,18 +194,20 @@ def is_label_value(value) -> bool:
         return True
     if _SELECTED_WORD.search(value) or _KEEP_SELECTED.search(value):
         return True
+    if _RETAIN_ADOPT_REJECT_DEFER_PREFIX.match(value):
+        return True
     return False
 
 
-def strip_ledger_row(row: dict, pointer_prefix: str, stripped: list) -> None:
+def strip_ledger_row(row: dict, pointer_prefix: str, stripped: list, hmac_key: bytes) -> None:
     for key, default in PENDING_LANES.items():
         if row.get(key) != default:
             if key in row:
-                stripped.append({"path": f"{pointer_prefix}/{key}", "old_sha256": sha256_of(row[key])})
+                stripped.append({"path": f"{pointer_prefix}/{key}", "old_sha256": hmac_sha256_of(row[key], hmac_key)})
             row[key] = json.loads(json.dumps(default)) if isinstance(default, (list, dict)) else default
     for key in LEDGER_ROW_LABEL_KEYS:
         if key in row:
-            stripped.append({"path": f"{pointer_prefix}/{key}", "old_sha256": sha256_of(row[key])})
+            stripped.append({"path": f"{pointer_prefix}/{key}", "old_sha256": hmac_sha256_of(row[key], hmac_key)})
             del row[key]
     for index, candidate in enumerate(row.get("candidates") or []):
         if not isinstance(candidate, dict):
@@ -140,37 +215,38 @@ def strip_ledger_row(row: dict, pointer_prefix: str, stripped: list) -> None:
         for key in LEDGER_CANDIDATE_LABEL_KEYS:
             if key in candidate:
                 stripped.append({"path": f"{pointer_prefix}/candidates/{index}/{key}",
-                                  "old_sha256": sha256_of(candidate[key])})
+                                  "old_sha256": hmac_sha256_of(candidate[key], hmac_key)})
                 del candidate[key]
 
 
-def strip_ledger_document(document: dict, relative_path: str, stripped: list) -> None:
+def strip_ledger_document(document: dict, relative_path: str, stripped: list, hmac_key: bytes) -> None:
     for index, row in enumerate(document.get("layers") or []):
         if isinstance(row, dict):
-            strip_ledger_row(row, f"{relative_path}#/layers/{index}", stripped)
+            strip_ledger_row(row, f"{relative_path}#/layers/{index}", stripped, hmac_key)
 
 
-def _walk_strip(node, path_prefix: str, stripped: list, keys: frozenset, *, only_labels: bool) -> None:
+def _walk_strip(node, path_prefix: str, stripped: list, keys: frozenset, *, only_labels: bool,
+                hmac_key: bytes) -> None:
     if isinstance(node, dict):
         for key in list(node.keys()):
             pointer = f"{path_prefix}/{key}"
             value = node[key]
             if key in keys and (not only_labels or is_label_value(value)):
-                stripped.append({"path": pointer, "old_sha256": sha256_of(value)})
+                stripped.append({"path": pointer, "old_sha256": hmac_sha256_of(value, hmac_key)})
                 del node[key]
                 continue
-            _walk_strip(value, pointer, stripped, keys, only_labels=only_labels)
+            _walk_strip(value, pointer, stripped, keys, only_labels=only_labels, hmac_key=hmac_key)
     elif isinstance(node, list):
         for index, item in enumerate(node):
-            _walk_strip(item, f"{path_prefix}/{index}", stripped, keys, only_labels=only_labels)
+            _walk_strip(item, f"{path_prefix}/{index}", stripped, keys, only_labels=only_labels, hmac_key=hmac_key)
 
 
-def strip_catalog_unconditional(document, relative_path: str, stripped: list) -> None:
-    _walk_strip(document, relative_path, stripped, CATALOGS_UNCONDITIONAL_KEYS, only_labels=False)
+def strip_catalog_unconditional(document, relative_path: str, stripped: list, hmac_key: bytes) -> None:
+    _walk_strip(document, relative_path, stripped, CATALOGS_UNCONDITIONAL_KEYS, only_labels=False, hmac_key=hmac_key)
 
 
-def strip_blueprint_labels(document, relative_path: str, stripped: list) -> None:
-    _walk_strip(document, relative_path, stripped, BLUEPRINT_CONDITIONAL_KEYS, only_labels=True)
+def strip_blueprint_labels(document, relative_path: str, stripped: list, hmac_key: bytes) -> None:
+    _walk_strip(document, relative_path, stripped, BLUEPRINT_CONDITIONAL_KEYS, only_labels=True, hmac_key=hmac_key)
 
 
 def git(args, cwd: Path) -> str:
@@ -179,11 +255,18 @@ def git(args, cwd: Path) -> str:
     return completed.stdout
 
 
-def create_worktree(source: Path, rev: str, dest: Path) -> None:
+def resolve_commit(source: Path, rev: str) -> str:
+    """The full commit SHA ``rev`` names in ``source``, so the manifest records
+    a stable identifier instead of a caller-relative ref like ``HEAD`` or a
+    branch name that can move after the checkout is made."""
+    return git(["rev-parse", f"{rev}^{{commit}}"], cwd=source).strip()
+
+
+def create_worktree(source: Path, resolved_rev: str, dest: Path) -> None:
     if dest.exists():
         raise SystemExit(f"--dest already exists: {dest}")
     dest.parent.mkdir(parents=True, exist_ok=True)
-    git(["worktree", "add", "--detach", str(dest), rev], cwd=source)
+    git(["worktree", "add", "--detach", str(dest), resolved_rev], cwd=source)
 
 
 def remove_paths(root: Path, removed: list) -> None:
@@ -211,9 +294,13 @@ def _rewrite_if_changed(path: Path, before: str, document) -> None:
         path.write_text(json.dumps(document, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
 
-def strip_worktree(dest: Path) -> dict:
+def strip_worktree(dest: Path, hmac_key: bytes) -> dict:
     """Mutate every file already checked out under ``dest`` in place; return
-    the ``BLIND-MANIFEST.json`` payload (not written by this function)."""
+    the ``BLIND-MANIFEST.json`` payload (not written by this function).
+    ``hmac_key`` keys every ``old_sha256`` recorded for a stripped value; pass
+    the same key to compare two runs' hashes, or a fresh one (the default in
+    ``run_blind_checkout``) each time hash secrecy from ``<dest>`` matters
+    more than cross-run comparability."""
     removed_files: list = []
     stripped_fields: list = []
 
@@ -225,7 +312,7 @@ def strip_worktree(dest: Path) -> dict:
             continue
         document = json.loads(path.read_text(encoding="utf-8"))
         before = json.dumps(document, sort_keys=True)
-        strip_ledger_document(document, relative, stripped_fields)
+        strip_ledger_document(document, relative, stripped_fields, hmac_key)
         _rewrite_if_changed(path, before, document)
 
     for path in iter_json_files(dest, "catalogs"):
@@ -235,7 +322,7 @@ def strip_worktree(dest: Path) -> dict:
         except (OSError, UnicodeError, ValueError):
             continue
         before = json.dumps(document, sort_keys=True)
-        strip_catalog_unconditional(document, relative, stripped_fields)
+        strip_catalog_unconditional(document, relative, stripped_fields, hmac_key)
         _rewrite_if_changed(path, before, document)
 
     for path in iter_json_files(dest, "blueprints"):
@@ -245,7 +332,7 @@ def strip_worktree(dest: Path) -> dict:
         except (OSError, UnicodeError, ValueError):
             continue
         before = json.dumps(document, sort_keys=True)
-        strip_blueprint_labels(document, relative, stripped_fields)
+        strip_blueprint_labels(document, relative, stripped_fields, hmac_key)
         _rewrite_if_changed(path, before, document)
 
     return {
@@ -255,12 +342,21 @@ def strip_worktree(dest: Path) -> dict:
     }
 
 
-def run_blind_checkout(source: Path, rev: str, dest: Path) -> dict:
-    create_worktree(source, rev, dest)
-    manifest = strip_worktree(dest)
-    manifest = {"source": str(source), "rev": rev, **manifest}
+def run_blind_checkout(source: Path, rev: str, dest: Path, hmac_key: bytes = None) -> dict:
+    """``hmac_key`` defaults to a fresh random 32-byte key (never persisted
+    under ``dest``); pass an explicit key only when two runs' ``old_sha256``
+    values must be directly comparable and the caller accepts keeping that
+    key itself out of the lane's hands. ``source`` is never recorded in the
+    written manifest (only the resolved commit and the originally requested
+    rev are)."""
+    resolved_rev = resolve_commit(source, rev)
+    create_worktree(source, resolved_rev, dest)
+    key = hmac_key if hmac_key is not None else secrets.token_bytes(32)
+    manifest = strip_worktree(dest, key)
+    manifest = {"requested_rev": rev, "rev": resolved_rev, **manifest}
     (dest / "BLIND-MANIFEST.json").write_text(
         json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    manifest["hmac_key_hex"] = key.hex()
     return manifest
 
 
@@ -277,8 +373,11 @@ def main(argv=None) -> int:
     source = args.source.resolve()
     dest = args.dest.resolve()
     manifest = run_blind_checkout(source, args.rev, dest)
+    key_path = dest.parent / f"{dest.name}.hmac-key"
+    key_path.write_text(manifest.pop("hmac_key_hex") + "\n", encoding="utf-8")
     print(json.dumps({"removed_files": len(manifest["removed_files"]),
-                       "stripped_fields": len(manifest["stripped_fields"])}, sort_keys=True))
+                       "stripped_fields": len(manifest["stripped_fields"]),
+                       "hmac_key_path": str(key_path)}, sort_keys=True))
     return 0
 
 

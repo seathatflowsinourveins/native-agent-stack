@@ -918,7 +918,7 @@
         "prometheus",
         "loki"
       ],
-      "claim": "After native sign-in restored readiness, the freshly reproduced SDK completed a real LEAN backtest\u2192Dagu\u2192DuckDB\u2192GPT-6 Astra\u2192Claude Opus 5 prepared-packet research workflow; both native reports passed structural citation/value/unit/scope checks and the accepted Astra report was bound into Claude's prompt by verified hashes.",
+      "claim": "After native sign-in restored readiness, the freshly reproduced SDK completed a real LEAN backtest→Dagu→DuckDB→GPT-6 Astra→Claude Opus 5 prepared-packet research workflow; both native reports passed structural citation/value/unit/scope checks and the accepted Astra report was bound into Claude's prompt by verified hashes.",
       "limitations": [
         "This validates a bounded historical simulation research workflow on the authoring host, not a profitable strategy, current market source, broker execution or unattended production service.",
         "The two reported model tasks used no model tools. Their native hooks and telemetry remain separate evidence; this does not repeat every MCP, memory or GPU-RAG behavior.",
@@ -1900,7 +1900,7 @@
       "component_ids": [
         "ai-memory"
       ],
-      "claim": "Mac arm64 synthetic2.3.1\u21922.3.2 migration, scoped exact reads/FTS, reserved and Unicode paths, restart and no-capture checks passed.",
+      "claim": "Mac arm64 synthetic2.3.1→2.3.2 migration, scoped exact reads/FTS, reserved and Unicode paths, restart and no-capture checks passed.",
       "limitations": [
         "Separate synthetic store and explicit no-model policy only; no production migration claimed by this receipt.",
         "OS filesystem/network confinement was not established; failed restricted-sandbox attempt retained. Native execution succeeded without security overrides; Gatekeeper assessment rejected the ad-hoc distribution.",
@@ -11844,13 +11844,13 @@
     },
     {
       "path": "tests/test_landscape.py",
-      "sha256": "c58424011bd31121d8198a8043360f5f37c7cbddfdc78f56ab6ac1daffbd054a",
-      "bytes": 33290
+      "sha256": "8c64aeaba390810d6b66342cd264bf5773a993339d8ab1a99d2d3a2cca263ed5",
+      "bytes": 36600
     },
     {
       "path": "tests/test_layer_verdicts.py",
-      "sha256": "45e3e3ce53951a85352b129d309c134b9b50e0b2bf35493864c26be9603f05ca",
-      "bytes": 15404
+      "sha256": "b33a6795ae280c18d96ba8be7086153e10683d4d954be402607c67d3efcba19a",
+      "bytes": 19009
     },
     {
       "path": "tests/test_lifecycle_capture.py",
@@ -12039,8 +12039,8 @@
     },
     {
       "path": "tools/sota-convergence/README.md",
-      "sha256": "b0cf3f775713f233e554cd70774bfcca94f3f5140ebac4708b409a6c4d11ddf9",
-      "bytes": 56538
+      "sha256": "87e15f4756ef162ae79f57e5bbf2ca0d38da297459828d3b499f4103356ecccb",
+      "bytes": 60896
     },
     {
       "path": "tools/sota-convergence/build_manifest.py",
@@ -12049,8 +12049,8 @@
     },
     {
       "path": "tools/sota-convergence/build_verdicts.py",
-      "sha256": "6336697dbf61d38c3d4568f475d80e20df92a4f47095d2c853b29145a9c542de",
-      "bytes": 16502
+      "sha256": "220e55dafe824a3817541b67887b2db0d3ad9016ba4c9f4b6fd059f87e41cbe5",
+      "bytes": 17212
     },
     {
       "path": "tools/sota-convergence/extract_layers.py",

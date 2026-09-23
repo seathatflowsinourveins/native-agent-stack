@@ -1139,6 +1139,68 @@ class RunIdTests(RecordVerdictsFixture):
         # a fresh (never-run) fixture root's rows.
         self.assertEqual(self.run_main(write=False, check=True, run_id="20260923"), 0)
 
+    def test_mixed_wave_ledger_verifies_both_and_tampering_an_old_wave_still_fails(self):
+        # One row recorded on the default (20260922) wave, a second recorded with
+        # --run-id 20260923 in the same run_main --write invocation as far as the
+        # operator is concerned (two separate record_verdicts runs against the same
+        # ledger, one per wave) -- both must verify, and the older wave's sealed
+        # file staying valid (not silently orphaned) is the acceptance criterion.
+        old_catalog, old_layer = "foundation", "same-winner-layer"
+        new_catalog, new_layer = "foundation", "disagree-pending-layer"
+        for catalog, layer_id in ((old_catalog, old_layer), (new_catalog, new_layer)):
+            c1, c2, digest = self.build_packet_pair(catalog, layer_id, c1_component=f"{layer_id}-component")
+            alt = make_alternative(c2)
+            write_lane(self.work_dir, "claude", catalog, layer_id,
+                      make_lane_return("claude", catalog, layer_id, digest, ["c1"], [alt]))
+            write_lane(self.work_dir, "codex", catalog, layer_id,
+                      make_lane_return("codex", catalog, layer_id, digest, ["c1"], [alt]))
+
+        # Record the first layer on the default 2026-09-22 wave.
+        self.assertEqual(self.run_main(write=True), 0)
+        # A fresh packets/lane-return set is needed per record_verdicts run (its own
+        # SHA256SUMS/digest scope), so rebuild the second layer's packets/lanes before
+        # recording it on the 20260923 wave -- record_verdicts.main re-reads both rows
+        # from the ledger each time, so the already-recorded first row is preserved.
+        work_temp_2 = tempfile.TemporaryDirectory()
+        self.addCleanup(work_temp_2.cleanup)
+        self.work_dir = Path(work_temp_2.name).resolve()
+        self.packets = PacketWriter(self.work_dir)
+        c1, c2, digest = self.build_packet_pair(new_catalog, new_layer, c1_component=f"{new_layer}-component")
+        alt = make_alternative(c2)
+        write_lane(self.work_dir, "claude", new_catalog, new_layer,
+                  make_lane_return("claude", new_catalog, new_layer, digest, ["c1"], [alt]))
+        write_lane(self.work_dir, "codex", new_catalog, new_layer,
+                  make_lane_return("codex", new_catalog, new_layer, digest, ["c1"], [alt]))
+        self.assertEqual(self.run_main(write=True, run_id="20260923"), 0)
+
+        old_row = self.load_row(old_catalog, old_layer)
+        new_row = self.load_row(new_catalog, new_layer)
+        self.assertEqual(old_row["verdict_status"], "recorded")
+        self.assertNotIn("sealed_base", old_row["lanes"])
+        self.assertEqual(new_row["verdict_status"], "recorded")
+        self.assertEqual(new_row["lanes"]["sealed_base"], "evidence/artifacts/layer-verdicts-20260923")
+
+        # Both rows verify together.
+        build_landscape(self.root)
+
+        # Tampering with the OLDER wave's sealed file fails verification even though a
+        # newer wave has since been recorded on top of the same ledger.
+        old_sealed = (self.root / "evidence/artifacts/layer-verdicts-20260922/claude" /
+                     f"{old_row['lanes']['claude']['run_id']}.json")
+        original = old_sealed.read_text(encoding="utf-8")
+        old_sealed.write_text(original.rstrip() + " ", encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "sealed_sha256 does not match"):
+            build_landscape(self.root)
+        old_sealed.write_text(original, encoding="utf-8")  # restore for cleanliness
+
+        # Tampering with the NEWER wave's sealed file also fails, independently.
+        new_sealed = self.root / f"{new_row['lanes']['sealed_base']}/claude/{new_row['lanes']['claude']['run_id']}.json"
+        original_new = new_sealed.read_text(encoding="utf-8")
+        new_sealed.write_text(original_new.rstrip() + " ", encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "sealed_sha256 does not match"):
+            build_landscape(self.root)
+        new_sealed.write_text(original_new, encoding="utf-8")
+
     def test_default_run_id_output_is_unaffected_by_run_id_support(self):
         catalog, layer_id = "foundation", "same-winner-layer"
         c1, c2, digest = self.build_packet_pair(catalog, layer_id, c1_component="same-winner-component")

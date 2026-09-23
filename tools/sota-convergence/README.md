@@ -562,7 +562,11 @@ python3 tools/sota-convergence/lane_packets.py --root . --out /path/to/work-dir 
 
 No network access; every input is already checked into `catalogs/` and
 `adoption/`. Each candidate is matched to a `catalogs/sota-convergence/
-manifest-20260922.json` component/entry by normalized GitHub slug
+manifest-20260922.json` component/entry by normalized GitHub slug (override
+the dated manifest joined in with `--manifest <path>`, e.g. to match a later
+`build_verdicts.py --manifest`/`--run-id` run so the packets and the verdict
+catalog agree on the pins; default `catalogs/sota-convergence/
+manifest-20260922.json` reproduces the 2026-09-22 packets byte for byte)
 (`build_manifest.github_repo_slug` -- lowercase `owner/repo`, `.git`/
 `/tree/...`/`/releases/tag/...` stripped); a candidate without a `repository`,
 or whose repository is not a GitHub URL, never matches, and a matched
@@ -637,13 +641,33 @@ resolves its sealed files from the row itself, not from a hardcoded
 constant; a row recorded (or never re-recorded) under the default omits
 `sealed_base` and `scripts/landscape.py` falls back to the sealed
 2026-09-22 directory, so every already-checked-in row stays valid and the
-default run's output is unaffected byte for byte.
+default run's output is unaffected byte for byte. `--run-id` is validated
+against the same character class `scripts/landscape.py` requires of
+`lanes.<lane>.sealed_base` (`[0-9A-Za-z]+`; no `-`, `/` or `..`) before any
+sealed file is written, in both `record_verdicts.py` and
+`build_verdicts.py`'s own `--run-id` -- a malformed value is rejected up
+front rather than surfacing only when `scripts/landscape.py` runs later.
 
 ```sh
 python3 tools/sota-convergence/record_verdicts.py \
   --root . --work-dir /path/to/work-dir --checked-at YYYY-MM-DD \
   --run-id 20260923 --write
 ```
+
+**A later wave's `--check` needs its own CI step.** `build_verdicts.py
+--check`'s defaults (and CI's `validate.yml` step, which always calls it with
+no `--run-id`) only ever recompute and compare the default 2026-09-22
+catalog/handbook -- they do not know about a later wave's ledger rows or its
+own `catalogs/sota-convergence/layer-verdicts-<run-id>.json`. Once a later
+wave is recorded (`record_verdicts.py --run-id <new> --write`), verify it
+with the matching `build_verdicts.py --check --run-id <new>`; the checked-in
+`layer-verdicts-20260922.json`/handbook section stay a frozen snapshot of
+the rows as they stood before the later wave's `record_verdicts.py --write`
+touched them (its own rows carry `lanes.sealed_base`, so a mismatch there is
+expected, not a break, once a `record_verdicts.py --write` for a later wave
+has run against this checkout). A CI update to also run
+`build_verdicts.py --check --run-id <new>` for an active later wave is not
+included here.
 
 - **Per-lane validation, never aborts the run.** For every layer with at
   least one `<work-dir>/{claude,codex}/<catalog>__<layer_id>.json` file, each
@@ -773,22 +797,63 @@ It removes outright: `evidence/artifacts/layer-verdicts-*/` (recursively),
 `docs/ecosystem/manifest.json`. In the two landscape ledgers
 (`catalogs/landscape/{foundation,us-equities}.json`) it resets every row's
 layer-verdict schema v2 fields to `pending_lanes` with empty
-`winners`/`alternatives`, a pending `lanes` object and an empty
-`verdict_overturn_when` (keeping `requirement`/`evidence_refs`/
-`overturn_when`), and removes the v1 label fields `current_choice`,
-`decision`, `rationale` (row level) and `disposition`, `rationale`,
-`review_status` (each `candidates[]` entry). Every other JSON file under
-`catalogs/` has `selection`, `decision`, `disposition`, `current_choice` and
-`review_status` removed wherever they appear, regardless of value; under
-`blueprints/` the same five keys are removed only when the value is itself
-a label (a closed-vocabulary string such as `selected`, `retain`,
-`confirmed_default`, `selected_destination`, or free text that states a
-selection) -- a mapping/rule value or an unrelated data value (e.g.
-`"top_20"`) under one of those keys is left alone. `<dest>/BLIND-MANIFEST.json`
-lists every removed file and every stripped JSON path together with its old
-value's sha256 (never the value itself). This tool never removes the
-worktree it creates; the caller does that with
+`winners`/`alternatives`/`open_gaps`, a pending `lanes` object, an empty
+`verdict_overturn_when` and an empty `overturn_protocol`
+(`{"fixture_paths": [], "metric": "", "arms": []}`) -- keeping
+`requirement`/`evidence_refs`/`overturn_when`. `open_gaps` and
+`overturn_protocol` reset alongside `winners`/`alternatives` because
+`record_verdicts.process_row` writes them from the same lanes' returns, and
+an `open_gaps` entry or an `overturn_protocol.arms` value routinely names a
+lane's winner or a disagreement between the lanes by name. It also removes
+the v1 label fields `current_choice`, `decision`, `rationale` (row level) and
+`disposition`, `rationale`, `review_status` (each `candidates[]` entry).
+Every other JSON file under `catalogs/` has `selection`, `decision`,
+`disposition`, `current_choice` and `review_status` removed wherever they
+appear, regardless of value; under `blueprints/` the same five keys are
+removed only when the value is itself a label -- a closed-vocabulary string
+(enumerated in `blind_checkout.LABEL_VALUES` from every string value
+actually found under these keys in this repository's `blueprints/`, not an
+illustrative subset: `selected`, `retain`, `confirmed_default`,
+`selected_destination`, `adopt_within_scope`, `reject_evidence`, `defer`,
+`advisory_supported`/`advisory_contradicted`/`advisory_insufficient` and
+their `... retained; reviewer concurs` forms, `qualified_within_isolated_
+synthetic_scope`, `retain_2.3.1_pending_functional_acceptance`,
+`source-reviewed-not-executed`, `language alternative only`, etc.), free
+text stating a selection (contains "selected", or matches "keep ...
+selected"), or free text that opens with "retain"/"adopt"/"reject"/"defer"
+(case-insensitively, at a word boundary -- e.g. `"Retain current catalog
+pin..."`) -- a mapping/rule value or an unrelated data or procedural value
+(e.g. `"top_20"`, or `"Submission is deferred by session, not by bar
+count..."`, which does not open with the decision verb) under one of those
+keys is left alone.
+
+`<dest>/BLIND-MANIFEST.json` lists every removed file and every stripped
+JSON path together with its old value's **HMAC-SHA256** (never a plain
+unsalted `sha256`, and never the value itself) -- a small closed vocabulary
+of label strings would otherwise let a lane dictionary-attack an unsalted
+hash straight back to the original value. The key is a fresh random 32
+bytes generated per run and is never written under `<dest>`;
+`blind_checkout.py`'s CLI writes it to `<dest>.hmac-key` (a sibling of
+`<dest>`, not inside the worktree handed to a lane) so an operator can
+verify a hash later, or pass `hmac_key=` explicitly to `run_blind_checkout`/
+`strip_worktree` when two runs' hashes must be directly comparable. `--rev`
+is resolved to a full commit SHA (`git rev-parse <rev>^{commit}`) before the
+worktree is created, and the manifest records that resolved SHA plus the
+originally requested `--rev` string as `rev`/`requested_rev` -- it never
+records `--source`'s absolute host path.
+
+This tool never removes the worktree it creates; the caller does that with
 `git worktree remove --force <dest>` once the blind lane has finished.
+Two caveats it does not itself close: the destination is a `git worktree` of
+`--source` and so shares that repository's object store -- `git log`/
+`git diff`/`git show HEAD:<path>` run inside `<dest>` can still recover a
+stripped value from history, so a lane given raw `git` access (rather than
+just the working tree) is not actually blind; deny the lane `git`, or export
+with `git archive` instead of handing over the worktree, if that matters.
+The manifest's per-field hashes, even keyed, still let an operator (who also
+holds the key) map every stripped path to its class of change; they are an
+audit trail for the operator, not something to hand the blind lane
+unfiltered.
 
 ## Codex lane
 
