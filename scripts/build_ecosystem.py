@@ -711,11 +711,13 @@ def render(root):
     return render_from_data(build_data(root), root)
 
 
-def input_digest(data):
+def input_digest(data, root):
     """sha256 over the sorted list of every input path this build actually read
-    (path, sha256, bytes, scope), so the report is tied to exact source content
-    without re-reading files a second time outside the build itself."""
-    return digest(canonical_json(data["inputs"]).encode())
+    (path, sha256, bytes, scope) plus the HTML template render_from_data reads,
+    so the report is tied to exact source content."""
+    template = safe_file(root, TEMPLATE).read_bytes()
+    return digest(canonical_json({"inputs": data["inputs"],
+                                  "template": {"path": str(TEMPLATE), "sha256": digest(template)}}).encode())
 
 
 def check(root):
@@ -738,7 +740,7 @@ def check(root):
         second_bytes = target.read_bytes()
     require(first_bytes == second_bytes,
             "explorer build is not deterministic across two independent builds (separate processes and hash seeds)")
-    return first_bytes, input_digest(data)
+    return first_bytes, input_digest(data, root)
 
 
 def main(argv=None):

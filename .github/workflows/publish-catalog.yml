@@ -44,7 +44,7 @@ jobs:
           python3 scripts/validate_catalogs.py 2>&1 | tee -a "$PUBLICATION_DIR/validation.log"
           python3 scripts/validate_foundation.py --root . --json 2>&1 | tee -a "$PUBLICATION_DIR/validation.log"
           python3 scripts/validate_convergence.py --all-recorded --root . --json 2>&1 | tee -a "$PUBLICATION_DIR/validation.log"
-          python3 scripts/build_ecosystem.py --check 2>&1 | tee -a "$PUBLICATION_DIR/validation.log"
+          python3 scripts/build_ecosystem.py --check | tee "$PUBLICATION_DIR/explorer-check.json" | tee -a "$PUBLICATION_DIR/validation.log"
       - name: Archive only the validated Git commit
         shell: bash
         run: |
@@ -65,6 +65,11 @@ jobs:
           # rebuild it from this validated commit and publish it as its own
           # attested artifact alongside the source archive.
           python3 scripts/build_ecosystem.py --write
+          # Publish only the bytes --check verified: the rebuild must match its output_sha256.
+          checked="$(python3 -c 'import json, sys; print(json.load(open(sys.argv[1]))["output_sha256"])' "$PUBLICATION_DIR/explorer-check.json")"
+          built="$(sha256sum docs/ecosystem/index.html | awk '{print $1}')"
+          printf 'checked_explorer_sha256=%s\nbuilt_explorer_sha256=%s\n' "$checked" "$built" | tee "$PUBLICATION_DIR/explorer-build.log"
+          test "$built" = "$checked"
           explorer="$PUBLICATION_DIR/native-agent-stack-${GITHUB_SHA}.explorer.html"
           cp docs/ecosystem/index.html "$explorer"
           cd "$PUBLICATION_DIR"

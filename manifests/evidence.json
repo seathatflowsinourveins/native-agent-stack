@@ -3038,8 +3038,8 @@
     },
     {
       "path": ".github/workflows/publish-catalog.yml",
-      "sha256": "2b78830ba85fc39a64ded8b8454fa3c2f614fd5758cd78731343d295d37feaa2",
-      "bytes": 13824
+      "sha256": "ee0795fb6a4093ad6b620a3b93546a090f9835fea3e98b8e0ec5248f737d2940",
+      "bytes": 14356
     },
     {
       "path": ".github/workflows/supply-chain.yml",
@@ -12969,8 +12969,8 @@
     },
     {
       "path": "scripts/build_ecosystem.py",
-      "sha256": "509702872ed8346185ba8c92e654bf257fe970c5e3161d261422713fac48682b",
-      "bytes": 48387
+      "sha256": "cc8ef0795733e74bcefb802d93c6162299b12eed4eb4a32484e7d3e39a6a69e3",
+      "bytes": 48546
     },
     {
       "path": "scripts/catalog_decisions.py",
@@ -13249,8 +13249,8 @@
     },
     {
       "path": "tests/test_ecosystem_manifest.py",
-      "sha256": "74480f162185370f74f56de9fd354d13931a1eb632b5c9a95d200669994cf0bb",
-      "bytes": 55498
+      "sha256": "b5e847263c742924ca96773e4eded4dca9d0255c3245a4209744ec588f8c054f",
+      "bytes": 56250
     },
     {
       "path": "tests/test_execution_realism.py",

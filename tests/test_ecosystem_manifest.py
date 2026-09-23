@@ -319,6 +319,18 @@ process.stdout.write(JSON.stringify({nodes, errors, renderAttempts, navigations}
         self.assertNotEqual(second_report["input_sha256"], report["input_sha256"])
         self.assertNotEqual(second_report["output_sha256"], report["output_sha256"])
 
+    def test_check_input_digest_covers_the_html_template(self):
+        """A template-only change must change input_sha256, not just output_sha256."""
+        self.build()
+        first = json.loads(self.run_generator("--check").stdout)
+        template = self.root / "docs/ecosystem/template.html"
+        template.write_text(template.read_text().replace("</body>", "<!-- template-only change --></body>", 1))
+        second_run = self.run_generator("--check")
+        self.assertEqual(second_run.returncode, 0, second_run.stdout + second_run.stderr)
+        second = json.loads(second_run.stdout)
+        self.assertNotEqual(second["input_sha256"], first["input_sha256"])
+        self.assertNotEqual(second["output_sha256"], first["output_sha256"])
+
     def test_check_still_rejects_invalid_sources(self):
         self.records.append(self.records[0])
         self.save()
