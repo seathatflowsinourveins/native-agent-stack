@@ -439,12 +439,12 @@ LEAK = "leak"
 
 
 def judgment_record(family, name, order, input_path, packet_sha256, model, repo, judge, refuter,
-                    failure=None, exit_codes=None, leak=None, input_sha256=None) -> dict:
+                    failure=None, exit_codes=None, leak=None, input_sha256=None, effort=None) -> dict:
     """``leak`` is ``{"stage": "judge"|"refuter", "text": ...}`` when an agent refused on a reviewer-identity
     leak; the judgment is then missing with failure "leak"."""
     record = {"schema_version": JUDGMENT_SCHEMA_VERSION, "family": family, "layer": name, "order": order,
               "input_path": str(input_path), "input_sha256": input_sha256, "packet_sha256": packet_sha256,
-              "model": model,
+              "model": model, "effort": effort,
               "repo": str(repo) if repo else None, "judge": judge, "refuter": refuter,
               "failure": LEAK if leak else failure, "exit_codes": exit_codes or {}}
     if leak:
@@ -578,8 +578,9 @@ def run_codex(args) -> int:
         try:
             existing = load_json(out_path)
             # Resume skips only a judgment made with the configured model.
+            # ... and at the configured effort: a changed --effort reruns it (Codex review of #145).
             if (usable_judgment(existing, "openai", order, packet_sha256) is None
-                    and existing.get("model") == args.model):
+                    and existing.get("model") == args.model and existing.get("effort") == args.effort):
                 continue
         except (OSError, ValueError, AttributeError):
             pass
@@ -626,7 +627,7 @@ def run_codex(args) -> int:
         model = args.model or judge_model or "unknown"
         write_json(out_path, judgment_record(
             "openai", name, order, input_path, packet_sha256, model, repo, None if leak else judge,
-            refuter, failure, {"judge": judge_codes, "refuter": refute_codes}, leak, judged_sha256))
+            refuter, failure, {"judge": judge_codes, "refuter": refute_codes}, leak, judged_sha256, args.effort))
         if refute_model and refute_model != judge_model:
             print(f"adjudicate: {stem} judge model {judge_model!r} and refuter model {refute_model!r} differ",
                   file=sys.stderr)
@@ -718,6 +719,8 @@ def recorded_leaks(work_dir: Path) -> set:
 # ---------------------------------------------------------------- claude
 
 CLAUDE_ARGS_SNAPSHOT = "args-snapshot.json"
+# adjudication-lane.js binds every agent() call to effort 'high' (inline literal, contract style).
+CLAUDE_LANE_EFFORT = "high"
 
 
 def claude_args(work_dir: Path, repo: Path, prompt_path: Path = PROMPT_PATH, layers=None) -> dict:
@@ -758,8 +761,13 @@ def collect_claude(work_dir: Path, result, model: str, repo=None) -> list:
     snapshot_path = work_dir / JUDGMENTS_DIR / "claude" / CLAUDE_ARGS_SNAPSHOT
     snapshot = (load_json(snapshot_path).get("inputs") or {}) if snapshot_path.is_file() else {}
     for name, order, input_path, packet_sha256 in pending_items(index):
+        if f"{name}.{order}" not in snapshot:
+            # Only the items claude-args gave this workflow run are collected; other layers' judgment files
+            # (a selective --layers rerun, or an omitted leaked input) are left as they are.
+            continue
         item = returned.get((name, order)) or {}
         judged_sha256 = snapshot.get(f"{name}.{order}")
+        input_changed = judged_sha256 != sha256_file(Path(input_path))
         if input_key(input_path) in leaked_inputs:
             # Sticky: a judgment of an input with a recorded leak never counts, whatever the workflow returned.
             write_json(work_dir / JUDGMENTS_DIR / "claude" / f"{name}.{order}.json", judgment_record(
@@ -777,7 +785,10 @@ def collect_claude(work_dir: Path, result, model: str, repo=None) -> list:
         if leak is not None:
             leak = {"stage": leak.get("stage"), "text": leak.get("text")}
             judge, refuter = None, None
-            leaks.append((name, order, input_path, {**leak, "family": "anthropic"}))
+            if not input_changed:
+                # A leak reported on an input rebuilt since the snapshot is about the old content: discarded,
+                # so it cannot mark the rebuilt input as leaked.
+                leaks.append((name, order, input_path, {**leak, "family": "anthropic"}))
         if leak is not None:
             failure = LEAK
         elif not item:
@@ -790,12 +801,12 @@ def collect_claude(work_dir: Path, result, model: str, repo=None) -> list:
             failure = None
         if item and item.get("packet_sha256") not in (None, packet_sha256):
             failure, judge, refuter = "the workflow judged a different packet", None, None
-        if judged_sha256 is None or judged_sha256 != sha256_file(Path(input_path)):
-            # The input changed (or was never given) since claude-args built the workflow's items.
-            failure, judge, refuter = "the input changed after claude-args; rerun claude-args", None, None
+        if input_changed:
+            # The input changed since claude-args built the workflow's items.
+            failure, judge, refuter, leak = "the input changed after claude-args; rerun claude-args", None, None, None
         write_json(work_dir / JUDGMENTS_DIR / "claude" / f"{name}.{order}.json", judgment_record(
             "anthropic", name, order, input_path, packet_sha256, model, repo, judge, refuter, failure,
-            leak=leak, input_sha256=judged_sha256))
+            leak=leak, input_sha256=judged_sha256, effort=CLAUDE_LANE_EFFORT))
         if failure:
             missing.append((f"{name}.{order}", failure))
     record_leaks(work_dir / JUDGMENTS_DIR / "claude" / LEAKS_NAME, index, leaks)
@@ -884,6 +895,13 @@ def assemble(work_dir: Path, out_dir: Path, layers=None):
     provenance = adjudication_provenance()
     index = load_index(work_dir)
     leaked_inputs = recorded_leaks(work_dir)
+    # Every layer inputs indexed or skipped loses its earlier record first, so a layer that no longer
+    # disagrees, was skipped (for example a surviving host path) or is refused below never leaves a stale
+    # winner for record_verdicts --adjudications (Codex review of #145).
+    for entry in list(index.get("layers") or []) + list(index.get("skipped") or []):
+        name = entry.get("layer") if isinstance(entry, dict) else None
+        if isinstance(name, str) and (not layers or name in layers or name.split("__", 1)[-1] in layers):
+            (out_dir / f"{name}.json").unlink(missing_ok=True)
     for entry in index.get("layers") or []:
         if entry.get("agreement") != "disagree":
             continue

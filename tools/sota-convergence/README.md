@@ -1517,6 +1517,11 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
   for a leak or for validation, so `record_verdicts.py --adjudications` never reads a stale winner.
 - **Paths:** a repository root or work dir containing whitespace is refused, because path scrubbing
   tokenizes on whitespace.
+- **Resume:** a Codex judgment is reused only at the same `--model` and `--effort`. The Claude lane's
+  effort is fixed at `high` by `adjudication-lane.js`.
+- **Snapshot scope:** `claude-collect` touches only the items in the `claude-args` snapshot. It discards a
+  leak reported on an input rebuilt since that snapshot, so the stale leak cannot mark the new content.
+- **Assembly:** `assemble` first removes the earlier record of every layer `inputs` indexed or skipped.
 
 **Limits:**
 - Writing style can still reveal a lane.

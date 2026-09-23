@@ -352,10 +352,11 @@ class CodexTests(AdjudicateFixture):
                     "CODEX_FAKE_ARGV_LOG": str(self.argv_log), "CODEX_FAKE_RETURN_FILE": str(return_file),
                     "CODEX_FAKE_EVENTS_FILE": str(events), "CODEX_FAKE_COUNTER_FILE": str(self.base / "count")}
 
-    def run_codex(self, repo=None, model="gpt-6-astra", **env):
+    def run_codex(self, repo=None, model="gpt-6-astra", effort=None, **env):
         with mock.patch.dict(os.environ, {**self.env, **env}):
             return quiet(adjudicate.main, ["codex", "--work-dir", str(self.work), "--repo", str(repo or self.repo),
-                                           "--timeout", "30", "--model", model])
+                                           "--timeout", "30", "--model", model]
+                         + (["--effort", effort] if effort else []))
 
     def calls(self):
         return [json.loads(line) for line in self.argv_log.read_text(encoding="utf-8").splitlines()]
@@ -404,6 +405,17 @@ class CodexTests(AdjudicateFixture):
             self.assertEqual(argv[argv.index("-m") + 1], "gpt-6-codex")
         data = json.loads((self.work / "adjudication-judgments" / "codex" / f"{NAME}.AB.json").read_text(encoding="utf-8"))
         self.assertEqual(data["model"], "gpt-6-codex")
+
+    def test_resume_reruns_a_judgment_made_at_another_effort(self):
+        # Codex re-review of #145: effort is recorded and a changed --effort reruns the judgment.
+        self.assertEqual(self.run_codex(effort="high")[0], 0)
+        first = len(self.calls())
+        data = json.loads((self.work / "adjudication-judgments" / "codex" / f"{NAME}.AB.json").read_text())
+        self.assertEqual(data["effort"], "high")
+        self.assertEqual(self.run_codex(effort="high")[0], 0)
+        self.assertEqual(len(self.calls()), first, "same effort: resumed, no new calls")
+        self.assertEqual(self.run_codex(effort="medium")[0], 0)
+        self.assertGreater(len(self.calls()), first, "a changed effort reruns the judgments")
 
     def test_resume_reruns_a_judgment_with_an_unknown_or_other_model(self):
         self.run_codex()
@@ -543,9 +555,9 @@ class LeakTests(AdjudicateFixture):
                          [(f"{NAME}.AB", "leak")])
         self.assertEqual(adjudicate.claude_args(self.work, self.repo)["leaked"], [f"{NAME}.AB"])
         self.assertEqual([i["order"] for i in adjudicate.claude_args(self.work, self.repo)["items"]], ["BA"])
-        # The workflow is rerun anyway and returns a clean judgment for the leaked input.
-        self.assertEqual(adjudicate.collect_claude(self.work, self.claude_result(), "claude-opus-5-5"),
-                         [(f"{NAME}.AB", "leak")])
+        # The workflow is rerun anyway and returns a clean judgment for the leaked input. claude-args left the
+        # leaked AB out of its snapshot, so collect does not touch AB's leak record at all.
+        self.assertEqual(adjudicate.collect_claude(self.work, self.claude_result(), "claude-opus-5-5"), [])
         data = json.loads((self.work / "adjudication-judgments" / "claude" / f"{NAME}.AB.json").read_text(encoding="utf-8"))
         self.assertEqual((data["failure"], data["judge"]), ("leak", None))
         records = json.loads((self.work / "adjudication-judgments" / "claude" / "leaks.json").read_text(encoding="utf-8"))
@@ -561,6 +573,44 @@ class LeakTests(AdjudicateFixture):
         self.write_return("codex", "c2", why_selected="c2 has evidence in evidence/receipt.json and docs/b.md")
         self.inputs()
         self.assertEqual(adjudicate.claude_args(self.work, self.repo)["leaked"], [])
+
+
+class RereviewOf145Tests(AdjudicateFixture):
+    """Codex re-review of #145: skipped layers, selective collection, stale leaks and effort on resume."""
+
+    def setUp(self):
+        super().setUp()
+        self.inputs()
+
+    def test_a_layer_skipped_by_inputs_loses_its_earlier_record(self):
+        out = self.base / "adjudications"
+        out.mkdir()
+        (out / f"{NAME}.json").write_text("{}", encoding="utf-8")
+        index_path = self.work / "adjudication-inputs" / "index.json"
+        index = json.loads(index_path.read_text(encoding="utf-8"))
+        index["skipped"] = [{"layer": NAME, "reason": "host paths remain after scrubbing"}]
+        index["layers"] = []
+        index_path.write_text(json.dumps(index), encoding="utf-8")
+        quiet(adjudicate.main, ["assemble", "--work-dir", str(self.work), "--out", str(out)])
+        self.assertFalse((out / f"{NAME}.json").exists())
+
+    def test_collect_touches_only_the_snapshotted_items(self):
+        for order in adjudicate.ORDERS:
+            self.judgment("claude", order, "claude")
+        before = (self.work / "adjudication-judgments" / "claude" / f"{NAME}.AB.json").read_bytes()
+        adjudicate.write_json(self.work / "adjudication-judgments" / "claude" / adjudicate.CLAUDE_ARGS_SNAPSHOT,
+                              {"inputs": {}})
+        self.assertEqual(adjudicate.collect_claude(self.work, {"items": []}, "claude-opus-5-5"), [])
+        self.assertEqual((self.work / "adjudication-judgments" / "claude" / f"{NAME}.AB.json").read_bytes(), before)
+
+    def test_a_leak_on_an_input_rebuilt_after_claude_args_is_discarded(self):
+        adjudicate.claude_args(self.work, self.repo)
+        ab = self.work / "adjudication-inputs" / f"{NAME}.AB.json"
+        ab.write_text(ab.read_text(encoding="utf-8").replace("}", " }", 1), encoding="utf-8")
+        result = {"items": [{"name": NAME, "order": "AB", "packet_sha256": self.sha, "leak": {"stage": "judge",
+                             "text": "the Codex lane"}}]}
+        adjudicate.collect_claude(self.work, result, "claude-opus-5-5")
+        self.assertEqual(adjudicate.recorded_leaks(self.work), set())
 
 
 class InputScrubTests(AdjudicateFixture):
