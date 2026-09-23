@@ -143,6 +143,8 @@ class FakePort:
 
     async def stop(self):
         self.stopped += 1
+        if self.scenario.get("stop_raises"):
+            raise RuntimeError("stream thread still alive")
 
 
 class HarnessRuns(unittest.TestCase):
@@ -298,6 +300,31 @@ class HarnessRuns(unittest.TestCase):
         self.assertEqual((receipt["status"], code), ("cleanup_required", 3))
         self.assertEqual(len(self.markers()), 1)
         self.assertEqual(len(self.markers("IN_FLIGHT")), 1)
+
+    def test_prior_run_marker_refuses_before_any_transport(self):
+        for name in ("IN_FLIGHT", "CLEANUP_REQUIRED"):
+            with self.subTest(name=name):
+                stale = self.root / ("nf-old-" + name.lower())
+                stale.mkdir(parents=True)
+                (stale / name).write_text("{}\n")
+                FakePort.instances = []
+                code = h.run(self.env, self.root, self.out, factory=FakePort)
+                receipt = json.loads(self.out.read_text())
+                self.assertEqual((code, receipt["status"]), (2, "not_started"))
+                self.assertEqual(receipt["error"]["reason"], "prior_run_marker_present")
+                self.assertEqual(FakePort.instances, [])
+                (stale / name).unlink()
+
+    def test_in_flight_marker_is_fsynced_before_the_first_post(self):
+        with patch.object(h.os, "fsync", wraps=h.os.fsync) as fsync:
+            code, receipt, port = self.run_harness(run_root=self.root)
+        self.assertGreaterEqual(fsync.call_count, 2)  # the marker file and its directory
+        self.assertEqual(len(port.in_flight_at_first_post), 1)
+
+    def test_transport_stop_failure_is_never_a_pass(self):
+        code, receipt, port = self.run_harness(stop_raises=True)
+        self.assertEqual((receipt["status"], code), ("error", 1))
+        self.assertEqual(receipt["stop_error"]["type"], "RuntimeError")
 
     def test_state_root_must_be_dedicated(self):
         for bad in (self.state_base, self.state_base / "alpaca-paper", self.state_base / "alpaca-paper/x",

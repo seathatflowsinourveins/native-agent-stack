@@ -16,9 +16,11 @@ partial native evidence only (C01 and C02), with the best status
 The one live run (2026-09-23 14:20:24Z, from a read-only `git archive` of the
 harness commit) went exactly that way. The plan and engine source hashes in
 the receipt match this tree; its `harness_sha256` (742fb666...) is the harness
-as run. `harness.py` was changed after the run so that an exception inside
-cleanup still writes `CLEANUP_REQUIRED` and a receipt (the run itself cleaned
-up without error), so the next run binds a new harness hash.
+as run. `harness.py` was changed after the run, following review: an
+exception inside cleanup still writes `CLEANUP_REQUIRED` and a receipt (the run
+itself cleaned up without error), a leftover marker from an earlier run
+refuses a new start, the write-ahead marker is fsynced, and a failed transport
+stop fails the run. The next run therefore binds a new harness hash.
 
 | Case | Outcome | Evidence class | Broker requests |
 |---|---|---|---|
@@ -74,13 +76,18 @@ Bounds:
   stops new buy admissions and ends the case sequence. A second signal that
   arrives while cleanup is running logs `<SIG> received: cleanup in progress;
   not aborting, waiting for flat proof` to stderr and does not abort cleanup.
+- The run refuses to start (status `not_started`, exit 2, before reading
+  credentials or building a transport) while any earlier run directory under
+  the state root still holds `IN_FLIGHT` or `CLEANUP_REQUIRED`: that run may own
+  an order the broker has not shown yet.
 - The run refuses to start unless the account is flat with zero open orders
   (via `transport.snapshot()`). It also takes the engine's account-writer lock.
   The lock is taken after `transport.start()` opens the streams but before any
   write. It cannot come earlier: the transport's REST client sends every request
   through the owner loop that only `start()` sets, and a second client is out of
   bounds.
-- Before the first POST the harness writes `IN_FLIGHT` in the run directory.
+- Before the first POST the harness writes `IN_FLIGHT` in the run directory
+  and fsyncs the file and the directory.
   The marker holds the run id and the client-id prefix. It is removed only
   after cleanup proves flat, or when no write was ever attempted. SIGKILL or a
   host crash skips cleanup and leaves `IN_FLIGHT` in place. Recover by hand:
@@ -89,6 +96,7 @@ Bounds:
 - At most `max_posts` (4) POSTs, enforced ahead of the engine's own request
   budget.
 - It never retries and stops after the first failed or errored case.
+- A transport that fails to stop makes the run `error`, never a pass.
 - Cleanup always runs in `finally` on the same started transport:
   1. It cancels every non-terminal ledger intent that carries this run's
      client-id prefix.

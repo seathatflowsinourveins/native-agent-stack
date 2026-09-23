@@ -22,6 +22,7 @@ from datetime import datetime, timezone
 from decimal import ROUND_DOWN, Decimal
 import hashlib
 import json
+import os
 from pathlib import Path
 import secrets
 import signal
@@ -168,9 +169,20 @@ class Harness:
         return self.run_dir / "IN_FLIGHT"
 
     def mark_in_flight(self):
-        """Write-ahead marker before the first POST; SIGKILL leaves it for manual recovery."""
-        self.in_flight.write_text(json.dumps({"run_id": self.run_dir.name, "client_id_prefix": self.prefix,
-                                              "at": time.time()}) + "\n")
+        """Write-ahead marker before the first POST; SIGKILL leaves it for manual recovery.
+        The file and its directory are fsynced so a host crash after the POST keeps it."""
+        data = json.dumps({"run_id": self.run_dir.name, "client_id_prefix": self.prefix, "at": time.time()}) + "\n"
+        fd = os.open(self.in_flight, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+        try:
+            os.write(fd, data.encode())
+            os.fsync(fd)
+        finally:
+            os.close(fd)
+        dir_fd = os.open(self.run_dir, os.O_RDONLY)
+        try:
+            os.fsync(dir_fd)
+        finally:
+            os.close(dir_fd)
 
     def observe_response(self, observation):
         self.responses.append({"kind": observation["kind"], "status": observation["status"]})
@@ -404,7 +416,7 @@ class Harness:
         elif status is None:
             if self.interrupted:
                 status = "interrupted"
-            elif error:
+            elif error or stop_error:  # a transport that failed to stop never yields a pass
                 status = "error"
             elif (all(c["outcome"] == "passed" and c["evidence_class"] == "native_paper" for c in cases)
                   and cleanup and cleanup.get("flat") is True):
@@ -435,6 +447,17 @@ class Harness:
 def run(env_file, state_root, out, *, factory=None, plan_path=PLAN_PATH):
     plan, plan_sha = load_plan(plan_path)
     root = dedicated_root(state_root)
+    unresolved = sorted(str(p.relative_to(root)) for name in ("IN_FLIGHT", "CLEANUP_REQUIRED")
+                        for p in root.glob("*/" + name))
+    if unresolved:
+        # An earlier run may still own an order the broker has not shown yet: refuse
+        # before any credential read, transport or write until it is resolved by hand.
+        receipt = {"schema_version": 1, "kind": "native_fault_behaviour_receipt", "status": "not_started",
+                   "broker": "alpaca", "endpoint": "paper", "gate": "native-fault-behaviour",
+                   "error": {"type": "Refused", "reason": "prior_run_marker_present"}, "unresolved_markers": unresolved}
+        save(out, receipt)
+        print(json.dumps({"status": "not_started", "unresolved_markers": unresolved}))
+        return EXIT["not_started"]
     stamp = datetime.now(timezone.utc).strftime("%Y%m%dt%H%M%S")
     prefix = "nf-%s-%s-" % (stamp, secrets.token_hex(3))
     run_dir = root / prefix.rstrip("-")
