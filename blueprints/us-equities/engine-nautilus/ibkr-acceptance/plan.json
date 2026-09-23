@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "step": 1,
+  "step_title": "Read-only socket access, execution disabled",
+  "gate_id": "ibkr-local-acceptance",
+  "receipt_path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/receipt.json",
+  "host": "127.0.0.1",
+  "paper_ports": [4002, 7497],
+  "default_port": 4002,
+  "client_id": 71,
+  "client_id_note": "Declared unused: not assigned to any other adapter, session or probe in this repo. Must be verified free (no 'client id already in use' TWS API error 326) before reuse.",
+  "account_prefix_required": "DU",
+  "symbol": "SPY",
+  "instrument_id_candidates": ["SPY.ARCA", "SPY.NASDAQ", "SPY.SMART"],
+  "data_mode_declared": "DELAYED",
+  "data_mode_note": "Predeclared expectation: this paper account is not assumed to hold a live US equity market-data subscription. If the gateway grants REALTIME, the probe records REALTIME as observed; DELAYED is never upgraded to REALTIME in the receipt regardless of declared expectation. A quote reported as DELAYED never satisfies a case that later requires a current real-time feed.",
+  "max_acceptable_quote_age_seconds": 900,
+  "overall_timeout_seconds": 90,
+  "tcp_precheck_timeout_seconds": 5,
+  "per_call_timeout_seconds": 20,
+  "historical_bar_spec": "1-DAY",
+  "historical_bar_lookback_days": 5,
+  "evidence_class_connected": "native_paper_readonly",
+  "evidence_class_not_connected": "not_connected",
+  "execution_disabled": true,
+  "rc5_surface_used": {
+    "handshake_and_account_query": "Hand-rolled minimal read-only TWS API v100+ socket protocol (handshake, REQ_START_API, REQ_MANAGED_ACCTS, REQ_POSITIONS, REQ_ALL_OPEN_ORDERS, REQ_ACCOUNT_SUMMARY). No order-related outgoing message (PLACE_ORDER, CANCEL_ORDER, EXERCISE_OPTIONS, REQ_GLOBAL_CANCEL) is ever constructed or sent by probe.py.",
+    "contract_identity_and_bars": "nautilus_trader.adapters.interactive_brokers.HistoricalInteractiveBrokersClient + InteractiveBrokersInstrumentProvider (installed 2.0.0rc5), the officially bundled Rust-backed read-only surface for instrument/historical-bar retrieval.",
+    "rationale": "rc5's Python-exposed IB surface (see __init__.pyi) has no standalone class for account summary, positions or open orders outside a full TradingNode (msgbus/cache/clock) wiring, which is out of scope for this bounded step-1 probe; those items use the documented, stable, decades-old TWS API wire messages instead. Contract identity and historical bars use the rc5-bundled client directly rather than hand-rolled contract encoding, which is more version-fragile."
+  },
+  "notes": "Step 1 of blueprints/us-equities/engine-nautilus/acceptance-plan.md section 5. Execution is disabled throughout: no order submission path is constructed or reachable from probe.py."
+}

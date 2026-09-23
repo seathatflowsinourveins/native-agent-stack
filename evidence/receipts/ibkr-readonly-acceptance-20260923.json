@@ -1,0 +1,158 @@
+{
+  "id": "ibkr-readonly-acceptance-20260923",
+  "kind": "broker_readonly_acceptance",
+  "evidence_class": "native_paper_readonly",
+  "gate_id": "ibkr-local-acceptance",
+  "gate_status_after": "not_established",
+  "claim": "Acceptance-plan section 5 step 1 (read-only, execution disabled) against a signed-in IBKR paper IB Gateway: the official ibapi client probe returned status 'passed' and the NautilusTrader 2.0.0rc5 native adapter probe returned 'passed'. Partial evidence only: this is step 1 of 4; steps 2-4 need Nautilus native paper stock orders, which are blocked upstream (see blockers).",
+  "plan_path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/plan.json",
+  "plan_sha256": "edd7fba5a0e5167499eb3f4d2874125f4d50427bed939f01e4375b7e0726b57c",
+  "plan_written_utc": "2026-09-22T22:01:09Z",
+  "preregistered": false,
+  "plan_history": "plan.json was written before the first run and is kept verbatim, but was not independently reviewed before the run. Deviations: the hand-rolled TWS protocol probe it names failed its handshake and was replaced by the official ibapi client (ibapi_probe.py); client ids 73 (ibapi) and 76 (Nautilus) were used instead of 71; the Nautilus bar request uses 1-DAY-LAST and 5-MINUTE-LAST over 5 D.",
+  "probes": [
+    {
+      "client": "ibapi",
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/ibapi-readonly-20260923.json",
+      "sha256": "44dfaa71dabe3585aeb4045d7db7a5514ca3e76ef5981ad1a4767891bbb62d69"
+    },
+    {
+      "client": "nautilus",
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/nautilus-readonly-20260923.json",
+      "sha256": "a79d229be850078af872ccd9f5283c77f2f5b858debdd1758ad22c8f967a6414"
+    }
+  ],
+  "observed_summary": {
+    "paper_account_check": true,
+    "account_count": 1,
+    "positions": 0,
+    "open_orders": 0,
+    "summary_tags": [
+      "AccountType",
+      "BuyingPower",
+      "NetLiquidation",
+      "TotalCashValue"
+    ],
+    "spy_contract": {
+      "conId": 756733,
+      "secType": "STK",
+      "currency": "USD",
+      "exchange": "SMART",
+      "primaryExchange": "ARCA",
+      "longName": "SS SPDR S&P 500 ETF TRUST-US",
+      "tradingHoursSample": "20260923:0400-20260923:2000;20260924:040"
+    },
+    "market_data_type": "REALTIME",
+    "history_bars_ibapi": 87,
+    "server_minus_local_s": -1.256,
+    "ibapi_errors": [],
+    "nautilus_instrument": {
+      "id": "SPY.ARCA",
+      "class": "Equity",
+      "price_increment": "0.01",
+      "conId": 756733,
+      "primaryExchange": "ARCA",
+      "currency": "USD",
+      "elapsed_s": 0.002
+    },
+    "nautilus_bars": [
+      {
+        "spec": "1-DAY-LAST",
+        "end": "2026-09-22T20:00:00+00:00",
+        "duration": "5 D",
+        "count": 5,
+        "first": "SPY.ARCA-1-DAY-LAST-EXTERNAL,759.50,761.67,749.60,754.05,37772236,1789603199999999999",
+        "last": "SPY.ARCA-1-DAY-LAST-EXTERNAL,774.04,775.14,772.57,773.38,20070509,1790121599999999999",
+        "elapsed_s": 0.146
+      },
+      {
+        "spec": "5-MINUTE-LAST",
+        "end": "2026-09-22T20:00:00+00:00",
+        "duration": "5 D",
+        "count": 390,
+        "first": "SPY.ARCA-5-MINUTE-LAST-EXTERNAL,759.50,759.71,759.14,759.21,725714,1789565700000000000",
+        "last": "SPY.ARCA-5-MINUTE-LAST-EXTERNAL,774.36,774.36,773.29,773.44,1620113,1790107200000000000",
+        "elapsed_s": 0.193
+      }
+    ]
+  },
+  "attempts": [
+    {
+      "utc": "2026-09-23T13:11:51Z",
+      "client": "hand-rolled TWS protocol probe (builder draft, not committed)",
+      "status": "not_connected",
+      "detail": "ProtocolError connection_closed_during_read; a manual handshake from the same host returned server version 187, so the fault was the probe's protocol code"
+    },
+    {
+      "utc": "2026-09-23T13:14:36Z",
+      "client": "hand-rolled TWS protocol probe (builder draft, not committed)",
+      "status": "not_connected",
+      "detail": "same ProtocolError; probe replaced by the official ibapi client"
+    },
+    {
+      "utc": "2026-09-23T13:16:04Z",
+      "client": "ibapi_probe.py draft",
+      "status": "passed",
+      "detail": "error callback misparsed errorTime as the code (ibapi 10.45 signature); fixed before the next run"
+    },
+    {
+      "utc": "2026-09-23T13:16:53Z",
+      "client": "ibapi_probe.py draft",
+      "status": "passed",
+      "detail": "paper account, 0 positions/orders, SPY conId 756733, DELAYED, 156 5-min bars, only 2188 on history (bars still delivered); summary tags empty; the draft recorded a reversible account-id hash, so this receipt is not published"
+    },
+    {
+      "utc": "2026-09-23T13:18Z",
+      "client": "ad hoc Nautilus rc5 HistoricalInteractiveBrokersClient script",
+      "status": "instrument_only",
+      "detail": "SPY.ARCA resolved (conId 756733); request_bars 1-DAY-LAST and 5-MINUTE-LAST failed [2188] for a live end and for a past end 2026-09-22T20:00Z; 1-DAY-LAST-EXTERNAL rejected as an invalid spec"
+    },
+    {
+      "utc": "2026-09-23T13:23:58Z",
+      "client": "ibapi_probe.py (committed version)",
+      "status": "incomplete",
+      "detail": "10197 No market data during competing live session and 162 connected from a different IP address: the same username was signed in elsewhere; account summary tags returned (AccountType INDIVIDUAL)"
+    },
+    {
+      "utc": "2026-09-23T13:24:30Z",
+      "client": "nautilus_probe.py (committed version)",
+      "status": "refused_no_passed_paper_ibapi_receipt",
+      "detail": "precondition guard refused, as designed"
+    },
+    {
+      "utc": "2026-09-23T14:13:00Z",
+      "client": "ibapi_probe.py (committed version)",
+      "status": "passed",
+      "detail": "published as evidence/ibapi-readonly-20260923.json; REALTIME granted, no 2188, every request completed"
+    },
+    {
+      "utc": "2026-09-23T14:13Z",
+      "client": "nautilus_probe.py (committed version)",
+      "status": "passed",
+      "detail": "published as evidence/nautilus-readonly-20260923.json; SPY.ARCA resolved, 5 daily and 390 five-minute native bars"
+    }
+  ],
+  "blockers": [
+    {
+      "id": "rust-ibapi-2188",
+      "scope": "conditional: sessions where IB serves delayed data",
+      "effect": "Nautilus native historical bars fail on IB notice 2188 when the session lacks real-time API data (observed 13:18Z with DELAYED data; with REALTIME granted the native bars returned)",
+      "source": "rc5 Cargo.toml pins ibapi = \"=3.3.0\"; https://github.com/wboayue/rust-ibapi/issues/764 fixed by #765 (9d97926) in v4.0.0",
+      "unblock": "a NautilusTrader release with ibapi >= 4.0.0 (open PR https://github.com/nautechsystems/nautilus_trader/pull/5041 pins =4.1.0)"
+    },
+    {
+      "id": "nautilus-4983",
+      "effect": "Nautilus native stock orders are denied locally (venue IB never matches SMART)",
+      "source": "https://github.com/nautechsystems/nautilus_trader/issues/4983 (open)",
+      "unblock": "an upstream fix at the pinned release"
+    }
+  ],
+  "limitations": [
+    "Read-only step 1 only; acceptance-plan steps 2-4 (client-id ownership, bounded paper orders, reconnect/restart reconciliation) are not run.",
+    "Market-data type depends on the session: DELAYED at 13:16Z (pre-market), none during a competing session at 13:23Z (10197), REALTIME at 14:13Z; a delayed quote never satisfies a case that needs a current real-time feed.",
+    "The paper-account check comes from the ibapi probe; the Nautilus historical client has no account query of its own.",
+    "One session on one host (Windows IB Gateway 10.50 reached from WSL over mirrored networking); not a new-host acceptance.",
+    "Account ids are not recorded, not even hashed; balances are not recorded."
+  ],
+  "observed_utc": "2026-09-23T14:13:00.049339+00:00"
+}

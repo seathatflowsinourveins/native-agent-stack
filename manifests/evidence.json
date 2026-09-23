@@ -918,7 +918,7 @@
         "prometheus",
         "loki"
       ],
-      "claim": "After native sign-in restored readiness, the freshly reproduced SDK completed a real LEAN backtest\u2192Dagu\u2192DuckDB\u2192GPT-6 Astra\u2192Claude Opus 5 prepared-packet research workflow; both native reports passed structural citation/value/unit/scope checks and the accepted Astra report was bound into Claude's prompt by verified hashes.",
+      "claim": "After native sign-in restored readiness, the freshly reproduced SDK completed a real LEAN backtest→Dagu→DuckDB→GPT-6 Astra→Claude Opus 5 prepared-packet research workflow; both native reports passed structural citation/value/unit/scope checks and the accepted Astra report was bound into Claude's prompt by verified hashes.",
       "limitations": [
         "This validates a bounded historical simulation research workflow on the authoring host, not a profitable strategy, current market source, broker execution or unattended production service.",
         "The two reported model tasks used no model tools. Their native hooks and telemetry remain separate evidence; this does not repeat every MCP, memory or GPU-RAG behavior.",
@@ -1900,7 +1900,7 @@
       "component_ids": [
         "ai-memory"
       ],
-      "claim": "Mac arm64 synthetic2.3.1\u21922.3.2 migration, scoped exact reads/FTS, reserved and Unicode paths, restart and no-capture checks passed.",
+      "claim": "Mac arm64 synthetic2.3.1→2.3.2 migration, scoped exact reads/FTS, reserved and Unicode paths, restart and no-capture checks passed.",
       "limitations": [
         "Separate synthetic store and explicit no-model policy only; no production migration claimed by this receipt.",
         "OS filesystem/network confinement was not established; failed restricted-sandbox attempt retained. Native execution succeeded without security overrides; Gatekeeper assessment rejected the ad-hoc distribution.",
@@ -6953,6 +6953,36 @@
       "bytes": 12245
     },
     {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/README.md",
+      "sha256": "2ce48f560a4b9ffded5f526d1fd9f4c070951a141246c760b5ee17cf3332dd14",
+      "bytes": 4046
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/ibapi-readonly-20260923.json",
+      "sha256": "44dfaa71dabe3585aeb4045d7db7a5514ca3e76ef5981ad1a4767891bbb62d69",
+      "bytes": 1938
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/nautilus-readonly-20260923.json",
+      "sha256": "a79d229be850078af872ccd9f5283c77f2f5b858debdd1758ad22c8f967a6414",
+      "bytes": 1449
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/ibapi_probe.py",
+      "sha256": "7eac1f3abceb85fcc2aa7022fb002bdeebfc822ca4cd580a5649f076fb266fa7",
+      "bytes": 8916
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/nautilus_probe.py",
+      "sha256": "22fb6f3825bc215a00052ed0bce17c3c5882819e5260f0719ea6f2c2c50f8c42",
+      "bytes": 6043
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/plan.json",
+      "sha256": "edd7fba5a0e5167499eb3f4d2874125f4d50427bed939f01e4375b7e0726b57c",
+      "bytes": 2741
+    },
+    {
       "path": "blueprints/us-equities/engine-nautilus/observe_quickstart.py",
       "sha256": "b5cb94472619f6cd5432b7e410f4657fcf8db966fada9032c7dc188739565d30",
       "bytes": 2625
@@ -8424,8 +8454,8 @@
     },
     {
       "path": "catalogs/us-equities/gates-20260922.json",
-      "sha256": "cdffd15ba27c092792c1dd709bbb86c7a12b2881efea8977b802adc25a87a54d",
-      "bytes": 27680
+      "sha256": "8d2f052d10b8e57b2623821df4a0827d89d5964cba9df9dfdfe2ad38afae4ba0",
+      "bytes": 28507
     },
     {
       "path": "catalogs/us-equities/hosting-source-review.json",
@@ -13228,6 +13258,11 @@
       "bytes": 3678
     },
     {
+      "path": "evidence/receipts/ibkr-readonly-acceptance-20260923.json",
+      "sha256": "b898b1ca00e631950de8bb391b9f7e28f542980fd880a899261dedf14e98b7a7",
+      "bytes": 7744
+    },
+    {
       "path": "evidence/receipts/mac-memory-patch-20260920.json",
       "sha256": "b8d09fda1ad56976d57d938af0eb7076223c79e39b2261ef4521413b15d8a0f1",
       "bytes": 893
@@ -14476,6 +14511,11 @@
       "path": "tests/test_host_receipts.py",
       "sha256": "5a11f68bee22d1311375cacf88c68683c66e815f229fc30f2ee3290056905fe1",
       "bytes": 60927
+    },
+    {
+      "path": "tests/test_ibkr_acceptance.py",
+      "sha256": "b47c0359da54ab5c5e73cfff0feafe1784c213b659a56d42eecc449bc33343cb",
+      "bytes": 6679
     },
     {
       "path": "tests/test_job_recovery.py",
