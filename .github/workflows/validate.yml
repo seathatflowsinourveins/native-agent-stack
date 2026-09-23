@@ -141,7 +141,18 @@ jobs:
           if [ -z "$base" ] || [ -z "${base//0/}" ]; then
             base="$(git rev-parse HEAD^)"
           fi
-          python3 scripts/verdict_review_gate.py --base "$base" | tee -a "$GITHUB_STEP_SUMMARY"
+          # The rules come from the base: run the base commit's gate (and the code it imports) against
+          # this checkout, so a pull request cannot weaken the gate that judges it. Only the pull
+          # request that adds the gate finds none at its base and runs its own copy.
+          gate="scripts/verdict_review_gate.py"
+          if git cat-file -e "$base:$gate" 2>/dev/null; then
+            git worktree add --quiet --detach "$RUNNER_TEMP/gate-base" "$base"
+            gate="$RUNNER_TEMP/gate-base/$gate"
+          else
+            echo "verdict-review-gate: the base has no gate yet; running this checkout's copy (bootstrap)"
+          fi
+          set -o pipefail
+          python3 "$gate" --root "$GITHUB_WORKSPACE" --base "$base" | tee -a "$GITHUB_STEP_SUMMARY"
 
   secret-scan:
     runs-on: ubuntu-24.04

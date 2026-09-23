@@ -362,8 +362,16 @@ class VerdictReviewGateTests(unittest.TestCase):
         self.assertIn("BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}", gate)
         run = gate.split("run: |", 1)[1]
         self.assertNotIn("${{", run, "no expression is interpolated into the shell script")
-        self.assertIn('python3 scripts/verdict_review_gate.py --base "$base"', run)
         self.assertNotIn("continue-on-error", gate)
+
+    def test_the_gate_that_runs_is_the_base_commits_copy(self):
+        # Review of #123, finding 2: a pull request must not be judged by a gate it edited.
+        run = step_block(self.job, "Require sealed cross-family review").split("run: |", 1)[1]
+        self.assertIn('git worktree add --quiet --detach "$RUNNER_TEMP/gate-base" "$base"', run)
+        self.assertIn('gate="$RUNNER_TEMP/gate-base/$gate"', run)
+        self.assertIn('if git cat-file -e "$base:$gate"', run)
+        self.assertIn('python3 "$gate" --root "$GITHUB_WORKSPACE" --base "$base"', run)
+        self.assertIn("set -o pipefail", run.split('python3 "$gate"', 1)[0])
 
 
 class SupplyChainGateTests(unittest.TestCase):

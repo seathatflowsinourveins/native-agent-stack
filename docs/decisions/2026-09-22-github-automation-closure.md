@@ -642,27 +642,51 @@ Hosted and live results after merge. Evidence class: hosted runs and GitHub API 
   - a registered wave document and a registered run manifest that lists the row;
   - registered, hash-matching sealed returns from two distinct model families;
   - an agreement that matches the one recomputed from the two sealed returns, and winners that
-    match the chosen lane's keys resolved through the sealed packet, with that lane's evidence
-    class and `why_selected` and the packet's pin. With no sealed packet the row fails closed until
-    finding 6 lands;
+    match the chosen lane's keys resolved through the sealed packet, with the candidate's
+    repository, recipe reference and pin and that lane's evidence class and `why_selected`. With no
+    sealed packet the row fails closed until finding 6 lands;
+  - published `alternatives`, `verdict_overturn_when` and `overturn_protocol` equal to what
+    `record_verdicts.py` derives from the sealed returns (`open_gaps` is re-checked with the row,
+    not re-derived);
   - for a `disagree` row, an adjudication in which judges from both lane families agree in both
     presentation orders with no refuting vote. A third-family judge is recorded but not required;
   - for a `codex_absent` row, a `docs/decisions/` record that carries
     `single-lane-authorization: <catalog>/<layer_id>`.
 
   Every changed `platform_status` value must be the one `scripts/platform_status.py` derives.
-  Every base wave entry except the newest must be unchanged. `.github/main-ruleset.json` adds the
+  Every base wave entry except the newest must be unchanged. The rows always come from
+  `build_verdicts.LEDGER_FILES`, and the head's landscape manifest must name exactly those files,
+  so a decoy ledger cannot be validated in place of the published one. The job runs the base
+  commit's copy of the gate against the PR checkout. A PR that changes verdict rows, waves or
+  sealed artifacts together with the gate's trust base (the gate, the modules it imports and
+  runs, the verdict tools, `validate.yml`) fails. `.github/main-ruleset.json` adds the
   check. The coordinator applies the ruleset after merge, and until then the check reports but
   does not block.
-- **Measured.** `tests/test_verdict_review_gate.py` has 45 synthetic-fixture tests. They cover the
+- **Review of the gate (2026-09-23).** An independent review found a decoy-ledger bypass (the
+  manifest could point `scripts/landscape.py` at a copy while the published ledger changed), that
+  the gate ran the PR's own code, that a winner's repository and recipe reference and the published
+  alternatives were not tied to the sealed evidence, and that a base read error counted as an absent
+  file. All four are closed with a negative-control test each. It also noted that
+  `strict_required_status_checks_policy` stays `false` (a standing choice asserted by
+  `tests/test_workflow_hardening.py`): a squash merged after `main` gained or changed a wave is then
+  judged against the older base, and only the push-to-`main` run catches it, after the merge.
+- **Measured.** `tests/test_verdict_review_gate.py` has 61 synthetic-fixture tests (45 before the review). They cover the
   negative controls (missing, stale or unregistered lane files, same-family lanes, adjudications
   that are missing, one-order, one-family or refuted, a row missing from its run manifest, an
   unregistered wave, a declared platform upgrade, edited winner fields, a relabelled agreement, mismatched packets,
   swapped winners, missing packets, the single-lane path rules and a rewritten earlier wave) and
   the positive controls. Two mutations of the real checkout both exit 1 and were then restored:
   moving `foundation/workers` into an unsealed 20260923 wave, and deleting one of its sealed
-  20260922 lane files.
+  20260922 lane files. After the review, further real-checkout mutations also exit 1: a decoy
+  landscape manifest with an unevidenced real-ledger edit, and a head that widens
+  `GRANDFATHERED_RUN_IDS` judged by the base's gate.
 - **Overturn.** A merged PR that changes a verdict row without the sealed cross-family evidence
   while this check was required. The other trigger is a second maintainer joining, which would
-  make required approvals possible. The gate runs from the PR's own checkout, so a PR that edits
-  the gate or `validate.yml` is caught only by review of that diff.
+  make required approvals possible. The gate script comes from the base, but the job definition
+  comes from the PR (a `pull_request` workflow runs the PR's `validate.yml`). A PR that edits the
+  `verdict-review-gate` job itself so that it no longer runs the base's gate is therefore not closed
+  by this check: the trust-base rule only fires when the base's gate still runs. Closing that needs
+  a workflow the PR cannot edit, for example a ruleset-required workflow from another repository or
+  a `pull_request_target` job. Neither is adopted here: the first is documented for organization rulesets
+  (not checked for this user-owned repository) and the second is the pattern zizmor's dangerous-triggers audit rejects. Either one, once
+  qualified, would overturn this residual gap.

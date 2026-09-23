@@ -3,12 +3,14 @@
 
 The catalog has a single human maintainer, so required approvals cannot be the control
 (docs/decisions/2026-09-22-github-automation-closure.md, "verdict-review-gate (2026-09-23)").
-This check compares the landscape ledger rows (``catalogs/landscape/manifest.json#/catalogs``)
-at ``--base`` (resolved to its merge base with the head) with the head checkout, keyed by
+This check compares the landscape ledger rows (``build_verdicts.LEDGER_FILES``, the ledgers the
+published wave documents are generated from; the head's ``catalogs/landscape/manifest.json#/catalogs``
+must name exactly those) at ``--base`` (resolved to its merge base with the head) with the head checkout, keyed by
 ``(catalog, layer_id, run_id)`` where ``run_id`` comes from ``lanes.sealed_base``
 (``scripts/landscape.py`` ``run_id_of``; absent means the grandfathered 2026-09-22 wave), and
-lists every row added or changed in ``winners`` (including ``platform_status``), ``lanes`` or
-``verdict_status``.
+lists every row added or changed in ``VERDICT_FIELDS`` (``winners`` including ``platform_status``,
+``lanes``, ``verdict_status`` and the published ``alternatives``, ``verdict_overturn_when``,
+``overturn_protocol`` and ``open_gaps``).
 
 For each changed row outside ``GRANDFATHERED_RUN_IDS`` it requires, at the head:
 
@@ -30,15 +32,24 @@ For each changed row outside ``GRANDFATHERED_RUN_IDS`` it requires, at the head:
   ``single-lane-authorization: <catalog>/<layer_id>`` (and matching
   ``lanes.single_lane_decision_sha256`` when the row stores one; review finding 2).
 
-Each winner's ``evidence_class``, ``why_selected`` and packet ``pin`` must be the chosen lane's, and
+Each winner's ``repository``, ``recipe_ref``, ``evidence_class``, ``why_selected`` and packet ``pin``
+must be what ``record_verdicts.build_winners`` copies from the chosen lane and the packet; the
+published ``alternatives``, ``verdict_overturn_when`` and ``overturn_protocol`` must be the ones
+``record_verdicts`` derives from the sealed returns (``open_gaps`` is not re-derived); and
 every changed ``platform_status`` value must be what ``scripts/platform_status.py``
 ``platform_status()`` derives; a row whose only change is ``platform_status`` needs nothing else. A changed
 grandfathered row is reported and passes here (``build_verdicts.py --check`` freezes it). Every
 wave registry entry at the base except the newest, and every grandfathered entry, must be
 unchanged at the head, with its document (review finding 4). When a row, a wave or any path under
 ``VERDICT_PATHSPECS`` changed, ``scripts/landscape.py`` and ``tools/sota-convergence/build_verdicts.py
---check`` then run on the head. Exit 0 prints one line when nothing of that changed; otherwise every
-violation is printed with its row key and the exit code is 1 (2 for an unresolvable revision).
+--check`` then run on the head.
+
+The gate's own rules are trusted only from the base: CI runs the base commit's copy of this script
+against the head checkout (``--root``), and a change to a verdict row, wave or sealed artifact fails
+when the same comparison also changes a ``TRUST_PATHS`` file, so a weakening of the rules has to land
+(and be seen) in its own pull request first. Exit 0 prints one line when nothing of that changed;
+otherwise every violation is printed with its row key and the exit code is 1 (2 for an unresolvable
+revision or an unreadable or malformed base or head ledger, manifest or wave registry).
 """
 
 from __future__ import annotations
@@ -69,7 +80,10 @@ from scripts.catalog_decisions import safe_file  # noqa: E402
 from scripts.host_receipts import evidence_files  # noqa: E402
 from build_manifest import sanitize_value  # noqa: E402
 from build_verdicts import LEDGER_FILES, WAVE_REGISTRY  # noqa: E402
-from record_verdicts import derive_component_id, parse_sha256sums  # noqa: E402
+from record_verdicts import (  # noqa: E402
+    build_alternatives, canonical, choose_overturn_protocol, derive_component_id, load_canonical_index,
+    parse_sha256sums, safe_identity,
+)
 
 # Review finding 6: the follow-up PR seals lane_packets.py's packets/ and SHA256SUMS under each
 # wave's sealed base. Keep this constant and sealed_packet() aligned with that PR.
@@ -80,7 +94,20 @@ SINGLE_LANE_DECISION_SHA256_FIELD = "single_lane_decision_sha256"
 SINGLE_LANE_DECISION_DIR = "docs/decisions/"
 SINGLE_LANE_MARKER = "single-lane-authorization:"
 WAVE_DOCUMENT_PREFIX = "catalogs/sota-convergence/layer-verdicts-"
-VERDICT_FIELDS = ("winners", "lanes", "verdict_status")
+VERDICT_FIELDS = ("winners", "lanes", "verdict_status", "alternatives", "verdict_overturn_when",
+                  "overturn_protocol", "open_gaps")
+# The alternative fields build_verdicts.build_verdict_row publishes in the wave document.
+PUBLISHED_ALTERNATIVE_FIELDS = ("name", "repository", "disposition", "why_not_default", "evidence_class", "source")
+# The code the gate's verdict depends on (this script, what it imports and runs, and the workflow
+# that runs it). A pull request that changes one of these and a verdict row, wave or sealed artifact
+# in the same comparison fails: the rules change first, on its own.
+TRUST_PATHS = (
+    "scripts/verdict_review_gate.py", "scripts/landscape.py", "scripts/platform_status.py",
+    "scripts/catalog_decisions.py", "scripts/host_receipts.py",
+    "tools/sota-convergence/build_verdicts.py", "tools/sota-convergence/record_verdicts.py",
+    "tools/sota-convergence/build_manifest.py", "tools/sota-convergence/lane_packets.py",
+    "tools/sota-convergence/lane-return.schema.json", ".github/workflows/validate.yml",
+)
 # Any change under these paths runs the repository validators even when no row changed: a PR
 # that only deletes or rewrites a sealed lane file must still meet scripts/landscape.py.
 VERDICT_PATHSPECS = (SEALED_BASE_PREFIX + "*", "catalogs/landscape/", "catalogs/sota-convergence/")
@@ -93,6 +120,10 @@ REPO_VALIDATORS = (
 
 class RevisionError(ValueError):
     """A --base or --head revision git cannot resolve."""
+
+
+class ReadError(ValueError):
+    """A file the comparison needs exists but cannot be read or parsed (the gate fails closed)."""
 
 
 def git_environment():
@@ -129,8 +160,15 @@ class Side:
 
     def read(self, path):
         if self.commit is not None:
+            # Absent from the tree is None; any other failure to read an object that exists is an error,
+            # so a read failure cannot pass for "the base had no wave registry".
+            if git(self.root, "cat-file", "-e", f"{self.commit}:{path}", check=False).returncode != 0:
+                return None
             result = git(self.root, "show", f"{self.commit}:{path}", check=False)
-            return result.stdout if result.returncode == 0 else None
+            if result.returncode != 0:
+                raise ReadError(f"cannot read {path} at {self.commit[:12]}: "
+                                f"{result.stderr.decode(errors='replace').strip()}")
+            return result.stdout
         try:
             target = safe_file(self.root, path)
         except ValueError:
@@ -138,13 +176,15 @@ class Side:
         return target.read_bytes() if target.is_file() else None
 
     def json(self, path):
+        """The parsed file, None when absent; a file that exists but is not JSON raises ReadError."""
         data = self.read(path)
         if data is None:
             return None
         try:
             return json.loads(data)
-        except ValueError:
-            return None
+        except ValueError as error:
+            where = self.commit[:12] if self.commit is not None else "the head"
+            raise ReadError(f"{path} at {where} is not JSON ({error})") from None
 
 
 def row_waves(catalog, row):
@@ -165,11 +205,11 @@ def row_waves(catalog, row):
 
 
 def load_rows(side):
-    """{(catalog, layer_id, run_id): row} for every ledger row carrying the verdict fields."""
-    manifest = side.json(MANIFEST) or {}
-    documents = manifest.get("catalogs") if isinstance(manifest.get("catalogs"), dict) else LEDGER_FILES
+    """{(catalog, layer_id, run_id): row} for every ledger row carrying the verdict fields. The rows
+    come from build_verdicts.LEDGER_FILES, the files the published wave documents are generated
+    from, never from the manifest (which a pull request could point at a decoy ledger)."""
     rows = {}
-    for catalog, path in sorted(documents.items()):
+    for catalog, path in sorted(LEDGER_FILES.items()):
         document = side.json(path) or {}
         for row in document.get("layers") or []:
             if not (isinstance(row, dict) and isinstance(row.get("layer_id"), str)
@@ -178,6 +218,18 @@ def load_rows(side):
             run_id, _named = row_waves(catalog, row)
             rows[(row.get("catalog", catalog), row["layer_id"], run_id)] = row
     return rows
+
+
+def ledger_binding_violations(head):
+    """The head's landscape manifest must name exactly build_verdicts.LEDGER_FILES: scripts/landscape.py
+    validates the ledgers the manifest names, and the published verdicts come from LEDGER_FILES."""
+    manifest = head.json(MANIFEST)
+    catalogs = manifest.get("catalogs") if isinstance(manifest, dict) else None
+    if catalogs == LEDGER_FILES:
+        return []
+    return [{"row": "repository", "message": f"{MANIFEST}#/catalogs is {catalogs!r}, not the ledgers the published "
+             f"verdicts are generated from ({LEDGER_FILES!r}); scripts/landscape.py would validate other files "
+             "than the ones build_verdicts.py publishes"}]
 
 
 def load_waves(side):
@@ -206,7 +258,7 @@ def change_kind(old, new):
         return "added"
     if all(old.get(field) == new.get(field) for field in VERDICT_FIELDS):
         return None
-    if (old.get("lanes") == new.get("lanes") and old.get("verdict_status") == new.get("verdict_status")
+    if (all(old.get(field) == new.get(field) for field in VERDICT_FIELDS if field != "winners")
             and without_platform_status(old.get("winners")) == without_platform_status(new.get("winners"))):
         return "platform_status"
     return "changed"
@@ -315,9 +367,14 @@ class RowCheck:
             self.fail(f"the sealed packet's sha256 {sealed_packet_sha256} is not the packet_sha256 the lanes judged "
                       f"({packet_sha256})")
             candidates = None
+        if returns:
+            self.check_overturn_protocol(returns)
         if status != "recorded":
             if self.row.get("winners"):
                 self.fail(f"a {status!r} row carries winners; only a recorded verdict names winners")
+            if self.row.get("alternatives") or self.row.get("verdict_overturn_when"):
+                self.fail(f"a {status!r} row carries alternatives or verdict_overturn_when; record_verdicts.py "
+                          "publishes them only with a recorded verdict")
             return
         chosen = None
         if agreement == "same_winner":
@@ -342,14 +399,25 @@ class RowCheck:
                       f"packet ({expected})")
             return
         self.check_winner_fields(returns[chosen], chosen, winners, candidates)
+        self.check_published_alternatives(returns, chosen, winners)
 
     def check_winner_fields(self, sealed_return, lane, winners, candidates):
         """The fields record_verdicts.build_winners copies from the chosen lane and the packet."""
-        pins = {derive_component_id(candidates[key]): candidates[key].get("pin")
-                for key in sealed_return.get("winner_keys") or [] if key in candidates}
+        chosen = {derive_component_id(candidates[key]): candidates[key]
+                  for key in sealed_return.get("winner_keys") or [] if key in candidates}
+        pins = {component_id: candidate.get("pin") for component_id, candidate in chosen.items()}
         why_selected = sanitize_value(sealed_return.get("why_selected"))
+        ledger_path = LEDGER_FILES.get(self.key[0])
         for winner in winners:
             component_id = winner.get("component_id")
+            candidate = chosen.get(component_id) or {}
+            if winner.get("repository") != candidate.get("repository"):
+                self.fail(f"winner {component_id}: repository {winner.get('repository')!r} is not the sealed packet "
+                          f"candidate's {candidate.get('repository')!r}")
+            recipe_ref = candidate.get("recipe_ref") or ledger_path
+            if winner.get("recipe_ref") != recipe_ref:
+                self.fail(f"winner {component_id}: recipe_ref {winner.get('recipe_ref')!r} is not {recipe_ref!r} "
+                          "(the sealed packet candidate's, else the row's ledger)")
             if winner.get("evidence_class") != sealed_return.get("winner_evidence_class"):
                 self.fail(f"winner {component_id}: evidence_class {winner.get('evidence_class')!r} is not the {lane} "
                           f"lane's winner_evidence_class {sealed_return.get('winner_evidence_class')!r}")
@@ -358,6 +426,41 @@ class RowCheck:
             if pins.get(component_id) and winner.get("pin") != pins[component_id]:
                 self.fail(f"winner {component_id}: pin {winner.get('pin')!r} is not the sealed packet's "
                           f"{pins[component_id]!r}")
+
+    def check_published_alternatives(self, returns, lane, winners):
+        """The alternatives and verdict_overturn_when record_verdicts.py derives from the sealed
+        returns, compared on the fields the wave document publishes."""
+        try:
+            identities, aliases = load_canonical_index(self.head.root)
+        except (OSError, KeyError, TypeError, ValueError) as error:
+            self.fail(f"the canonical repository index cannot be loaded to derive the alternatives ({error!r})")
+            return
+        computed, _gaps = build_alternatives(returns, identities, aliases, None, None)
+        winner_ids = {canonical(safe_identity(winner.get("repository")), aliases) for winner in winners
+                      if safe_identity(winner.get("repository"))}
+        expected = [alternative for alternative in sanitize_value(computed)
+                    if canonical(safe_identity(alternative["repository"]), aliases) not in winner_ids]
+
+        def published(alternatives):
+            return [{field: alternative.get(field) for field in PUBLISHED_ALTERNATIVE_FIELDS}
+                    if isinstance(alternative, dict) else alternative for alternative in alternatives or []]
+
+        if published(self.row.get("alternatives")) != published(expected):
+            self.fail(f"alternatives are not the ones record_verdicts.py derives from the sealed lane returns "
+                      f"(expected {[a.get('repository') for a in expected]}, got "
+                      f"{[a.get('repository') for a in self.row.get('alternatives') or [] if isinstance(a, dict)]}, "
+                      f"compared on {', '.join(PUBLISHED_ALTERNATIVE_FIELDS)})")
+        overturn = sanitize_value(returns[lane].get("overturn_when"))
+        if self.row.get("verdict_overturn_when") != overturn:
+            self.fail(f"verdict_overturn_when differs from the sealed {lane} lane return's overturn_when")
+
+    def check_overturn_protocol(self, returns):
+        try:
+            expected = sanitize_value(choose_overturn_protocol(returns))
+        except (KeyError, TypeError):
+            expected = None
+        if self.row.get("overturn_protocol") != expected:
+            self.fail("overturn_protocol is not the one record_verdicts.py chooses from the sealed lane returns")
 
     def check_wave(self, run_id):
         entry = self.waves.get(run_id)
@@ -568,6 +671,14 @@ def changed_verdict_paths(head_root, base):
                    for line in result.stdout.decode().splitlines() if line})
 
 
+def changed_trust_paths(head_root, base):
+    """TRUST_PATHS files that differ between ``base`` and the head checkout."""
+    tracked = git(head_root, "diff", "--name-only", "--no-renames", base, "--", *TRUST_PATHS, check=False)
+    untracked = git(head_root, "ls-files", "--others", "--exclude-standard", "--", *TRUST_PATHS, check=False)
+    return sorted({line for result in (tracked, untracked) if result.returncode == 0
+                   for line in result.stdout.decode().splitlines() if line})
+
+
 def run_repo_validators(head_root):
     violations = []
     for name, (script, *arguments) in REPO_VALIDATORS:
@@ -609,12 +720,22 @@ def evaluate(root, base, head_root=None, *, validators=run_repo_validators):
     waves_changed = base_waves != head_waves or any(
         base_side.read(entry["path"]) != head_side.read(entry["path"])
         for entry in list(base_waves.values()) + list(head_waves.values()) if isinstance(entry.get("path"), str))
+    violations.extend(ledger_binding_violations(head_side))
     artifacts = changed_verdict_paths(head_root, base)
     touched = bool(changes or removed or waves_changed or artifacts)
+    # A verdict change is a row, a wave or a sealed/published verdict artifact; an edit to the
+    # ledgers' other fields (catalogs/landscape/) may land together with a rules change.
+    verdict_changed = bool(changes or removed or waves_changed
+                           or any(not path.startswith("catalogs/landscape/") for path in artifacts))
+    trust = changed_trust_paths(head_root, base)
+    if verdict_changed and trust:
+        violations.append({"row": "repository", "message": (
+            f"this change edits verdict rows, waves or sealed verdict artifacts and also the gate's trust base "
+            f"({', '.join(trust)}); land the rules change in its own pull request first")})
     if touched and validators is not None:
         violations.extend(validators(head_root))
     return {"base": base, "changes": changes, "removed": removed, "waves_changed": waves_changed,
-            "changed_paths": artifacts,
+            "changed_paths": artifacts, "trust_paths_changed": trust,
             "touched": touched, "violations": violations,
             "status": "failed" if violations else "passed"}
 
@@ -665,7 +786,7 @@ def main(argv=None):
             git(root, "worktree", "add", "--quiet", "--detach", worktree, head)
             head_root = Path(worktree)
         report = evaluate(root, base, head_root)
-    except RevisionError as error:
+    except (RevisionError, ReadError) as error:
         print(f"verdict-review-gate: {error}")
         return 2
     finally:

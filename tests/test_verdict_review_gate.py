@@ -35,6 +35,10 @@ PACKET = {"catalog": "foundation", "layer_id": "beta", "candidates": [
 ]}
 COMPONENTS = {"c1": "comp-one", "c2": "comp-two"}
 DECISION = "docs/decisions/2026-09-23-single-lane.md"
+INDEX = "catalogs/us-equities/decision-index.json"
+ALTERNATIVE = {"name": "Alt", "repository": "https://github.com/example/alt", "disposition": "rejected",
+               "why_not_default": "fixture alternative", "evidence_class": "source_review", "evidence_refs": []}
+PROTOCOL = {"metric": "fixture metric", "arms": [], "fixture_paths": []}
 
 
 def sha(data: bytes) -> str:
@@ -46,8 +50,9 @@ def dump(value) -> bytes:
 
 
 def winner(component_id, linux="not_established", macos="untested"):
-    return {"component_id": component_id, "repository": None, "pin": "1.0", "evidence_class": "source_review",
-            "why_selected": "fixture", "evidence_refs": [], "recipe_ref": "recipes/README.md",
+    repository = next(c["repository"] for c in PACKET["candidates"] if c["component_id"] == component_id)
+    return {"component_id": component_id, "repository": repository, "pin": "1.0", "evidence_class": "source_review",
+            "why_selected": "fixture", "evidence_refs": [], "recipe_ref": LEDGERS["foundation"],
             "platform_status": {"linux-wsl2-x86_64": linux, "macos-arm64": macos}}
 
 
@@ -74,7 +79,9 @@ class GateFixture(unittest.TestCase):
         self.git("init", "--quiet", "--initial-branch=main")
         self.registered, self.registered_overrides = set(), {}
         self.manifest_entries, self.new_wave = {}, False
-        self.write(MANIFEST, dump({"schema_version": 1, "catalogs": LEDGERS}))
+        self.manifest = {"schema_version": 1, "catalogs": dict(LEDGERS), "sources": {"repository_index": INDEX}}
+        self.write(INDEX, dump({"aliases": {}, "records": [
+            {"repository": c["repository"]} for c in PACKET["candidates"]] + [{"repository": ALTERNATIVE["repository"]}]}))
         self.ledger = {"foundation": [self.grandfathered_row("alpha")], "us-equities": []}
         self.waves = {}
         self.add_wave("20260922", b'{"wave": "20260922"}\n')
@@ -104,6 +111,7 @@ class GateFixture(unittest.TestCase):
                                   "sha256": sha(document)}
 
     def flush(self):
+        self.write(MANIFEST, dump(self.manifest))
         for catalog, path in LEDGERS.items():
             self.write(path, dump({"schema_version": 2, "layers": self.ledger[catalog]}))
         self.write(REGISTRY, dump({"schema_version": 1, "waves": [self.waves[r] for r in sorted(self.waves)]}))
@@ -171,7 +179,9 @@ class GateFixture(unittest.TestCase):
         for lane, keys, model, packet_sha in sealed:
             data = dump({"schema_version": 1, "lane": lane, "catalog": "foundation", "layer_id": layer_id,
                          "packet_sha256": packet_sha, "model": model, "winner_keys": list(keys),
-                         "winner_evidence_class": "source_review", "why_selected": "fixture"})
+                         "winner_evidence_class": "source_review", "why_selected": "fixture",
+                         "overturn_when": f"{lane} overturn", "overturn_protocol": PROTOCOL,
+                         "alternatives": [ALTERNATIVE]})
             path = f"{SEALED}/{lane}/{run_id}.json"
             self.write(path, data)
             if register_lanes:
@@ -181,12 +191,13 @@ class GateFixture(unittest.TestCase):
         if agreement is None:
             agreement = ("same_winner" if set(claude_keys) == set(codex_keys) else "disagree") if codex else "codex_absent"
         lanes["agreement"] = agreement
-        chosen_keys = claude_keys
+        chosen_keys, chosen_lane = claude_keys, "claude"
         if judged is not None:
             path = f"{SEALED}/adjudication/{run_id}.json"
             self.write(path, dump(judged))
             self.register(path)
-            chosen_keys = claude_keys if judged.get("winner_lane") != "codex" else codex_keys
+            if judged.get("winner_lane") == "codex":
+                chosen_keys, chosen_lane = codex_keys, "codex"
         if single_lane is not None:
             lanes["single_lane_decision"] = single_lane
         if in_run_manifest:
@@ -194,8 +205,12 @@ class GateFixture(unittest.TestCase):
                                                "packet_sha256": sha(packet_bytes), "lanes": outcomes}
         self.add_wave(RUN, b'{"wave": "20260923"}\n', register=register_wave)
         row = self.grandfathered_row(layer_id)
+        recorded = status == "recorded"
         row.update(verdict_status=status, checked_at="2026-09-23", lanes=lanes,
-                   winners=winners if winners is not None else [winner(COMPONENTS[key]) for key in chosen_keys])
+                   winners=winners if winners is not None else [winner(COMPONENTS[key]) for key in chosen_keys],
+                   alternatives=[{**ALTERNATIVE, "source": "lane:claude"}] if recorded else [],
+                   verdict_overturn_when=f"{chosen_lane} overturn" if recorded else "",
+                   overturn_protocol=PROTOCOL)
         self.ledger["foundation"].append(row)
         return row
 
@@ -483,6 +498,132 @@ class WaveFreezeTests(GateFixture):
     def test_grandfathered_wave_is_frozen_even_when_newest(self):
         self.add_wave("20260922", b'{"wave": "20260922", "rewritten": true}\n')
         self.assertFails(self.report(), "the frozen registry entry of wave 20260922")
+
+
+class LedgerBindingTests(GateFixture):
+    def test_manifest_pointing_at_a_decoy_ledger_fails_and_the_real_ledger_is_still_checked(self):
+        # Review of #123, finding 1: a decoy copy of the ledger plus a manifest pointing at it must not
+        # hide an unevidenced edit of the real ledger, which build_verdicts.py publishes.
+        decoy = "catalogs/landscape/foundation-decoy.json"
+        self.flush()
+        self.manifest["catalogs"]["foundation"] = decoy
+        row = self.grandfathered_row("beta")
+        row["lanes"] = {"sealed_base": SEALED, "claude": {"run_id": "", "sealed_sha256": ""},
+                        "codex": {"run_id": "", "sealed_sha256": ""}, "agreement": "same_winner"}
+        row.update(verdict_status="recorded", winners=[winner("comp-one")])
+        self.ledger["foundation"].append(row)
+        self.write(decoy, (self.root / LEDGERS["foundation"]).read_bytes())  # decoy keeps the base rows
+        report = self.report()
+        self.assertFails(report, f"{MANIFEST}#/catalogs is")
+        self.assertIn(f"foundation/beta@{RUN}", [change["row"] for change in report["changes"]])
+        self.assertIn(f"wave {RUN}'s document is not registered", self.messages(report))
+
+    def test_manifest_without_catalogs_fails(self):
+        del self.manifest["catalogs"]
+        self.assertFails(self.report(), f"{MANIFEST}#/catalogs is None")
+
+    def test_malformed_base_wave_registry_exits_2(self):
+        self.write(REGISTRY, b"{not json\n")
+        self.git("add", "-A")
+        self.git("commit", "--quiet", "-m", "malformed registry")
+        broken = self.git("rev-parse", "HEAD")
+        self.flush()
+        self.git("add", "-A")
+        self.git("commit", "--quiet", "-m", "repaired registry")
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            code = gate.main(["--root", str(self.root), "--base", broken])
+        self.assertEqual(code, 2, output.getvalue())
+        self.assertIn(f"{REGISTRY} at {broken[:12]} is not JSON", output.getvalue())
+
+    def test_malformed_head_ledger_fails_closed(self):
+        self.flush()
+        self.write(LEDGERS["foundation"], b"[truncated")
+        with self.assertRaisesRegex(gate.ReadError, "foundation.json at the head is not JSON"):
+            gate.evaluate(self.root, self.base, self.root, validators=lambda _root: [])
+
+
+class TrustBaseTests(GateFixture):
+    def test_verdict_row_change_with_a_rules_change_in_the_same_comparison_fails(self):
+        self.write("scripts/landscape.py", b'GRANDFATHERED_RUN_IDS = frozenset({"20260922", "20260923"})\n')
+        self.record()
+        self.assertFails(self.report(), "also the gate's trust base (scripts/landscape.py)")
+
+    def test_workflow_change_with_a_sealed_artifact_change_fails(self):
+        self.record()
+        self.rebase()
+        self.write(".github/workflows/validate.yml", b"name: weakened\n")
+        path = f"{SEALED}/codex/foundation-beta-{RUN}.json"
+        (self.root / path).unlink()
+        self.registered.discard(path)
+        self.assertFails(self.report(), "also the gate's trust base (.github/workflows/validate.yml)")
+
+    def test_rules_change_alone_passes(self):
+        self.write("scripts/verdict_review_gate.py", b"# rules change on its own\n")
+        report = self.report()
+        self.assertPasses(report)
+        self.assertEqual(report["trust_paths_changed"], ["scripts/verdict_review_gate.py"])
+
+    def test_rules_change_with_a_non_verdict_ledger_edit_passes(self):
+        self.write("scripts/landscape.py", b"# rules change\n")
+        self.ledger["foundation"][0]["rationale"] = "edited prose, no verdict field"
+        self.assertPasses(self.report())
+
+
+class PublishedFieldTests(GateFixture):
+    def test_winner_repository_other_than_the_packet_candidate_fails(self):
+        row = self.record()
+        self.rebase()
+        row["winners"][0]["repository"] = "https://github.com/example/two"
+        self.assertFails(self.report(), "winner comp-one: repository 'https://github.com/example/two' is not the "
+                                        "sealed packet candidate's 'https://github.com/example/one'")
+
+    def test_winner_recipe_ref_other_than_the_recorded_one_fails(self):
+        row = self.record()
+        self.rebase()
+        row["winners"][0]["recipe_ref"] = "recipes/elsewhere.md"
+        self.assertFails(self.report(), "winner comp-one: recipe_ref 'recipes/elsewhere.md' is not "
+                                        f"'{LEDGERS['foundation']}'")
+
+    def test_rewritten_alternative_fails(self):
+        row = self.record()
+        self.rebase()
+        row["alternatives"][0]["why_not_default"] = "rewritten after recording"
+        report = self.report()
+        self.assertEqual(report["changes"][0]["kind"], "changed")
+        self.assertFails(report, "alternatives are not the ones record_verdicts.py derives")
+
+    def test_dropped_alternative_fails(self):
+        row = self.record()
+        self.rebase()
+        row["alternatives"] = []
+        self.assertFails(self.report(), "alternatives are not the ones record_verdicts.py derives")
+
+    def test_rewritten_verdict_overturn_when_fails(self):
+        row = self.record()
+        self.rebase()
+        row["verdict_overturn_when"] = "never"
+        self.assertFails(self.report(), "verdict_overturn_when differs from the sealed claude lane return")
+
+    def test_rewritten_overturn_protocol_fails(self):
+        row = self.record()
+        self.rebase()
+        row["overturn_protocol"] = {"metric": "another"}
+        self.assertFails(self.report(), "overturn_protocol is not the one record_verdicts.py chooses")
+
+    def test_pending_row_publishing_alternatives_fails(self):
+        row = self.record(claude_keys=("c1",), codex_keys=("c2",), status="pending_lanes", winners=[])
+        row["alternatives"] = [{**ALTERNATIVE, "source": "lane:claude"}]
+        self.assertFails(self.report(), "a 'pending_lanes' row carries alternatives or verdict_overturn_when")
+
+    def test_open_gaps_change_is_a_verdict_change(self):
+        row = self.record()
+        self.rebase()
+        row["open_gaps"] = ["edited"]
+        report = self.report()
+        self.assertEqual(report["changes"], [{"row": f"foundation/beta@{RUN}", "kind": "changed",
+                                              "grandfathered": False}])
+        self.assertPasses(report)  # re-checked against the sealed evidence; its text is not re-derived
 
 
 if __name__ == "__main__":
