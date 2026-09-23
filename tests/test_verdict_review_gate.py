@@ -379,6 +379,19 @@ class MissingEvidenceTests(GateFixture):
         self.record(claude_keys=("c1",), codex_keys=("c2",), judged=adjudication(judgments))
         self.assertFails(self.report(), "a judgment carries refuting_votes 1")
 
+    def refuting_votes_report(self, votes):
+        judgments = [judgment(family, position) for family in ("anthropic", "openai") for position in ("A", "B")]
+        judgments[3]["refuting_votes"] = votes
+        self.record(claude_keys=("c1",), codex_keys=("c2",), judged=adjudication(judgments))
+        return self.report()
+
+    # Review of #135, round 2: false and 0.0 are == 0 in Python but are not a zero vote count.
+    def test_adjudication_with_false_refuting_votes_fails(self):
+        self.assertFails(self.refuting_votes_report(False), "a judgment carries refuting_votes False")
+
+    def test_adjudication_with_float_refuting_votes_fails(self):
+        self.assertFails(self.refuting_votes_report(0.0), "a judgment carries refuting_votes 0.0")
+
     def test_stale_sealed_sha256_fails(self):
         self.record()
         path = f"{SEALED}/claude/foundation-beta-{RUN}.json"
@@ -598,6 +611,13 @@ class WaveFreezeTests(GateFixture):
         self.assertPasses(report)
         self.assertEqual(gate.new_wave_violations({"20260922": {}}, {"20260922": {}, "20260923": {}}), [])
 
+    def test_unregistering_the_base_newest_wave_fails(self):
+        # Round 2 builder note: with no newer wave the base's newest wave may change, not disappear.
+        self.record()
+        self.rebase()
+        del self.waves[RUN]
+        self.assertFails(self.report(), f"wave {RUN}, the base's newest, was removed from")
+
     def test_frozen_values_compare_type_strictly(self):
         # Review of #135, L5: 1, 1.0 and true are equal to Python's ==, not in a frozen document.
         self.add_wave("20260922", b'{"n": 1, "flag": true}\n')
@@ -726,6 +746,20 @@ class PublishedFieldTests(GateFixture):
         self.rebase()
         row["overturn_protocol"] = {"metric": "another"}
         self.assertFails(self.report(), "overturn_protocol is not the one record_verdicts.py chooses")
+
+    def test_derived_values_compare_type_strictly(self):
+        # Review of #135, round 2: a value that only changes type (12 -> 12.0 or true) is == to the
+        # derivation from the sealed returns in Python, but not in the published document.
+        with mock.patch.dict(PROTOCOL, {"min_passes": 12}):
+            row = self.record()
+            self.rebase()
+            sealed = dict(row["overturn_protocol"])
+            for rewritten in (12.0, True):
+                with self.subTest(rewritten=rewritten):
+                    row["overturn_protocol"] = {**sealed, "min_passes": rewritten}
+                    self.assertFails(self.report(), "overturn_protocol is not the one record_verdicts.py chooses")
+            row["overturn_protocol"] = sealed
+            self.assertPasses(self.report())
 
     def test_pending_row_publishing_alternatives_fails(self):
         row = self.record(claude_keys=("c1",), codex_keys=("c2",), status="pending_lanes", winners=[])

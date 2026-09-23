@@ -948,6 +948,13 @@ Hosted and live results after merge. Evidence class: hosted runs and GitHub API 
       publish a document no check compares with the generator. A newly registered wave must now
       be the only new run id, the head's newest, and newer than every base wave. Negative
       controls: two new waves fail; a backdated new wave fails; one new current wave passes.
+    - Round 2 (builder note, closed by the coordinator): with no newer wave registered, the
+      base's newest wave was skipped entirely, so a change that only unregistered it passed the
+      gate. A fixture probe with stub validators confirmed this. Its rows would have stayed in
+      the ledgers with no registered document. The base's newest wave may still change, but
+      removing it now fails.
+      - Test: unregistering it fails.
+      - Mutation-checked.
   - *Fixed, low (L4): the bootstrap fallback failed open.* The job runs the head's gate only when
     the base lacks `scripts/verdict_review_gate.py` and `git diff --no-renames --name-status -z
     <base>...HEAD` shows it added (`A`); any other base without the gate fails closed. Tests: an
@@ -956,6 +963,18 @@ Hosted and live results after merge. Evidence class: hosted runs and GitHub API 
     documents, the registry, rule-input fields and a winner's binding fields) now compare as their
     canonical `json.dumps(..., sort_keys=True)` text, so `1`, `1.0` and `true` differ. Test: a frozen
     wave document rewritten `1` to `1.0`, `true` to `1` or `1` to `true` fails.
+    - Round 2 (low, closed by the coordinator): the comparisons of a changed row with what the
+      sealed returns derive were still Python `==`, so a type-only rewrite passed them. These are
+      the winner fields, the published alternatives, `verdict_overturn_when` and
+      `overturn_protocol`. They now use the same helper. An adjudication judgment's
+      `refuting_votes` must also be an `int` equal to 0, so `false` and `0.0` fail.
+      - Tests: a sealed `overturn_protocol` number rewritten `12` to `12.0` or `true` fails; the
+        sealed value passes; a judgment with `refuting_votes` `false` or `0.0` fails.
+      - Both were mutation-checked.
+      - Residual, outside this PR's paths: `tools/sota-convergence/build_verdicts.py`
+        `check_frozen_rows` still compares frozen rows with `==`. The type-strict wave-document
+        and registry freeze here covers the same frozen rows, because each is bound to its
+        document's sha256. The tooling owner (agent-lab-17) was notified.
   - *Hardening:* the changed-path listings use `git diff -z` and `git ls-files -z`, split on NUL. Test:
     a tracked and an untracked path with a space, a newline and a non-ASCII character are listed as
     themselves.

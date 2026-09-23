@@ -520,7 +520,8 @@ def two_family_adjudication_issue(raw, chosen_lanes):
     for judgment in judgments:
         if not isinstance(judgment, dict):
             return "an adjudication judgment is not an object", None
-        if judgment.get("refuting_votes") != 0:
+        # type-strict (review of #135, round 2): false and 0.0 are == 0 but are not a zero vote count.
+        if type(judgment.get("refuting_votes")) is not int or judgment.get("refuting_votes") != 0:
             return f"a judgment carries refuting_votes {judgment.get('refuting_votes')!r}", None
         judge = judgment.get("judge") if isinstance(judgment.get("judge"), dict) else {}
         orders.setdefault(judge.get("family"), set()).add(judgment.get("claude_position"))
@@ -744,22 +745,22 @@ class RowCheck:
             component_id = winner.get("component_id")
             want = expected_by_id.get(component_id) or {}
             candidate = by_key.get(component_id) or {}
-            if winner.get("repository") != want.get("repository"):
+            if not same_value(winner.get("repository"), want.get("repository")):
                 self.fail(f"winner {component_id}: repository {winner.get('repository')!r} is not the sealed packet "
                           f"candidate's {want.get('repository')!r}")
-            if winner.get("recipe_ref") != want.get("recipe_ref"):
+            if not same_value(winner.get("recipe_ref"), want.get("recipe_ref")):
                 self.fail(f"winner {component_id}: recipe_ref {winner.get('recipe_ref')!r} is not "
                           f"{want.get('recipe_ref')!r} (the sealed packet candidate's, else the row's ledger)")
-            if winner.get("evidence_class") != want.get("evidence_class"):
+            if not same_value(winner.get("evidence_class"), want.get("evidence_class")):
                 self.fail(f"winner {component_id}: evidence_class {winner.get('evidence_class')!r} is not the {lane} "
                           f"lane's winner_evidence_class {want.get('evidence_class')!r}")
-            if winner.get("why_selected") != want.get("why_selected"):
+            if not same_value(winner.get("why_selected"), want.get("why_selected")):
                 self.fail(f"winner {component_id}: why_selected differs from the sealed {lane} lane return")
-            if winner.get("evidence_refs") != want.get("evidence_refs"):
+            if not same_value(winner.get("evidence_refs"), want.get("evidence_refs")):
                 self.fail(f"winner {component_id}: evidence_refs {winner.get('evidence_refs')!r} are not the sealed "
                           f"{lane} lane's winner_evidence_refs as record_verdicts.py normalizes them "
                           f"({want.get('evidence_refs')!r})")
-            if winner.get("pin") != want.get("pin"):
+            if not same_value(winner.get("pin"), want.get("pin")):
                 source = ("the sealed packet's" if candidate.get("pin")
                           else "the one record_verdicts.py writes without a packet pin (the row's v1 candidate pin, "
                                "else 'unpinned'):")
@@ -788,13 +789,13 @@ class RowCheck:
             return [{field: alternative.get(field) for field in PUBLISHED_ALTERNATIVE_FIELDS}
                     if isinstance(alternative, dict) else alternative for alternative in alternatives or []]
 
-        if published(self.row.get("alternatives")) != published(expected):
+        if not same_value(published(self.row.get("alternatives")), published(expected)):
             self.fail(f"alternatives are not the ones record_verdicts.py derives from the sealed lane returns "
                       f"(expected {[a.get('repository') for a in expected]}, got "
                       f"{[a.get('repository') for a in self.row.get('alternatives') or [] if isinstance(a, dict)]}, "
                       f"compared on {', '.join(PUBLISHED_ALTERNATIVE_FIELDS)})")
         overturn = sanitize_value(returns[lane].get("overturn_when"))
-        if self.row.get("verdict_overturn_when") != overturn:
+        if not same_value(self.row.get("verdict_overturn_when"), overturn):
             self.fail(f"verdict_overturn_when differs from the sealed {lane} lane return's overturn_when")
 
     def check_overturn_protocol(self, returns):
@@ -802,7 +803,7 @@ class RowCheck:
             expected = sanitize_value(choose_overturn_protocol(returns))
         except (KeyError, TypeError):
             expected = None
-        if self.row.get("overturn_protocol") != expected:
+        if not same_value(self.row.get("overturn_protocol"), expected):
             self.fail("overturn_protocol is not the one record_verdicts.py chooses from the sealed lane returns")
 
     def check_wave(self, run_id):
@@ -1209,6 +1210,12 @@ def wave_freeze_violations(base, head, base_waves, head_waves):
         head_entry = head_waves.get(run_id)
         if run_id == newest and run_id not in GRANDFATHERED_RUN_IDS:
             if not superseded:
+                # The newest wave may change but not be unregistered (round 2 builder note): its rows
+                # would stay in the ledgers with no registered document to check them against.
+                if head_entry is None:
+                    violations.append({"row": where, "message": (
+                        f"wave {run_id}, the base's newest, was removed from {WAVE_REGISTRY}; a registered "
+                        f"wave is never unregistered")})
                 continue
             later = ", ".join(sorted(later_id for later_id in head_waves if later_id > newest))
             if head_entry is None or not same_value(head_entry, entry):

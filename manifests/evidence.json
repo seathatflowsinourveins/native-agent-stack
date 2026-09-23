@@ -9130,8 +9130,8 @@
     },
     {
       "path": "docs/decisions/2026-09-22-github-automation-closure.md",
-      "sha256": "e707dfcf23fdc040bb06897108a96262d163827fe21a608a58c4bb133323d3e0",
-      "bytes": 74770
+      "sha256": "db9d6507eed4f55cd1f2e6b54ee5aa524948299d928ef049085e0757150c69b7",
+      "bytes": 76246
     },
     {
       "path": "docs/direct-results.md",
