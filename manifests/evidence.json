@@ -12569,13 +12569,13 @@
     },
     {
       "path": "evidence/artifacts/sota-refresh-20260923/pins-runtime/dagu.json",
-      "sha256": "fb877f598d98bd305604620fc758a5a72fd1473d887524b6f94acec3d4bb4b46",
-      "bytes": 15376
+      "sha256": "246f4b7ca3e672efd6bdbd86780bd093c39257b8afe2d8ef91bdf3e8947bbb8b",
+      "bytes": 15820
     },
     {
       "path": "evidence/artifacts/sota-refresh-20260923/pins-runtime/skfolio.json",
-      "sha256": "4965d7b2430fc6db9b546820ce915f4c1f8679fdb24b49f1e85f037988dde887",
-      "bytes": 8959
+      "sha256": "ca4b22a6e450d4960a31407aec68cb27fb4cc83155fa3a4707a6f49ebe49f457",
+      "bytes": 9490
     },
     {
       "path": "evidence/artifacts/sota-refresh-20260923/pins-runtime/clickhouse.json",
