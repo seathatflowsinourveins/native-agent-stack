@@ -234,6 +234,7 @@ dispatch of this job:
   approval-required flow has not been exercised against a real pending run.
   That first live run is the concrete gap the overturn condition above
   names.
+  This gap is closed by "Live test, 2026-09-23" at the end of this record.
 
 ## Second fix round (Opus N1-N4, Codex P2-3), 2026-09-23
 
@@ -387,3 +388,18 @@ The branch-head check narrowed the overlap race without closing it. One ordering
 - **Contradictory receipt prose.** The receipt's limitations now say that a pin change on an unfetched row is still reported as drift.
 - **Tests.** The body block must contain no run-specific value (run id, run URL, drift file or date). New tests cover the create-race fallback and the drift wording.
 - **Known limitation, accepted.** An older run that observes the branch after a newer run has pushed can still replace the newer evidence: `--force-with-lease` rejects only changes made after observation, not chronology. Both runs start from main and report the same day's freshness, so the replaced evidence differs only by fetch time. The next scheduled run refreshes it.
+
+## Live test, 2026-09-23
+
+This test used a manual dispatch of `catalog-freshness.yml` on `main` with `open_pr=true`: [run 35822476248](https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/35822476248). The evidence class is `native_proven` for this repository's GitHub configuration.
+
+- **Setting.** `can_approve_pull_request_reviews` went from `false` to `true` ("Allow GitHub Actions to create and approve pull requests"). `default_workflow_permissions` stays `read`. The setting stays on, because the test passed and `propose` needs it.
+- **Fetch.** The `freshness` job made a full, unbounded fetch: `done 469 errors 0 partial_errors 0`. This refutes the concern that a full fetch would hit the rate limit. It found 2 drifted components (`codex` and `codex-native-sdk` upstream `rust-v0.156.0` → `rust-v0.156.1`) and 8 fetched components with no release.
+- **PR.** `propose` succeeded and opened [#109](https://github.com/seathatflowsinourveins/native-agent-stack/pull/109), authored by `app/github-actions`, head `79fdca6`. As documented, its three `pull_request` runs were created in the approval-required state.
+- **Approval by API.** `POST /repos/{owner}/{repo}/actions/runs/{run_id}/approve` succeeded (empty response) on runs 35822754574, 35822754536 and 35822754573, even though its reference text names only fork PRs. The runs then executed. The overturn condition "approval cannot be done through the API" is therefore not met.
+- **Required checks.** `validate`, `token-report` and `secret-scan` all reported success on the PR head, along with CodeQL, dependency-review and Socket. `mergeStateStatus` was `CLEAN`. The ruleset therefore recognises the approved `pull_request` runs, and the first overturn condition is not met either. No GitHub App token is needed.
+- **Merge.** The coordinator squash-merged #109 as `b5dd036`. Auto-merge stayed off.
+
+Observed limit: the drift report's `Rebuilt manifest` line prints `components_confirmed: 0` and `candidates_total: 0`. This is expected, because the scheduled rebuild passes an empty `lanes.json` and those counts come from lane review. The drift table compares only pins and upstream values, so it is unaffected. A reader should compare the drift table, not those two counts.
+
+The chosen design stands. The decision would be overturned by a future run whose approved `pull_request` checks fail to satisfy the ruleset, or by an approve call that is refused for this same-repo case.
