@@ -19,7 +19,7 @@ provenance by `.github/workflows/publish-catalog.yml`. Do **not** check out
 `source.baseline_commit`: that field records the parent publication
 immediately *before* this `adoption/` directory (and `tools/adoption/`) were
 added, so every step below it on this page would fail with a missing file
-(Codex cross-family review finding, `codex-review-64`); `baseline_commit`
+(Codex cross-family review finding, `codex-review-72`); `baseline_commit`
 remains meaningful only as the comparison point `scripts/adoption_status.py`
 uses for its `baseline_matches`/`baseline_differs` `git` result, not as a
 checkout target.

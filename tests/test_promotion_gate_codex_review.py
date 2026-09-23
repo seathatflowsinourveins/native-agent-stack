@@ -211,6 +211,15 @@ class VolumeDecimalPurePython(unittest.TestCase):
         # float() round-trip makes it look integral.
         self.assertTrue(g._volume_cell_fails("9007199254740992.5"))
 
+    def test_non_canonical_numeric_text_fails(self):
+        # Decimal parses these; pd.to_numeric turns them into NaN.
+        for text in ("1_000", "\u0661\u0662\u0663", "1 000", "Infinity", "NaN", "0x10"):
+            with self.subTest(text=text):
+                self.assertTrue(g._volume_cell_fails(text))
+        for text in ("0", "1000", "1000.0", "1e3", "+5"):
+            with self.subTest(text=text):
+                self.assertFalse(g._volume_cell_fails(text))
+
     def test_int64_max_passes_and_one_above_fails(self):
         self.assertFalse(g._volume_cell_fails(str(g.INT64_MAX)))
         self.assertTrue(g._volume_cell_fails(str(g.INT64_MAX + 1)))

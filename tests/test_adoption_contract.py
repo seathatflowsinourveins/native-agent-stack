@@ -103,7 +103,7 @@ class AdoptionContractTests(unittest.TestCase):
             self.assertEqual(set(client.values()), {'not_checked'})
 
     def test_bootstrap_step_zero_checks_out_the_attested_release_not_the_pre_adoption_baseline(self):
-        """Codex cross-family review finding (codex-review-64): adoption/bootstrap.md
+        """Codex cross-family review finding (codex-review-72): adoption/bootstrap.md
         step 0 used to check out `source.baseline_commit`
         (8f1da51757e925d319e2a50f080b02742e7e7168), a revision that predates
         `adoption/` and `tools/adoption/` entirely, so every later step on that page
@@ -123,6 +123,14 @@ class AdoptionContractTests(unittest.TestCase):
         step_zero = bootstrap_text[step_zero_start:step_zero_start + 1500]
         self.assertIn("['source']['release_tag']", step_zero)
         self.assertNotIn("['source']['baseline_commit']", step_zero)
+
+        tag = subprocess.run(
+            ['git', 'rev-parse', '--verify', '--quiet', f"{source['release_tag']}^{{commit}}"],
+            cwd=str(ROOT), capture_output=True, text=True,
+        )
+        if tag.returncode == 0:
+            self.assertEqual(tag.stdout.strip(), source['release_commit'],
+                             'source.release_tag must resolve to source.release_commit')
 
         for path in ('adoption/bootstrap.md', 'tools/adoption/render_config.py'):
             result = subprocess.run(

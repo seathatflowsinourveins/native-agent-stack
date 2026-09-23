@@ -111,6 +111,9 @@ def _load_frame(input_spec: str):
     raise ValueError(f"unsupported_input_format: {suffix or '(none)'}")
 
 
+_CANONICAL_NUMBER = re.compile(r"[+-]?(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+)(?:[eE][+-]?[0-9]+)?")
+
+
 def _volume_cell_fails(raw_value) -> bool:
     """True if a single RAW (pre-coercion) `volume` cell fails
     `volume_integral_non_negative`: non-finite, negative (including a `-0`
@@ -151,7 +154,13 @@ def _volume_cell_fails(raw_value) -> bool:
                 return True
             dec = decimal.Decimal(repr(raw_value))
         else:
-            dec = decimal.Decimal(str(raw_value).strip())
+            text = str(raw_value).strip()
+            # Decimal also accepts underscores and non-ASCII digits, which
+            # pd.to_numeric and ordinary readers reject; accept only canonical
+            # ASCII numeric text.
+            if not _CANONICAL_NUMBER.fullmatch(text):
+                return True
+            dec = decimal.Decimal(text)
     except (decimal.InvalidOperation, ValueError, TypeError):
         return True
     if not dec.is_finite():
