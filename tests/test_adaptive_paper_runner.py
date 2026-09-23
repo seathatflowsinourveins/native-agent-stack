@@ -37,6 +37,38 @@ from safety import SafetyError as SafetyErrorAlways
 
 @unittest.skipUnless(NATIVE, "requires pinned combined native runtime")
 class IntegratedRunner(unittest.TestCase):
+    def test_gap_arising_during_the_periodic_snapshot_stops_instead_of_thawing(self):
+        # Ported from reviewed 42b7e127, with the retained stop diagnostic asserted.
+        config, _, _ = load_config(SOURCE / "config.json")
+        config.update(duration_seconds=3, cleanup_seconds=2, order_timeout_seconds=1)
+        class GapDuringSnapshot(SimulatedPort):
+            marks = snapshots = 0
+            async def snapshot(self):
+                snap = await super().snapshot()
+                self.snapshots += 1
+                if self.snapshots == 2:
+                    self.health["reasons"] = ["orders_disconnected"]
+                return snap
+            def mark_reconciled(self):
+                self.marks += 1
+        with tempfile.TemporaryDirectory() as root:
+            ledger = Ledger(Path(root) / "journal.db", RiskLimits(trial_seconds=3, cleanup_seconds=2))
+            self.addCleanup(ledger.close)
+            ledger.start_trial(time.time())
+            controller = Controller(ledger, time.time() + 3600, market_open=True)
+            policy = PolicyConfig(symbols=("SPY", "QQQ", "IWM", "DIA"), max_positions=4, warmup_seconds=32)
+            port = GapDuringSnapshot(controller, policy.symbols, price=lambda symbol, tick: Decimal("100"))
+            port.health.update(fresh_quotes=True, reasons=[])
+            controller.port = port
+            with patch.object(runner_module, "RECONCILE_EVERY_SECONDS", .2, create=True), \
+                    patch.object(runner_module, "DEFAULT_STOP", Path(root) / "STOP"):
+                outcome = asyncio.run(run_native(controller, policy, [{"symbol": s} for s in policy.symbols],
+                                                "fixture", config, "100000"))
+            self.assertGreaterEqual(port.snapshots, 2)
+            self.assertEqual(port.marks, 0)
+            self.assertEqual(outcome["decision_exit"]["reason"], "transport_gap")
+            self.assertEqual(outcome["status"], "needs_attention")
+
     def test_default_config_is_bounded(self):
         config, risk, policy = load_config(SOURCE / "config.json")
         self.assertEqual(risk.max_submits_per_minute, 180)

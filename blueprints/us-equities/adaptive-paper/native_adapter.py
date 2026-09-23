@@ -7,6 +7,7 @@ limit/DAY orders only; unknown submission outcomes freeze and stop the node.
 from __future__ import annotations
 
 import asyncio
+import hashlib
 from datetime import datetime, timezone
 from decimal import Decimal
 import importlib.metadata
@@ -78,6 +79,16 @@ def shares(value):
     return Quantity.from_int(int(value))
 
 
+def quote_components(row):
+    """Validate native price/size capacity without constructing a QuoteTick."""
+    bid, ask = dec(row["bid"]), dec(row["ask"])
+    precision = max(0, -bid.as_tuple().exponent, -ask.as_tuple().exponent)
+    if precision > 16:
+        raise ValueError("quote_precision_unsupported")
+    return (Price.from_str(format(bid, f".{precision}f")), Price.from_str(format(ask, f".{precision}f")),
+            shares(row["bid_size"]), shares(row["ask_size"]))
+
+
 def instrument(metadata):
     symbol = metadata["symbol"]
     if metadata.get("currency", "USD") != "USD" or not isinstance(symbol, str) or not symbol:
@@ -99,6 +110,7 @@ class NativeSession:
         self.started = self.stopped = False
         self._start_lock = self._stop_lock = None
         self.quotes = {}
+        self.quote_tombstones = {}
         self.observations = []
         self.unresolved_orders = {}
         self.snapshot_state = None
@@ -130,19 +142,13 @@ class NativeSession:
     def on_quote(self, row):
         try:
             sym = row["symbol"]
+            if row["ts_ns"] <= self.quote_tombstones.get(sym, 0):
+                return
             ins = self.instruments[sym]
             bid, ask = dec(row["bid"]), dec(row["ask"])
             if bid <= 0 or ask < bid or type(row["ts_ns"]) is not int or row["ts_ns"] <= 0:
                 raise ValueError("invalid_quote")
-            # QuoteTick requires matching precision on both sides. Normalized
-            # decimal strings may have different trailing-zero counts; pad to
-            # their common exact precision, independently of cent order ticks.
-            precision = max(0, -bid.as_tuple().exponent, -ask.as_tuple().exponent)
-            if precision > 16:
-                raise ValueError("quote_precision_unsupported")
-            q = QuoteTick(ins.id, Price.from_str(format(bid, f".{precision}f")),
-                          Price.from_str(format(ask, f".{precision}f")),
-                          shares(row["bid_size"]), shares(row["ask_size"]), row["ts_ns"],
+            q = QuoteTick(ins.id, *quote_components(row), row["ts_ns"],
                           self.data.clock.timestamp_ns())
             previous = self.quotes.get(sym)
             if previous is not None and q.ts_event < previous.ts_event:
@@ -152,6 +158,12 @@ class NativeSession:
                 self.data._handle_data(q)
         except Exception as error:
             self.fail("quote_" + error_code(error))
+
+    def invalidate_quote(self, symbol, ts_ns):
+        previous = self.quotes.get(symbol)
+        if previous is None or ts_ns >= previous.ts_event:
+            self.quote_tombstones[symbol] = max(ts_ns, self.quote_tombstones.get(symbol, 0))
+            self.quotes.pop(symbol, None)
 
     def on_order(self, row):
         try:
@@ -170,6 +182,11 @@ class NativeSession:
     def stop(self):
         if self.handle.is_running:
             self.handle.stop()
+
+
+def fill_trade_id(broker_order_id, cumulative_qty):
+    """Reviewed 1c3ccba5: stable native ID within its 36-character limit."""
+    return TradeId(hashlib.sha256(f"{broker_order_id}:cum:{cumulative_qty}".encode()).hexdigest()[:36])
 
 
 class AlpacaDataClient(MarketDataClient):
@@ -311,7 +328,7 @@ class AlpacaExecutionClient(ExecutionClient):
             if last_px <= 0 or last_px != last_px.quantize(Decimal(1).scaleb(-ins.price_precision)):
                 raise ValueError("cumulative_fill_precision_requires_reconciliation")
             self.generate_order_filled(order, broker_id, None,
-                TradeId(row["id"] + ":cum:" + str(filled)), shares(delta), Price.from_str(str(last_px)),
+                fill_trade_id(row["id"], filled), shares(delta), Price.from_str(str(last_px)),
                 USD, Money(0, USD), LiquiditySide.NO_LIQUIDITY_SIDE, stamp)
             prior["qty"], prior["value"] = filled, value
         if not prior["terminal"]:

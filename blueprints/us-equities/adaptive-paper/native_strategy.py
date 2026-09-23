@@ -120,8 +120,8 @@ class AdaptiveStrategy(Strategy):
 
     def on_quote(self, quote):
         symbol = str(quote.instrument_id).rsplit(".", 1)[0]
-        if self.policy.observe(symbol, float(str(quote.bid_price)), float(str(quote.ask_price)),
-                               quote.ts_event / 1_000_000_000):
+        if self.policy.observe_native(symbol, float(str(quote.bid_price)), float(str(quote.ask_price)),
+                                      quote.ts_event):
             self.received_quotes += 1
 
     def on_order_filled(self, event):

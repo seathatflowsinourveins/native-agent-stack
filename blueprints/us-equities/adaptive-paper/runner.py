@@ -591,6 +591,8 @@ class Controller:
         self.ledger, self.close, self.market_open, self.clock = ledger, close, market_open, clock
         self.port = None
         self.quotes = {}
+        self.quote_ns = {}
+        self.quote_tombstones = {}
         self.requests = []
         self.events = []
         self.stop = False
@@ -607,7 +609,7 @@ class Controller:
                 intent = next((i for i in self.ledger.intents() if i.client_id == client_id), None)
                 if intent is None:
                     raise SafetyError("submit_without_intent")
-                self.ledger.validate_pending(client_id, quote=self.quotes[intent.symbol], now=self.clock(),
+                self.ledger.validate_pending(client_id, quote=self.executable_quote(intent.symbol), now=self.clock(),
                                              market_open=self.market_open, session_close=self.close)
                 if intent.side == "buy" and (self.stop or not self.port.ready):
                     raise SafetyError("admissions_not_ready")
@@ -626,9 +628,7 @@ class Controller:
         try:
             if order["side"] == "buy" and (self.stop or not self.port.ready):
                 raise SafetyError("admissions_not_ready")
-            quote = self.quotes.get(order["symbol"])
-            if quote is None:
-                raise SafetyError("no_current_quote")
+            quote = self.executable_quote(order["symbol"])
             intent = self.ledger.reserve_intent(order["client_order_id"], order["symbol"], order["side"],
                                                 order["qty"], order["limit_price"], quote=quote,
                                                 now=self.clock(), market_open=self.market_open,
@@ -656,9 +656,22 @@ class Controller:
         # source marks the symbol halted until trading_status clears it.
         halted = bool(quote.get("halted", False)) or quote["symbol"] in self.halted_symbols
         q = Quote(quote["symbol"], quote["bid"], quote["ask"], quote["ts_ns"] / 1e9, halted=halted)
-        old = self.quotes.get(q.symbol)
-        if old is None or q.timestamp > old.timestamp:
+        ns = quote["ts_ns"]
+        if ns > max(self.quote_ns.get(q.symbol, 0), self.quote_tombstones.get(q.symbol, 0)):
+            self.quote_ns[q.symbol] = ns
             self.quotes[q.symbol] = q
+
+    def executable_quote(self, symbol):
+        quote = self.quotes.get(symbol)
+        if quote is None or (symbol in self.quote_tombstones and
+                             self.quote_ns.get(symbol, 0) <= self.quote_tombstones[symbol]):
+            raise SafetyError("no_current_quote")
+        return quote
+
+    def invalidate_quote(self, symbol, ts_ns):
+        if ts_ns >= self.quote_ns.get(symbol, 0):
+            self.quote_tombstones[symbol] = max(ts_ns, self.quote_tombstones.get(symbol, 0))
+            self.quotes.pop(symbol, None)
 
     def trading_status(self, status):
         """Consume a normalize_trading_status(...) result (deliverable D3).
@@ -732,6 +745,31 @@ class Controller:
 _NORMAL_DECISION_EXITS = {"duration_completed", "session_boundary"}
 
 
+def install_quote_quarantine(controller, strategy, session):
+    """Opt in only for the native owner loop with every executable consumer bound."""
+    port = controller.port
+    if not hasattr(port, "set_quote_quarantine_handler"):
+        return  # Simulation/older ports retain their own quote semantics.
+
+    def invalidate(symbol, ts_ns):
+        controller.invalidate_quote(symbol, ts_ns)
+        session.invalidate_quote(symbol, ts_ns)
+        strategy.policy.invalidate_quote(symbol, ts_ns)
+        # Do not erase valuation marks, reservations, native pending orders,
+        # or possibly-sent IDs. Any exposure ends this trial and requires recovery.
+        exposed = (symbol in controller.ledger.positions()
+                   or any(i.symbol == symbol for i in controller.ledger.unresolved())
+                   or any(i["symbol"] == symbol for i in strategy.pending.values())
+                   or symbol in strategy.policy.holdings)
+        if exposed:
+            controller.stop = True
+            strategy.enabled = False
+        return exposed
+
+    from native_adapter import quote_components
+    port.set_quote_quarantine_handler(invalidate, validate=quote_components)
+
+
 def _diagnostic_code(value):
     """Keep bounded machine codes, never exception messages or provider payloads."""
     return value if isinstance(value, str) and re.fullmatch(r"[A-Za-z_][A-Za-z0-9_:]{0,95}", value) else "unclassified"
@@ -741,6 +779,12 @@ def _decision_transport_health(port):
     health = getattr(port, "health", {})
     result = {key: bool(health.get(key, False)) for key in ("ready", "frozen", "fresh_quotes")}
     result["reasons"] = [_diagnostic_code(reason) for reason in health.get("reasons", [])[:16]]
+    quarantine = health.get("quote_quarantine")
+    if isinstance(quarantine, dict):
+        result["quote_quarantine"] = {k: v for k, v in quarantine.items()
+            if k in {"invalidated", "released", "older_ignored", "exposure_escalations"} and type(v) is int and v >= 0}
+        result["quote_quarantine"]["active"] = [s for s in quarantine.get("active", [])
+            if isinstance(s, str) and s in getattr(port, "symbols", ())]
     for key in ("authenticated", "subscriptions"):
         source = health.get(key, {})
         result[key] = {channel: bool(source.get(channel, False)) for channel in ("orders", "quotes")}
@@ -754,6 +798,9 @@ def _decision_transport_health(port):
         if isinstance(symbol, str) and symbol in getattr(port, "symbols", ()):
             result["callback_failure"]["symbol"] = symbol
     return result
+
+
+RECONCILE_EVERY_SECONDS = 30
 
 
 async def run_native(controller, policy_config, assets, trial_id, config, baseline_cash, *, account_fingerprint="simulation"):
@@ -789,6 +836,7 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
     session_policy = validate_session_policy(config)
     session = build_node(port, metadata, [strategy], account_id="ALPACA-PAPER-" + account_fingerprint[:16],
                          max_order_submit_rate="180/00:01:00", session_policy=session_policy)
+    install_quote_quarantine(controller, strategy, session)
     task = asyncio.create_task(session.run_async())
     started = time.monotonic()
     last_reconciliation = started
@@ -893,12 +941,20 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
                     record_exit("mark_to_market_refused", str(exc))
                     controller.stop = True
                     force_exit = True
-            if (strategy.started and not force_exit and time.monotonic() - last_reconciliation >= 30
+            if (strategy.started and not force_exit and time.monotonic() - last_reconciliation >= RECONCILE_EVERY_SECONDS
                     and not controller.ledger.unresolved() and not strategy.pending):
                 strategy.enabled = False
                 snapshot = await port.snapshot()
                 reconcile(controller.ledger, snapshot, baseline_cash)
-                if health.get("fresh_quotes") and hasattr(port, "mark_reconciled"):
+                # Reviewed 42b7e127: a fault during awaited reconciliation is
+                # sticky and must take effect before this tick's rebalance.
+                health = getattr(port, "health", {})
+                if any("stale" not in str(reason) for reason in health.get("reasons", [])):
+                    record_exit("transport_gap")
+                    controller.stop = True
+                    force_exit = True
+                elif (health.get("fresh_quotes") and not health.get("quote_quarantine", {}).get("active")
+                      and hasattr(port, "mark_reconciled")):
                     port.mark_reconciled()
                 last_reconciliation = time.monotonic()
             # Boundary receipts (D6): independent of the 30s reconciliation
@@ -947,6 +1003,8 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
         if (finalization_failure is None
                 and any("stale" not in str(reason) for reason in health.get("reasons", []))):
             finalization_failure = {"stage": "final_transport_health", "reason_code": "transport_gap"}
+        if finalization_failure is None and health.get("quote_quarantine", {}).get("active"):
+            finalization_failure = {"stage": "final_transport_health", "reason_code": "quote_quarantine_unresolved"}
         try:
             session.stop()
         except Exception as exc:
@@ -976,6 +1034,7 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
               "boundary_receipts": boundary_receipts,
               "decision_exit": decision_exit, "shutdown_failure": shutdown_failure,
               "finalization_failure": finalization_failure, "pre_shutdown_health": pre_shutdown_health,
+              "quote_quarantine": pre_shutdown_health.get("quote_quarantine"),
               "elapsed_seconds": time.monotonic() - started}
     outcome["status"] = _run_native_status(reconciliation, session.errors, strategy.native_fills,
                                            outcome, session_policy, time.time())

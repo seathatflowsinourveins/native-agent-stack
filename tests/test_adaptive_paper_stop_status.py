@@ -60,6 +60,13 @@ class StopClassification(unittest.TestCase):
 
 @unittest.skipUnless(NATIVE, "requires pinned combined native runtime")
 class StopLifecycle(unittest.TestCase):
+    def test_unresolved_quarantine_at_duration_end_is_needs_attention(self):
+        outcome = self.run_fixture("late_quarantine")
+        self.assertTrue(outcome["flat"])
+        self.assertEqual(outcome["status"], "needs_attention")
+        self.assertEqual(outcome["finalization_failure"]["reason_code"], "quote_quarantine_unresolved")
+        self.assertEqual(outcome["quote_quarantine"]["active"], ["SPY"])
+
     def run_fixture(self, mode):
         from safety import Ledger, RiskLimits, SafetyError
         from simulation import SimulatedPort
@@ -100,6 +107,9 @@ class StopLifecycle(unittest.TestCase):
                             snapshot["account"]["cash"] = "99999"
                         if mode in ("late_transport_gap", "late_stale"):
                             self.health["reasons"] = ["callback_failure" if mode == "late_transport_gap" else "quote_stale"]
+                        if mode == "late_quarantine":
+                            self.health["quote_quarantine"] = {"active": ["SPY"], "invalidated": 1,
+                                "released": 0, "older_ignored": 0, "exposure_escalations": 0}
                     return snapshot
 
             port = Port(controller, policy.symbols)

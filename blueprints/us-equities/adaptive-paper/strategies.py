@@ -71,6 +71,31 @@ class AdaptivePolicy(_AdaptivePolicyV1):
         self.strategy_pool = strategy_pool
         self.selector = selector
         self.last_selector_decision = None
+        self.quote_ns = {}
+        self.quote_tombstones = {}
+
+    def invalidate_quote(self, symbol: str, ts_ns: int):
+        if ts_ns >= self.quote_ns.get(symbol, 0):
+            self.quote_tombstones[symbol] = max(ts_ns, self.quote_tombstones.get(symbol, 0))
+            self.latest.pop(symbol, None)
+
+    def observe_native(self, symbol: str, bid: float, ask: float, ts_ns: int) -> bool:
+        # Native data-engine ticks can already be queued at invalidation time.
+        # Compare their exact integer event time before reducing it to seconds.
+        if ts_ns <= max(self.quote_ns.get(symbol, 0), self.quote_tombstones.get(symbol, 0)):
+            return False
+        timestamp = ts_ns / 1_000_000_000
+        old = self.latest.get(symbol)
+        if old is not None and timestamp == old.timestamp:
+            # A genuinely newer nanosecond can round to the same float second.
+            # v1 history buckets stay unchanged; only latest authority advances.
+            self.latest.pop(symbol)
+        if not super().observe(symbol, bid, ask, timestamp):
+            if old is not None:
+                self.latest[symbol] = old
+            return False
+        self.quote_ns[symbol] = ts_ns
+        return True
 
     def _evaluate_pool(self, regime: str, risk_off: bool, signals: tuple[Signal, ...]):
         """Synthetic, deterministic candidate scoring for the shipped

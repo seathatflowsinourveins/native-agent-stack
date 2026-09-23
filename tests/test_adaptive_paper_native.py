@@ -137,6 +137,36 @@ if NATIVE:
 
 @unittest.skipUnless(NATIVE, "requires pinned Nautilus 2.0.0rc5 runtime")
 class NativeIntegration(unittest.TestCase):
+    def test_uuid_broker_ids_fill_without_trade_id_overflow(self):
+        # Reused from reviewed 1c3ccba5: real Alpaca IDs are 36-character UUIDs.
+        import uuid
+        original = FakePort.submit
+        async def uuid_submit(port, payload):
+            port.submissions.append(payload)
+            order = {**payload, "id": str(uuid.uuid4()), "filled_qty": "0", "filled_avg_price": None,
+                     "status": "new", "updated_at_ns": time.time_ns()}
+            port.active[payload["client_order_id"]] = order
+            port.on_order(dict(order))
+            order.update(filled_qty=payload["qty"], filled_avg_price=payload["limit_price"], status="filled",
+                         updated_at_ns=time.time_ns())
+            port.qty += int(payload["qty"]) if payload["side"] == "buy" else -int(payload["qty"])
+            port.on_order(dict(order))
+            port.active.pop(payload["client_order_id"])
+            return dict(order)
+        FakePort.submit = uuid_submit
+        try:
+            port, strategy, session = self.run_node("fills")
+        finally:
+            FakePort.submit = original
+        self.assertEqual(session.errors, [])
+        self.assertTrue(strategy.flat_seen)
+        self.assertEqual(port.qty, 0)
+        broker_id = str(uuid.uuid4())
+        first = ADAPTER.fill_trade_id(broker_id, Decimal("1"))
+        self.assertEqual(len(str(first)), 36)
+        self.assertEqual(first, ADAPTER.fill_trade_id(broker_id, Decimal("1")))
+        self.assertNotEqual(first, ADAPTER.fill_trade_id(broker_id, Decimal("2")))
+
     def test_native_quote_precision_preserves_normalized_and_subpenny_values(self):
         for bid, ask, precision in (("650.1", "650.12", 2), ("650.10", "650.12", 2),
                                     ("650.1234", "650.13", 4), ("0.1234", "0.1235", 4),

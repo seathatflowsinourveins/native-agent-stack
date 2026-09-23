@@ -136,7 +136,7 @@ def normalize_order(raw):
 QUOTE_HALT_CONDITION_CODES = frozenset({"H"})
 
 
-def normalize_quote(raw, symbol=None):
+def _quote_fields(raw, symbol=None):
     conditions = raw.get("c") or raw.get("cond") or raw.get("conditions") or []
     result = {"symbol": symbol or raw.get("S") or raw.get("symbol"),
               "bid": decimal_string(raw.get("bp", raw.get("bid")), positive=True),
@@ -145,12 +145,17 @@ def normalize_quote(raw, symbol=None):
               "ask_size": decimal_string(raw.get("as", raw.get("ask_size", 0))),
               "ts_ns": timestamp_ns(raw.get("t", raw.get("timestamp"))),
               "halted": bool(raw.get("halted")) or bool(QUOTE_HALT_CONDITION_CODES & set(conditions))}
-    if Decimal(result["bid"]) > Decimal(result["ask"]):
-        raise TransportError("invalid quote", reason_code="crossed_quote")
     if result["ts_ns"] <= 0:
         raise TransportError("invalid quote", reason_code="invalid_timestamp")
     if min(Decimal(result["bid_size"]), Decimal(result["ask_size"])) < 0:
         raise TransportError("invalid quote", reason_code="negative_size")
+    return result
+
+
+def normalize_quote(raw, symbol=None):
+    result = _quote_fields(raw, symbol)
+    if Decimal(result["bid"]) > Decimal(result["ask"]):
+        raise TransportError("invalid quote", reason_code="crossed_quote")
     return result
 
 
@@ -468,6 +473,13 @@ class AlpacaPaperTransport:
         self._ever_acks = dict(self._auth)
         self._quote_seen = {}
         self._quote_values = {}
+        self._quote_watermarks = {}
+        self._quote_versions = {}
+        self._intent_quote_versions = {}
+        self._quote_quarantined = {}
+        self._quarantine_handler = None
+        self._quarantine_validator = None
+        self._quarantine_counts = {"invalidated": 0, "released": 0, "older_ignored": 0, "exposure_escalations": 0}
         self._pending_stream = {}
         self._stream_seen = set()
         self._intents = {}
@@ -511,6 +523,7 @@ class AlpacaPaperTransport:
                     "authenticated": dict(self._auth), "subscriptions": dict(self._acks),
                     "fresh_quotes": fresh, "required_quote_symbols": list(self.required_quote_symbols),
                     "queue_size": self._events.qsize(),
+                    "quote_quarantine": dict(self._quarantine_counts, active=sorted(self._quote_quarantined)),
                     "callback_failure": dict(self._callback_failure) if self._callback_failure else None}
 
     @property
@@ -525,12 +538,19 @@ class AlpacaPaperTransport:
         """Caller must first validate positions, owned fills and a fresh snapshot."""
         with self._state_lock:
             if (not all(self._auth.values()) or not all(self._acks.values())
-                    or not self.health["fresh_quotes"] or not self._events.empty()):
+                    or not self.health["fresh_quotes"] or self._order_events_pending()):
                 raise TransportError("streams are not ready for reconciliation acknowledgement")
-            if "queue_overflow" in self._reasons or "callback_failure" in self._reasons:
+            if self._quote_quarantined or self._reasons & {"queue_overflow", "callback_failure", "quarantined_exposure", "quote_quarantine_expired", "quote_timestamp_conflict"}:
                 raise TransportError("event loss requires a new transport and durable recovery")
+            if any(str(reason).startswith("orders_") for reason in self._reasons):
+                self._pending_stream.clear()
             self._reasons.clear()
-            self._pending_stream.clear()
+
+    def _order_events_pending(self):
+        # Reviewed 7805fba4: active SIP quote traffic need not quiesce; queued
+        # order evidence still blocks acknowledgement. Quote guards stay live.
+        with self._events.mutex:
+            return any(kind != "quote" for kind, _ in self._events.queue)
 
     def _connection(self, channel, connected):
         with self._state_lock:
@@ -571,6 +591,7 @@ class AlpacaPaperTransport:
 
     def _budget_sync(self, kind, client_id=None):
         if client_id is not None:
+            self._assert_quote_version(client_id)
             # Never park a submission for an entire rolling window while it
             # holds locks needed by cancels. The supported hook reserves or
             # refuses immediately; this deadline also cancels accidental sleeps.
@@ -578,13 +599,97 @@ class AlpacaPaperTransport:
                                   _owner_timeout=0.25, _freeze_timeout=False)
         return self._on_owner(self.before_request, kind)
 
+    def _assert_quote_version(self, client_id):
+        with self._state_lock:
+            if any(self._quote_versions.get(symbol, 0) != version
+                   for symbol, version in self._intent_quote_versions.get(client_id, {}).items()):
+                raise SubmissionNotSent("quote invalidated this unsent intent")
+
     def _wire_guard(self, order):
         # Runs after a possibly delayed budget reservation, immediately before POST.
-        quote = self._quote_values.get(order.get("symbol"))
-        if (self._stopping or not self._started or quote is None
-                or not -0.25 <= (time.time_ns() - quote["ts_ns"]) / 1e9 <= self.quote_timeout
-                or (order.get("side") == "buy" and not self.ready)):
-            raise SubmissionNotSent("quote or stream readiness changed before submission")
+        # The short lock serializes this commitment with invalidation. It is
+        # released before HTTP: subsequent failures retain ordinary ambiguity.
+        with self._state_lock:
+            self._assert_quote_version(order.get("client_order_id"))
+            quote = self._quote_values.get(order.get("symbol"))
+            if (self._stopping or not self._started or quote is None
+                    or order.get("symbol") in self._quote_quarantined
+                    or not -0.25 <= (time.time_ns() - quote["ts_ns"]) / 1e9 <= self.quote_timeout
+                    or (order.get("side") == "buy" and not self.ready)):
+                raise SubmissionNotSent("quote or stream readiness changed before submission")
+
+    def set_quote_quarantine_handler(self, handler, *, validate):
+        """Opt in only with synchronous owner-loop invalidation of every consumer."""
+        if (not callable(handler) or inspect.iscoroutinefunction(handler)
+                or not callable(validate) or inspect.iscoroutinefunction(validate)):
+            raise TransportError("synchronous quote invalidation handler required")
+        self._quarantine_handler = handler
+        self._quarantine_validator = validate
+
+    def _invalidate_quote(self, symbol, ts_ns):
+        # No await between transport tombstone and consumer invalidation. REST
+        # workers see the tombstone immediately; no lock spans the callback.
+        with self._state_lock:
+            self._quote_watermarks[symbol] = ts_ns
+            self._quote_versions[symbol] = self._quote_versions.get(symbol, 0) + 1
+            self._quote_values.pop(symbol, None)
+            self._quote_seen.pop(symbol, None)
+            if symbol not in self._quote_quarantined:
+                self._quote_quarantined[symbol] = time.monotonic()
+                self._quarantine_counts["invalidated"] += 1
+        exposed = self._quarantine_handler(symbol, ts_ns)
+        if type(exposed) is not bool:
+            raise TransportError("invalid quote invalidation result")
+        if exposed:
+            self._quarantine_counts["exposure_escalations"] += 1
+            self.freeze_health("quarantined_exposure")
+
+    def _stream_quote(self, raw):
+        quote = _quote_fields(raw)
+        symbol, ts_ns = quote["symbol"], quote["ts_ns"]
+        if symbol not in self.symbols:
+            raise TransportError("unexpected quote symbol", reason_code="unknown_symbol")
+        crossed = Decimal(quote["bid"]) > Decimal(quote["ask"])
+        fresh = -0.25 <= (time.time_ns() - ts_ns) / 1e9 <= self.quote_timeout
+        if crossed:
+            # Cross-only qualification also respects downstream native bounds.
+            # Compound invalidity, halts, and the recovery port remain fatal.
+            if self._quarantine_handler is None or not fresh or quote["halted"]:
+                raise TransportError("invalid quote", reason_code="crossed_quote")
+            self._quarantine_validator(quote)
+        elif not fresh:
+            if symbol in self.required_quote_symbols:
+                self.freeze_health("quote_timestamp_stale")
+            return None
+        if symbol in self._quote_quarantined and quote["halted"]:
+            raise TransportError("halted quote cannot requalify execution")
+        previous_ns = self._quote_watermarks.get(symbol, 0)
+        if ts_ns < previous_ns:
+            self._quarantine_counts["older_ignored"] += 1
+            return None
+        if crossed:
+            self._invalidate_quote(symbol, ts_ns)
+            return None
+        if ts_ns == previous_ns:
+            if symbol in self._quote_quarantined or quote == self._quote_values.get(symbol):
+                return None
+            # Equal-time executable disagreements are an integrity failure,
+            # not a new recoverable quote category.
+            if self._quarantine_handler is not None:
+                self._invalidate_quote(symbol, ts_ns)
+            self.freeze_health("quote_timestamp_conflict")
+            raise TransportError("equal timestamp quote conflict")
+        with self._state_lock:
+            if symbol in self._quote_quarantined:
+                # A late valid quote cannot erase an already expired gap.
+                if time.monotonic() - self._quote_quarantined[symbol] > self.quote_timeout:
+                    self.freeze_health("quote_quarantine_expired")
+                del self._quote_quarantined[symbol]
+                self._quarantine_counts["released"] += 1
+            self._quote_watermarks[symbol] = ts_ns
+            self._quote_seen[symbol] = time.monotonic()
+            self._quote_values[symbol] = quote
+        return quote
 
     def _response_sync(self, observation):
         if observation["status"] == 429:
@@ -636,16 +741,9 @@ class AlpacaPaperTransport:
             try:
                 stage = "quote_normalization" if kind == "quote" else "order_normalization"
                 if kind == "quote":
-                    quote = normalize_quote(raw)
-                    if quote["symbol"] not in self.symbols:
-                        raise TransportError("unexpected quote symbol", reason_code="unknown_symbol")
-                    age = (time.time_ns() - quote["ts_ns"]) / 1e9
-                    if not -0.25 <= age <= self.quote_timeout:
-                        if quote["symbol"] in self.required_quote_symbols:
-                            self.freeze_health("quote_timestamp_stale")
+                    quote = self._stream_quote(raw)
+                    if quote is None:
                         continue
-                    self._quote_seen[quote["symbol"]] = time.monotonic()
-                    self._quote_values[quote["symbol"]] = quote
                     stage = "on_quote"
                     await self._invoke(self._on_quote, quote)
                 else:
@@ -679,7 +777,15 @@ class AlpacaPaperTransport:
             now = time.monotonic()
             if self.ready:
                 self._ever_ready = True
-            if self._ever_ready and not self.health["fresh_quotes"]:
+            expired = any(now - began > self.quote_timeout for began in self._quote_quarantined.values())
+            if expired:
+                self.freeze_health("quote_quarantine_expired")
+            # Only the invalidated symbols get their existing bounded quote
+            # deadline; an unrelated silent stream keeps its old stop behavior.
+            stale = any(s not in self._quote_quarantined and
+                        now - self._quote_seen.get(s, float("-inf")) > self.quote_timeout
+                        for s in self.required_quote_symbols)
+            if self._ever_ready and stale:
                 self.freeze_health("quote_stale")
             if any(now - started > self.order_update_timeout for started in self._pending_stream.values()):
                 self.freeze_health("order_update_missing")
@@ -767,11 +873,18 @@ class AlpacaPaperTransport:
                 return found
             if not self._started or self._stopping or (intent["side"] == "buy" and not self.ready):
                 raise SubmissionNotSent("transport not ready for exposure")
+            with self._state_lock:
+                dependencies = {intent["symbol"]}
+                if intent["side"] == "buy":
+                    dependencies.update(self.required_quote_symbols)
+                self._intent_quote_versions[key] = {symbol: self._quote_versions.get(symbol, 0)
+                                                    for symbol in dependencies}
             result = await self._invoke(self.before_submit, dict(intent))
             if result is False:
                 raise SubmissionNotSent("intent was not authorized by risk callback")
             self._intents[key] = dict(intent)
             try:
+                self._assert_quote_version(key)
                 raw = await asyncio.to_thread(self._client.submit_order, request)
                 observed = normalize_order(raw)
             except SubmissionNotSent:

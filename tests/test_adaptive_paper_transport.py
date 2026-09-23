@@ -237,6 +237,25 @@ class HTTPBoundary(unittest.TestCase):
 
 @unittest.skipUnless(HAS_SDK, "requires isolated reviewed alpaca-py runtime")
 class AsyncTransport(unittest.IsolatedAsyncioTestCase):
+    async def test_routine_acknowledgement_keeps_pending_order_update_timers(self):
+        # Reused from reviewed 42b7e127.
+        self.port._pending_stream["trial-1"] = time.monotonic()
+        self.port.freeze_health("quote_stale")
+        self.port.mark_reconciled()
+        self.assertIn("trial-1", self.port._pending_stream)
+        self.assertEqual(self.port.health["reasons"], [])
+        self.port.freeze_health("orders_disconnected")
+        self.port.mark_reconciled()
+        self.assertNotIn("trial-1", self.port._pending_stream)
+
+    async def test_queued_quotes_do_not_block_reconciliation_but_order_events_do(self):
+        # Reused from reviewed 7805fba4; pending quote validation still owns its guard.
+        self.port._enqueue("quote", {"S": "SPY"})
+        self.port.mark_reconciled()
+        self.port._enqueue("order", {"event": "new", "order": {}})
+        with self.assertRaises(t.TransportError):
+            self.port.mark_reconciled()
+
     async def asyncSetUp(self):
         self.budgets, self.observations, self.intents = [], [], []
         def budget(kind, client_id=None):
