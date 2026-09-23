@@ -109,11 +109,12 @@ tmux socket with no server, and the Codex credential rewrite (not reversible).
 
 ## Gated items executed (2026-09-23)
 
-The gated rows and their follow-ups ran on the WSL2 host, each preregistered with a sha256 lock and
-checked by an independent evidence reviewer against raw logs; the ledger's `gated_items` block and
+The gated rows and their follow-ups ran on the WSL2 host, each preregistered with a sha256 lock (with
+the post-hoc exceptions listed in the artifact) and checked by an independent evidence reviewer
+against raw logs; the ledger's `gated_items` block and
 Markdown section summarise them, and
 `evidence/artifacts/sdk-runtime-coverage-20260922/gated-items-20260923.json` carries the sanitised
-results with every reviewer correction. No disposition changes. Execution note: workflow stages treat
+results with the reviewer corrections that change meaning. No disposition changes. Execution note: workflow stages treat
 authorization text in their prompts as script output, so after two workflow rounds whose executors
 stopped or declined, the gated runs went to ordinary background workers dispatched from the
 coordinator's conversation, and workflows stayed for review. Host effects recorded there: kvm group

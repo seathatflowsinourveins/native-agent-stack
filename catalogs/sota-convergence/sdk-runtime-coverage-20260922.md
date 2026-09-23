@@ -168,16 +168,16 @@ Three targeted candidates that needed no account, consent or paid key were probe
 ## Gated items executed (2026-09-23)
 
 The rows this ledger left gated on an account, consent, device or model endpoint were executed on one
-WSL2 x86_64 host, each preregistered with a sha256 lock and independently verified against raw logs
-(corrections carried in `evidence/artifacts/sdk-runtime-coverage-20260922/gated-items-20260923.json`).
+WSL2 x86_64 host, each preregistered with a sha256 lock (post-hoc exceptions listed in the artifact) and
+independently verified against raw logs (corrections that change meaning carried in `evidence/artifacts/sdk-runtime-coverage-20260922/gated-items-20260923.json`).
 Evidence class: local integration, one run per arm.
 
 | Repository | Result | Effect |
 | --- | --- | --- |
 | `anthropics/claude-code-action` | CI arm: smoke OK; a settings-level deny rule produced 1 permission denial and no file content, the allow control 0; local arm OK; the routine arm is blocked on user consent (no GitHub connection on the Claude account) | No disposition change |
-| `swe-agent/mini-swe-agent` (local endpoint) | `Qwen/Qwen3-8B-AWQ` on vLLM 0.29.0 with the hermes parser: 20/20 tool calls and 4/5 tasks (bars 19 and 4), client inside srt with loopback-only egress; the prior 7B models and `Qwen3-4B-Instruct-2507` (3/5) did not qualify | Model-endpoint gate closed on this host; passes exactly at the bar on one run |
-| `awslabs/cli-agent-orchestrator` | 9, 9 and 0 host-hook executions for the plain worker, a PATH-shadow wrapper (defeated by the tmux login shell) and a project-local `disableAllHooks` file in the worker's working directory | Stays targeted_candidate; the host-hook defect has a verified workaround |
+| `swe-agent/mini-swe-agent` (local endpoint) | `Qwen/Qwen3-8B-AWQ` on vLLM 0.29.0 with the hermes parser: 20/20 tool calls and 4/5 tasks (bars 19 and 4), client inside srt with loopback-only egress; the prior 7B models and `Qwen3-4B-Instruct-2507` (3/5) did not qualify | Model-endpoint gate closed on this host; passes exactly at the bar on one run, and the 20-call fixture does not separate the two Qwen3 models; no disposition change |
+| `awslabs/cli-agent-orchestrator` | 9, 9 and 0 host-hook executions for the plain worker, a PATH-shadow wrapper (defeated by the tmux login shell) and a project-local `disableAllHooks` file in the worker's working directory (arms A and B post-hoc; arm C locked before it ran) | Stays targeted_candidate; the host-hook defect has a verified workaround |
 | `anthropics/claude-agent-sdk-typescript` | `disableBundledSkills` and the telemetry/nonessential-traffic variables: skills 18 to 1 (`doctor`, unreachable), agents 5 to 3 (unreachable with tools Read/Write), plugins 0; the only external destination is registered to Anthropic | Stays keep_but_compare; the listed `doctor` skill fails the locked no-skills bar |
 | `anthropics/claude-agent-sdk-python` | 0.2.157 ran `query()` on the native login with the API-key variables unset (`apiKeySource: none`) | Contradicts the gap-resolution ledger's paid-API blocker for `agent-sdks` |
 | `trailofbits/coop` | Against the incumbent srt: 8 of 8 probes denied vs 5 of 8, median 0.45 s vs 10.9 s; persistence after a WSL restart armed, not yet run | srt retained by the preregistered rule |
-| `snyk/agent-scan` | Offline arm: no findings on 14 skills and two controls; the Snyk-connected arm was blocked three times by the public tier's daily limit, one timed retry scheduled | No disposition change |
+| `snyk/agent-scan` | Offline arm: no findings on 14 skills and two controls; the Snyk-connected arm was blocked by the public tier's daily limit at about 22:2xZ, 23:11Z and 00:06Z, one timed retry scheduled | No disposition change |

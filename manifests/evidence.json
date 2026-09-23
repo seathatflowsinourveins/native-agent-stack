@@ -7189,13 +7189,13 @@
     },
     {
       "path": "catalogs/sota-convergence/sdk-runtime-coverage-20260922.json",
-      "sha256": "ae269b83a68662259bd28641b103c206a52498f695fce8bf467cf0d9ab429a2b",
-      "bytes": 1098255
+      "sha256": "ff35c2ddce63c086d1fc54329caa7f672536045edd151ede9c83389f38bedf57",
+      "bytes": 1098507
     },
     {
       "path": "catalogs/sota-convergence/sdk-runtime-coverage-20260922.md",
-      "sha256": "04c4225c79b10c371e6a093d5d809c97175774731857b9bff511ad406ea364db",
-      "bytes": 49554
+      "sha256": "45e67050ca5fcd743fec74ebdf2c7b47ffe0cfa4be68d10a2958296175736d2a",
+      "bytes": 49781
     },
     {
       "path": "catalogs/us-equities/README.md",
@@ -7629,7 +7629,7 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "2a9dd49a020e062c7e993c9202217f72703a389f262be12cbbb0c9a9d87018be",
+      "sha256": "23f31b7b470cfa603b288a42f02b5b5bc56c63d568863a98f8366cd320045a81",
       "bytes": 12918618
     },
     {
@@ -7904,8 +7904,8 @@
     },
     {
       "path": "docs/tasks/2026-09-22-sdk-runtime-coverage.md",
-      "sha256": "37b2d4c701dbdb24be83aee4d3683bf3db19776f1635102636fcf0ad22032921",
-      "bytes": 9054
+      "sha256": "1a4ab0334cfbe08122fab1180bbe2af0689a4cc1a4624893d90b807634ab0ebd",
+      "bytes": 9127
     },
     {
       "path": "docs/token-efficiency-stack.json",
@@ -10399,8 +10399,8 @@
     },
     {
       "path": "evidence/artifacts/sdk-runtime-coverage-20260922/gated-items-20260923.json",
-      "sha256": "e9399dfdc0e08834602986fde972b1a4d4b69edd4af01428ff25daa7f819f2c0",
-      "bytes": 12374
+      "sha256": "c74b9fa80aa3b0f3e77137bd5195dea613356650f1bcd2d64d85057334b1bc7a",
+      "bytes": 13874
     },
     {
       "path": "evidence/artifacts/sdk-runtime-coverage-20260922/protocol-sdks.json",
