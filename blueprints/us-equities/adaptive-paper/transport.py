@@ -135,29 +135,26 @@ def normalize_order(raw):
 QUOTE_HALT_CONDITION_CODES = frozenset({"H"})
 
 
-def _quote_price(value):
-    try:
-        if value is not None and Decimal(str(value)) == 0:
-            raise InvalidQuote("one_sided")
-    except (InvalidOperation, ValueError):
-        pass  # malformed text stays a TransportError below
-    return decimal_string(value, positive=True)
-
-
 def normalize_quote(raw, symbol=None):
     conditions = raw.get("c") or raw.get("cond") or raw.get("conditions") or []
-    result = {"symbol": symbol or raw.get("S") or raw.get("symbol"),
-              "bid": _quote_price(raw.get("bp", raw.get("bid"))),
-              "ask": _quote_price(raw.get("ap", raw.get("ask"))),
+    halted = bool(raw.get("halted")) or bool(QUOTE_HALT_CONDITION_CODES & set(conditions))
+    bid = decimal_string(raw.get("bp", raw.get("bid")))
+    ask = decimal_string(raw.get("ap", raw.get("ask")))
+    result = {"symbol": symbol or raw.get("S") or raw.get("symbol"), "bid": bid, "ask": ask,
               "bid_size": decimal_string(raw.get("bs", raw.get("bid_size", 0))),
               "ask_size": decimal_string(raw.get("as", raw.get("ask_size", 0))),
-              "ts_ns": timestamp_ns(raw.get("t", raw.get("timestamp"))),
-              "halted": bool(raw.get("halted")) or bool(QUOTE_HALT_CONDITION_CODES & set(conditions))}
-    if result["ts_ns"] <= 0 or min(Decimal(result["bid_size"]), Decimal(result["ask_size"])) < 0:
+              "ts_ns": timestamp_ns(raw.get("t", raw.get("timestamp"))), "halted": halted}
+    if (not result["symbol"] or result["ts_ns"] <= 0 or min(Decimal(bid), Decimal(ask)) < 0
+            or min(Decimal(result["bid_size"]), Decimal(result["ask_size"])) < 0):
         raise TransportError("invalid quote")
-    if Decimal(result["bid"]) > Decimal(result["ask"]):
-        # SIP publishes brief crossed books (measured 2026-09-23: 9 of 56,855 quotes in 60 s).
-        raise InvalidQuote("crossed")
+    # Well-formed but untradable market states: a one-sided zero price or a crossed book
+    # (SIP publishes brief crossed books; see adaptive-paper/trials/20260923b-needs-attention).
+    # A halt-flagged quote is never dropped, so its halt signal cannot be lost: fail closed.
+    zero = Decimal(bid) == 0 or Decimal(ask) == 0
+    if zero or Decimal(bid) > Decimal(ask):
+        if halted:
+            raise TransportError("invalid halted quote")
+        raise InvalidQuote("one_sided" if zero else "crossed")
     return result
 
 
@@ -471,6 +468,7 @@ class AlpacaPaperTransport:
         self._reasons = set()
         self._callback_failure = None
         self._dropped_quotes = {}
+        self._dropped_by_symbol = {}
         self._auth = {"orders": False, "quotes": False}
         self._acks = dict(self._auth)
         self._ever_acks = dict(self._auth)
@@ -519,6 +517,7 @@ class AlpacaPaperTransport:
                     "authenticated": dict(self._auth), "subscriptions": dict(self._acks),
                     "fresh_quotes": fresh, "required_quote_symbols": list(self.required_quote_symbols),
                     "queue_size": self._events.qsize(), "dropped_quotes": dict(self._dropped_quotes),
+                    "dropped_quotes_by_symbol": dict(self._dropped_by_symbol),
                     "callback_failure": dict(self._callback_failure) if self._callback_failure else None}
 
     @property
@@ -533,12 +532,18 @@ class AlpacaPaperTransport:
         """Caller must first validate positions, owned fills and a fresh snapshot."""
         with self._state_lock:
             if (not all(self._auth.values()) or not all(self._acks.values())
-                    or not self.health["fresh_quotes"] or not self._events.empty()):
+                    or not self.health["fresh_quotes"] or self._order_events_pending()):
                 raise TransportError("streams are not ready for reconciliation acknowledgement")
             if "queue_overflow" in self._reasons or "callback_failure" in self._reasons:
                 raise TransportError("event loss requires a new transport and durable recovery")
             self._reasons.clear()
             self._pending_stream.clear()
+
+    def _order_events_pending(self):
+        """True while an order event is still queued. Queued quotes do not block a
+        reconciliation acknowledgement: on SIP the quote queue is rarely empty."""
+        with self._events.mutex:
+            return any(kind != "quote" for kind, _ in self._events.queue)
 
     def _connection(self, channel, connected):
         with self._state_lock:
@@ -647,10 +652,15 @@ class AlpacaPaperTransport:
                     try:
                         quote = normalize_quote(raw)
                     except InvalidQuote as exc:
-                        # Untradable, not corrupt: drop it and keep the last valid quote until
-                        # it goes stale. Malformed data still fails the transport below.
+                        # Untradable, not corrupt: drop it without touching the stored quote or
+                        # its freshness, so the last valid quote only ages toward quote_stale.
+                        # Malformed data and unsubscribed symbols still fail the transport.
+                        dropped = raw.get("S") or raw.get("symbol")
+                        if dropped not in self.symbols:
+                            raise TransportError("unexpected quote symbol") from None
                         with self._state_lock:
                             self._dropped_quotes[exc.reason] = self._dropped_quotes.get(exc.reason, 0) + 1
+                            self._dropped_by_symbol[dropped] = self._dropped_by_symbol.get(dropped, 0) + 1
                         continue
                     if quote["symbol"] not in self.symbols:
                         raise TransportError("unexpected quote symbol")
