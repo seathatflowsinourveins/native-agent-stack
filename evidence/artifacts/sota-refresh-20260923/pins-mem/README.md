@@ -21,11 +21,15 @@ An independent Opus review of the first pass found five issues, resolved as foll
    exported to the isolated server's port, `AI_MEMORY_EMBEDDING_PROVIDER=none`,
    and an explicit `--workspace/--project` distinct from the live scope; verified
    by direct filesystem/git-log inspection that no new content landed in the live
-   store this time. **The stray page from the first pass is still in the live
-   store and was NOT deleted by this unit** -- removing it is a destructive
-   live-store change that needs the coordinator's or user's decision; see
-   `ai-memory.json`'s `fix_round.stray_live_page_unresolved` for the exact path
-   and a candidate command.
+   store this time. **The stray page from the first pass was NOT deleted by this
+   unit** -- removing it was a destructive live-store change that needed the
+   coordinator's or user's decision; see `ai-memory.json`'s
+   `fix_round.stray_live_page_unresolved` for the exact path. **Update**: the
+   coordinator subsequently deleted it via `memory_delete_page` on 2026-09-23
+   (wiki checkpoints ea02e38 -> e2fadf4); per the #81 finding this is a
+   wiki-level delete, not byte-level erasure, and the page and its history
+   remain in the wiki git history and the live store's SQLite WAL (see
+   `ai-memory.json`'s `fix_round.coordinator_followup_deletion`).
 2. **Major -- acceptance ref too narrow, no handoff check.** Broadened
    `acceptance_check_ref` to include both the retained maintenance receipt and
    the retained lifecycle-probe receipt/commands, and added an isolated,
@@ -71,10 +75,13 @@ An independent Opus review of the first pass found five issues, resolved as foll
   test result rather than re-running an unchanged check.
 
 - **markitdown 0.1.8 qualifies.** Isolated `uv` venv install; `--version` reports
-  `0.1.8`; the retained conversion functional check (convert a local Markdown/HTML
-  file, assert >=100 bytes of output) reproduces cleanly (21363 bytes on this
-  worktree's README vs. 2191 bytes on the original fixture -- different file,
-  same passing assertion class).
+  `0.1.8`. The primary reproduction leg is `markitdown fixtures/greeting.html`,
+  the exact upstream-directive fixture the retained receipt names by path
+  (results.json:4553, same 474-byte input) -- exit 0, expected text extracted.
+  The README.md conversion (21363 bytes on this worktree's README vs. 2191 bytes
+  on the original fixture) is kept only as a secondary, non-identical-fixture
+  check for the >=100-byte assertion class; it is not the fixture reproduction
+  that establishes the `qualified` verdict (see `markitdown.json`'s `limits`).
 
 - **pageindex and mteb have no retained functional baseline to reproduce.**
   `rg` over `evidence/`, `blueprints/`, `catalogs/` found only catalog citations
@@ -97,9 +104,13 @@ An independent Opus review of the first pass found five issues, resolved as foll
   write landed in the LIVE store, not the isolated one (a real isolation failure,
   corrected in this revision; see "Fix round" above and `ai-memory.json`). With
   `AI_MEMORY_SERVER_URL` correctly exported to the isolated server's own port,
-  write/search/read-page/handoffs/status/backup ALL correctly operate against
-  only the isolated data directory (re-verified by direct filesystem inspection
-  of both the isolated dir and the live store). This exactly matches documented,
+  write/search/read-page/handoffs(list)/status/backup -- the six legs this
+  fix round actually ran -- ALL correctly operate against only the isolated
+  data directory (re-verified by direct filesystem inspection of both the
+  isolated dir and the live store). Update, delete and a server restart were
+  NOT exercised in this rerun, so this does not cover the retained
+  lifecycle-probe's full write/read/update/delete/restart lifecycle -- see
+  `ai-memory.json`'s `limits` for that gap. This exactly matches documented,
   pre-existing 2.3.2 behavior (the retained probe already works around it by
   setting `AI_MEMORY_SERVER_URL`), so there is no 2.4.0-specific status
   regression.
@@ -113,11 +124,18 @@ An independent Opus review of the first pass found five issues, resolved as foll
   - The MCP-facing check ("configured direct MCP memory_status") was not
     attempted at all, per the isolation instruction to never touch the live
     store or MCP.
-  - **Unresolved from the first pass:** a stray canary page is still present in
-    the live store (`agent-lab/agent-lab/canary/test.md`, commit `9f9a01c`) and
-    this unit's own diagnostic commands incidentally viewed the live instance's
-    `token_pepper`. Neither was corrected by this unit -- both require an owner
-    decision (see `ai-memory.json`'s `fix_round` block).
+  - **From the first pass:** a stray canary page was left in the live store
+    (`agent-lab/agent-lab/canary/test.md`, commit `9f9a01c`); this unit's own
+    diagnostic commands also incidentally viewed the live instance's
+    `token_pepper`. Neither was corrected by this unit -- both required an
+    owner decision (see `ai-memory.json`'s `fix_round` block). **Status:** the
+    stray page was subsequently deleted by the coordinator via
+    `memory_delete_page` on 2026-09-23 (wiki checkpoints ea02e38 -> e2fadf4;
+    per the #81 finding this is wiki-level, not byte-level erasure -- the page
+    and its history remain in the wiki git history and the live store's SQLite
+    WAL). The `token_pepper` exposure has been reported to the user for a
+    rotation decision; the value itself is not reproduced anywhere in this
+    evidence directory and was not rotated by this unit.
 
 ## Isolation and containment
 
@@ -126,15 +144,23 @@ An independent Opus review of the first pass found five issues, resolved as foll
   extracted ai-memory binary). Nothing was installed onto PATH or over an
   existing binary; no `~/.config`, `~/.local/share/ai-memory`, `~/.headroom`,
   systemd unit or shell profile was modified.
-- The only process started by this unit (`ai-memory serve` bound to loopback
-  port 58217, isolated data dir) was killed at the end of the run; the port is
-  confirmed freed.
+- The only server processes started by this unit were `ai-memory serve`
+  instances bound to loopback: port 58217 in the first pass, and port 58317
+  in the fix round (`ai-memory.json`'s `isolation.server`), each on its own
+  isolated data dir. Both were killed at the end of their respective runs;
+  both ports are confirmed freed.
 - `pip`/`uv pip` installs for markitdown, mteb and pageindex ran through
   `$HOME/codex-ecosystem/bin/ecosystem-bounded-run` where noted in the
   per-component receipts' `commands` field.
-- No broker contact, no paid API call, no credential read. PageIndex's
-  `PageIndexCloudClient` and mteb's full evaluation-task path were left
-  untouched for exactly this reason (see the pageindex/mteb receipts' `limits`).
+- No broker contact and no paid API call. This is NOT a "no credential read"
+  run: while diagnosing the isolation bug, this unit's own commands
+  incidentally displayed the live production ai-memory instance's
+  `[auth] token_pepper` in plaintext (see `ai-memory.json`'s
+  `fix_round.secret_exposure_disclosure`); it was viewed but not modified,
+  copied elsewhere, or rotated, and rotation is left to the user/coordinator.
+  PageIndex's `PageIndexCloudClient` and mteb's full evaluation-task path were
+  left untouched for the unrelated reason of avoiding paid-API/external-dataset
+  use (see the pageindex/mteb receipts' `limits`).
 
 ## Verdict legend
 

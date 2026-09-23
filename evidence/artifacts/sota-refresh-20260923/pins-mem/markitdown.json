@@ -25,6 +25,7 @@
     "uv venv $HOME/.cache/sota-refresh-20260923/pins-mem/venvs/markitdown-0.1.8 --python 3.13",
     "ecosystem-bounded-run uv pip install --python <venv>/bin/python markitdown==0.1.8",
     "<venv>/bin/markitdown --version",
+    "<venv>/bin/markitdown fixtures/greeting.html -o $TMP/greeting.md",
     "<venv>/bin/markitdown README.md > $TMP/readme.md && wc -c < $TMP/readme.md"
   ],
   "results": {

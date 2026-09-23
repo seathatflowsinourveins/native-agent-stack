@@ -12564,13 +12564,13 @@
     },
     {
       "path": "evidence/artifacts/sota-refresh-20260923/pins-mem/README.md",
-      "sha256": "0d38619a971719e457263e8e7c621d0002a239853b679cf349c0be68bdb014c9",
-      "bytes": 9608
+      "sha256": "451eeb8f421ed98e92b3369ed92f0482e60bc5a25a2226115180caf6b446e0a0",
+      "bytes": 11563
     },
     {
       "path": "evidence/artifacts/sota-refresh-20260923/pins-mem/markitdown.json",
-      "sha256": "68aea16568d0752f328034d8c74db0eb3e911bd4033ec0c5631e217ee436850e",
-      "bytes": 5467
+      "sha256": "719469a6809de442b1872ee3580e35ee1533771e039dc2179bf8ca78583dcca4",
+      "bytes": 5539
     },
     {
       "path": "evidence/artifacts/sota-refresh-20260923/pins-mem/pageindex.json",
@@ -12584,8 +12584,8 @@
     },
     {
       "path": "evidence/artifacts/sota-refresh-20260923/pins-mem/ai-memory.json",
-      "sha256": "d71a5101650b1324460316b600cb43f232c35d3c99499c981395b878067c0773",
-      "bytes": 15087
+      "sha256": "a524ed359611ef76a7723917334e15aa6c30b8ac76e66466218efa44f95a0c21",
+      "bytes": 16896
     },
     {
       "path": "evidence/artifacts/sota-refresh-20260923/pins-mem/mteb.json",
