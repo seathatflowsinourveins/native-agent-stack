@@ -96,8 +96,13 @@ def validate_source(folder, identity, plan_sha256, record_sha256):
 
 def owned_root(path):
     path = Path(path).absolute()
-    if (path.parent != Path('/tmp') or not re.fullmatch(r'native-offhost-app\.[A-Za-z0-9_]+', path.name)
-            or path.resolve() != path or not path.is_dir() or path.stat().st_uid != os.getuid()):
+    # /tmp itself is a symlink on macOS (-> /private/tmp), so compare both
+    # sides resolved; the returned path stays the literal /tmp form the
+    # caller passed in. path.is_symlink() -- not a resolve() comparison on
+    # path itself -- catches an owned-looking leaf that is actually a symlink.
+    if (path.parent.resolve() != Path('/tmp').resolve()
+            or not re.fullmatch(r'native-offhost-app\.[A-Za-z0-9_]+', path.name)
+            or path.is_symlink() or not path.is_dir() or path.stat().st_uid != os.getuid()):
         raise ValueError('expected this job-owned real /tmp root')
     return path
 

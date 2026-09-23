@@ -68,7 +68,7 @@
     },
     {
       "path": "blueprints/convergence-practice/offhost-restore/verify.py",
-      "sha256": "fd51bb5c2ccdea21134b03848e53130bb0cf7dcf53840f988424533fa4bc772f"
+      "sha256": "0fc7e39fb112a1d7c8aae1de68957f0e5a67e3fc78f54080672e0b81a1c9df79"
     },
     {
       "path": "blueprints/convergence-practice/offhost-restore/run.py",

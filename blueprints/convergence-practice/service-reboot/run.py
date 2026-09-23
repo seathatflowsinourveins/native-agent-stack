@@ -13,6 +13,7 @@ import signal
 import socket
 import subprocess
 import tarfile
+import tempfile
 import time
 import urllib.request
 
@@ -143,8 +144,24 @@ def audit_guest(guest, observations, host, frozen):
 
 
 def run(work):
-    if not work.is_absolute() or work.exists() or work.is_symlink() or any(p.is_symlink() for p in work.parents):
+    if not work.is_absolute() or work.exists() or work.is_symlink():
         raise ValueError('--work must be a new absolute path without symlink ancestors')
+    # See blueprints/us-equities/alpaca-historical/collect.py:safe_path --
+    # only the system's own symlinked temp-directory boundary (macOS's
+    # /tmp -> /private/tmp, /var -> /private/var, ...) is tolerated; every
+    # component below it (or, outside the temp tree, from the filesystem
+    # root) must still be symlink-free.
+    tmp_root = Path(tempfile.gettempdir())
+    try:
+        remainder = work.relative_to(tmp_root)
+        candidate = tmp_root.resolve()
+    except ValueError:
+        remainder = work.relative_to(work.anchor)
+        candidate = Path(work.anchor)
+    for part in remainder.parts:
+        candidate /= part
+        if candidate.is_symlink():
+            raise ValueError('--work must be a new absolute path without symlink ancestors')
     # Execution is intentionally unavailable on an existing desktop host.
     if os.environ.get('GITHUB_ACTIONS') != 'true' or os.environ.get('RUNNER_ENVIRONMENT') != 'github-hosted':
         raise ValueError('Execution requires the declared disposable GitHub-hosted runner')

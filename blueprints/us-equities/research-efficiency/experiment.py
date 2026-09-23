@@ -9,6 +9,7 @@ import os
 from pathlib import Path
 import re
 import subprocess
+import tempfile
 import time
 
 HERE = Path(__file__).resolve().parent
@@ -79,8 +80,22 @@ def write(path, raw):
 
 def safe(path):
     path = Path(path).absolute()
-    if any(p.is_symlink() for p in [path, *path.parents]):
-        raise ValueError('symlink refused')
+    # See blueprints/us-equities/alpaca-historical/collect.py:safe_path --
+    # only the system's own symlinked temp-directory boundary (macOS's
+    # /tmp -> /private/tmp, /var -> /private/var, ...) is tolerated; every
+    # component below it (or, outside the temp tree, from the filesystem
+    # root) must still be symlink-free.
+    tmp_root = Path(tempfile.gettempdir())
+    try:
+        remainder = path.relative_to(tmp_root)
+        candidate = tmp_root.resolve()
+    except ValueError:
+        remainder = path.relative_to(path.anchor)
+        candidate = Path(path.anchor)
+    for part in remainder.parts:
+        candidate /= part
+        if candidate.is_symlink():
+            raise ValueError('symlink refused')
     return path
 
 
