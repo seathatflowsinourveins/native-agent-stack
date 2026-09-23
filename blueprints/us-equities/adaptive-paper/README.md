@@ -1,6 +1,6 @@
 # Adaptive equity research and paper practice
 
-Latest measured follow-up: [September 23 afternoon report](heartbeat-20260923-pm.md) and [receipt](heartbeat-20260923-pm.json). Same-account histories were consolidated into the original ledger; fresh proof and recovery matched a flat account with cash-1.10USD. The reviewed afternoon trial stopped after1.17seconds on conflicting equal-time quotes, with zero orders. Its changed quarantine followup passed95focused tests and native Claude/Codex review; the next trial remains conditional on current checks. The [morning heartbeat](heartbeat-20260923.md) retains both earlier interrupted attempts; these are not five-minute acceptance.
+Latest measured follow-up: [September 23 afternoon report](heartbeat-20260923-pm.md) and [receipt](heartbeat-20260923-pm.json). Reviewed frozen`93493e7d` completed300.87seconds in the original consolidated ledger and exact prior configuration:10submitted/filled orders,5roundtrips,+0.09USD incremental paper PnL, flat with cash matched. Peak4submissions/minute and relative-strength-only selections do not establish near200/minute or all-family execution. Earlier interrupted attempts and their recoveries remain separate; the changed quote guard passed95focused tests and native Claude/Codex review before this trial.
 
 This lane wires five deterministic policy families into NautilusTrader2.0.0rc5
 `LiveNode`, with the official Alpaca SDK0.44.0 carrying quotes, order updates and

@@ -8,12 +8,13 @@
     "claude-code",
     "codex"
   ],
-  "claim": "Native research and broker activity proof consolidated14same-account histories into the original ledger. A reviewed paper trial stopped after1.17seconds with0orders; cash-matched recovery passed. Changed equal-time conflict quarantine passed95focused checks and native Claude/Codex review; five-minute acceptance remains open.",
+  "claim": "Reviewed frozen93493e7d completed a300.87second Alpaca paper trial in the original consolidated ledger and exact prior configuration:10submitted/filled orders,5roundtrips,+0.09USD incremental executed-price PnL, flat with fresh cash reconciliation. Native quote quarantine released2084episodes; earlier failures remain preserved.",
   "limitations": [
-    "The failed afternoon trial and separate146.76second concurrent run are not five-minute acceptance; historical different-config fills remain separate.",
-    "Native LiveNode and mocked HTTP checks are local fixtures; strategy profitability, all-family execution and broker throughput remain unqualified.",
-    "The next changed trial requires current source/catalog checks and the original account lock, configuration and all risk/request/order history.",
-    "Original configuration,200REST/minute and180all-submission ceilings remain; no live trading, added leverage, paid features or catalyst orders.",
+    "This bounded paper run selected only relative strength; it does not establish all-family broker execution, profitability or near200fills/minute.",
+    "Peak4submissions/minute was measured. Shared200REST/minute and180all-submission ceilings remain;1000/minute entitlement is unestablished.",
+    "Held/pending quote escalation and submission faults remain local fixture evidence; this broker run had0exposure escalations.",
+    "Paper costs, market impact and queue realism remain unqualified; separate fees/spread/slippage were not independently measured.",
+    "No live trading, added leverage, paid features or catalyst orders. All prior risk/request/order history is retained.",
     "Generated dashboard HTML is excluded from the scoped secret scan; its scan coverage is incomplete."
   ],
   "native_evidence": "blueprints/us-equities/adaptive-paper/heartbeat-20260923-pm.json",

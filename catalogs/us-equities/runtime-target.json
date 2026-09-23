@@ -17,7 +17,7 @@
     "max_total_requests_per_minute": 200,
     "max_submission_requests_per_minute": 180,
     "native_synthetic_capacity": "180 fills / 90 roundtrips in60.4282seconds;178.7246submissions/minute;flat;zero broker connections",
-    "broker_status": "September23 original history consolidated and cash-1.10USD matched. Reviewed trial stopped1.17s on equal-time conflict with0orders; recovery passed. Changed quarantine passed95focused tests and native Claude/Codex review. Five-minute acceptance remains open.",
+    "broker_status": "September23 reviewed frozen93493e7d completed300.87s in the original ledger/config:10submitted/filled orders,5roundtrips,+0.09USD incremental executed-price PnL; flat and cash matched. Peak4submissions/min. Only relative strength selected; profitability and near200/min remain unqualified.",
     "market_research": "September23 19:07UTC bounded50news/24IEX snapshots;8new articles since17:38, breadth6positive18negative; all24quotes fresh. Publication/update/observation times retained; advisory only.",
     "selection": "Reuse selected native engine and official SDK; no replacement justified by repository recency",
     "overturning_comparison": "A maintained alternative must demonstrate better operational acceptance and cost-adjusted out-of-sample strategy results on the same frozen data/risk contract",
@@ -119,9 +119,9 @@
   "next_acceptance": [
     {
       "id": "adaptive-crossed-quote-handling",
-      "status": "blocked_quote_quarantine_unqualified",
-      "scope": "September23 native SIP attempts stopped before300seconds with zero orders/fills; recovery flat and cash matched. A separate read-only sample observed33crossed quotes. Qualify atomic executable-cache invalidation, strictly newer valid recovery and held/pending order-race handling before another trial on the original ledger and frozen limits.",
-      "executed_evidence_ref": "blueprints/us-equities/adaptive-paper/heartbeat-20260923.json"
+      "status": "bounded_native_quote_quarantine_paper_trial_passed",
+      "scope": "September23 changed300.87second original-ledger paper trial passed after native Claude/Codex review:2084quarantine episodes released,27crossed and2071timestamp-conflict invalidation events,10filled orders/5roundtrips, flat/cash matched. Held/pending escalation and faults remain locally qualified fixtures; no throughput or profitability claim.",
+      "executed_evidence_ref": "blueprints/us-equities/adaptive-paper/heartbeat-20260923-pm.json"
     },
     {
       "id": "retained-equity-replay",

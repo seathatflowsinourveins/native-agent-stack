@@ -5,6 +5,47 @@ SHA256 `77244c396c407d20f7b21f0e9e8ad9a2c4803ad663247ac210076a47ebbc7eb3`.
 The [structured receipt](heartbeat-20260923-pm.json) records current status;
 the [morning report](heartbeat-20260923.md) retains both interrupted attempts.
 
+## Measured five-minute paper result
+
+Trial`adaptive-20260923-pm2` from reviewed frozen`93493e7d` PASSED in300.868594s
+with normal duration completion. The broker confirmed an open regular session
+at19:25:15.873770382UTC; final reconciliation reads ran through19:30:17UTC.
+Independent order-level audit excluded all30prior intents.
+
+| Measure | This trial |
+| --- | --- |
+| Submitted orders / fully filled orders | 10 / 10 |
+| Positive fill increments / native fill events | 10 / 10 |
+| Roundtrips | 5: AAPL1, INTC3, NVDA1 |
+| Incremental executed-price cash/PnL | +0.09USD |
+| Final positions / open orders | 0 / 0 |
+| Fresh cash reconciliation | Matched; cumulative original-baseline delta-1.01USD |
+| Run-recorded requests | 54:44reads,10submits,0cancels |
+| Original-ledger request increase including preflight/outer reads | 82:72reads,10submits |
+| Peak rolling60seconds account requests / submissions | 38 / 4 |
+| Native quotes | 162036 |
+| Quarantine episodes / releases | 2084 / 2084 |
+| Crossed / timestamp-conflict invalidation events | 27 / 2071 |
+
+Reason counters count events, while episodes can contain several invalidations.
+No quarantine remained active and no exposed-symbol escalation occurred. Native
+rejections, adapter errors, shutdown failures and reconciliation errors were zero.
+Relative strength had21policy selections; the other four families had zero.
+Selection counts are not submitted orders. The five families remain wired, but
+this run exercised only relative-strength selection at the broker.
+
+Exact fills independently sum to+0.09USD. Incremental gross realized losses were
+0.08USD; cumulative realized loss is1.49USD. Separate fees, spread, slippage,
+market impact and queue realism were not independently measured. Paper results
+do not establish deployable profitability. The ledger retains1055requests,
+19trials and40intents, including the30prior intents and all imported history.
+No configuration, numeric risk limit, account baseline or state root was reset.
+
+The changed-source catalog/foundation/convergence/hash checks and15dashboard
+tests passed before entry. A scoped scan of its three new commits passed with
+34466bytes scanned; generated dashboard HTML remained excluded. The failed
+1.17second first trial below is preserved, not overwritten by this acceptance.
+
 ## Account continuity
 
 The17:54UTC read-only broker proof was open-session, flat and free of open orders.
@@ -159,4 +200,5 @@ promotion checks remain reusable because the input hash is unchanged. That
 daily-data evidence does not qualify live quote handling or strategy returns.
 
 The200shared REST requests/minute and180all-submissions/minute limits remain
-ceilings. No result establishes near200actual fills or1000trades per minute.
+ceilings. This trial measured a peak4submissions/minute. No result establishes
+near200actual fills or1000trades per minute, or qualifies live trading.

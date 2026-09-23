@@ -3,7 +3,7 @@
   "date": "2026-09-23",
   "phase": "afternoon",
   "kind": "native_paper_heartbeat",
-  "status": "changed_trial_ready_after_review",
+  "status": "bounded_five_minute_paper_trial_passed",
   "base_commit": "54ad06c3a1a671d8582e945404958a07ab472745",
   "config_sha256": "77244c396c407d20f7b21f0e9e8ad9a2c4803ad663247ac210076a47ebbc7eb3",
   "account_scope": "Original private Alpaca paper account ledger and lock; no new state root.",
@@ -30,9 +30,9 @@
       "intents": 0,
       "positions": 0
     },
-    "stop_present": true,
+    "stop_present": false,
     "separate_ledger_timer": "remains inactive",
-    "entry_hold_reason": "Owned recovery passed and changed quote source review closed; release owned STOP only for the next frozen trial after current checks.",
+    "entry_hold_reason": "Owned hold released after completed recovery, reviewed changed source, current checks and independent continuity pass; changed trial completed normally.",
     "concurrent_run": {
       "source_commit": "fbda2409bb072ef48baa8379ae114d1a51669c0f",
       "trial": "adaptive-20260923-e2e",
@@ -55,6 +55,18 @@
         "cash_delta_from_original_baseline_usd": "-1.10"
       },
       "scheduler": "inactive; Restart=no; no paper timers observed at19:00UTC"
+    },
+    "final": {
+      "phase": "finished",
+      "status": "passed",
+      "requests": 1055,
+      "trials": 19,
+      "intents": 40,
+      "positions": 0,
+      "cash_delta_usd": "-1.010",
+      "cumulative_realized_loss_usd": "1.49",
+      "prior_intents_preserved": 30,
+      "external_sources_unchanged_before_trial": 14
     }
   },
   "research": {
@@ -204,7 +216,7 @@
       }
     },
     "limitations": [
-      "The first reviewed native trial failed after1.17seconds on equal-time conflict. Changed quarantine source is qualified locally; its next paper acceptance remains conditional.",
+      "Equal-time conflict quarantine passed the changed300second broker trial; held/pending escalation and fault races retain local fixture coverage.",
       "Benchmark invalidation before port.submit is outside decision-time synchronization coverage.",
       "Exact-plan retry is idempotent; a caller restart after COMMIT requires reading the stored consolidation receipt before any new action."
     ],
@@ -325,10 +337,93 @@
         "cash_match": true,
         "cash_delta_from_original_baseline_usd": "-1.10"
       }
+    },
+    {
+      "trial": "adaptive-20260923-pm2",
+      "source_commit": "93493e7d4d2f00ac1371756368f6f540bed9a83a",
+      "private_receipt_sha256": "9ae6a7ebbe8c5033cbb0b7869a2edd084851e1137a65fc0864068fc39a385d96",
+      "status": "passed",
+      "exit_code": 0,
+      "elapsed_seconds": 300.86859399901005,
+      "decision_elapsed_seconds": 300.0606119050062,
+      "duration_completed": true,
+      "reason": "duration_completed",
+      "regular_session_open_confirmed": true,
+      "broker_clock_at_start": "2026-09-23T19:25:15.873770382Z",
+      "final_reconciliation_request_at": "2026-09-23T19:30:17.206135Z",
+      "orders_submitted": 10,
+      "filled_orders": 10,
+      "positive_fill_increments": 10,
+      "native_fill_events": 10,
+      "roundtrips": 5,
+      "roundtrips_by_symbol": {
+        "AAPL": 1,
+        "INTC": 3,
+        "NVDA": 1
+      },
+      "native_quotes": 162036,
+      "trial_cash_delta_usd": "0.09",
+      "trial_realized_pnl_usd": "0.09",
+      "incremental_gross_realized_loss_usd": "0.08",
+      "costs": {
+        "executed_price_pnl_usd": "0.09",
+        "separate_fees_spread_slippage": "not independently measured",
+        "limitation": "Paper fills do not establish realistic market impact, queue position or deployable returns. Later nontrade fees can post after this cash proof."
+      },
+      "quarantine": {
+        "invalidated": 2084,
+        "released": 2084,
+        "crossed_invalidations": 27,
+        "timestamp_conflict_invalidations": 2071,
+        "older_ignored": 0,
+        "exposure_escalations": 0,
+        "active": [],
+        "counter_meaning": "Reason counters count applied invalidation events; invalidated counts episodes. Counts differ when several invalidations occur within one episode."
+      },
+      "requests": {
+        "run_recorded_total": 54,
+        "run_recorded_reads": 44,
+        "run_recorded_submissions": 10,
+        "run_recorded_cancels": 0,
+        "run_peak_rolling_60s_total": 16,
+        "run_peak_rolling_60s_submissions": 4,
+        "account_ledger_delta": 82,
+        "account_ledger_reads": 72,
+        "account_ledger_submissions": 10,
+        "account_ledger_peak_rolling_60s_total": 38,
+        "account_ledger_peak_rolling_60s_submissions": 4,
+        "scope": "Ledger delta includes preflight/outer reads; run receipt covers the controller-recorded run. Trading200/min and all-submission180/min ceilings remained unchanged."
+      },
+      "policy_selections": {
+        "defensive_cash": 0,
+        "mean_reversion": 0,
+        "range_breakout": 0,
+        "relative_strength": 21,
+        "trend_momentum": 0
+      },
+      "reconciliation": {
+        "positions": 0,
+        "open_orders": 0,
+        "cash_match": true,
+        "positions_match": true,
+        "cash_delta_from_original_baseline_usd": "-1.01"
+      },
+      "errors": {
+        "adapter": [],
+        "native_rejections": 0,
+        "finalization": null,
+        "shutdown": null
+      },
+      "independent_audit": "Codex reader independently matched trial-prefix orders, positive cumulative-fill increments, exact fill cash and rolling request counts; historical30intents excluded.",
+      "limitations": [
+        "Only relative strength was selected in this trial; five wired families are not five broker-exercised strategies.",
+        "Peak4submissions/minute does not establish180/minute capacity or near200actualfills/minute.",
+        "Held/pending quarantine and submission faults remain local fixture coverage; exposure_escalations was0 in this broker trial."
+      ]
     }
   ],
   "limitations": [
-    "The reviewed afternoon trial stopped before300seconds with0orders. Its flat recovery does not establish five-minute acceptance.",
+    "Earlier interrupted trials and their recoveries remain separate failures. Only changed trialadaptive-20260923-pm2 completed the300second acceptance.",
     "Morning interrupted trials remain separate failures with flat recovery.",
     "Broker throughput, strategy profitability and all-family native order execution remain unqualified.",
     "No live trading, added leverage, paid features or catalyst-order signals."
@@ -482,7 +577,7 @@
       "native_engine_resumed": false
     }
   },
-  "orders_submitted_this_heartbeat": 0,
+  "orders_submitted_this_heartbeat": 10,
   "required_checks": {
     "source_commit": "3b252cc18b62e1e0e532d73b130167d288b3c5b8",
     "validate": "passed69components2022hashes4profiles142receipts",
@@ -541,5 +636,47 @@
     "orders_submitted": 0,
     "raw_payloads_retained": false,
     "classification_scope": "Comparisons use normalized executable quote fields; exact_duplicates means identical normalized quotes, not byte-identical raw SIP messages. Venue, tape and nonhalt conditions are outside this comparison."
+  },
+  "broker_readiness": {
+    "status": "passed",
+    "trial": "adaptive-20260923-pm2",
+    "source_commit": "93493e7d4d2f00ac1371756368f6f540bed9a83a",
+    "duration_completed": true,
+    "elapsed_seconds": 300.86859399901005,
+    "orders_submitted": 10,
+    "filled_orders": 10,
+    "roundtrips": 5,
+    "flat": true,
+    "cash_match": true,
+    "trial_cash_delta_usd": "0.09",
+    "scope": "Bounded regular-session paper operation only; native fault, all-family execution, strategy return and high-throughput acceptance remain separate."
+  },
+  "changed_trial_checks": {
+    "source_commit": "93493e7d4d2f00ac1371756368f6f540bed9a83a",
+    "frozen_source_pins_matched": 38,
+    "config_sha256": "77244c396c407d20f7b21f0e9e8ad9a2c4803ad663247ac210076a47ebbc7eb3",
+    "validate": "passed69components2022hashes4profiles142receipts",
+    "catalogs": "passed",
+    "foundation": "passed",
+    "convergence": "passed",
+    "build_check": {
+      "path": "docs/ecosystem/index.html",
+      "sha256": "073c988e9e6095008ec1d81f49d532c68be12bf66fe6ea32a51b4063fb0ae675",
+      "bytes": 12922603
+    },
+    "dashboard_tests": {
+      "run": 15,
+      "passed": 15,
+      "seconds": 0.181
+    },
+    "secret_scan": {
+      "commits": 3,
+      "bytes": 34466,
+      "status": "passed_no_findings",
+      "excluded_paths": [
+        "docs/ecosystem/index.html"
+      ],
+      "coverage": "incomplete for excluded generated HTML"
+    }
   }
 }

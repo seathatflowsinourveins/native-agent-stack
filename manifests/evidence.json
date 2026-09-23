@@ -2986,12 +2986,13 @@
         "claude-code",
         "codex"
       ],
-      "claim": "Native research and broker activity proof consolidated14same-account histories into the original ledger. A reviewed paper trial stopped after1.17seconds with0orders; cash-matched recovery passed. Changed equal-time conflict quarantine passed95focused checks and native Claude/Codex review; five-minute acceptance remains open.",
+      "claim": "Reviewed frozen93493e7d completed a300.87second Alpaca paper trial in the original consolidated ledger and exact prior configuration:10submitted/filled orders,5roundtrips,+0.09USD incremental executed-price PnL, flat with fresh cash reconciliation. Native quote quarantine released2084episodes; earlier failures remain preserved.",
       "limitations": [
-        "The failed afternoon trial and separate146.76second concurrent run are not five-minute acceptance; historical different-config fills remain separate.",
-        "Native LiveNode and mocked HTTP checks are local fixtures; strategy profitability, all-family execution and broker throughput remain unqualified.",
-        "The next changed trial requires current source/catalog checks and the original account lock, configuration and all risk/request/order history.",
-        "Original configuration,200REST/minute and180all-submission ceilings remain; no live trading, added leverage, paid features or catalyst orders.",
+        "This bounded paper run selected only relative strength; it does not establish all-family broker execution, profitability or near200fills/minute.",
+        "Peak4submissions/minute was measured. Shared200REST/minute and180all-submission ceilings remain;1000/minute entitlement is unestablished.",
+        "Held/pending quote escalation and submission faults remain local fixture evidence; this broker run had0exposure escalations.",
+        "Paper costs, market impact and queue realism remain unqualified; separate fees/spread/slippage were not independently measured.",
+        "No live trading, added leverage, paid features or catalyst orders. All prior risk/request/order history is retained.",
         "Generated dashboard HTML is excluded from the scoped secret scan; its scan coverage is incomplete."
       ],
       "path": "evidence/receipts/adaptive-paper-heartbeat-20260923-pm.json"
@@ -5466,8 +5467,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/README.md",
-      "sha256": "4d501bff373f6ff3d47f6614d2c3628f98e0b5fac9ba387ed645de795987a087",
-      "bytes": 19855
+      "sha256": "83cda39f06d0088595884de9eef3c0c0a453204f6f2492d2efb83dc6f96c7695",
+      "bytes": 19838
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/adaptive_policy_v1.receipt.json",
@@ -7411,8 +7412,8 @@
     },
     {
       "path": "catalogs/us-equities/gates-20260922.json",
-      "sha256": "a3ffea5d7e8b91f2ac759bcd1b6beaf6d92edca18f3f21ac16193eff6e9fa164",
-      "bytes": 23836
+      "sha256": "f81d0dc359da1e47ed22478a2e88c31a195ff1508ea006ed565b2ec8c52f1a95",
+      "bytes": 23738
     },
     {
       "path": "catalogs/us-equities/hosting-source-review.json",
@@ -7481,8 +7482,8 @@
     },
     {
       "path": "catalogs/us-equities/runtime-target.json",
-      "sha256": "e0a4b99494d0c3a7e49f5793fdcd16d0d58de94e21bbee53e9c3727965246f13",
-      "bytes": 9503
+      "sha256": "8236fbf855301e924fbe844009ff3e63edbe79c8fa37c6860548786b4cf5e861",
+      "bytes": 9553
     },
     {
       "path": "catalogs/us-equities/security-identity-review.json",
@@ -7666,8 +7667,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "073c988e9e6095008ec1d81f49d532c68be12bf66fe6ea32a51b4063fb0ae675",
-      "bytes": 12922603
+      "sha256": "e75f140841bb34bded91bad545ce0de4fe0b45864d026c336ea9d1b4decccdf7",
+      "bytes": 12922636
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -11506,8 +11507,8 @@
     },
     {
       "path": "observability/grand-dashboard/state.json",
-      "sha256": "afb95cea200c011065a847570d6077e4dec9644d54aa525d884b8de89f63f905",
-      "bytes": 10480
+      "sha256": "1b8ca584b0e318114c1d5d21acf88679ec4e033f3264aa3262a81e0b14720c85",
+      "bytes": 10474
     },
     {
       "path": "observability/native-data/README.md",
@@ -13096,13 +13097,13 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/heartbeat-20260923-pm.json",
-      "sha256": "b6520cf792666b3775e5e9ef7404900f253bc8663be4c2fbaacb6b59f40e3c02",
-      "bytes": 20559
+      "sha256": "8b2177bb8f8f9ba2aaa23ab3dfadd2990316ad06528693c810fe8f7273dbd0f0",
+      "bytes": 25890
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/heartbeat-20260923-pm.md",
-      "sha256": "97b32a0b5692efd334e2efee1b8123a658a2ea8de7a4b8685c30d07f7fc5d42f",
-      "bytes": 10451
+      "sha256": "eab45869fdb5b44ac6c5fe9d2ff89d34f47354556f20bf95db5608f40260802d",
+      "bytes": 12833
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/ledger_consolidation.py",
@@ -13111,8 +13112,8 @@
     },
     {
       "path": "evidence/receipts/adaptive-paper-heartbeat-20260923-pm.json",
-      "sha256": "153839e569e52816fe0e548f049a81bc7bd4417a22d5b8fb99ded292f74276ae",
-      "bytes": 1453
+      "sha256": "5e6db07c8b44f00368d6184ed752bed714ef8b2d93861d5870d5c24068d52c29",
+      "bytes": 1534
     },
     {
       "path": "tests/test_adaptive_paper_ledger_consolidation.py",

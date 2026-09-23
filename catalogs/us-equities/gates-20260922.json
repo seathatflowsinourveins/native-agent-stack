@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "id": "us-equities-gate-ladder-20260922",
-  "checked_at": "2026-09-22",
+  "checked_at": "2026-09-23",
   "scope": "The sim -> paper -> live gate ladder for the selected destination (NautilusTrader 2.0.0rc5 with IBKR primary and a separate Alpaca paper adapter; LEAN 985ef30 frozen oracle). Each gate names the receipt that establishes it and the machine-checkable condition that flips it. scripts/trading_gates.py --check verifies the ladder arithmetically; a status changes only by a dated commit after the checker lists the gate as a flip candidate; an exists condition proves only that a non-empty file is present, so gates using it carry a presence-only limitation in their note. Rung readiness = every required gate of that rung and every earlier rung established. Nothing here authorizes live configuration, paid hosting or orders.",
   "rungs": [
     "sim",
@@ -80,7 +80,7 @@
         "pointer": "/status",
         "equals": "pass"
       },
-      "note": "promotion_gate.py (pandera 0.33.1 in its own venv) passes the good fixture and fails closed on the bad and null-price fixtures (blueprints/us-equities/data/fixtures/*-gate-result.json); runner.validate_preflight refuses paper without a matching passing result. No real snapshot ingest exists yet, so a production paper run is not yet gated end-to-end."
+      "note": "The original synthetic receipt remains: promotion_gate.py (pandera0.33.1 in its own venv) passes the good fixture and fails closed on bad/null-price fixtures; runner.validate_preflight refuses paper without a matching passing result. Subsequently the September23 actual480row/24symbol daily snapshot throughSeptember22 passed12checks and was hash-matched in the completed300.87second native paper trial. That dated native evidence is in blueprints/us-equities/adaptive-paper/heartbeat-20260923-pm.json; it does not change the class of the original fixture receipt."
     },
     {
       "id": "rc5-supply-chain-scan",
@@ -206,17 +206,17 @@
       "rung": "paper",
       "layer": "execution-broker",
       "title": "Adaptive paper runtime completes a regular-session broker trial",
-      "status": "not_established",
-      "owner": "peer:sota-workflow-resolution",
-      "evidence_class": "none",
+      "status": "established",
+      "owner": "this-effort",
+      "evidence_class": "native_proven",
       "required": true,
-      "receipt_path": "blueprints/us-equities/adaptive-paper/receipt.json",
+      "receipt_path": "blueprints/us-equities/adaptive-paper/heartbeat-20260923-pm.json",
       "flip_condition": {
         "type": "equals",
         "pointer": "/broker_readiness/status",
         "equals": "passed"
       },
-      "note": "Current receipt: status local_integration_passed_new_broker_trial_pending, broker_readiness not_started (regular_session_window_unavailable). Synthetic capacity fixture (180 fills / 90 round trips in 60.42 s) used zero broker connections and is not this gate. Authorized paper work, not run by the 2026-09-22 handbook wave. 2026-09-22 10:55 ET: one SIP trial in the default state root ended completed_no_signals in 0.35 s with 0 orders and a flat reconciliation, which does not meet the flip condition. Root cause measured: the Windows host clock was +0.64 s off NTP and WSL's hv_utils time sync pulled the guest to it, so live quotes looked future-stamped and tripped the transport's -0.25 s quote guard (quote_timestamp_stale -> start_not_ready); an environment fault, not an engine or feed fault. Next attempt needs `w32tm /resync /force` on the host (user OS action) and, since PR-4, a passing promotion-gate result for the paper command (--gate-result/--snapshot). Ownership passed to peer:sota-workflow-resolution with adaptive-paper integration on 2026-09-22."
+      "note": "September23 current original-ledger trialadaptive-20260923-pm2 from reviewed frozen93493e7d:300.868594seconds,10submitted/filled orders,5roundtrips,+0.09USD incremental executed-price PnL; final flat/cash matched. Exact prior config77244c396c407d20f7b21f0e9e8ad9a2c4803ad663247ac210076a47ebbc7eb3 and200REST/180submission ceilings retained. Earlier failures/history remain. Native Claude/Codex reviewed changed quote quarantine. This is bounded paper operation; only relative strength selected, peak4submits/minute, not native fault/profitability/high-throughput acceptance. The unchanged /broker_readiness/status predicate nominated this gate before the dated promotion. Other ladder gates remain unchanged; this does not establish whole-rung readiness."
     },
     {
       "id": "broker-path-alerts",
