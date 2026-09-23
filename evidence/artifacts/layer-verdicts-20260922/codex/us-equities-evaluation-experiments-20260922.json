@@ -1,0 +1,129 @@
+{
+ "alternatives": [
+  {
+   "disposition": "overlap",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "https://github.com/mlflow/mlflow/blob/v3.16.1/README.md"
+   ],
+   "key": "c3",
+   "name": "mlflow",
+   "repository": "https://github.com/mlflow/mlflow",
+   "why_not_default": "Duplicates c1's upstream project and experiment-tracking role. The tag README supplies no independent execution evidence; prefer the commit-pinned c1 entry without counting the same project twice."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "https://github.com/online-ml/river/blob/64285b9dd6c606804753235fe992bcf25b9856ee/README.md"
+   ],
+   "key": "c4",
+   "name": "data-river",
+   "repository": "https://github.com/online-ml/river",
+   "why_not_default": "The reviewed README establishes an online-learning focus. Retained evidence does not demonstrate progressive financial evaluation with delayed outcomes, corrections or restart recovery, so it remains conditional on that specialized workload."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "https://github.com/embeddings-benchmark/mteb/blob/8ecdd976aad52ee9d5718772065438ec60ed388a/README.md",
+    "https://github.com/embeddings-benchmark/mteb/releases/tag/2.21.0"
+   ],
+   "key": "c5",
+   "name": "foundation-mteb",
+   "repository": "https://github.com/embeddings-benchmark/mteb",
+   "why_not_default": "The reviewed sources cover embedding and retrieval evaluation, including task-cleaning changes. No retained execution qualifies it on point-in-time financial retrieval, and its specialized benchmark role does not replace general experiment tracking or agent evaluation."
+  },
+  {
+   "disposition": "overlap",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "https://github.com/Arize-ai/phoenix/blob/arize-phoenix-v20.14.0/README.md"
+   ],
+   "key": "c6",
+   "name": "phoenix",
+   "repository": "https://github.com/Arize-ai/phoenix",
+   "why_not_default": "The reviewed README describes evaluation, versioned datasets and experiments, overlapping the selected pair. The packet retains no instrumented application, launched server or executed judge comparison demonstrating additional value or equivalent recovery and isolation."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "https://github.com/eyuansu62/agent-retrieval-bench/blob/07014c986f3deadb1548c62b32c0ffbe6a81465d/README.md",
+    "https://github.com/eyuansu62/agent-retrieval-bench/releases/tag/v0.2.1"
+   ],
+   "key": "c7",
+   "name": "foundation-agent-retrieval-bench",
+   "repository": "https://github.com/eyuansu62/agent-retrieval-bench",
+   "why_not_default": "The reviewed README targets coding-agent file retrieval. The release reports upstream test results, but these are not a locally observed benchmark run or financial-document evaluation. Use only for a separately frozen code-retrieval comparison."
+  }
+ ],
+ "catalog": "us-equities",
+ "challenger_preferred": null,
+ "lane": "codex",
+ "layer_id": "evaluation-experiments",
+ "limits": [
+  "GitHub blob-page fetches failed for all six referenced READMEs; their contents were successfully read through corresponding raw.githubusercontent.com URLs at the same commits or tags.",
+  "No candidate software, model evaluation, tracking server or recovery comparison was executed during this verdict.",
+  "Upstream README and release statements were inspected as source review, not independently verified runtime results.",
+  "The local research-evaluation receipt was inspected as historical evidence; its private artifacts and original execution were not independently reverified."
+ ],
+ "model": {
+  "effort": "high",
+  "name": "gpt-6-astra"
+ },
+ "open_gaps": [
+  "No candidate comparison establishes complete returned results, native identity preservation, scoped telemetry, failed-attempt retention or interruption recovery.",
+  "Broker execution isolation and absence of broker authority in research workers are not established by these source references.",
+  "The local chronological evaluation receipt concerns skfolio, pandas and LEAN sample data; it does not qualify MLflow, Inspect or the other packet candidates.",
+  "Delayed-label evaluation, historical revisions, original information availability and financial retrieval quality remain unqualified.",
+  "Experiment scores and judge results do not establish executable returns or trading profitability."
+ ],
+ "overturn_protocol": {
+  "arms": [
+   "c1 MLflow tracking plus c2 Inspect evaluation",
+   "c6 Phoenix evaluation and experiment tracking"
+  ],
+  "fixture_paths": [
+   "blueprints/us-equities/research-evaluation/plan.json",
+   "tests/test_research_evaluation.py"
+  ],
+  "metric": "Compare both arms on identical frozen inputs and scoring rules: exact preservation of candidate outcomes, exclusions, hashes and failures; reproducible scores; recoverable records after interruption; identity and usage completeness; and no broker authority. Among arms meeting these correctness gates, compare measured elapsed time, provider usage and operational burden. This comparison is proposed, not executed."
+ },
+ "overturn_when": "Replace the selected pair if an executed comparison using blueprints/us-equities/research-evaluation/plan.json and the temporal, censoring and immutable-record checks in tests/test_research_evaluation.py shows Phoenix preserves the same complete evaluation ledger and scoring contract, passes explicit failure/restart and identity/isolation checks, and improves measured cost or operational burden. Existing local tests alone do not establish this comparison.",
+ "packet_sha256": "f3433de3aba1e6886ba512eb36e77d81ea130047633d485de492ada8ecbee8bd",
+ "schema_version": 1,
+ "sources_read": [
+  "<host-path>/us-equities__evaluation-experiments.json",
+  "<host-path>/SKILL.md",
+  "https://github.com/mlflow/mlflow/blob/32792afe5b0183fce10532d3a023f5cfa8612d09/README.md",
+  "https://raw.githubusercontent.com/mlflow/mlflow/32792afe5b0183fce10532d3a023f5cfa8612d09/README.md",
+  "https://pypi.org/project/inspect-ai/0.3.266/",
+  "https://github.com/mlflow/mlflow/blob/v3.16.1/README.md",
+  "https://raw.githubusercontent.com/mlflow/mlflow/v3.16.1/README.md",
+  "https://github.com/online-ml/river/blob/64285b9dd6c606804753235fe992bcf25b9856ee/README.md",
+  "https://raw.githubusercontent.com/online-ml/river/64285b9dd6c606804753235fe992bcf25b9856ee/README.md",
+  "https://github.com/embeddings-benchmark/mteb/blob/8ecdd976aad52ee9d5718772065438ec60ed388a/README.md",
+  "https://raw.githubusercontent.com/embeddings-benchmark/mteb/8ecdd976aad52ee9d5718772065438ec60ed388a/README.md",
+  "https://github.com/embeddings-benchmark/mteb/releases/tag/2.21.0",
+  "https://github.com/Arize-ai/phoenix/blob/arize-phoenix-v20.14.0/README.md",
+  "https://raw.githubusercontent.com/Arize-ai/phoenix/arize-phoenix-v20.14.0/README.md",
+  "https://github.com/eyuansu62/agent-retrieval-bench/blob/07014c986f3deadb1548c62b32c0ffbe6a81465d/README.md",
+  "https://raw.githubusercontent.com/eyuansu62/agent-retrieval-bench/07014c986f3deadb1548c62b32c0ffbe6a81465d/README.md",
+  "https://github.com/eyuansu62/agent-retrieval-bench/releases/tag/v0.2.1",
+  "blueprints/us-equities/research-evaluation/README.md",
+  "blueprints/us-equities/research-evaluation/receipt.json",
+  "blueprints/us-equities/research-evaluation/plan.json",
+  "tests/test_research_evaluation.py"
+ ],
+ "why_selected": "Select c1 and c2 provisionally for the layer's experiment-tracking and agent-evaluation scope. Source review of the commit-pinned [MLflow README](https://github.com/mlflow/mlflow/blob/32792afe5b0183fce10532d3a023f5cfa8612d09/README.md), recovered through its raw URL, found explicit experiment-tracking and evaluation interfaces. Source review of the [Inspect package page](https://pypi.org/project/inspect-ai/0.3.266/) found evaluation components for tools, multi-turn tasks and scoring. These are complementary documented interfaces; no candidate execution or measured superiority was observed. blueprints/us-equities/research-evaluation/receipt.json retains a separate chronological control run, which supplies a useful comparison contract but does not upgrade either winner's evidence class.",
+ "winner_evidence_class": "source_review",
+ "winner_evidence_refs": [
+  "https://github.com/mlflow/mlflow/blob/32792afe5b0183fce10532d3a023f5cfa8612d09/README.md",
+  "https://pypi.org/project/inspect-ai/0.3.266/"
+ ],
+ "winner_keys": [
+  "c1",
+  "c2"
+ ]
+}

@@ -1,0 +1,335 @@
+{
+ "candidates": [
+  {
+   "adopted": true,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": "native_execution",
+   "evidence_refs": [
+    "catalogs/foundation/automation.json",
+    "docs/github-automation.md"
+   ],
+   "key": "c1",
+   "name": "actionlint",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": "catalogs/foundation/automation.json",
+   "repository": "https://github.com/rhysd/actionlint",
+   "review_status": null,
+   "upstream": null
+  },
+  {
+   "adopted": true,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/hosting-source-review.json"
+   ],
+   "key": "c2",
+   "name": "Trivy",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": "catalogs/us-equities/hosting-source-review.json",
+   "repository": "https://github.com/aquasecurity/trivy",
+   "review_status": null,
+   "upstream": null
+  },
+  {
+   "adopted": true,
+   "component_id": "syft",
+   "decisions": [
+    {
+     "capability": "Check workflow/secret controls and selected dependency identity",
+     "evidence_scope": "Native gitleaks and zizmor accepted clean controls and rejected inert unsafe fixtures; Syft matched thirty-six selected SDK distributions.",
+     "id": "offline-security-inventory",
+     "limitations": [
+      "Secret scanning is not proof of no secret anywhere; regular offline workflow analysis is scoped.",
+      "The financial SDK fixture supports dependency enumeration only, not financial behavior or vulnerability assurance."
+     ],
+     "next_gap": "Qualify new distributions or security boundaries independently."
+    }
+   ],
+   "evidence_kind": "native_execution",
+   "evidence_refs": [
+    "catalogs/us-equities/hosting-source-review.json",
+    "catalogs/foundation/decisions.json"
+   ],
+   "key": "c3",
+   "name": "Syft",
+   "pin": "1.52.0",
+   "pin_behind_upstream": false,
+   "recipe_ref": "blueprints/us-equities/supply-chain/README.md",
+   "repository": "https://github.com/anchore/syft",
+   "review_status": null,
+   "upstream": {
+    "archived": false,
+    "latest": "v1.52.0",
+    "license": "Apache-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-18",
+    "released_at": "2026-09-17",
+    "renamed_to": null,
+    "stars": 9598
+   }
+  },
+  {
+   "adopted": true,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": "native_execution",
+   "evidence_refs": [
+    "catalogs/foundation/automation.json",
+    "docs/catalog-provenance.md"
+   ],
+   "key": "c4",
+   "name": "GitHub Actions attest",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": "catalogs/foundation/automation.json",
+   "repository": "https://github.com/actions/attest",
+   "review_status": null,
+   "upstream": null
+  },
+  {
+   "adopted": true,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": "native_execution",
+   "evidence_refs": [
+    "docs/github-automation.md",
+    "catalogs/foundation/automation.json"
+   ],
+   "key": "c5",
+   "name": "Dependabot",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": "docs/github-automation.md",
+   "repository": "https://github.com/dependabot/dependabot-core",
+   "review_status": null,
+   "upstream": null
+  },
+  {
+   "adopted": true,
+   "component_id": "gitleaks",
+   "decisions": [
+    {
+     "capability": "Check workflow/secret controls and selected dependency identity",
+     "evidence_scope": "Native gitleaks and zizmor accepted clean controls and rejected inert unsafe fixtures; Syft matched thirty-six selected SDK distributions.",
+     "id": "offline-security-inventory",
+     "limitations": [
+      "Secret scanning is not proof of no secret anywhere; regular offline workflow analysis is scoped.",
+      "The financial SDK fixture supports dependency enumeration only, not financial behavior or vulnerability assurance."
+     ],
+     "next_gap": "Qualify new distributions or security boundaries independently."
+    },
+    {
+     "capability": "Detect and handle secrets/credentials through native sign-in and inventory scans",
+     "evidence_scope": "Reuses the existing gitleaks inventory and acceptance evidence; no new execution was run to freeze this taxonomy layer.",
+     "id": "secrets-credentials-policy",
+     "limitations": [
+      "openbao remains an unused, unqualified candidate; broker credential handling is a trading gate, not a foundation selection.",
+      "Native login state and account credentials are not inventoried as a component in this catalog."
+     ],
+     "next_gap": "Qualify openbao only against a concrete secret-management gap that native login and gitleaks do not already cover."
+    }
+   ],
+   "evidence_kind": "native_execution",
+   "evidence_refs": [
+    "catalogs/foundation/decisions.json",
+    "docs/foundation-closure-20260921.md"
+   ],
+   "key": "c6",
+   "name": "gitleaks",
+   "pin": "8.30.1",
+   "pin_behind_upstream": false,
+   "recipe_ref": "recipes/README.md",
+   "repository": "https://github.com/gitleaks/gitleaks",
+   "review_status": null,
+   "upstream": {
+    "archived": false,
+    "latest": "v8.30.1",
+    "license": "MIT",
+    "prerelease": false,
+    "pushed_at": "2026-09-09",
+    "released_at": "2026-03-21",
+    "renamed_to": null,
+    "stars": 29427
+   }
+  },
+  {
+   "adopted": true,
+   "component_id": "zizmor",
+   "decisions": [
+    {
+     "capability": "Check workflow/secret controls and selected dependency identity",
+     "evidence_scope": "Native gitleaks and zizmor accepted clean controls and rejected inert unsafe fixtures; Syft matched thirty-six selected SDK distributions.",
+     "id": "offline-security-inventory",
+     "limitations": [
+      "Secret scanning is not proof of no secret anywhere; regular offline workflow analysis is scoped.",
+      "The financial SDK fixture supports dependency enumeration only, not financial behavior or vulnerability assurance."
+     ],
+     "next_gap": "Qualify new distributions or security boundaries independently."
+    }
+   ],
+   "evidence_kind": "native_execution",
+   "evidence_refs": [
+    "catalogs/foundation/decisions.json",
+    "docs/github-automation.md"
+   ],
+   "key": "c7",
+   "name": "zizmor",
+   "pin": "1.30.1",
+   "pin_behind_upstream": false,
+   "recipe_ref": "blueprints/convergence-practice/ci-security/README.md",
+   "repository": "https://github.com/zizmorcore/zizmor",
+   "review_status": null,
+   "upstream": {
+    "archived": false,
+    "latest": "v1.30.1",
+    "license": "MIT",
+    "prerelease": false,
+    "pushed_at": "2026-09-21",
+    "released_at": "2026-09-09",
+    "renamed_to": null,
+    "stars": 6555
+   }
+  },
+  {
+   "adopted": false,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/agents-operations.json",
+    "docs/acceptance-evidence-policy.md"
+   ],
+   "key": "c8",
+   "name": "Grype",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": "catalogs/us-equities/agents-operations.json",
+   "repository": "https://github.com/anchore/grype",
+   "review_status": null,
+   "upstream": null
+  }
+ ],
+ "catalog": "foundation",
+ "checked_at": "2026-09-22",
+ "enums": {
+  "disposition": [
+   "conditional",
+   "measured_tradeoff",
+   "observed_failure",
+   "out_of_scope",
+   "overlap",
+   "selected",
+   "unqualified"
+  ],
+  "evidence_class": [
+   "local_integration",
+   "measured_comparison",
+   "native_proven",
+   "source_review",
+   "synthetic"
+  ]
+ },
+ "existing_overturn_when": "A specific dependency/update or vulnerability gap is demonstrated and one alternative covers it with pinned database/provenance, manageable findings and no duplicate ownership of the same dependency.",
+ "group": null,
+ "layer_id": "ci-supply-chain",
+ "limitations": [
+  "Syntax/security checks do not execute a workflow or prove model-task quality. Syft inventory is not a vulnerability verdict.",
+  "The recorded first Dependabot scans do not establish the scheduled weekly time or every grouped update. Existing automation sources are broader than the repository decision-index union."
+ ],
+ "requirement": "Publish reproducible changes with scoped workflow permissions, pinned dependencies, actual runtime inventory and attributable hosted checks.",
+ "rules": [
+  "Judge from retained evidence. Open the evidence_refs of every adopted candidate (bounded: the referenced file or its relevant section) and record every path you opened in sources_read. Do not rely on memory of the repositories.",
+  "The winner set is 1-3 adopted candidates (adopted == true) that best satisfy the requirement on the evidence. why_selected must cite at least one evidence path and state what was actually observed (native execution, measured comparison, local integration, synthetic fixture or source review), not what the project claims.",
+  "Every adopted non-winner candidate appears in alternatives with a why_not_default that states the concrete evidence gap or trade-off; add non-adopted candidates only with the same standard.",
+  "If a non-adopted candidate would satisfy the requirement better on the evidence, do not select it: record it in challenger_preferred with the comparison (a fixtures/, blueprints/ or tests/ path, or a python3/node command) that would establish it. Agreement between lanes never promotes; only an executed comparison can.",
+  "overturn_when names the concrete check that would change the verdict (a fixtures/, blueprints/ or tests/ path or a runnable python3/node command). open_gaps lists what the evidence does not establish. limits lists what you could not read or verify. Do not invent paths, numbers or results; leave evidence_refs empty rather than guess."
+ ],
+ "schema_version": 1,
+ "sota_components_not_in_candidates": [
+  {
+   "id": "qmd",
+   "pin": "2.8.3",
+   "pin_behind_upstream": false,
+   "repository": "https://github.com/tobi/qmd/releases/tag/v2.8.3",
+   "review_status": null,
+   "upstream": {
+    "archived": false,
+    "latest": "v2.8.3",
+    "license": "MIT",
+    "prerelease": false,
+    "pushed_at": "2026-09-09",
+    "released_at": "2026-08-16",
+    "renamed_to": null,
+    "stars": 29952
+   }
+  },
+  {
+   "id": "repomix",
+   "pin": "1.18.1",
+   "pin_behind_upstream": false,
+   "repository": "https://github.com/yamadashy/repomix/releases/tag/v1.18.1",
+   "review_status": null,
+   "upstream": {
+    "archived": false,
+    "latest": "v1.18.1",
+    "license": "MIT",
+    "prerelease": false,
+    "pushed_at": "2026-09-21",
+    "released_at": "2026-09-21",
+    "renamed_to": null,
+    "stars": 28461
+   }
+  },
+  {
+   "id": "rtk",
+   "pin": "0.49.0",
+   "pin_behind_upstream": false,
+   "repository": "https://github.com/rtk-ai/rtk/releases/tag/v0.49.0",
+   "review_status": null,
+   "upstream": {
+    "archived": false,
+    "latest": "v0.49.0",
+    "license": "Apache-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-21",
+    "released_at": "2026-09-11",
+    "renamed_to": null,
+    "stars": 81419
+   }
+  },
+  {
+   "id": "toon",
+   "pin": "4.1.1",
+   "pin_behind_upstream": false,
+   "repository": "https://github.com/toon-format/toon/releases/tag/v4.1.1",
+   "review_status": null,
+   "upstream": {
+    "archived": false,
+    "latest": "v4.1.1",
+    "license": "MIT",
+    "prerelease": false,
+    "pushed_at": "2026-09-03",
+    "released_at": "2026-08-05",
+    "renamed_to": null,
+    "stars": 25409
+   }
+  }
+ ],
+ "title": "CI and supply chain",
+ "withheld": [
+  "current_choice",
+  "decision",
+  "rationale",
+  "candidates[].disposition",
+  "candidates[].rationale",
+  "candidates[].review_status",
+  "candidates[].decisions[].selection",
+  "candidates[].decisions[].review_status",
+  "sota_components_not_in_candidates[].review_status"
+ ]
+}

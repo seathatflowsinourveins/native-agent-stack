@@ -1,0 +1,187 @@
+{
+ "alternatives": [
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "https://github.com/feast-dev/feast/blob/1d5be950cf718a674cb01eaf0fd0ad6f0a4c6335/README.md"
+   ],
+   "key": "c1",
+   "name": "data-feast",
+   "repository": "https://github.com/feast-dev/feast",
+   "why_not_default": "The reviewed README demonstrates historical-feature retrieval syntax, but retained evidence contains no executed late-correction test establishing historical knowledge cutoffs. Feature retrieval also depends on separately acquired, qualified observations."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "https://github.com/dlt-hub/dlt/blob/a2f4a21e22e5c266278271b6591c70dbc485aea8/README.md"
+   ],
+   "key": "c2",
+   "name": "data-dlt",
+   "repository": "https://github.com/dlt-hub/dlt",
+   "why_not_default": "The README contains REST pagination, DuckDB loading and merge examples. No retained execution establishes immutable financial revisions, decimal precision, historical eligibility or recovery from late corrections."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "https://github.com/alex9smith/gdelt-doc-api/blob/f2e500144b0a6090d63723f94453b32717e5fd23/README.md"
+   ],
+   "key": "c5",
+   "name": "data-gdeltdoc",
+   "repository": "https://github.com/alex9smith/gdelt-doc-api",
+   "why_not_default": "The README exposes article URLs and seendate fields, but no retained acquisition reconciles first-seen timestamps with publication, historical tradable availability, completeness or publisher rights."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "https://github.com/massive-com/client-python/blob/3c247d78c603fc13d274fda1aa26749e7c8c3710/README.md"
+   ],
+   "key": "c7",
+   "name": "Massive Python client",
+   "repository": "https://github.com/massive-com/client-python",
+   "why_not_default": "The reviewed client documentation describes access and service limits, but the packet provides no authenticated acquisition or corporate-action reconciliation comparable to the retained Alpaca sample."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "https://github.com/mortada/fredapi/blob/bf7cc8fdb03b12f8224bbb1bf66381b9d21c6d6d/README.md"
+   ],
+   "key": "c8",
+   "name": "data-fredapi",
+   "repository": "https://github.com/mortada/fredapi",
+   "why_not_default": "The README contains ALFRED revision and vintage examples. No retained request validates last-eligible-vintage selection or intraday announcement availability; this remains a conditional macro-data supplement."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "https://github.com/apache/kafka/blob/26b251a451ce941d3d7a55e6487bcb7f16b5ad48/README.md"
+   ],
+   "key": "c10",
+   "name": "data-kafka",
+   "repository": "https://github.com/apache/kafka",
+   "why_not_default": "The README supplies streaming-platform build and test instructions. No retained deployment, recovery result or workload comparison establishes a need for this operational layer, and transport alone does not qualify source rights or historical availability."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "https://github.com/questdb/questdb/blob/7a391566ac827e0d8c269b91f2415c16b0a32a84/README.md"
+   ],
+   "key": "c12",
+   "name": "QuestDB",
+   "repository": "https://github.com/questdb/questdb",
+   "why_not_default": "The README describes time-series ingestion and querying, but no retained server execution or task-specific throughput comparison justifies adoption as the default. Immutable correction history and reproducible historical snapshots remain unverified."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "https://github.com/databento/databento-python/blob/e675ef30369f5ee9f68b04606080c519adf3be69/README.md"
+   ],
+   "key": "c14",
+   "name": "Databento",
+   "repository": "https://github.com/databento/databento-python",
+   "why_not_default": "The README describes normalized records, symbology and point-in-time definitions, but no retained authenticated sample validates those semantics against the selected securities, corporate actions, historical cutoffs and permitted use."
+  }
+ ],
+ "catalog": "us-equities",
+ "challenger_preferred": null,
+ "lane": "codex",
+ "layer_id": "market-data-reference",
+ "limits": [
+  "This verdict reviews retained receipts and source sections; no provider acquisition, calendar execution or comparison was rerun.",
+  "GitHub blob retrieval failed for ten adopted candidates; all eleven pinned README files were subsequently read successfully through their raw.githubusercontent.com equivalents.",
+  "Private acquisition payloads and runtime artifacts were not opened or independently rehashed. Their verification is reported by the retained receipts.",
+  "Upstream README examples establish source-review evidence only. Release metadata and broader product claims were not independently validated.",
+  "Non-adopted candidates have no retained evidence references in the packet; none is established as a superior challenger."
+ ],
+ "model": {
+  "effort": "high",
+  "name": "gpt-6-astra"
+ },
+ "open_gaps": [
+  "The selected set provides bounded acquisition and reference capabilities; it does not fully satisfy licensed, historically eligible, reproducible all-equities research.",
+  "Authenticated access does not establish all storage, redistribution, derived-data or real-time entitlements.",
+  "Alpaca acceptance covers one retrospective AAPL sample. Delistings, ticker reuse, permanent security identity, complete corporate actions and an as-known historical universe remain unestablished.",
+  "The dividend's missing currency prevents complete cash-unit reconciliation despite matching numeric values.",
+  "SEC acceptance times and newly observed source bytes do not establish original historical dissemination or observation. The five sampled headers remain ineligible at the historical cutoff.",
+  "Calendar execution establishes one XNYS session, not comprehensive holidays, emergency closures, extended hours or security-specific halts.",
+  "Immutable capture and cutoff rejection depend on project-local adapters. Native SDKs alone do not establish those guarantees, and the Alpaca adapter uses pinned private transport seams.",
+  "No executed provider comparison establishes superiority on representative universe coverage, correction semantics, cost, latency and historical availability."
+ ],
+ "overturn_protocol": {
+  "arms": [
+   "Baseline: retained Alpaca acquisition and frozen LEAN reconciliation, EdgarTools SEC acquisition with the local provenance gate, and the recorded XNYS calendar result.",
+   "Challenger: Massive or Databento observations for the same frozen securities and dates, normalized to the existing comparison contract with retained source bytes, rights and availability evidence.",
+   "Negative controls: corrupted source bytes, late observations, ambiguous timestamps and missing acceptance metadata exercised through the existing provenance tests."
+  ],
+  "fixture_paths": [
+   "blueprints/us-equities/authenticated-data/compare.py",
+   "blueprints/us-equities/catalyst-provenance/access-resolution.json",
+   "blueprints/us-equities/data/summarize_backtest.py",
+   "tests/test_catalyst_provenance.py"
+  ],
+  "metric": "Compare exact raw-close agreement, missing or extra sessions, action-value and currency reconciliation, source-hash reproducibility, and rejection before demonstrated availability. Require documented permitted use and historical identity coverage; measure acquisition cost and latency on identical scope. A replacement must close a demonstrated gap without weakening existing checks."
+ },
+ "overturn_when": "Change the verdict after an executed comparison using blueprints/us-equities/authenticated-data/compare.py shows a candidate improves the retained acquisition or corporate-action reconciliation, with independently supported rights, identity and historical availability; preserve the rejection behavior checked by python3 -m unittest tests.test_catalyst_provenance. Calendar replacement additionally requires an executed comparison against blueprints/us-equities/data/summarize_backtest.py and evidence covering the newly required sessions. Passing synthetic gate tests alone cannot promote a provider.",
+ "packet_sha256": "d5e8c03062719382468b750607ec752bcc78efbbcec2199f61a433622f9cee0d",
+ "schema_version": 1,
+ "sources_read": [
+  "<host-path>/us-equities__market-data-reference.json",
+  "<host-path>/SKILL.md",
+  "<host-path>/RTK.md",
+  "https://github.com/feast-dev/feast/blob/1d5be950cf718a674cb01eaf0fd0ad6f0a4c6335/README.md",
+  "https://github.com/dlt-hub/dlt/blob/a2f4a21e22e5c266278271b6591c70dbc485aea8/README.md",
+  "https://github.com/alex9smith/gdelt-doc-api/blob/f2e500144b0a6090d63723f94453b32717e5fd23/README.md",
+  "https://github.com/dgunning/edgartools/blob/abe44344c56cf4bfb5443e0debca7e39342f6e7a/README.md",
+  "https://github.com/massive-com/client-python/blob/3c247d78c603fc13d274fda1aa26749e7c8c3710/README.md",
+  "https://github.com/mortada/fredapi/blob/bf7cc8fdb03b12f8224bbb1bf66381b9d21c6d6d/README.md",
+  "https://github.com/alpacahq/alpaca-py/blob/cc4cb3b7ba50ae250e621983c2779047fb16bb28/README.md",
+  "https://github.com/apache/kafka/blob/26b251a451ce941d3d7a55e6487bcb7f16b5ad48/README.md",
+  "https://github.com/questdb/questdb/blob/7a391566ac827e0d8c269b91f2415c16b0a32a84/README.md",
+  "https://github.com/gerrymanoim/exchange_calendars/blob/dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a/README.md",
+  "https://github.com/databento/databento-python/blob/e675ef30369f5ee9f68b04606080c519adf3be69/README.md",
+  "https://raw.githubusercontent.com/feast-dev/feast/1d5be950cf718a674cb01eaf0fd0ad6f0a4c6335/README.md",
+  "https://raw.githubusercontent.com/dlt-hub/dlt/a2f4a21e22e5c266278271b6591c70dbc485aea8/README.md",
+  "https://raw.githubusercontent.com/alex9smith/gdelt-doc-api/f2e500144b0a6090d63723f94453b32717e5fd23/README.md",
+  "https://raw.githubusercontent.com/dgunning/edgartools/abe44344c56cf4bfb5443e0debca7e39342f6e7a/README.md",
+  "https://raw.githubusercontent.com/massive-com/client-python/3c247d78c603fc13d274fda1aa26749e7c8c3710/README.md",
+  "https://raw.githubusercontent.com/mortada/fredapi/bf7cc8fdb03b12f8224bbb1bf66381b9d21c6d6d/README.md",
+  "https://raw.githubusercontent.com/alpacahq/alpaca-py/cc4cb3b7ba50ae250e621983c2779047fb16bb28/README.md",
+  "https://raw.githubusercontent.com/apache/kafka/26b251a451ce941d3d7a55e6487bcb7f16b5ad48/README.md",
+  "https://raw.githubusercontent.com/questdb/questdb/7a391566ac827e0d8c269b91f2415c16b0a32a84/README.md",
+  "https://raw.githubusercontent.com/gerrymanoim/exchange_calendars/dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a/README.md",
+  "https://raw.githubusercontent.com/databento/databento-python/e675ef30369f5ee9f68b04606080c519adf3be69/README.md",
+  "blueprints/us-equities/catalyst-provenance/receipt.json",
+  "blueprints/us-equities/catalyst-provenance/access-resolution.json",
+  "blueprints/us-equities/data/receipt.json",
+  "blueprints/us-equities/data/summarize_backtest.py",
+  "blueprints/us-equities/workers/requirements.txt",
+  "manifests/stack.json",
+  "blueprints/us-equities/historical-simulation/receipt.json",
+  "blueprints/us-equities/authenticated-data/native-receipt.json",
+  "blueprints/us-equities/authenticated-data/compare.py",
+  "tests/test_catalyst_provenance.py"
+ ],
+ "why_selected": "Select alpaca-py for bounded market observations, EdgarTools for SEC reference data, and exchange_calendars for session boundaries. Retained native execution in blueprints/us-equities/authenticated-data/native-receipt.json records Alpaca-py GET transport acquiring 25 AAPL SIP/raw daily bars and two corporate actions across five HTTP 200 pages; its measured comparison matched all 25 closes and both numeric action values, while dividend currency remained unknown. blueprints/us-equities/catalyst-provenance/access-resolution.json records native EdgarTools acquisition of 371 CIK/accession entries representing 360 unique accessions. Separately identified local integration acquired five headers and rejected all five at the historical cutoff, qualifying them only after current observation. blueprints/us-equities/data/receipt.json records native XNYS boundaries for 2013-10-07, corroborated by the calendar calls in summarize_backtest.py. These complementary bounded results provide stronger task evidence than README-only alternatives; they do not establish complete historical eligibility or data rights.",
+ "winner_evidence_class": "native_proven",
+ "winner_evidence_refs": [
+  "blueprints/us-equities/authenticated-data/native-receipt.json",
+  "blueprints/us-equities/authenticated-data/compare.py",
+  "blueprints/us-equities/catalyst-provenance/receipt.json",
+  "blueprints/us-equities/catalyst-provenance/access-resolution.json",
+  "blueprints/us-equities/data/receipt.json",
+  "blueprints/us-equities/data/summarize_backtest.py",
+  "blueprints/us-equities/workers/requirements.txt"
+ ],
+ "winner_keys": [
+  "c9",
+  "c6",
+  "c13"
+ ]
+}

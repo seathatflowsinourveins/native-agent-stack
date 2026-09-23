@@ -1,0 +1,380 @@
+{
+ "catalog": "foundation",
+ "layer_id": "document-retrieval",
+ "repository_root": "the repository root given in the task",
+ "return_A": {
+  "winner_keys": [
+   "c5",
+   "c1",
+   "c2"
+  ],
+  "winner_names": [
+   [
+    "QMD BM25",
+    "qmd"
+   ],
+   [
+    "MarkItDown",
+    "markitdown"
+   ],
+   [
+    "Poppler",
+    "poppler"
+   ]
+  ],
+  "why_selected": "Select QMD BM25 for scoped search/get, with MarkItDown for qualified HTML conversion and Poppler for qualified born-digital PDFs. The measured native comparison in evidence/artifacts/foundation-rd-20260921/qmd-comparison.json reported equal BM25/hybrid recall@3 of 0.5, with average latency of 5 versus 10328 ms. Native execution recorded in evidence/receipts/native-catalog-retrieval-20260920.json retrieved both selected sources first and recovered exact pinned bodies apart from a display newline. catalogs/foundation/decisions.json records selected MarkItDown HTML conversion passing. Native Poppler execution in blueprints/convergence-practice/document-ingestion/accepted/receipt.json and blueprints/convergence-practice/wsl-document-ingestion/receipt.json passed three pages, 24 cells, eight positive and four absent queries. Those PDF results use a designed synthetic corpus and project-local geometry/provenance checks, not general layout inference. The winner-set evidence class is conservatively local_integration because ingestion qualification relies on bounded project fixtures.",
+  "winner_evidence_class": "local_integration",
+  "winner_evidence_refs": [
+   "evidence/artifacts/foundation-rd-20260921/qmd-comparison.json",
+   "evidence/receipts/native-catalog-retrieval-20260920.json",
+   "catalogs/foundation/decisions.json",
+   "blueprints/convergence-practice/document-ingestion/accepted/receipt.json",
+   "blueprints/convergence-practice/wsl-document-ingestion/receipt.json"
+  ],
+  "alternatives": [
+   {
+    "disposition": "unqualified",
+    "evidence_class": "source_review",
+    "evidence_refs": [
+     "catalogs/us-equities/foundation-memory.json"
+    ],
+    "key": "c3",
+    "name": "LlamaIndex",
+    "repository": "https://github.com/run-llama/llama_index",
+    "why_not_default": "The retained pinned source review explicitly says candidate commands were not executed. No measured connector ingestion, original-body fidelity or retrieval comparison establishes an advantage."
+   },
+   {
+    "disposition": "conditional",
+    "evidence_class": "native_proven",
+    "evidence_refs": [
+     "docs/token-native-saturation.md",
+     "catalogs/foundation/decisions.json",
+     "evidence/receipts/token-native-retained-functional-20260920.json"
+    ],
+    "key": "c4",
+    "name": "Context Hub",
+    "repository": "https://github.com/andrewyng/context-hub",
+    "why_not_default": "Retained native search/get supports selected curated developer documentation, but does not establish controlled ingestion of the local corpus. Its selected-document representation grew by 85 tokens relative to the full entry in the retained comparison."
+   },
+   {
+    "disposition": "unqualified",
+    "evidence_class": "source_review",
+    "evidence_refs": [
+     "catalogs/us-equities/foundation-memory.json"
+    ],
+    "key": "c6",
+    "name": "Docling",
+    "repository": "https://github.com/docling-project/docling",
+    "why_not_default": "The retained evidence is pinned source review with prospective commands. Financial table/unit extraction and OCR quality remain unmeasured; no executed comparison justifies its additional pipeline and model requirements."
+   }
+  ],
+  "challenger_preferred": null,
+  "overturn_when": "Change the retrieval selection when an executed comparison using blueprints/us-equities/retrieval-evaluation/fixture.json, with a sealed representative corpus and repeated runs, demonstrates useful quality gains at acceptable end-to-end latency while preserving original-body fidelity. Change the parser selection when the representative layout/OCR extension described in blueprints/convergence-practice/document-ingestion/README.md demonstrates better extraction with preserved provenance and justified runtime costs.",
+  "open_gaps": [
+   "The QMD four-mode comparison used one ordered run and an expanded index without a complete corpus seal; repeated warm/cold latency and representative corpus recall remain unestablished.",
+   "The earlier scoped benchmark's eight top-three successes and four misses are separate from the later expanded-index diagnostic.",
+   "Two exact QMD source-body retrievals do not establish arbitrary query recall or automatic index freshness.",
+   "Poppler acceptance covers designed born-digital Latin pages with explicit table geometry and local exact-phrase retrieval. OCR, inferred layouts, arbitrary filings and semantic questions remain unqualified.",
+   "MarkItDown optional PDF/Office extras are not established by the selected HTML conversion.",
+   "No retained comparison establishes end-to-end answer quality or provider-token savings for the combined ingestion and retrieval workflow."
+  ]
+ },
+ "return_B": {
+  "winner_keys": [
+   "c5",
+   "c2"
+  ],
+  "winner_names": [
+   [
+    "QMD BM25",
+    "qmd"
+   ],
+   [
+    "Poppler",
+    "poppler"
+   ]
+  ],
+  "why_selected": "This verdict comes from my own review of the source files. No TypeSafe inference results were supplied, and no provider judgment is carried over. The skill body was in context from <host-path> The requirement is to find Markdown or document content from a controlled source and to retrieve the original body before relying on a result. Two components have observed native evidence that meets it.\n\n(1) QMD BM25 (c5) handles Markdown, and its search-then-get step was observed in this revision. evidence/receipts/native-catalog-retrieval-20260920.json (lines 38-93) records QMD 2.8.3 running two scoped 'search ... -n 1 --format json' commands and two 'get ... --no-line-numbers' commands. All four exited 0. Each search returned the intended source first: docs/harness-defaults.md at score 0.76 and catalogs/foundation/README.md at score 0.68. Each get returned 'exact source body plus upstream final display newline', matched to pinned source sha256 values at revision 1445d1b. The receipt also records an independent review with no actionable findings. The scope is two selected lexical queries on one host.\n\nRanking evidence comes from two runs on different corpora, and they should not be merged. First, blueprints/us-equities/retrieval-evaluation/receipt.json (observed 2026-09-19, lines 15-25) ran the pinned upstream runBenchmark on a lexical index snapshot. The collection filter limited results to 18 foundation sources, while BM25 statistics used 33 FTS documents. BM25 scored recall@1 0.5, recall@3 0.667 (8 of 12, so 4 top-three misses), recall@5 0.75 and MRR 0.610. manifests/evidence.json lines 832 and 839 give the same figures. Second, evidence/artifacts/foundation-rd-20260921/qmd-comparison.json is one ordered four-mode run on 2026-09-21 against an expanded, unsealed index of 131 documents in 5 collections. It records the embed and bench commands exiting 0; an earlier attempt that timed out (exit 124) is kept and excluded. There, BM25 scored recall@1 0.417, recall@3 0.5 (6 of 12), recall@5 0.667 (8 of 12) and MRR 0.508 at 5 ms. Hybrid matched those recall figures, with MRR 0.503 at 10328 ms. Full had the highest MRR, 0.519, but recall@5 dropped to 0.5 at 75920 ms. Vector was lower on every metric. On the expanded index, BM25 therefore had fewer top-three hits than the September 19 baseline, and the file itself notes that the 'expanded index differs from September19 baseline'. BM25 stays the default because no mode improved recall, full's small MRR gain came with a recall@5 loss and about 15,000 times the latency, and BM25 needs no embedding model.\n\n(2) Poppler (c2) handles PDFs. blueprints/convergence-practice/document-ingestion/accepted/receipt.json (attempt 2, the Mac qualification according to README lines 3-13 in the parent directory) records native pdftotext -bbox-layout from Poppler 26.09.0. Both commands exited 0. The corpus had 3 pages and 24 table cells, and 8 positive and 4 negative queries passed with source, page and coordinate references. Invalid PDF input was refused, and every check in the receipt is true.\n\nTogether, these two components cover finding Markdown and ingesting PDFs under control. The evidence is limited to these fixtures and hosts. It does not establish general ranking or recall.",
+  "winner_evidence_class": "measured_comparison",
+  "winner_evidence_refs": [
+   "evidence/receipts/native-catalog-retrieval-20260920.json",
+   "blueprints/us-equities/retrieval-evaluation/receipt.json",
+   "evidence/artifacts/foundation-rd-20260921/qmd-comparison.json",
+   "manifests/evidence.json",
+   "catalogs/foundation/decisions.json",
+   "blueprints/convergence-practice/document-ingestion/accepted/receipt.json",
+   "blueprints/convergence-practice/document-ingestion/README.md"
+  ],
+  "alternatives": [
+   {
+    "disposition": "conditional",
+    "evidence_class": "source_review",
+    "evidence_refs": [
+     "catalogs/foundation/decisions.json",
+     "blueprints/convergence-practice/document-ingestion/README.md"
+    ],
+    "key": "c1",
+    "name": "MarkItDown",
+    "repository": "https://github.com/microsoft/markitdown",
+    "why_not_default": "In catalogs/foundation/decisions.json, the source-document-conversion entry (lines 767-815) is marked 'conditional'. It records only that the selected HTML conversion passed, and its own limitation says this does not cover the optional PDF or Office extras. The Poppler README (blueprints/convergence-practice/document-ingestion/README.md, lines 15-17) still lists MarkItDown 0.1.7 as a candidate for specific unmet needs. The pin is behind upstream v0.1.8. The packet records its evidence_kind as native_execution, and the decisions lifecycle marks its 'use' stage accepted_within_scope. I did not open that HTML receipt (portable-cli-artifacts), so I label the class by what I verified myself (source_review). Keep it for HTML conversion only."
+   },
+   {
+    "disposition": "conditional",
+    "evidence_class": "local_integration",
+    "evidence_refs": [
+     "catalogs/foundation/decisions.json",
+     "docs/token-native-saturation.md"
+    ],
+    "key": "c4",
+    "name": "Context Hub",
+    "repository": "https://github.com/andrewyng/context-hub",
+    "why_not_default": "It covers a different scope: selected curated developer documentation, not controlled ingestion of local documents. The curated-developer-docs entry in catalogs/foundation/decisions.json (lines 817-856) is conditional and limited to a named documentation gap. It cites retained native search and retrieval, and the packet labels its evidence as mixed. docs/token-native-saturation.md (lines 16 and 72) shows only the 'use' stage accepted, and its kept comparison grew by 85 tokens. There is no measured retrieval-quality comparison against this layer's fixture."
+   },
+   {
+    "disposition": "unqualified",
+    "evidence_class": "source_review",
+    "evidence_refs": [
+     "catalogs/us-equities/foundation-memory.json",
+     "blueprints/convergence-practice/document-ingestion/README.md"
+    ],
+    "key": "c6",
+    "name": "Docling",
+    "repository": "https://github.com/docling-project/docling",
+    "why_not_default": "The only evidence is a source review. catalogs/us-equities/foundation-memory.json (foundation-docling, lines 1134-1170) states that commands are prospective and were not run, and that table and unit extraction quality is unmeasured. Model weights carry separate licences. The Poppler README (lines 118-123) says to adopt Docling only when it passes a frozen layout/OCR corpus with provenance and answer checks. That comparison has not been run, so the capability is untested rather than failed."
+   },
+   {
+    "disposition": "unqualified",
+    "evidence_class": "source_review",
+    "evidence_refs": [
+     "catalogs/us-equities/foundation-memory.json"
+    ],
+    "key": "c3",
+    "name": "LlamaIndex",
+    "repository": "https://github.com/run-llama/llama_index",
+    "why_not_default": "The only evidence is a source review. catalogs/us-equities/foundation-memory.json (foundation-llama_index, lines 983-1018) lists the layer as rag-pipeline, says commands were not run, and notes a README emphasis on LlamaParse with possible managed-parsing cost and data transfer. It has no ingestion or retrieval receipt for this layer, so it is untested rather than failed."
+   }
+  ],
+  "challenger_preferred": null,
+  "overturn_when": "The QMD BM25 verdict would change if a sealed, representative rerun of `qmd bench` on blueprints/us-equities/retrieval-evaluation/fixture.json, or on a successor fixture with positive and absent queries, showed hybrid, full, vector or another retriever giving useful gains in recall or MRR with acceptable repeated end-to-end latency. The same applies if an expanded-index rerun keeps BM25 top-three recall below the 8/12 baseline while another mode recovers it. The Poppler verdict would change if a separately frozen corpus of real multi-column, table-heavy or scanned pages, checked the same way as python3 blueprints/convergence-practice/document-ingestion/audit.py and tests/test_document_ingestion.py, showed Poppler failing where Docling or MarkItDown passes the provenance and answer checks.",
+  "open_gaps": [
+   "The two BM25 benchmark runs differ, and neither is general. On the 2026-09-19 lexical snapshot (18 eligible and 33 FTS documents), BM25 returned 8/12 top-three hits, so 4 top-three misses. On the 2026-09-21 expanded unsealed index (131 documents, full_corpus_seal false, one ordered run), it returned 6/12 top-three and 8/12 top-five, so 6 top-three misses and 4 top-five misses. Whether expanding the index degraded BM25 ranking has not been checked with a repeated or sealed run.",
+   "The observed search-then-get body retrieval covers two selected lexical queries on one source host (native-catalog-retrieval-20260920). It does not show exact-body retrieval for arbitrary queries or for another PC.",
+   "The Poppler evidence covers one designed, born-digital, 3-page Latin-script corpus with a known table layout on the observed Mac. It does not cover OCR, arbitrary layouts, scans, Office documents, filings or other machines.",
+   "MarkItDown acceptance covers HTML only. Its PDF and Office extras are unqualified.",
+   "Docling and LlamaIndex have no executed evidence for this layer. They are untested, not failed.",
+   "Neither the embedding-model download cost nor any provider-token saving is established."
+  ]
+ },
+ "packet": {
+  "title": "Documents and ingestion",
+  "requirement": "Find source-grounded Markdown/document content with controlled ingestion and retrieve the original body before relying on a result.",
+  "limitations": [
+   "The QMD diagnostic used one ordered run and an incompletely sealed expanded index; it is not a general retrieval ranking.",
+   "HTML/PDF fixtures do not qualify arbitrary Office documents, scans, tables or filing layouts. Context Hub's retained size comparison grew by 85 tokens."
+  ],
+  "candidates": [
+   {
+    "adopted": true,
+    "component_id": "markitdown",
+    "decisions": [
+     {
+      "capability": "Convert supported local documents into bounded source evidence",
+      "evidence_scope": "Selected HTML conversion passed; native Poppler preserved three designed PDF pages, twenty-four cells and twelve positive/absent queries on Mac and WSL.",
+      "id": "source-document-conversion",
+      "limitations": [
+       "Base MarkItDown HTML acceptance does not imply optional PDF/Office extras.",
+       "The designed born-digital PDF fixture does not qualify OCR, arbitrary layouts or semantic retrieval."
+      ],
+      "next_gap": "Freeze a representative layout/OCR protocol before extending the claim."
+     }
+    ],
+    "evidence_kind": "native_execution",
+    "evidence_refs": [
+     "catalogs/foundation/decisions.json"
+    ],
+    "key": "c1",
+    "name": "MarkItDown",
+    "pin": "0.1.7",
+    "pin_behind_upstream": true,
+    "recipe_ref": "recipes/README.md",
+    "repository": "https://github.com/microsoft/markitdown",
+    "review_status": null,
+    "upstream": {
+     "archived": false,
+     "latest": "v0.1.8",
+     "license": "MIT",
+     "prerelease": false,
+     "pushed_at": "2026-09-21",
+     "released_at": "2026-09-21",
+     "renamed_to": null,
+     "stars": 186376
+    }
+   },
+   {
+    "adopted": true,
+    "component_id": "poppler",
+    "decisions": [
+     {
+      "capability": "Convert supported local documents into bounded source evidence",
+      "evidence_scope": "Selected HTML conversion passed; native Poppler preserved three designed PDF pages, twenty-four cells and twelve positive/absent queries on Mac and WSL.",
+      "id": "source-document-conversion",
+      "limitations": [
+       "Base MarkItDown HTML acceptance does not imply optional PDF/Office extras.",
+       "The designed born-digital PDF fixture does not qualify OCR, arbitrary layouts or semantic retrieval."
+      ],
+      "next_gap": "Freeze a representative layout/OCR protocol before extending the claim."
+     }
+    ],
+    "evidence_kind": "native_execution",
+    "evidence_refs": [
+     "catalogs/foundation/decisions.json"
+    ],
+    "key": "c2",
+    "name": "Poppler",
+    "pin": "26.09.0",
+    "pin_behind_upstream": false,
+    "recipe_ref": "blueprints/convergence-practice/document-ingestion/README.md",
+    "repository": "https://github.com/tsdgeos/poppler_mirror",
+    "review_status": null,
+    "upstream": {
+     "archived": false,
+     "latest": null,
+     "license": "GPL-2.0",
+     "prerelease": null,
+     "pushed_at": "2026-09-13",
+     "released_at": null,
+     "renamed_to": null,
+     "stars": 61
+    }
+   },
+   {
+    "adopted": true,
+    "component_id": null,
+    "decisions": [],
+    "evidence_kind": "source_review",
+    "evidence_refs": [
+     "catalogs/us-equities/foundation-memory.json"
+    ],
+    "key": "c3",
+    "name": "LlamaIndex",
+    "pin": null,
+    "pin_behind_upstream": null,
+    "recipe_ref": "catalogs/us-equities/foundation-memory.json",
+    "repository": "https://github.com/run-llama/llama_index",
+    "review_status": null,
+    "upstream": null
+   },
+   {
+    "adopted": true,
+    "component_id": "context-hub",
+    "decisions": [
+     {
+      "capability": "Retrieve selected curated developer documentation",
+      "evidence_scope": "Retained native Context Hub search/retrieval supports its selected developer-document operation.",
+      "id": "curated-developer-docs",
+      "limitations": [
+       "This is not a claim that all external documentation is current or indexed."
+      ],
+      "next_gap": "Recheck the relevant source revision when its API or requirement changes."
+     }
+    ],
+    "evidence_kind": "mixed",
+    "evidence_refs": [
+     "docs/token-native-saturation.md",
+     "catalogs/foundation/decisions.json"
+    ],
+    "key": "c4",
+    "name": "Context Hub",
+    "pin": "0.1.4",
+    "pin_behind_upstream": false,
+    "recipe_ref": "recipes/README.md",
+    "repository": "https://github.com/andrewyng/context-hub",
+    "review_status": null,
+    "upstream": {
+     "archived": false,
+     "latest": "v0.1.4",
+     "license": "MIT",
+     "prerelease": false,
+     "pushed_at": "2026-05-31",
+     "released_at": "2026-04-27",
+     "renamed_to": null,
+     "stars": 13981
+    }
+   },
+   {
+    "adopted": true,
+    "component_id": "qmd",
+    "decisions": [
+     {
+      "capability": "Reproduce native context-tool commands in a clean CI environment",
+      "evidence_scope": "Local and GitHub clean installation passed forty-one command expectations and fourteen fidelity/recovery checks; retained artifact/source hashes matched.",
+      "id": "clean-token-tool-ci",
+      "limitations": [
+       "CI acceptance covers these four tool fixtures, not live providers, GPU execution or a full new-PC stack."
+      ],
+      "next_gap": "Extend a specific missing native-tool CI behavior only with its own useful fixture."
+     },
+     {
+      "capability": "Resolve persistent native command and MCP environments",
+      "evidence_scope": "Fresh native processes resolved selected commands/MCP servers and Claude startup hooks; restarted Desktop source retrieval has its own dated receipt.",
+      "id": "native-process-defaults",
+      "limitations": [
+       "Configuration presence does not prove an already-running task hot-reloaded it.",
+       "The Linux/WSL and Desktop process/configuration boundaries remain distinct."
+      ],
+      "next_gap": "Collect the specific new-host or changed-session activation evidence; do not copy account stores."
+     },
+     {
+      "capability": "Search and read a named local Markdown corpus",
+      "evidence_scope": "Native scoped QMD search/get passed; the fixed twelve-query benchmark returned the intended source in eight top-three results. The current-clone catalog repair returned both selected handbook sources first, with exact source bodies and independent configuration review.",
+      "id": "scoped-document-bm25",
+      "limitations": [
+       "All four benchmark misses remain; exact source retrieval on a fixture does not establish arbitrary corpus recall.",
+       "The selected BM25 lane needs no downloaded embedding model."
+      ],
+      "next_gap": "Evaluate positive and absent queries for a new corpus."
+     }
+    ],
+    "evidence_kind": "measured_comparison",
+    "evidence_refs": [
+     "evidence/artifacts/foundation-rd-20260921/qmd-comparison.json",
+     "docs/foundation-rd-readiness.md"
+    ],
+    "key": "c5",
+    "name": "QMD BM25",
+    "pin": "2.8.3",
+    "pin_behind_upstream": false,
+    "recipe_ref": "recipes/README.md",
+    "repository": "https://github.com/tobi/qmd",
+    "review_status": null,
+    "upstream": {
+     "archived": false,
+     "latest": "v2.8.3",
+     "license": "MIT",
+     "prerelease": false,
+     "pushed_at": "2026-09-09",
+     "released_at": "2026-08-16",
+     "renamed_to": null,
+     "stars": 29952
+    }
+   },
+   {
+    "adopted": true,
+    "component_id": null,
+    "decisions": [],
+    "evidence_kind": "source_review",
+    "evidence_refs": [
+     "catalogs/us-equities/foundation-memory.json"
+    ],
+    "key": "c6",
+    "name": "Docling",
+    "pin": null,
+    "pin_behind_upstream": null,
+    "recipe_ref": "catalogs/us-equities/foundation-memory.json",
+    "repository": "https://github.com/docling-project/docling",
+    "review_status": null,
+    "upstream": null
+   }
+  ]
+ }
+}

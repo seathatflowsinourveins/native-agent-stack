@@ -1,0 +1,506 @@
+{
+ "catalog": "us-equities",
+ "layer_id": "identity-provenance",
+ "repository_root": "the repository root given in the task",
+ "return_A": {
+  "winner_keys": [
+   "c2"
+  ],
+  "winner_names": [
+   [
+    "DVC",
+    "data-dvc"
+   ]
+  ],
+  "why_selected": "Select c2 provisionally for this layer's reproducibility and data-versioning scope. Source review of the exact pinned [DVC README](https://raw.githubusercontent.com/treeverse/dvc/356dfa03278058b02df42124f243c2c345329dae/README.rst) observed concrete add, dependency-stage, experiment and remote-storage workflows connecting versioned data with code. This is documentation inspection, not native execution. catalogs/us-equities/data-research.json explicitly marks the local workflow unexecuted. Among the adopted candidates, that bounded file-and-dependency contract is the closest supported fit to exact analytical snapshots without an unmeasured broker or lake requirement. The historical native results in blueprints/us-equities/identity-readiness/native-receipt.json separately demonstrate project-local observation cutoffs and quarantine; they are not DVC acceptance. No winner is established for the full acquisition and historical-eligibility requirement.",
+  "winner_evidence_class": "source_review",
+  "winner_evidence_refs": [
+   "https://raw.githubusercontent.com/treeverse/dvc/356dfa03278058b02df42124f243c2c345329dae/README.rst",
+   "catalogs/us-equities/data-research.json"
+  ],
+  "alternatives": [
+   {
+    "disposition": "conditional",
+    "evidence_class": "source_review",
+    "evidence_refs": [
+     "https://github.com/sigstore/cosign/blob/v3.1.3/README.md"
+    ],
+    "key": "c1",
+    "name": "cosign",
+    "repository": "https://github.com/sigstore/cosign",
+    "why_not_default": "The reviewed README contains artifact verification examples that bind a digest to an expected signer identity and issuer. No retained execution establishes verification of this layer's datasets; signatures also do not establish historical availability, eligibility or dataset revision lineage."
+   },
+   {
+    "disposition": "conditional",
+    "evidence_class": "source_review",
+    "evidence_refs": [
+     "catalogs/us-equities/data-research.json"
+    ],
+    "key": "c3",
+    "name": "data-kafka",
+    "repository": "https://github.com/apache/kafka",
+    "why_not_default": "The retained review explicitly labels its replay workflow unexecuted. No measured recovery, consumer replay or multi-writer requirement establishes a reason to introduce a broker for reproducible snapshots. The pinned README could not be retrieved."
+   },
+   {
+    "disposition": "conditional",
+    "evidence_class": "native_proven",
+    "evidence_refs": [
+     "evidence/receipts/native-rag.json",
+     "evidence/receipts/desktop-direct-rag.json",
+     "evidence/receipts/artifact-reductions.json",
+     "evidence/receipts/component-history.json",
+     "evidence/receipts/vllm-compatibility.json"
+    ],
+    "key": "c4",
+    "name": "foundation-socraticode",
+    "repository": "https://github.com/giancarloerra/SocratiCode",
+    "why_not_default": "Historical native receipts record successful code retrieval by both clients and independently observed add/update/delete propagation. This qualifies the index-freshness subscope, but does not demonstrate immutable equity-data snapshots, source-to-dataset lineage or historical eligibility rejection. The artifact reduction is lossy retrieval, not a provenance comparison."
+   },
+   {
+    "disposition": "conditional",
+    "evidence_class": "source_review",
+    "evidence_refs": [
+     "catalogs/us-equities/data-research.json"
+    ],
+    "key": "c5",
+    "name": "data-openlineage",
+    "repository": "https://github.com/OpenLineage/OpenLineage",
+    "why_not_default": "The retained review provides an unexecuted dataset-object example, with no emitted, persisted or replayed lineage events. Dataset-version and knowledge-cutoff facets remain an integration requirement. No executed comparison establishes a benefit over the initial snapshot manifests; the pinned README could not be retrieved."
+   },
+   {
+    "disposition": "conditional",
+    "evidence_class": "source_review",
+    "evidence_refs": [
+     "catalogs/us-equities/data-research.json"
+    ],
+    "key": "c6",
+    "name": "data-arcticdb",
+    "repository": "https://github.com/man-group/ArcticDB",
+    "why_not_default": "The retained review contains only a prospective dataframe write/read example, without executed version restoration or correction replay. Deployment licensing remains unresolved in that review. No workload measurement justifies this store over file snapshots, and the pinned README could not be retrieved."
+   },
+   {
+    "disposition": "conditional",
+    "evidence_class": "source_review",
+    "evidence_refs": [
+     "catalogs/us-equities/data-research.json"
+    ],
+    "key": "c7",
+    "name": "data-mlflow",
+    "repository": "https://github.com/mlflow/mlflow",
+    "why_not_default": "The retained review explicitly records no experiment execution; its example would log only a synthetic parameter and metric. There is no demonstrated binding of runs to exact source revisions, temporal splits and retained datasets. The pinned README could not be retrieved."
+   },
+   {
+    "disposition": "conditional",
+    "evidence_class": "source_review",
+    "evidence_refs": [
+     "catalogs/us-equities/data-research.json"
+    ],
+    "key": "c8",
+    "name": "data-iceberg",
+    "repository": "https://github.com/apache/iceberg",
+    "why_not_default": "The retained workflow is an unexecuted catalog/namespace example. It does not establish table writes, snapshot restoration, conflict handling or cross-engine consistency. No measured concurrency requirement justifies the additional catalog and storage integration; the pinned README could not be retrieved."
+   }
+  ],
+  "challenger_preferred": null,
+  "overturn_when": "Change the default after an executed DVC-versus-ArcticDB-or-Iceberg comparison using blueprints/us-equities/point-in-time/fixture.json and the invariants in tests/test_point_in_time.py and tests/test_security_identity.py shows a candidate preserves exact snapshots and rejection behavior while closing a demonstrated recovery or concurrency gap. A DVC failure on those invariants would also overturn this provisional selection; merely passing the existing project-local tests would not qualify a candidate.",
+  "open_gaps": [
+   "DVC has source-review support only: no retained native add, restore and reproduction run demonstrates this repository's equity snapshot contract.",
+   "No candidate evidence establishes the complete requirement: licensed acquisition, permanent security identity, historical universe eligibility, corporate-action completeness and original publication/revision availability remain separate obligations.",
+   "The identity-readiness receipt demonstrates bounded observation-time selection and quarantine through project-local adapters. It does not qualify DVC or another candidate as the executing implementation.",
+   "Content identity, signer identity, storage commit time and code-index freshness cannot substitute for original historical information availability.",
+   "No executed comparison measures snapshot restoration fidelity, correction retention, lineage completeness, recovery, concurrency, storage cost or latency across the candidate stores.",
+   "OpenLineage event persistence and consistent version/cutoff facets, and MLflow run-to-dataset bindings, remain unqualified."
+  ]
+ },
+ "return_B": {
+  "winner_keys": [
+   "c2",
+   "c5"
+  ],
+  "winner_names": [
+   [
+    "DVC",
+    "data-dvc"
+   ],
+   [
+    "data-openlineage",
+    "data-openlineage"
+   ]
+  ],
+  "why_selected": "The layer is titled \"Identity, provenance and lineage\". Its scope terms include provenance, data-lineage, data-versioning, reproducibility and metadata-events (packet lines 284-297, 317). DVC (c2) is the adopted candidate whose packet role covers Git-linked content hashes, data dependencies and pipelines, which is the versioning and reproducibility part of the requirement. OpenLineage (c5) is the adopted open standard and client set for job, run and dataset lineage events, which is the lineage and metadata-event part. Together they cover both parts with the least overlap.\n\nBoth winners rest on source review only. The evidence is the pinned upstream READMEs: https://github.com/treeverse/dvc/blob/356dfa03278058b02df42124f243c2c345329dae/README.rst and https://github.com/OpenLineage/OpenLineage/blob/8ad5c14c63fbab63fedd8ff42f9a208d86ad07fe/README.md. This lane could not open either URL because it has no web tool. The source-review class and the card limitations are provider judgments I kept from the packet; I did not verify them myself. No native execution, local integration or measured comparison of DVC or OpenLineage on US-equity data exists in the evidence I read.\n\nMy own source review of the project-local code found that it already covers part of the snapshot requirement. So DVC would add to that path, not replace it. In blueprints/us-equities/point-in-time/temporal_snapshot.py:\n- validate_source (lines 68-113) rejects rows whose availability is unknown or inconsistent: an unsupported availability_basis (lines 90-91), availability earlier than the captured observation, event or adjustment evidence (lines 92-98), and ambiguous temporal revisions (line 111).\n- write_snapshot and verified_snapshot (lines 116-167) already write per-file sha256 hashes and verify them against a manifest.\n\ntests/test_point_in_time.py exercises this with synthetic fixtures through native DuckDB, but every test there is skipped when duckdb is missing (line 16). Neither winner is part of that path.",
+  "winner_evidence_class": "source_review",
+  "winner_evidence_refs": [
+   "https://github.com/treeverse/dvc/blob/356dfa03278058b02df42124f243c2c345329dae/README.rst",
+   "https://github.com/OpenLineage/OpenLineage/blob/8ad5c14c63fbab63fedd8ff42f9a208d86ad07fe/README.md"
+  ],
+  "alternatives": [
+   {
+    "disposition": "out_of_scope",
+    "evidence_class": "source_review",
+    "evidence_refs": [
+     "https://github.com/sigstore/cosign/blob/v3.1.3/README.md"
+    ],
+    "key": "c1",
+    "name": "cosign",
+    "repository": "https://github.com/sigstore/cosign",
+    "why_not_default": "It signs and verifies the identity of software artifacts. It does not provide identity or provenance for equity observations. The packet card records that no signing or identity flow was run here, and that not every upstream publishes signatures. It could later sign snapshot manifests, but no evidence shows it doing so. I could not open the README URL."
+   },
+   {
+    "disposition": "conditional",
+    "evidence_class": "source_review",
+    "evidence_refs": [
+     "https://github.com/apache/kafka/blob/26b251a451ce941d3d7a55e6487bcb7f16b5ad48/README.md"
+    ],
+    "key": "c3",
+    "name": "data-kafka",
+    "repository": "https://github.com/apache/kafka",
+    "why_not_default": "It matches the replay-log scope term, but the card says a single-node synthetic replay is only a prospective smoke check, and ordering holds only within a partition. It is a transport log, not a provenance or version store. The packet's existing overturn text says to add a server only after local throughput and concurrency measurements justify it, and the evidence contains none. In the upstream metadata, the latest field is 'show' and the release date is null."
+   },
+   {
+    "disposition": "out_of_scope",
+    "evidence_class": "native_proven",
+    "evidence_refs": [
+     "evidence/receipts/native-rag.json",
+     "evidence/receipts/desktop-direct-rag.json",
+     "evidence/receipts/artifact-reductions.json",
+     "evidence/receipts/component-history.json",
+     "evidence/receipts/vllm-compatibility.json"
+    ],
+    "key": "c4",
+    "name": "foundation-socraticode",
+    "repository": "https://github.com/giancarloerra/SocratiCode",
+    "why_not_default": "It has the strongest evidence class in the packet. evidence/receipts/native-rag.json records a native_model_e2e run in which tools/ecosystem/linux-usage-report.cjs lines 2-39 were retrieved at score 0.6429, plus add, update and delete index phases. That evidence is about semantic code indexing and keeping the code index fresh. It shows nothing about identity, lineage or availability of US-equity data, so its evidence class does not carry over to this requirement."
+   },
+   {
+    "disposition": "conditional",
+    "evidence_class": "source_review",
+    "evidence_refs": [
+     "https://github.com/man-group/ArcticDB/blob/e620d8572a1e62c9ec07df8cbc8f5c432cd84325/README.md"
+    ],
+    "key": "c6",
+    "name": "data-arcticdb",
+    "repository": "https://github.com/man-group/ArcticDB",
+    "why_not_default": "It fits the versioned-store and snapshot-store terms. However, the card records a BSL-1.1 licence whose production and commercial-use terms are unresolved, and the upstream licence field is NOASSERTION. The card also says storage version time does not prove when market information was available. The evidence is source review only, with no local snapshot or replay comparison."
+   },
+   {
+    "disposition": "overlap",
+    "evidence_class": "source_review",
+    "evidence_refs": [
+     "https://github.com/mlflow/mlflow/blob/32792afe5b0183fce10532d3a023f5cfa8612d09/README.md"
+    ],
+    "key": "c7",
+    "name": "data-mlflow",
+    "repository": "https://github.com/mlflow/mlflow",
+    "why_not_default": "It covers model lineage and experiment tracking, which happen after observations are acquired and snapshotted. The card says no experiments or models were run, and that autologging does not capture every data revision. It overlaps DVC's reproducibility role without closing the data-identity requirement."
+   },
+   {
+    "disposition": "conditional",
+    "evidence_class": "source_review",
+    "evidence_refs": [
+     "https://github.com/apache/iceberg/blob/6976e020b894f6a6777704df2b8c4458cb291ae9/README.md"
+    ],
+    "key": "c8",
+    "name": "data-iceberg",
+    "repository": "https://github.com/apache/iceberg",
+    "why_not_default": "It fits the snapshot-store term. The card says that creating a catalog alone would not prove append, multi-writer conflict handling, cross-engine compatibility or time travel, and that storage snapshots do not show what information was available in the past. A table lake is justified only after a measured local need, and the evidence contains no such measurement."
+   }
+  ],
+  "challenger_preferred": null,
+  "overturn_when": "The verdict changes if an executed comparison over blueprints/us-equities/point-in-time/fixture.json shows DVC failing where another store succeeds. Each store would have to reproduce identical snapshot content and replay it, and one store would have to do this where DVC does not.\n\nThe comparison does not use the snapshot_sha256 manifest digest, because it cannot reproduce. temporal_snapshot.py lines 133-135 embed ingested_at from SEC.utc_now(), a wall-clock time with microseconds (sec_data.py lines 50-51), so the digest changes on every rerun. Instead, each arm compares:\n- the per-file sha256 values in the manifest's files map (source.json, observations.parquet, universe.parquet; lines 138-139), under the same pinned duckdb version;\n- the canonical row content, excluding ingestion metadata such as ingested_at and duckdb_version;\n- the rejection outcomes of validate_source for rows whose availability is unknown or inconsistent.\n\nThe baseline is `python3 -m unittest tests/test_point_in_time.py tests/test_security_identity.py`, run in the pinned research SDK environment with duckdb importable. Only a run with zero skipped tests counts, because tests/test_point_in_time.py line 16 skips the whole class when duckdb is missing.\n\nThe verdict also changes if an OpenLineage event emitted for that run does not identify the input dataset, the feed and the per-file content hashes.",
+  "open_gaps": [
+   "No retained evidence shows DVC or OpenLineage installed, run or integrated against US-equity observations. Both winners rest on source review only.",
+   "The project-local path already hashes snapshots per file and verifies the manifest (temporal_snapshot.py lines 116-167). What DVC would add beyond Git-linked versioning of those artifacts is not established by any comparison.",
+   "The snapshot_sha256 manifest digest cannot be reproduced across reruns because it embeds a wall-clock ingested_at (temporal_snapshot.py lines 133-135; sec_data.py lines 50-51). Reproducibility therefore has to be judged on per-file and row-content hashes.",
+   "Content hashes and lineage events establish identity and traceability. They do not establish data validity, licensing, as-known historical availability or survivorship-free coverage (packet limitations and the c2 card). The local code marks entitlement_verified False, and the tests assert availability_evidence_authenticated False (test_point_in_time.py lines 56-57).",
+   "The availability gate is project-local code (temporal_snapshot.py validate_source, lines 68-113), exercised only with synthetic fixtures, and those tests are skipped when duckdb is missing (test_point_in_time.py line 16). No provider data has passed through a DVC- or OpenLineage-backed path.",
+   "blueprints/us-equities/data/fixtures/empty-snapshot-gate-result.json records status 'fail' with row_count 0 (rows_present fail). That failure is kept as recorded, not treated as a pass.",
+   "No measured comparison exists among the snapshot and version-store candidates (c2, c6, c8), and no throughput measurement exists that would justify Kafka or Iceberg.",
+   "Permanent security identity across ticker reuse and delistings is not established. The packet limitations say the documentary lifecycle cases do not establish it."
+  ]
+ },
+ "packet": {
+  "title": "Identity, provenance and lineage",
+  "requirement": "Acquire licensed, source-identifiable US-equity observations; preserve feed, timestamps, identity and corporate actions; produce exact reproducible analytical snapshots and reject data whose historical availability or eligibility is unknown.",
+  "limitations": [
+   "The authenticated Alpaca receipt covers 25 AAPL SIP/raw daily bars and two corporate actions over five successful pages, not a survivorship-free universe, complete history or real-time feed entitlement.",
+   "Numeric corporate-action values matched the frozen probe, but missing dividend currency prevented full cash-unit reconciliation. Original historical availability and complete action coverage remain open.",
+   "Three documentary lifecycle cases preserve observed cutoffs and source anchors; retrospective claims do not establish historical as-known eligibility or permanent security identity.",
+   "The prior SEC HTTP 403 remains a historical failure. Later corrected acquisition and parsing qualify their selected requests only; no general filing-completeness or strategy-validity claim follows.",
+   "SQL, schemas and content hashes cannot repair missing provenance, revised fundamentals, access rights or outcome-selected samples.",
+   "The us-equities catalog also tags entries for this taxonomy layer under agents-operations (1), foundation-memory (1); data-research (9) was picked as the primary group by entry count."
+  ],
+  "layer_scope_terms": [
+   "provenance",
+   "data-lineage",
+   "data-versioning",
+   "object-store-versioning",
+   "versioned-store",
+   "data-branches",
+   "reproducibility",
+   "model-lineage",
+   "metadata-events",
+   "index-freshness",
+   "snapshot-store",
+   "replay-log"
+  ],
+  "requirement_note": "The requirement, limitations and existing_overturn_when text is shared by this layer's group; judge fit against the layer title and layer_scope_terms.",
+  "candidates": [
+   {
+    "adopted": true,
+    "card_limitations": [
+     "Do not replace exact identity with a permissive wildcard merely to pass verification.",
+     "Signing can use OIDC and publish transparency records; no signing or identity flow initiated here.",
+     "Not all upstreams publish signatures; keep checksum evidence labeled as such."
+    ],
+    "component_id": "cosign",
+    "decisions": [],
+    "evidence_kind": "source_review",
+    "evidence_refs": [
+     "https://github.com/sigstore/cosign/blob/v3.1.3/README.md"
+    ],
+    "key": "c1",
+    "name": "cosign",
+    "pin": "v3.1.3",
+    "pin_behind_upstream": false,
+    "recipe_ref": null,
+    "repository": "https://github.com/sigstore/cosign",
+    "review_status": null,
+    "role": "Artifact signature and identity verification",
+    "upstream": {
+     "archived": false,
+     "latest": "v3.1.3",
+     "license": "Apache-2.0",
+     "prerelease": false,
+     "pushed_at": "2026-09-21",
+     "released_at": "2026-08-06",
+     "renamed_to": null,
+     "stars": 6317
+    }
+   },
+   {
+    "adopted": true,
+    "card_limitations": [
+     "Content hashes prove identity, not data validity or point-in-time correctness.",
+     "GitHub canonical repository now resolves to treeverse/dvc; older iterative URLs redirect.",
+     "Even metadata can reveal identifiers; review public manifests separately from private data/cache."
+    ],
+    "component_id": "data-dvc",
+    "decisions": [],
+    "evidence_kind": "source_review",
+    "evidence_refs": [
+     "https://github.com/treeverse/dvc/blob/356dfa03278058b02df42124f243c2c345329dae/README.rst"
+    ],
+    "key": "c2",
+    "name": "DVC",
+    "pin": "3.67.1; source 356dfa03278058b02df42124f243c2c345329dae",
+    "pin_behind_upstream": false,
+    "recipe_ref": null,
+    "repository": "https://github.com/treeverse/dvc",
+    "review_status": null,
+    "role": "Git-linked hashes, data dependencies and experiment pipelines",
+    "upstream": {
+     "archived": false,
+     "latest": "3.67.1",
+     "license": "Apache-2.0",
+     "prerelease": false,
+     "pushed_at": "2026-09-21",
+     "released_at": "2026-03-31",
+     "renamed_to": null,
+     "stars": 15882
+    }
+   },
+   {
+    "adopted": true,
+    "card_limitations": [
+     "Single-node synthetic replay is a prospective smoke check, not high availability or exchange recovery evidence.",
+     "Ordering is partition-local; Kafka transactions do not make broker orders, files or all external sinks exactly-once.",
+     "GitHub has no current release entries; version/date come from Apache downloads."
+    ],
+    "component_id": "data-kafka",
+    "decisions": [],
+    "evidence_kind": "source_review",
+    "evidence_refs": [
+     "https://github.com/apache/kafka/blob/26b251a451ce941d3d7a55e6487bcb7f16b5ad48/README.md"
+    ],
+    "key": "c3",
+    "name": "data-kafka",
+    "pin": "4.3.1; source 26b251a451ce941d3d7a55e6487bcb7f16b5ad48",
+    "pin_behind_upstream": false,
+    "recipe_ref": null,
+    "repository": "https://github.com/apache/kafka",
+    "review_status": null,
+    "role": "Durable partitioned event log for multiple independent consumers",
+    "upstream": {
+     "archived": false,
+     "latest": "show",
+     "license": "Apache-2.0",
+     "prerelease": null,
+     "pushed_at": "2026-09-22",
+     "released_at": null,
+     "renamed_to": null,
+     "stars": 33783
+    }
+   },
+   {
+    "adopted": true,
+    "card_limitations": [
+     "AGPL obligations or commercial license apply to relevant deployments. The lmstudio setting in this profile targets local vLLM; it does not require LM Studio.",
+     "Embedding dimension/model changes require deliberate reindexing; no automatic linked-project expansion."
+    ],
+    "component_id": "foundation-socraticode",
+    "decisions": [],
+    "evidence_kind": "native_proven",
+    "evidence_refs": [
+     "evidence/receipts/native-rag.json",
+     "evidence/receipts/desktop-direct-rag.json",
+     "evidence/receipts/artifact-reductions.json",
+     "evidence/receipts/component-history.json",
+     "evidence/receipts/vllm-compatibility.json"
+    ],
+    "key": "c4",
+    "name": "foundation-socraticode",
+    "pin": "v1.14.0",
+    "pin_behind_upstream": false,
+    "recipe_ref": "evidence/receipts/native-rag.json",
+    "repository": "https://github.com/giancarloerra/SocratiCode",
+    "review_status": null,
+    "role": "Automatic semantic code indexing and graph context",
+    "upstream": {
+     "archived": false,
+     "latest": "v1.14.0",
+     "license": "AGPL-3.0",
+     "prerelease": false,
+     "pushed_at": "2026-09-22",
+     "released_at": "2026-09-16",
+     "renamed_to": null,
+     "stars": 3318
+    }
+   },
+   {
+    "adopted": true,
+    "card_limitations": [
+     "The client/specification is not a persistent lineage server, scheduler or dataset version store.",
+     "Lineage metadata may disclose private dataset names/URIs; never embed credentials or licensed row contents."
+    ],
+    "component_id": "data-openlineage",
+    "decisions": [],
+    "evidence_kind": "source_review",
+    "evidence_refs": [
+     "https://github.com/OpenLineage/OpenLineage/blob/8ad5c14c63fbab63fedd8ff42f9a208d86ad07fe/README.md"
+    ],
+    "key": "c5",
+    "name": "data-openlineage",
+    "pin": "1.53.0; source 8ad5c14c63fbab63fedd8ff42f9a208d86ad07fe",
+    "pin_behind_upstream": false,
+    "recipe_ref": null,
+    "repository": "https://github.com/OpenLineage/OpenLineage",
+    "review_status": null,
+    "role": "Open job/run/dataset lineage event standard and clients",
+    "upstream": {
+     "archived": false,
+     "latest": "1.53.0",
+     "license": "Apache-2.0",
+     "prerelease": false,
+     "pushed_at": "2026-09-22",
+     "released_at": "2026-09-01",
+     "renamed_to": null,
+     "stars": 2667
+    }
+   },
+   {
+    "adopted": true,
+    "card_limitations": [
+     "Current release is BSL-1.1 source-available, not blanket Apache-licensed software.",
+     "Pinned license includes an Additional Use Grant while current vendor prose describes paid production/business use; resolve the intended deployment with the licensor instead of assuming unrestricted commercial rights.",
+     "Storage version time is not proof of market information availability; do not discard revisions needed for replay."
+    ],
+    "component_id": "data-arcticdb",
+    "decisions": [],
+    "evidence_kind": "source_review",
+    "evidence_refs": [
+     "https://github.com/man-group/ArcticDB/blob/e620d8572a1e62c9ec07df8cbc8f5c432cd84325/README.md"
+    ],
+    "key": "c6",
+    "name": "data-arcticdb",
+    "pin": "v6.26.0; source e620d8572a1e62c9ec07df8cbc8f5c432cd84325",
+    "pin_behind_upstream": false,
+    "recipe_ref": null,
+    "repository": "https://github.com/man-group/ArcticDB",
+    "review_status": null,
+    "role": "Versioned dataframe storage using LMDB or object storage",
+    "upstream": {
+     "archived": false,
+     "latest": "v6.26.0",
+     "license": "NOASSERTION",
+     "prerelease": false,
+     "pushed_at": "2026-09-22",
+     "released_at": "2026-09-14",
+     "renamed_to": null,
+     "stars": 2519
+    }
+   },
+   {
+    "adopted": true,
+    "card_limitations": [
+     "No experiments or models were run by this review. The example would only record a synthetic local metric.",
+     "Autologging does not capture every data revision, leakage decision or external service cost; avoid unreviewed hosted telemetry and dataset uploads."
+    ],
+    "component_id": "data-mlflow",
+    "decisions": [],
+    "evidence_kind": "source_review",
+    "evidence_refs": [
+     "https://github.com/mlflow/mlflow/blob/32792afe5b0183fce10532d3a023f5cfa8612d09/README.md"
+    ],
+    "key": "c7",
+    "name": "data-mlflow",
+    "pin": "v3.16.1; source 32792afe5b0183fce10532d3a023f5cfa8612d09",
+    "pin_behind_upstream": false,
+    "recipe_ref": null,
+    "repository": "https://github.com/mlflow/mlflow",
+    "review_status": null,
+    "role": "Local experiment runs, parameters, metrics and artifacts",
+    "upstream": {
+     "archived": false,
+     "latest": "v3.16.1",
+     "license": "Apache-2.0",
+     "prerelease": false,
+     "pushed_at": "2026-09-22",
+     "released_at": "2026-09-17",
+     "renamed_to": null,
+     "stars": 28099
+    }
+   },
+   {
+    "adopted": true,
+    "card_limitations": [
+     "Catalog creation alone would not prove append, multi-writer conflict handling, cross-engine compatibility or time travel.",
+     "Snapshot expiry and orphan-file removal must preserve required research/audit versions; storage snapshots do not imply past information availability."
+    ],
+    "component_id": "data-iceberg",
+    "decisions": [],
+    "evidence_kind": "source_review",
+    "evidence_refs": [
+     "https://github.com/apache/iceberg/blob/6976e020b894f6a6777704df2b8c4458cb291ae9/README.md"
+    ],
+    "key": "c8",
+    "name": "data-iceberg",
+    "pin": "Apache Iceberg 1.11.0; PyIceberg 0.12.0; source 6976e020b894f6a6777704df2b8c4458cb291ae9",
+    "pin_behind_upstream": false,
+    "recipe_ref": null,
+    "repository": "https://github.com/apache/iceberg",
+    "review_status": null,
+    "role": "Open table snapshots and schema/partition evolution",
+    "upstream": {
+     "archived": false,
+     "latest": "apache-iceberg-1.11.0",
+     "license": "Apache-2.0",
+     "prerelease": false,
+     "pushed_at": "2026-09-22",
+     "released_at": "2026-05-20",
+     "renamed_to": null,
+     "stars": 9265
+    }
+   }
+  ]
+ }
+}

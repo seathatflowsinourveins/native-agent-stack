@@ -1,0 +1,118 @@
+{
+ "alternatives": [
+  {
+   "disposition": "conditional",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "catalogs/foundation/decisions.json",
+    "evidence/receipts/portable-cli-artifacts.json"
+   ],
+   "key": "c1",
+   "name": "ast-grep",
+   "repository": "https://github.com/ast-grep/ast-grep",
+   "why_not_default": "Native structural search returned eight matches after correcting .txt discovery with explicit language and stdin. This establishes selected syntax matching, not resolved incoming references; use when the question requires structural search."
+  },
+  {
+   "disposition": "measured_tradeoff",
+   "evidence_class": "measured_comparison",
+   "evidence_refs": [
+    "docs/token-native-saturation.md",
+    "docs/full-stack-convergence.md",
+    "evidence/receipts/native-jcodemunch-20260920.json"
+   ],
+   "key": "c2",
+   "name": "jCodeMunch",
+   "repository": "https://github.com/jgravelle/jcodemunch-mcp",
+   "why_not_default": "Native retrieval returned a byte-exact function. Complete search/source responses measured 861 tokens versus 5476 for the whole file and 601 for the known focused function. Useful for scoped discovery, but the retained comparison does not establish better reference retrieval than Serena or justify indexing for known-source reads."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "catalogs/foundation/decisions.json",
+    "catalogs/us-equities/foundation-memory.json",
+    "evidence/receipts/desktop-cli-workflows.json"
+   ],
+   "key": "c3",
+   "name": "codebase-memory-mcp",
+   "repository": "https://github.com/DeusData/codebase-memory-mcp",
+   "why_not_default": "Retained Desktop search and trace exited successfully and identified collect plus four static callees. That establishes a bounded graph operation, not complete incoming references, full implementation retrieval or runtime dependencies. Use for graph questions or demonstrated language-server gaps."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/star-audit.json"
+   ],
+   "key": "c4",
+   "name": "CodeGraph",
+   "repository": "https://github.com/colbymchenry/codegraph",
+   "why_not_default": "The retained review covers README/license overview only; it records no installation or native acceptance. No executed language/workload comparison establishes source fidelity, reference completeness or lower total cost."
+  }
+ ],
+ "catalog": "foundation",
+ "challenger_preferred": null,
+ "lane": "codex",
+ "layer_id": "code-navigation",
+ "limits": [
+  "Reviewed retained public evidence and relevant sections; did not rerun native retrieval or inspect private original client streams.",
+  "Historical host results do not establish acceptance on this checkout or every configured language."
+ ],
+ "model": {
+  "effort": "high",
+  "name": "gpt-6-astra"
+ },
+ "open_gaps": [
+  "No matched cross-candidate benchmark establishes source/reference completeness and total cost across representative languages and repositories.",
+  "The reviewed evidence does not establish symbol-update/deletion correctness for every index or language server.",
+  "Artifact token comparisons use different tasks and accounting boundaries; they cannot establish causal provider savings or a global ranking.",
+  "Static graph results do not establish dynamic runtime behavior."
+ ],
+ "overturn_protocol": {
+  "arms": [
+   "Serena exact symbol bodies and incoming references",
+   "jCodeMunch scoped discovery and exact source retrieval",
+   "ast-grep structural matching",
+   "codebase-memory-mcp static graph search and trace",
+   "CodeGraph challenger",
+   "Focused original-source read as fidelity and cost baseline"
+  ],
+  "fixture_paths": [
+   "fixtures/before.py",
+   "fixtures/after.py"
+  ],
+  "metric": "Compare byte-exact greeting bodies and correct incoming-reference results against original source, including the empty reference set in these fixtures. In an isolated before-to-after replacement, check stale-source rejection. Measure complete responses, cold indexing, warm retrieval and update cost separately; a fixture win warrants only fixture-scoped promotion."
+ },
+ "overturn_when": "Change the scoped verdict if an executed comparison on fixtures/before.py and fixtures/after.py shows another candidate returning exact changed greeting source and correct incoming references where Serena fails, or matching correctness at lower complete indexing/retrieval/update cost. Broader replacement requires representative target-language tasks beyond these small fixtures.",
+ "packet_sha256": "691a09c0f4d4a0dc1a14b2f5064079b6bf12960d202bf3db63d7043544de315f",
+ "schema_version": 1,
+ "sources_read": [
+  "<host-path>/SKILL.md",
+  "<host-path>/foundation__code-navigation.json",
+  "catalogs/foundation/decisions.json",
+  "catalogs/us-equities/foundation-memory.json",
+  "docs/token-native-saturation.md",
+  "docs/full-stack-convergence.md",
+  "docs/foundation-stack.md",
+  "evidence/receipts/native-context-memory.json",
+  "evidence/receipts/desktop-cli-workflows.json",
+  "evidence/receipts/portable-cli-artifacts.json",
+  "catalogs/us-equities/star-audit.json",
+  "evidence/receipts/foundation-native-20260920.json",
+  "blueprints/token-native-focus/saturation-audit.json",
+  "fixtures/after.py",
+  "fixtures/before.py",
+  "evidence/receipts/native-jcodemunch-20260920.json"
+ ],
+ "why_selected": "Select Serena for exact source and references in qualified languages. evidence/receipts/foundation-native-20260920.json records native execution: eight symbol/source/reference checks passed across fresh Codex and Claude server contexts after Python/TypeScript configuration repair, with exact Python parse_codex and CJS collect[0] source matches. evidence/receipts/native-context-memory.json also records completed find_symbol and find_referencing_symbols calls. This directly supports the requirement; use focused original-source reads when already sufficient and activate structural or indexed alternatives only for a concrete retrieval question.",
+ "winner_evidence_class": "native_proven",
+ "winner_evidence_refs": [
+  "catalogs/foundation/decisions.json",
+  "evidence/receipts/foundation-native-20260920.json",
+  "evidence/receipts/native-context-memory.json",
+  "docs/foundation-stack.md"
+ ],
+ "winner_keys": [
+  "c5"
+ ]
+}

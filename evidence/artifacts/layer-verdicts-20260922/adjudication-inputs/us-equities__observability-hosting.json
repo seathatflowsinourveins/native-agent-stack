@@ -1,0 +1,808 @@
+{
+ "catalog": "us-equities",
+ "layer_id": "observability-hosting",
+ "repository_root": "the repository root given in the task",
+ "return_A": {
+  "winner_keys": [
+   "c14",
+   "c3",
+   "c8"
+  ],
+  "winner_names": [
+   [
+    "OpenTelemetry Collector contrib",
+    "opentelemetry-collector-contrib"
+   ],
+   [
+    "sandbox-runtime",
+    "sandbox-runtime"
+   ],
+   [
+    "Restic",
+    "restic"
+   ]
+  ],
+  "why_selected": "Select contrib collection, sandbox-runtime and Restic for complementary coverage of observability, sandboxing and recovery. observability/receipt.json records native Codex and Claude task completion with matching collected usage, retained queries and corrected privacy handling; the privacy canary and backend persistence checks used synthetic inputs. evidence/receipts/runtime-tools.json records native allowed-write success, denied-read failure and separate protected-write failure, while preserving the overlapping-mount anomaly. blueprints/us-equities/hosting/backup/receipt.json records native encrypted backup, full-data checking and verified restore of 22 static files, with independent equality across 160642 bytes. These are bounded historical native executions, not complete hosting or broker-isolation acceptance. The collector's demonstrated backend dependencies remain necessary; this selection does not imply removing them.",
+  "winner_evidence_class": "native_proven",
+  "winner_evidence_refs": [
+   "observability/receipt.json",
+   "observability/backends/receipt.json",
+   "evidence/receipts/runtime-tools.json",
+   "blueprints/us-equities/hosting/backup/receipt.json",
+   "blueprints/us-equities/hosting/backup/source.sha256",
+   "blueprints/us-equities/hosting/backup/selected-files.txt"
+  ],
+  "alternatives": [
+   {
+    "disposition": "unqualified",
+    "evidence_class": "source_review",
+    "evidence_refs": [
+     "https://raw.githubusercontent.com/opensandbox-group/OpenSandbox/server/v0.2.3/README.md"
+    ],
+    "key": "c1",
+    "name": "opensandbox",
+    "repository": "https://github.com/opensandbox-group/OpenSandbox",
+    "why_not_default": "The reviewed README provides sandbox lifecycle and execution examples, but no retained execution establishes isolation, cancellation, recovery or native identity preservation for this workload."
+   },
+   {
+    "disposition": "conditional",
+    "evidence_class": "native_proven",
+    "evidence_refs": [
+     "observability/receipt.json",
+     "observability/backends/receipt.json"
+    ],
+    "key": "c2",
+    "name": "Grafana",
+    "repository": "https://github.com/grafana/grafana",
+    "why_not_default": "Native dashboard rendering, queries and provisioned views after restart were observed. It remains a useful visualization dependency, but does not itself provide worker restriction or verified backup; the three selections prioritize coverage across the layer."
+   },
+   {
+    "disposition": "unqualified",
+    "evidence_class": "source_review",
+    "evidence_refs": [
+     "https://pypi.org/project/modal/1.5.5/"
+    ],
+    "key": "c4",
+    "name": "modal",
+    "repository": "https://github.com/modal-labs/modal-client",
+    "why_not_default": "The package page documents cloud compute access and account setup. No retained cloud job demonstrates complete results, scoped credentials, cancellation or recovery."
+   },
+   {
+    "disposition": "conditional",
+    "evidence_class": "native_proven",
+    "evidence_refs": [
+     "observability/receipt.json",
+     "observability/backends/receipt.json"
+    ],
+    "key": "c5",
+    "name": "Prometheus",
+    "repository": "https://github.com/prometheus/prometheus",
+    "why_not_default": "Native scraping, historical queries and sample persistence after restart passed. It remains the demonstrated metrics backend for the selected collector, but cannot substitute for sandbox restrictions or backup. Retention expiry was not exercised."
+   },
+   {
+    "disposition": "conditional",
+    "evidence_class": "native_proven",
+    "evidence_refs": [
+     "observability/backends/receipt.json",
+     "observability/receipt.json"
+    ],
+    "key": "c6",
+    "name": "Loki",
+    "repository": "https://github.com/grafana/loki",
+    "why_not_default": "Native sanitized-log delivery, querying and synthetic-log persistence after restart passed. It remains the demonstrated log backend, but its single-host retention does not establish off-host recovery or worker isolation."
+   },
+   {
+    "disposition": "unqualified",
+    "evidence_class": "source_review",
+    "evidence_refs": [],
+    "key": "c7",
+    "name": "e2b",
+    "repository": "https://github.com/e2b-dev/E2B",
+    "why_not_default": "The referenced pinned README could not be retrieved, and the packet supplies no native sandbox execution receipt. Workload isolation, returned results and recovery therefore remain unqualified."
+   },
+   {
+    "disposition": "unqualified",
+    "evidence_class": "source_review",
+    "evidence_refs": [
+     "https://raw.githubusercontent.com/mlflow/mlflow/v3.16.1/README.md"
+    ],
+    "key": "c9",
+    "name": "mlflow",
+    "repository": "https://github.com/mlflow/mlflow",
+    "why_not_default": "The reviewed README describes tracking and tracing setup, but no retained experiment or instrumented native task establishes scoped collection, redaction or recoverable state."
+   },
+   {
+    "disposition": "conditional",
+    "evidence_class": "native_proven",
+    "evidence_refs": [
+     "observability/backends/receipt.json",
+     "observability/receipt.json"
+    ],
+    "key": "c10",
+    "name": "ntfy",
+    "repository": "https://github.com/binwiederhier/ntfy",
+    "why_not_default": "Local firing/resolved notifications and retained message retrieval passed. External delivery and operational response were not tested; notification receipt covers a narrower portion of this layer."
+   },
+   {
+    "disposition": "unqualified",
+    "evidence_class": "source_review",
+    "evidence_refs": [],
+    "key": "c11",
+    "name": "phoenix",
+    "repository": "https://github.com/Arize-ai/phoenix",
+    "why_not_default": "The referenced pinned README could not be retrieved. No native instrumented application or trace-storage receipt was supplied, leaving collection, privacy and recovery unqualified."
+   },
+   {
+    "disposition": "conditional",
+    "evidence_class": "native_proven",
+    "evidence_refs": [
+     "observability/backends/receipt.json",
+     "observability/receipt.json"
+    ],
+    "key": "c12",
+    "name": "alertmanager",
+    "repository": "https://github.com/prometheus/alertmanager",
+    "why_not_default": "The local alert route and silence persistence passed. External paging, high availability and unattended remediation remain unproved; alert routing is complementary to the selected capabilities."
+   },
+   {
+    "disposition": "overlap",
+    "evidence_class": "native_proven",
+    "evidence_refs": [
+     "observability/receipt.json"
+    ],
+    "key": "c13",
+    "name": "opentelemetry-collector",
+    "repository": "https://github.com/open-telemetry/opentelemetry-collector",
+    "why_not_default": "The retained execution used the contrib distribution containing this core runtime. Selecting core separately would duplicate that evidence; the standalone core binary was not separately exercised."
+   }
+  ],
+  "challenger_preferred": null,
+  "overturn_when": "Change the verdict after an executed comparison using fixtures/observability-check.json and the native backup/restore procedure in blueprints/us-equities/hosting/backup/README.md preserves complete results, scoped telemetry and exact restore equality while closing a material gap such as exercised network denial or off-host application recovery. Receipt replay or lane agreement alone is insufficient.",
+  "open_gaps": [
+   "The selected set covers collection, filesystem restriction and static-file recovery; it is not a standalone deployment. The accepted telemetry path also used Prometheus, Loki, Grafana, Alertmanager and ntfy.",
+   "Sandbox network denial was configured but not exercised. Filesystem checks do not establish a VM boundary or comprehensive prevention of broker execution authority.",
+   "Restic acceptance excludes live databases, order journals and later source changes. Off-host recovery, independent key recovery, scheduling and destructive retention enforcement remain unproved.",
+   "The SDK native turn histogram was absent even after a bounded flush experiment; imported receipt summaries do not close native telemetry completeness.",
+   "Privacy acceptance used a synthetic canary over tested fields, not arbitrary-content leakage prevention.",
+   "No high availability, external notification delivery, paid hosting or complete account billing was established."
+  ]
+ },
+ "return_B": {
+  "winner_keys": [
+   "c14",
+   "c5",
+   "c6"
+  ],
+  "winner_names": [
+   [
+    "OpenTelemetry Collector contrib",
+    "opentelemetry-collector-contrib"
+   ],
+   [
+    "Prometheus",
+    "prometheus"
+   ],
+   [
+    "Loki",
+    "loki"
+   ]
+  ],
+  "why_selected": "This verdict is my own source review of the retained receipts. No TypeSafe inference results were supplied or used, and no provider judgment is retained. In this revision c5 Prometheus replaces c8 restic as a winner. The refuters showed that the native-usage matches credited to the Collector were read out of Prometheus. They also showed that the only receipt for restic, the backup tool, covers no state this layer owns. The three winners together form the telemetry path that was actually run natively, so the weakest class in the set is native_proven.\n\n(1) c14, OpenTelemetry Collector contrib v0.161.0. observability/receipt.json records `otelcol-contrib validate` exit 0. Real native Codex 0.155.1 and Claude 2.1.278 runs of fixtures/observability-check.json exited 0 with the correct answer (lines 163-202). For Codex, collected_turn_histogram_matches_native_usage is true (line 182). For Claude, collected_request_logs_and_metrics_match is true (line 201). Six services were active, and the privacy canary recorded forbidden_marker_absent true (line 327). observability/followup-receipt.json records one fresh native SDK task run through blueprints/us-equities/workers/native_worker.py. After an analytics configuration fix, its turn histogram matched all six usage categories (total 40518; lines 97-110).\n\n(2) c5, Prometheus. The Codex usage match was queried from the Prometheus API. observability/README.md lines 109-111 query ecosystem_codex_turn_token_usage_sum at 127.0.0.1:19090. The follow-up SDK histogram was also a Prometheus query: HTTP 200, and a retained last_over_time query returned the same values (followup-receipt.json lines 98-125). observability/backends/receipt.json records all 7 scrape targets up, readiness HTTP 200, and prometheus_historical_sample true after one restart (lines 76-97).\n\n(3) c6, Loki v3.7.8. Claude request logs are read from Loki (README lines 112-113). The follow-up Loki query summed SDK receipts per receipt_id over 6h and returned 121288. That equals the 80770 from two earlier runs plus 40518 from the fresh run, and the fresh run published its own receipt automatically (followup-receipt.json lines 204-224). The earlier 80770 came from imported summaries of two completed runs, not new model calls. It was unchanged after a Collector restart (receipt.json lines 248-252). Loki log persistence after a backend restart was shown with a synthetic fixture only (backends/receipt.json lines 87-91).\n\nCorrection to the earlier proposal: no receipt shows a failed attempt stored in Loki. retained_failed_attempts (receipt.json lines 370-375) is the acceptance author's own process history. Three of its entries are corrections and one is an unresolved negative result (line 373). Writing a failed-status record is shown only by the offline unit test in tests/test_observability.py (lines 32-54). The live unknown-usage query returned no data, and the follow-up receipt says a receipt-based view cannot identify tasks that never emitted a receipt (followup-receipt.json lines 24 and 214-218). Restic is kept as a conditional alternative; see alternatives.",
+  "winner_evidence_class": "native_proven",
+  "winner_evidence_refs": [
+   "observability/receipt.json",
+   "observability/backends/receipt.json",
+   "observability/followup-receipt.json",
+   "observability/README.md",
+   "fixtures/observability-check.json"
+  ],
+  "alternatives": [
+   {
+    "disposition": "conditional",
+    "evidence_class": "native_proven",
+    "evidence_refs": [
+     "blueprints/us-equities/hosting/backup/receipt.json",
+     "blueprints/us-equities/hosting/backup/selected-files.txt",
+     "blueprints/us-equities/hosting/backup/source.sha256"
+    ],
+    "key": "c8",
+    "name": "restic",
+    "repository": "https://github.com/restic/restic",
+    "why_not_default": "Restic is the only candidate with a native backup and restore receipt, so it remains the preferred backup tool for this layer's backup scope term. blueprints/us-equities/hosting/backup/receipt.json records: signed checksums verified; init, backup, check --read-data ('no errors were found') and restore --verify all exit 0; 22 files and 160642 bytes restored; sha256 ok_lines 22; the independent byte comparison matched. The receipt covers only 22 static public reference files, with live_databases 0 (line 36). It states that no live SQLite, Qdrant, Loki, Prometheus, broker/order journal or transcript backup was attempted (line 125). There is no off-host destination (line 118), separate_key_escrow is not_configured, the retention step was a dry run with 0 deletions, and the timer and service are not enabled. Restic therefore has no evidence of recovering this layer's state, which is why it is not a winner."
+   },
+   {
+    "disposition": "overlap",
+    "evidence_class": "native_proven",
+    "evidence_refs": [
+     "observability/receipt.json",
+     "observability/backends/receipt.json"
+    ],
+    "key": "c2",
+    "name": "Grafana",
+    "repository": "https://github.com/grafana/grafana",
+    "why_not_default": "Readiness HTTP 200 is recorded. Provisioned dashboards and datasources survived a restart. agent-browser rendered the dashboard, and the follow-up render shows the SDK total of 121288. Grafana is only a view over Prometheus and Loki data; it neither collects nor retains telemetry itself. grafana_tag_build_commit_equal is false. The backends receipt contains no dashboard UI acceptance, and the first screenshot predates the SDK panel."
+   },
+   {
+    "disposition": "overlap",
+    "evidence_class": "native_proven",
+    "evidence_refs": [
+     "observability/receipt.json",
+     "observability/backends/receipt.json"
+    ],
+    "key": "c12",
+    "name": "alertmanager",
+    "repository": "https://github.com/prometheus/alertmanager",
+    "why_not_default": "`amtool check-config` exited 0. The EcosystemAcceptanceTargetDown route recorded 1 firing and 1 resolved notification against a dedicated loopback fixture (receipt.json lines 303-311). This is the only observed evidence for the requirement's 'supervise owned processes' clause; the systemctl is-active check is systemd, which is not a candidate. However, external_delivery_tested is false, and alerting does not retain or recover state. Supervision is not among the layer_scope_terms, so it is recorded as a complement rather than a fourth duty."
+   },
+   {
+    "disposition": "overlap",
+    "evidence_class": "native_proven",
+    "evidence_refs": [
+     "observability/receipt.json",
+     "observability/backends/receipt.json"
+    ],
+    "key": "c10",
+    "name": "ntfy",
+    "repository": "https://github.com/binwiederhier/ntfy",
+    "why_not_default": "ntfy is the local notification sink on the Alertmanager route, and its message persisted across a restart. There is no external delivery, and the route depends on ntfy's bundled alertmanager template. It is a notification endpoint, not telemetry retention or state recovery."
+   },
+   {
+    "disposition": "overlap",
+    "evidence_class": "native_proven",
+    "evidence_refs": [
+     "observability/receipt.json"
+    ],
+    "key": "c13",
+    "name": "opentelemetry-collector",
+    "repository": "https://github.com/open-telemetry/opentelemetry-collector",
+    "why_not_default": "The core collector runtime is inside the adopted contrib distribution (c14). The receipt records only the otelcol-contrib 0.161.0 asset, and the standalone core binary was not run separately. Selecting it as well would count one execution path twice."
+   },
+   {
+    "disposition": "conditional",
+    "evidence_class": "native_proven",
+    "evidence_refs": [
+     "evidence/receipts/runtime-tools.json"
+    ],
+    "key": "c3",
+    "name": "sandbox-runtime",
+    "repository": "https://github.com/anthropics/sandbox-runtime",
+    "why_not_default": "sandbox is one of this layer's scope terms. evidence/receipts/runtime-tools.json records: allowed write exit 0, denied read exit 1, a separate denied write exit 1 with no host file created, and a child environment reduced to HOME and PATH only (line 31). The reduced environment partly bears on keeping credentials out of research workers. Network denial was configured but not separately exercised (line 13). The overlapping read/write case exited 0 into an ephemeral hidden mount. The tool is not a VM boundary, and no receipt shows research workers denied broker execution authority."
+   },
+   {
+    "disposition": "unqualified",
+    "evidence_class": "source_review",
+    "evidence_refs": [],
+    "key": "c1",
+    "name": "opensandbox",
+    "repository": "https://github.com/opensandbox-group/OpenSandbox",
+    "why_not_default": "The only evidence is a source-review URL, with no retained local execution receipt. The pin (server/v0.2.3) is behind the upstream release-1.1.0. The card says help/import is not isolation proof."
+   },
+   {
+    "disposition": "unqualified",
+    "evidence_class": "source_review",
+    "evidence_refs": [],
+    "key": "c7",
+    "name": "e2b",
+    "repository": "https://github.com/e2b-dev/E2B",
+    "why_not_default": "Source review only. The card says import is not sandbox E2E, and self-hosting targets AWS/GCP rather than a local Linux binary. There is no retained execution receipt."
+   },
+   {
+    "disposition": "out_of_scope",
+    "evidence_class": "source_review",
+    "evidence_refs": [],
+    "key": "c4",
+    "name": "modal",
+    "repository": "https://github.com/modal-labs/modal-client",
+    "why_not_default": "Source review only. `modal run` executes code in the cloud, may incur charges, and was not run. Paid hosting is not authorized, and there is no local execution evidence."
+   },
+   {
+    "disposition": "unqualified",
+    "evidence_class": "source_review",
+    "evidence_refs": [],
+    "key": "c9",
+    "name": "mlflow",
+    "repository": "https://github.com/mlflow/mlflow",
+    "why_not_default": "Source review only. No tracking server or experiment was recorded. MLflow is an experiment-lineage store, not the operational telemetry path that was exercised."
+   },
+   {
+    "disposition": "unqualified",
+    "evidence_class": "source_review",
+    "evidence_refs": [],
+    "key": "c11",
+    "name": "phoenix",
+    "repository": "https://github.com/Arize-ai/phoenix",
+    "why_not_default": "Source review only. The server launch is prospective, no app was instrumented, and traces are disabled in the accepted Collector scope. The license is ELv2 with restrictions, and upstream reports NOASSERTION."
+   }
+  ],
+  "challenger_preferred": null,
+  "overturn_when": "Revise the verdict if any of the three checks below gives a different result. The existing tests/test_observability.py and tests/test_observability_backends_alerts.py are offline guards only; they cover identity, no-overwrite, the failed-status writer, the dashboard query and alert/config syntax. On their own they cannot overturn or confirm this verdict.\n\n(1) Native re-run. Run `python3 blueprints/us-equities/workers/native_worker.py run` with the argument shape recorded at observability/followup-receipt.json line 61 (native binary, home, workspace, receipt, prompt derived from fixtures/observability-check.json, --observation-dir). Then query the Prometheus series ecosystem_codex_turn_token_usage_sum and the Loki per-receipt_id sum. The winners are overturned if the collected usage no longer equals native usage. A second run should force a failure, for example with a very short --turn-deadline-seconds. If Loki never shows its record with usage_status other than reported, failed-attempt telemetry retention stays unproven for c6 and the set must be re-judged.\n\n(2) `python3 observability/backends/check_persistence.py --evidence-dir <fresh directory> --grafana-env <grafana env file>` (arguments as used in tests/test_observability.py lines 83-84). The Prometheus/Loki retention claim fails if a fresh run no longer records prometheus_historical_sample and loki_log true after a restart.\n\n(3) Recovery. Promote c8 restic to a winner if a backup receipt shows check --read-data and restore --verify exit 0 with byte-identical hashes for the live Loki, Prometheus and SQLite data and the broker journal, preferably to an off-host destination. The comparison point is blueprints/us-equities/hosting/backup/receipt.json. The offline refusal cases in tests/test_offhost_restore.py are a precondition, not such a receipt.\n\nA sandbox candidate enters the winners only after a receipt shows both network denial and research workers denied broker execution authority.",
+  "open_gaps": [
+   "Failed-attempt telemetry retention is not established. No failed or unknown-usage record was observed in Loki: the 6h unknown-usage query returned no data. Only the offline unit test of the writer creates a failed-status observation, and tasks that never emit a receipt are invisible.",
+   "Recoverable state is shown only as same-host restart persistence of the observability backends, and the Loki check used a synthetic fixture. Restic backed up 22 static files, with live_databases 0, no off-host destination, no key escrow, a dry-run retention step, and timer and service not enabled.",
+   "The earlier 80770 SDK total came from imported summaries of two completed runs. Only the follow-up task (40518) published its own receipt automatically, and it is a single run.",
+   "The Loki and Collector restart checks cover one controlled restart. There is no loss/recovery acceptance under a full disk or an extended backend outage, and the receipt spool has no automatic expiry.",
+   "Traces are disabled and no trace database was deployed.",
+   "Process supervision rests on systemd is-active checks and one local Alertmanager target-down route. There is no external notification delivery or high availability, and the Dagu HTTP 401 shows only anonymous protection.",
+   "No receipt shows research workers denied broker execution authority. Sandbox network denial was configured but not exercised.",
+   "The Desktop parent export was not observed: its correlated OTel records were 0, and it was not restarted.",
+   "The existing tests under tests/ for this layer are offline guards. No named repository test measures the native-usage match or restart totals."
+  ]
+ },
+ "packet": {
+  "title": "Observability and hosting",
+  "requirement": "Run bounded research with native identity and complete returned results; supervise owned processes; retain scoped telemetry, failed attempts and recoverable state without granting research workers broker execution authority.",
+  "limitations": [
+   "Native worker success and telemetry matching are bounded by the recorded task, process and account. They do not establish every native client/session, whole-task savings or unlimited allowance.",
+   "Dagu's older completed-history restart is not in-flight recovery. Later recovery receipts must be evaluated for their own process, host and workload rather than promoting all workflows.",
+   "Gateway transport health, routed text and ACP research acceptance do not establish native hook/tool parity or independent provider/model attestation.",
+   "Same-host recovery and configured restrictions do not establish off-host disaster recovery, a VM boundary, unattended broker operation or paid hosting."
+  ],
+  "layer_scope_terms": [
+   "observability",
+   "hosting",
+   "recovery",
+   "backup",
+   "sandbox"
+  ],
+  "requirement_note": "The requirement, limitations and existing_overturn_when text is shared by this layer's group; judge fit against the layer title and layer_scope_terms.",
+  "candidates": [
+   {
+    "adopted": true,
+    "card_limitations": [
+     "Canonical repository moved to opensandbox-group/OpenSandbox.",
+     "Server0.2.3 and Python SDK0.1.16 are separate; help/import is not isolation proof.",
+     "Container sandbox strength depends on configured runtime and host isolation."
+    ],
+    "component_id": "opensandbox",
+    "decisions": [],
+    "evidence_kind": "source_review",
+    "evidence_refs": [
+     "https://github.com/opensandbox-group/OpenSandbox/blob/server/v0.2.3/README.md"
+    ],
+    "key": "c1",
+    "name": "opensandbox",
+    "pin": "server/v0.2.3; Python SDK0.1.16",
+    "pin_behind_upstream": true,
+    "recipe_ref": null,
+    "repository": "https://github.com/opensandbox-group/OpenSandbox",
+    "review_status": null,
+    "role": "Self-hostable sandbox control API and SDKs",
+    "upstream": {
+     "archived": false,
+     "latest": "release-1.1.0",
+     "license": "Apache-2.0",
+     "prerelease": false,
+     "pushed_at": "2026-09-22",
+     "released_at": "2026-09-21",
+     "renamed_to": null,
+     "stars": 15472
+    }
+   },
+   {
+    "adopted": true,
+    "card_limitations": [
+     "Native proof covers local health, provisioned data sources/dashboard queries and the receipt-specific UI checks; no external dashboard publication or high availability.",
+     "AGPL-3.0-only applies with documented component exceptions; hosted-service terms are separate.",
+     "A successful dashboard query does not validate profitable strategy performance or maximum token efficiency."
+    ],
+    "component_id": "grafana",
+    "decisions": [],
+    "evidence_kind": "native_proven",
+    "evidence_refs": [
+     "observability/receipt.json",
+     "observability/backends/receipt.json"
+    ],
+    "key": "c2",
+    "name": "Grafana",
+    "pin": "v13.2.2",
+    "pin_behind_upstream": false,
+    "recipe_ref": "observability/backends/README.md",
+    "repository": "https://github.com/grafana/grafana",
+    "review_status": null,
+    "role": "Operations dashboards and visualization",
+    "upstream": {
+     "archived": false,
+     "latest": "v13.2.2",
+     "license": "AGPL-3.0",
+     "prerelease": false,
+     "pushed_at": "2026-09-22",
+     "released_at": "2026-09-15",
+     "renamed_to": null,
+     "stars": 76856
+    }
+   },
+   {
+    "adopted": true,
+    "card_limitations": [
+     "Filesystem allowed/denied operations were proven; network denial was configured but not independently exercised.",
+     "Overlapping denied-read/write paths can produce an ephemeral hidden mount: first write exit0 left host unchanged; separate protected-write fixture denied correctly.",
+     "Not a VM boundary or complete secret-isolation certification."
+    ],
+    "component_id": "sandbox-runtime",
+    "decisions": [],
+    "evidence_kind": "native_proven",
+    "evidence_refs": [
+     "evidence/receipts/runtime-tools.json"
+    ],
+    "key": "c3",
+    "name": "sandbox-runtime",
+    "pin": "v0.0.77",
+    "pin_behind_upstream": false,
+    "recipe_ref": "recipes/README.md",
+    "repository": "https://github.com/anthropics/sandbox-runtime",
+    "review_status": null,
+    "role": "Native filesystem/network restriction for selected commands",
+    "upstream": {
+     "archived": false,
+     "latest": "v0.0.77",
+     "license": "Apache-2.0",
+     "prerelease": false,
+     "pushed_at": "2026-09-22",
+     "released_at": "2026-09-18",
+     "renamed_to": null,
+     "stars": 5302
+    }
+   },
+   {
+    "adopted": true,
+    "card_limitations": [
+     "Open-source SDK license does not make hosted compute free or self-hostable.",
+     "modal run executes cloud code and may incur charges; not run here.",
+     "Do not assume native Codex subscription credentials belong in cloud containers."
+    ],
+    "component_id": "modal",
+    "decisions": [],
+    "evidence_kind": "source_review",
+    "evidence_refs": [
+     "https://pypi.org/project/modal/1.5.5/"
+    ],
+    "key": "c4",
+    "name": "modal",
+    "pin": "Python modal1.5.5; source be5f129326efe4864d666d263d249214bd9b4ed2",
+    "pin_behind_upstream": false,
+    "recipe_ref": null,
+    "repository": "https://github.com/modal-labs/modal-client",
+    "review_status": null,
+    "role": "Managed elastic Python/GPU jobs and sandboxes",
+    "upstream": {
+     "archived": false,
+     "latest": "v1.3.1",
+     "license": "Apache-2.0",
+     "prerelease": null,
+     "pushed_at": "2026-09-22",
+     "released_at": null,
+     "renamed_to": null,
+     "stars": 515
+    }
+   },
+   {
+    "adopted": true,
+    "card_limitations": [
+     "Accepted metrics ingestion/query, retained local storage and local rule/alert path only; no broker account, market-feed completeness or production availability claim.",
+     "Metrics are operational indicators, not an immutable transaction ledger or a subscription invoice.",
+     "Compare native final usage and completed-turn metrics; Codex transport startup prewarm can add token-bearing log events outside model-turn totals."
+    ],
+    "component_id": "prometheus",
+    "decisions": [],
+    "evidence_kind": "native_proven",
+    "evidence_refs": [
+     "observability/receipt.json",
+     "observability/backends/receipt.json"
+    ],
+    "key": "c5",
+    "name": "Prometheus",
+    "pin": "v3.14.0",
+    "pin_behind_upstream": false,
+    "recipe_ref": "observability/backends/README.md",
+    "repository": "https://github.com/prometheus/prometheus",
+    "review_status": null,
+    "role": "Metrics scraping, time-series retention and alert rules",
+    "upstream": {
+     "archived": false,
+     "latest": "v3.14.0",
+     "license": "Apache-2.0",
+     "prerelease": false,
+     "pushed_at": "2026-09-22",
+     "released_at": "2026-08-18",
+     "renamed_to": null,
+     "stars": 66176
+    }
+   },
+   {
+    "adopted": true,
+    "card_limitations": [
+     "Accepted local ingestion/query and receipt-specific storage retention/restart evidence only; no high-availability cluster or full transcript archive.",
+     "Loki indexes labels rather than all log content; sanitized logs cannot reconstruct removed prompt/tool payloads.",
+     "No tracing database or external telemetry destination was installed."
+    ],
+    "component_id": "loki",
+    "decisions": [],
+    "evidence_kind": "native_proven",
+    "evidence_refs": [
+     "observability/backends/receipt.json",
+     "observability/receipt.json"
+    ],
+    "key": "c6",
+    "name": "Loki",
+    "pin": "v3.7.8",
+    "pin_behind_upstream": false,
+    "recipe_ref": "observability/backends/README.md",
+    "repository": "https://github.com/grafana/loki",
+    "review_status": null,
+    "role": "Retained local sanitized operational logs and LogQL queries",
+    "upstream": {
+     "archived": false,
+     "latest": "v3.7.8",
+     "license": "AGPL-3.0",
+     "prerelease": false,
+     "pushed_at": "2026-09-22",
+     "released_at": "2026-09-17",
+     "renamed_to": null,
+     "stars": 28932
+    }
+   },
+   {
+    "adopted": true,
+    "card_limitations": [
+     "Import is not sandbox E2E.",
+     "Self-host guide targets AWS/GCP infrastructure; not a drop-in local Linux binary.",
+     "SDK, code-interpreter package and platform have separate versions."
+    ],
+    "component_id": "e2b",
+    "decisions": [],
+    "evidence_kind": "source_review",
+    "evidence_refs": [
+     "https://github.com/e2b-dev/E2B/blob/e2b@2.51.0/README.md"
+    ],
+    "key": "c7",
+    "name": "e2b",
+    "pin": "e2b@2.51.0",
+    "pin_behind_upstream": false,
+    "recipe_ref": null,
+    "repository": "https://github.com/e2b-dev/E2B",
+    "review_status": null,
+    "role": "Managed isolated code execution environments",
+    "upstream": {
+     "archived": false,
+     "latest": "e2b@2.51.0",
+     "license": "Apache-2.0",
+     "prerelease": false,
+     "pushed_at": "2026-09-22",
+     "released_at": "2026-09-18",
+     "renamed_to": null,
+     "stars": 13916
+    }
+   },
+   {
+    "adopted": true,
+    "card_limitations": [
+     "Native acceptance covers 22 static public reference files and 160642 bytes at source commit 1d6c3d2f67aaef8e381193385360bb81b1b022d9; it excludes later integrations.",
+     "Repository, restore and password share one host. Host/volume loss, independent key recovery and off-host disaster recovery remain unproved.",
+     "No live SQLite/Qdrant/Loki/Prometheus database, native-client authentication store, transcript or broker/order journal was backed up.",
+     "Retention was dry-run only; no deletion/prune, backup schedule, external alerts or always-on hosting was enabled. Packed-byte reduction is not token savings."
+    ],
+    "component_id": "restic",
+    "decisions": [],
+    "evidence_kind": "native_proven",
+    "evidence_refs": [
+     "blueprints/us-equities/hosting/backup/receipt.json",
+     "blueprints/us-equities/hosting/backup/source.sha256",
+     "blueprints/us-equities/hosting/backup/selected-files.txt"
+    ],
+    "key": "c8",
+    "name": "Restic",
+    "pin": "v0.19.1; publisher-signed linux/amd64 release asset",
+    "pin_behind_upstream": false,
+    "recipe_ref": "blueprints/us-equities/hosting/backup/README.md",
+    "repository": "https://github.com/restic/restic",
+    "review_status": null,
+    "role": "Encrypted selected-file local backup and verified restore",
+    "upstream": {
+     "archived": false,
+     "latest": "v0.19.1",
+     "license": "BSD-2-Clause",
+     "prerelease": false,
+     "pushed_at": "2026-09-20",
+     "released_at": "2026-07-05",
+     "renamed_to": null,
+     "stars": 36182
+    }
+   },
+   {
+    "adopted": true,
+    "card_limitations": [
+     "No tracking server or experiment recorded by this task.",
+     "Autologging can capture requests and artifacts; enable selected integrations deliberately.",
+     "A registry score is not an out-of-sample financial guarantee."
+    ],
+    "component_id": "mlflow",
+    "decisions": [],
+    "evidence_kind": "source_review",
+    "evidence_refs": [
+     "https://github.com/mlflow/mlflow/blob/v3.16.1/README.md"
+    ],
+    "key": "c9",
+    "name": "mlflow",
+    "pin": "v3.16.1",
+    "pin_behind_upstream": false,
+    "recipe_ref": null,
+    "repository": "https://github.com/mlflow/mlflow",
+    "review_status": null,
+    "role": "Versioned experiment artifacts, model lineage and optional traces",
+    "upstream": {
+     "archived": false,
+     "latest": "v3.16.1",
+     "license": "Apache-2.0",
+     "prerelease": false,
+     "pushed_at": "2026-09-22",
+     "released_at": "2026-09-17",
+     "renamed_to": null,
+     "stars": 28099
+    }
+   },
+   {
+    "adopted": true,
+    "card_limitations": [
+     "Accepted local message publication/retrieval and retained storage only; no delivery to a phone, email address or external topic.",
+     "The accepted webhook uses ntfy's native ?template=alertmanager integration; a plain arbitrary webhook endpoint is not equivalent.",
+     "No claim of guaranteed delivery, remote alerting or operational response coverage."
+    ],
+    "component_id": "ntfy",
+    "decisions": [],
+    "evidence_kind": "native_proven",
+    "evidence_refs": [
+     "observability/backends/receipt.json",
+     "observability/receipt.json"
+    ],
+    "key": "c10",
+    "name": "ntfy",
+    "pin": "v2.28.0",
+    "pin_behind_upstream": false,
+    "recipe_ref": "observability/backends/README.md",
+    "repository": "https://github.com/binwiederhier/ntfy",
+    "review_status": null,
+    "role": "Self-hosted local notification receipt and retrieval",
+    "upstream": {
+     "archived": false,
+     "latest": "v2.28.0",
+     "license": "Apache-2.0",
+     "prerelease": false,
+     "pushed_at": "2026-09-15",
+     "released_at": "2026-08-27",
+     "renamed_to": null,
+     "stars": 34370
+    }
+   },
+   {
+    "adopted": true,
+    "card_limitations": [
+     "ELv2 permits self-host use with restrictions; not Apache2 or unrestricted managed-service redistribution.",
+     "Server launch is prospective; no app instrumented and no judge-model calls run.",
+     "Auto-instrumentation can capture prompt/tool contents; scrub at source.",
+     "The proposed launch disables the optional MCP endpoint and hides built-in providers from the UI/catalog. PHOENIX_ALLOWED_PROVIDERS=NONE is not a backend inference authorization boundary; use a credential-free environment and appropriate access controls."
+    ],
+    "component_id": "phoenix",
+    "decisions": [],
+    "evidence_kind": "source_review",
+    "evidence_refs": [
+     "https://github.com/Arize-ai/phoenix/blob/arize-phoenix-v20.14.0/README.md"
+    ],
+    "key": "c11",
+    "name": "phoenix",
+    "pin": "arize-phoenix-v20.14.0",
+    "pin_behind_upstream": false,
+    "recipe_ref": null,
+    "repository": "https://github.com/Arize-ai/phoenix",
+    "review_status": null,
+    "role": "Local trace inspection and evaluation workspace",
+    "upstream": {
+     "archived": false,
+     "latest": "@arizeai/phoenix-mcp@4.3.13",
+     "license": "NOASSERTION",
+     "prerelease": false,
+     "pushed_at": "2026-09-22",
+     "released_at": "2026-09-22",
+     "renamed_to": null,
+     "stars": 11576
+    }
+   },
+   {
+    "adopted": true,
+    "card_limitations": [
+     "Receipt proves the local alert path only; no external phone, email, Slack or paging destination was configured.",
+     "Alert deduplication does not provide broker-order idempotency or reconciliation.",
+     "No high-availability cluster or unattended remediation was accepted."
+    ],
+    "component_id": "alertmanager",
+    "decisions": [],
+    "evidence_kind": "native_proven",
+    "evidence_refs": [
+     "observability/backends/receipt.json",
+     "observability/receipt.json"
+    ],
+    "key": "c12",
+    "name": "alertmanager",
+    "pin": "v0.34.1",
+    "pin_behind_upstream": false,
+    "recipe_ref": "observability/backends/README.md",
+    "repository": "https://github.com/prometheus/alertmanager",
+    "review_status": null,
+    "role": "Local alert grouping, deduplication and routing",
+    "upstream": {
+     "archived": false,
+     "latest": "v0.34.1",
+     "license": "Apache-2.0",
+     "prerelease": false,
+     "pushed_at": "2026-09-22",
+     "released_at": "2026-09-17",
+     "renamed_to": null,
+     "stars": 8626
+    }
+   },
+   {
+    "adopted": true,
+    "card_limitations": [
+     "Native proof is through the contrib distribution using this core version; the standalone otelcol core binary was not separately exercised.",
+     "Collector delivery/redaction and native client task evidence are bounded by the receipt; no trace database, broker monitoring or external alert destination was accepted.",
+     "Local filter estimates and cache shares are not measured net provider savings; raw sessions remain outside public evidence."
+    ],
+    "component_id": "opentelemetry-collector",
+    "decisions": [],
+    "evidence_kind": "native_proven",
+    "evidence_refs": [
+     "observability/receipt.json"
+    ],
+    "key": "c13",
+    "name": "opentelemetry-collector",
+    "pin": "v0.161.0",
+    "pin_behind_upstream": false,
+    "recipe_ref": "observability/receipt.json",
+    "repository": "https://github.com/open-telemetry/opentelemetry-collector",
+    "review_status": null,
+    "role": "OpenTelemetry core runtime used by the adopted contrib distribution",
+    "upstream": {
+     "archived": false,
+     "latest": "v0.161.0",
+     "license": "Apache-2.0",
+     "prerelease": false,
+     "pushed_at": "2026-09-22",
+     "released_at": "2026-09-14",
+     "renamed_to": null,
+     "stars": 7584
+    }
+   },
+   {
+    "adopted": true,
+    "card_limitations": [
+     "The binary release was published on 2026-09-16; the contrib source release was published on 2026-09-15. Neither date is the core source release date.",
+     "Accepted scope: native metrics/log delivery, sanitized canary and real Codex/Claude tasks; traces are disabled and no trace database was deployed.",
+     "Restart/retry and writer-identity details remain receipt-specific; this is not high availability or exact whole-account billing."
+    ],
+    "component_id": "opentelemetry-collector-contrib",
+    "decisions": [],
+    "evidence_kind": "native_proven",
+    "evidence_refs": [
+     "observability/receipt.json"
+    ],
+    "key": "c14",
+    "name": "OpenTelemetry Collector contrib",
+    "pin": "v0.161.0",
+    "pin_behind_upstream": false,
+    "recipe_ref": "observability/README.md",
+    "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+    "review_status": null,
+    "role": "Adopted native otelcol-contrib distribution and collection components",
+    "upstream": {
+     "archived": false,
+     "latest": "v0.161.0",
+     "license": "Apache-2.0",
+     "prerelease": false,
+     "pushed_at": "2026-09-22",
+     "released_at": "2026-09-15",
+     "renamed_to": null,
+     "stars": 4947
+    }
+   }
+  ]
+ }
+}

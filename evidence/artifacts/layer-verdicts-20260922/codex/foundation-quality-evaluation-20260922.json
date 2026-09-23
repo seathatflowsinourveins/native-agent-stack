@@ -1,0 +1,155 @@
+{
+ "alternatives": [
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/agents-operations.json"
+   ],
+   "key": "c1",
+   "name": "Inspect AI",
+   "repository": "https://github.com/UKGovernmentBEIS/inspect_ai",
+   "why_not_default": "The retained entry provides source review and prospective commands; no extraction/tool-use evaluation was executed."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "evidence/receipts/token-native-retained-functional-20260920.json"
+   ],
+   "key": "c3",
+   "name": "MCP Inspector",
+   "repository": "https://github.com/modelcontextprotocol/inspector",
+   "why_not_default": "Native stdio invocation computed 42, establishing a narrow protocol operation. It does not establish application behavior, client hooks, project scope or failure coverage."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/foundation/decisions.json"
+   ],
+   "key": "c4",
+   "name": "ShellCheck",
+   "repository": "https://github.com/koalaman/shellcheck",
+   "why_not_default": "The referenced decision summarizes scoped native shell acceptance without a concrete ShellCheck finding or returned command result. Useful for shell changes, but insufficient as the general behavioral default."
+  },
+  {
+   "disposition": "measured_tradeoff",
+   "evidence_class": "measured_comparison",
+   "evidence_refs": [
+    "catalogs/landscape/native-practice.json",
+    "docs/native-skill-practice-20260921.md",
+    "blueprints/native-skill-practice/typesafe-result.json"
+   ],
+   "key": "c5",
+   "name": "TypeSafe semantic skill",
+   "repository": "https://github.com/typesafe-ai/skills",
+   "why_not_default": "Eight provider judgments matched 7/8 frozen labels versus 3/8 for weak containment. C4 remained wrong and Promptfoo exit 100 was preserved. This supports advisory semantic checks, without representative accuracy or a matched native-review comparison."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/foundation/decisions.json"
+   ],
+   "key": "c7",
+   "name": "Difftastic",
+   "repository": "https://github.com/Wilfred/difftastic",
+   "why_not_default": "The referenced decision summarizes structural comparison acceptance, without a concrete behavioral oracle or returned diff. Structural review complements execution but cannot establish changed runtime behavior."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/landscape/native-practice.json",
+    "docs/native-skill-practice-20260921.md"
+   ],
+   "key": "c8",
+   "name": "Official OpenAI CI and security skills",
+   "repository": "https://github.com/openai/skills",
+   "why_not_default": "The CI helper returned a clean-check result independently corroborated by five successful checks, but failing-log recovery and repair remain unqualified. Security guidance has installation/discovery evidence without measured findings or false-positive controls; the combined candidate therefore remains source-review strength."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/agents-operations.json"
+   ],
+   "key": "c9",
+   "name": "MLflow",
+   "repository": "https://github.com/mlflow/mlflow",
+   "why_not_default": "The entry explicitly records no executed tracking server or experiment. Artifact lineage could complement evaluation, but retained evidence does not demonstrate behavioral verification or failure inspection."
+  }
+ ],
+ "catalog": "foundation",
+ "challenger_preferred": null,
+ "lane": "codex",
+ "layer_id": "quality-evaluation",
+ "limits": [
+  "Reviewed retained public evidence only; no fresh evaluation, browser run or upstream-version verification was performed.",
+  "Private browser/build logs, original-host state and unpublished failure captures were not inspected; public receipts describe those observations.",
+  "ShellCheck and Difftastic evidence was limited to relevant catalog decision sections, so their native execution summaries were not independently verified."
+ ],
+ "model": {
+  "effort": "high",
+  "name": "gpt-6-astra"
+ },
+ "open_gaps": [
+  "No representative held-out model-quality evaluation or matched comparison establishes universal superiority.",
+  "The four-query retrieval assertion is locally authored and evaluates rounded upstream output; direct evaluation token usage and cost are unreported.",
+  "Playwright acceptance covers a local synthetic ledger application, with no production authentication, load, external ingestion or independent-host restore qualification.",
+  "Inspect AI execution, MLflow experiment tracking, CI failure repair and security finding quality remain unestablished by the reviewed evidence.",
+  "TypeSafe's C4 disagreement and unmatched native-review baseline remain unresolved qualification boundaries."
+ ],
+ "overturn_protocol": {
+  "arms": [
+   "Current Promptfoo lane versus Inspect AI using identical frozen catalog cases, provider responses and deterministic scoring.",
+   "Current Playwright ledger workflow versus a proposed replacement using identical application inputs and independent API/database observations."
+  ],
+  "fixture_paths": [
+   "blueprints/native-skill-practice/catalog-cases.json",
+   "blueprints/convergence-practice/application-delivery/browser/ledger.spec.ts",
+   "blueprints/convergence-practice/wsl-application/README.md"
+  ],
+  "metric": "Compare frozen-oracle agreement, false passes, retained failure details and independently corroborated state. Replace a selected tool only after an executed comparison closes a concrete coverage or failure-inspection gap without losing existing checks."
+ },
+ "overturn_when": "Overturn after an executed matched comparison on blueprints/native-skill-practice/catalog-cases.json demonstrates that Inspect AI closes an evaluation or failure-inspection gap in Promptfoo, or a replacement exercises blueprints/convergence-practice/application-delivery/browser/ledger.spec.ts and the restart checks in blueprints/convergence-practice/wsl-application/README.md with better independently verified coverage and no lost assertions. Lane agreement alone is insufficient.",
+ "packet_sha256": "bc5abad6fc2a1b5248c4d1069e274543a6a548ca7c10fd0bd7ff9cc378452a58",
+ "schema_version": 1,
+ "sources_read": [
+  "<host-path>/foundation__quality-evaluation.json",
+  "<host-path>/SKILL.md",
+  "catalogs/us-equities/agents-operations.json",
+  "docs/acceptance-evidence-policy.md",
+  "docs/promptfoo-upstream-retrieval.md",
+  "evidence/receipts/token-native-retained-functional-20260920.json",
+  "catalogs/foundation/decisions.json",
+  "catalogs/landscape/native-practice.json",
+  "docs/native-skill-practice-20260921.md",
+  "blueprints/native-skill-practice/typesafe-result.json",
+  "docs/dashboard-rendered-acceptance.md",
+  "blueprints/convergence-practice/wsl-application/README.md",
+  "blueprints/convergence-practice/wsl-application/receipt.json",
+  "blueprints/convergence-practice/application-delivery/browser/ledger.spec.ts",
+  "blueprints/native-skill-practice/catalog-cases.json",
+  "evidence/artifacts/promptfoo-nemotron-upstream-20260921/qualification.json",
+  "evidence/artifacts/promptfoo-nemotron-upstream-20260921/promptfoo-eval.stdout",
+  "evidence/artifacts/promptfoo-nemotron-upstream-20260921/promptfoo-eval.stderr",
+  "evidence/artifacts/promptfoo-nemotron-upstream-20260921/results.public.json"
+ ],
+ "why_selected": "Select Promptfoo and Playwright for complementary evaluation and application checks. Native Promptfoo output in evidence/artifacts/promptfoo-nemotron-upstream-20260921/results.public.json contains the returned matrix with all four published query/document pairs ranked first; its qualification.json records separate model-metric observations and retained browser failures. This is upstream-example execution through a local integration, not held-out quality proof. blueprints/native-skill-practice/typesafe-result.json also preserves a failing evaluation with exit 100. For Playwright, blueprints/convergence-practice/wsl-application/receipt.json records the unchanged browser create/update/reload test passing with zero retries, separate API/database persistence observations across restart, and failed setup/recovery attempts. The inspected browser/ledger.spec.ts confirms the actual assertions. These project checks provide the strongest complementary retained evidence for the requirement; their combined classification is local integration.",
+ "winner_evidence_class": "local_integration",
+ "winner_evidence_refs": [
+  "docs/promptfoo-upstream-retrieval.md",
+  "evidence/artifacts/promptfoo-nemotron-upstream-20260921/qualification.json",
+  "evidence/artifacts/promptfoo-nemotron-upstream-20260921/results.public.json",
+  "evidence/artifacts/promptfoo-nemotron-upstream-20260921/promptfoo-eval.stdout",
+  "blueprints/native-skill-practice/typesafe-result.json",
+  "blueprints/convergence-practice/wsl-application/receipt.json",
+  "blueprints/convergence-practice/application-delivery/browser/ledger.spec.ts"
+ ],
+ "winner_keys": [
+  "c2",
+  "c6"
+ ]
+}

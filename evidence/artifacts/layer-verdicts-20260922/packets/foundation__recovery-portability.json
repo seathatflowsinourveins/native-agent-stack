@@ -1,0 +1,324 @@
+{
+ "candidates": [
+  {
+   "adopted": true,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": "mixed",
+   "evidence_refs": [
+    "adoption/research.json",
+    "docs/portable-userspace-install-20260921.md"
+   ],
+   "key": "c1",
+   "name": "uv",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": "adoption/research.json",
+   "repository": "https://github.com/astral-sh/uv",
+   "review_status": null,
+   "upstream": null
+  },
+  {
+   "adopted": true,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "adoption/research.json"
+   ],
+   "key": "c2",
+   "name": "chezmoi",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": "adoption/research.json",
+   "repository": "https://github.com/twpayne/chezmoi",
+   "review_status": null,
+   "upstream": null
+  },
+  {
+   "adopted": true,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "adoption/research.json"
+   ],
+   "key": "c3",
+   "name": "mise",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": "adoption/research.json",
+   "repository": "https://github.com/jdx/mise",
+   "review_status": null,
+   "upstream": null
+  },
+  {
+   "adopted": true,
+   "component_id": "restic",
+   "decisions": [
+    {
+     "capability": "Restore selected native state into an isolated empty target",
+     "evidence_scope": "Selected public bytes, native memory/FTS state and Qdrant snapshot/query results survived same-host backup/restore; synthetic wrong-key/corrupt-copy refusals were retained.",
+     "id": "same-host-restore",
+     "limitations": [
+      "Independent physical host, lost-key recovery and the whole stack after disaster remain unestablished.",
+      "Financial-blueprint location supplies reusable state-recovery evidence only."
+     ],
+     "next_gap": "Reuse the separate synthetic-offhost-application-restore acceptance for matching inputs; qualify production activation, native-client rebinding and lost-account/key recovery separately."
+    },
+    {
+     "capability": "Restore selected native memory and vector state on a fresh hosted destination",
+     "evidence_scope": "Two fresh hosted jobs passed native ai-memory and Qdrant backup, exact encrypted transfer and empty-target restore with actual scoped memory queries and complete Qdrant state/query equality. Independent review reconciled raw command outputs, artifact identities and cleanup.",
+     "id": "synthetic-offhost-application-restore",
+     "limitations": [
+      "New synthetic state only; no existing private application archive or production data was transferred.",
+      "Selected unchanged upstream tests passed (10 ai-memory and 4 Qdrant); the cross-host driver, observation oracle and composed restore checks are local integration coverage.",
+      "Source and destination are different hosted boot identities within one GitHub administrative domain; lost-account/password recovery and independent trust-domain availability remain unqualified.",
+      "Snapshots are sequential, not an atomic cross-application backup; native-client rebinding, physical-host or power-loss recovery and whole-stack acceptance are not established.",
+      "Actual destination MCP responses and Qdrant API responses were independently reviewed. Destination SQLite equality remains the runner composition assertion; archive SQLite integrity was separately checked.",
+      "No model calls or provider/lifetime token-saving measurement occurred."
+     ],
+     "next_gap": "Qualify the actual deployment, native-client rebinding and application consistency requirements only when adopting beyond the accepted synthetic boundary."
+    },
+    {
+     "capability": "Restore exact synthetic encrypted snapshots on an independent hosted runner",
+     "evidence_scope": "A fresh GitHub-hosted runner passed seven unchanged upstream tests, rejected the wrong password without restoring files, checked all repository data and restored both exact synthetic snapshots with complete path/type/byte/hash/POSIX-mode equality. Ciphertext remained unchanged and temporary runtime/password files were removed.",
+     "id": "synthetic-offhost-restic-restore",
+     "limitations": [
+      "This receipt covers synthetic file recovery only. The separate synthetic-offhost-application-restore capability qualifies selected ai-memory/Qdrant off-host queries.",
+      "Separate ciphertext and password delivery share one GitHub administrative account; account-loss and lost-password recovery remain unqualified.",
+      "No reboot, production disaster recovery, whole-stack recovery or provider-saving claim.",
+      "The seven upstream tests are a selected subset; the transfer fixture and complete-file oracle are local integration checks.",
+      "UID/GID, timestamps, ACL/xattrs, sparse files, links, Windows filesystems and long-term retention remain unqualified."
+     ],
+     "next_gap": "Reuse the separate synthetic-offhost-application-restore acceptance for matching inputs; qualify production activation, native-client rebinding and lost-account/key recovery separately."
+    }
+   ],
+   "evidence_kind": "native_execution",
+   "evidence_refs": [
+    "catalogs/foundation/decisions.json",
+    "adoption/lifecycle.md"
+   ],
+   "key": "c4",
+   "name": "Restic",
+   "pin": "0.19.1",
+   "pin_behind_upstream": false,
+   "recipe_ref": "blueprints/us-equities/hosting/backup/README.md",
+   "repository": "https://github.com/restic/restic",
+   "review_status": null,
+   "upstream": {
+    "archived": false,
+    "latest": "v0.19.1",
+    "license": "BSD-2-Clause",
+    "prerelease": false,
+    "pushed_at": "2026-09-20",
+    "released_at": "2026-07-05",
+    "renamed_to": null,
+    "stars": 36182
+   }
+  },
+  {
+   "adopted": true,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/hosting-source-review.json"
+   ],
+   "key": "c5",
+   "name": "Litestream",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": "catalogs/us-equities/hosting-source-review.json",
+   "repository": "https://github.com/benbjohnson/litestream",
+   "review_status": null,
+   "upstream": null
+  },
+  {
+   "adopted": false,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": "requirement_fit",
+   "evidence_refs": [
+    "adoption/research.json"
+   ],
+   "key": "c6",
+   "name": "Determinate Nix installer",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": "adoption/research.json",
+   "repository": "https://github.com/DeterminateSystems/nix-installer",
+   "review_status": null,
+   "upstream": null
+  },
+  {
+   "adopted": false,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "adoption/research.json"
+   ],
+   "key": "c7",
+   "name": "Devbox",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": "adoption/research.json",
+   "repository": "https://github.com/jetify-com/devbox",
+   "review_status": null,
+   "upstream": null
+  }
+ ],
+ "catalog": "foundation",
+ "checked_at": "2026-09-22",
+ "enums": {
+  "disposition": [
+   "conditional",
+   "measured_tradeoff",
+   "observed_failure",
+   "out_of_scope",
+   "overlap",
+   "selected",
+   "unqualified"
+  ],
+  "evidence_class": [
+   "local_integration",
+   "measured_comparison",
+   "native_proven",
+   "source_review",
+   "synthetic"
+  ]
+ },
+ "existing_overturn_when": "A real multi-language/system dependency or state-loss case exceeds the selected recipes, and the proposed environment/backup alternative passes install, restore, resume and cleanup on the target host.",
+ "group": null,
+ "layer_id": "recovery-portability",
+ "limitations": [
+  "Synthetic off-host/guest cases and a clean hosted runner do not certify the new physical PC, GPU, secrets or all application state.",
+  "Native sign-ins and host-specific acceptance remain necessary; rollback and hash checks alone do not prove a model task or service recovery."
+ ],
+ "requirement": "Reproduce selected tools and recover actual application state on an explicitly adopted host without copying authentication stores or treating old receipts as new acceptance.",
+ "rules": [
+  "Judge from retained evidence. Open the evidence_refs of every adopted candidate (bounded: the referenced file or its relevant section) and record every path you opened in sources_read. Do not rely on memory of the repositories.",
+  "The winner set is 1-3 adopted candidates (adopted == true) that best satisfy the requirement on the evidence. why_selected must cite at least one evidence path and state what was actually observed (native execution, measured comparison, local integration, synthetic fixture or source review), not what the project claims.",
+  "Every adopted non-winner candidate appears in alternatives with a why_not_default that states the concrete evidence gap or trade-off; add non-adopted candidates only with the same standard.",
+  "If a non-adopted candidate would satisfy the requirement better on the evidence, do not select it: record it in challenger_preferred with the comparison (a fixtures/, blueprints/ or tests/ path, or a python3/node command) that would establish it. Agreement between lanes never promotes; only an executed comparison can.",
+  "overturn_when names the concrete check that would change the verdict (a fixtures/, blueprints/ or tests/ path or a runnable python3/node command). open_gaps lists what the evidence does not establish. limits lists what you could not read or verify. Do not invent paths, numbers or results; leave evidence_refs empty rather than guess."
+ ],
+ "schema_version": 1,
+ "sota_components_not_in_candidates": [
+  {
+   "id": "ai-memory",
+   "pin": "2.3.2",
+   "pin_behind_upstream": true,
+   "repository": "https://github.com/akitaonrails/ai-memory",
+   "review_status": null,
+   "upstream": {
+    "archived": false,
+    "latest": "v2.4.0",
+    "license": "MIT",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "released_at": "2026-09-21",
+    "renamed_to": null,
+    "stars": 8014
+   }
+  },
+  {
+   "id": "claude-code",
+   "pin": "2.1.278",
+   "pin_behind_upstream": false,
+   "repository": "https://github.com/anthropics/claude-code",
+   "review_status": null,
+   "upstream": {
+    "archived": false,
+    "latest": "v2.1.278",
+    "license": null,
+    "prerelease": false,
+    "pushed_at": "2026-09-21",
+    "released_at": "2026-09-19",
+    "renamed_to": null,
+    "stars": 147597
+   }
+  },
+  {
+   "id": "codex",
+   "pin": "0.155.1",
+   "pin_behind_upstream": false,
+   "repository": "https://github.com/openai/codex",
+   "review_status": null,
+   "upstream": {
+    "archived": false,
+    "latest": "rust-v0.155.1",
+    "license": "Apache-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "released_at": "2026-09-18",
+    "renamed_to": null,
+    "stars": 125923
+   }
+  },
+  {
+   "id": "dagu",
+   "pin": "2.16.6",
+   "pin_behind_upstream": true,
+   "repository": "https://github.com/dagucloud/dagu",
+   "review_status": null,
+   "upstream": {
+    "archived": false,
+    "latest": "v2.17.0",
+    "license": "GPL-3.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-21",
+    "released_at": "2026-09-21",
+    "renamed_to": null,
+    "stars": 4058
+   }
+  },
+  {
+   "id": "qdrant",
+   "pin": "1.19.1",
+   "pin_behind_upstream": false,
+   "repository": "https://github.com/qdrant/qdrant",
+   "review_status": null,
+   "upstream": {
+    "archived": false,
+    "latest": "v1.19.1",
+    "license": "Apache-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "released_at": "2026-09-04",
+    "renamed_to": null,
+    "stars": 34752
+   }
+  },
+  {
+   "id": "systemd",
+   "pin": "255.4-1ubuntu8.17",
+   "pin_behind_upstream": false,
+   "repository": "https://github.com/systemd/systemd",
+   "review_status": null,
+   "upstream": {
+    "archived": false,
+    "latest": "v262",
+    "license": "GPL-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "released_at": "2026-09-22",
+    "renamed_to": null,
+    "stars": 16713
+   }
+  }
+ ],
+ "title": "Recovery and portability",
+ "withheld": [
+  "current_choice",
+  "decision",
+  "rationale",
+  "candidates[].disposition",
+  "candidates[].rationale",
+  "candidates[].review_status",
+  "candidates[].decisions[].selection",
+  "candidates[].decisions[].review_status",
+  "sota_components_not_in_candidates[].review_status"
+ ]
+}

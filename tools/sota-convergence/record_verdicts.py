@@ -24,8 +24,12 @@ Inputs (read, never modified):
 - ``<work-dir>/{claude,codex}/<catalog>__<layer_id>.json`` -- one lane return
   per lane per layer (see the lane-return contract in the PR-5 lane contract).
 - ``<adjudications>/<catalog>__<layer_id>.json`` (optional, ``--adjudications``)
-  -- ``{"winner_lane": "claude"|"codex", "why": str, "evidence_refs": [...]}``,
-  used only when the two lanes disagree on the winner set.
+  -- ``{"winner_lane": "claude"|"codex"|null, "why": str, "evidence_refs": [...],
+  "judgments": [{"claude_position": "A"|"B", "preferred_position": "A"|"B",
+  "preferred_lane": "claude"|"codex", "refuting_votes": int}, ...]}``, used only
+  when the two lanes disagree on the winner set. The judgments must cover both
+  presentation orders; ``winner_lane`` must be the lane every judgment chose
+  with no refutation, or null when they split.
 - ``catalogs/landscape/manifest.json#/sources/repository_index`` -- the
   canonical repository identity index, used only to decide whether an
   alternative's repository is indexed (an unindexed alternative is moved into
@@ -44,7 +48,8 @@ writing):
   indent=1`` + newline; the same "written verbatim" convention every other
   generator in this toolset uses, subject to the same leak defense).
 - ``evidence/artifacts/layer-verdicts-20260922/adjudication/<run_id>.json`` --
-  the adjudication record, when a disagreement was resolved by one.
+  the adjudication record, when a disagreement was resolved by one or when a
+  counterbalanced adjudication split (the row then stays ``pending_lanes``).
 
 A lane file that fails validation is reported (layer id, lane, failing rule)
 and treated as absent for that layer; this never aborts the run, but the
@@ -520,11 +525,33 @@ def load_adjudication(adjudications_dir, catalog, layer_id, issues: list = None)
         return reject("adjudication must be a JSON object")
     winner_lane = raw.get("winner_lane")
     evidence_refs = raw.get("evidence_refs")
-    if winner_lane not in ("claude", "codex") or not nonempty_str(raw.get("why")):
-        return reject("adjudication needs winner_lane claude|codex and a nonempty why")
+    if "winner_lane" not in raw or winner_lane not in ("claude", "codex", None) or not nonempty_str(raw.get("why")):
+        return reject("adjudication needs winner_lane claude|codex|null and a nonempty why")
     if not isinstance(evidence_refs, list) or not all(isinstance(item, str) for item in evidence_refs):
         return reject("adjudication evidence_refs must be a list of text")
-    return {"winner_lane": winner_lane, "raw": raw}
+    judgments = raw.get("judgments")
+    if not isinstance(judgments, list) or not judgments:
+        return reject("adjudication needs its judgments from both presentation orders")
+    for judgment in judgments:
+        if (not isinstance(judgment, dict) or judgment.get("claude_position") not in ("A", "B")
+                or judgment.get("preferred_position") not in ("A", "B")
+                or type(judgment.get("refuting_votes")) is not int or judgment["refuting_votes"] < 0):
+            return reject("each judgment needs claude_position A|B, preferred_position A|B "
+                          "and a nonnegative integer refuting_votes")
+        lane = "claude" if judgment["preferred_position"] == judgment["claude_position"] else "codex"
+        if judgment.get("preferred_lane") != lane:
+            return reject("a judgment's preferred_lane contradicts its presentation positions")
+    if {judgment["claude_position"] for judgment in judgments} != {"A", "B"}:
+        return reject("adjudication judgments must cover both presentation orders")
+    lanes = {judgment["preferred_lane"] for judgment in judgments}
+    unrefuted = all(judgment["refuting_votes"] == 0 for judgment in judgments)
+    agreed = next(iter(lanes)) if len(lanes) == 1 and unrefuted else None
+    if winner_lane != agreed:
+        return reject(f"winner_lane {winner_lane!r} must equal the lane every unrefuted judgment chose "
+                      f"({agreed!r}; null when the judgments split or any was refuted)")
+    tally = {lane: sum(judgment["preferred_lane"] == lane for judgment in judgments) for lane in ("claude", "codex")}
+    return {"winner_lane": winner_lane, "raw": raw, "tally": tally,
+            "refuted": sum(judgment["refuting_votes"] > 0 for judgment in judgments)}
 
 
 def relativize_source(entry: str, root: Path, lane_roots=()) -> str:
@@ -691,6 +718,14 @@ def process_row(row: dict, root: Path, catalog: str, layer_id: str, work_dir: Pa
             sealed_writes.append((root / SEALED_BASE / "adjudication" / f"{run_id}.json", adjudication_text))
             add_gap(f"lanes disagreed: {ids_text}; adjudicated by {adjudication_relative}")
             verdict_status = "recorded"
+        elif adjudication is not None and adjudication["winner_lane"] is None:
+            adjudication_relative = f"{SEALED_BASE}/adjudication/{run_id}.json"
+            sealed_writes.append((root / SEALED_BASE / "adjudication" / f"{run_id}.json", adjudication_text))
+            tally = adjudication["tally"]
+            add_gap(f"lanes disagreed: {ids_text}; the counterbalanced adjudication did not agree "
+                    f"(claude {tally['claude']}, codex {tally['codex']}, {adjudication['refuted']} refuted; "
+                    f"{adjudication_relative}); an executed comparison must decide it")
+            verdict_status = "pending_lanes"
         else:
             add_gap(f"lanes disagreed: {ids_text}; adjudication pending")
             verdict_status = "pending_lanes"

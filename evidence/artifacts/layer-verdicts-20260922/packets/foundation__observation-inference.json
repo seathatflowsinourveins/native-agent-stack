@@ -1,0 +1,566 @@
+{
+ "candidates": [
+  {
+   "adopted": true,
+   "component_id": "agentsview",
+   "decisions": [
+    {
+     "capability": "Inspect selected native session history and local traces",
+     "evidence_scope": "One scoped session archive query and a synthetic loopback terminal trace were accepted; current observations retain their separate bounds.",
+     "id": "bounded-history-and-traces",
+     "limitations": [
+      "Archive retrieval requires explicit scope/refresh and is not every native transcript or durable memory.",
+      "Synthetic trace acceptance is not production tracing completeness."
+     ],
+     "next_gap": "Test changed archive/session scope and missing attribution before drawing broader conclusions."
+    }
+   ],
+   "evidence_kind": "native_execution",
+   "evidence_refs": [
+    "docs/dashboard-gap-resolution.md",
+    "docs/token-native-saturation.md"
+   ],
+   "key": "c1",
+   "name": "AgentsView",
+   "pin": "0.43.0",
+   "pin_behind_upstream": true,
+   "recipe_ref": "recipes/README.md",
+   "repository": "https://github.com/kenn-io/agentsview",
+   "review_status": null,
+   "upstream": {
+    "archived": false,
+    "latest": "v0.44.0",
+    "license": "MIT",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "released_at": "2026-09-21",
+    "renamed_to": null,
+    "stars": 5965
+   }
+  },
+  {
+   "adopted": true,
+   "component_id": "otel-tui",
+   "decisions": [
+    {
+     "capability": "Inspect selected native session history and local traces",
+     "evidence_scope": "One scoped session archive query and a synthetic loopback terminal trace were accepted; current observations retain their separate bounds.",
+     "id": "bounded-history-and-traces",
+     "limitations": [
+      "Archive retrieval requires explicit scope/refresh and is not every native transcript or durable memory.",
+      "Synthetic trace acceptance is not production tracing completeness."
+     ],
+     "next_gap": "Test changed archive/session scope and missing attribution before drawing broader conclusions."
+    }
+   ],
+   "evidence_kind": "native_execution",
+   "evidence_refs": [
+    "catalogs/foundation/decisions.json"
+   ],
+   "key": "c2",
+   "name": "otel-tui",
+   "pin": "0.7.5",
+   "pin_behind_upstream": false,
+   "recipe_ref": "recipes/README.md",
+   "repository": "https://github.com/ymtdzzz/otel-tui",
+   "review_status": null,
+   "upstream": {
+    "archived": false,
+    "latest": "v0.7.5",
+    "license": "Apache-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-21",
+    "released_at": "2026-09-12",
+    "renamed_to": null,
+    "stars": 1088
+   }
+  },
+  {
+   "adopted": true,
+   "component_id": "claude-hud",
+   "decisions": [
+    {
+     "capability": "Render the configured HUD in a native Claude terminal",
+     "evidence_scope": "The retained foundation-closure native PTY observations show configured claude-hud 0.8.0 in Claude 2.1.278 before and after a bounded review, including model, project, context and usage fields. This catalog reconciliation reuses those observations without a new terminal or model run. Earlier onboarding and effort-overlay attempts remain retained.",
+     "id": "interactive-hud-boundary",
+     "limitations": [
+      "Evidence for the visible statusline is the original coordinator's screen observations and independent installed-plugin audit, separate from the native context export.",
+      "Not every HUD statistic, exact billing reconciliation, Windows Terminal dropdown interaction, automatic compaction or new-host activation was qualified."
+     ],
+     "next_gap": "Verify target-host activation or a specific untested statistic only when that capability is needed; reuse the accepted recorded rendering scope."
+    }
+   ],
+   "evidence_kind": "native_execution",
+   "evidence_refs": [
+    "docs/foundation-closure-20260921.md"
+   ],
+   "key": "c3",
+   "name": "Claude HUD",
+   "pin": "0.8.0",
+   "pin_behind_upstream": false,
+   "recipe_ref": "recipes/README.md",
+   "repository": "https://github.com/jarrodwatts/claude-hud",
+   "review_status": null,
+   "upstream": {
+    "archived": false,
+    "latest": "v0.8.0",
+    "license": "MIT",
+    "prerelease": false,
+    "pushed_at": "2026-09-19",
+    "released_at": "2026-08-18",
+    "renamed_to": null,
+    "stars": 28103
+   }
+  },
+  {
+   "adopted": false,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/agents-operations.json"
+   ],
+   "key": "c4",
+   "name": "OpenLIT",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": "catalogs/us-equities/agents-operations.json",
+   "repository": "https://github.com/openlit/openlit",
+   "review_status": null,
+   "upstream": null
+  },
+  {
+   "adopted": true,
+   "component_id": "grafana",
+   "decisions": [
+    {
+     "capability": "Observe bounded native outcomes and reconcile usage categories",
+     "evidence_scope": "Native tasks, loopback queries/dashboard and local firing/resolved notifications passed; later writer-scoped results reconcile selected native usage.",
+     "id": "loopback-usage-observation",
+     "limitations": [
+      "Liveness, checkpoint age, source attribution and consumed tokens are different observations.",
+      "Extra startup events and unlabelled historical invocations retain attribution limits; no exact causal lifetime savings are inferred."
+     ],
+     "next_gap": "Qualify scheduled-service/reboot persistence and missing task attribution only in the needed scope."
+    }
+   ],
+   "evidence_kind": "native_execution",
+   "evidence_refs": [
+    "docs/dashboard-rendered-acceptance.md",
+    "docs/dashboard-gap-resolution.md"
+   ],
+   "key": "c5",
+   "name": "Grafana",
+   "pin": "13.2.2",
+   "pin_behind_upstream": false,
+   "recipe_ref": "observability/backends/README.md",
+   "repository": "https://github.com/grafana/grafana",
+   "review_status": null,
+   "upstream": {
+    "archived": false,
+    "latest": "v13.2.2",
+    "license": "AGPL-3.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "released_at": "2026-09-15",
+    "renamed_to": null,
+    "stars": 76856
+   }
+  },
+  {
+   "adopted": true,
+   "component_id": "ntfy",
+   "decisions": [
+    {
+     "capability": "Observe bounded native outcomes and reconcile usage categories",
+     "evidence_scope": "Native tasks, loopback queries/dashboard and local firing/resolved notifications passed; later writer-scoped results reconcile selected native usage.",
+     "id": "loopback-usage-observation",
+     "limitations": [
+      "Liveness, checkpoint age, source attribution and consumed tokens are different observations.",
+      "Extra startup events and unlabelled historical invocations retain attribution limits; no exact causal lifetime savings are inferred."
+     ],
+     "next_gap": "Qualify scheduled-service/reboot persistence and missing task attribution only in the needed scope."
+    }
+   ],
+   "evidence_kind": "native_execution",
+   "evidence_refs": [
+    "docs/dashboard-gap-resolution.md",
+    "catalogs/foundation/decisions.json"
+   ],
+   "key": "c6",
+   "name": "ntfy",
+   "pin": "2.28.0",
+   "pin_behind_upstream": false,
+   "recipe_ref": "observability/backends/README.md",
+   "repository": "https://github.com/binwiederhier/ntfy",
+   "review_status": null,
+   "upstream": {
+    "archived": false,
+    "latest": "v2.28.0",
+    "license": "Apache-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-15",
+    "released_at": "2026-08-27",
+    "renamed_to": null,
+    "stars": 34370
+   }
+  },
+  {
+   "adopted": true,
+   "component_id": "alertmanager",
+   "decisions": [
+    {
+     "capability": "Observe bounded native outcomes and reconcile usage categories",
+     "evidence_scope": "Native tasks, loopback queries/dashboard and local firing/resolved notifications passed; later writer-scoped results reconcile selected native usage.",
+     "id": "loopback-usage-observation",
+     "limitations": [
+      "Liveness, checkpoint age, source attribution and consumed tokens are different observations.",
+      "Extra startup events and unlabelled historical invocations retain attribution limits; no exact causal lifetime savings are inferred."
+     ],
+     "next_gap": "Qualify scheduled-service/reboot persistence and missing task attribution only in the needed scope."
+    }
+   ],
+   "evidence_kind": "native_execution",
+   "evidence_refs": [
+    "catalogs/foundation/decisions.json",
+    "catalogs/us-equities/agents-operations.json"
+   ],
+   "key": "c7",
+   "name": "Alertmanager",
+   "pin": "0.34.1",
+   "pin_behind_upstream": false,
+   "recipe_ref": "observability/backends/README.md",
+   "repository": "https://github.com/prometheus/alertmanager",
+   "review_status": null,
+   "upstream": {
+    "archived": false,
+    "latest": "v0.34.1",
+    "license": "Apache-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "released_at": "2026-09-17",
+    "renamed_to": null,
+    "stars": 8626
+   }
+  },
+  {
+   "adopted": true,
+   "component_id": "opentelemetry-collector-contrib",
+   "decisions": [
+    {
+     "capability": "Observe bounded native outcomes and reconcile usage categories",
+     "evidence_scope": "Native tasks, loopback queries/dashboard and local firing/resolved notifications passed; later writer-scoped results reconcile selected native usage.",
+     "id": "loopback-usage-observation",
+     "limitations": [
+      "Liveness, checkpoint age, source attribution and consumed tokens are different observations.",
+      "Extra startup events and unlabelled historical invocations retain attribution limits; no exact causal lifetime savings are inferred."
+     ],
+     "next_gap": "Qualify scheduled-service/reboot persistence and missing task attribution only in the needed scope."
+    }
+   ],
+   "evidence_kind": "native_execution",
+   "evidence_refs": [
+    "docs/native-telemetry-resolution.md",
+    "catalogs/us-equities/agents-operations.json"
+   ],
+   "key": "c8",
+   "name": "OTel Collector Contrib",
+   "pin": "0.161.0",
+   "pin_behind_upstream": false,
+   "recipe_ref": "observability/README.md",
+   "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+   "review_status": null,
+   "upstream": {
+    "archived": false,
+    "latest": "v0.161.0",
+    "license": "Apache-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "released_at": "2026-09-15",
+    "renamed_to": null,
+    "stars": 4947
+   }
+  },
+  {
+   "adopted": true,
+   "component_id": "prometheus",
+   "decisions": [
+    {
+     "capability": "Observe bounded native outcomes and reconcile usage categories",
+     "evidence_scope": "Native tasks, loopback queries/dashboard and local firing/resolved notifications passed; later writer-scoped results reconcile selected native usage.",
+     "id": "loopback-usage-observation",
+     "limitations": [
+      "Liveness, checkpoint age, source attribution and consumed tokens are different observations.",
+      "Extra startup events and unlabelled historical invocations retain attribution limits; no exact causal lifetime savings are inferred."
+     ],
+     "next_gap": "Qualify scheduled-service/reboot persistence and missing task attribution only in the needed scope."
+    }
+   ],
+   "evidence_kind": "native_execution",
+   "evidence_refs": [
+    "docs/native-telemetry-resolution.md",
+    "catalogs/foundation/decisions.json"
+   ],
+   "key": "c9",
+   "name": "Prometheus",
+   "pin": "3.14.0",
+   "pin_behind_upstream": false,
+   "recipe_ref": "observability/backends/README.md",
+   "repository": "https://github.com/prometheus/prometheus",
+   "review_status": null,
+   "upstream": {
+    "archived": false,
+    "latest": "v3.14.0",
+    "license": "Apache-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "released_at": "2026-08-18",
+    "renamed_to": null,
+    "stars": 66176
+   }
+  },
+  {
+   "adopted": false,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/agents-operations.json"
+   ],
+   "key": "c10",
+   "name": "SGLang",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": "catalogs/us-equities/agents-operations.json",
+   "repository": "https://github.com/sgl-project/sglang",
+   "review_status": null,
+   "upstream": null
+  },
+  {
+   "adopted": true,
+   "component_id": "llama-cpp",
+   "decisions": [
+    {
+     "capability": "Trial local text generation against a frozen repair oracle",
+     "evidence_scope": "One pinned partial-offload local CUDA repair passed independent source review and twelve original tests on WSL RTX4090.",
+     "id": "local-generation-trial",
+     "limitations": [
+      "Single-task trial, not general frontier parity, host portability or causal token savings.",
+      "Memory reserve, model/hash provenance and missing exact layer telemetry remain in the receipt."
+     ],
+     "next_gap": "Freeze a representative next workload and resource acceptance before expanding use."
+    }
+   ],
+   "evidence_kind": "native_execution",
+   "evidence_refs": [
+    "evidence/receipts/native-gpu-patch-20260920.json"
+   ],
+   "key": "c11",
+   "name": "llama.cpp optional local inference",
+   "pin": "b11057 (0.4.1-dev)",
+   "pin_behind_upstream": false,
+   "recipe_ref": "blueprints/convergence-practice/gpu-inference/README.md",
+   "repository": "https://github.com/ggml-org/llama.cpp",
+   "review_status": null,
+   "upstream": {
+    "archived": false,
+    "latest": "v0.4.1",
+    "license": "MIT",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "released_at": "2026-09-14",
+    "renamed_to": null,
+    "stars": 129188
+   }
+  },
+  {
+   "adopted": true,
+   "component_id": "loki",
+   "decisions": [
+    {
+     "capability": "Observe bounded native outcomes and reconcile usage categories",
+     "evidence_scope": "Native tasks, loopback queries/dashboard and local firing/resolved notifications passed; later writer-scoped results reconcile selected native usage.",
+     "id": "loopback-usage-observation",
+     "limitations": [
+      "Liveness, checkpoint age, source attribution and consumed tokens are different observations.",
+      "Extra startup events and unlabelled historical invocations retain attribution limits; no exact causal lifetime savings are inferred."
+     ],
+     "next_gap": "Qualify scheduled-service/reboot persistence and missing task attribution only in the needed scope."
+    }
+   ],
+   "evidence_kind": "native_execution",
+   "evidence_refs": [
+    "docs/native-telemetry-resolution.md"
+   ],
+   "key": "c12",
+   "name": "Loki",
+   "pin": "3.7.8",
+   "pin_behind_upstream": false,
+   "recipe_ref": "observability/backends/README.md",
+   "repository": "https://github.com/grafana/loki",
+   "review_status": null,
+   "upstream": {
+    "archived": false,
+    "latest": "v3.7.8",
+    "license": "AGPL-3.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "released_at": "2026-09-17",
+    "renamed_to": null,
+    "stars": 28932
+   }
+  },
+  {
+   "adopted": true,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/agents-operations.json"
+   ],
+   "key": "c13",
+   "name": "Phoenix",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": "catalogs/us-equities/agents-operations.json",
+   "repository": "https://github.com/Arize-ai/phoenix",
+   "review_status": null,
+   "upstream": null
+  }
+ ],
+ "catalog": "foundation",
+ "checked_at": "2026-09-22",
+ "enums": {
+  "disposition": [
+   "conditional",
+   "measured_tradeoff",
+   "observed_failure",
+   "out_of_scope",
+   "overlap",
+   "selected",
+   "unqualified"
+  ],
+  "evidence_class": [
+   "local_integration",
+   "measured_comparison",
+   "native_proven",
+   "source_review",
+   "synthetic"
+  ]
+ },
+ "existing_overturn_when": "A required trace, evaluation or supported model/hardware workload is unanswerable by the current path, and one alternative passes privacy, fidelity, latency/cost and recovery comparisons without duplicate capture.",
+ "group": null,
+ "layer_id": "observation-inference",
+ "limitations": [
+  "Source time differs from scrape time; usage differs from savings. The current interactive HUD evidence does not certify every statistic or automatic compaction.",
+  "Local generation and gateway acceptance are route/workload-specific; catalog presence is not a passed exact-model task."
+ ],
+ "requirement": "Observe real native usage/service outcomes through one privacy-filtered local pipeline and qualify any optional model route on its actual workload.",
+ "rules": [
+  "Judge from retained evidence. Open the evidence_refs of every adopted candidate (bounded: the referenced file or its relevant section) and record every path you opened in sources_read. Do not rely on memory of the repositories.",
+  "The winner set is 1-3 adopted candidates (adopted == true) that best satisfy the requirement on the evidence. why_selected must cite at least one evidence path and state what was actually observed (native execution, measured comparison, local integration, synthetic fixture or source review), not what the project claims.",
+  "Every adopted non-winner candidate appears in alternatives with a why_not_default that states the concrete evidence gap or trade-off; add non-adopted candidates only with the same standard.",
+  "If a non-adopted candidate would satisfy the requirement better on the evidence, do not select it: record it in challenger_preferred with the comparison (a fixtures/, blueprints/ or tests/ path, or a python3/node command) that would establish it. Agreement between lanes never promotes; only an executed comparison can.",
+  "overturn_when names the concrete check that would change the verdict (a fixtures/, blueprints/ or tests/ path or a runnable python3/node command). open_gaps lists what the evidence does not establish. limits lists what you could not read or verify. Do not invent paths, numbers or results; leave evidence_refs empty rather than guess."
+ ],
+ "schema_version": 1,
+ "sota_components_not_in_candidates": [
+  {
+   "id": "ccusage",
+   "pin": "20.0.24",
+   "pin_behind_upstream": false,
+   "repository": "https://github.com/ccusage/ccusage",
+   "review_status": null,
+   "upstream": {
+    "archived": false,
+    "latest": "v20.0.24",
+    "license": "NOASSERTION",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "released_at": "2026-09-21",
+    "renamed_to": null,
+    "stars": 18686
+   }
+  },
+  {
+   "id": "claude-code",
+   "pin": "2.1.278",
+   "pin_behind_upstream": false,
+   "repository": "https://github.com/anthropics/claude-code",
+   "review_status": null,
+   "upstream": {
+    "archived": false,
+    "latest": "v2.1.278",
+    "license": null,
+    "prerelease": false,
+    "pushed_at": "2026-09-21",
+    "released_at": "2026-09-19",
+    "renamed_to": null,
+    "stars": 147597
+   }
+  },
+  {
+   "id": "huggingface-hub-native",
+   "pin": "1.32.0",
+   "pin_behind_upstream": false,
+   "repository": "https://github.com/huggingface/huggingface_hub",
+   "review_status": null,
+   "upstream": {
+    "archived": false,
+    "latest": "v1.32.0",
+    "license": "Apache-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "released_at": "2026-09-17",
+    "renamed_to": null,
+    "stars": 3922
+   }
+  },
+  {
+   "id": "omniroute",
+   "pin": "3.8.50",
+   "pin_behind_upstream": false,
+   "repository": "https://github.com/diegosouzapw/OmniRoute",
+   "review_status": null,
+   "upstream": {
+    "archived": false,
+    "latest": "v3.8.50",
+    "license": "MIT",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "released_at": "2026-08-26",
+    "renamed_to": null,
+    "stars": 69169
+   }
+  },
+  {
+   "id": "vllm",
+   "pin": "0.25.0",
+   "pin_behind_upstream": true,
+   "repository": "https://github.com/vllm-project/vllm",
+   "review_status": null,
+   "upstream": {
+    "archived": false,
+    "latest": "v0.30.0",
+    "license": "Apache-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "released_at": "2026-09-22",
+    "renamed_to": null,
+    "stars": 92429
+   }
+  }
+ ],
+ "title": "Observation and optional inference",
+ "withheld": [
+  "current_choice",
+  "decision",
+  "rationale",
+  "candidates[].disposition",
+  "candidates[].rationale",
+  "candidates[].review_status",
+  "candidates[].decisions[].selection",
+  "candidates[].decisions[].review_status",
+  "sota_components_not_in_candidates[].review_status"
+ ]
+}

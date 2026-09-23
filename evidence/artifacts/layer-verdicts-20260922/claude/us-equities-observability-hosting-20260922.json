@@ -4,40 +4,29 @@
    "disposition": "conditional",
    "evidence_class": "native_proven",
    "evidence_refs": [
-    "observability/receipt.json",
-    "observability/backends/receipt.json",
-    "blueprints/us-equities/hosting/backup/receipt.json"
+    "blueprints/us-equities/hosting/backup/receipt.json",
+    "blueprints/us-equities/hosting/backup/selected-files.txt",
+    "blueprints/us-equities/hosting/backup/source.sha256"
    ],
-   "key": "c6",
-   "name": "Loki",
-   "repository": "https://github.com/grafana/loki",
-   "why_not_default": "Loki is a required co-store for the winners, not an optional overlap. It is the only backend where completed SDK result usage records were queried: LogQL returned total_tokens 80770 (observability/receipt.json lines 122-127, 246-255), and native_turn_histogram_observed is false (line 227). Its config check passed with exit 0 and the synthetic log persisted after one restart (observability/backends/receipt.json lines 85-98). It is outside the three-winner cap only because Prometheus also carries the native-client collector series and the only proven alert route (1 firing, 1 resolved). That priority is my judgment. No comparison was measured. Receipts contain no retained failed-run records for Loki, the same as for Prometheus. The lack of high availability and backup applies to both stores: the restic scope excluded live Loki and Prometheus (backup receipt line 125), and backends receipt line 106 says single-host persistence is not replication or an off-host backup."
+   "key": "c8",
+   "name": "restic",
+   "repository": "https://github.com/restic/restic",
+   "why_not_default": "Restic is the only candidate with a native backup and restore receipt, so it remains the preferred backup tool for this layer's backup scope term. blueprints/us-equities/hosting/backup/receipt.json records: signed checksums verified; init, backup, check --read-data ('no errors were found') and restore --verify all exit 0; 22 files and 160642 bytes restored; sha256 ok_lines 22; the independent byte comparison matched. The receipt covers only 22 static public reference files, with live_databases 0 (line 36). It states that no live SQLite, Qdrant, Loki, Prometheus, broker/order journal or transcript backup was attempted (line 125). There is no off-host destination (line 118), separate_key_escrow is not_configured, the retention step was a dry run with 0 deletions, and the timer and service are not enabled. Restic therefore has no evidence of recovering this layer's state, which is why it is not a winner."
   },
   {
    "disposition": "overlap",
-   "evidence_class": "source_review",
-   "evidence_refs": [
-    "observability/receipt.json"
-   ],
-   "key": "c13",
-   "name": "opentelemetry-collector",
-   "repository": "https://github.com/open-telemetry/opentelemetry-collector",
-   "why_not_default": "This is the core runtime inside the adopted contrib distribution (c14). The packet (line 400) says the standalone otelcol core binary was not separately exercised. observability/receipt.json lists only otelcol-contrib, so c13 has no native evidence of its own apart from c14. I downgraded its class to source_review."
-  },
-  {
-   "disposition": "conditional",
    "evidence_class": "native_proven",
    "evidence_refs": [
-    "observability/backends/receipt.json",
-    "observability/receipt.json"
+    "observability/receipt.json",
+    "observability/backends/receipt.json"
    ],
    "key": "c2",
    "name": "Grafana",
    "repository": "https://github.com/grafana/grafana",
-   "why_not_default": "Grafana provides visualization, not retention or recovery. Readiness returned 200, and the provisioned dashboard and datasources were present after one restart. agent-browser rendered the dashboard. However, the screenshot predates the SDK panel (observability/receipt.json line 292), and grafana_tag_build_commit_equal is false. Use it for operator views on top of the stores."
+   "why_not_default": "Readiness HTTP 200 is recorded. Provisioned dashboards and datasources survived a restart. agent-browser rendered the dashboard, and the follow-up render shows the SDK total of 121288. Grafana is only a view over Prometheus and Loki data; it neither collects nor retains telemetry itself. grafana_tag_build_commit_equal is false. The backends receipt contains no dashboard UI acceptance, and the first screenshot predates the SDK panel."
   },
   {
-   "disposition": "conditional",
+   "disposition": "overlap",
    "evidence_class": "native_proven",
    "evidence_refs": [
     "observability/receipt.json",
@@ -46,19 +35,30 @@
    "key": "c12",
    "name": "alertmanager",
    "repository": "https://github.com/prometheus/alertmanager",
-   "why_not_default": "Only the local alert path is proven: amtool check-config returned exit 0, and the Prometheus to Alertmanager to ntfy route produced 1 firing and 1 resolved notification (observability/receipt.json lines 93-95, 303-311). external_delivery_tested is false. Alertmanager is needed for notification routing but does not retain telemetry or recover state."
+   "why_not_default": "`amtool check-config` exited 0. The EcosystemAcceptanceTargetDown route recorded 1 firing and 1 resolved notification against a dedicated loopback fixture (receipt.json lines 303-311). This is the only observed evidence for the requirement's 'supervise owned processes' clause; the systemctl is-active check is systemd, which is not a candidate. However, external_delivery_tested is false, and alerting does not retain or recover state. Supervision is not among the layer_scope_terms, so it is recorded as a complement rather than a fourth duty."
   },
   {
-   "disposition": "conditional",
+   "disposition": "overlap",
    "evidence_class": "native_proven",
    "evidence_refs": [
-    "observability/backends/receipt.json",
-    "observability/receipt.json"
+    "observability/receipt.json",
+    "observability/backends/receipt.json"
    ],
    "key": "c10",
    "name": "ntfy",
    "repository": "https://github.com/binwiederhier/ntfy",
-   "why_not_default": "Only local retained-inbox delivery is proven: readiness returned 200, the synthetic message persisted after restart, and the bundled alertmanager template worked. No external delivery was tested. ntfy is a notification sink, not a telemetry store or recovery mechanism."
+   "why_not_default": "ntfy is the local notification sink on the Alertmanager route, and its message persisted across a restart. There is no external delivery, and the route depends on ntfy's bundled alertmanager template. It is a notification endpoint, not telemetry retention or state recovery."
+  },
+  {
+   "disposition": "overlap",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "observability/receipt.json"
+   ],
+   "key": "c13",
+   "name": "opentelemetry-collector",
+   "repository": "https://github.com/open-telemetry/opentelemetry-collector",
+   "why_not_default": "The core collector runtime is inside the adopted contrib distribution (c14). The receipt records only the otelcol-contrib 0.161.0 asset, and the standalone core binary was not run separately. Selecting it as well would count one execution path twice."
   },
   {
    "disposition": "conditional",
@@ -69,7 +69,7 @@
    "key": "c3",
    "name": "sandbox-runtime",
    "repository": "https://github.com/anthropics/sandbox-runtime",
-   "why_not_default": "Filesystem restriction was proven natively: the allowed write exited 0, the denied read exited 1, the separate denied write exited 1, and no host file was created. Network denial was configured but not exercised (evidence/receipts/runtime-tools.json line 13). Network denial is what would withhold broker reachability from research workers, so no candidate proves the requirement's 'without broker execution authority' clause. sandbox-runtime is not a VM boundary."
+   "why_not_default": "sandbox is one of this layer's scope terms. evidence/receipts/runtime-tools.json records: allowed write exit 0, denied read exit 1, a separate denied write exit 1 with no host file created, and a child environment reduced to HOME and PATH only (line 31). The reduced environment partly bears on keeping credentials out of research workers. Network denial was configured but not separately exercised (line 13). The overlapping read/write case exited 0 into an ephemeral hidden mount. The tool is not a VM boundary, and no receipt shows research workers denied broker execution authority."
   },
   {
    "disposition": "unqualified",
@@ -78,7 +78,7 @@
    "key": "c1",
    "name": "opensandbox",
    "repository": "https://github.com/opensandbox-group/OpenSandbox",
-   "why_not_default": "The packet has source review only, and I did not open its external README. The pin server/v0.2.3 is behind upstream release-1.1.0. There is no local execution receipt, and help or import output does not prove isolation."
+   "why_not_default": "The only evidence is a source-review URL, with no retained local execution receipt. The pin (server/v0.2.3) is behind the upstream release-1.1.0. The card says help/import is not isolation proof."
   },
   {
    "disposition": "unqualified",
@@ -87,7 +87,7 @@
    "key": "c7",
    "name": "e2b",
    "repository": "https://github.com/e2b-dev/E2B",
-   "why_not_default": "Source review only, and I did not open the external README. An import check is not sandbox E2E, and the self-host guide targets AWS/GCP. There is no native receipt."
+   "why_not_default": "Source review only. The card says import is not sandbox E2E, and self-hosting targets AWS/GCP rather than a local Linux binary. There is no retained execution receipt."
   },
   {
    "disposition": "out_of_scope",
@@ -96,7 +96,7 @@
    "key": "c4",
    "name": "modal",
    "repository": "https://github.com/modal-labs/modal-client",
-   "why_not_default": "Modal is managed paid cloud compute. 'modal run' was not executed and could incur charges, and catalog inclusion does not authorize paid hosting. The evidence is source review of a PyPI page I did not open, and the pin and latest versions disagree (1.5.5 against v1.3.1)."
+   "why_not_default": "Source review only. `modal run` executes code in the cloud, may incur charges, and was not run. Paid hosting is not authorized, and there is no local execution evidence."
   },
   {
    "disposition": "unqualified",
@@ -105,7 +105,7 @@
    "key": "c9",
    "name": "mlflow",
    "repository": "https://github.com/mlflow/mlflow",
-   "why_not_default": "Source review only, and I did not open the external README. No tracking server was run. MLflow targets experiment and model lineage, not operational telemetry or recovery."
+   "why_not_default": "Source review only. No tracking server or experiment was recorded. MLflow is an experiment-lineage store, not the operational telemetry path that was exercised."
   },
   {
    "disposition": "unqualified",
@@ -114,7 +114,7 @@
    "key": "c11",
    "name": "phoenix",
    "repository": "https://github.com/Arize-ai/phoenix",
-   "why_not_default": "Source review only, and I did not open the external README. The server launch is prospective and no app was instrumented. The license is ELv2 with restrictions, and the provider-hiding flag is not an inference authorization boundary."
+   "why_not_default": "Source review only. The server launch is prospective, no app was instrumented, and traces are disabled in the accepted Collector scope. The license is ELv2 with restrictions, and upstream reports NOASSERTION."
   }
  ],
  "catalog": "us-equities",
@@ -122,68 +122,75 @@
  "lane": "claude",
  "layer_id": "observability-hosting",
  "limits": [
-  "I did not open the external evidence_refs for c1, c4, c7, c9 and c11 (GitHub and PyPI URLs) because this lane has no network access. Their source_review labels are packet data I could not verify.",
-  "I confirmed fixtures/observability-check.json exists but did not open it. Its sha256 (f1d66eb8..., observability/receipt.json line 238) was not compared with the current file.",
-  "I did not read observability/followup-receipt.json, observability/restart-receipt.json or the recipe READMEs. Any 8-rule restart evidence they contain was not checked.",
-  "I could not run commands. Every receipt value is documented as done at record time (2026-09-19) and was not observed now.",
-  "The coordinator supplied no TypeSafe inference results. This revision is my own source review of the retained receipts, incorporating the refuter findings after I re-read the cited lines. The packet's evidence_kind labels are kept as catalog data, except c13, which I downgraded to source_review.",
-  "The model name and effort are the fixed packet values (opus, high). The client reports the running model as claude-opus-5-5[1m]. Skill path: <host-path>/SKILL.md."
+  "I ran no commands. Every result is documented in retained receipts, not observed now. The unit-test behavior I cite is read from the test source, not from a test run.",
+  "I could not open the URL-only evidence_refs, because file reads were limited to the repository root. Those candidates are c1, c4, c7, c9 and c11. Their dispositions rest on the packet card text and the absence of a local receipt.",
+  "tests/test_observability_backends_alerts.py was found by glob but not read in this round; I rely on the refuter's description that it contains alert-rule and config checks. blueprints/us-equities/workers/native_worker.py and observability/backends/check_persistence.py were confirmed to exist by glob only. Their full argument parsing was not read.",
+  "I did not open observability/backends/README.md, recipes/README.md, blueprints/us-equities/hosting/backup/README.md or observability/restart-receipt.json.",
+  "I read only the first 5 lines of source.sha256; the 22-file count comes from the receipt's sha256sum_check.",
+  "No TypeSafe inference was supplied or performed. The verdict is my own source review. The typesafe-ai skill was loaded from <host-path>/SKILL.md.",
+  "The actual client model was claude-opus-5-5[1m]. The model field carries the required fixed value, opus/high."
  ],
  "model": {
   "effort": "high",
   "name": "claude-opus-5-5"
  },
  "open_gaps": [
-  "Completed SDK result usage records are retained only in Loki (c6): LogQL returned 80770, and native_turn_histogram_observed is false. The winner set depends on c6 being deployed with it.",
-  "No backend was observed retaining failed-attempt or failed-run records. retained_failed_attempts in observability/receipt.json lines 370-375 is the acceptance author's prose, not collected telemetry. The requirement's 'failed attempts' clause therefore has no native proof.",
-  "Recoverable state is proven only for 22 static public reference files with live_databases 0. There is no backup of Prometheus, Loki, SQLite or any broker/order journal, and no application-consistent database restore.",
-  "There is no off-host backup, and separate_key_escrow is not_configured. Host or volume loss is unprotected. The restic retention policy was run only as a dry run (1 snapshot kept, 0 removed). No backup timer or service is enabled.",
-  "The backend restart persistence checks ran under the earlier six-rule scope, not the final 8-rule configuration, and used synthetic fixtures. Retention was not aged out.",
-  "The only retained Prometheus value query is a synthetic privacy canary with values [\"7\",\"7\"]. Prometheus holds the native-client collector series, but the receipt does not name which backend held the matched Codex turn histogram.",
-  "No backend has high availability. The single WSL host depends on the user service manager.",
-  "Sandbox network denial was not exercised, so no candidate proves that research workers are blocked from broker execution authority.",
-  "No external alert delivery was tested (external_delivery_tested is false).",
-  "Process supervision is shown only by 'systemctl --user is-active' for six services and the target-down alert. There is no evidence of in-flight workload recovery.",
-  "No measured comparison between candidates was run. The priority of Prometheus over Loki in the three-winner cap is my judgment."
+  "Failed-attempt telemetry retention is not established. No failed or unknown-usage record was observed in Loki: the 6h unknown-usage query returned no data. Only the offline unit test of the writer creates a failed-status observation, and tasks that never emit a receipt are invisible.",
+  "Recoverable state is shown only as same-host restart persistence of the observability backends, and the Loki check used a synthetic fixture. Restic backed up 22 static files, with live_databases 0, no off-host destination, no key escrow, a dry-run retention step, and timer and service not enabled.",
+  "The earlier 80770 SDK total came from imported summaries of two completed runs. Only the follow-up task (40518) published its own receipt automatically, and it is a single run.",
+  "The Loki and Collector restart checks cover one controlled restart. There is no loss/recovery acceptance under a full disk or an extended backend outage, and the receipt spool has no automatic expiry.",
+  "Traces are disabled and no trace database was deployed.",
+  "Process supervision rests on systemd is-active checks and one local Alertmanager target-down route. There is no external notification delivery or high availability, and the Dagu HTTP 401 shows only anonymous protection.",
+  "No receipt shows research workers denied broker execution authority. Sandbox network denial was configured but not exercised.",
+  "The Desktop parent export was not observed: its correlated OTel records were 0, and it was not restarted.",
+  "The existing tests under tests/ for this layer are offline guards. No named repository test measures the native-usage match or restart totals."
  ],
  "overturn_protocol": {
   "arms": [
-   "c14+c5+c8 with c6 as the SDK-record co-store (current)",
-   "c14+c6+c8 with Loki ruler alerts and no Prometheus",
-   "c14+c5+c8 with the SDK turn histogram retained in Prometheus and no Loki",
-   "restic extended to live Prometheus/Loki data against the current selected-file scope"
+   "c14+c5+c6 (contrib Collector to Prometheus and Loki), current winners",
+   "c14+c6 without c5 (tests whether Loki alone carries the native-usage match)",
+   "c8 restic static-file backup vs live-state/off-host backup",
+   "c3 sandbox-runtime with network denial and broker-authority removal exercised"
   ],
   "fixture_paths": [
    "fixtures/observability-check.json",
-   "blueprints/us-equities/hosting/backup/receipt.json"
+   "blueprints/us-equities/workers/native_worker.py",
+   "blueprints/us-equities/hosting/backup/receipt.json",
+   "tests/test_observability.py",
+   "tests/test_offhost_restore.py"
   ],
-  "metric": "Native pass/fail for three checks. First, collector-delivered usage (native clients and SDK records) must match native client usage and remain queryable in the named store after a backend restart. Second, the alert route must produce 1 firing and 1 resolved notification. Third, restore must pass the byte and file-hash match, with 'check --read-data' reporting no errors."
+  "metric": "Pass or fail on each check: (a) every category of the native client's reported usage equals the value collected in Prometheus/Loki for the same task; (b) the per-receipt_id Loki sum is identical before and after a Collector or backend restart; (c) a forced-failure run appears in Loki as a record with usage_status other than reported; (d) prometheus_historical_sample and loki_log are true after a fresh check_persistence run; (e) restic check --read-data and restore --verify exit 0 with byte-identical hashes covering the live telemetry/SQLite state and broker journal, not only static files."
  },
- "overturn_when": "The current evidence already shows SDK result records in Loki only, so the earlier Loki trigger has been replaced. Any of the following would change the verdict, and each needs a recorded native run, not agreement between lanes.\n\n(1) Replace c5 with c6: a native rerun of the fixtures/observability-check.json acceptance in which Loki alone retains both the native Codex and Claude usage and the SDK receipt records, and a Loki-ruler alert routed through Alertmanager reproduces 1 firing and 1 resolved notification. That would make Prometheus redundant.\n\n(2) Remove the Loki dependency and confirm c5: a rerun in which the SDK turn histogram is observed in Prometheus (native_turn_histogram_observed true) and matches the native usage.\n\n(3) Displace c8: a new restic receipt at blueprints/us-equities/hosting/backup/receipt.json that fails 'check --read-data' or the restore byte comparison, or a same-scope alternative that backs up live Prometheus/Loki state with a verified restore.",
+ "overturn_when": "Revise the verdict if any of the three checks below gives a different result. The existing tests/test_observability.py and tests/test_observability_backends_alerts.py are offline guards only; they cover identity, no-overwrite, the failed-status writer, the dashboard query and alert/config syntax. On their own they cannot overturn or confirm this verdict.\n\n(1) Native re-run. Run `python3 blueprints/us-equities/workers/native_worker.py run` with the argument shape recorded at observability/followup-receipt.json line 61 (native binary, home, workspace, receipt, prompt derived from fixtures/observability-check.json, --observation-dir). Then query the Prometheus series ecosystem_codex_turn_token_usage_sum and the Loki per-receipt_id sum. The winners are overturned if the collected usage no longer equals native usage. A second run should force a failure, for example with a very short --turn-deadline-seconds. If Loki never shows its record with usage_status other than reported, failed-attempt telemetry retention stays unproven for c6 and the set must be re-judged.\n\n(2) `python3 observability/backends/check_persistence.py --evidence-dir <fresh directory> --grafana-env <grafana env file>` (arguments as used in tests/test_observability.py lines 83-84). The Prometheus/Loki retention claim fails if a fresh run no longer records prometheus_historical_sample and loki_log true after a restart.\n\n(3) Recovery. Promote c8 restic to a winner if a backup receipt shows check --read-data and restore --verify exit 0 with byte-identical hashes for the live Loki, Prometheus and SQLite data and the broker journal, preferably to an off-host destination. The comparison point is blueprints/us-equities/hosting/backup/receipt.json. The offline refusal cases in tests/test_offhost_restore.py are a precondition, not such a receipt.\n\nA sandbox candidate enters the winners only after a receipt shows both network denial and research workers denied broker execution authority.",
  "packet_sha256": "063948467311adc1dde76155a75a79b1d644ef882adc3656cdd6046597f94970",
  "schema_version": 1,
  "sources_read": [
   "<host-path>/us-equities__observability-hosting.json",
   "observability/receipt.json",
   "observability/backends/receipt.json",
-  "evidence/receipts/runtime-tools.json",
+  "observability/followup-receipt.json",
+  "observability/README.md (lines 95-119)",
   "blueprints/us-equities/hosting/backup/receipt.json",
-  "blueprints/us-equities/hosting/backup/source.sha256",
   "blueprints/us-equities/hosting/backup/selected-files.txt",
-  "<host-path>/SKILL.md (loaded in context via skill invocation)"
+  "blueprints/us-equities/hosting/backup/source.sha256 (lines 1-5)",
+  "evidence/receipts/runtime-tools.json",
+  "fixtures/observability-check.json",
+  "tests/test_observability.py",
+  "tests/test_offhost_restore.py (lines 1-40)",
+  "<host-path>/SKILL.md (skill body preloaded in context)"
  ],
- "why_selected": "This is my source review of retained native receipts. I did not run a measured comparison. The three winners cover the collector pipeline, native-client metrics with alert-based supervision, and the only recoverable-state proof. Loki (c6) must be deployed with them, as explained below.\n\nc14 (OpenTelemetry Collector contrib v0.161.0): observability/receipt.json lines 78-80 record 'otelcol-contrib validate' exit 0. Real native Codex 0.155.1 and Claude 2.1.278 tasks each exited 0 with the correct fixture answer (lines 164-201). The receipt records collected_turn_histogram_matches_native_usage=true (line 182) and collected_request_logs_and_metrics_match=true (line 201). The collector's file_log/sdk_receipts receiver delivered two SDK receipt records, and the total stayed at 80770 after a collector restart (lines 246-255).\n\nCorrection from the refuters: the 80770 figure comes from a Loki LogQL query (lines 122-127), not Prometheus. native_turn_histogram_observed is false (line 227). Completed SDK result usage records are therefore retained only in Loki today.\n\nc5 (Prometheus v3.14.0): observability/backends/receipt.json records config validation exit 0 and a final_rule_count of 8 (lines 115-116). The restart persistence check (synthetic_fixture true, restart_exit_code 0, prometheus_historical_sample true; lines 85-98) ran under the earlier six-rule scope (line 117, original_acceptance_rule_count 6 at line 158). Prometheus scrapes the collector-native target (observability/receipt.json line 118) and holds the native collector series (token_selection source query on job collector-native, 2134 series, lines 349-355). It carries the only natively proven supervision and alert path: EcosystemAcceptanceTargetDown produced 1 firing and 1 resolved notification to a local inbox (lines 303-311). The retained values [\"7\",\"7\"] come from a synthetic privacy canary, not an inference task (line 314).\n\nc8 (Restic v0.19.1): blueprints/us-equities/hosting/backup/receipt.json records verified signed checksums (line 28) and backup exit 0 for 22 files and 160642 bytes. 'check --read-data' reported 'no errors were found'. restore --verify restored 160642 bytes, the sha256sum check reported 22 OK lines, and the independent byte comparison matched 22 files. The retention dry run kept 1 snapshot and removed 0 (lines 33-97). The scope is only 22 static public reference files with live_databases 0 (lines 15, 36). No Loki, Prometheus or broker/order journal was backed up (line 125).\n\nWeakest class across the winners: native_proven. The receipt's retained_failed_attempts list (lines 370-375) is the acceptance author's prose. It is not collected telemetry, so I do not count it as evidence for the 'failed attempts' clause.",
+ "why_selected": "This verdict is my own source review of the retained receipts. No TypeSafe inference results were supplied or used, and no provider judgment is retained. In this revision c5 Prometheus replaces c8 restic as a winner. The refuters showed that the native-usage matches credited to the Collector were read out of Prometheus. They also showed that the only receipt for restic, the backup tool, covers no state this layer owns. The three winners together form the telemetry path that was actually run natively, so the weakest class in the set is native_proven.\n\n(1) c14, OpenTelemetry Collector contrib v0.161.0. observability/receipt.json records `otelcol-contrib validate` exit 0. Real native Codex 0.155.1 and Claude 2.1.278 runs of fixtures/observability-check.json exited 0 with the correct answer (lines 163-202). For Codex, collected_turn_histogram_matches_native_usage is true (line 182). For Claude, collected_request_logs_and_metrics_match is true (line 201). Six services were active, and the privacy canary recorded forbidden_marker_absent true (line 327). observability/followup-receipt.json records one fresh native SDK task run through blueprints/us-equities/workers/native_worker.py. After an analytics configuration fix, its turn histogram matched all six usage categories (total 40518; lines 97-110).\n\n(2) c5, Prometheus. The Codex usage match was queried from the Prometheus API. observability/README.md lines 109-111 query ecosystem_codex_turn_token_usage_sum at 127.0.0.1:19090. The follow-up SDK histogram was also a Prometheus query: HTTP 200, and a retained last_over_time query returned the same values (followup-receipt.json lines 98-125). observability/backends/receipt.json records all 7 scrape targets up, readiness HTTP 200, and prometheus_historical_sample true after one restart (lines 76-97).\n\n(3) c6, Loki v3.7.8. Claude request logs are read from Loki (README lines 112-113). The follow-up Loki query summed SDK receipts per receipt_id over 6h and returned 121288. That equals the 80770 from two earlier runs plus 40518 from the fresh run, and the fresh run published its own receipt automatically (followup-receipt.json lines 204-224). The earlier 80770 came from imported summaries of two completed runs, not new model calls. It was unchanged after a Collector restart (receipt.json lines 248-252). Loki log persistence after a backend restart was shown with a synthetic fixture only (backends/receipt.json lines 87-91).\n\nCorrection to the earlier proposal: no receipt shows a failed attempt stored in Loki. retained_failed_attempts (receipt.json lines 370-375) is the acceptance author's own process history. Three of its entries are corrections and one is an unresolved negative result (line 373). Writing a failed-status record is shown only by the offline unit test in tests/test_observability.py (lines 32-54). The live unknown-usage query returned no data, and the follow-up receipt says a receipt-based view cannot identify tasks that never emitted a receipt (followup-receipt.json lines 24 and 214-218). Restic is kept as a conditional alternative; see alternatives.",
  "winner_evidence_class": "native_proven",
  "winner_evidence_refs": [
   "observability/receipt.json",
   "observability/backends/receipt.json",
-  "blueprints/us-equities/hosting/backup/receipt.json",
-  "blueprints/us-equities/hosting/backup/source.sha256",
-  "blueprints/us-equities/hosting/backup/selected-files.txt"
+  "observability/followup-receipt.json",
+  "observability/README.md",
+  "fixtures/observability-check.json"
  ],
  "winner_keys": [
   "c14",
   "c5",
-  "c8"
+  "c6"
  ]
 }
