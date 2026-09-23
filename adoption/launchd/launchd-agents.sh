@@ -161,36 +161,83 @@ forget_enabled_label() {
 }
 
 # N1: install's own temporary backup of an owned destination plist (made just
-# before overwriting it) lives under this script's own state_dir, never
-# inside ~/Library/LaunchAgents itself: that directory is scanned and
-# auto-loaded by launchd at login, so a stray file an interrupted run left
-# there is a real hazard, not just clutter. cmd_install clears
-# pending_backup_plist/pending_backup_dest as soon as it no longer needs the
-# backup (restored, or the install it protected against completed either
-# way); this EXIT trap is the safety net for whatever premature exit --
-# `set -e` on a failing command install's own explicit branches never got to
-# handle, a signal, an unexpected error elsewhere -- would otherwise leave
-# pending. It RESTORES pending_backup_dest from pending_backup_plist (never
-# merely deletes the backup, a round-3c regression: a failing `cp` straight
-# into dest_plist could truncate it and then exit via set -e before any of
-# cmd_install's own restore branches ran, and the old trap deleted the one
-# copy that could have recovered it) before removing the backup file itself.
-# pending_dest_tmp is cmd_install's own same-directory staging file for the
-# rename-into-place below (N1 round 3c): a failed `cp` into IT never touches
-# dest_plist at all, so this only ever needs to delete a leftover partial
-# write, never restore anything from it.
+# before overwriting it) lives in the same directory as dest_plist itself
+# (round 3d correction: originally moved under this script's own state_dir,
+# reverted because a restore-by-rename across a filesystem boundary is not
+# atomic -- see the backup_plist comment in cmd_install for why). Its
+# filename never ends in ".plist", so launchd's own directory scan (auto-
+# loading at login) never treats it as a unit definition; cmd_install clears
+# pending_backup_plist/pending_backup_dest/pending_backup_reload_needed as
+# soon as it no longer needs the backup (the install it protected against
+# completed either way); this single EXIT trap is now the ONLY place that
+# ever restores it -- cmd_install's own explicit bootstrap-failure branch no
+# longer attempts its own separate restore (round 3d: two independent
+# implementations of the same recovery had independently drifted bugs; one
+# is authoritative).
+#
+# Recovery step table for the section of cmd_install that can touch an
+# owned, already-existing destination (backup_plist set):
+#   Step                                  | On failure here                 | On a signal here                 | Recovery action
+#   1. cp dest_plist -> backup_plist      | dest_plist unmodified; backup   | same as failure                   | none needed: dest_plist itself was
+#      (pending_backup_plist/_dest set    | may be partial or absent        |                                   | never touched
+#      BEFORE this call, not after --     |                                 |                                   |
+#      round 3d: a signal in the gap      |                                 |                                   |
+#      between cp finishing and the       |                                 |                                   |
+#      assignment would otherwise leave   |                                 |                                   |
+#      the trap unable to find it)        |                                 |                                   |
+#   2. bootout, if loaded (L2/L5 above)   | dest_plist unmodified;          | same                              | trap's restore (mv, a no-op: dest_plist
+#                                         | pending_backup_reload_needed    |                                   | was never touched) runs; reload only
+#                                         | not yet set (bootout itself     |                                   | attempted if reload_needed -- it is
+#                                         | did not succeed)                |                                   | not here, since bootout never confirmed
+#   3. wait_until_unloaded (L4)           | dest_plist unmodified;          | same                              | trap restores (no-op) AND attempts a
+#                                         | pending_backup_reload_needed=1  |                                   | reload, since bootout DID succeed
+#   4. cp source_plist -> dest_tmp        | dest_plist unmodified;          | same                              | trap deletes the stray dest_tmp;
+#      (pending_dest_tmp set BEFORE)      | dest_tmp may be partial          |                                   | restores the backup (no-op) + reload
+#                                         |                                  |                                   | if reload_needed
+#   5. mv dest_tmp -> dest_plist          | dest_plist now holds the NEW    | same                              | trap restores the backup ONTO
+#      (same-directory rename-into-place) | content                          |                                   | dest_plist via mv + reload if needed
+#   6. launchctl bootstrap                | dest_plist holds NEW content,   | same                              | trap restores the backup ONTO
+#                                         | not (re)loaded                  |                                   | dest_plist via mv + reload if needed
+#                                         |                                  |                                   | (THIS is the historically-buggy case:
+#                                         |                                  |                                   | restore-then-reload must both run)
+#   7. (success) delete backup_plist      | backup_plist may survive         | same                              | harmless: the label is already
+#                                         | (pending_backup_plist cleared    |                                   | correctly installed and loaded; a
+#                                         | before this line)                |                                   | leftover backup is prunable
 pending_backup_plist=""
 pending_backup_dest=""
+pending_backup_reload_needed=""
 pending_dest_tmp=""
 cleanup_install_state() {
   if [[ -n "$pending_dest_tmp" && -e "$pending_dest_tmp" ]]; then
     rm -f -- "$pending_dest_tmp"
   fi
-  if [[ -n "$pending_backup_plist" && -e "$pending_backup_plist" ]]; then
-    if [[ -n "$pending_backup_dest" ]]; then
-      cp -- "$pending_backup_plist" "$pending_backup_dest" 2>/dev/null || true
+  if [[ -n "$pending_backup_plist" && -e "$pending_backup_plist" && -n "$pending_backup_dest" ]]; then
+    # Restore only by same-directory rename, never `cp` (round 3d: `cp`
+    # ignoring its own failure and the backup being deleted unconditionally
+    # right after was exactly how a truncating failed copy could lose both
+    # copies). backup_plist and dest_plist are always in the same
+    # directory (~/Library/LaunchAgents), so this `mv` is a single
+    # rename(2): it either fully replaces dest_plist or does not touch it
+    # at all, never a partial write.
+    if mv -f -- "$pending_backup_plist" "$pending_backup_dest"; then
+      pending_backup_plist=""
+      if [[ "$pending_backup_reload_needed" == 1 ]]; then
+        if launchctl bootstrap "gui/$(id -u)" "$pending_backup_dest" >/dev/null 2>&1; then
+          printf 'Restored %s after an unexpected exit and reloaded it.\n' "$pending_backup_dest" >&2
+        else
+          printf 'WARNING: restored %s after an unexpected exit, but failed to reload it; the service is stopped. Run: launchctl bootstrap "gui/%s" %q\n' \
+            "$pending_backup_dest" "$(id -u)" "$pending_backup_dest" >&2
+        fi
+      else
+        printf 'Restored %s after an unexpected exit.\n' "$pending_backup_dest" >&2
+      fi
+    else
+      # Delete the backup ONLY after a successful restore, never before or
+      # regardless (round 3d): keep it, and report its exact location and
+      # the exact command to finish the job by hand.
+      printf 'WARNING: an unexpected exit could not restore %s automatically; the previous copy is kept at %s. Restore it manually with: mv -f -- %q %q\n' \
+        "$pending_backup_dest" "$pending_backup_plist" "$pending_backup_plist" "$pending_backup_dest" >&2
     fi
-    rm -f -- "$pending_backup_plist"
   fi
 }
 trap cleanup_install_state EXIT
@@ -327,15 +374,30 @@ cmd_install() {
     # previously working, owned install -- back it up first and restore it
     # (file and, best effort, its loaded state) instead of destroying a
     # config that was working before this reinstall was attempted. The
-    # backup lives under this script's own state_dir, never inside
-    # ~/Library/LaunchAgents (N1; see cleanup_install_state above).
+    # backup lives in the SAME DIRECTORY as dest_plist itself, deliberately
+    # NOT under this script's own state_dir (round 3d correction of N1's
+    # original choice): `mv` across a filesystem boundary is not atomic at
+    # all -- both GNU and BSD `mv` silently fall back to copy-then-unlink on
+    # EXDEV -- so restoring by rename (below) is only genuinely atomic when
+    # the backup and dest_plist are guaranteed to be on the SAME filesystem,
+    # which only holding it in dest_plist's own directory can guarantee
+    # (ECO_INSTALL_ROOT, and so state_dir, may legitimately be a separate
+    # mounted volume). Its filename never ends in ".plist", so launchd's own
+    # directory scan (which is the actual N1 hazard this is guarding
+    # against) does not treat it as a unit definition to auto-load; the EXIT
+    # trap below removes it on every exit path regardless.
     local backup_plist=""
     if [[ "$dest_existed" == 1 ]]; then
-      mkdir -p "$state_dir/backups"
-      backup_plist="$state_dir/backups/$label.plist.backup.$$"
-      cp -- "$dest_plist" "$backup_plist"
+      backup_plist="$dest_plist.backup.$$"
+      # Set BEFORE the cp, not after: a signal landing exactly between the
+      # cp completing and the next script line would otherwise reach the
+      # trap with pending_backup_plist still empty, unable to find the
+      # backup it should restore even though it already exists on disk.
+      # Harmless the other way (signalled before cp even starts): the trap
+      # only acts once pending_backup_plist actually exists on disk.
       pending_backup_plist="$backup_plist"
       pending_backup_dest="$dest_plist"
+      cp -- "$dest_plist" "$backup_plist"
     fi
 
     # A re-run on an owned label that is still loaded (e.g. reinstalling
@@ -357,6 +419,14 @@ cmd_install() {
             "$label" >&2
           exit 1
         fi
+        # was_loaded, recorded now (bootout just confirmed succeeded, not
+        # merely attempted): if this run ends up restoring dest_plist from
+        # its backup for any reason from here on -- a later failure, or a
+        # signal -- the service that WAS running under it must be reloaded
+        # too, not just have its file put back. The trap above is where
+        # that reload actually happens; this only tells it whether one is
+        # owed.
+        pending_backup_reload_needed=1
         # L4: bootout can return before the service has actually finished
         # tearing down; only proceed once launchctl print confirms it,
         # within a bounded wait, never trusting bootout's exit code alone.
@@ -402,25 +472,30 @@ cmd_install() {
         rm -f -- "$backup_plist"
         pending_backup_plist=""
         pending_backup_dest=""
+        pending_backup_reload_needed=""
       fi
       record_enabled_label "$label"
       printf 'Installed and bootstrapped %s (%s)\n' "$label" "$dest_plist"
-    elif [[ -n "$backup_plist" ]]; then
-      mv -f -- "$backup_plist" "$dest_plist"
-      pending_backup_plist=""
-      pending_backup_dest=""
-      launchctl bootstrap "gui/$(id -u)" "$dest_plist" >/dev/null 2>&1 || true
-      printf 'launchctl bootstrap failed for %s; restored the previous %s (best-effort reloaded).\n' \
-        "$label" "$dest_plist" >&2
-      exit 1
     else
-      # Undo the copy: an unowned, bootstrap-failed plist left under
-      # ~/Library/LaunchAgents would still load at the next login, and
-      # neither a retry (the ownership check above) nor remove (which never
-      # touches an unrecorded label) could ever reach it again otherwise.
-      rm -f -- "$dest_plist"
-      printf 'launchctl bootstrap failed for %s; removed %s (never recorded as enabled).\n' \
-        "$label" "$dest_plist" >&2
+      if [[ -z "$backup_plist" ]]; then
+        # Undo the copy: an unowned, bootstrap-failed plist left under
+        # ~/Library/LaunchAgents would still load at the next login, and
+        # neither a retry (the ownership check above) nor remove (which
+        # never touches an unrecorded label) could ever reach it again
+        # otherwise.
+        rm -f -- "$dest_plist"
+        printf 'launchctl bootstrap failed for %s; removed %s (never recorded as enabled).\n' \
+          "$label" "$dest_plist" >&2
+      else
+        # The restore (same-directory rename, never cp) and, if the service
+        # was running before this reinstall, the reload attempt both happen
+        # in the single EXIT trap above (cleanup_install_state) -- not here
+        # -- so a signal landing anywhere in this function gets the exact
+        # same recovery a plain bootstrap failure does (round 3d: two
+        # separate implementations of this same recovery had independently
+        # drifted bugs; one is now authoritative).
+        printf 'launchctl bootstrap failed for %s; restoring the previous %s.\n' "$label" "$dest_plist" >&2
+      fi
       exit 1
     fi
   done < <(selected_labels)

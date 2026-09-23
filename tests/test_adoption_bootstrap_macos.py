@@ -872,7 +872,15 @@ class PlatformDependencyInstallTests(unittest.TestCase):
         harness.write_text(
             "set -Eeuo pipefail\n"
             + _shell_functions(SCRIPT_PATH.read_text(), "canonical_path", "npm_package_name",
-                                "install_platform_dependency", "install_npm")
+                                "install_platform_dependency", "install_npm", "cleanup")
+            # The script-level pending_migration_prefix/_dest globals and the
+            # EXIT trap that uses them (round 3d) are NOT part of any single
+            # extracted function -- without registering the same trap here,
+            # a signal or a failure after install_npm sets them would never
+            # actually be recovered in this harness, unlike the real script.
+            + 'pending_migration_prefix=""\n'
+            + 'pending_migration_dest=""\n'
+            + "trap cleanup EXIT\n"
             + f'pins_path={json.dumps(str(pins_path))}\n'
             + f'ecosystem_root={json.dumps(str(eco_root))}\n'
             + f'bin_dir={json.dumps(str(eco_root / "bin"))}\n'
@@ -1238,56 +1246,15 @@ class PlatformDependencyInstallTests(unittest.TestCase):
         # into a live prefix, leaving a window where the wrapper's freshly
         # updated files point at whatever platform dependency npm's own
         # install just auto-fetched, unverified, before the fix-up runs.
-        # Staging under stage_dir and moving the finished, fully verified
-        # result into place means the live final_prefix is always either the
-        # complete old install or the complete new one. This runs install_npm
-        # twice for the same id/version and checks: both succeed, the
-        # staging directory never survives either run, and the final content
-        # is still fully verified after the second (re-)run.
-        with tempfile.TemporaryDirectory() as tmp:
-            tmp_path = Path(tmp)
-            pins_path = self._pins_fixture(tmp_path, {
-                "id": "codexlike", "version": "1.0.0", "kind": "npm",
-                "url": "https://registry.npmjs.org/fixture-codex-like/-/fixture-codex-like-1.0.0.tgz",
-                "sha256": self.codex_like_sha256, "checksum_source": "npm_registry_integrity_crosscheck",
-                "checksum_ref": "test", "install_note": "test",
-                "platform_dependency": self._platform_dependency_pin(),
-            })
-            first, eco_root = self._run_install_npm(
-                tmp_path, pins_path, "codexlike", "1.0.0", self.codex_like_tarball, self.codex_like_sha256,
-                npm_package="fixture-codex-like")
-            self.assertEqual(first.returncode, 0, first.stdout + first.stderr)
-            staged_dir = tmp_path / "stage" / "codexlike-1.0.0-staged"
-            self.assertFalse(staged_dir.exists(), "the staging directory must not survive a successful run")
-
-            second, eco_root = self._run_install_npm(
-                tmp_path, pins_path, "codexlike", "1.0.0", self.codex_like_tarball, self.codex_like_sha256,
-                npm_package="fixture-codex-like")
-            self.assertEqual(second.returncode, 0, second.stdout + second.stderr)
-            self.assertFalse(staged_dir.exists(), "the staging directory must not survive the re-run either")
-
-            wrapper_dir = eco_root / "tools" / "codexlike-1.0.0" / "lib" / "node_modules" / "fixture-codex-like"
-            self.assertTrue(wrapper_dir.is_dir())
-            content = subprocess.run(
-                ["node", "-e",
-                 'const p = require.resolve("widget-darwin-arm64/package.json", {paths: [process.argv[1]]});'
-                 'const fs = require("fs"), path = require("path");'
-                 'process.stdout.write(fs.readFileSync(path.join(path.dirname(p), "native-bin"), "utf8").trim());',
-                 str(wrapper_dir)],
-                capture_output=True, text=True, timeout=30,
-            )
-            self.assertEqual(content.returncode, 0, content.stdout + content.stderr)
-            self.assertEqual(content.stdout.strip(), "VERIFIED_CONTENT")
-
-    def test_a_failed_final_move_restores_the_previous_prefix_rather_than_leaving_it_absent(self):
-        # Codex round-3c Medium, failure injection: renaming the live prefix
-        # aside succeeds, but the subsequent move of the newly staged, fully
-        # verified prefix into place fails (disk full, a permission error,
-        # ...). Without a rollback, final_prefix -- and every bin_dir
-        # symlink into it -- would be left absent even though the previous,
-        # fully verified install still exists on disk under a
-        # "*.previous.*" name. This proves the live prefix is restored to
-        # place instead of being left missing.
+        # Installing into a freshly versioned directory (round 3d: tools/
+        # <id>-<version>-<stamp>, never reused) and only then atomically
+        # flipping final_prefix (a symlink) onto it means the live
+        # final_prefix always resolves to the complete old install or the
+        # complete new one. This runs install_npm twice for the same
+        # id/version and checks: both succeed, no "*-staged"/"*-link.*"
+        # transient survives either run, and the final content is still
+        # fully verified after the second (re-)run -- through the SAME
+        # stable symlink name both times.
         with tempfile.TemporaryDirectory() as tmp:
             tmp_path = Path(tmp)
             pins_path = self._pins_fixture(tmp_path, {
@@ -1302,42 +1269,29 @@ class PlatformDependencyInstallTests(unittest.TestCase):
                 npm_package="fixture-codex-like")
             self.assertEqual(first.returncode, 0, first.stdout + first.stderr)
             final_prefix = eco_root / "tools" / "codexlike-1.0.0"
+            self.assertTrue(final_prefix.is_symlink())
+            first_target = final_prefix.resolve()
+            leftover_links = [p.name for p in (tmp_path / "stage").iterdir() if "-link." in p.name]
+            self.assertEqual(leftover_links, [], "no tmp_link may survive a successful run")
+
+            second, eco_root = self._run_install_npm(
+                tmp_path, pins_path, "codexlike", "1.0.0", self.codex_like_tarball, self.codex_like_sha256,
+                npm_package="fixture-codex-like")
+            self.assertEqual(second.returncode, 0, second.stdout + second.stderr)
+            leftover_links = [p.name for p in (tmp_path / "stage").iterdir() if "-link." in p.name]
+            self.assertEqual(leftover_links, [], "no tmp_link may survive the re-run either")
+            # The SAME stable symlink name now resolves to a DIFFERENT
+            # (newly installed) versioned directory, and the old one is no
+            # longer on disk at all -- the flip actually happened, and the
+            # previous version's own bytes were cleaned up, not merely
+            # orphaned.
+            self.assertTrue(final_prefix.is_symlink())
+            second_target = final_prefix.resolve()
+            self.assertNotEqual(first_target, second_target)
+            self.assertFalse(first_target.exists(), "the superseded versioned directory must be cleaned up")
+
             wrapper_dir = final_prefix / "lib" / "node_modules" / "fixture-codex-like"
             self.assertTrue(wrapper_dir.is_dir())
-
-            # Real mv, except: fails when its SOURCE (not destination) is
-            # the staged prefix -- exactly install_npm's second move, `mv --
-            # "$prefix" "$final_prefix"` where $prefix is "*-staged" -- so
-            # the first move (renaming the OLD final_prefix aside) still
-            # succeeds normally, matching a genuine mid-swap failure rather
-            # than one that never got this far.
-            failing_mv_shim = tmp_path / "failing-mv-shim"
-            failing_mv_shim.mkdir()
-            (failing_mv_shim / "mv").write_text(
-                "#!/bin/sh\n"
-                'for arg in "$@"; do\n'
-                '  case "$arg" in\n'
-                "    *-staged)\n"
-                "      echo 'mv: injected failure for testing' >&2\n"
-                "      exit 1\n"
-                "      ;;\n"
-                "  esac\n"
-                "done\n"
-                'exec /bin/mv "$@"\n'
-            )
-            (failing_mv_shim / "mv").chmod(0o755)
-
-            second, _ = self._run_install_npm(
-                tmp_path, pins_path, "codexlike", "1.0.0", self.codex_like_tarball, self.codex_like_sha256,
-                npm_package="fixture-codex-like",
-                extra_env={"PATH": f"{failing_mv_shim}{os.pathsep}{os.environ['PATH']}"})
-            self.assertNotEqual(second.returncode, 0, second.stdout + second.stderr)
-            self.assertIn("restored the previous install", second.stderr)
-            # The live prefix was never left absent: it still exists, and
-            # require.resolve (standing in for every bin_dir symlink into
-            # it) still reaches the ORIGINAL, fully verified content, not
-            # silently gone.
-            self.assertTrue(final_prefix.is_dir(), "final_prefix must not be left absent after a failed move")
             content = subprocess.run(
                 ["node", "-e",
                  'const p = require.resolve("widget-darwin-arm64/package.json", {paths: [process.argv[1]]});'
@@ -1348,9 +1302,234 @@ class PlatformDependencyInstallTests(unittest.TestCase):
             )
             self.assertEqual(content.returncode, 0, content.stdout + content.stderr)
             self.assertEqual(content.stdout.strip(), "VERIFIED_CONTENT")
-            # No "*.previous.*" leftover either: the rollback moved it back.
-            leftover_previous = [p.name for p in (eco_root / "tools").iterdir() if ".previous." in p.name]
-            self.assertEqual(leftover_previous, [], leftover_previous)
+
+    def _codex_like_pins(self, tmp_path: Path) -> Path:
+        return self._pins_fixture(tmp_path, {
+            "id": "codexlike", "version": "1.0.0", "kind": "npm",
+            "url": "https://registry.npmjs.org/fixture-codex-like/-/fixture-codex-like-1.0.0.tgz",
+            "sha256": self.codex_like_sha256, "checksum_source": "npm_registry_integrity_crosscheck",
+            "checksum_ref": "test", "install_note": "test",
+            "platform_dependency": self._platform_dependency_pin(),
+        })
+
+    def _resolved_content(self, wrapper_dir: Path) -> str:
+        content = subprocess.run(
+            ["node", "-e",
+             'const p = require.resolve("widget-darwin-arm64/package.json", {paths: [process.argv[1]]});'
+             'const fs = require("fs"), path = require("path");'
+             'process.stdout.write(fs.readFileSync(path.join(path.dirname(p), "native-bin"), "utf8").trim());',
+             str(wrapper_dir)],
+            capture_output=True, text=True, timeout=30,
+        )
+        self.assertEqual(content.returncode, 0, content.stdout + content.stderr)
+        return content.stdout.strip()
+
+    def _downgrade_final_prefix_to_a_real_directory(self, eco_root: Path, final_prefix: Path) -> None:
+        """After a normal (round-3d, symlink-based) install, replace
+        final_prefix with what a PRE-3d install would have left: a real
+        directory holding the same content, not a symlink. Used to exercise
+        the one-time migration path (the step table's step 2) a fresh
+        install never reaches."""
+        target = final_prefix.resolve()
+        self.assertTrue(final_prefix.is_symlink(), "expected a round-3d symlink to downgrade")
+        final_prefix.unlink()
+        target.rename(final_prefix)
+
+    @unittest.skipUnless(NPM, "native npm unavailable")
+    def test_a_failed_atomic_flip_leaves_final_prefix_exactly_as_it_was(self):
+        # Codex round-3d Medium 1, failure injection: the atomic flip's own
+        # rename (python3 os.replace) itself fails. final_prefix must be
+        # left exactly as it was before this run -- absent (a first
+        # install) or still the previous, fully verified symlink target (a
+        # reinstall) -- never a broken intermediate state, and the freshly
+        # installed (but never made live) versioned directory is simply an
+        # orphan, safe to discard.
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            pins_path = self._codex_like_pins(tmp_path)
+            first, eco_root = self._run_install_npm(
+                tmp_path, pins_path, "codexlike", "1.0.0", self.codex_like_tarball, self.codex_like_sha256,
+                npm_package="fixture-codex-like")
+            self.assertEqual(first.returncode, 0, first.stdout + first.stderr)
+            final_prefix = eco_root / "tools" / "codexlike-1.0.0"
+            self.assertTrue(final_prefix.is_symlink())
+            original_target = final_prefix.resolve()
+            wrapper_dir = final_prefix / "lib" / "node_modules" / "fixture-codex-like"
+            self.assertEqual(self._resolved_content(wrapper_dir), "VERIFIED_CONTENT")
+
+            # Real python3, except: fails when invoked for the flip's own
+            # os.replace one-liner specifically (every other python3 call
+            # this script makes -- canonical_path, render_launchd.py, etc.
+            # -- is unaffected).
+            real_python3 = shutil.which("python3")
+            self.assertIsNotNone(real_python3)
+            failing_python3_shim = tmp_path / "failing-python3-shim"
+            failing_python3_shim.mkdir()
+            (failing_python3_shim / "python3").write_text(
+                "#!/bin/sh\n"
+                'for arg in "$@"; do\n'
+                '  case "$arg" in\n'
+                "    *os.replace*)\n"
+                "      echo 'python3: injected os.replace failure for testing' >&2\n"
+                "      exit 1\n"
+                "      ;;\n"
+                "  esac\n"
+                "done\n"
+                f'exec {real_python3} "$@"\n'
+            )
+            (failing_python3_shim / "python3").chmod(0o755)
+
+            second, _ = self._run_install_npm(
+                tmp_path, pins_path, "codexlike", "1.0.0", self.codex_like_tarball, self.codex_like_sha256,
+                npm_package="fixture-codex-like",
+                extra_env={"PATH": f"{failing_python3_shim}{os.pathsep}{os.environ['PATH']}"})
+            self.assertNotEqual(second.returncode, 0, second.stdout + second.stderr)
+            self.assertIn("Failed to flip", second.stderr)
+            # final_prefix is untouched: still the SAME symlink, to the SAME
+            # (original) target, resolving to the SAME verified content.
+            self.assertTrue(final_prefix.is_symlink())
+            self.assertEqual(final_prefix.resolve(), original_target)
+            self.assertEqual(self._resolved_content(wrapper_dir), "VERIFIED_CONTENT")
+            # No tmp_link leftover under stage_dir either.
+            leftover_links = [p.name for p in (tmp_path / "stage").iterdir() if "-link." in p.name]
+            self.assertEqual(leftover_links, [], leftover_links)
+
+    @unittest.skipUnless(NPM, "native npm unavailable")
+    def test_sigterm_between_the_one_time_migration_and_the_flip_restores_the_real_directory(self):
+        # Codex round-3d Medium 1, step-table step 2, SIGTERM injection: a
+        # process signaled after the one-time migration (moving a real,
+        # pre-3d final_prefix aside) but before the atomic flip completes
+        # must not leave final_prefix absent. The top-level cleanup() trap
+        # must restore it. kill -TERM is sent from a shimmed mv, exactly at
+        # the migration step, matching the coordinator's required method.
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            pins_path = self._codex_like_pins(tmp_path)
+            first, eco_root = self._run_install_npm(
+                tmp_path, pins_path, "codexlike", "1.0.0", self.codex_like_tarball, self.codex_like_sha256,
+                npm_package="fixture-codex-like")
+            self.assertEqual(first.returncode, 0, first.stdout + first.stderr)
+            final_prefix = eco_root / "tools" / "codexlike-1.0.0"
+            self._downgrade_final_prefix_to_a_real_directory(eco_root, final_prefix)
+            self.assertTrue(final_prefix.is_dir() and not final_prefix.is_symlink())
+            wrapper_dir = final_prefix / "lib" / "node_modules" / "fixture-codex-like"
+            original_content = self._resolved_content(wrapper_dir)
+
+            # Real mv, except: for the migration move specifically (its
+            # DESTINATION is the only "*.migrating.*" path this script ever
+            # names), perform the real move, then SIGTERM the parent script
+            # -- simulating a kill or crash landing exactly between the
+            # migration succeeding and the flip that follows it.
+            sigterm_mv_shim = tmp_path / "sigterm-mv-shim"
+            sigterm_mv_shim.mkdir()
+            (sigterm_mv_shim / "mv").write_text(
+                "#!/bin/sh\n"
+                'dest=""\n'
+                'for arg in "$@"; do dest="$arg"; done\n'
+                'case "$dest" in\n'
+                "  *.migrating.*)\n"
+                '    /bin/mv "$@" || exit $?\n'
+                '    kill -TERM "$PPID"\n'
+                # Stay alive briefly after sending the signal: the parent
+                # bash is blocked in wait() for THIS process, and a signal
+                # delivered while it is still blocked there reliably
+                # interrupts that wait immediately; if this shim exited
+                # instantly instead, bash's wait() could already be
+                # returning (child exited normally) around the same moment
+                # the kernel is still only queuing the signal, letting bash
+                # race ahead through the rest of the flip -- successfully --
+                # before ever servicing it, which would make this test flaky
+                # rather than a reliable reproduction of the coordinator's
+                # exact "signal mid-swap" scenario.
+                "    sleep 0.2\n"
+                "    exit 0\n"
+                "    ;;\n"
+                "esac\n"
+                'exec /bin/mv "$@"\n'
+            )
+            (sigterm_mv_shim / "mv").chmod(0o755)
+
+            second, _ = self._run_install_npm(
+                tmp_path, pins_path, "codexlike", "1.0.0", self.codex_like_tarball, self.codex_like_sha256,
+                npm_package="fixture-codex-like",
+                extra_env={"PATH": f"{sigterm_mv_shim}{os.pathsep}{os.environ['PATH']}"})
+            self.assertNotEqual(second.returncode, 0, second.stdout + second.stderr)
+            # The trap restored the real directory: it exists again, is
+            # still a real directory (not a dangling migrating name, not
+            # absent), and its content is exactly what it was before.
+            self.assertTrue(final_prefix.is_dir(), "final_prefix must not be left absent after SIGTERM")
+            self.assertFalse(final_prefix.is_symlink(), "the restored copy is the original real directory")
+            self.assertEqual(self._resolved_content(wrapper_dir), original_content)
+            leftover_migrating = [p.name for p in (eco_root / "tools").iterdir() if ".migrating." in p.name]
+            self.assertEqual(leftover_migrating, [], leftover_migrating)
+
+    @unittest.skipUnless(NPM, "native npm unavailable")
+    def test_a_failed_migration_rollback_keeps_the_previous_copy_and_reports_the_manual_command(self):
+        # Codex round-3d Medium 1, failure injection: the flip itself fails
+        # (as in the first test above) while a one-time migration is also in
+        # progress, AND the trap's own rollback mv also fails. Nothing may
+        # be silently lost: the previous, real directory must survive on
+        # disk under its "*.migrating.*" name, and the exact manual `mv`
+        # command to restore it must be reported.
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            pins_path = self._codex_like_pins(tmp_path)
+            first, eco_root = self._run_install_npm(
+                tmp_path, pins_path, "codexlike", "1.0.0", self.codex_like_tarball, self.codex_like_sha256,
+                npm_package="fixture-codex-like")
+            self.assertEqual(first.returncode, 0, first.stdout + first.stderr)
+            final_prefix = eco_root / "tools" / "codexlike-1.0.0"
+            self._downgrade_final_prefix_to_a_real_directory(eco_root, final_prefix)
+            wrapper_dir = final_prefix / "lib" / "node_modules" / "fixture-codex-like"
+            original_content = self._resolved_content(wrapper_dir)
+
+            real_python3 = shutil.which("python3")
+            self.assertIsNotNone(real_python3)
+            broken_shim = tmp_path / "broken-shim"
+            broken_shim.mkdir()
+            # The flip's own os.replace always fails...
+            (broken_shim / "python3").write_text(
+                "#!/bin/sh\n"
+                'for arg in "$@"; do\n'
+                '  case "$arg" in\n'
+                "    *os.replace*)\n"
+                "      echo 'python3: injected os.replace failure for testing' >&2\n"
+                "      exit 1\n"
+                "      ;;\n"
+                "  esac\n"
+                "done\n"
+                f'exec {real_python3} "$@"\n'
+            )
+            (broken_shim / "python3").chmod(0o755)
+            # ...and so does the trap's own rollback mv (recognized by its
+            # SOURCE, the only "*.migrating.*" path this script ever moves
+            # FROM).
+            (broken_shim / "mv").write_text(
+                "#!/bin/sh\n"
+                'case "$2" in\n'
+                "  *.migrating.*)\n"
+                "    echo 'mv: injected rollback failure for testing' >&2\n"
+                "    exit 1\n"
+                "    ;;\n"
+                "esac\n"
+                'exec /bin/mv "$@"\n'
+            )
+            (broken_shim / "mv").chmod(0o755)
+
+            second, _ = self._run_install_npm(
+                tmp_path, pins_path, "codexlike", "1.0.0", self.codex_like_tarball, self.codex_like_sha256,
+                npm_package="fixture-codex-like",
+                extra_env={"PATH": f"{broken_shim}{os.pathsep}{os.environ['PATH']}"})
+            self.assertNotEqual(second.returncode, 0, second.stdout + second.stderr)
+            self.assertIn("Restore it manually with: mv --", second.stderr)
+            migrating = [p for p in (eco_root / "tools").iterdir() if ".migrating." in p.name]
+            self.assertEqual(len(migrating), 1, migrating)
+            # The previous copy survives, fully intact, under its migrating
+            # name -- nothing was lost, only left exactly where the printed
+            # command says to find it.
+            migrated_wrapper = migrating[0] / "lib" / "node_modules" / "fixture-codex-like"
+            self.assertEqual(self._resolved_content(migrated_wrapper), original_content)
+            self.assertIn(migrating[0].name, second.stderr)
 
     def test_install_npm_passes_ignore_scripts_only_when_the_pin_sets_it(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -1388,7 +1567,10 @@ class PlatformDependencyInstallTests(unittest.TestCase):
                     harness.write_text(
                         "set -Eeuo pipefail\n"
                         + _shell_functions(SCRIPT_PATH.read_text(), "canonical_path", "npm_package_name",
-                                           "install_platform_dependency", "install_npm")
+                                           "install_platform_dependency", "install_npm", "cleanup")
+                        + 'pending_migration_prefix=""\n'
+                        + 'pending_migration_dest=""\n'
+                        + "trap cleanup EXIT\n"
                         + "fetch() { :; }\n"
                         + f'pins_path={json.dumps(str(pins_path))}\n'
                         + f'ecosystem_root={json.dumps(str(eco_root))}\n'

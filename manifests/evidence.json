@@ -3123,8 +3123,8 @@
     },
     {
       "path": "adoption/bootstrap-macos.sh",
-      "sha256": "ebe8e3cabacb26003d1944b88e6b3353dacefcfe2398ad6893170afc4675c9ba",
-      "bytes": 40412
+      "sha256": "90cc483e9b23ad0825768691cd79e7f530d955c3734ee30e624269020bc524c7",
+      "bytes": 45810
     },
     {
       "path": "adoption/bootstrap.md",
@@ -3168,8 +3168,8 @@
     },
     {
       "path": "adoption/launchd/launchd-agents.sh",
-      "sha256": "eee3d466f6e58f781cb8fedcd57a101e84968005bfa316f9d7b159cec9278725",
-      "bytes": 22098
+      "sha256": "4f27fdf744370ce7d121d5355b299c783e9996d52ad92501e3ea6d6ebb24ecc2",
+      "bytes": 29016
     },
     {
       "path": "adoption/lifecycle.md",
@@ -14084,8 +14084,8 @@
     },
     {
       "path": "tests/test_adoption_bootstrap_macos.py",
-      "sha256": "c3d0dfcc50dee27dc7b4e9e96d28f13783bdefb2ee6f3b8d0059e6beecbf4df1",
-      "bytes": 90364
+      "sha256": "8d36ebbc741e44c8e793187dbf76cc6cccf50d9d0c91426b4973524bed3c9c8e",
+      "bytes": 100784
     },
     {
       "path": "tests/test_adoption_contract.py",
@@ -14099,8 +14099,8 @@
     },
     {
       "path": "tests/test_adoption_launchd.py",
-      "sha256": "a3663256485d1edb3cf85a73771a86d4411341be824430fd81e9b4f7b1918579",
-      "bytes": 61829
+      "sha256": "c3268134502e9009f501470779393d0074a59fd6a8d131644e394a7013f4f400",
+      "bytes": 69993
     },
     {
       "path": "tests/test_adoption_status.py",

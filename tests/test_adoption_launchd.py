@@ -265,14 +265,27 @@ class LaunchdAgentsScriptStructureTests(unittest.TestCase):
         self.assertIn("is_enabled_label", self.text)
         self.assertIn("was not enabled by this script", self.text)
 
-    def test_install_backup_is_written_under_state_dir_not_launch_agents(self):
-        # N1, structural: proves the backup's location by inspecting the
-        # assignment itself (test_backup_files_live_under_state_dir_never_
-        # under_launch_agents, in the behavior test class, only proves no
-        # backup is left behind after a successful run, which the OLD,
-        # wrong-location code also satisfied via its own cleanup).
-        self.assertIn('backup_plist="$state_dir/backups/$label.plist.backup.$$"', self.text)
+    def test_install_backup_lives_beside_dest_plist_for_an_atomic_restore(self):
+        # N1, structural (round 3d correction): the backup must be in the
+        # SAME DIRECTORY as dest_plist, not this script's own state_dir --
+        # `mv` across a filesystem boundary silently falls back to a non-
+        # atomic copy-then-unlink, and ECO_INSTALL_ROOT (state_dir's parent)
+        # may legitimately be a different mounted volume than $HOME. Its
+        # name never ends in ".plist" (never auto-loaded by launchd), and
+        # the trap restores it by rename, never by `cp`.
+        self.assertIn('backup_plist="$dest_plist.backup.$$"', self.text)
         self.assertIn("trap cleanup_install_state EXIT", self.text)
+        self.assertIn('mv -f -- "$pending_backup_plist" "$pending_backup_dest"', self.text)
+        self.assertNotIn('cp -- "$pending_backup_plist"', self.text)
+
+    def test_install_records_whether_a_reload_is_owed_and_the_trap_attempts_it(self):
+        # round 3d, structural: was_loaded must be recorded (right after a
+        # successful bootout, not merely "was loaded") so that restoring the
+        # backup from any exit path -- not just the explicit bootstrap-
+        # failure branch -- also reloads the service, never just its file.
+        self.assertIn("pending_backup_reload_needed=1", self.text)
+        self.assertIn('if [[ "$pending_backup_reload_needed" == 1 ]]; then', self.text)
+        self.assertIn('launchctl bootstrap "gui/$(id -u)" "$pending_backup_dest"', self.text)
 
     def test_install_gates_its_pre_reinstall_load_check_on_ownership(self):
         # L2, structural: the print/bootout probe before a reinstall must be
@@ -900,14 +913,15 @@ class LaunchdAgentsScriptBehaviorTests(unittest.TestCase):
             invocations = log.read_text()
             self.assertNotIn("bootout", invocations)
 
-    def test_backup_files_live_under_state_dir_never_under_launch_agents(self):
-        # N1 (Codex round-3 verification): the temporary backup made before
-        # overwriting an owned, already-existing destination plist must
-        # never sit inside ~/Library/LaunchAgents (macOS auto-loads *.plist
-        # there at login; a stray file zone there is a real hazard). It
-        # belongs under this script's own state_dir and is removed on every
-        # exit path -- restore or success -- so a completed run never
-        # leaves one behind, in either location.
+    def test_backup_files_never_survive_a_completed_install(self):
+        # N1: the temporary backup made before overwriting an owned,
+        # already-existing destination plist -- deliberately in the SAME
+        # directory as dest_plist since round 3d (see backup_plist's own
+        # comment for why: an atomic restore needs the same filesystem, and
+        # this script's own state_dir may be a different mounted volume) --
+        # must never survive a completed run. Its name never ends in
+        # ".plist" (macOS auto-loads *.plist at login, but not this), and it
+        # is removed on every exit path, restore or success.
         with tempfile.TemporaryDirectory() as tmp:
             tmp_path = Path(tmp)
             eco_root = tmp_path / "eco"
@@ -932,10 +946,6 @@ class LaunchdAgentsScriptBehaviorTests(unittest.TestCase):
             self.assertEqual(reinstall.returncode, 0, reinstall.stdout + reinstall.stderr)
             leftover = [p.name for p in launch_agents_dir.iterdir() if "backup" in p.name]
             self.assertEqual(leftover, [], leftover)
-            state_backups = eco_root / "state" / "launchd" / "backups"
-            if state_backups.exists():
-                self.assertEqual(list(state_backups.iterdir()), [],
-                                  "a completed run must not leave a backup file behind")
 
     def test_a_failed_copy_into_the_destination_never_truncates_it_and_the_backup_is_restored(self):
         # Codex round-3c Medium, differential injection against 35980b3 vs
@@ -1024,11 +1034,150 @@ class LaunchdAgentsScriptBehaviorTests(unittest.TestCase):
             # No stray "*.new.*" temp file, and no leftover backup, either.
             leftover_tmp = [p.name for p in launch_agents_dir.iterdir() if ".new." in p.name]
             self.assertEqual(leftover_tmp, [], leftover_tmp)
-            state_backups = eco_root / "state" / "launchd" / "backups"
-            if state_backups.exists():
-                self.assertEqual(list(state_backups.iterdir()), [], "a successful reinstall must not leave a backup behind")
+            leftover_backup = [p.name for p in launch_agents_dir.iterdir() if "backup" in p.name]
+            self.assertEqual(leftover_backup, [], leftover_backup)
             state_file = eco_root / "state" / "launchd" / "enabled-labels.txt"
             self.assertIn("com.native-stack.qdrant", state_file.read_text().split())
+
+    def test_sigterm_between_the_rename_into_place_and_reload_restores_and_reloads(self):
+        # round 3d, Codex finding 3, SIGTERM injection (coordinator's
+        # required method: kill -TERM from a shim at the chosen step): "an
+        # error or SIGTERM after the rename... but before reload restores
+        # the plist but leaves the service unloaded." A signal landing
+        # exactly there must be caught by the trap, which restores
+        # dest_plist from its backup AND reloads it (was_loaded /
+        # pending_backup_reload_needed), never just the file.
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            eco_root = tmp_path / "eco"
+            fake_home = tmp_path / "home"
+            fake_home.mkdir()
+            log = tmp_path / "launchctl.log"
+            log.touch()
+            working_shim = self._launchctl_shim(tmp_path, log)
+            env = {
+                **os.environ,
+                "PATH": f"{working_shim}{os.pathsep}{os.environ['PATH']}",
+                "ECO_INSTALL_ROOT": str(eco_root),
+                "HOME": str(fake_home),
+            }
+            self.assertEqual(self._run(["render"], env=env).returncode, 0)
+            first_install = self._run(["install", "--label", "com.native-stack.qdrant"], env=env)
+            self.assertEqual(first_install.returncode, 0, first_install.stdout + first_install.stderr)
+            launch_agents_dir = fake_home / "Library" / "LaunchAgents"
+            dest_plist = launch_agents_dir / "com.native-stack.qdrant.plist"
+            original_content = dest_plist.read_bytes()
+
+            # Real mv, except: for the rename-into-place specifically
+            # (recognized by its SOURCE, the only "*.new.*" path this
+            # script ever moves FROM -- never confused with the trap's own
+            # restore, whose source is "*.backup.*"), perform the real
+            # move, then SIGTERM the parent script.
+            sigterm_mv_shim = tmp_path / "sigterm-mv-shim"
+            sigterm_mv_shim.mkdir()
+            (sigterm_mv_shim / "mv").write_text(
+                "#!/bin/sh\n"
+                'src=""\n'
+                'for arg in "$@"; do\n'
+                '  case "$arg" in -f|--) continue ;; esac\n'
+                '  if [ -z "$src" ]; then src="$arg"; fi\n'
+                "done\n"
+                'case "$src" in\n'
+                "  *.new.*)\n"
+                '    /bin/mv "$@" || exit $?\n'
+                '    kill -TERM "$PPID"\n'
+                "    sleep 0.3\n"
+                "    exit 0\n"
+                "    ;;\n"
+                "esac\n"
+                'exec /bin/mv "$@"\n'
+            )
+            (sigterm_mv_shim / "mv").chmod(0o755)
+            reinstall_env = {**env, "PATH": f"{sigterm_mv_shim}{os.pathsep}{env['PATH']}"}
+            reinstall = self._run(["install", "--label", "com.native-stack.qdrant"], env=reinstall_env)
+            self.assertNotEqual(reinstall.returncode, 0, reinstall.stdout + reinstall.stderr)
+            self.assertTrue(dest_plist.is_file())
+            self.assertEqual(dest_plist.read_bytes(), original_content)
+            self.assertIn("reloaded", reinstall.stderr)
+            invocations = log.read_text()
+            # bootstrap TWICE (the original first install, plus the trap's
+            # own reload after restoring) -- proving the reload actually
+            # ran, not merely that the file was put back.
+            self.assertEqual(invocations.count("launchctl bootstrap"), 2, invocations)
+            self.assertGreaterEqual(invocations.count("launchctl bootout"), 1, invocations)
+            leftover_backup = [p.name for p in launch_agents_dir.iterdir() if "backup" in p.name]
+            self.assertEqual(leftover_backup, [], leftover_backup)
+
+    def test_a_failed_rollback_keeps_the_backup_and_reports_the_manual_command(self):
+        # round 3d, Codex finding: "a failed rollback mv... reaches the same
+        # fallback" -- if the trap's OWN restore mv also fails, the backup
+        # must never be silently deleted. It must survive on disk, with the
+        # exact manual `mv` command reported, exit nonzero.
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            eco_root = tmp_path / "eco"
+            fake_home = tmp_path / "home"
+            fake_home.mkdir()
+            log = tmp_path / "launchctl.log"
+            log.touch()
+            working_shim = self._launchctl_shim(tmp_path, log)
+            env = {
+                **os.environ,
+                "PATH": f"{working_shim}{os.pathsep}{os.environ['PATH']}",
+                "ECO_INSTALL_ROOT": str(eco_root),
+                "HOME": str(fake_home),
+            }
+            self.assertEqual(self._run(["render"], env=env).returncode, 0)
+            first_install = self._run(["install", "--label", "com.native-stack.qdrant"], env=env)
+            self.assertEqual(first_install.returncode, 0, first_install.stdout + first_install.stderr)
+            launch_agents_dir = fake_home / "Library" / "LaunchAgents"
+            dest_plist = launch_agents_dir / "com.native-stack.qdrant.plist"
+            original_content = dest_plist.read_bytes()
+
+            broken_shim = tmp_path / "broken-shim"
+            broken_shim.mkdir()
+            # print/bootout behave like the stateful shim (so the reinstall
+            # legitimately reaches bootstrap); bootstrap always fails, so
+            # the trap's own restore path is reached.
+            (broken_shim / "launchctl").write_text(
+                "#!/bin/sh\n"
+                f'printf "%s\\n" "launchctl $*" >> {str(log)!r}\n'
+                'case "$1" in\n'
+                '  print) [ -f "' + str(working_shim) + '/com.native-stack.qdrant.loaded.marker" ] '
+                '&& exit 0 || exit 113 ;;\n'
+                '  bootout) rm -f "' + str(working_shim) + '/com.native-stack.qdrant.loaded.marker"; exit 0 ;;\n'
+                "  bootstrap) exit 1 ;;\n"
+                "  *) exit 0 ;;\n"
+                "esac\n"
+            )
+            (broken_shim / "launchctl").chmod(0o755)
+            # ...and the trap's own restore mv fails too (recognized by its
+            # SOURCE, the only "*.backup.*" path this script ever moves
+            # FROM).
+            (broken_shim / "mv").write_text(
+                "#!/bin/sh\n"
+                'src=""\n'
+                'for arg in "$@"; do\n'
+                '  case "$arg" in -f|--) continue ;; esac\n'
+                '  if [ -z "$src" ]; then src="$arg"; fi\n'
+                "done\n"
+                'case "$src" in\n'
+                "  *.backup.*)\n"
+                "    echo 'mv: injected rollback failure for testing' >&2\n"
+                "    exit 1\n"
+                "    ;;\n"
+                "esac\n"
+                'exec /bin/mv "$@"\n'
+            )
+            (broken_shim / "mv").chmod(0o755)
+            reinstall_env = {**env, "PATH": f"{broken_shim}{os.pathsep}{env['PATH']}"}
+            reinstall = self._run(["install", "--label", "com.native-stack.qdrant"], env=reinstall_env)
+            self.assertNotEqual(reinstall.returncode, 0, reinstall.stdout + reinstall.stderr)
+            self.assertIn("Restore it manually with: mv -f --", reinstall.stderr)
+            backups = [p for p in launch_agents_dir.iterdir() if "backup" in p.name]
+            self.assertEqual(len(backups), 1, backups)
+            self.assertEqual(backups[0].read_bytes(), original_content)
+            self.assertIn(backups[0].name, reinstall.stderr)
 
     def test_remove_on_an_unloaded_owned_label_cleans_up_without_calling_bootout(self):
         # Low finding: bootout always fails on a label that is owned but not

@@ -253,7 +253,25 @@ lock_dir="$ecosystem_root/bootstrap.lock.d"
 # cleanup can never remove a lock another bootstrap is holding.
 lock_held=0
 stage_dir=""
+# install_npm's one-time real-directory-to-symlink migration (round 3d) is
+# the one step of its atomic flip that is not itself a single rename: moving
+# the old final_prefix aside happens before the new symlink is flipped into
+# its place, so a failure or a signal in between needs its own recovery,
+# tracked here (a stray tmp_link, install_npm's OTHER transient file for
+# that same flip, needs no separate tracking: it always lives under
+# stage_dir, which this same cleanup() already removes wholesale below).
+pending_migration_prefix=""
+pending_migration_dest=""
 cleanup() {
+  if [[ -n "$pending_migration_prefix" && -e "$pending_migration_prefix" && -n "$pending_migration_dest" ]]; then
+    if [[ ! -e "$pending_migration_dest" ]]; then
+      mv -- "$pending_migration_prefix" "$pending_migration_dest" 2>/dev/null && pending_migration_prefix=""
+    fi
+    if [[ -n "$pending_migration_prefix" ]]; then
+      printf 'WARNING: an unexpected exit left a previous install moved aside at %s; its usual location %s was not restored automatically. Restore it manually with: mv -- %q %q\n' \
+        "$pending_migration_prefix" "$pending_migration_dest" "$pending_migration_prefix" "$pending_migration_dest" >&2
+    fi
+  fi
   if [[ -n "${stage_dir:-}" && "$stage_dir" == "$ecosystem_root"/staging.* && -d "$stage_dir" ]]; then
     rm -rf -- "$stage_dir"
   fi
@@ -669,8 +687,16 @@ install_npm() {
   command -v npm >/dev/null || { printf 'npm is required to install %s; install node first.\n' "$id" >&2; exit 1; }
   local archive="$cache_dir/${id}-${version}.tgz"
   fetch "$url" "$sha256" "$archive"
+  # final_prefix is deliberately NEVER canonicalized (round 3d fix): once a
+  # platform_dependency install has run once, it is a SYMLINK (see below),
+  # and canonical_path would resolve straight through it to whatever
+  # versioned directory it currently targets -- silently defeating the
+  # entire point of it being a stable, never-resolved name. ecosystem_root
+  # is already canonical by the time the top-level script reaches here (see
+  # its own canonicalization above); the one path that still genuinely
+  # needs canonical_path for install_platform_dependency's sake is the
+  # versioned prefix itself, canonicalized separately below.
   local final_prefix="$ecosystem_root/tools/$id-$version"
-  final_prefix="$(canonical_path "$final_prefix")"
   local package
   package="$(npm_package_name "$url")"
   local has_platform_dependency=0
@@ -680,19 +706,26 @@ install_npm() {
 
   local prefix="$final_prefix"
   if [[ "$has_platform_dependency" == 1 ]]; then
-    # Staged, not installed directly into a live prefix: a re-run into an
-    # already-populated final_prefix would otherwise leave a window where
-    # the wrapper's newly-updated files point at whatever platform
-    # dependency npm's own install just auto-fetched, unverified, before
-    # install_platform_dependency's fix-up below replaces it. The swap below
-    # is recoverable, not atomic (round 3c correction: an earlier version of
-    # this comment overclaimed atomicity) -- see its own comment for exactly
-    # what is and is not guaranteed if the final `mv` itself fails; bin_dir's
-    # existing symlinks (from a prior install of this same id/version, if
-    # any) keep resolving to a real, fully verified prefix throughout every
-    # outcome the swap can have.
-    prefix="$stage_dir/${id}-${version}-staged"
-    rm -rf -- "$prefix"
+    # Round 3d (Codex): rounds 3b/3c's rename-aside-then-move-in swap was
+    # only ever RECOVERABLE, not atomic, and the recovery itself had two
+    # more bugs -- an unchecked rollback `mv` that could itself fail
+    # silently, and no coverage at all for a signal landing between the
+    # rename and reporting success. This replaces it with the Homebrew
+    # Cellar/opt pattern: final_prefix becomes a SYMLINK to a versioned,
+    # never-reused directory (tools/<id>-<version>-<stamp>), installed here
+    # BEFORE it is ever live. bin_dir's own symlinks point into
+    # final_prefix/bin/* (unchanged below) and so transparently follow
+    # final_prefix through this extra indirection -- they never need to be
+    # re-created when a later install flips final_prefix to a new target.
+    # Flipping final_prefix is then a SINGLE rename(2) of one symlink over
+    # another (via python3's os.replace, guaranteed available -- see
+    # canonical_path's own comment -- and, unlike `ln -sfn`, a genuine
+    # single-syscall rename rather than an unlink-then-symlink pair), so at
+    # every instant final_prefix resolves to the complete old tree or the
+    # complete new one, never neither.
+    local stamp
+    stamp="$(date -u +%Y%m%d%H%M%S)-$$"
+    prefix="$final_prefix-$stamp"
   fi
   mkdir -p "$prefix"
   prefix="$(canonical_path "$prefix")"
@@ -707,42 +740,77 @@ install_npm() {
   npm install "${npm_install_args[@]}" "$archive" >/dev/null
   if [[ "$has_platform_dependency" == 1 ]]; then
     install_platform_dependency "$id" "$prefix" "$ignore_scripts"
-    # Rename the old prefix aside, move the staged one in, then delete the
-    # old one -- NOT `rm -rf "$final_prefix"` followed by `mv`, which (round
-    # 3b; found by Codex's own failure injection) left a real window where
-    # final_prefix did not exist at all if this process died between the two:
-    # every bin_dir symlink into it, and the old, previously fully verified
-    # install, would both be gone with nothing to replace them yet.
-    #
-    # This is RECOVERABLE, not atomic (round 3c: Codex's own failure
-    # injection on round 3b's version showed the second `mv` itself failing
-    # left final_prefix absent with broken bin_dir symlinks and no rollback
-    # -- the earlier comment's "atomic" framing was wrong). A genuinely
-    # atomic swap would need a versioned directory plus a single symlink
-    # flip (bin_dir symlinking to a stable "current" link rather than
-    # directly into tools/<id>-<version>), a larger restructuring this fix
-    # does not make. What this DOES guarantee: if the second `mv` below
-    # fails (disk full, a permission error, ...), the previous, fully
-    # verified install is moved straight back into final_prefix before this
-    # function returns, so final_prefix -- and every bin_dir symlink into it
-    # -- is never left missing; only the newly staged prefix (still on disk
-    # under stage_dir, not deleted) is lost in that case, never the
-    # previously working one bin_dir already pointed at.
-    local previous_prefix=""
-    if [[ -e "$final_prefix" ]]; then
-      previous_prefix="${final_prefix}.previous.$$"
-      rm -rf -- "$previous_prefix"
-      mv -- "$final_prefix" "$previous_prefix"
+
+    # --- Atomic-flip recovery step table -----------------------------------
+    # Step                                    | On failure here               | On a signal here              | Recovery action
+    # 1. mkdir versioned dir, npm install,    | final_prefix untouched; the   | same as failure               | none: the new versioned directory is an
+    #    install_platform_dependency (above)  | new versioned directory is    |                                | orphan (never referenced), safe to ignore
+    #                                         | partial or absent             |                                | or prune; nothing live changed
+    # 2. one-time migration: mv a REAL        | pending_migration_prefix set; | same as failure               | top-level cleanup() (trap, script-wide)
+    #    final_prefix aside (only when it     | final_prefix now absent,      |                                | moves pending_migration_prefix back onto
+    #    predates this design and is not      | previous install moved aside  |                                | pending_migration_dest if the destination
+    #    already a symlink)                   | but not yet restored          |                                | is still free; reports the exact manual
+    #                                         |                                |                                | `mv` command otherwise
+    # 3. readlink final_prefix (only when     | read-only; nothing mutated    | same                           | none needed
+    #    already a symlink from an earlier    |                                |                                |
+    #    3d-era install) -> previous_versioned|                                |                                |
+    # 4. ln -s new versioned dir -> tmp_link  | tmp_link absent or partial;   | same                           | harmless: tmp_link lives under stage_dir,
+    #    (a NEW symlink under stage_dir,      | final_prefix untouched        |                                | which the top-level cleanup() trap already
+    #    never yet referenced by final_prefix)|                                |                                | removes wholesale on every exit
+    # 5. os.replace(tmp_link, final_prefix)   | rename(2) either completes or | not interruptible mid-syscall  | on failure, tmp_link is removed and the
+    #    -- THE atomic step                   | does not begin; a failed call | (the kernel either performs    | pending migration (if any) is left for
+    #                                         | never touches final_prefix    | the whole rename or none of    | cleanup() to restore, exactly as step 2;
+    #                                         | at all                         | it)                            | on a genuine first install (final_prefix
+    #                                         |                                |                                | never existed) there is nothing to restore
+    # 6. rm the migration copy / the previous | orphaned directory left on    | same                           | harmless: an orphan is disk space only,
+    #    versioned dir (best effort, only     | disk, referenced by nothing   |                                | never a "which version is live" risk --
+    #    after step 5 already succeeded)      | live                           |                                | final_prefix already names the new tree
+    # -------------------------------------------------------------------------
+    local migration_prefix=""
+    if [[ -e "$final_prefix" && ! -L "$final_prefix" ]]; then
+      migration_prefix="${final_prefix}.migrating.$$"
+      # Set BEFORE the mv, not after: a signal landing exactly between the
+      # mv completing and the next script line would otherwise reach
+      # cleanup() with pending_migration_prefix still empty, unable to find
+      # what it should restore even though the mv itself already succeeded.
+      # Harmless the other way around (signalled before the mv even starts):
+      # cleanup() only acts once pending_migration_prefix actually exists on
+      # disk.
+      pending_migration_prefix="$migration_prefix"
+      pending_migration_dest="$final_prefix"
+      mv -- "$final_prefix" "$migration_prefix"
     fi
-    if ! mv -- "$prefix" "$final_prefix"; then
-      if [[ -n "$previous_prefix" ]]; then
-        mv -- "$previous_prefix" "$final_prefix" || true
+
+    local previous_versioned=""
+    if [[ -L "$final_prefix" ]]; then
+      previous_versioned="$(readlink -- "$final_prefix")"
+      case "$previous_versioned" in
+        /*) : ;;
+        *) previous_versioned="$ecosystem_root/tools/$previous_versioned" ;;
+      esac
+    fi
+
+    local tmp_link="$stage_dir/${id}-${version}-link.$$"
+    rm -f -- "$tmp_link"
+    ln -s -- "$prefix" "$tmp_link"
+    if python3 -c '
+import os, sys
+os.replace(sys.argv[1], sys.argv[2])
+' "$tmp_link" "$final_prefix"; then
+      if [[ -n "$migration_prefix" ]]; then
+        rm -rf -- "$migration_prefix"
+        pending_migration_prefix=""
+        pending_migration_dest=""
       fi
-      printf 'Failed to move the newly installed %s into place at %s; restored the previous install (if any) rather than leaving it absent (fail closed).\n' \
-        "$id" "$final_prefix" >&2
+      if [[ -n "$previous_versioned" && -e "$previous_versioned" ]]; then
+        rm -rf -- "$previous_versioned"
+      fi
+    else
+      rm -f -- "$tmp_link"
+      printf 'Failed to flip %s to the newly installed %s %s (fail closed).\n' \
+        "$final_prefix" "$id" "$version" >&2
       exit 1
     fi
-    [[ -n "$previous_prefix" ]] && rm -rf -- "$previous_prefix"
     prefix="$final_prefix"
   fi
 
