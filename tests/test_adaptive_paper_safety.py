@@ -3,6 +3,7 @@ from dataclasses import replace
 from decimal import Decimal as D
 import hashlib
 import importlib.util
+import json
 from pathlib import Path
 import sqlite3
 import sys
@@ -19,6 +20,19 @@ SPEC.loader.exec_module(s)
 
 
 class SafetyTests(unittest.TestCase):
+    # Literal snapshot of the original schema-1 frozen risk fields. This is
+    # deliberately independent of today's dataclass and migration helper.
+    LEGACY_LIMITS = {
+        "capital_usd": "10000", "max_gross_exposure_usd": "5000",
+        "max_order_notional_usd": "1000", "max_order_qty": "1",
+        "max_gross_loss_usd": "25", "max_drawdown_usd": "25",
+        "max_spread_bps": "15", "max_held_symbols": 10,
+        "max_outstanding_orders": 20, "max_rest_per_minute": 200,
+        "max_submits_per_minute": 180, "quote_max_age_seconds": 3,
+        "trial_seconds": 300, "cleanup_seconds": 120,
+        "min_entry_close_seconds": 300,
+    }
+
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
         self.root = Path(self.tmp.name)
@@ -46,6 +60,86 @@ class SafetyTests(unittest.TestCase):
     def reopen(self, limits=None):
         self.ledger.close()
         self.ledger = s.Ledger(self.db, limits)
+
+    def snapshot_tables(self):
+        return {table: [tuple(row) for row in self.ledger.db.execute(
+            f"SELECT * FROM {table} ORDER BY rowid")]
+            for table in ("meta", "intents", "positions", "marks", "requests", "events", "trials")}
+
+    def test_legacy_limits_upgrade_preserves_history_and_budget_and_is_idempotent(self):
+        self.ledger.begin_next_trial(self.now, "legacy-trial")
+        self.reserve(price="100")
+        self.fill()
+        self.reserve("sell-1", side="sell", price="99", quote=self.quote(bid="99", ask="99.01"))
+        self.fill("sell-1", price="99")
+        self.reserve("buy-2")
+        self.fill("buy-2", qty="0.4", status="partially_filled")
+        for _ in range(200):
+            self.assertEqual(self.ledger.request_budget(self.now, "read"), 0)
+        self.ledger.freeze("stream_gap")
+        self.ledger._set("limits", json.dumps(self.LEGACY_LIMITS, sort_keys=True))
+        before = self.snapshot_tables()
+        accounting = self.ledger.accounting()
+        try:
+            # Equivalent Decimal formatting must not make a default risky.
+            self.reopen(replace(s.RiskLimits(), overnight_gross_multiple=D("1.000")))
+        except s.SafetyError as exc:
+            self.fail(f"unchanged legacy limits refused: {exc}")
+        after = self.snapshot_tables()
+        updated = json.loads(self.ledger._get("limits"))
+        self.assertEqual(updated.pop("max_order_qty_mode"), "fixed")
+        self.assertEqual(D(updated.pop("overnight_gross_multiple")), D("1"))
+        self.assertEqual(updated, self.LEGACY_LIMITS)
+        # Only limits metadata changes; intents, fills, counters, halt, trial
+        # identity and cash/loss/peak history stay byte-for-byte identical.
+        before["meta"] = [(k, v) for k, v in before["meta"] if k != "limits"]
+        comparable = dict(after)
+        comparable["meta"] = [(k, v) for k, v in after["meta"] if k != "limits"]
+        self.assertEqual(comparable, before)
+        self.assertEqual(self.ledger.accounting(), accounting)
+        self.assertEqual(accounting.cumulative_realized_loss_usd, D("1"))
+        self.assertGreater(self.ledger.request_budget(self.now, "read"), 0)
+        self.reopen()
+        self.assertEqual(self.snapshot_tables(), after)
+
+    def test_legacy_limits_upgrade_rejects_changed_or_incomplete_snapshots(self):
+        legacy = self.LEGACY_LIMITS
+        candidates = [
+            {k: v for k, v in legacy.items() if k != "cleanup_seconds"},
+            dict(legacy, unknown="1"), dict(legacy, max_gross_loss_usd="26"),
+            dict(legacy, max_order_qty=True), dict(legacy, trial_seconds=300.0),
+            dict(legacy, max_order_qty_mode="fixed"),
+            dict(legacy, overnight_gross_multiple="1"),
+        ]
+        serialized = [json.dumps(x, sort_keys=True) for x in candidates]
+        serialized += ["[]", "null", "{", json.dumps(legacy, sort_keys=True)[:-1] + ', "capital_usd": "10000"}']
+        for raw in serialized:
+            with self.subTest(snapshot=raw):
+                self.ledger._set("limits", raw)
+                before = self.snapshot_tables()
+                with self.assertRaisesRegex(s.SafetyError, "persisted_risk_limits_differ"):
+                    s.Ledger(self.db)
+                self.assertEqual(self.snapshot_tables(), before)
+
+    def test_legacy_limits_upgrade_refuses_changed_requested_risk(self):
+        self.ledger._set("limits", json.dumps(self.LEGACY_LIMITS, sort_keys=True))
+        for limits in (replace(s.RiskLimits(), max_order_qty_mode="notional"),
+                       replace(s.RiskLimits(), overnight_gross_multiple=D("1.1")),
+                       replace(s.RiskLimits(), max_gross_loss_usd=D("24")),
+                       replace(s.RiskLimits(), max_gross_exposure_usd=D("6000"))):
+            with self.subTest(limits=limits):
+                before = self.snapshot_tables()
+                with self.assertRaisesRegex(s.SafetyError, "persisted_risk_limits_differ"):
+                    s.Ledger(self.db, limits)
+                self.assertEqual(self.snapshot_tables(), before)
+
+    def test_legacy_limits_upgrade_rolls_back_if_schema_is_unsupported(self):
+        self.ledger._set("limits", json.dumps(self.LEGACY_LIMITS, sort_keys=True))
+        self.ledger._set("schema_version", "2")
+        before = self.snapshot_tables()
+        with self.assertRaisesRegex(s.SafetyError, "unsupported_ledger_schema"):
+            s.Ledger(self.db)
+        self.assertEqual(self.snapshot_tables(), before)
 
     def test_intent_and_frozen_limits_survive_restart(self):
         created = self.reserve()

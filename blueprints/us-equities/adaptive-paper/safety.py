@@ -355,7 +355,8 @@ class Ledger:
             frozen = json.dumps(asdict(self.limits), default=str, sort_keys=True)
             with self._transaction():
                 previous = self._get("limits")
-                if previous is not None and previous != frozen:
+                if (previous is not None and previous != frozen
+                        and not self._matches_legacy_limits(previous)):
                     raise SafetyError("persisted_risk_limits_differ")
                 self._set("limits", frozen)
                 version = self._get("schema_version")
@@ -373,6 +374,30 @@ class Ledger:
         except BaseException:
             self.db.close()
             raise
+
+    def _matches_legacy_limits(self, previous):
+        """Recognize only the original complete, canonical schema-1 limits.
+
+        The two new fields preserve original behavior only at fixed sizing
+        and 1x overnight gross. Exact comparison of the old JSON preserves
+        every prior value and type and rejects missing, unknown or duplicate
+        keys. The caller updates just limits in its existing FULL transaction;
+        no trial, request, fill, cash, loss, halt or exposure history is reset.
+        """
+        fields = {
+            "capital_usd", "max_gross_exposure_usd", "max_order_notional_usd",
+            "max_order_qty", "max_gross_loss_usd", "max_drawdown_usd",
+            "max_spread_bps", "max_held_symbols", "max_outstanding_orders",
+            "max_rest_per_minute", "max_submits_per_minute",
+            "quote_max_age_seconds", "trial_seconds", "cleanup_seconds",
+            "min_entry_close_seconds",
+        }
+        values = asdict(self.limits)
+        if (set(values) != fields | {"max_order_qty_mode", "overnight_gross_multiple"}
+                or values.pop("max_order_qty_mode") != "fixed"
+                or values.pop("overnight_gross_multiple") != D("1")):
+            return False
+        return previous == json.dumps(values, default=str, sort_keys=True)
 
     @contextmanager
     def _transaction(self, *, keep_observations_on_refusal=False):
