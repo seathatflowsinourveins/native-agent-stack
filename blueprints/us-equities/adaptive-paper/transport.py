@@ -479,7 +479,8 @@ class AlpacaPaperTransport:
         self._quote_quarantined = {}
         self._quarantine_handler = None
         self._quarantine_validator = None
-        self._quarantine_counts = {"invalidated": 0, "released": 0, "older_ignored": 0, "exposure_escalations": 0}
+        self._quarantine_counts = {"invalidated": 0, "released": 0, "older_ignored": 0, "exposure_escalations": 0,
+                                   "crossed_invalidations": 0, "timestamp_conflict_invalidations": 0}
         self._pending_stream = {}
         self._stream_seen = set()
         self._intents = {}
@@ -626,7 +627,7 @@ class AlpacaPaperTransport:
         self._quarantine_handler = handler
         self._quarantine_validator = validate
 
-    def _invalidate_quote(self, symbol, ts_ns):
+    def _invalidate_quote(self, symbol, ts_ns, *, reason):
         # No await between transport tombstone and consumer invalidation. REST
         # workers see the tombstone immediately; no lock spans the callback.
         with self._state_lock:
@@ -634,6 +635,9 @@ class AlpacaPaperTransport:
             self._quote_versions[symbol] = self._quote_versions.get(symbol, 0) + 1
             self._quote_values.pop(symbol, None)
             self._quote_seen.pop(symbol, None)
+            # Reason counters count applied invalidation events. `invalidated`
+            # counts episodes, whose original deadline is never reset here.
+            self._quarantine_counts[reason + "_invalidations"] += 1
             if symbol not in self._quote_quarantined:
                 self._quote_quarantined[symbol] = time.monotonic()
                 self._quarantine_counts["invalidated"] += 1
@@ -664,23 +668,27 @@ class AlpacaPaperTransport:
         if symbol in self._quote_quarantined and quote["halted"]:
             raise TransportError("halted quote cannot requalify execution")
         previous_ns = self._quote_watermarks.get(symbol, 0)
+        if ts_ns == previous_ns and self._quarantine_handler is not None and not crossed:
+            # An equal-time conflict is recoverable only if every other native
+            # constraint is valid. Check even tombstoned/duplicate candidates:
+            # invalid capacity, fractional sizes, and halts remain fatal.
+            if quote["halted"]:
+                raise TransportError("halted quote cannot qualify as a timestamp conflict")
+            self._quarantine_validator(quote)
         if ts_ns < previous_ns:
             self._quarantine_counts["older_ignored"] += 1
             return None
         if crossed:
-            self._invalidate_quote(symbol, ts_ns)
+            self._invalidate_quote(symbol, ts_ns, reason="crossed")
             return None
         # Recovery does not opt into quarantine: retain its base behavior for
         # valid equal-time updates (e.g. changed displayed size). Opt-in native
-        # consumers keep the conservative conflict stop and strict tombstone.
+        # consumers tombstone the conflict; only strictly newer quotes release.
         if ts_ns == previous_ns and self._quarantine_handler is not None:
             if symbol in self._quote_quarantined or quote == self._quote_values.get(symbol):
                 return None
-            # Equal-time executable disagreements are an integrity failure,
-            # not a new recoverable quote category.
-            self._invalidate_quote(symbol, ts_ns)
-            self.freeze_health("quote_timestamp_conflict")
-            raise TransportError("equal timestamp quote conflict")
+            self._invalidate_quote(symbol, ts_ns, reason="timestamp_conflict")
+            return None
         with self._state_lock:
             if symbol in self._quote_quarantined:
                 # A late valid quote cannot erase an already expired gap.

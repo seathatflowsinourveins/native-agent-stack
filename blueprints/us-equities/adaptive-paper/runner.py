@@ -782,7 +782,7 @@ def _decision_transport_health(port):
     quarantine = health.get("quote_quarantine")
     if isinstance(quarantine, dict):
         result["quote_quarantine"] = {k: v for k, v in quarantine.items()
-            if k in {"invalidated", "released", "older_ignored", "exposure_escalations"} and type(v) is int and v >= 0}
+            if k in {"invalidated", "released", "older_ignored", "exposure_escalations", "crossed_invalidations", "timestamp_conflict_invalidations"} and type(v) is int and v >= 0}
         result["quote_quarantine"]["active"] = [s for s in quarantine.get("active", [])
             if isinstance(s, str) and s in getattr(port, "symbols", ())]
     for key in ("authenticated", "subscriptions"):

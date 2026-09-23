@@ -205,6 +205,12 @@ class Quarantine(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(self.ledger.intents()[0].status, "not_sent")
 
     async def test_crossing_after_http_started_retains_ambiguous_reservation(self):
+        await self.assert_http_started_retains_ambiguous_reservation(raw(self.ns + 1, bp="101"))
+
+    async def test_equal_timestamp_conflict_after_http_started_retains_ambiguous_reservation(self):
+        await self.assert_http_started_retains_ambiguous_reservation(raw(self.ns, bs="101"))
+
+    async def assert_http_started_retains_ambiguous_reservation(self, invalidation):
         wired, release = threading.Event(), threading.Event()
         def request(*args, **kwargs):
             wired.set()
@@ -223,7 +229,7 @@ class Quarantine(unittest.IsolatedAsyncioTestCase):
                         break
                     await asyncio.sleep(.005)
                 self.assertTrue(wired.is_set())
-                await self.push(raw(self.ns + 1, bp="101"))
+                await self.push(invalidation)
             finally:
                 release.set()
             with self.assertRaises(t.AmbiguousSubmission):
@@ -233,6 +239,7 @@ class Quarantine(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(row.submit_attempted)
         self.assertEqual(len(self.ledger.unresolved()), 1)
         self.assertNotIn("possibly-sent", self.port._not_sent)
+        self.assertIn("quarantined_exposure", self.port.health["reasons"])
 
     async def test_no_recovery_by_existing_quote_deadline_is_sticky(self):
         self.port.quote_timeout = .05
@@ -259,10 +266,146 @@ class Quarantine(unittest.IsolatedAsyncioTestCase):
         self.assertNotIn("AAPL", self.port._quote_values)
         self.assertTrue(self.port.health["frozen"])
 
-    async def test_equal_timestamp_valid_conflict_fails_closed(self):
+    async def test_equal_timestamp_valid_conflict_quarantines_until_strictly_newer(self):
+        history = list(self.policy.history["AAPL"])
         await self.push(raw(self.ns, bp="100.001"))
-        self.assertIn("quote_timestamp_conflict", self.port.health["reasons"])
+        self.assertFalse(self.port.health["frozen"])
+        for cache in (self.port._quote_values, self.controller.quotes, self.session.quotes, self.policy.latest):
+            self.assertNotIn("AAPL", cache)
+        self.assertEqual(list(self.policy.history["AAPL"]), history)
+        await self.push(raw(self.ns))
         self.assertNotIn("AAPL", self.policy.latest)
+        await self.push(raw(self.ns - 1))
+        self.assertNotIn("AAPL", self.policy.latest)
+        await self.push(raw(self.ns + 1))
+        self.assertIn("AAPL", self.policy.latest)
+        self.assertEqual(self.policy.quote_ns["AAPL"], self.ns + 1)
+        self.assertFalse(self.port.health["frozen"])
+        counts = self.port.health["quote_quarantine"]
+        self.assertEqual(counts["timestamp_conflict_invalidations"], 1)
+        self.assertEqual(counts["crossed_invalidations"], 0)
+
+    async def test_equal_timestamp_conflict_without_timely_recovery_expires(self):
+        self.port.quote_timeout = .05
+        ns = time.time_ns()
+        await self.push(raw(ns))
+        await self.push(raw(ns, bs="101"))
+        self.assertFalse(self.port.health["frozen"])
+        watchdog = asyncio.create_task(self.port._watchdog())
+        try:
+            await asyncio.sleep(.08)
+            self.assertIn("quote_quarantine_expired", self.port.health["reasons"])
+            await self.push(raw(time.time_ns()))
+            self.assertTrue(self.port.health["frozen"])
+        finally:
+            watchdog.cancel()
+            await asyncio.gather(watchdog, return_exceptions=True)
+
+    async def test_equal_timestamp_conflict_held_escalates_and_preserves_valuation(self):
+        quote = self.controller.quotes["AAPL"]
+        self.ledger.reserve_intent("held-conflict", "AAPL", "buy", "1", "100.01", quote=quote,
+            now=time.time(), market_open=True, session_close=time.time() + 3600)
+        self.ledger.record_order("held-conflict", "broker-held", "filled", "1", "100.01")
+        self.ledger.mark_to_market([quote], time.time())
+        before = self.ledger.accounting()
+        await self.push(raw(self.ns, bs="101"))
+        self.assertIn("quarantined_exposure", self.port.health["reasons"])
+        self.assertTrue(self.controller.stop)
+        self.assertEqual(self.ledger.accounting().unrealized_pnl_usd, before.unrealized_pnl_usd)
+        self.assertEqual(self.ledger.positions()["AAPL"].qty, Decimal(1))
+        await self.push(raw(self.ns + 1))
+        self.assertTrue(self.port.health["frozen"])
+
+    async def test_equal_timestamp_conflict_native_pending_retains_ownership_and_blocks_queued_tick(self):
+        queued = self.ticks[-1]
+        self.strategy.pending["pending-conflict"] = {"symbol": "AAPL", "side": "buy"}
+        await self.push(raw(self.ns, bs="101"))
+        self.strategy.on_quote(queued)
+        self.assertNotIn("AAPL", self.policy.latest)
+        self.assertIn("pending-conflict", self.strategy.pending)
+        self.assertIn("quarantined_exposure", self.port.health["reasons"])
+        self.assertTrue(self.controller.stop)
+
+    async def test_equal_timestamp_conflict_reserved_refuses_request_without_budget(self):
+        self.controller.before_submit({"client_order_id": "reserved-conflict", "symbol": "AAPL",
+            "side": "buy", "qty": "1", "limit_price": "100.01"})
+        await self.push(raw(self.ns, bs="101"))
+        with self.assertRaisesRegex(SafetyError, "no_current_quote"):
+            await self.controller.before_request("submit", client_id="reserved-conflict")
+        self.assertIn("quarantined_exposure", self.port.health["reasons"])
+        self.assertFalse(self.ledger.intents()[0].submit_attempted)
+        self.assertEqual(len(self.ledger.unresolved()), 1)
+
+    async def test_equal_timestamp_conflict_before_submit_has_no_reservation_or_http(self):
+        await self.push(raw(self.ns, bs="101"))
+        with patch.object(self.port._client._session._session, "request") as wire:
+            with self.assertRaises(NativeOrderRejected):
+                await self.port.submit({"client_order_id": "conflict-blocked", "symbol": "AAPL", "side": "buy",
+                                        "qty": "1", "limit_price": "100.01"})
+        wire.assert_not_called()
+        self.assertEqual(self.ledger.intents(), [])
+
+    async def test_equal_timestamp_conflict_after_budget_before_post_never_wires(self):
+        async def budget(kind, client_id=None):
+            await self.controller.before_request(kind, client_id)
+            if kind == "submit":
+                await self.push(raw(self.ns, bs="101"))
+        self.port.before_request = budget
+        with patch.object(self.port._client._session._session, "request") as wire:
+            with self.assertRaises(t.SubmissionNotSent):
+                await self.port.submit({"client_order_id": "conflict-wire", "symbol": "AAPL", "side": "buy",
+                                        "qty": "1", "limit_price": "100.01"})
+        wire.assert_not_called()
+        self.assertEqual(self.ledger.intents()[0].status, "not_sent")
+        self.assertTrue(self.ledger.intents()[0].submit_attempted)
+        self.assertIn("quarantined_exposure", self.port.health["reasons"])
+
+    async def test_benchmark_equal_conflict_recovery_cannot_revive_authorized_intent(self):
+        async def budget(kind, client_id=None):
+            await self.controller.before_request(kind, client_id)
+            if kind == "submit":
+                await self.push(raw(self.ns, "SPY", bs="101"))
+                self.assertFalse(self.port.ready)
+                self.assertNotIn("SPY", self.policy.latest)
+                await self.push(raw(self.ns + 1, "SPY"))
+                self.assertTrue(self.port.ready)
+        self.port.before_request = budget
+        with patch.object(self.port._client._session._session, "request") as wire:
+            with self.assertRaises(t.SubmissionNotSent):
+                await self.port.submit({"client_order_id": "conflict-generation", "symbol": "AAPL",
+                                        "side": "buy", "qty": "1", "limit_price": "100.01"})
+        wire.assert_not_called()
+        self.assertEqual(self.ledger.intents()[0].status, "not_sent")
+
+    async def test_equal_timestamp_compound_invalidity_remains_fatal_even_after_tombstone(self):
+        for active in (False, True):
+            for changes in ({"bs": "0.5"}, {"bs": "-1"}, {"bp": "100.00000000000000001"},
+                            {"bs": "1000000000000000000"}, {"halted": True}, {"t": None}, {"S": "PRIVATE"}):
+                with self.subTest(active=active, changes=list(changes)):
+                    # Reset this isolated fixture's executable state with a strictly newer valid quote.
+                    self.port._reasons.clear()
+                    self.port._callback_failure = None
+                    self.ns += 10
+                    await self.push(raw(self.ns))
+                    if active:
+                        await self.push(raw(self.ns, bs="101"))
+                        self.port._reasons.clear()
+                    await self.push(raw(self.ns, **changes))
+                    self.assertIn("callback_failure", self.port.health["reasons"])
+
+    async def test_reason_counters_count_invalidation_events_separately_from_episodes(self):
+        await self.push(raw(self.ns, bs="101"))
+        await self.push(raw(self.ns, bp="101"))
+        await self.push(raw(self.ns + 1))
+        await self.push(raw(self.ns + 1))  # exact duplicate is not a conflict
+        counts = self.port.health["quote_quarantine"]
+        self.assertEqual(counts["invalidated"], 1)
+        self.assertEqual(counts["released"], 1)
+        self.assertEqual(counts["crossed_invalidations"], 1)
+        self.assertEqual(counts["timestamp_conflict_invalidations"], 1)
+        diagnostic = runner._decision_transport_health(self.port)
+        self.assertEqual(diagnostic["quote_quarantine"]["crossed_invalidations"], 1)
+        self.assertEqual(diagnostic["quote_quarantine"]["timestamp_conflict_invalidations"], 1)
 
     async def test_no_handler_keeps_recovery_port_fail_closed(self):
         self.port._quarantine_handler = None
