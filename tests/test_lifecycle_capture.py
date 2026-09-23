@@ -5,6 +5,7 @@ from pathlib import Path
 import tempfile
 import unittest
 from unittest.mock import patch
+from urllib.parse import urlparse
 
 ROOT = Path(__file__).resolve().parents[1]
 SPEC = importlib.util.spec_from_file_location("lifecycle_capture", ROOT / "blueprints/us-equities/catalyst-convergence/capture_sources.py")
@@ -100,7 +101,9 @@ class CaptureTests(unittest.TestCase):
         class Routed(Session):
             def get(self, url, **kwargs):
                 self.calls.append((url, kwargs))
-                return Response([b"body"], url=url, status=403 if "sec.gov" in url else 200)
+                host = urlparse(url).hostname or ""
+                is_sec_gov = host == "sec.gov" or host.endswith(".sec.gov")
+                return Response([b"body"], url=url, status=403 if is_sec_gov else 200)
         session = Routed(None)
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
