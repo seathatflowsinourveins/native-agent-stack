@@ -292,7 +292,17 @@ recorder:
 - **`tools/sota-convergence/gap_crosswalk.py`** regenerates the crosswalk
   between open gaps and recorded evidence; rerun it after adding receipts
   that close or narrow a gap so the crosswalk reflects the new evidence
-  rather than going stale.
+  rather than going stale. `gap_crosswalk.py build --check` and
+  `gap_wave_ledger.py --check` run in CI (`validate.yml`), but only prove
+  each checked-in file still reproduces from its own fixed inputs
+  (`gap_crosswalk.py`'s `CURRENT_REV`, a pinned historical commit whose
+  `catalogs/landscape/*.json` `open_gaps` it read; the ledger's checked-in
+  `--wave`/`--owner` receipts). Neither check reads the *current*
+  `catalogs/landscape/*.json` `open_gaps`, so neither one can detect that a
+  layer re-recorded since `CURRENT_REV` has made the crosswalk stale; that
+  drift needs a human or maintainer to notice and rerun `gap_crosswalk.py`
+  (a new `CURRENT_REV` and a fresh TypeSafe/review pass) against the current
+  rows.
 - **The catalog-freshness report** (`docs/github-automation.md`'s
   `catalog-freshness.yml` lane, built on
   `tools/sota-convergence/github_freshness.py`) is a separate, report-only,
