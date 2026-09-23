@@ -4,6 +4,9 @@ on:
   push:
     branches: [main]
   pull_request:
+    # The default three plus edited, which fires when a pull request's base branch changes: a
+    # retargeted PR must be judged again against its new base, not keep an earlier green run.
+    types: [opened, synchronize, reopened, edited]
   workflow_dispatch:
 
 permissions:
@@ -148,6 +151,8 @@ jobs:
         shell: bash
         env:
           EVENT_NAME: ${{ github.event_name }}
+          # The pull request's base branch (GITHUB_BASE_REF): the gate judges only pull requests into main.
+          PR_BASE_REF: ${{ github.base_ref }}
           # Cross-check only: the base is the checked-out merge commit's first parent.
           PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
           # The checked-out HEAD must be the merge commit whose second parent is this PR head.
@@ -158,6 +163,13 @@ jobs:
           set -euo pipefail
           case "$EVENT_NAME" in
             pull_request)
+              # A pull request into another branch is not judged against main, and retargeting it to
+              # main later re-runs this job (the edited type): fail closed rather than pass a base the
+              # gate does not protect.
+              if [ "${PR_BASE_REF:-}" != "main" ]; then
+                echo "::error::verdict-review-gate: the pull request's base branch is '${PR_BASE_REF:-}', not main; the gate judges only pull requests into main (retarget it to main); failing closed"
+                exit 1
+              fi
               # actions/checkout checks out the PR merge commit; its first parent is the base-branch
               # commit the PR is merged into, which is what the gate must compare with. Assert that
               # premise: HEAD has exactly two parents and the second is the payload's PR head, or
@@ -200,13 +212,19 @@ jobs:
           esac
           # The rules come from the base: run the base commit's gate (and the code it imports) against
           # this checkout, so a pull request cannot weaken the gate that judges it. Only the pull
-          # request that adds the gate finds none at its base and runs its own copy.
+          # request that adds the gate (git diff reports it as A against the base) finds none at its
+          # base and runs its own copy; any other base without the gate fails closed.
           gate="scripts/verdict_review_gate.py"
           if git cat-file -e "$base:$gate" 2>/dev/null; then
             git worktree add --quiet --detach "$RUNNER_TEMP/gate-base" "$base"
             gate="$RUNNER_TEMP/gate-base/$gate"
           else
-            echo "verdict-review-gate: the base has no gate yet; running this checkout's copy (bootstrap)"
+            added="$(git diff --no-renames --name-status -z "$base...HEAD" -- "$gate" | tr '\0' '\n')"
+            if [ "$added" != $'A\n'"$gate" ]; then
+              echo "::error::verdict-review-gate: the base $base has no $gate and this change does not add it; failing closed"
+              exit 1
+            fi
+            echo "verdict-review-gate: this change adds the gate; running this checkout's copy (bootstrap)"
           fi
           python3 "$gate" --root "$GITHUB_WORKSPACE" --base "$base" | tee -a "$GITHUB_STEP_SUMMARY"
 

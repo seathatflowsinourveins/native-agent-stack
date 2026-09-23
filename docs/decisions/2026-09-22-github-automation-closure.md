@@ -654,8 +654,8 @@ Hosted and live results after merge. Evidence class: hosted runs and GitHub API 
     `single-lane-authorization: <catalog>/<layer_id>`.
 
   Every changed `platform_status` value must be the one `scripts/platform_status.py` derives.
-  Every base wave entry except the newest must be unchanged. The rows always come from
-  `build_verdicts.LEDGER_FILES`, and the head's landscape manifest must name exactly those files,
+  Every base wave entry except the newest must be unchanged (the newest too once the PR registers
+  a newer wave; review of #135, M1). The rows always come from `build_verdicts.LEDGER_FILES`, and the head's landscape manifest must name exactly those files,
   so a decoy ledger cannot be validated in place of the published one. The job runs the base
   commit's copy of the gate against the PR checkout. A PR that changes verdict rows, waves or
   sealed artifacts together with the gate's trust base (the gate, the modules it imports and
@@ -917,6 +917,39 @@ Hosted and live results after merge. Evidence class: hosted runs and GitHub API 
     base, it also authorizes a later wave's `codex_absent` row for that layer.
     - Proposed fix for the tooling owner: include the run id in the line, as
       `<catalog>/<layer_id>@<run-id>`, and have landscape.py and this gate require it.
+- **Review of #135 (2026-09-23, evidence-reviewer Opus/high; fixes in the same PR).**
+  - *Fixed, high (H1): a retargeted PR reused a stale green gate.* The `pull_request` trigger had
+    no `types`, so a base-branch change (the `edited` event) did not re-run the job, and the job
+    never checked the base branch. A PR from `f` to `t`, where `t` already held a rule-breaking
+    change and `f` only a harmless file, passed; `gh pr edit --base main` then kept that result.
+    The trigger now lists `[opened, synchronize, reopened, edited]`, and the job fails closed on a
+    `pull_request` event whose base branch (`GITHUB_BASE_REF`, passed as `PR_BASE_REF` through the
+    step's `env`, never interpolated into `run:`) is not `main`. Push-to-`main` runs are unchanged.
+    Tests: the trigger lists `edited`; the executed step script fails for `develop`, `main-copy` and
+    an empty base ref and runs the gate for `main`. Not reproduced live on GitHub.
+  - *Fixed, medium (M1): the base's newest wave was rewritable by a PR that registers a newer
+    wave.* Every wave document holds all rows, and once a wave is no longer current
+    `build_verdicts.py --check` checks only its own rows and its registry sha256. When the head
+    registers a wave newer than the base's newest, that newest (non-grandfathered) wave is now
+    frozen: its registry entry, sha256 included, is type-strictly unchanged and its document is
+    byte-identical. Negative controls: a row edited inside the base-newest document with its
+    registry sha256 updated and a newer wave registered fails; a pure reformat of it in that case
+    fails too; registering a newer wave without touching it passes.
+  - *Fixed, low (L4): the bootstrap fallback failed open.* The job runs the head's gate only when
+    the base lacks `scripts/verdict_review_gate.py` and `git diff --no-renames --name-status -z
+    <base>...HEAD` shows it added (`A`); any other base without the gate fails closed. Tests: an
+    adding PR bootstraps, a PR that does not add it fails, a base with the gate runs the base copy.
+  - *Fixed, low (L5): number and boolean values compared equal.* Frozen values (rows, wave
+    documents, the registry, rule-input fields and a winner's binding fields) now compare as their
+    canonical `json.dumps(..., sort_keys=True)` text, so `1`, `1.0` and `true` differ. Test: a frozen
+    wave document rewritten `1` to `1.0`, `true` to `1` or `1` to `true` fails.
+  - *Hardening:* the changed-path listings use `git diff -z` and `git ls-files -z`, split on NUL. Test:
+    a tracked and an untracked path with a space, a newline and a non-ASCII character are listed as
+    themselves.
+  - *Recorded, low (L3): the self-edit residual.* Confirmed: every required check is defined by the
+    head, including the tests that pin the job and the gate, so a PR can edit the job and its pinning
+    test together. It stays the accepted residual below.
+  - Each new negative control was mutation-checked: reverting its fix makes its test fail.
 - **Accepted residual: sealed lane returns are self-attested (fifth review, 2026-09-23).** The
   gate checks consistency, not provenance. A sealed lane return must match the row's
   `sealed_sha256` and be registered in the head's `manifests/evidence.json`, which the PR can
@@ -948,7 +981,14 @@ Hosted and live results after merge. Evidence class: hosted runs and GitHub API 
     modules. A PR that leaves the job running therefore cannot change the rules that judge it.
     Second, the trust-base rule fails a PR that changes gate-trust files (which include
     `validate.yml`) together with verdict data, as long as the job still runs the base's gate. To
-    get past it, a PR has to rewrite the job's own step, a visible edit of a workflow file.
+    get past it, a PR has to rewrite the job's own step, a visible edit of a workflow file. That
+    was not the only path: until the review of #135 (H1, below), retargeting a PR whose gate had
+    passed against another base branch reused that green run with no workflow edit at all. The
+    `edited` trigger type and the job's fail-closed check on a base branch other than `main` close
+    that path. The tests that pin the job's shape and the gate's rules
+    (`tests/test_workflow_hardening.py`, `tests/test_verdict_review_gate.py`) are defined by the
+    head too, so the PR that rewrites the step can rewrite them with it; the cost stays two visible
+    file edits (review of #135, L3).
     Third, the push-to-`main` run re-checks after merge (asserted by
     `tests/test_workflow_hardening.py`). It catches a merge judged against a stale base, but it
     runs the merged commit's job, so it does not catch a PR that disabled that job.

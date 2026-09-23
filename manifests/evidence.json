@@ -3089,8 +3089,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "7e450889acd813d4f68b820710e3724553bff1f2eab98094a933688d7712e0f7",
-      "bytes": 14669
+      "sha256": "2a90095abd795bf38dfa2dc91d01ab1e2e1ebef407a707ca065af86bfe2ba69e",
+      "bytes": 16021
     },
     {
       "path": ".gitignore",
@@ -9130,8 +9130,8 @@
     },
     {
       "path": "docs/decisions/2026-09-22-github-automation-closure.md",
-      "sha256": "6b7c739017b81f781b18ccf1d077236cf1035e87e7e98fa89eb86236484221fe",
-      "bytes": 69876
+      "sha256": "79f276ca1e8c26d568cef368a56d3510c0f61151d1a18ae6c3e4110fc769bd0b",
+      "bytes": 73562
     },
     {
       "path": "docs/direct-results.md",
@@ -9240,8 +9240,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "51d606d853b7846a881509a82b97e8e7ce02a189239be6b2649206a0dcb68462",
-      "bytes": 76282
+      "sha256": "faccaaeddd70c9631755aaf7afff333a3d053cf41ea55da05cc489109686756e",
+      "bytes": 77606
     },
     {
       "path": "docs/grand-catalog-handbook.md",
@@ -15215,8 +15215,8 @@
     },
     {
       "path": "tests/test_workflow_hardening.py",
-      "sha256": "5e22448da127b1af74823893e412befbd8c592881db837ae8f373973528d50a0",
-      "bytes": 32457
+      "sha256": "3cf6f35db7ead51ac6af36d5ee87483d781b2e646b6e7e7b315634293a02dee1",
+      "bytes": 36247
     },
     {
       "path": "tests/test_workflow_security.py",

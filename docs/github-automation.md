@@ -1069,7 +1069,14 @@ lands in its own earlier PR, as a single-lane authorization does; a lower
 value is not held to the base. A change to `platform_status` alone
 needs nothing else; its row is still resolved against the sealed evidence for
 that pin and those refs. The newest registered
-wave is the only one that may change. A PR that changes a verdict row, a wave
+wave is the only one that may change, and only while the PR registers no newer
+wave: a PR that registers a newer wave must leave the base's newest wave's
+registry entry (its sha256 included) and document byte for byte as they are,
+because once that wave is no longer current `build_verdicts.py --check` checks
+only its own rows and sha256 while its document holds every row. Frozen values
+compare type-strictly (`1`, `1.0` and `true` differ), and changed paths are
+listed NUL-separated, so a path with a space, newline or non-ASCII byte is not
+lost to git's quoting. A PR that changes a verdict row, a wave
 or a sealed verdict artifact fails if it also changes the gate's trust base
 (`TRUST_PATHS`), so a rules change lands on its own first. The trust base is
 the gate script, every repository module the gate and its validators import
@@ -1099,9 +1106,21 @@ and `build_verdicts.py --check`. Run it locally with:
 python3 scripts/verdict_review_gate.py --base origin/main
 ```
 
+The workflow's `pull_request` trigger adds the `edited` type to the default
+three, so a PR whose base branch changes runs again, and the job fails closed
+on any `pull_request` event whose base branch (`GITHUB_BASE_REF`, passed
+through the step's environment) is not `main`. A PR first judged against
+another branch and then retargeted to `main` therefore cannot merge on its
+earlier green run. The job runs the head's own copy of the gate only when the
+base has none and this change adds `scripts/verdict_review_gate.py` (the
+bootstrap PR); a base without the gate otherwise fails closed.
+
 One residual is accepted. A pull request runs the job definition from its
 own `validate.yml`, so a PR that rewrites this job's step can disable the
-check for itself. No `pull_request_target` or `workflow_run` job is added,
+check for itself. The tests that pin the job's shape
+(`tests/test_workflow_hardening.py`) and the gate's rules
+(`tests/test_verdict_review_gate.py`) are the head's copies too, so such a PR
+can edit them in the same change. No `pull_request_target` or `workflow_run` job is added,
 because the strict zizmor gate rejects those triggers, and ruleset-required
 workflows exist only for organizations. The decision record lists the
 mitigations and the overturn.

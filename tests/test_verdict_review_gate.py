@@ -536,6 +536,57 @@ class WaveFreezeTests(GateFixture):
         self.add_wave("20260922", b'{"wave": "20260922", "rewritten": true}\n')
         self.assertFails(self.report(), "the frozen registry entry of wave 20260922")
 
+    # Review of #135, M1: every wave document holds all rows, and build_verdicts.py --check verifies a
+    # wave that is no longer current only against its own rows and registry sha256. So the base's
+    # newest wave is frozen outright once the head registers a newer one.
+    NEWEST = {"catalogs": {"foundation": [{"layer_id": "alpha", "verdict_status": "pending_lanes"},
+                                          {"layer_id": "beta", "verdict_status": "recorded", "winners": ["comp-one"]}]}}
+
+    def test_base_newest_wave_rewritten_while_a_newer_wave_is_registered_fails(self):
+        self.add_wave("20260923", dump(self.NEWEST))
+        self.rebase()
+        edited = json.loads(json.dumps(self.NEWEST))
+        edited["catalogs"]["foundation"][0]["verdict_status"] = "recorded"
+        self.add_wave("20260923", dump(edited))  # the registry sha256 follows the edited document
+        self.add_wave("20260924", dump(self.NEWEST))
+        report = self.report()
+        self.assertFails(report, "the registry entry of wave 20260923, the base's newest, was changed or removed")
+        self.assertIn("the wave document catalogs/sota-convergence/layer-verdicts-20260923.json of wave 20260923, the "
+                      "base's newest, was rewritten while this change registers the newer wave(s) 20260924",
+                      self.messages(report))
+
+    def test_base_newest_wave_reformatted_while_a_newer_wave_is_registered_fails(self):
+        self.add_wave("20260923", dump(self.NEWEST))
+        self.rebase()
+        self.add_wave("20260923", (json.dumps(self.NEWEST, indent=4) + "\n").encode())
+        self.add_wave("20260924", dump(self.NEWEST))
+        self.assertFails(self.report(), "a superseded wave's document is frozen byte for byte")
+
+    def test_newer_wave_registered_without_touching_the_base_newest_passes(self):
+        self.add_wave("20260923", dump(self.NEWEST))
+        self.rebase()
+        self.add_wave("20260924", dump(self.NEWEST))
+        report = self.report()
+        self.assertPasses(report)
+        self.assertTrue(report["waves_changed"])
+
+    def test_frozen_values_compare_type_strictly(self):
+        # Review of #135, L5: 1, 1.0 and true are equal to Python's ==, not in a frozen document.
+        self.add_wave("20260922", b'{"n": 1, "flag": true}\n')
+        self.add_wave("20260923", b'{"wave": "20260923"}\n')
+        self.rebase()
+        for rewritten in (b'{"n": 1.0, "flag": true}\n', b'{"n": 1, "flag": 1}\n', b'{"n": true, "flag": true}\n'):
+            with self.subTest(rewritten=rewritten):
+                self.add_wave("20260922", rewritten)
+                self.assertFails(self.report(), "the frozen wave document catalogs/sota-convergence/"
+                                                "layer-verdicts-20260922.json was rewritten")
+        self.assertFalse(gate.json_equivalent(b'{"a": 12}', b'{"a": 12.0}'))
+        self.assertFalse(gate.registry_equivalent(b'{"waves": [{"n": 1}]}', b'{"waves": [{"n": true}]}'))
+        self.assertTrue(gate.json_equivalent(b'{"a": 1, "b": [true]}', b'{"b": [true],\n "a": 1}'))
+        row = {"winners": [], "lanes": {"agreement": "pending", "attempt": 1}}
+        self.assertEqual(gate.change_kind(row, {**row, "lanes": {"agreement": "pending", "attempt": True}}), "changed")
+        self.assertEqual(gate.change_kind(row, {**row, "lanes": {"attempt": 1, "agreement": "pending"}}), None)
+
 
 class LedgerBindingTests(GateFixture):
     def test_manifest_pointing_at_a_decoy_ledger_fails_and_the_real_ledger_is_still_checked(self):
@@ -1016,6 +1067,23 @@ class FailClosedTests(GateFixture):
         self.assertFails(report, "the frozen wave document catalogs/sota-convergence/layer-verdicts-20260922.json "
                                  "was rewritten")
         self.assertIn(path, report["value_changed_paths"])
+
+    def test_changed_paths_are_listed_nul_separated(self):
+        # Review of #135, hardening: without -z git C-quotes a path with a newline or a non-ASCII byte
+        # (and splitlines splits it), so the listed path would not be the file's.
+        odd = ["catalogs/sota-convergence/tracked name\nwith \u00e9.json",
+               "catalogs/sota-convergence/untracked name \u00e9.json"]
+        self.write(odd[0], b"{}\n")
+        self.rebase()
+        self.write(odd[0], b'{"edited": true}\n')
+        self.write(odd[1], b"{}\n")
+        paths = gate.changed_verdict_paths(self.root, self.base)
+        for path in odd:
+            self.assertIn(path, paths)
+        self.assertFalse([path for path in paths if path.startswith('"')], paths)
+        report = self.report()
+        self.assertIn(odd[0], report["value_changed_paths"])
+        self.assertTrue(report["touched"])
 
     def test_ledger_with_a_duplicate_key_is_a_read_error(self):
         self.flush()

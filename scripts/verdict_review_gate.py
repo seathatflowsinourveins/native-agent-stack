@@ -60,7 +60,10 @@ grandfathered row is reported and passes here (``build_verdicts.py --check`` fre
 row of the base keeps a row at the head whose run id is not older, never moves from a new wave back
 to the grandfathered one and changes only to the newest registered wave (review of #123, finding 1).
 Every wave registry entry at the base except the newest, and every grandfathered entry, must be
-unchanged at the head, with its document (review finding 4). The SOTA manifest every base entry
+unchanged at the head, with its document (review finding 4); when the head registers a wave newer
+than the base's newest, that newest entry is frozen too, its sha256 included, with its document byte
+for byte (review of #135, M1). Frozen values compare type-strictly (``same_value``: 1, 1.0 and true
+differ). The SOTA manifest every base entry
 registers (``manifest``), the newest included, must keep its pointer and its parsed value at the head
 (fifth review): a registered wave's published ``sota_components`` come from it. Rows, wave documents and the registry
 are compared on parsed values without duplicate keys, so a pure reformat is not a change
@@ -395,10 +398,10 @@ def without_platform_status(winners):
 def change_kind(old, new):
     if old is None:
         return "added"
-    if all(old.get(field) == new.get(field) for field in VERDICT_FIELDS):
+    if all(same_value(old.get(field), new.get(field)) for field in VERDICT_FIELDS):
         return None
-    if (all(old.get(field) == new.get(field) for field in VERDICT_FIELDS if field != "winners")
-            and without_platform_status(old.get("winners")) == without_platform_status(new.get("winners"))):
+    if (all(same_value(old.get(field), new.get(field)) for field in VERDICT_FIELDS if field != "winners")
+            and same_value(without_platform_status(old.get("winners")), without_platform_status(new.get("winners")))):
         return "platform_status"
     return "changed"
 
@@ -1104,7 +1107,7 @@ def platform_status_violations(key, old, new, context, sealed_bindings, trust=No
         sealed = {**winner, **sealed_bindings.get(winner.get("component_id"), UNBOUND_WINNER)}
         # An unchanged value is skipped only when what it is derived from is unchanged too (sixth
         # review): a new pin or new evidence behind the same declared status must be re-derived.
-        binding_changed = not old_winner or any(winner.get(field) != old_winner.get(field)
+        binding_changed = not old_winner or any(not same_value(winner.get(field), old_winner.get(field))
                                                 for field in ("pin", "evidence_refs", "evidence_class"))
         for platform in platform_evidence.PLATFORMS:
             if declared.get(platform) == before.get(platform) and not binding_changed:
@@ -1141,16 +1144,23 @@ def strict_json(data):
     return json.loads(data, object_pairs_hook=unique_json)
 
 
+def same_value(before, after):
+    """Type-strict equality of parsed JSON values (review of #135, L5): Python's == makes 1, 1.0 and
+    True equal (and so {"a": 1} and {"a": true}), so frozen values are compared as their canonical JSON
+    text, which keeps the type of every number and boolean."""
+    return json.dumps(before, sort_keys=True) == json.dumps(after, sort_keys=True)
+
+
 def json_equivalent(before, after):
     """True when two file contents are equal as bytes, or both parse as JSON, without duplicate
     keys, to equal values (review of #123, finding 3: a pure formatting change of a generated
-    document is not a value change)."""
+    document is not a value change), compared type-strictly (same_value)."""
     if before == after:
         return True
     if before is None or after is None:
         return False
     try:
-        return strict_json(before) == strict_json(after)
+        return same_value(strict_json(before), strict_json(after))
     except ValueError:
         return False
 
@@ -1174,7 +1184,7 @@ def registry_equivalent(before, after):
     if before is None or after is None:
         return False
     try:
-        return values(before) == values(after)
+        return same_value(values(before), values(after))
     except ValueError:
         return False
 
@@ -1183,19 +1193,39 @@ def wave_freeze_violations(base, head, base_waves, head_waves):
     """Review finding 4: every base registry entry except the newest (and every grandfathered one)
     is unchanged at the head, and so is the document it registers, compared on parsed values: a
     reformatted document passes when its registry sha256 is updated to the reformatted bytes
-    (build_verdicts.py --check then decides whether the reformat is the generator's)."""
+    (build_verdicts.py --check then decides whether the reformat is the generator's).
+
+    Review of #135, M1: once the head registers a wave newer than the base's newest, the base's
+    newest (non-grandfathered) wave stops being current, and build_verdicts.py --check then verifies
+    only its own rows and registry sha256, while every wave document holds all rows. So in that case
+    the base's newest entry is frozen outright: its registry entry, sha256 included, and its document
+    byte for byte (so also its parsed value)."""
     violations = []
     newest = max(base_waves) if base_waves else None
+    superseded = newest is not None and any(run_id > newest for run_id in head_waves)
     for run_id, entry in sorted(base_waves.items()):
-        if run_id == newest and run_id not in GRANDFATHERED_RUN_IDS:
-            continue
         where = f"wave {run_id}"
         path = entry.get("path")
         head_entry = head_waves.get(run_id)
+        if run_id == newest and run_id not in GRANDFATHERED_RUN_IDS:
+            if not superseded:
+                continue
+            later = ", ".join(sorted(later_id for later_id in head_waves if later_id > newest))
+            if head_entry is None or not same_value(head_entry, entry):
+                violations.append({"row": where, "message": (
+                    f"the registry entry of wave {run_id}, the base's newest, was changed or removed (its sha256 "
+                    f"included) while this change registers the newer wave(s) {later}; a superseded wave is frozen")})
+            base_document = base.read(path) if isinstance(path, str) else None
+            head_document = head.read(path) if isinstance(path, str) else None
+            if isinstance(path, str) and base_document != head_document:
+                violations.append({"row": where, "message": (
+                    f"the wave document {path} of wave {run_id}, the base's newest, was rewritten while this change "
+                    f"registers the newer wave(s) {later}; a superseded wave's document is frozen byte for byte")})
+            continue
         base_document = base.read(path) if isinstance(path, str) else None
         head_document = head.read(path) if isinstance(path, str) else None
         same_document = json_equivalent(base_document, head_document)
-        if head_entry is None or registry_values(head_entry) != registry_values(entry) or (
+        if head_entry is None or not same_value(registry_values(head_entry), registry_values(entry)) or (
                 head_entry.get("sha256") != entry.get("sha256") and not same_document):
             violations.append({"row": where, "message": f"the frozen registry entry of wave {run_id} in "
                                f"{WAVE_REGISTRY} was changed or removed (only the newest wave may change)"})
@@ -1293,15 +1323,18 @@ def row_continuity_violations(base_rows, head_rows, head_waves):
 def changed_paths(head_root, base, pathspecs):
     """Paths matching ``pathspecs`` that differ between ``base`` and the head checkout (tracked
     changes and untracked files). A git command that fails raises ReadError (exit 2): an unlisted
-    change must not pass for "nothing changed" and skip the trust-base rule or the validators."""
-    lines = set()
-    for arguments in (("diff", "--name-only", "--no-renames", base), ("ls-files", "--others", "--exclude-standard")):
+    change must not pass for "nothing changed" and skip the trust-base rule or the validators. The
+    listings are NUL-separated (-z), so a path with a space, a newline or a non-ASCII byte is listed
+    as itself, not C-quoted."""
+    paths = set()
+    for arguments in (("diff", "--name-only", "-z", "--no-renames", base),
+                      ("ls-files", "-z", "--others", "--exclude-standard")):
         result = git(head_root, *arguments, "--", *pathspecs, check=False)
         if result.returncode != 0:
             raise ReadError(f"git {arguments[0]} failed in {head_root} (exit {result.returncode}): "
                             f"{result.stderr.decode(errors='replace').strip()}")
-        lines.update(line for line in result.stdout.decode().splitlines() if line)
-    return sorted(lines)
+        paths.update(os.fsdecode(name) for name in result.stdout.split(b"\0") if name)
+    return sorted(paths)
 
 
 def changed_verdict_paths(head_root, base):
@@ -1322,7 +1355,7 @@ def changed_rule_input_fields(base, head):
     for path, key, _reader in RULE_INPUT_FIELDS:
         values = [document.get(key) if isinstance(document, dict) else None
                   for document in (base.json(path), head.json(path))]
-        if values[0] != values[1]:
+        if not same_value(values[0], values[1]):
             changed.append(f"{path}#/{key}")
     return changed
 
@@ -1375,8 +1408,8 @@ def evaluate(root, base, head_root=None, *, validators=run_repo_validators):
     violations.extend(sota_manifest_violations(base_side, head_side, base_waves, head_waves))
     # Compared on parsed values (finding 3): a regenerated wave document or registry that only
     # changes formatting (and the document sha256 it records) is not a wave change.
-    waves_changed = ({run_id: registry_values(entry) for run_id, entry in base_waves.items()}
-                     != {run_id: registry_values(entry) for run_id, entry in head_waves.items()}) or any(
+    waves_changed = not same_value({run_id: registry_values(entry) for run_id, entry in base_waves.items()},
+                                   {run_id: registry_values(entry) for run_id, entry in head_waves.items()}) or any(
         not json_equivalent(base_side.read(entry["path"]), head_side.read(entry["path"]))
         for entry in list(base_waves.values()) + list(head_waves.values()) if isinstance(entry.get("path"), str))
     violations.extend(ledger_binding_violations(head_side))
