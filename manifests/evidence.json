@@ -6769,13 +6769,13 @@
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/README.md",
-      "sha256": "a2968f01d9132fec8c6536ab44ade9c2e517e997eca8650f9ad3b80fcd8ae042",
-      "bytes": 10546
+      "sha256": "b602088d17c274cc68ae0d0b3fa91915bd4fe80e430e6ecce437f5d12a982af2",
+      "bytes": 11838
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/compare.py",
-      "sha256": "fc0ed6836add5e2bb9a612b15ca6c57eb3e2d8825af3cad6a39a46f82c441a2e",
-      "bytes": 26843
+      "sha256": "c70386f869e45bcdc54602100991235a450d2a5854445d98ffe45b849454a5ec",
+      "bytes": 67588
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/convert.py",
@@ -6783,9 +6783,24 @@
       "bytes": 14090
     },
     {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/deviation-acceptance-v2.json",
+      "sha256": "b279cf6a81489591e722a97f4e1f085041f358153a9f3553f61e559122dbeb89",
+      "bytes": 1550
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/distribution_module.py",
+      "sha256": "eefee070b0dbe6ad3a1e68755ca959b5fff081fad61af8b84902a438996b126b",
+      "bytes": 10088
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/dividend-module-receipt.json",
+      "sha256": "660f3260a8bdd717b59a2d67209a706ea5ec02aa65538ef7ef977fb9d1ebcbd2",
+      "bytes": 2924
+    },
+    {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/fixture_strategy.py",
-      "sha256": "5c035ba3923e2febcd70ef88a354ce045a4ff45301d19a521f8d41571dd84502",
-      "bytes": 13911
+      "sha256": "59649ac50f26c8b6090dc976e4ec0b3b7e2121cc214674f6c122fbbca9b143f1",
+      "bytes": 23733
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/mapping-manifest-v2.json",
@@ -6796,6 +6811,11 @@
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/mapping-manifest.json",
       "sha256": "43f510494a970d235f27e5676120ee749b45eb6b060cf74f0b768374b8177909",
       "bytes": 19081
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/mapping-status-20260923.json",
+      "sha256": "519b6d56207c27945db1bda33e22a4098a0ad3063edf40c0ed293271d9ae66bf",
+      "bytes": 1894
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/probes/dividend-symbol-scan.json",
@@ -6928,19 +6948,39 @@
       "bytes": 4266
     },
     {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/receipt-v2.json",
+      "sha256": "f881ee3208317c9f954639c5229a7c1e2c785b196d6ea7cfbac1e1d3088f041c",
+      "bytes": 48161
+    },
+    {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/receipt.json",
       "sha256": "1424b9aa8be9d04f16f7aa5efb6a782759cf915035a461dcfd01e1da601d3a88",
       "bytes": 11629
     },
     {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/replay-history-v2.json",
+      "sha256": "02f1be40b05520f783d050fedc2778e54ae1118509b587d39b1a05d7616eeb83",
+      "bytes": 8036
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/review-record-v2-cc4503f.json",
+      "sha256": "7fdf6d104f7e75b07718b33873fd2d32f06113e3cc42a14adfa934aeb0fb01f6",
+      "bytes": 2475
+    },
+    {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/run.py",
-      "sha256": "299b81b230195b6bf9f9a1cebcad2629cc121e4078abe96de8b6f4486c861951",
-      "bytes": 20067
+      "sha256": "c3917c2f6446ffb1bcfe411cc2339ffc1f804a87904ed3a1f1a67e51817ad2f2",
+      "bytes": 51307
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/tolerances.json",
       "sha256": "c8bc72317fb4de83f2b0b7e71888828c7dd15a5a7eb2f60b68f87d54e751c15a",
       "bytes": 2333
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/verdict-v2.json",
+      "sha256": "1816835f9cf2ea2fa3134e4f5c44a57dc48158499efc7d1fc649e0ed715c9fcd",
+      "bytes": 49296
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/verdict.json",
@@ -8179,8 +8219,8 @@
     },
     {
       "path": "catalogs/us-equities/gates-20260922.json",
-      "sha256": "6d3b7364cf671d686b196ef8491c51275c1cd63ea4d01c70f032318725774553",
-      "bytes": 26449
+      "sha256": "cdffd15ba27c092792c1dd709bbb86c7a12b2881efea8977b802adc25a87a54d",
+      "bytes": 27680
     },
     {
       "path": "catalogs/us-equities/hosting-source-review.json",
@@ -14289,8 +14329,8 @@
     },
     {
       "path": "tests/test_spy_parity.py",
-      "sha256": "7b2ff836382c6004a3c52e4928ec460423af2b9a8c7b12c9e8575a3e4fd7c11b",
-      "bytes": 51829
+      "sha256": "f210e6f4fc1ff37173fc42e84ace878245e3448f03a2d1bee93d4be04ae6ab5e",
+      "bytes": 121917
     },
     {
       "path": "tests/test_stack_lifecycle.py",
@@ -14304,8 +14344,8 @@
     },
     {
       "path": "tests/test_trading_gates.py",
-      "sha256": "02c0b947dfad2df175406780471728234fd60289d042b0395fd9401de2a8bde2",
-      "bytes": 15953
+      "sha256": "b6087fb4a690e42d146ba48f7c03f3077a280366b837bee83dfea981da7bb10d",
+      "bytes": 16185
     },
     {
       "path": "tests/test_validate.py",

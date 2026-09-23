@@ -146,6 +146,30 @@ otherwise clean run into `BLOCKED-INCOMPLETE`, not a pass.
 `compare.py` compares the receipt's own case rather than a case named on the
 command line.
 
+## v2 preconditions and the gate owner's acceptance
+
+Under `mapping-manifest-v2.json` the preconditions are checks, and a skipped
+check is `FAIL` (PREREGISTRATION-v2.md lists any skipped check as a falsifier).
+Every earlier v2 replay in `replay-history-v2.json` ran before any review, so
+`precondition_review` fails unless the gate owner's acceptance of deviation
+`first_v2_run_preceded_review` is present **before** the run, as
+`deviation-acceptance-v2.json` in this directory:
+
+```json
+{"schema_version": 1, "deviation_id": "first_v2_run_preceded_review",
+ "accepted_by": "<gate owner>", "accepted_utc": "<ISO 8601 with offset, before the run>",
+ "reviewed_harness_local_source_sha256": {"compare.py": "<sha256>", "convert.py": "<sha256>",
+   "distribution_module.py": "<sha256>", "fixture_strategy.py": "<sha256>", "run.py": "<sha256>"},
+ "statement": "<the acceptance>"}
+```
+
+`run.py` records the file's path and sha256 in `preconditions.deviation_acceptance`;
+`compare.py` re-hashes it and checks exactly these six keys, the deviation id,
+the five harness hashes against the run's `local_source_sha256`, and
+`accepted_utc` < `started_utc`. The harness never writes this file. The replay
+history is re-hashed at comparison time and may only have grown by appended
+entries since the run.
+
 ## Reproduce the probe transcripts
 
 ```sh
