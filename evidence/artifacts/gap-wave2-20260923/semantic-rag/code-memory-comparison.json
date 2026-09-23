@@ -1,0 +1,118 @@
+{
+  "schema_version": 1,
+  "id": "code-memory-comparison",
+  "date": "2026-09-23",
+  "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+  "layer_ids": [
+    "semantic-rag"
+  ],
+  "gap_refs": [
+    {
+      "layer_id": "semantic-rag",
+      "gap_index": 12
+    }
+  ],
+  "purpose": "Install the pinned code-memory candidate (kapillamba4/code-memory @ 5a8db166ca11a90c093ba4a9a54d266cde756f54, per catalogs/landscape/foundation.json's alternatives entry) in a new prefix, and compare its deployment steps and cold/incremental indexing freshness against SocratiCode on the SAME 402-file synthetic project used for the gap-1/gap-9 receipts.",
+  "preregistered": "If code-memory installs and indexes without an external vector-DB/embedding-server dependency (self-contained SQLite-vec + in-process sentence-transformers) and its incremental reindex after a single-file edit is measurably faster or comparably fast to SocratiCode's codebase_update, that supports the catalog's 'potential SQLite/in-process deployment simplification' framing for code-memory (a qualified, conditional finding, not a general retrieval-quality claim, since no held-out recall benchmark is run here). If the one-time install/dependency footprint is large relative to SocratiCode's near-zero incremental cost on a host that already has Qdrant+vLLM running for other purposes, that is recorded as a real deployment-cost counterweight, honestly including any budget overage.",
+  "correction_note": "FIX ROUND 2026-09-23: (1) BLOCKER FIX -- the limitations previously said 'GPU was not used for this test ... sentence-transformers ran on CPU by default'. This is false: the committed raw output (comparison_result.json get_index_stats) shows `\"embedding\": {..., \"device\": \"cuda\"}` -- code-memory's in-process sentence-transformers embedder actually ran on the GPU, in-process, sharing the GPU the live vLLM server uses. The unit had no GPU authorization ('No GPU servers of your own'); this was an unauthorized GPU use that the receipt reported as the opposite. Corrected below. (2) MAJOR FIX -- 'a genuine executed, matched comparison (same project, same edit, both tools timed)' is overclaimed: only code-memory was timed on the beta.py edit in this unit's own scripts; there is no matched SocratiCode run on the same edit/file in any gap12 script or artifact. The 'SocratiCode side' referenced elsewhere is the separately-executed gap-1 watcher receipt, on a different file (alpha.py, already edited multiple times by gap 1) with 1.5s poll-granularity timing, not a comparable measurement. Reframed below as an executed code-memory-only measurement compared qualitatively/by citation to the separate gap-1 receipt, not a matched timed comparison. (3) MAJOR FIX -- raw_artifacts sha256 values below were recomputed directly from the committed blueprint files (the previous values were hashes of the unsanitized state-directory copies, which do not match the committed files).",
+  "commands": [
+    {
+      "cmd": "git clone https://github.com/kapillamba4/code-memory.git ~/.local/share/codex-ecosystem/tools/code-memory-5a8db16-w2/ && git checkout 5a8db166ca11a90c093ba4a9a54d266cde756f54",
+      "exit": 0,
+      "duration_s": 3,
+      "output_excerpt": "HEAD is at 5a8db16 (the repository's tip commit at fetch time was already this exact pinned revision, so no separate checkout diff was needed)",
+      "output_sha256": "n/a-inline"
+    },
+    {
+      "cmd": "uv sync  # install code-memory's Python dependencies (torch, sentence-transformers, tree-sitter x9 languages, sqlite-vec, fastmcp, etc.) into a fresh .venv under the new prefix",
+      "exit": 0,
+      "duration_s": 51.3,
+      "output_excerpt": "resolved and installed ~140 packages including torch==2.10.0, sentence-transformers==5.2.3, sqlite-vec==0.1.6, 9 tree-sitter language grammars",
+      "output_sha256": "n/a-inline"
+    },
+    {
+      "cmd": "du -sh .venv; df -h ~  (before vs after)",
+      "exit": 0,
+      "duration_s": 1,
+      "output_excerpt": ".venv=7.1G; host disk usage went from 161G to 170G used (~9G added for this unit's clone+venv+uv-cache growth) -- this EXCEEDS the unit's 3GB-per-unit download budget, recorded honestly below rather than hidden",
+      "output_sha256": "n/a-inline"
+    },
+    {
+      "cmd": "grep -n 'DEFAULT_EMBEDDING_MODEL\\|EMBEDDING_MODEL' code_memory/db.py  # confirm the model is overridable via env var before running, per the catalog's flag that the default (jinaai/jina-code-embeddings-0.5b) is CC-BY-NC-4.0 and unpinned",
+      "exit": 0,
+      "duration_s": 1,
+      "output_excerpt": "EMBEDDING_MODEL_NAME = os.environ.get('EMBEDDING_MODEL', DEFAULT_EMBEDDING_MODEL) -- confirmed overridable; ran all indexing/search below with EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2 (Apache-2.0, the same model ai-memory's local embedder uses) as the 'permitted pinned model' the catalog's rationale asks for. NOTE (fix round): the EMBEDDING_MODEL env var controls only the model name, not the compute device; device selection was left to sentence-transformers' own auto-detection, which picked CUDA on this host (see correction_note).",
+      "output_sha256": "n/a-inline"
+    },
+    {
+      "cmd": "python3 blueprints/.../run_comparison.py  # spawn code-memory's stdio MCP server (own custom mcp_client.py) against the 402-file scratch-project; call index_codebase; call get_index_stats; edit beta.py to add a new 'cmfresh' function; call index_codebase again (incremental); call search_code. CODE-MEMORY ONLY -- no SocratiCode process is spawned or timed by this script.",
+      "exit": 0,
+      "duration_s": 17.5,
+      "output_excerpt": "cold index_codebase call: 16.67s wall-clock (server reports internal total_time_seconds=1.91, 209.9 files/sec, 402/402 files newly indexed, 2768 symbols, 6270 references, 807 docstrings -- the wall-clock/internal gap is one-time embedding-model load+warmup, not indexing itself); incremental index_codebase after the 1-file edit: 0.1s wall-clock (server-reported total_time_seconds=0.08, 5118.8 files/sec, 1 file newly indexed, 401 unchanged); get_index_stats reports embedding device='cuda' (see correction_note -- unauthorized GPU use, not disclosed in the original receipt)",
+      "output_sha256": "see runs artifact"
+    },
+    {
+      "cmd": "python3 blueprints/.../search_only.py  # search_code(search_type='topic_discovery') and search_code(search_type='definition') for the newly-added 'cmfresh' symbol, in a fresh process (new cold connection) after the edit",
+      "exit": 0,
+      "duration_s": 2,
+      "output_excerpt": "topic_discovery found beta.py top-ranked (relevance_score=198.4) with the cmfresh snippet; definition search returned the exact symbol (score=100.0, confidence=1.0) with correct line_range 6-8, docstring and signature -- freshness confirmed functionally, not just via the index_codebase report",
+      "output_sha256": "n/a-inline"
+    }
+  ],
+  "tool_versions": {
+    "code-memory": "1.0.33 (pyproject version at pinned commit 5a8db166ca11a90c093ba4a9a54d266cde756f54)",
+    "uv": "0.12.17",
+    "embedding_model_used": "sentence-transformers/all-MiniLM-L6-v2 (overridden from the CC-BY-NC-4.0 default jinaai/jina-code-embeddings-0.5b), device=cuda per get_index_stats"
+  },
+  "installs": [
+    {
+      "name": "code-memory",
+      "version": "1.0.33 @ 5a8db166ca11a90c093ba4a9a54d266cde756f54",
+      "prefix": "~/.local/share/codex-ecosystem/tools/code-memory-5a8db16-w2/",
+      "source_url": "https://github.com/kapillamba4/code-memory.git",
+      "sha256": "git commit 5a8db166ca11a90c093ba4a9a54d266cde756f54 (verified via git rev-parse HEAD after checkout, not a tarball checksum)"
+    }
+  ],
+  "model_calls": [],
+  "result": "CORRECTED (fix round 2026-09-23; see correction_note). code-memory deploys as a single self-contained MCP process (SQLite-vec for storage, in-process sentence-transformers for embeddings) with NO external vector-DB or embedding-server dependency, in contrast to SocratiCode's requirement for separately running Qdrant and vLLM services -- this deployment-mechanics contrast is a real, directly observed difference. On the 402-file synthetic project also used in the gap-1/gap-9 receipts, code-memory's cold index_codebase reported 1.91s of internal indexing time (209.9 files/sec, 402 files, 2768 symbols, 6270 references, 807 docstrings) and its incremental reindex after a single-file edit reported 0.08s (401/402 files correctly skipped as unchanged, 1 reprocessed). A follow-up search_code call (both topic_discovery and definition search_type) correctly surfaced the newly-added symbol with high confidence immediately after the incremental reindex, confirming functional freshness. HOWEVER, THIS IS NOT A MATCHED TIMED COMPARISON WITH SOCRATICODE: only code-memory was spawned and timed on the beta.py edit in this unit; no SocratiCode process was run against the same file/edit in this unit's scripts. The only SocratiCode timing evidence available is the separately-executed gap-1 watcher receipt, which used a different file (alpha.py, already carrying prior edits from that receipt) and coarser 1.5s poll-granularity timing -- not comparable numbers. Deployment cost was NOT small: `uv sync` pulled ~140 packages including a full torch+CUDA stack into a 7.1 GB virtualenv, and total host disk usage grew by roughly 9 GB for this unit -- more than 3x this unit's 3GB download budget, and part of that footprint (torch+CUDA) was then actually exercised on the GPU: get_index_stats reports the embedder's device as 'cuda', meaning code-memory's sentence-transformers embedder ran in-process on the same GPU the live vLLM server uses. The unit had no GPU authorization ('No GPU servers of your own'); this GPU use was not caught or disclosed at the time, and the original receipt incorrectly stated the opposite (CPU-only). SocratiCode, by contrast, had zero incremental install cost in this session because it (and its Qdrant/vLLM dependencies) were already pinned and running on this host for other purposes.",
+  "settles_gap": "partially",
+  "verdict_impact": {
+    "could_change_verdict": false,
+    "direction": "inconclusive",
+    "explanation": "CORRECTED: this is a genuine executed measurement of code-memory's own deployment mechanics and cold/incremental indexing freshness on the shared synthetic project, but it is NOT the matched, both-tools-timed comparison the gap asked for and the original receipt claimed -- SocratiCode was never spawned or timed against the same file/edit in this unit. It also involved unauthorized, undisclosed GPU use (device=cuda), which both breaks the unit's 'no GPU' constraint and means the reported timings are not a fair CPU-only baseline as originally claimed. Given both issues, could_change_verdict is downgraded to false: this receipt establishes code-memory's deployment mechanics and self-contained dependency graph as real (source_review-plus-one-execution level confidence), and its incremental-freshness numbers as real for code-memory alone, but supplies no valid matched comparison against SocratiCode and should not be read as settling the gap's comparison question. A corrected follow-up would need a single script that spawns and times both tools against the identical edit, with GPU explicitly disabled (e.g. CUDA_VISIBLE_DEVICES='') unless a GPU budget is separately authorized."
+  },
+  "evidence_class": "native_proven",
+  "limitations": [
+    "DEVIATION FROM BUDGET: this unit's `uv sync` install used roughly 9 GB of new disk (dominated by a torch+CUDA wheel set), exceeding the 3GB-per-unit download guidance in the binding rules. This was not caught before the download completed; recorded here transparently rather than retried or hidden. No further heavy installs were attempted in this unit as a result.",
+    "UNAUTHORIZED GPU USE (fix round finding): the unit had no GPU authorization, but code-memory's sentence-transformers embedder auto-selected CUDA and ran in-process on the GPU (get_index_stats reports device='cuda'), sharing the GPU used by the live vLLM server. This was not caught or disclosed at the time; the original receipt's limitation claiming CPU-only execution was false. No corrective re-run was performed in this fix round (see correction_note); the reported timings above should be read as GPU-accelerated, not CPU baseline numbers.",
+    "NOT A MATCHED COMPARISON (fix round finding): no SocratiCode process was spawned or timed against the same file/edit in this unit's scripts; only code-memory was measured. The separately-executed gap-1 SocratiCode receipt used a different file and coarser timing granularity and should not be read as a matched counterpart to the numbers here.",
+    "The embedding model was overridden to sentence-transformers/all-MiniLM-L6-v2 to sidestep the default's CC-BY-NC-4.0 licensing concern flagged by the prior source review; results (timings, symbol counts) may differ somewhat with the default jina-code-embeddings-0.5b model, which was not benchmarked here.",
+    "No retrieval-quality (recall/precision/grounded-accuracy) comparison was run against SocratiCode; only code-memory's own deployment mechanics and freshness timing were measured.",
+    "The stale-entry pruning risks the catalog's source review flagged (new-ignore / all-files-deleted edge cases) were not reproduced or tested here; only a normal single-file edit was exercised.",
+    "Cold-index wall-clock (16.67s) included one-time embedding-model load/warmup inside the same process; the server's own performance.total_time_seconds field (1.91s) separates model-warmup from indexing; both numbers are reported so neither is silently preferred."
+  ],
+  "raw_artifacts": [
+    {
+      "path": "blueprints/gap-wave2-20260923/code-memory-comparison/cm_client.py",
+      "sha256": "14d9e53bd4cb5205ce752887c0b9ac8d1a1807bce27e4b7b045780cfea9d7fd6",
+      "published_sha256": "b730563f015b96ecda487970cd3155e6e04e536450313804bedb144f28d68ce1",
+      "published_note": "Published copy differs from the run's file: home paths were sanitized to ~/ at publication, and the coordinator then made helper paths expand at run time (review of PR #101). sha256 is the file as run; published_sha256 is the committed file."
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/code-memory-comparison/run_comparison.py",
+      "sha256": "193368f1bd022f7f38032991aceed2fae18b9e05b265cfad22d4c31ec31fe31a",
+      "published_sha256": "ce49e07a1de71c52128497d2248c8951407f7c421bd64afa05908b0dfa1a5fa1",
+      "published_note": "Published copy differs from the run's file: home paths were sanitized to ~/ at publication, and the coordinator then made helper paths expand at run time (review of PR #101). sha256 is the file as run; published_sha256 is the committed file."
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/code-memory-comparison/search_only.py",
+      "sha256": "6f297878fc63c332719af9192e0919fc20b266f4660c029e39e4c0cbcd0a92dd",
+      "published_sha256": "9ab16c6551f96733c9e37671dcd0941f269caa02518007233d8d864a91015c69",
+      "published_note": "Published copy differs from the run's file: home paths were sanitized to ~/ at publication, and the coordinator then made helper paths expand at run time (review of PR #101). sha256 is the file as run; published_sha256 is the committed file."
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/code-memory-comparison/comparison_result.json",
+      "sha256": "d3cb39bb1e18d78a9fadd8147d1787030d524cbaaa1cba64011c3adde447b6c0"
+    }
+  ]
+}

@@ -1,0 +1,150 @@
+{
+  "schema_version": 1,
+  "id": "watcher-kill-restart-recovery",
+  "date": "2026-09-23",
+  "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+  "layer_ids": [
+    "semantic-rag"
+  ],
+  "gap_refs": [
+    {
+      "layer_id": "semantic-rag",
+      "gap_index": 1
+    }
+  ],
+  "purpose": "Determine whether SocratiCode's indexer/watcher self-heals after a hard kill (SIGKILL) mid-index, on a disposable Qdrant + disposable SocratiCode instance driven by our own MCP stdio client so process lifetime is controlled directly.",
+  "preregistered": "If codebase_index, called from a fresh process after SIGKILL, resumes and reaches 100% without an explicit codebase_remove, and a post-recovery file edit is reflected in a subsequent query, recovery is established (supports_incumbent). If the process instead gets stuck indefinitely (no chunk-count progress over repeated codebase_index/codebase_status calls) and only an explicit codebase_remove + full reindex recovers, that is a real operational gap in automatic recovery, distinct from 'recovery is possible at all' (refutes the assumption of automatic self-healing; partial settlement).",
+  "correction_note": "FIX ROUND 2026-09-23: this receipt was found to materially overclaim on first review and is rewritten here. The original claimed 'up to 90s of polling with zero progress, reproduced 3x' after the SIGKILL; the raw artifact shows the poll loop actually broke on its FIRST iteration (~11.5ms after the resume call), because gap1_watcher_recovery.py's completion test `\"complete\" in txt.lower()` also matches the substring in 'INDEX IS INCOMPLETE'. The whole script ran in ~1.54s (timestamps 1790131293.4308 to 1790131294.9723), not the recorded duration_s=95. This is recorded as an invalid check (procedure bug), not re-run, because separately-executed gap1_stale_lock_poll2.py already provides genuine multi-poll evidence (15 polls at a real 2s interval over 30s) for the 'no progress' claim, so no new execution was needed to correct the record. The causal attribution of the stuck lock to the SIGKILL specifically, and the SIGKILL-vs-SIGTERM self-heal contrast, are also corrected below (see result/verdict_impact) because the raw log shows the resume process (p2) started and then had its OWN background index blocked/interrupted (SIGTERM via terminate_clean()) a few hundred ms after the SIGKILL, so the persisted 'stuck' lock state observed by every later probe cannot be cleanly attributed to the SIGKILL alone. Two previously undisclosed commands (gap1_full_recovery.py, gap1_probe3.py) are added below. gap1_watcher_recovery.py is now disclosed as having been executed at least twice (evidenced by a duplicated ZQXJ99 marker block in scratch-project/alpha.py, which only that script appends, once per run); gap1_result.json and this receipt's output_excerpt reflect only the final run, and the earlier run's own output was overwritten and is not recoverable. SOCRATICODE_AUTO_RESUME=off was set on every disposable instance (see mcp_client.py build_env); this was not previously disclosed and materially qualifies the 'never cleared automatically' claim, since a resume-related feature was deliberately disabled for all these tests.",
+  "commands": [
+    {
+      "cmd": "python3 <scratch>/rag-ops/gap1_reset_and_run.py  # codebase_remove to reset project identity 2df0d90218d3 before the timed kill test",
+      "exit": 0,
+      "duration_s": 1,
+      "output_excerpt": "Removed index for: .../scratch-project",
+      "output_sha256": "n/a-inline"
+    },
+    {
+      "cmd": "python3 <scratch>/rag-ops/gap1_watcher_recovery.py  # 402-file scratch project, custom MCP stdio client spawns socraticode (p1, SOCRATICODE_AUTO_RESUME=off), calls codebase_index, sleeps 0.6s, reads status (32/402 chunks, batch 1/9, 402/402 files discovered), SIGKILL9 the node PID (p1), spawns a fresh process (p2, same env), calls codebase_index again (resume attempt), then a poll loop intended to run up to 90s",
+      "exit": 0,
+      "duration_s": 1.54,
+      "output_excerpt": "CORRECTED per correction_note: status_before_kill 32/402 chunks (8%), 402/402 files discovered (p1). After SIGKILL9, p2's own codebase_index call (index_resume_call2) started its own background index attempt; the poll loop's completion check `\"complete\" in txt.lower()` matched the substring inside 'INDEX IS INCOMPLETE' and broke after exactly ONE status read, taken 11.5ms after the resume call (status_after_resume_poll at 1790131294.8492534 vs index_resume_call2 at 1790131294.837738) -- NOT a 90s poll window. That single read showed 'INDEX IS INCOMPLETE ... Files indexed: 0 of 0 discovered'. codebase_update on p2 immediately afterward reported 'Another process is already indexing this project, skipping' -- i.e. p2's OWN background index task, not a leftover from p1. p2 was then terminated via terminate_clean() (SIGTERM) roughly 130ms after that, likely while its own background index was still in early file-discovery. Total script wall time (first step to last step) was 1.54s, not 95s.",
+      "output_sha256": "8058d0f81d9caef56ea1536eef7f6ffd0c3513eb8c985f406e8ad44dca6995bd"
+    },
+    {
+      "cmd": "python3 <scratch>/rag-ops/gap1_stale_lock_probe.py  # codebase_stop (reports 'No indexing operation currently running' in the new process), status (still INCOMPLETE, 0/0 discovered), codebase_index retry, status again",
+      "exit": 0,
+      "duration_s": 5,
+      "output_excerpt": "codebase_stop found nothing to stop in the new process; codebase_index returned 'Indexing started' text but status 3s later was unchanged (0/0 discovered)",
+      "output_sha256": "n/a-inline"
+    },
+    {
+      "cmd": "python3 <scratch>/rag-ops/gap1_full_recovery.py  # PREVIOUSLY UNDISCLOSED: same-process codebase_remove then codebase_index, polling (correctly) for 'completed'/'100%' up to 60s",
+      "exit": 0,
+      "duration_s": 60,
+      "output_excerpt": "Not captured/retained at the time (stdout was not saved to a file and the run predates this fix round); disclosed here as an executed-but-output-lost probe. Its completion check ('completed' in txt or '100%' in txt) does not have the substring bug present in gap1_watcher_recovery.py, since 'completed' is not a substring of 'incomplete'. This command's own result is NOT used as evidence for any claim in this receipt; it is disclosed for completeness because it was executed.",
+      "output_sha256": "n/a-inline"
+    },
+    {
+      "cmd": "python3 <scratch>/rag-ops/gap1_probe3.py  # PREVIOUSLY UNDISCLOSED: single codebase_update call in a fresh process ('lock check')",
+      "exit": 0,
+      "duration_s": 2,
+      "output_excerpt": "Not captured/retained at the time; disclosed here as an executed-but-output-lost probe. Not used as evidence for any claim in this receipt.",
+      "output_sha256": "n/a-inline"
+    },
+    {
+      "cmd": "python3 <scratch>/rag-ops/gap1_stale_lock_poll2.py  # 30s of 2s-interval polling after a fresh codebase_index call on the stuck project -- this is the receipt's ONLY genuine multi-poll evidence of no progress",
+      "exit": 0,
+      "duration_s": 32,
+      "output_excerpt": "status identical ('INDEX IS INCOMPLETE ... 0 of 0 discovered') at every one of 15 polls (t+2s .. t+30s); no progress over a real 30s window. Output is inline-only (printed to stdout, not saved as a separate file); no raw artifact file exists for this command, which is itself a limitation (see limitations).",
+      "output_sha256": "n/a-inline"
+    },
+    {
+      "cmd": "curl -s -X POST http://127.0.0.1:26333/collections/socraticode_metadata/points/scroll -d '{\"limit\":10,\"with_payload\":true}'  # inspect the persisted lock",
+      "exit": 0,
+      "duration_s": 1,
+      "output_excerpt": "payload.indexingStatus = 'in-progress', filesTotal=0, filesIndexed=0. CORRECTED: this filesTotal=0 shape matches p2's own aborted background-index attempt (which never got past file discovery before being SIGTERM'd), not p1's SIGKILL state, which had already discovered 402/402 files. The receipt cannot establish which of the two kills (p1's SIGKILL, or p2's own subsequent SIGTERM) produced this specific durable lock.",
+      "output_sha256": "n/a-inline"
+    },
+    {
+      "cmd": "python3 <scratch>/rag-ops/gap1_full_recovery2.py  # explicit codebase_remove in one process (clears the stale metadata point), terminate, 1s delay, fresh process calls codebase_index",
+      "exit": 0,
+      "duration_s": 8,
+      "output_excerpt": "after codebase_remove + fresh codebase_index, status showed real progress (200 indexed / 232/402 chunks embedded, batch 5/9) within seconds -- explicit removal is a working recovery path here",
+      "output_sha256": "n/a-inline"
+    },
+    {
+      "cmd": "python3 <scratch>/rag-ops/gap1_finish_and_watch.py  # new process polls status to completion (this run's own terminate_clean() SIGTERM'd the prior process mid-index a second time, leaving 250/402 chunks and another 'INDEX IS INCOMPLETE'); codebase_watch(action=start) is then called, which self-reports 'Caught up 152 change(s)' and finishes the index; watcher then picks up a live file edit (WATCHFRESH42 marker) and a query returns it within 1.5s without any manual codebase_update call",
+      "exit": 0,
+      "duration_s": 45,
+      "output_excerpt": "codebase_watch start: 'Caught up 152 change(s) since last session: 152 added'; final qdrant codebase_2df0d90218d3 count = 402 (matches 402 files on disk); query for WATCHFRESH42 succeeded on first 1.5s poll",
+      "output_sha256": "n/a-inline"
+    }
+  ],
+  "tool_versions": {
+    "socraticode": "1.14.0",
+    "qdrant": "1.19.1",
+    "node": "v24.21.0",
+    "vllm_embedding_endpoint": "live 127.0.0.1:8231 (Nemotron-3-Embed-1B-BF16, pinned production vllm-0.25.0, read-only embedding calls only)"
+  },
+  "installs": [],
+  "model_calls": [],
+  "result": "CORRECTED (fix round 2026-09-23; see correction_note for what changed and why). On a disposable Qdrant (port 26333) + disposable SocratiCode instance, cwd=a 402-file scratch project, driven by a purpose-built MCP stdio client, all instances run with SOCRATICODE_AUTO_RESUME=off: (1) After p1 is SIGKILL9'd mid-index (32/402 chunks embedded, 402/402 files discovered), a fresh process (p2) calling codebase_index starts its OWN background index attempt, which is then blocked ('Another process is already indexing this project, skipping' -- referring to p2's own task) and shortly after (~130ms) p2 itself is terminated via SIGTERM (terminate_clean()) while that task was apparently still in early file-discovery (a subsequently-observed 'filesTotal=0' state). The originally-claimed '90s of polling with zero progress' after the resume call is FALSE: the poll loop broke after exactly one read (~11.5ms) due to a string-matching bug ('complete' in 'INDEX IS INCOMPLETE'). The genuine multi-poll evidence for 'no progress' is a separate script, gap1_stale_lock_poll2.py: 15 polls at a real 2s interval over 30s, all showing the identical stuck state. (2) A durable 'indexingStatus: in-progress, filesTotal=0' point in the socraticode_metadata Qdrant collection persists across every subsequent probe (gap1_stale_lock_probe.py, gap1_stale_lock_poll2.py) and three blind codebase_index/codebase_stop retries in fresh processes do not clear it or make progress. Because this filesTotal=0 shape matches p2's own aborted attempt rather than p1's already-402/402-discovered SIGKILL state, this receipt cannot cleanly attribute the stuck lock to the SIGKILL specifically as opposed to the SIGTERM that followed it ~130ms later in the same script -- so it does NOT establish a SIGKILL-vs-SIGTERM contrast in self-healing behavior. (3) The only recovery path found that actually works from the stuck state is destructive: an explicit codebase_remove followed by a fresh codebase_index, which then makes real, observable progress (gap1_full_recovery2.py). (4) Separately, in a later, distinct run (gap1_finish_and_watch.py), a graceful SIGTERM mid-index left a similar 'INDEX IS INCOMPLETE' state (250/402 chunks), and here codebase_watch(action='start') self-healed it, reporting 'Caught up 152 change(s)' and completing the index to 402/402 without any codebase_remove; a subsequent live file edit was reflected in codebase_search within 1.5s. This SIGTERM-then-watch-recovers observation is valid on its own terms but is a different process/run than (1)-(2) and does not, by itself, establish that codebase_watch(start) would also clear the stuck lock reached in (1)-(2). All results above were obtained with SOCRATICODE_AUTO_RESUME=off; whether SocratiCode's default configuration (auto-resume on, if that is the default) would have cleared any of the stuck states automatically was not tested and is a real gap in this receipt's own coverage, not evidence that no configuration self-heals.",
+  "settles_gap": "partially",
+  "verdict_impact": {
+    "could_change_verdict": false,
+    "direction": "inconclusive",
+    "explanation": "CORRECTED: the original 'refutes_incumbent' direction rested on a false '90s of zero-progress polling, reproduced 3x' claim and on attributing a stuck lock to the SIGKILL specifically; both are corrected above. What remains supportable: a real stuck-lock state was reached and reproduced across several fresh-process probes with a genuine 30s/15-poll window of confirmed no progress, and the only recovery path found from that state was destructive (codebase_remove+reindex); a separately-observed SIGTERM interruption did self-heal via codebase_watch(start). But because (a) the stuck-lock scenario cannot be cleanly attributed to the SIGKILL versus the SIGTERM that followed it ~130ms later in the same script, (b) every test ran with SOCRATICODE_AUTO_RESUME=off (a feature whose name suggests it exists precisely to handle this case, and which was never tested in its default/on state), and (c) the SIGTERM self-heal and the stuck-lock scenario are different runs rather than a controlled SIGKILL-vs-SIGTERM comparison, this receipt cannot decide whether the incumbent has a genuine unattended-crash-recovery gap or whether the observed behavior is an artifact of disabling auto-resume. Direction is therefore inconclusive rather than refutes_incumbent, and could_change_verdict is false pending a corrected, controlled follow-up (default auto-resume setting; an isolated single-kill-type scenario per run)."
+  },
+  "evidence_class": "native_proven",
+  "limitations": [
+    "Single host. gap1_watcher_recovery.py (the core SIGKILL scenario) was executed at least twice: scratch-project/alpha.py contains its appended ZQXJ99 marker block twice, but only the final run's output (gap1_result.json) was retained -- the earlier run's outcome is unknown and not recoverable. All other scripts were run once each, so the receipt's earlier 'single run per scenario' claim was inaccurate for this scenario.",
+    "gap1_full_recovery.py and gap1_probe3.py were executed but their stdout was not captured/retained at the time; they are disclosed above for completeness but are not used as evidence for any claim in this receipt.",
+    "gap1_stale_lock_poll2.py -- this receipt's only genuine multi-poll (15 x 2s) evidence for 'no progress' -- has no raw artifact file; its output exists only as the inline output_excerpt above, so it cannot be independently re-verified from a retained file.",
+    "The 'stuck lock' scenario (gap1_watcher_recovery.py through gap1_full_recovery2.py) cannot be cleanly attributed to the SIGKILL of p1 specifically, since p2's own subsequent background-index attempt was itself interrupted by a SIGTERM (terminate_clean()) about 130ms after the SIGKILL, and the persisted filesTotal=0 lock state matches p2's aborted attempt rather than p1's already-402/402-discovered state.",
+    "SOCRATICODE_AUTO_RESUME=off was set on every disposable instance in this receipt (via mcp_client.py's build_env) and was not previously disclosed; none of the 'stuck lock never clears' findings were tested with SocratiCode's default auto-resume configuration.",
+    "Did not instrument socraticode's source to find the exact code path involved; this is a black-box behavioral finding, not a root-cause fix.",
+    "Only the disposable stack was touched; the live SocratiCode/Qdrant/vLLM services used by this project were never restarted or killed, so live-service kill/restart is not established by this receipt.",
+    "codebase_watch(start) catch-up was only exercised after a SIGTERM-based interruption in a separate later run, not directly after the SIGKILL+stuck-lock state reached in gap1_watcher_recovery.py/gap1_full_recovery2.py; whether codebase_watch(start) alone (without codebase_remove) can clear that specific stuck lock was not tested.",
+    "Per this fix round's constraint, the invalid poll-loop check in gap1_watcher_recovery.py was NOT re-run with a corrected script; the record was corrected using already-executed evidence (gap1_stale_lock_poll2.py) instead, so no new 90s-scale controlled poll of the resume attempt exists in this receipt."
+  ],
+  "raw_artifacts": [
+    {
+      "path": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/gap1_result.json",
+      "sha256": "8058d0f81d9caef56ea1536eef7f6ffd0c3513eb8c985f406e8ad44dca6995bd"
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/watcher-kill-restart-recovery/mcp_client.py",
+      "sha256": "8e9ce267c0368559a562278180c3ff6c3a4c7a4c46c564db9fa29b8667a84351",
+      "published_sha256": "b2cc59cc27ee89e2cc678d952120f9850068d8783405ec26c6b68c62b4aaa8b8",
+      "published_note": "Published copy differs from the run's file: home paths were sanitized to ~/ at publication, and the coordinator then made helper paths expand at run time (review of PR #101). sha256 is the file as run; published_sha256 is the committed file."
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/watcher-kill-restart-recovery/gap1_watcher_recovery.py",
+      "sha256": "2708bb63771e3aaedef6297c18b49c389653fa594431bcce950ecab55118863d"
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/watcher-kill-restart-recovery/gap1_stale_lock_probe.py",
+      "sha256": "8d6c0916e296f40c0e91964984f40fa0bdce2dfc5f8258a90bcd19b3beaa4753"
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/watcher-kill-restart-recovery/gap1_full_recovery.py",
+      "sha256": "342586268c748f69fe8a556497b65ffdc8ae4596c63139462211e41f09537c2b"
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/watcher-kill-restart-recovery/gap1_probe3.py",
+      "sha256": "b68d4f5c1e44f1ef66b66193cd670b28c03451284e833e21bd07434ed7b50055"
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/watcher-kill-restart-recovery/gap1_stale_lock_poll2.py",
+      "sha256": "5b81635a0a7b31692fcfe44c798c9abec81acd03c811d06ff498401ba0bb36e4"
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/watcher-kill-restart-recovery/gap1_full_recovery2.py",
+      "sha256": "0d59b60460d848f6d2034537e31b8b0b915341cec3761fe3378788c4df95eec3"
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/watcher-kill-restart-recovery/gap1_finish_and_watch.py",
+      "sha256": "2af779fd6511fe98cfe4af81881a3746f3ec41946c1ffbdd5157f3eabdee8b44"
+    }
+  ]
+}

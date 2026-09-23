@@ -1,0 +1,1305 @@
+{
+  "collection": "arm_b_bge_small",
+  "n_questions": 35,
+  "recall_at_5": 0.7714285714285715,
+  "recall_at_5_hits": 27,
+  "mrr": 0.5923809523809523,
+  "mean_query_latency_s": 0.01840552602495466,
+  "detail": [
+    {
+      "id": "q01",
+      "hit_at_5": true,
+      "rank": 1,
+      "top5": [
+        {
+          "path": "tools/compare/workers/lib/scoring.mjs",
+          "start_line": 31,
+          "end_line": 50,
+          "score": 0.8326701
+        },
+        {
+          "path": "tools/compare/workers/lib/constants.mjs",
+          "start_line": 151,
+          "end_line": 170,
+          "score": 0.7863271
+        },
+        {
+          "path": ".claude/workflows/sota-convergence.js",
+          "start_line": 241,
+          "end_line": 260,
+          "score": 0.776265
+        },
+        {
+          "path": "tools/compare/semantic/run-arms.mjs",
+          "start_line": 451,
+          "end_line": 470,
+          "score": 0.77406436
+        },
+        {
+          "path": "tools/ecosystem/e2e_manifest_v3.py",
+          "start_line": 76,
+          "end_line": 95,
+          "score": 0.7718723
+        }
+      ]
+    },
+    {
+      "id": "q02",
+      "hit_at_5": false,
+      "rank": null,
+      "top5": [
+        {
+          "path": "tools/compare/workers/lib/scoring.mjs",
+          "start_line": 211,
+          "end_line": 230,
+          "score": 0.78464353
+        },
+        {
+          "path": "tools/compare/workers/lib/protocol.mjs",
+          "start_line": 151,
+          "end_line": 170,
+          "score": 0.75547206
+        },
+        {
+          "path": "tools/compare/workers/lib/constants.mjs",
+          "start_line": 436,
+          "end_line": 455,
+          "score": 0.74436957
+        },
+        {
+          "path": "tests/compare/workers-scoring.test.mjs",
+          "start_line": 1,
+          "end_line": 20,
+          "score": 0.7382045
+        },
+        {
+          "path": "tools/compare/workers/lib/protocol.mjs",
+          "start_line": 181,
+          "end_line": 200,
+          "score": 0.7245337
+        }
+      ]
+    },
+    {
+      "id": "q03",
+      "hit_at_5": true,
+      "rank": 3,
+      "top5": [
+        {
+          "path": "tools/compare/workers/lib/scoring.mjs",
+          "start_line": 226,
+          "end_line": 245,
+          "score": 0.77150595
+        },
+        {
+          "path": "tools/compare/memory/arms/hindsight_driver.py",
+          "start_line": 121,
+          "end_line": 140,
+          "score": 0.7602233
+        },
+        {
+          "path": "tools/compare/workers/lib/scoring.mjs",
+          "start_line": 436,
+          "end_line": 455,
+          "score": 0.75962913
+        },
+        {
+          "path": "tools/compare/data/run-gap-cases.py",
+          "start_line": 1141,
+          "end_line": 1160,
+          "score": 0.75844425
+        },
+        {
+          "path": "tools/compare/workers/lib/scoring.mjs",
+          "start_line": 421,
+          "end_line": 440,
+          "score": 0.7558117
+        }
+      ]
+    },
+    {
+      "id": "q04",
+      "hit_at_5": true,
+      "rank": 3,
+      "top5": [
+        {
+          "path": "tools/compare/workers/lib/constants.mjs",
+          "start_line": 106,
+          "end_line": 125,
+          "score": 0.79002845
+        },
+        {
+          "path": "tests/compare/workers-normalisation.test.mjs",
+          "start_line": 76,
+          "end_line": 95,
+          "score": 0.78218246
+        },
+        {
+          "path": "tools/compare/workers/lib/scoring.mjs",
+          "start_line": 391,
+          "end_line": 410,
+          "score": 0.78164303
+        },
+        {
+          "path": "tools/compare/workers/lib/constants.mjs",
+          "start_line": 166,
+          "end_line": 185,
+          "score": 0.7627287
+        },
+        {
+          "path": "tools/compare/workers/lib/scoring.mjs",
+          "start_line": 361,
+          "end_line": 380,
+          "score": 0.7549194
+        }
+      ]
+    },
+    {
+      "id": "q05",
+      "hit_at_5": true,
+      "rank": 3,
+      "top5": [
+        {
+          "path": "tools/compare/workers/lib/constants.mjs",
+          "start_line": 136,
+          "end_line": 155,
+          "score": 0.77482605
+        },
+        {
+          "path": "tools/compare/workers/lib/constants.mjs",
+          "start_line": 151,
+          "end_line": 170,
+          "score": 0.7506672
+        },
+        {
+          "path": "tools/compare/workers/lib/scoring.mjs",
+          "start_line": 16,
+          "end_line": 35,
+          "score": 0.72933066
+        },
+        {
+          "path": "tools/compare/memory/lib/cases.mjs",
+          "start_line": 46,
+          "end_line": 65,
+          "score": 0.72712195
+        },
+        {
+          "path": "tools/compare/memory/lib/cases.mjs",
+          "start_line": 16,
+          "end_line": 35,
+          "score": 0.7219199
+        }
+      ]
+    },
+    {
+      "id": "q06",
+      "hit_at_5": true,
+      "rank": 1,
+      "top5": [
+        {
+          "path": "tools/compare/memory/lib/isolation.mjs",
+          "start_line": 121,
+          "end_line": 140,
+          "score": 0.81759876
+        },
+        {
+          "path": "tests/compare/memory-compare.test.mjs",
+          "start_line": 256,
+          "end_line": 275,
+          "score": 0.7654921
+        },
+        {
+          "path": "tools/compare/workers/lib/arms.mjs",
+          "start_line": 106,
+          "end_line": 125,
+          "score": 0.7510967
+        },
+        {
+          "path": "tools/compare/workers/lib/constants.mjs",
+          "start_line": 376,
+          "end_line": 395,
+          "score": 0.7480003
+        },
+        {
+          "path": "tools/compare/memory/run-arms.mjs",
+          "start_line": 1,
+          "end_line": 20,
+          "score": 0.7418192
+        }
+      ]
+    },
+    {
+      "id": "q07",
+      "hit_at_5": true,
+      "rank": 1,
+      "top5": [
+        {
+          "path": "tools/compare/memory/lib/isolation.mjs",
+          "start_line": 61,
+          "end_line": 80,
+          "score": 0.8061284
+        },
+        {
+          "path": "tests/compare/memory-compare.test.mjs",
+          "start_line": 226,
+          "end_line": 245,
+          "score": 0.7420169
+        },
+        {
+          "path": "tools/compare/memory/lib/isolation.mjs",
+          "start_line": 46,
+          "end_line": 65,
+          "score": 0.73183155
+        },
+        {
+          "path": "tools/compare/memory/lib/isolation.mjs",
+          "start_line": 76,
+          "end_line": 95,
+          "score": 0.7237613
+        },
+        {
+          "path": "tools/compare/memory/lib/isolation.mjs",
+          "start_line": 91,
+          "end_line": 110,
+          "score": 0.7201024
+        }
+      ]
+    },
+    {
+      "id": "q08",
+      "hit_at_5": true,
+      "rank": 1,
+      "top5": [
+        {
+          "path": "tools/compare/memory/lib/isolation.mjs",
+          "start_line": 31,
+          "end_line": 50,
+          "score": 0.8153782
+        },
+        {
+          "path": "tests/compare/memory-compare.test.mjs",
+          "start_line": 256,
+          "end_line": 275,
+          "score": 0.74504286
+        },
+        {
+          "path": "tests/compare/memory-compare.test.mjs",
+          "start_line": 271,
+          "end_line": 290,
+          "score": 0.72363734
+        },
+        {
+          "path": "tools/compare/memory/lib/isolation.mjs",
+          "start_line": 46,
+          "end_line": 65,
+          "score": 0.7163619
+        },
+        {
+          "path": "tests/compare/memory-compare.test.mjs",
+          "start_line": 226,
+          "end_line": 245,
+          "score": 0.7082723
+        }
+      ]
+    },
+    {
+      "id": "q09",
+      "hit_at_5": false,
+      "rank": null,
+      "top5": [
+        {
+          "path": "tools/compare/memory/lib/isolation.mjs",
+          "start_line": 61,
+          "end_line": 80,
+          "score": 0.7770411
+        },
+        {
+          "path": "tests/compare/memory-compare.test.mjs",
+          "start_line": 226,
+          "end_line": 245,
+          "score": 0.77409303
+        },
+        {
+          "path": "tools/ecosystem/test_token_manifest.py",
+          "start_line": 166,
+          "end_line": 185,
+          "score": 0.7612156
+        },
+        {
+          "path": "tools/ecosystem/verify-context-mode.py",
+          "start_line": 31,
+          "end_line": 50,
+          "score": 0.7565616
+        },
+        {
+          "path": "docs/tasks/2026-09-22-clean-foundation-trading-closure.md",
+          "start_line": 46,
+          "end_line": 65,
+          "score": 0.7556528
+        }
+      ]
+    },
+    {
+      "id": "q10",
+      "hit_at_5": false,
+      "rank": null,
+      "top5": [
+        {
+          "path": "tools/ecosystem/token_manifest.py",
+          "start_line": 166,
+          "end_line": 185,
+          "score": 0.78402334
+        },
+        {
+          "path": "docs/tasks/archive/2026-09-21-claude-broad-market-monitor-through-2358.md",
+          "start_line": 16,
+          "end_line": 35,
+          "score": 0.78389484
+        },
+        {
+          "path": "docs/tasks/2026-09-20-current-session-observation.md",
+          "start_line": 46,
+          "end_line": 65,
+          "score": 0.77452654
+        },
+        {
+          "path": "tools/ecosystem/token_manifest.py",
+          "start_line": 151,
+          "end_line": 170,
+          "score": 0.7661865
+        },
+        {
+          "path": "docs/tasks/2026-09-19-acceptance-wave.md",
+          "start_line": 31,
+          "end_line": 50,
+          "score": 0.7608593
+        }
+      ]
+    },
+    {
+      "id": "q11",
+      "hit_at_5": false,
+      "rank": null,
+      "top5": [
+        {
+          "path": "tools/ecosystem/token_manifest.py",
+          "start_line": 511,
+          "end_line": 530,
+          "score": 0.7923562
+        },
+        {
+          "path": "tools/ecosystem/test_token_manifest.py",
+          "start_line": 46,
+          "end_line": 65,
+          "score": 0.792254
+        },
+        {
+          "path": "tools/ecosystem/token_manifest.py",
+          "start_line": 166,
+          "end_line": 185,
+          "score": 0.777157
+        },
+        {
+          "path": "tools/ecosystem/e2e_manifest_v3.py",
+          "start_line": 451,
+          "end_line": 470,
+          "score": 0.7764498
+        },
+        {
+          "path": "tools/ecosystem/test_token_manifest.py",
+          "start_line": 106,
+          "end_line": 125,
+          "score": 0.77546376
+        }
+      ]
+    },
+    {
+      "id": "q12",
+      "hit_at_5": false,
+      "rank": null,
+      "top5": [
+        {
+          "path": "tools/ecosystem/toon-artifact.py",
+          "start_line": 91,
+          "end_line": 110,
+          "score": 0.8162901
+        },
+        {
+          "path": "docs/tasks/2026-09-20-foundation-native.md",
+          "start_line": 136,
+          "end_line": 155,
+          "score": 0.7770761
+        },
+        {
+          "path": "tools/compare/memory/lib/corpus.mjs",
+          "start_line": 16,
+          "end_line": 35,
+          "score": 0.7739775
+        },
+        {
+          "path": "tools/compare/retrieval/run-arms.mjs",
+          "start_line": 856,
+          "end_line": 875,
+          "score": 0.770321
+        },
+        {
+          "path": "tools/compare/retrieval/run-arms.mjs",
+          "start_line": 466,
+          "end_line": 485,
+          "score": 0.76774466
+        }
+      ]
+    },
+    {
+      "id": "q13",
+      "hit_at_5": true,
+      "rank": 1,
+      "top5": [
+        {
+          "path": "tools/ecosystem/token_manifest.py",
+          "start_line": 256,
+          "end_line": 275,
+          "score": 0.85808647
+        },
+        {
+          "path": "tools/ecosystem/test_token_manifest.py",
+          "start_line": 241,
+          "end_line": 260,
+          "score": 0.80419433
+        },
+        {
+          "path": "tools/ecosystem/install-linux-efficiency.py",
+          "start_line": 76,
+          "end_line": 95,
+          "score": 0.7942164
+        },
+        {
+          "path": "docs/tasks/native-evaluation.md",
+          "start_line": 61,
+          "end_line": 80,
+          "score": 0.7926432
+        },
+        {
+          "path": "tools/compare/workers/lib/constants.mjs",
+          "start_line": 376,
+          "end_line": 395,
+          "score": 0.7806957
+        }
+      ]
+    },
+    {
+      "id": "q14",
+      "hit_at_5": false,
+      "rank": null,
+      "top5": [
+        {
+          "path": "docs/tasks/2026-09-20-authenticated-data-convergence.md",
+          "start_line": 76,
+          "end_line": 95,
+          "score": 0.7286941
+        },
+        {
+          "path": "tools/ecosystem/test_token_manifest.py",
+          "start_line": 46,
+          "end_line": 65,
+          "score": 0.7262257
+        },
+        {
+          "path": "tools/compare/data/run-gap-cases.py",
+          "start_line": 646,
+          "end_line": 665,
+          "score": 0.71115804
+        },
+        {
+          "path": "docs/tasks/2026-09-22-grand-catalog-handbook.md",
+          "start_line": 271,
+          "end_line": 290,
+          "score": 0.7068367
+        },
+        {
+          "path": "docs/tasks/2026-09-20-current-session-observation.md",
+          "start_line": 46,
+          "end_line": 65,
+          "score": 0.7052345
+        }
+      ]
+    },
+    {
+      "id": "q15",
+      "hit_at_5": true,
+      "rank": 1,
+      "top5": [
+        {
+          "path": ".claude/workflows/child-usage.mjs",
+          "start_line": 1,
+          "end_line": 20,
+          "score": 0.7692554
+        },
+        {
+          "path": ".claude/workflows/child-usage.mjs",
+          "start_line": 16,
+          "end_line": 35,
+          "score": 0.73295844
+        },
+        {
+          "path": "tests/compare/retrieval.test.mjs",
+          "start_line": 151,
+          "end_line": 170,
+          "score": 0.7235811
+        },
+        {
+          "path": "tools/compare/retrieval/run-arms.mjs",
+          "start_line": 1051,
+          "end_line": 1070,
+          "score": 0.7119953
+        },
+        {
+          "path": "tools/compare/memory/run-arms.mjs",
+          "start_line": 346,
+          "end_line": 365,
+          "score": 0.70760375
+        }
+      ]
+    },
+    {
+      "id": "q16",
+      "hit_at_5": true,
+      "rank": 1,
+      "top5": [
+        {
+          "path": ".claude/workflows/child-usage.mjs",
+          "start_line": 46,
+          "end_line": 65,
+          "score": 0.7664788
+        },
+        {
+          "path": ".claude/workflows/child-usage.mjs",
+          "start_line": 76,
+          "end_line": 95,
+          "score": 0.7359087
+        },
+        {
+          "path": ".claude/workflows/child-usage.mjs",
+          "start_line": 61,
+          "end_line": 80,
+          "score": 0.70720077
+        },
+        {
+          "path": "docs/tasks/2026-09-21-dashboard-rendered-e2e.md",
+          "start_line": 31,
+          "end_line": 49,
+          "score": 0.69846743
+        },
+        {
+          "path": "tools/compare/data/run-gap-cases.py",
+          "start_line": 856,
+          "end_line": 875,
+          "score": 0.69314945
+        }
+      ]
+    },
+    {
+      "id": "q17",
+      "hit_at_5": false,
+      "rank": null,
+      "top5": [
+        {
+          "path": "tools/compare/workers/lib/constants.mjs",
+          "start_line": 211,
+          "end_line": 230,
+          "score": 0.7861614
+        },
+        {
+          "path": "tests/compare/workers-usage.test.mjs",
+          "start_line": 61,
+          "end_line": 80,
+          "score": 0.7749981
+        },
+        {
+          "path": "tools/compare/retrieval/run-arms.mjs",
+          "start_line": 1111,
+          "end_line": 1130,
+          "score": 0.7638831
+        },
+        {
+          "path": "tests/compare/test_run_gap_cases.py",
+          "start_line": 46,
+          "end_line": 65,
+          "score": 0.7629996
+        },
+        {
+          "path": "tools/ecosystem/e2e_manifest_v3.py",
+          "start_line": 436,
+          "end_line": 455,
+          "score": 0.75726485
+        }
+      ]
+    },
+    {
+      "id": "q18",
+      "hit_at_5": true,
+      "rank": 1,
+      "top5": [
+        {
+          "path": ".claude/workflows/child-usage.mjs",
+          "start_line": 91,
+          "end_line": 110,
+          "score": 0.85305595
+        },
+        {
+          "path": ".claude/workflows/child-usage.mjs",
+          "start_line": 106,
+          "end_line": 121,
+          "score": 0.7862257
+        },
+        {
+          "path": "tools/compare/models/phase1/t2/prompt.md",
+          "start_line": 1,
+          "end_line": 14,
+          "score": 0.73011535
+        },
+        {
+          "path": "tools/ecosystem/native-choice-guide.md",
+          "start_line": 31,
+          "end_line": 50,
+          "score": 0.7228259
+        },
+        {
+          "path": "tools/compare/semantic/run-arms.mjs",
+          "start_line": 496,
+          "end_line": 515,
+          "score": 0.7217555
+        }
+      ]
+    },
+    {
+      "id": "q19",
+      "hit_at_5": true,
+      "rank": 1,
+      "top5": [
+        {
+          "path": "tools/compare/workers/lib/usage.mjs",
+          "start_line": 31,
+          "end_line": 50,
+          "score": 0.8133673
+        },
+        {
+          "path": "tools/compare/workers/lib/usage.mjs",
+          "start_line": 1,
+          "end_line": 20,
+          "score": 0.7883995
+        },
+        {
+          "path": "tools/compare/workers/lib/usage.mjs",
+          "start_line": 16,
+          "end_line": 35,
+          "score": 0.76570714
+        },
+        {
+          "path": "tools/compare/workers/lib/usage.mjs",
+          "start_line": 61,
+          "end_line": 80,
+          "score": 0.76239944
+        },
+        {
+          "path": "tests/compare/workers-usage.test.mjs",
+          "start_line": 46,
+          "end_line": 65,
+          "score": 0.7613284
+        }
+      ]
+    },
+    {
+      "id": "q20",
+      "hit_at_5": true,
+      "rank": 1,
+      "top5": [
+        {
+          "path": "tools/compare/workers/lib/usage.mjs",
+          "start_line": 76,
+          "end_line": 82,
+          "score": 0.8220781
+        },
+        {
+          "path": "tools/compare/workers/lib/usage.mjs",
+          "start_line": 61,
+          "end_line": 80,
+          "score": 0.750597
+        },
+        {
+          "path": "tools/compare/workers/lib/usage.mjs",
+          "start_line": 46,
+          "end_line": 65,
+          "score": 0.72873485
+        },
+        {
+          "path": "tools/compare/workers/lib/scoring.mjs",
+          "start_line": 436,
+          "end_line": 455,
+          "score": 0.7188685
+        },
+        {
+          "path": "tests/compare/workers-usage.test.mjs",
+          "start_line": 1,
+          "end_line": 20,
+          "score": 0.7039614
+        }
+      ]
+    },
+    {
+      "id": "q21",
+      "hit_at_5": true,
+      "rank": 1,
+      "top5": [
+        {
+          "path": "tools/compare/workers/lib/usage.mjs",
+          "start_line": 16,
+          "end_line": 35,
+          "score": 0.7790195
+        },
+        {
+          "path": "tools/compare/workers/lib/usage.mjs",
+          "start_line": 46,
+          "end_line": 65,
+          "score": 0.7778321
+        },
+        {
+          "path": "tools/compare/semantic/run-arms.mjs",
+          "start_line": 481,
+          "end_line": 500,
+          "score": 0.74411863
+        },
+        {
+          "path": "tools/compare/workers/lib/usage.mjs",
+          "start_line": 61,
+          "end_line": 80,
+          "score": 0.7240299
+        },
+        {
+          "path": "tools/compare/semantic/run-arms.mjs",
+          "start_line": 796,
+          "end_line": 815,
+          "score": 0.7212456
+        }
+      ]
+    },
+    {
+      "id": "q22",
+      "hit_at_5": true,
+      "rank": 5,
+      "top5": [
+        {
+          "path": "tools/compare/workers/lib/arms.mjs",
+          "start_line": 376,
+          "end_line": 395,
+          "score": 0.81852055
+        },
+        {
+          "path": "tools/compare/workers/lib/constants.mjs",
+          "start_line": 376,
+          "end_line": 395,
+          "score": 0.8157401
+        },
+        {
+          "path": "tools/compare/memory/arms/hindsight_driver.py",
+          "start_line": 76,
+          "end_line": 95,
+          "score": 0.8010728
+        },
+        {
+          "path": "tools/compare/workers/lib/constants.mjs",
+          "start_line": 391,
+          "end_line": 410,
+          "score": 0.7994957
+        },
+        {
+          "path": "tools/compare/workers/lib/blocked.mjs",
+          "start_line": 61,
+          "end_line": 80,
+          "score": 0.79885393
+        }
+      ]
+    },
+    {
+      "id": "q23",
+      "hit_at_5": true,
+      "rank": 1,
+      "top5": [
+        {
+          "path": "tools/compare/workers/lib/blocked.mjs",
+          "start_line": 91,
+          "end_line": 110,
+          "score": 0.8238988
+        },
+        {
+          "path": "tools/compare/workers/lib/blocked.mjs",
+          "start_line": 76,
+          "end_line": 95,
+          "score": 0.8194032
+        },
+        {
+          "path": "tools/compare/workers/lib/blocked.mjs",
+          "start_line": 46,
+          "end_line": 65,
+          "score": 0.8007239
+        },
+        {
+          "path": "tests/compare/workers-blocked.test.mjs",
+          "start_line": 136,
+          "end_line": 154,
+          "score": 0.7835657
+        },
+        {
+          "path": "tools/compare/workers/lib/blocked.mjs",
+          "start_line": 31,
+          "end_line": 50,
+          "score": 0.7745395
+        }
+      ]
+    },
+    {
+      "id": "q24",
+      "hit_at_5": true,
+      "rank": 1,
+      "top5": [
+        {
+          "path": "tools/compare/workers/lib/blocked.mjs",
+          "start_line": 121,
+          "end_line": 129,
+          "score": 0.85811126
+        },
+        {
+          "path": "tools/compare/workers/lib/blocked.mjs",
+          "start_line": 46,
+          "end_line": 65,
+          "score": 0.7987628
+        },
+        {
+          "path": "tests/compare/workers-blocked.test.mjs",
+          "start_line": 61,
+          "end_line": 80,
+          "score": 0.79128957
+        },
+        {
+          "path": "tools/compare/workers/lib/constants.mjs",
+          "start_line": 331,
+          "end_line": 350,
+          "score": 0.78191894
+        },
+        {
+          "path": "tools/compare/workers/lib/constants.mjs",
+          "start_line": 316,
+          "end_line": 335,
+          "score": 0.77763164
+        }
+      ]
+    },
+    {
+      "id": "q25",
+      "hit_at_5": true,
+      "rank": 1,
+      "top5": [
+        {
+          "path": "tools/compare/workers/lib/blocked.mjs",
+          "start_line": 16,
+          "end_line": 35,
+          "score": 0.8248501
+        },
+        {
+          "path": "tools/ecosystem/toon-artifact.py",
+          "start_line": 91,
+          "end_line": 110,
+          "score": 0.7340511
+        },
+        {
+          "path": "tools/ecosystem/test_e2e_template.py",
+          "start_line": 61,
+          "end_line": 80,
+          "score": 0.7320716
+        },
+        {
+          "path": "tests/compare/closure-and-isolation.test.mjs",
+          "start_line": 196,
+          "end_line": 215,
+          "score": 0.7225384
+        },
+        {
+          "path": "tools/ecosystem/test_e2e_manifest_v3.py",
+          "start_line": 46,
+          "end_line": 65,
+          "score": 0.7196106
+        }
+      ]
+    },
+    {
+      "id": "q26",
+      "hit_at_5": true,
+      "rank": 2,
+      "top5": [
+        {
+          "path": "tests/compare/closure-and-isolation.test.mjs",
+          "start_line": 226,
+          "end_line": 239,
+          "score": 0.81643105
+        },
+        {
+          "path": "tools/ecosystem/toon-artifact.py",
+          "start_line": 46,
+          "end_line": 65,
+          "score": 0.8022679
+        },
+        {
+          "path": "tools/ecosystem/toon-artifact.py",
+          "start_line": 31,
+          "end_line": 50,
+          "score": 0.7847537
+        },
+        {
+          "path": "tools/ecosystem/context-evaluation/accept.py",
+          "start_line": 46,
+          "end_line": 51,
+          "score": 0.77972925
+        },
+        {
+          "path": "tools/compare/data/run-gap-cases.py",
+          "start_line": 451,
+          "end_line": 470,
+          "score": 0.776432
+        }
+      ]
+    },
+    {
+      "id": "q27",
+      "hit_at_5": true,
+      "rank": 4,
+      "top5": [
+        {
+          "path": "tools/compare/workers/run-arms.mjs",
+          "start_line": 166,
+          "end_line": 185,
+          "score": 0.7573142
+        },
+        {
+          "path": "tests/compare/retrieval.test.mjs",
+          "start_line": 151,
+          "end_line": 170,
+          "score": 0.75500906
+        },
+        {
+          "path": "tools/ecosystem/toon-artifact.py",
+          "start_line": 61,
+          "end_line": 80,
+          "score": 0.74262667
+        },
+        {
+          "path": "tools/ecosystem/toon-artifact.py",
+          "start_line": 91,
+          "end_line": 110,
+          "score": 0.73687243
+        },
+        {
+          "path": "tests/compare/retrieval.test.mjs",
+          "start_line": 166,
+          "end_line": 185,
+          "score": 0.73636657
+        }
+      ]
+    },
+    {
+      "id": "q28",
+      "hit_at_5": true,
+      "rank": 4,
+      "top5": [
+        {
+          "path": "tools/ecosystem/toon-artifact.py",
+          "start_line": 61,
+          "end_line": 80,
+          "score": 0.79091537
+        },
+        {
+          "path": "tools/ecosystem/toon-artifact.py",
+          "start_line": 31,
+          "end_line": 50,
+          "score": 0.77007014
+        },
+        {
+          "path": "tools/ecosystem/toon-artifact.py",
+          "start_line": 1,
+          "end_line": 20,
+          "score": 0.7658755
+        },
+        {
+          "path": "tools/ecosystem/toon-artifact.py",
+          "start_line": 136,
+          "end_line": 155,
+          "score": 0.7610153
+        },
+        {
+          "path": "tools/ecosystem/toon-artifact.py",
+          "start_line": 46,
+          "end_line": 65,
+          "score": 0.74401397
+        }
+      ]
+    },
+    {
+      "id": "q29",
+      "hit_at_5": true,
+      "rank": 1,
+      "top5": [
+        {
+          "path": "tools/ecosystem/toon-artifact.py",
+          "start_line": 16,
+          "end_line": 35,
+          "score": 0.79862714
+        },
+        {
+          "path": "tools/ecosystem/test_toon_artifact.py",
+          "start_line": 106,
+          "end_line": 125,
+          "score": 0.7661675
+        },
+        {
+          "path": "tools/ecosystem/toon-artifact.py",
+          "start_line": 121,
+          "end_line": 140,
+          "score": 0.76245457
+        },
+        {
+          "path": "tools/ecosystem/toon-artifact.py",
+          "start_line": 91,
+          "end_line": 110,
+          "score": 0.74273825
+        },
+        {
+          "path": "tools/compare/workers/run-arms.mjs",
+          "start_line": 286,
+          "end_line": 305,
+          "score": 0.7391951
+        }
+      ]
+    },
+    {
+      "id": "q30",
+      "hit_at_5": true,
+      "rank": 1,
+      "top5": [
+        {
+          "path": "tools/ecosystem/toon-artifact.py",
+          "start_line": 31,
+          "end_line": 50,
+          "score": 0.83272606
+        },
+        {
+          "path": "tools/compare/data/run-gap-cases.py",
+          "start_line": 406,
+          "end_line": 425,
+          "score": 0.7690649
+        },
+        {
+          "path": "tools/compare/data/run-gap-cases.py",
+          "start_line": 466,
+          "end_line": 485,
+          "score": 0.7413173
+        },
+        {
+          "path": "tests/compare/closure-and-isolation.test.mjs",
+          "start_line": 226,
+          "end_line": 239,
+          "score": 0.73495936
+        },
+        {
+          "path": "tools/ecosystem/toon-artifact.py",
+          "start_line": 16,
+          "end_line": 35,
+          "score": 0.73027194
+        }
+      ]
+    },
+    {
+      "id": "q31",
+      "hit_at_5": true,
+      "rank": 3,
+      "top5": [
+        {
+          "path": "tests/compare/memory-compare.test.mjs",
+          "start_line": 136,
+          "end_line": 155,
+          "score": 0.8333208
+        },
+        {
+          "path": "tools/compare/memory/lib/score.mjs",
+          "start_line": 121,
+          "end_line": 140,
+          "score": 0.80774546
+        },
+        {
+          "path": "tools/compare/memory/lib/score.mjs",
+          "start_line": 1,
+          "end_line": 20,
+          "score": 0.8077174
+        },
+        {
+          "path": "tests/compare/memory-compare.test.mjs",
+          "start_line": 121,
+          "end_line": 140,
+          "score": 0.804349
+        },
+        {
+          "path": "tools/compare/memory/lib/score.mjs",
+          "start_line": 16,
+          "end_line": 35,
+          "score": 0.7949898
+        }
+      ]
+    },
+    {
+      "id": "q32",
+      "hit_at_5": true,
+      "rank": 1,
+      "top5": [
+        {
+          "path": "tools/compare/memory/lib/score.mjs",
+          "start_line": 106,
+          "end_line": 125,
+          "score": 0.79641277
+        },
+        {
+          "path": "tools/compare/semantic/run-arms.mjs",
+          "start_line": 916,
+          "end_line": 935,
+          "score": 0.76216257
+        },
+        {
+          "path": "tools/compare/memory/lib/score.mjs",
+          "start_line": 91,
+          "end_line": 110,
+          "score": 0.7582665
+        },
+        {
+          "path": "docs/tasks/archive/2026-09-21-claude-broad-market-monitor-through-2358.md",
+          "start_line": 106,
+          "end_line": 125,
+          "score": 0.7519048
+        },
+        {
+          "path": "tools/compare/memory/run-arms.mjs",
+          "start_line": 61,
+          "end_line": 80,
+          "score": 0.7510066
+        }
+      ]
+    },
+    {
+      "id": "q33",
+      "hit_at_5": true,
+      "rank": 5,
+      "top5": [
+        {
+          "path": "tests/compare/latency-stats.test.mjs",
+          "start_line": 1,
+          "end_line": 20,
+          "score": 0.81086504
+        },
+        {
+          "path": "tools/compare/semantic/run-arms.mjs",
+          "start_line": 706,
+          "end_line": 725,
+          "score": 0.8041881
+        },
+        {
+          "path": "tests/compare/latency-stats.test.mjs",
+          "start_line": 16,
+          "end_line": 35,
+          "score": 0.7880863
+        },
+        {
+          "path": "tests/compare/memory-compare.test.mjs",
+          "start_line": 211,
+          "end_line": 230,
+          "score": 0.78046554
+        },
+        {
+          "path": "tools/compare/memory/lib/score.mjs",
+          "start_line": 166,
+          "end_line": 185,
+          "score": 0.76886773
+        }
+      ]
+    },
+    {
+      "id": "q34",
+      "hit_at_5": false,
+      "rank": null,
+      "top5": [
+        {
+          "path": "tests/compare/closure-and-isolation.test.mjs",
+          "start_line": 61,
+          "end_line": 80,
+          "score": 0.740813
+        },
+        {
+          "path": "tools/compare/semantic/run-arms.mjs",
+          "start_line": 601,
+          "end_line": 620,
+          "score": 0.73752093
+        },
+        {
+          "path": "tools/compare/retrieval/run-arms.mjs",
+          "start_line": 721,
+          "end_line": 740,
+          "score": 0.7130159
+        },
+        {
+          "path": "tools/compare/workers/lib/blocked.mjs",
+          "start_line": 91,
+          "end_line": 110,
+          "score": 0.7119954
+        },
+        {
+          "path": "tests/compare/closure-and-isolation.test.mjs",
+          "start_line": 76,
+          "end_line": 95,
+          "score": 0.7114948
+        }
+      ]
+    },
+    {
+      "id": "q35",
+      "hit_at_5": true,
+      "rank": 1,
+      "top5": [
+        {
+          "path": ".claude/workflows/check-syntax.mjs",
+          "start_line": 1,
+          "end_line": 18,
+          "score": 0.811935
+        },
+        {
+          "path": "docs/tasks/2026-09-22-clean-foundation-trading-closure.md",
+          "start_line": 61,
+          "end_line": 80,
+          "score": 0.78418064
+        },
+        {
+          "path": "docs/tasks/2026-09-21-native-workflow-alignment.md",
+          "start_line": 46,
+          "end_line": 52,
+          "score": 0.7802674
+        },
+        {
+          "path": "docs/foundation-tooling-commit-plan-20260922.md",
+          "start_line": 91,
+          "end_line": 110,
+          "score": 0.7566663
+        },
+        {
+          "path": "tests/compare/closure-script.test.mjs",
+          "start_line": 1,
+          "end_line": 20,
+          "score": 0.7546872
+        }
+      ]
+    }
+  ]
+}

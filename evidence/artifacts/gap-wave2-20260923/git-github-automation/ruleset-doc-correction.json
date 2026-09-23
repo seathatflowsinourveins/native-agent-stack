@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "id": "ruleset-doc-correction",
+  "date": "2026-09-23",
+  "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+  "layer_ids": ["git-github-automation"],
+  "gap_refs": [
+    { "layer_id": "git-github-automation", "gap_index": 11 }
+  ],
+  "purpose": "Run a dated gh api GET of the live main ruleset and branch rules, then correct docs/github-automation.md's 'Publication and practical acceptance' section, which still described only validate+token-report as required and treated main-ruleset.json as reviewed-but-not-yet-applied -- contradicting the same file's later 'Ruleset upgrade, 2026-09-22' section, which records both rulesets as applied on 2026-09-22 with secret-scan added. Per gap [11]'s next_check.",
+  "preregistered": "If the dated GET shows the live ruleset already includes secret-scan and the full rule set described in 'Ruleset upgrade, 2026-09-22' (deletion, non_fast_forward, required_linear_history, pull_request rule), that confirms the earlier 'Publication and practical acceptance' section is stale and contradicts the later section rather than describing a different, still-current state; the fix is to update that earlier section to the dated GET's actual content and remove the not-yet-applied framing, not to touch the later section (which already matches the GET). If the GET instead showed only validate+token-report and no pull_request rule, the earlier section would already be correct and no edit would be made.",
+  "commands": [
+    { "cmd": "gh api repos/seathatflowsinourveins/native-agent-stack/rulesets", "exit": 0, "duration_s": 0.6, "output_excerpt": "two active rulesets: id 23739774 (Native foundation required checks, branch target, updated_at 2026-09-22T11:08:22.608-04:00) and id 23829417 (Native foundation tag protection, tag target, created_at 2026-09-22T11:08:53.556-04:00)", "output_sha256": "d90daa69c02e0586f1749f8190e7938d16f4963849cc8c83fa34560e5fe46308" },
+    { "cmd": "gh api repos/seathatflowsinourveins/native-agent-stack/rules/branches/main", "exit": 0, "duration_s": 0.5, "output_excerpt": "required_status_checks=[validate,token-report,secret-scan]; deletion; non_fast_forward; required_linear_history; pull_request(required_approving_review_count=0, dismiss_stale_reviews_on_push=true, require_code_owner_review=false, require_last_push_approval=false, required_review_thread_resolution=true, allowed_merge_methods=[squash,rebase]) -- matches 'Ruleset upgrade, 2026-09-22' field for field", "output_sha256": "154efb2f4eb0fc5e945f9788dda2aca392980c04f6888d63f3426278b7925bea" }
+  ],
+  "tool_versions": {
+    "gh": "gh version 2.101.0 (2026-09-15)"
+  },
+  "installs": [],
+  "model_calls": [],
+  "result": {
+    "status": "doc_corrected",
+    "file_edited": "docs/github-automation.md",
+    "section": "Publication and practical acceptance",
+    "change_summary": "Replaced the 'as of this writing ... validate and token-report only' / 'main-ruleset.json ... reviewed, not-yet-applied' passage with the dated 2026-09-23 GET's actual content (both rulesets active, secret-scan plus deletion/non_fast_forward/required_linear_history/pull_request rule on main; separate tag ruleset id 23829417 active), removed the contradiction with 'Ruleset upgrade, 2026-09-22' below it, and added a one-line note that a 2026-09-23 re-check reconfirmed the same live state. The later section was left unchanged since it already matched the GET."
+  },
+  "settles_gap": true,
+  "verdict_impact": {
+    "could_change_verdict": false,
+    "direction": "supports_incumbent",
+    "explanation": "The live ruleset state matches what 'Ruleset upgrade, 2026-09-22' already claimed; only the earlier, stale passage needed correction. No ruleset behavior changed and no alternative was compared."
+  },
+  "evidence_class": "native_proven",
+  "limitations": [
+    "Only docs/github-automation.md's 'Publication and practical acceptance' section was edited, per the unit's ownership of that file; catalogs/landscape/*.json and manifests/stack.json were not touched even though they may reference the same claim elsewhere.",
+    "The dated GET reconfirms the ruleset content as of 2026-09-23T02:23-02:24Z; it does not itself prove no further change happens before this receipt is read."
+  ],
+  "raw_artifacts": [
+    { "path": "~/codex-ecosystem/state/gap-wave2-20260923/gh-flow/ruleset-checks/rulesets-20260923.json", "sha256": "d90daa69c02e0586f1749f8190e7938d16f4963849cc8c83fa34560e5fe46308" },
+    { "path": "~/codex-ecosystem/state/gap-wave2-20260923/gh-flow/ruleset-checks/rules-branches-main-20260923.json", "sha256": "154efb2f4eb0fc5e945f9788dda2aca392980c04f6888d63f3426278b7925bea" }
+  ]
+}

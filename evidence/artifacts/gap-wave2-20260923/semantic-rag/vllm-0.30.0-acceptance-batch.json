@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "id": "vllm-0.30.0-acceptance-batch",
+  "date": "2026-09-23",
+  "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+  "layer_ids": [
+    "semantic-rag"
+  ],
+  "gap_refs": [
+    {
+      "layer_id": "semantic-rag",
+      "gap_index": 11
+    }
+  ],
+  "purpose": "Extend the prior single-embedding vLLM 0.30.0 smoke test (evidence/artifacts/gap-resolution-20260922/semantic-rag/vllm-0.30.0-uva-smoke.json, which only confirmed a startup + one embedding request) with a real indexing-scale batch and a retrieval question, matching the substance of the 0.25.0 production acceptance, so gap 11's 'no retained runtime acceptance here' can move from a bare startup smoke test to an actual batch-indexing + query acceptance for the isolated 0.30.0 prefix.",
+  "preregistered": "Start the production embedding model (nvidia/Nemotron-3-Embed-1B-BF16) under the isolated vLLM 0.30.0 prefix on a new port, confirm the embedding dimension matches the incumbent (2048), index a real SocratiCode-scale batch (the tools/ecosystem/* subset of the sealed benchmark's chunk set: 331 chunks) into a disposable Qdrant collection, then run one retrieval question standing in for 'the native-rag question' (the literal question text in evidence/receipts/native-rag.json was not retained verbatim, only its target result tools/ecosystem/linux-usage-report.cjs, which is a .cjs file outside this chunker's four indexed extensions -- so an exact reproduction is not possible; a clearly-labelled stand-in question is used and the literal-file limitation is recorded, not hidden). A clean batch index (few/no per-item errors) plus a topically relevant top-5 result settles the batch-acceptance question; a crash or empty/irrelevant results would refute it.",
+  "preregistered_fix_round": "CORRECTED (fix round, written before the corrected run below): the claim above that the literal native-rag.json question text 'was not retained verbatim' is FALSE -- this worktree's own evidence/receipts/desktop-direct-rag.json (checked out since the base commit, read-only corpus, never edited by this unit) carries the exact original query text verbatim ('collect agent usage totals separately for native Linux and Desktop configuration homes') and its exact gold target (tools/ecosystem/linux-usage-report.cjs, lines 2-39, score 0.6429 on the live 0.25.0 service). The stand-in-question workaround was therefore unnecessary and the batch-acceptance check as originally run did not test what gap 11 actually asks for ('embedding service under SocratiCode indexing'): it used this unit's own raw index_arm.py indexer, not SocratiCode. Full sha256 of blueprints/gap-wave2-20260923/rag-bench-eval/questions.json (the sealed benchmark set) is unaffected; this correction concerns only the gap-11 batch check's question and indexer choice. Corrected procedure (run once, no further reruns planned regardless of outcome): confirm SocratiCode already indexes .cjs files (independently confirmed: tools/ecosystem/linux-usage-report.cjs and native-choice-run.cjs already appear in the completed gap-7 SocratiCode index's own results), then point the same disposable-Qdrant SocratiCode harness used for gap 7 at the isolated vLLM 0.30.0 server (port 8237) instead of the live 0.25.0 service, index agent-lab once, and issue the ONE literal original query verbatim. A top-5 result overlapping tools/ecosystem/linux-usage-report.cjs:2-39 would be a genuine like-for-like reproduction of the original native-rag question via the actual SocratiCode path on 0.30.0, settling this specific limitation; a miss, error or crash is recorded as the result without retrying.",
+  "commands": [
+    {
+      "cmd": "vllm serve nemotron-3-embed-1b-c0c9fea --served-model-name nvidia/Nemotron-3-Embed-1B-BF16 --host 127.0.0.1 --port 8237 --max-model-len 4096 --max-num-seqs 4 --gpu-memory-utilization 0.16 --enforce-eager (isolated vllm-0.30.0 prefix, under ecosystem-bounded-run)",
+      "exit": 0,
+      "duration_s": 40,
+      "output_excerpt": "Application startup complete (same 'Pinned memory is not available on this platform; falling back to device memory for UVA buffers' PR #56908 fallback as the prior smoke test, no crash). One embedding POST confirmed dim=2048, matching the incumbent.",
+      "output_sha256": null
+    },
+    {
+      "cmd": "python3 index_arm.py --chunks <state>/gap11_batch.jsonl (331 chunks: the tools/ecosystem/* subset of the sealed benchmark's chunk set, a real SocratiCode-style indexing batch) --embed-url http://127.0.0.1:8237/v1/embeddings --model nvidia/Nemotron-3-Embed-1B-BF16 --dim 2048 --passage-prefix 'passage: ' --collection gap11_vllm030_nemotron_batch",
+      "exit": 0,
+      "duration_s": 5,
+      "output_excerpt": "331/331 chunks embedded, 0 errors, index_build_seconds=4.63",
+      "output_sha256": "67faa4731dabfd28bd0bba371a7f6c49a5eb209fe5191cfa595ac070ccf1fdbe"
+    },
+    {
+      "cmd": "Embed query 'query: which file computes and prints a Linux usage / native token savings report' via the 0.30.0 server; search gap11_vllm030_nemotron_batch top-5",
+      "exit": 0,
+      "duration_s": 1,
+      "output_excerpt": "Top hit tools/ecosystem/token_manifest.py:1-20 (score 0.368), followed by install-linux-efficiency.py, token_manifest.py (two more spans) and validate-linux-efficiency.py -- all genuinely on-topic Python files about the Linux/token savings report. The original native-rag.json target file, tools/ecosystem/linux-usage-report.cjs, was NOT in this batch (it is a .cjs file; this chunker only indexes .py/.mjs/.js/.md) and so could not appear.",
+      "output_sha256": "4bfd47d3b6308a8f97b5f3bba26f6dab7e3814e13ce170841b68d5310898200f"
+    },
+    {
+      "cmd": "kill -TERM (own 0.30.0 server on port 8237, clean shutdown)",
+      "exit": 143,
+      "duration_s": 3,
+      "output_excerpt": "SIGTERM, expected non-zero exit for a clean manual stop; nvidia-smi confirmed GPU memory returned to baseline (5493MiB used, matching only the untouched live 0.25.0 service) after stop.",
+      "output_sha256": null
+    },
+    {
+      "cmd": "CORRECTED (fix round) run, following preregistered_fix_round above: nvidia-smi (18718MiB free, only live 0.25.0 PID 399 running) -> started disposable Qdrant on the same pinned config/port (26333, reused storage under ~/codex-ecosystem/state/gap-wave2-20260923/rag-bench/qdrant-storage, pre-existing collections from the original unit untouched) -> started isolated vLLM 0.30.0 serving nvidia/Nemotron-3-Embed-1B-BF16 on port 8237 under ecosystem-bounded-run (same command as the original batch check above) -> ran a small persistent-MCP-session node script (socraticode-gap11fix-session.mjs, modeled on the gap-7 socraticode-session.mjs harness) pointed at LMSTUDIO_URL=http://127.0.0.1:8237/v1 and a fresh disposable-Qdrant collection prefix (gapw2rb2fix_), calling codebase_index on ~/code/agent-lab, polling codebase_status to completion, then codebase_search with the ONE literal query 'collect agent usage totals separately for native Linux and Desktop configuration homes' (limit 5).",
+      "exit": 0,
+      "duration_s": 45,
+      "output_excerpt": "Index completed: 'Status: green / Indexed chunks: 1242 / Full index -- completed / Files: 113, Chunks: 1242 (took 22.9s)'. Search top-1 result: tools/ecosystem/linux-usage-report.cjs (lines 2-39) score 0.7000 -- an EXACT line-span match (2-39) to the original native-rag.json/desktop-direct-rag.json gold target and rank, via the actual SocratiCode indexing/search path (not this unit's own raw indexer) on the isolated vLLM 0.30.0 server. This settles the literal-reproduction limitation from the original batch check: the exact original question now has a retained, scored acceptance run against 0.30.0.",
+      "output_sha256": "a1ab8661b4d054f3d3746a11455917bc07030a834181b7ba1a5d431e6f2e1842"
+    },
+    {
+      "cmd": "Stop this fix round's own servers: kill -TERM the 0.30.0 vllm process (port 8237), kill -TERM the disposable Qdrant process; verify both ports no longer listening and GPU memory returns to baseline.",
+      "exit": 0,
+      "duration_s": 5,
+      "output_excerpt": "nvidia-smi after stop: 5420MiB used / 18718MiB free (matches pre-run baseline, only the untouched live 0.25.0 service remains). `ss -tlnp` confirms neither 8237 nor 26333 is listening.",
+      "output_sha256": null
+    }
+  ],
+  "tool_versions": {
+    "vllm": "0.30.0 (isolated prefix ~/.local/share/codex-ecosystem/tools/vllm-0.30.0)",
+    "qdrant": "1.19.1 (pinned, disposable instance shared with the recall-benchmark check)",
+    "socraticode": "1.14.0 (fix round only, same pinned install used for the gap-7 check)"
+  },
+  "installs": [],
+  "model_calls": [],
+  "result": "The isolated vLLM 0.30.0 prefix, serving the same production nvidia/Nemotron-3-Embed-1B-BF16 model as the live 0.25.0 service (matching 2048-dim output), completed a 331-chunk real indexing batch with 0 errors in 4.6s and returned topically relevant top-5 results for a stand-in native-rag-style question (original run). CORRECTED (fix round): the original claim that the literal native-rag.json question text was 'not retained' was false; it is retained verbatim in this worktree's own evidence/receipts/desktop-direct-rag.json. A corrected run pointed the same disposable-Qdrant SocratiCode harness used for the gap-7 check at the 0.30.0 server (port 8237) and issued that exact literal query. The result was a rank-1, exact-line-span (2-39) match to tools/ecosystem/linux-usage-report.cjs, the true original gold target -- a genuine reproduction of the original native-rag question via the actual SocratiCode indexing/search path on the isolated 0.30.0 prefix, not a stand-in question and not this unit's own raw indexer. Both the original 331-chunk raw-indexer batch acceptance and this corrected SocratiCode-path literal-question acceptance are retained; together they give 0.30.0 a materially larger and now also a like-for-like acceptance than the prior smoke test's single embedding request.",
+  "settles_gap": "partially",
+  "verdict_impact": {
+    "could_change_verdict": true,
+    "direction": "supports_incumbent",
+    "explanation": "Strengthens (does not newly establish) the prior 'partially' verdict on this gap: 0.30.0 now has both a batch-indexing acceptance and, after this fix round's correction, a like-for-like reproduction of the exact original native-rag question via SocratiCode on the isolated 0.30.0 prefix. It still does not establish throughput/latency parity with 0.25.0 under production load (not measured here), so it does not by itself justify a pin change away from 0.25.0."
+  },
+  "evidence_class": "native_proven",
+  "limitations": [
+    "331-chunk batch (original run) is a real subset, not the full corpus indexed by the recall-benchmark check, and not a production-scale SocratiCode index; the corrected run's SocratiCode index (1242 chunks, 113 files) is closer to production scale.",
+    "CORRECTED (fix round): the original run's claim that the literal question was 'not retained' was false and has been superseded by a corrected run using the exact literal question via SocratiCode against 0.30.0; the original stand-in-question result above is retained for provenance but is no longer the basis for this gap's literal-reproduction claim.",
+    "No throughput/latency comparison against 0.25.0 was run in either the original or corrected check (that remains open per the prior receipt's own limitation).",
+    "Corrected run is a single trial (one query, one index build); not repeated, per the no-refishing rule for this fix round.",
+    "CORRECTED (fix round): the 'preregistered' field's text was finalized after its commands completed (not independently timestamped beyond the shared question-set seal); only 'preregistered_fix_round' above was written and hashed-referenceable before this fix round's own corrected commands ran."
+  ],
+  "raw_artifacts": [
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/raw/gap11_index_result.json",
+      "sha256": "67faa4731dabfd28bd0bba371a7f6c49a5eb209fe5191cfa595ac070ccf1fdbe"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/raw/gap11_native_rag_query_result.json",
+      "sha256": "4bfd47d3b6308a8f97b5f3bba26f6dab7e3814e13ce170841b68d5310898200f"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/raw/gap11_socraticode_030_literal_query_result.json",
+      "sha256": "a1ab8661b4d054f3d3746a11455917bc07030a834181b7ba1a5d431e6f2e1842",
+      "published_sha256": "acc071cae1cc4192fb98acb45dbe6a608108aae79f4644a46c634afa15626c24",
+      "published_note": "Published copy differs from the run's file: home paths were sanitized to ~/ at publication, and the coordinator then made helper paths expand at run time (review of PR #101). sha256 is the file as run; published_sha256 is the committed file."
+    }
+  ]
+}

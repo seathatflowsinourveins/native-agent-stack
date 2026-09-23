@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "id": "claude-resume-mcp-toolset",
+  "date": "2026-09-23",
+  "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+  "layer_ids": ["native-clients"],
+  "gap_refs": [
+    {"layer_id": "native-clients", "gap_index": 1},
+    {"layer_id": "native-clients", "gap_index": 5}
+  ],
+  "purpose": "Gap 1: the prior Claude resume trial ran with only Bash available and MCP tools denied, and used an explicitly scoped claude-opus-5/ultracode rather than the default model. Gap 5 (claude half): `claude --version`/login-status readiness rows are zero-exit checks, not a functional turn. This check runs `claude -p` with no --model override (default model) and the MCP servers configured in this worktree's context loaded, then resumes the same session with `claude --resume` and asks it to call an MCP tool, to confirm both default-model resume continuity and a working MCP call after resume.",
+  "preregistered": "FIX-ROUND NOTE: this text is a same-day, post-hoc-labelled description of the check's intent and expected discriminating signal, not a proven-prior-timestamped prediction -- no separate timestamped preregistration artifact exists for this receipt (the raw output directory holds only run artifacts, and this receipt file itself was first committed after the commands ran). Read the 'Limitation acknowledged before running' clause below as a limitation stated in this same document, not as evidence it was known strictly before the `claude mcp list` call quoted in it. Expectation: `claude -p \"Reply with OK\" --output-format json` with no --model flag returns exit 0, a JSON result with `is_error: false`, `result: \"OK\"`, a session_id, and a `modelUsage` key showing the actual default model (expected to be an opus-family model, not an explicitly forced non-default choice). `claude --resume <session_id> -p \"Call the context-mode ctx_doctor MCP tool now and report its raw result verbatim.\"` should then return exit 0, the SAME session_id, and a transcript containing a `tool_use` block naming an MCP tool (mcp__plugin_context-mode_context-mode__ctx_doctor) followed by a `tool_result` with real diagnostic text (not a permission-denial or synthesized answer) -- that is the discriminating signal that the MCP tool is actually reachable and functional after resume, not just listed. Limitation: this worktree (native-agent-stack-token-practice-review, not agent-lab) has no project-scoped .mcp.json, so 'the project MCP set' available here is whatever is configured at user/plugin scope (`claude mcp list` showed 'claude.ai Claude Docs' and 'plugin:context-mode:context-mode' connected) rather than agent-lab's full project MCP set (which also includes ai-memory, jcodemunch, serena, socraticode per agent-lab's own .mcp.json) -- this check can only exercise the MCP servers actually loaded in this worktree's context.",
+  "commands": [
+    {
+      "cmd": "claude mcp list",
+      "exit": 0,
+      "duration_s": 1.0,
+      "output_excerpt": "claude.ai Claude Docs: ... - Connected\nplugin:context-mode:context-mode: ... - Connected",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "flock ~/codex-ecosystem/state/gap-wave2-20260923/claude.lock claude -p \"Reply with OK\" --output-format json",
+      "exit": 0,
+      "duration_s": 1.6,
+      "output_excerpt": "result: \"OK\"; is_error: false; num_turns: 1; session_id: private-id-e01407ed6de2b6a6; modelUsage key: \"claude-opus-5-5[1m]\" (default, no --model passed); total_cost_usd 0.156",
+      "output_sha256": "65a01e9bf8151d27ac89b7666166cc1a249751acd5ef47cedd20ed2ad471b86c"
+    },
+    {
+      "cmd": "flock ~/codex-ecosystem/state/gap-wave2-20260923/claude.lock claude --resume <session_id> -p \"Call the context-mode ctx_doctor MCP tool now and report its raw result verbatim.\" --output-format json",
+      "exit": 0,
+      "duration_s": 4.0,
+      "output_excerpt": "assistant tool_use: ToolSearch(query='select:mcp__plugin_context-mode_context-mode__ctx_doctor') -> tool_use: mcp__plugin_context-mode_context-mode__ctx_doctor({}) -> tool_result text: 'context-mode doctor\\n[OK] Runtimes: 5/11 (45%) ... [OK] Server test: PASS [OK] FTS5 / SQLite: PASS ...' -> final assistant text reproduces that output verbatim; result.session_id matches the first call; is_error: false",
+      "output_sha256": "af38e6d910312b6b9a2e317dfaa3b96a760df0ce24eb4b2b93a73e3a2c725cb7"
+    }
+  ],
+  "tool_versions": {
+    "claude-code": "2.1.280"
+  },
+  "installs": [],
+  "model_calls": [
+    {"client": "claude -p", "model": "claude-opus-5-5[1m] (default, no --model override)", "effort": "default", "count": 1, "input_tokens": 2, "output_tokens": 4},
+    {"client": "claude --resume -p", "model": "claude-opus-5-5[1m] (default) plus one claude-haiku-4-5-20251001 subagent-tier call reported in modelUsage", "effort": "default", "count": 1, "input_tokens": 8, "output_tokens": 787}
+  ],
+  "result": "`claude -p \"Reply with OK\" --output-format json` with the default model (no --model flag) returned exit 0, result \"OK\", and session_id private-id-e01407ed6de2b6a6, with modelUsage keyed by claude-opus-5-5[1m] -- confirming the default model, not an explicitly scoped alternative, was used this time. `claude --resume private-id-e01407ed6de2b6a6 -p \"Call the context-mode ctx_doctor MCP tool now...\"` returned exit 0 with the SAME session_id, and the transcript shows the model first used ToolSearch to resolve the deferred MCP tool reference, then actually invoked mcp__plugin_context-mode_context-mode__ctx_doctor and received a real diagnostic tool_result (multi-line context-mode doctor report, e.g. 'Server test: PASS', 'FTS5 / SQLite: PASS'), which it then reproduced in its final answer. This is direct evidence that an MCP tool call succeeds after `claude --resume`, with the full (worktree-available) MCP set loaded and the default model, addressing gap 1's stated limitation and giving claude a functional readiness row for gap 5.",
+  "settles_gap": "partially",
+  "verdict_impact": {
+    "could_change_verdict": false,
+    "direction": "supports_incumbent",
+    "explanation": "Confirms default-model same-session resume plus a working MCP tool call after resume, closing the specific model/tool-scope limitation named in gap 1's text. Does not establish resume with agent-lab's full project MCP set (ai-memory, jcodemunch, serena, socraticode), since this worktree carries no project-scoped .mcp.json; that remains open for a trial run from within agent-lab's own worktree context."
+  },
+  "evidence_class": "native_proven",
+  "limitations": [
+    "This worktree (native-agent-stack-token-practice-review) has no project .mcp.json; the MCP set exercised here (claude.ai Claude Docs, context-mode) is the user/plugin-scoped set visible via `claude mcp list` in this directory, not agent-lab's full project MCP set named in the original gap 1 text.",
+    "Single trial (N=1) of the resume+tool-call sequence; not repeated.",
+    "RateLimitEvent observed during a later call in this same run reported 'allowed_warning' at 0.89 seven-day utilization; this was noted as a reason to bound further claude -p calls in this unit rather than as a failure of this specific check."
+  ],
+  "raw_artifacts": [
+    {"path": "~/codex-ecosystem/state/gap-wave2-20260923/native-clients/raw/claude-exec1.json", "sha256": "65a01e9bf8151d27ac89b7666166cc1a249751acd5ef47cedd20ed2ad471b86c"},
+    {"path": "~/codex-ecosystem/state/gap-wave2-20260923/native-clients/raw/claude-resume1.json", "sha256": "af38e6d910312b6b9a2e317dfaa3b96a760df0ce24eb4b2b93a73e3a2c725cb7"}
+  ]
+}

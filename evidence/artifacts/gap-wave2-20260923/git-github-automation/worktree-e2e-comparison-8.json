@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "id": "worktree-e2e-comparison-8",
+  "date": "2026-09-23",
+  "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+  "layer_ids": ["git-github-automation"],
+  "gap_refs": [{ "layer_id": "git-github-automation", "gap_index": 8 }],
+  "purpose": "Script one real change through worktree create, structural diff review and cleanup, twice: once with worktrunk+difftastic, once with native git worktree+git diff, on a scratch repository, per gap_index 8's next_check as narrowed by this wave's unit brief ('one scripted change end-to-end (worktree, structural diff, cleanup; no push)'). `gh pr create`/`merge` is explicitly NOT executed: this wave's authorization forbids pushing except where a unit task names a scratch branch, and this task names no such exception, so the GitHub-PR leg of the ORIGINAL gap 8 text ('across worktree creation, structural review, PR handling and cleanup') is out of scope here and recorded as not_run rather than silently omitted or faked.",
+  "preregistered": "Both arms perform: init scratch repo, create a worktree/branch for a feature change, edit compute.py to add a None-skipping guard, run the arm's diff tool, commit the change ON THE FEATURE BRANCH (not merged to main, since no PR merge step runs), then clean up the worktree via the arm's own tool. If arm A (worktrunk) and arm B (native git) both complete all steps and leave a clean single-worktree final state, that would be a clean tie on E2E mechanics (with difftastic's structural report scored as at least as informative as git diff's line-based one, from the larger-fixture and gap-6 receipts). If either arm fails a step it would not otherwise fail (i.e. a step whose semantics are the same across arms), that is recorded as a genuine reliability/ergonomics difference, not retried or worked around beyond what a real user would naturally try. This check does not predict which arm will 'win'.",
+  "commands": [
+    { "cmd": "python3 blueprints/gap-wave2-20260923/worktree-e2e-8/e2e_compare.py --base $SCRATCH/e2e-8", "exit": 0, "duration_s": null, "output_excerpt": "arm_a(worktrunk+difft): status=passed total_elapsed_s=0.09379 n_steps=9; diff exit_code=1 report_bytes=273 structural=true; cleanup branch_outcome=retained_unmerged (worktree removed, branch kept because it has an unmerged commit). arm_b(git worktree+git diff): status=failed total_elapsed_s=0.02424 n_steps=9; diff exit_code=0 report_bytes=343; cleanup-remove-worktree succeeded but cleanup-delete-branch failed: 'the branch feature-change is not fully merged' (git branch -d refuses; would need -D or a real merge)", "output_sha256": "5877dc73b30f901f647ec5e4a6eae83077708d56271fb23b584a46cae2897a85" }
+  ],
+  "tool_versions": { "git": "git version 2.43.0", "wt": "wt v0.79.0", "difft": "Difftastic 0.71.0" },
+  "installs": [],
+  "model_calls": [],
+  "result": {
+    "arm_a_worktrunk_difftastic": {
+      "status": "passed", "total_elapsed_s": 0.09379, "n_steps": 9, "n_failed_steps": 0,
+      "diff_tool_result": { "tool": "difft", "exit_code": 1, "report_bytes": 273, "structural": true },
+      "cleanup_behavior": "`wt remove` removed the worktree directory and its own JSON output declared branch_outcome='retained_unmerged'. CORRECTED (fix round, 2026-09-23): this means `wt remove` never attempted (or needed) a separate branch-delete step at all -- it simply left the unmerged branch in place as part of one call. A post-hoc `git branch -a` against arm-a/repo (added in the fix round, not a re-run) confirms `feature-change` is present there, in exactly the same state as arm B's repo. So arm A's outcome is 'branch retained, never an attempted delete', not 'branch delete attempted and gracefully handled'."
+    },
+    "arm_b_git_worktree_git_diff": {
+      "status": "failed", "total_elapsed_s": 0.02424, "n_steps": 9, "n_failed_steps": 1,
+      "failed_step": "cleanup-delete-branch",
+      "failure_detail": "`git branch -d feature-change` refused: 'the branch feature-change is not fully merged'. This is CORRECT, safe git behavior (matches worktrunk's own underlying safety judgment of retaining an unmerged branch). CORRECTED (fix round, 2026-09-23): e2e_compare.py (line 116) adds a 'cleanup-delete-branch' step ONLY to arm B's script; arm A's script (line 113) has no matching step that attempts a branch delete. So this is not a case where arm A succeeded at a step and arm B failed the same step -- the step exists in only one arm's script. A post-hoc `git branch -a` (added in the fix round) shows arm A's and arm B's repos end in the IDENTICAL final git state: worktree removed, `feature-change` branch retained, unmerged. This receipt's own preregistration says a failure counts only 'on a step whose semantics are the same across arms'; a step present in only one arm's script does not meet that bar, so this is not scored as a tool difference.",
+      "diff_tool_result": { "tool": "git diff", "exit_code": 0, "report_bytes": 343 }
+    },
+    "gh_pr_create_and_merge": {
+      "run": false,
+      "reason": "No push authorized for this unit task; recorded as not_run per the preregistration, not scored as pass or fail."
+    },
+    "final_state_comparison": {
+      "note": "ADDED (fix round, 2026-09-23), from a post-hoc `git branch -a`/`git worktree list --porcelain` against both arm-a/repo and arm-b/repo (not a re-run of the E2E script). Both arms end in exactly the same git state: 1 worktree remaining (main), `feature-change` branch present and unmerged. There is no observable difference in the actual git/filesystem end state between the two arms; the only difference is that arm B's SCRIPT chose to additionally attempt (and fail on) a 'git branch -d' call that arm A's script never made."
+    },
+    "comparison_summary": "Both arms produced a correct, non-empty diff report on the same scripted change; difftastic's report was structurally parsed and smaller (273 vs 343 bytes) for the same 6-line Python edit, consistent with prior larger-fixture findings. CORRECTED (fix round, 2026-09-23): the originally claimed 'decisive difference' in cleanup ergonomics is an artifact of the script giving arm B an extra step (an explicit `git branch -d` attempt) that arm A's script never runs, not a difference in the underlying tools' end states -- both arms leave the worktree removed and the unmerged branch retained. This E2E run is therefore a tie/inconclusive on cleanup mechanics as executed; it does not establish that worktrunk's single-command remove is functionally superior to native git's two-command remove+branch-d sequence for THIS scenario, only that a real user driving native git through the equivalent two commands would encounter (and need to consciously resolve) an extra decision point that worktrunk's single command absorbs silently -- a genuine but more modest ergonomics observation than 'decisive', not independently re-verified with a matched two-arm script in this wave."
+  },
+  "settles_gap": "partially",
+  "verdict_impact": {
+    "could_change_verdict": false,
+    "direction": "inconclusive",
+    "explanation": "This is a real, matched, end-to-end scripted-change comparison (gap 8's specific complaint: 'no matched end-to-end comparison establishes superiority'), and on the two legs actually run (worktree lifecycle, structural diff review) both arms completed with an identical final git state (worktree removed, unmerged branch retained). CORRECTED (fix round, 2026-09-23): the original 'supports_incumbent' direction and 'decisive difference' claim rested on arm B's script attempting an extra `git branch -d` step that arm A's script never attempted, which this receipt's own preregistration rule ('a step whose semantics are the same across arms') does not license as a scored tool difference. Direction is corrected to 'inconclusive': this run neither establishes worktrunk's superiority nor refutes it on the worktree-lifecycle/cleanup mechanics, and it does not fully settle gap 8 because the GitHub PR/review leg named in the gap's original text was also not run at all (no push authorized)."
+  },
+  "evidence_class": "native_proven",
+  "limitations": [
+    "gh PR create/merge was not executed at all (no push authorized this wave); gap 8's original text names PR handling explicitly, so this receipt only covers worktree lifecycle and structural diff review end-to-end, not the GitHub leg.",
+    "Single scripted change (one 6-line Python edit) on a scratch repo; no larger, multi-commit, or conflict-bearing change was exercised.",
+    "The 'failure' in arm B is arguably expected/correct git safety behavior, not a bug in git; it is reported as an ergonomics/workflow-completeness difference, not a correctness defect in native git.",
+    "Timing (0.094s vs 0.024s) reflects worktrunk's additional git status/hook-check machinery on a trivial single-file repo; not representative of a large real repository's relative overhead.",
+    "CORRECTED (fix round, 2026-09-23): the script (blueprints/gap-wave2-20260923/worktree-e2e-8/e2e_compare.py) gives arm B an extra 'cleanup-delete-branch' step with no matching step in arm A, so arm B's 'failure' does not reflect a genuine tool-vs-tool difference in final state (both arms end identically: worktree removed, branch retained unmerged). Re-scoring this as a fair matched comparison of an equivalent 'attempt to also delete the branch' step would require a corrected script with a symmetric step in both arms; that was not run here (per the fix-round instruction not to re-run a check to fish for a different outcome), so this limitation is recorded instead of a new run."
+  ],
+  "raw_artifacts": [
+    { "path": "~/codex-ecosystem/state/gap-wave2-20260923/worktree-diff/e2e-8/receipt.json", "sha256": "5877dc73b30f901f647ec5e4a6eae83077708d56271fb23b584a46cae2897a85" }
+  ]
+}

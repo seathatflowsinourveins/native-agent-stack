@@ -323,6 +323,8 @@ class GitleaksIgnoreFingerprintTests(unittest.TestCase):
                 match,
                 f"not a gitleaks fingerprint (commit:path:rule:line or path:rule:line): {line!r}",
             )
+            if line in self.REVIEWED_OUT_OF_ANCESTRY:
+                continue  # checked separately in test_a2
             self.assertIn(
                 match.group("path"), self.NARRATIVE_FILES,
                 f"fingerprint path is not one of the two reviewed narrative files: {line!r}",
@@ -331,6 +333,26 @@ class GitleaksIgnoreFingerprintTests(unittest.TestCase):
                 match.group("rule"), self.NARRATIVE_RULES,
                 f"fingerprint rule is not generic-api-key or sourcegraph-access-token: {line!r}",
             )
+
+    # Reviewed findings on sibling branches that are NOT ancestors of main: synthetic test data
+    # the default all-refs local scan reports. Each entry needs a review note in .gitleaksignore,
+    # and test_a2 fails if its commit ever enters HEAD's ancestry.
+    REVIEWED_OUT_OF_ANCESTRY = {
+        "34fc51beaf24114fe266f73b2e36ae8176c8a521:tests/test_lane_packets.py:generic-api-key:255",
+    }
+
+    def test_a2_out_of_ancestry_exceptions_stay_out_of_head_history(self):
+        lines = set(self._ignore_lines())
+        for entry in self.REVIEWED_OUT_OF_ANCESTRY:
+            self.assertIn(entry, lines, f"reviewed exception is no longer in .gitleaksignore; drop it here: {entry}")
+            commit = entry.split(":", 1)[0]
+            if subprocess.run(["git", "-C", str(ROOT), "cat-file", "-e", f"{commit}^{{commit}}"],
+                              capture_output=True).returncode:
+                continue  # object absent (shallow clone): nothing to check
+            ancestry = subprocess.run(["git", "-C", str(ROOT), "merge-base", "--is-ancestor", commit, "HEAD"],
+                                      capture_output=True)
+            self.assertNotEqual(ancestry.returncode, 0,
+                                f"{commit} is now an ancestor of HEAD; review the finding instead of ignoring it")
 
     def test_b_gitleaks_toml_has_no_allowlist_naming_the_narrative_files(self):
         """.gitleaks.toml must no longer contain an allowlist whose `paths`

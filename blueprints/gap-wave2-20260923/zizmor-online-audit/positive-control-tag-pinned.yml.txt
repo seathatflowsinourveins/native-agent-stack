@@ -1,0 +1,10 @@
+name: Online-audit positive control, tag-pinned (never executed)
+on: push
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: tj-actions/changed-files@v45.0.7

@@ -79,3 +79,19 @@
 6568523f27e718a86251d041106c53e765a8325d:evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger.json:sourcegraph-access-token:9360
 6568523f27e718a86251d041106c53e765a8325d:evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger.json:sourcegraph-access-token:10815
 6568523f27e718a86251d041106c53e765a8325d:evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger.json:sourcegraph-access-token:10890
+
+# gap-wave2-20260923 secrets-credentials gap 8: this repository is shared and
+# concurrently active across many sibling branches. `gitleaks git .` with the
+# default (all-refs) log-opts walks every ref reachable in the shared object
+# store, not just this branch's own ancestry. .gitleaks.toml:51-66 and
+# evidence/artifacts/gap-resolution-20260922/secrets-credentials/gitleaks-repo-history-scan.json
+# both independently confirm the one entry below is a synthetic unit-test
+# fixture string ("Key leaked: REDACTED") inside tests/test_lane_packets.py,
+# asserting that file's own leak-redaction behavior, not a real credential --
+# and that commit 34fc51b is confirmed NOT an
+# ancestor of this branch's HEAD (`git merge-base --is-ancestor 34fc51b HEAD`
+# fails; `git branch -a --contains 34fc51b` lists only the sibling branches
+# claude/gc-pr5-packets and claude/grand-catalog-pr5). Ignoring it here lets
+# the default all-refs acceptance command reach 0 findings without editing
+# .gitleaks.toml (owned by another PR) or that sibling branch.
+34fc51beaf24114fe266f73b2e36ae8176c8a521:tests/test_lane_packets.py:generic-api-key:255

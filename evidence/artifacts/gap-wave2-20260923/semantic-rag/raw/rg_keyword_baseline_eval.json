@@ -1,0 +1,1584 @@
+{
+  "baseline": "rg_keyword",
+  "n_questions": 35,
+  "recall_at_5": 0.5714285714285714,
+  "recall_at_5_hits": 20,
+  "mrr": 0.2885714285714286,
+  "detail": [
+    {
+      "id": "q01",
+      "hit_at_5": false,
+      "rank": null,
+      "top5": [
+        {
+          "path": "tools/compare/strip-packet.mjs",
+          "start_line": 26,
+          "end_line": 46,
+          "matched_keyword": "stripping"
+        },
+        {
+          "path": "tools/compare/models/run.mjs",
+          "start_line": 27,
+          "end_line": 47,
+          "matched_keyword": "balanced"
+        },
+        {
+          "path": "tools/compare/models/run2.mjs",
+          "start_line": 27,
+          "end_line": 47,
+          "matched_keyword": "balanced"
+        },
+        {
+          "path": "docs/tasks/2026-09-21-claude-broad-market-monitor.md",
+          "start_line": 160,
+          "end_line": 180,
+          "matched_keyword": "balanced"
+        },
+        {
+          "path": "docs/tasks/2026-09-22-grand-catalog-verdicts.md",
+          "start_line": 104,
+          "end_line": 124,
+          "matched_keyword": "balanced"
+        }
+      ],
+      "keywords": [
+        "stripping",
+        "balanced",
+        "extracts",
+        "function",
+        "returns",
+        "fences"
+      ]
+    },
+    {
+      "id": "q02",
+      "hit_at_5": false,
+      "rank": null,
+      "top5": [
+        {
+          "path": "tests/compare/workers-scoring.test.mjs",
+          "start_line": 2,
+          "end_line": 22,
+          "matched_keyword": "scoreCompleteness"
+        },
+        {
+          "path": "tests/compare/workers-scoring.test.mjs",
+          "start_line": 35,
+          "end_line": 55,
+          "matched_keyword": "scoreCompleteness"
+        },
+        {
+          "path": "tests/compare/workers-scoring.test.mjs",
+          "start_line": 55,
+          "end_line": 75,
+          "matched_keyword": "scoreCompleteness"
+        },
+        {
+          "path": "tests/compare/workers-scoring.test.mjs",
+          "start_line": 71,
+          "end_line": 91,
+          "matched_keyword": "scoreCompleteness"
+        },
+        {
+          "path": "tests/compare/workers-scoring.test.mjs",
+          "start_line": 91,
+          "end_line": 111,
+          "matched_keyword": "scoreCompleteness"
+        }
+      ],
+      "keywords": [
+        "scoreCompleteness",
+        "completeness",
+        "documented",
+        "explicitly",
+        "structural",
+        "heuristic"
+      ]
+    },
+    {
+      "id": "q03",
+      "hit_at_5": true,
+      "rank": 5,
+      "top5": [
+        {
+          "path": "tests/compare/workers-usage.test.mjs",
+          "start_line": 1,
+          "end_line": 15,
+          "matched_keyword": "usageCompleteness"
+        },
+        {
+          "path": "tests/compare/workers-usage.test.mjs",
+          "start_line": 68,
+          "end_line": 88,
+          "matched_keyword": "usageCompleteness"
+        },
+        {
+          "path": "tests/compare/workers-usage.test.mjs",
+          "start_line": 81,
+          "end_line": 101,
+          "matched_keyword": "usageCompleteness"
+        },
+        {
+          "path": "tools/compare/workers/lib/constants.mjs",
+          "start_line": 347,
+          "end_line": 367,
+          "matched_keyword": "usageCompleteness"
+        },
+        {
+          "path": "tools/compare/workers/lib/scoring.mjs",
+          "start_line": 419,
+          "end_line": 439,
+          "matched_keyword": "usageCompleteness"
+        }
+      ],
+      "keywords": [
+        "usageCompleteness",
+        "programming",
+        "exception",
+        "excluded",
+        "scoring",
+        "rather"
+      ]
+    },
+    {
+      "id": "q04",
+      "hit_at_5": true,
+      "rank": 4,
+      "top5": [
+        {
+          "path": "tests/compare/workers-normalisation.test.mjs",
+          "start_line": 1,
+          "end_line": 17,
+          "matched_keyword": "replayAgreement"
+        },
+        {
+          "path": "tests/compare/workers-normalisation.test.mjs",
+          "start_line": 65,
+          "end_line": 85,
+          "matched_keyword": "replayAgreement"
+        },
+        {
+          "path": "tests/compare/workers-normalisation.test.mjs",
+          "start_line": 73,
+          "end_line": 93,
+          "matched_keyword": "replayAgreement"
+        },
+        {
+          "path": "tools/compare/workers/lib/scoring.mjs",
+          "start_line": 362,
+          "end_line": 382,
+          "matched_keyword": "replayAgreement"
+        },
+        {
+          "path": "tools/compare/workers/lib/scoring.mjs",
+          "start_line": 394,
+          "end_line": 414,
+          "matched_keyword": "replayAgreement"
+        }
+      ],
+      "keywords": [
+        "replayAgreement",
+        "agreement",
+        "textually",
+        "sentinel",
+        "treated",
+        "verdict"
+      ]
+    },
+    {
+      "id": "q05",
+      "hit_at_5": true,
+      "rank": 3,
+      "top5": [
+        {
+          "path": "tests/compare/workers-scoring.test.mjs",
+          "start_line": 1,
+          "end_line": 21,
+          "matched_keyword": "normaliseToken"
+        },
+        {
+          "path": "tests/compare/workers-scoring.test.mjs",
+          "start_line": 218,
+          "end_line": 238,
+          "matched_keyword": "normaliseToken"
+        },
+        {
+          "path": "tools/compare/workers/lib/scoring.mjs",
+          "start_line": 12,
+          "end_line": 32,
+          "matched_keyword": "normaliseToken"
+        },
+        {
+          "path": "tools/compare/workers/lib/scoring.mjs",
+          "start_line": 96,
+          "end_line": 116,
+          "matched_keyword": "normaliseToken"
+        },
+        {
+          "path": "tools/compare/workers/lib/scoring.mjs",
+          "start_line": 334,
+          "end_line": 354,
+          "matched_keyword": "normaliseToken"
+        }
+      ],
+      "keywords": [
+        "normaliseToken",
+        "underscores",
+        "whitespace",
+        "collapse",
+        "internal",
+        "hyphens"
+      ]
+    },
+    {
+      "id": "q06",
+      "hit_at_5": false,
+      "rank": null,
+      "top5": [
+        {
+          "path": "docs/tasks/2026-09-20-security-identity-readiness.md",
+          "start_line": 96,
+          "end_line": 116,
+          "matched_keyword": "bubblewrap"
+        },
+        {
+          "path": "docs/tasks/2026-09-22-opus-5-5-main-routing.md",
+          "start_line": 58,
+          "end_line": 78,
+          "matched_keyword": "bubblewrap"
+        },
+        {
+          "path": "docs/tasks/2026-09-19-acceptance-wave.md",
+          "start_line": 23,
+          "end_line": 43,
+          "matched_keyword": "bubblewrap"
+        },
+        {
+          "path": "docs/tasks/2026-09-21-native-foundation-resolution.md",
+          "start_line": 1,
+          "end_line": 20,
+          "matched_keyword": "bubblewrap"
+        },
+        {
+          "path": "docs/tasks/2026-09-21-sota-catalog-independent-review.json",
+          "start_line": 174,
+          "end_line": 194,
+          "matched_keyword": "bubblewrap"
+        }
+      ],
+      "keywords": [
+        "bubblewrap",
+        "capability",
+        "comparison",
+        "function",
+        "network",
+        "sandbox"
+      ]
+    },
+    {
+      "id": "q07",
+      "hit_at_5": true,
+      "rank": 1,
+      "top5": [
+        {
+          "path": "tools/compare/memory/lib/isolation.mjs",
+          "start_line": 53,
+          "end_line": 73,
+          "matched_keyword": "checkIsolation"
+        },
+        {
+          "path": "tools/compare/memory/run-arms.mjs",
+          "start_line": 3,
+          "end_line": 23,
+          "matched_keyword": "checkIsolation"
+        },
+        {
+          "path": "tools/compare/memory/run-arms.mjs",
+          "start_line": 17,
+          "end_line": 37,
+          "matched_keyword": "checkIsolation"
+        },
+        {
+          "path": "tools/compare/memory/run-arms.mjs",
+          "start_line": 279,
+          "end_line": 299,
+          "matched_keyword": "checkIsolation"
+        },
+        {
+          "path": "tests/compare/memory-compare.test.mjs",
+          "start_line": 8,
+          "end_line": 28,
+          "matched_keyword": "checkIsolation"
+        }
+      ],
+      "keywords": [
+        "checkIsolation",
+        "deliberately",
+        "deriving",
+        "derived",
+        "source",
+        "avoid"
+      ]
+    },
+    {
+      "id": "q08",
+      "hit_at_5": true,
+      "rank": 1,
+      "top5": [
+        {
+          "path": "tools/compare/memory/lib/isolation.mjs",
+          "start_line": 33,
+          "end_line": 53,
+          "matched_keyword": "FORBIDDEN_ENV"
+        },
+        {
+          "path": "tools/compare/memory/lib/isolation.mjs",
+          "start_line": 61,
+          "end_line": 81,
+          "matched_keyword": "FORBIDDEN_ENV"
+        },
+        {
+          "path": "tools/compare/workers/arm_c_driver.py",
+          "start_line": 2,
+          "end_line": 22,
+          "matched_keyword": "environment"
+        },
+        {
+          "path": "tools/compare/models/phase1/t2/prompt.md",
+          "start_line": 1,
+          "end_line": 17,
+          "matched_keyword": "environment"
+        },
+        {
+          "path": "tests/compare/test_run_gap_cases.py",
+          "start_line": 405,
+          "end_line": 425,
+          "matched_keyword": "environment"
+        }
+      ],
+      "keywords": [
+        "FORBIDDEN_ENV",
+        "environment",
+        "comparison",
+        "disposable",
+        "directory",
+        "variables"
+      ]
+    },
+    {
+      "id": "q09",
+      "hit_at_5": false,
+      "rank": null,
+      "top5": [
+        {
+          "path": "tests/compare/memory-compare.test.mjs",
+          "start_line": 8,
+          "end_line": 28,
+          "matched_keyword": "checkIsolation"
+        },
+        {
+          "path": "tests/compare/memory-compare.test.mjs",
+          "start_line": 217,
+          "end_line": 237,
+          "matched_keyword": "checkIsolation"
+        },
+        {
+          "path": "tests/compare/memory-compare.test.mjs",
+          "start_line": 230,
+          "end_line": 250,
+          "matched_keyword": "checkIsolation"
+        },
+        {
+          "path": "tools/compare/memory/run-arms.mjs",
+          "start_line": 3,
+          "end_line": 23,
+          "matched_keyword": "checkIsolation"
+        },
+        {
+          "path": "tools/compare/memory/run-arms.mjs",
+          "start_line": 17,
+          "end_line": 37,
+          "matched_keyword": "checkIsolation"
+        }
+      ],
+      "keywords": [
+        "checkIsolation",
+        "directory",
+        "violation",
+        "perform",
+        "symlink",
+        "check"
+      ]
+    },
+    {
+      "id": "q10",
+      "hit_at_5": true,
+      "rank": 5,
+      "top5": [
+        {
+          "path": "docs/socraticode-graph.html",
+          "start_line": 4402,
+          "end_line": 4422,
+          "matched_keyword": "native_events"
+        },
+        {
+          "path": "tools/ecosystem/test_token_manifest.py",
+          "start_line": 272,
+          "end_line": 292,
+          "matched_keyword": "native_events"
+        },
+        {
+          "path": "tools/ecosystem/token_manifest.html.in",
+          "start_line": 37,
+          "end_line": 57,
+          "matched_keyword": "native_events"
+        },
+        {
+          "path": "tools/ecosystem/token_manifest.py",
+          "start_line": 65,
+          "end_line": 85,
+          "matched_keyword": "native_events"
+        },
+        {
+          "path": "tools/ecosystem/token_manifest.py",
+          "start_line": 106,
+          "end_line": 126,
+          "matched_keyword": "native_events"
+        }
+      ],
+      "keywords": [
+        "native_events",
+        "event_totals",
+        "aggregate",
+        "computed",
+        "columns",
+        "Ledger"
+      ]
+    },
+    {
+      "id": "q11",
+      "hit_at_5": false,
+      "rank": null,
+      "top5": [
+        {
+          "path": "tools/ecosystem/toon-artifact.py",
+          "start_line": 24,
+          "end_line": 44,
+          "matched_keyword": "ValueError"
+        },
+        {
+          "path": "tools/ecosystem/toon-artifact.py",
+          "start_line": 31,
+          "end_line": 51,
+          "matched_keyword": "ValueError"
+        },
+        {
+          "path": "tools/ecosystem/toon-artifact.py",
+          "start_line": 74,
+          "end_line": 94,
+          "matched_keyword": "ValueError"
+        },
+        {
+          "path": "tools/ecosystem/toon-artifact.py",
+          "start_line": 96,
+          "end_line": 116,
+          "matched_keyword": "ValueError"
+        },
+        {
+          "path": "tools/ecosystem/toon-artifact.py",
+          "start_line": 110,
+          "end_line": 130,
+          "matched_keyword": "ValueError"
+        }
+      ],
+      "keywords": [
+        "ValueError",
+        "comparison",
+        "conditions",
+        "recording",
+        "Ledger",
+        "before"
+      ]
+    },
+    {
+      "id": "q12",
+      "hit_at_5": true,
+      "rank": 2,
+      "top5": [
+        {
+          "path": "docs/socraticode-graph.html",
+          "start_line": 4402,
+          "end_line": 4422,
+          "matched_keyword": "count_files"
+        },
+        {
+          "path": "tools/ecosystem/token_manifest.py",
+          "start_line": 130,
+          "end_line": 150,
+          "matched_keyword": "count_files"
+        },
+        {
+          "path": "tools/ecosystem/token_manifest.py",
+          "start_line": 474,
+          "end_line": 494,
+          "matched_keyword": "count_files"
+        },
+        {
+          "path": "docs/full-stack-evidence.md",
+          "start_line": 65,
+          "end_line": 85,
+          "matched_keyword": "tokenizer"
+        },
+        {
+          "path": "docs/full-stack-evidence.md",
+          "start_line": 219,
+          "end_line": 239,
+          "matched_keyword": "tokenizer"
+        }
+      ],
+      "keywords": [
+        "count_files",
+        "tokenizer",
+        "embedded",
+        "encoding",
+        "package",
+        "version"
+      ]
+    },
+    {
+      "id": "q13",
+      "hit_at_5": true,
+      "rank": 3,
+      "top5": [
+        {
+          "path": "tools/ecosystem/test_token_manifest.py",
+          "start_line": 235,
+          "end_line": 255,
+          "matched_keyword": "claude_rtk_hook_enabled"
+        },
+        {
+          "path": "docs/socraticode-graph.html",
+          "start_line": 4402,
+          "end_line": 4422,
+          "matched_keyword": "claude_rtk_hook_enabled"
+        },
+        {
+          "path": "tools/ecosystem/token_manifest.py",
+          "start_line": 249,
+          "end_line": 269,
+          "matched_keyword": "claude_rtk_hook_enabled"
+        },
+        {
+          "path": "tools/ecosystem/token_manifest.py",
+          "start_line": 285,
+          "end_line": 305,
+          "matched_keyword": "claude_rtk_hook_enabled"
+        },
+        {
+          "path": ".claude/workflows/test-usage-receipts.mjs",
+          "start_line": 37,
+          "end_line": 57,
+          "matched_keyword": "PreToolUse"
+        }
+      ],
+      "keywords": [
+        "claude_rtk_hook_enabled",
+        "PreToolUse",
+        "configured",
+        "automatic",
+        "actually",
+        "whether"
+      ]
+    },
+    {
+      "id": "q14",
+      "hit_at_5": true,
+      "rank": 2,
+      "top5": [
+        {
+          "path": "tools/ecosystem/token_manifest.html.in",
+          "start_line": 34,
+          "end_line": 54,
+          "matched_keyword": "dollar_explanation"
+        },
+        {
+          "path": "tools/ecosystem/token_manifest.py",
+          "start_line": 411,
+          "end_line": 431,
+          "matched_keyword": "dollar_explanation"
+        },
+        {
+          "path": "tools/ecosystem/token_manifest.py",
+          "start_line": 527,
+          "end_line": 547,
+          "matched_keyword": "dollar_explanation"
+        },
+        {
+          "path": "docs/socraticode-graph.html",
+          "start_line": 4402,
+          "end_line": 4422,
+          "matched_keyword": "dollar_explanation"
+        },
+        {
+          "path": "tools/ecosystem/test_token_manifest.py",
+          "start_line": 36,
+          "end_line": 56,
+          "matched_keyword": "dollar_explanation"
+        }
+      ],
+      "keywords": [
+        "dollar_explanation",
+        "session_formula",
+        "illustrative",
+        "arithmetic",
+        "dollar",
+        "figure"
+      ]
+    },
+    {
+      "id": "q15",
+      "hit_at_5": true,
+      "rank": 5,
+      "top5": [
+        {
+          "path": "tools/compare/models/phase1/t1/seeded.patch",
+          "start_line": 2,
+          "end_line": 22,
+          "matched_keyword": "summarizeChild"
+        },
+        {
+          "path": "tools/compare/models/phase1/t1/seeded.patch",
+          "start_line": 14,
+          "end_line": 34,
+          "matched_keyword": "summarizeChild"
+        },
+        {
+          "path": ".claude/workflows/test-child-usage.mjs",
+          "start_line": 1,
+          "end_line": 15,
+          "matched_keyword": "summarizeChild"
+        },
+        {
+          "path": ".claude/workflows/test-child-usage.mjs",
+          "start_line": 10,
+          "end_line": 30,
+          "matched_keyword": "summarizeChild"
+        },
+        {
+          "path": ".claude/workflows/child-usage.mjs",
+          "start_line": 10,
+          "end_line": 30,
+          "matched_keyword": "summarizeChild"
+        }
+      ],
+      "keywords": [
+        "summarizeChild",
+        "deduplicate",
+        "transcript",
+        "assistant",
+        "repeated",
+        "streamed"
+      ]
+    },
+    {
+      "id": "q16",
+      "hit_at_5": false,
+      "rank": null,
+      "top5": [
+        {
+          "path": ".claude/workflows/test-child-usage.mjs",
+          "start_line": 1,
+          "end_line": 15,
+          "matched_keyword": "summarizeChild"
+        },
+        {
+          "path": ".claude/workflows/test-child-usage.mjs",
+          "start_line": 10,
+          "end_line": 30,
+          "matched_keyword": "summarizeChild"
+        },
+        {
+          "path": ".claude/workflows/child-usage.mjs",
+          "start_line": 10,
+          "end_line": 30,
+          "matched_keyword": "summarizeChild"
+        },
+        {
+          "path": ".claude/workflows/child-usage.mjs",
+          "start_line": 66,
+          "end_line": 86,
+          "matched_keyword": "summarizeChild"
+        },
+        {
+          "path": "tools/compare/models/phase1/t1/seeded.patch",
+          "start_line": 2,
+          "end_line": 22,
+          "matched_keyword": "summarizeChild"
+        }
+      ],
+      "keywords": [
+        "summarizeChild",
+        "condition",
+        "requested",
+        "resolved",
+        "specific",
+        "outside"
+      ]
+    },
+    {
+      "id": "q17",
+      "hit_at_5": true,
+      "rank": 2,
+      "top5": [
+        {
+          "path": ".claude/workflows/test-child-usage.mjs",
+          "start_line": 7,
+          "end_line": 27,
+          "matched_keyword": "first_request_cache_read"
+        },
+        {
+          "path": ".claude/workflows/child-usage.mjs",
+          "start_line": 48,
+          "end_line": 68,
+          "matched_keyword": "first_request_cache_read"
+        },
+        {
+          "path": ".claude/workflows/test-usage-receipts.mjs",
+          "start_line": 39,
+          "end_line": 59,
+          "matched_keyword": "first_request_cache_read"
+        },
+        {
+          "path": "docs/evidence/portable-qualification-20260921/angle1-upstream.json",
+          "start_line": 1533,
+          "end_line": 1553,
+          "matched_keyword": "first_request_cache_read"
+        },
+        {
+          "path": "docs/evidence/portable-qualification-20260921/angle1-upstream.json",
+          "start_line": 1565,
+          "end_line": 1585,
+          "matched_keyword": "first_request_cache_read"
+        }
+      ],
+      "keywords": [
+        "first_request_cache_read",
+        "summarizeChild",
+        "evidence",
+        "object",
+        "return",
+        "meant"
+      ]
+    },
+    {
+      "id": "q18",
+      "hit_at_5": true,
+      "rank": 3,
+      "top5": [
+        {
+          "path": ".claude/workflows/test-child-usage.mjs",
+          "start_line": 1,
+          "end_line": 15,
+          "matched_keyword": "latestRunDir"
+        },
+        {
+          "path": ".claude/workflows/test-child-usage.mjs",
+          "start_line": 33,
+          "end_line": 53,
+          "matched_keyword": "latestRunDir"
+        },
+        {
+          "path": ".claude/workflows/child-usage.mjs",
+          "start_line": 86,
+          "end_line": 106,
+          "matched_keyword": "latestRunDir"
+        },
+        {
+          "path": ".claude/workflows/child-usage.mjs",
+          "start_line": 104,
+          "end_line": 124,
+          "matched_keyword": "latestRunDir"
+        },
+        {
+          "path": "tools/compare/models/phase1/t2/hidden.test.mjs",
+          "start_line": 17,
+          "end_line": 37,
+          "matched_keyword": "latestRunDir"
+        }
+      ],
+      "keywords": [
+        "characterized",
+        "latestRunDir",
+        "transcript",
+        "directory",
+        "Workflow",
+        "comment"
+      ]
+    },
+    {
+      "id": "q19",
+      "hit_at_5": false,
+      "rank": null,
+      "top5": [
+        {
+          "path": "tests/compare/workers-usage.test.mjs",
+          "start_line": 1,
+          "end_line": 14,
+          "matched_keyword": "categories"
+        },
+        {
+          "path": "docs/token-savings-current-session.html",
+          "start_line": 19,
+          "end_line": 39,
+          "matched_keyword": "categories"
+        },
+        {
+          "path": "docs/token-savings-current-session.json",
+          "start_line": 694,
+          "end_line": 714,
+          "matched_keyword": "categories"
+        },
+        {
+          "path": "docs/foundation-grand-roadmap-2026-09-20.md",
+          "start_line": 29,
+          "end_line": 49,
+          "matched_keyword": "categories"
+        },
+        {
+          "path": "docs/tasks/2026-09-20-post-restart-token-session.md",
+          "start_line": 3,
+          "end_line": 23,
+          "matched_keyword": "categories"
+        }
+      ],
+      "keywords": [
+        "categories",
+        "comparison",
+        "parseUsage",
+        "category",
+        "populate",
+        "receipt"
+      ]
+    },
+    {
+      "id": "q20",
+      "hit_at_5": true,
+      "rank": 1,
+      "top5": [
+        {
+          "path": "tools/compare/workers/lib/usage.mjs",
+          "start_line": 67,
+          "end_line": 87,
+          "matched_keyword": "usageIsComplete"
+        },
+        {
+          "path": "tests/compare/workers-usage.test.mjs",
+          "start_line": 1,
+          "end_line": 14,
+          "matched_keyword": "usageIsComplete"
+        },
+        {
+          "path": "tests/compare/workers-usage.test.mjs",
+          "start_line": 13,
+          "end_line": 33,
+          "matched_keyword": "usageIsComplete"
+        },
+        {
+          "path": "tests/compare/workers-usage.test.mjs",
+          "start_line": 44,
+          "end_line": 64,
+          "matched_keyword": "usageIsComplete"
+        },
+        {
+          "path": "docs/token-savings-current-session.html",
+          "start_line": 19,
+          "end_line": 39,
+          "matched_keyword": "categories"
+        }
+      ],
+      "keywords": [
+        "usageIsComplete",
+        "categories",
+        "condition",
+        "return",
+        "every",
+        "four"
+      ]
+    },
+    {
+      "id": "q21",
+      "hit_at_5": true,
+      "rank": 1,
+      "top5": [
+        {
+          "path": "tools/compare/workers/lib/usage.mjs",
+          "start_line": 7,
+          "end_line": 27,
+          "matched_keyword": "candidateObjects"
+        },
+        {
+          "path": "tools/compare/workers/lib/usage.mjs",
+          "start_line": 42,
+          "end_line": 62,
+          "matched_keyword": "candidateObjects"
+        },
+        {
+          "path": "tests/compare/retrieval.test.mjs",
+          "start_line": 30,
+          "end_line": 50,
+          "matched_keyword": "candidate"
+        },
+        {
+          "path": "tests/compare/retrieval.test.mjs",
+          "start_line": 70,
+          "end_line": 90,
+          "matched_keyword": "candidate"
+        },
+        {
+          "path": "tests/compare/retrieval.test.mjs",
+          "start_line": 162,
+          "end_line": 182,
+          "matched_keyword": "candidate"
+        }
+      ],
+      "keywords": [
+        "candidateObjects",
+        "candidate",
+        "assemble",
+        "category",
+        "objects",
+        "beyond"
+      ]
+    },
+    {
+      "id": "q22",
+      "hit_at_5": false,
+      "rank": null,
+      "top5": [
+        {
+          "path": "docs/tasks/2026-09-22-executed-comparisons.md",
+          "start_line": 422,
+          "end_line": 442,
+          "matched_keyword": "native_worker"
+        },
+        {
+          "path": "docs/tasks/2026-09-22-executed-comparisons.md",
+          "start_line": 524,
+          "end_line": 544,
+          "matched_keyword": "native_worker"
+        },
+        {
+          "path": "docs/token-savings-e2e-results.json",
+          "start_line": 2283,
+          "end_line": 2303,
+          "matched_keyword": "native_worker"
+        },
+        {
+          "path": "docs/token-savings-e2e-results.json",
+          "start_line": 8035,
+          "end_line": 8055,
+          "matched_keyword": "native_worker"
+        },
+        {
+          "path": "tools/compare/workers/arm_c_driver.py",
+          "start_line": 1,
+          "end_line": 16,
+          "matched_keyword": "native_worker"
+        }
+      ],
+      "keywords": [
+        "native_worker",
+        "definitive",
+        "behavior",
+        "comment",
+        "source",
+        "status"
+      ]
+    },
+    {
+      "id": "q23",
+      "hit_at_5": false,
+      "rank": null,
+      "top5": [
+        {
+          "path": "tests/compare/workers-blocked.test.mjs",
+          "start_line": 1,
+          "end_line": 14,
+          "matched_keyword": "classifyBlocked"
+        },
+        {
+          "path": "tests/compare/workers-blocked.test.mjs",
+          "start_line": 14,
+          "end_line": 34,
+          "matched_keyword": "classifyBlocked"
+        },
+        {
+          "path": "tests/compare/workers-blocked.test.mjs",
+          "start_line": 33,
+          "end_line": 53,
+          "matched_keyword": "classifyBlocked"
+        },
+        {
+          "path": "tests/compare/workers-blocked.test.mjs",
+          "start_line": 52,
+          "end_line": 72,
+          "matched_keyword": "classifyBlocked"
+        },
+        {
+          "path": "tests/compare/workers-blocked.test.mjs",
+          "start_line": 120,
+          "end_line": 140,
+          "matched_keyword": "classifyBlocked"
+        }
+      ],
+      "keywords": [
+        "classifyBlocked",
+        "readiness",
+        "positive",
+        "receipt",
+        "reports",
+        "itself"
+      ]
+    },
+    {
+      "id": "q24",
+      "hit_at_5": true,
+      "rank": 3,
+      "top5": [
+        {
+          "path": "tests/compare/workers-blocked.test.mjs",
+          "start_line": 1,
+          "end_line": 14,
+          "matched_keyword": "nullifyForBlock"
+        },
+        {
+          "path": "tests/compare/workers-blocked.test.mjs",
+          "start_line": 57,
+          "end_line": 77,
+          "matched_keyword": "nullifyForBlock"
+        },
+        {
+          "path": "tools/compare/workers/lib/blocked.mjs",
+          "start_line": 116,
+          "end_line": 136,
+          "matched_keyword": "nullifyForBlock"
+        },
+        {
+          "path": ".claude/workflows/comparison-preregister.js",
+          "start_line": 32,
+          "end_line": 52,
+          "matched_keyword": "submission"
+        },
+        {
+          "path": ".claude/workflows/comparison-preregister.js",
+          "start_line": 60,
+          "end_line": 80,
+          "matched_keyword": "submission"
+        }
+      ],
+      "keywords": [
+        "nullifyForBlock",
+        "submission",
+        "converted",
+        "blocked",
+        "comment",
+        "metrics"
+      ]
+    },
+    {
+      "id": "q25",
+      "hit_at_5": false,
+      "rank": null,
+      "top5": [
+        {
+          "path": "tests/compare/workers-blocked.test.mjs",
+          "start_line": 7,
+          "end_line": 27,
+          "matched_keyword": "provider_usage_limit"
+        },
+        {
+          "path": "tests/compare/workers-blocked.test.mjs",
+          "start_line": 16,
+          "end_line": 36,
+          "matched_keyword": "provider_usage_limit"
+        },
+        {
+          "path": "tests/compare/workers-blocked.test.mjs",
+          "start_line": 41,
+          "end_line": 61,
+          "matched_keyword": "provider_usage_limit"
+        },
+        {
+          "path": "tests/compare/workers-blocked.test.mjs",
+          "start_line": 117,
+          "end_line": 137,
+          "matched_keyword": "provider_usage_limit"
+        },
+        {
+          "path": "docs/tasks/2026-09-22-executed-comparisons.md",
+          "start_line": 529,
+          "end_line": 549,
+          "matched_keyword": "provider_usage_limit"
+        }
+      ],
+      "keywords": [
+        "provider_usage_limit",
+        "TEXT_PATTERNS",
+        "matching",
+        "checked",
+        "literal",
+        "first"
+      ]
+    },
+    {
+      "id": "q26",
+      "hit_at_5": false,
+      "rank": null,
+      "top5": [
+        {
+          "path": "tools/compare/strip-packet.mjs",
+          "start_line": 16,
+          "end_line": 36,
+          "matched_keyword": "artifact"
+        },
+        {
+          "path": ".claude/workflows/comparison-execute.js",
+          "start_line": 11,
+          "end_line": 31,
+          "matched_keyword": "artifact"
+        },
+        {
+          "path": ".claude/workflows/comparison-judge.js",
+          "start_line": 12,
+          "end_line": 32,
+          "matched_keyword": "artifact"
+        },
+        {
+          "path": ".claude/workflows/comparison-cross-family.js",
+          "start_line": 7,
+          "end_line": 27,
+          "matched_keyword": "artifact"
+        },
+        {
+          "path": ".claude/workflows/layer-verdict-lane.js",
+          "start_line": 22,
+          "end_line": 42,
+          "matched_keyword": "artifact"
+        }
+      ],
+      "keywords": [
+        "artifact",
+        "booleans",
+        "function",
+        "special",
+        "treated",
+        "Python"
+      ]
+    },
+    {
+      "id": "q27",
+      "hit_at_5": false,
+      "rank": null,
+      "top5": [
+        {
+          "path": "docs/evidence/sota/sota-repo-audit-20260921.workflow-output.json",
+          "start_line": 684,
+          "end_line": 704,
+          "matched_keyword": "attempting"
+        },
+        {
+          "path": "docs/tasks/2026-09-21-sota-repo-audit-detail.md",
+          "start_line": 41,
+          "end_line": 61,
+          "matched_keyword": "attempting"
+        },
+        {
+          "path": ".claude/workflows/comparison-judge.js",
+          "start_line": 27,
+          "end_line": 47,
+          "matched_keyword": "violation"
+        },
+        {
+          "path": "tests/compare/memory-compare.test.mjs",
+          "start_line": 219,
+          "end_line": 239,
+          "matched_keyword": "violation"
+        },
+        {
+          "path": "tests/compare/memory-compare.test.mjs",
+          "start_line": 237,
+          "end_line": 257,
+          "matched_keyword": "violation"
+        }
+      ],
+      "keywords": [
+        "attempting",
+        "violation",
+        "convert",
+        "enforce",
+        "message",
+        "before"
+      ]
+    },
+    {
+      "id": "q28",
+      "hit_at_5": false,
+      "rank": null,
+      "top5": [
+        {
+          "path": "tests/compare/closure-and-isolation.test.mjs",
+          "start_line": 36,
+          "end_line": 56,
+          "matched_keyword": "condition"
+        },
+        {
+          "path": "tests/compare/retrieval.test.mjs",
+          "start_line": 347,
+          "end_line": 367,
+          "matched_keyword": "condition"
+        },
+        {
+          "path": "tests/compare/retrieval.test.mjs",
+          "start_line": 360,
+          "end_line": 380,
+          "matched_keyword": "condition"
+        },
+        {
+          "path": "tests/compare/retrieval.test.mjs",
+          "start_line": 380,
+          "end_line": 400,
+          "matched_keyword": "condition"
+        },
+        {
+          "path": "tools/compare/models/phase1/t1/seeded.patch",
+          "start_line": 46,
+          "end_line": 66,
+          "matched_keyword": "condition"
+        }
+      ],
+      "keywords": [
+        "condition",
+        "original",
+        "selected",
+        "compact",
+        "convert",
+        "instead"
+      ]
+    },
+    {
+      "id": "q29",
+      "hit_at_5": false,
+      "rank": null,
+      "top5": [
+        {
+          "path": "docs/full-stack-evidence.md",
+          "start_line": 30,
+          "end_line": 50,
+          "matched_keyword": "connection"
+        },
+        {
+          "path": "docs/full-stack-evidence.md",
+          "start_line": 89,
+          "end_line": 109,
+          "matched_keyword": "connection"
+        },
+        {
+          "path": "docs/full-stack-evidence.md",
+          "start_line": 195,
+          "end_line": 215,
+          "matched_keyword": "connection"
+        },
+        {
+          "path": "docs/full-stack-evidence.md",
+          "start_line": 279,
+          "end_line": 299,
+          "matched_keyword": "connection"
+        },
+        {
+          "path": "docs/full-stack-evidence.md",
+          "start_line": 291,
+          "end_line": 311,
+          "matched_keyword": "connection"
+        }
+      ],
+      "keywords": [
+        "connection",
+        "subprocess",
+        "TOKENIZER",
+        "counting",
+        "embedded",
+        "network"
+      ]
+    },
+    {
+      "id": "q30",
+      "hit_at_5": true,
+      "rank": 1,
+      "top5": [
+        {
+          "path": "tools/ecosystem/toon-artifact.py",
+          "start_line": 32,
+          "end_line": 52,
+          "matched_keyword": "object_pairs_hook"
+        },
+        {
+          "path": ".claude/workflows/test-child-usage.mjs",
+          "start_line": 6,
+          "end_line": 26,
+          "matched_keyword": "duplicate"
+        },
+        {
+          "path": "tests/compare/retrieval.test.mjs",
+          "start_line": 113,
+          "end_line": 133,
+          "matched_keyword": "duplicate"
+        },
+        {
+          "path": "tests/compare/retrieval.test.mjs",
+          "start_line": 130,
+          "end_line": 150,
+          "matched_keyword": "duplicate"
+        },
+        {
+          "path": "tests/compare/retrieval.test.mjs",
+          "start_line": 213,
+          "end_line": 233,
+          "matched_keyword": "duplicate"
+        }
+      ],
+      "keywords": [
+        "object_pairs_hook",
+        "encounters",
+        "duplicate",
+        "function",
+        "object",
+        "passed"
+      ]
+    },
+    {
+      "id": "q31",
+      "hit_at_5": true,
+      "rank": 4,
+      "top5": [
+        {
+          "path": "tests/compare/memory-compare.test.mjs",
+          "start_line": 7,
+          "end_line": 27,
+          "matched_keyword": "recallAtK"
+        },
+        {
+          "path": "tests/compare/memory-compare.test.mjs",
+          "start_line": 123,
+          "end_line": 143,
+          "matched_keyword": "recallAtK"
+        },
+        {
+          "path": "tests/compare/memory-compare.test.mjs",
+          "start_line": 131,
+          "end_line": 151,
+          "matched_keyword": "recallAtK"
+        },
+        {
+          "path": "tools/compare/memory/lib/score.mjs",
+          "start_line": 25,
+          "end_line": 45,
+          "matched_keyword": "recallAtK"
+        },
+        {
+          "path": "tools/compare/memory/lib/score.mjs",
+          "start_line": 201,
+          "end_line": 221,
+          "matched_keyword": "recallAtK"
+        }
+      ],
+      "keywords": [
+        "recallAtK",
+        "reference",
+        "resolved",
+        "counted",
+        "leakage",
+        "returns"
+      ]
+    },
+    {
+      "id": "q32",
+      "hit_at_5": true,
+      "rank": 2,
+      "top5": [
+        {
+          "path": "tests/compare/memory-compare.test.mjs",
+          "start_line": 168,
+          "end_line": 188,
+          "matched_keyword": "lower_is_better"
+        },
+        {
+          "path": "tools/compare/memory/lib/score.mjs",
+          "start_line": 108,
+          "end_line": 128,
+          "matched_keyword": "lower_is_better"
+        },
+        {
+          "path": "tools/compare/memory/run-arms.mjs",
+          "start_line": 61,
+          "end_line": 81,
+          "matched_keyword": "lower_is_better"
+        },
+        {
+          "path": "tools/compare/memory/run-arms.mjs",
+          "start_line": 95,
+          "end_line": 115,
+          "matched_keyword": "lower_is_better"
+        },
+        {
+          "path": "docs/wsl-first-foundation-handoff-20260922.md",
+          "start_line": 115,
+          "end_line": 135,
+          "matched_keyword": "convention"
+        }
+      ],
+      "keywords": [
+        "lower_is_better",
+        "convention",
+        "direction",
+        "relevance",
+        "threshold",
+        "keptHits"
+      ]
+    },
+    {
+      "id": "q33",
+      "hit_at_5": true,
+      "rank": 3,
+      "top5": [
+        {
+          "path": "tests/compare/memory-compare.test.mjs",
+          "start_line": 7,
+          "end_line": 27,
+          "matched_keyword": "p95NearestRank"
+        },
+        {
+          "path": "tests/compare/memory-compare.test.mjs",
+          "start_line": 207,
+          "end_line": 227,
+          "matched_keyword": "p95NearestRank"
+        },
+        {
+          "path": "tools/compare/memory/lib/score.mjs",
+          "start_line": 169,
+          "end_line": 189,
+          "matched_keyword": "p95NearestRank"
+        },
+        {
+          "path": "tools/compare/memory/lib/score.mjs",
+          "start_line": 217,
+          "end_line": 237,
+          "matched_keyword": "p95NearestRank"
+        },
+        {
+          "path": ".claude/workflows/comparison-judge.js",
+          "start_line": 1,
+          "end_line": 13,
+          "matched_keyword": "compute"
+        }
+      ],
+      "keywords": [
+        "p95NearestRank",
+        "compute",
+        "formula",
+        "latency",
+        "nearest",
+        "sample"
+      ]
+    },
+    {
+      "id": "q34",
+      "hit_at_5": true,
+      "rank": 3,
+      "top5": [
+        {
+          "path": "tests/compare/memory-compare.test.mjs",
+          "start_line": 7,
+          "end_line": 27,
+          "matched_keyword": "deleteRestore"
+        },
+        {
+          "path": "tests/compare/memory-compare.test.mjs",
+          "start_line": 189,
+          "end_line": 209,
+          "matched_keyword": "deleteRestore"
+        },
+        {
+          "path": "tools/compare/memory/lib/score.mjs",
+          "start_line": 141,
+          "end_line": 161,
+          "matched_keyword": "deleteRestore"
+        },
+        {
+          "path": "tools/compare/memory/lib/score.mjs",
+          "start_line": 194,
+          "end_line": 214,
+          "matched_keyword": "deleteRestore"
+        },
+        {
+          "path": "tools/compare/memory/run-arms.mjs",
+          "start_line": 192,
+          "end_line": 212,
+          "matched_keyword": "deleteRestore"
+        }
+      ],
+      "keywords": [
+        "deleteRestore",
+        "conditions",
+        "count",
+        "entry",
+        "input",
+        "hold"
+      ]
+    },
+    {
+      "id": "q35",
+      "hit_at_5": false,
+      "rank": null,
+      "top5": [
+        {
+          "path": "tools/compare/data/databento_arm.py",
+          "start_line": 1,
+          "end_line": 15,
+          "matched_keyword": "execution"
+        },
+        {
+          "path": "tests/compare/workers-scoring.test.mjs",
+          "start_line": 28,
+          "end_line": 48,
+          "matched_keyword": "execution"
+        },
+        {
+          "path": "docs/full-stack-evidence.md",
+          "start_line": 1,
+          "end_line": 16,
+          "matched_keyword": "execution"
+        },
+        {
+          "path": "docs/full-stack-evidence.md",
+          "start_line": 27,
+          "end_line": 47,
+          "matched_keyword": "execution"
+        },
+        {
+          "path": "docs/full-stack-evidence.md",
+          "start_line": 98,
+          "end_line": 118,
+          "matched_keyword": "execution"
+        }
+      ],
+      "keywords": [
+        "execution",
+        "Workflow",
+        "actually",
+        "workflow",
+        "checker",
+        "emulate"
+      ]
+    }
+  ]
+}

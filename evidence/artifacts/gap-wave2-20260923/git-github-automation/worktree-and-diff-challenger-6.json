@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "id": "worktree-and-diff-challenger-6",
+  "date": "2026-09-23",
+  "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+  "layer_ids": ["git-github-automation"],
+  "gap_refs": [{ "layer_id": "git-github-automation", "gap_index": 6 }],
+  "purpose": "Run the frozen create/list/remove/dirty-refuse worktree plan with native `git worktree` as the challenger to worktrunk 0.79.0, and run the native `git diff --no-index` structural-diff challenger over the same byte-verified 20-file 231077d..bdd04ca old/new tree used for difftastic-larger-fixture.json, per gap_index 6's next_check ('Run the frozen create/list/remove/dirty-refuse plan with native git worktree as the challenger. Run a second structural-diff tool over the same ... range.').",
+  "preregistered": "If native `git worktree` completes the same create(2)/list/remove-clean/dirty-refuse/restore-remove/final-state sequence used to qualify worktrunk 0.79.0 (worktrunk-0-79-0-requalify.json) with matching pass/fail semantics, that is a genuine matched comparison result regardless of which tool 'wins'; any behavioral difference (e.g. branch cleanup, hook support, dirty-refusal trigger) is recorded as a finding, not scored pass/fail unless it breaks isolation or loses data. If `git diff --no-index` exits non-{0,1} or crashes on any of the 20 files that difftastic parsed (structurally or via fallback), that is a difftastic-favoring result; if it succeeds uniformly where difftastic fell back to Text on 5/20 files, that is a git-diff-favoring result for raw coverage (though not for syntax-aware review quality, which this check does not score -- see gap 10 for that). Neither run is expected to overturn the layer's keep_but_compare selections by itself; this settles the comparison gap's existence, not a verdict change.",
+  "commands": [
+    { "cmd": "python3 blueprints/gap-wave2-20260923/worktree-challenger-6/git_worktree_challenger.py --work $SCRATCH/git-worktree-challenger-6", "exit": 0, "duration_s": 0.0345, "output_excerpt": "status=passed; created=2 removed_without_force=1 removed_with_force_or_after_cleanup=1 dirty_removal_refused=true hooks_supported=false branch_cleanup_needed=true remaining_worktrees=[repo] remaining_branches=[main]", "output_sha256": "1c142209a32aec0fe75379405d046cde3779e9fc7fcb42eb68a7abaddf179947" },
+    { "cmd": "bash blueprints/gap-wave2-20260923/worktree-challenger-6/run_git_diff_challenger.sh", "exit": 0, "duration_s": 0.565, "output_excerpt": "20/20 files: git diff --no-index exit 1 (diff found), 20/20 non-empty reports; largest docs/ecosystem/index.html report 26015141 bytes", "output_sha256": "cd4f25fe106b3936e3d5329b8cfd03740ce3aad6c2d4915883226d6a9b4166a0" }
+  ],
+  "tool_versions": { "git": "git version 2.43.0", "wt": "not invoked in this receipt (native git worktree is the challenger, not worktrunk)", "difft": "Difftastic 0.71.0 (prior receipt, referenced not rerun)" },
+  "installs": [],
+  "model_calls": [],
+  "result": {
+    "worktree_challenger": {
+      "status": "passed",
+      "total_elapsed_s": 0.0345,
+      "n_commands": 18,
+      "vs_worktrunk_0_79_0_requalify": {
+        "worktrunk_full_run_duration_s": 1.706364,
+        "git_worktree_full_run_duration_s": 0.0345,
+        "note": "worktrunk's duration includes gitleaks positive/negative scans and version invocations absent from this native-git-only plan, so this is not an apples-to-apples timing comparison; recorded for reference only."
+      },
+      "behavioral_differences_found": [
+        "native `git worktree remove` refuses removal when a TRACKED file is modified, but (unverified further here) untracked-only files alone are documented upstream not to block plain removal without --force in the same way worktrunk refuses on either tracked or untracked changes; this run only exercised the modified-tracked-file case.",
+        "native `git worktree remove` does NOT delete the associated branch; worktrunk's `wt remove` deletes both worktree and branch in one step. This run needed an explicit follow-up `git branch -d` per removed worktree to reach the same end state that worktrunk reaches natively -- a real feature-parity gap for git worktree as a challenger.",
+        "native git worktree has no project-hook mechanism at all (worktrunk supports pre-start/pre-remove hooks, exercised separately in gap 9's receipt)."
+      ]
+    },
+    "diff_challenger": {
+      "tool": "git diff --no-index --no-color",
+      "files_attempted": 20,
+      "files_exit_1_diff_found": 20,
+      "files_exit_0_no_diff": 0,
+      "files_other_exit": 0,
+      "files_nonempty_report": 20,
+      "vs_difftastic_larger_fixture": {
+        "difftastic_files_structurally_parsed": 15,
+        "difftastic_files_fell_back_to_text": 5,
+        "difftastic_files_exit_0": 20,
+        "git_diff_files_succeeded_uniformly": 20,
+        "finding": "git diff --no-index succeeded (non-empty, exit 1) on all 20 files including the 2 large JSON catalogs, both Markdown docs and the large HTML file that difftastic fell back to plain-text diffing for -- but git diff's output is ALWAYS line-based/textual, never syntax-aware, so 'succeeded uniformly' is a coverage/robustness result, not a review-quality result. Difftastic's advantage (syntax-aware hunks) only applies on the 15/20 files where it parsed structurally; on those 15 it is a strictly richer diff than git diff's line-based output for the same change, though this check does not score that richness (see gap 10)."
+      }
+    }
+  },
+  "settles_gap": "partially",
+  "verdict_impact": {
+    "could_change_verdict": false,
+    "direction": "inconclusive",
+    "explanation": "This establishes the matched winner-vs-challenger comparisons gap 6 asked for on both axes (worktree isolation, structural diff) and both challengers ran successfully end to end, so gap 6's specific complaint ('no matched comparison ... exists for this layer') is addressed. Neither comparison flips the layer's keep_but_compare selection: worktrunk remains ahead on hooks and one-step branch cleanup (a genuine, newly-documented advantage over native git worktree), while difftastic's advantage over git diff is confined to the 15/20 files it parses structurally and this check does not score review quality (gap 10 does). Direction is 'inconclusive' at the overall-verdict level because the comparison surfaced real, mixed findings rather than a clean win for either incumbent or challenger.",
+    "corrected_from": null
+  },
+  "evidence_class": "native_proven",
+  "limitations": [
+    "Worktree challenger plan is a synthetic single-repo fixture, not a fork of worktrunk's exact run.py fixture; it mirrors the same steps and pass criteria but is a separate script, so timing is not directly comparable (recorded as such above).",
+    "Dirty-removal refusal was only exercised for a modified TRACKED file; the untracked-only-file refusal behavior of native git worktree was not separately tested here (worktrunk's dirty_refusal check covers both in worktrunk-0-79-0-requalify.json).",
+    "git diff --no-index challenger measures mechanical success/coverage only (exit code, non-empty output); it does not score diff quality, correctness or reviewer usefulness -- that is addressed by gap 10's blind-judge receipt in this same wave.",
+    "Both challenger runs are single-trial, synthetic or reused fixtures; no concurrency, remote, or submodule scenarios were exercised."
+  ],
+  "raw_artifacts": [
+    { "path": "~/codex-ecosystem/state/gap-wave2-20260923/worktree-diff/git-worktree-challenger-6/receipt.json", "sha256": "1c142209a32aec0fe75379405d046cde3779e9fc7fcb42eb68a7abaddf179947" },
+    { "path": "~/codex-ecosystem/state/gap-wave2-20260923/worktree-diff/git-diff-challenger-6/results.jsonl", "sha256": "cd4f25fe106b3936e3d5329b8cfd03740ce3aad6c2d4915883226d6a9b4166a0" },
+    { "path": "~/codex-ecosystem/state/gap-wave2-20260923/worktree-diff/git-diff-challenger-6/reports/ (20 git diff --no-index reports, reused old/new extraction from the prior wave's gap-resolution-20260922/worktrunk/difft-out/)" }
+  ]
+}

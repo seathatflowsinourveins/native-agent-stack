@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "id": "skill-sync-and-closure-reconciliation",
+  "date": "2026-09-23",
+  "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+  "layer_ids": ["instructions-skills"],
+  "gap_refs": [
+    {"layer_id": "instructions-skills", "gap_index": 2}
+  ],
+  "purpose": "Gap 2: docs/foundation-closure-20260921.md line 53 named ECC, Anthropic skills and Agent Skills (not TypeSafe or the OpenAI skills), and line 26 claimed a Claude skill sync exposing official Anthropic skills without a receipt (pins, hashes, discovery). Rerun a fresh hash check of the five installed skills, record a fresh Claude init skill listing, and reconcile line 53 against the counterbalanced adjudication.",
+  "preregistered": "Before running: (1) re-hashing the five currently-installed global SKILL.md files (search-first, iterative-retrieval, typesafe-ai, gh-fix-ci, security-best-practices) against the pins recorded in native-claude-profile-20260920.json and native-practice.json will either match (confirming the sync is still intact today) or diverge (a fresh drift finding); (2) a fresh `claude -p --output-format stream-json --verbose` init event's flat 'skills' array will show whether discovery is name-only (as native-receipt.json lines 199-203 describe) or includes richer metadata; (3) line 53 will be reconciled using the existing counterbalanced adjudication verdict already on file (evidence/artifacts/layer-verdicts-20260922/adjudication/foundation-instructions-skills-20260922.json), not a new judgment call, since that adjudication is the authoritative winner-set source and this check is not authorized to produce a new comparison.",
+  "commands": [
+    {
+      "cmd": "sha256sum ~/.claude/skills/{search-first,iterative-retrieval,typesafe-ai,gh-fix-ci,security-best-practices}/SKILL.md",
+      "exit": 0,
+      "duration_s": 0.1,
+      "output_excerpt": "search-first: d66d744228b9cf860acf35f8a90cbbe8195e61367860da9d3632f9fc65706733 | iterative-retrieval: b453b16d3e36174b8487c05ab807d0321a66c2d058812b2ae129d82824183725 | typesafe-ai: 71ea90d7906c6554c4f4c460ef7361b2d26f59116ccdae986dc6d997b9389f52 | gh-fix-ci: 7b326b4a2f0f5f85122144628ec02077e48841e0e0e82efce88b3415bcfb7c26 | security-best-practices: 7b3dae1ffc5434d890f3c65c8f552af52d0307fab3b35dec13013c9ca3844c4f -- all five match the pins already on record (native-claude-profile-20260920.json skills[], native-practice.json skills[].skill_sha256).",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "flock ~/codex-ecosystem/state/gap-wave2-20260923/claude.lock claude -p \"List the file paths of every skill you have discovered/loaded at session start. Do not use any tools; just answer from your initial context.\" --output-format stream-json --verbose",
+      "exit": 0,
+      "duration_s": 8.1,
+      "output_excerpt": "CORRECTED 2026-09-23: the raw init event's flat 'skills' array has len()==57, not 55 (recounted with `python3 -c \"import json; ...; print(len(init['skills']))\"` against the retained runs/gap2-skill-listing.jsonl, whose sha256 is unchanged below) -- e.g. 'agent-browser','gh-fix-ci','iterative-retrieval','search-first','typesafe-ai','security-best-practices', plugin-namespaced entries like 'codex:review','context-mode:ctx-search', and eight 'anthropic-skills:*' entries (docs, docx, import-memory, morning, pdf, pptx, skill-creator, xlsx) -- no file paths, descriptions or bodies in the raw init event. The model's own answer confirmed it cannot supply file paths because none were in its starting context, and that no skill had been Skill-invoked (loaded) yet this session, only discovered by name.",
+      "output_sha256": "42d616322556e9b767699dc6222a183def9b53fab0be1ebec68de198f9b0e66e"
+    },
+    {
+      "cmd": "ADDED 2026-09-23 (fix round: closes the previously-missing half of gap 2 -- no pins/hashes had been recorded for the anthropics/skills (34040c9c) portion of the sync that line 26 asserts; not a re-run of the original hash command, which covered only the 5 non-Anthropic skills): git clone --depth 100 https://github.com/anthropics/skills.git; for f in docx pdf pptx xlsx: sha256sum <(git show 34040c9c:skills/$f/SKILL.md) and sha256sum on the locally client-synced ~/.claude/skills/synced/<session-scoped-dir>/$f/SKILL.md",
+      "exit": 0,
+      "duration_s": 4.5,
+      "output_excerpt": "anthropics/skills at pin 34040c9c568585f6929bedeaad110ad08f079624 (git log -1 confirms this is a real, reachable commit: 'Update claude-api skill: Managed Agents auto permission policy...#1750'). Repo-pin sha256: pdf 9f78b835...85c, xlsx 6712b397...622, docx 8017469e...7fe, pptx a7ff03e2...3a0. Locally synced sha256 (one representative synced session dir; the same 4 files are duplicated byte-identically across the other synced session dirs on this host, spot-checked): pdf 9f78b835...85c (MATCH), xlsx 6712b397...622 (MATCH), docx 62a566a8...d50 (DIFFERS), pptx 66c1b7e8...ec2f (DIFFERS). Diffing the two DIFFERS files: docx (91 lines both sides) differs only in the YAML frontmatter `description:` field, reworded for product routing (adds 'to download, email or print' and a fallback cross-reference to 'Claude's own dedicated document or page skill or connector'); the skill body is byte-identical. pptx differs more substantively (238 repo lines vs 241 local): the frontmatter `description:` is reworded similarly, AND the body gains two client-side additions absent from the repo pin -- a routing paragraph preferring a dedicated slide-deck artifact/skill when the user does not name a file format, and an accessibility instruction ('Every addText call needs isTextBox: true ... otherwise screen readers announce the text as a graphic'). So 2 of 4 Anthropic document skills (pdf, xlsx) are byte-identical to the 34040c9c pin; 1 (docx) differs only in routing-description wording; 1 (pptx) differs in routing-description wording plus two added body instructions not present in the open-source repo pin.",
+      "output_sha256": "n/a"
+    }
+  ],
+  "tool_versions": {"claude": "2.1.280 (claude-opus-5-5[1m])"},
+  "installs": [],
+  "model_calls": [
+    {"client": "claude", "model": "claude-opus-5-5[1m]", "effort": "unspecified (session default, not explicitly set to low/medium by this call)", "count": 1, "input_tokens": 2, "output_tokens": 896}
+  ],
+  "result": "CORRECTED 2026-09-23: the five-skill hash check and closure-reconciliation edit were accurate as originally recorded; two things were wrong and are fixed here without re-running the original commands: (1) the skill count was misreported as 55 when the raw retained init event actually has 57 names (recounted from the unchanged runs/gap2-skill-listing.jsonl, same sha256), and (2) gap 2's second half -- 'no receipt for that sync (pins, hashes, discovery)' for the Anthropic-skills portion of line 26 -- was never actually addressed: only the 5 non-Anthropic skills were hashed. New work in this fix round (not a rerun of prior commands) hashes the 4 client-synced Anthropic document skills (docx, pdf, pptx, xlsx) against the anthropics/skills pin 34040c9c named in line 26: pdf and xlsx are byte-identical to the repo pin; docx differs only in a reworded frontmatter `description:` field (routing text, same body); pptx differs in both a reworded description and two added body instructions (a routing preference and a screen-reader accessibility note) not present in the open-source repo at that pin. This is a genuine, newly-documented drift for 2 of 4 Anthropic skills (client-side product build diverges from the open-source pin's content, not just a missing receipt) -- it is not byte-identical sync as line 26's phrasing might imply, though the skills remain discoverable and functionally aligned. Closure reconciliation (unchanged from the original receipt): per the on-file counterbalanced adjudication (winner_lane 'claude', 2/2 non-refuting votes), the correct winner set for this layer is ECC (c4), OpenAI skills gh-fix-ci/security-best-practices (c3), and TypeSafe (c8), with Agent Skills/skills-ref (c9) recorded as a conditional supporting format validator. docs/foundation-closure-20260921.md line 53 was edited in the original receipt's commit to reflect that adjudicated set; that edit is unchanged and re-verified present at HEAD in this fix round.",
+  "settles_gap": "partially",
+  "verdict_impact": {
+    "could_change_verdict": false,
+    "direction": "supports_incumbent",
+    "explanation": "The five originally-hashed skills and the newly-hashed pdf/xlsx Anthropic skills confirm the sync is intact and pinned; the closure-row wording (line 53) is reconciled with the layer's own prior counterbalanced adjudication. The newly-found docx/pptx drift (frontmatter reword; pptx also gains two body instructions) does not change which skills win adjudication -- it is evidence that the client-shipped Anthropic skills are a product-tuned variant of the open-source repo pin rather than a byte-for-byte mirror, which is a documentation-accuracy finding about line 26's 'exposes selected official skills' claim, not a new comparison result. Recorded as settles_gap: partially rather than true, since a genuine (if minor) content drift is now on record where the original receipt reported none."
+  },
+  "evidence_class": "native_proven",
+  "limitations": [
+    "The claude -p call did not pass an explicit --effort flag, so it ran at the session's default (observed model claude-opus-5-5[1m]), not explicitly constrained to low/medium as the unit's model-call guidance requests; recorded honestly rather than mislabeled. Subsequent claude -p calls in this unit pass --effort medium explicitly.",
+    "The init event's flat name list was inspected only for this one session invocation; skill body preload/full-text presence in the init payload itself (distinct from a later Skill-tool invocation) was not separately probed byte-for-byte -- the model's own negative claim ('no paths in my context') is self-report, not a raw-payload assertion, though the raw init JSON was also directly inspected and confirmed to contain only the bare name array (recounted at 57, not 55).",
+    "The line 53 edit is a text reconciliation against an existing adjudication verdict already in the repository; it is not a new comparison or re-adjudication.",
+    "The Anthropic-skills hash check covered only the 4 document skills (docx, pdf, pptx, xlsx) that map to files present in the anthropics/skills public repo at the cited pin; the other anthropic-skills:* discovered names (skill-creator, docs, import-memory, morning) were not source-reviewed against any public pin in this receipt, and the product-vs-open-source drift mechanism (whether it is applied at sync time, baked into a separate distribution channel, or something else) was not investigated -- only the resulting byte content was compared.",
+    "This entry was corrected in a fix round on 2026-09-23 after independent review found the skill count wrong (55 vs actual 57) and found that gap 2's Anthropic-skills sync-receipt half was never actually produced; the original commands were not re-run, one new hash-comparison command was added, and settles_gap was downgraded from true to partially to reflect the newly-found docx/pptx content drift."
+  ],
+  "raw_artifacts": [
+    {"path": "~/codex-ecosystem/state/gap-wave2-20260923/instructions-skills/runs/gap2-skill-listing.jsonl", "sha256": "42d616322556e9b767699dc6222a183def9b53fab0be1ebec68de198f9b0e66e"}
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "id": "difftastic-multilang-scoring-10",
+  "date": "2026-09-23",
+  "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+  "layer_ids": ["git-github-automation"],
+  "gap_refs": [{ "layer_id": "git-github-automation", "gap_index": 10 }],
+  "purpose": "Assemble paired before/after files in 4 languages (Python, JavaScript, Go, Rust) with known semantic edits, write the expected-edit key BEFORE running any tool, run difft 0.71.0 and git diff on each pair, and blind-score whether each tool's output surfaces the intended semantic change using up to 8 `claude -p` judge calls with tool identity stripped, per gap_index 10's next_check.",
+  "preregistered": "See blueprints/gap-wave2-20260923/difftastic-multilang-10/expected_edit_key.json (written before any diff command ran): 4 languages, each with one described semantic edit and a yes/no surfacing question. For each (language, tool) pair, `claude -p --model sonnet --effort low --tools \"\"` judges ONE blind packet (labelled 'Diff A'/'Diff B' only, tool identity never named, order fixed by a hash of the language name so it is not chosen post-hoc) against the surfacing question, based only on the diff text shown. If difft's yes-rate across the 4 languages is higher than git diff's, that supports difftastic's cross-language surfacing value (gap 10's complaint: the single small Python fixture does not establish this). If they tie or difft scores lower, that is recorded honestly as inconclusive or refuting, not retried. Both tools are run with the exact flags used elsewhere in this repository's frozen fixtures (difft --exit-code --color never; git diff --no-index --no-color), for direct comparability with the other receipts in this wave, even though this choice has a known consequence discovered during scoring (see result.methodological_finding below).",
+  "commands": [
+    { "cmd": "difft --exit-code --color never fixtures/{py,js,go,rs}_before.* fixtures/{py,js,go,rs}_after.* (4 invocations)", "exit": 1, "duration_s": null, "output_excerpt": "all 4 exit 1 (diff found), non-empty, structurally parsed (Python/JavaScript/Go/Rust headers, no fallback-to-Text marker)", "output_sha256": null },
+    { "cmd": "git diff --no-index --no-color -- fixtures/{py,js,go,rs}_before.* fixtures/{py,js,go,rs}_after.* (4 invocations)", "exit": 1, "duration_s": null, "output_excerpt": "all 4 exit 1, standard unified diff format", "output_sha256": null },
+    { "cmd": "python3 blueprints/gap-wave2-20260923/difftastic-multilang-10/build_packets.py", "exit": 0, "duration_s": null, "output_excerpt": "8 blind packets built (4 languages x 2 tools), order per language fixed by sha256(language_name)[0]", "output_sha256": "b0287e3c9884240b1fc2452ff4cdbdc725ffd5fa9523e2d33292acaea9c75210" },
+    { "cmd": "flock ~/codex-ecosystem/state/gap-wave2-20260923/claude.lock claude -p --tools \"\" --model sonnet --effort low \"<packet text>\" (8 invocations, py_A py_B js_A js_B go_A go_B rs_A rs_B, 20s sleep after each per shared-account pacing)", "exit": 0, "duration_s": null, "output_excerpt": "8/8 exit 0; 7/8 ANSWER: YES, 1/8 (go_A, actual_tool=difft) ANSWER: NO", "output_sha256": "6c07beb1ec80e90413afafb1c2ff5a388e0bdf322f1dac8b8d27892a6e40955d" }
+  ],
+  "tool_versions": { "difft": "Difftastic 0.71.0", "git": "git version 2.43.0", "claude": "Claude Code 2.1.280" },
+  "installs": [],
+  "model_calls": [
+    { "client": "claude -p", "model": "sonnet", "effort": "low", "count": 8, "input_tokens": null, "output_tokens": null, "note": "Per-call token counts were not captured by this script (claude -p --tools \"\" stdout was captured as text, not --output-format json); count of 8 calls and their full prompts/outputs are retained under blueprints/gap-wave2-20260923/difftastic-multilang-10/judge_packets/ and judge_results/. Paced with flock claude.lock and a 20s sleep after each call per shared-account pacing." }
+  ],
+  "result": {
+    "scored_results": [
+      { "packet_id": "py_A", "language": "python", "actual_tool": "gitdiff", "judged_answer": "YES" },
+      { "packet_id": "py_B", "language": "python", "actual_tool": "difft", "judged_answer": "YES" },
+      { "packet_id": "js_A", "language": "javascript", "actual_tool": "difft", "judged_answer": "YES" },
+      { "packet_id": "js_B", "language": "javascript", "actual_tool": "gitdiff", "judged_answer": "YES" },
+      { "packet_id": "go_A", "language": "go", "actual_tool": "difft", "judged_answer": "NO" },
+      { "packet_id": "go_B", "language": "go", "actual_tool": "gitdiff", "judged_answer": "YES" },
+      { "packet_id": "rs_A", "language": "rust", "actual_tool": "gitdiff", "judged_answer": "YES" },
+      { "packet_id": "rs_B", "language": "rust", "actual_tool": "difft", "judged_answer": "YES" }
+    ],
+    "difft_yes_rate": "3/4 (python, javascript, rust surfaced; go missed)",
+    "gitdiff_yes_rate": "4/4 (all four surfaced)",
+    "methodological_finding": "The single miss (go_A, difft, Go signature change) was hypothesized to trace to a specific mechanism, not a general difftastic parsing failure: with --color never (the exact flag used by every frozen fixture in this repository), difftastic aligns the changed signature line at the SAME position ('3 3 func Divide(a, b int) (int, error) {') because it structurally recognizes the line as the 'same node' with modified tokens, and (per this hypothesis) normally highlights the changed tokens (the new '(int, error)' return type) in ANSI color/bold, a signal --color never strips. CORRECTED (fix round, 2026-09-23): a `difft --color=always` re-run on the same pair was described as a retained, directly-inspected diagnostic, but no colored-output artifact was actually saved anywhere in this repository or under the session's scratch state (confirmed by a search of both trees for ANSI escape bytes and for color/diag-named files, added in the fix round; none found). The claim that this mechanism was verified by inspecting retained colored output is therefore withdrawn. The color-stripping explanation for the go_A miss is downgraded from a verified mechanism to an UNVERIFIED HYPOTHESIS, consistent with the general shape of how difft highlights same-position token changes, but not confirmed by any artifact this receipt can point to."
+  },
+  "settles_gap": "partially",
+  "verdict_impact": {
+    "could_change_verdict": false,
+    "direction": "inconclusive",
+    "explanation": "This directly settles gap 10's specific complaint (the small single Python fixture does not establish cross-language accuracy) by running a real, labelled, multi-language, blind-judged comparison across 4 languages -- difftastic's structural parsing itself worked on all 4 (no fallback to Text), and 3/4 surfaced the semantic edit clearly to a blind judge. CORRECTED (fix round, 2026-09-23): against the preregistered rule ('If difft's yes-rate ... is higher than git diff's, that supports ... If they tie or difft scores lower, that is recorded honestly as inconclusive or refuting'), the scored result is git diff 4/4 vs difft 3/4 -- difft scored LOWER, which the preregistration itself says to record as refuting or inconclusive, not as a wash rescued by an unverified mechanism claim. The color-stripping explanation for the one difft miss is now an unverified hypothesis (no retained artifact backs it after a fix-round search found none), so this receipt no longer leans on it to soften the result. Given the very small sample (4 languages, 1 edit each, 1 judge, no repeated trials -- see limitations), 'inconclusive' rather than a stronger 'refutes_incumbent' is the honest label: on this specific preregistered blind-surfacing metric difftastic did not outperform git diff and one point went against it with its mitigating explanation now unconfirmed, but n=4 is too small to draw a confident directional conclusion either way. This does not overturn difftastic's structural-parsing value shown elsewhere (all 4 languages parsed structurally, unlike the 5/20 fallback rate in the larger real-repo fixture), but it withdraws the prior 'may be systematically undercounting difftastic' framing that rested on the unretained diagnostic."
+  },
+  "evidence_class": "native_proven",
+  "limitations": [
+    "Only 4 languages, 1 fixture pair each, 1 semantic edit per language; not a large statistical sample.",
+    "Judge model (Sonnet, effort low, single call per packet, no repeated trials) may have some variance; no inter-rater reliability check was run (single judge, not multiple).",
+    "CORRECTED (fix round, 2026-09-23): the --color=always diagnostic check that was said to explain the go_A miss was NOT itself a blind-judged trial and is not counted against the 8-call budget; its claim of being 'directly inspected and retained' is FALSE -- no colored-output artifact exists anywhere in the repository or scratch state (verified by search in the fix round). The color-stripping explanation for the miss is now recorded as an unverified hypothesis, not a confirmed mechanism.",
+    "Blind packets stripped explicit tool-naming labels, but the two tools' native output FORMATS remain inherently distinguishable (unified +/- vs difft's paired line-number columns) to any judge familiar with either tool; this is an unavoidable property of presenting real tool output rather than a flaw in the blinding methodology.",
+    "'Surfacing' was scored as a binary yes/no on one targeted question per language, not a holistic diff-quality or reviewer-preference rating.",
+    "On the preregistered scored metric alone (blind judge yes/no, 4 languages, --color never), difft 3/4 vs git diff 4/4 is a difft loss; the preregistration's own rule calls this refuting/inconclusive, not a tie explained away."
+  ],
+  "raw_artifacts": [
+    { "path": "blueprints/gap-wave2-20260923/difftastic-multilang-10/expected_edit_key.json", "sha256": "8da3c57c8ec7ece91c48f2fd676444f0466e1bff555cdbaae07866c2eb06e617" },
+    { "path": "blueprints/gap-wave2-20260923/difftastic-multilang-10/judge_packets_manifest.json", "sha256": "b0287e3c9884240b1fc2452ff4cdbdc725ffd5fa9523e2d33292acaea9c75210" },
+    { "path": "blueprints/gap-wave2-20260923/difftastic-multilang-10/judge_scored_results.json", "sha256": "6c07beb1ec80e90413afafb1c2ff5a388e0bdf322f1dac8b8d27892a6e40955d" },
+    { "path": "blueprints/gap-wave2-20260923/difftastic-multilang-10/packets/ (raw difft and git diff output per language, 8 files)" },
+    { "path": "blueprints/gap-wave2-20260923/difftastic-multilang-10/judge_packets/ (8 blind prompt files actually sent to claude -p)" },
+    { "path": "blueprints/gap-wave2-20260923/difftastic-multilang-10/judge_results/ (8 raw claude -p stdout/stderr pairs)" }
+  ]
+}

@@ -1,0 +1,146 @@
+{
+  "schema_version": 1,
+  "id": "mcporter-context-mode-bridge-recovery",
+  "date": "2026-09-23",
+  "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+  "layer_ids": ["native-clients"],
+  "gap_refs": [
+    {"layer_id": "native-clients", "gap_index": 13}
+  ],
+  "purpose": "MCPorter's earlier referenced readiness output included a Context Mode daemon error; version and listing success alone do not establish functional bridge recovery. This check diagnoses MCPorter's OWN keep-alive daemon (never a live Context Mode process belonging to a running Claude session), attempts a restart, and then confirms a functional bridge call through `mcporter call`.",
+  "preregistered": "Original preregistration (post-hoc-labelled; see limitations -- no timestamped pre-run record exists, so this text is retained as a same-day description of intent rather than a proven-prior prediction): `mcporter daemon status` and `mcporter list context-mode` should be checked first without modification. If a daemon error is present, `mcporter daemon restart` is attempted; if that fails, `mcporter daemon start --foreground --log` is run bounded (timeout 60s) to capture the underlying error text rather than guessing. If the error is a stale local state file left by an unclean prior retirement (verifiable by checking that its recorded pid is no longer running), clearing that MCPorter-owned state file and retrying start is within the authorized scope of 'restart MCPorter's own keep-alive daemon' (this is not a live shared service: ai-memory/Qdrant/vLLM/SocratiCode/Context Mode-of-a-running-Claude-session are explicitly out of scope and were not touched). Success is `mcporter daemon status` reporting a running pid, then `mcporter list context-mode` succeeding, then one `mcporter call context-mode.<tool>` returning the tool's actual output (not a connection/daemon error) -- that last step is the discriminating signal for functional bridge recovery versus mere version/listing success. FIX-ROUND FINDING (correct): this original procedure was flawed -- the `list`/`call` after recovery auto-imported context-mode as an ad hoc STDIO server from `~/.codex/config.toml` (mcporter's editor-import discovery), not through the canonical keep-alive definition in `~/codex-ecosystem/config/mcporter.json` (`lifecycle: keep-alive`). `mcporter daemon status` after that call still showed `servers: []` -- the daemon never registered a keep-alive view, so the original success did not exercise the keep-alive bridge path referenced by the original gap-13 error text. Corrected preregistration for the fix-round re-run: written before running the commands below. `mcporter daemon restart` (MCPorter's own daemon, already authorized) resets to a clean state; `mcporter --config ~/codex-ecosystem/config/mcporter.json daemon status` before any list/call is expected to show `servers: []` (no keep-alive view registered yet, since none has been requested); `mcporter --config ~/codex-ecosystem/config/mcporter.json list context-mode` is expected to register a connected keep-alive view, verifiable by `mcporter --config ... daemon status` afterward showing a `servers[]` entry with `connected: true`; a subsequent `mcporter --config ~/codex-ecosystem/config/mcporter.json call context-mode.ctx_execute` is expected to return the tool's actual executed output while that keep-alive entry remains registered. That before/after `daemon status` delta plus a successful call through the SAME `--config` is the discriminating signal for genuine keep-alive-bridge recovery, distinct from the ad hoc STDIO path the original run actually exercised.",
+  "commands": [
+    {
+      "cmd": "mcporter daemon status",
+      "exit": 0,
+      "duration_s": 0.3,
+      "output_excerpt": "Daemon is not running.",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "mcporter daemon restart",
+      "exit": 1,
+      "duration_s": 46.0,
+      "output_excerpt": "Daemon stopped (if it was running). [mcporter] Daemon startup is taking longer than usual; Chrome relay discovery can take up to 30 seconds. [mcporter] MCPorter daemon did not become ready within 45 seconds. Run 'mcporter daemon start --foreground --log' to diagnose startup.",
+      "output_sha256": "9b74c42a50b44a24cd3264b03b7a8c438cc5eef32463bb0a2f37137015b50eef"
+    },
+    {
+      "cmd": "timeout 60 mcporter daemon start --foreground --log",
+      "exit": 1,
+      "duration_s": 1.2,
+      "output_excerpt": "BrokerError: Previous daemon retirement is unverified; inspect its transports before deliberate recovery. code: 'daemon_unresponsive'",
+      "output_sha256": "ec3648bdf1910c6b8c99112916f4d7f5d3ab35dbd849baed98c55f4cd3155bc0"
+    },
+    {
+      "cmd": "ps -p <recorded-stale-pid-from-~/.mcporter/daemon/user.json>",
+      "exit": 1,
+      "duration_s": 0.05,
+      "output_excerpt": "no such process -- confirms the daemon's own recorded state file referenced a pid that was actually dead, i.e. an unclean prior retirement of MCPorter's own daemon, not a live process",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "cp -a ~/.mcporter/daemon ~/codex-ecosystem/state/gap-wave2-20260923/native-clients/raw/mcporter-daemon-state-backup; mv ~/.mcporter/daemon/user.json ~/.mcporter/daemon/user.json.stale-pid; mv ~/.mcporter/daemon/user.sock ~/.mcporter/daemon/user.sock.stale",
+      "exit": 0,
+      "duration_s": 0.1,
+      "output_excerpt": "backed up then cleared the stale state files owned by MCPorter's own daemon under $HOME/.mcporter/daemon (no other host process, live shared service, or another session's worktree was touched)",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "mcporter daemon start",
+      "exit": 0,
+      "duration_s": 1.0,
+      "output_excerpt": "Single-user daemon started.",
+      "output_sha256": "fd631476edb0fbd2b9439a5920291b78f926959d95c05bcd84c6897b07525e63"
+    },
+    {
+      "cmd": "mcporter daemon status",
+      "exit": 0,
+      "duration_s": 0.3,
+      "output_excerpt": "Daemon pid <new-pid> -- socket: $HOME/.mcporter/daemon/user.sock; No keep-alive servers registered.",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "mcporter list context-mode",
+      "exit": 0,
+      "duration_s": 1.5,
+      "output_excerpt": "context-mode\\n\\n  /** Run code in a sandboxed subprocess. (Bun detected...) ... ctx_execute, ctx_doctor, ctx_search, ctx_batch_execute, ... full tool docs listed",
+      "output_sha256": "163dad1f7be3afdefa619d308404d2f87f69c6e6cb2a4cefa5506f01ea61064a"
+    },
+    {
+      "cmd": "mcporter call context-mode.ctx_execute language:javascript \"code:console.log('mcporter-bridge-ok')\"",
+      "exit": 0,
+      "duration_s": 0.8,
+      "output_excerpt": "```javascript\\nconsole.log('mcporter-bridge-ok')\\n```\\n\\nmcporter-bridge-ok -- NOTE (fix-round correction): this call was routed through an ad hoc STDIO server auto-imported from ~/.codex/config.toml (`mcporter-list-after.txt` footer: 'STDIO ... .codex/config.toml'), not through the canonical keep-alive config; `mcporter daemon status` at this point still showed `servers: []` (see mcporter-daemon-restart2.txt and live ~/.mcporter/daemon/user.json). This command alone does not settle gap 13's keep-alive-daemon path; see the fix-round commands below.",
+      "output_sha256": "e72bf2ac8d48c38f154a0d119706271942cfe2bf5cfb2fa285e9f987cecf4516"
+    },
+    {
+      "cmd": "FIX-ROUND CORRECTED PROCEDURE (2026-09-23, same day): mcporter daemon restart",
+      "exit": 0,
+      "duration_s": 1.0,
+      "output_excerpt": "Daemon stopped (if it was running). Single-user daemon started.",
+      "output_sha256": "491b010ccea29d859a63ee27ad758b7f640e135beee81d3726421c8727b27f6d"
+    },
+    {
+      "cmd": "mcporter --config ~/codex-ecosystem/config/mcporter.json daemon status --json",
+      "exit": 0,
+      "duration_s": 0.3,
+      "output_excerpt": "{\"pid\":2276114,...,\"views\":0,\"servers\":[],\"idleShutdownBlocked\":false} -- confirms no keep-alive view registered yet, BEFORE any list/call against the canonical config",
+      "output_sha256": "ceac453f376bab15d0e9817e30fc433e760dc3445f7e41bec2902e806325ea04"
+    },
+    {
+      "cmd": "mcporter --config ~/codex-ecosystem/config/mcporter.json list context-mode --status --json",
+      "exit": 0,
+      "duration_s": 1.0,
+      "output_excerpt": "full context-mode tool catalog (11 tools) returned ok via the canonical config's STDIO transport (node .../context-mode/1.0.169/start.mjs), source.path=~/codex-ecosystem/config/mcporter.json",
+      "output_sha256": "cdafcb5a553830852117ffe90e764e817bf54401efb7b1a05eba527c6d7760e0"
+    },
+    {
+      "cmd": "mcporter --config ~/codex-ecosystem/config/mcporter.json daemon status --json",
+      "exit": 0,
+      "duration_s": 0.3,
+      "output_excerpt": "{\"pid\":2276114,...,\"servers\":[{\"name\":\"<connection-id>\",\"connectionId\":\"<connection-id>\",\"connectionGeneration\":1,\"connected\":true,...}]} -- context-mode now registered as a CONNECTED keep-alive server under MCPorter's own daemon, the discriminating delta versus the before-status",
+      "output_sha256": "e0a50322445ea4c4fe647e8d744a8023359c4ce6e2c218191e28a3cc9f394dba"
+    },
+    {
+      "cmd": "mcporter --config ~/codex-ecosystem/config/mcporter.json call context-mode.ctx_execute language:javascript \"code:console.log('mcporter-bridge-fix-ok')\"",
+      "exit": 0,
+      "duration_s": 0.6,
+      "output_excerpt": "```javascript\\nconsole.log('mcporter-bridge-fix-ok')\\n```\\n\\nmcporter-bridge-fix-ok -- real tool output, returned while the keep-alive server entry from the previous status check remained registered/connected",
+      "output_sha256": "52575b6a5198888e154136345482bf696525ad901f3d114e6be7c266a77ad432"
+    }
+  ],
+  "tool_versions": {
+    "mcporter": "0.13.13"
+  },
+  "installs": [],
+  "model_calls": [],
+  "result": "Confirmed a real, diagnosable daemon error: `mcporter daemon restart` timed out (Chrome relay discovery/45s readiness timeout), and `mcporter daemon start --foreground --log` surfaced the underlying cause as `BrokerError: Previous daemon retirement is unverified; inspect its transports before deliberate recovery` (code daemon_unresponsive). Inspecting MCPorter's own state file ($HOME/.mcporter/daemon/user.json) showed a recorded pid that `ps -p` confirmed was no longer running -- an unclean prior retirement of MCPorter's OWN daemon (not a live shared service). After backing up and clearing that stale state (user.json, user.sock), `mcporter daemon start` succeeded (new pid, socket present). HOWEVER (fix-round correction), the original `mcporter list context-mode` / `mcporter call context-mode.ctx_execute` that followed did NOT exercise the keep-alive daemon path: mcporter auto-imported context-mode as an ad hoc STDIO server from `~/.codex/config.toml`, and `mcporter daemon status` at that point still reported `servers: []` -- i.e. the daemon-recovery work (stale-pid diagnosis and clearing) and that successful call were unrelated; the call would have succeeded the same way even with the daemon fully broken, since it never touched the daemon's keep-alive registration. The corrected fix-round re-run isolates the keep-alive path specifically: `mcporter daemon restart` reset to a clean daemon state, `mcporter --config ~/codex-ecosystem/config/mcporter.json daemon status` confirmed `servers: []` beforehand, `mcporter --config ~/codex-ecosystem/config/mcporter.json list context-mode` then registered context-mode as a keep-alive view, `mcporter --config ... daemon status` afterward showed that view as a CONNECTED entry in `servers[]`, and `mcporter --config ~/codex-ecosystem/config/mcporter.json call context-mode.ctx_execute ...` returned the tool's actual output ('mcporter-bridge-fix-ok') while that keep-alive registration remained connected. This before/after daemon-status delta plus a successful call through the same `--config` is the evidence that was missing: it directly exercises the keep-alive bridge referenced by the original gap-13 error, not an unrelated ad hoc STDIO import.",
+  "settles_gap": true,
+  "verdict_impact": {
+    "could_change_verdict": false,
+    "direction": "supports_incumbent",
+    "explanation": "Establishes that the previously-referenced daemon error was a recoverable stale-state condition in MCPorter's own daemon, AND (after the fix-round correction) that the canonical keep-alive registration path to context-mode -- the one implicated by the original gap-13 error -- is itself functionally reachable end-to-end (registration confirmed via daemon status, then a real tool call while still registered). Does not establish that every daemon error MCPorter can hit is this same stale-state class, nor does it change any north-star verdict."
+  },
+  "evidence_class": "native_proven",
+  "limitations": [
+    "Only one specific daemon-error mode was diagnosed and recovered (stale local state from an unclean prior retirement, confirmed via a dead pid); other possible daemon failure modes (e.g. an actually-live conflicting process, permission issues, a genuinely broken build) were not exercised.",
+    "Manual clearing of the stale state file was necessary because no documented `--force` flag exists on `mcporter daemon restart`/`start`; this is a reasonable but non-upstream-scripted recovery path, backed up before deletion.",
+    "Only the context-mode server was exercised through the daemon/bridge; other MCP servers configured for mcporter were not tested here (the canonical config also declares ai-memory and socraticode, neither of which was listed or called, to avoid touching the live ai-memory server and to keep this check's footprint minimal).",
+    "A live Context Mode process belonging to a running Claude session was never touched, per the binding rule; the keep-alive context-mode process spawned by MCPorter's daemon during the fix-round re-run is a separate, newly-spawned process (its own pid, launched by MCPorter's own daemon from the canonical config) and was left registered under MCPorter's daemon after the check, matching normal keep-alive behavior rather than being torn down.",
+    "The original preregistration text for this check was written and stored the same day as the run but with no timestamped pre-run artifact predating the commands; see the 'FIX-ROUND FINDING' note embedded in the preregistered field. The corrected fix-round preregistration was written into this receipt, in the order shown, before its corresponding commands were executed.",
+    "Single trial (N=1) of the corrected keep-alive registration + call sequence; not repeated."
+  ],
+  "raw_artifacts": [
+    {"path": "~/codex-ecosystem/state/gap-wave2-20260923/native-clients/raw/mcporter-daemon-restart.txt", "sha256": "9b74c42a50b44a24cd3264b03b7a8c438cc5eef32463bb0a2f37137015b50eef"},
+    {"path": "~/codex-ecosystem/state/gap-wave2-20260923/native-clients/raw/mcporter-daemon-fg.txt", "sha256": "ec3648bdf1910c6b8c99112916f4d7f5d3ab35dbd849baed98c55f4cd3155bc0"},
+    {"path": "~/codex-ecosystem/state/gap-wave2-20260923/native-clients/raw/mcporter-daemon-restart2.txt", "sha256": "fd631476edb0fbd2b9439a5920291b78f926959d95c05bcd84c6897b07525e63"},
+    {"path": "~/codex-ecosystem/state/gap-wave2-20260923/native-clients/raw/mcporter-list-after.txt", "sha256": "163dad1f7be3afdefa619d308404d2f87f69c6e6cb2a4cefa5506f01ea61064a"},
+    {"path": "~/codex-ecosystem/state/gap-wave2-20260923/native-clients/raw/mcporter-call.txt", "sha256": "e72bf2ac8d48c38f154a0d119706271942cfe2bf5cfb2fa285e9f987cecf4516"},
+    {"path": "~/codex-ecosystem/state/gap-wave2-20260923/native-clients/raw/mcporter-daemon-state-backup/", "sha256": "n/a (directory backup of ~/.mcporter/daemon prior to clearing stale state)"},
+    {"path": "~/codex-ecosystem/state/gap-wave2-20260923/native-clients/raw/mcporter-daemon-restart-for-fix.txt", "sha256": "491b010ccea29d859a63ee27ad758b7f640e135beee81d3726421c8727b27f6d"},
+    {"path": "~/codex-ecosystem/state/gap-wave2-20260923/native-clients/raw/mcporter-daemon-status-before-keepalive-config.txt", "sha256": "ceac453f376bab15d0e9817e30fc433e760dc3445f7e41bec2902e806325ea04"},
+    {"path": "~/codex-ecosystem/state/gap-wave2-20260923/native-clients/raw/mcporter-list-keepalive-config.txt", "sha256": "cdafcb5a553830852117ffe90e764e817bf54401efb7b1a05eba527c6d7760e0"},
+    {"path": "~/codex-ecosystem/state/gap-wave2-20260923/native-clients/raw/mcporter-daemon-status-after-registration.txt", "sha256": "e0a50322445ea4c4fe647e8d744a8023359c4ce6e2c218191e28a3cc9f394dba"},
+    {"path": "~/codex-ecosystem/state/gap-wave2-20260923/native-clients/raw/mcporter-call-keepalive.txt", "sha256": "52575b6a5198888e154136345482bf696525ad901f3d114e6be7c266a77ad432"}
+  ]
+}

@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "id": "publish-catalog-dispatch-attestation",
+  "date": "2026-09-23",
+  "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+  "layer_ids": ["ci-supply-chain"],
+  "gap_refs": [{"layer_id": "ci-supply-chain", "gap_index": 1}],
+  "purpose": "Dispatch publish-catalog.yml at its current bytes (main HEAD, which added the tag trigger, changed job condition, Syft SBOM step and a second attest step on 2026-09-22) and independently verify both the archive and the SBOM attestations on the downloaded artifacts, since the prior 0/1/0 attestation qualification was for an earlier run (35541322881, commit d0fe136c) that predates these workflow changes.",
+  "preregistered": "If a hosted workflow_dispatch run of the current publish-catalog.yml bytes on main completes successfully and gh attestation verify passes for both the downloaded archive and the downloaded SBOM against that run's exact digests, that settles gap 1 in the supports_incumbent direction (the current, changed workflow bytes are attestation-qualified, not just the pre-2026-09-22 bytes). Any verify failure, digest mismatch, or run failure refutes readiness and would change the verdict the other way.",
+  "commands": [
+    {
+      "cmd": "git -C ~/code/nas-wt-w2-ci-supply-chain show origin/main:.github/workflows/publish-catalog.yml | diff - .github/workflows/publish-catalog.yml",
+      "exit": 0,
+      "duration_s": 0.05,
+      "output_excerpt": "(no diff output; origin/main's publish-catalog.yml is byte-identical to the worktree's, confirming a dispatch on main runs these exact current bytes)",
+      "output_sha256": "n/a (empty diff)"
+    },
+    {
+      "cmd": "gh workflow run publish-catalog.yml --repo seathatflowsinourveins/native-agent-stack --ref main",
+      "exit": 0,
+      "duration_s": 0.6,
+      "output_excerpt": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/35803145596",
+      "output_sha256": "n/a (single URL line)"
+    },
+    {
+      "cmd": "gh run view 35803145596 --repo seathatflowsinourveins/native-agent-stack --json status,conclusion,headSha",
+      "exit": 0,
+      "duration_s": 0.4,
+      "output_excerpt": "{\"conclusion\":\"success\",\"headSha\":\"41d39b3917feee17ecc6369a5662b6acda7c0983\",\"status\":\"completed\"}",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "gh api repos/seathatflowsinourveins/native-agent-stack/actions/artifacts/10726178267/zip > native-agent-stack-41d39b3917feee17ecc6369a5662b6acda7c0983.tar.gz",
+      "exit": 0,
+      "duration_s": 3.1,
+      "output_excerpt": "sha256sum matches artifact-listing digest a528186ea3f679fabcf6ac9fb768ce8e8c5c1790cb361c101009c0cc76ecf3c6 exactly",
+      "output_sha256": "a528186ea3f679fabcf6ac9fb768ce8e8c5c1790cb361c101009c0cc76ecf3c6"
+    },
+    {
+      "cmd": "gh api repos/seathatflowsinourveins/native-agent-stack/actions/artifacts/10726801768/zip > native-agent-stack-41d39b3917feee17ecc6369a5662b6acda7c0983.spdx.json",
+      "exit": 0,
+      "duration_s": 0.8,
+      "output_excerpt": "sha256sum matches artifact-listing digest f8c072436125c7564b372631715e3a8be50720dd606675d0990bcc101885da4c exactly",
+      "output_sha256": "f8c072436125c7564b372631715e3a8be50720dd606675d0990bcc101885da4c"
+    },
+    {
+      "cmd": "gh attestation verify native-agent-stack-41d39b3917feee17ecc6369a5662b6acda7c0983.tar.gz --repo seathatflowsinourveins/native-agent-stack --signer-workflow seathatflowsinourveins/native-agent-stack/.github/workflows/publish-catalog.yml --format json",
+      "exit": 0,
+      "duration_s": 1.7,
+      "output_excerpt": "loaded digest sha256:a528186ea... verification succeeded",
+      "output_sha256": "8cdb3931cde257a91e7a78119b6af909008217a18555427aef4ec093c3fac608"
+    },
+    {
+      "cmd": "gh attestation verify native-agent-stack-41d39b3917feee17ecc6369a5662b6acda7c0983.spdx.json --repo seathatflowsinourveins/native-agent-stack --signer-workflow seathatflowsinourveins/native-agent-stack/.github/workflows/publish-catalog.yml --predicate-type https://spdx.dev/Document --format json",
+      "exit": 0,
+      "duration_s": 1.6,
+      "output_excerpt": "loaded digest sha256:f8c07243... verification succeeded",
+      "output_sha256": "e2cb861221ffa8c36638b90fd76bb07d7f7dc03b097200d717838aa570920b5a"
+    }
+  ],
+  "tool_versions": {"gh": "2.101.0"},
+  "installs": [],
+  "model_calls": [],
+  "result": "Dispatched publish-catalog.yml via workflow_dispatch on main (origin/main's publish-catalog.yml bytes verified byte-identical to this worktree's current file via diff, so the dispatch exercised these exact current bytes, including the tag trigger, changed job condition, Syft SBOM step and second attest step added 2026-09-22). Run 35803145596 completed with conclusion=success at headSha 41d39b3917feee17ecc6369a5662b6acda7c0983. Both artifacts (native-agent-stack-...tar.gz and ...spdx.json) were downloaded via the GitHub API and their sha256 digests matched the artifact-listing's recorded digest field exactly. gh attestation verify succeeded for both the archive (build-provenance attestation) and the SBOM (SPDX-predicate attestation), scoped to the publish-catalog.yml signer workflow in this repository.",
+  "settles_gap": true,
+  "verdict_impact": {
+    "could_change_verdict": true,
+    "direction": "supports_incumbent",
+    "explanation": "The previously-qualified attestation (run 35541322881, commit d0fe136c, 2026-09-20) predates the 2026-09-22 tag-trigger/SBOM/second-attest changes to publish-catalog.yml. This receipt re-qualifies attestation on the current workflow bytes at a fresh hosted run (35803145596, commit 41d39b3), independently downloading and verifying both attestations rather than trusting the workflow's own internal verification steps."
+  },
+  "evidence_class": "native_proven",
+  "limitations": [
+    "This dispatch ran on main's current HEAD (41d39b3917feee17ecc6369a5662b6acda7c0983), two commits ahead of this worktree's base (3bb8cb3); the worktree's own uncommitted/committed changes in this branch were not part of the dispatched run.",
+    "gh attestation verify was run with GH_TOKEN from the authenticated gh session (online verification against GitHub's Sigstore-backed attestation API); no offline/bundle-based re-verification was performed in this receipt (the workflow itself performs an offline bundle verification internally, which is a separate, already-passing CI step, not re-checked here).",
+    "Does not by itself establish 'release, tag or push' behavior: this was a workflow_dispatch run, which per the workflow's own logic only builds, uploads and attests artifacts -- it does not create a GitHub Release, push a tag, or push any ref. No such release-creation step exists anywhere in publish-catalog.yml, so this gap's premise ('no release, tag or push') is confirmed to still hold for workflow_dispatch triggers; tag-push triggers (runs 35789931619, 35782414436) exercise the identical job body and also do not create a GitHub Release object, only the archive/SBOM artifacts and attestations."
+  ],
+  "raw_artifacts": [
+    {"path": "<scratch>/publish-run/verify-archive.json", "sha256": "8cdb3931cde257a91e7a78119b6af909008217a18555427aef4ec093c3fac608"},
+    {"path": "<scratch>/publish-run/verify-sbom.json", "sha256": "e2cb861221ffa8c36638b90fd76bb07d7f7dc03b097200d717838aa570920b5a"},
+    {"path": "<scratch>/publish-run/native-agent-stack-41d39b3917feee17ecc6369a5662b6acda7c0983.tar.gz", "sha256": "a528186ea3f679fabcf6ac9fb768ce8e8c5c1790cb361c101009c0cc76ecf3c6"},
+    {"path": "<scratch>/publish-run/native-agent-stack-41d39b3917feee17ecc6369a5662b6acda7c0983.spdx.json", "sha256": "f8c072436125c7564b372631715e3a8be50720dd606675d0990bcc101885da4c"}
+  ]
+}
