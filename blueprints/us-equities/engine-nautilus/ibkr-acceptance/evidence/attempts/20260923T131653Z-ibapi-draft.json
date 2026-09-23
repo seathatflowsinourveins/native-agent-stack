@@ -3,12 +3,9 @@
   "gate_id": "ibkr-local-acceptance",
   "step": "acceptance-plan 5.1 read-only",
   "client": "ibapi (official IB API client)",
-  "host": "127.0.0.1",
   "port": 4002,
   "client_id": 73,
-  "deadline_seconds": 90.0,
-  "generated_at": "2026-09-23T14:32:49.971823+00:00",
-  "ibapi_version": "10.45.1",
+  "generated_at": "2026-09-23T13:16:53.647349+00:00",
   "status": "passed",
   "evidence_class": "native_paper_readonly",
   "existing_state": {
@@ -16,18 +13,12 @@
     "open_orders": 0
   },
   "observed": {
-    "account_count": 1,
     "paper_accounts": true,
-    "server_time_epoch": 1790173969,
+    "server_time_epoch": 1790169413,
     "positions": 0,
     "open_orders": 0,
-    "summary_tags": [
-      "AccountType",
-      "BuyingPower",
-      "NetLiquidation",
-      "TotalCashValue"
-    ],
-    "account_type": "INDIVIDUAL",
+    "summary_tags": [],
+    "summary_currency": null,
     "spy_contract": {
       "conId": 756733,
       "secType": "STK",
@@ -37,20 +28,25 @@
       "longName": "SS SPDR S&P 500 ETF TRUST-US",
       "tradingHoursSample": "20260923:0400-20260923:2000;20260924:040"
     },
-    "market_data_type": "REALTIME",
+    "market_data_type": "DELAYED",
     "spy_quote": {
-      "last_trade_epoch": 1790173970,
-      "last": 769.18,
-      "first_tick_local_epoch": 1790173970.5034857,
-      "bid": 769.17,
-      "ask": 769.18
+      "delayed_last": 772.66,
+      "first_tick_local_epoch": 1790169434.3844202,
+      "delayed_bid": 772.64,
+      "delayed_ask": 772.67
     },
     "history": {
-      "bars": 91,
-      "first": "1790083800",
-      "last": "1790173800"
+      "bars": 156,
+      "first": "1789997400",
+      "last": "1790106900"
     },
-    "errors": [],
+    "errors": [
+      {
+        "reqId": 9004,
+        "code": 2188,
+        "text": "Up-to-the-second historical data requires additional subscription for the API."
+      }
+    ],
     "info": [
       {
         "reqId": -1,
@@ -66,21 +62,15 @@
         "reqId": -1,
         "code": 2158,
         "text": "Sec-def data farm connection is OK:secdefil"
+      },
+      {
+        "reqId": 9003,
+        "code": 10167,
+        "text": "Requested market data is not subscribed. Displaying delayed market data."
       }
     ],
-    "server_minus_local_s": -1.082,
-    "quote_age_s": -0.578,
-    "max_quote_age_s": 900.0
+    "server_minus_local_s": -0.674
   },
-  "requests_completed": {
-    "accounts": true,
-    "time": true,
-    "positions": true,
-    "orders": true,
-    "summary": true,
-    "contract": true,
-    "mktdata": true,
-    "history": true
-  },
-  "exit_code": 0
+  "exit_code": 0,
+  "redaction": "observed.accounts_sha256 removed before publication: a hash of a DU paper id is reversible"
 }

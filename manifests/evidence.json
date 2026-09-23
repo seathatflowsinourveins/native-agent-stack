@@ -918,7 +918,7 @@
         "prometheus",
         "loki"
       ],
-      "claim": "After native sign-in restored readiness, the freshly reproduced SDK completed a real LEAN backtest→Dagu→DuckDB→GPT-6 Astra→Claude Opus 5 prepared-packet research workflow; both native reports passed structural citation/value/unit/scope checks and the accepted Astra report was bound into Claude's prompt by verified hashes.",
+      "claim": "After native sign-in restored readiness, the freshly reproduced SDK completed a real LEAN backtest\u2192Dagu\u2192DuckDB\u2192GPT-6 Astra\u2192Claude Opus 5 prepared-packet research workflow; both native reports passed structural citation/value/unit/scope checks and the accepted Astra report was bound into Claude's prompt by verified hashes.",
       "limitations": [
         "This validates a bounded historical simulation research workflow on the authoring host, not a profitable strategy, current market source, broker execution or unattended production service.",
         "The two reported model tasks used no model tools. Their native hooks and telemetry remain separate evidence; this does not repeat every MCP, memory or GPU-RAG behavior.",
@@ -1900,7 +1900,7 @@
       "component_ids": [
         "ai-memory"
       ],
-      "claim": "Mac arm64 synthetic2.3.1→2.3.2 migration, scoped exact reads/FTS, reserved and Unicode paths, restart and no-capture checks passed.",
+      "claim": "Mac arm64 synthetic2.3.1\u21922.3.2 migration, scoped exact reads/FTS, reserved and Unicode paths, restart and no-capture checks passed.",
       "limitations": [
         "Separate synthetic store and explicit no-model policy only; no production migration claimed by this receipt.",
         "OS filesystem/network confinement was not established; failed restricted-sandbox attempt retained. Native execution succeeded without security overrides; Gatekeeper assessment rejected the ad-hoc distribution.",
@@ -6954,28 +6954,93 @@
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/README.md",
-      "sha256": "2ce48f560a4b9ffded5f526d1fd9f4c070951a141246c760b5ee17cf3332dd14",
-      "bytes": 4046
+      "sha256": "d12203501feccebd12fbd833f0630579226da0b2c5ee0751322401712b779fc8",
+      "bytes": 4987
     },
     {
-      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/ibapi-readonly-20260923.json",
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/attempts/20260923T131151Z-handrolled-protocol-probe.json",
+      "sha256": "69ffa707d3d010771c86b7eb9cc81f2fb949fa547a8df5c3f39e7cc1a6493250",
+      "bytes": 399
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/attempts/20260923T131436Z-handrolled-protocol-probe.json",
+      "sha256": "e4c1b6f79e47e7d668b4e2e306f60c528d2b46bcc0f6b396ea465ccce421ea0b",
+      "bytes": 399
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/attempts/20260923T131604Z-ibapi-draft.json",
+      "sha256": "b65b78cf11ca90923854f6de052aa17b0356b4153ea9392d47e658c1147c0c9b",
+      "bytes": 2054
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/attempts/20260923T131653Z-ibapi-draft.json",
+      "sha256": "1cea3a50c2bb1e5c319ec8c50ed99b39ea16f69f7a5c67068ecc084ecab25388",
+      "bytes": 2015
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/attempts/20260923T1318Z-nautilus-adhoc.json",
+      "sha256": "75a662ade64629576411456d83c12739cca95f18578af04b0141f8cf713927db",
+      "bytes": 1416
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/attempts/20260923T132358Z-ibapi.json",
+      "sha256": "b420214bf6e6dadbc0cada74f82fff85fb9246fe5fb7e1c2833cccc6c89dfa72",
+      "bytes": 2074
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/attempts/20260923T132430Z-nautilus.json",
+      "sha256": "560ddef43cd0a6770daa48b8364b01554db2a5c68587aa2cbca513adc8353eeb",
+      "bytes": 413
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/attempts/20260923T141300Z-ibapi.json",
       "sha256": "44dfaa71dabe3585aeb4045d7db7a5514ca3e76ef5981ad1a4767891bbb62d69",
       "bytes": 1938
     },
     {
-      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/nautilus-readonly-20260923.json",
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/attempts/20260923T141311Z-nautilus.json",
       "sha256": "a79d229be850078af872ccd9f5283c77f2f5b858debdd1758ad22c8f967a6414",
       "bytes": 1449
     },
     {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/attempts/20260923T142801Z-ibapi.json",
+      "sha256": "5868870f113516c2f33fc8816586f063aa44f4d2927acb41a1f2f731529bcb05",
+      "bytes": 2059
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/attempts/20260923T142803Z-nautilus.json",
+      "sha256": "b12856dac1c55f40461466ac66278d96eb562740c2d9fbfeca1bf2431408e182",
+      "bytes": 1855
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/attempts/20260923T142819Z-ibapi.json",
+      "sha256": "40b37c9686610ffa7535dd49232c63670a8dda56d5d99963da1561849ff8b4f8",
+      "bytes": 2060
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/attempts/20260923T142821Z-nautilus.json",
+      "sha256": "590c97af75bfba8800ae8fcaeb692a03d43bfaacc2f05de684afb773ec4e7d1c",
+      "bytes": 1854
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/ibapi-readonly-20260923.json",
+      "sha256": "ccd3ace1a4c8df3dc7280b81cfac97bf1bfb199e7056cf5bc35196aa7edd95ed",
+      "bytes": 2061
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/nautilus-readonly-20260923.json",
+      "sha256": "6d1e3e1ae0f13d9610598e285b8fc721b856704cd28f2bd537ba3b5930eb9b64",
+      "bytes": 1641
+    },
+    {
       "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/ibapi_probe.py",
-      "sha256": "7eac1f3abceb85fcc2aa7022fb002bdeebfc822ca4cd580a5649f076fb266fa7",
-      "bytes": 8916
+      "sha256": "2d674bb1a1fa563e0c92ba93bf43f17d322d487b718cff925d0dce9b0d9085d2",
+      "bytes": 11711
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/nautilus_probe.py",
-      "sha256": "22fb6f3825bc215a00052ed0bce17c3c5882819e5260f0719ea6f2c2c50f8c42",
-      "bytes": 6043
+      "sha256": "c1a753fb636d928f2155eaedc0d299a93f11419a97c3d88fb5da026b5f316b94",
+      "bytes": 8045
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/plan.json",
@@ -8454,8 +8519,8 @@
     },
     {
       "path": "catalogs/us-equities/gates-20260922.json",
-      "sha256": "8d2f052d10b8e57b2623821df4a0827d89d5964cba9df9dfdfe2ad38afae4ba0",
-      "bytes": 28507
+      "sha256": "08aa93b30790b5534d4ce4246849fc24bb395465283b04cb20c3229340cd1750",
+      "bytes": 28656
     },
     {
       "path": "catalogs/us-equities/hosting-source-review.json",
@@ -13259,8 +13324,8 @@
     },
     {
       "path": "evidence/receipts/ibkr-readonly-acceptance-20260923.json",
-      "sha256": "b898b1ca00e631950de8bb391b9f7e28f542980fd880a899261dedf14e98b7a7",
-      "bytes": 7744
+      "sha256": "647b6ddf97fe8e2e15f49c0a27c45f2469e2360a9dedc0a9cb58b73efa16877b",
+      "bytes": 13484
     },
     {
       "path": "evidence/receipts/mac-memory-patch-20260920.json",
@@ -14514,8 +14579,8 @@
     },
     {
       "path": "tests/test_ibkr_acceptance.py",
-      "sha256": "b47c0359da54ab5c5e73cfff0feafe1784c213b659a56d42eecc449bc33343cb",
-      "bytes": 6679
+      "sha256": "a9ac292e5fe72be5f59d7989ff7eb9105ce2cadb11c76986590ad4430153d187",
+      "bytes": 13565
     },
     {
       "path": "tests/test_job_recovery.py",

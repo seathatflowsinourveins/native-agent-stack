@@ -13,10 +13,16 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import threading
 import time
 from datetime import datetime, timezone
+from pathlib import Path
 
+HERE = Path(__file__).resolve().parent
+PLAN = HERE / "plan.json"
+# The gate's flip receipt; a step-1 probe must never write there.
+GATE_RECEIPT = HERE / "receipt.json"
 PAPER_PORTS = {4002, 7497}
 PAPER_ACCOUNT_PREFIX = "DU"
 SUMMARY_TAGS = "AccountType,NetLiquidation,TotalCashValue,BuyingPower"
@@ -25,7 +31,12 @@ MARKET_DATA_TYPES = {1: "REALTIME", 2: "FROZEN", 3: "DELAYED", 4: "DELAYED_FROZE
 # (farm status, "displaying delayed market data"); they are not failures.
 INFO_CODES = {2104, 2106, 2107, 2108, 2158, 2119, 2100, 10167, 10089}
 TICK_NAMES = {1: "bid", 2: "ask", 4: "last", 66: "delayed_bid", 67: "delayed_ask", 68: "delayed_last"}
+# LAST_TIMESTAMP and DELAYED_LAST_TIMESTAMP arrive as epoch-second strings.
+TIMESTAMP_TICKS = {45: "last_trade_epoch", 88: "delayed_last_trade_epoch"}
+QUOTE_AGE_RESOLUTION_S = 2.0
 REQUESTS = ("accounts", "time", "positions", "orders", "summary", "contract", "mktdata", "history")
+# IBKR account ids: paper DU/DF, live U/F, and I for some institutional forms.
+ACCOUNT_ID = re.compile(r"\b(?:D?[UF]|I)\d{5,}\b")
 
 
 def account_scope(accounts_list: str) -> tuple[int, bool]:
@@ -36,6 +47,14 @@ def account_scope(accounts_list: str) -> tuple[int, bool]:
 
 def is_info(code: int) -> bool:
     return code in INFO_CODES
+
+
+def is_gate_receipt(path) -> bool:
+    return Path(path).resolve() == GATE_RECEIPT
+
+
+def max_quote_age(plan_path=PLAN) -> float:
+    return float(json.loads(Path(plan_path).read_text())["max_acceptable_quote_age_seconds"])
 
 
 class ProbeState:
@@ -96,6 +115,11 @@ class ProbeState:
             self.r["spy_quote"][name] = price
             self.r["spy_quote"].setdefault("first_tick_local_epoch", time.time())
 
+    def tickString(self, reqId, tickType, value):
+        name = TIMESTAMP_TICKS.get(tickType)
+        if name and str(value).isdigit():
+            self.r["spy_quote"][name] = int(value)
+
     def tickSnapshotEnd(self, reqId):
         self.done["mktdata"].set()
 
@@ -110,14 +134,45 @@ class ProbeState:
 
     def error(self, reqId, errorTime, errorCode, errorString, advancedOrderRejectJson=""):
         # ibapi 10.45 signature: (reqId, errorTime, errorCode, errorString, advancedOrderRejectJson)
-        entry = {"reqId": reqId, "code": errorCode, "text": (errorString or "")[:160]}
+        text = ACCOUNT_ID.sub("<account-id>", (errorString or "")[:160])
+        entry = {"reqId": reqId, "code": errorCode, "text": text}
         (self.r["info"] if is_info(errorCode) else self.r["errors"]).append(entry)
 
     def completed(self) -> dict:
         return {k: v.is_set() for k, v in self.done.items()}
 
 
+def quote_age(r: dict, local_now: float) -> float | None:
+    """Seconds from the last trade time IB reported to the server clock now."""
+    quote = r["spy_quote"]
+    epoch = quote.get("last_trade_epoch") or quote.get("delayed_last_trade_epoch")
+    if epoch is None:
+        return None
+    return round(local_now + (r.get("server_minus_local_s") or 0.0) - epoch, 3)
+
+
+def verdict(r: dict, completed: dict, max_age: float) -> str:
+    """Passed needs every request complete, no existing positions or orders, the
+    contract, bars, server time and a quote no older than the plan's limit. IB
+    trade and server times have one-second resolution, so an age down to
+    ``-QUOTE_AGE_RESOLUTION_S`` counts as current; anything earlier is refused."""
+    if not all(completed.get(k) for k in REQUESTS):
+        return "incomplete"
+    if r["positions"] or r["open_orders"]:
+        return "blocked_existing_state"
+    age = r.get("quote_age_s")
+    if (r["spy_contract"] and r["history"]["bars"] > 0 and r["server_time_epoch"] and r["spy_quote"]
+            and age is not None and -QUOTE_AGE_RESOLUTION_S <= age <= max_age):
+        return "passed"
+    return "incomplete"
+
+
+EXIT_CODES = {"passed": 0, "incomplete": 1, "not_connected": 2, "refused_not_paper_port": 3,
+              "refused_not_paper_account": 3, "blocked_existing_state": 4}
+
+
 def build_probe():
+    import ibapi
     from ibapi.client import EClient
     from ibapi.wrapper import EWrapper
 
@@ -126,7 +181,9 @@ def build_probe():
             ProbeState.__init__(self)
             EClient.__init__(self, self)
 
-    return Probe()
+    probe = Probe()
+    probe.client_version = ibapi.get_version_string()
+    return probe
 
 
 def spy():
@@ -137,28 +194,27 @@ def spy():
     return c
 
 
-def verdict(r: dict) -> str:
-    return "passed" if (r["spy_contract"] and r["history"]["bars"] > 0 and r["server_time_epoch"]) else "incomplete"
-
-
-def main(argv=None) -> int:
+def main(argv=None, probe_factory=None, contract_factory=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--host", default="127.0.0.1")
     ap.add_argument("--port", type=int, default=4002)
     ap.add_argument("--client-id", type=int, default=73)
     ap.add_argument("--receipt", required=True)
-    ap.add_argument("--deadline-seconds", type=float, default=60.0)
+    ap.add_argument("--deadline-seconds", type=float, default=90.0, help="plan.json overall_timeout_seconds")
     a = ap.parse_args(argv)
+    if is_gate_receipt(a.receipt):
+        print(json.dumps({"status": "refused_gate_receipt_path", "exit_code": 3}))
+        return 3
     receipt = {"schema_version": 1, "gate_id": "ibkr-local-acceptance", "step": "acceptance-plan 5.1 read-only",
                "client": "ibapi (official IB API client)", "host": a.host, "port": a.port, "client_id": a.client_id,
-               "generated_at": datetime.now(timezone.utc).isoformat()}
+               "deadline_seconds": a.deadline_seconds, "generated_at": datetime.now(timezone.utc).isoformat()}
     if a.port not in PAPER_PORTS:
         receipt.update(status="refused_not_paper_port", evidence_class="none")
-        return _write(a.receipt, receipt, 3)
-    import ibapi
-
-    receipt["ibapi_version"] = getattr(ibapi, "__version__", None) or ibapi.get_version_string()
-    p = build_probe()
+        return _write(a.receipt, receipt)
+    limit = max_quote_age()
+    contract = contract_factory or spy
+    p = (probe_factory or build_probe)()
+    receipt["ibapi_version"] = getattr(p, "client_version", None)
     deadline = time.monotonic() + a.deadline_seconds
     p.connect(a.host, a.port, a.client_id)
     threading.Thread(target=p.run, daemon=True).start()
@@ -169,10 +225,10 @@ def main(argv=None) -> int:
     try:
         if not p.isConnected() or not wait("accounts", 10):
             receipt.update(status="not_connected", evidence_class="not_connected")
-            return _write(a.receipt, receipt, 2, p)
+            return _write(a.receipt, receipt, p)
         if not p.r["paper_accounts"]:
             receipt.update(status="refused_not_paper_account", evidence_class="none")
-            return _write(a.receipt, receipt, 3, p)
+            return _write(a.receipt, receipt, p)
         local_before = time.time()
         p.reqCurrentTime()
         wait("time", 5)
@@ -182,22 +238,25 @@ def main(argv=None) -> int:
         p.reqPositions(); wait("positions", 10); p.cancelPositions()
         p.reqAllOpenOrders(); wait("orders", 10)
         p.reqAccountSummary(9001, "All", SUMMARY_TAGS); wait("summary", 10); p.cancelAccountSummary(9001)
-        p.reqContractDetails(9002, spy()); wait("contract", 10)
+        p.reqContractDetails(9002, contract()); wait("contract", 10)
         p.reqMarketDataType(3)  # delayed allowed; the callback records what is actually granted
-        p.reqMktData(9003, spy(), "", True, False, []); wait("mktdata", 15)
-        p.reqHistoricalData(9004, spy(), "", "2 D", "5 mins", "TRADES", 1, 2, False, []); wait("history", 20)
-        status = verdict(p.r)
-        receipt.update(status=status, evidence_class="native_paper_readonly",
-                       existing_state={"positions": p.r["positions"], "open_orders": p.r["open_orders"]})
-        return _write(a.receipt, receipt, 0 if status == "passed" else 1, p)
+        p.reqMktData(9003, contract(), "", True, False, []); wait("mktdata", 15)
+        p.r["quote_age_s"], p.r["max_quote_age_s"] = quote_age(p.r, time.time()), limit
+        p.reqHistoricalData(9004, contract(), "", "2 D", "5 mins", "TRADES", 1, 2, False, []); wait("history", 20)
+        completed = p.completed()
+        receipt.update(status=verdict(p.r, completed, limit), evidence_class="native_paper_readonly",
+                       existing_state={"positions": p.r["positions"] if completed["positions"] else None,
+                                       "open_orders": p.r["open_orders"] if completed["orders"] else None})
+        return _write(a.receipt, receipt, p)
     finally:
         p.disconnect()
 
 
-def _write(path, receipt, code, probe=None):
+def _write(path, receipt, probe=None):
     if probe is not None:
         receipt["observed"] = probe.r
         receipt["requests_completed"] = probe.completed()
+    code = EXIT_CODES[receipt["status"]]
     receipt["exit_code"] = code
     with open(path, "w") as f:
         json.dump(receipt, f, indent=2, default=str)

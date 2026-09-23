@@ -8,16 +8,18 @@ import ast
 import importlib.util
 import json
 import re
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 import tempfile
+import threading
 import unittest
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "blueprints/us-equities/engine-nautilus/ibkr-acceptance"
 ORDER_CALLS = {"placeOrder", "cancelOrder", "reqGlobalCancel", "exerciseOptions", "submit_order",
                "cancel_order", "modify_order", "cancel_all_orders"}
-RAW_ACCOUNT = re.compile(r"\b[D]?U\d{5,}\b")
+RAW_ACCOUNT = re.compile(r"\b(?:D?[UF]|I)\d{5,}\b")
 
 
 def _load(name, path):
@@ -29,6 +31,7 @@ def _load(name, path):
 
 IBAPI = _load("ibkr_ibapi_probe", SOURCE / "ibapi_probe.py")
 NAUTILUS = _load("ibkr_nautilus_probe", SOURCE / "nautilus_probe.py")
+ALL_DONE = {k: True for k in IBAPI.REQUESTS}
 
 
 class Bar:
@@ -36,7 +39,75 @@ class Bar:
         self.date = date
 
 
-class AccountScope(unittest.TestCase):
+class Details:
+    class contract:
+        conId, secType, currency, exchange, primaryExchange = 756733, "STK", "USD", "SMART", "ARCA"
+    longName, tradingHours = "SPY", "20260923:0930-20260923:1600"
+
+
+class FakeProbe(IBAPI.ProbeState):
+    """Drives ProbeState callbacks synchronously in place of the ibapi client."""
+
+    def __init__(self, accounts="DU1234567", connected=True, positions=0, finish_positions=True):
+        super().__init__()
+        self.accounts, self.connected, self.n_positions = accounts, connected, positions
+        self.finish_positions, self.calls, self.disconnected = finish_positions, [], False
+        self.client_version = "fake"
+
+    def connect(self, host, port, client_id):
+        if self.connected:
+            self.managedAccounts(self.accounts)
+
+    def run(self):
+        pass
+
+    def isConnected(self):
+        return self.connected
+
+    def disconnect(self):
+        self.disconnected = True
+
+    def __getattr__(self, name):
+        if not name.startswith(("req", "cancel")):
+            raise AttributeError(name)
+
+        def call(*args):
+            self.calls.append(name)
+            if name == "reqCurrentTime":
+                self.currentTime(int(__import__("time").time()))
+            elif name == "reqPositions":
+                for _ in range(self.n_positions):
+                    self.position("DU1234567", None, 1, 1.0)
+                if self.finish_positions:
+                    self.positionEnd()
+            elif name == "reqAllOpenOrders":
+                self.openOrderEnd()
+            elif name == "reqAccountSummary":
+                self.accountSummary(9001, "DU1234567", "NetLiquidation", "1000123.45", "USD")
+                self.accountSummaryEnd(9001)
+            elif name == "reqContractDetails":
+                self.contractDetails(9002, Details)
+                self.contractDetailsEnd(9002)
+            elif name == "reqMktData":
+                self.marketDataType(9003, 1)
+                self.tickPrice(9003, 1, 772.64, None)
+                self.tickString(9003, 45, str(int(__import__("time").time()) - 5))
+                self.tickSnapshotEnd(9003)
+            elif name == "reqHistoricalData":
+                self.historicalData(9004, Bar("1790083800"))
+                self.historicalDataEnd(9004, "", "")
+        return call
+
+
+def run_main(probe, *extra):
+    with tempfile.TemporaryDirectory() as tmp:
+        path = Path(tmp) / "r.json"
+        code = IBAPI.main(["--receipt", str(path), "--deadline-seconds", "0.5", *extra],
+                          probe_factory=lambda: probe, contract_factory=lambda: None)
+        return code, json.loads(path.read_text())
+
+
+class AccountScopeAndPrivacy(unittest.TestCase):
     def test_only_all_paper_accounts_pass(self):
         self.assertEqual(IBAPI.account_scope("DU1234567,"), (1, True))
         self.assertEqual(IBAPI.account_scope("DU1234567,DU7654321"), (2, True))
@@ -48,16 +119,23 @@ class AccountScope(unittest.TestCase):
         state.managedAccounts("DU1234567,")
         state.accountSummary(9001, "DU1234567", "NetLiquidation", "1000123.45", "USD")
         state.accountSummary(9001, "DU1234567", "AccountType", "INDIVIDUAL", "")
-        state.position("DU1234567", None, 0, 0.0)
+        state.error(9001, 0, 321, "Error validating request for account DU1234567 and F7654321")
         dumped = json.dumps(state.r)
-        self.assertNotIn("1234567", dumped)
+        self.assertIsNone(RAW_ACCOUNT.search(dumped))
         self.assertNotIn("1000123.45", dumped)
+        self.assertIn("<account-id>", state.r["errors"][0]["text"])
         self.assertEqual(state.r["summary_tags"], ["NetLiquidation", "AccountType"])
-        self.assertEqual((state.r["account_count"], state.r["paper_accounts"]), (1, True))
-        self.assertEqual(state.r["positions"], 0)
 
 
 class ErrorRoutingAndVerdict(unittest.TestCase):
+    def passing_state(self):
+        state = IBAPI.ProbeState()
+        state.currentTime(1790169413)
+        state.r.update(spy_contract={"conId": 756733}, quote_age_s=12.0)
+        state.tickPrice(9003, 1, 772.64, None)
+        state.historicalData(9004, Bar("1789997400"))
+        return state
+
     def test_farm_notices_are_info_and_data_refusals_are_errors(self):
         state = IBAPI.ProbeState()
         for code in (2104, 2106, 2158, 10167):
@@ -67,61 +145,125 @@ class ErrorRoutingAndVerdict(unittest.TestCase):
         self.assertEqual([e["code"] for e in state.r["info"]], [2104, 2106, 2158, 10167])
         self.assertEqual([e["code"] for e in state.r["errors"]], [2188, 162, 10197])
 
-    def test_passed_needs_contract_bars_and_server_time(self):
+    def test_passed_needs_every_request_zero_state_and_a_fresh_quote(self):
+        state = self.passing_state()
+        self.assertEqual(IBAPI.verdict(state.r, ALL_DONE, 900), "passed")
+        self.assertEqual(IBAPI.verdict(state.r, {**ALL_DONE, "positions": False}, 900), "incomplete")
+        self.assertEqual(IBAPI.verdict(state.r, {**ALL_DONE, "orders": False}, 900), "incomplete")
+        self.assertEqual(IBAPI.verdict({**state.r, "quote_age_s": 901.0}, ALL_DONE, 900), "incomplete")
+        self.assertEqual(IBAPI.verdict({**state.r, "quote_age_s": None}, ALL_DONE, 900), "incomplete")
+        self.assertEqual(IBAPI.verdict({**state.r, "quote_age_s": -0.4}, ALL_DONE, 900), "passed")
+        self.assertEqual(IBAPI.verdict({**state.r, "quote_age_s": -2.5}, ALL_DONE, 900), "incomplete")
+        self.assertEqual(IBAPI.verdict({**state.r, "positions": 1}, ALL_DONE, 900), "blocked_existing_state")
+        self.assertEqual(IBAPI.verdict({**state.r, "open_orders": 2}, ALL_DONE, 900), "blocked_existing_state")
+
+    def test_quote_age_uses_the_trade_timestamp_and_server_offset(self):
         state = IBAPI.ProbeState()
-        self.assertEqual(IBAPI.verdict(state.r), "incomplete")
-        state.currentTime(1790169413)
-        state.r["spy_contract"] = {"conId": 756733}
-        self.assertEqual(IBAPI.verdict(state.r), "incomplete")
-        state.historicalData(9004, Bar("1789997400"))
-        state.historicalDataEnd(9004, "", "")
-        self.assertEqual(IBAPI.verdict(state.r), "passed")
-        self.assertTrue(state.completed()["history"])
-        self.assertFalse(state.completed()["summary"])
+        self.assertIsNone(IBAPI.quote_age(state.r, 1000.0))
+        state.tickString(9003, 45, "990")
+        state.tickString(9003, 45, "not-a-number")
+        state.r["server_minus_local_s"] = -0.5
+        self.assertEqual(IBAPI.quote_age(state.r, 1000.0), 9.5)
+        delayed = IBAPI.ProbeState()
+        delayed.tickString(9003, 88, "100")
+        self.assertEqual(IBAPI.quote_age(delayed.r, 1000.0), 900.0)
 
-    def test_delayed_quote_ticks_are_named(self):
-        state = IBAPI.ProbeState()
-        state.marketDataType(9003, 3)
-        state.tickPrice(9003, 66, 772.64, None)
-        state.tickPrice(9003, 67, -1.0, None)
-        self.assertEqual(state.r["market_data_type"], "DELAYED")
-        self.assertEqual(state.r["spy_quote"]["delayed_bid"], 772.64)
-        self.assertNotIn("delayed_ask", state.r["spy_quote"])
+    def test_plan_declares_the_quote_age_limit(self):
+        self.assertEqual(IBAPI.max_quote_age(), 900.0)
 
 
-class Refusals(unittest.TestCase):
-    def test_ibapi_probe_refuses_a_live_port_before_connecting(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            path = Path(tmp) / "r.json"
-            self.assertEqual(IBAPI.main(["--port", "7496", "--receipt", str(path)]), 3)
-            receipt = json.loads(path.read_text())
-        self.assertEqual(receipt["status"], "refused_not_paper_port")
+class IbapiMain(unittest.TestCase):
+    def test_happy_path_passes_with_zero_existing_state(self):
+        probe = FakeProbe()
+        code, receipt = run_main(probe)
+        self.assertEqual((code, receipt["status"]), (0, "passed"))
+        self.assertEqual(receipt["existing_state"], {"positions": 0, "open_orders": 0})
+        self.assertTrue(probe.disconnected)
+        self.assertIsNone(RAW_ACCOUNT.search(json.dumps(receipt)))
+
+    def test_non_paper_account_disconnects_before_any_read(self):
+        probe = FakeProbe(accounts="U1234567")
+        code, receipt = run_main(probe)
+        self.assertEqual((code, receipt["status"]), (3, "refused_not_paper_account"))
+        self.assertEqual(probe.calls, [])
+        self.assertTrue(probe.disconnected)
+
+    def test_not_connected(self):
+        code, receipt = run_main(FakeProbe(connected=False))
+        self.assertEqual((code, receipt["status"]), (2, "not_connected"))
+
+    def test_existing_position_blocks(self):
+        code, receipt = run_main(FakeProbe(positions=1))
+        self.assertEqual((code, receipt["status"]), (4, "blocked_existing_state"))
+
+    def test_unfinished_positions_snapshot_is_incomplete_not_zero(self):
+        code, receipt = run_main(FakeProbe(finish_positions=False))
+        self.assertEqual((code, receipt["status"]), (1, "incomplete"))
+        self.assertIsNone(receipt["existing_state"]["positions"])
+
+    def test_live_port_is_refused_before_connecting(self):
+        probe = FakeProbe()
+        code, receipt = run_main(probe, "--port", "7496")
+        self.assertEqual((code, receipt["status"]), (3, "refused_not_paper_port"))
         self.assertNotIn("observed", receipt)
+        self.assertFalse(probe.disconnected)
 
-    def test_nautilus_precondition(self):
-        good = {"status": "passed", "host": "127.0.0.1", "port": 4002, "observed": {"paper_accounts": True}}
-        pre = NAUTILUS.paper_precondition
-        self.assertIsNone(pre(good, "127.0.0.1", 4002))
-        self.assertEqual(pre(good, "127.0.0.1", 4001), "refused_not_paper_port")
-        self.assertEqual(pre({**good, "status": "incomplete"}, "127.0.0.1", 4002),
-                         "refused_no_passed_paper_ibapi_receipt")
-        self.assertEqual(pre({**good, "observed": {"paper_accounts": False}}, "127.0.0.1", 4002),
-                         "refused_no_passed_paper_ibapi_receipt")
-        self.assertEqual(pre(good, "127.0.0.1", 7497), "refused_ibapi_receipt_for_other_endpoint")
-        self.assertEqual(pre(good, "10.0.0.2", 4002), "refused_ibapi_receipt_for_other_endpoint")
 
-    def test_nautilus_probe_refuses_without_a_passed_receipt(self):
+class GateReceiptPath(unittest.TestCase):
+    def test_probes_refuse_to_write_the_gate_receipt(self):
+        gate = str(SOURCE / "receipt.json")
+        self.assertEqual(IBAPI.main(["--receipt", gate], probe_factory=FakeProbe), 3)
+        self.assertEqual(NAUTILUS.main(["--ibapi-receipt", gate, "--receipt", gate]), 3)
+        self.assertFalse((SOURCE / "receipt.json").exists())
+
+
+class NautilusPrecondition(unittest.TestCase):
+    now = datetime(2026, 9, 23, 14, 13, 30, tzinfo=timezone.utc)
+    good = {"client": "ibapi (official IB API client)", "status": "passed", "exit_code": 0, "host": "127.0.0.1",
+            "port": 4002, "generated_at": "2026-09-23T14:13:00+00:00", "observed": {"paper_accounts": True}}
+
+    def pre(self, receipt, host="127.0.0.1", port=4002, now=None):
+        return NAUTILUS.paper_precondition(receipt, host, port, now or self.now, 300)
+
+    def test_fresh_passed_paper_receipt_for_the_same_endpoint(self):
+        self.assertIsNone(self.pre(self.good))
+        self.assertEqual(self.pre(self.good, port=4001), "refused_not_paper_port")
+        self.assertEqual(self.pre(self.good, port=7497), "refused_ibapi_receipt_for_other_endpoint")
+        self.assertEqual(self.pre(self.good, host="10.0.0.2"), "refused_ibapi_receipt_for_other_endpoint")
+        for change in ({"status": "incomplete"}, {"exit_code": 1}, {"client": "other"},
+                       {"observed": {"paper_accounts": False}}, {"generated_at": "not-a-time"}):
+            self.assertEqual(self.pre({**self.good, **change}), "refused_no_passed_paper_ibapi_receipt", change)
+
+    def test_stale_or_future_receipt_is_refused(self):
+        self.assertEqual(self.pre(self.good, now=self.now + timedelta(minutes=6)), "refused_stale_ibapi_receipt")
+        self.assertEqual(self.pre(self.good, now=self.now - timedelta(minutes=2)), "refused_stale_ibapi_receipt")
+
+    def test_the_committed_ibapi_evidence_is_stale_now(self):
+        for path in sorted((SOURCE / "evidence").glob("ibapi-readonly-*.json")):
+            receipt = json.loads(path.read_text())
+            later = datetime.fromisoformat(receipt["generated_at"]) + timedelta(hours=1)
+            self.assertEqual(self.pre(receipt, now=later), "refused_stale_ibapi_receipt", path.name)
+
+    def test_missing_or_malformed_receipt_is_refused(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            bad = Path(tmp) / "bad.json"
+            bad.write_text("[1, 2")
+            for ib in (Path(tmp) / "missing.json", bad):
+                out = Path(tmp) / "n.json"
+                self.assertEqual(NAUTILUS.main(["--ibapi-receipt", str(ib), "--receipt", str(out)]), 3)
+                self.assertEqual(json.loads(out.read_text())["status"], "refused_no_passed_paper_ibapi_receipt")
+
+    def test_unreachable_gateway_is_not_connected(self):
         with tempfile.TemporaryDirectory() as tmp:
             ib = Path(tmp) / "ibapi.json"
-            ib.write_text(json.dumps({"status": "incomplete", "host": "127.0.0.1", "port": 4002,
-                                      "observed": {"paper_accounts": True}}))
+            ib.write_text(json.dumps({**self.good, "generated_at": datetime.now(timezone.utc).isoformat()}))
             out = Path(tmp) / "n.json"
-            self.assertEqual(NAUTILUS.main(["--ibapi-receipt", str(ib), "--receipt", str(out)]), 3)
-            self.assertEqual(json.loads(out.read_text())["status"], "refused_no_passed_paper_ibapi_receipt")
+            with mock.patch.object(NAUTILUS, "tcp_reachable", return_value=False):
+                self.assertEqual(NAUTILUS.main(["--ibapi-receipt", str(ib), "--receipt", str(out)]), 2)
+            self.assertEqual(json.loads(out.read_text())["status"], "not_connected")
 
     def test_bar_window_ends_on_the_previous_day(self):
-        now = datetime(2026, 9, 23, 13, 0, tzinfo=timezone.utc)
-        self.assertEqual(NAUTILUS.default_end(now), datetime(2026, 9, 22, 20, 0, tzinfo=timezone.utc))
+        self.assertEqual(NAUTILUS.default_end(self.now), datetime(2026, 9, 22, 20, 0, tzinfo=timezone.utc))
 
 
 class ReadOnlySource(unittest.TestCase):
@@ -132,8 +274,10 @@ class ReadOnlySource(unittest.TestCase):
                       for node in ast.walk(tree) if isinstance(node, ast.Call)}
             self.assertFalse(called & ORDER_CALLS, name)
 
-    def test_retained_receipts_hold_no_account_id_or_home_path(self):
-        for path in sorted((SOURCE / "evidence").glob("*.json")) if (SOURCE / "evidence").is_dir() else []:
+    def test_published_evidence_holds_no_account_id_or_home_path(self):
+        paths = sorted((SOURCE / "evidence").rglob("*.json")) + sorted((ROOT / "evidence/receipts").glob("ibkr-*.json"))
+        self.assertTrue(paths)
+        for path in paths:
             text = path.read_text()
             self.assertIsNone(RAW_ACCOUNT.search(text), path.name)
             self.assertNotIn("/home/", text, path.name)

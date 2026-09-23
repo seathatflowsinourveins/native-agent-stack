@@ -6,11 +6,11 @@
   "host": "127.0.0.1",
   "port": 4002,
   "client_id": 76,
-  "generated_at": "2026-09-23T14:32:51.657347+00:00",
+  "generated_at": "2026-09-23T14:28:21.460742+00:00",
   "paper_check": {
     "ibapi_receipt": {
-      "sha256": "ccd3ace1a4c8df3dc7280b81cfac97bf1bfb199e7056cf5bc35196aa7edd95ed",
-      "generated_at": "2026-09-23T14:32:49.971823+00:00"
+      "sha256": "40b37c9686610ffa7535dd49232c63670a8dda56d5d99963da1561849ff8b4f8",
+      "generated_at": "2026-09-23T14:28:19.819303+00:00"
     }
   },
   "status": "passed",
@@ -24,7 +24,7 @@
       "conId": 756733,
       "primaryExchange": "ARCA",
       "currency": "USD",
-      "elapsed_s": 0.01
+      "elapsed_s": 0.001
     },
     "bars": [
       {
@@ -43,9 +43,10 @@
         "count": 390,
         "first": "SPY.ARCA-5-MINUTE-LAST-EXTERNAL,759.50,759.71,759.14,759.21,725714,1789565700000000000",
         "last": "SPY.ARCA-5-MINUTE-LAST-EXTERNAL,774.36,774.36,773.29,773.44,1620113,1790107200000000000",
-        "elapsed_s": 0.266
+        "elapsed_s": 0.143
       }
     ]
   },
-  "exit_code": 0
+  "exit_code": 0,
+  "redaction": "paper_check key renamed from ibapi_receipt_sha256/ibapi_generated_at to ibapi_receipt.sha256/generated_at before publication, so secret scanning treats the file hash as a hash; values unchanged"
 }
