@@ -14180,7 +14180,7 @@
     },
     {
       "path": "examples/claude-native/workflows/SHA256SUMS",
-      "sha256": "6c806833c193c6ba7304672b8a8dd0058224417c29e78041c64bd25c23b28a1d",
+      "sha256": "cb039d7b829d2aa37307e1d3f021690c72cc3c5099d08c97dbbebe6fb027568c",
       "bytes": 1129
     },
     {
@@ -15275,8 +15275,8 @@
     },
     {
       "path": "tools/sota-convergence/README.md",
-      "sha256": "91dfee540be37f8efa4338b887d67df4430f9f9da8625f99e496d9883cf83d11",
-      "bytes": 79618
+      "sha256": "1e56259088647f58d36313801f8627035f19fac39208bf6b442a5ede45f10085",
+      "bytes": 81034
     },
     {
       "path": "tools/sota-convergence/build_manifest.py",
