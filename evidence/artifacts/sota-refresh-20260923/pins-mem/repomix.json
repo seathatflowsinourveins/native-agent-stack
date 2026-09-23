@@ -7,7 +7,7 @@
   "release_published_at": "2026-09-21T08:34:49Z",
   "preregistration": {
     "written_at": "2026-09-23T00:26:00Z",
-    "note": "Written concurrently with, not strictly before, the version-resolution and install commands below; the acceptance criteria were fixed before interpreting the result.",
+    "note": "LATE, not prior: written after the version-resolution and install commands below ran (its written_at and this receipt's original checked_at were both rounded to the same 00:27:00Z; an independent review correctly flagged this pattern across the wave's receipts as looking reconstructed rather than measured). The acceptance criteria were fixed in the operator's head before interpreting the result, but not committed to this file first.",
     "expectation": "The task names a 1.18.0 -> 1.18.1 upgrade, but the in-repo pin (scripts/native_token_ci.py PINS['repomix']) and the retained receipt evidence/artifacts/full-stack-convergence-20260921/ccusage-repomix-upgrades.json already record repomix at 1.18.1 (upgraded 2026-09-21, before this wave). `gh api repos/yamadashy/repomix/releases/latest` should confirm 1.18.1 is still the newest release, i.e. there is no pending upgrade for this unit to perform.",
     "criteria": "pass/qualified: gh api latest release == 1.18.1 and an isolated install of repomix@1.18.1 reports the matching version; the retained receipt's test run (148/148 passing across the 5 scoped upstream test files) is reused as native_proven evidence for that exact version. fail: a newer release exists beyond 1.18.1, or the isolated install reports a different version than the retained receipt."
   },

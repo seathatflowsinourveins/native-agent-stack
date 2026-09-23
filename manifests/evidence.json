@@ -12564,33 +12564,33 @@
     },
     {
       "path": "evidence/artifacts/sota-refresh-20260923/pins-mem/README.md",
-      "sha256": "d5f9f5883220c89e7a136eb4ba7e36ca379222ec1430b5e1079273b5edb88955",
-      "bytes": 5905
+      "sha256": "0d38619a971719e457263e8e7c621d0002a239853b679cf349c0be68bdb014c9",
+      "bytes": 9608
     },
     {
       "path": "evidence/artifacts/sota-refresh-20260923/pins-mem/markitdown.json",
-      "sha256": "0a71a5144735375535a070d873c155e73651d93e7802d88e26eae05541f882b4",
-      "bytes": 3498
+      "sha256": "68aea16568d0752f328034d8c74db0eb3e911bd4033ec0c5631e217ee436850e",
+      "bytes": 5467
     },
     {
       "path": "evidence/artifacts/sota-refresh-20260923/pins-mem/pageindex.json",
-      "sha256": "f5c67cdde88e63fe24a84b660e4a9e3dd3b73479e3d2b6e9a55d9b5a0ca98823",
-      "bytes": 4805
+      "sha256": "d7bd5530e8e3c141ec8aab64eebaac26d1e3860230630de77fb00895c6eb4764",
+      "bytes": 5148
     },
     {
       "path": "evidence/artifacts/sota-refresh-20260923/pins-mem/repomix.json",
-      "sha256": "bbefaa9abd6e75dbbecf3aa296e7ea4fd3b1b94c77364c3b3ce66db610df6960",
-      "bytes": 4227
+      "sha256": "6daa8ac2054b323740b0aaea014bb96491f6c2889e801611a2bec9c168fa1efb",
+      "bytes": 4498
     },
     {
       "path": "evidence/artifacts/sota-refresh-20260923/pins-mem/ai-memory.json",
-      "sha256": "2ba92bef013ad8c47e6c96a7a3024374817a900cb1fc534b64357337867c346c",
-      "bytes": 7277
+      "sha256": "d71a5101650b1324460316b600cb43f232c35d3c99499c981395b878067c0773",
+      "bytes": 15087
     },
     {
       "path": "evidence/artifacts/sota-refresh-20260923/pins-mem/mteb.json",
-      "sha256": "405eef7d4b53f85ee8443e06e43ac921c8a1ee60e3bd7d69874d23cf686711f3",
-      "bytes": 3376
+      "sha256": "d3ff2011dafc09060ca4dd15abc4cf6469a77f9eedfb27d255eb2aaa0208cc47",
+      "bytes": 4375
     }
   ],
   "convergence_records": [
