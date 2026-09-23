@@ -9,6 +9,10 @@ on:
         description: 'Bound the GitHub freshness fetch to the first N pending repositories (0 = no bound).'
         type: number
         default: 0
+      open_pr:
+        description: 'Open or update the report-only catalog-freshness evidence PR when drift is detected.'
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -21,6 +25,8 @@ jobs:
   freshness:
     runs-on: ubuntu-24.04
     timeout-minutes: 30
+    outputs:
+      drift: ${{ steps.diff.outputs.drift }}
     steps:
       - name: Harden the runner (audit-only network egress)
         uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
@@ -65,6 +71,7 @@ jobs:
             --out "$RUNNER_TEMP/freshness/manifest-$(date -u +%Y%m%d).json" \
             --checked-at "$(date -u +%Y-%m-%d)" --id "catalog-freshness-$(date -u +%Y%m%d)"
       - name: Diff the rebuilt manifest against the published pins/upstream
+        id: diff
         run: |
           python3 - "$RUNNER_TEMP/freshness" <<'PYEOF'
           import glob, json, sys
@@ -73,7 +80,11 @@ jobs:
           work_dir = Path(sys.argv[1])
           rebuilt_path = sorted(work_dir.glob("manifest-*.json"))[-1]
           rebuilt = json.loads(rebuilt_path.read_text())
-          published_path = Path("catalogs/sota-convergence/manifest-20260922.json")
+          # Diff against the newest published manifest by name (manifest-YYYYMMDD.json
+          # sorts chronologically as text), not a hard-coded dated filename, so this
+          # step keeps working the next time catalogs/sota-convergence/ publishes a
+          # newer dated manifest.
+          published_path = sorted(Path("catalogs/sota-convergence").glob("manifest-*.json"))[-1]
           published = json.loads(published_path.read_text())
 
           def rows(manifest):
@@ -117,7 +128,9 @@ jobs:
           drift_md = work_dir / "drift.md"
           drift_md.write_text("\n".join(lines) + "\n")
           print(drift_md.read_text())
+          (work_dir / "drift-status.txt").write_text("true\n" if drifted else "false\n")
           PYEOF
+          echo "drift=$(cat "$RUNNER_TEMP/freshness/drift-status.txt")" >> "$GITHUB_OUTPUT"
       - name: Append the fixed CI-tool pin-drift table
         env:
           GH_TOKEN: ${{ github.token }}
@@ -154,7 +167,25 @@ jobs:
           python3 scripts/validate_convergence.py
           --all-recorded --root . --json
       - name: Run project test suite
-        run: python3 -m unittest
+        run: |
+          set -o pipefail
+          python3 -m unittest 2>&1 | tee "$RUNNER_TEMP/freshness/unittest.log"
+      - name: Report the test suite's skipped-test count
+        if: ${{ !cancelled() }}
+        run: |
+          python3 - "$RUNNER_TEMP/freshness/unittest.log" <<'PYEOF'
+          import os, re, sys
+
+          text = open(sys.argv[1], encoding="utf-8", errors="replace").read()
+          match = re.search(r"skipped=(\d+)", text)
+          skipped = match.group(1) if match else "0"
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as handle:
+              handle.write(
+                  "## Test suite skipped-test count\n\n"
+                  f"`python3 -m unittest` reported {skipped} skipped test(s) on this job's interpreter "
+                  "(see the \"Run project test suite\" step log for which cases).\n\n"
+              )
+          PYEOF
       - name: Retain the rebuilt manifest and drift report
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
@@ -167,3 +198,128 @@ jobs:
           if-no-files-found: error
           include-hidden-files: false
           retention-days: 30
+
+  # The only write-permitted job in this workflow (docs/decisions/2026-09-23-bot-pr-dispatch.md).
+  # It opens/updates a human-reviewable evidence branch and PR from this run's own drift
+  # artifact; scripts/freshness_propose.py enforces that it only ever adds files under
+  # evidence/artifacts/ and evidence/receipts/ and updates manifests/evidence.json's
+  # registration -- it never selects, evaluates, or writes catalogs/sota-convergence/*,
+  # catalogs/landscape/*.json, manifests/stack.json, or layer-verdicts* (owned by the
+  # separate SOTA-convergence lane review). Off by default: it only runs from an explicit
+  # manual `open_pr: true` dispatch, or from a schedule when the repository variable
+  # CATALOG_FRESHNESS_PROPOSE is set to 'true'.
+  propose:
+    needs: freshness
+    if: >-
+      github.ref == 'refs/heads/main' && needs.freshness.outputs.drift == 'true' &&
+      (inputs.open_pr == true || (github.event_name == 'schedule' && vars.CATALOG_FRESHNESS_PROPOSE == 'true'))
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: write
+      pull-requests: write
+      actions: write # dispatches validate.yml/token-report.yml on the evidence branch; see below
+    steps:
+      - name: Harden the runner (audit-only network egress)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.13'
+          check-latest: false
+      - name: Download this run's freshness artifact
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: catalog-freshness-${{ github.run_id }}
+          path: ${{ runner.temp }}/freshness
+      - name: Force-create the automation branch from main
+        run: git checkout -B automation/catalog-freshness
+      - name: Build the evidence artifact, receipt and registration
+        id: build
+        env:
+          RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          python3 scripts/freshness_propose.py \
+            --artifact-dir "$RUNNER_TEMP/freshness" --run-url "$RUN_URL" \
+            | tee "$RUNNER_TEMP/freshness/propose-result.json"
+          receipt_path=$(python3 -c "import json;print(json.load(open('$RUNNER_TEMP/freshness/propose-result.json'))['receipt_path'])")
+          echo "receipt_path=$receipt_path" >> "$GITHUB_OUTPUT"
+      - name: Validate the new evidence
+        run: |
+          set -euo pipefail
+          python3 scripts/validate.py
+          python3 scripts/host_receipts.py validate
+      - name: Check the ecosystem explorer only if it is still a tracked file
+        run: |
+          set -euo pipefail
+          # scripts/freshness_propose.py only rebuilds/rehashes docs/ecosystem/index.html when
+          # `git ls-files` still tracks it, so this check stays correct whether or not a future
+          # change makes it an untracked build artifact instead.
+          if git ls-files --error-unmatch docs/ecosystem/index.html >/dev/null 2>&1; then
+            python3 scripts/build_ecosystem.py --check
+          else
+            echo "docs/ecosystem/index.html is not a tracked file; skipping --check (nothing was rehashed)."
+          fi
+      - name: Commit the evidence branch
+        run: |
+          set -euo pipefail
+          git add evidence/artifacts evidence/receipts manifests/evidence.json
+          if git ls-files --error-unmatch docs/ecosystem/index.html >/dev/null 2>&1; then
+            git add docs/ecosystem/index.html
+          fi
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+            commit -m "Catalog freshness: report-only drift evidence ($(date -u +%Y-%m-%d))"
+      - name: Push the evidence branch with the workflow token (never persisted to disk)
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          basic_auth=$(printf 'x-access-token:%s' "$GITHUB_TOKEN" | base64 -w0)
+          GIT_CONFIG_COUNT=1 \
+          GIT_CONFIG_KEY_0="http.https://github.com/.extraheader" \
+          GIT_CONFIG_VALUE_0="AUTHORIZATION: basic $basic_auth" \
+          git push --force origin HEAD:refs/heads/automation/catalog-freshness
+      - name: Open or update the evidence PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RECEIPT_PATH: ${{ steps.build.outputs.receipt_path }}
+        run: |
+          set -euo pipefail
+          body_file="$RUNNER_TEMP/freshness/pr-body.md"
+          {
+            echo "## Catalog freshness: report-only drift evidence"
+            echo ""
+            cat "$RUNNER_TEMP/freshness/drift.md"
+            echo ""
+            echo "This PR is report-only; no selection or pin changed; pin bumps require a qualified receipt under evidence/artifacts/*/."
+            echo ""
+            echo "Receipt: \`$RECEIPT_PATH\`"
+          } > "$body_file"
+          existing="$(gh pr list --head automation/catalog-freshness --base main --state open --json number --jq '.[0].number // empty')"
+          if [ -n "$existing" ]; then
+            gh pr edit "$existing" --body-file "$body_file"
+          else
+            gh pr create --base main --head automation/catalog-freshness \
+              --title "Catalog freshness: report-only drift evidence ($(date -u +%Y-%m-%d))" \
+              --body-file "$body_file"
+          fi
+      - name: Dispatch downstream checks on the evidence branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          # A push made with the default GITHUB_TOKEN does not trigger a `pull_request`-event run
+          # ("When you use the repository's GITHUB_TOKEN to perform tasks on behalf of the GitHub
+          # Actions app, ... events triggered by the GITHUB_TOKEN will not create a new workflow
+          # run" -- https://docs.github.com/en/actions/concepts/security/github_token). A
+          # `workflow_dispatch` call always creates a run regardless of who pushed the ref, so this
+          # explicitly supplies the review evidence a pull_request trigger would otherwise have.
+          gh workflow run validate.yml --ref automation/catalog-freshness
+          gh workflow run token-report.yml --ref automation/catalog-freshness
