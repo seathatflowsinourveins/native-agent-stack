@@ -3068,8 +3068,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "2f4b59872ee901522f26656032fc6022d046e224e9739f9ba1f8a0a16aa87fba",
-      "bytes": 8138
+      "sha256": "4e391eabbddabc78f0633f124a54c9334ba4769b3af1efc124c1b04a6ed12e92",
+      "bytes": 8415
     },
     {
       "path": ".gitignore",
@@ -3103,8 +3103,8 @@
     },
     {
       "path": "README.md",
-      "sha256": "32aa91b40225b9663a9ecdff2a434036c547accde3b15c7b1783a1d63dc70711",
-      "bytes": 21873
+      "sha256": "53bfed4eaa4eda921c81bbd44ac334d36119c9eb23508cfe73814e6f3ad3d715",
+      "bytes": 22036
     },
     {
       "path": "SECURITY.md",
@@ -3128,8 +3128,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "f111297e0e34fff084cb0399fd04c9183f841d835d848c241a5357f46dc939a5",
-      "bytes": 8341
+      "sha256": "96e67ed5862cc074f6acf932fcc997bda8ffd4966a746e63347cb9625968e452",
+      "bytes": 8501
     },
     {
       "path": "adoption/host-receipt.schema.json",
@@ -8149,8 +8149,8 @@
     },
     {
       "path": "catalogs/landscape/component-evidence-matrix.json",
-      "sha256": "17e29057694b81889ac695f0eb83bb05a20d476a96fac720a7ea54270ca7a58a",
-      "bytes": 145386
+      "sha256": "621109d1de2dd09ee9e87655b2d1774ddea2771aa5e5bff2e97b1470fc4fee65",
+      "bytes": 146112
     },
     {
       "path": "catalogs/landscape/foundation.json",
@@ -8199,8 +8199,8 @@
     },
     {
       "path": "catalogs/landscape/new-host-grand-list.json",
-      "sha256": "822fa078142d43b08f64020808df5d5027986d5913bd223e15ba9b52ba3fe1d3",
-      "bytes": 71540
+      "sha256": "fa93dc2e5ede135f27bac017b1723c33d691c380d7eab93b94e5279be408b904",
+      "bytes": 72266
     },
     {
       "path": "catalogs/landscape/research-state.json",
@@ -8914,8 +8914,8 @@
     },
     {
       "path": "docs/new-host-grand-list.md",
-      "sha256": "156de59bca9d4df1bd977fbf3fdc04c1eddf08c45576540b56d2f66bbc32fae6",
-      "bytes": 13372
+      "sha256": "6c13e86a1e8bd0078e7df68766a49371d7000e010e47ba80e2b25cbaad6dd9a6",
+      "bytes": 13568
     },
     {
       "path": "docs/new-workstation-runtime-profile-20260922.md",
@@ -14129,8 +14129,8 @@
     },
     {
       "path": "scripts/component_matrix.py",
-      "sha256": "61960ef38d546c4e99cebf126531f636bf321f413913a20b86f2e20c710273d4",
-      "bytes": 21717
+      "sha256": "4bdc4609d98b6fafb86fa41301471379a1297835fe9dad293ca413c4545aa0a4",
+      "bytes": 22624
     },
     {
       "path": "scripts/host_receipts.py",
@@ -14151,6 +14151,11 @@
       "path": "scripts/recount-tokens.cjs",
       "sha256": "8f5749fb447e508e0a9a6b52ce61fad195a4f9cdcc6407726a677622cb9f5837",
       "bytes": 1634
+    },
+    {
+      "path": "scripts/release_due.py",
+      "sha256": "3afdb6947b54c1fec4f7f7b9bbb4b525a1d9a33a84a2efa996515ba396694497",
+      "bytes": 5649
     },
     {
       "path": "scripts/trading_gates.py",
@@ -14581,6 +14586,11 @@
       "path": "tests/test_promotion_gate_codex_review.py",
       "sha256": "ac1a31d28a737ca208d58595173e2f57ef43828088dc0c4e286de3c95f76d4ab",
       "bytes": 20781
+    },
+    {
+      "path": "tests/test_release_pin_contents.py",
+      "sha256": "170320841953c442ec85a1617b895624cba2979643abc2f9854bf7eeb9533fe2",
+      "bytes": 3752
     },
     {
       "path": "tests/test_render_config.py",

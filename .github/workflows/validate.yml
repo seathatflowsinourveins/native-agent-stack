@@ -62,6 +62,11 @@ jobs:
         run: python3 scripts/validate.py
       - name: Validate host evidence contribution receipts
         run: python3 scripts/host_receipts.py validate
+      - name: Report release-due new-machine paths (strict only on a re-pin)
+        shell: bash
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: python3 scripts/release_due.py --strict-if-repinned "origin/${BASE_REF:-main}" | tee -a "$GITHUB_STEP_SUMMARY"
       - name: Validate catalog evidence and coverage joins
         run: python3 scripts/validate_catalogs.py
       - name: Validate general foundation capability claims
