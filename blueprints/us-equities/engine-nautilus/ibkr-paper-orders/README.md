@@ -275,8 +275,9 @@ or wide quote leaves the run incomplete instead of paying up.
 ### After-hours run, 2026-09-23 (read-only frozen copy of `c5468df1`, hashes in `evidence/frozen-c5468df1.SHA256SUMS`)
 
 - 18:58 ET, `run --plan plan-post.json`, `evidence/receipt-20260923-post-incomplete.json`: **incomplete** (exit 1,
-  81.8 s), ended flat. The pre-run check passed: paper account, 0 positions, 0 open orders. Today's SPY `tradingHours`
-  were `0400-2000`, giving the window 16:00-19:50.
+  81.8 s), ended flat. The pre-run check passed: paper account, 0 positions, 0 open orders. The receipt records the
+  window check as `inside_window`. A read-only preview just before the run (not committed) showed today's SPY
+  `tradingHours` as `0400-2000`, giving the window 16:00-19:50.
   - C1: a resting BUY at 383.99 was accepted outside regular hours.
   - C2: that order was cancelled.
   - C3: a marketable BUY filled at 768.01 (limit 768.06).
@@ -285,8 +286,13 @@ or wide quote leaves the run incomplete instead of paying up.
     767.93) filled at 767.96.
   - Round trip: realized -2.07 USD including about 2.02 USD commission, within the 5 USD bound. 5 of 6 orders used.
   - Flat proof passed: 0 positions, 0 open orders.
-  - The node log has no IB warning 399 or 2109, which would mean `outsideRth` was ignored. The receipt and log carry no
-    account id.
+  - The node console log (not committed) had no IB warning 399 or 2109, which would mean `outsideRth` was ignored, and
+    no account id. The committed receipt has no account id either.
 - What it shows: NautilusTrader 1.231.0's IB engine places, cancels and fills paper stock orders after hours with
-  `outsideRth`, and the harness cleans up on a timeout. The C4 timeout is thin after-hours liquidity against a fixed
-  45 s step. The plan is unchanged; a changed step or offset would need a new predeclared plan.
+  `outsideRth`, and the harness cleans up on a timeout. Why C4 timed out is unmeasured. Its SELL limit (767.93) was
+  below the recorded bid (767.98, quote age 3.2 s), yet it did not fill within 45 s. Thin after-hours liquidity, a
+  stale displayed bid and IB paper-simulation behaviour are all possible. The plan is unchanged; a changed step or
+  offset would need a new predeclared plan.
+- Erratum: `plan-post.json`'s `revision_note` says it was frozen at 19:05 ET. It was committed at 18:54:51 ET in
+  `7719a10c`, before this 18:58 run, and the receipt's `plan_sha256` (`4500c917…`) matches that file. The note is left
+  as is because editing it would change the hash the receipt binds.
