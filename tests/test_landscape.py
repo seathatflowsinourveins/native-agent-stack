@@ -495,6 +495,57 @@ class LayerVerdictSchemaV2Tests(LandscapeTests):
         with self.assertRaisesRegex(ValueError, "sealed_sha256 needs a sealed file"):
             self.build()
 
+    def test_malformed_sealed_base_is_rejected(self):
+        self.seal_claude_run()
+        fields = self.recorded_fields()
+        fields["lanes"]["sealed_base"] = "evidence/artifacts/layer-verdicts-2026-09-23"  # "-" not allowed
+        self.layer.update(fields)
+        with self.assertRaisesRegex(ValueError, "lanes.sealed_base must be evidence/artifacts/layer-verdicts"):
+            self.build()
+
+    def test_sealed_base_path_traversal_is_rejected(self):
+        self.seal_claude_run()
+        fields = self.recorded_fields()
+        fields["lanes"]["sealed_base"] = "evidence/artifacts/layer-verdicts-../../etc"
+        self.layer.update(fields)
+        with self.assertRaisesRegex(ValueError, "lanes.sealed_base must be evidence/artifacts/layer-verdicts"):
+            self.build()
+
+    def test_a_later_wave_row_verifies_against_its_own_sealed_base_while_an_older_wave_stays_valid(self):
+        # One row on the default (20260922, no sealed_base recorded) fallback and a second
+        # row carrying an explicit sealed_base for a later wave both verify in the same build;
+        # this is the "older sealed runs stay intact and verifiable" acceptance criterion.
+        self.seal_claude_run()  # writes evidence/artifacts/layer-verdicts-20260922/claude/run-1.json
+        # Register the second layer_id as a known foundation layer (foundation-manifest.json)
+        # and give it a taxonomy pin entry matching the winner recorded below.
+        self.write("foundation-manifest.json", {"layers": [{"id": "retrieval"}, {"id": "retrieval-2"}]})
+        self.write("taxonomy.json", {"foundation": [
+            {"layer": "retrieval", "components": [{"id": "selected", "pin": "1"}]},
+            {"layer": "retrieval-2", "components": [{"id": "selected", "pin": "1"}]},
+        ], "trading": [{"layer": "data", "entries": [{"id": "old-trading", "pin": "2"}]}]})
+        later_sha = hashlib.sha256(json.dumps({"run_id": "run-2", "lane": "claude"}).encode("utf-8")).hexdigest()
+        self.write("evidence/artifacts/layer-verdicts-20260923/claude/run-2.json",
+                  {"run_id": "run-2", "lane": "claude"})
+        later_layer = copy.deepcopy(self.layer)
+        later_layer["layer_id"] = "retrieval-2"
+        later_fields = self.recorded_fields(
+            lanes={"claude": {"run_id": "run-2", "sealed_sha256": later_sha},
+                   "codex": {"run_id": "", "sealed_sha256": ""}, "agreement": "codex_absent",
+                   "sealed_base": "evidence/artifacts/layer-verdicts-20260923"})
+        later_layer.update(later_fields)
+        self.layer.update(self.recorded_fields())
+        self.foundation["layers"].append(later_layer)
+        data = self.build()
+        foundation_ids = {row["layer_id"] for row in data["layers"] if row["catalog"] == "foundation"}
+        self.assertEqual(foundation_ids, {"retrieval", "retrieval-2"})
+
+        # Tampering with the older (20260922) sealed run's file still fails verification even
+        # though a new (20260923) wave has since been recorded.
+        (self.root / "evidence/artifacts/layer-verdicts-20260922/claude/run-1.json").write_text(
+            json.dumps({"run_id": "run-1", "lane": "claude", "tampered": True}))
+        with self.assertRaisesRegex(ValueError, "sealed_sha256 does not match"):
+            self.build()
+
     def test_no_selection_needs_open_gaps(self):
         self.layer.update(self.recorded_fields(
             verdict_status="no_selection", winners=[], alternatives=[],

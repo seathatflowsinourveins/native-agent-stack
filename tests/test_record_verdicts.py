@@ -278,7 +278,7 @@ class RecordVerdictsFixture(unittest.TestCase):
         document = json.loads((self.root / relative).read_text(encoding="utf-8"))
         return next(row for row in document["layers"] if row["layer_id"] == layer_id)
 
-    def run_main(self, *, write=True, check=False, adjudications=None, lane_roots=()):
+    def run_main(self, *, write=True, check=False, adjudications=None, lane_roots=(), run_id=None):
         args = ["--root", str(self.root), "--work-dir", str(self.work_dir), "--checked-at", "2026-09-22"]
         for lane_root in lane_roots:
             args += ["--lane-repo-root", lane_root]
@@ -287,6 +287,8 @@ class RecordVerdictsFixture(unittest.TestCase):
             args.append("--check")
         if adjudications is not None:
             args += ["--adjudications", str(adjudications)]
+        if run_id is not None:
+            args += ["--run-id", run_id]
         return record_verdicts.main(args)
 
     def build_packet_pair(self, catalog, layer_id, *, c1_component=None, c2_component=None):
@@ -1103,6 +1105,114 @@ class LaneSchemaRuleTests(unittest.TestCase):
         data = self.base_return(winner_evidence_refs=[],
                                 why_selected="Observed native execution recorded in blueprints/x/receipt.json " * 2)
         self.assertEqual(self.validate(data)["winner_evidence_refs"], [])
+
+
+class RunIdTests(RecordVerdictsFixture):
+    """--run-id parameterizes the sealed evidence directory and the recorded
+    run_id without disturbing the default (sealed 2026-09-22) wave's output."""
+
+    def test_non_default_run_id_writes_a_separate_sealed_wave_and_records_sealed_base(self):
+        catalog, layer_id = "foundation", "same-winner-layer"
+        c1, c2, digest = self.build_packet_pair(catalog, layer_id, c1_component="same-winner-component")
+        alt = make_alternative(c2)
+        write_lane(self.work_dir, "claude", catalog, layer_id,
+                   make_lane_return("claude", catalog, layer_id, digest, ["c1"], [alt]))
+        write_lane(self.work_dir, "codex", catalog, layer_id,
+                   make_lane_return("codex", catalog, layer_id, digest, ["c1"], [alt]))
+
+        self.assertEqual(self.run_main(write=True, run_id="20260923"), 0)
+        row = self.load_row(catalog, layer_id)
+        run_id = row["lanes"]["claude"]["run_id"]
+        self.assertEqual(run_id, f"{catalog}-{layer_id}-20260923")
+        self.assertEqual(row["lanes"]["sealed_base"], "evidence/artifacts/layer-verdicts-20260923")
+        sealed_path = self.root / "evidence/artifacts/layer-verdicts-20260923/claude" / f"{run_id}.json"
+        self.assertTrue(sealed_path.is_file())
+        # The default 2026-09-22 sealed directory is untouched by this run.
+        self.assertFalse((self.root / "evidence/artifacts/layer-verdicts-20260922").exists())
+
+        # The real row validator resolves the sealed file from the row's own
+        # recorded sealed_base, not from a hardcoded default.
+        build_landscape(self.root)
+
+        # --check with the same --run-id is idempotent.
+        self.assertEqual(self.run_main(write=False, check=True, run_id="20260923"), 0)
+
+    def test_mixed_wave_ledger_verifies_both_and_tampering_an_old_wave_still_fails(self):
+        # One row recorded on the default (20260922) wave, a second recorded with
+        # --run-id 20260923 in the same run_main --write invocation as far as the
+        # operator is concerned (two separate record_verdicts runs against the same
+        # ledger, one per wave) -- both must verify, and the older wave's sealed
+        # file staying valid (not silently orphaned) is the acceptance criterion.
+        old_catalog, old_layer = "foundation", "same-winner-layer"
+        new_catalog, new_layer = "foundation", "disagree-pending-layer"
+        for catalog, layer_id in ((old_catalog, old_layer), (new_catalog, new_layer)):
+            c1, c2, digest = self.build_packet_pair(catalog, layer_id, c1_component=f"{layer_id}-component")
+            alt = make_alternative(c2)
+            write_lane(self.work_dir, "claude", catalog, layer_id,
+                      make_lane_return("claude", catalog, layer_id, digest, ["c1"], [alt]))
+            write_lane(self.work_dir, "codex", catalog, layer_id,
+                      make_lane_return("codex", catalog, layer_id, digest, ["c1"], [alt]))
+
+        # Record the first layer on the default 2026-09-22 wave.
+        self.assertEqual(self.run_main(write=True), 0)
+        # A fresh packets/lane-return set is needed per record_verdicts run (its own
+        # SHA256SUMS/digest scope), so rebuild the second layer's packets/lanes before
+        # recording it on the 20260923 wave -- record_verdicts.main re-reads both rows
+        # from the ledger each time, so the already-recorded first row is preserved.
+        work_temp_2 = tempfile.TemporaryDirectory()
+        self.addCleanup(work_temp_2.cleanup)
+        self.work_dir = Path(work_temp_2.name).resolve()
+        self.packets = PacketWriter(self.work_dir)
+        c1, c2, digest = self.build_packet_pair(new_catalog, new_layer, c1_component=f"{new_layer}-component")
+        alt = make_alternative(c2)
+        write_lane(self.work_dir, "claude", new_catalog, new_layer,
+                  make_lane_return("claude", new_catalog, new_layer, digest, ["c1"], [alt]))
+        write_lane(self.work_dir, "codex", new_catalog, new_layer,
+                  make_lane_return("codex", new_catalog, new_layer, digest, ["c1"], [alt]))
+        self.assertEqual(self.run_main(write=True, run_id="20260923"), 0)
+
+        old_row = self.load_row(old_catalog, old_layer)
+        new_row = self.load_row(new_catalog, new_layer)
+        self.assertEqual(old_row["verdict_status"], "recorded")
+        self.assertNotIn("sealed_base", old_row["lanes"])
+        self.assertEqual(new_row["verdict_status"], "recorded")
+        self.assertEqual(new_row["lanes"]["sealed_base"], "evidence/artifacts/layer-verdicts-20260923")
+
+        # Both rows verify together.
+        build_landscape(self.root)
+
+        # Tampering with the OLDER wave's sealed file fails verification even though a
+        # newer wave has since been recorded on top of the same ledger.
+        old_sealed = (self.root / "evidence/artifacts/layer-verdicts-20260922/claude" /
+                     f"{old_row['lanes']['claude']['run_id']}.json")
+        original = old_sealed.read_text(encoding="utf-8")
+        old_sealed.write_text(original.rstrip() + " ", encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "sealed_sha256 does not match"):
+            build_landscape(self.root)
+        old_sealed.write_text(original, encoding="utf-8")  # restore for cleanliness
+
+        # Tampering with the NEWER wave's sealed file also fails, independently.
+        new_sealed = self.root / f"{new_row['lanes']['sealed_base']}/claude/{new_row['lanes']['claude']['run_id']}.json"
+        original_new = new_sealed.read_text(encoding="utf-8")
+        new_sealed.write_text(original_new.rstrip() + " ", encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "sealed_sha256 does not match"):
+            build_landscape(self.root)
+        new_sealed.write_text(original_new, encoding="utf-8")
+
+    def test_default_run_id_output_is_unaffected_by_run_id_support(self):
+        catalog, layer_id = "foundation", "same-winner-layer"
+        c1, c2, digest = self.build_packet_pair(catalog, layer_id, c1_component="same-winner-component")
+        alt = make_alternative(c2)
+        write_lane(self.work_dir, "claude", catalog, layer_id,
+                   make_lane_return("claude", catalog, layer_id, digest, ["c1"], [alt]))
+        write_lane(self.work_dir, "codex", catalog, layer_id,
+                   make_lane_return("codex", catalog, layer_id, digest, ["c1"], [alt]))
+
+        self.assertEqual(self.run_main(write=True), 0)
+        row = self.load_row(catalog, layer_id)
+        self.assertNotIn("sealed_base", row["lanes"])
+        self.assertEqual(row["lanes"]["claude"]["run_id"], f"{catalog}-{layer_id}-20260922")
+        build_landscape(self.root)
 
 
 if __name__ == "__main__":

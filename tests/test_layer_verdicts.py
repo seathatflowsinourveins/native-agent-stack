@@ -122,6 +122,60 @@ class BuildVerdictsTests(LayerVerdictFixture):
         self.assertEqual(build_verdicts.main(["--write", "--root", str(self.root)]), 0)
         self.assertEqual(self.handbook_text(), first_handbook)
 
+    def test_run_id_option_derives_a_dated_manifest_and_out_path_and_id_field(self):
+        self.write("catalogs/sota-convergence/manifest-20260923.json", {
+            "foundation": [{"layer": "native-clients", "title": "Native clients", "components": [
+                {"id": "codex-native-sdk", "pin": "2.0", "upstream": {"latest": "2.0"},
+                 "review_status": "confirmed_default", "pin_behind_upstream": False}]}],
+            "trading": [{"layer": "market-data-reference", "entries": [
+                {"id": "alpaca-py", "pin": "3.0", "upstream": {"latest": "3.0"},
+                 "review_status": "confirmed_default", "pin_behind_upstream": False}]}],
+        })
+        self.assertEqual(build_verdicts.main(
+            ["--write", "--root", str(self.root), "--run-id", "20260923"]), 0)
+        out_path = self.root / "catalogs/sota-convergence/layer-verdicts-20260923.json"
+        self.assertTrue(out_path.is_file())
+        document = json.loads(out_path.read_text(encoding="utf-8"))
+        self.assertEqual(document["id"], "layer-verdicts-20260923")
+        # A later run's --manifest join is used (2.0 pin), not the default 2026-09-22 one (1.0).
+        foundation_row = next(row for row in document["catalogs"]["foundation"]
+                              if row["layer_id"] == "native-clients")
+        self.assertEqual(foundation_row["sota_components"][0]["pin"], "2.0")
+        # The default 2026-09-22 output is untouched by a --run-id 20260923 write.
+        self.assertFalse(self.out_path().exists())
+        self.assertEqual(build_verdicts.main(
+            ["--check", "--root", str(self.root), "--run-id", "20260923"]), 0)
+
+    def test_explicit_manifest_and_out_override_the_run_id_derived_defaults(self):
+        self.write("catalogs/sota-convergence/manifest-custom.json", {
+            "foundation": [{"layer": "native-clients", "title": "Native clients", "components": [
+                {"id": "codex-native-sdk", "pin": "9.0", "upstream": {"latest": "9.0"},
+                 "review_status": "confirmed_default", "pin_behind_upstream": False}]}],
+            "trading": [{"layer": "market-data-reference", "entries": [
+                {"id": "alpaca-py", "pin": "3.0", "upstream": {"latest": "3.0"},
+                 "review_status": "confirmed_default", "pin_behind_upstream": False}]}],
+        })
+        custom_out = self.root / "catalogs/sota-convergence/layer-verdicts-custom-out.json"
+        self.assertEqual(build_verdicts.main([
+            "--write", "--root", str(self.root),
+            "--manifest", str(self.root / "catalogs/sota-convergence/manifest-custom.json"),
+            "--out", str(custom_out),
+        ]), 0)
+        self.assertTrue(custom_out.is_file())
+        document = json.loads(custom_out.read_text(encoding="utf-8"))
+        # --id still uses the default run-id (20260922) since --run-id was not given.
+        self.assertEqual(document["id"], "layer-verdicts-20260922")
+        foundation_row = next(row for row in document["catalogs"]["foundation"]
+                              if row["layer_id"] == "native-clients")
+        self.assertEqual(foundation_row["sota_components"][0]["pin"], "9.0")
+        self.assertFalse(self.out_path().exists())
+
+    def test_malformed_run_id_is_rejected_before_any_write(self):
+        for bad in ("2026-09-23", "../escape", "20260923/x"):
+            with self.assertRaises(SystemExit):
+                build_verdicts.main(["--write", "--root", str(self.root), "--run-id", bad])
+            self.assertFalse((self.root / f"catalogs/sota-convergence/layer-verdicts-{bad}.json").exists())
+
     def test_marker_insertion_when_absent_then_reused_on_rerun(self):
         self.assertNotIn(build_verdicts.MARKER_BEGIN, self.handbook_text())
         self.assertEqual(build_verdicts.main(["--write", "--root", str(self.root)]), 0)
