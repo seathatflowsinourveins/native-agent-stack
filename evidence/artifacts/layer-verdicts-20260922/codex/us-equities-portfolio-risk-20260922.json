@@ -1,0 +1,96 @@
+{
+ "alternatives": [
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "https://raw.githubusercontent.com/cvxgrp/cvxportfolio/1.5.1/README.rst"
+   ],
+   "key": "c1",
+   "name": "cvxportfolio",
+   "repository": "https://github.com/cvxgrp/cvxportfolio",
+   "why_not_default": "The pinned README contains a multi-period optimization example, but the packet supplies no retained native execution or matched comparison establishing causal, cost-aware portfolio results. Its optimization scope could complement the selected chronological evaluation."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "https://raw.githubusercontent.com/stefan-jansen/empyrical-reloaded/0.5.12/README.md"
+   ],
+   "key": "c2",
+   "name": "empyrical-reloaded",
+   "repository": "https://github.com/stefan-jansen/empyrical-reloaded",
+   "why_not_default": "Source review establishes documented return and risk metric functions, but no retained execution establishes metric agreement on this project's accounting inputs. Metrics alone do not qualify chronological selection or portfolio optimization."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "https://raw.githubusercontent.com/ranaroussi/quantstats/v0.0.81/README.md"
+   ],
+   "key": "c4",
+   "name": "quantstats",
+   "repository": "https://github.com/ranaroussi/quantstats",
+   "why_not_default": "The pinned README documents statistics, plots and HTML reports. No retained execution or accounting reconciliation qualifies those reports for this project, and reporting does not establish causal evaluation or optimizer correctness."
+  }
+ ],
+ "catalog": "us-equities",
+ "challenger_preferred": null,
+ "lane": "codex",
+ "layer_id": "portfolio-risk",
+ "limits": [
+  "The four GitHub blob URLs failed to fetch; their corresponding pinned raw.githubusercontent.com README files were successfully retrieved and reviewed.",
+  "This verdict reviews historical retained evidence; no native evaluation or comparison was rerun.",
+  "Private execution artifacts were not opened or independently rehashed in this session; their verification is reported by the retained receipt.",
+  "The skfolio README reference is v1.2.8, whereas native acceptance records version 1.2.9 and a separate reviewed source revision. Acceptance does not extend to the packet's newer upstream release."
+ ],
+ "model": {
+  "effort": "high",
+  "name": "gpt-6-astra"
+ },
+ "open_gaps": [
+  "No matched execution compares the four candidates on common inputs, temporal boundaries and cost assumptions.",
+  "Native skfolio acceptance establishes WalkForward-based raw-price label evaluation, not portfolio optimizer performance or reconciled portfolio P&L.",
+  "The retained study omits dividend-inclusive returns, realistic fills, financing, borrowing, liquidity and capacity; its fixed cost deduction is illustrative.",
+  "No accepted point-in-time equity universe, catalyst strategy, original historical availability or statistical alpha follows from this evidence.",
+  "The inspected 2021Q1 segment cannot become an untouched holdout through reuse.",
+  "Broker-specific execution, deterministic pre-trade enforcement and Nautilus/LEAN accounting parity require separate acceptance."
+ ],
+ "overturn_protocol": {
+  "arms": [
+   "Retained skfolio 1.2.9 chronological evaluation as the baseline.",
+   "Prospective cvxportfolio comparison using the same frozen inputs and causal selection boundaries; no executed comparator is retained."
+  ],
+  "fixture_paths": [
+   "blueprints/us-equities/research-evaluation/evaluate.py",
+   "tests/test_research_evaluation.py"
+  ],
+  "metric": "Preservation of temporal isolation, completed training-label boundaries and reproducible outputs; any optimization comparison must additionally use identical costs and independently reconciled cash, positions and returns."
+ },
+ "overturn_when": "Reopen if python3 -m unittest discover -s tests -p test_research_evaluation.py -v exposes a temporal or input-integrity regression, or an executed paired comparison using the frozen inputs and boundaries of blueprints/us-equities/research-evaluation/evaluate.py establishes stronger cost-aware portfolio evaluation with independent accounting reconciliation. Passing existing tests alone does not establish comparative superiority.",
+ "packet_sha256": "824673a65fddc83cc26de5e8b6ae139effdaf62ec0feb2e11562cb97eda768f6",
+ "schema_version": 1,
+ "sources_read": [
+  "<host-path>/us-equities__portfolio-risk.json",
+  "<host-path>/SKILL.md",
+  "<host-path>/RTK.md",
+  "blueprints/us-equities/research-evaluation/receipt.json",
+  "blueprints/us-equities/research-evaluation/README.md",
+  "blueprints/us-equities/research-evaluation/evaluate.py",
+  "tests/test_research_evaluation.py",
+  "https://raw.githubusercontent.com/cvxgrp/cvxportfolio/1.5.1/README.rst",
+  "https://raw.githubusercontent.com/stefan-jansen/empyrical-reloaded/0.5.12/README.md",
+  "https://raw.githubusercontent.com/skfolio/skfolio/v1.2.8/README.rst",
+  "https://raw.githubusercontent.com/ranaroussi/quantstats/v0.0.81/README.md"
+ ],
+ "why_selected": "Select skfolio for this layer's portfolio-research and performance-evaluation scope. blueprints/us-equities/research-evaluation/receipt.json records native skfolio 1.2.9 execution producing 20 chronological development folds, one reserved evaluation and 21 frozen selections, with all training label exits preceding their evaluation cutoff. Its retained independent review reports matching public/native results and verified selection boundaries. The project runner uses upstream WalkForward; this is bounded native chronological evaluation evidence, not new engine execution, optimizer superiority or portfolio P&L. The other adopted candidates have only README source-review evidence in this packet.",
+ "winner_evidence_class": "native_proven",
+ "winner_evidence_refs": [
+  "blueprints/us-equities/research-evaluation/receipt.json",
+  "blueprints/us-equities/research-evaluation/evaluate.py",
+  "https://raw.githubusercontent.com/skfolio/skfolio/v1.2.8/README.rst"
+ ],
+ "winner_keys": [
+  "c3"
+ ]
+}

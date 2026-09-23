@@ -18,6 +18,10 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
+      - name: Harden the runner (audit-only network egress)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
       - name: Check out repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -65,6 +69,24 @@ jobs:
         run: python3 tools/sota-convergence/build_verdicts.py --check
       - name: Check offline ecosystem explorer rebuild
         run: python3 scripts/build_ecosystem.py --check
+      - name: Provision the promotion gate's isolated venv
+        env:
+          UV_VERSION: '0.12.17'
+          # https://github.com/astral-sh/uv/releases/download/0.12.17/uv-x86_64-unknown-linux-gnu.tar.gz.sha256
+          UV_SHA256: fa82fd8dde8e8eefdecada6aa0889666556cfceb690d06e0c3bca49eb3070a63
+        run: |
+          mkdir -p "$RUNNER_TEMP/uv"
+          curl --fail --silent --show-error --location --retry 3 \
+            "https://github.com/astral-sh/uv/releases/download/${UV_VERSION}/uv-x86_64-unknown-linux-gnu.tar.gz" \
+            --output "$RUNNER_TEMP/uv/archive.tar.gz"
+          printf '%s  %s\n' "$UV_SHA256" "$RUNNER_TEMP/uv/archive.tar.gz" | sha256sum --check
+          tar -xzf "$RUNNER_TEMP/uv/archive.tar.gz" -C "$RUNNER_TEMP/uv" --strip-components=1
+          "$RUNNER_TEMP/uv/uv" --version
+          "$RUNNER_TEMP/uv/uv" venv --python /usr/bin/python3 "$RUNNER_TEMP/promotion-gate-venv"
+          "$RUNNER_TEMP/uv/uv" pip sync --python "$RUNNER_TEMP/promotion-gate-venv/bin/python3" --require-hashes \
+            blueprints/us-equities/data/requirements.lock
+          echo "PROMOTION_GATE_PYTHON=$RUNNER_TEMP/promotion-gate-venv/bin/python3" >> "$GITHUB_ENV"
+          echo "REQUIRE_PROMOTION_GATE_VENV=1" >> "$GITHUB_ENV"
       - name: Test validation failure modes
         run: python3 -m unittest
       - name: Test semantic evidence contract boundaries
@@ -74,6 +96,10 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
+      - name: Harden the runner (audit-only network egress)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
       - name: Check out repository with full history
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:

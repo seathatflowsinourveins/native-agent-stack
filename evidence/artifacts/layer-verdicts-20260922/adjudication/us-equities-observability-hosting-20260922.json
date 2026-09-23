@@ -1,0 +1,86 @@
+{
+ "evidence_refs": [
+  "blueprints/us-equities/hosting/backup/receipt.json",
+  "evidence/receipts/runtime-tools.json",
+  "observability/README.md",
+  "observability/backends/receipt.json",
+  "observability/followup-receipt.json",
+  "observability/receipt.json"
+ ],
+ "judgments": [
+  {
+   "claude_position": "B",
+   "evidence_refs": [
+    "observability/receipt.json",
+    "observability/backends/receipt.json",
+    "observability/README.md",
+    "observability/followup-receipt.json",
+    "evidence/receipts/runtime-tools.json",
+    "blueprints/us-equities/hosting/backup/receipt.json"
+   ],
+   "packet_order": "original",
+   "preferred_lane": "codex",
+   "preferred_position": "A",
+   "refuting_votes": 0,
+   "votes": 2,
+   "why": "Both returns select c14 (otelcol-contrib), and observability/receipt.json supports that choice: `otelcol-contrib validate` exited 0, the Codex check has collected_turn_histogram_matches_native_usage true (line 182) and the Claude check has collected_request_logs_and_metrics_match true (line 201). The two sets differ on {c3, c8} in A and {c5, c6} in B. All four have native evidence, and neither return makes a claim that the evidence contradicts.\n\nFor B's picks: observability/README.md lines 109-113 shows the usage checks were queried from Prometheus (19090) and Loki (13100). observability/followup-receipt.json lines 97-125 shows a Prometheus histogram matching the SDK total of 40518. observability/backends/receipt.json lines 85-98 shows prometheus_historical_sample and loki_log true after one restart, using a synthetic fixture. So Prometheus and Loki are well supported. However, they sit under the \"observability\" scope term that c14 already represents.\n\nFor A's picks: packet.layer_scope_terms explicitly includes \"sandbox\", \"backup\" and \"recovery\". evidence/receipts/runtime-tools.json lines 25-31 records allowed write exit 0, denied read exit 1, a separate denied write exit 1 with host_file_created false, and an environment reduced to HOME and PATH. That is the only native evidence for sandbox-runtime; opensandbox, e2b and modal have source review only. blueprints/us-equities/hosting/backup/receipt.json lines 38-91 records restic check --read-data with \"no errors were found\", restore --verify exit 0, 22 sha256 ok_lines and 160642 matched bytes. That makes restic the only candidate with a native backup and restore, even though line 125 excludes live databases and journals, as B correctly notes.\n\nWith c3 and c8 left out, B's set has no winner for the sandbox or backup/recovery scope terms, although native evidence exists for both and no alternative does better. A's set covers three distinct scope terms and acknowledges Prometheus and Loki as demonstrated dependencies in its open_gaps. A's omission of c5 and c6 is a weakness, but a smaller one than B leaving two scope terms uncovered.",
+   "workflow": "wf_3e94965e-141"
+  },
+  {
+   "claude_position": "A",
+   "evidence_refs": [
+    "observability/receipt.json",
+    "observability/followup-receipt.json",
+    "observability/README.md",
+    "observability/backends/receipt.json",
+    "evidence/receipts/runtime-tools.json",
+    "blueprints/us-equities/hosting/backup/receipt.json"
+   ],
+   "packet_order": "swapped",
+   "preferred_lane": "claude",
+   "preferred_position": "A",
+   "refuting_votes": 0,
+   "votes": 2,
+   "why": "A is better supported. Both sets include c14, and observability/receipt.json lines 163-202 back it: native Codex and Claude runs exited 0, and collected usage matched native usage. The sets differ in two ways: A adds Prometheus (c5) and Loki (c6), while B adds sandbox-runtime (c3) and restic (c8).\n\nThe requirement asks the layer to retain scoped telemetry and recoverable state. The retained evidence shows Prometheus and Loki are the parts that store and serve that telemetry. The collector only delivers it.\n- In observability/README.md lines 109-113, the usage match is read from the Prometheus API on port 19090, and Claude logs are read from Loki on port 13100.\n- In observability/followup-receipt.json lines 97-125, a fresh native SDK run shows a Prometheus histogram that returned HTTP 200 and matched all six categories, total 40518. A last_over_time query over 6h returned the same values.\n- In the same file, lines 206-223, the Loki per-receipt_id query returned 121288, which equals 80770 plus 40518.\n- In observability/backends/receipt.json lines 76-98, all 7 scrape targets were up, and after one restart prometheus_historical_sample and loki_log were both true. The Loki check used a synthetic fixture.\n\nB leaves both stores out, so B's own winners retain no telemetry.\n\nB's two additions do not meet the layer's retention and recovery requirement:\n- **Restic (c8):** blueprints/us-equities/hosting/backup/receipt.json shows a real encrypted backup and verified restore. However, it covered only 22 static public files, with live_databases 0 (line 36). Line 125 states that no Loki, Prometheus, SQLite or broker/order journal backup was attempted, and line 118 records off_host_destination false. It recovers no state that this layer produces.\n- **sandbox-runtime (c3):** evidence/receipts/runtime-tools.json shows filesystem allow/deny and a child environment limited to HOME and PATH. Network denial was not exercised (line 13), and nothing shows research workers being denied broker execution authority.\n\nB also lists as an open gap that the SDK native turn histogram was absent. That is outdated: followup-receipt.json lines 272-277 record sdk_histogram_gap as \"resolved by native user configuration\".\n\nA keeps c3 and c8 as conditional alternatives with accurate limits. That is a fair reading, although B has some basis for covering the sandbox and backup scope terms.",
+   "workflow": "wf_53dd768b-bff"
+  },
+  {
+   "claude_position": "B",
+   "evidence_refs": [
+    "evidence/receipts/runtime-tools.json",
+    "blueprints/us-equities/hosting/backup/receipt.json",
+    "observability/backends/receipt.json",
+    "observability/receipt.json",
+    "observability/README.md"
+   ],
+   "packet_order": "original",
+   "preferred_lane": "codex",
+   "preferred_position": "A",
+   "refuting_votes": 0,
+   "votes": 2,
+   "why": "Both sets share c14 and neither makes a claim the opened receipts contradict, so the decision rests on the requirement_note, which says to judge fit against the title and the scope terms (observability, hosting, recovery, backup, sandbox). Set A's two extra components are the only native-proven candidates for the sandbox and backup terms. evidence/receipts/runtime-tools.json lines 25-31: allowed write exited 0, denied read exited 1, a separate denied write exited 1 with host_file_created false, and the child environment was reduced to HOME and PATH. The other sandbox candidates (c1, c4, c7) have source review only. blueprints/us-equities/hosting/backup/receipt.json lines 38-91: init, backup, check --read-data ('no errors were found') and restore --verify all exited 0, and an independent comparison matched 22 files and 160642 bytes. Set B's c5 and c6 are genuinely native-proven. observability/README.md lines 109-113 shows the usage matches were queried from Prometheus (19090) and Loki (13100). observability/backends/receipt.json lines 76-97 records all 7 scrape targets up and prometheus_historical_sample and loki_log true after one restart, on a synthetic fixture. But c5 and c6 add a second and third component on the same observability path already represented by c14, and they leave the sandbox and backup terms with no winner. Set A explicitly keeps these backends as necessary dependencies, and its open_gaps state their role. B is right about restic's narrow scope: backup receipt line 36 has live_databases 0, and line 125 says no Loki, Prometheus or broker journal backup was attempted. That limits restic's evidence but does not contradict A's claim of bounded static-file recovery, which A also states. A therefore covers more of the layer's scope with the strongest available evidence per term.",
+   "workflow": "wf_4b450ac4-c77"
+  },
+  {
+   "claude_position": "A",
+   "evidence_refs": [
+    "observability/receipt.json",
+    "observability/backends/receipt.json",
+    "observability/followup-receipt.json",
+    "observability/README.md",
+    "blueprints/us-equities/hosting/backup/receipt.json",
+    "evidence/receipts/runtime-tools.json"
+   ],
+   "packet_order": "swapped",
+   "preferred_lane": "claude",
+   "preferred_position": "A",
+   "refuting_votes": 0,
+   "votes": 2,
+   "why": "Both returns select c14. The difference is that A adds c5 (Prometheus) and c6 (Loki), while B adds c3 (sandbox-runtime) and c8 (restic). The requirement asks the layer to retain scoped telemetry, failed attempts and recoverable state. Prometheus and Loki are the parts of the observed native path that actually store and serve telemetry. In observability/README.md lines 109-113, the Codex usage match is queried from Prometheus at 127.0.0.1:19090 and the Claude request logs are read from Loki. observability/followup-receipt.json lines 97-125 shows the SDK histogram matching all six usage categories (total 40518) through Prometheus queries, including a retained last_over_time query. Lines 207-212 show a Loki query returning 121288. observability/backends/receipt.json lines 76-97 shows all 7 scrape targets up, and prometheus_historical_sample and loki_log both true after a restart; the Loki check used a synthetic fixture. The Collector does not retain data on its own, and B's own open gap says the accepted telemetry path \"also used Prometheus, Loki\". B's set therefore leaves out components the evidence supports for this requirement. B's additions are weaker against the requirement. blueprints/us-equities/hosting/backup/receipt.json shows live_databases 0 (line 36), off_host_destination false (line 118), and states that no live SQLite, Qdrant, Loki, Prometheus or broker/order journal backup was attempted (line 125). Restic backed up 22 static public files and recovered none of this layer's state. evidence/receipts/runtime-tools.json shows sandbox filesystem allow and deny (lines 26-31), but network denial was not exercised (line 13), and no receipt shows research workers being denied broker execution authority. B also lists the SDK native histogram as still absent. observability/followup-receipt.json line 275 contradicts this: it records that gap as resolved by native user configuration. A keeps restic and sandbox-runtime as conditional alternatives, with accurate reasons, instead of treating them as winners.",
+   "workflow": "wf_4b450ac4-c77"
+  }
+ ],
+ "method": "anonymous A/B adjudication: one evidence-reviewer judge and two evidence-reviewer refuters (Opus 5.5, high) per presentation order, lane identities scrubbed; two judgments per order (workflows wf_3e94965e-141, wf_53dd768b-bff and wf_4b450ac4-c77)",
+ "why": "The counterbalanced adjudication split 2-2. Each of the 4 judgments, two per presentation order, chose whichever return was shown as A, so the pick followed the presentation order rather than the evidence. The judgments list keeps each judge's reasoning. The evidence does not separate the two sets; an executed comparison must decide the layer.",
+ "winner_lane": null
+}

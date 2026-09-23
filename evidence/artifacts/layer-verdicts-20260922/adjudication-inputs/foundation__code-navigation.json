@@ -1,0 +1,327 @@
+{
+ "catalog": "foundation",
+ "layer_id": "code-navigation",
+ "repository_root": "the repository root given in the task",
+ "return_A": {
+  "winner_keys": [
+   "c5"
+  ],
+  "winner_names": [
+   [
+    "Serena",
+    "serena"
+   ]
+  ],
+  "why_selected": "Select Serena for exact source and references in qualified languages. evidence/receipts/foundation-native-20260920.json records native execution: eight symbol/source/reference checks passed across fresh Codex and Claude server contexts after Python/TypeScript configuration repair, with exact Python parse_codex and CJS collect[0] source matches. evidence/receipts/native-context-memory.json also records completed find_symbol and find_referencing_symbols calls. This directly supports the requirement; use focused original-source reads when already sufficient and activate structural or indexed alternatives only for a concrete retrieval question.",
+  "winner_evidence_class": "native_proven",
+  "winner_evidence_refs": [
+   "catalogs/foundation/decisions.json",
+   "evidence/receipts/foundation-native-20260920.json",
+   "evidence/receipts/native-context-memory.json",
+   "docs/foundation-stack.md"
+  ],
+  "alternatives": [
+   {
+    "disposition": "conditional",
+    "evidence_class": "native_proven",
+    "evidence_refs": [
+     "catalogs/foundation/decisions.json",
+     "evidence/receipts/portable-cli-artifacts.json"
+    ],
+    "key": "c1",
+    "name": "ast-grep",
+    "repository": "https://github.com/ast-grep/ast-grep",
+    "why_not_default": "Native structural search returned eight matches after correcting .txt discovery with explicit language and stdin. This establishes selected syntax matching, not resolved incoming references; use when the question requires structural search."
+   },
+   {
+    "disposition": "measured_tradeoff",
+    "evidence_class": "measured_comparison",
+    "evidence_refs": [
+     "docs/token-native-saturation.md",
+     "docs/full-stack-convergence.md",
+     "evidence/receipts/native-jcodemunch-20260920.json"
+    ],
+    "key": "c2",
+    "name": "jCodeMunch",
+    "repository": "https://github.com/jgravelle/jcodemunch-mcp",
+    "why_not_default": "Native retrieval returned a byte-exact function. Complete search/source responses measured 861 tokens versus 5476 for the whole file and 601 for the known focused function. Useful for scoped discovery, but the retained comparison does not establish better reference retrieval than Serena or justify indexing for known-source reads."
+   },
+   {
+    "disposition": "conditional",
+    "evidence_class": "native_proven",
+    "evidence_refs": [
+     "catalogs/foundation/decisions.json",
+     "catalogs/us-equities/foundation-memory.json",
+     "evidence/receipts/desktop-cli-workflows.json"
+    ],
+    "key": "c3",
+    "name": "codebase-memory-mcp",
+    "repository": "https://github.com/DeusData/codebase-memory-mcp",
+    "why_not_default": "Retained Desktop search and trace exited successfully and identified collect plus four static callees. That establishes a bounded graph operation, not complete incoming references, full implementation retrieval or runtime dependencies. Use for graph questions or demonstrated language-server gaps."
+   },
+   {
+    "disposition": "unqualified",
+    "evidence_class": "source_review",
+    "evidence_refs": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "key": "c4",
+    "name": "CodeGraph",
+    "repository": "https://github.com/colbymchenry/codegraph",
+    "why_not_default": "The retained review covers README/license overview only; it records no installation or native acceptance. No executed language/workload comparison establishes source fidelity, reference completeness or lower total cost."
+   }
+  ],
+  "challenger_preferred": null,
+  "overturn_when": "Change the scoped verdict if an executed comparison on fixtures/before.py and fixtures/after.py shows another candidate returning exact changed greeting source and correct incoming references where Serena fails, or matching correctness at lower complete indexing/retrieval/update cost. Broader replacement requires representative target-language tasks beyond these small fixtures.",
+  "open_gaps": [
+   "No matched cross-candidate benchmark establishes source/reference completeness and total cost across representative languages and repositories.",
+   "The reviewed evidence does not establish symbol-update/deletion correctness for every index or language server.",
+   "Artifact token comparisons use different tasks and accounting boundaries; they cannot establish causal provider savings or a global ranking.",
+   "Static graph results do not establish dynamic runtime behavior."
+  ]
+ },
+ "return_B": {
+  "winner_keys": [
+   "c5",
+   "c3",
+   "c2"
+  ],
+  "winner_names": [
+   [
+    "Serena",
+    "serena"
+   ],
+   [
+    "codebase-memory-mcp",
+    "codebase-memory-mcp"
+   ],
+   [
+    "jCodeMunch",
+    "jcodemunch-mcp"
+   ]
+  ],
+  "why_selected": "The requirement is exact source and references first, with an index only when it answers the actual question. Each winner does a separate job that the evidence covers.\n\nSerena (c5) retrieves exact symbols and references in configured languages. catalogs/foundation/decisions.json#language-symbols (lines 565-603) records that native symbol operations passed, plus eight fresh Python/CJS checks after a language-coverage repair. docs/full-stack-convergence.md lines 25-30 records a read-only task, including Serena source/callers, that both native clients completed with no tool-result failures and with independent review of the original streams. These are retained summaries; I did not open the underlying receipts.\n\ncodebase-memory-mcp (c3) is the static-graph lane for source spans plus references. This is corrected from round 1, based on receipts I opened. evidence/receipts/native-cli-gaps.json (kind native_model_e2e, lines 4 and 77-110) records a native Claude run in which search_graph and trace_path both passed (native_tool_results_is_error [false,false]). It returned the function collect in tools/ecosystem/linux-usage-report.cjs, source_lines [91,127], with direct_callees installation, sourcesFor, runParser and overlaps (callees_total 4). evidence/receipts/desktop-cli-workflows.json lines 4 and 25-40 records the same span and callees on Codex Desktop (search_exit 0, trace_exit 0). The Codex CLI attempt in native-cli-gaps.json lines 32-39 was blocked_before_tools (usage_limit_exceeded, tools_executed 0, static_graph not_exercised). That is an account limit before any tool ran, not a tool failure. Among the adopted candidates, this is the only reference retrieval I observed in a receipt.\n\njCodeMunch (c2) is the conditional scoped symbol index. decisions.json#scoped-symbol-index (lines 656-719) records exact function retrieval and bounded native client calls, with install, restart and cleanup accepted and recovery not_established. docs/token-native-saturation.md lines 3-10 and 18 record three things: a clean-prefix install, real MCP use and restart with the exact selected function retained; native uninstall; and both native clients passing a Context Mode/jCodeMunch task with six successful MCP calls. The retained limit matches the requirement's index clause: its search/source sequence was larger than a known focused read. It therefore wins only when it replaces broad reads.\n\nNo measured cross-tool comparison ranks these tools against each other. Each passed only its own recorded scope. The class is native_proven for c3 on the receipts I read, and native_proven by retained record for c5 and c2.",
+  "winner_evidence_class": "native_proven",
+  "winner_evidence_refs": [
+   "catalogs/foundation/decisions.json",
+   "docs/full-stack-convergence.md",
+   "docs/token-native-saturation.md",
+   "evidence/receipts/native-cli-gaps.json",
+   "evidence/receipts/desktop-cli-workflows.json"
+  ],
+  "alternatives": [
+   {
+    "disposition": "conditional",
+    "evidence_class": "native_proven",
+    "evidence_refs": [
+     "evidence/receipts/portable-cli-artifacts.json",
+     "catalogs/foundation/decisions.json"
+    ],
+    "key": "c1",
+    "name": "ast-grep",
+    "repository": "https://github.com/ast-grep/ast-grep",
+    "why_not_default": "Adopted, and it shares the structural-code-lane decision with c3 (decisions.json lines 606-654). Its only retained execution is weaker for this requirement. evidence/receipts/portable-cli-artifacts.json is a native_cli_e2e fixture that says it is 'not an LLM invocation or general quality benchmark' (lines 4 and 15). The initial command returned exit_code 1 with matched false (lines 53-67). The corrected --stdin run found 8 function definitions with the pattern 'function $NAME($$$ARGS) { $$$BODY }' (lines 110-125). That shows definition matching only: no references and no native model host. It stays useful as index-free exact syntax search when the question is a structural pattern. It does not beat the winners on 'exact source and references'. The quota-blocked Codex CLI attempt did not exercise either tool, so it counts against neither c1 nor c3."
+   },
+   {
+    "disposition": "unqualified",
+    "evidence_class": "source_review",
+    "evidence_refs": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "key": "c4",
+    "name": "CodeGraph",
+    "repository": "https://github.com/colbymchenry/codegraph",
+    "why_not_default": "Not adopted. The only evidence is a README/license review at commit ba3c21e50d9129d2f5f3843ec3728868ae6d47a1, which records 'No installation, model inference, broker call or native acceptance was performed by this audit'. Its speed and completeness claims 'need a relevant language/workload comparison' (catalogs/us-equities/star-audit.json lines 9884-9904). It is untested, not failed. No executed evidence shows it beating the adopted lanes."
+   }
+  ],
+  "challenger_preferred": null,
+  "overturn_when": "Build a sealed task set in the target languages, anchored on fixtures/after.py and the Serena find_symbol recipe in blueprints/token-native-focus/saturation-audit.json (lines 7609-7625). Include the retained collect span-plus-callees question (source_lines 91-127, 4 callees) as a reference-retrieval item. Change the verdict if, on that set, any of the following holds: ast-grep, CodeGraph or another challenger returns more correct original source and references than Serena, codebase-memory-mcp or jCodeMunch at an acceptable total indexing, retrieval and maintenance cost; a winner fails its item; or a focused read makes jCodeMunch redundant on every item. Two caveats: the Serena anchor is a documented recipe that this audit did not re-certify (current_host_recertified_by_this_audit false, line 7609), and fixtures/after.py is a single two-line function. The sealed multi-language set does not yet exist in the repository.",
+  "open_gaps": [
+   "No representative benchmark across repositories or languages; no global best code retriever is established (packet limitations).",
+   "No measured head-to-head comparison between Serena, codebase-memory-mcp, jCodeMunch and ast-grep; each passed only its own recorded scope.",
+   "codebase-memory-mcp is proven on one existing selected index (not a fresh public-repo index) and one CJS function at depth 1. Static edges do not show runtime execution, and coverage for new target languages or changed sources is unverified (native-cli-gaps.json line 110; decisions.json lines 629 and 635).",
+   "The Codex CLI static-graph counterpart was never exercised because of the quota block; only Codex Desktop covers that host.",
+   "Serena coverage is established only for configured languages: Bash historically, plus eight Python/CJS checks. Other language servers are unverified.",
+   "jCodeMunch returned exact functions but no references in the retained evidence. Symbol updates, deletions and recovery are not_established (decisions.json lines 685 and 712-714).",
+   "ast-grep evidence covers definition matching on one fixture after a corrected command. Reference search and model-hosted use are unverified.",
+   "CodeGraph is untested, not failed.",
+   "jCodeMunch's estimated tokens avoided are not exact provider savings."
+  ]
+ },
+ "packet": {
+  "title": "Code navigation",
+  "requirement": "Retrieve exact source and references for changes with a conceptual or structural index only when it answers the actual question.",
+  "limitations": [
+   "Compressed structure and symbol indexes omit implementation details; correctness still requires original source.",
+   "No representative cross-repository or cross-language benchmark establishes a global best code retriever."
+  ],
+  "candidates": [
+   {
+    "adopted": true,
+    "component_id": "ast-grep",
+    "decisions": [
+     {
+      "capability": "Search syntax and inspect a selected static call graph",
+      "evidence_scope": "Native structural-source fixtures and selected static graph search/trace passed.",
+      "id": "structural-code-lane",
+      "limitations": [
+       "The earlier Codex attempt in native-cli-gaps was quota-blocked; later Desktop acceptance does not rewrite that attempt.",
+       "Static graph coverage is language/project-specific and does not establish runtime call behavior."
+      ],
+      "next_gap": "Check target-language and changed-source coverage rather than assuming a universal graph."
+     }
+    ],
+    "evidence_kind": "native_execution",
+    "evidence_refs": [
+     "catalogs/foundation/decisions.json"
+    ],
+    "key": "c1",
+    "name": "ast-grep",
+    "pin": "0.45.3",
+    "pin_behind_upstream": false,
+    "recipe_ref": "recipes/README.md",
+    "repository": "https://github.com/ast-grep/ast-grep",
+    "review_status": null,
+    "upstream": {
+     "archived": false,
+     "latest": "0.45.3",
+     "license": "MIT",
+     "prerelease": false,
+     "pushed_at": "2026-09-21",
+     "released_at": "2026-08-31",
+     "renamed_to": null,
+     "stars": 16001
+    }
+   },
+   {
+    "adopted": true,
+    "component_id": "jcodemunch-mcp",
+    "decisions": [
+     {
+      "capability": "Retrieve exact implementation from a scoped symbol index",
+      "evidence_scope": "Exact function retrieval and bounded native client calls passed; isolated install/restart/uninstall has its own receipt.",
+      "id": "scoped-symbol-index",
+      "limitations": [
+       "The complete search/source sequence was smaller than a whole file and larger than a known focused read.",
+       "Native estimated tokens avoided are not exact causal provider savings."
+      ],
+      "next_gap": "Verify symbol updates/deletions or recovery only after a relevant index/input change."
+     }
+    ],
+    "evidence_kind": "native_execution",
+    "evidence_refs": [
+     "docs/token-native-saturation.md",
+     "docs/full-stack-convergence.md"
+    ],
+    "key": "c2",
+    "name": "jCodeMunch",
+    "pin": "1.108.319",
+    "pin_behind_upstream": false,
+    "recipe_ref": "recipes/README.md",
+    "repository": "https://github.com/jgravelle/jcodemunch-mcp",
+    "review_status": null,
+    "upstream": {
+     "archived": false,
+     "latest": "v1.108.319",
+     "license": "NOASSERTION",
+     "prerelease": false,
+     "pushed_at": "2026-09-22",
+     "released_at": "2026-09-16",
+     "renamed_to": null,
+     "stars": 2708
+    }
+   },
+   {
+    "adopted": true,
+    "component_id": "codebase-memory-mcp",
+    "decisions": [
+     {
+      "capability": "Search syntax and inspect a selected static call graph",
+      "evidence_scope": "Native structural-source fixtures and selected static graph search/trace passed.",
+      "id": "structural-code-lane",
+      "limitations": [
+       "The earlier Codex attempt in native-cli-gaps was quota-blocked; later Desktop acceptance does not rewrite that attempt.",
+       "Static graph coverage is language/project-specific and does not establish runtime call behavior."
+      ],
+      "next_gap": "Check target-language and changed-source coverage rather than assuming a universal graph."
+     }
+    ],
+    "evidence_kind": "native_execution",
+    "evidence_refs": [
+     "catalogs/foundation/decisions.json",
+     "catalogs/us-equities/foundation-memory.json"
+    ],
+    "key": "c3",
+    "name": "codebase-memory-mcp",
+    "pin": "0.11.0",
+    "pin_behind_upstream": false,
+    "recipe_ref": "recipes/README.md",
+    "repository": "https://github.com/DeusData/codebase-memory-mcp",
+    "review_status": null,
+    "upstream": {
+     "archived": false,
+     "latest": "v0.11.0",
+     "license": "MIT",
+     "prerelease": false,
+     "pushed_at": "2026-09-22",
+     "released_at": "2026-09-15",
+     "renamed_to": null,
+     "stars": 44144
+    }
+   },
+   {
+    "adopted": false,
+    "component_id": null,
+    "decisions": [],
+    "evidence_kind": "source_review",
+    "evidence_refs": [
+     "catalogs/us-equities/star-audit.json"
+    ],
+    "key": "c4",
+    "name": "CodeGraph",
+    "pin": null,
+    "pin_behind_upstream": null,
+    "recipe_ref": "catalogs/us-equities/star-audit.json",
+    "repository": "https://github.com/colbymchenry/codegraph",
+    "review_status": null,
+    "upstream": null
+   },
+   {
+    "adopted": true,
+    "component_id": "serena",
+    "decisions": [
+     {
+      "capability": "Retrieve exact symbols and references in configured languages",
+      "evidence_scope": "Serena native symbol operations passed; the foundation wave adds eight fresh Python/CJS checks after language coverage repair.",
+      "id": "language-symbols",
+      "limitations": [
+       "A configured Bash server or one passing extension cannot establish every language server."
+      ],
+      "next_gap": "Run the relevant extension/language operation for a newly adopted project."
+     }
+    ],
+    "evidence_kind": "native_execution",
+    "evidence_refs": [
+     "catalogs/foundation/decisions.json"
+    ],
+    "key": "c5",
+    "name": "Serena",
+    "pin": "2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+    "pin_behind_upstream": false,
+    "recipe_ref": "recipes/README.md",
+    "repository": "https://github.com/oraios/serena",
+    "review_status": null,
+    "upstream": {
+     "archived": false,
+     "latest": "v1.7.0",
+     "license": "NOASSERTION",
+     "prerelease": false,
+     "pushed_at": "2026-09-22",
+     "released_at": "2026-08-09",
+     "renamed_to": null,
+     "stars": 29712
+    }
+   }
+  ]
+ }
+}

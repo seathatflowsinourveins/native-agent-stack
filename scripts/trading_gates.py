@@ -83,7 +83,12 @@ def condition_holds(root: Path, gate: dict) -> tuple[bool, str]:
     except (KeyError, IndexError, ValueError):
         return False, f"pointer absent: {condition['pointer']}"
     if condition["type"] == "equals":
-        return (value == condition["equals"]), f"{condition['pointer']} == {json.dumps(value)[:80]}"
+        expected = condition["equals"]
+        # Python's == treats bool as a subtype of int (False == 0, True == 1);
+        # a type-strict match keeps a receipt value of false/0.0 from
+        # satisfying a condition that names an integer or string literal.
+        matches = type(value) is type(expected) and value == expected
+        return matches, f"{condition['pointer']} == {json.dumps(value)[:80]}"
     if condition["type"] == "array_contains_id":
         ids = {item.get("id") for item in value if isinstance(item, dict)} if isinstance(value, list) else set()
         return (condition["id"] in ids), f"{condition['pointer']} contains id {condition['id']!r}: {condition['id'] in ids}"
