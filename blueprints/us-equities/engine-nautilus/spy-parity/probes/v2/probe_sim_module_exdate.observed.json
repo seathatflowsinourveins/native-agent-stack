@@ -1,0 +1,301 @@
+{
+ "evidence_class": "synthetic engine-semantics probe (not SPY/LEAN data, not a parity run)",
+ "probe": "probe_sim_module_exdate.py",
+ "args": [],
+ "origin": "written for v2",
+ "relied_on_for": "dividend: v2 design - ex-date instant with no bar, next-session ex-date, later same-day fill excluded, zero-quantity posting, half-even per-share midpoint",
+ "probe_sha256": "eb5363800ade98fdea90387c92530b2b320681c7e3e709bfbd4dcd281ad9cc59",
+ "command": "bwrap --unshare-all --clearenv ... <nautilus-2.0.0rc5>/bin/python -I /probes/probe_sim_module_exdate.py",
+ "engine": {
+  "package": "nautilus_trader",
+  "version": "2.0.0rc5",
+  "_libnautilus_sha256": "a53dd5a24fe77f4c66169af84ee9c7e292018010922e3dce9a8b6c9f7f3b7021",
+  "note": "same extension sha256 as ~/.local/share/codex-ecosystem/tools/adaptive-paper-20260921 (checked 2026-09-22)"
+ },
+ "run_utc_date": "2026-09-22",
+ "exit_code": 0,
+ "stdout_sha256": "91bd4385566d5823bc59461a9c920440c6db35231615f94cf7834a3d74d6157f",
+ "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+ "stderr_text_ansi_stripped": "",
+ "observed_stdout": {
+  "probe": "probe_sim_module_exdate",
+  "data": "synthetic engine-semantics bars and factor rows (not SPY/LEAN data)",
+  "distributions_derived": [
+   {
+    "factor_row_date": "2030-01-03",
+    "ex_date": "2030-01-04",
+    "calendar_plus_one": "2030-01-04",
+    "ex_ts_ns": 1893733200000000000,
+    "per_share": "1.01"
+   },
+   {
+    "factor_row_date": "2030-01-04",
+    "ex_date": "2030-01-07",
+    "calendar_plus_one": "2030-01-05",
+    "ex_ts_ns": 1893992400000000000,
+    "per_share": "1.00"
+   }
+  ],
+  "module_log": [
+   {
+    "call": "process",
+    "ts_now": 1893682800000000000
+   },
+   {
+    "call": "acknowledge",
+    "outcomes": []
+   },
+   {
+    "call": "process",
+    "ts_now": 1893704400000000000
+   },
+   {
+    "call": "acknowledge",
+    "outcomes": []
+   },
+   {
+    "call": "process",
+    "ts_now": 1893715200000000000
+   },
+   {
+    "call": "acknowledge",
+    "outcomes": []
+   },
+   {
+    "call": "process",
+    "ts_now": 1893733200000000000
+   },
+   {
+    "call": "emit",
+    "ts_now": 1893733200000000000,
+    "ex_ts_ns": 1893733200000000000,
+    "on_time": true,
+    "eligible_signed_qty": "0",
+    "per_share": "1.01",
+    "amount": "0.00"
+   },
+   {
+    "call": "acknowledge",
+    "outcomes": [
+     {
+      "applied": true,
+      "error": null
+     }
+    ]
+   },
+   {
+    "call": "process",
+    "ts_now": 1893769200000000000
+   },
+   {
+    "call": "acknowledge",
+    "outcomes": []
+   },
+   {
+    "call": "process",
+    "ts_now": 1893790800000000000
+   },
+   {
+    "call": "acknowledge",
+    "outcomes": []
+   },
+   {
+    "call": "process",
+    "ts_now": 1893801600000000000
+   },
+   {
+    "call": "acknowledge",
+    "outcomes": []
+   },
+   {
+    "call": "process",
+    "ts_now": 1893888000000000000
+   },
+   {
+    "call": "acknowledge",
+    "outcomes": []
+   },
+   {
+    "call": "process",
+    "ts_now": 1893974400000000000
+   },
+   {
+    "call": "acknowledge",
+    "outcomes": []
+   },
+   {
+    "call": "process",
+    "ts_now": 1893992400000000000
+   },
+   {
+    "call": "emit",
+    "ts_now": 1893992400000000000,
+    "ex_ts_ns": 1893992400000000000,
+    "on_time": true,
+    "eligible_signed_qty": "50.0",
+    "per_share": "1.00",
+    "amount": "50.000"
+   },
+   {
+    "call": "acknowledge",
+    "outcomes": [
+     {
+      "applied": true,
+      "error": null
+     }
+    ]
+   },
+   {
+    "call": "process",
+    "ts_now": 1894028400000000000
+   },
+   {
+    "call": "acknowledge",
+    "outcomes": []
+   },
+   {
+    "call": "process",
+    "ts_now": 1894050000000000000
+   },
+   {
+    "call": "acknowledge",
+    "outcomes": []
+   },
+   {
+    "call": "process",
+    "ts_now": 1894060800000000000
+   },
+   {
+    "call": "acknowledge",
+    "outcomes": []
+   },
+   {
+    "call": "process",
+    "ts_now": 1894114800000000000
+   },
+   {
+    "call": "acknowledge",
+    "outcomes": []
+   },
+   {
+    "call": "process",
+    "ts_now": 1894136400000000000
+   },
+   {
+    "call": "acknowledge",
+    "outcomes": []
+   }
+  ],
+  "fills": [
+   {
+    "ts_event": 1893769200000000000,
+    "last_px": "100.0000",
+    "last_qty": "50"
+   },
+   {
+    "ts_event": 1894028400000000000,
+    "last_px": "100.0000",
+    "last_qty": "25"
+   }
+  ],
+  "strategy_balance_seen": [
+   {
+    "ts": 1893682800000000000,
+    "total": "100000.00 USD"
+   },
+   {
+    "ts": 1893704400000000000,
+    "total": "100000.00 USD"
+   },
+   {
+    "ts": 1893769200000000000,
+    "total": "100000.00 USD"
+   },
+   {
+    "ts": 1893790800000000000,
+    "total": "95000.00 USD"
+   },
+   {
+    "ts": 1894028400000000000,
+    "total": "95050.00 USD"
+   },
+   {
+    "ts": 1894050000000000000,
+    "total": "92550.00 USD"
+   },
+   {
+    "ts": 1894114800000000000,
+    "total": "92550.00 USD"
+   },
+   {
+    "ts": 1894136400000000000,
+    "total": "92550.00 USD"
+   }
+  ],
+  "callback_errors": [],
+  "final_total": "92550.00 USD",
+  "account_report_rows": [
+   {
+    "total": "100000.00",
+    "locked": "0.00",
+    "free": "100000.00",
+    "currency": "USD",
+    "account_id": "SIM-001",
+    "account_type": "CASH",
+    "margins": [],
+    "reported": true,
+    "info": {},
+    "base_currency": "USD"
+   },
+   {
+    "total": "100000.00",
+    "locked": "0.00",
+    "free": "100000.00",
+    "currency": "USD",
+    "account_id": "SIM-001",
+    "account_type": "CASH",
+    "margins": [],
+    "reported": true,
+    "info": {},
+    "base_currency": "USD"
+   },
+   {
+    "total": "95000.00",
+    "locked": "0.00",
+    "free": "95000.00",
+    "currency": "USD",
+    "account_id": "SIM-001",
+    "account_type": "CASH",
+    "margins": [],
+    "reported": false,
+    "info": {},
+    "base_currency": "USD"
+   },
+   {
+    "total": "95050.00",
+    "locked": "0.00",
+    "free": "95050.00",
+    "currency": "USD",
+    "account_id": "SIM-001",
+    "account_type": "CASH",
+    "margins": [],
+    "reported": true,
+    "info": {},
+    "base_currency": "USD"
+   },
+   {
+    "total": "92550.00",
+    "locked": "0.00",
+    "free": "92550.00",
+    "currency": "USD",
+    "account_id": "SIM-001",
+    "account_type": "CASH",
+    "margins": [],
+    "reported": false,
+    "info": {},
+    "base_currency": "USD"
+   }
+  ],
+  "expected_final_total_if_posted": "92550.00"
+ }
+}

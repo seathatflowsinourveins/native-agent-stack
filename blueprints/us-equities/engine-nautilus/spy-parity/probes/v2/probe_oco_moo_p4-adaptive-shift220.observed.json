@@ -1,0 +1,787 @@
+{
+ "evidence_class": "synthetic engine-semantics probe (not SPY/LEAN data, not a parity run)",
+ "probe": "probe_oco_moo_p4.py",
+ "args": [
+  "adaptive",
+  "shift220"
+ ],
+ "origin": "written for v2",
+ "relied_on_for": "market-on-open: same shifted cases, adaptive ordering",
+ "probe_sha256": "d51dff36abe593d6f438f4fde0f3443729e5462c14762a2008a76b891fe1089f",
+ "command": "bwrap --unshare-all --clearenv ... <nautilus-2.0.0rc5>/bin/python -I /probes/probe_oco_moo_p4.py adaptive shift220",
+ "engine": {
+  "package": "nautilus_trader",
+  "version": "2.0.0rc5",
+  "_libnautilus_sha256": "a53dd5a24fe77f4c66169af84ee9c7e292018010922e3dce9a8b6c9f7f3b7021",
+  "note": "same extension sha256 as ~/.local/share/codex-ecosystem/tools/adaptive-paper-20260921 (checked 2026-09-22)"
+ },
+ "run_utc_date": "2026-09-22",
+ "exit_code": 0,
+ "stdout_sha256": "b71122ce073b0339f3426c3206b08f2a0b81a4f726b4a22b1220f66fe6ac69ef",
+ "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+ "stderr_text_ansi_stripped": "",
+ "observed_stdout": {
+  "probe": "probe_oco_moo_p4",
+  "data": "synthetic engine-semantics bars (not SPY/LEAN data)",
+  "bar_adaptive_high_low_ordering": true,
+  "price_shift": "220.0000",
+  "results": [
+   {
+    "case": "gap_up",
+    "side": "BUY",
+    "decision_bar": [
+     "99.8000",
+     "100.2000",
+     "99.7000",
+     "100.0000"
+    ],
+    "tested_bar": [
+     "101.0000",
+     "101.5000",
+     "100.8000",
+     "101.2000"
+    ],
+    "price_shift": "220.0000",
+    "final_balance_total": "2416.00 USD",
+    "tested_bar_ts": 1600007200000000000,
+    "triggers": {
+     "stop": "320.0001",
+     "mit": "319.9999"
+    },
+    "events": [
+     {
+      "event": "OrderAccepted",
+      "order": "stop",
+      "ts_event": 1600003600000000000,
+      "bar_index_at_ts": 1
+     },
+     {
+      "event": "OrderAccepted",
+      "order": "mit",
+      "ts_event": 1600003600000000000,
+      "bar_index_at_ts": 1
+     },
+     {
+      "event": "OrderFilled",
+      "order": "stop",
+      "ts_event": 1600007200000000000,
+      "bar_index_at_ts": 2,
+      "last_px": "321.0000",
+      "last_qty": "304"
+     },
+     {
+      "event": "OrderCanceled",
+      "order": "mit",
+      "ts_event": 1600007200000000000,
+      "bar_index_at_ts": 2,
+      "reason": ""
+     }
+    ],
+    "callback_errors": [],
+    "check": {
+     "oco_fill_count": 1,
+     "single_fill_in_tested_bar": true,
+     "fill_px_equals_tested_open": true,
+     "fill_qty_total": "304"
+    }
+   },
+   {
+    "case": "gap_down",
+    "side": "BUY",
+    "decision_bar": [
+     "99.8000",
+     "100.2000",
+     "99.7000",
+     "100.0000"
+    ],
+    "tested_bar": [
+     "99.0000",
+     "99.2000",
+     "98.5000",
+     "98.8000"
+    ],
+    "price_shift": "220.0000",
+    "final_balance_total": "3024.00 USD",
+    "tested_bar_ts": 1600007200000000000,
+    "triggers": {
+     "stop": "320.0001",
+     "mit": "319.9999"
+    },
+    "events": [
+     {
+      "event": "OrderAccepted",
+      "order": "stop",
+      "ts_event": 1600003600000000000,
+      "bar_index_at_ts": 1
+     },
+     {
+      "event": "OrderAccepted",
+      "order": "mit",
+      "ts_event": 1600003600000000000,
+      "bar_index_at_ts": 1
+     },
+     {
+      "event": "OrderFilled",
+      "order": "mit",
+      "ts_event": 1600007200000000000,
+      "bar_index_at_ts": 2,
+      "last_px": "319.0000",
+      "last_qty": "304"
+     },
+     {
+      "event": "OrderCanceled",
+      "order": "stop",
+      "ts_event": 1600007200000000000,
+      "bar_index_at_ts": 2,
+      "reason": ""
+     }
+    ],
+    "callback_errors": [],
+    "check": {
+     "oco_fill_count": 1,
+     "single_fill_in_tested_bar": true,
+     "fill_px_equals_tested_open": true,
+     "fill_qty_total": "304"
+    }
+   },
+   {
+    "case": "one_tick_up",
+    "side": "BUY",
+    "decision_bar": [
+     "99.8000",
+     "100.2000",
+     "99.7000",
+     "100.0000"
+    ],
+    "tested_bar": [
+     "100.0001",
+     "100.5000",
+     "99.5000",
+     "100.2000"
+    ],
+    "price_shift": "220.0000",
+    "final_balance_total": "2719.97 USD",
+    "tested_bar_ts": 1600007200000000000,
+    "triggers": {
+     "stop": "320.0001",
+     "mit": "319.9999"
+    },
+    "events": [
+     {
+      "event": "OrderAccepted",
+      "order": "stop",
+      "ts_event": 1600003600000000000,
+      "bar_index_at_ts": 1
+     },
+     {
+      "event": "OrderAccepted",
+      "order": "mit",
+      "ts_event": 1600003600000000000,
+      "bar_index_at_ts": 1
+     },
+     {
+      "event": "OrderFilled",
+      "order": "stop",
+      "ts_event": 1600007200000000000,
+      "bar_index_at_ts": 2,
+      "last_px": "320.0001",
+      "last_qty": "304"
+     },
+     {
+      "event": "OrderCanceled",
+      "order": "mit",
+      "ts_event": 1600007200000000000,
+      "bar_index_at_ts": 2,
+      "reason": ""
+     }
+    ],
+    "callback_errors": [],
+    "check": {
+     "oco_fill_count": 1,
+     "single_fill_in_tested_bar": true,
+     "fill_px_equals_tested_open": true,
+     "fill_qty_total": "304"
+    }
+   },
+   {
+    "case": "one_tick_down",
+    "side": "BUY",
+    "decision_bar": [
+     "99.8000",
+     "100.2000",
+     "99.7000",
+     "100.0000"
+    ],
+    "tested_bar": [
+     "99.9999",
+     "100.5000",
+     "99.5000",
+     "100.2000"
+    ],
+    "price_shift": "220.0000",
+    "final_balance_total": "2720.03 USD",
+    "tested_bar_ts": 1600007200000000000,
+    "triggers": {
+     "stop": "320.0001",
+     "mit": "319.9999"
+    },
+    "events": [
+     {
+      "event": "OrderAccepted",
+      "order": "stop",
+      "ts_event": 1600003600000000000,
+      "bar_index_at_ts": 1
+     },
+     {
+      "event": "OrderAccepted",
+      "order": "mit",
+      "ts_event": 1600003600000000000,
+      "bar_index_at_ts": 1
+     },
+     {
+      "event": "OrderFilled",
+      "order": "mit",
+      "ts_event": 1600007200000000000,
+      "bar_index_at_ts": 2,
+      "last_px": "319.9999",
+      "last_qty": "304"
+     },
+     {
+      "event": "OrderCanceled",
+      "order": "stop",
+      "ts_event": 1600007200000000000,
+      "bar_index_at_ts": 2,
+      "reason": ""
+     }
+    ],
+    "callback_errors": [],
+    "check": {
+     "oco_fill_count": 1,
+     "single_fill_in_tested_bar": true,
+     "fill_px_equals_tested_open": true,
+     "fill_qty_total": "304"
+    }
+   },
+   {
+    "case": "no_gap",
+    "side": "BUY",
+    "decision_bar": [
+     "99.8000",
+     "100.2000",
+     "99.7000",
+     "100.0000"
+    ],
+    "tested_bar": [
+     "100.0000",
+     "100.5000",
+     "99.5000",
+     "100.2000"
+    ],
+    "price_shift": "220.0000",
+    "final_balance_total": "2720.03 USD",
+    "tested_bar_ts": 1600007200000000000,
+    "triggers": {
+     "stop": "320.0001",
+     "mit": "319.9999"
+    },
+    "events": [
+     {
+      "event": "OrderAccepted",
+      "order": "stop",
+      "ts_event": 1600003600000000000,
+      "bar_index_at_ts": 1
+     },
+     {
+      "event": "OrderAccepted",
+      "order": "mit",
+      "ts_event": 1600003600000000000,
+      "bar_index_at_ts": 1
+     },
+     {
+      "event": "OrderFilled",
+      "order": "mit",
+      "ts_event": 1600007200000000000,
+      "bar_index_at_ts": 2,
+      "last_px": "319.9999",
+      "last_qty": "304"
+     },
+     {
+      "event": "OrderCanceled",
+      "order": "stop",
+      "ts_event": 1600007200000000000,
+      "bar_index_at_ts": 2,
+      "reason": ""
+     }
+    ],
+    "callback_errors": [],
+    "check": {
+     "oco_fill_count": 1,
+     "single_fill_in_tested_bar": true,
+     "fill_px_equals_tested_open": false,
+     "fill_qty_total": "304"
+    }
+   },
+   {
+    "case": "no_gap_flat",
+    "side": "BUY",
+    "decision_bar": [
+     "99.8000",
+     "100.2000",
+     "99.7000",
+     "100.0000"
+    ],
+    "tested_bar": [
+     "100.0000",
+     "100.0000",
+     "100.0000",
+     "100.0000"
+    ],
+    "price_shift": "220.0000",
+    "final_balance_total": "1200.00 USD",
+    "tested_bar_ts": 1600007200000000000,
+    "triggers": {
+     "stop": "320.0001",
+     "mit": "319.9999"
+    },
+    "events": [
+     {
+      "event": "OrderAccepted",
+      "order": "stop",
+      "ts_event": 1600003600000000000,
+      "bar_index_at_ts": 1
+     },
+     {
+      "event": "OrderAccepted",
+      "order": "mit",
+      "ts_event": 1600003600000000000,
+      "bar_index_at_ts": 1
+     },
+     {
+      "event": "OrderFilled",
+      "order": "stop",
+      "ts_event": 1600010800000000000,
+      "bar_index_at_ts": 3,
+      "last_px": "325.0000",
+      "last_qty": "304"
+     },
+     {
+      "event": "OrderCanceled",
+      "order": "mit",
+      "ts_event": 1600010800000000000,
+      "bar_index_at_ts": 3,
+      "reason": ""
+     }
+    ],
+    "callback_errors": [],
+    "check": {
+     "oco_fill_count": 1,
+     "single_fill_in_tested_bar": false,
+     "fill_px_equals_tested_open": false,
+     "fill_qty_total": "304"
+    }
+   },
+   {
+    "case": "gap_up",
+    "side": "SELL",
+    "decision_bar": [
+     "99.8000",
+     "100.2000",
+     "99.7000",
+     "100.0000"
+    ],
+    "tested_bar": [
+     "101.0000",
+     "101.5000",
+     "100.8000",
+     "101.2000"
+    ],
+    "price_shift": "220.0000",
+    "final_balance_total": "100334.40 USD",
+    "tested_bar_ts": 1600007200000000000,
+    "triggers": {
+     "stop": "319.9999",
+     "mit": "320.0001"
+    },
+    "events": [
+     {
+      "event": "OrderFilled",
+      "order": "setup_buy",
+      "ts_event": 1600000000000000000,
+      "bar_index_at_ts": 0,
+      "last_px": "319.9000",
+      "last_qty": "304"
+     },
+     {
+      "event": "OrderAccepted",
+      "order": "stop",
+      "ts_event": 1600003600000000000,
+      "bar_index_at_ts": 1
+     },
+     {
+      "event": "OrderAccepted",
+      "order": "mit",
+      "ts_event": 1600003600000000000,
+      "bar_index_at_ts": 1
+     },
+     {
+      "event": "OrderFilled",
+      "order": "mit",
+      "ts_event": 1600007200000000000,
+      "bar_index_at_ts": 2,
+      "last_px": "321.0000",
+      "last_qty": "304"
+     },
+     {
+      "event": "OrderCanceled",
+      "order": "stop",
+      "ts_event": 1600007200000000000,
+      "bar_index_at_ts": 2,
+      "reason": ""
+     }
+    ],
+    "callback_errors": [],
+    "check": {
+     "oco_fill_count": 1,
+     "single_fill_in_tested_bar": true,
+     "fill_px_equals_tested_open": true,
+     "fill_qty_total": "304"
+    }
+   },
+   {
+    "case": "gap_down",
+    "side": "SELL",
+    "decision_bar": [
+     "99.8000",
+     "100.2000",
+     "99.7000",
+     "100.0000"
+    ],
+    "tested_bar": [
+     "99.0000",
+     "99.2000",
+     "98.5000",
+     "98.8000"
+    ],
+    "price_shift": "220.0000",
+    "final_balance_total": "99726.40 USD",
+    "tested_bar_ts": 1600007200000000000,
+    "triggers": {
+     "stop": "319.9999",
+     "mit": "320.0001"
+    },
+    "events": [
+     {
+      "event": "OrderFilled",
+      "order": "setup_buy",
+      "ts_event": 1600000000000000000,
+      "bar_index_at_ts": 0,
+      "last_px": "319.9000",
+      "last_qty": "304"
+     },
+     {
+      "event": "OrderAccepted",
+      "order": "stop",
+      "ts_event": 1600003600000000000,
+      "bar_index_at_ts": 1
+     },
+     {
+      "event": "OrderAccepted",
+      "order": "mit",
+      "ts_event": 1600003600000000000,
+      "bar_index_at_ts": 1
+     },
+     {
+      "event": "OrderFilled",
+      "order": "stop",
+      "ts_event": 1600007200000000000,
+      "bar_index_at_ts": 2,
+      "last_px": "319.0000",
+      "last_qty": "304"
+     },
+     {
+      "event": "OrderCanceled",
+      "order": "mit",
+      "ts_event": 1600007200000000000,
+      "bar_index_at_ts": 2,
+      "reason": ""
+     }
+    ],
+    "callback_errors": [],
+    "check": {
+     "oco_fill_count": 1,
+     "single_fill_in_tested_bar": true,
+     "fill_px_equals_tested_open": true,
+     "fill_qty_total": "304"
+    }
+   },
+   {
+    "case": "one_tick_up",
+    "side": "SELL",
+    "decision_bar": [
+     "99.8000",
+     "100.2000",
+     "99.7000",
+     "100.0000"
+    ],
+    "tested_bar": [
+     "100.0001",
+     "100.5000",
+     "99.5000",
+     "100.2000"
+    ],
+    "price_shift": "220.0000",
+    "final_balance_total": "100030.43 USD",
+    "tested_bar_ts": 1600007200000000000,
+    "triggers": {
+     "stop": "319.9999",
+     "mit": "320.0001"
+    },
+    "events": [
+     {
+      "event": "OrderFilled",
+      "order": "setup_buy",
+      "ts_event": 1600000000000000000,
+      "bar_index_at_ts": 0,
+      "last_px": "319.9000",
+      "last_qty": "304"
+     },
+     {
+      "event": "OrderAccepted",
+      "order": "stop",
+      "ts_event": 1600003600000000000,
+      "bar_index_at_ts": 1
+     },
+     {
+      "event": "OrderAccepted",
+      "order": "mit",
+      "ts_event": 1600003600000000000,
+      "bar_index_at_ts": 1
+     },
+     {
+      "event": "OrderFilled",
+      "order": "mit",
+      "ts_event": 1600007200000000000,
+      "bar_index_at_ts": 2,
+      "last_px": "320.0001",
+      "last_qty": "304"
+     },
+     {
+      "event": "OrderCanceled",
+      "order": "stop",
+      "ts_event": 1600007200000000000,
+      "bar_index_at_ts": 2,
+      "reason": ""
+     }
+    ],
+    "callback_errors": [],
+    "check": {
+     "oco_fill_count": 1,
+     "single_fill_in_tested_bar": true,
+     "fill_px_equals_tested_open": true,
+     "fill_qty_total": "304"
+    }
+   },
+   {
+    "case": "one_tick_down",
+    "side": "SELL",
+    "decision_bar": [
+     "99.8000",
+     "100.2000",
+     "99.7000",
+     "100.0000"
+    ],
+    "tested_bar": [
+     "99.9999",
+     "100.5000",
+     "99.5000",
+     "100.2000"
+    ],
+    "price_shift": "220.0000",
+    "final_balance_total": "100030.37 USD",
+    "tested_bar_ts": 1600007200000000000,
+    "triggers": {
+     "stop": "319.9999",
+     "mit": "320.0001"
+    },
+    "events": [
+     {
+      "event": "OrderFilled",
+      "order": "setup_buy",
+      "ts_event": 1600000000000000000,
+      "bar_index_at_ts": 0,
+      "last_px": "319.9000",
+      "last_qty": "304"
+     },
+     {
+      "event": "OrderAccepted",
+      "order": "stop",
+      "ts_event": 1600003600000000000,
+      "bar_index_at_ts": 1
+     },
+     {
+      "event": "OrderAccepted",
+      "order": "mit",
+      "ts_event": 1600003600000000000,
+      "bar_index_at_ts": 1
+     },
+     {
+      "event": "OrderFilled",
+      "order": "stop",
+      "ts_event": 1600007200000000000,
+      "bar_index_at_ts": 2,
+      "last_px": "319.9999",
+      "last_qty": "304"
+     },
+     {
+      "event": "OrderCanceled",
+      "order": "mit",
+      "ts_event": 1600007200000000000,
+      "bar_index_at_ts": 2,
+      "reason": ""
+     }
+    ],
+    "callback_errors": [],
+    "check": {
+     "oco_fill_count": 1,
+     "single_fill_in_tested_bar": true,
+     "fill_px_equals_tested_open": true,
+     "fill_qty_total": "304"
+    }
+   },
+   {
+    "case": "no_gap",
+    "side": "SELL",
+    "decision_bar": [
+     "99.8000",
+     "100.2000",
+     "99.7000",
+     "100.0000"
+    ],
+    "tested_bar": [
+     "100.0000",
+     "100.5000",
+     "99.5000",
+     "100.2000"
+    ],
+    "price_shift": "220.0000",
+    "final_balance_total": "100030.37 USD",
+    "tested_bar_ts": 1600007200000000000,
+    "triggers": {
+     "stop": "319.9999",
+     "mit": "320.0001"
+    },
+    "events": [
+     {
+      "event": "OrderFilled",
+      "order": "setup_buy",
+      "ts_event": 1600000000000000000,
+      "bar_index_at_ts": 0,
+      "last_px": "319.9000",
+      "last_qty": "304"
+     },
+     {
+      "event": "OrderAccepted",
+      "order": "stop",
+      "ts_event": 1600003600000000000,
+      "bar_index_at_ts": 1
+     },
+     {
+      "event": "OrderAccepted",
+      "order": "mit",
+      "ts_event": 1600003600000000000,
+      "bar_index_at_ts": 1
+     },
+     {
+      "event": "OrderFilled",
+      "order": "stop",
+      "ts_event": 1600007200000000000,
+      "bar_index_at_ts": 2,
+      "last_px": "319.9999",
+      "last_qty": "304"
+     },
+     {
+      "event": "OrderCanceled",
+      "order": "mit",
+      "ts_event": 1600007200000000000,
+      "bar_index_at_ts": 2,
+      "reason": ""
+     }
+    ],
+    "callback_errors": [],
+    "check": {
+     "oco_fill_count": 1,
+     "single_fill_in_tested_bar": true,
+     "fill_px_equals_tested_open": false,
+     "fill_qty_total": "304"
+    }
+   },
+   {
+    "case": "no_gap_flat",
+    "side": "SELL",
+    "decision_bar": [
+     "99.8000",
+     "100.2000",
+     "99.7000",
+     "100.0000"
+    ],
+    "tested_bar": [
+     "100.0000",
+     "100.0000",
+     "100.0000",
+     "100.0000"
+    ],
+    "price_shift": "220.0000",
+    "final_balance_total": "101550.40 USD",
+    "tested_bar_ts": 1600007200000000000,
+    "triggers": {
+     "stop": "319.9999",
+     "mit": "320.0001"
+    },
+    "events": [
+     {
+      "event": "OrderFilled",
+      "order": "setup_buy",
+      "ts_event": 1600000000000000000,
+      "bar_index_at_ts": 0,
+      "last_px": "319.9000",
+      "last_qty": "304"
+     },
+     {
+      "event": "OrderAccepted",
+      "order": "stop",
+      "ts_event": 1600003600000000000,
+      "bar_index_at_ts": 1
+     },
+     {
+      "event": "OrderAccepted",
+      "order": "mit",
+      "ts_event": 1600003600000000000,
+      "bar_index_at_ts": 1
+     },
+     {
+      "event": "OrderFilled",
+      "order": "mit",
+      "ts_event": 1600010800000000000,
+      "bar_index_at_ts": 3,
+      "last_px": "325.0000",
+      "last_qty": "304"
+     },
+     {
+      "event": "OrderCanceled",
+      "order": "stop",
+      "ts_event": 1600010800000000000,
+      "bar_index_at_ts": 3,
+      "reason": ""
+     }
+    ],
+    "callback_errors": [],
+    "check": {
+     "oco_fill_count": 1,
+     "single_fill_in_tested_bar": false,
+     "fill_px_equals_tested_open": false,
+     "fill_qty_total": "304"
+    }
+   }
+  ]
+ }
+}

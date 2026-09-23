@@ -827,11 +827,21 @@ class ProbeArtifactTests(unittest.TestCase):
 
     def test_every_referenced_probe_artifact_hashes_as_recorded(self):
         recorded = MANIFEST["probes"]["artifacts"]
-        self.assertEqual(sorted(recorded), sorted(p.name for p in self.PROBES.iterdir()))
+        # Files only: probes/v2/ belongs to the v2 preregistration and is checked below.
+        self.assertEqual(sorted(recorded), sorted(p.name for p in self.PROBES.iterdir() if p.is_file()))
         for name, expected in recorded.items():
             with self.subTest(name=name):
                 self.assertEqual(hashlib.sha256((self.PROBES / name).read_bytes()).hexdigest(),
                                  expected)
+
+    def test_v2_preregistration_probe_artifacts_hash_as_recorded(self):
+        manifest_v2 = json.loads((SOURCE / "mapping-manifest-v2.json").read_text())
+        recorded = manifest_v2["probes"]["artifacts"]
+        v2 = self.PROBES / "v2"
+        self.assertEqual(sorted(recorded), sorted(p.name for p in v2.iterdir() if p.is_file()))
+        for name, expected in recorded.items():
+            with self.subTest(name=name):
+                self.assertEqual(hashlib.sha256((v2 / name).read_bytes()).hexdigest(), expected)
 
     def test_at_the_open_transcript_carries_the_cited_rejection(self):
         transcript = json.loads((self.PROBES / "fill-semantics-atopen.json").read_text())

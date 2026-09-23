@@ -1,0 +1,138 @@
+{
+ "evidence_class": "synthetic engine-semantics probe (not SPY/LEAN data, not a parity run)",
+ "probe": "probe_oco_full.py",
+ "args": [],
+ "origin": "refute-gapoco/probe_oco_full.py, unchanged",
+ "relied_on_for": "market-on-open: 990-share OCO against 1000 bar volume splits into two fills at two prices; gap-up overdraft logged by the portfolio",
+ "probe_sha256": "a9d7ac9eff27c1b085e4a4bf85e6d4d1eda00a2868d1bf829587ea8b9f3a862b",
+ "command": "bwrap --unshare-all --clearenv ... <nautilus-2.0.0rc5>/bin/python -I /probes/probe_oco_full.py",
+ "engine": {
+  "package": "nautilus_trader",
+  "version": "2.0.0rc5",
+  "_libnautilus_sha256": "a53dd5a24fe77f4c66169af84ee9c7e292018010922e3dce9a8b6c9f7f3b7021",
+  "note": "same extension sha256 as ~/.local/share/codex-ecosystem/tools/adaptive-paper-20260921 (checked 2026-09-22)"
+ },
+ "run_utc_date": "2026-09-22",
+ "exit_code": 0,
+ "stdout_sha256": "779c1017dab3db44e58153a37bd038e0a71331961e7f26cfe4ab743ed6d65325",
+ "stderr_sha256": "660f117a3ccdf3d1704714f9bfde0a55088067eacccf5206574b794922ce2bbc",
+ "stderr_text_ansi_stripped": "2020-09-13T13:26:40.000000000Z [ERROR] TRADER-001.nautilus_portfolio::manager: Cannot update cash account balance: Cash account balance would become negative: -8907.40 USD (borrowing not allowed for SIM-001)\n2020-09-13T13:26:40.000000000Z [ERROR] TRADER-001.nautilus_portfolio::manager: Cannot update cash account balance: Cash account balance would become negative: -8907.40 USD (borrowing not allowed for SIM-001)\n",
+ "observed_stdout": [
+  {
+   "case": "no_gap_both",
+   "bar1": [
+    100.5,
+    103.0,
+    99.0,
+    102.0
+   ],
+   "events": [
+    {
+     "event": "OrderFilled",
+     "order": "stop",
+     "ts_event": 1600003600000000000,
+     "last_px": "100.51"
+    },
+    {
+     "event": "OrderCanceled",
+     "order": "mit",
+     "ts_event": 1600003600000000000,
+     "reason": ""
+    },
+    {
+     "event": "OrderFilled",
+     "order": "stop",
+     "ts_event": 1600003600000000000,
+     "last_px": "100.52"
+    }
+   ]
+  },
+  {
+   "case": "gap_up_both_range_crosses_back",
+   "bar1": [
+    110.0,
+    112.0,
+    95.0,
+    111.0
+   ],
+   "events": [
+    {
+     "event": "OrderFilled",
+     "order": "stop",
+     "ts_event": 1600003600000000000,
+     "last_px": "110.00"
+    },
+    {
+     "event": "OrderCanceled",
+     "order": "mit",
+     "ts_event": 1600003600000000000,
+     "reason": ""
+    },
+    {
+     "event": "OrderFilled",
+     "order": "stop",
+     "ts_event": 1600003600000000000,
+     "last_px": "110.01"
+    }
+   ]
+  },
+  {
+   "case": "gap_down_both",
+   "bar1": [
+    90.0,
+    91.0,
+    88.0,
+    89.0
+   ],
+   "events": [
+    {
+     "event": "OrderFilled",
+     "order": "mit",
+     "ts_event": 1600003600000000000,
+     "last_px": "90.00"
+    },
+    {
+     "event": "OrderCanceled",
+     "order": "stop",
+     "ts_event": 1600003600000000000,
+     "reason": ""
+    },
+    {
+     "event": "OrderFilled",
+     "order": "mit",
+     "ts_event": 1600003600000000000,
+     "last_px": "90.01"
+    }
+   ]
+  },
+  {
+   "case": "gap_up_both",
+   "bar1": [
+    110.0,
+    112.0,
+    109.0,
+    111.0
+   ],
+   "events": [
+    {
+     "event": "OrderFilled",
+     "order": "stop",
+     "ts_event": 1600003600000000000,
+     "last_px": "110.00"
+    },
+    {
+     "event": "OrderCanceled",
+     "order": "mit",
+     "ts_event": 1600003600000000000,
+     "reason": ""
+    },
+    {
+     "event": "OrderFilled",
+     "order": "stop",
+     "ts_event": 1600003600000000000,
+     "last_px": "110.01"
+    }
+   ]
+  }
+ ]
+}

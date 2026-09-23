@@ -1,0 +1,114 @@
+{
+ "evidence_class": "synthetic engine-semantics probe (not SPY/LEAN data, not a parity run)",
+ "probe": "nt_probe.py",
+ "args": [
+  "div"
+ ],
+ "origin": "research scratchpad probes/nt_probe.py, unchanged; only mode 'div' was run and is relied on",
+ "relied_on_for": "dividend: second independent module shape; also shows qty*unrounded-per-share quantized half-even (12.345 -> 12.34), the rounding order v2 forbids",
+ "probe_sha256": "28a39f20b6a813702b9160ed7c4c71bfbe6bc105e081ddb2121471ad52404183",
+ "command": "bwrap --unshare-all --clearenv ... <nautilus-2.0.0rc5>/bin/python -I /probes/nt_probe.py div",
+ "engine": {
+  "package": "nautilus_trader",
+  "version": "2.0.0rc5",
+  "_libnautilus_sha256": "a53dd5a24fe77f4c66169af84ee9c7e292018010922e3dce9a8b6c9f7f3b7021",
+  "note": "same extension sha256 as ~/.local/share/codex-ecosystem/tools/adaptive-paper-20260921 (checked 2026-09-22)"
+ },
+ "run_utc_date": "2026-09-22",
+ "exit_code": 0,
+ "stdout_sha256": "09b8fbe3f1dc411a64ce2aa8a5a7ff63fb62cd43900547c8d9819678102ee811",
+ "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+ "stderr_text_ansi_stripped": "",
+ "observed_stdout": {
+  "mode": "div",
+  "open1_ns": 1600063000000000000,
+  "t0": 1600000000000000000,
+  "events": [
+   {
+    "event": "OrderInitialized",
+    "ts_event": 1600000000000000000,
+    "last_px": null,
+    "reason": null
+   },
+   {
+    "event": "OrderSubmitted",
+    "ts_event": 1600000000000000000,
+    "last_px": null,
+    "reason": null
+   },
+   {
+    "event": "OrderFilled",
+    "ts_event": 1600000000000000000,
+    "last_px": "100.50",
+    "reason": null
+   }
+  ],
+  "final_balance_total": "99007.34 USD",
+  "account_events": 3,
+  "module_log": [
+   {
+    "ack": []
+   },
+   {
+    "ack": []
+   },
+   {
+    "ts_now": 1600086400000000000,
+    "qty": "10.0",
+    "amount": "12.34"
+   },
+   {
+    "ack": [
+     [
+      true,
+      null
+     ]
+    ]
+   },
+   {
+    "ack": []
+   },
+   {
+    "ack": []
+   }
+  ],
+  "account_report": [
+   {
+    "total": "100000.00",
+    "locked": "0.00",
+    "free": "100000.00",
+    "currency": "USD",
+    "account_id": "SIM-001",
+    "account_type": "CASH",
+    "margins": [],
+    "reported": true,
+    "info": {},
+    "base_currency": "USD"
+   },
+   {
+    "total": "98995.00",
+    "locked": "0.00",
+    "free": "98995.00",
+    "currency": "USD",
+    "account_id": "SIM-001",
+    "account_type": "CASH",
+    "margins": [],
+    "reported": false,
+    "info": {},
+    "base_currency": "USD"
+   },
+   {
+    "total": "99007.34",
+    "locked": "0.00",
+    "free": "99007.34",
+    "currency": "USD",
+    "account_id": "SIM-001",
+    "account_type": "CASH",
+    "margins": [],
+    "reported": true,
+    "info": {},
+    "base_currency": "USD"
+   }
+  ]
+ }
+}
