@@ -9,18 +9,22 @@ on:
         description: 'Bound the GitHub freshness fetch to the first N pending repositories (0 = no bound).'
         type: number
         default: 0
+      open_pr:
+        description: 'Open or update the report-only catalog-freshness evidence PR when drift is detected.'
+        type: boolean
+        default: false
 
 permissions:
   contents: read
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.event_name }}
-  cancel-in-progress: true
 
 jobs:
   freshness:
     runs-on: ubuntu-24.04
     timeout-minutes: 30
+    outputs:
+      drift: ${{ steps.diff.outputs.drift }}
+      upstream_errors: ${{ steps.diff.outputs.upstream_errors }}
+      partial_errors: ${{ steps.diff.outputs.partial_errors }}
     steps:
       - name: Harden the runner (audit-only network egress)
         uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
@@ -65,59 +69,30 @@ jobs:
             --out "$RUNNER_TEMP/freshness/manifest-$(date -u +%Y%m%d).json" \
             --checked-at "$(date -u +%Y-%m-%d)" --id "catalog-freshness-$(date -u +%Y%m%d)"
       - name: Diff the rebuilt manifest against the published pins/upstream
+        id: diff
         run: |
+          # Delegates to scripts/freshness_propose.py's build_drift_report() instead of
+          # reimplementing the diff here, so the drift-table header text and the
+          # drift-vs-unfetched rule live in exactly one place, shared with the `propose`
+          # job's own use of that module (docs/decisions/2026-09-23-bot-pr-dispatch.md, T3).
           python3 - "$RUNNER_TEMP/freshness" <<'PYEOF'
-          import glob, json, sys
+          import sys
           from pathlib import Path
 
+          sys.path.insert(0, ".")
+          from scripts.freshness_propose import build_drift_report
+
           work_dir = Path(sys.argv[1])
-          rebuilt_path = sorted(work_dir.glob("manifest-*.json"))[-1]
-          rebuilt = json.loads(rebuilt_path.read_text())
-          published_path = Path("catalogs/sota-convergence/manifest-20260922.json")
-          published = json.loads(published_path.read_text())
-
-          def rows(manifest):
-              out = {}
-              for group in manifest.get("foundation", []):
-                  for c in group.get("components", []):
-                      out[c["id"]] = c
-              for group in manifest.get("trading", []):
-                  for c in group.get("entries", []):
-                      out[c["id"]] = c
-              return out
-
-          old_rows, new_rows = rows(published), rows(rebuilt)
-          drifted = []
-          for component_id, new in sorted(new_rows.items()):
-              old = old_rows.get(component_id)
-              if old is None:
-                  continue
-              old_latest = (old.get("upstream") or {}).get("latest")
-              new_latest = (new.get("upstream") or {}).get("latest")
-              if old.get("pin") != new.get("pin") or old_latest != new_latest \
-                      or old.get("pin_behind_upstream") != new.get("pin_behind_upstream"):
-                  drifted.append((component_id, old.get("pin"), new.get("pin"),
-                                   old_latest, new_latest,
-                                   old.get("pin_behind_upstream"), new.get("pin_behind_upstream")))
-
-          lines = ["# Catalog freshness drift",
-                   "",
-                   f"Published manifest: `{published_path}` (counts: {published.get('counts')})",
-                   f"Rebuilt manifest: `{rebuilt_path.name}` (counts: {rebuilt.get('counts')})",
-                   "",
-                   "This is a report-only diff; it never writes to the repository or opens an issue.",
-                   ""]
-          if drifted:
-              lines += ["| id | pin (published) | pin (fresh) | upstream latest (published) | upstream latest (fresh) | behind (published) | behind (fresh) |",
-                        "| --- | --- | --- | --- | --- | --- | --- |"]
-              for row in drifted:
-                  lines.append("| " + " | ".join(str(v) for v in row) + " |")
-          else:
-              lines.append("No pin/upstream drift detected for components present in both manifests.")
-          drift_md = work_dir / "drift.md"
-          drift_md.write_text("\n".join(lines) + "\n")
-          print(drift_md.read_text())
+          result = build_drift_report(work_dir)
+          print((work_dir / "drift.md").read_text())
+          print(f"drifted={len(result['drifted'])} unfetched={len(result['unfetched'])} "
+                f"no_release={len(result['no_release'])}")
           PYEOF
+          {
+            echo "drift=$(cat "$RUNNER_TEMP/freshness/drift-status.txt")"
+            echo "upstream_errors=$(cat "$RUNNER_TEMP/freshness/upstream-errors.txt")"
+            echo "partial_errors=$(cat "$RUNNER_TEMP/freshness/upstream-partial-errors.txt")"
+          } >> "$GITHUB_OUTPUT"
       - name: Append the fixed CI-tool pin-drift table
         env:
           GH_TOKEN: ${{ github.token }}
@@ -154,7 +129,25 @@ jobs:
           python3 scripts/validate_convergence.py
           --all-recorded --root . --json
       - name: Run project test suite
-        run: python3 -m unittest
+        run: |
+          set -o pipefail
+          python3 -m unittest 2>&1 | tee "$RUNNER_TEMP/freshness/unittest.log"
+      - name: Report the test suite's skipped-test count
+        if: ${{ !cancelled() }}
+        run: |
+          python3 - "$RUNNER_TEMP/freshness/unittest.log" <<'PYEOF'
+          import os, re, sys
+
+          text = open(sys.argv[1], encoding="utf-8", errors="replace").read()
+          match = re.search(r"skipped=(\d+)", text)
+          skipped = match.group(1) if match else "0"
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as handle:
+              handle.write(
+                  "## Test suite skipped-test count\n\n"
+                  f"`python3 -m unittest` reported {skipped} skipped test(s) on this job's interpreter "
+                  "(see the \"Run project test suite\" step log for which cases).\n\n"
+              )
+          PYEOF
       - name: Retain the rebuilt manifest and drift report
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
@@ -167,3 +160,202 @@ jobs:
           if-no-files-found: error
           include-hidden-files: false
           retention-days: 30
+
+  # The only write-permitted job in this workflow (docs/decisions/2026-09-23-bot-pr-dispatch.md).
+  # It opens/updates a human-reviewable evidence branch and PR from this run's own drift
+  # artifact; scripts/freshness_propose.py enforces that it only ever adds files under
+  # evidence/artifacts/ and evidence/receipts/ and updates manifests/evidence.json's
+  # registration -- it never selects, evaluates, or writes catalogs/sota-convergence/*,
+  # catalogs/landscape/*.json, manifests/stack.json, or layer-verdicts* (owned by the
+  # separate SOTA-convergence lane review). Off by default: it only runs from an explicit
+  # manual `open_pr: true` dispatch, or from a schedule when the repository variable
+  # CATALOG_FRESHNESS_PROPOSE is set to 'true' -- and, either way, only when this run's own
+  # freshness fetch was unbounded and free of both full fetch errors and partial errors (a
+  # releases/tags/commit sub-fetch that failed and fell back, e.g. a 503 on releases papered
+  # over by the tags endpoint) -- a bounded or partly-failed fetch must not be turned into
+  # evidence that looks complete.
+  propose:
+    needs: freshness
+    if: >-
+      github.ref == 'refs/heads/main' && needs.freshness.outputs.drift == 'true' &&
+      (inputs.max_repos || 0) == 0 && needs.freshness.outputs.upstream_errors == '0' &&
+      needs.freshness.outputs.partial_errors == '0' &&
+      (inputs.open_pr == true || (github.event_name == 'schedule' && vars.CATALOG_FRESHNESS_PROPOSE == 'true'))
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    concurrency:
+      # Job-scoped, not a workflow-level group: `freshness` reads/reports only and is safe
+      # to run in parallel across overlapping triggers, so only this job needs to queue.
+      # Keyed on opt-in vs. scheduled (not just ${{ github.workflow }}) so a plain scheduled
+      # activation can never silently replace a pending manual `open_pr: true` request in the
+      # same queue slot -- GitHub's default concurrency queue holds only one pending run per
+      # group and a newly queued run cancels/replaces it (the `queue: max` property that
+      # would instead let up to 100 runs queue is rejected by this repository's pinned
+      # actionlint 1.7.12, which does not yet recognize that key; see
+      # docs/decisions/2026-09-23-bot-pr-dispatch.md). Two runs *within* the same category
+      # (two manual dispatches, or two scheduled activations) can still replace each other's
+      # pending slot, which is an accepted, lower-stakes loss (the later same-category request
+      # already supersedes the earlier one). A manual and a scheduled run can therefore still
+      # execute this job concurrently; --force-with-lease on the push below is the actual
+      # data-safety guard for that case, not this concurrency group.
+      group: ${{ github.workflow }}-propose-${{ inputs.open_pr == true && 'manual' || 'scheduled' }}
+      cancel-in-progress: false
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Harden the runner (audit-only network egress)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          # Full history, not the default fetch-depth: 1 (matching validate.yml's own
+          # comment): scripts/host_receipts.py validate resolves every existing receipt's
+          # pinned catalog_revision commit with `git cat-file -e`, and a shallow clone
+          # would make every one of those historical commits unresolvable, failing that
+          # step for reasons unrelated to this run's own new receipt.
+          fetch-depth: 0
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.13'
+          check-latest: false
+      - name: Download this run's freshness artifact
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: catalog-freshness-${{ github.run_id }}
+          path: ${{ runner.temp }}/freshness
+      - name: Observe the remote evidence branch, then force-create it from main
+        id: branch
+        run: |
+          set -euo pipefail
+          # Recorded before the push below uses it as a --force-with-lease expectation,
+          # so a concurrent run's push in between is detected and rejected instead of
+          # silently overwritten. The lease is the primary guard: the job-scoped
+          # concurrency groups are keyed manual vs scheduled, so a manual and a
+          # scheduled propose can overlap.
+          observed_sha="$(git ls-remote origin refs/heads/automation/catalog-freshness | awk '{print $1}')"
+          echo "observed_sha=$observed_sha" >> "$GITHUB_OUTPUT"
+          # -B always resets this local branch to the current checkout (main's tip), even
+          # if automation/catalog-freshness already existed remotely with different commits
+          # on it -- for example a human's own commit pushed onto that branch between runs.
+          # Every run starts fresh from main and discards whatever was there before; see
+          # docs/github-automation.md for why this branch is not meant to hold manual edits.
+          git checkout -B automation/catalog-freshness
+      - name: Build the evidence artifact, receipt and registration
+        id: build
+        env:
+          RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          python3 scripts/freshness_propose.py \
+            --artifact-dir "$RUNNER_TEMP/freshness" --run-url "$RUN_URL" \
+            | tee "$RUNNER_TEMP/freshness/propose-result.json"
+          receipt_path=$(python3 -c "import json;print(json.load(open('$RUNNER_TEMP/freshness/propose-result.json'))['receipt_path'])")
+          echo "receipt_path=$receipt_path" >> "$GITHUB_OUTPUT"
+      - name: Validate the new evidence
+        run: |
+          set -euo pipefail
+          python3 scripts/validate.py
+          python3 scripts/host_receipts.py validate
+      - name: Check the ecosystem explorer only if it is still a tracked file
+        run: |
+          set -euo pipefail
+          # scripts/freshness_propose.py only rebuilds/rehashes docs/ecosystem/index.html when
+          # `git ls-files` still tracks it, so this check stays correct whether or not a future
+          # change makes it an untracked build artifact instead.
+          if git ls-files --error-unmatch docs/ecosystem/index.html >/dev/null 2>&1; then
+            python3 scripts/build_ecosystem.py --check
+          else
+            echo "docs/ecosystem/index.html is not a tracked file; skipping --check (nothing was rehashed)."
+          fi
+      - name: Commit the evidence branch
+        run: |
+          set -euo pipefail
+          git add evidence/artifacts evidence/receipts manifests/evidence.json
+          if git ls-files --error-unmatch docs/ecosystem/index.html >/dev/null 2>&1; then
+            git add docs/ecosystem/index.html
+          fi
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+            commit -m "Catalog freshness: report-only drift evidence ($(date -u +%Y-%m-%d))"
+      - name: Push the evidence branch with the workflow token (never persisted to disk)
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          OBSERVED_SHA: ${{ steps.branch.outputs.observed_sha }}
+        run: |
+          set -euo pipefail
+          basic_auth="$(printf 'x-access-token:%s' "$GITHUB_TOKEN" | base64 -w0)"
+          echo "::add-mask::$basic_auth"
+          GIT_CONFIG_COUNT=1 \
+          GIT_CONFIG_KEY_0="http.https://github.com/.extraheader" \
+          GIT_CONFIG_VALUE_0="AUTHORIZATION: basic $basic_auth" \
+          git push --force-with-lease="automation/catalog-freshness:$OBSERVED_SHA" \
+            origin HEAD:refs/heads/automation/catalog-freshness
+      - name: Open or update the evidence PR
+        id: pr
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          # The description is deliberately run-independent: it points at the evidence the
+          # branch head carries instead of embedding this run's report. A manual and a
+          # scheduled propose can overlap (separate concurrency groups), and a
+          # run-specific body could then describe an older commit than the branch holds.
+          body_file="$RUNNER_TEMP/freshness/pr-body.md"
+          {
+            echo "## Catalog freshness: report-only drift evidence"
+            echo ""
+            echo "The evidence is the current head of \`automation/catalog-freshness\`: the drift report under \`evidence/artifacts/catalog-freshness-<date>/drift.md\` and the receipt under \`evidence/receipts/catalog-freshness-<date>.json\` in this PR's diff. The workflow run that produced the head commit is linked from that receipt."
+            echo ""
+            echo "This PR is report-only; no selection or pin changed; pin bumps require a qualified receipt under evidence/artifacts/*/."
+          } > "$body_file"
+          title="Catalog freshness: report-only drift evidence ($(date -u +%Y-%m-%d))"
+          find_open_pr() {
+            gh pr list --head automation/catalog-freshness --base main --state open --json number --jq '.[0].number // empty'
+          }
+          existing="$(find_open_pr)"
+          if [ -z "$existing" ] && ! gh pr create --base main --head automation/catalog-freshness \
+              --title "$title" --body-file "$body_file" >/dev/null; then
+            # An overlapping run may have created the PR between the list and the create
+            # (gh refuses a second PR for the same head); fall through to updating it.
+            existing="$(find_open_pr)"
+            [ -n "$existing" ] || { echo "gh pr create failed and no open PR exists" >&2; exit 1; }
+          fi
+          if [ -n "$existing" ]; then
+            gh pr edit "$existing" --title "$title" --body-file "$body_file"
+          fi
+          pr_url="$(gh pr view automation/catalog-freshness --json url --jq '.url')"
+          echo "pr_url=$pr_url" >> "$GITHUB_OUTPUT"
+      - name: Note that this PR's own checks need write-access approval
+        env:
+          PR_URL: ${{ steps.pr.outputs.pr_url }}
+        run: |
+          # This PR was opened with the workflow's own GITHUB_TOKEN, so GitHub puts its
+          # pull_request-triggered runs (validate, token-report, secret-scan, ...) into an
+          # approval-required state rather than running them automatically -- "events
+          # triggered by the GITHUB_TOKEN will not create a new workflow run, with the following exceptions:
+          # ... pull_request events with the opened, synchronize, or reopened activity types: when a
+          # workflow using GITHUB_TOKEN creates or updates a pull request, the resulting pull_request
+          # event creates workflow runs in an approval-required state"
+          # (https://docs.github.com/en/actions/concepts/security/github_token).
+          # This job deliberately does not call `gh workflow run` to work around that: a
+          # workflow_dispatch run's checks do not satisfy a required status check on this
+          # PR at all
+          # (https://docs.github.com/en/pull-requests/how-tos/merge-and-close-pull-requests/troubleshooting-required-status-checks),
+          # so dispatching would add a green-looking but not-actually-required run instead
+          # of the real one. See docs/github-automation.md for the exact approval steps and
+          # docs/decisions/2026-09-23-bot-pr-dispatch.md for the full evidence.
+          {
+            echo "## Catalog freshness evidence PR opened"
+            echo ""
+            echo "$PR_URL"
+            echo ""
+            echo "A repository collaborator with write access must approve this PR's pending checks"
+            echo "before validate, token-report and secret-scan actually run on it: open the PR,"
+            echo "use the approval banner in the PR's merge box and select \"Approve workflows to run\""
+            echo "(GITHUB_TOKEN docs). A run left awaiting approval for"
+            echo "more than 30 days is automatically deleted. See docs/github-automation.md."
+          } >> "$GITHUB_STEP_SUMMARY"
