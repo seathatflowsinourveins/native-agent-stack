@@ -812,6 +812,43 @@ class RecursiveWithheldKeyTests(unittest.TestCase):
         self.assertEqual(withheld_packet_keys(packet), [])
 
 
+class RegisteredReceiptsTests(LanePacketsFixture):
+    """2026-09-23 re-record: --registered-receipts attaches each component's registered receipts, so a
+    lane can open and cite a native receipt its ledger row never named."""
+
+    def receipts(self, *entries):
+        self.write("manifests/evidence.json", {"schema_version": 1, "files": [], "convergence_records": [],
+                                               "receipts": [dict(entry, claim="c", limitations=[]) for entry in entries]})
+
+    def test_candidates_carry_their_registered_receipts_sorted_by_path(self):
+        packet = self.packet("foundation", "layer-a")
+        component = next(c["component_id"] for c in packet["candidates"] if c.get("component_id"))
+        self.receipts({"id": "r2", "kind": "native_cli_e2e", "component_ids": [component], "path": "evidence/receipts/b.json"},
+                      {"id": "r1", "kind": "host_e2e", "component_ids": [component, "other"], "path": "evidence/receipts/a.json"},
+                      {"id": "r3", "kind": "native_cli_e2e", "component_ids": ["unrelated"], "path": "evidence/receipts/c.json"})
+        packet = self.packet("foundation", "layer-a", self.build(registered_receipts=True))
+        candidate = next(c for c in packet["candidates"] if c.get("component_id") == component)
+        self.assertEqual(candidate["registered_receipts"], [
+            {"id": "r1", "kind": "host_e2e", "path": "evidence/receipts/a.json"},
+            {"id": "r2", "kind": "native_cli_e2e", "path": "evidence/receipts/b.json"}])
+        self.assertTrue(all("registered_receipts" in c for c in packet["candidates"]))
+        self.assertIn("registered_receipts lists", packet["registered_receipts_note"])
+
+    def test_default_build_is_unchanged(self):
+        self.receipts({"id": "r1", "kind": "host_e2e", "component_ids": ["anything"], "path": "evidence/receipts/a.json"})
+        self.assertEqual(self.build(), self.build(registered_receipts=False))
+        for text in self.build().values():
+            self.assertNotIn("registered_receipts", text)
+
+    def test_withheld_packets_keep_the_receipts(self):
+        packet = self.packet("foundation", "layer-a")
+        component = next(c["component_id"] for c in packet["candidates"] if c.get("component_id"))
+        self.receipts({"id": "r1", "kind": "host_e2e", "component_ids": [component], "path": "evidence/receipts/a.json"})
+        packet = self.packet("foundation", "layer-a", self.build(registered_receipts=True, withhold=True))
+        candidate = next(c for c in packet["candidates"] if c.get("component_id") == component)
+        self.assertEqual([r["id"] for r in candidate["registered_receipts"]], ["r1"])
+
+
 if __name__ == "__main__":
     unittest.main()
 

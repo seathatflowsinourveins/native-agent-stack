@@ -621,6 +621,17 @@ the 32 packets and their `SHA256SUMS` are retained under
 reads still carries those labels in the catalog files, so withholding them from
 the packets alone does not blind a lane; see the handbook's label-exposure limit.
 
+**Registered receipts** (`--registered-receipts`, 2026-09-23 re-record). A packet's `evidence_refs` come from
+the ledger row, so a lane could not see a native receipt the row never named. Under Linux, `platform_status`
+accepts a `native_proven` or `measured_comparison` winner only when it cites a registered `evidence/` file.
+With the flag, every candidate and `sota_components_not_in_candidates` entry carries `registered_receipts`:
+the `{id, kind, path}` of each `manifests/evidence.json` receipt whose `component_ids` names it, sorted by
+path. A packet-level `registered_receipts_note` tells the lane that a receipt's kind and content, not its
+presence, decide the evidence class.
+
+On the 2026-09-23 tree with `manifest-20260923`, 88 of 286 candidates carry at least one receipt. The flag is
+off by default, so the 2026-09-22 packets reproduce.
+
 **Popularity and recency are withheld too** (2026-09-23 peer audit: 132
 foundation-packet objects still carried GitHub `stars` and `pushed_at` through
 `candidates[].upstream`). Under `--withhold-labels` every packet -- manifest-mode
