@@ -111,7 +111,11 @@ machine (`host.second_physical_machine: true`), independently reviewed.
 
    ```sh
    python3 scripts/component_matrix.py --write
+   python3 scripts/new_host_grand_list.py --write
    ```
+
+   The second command refreshes the new-host grand list, which joins the matrix; its `--check` also
+   runs in CI.
 
    `--write` recomputes and writes both
    `catalogs/landscape/component-evidence-matrix.json` and

@@ -1,0 +1,13 @@
+diff --git a/fixtures/rs_before.rs b/fixtures/rs_after.rs
+index 6b9090a..ad815f2 100644
+--- a/fixtures/rs_before.rs
++++ b/fixtures/rs_after.rs
+@@ -2,5 +2,8 @@ fn clamp(value: i32, max: i32) -> i32 {
+     if value > max {
+         return max;
+     }
++    if value < 0 {
++        return 0;
++    }
+     value
+ }

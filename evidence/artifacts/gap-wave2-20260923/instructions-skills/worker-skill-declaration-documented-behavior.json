@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "id": "worker-skill-declaration-documented-behavior",
+  "date": "2026-09-23",
+  "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+  "layer_ids": ["instructions-skills"],
+  "gap_refs": [
+    {"layer_id": "instructions-skills", "gap_index": 4}
+  ],
+  "purpose": "Gap 4: discovery is client-level, not worker-level (native-receipt.json lines 199-203 vs 277-284: client init lists all three native-practice skills, but the worker context did not list them and read TypeSafe from disk). next_check asks to dispatch one lean workflow child with the typesafe-ai skill declared and compare its initial context against a child that does not declare it. This unit's binding rules state this worktree cannot spawn agents (no Task/Workflow dispatch authority here); per the unit task's own instruction, record the documented behaviour from the installed CLI/docs/agent config instead and mark this as NOT EXECUTED as a live dispatch test.",
+  "preregistered": "This is a source-review check only, not a live dispatch. Before reading: the existing semantic-evidence-reviewer agent definition (examples/claude-native/agents/semantic-evidence-reviewer.md, used as the source for the very native-receipt.json cited by gap 4) is expected to already document, in its own body text, whether skill-body preload for a declared skill is assumed or must be defensively re-read from disk -- if so, that is documented (author-anticipated) behavior, not a fresh measurement, and is recorded as such rather than upgraded to a dispatch result.",
+  "commands": [
+    {
+      "cmd": "cat examples/claude-native/agents/semantic-evidence-reviewer.md",
+      "exit": 0,
+      "duration_s": 0.02,
+      "output_excerpt": "Frontmatter declares 'skills:\\n  - typesafe-ai' alongside model: opus, effort: high, tools: Read, Glob, Grep. Body text: 'Use TypeSafe only for the assigned semantic evidence task. Verify that its skill body is in context; if a headless invocation does not preload it, Read the project `.agents/skills/typesafe-ai/SKILL.md` or the user's installed copy explicitly.' -- i.e. the agent author already assumes preload is not guaranteed and hard-codes a disk-read fallback instruction into the role body itself.",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "grep -n 'skill' docs/ultracode-token-routing-20260921.md",
+      "exit": 0,
+      "duration_s": 0.03,
+      "output_excerpt": "Line 19 (fixed child prompt cost comparison across grant styles): '... previous `evidence-reviewer` with bare `mcp__server` grants 42,220 (dropping the skills listing was cancelled out by eager schemas for four whole servers ...)' -- this documents that whether the flat skills-name listing appears in a child's initial context varies by how MCP tools are granted (bare server prefix vs named tools vs deferred ToolSearch), independent of whether a skill is declared in the agent's own frontmatter.",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "grep -n -A5 'returned_report' blueprints/native-skill-practice/native-receipt.json | sed -n '1,20p' (prior cited evidence, re-read not re-run)",
+      "exit": 0,
+      "duration_s": 0.02,
+      "output_excerpt": "Confirms the exact prior finding gap 4 cites: this was a top-level `claude --agent semantic-evidence-reviewer` invocation (native-receipt.json line 194: 'native subagent_stats.spawned=0. This does not verify Claude child-agent dispatch.'), and its returned_report.discovered_skills.client_listing_exposed is false -- the worker's own context did not expose a flat skills list the way the top-level client init event does, and typesafe-ai was found only via Glob + Read from disk, matching the SKILL.md's own defensive instruction.",
+      "output_sha256": "n/a"
+    }
+  ],
+  "tool_versions": {},
+  "installs": [],
+  "model_calls": [],
+  "result": "NOT EXECUTED AS A LIVE DISPATCH TEST. Per this unit's binding rules, this worktree has no Task/Workflow dispatch authority to spawn a real workflow child, so the requested with-declaration-vs-without-declaration comparison was not run. What this check adds instead is documented, already-on-file behavior: (1) the semantic-evidence-reviewer agent's own definition file hard-codes a disk-read fallback specifically because the skill body is not assumed to preload for a declared skill -- i.e. the project's own agent authors had already reached the same conclusion the prior native-receipt.json run observed empirically (client-level discovery != worker-level body preload); (2) docs/ultracode-token-routing-20260921.md documents that a child's flat skills-name listing (the client-level discovery surface) appears or is dropped depending on MCP-grant style, a separate axis from whether a specific skill is declared in agentType frontmatter; (3) the previously cited native-receipt.json evidence was re-read (not re-run) and confirms it was a top-level --agent invocation with subagent_stats.spawned=0, explicitly not a Task/Workflow-dispatched child, so gap 4's underlying 'worker-level' claim remains based on that same top-level-invocation proxy, not a true dispatched-child measurement, in this catalog's own records as well as in this check.",
+  "settles_gap": false,
+  "verdict_impact": {
+    "could_change_verdict": false,
+    "direction": "not_applicable",
+    "explanation": "No new dispatch evidence was produced; this only surfaces existing documentation (the agent file's own defensive instruction and the token-routing doc's MCP-grant-style note) that is consistent with, but does not newly test, the prior finding. The gap remains open pending an actual Task/Workflow-dispatched child comparison, which is out of this worktree's authorized scope."
+  },
+  "evidence_class": "source_review",
+  "limitations": [
+    "This is explicitly not an execution of the requested check: no workflow child was dispatched, with or without a declared skill. It is a source review of existing agent config and docs only.",
+    "The cited native-receipt.json evidence (client_listing_exposed: false, disk-read fallback) comes from a top-level `claude --agent` invocation, which its own text says does not verify true Task/Workflow child-agent dispatch behavior -- so even the existing evidence this check re-reads is an imperfect proxy for the gap's actual question.",
+    "docs/ultracode-token-routing-20260921.md's MCP-grant-style note is about the flat skills-name listing's presence/absence, not about full SKILL.md body preload, so it only partially speaks to the gap's 'full body preload' question."
+  ],
+  "raw_artifacts": []
+}

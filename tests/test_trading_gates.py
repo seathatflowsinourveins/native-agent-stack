@@ -265,8 +265,9 @@ class GatePointerContentTests(unittest.TestCase):
     def test_empty_placeholder_is_not_a_flip_candidate_but_a_passing_receipt_is(self):
         for gate_id, good_content in self.GOOD_RECEIPTS.items():
             with self.subTest(gate=gate_id):
-                gate = self.gates_by_id[gate_id]
-                self.assertNotEqual(gate["status"], "established", f"{gate_id}: fixture assumes a non-established gate")
+                # The content condition is what is under test, not the gate's live status
+                # (a gate may already be established): evaluate a not-established copy.
+                gate = {**self.gates_by_id[gate_id], "status": "not_established", "evidence_class": "none"}
 
                 # An empty JSON placeholder (what a presence-only 'exists' flip
                 # would have accepted) must not satisfy the content condition.
@@ -293,8 +294,9 @@ class GatePointerContentTests(unittest.TestCase):
     def test_well_formed_failing_receipt_is_not_a_flip_candidate(self):
         for gate_id, bad_content in self.BAD_RECEIPTS.items():
             with self.subTest(gate=gate_id):
-                gate = self.gates_by_id[gate_id]
-                self.assertNotEqual(gate["status"], "established", f"{gate_id}: fixture assumes a non-established gate")
+                # The content condition is what is under test, not the gate's live status
+                # (a gate may already be established): evaluate a not-established copy.
+                gate = {**self.gates_by_id[gate_id], "status": "not_established", "evidence_class": "none"}
 
                 self.write(gate["receipt_path"], json.dumps(bad_content))
                 result = trading_gates.check(self.root, self.write("gates.json", json.dumps(document(gate))))

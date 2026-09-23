@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "id": "qdrant-restart-reconnect",
+  "date": "2026-09-23",
+  "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+  "layer_ids": [
+    "semantic-rag"
+  ],
+  "gap_refs": [
+    {
+      "layer_id": "semantic-rag",
+      "gap_index": 9
+    }
+  ],
+  "purpose": "Check whether a SocratiCode instance (and a freshly spawned one) reconnects to its Qdrant backend after Qdrant is killed and restarted on the same port/data dir, without any client-side reconfiguration, and whether the index state survives.",
+  "preregistered": "If both the already-running SocratiCode process and a newly spawned one continue to report the full, correct indexed-chunk count and answer queries after the Qdrant restart with zero config changes, SocratiCode-side reconnection is established for this disposable pair (supports_incumbent, scoped to same-host process restart, not full-service/native-client MCP reconnection which this unit does not test per the binding rules).",
+  "commands": [
+    {
+      "cmd": "python3 <scratch>/rag-ops/gap9_qdrant_restart.py  # 402-file project already fully indexed (402 chunks) from the gap-1 run; record status/search/point-counts; pgrep+SIGKILL9 the disposable qdrant process (pid 2046732, port 26333, NOT the live qdrant-agent-lab.service on pid 402); relaunch qdrant with the identical --config-path (same data dir, same port); wait for /collections to answer; re-query the SAME already-open SocratiCode MCP process, then spawn a brand-new SocratiCode process with identical env and query it too",
+      "exit": 0,
+      "duration_s": 5,
+      "output_excerpt": "qdrant_reachable_immediately_after_kill=False; qdrant back up after 1s; same-process status after restart: 'Indexed chunks: 402' (unchanged); fresh-process status after restart: 'Indexed chunks: 402' (unchanged); search for 'modulo watcher marker' returned real matches post-restart; qdrant point counts identical before/after (codebase_2df0d90218d3=402, symgraph collections unchanged, socraticode_metadata=2)",
+      "output_sha256": "f5d24bf79f807e562394bb551689a06cb0a1c159e12e7b60206f0b8102827e0b"
+    },
+    {
+      "cmd": "ps aux | grep qdrant  # confirm the live agent-lab qdrant (pid 402, qdrant-agent-lab.yaml) was never touched",
+      "exit": 0,
+      "duration_s": 1,
+      "output_excerpt": "seath 402 ... qdrant --config-path .../qdrant-agent-lab.yaml --disable-telemetry (untouched, same pid throughout); seath 2047251 ... qdrant-disposable.yaml (the new disposable pid after restart)",
+      "output_sha256": "n/a-inline"
+    }
+  ],
+  "tool_versions": {
+    "socraticode": "1.14.0",
+    "qdrant": "1.19.1",
+    "node": "v24.21.0"
+  },
+  "installs": [],
+  "model_calls": [],
+  "result": "On the disposable stack, killing the Qdrant process (SIGKILL) and restarting it with the identical config (same http_port=26333, same on-disk storage_path) restores full service within 1 second. Both an already-connected SocratiCode process and a brand-new one (same QDRANT_URL env var, no config change) correctly report the pre-restart index state (402/402 chunks) and successfully answer a semantic search query afterward. Qdrant point counts were bit-for-bit identical before and after (on-disk persistence, not an in-memory cache), so no data loss was observed for this same-host restart. The live agent-lab Qdrant instance (separate pid, separate config file, separate port) was confirmed running unaffected throughout via ps aux.",
+  "settles_gap": "partially",
+  "verdict_impact": {
+    "could_change_verdict": true,
+    "direction": "supports_incumbent",
+    "explanation": "This closes the specific sub-claim the gap named as missing: SocratiCode-side reconnection to a restarted Qdrant, both for an already-open client and a fresh one, with zero manual reconfiguration. It does NOT establish 'SocratiCode full-service restart' (we restarted only Qdrant, not the SocratiCode process itself simultaneously) or 'native-client rebinding' (we did not restart/reconnect an actual Claude/Codex MCP client session, per the binding rule that live MCP client sessions of running Claude sessions are off limits). Those two remaining sub-claims stay open and are recorded as not tested here, so the gap is only partially settled."
+  },
+  "evidence_class": "native_proven",
+  "limitations": [
+    "Only Qdrant was restarted; SocratiCode's own process (and the live vLLM embedding server) were left running throughout, so this does not test 'SocratiCode full-service restart' as the gap's next_check literally asks.",
+    "Native Claude/Codex MCP client reconnection was not tested (explicitly out of scope per the binding rules, which forbid touching the Context Mode processes of running Claude sessions); recorded here as not tested, not as passing.",
+    "Single restart cycle, single host, no concurrent writers during the outage window -- does not test reconnection under write contention.",
+    "Qdrant was down for only ~1s in this test; a longer outage or a crash that corrupts the on-disk segment files was not exercised."
+  ],
+  "raw_artifacts": [
+    {
+      "path": "~/codex-ecosystem/state/gap-wave2-20260923/rag-ops/gap9_result.json",
+      "sha256": "f5d24bf79f807e562394bb551689a06cb0a1c159e12e7b60206f0b8102827e0b"
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/qdrant-restart-reconnect/gap9_qdrant_restart.py",
+      "sha256": "b91d1be6606be12317b904b3cc4c586e5e20b58a5da56392ca866309f777092b",
+      "published_sha256": "e9bee7aa500343bfaf128ccb050d90b9c75db23f09d2e1eed42c975939416cc0",
+      "published_note": "Published copy differs from the run's file: home paths were sanitized to ~/ at publication, and the coordinator then made helper paths expand at run time (review of PR #101). sha256 is the file as run; published_sha256 is the committed file."
+    }
+  ]
+}

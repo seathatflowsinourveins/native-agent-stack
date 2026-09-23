@@ -1,0 +1,1 @@
+In the ~/code/agent-lab repository, find the file .claude/workflows/child-usage.mjs. It defines a top-level constant named COUNTERS as an array of strings. What are the exact string values in that array, in order? Answer with just a comma-separated list of the values, nothing else.

@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "id": "codex-review-lane",
+  "date": "2026-09-23",
+  "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+  "layer_ids": ["git-github-automation"],
+  "gap_refs": [
+    { "layer_id": "git-github-automation", "gap_index": 3 },
+    { "layer_id": "git-github-automation", "gap_index": 12 }
+  ],
+  "purpose": "From ~/code/broad-universe-review (a dedicated sole-Claude checkout per recipes/claude-codex-cooperation-lanes.md), run the installed /codex:review lane once in foreground (--wait) and once in background (--background) on a small multi-file scratch diff against the checkout's HEAD, record polling behaviour and exit status, and reconcile with evidence/receipts/foundation-rd-20260921.json's prior limitations (usage/model/effort not exposed; background/concurrency unqualified). Two concurrent invocations in the same workspace were explicitly disallowed for this window by the binding rules and are recorded as undone. Per gaps [3] and [12]'s next_check.",
+  "preregistered": "Foreground: if `claude -p '/codex:review --wait --scope branch --base <sha> --json'` exits 0 and returns a JSON envelope with a real codex.stdout review body, that reconfirms the prior foreground result from foundation-rd-20260921 on a fresh diff and settles the foreground portion of gap [12]. Background: `claude -p '/codex:review --background ...'` is expected to return a job id promptly; this check then polls that job via `/codex:status` and `/codex:result` within the unit's remaining claude -p budget (at most two further calls) and records whatever terminal or non-terminal state is observed at that point, without retrying to obtain a different outcome. A terminal status (completed or failed) with a readable result would newly qualify background polling behaviour for gap [3] as working end to end. A job that has not reached a terminal state within the polling budget -- whether because the underlying worker process is still running, has exited without updating job state, or any other cause -- is recorded as-is as a genuine partial/inconclusive result for background reliability within this budget, not as a failure to be retried past the budget. Same-workspace concurrency remains explicitly out of scope for this window (binding rules) and is recorded as undone, consistent with foundation-rd-20260921's 'concurrency remain unqualified' limitation, which this receipt does not close.",
+  "commands": [
+    { "cmd": "pgrep-equivalent precheck: ps -eo args= | awk '$1 ~ /(^|\\/)codex$/ && $2==\"exec\"' | wc -l", "exit": 0, "duration_s": 0.05, "output_excerpt": "0 (checked immediately before each of the two invocations below)", "output_sha256": null },
+    { "cmd": "git commit (detached HEAD in broad-universe-review, 3 scratch files under .scratch-w2-gh-flow/, including a deliberate off-by-one bug marker) -> 718dd960ac00f2b67e69432385dfd84fd3708bb4, base 4378f0de82bad87c9a8a6517650849f22be0dc77", "exit": 0, "duration_s": 0.1, "output_excerpt": "3 files changed, 13 insertions(+)", "output_sha256": null },
+    { "cmd": "flock claude.lock flock codex.lock claude -p '/codex:review --wait --scope branch --base 4378f0de82bad87c9a8a6517650849f22be0dc77 --json'", "exit": 0, "duration_s": 51, "output_excerpt": "{\"review\":\"Review\",\"target\":{\"mode\":\"branch\",\"baseRef\":\"4378f0d...\"},\"threadId\":\"<redacted-codex-thread-id-fg>\",\"codex\":{\"status\":0,\"stderr\":\"\",\"stdout\":\"The diff only adds three scratch Markdown/text files with no identified consumers. The off-by-one snippet is explicitly a deliberate review fixture, not an unintended regression. The diff whitespace check passes.\"}}", "output_sha256": "c35c3e28e4019c8a8f88f8ecc161ac00870cd43d8a2516fb6153a018c17fd741" },
+    { "cmd": "flock claude.lock flock codex.lock claude -p '/codex:review --background --scope branch --base 4378f0de82bad87c9a8a6517650849f22be0dc77 --json'", "exit": 0, "duration_s": 11, "output_excerpt": "Codex review started in the background. Check `/codex:status` for progress. (plain text, not JSON, despite --json being passed)", "output_sha256": "5fa5d5e0bb361679ad02cfb6bfbefb47aab886511e8217f70a9d240599239e97" },
+    { "cmd": "read ~/.claude/plugins/data/codex-openai-codex/state/broad-universe-review-*/jobs/review-mudhgxv2-oa7thd.json (file read, no model call)", "exit": 0, "duration_s": 0.05, "output_excerpt": "job id review-mudhgxv2-oa7thd, pid 1826353, threadId <redacted-codex-thread-id-bg>, status running, phase reviewing, log shows only 4 startup lines ending 'Reviewer started'", "output_sha256": null },
+    { "cmd": "ps -p 1826353 (file/process read, no model call, ~24s after job start)", "exit": 1, "duration_s": 0.05, "output_excerpt": "no such process -- the job's own worker pid had already exited", "output_sha256": null },
+    { "cmd": "flock claude.lock claude -p '/codex:status review-mudhgxv2-oa7thd --json'", "exit": 0, "duration_s": 8, "output_excerpt": "{\"job\":{\"id\":\"review-mudhgxv2-oa7thd\",\"status\":\"running\",\"phase\":\"reviewing\",\"pid\":1826353,\"elapsed\":\"43s\",\"duration\":null,\"progressPreview\":[4 startup lines, unchanged since job start]}}", "output_sha256": "37b5b276ee6fbdc2d31770ab4bb5b62919f6f28df0bbb5519628c59fbae1429b" },
+    { "cmd": "flock claude.lock claude -p '/codex:result review-mudhgxv2-oa7thd --json'", "exit": 0, "duration_s": 2, "output_excerpt": "(empty stdout and stderr -- no terminal result surfaced for the still-'running' job)", "output_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b" },
+    { "cmd": "re-read job json + ps -p 1826353 (final check, no further model call: budget of 4 claude -p calls for this unit was exhausted after the /codex:result call above)", "exit": 1, "duration_s": 0.05, "output_excerpt": "job state.json still reports status=running, updatedAt unchanged at 2026-09-23T02:28:04.825Z; pid 1826353 confirmed absent from the process table", "output_sha256": null },
+    { "cmd": "git reset --hard 4378f0de82bad87c9a8a6517650849f22be0dc77 (restore broad-universe-review to its original state)", "exit": 0, "duration_s": 0.2, "output_excerpt": "HEAD is now at 4378f0d Merge origin/main (PR-2 taxonomy and verdict schema) into PR-4", "output_sha256": null }
+  ],
+  "tool_versions": {
+    "claude": "claude code (see recipes/claude-codex-cooperation-lanes.md: qualified surface Claude Code 2.1.278 with codex@openai-codex 1.0.6)",
+    "gh": "n/a for this check"
+  },
+  "installs": [],
+  "model_calls": [
+    { "client": "claude -p (/codex:review --wait)", "model": "not exposed by the companion envelope; scoped native Codex thread/session records for threadId <redacted-codex-thread-id-fg> were not found in ~/.codex/sqlite/thread_history_1.sqlite (queried read-only, no rows by thread_id or by started_at window) nor under ~/.codex/sessions/2026/09/ (no 23 subdirectory yet), and the workspace-keyed plugin job ledger showed an empty jobs[] array for this --wait invocation -- consistent with foundation-rd-20260921.json's prior 'Codex review usage/model/effort are not exposed by this companion path' limitation", "effort": "not exposed (same reason)", "count": 1, "input_tokens": null, "output_tokens": null },
+    { "client": "claude -p (/codex:review --background)", "model": "not exposed by the companion envelope or the workspace job ledger", "effort": "not exposed", "count": 1, "input_tokens": null, "output_tokens": null },
+    { "client": "claude -p (/codex:status)", "model": "n/a -- polling command, not a review invocation", "effort": "n/a", "count": 1, "input_tokens": null, "output_tokens": null },
+    { "client": "claude -p (/codex:result)", "model": "n/a -- polling command, not a review invocation", "effort": "n/a", "count": 1, "input_tokens": null, "output_tokens": null }
+  ],
+  "result": {
+    "foreground": {
+      "status": "succeeded",
+      "exit": 0,
+      "duration_s": 51,
+      "review_body_present": true,
+      "notable": "Correctly identified the deliberate off-by-one snippet as a fixture rather than flagging it as a real bug, and correctly scoped the review to the 3 added scratch files."
+    },
+    "background": {
+      "status": "stuck_running_after_worker_pid_exit",
+      "job_id": "review-mudhgxv2-oa7thd",
+      "thread_id": "<redacted-codex-thread-id-bg>",
+      "worker_pid_alive_at_job_start": true,
+      "worker_pid_alive_at_t_plus_24s": false,
+      "state_json_status_at_t_plus_43s_and_beyond": "running (unchanged from job start; no terminal state written)",
+      "codex_status_result_call": "empty stdout/stderr, no terminal result surfaced"
+    },
+    "concurrent_invocation_subcheck": "undone -- binding rules for this window explicitly disallow two concurrent /codex:review invocations in the same workspace; not attempted"
+  },
+  "settles_gap": "partially",
+  "verdict_impact": {
+    "could_change_verdict": false,
+    "direction": "inconclusive",
+    "explanation": "Foreground /codex:review is reconfirmed working end to end and matches the prior foundation-rd-20260921 result, so it supports the incumbent lane as a review tool. Background mode, however, produced a genuinely stuck job (worker process exited but the job's own state file was never updated past 'running', and /codex:result returned nothing) -- this is a new, reproducible operational finding, not a retry-to-fix result. It does not by itself argue for replacing the lane (no alternative was compared), but it means gap [3]'s 'background polling behaviour ... unqualified' is now qualified as unreliable in this one observed run, and should not be treated as a settled-working capability without further investigation (e.g. whether this is a one-off orphan or a reproducible defect in the plugin's background job supervisor)."
+  },
+  "evidence_class": "native_proven",
+  "limitations": [
+    "Model, effort and token usage for both the foreground and background Codex reviews were not recoverable: the companion envelope omits them, the workspace-keyed plugin job ledger for the --wait invocation showed an empty jobs[] array (apparently not persisted for --wait mode), and no matching Codex thread/session record was found in ~/.codex/sqlite/thread_history_1.sqlite or ~/.codex/sessions/ for either threadId. This matches, and does not newly resolve, foundation-rd-20260921.json's existing 'usage/model/effort are not exposed' limitation.",
+    "The background job's stuck state was observed once, in one run, on one small diff; whether it reproduces on a larger diff, a different workspace, or a later plugin version is not established here. No root-cause investigation (e.g. reading the plugin's own source or the job's session logs beyond the 4 lines captured) was performed within this unit's scope and model-call budget.",
+    "The two-concurrent-invocations sub-check named in gap [3]'s next_check was not attempted this window per the binding rules and is recorded as undone below, not as a negative result.",
+    "claude -p model-call budget for this unit (at most 4, each driving one Codex review) was fully used by the two review invocations plus the two polling calls (/codex:status, /codex:result) needed to observe the background job's terminal (non-)state; no further polling or a /codex:cancel call was made once the budget was exhausted, so the background job's plugin-side ledger may still show 'running' after this receipt is written.",
+    "The scratch multi-file diff (3 small files, one deliberate synthetic bug) is a fixture, not a representative production diff; reviewer quality/coverage on larger or more realistic changes is not assessed here.",
+    "Fix-round correction (2026-09-23): the original receipt's preregistered background-check text named the exact 'stuck running after worker pid exit' outcome that was later observed, which is not a valid pre-result expectation. The preregistration text is corrected here to describe the polling procedure and budget generically, without predicting the specific stuck-state result; no command was re-run and the recorded result, settles_gap and verdict_impact values are unchanged."
+  ],
+  "raw_artifacts": [
+    { "path": "~/codex-ecosystem/state/gap-wave2-20260923/gh-flow/review-foreground-out.json", "sha256": "c35c3e28e4019c8a8f88f8ecc161ac00870cd43d8a2516fb6153a018c17fd741" },
+    { "path": "~/codex-ecosystem/state/gap-wave2-20260923/gh-flow/review-bg-start-out.json", "sha256": "5fa5d5e0bb361679ad02cfb6bfbefb47aab886511e8217f70a9d240599239e97" },
+    { "path": "~/codex-ecosystem/state/gap-wave2-20260923/gh-flow/review-bg-status-out.json", "sha256": "37b5b276ee6fbdc2d31770ab4bb5b62919f6f28df0bbb5519628c59fbae1429b" },
+    { "path": "~/codex-ecosystem/state/gap-wave2-20260923/gh-flow/review-bg-result-out.json", "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b" }
+  ]
+}

@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "id": "syft-signature-verification-and-wider-scan",
+  "date": "2026-09-23",
+  "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+  "layer_ids": ["ci-supply-chain"],
+  "gap_refs": [
+    {"layer_id": "ci-supply-chain", "gap_index": 3},
+    {"layer_id": "ci-supply-chain", "gap_index": 9}
+  ],
+  "purpose": "The installed Syft release (v1.52.0) was previously checksum-verified only (blueprints/us-equities/supply-chain/README.md lines 51-52); this check verifies its cosign signature and searches for a build-provenance attestation, and separately widens the local Syft inventory scope onto system interpreter prefixes and native-library directories (results shared with supply-chain-hosted-run-and-wider-syft.json in this same directory, referenced here for gaps 3/9). FIX ROUND CORRECTION (2026-09-23): the original `gh attestation verify` call defaulted to enforcing predicate-type `https://slsa.dev/provenance/v1` (SLSA build provenance), and its 404 was mischaracterized as 'no GitHub-native attestation exists' for this asset; the unfiltered `gh api repos/anchore/syft/attestations/sha256:...` endpoint returns a GitHub-native release attestation (predicateType release/v0.2), and `gh release verify-asset` verifies it successfully. This revision corrects that finding using the procedure the review identified as the right one (predicate-type-aware verification), run once with a new preregistration; it does not re-run the original 404 check to get a different outcome.",
+  "preregistered": "If `cosign verify-blob` against Syft's published checksums file, using its keyless certificate and signature, returns 'Verified OK', that settles the signature half of gaps 3 and 9 in the supports_incumbent direction. `gh attestation verify` against the syft release tarball's exact digest either finds and verifies a build-provenance attestation (further supporting the incumbent) or returns a real 404 (an honest negative result, recorded as-is, not retried against a different digest or repo to fish for a match). The wider-scan half is preregistered jointly with supply-chain-hosted-run-and-wider-syft.json: either it finds materially more/less inventory outside the single-prefix baseline, or it demonstrates a structural blind spot.",
+  "commands": [
+    {
+      "cmd": "curl -sSL -o cosign-linux-amd64 https://github.com/sigstore/cosign/releases/download/v2.6.1/cosign-linux-amd64 && curl -sSL -o cosign_checksums.txt https://github.com/sigstore/cosign/releases/download/v2.6.1/cosign_checksums.txt && grep cosign-linux-amd64$ cosign_checksums.txt | awk '{print $1}' > expected.txt && sha256sum cosign-linux-amd64 | awk '{print $1}' > actual.txt && diff expected.txt actual.txt",
+      "exit": 0,
+      "duration_s": 4.1,
+      "output_excerpt": "064954c5d8c7e3b28188eee5b1727b31c411550bc5fefd41aa672d3c761d103a matches for both files; diff produced no output (checksum match)",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "install -m 0755 cosign-linux-amd64 ~/.local/share/codex-ecosystem/tools/cosign-2.6.1-w2/bin/cosign && cosign version",
+      "exit": 0,
+      "duration_s": 0.3,
+      "output_excerpt": "GitVersion: v2.6.1  GitCommit: 634fabe54f9fbbab55d821a83ba93b2d25bdba5f",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "cosign verify-blob --certificate cosign_checksums.txt-keyless.pem --signature cosign_checksums.txt-keyless.sig --certificate-identity keyless@projectsigstore.iam.gserviceaccount.com --certificate-oidc-issuer https://accounts.google.com cosign_checksums.txt",
+      "exit": 0,
+      "duration_s": 1.2,
+      "output_excerpt": "Verified OK",
+      "output_sha256": "80a53f76c7ed6969dade3b6ee47cdb753162db7c00be625448999d08bae77ed8"
+    },
+    {
+      "cmd": "curl -sSL -o syft_1.52.0_checksums.txt(.pem/.sig) [the syft release's own checksums file plus its cosign signature/certificate assets] && cosign verify-blob --certificate syft_1.52.0_checksums.txt.pem --signature syft_1.52.0_checksums.txt.sig --certificate-identity-regexp 'https://github\\.com/anchore/syft/\\.github/workflows/.*\\.ya?ml.*' --certificate-oidc-issuer https://token.actions.githubusercontent.com syft_1.52.0_checksums.txt",
+      "exit": 0,
+      "duration_s": 1.4,
+      "output_excerpt": "Verified OK",
+      "output_sha256": "80a53f76c7ed6969dade3b6ee47cdb753162db7c00be625448999d08bae77ed8"
+    },
+    {
+      "cmd": "curl -sSL -o syft_1.52.0_linux_amd64.tar.gz https://github.com/anchore/syft/releases/download/v1.52.0/syft_1.52.0_linux_amd64.tar.gz && sha256sum syft_1.52.0_linux_amd64.tar.gz && tar -xzf syft_1.52.0_linux_amd64.tar.gz syft -O | sha256sum && sha256sum $(readlink -f $(which syft))",
+      "exit": 0,
+      "duration_s": 2.0,
+      "output_excerpt": "all three sha256 values equal caeedb81fb0491615f1ebd1761e4145d41ee86dd2cc7bf80669f9f5ad9d6133d (tarball) / 15a52d0122953081d16e6695f48055216a4de293bb005948663bb739a63880f9 (extracted binary, matches the already-installed binary exactly)",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "gh attestation verify syft_1.52.0_linux_amd64.tar.gz --repo anchore/syft --format json",
+      "exit": 1,
+      "duration_s": 0.7,
+      "output_excerpt": "Error: HTTP 404: Not Found (https://api.github.com/repos/anchore/syft/attestations/sha256:caeedb81fb0491615f1ebd1761e4145d41ee86dd2cc7bf80669f9f5ad9d6133d?...) -- this call implicitly requested predicate-type https://slsa.dev/provenance/v1 (gh attestation verify's default); the 404 is scoped to that predicate type only, not to attestations for this digest in general",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "FIX ROUND CORRECTION: gh api repos/anchore/syft/attestations/sha256:caeedb81fb0491615f1ebd1761e4145d41ee86dd2cc7bf80669f9f5ad9d6133d (unfiltered by predicate type)",
+      "exit": 0,
+      "duration_s": 0.5,
+      "output_excerpt": "1 attestation returned. DSSE payload predicateType=https://in-toto.io/attestation/release/v0.2, subject list of 31 release assets includes {name: syft_1.52.0_linux_amd64.tar.gz, digest.sha256: caeedb81fb0491615f1ebd1761e4145d41ee86dd2cc7bf80669f9f5ad9d6133d}; certificate SAN https://dotcom.releases.github.com (GitHub's own immutable-release attester identity, not an anchore/syft workflow identity)",
+      "output_sha256": "c77a256e9c54c2490a523cb914f4ed70ad07ac54757eacf78e5f915377bf16df"
+    },
+    {
+      "cmd": "FIX ROUND CORRECTION: gh release verify-asset v1.52.0 syft_1.52.0_linux_amd64.tar.gz --repo anchore/syft --format json",
+      "exit": 0,
+      "duration_s": 0.6,
+      "output_excerpt": "Human-readable form: 'Calculated digest for syft_1.52.0_linux_amd64.tar.gz: sha256:caeedb81...'; 'Resolved tag v1.52.0 to sha1:46d552f9...'; 'Loaded attestation from GitHub API'; '✓ Verification succeeded! syft_1.52.0_linux_amd64.tar.gz is present in release v1.52.0'. JSON form's verificationResult.signature.certificate.subjectAlternativeName is https://dotcom.releases.github.com, verifiedIdentity regexp ^https://dotcom\\.releases\\.github\\.com$, matching the attestation found via gh api above.",
+      "output_sha256": "7ba22194a3a52314c6c45afabb27f1afca980d617b8010ccd60e01d17ad1b9a8"
+    }
+  ],
+  "tool_versions": {"cosign": "2.6.1", "syft": "1.52.0", "gh": "2.101.0"},
+  "installs": [
+    {"name": "cosign", "version": "2.6.1", "prefix": "~/.local/share/codex-ecosystem/tools/cosign-2.6.1-w2", "source_url": "https://github.com/sigstore/cosign/releases/download/v2.6.1/cosign-linux-amd64", "sha256": "064954c5d8c7e3b28188eee5b1727b31c411550bc5fefd41aa672d3c761d103a"}
+  ],
+  "model_calls": [],
+  "result": "Installed cosign v2.6.1 into a new prefix, checksum-verified against its own published checksums file. Used it to verify (a) the cosign_checksums.txt file's own keyless Sigstore signature (Verified OK, signer keyless@projectsigstore.iam.gserviceaccount.com via accounts.google.com -- this is cosign's own release-signing identity, the expected bootstrap-trust anchor for the cosign release itself), and (b) Syft v1.52.0's checksums file signature (Verified OK, signer identity matched the regex for anchore/syft's own GitHub Actions release workflow via token.actions.githubusercontent.com). The syft_1.52.0_linux_amd64.tar.gz tarball's sha256 matched the now-signature-verified checksums file exactly, and extracting it reproduced the exact bytes of the already-installed syft binary (15a52d01...) -- so the previously checksum-only-verified install is now also signature-chain-verified back to anchore/syft's release workflow identity. FIX ROUND CORRECTION: `gh attestation verify` against the syft tarball's exact digest returned a real HTTP 404, but that call implicitly enforces predicate-type https://slsa.dev/provenance/v1 (gh attestation verify's documented default) -- it is a 404 for SLSA build provenance specifically, not evidence of 'no GitHub-native attestation'. The unfiltered `gh api repos/anchore/syft/attestations/sha256:<digest>` endpoint DOES return an attestation for this exact digest: a GitHub-native immutable-release attestation (predicateType https://in-toto.io/attestation/release/v0.2, signer identity https://dotcom.releases.github.com, a GitHub-operated, not anchore/syft-operated, signer -- this is GitHub's platform-level 'this asset really is attached to this release' attestation, distinct in kind from a repo-workflow-signed SLSA build-provenance attestation). `gh release verify-asset v1.52.0 syft_1.52.0_linux_amd64.tar.gz --repo anchore/syft` (the command purpose-built for this predicate type) succeeded: 'Verification succeeded! syft_1.52.0_linux_amd64.tar.gz is present in release v1.52.0'. So a GitHub-native attestation for this exact asset digest does exist and does verify; anchore/syft's tarball has both a verified cosign/Sigstore blob signature (workflow-identity-signed) and a verified GitHub-native release attestation (GitHub-platform-signed) -- two independent, both-passing provenance mechanisms, not one present and one absent. Wider local-scan results for external interpreters and native libraries are recorded in supply-chain-hosted-run-and-wider-syft.json in this same directory, including its own fix-round correction (61 packages found in /usr/lib/python3/dist-packages; the earlier 'only 4 of many native libraries attributed' claim for /usr/lib/x86_64-linux-gnu is corrected there to a scan-scoping artifact, not a Syft blind spot -- see that receipt).",
+  "settles_gap": "partially",
+  "verdict_impact": {
+    "could_change_verdict": true,
+    "direction": "supports_incumbent",
+    "explanation": "Signature verification (the specific missing check named in both gap texts) is now done and passed for the installed Syft release, closing that half of gaps 3 and 9 with native_proven evidence, and is now further supported by an independently verified GitHub-native release attestation for the exact same asset digest (found via unfiltered gh api and verified via gh release verify-asset), which the original run's gh attestation verify call did not surface because it enforces a different predicate type by default. This strengthens, not weakens, the incumbent's provenance posture for gaps 3/9: two independent, passing provenance checks exist for this release asset. The wider-scan half remains only partially settled and its native-library-completeness claim is now recorded as inconclusive in supply-chain-hosted-run-and-wider-syft.json, not supports_incumbent."
+  },
+  "evidence_class": "native_proven",
+  "limitations": [
+    "cosign was installed fresh into a new prefix for this check and used without independently verifying cosign's own release binary against a build-provenance attestation (a bootstrap-trust question: the checksum match plus the fact that cosign's checksums.txt itself carries a valid keyless signature from cosign's known release identity is the trust basis used here, consistent with the sigstore project's own documented verification model, but this is not a third, independent root of trust).",
+    "The GitHub-native release attestation (predicateType release/v0.2) proves this asset is attached to anchore/syft's v1.52.0 GitHub release and is signed by GitHub's own release-attestation identity (dotcom.releases.github.com); it is not a SLSA build-provenance attestation and does not by itself prove which anchore/syft workflow run produced the binary bytes -- that stronger claim is instead supported by the separately verified cosign/Sigstore signature, whose signer identity is scoped to anchore/syft's own release workflow.",
+    "See supply-chain-hosted-run-and-wider-syft.json's limitations for the wider-scan portion (full /usr/lib scan incomplete; native-library coverage measured on one subdirectory only, and the earlier low-attribution claim there is now corrected to inconclusive rather than a demonstrated Syft limitation)."
+  ],
+  "raw_artifacts": [
+    {"path": "<scratch>/cosign_checksums_verify.log", "sha256": "80a53f76c7ed6969dade3b6ee47cdb753162db7c00be625448999d08bae77ed8"},
+    {"path": "<scratch>/syft_checksums_verify.log", "sha256": "80a53f76c7ed6969dade3b6ee47cdb753162db7c00be625448999d08bae77ed8"},
+    {"path": "<scratch>/gh-attestations-release-unfiltered.json", "sha256": "c77a256e9c54c2490a523cb914f4ed70ad07ac54757eacf78e5f915377bf16df"},
+    {"path": "<scratch>/gh-release-verify-asset.json", "sha256": "7ba22194a3a52314c6c45afabb27f1afca980d617b8010ccd60e01d17ad1b9a8"}
+  ]
+}

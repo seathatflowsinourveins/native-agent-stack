@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "id": "socraticode-vs-baselines",
+  "date": "2026-09-23",
+  "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+  "layer_ids": ["semantic-rag"],
+  "gap_refs": [{"layer_id": "semantic-rag", "gap_index": 7}],
+  "purpose": "Score SocratiCode against a scoped rg keyword baseline on the same sealed 35-question set (recall, MRR) with a decoy second-project index, to give the 'comparative recall ... cross-project isolation' gap a first measured comparison instead of no comparison at all.",
+  "preregistered": "Point SocratiCode's own MCP server at the disposable Qdrant instance via QDRANT_URL/QDRANT_MODE=external env vars (never the live 127.0.0.1:16333), with a distinct QDRANT_COLLECTION_PREFIX and a redirected SOCRATICODE_GLOBAL_CONFIG_DIR, keeping LMSTUDIO_URL pointed at the permitted read-only live embedding endpoint. If SocratiCode cannot be pointed at the disposable Qdrant without touching live config, record it as not run and score only rg (and QMD if applicable) on the sealed set. If it can: run codebase_index to completion (poll codebase_status until the index is no longer 'in progress'), then codebase_search for all 35 sealed questions, score Recall@5/MRR with the same line-overlap rule as the embedder-arm benchmark, and additionally index a small decoy second project into the same disposable Qdrant instance and confirm a decoy-project search for agent-lab-specific terms never returns an agent-lab path (cross-project leakage = 0 is the pass condition). QMD (Markdown-only per this project's own scope note) is not expected to score meaningfully on this code-only gold-span set and is recorded as not applicable rather than run as a token gesture.",
+  "commands": [
+    {
+      "cmd": "mcporter --config <disposable mcporter config with QDRANT_URL=http://127.0.0.1:26333, QDRANT_MODE=external, QDRANT_COLLECTION_PREFIX=gapw2rb_, SOCRATICODE_GLOBAL_CONFIG_DIR=<scratch>, LMSTUDIO_URL=http://127.0.0.1:8231/v1 (live, read-only)> list socraticode",
+      "exit": 0,
+      "duration_s": 1,
+      "output_excerpt": "SocratiCode MCP server started successfully against the disposable config; tools codebase_index/codebase_status/codebase_search/codebase_remove/codebase_graph_build enumerated.",
+      "output_sha256": null
+    },
+    {
+      "cmd": "A first attempt via `mcporter call` (one process per call, lifecycle:ephemeral) started codebase_index but the process was torn down before indexing finished, leaving an INTERRUPTED index (0 chunks). Corrected by holding one persistent MCP stdio session open in a small node script (socraticode-session.mjs) that calls codebase_index once, polls codebase_status in a loop until 'in progress'/'INCOMPLETE' text is absent, then runs all 35 codebase_search calls in the same session.",
+      "exit": 0,
+      "duration_s": 27,
+      "output_excerpt": "Corrected run: 'Status: green / Indexed chunks: 1242 / Last operation: Full index -- completed / Files: 113, Chunks: 1242 (took 23.0s) / Code graph: 99 files, 73 edges'. Collection gapw2rb_codebase_72cfa87c5abf confirmed created in the disposable Qdrant (127.0.0.1:26333), never in the live instance (16333, untouched).",
+      "output_sha256": "5246eb0628251b33321f2eabea2dfb5ac75a57c66b8b22872fdd7d7dd9f30879"
+    },
+    {
+      "cmd": "CORRECTED (fix round) DISCLOSURE: a scored run was discarded and not disclosed in the original receipt. Before the persistent-session run reported immediately above, an EARLIER persistent-session run (using an earlier, pre-edit version of socraticode-session.mjs, overwritten in place when the script was fixed and re-run -- the earlier script text itself is not recoverable) held its poll loop open for only 2 status polls (8s elapsed) before exiting the poll loop and proceeding to search 35 sealed questions against a still-building index. That run's own status text read 'Indexed chunks: 643 ... Full index in progress ... Progress: 643/1242 chunks embedded (52%)' at the moment of its last poll (socraticode_session_parsed.json, retained). All 35 codebase_search calls were still issued against that 52%-complete index and produced real, scoreable results.",
+      "exit": 0,
+      "duration_s": 20,
+      "output_excerpt": "Re-scored in the fix round with the same overlap rule used throughout this unit: recall_at_5=0.4857142857142857 (17/35 hits), mrr=0.37857142857142856. This run was superseded because the index was demonstrably incomplete (52%) when searched, which is a legitimate reason to treat it as not the intended measurement -- but the original receipt disclosed only the earlier, separate mcporter/ephemeral failure (0 chunks, no scoreable results) and omitted this later, actually-scored, materially different (17/35 vs 30/35) run entirely. It is disclosed here rather than silently dropped; it was NOT re-run again to try to change this number, and the reported gap-7 result below uses only the corrected/completed-index run's 30/35, exactly as originally reported.",
+      "output_sha256": "19bf05509ea539ca0f67335b6af1ee97616a285f9668666e259194034fd7a428"
+    },
+    {
+      "cmd": "35x codebase_search (one per sealed question, limit 5) against the completed index, scored with the same line-overlap rule and script logic as the embedder-arm benchmark",
+      "exit": 0,
+      "duration_s": 20,
+      "output_excerpt": "recall_at_5=0.8571428571428571 (30/35 hits), mrr=0.7214285714285713",
+      "output_sha256": "968c80306fec4dde24e429a4733310b5eef22f485d202ca7b253125c7c0434b9"
+    },
+    {
+      "cmd": "python3 rg_baseline.py: for each sealed question, extract salient keywords, `rg -n -i` over the same include dirs, take the first 5 distinct hits in rg's own ranking order as top-5, score with the same overlap rule",
+      "exit": 0,
+      "duration_s": 3,
+      "output_excerpt": "recall_at_5=0.5714285714285714 (20/35 hits), mrr=0.2885714285714286",
+      "output_sha256": "efe30a497fec00006f11a6b15e21738a2aed7adabd614d8629439f69f17b8b7a"
+    },
+    {
+      "cmd": "Decoy second-project isolation check: create a tiny unrelated decoy project (one file, widget.py, kitchen-inventory functions unrelated to agent-lab), index it into the SAME disposable Qdrant via a second persistent session, then search the DECOY project for agent-lab-specific terms (extractReturnObject, scoreCompleteness, usageCompleteness, layer verdict extraction)",
+      "exit": 0,
+      "duration_s": 4,
+      "output_excerpt": "Decoy indexed into its own separate collection (gapw2rb_codebase_f12369ea51ac, distinct from agent-lab's gapw2rb_codebase_72cfa87c5abf). The agent-lab-specific-term search against the decoy project returned exactly 1 match: the decoy's own widget.py -- zero agent-lab paths leaked into the decoy project's results.",
+      "output_sha256": null
+    },
+    {
+      "cmd": "qmd collection list",
+      "exit": 0,
+      "duration_s": 1,
+      "output_excerpt": "'No collections found.' QMD is documented (AGENTS.md) as scoped Markdown retrieval; this sealed set's 35 gold spans are all in .py/.mjs/.js code files, none in .md, so QMD is not applicable to this particular gold-span set and was not run as a baseline (would trivially score at or near 0 by construction, not a meaningful comparison).",
+      "output_sha256": null
+    }
+  ],
+  "tool_versions": {
+    "socraticode": "1.14.0",
+    "mcporter": "0.13.13",
+    "qdrant": "1.19.1 (pinned, disposable instance shared with the other two checks in this unit)",
+    "rg": "system ripgrep"
+  },
+  "installs": [],
+  "model_calls": [],
+  "result": "On this sealed 35-question set: SocratiCode Recall@5=0.857 (30/35), MRR=0.721 (from the completed-index run; an earlier, now-disclosed run against a 52%-complete index scored 0.486/0.379 and was superseded, not silently dropped -- see commands above and CORRECTED notes below). Scoped rg-keyword baseline Recall@5=0.571 (20/35), MRR=0.289. CORRECTED (fix round): the original claim that 'SocratiCode meaningfully outperforms the literal rg baseline' overstates what this specific comparison establishes. rg_baseline.py ranks its top-5 by rg's own file-traversal order (no --sort, no relevance ranking) over the first 5 hits of at most 6 keyword queries, not by any notion of definition-site or relevance; a large majority of the 35 sealed questions additionally name the exact identifier defined at (or near) the gold span (see held-out-recall-benchmark.json's corrected limitations for the count check), which a keyword search should trivially find if the ranking heuristic surfaced the right file first. The measured gap (0.857/0.721 vs 0.571/0.289) is real and reproducible from the retained raw artifacts, but is at least partly attributable to this baseline's weak ranking heuristic rather than solely to a fundamental limit of scoped literal search -- so it should be read as 'SocratiCode beat this specific, not-relevance-ranked rg heuristic', not as an established general claim that SocratiCode outperforms scoped literal search per se. Cross-project isolation held in the one decoy trial run (0 leaked hits out of 1 decoy-project result; each project gets its own Qdrant collection by construction). QMD was assessed as not applicable to this code-only gold-span set, not run as a baseline. SocratiCode's own Recall@5/MRR (0.857/0.721) sit between the rg baseline (0.571/0.289) and the raw incumbent-embedder-direct benchmark (0.971/0.853 for the same questions against the same corpus with 2x the chunk density, no reranking-vs-raw-vector difference, and no code-graph overhead) -- the gap between SocratiCode and the raw-embedding arm A is plausibly attributable to SocratiCode's own chunking/graph/reranking pipeline differing from this benchmark's fixed 20-line chunker, not to a worse embedding model (it uses the same Nemotron-3-Embed-1B endpoint); this attribution is not independently verified here.",
+  "settles_gap": "partially",
+  "verdict_impact": {
+    "could_change_verdict": true,
+    "direction": "inconclusive",
+    "explanation": "CORRECTED (fix round): downgraded from 'supports_incumbent' to 'inconclusive' for the comparative-recall claim specifically. Gives gap 7 its first measured recall/MRR/leakage numbers instead of none, and the one decoy-isolation trial genuinely supports zero cross-project leakage by construction (that narrow finding stays supported). But the comparative 'SocratiCode > rg' recall/MRR direction rests on a literal-match baseline (rg_baseline.py) that ranks hits by unordered file-traversal position rather than relevance, against a question set where most questions name the gold span's own defined identifier -- so a stronger, relevance- or definition-aware literal baseline could plausibly close some or all of the measured gap, and this check alone does not establish that SocratiCode outperforms scoped literal search in general. It does NOT settle 'grounded answer accuracy ... latency or resource superiority' against a broader baseline set (QMD was not applicable here; only one decoy-isolation trial was run, not a stress test)."
+  },
+  "evidence_class": "native_proven",
+  "limitations": [
+    "One decoy-project trial only, not an adversarial or larger-scale leakage stress test.",
+    "QMD was not run (assessed as not applicable to a code-only gold-span set); the gap's 'rg/QMD baselines' language is only half-covered by measured evidence.",
+    "CORRECTED (fix round): rg baseline uses a simple keyword-extraction heuristic (longest non-stopword identifiers) AND ranks its top-5 by unordered rg file-traversal position, not by relevance or definition-site proximity, and has no --sort flag so its own ordering is not guaranteed stable; combined with most sealed questions naming the gold span's own defined identifier, this makes it a weak (strawman) baseline for a 'SocratiCode outperforms literal search' claim specifically, though the raw recall/MRR numbers themselves are accurately reported and reproducible.",
+    "SocratiCode's pipeline (chunking, code graph, hybrid ranking) differs from this benchmark's own fixed chunker, so this receipt cannot isolate whether SocratiCode's edge over rg comes from its embedding model, its chunking, or its graph/reranking.",
+    "Grounded-answer-accuracy and latency/resource-superiority claims named in the gap text were not scored in this check.",
+    "CORRECTED (fix round): a scored, discarded first SocratiCode session run (searched all 35 questions against a 52%-complete index, 17/35 hits, MRR 0.379) was not disclosed in the original receipt; it is now recorded explicitly in commands[] and raw_artifacts[] below. It was legitimately superseded (the index was incomplete when searched) but should have been disclosed rather than omitted; the reported 30/35 / MRR 0.721 result is unchanged and was not re-run again in this fix round.",
+    "CORRECTED (fix round): the 'preregistered' field's text in this receipt was finalized when this receipt file was written (after all commands, including both SocratiCode runs and the rg baseline, had already completed), not independently timestamped before the runs beyond the shared question-set seal (blueprints/gap-wave2-20260923/rag-bench-eval/questions.json, sealed 2026-09-23T00:42:37Z); it should be read as this unit's contemporaneous restatement of intent, not ex-ante preregistration."
+  ],
+  "raw_artifacts": [
+    {"path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/raw/socraticode_eval.json", "sha256": "968c80306fec4dde24e429a4733310b5eef22f485d202ca7b253125c7c0434b9"},
+    {"path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/raw/socraticode_session_raw.json", "sha256": "30c6708bde85e61dcc562d5d7ef26f1f3619a22366e7616ed97d6b1b4cf186ce"},
+    {"path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/raw/rg_keyword_baseline_eval.json", "sha256": "efe30a497fec00006f11a6b15e21738a2aed7adabd614d8629439f69f17b8b7a"},
+    {"path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/raw/socraticode_decoy_leakage_check.txt", "sha256": "9fc4c7a752fa4069a3b7d339b0e17e50b1be32c61cd458866dbc8c9f33442249"},
+    {"path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/raw/socraticode_eval_discarded_first_run.json", "sha256": "19bf05509ea539ca0f67335b6af1ee97616a285f9668666e259194034fd7a428"}
+  ]
+}

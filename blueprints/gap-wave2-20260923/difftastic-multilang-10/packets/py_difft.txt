@@ -1,0 +1,6 @@
+fixtures/py_after.py --- Python
+1 def is_allowed(age, has_permit):  1 def is_allowed(age, has_permit):
+2     if age > 18:                  2     if age >= 18:
+3         return True               3         return True
+4     return has_permit             4     return has_permit
+

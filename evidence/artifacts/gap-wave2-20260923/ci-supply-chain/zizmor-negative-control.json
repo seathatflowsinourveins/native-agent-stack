@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "id": "zizmor-negative-control",
+  "date": "2026-09-23",
+  "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+  "layer_ids": ["ci-supply-chain"],
+  "gap_refs": [{"layer_id": "ci-supply-chain", "gap_index": 0}],
+  "purpose": "Add a retained negative-control fixture that proves zizmor's excessive-permissions audit actually fires against real over-broad workflow permissions, rather than relying only on configuration and source review (docs/catalog-provenance.md lines 20-24; automation.json line 254). FIX ROUND CORRECTION (2026-09-23): the original receipt generalized from a single-job fixture (whose one job declares its own permissions block) that zizmor's excessive-permissions audit is pedantic-only and that the repository's regular-persona CI 'would not itself catch a real excessive-permissions regression'. This revision adds a second, multi-job fixture (no job declares its own permissions) and shows excessive-permissions DOES fire under --persona regular for that shape, narrowing the claim to the specific fixture shape it was actually tested on. This is a corrected/extended procedure, run once with a new preregistration below; the original single-job result was not re-run or altered.",
+  "preregistered": "If zizmor run offline against a fixture declaring `permissions: write-all` plus a needless job-level `contents: write` produces a finding with ident excessive-permissions and High severity, that settles gap 0 in the supports_incumbent direction (the analyzer genuinely detects over-broad permissions, not just template-injection/unpinned-uses as the existing retained receipts show). If no such finding appears, or the fixture is rejected/errors, that refutes readiness and would change the verdict the other way. A secondary check preregistered before running: the excessive-permissions audit is gated behind --persona pedantic (not the --persona regular used by every other zizmor test in this repository), so a control run at --persona regular against the same fixture is expected to NOT show excessive-permissions; if it did show it under regular persona, that would mean the existing regular-persona test suite was already implicitly covering this and the gap would already have been closed by prior evidence, which is not the case per gap text.",
+  "commands": [
+    {
+      "cmd": "env -u GH_TOKEN -u GITHUB_TOKEN -u ZIZMOR_GITHUB_TOKEN zizmor --offline --no-config --no-ignores --no-progress --persona pedantic --strict-collection --format json --cache-dir <scratch>/cache blueprints/gap-wave2-20260923/zizmor-negative-control/negative-control.yml.txt (copied to a temp path as negative-control.yml, per test harness)",
+      "exit": 13,
+      "duration_s": 0.15,
+      "output_excerpt": "[{\"ident\": \"excessive-permissions\", \"desc\": \"overly broad permissions\", \"determinations\": {\"confidence\": \"High\", \"severity\": \"High\", \"persona\": \"Pedantic\"}, \"locations\": [{\"symbolic\": {\"annotation\": \"uses write-all permissions\", ...}, \"concrete\": {\"feature\": \"permissions: write-all\"}}]}]",
+      "output_sha256": "manually inspected via python3 -c json.load; see tests/test_zizmor_negative_control.py assertions for the exact machine-checked shape"
+    },
+    {
+      "cmd": "cd ~/code/nas-wt-w2-ci-supply-chain && python3 -m unittest tests.test_zizmor_negative_control -v (original 3-test run, retained for provenance; the FIX ROUND run below adds a 4th test and supersedes this count)",
+      "exit": 0,
+      "duration_s": 0.14,
+      "output_excerpt": "test_fixture_declares_write_all_and_a_needless_job_level_grant ... ok\ntest_negative_control_triggers_excessive_permissions_finding ... ok\ntest_regular_persona_does_not_surface_excessive_permissions ... ok\n\nRan 3 tests in 0.136s\n\nOK",
+      "output_sha256": "0163636549b910a68f2b92f8254ba90b912fecbd443da1b6aba406671387ebdd"
+    },
+    {
+      "cmd": "FIX ROUND CORRECTION, preregistered: if a second fixture with `permissions: write-all` at workflow level, two jobs, and NO job declaring its own permissions block, shows excessive-permissions under --persona regular, that refutes the generalized claim that this audit is pedantic-only / that regular-persona CI could not catch a real regression, and narrows it to the single-job-with-own-permissions fixture shape instead. blueprints/gap-wave2-20260923/zizmor-negative-control/multi-job-no-job-permissions.yml.txt (2 jobs, build/deploy, neither declares job-level permissions): env -u GH_TOKEN -u GITHUB_TOKEN -u ZIZMOR_GITHUB_TOKEN zizmor --offline --no-config --no-ignores --no-progress --persona regular --strict-collection --format json --cache-dir <scratch>/cache2 multi-job-no-job-permissions.yml",
+      "exit": 14,
+      "duration_s": 0.1,
+      "output_excerpt": "2 findings: artipacked (Regular, Medium/Low), excessive-permissions (Regular persona, confidence High, severity High, annotation 'uses write-all permissions', route ['permissions'], feature 'permissions: write-all') -- excessive-permissions DID fire under --persona regular for this fixture shape",
+      "output_sha256": "b7aa166724ff3023cbee1112592522d6ba2cd90a78c4942882d61e661c0498d6"
+    },
+    {
+      "cmd": "New test test_multi_job_fixture_triggers_under_regular_persona added to tests/test_zizmor_negative_control.py, asserting the multi-job fixture's excessive-permissions finding under --persona regular; cd ~/code/nas-wt-w2-ci-supply-chain && python3 -m unittest tests.test_zizmor_negative_control -v",
+      "exit": 0,
+      "duration_s": 0.23,
+      "output_excerpt": "test_fixture_declares_write_all_and_a_needless_job_level_grant ... ok\ntest_multi_job_fixture_triggers_under_regular_persona ... ok\ntest_negative_control_triggers_excessive_permissions_finding ... ok\ntest_regular_persona_does_not_surface_excessive_permissions ... ok\n\nRan 4 tests in 0.225s\n\nOK",
+      "output_sha256": "459ccdecf53e0b8a16a454fe8488d0ae014c3cb853a20593bb8e544b086c8b37"
+    }
+  ],
+  "tool_versions": {"zizmor": "1.30.1"},
+  "installs": [],
+  "model_calls": [],
+  "result": "New fixture blueprints/gap-wave2-20260923/zizmor-negative-control/negative-control.yml.txt declares workflow-level `permissions: write-all` and a needless job-level `contents: write` on its single job. Running zizmor offline at --persona pedantic against this fixture produces an excessive-permissions finding (confidence High, severity High, annotation 'uses write-all permissions', feature 'permissions: write-all') with exit code 13. The new test tests/test_zizmor_negative_control.py asserts this finding's ident, severity and annotation content, and additionally asserts that the same fixture under --persona regular produces zero excessive-permissions findings. All 3 new tests pass. FIX ROUND CORRECTION: the original receipt generalized this single fixture's pedantic-only downgrade into a general claim that excessive-permissions is a pedantic-only audit and that 'the repository's regular-persona CI scan would not itself catch a real excessive-permissions regression'. A second fixture (blueprints/gap-wave2-20260923/zizmor-negative-control/multi-job-no-job-permissions.yml.txt: same workflow-level `permissions: write-all`, two jobs, neither declaring its own job-level permissions block) was built and run under --persona regular; excessive-permissions DID fire for this shape (confidence High, severity High, same annotation, exit code 14). So the pedantic-only downgrade is a property of the original fixture's specific shape (a single job that declares its own permissions block appears to suppress or downgrade the workflow-level finding under regular persona), not a general property of the excessive-permissions audit. The generalized claim about the repository's regular-persona CI is retracted; whether it would catch a real excessive-permissions regression depends on the shape of the affected workflow (specifically, whether every job in it declares its own permissions block), which was not separately audited across .github/workflows here.",
+  "settles_gap": true,
+  "verdict_impact": {
+    "could_change_verdict": true,
+    "direction": "supports_incumbent",
+    "explanation": "Directly demonstrates zizmor's excessive-permissions audit fires on genuinely over-broad permissions with real, retained, re-runnable native execution across two fixture shapes, closing the gap between the scoped-permissions claim (previously configuration/source-review only) and actual analyzer behavior. The persona-gating behavior is more nuanced than originally reported: excessive-permissions fires under --persona regular for a multi-job fixture where no job declares its own permissions, and is downgraded to --persona pedantic only when a job in the fixture declares its own (narrower) permissions block, which likely reads as the workflow author having already scoped that job explicitly. This means the repository's regular-persona CI zizmor scan (validate.yml) would in fact catch an excessive-permissions regression in most real multi-job workflows, unless every affected job also declares its own permissions block."
+  },
+  "evidence_class": "native_proven",
+  "limitations": [
+    "The persona-downgrade mechanism was probed with exactly two fixture shapes (single job declaring its own permissions vs. two jobs where neither declares permissions); zizmor's actual internal rule for when excessive-permissions is downgraded to pedantic was not read from source, only inferred from these two observed behaviors, so edge cases (e.g. a multi-job workflow where only one of several jobs declares permissions) remain untested.",
+    "Only one over-permission pattern (write-all plus a needless job-level contents: write, and separately write-all with no job-level permissions) was tested; zizmor's excessive-permissions audit may have other trigger conditions (e.g. specific named scopes like `packages: write` without use) not exercised here.",
+    "This does not audit whether any of the repository's actual .github/workflows/*.yml files have the fixture-1 shape (workflow-level over-broad permissions plus every job declaring its own permissions) that would still only be caught under pedantic persona; that would require a separate pass over the real workflow files, out of scope for this check."
+  ],
+  "raw_artifacts": [
+    {"path": "<scratch>/multi-job-regular-persona-result.json", "sha256": "b7aa166724ff3023cbee1112592522d6ba2cd90a78c4942882d61e661c0498d6"}
+  ]
+}

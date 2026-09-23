@@ -1,0 +1,14 @@
+name: Multi-job excessive-permissions probe (never executed)
+on: push
+permissions: write-all
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v4
+      - run: echo build
+  deploy:
+    runs-on: ubuntu-24.04
+    needs: build
+    steps:
+      - run: echo deploy

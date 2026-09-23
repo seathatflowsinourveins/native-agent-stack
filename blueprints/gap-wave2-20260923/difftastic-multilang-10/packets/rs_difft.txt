@@ -1,0 +1,10 @@
+fixtures/rs_after.rs --- Rust
+2 2     if value > max {
+3 3         return max;
+4 4     }
+. 5     if value < 0 {
+. 6         return 0;
+. 7     }
+5 8     value
+6 9 }
+

@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "id": "supply-chain-hosted-run-and-wider-syft",
+  "date": "2026-09-23",
+  "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+  "layer_ids": ["ci-supply-chain"],
+  "gap_refs": [{"layer_id": "ci-supply-chain", "gap_index": 2}],
+  "purpose": "Record a hosted run ID for supply-chain.yml's sbom-vuln job (gap text claimed none existed) and widen local Syft inventory coverage beyond the single runtime-venv prefix scanned in the retained baseline receipt (blueprints/us-equities/supply-chain/scan-nautilus-rc5-20260922/receipt.json: 21 runtime-venv packages + 2 adapter-directory packages). FIX ROUND CORRECTION (2026-09-23): the original result claimed Syft's inventory is 'largely blind to native libraries lacking package-manager metadata', but /usr/lib/x86_64-linux-gnu was scanned with `syft scan dir:...`, which excludes /var/lib/dpkg/status (present on this host) from the scan target and so denies Syft its normal deb-package attribution path for that directory; the low attribution count is a scoping artifact of the check, not a demonstrated Syft limitation. This revision corrects that claim and its direction; no command was re-run to get a different outcome.",
+  "preregistered": "If gh run list shows at least one completed hosted run of supply-chain.yml's sbom-vuln job with a recorded run ID and success conclusion, that settles the first half of gap 2 (no recorded run ID) in the supports_incumbent direction. Running syft against additional host prefixes (system dist-packages, native-library directory) and comparing package counts to the single-prefix baseline (21+2=23 packages) either finds materially more inventory (supporting the incumbent's implicit assumption that a wider scan would mostly be redundant) or reveals categories of software the baseline scan structurally cannot see (refuting completeness and requiring a limitations note either way).",
+  "commands": [
+    {
+      "cmd": "gh run list --repo seathatflowsinourveins/native-agent-stack --workflow supply-chain.yml --limit 10",
+      "exit": 0,
+      "duration_s": 0.6,
+      "output_excerpt": "10 most recent runs, most recent [ok] 35799579095 ... [ok] 35744150104, all conclusion=success",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "gh run view 35799579095 --repo seathatflowsinourveins/native-agent-stack --json headSha,headBranch,event,createdAt,conclusion,jobs",
+      "exit": 0,
+      "duration_s": 0.5,
+      "output_excerpt": "conclusion=success, headBranch=main, headSha=8889cf0f019d0a02123e9dc9296d624869e737a6, event=push, job 'sbom-vuln' databaseId=106986593903 conclusion=success",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "syft scan dir:/usr/lib/python3/dist-packages -o json=<scratch>/usr-dist-packages.syft.json -o spdx-json=<scratch>/usr-dist-packages.spdx.json",
+      "exit": 0,
+      "duration_s": 4.2,
+      "output_excerpt": "61 artifacts found (python-type packages: attrs, automat, babel, bcrypt, cryptography, dbus-python, distro, cloud-init, ...)",
+      "output_sha256": "0f0bc4d25460b1792dd24a4ecc05836835e78824d4db5b1c7480431cf2603ade"
+    },
+    {
+      "cmd": "syft scan dir:/usr/lib/x86_64-linux-gnu -o json=<scratch>/usr-lib-x86_64.syft.json",
+      "exit": 0,
+      "duration_s": 6.8,
+      "output_excerpt": "4 artifacts found: gcc-14 (deb), libzstd (deb), systemd (deb), python (binary, version string embedded)",
+      "output_sha256": "de78e2dddbd3fec1c49d058a08721ac0e11a60ca9ab67d9364fce5ad6059939f"
+    },
+    {
+      "cmd": "timeout 280 ecosystem-bounded-run syft scan dir:/usr/lib -o json=<scratch>/usr-lib-full.syft.json",
+      "exit": 143,
+      "duration_s": 280,
+      "output_excerpt": "Terminated (background command killed by its 280s timeout, empty output file; the full 11G /usr/lib directory was too large to complete a full recursive scan within budget)",
+      "output_sha256": "n/a (empty file, deleted)"
+    },
+    {
+      "cmd": "FIX ROUND CORRECTION: verify whether the 4 of ~1240 .so-file attribution count reflects an absence of package-manager metadata, or a scan-scoping artifact. python3 -c to confirm each artifact's foundBy (elf-binary-package-cataloger / binary-classifier-cataloger) in usr-lib-x86_64.syft.json; ls -la /var/lib/dpkg/status (host dpkg database presence); find /usr/lib/x86_64-linux-gnu -maxdepth 1 -name '*.so*' -type f | wc -l (total .so file count, measured not estimated); then a random sample of 30 of those files (shuf --random-source=<(yes 42) -n 30) checked with `dpkg -S <file>` each",
+      "exit": 0,
+      "duration_s": 1.5,
+      "output_excerpt": "usr-lib-x86_64.syft.json's 3 deb artifacts (gcc-14, libzstd, systemd) all have foundBy=elf-binary-package-cataloger, and the 1 binary artifact (python) has foundBy=binary-classifier-cataloger; /var/lib/dpkg/status exists (605997 bytes, present on this host); /usr/lib/x86_64-linux-gnu contains 1240 .so* files (measured, not estimated); of a random 30-file sample, 30/30 (100%) are owned by a dpkg package per `dpkg -S`",
+      "output_sha256": "e9dc25f5bf8a84fc2f4bb41ec742aa96410d93952c5fcba1a4f32ffcfabf6a68"
+    }
+  ],
+  "tool_versions": {"gh": "2.101.0", "syft": "1.52.0"},
+  "installs": [],
+  "model_calls": [],
+  "result": "A hosted run of supply-chain.yml's sbom-vuln job exists and succeeded: run 35799579095 (headSha 8889cf0f019d0a02123e9dc9296d624869e737a6, event push, job databaseId 106986593903, conclusion success), among 10 recent successful runs -- the gap's premise that no run ID was recorded is now settled with a concrete run ID. For local Syft coverage: scanning /usr/lib/python3/dist-packages (the Debian-managed system Python 3.12 site-packages, an external interpreter the baseline runtime-venv scan does not cover) found 61 packages, roughly 2.7x the baseline's combined 23. Scanning /usr/lib/x86_64-linux-gnu (525M of native shared libraries) found only 4 artifacts via `syft scan dir:/usr/lib/x86_64-linux-gnu`: 3 dpkg-attributed packages (gcc-14, libzstd, systemd, all via foundBy=elf-binary-package-cataloger) and one binary-classifier match (an embedded 'python' version string), against 1240 measured .so* files in that directory. FIX ROUND CORRECTION: this low count is NOT evidence that these native libraries lack package-manager metadata -- the host's /var/lib/dpkg/status exists (605997 bytes) and a random 30-file sample of the same directory's .so files is 30/30 (100%) dpkg-owned per `dpkg -S`. `syft scan dir:<path>` scopes its scan root to exactly the given directory, so scanning dir:/usr/lib/x86_64-linux-gnu structurally excludes /var/lib/dpkg/status from the scan and denies Syft its normal deb-manifest attribution path for that directory's files; elf-binary-package-cataloger only recovers the few packages whose binaries carry embedded ELF package notes. The low attribution count is a scoping artifact of how this check invoked syft, not a demonstrated blind spot in Syft's native-library cataloging when package-manager metadata is actually reachable. A full recursive scan of /usr/lib (11G total), which would have included /var/lib/dpkg only if the scan root were raised to include it (it is not under /usr/lib), was attempted but exceeded a 280s bounded timeout and was terminated without output; whether a correctly-scoped scan (root including both the library directory and /var/lib/dpkg) would achieve near-complete attribution was not directly tested here and remains open.",
+  "settles_gap": "partially",
+  "verdict_impact": {
+    "could_change_verdict": true,
+    "direction": "inconclusive",
+    "explanation": "Settles the 'no recorded run ID' half of the gap outright with a concrete, verifiable run (supports_incumbent for that half). The wider-scan/native-library-completeness half is now inconclusive, not supports_incumbent: the check's own low attribution count for /usr/lib/x86_64-linux-gnu does not demonstrate a Syft coverage gap, because the scan invocation used (`syft scan dir:/usr/lib/x86_64-linux-gnu`) structurally excludes the dpkg database that a corrected sample check shows 100% of a random 30-file sample from that same directory is actually registered under. Whether Syft would attribute most of these libraries under a scan rooted to include both the library directory and /var/lib/dpkg was not tested (the only broader attempt, scanning all of /usr/lib, timed out). Gap 9's completeness concern is therefore neither confirmed nor refuted by this check as executed."
+  },
+  "evidence_class": "native_proven",
+  "limitations": [
+    "The full /usr/lib recursive scan (11G) did not complete within the 280s bounded timeout used here; whole-directory native-library coverage remains untested beyond the /usr/lib/x86_64-linux-gnu subdirectory (525M) and /usr/lib/python3.12 (27M, 0 artifacts -- it is the stdlib, not a site-packages directory) sampled here.",
+    "The corrected dpkg-ownership check (30-file random sample, 100% dpkg-owned) establishes that package-manager metadata exists for these native libraries on this host; it does not directly measure what a correctly-scoped Syft scan (one whose root includes /var/lib/dpkg alongside the library directory) would actually attribute -- that scan was not run, so the true native-library attribution rate under a corrected invocation remains unmeasured, not merely assumed to be high.",
+    "supply-chain.yml's schedule trigger (cron weekly) and dispatch were not used to force a fresh run for this check; the existing most-recent push-triggered run (35799579095, 2026-09-22) was used as the recorded run ID since one already existed, avoiding an unnecessary duplicate hosted run."
+  ],
+  "raw_artifacts": [
+    {"path": "<scratch>/usr-dist-packages.syft.json", "sha256": "0f0bc4d25460b1792dd24a4ecc05836835e78824d4db5b1c7480431cf2603ade"},
+    {"path": "<scratch>/usr-lib-x86_64.syft.json", "sha256": "de78e2dddbd3fec1c49d058a08721ac0e11a60ca9ab67d9364fce5ad6059939f"},
+    {"path": "<scratch>/so-sample-dpkg-ownership.txt", "sha256": "e9dc25f5bf8a84fc2f4bb41ec742aa96410d93952c5fcba1a4f32ffcfabf6a68"}
+  ]
+}

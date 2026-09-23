@@ -11,6 +11,7 @@ from decimal import Decimal
 from pathlib import Path
 import tempfile
 import unittest
+import uuid
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -26,10 +27,15 @@ def _load(name, path):
 
 CONVERT = _load("spy_parity_convert", SOURCE / "convert.py")
 FIXTURE = _load("spy_parity_fixture", SOURCE / "fixture_strategy.py")
+DISTRIBUTION = _load("spy_parity_distribution", SOURCE / "distribution_module.py")
 COMPARE = _load("spy_parity_compare", SOURCE / "compare.py")
 RUN = _load("spy_parity_run", SOURCE / "run.py")
 TOLERANCES = json.loads((SOURCE / "tolerances.json").read_text())["limits"]
 MANIFEST = json.loads((SOURCE / "mapping-manifest.json").read_text())
+MANIFEST_V2 = json.loads((SOURCE / "mapping-manifest-v2.json").read_text())
+EFFECTIVE_V2 = COMPARE.effective_manifest(MANIFEST_V2, MANIFEST)
+RECEIPT_V2 = SOURCE / "receipt-v2.json"
+VERDICT_V2 = SOURCE / "verdict-v2.json"
 LEAN_RECEIPT = ROOT / "blueprints/us-equities/historical-simulation/receipt.json"
 
 
@@ -664,15 +670,37 @@ class OracleSchemaTests(unittest.TestCase):
             COMPARE.oracle_case({"cases": [case]}, "one_zero")
 
 
+def _rebound_to_current_harness(receipt):
+    """The published receipt with its harness hashes replaced by the files on disk.
+
+    The published receipt-v2.json ran the f079f6c harness, which the 2026-09-23
+    pre-run review round changed; V2PublishedResultTests pins exactly which files
+    differ. The binding machinery is exercised against a copy rebound to the
+    current files, never by editing the published receipt.
+    """
+    receipt = json.loads(json.dumps(receipt))
+    for name in receipt["local_source_sha256"]:
+        receipt["local_source_sha256"][name] = hashlib.sha256((SOURCE / name).read_bytes()).hexdigest()
+    return receipt
+
+
 class BindingTests(unittest.TestCase):
+    """Binding checks against the published v2 receipt (rebound) and the files on disk.
+
+    The v1 receipt stays bound to the pre-v2 harness; see V1ReceiptProvenanceTests.
+    """
+
+    MANIFEST_PATH = SOURCE / "mapping-manifest-v2.json"
+
     def setUp(self):
-        self.receipt = json.loads((SOURCE / "receipt.json").read_text())
+        self.receipt = _rebound_to_current_harness(json.loads(RECEIPT_V2.read_text()))
 
     def test_bind_accepts_the_files_the_receipt_recorded(self):
-        limits, manifest = COMPARE.bind(self.receipt, SOURCE / "tolerances.json",
-                                        SOURCE / "mapping-manifest.json")
+        limits, manifest = COMPARE.bind(self.receipt, SOURCE / "tolerances.json", self.MANIFEST_PATH)
         self.assertEqual(set(limits), set(COMPARE.REQUIRED_LIMITS))
         self.assertEqual(manifest["case"], "one_zero")
+        # The effective manifest carries v1's unchanged rows, so short sessions resolve.
+        self.assertEqual(COMPARE.known_short_sessions(manifest), {"2019-12-24": 4})
 
     def test_bind_refuses_a_sheet_or_manifest_the_run_did_not_use(self):
         for key, code in (("tolerances", "tolerances_sha256_mismatch"),
@@ -680,20 +708,25 @@ class BindingTests(unittest.TestCase):
             receipt = json.loads(json.dumps(self.receipt))
             receipt[key]["sha256"] = "0" * 64
             with self.subTest(key=key), self.assertRaisesRegex(ValueError, code):
-                COMPARE.bind(receipt, SOURCE / "tolerances.json", SOURCE / "mapping-manifest.json")
+                COMPARE.bind(receipt, SOURCE / "tolerances.json", self.MANIFEST_PATH)
+
+    def test_a_v2_receipt_is_refused_against_the_v1_manifest(self):
+        receipt = json.loads(json.dumps(self.receipt))
+        receipt["mapping_manifest"]["sha256"] = hashlib.sha256(
+            (SOURCE / "mapping-manifest.json").read_bytes()).hexdigest()
+        with self.assertRaisesRegex(ValueError, "v2_receipt_bound_to_a_v1_manifest"):
+            COMPARE.bind(receipt, SOURCE / "tolerances.json", SOURCE / "mapping-manifest.json")
 
     def test_bind_pins_the_lean_oracle_receipt(self):
         oracle = ROOT / "blueprints/us-equities/historical-simulation/receipt.json"
         self.assertEqual(hashlib.sha256(oracle.read_bytes()).hexdigest(),
-                         MANIFEST["oracle"]["receipt_sha256"])
-        COMPARE.bind(self.receipt, SOURCE / "tolerances.json",
-                     SOURCE / "mapping-manifest.json", oracle)
+                         MANIFEST_V2["oracle"]["receipt_sha256"])
+        COMPARE.bind(self.receipt, SOURCE / "tolerances.json", self.MANIFEST_PATH, oracle)
         with tempfile.TemporaryDirectory() as tmp:
             other = Path(tmp) / "receipt.json"
             other.write_text(oracle.read_text() + "\n")
             with self.assertRaisesRegex(ValueError, "oracle_receipt_sha256_mismatch"):
-                COMPARE.bind(self.receipt, SOURCE / "tolerances.json",
-                             SOURCE / "mapping-manifest.json", other)
+                COMPARE.bind(self.receipt, SOURCE / "tolerances.json", self.MANIFEST_PATH, other)
 
     def test_bind_refuses_a_receipt_that_disagrees_with_the_manifest(self):
         cases = {
@@ -706,7 +739,20 @@ class BindingTests(unittest.TestCase):
             receipt = json.loads(json.dumps(self.receipt))
             receipt.update(override)
             with self.subTest(code=code), self.assertRaisesRegex(ValueError, code):
-                COMPARE.bind(receipt, SOURCE / "tolerances.json", SOURCE / "mapping-manifest.json")
+                COMPARE.bind(receipt, SOURCE / "tolerances.json", self.MANIFEST_PATH)
+
+    def test_bind_refuses_a_superseded_manifest_that_is_not_the_recorded_v1(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            (Path(tmp) / "mapping-manifest.json").write_text(
+                (SOURCE / "mapping-manifest.json").read_text() + "\n")
+            with self.assertRaisesRegex(ValueError, "superseded_manifest_sha256_mismatch"):
+                COMPARE.load_effective_v2(MANIFEST_V2, Path(tmp))
+
+    def test_bind_requires_every_v2_source_to_be_recorded(self):
+        receipt = json.loads(json.dumps(self.receipt))
+        del receipt["local_source_sha256"]["distribution_module.py"]
+        with self.assertRaisesRegex(ValueError, "local_source_not_recorded:distribution_module.py"):
+            COMPARE.bind(receipt, SOURCE / "tolerances.json", self.MANIFEST_PATH)
 
     def test_bind_verifies_the_harness_files_on_disk(self):
         COMPARE.check_local_sources(self.receipt)
@@ -725,17 +771,37 @@ class BindingTests(unittest.TestCase):
     def test_bind_pins_the_frozen_plan_and_case_configuration(self):
         plan = ROOT / "blueprints/us-equities/historical-simulation/plan.json"
         self.assertEqual(hashlib.sha256(plan.read_bytes()).hexdigest(),
-                         MANIFEST["oracle"]["plan_sha256"])
-        COMPARE.bind(self.receipt, SOURCE / "tolerances.json", SOURCE / "mapping-manifest.json",
+                         MANIFEST_V2["oracle"]["plan_sha256"])
+        COMPARE.bind(self.receipt, SOURCE / "tolerances.json", self.MANIFEST_PATH,
                      ROOT / "blueprints/us-equities/historical-simulation/receipt.json", plan)
         with tempfile.TemporaryDirectory() as tmp:
             other = Path(tmp) / "plan.json"
             other.write_text(plan.read_text() + "\n")
             with self.assertRaisesRegex(ValueError, "plan_sha256_mismatch"):
-                COMPARE.bind(self.receipt, SOURCE / "tolerances.json",
-                             SOURCE / "mapping-manifest.json", None, other)
+                COMPARE.bind(self.receipt, SOURCE / "tolerances.json", self.MANIFEST_PATH, None, other)
+
+    def test_v2_case_configuration_binds_the_explicit_venue_settings(self):
+        plan = json.loads((ROOT / "blueprints/us-equities/historical-simulation/plan.json").read_text())
+        COMPARE.check_case_configuration(self.receipt, EFFECTIVE_V2, plan)
+        cases = {
+            "case_configuration_disagrees_with_manifest:bar_adaptive_high_low_ordering":
+                {"bar_adaptive_high_low_ordering": True},
+            "case_configuration_disagrees_with_manifest:reject_stop_orders":
+                {"reject_stop_orders": False},
+            "case_configuration_disagrees_with_manifest:support_contingent_orders":
+                {"support_contingent_orders": False},
+            "case_configuration_disagrees_with_manifest:latency_model": {"latency_model": "fixed"},
+            "case_configuration_disagrees_with_manifest:venue_modules":
+                {"venue_modules": ["DistributionModule", "Other"]},
+        }
+        for code, override in cases.items():
+            receipt = json.loads(json.dumps(self.receipt))
+            receipt["case_configuration"].update(override)
+            with self.subTest(code=code), self.assertRaisesRegex(ValueError, re.escape(code)):
+                COMPARE.check_case_configuration(receipt, EFFECTIVE_V2, plan)
 
     def test_case_configuration_must_match_the_plan_and_the_manifest(self):
+        self.receipt = json.loads((SOURCE / "receipt.json").read_text())
         plan = json.loads((ROOT / "blueprints/us-equities/historical-simulation/plan.json").read_text())
         COMPARE.check_case_configuration(self.receipt, MANIFEST, plan)
         cases = {
@@ -755,7 +821,7 @@ class BindingTests(unittest.TestCase):
 
     def test_a_receipt_pointing_at_another_plan_is_refused(self):
         plan = json.loads((ROOT / "blueprints/us-equities/historical-simulation/plan.json").read_text())
-        receipt = json.loads(json.dumps(self.receipt))
+        receipt = json.loads((SOURCE / "receipt.json").read_text())
         receipt["frozen_plan"]["sha256"] = "0" * 64
         with self.assertRaisesRegex(ValueError, "receipt_plan_sha256_disagrees_with_manifest"):
             COMPARE.check_case_configuration(receipt, MANIFEST, plan)
@@ -766,10 +832,38 @@ class BindingTests(unittest.TestCase):
             limits = dict(TOLERANCES)
             limits.pop("cash_usd_abs")
             sheet.write_text(json.dumps({"limits": limits, "status": "test"}))
-            receipt = json.loads(json.dumps(self.receipt))
+            receipt = json.loads((SOURCE / "receipt.json").read_text())
             receipt["tolerances"]["sha256"] = hashlib.sha256(sheet.read_bytes()).hexdigest()
             with self.assertRaisesRegex(ValueError, "tolerance_sheet_keys:cash_usd_abs"):
                 COMPARE.bind(receipt, sheet, SOURCE / "mapping-manifest.json")
+
+    def test_v2_refuses_a_sheet_other_than_the_one_the_manifest_froze(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            sheet = Path(tmp) / "tolerances.json"
+            sheet.write_text(json.dumps({"limits": dict(TOLERANCES, cash_usd_abs="1"),
+                                         "status": "retuned"}))
+            receipt = json.loads(json.dumps(self.receipt))
+            receipt["tolerances"]["sha256"] = hashlib.sha256(sheet.read_bytes()).hexdigest()
+            with self.assertRaisesRegex(ValueError, "tolerances_sha256_disagrees_with_manifest"):
+                COMPARE.bind(receipt, sheet, self.MANIFEST_PATH)
+
+
+class V1ReceiptProvenanceTests(unittest.TestCase):
+    """The v1 receipt and verdict stay published and bound to the pre-v2 harness."""
+
+    CHANGED_FOR_V2 = {"compare.py", "fixture_strategy.py", "run.py"}
+
+    def test_v1_receipt_is_bound_to_the_superseded_manifest(self):
+        receipt = json.loads((SOURCE / "receipt.json").read_text())
+        self.assertEqual(receipt["mapping_manifest"]["sha256"], MANIFEST_V2["supersedes"]["sha256"])
+        self.assertEqual(hashlib.sha256((SOURCE / "verdict.json").read_bytes()).hexdigest(),
+                         "b7b898a861492348ae864de25551c127a0367e4638ef5dfa65152f233a6b0d10")
+
+    def test_only_the_files_v2_names_changed_since_the_v1_receipt(self):
+        receipt = json.loads((SOURCE / "receipt.json").read_text())
+        changed = {name for name, recorded in receipt["local_source_sha256"].items()
+                   if hashlib.sha256((SOURCE / name).read_bytes()).hexdigest() != recorded}
+        self.assertEqual(changed, self.CHANGED_FOR_V2)
 
 
 class AttributionEvidenceBindingTests(unittest.TestCase):
@@ -937,6 +1031,1068 @@ class ManifestTests(unittest.TestCase):
                 self.assertTrue(row.get("decision"))
                 self.assertTrue(row.get("limitations"))
 
+# ---------------------------------------------------------------------------
+# Mapping manifest v2: synthetic boundary fixtures. These never run the engine.
+# ---------------------------------------------------------------------------
+
+ENTRY_CLOSE, EXIT_CLOSE = Decimal("321.8600"), Decimal("293.2100")
+V2_BARS = [
+    {"session_date": "2019-12-31", "local_start": "15:00", "ts_event_ns": ENTRY_INTENT_TS * 10 ** 9,
+     "o": "320.9400", "h": "322.1250", "l": "320.8900", "c": "321.8600", "v": 17744667},
+    {"session_date": "2020-01-02", "local_start": "09:00", "ts_event_ns": ENTRY_FILL_TS * 10 ** 9,
+     "o": "323.5800", "h": "324.0200", "l": "323.4100", "c": "323.8700", "v": 6498003},
+    {"session_date": "2020-01-02", "local_start": "10:00",
+     "ts_event_ns": (ENTRY_FILL_TS + 3600) * 10 ** 9,
+     "o": "323.8800", "h": "323.9000", "l": "322.6100", "c": "323.2500", "v": 7134452},
+    {"session_date": "2020-04-29", "local_start": "15:00", "ts_event_ns": EXIT_INTENT_TS * 10 ** 9,
+     "o": "293.9900", "h": "294.0000", "l": "293.0000", "c": "293.2100", "v": 1000000},
+    {"session_date": "2020-04-30", "local_start": "09:00", "ts_event_ns": EXIT_FILL_TS * 10 ** 9,
+     "o": "291.6900", "h": "291.7100", "l": "289.5800", "c": "290.0000", "v": 13673384},
+]
+
+
+def _pair(ref, quantity, close, ts):
+    side = "BUY" if quantity > 0 else "SELL"
+    triggers = FIXTURE.oco_triggers(quantity, close)
+    ids = {"STOP_MARKET": "O-%d-STOP" % ref, "MARKET_IF_TOUCHED": "O-%d-MIT" % ref}
+    legs = [{"client_order_id": ids[t], "order_type": t, "side": side, "quantity": abs(quantity),
+             "trigger_price": format(triggers[t], ".4f"), "trigger_type": "DEFAULT",
+             "time_in_force": "GTC", "reduce_only": False, "contingency_type": "OCO",
+             "order_list_id": "OL-%d" % ref,
+             "linked_order_ids": [ids["MARKET_IF_TOUCHED" if t == "STOP_MARKET" else "STOP_MARKET"]]}
+            for t in ("STOP_MARKET", "MARKET_IF_TOUCHED")]
+    for leg in legs:
+        view = {"client_order_id": leg["client_order_id"], "type": leg["order_type"], "side": side,
+                "quantity": str(abs(quantity)), "status": "ACCEPTED",
+                "trigger_price": leg["trigger_price"], "trigger_type": "DEFAULT",
+                "time_in_force": "GTC", "is_reduce_only": False, "contingency_type": "OCO",
+                "order_list_id": "OL-%d" % ref, "linked_order_ids": list(leg["linked_order_ids"]),
+                "filled_qty": "0"}
+        filled = leg["order_type"] == "STOP_MARKET"
+        leg["engine_at_accept"] = view
+        leg["engine_final"] = dict(view, status="FILLED" if filled else "CANCELED",
+                                   filled_qty=str(abs(quantity)) if filled else "0")
+    return {"order_ref": ref, "order_list_id": "OL-%d" % ref, "reference_close": str(close),
+            "submitted_ts_event_ns": ts * 10 ** 9, "submitted_clock_ns": ts * 10 ** 9, "legs": legs}
+
+
+def _events(ref, decision_ts, fill_ts, fill_px, quantity, filled="STOP"):
+    other = "MIT" if filled == "STOP" else "STOP"
+    out = []
+    for leg in ("STOP", "MIT"):
+        for name in ("OrderInitialized", "OrderSubmitted", "OrderAccepted"):
+            out.append({"event": name, "client_order_id": "O-%d-%s" % (ref, leg),
+                        "ts_event_ns": decision_ts * 10 ** 9})
+    out.append({"event": "OrderFilled", "client_order_id": "O-%d-%s" % (ref, filled),
+                "ts_event_ns": fill_ts * 10 ** 9, "last_qty": str(abs(quantity)), "last_px": fill_px})
+    out.append({"event": "OrderCanceled", "client_order_id": "O-%d-%s" % (ref, other),
+                "ts_event_ns": fill_ts * 10 ** 9, "reason": ""})
+    return out
+
+
+def _v2_receipt(**overrides):
+    """A clean, internally consistent synthetic v2 receipt matching the predictions."""
+    distributions = [{"utc_seconds": DIVIDEND_ZERO_TS, "ts_event_ns": DIVIDEND_ZERO_TS * 10 ** 9,
+                      "ex_date": "2019-12-20", "per_share": "1.57", "quantity": "0",
+                      "amount": "0.00", "engine_posted": True},
+                     {"utc_seconds": DIVIDEND_TS, "ts_event_ns": DIVIDEND_TS * 10 ** 9,
+                      "ex_date": "2020-03-20", "per_share": "1.41", "quantity": "304",
+                      "amount": "428.64", "engine_posted": True}]
+    # Copies: a test that edits a fill must never change the shared constant.
+    receipt = _receipt([dict(f) for f in MATCHED_FILLS], "428.64", distributions)
+    receipt["native_end_cash_usd"] = receipt["reconciled_end_cash_usd"]
+    receipt["schema_version"] = 2
+    receipt["intents"] = [dict(i, order_ref=n + 1, ts_event_ns=i["utc_seconds"] * 10 ** 9)
+                          for n, i in enumerate(receipt["intents"])]
+    receipt["oco_pairs"] = [_pair(1, 304, ENTRY_CLOSE, ENTRY_INTENT_TS),
+                            _pair(2, -304, EXIT_CLOSE, EXIT_INTENT_TS)]
+    receipt["order_events"] = (_events(1, ENTRY_INTENT_TS, ENTRY_FILL_TS, "323.5800", 304)
+                               + _events(2, EXIT_INTENT_TS, EXIT_FILL_TS, "291.6900", -304))
+    scan = {"lines": 227, "error_lines": 0, "negative_cash_lines": 0}
+    receipt["runs"] = [{"label": label, "strategy_callback_errors": [], "engine_log_scan": scan,
+                        "normalized_economic_sha256": "e" * 64} for label in ("run-1", "run-2")]
+    receipt["two_run_determinism"] = {"undeclared_differing_fields": []}
+    emissions = [{"ex_date": "2019-12-20", "ex_instant_ns": DIVIDEND_ZERO_TS * 10 ** 9,
+                  "ts_now_ns": DIVIDEND_ZERO_TS * 10 ** 9, "on_time": True, "eligible_quantity": 0,
+                  "per_share": "1.57", "amount": "0.00"},
+                 {"ex_date": "2020-03-20", "ex_instant_ns": DIVIDEND_TS * 10 ** 9,
+                  "ts_now_ns": DIVIDEND_TS * 10 ** 9, "on_time": True, "eligible_quantity": 304,
+                  "per_share": "1.41", "amount": "428.64"}]
+    receipt["distribution_module"] = {
+        "class": "DistributionModule", "venue_module_count": 1, "errors": [],
+        "calls_at_event_instants_ns": [DIVIDEND_ZERO_TS * 10 ** 9, DIVIDEND_TS * 10 ** 9],
+        "emissions": emissions,
+        "acknowledgements": [{"ex_dates": ["2019-12-20"], "outcomes": [{"applied": True, "error": None}]},
+                             {"ex_dates": ["2020-03-20"], "outcomes": [{"applied": True, "error": None}]}]}
+    receipt["native_account_event_rows"] = [
+        {"ts_event_ns": 1575298800 * 10 ** 9, "reported": True, "total": "100000.00"},
+        {"ts_event_ns": DIVIDEND_ZERO_TS * 10 ** 9, "reported": True, "total": "100000.00"},
+        {"ts_event_ns": ENTRY_FILL_TS * 10 ** 9, "reported": False, "total": "1631.68"},
+        {"ts_event_ns": DIVIDEND_TS * 10 ** 9, "reported": True, "total": "2060.32"},
+        {"ts_event_ns": EXIT_FILL_TS * 10 ** 9, "reported": False, "total": "90734.08"}]
+    receipt["mapping_manifest"] = {"sha256": COMPARE.SEALED_V2_MANIFEST_SHA256}
+    receipt["tolerances"] = {"sha256": MANIFEST_V2["tolerances"]["sha256"]}
+    receipt["inputs"] = {"sha256": dict(MANIFEST_V2["inputs"]["frozen_sha256"])}
+    receipt["engine"] = {"version": MANIFEST_V2["engine"]["version"],
+                         "extension_sha256": dict(MANIFEST_V2["engine"]["extension_sha256"])}
+    receipt["isolation"] = {"network_interfaces": [[1, "lo"]],
+                            "environment_names": sorted(COMPARE.ISOLATED_ENVIRONMENT),
+                            "environment_values": dict(COMPARE.ISOLATED_ENVIRONMENT_VALUES),
+                            "python_flags_isolated": 1,
+                            "read_only": {"harness_source": True, "data_root": True,
+                                          "python_prefix": True},
+                            # As observed in a bwrap --unshare-all sandbox on this host.
+                            "namespaces": {"uid_map": "      1000          0          1\n",
+                                           "pid": 2, "pid1_comm": "bwrap"}}
+    receipt["local_source_sha256"] = dict(SYNTHETIC_REVIEW["reviewed_local_source_sha256"])
+    receipt["started_utc"] = "2026-09-23T06:00:00+00:00"
+    receipt["preconditions"] = {
+        "review": {"path": "synthetic/review.json", "sha256": SYNTHETIC_REVIEW_SHA256},
+        "deviation_acceptance": {"path": ACCEPTANCE_PATH, "sha256": SYNTHETIC_ACCEPTANCE_SHA256},
+        "prior_v2_replays": {"sha256": SYNTHETIC_HISTORY_SHA256,
+                             "replays": [dict(r) for r in SYNTHETIC_HISTORY["replays"]]}}
+    receipt["preregistration_deviations"] = [{"id": "review_before_first_run"},
+                                             {"id": COMPARE.ACCEPTED_DEVIATION}]
+    receipt.update(overrides)
+    return receipt
+
+
+SYNTHETIC_REVIEW = {"schema": COMPARE.REVIEW_RECORD_SCHEMA, "reviewer": "synthetic",
+                    "completed_utc": "2026-09-23T05:00:00+00:00", "reviewed_commit": "0" * 40,
+                    "reviewed_local_source_sha256": {f: "a" * 64 for f in COMPARE.REVIEWED_HARNESS_FILES},
+                    "unresolved_findings": 0}
+SYNTHETIC_REVIEW_SHA256 = "b" * 64
+# Synthetic stand-in for the gate owner's acceptance; the real file is never
+# written by the harness or these tests.
+ACCEPTANCE_PATH = "blueprints/us-equities/engine-nautilus/spy-parity/" + COMPARE.DEVIATION_ACCEPTANCE
+SYNTHETIC_ACCEPTANCE = {"schema_version": 1, "deviation_id": "first_v2_run_preceded_review",
+                        "accepted_by": "synthetic gate owner",
+                        "accepted_utc": "2026-09-23T05:30:00+00:00",
+                        "reviewed_harness_local_source_sha256":
+                            dict(SYNTHETIC_REVIEW["reviewed_local_source_sha256"]),
+                        "statement": "synthetic acceptance for tests"}
+SYNTHETIC_ACCEPTANCE_SHA256 = "f" * 64
+SYNTHETIC_HISTORY = {"schema": "spy-parity-v2-replay-history/1",
+                     "replays": [{"id": "earlier", "reviewed_before_run": False}]}
+SYNTHETIC_HISTORY_SHA256 = "9" * 64
+MET_PRECONDITIONS = {"inputs_rehashed_at_comparison": True,
+                     "review_record": {"sha256": SYNTHETIC_REVIEW_SHA256, "content": SYNTHETIC_REVIEW},
+                     "deviation_acceptance": {"sha256": SYNTHETIC_ACCEPTANCE_SHA256,
+                                              "content": SYNTHETIC_ACCEPTANCE},
+                     "replay_history": {"sha256": SYNTHETIC_HISTORY_SHA256,
+                                        "content": SYNTHETIC_HISTORY}}
+
+
+def _context(**changes):
+    """MET_PRECONDITIONS with deep-copied records and the given keys replaced."""
+    context = json.loads(json.dumps(MET_PRECONDITIONS))
+    context.update(changes)
+    return context
+
+
+def _v2(receipt, bars=V2_BARS, manifest=EFFECTIVE_V2, preconditions=MET_PRECONDITIONS):
+    return COMPARE.compare(receipt, ORACLE, TOLERANCES, manifest, bars, preconditions)
+
+
+def _failing_fields(verdict):
+    return {(c["id"], c["field"]) for c in verdict["checks"] if c["status"] == "FAIL"}
+
+
+class V2ControlTests(unittest.TestCase):
+    def test_a_receipt_meeting_every_criterion_passes(self):
+        verdict = _v2(_v2_receipt())
+        self.assertEqual(_failing_fields(verdict), set())
+        self.assertEqual(verdict["verdict"], "PASS")
+        self.assertTrue(verdict["complete"])
+        self.assertEqual(verdict["manifest_unsupported_mappings"], [])
+
+    def test_the_effective_manifest_declares_nothing_unsupported(self):
+        self.assertEqual(RUN.unsupported_mappings(EFFECTIVE_V2), [])
+        self.assertEqual(RUN.preregistered_mappings(EFFECTIVE_V2),
+                         ["decision_visibility", "distributions_and_cash", "market_on_open_proxy"])
+        self.assertEqual(RUN.known_short_sessions(EFFECTIVE_V2), {"2019-12-24": 4})
+        self.assertEqual(RUN.effective_manifest(MANIFEST_V2, MANIFEST), EFFECTIVE_V2)
+
+    def test_a_v1_style_close_fill_can_no_longer_be_attributed(self):
+        receipt = _v2_receipt()
+        receipt.update(_receipt(BLOCKED_FILLS, "428.64", receipt["distribution_ledger"]))
+        verdict = _v2(receipt)
+        self.assertEqual(verdict["verdict"], "FAIL")
+        self.assertEqual(verdict["blocking_mappings"], [])
+        self.assertIn("market_on_open_proxy", verdict["rejected_attributions"])
+
+    def test_missing_bars_fail_the_v2_comparison(self):
+        """PREREGISTRATION-v2.md lists any skipped check as a falsifier: FAIL, not incomplete."""
+        verdict = _v2(_v2_receipt(), bars=None)
+        self.assertEqual(verdict["failed"], 0)
+        self.assertTrue(verdict["skipped"])
+        self.assertEqual(verdict["verdict"], "FAIL")
+        self.assertFalse(verdict["complete"])
+
+
+class V2MarketOnOpenBoundaryTests(unittest.TestCase):
+    def test_no_gap_open_equal_to_the_decision_close_fails(self):
+        """open == C: the pair fills at a trigger, not the open (moo_proxy_no_gap)."""
+        bars = [dict(b) for b in V2_BARS]
+        bars[1].update(o="321.8600", l="321.5000")
+        receipt = _v2_receipt()
+        receipt["order_events"][6]["last_px"] = "321.8601"
+        receipt["fills"][0]["price"] = "321.8601"
+        verdict = _v2(receipt, bars)
+        failing = _failing_fields(verdict)
+        self.assertIn(("entry_oco", "moo_proxy_no_gap"), failing)
+        self.assertIn(("entry_oco", "moo_proxy_not_open"), failing)
+        self.assertEqual(verdict["verdict"], "FAIL")
+        self.assertEqual(verdict["blocking_mappings"], [])
+
+    def test_flat_bar_fill_in_a_later_bar_fails(self):
+        """open == high == low == close == C: the pair survives and fills a bar later."""
+        later = ENTRY_FILL_TS + 3600
+        bars = [dict(b) for b in V2_BARS]
+        bars[1].update(o="321.8600", h="321.8600", l="321.8600", c="321.8600")
+        receipt = _v2_receipt()
+        receipt["order_events"][6]["ts_event_ns"] = later * 10 ** 9
+        receipt["order_events"][7]["ts_event_ns"] = later * 10 ** 9
+        verdict = _v2(receipt, bars)
+        failing = _failing_fields(verdict)
+        self.assertIn(("entry_oco", "fill_in_tested_bar"), failing)
+        self.assertIn(("entry_oco", "moo_proxy_no_gap"), failing)
+        self.assertEqual(verdict["verdict"], "FAIL")
+
+    def test_double_fill_of_both_legs_fails(self):
+        receipt = _v2_receipt()
+        cancel = receipt["order_events"][7]
+        receipt["order_events"][7] = dict(cancel, event="OrderFilled", last_qty="304", last_px="323.5800")
+        failing = _failing_fields(_v2(receipt))
+        self.assertIn(("entry_oco", "fill_events"), failing)
+
+    def test_partial_fills_fail_even_when_they_sum_to_the_intent(self):
+        receipt = _v2_receipt()
+        fill = receipt["order_events"][6]
+        receipt["order_events"][6:7] = [dict(fill, last_qty="104"), dict(fill, last_qty="200")]
+        failing = _failing_fields(_v2(receipt))
+        self.assertIn(("entry_oco", "fill_events"), failing)
+
+    def test_denied_leg_and_missing_sibling_cancel_fail(self):
+        receipt = _v2_receipt()
+        receipt["order_events"][5] = dict(receipt["order_events"][5], event="OrderDenied")
+        del receipt["order_events"][7]
+        failing = _failing_fields(_v2(receipt))
+        self.assertIn(("entry_oco", "denied_or_rejected"), failing)
+        self.assertIn(("entry_oco", "legs_accepted"), failing)
+        self.assertIn(("entry_oco", "sibling_cancels"), failing)
+
+    def test_trigger_not_derived_from_the_decision_close_fails(self):
+        receipt = _v2_receipt()
+        receipt["oco_pairs"][0]["legs"][0]["trigger_price"] = "323.5700"
+        failing = _failing_fields(_v2(receipt))
+        self.assertIn(("entry_oco", "stop_market_trigger"), failing)
+
+    def test_a_strategy_level_pair_without_native_links_fails(self):
+        receipt = _v2_receipt()
+        receipt["oco_pairs"][0]["legs"][0]["engine_at_accept"]["linked_order_ids"] = []
+        failing = _failing_fields(_v2(receipt))
+        self.assertIn(("entry_oco", "oco_structure"), failing)
+
+    def test_oco_structure_is_judged_from_the_engine_record_not_the_harness_strings(self):
+        # Harness strings that claim OCO do not help when the engine's record disagrees.
+        receipt = _v2_receipt()
+        receipt["oco_pairs"][0]["legs"][1]["engine_at_accept"]["contingency_type"] = "NO_CONTINGENCY"
+        self.assertIn(("entry_oco", "oco_structure"), _failing_fields(_v2(receipt)))
+        # A leg with no engine record at all fails, whatever the harness wrote.
+        receipt = _v2_receipt()
+        receipt["oco_pairs"][1]["legs"][0]["engine_at_accept"] = None
+        self.assertIn(("exit_oco", "oco_structure"), _failing_fields(_v2(receipt)))
+        # The harness strings alone are no longer read: corrupting them changes nothing.
+        receipt = _v2_receipt()
+        receipt["oco_pairs"][0]["legs"][0].update(contingency_type="X", time_in_force="X",
+                                                  trigger_type="X", reduce_only=True)
+        self.assertEqual(_failing_fields(_v2(receipt)), set())
+
+    def test_engine_final_status_must_show_one_fill_and_one_cancel(self):
+        receipt = _v2_receipt()
+        receipt["oco_pairs"][0]["legs"][1]["engine_final"]["status"] = "ACCEPTED"
+        self.assertIn(("entry_oco", "engine_final_status"), _failing_fields(_v2(receipt)))
+
+    def test_an_error_log_line_fails(self):
+        receipt = _v2_receipt()
+        receipt["runs"][1]["engine_log_scan"] = {"lines": 228, "error_lines": 1, "negative_cash_lines": 1}
+        failing = _failing_fields(_v2(receipt))
+        self.assertIn(("engine_log", "run-2.error_lines"), failing)
+        self.assertIn(("engine_log", "run-2.negative_cash_lines"), failing)
+
+    def test_oco_trigger_rule_and_session_final_decision_bar(self):
+        self.assertEqual(FIXTURE.oco_triggers(304, Decimal("321.8600")),
+                         {"STOP_MARKET": Decimal("321.8601"), "MARKET_IF_TOUCHED": Decimal("321.8599")})
+        self.assertEqual(FIXTURE.oco_triggers(-304, Decimal("293.2100")),
+                         {"STOP_MARKET": Decimal("293.2099"), "MARKET_IF_TOUCHED": Decimal("293.2101")})
+        with self.assertRaisesRegex(ValueError, "zero_intent_quantity"):
+            FIXTURE.oco_triggers(0, Decimal("1"))
+        FIXTURE.check_decision_bar_is_session_final(V2_BARS, 0)
+        with self.assertRaisesRegex(ValueError, "decision_bar_not_session_final:2020-01-02"):
+            FIXTURE.check_decision_bar_is_session_final(V2_BARS, 1)
+        with self.assertRaisesRegex(ValueError, "decision_bar_is_last_row"):
+            FIXTURE.check_decision_bar_is_session_final(V2_BARS, len(V2_BARS) - 1)
+
+    def test_engine_log_scan_counts_error_and_negative_cash_lines(self):
+        text = ("2020-01-02T15:00:00Z [INFO] TRADER-001.X: ok\n"
+                "2020-01-02T15:00:00Z [ERROR] TRADER-001.Portfolio: "
+                "Cash account balance would become negative\n")
+        scan = RUN.scan_engine_log(text)
+        self.assertEqual((scan["lines"], scan["error_lines"], scan["negative_cash_lines"]), (2, 1, 1))
+        self.assertEqual(scan["lines_by_level"], {"ERROR": 1, "INFO": 1})
+
+
+class _Position:
+    def __init__(self, instrument_id, signed_qty):
+        self.instrument_id, self.signed_qty = instrument_id, signed_qty
+
+
+class V2DistributionBoundaryTests(unittest.TestCase):
+    SESSIONS = ["2030-01-02", "2030-01-03", "2030-01-04", "2030-01-07", "2030-01-08"]
+
+    def _rows(self, text):
+        return CONVERT.parse_factor_rows(text)
+
+    def test_one_zero_events_match_the_preregistered_window_events(self):
+        factors = CorporateActionTests.FACTORS
+        sessions = ["2019-11-29", "2019-12-02", "2019-12-19", "2019-12-20", "2020-03-19",
+                    "2020-03-20", "2020-04-30"]
+        events = DISTRIBUTION.derive_events(self._rows(factors), sessions, "2019-12-02", "2020-04-30")
+        row = next(m for m in MANIFEST_V2["mappings"] if m["id"] == "distributions_and_cash")
+        projected = [{k: e[k] for k in ("factor_row_date", "ex_date", "ex_instant_utc_seconds",
+                                        "pf0", "pf1", "ref0", "per_share")} for e in events]
+        self.assertEqual(projected, row["mechanism_rules"]["window_events_for_one_zero"])
+
+    def test_a_friday_row_pays_on_the_next_session_not_calendar_plus_one(self):
+        rows = self._rows("20300104,0.9900000,1,100.50\n20301231,1,1,0\n")
+        events = DISTRIBUTION.derive_events(rows, self.SESSIONS, "2030-01-03", "2030-01-08")
+        self.assertEqual([(e["ex_date"], e["calendar_plus_one"]) for e in events],
+                         [("2030-01-07", "2030-01-05")])
+        self.assertEqual(events[0]["ex_instant_ns"], DISTRIBUTION.ex_date_instant_ns("2030-01-07"))
+        # 100.50 * (1 - 0.99) = 1.005 exactly: one half-to-even rounding gives 1.00.
+        self.assertEqual(events[0]["per_share"], "1.00")
+
+    def test_a_calendar_plus_one_emission_is_refused_by_the_comparator(self):
+        manifest = json.loads(json.dumps(EFFECTIVE_V2))
+        monday = DISTRIBUTION.ex_date_instant_ns("2030-01-07") // 10 ** 9
+        saturday = DISTRIBUTION.ex_date_instant_ns("2030-01-05")
+        manifest["one_zero_predictions"]["distributions"][1]["ex_instant_utc_seconds"] = monday
+        receipt = _v2_receipt()
+        receipt["distribution_module"]["emissions"][1]["ts_now_ns"] = saturday
+        receipt["distribution_module"]["calls_at_event_instants_ns"][1] = saturday
+        failing = _failing_fields(_v2(receipt, manifest=manifest))
+        self.assertIn(("distribution_2", "emitted_at_ns"), failing)
+        self.assertIn(("distribution_2", "process_called_at_ex_instant"), failing)
+
+    def test_factor_rows_that_are_not_sessions_or_carry_splits_are_refused(self):
+        with self.assertRaisesRegex(ValueError, "factor_row_not_a_session:2030-01-05"):
+            DISTRIBUTION.derive_events(self._rows("20300105,0.99,1,100\n20301231,1,1,0\n"),
+                                       self.SESSIONS, "2030-01-03", "2030-01-08")
+        with self.assertRaisesRegex(ValueError, "unexpected_split:2030-01-04"):
+            DISTRIBUTION.derive_events(self._rows("20300104,0.99,1,100\n20301231,1,2,0\n"),
+                                       self.SESSIONS, "2030-01-03", "2030-01-08")
+        with self.assertRaisesRegex(ValueError, "nonpositive_distribution:2030-01-04"):
+            DISTRIBUTION.derive_events(self._rows("20300104,1.01,1,100\n20301231,1,1,0\n"),
+                                       self.SESSIONS, "2030-01-03", "2030-01-08")
+
+    def test_late_module_emission_is_detected_and_never_posted(self):
+        event = {"ex_date": "2030-01-07", "ex_instant_ns": DISTRIBUTION.ex_date_instant_ns("2030-01-07")}
+        on_time, late = DISTRIBUTION.due_events([event], event["ex_instant_ns"])
+        self.assertEqual((on_time, late), ([event], []))
+        on_time, late = DISTRIBUTION.due_events([event], event["ex_instant_ns"] + 1)
+        self.assertEqual((on_time, late), ([], [event]))
+        self.assertEqual(DISTRIBUTION.due_events([event], event["ex_instant_ns"] - 1), ([], []))
+
+    def test_a_late_emission_in_a_receipt_fails(self):
+        receipt = _v2_receipt()
+        emission = receipt["distribution_module"]["emissions"][1]
+        emission.update(ts_now_ns=emission["ts_now_ns"] + 36000 * 10 ** 9, on_time=False)
+        failing = _failing_fields(_v2(receipt))
+        self.assertIn(("distribution_2", "emitted_at_ns"), failing)
+        self.assertIn(("distribution_2", "on_time"), failing)
+
+    def test_eligible_quantity_comes_from_engine_positions_only(self):
+        positions = [_Position("SPY.SIM", 304.0), _Position("QQQ.SIM", 10.0)]
+        self.assertEqual(DISTRIBUTION.eligible_quantity(positions, "SPY.SIM"), 304)
+        self.assertEqual(DISTRIBUTION.eligible_quantity([], "SPY.SIM"), 0)
+        with self.assertRaisesRegex(ValueError, "non_integral_eligible_quantity"):
+            DISTRIBUTION.eligible_quantity([_Position("SPY.SIM", 0.5)], "SPY.SIM")
+
+    def test_amount_is_quantity_times_cent_rounded_per_share_with_no_second_rounding(self):
+        self.assertEqual(DISTRIBUTION.distribution_amount(304, "1.41"), Decimal("428.64"))
+        self.assertEqual(DISTRIBUTION.distribution_amount(0, "1.57"), Decimal("0.00"))
+        # nt_probe div: 10 x 1.2345 would quantize to 12.34; v2 rounds per share first.
+        per_share = DISTRIBUTION.per_share_distribution(Decimal("123.45"), Decimal("0.99"), Decimal("1"))
+        self.assertEqual(per_share, Decimal("1.23"))
+        self.assertEqual(DISTRIBUTION.distribution_amount(10, per_share), Decimal("12.30"))
+
+    def test_unapplied_or_unreported_adjustments_fail(self):
+        receipt = _v2_receipt()
+        receipt["distribution_module"]["acknowledgements"][1]["outcomes"] = [
+            {"applied": False, "error": "rejected"}]
+        receipt["native_account_event_rows"][3]["reported"] = False
+        failing = _failing_fields(_v2(receipt))
+        self.assertIn(("distribution_2", "acknowledged_applied"), failing)
+        self.assertIn(("distribution_2", "reported_account_state_delta"), failing)
+
+    def test_a_reported_account_state_no_emission_explains_fails(self):
+        receipt = _v2_receipt()
+        rows = receipt["native_account_event_rows"]
+        rows.insert(3, {"ts_event_ns": (DIVIDEND_TS - 3600) * 10 ** 9, "reported": True,
+                        "total": "1700.00"})
+        failing = _failing_fields(_v2(receipt))
+        self.assertIn(("distribution_module", "unexplained_reported_account_states"), failing)
+
+    def test_an_unposted_ledger_fails_under_v2(self):
+        receipt = _v2_receipt()
+        for entry in receipt["distribution_ledger"]:
+            entry["engine_posted"] = False
+        verdict = _v2(receipt)
+        self.assertIn(("distribution_ledger", "engine_posted"), _failing_fields(verdict))
+        self.assertEqual(verdict["verdict"], "FAIL")
+
+    def test_posted_ledger_requires_on_time_applied_emissions(self):
+        emissions = _v2_receipt()["distribution_module"]["emissions"]
+        acknowledgements = [{"ex_dates": ["2019-12-20"], "outcomes": [{"applied": True, "error": None}]},
+                            {"ex_dates": ["2020-03-20"], "outcomes": [{"applied": False, "error": "x"}]}]
+        ledger = FIXTURE.posted_distribution_ledger(emissions, acknowledgements)
+        self.assertEqual([d["engine_posted"] for d in ledger], [True, False])
+        self.assertEqual([d["amount"] for d in ledger], ["0.00", "428.64"])
+        self.assertEqual([d["utc_seconds"] for d in ledger], [DIVIDEND_ZERO_TS, DIVIDEND_TS])
+
+
+class V2PreconditionTests(unittest.TestCase):
+    """acceptance_criteria.preconditions are checks: an unmet one fails the comparison."""
+
+    def test_met_preconditions_qualify(self):
+        verdict = _v2(_v2_receipt())
+        self.assertTrue(verdict["preregistration_qualifying"])
+        self.assertTrue(all(status == "PASS" for status in verdict["preconditions"].values()))
+        self.assertEqual(verdict["prior_v2_replays"], 1)
+        self.assertEqual(verdict["prior_v2_replays_reviewed_before_run"], 0)
+        self.assertTrue(verdict["deviation_acceptance_recorded"])
+        self.assertIn(COMPARE.ACCEPTED_DEVIATION, verdict["preregistration_deviations"])
+        self.assertEqual(verdict["verdict"], "PASS")
+
+    def test_a_run_with_no_review_record_fails_even_when_execution_passes(self):
+        receipt = _v2_receipt()
+        receipt["preconditions"]["review"] = None
+        verdict = _v2(receipt)
+        self.assertEqual(verdict["verdict"], "FAIL")
+        self.assertFalse(verdict["preregistration_qualifying"])
+        self.assertEqual(verdict["execution_checks"]["fail"], 0)
+        self.assertEqual(_failing_fields(verdict),
+                         {("precondition_review", "retained_record_before_run")})
+        self.assertEqual(COMPARE.compare(receipt, ORACLE, TOLERANCES, EFFECTIVE_V2, V2_BARS)["verdict"],
+                         "FAIL")
+
+    def test_review_record_must_cover_the_files_that_ran_before_the_run(self):
+        cases = {
+            "reviewed_files_are_the_files_that_ran":
+                lambda r, c: r["local_source_sha256"].update({"run.py": "c" * 64}),
+            "completed_before_run_started":
+                lambda r, c: c.update(completed_utc="2026-09-23T07:00:00+00:00"),
+            "unresolved_findings": lambda r, c: c.update(unresolved_findings=1),
+        }
+        for field, mutate in cases.items():
+            with self.subTest(field=field):
+                receipt = _v2_receipt()
+                content = json.loads(json.dumps(SYNTHETIC_REVIEW))
+                mutate(receipt, content)
+                context = {"inputs_rehashed_at_comparison": True,
+                           "review_record": {"sha256": SYNTHETIC_REVIEW_SHA256, "content": content}}
+                verdict = _v2(receipt, preconditions=context)
+                self.assertIn(("precondition_review", field), _failing_fields(verdict))
+                self.assertEqual(verdict["verdict"], "FAIL")
+
+    def test_a_review_record_changed_or_missing_at_comparison_time_fails(self):
+        for record in ({"sha256": "d" * 64, "content": SYNTHETIC_REVIEW}, None):
+            with self.subTest(record=bool(record)):
+                verdict = _v2(_v2_receipt(), preconditions={"inputs_rehashed_at_comparison": True,
+                                                            "review_record": record})
+                self.assertIn(("precondition_review", "record_sha256_at_comparison"),
+                              _failing_fields(verdict))
+
+    def test_bars_mode_cannot_rehash_inputs_so_the_comparison_fails(self):
+        context = dict(MET_PRECONDITIONS, inputs_rehashed_at_comparison=False)
+        verdict = _v2(_v2_receipt(), preconditions=context)
+        self.assertEqual(verdict["failed"], 0)
+        self.assertEqual(verdict["verdict"], "FAIL")
+        self.assertFalse(verdict["preregistration_qualifying"])
+
+    def test_inputs_engine_and_isolation_are_checked(self):
+        cases = {
+            ("precondition_hashes", "inputs_at_run"):
+                lambda r: r["inputs"]["sha256"].update({"equity/usa/hour/spy.zip": "0" * 64}),
+            ("precondition_engine", "extension_sha256"):
+                lambda r: r["engine"].update(extension_sha256={"x": "0" * 64}),
+            ("precondition_engine", "network_interfaces"):
+                lambda r: r["isolation"].update(network_interfaces=[[1, "lo"], [2, "eth0"]]),
+            ("precondition_engine", "environment_beyond_cleared_set"):
+                lambda r: r["isolation"]["environment_names"].append("HOME"),
+            ("precondition_engine", "read_only_mounts"):
+                lambda r: r["isolation"]["read_only"].update(data_root=False),
+        }
+        for key, mutate in cases.items():
+            with self.subTest(check=key):
+                receipt = _v2_receipt()
+                mutate(receipt)
+                self.assertIn(key, _failing_fields(_v2(receipt)))
+
+    def test_a_v2_receipt_bound_to_another_v2_manifest_is_refused(self):
+        receipt = json.loads(RECEIPT_V2.read_text())
+        with tempfile.TemporaryDirectory() as tmp:
+            other = Path(tmp) / "mapping-manifest-v2.json"
+            altered = dict(MANIFEST_V2, drafted_utc_date="1999-01-01")
+            other.write_text(json.dumps(altered))
+            for name in ("mapping-manifest.json", "PREREGISTRATION-v2.md"):
+                (Path(tmp) / name).write_bytes((SOURCE / name).read_bytes())
+            receipt["mapping_manifest"]["sha256"] = hashlib.sha256(other.read_bytes()).hexdigest()
+            with self.assertRaisesRegex(ValueError, "v2_receipt_not_bound_to_the_sealed_manifest"):
+                COMPARE.bind(receipt, SOURCE / "tolerances.json", other)
+
+    def test_the_pins_are_the_sealed_files(self):
+        self.assertEqual(COMPARE.SEALED_V2_MANIFEST_SHA256,
+                         hashlib.sha256((SOURCE / "mapping-manifest-v2.json").read_bytes()).hexdigest())
+        self.assertEqual(COMPARE.SEALED_V2_PREREGISTRATION_SHA256,
+                         hashlib.sha256((SOURCE / "PREREGISTRATION-v2.md").read_bytes()).hexdigest())
+        self.assertEqual(COMPARE.REVIEWED_HARNESS_FILES, RUN.REVIEWED_HARNESS_FILES)
+        self.assertEqual(COMPARE.REVIEW_RECORD_SCHEMA, RUN.REVIEW_RECORD_SCHEMA)
+
+
+class V2RunnerRecordTests(unittest.TestCase):
+    """Pure runner helpers behind the review, replay-history and engine-view records."""
+
+    def test_review_record_must_be_inside_the_checkout_and_well_formed(self):
+        self.assertIsNone(RUN.load_review_record(None))
+        with tempfile.TemporaryDirectory() as tmp:
+            outside = Path(tmp) / "review.json"
+            outside.write_text(json.dumps(SYNTHETIC_REVIEW))
+            with self.assertRaisesRegex(ValueError, "review_record_outside_checkout"):
+                RUN.load_review_record(outside)
+        with tempfile.TemporaryDirectory(dir=SOURCE) as tmp:
+            record = Path(tmp) / "review.json"
+            record.write_text(json.dumps(dict(SYNTHETIC_REVIEW, schema="other")))
+            with self.assertRaisesRegex(ValueError, "review_record_schema"):
+                RUN.load_review_record(record)
+            record.write_text(json.dumps(SYNTHETIC_REVIEW))
+            loaded = RUN.load_review_record(record)
+            self.assertEqual(loaded["sha256"], hashlib.sha256(record.read_bytes()).hexdigest())
+            self.assertTrue(loaded["path"].startswith("blueprints/us-equities/engine-nautilus/spy-parity/"))
+
+    def test_replay_history_lists_every_earlier_replay(self):
+        history = RUN.load_replay_history()
+        ids = [r["id"] for r in history["replays"]]
+        for expected in ("dev1-dev5", "dev9", "late-emission-experiment", "bwrap-db8bad7",
+                         "bwrap-8c4d7e7", "bwrap-f079f6c"):
+            self.assertIn(expected, ids)
+        # Only the single qualifying replay of the reviewed harness ran after review.
+        self.assertEqual([r["id"] for r in history["replays"] if r["reviewed_before_run"]],
+                         ["bwrap-cc4503f-qualifying"])
+        # Every replay from f079f6c (the harness the pre-run review changed) is superseded.
+        from_f079f6c = [r for r in history["replays"] if "f079f6c" in r["harness"]]
+        self.assertTrue(from_f079f6c)
+        self.assertTrue(all(r["status"].startswith("superseded") for r in from_f079f6c))
+        self.assertEqual(history["sha256"], hashlib.sha256((SOURCE / RUN.REPLAY_HISTORY).read_bytes())
+                         .hexdigest())
+
+    def test_engine_order_view_refuses_a_missing_field_and_attaches_per_leg(self):
+        snapshot = {field: None for field in FIXTURE.ENGINE_ORDER_FIELDS}
+        snapshot.update(client_order_id="O-1-STOP", linked_order_ids=["O-1-MIT"])
+        self.assertEqual(FIXTURE.engine_order_view(snapshot)["linked_order_ids"], ["O-1-MIT"])
+        with self.assertRaisesRegex(ValueError, "engine_order_view_missing:contingency_type"):
+            FIXTURE.engine_order_view({k: v for k, v in snapshot.items() if k != "contingency_type"})
+        pairs = [{"legs": [{"client_order_id": "O-1-STOP"}, {"client_order_id": "O-1-MIT"}]}]
+        attached = FIXTURE.attach_engine_views(pairs, {"O-1-STOP": {"a": 1}}, {"O-1-MIT": {"b": 2}})
+        self.assertEqual(attached[0]["legs"][0]["engine_at_accept"], {"a": 1})
+        self.assertIsNone(attached[0]["legs"][0]["engine_final"])
+        self.assertEqual(attached[0]["legs"][1]["engine_final"], {"b": 2})
+        self.assertNotIn("engine_at_accept", pairs[0]["legs"][0])
+
+    def test_declared_deviations_cover_the_review_findings(self):
+        ids = [d["id"] for d in RUN.PREREGISTRATION_DEVIATIONS]
+        for expected in ("review_before_first_run", "first_v2_run_preceded_review",
+                         "venue_module_count_not_engine_observable", "bars_mode_cannot_rehash_inputs"):
+            self.assertIn(expected, ids)
+
+
+class V2PublishedResultTests(unittest.TestCase):
+    """The published v2 receipt and verdict agree with each other and the manifest."""
+
+    def setUp(self):
+        self.receipt = json.loads(RECEIPT_V2.read_text())
+        self.verdict = json.loads(VERDICT_V2.read_text())
+
+    def test_receipt_is_bound_to_the_sealed_v2_files(self):
+        self.assertEqual(self.receipt["mapping_manifest"]["sha256"],
+                         hashlib.sha256((SOURCE / "mapping-manifest-v2.json").read_bytes()).hexdigest())
+        self.assertEqual(self.receipt["preregistration"]["sha256"],
+                         hashlib.sha256((SOURCE / "PREREGISTRATION-v2.md").read_bytes()).hexdigest())
+        self.assertEqual(self.receipt["tolerances"]["sha256"], MANIFEST_V2["tolerances"]["sha256"])
+        self.assertEqual(self.receipt["unsupported_mappings"], [])
+
+    # The published receipt ran the f079f6c harness; the 2026-09-23 pre-run
+    # review round changed exactly these files, so the receipt is superseded.
+
+    def test_published_receipt_is_the_qualifying_run_of_the_harness_on_disk(self):
+        changed = {name for name, recorded in self.receipt["local_source_sha256"].items()
+                   if hashlib.sha256((SOURCE / name).read_bytes()).hexdigest() != recorded}
+        self.assertEqual(changed, set())
+        entry = next(r for r in RUN.load_replay_history()["replays"] if r["id"] == "bwrap-cc4503f-qualifying")
+        self.assertTrue(entry["reviewed_before_run"])
+        self.assertTrue(entry["status"].startswith("qualifying"))
+        self.assertEqual(entry["harness_local_source_sha256"],
+                         {f: self.receipt["local_source_sha256"][f] for f in RUN.REVIEWED_HARNESS_FILES})
+        self.assertEqual(entry["receipt_sha256"], [hashlib.sha256((SOURCE / "receipt-v2.json").read_bytes()).hexdigest()])
+        superseded = next(r for r in RUN.load_replay_history()["replays"] if r["id"] == "bwrap-f079f6c")
+        self.assertTrue(superseded["status"].startswith("superseded"))
+
+    def test_published_v2_receipt_reconciles_without_bars(self):
+        oracle = COMPARE.oracle_case(json.loads(LEAN_RECEIPT.read_text()), self.receipt["case"])
+        verdict = COMPARE.compare(self.receipt, oracle, TOLERANCES, EFFECTIVE_V2, None)
+        self.assertEqual(verdict["execution_checks"]["fail"], 0)
+        published = {c["key"]: c["status"] for c in self.verdict["checks"]}
+        for check in verdict["checks"]:
+            if check["id"].startswith(COMPARE.PRECONDITION_PREFIX):
+                continue
+            if check["status"] != "SKIPPED" and check["key"] in published:
+                self.assertEqual(published[check["key"]], "PASS", check["key"])
+
+    def test_receipt_carries_the_declared_deviations(self):
+        recorded = [d["id"] for d in self.receipt["preregistration_deviations"]]
+        current = [d["id"] for d in RUN.PREREGISTRATION_DEVIATIONS]
+        self.assertIn("review_before_first_run", recorded)
+        # The qualifying run declares exactly the harness's current deviations, in order.
+        self.assertEqual(recorded, current)
+        self.assertIn("first_v2_run_preceded_review", recorded)
+
+    def test_receipt_lists_every_earlier_replay(self):
+        recorded = self.receipt["preconditions"]["prior_v2_replays"]["replays"]
+        current = RUN.load_replay_history()["replays"]
+        self.assertEqual(recorded, current[:len(recorded)])
+        self.assertIn("bwrap-8c4d7e7", [r["id"] for r in recorded])
+
+    def test_published_verdict_records_the_comparison_it_claims(self):
+        self.assertEqual(self.verdict["manifest_schema_version"], 2)
+        self.assertEqual(self.verdict["attribution_evidence"], "converted bars")
+        self.assertEqual(self.verdict["skipped"], [])
+        self.assertEqual(self.verdict["blocking_mappings"], [])
+        self.assertEqual(self.verdict["failed"],
+                         sum(1 for c in self.verdict["checks"] if c["status"] == "FAIL"))
+        self.assertEqual(self.verdict["verdict"],
+                         "PASS" if self.verdict["failed"] == 0 else "FAIL")
+        pre = [c for c in self.verdict["checks"] if c["id"].startswith(COMPARE.PRECONDITION_PREFIX)]
+        self.assertTrue(pre)
+        self.assertEqual(self.verdict["preregistration_qualifying"],
+                         all(c["status"] == "PASS" for c in pre))
+        # A run no retained review preceded can never be published as a PASS.
+        if not self.receipt["preconditions"]["review"]:
+            self.assertEqual(self.verdict["verdict"], "FAIL")
+            self.assertFalse(self.verdict["preregistration_qualifying"])
+            self.assertIn("precondition_review.retained_record_before_run",
+                          [k.split("#")[0] for k in self.verdict["unattributed_failures"]])
+
+
+class V2DeviationAcceptanceTests(unittest.TestCase):
+    """precondition_review: earlier unreviewed replays need the gate owner's acceptance."""
+
+    def _verdict(self, receipt=None, **context):
+        return _v2(receipt or _v2_receipt(), preconditions=_context(**context))
+
+    def test_present_valid_acceptance_qualifies(self):
+        verdict = self._verdict()
+        self.assertEqual(_failing_fields(verdict), set())
+        self.assertTrue(verdict["preregistration_qualifying"])
+        self.assertEqual(verdict["verdict"], "PASS")
+
+    def test_absent_acceptance_fails_while_an_earlier_replay_was_unreviewed(self):
+        receipt = _v2_receipt()
+        receipt["preconditions"]["deviation_acceptance"] = None
+        verdict = self._verdict(receipt, deviation_acceptance=None)
+        self.assertEqual(_failing_fields(verdict),
+                         {("precondition_review", "deviation_acceptance_before_run")})
+        self.assertEqual(verdict["verdict"], "FAIL")
+        self.assertFalse(verdict["preregistration_qualifying"])
+        self.assertEqual(verdict["execution_checks"]["fail"], 0)
+        self.assertFalse(verdict["deviation_acceptance_recorded"])
+
+    def test_an_acceptance_absent_at_run_time_but_present_later_does_not_count(self):
+        receipt = _v2_receipt()
+        receipt["preconditions"]["deviation_acceptance"] = None
+        verdict = self._verdict(receipt)
+        self.assertIn(("precondition_review", "deviation_acceptance_before_run"),
+                      _failing_fields(verdict))
+
+    def test_no_acceptance_is_needed_when_every_earlier_replay_was_reviewed(self):
+        receipt = _v2_receipt()
+        receipt["preconditions"]["deviation_acceptance"] = None
+        receipt["preconditions"]["prior_v2_replays"]["replays"][0]["reviewed_before_run"] = True
+        history = {"schema": SYNTHETIC_HISTORY["schema"],
+                   "replays": receipt["preconditions"]["prior_v2_replays"]["replays"]}
+        verdict = self._verdict(receipt, deviation_acceptance=None,
+                                replay_history={"sha256": SYNTHETIC_HISTORY_SHA256, "content": history})
+        self.assertEqual(_failing_fields(verdict), set())
+        self.assertTrue(verdict["preregistration_qualifying"])
+
+    def test_wrong_hash_acceptance_fails(self):
+        wrong = dict(SYNTHETIC_ACCEPTANCE, reviewed_harness_local_source_sha256=dict(
+            SYNTHETIC_ACCEPTANCE["reviewed_harness_local_source_sha256"], **{"run.py": "c" * 64}))
+        verdict = self._verdict(deviation_acceptance={"sha256": SYNTHETIC_ACCEPTANCE_SHA256,
+                                                      "content": wrong})
+        self.assertEqual(_failing_fields(verdict), {
+            ("precondition_review", "deviation_acceptance.reviewed_harness_is_the_harness_that_ran")})
+        self.assertFalse(verdict["preregistration_qualifying"])
+        # The file changed since the run recorded it: its content is not read at all.
+        verdict = self._verdict(deviation_acceptance={"sha256": "d" * 64, "content": SYNTHETIC_ACCEPTANCE})
+        self.assertEqual(_failing_fields(verdict), {
+            ("precondition_review", "deviation_acceptance.sha256_at_comparison"),
+            ("precondition_review", "deviation_acceptance.content")})
+
+    def test_late_dated_acceptance_fails(self):
+        for stamp in ("2026-09-23T06:00:00+00:00", "2026-09-23T07:00:00+00:00",
+                      "2026-09-23T05:30:00", "not a date"):
+            with self.subTest(accepted_utc=stamp):
+                late = dict(SYNTHETIC_ACCEPTANCE, accepted_utc=stamp)
+                verdict = self._verdict(deviation_acceptance={"sha256": SYNTHETIC_ACCEPTANCE_SHA256,
+                                                              "content": late})
+                self.assertEqual(_failing_fields(verdict), {
+                    ("precondition_review", "deviation_acceptance.accepted_before_run_started")})
+                self.assertEqual(verdict["verdict"], "FAIL")
+
+    def test_acceptance_schema_identity_and_declaration(self):
+        cases = {
+            "deviation_acceptance.deviation_id": dict(SYNTHETIC_ACCEPTANCE, deviation_id="other"),
+            "deviation_acceptance.schema_version": dict(SYNTHETIC_ACCEPTANCE, schema_version=2),
+            "deviation_acceptance.accepted_by": dict(SYNTHETIC_ACCEPTANCE, accepted_by=" "),
+            "deviation_acceptance.statement": dict(SYNTHETIC_ACCEPTANCE, statement=None),
+            "deviation_acceptance.fields": dict(SYNTHETIC_ACCEPTANCE, extra="x"),
+        }
+        for field, content in cases.items():
+            with self.subTest(field=field):
+                verdict = self._verdict(deviation_acceptance={"sha256": SYNTHETIC_ACCEPTANCE_SHA256,
+                                                              "content": content})
+                self.assertIn(("precondition_review", field), _failing_fields(verdict))
+        receipt = _v2_receipt(preregistration_deviations=[{"id": "review_before_first_run"}])
+        self.assertIn(("precondition_review", "deviation_acceptance.deviation_declared_in_receipt"),
+                      _failing_fields(self._verdict(receipt)))
+        receipt = _v2_receipt()
+        receipt["preconditions"]["deviation_acceptance"]["path"] = "elsewhere.json"
+        self.assertIn(("precondition_review", "deviation_acceptance.path"),
+                      _failing_fields(self._verdict(receipt)))
+
+    def test_the_committed_acceptance_binds_the_reviewed_harness(self):
+        # The gate owner committed the acceptance (not the harness) before the qualifying run.
+        acceptance = RUN.load_deviation_acceptance()
+        self.assertIsNotNone(acceptance)
+        self.assertEqual(acceptance["deviation_id"], COMPARE.ACCEPTED_DEVIATION)
+        self.assertEqual(acceptance["reviewed_harness_local_source_sha256"],
+                         {f: hashlib.sha256((SOURCE / f).read_bytes()).hexdigest() for f in RUN.REVIEWED_HARNESS_FILES})
+        self.assertEqual(COMPARE.DEVIATION_ACCEPTANCE_FIELDS, RUN.DEVIATION_ACCEPTANCE_FIELDS)
+        self.assertEqual(COMPARE.REPLAY_HISTORY, RUN.REPLAY_HISTORY)
+        self.assertIn(COMPARE.ACCEPTED_DEVIATION, [d["id"] for d in RUN.PREREGISTRATION_DEVIATIONS])
+
+
+class V2GateClosureTests(unittest.TestCase):
+    """The dividend-sim-module closure receipt and the dated mapping-status revision
+    are tied to the qualifying verdict and receipt, not free-standing claims."""
+
+    def test_closure_receipt_matches_the_preregistered_schema_and_the_verdict(self):
+        receipt = json.loads((SOURCE / "dividend-module-receipt.json").read_text())
+        self.assertEqual((receipt["schema_version"], receipt["status"]), (1, "closed"))
+        self.assertEqual(receipt["mappings_closed"], ["market_on_open_proxy", "distributions_and_cash"])
+        evidence = receipt["evidence"]
+        self.assertEqual(evidence["verdict_sha256"], hashlib.sha256((SOURCE / "verdict-v2.json").read_bytes()).hexdigest())
+        self.assertEqual(evidence["receipt_sha256"], hashlib.sha256((SOURCE / "receipt-v2.json").read_bytes()).hexdigest())
+        verdict = json.loads((SOURCE / "verdict-v2.json").read_text())
+        self.assertEqual((verdict["verdict"], verdict["preregistration_qualifying"], verdict["failed"]), ("PASS", True, 0))
+        self.assertEqual(evidence["execution_checks"], verdict["execution_checks"])
+
+    def test_dated_revision_resolves_every_v2_row_only_on_the_qualifying_verdict(self):
+        revision = json.loads((SOURCE / "mapping-status-20260923.json").read_text())
+        receipt = json.loads((SOURCE / "dividend-module-receipt.json").read_text())
+        self.assertEqual(receipt["mapping_resolution"]["sha256"],
+                         hashlib.sha256((SOURCE / "mapping-status-20260923.json").read_bytes()).hexdigest())
+        self.assertEqual(revision["revises"]["sha256"],
+                         hashlib.sha256((SOURCE / "mapping-manifest-v2.json").read_bytes()).hexdigest())
+        self.assertEqual(set(revision["mapping_status"]), {m["id"] for m in MANIFEST_V2["mappings"]})
+        for row_id, row in revision["mapping_status"].items():
+            with self.subTest(row=row_id):
+                self.assertEqual((row["was"], row["now"]), ("preregistered", "resolved"))
+        self.assertEqual(revision["evidence"]["verdict_sha256"],
+                         hashlib.sha256((SOURCE / "verdict-v2.json").read_bytes()).hexdigest())
+        # The sealed v2 manifest itself still reads preregistered: the revision never edits it.
+        self.assertTrue(all(m["status"] == "preregistered" for m in MANIFEST_V2["mappings"]))
+
+
+class V2ReplayHistoryTests(unittest.TestCase):
+    """The replay history is re-hashed at comparison time and may only grow."""
+
+    def test_an_appended_replay_is_accepted_and_an_edit_or_omission_fails(self):
+        grown = {"schema": SYNTHETIC_HISTORY["schema"],
+                 "replays": SYNTHETIC_HISTORY["replays"] + [{"id": "this-run", "reviewed_before_run": True}]}
+        verdict = _v2(_v2_receipt(), preconditions=_context(
+            replay_history={"sha256": "8" * 64, "content": grown}))
+        self.assertEqual(_failing_fields(verdict), set())
+        for label, record in (
+                ("edited", {"sha256": "8" * 64, "content": {"replays": [{"id": "earlier",
+                                                                         "reviewed_before_run": True}]}}),
+                ("omitted", {"sha256": "8" * 64, "content": {"replays": []}}),
+                ("rewritten_same_length", {"sha256": "8" * 64, "content": SYNTHETIC_HISTORY}),
+                ("missing", None)):
+            with self.subTest(label=label):
+                verdict = _v2(_v2_receipt(), preconditions=_context(replay_history=record))
+                self.assertIn(("precondition_review", "replay_history_at_comparison"),
+                              _failing_fields(verdict))
+
+    def test_a_receipt_without_the_history_fails(self):
+        receipt = _v2_receipt()
+        del receipt["preconditions"]["prior_v2_replays"]
+        self.assertIn(("precondition_review", "prior_v2_replays_recorded"),
+                      _failing_fields(_v2(receipt)))
+
+    def test_a_run_of_a_harness_an_earlier_replay_already_ran_fails(self):
+        receipt = _v2_receipt()
+        replay = receipt["preconditions"]["prior_v2_replays"]["replays"][0]
+        replay["harness_local_source_sha256"] = dict(SYNTHETIC_REVIEW["reviewed_local_source_sha256"])
+        history = {"replays": receipt["preconditions"]["prior_v2_replays"]["replays"]}
+        verdict = _v2(receipt, preconditions=_context(
+            replay_history={"sha256": SYNTHETIC_HISTORY_SHA256, "content": history}))
+        self.assertEqual(_failing_fields(verdict),
+                         {("precondition_review", "no_prior_replay_ran_the_reviewed_harness")})
+
+    def test_precondition_context_reads_the_history_and_the_recorded_acceptance_path(self):
+        receipt = _v2_receipt()
+        receipt["preconditions"]["deviation_acceptance"] = None
+        context = COMPARE.precondition_context(receipt, EFFECTIVE_V2, None, Path("/data"))
+        self.assertTrue(context["inputs_rehashed_at_comparison"])
+        self.assertIsNone(context["deviation_acceptance"])
+        self.assertEqual(context["replay_history"]["sha256"],
+                         hashlib.sha256((SOURCE / COMPARE.REPLAY_HISTORY).read_bytes()).hexdigest())
+        self.assertEqual(context["replay_history"]["content"]["schema"], RUN.REPLAY_HISTORY_SCHEMA)
+
+
+class V2SubmissionInstantTests(unittest.TestCase):
+    """The submission instant is judged from the engine clock and the engine's events."""
+
+    def test_the_probe_observed_acceptance_at_the_decision_bar(self):
+        base, step = 1_600_000_000_000_000_000, 3_600_000_000_000
+        seen = 0
+        for path in sorted((SOURCE / "probes/v2").glob("probe_oco_moo_p4-*.observed.json")):
+            for result in json.loads(path.read_text())["observed_stdout"]["results"]:
+                for event in result["events"]:
+                    if event["event"] == "OrderAccepted" and event["order"] in ("stop", "mit"):
+                        seen += 1
+                        self.assertEqual(event["ts_event"], base + step, path.name)
+        self.assertEqual(seen, 96)
+
+    def test_a_later_submission_that_keeps_the_decision_row_stamp_fails(self):
+        receipt = _v2_receipt()
+        later = (ENTRY_INTENT_TS + 60) * 10 ** 9
+        pair = receipt["oco_pairs"][0]
+        self.assertEqual(pair["submitted_ts_event_ns"], ENTRY_INTENT_TS * 10 ** 9)
+        pair["submitted_clock_ns"] = later
+        for event in receipt["order_events"]:
+            if event["client_order_id"].startswith("O-1-") and event["event"] in (
+                    "OrderSubmitted", "OrderAccepted"):
+                event["ts_event_ns"] = later
+        self.assertEqual(_failing_fields(_v2(receipt)), {
+            ("entry_oco", "submitted_clock_ns"), ("entry_oco", "legs_submitted_at_decision_ts"),
+            ("entry_oco", "legs_accepted_at_decision_ts")})
+
+    def test_one_late_leg_or_a_missing_clock_fails(self):
+        receipt = _v2_receipt()
+        receipt["order_events"][13]["ts_event_ns"] += 1  # O-2-MIT OrderAccepted
+        self.assertEqual((receipt["order_events"][13]["client_order_id"],
+                          receipt["order_events"][13]["event"]), ("O-2-MIT", "OrderAccepted"))
+        self.assertEqual(_failing_fields(_v2(receipt)), {("exit_oco", "legs_accepted_at_decision_ts")})
+        receipt = _v2_receipt()
+        del receipt["oco_pairs"][1]["submitted_clock_ns"]
+        self.assertEqual(_failing_fields(_v2(receipt)), {("exit_oco", "submitted_clock_ns")})
+
+
+def _swap_filled_leg(receipt, pair_index, ref):
+    """Make the MIT leg the filled one (events and engine_final), keeping price and instant."""
+    for event in receipt["order_events"]:
+        if event.get("client_order_id") == "O-%d-STOP" % ref and event["event"] == "OrderFilled":
+            event["client_order_id"] = "O-%d-MIT" % ref
+        elif event.get("client_order_id") == "O-%d-MIT" % ref and event["event"] == "OrderCanceled":
+            event["client_order_id"] = "O-%d-STOP" % ref
+    legs = receipt["oco_pairs"][pair_index]["legs"]
+    legs[0]["engine_final"], legs[1]["engine_final"] = (
+        dict(legs[0]["engine_final"], status="CANCELED", filled_qty="0"),
+        dict(legs[1]["engine_final"], status="FILLED", filled_qty=legs[1]["engine_final"]["quantity"]))
+
+
+class V2FilledLegTests(unittest.TestCase):
+    """mechanism_rules.fill_rule_by_open names the leg that fills at the open."""
+
+    def test_rule_table(self):
+        close = Decimal("100.0000")
+        cases = {(304, "100.0001"): "STOP_MARKET", (304, "99.9999"): "MARKET_IF_TOUCHED",
+                 (-304, "99.9999"): "STOP_MARKET", (-304, "100.0001"): "MARKET_IF_TOUCHED",
+                 (304, "100.0000"): None, (-304, "100.0000"): None}
+        for (quantity, tested_open), wanted in cases.items():
+            with self.subTest(quantity=quantity, open=tested_open):
+                self.assertEqual(COMPARE.expected_filled_leg(quantity, close, Decimal(tested_open)),
+                                 wanted)
+
+    def test_the_mit_leg_filling_a_buy_on_a_gap_up_fails(self):
+        receipt = _v2_receipt()
+        _swap_filled_leg(receipt, 0, 1)
+        verdict = _v2(receipt)
+        self.assertEqual(_failing_fields(verdict), {("entry_oco", "filled_leg_by_open_rule")})
+        self.assertEqual(_check(verdict, "entry_oco", "filled_leg_by_open_rule")["observed"],
+                         "MARKET_IF_TOUCHED")
+        self.assertEqual(verdict["verdict"], "FAIL")
+
+    def test_the_mit_leg_filling_a_sell_on_a_gap_down_fails(self):
+        receipt = _v2_receipt()
+        _swap_filled_leg(receipt, 1, 2)
+        self.assertEqual(_failing_fields(_v2(receipt)), {("exit_oco", "filled_leg_by_open_rule")})
+
+    def test_the_published_receipt_filled_the_stop_leg_both_times(self):
+        receipt = json.loads(RECEIPT_V2.read_text())
+        fills = [e for e in receipt["order_events"] if e["event"] == "OrderFilled"]
+        self.assertEqual([f["client_order_id"] for f in fills], ["O-1-STOP", "O-2-STOP"])
+
+
+class V2OrderStreamUniquenessTests(unittest.TestCase):
+    """One pair per intent, four distinct legs, and nothing else in the order stream."""
+
+    def test_duplicate_order_ref_fails(self):
+        receipt = _v2_receipt()
+        receipt["oco_pairs"][1]["order_ref"] = 1
+        self.assertIn(("oco_pairs", "order_refs_unique_and_equal_to_intents"),
+                      _failing_fields(_v2(receipt)))
+
+    def test_duplicate_leg_ids_fail(self):
+        receipt = _v2_receipt()
+        receipt["oco_pairs"][1]["legs"][0]["client_order_id"] = "O-1-STOP"
+        self.assertIn(("oco_orders", "distinct_client_order_ids"), _failing_fields(_v2(receipt)))
+
+    def test_an_order_outside_the_pairs_fails_and_its_denial_counts(self):
+        receipt = _v2_receipt()
+        receipt["order_events"].append({"event": "OrderDenied", "client_order_id": "O-9-EXTRA",
+                                        "ts_event_ns": ENTRY_INTENT_TS * 10 ** 9, "reason": "x"})
+        self.assertEqual(_failing_fields(_v2(receipt)), {
+            ("order_events", "client_order_ids_beyond_the_legs"),
+            ("order_events", "denied_or_rejected")})
+
+    def test_non_integral_final_quantity_is_refused_not_truncated(self):
+        with self.assertRaisesRegex(ValueError, "non_integral_final_quantity:0.5"):
+            _v2(_v2_receipt(final_quantity="0.5"))
+
+
+class V2DeterminismTests(unittest.TestCase):
+    """Two-run determinism is recomputed from the runs, not read from the boolean."""
+
+    def test_recomputed_from_the_runs(self):
+        cases = {
+            "hashes_differ": lambda r: r["runs"][1].update(normalized_economic_sha256="d" * 64),
+            "boolean_disagrees": lambda r: r.update(two_run_records_equal=False),
+            "undeclared_field": lambda r: r["two_run_determinism"].update(
+                undeclared_differing_fields=["fills[0].price"]),
+            "no_determinism_record": lambda r: r.pop("two_run_determinism"),
+            "three_runs": lambda r: r["runs"].append(dict(r["runs"][0], label="run-3")),
+            "malformed_hash": lambda r: [run.update(normalized_economic_sha256="x") for run in r["runs"]],
+        }
+        for label, mutate in cases.items():
+            with self.subTest(case=label):
+                receipt = _v2_receipt()
+                mutate(receipt)
+                self.assertIn(("two_run_determinism", "normalized_economic_sha256"),
+                              _failing_fields(_v2(receipt)))
+
+    def test_published_receipt_is_deterministic_by_recomputation(self):
+        ok, detail = COMPARE.v2_determinism(json.loads(RECEIPT_V2.read_text()))
+        self.assertTrue(ok, detail)
+
+    def test_normalize_replaces_only_validated_generated_ids(self):
+        # Generated at test time: the publication scan refuses literal UUIDs.
+        first, second = str(uuid.uuid4()), str(uuid.uuid4())
+        record = {"fills": [{"init_id": first, "client_order_id": "O-1-STOP", "trade_id": second},
+                            {"init_id": second, "event_id": first}],
+                  "positions": [{"events": [{"event_id": first}]}]}
+        counters = {}
+        out = RUN.normalize(record, counters)
+        self.assertEqual(out["fills"][0], {"init_id": "init_id#1", "client_order_id": "O-1-STOP",
+                                           "trade_id": second})
+        self.assertEqual(out["fills"][1], {"init_id": "init_id#2", "event_id": "event_id#1"})
+        self.assertEqual(out["positions"][0]["events"][0]["event_id"], "event_id#1")
+        self.assertEqual(RUN.APPLIED_ID_FIELDS, ("init_id", "event_id"))
+        for bad in ("not-a-uuid", first[:14] + "1" + first[15:], first.upper()):
+            with self.subTest(value=bad), self.assertRaisesRegex(ValueError,
+                                                                 "unexpected_generated_id_format:init_id"):
+                RUN.normalize({"init_id": bad}, {})
+        self.assertEqual(RUN.normalize({"init_id": None, "price": "1.00"}, {}),
+                         {"init_id": None, "price": "1.00"})
+
+    def test_field_differences_and_the_undeclared_excusal(self):
+        left = {"fills": [{"init_id": "a", "price": "1"}], "positions": [{"events": [{"event_id": "x"}]}],
+                "rows": [1, 2]}
+        right = {"fills": [{"init_id": "b", "price": "2"}], "positions": [{"events": [{"event_id": "y"}]}],
+                 "rows": [1], "extra": 1}
+        found = RUN.field_differences(left, right)
+        self.assertEqual(found, ["extra", "fills[0].init_id", "fills[0].price",
+                                 "positions[0].events[0].event_id", "rows[len]"])
+        self.assertEqual(RUN.undeclared_differences(found), ["extra", "fills[0].price", "rows[len]"])
+        self.assertEqual(RUN.field_differences({"a": [1]}, {"a": [1]}), [])
+        published = json.loads(RECEIPT_V2.read_text())["two_run_determinism"]
+        self.assertEqual(RUN.undeclared_differences(published["raw_field_paths_differing"]),
+                         published["undeclared_differing_fields"])
+
+
+class V2VerdictRuleTests(unittest.TestCase):
+    def test_a_correct_fill_on_an_open_equal_close_bar_raises_no_attribution(self):
+        bars = [dict(b) for b in V2_BARS]
+        bars[1].update(c="323.5800")
+        verdict = _v2(_v2_receipt(), bars)
+        self.assertEqual(verdict["rejected_attributions"], [])
+        self.assertEqual(verdict["verdict"], "PASS")
+
+    def test_isolation_evidence_is_checked(self):
+        cases = {
+            "python_isolated_flag": lambda i: i.update(python_flags_isolated=0),
+            "read_only_mounts": lambda i: i["read_only"].update(python_prefix=False),
+            "user_namespace": lambda i: i["namespaces"].update(uid_map="0 0 4294967295\n"),
+            "pid_namespace_pid1": lambda i: i["namespaces"].update(pid1_comm="systemd"),
+            "environment_values": lambda i: i["environment_values"].update(PATH="/opt/x/bin:/usr/bin"),
+        }
+        for field, mutate in cases.items():
+            with self.subTest(field=field):
+                receipt = _v2_receipt()
+                mutate(receipt["isolation"])
+                self.assertEqual(_failing_fields(_v2(receipt)), {("precondition_engine", field)})
+        receipt = _v2_receipt()
+        del receipt["isolation"]["namespaces"]
+        self.assertIn(("precondition_engine", "user_namespace"), _failing_fields(_v2(receipt)))
+
+    def test_runner_isolation_record_holds_no_undocumented_value(self):
+        """Only documented values are recorded, so an unisolated run leaks no personal path."""
+        self.assertEqual(RUN.ISOLATED_ENVIRONMENT_VALUES, COMPARE.ISOLATED_ENVIRONMENT_VALUES)
+        record = RUN.isolation_evidence(SOURCE)
+        self.assertEqual(set(record["read_only"]), {"harness_source", "data_root", "python_prefix"})
+        self.assertNotIn("python_prefix_path", record)
+        for name, value in record["environment_values"].items():
+            self.assertIn(value, (RUN.ISOLATED_ENVIRONMENT_VALUES[name], RUN.UNDOCUMENTED_VALUE))
+        self.assertIn("uid_map", record["namespaces"])
+        self.assertIsInstance(record["python_flags_isolated"], int)
+
+    def test_sizing_limitation_is_derived_from_the_intents(self):
+        receipt = json.loads(RECEIPT_V2.read_text())
+        text = RUN.sizing_limitation(receipt["intents"], receipt["distribution_ledger"])
+        self.assertIn("exit intent records decision_equity 90767.5200", text)
+        self.assertIn("leaves out 428.64", text)
+        self.assertIn("(91196.1600 with them)", text)
+        self.assertIn("quantities are unaffected", text)
+        self.assertNotIn("entry intent", text)
+        # A nonzero-target intent after a posted distribution is named as under-sized.
+        intents = [dict(receipt["intents"][1], reason="rebalance", target="1", quantity=10)]
+        self.assertIn("under-sized: rebalance",
+                      RUN.sizing_limitation(intents, receipt["distribution_ledger"]))
+        self.assertIn("no intent of this run follows",
+                      RUN.sizing_limitation(receipt["intents"][:1], receipt["distribution_ledger"]))
 
 if __name__ == "__main__":
     unittest.main()

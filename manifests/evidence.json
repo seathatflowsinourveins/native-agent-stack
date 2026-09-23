@@ -3053,8 +3053,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "520d9ae235032d6e1c13ae912a7cfaae5ace7d417165d84e633274431311a46c",
-      "bytes": 8023
+      "sha256": "2f4b59872ee901522f26656032fc6022d046e224e9739f9ba1f8a0a16aa87fba",
+      "bytes": 8138
     },
     {
       "path": ".gitignore",
@@ -3068,8 +3068,8 @@
     },
     {
       "path": ".gitleaksignore",
-      "sha256": "525746b6114d1f10e97f3d9818823a258fe766f38847b74fd1f6cc9c6a1992dc",
-      "bytes": 6199
+      "sha256": "b17156d26a9041d78135927b08fc45bd892d0c603e9484966f8c47c3d8d41721",
+      "bytes": 7333
     },
     {
       "path": "AGENTS.md",
@@ -5463,6 +5463,476 @@
       "bytes": 4903
     },
     {
+      "path": "blueprints/gap-wave2-20260923/claude-agent-sdk-minimal.py",
+      "sha256": "ebba7ffaf4395dc86939ec84fada50accce5cfd4a549d2d0b02897beefc963d2",
+      "bytes": 696
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/code-memory-comparison/cm_client.py",
+      "sha256": "b730563f015b96ecda487970cd3155e6e04e536450313804bedb144f28d68ce1",
+      "bytes": 801
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/code-memory-comparison/comparison_result.json",
+      "sha256": "d3cb39bb1e18d78a9fadd8147d1787030d524cbaaa1cba64011c3adde447b6c0",
+      "bytes": 183076
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/code-memory-comparison/run_comparison.py",
+      "sha256": "ce49e07a1de71c52128497d2248c8951407f7c421bd64afa05908b0dfa1a5fa1",
+      "bytes": 2070
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/code-memory-comparison/search_only.py",
+      "sha256": "9ab16c6551f96733c9e37671dcd0941f269caa02518007233d8d864a91015c69",
+      "bytes": 716
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/coordinated-snapshot-restore/sc_restored_check.py",
+      "sha256": "98fe4272269bdfb3bd569dee8f27c26690f2254ba047fa90b02f67ea91782482",
+      "bytes": 674
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/coordinated-snapshot-restore/sc_restored_query.py",
+      "sha256": "18424bef4d84989be40c1215dfe7476a90daf69eb97e17c1553f91204ce7634f",
+      "bytes": 612
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/difftastic-multilang-10/build_packets.py",
+      "sha256": "12b7803fef52accc88af14725bed6f0a17390832a992cb01f6249fddfbb75816",
+      "bytes": 2203
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/difftastic-multilang-10/expected_edit_key.json",
+      "sha256": "8da3c57c8ec7ece91c48f2fd676444f0466e1bff555cdbaae07866c2eb06e617",
+      "bytes": 3473
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/difftastic-multilang-10/fixtures/go_after.go",
+      "sha256": "14496e1854c3d91e5ab2e7ff04fb30e9b3a77bf27a2cb38e6495ade2350b7f4c",
+      "bytes": 131
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/difftastic-multilang-10/fixtures/go_before.go",
+      "sha256": "c34284ac437db09d6e6d9214c1516490bbd5ba4c3de4c9ed0f50d0145af54c9b",
+      "bytes": 58
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/difftastic-multilang-10/fixtures/js_after.js",
+      "sha256": "0473daa3bf3425eb7117338f227c52618d2d6152d64a1b67a0bdb3f62ba335a8",
+      "bytes": 166
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/difftastic-multilang-10/fixtures/js_before.js",
+      "sha256": "fd80ed79cefdfd33ecd5ef2a1740f99629cc65f3942286d01142a5c5f5b80cfb",
+      "bytes": 125
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/difftastic-multilang-10/fixtures/py_after.py",
+      "sha256": "b39cb344a5acfb5439dae6b049dfe74b30fb5e4249384d63c1727dee0fa169b6",
+      "bytes": 93
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/difftastic-multilang-10/fixtures/py_before.py",
+      "sha256": "aa574eaf50320929ad95d84c6a00ad31e9599c8736c555181dea89be9e4c50dd",
+      "bytes": 92
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/difftastic-multilang-10/fixtures/rs_after.rs",
+      "sha256": "97088dfb2b6ed8efead71391c4ebfaf2d42a90756ca817596ae5d48a08a16668",
+      "bytes": 142
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/difftastic-multilang-10/fixtures/rs_before.rs",
+      "sha256": "e5e8957aef9ba877aac86bf7f8d56f08b106e0bc0ddc6b3b636267732b25c3c8",
+      "bytes": 99
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/difftastic-multilang-10/judge_packets/go_A.txt",
+      "sha256": "2f8e63456820d522eb90a27cf7c272a9e324ca1c825a0f7da87b8c02036eb4e9",
+      "bytes": 883
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/difftastic-multilang-10/judge_packets/go_B.txt",
+      "sha256": "d9e1a3e10b3a5af230e0a3e786bd9de8261ddb6393ec52ba6947f94f6235fd64",
+      "bytes": 1018
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/difftastic-multilang-10/judge_packets/js_A.txt",
+      "sha256": "65baf24970ce4bdcf4cba1769ab106b11c80f3c90dcbdcd8fe0ca8b6aab5bf57",
+      "bytes": 868
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/difftastic-multilang-10/judge_packets/js_B.txt",
+      "sha256": "96c5976b6124c8254ebe3519f44304b97704bef9df8b1bab87a3342bd80ac017",
+      "bytes": 998
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/difftastic-multilang-10/judge_packets/py_A.txt",
+      "sha256": "dc48b7b5819233b966eaa0543d934ab1b3e5ee6b291239ccf05837809bee4c22",
+      "bytes": 924
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/difftastic-multilang-10/judge_packets/py_B.txt",
+      "sha256": "01f43d3596508af65ad4cce11819e96925c1c315da696a42eea417c3798a0a2c",
+      "bytes": 928
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/difftastic-multilang-10/judge_packets/rs_A.txt",
+      "sha256": "ed71126f9113cbaba62568d3015f072482283d696e992276f8436f791f982b10",
+      "bytes": 945
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/difftastic-multilang-10/judge_packets/rs_B.txt",
+      "sha256": "58f11025c454d53982724bd1650c346a567c3b4fc77cd2ed2a9cd0c33c573e22",
+      "bytes": 801
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/difftastic-multilang-10/judge_packets_manifest.json",
+      "sha256": "b0287e3c9884240b1fc2452ff4cdbdc725ffd5fa9523e2d33292acaea9c75210",
+      "bytes": 2216
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/difftastic-multilang-10/judge_results/go_A.err.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/difftastic-multilang-10/judge_results/go_A.out.txt",
+      "sha256": "1fae8b9543dc404c8ebf7ae204bcc6909b1c14e1763aa709709a6a69010c4a66",
+      "bytes": 282
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/difftastic-multilang-10/judge_results/go_B.err.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/difftastic-multilang-10/judge_results/go_B.out.txt",
+      "sha256": "8df2e77f986bf95069299bb7685ce19ec543c30386e3a73a0754e5ebfb8d0463",
+      "bytes": 228
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/difftastic-multilang-10/judge_results/js_A.err.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/difftastic-multilang-10/judge_results/js_A.out.txt",
+      "sha256": "05c65d08374548e51d81452440e0d0cd408e55e6bd2d90e6109702d84bb386ea",
+      "bytes": 248
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/difftastic-multilang-10/judge_results/js_B.err.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/difftastic-multilang-10/judge_results/js_B.out.txt",
+      "sha256": "c62bcfc3e71e7ce26ff2f27d8943a1bea20664a0cd33b56f6b591dbadf2fed23",
+      "bytes": 179
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/difftastic-multilang-10/judge_results/py_A.err.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/difftastic-multilang-10/judge_results/py_A.out.txt",
+      "sha256": "9f226b4dfce3059a9c90f83d53728e93da3c521438049086dbd272f7e971150f",
+      "bytes": 136
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/difftastic-multilang-10/judge_results/py_B.err.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/difftastic-multilang-10/judge_results/py_B.out.txt",
+      "sha256": "ffbc1f1463b274a522952e76d49548b1e9ade7cf5af8563865b503742ceaaee1",
+      "bytes": 138
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/difftastic-multilang-10/judge_results/rs_A.err.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/difftastic-multilang-10/judge_results/rs_A.out.txt",
+      "sha256": "147edb1e74058aceac7adeb54775a3f88c9e26c07384b92f4013f9c95f560402",
+      "bytes": 163
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/difftastic-multilang-10/judge_results/rs_B.err.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/difftastic-multilang-10/judge_results/rs_B.out.txt",
+      "sha256": "12b976fd03ce2de675e3450e5d877bf46fe0b3a426809c3056c38ace3fe21052",
+      "bytes": 180
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/difftastic-multilang-10/judge_scored_results.json",
+      "sha256": "6c07beb1ec80e90413afafb1c2ff5a388e0bdf322f1dac8b8d27892a6e40955d",
+      "bytes": 2439
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/difftastic-multilang-10/packets/go_difft.txt",
+      "sha256": "c9d27b21b99dba3974d7da64b39900008c36c76dd2e81812d77917abae8e8d6b",
+      "bytes": 207
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/difftastic-multilang-10/packets/go_gitdiff.txt",
+      "sha256": "9009b26fb4d48e5794c4e44da26115dbcf28b854696c0a72fac7a80057e76a9f",
+      "bytes": 342
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/difftastic-multilang-10/packets/js_difft.txt",
+      "sha256": "b649335d7d309d8feeaa91e06fd40642f5ee23846bc434374631577811758056",
+      "bytes": 183
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/difftastic-multilang-10/packets/js_gitdiff.txt",
+      "sha256": "8575739c92da8fda446216745d415408b34eb657bed07d67585c4973fe59fb08",
+      "bytes": 313
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/difftastic-multilang-10/packets/py_difft.txt",
+      "sha256": "ac6a3aac6dfd8728e95f015d6cf3e8baf341ba82e860fb77284e492f4d93e1bb",
+      "bytes": 278
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/difftastic-multilang-10/packets/py_gitdiff.txt",
+      "sha256": "54fc782a4e588b180aeefc2e404cbdaac8b6c85757a8457316f3f9e2d18c724b",
+      "bytes": 274
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/difftastic-multilang-10/packets/rs_difft.txt",
+      "sha256": "09c09297ea596a8c554102c67c0a73a864170a793d0f3bef94a004dc343beb2d",
+      "bytes": 165
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/difftastic-multilang-10/packets/rs_gitdiff.txt",
+      "sha256": "400c53c2514649785beb4d20c890f7868faaafeaf09d0ac68e7c842b1150de29",
+      "bytes": 309
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/grype-known-cve-fixture/requirements.txt",
+      "sha256": "d3b3b59405b2e7919cc5045aa238932c0e3cc593d1d6896f75a41c37b6f45bd6",
+      "bytes": 276
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/lockfile-audit/audit_lockfiles.py",
+      "sha256": "aec8914030cc2f315c3deb2854a77d7c8fc797e0513aaa168cb36e90eb5aa763",
+      "bytes": 4851
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/qdrant-restart-reconnect/gap9_qdrant_restart.py",
+      "sha256": "e9bee7aa500343bfaf128ccb050d90b9c75db23f09d2e1eed42c975939416cc0",
+      "bytes": 3979
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/rag-bench-eval/SEALED_AT.txt",
+      "sha256": "6aafe6f4badd64cf5ff19c08507ac6f7aa385cf6a178b714a10132d00a71a30b",
+      "bytes": 21
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/rag-bench-eval/chunk.py",
+      "sha256": "d4ae49e554367ac36d58238d804dabad1fa071aec56a8d29ba4c6e90940e635e",
+      "bytes": 2408
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/rag-bench-eval/eval_arm.py",
+      "sha256": "9fc7532de9ac27b9f1e444e52caf72a3e4c983d8644924add903b87f76034bcd",
+      "bytes": 3329
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/rag-bench-eval/index_arm.py",
+      "sha256": "2976fb4841a9fe0c8364f016611e6b82aadef1e40650105ba7fd7754e673dd9a",
+      "bytes": 3391
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/rag-bench-eval/questions.json",
+      "sha256": "4c96addb7bea3edfe5e0289ffffa0092600dc9f3e17b32ae0778ff31f93345b4",
+      "bytes": 10549
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/rag-bench-eval/questions.json.sha256",
+      "sha256": "215d263bf4373b8ff95d1e17a24e700335b2f93af017e5db3b772f122cac5902",
+      "bytes": 81
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/rag-bench-eval/rg_baseline.py",
+      "sha256": "23a32a000b7f506a743fd5c1569bf63a3906b683e423d7def03df93d1809c0df",
+      "bytes": 3682
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/restic-mtime-sparse-uid/extend_fixture.py",
+      "sha256": "553548ffa99391e2bda29dc7a48391fddf69e747325900161fd5866607afd4ec",
+      "bytes": 6576
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/restic-vs-litestream-uv-vs-mise/schema_diff.py",
+      "sha256": "0147079ffd3e8e4cba46bbbd1e62091b78917c2f5ae9b4512842dfb42841dae2",
+      "bytes": 1754
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/skill-arm-ab/cases.json",
+      "sha256": "3ec43a162c62762f0a289f854c3152f80ad3d4425f8339113d0f22c8f7491965",
+      "bytes": 5320
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/skill-arm-ab/scored-results.json",
+      "sha256": "99478e481871fe14da5cdf13a14d5d71be963b3f885ecac3875b66c330dda395",
+      "bytes": 3675
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/socraticode-token-comparison/empty-mcp.json",
+      "sha256": "372a7f8c1e988f58480012e741582e13bb1c9c2b2611432f365ae132f519cfe5",
+      "bytes": 19
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/socraticode-token-comparison/gold_answer.txt",
+      "sha256": "3d9d10d7638bda52ba706d0b24abdcac49c66d43d51efb002483fa80cda2aa89",
+      "bytes": 82
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/socraticode-token-comparison/question.txt",
+      "sha256": "71285bab81baa2aa74ac0f52338df2150c9423e593ae16d24d806f32eb0c5659",
+      "bytes": 283
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/socraticode-token-comparison/run_arm.sh",
+      "sha256": "e5618899a85e1e17594d6c3f70297b2080df36762a9e76607d46869288cd67f4",
+      "bytes": 1322
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/socraticode-token-comparison/runs/with_1.stdout",
+      "sha256": "44dec266d0169e7018eed464e81093d6c906c5cc938066376cd16bebe2934332",
+      "bytes": 12138
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/socraticode-token-comparison/runs/with_2.stdout",
+      "sha256": "4e0d901180eeedea997f9e2fafb9e2e8555fa74cf5d873c28908a64ca89fb585",
+      "bytes": 13899
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/socraticode-token-comparison/runs/with_3.stdout",
+      "sha256": "d3d8c2c78e0887e89b7561c06622d8b7e2a178d103eae9e3fe8c2b7cfa23627c",
+      "bytes": 12143
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/socraticode-token-comparison/runs/without_1.stdout",
+      "sha256": "3e7670a9b5a3b2b95fe03bcb421ffcafacf50b43648f7cb027350c125f073f37",
+      "bytes": 10859
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/socraticode-token-comparison/runs/without_2.stdout",
+      "sha256": "33353ac3d5547661a8c8faee2a16a350a60a687c50e3155402c4021a6319c812",
+      "bytes": 12789
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/socraticode-token-comparison/runs/without_3.stdout",
+      "sha256": "bd40389d38d1d63a41b7c6d6563c4d3a38fd0ee1e73c756b023632de4492a604",
+      "bytes": 10838
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/socraticode-token-comparison/socraticode-mcp.json",
+      "sha256": "443b25c933f3bd478db67a8a10bcfdef120c5246f2784baa38dbefcd2d8da5ee",
+      "bytes": 995
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/socraticode-token-comparison/summary.json",
+      "sha256": "ee6ffca528054c5e0e9d38fd9d8eba4f2c9aab64fc967940fe4a7a018849bd2c",
+      "bytes": 2779
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/watcher-kill-restart-recovery/gap1_finish_and_watch.py",
+      "sha256": "2af779fd6511fe98cfe4af81881a3746f3ec41946c1ffbdd5157f3eabdee8b44",
+      "bytes": 2595
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/watcher-kill-restart-recovery/gap1_full_recovery.py",
+      "sha256": "342586268c748f69fe8a556497b65ffdc8ae4596c63139462211e41f09537c2b",
+      "bytes": 993
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/watcher-kill-restart-recovery/gap1_full_recovery2.py",
+      "sha256": "0d59b60460d848f6d2034537e31b8b0b915341cec3761fe3378788c4df95eec3",
+      "bytes": 1045
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/watcher-kill-restart-recovery/gap1_probe3.py",
+      "sha256": "b68d4f5c1e44f1ef66b66193cd670b28c03451284e833e21bd07434ed7b50055",
+      "bytes": 444
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/watcher-kill-restart-recovery/gap1_stale_lock_poll2.py",
+      "sha256": "5b81635a0a7b31692fcfe44c798c9abec81acd03c811d06ff498401ba0bb36e4",
+      "bytes": 628
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/watcher-kill-restart-recovery/gap1_stale_lock_probe.py",
+      "sha256": "8d6c0916e296f40c0e91964984f40fa0bdce2dfc5f8258a90bcd19b3beaa4753",
+      "bytes": 853
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/watcher-kill-restart-recovery/gap1_watcher_recovery.py",
+      "sha256": "2708bb63771e3aaedef6297c18b49c389653fa594431bcce950ecab55118863d",
+      "bytes": 3332
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/watcher-kill-restart-recovery/mcp_client.py",
+      "sha256": "b2cc59cc27ee89e2cc678d952120f9850068d8783405ec26c6b68c62b4aaa8b8",
+      "bytes": 4047
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/worktree-challenger-6/git_worktree_challenger.py",
+      "sha256": "56549aa1ceabcdbfbdccf7d68a5782ec15b59f762447a609591a3059804c4642",
+      "bytes": 8538
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/worktree-challenger-6/run_git_diff_challenger.sh",
+      "sha256": "b48b08cfe580150f7c67f41bb55cc1b51d79192c0612cc38b8d5ce98f0e80c12",
+      "bytes": 1273
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/worktree-crash-cleanup-5-9/crash_probe.py",
+      "sha256": "62b26f9fb529bcca7620fecbaf2624670fd22fd87091548b7de437cb3edf1b8e",
+      "bytes": 11971
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/worktree-crash-cleanup-5-9/hooks_and_umask_probe.py",
+      "sha256": "3a07e131dce8cfa97808dff8aba59afc58c7e501ad1911a53de53d30b1f73019",
+      "bytes": 6285
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/worktree-e2e-8/e2e_compare.py",
+      "sha256": "5f7bab0ad983e13967be0e3db04e3d803271674f061737f933e263665aa21660",
+      "bytes": 7520
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/zizmor-negative-control/multi-job-no-job-permissions.yml.txt",
+      "sha256": "9ed34c39ba54ad2f787523a9b5d5338a180ae4455653929eb44a975ed257daad",
+      "bytes": 335
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/zizmor-negative-control/negative-control.yml.txt",
+      "sha256": "848ff1a4b866586b4707d5d47439733329ba974f2f58d8f176303aef83e5870c",
+      "bytes": 992
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/zizmor-online-audit/positive-control-sha-pinned.yml.txt",
+      "sha256": "40c0f6b2213482c6b44c2080dbe83a4def407010539121dd3b22b7ff6d4df7b9",
+      "bytes": 310
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/zizmor-online-audit/positive-control-tag-pinned.yml.txt",
+      "sha256": "39e9c9ae4845f3903c0f15fa0d2ef0575c85346857221d18bb77437561f0d6db",
+      "bytes": 236
+    },
+    {
       "path": "blueprints/memory-lifecycle-probe/README.md",
       "sha256": "c50ba6b05cba66095a357f1185429761b251462b9b91d1d23a51532b317bc042",
       "bytes": 9126
@@ -6324,13 +6794,13 @@
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/README.md",
-      "sha256": "a2968f01d9132fec8c6536ab44ade9c2e517e997eca8650f9ad3b80fcd8ae042",
-      "bytes": 10546
+      "sha256": "b602088d17c274cc68ae0d0b3fa91915bd4fe80e430e6ecce437f5d12a982af2",
+      "bytes": 11838
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/compare.py",
-      "sha256": "fc0ed6836add5e2bb9a612b15ca6c57eb3e2d8825af3cad6a39a46f82c441a2e",
-      "bytes": 26843
+      "sha256": "c70386f869e45bcdc54602100991235a450d2a5854445d98ffe45b849454a5ec",
+      "bytes": 67588
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/convert.py",
@@ -6338,9 +6808,24 @@
       "bytes": 14090
     },
     {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/deviation-acceptance-v2.json",
+      "sha256": "b279cf6a81489591e722a97f4e1f085041f358153a9f3553f61e559122dbeb89",
+      "bytes": 1550
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/distribution_module.py",
+      "sha256": "eefee070b0dbe6ad3a1e68755ca959b5fff081fad61af8b84902a438996b126b",
+      "bytes": 10088
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/dividend-module-receipt.json",
+      "sha256": "660f3260a8bdd717b59a2d67209a706ea5ec02aa65538ef7ef977fb9d1ebcbd2",
+      "bytes": 2924
+    },
+    {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/fixture_strategy.py",
-      "sha256": "5c035ba3923e2febcd70ef88a354ce045a4ff45301d19a521f8d41571dd84502",
-      "bytes": 13911
+      "sha256": "59649ac50f26c8b6090dc976e4ec0b3b7e2121cc214674f6c122fbbca9b143f1",
+      "bytes": 23733
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/mapping-manifest-v2.json",
@@ -6351,6 +6836,11 @@
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/mapping-manifest.json",
       "sha256": "43f510494a970d235f27e5676120ee749b45eb6b060cf74f0b768374b8177909",
       "bytes": 19081
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/mapping-status-20260923.json",
+      "sha256": "519b6d56207c27945db1bda33e22a4098a0ad3063edf40c0ed293271d9ae66bf",
+      "bytes": 1894
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/probes/dividend-symbol-scan.json",
@@ -6483,19 +6973,39 @@
       "bytes": 4266
     },
     {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/receipt-v2.json",
+      "sha256": "f881ee3208317c9f954639c5229a7c1e2c785b196d6ea7cfbac1e1d3088f041c",
+      "bytes": 48161
+    },
+    {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/receipt.json",
       "sha256": "1424b9aa8be9d04f16f7aa5efb6a782759cf915035a461dcfd01e1da601d3a88",
       "bytes": 11629
     },
     {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/replay-history-v2.json",
+      "sha256": "02f1be40b05520f783d050fedc2778e54ae1118509b587d39b1a05d7616eeb83",
+      "bytes": 8036
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/review-record-v2-cc4503f.json",
+      "sha256": "7fdf6d104f7e75b07718b33873fd2d32f06113e3cc42a14adfa934aeb0fb01f6",
+      "bytes": 2475
+    },
+    {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/run.py",
-      "sha256": "299b81b230195b6bf9f9a1cebcad2629cc121e4078abe96de8b6f4486c861951",
-      "bytes": 20067
+      "sha256": "c3917c2f6446ffb1bcfe411cc2339ffc1f804a87904ed3a1f1a67e51817ad2f2",
+      "bytes": 51307
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/tolerances.json",
       "sha256": "c8bc72317fb4de83f2b0b7e71888828c7dd15a5a7eb2f60b68f87d54e751c15a",
       "bytes": 2333
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/verdict-v2.json",
+      "sha256": "1816835f9cf2ea2fa3134e4f5c44a57dc48158499efc7d1fc649e0ed715c9fcd",
+      "bytes": 49296
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/verdict.json",
@@ -7488,6 +7998,11 @@
       "sha256": "45c9f3a0d38f4a8bad7d0f59bbc31ff87f6631135273b8a2f731388e993c6555"
     },
     {
+      "path": "catalogs/landscape/gap-wave2-20260923--gap-resolution.json",
+      "sha256": "c7c9e05bdacc5263d370333fd4679ee9c7599f16445c7c75a07dffaf9291b801",
+      "bytes": 69876
+    },
+    {
       "path": "catalogs/landscape/hosting-practice.json",
       "sha256": "00d51484a4984fe8fdbde06fc262d318b600137494e46f532c8a4b410f300e43",
       "bytes": 5456
@@ -7506,6 +8021,11 @@
       "path": "catalogs/landscape/native-practice.json",
       "sha256": "9b15860a6b24060eba318e712bee9e1f5e0d124d72a4fba15d6021c9645ab0d6",
       "bytes": 19759
+    },
+    {
+      "path": "catalogs/landscape/new-host-grand-list.json",
+      "sha256": "822fa078142d43b08f64020808df5d5027986d5913bd223e15ba9b52ba3fe1d3",
+      "bytes": 71540
     },
     {
       "path": "catalogs/landscape/research-state.json",
@@ -7536,6 +8056,11 @@
       "path": "catalogs/sota-convergence/manifest-20260922.json",
       "sha256": "6c9fddc0c664521782f7cad64f6a3d16e4db5ce968834ee5e5940a9bfb56ca77",
       "bytes": 504565
+    },
+    {
+      "path": "catalogs/sota-convergence/manifest-20260923.json",
+      "sha256": "812c913c1e333ba0dca7721832569741f0b9d50618bad4ea4e434c9c031ef6d2",
+      "bytes": 568301
     },
     {
       "path": "catalogs/sota-convergence/sdk-runtime-coverage-20260922.json",
@@ -7724,8 +8249,8 @@
     },
     {
       "path": "catalogs/us-equities/gates-20260922.json",
-      "sha256": "6d3b7364cf671d686b196ef8491c51275c1cd63ea4d01c70f032318725774553",
-      "bytes": 26449
+      "sha256": "cdffd15ba27c092792c1dd709bbb86c7a12b2881efea8977b802adc25a87a54d",
+      "bytes": 27680
     },
     {
       "path": "catalogs/us-equities/hosting-source-review.json",
@@ -7934,8 +8459,8 @@
     },
     {
       "path": "docs/contributing-evidence.md",
-      "sha256": "1bd7ca8e5b4f2a22adfd4d54df87a8ae8329198359c181c542b0498d896bd576",
-      "bytes": 12263
+      "sha256": "fbb657f5a195ae110cc32fb6d63e720d0a2a8324e31b2b73036f693e2647ab7b",
+      "bytes": 12429
     },
     {
       "path": "docs/convergence-architecture.md",
@@ -8024,8 +8549,8 @@
     },
     {
       "path": "docs/foundation-closure-20260921.md",
-      "sha256": "2b490d0bcfca6c7300079f36ced0e21ab708fb3f6517f4fc06076d5391b18164",
-      "bytes": 18870
+      "sha256": "6c9b8acd56ea82ddd2841b3e7f638ee9d980bb648b519e116f5771f8a5ea0e4b",
+      "bytes": 19475
     },
     {
       "path": "docs/foundation-convergence-20260921.md",
@@ -8058,14 +8583,19 @@
       "sha256": "f8c93e1889a46ef7800cb2cbd78168da21dfe77dcce2ef965316c0eb5ce8e6d5"
     },
     {
+      "path": "docs/gap-wave2-20260923--gap-resolution.md",
+      "sha256": "d55375ed6fe901b42516f091532e252f5e157d07d4ce1b0e6b20748344769bdc",
+      "bytes": 12548
+    },
+    {
       "path": "docs/github-automation-evidence.json",
       "sha256": "bd3ad41bfd8b220b543175c6609e1aa44341f6a41c77c0d14578e17bc3215c57",
       "bytes": 14047
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "55417bbe4dcc2c211fb877817ad407b83c8509ae853e2aaa45ca4d12b39c35fe",
-      "bytes": 38356
+      "sha256": "a3ea0313ebe19e9e270d2f2ce0e81988c76fa23056f35de715e5491c09a4a154",
+      "bytes": 39063
     },
     {
       "path": "docs/grand-catalog-handbook.md",
@@ -8188,9 +8718,19 @@
       "bytes": 12760
     },
     {
+      "path": "docs/new-host-grand-list.md",
+      "sha256": "156de59bca9d4df1bd977fbf3fdc04c1eddf08c45576540b56d2f66bbc32fae6",
+      "bytes": 13372
+    },
+    {
       "path": "docs/new-workstation-runtime-profile-20260922.md",
       "sha256": "da5dd61a96155dd73c9c1e2166ff9977e68231dfc0b0200aea5f0f845fb33499",
       "bytes": 15978
+    },
+    {
+      "path": "docs/next-host-stages.md",
+      "sha256": "4804b33e8516384ea8aa3c44b1f69e631410f147ae69ae6a64074eec4c5c0b5a",
+      "bytes": 5304
     },
     {
       "path": "docs/paper-lane-policy.md",
@@ -9243,6 +9783,336 @@
       "bytes": 11920
     },
     {
+      "path": "evidence/artifacts/gap-wave2-20260923/ci-supply-chain/archive-reproducibility.json",
+      "sha256": "6dab85a484babaef04a1738769f0065c2c091eb58f1ce904a4fc3a5d00f25a7e",
+      "bytes": 8932
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/ci-supply-chain/grype-known-cve-fixture.json",
+      "sha256": "f77547f264b077e2ed25c28a7d61218a1d500e3f87a57825976ea325a6b42edd",
+      "bytes": 4410
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/ci-supply-chain/lockfile-audit.json",
+      "sha256": "c80b1cc4c9f36440899cd4e2a9de42b18e3f07c53e477863f81056f2ddce414a",
+      "bytes": 8655
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/ci-supply-chain/publish-catalog-dispatch-attestation.json",
+      "sha256": "0ad291ddd250087271c02b467ffa98174d5f19a34ff6882bc47c1aa7bdd8e826",
+      "bytes": 7708
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/ci-supply-chain/supply-chain-hosted-run-and-wider-syft.json",
+      "sha256": "5af939728f9085e59ff7cde859d548975e368a6262829a237bef5ccff3db96c5",
+      "bytes": 10043
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/ci-supply-chain/syft-signature-verification-and-wider-scan.json",
+      "sha256": "91b440eb18d4edbebb9b4529945b490c02b5179d707d8c3ba05d49511dbe931e",
+      "bytes": 13390
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/ci-supply-chain/zizmor-negative-control.json",
+      "sha256": "009d5a254bfb6c08807caca93a95cbde1a506873d05f309581963d4ed2ef5723",
+      "bytes": 10454
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/ci-supply-chain/zizmor-online-audit.json",
+      "sha256": "ca9ec43a47fb7fcad71f283b368df40f916492e4cf3bcc775674cb31bc154132",
+      "bytes": 11020
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/git-github-automation/codex-review-lane.json",
+      "sha256": "7820ab31a18a25dbe62b5508efe716abeac3d2040d2845c23c5ef8bdd88fd8a8",
+      "bytes": 12792
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/git-github-automation/difftastic-fixture-rerun-4.json",
+      "sha256": "76dd54877082fb13a1800b36ee153e7cd5ee13ad3ca0a093fd3398107482a950",
+      "bytes": 4979
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/git-github-automation/difftastic-multilang-scoring-10.json",
+      "sha256": "8b62615e87f999f95fdc80ab716b002688777fe3d3d458da05411c6530e7143b",
+      "bytes": 10677
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/git-github-automation/gh-inventory-baseline.json",
+      "sha256": "ae390a68e0f14b18da37a8ebade3686d97f6db859b0719cd11937c5517831a5e",
+      "bytes": 6353
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/git-github-automation/gh-pr-flow.json",
+      "sha256": "254449e2a02b7be20e400a2ce6acb39ece258f062ea3d8a988be7b1a1b3ab174",
+      "bytes": 9112
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/git-github-automation/ruleset-doc-correction.json",
+      "sha256": "f62641a743cf8dfe7b7b1e93554f89ea264f54e8b1b356de81fe350b4c7026ac",
+      "bytes": 4664
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/git-github-automation/worktree-and-diff-challenger-6.json",
+      "sha256": "282aaf29ca56cb38ba2b02876bdd567cd583092b83a1770f4efd99263d2aa564",
+      "bytes": 8073
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/git-github-automation/worktree-e2e-comparison-8.json",
+      "sha256": "7f09cc6d31e0ca68cb1c9c384adec86c517081276ecaaef11b271a771b1fa908",
+      "bytes": 9806
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/git-github-automation/worktrunk-crash-cleanup-probe-5.json",
+      "sha256": "bda1f04c3cbdd4085401641af570517981c222131c2edd618e25a684f5a5dcdb",
+      "bytes": 11446
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/git-github-automation/worktrunk-hooks-umask-crash-9.json",
+      "sha256": "f02b6896f82b2b2555d83223adf692cdbffe3579f028b11cd5b5c3e2079bb663",
+      "bytes": 8804
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/hosting-services/backup-restore-app-rebuild.json",
+      "sha256": "c5795d931fc7e72fc3b8b3112721d9def1c28cf6dbd101fd3dbf637dc6aa659d",
+      "bytes": 13694
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/hosting-services/hardened-postgres-tls-scram.json",
+      "sha256": "f5e2bc71d89d710b12bbcc883c04dcec5a28930d780d1f0c5fe54bb01b100cc0",
+      "bytes": 15957
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/hosting-services/migration-up-down-up-data-survival.json",
+      "sha256": "82c492a15065630b0bd1f7e5f518c7d294eab5b5fd39c4ef73d2b3491f1c7d02",
+      "bytes": 8673
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/hosting-services/podman-rootless-feasibility-and-native-comparison.json",
+      "sha256": "8ef79c53641f9ee8772bcd18be015fda906fdc58a95702e138770887428d6b33",
+      "bytes": 12962
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/hosting-services/systemd-run-supervision-kill-restart.json",
+      "sha256": "e6ce2adbbe973149df8a73eaf4077d2c6a9d4ebd7037075ffe8e16c9d1fe63dc",
+      "bytes": 10480
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/instructions-skills/claude-code-templates-source-review.json",
+      "sha256": "232b26c0c1439fefd8b53b05be658ab19f5e7561962ccc1ce551d34dfd9d00bb",
+      "bytes": 5093
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/instructions-skills/ecc-shan-pin-diff.json",
+      "sha256": "69563905ca71316e8350e3f5e7d08a5f16d178d727a7785fa197cc2cba39d10e",
+      "bytes": 12016
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/instructions-skills/ecc-trigger-activation-test.json",
+      "sha256": "dbc167debdee9d24c592357ce2bab5bdbf696615af02e71a9903482e9ac16d08",
+      "bytes": 7049
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/instructions-skills/frozen-skill-arm-ab.json",
+      "sha256": "c3ff5c66274487c6154b9fcdfbaeb02656aa817cf04cecd2a2f7b5f0ad74a6fa",
+      "bytes": 16546
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/instructions-skills/gh-fix-ci-failing-path-trial.json",
+      "sha256": "e44fed839dc3c3fd8173aa0f3e81a610901a6ccc02c7c894d82dccbbf09ccbd1",
+      "bytes": 8553
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/instructions-skills/security-best-practices-reference-drift.json",
+      "sha256": "8eb15f98994a3fc4e77fc2a16132afb0703dc4fba65eb78efe44ca3ec354b9ff",
+      "bytes": 9514
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/instructions-skills/skill-sync-and-closure-reconciliation.json",
+      "sha256": "af0dabd7d3cc46b82c116655720f28d0262cbb95dbfa44e6ae3a6a879e450768",
+      "bytes": 11434
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/instructions-skills/worker-skill-declaration-documented-behavior.json",
+      "sha256": "beb36557166d87924b9c5611f1662babcdbc0787612fcf4519266ef9c13679dd",
+      "bytes": 6571
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/native-clients/agent-sdk-install-and-tool-use.json",
+      "sha256": "26ad9d150455b961749a0c3ad3f53736209f81b2080f362fd1571f901a77a6df",
+      "bytes": 9838
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/native-clients/claude-resume-mcp-toolset.json",
+      "sha256": "1425015211968facb90a757168159dcd76262e38c74dd39ee29ee8a5e902894c",
+      "bytes": 7564
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/native-clients/codex-resume-pinned-build.json",
+      "sha256": "ba4ce5a7829507f57a6857ae0fb3f3e39da37c23f88042e93075d1acc41f70d2",
+      "bytes": 7114
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/native-clients/mcporter-context-mode-bridge-recovery.json",
+      "sha256": "e1a7e9ca63bf150d1a210369989c6756289019879b4d48af441047dfcb85fca6",
+      "bytes": 16678
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/recovery-portability/clean-prefix-context-mode-ai-memory-mcporter.json",
+      "sha256": "9eaf43481b26cec001b351542707c027b4f6dc846bc702a90ff086b59cf3dde3",
+      "bytes": 11917
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/recovery-portability/restic-mtime-sparse-uid-extension.json",
+      "sha256": "70d752c951efca8e91a5fc040b7cb7efead1981760f963a030f2332ab3f8a38f",
+      "bytes": 22609
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/recovery-portability/restic-vs-litestream-uv-vs-mise.json",
+      "sha256": "1f59c3a91587f1738cbb83efb9be324bb1870b1eb052d432e3ee4c2b586bf285",
+      "bytes": 19556
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/recovery-portability/uv-fresh-cache-sdk-graph-sync.json",
+      "sha256": "66fd6142a68dba40b71923c6881724b9c007126bdb83aa7a0cbc89079b8a1877",
+      "bytes": 6735
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/secrets-credentials/PREREGISTRATION-NOTE.md",
+      "sha256": "a5a3aa825111075bbd71662ab06ffe8e17533118c24f4f1d41a6713305f92926",
+      "bytes": 3557
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/secrets-credentials/credential-path-containment.json",
+      "sha256": "d7e9f7b492be7278ff66fb61feb0c53060c14f3bd03f9b42a6756cb74d3fed3c",
+      "bytes": 9890
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/secrets-credentials/gitleaks-headancestry-and-ci-pipeline.json",
+      "sha256": "1f1509f10768740c2a4998b56e5ce344f7523c59b08c1708f6d2e063cc8dc9b3",
+      "bytes": 16513
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/secrets-credentials/gitleaks-html-chunk-coverage.json",
+      "sha256": "7fbc84c95c27f94a6f8e9c147da076f07f867560f524f636fdf769f9dfdc2d04",
+      "bytes": 9960
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/secrets-credentials/gitleaks-precommit-enforcement.json",
+      "sha256": "001c8b5c7d51a0b2d3930e2863235ad4e00ddb7687ce84c9bc08ece4fafd1b19",
+      "bytes": 8430
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/secrets-credentials/gitleaksignore-allrefs-clean.json",
+      "sha256": "1ec55da4c949e47dc4f60b628f4d2bce33caf4465d1cd36017763969a142973e",
+      "bytes": 6324
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/secrets-credentials/openbao-lifecycle-comparison.json",
+      "sha256": "c41f6309ca67dc21a05c1d9c73c45f60ab771487ea02809399e85996a99c2dd7",
+      "bytes": 15088
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/code-memory-comparison.json",
+      "sha256": "19a87a4087600a5844f7eeabe6c25c3978e19c2b1b274c4a498f8bbaaeb31792",
+      "bytes": 15527
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/coordinated-snapshot-restore.json",
+      "sha256": "8a73745d83a8f2994e613f6d516e349770f1efc395c5d9495f687f82d9d44f54",
+      "bytes": 16803
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/held-out-recall-benchmark.json",
+      "sha256": "55bb7418943598123247447aabafd34ef9816b0dd7afc197cc9b207d1531c076",
+      "bytes": 14641
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/qdrant-restart-reconnect.json",
+      "sha256": "a1c904e005417130fc4619b242599338cd4a0c4363701ea7e9146ce1f8d94a15",
+      "bytes": 5816
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/raw/arm_a_index_result.json",
+      "sha256": "54d34cf4fec1e987053e5bc2341236bc19b336f8663522e487128ad8d295be02",
+      "bytes": 779
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/raw/arm_a_nemotron_incumbent_eval.json",
+      "sha256": "d054f81ecc447d3ac35c197905d7e63fc937a9aa34534a2b8fc74565d81e78b0",
+      "bytes": 32170
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/raw/arm_b_bge_small_eval.json",
+      "sha256": "32ce966304d1af846081b02332e0ee53b60a33706a9bccf1366c6c6122937143",
+      "bytes": 32428
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/raw/arm_b_index_result.json",
+      "sha256": "a60fab8e9b4f89321fe6254dd41db37919a67d82304f490dc12cdbfe133e4538",
+      "bytes": 65115
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/raw/gap11_index_result.json",
+      "sha256": "67faa4731dabfd28bd0bba371a7f6c49a5eb209fe5191cfa595ac070ccf1fdbe",
+      "bytes": 148
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/raw/gap11_native_rag_query_result.json",
+      "sha256": "4bfd47d3b6308a8f97b5f3bba26f6dab7e3814e13ce170841b68d5310898200f",
+      "bytes": 707
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/raw/gap11_socraticode_030_literal_query_result.json",
+      "sha256": "acc071cae1cc4192fb98acb45dbe6a608108aae79f4644a46c634afa15626c24",
+      "bytes": 14009
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/raw/rg_keyword_baseline_eval.json",
+      "sha256": "efe30a497fec00006f11a6b15e21738a2aed7adabd614d8629439f69f17b8b7a",
+      "bytes": 40433
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/raw/socraticode_decoy_leakage_check.txt",
+      "sha256": "9fc4c7a752fa4069a3b7d339b0e17e50b1be32c61cd458866dbc8c9f33442249",
+      "bytes": 1752
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/raw/socraticode_eval.json",
+      "sha256": "968c80306fec4dde24e429a4733310b5eef22f485d202ca7b253125c7c0434b9",
+      "bytes": 22230
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/raw/socraticode_eval_discarded_first_run.json",
+      "sha256": "19bf05509ea539ca0f67335b6af1ee97616a285f9668666e259194034fd7a428",
+      "bytes": 26849
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/raw/socraticode_session_raw.json",
+      "sha256": "30c6708bde85e61dcc562d5d7ef26f1f3619a22366e7616ed97d6b1b4cf186ce",
+      "bytes": 269447
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/socraticode-token-comparison.json",
+      "sha256": "a5eddee147e890c4e66c42c80ba7ad865d1f80cfa854cf8ae7b1ebd8ce7c8769",
+      "bytes": 15474
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/socraticode-vs-baselines.json",
+      "sha256": "8df7699aa87666d3f186e38a13a4c88059cc77fbcb7b1223652364caff7c55ea",
+      "bytes": 14233
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/vllm-0.30.0-acceptance-batch.json",
+      "sha256": "aad2959a257a9974a0e2a6d5a9a92c6efce9c18ebfcc8e6553683c0e641a9dff",
+      "bytes": 12890
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/watcher-kill-restart-recovery.json",
+      "sha256": "1702356a6e2ee2db38b4bf38daa8a7caf14df71efb802635153616a8d7e2e120",
+      "bytes": 19163
+    },
+    {
       "path": "evidence/artifacts/harness-rules-convergence-20260922/codex-agent-roles-source.json",
       "sha256": "79e8f86b6c36d0afff4e5174f491937c7c257cebc4fc2cbb3f88adf6efb90e94",
       "bytes": 3576
@@ -9276,6 +10146,11 @@
       "path": "evidence/artifacts/hf-memory-models-20260921/native-results.json",
       "sha256": "01263899ad06977b5fc855f9667f2c29bdffd13d2036705485b24bb7095c5e50",
       "bytes": 17286
+    },
+    {
+      "path": "evidence/artifacts/host-upgrade-20260923/upgrade-evidence.json",
+      "sha256": "8b59148cd489ecada14f2b52ae1730bd7f20ffb857ed2d58109e5ae4a5ac86b2",
+      "bytes": 6598
     },
     {
       "path": "evidence/artifacts/layer-verdicts-20260922/adjudication-inputs/adjudication-key.json",
@@ -11553,6 +12428,11 @@
       "bytes": 90508
     },
     {
+      "path": "evidence/artifacts/sota-convergence-review-20260923/manifest-citation-review.json",
+      "sha256": "dbfe159a5dda9e3772405dc410ac761bfdb4c9baa0621ccb5ba9b22c00462890",
+      "bytes": 67506
+    },
+    {
       "path": "evidence/artifacts/sota-refresh-20260923/hw-profiles/README.md",
       "sha256": "d0c84eaa61e72c7b5f69b0867f34628050cf0694b37703ad372b26cc29689d57",
       "bytes": 9201
@@ -13308,9 +14188,14 @@
       "sha256": "686fab880ea35dd0863d04a721d924158b76f0edde464af93f40fac1bd36b156"
     },
     {
+      "path": "tests/test_gap_wave_ledger.py",
+      "sha256": "1ce3ed5fb281a4bca2a316e0c5db473f29c7a0b97d3773df7fdb118c03f2a883",
+      "bytes": 4174
+    },
+    {
       "path": "tests/test_gitleaks_config.py",
-      "sha256": "67c9ac7c0210a9cd42a5174475913208df6390951f412663c32c2ff4cb656abf",
-      "bytes": 30504
+      "sha256": "49138ec57925d5d94c64b92df08eeea2dfdec5cdf95229f9d91a08225399e77e",
+      "bytes": 31926
     },
     {
       "path": "tests/test_gpu_inference.py",
@@ -13321,6 +14206,11 @@
       "path": "tests/test_grand_dashboard.py",
       "sha256": "0b60a4c8bd8443fcb668ee003c5e88a785ce430460ee1a9e872f0ac9cdf22b8c",
       "bytes": 13225
+    },
+    {
+      "path": "tests/test_grype_known_cve_fixture.py",
+      "sha256": "9d8d907c96f6549607af6ed1403aa044afefce6baa08bca93b439717922a2377",
+      "bytes": 4283
     },
     {
       "path": "tests/test_historical_comparison.py",
@@ -13484,13 +14374,13 @@
     },
     {
       "path": "tests/test_sota_convergence.py",
-      "sha256": "557605ad4b390785ca9b9927be43fede3c66cc4a74b8f42976cb605ce87b69f2",
-      "bytes": 133084
+      "sha256": "486bfa1d94c7c3d01ff188434a447d12a08b1846f7c2eb4cd1900c09bb26fad3",
+      "bytes": 147840
     },
     {
       "path": "tests/test_spy_parity.py",
-      "sha256": "7b2ff836382c6004a3c52e4928ec460423af2b9a8c7b12c9e8575a3e4fd7c11b",
-      "bytes": 51829
+      "sha256": "f210e6f4fc1ff37173fc42e84ace878245e3448f03a2d1bee93d4be04ae6ab5e",
+      "bytes": 121917
     },
     {
       "path": "tests/test_stack_lifecycle.py",
@@ -13504,8 +14394,8 @@
     },
     {
       "path": "tests/test_trading_gates.py",
-      "sha256": "02c0b947dfad2df175406780471728234fd60289d042b0395fd9401de2a8bde2",
-      "bytes": 15953
+      "sha256": "b6087fb4a690e42d146ba48f7c03f3077a280366b837bee83dfea981da7bb10d",
+      "bytes": 16185
     },
     {
       "path": "tests/test_validate.py",
@@ -13548,6 +14438,11 @@
       "bytes": 4442
     },
     {
+      "path": "tests/test_zizmor_negative_control.py",
+      "sha256": "fa0bcd820eb59cfb7b806d440fa5c1abaa4b576062fdcc9190f4ed3f427ee4a3",
+      "bytes": 7469
+    },
+    {
       "path": "tools/adoption/render_config.py",
       "sha256": "ca30b4f62c3df35e96c1da766ac8cd76e21af23a4a5d913317b4a4d77f28c819",
       "bytes": 10586
@@ -13559,13 +14454,13 @@
     },
     {
       "path": "tools/sota-convergence/README.md",
-      "sha256": "75dbb3b3414afe3bb152af0bf2e362fea1eec1d042402617403e218a4915775d",
-      "bytes": 61245
+      "sha256": "dd7735c9deb65f5570a4252af8aa4832e1733f35435b4cbfca7a8817672f7d27",
+      "bytes": 63319
     },
     {
       "path": "tools/sota-convergence/build_manifest.py",
-      "sha256": "f3b3dfc83c53e2972ffed67ca7ce7635d828e2179a00e829a7645bf8abcd15aa",
-      "bytes": 74139
+      "sha256": "32bd46ac753d0e736f793013dc1ad748d9657c2a4768d96bd086f74806e17add",
+      "bytes": 87831
     },
     {
       "path": "tools/sota-convergence/build_verdicts.py",
@@ -13581,6 +14476,11 @@
       "path": "tools/sota-convergence/gap_crosswalk.py",
       "sha256": "012d515016a61a1b7c78d47fa79fb80eb69ba5f7215a204cc69f09dfeb6f4c00",
       "bytes": 25258
+    },
+    {
+      "path": "tools/sota-convergence/gap_wave_ledger.py",
+      "sha256": "6dc6ec19d3c8db944371cbde86f8c7b0dcced125f38b4b14f8ff9fcf455f652b",
+      "bytes": 8675
     },
     {
       "path": "tools/sota-convergence/github_freshness.py",

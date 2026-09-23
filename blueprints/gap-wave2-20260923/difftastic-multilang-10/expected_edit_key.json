@@ -1,0 +1,29 @@
+{
+  "purpose": "Expected-edit key for gap 10's multi-language difftastic accuracy scoring, written BEFORE running difft or git diff on any fixture pair or showing any output to a judge.",
+  "written_before_running_checks": true,
+  "written_at": "2026-09-23T02:05:00Z",
+  "languages": {
+    "python": {
+      "files": ["fixtures/py_before.py", "fixtures/py_after.py"],
+      "semantic_edit": "Boundary condition change: `if age > 18` becomes `if age >= 18`, so an 18-year-old now returns True instead of falling through to has_permit. This is a genuine off-by-one/boundary semantic change, not a formatting change.",
+      "surfacing_question": "Does the diff clearly show the comparison operator changing from '>' to '>=' on the age check (not merely that the line changed)?"
+    },
+    "javascript": {
+      "files": ["fixtures/js_before.js", "fixtures/js_after.js"],
+      "semantic_edit": "A new branch is added: `if (isMember) { discount += 5; }` before the return, so members now get an additional 5 discount. This is an added code path (new behavior), not a rewording.",
+      "surfacing_question": "Does the diff clearly show a new `if (isMember)` block adding 5 to discount, as an ADDITION rather than a modification of the existing `if (total > 100)` block?"
+    },
+    "go": {
+      "files": ["fixtures/go_before.go", "fixtures/go_after.go"],
+      "semantic_edit": "Function signature changes from `func Divide(a, b int) int` to `func Divide(a, b int) (int, error)`, and a division-by-zero guard is added returning an error instead of panicking/crashing. This changes the function's contract (return type and error handling), a significant semantic change.",
+      "surfacing_question": "Does the diff clearly show BOTH the return-type signature change (int -> (int, error)) AND the new zero-check guard, not just that 'the function body changed'?"
+    },
+    "rust": {
+      "files": ["fixtures/rs_before.rs", "fixtures/rs_after.rs"],
+      "semantic_edit": "A new lower-bound guard `if value < 0 { return 0; }` is added, so the function now clamps negative values to 0 in addition to the existing upper-bound clamp. This is an added guard changing the function's range of outputs.",
+      "surfacing_question": "Does the diff clearly show a NEW `if value < 0` block being added, distinct from the existing `if value > max` block?"
+    }
+  },
+  "scoring_method": "For each language, run BOTH difft --exit-code --color never and git diff --no-index --no-color on the before/after pair. Build one blind packet per (language, tool) pair containing ONLY the raw diff tool output (no filename hints beyond what the tool itself prints, no tool name, no header saying which tool produced it). Send each packet to a single `claude -p` call (effort low, model sonnet) with the surfacing_question and the semantic_edit description, asking it to answer yes/no on whether the shown diff surfaces the described change, based ONLY on the diff text (not on prior knowledge of these files). 4 languages x 2 tools = 8 judge calls, matching the 'at most 8' budget.",
+  "preregistered_settlement_rule": "If difft's blind-judged yes-rate across the 4 languages is higher than git diff's, that supports difftastic's structural-review value for gap 10's complaint (single small Python fixture does not establish cross-language accuracy). If they tie or git diff scores higher, that refutes or is inconclusive on difftastic's claimed advantage and is recorded as such, not re-run."
+}

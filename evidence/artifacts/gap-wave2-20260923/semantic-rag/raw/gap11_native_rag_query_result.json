@@ -1,0 +1,30 @@
+{
+  "query": "query: which file computes and prints a Linux usage / native token savings report",
+  "top5": [
+    {
+      "path": "tools/ecosystem/token_manifest.py",
+      "lines": "1-20",
+      "score": 0.36831212
+    },
+    {
+      "path": "tools/ecosystem/install-linux-efficiency.py",
+      "lines": "196-210",
+      "score": 0.3606344
+    },
+    {
+      "path": "tools/ecosystem/token_manifest.py",
+      "lines": "346-365",
+      "score": 0.34825736
+    },
+    {
+      "path": "tools/ecosystem/validate-linux-efficiency.py",
+      "lines": "76-90",
+      "score": 0.3455917
+    },
+    {
+      "path": "tools/ecosystem/token_manifest.py",
+      "lines": "376-395",
+      "score": 0.3433953
+    }
+  ]
+}

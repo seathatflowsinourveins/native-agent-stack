@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "id": "claude-code-templates-source-review",
+  "date": "2026-09-23",
+  "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+  "layer_ids": ["instructions-skills"],
+  "gap_refs": [
+    {"layer_id": "instructions-skills", "gap_index": 9}
+  ],
+  "purpose": "Gap 9: c7 (davila7/claude-code-templates) has no source review of a selected file in the referenced evidence. manifests/stack.json pins version c840d6f626be7ba418da60aeb0f2080413562451 and lists the single accepted skill_invocation 'concise-planning'. Check out the pin and source-review that selected file.",
+  "preregistered": "Before running: fetch the repository at the pinned commit, locate the 'concise-planning' skill (expected under a skills/ or cli-tool/components/skills/ path given the repo's component-catalog layout), confirm the pin resolves and matches the commit date/history the stack pin implies, record its sha256 and read its content for scope/quality (a short structured planning-checklist template is expected, matching its stack.json role 'Selective on-demand community guidance'). If the file is missing or the pin does not resolve, that refutes the existing stack.json entry and is recorded as such.",
+  "commands": [
+    {
+      "cmd": "git clone https://github.com/davila7/claude-code-templates.git cct",
+      "exit": 0,
+      "duration_s": 3.5,
+      "output_excerpt": "clone completed",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "git -C cct log -1 c840d6f626be7ba418da60aeb0f2080413562451 --format='%H %ci' > cct_pin.txt",
+      "exit": 0,
+      "duration_s": 0.05,
+      "output_excerpt": "c840d6f626be7ba418da60aeb0f2080413562451 2026-09-18 12:03:22 -0400",
+      "output_sha256": "066ac627440a5d04be4b2d33ddc0d1a51643524a42a21e740fec1c812e4448d2"
+    },
+    {
+      "cmd": "git -C cct ls-tree -r c840d6f626be7ba418da60aeb0f2080413562451 --name-only | grep -i concise-planning",
+      "exit": 0,
+      "duration_s": 0.3,
+      "output_excerpt": "cli-tool/components/skills/productivity/concise-planning/SKILL.md\ndashboard/public/component-content/skills/productivity/concise-planning.json",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "git -C cct show c840d6f626be7ba418da60aeb0f2080413562451:cli-tool/components/skills/productivity/concise-planning/SKILL.md > cct_skill.txt; sha256sum cct_skill.txt",
+      "exit": 0,
+      "duration_s": 0.1,
+      "output_excerpt": "ecd35e54ee110a81623893617567aca442bbe6b13699bd4c65bb8bfec9ac920c cct_skill.txt (62 lines)",
+      "output_sha256": "ecd35e54ee110a81623893617567aca442bbe6b13699bd4c65bb8bfec9ac920c"
+    },
+    {
+      "cmd": "git -C cct show c840d6f626be7ba418da60aeb0f2080413562451:LICENSE | head -3",
+      "exit": 0,
+      "duration_s": 0.05,
+      "output_excerpt": "MIT License\nCopyright (c) 2025 Daniel (San) Avila",
+      "output_sha256": "n/a"
+    }
+  ],
+  "tool_versions": {"git": "2.43.0"},
+  "installs": [],
+  "result": "The pin resolves cleanly: c840d6f626be7ba418da60aeb0f2080413562451 dated 2026-09-18 in the upstream repository history. The selected 'concise-planning' skill_invocation named in manifests/stack.json exists at that pin at cli-tool/components/skills/productivity/concise-planning/SKILL.md (sha256 ecd35e54ee110a81623893617567aca442bbe6b13699bd4c65bb8bfec9ac920c, 62 lines). Content review: it is a short frontmatter-tagged skill ('Use when a user asks for a plan for a coding task, to generate a clear, actionable, and atomic checklist') with a 3-step workflow (scan context, minimal clarifying questions, generate a structured plan template with Approach/Scope/Action Items/Validation/Open Questions sections) and checklist guidelines (atomic, verb-first, concrete steps). This matches the stack.json role description 'Selective on-demand community guidance' -- it is a lightweight planning-template reference, not an executable tool, hook or credential-bearing component. License at the pin is MIT, matching the manifests/stack.json license field.",
+  "settles_gap": true,
+  "verdict_impact": {
+    "could_change_verdict": false,
+    "direction": "supports_incumbent",
+    "explanation": "Settles gap 9: the previously unreviewed selected file exists at the pinned commit, is small and scoped as recorded, and its content matches the existing 'optional / selective on-demand guidance' classification. No quality or task-improvement claim follows from this source review alone; it only establishes that the pin, file and license match what manifests/stack.json already asserts."
+  },
+  "evidence_class": "source_review",
+  "limitations": [
+    "Source review only: the skill was not exercised by a native client or scored against a task; no task-quality claim is made.",
+    "Only the one accepted skill_invocation (concise-planning) was reviewed; claude-code-templates ships a much larger component catalog (agents, commands, MCPs, other skills) that remains out of scope per the existing 'optional' stack.json decision."
+  ],
+  "raw_artifacts": [
+    {"path": "<scratch>/instructions-skills/cct", "sha256": "n/a (git working tree, not a single file)"}
+  ]
+}

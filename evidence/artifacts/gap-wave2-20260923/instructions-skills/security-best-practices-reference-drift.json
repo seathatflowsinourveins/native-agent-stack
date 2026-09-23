@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "id": "security-best-practices-reference-drift",
+  "date": "2026-09-23",
+  "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+  "layer_ids": ["instructions-skills"],
+  "gap_refs": [
+    {"layer_id": "instructions-skills", "gap_index": 6}
+  ],
+  "purpose": "Gap 6 has two parts: (a) finding quality/false-positive rate on a labeled seeded-vulnerability fixture (FastAPI 0.141.1, Next.js 16.3.5), and (b) whether upstream security-best-practices references have been updated beyond the bundled FastAPI 0.128.x / Next.js 16.1.x specs. This receipt settles part (b) only, via cheap source review; part (a) is recorded as undone below per the unit's own 'only if buildable offline in under 20 minutes' condition.",
+  "preregistered": "Before running: cloning openai/skills fresh and comparing its current default-branch HEAD against the pinned commit (49f948fa...) will show whether the repository has advanced past the pin at all, and if so, whether skills/.curated/security-best-practices/references/*.md were touched by any commit after the pin. If HEAD equals the pin exactly, that directly answers 'has upstream been updated beyond 0.128.x/16.1.x' as no (nothing to update to yet, from this source), settling that half of the gap without needing a fixture.",
+  "commands": [
+    {
+      "cmd": "git clone https://github.com/openai/skills.git openai-skills; git log -1 --format='%H %ci' HEAD; git log -1 --format='%H %ci' 49f948faa9258a0c61caceaf225e179651397431",
+      "exit": 0,
+      "duration_s": 4.0,
+      "output_excerpt": "origin/main HEAD == 49f948faa9258a0c61caceaf225e179651397431, dated 2026-06-23 19:36:12 -0700, exactly the pin recorded in native-practice.json. No branches or tags advance past it for this repository (git branch -a shows only main and 19 unrelated agent/* remote branches).",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "git log -5 --oneline -- skills/.curated/security-best-practices/references/",
+      "exit": 0,
+      "duration_s": 0.2,
+      "output_excerpt": "CORRECTED 2026-09-23: only one commit touches these files: 5c8f1e2 'Add security best-practices, ownership-map, and threat-model skills (#83)' -- the same commit that introduced them. This is NOT the current repository HEAD; HEAD is 49f948faa9258a0c61caceaf225e179651397431 ('[codex] Update skill installer post-install guidance (#507)'), which does not touch these reference files (correcting the original erroneous claim that 5c8f1e2 was HEAD).",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "ADDED 2026-09-23 (fix round, new information, not a re-run): git log --oneline -3 in openai/skills; grep -n README.md for a deprecation notice",
+      "exit": 0,
+      "duration_s": 0.2,
+      "output_excerpt": "`git log --oneline -3` from HEAD: 49f948f, 778b0e6 'Deprecate skills repository (#496)', 972cb86. 778b0e6 is an ancestor of the pin (verified: `git merge-base --is-ancestor 778b0e6 49f948fa... && echo yes` -> yes). README.md line 2: '> [!IMPORTANT]\\n> **This repository is deprecated.** For current Codex skill and plugin examples, use the [OpenAI Plugins repository](https://github.com/openai/plugins).' catalogs/us-equities/star-audit.md line 137 already records this same redirect for a different purpose.",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "ADDED 2026-09-23 (fix round, freshness sub-question requires checking the successor repo, per finding): git clone --depth 50 https://github.com/openai/plugins.git; find . -iname '*security*'; wc -l plugins/codex-security/references/security-guidance.md; grep -in 'fastapi\\|next.js\\|version' plugins/codex-security/references/security-guidance.md",
+      "exit": 0,
+      "duration_s": 3.0,
+      "output_excerpt": "openai/plugins HEAD 1dc1958 ('Sync Codex Security 0.1.24 to the API marketplace'). The only security-focused reference in the successor repo is plugins/codex-security/references/security-guidance.md, a 15-line, framework-agnostic file with no FastAPI or Next.js mentions and no version pins -- it is not a version-pinned FastAPI/Next.js web-server-security spec and does not supersede the deprecated skill's content in a way that would update the 0.128.x/16.1.x version citation. No other 'security-best-practices'-named skill or FastAPI/Next.js-specific security reference exists in the successor repo as of this clone.",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "grep -n 'FastAPI 0.128.x\\|Next.js 16.1.x' skills/.curated/security-best-practices/references/*.md",
+      "exit": 0,
+      "duration_s": 0.1,
+      "output_excerpt": "python-fastapi-web-server-security.md line 1: 'FastAPI Web Security Spec (FastAPI 0.128.x, Python 3.x)'. javascript-typescript-nextjs-web-server-security.md line 1 and line 10: 'Next.js 16.1.x' target scope, unchanged from the previously-recorded citation.",
+      "output_sha256": "n/a"
+    }
+  ],
+  "tool_versions": {"git": "2.43.0"},
+  "installs": [],
+  "result": "CORRECTED 2026-09-23: the original commands and their output_sha256/factual content were accurate except the '5c8f1e2 ... is also the current repository HEAD' claim, which was wrong (HEAD is 49f948fa..., a later commit) and has been fixed above. Upstream openai/skills has not advanced past the pinned commit's content at all in the specific reference files -- the security-best-practices reference files have never been touched by any commit other than the one that introduced them, and the bundled specs still name FastAPI 0.128.x and Next.js 16.1.x verbatim. However, the reason the repository's HEAD equals the pin is NOT that the pin is freshly current: the repository was deprecated at commit 778b0e6 ('Deprecate skills repository (#496)'), an ancestor of the pin, with a README banner redirecting to the successor openai/plugins repository. A check of that successor repository (new evidence, added in this fix round) finds no version-pinned FastAPI/Next.js security-best-practices successor content -- only a generic, framework-agnostic 15-line codex-security reference with no version citations. So: no newer content exists to re-adopt from either repository, but that is because the openai/skills line of development has stopped (deprecated), not because upstream 'reviewed and left it current'. This settles gap 6's upstream-freshness sub-question honestly as 'no newer version-specific content available from either the deprecated repository or its stated successor', not as 'the pin is current/fresh'.",
+  "settles_gap": "partially",
+  "verdict_impact": {
+    "could_change_verdict": true,
+    "direction": "inconclusive",
+    "explanation": "CORRECTED 2026-09-23: the original 'supports_incumbent' direction and 'no newer head to re-adopt' framing implied the upstream source was actively maintained and simply hadn't changed. The source is deprecated (778b0e6, an ancestor of the pin), and its named successor (openai/plugins) has no version-pinned FastAPI/Next.js equivalent to adopt instead. That changes the nature of the freshness claim: this is not evidence the incumbent pin is being kept current by an active upstream, it is evidence there is currently no better upstream source to move to. Whether that could change the verdict depends on a judgment this receipt does not make (e.g. whether a deprecated, frozen reference should still count as the incumbent, or whether the catalog's own separately-pinned FastAPI 0.141.1/Next.js 16.3.5 runtime versions should be reconciled by a locally-authored update instead) -- flagged as could_change_verdict: true and direction: inconclusive rather than re-asserting supports_incumbent."
+  },
+  "evidence_class": "source_review",
+  "limitations": [
+    "This receipt settles only the upstream-freshness half of gap 6, and even that only partially: it establishes the source is deprecated with no version-matched successor, not that the incumbent pin is actively current. The labeled-fixture precision/recall measurement (build a FastAPI 0.141.1 and Next.js 16.3.5 app with known true/false-positive vulnerabilities, run the skill, score results) was assessed for feasibility and is recorded as UNDONE below, not attempted: building two runnable, realistically-vulnerable fixture apps at those specific pinned versions plus a native claude -p security-review run and manual precision/recall scoring was judged not achievable within the unit's ~20-minute offline-buildable bar together with the remaining claude -p budget already committed to gaps 0/1/3/5/7 in this same unit; per the unit's own binding instruction ('otherwise undone'), it is deferred rather than rushed or faked.",
+    "No claim is made here about actual finding quality or false-positive rate; that remains genuinely unmeasured.",
+    "The openai/plugins successor-repository check inspected only file names and one security-guidance.md file for FastAPI/Next.js/version content; it did not exhaustively read every plugin's skill references for a possible non-obviously-named successor.",
+    "This entry was corrected in a fix round on 2026-09-23 after independent review found it omitted the deprecation of the source repository and misidentified the repository's current HEAD commit; the original commands were not re-run, two new source-review commands (deprecation check, successor-repo check) were added, and the result/verdict_impact were revised from 'supports_incumbent' to 'inconclusive' to reflect that a frozen, deprecated source is not the same as a currently-maintained one."
+  ],
+  "raw_artifacts": []
+}

@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "status": "closed",
+  "mappings_closed": [
+    "market_on_open_proxy",
+    "distributions_and_cash"
+  ],
+  "mapping_resolution": {
+    "revision": "blueprints/us-equities/engine-nautilus/spy-parity/mapping-status-20260923.json",
+    "sha256": "519b6d56207c27945db1bda33e22a4098a0ad3063edf40c0ed293271d9ae66bf",
+    "declared_deviation": "The gate note (2026-09-22) asked for both ids to read resolved in mapping-manifest.json (v1). v1 is hash-bound to the retained BLOCKED verdict and v2 is sealed, so the resolution is recorded in the dated revision the v2 manifest itself prescribes."
+  },
+  "gate": "dividend-sim-module",
+  "closed_on_utc_date": "2026-09-23",
+  "mechanisms": {
+    "distributions_and_cash": "native NautilusTrader 2.0.0rc5 SimulationModule (distribution_module.DistributionModule) whose process() returns Money from the frozen factor file x the engine-observed position on LEAN's next-trading-day ex-date, applied by the engine as reported AccountStates",
+    "market_on_open_proxy": "native OCO-linked STOP_MARKET/MARKET_IF_TOUCHED pair submitted at the decision bar, triggered at the engine's own open tick of the tested bar (not a general MOO equivalent when the open equals the prior close; see the sealed manifest)"
+  },
+  "evidence": {
+    "verdict": "PASS",
+    "verdict_sha256": "1816835f9cf2ea2fa3134e4f5c44a57dc48158499efc7d1fc649e0ed715c9fcd",
+    "receipt": "blueprints/us-equities/engine-nautilus/spy-parity/receipt-v2.json",
+    "receipt_sha256": "f881ee3208317c9f954639c5229a7c1e2c785b196d6ea7cfbac1e1d3088f041c",
+    "sealed_manifest": "blueprints/us-equities/engine-nautilus/spy-parity/mapping-manifest-v2.json",
+    "sealed_manifest_sha256": "1b821d7ba42ea6121002a26a5082df08ed7a79f9a50b2edc9959503e1088ac67",
+    "preregistration_qualifying": true,
+    "execution_checks": {
+      "fail": 0,
+      "pass": 106,
+      "skipped": 0
+    },
+    "distribution_checks_passed": 23,
+    "distribution_checks_total": 23,
+    "market_on_open_checks_passed": 44,
+    "market_on_open_checks_total": 44,
+    "native_end_cash_usd": "90734.08"
+  },
+  "provenance": "implemented by peer session agent-lab-17 against the sealed v2 preregistration (12059ba); harness cc4503f independently reviewed before the qualifying run (review-record-v2-cc4503f.json); deviation first_v2_run_preceded_review accepted by the gate-owner session (deviation-acceptance-v2.json, committed before the run); qualifying bwrap two-run replay run by the gate-owner session (replay-history-v2.json entry bwrap-cc4503f-qualifying)",
+  "limits": [
+    "one_zero case only; other cases (e.g. resizing after a paid ex-date) need a new dated preregistration because v1 sizing excludes module-posted cash",
+    "the open-fill proxy is not a general market-on-open equivalent when the open equals the prior close",
+    "isolation partially observed (declared deviation isolation_partially_observed)"
+  ]
+}
