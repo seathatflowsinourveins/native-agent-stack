@@ -1,14 +1,15 @@
 # Decision: layer-verdict integrity rules before the 2026-09-23 re-record (2026-09-23)
 
-**Decided by:** unit `verdict-integrity`, catalog branch `claude/verdict-integrity-20260923` (base `38847e5`).
+**Decided by:** unit `verdict-integrity`, catalog branch `claude/verdict-integrity-20260923` (base `38847e5`,
+merged with catalog `main` at `9432720`, which carries PR #117).
 
 **Scope:** the layer-verdict pipeline under `tools/sota-convergence/` (`build_verdicts.py`,
 `lane_packets.py`, `record_verdicts.py`, `codex_lane.py`, `claude_lane.py`) and its CI re-check in
 `scripts/landscape.py`. It answers seven defects of the peer update-path audit (workflow
 `wf_77c0ea46-091`, catalog main `38847e5`) that had to be fixed before all 32 ledger rows are
 re-recorded by both model families under `--run-id 20260923`. Host-receipt review independence,
-macOS platform status and the ruleset/CODEOWNERS findings of the same audit belong to catalog PR #117
-and are not decided here.
+the macOS receipt rule and the ruleset/CODEOWNERS findings of the same audit were decided in catalog
+PR #117 (`scripts/platform_status.py`, merged at `9432720`); this record only makes the recorder use it.
 
 ## Decision
 
@@ -19,7 +20,11 @@ and are not decided here.
 2. **Blind packets.** `--withhold-labels` strips stars, forks, watchers, `pushed_at`, `released_at`
    and any other popularity or timestamp key from every candidate and component copy, keeping
    `archived`/`license` only when the requirement names them, and lists each stripped field in
-   `withheld`. Default packets are byte-identical.
+   `withheld`. The latest upstream release is withheld always (`upstream.latest`, with
+   `upstream.prerelease` and the copy's `pin_behind_upstream`, which describe or are derived from it):
+   a date-based tag such as inspect_ai's `release/2025-11-28` is a release date. Of the two options
+   (strip only a date-shaped `latest`, or withhold it entirely) this is the stricter, and no packet
+   requirement names releases, versions or maintenance. Default packets are byte-identical.
 3. **No single-family winner.** A `codex_absent` layer stays `pending_lanes` unless
    `--allow-single-lane PATH` names a dated decision record that names the layer; the path is stored
    as `lanes.single_lane_decision` and `landscape.py` rejects a recorded `codex_absent` row without it.
@@ -27,23 +32,33 @@ and are not decided here.
    `agents-models-workers`).
 4. **Lane identity and two-family adjudication.** Lane returns declare `model.family` (claude lane
    `anthropic`, name `claude-*|opus|sonnet|fable|haiku`; codex lane `openai`, name `gpt-*|codex`), and
-   the two families differ. Each adjudication judgment records `judge {model, family}` and
+   the two families differ. `codex_lane.py` writes the Codex `model` itself from its own observation
+   (the `--model` it passed to `codex exec -m`, else the event-stream model, else `unknown`), never from
+   the model's response text. Each adjudication judgment records `judge {model, family}` and
    `stripped_packet_sha256`, which must equal the layer's sealed lane packet (its `packets/SHA256SUMS`
    entry at record time, its run-manifest `packet_sha256` in CI): the judge is shown the
    `--withhold-labels` packet the lanes judged, not a private reduction. A winner needs unanimous, unrefuted judgments from both lane families,
    each in both presentation orders; otherwise the row is a sealed split (`pending_lanes`).
+   `winner_lane` is validated after that rule, so a unanimous single-family adjudication is a split
+   whether it writes `null` or the lane its judges chose.
 5. **Survivorship.** Every sealed wave writes `evidence/artifacts/layer-verdicts-<run-id>/run-manifest.json`
    listing every packet with its sha256, each lane's outcome (sealed, rejected with reasons, missing)
    and the `packets/SHA256SUMS` text; `landscape.py` requires each new-wave row there with both lanes
-   accounted for.
-6. **Linux platform status.** `accepted` needs a `native_proven`/`measured_comparison` winner citing a
-   receipt or `evidence/` artifact registered in `manifests/evidence.json`; otherwise `conditional`.
-   The layer-verdict pipeline's own sealed files (`evidence/artifacts/layer-verdicts-<run-id>/`:
-   packets, lane returns, adjudications and their inputs) never count: they are lane inputs or
-   opinions, not execution receipts.
-   `record_verdicts.py` reaches the rule through a one-line adapter import with the call shape of
-   PR #117's shared `scripts/platform_status.py`, which was not on `origin/main` at `05e134f` when this
-   was built.
+   accounted for. A row is new-wave when its `lanes.sealed_base` or any lane run id names a
+   non-grandfathered wave, whether or not a lane carries a run id, and every recorded row must seal the
+   lanes its agreement implies (both for `same_winner`/`disagree`, claude only for `codex_absent`), so a
+   hand-edited row cannot skip identity, provenance or survivorship.
+6. **Platform status: one shared rule.** `record_verdicts.py` calls PR #117's
+   `scripts/platform_status.py` `platform_status(platform_id, winner, context)` for every platform,
+   with `load_context(root)` once per run, so a qualifying macOS receipt records `accepted` on a
+   re-record. Linux `accepted` needs a qualifying receipt or a `native_proven`/`measured_comparison`
+   winner citing a registered `evidence/` file. The layer-verdict pipeline's own sealed files
+   (`evidence/artifacts/layer-verdicts-<run-id>/`: packets, lane returns, adjudications and their
+   inputs) never count: they are lane inputs or opinions, not execution receipts. That exclusion is
+   made in the shared `registered_evidence_refs`, so the recorder, `landscape.py` and
+   `component_matrix.py` agree. `landscape.py` re-checks a new-wave row on every platform with
+   `declared_status_error` and a grandfathered row on `ENFORCED_PLATFORMS` (`macos-arm64`, as on main;
+   the re-record widens it). The earlier Linux-only adapter in `landscape.py` is deleted.
 7. **Reproducible lanes.** The Claude lane workflow is vendored at
    `examples/claude-native/workflows/layer-verdict-lane.js` under its `SHA256SUMS` (pin in
    `vendored-lanes.json`). New-wave Claude returns carry `{workflow_path, workflow_sha256,
@@ -63,9 +78,11 @@ Opus-only adjudications covering both presentation orders (12 disagree rows, 10 
 manifest (their `packets/` and `SHA256SUMS` are retained under
 `evidence/artifacts/layer-verdicts-20260922/`; a manifest generated now could not list that run's
 rejected returns, so none is fabricated), and Linux `accepted` from the lane's own evidence class.
-Under the new Linux rule two recorded rows would change (`foundation/ci-supply-chain` and
-`foundation/hosting-services`, six winners, `accepted` to `conditional`); they stay unchanged because the
-wave is frozen by hash and any row still naming it must equal its frozen entry. No 2026-09-22 row is
+Under the shared rule 13 of the 33 Linux `accepted` winners would derive `conditional` (six rows:
+`foundation/ci-supply-chain`, `foundation/hosting-services`, `us-equities/market-data-reference`,
+`storage-compute`, `research-factors-ml` and `portfolio-risk`, measured with
+`declared_status_error` on the merged tree); they stay unchanged because the wave is frozen by hash and
+any row still naming it must equal its frozen entry, and the re-record moves them. No 2026-09-22 row is
 `codex_absent`, so item 3 needs no grandfathering.
 
 The exemption is narrow because the committed wave is frozen by the tools and by CI, whether or not a
@@ -108,3 +125,9 @@ revision found the grandfather rule too broad and four minor gaps (shared-refere
 `lane_packets.py`, pipeline artifacts counting as receipts, substring layer matching, format-only
 provenance and packet hashes); all five are fixed with regression tests that fail on the first
 revision.
+
+A re-review of the second revision found the recorder still on the Linux-only adapter although
+PR #117 was already on `main`, plus five minor gaps (a hand-edited new-wave row skipping the checks,
+`winner_lane` validated before the two-family rule, `--checked-at` defaulting to 2026-09-22, the
+Codex `model.name` taken from response text, and `upstream.latest` surviving `--withhold-labels`);
+each is fixed with a regression test.

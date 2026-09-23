@@ -12,8 +12,10 @@ and writes the result deterministically to
 ``docs/component-evidence-matrix.md``.
 
 Modes: ``--check`` (default) recomputes both outputs in memory and exits 1 on
-any difference from the checked-in files, or on a flip-rule violation (see
-``flip_rule_violations``); ``--write`` recomputes and writes them.
+any difference from the checked-in files, or on a flip-rule violation (a
+declared ``platform_status`` above what ``scripts/platform_status.py`` derives,
+for the platforms in ``landscape.ENFORCED_PLATFORMS``); ``--write`` recomputes
+and writes them.
 """
 
 from __future__ import annotations
@@ -24,13 +26,15 @@ from pathlib import Path
 
 try:
     from . import host_receipts
+    from . import platform_status as platform_evidence
     from .catalog_decisions import InvalidDecisionIndex, load, safe_file, unique_json
-    from .landscape import PLATFORM_KEYS
+    from .landscape import ENFORCED_PLATFORMS, PLATFORM_KEYS
     from .validate import PRIVATE_CONTENT
 except ImportError:  # running as a plain script, not a package
     import host_receipts
+    import platform_status as platform_evidence
     from catalog_decisions import InvalidDecisionIndex, load, safe_file, unique_json
-    from landscape import PLATFORM_KEYS
+    from landscape import ENFORCED_PLATFORMS, PLATFORM_KEYS
     from validate import PRIVATE_CONTENT
 
 
@@ -50,7 +54,6 @@ DECISIONS_FILE = "catalogs/foundation/decisions.json"
 GAP_CROSSWALK_FILE = "catalogs/landscape/gap-crosswalk-92bb279.json"
 STACK_FILE = "manifests/stack.json"
 ADJUDICATION_TEMPLATE = "evidence/artifacts/layer-verdicts-20260922/adjudication/{catalog}-{layer_id}-20260922.json"
-FLIP_RULE_STAGES = {"use", "install"}
 
 OUTPUT_JSON = "catalogs/landscape/component-evidence-matrix.json"
 OUTPUT_MD = "docs/component-evidence-matrix.md"
@@ -163,38 +166,49 @@ def find_adjudication_ref(root: Path, catalog: str, layer_id: str, layer: dict) 
 # --------------------------------------------------------------------- receipts join
 
 
-def platform_receipt_info(receipts_summary: dict, component_id: str, platform_key: str) -> tuple[dict, set[str]]:
+def platform_receipt_info(receipts_summary: dict, component_id: str, platform_key: str) -> dict:
     component_bucket = receipts_summary.get("components", {}).get(component_id, {})
     platform_bucket = component_bucket.get("platforms", {}).get(platform_key)
     if not platform_bucket:
-        return {"pass": 0, "fail": 0, "independently_reviewed_pass": 0, "latest": None}, set()
+        return {"pass": 0, "fail": 0, "independently_reviewed_pass": 0, "independently_reviewed_fail": 0,
+                "dissented": 0, "latest": None}
     stages = platform_bucket.get("stages", {}) or {}
     total_pass = sum(counts.get("pass", 0) for counts in stages.values() if isinstance(counts, dict))
     total_fail = sum(counts.get("fail", 0) for counts in stages.values() if isinstance(counts, dict))
-    reviewed_stages = set(platform_bucket.get("independently_reviewed_native_proven_pass_stages", []) or [])
-    info = {
+    return {
         "pass": total_pass,
         "fail": total_fail,
         "independently_reviewed_pass": platform_bucket.get("independently_reviewed_passes", 0),
+        "independently_reviewed_fail": platform_bucket.get("independently_reviewed_fails", 0),
+        "dissented": platform_bucket.get("dissented", 0),
         "latest": platform_bucket.get("latest_observed_at_utc"),
     }
-    return info, reviewed_stages
 
 
-def build_winner(winner: dict, decisions: dict[str, list[dict]], receipts_summary: dict):
+def build_winner(winner: dict, decisions: dict[str, list[dict]], receipts_summary: dict,
+                 status_context: platform_evidence.StatusContext):
+    """Per-platform catalog status, the status the evidence derives (scripts/platform_status.py),
+    receipt counts and e2e_state. ``host_verified`` means the derived status is ``accepted``
+    on the strength of a host receipt; otherwise e2e_state is the declared catalog status."""
     component_id = winner.get("component_id")
     platforms: dict[str, dict] = {}
-    reviewed_stages_by_platform: dict[str, set[str]] = {}
+    violations: list[str] = []
     for platform_key in sorted(PLATFORM_KEYS):
         catalog_status = (winner.get("platform_status") or {}).get(platform_key, "untested")
-        info, reviewed_stages = platform_receipt_info(receipts_summary, component_id, platform_key)
-        e2e_state = "host_verified" if reviewed_stages else catalog_status
+        derived = platform_evidence.platform_status(platform_key, winner, status_context)
+        host_verified = derived.status == "accepted" and any(
+            ref.startswith("evidence/hosts/") for ref in derived.receipt_refs)
         platforms[platform_key] = {
             "catalog_status": catalog_status,
-            "host_receipts": info,
-            "e2e_state": e2e_state,
+            "derived_status": derived.status,
+            "derived_reason": derived.reason,
+            "host_receipts": platform_receipt_info(receipts_summary, component_id, platform_key),
+            "e2e_state": "host_verified" if host_verified else catalog_status,
         }
-        reviewed_stages_by_platform[platform_key] = reviewed_stages
+        if platform_key in ENFORCED_PLATFORMS:
+            error = platform_evidence.declared_status_error(platform_key, catalog_status, winner, status_context)
+            if error:
+                violations.append(error)
     built = {
         "component_id": component_id,
         "repository": winner.get("repository"),
@@ -203,7 +217,7 @@ def build_winner(winner: dict, decisions: dict[str, list[dict]], receipts_summar
         "lifecycle_stages": decisions.get(component_id, []),
         "platforms": platforms,
     }
-    return built, reviewed_stages_by_platform
+    return built, violations
 
 
 def build_alternative(alternative: dict, repo_to_component: dict[str, str], receipts_summary: dict) -> dict:
@@ -229,7 +243,10 @@ def build_alternative(alternative: dict, repo_to_component: dict[str, str], rece
 
 def build_row(root: Path, catalog: str, layer: dict, decisions: dict[str, list[dict]],
               gap_counts: dict[tuple[str, str], int], receipts_summary: dict,
-              repo_to_component: dict[str, str], open_gap_counts: dict[tuple[str, str], int] | None = None):
+              repo_to_component: dict[str, str], open_gap_counts: dict[tuple[str, str], int] | None = None,
+              status_context: platform_evidence.StatusContext | None = None):
+    if status_context is None:
+        status_context = platform_evidence.load_context(root)
     layer_id = layer.get("layer_id")
     independent_review = classify_independent_review(layer)
     adjudication_ref = find_adjudication_ref(root, catalog, layer_id, layer)
@@ -237,17 +254,10 @@ def build_row(root: Path, catalog: str, layer: dict, decisions: dict[str, list[d
     winners = []
     flip_violations: list[str] = []
     for winner in layer.get("winners", []) or []:
-        built, reviewed_stages_by_platform = build_winner(winner, decisions, receipts_summary)
+        built, violations = build_winner(winner, decisions, receipts_summary, status_context)
         winners.append(built)
-        macos_entry = built["platforms"].get("macos-arm64")
-        if macos_entry and macos_entry["catalog_status"] == "accepted":
-            reviewed = reviewed_stages_by_platform.get("macos-arm64", set())
-            if not (reviewed & FLIP_RULE_STAGES):
-                flip_violations.append(
-                    f"{catalog}/{layer_id} winner {built['component_id']!r}: platform_status "
-                    "macos-arm64=accepted has no independently reviewed passing native_proven "
-                    "host receipt with platform_id macos-arm64 and stage use or install"
-                )
+        flip_violations.extend(f"{catalog}/{layer_id} winner {built['component_id']!r}: {violation}"
+                               for violation in violations)
 
     alternatives = [
         build_alternative(alternative, repo_to_component, receipts_summary)
@@ -280,7 +290,8 @@ def build_document(root: Path):
     open_gap_counts = open_gap_counts_by_layer(gap_doc)
     stack_doc = load_optional(root, STACK_FILE)
     repo_to_component = repository_to_component_id(stack_doc)
-    receipts_summary = host_receipts.build_summary(root)
+    status_context = platform_evidence.load_context(root)
+    receipts_summary = status_context.summary
 
     rows: list[dict] = []
     flip_violations: list[str] = []
@@ -293,6 +304,7 @@ def build_document(root: Path):
                 continue
             row, row_flip_violations = build_row(
                 root, catalog, layer, decisions, gap_counts, receipts_summary, repo_to_component, open_gap_counts,
+                status_context,
             )
             rows.append(row)
             flip_violations.extend(row_flip_violations)
@@ -377,15 +389,29 @@ def render_markdown(document: dict) -> str:
         "",
         "## Per-layer",
         "",
-        "| Layer | Independent review | Winners: e2e_state (linux-wsl2-x86_64 / macos-arm64) |",
+        "Each winner shows, for linux-wsl2-x86_64 / macos-arm64, its `e2e_state` and host receipts as "
+        "[pass/fail/independently reviewed pass/independently reviewed fail], plus `dissented N` when a "
+        "reviewer's latest verdict is disagree or needs_changes. Receipt counts ignore pins; the derived "
+        "status in the JSON binds receipts to the winner's current pin.",
+        "",
+        "| Layer | Independent review | Winners: e2e_state [receipts] (linux-wsl2-x86_64 / macos-arm64) |",
         "| --- | --- | --- |",
     ]
+
+    def platform_cell(entry: dict) -> str:
+        counts = entry.get("host_receipts") or {}
+        cell = (f"{entry.get('e2e_state', '-')} [{counts.get('pass', 0)}/{counts.get('fail', 0)}/"
+                f"{counts.get('independently_reviewed_pass', 0)}/{counts.get('independently_reviewed_fail', 0)}]")
+        if counts.get("dissented"):
+            cell += f" dissented {counts['dissented']}"
+        return cell
+
     for row in document["rows"]:
         winner_cells = []
         for winner in row["winners"]:
-            linux_state = winner["platforms"].get("linux-wsl2-x86_64", {}).get("e2e_state", "-")
-            macos_state = winner["platforms"].get("macos-arm64", {}).get("e2e_state", "-")
-            winner_cells.append(f"{winner['component_id']} ({linux_state} / {macos_state})")
+            linux_cell = platform_cell(winner["platforms"].get("linux-wsl2-x86_64", {}))
+            macos_cell = platform_cell(winner["platforms"].get("macos-arm64", {}))
+            winner_cells.append(f"{winner['component_id']} ({linux_cell} / {macos_cell})")
         adjudication = f" (adjudication: `{row['adjudication_ref']}`)" if row["adjudication_ref"] else ""
         lines.append(
             f"| `{row['catalog']}/{row['layer_id']}` | {row['independent_review']}{adjudication} "
@@ -394,8 +420,9 @@ def render_markdown(document: dict) -> str:
     lines += ["", "## Needs host evidence", "", (
         "Winners whose per-platform `e2e_state` is neither `accepted` nor `host_verified`, grouped by "
         "platform. This is the list other WSL/macOS machines should work through with "
-        "[`docs/contributing-evidence.md`](contributing-evidence.md); most `macos-arm64` entries are "
-        "expected here today, since every current `macos-arm64` `platform_status` is `untested`."
+        "[`docs/contributing-evidence.md`](contributing-evidence.md). `macos-arm64` entries stay here "
+        "until a Mac records receipts that `scripts/platform_status.py` accepts and the layer rows are "
+        "re-recorded."
     ), ""]
     for platform_key in sorted(document["summary"]["needs_host"]):
         entries = document["summary"]["needs_host"][platform_key]
@@ -428,14 +455,19 @@ def render_markdown(document: dict) -> str:
         "After adding host receipts, a decision, a gap-crosswalk regeneration or a landscape verdict update, "
         "run `python3 scripts/component_matrix.py --write` and commit both files. "
         "`python3 scripts/component_matrix.py --check` (run in CI) recomputes both outputs and also enforces "
-        "the flip rule: a winner cannot show `macos-arm64` `platform_status: accepted` without at least one "
-        "host receipt for that platform at stage `use` or `install` that is `result: pass`, "
-        "`evidence_class: native_proven`, carries a non-self independently-reviewed `agree` verdict, declares "
-        "`host.second_physical_machine: true`, and has `host.os`/`host.architecture` consistent with "
-        "`adoption/manifest.json`'s `platform_profiles[]` entry for that platform id (a receipt recorded and "
-        "reviewed entirely on one host, without `second_physical_machine`, does not satisfy it). Never edit "
-        "`platform_status` in the landscape files to make this page pass; add the underlying host receipt "
-        "instead, following [`docs/contributing-evidence.md`](contributing-evidence.md).",
+        "the flip rule, which `scripts/landscape.py` enforces too through the same function "
+        "(`scripts/platform_status.py`): a declared `macos-arm64` `platform_status` may not claim more than "
+        "the recorded evidence supports. `accepted` needs a host receipt for that platform at stage `use` or "
+        "`install` that is `result: pass` and `evidence_class: native_proven`, records the winner's current "
+        "pin in `tool_versions`, declares `host.second_physical_machine: true`, has `host.os`/"
+        "`host.architecture` consistent with `adoption/manifest.json`'s `platform_profiles[]` entry, and "
+        "carries an `agree` review from a reviewer identity other than the recorder's with no standing "
+        "`disagree`/`needs_changes` review. A `native_proven` `use`/`install` fail that is the latest receipt for "
+        "its host and stage blocks `accepted` until that host records a later pass. `conditional` needs a "
+        "pin-bound, non-`synthetic` pass from a declared second physical machine with no standing dissent. "
+        "Never edit `platform_status` in the landscape files to make this page "
+        "pass; add the underlying host receipt instead, following "
+        "[`docs/contributing-evidence.md`](contributing-evidence.md).",
         "",
     ]
     return "\n".join(lines)

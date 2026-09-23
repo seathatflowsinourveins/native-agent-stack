@@ -97,8 +97,8 @@ TRADING_CARD_FILES = (
 CARD_DECISION_ADOPTED = {"default", "conditional"}
 # Manifest review labels are not carried in manifest mode: every label value, including
 # not_individually_reviewed and unmaintained_signal, correlates with the withheld card
-# decision (measured over the 112 2026-09-22 trading entries). pin_behind_upstream stays
-# as its own boolean field and the upstream metadata stays.
+# decision (measured over the 112 2026-09-22 trading entries). Outside --withhold-labels,
+# pin_behind_upstream stays as its own boolean field and the upstream metadata stays.
 LAYER_REQUIREMENT_NOTE = ("The requirement, limitations and existing_overturn_when text is shared by this layer's "
                           "group; judge fit against the layer title and layer_scope_terms.")
 MANIFEST_CANDIDATE_SOURCE = "sota_manifest_layer_entries"
@@ -113,6 +113,13 @@ WITHHELD_DECISION_FIELDS = ("selection", "review_status")
 # build_manifest.upstream_record() and the GitHub API emit; any other key naming a count of stars,
 # forks, watchers or downloads, or a timestamp (``*_at``), is stripped the same way.
 POPULARITY_RECENCY_FIELDS = ("stars", "forks", "watchers", "pushed_at", "released_at")
+# The latest upstream release is withheld entirely (re-review 2026-09-23): a date-based tag such as
+# inspect_ai's "release/2025-11-28" carries a release date. Withholding it always is the stricter
+# of the two options considered (the other stripped it only when date-shaped) and no packet
+# requirement names releases, versions or maintenance. prerelease describes that same release, and
+# pin_behind_upstream is derived by comparing the pin with it, so both go with it.
+UPSTREAM_RELEASE_FIELDS = ("latest", "prerelease")
+COPY_RELEASE_FIELDS = ("pin_behind_upstream",)
 _POPULARITY_TOKENS = ("star", "fork", "watcher", "subscriber", "download", "popular", "trending")
 # Kept only when the packet's requirement text names them (a requirement about licensing or
 # maintenance status makes them evidence rather than a popularity proxy).
@@ -133,20 +140,22 @@ def requirement_names(field: str, requirement) -> bool:
 
 
 def withhold_popularity(packet: dict) -> dict:
-    """Strip popularity and recency fields (and archived/license unless the requirement names
-    them) from every candidate and sota-component copy in a built packet, and list each stripped
-    field in ``withheld``. The canonical fields are always listed, so a reader can tell the
+    """Strip popularity and recency fields and the latest upstream release (and archived/license
+    unless the requirement names them) from every candidate and sota-component copy in a built
+    packet, and list each stripped field in ``withheld``. The canonical fields are always listed, so a reader can tell the
     packet was built under this policy even when no copy carried upstream metadata."""
     requirement = packet.get("requirement")
     gated = [field for field in REQUIREMENT_GATED_FIELDS if not requirement_names(field, requirement)]
     # Labels are relative to one copy: "upstream.<key>" inside the upstream record, "<key>" on the copy itself.
-    policy = {f"upstream.{field}" for field in list(POPULARITY_RECENCY_FIELDS) + gated}
+    policy = ({f"upstream.{field}" for field in list(POPULARITY_RECENCY_FIELDS) + list(UPSTREAM_RELEASE_FIELDS)
+               + gated} | set(COPY_RELEASE_FIELDS))
     stripped = {collection: set(policy) for collection in UPSTREAM_COPIES}
     for collection in UPSTREAM_COPIES:
         for item in packet.get(collection) or []:
             if not isinstance(item, dict):
                 continue
-            for key in [key for key in item if key != "upstream" and is_popularity_or_recency_key(key)]:
+            for key in [key for key in item if key != "upstream" and (
+                    is_popularity_or_recency_key(key) or key in COPY_RELEASE_FIELDS)]:
                 del item[key]
                 stripped[collection].add(key)
             upstream = item.get("upstream")
@@ -155,7 +164,8 @@ def withhold_popularity(packet: dict) -> dict:
                 # upstream record, shared by every packet naming that component: strip a private
                 # copy, so an earlier packet cannot remove a field a later packet's requirement keeps.
                 upstream = item["upstream"] = dict(upstream)
-                for key in [key for key in upstream if is_popularity_or_recency_key(key) or key in gated]:
+                for key in [key for key in upstream if is_popularity_or_recency_key(key) or key in gated
+                            or key in UPSTREAM_RELEASE_FIELDS]:
                     del upstream[key]
                     stripped[collection].add(f"upstream.{key}")
     withheld = list(packet.get("withheld", []))

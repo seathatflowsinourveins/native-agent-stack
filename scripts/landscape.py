@@ -9,14 +9,15 @@ from datetime import date
 import hashlib
 import json
 from pathlib import Path
-from typing import NamedTuple
 import re
 from urllib.parse import urlsplit
 
 try:
     from .catalog_decisions import canonical, identity, load, safe_file
+    from . import platform_status as platform_evidence
 except ImportError:
     from catalog_decisions import canonical, identity, load, safe_file
+    import platform_status as platform_evidence
 
 MANIFEST = "catalogs/landscape/manifest.json"
 DISPOSITIONS = {
@@ -39,8 +40,15 @@ PLATFORM_KEYS = {"linux-wsl2-x86_64", "macos-arm64"}
 PLATFORM_STATUSES = {"accepted", "conditional", "not_established", "untested"}
 PLATFORM_ALLOWED = {
     "linux-wsl2-x86_64": {"accepted", "conditional", "not_established"},
-    "macos-arm64": {"untested"},
+    "macos-arm64": {"accepted", "conditional", "not_established", "untested"},
 }
+# Platforms whose declared status may not outrank what scripts/platform_status.py derives
+# from the host receipts and registered evidence, on every row. tools/sota-convergence/
+# record_verdicts.py now derives every platform of a new wave through that same function, and
+# validate_verdict_row enforces every platform on a non-grandfathered row; Linux joins this set
+# for the grandfathered rows when they are re-recorded (13 Linux "accepted" rows at 38847e5 cite
+# no registered evidence/ file and would derive "conditional"); that re-record widens it.
+ENFORCED_PLATFORMS = {"macos-arm64"}
 OVERTURN_MARKERS = ("fixtures/", "blueprints/", "tests/", "python3 ", "node ")
 
 # --- Layer-verdict integrity rules (2026-09-23 peer audit) ---------------------------------------
@@ -50,8 +58,9 @@ DEFAULT_SEALED_BASE = SEALED_BASE_PREFIX + "20260922"
 # Grandfathered wave: the 32 rows sealed on 2026-09-22 predate these rules. Their lane returns
 # declare no model family or provenance, their adjudications are Opus-only (both presentation
 # orders, no judge identity), they have no run manifest (their packets/ and SHA256SUMS are
-# retained under the sealed base instead), and ci-supply-chain and hosting-services carry linux
-# "accepted" without citing a registered receipt. The exemption covers only the committed wave,
+# retained under the sealed base instead), and their Linux platform_status came from the lane's
+# evidence class alone (13 "accepted" winners cite no registered evidence/ file, so
+# scripts/platform_status.py would derive "conditional"). The exemption covers only the committed wave,
 # which is frozen independently of whether a later wave exists yet:
 # - record_verdicts.py has no default --run-id and its --write refuses a grandfathered id once
 #   --root holds that wave (its sealed directory or a registered wave document), so it never
@@ -80,8 +89,6 @@ RUN_MANIFEST_NAME = "run-manifest.json"
 LANE_OUTCOMES = {"sealed", "rejected", "missing"}
 # A single-lane decision record must be dated in its file name (YYYY-MM-DD or YYYYMMDD).
 DATED_NAME = re.compile(r"(?<![0-9])20[0-9]{2}-?(?:0[1-9]|1[0-2])-?(?:0[1-9]|[12][0-9]|3[01])(?![0-9])")
-ACCEPTED_EVIDENCE_CLASSES = {"native_proven", "measured_comparison"}
-EVIDENCE_MANIFEST = "manifests/evidence.json"
 # Append-only list of the lane code a new-wave return may name in its provenance: the Claude
 # lane's (workflow_path, workflow_sha256) and the Codex lane's (codex_lane_py_sha256,
 # prompt_sha256). tests/test_verdict_lane_vendoring.py keeps it covering the current
@@ -213,11 +220,8 @@ def judge_adjudication(raw, *, grandfathered, packet_sha256=None):
         return "adjudication judgments must cover both presentation orders", None
     lanes = {judgment["preferred_lane"] for judgment in judgments}
     unrefuted = all(judgment["refuting_votes"] == 0 for judgment in judgments)
-    agreed = next(iter(lanes)) if len(lanes) == 1 and unrefuted else None
-    if winner_lane != agreed:
-        return (f"winner_lane {winner_lane!r} must equal the lane every unrefuted judgment chose "
-                f"({agreed!r}; null when the judgments split or any was refuted)"), None
-    split_reason = None
+    unanimous = next(iter(lanes)) if len(lanes) == 1 and unrefuted else None
+    agreed, split_reason = unanimous, None
     if agreed is not None and not grandfathered:
         orders = defaultdict(set)
         for judgment in judgments:
@@ -227,82 +231,16 @@ def judge_adjudication(raw, *, grandfathered, packet_sha256=None):
             split_reason = ("the adjudication needs unanimous judgments from both lane families in both "
                             "presentation orders; missing: " + ", ".join(missing))
             agreed = None
+    # winner_lane is checked after the two-family rule: when that rule alone makes the result a
+    # split, null (the documented split value) and the lane the single family chose are both
+    # accepted, and either way the result is a split, never a malformed record.
+    allowed = {agreed} | ({unanimous} if split_reason else set())
+    if winner_lane not in allowed:
+        return (f"winner_lane {winner_lane!r} must equal the lane every unrefuted judgment chose "
+                f"({agreed!r}; null when the judgments split, any was refuted or a lane family is missing)"), None
     tally = {lane: sum(judgment["preferred_lane"] == lane for judgment in judgments) for lane in LANES}
     return None, {"winner_lane": agreed, "tally": tally, "split_reason": split_reason,
                   "refuted": sum(judgment["refuting_votes"] > 0 for judgment in judgments)}
-
-
-def registered_evidence_paths(evidence_document):
-    """Repository paths a linux "accepted" winner may cite: every receipt listed in
-    manifests/evidence.json receipts[], and every hash-registered files[] artifact under
-    evidence/ (receipts, artifacts, host receipts). Docs and catalogs are not receipts, and
-    neither is anything the layer-verdict pipeline itself sealed
-    (evidence/artifacts/layer-verdicts-<run-id>/: packets, lane returns, adjudications and
-    their inputs are lane inputs or opinions, not execution receipts)."""
-    paths = set()
-    if not isinstance(evidence_document, dict):
-        return paths
-    for receipt in evidence_document.get("receipts") or []:
-        if isinstance(receipt, dict) and isinstance(receipt.get("path"), str):
-            paths.add(receipt["path"])
-    for entry in evidence_document.get("files") or []:
-        if isinstance(entry, dict) and isinstance(entry.get("path"), str) and entry["path"].startswith("evidence/"):
-            paths.add(entry["path"])
-    return {path for path in paths if not path.startswith(SEALED_BASE_PREFIX)}
-
-
-def cited_registered_refs(evidence_refs, registered):
-    """The evidence refs (a ``#fragment`` ignored) that name a registered receipt or artifact."""
-    return tuple(ref for ref in evidence_refs or []
-                 if isinstance(ref, str) and ref.split("#", 1)[0] in registered)
-
-
-def linux_platform_status(evidence_class, evidence_refs, registered):
-    """accepted only for a native/measured winner citing at least one registered receipt or artifact."""
-    if evidence_class in ACCEPTED_EVIDENCE_CLASSES:
-        return "accepted" if cited_registered_refs(evidence_refs, registered) else "conditional"
-    if evidence_class in {"local_integration", "synthetic"}:
-        return "conditional"
-    return "not_established"
-
-
-# Platform-status adapter (2026-09-23 peer audit, item 6). Catalog PR #117
-# (claude/host-evidence-hardening-20260923) owns the shared scripts/platform_status.py with
-# load_context(root) and platform_status(platform_id, winner, context) -> PlatformStatus. Until it
-# is on main, these two functions carry the same call shape with the Linux rule only (macos-arm64
-# stays "untested"), so tools/sota-convergence/record_verdicts.py switches to the shared module by
-# changing its single adapter import line. The shared module is stricter for Linux (it counts only
-# registered evidence/ files, not receipts[] entries outside evidence/).
-PLATFORM_IDS = ("linux-wsl2-x86_64", "macos-arm64")
-
-
-class PlatformStatus(NamedTuple):
-    status: str
-    reason: str
-    receipt_refs: tuple
-
-
-def load_platform_context(root):
-    """The registered receipt/artifact paths, read once per run (the adapter's context)."""
-    path = Path(root) / EVIDENCE_MANIFEST
-    if not path.is_file():
-        return frozenset()
-    return frozenset(registered_evidence_paths(json.loads(path.read_text(encoding="utf-8"))))
-
-
-def linux_rule_platform_status(platform_id, winner, context):
-    """``winner`` is {component_id, pin, evidence_class, evidence_refs}; ``context`` is
-    load_platform_context(root). Linux: linux_platform_status; macos-arm64: untested."""
-    if platform_id not in PLATFORM_IDS:
-        raise ValueError(f"unknown platform {platform_id!r}")
-    if platform_id == "macos-arm64":
-        return PlatformStatus("untested", "no host-receipt rule in this adapter", ())
-    refs = cited_registered_refs(winner.get("evidence_refs"), context)
-    status = linux_platform_status(winner.get("evidence_class"), winner.get("evidence_refs"), context)
-    reason = {"accepted": "native/measured winner citing a registered receipt or evidence/ artifact",
-              "conditional": "no registered receipt or evidence/ artifact cited, or a local/synthetic class",
-              "not_established": "source-review evidence only"}[status]
-    return PlatformStatus(status, reason, refs if status == "accepted" else ())
 
 
 def names_layer_id(text, layer_id):
@@ -396,7 +334,7 @@ def https_url(value):
 
 
 def validate_verdict_row(row, key, *, root, identities, aliases, evidence, recipe_map, sota_pins,
-                         registered=frozenset(), lane_registry=None):
+                          status_context, lane_registry=None):
     """Layer-verdict schema v2 checks for a single landscape row. ``evidence``
     is the confined evidence()/track() helper already bound to this run; a
     winner/alternative's ``evidence_refs`` may be an empty list (schema v2
@@ -436,14 +374,32 @@ def validate_verdict_row(row, key, *, root, identities, aliases, evidence, recip
                                                            sealed_base),
             str(key) + ".lanes.sealed_base must be evidence/artifacts/layer-verdicts-<run-id>")
     wave = run_id_of(sealed_base)
-    grandfathered = is_grandfathered_run(wave)
-    sealed_returns = {}
-    for lane_name in ("claude", "codex"):
+    for lane_name in LANES:
         lane = lanes_field.get(lane_name)
         require(isinstance(lane, dict), str(key) + f".lanes.{lane_name} must be an object")
         require(isinstance(lane.get("run_id"), str), str(key) + f".lanes.{lane_name}.run_id must be text")
-        sealed = lane.get("sealed_sha256")
-        require(isinstance(sealed, str), str(key) + f".lanes.{lane_name}.sealed_sha256 must be text")
+        require(isinstance(lane.get("sealed_sha256"), str), str(key) + f".lanes.{lane_name}.sealed_sha256 must be text")
+    # A row gets every new-wave rule when its sealed_base OR any lane run id (the recorder's
+    # <catalog>-<layer_id>-<run-id>) names a non-grandfathered wave, whether or not a lane carries a
+    # run id: a hand edit cannot drop the rules by emptying a run id or omitting sealed_base.
+    run_prefix = f"{key[0]}-{key[1]}-"
+    named_waves = {wave} | {lanes_field[lane]["run_id"][len(run_prefix):] for lane in LANES
+                            if lanes_field[lane]["run_id"].startswith(run_prefix)}
+    grandfathered = all(is_grandfathered_run(named) for named in named_waves)
+    if not grandfathered:
+        require(not is_grandfathered_run(wave),
+                str(key) + ".lanes run ids name wave(s) " + ", ".join(sorted(named_waves - {wave}))
+                + " but lanes.sealed_base names the grandfathered wave " + str(wave))
+        for lane_name in LANES:
+            lane = lanes_field[lane_name]
+            require(lane["run_id"] in ("", run_prefix + wave),
+                    str(key) + f".lanes.{lane_name}.run_id must be {run_prefix + wave!r} in wave {wave}")
+            require(bool(lane["run_id"]) == bool(lane["sealed_sha256"]),
+                    str(key) + f".lanes.{lane_name} must carry a run_id exactly when it carries a sealed_sha256")
+    sealed_returns = {}
+    for lane_name in LANES:
+        lane = lanes_field[lane_name]
+        sealed = lane["sealed_sha256"]
         if sealed:
             require(bool(re.fullmatch(r"[a-f0-9]{64}", sealed)),
                     str(key) + f".lanes.{lane_name}.sealed_sha256 must be a lowercase 64-digit hash")
@@ -456,7 +412,7 @@ def validate_verdict_row(row, key, *, root, identities, aliases, evidence, recip
                     str(key) + f".lanes.{lane_name}.sealed_sha256 does not match {sealed_path}")
             sealed_returns[lane_name] = sealed_bytes
     require(lanes_field.get("agreement") in LANE_AGREEMENTS, str(key) + ".lanes.agreement is unknown")
-    if not grandfathered and any(lanes_field[lane].get("run_id") for lane in LANES):
+    if not grandfathered:
         # Lane identity, family and provenance are re-checked from the sealed returns themselves.
         families = []
         for lane_name, sealed_bytes in sealed_returns.items():
@@ -524,12 +480,12 @@ def validate_verdict_row(row, key, *, root, identities, aliases, evidence, recip
             require(value in PLATFORM_ALLOWED[platform],
                     str(key) + ".winner.platform_status." + platform + " must be one of "
                     + ", ".join(sorted(PLATFORM_ALLOWED[platform])))
-        if not grandfathered and platform_status.get("linux-wsl2-x86_64") == "accepted":
-            require(linux_platform_status(winner.get("evidence_class"), winner.get("evidence_refs"),
-                                          registered) == "accepted",
-                    str(key) + ".winner.platform_status.linux-wsl2-x86_64 accepted needs a native_proven or "
-                               "measured_comparison winner citing a registered receipt or evidence/ artifact "
-                               "(" + EVIDENCE_MANIFEST + ")")
+            # A new wave's rows were derived through scripts/platform_status.py for every platform
+            # (tools/sota-convergence/record_verdicts.py), so none may claim more than it derives;
+            # grandfathered rows are held to it for ENFORCED_PLATFORMS only.
+            if platform in ENFORCED_PLATFORMS or not grandfathered:
+                error = platform_evidence.declared_status_error(platform, value, winner, status_context)
+                require(error is None, str(key) + ".winner " + str(winner.get("component_id")) + ": " + str(error))
 
     alternatives = row.get("alternatives")
     require(isinstance(alternatives, list), str(key) + ".alternatives must be a list")
@@ -569,13 +525,17 @@ def validate_verdict_row(row, key, *, root, identities, aliases, evidence, recip
         agreement = lanes_field.get("agreement")
         require(agreement in {"same_winner", "disagree", "codex_absent"},
                 str(key) + " recorded verdict needs lanes.agreement same_winner, disagree or codex_absent")
+        # The lanes each agreement implies must be sealed (a recorded row always seals the claude lane).
+        sealed_lanes = {lane for lane in LANES if lanes_field[lane].get("sealed_sha256")}
         if agreement == "codex_absent":
+            require(sealed_lanes == {"claude"},
+                    str(key) + " codex_absent verdict needs the claude lane sealed and the codex lane unsealed")
             issue = single_lane_decision_issue(root, lanes_field.get("single_lane_decision"), key[1])
             require(issue is None, str(key) + ": " + str(issue))
         elif agreement == "same_winner":
-            require(all(lanes_field[lane].get("sealed_sha256") for lane in LANES),
-                    str(key) + " same_winner verdict needs both lanes sealed")
+            require(sealed_lanes == set(LANES), str(key) + " same_winner verdict needs both lanes sealed")
         else:
+            require(sealed_lanes == set(LANES), str(key) + " disagree verdict needs both lanes sealed")
             adjudication_path = f"{sealed_base}/adjudication/{lanes_field['claude'].get('run_id')}.json"
             adjudication_file = safe_file(root, adjudication_path)
             require(adjudication_file.is_file(),
@@ -625,8 +585,6 @@ def build_landscape(root, manifest_path=MANIFEST, *, read=None, track=None, file
     require(bool(trading_layer_ids), "trading taxonomy needs at least one layer")
     expected.update(("us-equities", layer_id) for layer_id in trading_layer_ids)
     recipe_map = read("adoption/manifest.json").get("recipe_map", {})
-    registered = (registered_evidence_paths(read(EVIDENCE_MANIFEST))
-                  if safe_file(root, EVIDENCE_MANIFEST).is_file() else set())
     lane_registry = load_lane_provenance_registry(root)
     # Per-layer, not a single flattened map: a component id can recur across
     # layers with a different pin in each (tools/sota-convergence/build_verdicts.py's
@@ -651,6 +609,8 @@ def build_landscape(root, manifest_path=MANIFEST, *, read=None, track=None, file
                 track(value)
                 result.append({"path": value, "url": file_url(value)})
         return result
+
+    status_context = platform_evidence.load_context(root)
 
     documents = manifest["catalogs"]
     require(set(documents) == {"foundation", "us-equities"}, "landscape must cover both catalogs")
@@ -678,8 +638,8 @@ def build_landscape(root, manifest_path=MANIFEST, *, read=None, track=None, file
                 require(group is None, str(key) + ".group is only used for trading rows")
             validate_verdict_row(row, key, root=root, identities=identities, aliases=aliases,
                                   evidence=evidence, recipe_map=recipe_map,
-                                  sota_pins=sota_pins_by_layer.get(key[1], {}), registered=registered,
-                                  lane_registry=lane_registry)
+                                  sota_pins=sota_pins_by_layer.get(key[1], {}),
+                                  status_context=status_context, lane_registry=lane_registry)
             source_links = evidence(row.get("evidence_refs"), str(key))
             candidates, candidate_ids = [], set()
             require(isinstance(row.get("candidates"), list) and row["candidates"], "layer needs candidates")

@@ -62,6 +62,7 @@ import hashlib
 import json
 import re
 import sys
+from datetime import date
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -86,14 +87,13 @@ from build_verdicts import LEDGER_FILES, WAVE_REGISTRY, load_registry  # noqa: E
 from scripts.landscape import (  # noqa: E402
     DISPOSITIONS, WINNER_EVIDENCE_CLASSES, OVERTURN_MARKERS, https_url,
     DATED_NAME, RUN_MANIFEST_NAME, is_grandfathered_run, judge_adjudication, names_layer_id,
-    lane_model_issue, lane_provenance_issue, PLATFORM_IDS, load_lane_provenance_registry,
+    lane_model_issue, lane_provenance_issue, load_lane_provenance_registry,
     lane_provenance_registry_issue, registered_provenance_entry,
 )
-# Platform-status adapter (2026-09-23 peer audit, item 6). Catalog PR #117 owns the shared
-# scripts/platform_status.py; once it is merged, this one import line becomes
-#   from scripts.platform_status import load_context, platform_status  # noqa: E402
-# and every platform's status (macos-arm64 included) comes from the shared rule.
-from scripts.landscape import load_platform_context as load_context, linux_rule_platform_status as platform_status  # noqa: E402,E501
+# One platform-status rule for every caller (2026-09-23 peer audit, item 6): scripts/platform_status.py
+# (catalog PR #117) derives each platform's status from the host receipts and registered evidence;
+# scripts/landscape.py and scripts/component_matrix.py call the same function.
+from scripts.platform_status import PLATFORMS, load_context, platform_status  # noqa: E402
 from scripts.catalog_decisions import identity, canonical, load, safe_file  # noqa: E402
 
 LANES = ("claude", "codex")
@@ -120,6 +120,21 @@ def validate_run_id(run_id: str) -> str:
     if not RUN_ID_PATTERN.fullmatch(run_id):
         raise SystemExit(f"--run-id must match {RUN_ID_PATTERN.pattern!r} (got {run_id!r})")
     return run_id
+
+
+def checked_at_for(run_id: str, checked_at=None) -> str:
+    """``--checked-at`` when given (an ISO date), else the dated run id's own date."""
+    if checked_at is not None:
+        try:
+            return date.fromisoformat(checked_at).isoformat()
+        except ValueError:
+            raise SystemExit(f"--checked-at must be an ISO date YYYY-MM-DD (got {checked_at!r})") from None
+    if re.fullmatch(r"[0-9]{8}", run_id):
+        try:
+            return date(int(run_id[:4]), int(run_id[4:6]), int(run_id[6:])).isoformat()
+        except ValueError:
+            pass
+    raise SystemExit(f"--run-id {run_id!r} is not a YYYYMMDD date; pass --checked-at YYYY-MM-DD")
 
 
 def sealed_base_for(run_date: str) -> str:
@@ -416,9 +431,10 @@ def component_ids_for(lane_data: dict, candidates_by_key: dict) -> set:
 def platform_status_for(evidence_class: str, evidence_refs=(), status_context=None, *,
                         component_id=None, pin=None) -> dict:
     """Per-platform status of one winner. ``status_context`` None is the grandfathered 2026-09-22
-    rule (linux accepted from the lane's own evidence class, macos-arm64 untested); otherwise every
-    platform's status comes from the adapter ``platform_status`` (Linux: accepted also needs one
-    evidence ref that is a registered receipt or evidence/ artifact, else conditional)."""
+    rule, kept only so --check reproduces that frozen wave (linux from the lane's own evidence
+    class, macos-arm64 untested); otherwise every platform's status is
+    scripts/platform_status.py ``platform_status(platform_id, winner, status_context)``, with
+    ``status_context`` from one ``load_context(root)`` per run."""
     if status_context is None:
         if evidence_class in {"native_proven", "measured_comparison"}:
             linux_status = "accepted"
@@ -430,7 +446,7 @@ def platform_status_for(evidence_class: str, evidence_refs=(), status_context=No
     winner = {"component_id": component_id, "pin": pin, "evidence_class": evidence_class,
               "evidence_refs": list(evidence_refs or ())}
     return {platform_id: platform_status(platform_id, winner, status_context).status
-            for platform_id in PLATFORM_IDS}
+            for platform_id in PLATFORMS}
 
 
 def v1_pin_text(v1_candidate: dict) -> str | None:
@@ -969,7 +985,9 @@ def parse_args(argv=None):
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--root", type=Path, default=REPO_ROOT)
     parser.add_argument("--work-dir", type=Path, required=True)
-    parser.add_argument("--checked-at", default="2026-09-22")
+    parser.add_argument("--checked-at", default=None,
+                        help="ISO date stamped on every re-recorded row. Default: the --run-id's date "
+                             "(YYYYMMDD -> YYYY-MM-DD); a run id that is not a date needs it explicitly.")
     parser.add_argument("--run-id", required=True,
                         help="Run id suffix for a wave's run_id (<catalog>-<layer_id>-<run-id>) and its "
                              "sealed evidence directory (evidence/artifacts/layer-verdicts-<run-id>/). Required: "
@@ -1009,6 +1027,7 @@ def main(argv=None) -> int:
     identities, aliases = load_canonical_index(root)
     sha256sums = parse_sha256sums(work_dir / "packets" / "SHA256SUMS")
     run_date = validate_run_id(args.run_id)
+    checked_at = checked_at_for(run_date, args.checked_at)
     sealed_base = sealed_base_for(run_date)
     grandfathered = is_grandfathered_run(run_date)
     if write_mode and grandfathered and ((root / sealed_base).exists() or run_date in load_registry(root)):
@@ -1031,7 +1050,7 @@ def main(argv=None) -> int:
         document = json.loads(original_text)
         for row in document.get("layers", []):
             sealed_writes.extend(process_row(
-                row, root, catalog, row["layer_id"], work_dir, args.checked_at, args.adjudications,
+                row, root, catalog, row["layer_id"], work_dir, checked_at, args.adjudications,
                 identities, aliases, sha256sums, rejections, tuple(args.lane_repo_root),
                 run_date=run_date, sealed_base=sealed_base, outcomes=outcomes,
                 single_lane_decision=single_lane_decision, status_context=status_context,

@@ -611,6 +611,9 @@ class WithholdWithManifestModeTests(ManifestTradingCandidatesTests):
 # Popularity/recency keys a --withhold-labels packet must never carry (2026-09-23 peer audit:
 # lane_packets copied candidates[].upstream verbatim, so judges saw GitHub stars and push dates).
 POPULARITY_RECENCY_KEYS = ("stars", "forks", "watchers", "pushed_at", "released_at")
+# Re-review 2026-09-23: the latest upstream release is withheld entirely (a date-based tag such as
+# "release/2025-11-28" is a release date), with prerelease and the pin_behind_upstream comparison.
+RELEASE_KEYS = ("latest", "prerelease", "pin_behind_upstream")
 
 
 def keys_anywhere(value):
@@ -628,7 +631,7 @@ def scrub_popularity(value):
     archived/license (no fixture requirement names them) removed at any depth."""
     if isinstance(value, dict):
         return {key: scrub_popularity(item) for key, item in value.items()
-                if key not in POPULARITY_RECENCY_KEYS + ("archived", "license")}
+                if key not in POPULARITY_RECENCY_KEYS + RELEASE_KEYS + ("archived", "license")}
     if isinstance(value, list):
         return [scrub_popularity(item) for item in value]
     return value
@@ -645,7 +648,7 @@ class WithholdPopularityAndRecencyTests(LanePacketsFixture):
             packets = self.build(withhold=True, trading_candidates=trading_candidates)
             for name, text in packets.items():
                 packet = json.loads(text)
-                found = sorted({key for key in keys_anywhere(packet) if key in POPULARITY_RECENCY_KEYS})
+                found = sorted({key for key in keys_anywhere(packet) if key in POPULARITY_RECENCY_KEYS + RELEASE_KEYS})
                 self.assertEqual(found, [], f"{name} ({trading_candidates}) still carries {found}")
                 for key in ("stars", "pushed_at", "released_at"):
                     self.assertIn(f"candidates[].upstream.{key}", packet["withheld"], name)
@@ -681,9 +684,28 @@ class WithholdPopularityAndRecencyTests(LanePacketsFixture):
         lane_packets.withhold_popularity(packet("Run the tool."))
         later = lane_packets.withhold_popularity(packet("Use a permissively licensed, maintained tool."))
         for copy_ in (later["candidates"][0], later["sota_components_not_in_candidates"][0]):
-            self.assertEqual(copy_["upstream"], {"latest": "1.0", "license": "MIT", "archived": False})
+            self.assertEqual(copy_["upstream"], {"license": "MIT", "archived": False})
         self.assertNotIn("candidates[].upstream.license", later["withheld"])
         self.assertEqual(shared["stars"], 10, "the loaded manifest record itself is never mutated")
+
+    def test_the_latest_release_is_withheld_even_when_it_is_date_shaped(self):
+        # Re-review finding: upstream.latest survived stripping, and a date-based tag carries the
+        # release date. The stricter option withholds it always, with prerelease and the
+        # pin_behind_upstream comparison derived from it; the pin itself stays.
+        for latest in ("release/2025-11-28", "2026.09.1", "1.4.0"):
+            packet = lane_packets.withhold_popularity({
+                "requirement": "Run the tool.", "withheld": [],
+                "candidates": [{"key": "c1", "pin": "1.0", "pin_behind_upstream": True,
+                                "upstream": {"latest": latest, "prerelease": False, "license": "MIT"}}],
+                "sota_components_not_in_candidates": [{"id": "x", "pin": "1.0", "pin_behind_upstream": False,
+                                                       "upstream": {"latest": latest}}]})
+            self.assertNotIn(latest, json.dumps(packet))
+            for collection in ("candidates", "sota_components_not_in_candidates"):
+                copy_ = packet[collection][0]
+                self.assertEqual(copy_["pin"], "1.0")
+                self.assertFalse(set(RELEASE_KEYS) & set(keys_anywhere(copy_)), copy_)
+                for label in ("upstream.latest", "upstream.prerelease", "pin_behind_upstream"):
+                    self.assertIn(f"{collection}[].{label}", packet["withheld"])
 
     def test_default_mode_keeps_upstream_metadata_byte_identical(self):
         plain = self.build()

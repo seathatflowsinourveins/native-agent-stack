@@ -7,7 +7,8 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from scripts.landscape import MANIFEST, build_landscape, registered_evidence_paths
+from scripts.landscape import MANIFEST, build_landscape, judge_adjudication
+from scripts import platform_status
 
 
 # Bytes the fixture writes for the sealed runs (self.write serializes with json.dumps).
@@ -16,6 +17,9 @@ SEALED_CODEX_RUN_1_SHA256 = hashlib.sha256(
     json.dumps({"run_id": "run-1", "lane": "codex"}).encode("utf-8")).hexdigest()
 NEW_WAVE = "20260923"
 NEW_WAVE_BASE = f"evidence/artifacts/layer-verdicts-{NEW_WAVE}"
+# The evidence/ receipt a new-wave winner cites; seal_new_wave registers it in files[] (the only
+# evidence scripts/platform_status.py counts toward a Linux "accepted").
+NEW_WAVE_RECEIPT = "evidence/receipt.json"
 NEW_WAVE_MODELS = {"claude": {"name": "claude-opus-5-5", "effort": "high", "family": "anthropic"},
                    "codex": {"name": "gpt-6-astra", "effort": "high", "family": "openai"}}
 NEW_WAVE_PROVENANCE = {
@@ -393,6 +397,10 @@ class LayerVerdictSchemaV2Tests(LandscapeTests):
                       "codex": {"run_id": "run-1", "sealed_sha256": SEALED_CODEX_RUN_1_SHA256},
                       "agreement": "same_winner"},
         }
+        lanes = overrides.get("lanes")
+        if isinstance(lanes, dict) and lanes.get("sealed_base") == NEW_WAVE_BASE:
+            # A new-wave row is held to scripts/platform_status.py on every platform.
+            fields["winners"][0]["evidence_refs"] = ["receipt.json", NEW_WAVE_RECEIPT]
         fields.update(overrides)
         return fields
 
@@ -429,9 +437,10 @@ class LayerVerdictSchemaV2Tests(LandscapeTests):
                          "lanes": manifest_lanes or manifest_entry_lanes}],
             "rejections": [],
         })
+        self.write(NEW_WAVE_RECEIPT, {"exit_code": 0, "scope": "A registered local fixture receipt"})
         if register_receipt:
             self.write("manifests/evidence.json", {"schema_version": 1, "receipts": [{"path": "receipt.json"}],
-                                                   "files": []})
+                                                   "files": [{"path": NEW_WAVE_RECEIPT}]})
         self.write("tools/sota-convergence/lane-provenance.json", {"schema_version": 1, **NEW_WAVE_REGISTRY})
         return lanes
 
@@ -496,8 +505,8 @@ class LayerVerdictSchemaV2Tests(LandscapeTests):
             self.build()
 
     def test_platform_status_vocabulary_is_per_platform(self):
-        # Codex cross-family review of PR-2: macOS may only be untested on this profile
-        # and Linux may not be untested.
+        # Codex cross-family review of PR-2: Linux may not be untested, and macOS may not
+        # claim more than its host receipts support (no receipts here, so not accepted).
         self.seal_claude_run()
         fields = self.recorded_fields()
         fields["winners"][0]["platform_status"] = {"linux-wsl2-x86_64": "accepted", "macos-arm64": "accepted"}
@@ -509,6 +518,40 @@ class LayerVerdictSchemaV2Tests(LandscapeTests):
         self.layer.update(fields)
         with self.assertRaisesRegex(ValueError, "platform_status.linux-wsl2-x86_64"):
             self.build()
+
+    def test_macos_flip_needs_a_qualifying_host_receipt(self):
+        # Peer-update audit (wf_77c0ea46-091) finding 1: macOS could never leave "untested".
+        # The declared status may now rise to what scripts/platform_status.py derives.
+        from scripts import host_receipts
+        self.seal_claude_run()
+        fields = self.recorded_fields()
+        fields["winners"][0]["platform_status"] = {"linux-wsl2-x86_64": "accepted", "macos-arm64": "accepted"}
+        self.layer.update(fields)
+        with self.assertRaisesRegex(ValueError, "supports at most 'untested'"):
+            self.build()
+        (self.root / "adoption" / "host-receipt.schema.json").write_text(
+            (Path(__file__).resolve().parents[1] / "adoption" / "host-receipt.schema.json").read_text(
+                encoding="utf-8"), encoding="utf-8")
+        recorder = {"identity_sha256": host_receipts.identity_digest("mac-recorder")}
+        reviewer = {"identity_sha256": host_receipts.identity_digest("wsl-reviewer")}
+        self.write("evidence/hosts/mac-20260923/mac-20260923--selected--use--20260923.json", {
+            "schema_version": 1, "id": "mac-20260923--selected--use--20260923", "kind": "host_acceptance",
+            "host": {"host_id": "mac-20260923", "platform_id": "macos-arm64", "os": "macos",
+                     "architecture": "arm64", "second_physical_machine": True},
+            "catalog_revision": "b" * 40, "recorded_by": recorder, "component_id": "selected", "stage": "use",
+            "commands": [{"cmd": "selected --version", "exit": 0, "duration_s": 0.1,
+                          "output_sha256": "0" * 64, "output_excerpt": "1"}],
+            "tool_versions": {"selected": "1"}, "observed_at_utc": "2026-09-23T01:00:00Z", "result": "pass",
+            "claim": "Ran on a Mac", "limitations": ["One command"], "evidence_class": "native_proven",
+            "reviews": [
+                {"kind": "self", "ref": "record", "verdict": "agree", "at_utc": "2026-09-23T01:00:00Z",
+                 "reviewer": recorder},
+                {"kind": "independent_session", "ref": "review", "verdict": "agree",
+                 "at_utc": "2026-09-23T02:00:00Z", "reviewer": reviewer},
+            ],
+        })
+        data = self.build()
+        self.assertEqual(data["layers"][0]["winners"][0]["platform_status"]["macos-arm64"], "accepted")
 
     def test_recipe_ref_must_resolve_to_a_recipe_map_key_or_an_existing_path(self):
         self.seal_claude_run()
@@ -658,7 +701,7 @@ class LayerVerdictSchemaV2Tests(LandscapeTests):
 
     def test_new_wave_accepted_linux_status_needs_a_registered_receipt(self):
         self.layer.update(self.recorded_fields(lanes=self.seal_new_wave(register_receipt=False)))
-        with self.assertRaisesRegex(ValueError, "registered receipt"):
+        with self.assertRaisesRegex(ValueError, "linux-wsl2-x86_64 declares 'accepted'.*at most 'conditional'"):
             self.build()
         self.layer["winners"][0]["platform_status"]["linux-wsl2-x86_64"] = "conditional"
         self.build()
@@ -703,10 +746,106 @@ class LayerVerdictSchemaV2Tests(LandscapeTests):
         fields = self.recorded_fields(lanes=lanes)
         fields["winners"][0]["evidence_refs"] = [sealed, packet]
         self.layer.update(fields)
-        with self.assertRaisesRegex(ValueError, "registered receipt"):
+        with self.assertRaisesRegex(ValueError, "linux-wsl2-x86_64 declares 'accepted'.*at most 'conditional'"):
             self.build()
-        self.assertEqual(registered_evidence_paths(json.loads(
-            (self.root / "manifests/evidence.json").read_text(encoding="utf-8"))), set())
+        # The shared rule itself excludes them, so component_matrix.py and the recorder agree.
+        context = platform_status.load_context(self.root)
+        self.assertEqual(platform_status.registered_evidence_refs(fields["winners"][0], context.registered_paths), ())
+        self.assertEqual(platform_status.platform_status("linux-wsl2-x86_64", fields["winners"][0], context).status,
+                         "conditional")
+
+    # --- Re-review findings (2026-09-23) -----------------------------------------------
+    def test_new_wave_macos_status_is_held_to_the_shared_rule(self):
+        # A new-wave row is checked on every platform, not only ENFORCED_PLATFORMS.
+        fields = self.recorded_fields(lanes=self.seal_new_wave())
+        fields["winners"][0]["platform_status"]["macos-arm64"] = "conditional"
+        self.layer.update(fields)
+        with self.assertRaisesRegex(ValueError, "macos-arm64 declares 'conditional'.*at most 'untested'"):
+            self.build()
+
+    def test_a_hand_edited_new_wave_codex_absent_row_without_run_ids_is_rejected(self):
+        # Re-review finding 2, case 1: the new-wave block ran only when some lane had a run_id.
+        (self.root / "decisions").mkdir()
+        (self.root / "decisions/2026-09-23-single-lane.md").write_text("Record `retrieval` alone\n",
+                                                                     encoding="utf-8")
+        lanes = {"claude": {"run_id": "", "sealed_sha256": ""}, "codex": {"run_id": "", "sealed_sha256": ""},
+                 "agreement": "codex_absent", "sealed_base": NEW_WAVE_BASE,
+                 "single_lane_decision": "decisions/2026-09-23-single-lane.md"}
+        # The wave's run manifest (both lanes missing for this layer) and registry exist.
+        self.seal_new_wave(manifest_lanes={"claude": {"outcome": "missing"}, "codex": {"outcome": "missing"}})
+        self.layer.update(self.recorded_fields(lanes=lanes))
+        with self.assertRaisesRegex(ValueError, "codex_absent verdict needs the claude lane sealed"):
+            self.build()
+        # Same row in the grandfathered wave: the lane-seal rule for a recorded row still holds.
+        lanes.pop("sealed_base")
+        self.layer.update(self.recorded_fields(lanes=lanes))
+        with self.assertRaisesRegex(ValueError, "codex_absent verdict needs the claude lane sealed"):
+            self.build()
+
+    def test_a_hand_edited_disagree_row_needs_both_lanes_sealed(self):
+        # Re-review finding 2, case 2: an unsealed disagree row with only a claude run_id passed.
+        lanes = self.seal_new_wave()
+        lanes["agreement"] = "disagree"
+        self.write_adjudication(NEW_WAVE_BASE, lanes["claude"]["run_id"], ("anthropic", "openai"))
+        lanes["codex"] = {"run_id": "", "sealed_sha256": ""}
+        # The run manifest agrees the codex lane is missing, so only the agreement rule can object.
+        self.seal_new_wave(manifest_lanes={"claude": lanes["claude"] | {"outcome": "sealed"},
+                                           "codex": {"outcome": "missing"}})
+        self.layer.update(self.recorded_fields(lanes=lanes))
+        with self.assertRaisesRegex(ValueError, "disagree verdict needs both lanes sealed"):
+            self.build()
+        lanes["claude"]["sealed_sha256"] = ""
+        self.layer.update(self.recorded_fields(lanes=lanes))
+        with self.assertRaisesRegex(ValueError, "run_id exactly when it carries a sealed_sha256"):
+            self.build()
+
+    def test_a_run_id_naming_a_new_wave_gets_the_new_wave_rules_without_a_sealed_base(self):
+        lanes = self.seal_new_wave()
+        del lanes["sealed_base"]
+        self.layer.update(self.recorded_fields(lanes=lanes))
+        with self.assertRaisesRegex(ValueError, "run ids name wave\\(s\\) 20260923 but lanes.sealed_base names "
+                                                "the grandfathered wave 20260922"):
+            self.build()
+
+    def test_a_new_wave_run_id_must_name_its_own_layer_and_wave(self):
+        lanes = self.seal_new_wave()
+        lanes["codex"]["run_id"] = "run-1"
+        self.layer.update(self.recorded_fields(lanes=lanes))
+        with self.assertRaisesRegex(ValueError, "codex.run_id must be 'foundation-retrieval-20260923'"):
+            self.build()
+
+    def test_a_unanimous_single_family_adjudication_is_a_split_whatever_its_winner_lane(self):
+        # Re-review finding 3: winner_lane was validated before the two-family rule, so the
+        # documented null was rejected as malformed instead of classified as a split.
+        judgments = [{"claude_position": position, "preferred_position": position, "preferred_lane": "claude",
+                      "refuting_votes": 0, "judge": {"model": "claude-opus-5-5", "family": "anthropic"},
+                      "stripped_packet_sha256": "a" * 64} for position in ("A", "B")]
+        for winner_lane in (None, "claude"):
+            issue, result = judge_adjudication(
+                {"winner_lane": winner_lane, "why": "Split.", "evidence_refs": [], "judgments": judgments},
+                grandfathered=False, packet_sha256="a" * 64)
+            self.assertIsNone(issue, winner_lane)
+            self.assertIsNone(result["winner_lane"])
+            self.assertIn("both lane families", result["split_reason"])
+        issue, _ = judge_adjudication({"winner_lane": "codex", "why": "Split.", "evidence_refs": [],
+                                       "judgments": judgments}, grandfathered=False, packet_sha256="a" * 64)
+        self.assertIn("winner_lane 'codex'", issue)
+        # A cross-family unanimous record still needs its lane named: null is not a winner.
+        both = judgments + [dict(judgment, judge={"model": "gpt-6-astra", "family": "openai"})
+                            for judgment in judgments]
+        issue, _ = judge_adjudication({"winner_lane": None, "why": "x", "evidence_refs": [], "judgments": both},
+                                      grandfathered=False, packet_sha256="a" * 64)
+        self.assertIn("winner_lane None", issue)
+        # The recorded row then reports the split, not a malformed adjudication.
+        lanes = self.seal_new_wave()
+        lanes["agreement"] = "disagree"
+        self.write_adjudication(NEW_WAVE_BASE, lanes["claude"]["run_id"], ("anthropic",))
+        path = self.root / NEW_WAVE_BASE / "adjudication" / f"{lanes['claude']['run_id']}.json"
+        self.write(path.relative_to(self.root).as_posix(),
+                   dict(json.loads(path.read_text(encoding="utf-8")), winner_lane=None))
+        self.layer.update(self.recorded_fields(lanes=lanes))
+        with self.assertRaisesRegex(ValueError, "is a split and cannot record a winner"):
+            self.build()
 
     def test_new_wave_sealed_provenance_must_be_registered_lane_code(self):
         forged = {"claude": NEW_WAVE_PROVENANCE["claude"],

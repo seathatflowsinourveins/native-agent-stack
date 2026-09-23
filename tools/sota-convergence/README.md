@@ -631,9 +631,14 @@ containing star/fork/watcher/subscriber/download) from every
 `upstream` record; `archived` and `license` are kept only when the packet's
 `requirement` names them (archiv/maintained, licen). Each stripped field is
 listed in the packet's `withheld` list (for example
-`candidates[].upstream.stars`). `latest`, `prerelease`, `renamed_to` and the
-`pin_behind_upstream` flag stay (a pin's relation to its upstream, not a
-popularity measure). The default mode is byte-identical, so the retained
+`candidates[].upstream.stars`). The latest upstream release is withheld too
+(2026-09-23 re-review: a date-based tag such as inspect_ai's
+`release/2025-11-28` carries a release date): `upstream.latest` is stripped
+always, not only when it is date-shaped (the stricter of the two options; no
+packet requirement names releases, versions or maintenance), together with
+`upstream.prerelease`, which describes that release, and the copy's
+`pin_behind_upstream`, which is derived by comparing the pin with it. The pin
+itself and `upstream.renamed_to` stay. The default mode is byte-identical, so the retained
 2026-09-22 packets still reproduce; they were built before this rule and carry
 those fields.
 
@@ -702,11 +707,16 @@ file, seals the accepted ones as retained evidence and derives the row's
 
 ```sh
 python3 tools/sota-convergence/record_verdicts.py \
-  --root . --work-dir /path/to/work-dir --checked-at YYYY-MM-DD --run-id YYYYMMDD \
+  --root . --work-dir /path/to/work-dir --run-id YYYYMMDD [--checked-at YYYY-MM-DD] \
   [--adjudications /path/to/adjudications] --write
 python3 tools/sota-convergence/record_verdicts.py \
-  --root . --work-dir /path/to/work-dir --checked-at YYYY-MM-DD --run-id YYYYMMDD --check
+  --root . --work-dir /path/to/work-dir --run-id YYYYMMDD [--checked-at YYYY-MM-DD] --check
 ```
+
+`--checked-at` (the date stamped on every re-recorded row) defaults to the
+run id's own date (`--run-id 20260923` stamps `2026-09-23`), like
+`build_verdicts.default_checked_at`; a run id that is not a `YYYYMMDD` date
+needs `--checked-at` explicitly.
 
 `--write` and `--check` are a required, mutually exclusive pair (argparse
 rejects both together and rejects neither) -- there is no silent default
@@ -759,9 +769,12 @@ re-applied by `scripts/landscape.py` in CI to the sealed files):
   presentation orders, no judge identity), they have no run manifest (their
   `packets/` and `SHA256SUMS` are retained under the sealed base; a manifest
   generated now could not list the rejections of that run, so none is
-  fabricated), and two recorded rows (`foundation/ci-supply-chain`,
-  `foundation/hosting-services`) carry linux `accepted` without citing a
-  registered receipt. Those rows stay valid because the committed wave is
+  fabricated), and their Linux `platform_status` came from the lane's evidence
+  class alone: 13 of their 33 Linux `accepted` winners (six rows:
+  `foundation/ci-supply-chain`, `foundation/hosting-services`,
+  `us-equities/market-data-reference`, `storage-compute`,
+  `research-factors-ml`, `portfolio-risk`) cite no registered `evidence/` file,
+  so `scripts/platform_status.py` would derive `conditional`. Those rows stay valid because the committed wave is
   frozen, whether or not a later wave exists yet: `record_verdicts.py` has no
   default `--run-id` and its `--write` refuses a grandfathered id once `--root`
   holds that wave (its sealed directory or a registered wave document), so it
@@ -782,6 +795,14 @@ re-applied by `scripts/landscape.py` in CI to the sealed files):
   `lanes.single_lane_decision`; `scripts/landscape.py` rejects any recorded
   `codex_absent` row without such a record (this rule has no grandfathering:
   no 2026-09-22 row is `codex_absent`).
+- *New-wave rows cannot opt out.* `scripts/landscape.py` applies every rule
+  below to a row whose `lanes.sealed_base` or any lane `run_id`
+  (`<catalog>-<layer_id>-<run-id>`) names a non-grandfathered wave, whether or
+  not a lane carries a run id: the run ids must then name that same wave and
+  layer, a lane carries a run id exactly when it carries a sealed hash, and a
+  run id naming a new wave under the grandfathered `sealed_base` is rejected.
+  On every recorded row, `same_winner` and `disagree` need both lanes sealed
+  and `codex_absent` needs the claude lane sealed and the codex lane unsealed.
 - *Identity and family.* Each lane return declares `model.family`: `anthropic`
   for the claude lane with a name matching
   `claude-*|opus|sonnet|fable|haiku`, `openai` for the codex lane with a name
@@ -794,7 +815,10 @@ re-applied by `scripts/landscape.py` in CI to the sealed files):
   winner is accepted only when judgments from both lane families are present,
   each family covers both presentation orders, all pick the same lane and none
   is refuted; otherwise the adjudication is sealed as a split and the row stays
-  `pending_lanes` (a missing family is named in `open_gaps`). A recorded
+  `pending_lanes` (a missing family is named in `open_gaps`). `winner_lane` is
+  checked after that two-family rule: a unanimous single-family adjudication is
+  a split whether its `winner_lane` is `null` or names the lane its judges
+  chose. A recorded
   `disagree` row needs its sealed adjudication in CI as well.
 - *Survivorship.* Every run writes
   `evidence/artifacts/layer-verdicts-<run-id>/run-manifest.json`: every packet
@@ -805,13 +829,19 @@ re-applied by `scripts/landscape.py` in CI to the sealed files):
   requires every row recorded in a non-grandfathered wave to appear in that
   manifest exactly once, with both lanes accounted for and its packet hash in
   the recorded SHA256SUMS text.
-- *Linux platform status.* `accepted` needs a `native_proven` or
-  `measured_comparison` winner citing at least one path listed in
-  `manifests/evidence.json` `receipts[]`, or a hash-registered `files[]` entry
-  under `evidence/`; otherwise the row publishes `conditional`. Docs and catalog
-  files are not receipts, and neither is anything under
-  `evidence/artifacts/layer-verdicts-<run-id>/` (packets, lane returns,
-  adjudications and their inputs are lane inputs or opinions).
+- *Platform status (one shared rule).* `record_verdicts.platform_status_for`
+  calls `scripts/platform_status.py` `platform_status(platform_id, winner,
+  context)` for every platform, with `context = load_context(root)` read once
+  per run; `scripts/landscape.py` and `scripts/component_matrix.py` call the
+  same function. Linux `accepted` needs a qualifying host receipt, or a
+  `native_proven`/`measured_comparison` winner citing a hash-registered
+  `manifests/evidence.json` `files[]` entry under `evidence/`; `macos-arm64`
+  moves off `untested` only through host receipts bound to the winner's pin.
+  Nothing under `evidence/artifacts/layer-verdicts-<run-id>/` counts (packets,
+  lane returns, adjudications and their inputs are lane inputs or opinions).
+  `scripts/landscape.py` holds a new-wave row to this rule on every platform
+  (`declared_status_error`) and a grandfathered row on `ENFORCED_PLATFORMS`
+  only (`macos-arm64`; the re-record widens it to Linux).
 - *Reproducible lanes.* A Claude return carries `provenance: {workflow_path,
   workflow_sha256, agentlab_commit}` and a Codex return `provenance:
   {codex_lane_py_sha256, prompt_sha256}`. Both must name lane code listed in
@@ -824,8 +854,12 @@ re-applied by `scripts/landscape.py` in CI to the sealed files):
   checkout's `codex_lane.py` and `lane-prompt.md`. When any of those files
   changes, append an entry (never edit one);
   `tests/test_verdict_lane_vendoring.py` fails until the current bytes are
-  listed. `codex_lane.py` writes its provenance itself together with `model.family: "openai"`; the
-  strict schema it passes to `codex exec` omits both runner-owned fields. The
+  listed. `codex_lane.py` writes its provenance and the whole `model` field
+  itself: `model.name` is the `--model` it passed to `codex exec -m`, else the
+  model name the event stream carried, else `unknown` (never the model's own
+  response text), `model.effort` is `--effort` and `model.family` is
+  `"openai"`; the strict schema it passes to `codex exec` omits `provenance`
+  and `model.family`. The
   vendored Claude workflow returns only `model {name: "opus", effort: "high"}`
   and writes no files; `claude_lane.py` is the step that writes
   `<work-dir>/claude/<catalog>__<layer_id>.json` from the workflow result,
@@ -838,15 +872,6 @@ re-applied by `scripts/landscape.py` in CI to the sealed files):
     --work-dir /path/to/work-dir --agentlab-root /path/to/agent-lab \
     --resolved-model claude-opus-5-5
   ```
-- *Platform-status adapter.* `record_verdicts.platform_status_for` asks one
-  adapter, `platform_status(platform_id, winner, context)` with
-  `context = load_context(root)` read once per run, for every platform. Until
-  catalog PR #117's shared `scripts/platform_status.py` is on `main`, that
-  adapter is `scripts/landscape.py` `linux_rule_platform_status` (the Linux rule
-  above; `macos-arm64` stays `untested`). Switching is the single import line
-  marked in `record_verdicts.py`; the shared rule is stricter for Linux (only
-  registered `evidence/` files count, not `receipts[]` entries outside
-  `evidence/`).
 
 **Two-family adjudication is keep-but-compare** (decision
 [`docs/decisions/2026-09-23-verdict-integrity.md`](../../docs/decisions/2026-09-23-verdict-integrity.md)).

@@ -204,7 +204,7 @@ FOUNDATION_LAYERS = [
     "wave-badworkflow-layer", "wave-onefamily-layer", "wave-crossfamily-layer", "wave-nojudge-layer",
     "wave-rejected-layer", "wave-missing-layer", "wave-unregistered-layer", "wave-registered-layer",
     "wave-basename-layer", "wave-stalevendor-layer", "wave-forgedcodex-layer", "wave-stalecodex-layer",
-    "wave-otherpacket-layer", "frozen-wave-layer",
+    "wave-otherpacket-layer", "frozen-wave-layer", "wave-artifact-layer", "wave-mac-layer",
 ]
 US_EQUITIES_LAYERS = ["unindexed-alt-layer", "unindexed-pending-layer"]
 
@@ -284,9 +284,10 @@ class RecordVerdictsFixture(unittest.TestCase):
         document = json.loads((self.root / relative).read_text(encoding="utf-8"))
         return next(row for row in document["layers"] if row["layer_id"] == layer_id)
 
-    def run_main(self, *, write=True, check=False, adjudications=None, lane_roots=(), run_id=None, extra=()):
-        args = ["--root", str(self.root), "--work-dir", str(self.work_dir), "--checked-at", "2026-09-22",
-                *extra]
+    def run_main(self, *, write=True, check=False, adjudications=None, lane_roots=(), run_id=None, extra=(),
+                 checked_at="2026-09-22"):
+        args = ["--root", str(self.root), "--work-dir", str(self.work_dir),
+                *(["--checked-at", checked_at] if checked_at is not None else []), *extra]
         for lane_root in lane_roots:
             args += ["--lane-repo-root", lane_root]
         args.append("--write" if write else "--check")
@@ -1301,6 +1302,9 @@ WORKFLOW_SHA256 = hashlib.sha256(WORKFLOW_BYTES).hexdigest()
 LANE_MODELS = {"claude": {"name": "claude-opus-5-5", "effort": "high", "family": "anthropic"},
                "codex": {"name": "gpt-6-astra", "effort": "high", "family": "openai"}}
 JUDGES = {"anthropic": "claude-opus-5-5", "openai": "gpt-6-astra"}
+# Lane overrides citing the fixture's registered evidence/receipt.json (prepare_new_wave_root).
+REGISTERED_REFS = {"winner_evidence_refs": ["evidence/receipt.json"],
+                   "why_selected": "Observed natively; see evidence/receipt.json for the run. " * 2}
 # The fixture root's own codex lane code: provenance must hash to these files, and both they
 # and the vendored workflow must be listed in the fixture's lane-provenance.json.
 CODEX_LANE_BYTES = b"# fixture codex_lane.py\n"
@@ -1342,7 +1346,8 @@ def cross_family(winner_lane, packet_sha256, families=("anthropic", "openai"), p
 def prepare_new_wave_root(fixture):
     """The root files a new wave reads: the vendored workflow SHA256SUMS its Claude provenance
     must match, the codex lane code and lane-provenance.json registry its provenance must name, and
-    the evidence manifest registering receipt.json (docs/guide.md stays unregistered)."""
+    the evidence manifest registering evidence/receipt.json in files[] (the only kind of evidence
+    scripts/platform_status.py counts; receipt.json and docs/guide.md stay unregistered there)."""
     sums = fixture.root / "examples/claude-native/workflows/SHA256SUMS"
     sums.parent.mkdir(parents=True, exist_ok=True)
     sums.write_text(f"{WORKFLOW_SHA256}  layer-verdict-lane.js\n", encoding="utf-8")
@@ -1355,8 +1360,12 @@ def prepare_new_wave_root(fixture):
         "claude": [{"workflow_path": SOURCE_WORKFLOW, "vendored_path": VENDORED_WORKFLOW,
                     "workflow_sha256": WORKFLOW_SHA256}],
         "codex": [{key: value for key, value in lane_provenance("codex").items()}]})
+    fixture.write("evidence/receipt.json", {"exit_code": 0, "scope": "A registered local fixture receipt"})
+    receipt_bytes = (fixture.root / "evidence/receipt.json").read_bytes()
     fixture.write("manifests/evidence.json", {"schema_version": 1, "receipts": [{"path": "receipt.json"}],
-                                              "files": []})
+                                              "files": [{"path": "evidence/receipt.json",
+                                                         "sha256": hashlib.sha256(receipt_bytes).hexdigest(),
+                                                         "bytes": len(receipt_bytes)}]})
     (fixture.root / "docs").mkdir(exist_ok=True)
     (fixture.root / "docs/guide.md").write_text("# Unregistered guide\n", encoding="utf-8")
 
@@ -1481,6 +1490,23 @@ class NewWaveLaneIdentityTests(NewWaveFixture):
         self.assertEqual(row["winners"], [])
         run_id = row["lanes"]["claude"]["run_id"]
         self.assertTrue((self.root / NEW_SEALED_BASE / "adjudication" / f"{run_id}.json").is_file())
+        gap = next(gap for gap in row["open_gaps"] if gap.startswith("lanes disagreed"))
+        self.assertIn("both lane families", gap)
+        build_landscape(self.root)
+
+    def test_a_unanimous_single_family_adjudication_with_a_null_winner_lane_is_a_split(self):
+        # Re-review finding: winner_lane was compared with the unanimous lane before the two-family
+        # rule, so the documented null for a split was rejected as malformed.
+        catalog = self.both_lanes("wave-onefamily-layer", codex_winner="c2")
+        adjudications = self.work_dir / "adjudications"
+        data = cross_family("claude", self.digest, families=("anthropic",))
+        data["winner_lane"] = None
+        write_adjudication(adjudications, catalog, "wave-onefamily-layer", data)
+        code, output = self.run_wave(adjudications=adjudications)
+        self.assertEqual(code, 0, output)
+        self.assertNotIn("rejected", output)
+        row = self.load_row(catalog, "wave-onefamily-layer")
+        self.assertEqual((row["verdict_status"], row["winners"]), ("pending_lanes", []))
         gap = next(gap for gap in row["open_gaps"] if gap.startswith("lanes disagreed"))
         self.assertIn("both lane families", gap)
         build_landscape(self.root)
@@ -1626,37 +1652,142 @@ class NewWavePlatformStatusTests(NewWaveFixture):
         build_landscape(self.root)
 
     def test_a_registered_receipt_keeps_accepted(self):
-        catalog = self.both_lanes("wave-registered-layer")
+        catalog = self.both_lanes("wave-registered-layer", claude=REGISTERED_REFS, codex=REGISTERED_REFS)
         code, output = self.run_wave()
         self.assertEqual(code, 0, output)
         winner = self.load_row(catalog, "wave-registered-layer")["winners"][0]
         self.assertEqual(winner["platform_status"]["linux-wsl2-x86_64"], "accepted")
         build_landscape(self.root)
 
-    def test_every_platform_goes_through_the_shared_call_shape(self):
-        # The one-line adapter carries the call shape of catalog PR #117's scripts/platform_status.py:
-        # load_context(root) once, platform_status(platform_id, winner, context) per platform.
-        calls = []
-        original = record_verdicts.platform_status
+    def test_every_platform_goes_through_the_shared_function(self):
+        # scripts/platform_status.py (catalog PR #117) is the one rule: load_context(root) once per
+        # run, platform_status(platform_id, winner, context) for every platform.
+        from scripts import platform_status as shared
+        self.assertIs(record_verdicts.platform_status, shared.platform_status)
+        self.assertIs(record_verdicts.load_context, shared.load_context)
+        calls, contexts = [], []
+        original, original_load = record_verdicts.platform_status, record_verdicts.load_context
 
         def spy(platform_id, winner, context):
-            calls.append((platform_id, dict(winner)))
+            calls.append((platform_id, dict(winner), context))
             return original(platform_id, winner, context)
 
-        record_verdicts.platform_status = spy
+        def load_spy(root):
+            contexts.append(root)
+            return original_load(root)
+
+        record_verdicts.platform_status, record_verdicts.load_context = spy, load_spy
         try:
-            catalog = self.both_lanes("wave-registered-layer")
+            catalog = self.both_lanes("wave-registered-layer", claude=REGISTERED_REFS, codex=REGISTERED_REFS)
+            self.both_lanes("wave-unregistered-layer")
             code, output = self.run_wave()
         finally:
-            record_verdicts.platform_status = original
+            record_verdicts.platform_status, record_verdicts.load_context = original, original_load
         self.assertEqual(code, 0, output)
+        self.assertEqual(len(contexts), 1, "load_context is called once per run")
         winner = self.load_row(catalog, "wave-registered-layer")["winners"][0]
-        self.assertEqual({platform for platform, _ in calls}, {"linux-wsl2-x86_64", "macos-arm64"})
-        for _, seen in calls:
+        self.assertEqual({platform for platform, _, _ in calls}, set(shared.PLATFORMS))
+        self.assertEqual(len({id(context) for _, _, context in calls}), 1)
+        for _, seen, _ in calls:
             self.assertEqual(set(seen), {"component_id", "pin", "evidence_class", "evidence_refs"})
-            self.assertEqual((seen["component_id"], seen["pin"]), (winner["component_id"], winner["pin"]))
-        status = original("linux-wsl2-x86_64", calls[0][1], record_verdicts.load_context(self.root))
-        self.assertEqual((status.status, bool(status.reason), bool(status.receipt_refs)), ("accepted", True, True))
+        seen = next(seen for _, seen, _ in calls if seen["component_id"] == winner["component_id"])
+        self.assertEqual(seen["pin"], winner["pin"])
+        status = original("linux-wsl2-x86_64", seen, original_load(self.root))
+        self.assertEqual((status.status, status.receipt_refs), ("accepted", ("evidence/receipt.json",)))
+
+    def test_a_registered_layer_verdict_artifact_is_not_a_receipt(self):
+        # Re-review finding (a): the shared rule counted any registered evidence/ file, so a lane
+        # citing a hash-registered layer-verdict packet or sealed return would derive "accepted".
+        packet = "evidence/artifacts/layer-verdicts-20260922/packets/foundation__wave-artifact-layer.json"
+        self.write(packet, {"layer_id": "wave-artifact-layer"})
+        manifest = json.loads((self.root / "manifests/evidence.json").read_text(encoding="utf-8"))
+        manifest["files"].append({"path": packet, "sha256": "0" * 64, "bytes": 0})
+        self.write("manifests/evidence.json", manifest)
+        refs = {"winner_evidence_refs": [packet],
+                "why_selected": long_text(f"Observed natively; see {packet} for the run.", 60)}
+        catalog = self.both_lanes("wave-artifact-layer", claude=refs, codex=refs)
+        code, output = self.run_wave()
+        self.assertEqual(code, 0, output)
+        winner = self.load_row(catalog, "wave-artifact-layer")["winners"][0]
+        self.assertEqual(winner["evidence_refs"], [packet])
+        self.assertEqual(winner["platform_status"]["linux-wsl2-x86_64"], "conditional")
+        build_landscape(self.root)
+
+    def write_mac_receipt(self, component_id, version, *, independent_review=True):
+        """A macOS host receipt in the shape scripts/host_receipts.py validates: a native_proven use
+        pass on a declared second physical machine, reviewed by a different identity."""
+        from scripts import host_receipts
+        schema = self.root / "adoption" / "host-receipt.schema.json"
+        schema.parent.mkdir(parents=True, exist_ok=True)
+        schema.write_text((ROOT / "adoption" / "host-receipt.schema.json").read_text(encoding="utf-8"),
+                          encoding="utf-8")
+        recorder = {"identity_sha256": host_receipts.identity_digest("mac-recorder")}
+        reviewer = {"identity_sha256": host_receipts.identity_digest("wsl-reviewer")}
+        reviews = [{"kind": "self", "ref": "record", "verdict": "agree", "at_utc": "2026-09-23T01:00:00Z",
+                    "reviewer": recorder}]
+        if independent_review:
+            reviews.append({"kind": "independent_session", "ref": "review", "verdict": "agree",
+                            "at_utc": "2026-09-23T02:00:00Z", "reviewer": reviewer})
+        receipt_id = f"mac-20260923--{component_id}--use--20260923"
+        self.write(f"evidence/hosts/mac-20260923/{receipt_id}.json", {
+            "schema_version": 1, "id": receipt_id, "kind": "host_acceptance",
+            "host": {"host_id": "mac-20260923", "platform_id": "macos-arm64", "os": "macos",
+                     "architecture": "arm64", "second_physical_machine": True},
+            "catalog_revision": "b" * 40, "recorded_by": recorder, "component_id": component_id, "stage": "use",
+            "commands": [{"cmd": f"{component_id} --version", "exit": 0, "duration_s": 0.1,
+                          "output_sha256": "0" * 64, "output_excerpt": version}],
+            "tool_versions": {component_id: version}, "observed_at_utc": "2026-09-23T01:00:00Z",
+            "result": "pass", "claim": "Ran on a Mac", "limitations": ["One command"],
+            "evidence_class": "native_proven", "reviews": reviews,
+        })
+
+    def test_a_qualifying_macos_receipt_records_accepted_on_re_record(self):
+        # The re-record path: a Mac receipt that scripts/platform_status.py qualifies (bound to the
+        # winner's pin, second physical machine, independently reviewed) moves macos-arm64 off
+        # "untested" in the row record_verdicts.py writes, and landscape.py accepts that row.
+        self.write_mac_receipt("wave-mac-layer-c1", "1.0")
+        catalog = self.both_lanes("wave-mac-layer", claude=REGISTERED_REFS, codex=REGISTERED_REFS)
+        code, output = self.run_wave()
+        self.assertEqual(code, 0, output)
+        winner = self.load_row(catalog, "wave-mac-layer")["winners"][0]
+        self.assertEqual((winner["component_id"], winner["pin"]), ("wave-mac-layer-c1", "1.0"))
+        self.assertEqual(winner["platform_status"], {"linux-wsl2-x86_64": "accepted", "macos-arm64": "accepted"})
+        build_landscape(self.root)
+
+    def test_a_non_qualifying_macos_receipt_keeps_untested(self):
+        # The same receipt at an older pin is not bound to the winner, so it proves nothing about it.
+        self.write_mac_receipt("wave-mac-layer-c1", "0.9")
+        catalog = self.both_lanes("wave-mac-layer", claude=REGISTERED_REFS, codex=REGISTERED_REFS)
+        code, output = self.run_wave()
+        self.assertEqual(code, 0, output)
+        winner = self.load_row(catalog, "wave-mac-layer")["winners"][0]
+        self.assertEqual(winner["platform_status"]["macos-arm64"], "untested")
+        build_landscape(self.root)
+
+
+class CheckedAtDefaultTests(NewWaveFixture):
+    """Re-review finding: --checked-at defaulted to 2026-09-22 whatever --run-id said."""
+
+    def test_checked_at_defaults_to_the_run_ids_date(self):
+        catalog = self.both_lanes("wave-same-layer")
+        code, output = self.run_wave(checked_at=None)
+        self.assertEqual(code, 0, output)
+        self.assertEqual(self.load_row(catalog, "wave-same-layer")["checked_at"], "2026-09-23")
+
+    def test_an_explicit_checked_at_wins(self):
+        catalog = self.both_lanes("wave-same-layer")
+        code, output = self.run_wave(checked_at="2026-09-24")
+        self.assertEqual(code, 0, output)
+        self.assertEqual(self.load_row(catalog, "wave-same-layer")["checked_at"], "2026-09-24")
+
+    def test_helper_derives_or_refuses(self):
+        self.assertEqual(record_verdicts.checked_at_for("20260923"), "2026-09-23")
+        self.assertEqual(record_verdicts.checked_at_for("20260923", "2026-09-30"), "2026-09-30")
+        for run_id in ("20261399", "wave2"):
+            with self.assertRaises(SystemExit):
+                record_verdicts.checked_at_for(run_id)
+        with self.assertRaises(SystemExit):
+            record_verdicts.checked_at_for("20260923", "23 Sep 2026")
 
 
 if __name__ == "__main__":

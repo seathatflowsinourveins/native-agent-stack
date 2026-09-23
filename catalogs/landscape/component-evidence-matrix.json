@@ -58,9 +58,13 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "accepted",
+              "derived_reason": "native_proven winner citing registered evidence",
+              "derived_status": "accepted",
               "e2e_state": "accepted",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -68,9 +72,13 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin '0.155.1'",
+              "derived_status": "untested",
               "e2e_state": "untested",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -141,9 +149,13 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "accepted",
+              "derived_reason": "native_proven winner without a registered evidence/ reference",
+              "derived_status": "conditional",
               "e2e_state": "accepted",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -151,9 +163,13 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin '1.30.1'",
+              "derived_status": "untested",
               "e2e_state": "untested",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -175,9 +191,13 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "accepted",
+              "derived_reason": "native_proven winner without a registered evidence/ reference",
+              "derived_status": "conditional",
               "e2e_state": "accepted",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -185,9 +205,13 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin '1.52.0'",
+              "derived_status": "untested",
               "e2e_state": "untested",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -204,9 +228,13 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "accepted",
+              "derived_reason": "native_proven winner without a registered evidence/ reference",
+              "derived_status": "conditional",
               "e2e_state": "accepted",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -214,9 +242,13 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin 'unpinned'",
+              "derived_status": "untested",
               "e2e_state": "untested",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -280,9 +312,13 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "accepted",
+              "derived_reason": "native_proven winner citing registered evidence",
+              "derived_status": "accepted",
               "e2e_state": "accepted",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -290,9 +326,13 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin '2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143'",
+              "derived_status": "untested",
               "e2e_state": "untested",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -349,9 +389,13 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "conditional",
+              "derived_reason": "local_integration winner",
+              "derived_status": "conditional",
               "e2e_state": "conditional",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -359,9 +403,13 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin '2.8.3'",
+              "derived_status": "untested",
               "e2e_state": "untested",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -383,9 +431,13 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "conditional",
+              "derived_reason": "local_integration winner",
+              "derived_status": "conditional",
               "e2e_state": "conditional",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -393,9 +445,13 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin '0.1.7'",
+              "derived_status": "untested",
               "e2e_state": "untested",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -417,9 +473,13 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "conditional",
+              "derived_reason": "local_integration winner",
+              "derived_status": "conditional",
               "e2e_state": "conditional",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -427,9 +487,13 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin '26.09.0'",
+              "derived_status": "untested",
               "e2e_state": "untested",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -548,9 +612,13 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "accepted",
+              "derived_reason": "native_proven winner citing registered evidence",
+              "derived_status": "accepted",
               "e2e_state": "accepted",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -558,9 +626,13 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin '2.3.2'",
+              "derived_status": "untested",
               "e2e_state": "untested",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -603,9 +675,13 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "not_established",
+              "derived_reason": "source_review winner with no passing host receipt",
+              "derived_status": "not_established",
               "e2e_state": "not_established",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -613,9 +689,13 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin '0.79.0'",
+              "derived_status": "untested",
               "e2e_state": "untested",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -632,9 +712,13 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "not_established",
+              "derived_reason": "source_review winner with no passing host receipt",
+              "derived_status": "not_established",
               "e2e_state": "not_established",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -642,9 +726,13 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin 'unpinned'",
+              "derived_status": "untested",
               "e2e_state": "untested",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -666,9 +754,13 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "not_established",
+              "derived_reason": "source_review winner with no passing host receipt",
+              "derived_status": "not_established",
               "e2e_state": "not_established",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 1,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": "2026-09-23T01:05:55Z",
                 "pass": 0
@@ -676,9 +768,13 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin '0.71.0'",
+              "derived_status": "untested",
               "e2e_state": "untested",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -786,9 +882,13 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "accepted",
+              "derived_reason": "native_proven winner without a registered evidence/ reference",
+              "derived_status": "conditional",
               "e2e_state": "accepted",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -796,9 +896,13 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin '0.141.1'",
+              "derived_status": "untested",
               "e2e_state": "untested",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -836,9 +940,13 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "accepted",
+              "derived_reason": "native_proven winner without a registered evidence/ reference",
+              "derived_status": "conditional",
               "e2e_state": "accepted",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -846,9 +954,13 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin '16.3.5'",
+              "derived_status": "untested",
               "e2e_state": "untested",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -886,9 +998,13 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "accepted",
+              "derived_reason": "native_proven winner without a registered evidence/ reference",
+              "derived_status": "conditional",
               "e2e_state": "accepted",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -896,9 +1012,13 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin '18.6'",
+              "derived_status": "untested",
               "e2e_state": "untested",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -983,9 +1103,13 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "conditional",
+              "derived_reason": "local_integration winner",
+              "derived_status": "conditional",
               "e2e_state": "conditional",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -993,9 +1117,13 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin 'dd6ee538aee0f548d4a6b520118f875431fd749e'",
+              "derived_status": "untested",
               "e2e_state": "untested",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -1012,9 +1140,13 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "conditional",
+              "derived_reason": "local_integration winner",
+              "derived_status": "conditional",
               "e2e_state": "conditional",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -1022,9 +1154,13 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin 'unpinned'",
+              "derived_status": "untested",
               "e2e_state": "untested",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -1041,9 +1177,13 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "conditional",
+              "derived_reason": "local_integration winner",
+              "derived_status": "conditional",
               "e2e_state": "conditional",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -1051,9 +1191,13 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin 'unpinned'",
+              "derived_status": "untested",
               "e2e_state": "untested",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -1124,9 +1268,13 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "accepted",
+              "derived_reason": "native_proven winner citing registered evidence",
+              "derived_status": "accepted",
               "e2e_state": "accepted",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -1134,9 +1282,13 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin '0.79.0'",
+              "derived_status": "untested",
               "e2e_state": "untested",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -1158,9 +1310,13 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "accepted",
+              "derived_reason": "native_proven winner citing registered evidence",
+              "derived_status": "accepted",
               "e2e_state": "accepted",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -1168,9 +1324,13 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin '0.0.77'",
+              "derived_status": "untested",
               "e2e_state": "untested",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -1213,9 +1373,13 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "accepted",
+              "derived_reason": "native_proven winner citing registered evidence",
+              "derived_status": "accepted",
               "e2e_state": "accepted",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -1223,9 +1387,13 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin '0.13.13'",
+              "derived_status": "untested",
               "e2e_state": "untested",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -1247,9 +1415,13 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "accepted",
+              "derived_reason": "native_proven winner citing registered evidence",
+              "derived_status": "accepted",
               "e2e_state": "accepted",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -1257,9 +1429,13 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin '2.7.0'",
+              "derived_status": "untested",
               "e2e_state": "untested",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -1334,9 +1510,13 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "accepted",
+              "derived_reason": "native_proven winner citing registered evidence",
+              "derived_status": "accepted",
               "e2e_state": "accepted",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -1344,9 +1524,13 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin '2.1.278'",
+              "derived_status": "untested",
               "e2e_state": "untested",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -1372,9 +1556,13 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "accepted",
+              "derived_reason": "native_proven winner citing registered evidence",
+              "derived_status": "accepted",
               "e2e_state": "accepted",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -1382,9 +1570,13 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin '0.155.1'",
+              "derived_status": "untested",
               "e2e_state": "untested",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -1490,9 +1682,13 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "conditional",
+              "derived_reason": "synthetic winner",
+              "derived_status": "conditional",
               "e2e_state": "conditional",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -1500,9 +1696,13 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin '0.161.0'",
+              "derived_status": "untested",
               "e2e_state": "untested",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -1524,9 +1724,13 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "conditional",
+              "derived_reason": "synthetic winner",
+              "derived_status": "conditional",
               "e2e_state": "conditional",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -1534,9 +1738,13 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin '3.14.0'",
+              "derived_status": "untested",
               "e2e_state": "untested",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -1558,9 +1766,13 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "conditional",
+              "derived_reason": "synthetic winner",
+              "derived_status": "conditional",
               "e2e_state": "conditional",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -1568,9 +1780,13 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin '3.7.8'",
+              "derived_status": "untested",
               "e2e_state": "untested",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -1655,9 +1871,13 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "conditional",
+              "derived_reason": "local_integration winner",
+              "derived_status": "conditional",
               "e2e_state": "conditional",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -1665,9 +1885,13 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin '0.123.1'",
+              "derived_status": "untested",
               "e2e_state": "untested",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -1689,9 +1913,13 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "conditional",
+              "derived_reason": "local_integration winner",
+              "derived_status": "conditional",
               "e2e_state": "conditional",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -1699,9 +1927,13 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin '1.63.0'",
+              "derived_status": "untested",
               "e2e_state": "untested",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -1788,9 +2020,13 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "conditional",
+              "derived_reason": "synthetic winner",
+              "derived_status": "conditional",
               "e2e_state": "conditional",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -1798,9 +2034,13 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin '0.19.1'",
+              "derived_status": "untested",
               "e2e_state": "untested",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -1817,9 +2057,13 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "conditional",
+              "derived_reason": "synthetic winner",
+              "derived_status": "conditional",
               "e2e_state": "conditional",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -1827,9 +2071,13 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin 'unpinned'",
+              "derived_status": "untested",
               "e2e_state": "untested",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -1909,9 +2157,13 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "conditional",
+              "derived_reason": "local_integration winner",
+              "derived_status": "conditional",
               "e2e_state": "conditional",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -1919,9 +2171,13 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin '2.16.6'",
+              "derived_status": "untested",
               "e2e_state": "untested",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -1959,9 +2215,13 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "conditional",
+              "derived_reason": "local_integration winner",
+              "derived_status": "conditional",
               "e2e_state": "conditional",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -1969,9 +2229,13 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin '255.4-1ubuntu8.17'",
+              "derived_status": "untested",
               "e2e_state": "untested",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -2014,9 +2278,13 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "conditional",
+              "derived_reason": "local_integration winner",
+              "derived_status": "conditional",
               "e2e_state": "conditional",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -2024,9 +2292,13 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin '8.30.1'",
+              "derived_status": "untested",
               "e2e_state": "untested",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -2105,9 +2377,13 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "accepted",
+              "derived_reason": "native_proven winner citing registered evidence",
+              "derived_status": "accepted",
               "e2e_state": "accepted",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -2115,9 +2391,13 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin '1.14.0'",
+              "derived_status": "untested",
               "e2e_state": "untested",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -2155,9 +2435,13 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "accepted",
+              "derived_reason": "native_proven winner citing registered evidence",
+              "derived_status": "accepted",
               "e2e_state": "accepted",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -2165,9 +2449,13 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin '1.19.1'",
+              "derived_status": "untested",
               "e2e_state": "untested",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -2189,9 +2477,13 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "accepted",
+              "derived_reason": "native_proven winner citing registered evidence",
+              "derived_status": "accepted",
               "e2e_state": "accepted",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -2199,9 +2491,13 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin '0.25.0'",
+              "derived_status": "untested",
               "e2e_state": "untested",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -2265,9 +2561,13 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "conditional",
+              "derived_reason": "synthetic winner",
+              "derived_status": "conditional",
               "e2e_state": "conditional",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": "2026-09-23T01:05:22Z",
                 "pass": 1
@@ -2275,9 +2575,13 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin '0.49.0'",
+              "derived_status": "untested",
               "e2e_state": "untested",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -2315,9 +2619,13 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "conditional",
+              "derived_reason": "synthetic winner",
+              "derived_status": "conditional",
               "e2e_state": "conditional",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -2325,9 +2633,13 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin '0.37.0'",
+              "derived_status": "untested",
               "e2e_state": "untested",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -2349,9 +2661,13 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "conditional",
+              "derived_reason": "synthetic winner",
+              "derived_status": "conditional",
               "e2e_state": "conditional",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -2359,9 +2675,13 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin '20.0.24'",
+              "derived_status": "untested",
               "e2e_state": "untested",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -2432,9 +2752,13 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "conditional",
+              "derived_reason": "local_integration winner",
+              "derived_status": "conditional",
               "e2e_state": "conditional",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -2442,9 +2766,13 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin '0.1.8'",
+              "derived_status": "untested",
               "e2e_state": "untested",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -2466,9 +2794,13 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "conditional",
+              "derived_reason": "local_integration winner",
+              "derived_status": "conditional",
               "e2e_state": "conditional",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -2476,9 +2808,13 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin '0.38.1'",
+              "derived_status": "untested",
               "e2e_state": "untested",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -2500,9 +2836,13 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "conditional",
+              "derived_reason": "local_integration winner",
+              "derived_status": "conditional",
               "e2e_state": "conditional",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -2510,9 +2850,13 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin '0.2.7'",
+              "derived_status": "untested",
               "e2e_state": "untested",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -2622,9 +2966,13 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "conditional",
+              "derived_reason": "local_integration winner",
+              "derived_status": "conditional",
               "e2e_state": "conditional",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -2632,9 +2980,13 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin '2.1.278'",
+              "derived_status": "untested",
               "e2e_state": "untested",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -2656,9 +3008,13 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "conditional",
+              "derived_reason": "local_integration winner",
+              "derived_status": "conditional",
               "e2e_state": "conditional",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -2666,9 +3022,13 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin '0.79.0'",
+              "derived_status": "untested",
               "e2e_state": "untested",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -2832,9 +3192,13 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "accepted",
+              "derived_reason": "native_proven winner citing registered evidence",
+              "derived_status": "accepted",
               "e2e_state": "accepted",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -2842,9 +3206,13 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin 'CLI rust-v0.155.1; Python openai-codex 0.154.0'",
+              "derived_status": "untested",
               "e2e_state": "untested",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -2861,9 +3229,13 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "accepted",
+              "derived_reason": "native_proven winner citing registered evidence",
+              "derived_status": "accepted",
               "e2e_state": "accepted",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -2871,9 +3243,13 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin 'v2.3.1'",
+              "derived_status": "untested",
               "e2e_state": "untested",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -2890,9 +3266,13 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "accepted",
+              "derived_reason": "native_proven winner citing registered evidence",
+              "derived_status": "accepted",
               "e2e_state": "accepted",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -2900,9 +3280,13 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin 'v1.14.0'",
+              "derived_status": "untested",
               "e2e_state": "untested",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -2961,9 +3345,13 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "accepted",
+              "derived_reason": "native_proven winner citing registered evidence",
+              "derived_status": "accepted",
               "e2e_state": "accepted",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -2971,9 +3359,13 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin '2.0.0rc5 (tag v2.0.0rc5; source pin from evidence/receipts/native-nautilus-v2-20260920.json \u2014 commit 1b0a49d2792a9432a3aca3fcb617ce7a630d905e)'",
+              "derived_status": "untested",
               "e2e_state": "untested",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -2990,9 +3382,13 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "accepted",
+              "derived_reason": "native_proven winner citing registered evidence",
+              "derived_status": "accepted",
               "e2e_state": "accepted",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -3000,9 +3396,13 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin '985ef30ad3ac774218c5ac516b4cb0aa2655730f'",
+              "derived_status": "untested",
               "e2e_state": "untested",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -3068,9 +3468,13 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "conditional",
+              "derived_reason": "synthetic winner",
+              "derived_status": "conditional",
               "e2e_state": "conditional",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -3078,9 +3482,13 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin 'v2.16.6'",
+              "derived_status": "untested",
               "e2e_state": "untested",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -3097,9 +3505,13 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "conditional",
+              "derived_reason": "synthetic winner",
+              "derived_status": "conditional",
               "e2e_state": "conditional",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -3107,9 +3519,13 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin 'v0.33.1; source 62f55e2dccf0a199cfe4d6ce3eda0c1d29e2e4e6'",
+              "derived_status": "untested",
               "e2e_state": "untested",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -3168,9 +3584,13 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "not_established",
+              "derived_reason": "source_review winner with no passing host receipt",
+              "derived_status": "not_established",
               "e2e_state": "not_established",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -3178,9 +3598,13 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin 'v0.2.1'",
+              "derived_status": "untested",
               "e2e_state": "untested",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -3197,9 +3621,13 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "not_established",
+              "derived_reason": "source_review winner with no passing host receipt",
+              "derived_status": "not_established",
               "e2e_state": "not_established",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -3207,9 +3635,13 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin 'inspect-ai0.3.266; source ec4dfc6953784dc45b79de3147530c89868c6e26'",
+              "derived_status": "untested",
               "e2e_state": "untested",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -3226,9 +3658,13 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "not_established",
+              "derived_reason": "source_review winner with no passing host receipt",
+              "derived_status": "not_established",
               "e2e_state": "not_established",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -3236,9 +3672,13 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin 'v3.16.1; source 32792afe5b0183fce10532d3a023f5cfa8612d09'",
+              "derived_status": "untested",
               "e2e_state": "untested",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -3330,9 +3770,13 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "not_established",
+              "derived_reason": "source_review winner with no passing host receipt",
+              "derived_status": "not_established",
               "e2e_state": "not_established",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -3340,9 +3784,13 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin '3.67.1; source 356dfa03278058b02df42124f243c2c345329dae'",
+              "derived_status": "untested",
               "e2e_state": "untested",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -3436,9 +3884,13 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "accepted",
+              "derived_reason": "native_proven winner without a registered evidence/ reference",
+              "derived_status": "conditional",
               "e2e_state": "accepted",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -3446,9 +3898,13 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin 'v0.44.0; source cc4cb3b7ba50ae250e621983c2779047fb16bb28'",
+              "derived_status": "untested",
               "e2e_state": "untested",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -3465,9 +3921,13 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "accepted",
+              "derived_reason": "native_proven winner without a registered evidence/ reference",
+              "derived_status": "conditional",
               "e2e_state": "accepted",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -3475,9 +3935,13 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin 'v5.58.0; source abe44344c56cf4bfb5443e0debca7e39342f6e7a'",
+              "derived_status": "untested",
               "e2e_state": "untested",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -3494,9 +3958,13 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "accepted",
+              "derived_reason": "native_proven winner without a registered evidence/ reference",
+              "derived_status": "conditional",
               "e2e_state": "accepted",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -3504,9 +3972,13 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin '4.13.2; source dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a'",
+              "derived_status": "untested",
               "e2e_state": "untested",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -3570,9 +4042,13 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "accepted",
+              "derived_reason": "native_proven winner without a registered evidence/ reference",
+              "derived_status": "conditional",
               "e2e_state": "accepted",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -3580,9 +4056,13 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin '1.2.9; WalkForward source c99fcf71349e2df4a7a1033ee85ca2e9ced9abee'",
+              "derived_status": "untested",
               "e2e_state": "untested",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -3753,9 +4233,13 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "accepted",
+              "derived_reason": "native_proven winner without a registered evidence/ reference",
+              "derived_status": "conditional",
               "e2e_state": "accepted",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -3763,9 +4247,13 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin '1.2.9; WalkForward source c99fcf71349e2df4a7a1033ee85ca2e9ced9abee'",
+              "derived_status": "untested",
               "e2e_state": "untested",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -3782,9 +4270,13 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "accepted",
+              "derived_reason": "native_proven winner without a registered evidence/ reference",
+              "derived_status": "conditional",
               "e2e_state": "accepted",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -3792,9 +4284,13 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin 'v5.58.0; source abe44344c56cf4bfb5443e0debca7e39342f6e7a'",
+              "derived_status": "untested",
               "e2e_state": "untested",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -3839,9 +4335,13 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "accepted",
+              "derived_reason": "native_proven winner citing registered evidence",
+              "derived_status": "accepted",
               "e2e_state": "accepted",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -3849,9 +4349,13 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin 'v0.119.0'",
+              "derived_status": "untested",
               "e2e_state": "untested",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -3873,9 +4377,13 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "accepted",
+              "derived_reason": "native_proven winner citing registered evidence",
+              "derived_status": "accepted",
               "e2e_state": "accepted",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -3883,9 +4391,13 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin 'v1.52.0'",
+              "derived_status": "untested",
               "e2e_state": "untested",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -3907,9 +4419,13 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "accepted",
+              "derived_reason": "native_proven winner citing registered evidence",
+              "derived_status": "accepted",
               "e2e_state": "accepted",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -3917,9 +4433,13 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin 'v8.30.1'",
+              "derived_status": "untested",
               "e2e_state": "untested",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -4020,9 +4540,13 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "catalog_status": "accepted",
+              "derived_reason": "native_proven winner without a registered evidence/ reference",
+              "derived_status": "conditional",
               "e2e_state": "accepted",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
@@ -4030,9 +4554,13 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin 'v1.5.5; source d8cdaa33fda8df955cc76ef58a280f68f4cd43fa'",
+              "derived_status": "untested",
               "e2e_state": "untested",
               "host_receipts": {
+                "dissented": 0,
                 "fail": 0,
+                "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0

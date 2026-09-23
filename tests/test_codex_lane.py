@@ -182,19 +182,40 @@ class CodexLaneTests(CodexLaneFixture):
         self.assertEqual(data["packet_sha256"], expected_sha)
         self.assertEqual(data["model"], {"name": "gpt-6-astra", "effort": "high", "family": "openai"})
 
-    def test_lane_forced_and_existing_model_not_overwritten(self):
+    def test_lane_forced_and_self_declared_model_replaced_by_the_event_stream_model(self):
         self.write_packet("foundation", "native-clients")
-        # lane deliberately wrong, model already fully set by the "model" --
-        # codex_lane must force lane but must NOT clobber an already-usable model.
+        # lane deliberately wrong and a self-declared model in the response text: the runner forces
+        # lane and records the model it observed in the event stream, never the response's claim
+        # (re-review 2026-09-23: a non-OpenAI provider answering "gpt-5" would otherwise be sealed).
         self.return_file.write_text(
-            json.dumps(canned_return(lane="claude", model={"name": "already-set", "effort": "medium"})),
+            json.dumps(canned_return(lane="claude", model={"name": "gpt-5", "effort": "medium"})),
             encoding="utf-8")
         exit_code = self.run_lane()
         self.assertEqual(exit_code, 0)
         data = json.loads(self.out_path("foundation", "native-clients").read_text(encoding="utf-8"))
         self.assertEqual(data["lane"], "codex")
-        # name and effort are kept; the runner adds the family it actually ran (codex exec is OpenAI's CLI).
-        self.assertEqual(data["model"], {"name": "already-set", "effort": "medium", "family": "openai"})
+        self.assertEqual(data["model"], {"name": "gpt-6-astra", "effort": "high", "family": "openai"})
+
+    def test_configured_model_is_passed_to_codex_and_recorded(self):
+        self.write_packet("foundation", "native-clients")
+        self.return_file.write_text(json.dumps(canned_return(model={"name": "gpt-5", "effort": "low"})),
+                                    encoding="utf-8")
+        self.assertEqual(self.run_lane(["--model", "gpt-6-configured"]), 0)
+        argv = self.argv_calls()[0]
+        self.assertEqual(argv[argv.index("-m") + 1], "gpt-6-configured")
+        data = json.loads(self.out_path("foundation", "native-clients").read_text(encoding="utf-8"))
+        self.assertEqual(data["model"], {"name": "gpt-6-configured", "effort": "high", "family": "openai"})
+
+    def test_without_an_observed_model_the_name_is_unknown_not_the_response_text(self):
+        self.write_packet("foundation", "native-clients")
+        self.events_file.write_text("\n".join(line for line in CANNED_EVENTS.splitlines()
+                                              if '"model"' not in line) + "\n", encoding="utf-8")
+        self.return_file.write_text(json.dumps(canned_return(model={"name": "gpt-5", "effort": "high"})),
+                                    encoding="utf-8")
+        self.assertEqual(self.run_lane(), 0)
+        data = json.loads(self.out_path("foundation", "native-clients").read_text(encoding="utf-8"))
+        self.assertEqual(data["model"]["name"], "unknown")
+        self.assertEqual(self.argv_calls()[0].count("-m"), 0, "no -m without --model")
 
     def test_written_return_records_its_own_provenance_and_family(self):
         import hashlib

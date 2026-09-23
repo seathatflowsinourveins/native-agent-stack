@@ -3068,8 +3068,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "4e391eabbddabc78f0633f124a54c9334ba4769b3af1efc124c1b04a6ed12e92",
-      "bytes": 8415
+      "sha256": "f46572f4e6e9bd058fa800a211c4703c0f109ee76434ec86615bb9a226f096ad",
+      "bytes": 8716
     },
     {
       "path": ".gitignore",
@@ -3078,8 +3078,8 @@
     },
     {
       "path": ".gitleaks.toml",
-      "sha256": "992903854d0ccd3fac56efe3e75c1b25b8e6cf2443191adb40ccd283b0ac84fc",
-      "bytes": 22666
+      "sha256": "9e0519773005b847ebc9fa1e8935765e93b74259fd7c8a4f15a4721cb7271107",
+      "bytes": 23008
     },
     {
       "path": ".gitleaksignore",
@@ -3133,8 +3133,8 @@
     },
     {
       "path": "adoption/host-receipt.schema.json",
-      "sha256": "8153fdebc1351e45aadfb7d7d3417e2ec9d8f69187d8100795f8c2ea17a27410",
-      "bytes": 5747
+      "sha256": "9c55c3c647b71d4c76cdf4bf39cc5092b5ed2c054a94e4b013c078909e9ba310",
+      "bytes": 7055
     },
     {
       "path": "adoption/host-state.example.json",
@@ -8149,8 +8149,8 @@
     },
     {
       "path": "catalogs/landscape/component-evidence-matrix.json",
-      "sha256": "621109d1de2dd09ee9e87655b2d1774ddea2771aa5e5bff2e97b1470fc4fee65",
-      "bytes": 146112
+      "sha256": "550847ef49bf3364dc0237901964f79a38783a8f43a01023b7a87633dae5a17d",
+      "bytes": 174483
     },
     {
       "path": "catalogs/landscape/foundation.json",
@@ -8629,13 +8629,13 @@
     },
     {
       "path": "docs/component-evidence-matrix.md",
-      "sha256": "dfef76d02d90990448a2add7928fffd54903a5c95b3df36a859a6247e05dce86",
-      "bytes": 16526
+      "sha256": "c4d18d82e9dd132b284dad5846a89491d7c8f122aa062e52548df531d845aac5",
+      "bytes": 18618
     },
     {
       "path": "docs/contributing-evidence.md",
-      "sha256": "fbb657f5a195ae110cc32fb6d63e720d0a2a8324e31b2b73036f693e2647ab7b",
-      "bytes": 12429
+      "sha256": "29debc2e3261a7d901f3735d2a929953728e57eefb931032be71a7e16872764f",
+      "bytes": 17672
     },
     {
       "path": "docs/convergence-architecture.md",
@@ -8789,8 +8789,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "08d203319ab4e8e56905b5b6d29a16ef5799d9cdbd328b89f50d865cefdb70db",
-      "bytes": 62715
+      "sha256": "0291d8ebdb209f293896bae915ca74a25ae024c6d239a6d5cd90a3cac009f5fc",
+      "bytes": 63228
     },
     {
       "path": "docs/grand-catalog-handbook.md",
@@ -14129,23 +14129,28 @@
     },
     {
       "path": "scripts/component_matrix.py",
-      "sha256": "4bdc4609d98b6fafb86fa41301471379a1297835fe9dad293ca413c4545aa0a4",
-      "bytes": 22624
+      "sha256": "50d61f97267de33ef11d3b8f5cd850fd8a4670da2b498b60cb81afa3de516f31",
+      "bytes": 24714
     },
     {
       "path": "scripts/host_receipts.py",
-      "sha256": "476a4f1a53c9591865a12be46ca0c2fb49b2dcf42b195d976cf62cfbb0020a9c",
-      "bytes": 40745
+      "sha256": "c95b004b8efec6a6295644def8a65f5c7bca1f5e895900a3c494fa91b21d1ca0",
+      "bytes": 57494
     },
     {
       "path": "scripts/landscape.py",
-      "sha256": "0cf0fa7a161e1623a023f2a25c5ab658bae85f068a54d1ca5bf0c077cca634cf",
-      "bytes": 63916
+      "sha256": "f980960ddac3ce630b12740aeaa50bc4521e830023e938876c56fc58dd19023a",
+      "bytes": 62629
     },
     {
       "path": "scripts/native_token_ci.py",
       "sha256": "0651d44763ef778184a2cbb414715ec444c7e36457851361b99a50b6b6d52416",
       "bytes": 20201
+    },
+    {
+      "path": "scripts/platform_status.py",
+      "sha256": "6cd39c921358cc0c14865610ee07442aebcf76f5cecf8ef84af7363fd1baeec0",
+      "bytes": 9906
     },
     {
       "path": "scripts/recount-tokens.cjs",
@@ -14154,8 +14159,8 @@
     },
     {
       "path": "scripts/release_due.py",
-      "sha256": "3afdb6947b54c1fec4f7f7b9bbb4b525a1d9a33a84a2efa996515ba396694497",
-      "bytes": 5649
+      "sha256": "227e9d0827ba6509d5086d6c0611472149362fcd3b449c9e010a67644b53b8c5",
+      "bytes": 5817
     },
     {
       "path": "scripts/trading_gates.py",
@@ -14379,8 +14384,8 @@
     },
     {
       "path": "tests/test_component_matrix.py",
-      "sha256": "8675685fb0f139d074717a552f7f90c1a67acbbe6ad27be2b970d992cd6e568c",
-      "bytes": 18059
+      "sha256": "80e14a610b902417b063655303931892c3afc4e7670ff989221379cafb74c8a9",
+      "bytes": 21178
     },
     {
       "path": "tests/test_convergence_contract.py",
@@ -14469,8 +14474,8 @@
     },
     {
       "path": "tests/test_host_receipts.py",
-      "sha256": "63cd51d44ab08a1bfd1661785bdb502fb4871c2fd59a5311abf42d226ec0ca02",
-      "bytes": 42483
+      "sha256": "5a11f68bee22d1311375cacf88c68683c66e815f229fc30f2ee3290056905fe1",
+      "bytes": 60927
     },
     {
       "path": "tests/test_job_recovery.py",
@@ -14479,8 +14484,8 @@
     },
     {
       "path": "tests/test_landscape.py",
-      "sha256": "29108549ca14fac96a1435b34b217eefc9adfb2949995d1b32d97eecc68e47c8",
-      "bytes": 48270
+      "sha256": "3e512347df2e56d26d65a65a7ea3e5ee58b5e35f899a5ba3d67332ea2e1b8cfc",
+      "bytes": 57952
     },
     {
       "path": "tests/test_layer_verdicts.py",
@@ -14571,6 +14576,11 @@
       "path": "tests/test_pit_availability.py",
       "sha256": "4f9cb899edcd84950a71014d4efe588a4d9d70e5ee74f91ecf0c3a40f860c40b",
       "bytes": 20615
+    },
+    {
+      "path": "tests/test_platform_status.py",
+      "sha256": "efea1b7d21275f595ad492043d3ff5cc76f360b9f6be1f735c960b878543dbf4",
+      "bytes": 15658
     },
     {
       "path": "tests/test_point_in_time.py",
@@ -14694,8 +14704,8 @@
     },
     {
       "path": "tools/sota-convergence/README.md",
-      "sha256": "c9b16696ad19ba175e504333dc6d1256534adab766630bb248be83aa341452b7",
-      "bytes": 74460
+      "sha256": "23a805932370363a2cd6ae97b507c6a4d92ed61f9cc7471d6179136468da024b",
+      "bytes": 76228
     },
     {
       "path": "tools/sota-convergence/build_manifest.py",

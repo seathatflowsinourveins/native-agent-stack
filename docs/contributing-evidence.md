@@ -45,8 +45,13 @@ machine (`host.second_physical_machine: true`), independently reviewed.
 
 ## 3. The flow
 
-1. **Bootstrap.** Follow [`adoption/bootstrap.md`](../adoption/bootstrap.md)
-   for your platform. Do not skip ahead to recording receipts on a host that
+1. **Bootstrap, then work on current `main`.** Follow
+   [`adoption/bootstrap.md`](../adoption/bootstrap.md) for your platform. It
+   installs from the pinned release, but record and contribute from a branch
+   of current `main` (`git fetch origin && git switch -c <branch> origin/main`):
+   the matrix and grand-list generators on `main` can differ from the
+   release's, and CI checks the generated files with `main`'s. Rebase onto
+   `origin/main` again right before opening the PR and rerun step 5. Do not skip ahead to recording receipts on a host that
    has not completed the ordered adoption steps; a receipt for a tool that
    is not actually installed correctly is worse than no receipt.
 2. **Choose components.** Use the component evidence matrix's needs-host list
@@ -64,6 +69,7 @@ machine (`host.second_physical_machine: true`), independently reviewed.
      --component-id <a manifests/stack.json component id> \
      --stage use \
      --evidence-class native_proven \
+     --identity <random-per-session-token> \
      --from-stack-commands
    ```
 
@@ -84,7 +90,32 @@ machine (`host.second_physical_machine: true`), independently reviewed.
    only when this really is a second physical machine, not a fresh prefix or
    container on the catalog's existing authoring host — a receipt recorded
    without this flag can never satisfy the `component_matrix.py` macOS flip
-   rule (Section 5). The recorder runs your commands with a bounded timeout,
+   rule (Section 5). The receipt stores who recorded it only as a
+   domain-separated sha256 (`recorded_by.identity_sha256`, plus `--model` when
+   given). Inside a Claude Code session the identity is always
+   `$CLAUDE_CODE_SESSION_ID` (exported by Claude Code; observed in 2.1.280),
+   and `--identity` is refused there, so a session cannot record under one
+   name and review under another. A Codex session, a human or CI has no such
+   variable and must pass `--identity`; the recorder refuses to write a
+   receipt without one rather than giving every such recorder the same
+   identity. Use a random token for the session (for example the output of
+   `python3 -c 'import secrets; print(secrets.token_hex(16))'`), not a name:
+   the hash has a fixed public prefix, not a secret salt, so a guessable name
+   can be recovered and every `--identity codex` is the same identity.
+   `--identity` is NFKC-normalized and case-folded. A tool launched from a
+   Claude Code session inherits its session id and counts as that session.
+   The receipt also records the component version it ran in `tool_versions`:
+   the landscape winner pin when every layer that selects the component
+   agrees on it, else the `manifests/stack.json` version. Pass
+   `--component-version` when neither applies or the host ran something else;
+   a version without a digit (such as `unpinned`) is refused, and so is one
+   that matches none of the component's current winner pins (it would never
+   count), unless you pass `--allow-unbound-version`. Multi-part pins such
+   as `2.0.0rc5 (tag ...)` must be given as written. A receipt only
+   counts toward a winner's status while that version equals the winner's
+   current pin in full, so a pin bump retires older receipts until someone
+   re-records. The
+   recorder runs your commands with a bounded timeout,
    sanitizes `$HOME` to `~` and your username to `<user>` in the captured
    excerpt, writes the receipt under `evidence/hosts/<host_id>/`, and
    registers it in `manifests/evidence.json`. It never uploads anything over
@@ -92,9 +123,10 @@ machine (`host.second_physical_machine: true`), independently reviewed.
    but can be overridden; nothing in this repository can verify from the
    receipt's JSON alone that a claimed `platform_id`,
    `second_physical_machine` or `os`/`architecture` combination is honest —
-   independent review (step 8) is what a reader relies on for that, and it is
-   itself a self-declared `kind`/`ref` the recorder cannot forge review
-   authenticity for beyond requiring it be a non-`self` entry.
+   independent review (step 8) is what a reader relies on for that. Reviewer
+   and recorder identities are self-declared too: the checks below stop a
+   session from reviewing its own receipt by accident or by default, not a
+   contributor who deliberately passes a false `--identity`.
 4. **Sanitize and scan.** Re-read the receipt file yourself before opening a
    PR: sanitization is best-effort, not a guarantee. Then run the guarded
    secret scanner over just the files you touched:
@@ -134,12 +166,13 @@ machine (`host.second_physical_machine: true`), independently reviewed.
 
    The first command checks your new receipts against the schema rules
    (platform/component identity, id/path coherence, pass/exit coherence,
-   registration, and private-content scanning). The second is this
+   registration, reviewer independence, dates no later than 15 minutes past
+   the validating machine's clock, and private-content scanning). The second is this
    repository's general publication validator; it also re-checks that every
    file you touched is correctly hash-registered. The third confirms step 5's
    `--write` is current and enforces the macOS-acceptance flip rule (Section
    5 below).
-7. **Open a PR.** Use the [PR template](../.github/pull_request_template.md)'s
+7. **Open a PR.** Rebase onto `origin/main` and rerun step 5 first. Use the [PR template](../.github/pull_request_template.md)'s
    "Host evidence" section. List each receipt's path and evidence class.
 8. **Independent review.** Someone other than the recorder — another agent
    session, the Codex review lane, or a human — reviews the receipt (reads
@@ -156,10 +189,35 @@ machine (`host.second_physical_machine: true`), independently reviewed.
 
    `--kind` is one of `independent_session`, `codex_lane`, or `human` for a
    real independent reviewer (`self` is reserved for the recorder's own
-   automatic entry, written once by `record`). This step re-registers the
-   file's hash after the review is appended; rerun step 5's
+   automatic entry, written once by `record`). The reviewer's identity comes
+   from `$CLAUDE_CODE_SESSION_ID` or `--identity`, exactly as for `record`,
+   and is stored hashed as `reviewer.identity_sha256`. `review` refuses a
+   non-`self` review whose identity equals the receipt's `recorded_by`, and a
+   receipt with no `recorded_by` (recorded before 2026-09-23) cannot take an
+   independent review until it is re-recorded. `validate` rejects the same
+   cases in CI, and a review dated before the observation. Only each
+   reviewer's latest verdict counts, and any standing `disagree` or
+   `needs_changes` vetoes the receipt however many others agree; a reviewer
+   withdraws a dissent by appending a newer review. A dissent that fails
+   those checks (no reviewer, the recorder's own identity, or dated before
+   the observation) still vetoes and cannot be withdrawn. Only the identity
+   that dissented can withdraw it; a Claude session's dissent can be
+   withdrawn only by that same session, and no other review, a maintainer's
+   `human` review included, overrides it. Once that session is gone, the
+   supported path is to address the dissent and record a fresh receipt,
+   which starts with no reviews. A subagent or tool launched from the
+   recording session inherits its session id and is refused as the recorder.
+   An independent review therefore runs in a separate session, a Codex
+   session or a person's shell. A process that has no
+   `$CLAUDE_CODE_SESSION_ID` passes `--identity` (for example
+   `env -u CLAUDE_CODE_SESSION_ID python3 scripts/host_receipts.py review
+   ... --identity <token>`). That identity is self-declared, so use it only
+   for a reviewer that really is separate. `review` refuses to run when this
+   host's clock is behind the receipt's `observed_at_utc`, because the review
+   would be dated before the observation. This step re-registers
+   the file's hash after the review is appended; rerun step 5's
    `component_matrix.py --write` afterward, since a new review can change the
-   matrix's `independently_reviewed_pass` counts.
+   matrix's receipt counts and derived status.
 9. **Merge.** A maintainer merges once CI's
    `python3 scripts/host_receipts.py validate` step is green and at least one
    independent review is present or explicitly requested in the PR (the
@@ -188,28 +246,43 @@ recorder:
   read `evidence/hosts/` and a host receipt does not feed it.
 
 Use `python3 scripts/host_receipts.py summary --json` to see, per component
-and platform, how many passing receipts exist and how many of those passes
-have an independent review — useful input for deciding whether a layer has
+and platform, how many passing and failing receipts exist, how many have an
+independent review or a standing dissent, and how old the latest one is
+(`--max-age-days`, default 180, flags old ones; age is reported only here,
+never in the generated matrix, so `component_matrix.py --check` stays
+deterministic) — useful input for deciding whether a layer has
 enough evidence to bring to one of the processes above, but not a substitute
 for running them.
 
 ## 5. What never changes through a host receipt alone
 
 - **`catalogs/landscape/*.json` `winners[].platform_status`.** A winner's
-  per-platform `platform_status` field is edited by the recorded verdict
-  process above, not by this recorder. What `scripts/component_matrix.py`
-  *does* enforce automatically (`--check`, run in CI) is a narrower flip
-  rule: a winner cannot show `macos-arm64` `platform_status: accepted`
-  unless at least one recorded receipt for that `component_id` is
-  `result: pass`, `evidence_class: native_proven`, stage `use` or `install`,
-  carries a non-`self` review with verdict `agree`, declares
-  `host.second_physical_machine: true`, and has `host.os`/`host.architecture`
-  consistent with `adoption/manifest.json`'s `platform_profiles[]` entry for
-  that platform id. A receipt missing any of those — including one recorded
-  and reviewed entirely on a single WSL host with `second_physical_machine`
-  left at its default `false` — does not satisfy it; see
-  `docs/component-evidence-matrix.md`'s "How to update this page" section for
-  the exact rule text.
+  per-platform `platform_status` field is written by the recorded verdict
+  process above, not by this recorder. Both the verdict recorder and the
+  validators derive it through one function,
+  [`scripts/platform_status.py`](../scripts/platform_status.py): the
+  validators, and the verdict recorder
+  (`tools/sota-convergence/record_verdicts.py`) for every platform of a new
+  wave. A Mac's merged receipts raise what a row may declare, and the row's
+  next re-record writes it. `scripts/landscape.py` and
+  `scripts/component_matrix.py --check` (both run in CI) reject a declared
+  `macos-arm64` status that claims more than the receipts support; a weaker,
+  not-yet-re-recorded status is allowed. `accepted` needs a recorded receipt
+  for that `component_id` that is `result: pass`,
+  `evidence_class: native_proven`, stage `use` or `install`, bound to the
+  winner's current pin, independently reviewed (step 8) with no standing
+  dissent, declares `host.second_physical_machine: true`, and has
+  `host.os`/`host.architecture` consistent with `adoption/manifest.json`'s
+  `platform_profiles[]` entry for that platform id. A `native_proven` fail at
+  `use` or `install` that is the latest receipt for its host and stage blocks
+  `accepted`, whatever its review, until that host records a later pass.
+  `conditional` needs a pin-bound, non-`synthetic` pass from a declared
+  second physical machine with no standing dissent; `not_established` means
+  pin-bound receipts exist but none is such a pass. A receipt recorded
+  and reviewed entirely on a single WSL host, with `second_physical_machine`
+  left at its default `false`, cannot make a winner `accepted`. The Linux
+  rule, and when CI starts enforcing it, is described in that module's
+  docstring.
 - **`adoption/manifest.json` `platform_profiles[].status`.** This is a
   separate field, owned by another unit, and moving a platform from
   `drafted_not_accepted` to `accepted` is presently a maintainer judgment

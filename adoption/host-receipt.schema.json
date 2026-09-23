@@ -71,6 +71,26 @@
       "pattern": "^[0-9a-f]{40}$",
       "description": "Full commit SHA of the checkout used to record this receipt"
     },
+    "recorded_by": {
+      "description": "Who ran scripts/host_receipts.py record; an independent review must come from a different identity",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "identity_sha256"
+      ],
+      "properties": {
+        "identity_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "description": "Domain-separated sha256 of 'host-receipt-identity-v1:' + $CLAUDE_CODE_SESSION_ID, or else the normalized --identity; never the raw value"
+        },
+        "model": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        }
+      }
+    },
     "component_id": {
       "type": "string",
       "minLength": 1,
@@ -178,7 +198,26 @@
           "at_utc": {
             "type": "string",
             "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"
+          },
+          "reviewer": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "identity_sha256"
+          ],
+          "properties": {
+            "identity_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$",
+              "description": "Domain-separated sha256 of 'host-receipt-identity-v1:' + $CLAUDE_CODE_SESSION_ID, or else the normalized --identity; never the raw value"
+            },
+            "model": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            }
           }
+        }
         }
       }
     }
