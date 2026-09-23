@@ -874,9 +874,12 @@ re-dispatch) before its checks can run at all. The REST API also documents
 description scopes it to "a pull request from a public fork of a first time
 contributor" -- this repository's evidence PR is not a fork PR, so whether
 that same endpoint accepts a GITHUB_TOKEN-created same-repo PR's pending run
-is **not established by the documentation** and is left as a manual UI step
-here rather than assumed and automated; see the decision record's overturn
-condition for what would change this.
+is **not established by the documentation**. The live test on 2026-09-23
+answered it: for bot PR #109, `gh api -X POST .../actions/runs/<id>/approve`
+returned success on all three pending runs, and they then ran. The UI banner
+and this API call both work, so a coordinator session can approve without a
+browser. The job itself still does not call it, because approval stays a
+reviewer's act. See "Live test, 2026-09-23" in the decision record.
 
 `propose` is the one job in this workflow with write permissions
 (`contents: write`, `pull-requests: write`, scoped to the job, not the
