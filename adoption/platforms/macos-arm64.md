@@ -136,19 +136,37 @@ Two pins carry an additional `platform_dependency`, not covered by the hash
 above. The `@openai/codex` and `@anthropic-ai/claude-code` npm tarballs are
 byte-identical to the Linux pins, but on Apple Silicon npm additionally
 resolves `@openai/codex-darwin-arm64` and `@anthropic-ai/claude-code-darwin-arm64`
-— the packages carrying the real binaries. Each one's name, version and npm
-`dist.integrity` (read 2026-09-23) is recorded as that tool's
-`platform_dependency` in `adoption/pins-macos-arm64.json`, and
-`adoption/bootstrap-macos.sh`'s `verify_platform_dependency` checks it against
-the host's own npm lockfile (`$prefix/lib/node_modules/.package-lock.json`, or
-the package's own `package.json` `_integrity`) immediately after `npm
-install`, refusing (exit 1) on any drift instead of only noting it. Unlike the
-`@anthropic-ai/claude-code-darwin-arm64` package, `@openai/codex-darwin-arm64`
-is not itself a published package name: `npm view @openai/codex@0.155.1
-optionalDependencies` shows it as an `npm:` alias to
-`@openai/codex@0.155.1-darwin-arm64`, the same `@openai/codex` package name at
-a platform-suffixed version, and the pin's `resolved_package`/`version`
-fields record that distinction.
+— the packages carrying the real binaries. A `npm install` of the wrapper
+alone auto-fetches this platform package too, unverified (measured directly:
+`--omit=optional`, `--no-optional` and `NPM_CONFIG_OMIT=optional` do not
+suppress it, and this install path has no lockfile to omit from in the first
+place). `adoption/bootstrap-macos.sh`'s `install_platform_dependency` does
+not trust that fetch or try to read it back: each pin instead records the
+platform package's own `name`, `resolved_package`, `version` and independent
+`sha256` (plus, for `claude-code`, a `postinstall_binary_check` naming the
+exact files its `install.cjs` postinstall copies from it), and the function
+(1) installs the wrapper with `--ignore-scripts`, deferring its lifecycle
+scripts; (2) asks Node's own `require.resolve`, scoped to the wrapper's
+directory, exactly where it would resolve this dependency from, trusting and
+deleting that path only when it is an EXACT canonicalized-path match for the
+one nested location the wrapper's own `node_modules` would use (never
+whatever `require.resolve`'s NODE_PATH/GLOBAL_FOLDERS fallback might report
+from outside the prefix entirely) — falling back to a top-level alias inside
+the prefix otherwise; (3) extracts the independently sha256-verified tarball
+there instead; (4) re-verifies resolution, the resolved package.json's
+`version` against the pin, and its `name` against `resolved_package`, fail
+closed (exit 1) on any mismatch; and (5) runs `npm rebuild` for the wrapper
+so its deferred lifecycle scripts run against the now-verified copy, then
+(when the pin names one) confirms the `postinstall_binary_check` files are
+byte-identical. Every path this compares is canonicalized first
+(`canonical_path`, in the script), because Node realpath-resolves symlinks
+by default when it locates a module and a real Mac's `/var` is a symlink to
+`/private/var`. Unlike the `@anthropic-ai/claude-code-darwin-arm64` package,
+`@openai/codex-darwin-arm64` is not itself a published package name: `npm
+view @openai/codex@0.155.1 optionalDependencies` shows it as an `npm:` alias
+to `@openai/codex@0.155.1-darwin-arm64`, the same `@openai/codex` package
+name at a platform-suffixed version, and the pin's `resolved_package`/
+`version` fields record that distinction.
 
 `llama-server` is a profile `required_command`, so llama.cpp is pinned rather
 than left to `brew install llama.cpp`. The macOS asset holds every executable

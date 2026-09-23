@@ -160,6 +160,48 @@ forget_enabled_label() {
   mv -- "$enabled_state_file.tmp" "$enabled_state_file"
 }
 
+# N1: install's own temporary backup of an owned destination plist (made just
+# before overwriting it) lives under this script's own state_dir, never
+# inside ~/Library/LaunchAgents itself: that directory is scanned and
+# auto-loaded by launchd at login, so a stray file an interrupted run left
+# there is a real hazard, not just clutter. cmd_install clears
+# pending_backup_plist as soon as it no longer needs the backup (restored, or
+# the install it protected against completed either way); this EXIT trap is
+# the safety net for whatever premature exit -- a signal, an unexpected
+# error elsewhere -- would otherwise leave it behind.
+pending_backup_plist=""
+cleanup_pending_backup() {
+  if [[ -n "$pending_backup_plist" && -e "$pending_backup_plist" ]]; then
+    rm -f -- "$pending_backup_plist"
+  fi
+}
+trap cleanup_pending_backup EXIT
+
+# L4: launchctl bootout can return success before the service's own teardown
+# has actually finished (real launchd; not something an offline shim can
+# prove by itself). Trusting its exit code alone and immediately calling
+# bootstrap can then race a service that has not actually stopped yet. Polls
+# launchctl print for a bounded number of attempts -- checked BEFORE any
+# sleep, so the common case (already unloaded by the time bootout returns)
+# costs no wall-clock time at all -- until it reports 113 ("Could not find
+# service", genuinely unloaded). WAIT_UNTIL_UNLOADED_ATTEMPTS/_INTERVAL are
+# overridable so a test can force either a fast success or a bounded,
+# fast-failing timeout without a real multi-second sleep.
+wait_until_unloaded() {
+  local label="$1"
+  local attempts_left="${WAIT_UNTIL_UNLOADED_ATTEMPTS:-10}"
+  local interval="${WAIT_UNTIL_UNLOADED_INTERVAL:-1}"
+  local status
+  while :; do
+    status=0
+    launchctl print "gui/$(id -u)/$label" >/dev/null 2>&1 || status=$?
+    [[ "$status" == 113 ]] && return 0
+    attempts_left=$((attempts_left - 1))
+    [[ "$attempts_left" -gt 0 ]] || return 1
+    sleep "$interval"
+  done
+}
+
 # Reads one string-valued key from a plist file. Empty (never an error exit
 # under set -e's callers, since this is always read with `$(...)`) when the
 # key is absent. Prefers plutil (present on every real Mac); falls back to
@@ -244,23 +286,12 @@ cmd_install() {
       exit 1
     fi
 
-    # A re-run on an owned label that is still loaded (e.g. reinstalling
-    # after a re-render) would otherwise have `cp` overwrite the live
-    # service's plist in place, then `launchctl bootstrap` fail because the
-    # label is already bootstrapped (launchctl error 5), and the failure
-    # path below would then delete the just-overwritten file out from under
-    # the still-running service. Unload it first, so the fresh bootstrap
-    # further down actually applies.
-    if launchctl print "gui/$(id -u)/$label" >/dev/null 2>&1; then
-      if ! launchctl bootout "gui/$(id -u)/$label"; then
-        printf 'Refusing to reinstall %s: it is currently loaded and launchctl bootout failed; leaving it running, unmodified.\n' \
-          "$label" >&2
-        exit 1
-      fi
-    fi
-
-    # Every directory this plist writes into or runs from comes from ITS OWN
-    # declared StandardOutPath/StandardErrorPath/WorkingDirectory, never
+    # Directory creation and the backup both happen BEFORE anything below
+    # ever stops a running service (L3): a failure in either (a bad declared
+    # path, a backup copy that cannot be written) must never leave an
+    # already-unloaded service down with nothing done afterward to restore
+    # it. Every directory this plist writes into or runs from comes from ITS
+    # OWN declared StandardOutPath/StandardErrorPath/WorkingDirectory, never
     # this shell's ECO_INSTALL_ROOT: a plist rendered with --host against a
     # different host's value file can point anywhere, and launchd does not
     # create missing parent directories for any of the three on its own.
@@ -277,19 +308,67 @@ cmd_install() {
     # nothing else could still reference it). When it did exist -- a
     # previously working, owned install -- back it up first and restore it
     # (file and, best effort, its loaded state) instead of destroying a
-    # config that was working before this reinstall was attempted.
+    # config that was working before this reinstall was attempted. The
+    # backup lives under this script's own state_dir, never inside
+    # ~/Library/LaunchAgents (N1; see cleanup_pending_backup above).
     local backup_plist=""
     if [[ "$dest_existed" == 1 ]]; then
-      backup_plist="$dest_plist.backup.$$"
+      mkdir -p "$state_dir/backups"
+      backup_plist="$state_dir/backups/$label.plist.backup.$$"
       cp -- "$dest_plist" "$backup_plist"
+      pending_backup_plist="$backup_plist"
     fi
+
+    # A re-run on an owned label that is still loaded (e.g. reinstalling
+    # after a re-render) would otherwise have `cp` overwrite the live
+    # service's plist in place, then `launchctl bootstrap` fail because the
+    # label is already bootstrapped (launchctl error 5), and the failure
+    # path below would then delete the just-overwritten file out from under
+    # the still-running service. Unload it first, so the fresh bootstrap
+    # further down actually applies. Only ever probed or unloaded for a
+    # label this script itself owns (L2): a label that merely happens to be
+    # loaded by something else entirely -- no destination plist yet, never
+    # recorded as enabled -- is never this script's to bootout.
+    if is_enabled_label "$label"; then
+      local print_status=0
+      launchctl print "gui/$(id -u)/$label" >/dev/null 2>&1 || print_status=$?
+      if [[ "$print_status" == 0 ]]; then
+        if ! launchctl bootout "gui/$(id -u)/$label"; then
+          printf 'Refusing to reinstall %s: it is currently loaded and launchctl bootout failed; leaving it running, unmodified.\n' \
+            "$label" >&2
+          exit 1
+        fi
+        # L4: bootout can return before the service has actually finished
+        # tearing down; only proceed once launchctl print confirms it,
+        # within a bounded wait, never trusting bootout's exit code alone.
+        if ! wait_until_unloaded "$label"; then
+          printf 'Refusing to reinstall %s: launchctl bootout succeeded but the service did not report unloaded (launchctl print never returned 113) within the bounded wait; leaving it as is.\n' \
+            "$label" >&2
+          exit 1
+        fi
+      elif [[ "$print_status" != 113 ]]; then
+        # L5: only exit 113 ("Could not find service") is confidently "not
+        # loaded"; any other launchctl print failure (permission, launchd
+        # itself unresponsive, ...) must refuse rather than silently assume
+        # "not loaded" and bootstrap over state print could not determine --
+        # exactly what remove already does for the same exit code, below.
+        printf 'Refusing to reinstall %s: launchctl print failed with exit %s (not 113/"not found"); not confidently unloaded, leaving it as is. Investigate launchctl print gui/%s/%s.\n' \
+          "$label" "$print_status" "$(id -u)" "$label" >&2
+        exit 1
+      fi
+    fi
+
     cp -- "$source_plist" "$dest_plist"
     if launchctl bootstrap "gui/$(id -u)" "$dest_plist"; then
-      [[ -n "$backup_plist" ]] && rm -f -- "$backup_plist"
+      if [[ -n "$backup_plist" ]]; then
+        rm -f -- "$backup_plist"
+        pending_backup_plist=""
+      fi
       record_enabled_label "$label"
       printf 'Installed and bootstrapped %s (%s)\n' "$label" "$dest_plist"
     elif [[ -n "$backup_plist" ]]; then
       mv -f -- "$backup_plist" "$dest_plist"
+      pending_backup_plist=""
       launchctl bootstrap "gui/$(id -u)" "$dest_plist" >/dev/null 2>&1 || true
       printf 'launchctl bootstrap failed for %s; restored the previous %s (best-effort reloaded).\n' \
         "$label" "$dest_plist" >&2

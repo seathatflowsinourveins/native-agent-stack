@@ -292,6 +292,62 @@ find_one() {
   find "$directory" -type f -name "$name" -print -quit
 }
 
+# Canonicalizes a path (resolving every symlink in whatever prefix of it
+# already exists) so a string comparison against what Node's require.resolve
+# reports is not defeated by a symlinked ancestor -- macOS's /var ->
+# /private/var (also /tmp -> /private/tmp, and a symlinked TMPDIR-based test
+# fixture root on any platform) is the exact case that broke the
+# install_platform_dependency containment/resolution checks below: Node
+# realpath-resolves symlinks by default when it locates a module, so a
+# hand-built expected path using the ORIGINAL (non-canonical) prefix spelling
+# never matched. Deliberately does NOT shell out to a `realpath` binary: a
+# stock Mac (this script's own test suite enforces this) is not guaranteed
+# to have one pre-macOS 13. python3's `os.path.realpath` is used instead --
+# it never requires the path to exist either, unlike most `realpath`
+# implementations, which matters for a platform dependency's nested
+# directory before it is ever fetched -- and, only if python3 is somehow
+# unavailable, `cd -P && pwd -P` for an existing directory, or a manual walk
+# up to the nearest existing ancestor for anything else (a file, or a path
+# that does not exist yet). A stock Mac has bash 3.2 but no other guarantee,
+# so this avoids arrays and `[[ =~ ]]`.
+canonical_path() {
+  local target="$1"
+  if [[ -e "$target" ]]; then
+    if command -v python3 >/dev/null 2>&1; then
+      local via_python3
+      via_python3="$(python3 -c 'import os, sys
+print(os.path.realpath(sys.argv[1]))' "$target" 2>/dev/null)" && [[ -n "$via_python3" ]] && {
+        printf '%s\n' "$via_python3"; return
+      }
+    fi
+    if [[ -d "$target" ]]; then
+      (cd -P -- "$target" >/dev/null 2>&1 && pwd -P) && return
+    fi
+  fi
+  # $target does not exist (or every canonicalizer above failed): walk up to
+  # the nearest existing ancestor, canonicalize only that, and reattach the
+  # non-existent remainder unchanged -- matching os.path.realpath's own
+  # semantics for a path whose tail has not been created yet.
+  local remainder="" walk="$target"
+  while [[ "$walk" != "/" && -n "$walk" && ! -e "$walk" ]]; do
+    if [[ -z "$remainder" ]]; then
+      remainder="$(basename -- "$walk")"
+    else
+      remainder="$(basename -- "$walk")/$remainder"
+    fi
+    walk="$(dirname -- "$walk")"
+  done
+  local canonical_walk="$walk"
+  if [[ -d "$walk" ]]; then
+    canonical_walk="$(cd -P -- "$walk" >/dev/null 2>&1 && pwd -P)" || canonical_walk="$walk"
+  fi
+  if [[ -n "$remainder" ]]; then
+    printf '%s/%s\n' "$canonical_walk" "$remainder"
+  else
+    printf '%s\n' "$canonical_walk"
+  fi
+}
+
 # Node needs multiple executables symlinked from one --strip-components=1 tree.
 install_node() {
   local version="$1" url="$2" sha256="$3"
@@ -456,9 +512,26 @@ npm_package_name() {
 # codex has no lifecycle scripts at all; it resolves its platform package at
 # every invocation of bin/codex.js, so step (5) is a no-op for it and step
 # (3)'s replacement alone is what matters. A component with no
-# platform_dependency pin is a silent no-op.
+# platform_dependency pin is a silent no-op. Step (2) only ever trusts an
+# EXACT string match between what require.resolve reports and the one nested
+# path this wrapper's own node_modules would place this dependency at
+# (computed independently, never derived from `resolved` itself); anything
+# else -- including a decoy resolved from NODE_PATH/GLOBAL_FOLDERS outside
+# the prefix entirely, see the comment at the containment check below -- is
+# never trusted enough to delete. Step (4) re-verifies both the resolved
+# package.json's `version` against the pin's `version` AND its own `name`
+# against the pin's `resolved_package`, fail closed on either mismatch, so a
+# same-version fixture published under the wrong package name cannot pass.
+# Every path compared or deleted here is canonicalized first (`prefix` on
+# entry, and independently whatever Node itself reports), because Node
+# realpath-resolves symlinks by default when it locates a module: on a real
+# Mac, `/var` is a symlink to `/private/var`, and a prefix built under
+# `$TMPDIR` (or any other symlinked ancestor) would otherwise never
+# string-equal what require.resolve reports, tripping the fail-closed path on
+# a perfectly good install (see canonical_path's own comment above).
 install_platform_dependency() {
   local id="$1" prefix="$2" wrapper_ignore_scripts="${3:-false}"
+  prefix="$(canonical_path "$prefix")"
   local dep
   dep="$(jq -c --arg id "$id" '.tools[] | select(.id == $id) | .platform_dependency // empty' "$pins_path")"
   [[ -n "$dep" && "$dep" != "null" ]] || return 0
@@ -489,6 +562,12 @@ install_platform_dependency() {
       process.exit(1);
     }
   ' "$dep_name" "$wrapper_dir" 2>/dev/null)" || resolved=""
+  # Node already realpath-resolves symlinks when it locates a module (unless
+  # --preserve-symlinks is set), so this is normally a no-op; canonicalizing
+  # it here too, independently of $expected_nested's own canonical prefix,
+  # is the "realpath what Node reports" half of the fix -- belt and braces
+  # against a Node build or flag where that default does not hold.
+  [[ -n "$resolved" ]] && resolved="$(canonical_path "$resolved")"
 
   local target_dir
   if [[ "$resolved" == "$expected_nested" ]]; then
@@ -516,9 +595,19 @@ install_platform_dependency() {
 
   local verify
   verify="$(node -e '
+    const fs = require("fs");
     const resolvedPath = require.resolve(process.argv[1] + "/package.json", { paths: [process.argv[2]] });
-    if (resolvedPath !== process.argv[3]) {
-      console.error("resolved to " + resolvedPath + ", expected " + process.argv[3]);
+    // fs.realpathSync canonicalizes both sides explicitly here (not the
+    // shell-side canonical_path helper): resolvedPath normally already has
+    // every symlink resolved by require.resolve itself, and argv[3] was
+    // built from the bash-canonicalized target_dir variable, but a
+    // symlinked ancestor introduced between the two calls (or a Node build
+    // with --preserve-symlinks) must not defeat this fail-closed comparison
+    // either way.
+    const expectedPath = fs.realpathSync(process.argv[3]);
+    const canonicalResolvedPath = fs.realpathSync(resolvedPath);
+    if (canonicalResolvedPath !== expectedPath) {
+      console.error("resolved to " + canonicalResolvedPath + ", expected " + expectedPath);
       process.exit(1);
     }
     const pkg = require(resolvedPath);
@@ -581,6 +670,7 @@ install_npm() {
   local archive="$cache_dir/${id}-${version}.tgz"
   fetch "$url" "$sha256" "$archive"
   local final_prefix="$ecosystem_root/tools/$id-$version"
+  final_prefix="$(canonical_path "$final_prefix")"
   local package
   package="$(npm_package_name "$url")"
   local has_platform_dependency=0
@@ -604,6 +694,7 @@ install_npm() {
     rm -rf -- "$prefix"
   fi
   mkdir -p "$prefix"
+  prefix="$(canonical_path "$prefix")"
 
   local npm_install_args=(--global --no-audit --no-fund --prefix "$prefix")
   if [[ "$ignore_scripts" == "true" || "$has_platform_dependency" == 1 ]]; then
@@ -615,8 +706,26 @@ install_npm() {
   npm install "${npm_install_args[@]}" "$archive" >/dev/null
   if [[ "$has_platform_dependency" == 1 ]]; then
     install_platform_dependency "$id" "$prefix" "$ignore_scripts"
-    rm -rf -- "$final_prefix"
+    # Rename the old prefix aside, move the staged one in, then delete the
+    # old one -- NOT `rm -rf "$final_prefix"` followed by `mv`, which (fixed
+    # here; found by Codex's own failure injection) left a real window where
+    # final_prefix did not exist at all if this process died between the two:
+    # every bin_dir symlink into it, and the old, previously fully verified
+    # install, would both be gone with nothing to replace them yet. `mv` on
+    # the same filesystem (stage_dir is always under ecosystem_root, so this
+    # always holds) is a single rename(2) per call, so final_prefix is never
+    # missing for longer than the gap between two such renames, and -- unlike
+    # the old design -- a crash in that gap leaves the old install fully
+    # intact and recoverable at final_prefix.previous.$$, never silently
+    # deleted with nothing in its place.
+    local previous_prefix=""
+    if [[ -e "$final_prefix" ]]; then
+      previous_prefix="${final_prefix}.previous.$$"
+      rm -rf -- "$previous_prefix"
+      mv -- "$final_prefix" "$previous_prefix"
+    fi
     mv -- "$prefix" "$final_prefix"
+    [[ -n "$previous_prefix" ]] && rm -rf -- "$previous_prefix"
     prefix="$final_prefix"
   fi
 

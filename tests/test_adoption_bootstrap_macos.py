@@ -276,9 +276,17 @@ class ScriptStructureTests(unittest.TestCase):
         # are checked for a command a stock Mac does not ship.
         code = "\n".join(line for line in self.text.splitlines()
                          if not line.lstrip().startswith("#"))
-        for absent in ("sha256sum", "flock", "dpkg-query", "apt-get",
-                       "realpath", "mapfile"):
+        for absent in ("sha256sum", "flock", "dpkg-query", "apt-get", "mapfile"):
             self.assertNotIn(absent, code, f"{absent} is not available on a stock Mac")
+        # `realpath` the external command (a stock, pre-macOS 13 Mac has no
+        # guarantee of one) must never be shelled out to; Python's
+        # `os.path.realpath` function -- always spelled with the leading
+        # `os.path.` attribute access below, inside a python3 -c script -- is
+        # not that command and is exactly canonical_path's own guaranteed-
+        # portable fallback, so it is deliberately excluded from this check.
+        self.assertNotRegex(code, r"(?<!os\.path\.)\brealpath\b",
+                             "realpath is not available on a stock Mac")
+        self.assertIn("os.path.realpath", self.text)
         self.assertIn('pwd -P', self.text)
         self.assertIn('mkdir "$lock_dir"', self.text)
 
@@ -832,7 +840,8 @@ class PlatformDependencyInstallTests(unittest.TestCase):
         harness = tmp_path / "install-platform-dep-harness.sh"
         harness.write_text(
             "set -Eeuo pipefail\n"
-            + _shell_functions(SCRIPT_PATH.read_text(), "npm_package_name", "install_platform_dependency")
+            + _shell_functions(SCRIPT_PATH.read_text(), "canonical_path", "npm_package_name",
+                                "install_platform_dependency")
             + f'pins_path={json.dumps(str(pins_path))}\n'
             + f'cache_dir={json.dumps(str(tmp_path / "downloads"))}\n'
             + f'stage_dir={json.dumps(str(tmp_path / "stage"))}\n'
@@ -862,7 +871,7 @@ class PlatformDependencyInstallTests(unittest.TestCase):
         harness = tmp_path / "install-npm-e2e-harness.sh"
         harness.write_text(
             "set -Eeuo pipefail\n"
-            + _shell_functions(SCRIPT_PATH.read_text(), "npm_package_name",
+            + _shell_functions(SCRIPT_PATH.read_text(), "canonical_path", "npm_package_name",
                                 "install_platform_dependency", "install_npm")
             + f'pins_path={json.dumps(str(pins_path))}\n'
             + f'ecosystem_root={json.dumps(str(eco_root))}\n'
@@ -930,6 +939,86 @@ class PlatformDependencyInstallTests(unittest.TestCase):
             })
             result, eco_root = self._run_install_npm(
                 tmp_path, pins_path, "codexlike", "1.0.0", self.codex_like_tarball, self.codex_like_sha256,
+                npm_package="fixture-codex-like")
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            wrapper_dir = eco_root / "tools" / "codexlike-1.0.0" / "lib" / "node_modules" / "fixture-codex-like"
+            content = subprocess.run(
+                ["node", "-e",
+                 'const p = require.resolve("widget-darwin-arm64/package.json", {paths: [process.argv[1]]});'
+                 'const fs = require("fs"), path = require("path");'
+                 'process.stdout.write(fs.readFileSync(path.join(path.dirname(p), "native-bin"), "utf8").trim());',
+                 str(wrapper_dir)],
+                capture_output=True, text=True, timeout=30,
+            )
+            self.assertEqual(content.returncode, 0, content.stdout + content.stderr)
+            self.assertEqual(content.stdout.strip(), "VERIFIED_CONTENT")
+
+    def _tmp_via_symlink(self, tmp: str) -> Path:
+        """A directory reached only through a symlinked ancestor, mirroring
+        a real Mac's own /var -> /private/var (also /tmp -> /private/tmp):
+        the exact class of path that broke install_platform_dependency's
+        containment and resolution checks, since Node's require.resolve
+        realpath-resolves symlinks by default. Reproduced here off-Mac so
+        the fix (canonical_path, applied to both sides of every comparison)
+        has real, non-simulated evidence on this Linux host too."""
+        tmp_path = Path(tmp)
+        real_var = tmp_path / "private" / "var"
+        real_var.mkdir(parents=True)
+        symlinked_var = tmp_path / "var"
+        symlinked_var.symlink_to(real_var, target_is_directory=True)
+        return symlinked_var
+
+    def test_places_the_verified_tarball_correctly_when_the_prefix_is_reached_through_a_symlink(self):
+        # Round 3b, Opus Medium M1 / hosted macos-15 run 35820422561: seven
+        # PlatformDependencyInstallTests failed on a real Mac with "does not
+        # resolve to .../tools/widget-1.0.0/.../package.json ... resolved to
+        # /priva[te/var/...]" -- expected_nested was built from the ORIGINAL
+        # (non-canonical) prefix, but require.resolve returns the
+        # realpath-resolved (/private/var) form. Reproduced here with an
+        # equivalent symlinked tmp root standing in for /var.
+        with tempfile.TemporaryDirectory() as tmp:
+            symlinked_root = self._tmp_via_symlink(tmp)
+            tmp_path = Path(tmp)
+            prefix = symlinked_root / "tools" / "widget-1.0.0"
+            pins_path = self._pins_fixture(tmp_path, {
+                "id": "widget", "version": "1.0.0", "kind": "npm",
+                "url": "https://registry.npmjs.org/widget/-/widget-1.0.0.tgz",
+                "sha256": "0" * 64, "checksum_source": "npm_registry_integrity_crosscheck",
+                "checksum_ref": "test", "install_note": "test",
+                "platform_dependency": self._platform_dependency_pin(),
+            })
+            result = self._run(tmp_path, pins_path, "widget", prefix,
+                                f'cp {json.dumps(str(self.verified_tarball))} "$3"')
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("Installed and verified platform dependency widget-darwin-arm64", result.stdout)
+            installed_pkg = prefix / "lib" / "node_modules" / "widget-darwin-arm64" / "package.json"
+            self.assertTrue(installed_pkg.is_file(), list(prefix.rglob("*")))
+            manifest = json.loads(installed_pkg.read_text())
+            self.assertEqual(manifest["name"], "fixture-real-name")
+            self.assertEqual(manifest["version"], "1.2.3")
+
+    @unittest.skipUnless(NPM, "native npm unavailable")
+    def test_codex_like_wrapper_resolves_the_verified_dependency_when_the_ecosystem_root_is_reached_through_a_symlink(self):
+        # Same finding as the previous test, exercised through the full
+        # install_npm path (the atomic staged-swap plus
+        # install_platform_dependency) with ecosystem_root itself reached
+        # through a symlink -- matching either a real Mac's ECO_INSTALL_ROOT
+        # default (under $HOME, not itself under /var, but staged installs
+        # go through stage_dir under ecosystem_root either way) or a
+        # symlinked TMPDIR-based fixture root, the two cases the coordinator
+        # named for this reproduction.
+        with tempfile.TemporaryDirectory() as tmp:
+            symlinked_root = self._tmp_via_symlink(tmp)
+            tmp_path = Path(tmp)
+            pins_path = self._pins_fixture(tmp_path, {
+                "id": "codexlike", "version": "1.0.0", "kind": "npm",
+                "url": "https://registry.npmjs.org/fixture-codex-like/-/fixture-codex-like-1.0.0.tgz",
+                "sha256": self.codex_like_sha256, "checksum_source": "npm_registry_integrity_crosscheck",
+                "checksum_ref": "test", "install_note": "test",
+                "platform_dependency": self._platform_dependency_pin(),
+            })
+            result, eco_root = self._run_install_npm(
+                symlinked_root, pins_path, "codexlike", "1.0.0", self.codex_like_tarball, self.codex_like_sha256,
                 npm_package="fixture-codex-like")
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             wrapper_dir = eco_root / "tools" / "codexlike-1.0.0" / "lib" / "node_modules" / "fixture-codex-like"
@@ -1225,7 +1314,7 @@ class PlatformDependencyInstallTests(unittest.TestCase):
                     harness = case_dir / "install-npm-harness.sh"
                     harness.write_text(
                         "set -Eeuo pipefail\n"
-                        + _shell_functions(SCRIPT_PATH.read_text(), "npm_package_name",
+                        + _shell_functions(SCRIPT_PATH.read_text(), "canonical_path", "npm_package_name",
                                            "install_platform_dependency", "install_npm")
                         + "fetch() { :; }\n"
                         + f'pins_path={json.dumps(str(pins_path))}\n'

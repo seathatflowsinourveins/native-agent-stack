@@ -265,13 +265,42 @@ class LaunchdAgentsScriptStructureTests(unittest.TestCase):
         self.assertIn("is_enabled_label", self.text)
         self.assertIn("was not enabled by this script", self.text)
 
+    def test_install_backup_is_written_under_state_dir_not_launch_agents(self):
+        # N1, structural: proves the backup's location by inspecting the
+        # assignment itself (test_backup_files_live_under_state_dir_never_
+        # under_launch_agents, in the behavior test class, only proves no
+        # backup is left behind after a successful run, which the OLD,
+        # wrong-location code also satisfied via its own cleanup).
+        self.assertIn('backup_plist="$state_dir/backups/$label.plist.backup.$$"', self.text)
+        self.assertIn("trap cleanup_pending_backup EXIT", self.text)
+
+    def test_install_gates_its_pre_reinstall_load_check_on_ownership(self):
+        # L2, structural: the print/bootout probe before a reinstall must be
+        # reached only for a label this script itself recorded as enabled.
+        self.assertRegex(
+            self.text,
+            r"if is_enabled_label \"\$label\"; then\n\s+local print_status=0\n\s+launchctl print",
+        )
+
+    def test_install_treats_only_exit_113_as_confidently_unloaded(self):
+        # L5, structural: any launchctl print exit other than 0 (loaded) or
+        # 113 (not found) must refuse, the same way remove already does.
+        self.assertIn('elif [[ "$print_status" != 113 ]]; then', self.text)
+
+    def test_install_waits_for_unloaded_after_a_successful_bootout(self):
+        # L4, structural: bootout succeeding is not itself trusted; a
+        # bounded poll of launchctl print must confirm 113 before bootstrap.
+        self.assertIn("wait_until_unloaded", self.text)
+
     def test_remove_deletes_only_the_owned_plist_never_component_data_or_logs(self):
         # Every `rm` in the script targets exactly the copied unit-definition
         # file this script itself placed under ~/Library/LaunchAgents (on a
         # successful bootout, on removing an already-unloaded label, or on
         # rolling back a failed bootstrap during install), or the install
-        # subcommand's own temporary backup of that same file; none may ever
-        # target state/logs, state/qdrant, or the enabled-labels state file.
+        # subcommand's own temporary backup of that same file (now under
+        # state_dir, N1) via either its explicit cleanup or the EXIT trap's
+        # safety net; none may ever target state/logs, state/qdrant, or the
+        # enabled-labels state file.
         self.assertNotIn("rm -rf", self.text)
         rm_lines = [line.strip() for line in self.text.splitlines() if re.search(r"\brm\b", line)]
         self.assertGreaterEqual(len(rm_lines), 1, rm_lines)
@@ -279,6 +308,7 @@ class LaunchdAgentsScriptStructureTests(unittest.TestCase):
             'rm -f -- "$launch_agents_dir/$label.plist"',
             'rm -f -- "$dest_plist"',
             'rm -f -- "$backup_plist"',
+            'rm -f -- "$pending_backup_plist"',
         )
         for rm_line in rm_lines:
             self.assertTrue(any(target in rm_line for target in allowed_targets), rm_line)
@@ -513,16 +543,19 @@ class LaunchdAgentsScriptBehaviorTests(unittest.TestCase):
 
             invocations = log.read_text()
             self.assertEqual(invocations.count("launchctl bootstrap"), 4)
-            # cmd_install now also calls launchctl print once per label
-            # reached (to check whether a reinstall needs an unload first):
-            # 2 (the default install) + 1 (explicit llama-embed) + 1 (mid-test
-            # forget's remove) + 1 (the reinstall after the unowned-file
-            # test) + 1 (the explicit `status`) + 1 (the final remove) = 7.
-            # The refused install (an unowned destination) never reaches its
-            # own print call, and the trailing no-op remove never reaches
-            # its print or bootout call either (the label is no longer
-            # enabled by that point).
-            self.assertEqual(invocations.count("launchctl print"), 7)
+            # cmd_install's own pre-reinstall print check is gated on
+            # is_enabled_label (L2): it never probes a label that is not yet
+            # owned, so every install in this cycle skips it (the default
+            # install's two labels, the explicit llama-embed install, and
+            # the reinstall after the unowned-file test are all fresh/
+            # unowned at the moment install runs). Only cmd_remove (mid-test
+            # forget, and the final remove) and cmd_status's own explicit
+            # print call ever reach launchctl print here: 1 + 1 + 1 = 3. The
+            # refused install (an unowned destination) never reaches even
+            # that gate, and the trailing no-op remove never reaches its
+            # print or bootout call either (the label is no longer enabled
+            # by that point).
+            self.assertEqual(invocations.count("launchctl print"), 3)
             self.assertEqual(invocations.count("launchctl bootout"), 2,
                               "one for the mid-test forget, one for the final remove; "
                               "the trailing no-op remove must not invoke bootout again")
@@ -675,6 +708,233 @@ class LaunchdAgentsScriptBehaviorTests(unittest.TestCase):
             self.assertIn("com.native-stack.qdrant", state_file.read_text().split())
             invocations = log.read_text()
             self.assertIn("launchctl bootout", invocations)
+
+    def test_install_never_boots_out_a_currently_loaded_label_it_does_not_own(self):
+        # L2 (Opus round-3 verification / Codex round-3 Medium): without a
+        # destination plist yet (a fresh install attempt), a label that
+        # happens to already be loaded by something else entirely -- not
+        # this script -- must never be torn down just because install's own
+        # pre-reinstall unload check ran unconditionally on every load-check
+        # hit. Only a label this script itself recorded as enabled may ever
+        # reach launchctl bootout here. bootstrap fails as real launchctl
+        # would on an already-loaded label (error 5), so install correctly
+        # reports a failure without having destroyed anything it does not
+        # own.
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            eco_root = tmp_path / "eco"
+            fake_home = tmp_path / "home"
+            fake_home.mkdir()
+            log = tmp_path / "launchctl.log"
+            log.touch()
+            shim = tmp_path / "shim"
+            shim.mkdir()
+            (shim / "launchctl").write_text(
+                "#!/bin/sh\n"
+                f'printf "%s\\n" "launchctl $*" >> {str(log)!r}\n'
+                'case "$1" in\n'
+                '  print) exit 0 ;;\n'
+                '  bootstrap) exit 5 ;;\n'
+                '  bootout) exit 0 ;;\n'
+                '  *) exit 0 ;;\n'
+                'esac\n'
+            )
+            (shim / "launchctl").chmod(0o755)
+            env = {
+                **os.environ,
+                "PATH": f"{shim}{os.pathsep}{os.environ['PATH']}",
+                "ECO_INSTALL_ROOT": str(eco_root),
+                "HOME": str(fake_home),
+            }
+            self.assertEqual(self._run(["render"], env=env).returncode, 0)
+            install_result = self._run(["install", "--label", "com.native-stack.qdrant"], env=env)
+            self.assertNotEqual(install_result.returncode, 0, install_result.stdout + install_result.stderr)
+            invocations = log.read_text()
+            self.assertNotIn("bootout", invocations,
+                              "install must never bootout a label it does not own, even if it is loaded")
+            launch_agents_dir = fake_home / "Library" / "LaunchAgents"
+            self.assertFalse((launch_agents_dir / "com.native-stack.qdrant.plist").exists())
+
+    def test_install_refuses_when_print_fails_with_neither_loaded_nor_not_found(self):
+        # L5 (Opus + Codex round-3): install's own pre-reinstall load check
+        # must treat only exit 113 as confidently "not loaded"; any other
+        # launchctl print failure (permission, launchd unresponsive, ...)
+        # must refuse rather than silently assume "not loaded" and bootstrap
+        # over state print could not determine -- exactly what remove
+        # already does for the same exit code.
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            eco_root = tmp_path / "eco"
+            fake_home = tmp_path / "home"
+            fake_home.mkdir()
+            log = tmp_path / "launchctl.log"
+            log.touch()
+            working_shim = self._launchctl_shim(tmp_path, log)
+            env = {
+                **os.environ,
+                "PATH": f"{working_shim}{os.pathsep}{os.environ['PATH']}",
+                "ECO_INSTALL_ROOT": str(eco_root),
+                "HOME": str(fake_home),
+            }
+            self.assertEqual(self._run(["render"], env=env).returncode, 0)
+            first_install = self._run(["install", "--label", "com.native-stack.qdrant"], env=env)
+            self.assertEqual(first_install.returncode, 0, first_install.stdout + first_install.stderr)
+            launch_agents_dir = fake_home / "Library" / "LaunchAgents"
+            dest_plist = launch_agents_dir / "com.native-stack.qdrant.plist"
+            original_content = dest_plist.read_bytes()
+
+            (working_shim / "launchctl").write_text(
+                '#!/bin/sh\n'
+                f'printf "%s\\n" "launchctl $*" >> {str(log)!r}\n'
+                'case "$1" in\n'
+                '  print) exit 5 ;;\n'
+                '  *) exit 0 ;;\n'
+                'esac\n'
+            )
+            reinstall = self._run(["install", "--label", "com.native-stack.qdrant"], env=env)
+            self.assertNotEqual(reinstall.returncode, 0, reinstall.stdout + reinstall.stderr)
+            self.assertIn("not confidently unloaded", reinstall.stderr)
+            invocations = log.read_text()
+            self.assertNotIn("bootout", invocations)
+            # Nothing was touched: the original, still-owned plist survives
+            # untouched (the refusal happens before the overwriting cp).
+            self.assertTrue(dest_plist.is_file())
+            self.assertEqual(dest_plist.read_bytes(), original_content)
+            state_file = eco_root / "state" / "launchd" / "enabled-labels.txt"
+            self.assertIn("com.native-stack.qdrant", state_file.read_text().split())
+
+    def test_install_refuses_when_bootout_succeeds_but_the_service_never_reports_unloaded(self):
+        # L4 (Opus round-3 verification): on real launchd, bootout can
+        # return before teardown finishes. install must poll launchctl
+        # print for a bounded time and refuse -- never bootstrap over a
+        # service that never actually stopped -- rather than trust bootout's
+        # own exit code alone. WAIT_UNTIL_UNLOADED_ATTEMPTS/_INTERVAL are
+        # overridden here so the bounded wait this exercises costs no real
+        # wall-clock time.
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            eco_root = tmp_path / "eco"
+            fake_home = tmp_path / "home"
+            fake_home.mkdir()
+            log = tmp_path / "launchctl.log"
+            log.touch()
+            shim = tmp_path / "shim"
+            shim.mkdir()
+            # print always reports loaded; bootout exits 0 but never clears
+            # anything, simulating teardown that has not actually finished.
+            (shim / "launchctl").write_text(
+                "#!/bin/sh\n"
+                f'printf "%s\\n" "launchctl $*" >> {str(log)!r}\n'
+                'case "$1" in\n'
+                '  print) exit 0 ;;\n'
+                '  bootstrap) exit 0 ;;\n'
+                '  bootout) exit 0 ;;\n'
+                '  *) exit 0 ;;\n'
+                'esac\n'
+            )
+            (shim / "launchctl").chmod(0o755)
+            env = {
+                **os.environ,
+                "PATH": f"{shim}{os.pathsep}{os.environ['PATH']}",
+                "ECO_INSTALL_ROOT": str(eco_root),
+                "HOME": str(fake_home),
+                "WAIT_UNTIL_UNLOADED_ATTEMPTS": "2",
+                "WAIT_UNTIL_UNLOADED_INTERVAL": "0",
+            }
+            self.assertEqual(self._run(["render"], env=env).returncode, 0)
+            first_install = self._run(["install", "--label", "com.native-stack.qdrant"], env=env)
+            self.assertEqual(first_install.returncode, 0, first_install.stdout + first_install.stderr)
+            launch_agents_dir = fake_home / "Library" / "LaunchAgents"
+            dest_plist = launch_agents_dir / "com.native-stack.qdrant.plist"
+            original_content = dest_plist.read_bytes()
+
+            reinstall = self._run(["install", "--label", "com.native-stack.qdrant"], env=env)
+            self.assertNotEqual(reinstall.returncode, 0, reinstall.stdout + reinstall.stderr)
+            self.assertIn("did not report unloaded", reinstall.stderr)
+            invocations = log.read_text()
+            self.assertIn("launchctl bootout", invocations)
+            # Refused before the overwriting cp: the original plist survives.
+            self.assertTrue(dest_plist.is_file())
+            self.assertEqual(dest_plist.read_bytes(), original_content)
+
+    def test_remove_keeps_ownership_and_the_plist_when_print_fails_unexpectedly(self):
+        # L6 (Opus round-3 verification): only launchctl print exit 113
+        # means "confidently not loaded"; any other failure (5, here) must
+        # keep ownership and the plist, exactly like a failed bootout does,
+        # rather than guess either way.
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            eco_root = tmp_path / "eco"
+            fake_home = tmp_path / "home"
+            fake_home.mkdir()
+            log = tmp_path / "launchctl.log"
+            log.touch()
+            working_shim = self._launchctl_shim(tmp_path, log)
+            env = {
+                **os.environ,
+                "PATH": f"{working_shim}{os.pathsep}{os.environ['PATH']}",
+                "ECO_INSTALL_ROOT": str(eco_root),
+                "HOME": str(fake_home),
+            }
+            self.assertEqual(self._run(["render"], env=env).returncode, 0)
+            install_result = self._run(["install", "--label", "com.native-stack.qdrant"], env=env)
+            self.assertEqual(install_result.returncode, 0, install_result.stdout + install_result.stderr)
+            launch_agents_dir = fake_home / "Library" / "LaunchAgents"
+            dest_plist = launch_agents_dir / "com.native-stack.qdrant.plist"
+
+            (working_shim / "launchctl").write_text(
+                '#!/bin/sh\n'
+                f'printf "%s\\n" "launchctl $*" >> {str(log)!r}\n'
+                'case "$1" in\n'
+                '  print) exit 5 ;;\n'
+                '  *) exit 0 ;;\n'
+                'esac\n'
+            )
+            remove_result = self._run(["remove", "--label", "com.native-stack.qdrant"], env=env)
+            self.assertNotEqual(remove_result.returncode, 0, remove_result.stdout + remove_result.stderr)
+            self.assertIn("not 113", remove_result.stderr)
+            self.assertTrue(dest_plist.is_file())
+            state_file = eco_root / "state" / "launchd" / "enabled-labels.txt"
+            self.assertIn("com.native-stack.qdrant", state_file.read_text().split())
+            invocations = log.read_text()
+            self.assertNotIn("bootout", invocations)
+
+    def test_backup_files_live_under_state_dir_never_under_launch_agents(self):
+        # N1 (Codex round-3 verification): the temporary backup made before
+        # overwriting an owned, already-existing destination plist must
+        # never sit inside ~/Library/LaunchAgents (macOS auto-loads *.plist
+        # there at login; a stray file zone there is a real hazard). It
+        # belongs under this script's own state_dir and is removed on every
+        # exit path -- restore or success -- so a completed run never
+        # leaves one behind, in either location.
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            eco_root = tmp_path / "eco"
+            fake_home = tmp_path / "home"
+            fake_home.mkdir()
+            log = tmp_path / "launchctl.log"
+            log.touch()
+            working_shim = self._launchctl_shim(tmp_path, log)
+            env = {
+                **os.environ,
+                "PATH": f"{working_shim}{os.pathsep}{os.environ['PATH']}",
+                "ECO_INSTALL_ROOT": str(eco_root),
+                "HOME": str(fake_home),
+            }
+            self.assertEqual(self._run(["render"], env=env).returncode, 0)
+            self.assertEqual(
+                self._run(["install", "--label", "com.native-stack.qdrant"], env=env).returncode, 0)
+            launch_agents_dir = fake_home / "Library" / "LaunchAgents"
+            # A reinstall of the same, still-loaded, owned label exercises
+            # the backup-then-cleanup path end to end.
+            reinstall = self._run(["install", "--label", "com.native-stack.qdrant"], env=env)
+            self.assertEqual(reinstall.returncode, 0, reinstall.stdout + reinstall.stderr)
+            leftover = [p.name for p in launch_agents_dir.iterdir() if "backup" in p.name]
+            self.assertEqual(leftover, [], leftover)
+            state_backups = eco_root / "state" / "launchd" / "backups"
+            if state_backups.exists():
+                self.assertEqual(list(state_backups.iterdir()), [],
+                                  "a completed run must not leave a backup file behind")
 
     def test_remove_on_an_unloaded_owned_label_cleans_up_without_calling_bootout(self):
         # Low finding: bootout always fails on a label that is owned but not
