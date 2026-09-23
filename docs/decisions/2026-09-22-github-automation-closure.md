@@ -618,3 +618,50 @@ Hosted and live results after merge. Evidence class: hosted runs and GitHub API 
   packet was built (the battery file shows all 10 commands exit 0, so
   `own_suite_pass` is unaffected); the completeness critic ran before closure
   files existed.
+
+## verdict-review-gate (2026-09-23)
+
+- **Evidence.** The coordinator's audit found that a PR changing layer-verdict rows could merge
+  with 0 reviews. The live ruleset readback (`gh api .../rulesets/23739774`, 2026-09-23T15:16Z)
+  shows `required_approving_review_count: 0` and `require_code_owner_review: false`. The required
+  checks are `validate`, `token-report`, `secret-scan`, `dependency-review` and `osv-scanner`.
+  `gh api .../collaborators` returns 1 collaborator. Review of #122 (findings 1, 2, 4 and 6) showed
+  that CI compared the hashes of a new-wave row but not its agreement, its winners, its
+  single-lane authorization or earlier wave registry entries.
+- **Alternatives.**
+  - Required approvals: they block the only maintainer, who cannot approve their own PR.
+  - CODEOWNERS review: the existing `*` rule already names the only owner, so requesting a
+    review from the author adds nothing.
+  - Relying on `validate` alone: `scripts/landscape.py` checks what a row claims against its own
+    files. It does not compare the row with the base, and it does not recompute agreement or
+    winners from the sealed returns.
+- **Decision.** The new `verdict-review-gate` job in `validate.yml` runs
+  `scripts/verdict_review_gate.py` on every pull request, with no path filter, and on each push
+  to `main`. Any row that is added or changed outside the grandfathered 20260922 wave needs all
+  of the following:
+  - a registered wave document and a registered run manifest that lists the row;
+  - registered, hash-matching sealed returns from two distinct model families;
+  - an agreement that matches the one recomputed from the two sealed returns, and winners that
+    match the chosen lane's keys resolved through the sealed packet. With no sealed packet the row
+    fails closed until finding 6 lands;
+  - for a `disagree` row, an adjudication in which judges from both lane families agree in both
+    presentation orders with no refuting vote. A third-family judge is recorded but not required;
+  - for a `codex_absent` row, a `docs/decisions/` record that carries
+    `single-lane-authorization: <catalog>/<layer_id>`.
+
+  A change to `platform_status` alone passes only when `scripts/platform_status.py` derives it.
+  Every base wave entry except the newest must be unchanged. `.github/main-ruleset.json` adds the
+  check. The coordinator applies the ruleset after merge, and until then the check reports but
+  does not block.
+- **Measured.** `tests/test_verdict_review_gate.py` has 40 synthetic-fixture tests. They cover the
+  negative controls (missing, stale or unregistered lane files, same-family lanes, adjudications
+  that are missing, one-order, one-family or refuted, a row missing from its run manifest, an
+  unregistered wave, a declared platform upgrade, a relabelled agreement, mismatched packets,
+  swapped winners, missing packets, the single-lane path rules and a rewritten earlier wave) and
+  the positive controls. Two mutations of the real checkout both exit 1 and were then restored:
+  moving `foundation/workers` into an unsealed 20260923 wave, and deleting one of its sealed
+  20260922 lane files.
+- **Overturn.** A merged PR that changes a verdict row without the sealed cross-family evidence
+  while this check was required. The other trigger is a second maintainer joining, which would
+  make required approvals possible. The gate runs from the PR's own checkout, so a PR that edits
+  the gate or `validate.yml` is caught only by review of that diff.

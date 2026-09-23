@@ -327,9 +327,43 @@ class TargetRulesetTests(unittest.TestCase):
     def test_target_requires_the_security_gates_from_github_actions(self):
         (checks,) = self.rule("required_status_checks")
         contexts = {check["context"]: check.get("integration_id") for check in checks["parameters"]["required_status_checks"]}
-        for context in ("validate", "token-report", "secret-scan", "dependency-review", "osv-scanner"):
+        for context in ("validate", "token-report", "secret-scan", "dependency-review", "osv-scanner",
+                        "verdict-review-gate"):
             self.assertEqual(contexts.get(context), 15368, context)
         self.assertEqual(len(self.rule("code_scanning")), 1)
+
+
+class VerdictReviewGateTests(unittest.TestCase):
+    """The required verdict-review-gate job (docs/decisions/2026-09-22-github-automation-closure.md,
+    "verdict-review-gate (2026-09-23)")."""
+
+    text = (WORKFLOWS / "validate.yml").read_text(encoding="utf-8")
+    job = jobs(text)["verdict-review-gate"]
+
+    def test_runs_on_every_pull_request_without_a_path_filter(self):
+        trigger = self.text.split("\non:\n", 1)[1].split("\n\n", 1)[0]
+        self.assertRegex(trigger, r"(?m)^  pull_request:[ \t]*$")
+        self.assertNotIn("paths", trigger)
+        self.assertIn("push:", trigger)
+        self.assertIsNone(block_if(self.job), "a required check must run on every event")
+
+    def test_read_only_hardened_and_without_persisted_credentials(self):
+        self.assertEqual(scopes(self.job), [{"contents": "read"}])
+        step = first_step(self.job)
+        self.assertIn(HARDEN, step)
+        self.assertIn("egress-policy: audit", step)
+        checkout = step_block(self.job, "Check out repository")
+        self.assertIn("persist-credentials: false", checkout)
+        self.assertIn("fetch-depth: 0", checkout)
+        self.assertRegex(self.job, r"timeout-minutes: \d+")
+
+    def test_base_sha_reaches_the_gate_through_env_only(self):
+        gate = step_block(self.job, "Require sealed cross-family review")
+        self.assertIn("BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}", gate)
+        run = gate.split("run: |", 1)[1]
+        self.assertNotIn("${{", run, "no expression is interpolated into the shell script")
+        self.assertIn('python3 scripts/verdict_review_gate.py --base "$base"', run)
+        self.assertNotIn("continue-on-error", gate)
 
 
 class SupplyChainGateTests(unittest.TestCase):

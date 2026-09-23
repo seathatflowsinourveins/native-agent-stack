@@ -110,6 +110,39 @@ jobs:
       - name: Test semantic evidence contract boundaries
         run: node --test blueprints/native-skill-practice/test-contract.cjs
 
+  verdict-review-gate:
+    # Required check (docs/decisions/2026-09-22-github-automation-closure.md, "verdict-review-gate
+    # (2026-09-23)"): with one maintainer and zero required approvals, a PR that changes a
+    # layer-verdict row merges only with the sealed cross-family review its wave records. It has
+    # no path filter so it reports on every pull request and can be required.
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - name: Harden the runner (audit-only network egress)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+      - name: Check out repository with full history
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+        # Full history: the gate reads the base commit's ledger and wave registry with git show.
+      - name: Require sealed cross-family review for changed verdict rows
+        shell: bash
+        env:
+          # The pull request's base, or the pushed range's previous commit on main.
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          base="${BASE_SHA:-}"
+          # A dispatch has no base and a branch-creating push has an all-zero one: compare with the parent.
+          if [ -z "$base" ] || [ -z "${base//0/}" ]; then
+            base="$(git rev-parse HEAD^)"
+          fi
+          python3 scripts/verdict_review_gate.py --base "$base" | tee -a "$GITHUB_STEP_SUMMARY"
+
   secret-scan:
     runs-on: ubuntu-24.04
     timeout-minutes: 10

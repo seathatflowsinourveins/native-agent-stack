@@ -926,6 +926,56 @@ opening its own PR, and requesting independent review remains the primary
 way this catalog gains evidence; read that chapter for the full flow.
 
 
+## Verdict review gate, 2026-09-23
+
+The repository has one maintainer and the main ruleset requires 0 approvals,
+so a PR that changes a layer verdict could merge with no review at all.
+`validate.yml`'s `verdict-review-gate` job is the control instead. It runs
+[`scripts/verdict_review_gate.py`](../scripts/verdict_review_gate.py) on every
+pull request (no path filter, so it can be required) and on each push to
+`main`. The job has `contents: read`, starts with harden-runner in audit mode,
+and checks out full history without persisted credentials. The base sha
+reaches the script only through `env`.
+
+The script compares the ledger rows at the PR's merge base with the head,
+keyed by `(catalog, layer_id, run_id)`. It then checks each row that is added
+or changed in `winners`, `platform_status`, `lanes` or `verdict_status` and
+does not belong to the grandfathered 20260922 wave. Such a row passes only
+when all of these hold at the head:
+
+- its wave document is registered in `layer-verdict-waves.json`;
+- its `run-manifest.json` is registered in `manifests/evidence.json` and
+  lists the row;
+- each sealed lane return exists, matches the row's `sealed_sha256` and is
+  registered with that sha256, and the two lanes come from distinct model
+  families;
+- the agreement recomputed from the two sealed returns equals the recorded
+  one;
+- the row's winners equal the chosen lane's `winner_keys`, resolved through
+  the wave's sealed packet. With no sealed packet, the row fails closed until
+  review finding 6 lands;
+- a recorded `disagree` row has an adjudication in which judges from both
+  lane families agree in both presentation orders with no refuting vote;
+- a recorded `codex_absent` row names a `docs/decisions/` record that carries
+  `single-lane-authorization: <catalog>/<layer_id>`.
+
+A change to `platform_status` alone passes only when
+`scripts/platform_status.py` derives the new value. The newest registered
+wave is the only one that may change. Whenever a row, a wave or a file under
+the sealed verdict artifacts, `catalogs/landscape/` or
+`catalogs/sota-convergence/` changes, the job also runs `scripts/landscape.py`
+and `build_verdicts.py --check`. Run it locally with:
+
+```sh
+python3 scripts/verdict_review_gate.py --base origin/main
+```
+
+`.github/main-ruleset.json` adds `verdict-review-gate` to the required checks.
+The coordinator applies it with the ruleset PUT above after this change
+merges. The decision record is "verdict-review-gate (2026-09-23)" in
+[`docs/decisions/2026-09-22-github-automation-closure.md`](decisions/2026-09-22-github-automation-closure.md).
+
+
 ## Automation closure, 2026-09-22
 
 The closure record
