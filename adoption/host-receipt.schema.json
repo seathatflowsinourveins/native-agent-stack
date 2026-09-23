@@ -1,0 +1,186 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "adoption/host-receipt.schema.json",
+  "title": "Host evidence acceptance receipt",
+  "description": "One receipt records one component x one host x one lifecycle stage. See docs/contributing-evidence.md and scripts/host_receipts.py, which implements these rules in stdlib code (no external JSON Schema library) and is kept in sync with this file by tests/test_host_receipts.py.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "id",
+    "kind",
+    "host",
+    "catalog_revision",
+    "component_id",
+    "stage",
+    "commands",
+    "tool_versions",
+    "observed_at_utc",
+    "result",
+    "claim",
+    "limitations",
+    "evidence_class",
+    "reviews"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "id": {
+      "type": "string",
+      "description": "<host_id>--<component_id>--<stage>--<yyyymmdd>",
+      "pattern": "^[a-z0-9-]+-[0-9]{8}--[A-Za-z0-9][A-Za-z0-9._/:-]*--(install|use|restart|recovery|persistence|cleanup)--[0-9]{8}$"
+    },
+    "kind": {
+      "const": "host_acceptance"
+    },
+    "host": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["host_id", "platform_id", "os", "architecture", "second_physical_machine"],
+      "properties": {
+        "host_id": {
+          "type": "string",
+          "pattern": "^[a-z0-9-]+-[0-9]{8}$"
+        },
+        "platform_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "os": {
+          "type": "string",
+          "minLength": 1
+        },
+        "architecture": {
+          "type": "string",
+          "minLength": 1
+        },
+        "second_physical_machine": {
+          "type": "boolean",
+          "description": "false only on the catalog's authoring host"
+        },
+        "hardware_profile_ref": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Optional string reference into adoption/hardware-profiles.json hosts[].id, owned by another unit"
+        }
+      }
+    },
+    "catalog_revision": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$",
+      "description": "Full commit SHA of the checkout used to record this receipt"
+    },
+    "component_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "A manifests/stack.json components[].id or a catalogs/landscape/*.json layers[].winners[].component_id. May legitimately contain '/' (for example 'affaan-m/ECC') or ':' (for example 'candidate:cli-cli'); scripts/host_receipts.py's receipt_filename_stem() percent-escapes each to a distinct, reversible filename token ('/' -> '%2F', ':' -> '%3A', and a literal '%' itself -> '%25' first) so the receipt stays a flat file under evidence/hosts/<host_id>/. This escaping applies only to the filename, never to this field or the 'id' field."
+    },
+    "layer_refs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["catalog", "layer_id"],
+        "properties": {
+          "catalog": {
+            "type": "string",
+            "minLength": 1
+          },
+          "layer_id": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "stage": {
+      "enum": ["install", "use", "restart", "recovery", "persistence", "cleanup"]
+    },
+    "commands": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["cmd", "exit", "duration_s", "output_sha256", "output_excerpt"],
+        "properties": {
+          "cmd": {
+            "type": "string",
+            "minLength": 1
+          },
+          "exit": {
+            "type": "integer"
+          },
+          "expected_exit": {
+            "type": "integer",
+            "description": "Optional; when present, this exit code (not 0) is the coherent pass value for this command"
+          },
+          "duration_s": {
+            "type": "number",
+            "minimum": 0
+          },
+          "output_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "output_excerpt": {
+            "type": "string",
+            "maxLength": 400
+          }
+        }
+      }
+    },
+    "tool_versions": {
+      "type": "object"
+    },
+    "observed_at_utc": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"
+    },
+    "result": {
+      "enum": ["pass", "fail", "partial", "not_runnable"]
+    },
+    "claim": {
+      "type": "string",
+      "minLength": 1
+    },
+    "limitations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "evidence_class": {
+      "enum": ["native_proven", "local_integration", "synthetic"]
+    },
+    "reviews": {
+      "type": "array",
+      "minItems": 1,
+      "description": "The recorder writes exactly one self entry; independent reviewers append theirs with scripts/host_receipts.py review",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "ref", "verdict", "at_utc"],
+        "properties": {
+          "kind": {
+            "enum": ["self", "independent_session", "codex_lane", "human"]
+          },
+          "ref": {
+            "type": "string",
+            "minLength": 1
+          },
+          "verdict": {
+            "enum": ["agree", "disagree", "needs_changes"]
+          },
+          "at_utc": {
+            "type": "string",
+            "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"
+          }
+        }
+      }
+    }
+  }
+}

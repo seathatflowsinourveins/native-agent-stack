@@ -2983,8 +2983,8 @@
     },
     {
       "path": ".github/pull_request_template.md",
-      "sha256": "b3196c10719125959ffa1decf5c2924a3e7d938db5ab1f7373a192e62557fcce",
-      "bytes": 1293
+      "sha256": "74da954045c961a0867f77dc4e7a1315c82ab34b4f061a54f70e351dbf4b827e",
+      "bytes": 1818
     },
     {
       "path": ".github/requirements-ci.lock",
@@ -3053,8 +3053,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "a376703bdb6e31ebe30f38e57f56e14f3250e286824b7d4525b7b2be7e8b0987",
-      "bytes": 7244
+      "sha256": "520d9ae235032d6e1c13ae912a7cfaae5ace7d417165d84e633274431311a46c",
+      "bytes": 8023
     },
     {
       "path": ".gitignore",
@@ -3098,8 +3098,8 @@
     },
     {
       "path": "adoption/README.md",
-      "sha256": "0e5b5bac62a5f67a42bb4bc6126829a21fd937f310b1f5784122238f6fb3f3ae",
-      "bytes": 12480
+      "sha256": "6e7e219f6ed43cd36ba6d97bc6c5f981d3e8d886b3a8968de0d19d538208ee25",
+      "bytes": 13096
     },
     {
       "path": "adoption/bootstrap-linux.sh",
@@ -7634,8 +7634,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "77cb3d3b79818a583ef0437b13e8bd82139dfe55094bc2d9060b9d52a65636a1",
-      "bytes": 12926572
+      "sha256": "124278fe0a136a8da8ed719c7fae40cc5c1a49ee8c685b803257464c29882130",
+      "bytes": 12927198
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -12756,6 +12756,96 @@
       "path": "tests/test_delisting_coverage.py",
       "sha256": "c33b6dd7b33691dcac0ec84db6c600f8777abb06f6fce6d992b7f5fa2d277af5",
       "bytes": 24344
+    },
+    {
+      "path": "evidence/hosts/wsl-authoring-20260923/wsl-authoring-20260923--rtk--use--20260923.json",
+      "sha256": "2a0525ce9efbf9939166429115035a57d039255add089ed7d4503047d4f3f9fb",
+      "bytes": 1326
+    },
+    {
+      "path": "evidence/hosts/wsl-authoring-20260923/wsl-authoring-20260923--shellcheck--use--20260923.json",
+      "sha256": "18b5b240b3e2626e101104c529b8b0bf67fc14b39ec24c765d33ec503376bb3e",
+      "bytes": 1472
+    },
+    {
+      "path": "evidence/hosts/wsl-authoring-20260923/wsl-authoring-20260923--difftastic--use--20260923.json",
+      "sha256": "14c16d2fe0aabba2d953c2901b871253017bcd4626856b6a34792be269471f35",
+      "bytes": 2116
+    },
+    {
+      "path": "adoption/host-receipt.schema.json",
+      "sha256": "8153fdebc1351e45aadfb7d7d3417e2ec9d8f69187d8100795f8c2ea17a27410",
+      "bytes": 5747
+    },
+    {
+      "path": "scripts/host_receipts.py",
+      "sha256": "7a91dd66b9a8cb0776b86451bd415e7f466c55e498750970fe5f6abc8af33d6a",
+      "bytes": 40442
+    },
+    {
+      "path": "tests/test_host_receipts.py",
+      "sha256": "83253137b32036271fd606db087cb023a7b548c76307f71adf8d817dfe594b9f",
+      "bytes": 40362
+    },
+    {
+      "path": "tests/fixtures/host-receipts/valid.json",
+      "sha256": "e339257259f8c7616083b5befa772945377f328078ede861345ba12d43bf2797",
+      "bytes": 1042
+    },
+    {
+      "path": "tests/fixtures/host-receipts/wrong-platform.json",
+      "sha256": "a9b24a022c5bd2edf654ebddd8d6077bf2fc2aebe797191afebe416f63fe8782",
+      "bytes": 1041
+    },
+    {
+      "path": "tests/fixtures/host-receipts/unknown-component.json",
+      "sha256": "6baec4155038143def6b8014b071e8f6f237380ff195aa2d8a6f791b0e33969d",
+      "bytes": 1096
+    },
+    {
+      "path": "tests/fixtures/host-receipts/home-path-in-excerpt.json",
+      "sha256": "ca1f6125a57e5095c729410e445f279f674231ed1f379621ffa5c0fafea38f8a",
+      "bytes": 1086
+    },
+    {
+      "path": "tests/fixtures/host-receipts/pass-with-nonzero-exit.json",
+      "sha256": "6bc8befb4681e120aa8cf4d9a82acc6c6a6ae15b0f5421bb3ad802a5b0f6ae05",
+      "bytes": 1068
+    },
+    {
+      "path": "tests/fixtures/host-receipts/unregistered-file.json",
+      "sha256": "e339257259f8c7616083b5befa772945377f328078ede861345ba12d43bf2797",
+      "bytes": 1042
+    },
+    {
+      "path": "tests/fixtures/host-receipts/id-path-mismatch.json",
+      "sha256": "e339257259f8c7616083b5befa772945377f328078ede861345ba12d43bf2797",
+      "bytes": 1042
+    },
+    {
+      "path": "docs/contributing-evidence.md",
+      "sha256": "1bd7ca8e5b4f2a22adfd4d54df87a8ae8329198359c181c542b0498d896bd576",
+      "bytes": 12263
+    },
+    {
+      "path": "scripts/component_matrix.py",
+      "sha256": "61960ef38d546c4e99cebf126531f636bf321f413913a20b86f2e20c710273d4",
+      "bytes": 21717
+    },
+    {
+      "path": "catalogs/landscape/component-evidence-matrix.json",
+      "sha256": "17e29057694b81889ac695f0eb83bb05a20d476a96fac720a7ea54270ca7a58a",
+      "bytes": 145386
+    },
+    {
+      "path": "docs/component-evidence-matrix.md",
+      "sha256": "dfef76d02d90990448a2add7928fffd54903a5c95b3df36a859a6247e05dce86",
+      "bytes": 16526
+    },
+    {
+      "path": "tests/test_component_matrix.py",
+      "sha256": "8675685fb0f139d074717a552f7f90c1a67acbbe6ad27be2b970d992cd6e568c",
+      "bytes": 18059
     },
     {
       "path": "blueprints/gap-resolution-20260922/dagu-inflight-resume-after-kill/fixture.py",

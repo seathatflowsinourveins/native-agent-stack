@@ -117,4 +117,14 @@ the next concrete acceptance without reloading the entire repository catalog.
 
 Load `AGENTS.md`, this guide, then [the small continuation map](manifest.json). Follow [the update protocol](update.md) and only the layer needed for the task. Open gates remain in [the convergence ledger](../catalogs/us-equities/convergence-review.json); a new checkout cannot clear them. Distinguish latest upstream metadata from the compatible version actually accepted locally.
 
+To add your own host's evidence back to this reference (another WSL host, a
+macOS host, another agent session, or CI), use
+[the host evidence contribution guide](../docs/contributing-evidence.md) with
+[`scripts/host_receipts.py`](../scripts/host_receipts.py) and
+[the receipt schema](host-receipt.schema.json). It never uploads anything; it
+only records what actually ran on your host into a reviewable PR. Use
+[the component evidence matrix](../docs/component-evidence-matrix.md) to see,
+per layer, which winners still need a host receipt or an independent lane
+review on your platform before picking what to run.
+
 Primary references: [uv locking and synchronization](https://docs.astral.sh/uv/pip/compile/), [official Codex SDK](https://learn.chatgpt.com/docs/codex-sdk), [Codex authentication](https://learn.chatgpt.com/docs/auth), [Claude authentication](https://code.claude.com/docs/en/authentication), [Claude settings](https://code.claude.com/docs/en/settings).

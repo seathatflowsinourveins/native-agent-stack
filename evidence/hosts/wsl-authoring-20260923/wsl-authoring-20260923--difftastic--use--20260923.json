@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "id": "wsl-authoring-20260923--difftastic--use--20260923",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "wsl-authoring-20260923",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": false
+  },
+  "catalog_revision": "8edf4dceed62985ad1834c79ecc82e713c78eec5",
+  "component_id": "difftastic",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "difft --exit-code --color never fixtures/before.py fixtures/after.py",
+      "exit": 1,
+      "duration_s": 0.015,
+      "output_sha256": "2043cb5ed29de8293af163b3d110897433345cf474f6ce714363af93e00cfa70",
+      "output_excerpt": "fixtures/after.py --- Python\n1 def greeting(name):\n2     return \"Hello, \" + name + \"!\"\n\n"
+    }
+  ],
+  "tool_versions": {
+    "difftastic": "0.71.0"
+  },
+  "observed_at_utc": "2026-09-23T01:05:55Z",
+  "result": "fail",
+  "claim": "On the catalog's authoring WSL host, difftastic's documented use command ran a structural diff of the tracked before/after fixtures and printed the expected structural diff.",
+  "limitations": [
+    "Covers only 'difft --exit-code --color never fixtures/before.py fixtures/after.py' on this host; no other language grammar or second physical machine is exercised.",
+    "The command's exit code is 1 (not 0) by difftastic's own --exit-code contract, because the two fixtures are intentionally different; that is the tool's documented differences-found signal, not an install or runtime failure, and the schema has no expected_exit override wired through this recorder's flags, so 'result' is honestly recorded as 'fail' rather than special-cased to 'pass'.",
+    "Runs against this repository's own tracked fixtures (fixtures/before.py, fixtures/after.py), not an external real-world diff; per docs/contributing-evidence.md Section 2 this is local_integration, not native_proven."
+  ],
+  "evidence_class": "local_integration",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-23T01:05:55Z"
+    }
+  ]
+}
