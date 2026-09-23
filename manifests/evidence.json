@@ -2988,13 +2988,13 @@
     },
     {
       "path": ".github/dependabot.yml",
-      "sha256": "d2f1900108fff96b1d677f0c5fb62a9513e89a122aac08d3eb50350bc372aa05",
-      "bytes": 350
+      "sha256": "1a504bb975f17f5af05f43a17df9d0e90b7ae3177f87d0ae7a6b99f68caf6b73",
+      "bytes": 1292
     },
     {
       "path": ".github/main-ruleset.json",
-      "sha256": "835f09f7043193afd2f4c77a0758235a1622fa8ea49ed11b6d2f53ed2fff6880",
-      "bytes": 1118
+      "sha256": "6c7f79c59b1e667531e71b5b2981626d24bd3f0d3c28ce39d98525450b23caac",
+      "bytes": 1562
     },
     {
       "path": ".github/pull_request_template.md",
@@ -3008,8 +3008,8 @@
     },
     {
       "path": ".github/tag-ruleset.json",
-      "sha256": "615df034db59a9a297d20d92c7277bb36afc191f5ab2a5677a30385c3dbeda88",
-      "bytes": 296
+      "sha256": "b11fda27d1e2011ff3c001ac830fa3b2c0c3af6090e929ee2d20e4d0507dda5e",
+      "bytes": 320
     },
     {
       "path": ".github/workflows/action-compatibility.yml",
@@ -3053,13 +3053,13 @@
     },
     {
       "path": ".github/workflows/publish-catalog.yml",
-      "sha256": "ee0795fb6a4093ad6b620a3b93546a090f9835fea3e98b8e0ec5248f737d2940",
-      "bytes": 14356
+      "sha256": "6e3212ba3134a62b27bc4d24129a3054a0f94263c0c0f148af94456152fd00c1",
+      "bytes": 19723
     },
     {
       "path": ".github/workflows/supply-chain.yml",
-      "sha256": "d33f30444814f3b4a80b335083fd855b60f69a66d4ada425128ee11e1c2bfe43",
-      "bytes": 6886
+      "sha256": "a752c1be5c7e73642085b3fd91f3e97c4b42167dbe5b3452b2bd1191652e9c24",
+      "bytes": 7411
     },
     {
       "path": ".github/workflows/token-report.yml",
@@ -3108,8 +3108,8 @@
     },
     {
       "path": "SECURITY.md",
-      "sha256": "37f1550108a21272953972ded3daba8d725218c323ab94b6d9368159e4d170d4",
-      "bytes": 1780
+      "sha256": "1554f15c5617e3eca4ccdabbcba05420507a77406a4f924bdae51441959ca601",
+      "bytes": 2826
     },
     {
       "path": "adoption/README.md",
@@ -8099,8 +8099,8 @@
     },
     {
       "path": "catalogs/foundation/automation.json",
-      "sha256": "02e67345699b58977505f02988758b1728f6d40041dfe53ad58b4bbfab7e6c1e",
-      "bytes": 19875
+      "sha256": "f26e1da357e8ef10226e91cf81265cf5ec56d9b60311b5c34c6fee230246538a",
+      "bytes": 31996
     },
     {
       "path": "catalogs/foundation/community-practice-20260920.json",
@@ -8149,8 +8149,8 @@
     },
     {
       "path": "catalogs/landscape/foundation.json",
-      "sha256": "997c9694d29f765b9a920bcf3f1eff056733d4fae3e3a2f61c5532ecb66e4adc",
-      "bytes": 468352
+      "sha256": "c2ee606f29d43519e407f34f7c1f8aa81329f4649dee4215f7b99c941036eb77",
+      "bytes": 468999
     },
     {
       "path": "catalogs/landscape/gap-crosswalk-92bb279.json",
@@ -8214,8 +8214,8 @@
     },
     {
       "path": "catalogs/sota-convergence/layer-verdicts-20260922.json",
-      "sha256": "5d96619e29c6f024e8e5e482e1cdd22d625189619b5435a9bcf3d6c35fd4c62b",
-      "bytes": 608479
+      "sha256": "2fef6da7468a8e97a319fdc6f75f73374cd34b412bf93de90fd0c2a7504159de",
+      "bytes": 609126
     },
     {
       "path": "catalogs/sota-convergence/manifest-20260922.json",
@@ -8653,6 +8653,11 @@
       "bytes": 7671
     },
     {
+      "path": "docs/decisions/2026-09-22-actions-hardening.md",
+      "sha256": "d7cbb6886b8b7b8c568afcd9763ce65fd30ad3af4754a35f345aba78230eba2f",
+      "bytes": 14719
+    },
+    {
       "path": "docs/decisions/2026-09-22-broker-credential-handling.md",
       "sha256": "4e32f464b3466e03be4122471fec9cc46886238f602a7ec3d128bfe2eac4e9e7",
       "bytes": 4241
@@ -8661,6 +8666,11 @@
       "path": "docs/decisions/2026-09-22-codeql-first-analysis.md",
       "sha256": "e71a63db7692ddf497ebdcb6ec4c3e979f3afaf61944731efbee35c28f982b6b",
       "bytes": 11943
+    },
+    {
+      "path": "docs/decisions/2026-09-22-github-automation-closure.md",
+      "sha256": "b3df56be588d1d3babef581a302686fb7d1ba41c94534d1549a97850d06dc9a0",
+      "bytes": 29763
     },
     {
       "path": "docs/direct-results.md",
@@ -8764,13 +8774,13 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "10b4ff2bba9deee86b71c2981b4c8aa18ad6a22ad615402918e54c6928e29def",
-      "bytes": 53814
+      "sha256": "8cd762fbd171bb95f8e5cfb664f67703ef31837298e30498a43ce43e6d1cec1e",
+      "bytes": 62460
     },
     {
       "path": "docs/grand-catalog-handbook.md",
-      "sha256": "8f080e982e19a4f54221bc8e3dbb58737d8eb358e1c88ebb748241ff76b1d302",
-      "bytes": 423129
+      "sha256": "e7aa905f082b1cdd43897b8f7651061bba4e8d9beff9e093db0a0b6bdf9d468e",
+      "bytes": 425236
     },
     {
       "path": "docs/harness-defaults.md",
@@ -14619,8 +14629,8 @@
     },
     {
       "path": "tests/test_workflow_security_coverage.py",
-      "sha256": "671d9df9688e979d259d74fd9ec68e6e649ae7584e3685eef20b110b07b85786",
-      "bytes": 4088
+      "sha256": "2b31658da07f041106c99dab166da77ab1f5973d7bf2e9e805289ebcb7a91c7e",
+      "bytes": 4121
     },
     {
       "path": "tests/test_wsl_memory_maintenance.py",
