@@ -40,13 +40,25 @@
     "old_0_2_7_help_line1": "OpenResearch CLI",
     "new_0_2_8_help_exit": 0,
     "new_0_2_8_help_line1": "OpenResearch CLI",
-    "top_help_full_body_diff": "`diff orx_old_help.txt orx_new_help.txt` reports no differences; the full --help body (not just line 1) is byte-identical between 0.2.7 and 0.2.8.",
+    "top_help_full_body_diff": "`diff orx_old_help.txt orx_new_help.txt` reports no differences: the full --help body is byte-identical between 0.2.7 and 0.2.8 (stored as raw/orx_old_help.txt and raw/orx_new_help.txt, same sha256; see raw_help_captures).",
     "discover_help_old_exit": 0,
     "discover_help_new_exit": 0,
     "discover_help_sha256_old": "c89fec1a98c25f17a1478793424c416965e074fb3a235923081caab14e004cf5",
     "discover_help_sha256_new": "c89fec1a98c25f17a1478793424c416965e074fb3a235923081caab14e004cf5",
     "discover_help_diff": "`diff orx_old_discover.txt orx_new_discover.txt` reports no differences; sha256 hashes match. This is a same-session v0.2.7-vs-v0.2.8 comparison (no retained receipt captures discover --help output to compare against; the retained receipt only has --version and --help line 1). Both orx_old_discover.txt (v0.2.7, sha256 c89fec1a98c25f17a1478793424c416965e074fb3a235923081caab14e004cf5, mtime 2026-09-22T20:30:48-04:00) and orx_new_discover.txt (v0.2.8, same sha256, mtime 2026-09-22T20:30:48-04:00) are copied (not moved -- the originals remained in the ephemeral session /tmp) into $HOME/.cache/sota-refresh-20260923/pins-tools/openresearch/ and are additionally committed to this repository at evidence/artifacts/sota-refresh-20260923/pins-tools/raw/orx_old_discover.txt and raw/orx_new_discover.txt (cp -p, mtimes preserved). Both sides of the sha256/diff comparison above are independently re-verifiable from a stored file.",
-    "not_run": "discover keyword/embedding/openalex/biorxiv, paper, login, ssh-key, instance, compute -- these need a stored search/compute key or network account state this unit does not hold; recorded as offline-only, not attempted."
+    "not_run": "discover keyword/embedding/openalex/biorxiv, paper, login, ssh-key, instance, compute -- these need a stored search/compute key or network account state this unit does not hold; recorded as offline-only, not attempted.",
+    "raw_help_captures": {
+      "orx_old_help.txt": {
+        "path": "raw/orx_old_help.txt",
+        "sha256": "009d4649e88a9060951715928c8e1a2588a2759ffe40a843c497ac1bc8845301",
+        "mtime": "2026-09-22T20:30:48.242-04:00"
+      },
+      "orx_new_help.txt": {
+        "path": "raw/orx_new_help.txt",
+        "sha256": "009d4649e88a9060951715928c8e1a2588a2759ffe40a843c497ac1bc8845301",
+        "mtime": "2026-09-22T20:30:48.282-04:00"
+      }
+    }
   },
   "verdict": "qualified",
   "evidence_class": "native_proven",

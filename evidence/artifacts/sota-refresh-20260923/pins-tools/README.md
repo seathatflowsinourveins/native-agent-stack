@@ -172,8 +172,11 @@ several minor findings, all resolved here:
   `mp_old_list_rerun.txt` and `mp_new_list.txt` were, contrary to the prior
   round's claims, still present in `/tmp` the entire time -- they were never
   moved or lost, just never copied out of the ephemeral session scratch
-  area. All ten of this unit's raw capture files (the six already handled
-  plus these four) are now copied with `cp -p` (mtime preserved) into this
+  area. All ten raw capture files are now committed: four had been copied
+  to the cache prefix in the first attempt (`mp_old_help`, `mp_new_help`,
+  `av_old_help`, `orx_old_discover`), these four were recovered from
+  `/tmp`, and `orx_old_help`/`orx_new_help` were copied from `/tmp` straight
+  into `raw/` only. All ten are copied with `cp -p` (mtime preserved) into this
   repository at
   [raw/](raw/) (`evidence/artifacts/sota-refresh-20260923/pins-tools/raw/`),
   with host-path strings checked; the only home-directory-shaped string
@@ -184,8 +187,8 @@ several minor findings, all resolved here:
   copies (sha256 recomputed after the rewrite, mtime preserved via
   `touch -r`; the unmodified original bytes stay in the unit's `.cache/`
   prefix, matching the sha256 already cited elsewhere in this receipt set).
-  `agentsview.json`, `openresearch.json` and `mcporter.json` now
-  record each file's sha256 and mtime and state plainly that both sides of
+  `agentsview.json`, `openresearch.json` (`results.raw_help_captures`) and
+  `mcporter.json` now record each stored file's sha256 and mtime and state plainly that both sides of
   every diff/hash comparison are stored and independently re-verifiable;
   every "not preserved" / "not recoverable" / "moved ... not left in /tmp"
   statement in those three receipts has been corrected to "copied (not
@@ -277,3 +280,16 @@ langgraph graph smoke test, two for the opensandbox SDK import check). No
 binary on PATH was replaced, no live config was edited, no systemd unit or
 shell profile was touched, and no long-running process was left behind (no
 daemons/servers were started for any of these five checks).
+
+## Coordinator corrections (2026-09-23)
+
+The final Opus check found four precision errors, corrected by the coordinator:
+- mcporter `checked_at` is now the last capture's mtime (`mp_new_list.txt`,
+  20:30:56); the note records that the commands array is not in execution order.
+- `openresearch.json` records the sha256 and mtime of `raw/orx_old_help.txt`
+  and `raw/orx_new_help.txt`.
+- The mcporter, opensandbox and langgraph preregistration `written_at` values
+  are now `null`, with notes saying the drafting time is unknown. A commit time
+  would be superseded by every later edit.
+- langgraph `checked_at` is truncated to 20:32:46, the out_new.txt mtime,
+  instead of being rounded up past the run.

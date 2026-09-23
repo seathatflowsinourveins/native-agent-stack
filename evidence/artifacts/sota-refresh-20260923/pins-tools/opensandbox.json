@@ -7,8 +7,8 @@
   "release_published_at": "2026-09-21T07:46:25Z",
   "release_resolved_via": "gh api repos/opensandbox-group/OpenSandbox/releases/latest --jq '{tag:.tag_name, published_at:.published_at}'",
   "preregistration": {
-    "written_at": "2026-09-22T21:12:27-04:00",
-    "written_at_note": "LATE: finalized alongside the receipt after this fix round's checks ran. The `which docker/podman/docker-compose` and `test -S /var/run/docker.sock` commands write no output files of their own, so no file mtime measures exactly when they ran or when this text was drafted; the surrounding checks' output files (server_help_old.txt through pip_install_new.txt) are timestamped 20:29-20:31:37-04:00 by file mtime and bound the run window. The 20:29:00-04:00 value in a prior version of this field was an unmeasured round number, not a real mtime; corrected to the commit time that finalized this text (d4888f1, 2026-09-22T21:12:27-04:00, from `git log --format=%cI`).",
+    "written_at": null,
+    "written_at_note": "LATE; unknown: drafted after the runs it describes and last edited in the commit that last touched this field (git log -- this file); no file mtime measures the drafting time. The which/test -S checks write no output files; the surrounding checks' output files (server_help_old.txt through pip_install_new.txt) have mtimes from 20:31:25 to 20:31:37-04:00.",
     "expectation": "This repository's own catalog (catalogs/us-equities/agents-operations.json id=opensandbox) lists two offline, no-container commands as its native_workflow surface: `uvx --from opensandbox-server==0.2.3 opensandbox-server --help` and `python -m pip install opensandbox==0.1.16`, with limitations text already noting 'help/import is not isolation proof' -- i.e. these were always understood as a partial, non-functional surface, matching the version-help pattern used for openresearch/agentsview. Expectations, checked rather than assumed before drawing any conclusion: (a) `opensandbox-server --help` and a `python -c 'import opensandbox'` SDK-import smoke check can run without Docker/Kubernetes at both the retained pin and release-1.1.0, since they do not start the server or create a sandbox; (b) any actual sandbox creation/connect operation requires a running server, which upstream's README states needs Docker or Kubernetes; (c) this host has neither docker, podman, docker-compose, nor a docker.sock, each confirmed by its own `which`/`test -S` exit code in `results`.",
     "criteria": "`uvx --from opensandbox-server==1.1.0 opensandbox-server --help` exits 0 without a running Docker/Kubernetes backend, and its subcommand surface is compared against the retained-pin (0.2.3) `--help` output; `python -m pip install opensandbox==1.1.0` into an isolated venv exits 0, and `import opensandbox` exits 0 and exposes the same public API name set as the 0.1.16 SDK (or the diff is reported); `which docker podman docker-compose` and `test -S /var/run/docker.sock` are run and their exit codes recorded before any conclusion about missing Docker is stated; if all three are absent, full sandbox-creation functional parity is recorded as blocked (not attempted), citing the exact upstream requirement and its source line."
   },
@@ -36,10 +36,26 @@
     "release_commit_sha": "b1a29cf93a823a95913f7943010febb3f29de05c",
     "release_notes_excerpt": "From `gh api .../releases/latest --jq '.body'` (the GitHub release body itself, not the README): 'First unified umbrella release: every artifact ships at 1.1.0 from tag release-1.1.0, with a Sigstore-signed BOM as the digest authority... First release of the Fast Sandbox integration: a Firecracker microVM runtime... Snapshot persistence gains an opt-in PostgreSQL store with multi-process HA and a SQLite migration command, and sandboxes gain preStart/periodic lifecycle hooks.'",
     "docker_requirement_source": "README.md at commit b1a29cf93a823a95913f7943010febb3f29de05c (tag release-1.1.0), 'Getting Started > Requirements' section, lines 166-169: 'Requirements:\\n\\n- Docker (required for local execution)\\n- Python 3.10+ (required for examples and local runtime)'. Fetched and stored at $HOME/.cache/sota-refresh-20260923/pins-tools/opensandbox/opensandbox_readme.md (sha256 ab78736660038f0f08365302d511c10b01c48af9678d71dd5844abf09e8b026b); `grep -n` against that file confirms 'Requirements:' at line 166 and the two quoted bullets at lines 168-169.",
-    "docker_present": {"checked": true, "exit": 1, "output": ""},
-    "podman_present": {"checked": true, "exit": 1, "output": ""},
-    "docker_compose_present": {"checked": true, "exit": 1, "output": ""},
-    "docker_socket_present": {"checked": true, "exit": 1, "output": ""},
+    "docker_present": {
+      "checked": true,
+      "exit": 1,
+      "output": ""
+    },
+    "podman_present": {
+      "checked": true,
+      "exit": 1,
+      "output": ""
+    },
+    "docker_compose_present": {
+      "checked": true,
+      "exit": 1,
+      "output": ""
+    },
+    "docker_socket_present": {
+      "checked": true,
+      "exit": 1,
+      "output": ""
+    },
     "server_help_old_0_2_3": {
       "exit": 0,
       "sha256": "cb316bcc8a08c1e4198d435fa9da98ec13c32b7f6ffb964452d69457891ad721",
@@ -51,8 +67,16 @@
       "output": "Downloading pydantic-core (2.0MiB)\nDownloading kubernetes (4.4MiB)\nDownloading psycopg-binary (5.0MiB)\nDownloading uvloop (4.2MiB)\nDownloading grpcio (6.8MiB)\nDownloading aiohttp (1.7MiB)\n Downloaded pydantic-core\n Downloaded aiohttp\n Downloaded psycopg-binary\n Downloaded uvloop\n Downloaded kubernetes\n Downloaded grpcio\nInstalled 58 packages in 39ms\nusage: opensandbox-server [-h] [--config CONFIG] [--reload]\n                          {init-config,migrate-snapshots} ...\n\nRun the OpenSandbox server.\n\npositional arguments:\n  {init-config,migrate-snapshots}\n    init-config         Generate a config file from packaged examples or the schema skeleton.\n    migrate-snapshots   Copy snapshot records from a SQLite database to PostgreSQL.\n\noptions:\n  -h, --help            show this help message and exit\n  --config CONFIG       Path to the server config TOML file (overrides SANDBOX_CONFIG_PATH).\n  --reload              Enable auto-reload (development only).\n\nSubcommands:\n  init-config [path] [--example {docker,docker-zh,k8s,k8s-zh}] [--force]\n    Generate a config file. Without --example it renders the full skeleton (placeholders only).\n    --example    Copy a packaged example config.\n    --force      Overwrite destination if it exists.\n  migrate-snapshots --from <sqlite-path> --to <postgresql-dsn> [--dry-run]\n    Copy snapshot records from SQLite to PostgreSQL before switching store.type."
     },
     "server_help_diff": "1.1.0 adds a `migrate-snapshots` subcommand (matching the release notes' opt-in PostgreSQL snapshot store) and pulls additional dependencies (kubernetes, psycopg-binary, uvloop, grpcio, aiohttp) not needed by 0.2.3; both exit 0 without any container runtime present.",
-    "pip_install_old_0_1_16": {"exit": 0, "python": "3.13", "note": "clean install, no compiled extensions beyond pydantic-core wheel"},
-    "pip_install_new_1_1_0": {"exit": 0, "python": "3.13", "note": "clean install, same dependency set as 0.1.16 (pydantic, pydantic-core, python-dateutil, six, typing-extensions, typing-inspection)"},
+    "pip_install_old_0_1_16": {
+      "exit": 0,
+      "python": "3.13",
+      "note": "clean install, no compiled extensions beyond pydantic-core wheel"
+    },
+    "pip_install_new_1_1_0": {
+      "exit": 0,
+      "python": "3.13",
+      "note": "clean install, same dependency set as 0.1.16 (pydantic, pydantic-core, python-dateutil, six, typing-extensions, typing-inspection)"
+    },
     "sdk_import_old_0_1_16": "opensandbox SDK version: 0.1.16\n['AcquirePolicy', 'AsyncPooledSandboxCreator', 'AsyncSandboxPool', 'InMemoryAsyncPoolStateStore', 'InMemoryPoolStateStore', 'PackageNotFoundError', 'PoolCreationSpec', 'PoolDestroyOptions', 'PoolDestroyResult', 'PoolDestroyState', 'PoolDestroyStrategy', 'PooledSandboxCreateContext', 'PooledSandboxCreateReason', 'PooledSandboxCreator', 'Sandbox', 'SandboxManager', 'SandboxManagerSync', 'SandboxPool', 'SandboxPoolAsync', 'SandboxPoolManager']",
     "sdk_import_new_1_1_0": "opensandbox SDK version: 1.1.0\n['AcquirePolicy', 'AsyncPooledSandboxCreator', 'AsyncSandboxPool', 'InMemoryAsyncPoolStateStore', 'InMemoryPoolStateStore', 'PackageNotFoundError', 'PoolCreationSpec', 'PoolDestroyOptions', 'PoolDestroyResult', 'PoolDestroyState', 'PoolDestroyStrategy', 'PooledSandboxCreateContext', 'PooledSandboxCreateReason', 'PooledSandboxCreator', 'Sandbox', 'SandboxManager', 'SandboxManagerSync', 'SandboxPool', 'SandboxPoolAsync', 'SandboxPoolManager']",
     "sdk_import_diff": "Identical public top-level name set between 0.1.16 and 1.1.0; only the version string differs."
