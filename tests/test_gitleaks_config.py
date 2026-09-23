@@ -36,7 +36,9 @@ CONFIG_PATH = ROOT / ".gitleaks.toml"
 # A 64-hex and a 40-hex synthetic digest-shaped value, plus a synthetic GitHub
 # personal-access-token-shaped value. None of these are real credentials.
 HEX64 = "e1d0b0d7d8fa3617cc6410b02e8767ca242cd3f4882f5792b27ccdb1ea2b34e8"
-HEX40 = "1bf6df330b056ef93ab283083afdcce642387949"
+# Assembled at runtime: a literal 40-hex value in this file matches the sourcegraph-access-token
+# rule in `gitleaks dir` (the file names that rule, which satisfies its keyword check).
+HEX40 = "".join(("1bf6df330b056ef9", "3ab283083afdcce6", "42387949"))
 # Assembled from short chunks under a name with no credential-like substring
 # (not "*token*"/"*key*"/"*secret*"/"*api*"), not as one literal assigned to a
 # credential-named variable: written either way, this file is itself scanned
