@@ -47,6 +47,24 @@ def templates() -> dict[str, Path]:
     }
 
 
+def _shell_functions(text: str, *names: str) -> str:
+    """The source of top-level shell functions, from `name() {` to its `}`.
+
+    Same helper (and the same regex) as tests/test_adoption_bootstrap_macos.py's
+    own `_shell_functions`: used here to SCOPE a structural assertion to one
+    function's body, so a pattern that happens to also match some OTHER
+    function's near-identical code (cmd_remove's own `is_enabled_label`/
+    `launchctl print` gate looks a lot like cmd_install's, for one) cannot
+    silently satisfy an assertion meant for cmd_install alone.
+    """
+    blocks = []
+    for name in names:
+        match = re.search(rf"(?ms)^{re.escape(name)}\(\) \{{\n.*?^\}}\n", text)
+        assert match, f"function {name} not found"
+        blocks.append(match.group(0))
+    return "".join(blocks)
+
+
 class TemplateRenderAndSchemaTests(unittest.TestCase):
     def setUp(self):
         self.templates = templates()
@@ -303,12 +321,36 @@ class LaunchdAgentsScriptStructureTests(unittest.TestCase):
         self.assertIn("trap 'exit 129' HUP", self.text)
 
     def test_install_gates_its_pre_reinstall_load_check_on_ownership(self):
-        # L2, structural: the print/bootout probe before a reinstall must be
-        # reached only for a label this script itself recorded as enabled.
-        self.assertRegex(
-            self.text,
-            r"if is_enabled_label \"\$label\"; then\n\s+local print_status=0\n\s+launchctl print",
-        )
+        # L2 + round 3f findings 2/3, structural: cmd_install's own bootout
+        # gate -- reached only for was_already_enabled -- must path-verify
+        # loaded_here via launchctl_label_state before ever booting anything
+        # out, and must refuse outright (never bootout, never proceed) on
+        # loaded_elsewhere or unknown. Scoped to cmd_install's OWN body (via
+        # _shell_functions, the same helper test_adoption_bootstrap_macos.py
+        # uses) rather than searched across the whole file: cmd_remove has
+        # its own, textually similar `is_enabled_label` + `launchctl print`
+        # gate, and a plain self.text search could satisfy this assertion by
+        # matching THAT code instead of cmd_install's.
+        body = _shell_functions(self.text, "cmd_install")
+        self.assertIn('if [[ "$was_already_enabled" == 1 ]]; then', body)
+        self.assertIn(
+            'pre_bootout_state="$(launchctl_label_state "$label" "$dest_plist")"', body,
+            "cmd_install's own bootout gate must path-verify state via launchctl_label_state, "
+            "not a raw launchctl print exit-code check")
+        self.assertIn('case "$pre_bootout_state" in', body)
+        self.assertIn("loaded_here)", body)
+
+        elsewhere_match = re.search(r"(?ms)^\s*loaded_elsewhere\)\n(.*?)\n\s*;;", body)
+        self.assertIsNotNone(elsewhere_match, "no loaded_elsewhere case arm in cmd_install's bootout gate")
+        self.assertIn("Refusing to reinstall", elsewhere_match.group(1))
+        self.assertIn("exit 1", elsewhere_match.group(1))
+        self.assertNotIn("launchctl bootout", elsewhere_match.group(1))
+
+        unknown_match = re.search(r"(?ms)^\s*unknown\)\n(.*?)\n\s*;;", body)
+        self.assertIsNotNone(unknown_match, "no unknown case arm in cmd_install's bootout gate")
+        self.assertIn("Refusing to reinstall", unknown_match.group(1))
+        self.assertIn("exit 1", unknown_match.group(1))
+        self.assertNotIn("launchctl bootout", unknown_match.group(1))
 
     def test_install_treats_only_exit_113_as_confidently_unloaded(self):
         # L5 + round 3f (tri-state print, finding 2): any launchctl print

@@ -14324,8 +14324,8 @@
     },
     {
       "path": "tests/test_adoption_launchd.py",
-      "sha256": "8cd91b6f4d9f0f131f61fab1cac3e7736c414d0b1aecaaa428f65e264fe0deaf",
-      "bytes": 123656
+      "sha256": "5c3998d082d5e59e3249e7157a022d4a5435f74423f69ba638640d5a074e33ea",
+      "bytes": 126174
     },
     {
       "path": "tests/test_adoption_status.py",
