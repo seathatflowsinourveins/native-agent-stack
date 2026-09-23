@@ -714,8 +714,10 @@ lane. With the flag:
   example `keep-but-compare`, `refuted`, `targeted-candidate` or `newcomer`) is not attached either; the same
   wider vocabulary applies to registered receipts.
 
-The flag is off by default, so the 2026-09-22 packets reproduce. With `manifest-20260923.json`, the flag adds
-29 foundation newcomers and removes 9 refuted trading newcomers across the 32 blind packets (306 candidates).
+The flag is off by default, so the 2026-09-22 packets reproduce. A non-GitHub https repository, such as a
+Hugging Face model, is identified by its lowercased URL rather than dropped. With `manifest-20260923.json`, the
+flag adds 35 foundation newcomers, 6 of them Hugging Face models, and removes 9 refuted trading newcomers
+across the 32 blind packets (312 candidates).
 
 A newcomer is never adopted, and the lane contract forbids a non-adopted winner
 (`scripts/landscape.py lane_winner_components`). A lane can prefer one as its challenger

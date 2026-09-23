@@ -354,7 +354,7 @@ def manifest_layer_candidates(layer: dict, cards: dict, ledger_names_by_slug: di
             "recipe_ref": resolve_recipe_ref(entry["id"], recipe_map, evidence_refs, root),
             "decisions": [],
         })
-    seen = {github_repo_slug(c["repository"]) for c in candidates if c["repository"]}
+    seen = {candidate_identity(c["repository"], evidence_files is not None) for c in candidates if c["repository"]}
     for newcomer in manifest_newcomers(layer, seen, evidence_files, root, withhold):
         candidates.append({**newcomer, "role": None, "card_limitations": []})
     return candidates
@@ -364,6 +364,18 @@ def manifest_layer_candidates(layer: dict, cards: dict, ledger_names_by_slug: di
 # carried, and a newcomer's evidence_refs are the repository-relative evidence/ paths its manifest evidence[]
 # lists that manifests/evidence.json registers in files[] with the file's current sha256.
 REFUTED_DISPOSITION_PREFIX = "refuted_"
+
+
+def candidate_identity(repository, extended: bool = False):
+    """A repository's identity for de-duplication: its GitHub slug. With ``extended`` (--manifest-newcomers) a
+    non-GitHub https URL (a Hugging Face model, for example) is identified by its lowercased URL without a
+    trailing slash or .git, so it is carried instead of dropped (Codex review of #151); the default build keeps
+    the slug-only rule, so the 2026-09-22 packets reproduce."""
+    slug = github_repo_slug(repository) if repository else None
+    if slug or not extended or not isinstance(repository, str) or not repository.startswith("https://"):
+        return slug
+    identity = repository.strip().lower().rstrip("/")
+    return identity[:-len(".git")] if identity.endswith(".git") else identity
 
 
 def registered_evidence_files(root: Path) -> dict:
@@ -404,11 +416,12 @@ def manifest_newcomers(layer: dict, seen: set, evidence_files: dict = None, root
     # addition; a ledger candidate (``seen``) keeps its place and its own evidence (Codex review of #151).
     # A repository refuted in any of its entries is left out entirely, even where another list repeats it
     # without a disposition.
-    refuted = {github_repo_slug(item["repository"]) for item in items if item.get("repository")
+    extended = evidence_files is not None
+    refuted = {candidate_identity(item["repository"], extended) for item in items if item.get("repository")
                and str(item.get("disposition") or "").startswith(REFUTED_DISPOSITION_PREFIX)}
     for item in items:
         repository = item.get("repository")
-        slug = github_repo_slug(repository) if repository else None
+        slug = candidate_identity(repository, extended)
         if not slug or slug in seen or (evidence_files is not None and slug in refuted):
             continue
         seen.add(slug)
@@ -1108,7 +1121,8 @@ def build_all_packets(root: Path, *, catalogs: list, seed: str, checked_at: str,
             newcomers = None
             if evidence_files is not None and layer_candidates is None:
                 # --manifest-newcomers on a ledger-built packet: the manifest row's surviving newcomers.
-                seen = {github_repo_slug(c["repository"]) for c in row.get("candidates") or [] if c.get("repository")}
+                seen = {candidate_identity(c["repository"], True) for c in row.get("candidates") or []
+                        if c.get("repository")}
                 newcomers = manifest_newcomers(manifest_rows[catalog].get(row["layer_id"], {}), seen,
                                                evidence_files, root, withhold)
             packet = build_packet(

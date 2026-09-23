@@ -1050,6 +1050,21 @@ class ManifestNewcomersTests(LanePacketsFixture):
         for name in ("candidate-3.json", "new-alpha.json", "owner-repo.json"):
             self.assertFalse(lane_packets.label_bearing_receipt({"path": f"{self.SWEEP}/{name}"}), name)
 
+    def test_non_github_candidates_are_carried_under_a_url_identity(self):
+        # Codex review of #151: Hugging Face models have no GitHub slug and were silently dropped.
+        manifest = self.read(lane_packets.SOTA_MANIFEST_PATH)
+        manifest["foundation"][0]["candidates"] += [
+            {"repository": "https://huggingface.co/Org/Embed-Model", "disposition": "keep_but_compare"},
+            {"repository": "https://huggingface.co/org/embed-model/", "disposition": "keep_but_compare"},
+            {"repository": "https://huggingface.co/org/refuted-model", "disposition": "refuted_keep_but_compare"}]
+        self.write(lane_packets.SOTA_MANIFEST_PATH, manifest)
+        _, by_repository = self.candidates(manifest_newcomers_on=True)
+        self.assertIn("https://huggingface.co/Org/Embed-Model", by_repository)
+        self.assertNotIn("https://huggingface.co/org/embed-model/", by_repository, "one identity, first seen wins")
+        self.assertNotIn("https://huggingface.co/org/refuted-model", by_repository)
+        _, default = self.candidates()
+        self.assertNotIn("https://huggingface.co/Org/Embed-Model", default)
+
     def test_the_cli_flag_reaches_the_packets(self):
         with contextlib.redirect_stdout(io.StringIO()):
             self.assertEqual(lane_packets.main(["--root", str(self.root), "--out", str(self.out),
