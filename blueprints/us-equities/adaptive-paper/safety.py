@@ -972,8 +972,9 @@ class Ledger:
         intent, every row is a whole-share quantity (a positive price when filled), no
         client id is already known here or already booked, and the batch closes every
         position it opens (no residual or short). Each fill updates cash, realized P&L and
-        realized loss and refreshes risk exactly as record_order does (average cost, loss
-        per closing fill, peak tracked per fill). Append-only: one
+        realized loss and refreshes risk as record_order does (average cost, loss per
+        closing fill, peak tracked per fill on realized P&L; the external positions had no
+        marks here, so their unrealized swings are not seen). Append-only: one
         external_fills_consolidated event keeps every row. The caller proves broker flat
         and the cash gap first."""
         now = instant(now)
@@ -996,8 +997,13 @@ class Ledger:
                 ids.add(cid)
                 row = {"client_order_id": cid, "symbol": symbol, "side": side, "qty": str(qty),
                        "price": None, "filled_at": str(f["filled_at"])}
+                if f.get("broker_id") is not None:
+                    row["broker_id"] = str(f["broker_id"])
                 if qty:
-                    price = D(str(f["price"]))
+                    try:
+                        price = D(str(f["price"]))
+                    except ArithmeticError:
+                        raise SafetyError("external_fill_invalid") from None
                     if not price.is_finite() or price <= 0:
                         raise SafetyError("external_fill_invalid")
                     held, cost = book.get(symbol, (ZERO, ZERO))
@@ -1043,7 +1049,8 @@ class Ledger:
         skip. Any other unknown order is still external."""
         with self._lock:
             booked = self._external_orders().get(order.get("client_order_id"))
-        return (booked is not None and order.get("status") in TERMINAL
+        return (booked is not None and order.get("status") in TERMINAL | {"replaced"}
+                and booked.get("broker_id", order.get("id")) == order.get("id")
                 and order.get("symbol") == booked["symbol"] and order.get("side") == booked["side"]
                 and D(str(order.get("filled_qty") or 0)) == D(booked["qty"]))
 

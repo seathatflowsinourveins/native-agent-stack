@@ -37,7 +37,7 @@ sys.path.insert(0, str(HERE))
 TOLERANCE_USD = D("0.01")
 
 
-TERMINAL = ("filled", "canceled", "expired", "rejected")
+TERMINAL = ("filled", "canceled", "expired", "rejected", "replaced")
 
 
 def external_fills(orders, known_ids):
@@ -50,7 +50,7 @@ def external_fills(orders, known_ids):
         if o["status"] not in TERMINAL:
             raise SystemExit("an external order is not terminal; the account is not settled")
         qty = D(str(o["filled_qty"] or 0))
-        fills.append({"client_order_id": o["client_order_id"], "symbol": o["symbol"], "side": o["side"],
+        fills.append({"client_order_id": o["client_order_id"], "broker_id": o["id"], "symbol": o["symbol"], "side": o["side"],
                       "qty": str(qty), "price": str(o["filled_avg_price"]) if qty else None,
                       "filled_at": str(o["filled_at"] or o["updated_at"])})
     return fills
@@ -78,7 +78,7 @@ def _broker_orders(key, secret, since):
     rows = client.get_orders(GetOrdersRequest(status=QueryOrderStatus.ALL, after=since, limit=500))
     if len(rows) >= 500:
         raise SystemExit("more than 500 orders since --since: narrow the window")
-    return [{"client_order_id": o.client_order_id, "symbol": o.symbol, "side": o.side.value,
+    return [{"client_order_id": o.client_order_id, "id": str(o.id), "symbol": o.symbol, "side": o.side.value,
              "status": o.status.value, "filled_qty": o.filled_qty, "filled_avg_price": o.filled_avg_price,
              "filled_at": o.filled_at.isoformat() if o.filled_at else None,
              "updated_at": o.updated_at.isoformat() if o.updated_at else None} for o in rows]

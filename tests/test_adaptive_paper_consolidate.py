@@ -80,6 +80,7 @@ class RecordExternalFillsTests(unittest.TestCase):
             ([fill("x-1", "buy", "0.5", "10", "t1"), fill("x-2", "sell", "0.5", "10", "t2")], "external_fill_invalid"),
             ([fill("x-1", "buy", "1", "0", "t1"), fill("x-2", "sell", "1", "10", "t2")], "external_fill_invalid"),
             ([fill("x-1", "buy", "-1", "10", "t1")], "external_fill_invalid"),
+            ([fill("x-1", "buy", "1", None, "t1"), fill("x-2", "sell", "1", "10", "t2")], "external_fill_invalid"),
             ([fill("x-1", "short", "1", "10", "t1")], "external_fill_invalid"),
             ([fill("x-1", "buy", "1", "10", "t1"), fill("x-1", "sell", "1", "10", "t2")], "external_fill_already_known"),
         ]
@@ -142,7 +143,7 @@ class RecordExternalFillsTests(unittest.TestCase):
 
 
 def broker_order(cid, side, qty, price, status="filled", symbol="SPY", at="2026-09-23T14:00:00+00:00"):
-    return {"client_order_id": cid, "symbol": symbol, "side": side, "status": status,
+    return {"client_order_id": cid, "id": "broker-" + cid, "symbol": symbol, "side": side, "status": status,
             "filled_qty": qty, "filled_avg_price": price, "filled_at": at if D(qty) else None,
             "updated_at": at}
 
@@ -255,7 +256,7 @@ class CommandTests(unittest.TestCase):
         import runner
         ledger = s.Ledger(self.adaptive / "ledger.sqlite3", self.limits)
         try:
-            history = [{**o, "id": "broker-" + o["client_order_id"], "qty": o["filled_qty"] or "1",
+            history = [{**o, "qty": o["filled_qty"] or "1",
                         "updated_at_ns": int(NOW * 1e9)} for o in self.orders]
             snapshot = {"complete": True, "orders": history, "positions": [], "account": {"cash": "998.90"}}
             self.assertTrue(runner.reconcile(ledger, snapshot, "1000.00")["cash_match"])
@@ -263,9 +264,9 @@ class CommandTests(unittest.TestCase):
             for order in history:
                 controller.observe(order)
             self.assertIsNone(ledger.accounting().halted_reason)
-            changed = {**history[0], "filled_qty": "2"}
-            with self.assertRaisesRegex(s.SafetyError, "external_order_detected"):
-                runner.reconcile(ledger, {**snapshot, "orders": [changed]}, "1000.00")
+            for change in ({"filled_qty": "2"}, {"id": "another-broker-order"}):
+                with self.subTest(change=change), self.assertRaisesRegex(s.SafetyError, "external_order_detected"):
+                    runner.reconcile(ledger, {**snapshot, "orders": [{**history[0], **change}]}, "1000.00")
             with self.assertRaisesRegex(s.SafetyError, "external_order_detected"):
                 controller.observe({**history[0], "client_order_id": "never-booked"})
             self.assertEqual(ledger.accounting().halted_reason, "external_order_detected")
