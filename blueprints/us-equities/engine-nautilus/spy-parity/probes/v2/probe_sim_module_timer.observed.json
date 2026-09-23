@@ -1,0 +1,151 @@
+{
+ "evidence_class": "synthetic engine-semantics probe (not SPY/LEAN data, not a parity run)",
+ "probe": "probe_sim_module_timer.py",
+ "args": [],
+ "origin": "research scratchpad probe_sim_module_timer.py, unchanged",
+ "relied_on_for": "dividend: process() runs at a timer-only instant registered with clock.set_time_alert_ns",
+ "probe_sha256": "f208abaadbed6f34b8ec7e69595cd8a6c97d14164208e6412e10d870d64c5482",
+ "command": "bwrap --unshare-all --clearenv ... <nautilus-2.0.0rc5>/bin/python -I /probes/probe_sim_module_timer.py",
+ "engine": {
+  "package": "nautilus_trader",
+  "version": "2.0.0rc5",
+  "_libnautilus_sha256": "a53dd5a24fe77f4c66169af84ee9c7e292018010922e3dce9a8b6c9f7f3b7021",
+  "note": "same extension sha256 as ~/.local/share/codex-ecosystem/tools/adaptive-paper-20260921 (checked 2026-09-22)"
+ },
+ "run_utc_date": "2026-09-22",
+ "exit_code": 0,
+ "stdout_sha256": "24627371d5c533fcc4098c2f1b057bd55507a94fcc37cc6cb6d8630bdefcf237",
+ "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+ "stderr_text_ansi_stripped": "",
+ "observed_stdout": {
+  "module_log": [
+   {
+    "call": "process",
+    "ts_now": 1600000000000000000,
+    "venue": "SIM",
+    "positions_signed_qty": "100.0",
+    "n_instruments": 1
+   },
+   {
+    "call": "acknowledge",
+    "outcomes": []
+   },
+   {
+    "call": "process",
+    "ts_now": 1600003600000000000,
+    "venue": "SIM",
+    "positions_signed_qty": "100.0",
+    "n_instruments": 1
+   },
+   {
+    "call": "acknowledge",
+    "outcomes": []
+   },
+   {
+    "call": "process",
+    "ts_now": 1600005400000000000,
+    "venue": "SIM",
+    "positions_signed_qty": "100.0",
+    "n_instruments": 1
+   },
+   {
+    "call": "emit",
+    "ts_now": 1600005400000000000,
+    "amount": "157.00"
+   },
+   {
+    "call": "acknowledge",
+    "outcomes": [
+     {
+      "applied": true,
+      "error": null
+     }
+    ]
+   },
+   {
+    "call": "process",
+    "ts_now": 1600007200000000000,
+    "venue": "SIM",
+    "positions_signed_qty": "100.0",
+    "n_instruments": 1
+   },
+   {
+    "call": "acknowledge",
+    "outcomes": []
+   },
+   {
+    "call": "process",
+    "ts_now": 1600010800000000000,
+    "venue": "SIM",
+    "positions_signed_qty": "100.0",
+    "n_instruments": 1
+   },
+   {
+    "call": "acknowledge",
+    "outcomes": []
+   }
+  ],
+  "strategy_balance_seen": [
+   {
+    "bar": 0,
+    "ts": 1600000000000000000,
+    "total": "100000.00 USD"
+   },
+   {
+    "bar": 1,
+    "ts": 1600003600000000000,
+    "total": "90000.00 USD"
+   },
+   {
+    "bar": 2,
+    "ts": 1600007200000000000,
+    "total": "90157.00 USD"
+   },
+   {
+    "bar": 3,
+    "ts": 1600010800000000000,
+    "total": "90157.00 USD"
+   }
+  ],
+  "final_total": "90157.00 USD",
+  "account_report_rows": [
+   {
+    "total": "100000.00",
+    "locked": "0.00",
+    "free": "100000.00",
+    "currency": "USD",
+    "account_id": "SIM-001",
+    "account_type": "CASH",
+    "margins": [],
+    "reported": true,
+    "info": {},
+    "base_currency": "USD"
+   },
+   {
+    "total": "90000.00",
+    "locked": "0.00",
+    "free": "90000.00",
+    "currency": "USD",
+    "account_id": "SIM-001",
+    "account_type": "CASH",
+    "margins": [],
+    "reported": false,
+    "info": {},
+    "base_currency": "USD"
+   },
+   {
+    "total": "90157.00",
+    "locked": "0.00",
+    "free": "90157.00",
+    "currency": "USD",
+    "account_id": "SIM-001",
+    "account_type": "CASH",
+    "margins": [],
+    "reported": true,
+    "info": {},
+    "base_currency": "USD"
+   }
+  ],
+  "expected_if_credited": "90157.00"
+ }
+}

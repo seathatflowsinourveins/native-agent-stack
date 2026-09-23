@@ -1,0 +1,160 @@
+{
+ "evidence_class": "synthetic engine-semantics probe (not SPY/LEAN data, not a parity run)",
+ "probe": "probe_gap_open.py",
+ "args": [],
+ "origin": "research scratchpad probe_gap_open.py, unchanged",
+ "relied_on_for": "market-on-open: UNLINKED stop/MIT pair double-fills (no_gap_both, gap_up_both_range_crosses_back)",
+ "probe_sha256": "31e309217b04fd79e5820c55cfaf10f99020cf21bf9833003ec4969dd68c738a",
+ "command": "bwrap --unshare-all --clearenv ... <nautilus-2.0.0rc5>/bin/python -I /probes/probe_gap_open.py",
+ "engine": {
+  "package": "nautilus_trader",
+  "version": "2.0.0rc5",
+  "_libnautilus_sha256": "a53dd5a24fe77f4c66169af84ee9c7e292018010922e3dce9a8b6c9f7f3b7021",
+  "note": "same extension sha256 as ~/.local/share/codex-ecosystem/tools/adaptive-paper-20260921 (checked 2026-09-22)"
+ },
+ "run_utc_date": "2026-09-22",
+ "exit_code": 0,
+ "stdout_sha256": "1668850753e310c67202a47aaab62b19b42b0d3eabac3bab4cefe4ff9dea5cf8",
+ "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+ "stderr_text_ansi_stripped": "",
+ "observed_stdout": [
+  {
+   "case": "gap_up_stop",
+   "bar0": [
+    100.0,
+    101.0,
+    99.0,
+    100.5
+   ],
+   "bar1": [
+    110.0,
+    112.0,
+    109.0,
+    111.0
+   ],
+   "bar1_ts": 1600003600000000000,
+   "events": [
+    {
+     "event": "OrderFilled",
+     "order": "stop",
+     "ts_event": 1600003600000000000,
+     "last_px": "110.00"
+    }
+   ]
+  },
+  {
+   "case": "gap_down_mit",
+   "bar0": [
+    100.0,
+    101.0,
+    99.0,
+    100.5
+   ],
+   "bar1": [
+    90.0,
+    91.0,
+    88.0,
+    89.0
+   ],
+   "bar1_ts": 1600003600000000000,
+   "events": [
+    {
+     "event": "OrderFilled",
+     "order": "mit",
+     "ts_event": 1600003600000000000,
+     "last_px": "90.00"
+    }
+   ]
+  },
+  {
+   "case": "no_gap_both",
+   "bar0": [
+    100.0,
+    101.0,
+    99.0,
+    100.5
+   ],
+   "bar1": [
+    100.5,
+    103.0,
+    99.0,
+    102.0
+   ],
+   "bar1_ts": 1600003600000000000,
+   "events": [
+    {
+     "event": "OrderFilled",
+     "order": "stop",
+     "ts_event": 1600003600000000000,
+     "last_px": "100.51"
+    },
+    {
+     "event": "OrderFilled",
+     "order": "mit",
+     "ts_event": 1600003600000000000,
+     "last_px": "100.49"
+    }
+   ]
+  },
+  {
+   "case": "gap_up_both_range_crosses_back",
+   "bar0": [
+    100.0,
+    101.0,
+    99.0,
+    100.5
+   ],
+   "bar1": [
+    110.0,
+    112.0,
+    95.0,
+    111.0
+   ],
+   "bar1_ts": 1600003600000000000,
+   "events": [
+    {
+     "event": "OrderFilled",
+     "order": "stop",
+     "ts_event": 1600003600000000000,
+     "last_px": "110.00"
+    },
+    {
+     "event": "OrderFilled",
+     "order": "mit",
+     "ts_event": 1600003600000000000,
+     "last_px": "100.49"
+    }
+   ]
+  },
+  {
+   "case": "gap_down_both",
+   "bar0": [
+    100.0,
+    101.0,
+    99.0,
+    100.5
+   ],
+   "bar1": [
+    90.0,
+    91.0,
+    88.0,
+    89.0
+   ],
+   "bar1_ts": 1600003600000000000,
+   "events": [
+    {
+     "event": "OrderFilled",
+     "order": "mit",
+     "ts_event": 1600003600000000000,
+     "last_px": "90.00"
+    },
+    {
+     "event": "OrderCanceled",
+     "order": "stop",
+     "ts_event": 1600003600000000000,
+     "reason": ""
+    }
+   ]
+  }
+ ]
+}
