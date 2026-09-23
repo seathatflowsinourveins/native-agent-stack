@@ -7634,8 +7634,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "41dac733af71f47a14bf6dfb1be7c31ae5c312291c3a38eb77e3b4454c968d9e",
-      "bytes": 12926268
+      "sha256": "9d9981d7d2c967a2b0218970b29467fab06fc8e37bc6bf279e44c876dc71dcf6",
+      "bytes": 12926840
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
