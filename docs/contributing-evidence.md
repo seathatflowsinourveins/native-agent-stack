@@ -69,7 +69,7 @@ machine (`host.second_physical_machine: true`), independently reviewed.
      --component-id <a manifests/stack.json component id> \
      --stage use \
      --evidence-class native_proven \
-     --identity <session-or-person-name> \
+     --identity <random-per-session-token> \
      --from-stack-commands
    ```
 
@@ -90,18 +90,28 @@ machine (`host.second_physical_machine: true`), independently reviewed.
    only when this really is a second physical machine, not a fresh prefix or
    container on the catalog's existing authoring host — a receipt recorded
    without this flag can never satisfy the `component_matrix.py` macOS flip
-   rule (Section 5). `--identity` names who is recording; the receipt stores
-   only its salted sha256 as `recorded_by.identity_sha256` (plus `--model`
-   when given). A Claude Code session may omit it, because the recorder then
-   hashes `$CLAUDE_CODE_SESSION_ID` (exported by Claude Code; observed in
-   2.1.280). A Codex session, a human or CI has no such variable and must pass
-   `--identity`: the recorder refuses to write a receipt without one rather
-   than giving every such recorder the same identity. The receipt also records
-   the component version it ran in `tool_versions` (the `manifests/stack.json`
-   version, else the landscape winner pin; pass `--component-version` when
-   neither applies or the host ran something else). A receipt only counts
-   toward a winner's status while that version equals the winner's current
-   pin, so a pin bump retires older receipts until someone re-records. The
+   rule (Section 5). The receipt stores who recorded it only as a
+   domain-separated sha256 (`recorded_by.identity_sha256`, plus `--model` when
+   given). Inside a Claude Code session the identity is always
+   `$CLAUDE_CODE_SESSION_ID` (exported by Claude Code; observed in 2.1.280),
+   and `--identity` is refused there, so a session cannot record under one
+   name and review under another. A Codex session, a human or CI has no such
+   variable and must pass `--identity`; the recorder refuses to write a
+   receipt without one rather than giving every such recorder the same
+   identity. Use a random token for the session (for example the output of
+   `python3 -c 'import secrets; print(secrets.token_hex(16))'`), not a name:
+   the hash has a fixed public prefix, not a secret salt, so a guessable name
+   can be recovered and every `--identity codex` is the same identity.
+   `--identity` is NFKC-normalized and case-folded. A tool launched from a
+   Claude Code session inherits its session id and counts as that session.
+   The receipt also records the component version it ran in `tool_versions`:
+   the landscape winner pin when every layer that selects the component
+   agrees on it, else the `manifests/stack.json` version. Pass
+   `--component-version` when neither applies or the host ran something else;
+   a version without a digit (such as `unpinned`) is refused. A receipt only
+   counts toward a winner's status while that version equals the winner's
+   current pin in full, so a pin bump retires older receipts until someone
+   re-records. The
    recorder runs your commands with a bounded timeout,
    sanitizes `$HOME` to `~` and your username to `<user>` in the captured
    excerpt, writes the receipt under `evidence/hosts/<host_id>/`, and
@@ -176,7 +186,7 @@ machine (`host.second_physical_machine: true`), independently reviewed.
    `--kind` is one of `independent_session`, `codex_lane`, or `human` for a
    real independent reviewer (`self` is reserved for the recorder's own
    automatic entry, written once by `record`). The reviewer's identity comes
-   from `--identity` or `$CLAUDE_CODE_SESSION_ID`, exactly as for `record`,
+   from `$CLAUDE_CODE_SESSION_ID` or `--identity`, exactly as for `record`,
    and is stored hashed as `reviewer.identity_sha256`. `review` refuses a
    non-`self` review whose identity equals the receipt's `recorded_by`, and a
    receipt with no `recorded_by` (recorded before 2026-09-23) cannot take an
@@ -184,7 +194,9 @@ machine (`host.second_physical_machine: true`), independently reviewed.
    cases in CI, and a review dated before the observation. Only each
    reviewer's latest verdict counts, and any standing `disagree` or
    `needs_changes` vetoes the receipt however many others agree; a reviewer
-   withdraws a dissent by appending a newer review. This step re-registers
+   withdraws a dissent by appending a newer review. A dissent that fails
+   those checks (no reviewer, the recorder's own identity, or dated before
+   the observation) still vetoes and cannot be withdrawn. This step re-registers
    the file's hash after the review is appended; rerun step 5's
    `component_matrix.py --write` afterward, since a new review can change the
    matrix's receipt counts and derived status.
@@ -230,9 +242,12 @@ for running them.
   per-platform `platform_status` field is written by the recorded verdict
   process above, not by this recorder. Both the verdict recorder and the
   validators derive it through one function,
-  [`scripts/platform_status.py`](../scripts/platform_status.py), so a Mac's
-  receipts do reach the catalog. After they merge, the next verdict re-record
-  writes the derived status. `scripts/landscape.py` and
+  [`scripts/platform_status.py`](../scripts/platform_status.py). The
+  validators use it now. The verdict recorder
+  (`tools/sota-convergence/record_verdicts.py`) switches to it in agent-lab-17's
+  verdict-integrity change and still writes `macos-arm64: untested` until
+  then, so today a Mac's merged receipts raise what a row may declare, and
+  the first re-record after that change writes it. `scripts/landscape.py` and
   `scripts/component_matrix.py --check` (both run in CI) reject a declared
   `macos-arm64` status that claims more than the receipts support; a weaker,
   not-yet-re-recorded status is allowed. `accepted` needs a recorded receipt
@@ -241,9 +256,12 @@ for running them.
   winner's current pin, independently reviewed (step 8) with no standing
   dissent, declares `host.second_physical_machine: true`, and has
   `host.os`/`host.architecture` consistent with `adoption/manifest.json`'s
-  `platform_profiles[]` entry for that platform id; a later such receipt that
-  fails supersedes it. `conditional` needs any pin-bound passing receipt, and
-  `not_established` pin-bound receipts none of which pass. A receipt recorded
+  `platform_profiles[]` entry for that platform id. A `native_proven` fail at
+  `use` or `install` that is the latest receipt for its host and stage blocks
+  `accepted`, whatever its review, until that host records a later pass.
+  `conditional` needs a pin-bound, non-`synthetic` pass from a declared
+  second physical machine with no standing dissent; `not_established` means
+  pin-bound receipts exist but none is such a pass. A receipt recorded
   and reviewed entirely on a single WSL host, with `second_physical_machine`
   left at its default `false`, cannot make a winner `accepted`. The Linux
   rule, and when CI starts enforcing it, is described in that module's

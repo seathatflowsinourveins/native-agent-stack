@@ -1,31 +1,35 @@
 #!/usr/bin/env python3
 """Derive a layer winner's per-platform status from recorded evidence: one rule for every caller.
 
-``scripts/landscape.py`` (the ceiling a declared ``platform_status`` may claim),
-``scripts/component_matrix.py`` (the matrix's e2e state and flip rule) and
-``tools/sota-convergence/record_verdicts.py`` (the status a re-record writes) all call
-``platform_status()``, so the rule cannot drift between the recorder, the validator and the
-report. The inputs are the host receipts under ``evidence/hosts/`` (via
+``scripts/landscape.py`` (the ceiling a declared ``platform_status`` may claim) and
+``scripts/component_matrix.py`` (the matrix's e2e state and flip rule) call
+``platform_status()``; ``tools/sota-convergence/record_verdicts.py`` (the status a re-record
+writes) switches to it in agent-lab-17's verdict-integrity change and still writes
+``macos-arm64: untested`` until then, so today a Mac receipt raises the allowed ceiling and a
+row reaches it on that re-record. The inputs are the host receipts under ``evidence/hosts/`` (via
 ``host_receipts.build_summary``) and the winner's own ``evidence_class`` and
 ``evidence_refs``; nothing here reads a lane's prose.
 
-A *qualifying* receipt is schema-valid, bound to the winner's current pin
-(``tool_versions[component_id]`` equals ``pin`` after normalization), ``native_proven``,
-at stage ``install`` or ``use``, on a declared second physical machine whose
-``host.os``/``host.architecture`` match the platform profile, and independently reviewed
-(``host_receipts.review_state`` is ``agree``: at least one reviewer identity other than the
-recorder's agrees, and no reviewer's latest verdict dissents). The latest qualifying
-receipt decides: a later qualifying ``fail`` supersedes an earlier ``pass``.
+A receipt is *bound* when it is schema-valid, its ``host.os``/``host.architecture`` match the
+platform profile, and its ``tool_versions[component_id]`` equals the winner's current ``pin``
+after ``normalize_pin`` (the whole string, so a multi-part pin must match in full). A
+*qualifying* receipt is a bound ``native_proven`` pass at stage ``install`` or ``use``, on a
+declared second physical machine, independently reviewed (``host_receipts.review_state`` is
+``agree``: a reviewer identity other than the recorder's agrees and nothing dissents). A
+*blocking* fail is a bound ``native_proven`` fail at ``install`` or ``use`` that is the latest
+receipt for its host and stage, whatever its review; it withholds ``accepted`` until that host
+records a later pass for that stage.
 
-``macos-arm64``: ``accepted`` needs a qualifying pass; ``conditional`` any pin-bound,
-schema-valid pass that no reviewer dissents from; ``not_established`` pin-bound receipts
-none of which is such a pass; otherwise ``untested``.
+``macos-arm64``: ``accepted`` needs a qualifying pass and no blocking fail; ``conditional`` a
+bound pass that is not ``synthetic``, comes from a declared second physical machine and has
+no standing dissent; ``not_established`` bound receipts none of which is such a pass;
+otherwise ``untested``.
 
 ``linux-wsl2-x86_64``: ``accepted`` needs a qualifying pass, or a ``native_proven`` /
 ``measured_comparison`` winner citing at least one ``evidence/`` file registered in
-``manifests/evidence.json`` (and no superseding qualifying fail); ``conditional`` covers
-the same classes without such a reference, ``local_integration``, ``synthetic`` and any
-pin-bound pass; otherwise ``not_established``.
+``manifests/evidence.json``, and in both cases no blocking fail; ``conditional`` covers the
+same classes otherwise, ``local_integration``, ``synthetic`` and any bound non-``synthetic``
+pass without a standing dissent; otherwise ``not_established``.
 
 Every input is self-declared by whoever recorded or reviewed it (host identity, second
 machine, reviewer identity); the rule makes an unsupported claim fail loudly, it does not
@@ -75,23 +79,15 @@ def load_context(root: Path) -> StatusContext:
     )
 
 
-def normalize_pin(value) -> str | None:
-    """Comparable form of a pin or recorded version: the first token before ';' or
-    whitespace, lower-cased, with a leading 'v' dropped before a digit ('v1.52.0' ->
-    '1.52.0'; '985ef30 with remediation' -> '985ef30'). ``None`` when nothing usable."""
-    if not isinstance(value, str):
-        return None
-    token = re.split(r"[;\s]", value.strip(), maxsplit=1)[0].lower()
-    if re.fullmatch(r"v[0-9].*", token):
-        token = token[1:]
-    return token or None
+normalize_pin = host_receipts.normalize_pin
 
 
 def pin_matches(recorded, pin) -> bool:
-    """True when a receipt's recorded component version is the winner's current pin. An
-    unpinned winner ('unpinned' or empty) never matches: pin it before a receipt can bind."""
+    """True when a receipt's recorded component version is the winner's current pin: equal
+    after ``normalize_pin``, or both a single hex commit id where one abbreviates the other
+    (at least 7 characters). A pin without a digit ('unpinned') never binds."""
     left, right = normalize_pin(recorded), normalize_pin(pin)
-    if not left or not right or right == "unpinned":
+    if not left or not right:
         return False
     if left == right:
         return True
@@ -124,22 +120,31 @@ def platform_status(platform_id: str, winner: dict, context: StatusContext) -> P
     bound = [entry for entry in entries
              if entry.get("shape_ok") and entry.get("platform_identity_ok")
              and pin_matches(entry.get("component_version"), pin)]
-    qualifying = [entry for entry in bound
-                  if entry.get("evidence_class") == "native_proven"
-                  and entry.get("stage") in QUALIFYING_STAGES
-                  and entry.get("second_physical_machine") is True
-                  and entry.get("review_state") == "agree"
-                  and entry.get("result") in ("pass", "fail")]
-    latest = max(qualifying, key=lambda entry: (entry.get("observed_at_utc") or "", entry.get("path") or ""),
-                 default=None)
-    superseded_by_fail = latest is not None and latest.get("result") == "fail"
-    passes = [entry for entry in bound if entry.get("result") == "pass" and entry.get("review_state") != "dissent"]
+    native_stage = [entry for entry in bound
+                    if entry.get("evidence_class") == "native_proven" and entry.get("stage") in QUALIFYING_STAGES]
+    latest_per_host_stage: dict[tuple, tuple] = {}
+    for entry in native_stage:
+        key = (entry.get("host_id"), entry.get("stage"))
+        # On an equal timestamp a fail sorts after a pass, so the tie blocks.
+        rank = (entry.get("observed_at_utc") or "", entry.get("result") == "fail", entry.get("path") or "")
+        current = latest_per_host_stage.get(key)
+        if current is None or rank > current[0]:
+            latest_per_host_stage[key] = (rank, entry)
+    blocking = sorted(entry["path"] for _rank, entry in latest_per_host_stage.values()
+                      if entry.get("result") == "fail")
+    qualifying = sorted(entry["path"] for entry in native_stage
+                        if entry.get("result") == "pass" and entry.get("second_physical_machine") is True
+                        and entry.get("review_state") == "agree")
+    passes = [entry for entry in bound if entry.get("result") == "pass"
+              and entry.get("review_state") != "dissent" and entry.get("evidence_class") != "synthetic"]
+    if platform_id == "macos-arm64":
+        passes = [entry for entry in passes if entry.get("second_physical_machine") is True]
     pass_refs = tuple(sorted(entry["path"] for entry in passes))
-    fail_note = f"; latest qualifying receipt {latest['path']} failed" if superseded_by_fail else ""
+    fail_note = f"; latest native_proven receipt failed: {', '.join(blocking)}" if blocking else ""
 
-    if latest is not None and not superseded_by_fail:
+    if qualifying and not blocking:
         return PlatformStatus("accepted", "independently reviewed native_proven pass at the current pin",
-                              (latest["path"],))
+                              tuple(qualifying))
 
     if platform_id == "macos-arm64":
         if passes:
@@ -152,10 +157,10 @@ def platform_status(platform_id: str, winner: dict, context: StatusContext) -> P
 
     evidence_class = winner.get("evidence_class")
     registered = registered_evidence_refs(winner, context.registered_paths)
-    if evidence_class in NATIVE_CLASSES and registered and not superseded_by_fail:
+    if evidence_class in NATIVE_CLASSES and registered and not blocking:
         return PlatformStatus("accepted", f"{evidence_class} winner citing registered evidence", registered)
     if evidence_class in NATIVE_CLASSES:
-        reason = (f"{evidence_class} winner" + fail_note if superseded_by_fail
+        reason = (f"{evidence_class} winner" + fail_note if blocking
                   else f"{evidence_class} winner without a registered evidence/ reference")
         return PlatformStatus("conditional", reason, registered + pass_refs)
     if evidence_class in CONDITIONAL_CLASSES:

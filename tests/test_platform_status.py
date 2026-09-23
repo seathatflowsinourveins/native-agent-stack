@@ -5,7 +5,10 @@ host_receipts.build_summary, so the rule is exercised end to end."""
 
 from __future__ import annotations
 
+import inspect
 import json
+import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -49,16 +52,21 @@ class _Root:
 
     def receipt(self, platform_id="macos-arm64", *, result="pass", stage="use", evidence_class="native_proven",
                 version="1.0.0", second_machine=True, reviewer="other-session", verdict="agree",
-                observed_at="2026-09-23T01:00:00Z", os_value=None, architecture=None):
+                observed_at="2026-09-23T01:00:00Z", os_value=None, architecture=None, host=None):
         self.count += 1
         mac = platform_id == "macos-arm64"
-        host_id = f"host{self.count}-20260923"
+        host_id = f"{host or 'host' + str(self.count)}-20260923"
         recorder = {"identity_sha256": hr.identity_digest(f"recorder-{self.count}")}
         reviews = [{"kind": "self", "ref": "record", "verdict": "agree", "at_utc": observed_at, "reviewer": recorder}]
         if reviewer is not None:
             reviews.append({"kind": "independent_session", "ref": "review", "verdict": verdict,
                             "at_utc": observed_at, "reviewer": {"identity_sha256": hr.identity_digest(reviewer)}})
         receipt_id = f"{host_id}--widget--{stage}--20260923"
+        if (self.root / "evidence" / "hosts" / host_id / f"{receipt_id}.json").exists():
+            receipt_id = f"{host_id}--widget--{stage}--20260924"
+            observed_at = "2026-09-24" + observed_at[10:]
+            for review in reviews:
+                review["at_utc"] = observed_at
         receipt = {
             "schema_version": 1, "id": receipt_id, "kind": "host_acceptance",
             "host": {"host_id": host_id, "platform_id": platform_id,
@@ -121,10 +129,22 @@ class PlatformStatusTests(unittest.TestCase):
     def test_pin_normalization_binds_v_prefix_and_sha_prefix(self):
         self.r.receipt(version="v1.0.0")
         self.assertEqual(self.r.status(pin="1.0.0").status, "accepted")
-        self.assertTrue(ps.pin_matches("985ef30 with documented remediation", "985ef30ad3ac774218c5ac516b4cb0aa2655730f"))
-        self.assertFalse(ps.pin_matches("985ef", "985ef30ad3ac774218c5ac516b4cb0aa2655730f"))
+        full_sha = "985ef30ad3ac774218c5ac516b4cb0aa2655730f"
+        self.assertTrue(ps.pin_matches("985ef30", full_sha))
+        self.assertFalse(ps.pin_matches("985ef", full_sha))
+        self.assertFalse(ps.pin_matches("985ef30 with documented remediation", full_sha))
         self.assertFalse(ps.pin_matches("unpinned", "unpinned"))
         self.assertFalse(ps.pin_matches(None, "1.0.0"))
+        self.assertFalse(ps.pin_matches("1.2", "1.2.9"))
+
+    def test_multi_part_pins_must_match_in_full(self):
+        # Review of #117 finding 2: only the first token used to be compared, so any
+        # "CLI ..." version matched this us-equities pin.
+        pin = "CLI rust-v0.155.1; Python openai-codex 0.154.0"
+        self.assertFalse(ps.pin_matches("CLI rust-v0.999.0", pin))
+        self.assertFalse(ps.pin_matches("cli", pin))
+        self.assertTrue(ps.pin_matches("cli  rust-v0.155.1;  python openai-codex v0.154.0", pin))
+        self.assertTrue(ps.pin_matches("1.2.9; WalkForward source c99fcf7", "1.2.9; walkforward source c99fcf7"))
 
     def test_standing_dissent_vetoes_acceptance_and_conditional(self):
         self.r.receipt(verdict="needs_changes")
@@ -137,10 +157,29 @@ class PlatformStatusTests(unittest.TestCase):
         self.assertEqual(derived.status, "conditional")
         self.assertIn("failed", derived.reason)
 
-    def test_a_later_qualifying_pass_restores_acceptance(self):
-        self.r.receipt(result="fail", observed_at="2026-09-23T01:00:00Z")
-        self.r.receipt(observed_at="2026-09-23T02:00:00Z")
+    def test_a_later_pass_on_the_failing_host_restores_acceptance(self):
+        self.r.receipt(result="fail", host="mac-a", observed_at="2026-09-23T01:00:00Z")
+        self.r.receipt(host="mac-b", observed_at="2026-09-23T02:00:00Z")
+        self.assertEqual(self.r.status().status, "conditional")  # mac-a's latest is still a fail
+        self.r.receipt(host="mac-a", observed_at="2026-09-23T03:00:00Z")
         self.assertEqual(self.r.status().status, "accepted")
+
+    def test_an_unreviewed_native_fail_blocks_acceptance(self):
+        # Review of #117 finding 5: a fail supersedes whatever its review state.
+        self.r.receipt(host="mac-a", observed_at="2026-09-23T01:00:00Z")
+        self.r.receipt(result="fail", host="mac-a", reviewer=None, observed_at="2026-09-23T02:00:00Z")
+        self.assertEqual(self.r.status().status, "conditional")
+
+    def test_a_use_fail_is_not_hidden_by_a_later_install_pass(self):
+        self.r.receipt(result="fail", stage="use", host="mac-a", observed_at="2026-09-23T01:00:00Z")
+        self.r.receipt(stage="install", host="mac-a", observed_at="2026-09-23T02:00:00Z")
+        self.assertEqual(self.r.status().status, "conditional")
+
+    def test_macos_conditional_needs_a_second_machine_and_a_non_synthetic_pass(self):
+        # Review of #117 finding 6: a Linux box could record a synthetic macos-arm64 receipt.
+        self.r.receipt(evidence_class="synthetic", reviewer=None)
+        self.r.receipt(second_machine=False, reviewer=None)
+        self.assertEqual(self.r.status().status, "not_established")
 
     def test_macos_not_established_when_only_failures(self):
         self.r.receipt(result="fail", reviewer=None)
@@ -190,6 +229,11 @@ class PlatformStatusTests(unittest.TestCase):
         for declared in ("untested", "conditional", "accepted"):
             self.assertIsNone(ps.declared_status_error("macos-arm64", declared, _winner(), context))
 
+    def test_linux_synthetic_receipt_does_not_raise_a_source_review_winner(self):
+        self.r.receipt("linux-wsl2-x86_64", evidence_class="synthetic", reviewer=None)
+        self.assertEqual(self.r.status("linux-wsl2-x86_64", evidence_class="source_review").status,
+                         "not_established")
+
     def test_unknown_platform_is_an_error(self):
         with self.assertRaises(ValueError):
             self.r.status("windows-x86_64")
@@ -197,3 +241,30 @@ class PlatformStatusTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class RecorderHandoffContractTests(unittest.TestCase):
+    """The interface agent-lab-17's record_verdicts.py imports (agreed 2026-09-23). If this
+    changes, that recorder breaks: change both together."""
+
+    def test_signature(self):
+        self.assertEqual(list(inspect.signature(ps.platform_status).parameters), ["platform_id", "winner", "context"])
+        self.assertEqual(list(inspect.signature(ps.load_context).parameters), ["root"])
+        self.assertEqual(list(inspect.signature(ps.declared_status_error).parameters),
+                         ["platform_id", "declared", "winner", "context"])
+        self.assertEqual(ps.PlatformStatus._fields, ("status", "reason", "receipt_refs"))
+        self.assertEqual(set(ps.STATUS_RANK), {"untested", "not_established", "conditional", "accepted"})
+
+    def test_importable_the_way_record_verdicts_sets_up_its_path(self):
+        # record_verdicts.py puts tools/sota-convergence and the repository root on sys.path.
+        code = (
+            "import sys; sys.path[:0] = [sys.argv[1], sys.argv[2]]; "
+            "from scripts.platform_status import load_context, platform_status; "
+            "import json; from pathlib import Path; root = Path(sys.argv[2]); "
+            "winner = json.loads((root / 'catalogs/landscape/foundation.json').read_text())['layers'][0]['winners'][0]; "
+            "print(platform_status('macos-arm64', winner, load_context(root)).status)"
+        )
+        result = subprocess.run([sys.executable, "-c", code, str(REPO_ROOT / "tools" / "sota-convergence"),
+                                 str(REPO_ROOT)], capture_output=True, text=True, cwd=REPO_ROOT / "tools", check=False)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn(result.stdout.strip(), ps.STATUS_RANK)

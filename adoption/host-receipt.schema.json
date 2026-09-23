@@ -82,7 +82,7 @@
         "identity_sha256": {
           "type": "string",
           "pattern": "^[0-9a-f]{64}$",
-          "description": "sha256 of 'host-receipt-identity-v1:' + the session id or --identity value; never the raw value"
+          "description": "Domain-separated sha256 of 'host-receipt-identity-v1:' + $CLAUDE_CODE_SESSION_ID, or else the normalized --identity; never the raw value"
         },
         "model": {
           "type": "string",
@@ -209,7 +209,7 @@
             "identity_sha256": {
               "type": "string",
               "pattern": "^[0-9a-f]{64}$",
-              "description": "sha256 of 'host-receipt-identity-v1:' + the session id or --identity value; never the raw value"
+              "description": "Domain-separated sha256 of 'host-receipt-identity-v1:' + $CLAUDE_CODE_SESSION_ID, or else the normalized --identity; never the raw value"
             },
             "model": {
               "type": "string",

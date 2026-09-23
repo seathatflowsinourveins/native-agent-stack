@@ -26,6 +26,7 @@ import re
 import shutil
 import subprocess
 import time
+import unicodedata
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -44,10 +45,13 @@ EVIDENCE_CLASSES = {"native_proven", "local_integration", "synthetic"}
 REVIEW_KINDS = {"self", "independent_session", "codex_lane", "human"}
 REVIEW_VERDICTS = {"agree", "disagree", "needs_changes"}
 
-# Identity of whoever records or reviews a receipt, stored only as a salted sha256. A Claude
-# Code session exports CLAUDE_CODE_SESSION_ID (observed in Claude Code 2.1.280); a Codex
-# session, a human or CI has no such variable and must pass --identity. There is no default:
-# an absent identity fails closed rather than making every such recorder the same identity.
+# Identity of whoever records or reviews a receipt, stored only as a domain-separated sha256
+# (a fixed public prefix, not a secret salt: a guessable --identity can be recovered by
+# dictionary, so use a random per-session token). A Claude Code session exports
+# CLAUDE_CODE_SESSION_ID (observed in Claude Code 2.1.280) and is always identified by it; a
+# Codex session, a human or CI has no such variable and must pass --identity. There is no
+# default: an absent identity fails closed rather than making every such recorder the same
+# identity.
 IDENTITY_ENV = "CLAUDE_CODE_SESSION_ID"
 IDENTITY_DOMAIN = "host-receipt-identity-v1:"
 DISSENT_VERDICTS = {"disagree", "needs_changes"}
@@ -97,10 +101,38 @@ def identity_digest(value: str) -> str:
     return hashlib.sha256((IDENTITY_DOMAIN + value).encode("utf-8")).hexdigest()
 
 
+class IdentityError(ValueError):
+    """An identity that cannot be used; the message says why."""
+
+
+def normalize_identity(value: str) -> str:
+    """NFKC, case-folded, whitespace-collapsed, so 'Alice' and ' alice ' are one identity."""
+    return " ".join(unicodedata.normalize("NFKC", value).casefold().split())
+
+
 def resolve_identity(explicit: str | None) -> str | None:
-    """sha256 of --identity, else of $CLAUDE_CODE_SESSION_ID, else None (callers fail closed)."""
-    value = (explicit or "").strip() or os.environ.get(IDENTITY_ENV, "").strip()
-    return identity_digest(value) if value else None
+    """Digest of $CLAUDE_CODE_SESSION_ID when set (a Claude Code session cannot choose another
+    identity), else of the normalized --identity, else None (callers fail closed)."""
+    session = os.environ.get(IDENTITY_ENV, "").strip()
+    chosen = normalize_identity(explicit or "")
+    if session:
+        if chosen:
+            raise IdentityError(
+                f"--identity is for sessions without ${IDENTITY_ENV}; this Claude Code session is identified "
+                "by its session id, so a review from it cannot pose as another reviewer")
+        return identity_digest(session)
+    return identity_digest(chosen) if chosen else None
+
+
+def normalize_pin(value) -> str | None:
+    """Comparable form of a pin or recorded version: lower-cased, whitespace collapsed, and a
+    leading 'v' dropped from each token that continues with a digit ('v1.52.0' -> '1.52.0').
+    ``None`` when the text has no digit (for example 'unpinned'): such a value cannot bind."""
+    if not isinstance(value, str):
+        return None
+    tokens = [token[1:] if re.fullmatch(r"v[0-9].*", token) else token for token in value.lower().split()]
+    text = " ".join(tokens)
+    return text if re.search(r"[0-9]", text) else None
 
 
 def identity_record(digest: str, model: str | None) -> dict:
@@ -317,11 +349,9 @@ def landscape_component_ids(root: Path) -> set[str]:
 
 
 def catalog_component_version(root: Path, component_id: str) -> str | None:
-    """The version a receipt binds to by default: the manifests/stack.json version, else the
-    landscape winner pin when every layer that selects the component agrees on it."""
-    version = stack_component_version(root, component_id)
-    if version:
-        return version
+    """The version a receipt binds to by default: the landscape winner pin when every layer
+    that selects the component agrees on it (the pin scripts/platform_status.py binds to),
+    else the manifests/stack.json version."""
     pins: set[str] = set()
     landscape_dir = root / "catalogs" / "landscape"
     for path in sorted(landscape_dir.glob("*.json")) if landscape_dir.is_dir() else []:
@@ -334,7 +364,11 @@ def catalog_component_version(root: Path, component_id: str) -> str | None:
                 if isinstance(winner, dict) and winner.get("component_id") == component_id \
                         and isinstance(winner.get("pin"), str) and winner["pin"].strip():
                     pins.add(winner["pin"].strip())
-    return pins.pop() if len(pins) == 1 else None
+    if len(pins) == 1:
+        return pins.pop()
+    if pins:
+        return None
+    return stack_component_version(root, component_id)
 
 
 def platform_ids(root: Path) -> set[str]:
@@ -466,15 +500,20 @@ def cmd_record(args: argparse.Namespace) -> int:
         print(f"error: --platform-id {args.platform_id!r} is not a known adoption/manifest.json platform_profiles id")
         return 2
 
-    recorder = resolve_identity(args.identity)
+    try:
+        recorder = resolve_identity(args.identity)
+    except IdentityError as error:
+        print(f"error: {error}")
+        return 2
     if recorder is None:
         print(f"error: no recorder identity: pass --identity NAME (only a Claude Code session exports "
               f"{IDENTITY_ENV}; a Codex session, a human or CI must name itself)")
         return 2
     component_version = args.component_version or catalog_component_version(root, args.component_id)
-    if not component_version:
-        print(f"error: no catalog version for component {args.component_id!r} (its landscape pins disagree or it "
-              "has none); pass --component-version with the version this host ran")
+    if normalize_pin(component_version) is None:
+        print(f"error: no usable version for component {args.component_id!r} ({component_version!r}: its landscape "
+              "pins disagree, it has none, or it has no digit such as 'unpinned'); pass --component-version with "
+              "the version this host ran")
         return 2
 
     commands_to_run: list[str] = []
@@ -610,7 +649,11 @@ def cmd_review(args: argparse.Namespace) -> int:
     if args.verdict not in REVIEW_VERDICTS:
         print(f"error: --verdict must be one of {sorted(REVIEW_VERDICTS)}")
         return 2
-    reviewer = resolve_identity(args.identity)
+    try:
+        reviewer = resolve_identity(args.identity)
+    except IdentityError as error:
+        print(f"error: {error}")
+        return 2
     if reviewer is None:
         print(f"error: no reviewer identity: pass --identity NAME (only a Claude Code session exports {IDENTITY_ENV})")
         return 2
@@ -828,32 +871,44 @@ def cmd_validate(args: argparse.Namespace) -> int:
 def review_state(receipt: dict) -> str:
     """``agree``, ``dissent`` or ``none`` over the receipt's independent reviews.
 
-    A review is independent when it is not ``self``, carries a reviewer identity that differs
-    from ``recorded_by``, and is not older than the observation. Only each reviewer's latest
-    review counts (a reviewer may revise a dissent); any standing ``disagree`` or
-    ``needs_changes`` vetoes, however many reviewers agree. A receipt without ``recorded_by``
-    has no checkable independent review."""
+    A review is well formed when it is not ``self``, carries a reviewer identity that differs
+    from ``recorded_by``, and has a valid ``at_utc`` not older than the observation. Only
+    each well-formed reviewer's latest review counts, so a reviewer may withdraw their own
+    dissent. Any standing ``disagree`` or ``needs_changes`` vetoes, however many reviewers
+    agree, and so does a dissent in a review that is not well formed, which nobody can
+    withdraw. A non-self ``agree`` that is not well formed keeps the state from being
+    ``agree``. Without ``recorded_by`` no review can be checked for independence."""
     recorded_by = receipt.get("recorded_by") if isinstance(receipt.get("recorded_by"), dict) else {}
     recorder = recorded_by.get("identity_sha256")
-    if not recorder:
-        return "none"
     observed_at = receipt.get("observed_at_utc") if isinstance(receipt.get("observed_at_utc"), str) else ""
     latest: dict[str, tuple[str, int, str]] = {}
+    malformed_dissent = malformed_other = False
     reviews = receipt.get("reviews") if isinstance(receipt.get("reviews"), list) else []
     for position, review in enumerate(reviews):
-        if not isinstance(review, dict) or review.get("kind") == "self":
+        if not isinstance(review, dict):
+            malformed_other = True
+            continue
+        if review.get("kind") == "self":
             continue
         reviewer = review.get("reviewer") if isinstance(review.get("reviewer"), dict) else {}
         identity = reviewer.get("identity_sha256")
         at_utc = review.get("at_utc") if isinstance(review.get("at_utc"), str) else ""
-        if not identity or identity == recorder or at_utc < observed_at:
+        well_formed = bool(recorder and identity and identity != recorder
+                           and ISO_UTC_PATTERN.fullmatch(at_utc) and at_utc >= observed_at)
+        if not well_formed:
+            if review.get("verdict") in DISSENT_VERDICTS:
+                malformed_dissent = True
+            else:
+                malformed_other = True
             continue
         key = (at_utc, position, review.get("verdict"))
         if identity not in latest or key[:2] > latest[identity][:2]:
             latest[identity] = key
     verdicts = {entry[2] for entry in latest.values()}
-    if verdicts & DISSENT_VERDICTS:
+    if malformed_dissent or verdicts & DISSENT_VERDICTS:
         return "dissent"
+    if malformed_other or not recorder:
+        return "none"
     return "agree" if "agree" in verdicts else "none"
 
 
@@ -926,6 +981,7 @@ def build_summary(root: Path) -> dict:
         component_version = tool_versions.get(component_id)
         platform_bucket["receipts"].append({
             "path": relative,
+            "host_id": host.get("host_id") if isinstance(host.get("host_id"), str) else None,
             "stage": stage,
             "result": result,
             "evidence_class": evidence_class,

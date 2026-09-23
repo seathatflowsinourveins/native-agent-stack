@@ -799,6 +799,39 @@ class RecorderRoundTripTests(unittest.TestCase):
             exit_code = _run_cli(argv, identity=reviewer)
         return exit_code, review_buffer.getvalue()
 
+    def test_a_claude_session_cannot_pose_as_another_identity(self):
+        # Review of #117 finding 3: with the session id set, --identity is refused.
+        buffer = io.StringIO()
+        with mock.patch.dict(os.environ, {hr.IDENTITY_ENV: "session-a"}), contextlib.redirect_stdout(buffer):
+            exit_code = hr.main([
+                "record", "--root", str(self.root), "--host-id", "test-host-20260101",
+                "--platform-id", "linux-wsl2-x86_64", "--component-id", "widget", "--stage", "use",
+                "--evidence-class", "synthetic", "--from-stack-commands", "--identity", "someone-else",
+            ])
+        self.assertEqual(exit_code, 2, buffer.getvalue())
+        self.assertIn("--identity is for sessions without", buffer.getvalue())
+
+    def test_identity_is_normalized(self):
+        with mock.patch.dict(os.environ, {}, clear=True):
+            self.assertEqual(hr.resolve_identity("Alice"), hr.resolve_identity("  alice "))
+            self.assertEqual(hr.resolve_identity("\uff21lice"), hr.resolve_identity("alice"))  # NFKC fullwidth A
+            self.assertIsNone(hr.resolve_identity("   "))
+
+    def test_record_refuses_a_version_without_a_digit(self):
+        buffer = io.StringIO()
+        with contextlib.redirect_stdout(buffer):
+            exit_code = self._run([
+                "record", "--root", str(self.root), "--host-id", "test-host-20260101",
+                "--platform-id", "linux-wsl2-x86_64", "--component-id", "widget", "--stage", "use",
+                "--evidence-class", "synthetic", "--from-stack-commands", "--component-version", "unpinned",
+            ])
+        self.assertEqual(exit_code, 2, buffer.getvalue())
+
+    def test_default_version_prefers_the_landscape_pin_over_the_stack_version(self):
+        (self.root / "catalogs" / "landscape" / "foundation.json").write_text(json.dumps({"layers": [
+            {"winners": [{"component_id": "widget", "pin": "v1.0.0"}]}]}), encoding="utf-8")
+        self.assertEqual(hr.catalog_component_version(self.root, "widget"), "v1.0.0")
+
     def test_review_from_the_recorders_identity_is_refused(self):
         exit_code, output = self._record_then_review(reviewer="test-recorder")
         self.assertEqual(exit_code, 2, output)
@@ -864,6 +897,22 @@ class ReviewIndependenceTests(unittest.TestCase):
     def test_review_dated_before_the_observation_does_not_count(self):
         receipt = self._receipt([self._review(self.OTHER, at_utc="2025-12-31T23:00:00Z")])
         self.assertEqual(hr.review_state(receipt), "none")
+
+    def test_a_malformed_dissent_still_vetoes_and_cannot_be_withdrawn(self):
+        # Review of #117 finding 4.
+        for dissent in (self._review(None, "disagree"), self._review(self.RECORDER, "needs_changes"),
+                        self._review(self.OTHER, "disagree", "2025-12-31T23:00:00Z")):
+            receipt = self._receipt([self._review(self.THIRD), dissent,
+                                     self._review(self.OTHER, "agree", "2026-01-01T05:00:00Z")])
+            self.assertEqual(hr.review_state(receipt), "dissent", dissent)
+
+    def test_a_malformed_agree_keeps_the_state_from_agree(self):
+        receipt = self._receipt([self._review(self.OTHER), self._review(None)])
+        self.assertEqual(hr.review_state(receipt), "none")
+
+    def test_a_dissent_without_recorded_by_still_vetoes(self):
+        receipt = self._receipt([self._review(self.OTHER, "disagree")], recorded_by=False)
+        self.assertEqual(hr.review_state(receipt), "dissent")
 
     def test_receipt_without_recorded_by_has_no_independent_review(self):
         self.assertEqual(hr.review_state(self._receipt([self._review(self.OTHER)], recorded_by=False)), "none")

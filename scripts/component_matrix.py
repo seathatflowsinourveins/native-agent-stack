@@ -186,13 +186,11 @@ def platform_receipt_info(receipts_summary: dict, component_id: str, platform_ke
 
 
 def build_winner(winner: dict, decisions: dict[str, list[dict]], receipts_summary: dict,
-                 status_context: platform_evidence.StatusContext | None = None):
+                 status_context: platform_evidence.StatusContext):
     """Per-platform catalog status, the status the evidence derives (scripts/platform_status.py),
     receipt counts and e2e_state. ``host_verified`` means the derived status is ``accepted``
     on the strength of a host receipt; otherwise e2e_state is the declared catalog status."""
     component_id = winner.get("component_id")
-    if status_context is None:
-        status_context = platform_evidence.StatusContext(summary=receipts_summary, registered_paths=frozenset())
     platforms: dict[str, dict] = {}
     violations: list[str] = []
     for platform_key in sorted(PLATFORM_KEYS):
@@ -247,6 +245,8 @@ def build_row(root: Path, catalog: str, layer: dict, decisions: dict[str, list[d
               gap_counts: dict[tuple[str, str], int], receipts_summary: dict,
               repo_to_component: dict[str, str], open_gap_counts: dict[tuple[str, str], int] | None = None,
               status_context: platform_evidence.StatusContext | None = None):
+    if status_context is None:
+        status_context = platform_evidence.load_context(root)
     layer_id = layer.get("layer_id")
     independent_review = classify_independent_review(layer)
     adjudication_ref = find_adjudication_ref(root, catalog, layer_id, layer)
@@ -462,8 +462,10 @@ def render_markdown(document: dict) -> str:
         "pin in `tool_versions`, declares `host.second_physical_machine: true`, has `host.os`/"
         "`host.architecture` consistent with `adoption/manifest.json`'s `platform_profiles[]` entry, and "
         "carries an `agree` review from a reviewer identity other than the recorder's with no standing "
-        "`disagree`/`needs_changes` review; a later such receipt that fails supersedes it. `conditional` needs "
-        "any pin-bound passing receipt. Never edit `platform_status` in the landscape files to make this page "
+        "`disagree`/`needs_changes` review. A `native_proven` `use`/`install` fail that is the latest receipt for "
+        "its host and stage blocks `accepted` until that host records a later pass. `conditional` needs a "
+        "pin-bound, non-`synthetic` pass from a declared second physical machine with no standing dissent. "
+        "Never edit `platform_status` in the landscape files to make this page "
         "pass; add the underlying host receipt instead, following "
         "[`docs/contributing-evidence.md`](contributing-evidence.md).",
         "",

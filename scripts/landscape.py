@@ -43,9 +43,10 @@ PLATFORM_ALLOWED = {
     "macos-arm64": {"accepted", "conditional", "not_established", "untested"},
 }
 # Platforms whose declared status may not outrank what scripts/platform_status.py derives
-# from the host receipts and registered evidence. Linux joins once the layer rows are
-# re-recorded through that same function (13 Linux "accepted" rows at 38847e5 cite no
-# registered evidence/ file and would derive "conditional").
+# from the host receipts and registered evidence. Linux joins once record_verdicts.py derives
+# rows through that same function and they are re-recorded (agent-lab-17's verdict-integrity
+# change; 13 Linux "accepted" rows at 38847e5 cite no registered evidence/ file and would
+# derive "conditional").
 ENFORCED_PLATFORMS = {"macos-arm64"}
 OVERTURN_MARKERS = ("fixtures/", "blueprints/", "tests/", "python3 ", "node ")
 
@@ -82,7 +83,7 @@ def https_url(value):
 
 
 def validate_verdict_row(row, key, *, root, identities, aliases, evidence, recipe_map, sota_pins,
-                          status_context=None):
+                          status_context):
     """Layer-verdict schema v2 checks for a single landscape row. ``evidence``
     is the confined evidence()/track() helper already bound to this run; a
     winner/alternative's ``evidence_refs`` may be an empty list (schema v2
@@ -174,7 +175,7 @@ def validate_verdict_row(row, key, *, root, identities, aliases, evidence, recip
             require(value in PLATFORM_ALLOWED[platform],
                     str(key) + ".winner.platform_status." + platform + " must be one of "
                     + ", ".join(sorted(PLATFORM_ALLOWED[platform])))
-            if platform in ENFORCED_PLATFORMS and status_context is not None:
+            if platform in ENFORCED_PLATFORMS:
                 error = platform_evidence.declared_status_error(platform, value, winner, status_context)
                 require(error is None, str(key) + ".winner " + str(winner.get("component_id")) + ": " + str(error))
 
