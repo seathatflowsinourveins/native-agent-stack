@@ -86,10 +86,11 @@ jobs:
       - name: Check the new-host grand list is current
         run: python3 scripts/new_host_grand_list.py --check
       - name: Report layer-winner rows whose evidence could flip their platform_status (report-only)
+        shell: bash
         run: python3 scripts/verdict_flip_candidates.py | tee -a "$GITHUB_STEP_SUMMARY"
-      - name: Check the gap crosswalk is current
+      - name: Check the gap crosswalk reproduces from its fixed source revision (92bb279; does not detect drift against current open_gaps)
         run: python3 tools/sota-convergence/gap_crosswalk.py build --check
-      - name: Check the gap-resolution wave ledger is current
+      - name: Check the gap-resolution wave ledger reproduces from its checked-in receipts (does not detect drift against the current crosswalk)
         # The exact invocation that reproduces the checked-in combined ledger
         # (catalogs/landscape/gap-wave2-20260923+gap-wave3-20260923--gap-resolution.json);
         # --wave/--owner are required by the script and there is no single canonical
