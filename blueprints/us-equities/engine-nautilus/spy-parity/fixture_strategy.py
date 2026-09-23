@@ -6,23 +6,28 @@ Decision semantics reproduced from the frozen plan:
 * the intent is formed on the completed 16:00 New York bar (the hourly row whose
   local start is 15:00), sized ``floor(equity * target * 0.98 / price)`` with the
   decision bar's close as the decision price and integer shares;
-* the order is submitted on a strictly later bar - the first completed bar of the
-  next session - so no fill can consume the decision bar;
+* no fill may consume the decision bar (``check_causality``);
 * accounting is ``Decimal`` throughout; nothing is inferred from float reports.
 
-Two mapping rows could not be expressed on the pinned engine and are recorded
-here rather than approximated (see ``mapping-manifest.json``):
+Mapping manifest v2 (``mapping-manifest-v2.json``) preregisters the two rows v1
+declared unsupported, and this fixture implements them exactly as specified:
 
-* ``market_on_open_proxy`` is **unsupported**. ``TimeInForce.AT_THE_OPEN`` is
-  rejected by the pinned simulated exchange, and a market order pending before a
-  bar still fills at that bar's close. The fixture therefore fills at the close
-  of the next session's first hourly bar, which reproduces LEAN's fill *instant*
-  (10:00 New York) but not LEAN's fill *price* (that bar's open). The resulting
-  price difference is a declared deviation, never a tolerance.
-* ``distributions_and_cash`` is **unsupported**. The pinned wheel exposes no
-  dividend or cash-distribution mechanism, so no balancing cash entry is injected
-  into the engine. Distribution cash is kept as a separate external ``Decimal``
-  ledger and reported beside the native account, never merged into it silently.
+* ``market_on_open_proxy`` (**preregistered**): from the decision bar's own
+  ``on_bar`` the fixture submits one native OCO pair (``ContingencyType.OCO``,
+  one ``order_list_id``, reciprocal ``linked_order_ids``) of a STOP_MARKET and a
+  MARKET_IF_TOUCHED order in the intent's direction, each for the full intent
+  quantity, ``GTC``, ``TriggerType.DEFAULT``, not reduce-only, with triggers at
+  the decision close +/- one tick (0.0001). The matching engine's gap-open trade
+  tick fills whichever leg the next session's first-bar open crosses, at that
+  open, and the engine's OCO contingency cancels the sibling. No order is
+  submitted on a later bar, no tick or bar is injected, and no strategy-level
+  cancel stands in for the native OCO. The proxy is only faithful when the open
+  differs from the decision close by at least one tick; ``compare.py`` checks
+  that per event.
+* ``distributions_and_cash`` (**preregistered**): cash is posted by the venue's
+  ``DistributionModule`` (``distribution_module.py``), never by this strategy.
+  The strategy only registers one no-op time alert at each ex-date instant so the
+  engine has a timestamp at which to run its venue modules there.
 
 Nautilus is imported inside ``build_strategy`` so the pure decision, causality
 and ledger helpers stay importable without the engine.
@@ -32,8 +37,11 @@ from __future__ import annotations
 from decimal import Decimal
 
 DECISION_LOCAL_START = "15:00"  # the hourly row that completes at 16:00 New York
-MARKET_ON_OPEN_PROXY = "unsupported"
-NATIVE_CASH_POSTING = "unsupported"
+MARKET_ON_OPEN_PROXY = "preregistered"
+NATIVE_CASH_POSTING = "preregistered"
+TICK = Decimal("0.0001")  # the instrument's declared price_increment
+STOP_MARKET = "STOP_MARKET"
+MARKET_IF_TOUCHED = "MARKET_IF_TOUCHED"
 
 
 def decision_rows(rows, decision_dates) -> dict:
@@ -48,6 +56,30 @@ def decision_rows(rows, decision_dates) -> dict:
     if missing:
         raise ValueError("missing_decision_bar:" + ",".join(missing))
     return found
+
+
+def oco_triggers(quantity: int, close: Decimal, tick: Decimal = TICK) -> dict:
+    """Trigger prices of the market_on_open_proxy pair from the decision close.
+
+    BUY: stop at C + tick, MIT at C - tick. SELL: stop at C - tick, MIT at C + tick.
+    Both lie strictly outside the engine's last price C, so neither leg can fill
+    on the decision bar, and they depend on nothing later than that close.
+    """
+    if quantity == 0:
+        raise ValueError("zero_intent_quantity")
+    close, tick = Decimal(close), Decimal(tick)
+    if quantity > 0:
+        return {STOP_MARKET: close + tick, MARKET_IF_TOUCHED: close - tick}
+    return {STOP_MARKET: close - tick, MARKET_IF_TOUCHED: close + tick}
+
+
+def check_decision_bar_is_session_final(rows, index: int) -> None:
+    """The pair must rest when the next session's first bar is processed."""
+    row = rows[index]
+    if index + 1 >= len(rows):
+        raise ValueError("decision_bar_is_last_row:" + row["session_date"])
+    if rows[index + 1]["session_date"] == row["session_date"]:
+        raise ValueError("decision_bar_not_session_final:" + row["session_date"])
 
 
 def target_quantity(equity: Decimal, target: Decimal, buffer: Decimal, price: Decimal) -> int:
@@ -123,10 +155,12 @@ def check_final_state(pending, open_orders: int, open_positions: int, position) 
 
 
 def distribution_ledger(distributions, fills) -> list[dict]:
-    """Eligible holdings and cash per derived distribution.
+    """External cross-check: holdings implied by the fixture's own fills.
 
-    ``engine_posted`` stays false: the pinned engine has no cash-distribution
-    mechanism, so this ledger is external evidence beside the native account.
+    Never used to post or size a distribution. v2 posts through the venue's
+    ``DistributionModule``, whose eligible quantity is the engine's own position
+    (see ``posted_distribution_ledger``); this ledger only lets the receipt show
+    that the two agree.
     """
     ledger = []
     for distribution in distributions:
@@ -138,6 +172,25 @@ def distribution_ledger(distributions, fills) -> list[dict]:
                        "per_share": str(per_share), "quantity": str(held),
                        "amount": str(held * per_share), "engine_posted": False})
     return ledger
+
+
+def posted_distribution_ledger(emissions, acknowledgements) -> list[dict]:
+    """The distribution ledger as the engine posted it through the module.
+
+    ``engine_posted`` is true only when the emission was on time and every
+    acknowledgement outcome for its ex-date reports ``applied`` with no error.
+    """
+    applied = {}
+    for record in acknowledgements:
+        ok = bool(record["outcomes"]) and all(o["applied"] and o["error"] is None
+                                              for o in record["outcomes"])
+        for ex_date in record["ex_dates"]:
+            applied[ex_date] = ok
+    return [{"ex_date": e["ex_date"], "utc_seconds": e["ts_now_ns"] // 10 ** 9,
+             "ts_event_ns": e["ts_now_ns"], "per_share": e["per_share"],
+             "quantity": str(e["eligible_quantity"]), "amount": e["amount"],
+             "engine_posted": bool(e["on_time"] and applied.get(e["ex_date"], False)),
+             "source": "DistributionModule.process"} for e in emissions]
 
 
 def cash_ledger(initial_cash: Decimal, fills, distributions) -> list[dict]:
@@ -156,10 +209,17 @@ def cash_ledger(initial_cash: Decimal, fills, distributions) -> list[dict]:
     return ledger
 
 
-def build_strategy(equity_id, bar_type_str, rows, case):
-    """Return the native Strategy class bound to this frozen case."""
+def build_strategy(equity_id, bar_type_str, rows, case, ex_instants_ns=()):
+    """Return the native Strategy class bound to this frozen case.
+
+    ``ex_instants_ns`` are the DistributionModule's ex-date instants; the
+    strategy registers one no-op time alert at each and does nothing else there.
+    """
     from nautilus_trader.config import StrategyConfig
-    from nautilus_trader.model import BarType, OrderSide, Quantity
+    from nautilus_trader.core import UUID4
+    from nautilus_trader.model import (BarType, ClientOrderId, ContingencyType, MarketIfTouchedOrder,
+                                       OrderListId, OrderSide, Price, Quantity, StopMarketOrder,
+                                       TimeInForce, TriggerType)
     from nautilus_trader.trading import Strategy
 
     bar_type = BarType.from_str(bar_type_str)
@@ -167,6 +227,8 @@ def build_strategy(equity_id, bar_type_str, rows, case):
     target = Decimal(case["target"])
     buffer = Decimal(case["sizing_buffer"])
     initial_cash = Decimal(case["initial_cash_usd"])
+    alerts = [int(ns) for ns in ex_instants_ns]
+    price_format = "." + str(-TICK.as_tuple().exponent) + "f"
 
     class OneZeroFixture(Strategy):
         def __init__(self):
@@ -177,6 +239,9 @@ def build_strategy(equity_id, bar_type_str, rows, case):
             self.order_events = []
             self.buying_power_events = []
             self.latch_events = []
+            self.oco_pairs = []
+            self.alerts_registered = []
+            self.alerts_fired = []
             self.pending = None
             self.position = Decimal(0)
             self.cash = initial_cash
@@ -186,7 +251,20 @@ def build_strategy(equity_id, bar_type_str, rows, case):
             self.last_session = None
 
         def on_start(self):
-            self.subscribe_bars(bar_type)
+            try:
+                self.subscribe_bars(bar_type)
+                for instant in alerts:
+                    name = "ex_date_" + str(instant)
+                    self.clock.set_time_alert_ns(name, instant, self._on_ex_date_alert, allow_past=False)
+                    self.alerts_registered.append({"name": name, "alert_time_ns": instant})
+            except BaseException as error:
+                self._record("on_start", error)
+                raise
+
+        def _on_ex_date_alert(self, event):
+            # No-op by design: the alert only gives the engine a timestamp at
+            # which run_venue_modules executes. No cash, order or state change.
+            self.alerts_fired.append({"name": str(event.name), "ts_event_ns": int(event.ts_event)})
 
         def _record(self, callback, error):
             """The engine swallows callback exceptions; keep the evidence."""
@@ -208,14 +286,14 @@ def build_strategy(equity_id, bar_type_str, rows, case):
 
         def _handle_bar(self, bar):
             self.bars_seen += 1
-            row = rows[self.bars_seen - 1]
+            index = self.bars_seen - 1
+            row = rows[index]
             if row["ts_event_ns"] != bar.ts_event:
                 raise ValueError("bar_stream_desync:" + row["session_date"])
-            # Submit a decision taken on an earlier session on the first bar of
-            # the next session. This is strictly after the decision bar.
-            if self.pending is not None and row["session_date"] != self.pending["session_date"]:
-                self._submit(row)
             if row["local_start"] == DECISION_LOCAL_START and row["session_date"] in decisions:
+                check_decision_bar_is_session_final(rows, index)
+                if Decimal(str(bar.close)) != Decimal(row["c"]):
+                    raise ValueError("decision_close_mismatch:" + row["session_date"])
                 self._decide(row)
             self.last_session = row["session_date"]
 
@@ -234,33 +312,74 @@ def build_strategy(equity_id, bar_type_str, rows, case):
                 "quantity": int(delta), "target": str(target if wanted else Decimal(0)),
                 "decision_price": str(price), "decision_equity": str(equity),
                 "reason": "entry" if wanted else "exit"})
-            self.pending = {"order_ref": self.order_ref, "quantity": int(delta),
-                            "session_date": row["session_date"]}
+            self._submit_oco(self.order_ref, int(delta), price, row)
 
-        def _submit(self, row):
-            pending = self.pending
-            self.pending = None
-            side = OrderSide.BUY if pending["quantity"] > 0 else OrderSide.SELL
-            order = self.order_factory.market(equity_id, side, Quantity.from_int(abs(pending["quantity"])))
-            self.submitted[order.client_order_id.value] = {
-                "order_ref": pending["order_ref"], "submitted_session": row["session_date"],
-                "submitted_ts_event_ns": row["ts_event_ns"]}
-            self.submit_order(order)
+        def _submit_oco(self, order_ref, quantity, close, row):
+            """Submit the preregistered native OCO pair from the decision bar."""
+            triggers = oco_triggers(quantity, close)
+            side = OrderSide.BUY if quantity > 0 else OrderSide.SELL
+            list_id = OrderListId("OL-" + str(order_ref))
+            ids = {STOP_MARKET: ClientOrderId("O-" + str(order_ref) + "-STOP"),
+                   MARKET_IF_TOUCHED: ClientOrderId("O-" + str(order_ref) + "-MIT")}
+            ts_init = self.clock.timestamp_ns()
+            common = dict(trader_id=self.trader_id, strategy_id=self.strategy_id,
+                          instrument_id=equity_id, order_side=side,
+                          quantity=Quantity.from_int(abs(quantity)),
+                          trigger_type=TriggerType.DEFAULT, time_in_force=TimeInForce.GTC,
+                          reduce_only=False, quote_quantity=False, ts_init=ts_init,
+                          contingency_type=ContingencyType.OCO, order_list_id=list_id)
+            stop = StopMarketOrder(
+                client_order_id=ids[STOP_MARKET],
+                trigger_price=Price.from_str(format(triggers[STOP_MARKET], price_format)),
+                init_id=UUID4(), linked_order_ids=[ids[MARKET_IF_TOUCHED]], **common)
+            touched = MarketIfTouchedOrder(
+                client_order_id=ids[MARKET_IF_TOUCHED],
+                trigger_price=Price.from_str(format(triggers[MARKET_IF_TOUCHED], price_format)),
+                init_id=UUID4(), linked_order_ids=[ids[STOP_MARKET]], **common)
+            legs = []
+            for leg_type, order in ((STOP_MARKET, stop), (MARKET_IF_TOUCHED, touched)):
+                sibling = MARKET_IF_TOUCHED if leg_type == STOP_MARKET else STOP_MARKET
+                self.submitted[order.client_order_id.value] = {
+                    "order_ref": order_ref, "leg": leg_type, "order_list_id": list_id.value,
+                    "trigger_price": str(order.trigger_price), "submitted_session": row["session_date"],
+                    "submitted_ts_event_ns": row["ts_event_ns"]}
+                legs.append({"client_order_id": order.client_order_id.value, "order_type": leg_type,
+                             "side": "BUY" if quantity > 0 else "SELL", "quantity": abs(quantity),
+                             "trigger_price": str(order.trigger_price),
+                             "expected_trigger_price": format(triggers[leg_type], price_format),
+                             "trigger_type": "DEFAULT", "time_in_force": "GTC", "reduce_only": False,
+                             "contingency_type": "OCO", "order_list_id": list_id.value,
+                             "linked_order_ids": [ids[sibling].value]})
+            self.oco_pairs.append({"order_ref": order_ref, "order_list_id": list_id.value,
+                                   "reference_close": str(close),
+                                   "decision_session": row["session_date"],
+                                   "submitted_ts_event_ns": row["ts_event_ns"],
+                                   "submitted_clock_ns": ts_init, "legs": legs})
+            self.submit_order(stop)
+            self.submit_order(touched)
 
         def _handle_order_event(self, event):
             name = type(event).__name__
-            record = {"event": name, "ts_event_ns": event.ts_event,
-                      "client_order_id": getattr(event, "client_order_id", None)}
-            record["client_order_id"] = str(record["client_order_id"])
-            self.order_events.append(record)
+            client_order_id = str(getattr(event, "client_order_id", None))
+            mapped = self.submitted.get(client_order_id)
+            record = {"event": name, "ts_event_ns": event.ts_event, "client_order_id": client_order_id,
+                      "order_ref": mapped["order_ref"] if mapped else None,
+                      "leg": mapped["leg"] if mapped else None,
+                      "order_list_id": mapped["order_list_id"] if mapped else None}
             reason = str(getattr(event, "reason", "") or "")
+            if name in ("OrderDenied", "OrderRejected", "OrderCanceled", "OrderModifyRejected",
+                        "OrderCancelRejected", "OrderExpired"):
+                record["reason"] = reason
+            if name == "OrderFilled":
+                record["last_qty"] = str(event.last_qty)
+                record["last_px"] = str(event.last_px)
+            self.order_events.append(record)
             if name in ("OrderDenied", "OrderRejected"):
                 self.buying_power_events.append({**record, "reason": reason})
             if name != "OrderFilled":
                 return
-            mapped = self.submitted.get(str(event.client_order_id))
             if mapped is None:
-                raise ValueError("unmapped_fill:" + str(event.client_order_id))
+                raise ValueError("unmapped_fill:" + client_order_id)
             signed = Decimal(str(event.last_qty)) * (1 if str(event.order_side) == "BUY" else -1)
             price = Decimal(str(event.last_px))
             commission = str(event.commission) if event.commission is not None else "0 " + case["currency"]
@@ -273,8 +392,11 @@ def build_strategy(equity_id, bar_type_str, rows, case):
                                "fee": str(fee), "instrument_id": str(event.instrument_id),
                                "currency": str(event.currency), "side": str(event.order_side),
                                "venue_order_id": str(event.venue_order_id),
+                               "client_order_id": client_order_id, "leg": mapped["leg"],
+                               "order_list_id": mapped["order_list_id"],
+                               "trigger_price": mapped["trigger_price"],
                                "submitted_session": mapped["submitted_session"],
-                               "fill_source": "next_session_first_bar_close",
+                               "fill_source": "native_oco_leg",
                                "market_on_open_proxy": MARKET_ON_OPEN_PROXY})
 
     return OneZeroFixture

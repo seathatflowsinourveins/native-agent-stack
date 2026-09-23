@@ -26,10 +26,15 @@ def _load(name, path):
 
 CONVERT = _load("spy_parity_convert", SOURCE / "convert.py")
 FIXTURE = _load("spy_parity_fixture", SOURCE / "fixture_strategy.py")
+DISTRIBUTION = _load("spy_parity_distribution", SOURCE / "distribution_module.py")
 COMPARE = _load("spy_parity_compare", SOURCE / "compare.py")
 RUN = _load("spy_parity_run", SOURCE / "run.py")
 TOLERANCES = json.loads((SOURCE / "tolerances.json").read_text())["limits"]
 MANIFEST = json.loads((SOURCE / "mapping-manifest.json").read_text())
+MANIFEST_V2 = json.loads((SOURCE / "mapping-manifest-v2.json").read_text())
+EFFECTIVE_V2 = COMPARE.effective_manifest(MANIFEST_V2, MANIFEST)
+RECEIPT_V2 = SOURCE / "receipt-v2.json"
+VERDICT_V2 = SOURCE / "verdict-v2.json"
 LEAN_RECEIPT = ROOT / "blueprints/us-equities/historical-simulation/receipt.json"
 
 
@@ -665,14 +670,22 @@ class OracleSchemaTests(unittest.TestCase):
 
 
 class BindingTests(unittest.TestCase):
+    """Binding checks against the published v2 receipt and the files on disk.
+
+    The v1 receipt stays bound to the pre-v2 harness; see V1ReceiptProvenanceTests.
+    """
+
+    MANIFEST_PATH = SOURCE / "mapping-manifest-v2.json"
+
     def setUp(self):
-        self.receipt = json.loads((SOURCE / "receipt.json").read_text())
+        self.receipt = json.loads(RECEIPT_V2.read_text())
 
     def test_bind_accepts_the_files_the_receipt_recorded(self):
-        limits, manifest = COMPARE.bind(self.receipt, SOURCE / "tolerances.json",
-                                        SOURCE / "mapping-manifest.json")
+        limits, manifest = COMPARE.bind(self.receipt, SOURCE / "tolerances.json", self.MANIFEST_PATH)
         self.assertEqual(set(limits), set(COMPARE.REQUIRED_LIMITS))
         self.assertEqual(manifest["case"], "one_zero")
+        # The effective manifest carries v1's unchanged rows, so short sessions resolve.
+        self.assertEqual(COMPARE.known_short_sessions(manifest), {"2019-12-24": 4})
 
     def test_bind_refuses_a_sheet_or_manifest_the_run_did_not_use(self):
         for key, code in (("tolerances", "tolerances_sha256_mismatch"),
@@ -680,20 +693,25 @@ class BindingTests(unittest.TestCase):
             receipt = json.loads(json.dumps(self.receipt))
             receipt[key]["sha256"] = "0" * 64
             with self.subTest(key=key), self.assertRaisesRegex(ValueError, code):
-                COMPARE.bind(receipt, SOURCE / "tolerances.json", SOURCE / "mapping-manifest.json")
+                COMPARE.bind(receipt, SOURCE / "tolerances.json", self.MANIFEST_PATH)
+
+    def test_a_v2_receipt_is_refused_against_the_v1_manifest(self):
+        receipt = json.loads(json.dumps(self.receipt))
+        receipt["mapping_manifest"]["sha256"] = hashlib.sha256(
+            (SOURCE / "mapping-manifest.json").read_bytes()).hexdigest()
+        with self.assertRaisesRegex(ValueError, "v2_receipt_bound_to_a_v1_manifest"):
+            COMPARE.bind(receipt, SOURCE / "tolerances.json", SOURCE / "mapping-manifest.json")
 
     def test_bind_pins_the_lean_oracle_receipt(self):
         oracle = ROOT / "blueprints/us-equities/historical-simulation/receipt.json"
         self.assertEqual(hashlib.sha256(oracle.read_bytes()).hexdigest(),
-                         MANIFEST["oracle"]["receipt_sha256"])
-        COMPARE.bind(self.receipt, SOURCE / "tolerances.json",
-                     SOURCE / "mapping-manifest.json", oracle)
+                         MANIFEST_V2["oracle"]["receipt_sha256"])
+        COMPARE.bind(self.receipt, SOURCE / "tolerances.json", self.MANIFEST_PATH, oracle)
         with tempfile.TemporaryDirectory() as tmp:
             other = Path(tmp) / "receipt.json"
             other.write_text(oracle.read_text() + "\n")
             with self.assertRaisesRegex(ValueError, "oracle_receipt_sha256_mismatch"):
-                COMPARE.bind(self.receipt, SOURCE / "tolerances.json",
-                             SOURCE / "mapping-manifest.json", other)
+                COMPARE.bind(self.receipt, SOURCE / "tolerances.json", self.MANIFEST_PATH, other)
 
     def test_bind_refuses_a_receipt_that_disagrees_with_the_manifest(self):
         cases = {
@@ -706,7 +724,20 @@ class BindingTests(unittest.TestCase):
             receipt = json.loads(json.dumps(self.receipt))
             receipt.update(override)
             with self.subTest(code=code), self.assertRaisesRegex(ValueError, code):
-                COMPARE.bind(receipt, SOURCE / "tolerances.json", SOURCE / "mapping-manifest.json")
+                COMPARE.bind(receipt, SOURCE / "tolerances.json", self.MANIFEST_PATH)
+
+    def test_bind_refuses_a_superseded_manifest_that_is_not_the_recorded_v1(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            (Path(tmp) / "mapping-manifest.json").write_text(
+                (SOURCE / "mapping-manifest.json").read_text() + "\n")
+            with self.assertRaisesRegex(ValueError, "superseded_manifest_sha256_mismatch"):
+                COMPARE.load_effective_v2(MANIFEST_V2, Path(tmp))
+
+    def test_bind_requires_every_v2_source_to_be_recorded(self):
+        receipt = json.loads(json.dumps(self.receipt))
+        del receipt["local_source_sha256"]["distribution_module.py"]
+        with self.assertRaisesRegex(ValueError, "local_source_not_recorded:distribution_module.py"):
+            COMPARE.bind(receipt, SOURCE / "tolerances.json", self.MANIFEST_PATH)
 
     def test_bind_verifies_the_harness_files_on_disk(self):
         COMPARE.check_local_sources(self.receipt)
@@ -725,17 +756,37 @@ class BindingTests(unittest.TestCase):
     def test_bind_pins_the_frozen_plan_and_case_configuration(self):
         plan = ROOT / "blueprints/us-equities/historical-simulation/plan.json"
         self.assertEqual(hashlib.sha256(plan.read_bytes()).hexdigest(),
-                         MANIFEST["oracle"]["plan_sha256"])
-        COMPARE.bind(self.receipt, SOURCE / "tolerances.json", SOURCE / "mapping-manifest.json",
+                         MANIFEST_V2["oracle"]["plan_sha256"])
+        COMPARE.bind(self.receipt, SOURCE / "tolerances.json", self.MANIFEST_PATH,
                      ROOT / "blueprints/us-equities/historical-simulation/receipt.json", plan)
         with tempfile.TemporaryDirectory() as tmp:
             other = Path(tmp) / "plan.json"
             other.write_text(plan.read_text() + "\n")
             with self.assertRaisesRegex(ValueError, "plan_sha256_mismatch"):
-                COMPARE.bind(self.receipt, SOURCE / "tolerances.json",
-                             SOURCE / "mapping-manifest.json", None, other)
+                COMPARE.bind(self.receipt, SOURCE / "tolerances.json", self.MANIFEST_PATH, None, other)
+
+    def test_v2_case_configuration_binds_the_explicit_venue_settings(self):
+        plan = json.loads((ROOT / "blueprints/us-equities/historical-simulation/plan.json").read_text())
+        COMPARE.check_case_configuration(self.receipt, EFFECTIVE_V2, plan)
+        cases = {
+            "case_configuration_disagrees_with_manifest:bar_adaptive_high_low_ordering":
+                {"bar_adaptive_high_low_ordering": True},
+            "case_configuration_disagrees_with_manifest:reject_stop_orders":
+                {"reject_stop_orders": False},
+            "case_configuration_disagrees_with_manifest:support_contingent_orders":
+                {"support_contingent_orders": False},
+            "case_configuration_disagrees_with_manifest:latency_model": {"latency_model": "fixed"},
+            "case_configuration_disagrees_with_manifest:venue_modules":
+                {"venue_modules": ["DistributionModule", "Other"]},
+        }
+        for code, override in cases.items():
+            receipt = json.loads(json.dumps(self.receipt))
+            receipt["case_configuration"].update(override)
+            with self.subTest(code=code), self.assertRaisesRegex(ValueError, re.escape(code)):
+                COMPARE.check_case_configuration(receipt, EFFECTIVE_V2, plan)
 
     def test_case_configuration_must_match_the_plan_and_the_manifest(self):
+        self.receipt = json.loads((SOURCE / "receipt.json").read_text())
         plan = json.loads((ROOT / "blueprints/us-equities/historical-simulation/plan.json").read_text())
         COMPARE.check_case_configuration(self.receipt, MANIFEST, plan)
         cases = {
@@ -755,7 +806,7 @@ class BindingTests(unittest.TestCase):
 
     def test_a_receipt_pointing_at_another_plan_is_refused(self):
         plan = json.loads((ROOT / "blueprints/us-equities/historical-simulation/plan.json").read_text())
-        receipt = json.loads(json.dumps(self.receipt))
+        receipt = json.loads((SOURCE / "receipt.json").read_text())
         receipt["frozen_plan"]["sha256"] = "0" * 64
         with self.assertRaisesRegex(ValueError, "receipt_plan_sha256_disagrees_with_manifest"):
             COMPARE.check_case_configuration(receipt, MANIFEST, plan)
@@ -766,10 +817,38 @@ class BindingTests(unittest.TestCase):
             limits = dict(TOLERANCES)
             limits.pop("cash_usd_abs")
             sheet.write_text(json.dumps({"limits": limits, "status": "test"}))
-            receipt = json.loads(json.dumps(self.receipt))
+            receipt = json.loads((SOURCE / "receipt.json").read_text())
             receipt["tolerances"]["sha256"] = hashlib.sha256(sheet.read_bytes()).hexdigest()
             with self.assertRaisesRegex(ValueError, "tolerance_sheet_keys:cash_usd_abs"):
                 COMPARE.bind(receipt, sheet, SOURCE / "mapping-manifest.json")
+
+    def test_v2_refuses_a_sheet_other_than_the_one_the_manifest_froze(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            sheet = Path(tmp) / "tolerances.json"
+            sheet.write_text(json.dumps({"limits": dict(TOLERANCES, cash_usd_abs="1"),
+                                         "status": "retuned"}))
+            receipt = json.loads(json.dumps(self.receipt))
+            receipt["tolerances"]["sha256"] = hashlib.sha256(sheet.read_bytes()).hexdigest()
+            with self.assertRaisesRegex(ValueError, "tolerances_sha256_disagrees_with_manifest"):
+                COMPARE.bind(receipt, sheet, self.MANIFEST_PATH)
+
+
+class V1ReceiptProvenanceTests(unittest.TestCase):
+    """The v1 receipt and verdict stay published and bound to the pre-v2 harness."""
+
+    CHANGED_FOR_V2 = {"compare.py", "fixture_strategy.py", "run.py"}
+
+    def test_v1_receipt_is_bound_to_the_superseded_manifest(self):
+        receipt = json.loads((SOURCE / "receipt.json").read_text())
+        self.assertEqual(receipt["mapping_manifest"]["sha256"], MANIFEST_V2["supersedes"]["sha256"])
+        self.assertEqual(hashlib.sha256((SOURCE / "verdict.json").read_bytes()).hexdigest(),
+                         "b7b898a861492348ae864de25551c127a0367e4638ef5dfa65152f233a6b0d10")
+
+    def test_only_the_files_v2_names_changed_since_the_v1_receipt(self):
+        receipt = json.loads((SOURCE / "receipt.json").read_text())
+        changed = {name for name, recorded in receipt["local_source_sha256"].items()
+                   if hashlib.sha256((SOURCE / name).read_bytes()).hexdigest() != recorded}
+        self.assertEqual(changed, self.CHANGED_FOR_V2)
 
 
 class AttributionEvidenceBindingTests(unittest.TestCase):
@@ -936,6 +1015,373 @@ class ManifestTests(unittest.TestCase):
                 self.assertIn(row["status"], ("resolved", "unsupported", "blocked"))
                 self.assertTrue(row.get("decision"))
                 self.assertTrue(row.get("limitations"))
+
+# ---------------------------------------------------------------------------
+# Mapping manifest v2: synthetic boundary fixtures. These never run the engine.
+# ---------------------------------------------------------------------------
+
+ENTRY_CLOSE, EXIT_CLOSE = Decimal("321.8600"), Decimal("293.2100")
+V2_BARS = [
+    {"session_date": "2019-12-31", "local_start": "15:00", "ts_event_ns": ENTRY_INTENT_TS * 10 ** 9,
+     "o": "320.9400", "h": "322.1250", "l": "320.8900", "c": "321.8600", "v": 17744667},
+    {"session_date": "2020-01-02", "local_start": "09:00", "ts_event_ns": ENTRY_FILL_TS * 10 ** 9,
+     "o": "323.5800", "h": "324.0200", "l": "323.4100", "c": "323.8700", "v": 6498003},
+    {"session_date": "2020-01-02", "local_start": "10:00",
+     "ts_event_ns": (ENTRY_FILL_TS + 3600) * 10 ** 9,
+     "o": "323.8800", "h": "323.9000", "l": "322.6100", "c": "323.2500", "v": 7134452},
+    {"session_date": "2020-04-29", "local_start": "15:00", "ts_event_ns": EXIT_INTENT_TS * 10 ** 9,
+     "o": "293.9900", "h": "294.0000", "l": "293.0000", "c": "293.2100", "v": 1000000},
+    {"session_date": "2020-04-30", "local_start": "09:00", "ts_event_ns": EXIT_FILL_TS * 10 ** 9,
+     "o": "291.6900", "h": "291.7100", "l": "289.5800", "c": "290.0000", "v": 13673384},
+]
+
+
+def _pair(ref, quantity, close, ts):
+    side = "BUY" if quantity > 0 else "SELL"
+    triggers = FIXTURE.oco_triggers(quantity, close)
+    ids = {"STOP_MARKET": "O-%d-STOP" % ref, "MARKET_IF_TOUCHED": "O-%d-MIT" % ref}
+    legs = [{"client_order_id": ids[t], "order_type": t, "side": side, "quantity": abs(quantity),
+             "trigger_price": format(triggers[t], ".4f"), "trigger_type": "DEFAULT",
+             "time_in_force": "GTC", "reduce_only": False, "contingency_type": "OCO",
+             "order_list_id": "OL-%d" % ref,
+             "linked_order_ids": [ids["MARKET_IF_TOUCHED" if t == "STOP_MARKET" else "STOP_MARKET"]]}
+            for t in ("STOP_MARKET", "MARKET_IF_TOUCHED")]
+    return {"order_ref": ref, "order_list_id": "OL-%d" % ref, "reference_close": str(close),
+            "submitted_ts_event_ns": ts * 10 ** 9, "legs": legs}
+
+
+def _events(ref, decision_ts, fill_ts, fill_px, quantity, filled="STOP"):
+    other = "MIT" if filled == "STOP" else "STOP"
+    out = []
+    for leg in ("STOP", "MIT"):
+        for name in ("OrderInitialized", "OrderSubmitted", "OrderAccepted"):
+            out.append({"event": name, "client_order_id": "O-%d-%s" % (ref, leg),
+                        "ts_event_ns": decision_ts * 10 ** 9})
+    out.append({"event": "OrderFilled", "client_order_id": "O-%d-%s" % (ref, filled),
+                "ts_event_ns": fill_ts * 10 ** 9, "last_qty": str(abs(quantity)), "last_px": fill_px})
+    out.append({"event": "OrderCanceled", "client_order_id": "O-%d-%s" % (ref, other),
+                "ts_event_ns": fill_ts * 10 ** 9, "reason": ""})
+    return out
+
+
+def _v2_receipt(**overrides):
+    """A clean, internally consistent synthetic v2 receipt matching the predictions."""
+    distributions = [{"utc_seconds": DIVIDEND_ZERO_TS, "ts_event_ns": DIVIDEND_ZERO_TS * 10 ** 9,
+                      "ex_date": "2019-12-20", "per_share": "1.57", "quantity": "0",
+                      "amount": "0.00", "engine_posted": True},
+                     {"utc_seconds": DIVIDEND_TS, "ts_event_ns": DIVIDEND_TS * 10 ** 9,
+                      "ex_date": "2020-03-20", "per_share": "1.41", "quantity": "304",
+                      "amount": "428.64", "engine_posted": True}]
+    receipt = _receipt(MATCHED_FILLS, "428.64", distributions)
+    receipt["native_end_cash_usd"] = receipt["reconciled_end_cash_usd"]
+    receipt["schema_version"] = 2
+    receipt["intents"] = [dict(i, order_ref=n + 1, ts_event_ns=i["utc_seconds"] * 10 ** 9)
+                          for n, i in enumerate(receipt["intents"])]
+    receipt["oco_pairs"] = [_pair(1, 304, ENTRY_CLOSE, ENTRY_INTENT_TS),
+                            _pair(2, -304, EXIT_CLOSE, EXIT_INTENT_TS)]
+    receipt["order_events"] = (_events(1, ENTRY_INTENT_TS, ENTRY_FILL_TS, "323.5800", 304)
+                               + _events(2, EXIT_INTENT_TS, EXIT_FILL_TS, "291.6900", -304))
+    scan = {"lines": 227, "error_lines": 0, "negative_cash_lines": 0}
+    receipt["runs"] = [{"label": "run-1", "strategy_callback_errors": [], "engine_log_scan": scan},
+                       {"label": "run-2", "strategy_callback_errors": [], "engine_log_scan": scan}]
+    emissions = [{"ex_date": "2019-12-20", "ex_instant_ns": DIVIDEND_ZERO_TS * 10 ** 9,
+                  "ts_now_ns": DIVIDEND_ZERO_TS * 10 ** 9, "on_time": True, "eligible_quantity": 0,
+                  "per_share": "1.57", "amount": "0.00"},
+                 {"ex_date": "2020-03-20", "ex_instant_ns": DIVIDEND_TS * 10 ** 9,
+                  "ts_now_ns": DIVIDEND_TS * 10 ** 9, "on_time": True, "eligible_quantity": 304,
+                  "per_share": "1.41", "amount": "428.64"}]
+    receipt["distribution_module"] = {
+        "class": "DistributionModule", "venue_module_count": 1, "errors": [],
+        "calls_at_event_instants_ns": [DIVIDEND_ZERO_TS * 10 ** 9, DIVIDEND_TS * 10 ** 9],
+        "emissions": emissions,
+        "acknowledgements": [{"ex_dates": ["2019-12-20"], "outcomes": [{"applied": True, "error": None}]},
+                             {"ex_dates": ["2020-03-20"], "outcomes": [{"applied": True, "error": None}]}]}
+    receipt["native_account_event_rows"] = [
+        {"ts_event_ns": 1575298800 * 10 ** 9, "reported": True, "total": "100000.00"},
+        {"ts_event_ns": DIVIDEND_ZERO_TS * 10 ** 9, "reported": True, "total": "100000.00"},
+        {"ts_event_ns": ENTRY_FILL_TS * 10 ** 9, "reported": False, "total": "1631.68"},
+        {"ts_event_ns": DIVIDEND_TS * 10 ** 9, "reported": True, "total": "2060.32"},
+        {"ts_event_ns": EXIT_FILL_TS * 10 ** 9, "reported": False, "total": "90734.08"}]
+    receipt.update(overrides)
+    return receipt
+
+
+def _v2(receipt, bars=V2_BARS, manifest=EFFECTIVE_V2):
+    return COMPARE.compare(receipt, ORACLE, TOLERANCES, manifest, bars)
+
+
+def _failing_fields(verdict):
+    return {(c["id"], c["field"]) for c in verdict["checks"] if c["status"] == "FAIL"}
+
+
+class V2ControlTests(unittest.TestCase):
+    def test_a_receipt_meeting_every_criterion_passes(self):
+        verdict = _v2(_v2_receipt())
+        self.assertEqual(_failing_fields(verdict), set())
+        self.assertEqual(verdict["verdict"], "PASS")
+        self.assertTrue(verdict["complete"])
+        self.assertEqual(verdict["manifest_unsupported_mappings"], [])
+
+    def test_the_effective_manifest_declares_nothing_unsupported(self):
+        self.assertEqual(RUN.unsupported_mappings(EFFECTIVE_V2), [])
+        self.assertEqual(RUN.preregistered_mappings(EFFECTIVE_V2),
+                         ["decision_visibility", "distributions_and_cash", "market_on_open_proxy"])
+        self.assertEqual(RUN.known_short_sessions(EFFECTIVE_V2), {"2019-12-24": 4})
+        self.assertEqual(RUN.effective_manifest(MANIFEST_V2, MANIFEST), EFFECTIVE_V2)
+
+    def test_a_v1_style_close_fill_can_no_longer_be_attributed(self):
+        receipt = _v2_receipt()
+        receipt.update(_receipt(BLOCKED_FILLS, "428.64", receipt["distribution_ledger"]))
+        verdict = _v2(receipt)
+        self.assertEqual(verdict["verdict"], "FAIL")
+        self.assertEqual(verdict["blocking_mappings"], [])
+        self.assertIn("market_on_open_proxy", verdict["rejected_attributions"])
+
+    def test_missing_bars_leave_the_v2_comparison_incomplete(self):
+        verdict = _v2(_v2_receipt(), bars=None)
+        self.assertEqual(verdict["failed"], 0)
+        self.assertEqual(verdict["verdict"], "BLOCKED-INCOMPLETE")
+        self.assertFalse(verdict["complete"])
+
+
+class V2MarketOnOpenBoundaryTests(unittest.TestCase):
+    def test_no_gap_open_equal_to_the_decision_close_fails(self):
+        """open == C: the pair fills at a trigger, not the open (moo_proxy_no_gap)."""
+        bars = [dict(b) for b in V2_BARS]
+        bars[1].update(o="321.8600", l="321.5000")
+        receipt = _v2_receipt()
+        receipt["order_events"][6]["last_px"] = "321.8601"
+        receipt["fills"][0]["price"] = "321.8601"
+        verdict = _v2(receipt, bars)
+        failing = _failing_fields(verdict)
+        self.assertIn(("entry_oco", "moo_proxy_no_gap"), failing)
+        self.assertIn(("entry_oco", "moo_proxy_not_open"), failing)
+        self.assertEqual(verdict["verdict"], "FAIL")
+        self.assertEqual(verdict["blocking_mappings"], [])
+
+    def test_flat_bar_fill_in_a_later_bar_fails(self):
+        """open == high == low == close == C: the pair survives and fills a bar later."""
+        later = ENTRY_FILL_TS + 3600
+        bars = [dict(b) for b in V2_BARS]
+        bars[1].update(o="321.8600", h="321.8600", l="321.8600", c="321.8600")
+        receipt = _v2_receipt()
+        receipt["order_events"][6]["ts_event_ns"] = later * 10 ** 9
+        receipt["order_events"][7]["ts_event_ns"] = later * 10 ** 9
+        verdict = _v2(receipt, bars)
+        failing = _failing_fields(verdict)
+        self.assertIn(("entry_oco", "fill_in_tested_bar"), failing)
+        self.assertIn(("entry_oco", "moo_proxy_no_gap"), failing)
+        self.assertEqual(verdict["verdict"], "FAIL")
+
+    def test_double_fill_of_both_legs_fails(self):
+        receipt = _v2_receipt()
+        cancel = receipt["order_events"][7]
+        receipt["order_events"][7] = dict(cancel, event="OrderFilled", last_qty="304", last_px="323.5800")
+        failing = _failing_fields(_v2(receipt))
+        self.assertIn(("entry_oco", "fill_events"), failing)
+
+    def test_partial_fills_fail_even_when_they_sum_to_the_intent(self):
+        receipt = _v2_receipt()
+        fill = receipt["order_events"][6]
+        receipt["order_events"][6:7] = [dict(fill, last_qty="104"), dict(fill, last_qty="200")]
+        failing = _failing_fields(_v2(receipt))
+        self.assertIn(("entry_oco", "fill_events"), failing)
+
+    def test_denied_leg_and_missing_sibling_cancel_fail(self):
+        receipt = _v2_receipt()
+        receipt["order_events"][5] = dict(receipt["order_events"][5], event="OrderDenied")
+        del receipt["order_events"][7]
+        failing = _failing_fields(_v2(receipt))
+        self.assertIn(("entry_oco", "denied_or_rejected"), failing)
+        self.assertIn(("entry_oco", "legs_accepted"), failing)
+        self.assertIn(("entry_oco", "sibling_cancels"), failing)
+
+    def test_trigger_not_derived_from_the_decision_close_fails(self):
+        receipt = _v2_receipt()
+        receipt["oco_pairs"][0]["legs"][0]["trigger_price"] = "323.5700"
+        failing = _failing_fields(_v2(receipt))
+        self.assertIn(("entry_oco", "stop_market_trigger"), failing)
+
+    def test_a_strategy_level_pair_without_native_links_fails(self):
+        receipt = _v2_receipt()
+        receipt["oco_pairs"][0]["legs"][0]["linked_order_ids"] = []
+        failing = _failing_fields(_v2(receipt))
+        self.assertIn(("entry_oco", "oco_structure"), failing)
+
+    def test_an_error_log_line_fails(self):
+        receipt = _v2_receipt()
+        receipt["runs"][1]["engine_log_scan"] = {"lines": 228, "error_lines": 1, "negative_cash_lines": 1}
+        failing = _failing_fields(_v2(receipt))
+        self.assertIn(("engine_log", "run-2.error_lines"), failing)
+        self.assertIn(("engine_log", "run-2.negative_cash_lines"), failing)
+
+    def test_oco_trigger_rule_and_session_final_decision_bar(self):
+        self.assertEqual(FIXTURE.oco_triggers(304, Decimal("321.8600")),
+                         {"STOP_MARKET": Decimal("321.8601"), "MARKET_IF_TOUCHED": Decimal("321.8599")})
+        self.assertEqual(FIXTURE.oco_triggers(-304, Decimal("293.2100")),
+                         {"STOP_MARKET": Decimal("293.2099"), "MARKET_IF_TOUCHED": Decimal("293.2101")})
+        with self.assertRaisesRegex(ValueError, "zero_intent_quantity"):
+            FIXTURE.oco_triggers(0, Decimal("1"))
+        FIXTURE.check_decision_bar_is_session_final(V2_BARS, 0)
+        with self.assertRaisesRegex(ValueError, "decision_bar_not_session_final:2020-01-02"):
+            FIXTURE.check_decision_bar_is_session_final(V2_BARS, 1)
+        with self.assertRaisesRegex(ValueError, "decision_bar_is_last_row"):
+            FIXTURE.check_decision_bar_is_session_final(V2_BARS, len(V2_BARS) - 1)
+
+    def test_engine_log_scan_counts_error_and_negative_cash_lines(self):
+        text = ("2020-01-02T15:00:00Z [INFO] TRADER-001.X: ok\n"
+                "2020-01-02T15:00:00Z [ERROR] TRADER-001.Portfolio: "
+                "Cash account balance would become negative\n")
+        scan = RUN.scan_engine_log(text)
+        self.assertEqual((scan["lines"], scan["error_lines"], scan["negative_cash_lines"]), (2, 1, 1))
+        self.assertEqual(scan["lines_by_level"], {"ERROR": 1, "INFO": 1})
+
+
+class _Position:
+    def __init__(self, instrument_id, signed_qty):
+        self.instrument_id, self.signed_qty = instrument_id, signed_qty
+
+
+class V2DistributionBoundaryTests(unittest.TestCase):
+    SESSIONS = ["2030-01-02", "2030-01-03", "2030-01-04", "2030-01-07", "2030-01-08"]
+
+    def _rows(self, text):
+        return CONVERT.parse_factor_rows(text)
+
+    def test_one_zero_events_match_the_preregistered_window_events(self):
+        factors = CorporateActionTests.FACTORS
+        sessions = ["2019-11-29", "2019-12-02", "2019-12-19", "2019-12-20", "2020-03-19",
+                    "2020-03-20", "2020-04-30"]
+        events = DISTRIBUTION.derive_events(self._rows(factors), sessions, "2019-12-02", "2020-04-30")
+        row = next(m for m in MANIFEST_V2["mappings"] if m["id"] == "distributions_and_cash")
+        projected = [{k: e[k] for k in ("factor_row_date", "ex_date", "ex_instant_utc_seconds",
+                                        "pf0", "pf1", "ref0", "per_share")} for e in events]
+        self.assertEqual(projected, row["mechanism_rules"]["window_events_for_one_zero"])
+
+    def test_a_friday_row_pays_on_the_next_session_not_calendar_plus_one(self):
+        rows = self._rows("20300104,0.9900000,1,100.50\n20301231,1,1,0\n")
+        events = DISTRIBUTION.derive_events(rows, self.SESSIONS, "2030-01-03", "2030-01-08")
+        self.assertEqual([(e["ex_date"], e["calendar_plus_one"]) for e in events],
+                         [("2030-01-07", "2030-01-05")])
+        self.assertEqual(events[0]["ex_instant_ns"], DISTRIBUTION.ex_date_instant_ns("2030-01-07"))
+        # 100.50 * (1 - 0.99) = 1.005 exactly: one half-to-even rounding gives 1.00.
+        self.assertEqual(events[0]["per_share"], "1.00")
+
+    def test_a_calendar_plus_one_emission_is_refused_by_the_comparator(self):
+        manifest = json.loads(json.dumps(EFFECTIVE_V2))
+        monday = DISTRIBUTION.ex_date_instant_ns("2030-01-07") // 10 ** 9
+        saturday = DISTRIBUTION.ex_date_instant_ns("2030-01-05")
+        manifest["one_zero_predictions"]["distributions"][1]["ex_instant_utc_seconds"] = monday
+        receipt = _v2_receipt()
+        receipt["distribution_module"]["emissions"][1]["ts_now_ns"] = saturday
+        receipt["distribution_module"]["calls_at_event_instants_ns"][1] = saturday
+        failing = _failing_fields(_v2(receipt, manifest=manifest))
+        self.assertIn(("distribution_2", "emitted_at_ns"), failing)
+        self.assertIn(("distribution_2", "process_called_at_ex_instant"), failing)
+
+    def test_factor_rows_that_are_not_sessions_or_carry_splits_are_refused(self):
+        with self.assertRaisesRegex(ValueError, "factor_row_not_a_session:2030-01-05"):
+            DISTRIBUTION.derive_events(self._rows("20300105,0.99,1,100\n20301231,1,1,0\n"),
+                                       self.SESSIONS, "2030-01-03", "2030-01-08")
+        with self.assertRaisesRegex(ValueError, "unexpected_split:2030-01-04"):
+            DISTRIBUTION.derive_events(self._rows("20300104,0.99,1,100\n20301231,1,2,0\n"),
+                                       self.SESSIONS, "2030-01-03", "2030-01-08")
+        with self.assertRaisesRegex(ValueError, "nonpositive_distribution:2030-01-04"):
+            DISTRIBUTION.derive_events(self._rows("20300104,1.01,1,100\n20301231,1,1,0\n"),
+                                       self.SESSIONS, "2030-01-03", "2030-01-08")
+
+    def test_late_module_emission_is_detected_and_never_posted(self):
+        event = {"ex_date": "2030-01-07", "ex_instant_ns": DISTRIBUTION.ex_date_instant_ns("2030-01-07")}
+        on_time, late = DISTRIBUTION.due_events([event], event["ex_instant_ns"])
+        self.assertEqual((on_time, late), ([event], []))
+        on_time, late = DISTRIBUTION.due_events([event], event["ex_instant_ns"] + 1)
+        self.assertEqual((on_time, late), ([], [event]))
+        self.assertEqual(DISTRIBUTION.due_events([event], event["ex_instant_ns"] - 1), ([], []))
+
+    def test_a_late_emission_in_a_receipt_fails(self):
+        receipt = _v2_receipt()
+        emission = receipt["distribution_module"]["emissions"][1]
+        emission.update(ts_now_ns=emission["ts_now_ns"] + 36000 * 10 ** 9, on_time=False)
+        failing = _failing_fields(_v2(receipt))
+        self.assertIn(("distribution_2", "emitted_at_ns"), failing)
+        self.assertIn(("distribution_2", "on_time"), failing)
+
+    def test_eligible_quantity_comes_from_engine_positions_only(self):
+        positions = [_Position("SPY.SIM", 304.0), _Position("QQQ.SIM", 10.0)]
+        self.assertEqual(DISTRIBUTION.eligible_quantity(positions, "SPY.SIM"), 304)
+        self.assertEqual(DISTRIBUTION.eligible_quantity([], "SPY.SIM"), 0)
+        with self.assertRaisesRegex(ValueError, "non_integral_eligible_quantity"):
+            DISTRIBUTION.eligible_quantity([_Position("SPY.SIM", 0.5)], "SPY.SIM")
+
+    def test_amount_is_quantity_times_cent_rounded_per_share_with_no_second_rounding(self):
+        self.assertEqual(DISTRIBUTION.distribution_amount(304, "1.41"), Decimal("428.64"))
+        self.assertEqual(DISTRIBUTION.distribution_amount(0, "1.57"), Decimal("0.00"))
+        # nt_probe div: 10 x 1.2345 would quantize to 12.34; v2 rounds per share first.
+        per_share = DISTRIBUTION.per_share_distribution(Decimal("123.45"), Decimal("0.99"), Decimal("1"))
+        self.assertEqual(per_share, Decimal("1.23"))
+        self.assertEqual(DISTRIBUTION.distribution_amount(10, per_share), Decimal("12.30"))
+
+    def test_unapplied_or_unreported_adjustments_fail(self):
+        receipt = _v2_receipt()
+        receipt["distribution_module"]["acknowledgements"][1]["outcomes"] = [
+            {"applied": False, "error": "rejected"}]
+        receipt["native_account_event_rows"][3]["reported"] = False
+        failing = _failing_fields(_v2(receipt))
+        self.assertIn(("distribution_2", "acknowledged_applied"), failing)
+        self.assertIn(("distribution_2", "reported_account_state_delta"), failing)
+
+    def test_an_unposted_ledger_fails_under_v2(self):
+        receipt = _v2_receipt()
+        for entry in receipt["distribution_ledger"]:
+            entry["engine_posted"] = False
+        verdict = _v2(receipt)
+        self.assertIn(("distribution_ledger", "engine_posted"), _failing_fields(verdict))
+        self.assertEqual(verdict["verdict"], "FAIL")
+
+    def test_posted_ledger_requires_on_time_applied_emissions(self):
+        emissions = _v2_receipt()["distribution_module"]["emissions"]
+        acknowledgements = [{"ex_dates": ["2019-12-20"], "outcomes": [{"applied": True, "error": None}]},
+                            {"ex_dates": ["2020-03-20"], "outcomes": [{"applied": False, "error": "x"}]}]
+        ledger = FIXTURE.posted_distribution_ledger(emissions, acknowledgements)
+        self.assertEqual([d["engine_posted"] for d in ledger], [True, False])
+        self.assertEqual([d["amount"] for d in ledger], ["0.00", "428.64"])
+        self.assertEqual([d["utc_seconds"] for d in ledger], [DIVIDEND_ZERO_TS, DIVIDEND_TS])
+
+
+class V2PublishedResultTests(unittest.TestCase):
+    """The published v2 receipt and verdict agree with each other and the manifest."""
+
+    def setUp(self):
+        self.receipt = json.loads(RECEIPT_V2.read_text())
+        self.verdict = json.loads(VERDICT_V2.read_text())
+
+    def test_receipt_is_bound_to_the_sealed_v2_files(self):
+        self.assertEqual(self.receipt["mapping_manifest"]["sha256"],
+                         hashlib.sha256((SOURCE / "mapping-manifest-v2.json").read_bytes()).hexdigest())
+        self.assertEqual(self.receipt["preregistration"]["sha256"],
+                         hashlib.sha256((SOURCE / "PREREGISTRATION-v2.md").read_bytes()).hexdigest())
+        self.assertEqual(self.receipt["tolerances"]["sha256"], MANIFEST_V2["tolerances"]["sha256"])
+        self.assertEqual(self.receipt["unsupported_mappings"], [])
+        COMPARE.check_local_sources(self.receipt)
+
+    def test_published_v2_receipt_reconciles_without_bars(self):
+        oracle = COMPARE.oracle_case(json.loads(LEAN_RECEIPT.read_text()), self.receipt["case"])
+        verdict = COMPARE.compare(self.receipt, oracle, TOLERANCES, EFFECTIVE_V2, None)
+        self.assertEqual(verdict["failed"], 0)
+        published = {c["key"]: c["status"] for c in self.verdict["checks"]}
+        for check in verdict["checks"]:
+            if check["status"] != "SKIPPED" and check["key"] in published:
+                self.assertEqual(published[check["key"]], "PASS", check["key"])
+
+    def test_published_verdict_records_the_comparison_it_claims(self):
+        self.assertEqual(self.verdict["manifest_schema_version"], 2)
+        self.assertEqual(self.verdict["attribution_evidence"], "converted bars")
+        self.assertEqual(self.verdict["skipped"], [])
+        self.assertEqual(self.verdict["blocking_mappings"], [])
+        self.assertEqual(self.verdict["failed"],
+                         sum(1 for c in self.verdict["checks"] if c["status"] == "FAIL"))
+        self.assertEqual(self.verdict["verdict"],
+                         "PASS" if self.verdict["failed"] == 0 else "FAIL")
 
 
 if __name__ == "__main__":

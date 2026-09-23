@@ -2,21 +2,23 @@
 """Replay the frozen ``one_zero`` SPY case twice on native NautilusTrader 2.0.0rc5.
 
 Both runs use the same seed and the same venue/instrument configuration in fresh
-engines. The receipt records the native intents and fills, the independent
-``Decimal`` cash ledger, the externally derived distribution cash, the native end
-cash, the buying-power and latch event lists, raw and normalized output hashes
-for both runs, and the evidence class ``HIST``. This runner applies no numeric
-tolerance of its own: its own checks are exact. It records ``tolerances.json``
-and its hash in the receipt, and ``compare.py`` is the component that reads and
-applies every limit the sheet declares, so a preregistered sheet replaces the
-defaults without any code change.
+engines. The receipt records the native intents, the native OCO pairs and every
+order event, the fills, the DistributionModule's emissions and acknowledgements,
+the native account events, the independent ``Decimal`` cash ledger, the native
+end cash, the buying-power and latch event lists, an ERROR-level engine log scan,
+raw and normalized output hashes for both runs, and the evidence class ``HIST``.
+This runner applies no numeric tolerance of its own: its own checks are exact. It
+records ``tolerances.json`` and its hash in the receipt, and ``compare.py`` is the
+component that reads and applies every limit the sheet declares.
 
-The unsupported mapping list and the declared short sessions are read from
-``mapping-manifest.json``; this file never restates them.
+The run is bound to ``mapping-manifest-v2.json`` (the sealed v2
+preregistration). Rows v2 carries unchanged from v1, including the declared
+short sessions, are read from ``mapping-manifest.json`` after checking it against
+the sha256 the v2 manifest records for it; this file never restates them.
 
 No network, no broker client and no credential store is used. Raw native reports
-stay in the private output directory; the receipt publishes hashes and the
-economic ledger only.
+and the captured engine log stay in the private output directory; the receipt
+publishes hashes and the economic ledger only.
 """
 from __future__ import annotations
 
@@ -33,6 +35,7 @@ import random
 import re
 import socket
 import sys
+import time
 
 SOURCE = Path(__file__).resolve().parent
 REPO = SOURCE.parents[3]
@@ -40,6 +43,18 @@ HISTORICAL = SOURCE.parent.parent / "historical-simulation"
 FROZEN_PLAN_SHA256 = "60959a050a3b004abf5346d376930b3b2f563096c725dc96e5427703ea203632"
 EVIDENCE_CLASS = "HIST"
 SEED = 20260922
+MANIFEST_V2 = "mapping-manifest-v2.json"
+MANIFEST_V1 = "mapping-manifest.json"
+EXTENSION = "_libnautilus.cpython-312-x86_64-linux-gnu.so"
+# Explicit venue settings from the v2 manifest's case_configuration, passed to
+# add_venue instead of relied on as defaults. fill_model, fee_model and
+# latency_model stay None, as preregistered.
+VENUE = {"oms_type": "NETTING", "account_type": "CASH", "use_random_ids": False,
+         "fill_model": None, "fee_model": None, "latency_model": None, "bar_execution": True,
+         "bar_adaptive_high_low_ordering": False, "reject_stop_orders": True,
+         "support_contingent_orders": True, "frozen_account": False}
+NEGATIVE_CASH_TEXT = "Cash account balance would become negative"
+LOG_LEVEL_RE = re.compile(r"\[(TRACE|DEBUG|INFO|WARN|WARNING|ERROR)\]")
 
 WINDOW = {"symbol": "SPY", "start": "2019-12-02", "end": "2020-04-30"}
 INSTRUMENT = {"instrument_id": "SPY.SIM", "symbol": "SPY", "venue": "SIM", "currency": "USD",
@@ -68,6 +83,7 @@ def _load(name, path):
 
 CONVERT = _load("spy_parity_convert", SOURCE / "convert.py")
 FIXTURE = _load("spy_parity_fixture", SOURCE / "fixture_strategy.py")
+DISTRIBUTION = _load("spy_parity_distribution", SOURCE / "distribution_module.py")
 
 
 def digest(path):
@@ -88,7 +104,30 @@ def number(value) -> Decimal:
 
 
 def load_manifest(path: Path | None = None) -> dict:
-    return json.loads(Path(path or SOURCE / "mapping-manifest.json").read_text())
+    return json.loads(Path(path or SOURCE / MANIFEST_V2).read_text())
+
+
+def effective_manifest(v2: dict, v1: dict) -> dict:
+    """v2 rows plus the v1 rows v2 declares carried unchanged, by id."""
+    carried = set(v2["carried_unchanged_from_v1"])
+    rows = [row for row in v1["mappings"] if row["id"] in carried]
+    if sorted(row["id"] for row in rows) != sorted(carried):
+        raise ValueError("carried_v1_rows_missing")
+    overlap = carried & {row["id"] for row in v2["mappings"]}
+    if overlap:
+        raise ValueError("carried_rows_overlap_v2:" + ",".join(sorted(overlap)))
+    return {**v2, "mappings": rows + list(v2["mappings"])}
+
+
+def load_bound_manifests() -> tuple[dict, dict]:
+    """The sealed v2 manifest, and the v1 file checked against v2's record of it."""
+    v2 = load_manifest(SOURCE / MANIFEST_V2)
+    if v2.get("schema_version") != 2:
+        raise ValueError("manifest_not_v2")
+    v1_path = SOURCE / MANIFEST_V1
+    if digest(v1_path) != v2["supersedes"]["sha256"]:
+        raise ValueError("superseded_manifest_sha256_mismatch")
+    return v2, effective_manifest(v2, json.loads(v1_path.read_text()))
 
 
 def unsupported_mappings(manifest: dict) -> list:
@@ -96,9 +135,90 @@ def unsupported_mappings(manifest: dict) -> list:
     return sorted(row["id"] for row in manifest["mappings"] if row["status"] == "unsupported")
 
 
+def preregistered_mappings(manifest: dict) -> list:
+    return sorted(row["id"] for row in manifest["mappings"] if row["status"] == "preregistered")
+
+
 def known_short_sessions(manifest: dict) -> dict:
     row = next(r for r in manifest["mappings"] if r["id"] == "sessions_and_time")
     return row["known_short_sessions"]
+
+
+def check_engine_binary(manifest: dict) -> dict:
+    """The installed extension must be the one the manifest pins."""
+    import nautilus_trader
+
+    path = Path(nautilus_trader.__file__).resolve().parent / EXTENSION
+    found = digest(path)
+    if found != manifest["engine"]["extension_sha256"][EXTENSION]:
+        raise ValueError("engine_extension_sha256_mismatch")
+    return {EXTENSION: found}
+
+
+def check_bound_inputs(manifest: dict, tolerances_path: Path) -> None:
+    """Tolerances and frozen inputs must be the ones the v2 manifest froze."""
+    if digest(tolerances_path) != manifest["tolerances"]["sha256"]:
+        raise ValueError("tolerances_sha256_disagrees_with_manifest")
+    if manifest["inputs"]["frozen_sha256"] != CONVERT.FROZEN_INPUT_SHA256:
+        raise ValueError("frozen_inputs_disagree_with_manifest")
+
+
+def daily_sessions(data_root: Path) -> list:
+    """Every retained daily session (ISO dates), not only the replay window."""
+    lines = CONVERT.read_zip_member(Path(data_root) / "equity/usa/daily/spy.zip", "spy.csv")
+    return CONVERT.parse_daily_sessions(lines, "0001-01-01", "9999-12-31")
+
+
+def distribution_events(data_root: Path) -> list:
+    factor_rows = CONVERT.parse_factor_rows(
+        (Path(data_root) / "equity/usa/factor_files/spy.csv").read_text())
+    return DISTRIBUTION.derive_events(factor_rows, daily_sessions(data_root),
+                                      WINDOW["start"], WINDOW["end"])
+
+
+def scan_engine_log(text: str) -> dict:
+    """Count log lines by level; any ERROR line refuses a v2 PASS in compare.py."""
+    levels, errors = {}, []
+    for line in text.splitlines():
+        match = LOG_LEVEL_RE.search(line)
+        if match:
+            levels[match.group(1)] = levels.get(match.group(1), 0) + 1
+            if match.group(1) == "ERROR":
+                errors.append(line)
+    return {"lines": len(text.splitlines()), "lines_by_level": dict(sorted(levels.items())),
+            "error_lines": len(errors),
+            "negative_cash_lines": sum(1 for line in text.splitlines() if NEGATIVE_CASH_TEXT in line),
+            "error_line_sha256": [digest_text(line) for line in errors]}
+
+
+class CapturedOutput:
+    """Redirect the process's stdout and stderr file descriptors to a file.
+
+    The engine's Rust logger writes to the file descriptors directly, so this is
+    the only complete capture of its output without changing its configuration.
+    """
+
+    def __init__(self, path: Path):
+        self.path = path
+
+    def __enter__(self):
+        sys.stdout.flush()
+        sys.stderr.flush()
+        self.handle = open(self.path, "wb")
+        self.saved = (os.dup(1), os.dup(2))
+        os.dup2(self.handle.fileno(), 1)
+        os.dup2(self.handle.fileno(), 2)
+        return self
+
+    def __exit__(self, *exc):
+        sys.stdout.flush()
+        sys.stderr.flush()
+        os.dup2(self.saved[0], 1)
+        os.dup2(self.saved[1], 2)
+        for fd in self.saved:
+            os.close(fd)
+        self.handle.close()
+        return False
 
 
 def check_frozen_plan() -> dict:
@@ -163,9 +283,22 @@ def field_differences(left, right, path="") -> list:
     return [] if left == right else [path]
 
 
-def run_once(rows, distributions, out: Path, label: str) -> dict:
+def account_events(account, currency) -> list:
+    """Every native AccountState on the venue account, in engine order."""
+    found = []
+    for event in account.events:
+        balances = [b for b in event.balances if str(b.currency) == str(currency)]
+        if len(balances) != 1:
+            raise ValueError("account_event_balance_shape")
+        found.append({"ts_event_ns": int(event.ts_event), "reported": bool(event.is_reported),
+                      "total": str(number(balances[0].total)), "free": str(number(balances[0].free)),
+                      "locked": str(number(balances[0].locked))})
+    return found
+
+
+def run_once(rows, events, out: Path, label: str) -> dict:
     from nautilus_trader.backtest import BacktestEngine
-    from nautilus_trader.common import LogLevel
+    from nautilus_trader.common import LogColor, LogLevel, logger_flush, logger_log
     from nautilus_trader.config import BacktestEngineConfig, LoggerConfig
     from nautilus_trader.model import (AccountType, Currency, Equity, InstrumentId, Money,
                                        OmsType, Price, Quantity, Symbol, Venue)
@@ -179,55 +312,98 @@ def run_once(rows, distributions, out: Path, label: str) -> dict:
                     0, 0, lot_size=Quantity.from_int(INSTRUMENT["lot_size"]))
     bars = CONVERT.to_bars(rows, INSTRUMENT["bar_type"], INSTRUMENT["price_precision"],
                            INSTRUMENT["size_precision"])
-    strategy_class = FIXTURE.build_strategy(equity.id, INSTRUMENT["bar_type"], rows, CASE)
-    engine = BacktestEngine(BacktestEngineConfig(logging=LoggerConfig(stdout_level=LogLevel.ERROR)))
+    strategy_class = FIXTURE.build_strategy(equity.id, INSTRUMENT["bar_type"], rows, CASE,
+                                            [e["ex_instant_ns"] for e in events])
+    module = DISTRIBUTION.build_module(events, INSTRUMENT["instrument_id"], INSTRUMENT["currency"])
+    log_path = out / "engine.log"
     # Bound before the try so an engine failure surfaces as itself, never as a
     # NameError from the post-run block, and never masked by dispose().
-    strategy = raw = reports = result = None
+    strategy = raw = reports = result = native_events = None
     open_positions = open_orders = None
     failure = None
-    try:
-        engine.add_venue(venue, OmsType.NETTING, AccountType.CASH,
-                         [Money(Decimal(CASE["initial_cash_usd"]), usd)], base_currency=usd,
-                         use_random_ids=False)
-        engine.add_instrument(equity)
-        engine.add_data(bars)
-        strategy = strategy_class()
-        engine.add_strategy(strategy)
-        engine.run()
-        result = engine.get_result()
-        reports = {"account": engine.generate_account_report(venue=venue),
-                   "positions": engine.generate_positions_report(),
-                   "fills": engine.generate_order_fills_report()}
-        for name, report in reports.items():
-            report.to_csv(out / (name + ".csv"))
-        raw = {name: json.loads(report.to_json(orient="records")) for name, report in reports.items()}
-        save(out / "reports.private.json", raw)
-        open_positions = len(engine.cache.positions_open())
-        open_orders = len(engine.cache.orders_open())
-    except BaseException as error:  # noqa: BLE001 - the original failure is re-raised
-        failure = error
-        raise
-    finally:
+    with CapturedOutput(log_path):
+        engine = BacktestEngine(BacktestEngineConfig(
+            logging=LoggerConfig(stdout_level=LogLevel.INFO, is_colored=False)))
         try:
-            engine.dispose()
-        except Exception as dispose_error:
-            if failure is None:
-                raise
-            failure.add_note("engine.dispose() also failed: " + repr(dispose_error))
+            engine.add_venue(venue, getattr(OmsType, VENUE["oms_type"]),
+                             getattr(AccountType, VENUE["account_type"]),
+                             [Money(Decimal(CASE["initial_cash_usd"]), usd)], base_currency=usd,
+                             fill_model=VENUE["fill_model"], fee_model=VENUE["fee_model"],
+                             latency_model=VENUE["latency_model"], modules=[module],
+                             reject_stop_orders=VENUE["reject_stop_orders"],
+                             support_contingent_orders=VENUE["support_contingent_orders"],
+                             use_random_ids=VENUE["use_random_ids"],
+                             bar_execution=VENUE["bar_execution"],
+                             bar_adaptive_high_low_ordering=VENUE["bar_adaptive_high_low_ordering"],
+                             frozen_account=VENUE["frozen_account"])
+            engine.add_instrument(equity)
+            engine.add_data(bars)
+            strategy = strategy_class()
+            engine.add_strategy(strategy)
+            engine.run()
+            result = engine.get_result()
+            reports = {"account": engine.generate_account_report(venue=venue),
+                       "positions": engine.generate_positions_report(),
+                       "fills": engine.generate_order_fills_report()}
+            for name, report in reports.items():
+                report.to_csv(out / (name + ".csv"))
+            raw = {name: json.loads(report.to_json(orient="records")) for name, report in reports.items()}
+            save(out / "reports.private.json", raw)
+            native_events = account_events(engine.cache.account_for_venue(venue), usd)
+            open_positions = len(engine.cache.positions_open())
+            open_orders = len(engine.cache.orders_open())
+        except BaseException as error:  # noqa: BLE001 - the original failure is re-raised
+            failure = error
+            raise
+        finally:
+            try:
+                engine.dispose()
+            except Exception as dispose_error:
+                if failure is None:
+                    raise
+                failure.add_note("engine.dispose() also failed: " + repr(dispose_error))
+            # The engine logs from a writer thread in order. Log one sentinel
+            # after dispose and wait until it reaches the file, so every line of
+            # this run is captured before the file descriptors are restored.
+            logger_flush()
+            sentinel = "spy-parity capture end " + label
+            logger_log(LogLevel.INFO, LogColor.NORMAL, "SpyParityRunner", sentinel)
+            logger_flush()
+            deadline = time.monotonic() + 30
+            while sentinel not in log_path.read_text(encoding="utf-8", errors="replace"):
+                if time.monotonic() > deadline:
+                    raise ValueError("engine_log_capture_incomplete:" + label)
+                time.sleep(0.01)
 
+    log_scan = scan_engine_log(log_path.read_text(encoding="utf-8", errors="replace"))
     if strategy is None or raw is None or result is None:
         raise ValueError("engine_run_incomplete:" + label)
+    if module.errors:
+        # A late emission or an unapplied adjustment is a module error; the
+        # preregistration refuses the run rather than publishing it.
+        raise ValueError("distribution_module_failed:" + ";".join(module.errors))
     FIXTURE.check_run_integrity(strategy.errors, strategy.bars_seen, len(rows), result.iterations)
     FIXTURE.check_final_state(strategy.pending, open_orders, open_positions, strategy.position)
     FIXTURE.check_causality(strategy.intents, strategy.fills)
-    ledger = FIXTURE.distribution_ledger(distributions, strategy.fills)
+    ledger = FIXTURE.posted_distribution_ledger(module.emissions, module.acknowledgements)
+    external = FIXTURE.distribution_ledger(
+        [{"ex_date": e["ex_date"], "utc_seconds": e["ex_instant_utc_seconds"],
+          "per_share": e["per_share"]} for e in events], strategy.fills)
     cash = FIXTURE.cash_ledger(Decimal(CASE["initial_cash_usd"]), strategy.fills, ledger)
     native_balances = [str(number(row["total"])) for row in raw["account"]]
+    module_record = {"class": type(module).__name__, "process_calls": module.process_calls,
+                     "resets": module.resets,
+                     "calls_at_event_instants_ns": module.calls_at_event_instants,
+                     "emissions": module.emissions, "acknowledgements": module.acknowledgements,
+                     "errors": module.errors, "pending_at_end": [e["ex_date"] for e in module.pending]}
     counters = {}
     economic = {"intents": strategy.intents, "fills": strategy.fills,
+                "oco_pairs": strategy.oco_pairs,
                 "order_events": normalize(strategy.order_events, counters),
                 "native_account_totals": native_balances,
+                "native_account_events": native_events,
+                "distribution_module": module_record,
+                "alerts_fired": strategy.alerts_fired,
                 "native_fills": normalize(raw["fills"], counters),
                 "positions": normalize(raw["positions"], counters)}
     normalized_text = json.dumps(economic, sort_keys=True, default=str)
@@ -248,17 +424,32 @@ def run_once(rows, distributions, out: Path, label: str) -> dict:
         "fees_usd": str(sum((Decimal(f["fee"]) for f in strategy.fills), Decimal(0))),
         "intents": strategy.intents,
         "fills": strategy.fills,
+        "oco_pairs": strategy.oco_pairs,
+        "order_events": strategy.order_events,
+        "alerts_registered": strategy.alerts_registered,
+        "alerts_fired": strategy.alerts_fired,
+        "distribution_module": module_record,
+        "native_account_event_rows": native_events,
         "distribution_ledger": ledger,
+        "external_distribution_cross_check": external,
         "dividend_cash_usd": str(sum((Decimal(d["amount"]) for d in ledger), Decimal(0))),
         "cash_ledger": cash,
         "reconciled_end_cash_usd": cash[-1]["cash"] if cash else CASE["initial_cash_usd"],
         "buying_power_events": strategy.buying_power_events,
         "latch_events": strategy.latch_events,
+        "engine_log_scan": log_scan,
+        "engine_log_sha256": digest(log_path),
         "raw_report_sha256": {name: digest(out / (name + ".csv")) for name in reports},
+        "raw_reports_json_sha256": digest(out / "reports.private.json"),
         "normalized_economic_sha256": digest_text(normalized_text),
     }
     save(out / "summary.json", {k: v for k, v in record.items() if k != "_raw_reports"})
     return record
+
+
+PER_RUN_DETAIL = ("intents", "fills", "cash_ledger", "distribution_ledger", "_raw_reports",
+                  "oco_pairs", "order_events", "distribution_module", "native_account_event_rows",
+                  "external_distribution_cross_check", "alerts_registered", "alerts_fired")
 
 
 def main():
@@ -267,6 +458,9 @@ def main():
                         help="Retained LEAN Data root holding the frozen SPY inputs")
     parser.add_argument("--out", type=Path, required=True, help="Fresh private output directory")
     parser.add_argument("--tolerances", type=Path, default=SOURCE / "tolerances.json")
+    parser.add_argument("--harness-commit", default=None,
+                        help="Commit of the checkout being run, recorded as declared by the operator "
+                             "(the isolated run cannot read Git); local_source_sha256 binds the files")
     args = parser.parse_args()
 
     installed = importlib.metadata.version("nautilus_trader")
@@ -276,14 +470,24 @@ def main():
     args.out.mkdir(mode=0o700, parents=True, exist_ok=False)
 
     frozen_plan = check_frozen_plan()
-    manifest = load_manifest()
+    manifest_v2, manifest = load_bound_manifests()
+    extension = check_engine_binary(manifest_v2)
+    check_bound_inputs(manifest_v2, args.tolerances)
     conversion = CONVERT.convert(args.lean_data, WINDOW["symbol"], WINDOW["start"], WINDOW["end"],
                                  known_short_sessions(manifest))
+    events = distribution_events(args.lean_data)
     rows_path = args.out / "converted-rows.private.json"
     save(rows_path, conversion["rows"])
     tolerances = json.loads(args.tolerances.read_text())
+    preregistered_events = next(
+        row for row in manifest_v2["mappings"] if row["id"] == "distributions_and_cash"
+    )["mechanism_rules"]["window_events_for_one_zero"]
+    derived_projection = [{"factor_row_date": e["factor_row_date"], "ex_date": e["ex_date"],
+                           "ex_instant_utc_seconds": e["ex_instant_utc_seconds"], "pf0": e["pf0"],
+                           "pf1": e["pf1"], "ref0": e["ref0"], "per_share": e["per_share"]}
+                          for e in events]
 
-    runs = [run_once(conversion["rows"], conversion["distributions"], args.out / label, label)
+    runs = [run_once(conversion["rows"], events, args.out / label, label)
             for label in ("run-1", "run-2")]
     raw_differences = field_differences(runs[0]["_raw_reports"], runs[1]["_raw_reports"])
     undeclared = sorted({d for d in raw_differences
@@ -304,32 +508,54 @@ def main():
     primary = runs[0]
 
     receipt = {
-        "schema_version": 1,
-        "id": "spy-parity-one-zero-20260922",
+        "schema_version": 2,
+        "id": "spy-parity-one-zero-v2",
         "gate": "G-a",
         "case": CASE["id"],
         "evidence_class": EVIDENCE_CLASS,
         "classification": "local historical replay on retained bundled sample data; not an unchanged "
                           "upstream test, a point-in-time dataset or any broker execution",
         "observed_utc": datetime.now(timezone.utc).isoformat(),
+        "harness_commit": {"value": args.harness_commit,
+                           "source": "declared by the operator on the command line; the isolated run "
+                                     "cannot read Git, so local_source_sha256 is the binding record"},
         "engine": {"package": "nautilus_trader", "version": installed,
-                   "upstream_commit_pin": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+                   "upstream_commit_pin": manifest_v2["engine"]["upstream_commit_pin"],
+                   "extension_sha256": extension,
                    "python": sys.version.split()[0]},
         "frozen_plan": frozen_plan,
         "case_configuration": {**CASE, "instrument": INSTRUMENT, "window": WINDOW, "seed": SEED,
-                               "fill_model": None, "fee_model": None, "use_random_ids": False,
-                               "account_type": "CASH",
+                               **VENUE, "venue_modules": [module_class_name()],
                                "determinism_note": "one_zero configures no stochastic fill, fee or "
                                                    "latency model; the seed is recorded and applied "
                                                    "but no sampled component is exercised."},
-        "mapping_manifest": {"path": "mapping-manifest.json",
-                             "sha256": digest(SOURCE / "mapping-manifest.json")},
+        "mapping_manifest": {"path": MANIFEST_V2, "sha256": digest(SOURCE / MANIFEST_V2),
+                             "schema_version": manifest_v2["schema_version"]},
+        "superseded_manifest": {"path": MANIFEST_V1, "sha256": digest(SOURCE / MANIFEST_V1),
+                                "carried_rows": manifest_v2["carried_unchanged_from_v1"]},
+        "preregistration": {"path": "PREREGISTRATION-v2.md",
+                            "sha256": digest(SOURCE / "PREREGISTRATION-v2.md")},
         "tolerances": {"path": str(args.tolerances.name), "sha256": digest(args.tolerances),
                        "limits": tolerances["limits"], "status": tolerances["status"]},
         "local_source_sha256": {name: digest(SOURCE / name) for name in
-                                ("convert.py", "fixture_strategy.py", "run.py", "compare.py",
-                                 "mapping-manifest.json", "tolerances.json")
+                                ("convert.py", "fixture_strategy.py", "distribution_module.py",
+                                 "run.py", "compare.py", MANIFEST_V1, MANIFEST_V2,
+                                 "tolerances.json")
                                 if (SOURCE / name).is_file()},
+        "distribution_module": {"class": module_class_name(), "source": "distribution_module.py",
+                                "source_sha256": digest(SOURCE / "distribution_module.py"),
+                                "venue_module_count": 1,
+                                "events": events,
+                                "derived_events_equal_preregistered_window_events":
+                                    derived_projection == preregistered_events,
+                                "process_calls": primary["distribution_module"]["process_calls"],
+                                "resets": primary["distribution_module"]["resets"],
+                                "calls_at_event_instants_ns":
+                                    primary["distribution_module"]["calls_at_event_instants_ns"],
+                                "emissions": primary["distribution_module"]["emissions"],
+                                "acknowledgements": primary["distribution_module"]["acknowledgements"],
+                                "errors": primary["distribution_module"]["errors"],
+                                "pending_at_end": primary["distribution_module"]["pending_at_end"]},
         "inputs": {"data_root": str(args.lean_data), "sha256": conversion["input_hashes"],
                    "decoded": conversion["decoded_inputs"],
                    "price_encoding": conversion["price_encoding"],
@@ -343,19 +569,25 @@ def main():
             "converted_rows_sha256": digest(rows_path),
             "serialization": "json.dumps(rows, indent=2, sort_keys=True, default=str) + newline",
             "note": "compare.py refuses a --bars file whose digest differs, and re-hashes its own "
-                    "re-derivation under --lean-data against this value.",
+                    "re-derivation under --lean-data against this value. Under v2 the rows are "
+                    "evidence for the per-event gap and open-price checks, never for an attribution.",
         },
-        "derived_distributions": conversion["distributions"],
+        "derived_distributions_v1_rule": conversion["distributions"],
         "unsupported_mappings": unsupported_mappings(manifest),
-        "runs": [{k: v for k, v in run.items() if k not in ("intents", "fills", "cash_ledger",
-                                                            "distribution_ledger", "_raw_reports")}
-                 for run in runs],
+        "preregistered_mappings": preregistered_mappings(manifest),
+        "runs": [{k: v for k, v in run.items() if k not in PER_RUN_DETAIL} for run in runs],
         "two_run_records_equal": equal,
         "two_run_determinism": determinism,
         "intents": primary["intents"],
         "fills": primary["fills"],
+        "oco_pairs": primary["oco_pairs"],
+        "order_events": primary["order_events"],
+        "alerts_registered": primary["alerts_registered"],
+        "alerts_fired": primary["alerts_fired"],
+        "native_account_event_rows": primary["native_account_event_rows"],
         "cash_ledger": primary["cash_ledger"],
         "distribution_ledger": primary["distribution_ledger"],
+        "external_distribution_cross_check": primary["external_distribution_cross_check"],
         "dividend_cash_usd": primary["dividend_cash_usd"],
         "fees_usd": primary["fees_usd"],
         "native_end_cash_usd": primary["native_end_cash_usd"],
@@ -370,8 +602,12 @@ def main():
                       "environment_names": sorted(os.environ),
                       "argv": sys.argv, "cwd": os.getcwd()},
         "limitations": [
-            "Distribution cash is an external Decimal ledger: the pinned engine posts none of it.",
-            "Fill prices use the next session's first-bar close because market-on-open is unsupported.",
+            "The market-on-open proxy equals LEAN's MarketOnOpenFill only inside the manifest's "
+            "faithfulness_domain (open differs from the decision close by at least one tick, the "
+            "quantity fits the open tick and the fill does not overdraw the CASH account); "
+            "compare.py checks each event.",
+            "The DistributionModule posts cash only; bar prices stay raw-normalized. Payable dates, "
+            "withholding and short-position debits are outside one_zero.",
             "Bundled sample bytes are not an entitled, point-in-time or market-wide dataset.",
         ],
     }
@@ -383,8 +619,13 @@ def main():
                       "dividend_cash_usd": primary["dividend_cash_usd"],
                       "native_end_cash_usd": primary["native_end_cash_usd"],
                       "reconciled_end_cash_usd": primary["reconciled_end_cash_usd"],
+                      "engine_error_lines": [r["engine_log_scan"]["error_lines"] for r in runs],
                       "unsupported_mappings": receipt["unsupported_mappings"],
                       "receipt": str(args.out / "receipt.json")}, sort_keys=True))
+
+
+def module_class_name() -> str:
+    return DISTRIBUTION.MODULE_CLASS_NAME
 
 
 if __name__ == "__main__":

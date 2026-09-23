@@ -15,6 +15,17 @@ part the attributed fill-price deltas (and, for the native balance, the
 unposted distribution total) explain exactly. Any residue outside tolerance stays
 an unattributed FAIL, and a named mapping must carry status ``unsupported`` in
 the manifest the receipt was bound to or the attribution is rejected.
+
+Under mapping manifest v2 (``schema_version`` 2) the two formerly unsupported
+rows are ``preregistered``, so the bound manifest declares no unsupported row
+for ``one_zero`` and no failure can be attributed: any failing check is FAIL.
+The v2 comparison adds the preregistered acceptance checks: the native OCO pairs
+(count, submission instant, trigger prices from the decision bar's close, legs
+accepted, one full fill, one sibling cancel at the fill instant, no denial,
+rejection or callback failure), the per-event ``moo_proxy_no_gap`` and
+``moo_proxy_not_open`` checks against the converted bars, the ERROR-level engine
+log scan, and the DistributionModule's emissions, acknowledgements and reported
+``AccountState`` rows. Engine-posted distributions are part of native cash.
 """
 from __future__ import annotations
 
@@ -31,6 +42,14 @@ REQUIRED_LIMITS = ("event_seconds_abs", "fill_quantity_abs", "fill_price_usd_abs
                    "dividend_usd_abs", "cash_usd_abs", "end_cash_usd_abs", "final_quantity_abs")
 MARKET_ON_OPEN = "market_on_open_proxy"
 DISTRIBUTIONS = "distributions_and_cash"
+MANIFEST_V1 = "mapping-manifest.json"
+TICK = Decimal("0.0001")
+V2_CONFIGURATION_FIELDS = ("seed", "account_type", "use_random_ids", "fill_model", "fee_model",
+                           "window", "oms_type", "latency_model", "bar_execution",
+                           "bar_adaptive_high_low_ordering", "reject_stop_orders",
+                           "support_contingent_orders", "frozen_account")
+V2_SOURCES = ("convert.py", "fixture_strategy.py", "distribution_module.py", "run.py",
+              "compare.py", "mapping-manifest.json", "mapping-manifest-v2.json", "tolerances.json")
 
 
 def digest(path: Path) -> str:
@@ -162,6 +181,35 @@ def check_local_sources(receipt: dict, source_dir=None) -> None:
             raise ValueError("local_source_sha256_mismatch:" + name)
 
 
+def is_v2(manifest) -> bool:
+    return bool(manifest) and manifest.get("schema_version") == 2
+
+
+def effective_manifest(v2: dict, v1: dict) -> dict:
+    """v2 rows plus the v1 rows v2 declares carried unchanged, by id."""
+    carried = set(v2["carried_unchanged_from_v1"])
+    rows = [row for row in v1["mappings"] if row["id"] in carried]
+    if sorted(row["id"] for row in rows) != sorted(carried):
+        raise ValueError("carried_v1_rows_missing")
+    if carried & {row["id"] for row in v2["mappings"]}:
+        raise ValueError("carried_rows_overlap_v2")
+    return {**v2, "mappings": rows + list(v2["mappings"])}
+
+
+def load_effective_v2(v2: dict, manifest_dir: Path) -> dict:
+    """Check the superseded v1 file against v2's record of it, then merge."""
+    v1_path = Path(manifest_dir) / MANIFEST_V1
+    if digest(v1_path) != v2["supersedes"]["sha256"]:
+        raise ValueError("superseded_manifest_sha256_mismatch")
+    return effective_manifest(v2, json.loads(v1_path.read_text()))
+
+
+def manifest_evidence_class(manifest: dict) -> str:
+    """v2 annotates the class ('HIST (for the future replay); ...'); use its token."""
+    value = manifest["evidence_class"]
+    return value.split()[0] if is_v2(manifest) else value
+
+
 def check_case_configuration(receipt: dict, manifest: dict, plan: dict) -> None:
     """Bind the run's configuration to the pinned plan and the preregistered manifest.
 
@@ -185,9 +233,16 @@ def check_case_configuration(receipt: dict, manifest: dict, plan: dict) -> None:
                           ("slippage", spec["slippage"])):
         if _decimal(configuration[field]) != _decimal(wanted):
             raise ValueError("case_configuration_disagrees_with_plan:" + field)
-    for field in ("seed", "account_type", "use_random_ids", "fill_model", "fee_model", "window"):
+    fields = V2_CONFIGURATION_FIELDS if is_v2(manifest) else \
+        ("seed", "account_type", "use_random_ids", "fill_model", "fee_model", "window")
+    for field in fields:
         if configuration.get(field) != declared[field]:
             raise ValueError("case_configuration_disagrees_with_manifest:" + field)
+    if is_v2(manifest):
+        modules = configuration.get("venue_modules")
+        if (not isinstance(modules, list) or len(modules) != 1 or len(declared["venue_modules"]) != 1
+                or not declared["venue_modules"][0].startswith(str(modules[0]) + " ")):
+            raise ValueError("case_configuration_disagrees_with_manifest:venue_modules")
 
 
 def bind(receipt: dict, tolerances_path: Path, manifest_path: Path, oracle_path=None,
@@ -199,6 +254,20 @@ def bind(receipt: dict, tolerances_path: Path, manifest_path: Path, oracle_path=
         raise ValueError("tolerances_sha256_mismatch")
     if digest(manifest_path) != receipt["mapping_manifest"]["sha256"]:
         raise ValueError("mapping_manifest_sha256_mismatch")
+    if is_v2(manifest):
+        if digest(tolerances_path) != manifest["tolerances"]["sha256"]:
+            raise ValueError("tolerances_sha256_disagrees_with_manifest")
+        if receipt.get("schema_version") != 2:
+            raise ValueError("receipt_is_not_a_v2_receipt")
+        manifest = load_effective_v2(manifest, Path(manifest_path).parent)
+        missing = [name for name in V2_SOURCES if name not in receipt.get("local_source_sha256", {})]
+        if missing:
+            raise ValueError("local_source_not_recorded:" + ",".join(missing))
+        module = receipt.get("distribution_module", {})
+        if module.get("source_sha256") != receipt["local_source_sha256"]["distribution_module.py"]:
+            raise ValueError("distribution_module_source_sha256_mismatch")
+    elif receipt.get("schema_version", 1) != 1:
+        raise ValueError("v2_receipt_bound_to_a_v1_manifest")
     if oracle_path is not None and digest(oracle_path) != manifest["oracle"]["receipt_sha256"]:
         raise ValueError("oracle_receipt_sha256_mismatch")
     limits = tolerances["limits"]
@@ -208,7 +277,7 @@ def bind(receipt: dict, tolerances_path: Path, manifest_path: Path, oracle_path=
         raise ValueError("receipt_unsupported_mappings_disagree_with_manifest")
     if receipt["engine"]["version"] != manifest["engine"]["version"]:
         raise ValueError("engine_version_disagrees_with_manifest:" + receipt["engine"]["version"])
-    if receipt["evidence_class"] != manifest["evidence_class"]:
+    if receipt["evidence_class"] != manifest_evidence_class(manifest):
         raise ValueError("evidence_class_disagrees_with_manifest:" + receipt["evidence_class"])
     check_local_sources(receipt, source_dir)
     if plan_path is not None:
@@ -267,6 +336,178 @@ def recompute_cash_ledger(initial: Decimal, fills, distributions) -> list:
         cash += event["delta"]
         ledger.append({"kind": event["kind"], "utc_seconds": event["utc_seconds"], "cash": cash})
     return ledger
+
+
+def _exact(checks, key, field, expected, observed, ok=None):
+    """An exact, non-numeric or structural check. ``ok`` overrides equality."""
+    passed = (expected == observed) if ok is None else bool(ok)
+    return _record(checks, {"id": key, "field": field, "expected": str(expected),
+                            "observed": str(observed), "delta": "-", "tolerance": "exact",
+                            "status": "PASS" if passed else "FAIL", "blocked_by": None})
+
+
+def _skip(checks, key, field, reason):
+    return _record(checks, {"id": key, "field": field, "expected": "available", "observed": "absent",
+                            "delta": "-", "tolerance": "exact", "status": "SKIPPED",
+                            "blocked_by": None, "reason": reason})
+
+
+def _oco_structure_ok(pair, side: str, quantity: int) -> bool:
+    legs = pair.get("legs", [])
+    if len(legs) != 2:
+        return False
+    ids = [leg["client_order_id"] for leg in legs]
+    for leg, sibling in zip(legs, reversed(ids)):
+        if (leg["side"] != side or int(leg["quantity"]) != abs(quantity)
+                or leg["contingency_type"] != "OCO" or leg["order_list_id"] != pair["order_list_id"]
+                or leg["time_in_force"] != "GTC" or leg["trigger_type"] != "DEFAULT"
+                or leg["reduce_only"] is not False or leg["linked_order_ids"] != [sibling]):
+            return False
+    return True
+
+
+def v2_oco_checks(checks, receipt: dict, expected: dict, bars) -> None:
+    """market_on_open_proxy acceptance criteria, per preregistered OCO pair."""
+    evidence = bars is not None and len(bars) > 0
+    by_ts = {row["ts_event_ns"]: row for row in bars} if evidence else {}
+    sessions, first = [], {}
+    for row in bars or []:
+        if row["session_date"] not in first:
+            first[row["session_date"]] = row
+            sessions.append(row["session_date"])
+    pairs = receipt.get("oco_pairs", [])
+    events = receipt.get("order_events", [])
+    intents = {i.get("order_ref"): i for i in receipt["intents"]}
+    _exact(checks, "oco_pairs", "count", len(expected["intents"]), len(pairs))
+    _exact(checks, "oco_orders", "count", 2 * len(expected["intents"]),
+           sum(len(pair.get("legs", [])) for pair in pairs))
+    for index, pair in enumerate(pairs):
+        intent = intents.get(pair.get("order_ref"))
+        name = (str(intent.get("reason")) + "_oco") if intent and intent.get("reason") \
+            else "oco_" + str(index + 1)
+        if intent is None:
+            _exact(checks, name, "intent", "present", "absent")
+            continue
+        quantity = int(intent["quantity"])
+        side = "BUY" if quantity > 0 else "SELL"
+        decision_ts = int(intent["ts_event_ns"])
+        _exact(checks, name, "submitted_ts_event_ns", decision_ts, int(pair["submitted_ts_event_ns"]))
+        _exact(checks, name, "leg_types", ["MARKET_IF_TOUCHED", "STOP_MARKET"],
+               sorted(leg["order_type"] for leg in pair.get("legs", [])))
+        _exact(checks, name, "oco_structure", "native OCO, full quantity, reciprocal links",
+               "as expected" if _oco_structure_ok(pair, side, quantity) else "differs",
+               ok=_oco_structure_ok(pair, side, quantity))
+        close = tested = None
+        if evidence:
+            bar = by_ts.get(decision_ts)
+            if bar is None:
+                _exact(checks, name, "decision_bar", "present", "absent")
+            else:
+                close = Decimal(bar["c"])
+                _exact(checks, name, "reference_close", close, Decimal(pair["reference_close"]))
+                want = {"STOP_MARKET": close + TICK if quantity > 0 else close - TICK,
+                        "MARKET_IF_TOUCHED": close - TICK if quantity > 0 else close + TICK}
+                for leg in pair.get("legs", []):
+                    if leg["order_type"] in want:
+                        _exact(checks, name, leg["order_type"].lower() + "_trigger",
+                               want[leg["order_type"]], Decimal(leg["trigger_price"]))
+                position = sessions.index(bar["session_date"])
+                tested = first[sessions[position + 1]] if position + 1 < len(sessions) else None
+                if tested is None:
+                    _exact(checks, name, "tested_bar", "present", "absent")
+        else:
+            _skip(checks, name, "trigger_and_gap_evidence",
+                  "No converted bars: triggers, the gap and the open price cannot be checked.")
+        leg_ids = {leg["client_order_id"] for leg in pair.get("legs", [])}
+        pair_events = [e for e in events if e.get("client_order_id") in leg_ids]
+        accepted = {e["client_order_id"] for e in pair_events if e["event"] == "OrderAccepted"}
+        _exact(checks, name, "legs_accepted", 2, len(accepted))
+        _exact(checks, name, "denied_or_rejected", 0,
+               sum(1 for e in pair_events if e["event"] in ("OrderDenied", "OrderRejected")))
+        fills = [e for e in pair_events if e["event"] == "OrderFilled"]
+        _exact(checks, name, "fill_events", 1, len(fills))
+        if len(fills) != 1:
+            continue
+        fill = fills[0]
+        _exact(checks, name, "fill_quantity", abs(quantity), int(_decimal(fill["last_qty"])))
+        _exact(checks, name, "look_ahead_fill", "after " + str(decision_ts), fill["ts_event_ns"],
+               ok=int(fill["ts_event_ns"]) > decision_ts)
+        cancels = [e for e in pair_events if e["event"] == "OrderCanceled"]
+        _exact(checks, name, "sibling_cancels", 1, len(cancels))
+        sibling_ok = (len(cancels) == 1 and cancels[0]["client_order_id"] in leg_ids - {fill["client_order_id"]}
+                      and cancels[0]["ts_event_ns"] == fill["ts_event_ns"])
+        _exact(checks, name, "sibling_canceled_at_fill_instant", fill["ts_event_ns"],
+               cancels[0]["ts_event_ns"] if cancels else None, ok=sibling_ok)
+        if close is not None and tested is not None:
+            _exact(checks, name, "fill_in_tested_bar", tested["ts_event_ns"], fill["ts_event_ns"])
+            gap = abs(Decimal(tested["o"]) - close)
+            _exact(checks, name, "moo_proxy_no_gap", ">= " + str(TICK), gap, ok=gap >= TICK)
+            _exact(checks, name, "moo_proxy_not_open", Decimal(tested["o"]), _decimal(fill["last_px"]))
+
+
+def v2_run_checks(checks, receipt: dict) -> None:
+    """Callback failures and the ERROR-level engine log scan, for both runs."""
+    runs = receipt.get("runs", [])
+    _exact(checks, "runs", "count", 2, len(runs))
+    for run in runs:
+        label = str(run.get("label"))
+        _exact(checks, "run_integrity", label + ".strategy_callback_errors", 0,
+               len(run.get("strategy_callback_errors", [])))
+        scan = run.get("engine_log_scan")
+        if scan is None:
+            _exact(checks, "engine_log", label + ".scan", "present", "absent")
+            continue
+        _exact(checks, "engine_log", label + ".captured_lines", "> 0", scan["lines"],
+               ok=scan["lines"] > 0)
+        _exact(checks, "engine_log", label + ".error_lines", 0, scan["error_lines"])
+        _exact(checks, "engine_log", label + ".negative_cash_lines", 0, scan["negative_cash_lines"])
+
+
+def v2_distribution_checks(checks, receipt: dict, manifest: dict, limits: dict) -> None:
+    """distributions_and_cash acceptance criteria against the sealed predictions."""
+    module = receipt.get("distribution_module", {})
+    predictions = manifest["one_zero_predictions"]["distributions"]
+    _exact(checks, "distribution_module", "class", "DistributionModule", module.get("class"))
+    _exact(checks, "distribution_module", "venue_module_count", 1, module.get("venue_module_count"))
+    _exact(checks, "distribution_module", "errors", 0, len(module.get("errors", [])))
+    emissions = module.get("emissions", [])
+    _exact(checks, "distribution_module", "emissions", len(predictions), len(emissions))
+    calls = set(module.get("calls_at_event_instants_ns", []))
+    rows = receipt.get("native_account_event_rows", [])
+    acknowledged = {}
+    for record in module.get("acknowledgements", []):
+        ok = bool(record["outcomes"]) and all(o["applied"] and o["error"] is None
+                                              for o in record["outcomes"])
+        for ex_date in record["ex_dates"]:
+            acknowledged[ex_date] = acknowledged.get(ex_date, True) and ok
+    for index, want in enumerate(predictions):
+        name = "distribution_" + str(index + 1)
+        instant = int(want["ex_instant_utc_seconds"]) * 10 ** 9
+        _exact(checks, name, "process_called_at_ex_instant", instant,
+               instant if instant in calls else None)
+        got = emissions[index] if index < len(emissions) else None
+        if got is None:
+            _exact(checks, name, "emission", "present", "absent")
+            continue
+        _exact(checks, name, "emitted_at_ns", instant, int(got["ts_now_ns"]))
+        _exact(checks, name, "on_time", True, got["on_time"])
+        _exact(checks, name, "eligible_quantity", int(want["eligible_quantity"]),
+               int(got["eligible_quantity"]))
+        _exact(checks, name, "per_share", Decimal(want["per_share"]), Decimal(got["per_share"]))
+        _check(checks, name, "amount_usd", want["amount_usd"], got["amount"], limits["dividend_usd_abs"])
+        _exact(checks, name, "acknowledged_applied", True, acknowledged.get(got["ex_date"], False))
+        reported = [i for i, row in enumerate(rows)
+                    if row["reported"] and int(row["ts_event_ns"]) == instant]
+        delta = None
+        if len(reported) == 1 and reported[0] > 0:
+            j = reported[0]
+            delta = Decimal(rows[j]["total"]) - Decimal(rows[j - 1]["total"])
+        _exact(checks, name, "reported_account_state_delta", Decimal(got["amount"]), delta,
+               ok=delta is not None and delta == Decimal(got["amount"]))
+    ledger = receipt.get("distribution_ledger", [])
+    _exact(checks, "distribution_ledger", "engine_posted", True,
+           bool(ledger) and len(ledger) == len(predictions)
+           and all(d.get("engine_posted") is True for d in ledger))
 
 
 def compare(receipt: dict, oracle: dict, limits: dict, manifest=None, bars=None) -> dict:
@@ -406,6 +647,11 @@ def compare(receipt: dict, oracle: dict, limits: dict, manifest=None, bars=None)
                              "delta": "-", "tolerance": "exact", "status": "FAIL",
                              "blocked_by": None})
 
+    if is_v2(manifest):
+        v2_oco_checks(checks, receipt, expected, bars if evidence_available else None)
+        v2_run_checks(checks, receipt)
+        v2_distribution_checks(checks, receipt, manifest, limits)
+
     _record(checks, {"id": "two_run_determinism", "field": "normalized_economic_sha256",
                      "expected": "equal",
                      "observed": "equal" if observed["two_run_records_equal"] else "differs",
@@ -445,9 +691,13 @@ def compare(receipt: dict, oracle: dict, limits: dict, manifest=None, bars=None)
             "manifest_unsupported_mappings": sorted(declared),
             "attribution_evidence": "converted bars" if evidence_available else "none",
             "native_end_cash_usd": str(observed["native_end_cash_usd"]),
-            "note": "A failure is BLOCKED only when a measured deviation matches a mapping the bound "
-                    "manifest declares unsupported. Any residue stays an unattributed FAIL, and a "
-                    "skipped check or rejected attribution leaves the comparison incomplete."}
+            "manifest_schema_version": manifest.get("schema_version", 1) if manifest else None,
+            "note": ("Mapping manifest v2 declares no unsupported row for this case, so no failure "
+                     "can be attributed: any failing check is FAIL, and a skipped check or rejected "
+                     "attribution leaves the comparison incomplete." if is_v2(manifest) else
+                     "A failure is BLOCKED only when a measured deviation matches a mapping the bound "
+                     "manifest declares unsupported. Any residue stays an unattributed FAIL, and a "
+                     "skipped check or rejected attribution leaves the comparison incomplete.")}
 
 
 def main() -> int:
@@ -456,7 +706,9 @@ def main() -> int:
     parser.add_argument("--oracle", type=Path,
                         default=SOURCE.parent.parent / "historical-simulation/receipt.json")
     parser.add_argument("--tolerances", type=Path, default=SOURCE / "tolerances.json")
-    parser.add_argument("--manifest", type=Path, default=SOURCE / "mapping-manifest.json")
+    parser.add_argument("--manifest", type=Path, default=None,
+                        help="Mapping manifest; defaults to the file the receipt names in this "
+                             "directory, and is always checked against the receipt's sha256")
     parser.add_argument("--plan", type=Path,
                         default=SOURCE.parent.parent / "historical-simulation/plan.json")
     parser.add_argument("--bars", type=Path,
@@ -468,6 +720,8 @@ def main() -> int:
     args = parser.parse_args()
 
     receipt = json.loads(args.receipt.read_text())
+    if args.manifest is None:
+        args.manifest = SOURCE / Path(receipt["mapping_manifest"]["path"]).name
     if args.case and args.case != receipt["case"]:
         raise ValueError("requested_case_is_not_the_receipt_case:" + args.case)
     limits, manifest = bind(receipt, args.tolerances, args.manifest, args.oracle, args.plan)
