@@ -281,12 +281,18 @@ class NautilusPrecondition(unittest.TestCase):
 
 
 class ReadOnlySource(unittest.TestCase):
-    def test_no_probe_calls_an_order_method(self):
+    def test_no_probe_references_an_order_method(self):
+        # Any reference counts, not only direct calls: the ibapi probe dispatches
+        # requests through a table of bound methods.
         for name in ("ibapi_probe.py", "nautilus_probe.py"):
             tree = ast.parse((SOURCE / name).read_text())
-            called = {node.func.attr if isinstance(node.func, ast.Attribute) else getattr(node.func, "id", "")
-                      for node in ast.walk(tree) if isinstance(node, ast.Call)}
-            self.assertFalse(called & ORDER_CALLS, name)
+            names = {node.attr for node in ast.walk(tree) if isinstance(node, ast.Attribute)}
+            names |= {node.id for node in ast.walk(tree) if isinstance(node, ast.Name)}
+            self.assertFalse(names & ORDER_CALLS, name)
+
+    def test_order_reference_check_catches_table_dispatch(self):
+        tree = ast.parse('steps = (("orders", 10, p.reqGlobalCancel, None),)')
+        self.assertIn("reqGlobalCancel", {n.attr for n in ast.walk(tree) if isinstance(n, ast.Attribute)} & ORDER_CALLS)
 
     def test_published_evidence_holds_no_account_id_or_home_path(self):
         paths = sorted((SOURCE / "evidence").rglob("*.json")) + sorted((ROOT / "evidence/receipts").glob("ibkr-*.json"))

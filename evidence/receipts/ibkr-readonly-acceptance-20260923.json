@@ -15,7 +15,7 @@
     "Client ids 73 (ibapi) and 76 (Nautilus) instead of the planned 71.",
     "Receipts: evidence/ and evidence/receipts/ instead of the plan's receipt_path, which is the gate's flip receipt; both probes now refuse to write there.",
     "Bars: the ibapi probe requests 2 D of 5-minute TRADES bars (useRTH=1); the Nautilus probe requests 1-DAY-LAST and 5-MINUTE-LAST over 5 D; the plan named 1-DAY over 5 days.",
-    "Timeouts: ibapi overall deadline 90 s (plan overall_timeout_seconds) with per-request waits of 5-20 s; Nautilus per-call timeout 20 s (plan per_call_timeout_seconds) plus a 5 s TCP pre-check. The first committed version (a0bed5d) used 60 s and 30 s.",
+    "Timeouts: ibapi overall deadline 90 s (plan overall_timeout_seconds) with per-request waits of 5-20 s; Nautilus per-call timeout 20 s (plan per_call_timeout_seconds) plus a 5 s TCP pre-check. The first committed version (b67bf15) used 60 s and 30 s.",
     "Quote age: applied from the fixed version on, as last-trade timestamp against server time with a 2 s one-second-resolution allowance; the first committed version did not check it.",
     "Data mode: the plan declared DELAYED; the published run was granted REALTIME (the plan records whatever is granted)."
   ],
@@ -130,7 +130,7 @@
     },
     {
       "utc": "2026-09-23T13:23:58Z",
-      "client": "ibapi_probe.py first committed version (a0bed5d)",
+      "client": "ibapi_probe.py first committed version (b67bf15)",
       "status": "incomplete",
       "detail": "10197 No market data during competing live session and 162 connected from a different IP address: the same username was signed in elsewhere; account-summary tags returned",
       "file": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/attempts/20260923T132358Z-ibapi.json",
@@ -138,7 +138,7 @@
     },
     {
       "utc": "2026-09-23T13:24:30Z",
-      "client": "nautilus_probe.py first committed version (a0bed5d)",
+      "client": "nautilus_probe.py first committed version (b67bf15)",
       "status": "refused_no_passed_paper_ibapi_receipt",
       "detail": "precondition guard refused, as designed",
       "file": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/attempts/20260923T132430Z-nautilus.json",
@@ -146,7 +146,7 @@
     },
     {
       "utc": "2026-09-23T14:13:00Z",
-      "client": "ibapi_probe.py first committed version (a0bed5d)",
+      "client": "ibapi_probe.py first committed version (b67bf15)",
       "status": "passed",
       "detail": "REALTIME, no 2188, every request completed; superseded after review (verdict did not require completed snapshots or a quote age)",
       "file": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/attempts/20260923T141300Z-ibapi.json",
@@ -154,7 +154,7 @@
     },
     {
       "utc": "2026-09-23T14:13:11Z",
-      "client": "nautilus_probe.py first committed version (a0bed5d)",
+      "client": "nautilus_probe.py first committed version (b67bf15)",
       "status": "passed",
       "detail": "5 daily and 390 five-minute native bars; superseded after review (no receipt-age guard)",
       "file": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/attempts/20260923T141311Z-nautilus.json",
