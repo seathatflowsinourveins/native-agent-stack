@@ -21,7 +21,10 @@ families, each in both presentation orders, and every judgment is attacked by on
    written; ``record_verdicts.py --adjudications <out>`` reads them.
 
 A winner needs unanimous, unrefuted judgments from both families, each covering both orders; anything
-else is a split (winner_lane null). A judgment counts only when both its judge and its refuter returned
+else is a split (winner_lane null). A judge or refuter that finds reviewer identity in its input answers
+``leak: true`` with the text (adjudication-prompt.md): that judgment is missing with failure "leak", never
+counted, and the layer's inputs are listed in a ``leaks.json`` (codex, claude-collect) and
+``<work-dir>/adjudication-leaks.json`` (assemble). A judgment counts only when both its judge and its refuter returned
 a valid object: a lost refuter is never read as "unrefuted". Stdlib only.
 """
 from __future__ import annotations
@@ -213,6 +216,15 @@ def load_index(work_dir: Path) -> dict:
     return load_json(path)
 
 
+def packet_path_of(input_path) -> str:
+    """The packet path an input file names (written by ``build_inputs``), or "" when it cannot be read."""
+    try:
+        value = load_json(input_path).get("packet_path")
+    except (OSError, ValueError, AttributeError):
+        return ""
+    return value if isinstance(value, str) else ""
+
+
 def pending_items(index: dict, layers=None) -> list:
     """[(name, order, input_path, packet_sha256)] for every disagreeing layer."""
     items = []
@@ -229,9 +241,18 @@ def pending_items(index: dict, layers=None) -> list:
 
 # ---------------------------------------------------------------- judgment objects
 
+def leak_text(data):
+    """The reported text when a judge or refuter object declares ``leak: true``, else None. A leak refusal
+    never counts as a judgment (round-2 review)."""
+    if isinstance(data, dict) and data.get("leak") is True:
+        text = data.get("leak_text")
+        return text if isinstance(text, str) and text.strip() else "(no leak text given)"
+    return None
+
+
 def valid_judge(data):
-    """The judge object reduced to its schema keys, or None."""
-    if not isinstance(data, dict):
+    """The judge object reduced to its schema keys, or None (a ``leak: true`` object is never valid)."""
+    if not isinstance(data, dict) or leak_text(data) is not None:
         return None
     why, refs = data.get("why"), data.get("evidence_refs")
     if (data.get("preferred") not in ("A", "B") or not isinstance(why, str) or len(why.strip()) < MIN_WHY
@@ -241,7 +262,7 @@ def valid_judge(data):
 
 
 def valid_refuter(data):
-    if not isinstance(data, dict):
+    if not isinstance(data, dict) or leak_text(data) is not None:
         return None
     refs = data.get("evidence_refs")
     if (type(data.get("refuted")) is not bool or not isinstance(data.get("reason"), str)
@@ -250,12 +271,20 @@ def valid_refuter(data):
     return {"refuted": data["refuted"], "reason": data["reason"], "evidence_refs": refs}
 
 
+LEAK = "leak"
+
+
 def judgment_record(family, name, order, input_path, packet_sha256, model, repo, judge, refuter,
-                    failure=None, exit_codes=None) -> dict:
-    return {"schema_version": JUDGMENT_SCHEMA_VERSION, "family": family, "layer": name, "order": order,
-            "input_path": str(input_path), "packet_sha256": packet_sha256, "model": model,
-            "repo": str(repo) if repo else None, "judge": judge, "refuter": refuter, "failure": failure,
-            "exit_codes": exit_codes or {}}
+                    failure=None, exit_codes=None, leak=None) -> dict:
+    """``leak`` is ``{"stage": "judge"|"refuter", "text": ...}`` when an agent refused on a reviewer-identity
+    leak; the judgment is then missing with failure "leak"."""
+    record = {"schema_version": JUDGMENT_SCHEMA_VERSION, "family": family, "layer": name, "order": order,
+              "input_path": str(input_path), "packet_sha256": packet_sha256, "model": model,
+              "repo": str(repo) if repo else None, "judge": judge, "refuter": refuter,
+              "failure": LEAK if leak else failure, "exit_codes": exit_codes or {}}
+    if leak:
+        record["leak"] = leak
+    return record
 
 
 def model_issue(model, family):
@@ -276,6 +305,8 @@ def usable_judgment(data, family, order, packet_sha256):
         return issue
     if data.get("packet_sha256") != packet_sha256:
         return "judged a different packet"
+    if data.get("leak") or data.get("failure") == LEAK:
+        return LEAK
     if valid_judge(data.get("judge")) is None:
         return data.get("failure") or "no valid judge object"
     if valid_refuter(data.get("refuter")) is None:
@@ -290,8 +321,12 @@ def split_prompt(text: str):
     return judge.strip() + "\n", refuter.strip() + "\n"
 
 
-def fill(template: str, input_path, repo, judgment=None) -> str:
-    text = template.replace("{INPUT_PATH}", str(input_path)).replace("{REPO_ROOT}", str(repo))
+def fill(template: str, input_path, repo, judgment=None, packet_path=None) -> str:
+    """Fill the three labelled lines' placeholders ({INPUT_PATH}, {PACKET_PATH}, {REPO_ROOT}) and {JUDGMENT}.
+    ``packet_path`` defaults to the one the input file names."""
+    packet = packet_path if packet_path is not None else packet_path_of(input_path)
+    text = (template.replace("{INPUT_PATH}", str(input_path)).replace("{PACKET_PATH}", str(packet))
+            .replace("{REPO_ROOT}", str(repo)))
     return text.replace("{JUDGMENT}", json.dumps(judgment, sort_keys=True)) if judgment is not None else text
 
 
@@ -306,7 +341,8 @@ def refuse_git_repo(repo: Path):
 # ---------------------------------------------------------------- codex
 
 def run_codex_call(repo, schema, out_tmp, effort, prompt, model, timeout, events_path, validate):
-    """Run one codex exec call, retried once. Returns (object or None, event model or None, exit codes, failure)."""
+    """Run one codex exec call, retried once. Returns (object or None, event model or None, exit codes, failure,
+    leak text or None). A ``leak: true`` answer is final: it is not retried and never returns an object."""
     cmd = codex_lane.build_command(repo, schema, out_tmp, effort, prompt, model, codex_lane.ISOLATION_ARGS)
     exit_codes, event_model, failure = [], None, "no attempt ran"
     events_path.write_text("", encoding="utf-8")
@@ -330,12 +366,15 @@ def run_codex_call(repo, schema, out_tmp, effort, prompt, model, timeout, events
             continue
         finally:
             out_tmp.unlink(missing_ok=True)
+        leaked = leak_text(data)
+        if leaked is not None:
+            return None, event_model, exit_codes, LEAK, leaked
         checked = validate(data)
         if checked is None:
             failure = "the output did not satisfy the schema"
             continue
-        return checked, event_model, exit_codes, None
-    return None, event_model, exit_codes, f"failed after retry: {failure}"
+        return checked, event_model, exit_codes, None, None
+    return None, event_model, exit_codes, f"failed after retry: {failure}", None
 
 
 def run_codex(args) -> int:
@@ -375,29 +414,38 @@ def run_codex(args) -> int:
         schemas[label] = out_dir / f"adjudication-{label}.codex-strict.schema.json"
         schemas[label].write_text(json.dumps(codex_lane.strict_output_schema(load_json(source)), indent=1,
                                              sort_keys=True) + "\n", encoding="utf-8")
-    failures, lock = [], threading.Lock()
+    failures, leaks, lock = [], [], threading.Lock()
 
     def process(item):
         name, order, input_path, packet_sha256, out_path = item
         stem = f"{name}.{order}"
-        judge, judge_model, judge_codes, failure = run_codex_call(
+        leak = None
+        judge, judge_model, judge_codes, failure, judge_leak = run_codex_call(
             repo, schemas["judge"], out_dir / f"{stem}.judge.out.tmp", args.effort,
             fill(judge_template, input_path, repo), args.model, args.timeout,
             events_dir / f"{stem}.judge.jsonl", valid_judge)
         refuter, refute_model, refute_codes = None, None, []
-        if judge is not None:
-            refuter, refute_model, refute_codes, failure = run_codex_call(
+        if judge_leak is not None:
+            leak = {"stage": "judge", "text": judge_leak}
+        elif judge is not None:
+            refuter, refute_model, refute_codes, failure, refute_leak = run_codex_call(
                 repo, schemas["refute"], out_dir / f"{stem}.refute.out.tmp", args.effort,
                 fill(refute_template, input_path, repo, judge), args.model, args.timeout,
                 events_dir / f"{stem}.refute.jsonl", valid_refuter)
+            if refute_leak is not None:
+                leak = {"stage": "refuter", "text": refute_leak}
             failure = f"refuter {failure}" if failure else None
         elif failure:
             failure = f"judge {failure}"
+        if leak:
+            failure = LEAK
+            with lock:
+                leaks.append((name, order, {**leak, "family": "openai"}))
         # The configured --model first, as codex_lane.py records it; the event stream only reports.
         model = args.model or judge_model or "unknown"
         write_json(out_path, judgment_record(
-            "openai", name, order, input_path, packet_sha256, model, repo, judge, refuter, failure,
-            {"judge": judge_codes, "refuter": refute_codes}))
+            "openai", name, order, input_path, packet_sha256, model, repo, None if leak else judge,
+            refuter, failure, {"judge": judge_codes, "refuter": refute_codes}, leak))
         if refute_model and refute_model != judge_model:
             print(f"adjudicate: {stem} judge model {judge_model!r} and refuter model {refute_model!r} differ",
                   file=sys.stderr)
@@ -420,9 +468,30 @@ def run_codex(args) -> int:
     if flagged:
         print(f"adjudicate: blind audit flags {len(flagged)} call(s) for review: {', '.join(flagged)}",
               file=sys.stderr)
+    write_leaks(out_dir / LEAKS_NAME, load_index(work_dir), leaks)
     for stem, failure in sorted(failures):
         print(f"adjudicate: codex {stem}: {failure}", file=sys.stderr)
     return 1 if failures else 0
+
+
+# ---------------------------------------------------------------- leaks
+
+LEAKS_NAME = "leaks.json"
+
+
+def write_leaks(path: Path, index: dict, leaks) -> list:
+    """Write ``{"schema_version", "leaks": [...]}`` to ``path``: one entry per leaked judgment (layer, order,
+    family, stage, text) with both of the layer's input files, since the leaking text sits in the layer's
+    inputs, not in one order. Returns the entries; an empty list is written too, so a rerun clears old ones."""
+    inputs = {entry["layer"]: entry.get("inputs") or {} for entry in index.get("layers") or []}
+    entries = [{"layer": name, "order": order, "family": leak.get("family"), "stage": leak.get("stage"),
+                "text": leak.get("text"), "inputs": inputs.get(name, {})}
+               for name, order, leak in sorted(leaks, key=lambda item: (item[0], item[1], str(item[2].get("family"))))]
+    write_json(path, {"schema_version": 1, "leaks": entries})
+    for entry in entries:
+        print(f"adjudicate: LEAK {entry['family']} {entry['layer']}.{entry['order']} {entry['stage']}: "
+              f"{entry['text']}", file=sys.stderr)
+    return entries
 
 
 # ---------------------------------------------------------------- claude
@@ -431,8 +500,8 @@ def claude_args(work_dir: Path, repo: Path, prompt_path: Path = PROMPT_PATH, lay
     """The adjudication-lane.js args for every disagreeing layer."""
     items = pending_items(load_index(work_dir), layers)
     return {"repo": str(repo), "prompt": prompt_path.read_text(encoding="utf-8"),
-            "items": [{"name": name, "order": order, "path": path, "packet_sha256": sha}
-                      for name, order, path, sha in items]}
+            "items": [{"name": name, "order": order, "path": path, "packet_path": packet_path_of(path),
+                       "packet_sha256": sha} for name, order, path, sha in items]}
 
 
 def collect_claude(work_dir: Path, result, model: str, repo=None) -> list:
@@ -448,11 +517,24 @@ def collect_claude(work_dir: Path, result, model: str, repo=None) -> list:
         if isinstance(item, dict) and item.get("order") in ORDERS and isinstance(item.get("name"), str):
             returned[(item["name"], item["order"])] = item
     repo = repo or (result.get("repo") if isinstance(result, dict) else None)
-    missing = []
-    for name, order, input_path, packet_sha256 in pending_items(load_index(work_dir)):
+    missing, leaks = [], []
+    index = load_index(work_dir)
+    for name, order, input_path, packet_sha256 in pending_items(index):
         item = returned.get((name, order)) or {}
         judge, refuter = valid_judge(item.get("judge")), valid_refuter(item.get("refuter"))
-        if not item:
+        leak = item.get("leak") if isinstance(item.get("leak"), dict) else None
+        if leak is None:
+            for stage in ("judge", "refuter"):
+                if leak_text(item.get(stage)) is not None:
+                    leak = {"stage": stage, "text": leak_text(item.get(stage))}
+                    break
+        if leak is not None:
+            leak = {"stage": leak.get("stage"), "text": leak.get("text")}
+            judge, refuter = None, None
+            leaks.append((name, order, {**leak, "family": "anthropic"}))
+        if leak is not None:
+            failure = LEAK
+        elif not item:
             failure = "lost: the workflow returned no item"
         elif judge is None:
             failure = "judge lost or invalid"
@@ -463,9 +545,11 @@ def collect_claude(work_dir: Path, result, model: str, repo=None) -> list:
         if item and item.get("packet_sha256") not in (None, packet_sha256):
             failure, judge, refuter = "the workflow judged a different packet", None, None
         write_json(work_dir / JUDGMENTS_DIR / "claude" / f"{name}.{order}.json", judgment_record(
-            "anthropic", name, order, input_path, packet_sha256, model, repo, judge, refuter, failure))
+            "anthropic", name, order, input_path, packet_sha256, model, repo, judge, refuter, failure,
+            leak=leak))
         if failure:
             missing.append((f"{name}.{order}", failure))
+    write_leaks(work_dir / JUDGMENTS_DIR / "claude" / LEAKS_NAME, index, leaks)
     return missing
 
 
@@ -480,7 +564,7 @@ def relative_ref(ref: str, repo) -> str:
 def assemble_layer(work_dir: Path, entry: dict):
     """(record, notes) for one disagreeing layer; notes name every judgment that does not count."""
     name, packet_sha256 = entry["layer"], entry["packet_sha256"]
-    judgments, whys, refs, notes = [], [], set(), []
+    judgments, whys, refs, notes, leaks = [], [], set(), [], []
     for lane, family in FAMILIES.items():
         for order in ORDERS:
             path = work_dir / JUDGMENTS_DIR / lane / f"{name}.{order}.json"
@@ -490,6 +574,9 @@ def assemble_layer(work_dir: Path, entry: dict):
                 notes.append(f"{family} {order}: no judgment file")
                 continue
             reason = usable_judgment(data, family, order, packet_sha256)
+            if reason == LEAK:
+                leak = data.get("leak") if isinstance(data.get("leak"), dict) else {}
+                leaks.append((name, order, {"family": family, "stage": leak.get("stage"), "text": leak.get("text")}))
             if reason:
                 notes.append(f"{family} {order}: {reason}")
                 continue
@@ -524,7 +611,7 @@ def assemble_layer(work_dir: Path, entry: dict):
               "evidence_refs": sorted(refs), "judgments": judgments}
     if missing:
         record["missing_families"] = missing
-    return record, notes
+    return record, notes, leaks
 
 
 def adjudication_provenance() -> dict:
@@ -537,15 +624,17 @@ def adjudication_provenance() -> dict:
 def assemble(work_dir: Path, out_dir: Path, layers=None):
     """Write every valid record; return (written names, issues)."""
     work_dir, out_dir = Path(work_dir).resolve(), Path(out_dir)
-    written, issues = [], []
+    written, issues, leaks = [], [], []
     provenance = adjudication_provenance()
-    for entry in load_index(work_dir).get("layers") or []:
+    index = load_index(work_dir)
+    for entry in index.get("layers") or []:
         if entry.get("agreement") != "disagree":
             continue
         name = entry["layer"]
         if layers and name not in layers and name.split("__", 1)[1] not in layers:
             continue
-        record, notes = assemble_layer(work_dir, entry)
+        record, notes, layer_leaks = assemble_layer(work_dir, entry)
+        leaks.extend(layer_leaks)
         for note in notes:
             print(f"adjudicate: {name}: {note}", file=sys.stderr)
         issue, _result = judge_adjudication(record, grandfathered=False, packet_sha256=entry["packet_sha256"])
@@ -555,6 +644,8 @@ def assemble(work_dir: Path, out_dir: Path, layers=None):
         # judge_adjudication and record_verdicts.load_adjudication ignore extra top-level keys.
         write_json(out_dir / f"{name}.json", {**record, "provenance": provenance})
         written.append(name)
+    # Next to the adjudication-inputs, not in --out, which record_verdicts.py --adjudications reads.
+    write_leaks(work_dir / f"adjudication-{LEAKS_NAME}", index, leaks)
     return written, issues
 
 

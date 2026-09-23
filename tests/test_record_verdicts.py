@@ -2004,6 +2004,21 @@ class ReviewOf122Tests(NewWaveFixture):
             self.run_wave()
         self.assertFalse(self.sealed_base().exists())
 
+    def test_a_packet_built_with_gap_receipts_is_refused_for_a_new_wave(self):
+        # Round-2 review: --gap-receipts lists the checks run against the previous winner.
+        for key, value in (("gap_receipts", ["evidence/artifacts/gap-wave2/x/7-winner-readiness-today.json"]),
+                           ("gap_receipts_note", "gap_receipts lists receipts")):
+            with self.subTest(key):
+                self.packets = PacketWriter(self.work_dir)
+                packet = make_packet("foundation", "wave-withheld-layer", [
+                    make_candidate("c1", "wave-withheld-layer", "c1"), make_candidate("c2", "wave-withheld-layer", "c2")])
+                packet[key] = value
+                self.packets.write("foundation", "wave-withheld-layer", packet)
+                self.packets.flush()
+                with self.assertRaisesRegex(SystemExit, "carries withheld keys \\['" + key + "'\\]"):
+                    self.run_wave()
+                self.assertFalse(self.sealed_base().exists())
+
     def test_a_packet_carrying_a_disposition_label_or_a_nested_withheld_key_is_refused(self):
         # Review of the #122 fix round: --write re-checked only the positions withhold_popularity
         # strips, so a disposition label or a nested release/popularity key reached the sealed wave.

@@ -126,7 +126,10 @@ REQUIREMENT_GATED_FIELDS = {"archived": ("archiv", "maintained", "maintenance"),
 PACKET_OWN_KEYS = ("checked_at",)
 COPY_DISPOSITION_KEYS = ("selection", "disposition", "rationale", "current_choice")
 COPY_NULL_ONLY_KEYS = ("review_status",)
-TOP_LEVEL_WITHHELD_KEYS = ("current_choice", "decision", "rationale")
+# gap_receipts (lane_packets.py --gap-receipts) is the set of checks run against each layer's previous
+# winner, and many of those receipts repeat the gap text or name the winner, so a blind wave's retained
+# packets never carry it (round-2 review). The grandfathered 2026-09-22 packets are not re-checked.
+TOP_LEVEL_WITHHELD_KEYS = ("current_choice", "decision", "rationale", "gap_receipts", "gap_receipts_note")
 # The Claude lane's refutation summary (layer-verdict-lane.js): both lens votes are required on the
 # object it seals (2026-09-23 review of #122, finding 5).
 REFUTATION_LENSES = ("evidence", "challenger")

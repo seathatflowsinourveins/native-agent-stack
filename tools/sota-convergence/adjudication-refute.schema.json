@@ -1,13 +1,34 @@
 {
  "$schema": "https://json-schema.org/draft/2020-12/schema",
  "title": "Blind adjudication refutation (one judgment)",
- "description": "refuted is true only when the retained evidence shows the judge's pick is wrong or rests on a path that does not show what the judge says.",
+ "description": "refuted is true only when the retained evidence shows the judge's pick is wrong or rests on a path that does not show what the judge says. leak is true, with leak_text quoting what was found, when the input shows reviewer identity (adjudication-prompt.md, the leak check); the other fields are then placeholders and adjudicate.py records the judgment as missing (failure leak). Otherwise leak is false and leak_text is empty.",
  "type": "object",
  "additionalProperties": false,
  "properties": {
-  "refuted": {"type": "boolean"},
-  "reason": {"type": "string"},
-  "evidence_refs": {"type": "array", "items": {"type": "string"}}
+  "refuted": {
+   "type": "boolean"
+  },
+  "reason": {
+   "type": "string"
+  },
+  "evidence_refs": {
+   "type": "array",
+   "items": {
+    "type": "string"
+   }
+  },
+  "leak": {
+   "type": "boolean"
+  },
+  "leak_text": {
+   "type": "string"
+  }
  },
- "required": ["refuted", "reason", "evidence_refs"]
+ "required": [
+  "refuted",
+  "reason",
+  "evidence_refs",
+  "leak",
+  "leak_text"
+ ]
 }

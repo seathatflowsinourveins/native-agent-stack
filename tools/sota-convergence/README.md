@@ -670,8 +670,27 @@ receipts.
 With the flag, every packet carries `gap_receipts`: the sorted receipt paths that the gap-wave owner ledgers
 (`catalogs/landscape/gap-wave*--*.json`) list for its layer, with missing files dropped. A
 `gap_receipts_note` tells the lane to judge them like `evidence_refs`. The gap text and status are not
-carried: they derive from the previous verdict rows' `open_gaps`, which can name the incumbent. The flag is
-off by default.
+carried. The flag is off by default.
+
+**`--gap-receipts` is not blind; a blind wave must not pass it** (round-2 review). Each layer's list is the
+set of checks run against the previous winner. Carrying only paths does not hide that:
+- 111 of the 249 joined receipt files repeat the ledger gap text word for word, and 13 of them name the
+  winner;
+- file names such as `7-winner-readiness-today.json` and `0-nautilus-frozen-selections.json` name it too.
+
+The flag and its code stay for non-blind runs. `scripts/landscape.py` lists `gap_receipts` and
+`gap_receipts_note` in `TOP_LEVEL_WITHHELD_KEYS`, so `withheld_packet_keys` rejects a packet that carries
+either. As a result, `record_verdicts.py --write` refuses to seal a new wave whose packets were built with
+the flag, and CI rejects a sealed one. The grandfathered 2026-09-22 packets are not re-checked and do not
+carry the keys.
+
+**Limit: the blind export still carries the gap waves.** A lane that browses the repository can find the
+same receipts without the flag. The export keeps `evidence/artifacts/gap-wave2-20260923/` and
+`evidence/artifacts/gap-wave3-20260923/` (2,652 files) and the three owner ledgers
+`catalogs/landscape/gap-wave*--*.json` (40 layer entries, 327 gaps, each with its gap text).
+`catalogs/landscape/gap-resolution-20260922.json` and `gap-crosswalk-92bb279.json` also carry gap text.
+`blind_checkout.py` strips only label keys from them, not gap text. A coordinator discloses this with the
+wave.
 
 **Popularity and recency are withheld too** (2026-09-23 peer audit: 132
 foundation-packet objects still carried GitHub `stars` and `pushed_at` through
@@ -1402,7 +1421,7 @@ python3 tools/sota-convergence/adjudicate.py inputs --work-dir W \
   --lane-repo-root <claude lane export> --lane-repo-root <codex lane export>   # A/B and B/A inputs, index.json
 python3 tools/sota-convergence/adjudicate.py codex --work-dir W --repo <blind export> --model <model>
 python3 tools/sota-convergence/adjudicate.py claude-args --work-dir W --repo <blind export> > args.json
-# run tools/sota-convergence/adjudication-lane.js with args.json (blind-lane-reviewer agents)
+# run tools/sota-convergence/adjudication-lane.js with args.json (blind-adjudicator agents)
 python3 tools/sota-convergence/adjudicate.py claude-collect --work-dir W --result <workflow result> --model <resolved>
 python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjudications
 ```
@@ -1425,9 +1444,25 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
   `FAMILY_MODEL_PATTERNS` (exit 2 otherwise). It is passed to `codex exec -m` and recorded on each judgment
   ahead of the event-stream model name, the same order `codex_lane.py` uses. Resume skips a judgment only when
   it is usable and was made with this `--model`.
-- **`adjudication-lane.js`:** the Claude family's judge and refuter, one pair per input. Both run as
-  `blind-lane-reviewer` (Read, Glob and Grep; no skills or project instructions). `claude-collect` records
-  its return; a lost judge or refuter makes that judgment missing, never unrefuted.
+- **`adjudication-lane.js`:** the Claude family's judge and refuter, one pair per input. Both run as the
+  `blind-adjudicator` role (agent-lab PR #40, under review; the agent file is vendored separately).
+  `claude-collect` records its return; a lost judge or refuter makes that judgment missing, never unrefuted.
+- **Prompt and leak check (both families, round-2 review):**
+  - Every judge and refuter task starts with three labelled lines: `Input file: <path>`, `Packet file: <path>`
+    and `Repository root: <path>`. `adjudication-prompt.md` refers only to them and treats any other path as
+    data. `claude-args` gives each item its `packet_path`.
+  - The judge and the refuter first check their input for reviewer identity: a lane, model, provenance or
+    refutation key; a model name such as gpt-, o3, opus, sonnet, haiku or claude-opus; wording that
+    attributes a return; or a host path outside the repository root. A candidate that shares a vendor name
+    is not a leak.
+  - On a leak they return `leak: true` with `leak_text` and stop. Both `adjudication-judge.schema.json` and
+    `adjudication-refute.schema.json` require `leak` and `leak_text`, because Codex strict mode requires
+    every property.
+  - `adjudicate.py` records a leak as a missing judgment with failure `leak`, never as a judgment or a vote.
+    A Codex leak is not retried, and a judge leak skips the refuter.
+  - Each leak is listed, with both of the layer's input files, in `leaks.json`: `codex` and `claude-collect`
+    write it under `adjudication-judgments/<family>/`, and `assemble` writes
+    `<work-dir>/adjudication-leaks.json`. It is not written into `--out`, which `record_verdicts.py` reads.
 - **`assemble`:** writes one record per layer. `claude_position` follows the order, `refuting_votes` is 1 when
   the refuter refuted, and `judge` is `{model, family}`. `stripped_packet_sha256` is the layer's sealed lane
   packet. Each record is validated with `judge_adjudication` before it is written. A missing family gives a

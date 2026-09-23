@@ -1089,6 +1089,14 @@ class LayerVerdictSchemaV2Tests(LandscapeTests):
         with self.assertRaisesRegex(ValueError, "SHA256SUMS must be retained and equal"):
             self.build()
 
+    def test_retained_packets_with_gap_receipts_are_refused(self):
+        # Round-2 review: a blind wave cannot seal packets built with lane_packets.py --gap-receipts.
+        lanes = self.seal_new_wave(packet_extra={"gap_receipts": ["evidence/artifacts/gap-wave2/x/0-check.json"],
+                                                 "gap_receipts_note": "gap_receipts lists receipts"})
+        self.layer.update(self.recorded_fields(lanes=lanes))
+        with self.assertRaisesRegex(ValueError, "carries withheld keys \\['gap_receipts', 'gap_receipts_note'\\]"):
+            self.build()
+
     def test_retained_packets_are_checked_at_every_depth(self):
         # Review of the #122 fix round: CI only looked where withhold_popularity strips, so a nested
         # release date, a top-level newcomers list or a disposition label passed.

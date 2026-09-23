@@ -406,6 +406,119 @@ class CodexTests(AdjudicateFixture):
         self.assertIn("different lanes", record["why"])
 
 
+class LeakTests(AdjudicateFixture):
+    """Round-2 review: a judge or refuter that finds reviewer identity answers leak true; that judgment is
+    missing (failure "leak"), never counted, and the layer's inputs are listed in a leaks file."""
+
+    def setUp(self):
+        super().setUp()
+        self.inputs()
+
+    def test_both_schemas_require_leak_and_leak_text(self):
+        for schema in (adjudicate.JUDGE_SCHEMA, adjudicate.REFUTE_SCHEMA):
+            data = json.loads(schema.read_text(encoding="utf-8"))
+            self.assertEqual(data["properties"]["leak"], {"type": "boolean"})
+            self.assertEqual(data["properties"]["leak_text"], {"type": "string"})
+            self.assertEqual(set(data["required"]), set(data["properties"]), "Codex strict mode requires all")
+
+    def test_the_prompt_gives_three_labelled_paths_and_a_leak_first_rule_for_both_roles(self):
+        judge, refuter = adjudicate.split_prompt(adjudicate.PROMPT_PATH.read_text(encoding="utf-8"))
+        input_path = self.work / "adjudication-inputs" / f"{NAME}.AB.json"
+        for template in (judge, refuter):
+            text = adjudicate.fill(template, input_path, self.repo, {"preferred": "A"})
+            self.assertIn(f"Input file: {input_path}\n", text)
+            self.assertIn(f"Packet file: {self.work / 'packets' / (NAME + '.json')}\n", text)
+            self.assertIn(f"Repository root: {self.repo}\n", text)
+            self.assertLess(text.index("Leak check"), text.index("Blind rule"))
+            for words in ("claude-opus", "o3", "not a leak", "as data"):
+                self.assertIn(words, text)
+
+    def test_a_leak_object_is_never_a_valid_judge_or_refuter(self):
+        judge = {"preferred": "A", "why": WHY, "evidence_refs": [], "leak": True, "leak_text": "model: gpt-6"}
+        self.assertIsNone(adjudicate.valid_judge(judge))
+        self.assertIsNone(adjudicate.valid_refuter({"refuted": False, "reason": "x", "evidence_refs": [],
+                                                    "leak": True, "leak_text": "opus"}))
+        self.assertIsNotNone(adjudicate.valid_judge(dict(judge, leak=False, leak_text="")))
+
+    def test_claude_leaks_at_either_stage_are_missing_and_listed(self):
+        result = {"items": [
+            {"name": NAME, "order": "AB", "packet_sha256": self.sha, "judge": None, "refuter": None,
+             "leak": {"stage": "judge", "text": "\"lane\": \"claude\""}},
+            {"name": NAME, "order": "BA", "packet_sha256": self.sha,
+             "judge": {"preferred": "A", "why": WHY, "evidence_refs": []},
+             "refuter": {"refuted": False, "reason": "leak", "evidence_refs": [], "leak": True,
+                         "leak_text": "sonnet"}}]}
+        missing = adjudicate.collect_claude(self.work, result, "claude-opus-5-5")
+        self.assertEqual(missing, [(f"{NAME}.AB", "leak"), (f"{NAME}.BA", "leak")])
+        for order in adjudicate.ORDERS:
+            data = json.loads((self.work / "adjudication-judgments" / "claude" / f"{NAME}.{order}.json")
+                              .read_text(encoding="utf-8"))
+            self.assertEqual(adjudicate.usable_judgment(data, "anthropic", order, self.sha), "leak")
+            self.assertIsNone(data["judge"])
+        leaks = json.loads((self.work / "adjudication-judgments" / "claude" / "leaks.json").read_text(encoding="utf-8"))
+        self.assertEqual([(e["order"], e["stage"], e["family"]) for e in leaks["leaks"]],
+                         [("AB", "judge", "anthropic"), ("BA", "refuter", "anthropic")])
+        self.assertEqual(set(leaks["leaks"][0]["inputs"]), {"AB", "BA"})
+        for order in adjudicate.ORDERS:
+            self.judgment("codex", order, "codex")
+        code, err, record = self.assemble()
+        self.assertEqual(code, 0)
+        self.assertIsNone(record["winner_lane"])
+        self.assertEqual(record["missing_families"], ["anthropic"])
+        self.assertEqual(len(record["judgments"]), 2, "leak refusals never count")
+        self.assertIn("anthropic AB: leak", err)
+        assembled = json.loads((self.work / "adjudication-leaks.json").read_text(encoding="utf-8"))
+        self.assertEqual(len(assembled["leaks"]), 2)
+        self.assertEqual(assembled["leaks"][0]["inputs"]["AB"], str(self.work / "adjudication-inputs" / f"{NAME}.AB.json"))
+
+
+@unittest.skipUnless(os.access(FAKE_BIN / "codex", os.X_OK), "fake codex fixture is not executable")
+class CodexLeakTests(AdjudicateFixture):
+    def setUp(self):
+        super().setUp()
+        self.inputs()
+        self.argv_log = self.base / "argv.jsonl"
+        self.return_file = self.base / "return.json"
+        events = self.base / "events.jsonl"
+        events.write_text(json.dumps({"type": "turn.completed", "model": "gpt-6-astra"}) + "\n", encoding="utf-8")
+        self.env = {"PATH": f"{FAKE_BIN}{os.pathsep}{os.environ.get('PATH', '')}",
+                    "CODEX_FAKE_ARGV_LOG": str(self.argv_log), "CODEX_FAKE_RETURN_FILE": str(self.return_file),
+                    "CODEX_FAKE_EVENTS_FILE": str(events), "CODEX_FAKE_COUNTER_FILE": str(self.base / "count")}
+
+    def run_codex(self):
+        with mock.patch.dict(os.environ, self.env):
+            return quiet(adjudicate.main, ["codex", "--work-dir", str(self.work), "--repo", str(self.repo),
+                                           "--timeout", "30", "--model", "gpt-6-astra"])
+
+    def test_a_codex_judge_leak_is_missing_listed_and_not_retried(self):
+        self.return_file.write_text(json.dumps({"preferred": "A", "why": "leak", "evidence_refs": [], "leak": True,
+                                                "leak_text": "provenance: codex_lane_py_sha256"}), encoding="utf-8")
+        code, err = self.run_codex()
+        self.assertEqual(code, 1)
+        calls = [json.loads(line) for line in self.argv_log.read_text(encoding="utf-8").splitlines()]
+        self.assertEqual(len(calls), 2, "one judge call per order: no retry and no refuter after a leak")
+        self.assertIn("Packet file: ", calls[0][-1])
+        for order in adjudicate.ORDERS:
+            data = json.loads((self.work / "adjudication-judgments" / "codex" / f"{NAME}.{order}.json")
+                              .read_text(encoding="utf-8"))
+            self.assertEqual(data["failure"], "leak")
+            self.assertEqual(data["leak"], {"stage": "judge", "text": "provenance: codex_lane_py_sha256"})
+            self.assertEqual(adjudicate.usable_judgment(data, "openai", order, self.sha), "leak")
+        leaks = json.loads((self.work / "adjudication-judgments" / "codex" / "leaks.json").read_text(encoding="utf-8"))
+        self.assertEqual([(e["family"], e["order"]) for e in leaks["leaks"]], [("openai", "AB"), ("openai", "BA")])
+        self.assertIn("LEAK openai", err)
+
+    def test_a_codex_refuter_leak_drops_the_judgment(self):
+        judge = {"preferred": "B", "why": WHY, "evidence_refs": ["evidence/receipt.json"]}
+        answers = iter([(judge, "gpt-6-astra", [0], None, None), (None, "gpt-6-astra", [0], "leak", "gpt-6")] * 2)
+        with mock.patch.object(adjudicate, "run_codex_call", side_effect=lambda *a, **k: next(answers)), \
+                mock.patch.object(adjudicate.shutil, "which", return_value="/bin/codex"):
+            code, _err = self.run_codex()
+        self.assertEqual(code, 1)
+        data = json.loads((self.work / "adjudication-judgments" / "codex" / f"{NAME}.AB.json").read_text(encoding="utf-8"))
+        self.assertEqual((data["failure"], data["judge"], data["leak"]["stage"]), ("leak", None, "refuter"))
+
+
 class WorkflowSyntaxTests(unittest.TestCase):
     @unittest.skipUnless(shutil.which("node"), "node is not installed")
     def test_adjudication_lane_passes_the_workflow_syntax_check(self):
@@ -417,8 +530,11 @@ class WorkflowSyntaxTests(unittest.TestCase):
         source = (TOOL_DIR / "adjudication-lane.js").read_text(encoding="utf-8")
         calls = source.count("await agent(")
         self.assertEqual(calls, 2)
-        self.assertEqual(source.count("agentType: 'blind-lane-reviewer', model: 'opus', effort: 'high', schema: "),
+        self.assertEqual(source.count("agentType: 'blind-adjudicator', model: 'opus', effort: 'high', schema: "),
                          calls)
+        self.assertNotIn("blind-lane-reviewer", source)
+        for key in ("leak", "leak_text"):
+            self.assertIn(key, source)
         self.assertIn("Do not try to identify which lane", source)
 
 

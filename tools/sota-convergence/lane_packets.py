@@ -532,9 +532,15 @@ def attach_registered_receipts(packet: dict, index: dict, withhold: bool = False
 
 
 GAP_LEDGER_GLOB = "catalogs/landscape/gap-wave*--*.json"
-GAP_RECEIPTS_NOTE = ("gap_receipts lists receipts from the gap-resolution waves for this layer: executed checks of "
-                     "evidence gaps, recorded after the layer's previous verdict. Open and judge them like "
-                     "evidence_refs; a receipt's content, not its presence, decides what it establishes.")
+# Not blind (round-2 review): the list is the set of checks run against the layer's previous winner; 111 of
+# 249 joined receipt files repeat the ledger gap text word for word, 13 name the winner, and file names such
+# as 7-winner-readiness-today.json name it too. Only non-blind runs pass --gap-receipts; scripts/landscape.py
+# TOP_LEVEL_WITHHELD_KEYS refuses gap_receipts/gap_receipts_note in a new wave's retained packets.
+GAP_RECEIPTS_NOTE = ("gap_receipts lists receipts from the gap-resolution waves for this layer: checks run against "
+                     "the layer's previous winner, recorded after its previous verdict. They are not blind: many "
+                     "repeat the previous gap text and some name the previous winner, in their content or file "
+                     "name. Open and judge them like evidence_refs; a receipt's content, not its presence, decides "
+                     "what it establishes. A blind wave never carries this list.")
 
 
 def gap_receipts_index(root: Path) -> dict:
@@ -675,7 +681,9 @@ def parse_args(argv=None):
     parser.add_argument("--gap-receipts", action="store_true",
                         help="Attach to every packet the receipt paths the gap-wave owner ledgers "
                              "(catalogs/landscape/gap-wave*--*.json) list for its layer; paths only, no gap text. "
-                             "Off by default: the default build path is unchanged.")
+                             "Not blind: the receipts are checks of the previous winner and many name it, so a "
+                             "blind wave must not pass this (a new wave's retained packets refuse it). Off by "
+                             "default: the default build path is unchanged.")
     parser.add_argument("--trading-candidates", choices=("ledger", "manifest"), default="ledger",
                         help="Candidate source for us-equities packets: the ledger row's group-wide list "
                              "(default; reproduces the 2026-09-22 packets) or the sota manifest's own entries "
