@@ -227,160 +227,6 @@ class GitleaksConfigContextRestrictionTests(unittest.TestCase):
                 "even though the identical value under 'next_page_token' is legitimately suppressed",
             )
 
-    def test_c4_narrative_commit_id_and_unrelated_api_key_sharing_one_line_the_api_key_is_still_detected(self):
-        r"""Second-round finding from the Opus evidence review of this
-        branch (fix round 2; not codex-review-72, which is a different,
-        step-0 shallow-clone finding -- see .gitleaks.toml's header comment
-        for the attribution correction), .gitleaks.toml prose-narrative
-        allowlist, duplicated under both rules that match it -- see
-        .gitleaks.toml's "[[rules]] id" lines): whole-line anchoring
-        (test_c2 above) is not enough for this
-        allowlist, because its `.*?`/
-        `.*` (any char, including `"`) can cross the closing quote of the
-        JSON string holding the commit reference and reach a SECOND
-        key:value pair later on the same physical line -- e.g.
-        `{"detail": "pinned commit <hex>", "api_key": "<value>"}` on one
-        compact line. The allowlist regex now uses `(?:[^\"\\\\]|\\\\.)*`
-        instead of `.*`, so it cannot leave the JSON string holding the
-        commit reference; a second key:value pair on the same line is
-        outside that string and the line no longer matches the allowlist as
-        a whole, so gitleaks's own finding for the unrelated key is not
-        exempted. Uses `api_key`/HEX64 rather than the ghp_-shaped value: the
-        GitHub PAT shape is caught by gitleaks's own dedicated `github-pat`
-        rule, which never had this allowlist attached and so would pass
-        regardless of this fix; HEX64 under `api_key` is caught by the same
-        `generic-api-key` rule this narrative allowlist is scoped under
-        (matching test_c2's technique above), so this only passes for the
-        right reason. The two fields must NOT be compacted onto a line that
-        also holds the JSON object's opening `{`: gitleaks's `regexTarget =
-        "line"` allowlist match is against the exact physical line, and this
-        allowlist's own `^\s*"..."` anchor already fails to match a line
-        starting with `{` regardless of the crossing-quote bug being tested
-        here -- that would make the assertion pass for the wrong reason (a
-        pre-existing brace-anchoring mismatch, not this fix). Mirrors how
-        the real files actually look (pretty-printed, each JSON object's
-        `{`/`}` on its own line, fields following on later lines)."""
-        with tempfile.TemporaryDirectory() as tmp:
-            target = Path(tmp)
-            allow_dir = target / "evidence" / "artifacts" / "blind-catalog-convergence-20260921"
-            allow_dir.mkdir(parents=True)
-            (allow_dir / "claude-coverage-review.json").write_text(
-                "{\n"
-                f'  "detail": "pinned commit {HEX40}", "api_key": "{HEX64}"\n'
-                "}\n"
-            )
-            findings = self._scan(target)
-            secrets = {f["Secret"] for f in findings}
-            self.assertIn(
-                HEX64, secrets,
-                f"the api_key finding co-located with an allowlisted commit-narrative field on "
-                f"the same line must still be detected, got: {findings}",
-            )
-
-    def test_c5_narrative_commit_id_and_unrelated_secret_inside_the_SAME_string_is_still_detected(self):
-        r"""Third-round finding from the blind Codex cross-family review of
-        PR #83: test_c4 above proved the round-2 fix closes a SECOND
-        key:value pair sharing the line, but a single JSON string value that
-        itself narrates both a commit id AND an unrelated secret-shaped
-        substring -- no second key:value pair, nothing outside the string
-        for `(?:[^"\\]|\\.)*` to stop at -- was still exempted in full. This
-        is the shape from the actual finding:
-        `"detail": "pinned commit <40-hex>; password=<64-hex>"`. The round-3
-        fix rebuilds the free-text portions of the narrative allowlist regex
-        so an unmarked run of 8+ hex-valid characters (mixing in at least one
-        a-f/A-F letter, the shape a real hex secret has) can never appear
-        anywhere in the string unless it is the one recognized 40-hex
-        commit/tree id directly preceded by its context marker; see
-        .gitleaks.toml's header comment for the full grammar and its
-        documented residual (all-decimal) gap."""
-        with tempfile.TemporaryDirectory() as tmp:
-            target = Path(tmp)
-            allow_dir = target / "evidence" / "artifacts" / "blind-catalog-convergence-20260921"
-            allow_dir.mkdir(parents=True)
-            (allow_dir / "claude-coverage-review.json").write_text(
-                "{\n"
-                f'  "detail": "pinned commit {HEX40}; password={HEX64}"\n'
-                "}\n"
-            )
-            findings = self._scan(target)
-            secrets = {f["Secret"] for f in findings}
-            self.assertIn(
-                HEX64, secrets,
-                f"a secret-shaped value inside the SAME JSON string as an allowlisted commit "
-                f"reference must still be detected, got: {findings}",
-            )
-
-    def test_c6_narrative_commit_id_and_colon_separated_secret_inside_the_SAME_string_is_still_detected(self):
-        """Same round-3 finding, the second reported shape: a colon-separated
-        `key: <hex>` secret (rather than `key=<hex>`) after the commit
-        reference, still inside the same JSON string value."""
-        with tempfile.TemporaryDirectory() as tmp:
-            target = Path(tmp)
-            allow_dir = target / "evidence" / "artifacts" / "blind-catalog-convergence-20260921"
-            allow_dir.mkdir(parents=True)
-            (allow_dir / "screening-ledger.json").write_text(
-                "{\n"
-                f'  "detail": "commit {HEX40} api_key: {HEX64}"\n'
-                "}\n"
-            )
-            findings = self._scan(target)
-            secrets = {f["Secret"] for f in findings}
-            self.assertIn(
-                HEX64, secrets,
-                f"a colon-separated secret-shaped value inside the SAME JSON string as an "
-                f"allowlisted commit reference must still be detected, got: {findings}",
-            )
-
-    def test_c7_narrative_marker_word_followed_by_unrelated_long_hex_is_still_detected(self):
-        """Fourth-round finding (blind Opus/Codex evidence review of fix round
-        3): round 3 widened the marker-hex length window to `[0-9a-f]{4,64}`,
-        which newly exempted a marker word used as ORDINARY PROSE (not an
-        actual commit reference) immediately followed by an unrelated
-        41-64-char hex secret, e.g. `"detail": "source token: <64-hex>"` --
-        "source" here is not a commit/pin marker, just an English sentence,
-        but it matched the marker alternative all the same. The round-4 fix
-        narrows the marker-hex window to `4-12` (short abbreviated hashes) or
-        exactly `40` (a full SHA-1), so a marker word followed by a 64-hex
-        run is no longer exempted."""
-        with tempfile.TemporaryDirectory() as tmp:
-            target = Path(tmp)
-            allow_dir = target / "evidence" / "artifacts" / "blind-catalog-convergence-20260921"
-            allow_dir.mkdir(parents=True)
-            (allow_dir / "claude-coverage-review.json").write_text(
-                "{\n"
-                f'  "detail": "source token: {HEX64}"\n'
-                "}\n"
-            )
-            findings = self._scan(target)
-            secrets = {f["Secret"] for f in findings}
-            self.assertIn(
-                HEX64, secrets,
-                f"a 64-hex secret preceded only by the generic prose word 'source' (not a real "
-                f"commit reference) must still be detected, got: {findings}",
-            )
-
-    def test_c8_narrative_marker_and_unrelated_long_hex_secret_inside_the_SAME_string_is_still_detected(self):
-        """Same round-4 finding, the same-string variant: a real 40-hex
-        commit reference AND an unrelated 64-hex secret, both introduced by
-        marker words, inside the SAME JSON string value."""
-        with tempfile.TemporaryDirectory() as tmp:
-            target = Path(tmp)
-            allow_dir = target / "evidence" / "artifacts" / "blind-catalog-convergence-20260921"
-            allow_dir.mkdir(parents=True)
-            (allow_dir / "screening-ledger.json").write_text(
-                "{\n"
-                f'  "detail": "commit {HEX40}; source api_key: {HEX64}"\n'
-                "}\n"
-            )
-            findings = self._scan(target)
-            secrets = {f["Secret"] for f in findings}
-            self.assertIn(
-                HEX64, secrets,
-                f"a 64-hex secret introduced by the marker word 'source' but citing no real "
-                f"commit id must still be detected even alongside a genuine commit reference "
-                f"in the same string, got: {findings}",
-            )
-
     def test_exit_code_zero_flag_always_returns_zero_even_with_findings(self):
         """`--exit-code 0` must return process exit code 0 even when real leaks are found.
 
@@ -421,284 +267,194 @@ class GitleaksConfigContextRestrictionTests(unittest.TestCase):
             )
 
 
-class GitleaksNarrativeAllowlistRegexTests(unittest.TestCase):
-    """Pure-regex regression coverage for the prose-narrative commit-id
-    allowlist, independent of the installed gitleaks binary or its per-user
-    lock -- gitleaks's own `generic-api-key` rule never fires on these two
-    files' CURRENT content in the first place (no field name here matches
-    its own access/auth/api/credential/creds/key/password/secret/token
-    keyword list), so an end-to-end `dir`-mode positive control using only
-    real file content would be vacuous; this tests the allowlist regex
-    itself directly against real lines plus constructed adversarial lines,
-    complementing test_c4/test_c5/test_c6's end-to-end proofs above (which
-    use fixture lines engineered to also satisfy the base rule). Two fix
-    rounds are covered: round 2 (a second key:value pair sharing the
-    physical line -- from the Opus evidence review of this branch, not
-    codex-review-72) and round 3 (a secret-shaped substring inside the SAME
-    JSON string as the commit reference -- from the blind Codex
-    cross-family review of PR #83)."""
+class GitleaksIgnoreFingerprintTests(unittest.TestCase):
+    """Regression coverage for the root .gitleaksignore file that replaced the
+    prose-narrative commit-id regex allowlist (codex-review-83b fix round):
+    exact `commit:path:rule:line` fingerprints, gitleaks' own mechanism for
+    known historical false positives (read from this file by default), in
+    place of the four-round-leaky regex allowlist previously duplicated under
+    generic-api-key and sourcegraph-access-token in .gitleaks.toml. See
+    .gitleaksignore's own header comment for the full rationale."""
 
+    GITLEAKSIGNORE_PATH = ROOT / ".gitleaksignore"
     NARRATIVE_FILES = (
-        ROOT / "evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json",
-        ROOT / "evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger.json",
+        "evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json",
+        "evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger.json",
     )
-    # The allowlist regex exactly as it read before the round-2 (Opus
-    # evidence review) fix, frozen here for comparison; .gitleaks.toml no
-    # longer contains this form.
-    PRE_FIX_REGEX = (
-        r'''(?i)^\s*"[A-Za-z0-9_]+":\s*".*?(?:@\s*|\b(?:pin|pinned|commit|tree|'''
-        r'''source_pin|source_commit|source)\b[\sa-zA-Z0-9_./:,\-]{0,25})[0-9a-f]{40}\b.*"\s*,?\s*$'''
-    )
-    # The allowlist regex exactly as it read after the round-2 fix but
-    # before the round-3 (Codex review of PR #83) fix: closes the
-    # second-key:value-pair case (PRE_FIX_REGEX above) but still exempts a
-    # secret-shaped substring inside the SAME JSON string as the commit
-    # reference, because its trailing `(?:[^"\\]|\\.)*` allows ANY character
-    # run (including another hex-looking run) up to the closing quote.
-    # .gitleaks.toml no longer contains this form either.
-    ROUND_2_REGEX = (
-        r'''(?i)^\s*"[A-Za-z0-9_]+":\s*"(?:[^"\\]|\\.)*?(?:@\s*|\b(?:pin|pinned|commit|tree|'''
-        r'''source_pin|source_commit|source)\b[\sa-zA-Z0-9_./:,\-]{0,25})[0-9a-f]{40}\b'''
-        r'''(?:[^"\\]|\\.)*"\s*,?\s*$'''
-    )
-    # The allowlist regex exactly as it read after the round-3 (Codex review of
-    # PR #83) fix but before the round-4 (blind Opus/Codex evidence review of
-    # fix round 3) fix: closes the same-string case (ROUND_2_REGEX above) but
-    # widens the marker-hex window to `[0-9a-f]{4,64}\b`, which newly exempts a
-    # marker word used as ordinary prose (not a real commit reference)
-    # immediately followed by an unrelated 41-64-char hex secret.
-    # .gitleaks.toml no longer contains this form.
-    ROUND_3_REGEX = (
-        r'''(?i)^\s*"[A-Za-z0-9_]+":\s*"(?:(?:\\.|(?:@\s*|\b(?:pin|pinned|commit|tree|'''
-        r'''source_pin|source_commit|source)\b[\sa-zA-Z0-9_./:,\-]{0,25})[0-9a-f]{4,64}\b|'''
-        r'''(?:[0-9]{8,}|[0-9a-fA-F]{0,7})(?:[^"\\0-9a-fA-F]|\\.)))*(?:[0-9]{8,}|[0-9a-fA-F]{0,7})'''
-        r'''(?:@\s*|\b(?:pin|pinned|commit|tree|source_pin|source_commit|source)\b'''
-        r'''[\sa-zA-Z0-9_./:,\-]{0,25})[0-9a-f]{4,64}\b(?:(?:\\.|(?:@\s*|\b(?:pin|pinned|commit|tree|'''
-        r'''source_pin|source_commit|source)\b[\sa-zA-Z0-9_./:,\-]{0,25})[0-9a-f]{4,64}\b|'''
-        r'''(?:[0-9]{8,}|[0-9a-fA-F]{0,7})(?:[^"\\0-9a-fA-F]|\\.)))*(?:[0-9]{8,}|[0-9a-fA-F]{0,7})"\s*,?\s*$'''
+    NARRATIVE_RULES = ("generic-api-key", "sourcegraph-access-token")
+    # gitleaks' own git-mode fingerprint format: `commit:path:rule:line`, or
+    # `path:rule:line` for a working-tree (non-git) finding.
+    FINGERPRINT_RE = re.compile(
+        r'^(?:(?P<commit>[0-9a-f]{40}):)?(?P<path>[^:]+):(?P<rule>[^:]+):(?P<line>\d+)$'
     )
 
-    def _current_allowlist_regexes(self):
+    def setUp(self):
+        self.assertTrue(self.GITLEAKSIGNORE_PATH.exists(), ".gitleaksignore must exist at repo root")
+
+    def tearDown(self):
+        worktree = getattr(self, "_worktree", None)
+        if worktree is not None:
+            subprocess.run(
+                ["git", "worktree", "remove", "--force", str(worktree)],
+                cwd=str(ROOT), capture_output=True, text=True, check=False,
+            )
+            shutil.rmtree(worktree, ignore_errors=True)
+
+    def _ignore_lines(self):
+        return [
+            line.strip()
+            for line in self.GITLEAKSIGNORE_PATH.read_text().splitlines()
+            if line.strip() and not line.strip().startswith("#")
+        ]
+
+    def test_a_every_line_is_a_fingerprint_naming_a_narrative_file_and_rule(self):
+        """Every non-comment, non-blank line must be a well-formed gitleaks
+        fingerprint naming one of the two review-narrative files and one of
+        the two rules that matched them -- not a stray line, a literal
+        secret, or an entry for some other file this fix round did not
+        review."""
+        lines = self._ignore_lines()
+        self.assertGreater(len(lines), 0, ".gitleaksignore must contain at least one fingerprint")
+        for line in lines:
+            match = self.FINGERPRINT_RE.match(line)
+            self.assertIsNotNone(
+                match,
+                f"not a gitleaks fingerprint (commit:path:rule:line or path:rule:line): {line!r}",
+            )
+            self.assertIn(
+                match.group("path"), self.NARRATIVE_FILES,
+                f"fingerprint path is not one of the two reviewed narrative files: {line!r}",
+            )
+            self.assertIn(
+                match.group("rule"), self.NARRATIVE_RULES,
+                f"fingerprint rule is not generic-api-key or sourcegraph-access-token: {line!r}",
+            )
+
+    def test_b_gitleaks_toml_has_no_allowlist_naming_the_narrative_files(self):
+        """.gitleaks.toml must no longer contain an allowlist whose `paths`
+        name either narrative file: that suppression now lives exclusively
+        in .gitleaksignore, as exact per-commit fingerprints rather than a
+        shape/context regex that (per four review rounds) could not fully
+        distinguish a real commit reference from an adjacent secret."""
         import tomllib
         with open(CONFIG_PATH, "rb") as f:
             data = tomllib.load(f)
-        found = []
         for rule in data.get("rules", []):
             for allowlist in rule.get("allowlists", []):
-                if any("blind-catalog-convergence" in p for p in allowlist.get("paths", [])):
-                    found.extend(allowlist.get("regexes", []))
-        return found
+                for path_regex in allowlist.get("paths", []):
+                    for narrative_file in self.NARRATIVE_FILES:
+                        self.assertIsNone(
+                            re.search(path_regex, narrative_file),
+                            f"rule {rule.get('id')!r} allowlist {allowlist.get('description')!r} "
+                            f"still names a narrative file via path regex {path_regex!r}",
+                        )
 
-    def test_config_no_longer_contains_the_crossing_quote_regex(self):
-        raw = CONFIG_PATH.read_text()
-        self.assertNotIn(
-            self.PRE_FIX_REGEX, raw,
-            "the pre-fix `.*?`/`.*` form of the prose-narrative allowlist regex "
-            "(which can cross a JSON string's closing quote) is still present",
+    @unittest.skipUnless(GITLEAKS, "gitleaks not found on PATH")
+    def test_c_a_later_commit_sharing_a_narrative_line_with_an_injected_secret_is_detected(self):
+        """A LATER commit that appends an unrelated secret to the SAME line
+        (inside the SAME JSON string) as a real, fingerprint-ignored
+        narrative commit reference is still detected: the fingerprint is
+        `commit:path:rule:line`, so a different commit touching that line
+        number gets a different fingerprint and is not suppressed. This is
+        the exact class of gap all four regex-allowlist review rounds found
+        (an unrelated secret sharing a marker-preceded narrative line/string)
+        -- unlike that regex, which matched by shape/context on ANY commit,
+        this mechanism cannot be defeated by a same-line, same-string
+        adversarial addition on a commit the fingerprint does not name.
+
+        Uses a real, tracked narrative line (not a synthetic fixture file),
+        modified in a disposable detached worktree so the injected marker
+        never touches this repository's actual history or working tree."""
+        rev_parse = subprocess.run(
+            ["git", "rev-parse", "HEAD"], cwd=str(ROOT),
+            capture_output=True, text=True, check=False,
         )
+        if rev_parse.returncode != 0:
+            self.skipTest(f"could not resolve HEAD: {rev_parse.stderr.strip()}")
 
-    def test_fixed_regex_rejects_mixed_line_but_keeps_every_real_narrative_match(self):
-        regexes = self._current_allowlist_regexes()
-        self.assertEqual(
-            len(regexes), 2,
-            "expected one copy of the narrative allowlist under generic-api-key "
-            "and an identical copy under the other matching rule",
+        worktree = Path(tempfile.mkdtemp(prefix="gitleaksignore-fp-test-"))
+        worktree.rmdir()  # `git worktree add` requires the target not already exist
+        add = subprocess.run(
+            ["git", "worktree", "add", "--detach", str(worktree), "HEAD"],
+            cwd=str(ROOT), capture_output=True, text=True, check=False,
         )
-        self.assertEqual(regexes[0], regexes[1], "the two rule-scoped copies must stay identical")
-        current = re.compile(regexes[0])
-        pre_fix = re.compile(self.PRE_FIX_REGEX)
+        if add.returncode != 0:
+            self.skipTest(f"could not create a detached worktree: {add.stderr.strip()}")
+        self._worktree = worktree
 
-        hexid = "1bf6df330b056ef93ab283083afdcce642387949"
-        mixed_line = f'  "detail": "pinned commit {hexid}", "api_key": "{hexid}deadbeefdeadbeef"'
+        target_file = worktree / self.NARRATIVE_FILES[0]
+        lines = target_file.read_text().splitlines()
+        marker_idx = None
+        for i, line in enumerate(lines):
+            if (
+                re.search(r'\b(?:pin|pinned|commit|tree|source_pin|source_commit|source)\b', line, re.IGNORECASE)
+                and re.search(r'[0-9a-f]{8,}', line)
+                and line.rstrip().rstrip(",").endswith('"')
+            ):
+                marker_idx = i
+                break
+        self.assertIsNotNone(marker_idx, "expected at least one real commit-reference narrative line")
+
+        # Built at runtime from short chunks under a name with no
+        # credential-like substring, never as one literal: this source file
+        # is itself scanned by gitleaks, and the assembled value is
+        # deliberately shaped like a real GitHub personal access token so
+        # this test can prove it is still caught when injected into a
+        # narrative line's SAME JSON string. The literal never sits in any
+        # file committed to THIS repository's real history -- only inside the
+        # disposable worktree removed in tearDown -- so GitHub push
+        # protection is not a concern here.
+        marker_parts = ("ghp_", "wT9kLp3", "Qr7xNb2", "Yv5cMz8", "Hj4sDf6A")
+        injected_marker = "".join(marker_parts)
+
+        original = lines[marker_idx].rstrip()
+        trailing_comma = original.endswith(",")
+        core = original[:-1] if trailing_comma else original
+        self.assertTrue(core.endswith('"'), f"expected a JSON string on this line: {original!r}")
+        modified = core[:-1] + f"; api_key={injected_marker}" + '"' + ("," if trailing_comma else "")
+        lines[marker_idx] = modified
+        target_file.write_text("\n".join(lines) + "\n")
+
+        subprocess.run(["git", "add", "-A"], cwd=str(worktree), check=True, capture_output=True)
+        commit = subprocess.run(
+            ["git", "commit", "-m", "test: inject synthetic marker for gitleaksignore fingerprint test"],
+            cwd=str(worktree), capture_output=True, text=True, check=False,
+        )
+        self.assertEqual(commit.returncode, 0, f"worktree commit failed: {commit.stderr}")
+        sha = subprocess.run(
+            ["git", "rev-parse", "HEAD"], cwd=str(worktree),
+            capture_output=True, text=True, check=True,
+        ).stdout.strip()
+
+        report_path = worktree / "gitleaks-report.json"
+        # --config and --gitleaks-ignore-path point at THIS repository's real,
+        # live files (not whatever the worktree's checked-out HEAD happens to
+        # contain), so the test reflects the actual working-tree config even
+        # when run before these files are committed. No --redact: the test
+        # needs to find the injected marker in the report.
+        proc = subprocess.run(
+            [
+                GITLEAKS, "git", str(worktree),
+                "--config", str(CONFIG_PATH),
+                "--gitleaks-ignore-path", str(ROOT),
+                f"--log-opts=-1 {sha}",
+                "--no-banner", "--exit-code", "0",
+                "--report-format", "json", "--report-path", str(report_path),
+            ],
+            capture_output=True, text=True, check=False,
+        )
+        if "lock" in proc.stderr.lower():
+            self.skipTest(f"gitleaks per-user lock held by another scan: {proc.stderr.strip()}")
+        findings = json.loads(report_path.read_text()) if report_path.exists() and report_path.stat().st_size else []
+        matches = [
+            f for f in findings
+            if injected_marker in (f.get("Match") or "") or injected_marker in (f.get("Secret") or "")
+        ]
         self.assertTrue(
-            pre_fix.match(mixed_line),
-            "sanity check: the pre-fix regex must match this mixed line (it is the reported bug)",
+            matches,
+            f"a secret injected into the SAME JSON string as a fingerprint-ignored narrative "
+            f"commit reference, on a NEW commit, must still be detected: {findings}",
         )
-        self.assertFalse(
-            current.match(mixed_line),
-            "the fixed regex must not exempt a second key:value pair on the same physical line",
-        )
-
-        real_matches_before = 0
-        for path in self.NARRATIVE_FILES:
-            for line in path.read_text().splitlines():
-                if pre_fix.match(line):
-                    real_matches_before += 1
-                    self.assertTrue(
-                        current.match(line),
-                        f"fixed regex regressed a real, previously-allowlisted narrative line: {line[:160]}",
-                    )
-        self.assertGreater(
-            real_matches_before, 0,
-            "the two narrative files must contain at least one real line the pre-fix regex "
-            "matched, or this comparison is not exercising real content",
-        )
-
-    def test_round3_fixed_regex_rejects_same_string_secret_but_keeps_every_real_narrative_match(self):
-        """Round-3 (Codex review of PR #83) coverage, pure Python `re`
-        (RE2-compatible: the fix uses no lookaround or backreferences, so
-        match/reject decisions are engine-invariant; the installed gitleaks
-        binary's own agreement is separately confirmed by test_c5/test_c6
-        above and by the HEAD-ancestry/working-tree re-scans recorded in
-        .gitleaks.toml's header comment)."""
-        regexes = self._current_allowlist_regexes()
-        current = re.compile(regexes[0])
-        round_2 = re.compile(self.ROUND_2_REGEX)
-
-        # Reuse the module-level HEX64 constant rather than a new local
-        # variable named with a credential-like substring ("secret"/"key"/
-        # etc.): a bare `local_name = "<hex>"` assignment in THIS source
-        # file (not a synthetic fixture) is itself scanned by gitleaks, and
-        # a "secret"-named local would trip generic-api-key on this file.
-        hexid = "1bf6df330b056ef93ab283083afdcce642387949"
-        same_string_equals = f'  "detail": "pinned commit {hexid}; password={HEX64}"'
-        same_string_colon = f'  "detail": "commit {hexid} api_key: {HEX64}"'
-        same_string_reversed = f'  "detail": "password={HEX64}; pinned commit {hexid}"'
-        same_string_no_space_colon = f'  "detail": "commit {hexid} api_key:{HEX64}"'
-        same_string_uppercase = f'  "detail": "commit {hexid} api_key: {HEX64.upper()}"'
-
-        for adversarial, label in (
-            (same_string_equals, "trailing = separator"),
-            (same_string_colon, "trailing : separator"),
-            (same_string_reversed, "reversed order (secret first)"),
-            (same_string_no_space_colon, "colon with no following space"),
-            (same_string_uppercase, "uppercase hex secret"),
-        ):
-            with self.subTest(label=label):
-                self.assertTrue(
-                    round_2.match(adversarial),
-                    f"sanity check: the round-2 regex must match this same-string line ({label}); "
-                    "it is the round-3 reported bug",
-                )
-                self.assertFalse(
-                    current.match(adversarial),
-                    f"the round-3 fixed regex must not exempt a secret-shaped substring inside the "
-                    f"SAME JSON string as the commit reference ({label})",
-                )
-
-        real_matches_before = 0
-        for path in self.NARRATIVE_FILES:
-            for line in path.read_text().splitlines():
-                if round_2.match(line):
-                    real_matches_before += 1
-                    self.assertTrue(
-                        current.match(line),
-                        f"round-3 fixed regex regressed a real, previously-allowlisted narrative "
-                        f"line: {line[:160]}",
-                    )
-        self.assertGreater(
-            real_matches_before, 0,
-            "the two narrative files must contain at least one real line the round-2 regex "
-            "matched, or this comparison is not exercising real content",
-        )
-
-    def test_round3_documented_residual_gap_all_decimal_secret_is_not_closed(self):
-        """The round-3 fix caps any UNMARKED hex-valid run mixing in an a-f/A-F
-        letter at 7 characters, but leaves an all-decimal (no letter) run of
-        any length unrestricted -- closing that too would break real lines
-        that cite plain dates/star counts/byte sizes inline (see
-        .gitleaks.toml's header comment). Pins the documented residual gap so
-        a future tightening attempt that accidentally reintroduces it (or
-        silently over-tightens and breaks real lines) is caught either way."""
-        regexes = self._current_allowlist_regexes()
-        current = re.compile(regexes[0])
-        hexid = "1bf6df330b056ef93ab283083afdcce642387949"
-        # Named without a credential-like substring for the same reason as
-        # the constant reuse above (this low-entropy, pure-decimal value did
-        # not actually trip gitleaks's own scan of this file, but keeping
-        # the naming convention consistent avoids relying on that).
-        all_decimal_digits = "1234567890123456789012345678901234567890"
-        same_string_decimal = f'  "detail": "commit {hexid} password={all_decimal_digits}"'
-        self.assertTrue(
-            current.match(same_string_decimal),
-            "documented residual gap: an all-decimal secret-shaped run adjacent to a real "
-            "commit reference in the same string is still exempted",
-        )
-
-    def test_round4_marker_hex_length_rejects_unrelated_long_hex_but_keeps_every_real_narrative_match(self):
-        """Fourth-round (blind Opus/Codex evidence review of fix round 3)
-        coverage: round 3's `[0-9a-f]{4,64}\\b` marker-hex window is narrowed
-        to `(?:[0-9a-f]{4,12}|[0-9a-f]{40})\\b` (short abbreviated hashes or a
-        full 40-hex id), which are the only two shapes real narrative lines
-        use. This closes a round-3 regression: a marker word used as ordinary
-        prose (not an actual commit reference), e.g. "source" in
-        `"detail": "source token: <64-hex>"`, immediately followed by an
-        unrelated 41-64-char hex secret, was wrongly exempted by round 3's
-        widened window."""
-        regexes = self._current_allowlist_regexes()
-        current = re.compile(regexes[0])
-        round_3 = re.compile(self.ROUND_3_REGEX)
-
-        hex40 = "1bf6df330b056ef93ab283083afdcce642387949"
-        source_prefixed = f'  "detail": "source token: {HEX64}"'
-        pinned_prefixed = f'  "detail": "pinned token: {HEX64}"'
-        same_string_with_real_commit = f'  "detail": "commit {hex40}; source api_key: {HEX64}"'
-
-        for adversarial, label in (
-            (source_prefixed, "'source' as ordinary prose before an unrelated 64-hex secret"),
-            (pinned_prefixed, "'pinned' as ordinary prose before an unrelated 64-hex secret"),
-            (same_string_with_real_commit, "real commit id plus an unrelated 64-hex secret, same string"),
-        ):
-            with self.subTest(label=label):
-                self.assertTrue(
-                    round_3.match(adversarial),
-                    f"sanity check: the round-3 regex must match this line ({label}); "
-                    "it is the round-4 reported regression",
-                )
-                self.assertFalse(
-                    current.match(adversarial),
-                    f"the round-4 fixed regex must not exempt a marker word followed by an "
-                    f"unrelated 41-64-char hex secret ({label})",
-                )
-
-        real_matches_before = 0
-        for path in self.NARRATIVE_FILES:
-            for line in path.read_text().splitlines():
-                if round_3.match(line):
-                    real_matches_before += 1
-                    self.assertTrue(
-                        current.match(line),
-                        f"round-4 fixed regex regressed a real, previously-allowlisted narrative "
-                        f"line: {line[:160]}",
-                    )
-        self.assertGreater(
-            real_matches_before, 0,
-            "the two narrative files must contain at least one real line the round-3 regex "
-            "matched, or this comparison is not exercising real content",
-        )
-
-    def test_round4_documented_residual_gap_non_hex_secret_is_not_closed(self):
-        """The round-4 fix only restricts the marker-hex window's LENGTH; it
-        does not change the free-text grammar unit's treatment of non-hex-
-        shaped characters. A high-entropy secret that is NOT hex-shaped
-        (contains letters outside a-f/A-F, e.g. a base64-ish or
-        underscore-prefixed API key) sharing the SAME JSON string as a real
-        commit/pin/tree/source marker reference is still exempted in full --
-        see .gitleaks.toml's header comment for why this is not closed with a
-        blanket non-hex run-length cap (it would break real narrative prose).
-        Pins the documented residual gap so a future tightening attempt that
-        accidentally reintroduces it (or silently over-tightens and breaks
-        real lines) is caught either way."""
-        regexes = self._current_allowlist_regexes()
-        current = re.compile(regexes[0])
-        hex40 = "1bf6df330b056ef93ab283083afdcce642387949"
-        # Non-hex-shaped (contains g/y/k/L/m/N/p/Q/r/S/t/U/v/W/z, none of
-        # which are valid hex digits) high-entropy value. Named without a
-        # credential-like substring for the same reason as the constants
-        # above (this file is itself scanned by gitleaks).
-        non_hex_high_entropy_value = "sk_" + "live_" + "Xy9kLmN2pQrStUvWz4hJ8gTq"  # built at runtime: the literal never sits in git (push protection)
-        same_string_equals = f'  "detail": "pinned commit {hex40}; password={non_hex_high_entropy_value}"'
-        same_string_colon = f'  "detail": "commit {hex40} api_key: {non_hex_high_entropy_value}"'
-        for adversarial, label in (
-            (same_string_equals, "trailing = separator"),
-            (same_string_colon, "trailing : separator"),
-        ):
-            with self.subTest(label=label):
-                self.assertTrue(
-                    current.match(adversarial),
-                    f"documented residual gap: a non-hex-shaped secret adjacent to a real "
-                    f"commit reference in the same string is still exempted ({label})",
-                )
 
 
 class GitleaksBranchAncestryHistoryTests(unittest.TestCase):
