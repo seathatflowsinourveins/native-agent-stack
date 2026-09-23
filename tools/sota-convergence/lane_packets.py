@@ -66,7 +66,17 @@ LEDGER_FILES = {
     "foundation": "catalogs/landscape/foundation.json",
     "us-equities": "catalogs/landscape/us-equities.json",
 }
-SOTA_MANIFEST_PATH = "catalogs/sota-convergence/manifest-20260922.json"
+DEFAULT_MANIFEST_RUN_ID = "20260922"
+
+
+def default_sota_manifest_path(run_id: str) -> str:
+    return f"catalogs/sota-convergence/manifest-{run_id}.json"
+
+
+# Kept as a module-level constant for existing callers/tests; default_sota_manifest_path(DEFAULT_MANIFEST_RUN_ID)
+# reproduces the same path. build_all_packets/main take an explicit --manifest override so a later run can join
+# a differently-dated manifest without editing this default.
+SOTA_MANIFEST_PATH = default_sota_manifest_path(DEFAULT_MANIFEST_RUN_ID)
 ADOPTION_MANIFEST_PATH = "adoption/manifest.json"
 FOUNDATION_DECISIONS_PATH = "catalogs/foundation/decisions.json"
 PACKET_SCHEMA_VERSION = 1
@@ -92,6 +102,11 @@ CARD_DECISION_ADOPTED = {"default", "conditional"}
 LAYER_REQUIREMENT_NOTE = ("The requirement, limitations and existing_overturn_when text is shared by this layer's "
                           "group; judge fit against the layer title and layer_scope_terms.")
 MANIFEST_CANDIDATE_SOURCE = "sota_manifest_layer_entries"
+# --withhold-labels: fields whose values track the withheld v1 disposition (measured over the
+# 2026-09-22 foundation packets: candidate review_status confirmed_default and decision selection
+# default occur only on selected candidates; decision review_status accepted_within_scope on 105
+# selected against 6 others). Evidence prose (evidence_scope, limitations, next_gap) stays.
+WITHHELD_DECISION_FIELDS = ("selection", "review_status")
 
 
 RULE_ITEM_RE = re.compile(r"\n(?=\d+\.\s)")
@@ -353,12 +368,34 @@ def packet_filename(catalog: str, layer_id: str) -> str:
     return f"{catalog}__{layer_id}.json"
 
 
+def withhold_labels(packet: dict) -> dict:
+    """Drop decision-bearing labels from a built packet (candidate review_status and the
+    attached decisions' selection and review_status) and record what was withheld."""
+    for candidate in packet.get("candidates", []):
+        candidate["review_status"] = None
+        candidate["decisions"] = [{key: value for key, value in decision.items() if key not in WITHHELD_DECISION_FIELDS}
+                                  for decision in candidate.get("decisions") or []]
+    for component in packet.get("sota_components_not_in_candidates", []):
+        component["review_status"] = None
+    withheld = list(packet.get("withheld", []))
+    for label in ("candidates[].review_status", "candidates[].decisions[].selection",
+                  "candidates[].decisions[].review_status", "sota_components_not_in_candidates[].review_status"):
+        if label not in withheld:
+            withheld.append(label)
+    packet["withheld"] = withheld
+    return packet
+
+
 def build_all_packets(root: Path, *, catalogs: list, seed: str, checked_at: str,
-                      trading_candidates: str = "ledger") -> dict:
+                      trading_candidates: str = "ledger", withhold: bool = False,
+                      manifest: str = None) -> dict:
     """Returns {filename: serialized packet text}, fully built and leak-
-    checked in memory before any file is written."""
+    checked in memory before any file is written. ``manifest`` overrides the
+    dated sota manifest joined in (default reproduces the 2026-09-22
+    packets); pass the same value used for build_verdicts.py's --manifest so
+    the packets and the verdict catalog agree on the pins."""
     rules = load_rules()
-    sota_doc = load_json(root / SOTA_MANIFEST_PATH)
+    sota_doc = load_json(root / (manifest or SOTA_MANIFEST_PATH))
     sota_index = sota_layer_index(sota_doc)
     recipe_map = load_json(root / ADOPTION_MANIFEST_PATH).get("recipe_map", {})
     decisions_doc = load_json(root / FOUNDATION_DECISIONS_PATH)
@@ -385,6 +422,10 @@ def build_all_packets(root: Path, *, catalogs: list, seed: str, checked_at: str,
                 layer_scope_terms=(sota_doc.get("taxonomy") or {}).get(row["layer_id"]) if layer_candidates is not None
                 else None,
             )
+            if withhold and layer_candidates is None:
+                # Manifest-mode trading packets already carry no labels; leaving them untouched
+                # keeps their bytes (and every lane return sealed against them) unchanged.
+                packet = withhold_labels(packet)
             packets[packet_filename(catalog, row["layer_id"])] = serialize(packet)
     return packets
 
@@ -403,6 +444,16 @@ def parse_args(argv=None):
     parser.add_argument("--catalog", choices=sorted(LEDGER_FILES), default=None,
                          help="Build packets for one catalog only; default builds both.")
     parser.add_argument("--checked-at", default=DEFAULT_CHECKED_AT)
+    parser.add_argument("--manifest", type=Path, default=None,
+                        help="Override the dated sota manifest joined in (default "
+                             "catalogs/sota-convergence/manifest-20260922.json, reproducing the 2026-09-22 "
+                             "packets). Pass the same --manifest given to build_verdicts.py for the same run "
+                             "so packets and verdicts agree on the pins.")
+    parser.add_argument("--withhold-labels", action="store_true",
+                        help="Drop decision-bearing labels (candidate and SOTA-component review_status, decision "
+                             "selection and review_status) from every ledger-built packet; manifest-built trading "
+                             "packets (--trading-candidates manifest) carry none and stay byte-identical. Off by "
+                             "default so the 2026-09-22 packets reproduce.")
     parser.add_argument("--trading-candidates", choices=("ledger", "manifest"), default="ledger",
                         help="Candidate source for us-equities packets: the ledger row's group-wide list "
                              "(default; reproduces the 2026-09-22 packets) or the sota manifest's own entries "
@@ -416,7 +467,8 @@ def main(argv=None) -> int:
     catalogs = [args.catalog] if args.catalog else sorted(LEDGER_FILES)
 
     packets = build_all_packets(root, catalogs=catalogs, seed=str(args.seed), checked_at=args.checked_at,
-                                trading_candidates=args.trading_candidates)
+                                trading_candidates=args.trading_candidates, withhold=args.withhold_labels,
+                                manifest=str(args.manifest) if args.manifest else None)
 
     out_dir = args.out / "packets"
     out_dir.mkdir(parents=True, exist_ok=True)

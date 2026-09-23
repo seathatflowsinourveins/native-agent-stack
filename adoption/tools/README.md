@@ -21,8 +21,11 @@ the VM and take the whole session down; the scope kills the job instead.
     `7680fe1173b35a8472023772c8973c4a9b65c4e444414ac44efa199cbabe17db`
   - `gitleaks-guarded` —
     `66db06f653520ad49c2531ab2d5df762d1e952b1d1655ba5f509b6014cbc52f1`
-- `ecosystem-bounded-run` is byte-for-byte identical to its source; its copy here
-  still hashes to the value above.
+- `ecosystem-bounded-run` was byte-for-byte identical to its source at copy
+  time. On 2026-09-22 a cross-family review fix changed this repository's copy
+  (see "Divergence in `ecosystem-bounded-run`" below), so it now hashes to
+  `77c47d2dfea465a64ec7c7af8c80fe932d4bc43047d7608eee45ef13f6838a70`; the
+  `7680fe11…` value above identifies the unmodified source only.
 - `gitleaks-guarded` differs from its source on two lines only (see below), so
   the copy in this repository hashes to
   `61e87881841a346fc0c4d2ec514b283696311ce033fd7b27397973fc2429a655`. Compare
@@ -40,12 +43,30 @@ another host.
 | 5 | a literal absolute path to the pinned Gitleaks binary under one user's home | `gitleaks_native="${GITLEAKS_NATIVE:-${ECO_INSTALL_ROOT:-$HOME/.local/share/codex-ecosystem}/tools/gitleaks-8.30.1/gitleaks}"` | Resolves through the same `ECO_INSTALL_ROOT` contract the bootstrap scripts use, with `GITLEAKS_NATIVE` as an explicit override. The pinned version string `gitleaks-8.30.1` is unchanged. |
 | 6 | a literal absolute path to `ecosystem-bounded-run` in one user's checkout | `gitleaks_runner="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)/ecosystem-bounded-run"` | The guarded launcher finds its runner next to the path it was invoked with, so the pair stays correct wherever it is installed as long as the two files are installed together. `${BASH_SOURCE[0]}` is not symlink-resolved; see the install section. |
 
-Nothing else was touched. Every absolute `/usr/bin` tool path
+Nothing else in `gitleaks-guarded` was touched. Every absolute `/usr/bin` tool path
 (`/usr/bin/systemd-run`, `/usr/bin/systemctl`, `/usr/bin/timeout`,
 `/usr/bin/flock`), every exit code (`64` usage, `75` lock held by another scan,
 `78` refusal to run uncontained) and every default limit (`MemoryHigh=4G`,
 `MemoryMax=6G`, `MemorySwapMax=0`, `RuntimeMaxSec=600`, `TasksMax=256`) is
 unchanged.
+
+### Divergence in `ecosystem-bounded-run` (2026-09-22)
+
+Two cross-family review rounds found three gaps, and both are fixed in this repository's
+copy only. **The host original (in the Codex-owned `codex-ecosystem`
+checkout, not in this repository) has not been changed and should receive
+the same fix;** until it does, the two files are expected to differ.
+
+| Gap in the source | Change here |
+| --- | --- |
+| A successful `systemd-run --scope` did not prove the limits were enforced: systemd starts the scope and masks a limit whose controller an ancestor does not delegate, so the command could run with no memory or task cap. | The scope now starts `/bin/sh` with an in-scope check instead of the command. It reads the job's own `/proc/self/cgroup`, requires the leaf to be this run's unit, and requires the cgroup's `memory.max` to equal the requested `MemoryMax` rounded down to a whole page (`getconf PAGESIZE`) and `pids.max` to equal `TasksMax`. Otherwise, or if the command is not found, it exits 78 before the command runs. When the check passes, it `exec`s the command, so the command keeps the scope, PID, stdin and argument vector. A `MemoryMax` too large for 64-bit byte arithmetic is refused with 78 before anything starts. `MemoryHigh`, `MemorySwapMax` and `RuntimeMaxSec` are still applied but not re-read. |
+| A launcher failure after the filesystem prechecks passed (a stale user-bus socket makes `systemd-run` exit 1 with `Failed to connect to bus`) propagated the launcher's status instead of 78. | The in-scope check creates a start marker in a private `mktemp -d` directory under `/run/user/$UID` immediately before `exec`. Without the marker the runner exits 78 (`command was not started`), whatever status the launcher returned. With it, the command's own status is returned unchanged, including 78 from the command itself. A missing command now yields 78, where the source returned `systemd-run`'s 1. |
+
+The limit defaults, exit codes 64/78, the `/usr/bin` tool paths and the signal
+handling (129/130/143 after a native scope stop) are unchanged. The marker
+directory is removed on every exit path.
+
+- The command lookup mirrors `exec`: a path must be an executable file, and a bare name must be an executable file in a `PATH` directory. A shell builtin with no file (for example `cd`) is refused with 78 before the start marker instead of failing with 127 after it (second cross-family review round, 2026-09-22).
 
 ## Install on a new Linux/WSL2 host
 
@@ -153,7 +174,18 @@ and prints which containment branch it took.
   `memory.max` is `6442450944` with `pids.max` `256`, i.e. the kernel, not only
   systemd, applied the documented defaults. Any ambient `ECOSYSTEM_JOB_*`
   override is stripped from the job's environment first, so the defaults are
-  what is measured. Checked by mutation on 2026-09-22: a stand-in runner that
+  what is measured. Separately, and before the command can run, the runner
+  itself re-reads `memory.max`/`pids.max` inside the scope (see the divergence
+  above). `BoundedRunSetupRefusalTests` drives instrumented copies whose only
+  change is the `systemd-run` path. A stand-in that fails like a stale bus, one
+  that runs the command with no scope, and one that creates a real scope
+  without the four resource properties must each exit 78 without running the
+  command. Workload statuses 1, 78 and 127 must pass through unchanged, and a
+  missing command must exit 78. Non-default, page-unaligned limits
+  (`1000001K`, 64 tasks) must still run and show the page-rounded value.
+  `LiveTaskQueryTests` stubs `systemctl` and requires that a failed query, or a
+  missing count for a cgroup that still exists, is an error and never "no
+  tasks". Checked by mutation on 2026-09-22: a stand-in runner that
   `exec`s the command directly fails with `the job did not run inside an
   ecosystem-job-*.scope; its own cgroup was '0::/init.scope'`, and a runner
   patched to `MemoryMax=8G` fails with `'8589934592' != '6442450944'` — so a
@@ -167,7 +199,9 @@ and prints which containment branch it took.
   group, i.e. an empty unit waiting for systemd's garbage collector, not an
   escaped job. So the test polls to a 45s deadline, prints the observed release
   time, and if its unit is still listed it fails only when that unit still
-  holds tasks. A listing taken right after the runner exits can legitimately
+  holds tasks. That count must come from a successful `systemctl --user show`
+  reporting a number, or else from the job's own cgroup directory having
+  disappeared. A failed query fails the test. A listing taken right after the runner exits can legitimately
   still show the scope, so `systemctl --user list-units 'ecosystem-job-*'`
   returning a line is not by itself a containment failure — check
   `TasksCurrent`. The suite also
@@ -200,4 +234,4 @@ opened at line 21 survives the final `exec` on this bash (verified separately vi
 `/proc/self/fd`), which is what makes that guarantee hold. This is a one-host
 observation, not a suite assertion.
 
-The shellcheck structural test excludes `SC2317` (info: "command appears to be unreachable"): the bounded runner's cleanup function is only reached through `trap`, which the shellcheck release on the current GitHub-hosted image (its version is not captured in the run log) reports as unreachable while 0.11.0 is clean; the scripts are kept byte-faithful to their recorded provenance rather than annotated.
+The shellcheck structural test excludes `SC2317` (info: "command appears to be unreachable"): the bounded runner's cleanup function is only reached through `trap`, which the shellcheck release on the current GitHub-hosted image (its version is not captured in the run log) reports as unreachable while 0.11.0 is clean; the scripts are kept faithful to their recorded provenance (only the divergences listed above) rather than annotated for that finding.

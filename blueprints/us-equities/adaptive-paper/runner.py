@@ -390,6 +390,13 @@ def public_preflight(observation, config):
 
 _GATE_REQUIRED_KEYS = ("status", "input_sha256", "row_count", "checks", "versions", "checked_at")
 _GATE_ACCEPTED_SNAPSHOT_EXTENSIONS = (".csv", ".parquet")
+# Must equal promotion_gate.CHECK_NAMES (blueprints/us-equities/data/promotion_gate.py);
+# tests/test_adaptive_paper_runner.py parses that module and asserts the two agree.
+_GATE_CHECK_NAMES = frozenset((
+    "rows_present", "symbol_nonempty", "valid_trading_session", "open_positive", "high_positive",
+    "low_positive", "close_positive", "volume_integral_non_negative", "observed_at_not_future",
+    "high_ge_max_open_close", "low_le_min_open_close", "unique_symbol_session",
+))
 
 
 def _check_promotion_gate(gate_result_path, snapshot_path):
@@ -415,6 +422,13 @@ def _check_promotion_gate(gate_result_path, snapshot_path):
 
     * every key in `_GATE_REQUIRED_KEYS` is present, else
       `promotion_gate_incomplete`;
+    * `checks` names every entry of `_GATE_CHECK_NAMES` exactly once (no
+      missing, extra, unnamed or duplicate checks), `versions` is a non-empty
+      object of non-empty version strings and `checked_at` a timezone-aware
+      ISO-8601 date-time, else
+      `promotion_gate_incomplete`;
+    * a synthetic `unmapped_failures` check (pandera failures the gate could
+      not map to a named check) raises `promotion_gate_unmapped_failures`;
     * `checks` is a non-empty list and every entry's `status == "pass"`,
       else `promotion_gate_incomplete` (malformed/missing `checks`) or
       `promotion_gate_failed_check` (a real failing check);
@@ -423,7 +437,8 @@ def _check_promotion_gate(gate_result_path, snapshot_path):
     * `snapshot_path` is a regular file with an extension the gate accepts
       (`.csv`/`.parquet`) whose sha256 equals `input_sha256`, else
       `promotion_gate_missing` (unusable snapshot) or
-      `promotion_gate_mismatch` (hash disagreement).
+      `promotion_gate_mismatch` (hash disagreement, or for a `.csv` snapshot a
+      `row_count` different from the file's data rows).
     """
     if gate_result_path is None or snapshot_path is None:
         raise SafetyError("promotion_gate_missing")
@@ -436,7 +451,28 @@ def _check_promotion_gate(gate_result_path, snapshot_path):
     checks = gate.get("checks")
     if not isinstance(checks, list) or not checks:
         raise SafetyError("promotion_gate_incomplete")
-    if any(not isinstance(check, dict) or check.get("status") != "pass" for check in checks):
+    # Every check the gate emits must be reported exactly once: a result that lists
+    # only some checks (or unnamed ones) has not shown that the snapshot passed the gate.
+    names = [check["name"] if isinstance(check, dict) and isinstance(check.get("name"), str) else None
+             for check in checks]
+    # promotion_gate.py reports pandera failures it cannot map to a named check under a
+    # synthetic "unmapped_failures" entry (status "fail"): name that case explicitly.
+    if "unmapped_failures" in names:
+        raise SafetyError("promotion_gate_unmapped_failures")
+    if len(set(names)) != len(names) or set(names) != _GATE_CHECK_NAMES:
+        raise SafetyError("promotion_gate_incomplete")
+    versions, checked_at = gate.get("versions"), gate.get("checked_at")
+    if (not isinstance(versions, dict) or not versions
+            or any(not isinstance(value, str) or not value for value in versions.values())
+            or not isinstance(checked_at, str)):
+        raise SafetyError("promotion_gate_incomplete")
+    try:
+        checked = datetime.fromisoformat(checked_at)
+    except ValueError:
+        raise SafetyError("promotion_gate_incomplete")
+    if "T" not in checked_at or checked.tzinfo is None:
+        raise SafetyError("promotion_gate_incomplete")
+    if any(check.get("status") != "pass" for check in checks):
         raise SafetyError("promotion_gate_failed_check")
     row_count = gate.get("row_count")
     if not isinstance(row_count, int) or isinstance(row_count, bool) or row_count <= 0:
@@ -447,11 +483,18 @@ def _check_promotion_gate(gate_result_path, snapshot_path):
     if not snapshot.is_file() or snapshot.suffix.lower() not in _GATE_ACCEPTED_SNAPSHOT_EXTENSIONS:
         raise SafetyError("promotion_gate_missing")
     try:
-        observed_hash = hashlib.sha256(snapshot.read_bytes()).hexdigest()
+        snapshot_bytes = snapshot.read_bytes()
     except OSError:
         raise SafetyError("promotion_gate_missing")
-    if gate.get("input_sha256") != observed_hash:
+    if gate.get("input_sha256") != hashlib.sha256(snapshot_bytes).hexdigest():
         raise SafetyError("promotion_gate_mismatch")
+    if snapshot.suffix.lower() == ".csv":
+        # Bind row_count to the same hashed bytes: data rows after the header line.
+        # A quoted field containing a newline would count high and refuse (never pass);
+        # Parquet row counts would need a reader this runtime does not carry.
+        data_rows = sum(1 for line in snapshot_bytes.splitlines()[1:] if line.strip())
+        if data_rows != row_count:
+            raise SafetyError("promotion_gate_mismatch")
 
 
 def _check_margin_entitlement(account, config, lev, session_policy):

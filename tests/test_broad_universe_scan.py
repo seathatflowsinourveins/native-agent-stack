@@ -154,6 +154,7 @@ class SessionStateDetermination(unittest.TestCase):
         self.assertEqual(info["current_or_last_regular_session"], "2026-09-18")
 
 
+@unittest.skipUnless(HAS_REQUESTS, "requires requests")
 class SymbolBatching(unittest.TestCase):
     def test_snapshot_batches_stay_under_url_budget_and_report_missing(self):
         symbols = [f"SYM{i:04d}" for i in range(1200)]
@@ -309,6 +310,7 @@ class UniverseBuilding(unittest.TestCase):
         self.assertIn("not_active_tradable", skipped)
 
 
+@unittest.skipUnless(HAS_REQUESTS, "requires requests")
 class ProviderScreens(unittest.TestCase):
     def test_screens_are_labelled_bounded_not_market_coverage(self):
         session = m.Session("k", "s")
@@ -732,6 +734,7 @@ class PublicOutputRedaction(unittest.TestCase):
 
 
 class NewsFetch(unittest.TestCase):
+    @unittest.skipUnless(HAS_REQUESTS, "requires requests")
     def test_bounded_pages_and_capped_flag(self):
         session = m.Session("k", "s")
         calls = []

@@ -62,7 +62,7 @@
       "sha256": "ccab169473a3f863fcadf833eff5023f40eb8600dcfe3b7b92678d876765601d",
       "checksum_source": "npm_registry_integrity_crosscheck",
       "checksum_ref": "npm view mcporter@0.13.13 dist.integrity = sha512-rgltHjpmdsBzErnWfAlNsW6Sn5B3y3Qli8phNtKkgn7s/Lk3Uf1YWLpqJXrIXjhxzBR67Oi5Z3+wxptn/vxFkA== (2026-09-22); re-downloaded tarball sha256 matched the linux-x86_64 pin exactly",
-      "install_note": "Pure JavaScript package with no optionalDependencies on the registry (checked 2026-09-22), so the pinned tarball is the whole install. Requires Node >=24, satisfied by the node pin above."
+      "install_note": "UNPINNED DEPENDENCIES: this sha256 covers mcporter's own registry tarball only. `npm view mcporter@0.13.13 dependencies bundleDependencies optionalDependencies` (2026-09-22) lists ten runtime dependencies (@iarna/toml, @modelcontextprotocol/client, @modelcontextprotocol/server, acorn, commander, es-toolkit, jsonc-parser, ora and zod as caret ranges; rolldown exactly 1.2.8) and no bundled or optional ones, so npm resolves those packages from the registry at install time outside this hash; rolldown@1.2.8 in turn selects its native optionalDependency '@rolldown/binding-darwin-arm64@1.2.8' on Apple Silicon. Requires Node >=24, satisfied by the node pin above."
     },
     {
       "id": "context-mode",

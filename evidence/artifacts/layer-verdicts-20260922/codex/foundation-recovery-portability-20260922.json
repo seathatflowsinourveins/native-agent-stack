@@ -1,0 +1,121 @@
+{
+ "alternatives": [
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "adoption/research.json"
+   ],
+   "key": "c2",
+   "name": "chezmoi",
+   "repository": "https://github.com/twpayne/chezmoi",
+   "why_not_default": "Retained evidence reviews selected non-secret configuration management; init, apply and verify were not executed. It does not reproduce dependencies or recover application databases, and exact-directory adoption can remove unmanaged entries."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "adoption/research.json"
+   ],
+   "key": "c3",
+   "name": "mise",
+   "repository": "https://github.com/jdx/mise",
+   "why_not_default": "Multi-language locking is source-reviewed, but locked installation was not executed. Backend-dependent locks still exclude application state, host drivers and accounts; no demonstrated requirement exceeds the selected uv lane."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/hosting-source-review.json"
+   ],
+   "key": "c5",
+   "name": "Litestream",
+   "repository": "https://github.com/benbjohnson/litestream",
+   "why_not_default": "Continuous SQLite replication remains source review without retained execution. It adds a standing writer, source-database schema change and replica policy; the evidence does not establish a continuous-replication requirement or recovery advantage over native snapshots plus Restic."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "adoption/research.json"
+   ],
+   "key": "c6",
+   "name": "Determinate Nix installer",
+   "repository": "https://github.com/DeterminateSystems/nix-installer",
+   "why_not_default": "Neither system installation nor planning was executed. The reviewed Linux path requires root and changes the daemon/store platform; its installer receipt is not a dependency lock or application-state recovery result."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "adoption/research.json"
+   ],
+   "key": "c7",
+   "name": "Devbox",
+   "repository": "https://github.com/jetify-com/devbox",
+   "why_not_default": "No Nix or Devbox runtime was installed or accepted. The reviewed install can fill missing lock metadata, and package hooks require separate qualification; application dependencies, live state and accounts remain outside its demonstrated coverage."
+  }
+ ],
+ "catalog": "foundation",
+ "challenger_preferred": null,
+ "lane": "codex",
+ "layer_id": "recovery-portability",
+ "limits": [
+  "This verdict inspected retained records; no installation, restore, hosted workflow or upstream test was rerun.",
+  "Underlying raw command streams and encrypted proof archives were not independently reopened; detailed results rely on the inspected receipts and recorded independent review.",
+  "Upstream metadata was accepted as packet context without a fresh availability check."
+ ],
+ "model": {
+  "effort": "high",
+  "name": "gpt-6-astra"
+ },
+ "open_gaps": [
+  "A newly adopted physical host still needs its own installation, native sign-in, client rebinding and representative application acceptance.",
+  "uv's observed clean-prefix installs reused the existing host and package cache. The hash-locked SDK reproduction commands in adoption/research.json are source-reviewed recipes, not executions from that research pass.",
+  "docs/portable-userspace-install-20260921.md establishes a separate selected client/token-tool subset on the existing WSL kernel; it does not qualify uv or the whole foundation.",
+  "Off-host application recovery used newly generated synthetic state. Existing private application archives, production recovery and independent trust-domain availability remain unestablished.",
+  "Atomic cross-application backups, lost-account/password recovery, power-loss recovery and long-term retention remain unqualified.",
+  "No executed comparison establishes that an alternative improves installation or recovery for the selected workload."
+ ],
+ "overturn_protocol": {
+  "arms": [
+   "Selected uv installations plus native application snapshots encrypted and restored through Restic.",
+   "A scoped alternative environment manager or SQLite replication path, using identical selected tools, application contents, destination conditions and authentication-store exclusions."
+  ],
+  "fixture_paths": [
+   "blueprints/convergence-practice/offhost-app-state/README.md",
+   "blueprints/convergence-practice/offhost-app-state/plan.json",
+   "tests/test_offhost_app_state.py"
+  ],
+  "metric": "Compare successful installation and representative tool execution, exact restored memory bodies and scope refusals, complete Qdrant state and ranked-query equality, wrong-key refusal, restart usability and owned-resource cleanup. Retain failures and native outputs; offline guard-test success alone cannot promote an alternative."
+ },
+ "overturn_when": "Change the selection if execution of the recovery protocol in blueprints/convergence-practice/offhost-app-state/README.md on the explicitly adopted destination shows the selected path cannot preserve required state or resume usable applications, while an alternative passes the same frozen application oracles and installation/cleanup requirements. python3 -m unittest tests.test_offhost_app_state -v checks local guards only and is insufficient by itself.",
+ "packet_sha256": "c57cffa6f330fde6eff19143b4cc807ac0c9536a6f78f7aeefa5cf52ccf8d8c7",
+ "schema_version": 1,
+ "sources_read": [
+  "<host-path>/SKILL.md",
+  "<host-path>/foundation__recovery-portability.json",
+  "adoption/research.json",
+  "docs/portable-userspace-install-20260921.md",
+  "catalogs/foundation/decisions.json",
+  "adoption/lifecycle.md",
+  "catalogs/us-equities/hosting-source-review.json",
+  "blueprints/convergence-practice/offhost-app-state/README.md",
+  "evidence/receipts/native-offhost-app-state-20260920.json",
+  "evidence/receipts/native-token-clean-prefix-20260920.json"
+ ],
+ "why_selected": "Select uv for bounded tool reproduction and Restic for encrypted state recovery. evidence/receipts/native-token-clean-prefix-20260920.json records actual upstream uv installation of Headroom and jCodeMunch into fresh isolated environments, real MCP execution across process restarts, successful uninstall and removal of owned entrypoints. This is local integration on an existing host with cache reuse. catalogs/foundation/decisions.json records same-host native memory/FTS and Qdrant state recovery. evidence/receipts/native-offhost-app-state-20260920.json additionally records native Restic transfer/restore followed by usable memory and complete Qdrant state/query checks across fresh hosted jobs. That cross-host composition is local integration using synthetic application state, with selected unchanged upstream tests reported separately. These complementary results support the selected roles without establishing acceptance on a new host.",
+ "winner_evidence_class": "local_integration",
+ "winner_evidence_refs": [
+  "adoption/research.json",
+  "adoption/lifecycle.md",
+  "evidence/receipts/native-token-clean-prefix-20260920.json",
+  "catalogs/foundation/decisions.json",
+  "blueprints/convergence-practice/offhost-app-state/README.md",
+  "evidence/receipts/native-offhost-app-state-20260920.json"
+ ],
+ "winner_keys": [
+  "c1",
+  "c4"
+ ]
+}

@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "id": "sec-edgar-acquisition-deferred",
+  "date": "2026-09-22",
+  "layer_ids": ["storage-compute", "market-data-reference"],
+  "gap_refs": [
+    {"layer_id": "storage-compute", "gap_index": 0},
+    {"layer_id": "storage-compute", "gap_index": 2},
+    {"layer_id": "market-data-reference", "gap_index": 3}
+  ],
+  "purpose": "Record why a live SEC EDGAR retry/acquisition (storage-compute gaps 0 and 2's blocker, and market-data-reference gap 3's company-facts/XBRL path) was not executed in this unit, per this unit's explicit binding instruction to not query SEC EDGAR because it requires a contact email the user has not authorized sending.",
+  "preregistered": "No command was preregistered to be run for this check; this receipt documents a deliberate non-execution and the reasoning for it, so that the gap is not silently left blank or miscategorized as executable_now.",
+  "commands": [],
+  "tool_versions": {},
+  "installs": [],
+  "result": "Not executed. sec_data.py's user-agent validator (blueprints/us-equities/financial-data/sec_data.py lines ~129-132) accepts either an '@' (an email/contact) or an 'https://' (a project URL) in the User-Agent string, so a live acquisition could technically be attempted with a project GitHub URL alone, without the user's personal email, per the critic's correction (gap-triage.json critic.corrections, layer_id storage-compute, check_id sec-edgar-acquire-retry: 'sec_data.py also accepts an honest project URL, so the check should use the project's public GitHub URL'). This unit's own binding brief nonetheless explicitly excludes any SEC EDGAR query for this unit ('Do NOT query SEC EDGAR ... record that gap as needs_user_input'), so no live network call to SEC EDGAR was attempted here even with a URL-only User-Agent, deferring to that instruction rather than resolving the ambiguity unilaterally. The prior recorded evidence stands unchanged: financial-data/receipt.json records one HTTP403 with 0 automatic retries and an unresolved cause (user-agent, network policy, or another condition); storage-compute gap 0/2 and market-data-reference gap 3 remain open pending a decision on whether a URL-only User-Agent retry is authorized.",
+  "settles_gap": false,
+  "verdict_impact": {
+    "could_change_verdict": false,
+    "direction": "not_applicable",
+    "explanation": "No check was run; this is a scope/authorization note, not evidence for or against the incumbent. Resolving storage-compute gap 0/2 and market-data-reference gap 3 needs either explicit authorization to retry SEC EDGAR with a project-URL-only User-Agent, or continued acceptance that the HTTP403 cause is unresolved."
+  },
+  "evidence_class": "source_review",
+  "limitations": [
+    "This receipt records a deliberate non-action, not a measured result; it cannot settle whether the prior HTTP403 was caused by the user-agent, network policy, or another condition.",
+    "The critic's correction (a URL-only User-Agent avoids sending the user's email) was identified but not acted on in this unit, since the unit's own binding instruction excluded any SEC EDGAR query outright; a future session with explicit authorization to use a project-URL-only contact could close this."
+  ],
+  "raw_artifacts": []
+}

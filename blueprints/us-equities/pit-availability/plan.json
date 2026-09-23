@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "id": "pit-availability-plan-20260922",
+  "gate_id": "pit-news-filings",
+  "preregistered": false,
+  "plan_written_note": "plan_written_utc in the receipt is read from this file's own filesystem mtime (os.stat) at run time, not a hand-written value -- a hand-written timestamp in this file could be wrong or fabricated and is not used. This worktree does not commit, so 'unchanged since plan_written_utc' means unchanged on disk, not git-committed.",
+  "history": "Round 1: initial plan and measurement. Round 2: revised after review (added amendment forms, 10-K completeness check, post_close session split, created_at window filter, log-relative price-step detector, corporate-action step matching). Round 3: revised again after review (removed the hand-written plan_written_utc in favour of a stat-derived value; added filings_identity_breaks for XOM and DKNG). Because the plan was revised after seeing round-1 and round-2 results, it is not preregistered.",
+  "symbols_filings_news": [
+    "AAPL", "MSFT", "AMZN", "GOOGL", "META", "JPM", "XOM", "JNJ", "WMT", "NVDA",
+    "GME", "AMC", "PLUG", "RIOT", "MARA", "SOFI", "UPST", "DKNG", "CVNA", "FUBO"
+  ],
+  "symbols_filings_news_rationale": "10 large-cap constituents present on EDGAR and continuously listed 2016-2026, plus 10 small/mid-cap names with heavier retail/algorithmic-news coverage and more volatile filing cadence (SPACs, recent IPOs, meme-stock names); mixes long-tenured issuers with names that IPO'd or were renamed inside the window so filing/news availability at the edges of 2016-2026 is exercised.",
+  "symbols_vintage_prices": ["AAPL", "AMZN", "GOOGL", "NVDA", "TSLA"],
+  "symbols_vintage_prices_rationale": "5 large-cap symbols with a known forward stock split inside 2016-2026 (AAPL 4:1 2020-08-31; AMZN 20:1 2022-06-06; GOOGL 20:1 2022-07-18; NVDA 4:1 2021-07-20 and 10:1 2024-06-10; TSLA 5:1 2020-08-31 and 3:1 2022-08-25), so raw-vs-adjusted bar divergence around a corporate action is directly observable.",
+  "filings_source": "data.sec.gov submissions JSON per CIK (https://data.sec.gov/submissions/CIK{10-digit}.json), ticker-to-CIK mapping from https://www.sec.gov/files/company_tickers.json",
+  "filings_forms": ["8-K", "8-K/A", "10-Q", "10-Q/A", "10-K", "10-K/A"],
+  "filings_expected_10k_per_symbol": 10,
+  "filings_completeness_tolerance": 2,
+  "filings_identity_breaks": {
+    "note": "Symbols where www.sec.gov/files/company_tickers.json's current ticker->CIK mapping points to a distinct, separately-registered CIK from the one that filed most of the symbol's 2016-2026 history (a holdco reorg under Rule 12g-3, evidenced by an 8-K12B on the current CIK). Discovered by cross-checking data.sec.gov's full text search (efts.sec.gov) for each symbol's own company name against its 10-K filers. These symbols are excluded from the 'overall' filings totals (their current-CIK filing count is not representative coverage); each is also probed explicitly on its historical_cik, labelled historical_cik_probe, not merged into per_symbol or overall totals.",
+    "XOM": {"current_cik": "0002115436", "historical_cik": "0000034088"},
+    "DKNG": {"current_cik": "0001883685", "historical_cik": "0001772757"}
+  },
+  "filings_date_range": ["2016-01-01", "2026-09-22"],
+  "filings_rate_limit_per_sec": 5,
+  "news_source": "alpaca-py 0.44.0 NewsClient (Benzinga content) via /v1beta1/news",
+  "news_weeks_sampled": {
+    "note": "one fixed 7-day week per calendar year, ISO week containing the 2nd Monday of March, chosen without inspecting any news content before the plan was frozen",
+    "2016": ["2016-03-14", "2016-03-20"],
+    "2017": ["2017-03-13", "2017-03-19"],
+    "2018": ["2018-03-12", "2018-03-18"],
+    "2019": ["2019-03-11", "2019-03-17"],
+    "2020": ["2020-03-09", "2020-03-15"],
+    "2021": ["2021-03-08", "2021-03-14"],
+    "2022": ["2022-03-14", "2022-03-20"],
+    "2023": ["2023-03-13", "2023-03-19"],
+    "2024": ["2024-03-11", "2024-03-17"],
+    "2025": ["2025-03-10", "2025-03-16"],
+    "2026": ["2026-03-09", "2026-03-15"]
+  },
+  "vintage_prices_source": "alpaca-py 0.44.0 StockHistoricalDataClient (bars, feed=sip, adjustment=raw and adjustment=all) and CorporateActionsClient (/v1/corporate-actions)",
+  "vintage_prices_window_days_around_action": 10,
+  "env_files": {
+    "note": "Symbolic env-var names an operator exports before running measure.py; resolved with os.path.expandvars. No literal filesystem path is committed here (see scripts/validate.py PRIVATE_CONTENT).",
+    "sec": "$PIT_SEC_ENV_PATH",
+    "alpaca": "$PIT_ALPACA_ENV_PATH"
+  },
+  "alpaca_python": "$PIT_ALPACA_PYTHON",
+  "alpaca_py_version_expected": "0.44.0"
+}

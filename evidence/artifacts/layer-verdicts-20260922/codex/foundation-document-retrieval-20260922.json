@@ -1,0 +1,106 @@
+{
+ "alternatives": [
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/foundation-memory.json"
+   ],
+   "key": "c3",
+   "name": "LlamaIndex",
+   "repository": "https://github.com/run-llama/llama_index",
+   "why_not_default": "The retained pinned source review explicitly says candidate commands were not executed. No measured connector ingestion, original-body fidelity or retrieval comparison establishes an advantage."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "docs/token-native-saturation.md",
+    "catalogs/foundation/decisions.json",
+    "evidence/receipts/token-native-retained-functional-20260920.json"
+   ],
+   "key": "c4",
+   "name": "Context Hub",
+   "repository": "https://github.com/andrewyng/context-hub",
+   "why_not_default": "Retained native search/get supports selected curated developer documentation, but does not establish controlled ingestion of the local corpus. Its selected-document representation grew by 85 tokens relative to the full entry in the retained comparison."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/foundation-memory.json"
+   ],
+   "key": "c6",
+   "name": "Docling",
+   "repository": "https://github.com/docling-project/docling",
+   "why_not_default": "The retained evidence is pinned source review with prospective commands. Financial table/unit extraction and OCR quality remain unmeasured; no executed comparison justifies its additional pipeline and model requirements."
+  }
+ ],
+ "catalog": "foundation",
+ "challenger_preferred": null,
+ "lane": "codex",
+ "layer_id": "document-retrieval",
+ "limits": [
+  "This verdict reviews historical retained evidence; no native extraction, retrieval benchmark or provider run was repeated.",
+  "Private raw command captures and configuration backups were not inspected; public summaries and hashes do not independently reproduce them.",
+  "MarkItDown HTML acceptance was read from the referenced capability decision; its underlying conversion output was not inspected.",
+  "Current upstream releases and implementations were not independently rechecked."
+ ],
+ "model": {
+  "effort": "high",
+  "name": "gpt-6-astra"
+ },
+ "open_gaps": [
+  "The QMD four-mode comparison used one ordered run and an expanded index without a complete corpus seal; repeated warm/cold latency and representative corpus recall remain unestablished.",
+  "The earlier scoped benchmark's eight top-three successes and four misses are separate from the later expanded-index diagnostic.",
+  "Two exact QMD source-body retrievals do not establish arbitrary query recall or automatic index freshness.",
+  "Poppler acceptance covers designed born-digital Latin pages with explicit table geometry and local exact-phrase retrieval. OCR, inferred layouts, arbitrary filings and semantic questions remain unqualified.",
+  "MarkItDown optional PDF/Office extras are not established by the selected HTML conversion.",
+  "No retained comparison establishes end-to-end answer quality or provider-token savings for the combined ingestion and retrieval workflow."
+ ],
+ "overturn_protocol": {
+  "arms": [
+   "QMD BM25 versus vector, hybrid and full retrieval on identical sealed source bytes and queries.",
+   "Poppler versus Docling or MarkItDown on identical permitted documents, frozen answer oracles and provenance requirements."
+  ],
+  "fixture_paths": [
+   "blueprints/us-equities/retrieval-evaluation/fixture.json",
+   "blueprints/convergence-practice/document-ingestion/README.md"
+  ],
+  "metric": "Compare recall@1/3/5, MRR, exact original-body recovery and repeated end-to-end latency; for ingestion compare page text, table cells, source/page provenance, absent-answer behavior and runtime costs. Freeze representative extensions before execution."
+ },
+ "overturn_when": "Change the retrieval selection when an executed comparison using blueprints/us-equities/retrieval-evaluation/fixture.json, with a sealed representative corpus and repeated runs, demonstrates useful quality gains at acceptable end-to-end latency while preserving original-body fidelity. Change the parser selection when the representative layout/OCR extension described in blueprints/convergence-practice/document-ingestion/README.md demonstrates better extraction with preserved provenance and justified runtime costs.",
+ "packet_sha256": "874fbf9f81a7bf8d1c26df284949b0f87a0958cd12617d36bf08e04925e5fb46",
+ "schema_version": 1,
+ "sources_read": [
+  "<host-path>/foundation__document-retrieval.json",
+  "<host-path>/SKILL.md",
+  "catalogs/foundation/decisions.json",
+  "catalogs/us-equities/foundation-memory.json",
+  "evidence/artifacts/foundation-rd-20260921/qmd-comparison.json",
+  "docs/token-native-saturation.md",
+  "docs/foundation-rd-readiness.md",
+  "blueprints/convergence-practice/document-ingestion/README.md",
+  "blueprints/convergence-practice/wsl-document-ingestion/README.md",
+  "docs/catalog-retrieval.md",
+  "blueprints/us-equities/retrieval-evaluation/fixture.json",
+  "evidence/receipts/token-native-retained-functional-20260920.json",
+  "evidence/receipts/native-catalog-retrieval-20260920.json",
+  "blueprints/convergence-practice/document-ingestion/accepted/receipt.json",
+  "blueprints/convergence-practice/wsl-document-ingestion/receipt.json"
+ ],
+ "why_selected": "Select QMD BM25 for scoped search/get, with MarkItDown for qualified HTML conversion and Poppler for qualified born-digital PDFs. The measured native comparison in evidence/artifacts/foundation-rd-20260921/qmd-comparison.json reported equal BM25/hybrid recall@3 of 0.5, with average latency of 5 versus 10328 ms. Native execution recorded in evidence/receipts/native-catalog-retrieval-20260920.json retrieved both selected sources first and recovered exact pinned bodies apart from a display newline. catalogs/foundation/decisions.json records selected MarkItDown HTML conversion passing. Native Poppler execution in blueprints/convergence-practice/document-ingestion/accepted/receipt.json and blueprints/convergence-practice/wsl-document-ingestion/receipt.json passed three pages, 24 cells, eight positive and four absent queries. Those PDF results use a designed synthetic corpus and project-local geometry/provenance checks, not general layout inference. The winner-set evidence class is conservatively local_integration because ingestion qualification relies on bounded project fixtures.",
+ "winner_evidence_class": "local_integration",
+ "winner_evidence_refs": [
+  "evidence/artifacts/foundation-rd-20260921/qmd-comparison.json",
+  "evidence/receipts/native-catalog-retrieval-20260920.json",
+  "catalogs/foundation/decisions.json",
+  "blueprints/convergence-practice/document-ingestion/accepted/receipt.json",
+  "blueprints/convergence-practice/wsl-document-ingestion/receipt.json"
+ ],
+ "winner_keys": [
+  "c5",
+  "c1",
+  "c2"
+ ]
+}

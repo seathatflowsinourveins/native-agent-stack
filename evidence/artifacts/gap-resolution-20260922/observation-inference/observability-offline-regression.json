@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "id": "observability-offline-regression",
+  "date": "2026-09-22",
+  "layer_ids": ["observation-inference"],
+  "gap_refs": [{"layer_id": "observation-inference", "gap_index": 6}],
+  "purpose": "Re-run the offline observability/alerting regression suites the observation-inference row's verdict_overturn_when names (tests/test_observability.py, tests/test_observability_backends_alerts.py) to confirm the incumbent pipeline still passes before any challenger-stack comparison is weighed. Per the critic's correction, this check does NOT itself add an alternative arm (Phoenix/OpenLIT/Loki-first) and does not close gap 6's actual comparison gap; it only re-confirms the offline half named in verdict_overturn_when.",
+  "preregistered": "If `python3 -m unittest tests.test_observability tests.test_observability_backends_alerts -v` exits 0 with the same 21-test count the prior triage session recorded, the offline regression baseline the incumbent's verdict rests on is reconfirmed (a necessary but not sufficient condition for the verdict to hold); any failure, error, or a changed test count is recorded honestly and would itself be evidence the incumbent's baseline has regressed.",
+  "commands": [
+    {"cmd": "python3 -m unittest tests.test_observability tests.test_observability_backends_alerts -v", "exit": 0, "duration_s": 0.321, "output_excerpt": "Ran 21 tests in 0.321s\n\nOK", "output_sha256": "103972b27a3660bb65c9978e1dd254b0e1febe82800b603f19ce591625223868"}
+  ],
+  "tool_versions": {"python3": "3.12.3 (system)"},
+  "installs": [],
+  "result": "All 21 tests across tests/test_observability.py (5 tests: dashboard receipt identity, independent process identity, persistence replay refusal, bounded/atomic SDK observation, no-overwrite of existing receipts) and tests/test_observability_backends_alerts.py (16 tests: Alertmanager template routing, amtool/promtool config and rule validation, rules-template alert presence/labels/aggregation, scrape-template job target) passed, exit 0, matching the prior triage session's own run (21/21 OK) recorded in the gap-triage.json notes for this layer.",
+  "settles_gap": "partially",
+  "verdict_impact": {
+    "could_change_verdict": false,
+    "direction": "inconclusive",
+    "explanation": "This reconfirms the offline regression baseline is still green, which is necessary but not sufficient for the incumbent's verdict on gap 6. It does not change the verdict on its own: gap 6 is specifically the missing measured comparison against alternative observation stacks (Phoenix, OpenLIT, Loki-first), and this check installs and runs none of those challengers, so the comparison gap remains open exactly as the triage and critic both stated."
+  },
+  "evidence_class": "native_proven",
+  "limitations": [
+    "This does not close gap 6's actual comparison gap (no Phoenix/OpenLIT/Loki-first challenger was installed, pinned, or run); it only re-confirms the offline half of the incumbent's own regression baseline, as the critic's correction specified.",
+    "Re-verified importlib.metadata.PackageNotFoundError still holds for arize-phoenix and openlit on this host was not re-checked in this run (already established by the prior triage session); only the unittest re-run itself is new evidence here.",
+    "Ran once as preregistered; no retry."
+  ],
+  "raw_artifacts": [
+    {"path": "/home/example/codex-ecosystem/state/gap-resolution-20260922/token-observation/observability-offline-regression/observability-offline-regression.log", "sha256": "103972b27a3660bb65c9978e1dd254b0e1febe82800b603f19ce591625223868"}
+  ]
+}

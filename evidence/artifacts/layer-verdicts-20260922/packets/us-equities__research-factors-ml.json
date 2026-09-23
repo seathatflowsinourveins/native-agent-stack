@@ -1,0 +1,851 @@
+{
+ "candidate_source": "sota_manifest_layer_entries",
+ "candidates": [
+  {
+   "adopted": true,
+   "card_limitations": [
+    "Current profile is BM25 only. Semantic query/reranking models are not downloaded. New HF models are not automatically compatible with QMD GGUF/pooling contracts."
+   ],
+   "component_id": "foundation-qmd",
+   "decisions": [],
+   "evidence_kind": "native_proven",
+   "evidence_refs": [
+    "evidence/receipts/native-cli-gaps.json",
+    "evidence/receipts/component-history.json",
+    "evidence/receipts/desktop-cli-workflows.json"
+   ],
+   "key": "c1",
+   "name": "foundation-qmd",
+   "pin": "v2.8.3",
+   "pin_behind_upstream": false,
+   "recipe_ref": "evidence/receipts/native-cli-gaps.json",
+   "repository": "https://github.com/tobi/qmd",
+   "review_status": null,
+   "role": "Scoped Markdown BM25 retrieval",
+   "upstream": {
+    "archived": false,
+    "latest": "v2.8.3",
+    "license": "MIT",
+    "prerelease": false,
+    "pushed_at": "2026-09-09",
+    "released_at": "2026-08-16",
+    "renamed_to": null,
+    "stars": 29952
+   }
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "Current release is BSL-1.1 source-available, not blanket Apache-licensed software.",
+    "Pinned license includes an Additional Use Grant while current vendor prose describes paid production/business use; resolve the intended deployment with the licensor instead of assuming unrestricted commercial rights.",
+    "Storage version time is not proof of market information availability; do not discard revisions needed for replay."
+   ],
+   "component_id": "data-arcticdb",
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "https://github.com/man-group/ArcticDB/blob/e620d8572a1e62c9ec07df8cbc8f5c432cd84325/README.md"
+   ],
+   "key": "c2",
+   "name": "data-arcticdb",
+   "pin": "v6.26.0; source e620d8572a1e62c9ec07df8cbc8f5c432cd84325",
+   "pin_behind_upstream": false,
+   "recipe_ref": null,
+   "repository": "https://github.com/man-group/ArcticDB",
+   "review_status": null,
+   "role": "Versioned dataframe storage using LMDB or object storage",
+   "upstream": {
+    "archived": false,
+    "latest": "v6.26.0",
+    "license": "NOASSERTION",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "released_at": "2026-09-14",
+    "renamed_to": null,
+    "stars": 2519
+   }
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "Synthetic monthly example would demonstrate an API, not equity predictability or trading returns.",
+    "Purge overlapping future labels where required; fit scaling/selection within each training fold, retain a final untouched period and account for repeated strategy search."
+   ],
+   "component_id": "data-sktime",
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "https://github.com/sktime/sktime/blob/918fa838d99eb3703fe9bc963891619608aa35b4/README.md"
+   ],
+   "key": "c3",
+   "name": "data-sktime",
+   "pin": "v1.1.0; source 918fa838d99eb3703fe9bc963891619608aa35b4",
+   "pin_behind_upstream": false,
+   "recipe_ref": null,
+   "repository": "https://github.com/sktime/sktime",
+   "review_status": null,
+   "role": "Temporal splits, model interfaces and baseline evaluation",
+   "upstream": {
+    "archived": false,
+    "latest": "v1.1.0",
+    "license": "BSD-3-Clause",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "released_at": "2026-07-28",
+    "renamed_to": null,
+    "stars": 10030
+   }
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "Forward returns belong only to offline evaluation labels, never inference features.",
+    "PyPI 0.4.6 is newer numerically than GitHub latest-release tag 0.4.5; source/PyPI references are explicit.",
+    "IC does not include all turnover/borrow/execution costs or prove net portfolio edge.",
+    "Prospective workflow is unexecuted; source review is not installation, broker connectivity, or performance acceptance."
+   ],
+   "component_id": "alphalens-reloaded",
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "https://github.com/stefan-jansen/alphalens-reloaded/blob/f0a07c22d554e4b4036983cc80320b432714fe7e/README.md"
+   ],
+   "key": "c4",
+   "name": "alphalens-reloaded",
+   "pin": "0.4.6",
+   "pin_behind_upstream": false,
+   "recipe_ref": null,
+   "repository": "https://github.com/stefan-jansen/alphalens-reloaded",
+   "review_status": null,
+   "role": "Cross-sectional factor return, IC and turnover diagnostics",
+   "upstream": {
+    "archived": false,
+    "latest": "0.4.5",
+    "license": "Apache-2.0",
+    "prerelease": false,
+    "pushed_at": "2025-12-15",
+    "released_at": "2025-07-23",
+    "renamed_to": null,
+    "stars": 653
+   }
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "Library v2.3.2 (2026-09-08) is not model release date: Chronos-2 was announced 2025-10-20.",
+    "Generic forecasting benchmark claims and parameter counts do not establish US-equity alpha.",
+    "No inference, hosted service or GPU compatibility check was performed.",
+    "Prospective workflow is unexecuted; source review is not installation, broker connectivity, or performance acceptance."
+   ],
+   "component_id": "chronos",
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "https://github.com/amazon-science/chronos-forecasting/blob/v2.3.2/README.md"
+   ],
+   "key": "c5",
+   "name": "chronos",
+   "pin": "2.3.2",
+   "pin_behind_upstream": false,
+   "recipe_ref": null,
+   "repository": "https://github.com/amazon-science/chronos-forecasting",
+   "review_status": null,
+   "role": "Chronos-2 probabilistic forecasting baseline",
+   "upstream": {
+    "archived": false,
+    "latest": "v2.3.2",
+    "license": "Apache-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-17",
+    "released_at": "2026-09-08",
+    "renamed_to": null,
+    "stars": 5895
+   }
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "Feature extraction over a whole future window leaks; selection/imputation must occur inside training folds.",
+    "Large feature searches create multiple-testing/overfitting risk; feature significance is not economic usefulness after trading costs."
+   ],
+   "component_id": "data-tsfresh",
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "https://github.com/blue-yonder/tsfresh/blob/6aa24fdef7e3c3f48b19482535693f5796f2b598/README.md"
+   ],
+   "key": "c6",
+   "name": "data-tsfresh",
+   "pin": "v0.21.2; source 6aa24fdef7e3c3f48b19482535693f5796f2b598",
+   "pin_behind_upstream": false,
+   "recipe_ref": null,
+   "repository": "https://github.com/blue-yonder/tsfresh",
+   "review_status": null,
+   "role": "Statistical time-series features and feature selection",
+   "upstream": {
+    "archived": false,
+    "latest": "v0.21.2",
+    "license": "MIT",
+    "prerelease": false,
+    "pushed_at": "2026-07-06",
+    "released_at": "2026-05-31",
+    "renamed_to": null,
+    "stars": 9427
+   }
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "Latest stable release is v2.0.0 (2026-06-25); examined development commit reports backend2.1.0-rc0 and includes newer integration surfaces.",
+    "Do not reuse raw native OAuth stores through its separate model-provider adapters.",
+    "No standing service, production scheduler or provider-token saving demonstrated.",
+    "One real embedded ACP research prompt completed; no full planner/UI or persistent DeerFlow service was accepted.",
+    "ACP 1.12.0 mode ID read-only maps to workspaceWrite/on-request, not strict filesystem read-only. Use the official native SDK for enforced read-only research."
+   ],
+   "component_id": "deerflow",
+   "decisions": [],
+   "evidence_kind": "native_proven",
+   "evidence_refs": [
+    "blueprints/us-equities/deerflow/native-receipt.json",
+    "blueprints/us-equities/deerflow/research-receipt.json"
+   ],
+   "key": "c7",
+   "name": "deerflow",
+   "pin": "stable v2.0.0; discovery commit 42334f26d7025d905678f9075b079fc65f9beaf9 (2.1.0-rc0)",
+   "pin_behind_upstream": false,
+   "recipe_ref": "blueprints/us-equities/deerflow/native-receipt.json",
+   "repository": "https://github.com/bytedance/deer-flow",
+   "review_status": null,
+   "role": "Optional research application and subagent host",
+   "upstream": {
+    "archived": false,
+    "latest": "v2.0.0",
+    "license": "MIT",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "released_at": "2026-06-25",
+    "renamed_to": null,
+    "stars": 82848
+   }
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "Current upstream0.29.0 installed and CLI passed, but GPU startup failed with UVA unavailable on the recorded WSL host. Active0.25.0 restored.",
+    "The0.25pin is compatible, not latest; do not generalize host failure to all Linux.",
+    "This catalog adds no model, inference or serving benchmark."
+   ],
+   "component_id": "vllm",
+   "decisions": [],
+   "evidence_kind": "native_proven",
+   "evidence_refs": [
+    "evidence/receipts/vllm-compatibility.json",
+    "evidence/receipts/desktop-direct-rag.json"
+   ],
+   "key": "c8",
+   "name": "vllm",
+   "pin": "active0.25.0 (702f4814fe54fabff350d43cb753ae3e47c0c276); latest0.29.0",
+   "pin_behind_upstream": true,
+   "recipe_ref": "recipes/README.md",
+   "repository": "https://github.com/vllm-project/vllm",
+   "review_status": null,
+   "role": "Existing local GPU serving runtime",
+   "upstream": {
+    "archived": false,
+    "latest": "v0.30.0",
+    "license": "Apache-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "released_at": "2026-09-22",
+    "renamed_to": null,
+    "stars": 92429
+   }
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "No financial corpus pipeline or performance proof yet; enterprise platform is separate."
+   ],
+   "component_id": "foundation-haystack",
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "https://github.com/deepset-ai/haystack/blob/b717d00654af0dc405e5cec35546d734c832042f/README.md",
+    "https://github.com/deepset-ai/haystack/releases/tag/v3.1.1"
+   ],
+   "key": "c9",
+   "name": "foundation-haystack",
+   "pin": "v3.1.1",
+   "pin_behind_upstream": false,
+   "recipe_ref": null,
+   "repository": "https://github.com/deepset-ai/haystack",
+   "review_status": null,
+   "role": "Composable document/retrieval pipelines",
+   "upstream": {
+    "archived": false,
+    "latest": "v3.1.1",
+    "license": "Apache-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "released_at": "2026-09-03",
+    "renamed_to": null,
+    "stars": 26579
+   }
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "Immediate synthetic labels are not a valid financial online-evaluation assumption.",
+    "Progressive validation must model delayed fills/returns, late corrections and restart behavior; online updates do not guarantee adaptation or profitability."
+   ],
+   "component_id": "data-river",
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "https://github.com/online-ml/river/blob/64285b9dd6c606804753235fe992bcf25b9856ee/README.md"
+   ],
+   "key": "c10",
+   "name": "data-river",
+   "pin": "0.26.1; source 64285b9dd6c606804753235fe992bcf25b9856ee",
+   "pin_behind_upstream": false,
+   "recipe_ref": null,
+   "repository": "https://github.com/online-ml/river",
+   "review_status": null,
+   "role": "Incremental models, pipelines and progressive validation",
+   "upstream": {
+    "archived": false,
+    "latest": "0.26.1",
+    "license": "BSD-3-Clause",
+    "prerelease": false,
+    "pushed_at": "2026-09-21",
+    "released_at": "2026-08-21",
+    "renamed_to": null,
+    "stars": 6107
+   }
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "Company facts can contain later revisions; fiscal period end is not the date a fact became tradable information.",
+    "SEC public availability can lag acceptance. Historical downloads today do not prove what an agent actually observed in the past.",
+    "Automated filings parsing requires validation of units, dimensions, duplicate facts and issuer/security mappings.",
+    "Native5.58.0 accepted the selected SEC index request after contact correction:371CIK/accession entries represent360uniqueaccessions. Initial synthetic and real-fixture parser receipts remain dated. Bounded acquired samples do not establish a historical trading universe or strategy.",
+    "Dependencies are version-frozen in a separate42-package environment, not wheel-hash-locked; new hosts need native acceptance."
+   ],
+   "component_id": "data-edgartools",
+   "decisions": [],
+   "evidence_kind": "native_proven",
+   "evidence_refs": [
+    "https://github.com/dgunning/edgartools/blob/abe44344c56cf4bfb5443e0debca7e39342f6e7a/README.md",
+    "blueprints/us-equities/catalyst-provenance/receipt.json",
+    "blueprints/us-equities/catalyst-provenance/access-resolution.json"
+   ],
+   "key": "c11",
+   "name": "data-edgartools",
+   "pin": "v5.58.0; source abe44344c56cf4bfb5443e0debca7e39342f6e7a",
+   "pin_behind_upstream": false,
+   "recipe_ref": "blueprints/us-equities/catalyst-provenance/receipt.json",
+   "repository": "https://github.com/dgunning/edgartools",
+   "review_status": null,
+   "role": "SEC filing objects, XBRL, ownership and filing-text extraction",
+   "upstream": {
+    "archived": false,
+    "latest": "v5.58.0",
+    "license": "MIT",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "released_at": "2026-09-11",
+    "renamed_to": null,
+    "stars": 2737
+   }
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "Bundled airline data is a method demonstration, not financial evidence.",
+    "This open-source library is separate from Nixtla hosted TimeGPT; no hosted inference, key or forecast-performance claim is implied."
+   ],
+   "component_id": "data-statsforecast",
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "https://github.com/Nixtla/statsforecast/blob/264166ec0ddbfd481ee8e0b71e5ca42d2c0676fc/README.md"
+   ],
+   "key": "c12",
+   "name": "data-statsforecast",
+   "pin": "v2.1.1; source 264166ec0ddbfd481ee8e0b71e5ca42d2c0676fc",
+   "pin_behind_upstream": false,
+   "recipe_ref": null,
+   "repository": "https://github.com/Nixtla/statsforecast",
+   "review_status": null,
+   "role": "CPU statistical forecasting and rolling evaluation",
+   "upstream": {
+    "archived": false,
+    "latest": "v2.1.1",
+    "license": "Apache-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-21",
+    "released_at": "2026-07-16",
+    "renamed_to": null,
+    "stars": 4913
+   }
+  },
+  {
+   "adopted": false,
+   "card_limitations": [],
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": null,
+   "evidence_refs": [],
+   "key": "c13",
+   "name": "tradermonty/claude-trading-skills",
+   "newcomer": true,
+   "note": "One backtest-expert checklist criterion applied to the retained broad-universe results catching a defect that the two review lanes and 158 local tests did not.",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": null,
+   "repository": "https://github.com/tradermonty/claude-trading-skills",
+   "review_status": null,
+   "role": null,
+   "upstream": null
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "MIT applies to code; downloaded OCR/layout/model weights retain separate licenses. Table/unit extraction quality is unmeasured."
+   ],
+   "component_id": "foundation-docling",
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "https://github.com/docling-project/docling/blob/890dd42d017497c955a56a1d2cfc3f0af5bc2aa9/README.md",
+    "https://github.com/docling-project/docling/releases/tag/v2.129.0"
+   ],
+   "key": "c14",
+   "name": "foundation-docling",
+   "pin": "v2.129.0",
+   "pin_behind_upstream": false,
+   "recipe_ref": null,
+   "repository": "https://github.com/docling-project/docling",
+   "review_status": null,
+   "role": "Financial PDF/table/OCR ingestion",
+   "upstream": {
+    "archived": false,
+    "latest": "v2.129.0",
+    "license": "MIT",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "released_at": "2026-09-18",
+    "renamed_to": null,
+    "stars": 67611
+   }
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "Model-implied volatility is conditional on assumptions and can miss jumps/regime changes.",
+    "Block bootstrap/SPA/MCS help quantify uncertainty but do not remove dataset selection or strategy-search bias.",
+    "PyPI license expression is NCSA; GitHub classifier says Other.",
+    "Prospective workflow is unexecuted; source review is not installation, broker connectivity, or performance acceptance."
+   ],
+   "component_id": "arch",
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "https://github.com/bashtage/arch/blob/v8.0.0/README.md"
+   ],
+   "key": "c15",
+   "name": "arch",
+   "pin": "8.0.0",
+   "pin_behind_upstream": false,
+   "recipe_ref": null,
+   "repository": "https://github.com/bashtage/arch",
+   "review_status": null,
+   "role": "Volatility forecasts, block bootstrap and multiple-comparison tools",
+   "upstream": {
+    "archived": false,
+    "latest": "v8.0.0",
+    "license": "NOASSERTION",
+    "prerelease": false,
+    "pushed_at": "2026-09-20",
+    "released_at": "2025-10-21",
+    "renamed_to": null,
+    "stars": 1574
+   }
+  },
+  {
+   "adopted": false,
+   "card_limitations": [],
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": null,
+   "evidence_refs": [],
+   "key": "c16",
+   "name": "shiyu-coder/kronos",
+   "newcomer": true,
+   "note": "A chronological, cost-adjusted evaluation on the retained broad-universe dataset (development 2017-2021, validation 2022-2023, reserved 2024-01-01..2026-08-14) in which Kronos forecasts beat the C0 all-eligible control net of the protocol's 5/10/20 bps per side \u2014 the same bar the five predeclared signals failed.",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": null,
+   "repository": "https://github.com/shiyu-coder/Kronos",
+   "review_status": null,
+   "role": null,
+   "upstream": null
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "Application path must identify code prepared separately; the command is not a turnkey financial service.",
+    "Cluster control APIs are powerful; do not expose to untrusted networks.",
+    "No distributed performance or failover acceptance performed."
+   ],
+   "component_id": "ray-serve",
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "https://github.com/ray-project/ray/blob/ray-2.58.0/README.rst"
+   ],
+   "key": "c17",
+   "name": "ray-serve",
+   "pin": "ray-2.58.0",
+   "pin_behind_upstream": false,
+   "recipe_ref": null,
+   "repository": "https://github.com/ray-project/ray",
+   "review_status": null,
+   "role": "Distributed compute and model-service composition",
+   "upstream": {
+    "archived": false,
+    "latest": "ray-2.58.0",
+    "license": "Apache-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "released_at": "2026-08-23",
+    "renamed_to": null,
+    "stars": 43893
+   }
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "Code and model weights through 2.5 are Apache-2.0; google/timesfm-3.0-pytorch weights use timesfm-non-commercial-license-v1.0 and prohibit commercial/production use.",
+    "This is an API/shape example on a synthetic series, not a finance benchmark or alpha proof.",
+    "Model release 2.5 (2025-09-15) differs from repository v3.0.0 (2026-08-28) and package 3.0.2 (2026-09-09).",
+    "Prospective workflow is unexecuted; source review is not installation, broker connectivity, or performance acceptance."
+   ],
+   "component_id": "timesfm",
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "https://github.com/google-research/timesfm/blob/v3.0.0/README.md"
+   ],
+   "key": "c18",
+   "name": "timesfm",
+   "pin": "v3.0.0",
+   "pin_behind_upstream": false,
+   "recipe_ref": null,
+   "repository": "https://github.com/google-research/timesfm",
+   "review_status": null,
+   "role": "Pretrained forecasting baseline with model-specific licensing",
+   "upstream": {
+    "archived": false,
+    "latest": "v3.0.0",
+    "license": "Apache-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-15",
+    "released_at": "2026-08-28",
+    "renamed_to": null,
+    "stars": 33457
+   }
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "Current proof is local HTML conversion only; PDF/Office extras are not installed or proven."
+   ],
+   "component_id": "foundation-markitdown",
+   "decisions": [],
+   "evidence_kind": "native_proven",
+   "evidence_refs": [
+    "evidence/receipts/component-history.json",
+    "evidence/receipts/portable-cli-artifacts.json"
+   ],
+   "key": "c19",
+   "name": "foundation-markitdown",
+   "pin": "v0.1.7",
+   "pin_behind_upstream": true,
+   "recipe_ref": "evidence/receipts/component-history.json",
+   "repository": "https://github.com/microsoft/markitdown",
+   "review_status": null,
+   "role": "Selected document-to-Markdown conversion",
+   "upstream": {
+    "archived": false,
+    "latest": "v0.1.8",
+    "license": "MIT",
+    "prerelease": false,
+    "pushed_at": "2026-09-21",
+    "released_at": "2026-09-21",
+    "renamed_to": null,
+    "stars": 186376
+   }
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "Significance is not economic profitability; serial dependence, regime change and repeated testing remain.",
+    "Do not interpret a price-level regression or one cointegration p-value as a stable pairs strategy.",
+    "Prospective workflow is unexecuted; source review is not installation, broker connectivity, or performance acceptance."
+   ],
+   "component_id": "statsmodels",
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "https://github.com/statsmodels/statsmodels/blob/v0.15.0/README.md"
+   ],
+   "key": "c20",
+   "name": "statsmodels",
+   "pin": "0.15.0",
+   "pin_behind_upstream": false,
+   "recipe_ref": null,
+   "repository": "https://github.com/statsmodels/statsmodels",
+   "review_status": null,
+   "role": "Interpretable regressions and time-series diagnostics",
+   "upstream": {
+    "archived": false,
+    "latest": "v0.15.0",
+    "license": "BSD-3-Clause",
+    "prerelease": false,
+    "pushed_at": "2026-09-21",
+    "released_at": "2026-08-27",
+    "renamed_to": null,
+    "stars": 11642
+   }
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "A generic feature-extraction pipeline is not a substitute for documented model wrappers. Newest package does not establish compatibility with the current vLLM service."
+   ],
+   "component_id": "foundation-sentence-transformers",
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "https://github.com/huggingface/sentence-transformers/blob/f3864a53cfafb40a6f03f029ce96da70591e9931/README.md",
+    "https://github.com/huggingface/sentence-transformers/releases/tag/v6.1.0"
+   ],
+   "key": "c21",
+   "name": "foundation-sentence-transformers",
+   "pin": "v6.1.0",
+   "pin_behind_upstream": false,
+   "recipe_ref": null,
+   "repository": "https://github.com/huggingface/sentence-transformers",
+   "review_status": null,
+   "role": "Embedding and reranking model SDK",
+   "upstream": {
+    "archived": false,
+    "latest": "v6.1.0",
+    "license": "Apache-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-21",
+    "released_at": "2026-09-18",
+    "renamed_to": null,
+    "stars": 19109
+   }
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "TimeSeriesSplit gap=1 is illustrative; derive a purge/embargo policy from label overlap and execution latency.",
+    "Default random/K-fold validation is inappropriate for dependent time-ordered financial labels.",
+    "Prospective workflow is unexecuted; source review is not installation, broker connectivity, or performance acceptance."
+   ],
+   "component_id": "scikit-learn",
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "https://github.com/scikit-learn/scikit-learn/blob/1.9.1/README.rst"
+   ],
+   "key": "c22",
+   "name": "scikit-learn",
+   "pin": "1.9.1",
+   "pin_behind_upstream": false,
+   "recipe_ref": null,
+   "repository": "https://github.com/scikit-learn/scikit-learn",
+   "review_status": null,
+   "role": "Classical predictive baselines and fold-local preprocessing",
+   "upstream": {
+    "archived": false,
+    "latest": "1.9.1",
+    "license": "BSD-3-Clause",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "released_at": "2026-09-11",
+    "renamed_to": null,
+    "stars": 67346
+   }
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "WalkForward/CPCV purge and embargo default to zero; installing the library does not prevent leakage.",
+    "Fixed observation-count purging must be mapped to overlapping labels and timestamps; retain a final chronological holdout.",
+    "Optimization/risk estimates are not pre-trade enforcement or broker reconciliation.",
+    "Native acceptance covers WalkForward and the raw-price control study only; no new engine fills, dividend-inclusive performance, catalyst universe, alpha or broker execution."
+   ],
+   "component_id": "skfolio",
+   "decisions": [],
+   "evidence_kind": "native_proven",
+   "evidence_refs": [
+    "https://github.com/skfolio/skfolio/blob/v1.2.8/README.rst",
+    "blueprints/us-equities/research-evaluation/receipt.json"
+   ],
+   "key": "c23",
+   "name": "skfolio",
+   "pin": "1.2.9; WalkForward source c99fcf71349e2df4a7a1033ee85ca2e9ced9abee",
+   "pin_behind_upstream": true,
+   "recipe_ref": "blueprints/us-equities/research-evaluation/README.md",
+   "repository": "https://github.com/skfolio/skfolio",
+   "review_status": null,
+   "role": "Portfolio estimators with chronological validation",
+   "upstream": {
+    "archived": false,
+    "latest": "v1.3.0",
+    "license": "BSD-3-Clause",
+    "prerelease": false,
+    "pushed_at": "2026-09-21",
+    "released_at": "2026-09-20",
+    "renamed_to": null,
+    "stars": 2428
+   }
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "The bundled China workflow uses CSI300, SH000300 and China-style exchange costs/limits; copying it does not prove US-equity compatibility.",
+    "Upstream data download availability is not verified; data health/PIT audit precedes model training.",
+    "Automated factor mining/RD-Agent is separate and can incur model costs and multiple-testing bias.",
+    "Prospective workflow is unexecuted; source review is not installation, broker connectivity, or performance acceptance."
+   ],
+   "component_id": "qlib",
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "https://github.com/microsoft/qlib/blob/v0.9.7/README.md"
+   ],
+   "key": "c24",
+   "name": "Qlib",
+   "pin": "0.9.7",
+   "pin_behind_upstream": false,
+   "recipe_ref": null,
+   "repository": "https://github.com/microsoft/qlib",
+   "review_status": null,
+   "role": "Structured factor/model training and backtest workflows",
+   "upstream": {
+    "archived": false,
+    "latest": "v0.9.7",
+    "license": "MIT",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "released_at": "2025-08-15",
+    "renamed_to": null,
+    "stars": 48750
+   }
+  }
+ ],
+ "catalog": "us-equities",
+ "checked_at": "2026-09-22",
+ "enums": {
+  "disposition": [
+   "conditional",
+   "measured_tradeoff",
+   "observed_failure",
+   "out_of_scope",
+   "overlap",
+   "selected",
+   "unqualified"
+  ],
+  "evidence_class": [
+   "local_integration",
+   "measured_comparison",
+   "native_proven",
+   "source_review",
+   "synthetic"
+  ]
+ },
+ "existing_overturn_when": "Reopen the implementation choice if Nautilus cannot preserve a required cash/order semantic, fails a preregistered SPY/LEAN parity tolerance, or a broker-specific adapter cannot pass ownership, reconciliation, partial/cancel/reconnect and numeric risk cases. Compare alternatives on the same frozen inputs and failure contract; promote a strategy only after independent temporal and cost-aware evaluation.",
+ "group": "engines-strategies",
+ "layer_id": "research-factors-ml",
+ "layer_scope_terms": [
+  "factor-research",
+  "factor-evaluation",
+  "feature-extraction",
+  "feature-transforms",
+  "financial-ml",
+  "financial-nlp",
+  "forecasting",
+  "foundation-forecasting",
+  "time-series",
+  "time-series-research",
+  "time-series-evaluation",
+  "econometrics",
+  "statistical-baselines",
+  "volatility",
+  "tail-risk",
+  "labeling",
+  "supervised-learning",
+  "online-learning",
+  "reinforcement-learning",
+  "neural-research",
+  "ml-research",
+  "model-selection",
+  "model-serving",
+  "model-sdk",
+  "research-framework",
+  "research-platform",
+  "research-demos",
+  "research-interface",
+  "research-orchestration",
+  "research-validation",
+  "research-workflows",
+  "single-instrument-research",
+  "vectorized-research",
+  "exploration",
+  "document-research",
+  "document-ingestion",
+  "document-retrieval",
+  "rag-pipeline",
+  "financial-agents",
+  "financial-research-agent",
+  "financial-research-skills"
+ ],
+ "limitations": [
+  "Nautilus 2.0.0rc5 is a prerelease. The old September 19 Nautilus alternative and LEAN default cards remain historical; runtime-target.json governs the current destination.",
+  "The retained AAPL replay has 15 bars and five roundtrips per baseline/stress scenario with reconciled cash; it excludes known action dates and uses retrospective synthetic close fills with unlimited modeled depth.",
+  "SPY/LEAN dividend/cash parity is still planned. LEAN's known-crash fixtures are engineering stresses, not untouched holdout results or calibrated broker execution.",
+  "The Alpaca trial observed two actual writes, a -0.08 USD cash-matched gross result, flat/idle reconciliation and completed-trial recovery with zero additional writes. In-flight native failure cases, IBKR, live operation and continuous paper operation remain open.",
+  "No accepted point-in-time universe, extreme-mover/catalyst strategy, financing-inclusive performance or deployable profitability follows from these receipts.",
+  "Independent source review found two bare matches! expressions that do not assert denial-event variants in Nautilus risk tests, also present in v2.0.0rc5 source. Other tests assert denial and reasons. This narrow test defect is not an observed runtime failure; see docs/blind-catalog-source-adjudication-20260921.md.",
+  "The us-equities catalog also tags entries for this taxonomy layer under data-research (12), foundation-memory (6), agents-operations (5); engines-strategies (23) was picked as the primary group by entry count."
+ ],
+ "requirement": "Use the selected NautilusTrader destination with broker-specific execution boundaries, deterministic numeric risk and reproducible equity accounting; preserve the prior LEAN oracle and qualify any strategy with causal data, costs and independent reconciliation.",
+ "requirement_note": "The requirement, limitations and existing_overturn_when text is shared by this layer's group; judge fit against the layer title and layer_scope_terms.",
+ "rules": [
+  "Judge from retained evidence. Open the evidence_refs of every adopted candidate (bounded: the referenced file or its relevant section) and record every path you opened in sources_read. Do not rely on memory of the repositories.",
+  "The winner set is 1-3 adopted candidates (adopted == true) that best satisfy the requirement on the evidence. why_selected must cite at least one evidence path and state what was actually observed (native execution, measured comparison, local integration, synthetic fixture or source review), not what the project claims.",
+  "Every adopted non-winner candidate appears in alternatives with a why_not_default that states the concrete evidence gap or trade-off; add non-adopted candidates only with the same standard.",
+  "If a non-adopted candidate would satisfy the requirement better on the evidence, do not select it: record it in challenger_preferred with the comparison (a fixtures/, blueprints/ or tests/ path, or a python3/node command) that would establish it. Agreement between lanes never promotes; only an executed comparison can.",
+  "overturn_when names the concrete check that would change the verdict (a fixtures/, blueprints/ or tests/ path or a runnable python3/node command). open_gaps lists what the evidence does not establish. limits lists what you could not read or verify. Do not invent paths, numbers or results; leave evidence_refs empty rather than guess."
+ ],
+ "schema_version": 1,
+ "sota_components_not_in_candidates": [],
+ "title": "Research, factors and ML",
+ "withheld": [
+  "current_choice",
+  "decision",
+  "rationale",
+  "candidates[].disposition",
+  "candidates[].rationale",
+  "candidates[].card_rationale",
+  "candidates[].card_decision",
+  "candidates[].review_status"
+ ]
+}

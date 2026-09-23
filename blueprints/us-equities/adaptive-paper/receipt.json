@@ -410,5 +410,72 @@
     },
     "after_refusal": "recover liquidates only ledger-owned holdings (recovery.py) and requires a flat broker proof, so a foreign position leaves recovery at needs_attention until the operator closes it by hand; an overnight fill of the trial's own open order also refuses the resume (quantity differs), and recover resolves that case through the ledger's own intents",
     "review": "fix-verification review of e1fe5af: no correctness defect; follow-ups applied (recover wording, wiring test independent of the 2026 built-in calendar via a session_at stub, edge-case coverage)"
+  },
+  "promotion_gate_completeness": {
+    "recorded_at_utc": "2026-09-22T23:30:00Z",
+    "evidence_class": "SYN",
+    "summary": "The paper preflight's promotion-gate check now requires: checks naming every promotion_gate.CHECK_NAMES entry exactly once with string names (no missing, extra, unnamed, non-string or duplicate checks); a non-empty versions object of non-empty strings; a timezone-aware ISO-8601 date-time checked_at; and, for a .csv snapshot, row_count equal to the file's data rows. A gate 'unmapped_failures' entry raises promotion_gate_unmapped_failures. Closes a blind Codex review finding on #64 (relayed by peer finalize-llm-harness-catalogs): a result with checks=[{status:'pass'}], row_count=1, versions=null, checked_at=null and a matching header-only CSV hash previously passed.",
+    "tests": [
+      "test_complete_gate_result_is_accepted",
+      "test_gate_result_without_the_named_checks_is_incomplete",
+      "test_gate_result_missing_one_named_check_is_incomplete",
+      "test_gate_result_with_duplicate_or_unknown_check_is_incomplete",
+      "test_non_string_check_name_is_refused_cleanly",
+      "test_null_or_empty_versions_and_checked_at_are_incomplete",
+      "test_naive_or_date_only_checked_at_and_empty_versions_are_incomplete",
+      "test_csv_row_count_must_match_the_snapshot_rows",
+      "test_unmapped_failures_entry_is_reported_as_such",
+      "test_runner_check_names_match_the_gate_module"
+    ],
+    "mutation_check": "name-set guard removed: 3 test methods fail (4 cases: missing check; duplicate and unknown check subtests; non-string name); CSV row binding removed: test_csv_row_count_must_match_the_snapshot_rows fails; the blind reproduction is additionally caught by the null-versions guard",
+    "real_input_check": "universe-daily.csv (the 2026-09-22 real SIP snapshot, 480 data rows, gate 12/12) and fixtures/good.csv with good-gate-result.json are accepted including the CSV row binding; fixtures/null-price-cell-gate-result.json raises promotion_gate_unmapped_failures",
+    "files": {
+      "blueprints/us-equities/adaptive-paper/runner.py": "56d3a516b1e401eb41f52685d4befbaa6a198ddb91907f39462425b6a7a48698",
+      "tests/test_adaptive_paper_runner.py": "fd0832673b12777442c4eabdd5098ff242ab5d662418a3fad63fc06082729fb7"
+    },
+    "limits": "parquet snapshots are hash-bound but their row_count is not re-counted (no parquet reader in this runtime); checked_at age is not bounded; a .csv with a quoted field containing a newline would count more rows than the gate and be refused (a false refusal, never a false pass); the ingest writes unquoted rows",
+    "review": "independent review of eb2e9c8: no fail-open; follow-ups applied (non-string name TypeError, naive/date-only checked_at, version value types, CSV row_count binding, unmapped_failures diagnostic); second review: hash and row count now use one read of the snapshot bytes"
+  },
+  "leverage_schedule_v1": {
+    "recorded_at_utc": "2026-09-23T01:10:00Z",
+    "evidence_class": "SYN",
+    "policy_version": "leverage-schedule-v1-20260922",
+    "decision_record": "agent-lab docs/decisions/2026-09-22-leverage-schedule-and-entitlement.md (user decision 2026-09-22)",
+    "summary": "Opt-in fixed leverage ceiling keyed by session x regime x drawdown ladder (<= 4x intraday, <= 2x overnight, 0 in risk_off/unavailable and on the kill switch), clamped by the broker account multiplier and config max_leverage <= 4; enforced at the policy entry budget and by a ledger backstop that counts pending buys; shipped configs carry no leverage_policy and are byte-identical (golden fixture unchanged). Rung configs config-leverage-{1x,2x,4x}.json scale per-order sizing and loss caps; each leveraged run records peak achieved gross-to-equity leverage, the ceiling in force and seconds above the next-lower rung. A rung establishes the envelope at its cap; achieved exposure may stay below it.",
+    "reviews": {
+      "claude": "design (Opus) -> build (Sonnet) -> 3-lens reviews x2 rounds (risk invariants, default path and pins, evidence honesty) -> fix/verify; final verify pass",
+      "codex_cross_family": {
+        "lane": "companion 1.0.6 task, read-only (no --write)",
+        "model_run": "gpt-6-astra",
+        "effort_run": "high",
+        "sandbox": "read-only",
+        "usage_total_tokens": [
+          1270336,
+          1276789
+        ],
+        "findings": [
+          "P1 blocker: buys sized without positions awaiting sale (exposure ceiling)",
+          "P2 major: max_order_notional not propagated to PolicyConfig"
+        ],
+        "status": "both verified resolved",
+        "identifiers": "job and thread identifiers are kept in the private agent-lab task record (local session identifiers are not published)"
+      }
+    },
+    "coordinator_fix": "AchievedLeverageReceiptIntegrationTests failed deterministically (regime only range/unavailable under 0.02 s real-clock sampling, so a 2x rung was capped at 1x); the class now forces trend for complete non-risk_off samples, since it covers the receipt, not regime classification; 5/5 passes",
+    "limits": "SYN only: no paper rung has run; rungs need the 1x adaptive trial first; the per-tick time-above approximation is bounded by the tick cadence",
+    "files": {
+      "blueprints/us-equities/adaptive-paper/leverage.py": "4ad673522a5b3d76b6058da8fff8e7d8d27c43f2d243b87a5ef979db9a4c2803",
+      "blueprints/us-equities/adaptive-paper/runner.py": "549a326fec0f7b88fac793b3c8f74b7acdba87fccb585370dd0cfc020d46617f",
+      "blueprints/us-equities/adaptive-paper/safety.py": "8cc67464ab55794b232cedb9988c264b86c8ec11ebe1734a94fb71480a269fa0",
+      "blueprints/us-equities/adaptive-paper/strategies.py": "2d488a4fdd21ad323ab07cf7fb147b3623fd6e38951abcf2fc59cf8094a1383e",
+      "blueprints/us-equities/adaptive-paper/strategies_v1.py": "1952be269694485e12e4d927f124adca0ee29667588d6ac6651caede454c92f7",
+      "blueprints/us-equities/adaptive-paper/native_strategy.py": "7dbf1037b5909d0ea40d49f06740d74bee364ef4608e654350e18ee67b297e2b",
+      "blueprints/us-equities/adaptive-paper/transport.py": "c75f7db3025200d55a166b8ec2811939d32518861118490ffc1a57eb7ba389fa",
+      "blueprints/us-equities/adaptive-paper/config-leverage-1x.json": "ee56dff36a5b64c91f7735e86e58f018adb09d72061e05e58c671722d0ad5de7",
+      "blueprints/us-equities/adaptive-paper/config-leverage-2x.json": "d03ca9396437e9d4e4176b31e7aba4304d2b6324ff9ef1b69462483c8ac4807e",
+      "blueprints/us-equities/adaptive-paper/config-leverage-4x.json": "2bcedf606602db3ae73e73df5cffe3143bdb00a2f4e83fc456b232783946efd4",
+      "tests/test_adaptive_paper_leverage.py": "40ddd51e0e8c8393cfdd42b3e91ff4c1a08ec050ef1d61e5d5573e83113ded65",
+      "tests/test_adaptive_paper_runner.py": "e0c853db9ad432e3d7103ca2f0f87caca2dd4e94461cc588f673414390141eef"
+    }
   }
 }

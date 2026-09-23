@@ -1,0 +1,248 @@
+{
+ "candidates": [
+  {
+   "adopted": true,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "catalogs/landscape/hosting-practice.json",
+    "docs/hosting-container-practice.md",
+    "https://github.com/podman-container-tools/podman/blob/04f3aa430e6df81bea059978bc5bafbc846ba3e7/README.md",
+    "https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html"
+   ],
+   "key": "c1",
+   "name": "Podman / Quadlet",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": "catalogs/landscape/hosting-practice.json",
+   "repository": "https://github.com/podman-container-tools/podman",
+   "review_status": null,
+   "upstream": null
+  },
+  {
+   "adopted": false,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/hosting-source-review.json"
+   ],
+   "key": "c2",
+   "name": "gVisor",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": "catalogs/us-equities/hosting-source-review.json",
+   "repository": "https://github.com/google/gvisor",
+   "review_status": null,
+   "upstream": null
+  },
+  {
+   "adopted": true,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "catalogs/landscape/hosting-practice.json",
+    "docs/hosting-container-practice.md",
+    "https://github.com/moby/moby/blob/464cd50c3d9e92877d56940ea160de6fca7bea23/README.md",
+    "https://docs.docker.com/engine/security/rootless/"
+   ],
+   "key": "c3",
+   "name": "Docker Engine / Moby",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": "catalogs/landscape/hosting-practice.json",
+   "repository": "https://github.com/moby/moby",
+   "review_status": null,
+   "upstream": null
+  },
+  {
+   "adopted": true,
+   "component_id": "apple-container",
+   "decisions": [
+    {
+     "capability": "Retain a database row in an owned native Mac container volume",
+     "evidence_scope": "Pinned PostgreSQL image on Apple container retained its row after native stop/start; owned fixtures were removed.",
+     "id": "mac-container-volume",
+     "limitations": [
+      "Mac Documents bind mount stalled; accepted ext4 named-volume behavior does not erase that failure.",
+      "Mac-only fixture; no crash/reboot or production durability claim."
+     ],
+     "next_gap": "Qualify crash/reboot persistence only when that deployment needs it."
+    }
+   ],
+   "evidence_kind": "native_execution",
+   "evidence_refs": [
+    "catalogs/foundation/decisions.json",
+    "docs/token-native-saturation.md"
+   ],
+   "key": "c4",
+   "name": "Apple Container",
+   "pin": "1.4.1",
+   "pin_behind_upstream": false,
+   "recipe_ref": "blueprints/convergence-practice/container-storage/README.md",
+   "repository": "https://github.com/apple/container",
+   "review_status": null,
+   "upstream": {
+    "archived": false,
+    "latest": "1.4.1",
+    "license": "Apache-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-21",
+    "released_at": "2026-09-09",
+    "renamed_to": null,
+    "stars": 50112
+   }
+  },
+  {
+   "adopted": true,
+   "component_id": "worktrunk",
+   "decisions": [
+    {
+     "capability": "Practice native Git worktrees and GitHub review automation with owned tooling",
+     "evidence_scope": "Reuses the existing worktrunk/difftastic/codex-for-claude inventory and acceptance evidence; no new execution was run to freeze this taxonomy layer.",
+     "id": "git-github-automation-practice",
+     "limitations": [
+      "gh CLI has no separate manifests/stack.json inventory entry in this catalog; it is used as the native GitHub client, not a newly qualified component here.",
+      "The codex-for-claude bridge's use stage is partial_acceptance, not full integration."
+     ],
+     "next_gap": "Qualify gh CLI's own lifecycle evidence as a distinct component and a changed review-bridge version before extending acceptance."
+    },
+    {
+     "capability": "Create and retire bounded native Git worktrees",
+     "evidence_scope": "Native listing and disposable create/list/remove passed; dirty removal was refused without loss.",
+     "id": "owned-worktrees",
+     "limitations": [
+      "Worktrees isolate edits, not permissions, accounts, global settings or shared services."
+     ],
+     "next_gap": "Prove any required crash cleanup without deleting unrelated or dirty state."
+    }
+   ],
+   "evidence_kind": "native_execution",
+   "evidence_refs": [
+    "docs/token-native-saturation.md"
+   ],
+   "key": "c5",
+   "name": "Worktrunk",
+   "pin": "0.79.0",
+   "pin_behind_upstream": false,
+   "recipe_ref": "recipes/native-upgrades-20260921.md",
+   "repository": "https://github.com/max-sixty/worktrunk",
+   "review_status": null,
+   "upstream": {
+    "archived": false,
+    "latest": "v0.79.0",
+    "license": "NOASSERTION",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "released_at": "2026-09-21",
+    "renamed_to": null,
+    "stars": 8334
+   }
+  },
+  {
+   "adopted": true,
+   "component_id": "sandbox-runtime",
+   "decisions": [
+    {
+     "capability": "Enforce the selected filesystem and HTTP network boundaries",
+     "evidence_scope": "Permitted/protected filesystem checks and loopback allow/deny HTTP fixtures passed.",
+     "id": "scoped-os-isolation",
+     "limitations": [
+      "This is not a general escape audit or TLS/SOCKS/network-stack qualification."
+     ],
+     "next_gap": "Qualify a new protocol/platform boundary if the task actually needs it."
+    }
+   ],
+   "evidence_kind": "native_execution",
+   "evidence_refs": [
+    "catalogs/foundation/decisions.json",
+    "catalogs/us-equities/hosting-source-review.json"
+   ],
+   "key": "c6",
+   "name": "sandbox-runtime",
+   "pin": "0.0.77",
+   "pin_behind_upstream": false,
+   "recipe_ref": "recipes/README.md",
+   "repository": "https://github.com/anthropics/sandbox-runtime",
+   "review_status": null,
+   "upstream": {
+    "archived": false,
+    "latest": "v0.0.77",
+    "license": "Apache-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "released_at": "2026-09-18",
+    "renamed_to": null,
+    "stars": 5302
+   }
+  },
+  {
+   "adopted": true,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/agents-operations.json"
+   ],
+   "key": "c7",
+   "name": "E2B",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": "catalogs/us-equities/agents-operations.json",
+   "repository": "https://github.com/e2b-dev/E2B",
+   "review_status": null,
+   "upstream": null
+  }
+ ],
+ "catalog": "foundation",
+ "checked_at": "2026-09-22",
+ "enums": {
+  "disposition": [
+   "conditional",
+   "measured_tradeoff",
+   "observed_failure",
+   "out_of_scope",
+   "overlap",
+   "selected",
+   "unqualified"
+  ],
+  "evidence_class": [
+   "local_integration",
+   "measured_comparison",
+   "native_proven",
+   "source_review",
+   "synthetic"
+  ]
+ },
+ "existing_overturn_when": "Untrusted code or a deployment target requires a stronger VM/OCI boundary, and the selected alternative passes workload, network, resource, cleanup and host compatibility checks.",
+ "group": null,
+ "layer_id": "isolation",
+ "limitations": [
+  "A worktree is not a security sandbox. Ordinary native or Dagu processes are not automatically sandboxed.",
+  "Selected access/network fixtures do not certify hostile workloads, resource limits or unsupported platforms."
+ ],
+ "requirement": "Separate edits and apply a real filesystem/network boundary only where the selected task requires enforced restrictions.",
+ "rules": [
+  "Judge from retained evidence. Open the evidence_refs of every adopted candidate (bounded: the referenced file or its relevant section) and record every path you opened in sources_read. Do not rely on memory of the repositories.",
+  "The winner set is 1-3 adopted candidates (adopted == true) that best satisfy the requirement on the evidence. why_selected must cite at least one evidence path and state what was actually observed (native execution, measured comparison, local integration, synthetic fixture or source review), not what the project claims.",
+  "Every adopted non-winner candidate appears in alternatives with a why_not_default that states the concrete evidence gap or trade-off; add non-adopted candidates only with the same standard.",
+  "If a non-adopted candidate would satisfy the requirement better on the evidence, do not select it: record it in challenger_preferred with the comparison (a fixtures/, blueprints/ or tests/ path, or a python3/node command) that would establish it. Agreement between lanes never promotes; only an executed comparison can.",
+  "overturn_when names the concrete check that would change the verdict (a fixtures/, blueprints/ or tests/ path or a runnable python3/node command). open_gaps lists what the evidence does not establish. limits lists what you could not read or verify. Do not invent paths, numbers or results; leave evidence_refs empty rather than guess."
+ ],
+ "schema_version": 1,
+ "sota_components_not_in_candidates": [],
+ "title": "Isolation",
+ "withheld": [
+  "current_choice",
+  "decision",
+  "rationale",
+  "candidates[].disposition",
+  "candidates[].rationale",
+  "candidates[].review_status",
+  "candidates[].decisions[].selection",
+  "candidates[].decisions[].review_status",
+  "sota_components_not_in_candidates[].review_status"
+ ]
+}

@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "id": "cite-executed-retrieval",
+  "date": "2026-09-22",
+  "layer_ids": ["document-retrieval", "agents-models-workers"],
+  "gap_refs": [
+    {"layer_id": "document-retrieval", "gap_index": 1},
+    {"layer_id": "agents-models-workers", "gap_index": 0}
+  ],
+  "purpose": "Read the already-executed agent-lab document-retrieval-preregistration-v2 comparison runs (two dated output directories) and the sealed protocol they ran against, and record exactly what they measured: hybrid vs BM25 recall/MRR on a sealed disposable snapshot, and what remained unresolved. No rerun performed; this is a citation-and-transcription check only.",
+  "preregistered": "Expectation before reading: the triage's gap-1 text (\"no full corpus seal ... establishes no general ranking or token saving\") and the critic's correction both claim two prior agent-lab runs already measured hybrid vs BM25 on a SEALED (not live) index and found hybrid ahead on recall/MRR, with only latency_p95_ms left unresolved (decision D12: the CLI cannot target a disposable snapshot for timing). If confirmed by reading the actual closure.json/judgments.json/protocol.sealed.json files, this settles document-retrieval gap 1's 'no sealed comparison exists' framing as stale (a sealed comparison DOES exist and DOES show a recall/MRR advantage for hybrid) while leaving the deeper gap (latency measurement unresolved, so the overturn_comparison's status_scope clause is not satisfied) open. If the files show something else (e.g. still null/missing metrics), that refutes the critic's correction and the gap stays open as originally triaged.",
+  "commands": [
+    {
+      "cmd": "cat $HOME/code/agent-lab/tools/compare/retrieval/out/20260922T055714Z/closure.json",
+      "exit": 0,
+      "duration_s": 0.02,
+      "output_excerpt": "{\"layer_id\":\"document-retrieval\",\"protocol_id\":\"document-retrieval-preregistration-v2\",\"kind\":\"overturn_comparison\",\"status\":\"unresolved\",\"reasons\":[\"missing metric recall_at_3 for arm-1 or its reference\",\"missing metric recall_at_1 for arm-1 or its reference\",\"missing metric mrr for arm-1 or its reference\",\"missing metric latency_p95_ms for arm-1 or its reference\"]}",
+      "output_sha256": "56012340b0dfc04b25d0c508b26bc8f152856fdce857c4b9547afbb9e23293ef"
+    },
+    {
+      "cmd": "cat $HOME/code/agent-lab/tools/compare/retrieval/out/20260922T055714Z/judgments.json",
+      "exit": 0,
+      "duration_s": 0.02,
+      "output_excerpt": "arm-1 (hybrid): recall_at_3=null, recall_at_1=null, mrr=null, latency_p95_ms=null. null_reasons.arm-1.recall_at_3 = \"the arm did not run its preregistered backend configuration (decision D6); its judged metrics are null so the comparison cannot resolve to retain on a configuration that was never executed\"",
+      "output_sha256": "eb3f3be86f6e1fd23dfa3b6893e26d88784abe38bfdde4e696c519e7e8a9b72c"
+    },
+    {
+      "cmd": "cat $HOME/code/agent-lab/tools/compare/retrieval/out/20260922T060810Z/closure.json",
+      "exit": 0,
+      "duration_s": 0.02,
+      "output_excerpt": "{\"status\":\"unresolved\",\"reasons\":[\"recall_at_3: arm-1=0.8333333333333334 >= 0.6666666666666666+0.083 -> true\",\"recall_at_1: arm-1=0.5833333333333334 >= 0.4166666666666667 -> true\",\"mrr: arm-1=0.7319444444444444 >= 0.56875+0.013 -> true\",\"missing metric latency_p95_ms for arm-1 or its reference\"]}",
+      "output_sha256": "8a7c6194f48ebd1545c82b196854a971ea480162023d1db25a418d3c1a9e6ca2"
+    },
+    {
+      "cmd": "cat $HOME/code/agent-lab/tools/compare/retrieval/out/20260922T060810Z/judgments.json",
+      "exit": 0,
+      "duration_s": 0.02,
+      "output_excerpt": "arm-0 (BM25): recall_at_3=0.6667, recall_at_1=0.4167, mrr=0.5688. arm-1 (hybrid, lex+vec): recall_at_3=0.8333, recall_at_1=0.5833, mrr=0.7319. Both latency_p95_ms=null, null_reasons: \"cli_cannot_target_disposable_snapshot (decision D12)\".",
+      "output_sha256": "4ac7d1987ce71f475830c23eea8a06d17630e2a69b61fa695a7bb7885a55dfa9"
+    },
+    {
+      "cmd": "python3 -c \"import json;d=json.load(open('$HOME/code/agent-lab/tools/compare/retrieval/out/20260922T060810Z/run-record.json'));print(d['observed_at_utc'],d['repeat'],d['arms_executed'],d['arms_declared_not_executed'])\"",
+      "exit": 0,
+      "duration_s": 0.05,
+      "output_excerpt": "2026-09-22T06:10:14.559Z 3 ['arm-0', 'arm-1'] []",
+      "output_sha256": "84dc07646dde52a722e8ac7278eca50b8c68727e6024077f779d2b73c0ea5bca"
+    },
+    {
+      "cmd": "sed -n '1,90p' $HOME/code/agent-lab/tools/compare/retrieval/out/20260922T055714Z/protocol.sealed.json",
+      "exit": 0,
+      "duration_s": 0.02,
+      "output_excerpt": "status_scope: \"an overturn here establishes only the retrieval-fidelity, abstention and returned-context sub-claim, and does not satisfy the answer-fidelity, measured-task-cost or native-client-behaviour clauses of the incumbent's overturn_when. It cannot by itself rewrite the catalog row.\" arm-2 (difficult-layout parser lane) declared but never executed (install_required true).",
+      "output_sha256": "dc2f7adad4771d05bc5e6f22f4d32199c3b5313386c098ef09b3483ba88c5733"
+    }
+  ],
+  "tool_versions": {
+    "runner": "tools/compare/retrieval/run-arms.mjs (agent-lab, protocol document-retrieval-preregistration-v2, protocol_sha256 060810Z run=fd245fff089e04bcfb9f6d85213a22cf29336656b049a3ab9e2c277a85695b45, 055714Z run=dc2f7adad4771d05bc5e6f22f4d32199c3b5313386c098ef09b3483ba88c5733)",
+    "node_version": "v24.21.0 (from 060810Z run-record.json)"
+  },
+  "installs": [],
+  "result": "Two dated agent-lab runs of protocol document-retrieval-preregistration-v2 exist and are peer-executed, not mine. Run 1 (out/20260922T055714Z, started 05:57:14Z) is an INCOMPLETE prior attempt: arm-1 (hybrid) did not run its preregistered backend configuration and every arm-1 metric is null (decision D6: 'the arm did not run its preregistered backend configuration'). Run 2 (out/20260922T060810Z, started 06:10:14Z) is the COMPLETE, later run: arm-1's dense lane was supplied an embedding pass and both arms scored on the sealed snapshot with repeat=3. Measured: BM25 (arm-0) recall_at_3=0.6667, recall_at_1=0.4167, mrr=0.5688; hybrid (arm-1) recall_at_3=0.8333, recall_at_1=0.5833, mrr=0.7319 -- hybrid beats BM25 on all three closure-gating metrics by more than the preregistered delta thresholds (closure.json's reasons array shows each comparison evaluating to true). The ONLY remaining closure blocker in run 2 is a missing metric: latency_p95_ms is null for both arms, with null_reasons citing decision D12, 'cli_cannot_target_disposable_snapshot' -- the runner's CLI wrapper cannot point its own latency-timing path at a disposable/sealed snapshot copy, so no comparable p95 latency number can be produced under the sealed protocol as currently implemented. Because of this single missing metric, tools/compare/closure.mjs reports status \"unresolved\" for both runs (not \"retain\" or \"overturn\"), and the protocol's own status_scope note states explicitly that even a full closure here would establish only the retrieval-fidelity/abstention/returned-context sub-claim, not the full incumbent overturn_when (which also needs answer-fidelity, measured-task-cost and native-client-behaviour evidence). The sealed protocol also declares a third arm (arm-2, a difficult-layout parser lane) that was NEVER executed (install_required true, no install-receipt.json present), so the two runs cover only markdown BM25 vs hybrid, not difficult-layout documents.",
+  "settles_gap": "partially",
+  "verdict_impact": {
+    "could_change_verdict": true,
+    "direction": "refutes_incumbent",
+    "explanation": "This citation does not itself change any catalog verdict (it is read-only), but it corrects the triage's characterization of document-retrieval gap 1 ('no full corpus seal ... establishes no general ranking or token saving') and reinforces the critic's correction: a sealed-snapshot comparison DOES exist and DOES show hybrid materially ahead of BM25 on recall_at_3/recall_at_1/mrr with repeat=3, which weakens the current BM25-favoring decision text in catalogs/landscape/foundation.json (not edited here, per the binding rule against editing catalogs). The remaining blocker is narrower than 'no comparison exists': it is specifically the missing latency_p95_ms metric (decision D12) and the never-executed difficult-layout arm-2. A future check that resolves D12 (lets the runner target a disposable snapshot for timing) or executes arm-2 would be the next decision-changing step, not another repeat of this same read."
+  },
+  "evidence_class": "source_review",
+  "limitations": [
+    "Read-only citation; no command was executed by this check beyond reading and hashing existing files under agent-lab, which is peer-owned output (tools/compare/retrieval/out/) -- nothing was written there.",
+    "Both cited runs were produced by a different (peer) session; this receipt did not independently reproduce them, so it cannot rule out an error in the peer runner's own scoring logic.",
+    "recall/MRR advantage for hybrid is measured on one 12-query fixture with a single gold path per query (non-exhaustive relevance judgments), consistent with the fixture's own documented limits.",
+    "The status_scope clause in protocol.sealed.json means even a fully closed run here would not by itself satisfy the incumbent's full overturn_when (answer-fidelity, measured-task-cost, native-client-behaviour remain separately required)."
+  ],
+  "raw_artifacts": [
+    {"path": "$HOME/code/agent-lab/tools/compare/retrieval/out/20260922T055714Z/closure.json", "sha256": "56012340b0dfc04b25d0c508b26bc8f152856fdce857c4b9547afbb9e23293ef"},
+    {"path": "$HOME/code/agent-lab/tools/compare/retrieval/out/20260922T055714Z/judgments.json", "sha256": "eb3f3be86f6e1fd23dfa3b6893e26d88784abe38bfdde4e696c519e7e8a9b72c"},
+    {"path": "$HOME/code/agent-lab/tools/compare/retrieval/out/20260922T055714Z/run-record.json", "sha256": "e3c22a58988bfa3ac2dc79b063c5029d6363fcbb22e000cc4ac3a63e9bd43444"},
+    {"path": "$HOME/code/agent-lab/tools/compare/retrieval/out/20260922T055714Z/protocol.sealed.json", "sha256": "dc2f7adad4771d05bc5e6f22f4d32199c3b5313386c098ef09b3483ba88c5733"},
+    {"path": "$HOME/code/agent-lab/tools/compare/retrieval/out/20260922T060810Z/closure.json", "sha256": "8a7c6194f48ebd1545c82b196854a971ea480162023d1db25a418d3c1a9e6ca2"},
+    {"path": "$HOME/code/agent-lab/tools/compare/retrieval/out/20260922T060810Z/judgments.json", "sha256": "4ac7d1987ce71f475830c23eea8a06d17630e2a69b61fa695a7bb7885a55dfa9"},
+    {"path": "$HOME/code/agent-lab/tools/compare/retrieval/out/20260922T060810Z/run-record.json", "sha256": "84dc07646dde52a722e8ac7278eca50b8c68727e6024077f779d2b73c0ea5bca"},
+    {"path": "$HOME/code/agent-lab/tools/compare/retrieval/out/20260922T060810Z/protocol.sealed.json", "sha256": "fd245fff089e04bcfb9f6d85213a22cf29336656b049a3ab9e2c277a85695b45"},
+    {"path": "$HOME/code/agent-lab/tools/compare/retrieval/out/20260922T060810Z/arm-map.json", "sha256": "26dec77643895f98076786a03917cc43c8faa77fffc739967c158247c47abfeb"}
+  ]
+}

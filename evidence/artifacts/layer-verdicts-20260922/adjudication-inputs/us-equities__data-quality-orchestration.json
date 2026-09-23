@@ -1,0 +1,277 @@
+{
+ "catalog": "us-equities",
+ "layer_id": "data-quality-orchestration",
+ "repository_root": "the repository root given in the task",
+ "return_A": {
+  "winner_keys": [
+   "c3",
+   "c4"
+  ],
+  "winner_names": [
+   [
+    "Dagu",
+    "dagu"
+   ],
+   [
+    "data-pandera",
+    "data-pandera"
+   ]
+  ],
+  "why_selected": "This is my own source review of the retained files. I ran nothing and did not use any TypeSafe inference results. Two candidates win: c3 (Dagu) for orchestration and c4 (pandera) for data quality. They cover separate scope terms and do not overlap. c3 has native CLI end-to-end evidence. blueprints/us-equities/hosting/receipt.json (kind \"native_cli_e2e\", version \"2.16.6\", publisher_checksum_matched true) records a successful 3-step run, evidence-20260919-ready, with exit_code 0: summarize, baseline_evidence and catalog_evidence all \"succeeded\". The receipt keeps the earlier failures, a schema error with exit 1 and a first execution with exit 1. It also records an exit-23 failure fixture that reached status \"failed\" with its dependent step \"aborted\", and a native `dagu stop` cancellation that reached \"aborted\" even though the CLI exited 0. After service_restart_exit 0, prior_history_rows_preserved is true. The service ran with model_calls 0 and broker_calls 0, and its inherited environment was limited to \"HOME PATH DAGU_HOME only\". blueprints/us-equities/research-runtime/receipt.json (kind \"native_model_e2e\") shows Dagu 2.16.6 running the packet and order_table steps to \"succeeded\". It also records paired_model_workflow_executed false and a retained validation failure (\"entrypoint document must not define name\"). Together, these match the requirement: bounded runs, a supervised owned process, retained failed attempts and history, and no broker authority. c4 has local integration evidence on synthetic fixtures only. blueprints/us-equities/data/README.md documents a fail-closed promotion_gate.py that runs pandera 0.33.1 in an isolated venv. The retained outputs blueprints/us-equities/data/fixtures/good-gate-result.json (status \"pass\", row_count 4, 12 named checks) and bad-gate-result.json (status \"fail\"; valid_trading_session, volume_integral_non_negative, observed_at_not_future, high_ge_max_open_close and unique_symbol_session failed) show the gate separating good from bad synthetic snapshots. tests/test_promotion_gate.py reruns these fixtures, but only when the gate venv exists on the host. Because c4 rests on synthetic fixtures, the set's class is \"synthetic\", the weakest class among the winners.",
+  "winner_evidence_class": "synthetic",
+  "winner_evidence_refs": [
+   "blueprints/us-equities/hosting/receipt.json",
+   "blueprints/us-equities/research-runtime/receipt.json",
+   "blueprints/us-equities/hosting/README.md",
+   "blueprints/us-equities/data/README.md",
+   "blueprints/us-equities/data/fixtures/good-gate-result.json",
+   "blueprints/us-equities/data/fixtures/bad-gate-result.json",
+   "tests/test_promotion_gate.py"
+  ],
+  "alternatives": [
+   {
+    "disposition": "conditional",
+    "evidence_class": "source_review",
+    "evidence_refs": [],
+    "key": "c2",
+    "name": "Temporal",
+    "repository": "https://github.com/temporalio/temporal",
+    "why_not_default": "The only evidence is an upstream README URL (https://github.com/temporalio/temporal/blob/v1.32.0/README.md). I could not open it, and I found no local receipt, fixture or test for Temporal that runs failure, cancellation, restart or in-flight recovery. Durable history and activity-level recovery would address Dagu's recorded gap (\"Restart acceptance preserves completed history; it does not prove in-flight resumption\" in blueprints/us-equities/hosting/receipt.json), but that capability is untested here, not proven. The card also warns that activities retry by default and that unlimited retries are unsuitable for uncertain broker writes. It would also add a server and SDK beyond the single-binary lane. Temporal remains conditional on a specified in-flight or host-loss recovery requirement and an executed comparison."
+   },
+   {
+    "disposition": "unqualified",
+    "evidence_class": "source_review",
+    "evidence_refs": [],
+    "key": "c1",
+    "name": "modal",
+    "repository": "https://github.com/modal-labs/modal-client",
+    "why_not_default": "The only evidence is a PyPI URL (https://pypi.org/project/modal/1.5.5/), which I could not open. The card says `modal run` executes cloud code that may incur charges and was \"not run here\". No local execution, identity, telemetry or cost evidence exists. It covers the managed-compute scope term, not orchestration of existing native commands or data-quality validation. Paid hosting is not authorized. The packet also lists upstream latest as v1.3.1 against a 1.5.5 pin, a metadata inconsistency I could not resolve."
+   }
+  ],
+  "challenger_preferred": null,
+  "overturn_when": "Two checks could change this verdict. First, an executed same-fixture comparison in which Temporal (server v1.32.0, Python SDK 1.33.0) passes all the checks recorded for Dagu in blueprints/us-equities/hosting/receipt.json: the exit-23 failure producing status failed with its dependent step aborted, native cancellation reporting aborted, and completed history preserved across a service restart. Temporal would also need to resume an in-flight run after worker or host process loss without a duplicate effect owner, which Dagu has not shown. Second, running `python3 -m unittest tests.test_promotion_gate` with the gate venv present, where any fixture result differs from its retained outcome in blueprints/us-equities/data/fixtures/ (for example, good-gate-result.json no longer passing or bad-gate-result.json no longer failing its five named checks).",
+  "open_gaps": [
+   "Dagu: completed-history restart is not recovery of in-flight work (blueprints/us-equities/hosting/receipt.json limitations). No model-worker queue, continuous off-host hosting, VM boundary or trading host is established.",
+   "Dagu: the paired Astra-to-Claude model workflow was not executed (paired_model_workflow_executed false) because the Codex allowance was exhausted (usedPercent 100). The Claude <model> report ran standalone, outside the Dagu graph, so complete returned results from a model worker running inside the orchestrated graph are not established.",
+   "The two Dagu records disagree on dashboard authentication. The hosting receipt (2026-09-19) records basic auth with anonymous 401 and authenticated 200 after restart. The current hosting README says the dashboard now uses upstream auth.mode none, with anonymous API reads returning 200. No retained receipt covers the current auth mode.",
+   "Dagu pin v2.16.6 is behind upstream v2.17.0 (pin_behind_upstream true). The newer release is untested; that means unknown, not failed.",
+   "pandera: evidence covers synthetic CSV fixtures only. It does not establish provider completeness, correct corporate actions, accurate prices, absence of leakage or a production bars/universe ingest. The data README states that no such ingest ships yet.",
+   "pandera: the duckdb:// input path is source-only because the duckdb package is not in the pinned gate install (blueprints/us-equities/data/README.md).",
+   "Temporal and modal have no local execution, failure, cancellation, recovery or telemetry evidence. Their capabilities are untested, not failed.",
+   "No measured comparison between orchestrators exists. The winner set rests on single-lane native and local evidence, not on a head-to-head test."
+  ]
+ },
+ "return_B": {
+  "winner_keys": [
+   "c3"
+  ],
+  "winner_names": [
+   [
+    "Dagu",
+    "dagu"
+   ]
+  ],
+  "why_selected": "Select Dagu for the demonstrated bounded data-orchestration portion of this layer. blueprints/us-equities/hosting/receipt.json records native CLI execution of a successful three-step research workflow, an injected failure that aborted its dependent step, cancellation, systemd supervision and completed-history preservation after restart, with zero broker or model calls. blueprints/us-equities/research-runtime/receipt.json additionally records successful native packet and order_table preparation. These observations support orchestration of existing research commands; the standalone Claude report and its telemetry do not prove execution of the paired model graph. No other adopted candidate has task-specific execution evidence in its supplied references, and the data-quality portion remains unqualified.",
+  "winner_evidence_class": "native_proven",
+  "winner_evidence_refs": [
+   "blueprints/us-equities/hosting/receipt.json",
+   "blueprints/us-equities/research-runtime/receipt.json"
+  ],
+  "alternatives": [
+   {
+    "disposition": "conditional",
+    "evidence_class": "source_review",
+    "evidence_refs": [
+     "https://pypi.org/project/modal/1.5.5/"
+    ],
+    "key": "c1",
+    "name": "modal",
+    "repository": "https://github.com/modal-labs/modal-client",
+    "why_not_default": "The reviewed package page establishes SDK distribution and setup instructions, not executed research workloads. No retained cloud execution, recovery, identity preservation, telemetry reconciliation or cost comparison establishes a host-capacity advantage. See [package evidence](https://pypi.org/project/modal/1.5.5/)."
+   },
+   {
+    "disposition": "conditional",
+    "evidence_class": "source_review",
+    "evidence_refs": [
+     "https://github.com/temporalio/temporal/blob/v1.32.0/README.md"
+    ],
+    "key": "c2",
+    "name": "Temporal",
+    "repository": "https://github.com/temporalio/temporal",
+    "why_not_default": "The pinned README describes durable workflows and local development setup. It supplies no executed comparison of this research workload, bounded retries, cancellation, recovery or duplicate effects against Dagu. Its architectural fit does not establish acceptance."
+   },
+   {
+    "disposition": "conditional",
+    "evidence_class": "source_review",
+    "evidence_refs": [
+     "https://github.com/unionai-oss/pandera/blob/62f55e2dccf0a199cfe4d6ce3eda0c1d29e2e4e6/README.md"
+    ],
+    "key": "c4",
+    "name": "data-pandera",
+    "repository": "https://github.com/unionai-oss/pandera",
+    "why_not_default": "The pinned README contains dataframe schema examples, but the supplied evidence does not demonstrate executed market-data validation or rejection of invalid snapshot promotion. It remains a relevant data-quality complement whose integration is unqualified."
+   }
+  ],
+  "challenger_preferred": null,
+  "overturn_when": "Change the orchestration default if an executed comparison using blueprints/us-equities/research-runtime/prepare-evidence.yaml and blueprints/us-equities/hosting/research-evidence.yaml shows Temporal preserves the same complete outputs, identity and telemetry while recovering interrupted work without duplicate effects and passing failure/cancellation checks. Add Pandera to the winner set when an executed preparation comparison rejects invalid market data before promotion while accepting valid inputs and retaining validation failures.",
+  "open_gaps": [
+   "Dagu's retained restart acceptance preserves completed history; it does not establish in-flight recovery, host-loss recovery or duplicate-effect prevention.",
+   "The paired Astra-to-Claude workflow was not executed. The successful Claude report and matching telemetry were from a standalone process.",
+   "Real market-data schemas, fail-closed snapshot promotion, provider completeness, corporate-action correctness and historical availability are not established.",
+   "Native account homes and hooks remain accessible; environment filtering does not establish operating-system isolation or comprehensive denial of broker execution authority.",
+   "Managed compute capacity, continuous off-host operation, complete coordinator-plus-worker usage and comparative operating costs remain unmeasured."
+  ]
+ },
+ "packet": {
+  "title": "Data quality and orchestration",
+  "requirement": "Run bounded research with native identity and complete returned results; supervise owned processes; retain scoped telemetry, failed attempts and recoverable state without granting research workers broker execution authority.",
+  "limitations": [
+   "Native worker success and telemetry matching are bounded by the recorded task, process and account. They do not establish every native client/session, whole-task savings or unlimited allowance.",
+   "Dagu's older completed-history restart is not in-flight recovery. Later recovery receipts must be evaluated for their own process, host and workload rather than promoting all workflows.",
+   "Gateway transport health, routed text and ACP research acceptance do not establish native hook/tool parity or independent provider/model attestation.",
+   "Same-host recovery and configured restrictions do not establish off-host disaster recovery, a VM boundary, unattended broker operation or paid hosting.",
+   "The us-equities catalog also tags entries for this taxonomy layer under data-research (2); agents-operations (7) was picked as the primary group by entry count."
+  ],
+  "layer_scope_terms": [
+   "data-quality",
+   "data-orchestration",
+   "durable-jobs",
+   "host-capacity",
+   "managed-compute",
+   "packaging"
+  ],
+  "requirement_note": "The requirement, limitations and existing_overturn_when text is shared by this layer's group; judge fit against the layer title and layer_scope_terms.",
+  "candidates": [
+   {
+    "adopted": true,
+    "card_limitations": [
+     "Open-source SDK license does not make hosted compute free or self-hostable.",
+     "modal run executes cloud code and may incur charges; not run here.",
+     "Do not assume native Codex subscription credentials belong in cloud containers."
+    ],
+    "component_id": "modal",
+    "decisions": [],
+    "evidence_kind": "source_review",
+    "evidence_refs": [
+     "https://pypi.org/project/modal/1.5.5/"
+    ],
+    "key": "c1",
+    "name": "modal",
+    "pin": "Python modal1.5.5; source be5f129326efe4864d666d263d249214bd9b4ed2",
+    "pin_behind_upstream": false,
+    "recipe_ref": null,
+    "repository": "https://github.com/modal-labs/modal-client",
+    "review_status": null,
+    "role": "Managed elastic Python/GPU jobs and sandboxes",
+    "upstream": {
+     "archived": false,
+     "latest": "v1.3.1",
+     "license": "Apache-2.0",
+     "prerelease": null,
+     "pushed_at": "2026-09-22",
+     "released_at": null,
+     "renamed_to": null,
+     "stars": 515
+    }
+   },
+   {
+    "adopted": true,
+    "card_limitations": [
+     "start-dev is local development infrastructure, not production availability.",
+     "Activities retry by default; unlimited defaults are unsuitable for quota errors or uncertain broker writes.",
+     "Network and LLM effects belong in activities, not deterministic workflow code."
+    ],
+    "component_id": "temporal",
+    "decisions": [],
+    "evidence_kind": "source_review",
+    "evidence_refs": [
+     "https://github.com/temporalio/temporal/blob/v1.32.0/README.md"
+    ],
+    "key": "c2",
+    "name": "Temporal",
+    "pin": "server v1.32.0; CLI1.9.1; Python SDK1.33.0",
+    "pin_behind_upstream": false,
+    "recipe_ref": null,
+    "repository": "https://github.com/temporalio/temporal",
+    "review_status": null,
+    "role": "Durable workflow history, activities and cancellation",
+    "upstream": {
+     "archived": false,
+     "latest": "v1.32.0",
+     "license": "MIT",
+     "prerelease": false,
+     "pushed_at": "2026-09-22",
+     "released_at": "2026-09-11",
+     "renamed_to": null,
+     "stars": 23235
+    }
+   },
+   {
+    "adopted": true,
+    "card_limitations": [
+     "Current canonical repository is dagucloud/dagu. GPL3 license differs from older permissive assumptions.",
+     "Dynamic tool auto-provisioning and third-party actions need their own pins; optional paid governance features are distinct.",
+     "Local 3-step research DAG, failure/cancellation and completed-history restart were accepted; no model-worker queue, in-flight recovery or trading host is established.",
+     "The later packet and order_table preparation steps succeeded. Claude <model> produced a standalone cited report outside the paired graph; the new paired Astra-to-Claude graph remained allowance-blocked and was not executed. No broker orders or continuous off-host hosting."
+    ],
+    "component_id": "dagu",
+    "decisions": [],
+    "evidence_kind": "native_proven",
+    "evidence_refs": [
+     "blueprints/us-equities/hosting/receipt.json",
+     "blueprints/us-equities/research-runtime/receipt.json"
+    ],
+    "key": "c3",
+    "name": "Dagu",
+    "pin": "v2.16.6",
+    "pin_behind_upstream": true,
+    "recipe_ref": "blueprints/us-equities/hosting/README.md",
+    "repository": "https://github.com/dagucloud/dagu",
+    "review_status": null,
+    "role": "Single-binary scheduler for existing native commands",
+    "upstream": {
+     "archived": false,
+     "latest": "v2.17.0",
+     "license": "GPL-3.0",
+     "prerelease": false,
+     "pushed_at": "2026-09-21",
+     "released_at": "2026-09-21",
+     "renamed_to": null,
+     "stars": 4058
+    }
+   },
+   {
+    "adopted": true,
+    "card_limitations": [
+     "Schema validation is not provider completeness, correct corporate actions, accurate prices or absence of leakage.",
+     "The demonstration checks synthetic keys/quantities only; real market schemas and fail-closed promotion are still implementation work.",
+     "pandera-dev/pandera currently redirects to canonical unionai-oss/pandera."
+    ],
+    "component_id": "data-pandera",
+    "decisions": [],
+    "evidence_kind": "source_review",
+    "evidence_refs": [
+     "https://github.com/unionai-oss/pandera/blob/62f55e2dccf0a199cfe4d6ce3eda0c1d29e2e4e6/README.md"
+    ],
+    "key": "c4",
+    "name": "data-pandera",
+    "pin": "v0.33.1; source 62f55e2dccf0a199cfe4d6ce3eda0c1d29e2e4e6",
+    "pin_behind_upstream": false,
+    "recipe_ref": null,
+    "repository": "https://github.com/unionai-oss/pandera",
+    "review_status": null,
+    "role": "Dataframe schemas and validation before snapshot promotion",
+    "upstream": {
+     "archived": false,
+     "latest": "v0.33.1",
+     "license": "MIT",
+     "prerelease": false,
+     "pushed_at": "2026-09-22",
+     "released_at": "2026-09-01",
+     "renamed_to": null,
+     "stars": 4463
+    }
+   }
+  ]
+ }
+}

@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "id": "headroom-live-store-cleanup-20260922",
+  "date": "2026-09-22",
+  "layer_ids": ["token-efficiency"],
+  "gap_refs": [],
+  "purpose": "Coordinator cleanup of writes the headroom-0.38.0 check's disclosed invalid first run made to the live ~/.headroom store (outside the unit's sandbox).",
+  "preregistered": "Remove exactly the entries created by the invalid run (created_at 19:00 ET) and nothing older; keep a full backup.",
+  "commands": [
+    {"cmd": "stat ~/.headroom/*", "exit": 0, "output_excerpt": "store created 2026-09-18 18:11 ET; ccr_store.db modified 2026-09-22 19:00; session_stats.jsonl born 18:59:59; update_check.json born 18:59:55"},
+    {"cmd": "sqlite3 read-only: select count(*), min(created_at), max(created_at) from ccr_entries", "exit": 0, "output_excerpt": "1 row, created_at 1790117999.24 (2026-09-22 19:00 ET), i.e. only the invalid run's entry"},
+    {"cmd": "cp -a ~/.headroom/. <ecosystem-state>/gap-resolution-20260922/headroom-live-store-backup/", "exit": 0, "output_excerpt": "backup of all five files"},
+    {"cmd": "delete from ccr_entries where created_at between 1790117990 and 1790118020", "exit": 0, "output_excerpt": "deleted 1 row; 0 remain"},
+    {"cmd": "rm ~/.headroom/session_stats.jsonl ~/.headroom/update_check.json", "exit": 0, "output_excerpt": "both files were created by the invalid run"}
+  ],
+  "result": "The live store is back to its pre-run state (empty ccr_entries table); no pre-existing entry was touched. Stored content was never printed.",
+  "settles_gap": "not_applicable",
+  "verdict_impact": {"could_change_verdict": false, "direction": "not_applicable", "explanation": "Operational cleanup only."},
+  "evidence_class": "local_integration",
+  "limitations": ["Earlier entries (if any) had already expired by TTL before this cleanup; nothing can show what the store held before 2026-09-22 19:00 beyond the directory birth time."],
+  "raw_artifacts": []
+}

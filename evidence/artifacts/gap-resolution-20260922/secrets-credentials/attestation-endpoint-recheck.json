@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "id": "attestation-endpoint-recheck-20260922",
+  "date": "2026-09-22",
+  "layer_ids": [
+    "secrets-credentials"
+  ],
+  "gap_refs": [
+    {
+      "layer_id": "secrets-credentials",
+      "gap_index": 4
+    }
+  ],
+  "purpose": "Read-only recheck of whether the pinned gitleaks 8.30.1 GitHub release assets now carry GitHub artifact attestations, since gap 4 records a prior 404 result that may be stale.",
+  "preregistered": "Expected: `gh api repos/gitleaks/gitleaks/attestations/sha256:<digest>` for the linux_x64 release asset and for the checksums manifest; a 200 with an attestation bundle would refute the existing 404 finding and materially change the gap-4 record, while a 404 would reconfirm it unchanged. Also read the current default-branch release workflow source for an attest-build-provenance step, as corroborating (not sole) evidence. One dated pass, no retries to seek a different result.",
+  "commands": [
+    {
+      "cmd": "gh api repos/gitleaks/gitleaks/releases/tags/v8.30.1 --jq '{tag:.tag_name, id:.id, published:.published_at, assets:[.assets[]|{name,id}]}'",
+      "exit": 0,
+      "duration_s": 0.6,
+      "output_excerpt": "tag=v8.30.1 published=2026-03-21T02:17:58Z; 10 assets incl. gitleaks_8.30.1_checksums.txt (id 378333193) and gitleaks_8.30.1_linux_x64.tar.gz (id 378332058)",
+      "output_sha256": null
+    },
+    {
+      "cmd": "gh api repos/gitleaks/gitleaks/releases/assets/378333193 -H 'Accept: application/octet-stream' > ${HOME}/codex-ecosystem/state/gap-resolution-20260922/secrets-upstream/gitleaks/gitleaks-8.30.1-checksums.txt",
+      "exit": 0,
+      "duration_s": 0.5,
+      "output_excerpt": "10 lines of '<sha256>  <asset filename>'; linux_x64 asset digest = sha256:551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb",
+      "output_sha256": "061476c21adaf5441516f96f185c1a4706a83cd6329b9b38762271b3d4a52fae"
+    },
+    {
+      "cmd": "gh api repos/gitleaks/gitleaks/attestations/sha256:551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb",
+      "exit": 1,
+      "duration_s": 0.4,
+      "output_excerpt": "{\"message\":\"Not Found\",\"documentation_url\":\"https://docs.github.com/rest/repos/attestations#list-attestations\",\"status\":\"404\"}",
+      "output_sha256": "8ecae33333826db91507fbc9512eabf6e8e7c9be3c43f6681ca70bff4c028a6d"
+    },
+    {
+      "cmd": "gh api repos/gitleaks/gitleaks/attestations/sha256:061476c21adaf5441516f96f185c1a4706a83cd6329b9b38762271b3d4a52fae",
+      "exit": 1,
+      "duration_s": 0.4,
+      "output_excerpt": "{\"message\":\"Not Found\",\"documentation_url\":\"https://docs.github.com/rest/repos/attestations#list-attestations\",\"status\":\"404\"}",
+      "output_sha256": "8ecae33333826db91507fbc9512eabf6e8e7c9be3c43f6681ca70bff4c028a6d"
+    },
+    {
+      "cmd": "gh api repos/gitleaks/gitleaks/contents/.github/workflows/release.yml --jq '.content' | base64 -d > ${HOME}/codex-ecosystem/state/gap-resolution-20260922/secrets-upstream/gitleaks/release-workflow-head.yml && grep -ni attest ${HOME}/codex-ecosystem/state/gap-resolution-20260922/secrets-upstream/gitleaks/release-workflow-head.yml",
+      "exit": 1,
+      "duration_s": 0.7,
+      "output_excerpt": "no match (grep exit 1): the current default-branch release.yml (57 lines) contains no 'attest' keyword, i.e. no attest-build-provenance step, consistent with the 404s above",
+      "output_sha256": "9cc37626ce2ddb8889f870bd0ebcaa2370fa7e9f60fca953f29df7da763571d2"
+    }
+  ],
+  "tool_versions": {
+    "gh": "2.101.0"
+  },
+  "installs": [],
+  "result": "GitHub's attestations endpoint still returns 404 Not Found for both the gitleaks_8.30.1_linux_x64.tar.gz asset digest and the gitleaks_8.30.1_checksums.txt manifest digest, and the current default-branch .github/workflows/release.yml has no attest-build-provenance (or any 'attest') step. This reconfirms gap 4's prior finding is still accurate as of 2026-09-22; nothing has changed upstream.",
+  "settles_gap": true,
+  "verdict_impact": {
+    "could_change_verdict": false,
+    "direction": "supports_incumbent",
+    "explanation": "A 200 response or a new attest step in release.yml would have been a material change worth surfacing to the coordinator; neither occurred, so this recheck reconfirms the existing gap-4 record rather than overturning anything."
+  },
+  "evidence_class": "source_review",
+  "limitations": [
+    "Only two digests were checked (one platform binary, one checksums manifest) out of 10 release assets; the other 8 platform archives were not individually queried, though GitHub attestations are normally generated per-build-workflow-run rather than per-asset, so a 404 on these two is a reasonable proxy, not exhaustive per-asset proof.",
+    "The release.yml read is source review of the current default branch, not the exact workflow revision that produced the v8.30.1 release (published 2026-03-21); the workflow file may have changed since that release ran.",
+    "This is a point-in-time recheck; it does not predict whether attestations will be added to a future release.",
+    "Reclassified from native_proven to source_review in this fix round: per tools/sota-convergence/README.md's evidence_level definitions ('source_review means nothing was installed, built or run; native_proven ... means an actual reproducible execution exists'), this receipt's read-only `gh api` attestation/release-asset/workflow-source lookups do not install, build or run gitleaks itself, so they are source review of upstream metadata, not native execution."
+  ],
+  "raw_artifacts": [
+    {
+      "path": "${HOME}/codex-ecosystem/state/gap-resolution-20260922/secrets-upstream/gitleaks/gitleaks-8.30.1-checksums.txt",
+      "sha256": "061476c21adaf5441516f96f185c1a4706a83cd6329b9b38762271b3d4a52fae"
+    },
+    {
+      "path": "${HOME}/codex-ecosystem/state/gap-resolution-20260922/secrets-upstream/gitleaks/attestation-linux_x64.json",
+      "sha256": "8ecae33333826db91507fbc9512eabf6e8e7c9be3c43f6681ca70bff4c028a6d"
+    },
+    {
+      "path": "${HOME}/codex-ecosystem/state/gap-resolution-20260922/secrets-upstream/gitleaks/attestation-checksums.json",
+      "sha256": "8ecae33333826db91507fbc9512eabf6e8e7c9be3c43f6681ca70bff4c028a6d"
+    },
+    {
+      "path": "${HOME}/codex-ecosystem/state/gap-resolution-20260922/secrets-upstream/gitleaks/release-workflow-head.yml",
+      "sha256": "9cc37626ce2ddb8889f870bd0ebcaa2370fa7e9f60fca953f29df7da763571d2"
+    }
+  ]
+}
