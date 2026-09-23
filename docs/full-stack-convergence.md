@@ -8,8 +8,10 @@ its totals from the canonical records.
 
 The September 21 convergence connects **68 selected components**, **16 foundation
 layers** and **513 research repository identities** to upstream commands, dated
-native results, dashboards and portable recipes. Open the [offline HTML](ecosystem/index.html),
-select a component, and use its attached-results button. Screenshot bytes and
+native results, dashboards and portable recipes. Open the offline HTML
+(`ecosystem/index.html`, generated with `python3 scripts/build_ecosystem.py
+--write` -- not committed, or download it from a `publish-catalog.yml`
+release artifact), select a component, and use its attached-results button. Screenshot bytes and
 returned output are embedded. Missing coverage stays visible; inclusion does not
 mean installation or a passed run.
 

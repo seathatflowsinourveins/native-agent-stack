@@ -1,7 +1,9 @@
 # Native Claude and Codex foundation finalization — September 21, 2026
 
 The selected foundation now has one navigable map for all sixteen layers:
-[Foundation explorer](ecosystem/index.html#foundation),
+Foundation explorer (`ecosystem/index.html#foundation`; generated with
+`python3 scripts/build_ecosystem.py --write`, not committed -- download it
+from a `publish-catalog.yml` workflow artifact (7-day retention, `workflow_dispatch`/`v*`-tag runs only) otherwise),
 [operator surfaces](../catalogs/foundation/surfaces.json),
 [capability decisions](../catalogs/foundation/decisions.json) and
 [canonical repository pins](../manifests/stack.json).

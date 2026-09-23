@@ -49,7 +49,9 @@ component matrix; reuse matching acceptance and run only the missing check.
 The complete repository research catalog is not an instruction to install every
 alternative or start every optional service.
 
-The offline docs/ecosystem/index.html is the consolidated layer/setup guide;
+The offline docs/ecosystem/index.html is the consolidated layer/setup guide; it is
+generated, not committed -- build it with `python3 scripts/build_ecosystem.py
+--write`, or download it from a `publish-catalog.yml` workflow artifact (7-day retention, `workflow_dispatch`/`v*`-tag runs only).
 adoption/lifecycle.md defines owned installation, restart, recovery and cleanup.
 Choose the cheapest measured representation that meets the task's information
 contract. Known-source reads, compact JSON and full-original reads remain valid
