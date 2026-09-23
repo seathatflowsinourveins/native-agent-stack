@@ -78,6 +78,8 @@ jobs:
         run: python3 tools/sota-convergence/build_verdicts.py --check
       - name: Check per-component independent-review and E2E matrix is current
         run: python3 scripts/component_matrix.py --check
+      - name: Check the new-host grand list is current
+        run: python3 scripts/new_host_grand_list.py --check
       - name: Check offline ecosystem explorer rebuild
         run: python3 scripts/build_ecosystem.py --check
       - name: Provision the promotion gate's isolated venv

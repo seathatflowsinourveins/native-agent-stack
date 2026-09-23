@@ -1,0 +1,102 @@
+{
+ "schema_version": 1,
+ "id": "host-upgrade-evidence-20260923",
+ "date": "2026-09-23",
+ "question": "Which hardware or configuration upgrades does the measured load justify before the next stages on the new hosts?",
+ "measured_on": {
+  "host": "this-host-20260923 (adoption/hardware-profiles.json): Intel Core Ultra 9 275HX 24 threads, RTX 5090 Laptop GPU 24 GB, WSL2 with 48 GB configured (47 GB visible), 8 GB swap",
+  "evidence_class": "native_proven, point-in-time local measurement while five to eight agent sessions and a gap-resolution wave were running",
+  "cpu": "five 60-second samples of per-process utime+stime (2026-09-23 03:47-03:52 UTC): 1.1 to 9.9 of 24 cores busy per window; Gitleaks scans (no CPU cap) were 72% of all measured CPU (4.6, 8.4, 0.0, 1.9, 0.4 cores); all Claude sessions together about 0.5 cores; minute-bar collector about 0.2 cores",
+  "gpu": "5.2 to 5.5 GiB of 23.9 GiB (24,463 MiB) in use; utilization median 6.5%, max 28% over 30 samples at 2 s (37% in one spot check); one resident model (Nemotron-3-Embed-1B at a 0.16 reservation); peak 20,217 MiB (19.7 GiB) when the qualified Qwen3-8B-AWQ worker ran beside it",
+  "ram": "24 to 26 GiB available of 47 GiB visible; memory pressure (PSI some avg10) under 1; swap 0.9 of 8 GiB",
+  "disk": "199 of 1081 GB used (df, decimal GB); growth is per-wave caches (about 44 GiB: 35 GiB and 8.6 GiB for the two current waves, du) and per-wave run state (about 21 GiB) with no retention rule",
+  "limits": [
+   "One measurement window per quantity; short-lived jobs dominate single windows.",
+   "nvidia-smi cannot attribute VRAM per process under WSL; the embedder's share is its reservation.",
+   "The 128 GB workstation and the 48/64 GB macOS hosts are labelled projections until scripts/hardware_profile.py runs on each.",
+   "The raw CPU and GPU samples behind these figures are private to the measuring host's agent-lab records and are not retained in this repository."
+  ]
+ },
+ "items": [
+  {
+   "id": "wslconfig-workstation-memory",
+   "kind": "configuration",
+   "target": "128 GB WSL workstation",
+   "change": "Raise WSL memory from its default (half of physical RAM, 64 GB). The workstation runtime profile (docs/new-workstation-runtime-profile-20260922.md) proposes memory=96GB processors=60 swap=16GB.",
+   "verdict": "needed_at_setup",
+   "cost": "none",
+   "evidence": "adoption/hardware-profiles.json wsl-workstation-128gb-projected assumes wslconfig_memory_gb 100 and its 'headroom' semantic-RAG tier needs ram_gb >= 96; with the profiles' own arithmetic (about 1 GB of VM overhead) 96GB would show about 95 GB and miss that tier. The two records need reconciling by their owner; this manifest does not choose the value."
+  },
+  {
+   "id": "bounded-run-cpu-limit",
+   "kind": "software",
+   "target": "every host",
+   "change": "Give ecosystem-bounded-run a CPU property (CPUWeight or CPUQuota) so guarded scans cannot take many cores during interactive work.",
+   "verdict": "needed_now",
+   "cost": "none",
+   "owner": "the lane that owns the ecosystem bin",
+   "evidence": "Gitleaks was 72% of measured CPU, up to 8.4 cores in one window; the runner caps memory, swap, tasks and time but not CPU."
+  },
+  {
+   "id": "retention-wave-state",
+   "kind": "software",
+   "target": "every host",
+   "change": "Archive per-wave run state and delete per-wave caches once the wave's record is closed.",
+   "verdict": "needed_now",
+   "cost": "none",
+   "evidence": "about 65 GiB of per-wave caches and state (44 GiB caches, 21 GiB state) with no retention rule; 827 GB still free, so this is hygiene, not capacity."
+  },
+  {
+   "id": "gpu-vram-above-24gb",
+   "kind": "hardware",
+   "target": "128 GB WSL workstation",
+   "change": "A 48 GB or 96 GB workstation GPU, or a second GPU.",
+   "verdict": "not_needed_now",
+   "trigger": "A selected local slot that does not fit 24 GB: a dense model above about 32B at 4 bits, or two 8B-class models resident with long contexts, or a measured throughput shortfall.",
+   "evidence": "GPU utilization median 6.5%; the embedder plus the qualified 8B worker peaked at 20,217 MiB of 24,463 MiB; the generation tier for 24 GB is large-32b-q4."
+  },
+  {
+   "id": "workstation-ram-256gb",
+   "kind": "hardware",
+   "target": "128 GB WSL workstation",
+   "change": "256 GB system RAM.",
+   "verdict": "not_needed_now",
+   "trigger": "Selecting a 150B-class mixture-of-experts model served partly from system RAM, after a measured throughput run shows it is usable. No such model is selected; runtime support for candidates such as MiMo-V2.6-Flash (159B) is unverified here.",
+   "evidence": "RAM on the measured host has 24-26 GiB free under full load; the workstation projection already reaches the 'headroom' tier at 100 GB."
+  },
+  {
+   "id": "laptop-ram",
+   "kind": "hardware",
+   "target": "this host",
+   "change": "More RAM for the 48 GB WSL laptop.",
+   "verdict": "not_needed",
+   "evidence": "24-26 GiB available and memory pressure under 1 with five to eight sessions and a wave running."
+  },
+  {
+   "id": "disk",
+   "kind": "hardware",
+   "target": "every host",
+   "change": "More disk.",
+   "verdict": "not_needed",
+   "evidence": "827 GB free on the measured host; growth is addressed by the retention item."
+  },
+  {
+   "id": "macbook-64gb",
+   "kind": "hardware",
+   "target": "macOS arm64 64 GB",
+   "change": "No upgrade; use it as the portable host and for macOS acceptance.",
+   "verdict": "not_needed",
+   "evidence": "Projected generation tier large-32b-q4 from about 38 GB of the 64 GB unified memory; no macOS workstation run exists yet, so acceptance, not hardware, is the open item."
+  },
+  {
+   "id": "frontier-scale-local-models",
+   "kind": "hardware",
+   "target": "none",
+   "change": "Running trillion-parameter checkpoints locally (e.g. MiMo-V2.6-Pro-RL, about 1.02T parameters, about 1 TB of weights).",
+   "verdict": "not_feasible",
+   "evidence": "Hugging Face API for XiaomiMiMo/MiMo-V2.6-Pro-RL (queried 2026-09-23): safetensors total 1,024,216,603,392 parameters, mostly stored as U8 (about 1.0 TB); no listed host or upgrade reaches that memory. Such models are used through hosted APIs.",
+   "source": "https://huggingface.co/XiaomiMiMo/MiMo-V2.6-Pro-RL"
+  }
+ ],
+ "summary": "Needed now: two software changes (bounded-run CPU limit, wave retention). Needed at setup: a larger WSL memory setting on the workstation (value to reconcile between the runtime profile and the hardware profiles). No hardware purchase is justified by the measured load; GPU memory is the upgrade to buy first if a selected local model outgrows 24 GB."
+}
