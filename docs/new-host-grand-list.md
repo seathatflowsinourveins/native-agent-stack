@@ -25,13 +25,21 @@ Layers: 20 foundation, 12 trading. Winners: 66 layer-winner pairs (55 distinct c
 
 ## Hosts and hardware tiers
 
-| Host | Evidence | Generation tier | Semantic-RAG tier | Concurrency cap |
-| --- | --- | --- | --- | --- |
-| This host (measured) | native_proven | large-32b-q4 | standard | 16 |
-| 128 GB WSL workstation (labelled projection) | labelled_projection | large-32b-q4 | headroom | 60) |
-| macOS arm64, 48 GB unified memory (labelled projection) | labelled_projection | large-32b-q4 | full | 10 |
-| macOS arm64, 64 GB unified memory (labelled projection) | labelled_projection | large-32b-q4 | full | 12 |
-| GitHub-hosted macos-15 arm64 runner | native_proven | — | — | — |
+| Host | Evidence | Generation tier | Semantic-RAG tier | Concurrency cap | Measured |
+| --- | --- | --- | --- | --- | --- |
+| This host (measured) | native_proven | large-32b-q4 | standard | 16 | cpu_brand=Intel(R) Core(TM) Ultra 9 275HX; cores=24; effective_ram_gb=47.0 |
+| 128 GB WSL workstation (labelled projection) | labelled_projection | large-32b-q4 | headroom | 16 | — |
+| macOS arm64, 48 GB unified memory (labelled projection) | labelled_projection | large-32b-q4 | full | 10 | — |
+| macOS arm64, 64 GB unified memory (labelled projection) | labelled_projection | large-32b-q4 | full | 12 | — |
+| GitHub-hosted macos-15 arm64 runner | native_proven | — | — | — | cpu_brand=Apple M1 (Virtual); cores=3; unified_memory_gb=7.0; mlx_smoke: mlx-community/Qwen2.5-0.5B-Instruct-4bit@a5339a4, 146.57 tok/s, 32 tokens |
+
+## Qualified local models
+
+Locally-run model weights a host receipt recorded qualifying on a runtime component's winner row (`scripts/host_receipts.py record --qualified-model`). This is per-host, per-runtime evidence, not a verdict: it never marks anything `accepted` by itself, and the platform-status flip rule (`scripts/platform_status.py`) still governs whether that runtime's own row may claim more.
+
+| Model | Revision | Runtime | Version | Host | Platform | Result | Receipt |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| — | — | — | — | — | — | — | — |
 
 ## Foundation layers
 

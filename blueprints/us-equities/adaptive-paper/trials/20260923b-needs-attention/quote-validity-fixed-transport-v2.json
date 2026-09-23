@@ -1,0 +1,41 @@
+{
+  "kind": "streamed_quote_validity",
+  "feed": "sip",
+  "symbols": [
+    "AAPL",
+    "AMD",
+    "AMZN",
+    "ARM",
+    "ASTS",
+    "AVGO",
+    "COIN",
+    "CRWD",
+    "CRWV",
+    "DIA",
+    "GOOGL",
+    "INTC",
+    "IWM",
+    "JNJ",
+    "JPM",
+    "META",
+    "MSFT",
+    "MU",
+    "NVDA",
+    "PG",
+    "QQQ",
+    "SNDK",
+    "SPY",
+    "TSLA"
+  ],
+  "config_sha256": "3587653104e68fdfc9bbb9170825c611abcf7e2e1be1004327a056031c34555a",
+  "script_sha256": "52f6a9ea1e449c99979be17424178d484f1bf50ce47600daf1a98099d183f560",
+  "requested_window_seconds": 60.0,
+  "observed_window_seconds": 59.972,
+  "started_unix": 1790181015.12,
+  "transport_sha256": "325f0817abc3607665c7a3d60c896721f9d667622bcf09ab00f9a4efa64f92a2",
+  "counts": {
+    "total": 38251
+  },
+  "rejected_by_symbol": {},
+  "examples": []
+}

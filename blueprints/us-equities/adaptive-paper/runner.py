@@ -847,6 +847,9 @@ _INITIAL_LEVERAGE_ACHIEVEMENT_STATE = {"peak_achieved_leverage": Decimal("0"), "
                                        "seconds_above_next_lower_rung_ceiling": 0.0}
 
 
+RECONCILE_EVERY_SECONDS = 30  # periodic broker snapshot and reconciliation during a run
+
+
 async def run_native(controller, policy_config, assets, trial_id, config, baseline_cash, *, account_fingerprint="simulation"):
     from native_adapter import build_node
     from native_strategy import AdaptiveStrategy
@@ -970,12 +973,17 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
                 if str(exc) != "held_position_mark_stale":
                     controller.stop = True
                     force_exit = True
-            if (strategy.started and not force_exit and time.monotonic() - last_reconciliation >= 30
+            if (strategy.started and not force_exit and time.monotonic() - last_reconciliation >= RECONCILE_EVERY_SECONDS
                     and not controller.ledger.unresolved() and not strategy.pending):
                 strategy.enabled = False
                 snapshot = await port.snapshot()
                 reconcile(controller.ledger, snapshot, baseline_cash)
-                if health.get("fresh_quotes") and hasattr(port, "mark_reconciled"):
+                # Re-read health after the snapshot await: a gap that arose meanwhile must
+                # stop the run, never be thawed by this periodic acknowledgement.
+                health = getattr(port, "health", {})
+                if any("stale" not in str(reason) for reason in health.get("reasons", [])):
+                    controller.stop = True
+                elif health.get("fresh_quotes") and hasattr(port, "mark_reconciled"):
                     port.mark_reconciled()
                 last_reconciliation = time.monotonic()
             # Boundary receipts (D6): independent of the 30s reconciliation
@@ -1062,7 +1070,10 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
         await port.stop()
     state = asdict(controller.ledger.accounting())
     is_flat = not controller.ledger.positions() and not controller.ledger.unresolved()
+    port_health = getattr(port, "health", {})
     outcome = {"engine": "NautilusTrader LiveNode 2.0.0rc5", "native_quotes": strategy.received_quotes,
+              "dropped_quotes": {"by_reason": {str(k): int(v) for k, v in port_health.get("dropped_quotes", {}).items()},
+                                 "by_symbol": {str(k): int(v) for k, v in port_health.get("dropped_quotes_by_symbol", {}).items()}},
               "native_fill_events": strategy.native_fills, "native_rejections": strategy.native_rejections,
               "policy_selections": strategy.policy.counts, "accounting": state,
               "reconciliation": reconciliation, "startup_reconciliation": session.reconciliation,
@@ -1510,6 +1521,10 @@ def main():
                 except Exception as exc:
                     outcome = {"status": "needs_attention", "flat": False, "native_fill_events": 0,
                                "error_type": type(exc).__name__}
+                    port_health = getattr(controller.port, "health", {})
+                    outcome["dropped_quotes"] = {
+                        "by_reason": {str(k): int(v) for k, v in port_health.get("dropped_quotes", {}).items()},
+                        "by_symbol": {str(k): int(v) for k, v in port_health.get("dropped_quotes_by_symbol", {}).items()}}
                 if ledger.positions() or ledger.unresolved():
                     controller.stop = True
                     # This CLI invocation cannot yet tell whether it is the

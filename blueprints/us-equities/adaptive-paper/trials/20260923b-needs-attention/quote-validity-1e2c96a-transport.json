@@ -1,0 +1,31 @@
+{
+  "kind": "streamed_quote_validity",
+  "feed": "sip",
+  "symbols": 24,
+  "window_seconds": 60.0,
+  "started_unix": 1790177627.096,
+  "transport_sha256": "fe10f01bfe05880da08625fb5280a26ca51d05cf2262687fb0cde1caa32af8c5",
+  "counts": {
+    "total": 51116,
+    "crossed": 1
+  },
+  "rejected_by_symbol": {
+    "META": 1
+  },
+  "examples": [
+    {
+      "S": "META",
+      "bp": 756.36,
+      "ap": 756.35,
+      "bs": 400,
+      "as": 80,
+      "bx": "Z",
+      "ax": "Q",
+      "c": [
+        "R"
+      ],
+      "z": "C",
+      "t": "Timestamp(seconds=1790177645, nanoseconds=851305172)"
+    }
+  ]
+}

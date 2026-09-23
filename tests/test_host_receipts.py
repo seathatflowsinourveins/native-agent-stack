@@ -1184,5 +1184,155 @@ class RegisterFileSortTests(unittest.TestCase):
         self.assertEqual(self._paths(), sorted(self._paths()))
 
 
+class QualifiedModelSchemaSyncTests(unittest.TestCase):
+    """adoption/host-receipt.schema.json qualified_models[] item required keys and result
+    enum must match the code's constants, the same way SchemaSyncTests covers the top-level
+    fields."""
+
+    def setUp(self):
+        self.schema = _load_schema()
+
+    def test_qualified_model_required_matches(self):
+        self.assertEqual(
+            set(self.schema["properties"]["qualified_models"]["items"]["required"]),
+            set(hr.QUALIFIED_MODEL_REQUIRED))
+
+    def test_qualified_model_result_enum_matches(self):
+        self.assertEqual(
+            set(self.schema["properties"]["qualified_models"]["items"]["properties"]["result"]["enum"]),
+            hr.QUALIFIED_MODEL_RESULTS)
+
+    def test_qualified_models_is_not_in_top_level_required(self):
+        # Optional field: a receipt with no local model qualification is still valid.
+        self.assertNotIn("qualified_models", self.schema["required"])
+
+
+class QualifiedModelRecordTests(unittest.TestCase):
+    """scripts/host_receipts.py record --qualified-model / --qualified-models-file."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.root = Path(self.tmp.name)
+        _init_support_tree(self.root)
+
+    def _record(self, extra_argv: list[str]) -> tuple[int, str]:
+        buffer = io.StringIO()
+        with contextlib.redirect_stdout(buffer):
+            exit_code = _run_cli([
+                "record", "--root", str(self.root),
+                "--host-id", "test-host-20260101",
+                "--platform-id", "linux-wsl2-x86_64",
+                "--component-id", "widget",
+                "--stage", "use",
+                "--evidence-class", "synthetic",
+                "--from-stack-commands",
+                *extra_argv,
+            ])
+        return exit_code, buffer.getvalue()
+
+    def test_qualified_model_flag_is_recorded_and_validates(self):
+        qm = json.dumps({
+            "model_id": "Qwen/Qwen3-8B-AWQ", "revision": "abc123", "runtime": "vllm",
+            "runtime_version": "0.9.0", "bars": "20/20 tool calls, 4/5 tasks", "result": "pass",
+        })
+        exit_code, output = self._record(["--qualified-model", qm])
+        self.assertEqual(exit_code, 0, output)
+        receipt = json.loads((self.root / output.strip()).read_text(encoding="utf-8"))
+        self.assertEqual(receipt["qualified_models"], [json.loads(qm)])
+
+        validate_buffer = io.StringIO()
+        with contextlib.redirect_stdout(validate_buffer):
+            validate_exit = hr.cmd_validate(argparse.Namespace(root=self.root))
+        self.assertEqual(validate_exit, 0, validate_buffer.getvalue())
+
+    def test_repeated_qualified_model_flags_accumulate(self):
+        qm1 = json.dumps({"model_id": "a", "revision": "r1", "runtime": "vllm", "runtime_version": "1",
+                          "bars": "bars", "result": "pass"})
+        qm2 = json.dumps({"model_id": "b", "revision": "r2", "runtime": "mlx-lm", "runtime_version": "2",
+                          "bars": "bars", "result": "fail"})
+        exit_code, output = self._record(["--qualified-model", qm1, "--qualified-model", qm2])
+        self.assertEqual(exit_code, 0, output)
+        receipt = json.loads((self.root / output.strip()).read_text(encoding="utf-8"))
+        self.assertEqual(len(receipt["qualified_models"]), 2)
+
+    def test_qualified_models_file_is_merged(self):
+        models_file = self.root / "models.json"
+        models_file.write_text(json.dumps([
+            {"model_id": "a", "revision": "r1", "runtime": "vllm", "runtime_version": "1",
+             "bars": "bars", "result": "pass"},
+        ]), encoding="utf-8")
+        exit_code, output = self._record(["--qualified-models-file", str(models_file)])
+        self.assertEqual(exit_code, 0, output)
+        receipt = json.loads((self.root / output.strip()).read_text(encoding="utf-8"))
+        self.assertEqual(len(receipt["qualified_models"]), 1)
+
+    def test_no_qualified_model_flag_omits_the_key(self):
+        exit_code, output = self._record([])
+        self.assertEqual(exit_code, 0, output)
+        receipt = json.loads((self.root / output.strip()).read_text(encoding="utf-8"))
+        self.assertNotIn("qualified_models", receipt)
+
+    def test_malformed_qualified_model_json_is_rejected(self):
+        exit_code, output = self._record(["--qualified-model", "{not json"])
+        self.assertEqual(exit_code, 2, output)
+
+    def test_qualified_model_missing_required_key_is_rejected(self):
+        qm = json.dumps({"model_id": "a", "revision": "r1", "runtime": "vllm"})  # no runtime_version/bars/result
+        exit_code, output = self._record(["--qualified-model", qm])
+        self.assertEqual(exit_code, 2, output)
+
+    def test_qualified_model_bad_result_is_rejected(self):
+        qm = json.dumps({"model_id": "a", "revision": "r1", "runtime": "vllm", "runtime_version": "1",
+                         "bars": "bars", "result": "maybe"})
+        exit_code, output = self._record(["--qualified-model", qm])
+        self.assertEqual(exit_code, 2, output)
+
+    def _record_without_from_stack_commands(self, extra_argv: list[str], marker: Path) -> tuple[int, str]:
+        """Like _record, but with an explicit --cmd (that would touch ``marker`` if it ran)
+        instead of --from-stack-commands, so a test can assert nothing executed."""
+        buffer = io.StringIO()
+        with contextlib.redirect_stdout(buffer):
+            exit_code = _run_cli([
+                "record", "--root", str(self.root),
+                "--host-id", "test-host-20260101",
+                "--platform-id", "linux-wsl2-x86_64",
+                "--component-id", "widget",
+                "--stage", "use",
+                "--evidence-class", "synthetic",
+                "--cmd", f"touch {marker}",
+                *extra_argv,
+            ])
+        return exit_code, buffer.getvalue()
+
+    def test_overlong_bars_is_rejected_before_any_command_runs(self):
+        # Every schema constraint (not just required keys and the result enum) must be
+        # checked up front: an over-length `bars` (schema maxLength 400) previously slipped
+        # past the CLI's own ad hoc check, ran the qualification command(s), and failed only
+        # at the pre-write validate_receipt_shape() call.
+        marker = self.root / "executed.marker"
+        qm = json.dumps({
+            "model_id": "a", "revision": "r1", "runtime": "vllm", "runtime_version": "1",
+            "bars": "x" * 401, "result": "pass",
+        })
+        exit_code, output = self._record_without_from_stack_commands(["--qualified-model", qm], marker)
+        self.assertEqual(exit_code, 2, output)
+        self.assertIn("checked before running any command", output)
+        self.assertFalse(marker.exists(), "the qualification command ran despite the invalid entry")
+
+    def test_result_as_a_list_is_rejected_without_crashing(self):
+        # `entry.get("result") not in {"pass", "fail"}` raises TypeError: unhashable type on
+        # a non-hashable value like a list; the schema-driven validator's equality-based enum
+        # check must reject this cleanly (exit 2, no traceback) and run nothing.
+        marker = self.root / "executed.marker"
+        qm = json.dumps({
+            "model_id": "a", "revision": "r1", "runtime": "vllm", "runtime_version": "1",
+            "bars": "bars", "result": [],
+        })
+        exit_code, output = self._record_without_from_stack_commands(["--qualified-model", qm], marker)
+        self.assertEqual(exit_code, 2, output)
+        self.assertFalse(marker.exists(), "the qualification command ran despite the invalid entry")
+
+
 if __name__ == "__main__":
     unittest.main()

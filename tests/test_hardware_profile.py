@@ -10,7 +10,13 @@ evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json, not
 asserted on here since it is host-dependent.
 """
 
+import argparse
+import contextlib
+import hashlib
+import io
 import json
+import os
+import tempfile
 from pathlib import Path
 import sys
 import unittest
@@ -300,6 +306,298 @@ class BuildReportOnRealPlatformSmokeTest(unittest.TestCase):
         self.assertEqual(report["schema"], "hardware-profile-report-v1")
         self.assertIn("workflow_concurrency_cap", report["recommended"])
         self.assertGreaterEqual(report["recommended"]["workflow_concurrency_cap"], 1)
+
+
+class ValidateHostsTests(unittest.TestCase):
+    """scripts/hardware_profile.py's hosts[] structural check, independent of --record-host."""
+
+    def test_real_shipped_hosts_pass(self):
+        profiles_path = ROOT / "adoption" / "hardware-profiles.json"
+        with profiles_path.open("r", encoding="utf-8") as handle:
+            profiles = json.load(handle)
+        self.assertEqual(hp.validate_hosts(profiles, ROOT), [])
+
+    def test_missing_required_key_is_an_error(self):
+        profiles = {"hosts": [{"id": "widget-20260101", "label": "x"}]}  # no evidence_class
+        errors = hp.validate_hosts(profiles)
+        self.assertTrue(any("missing required key" in e for e in errors))
+
+    def test_unknown_evidence_class_is_an_error(self):
+        profiles = {"hosts": [{"id": "widget-20260101", "label": "x", "evidence_class": "guess"}]}
+        errors = hp.validate_hosts(profiles)
+        self.assertTrue(any("evidence_class" in e for e in errors))
+
+    def test_duplicate_id_is_an_error(self):
+        profiles = {"hosts": [
+            {"id": "widget-projected", "label": "a", "evidence_class": "labelled_projection"},
+            {"id": "widget-projected", "label": "b", "evidence_class": "labelled_projection"},
+        ]}
+        errors = hp.validate_hosts(profiles)
+        self.assertTrue(any("duplicate id" in e for e in errors))
+
+    def test_projected_id_must_end_in_projected(self):
+        profiles = {"hosts": [{"id": "widget-workstation", "label": "x", "evidence_class": "labelled_projection"}]}
+        errors = hp.validate_hosts(profiles)
+        self.assertTrue(any("must end in '-projected'" in e for e in errors))
+
+    def test_measured_native_proven_id_must_match_yyyymmdd_convention(self):
+        profiles = {"hosts": [{
+            "id": "not-dated", "label": "x", "evidence_class": "native_proven",
+            "evidence": "evidence/artifacts/hw-profiles/not-dated/profile.json",
+        }]}
+        errors = hp.validate_hosts(profiles)
+        self.assertTrue(any("must match" in e for e in errors))
+
+    def test_native_proven_prose_evidence_is_not_held_to_the_measured_id_pattern(self):
+        # Mirrors the shipped github-macos-15-arm64-runner entry: native_proven, but its
+        # evidence is a citation, not a .json report path --record-host would write.
+        profiles = {"hosts": [{
+            "id": "github-macos-15-arm64-runner", "label": "x", "evidence_class": "native_proven",
+            "evidence": "GitHub Actions run 1 (some workflow): a citation, not a file path.",
+        }]}
+        self.assertEqual(hp.validate_hosts(profiles), [])
+
+    def test_measured_missing_evidence_file_is_an_error_when_root_given(self):
+        profiles = {"hosts": [{
+            "id": "widget-20260101", "label": "x", "evidence_class": "native_proven",
+            "evidence": "evidence/artifacts/hw-profiles/widget-20260101/profile.json",
+        }]}
+        with tempfile.TemporaryDirectory() as tmp:
+            errors = hp.validate_hosts(profiles, Path(tmp))
+        self.assertTrue(any("file not found" in e for e in errors))
+
+    def test_hosts_not_a_list_is_an_error(self):
+        self.assertEqual(hp.validate_hosts({"hosts": "nope"}), ["hosts: expected a list"])
+
+
+def _init_record_host_root(root: Path) -> None:
+    (root / "adoption").mkdir(parents=True)
+    (root / "adoption" / "hardware-profiles.json").write_text(
+        json.dumps(SYNTHETIC_PROFILES), encoding="utf-8")
+    (root / "manifests").mkdir()
+    (root / "manifests" / "evidence.json").write_text(
+        json.dumps({"schema_version": 1, "files": []}), encoding="utf-8")
+
+
+class RecordHostTests(unittest.TestCase):
+    """scripts/hardware_profile.py --record-host: the one thing this module writes."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.root = Path(self.tmp.name)
+        _init_record_host_root(self.root)
+
+    def _record(self, host_id="widget-laptop-20260101", label=None, build_report_return=None):
+        args = argparse.Namespace(record_host=host_id, label=label, root=self.root)
+        buffer = io.StringIO()
+        patched = build_report_return or {
+            "schema": "hardware-profile-report-v1", "profiles_source": "adoption/hardware-profiles.json",
+            "measured": {"cores": 8, "effective_ram_gb": 32.0, "evidence_class": "native_proven"},
+            "recommended": {"workflow_concurrency_cap": 6}, "limits": [],
+        }
+        with mock.patch.object(hp, "build_report", return_value=patched):
+            with contextlib.redirect_stdout(buffer):
+                exit_code = hp.cmd_record_host(args)
+        return exit_code, buffer.getvalue()
+
+    def test_rejects_malformed_host_id(self):
+        exit_code, output = self._record(host_id="not-a-valid-id")
+        self.assertEqual(exit_code, 2, output)
+
+    def test_rejects_a_host_id_containing_the_local_user_name(self):
+        # The id is published as is; one carrying the user name is refused up front with
+        # a clear reason, and nothing is written.
+        with mock.patch.dict(os.environ, {"USER": "ram", "LOGNAME": "ram"}):
+            exit_code, output = self._record(host_id="ramstation-20260101")
+        self.assertEqual(exit_code, 2, output)
+        self.assertIn("local user name", output)
+        self.assertFalse((self.root / "evidence" / "artifacts" / "hw-profiles" / "ramstation-20260101").exists())
+
+    def test_writes_registered_evidence_and_hosts_entry(self):
+        exit_code, output = self._record()
+        self.assertEqual(exit_code, 0, output)
+
+        evidence_path = self.root / "evidence" / "artifacts" / "hw-profiles" / "widget-laptop-20260101" / "profile.json"
+        self.assertTrue(evidence_path.is_file())
+        written = json.loads(evidence_path.read_text(encoding="utf-8"))
+        self.assertEqual(written["measured"]["cores"], 8)
+
+        evidence_manifest = json.loads((self.root / "manifests" / "evidence.json").read_text(encoding="utf-8"))
+        registered = {f["path"]: f for f in evidence_manifest["files"]}
+        relative = "evidence/artifacts/hw-profiles/widget-laptop-20260101/profile.json"
+        self.assertIn(relative, registered)
+        self.assertEqual(registered[relative]["sha256"], hashlib.sha256(evidence_path.read_bytes()).hexdigest())
+
+        profiles = json.loads((self.root / "adoption" / "hardware-profiles.json").read_text(encoding="utf-8"))
+        entry = next(h for h in profiles["hosts"] if h["id"] == "widget-laptop-20260101")
+        self.assertEqual(entry["evidence_class"], "native_proven")
+        self.assertEqual(entry["evidence"], relative)
+        self.assertEqual(hp.validate_hosts(profiles, self.root), [])
+
+    def test_rerecording_the_same_host_updates_in_place_without_duplicating(self):
+        self._record()
+        exit_code, output = self._record(label="Updated label")
+        self.assertEqual(exit_code, 0, output)
+        profiles = json.loads((self.root / "adoption" / "hardware-profiles.json").read_text(encoding="utf-8"))
+        matches = [h for h in profiles["hosts"] if h["id"] == "widget-laptop-20260101"]
+        self.assertEqual(len(matches), 1)
+        self.assertEqual(matches[0]["label"], "Updated label")
+
+    def test_existing_host_fields_are_preserved_across_a_rerecord(self):
+        self._record()
+        profiles = json.loads((self.root / "adoption" / "hardware-profiles.json").read_text(encoding="utf-8"))
+        entry = next(h for h in profiles["hosts"] if h["id"] == "widget-laptop-20260101")
+        entry["extra_field"] = "kept"
+        (self.root / "adoption" / "hardware-profiles.json").write_text(json.dumps(profiles), encoding="utf-8")
+
+        self._record()
+        profiles = json.loads((self.root / "adoption" / "hardware-profiles.json").read_text(encoding="utf-8"))
+        entry = next(h for h in profiles["hosts"] if h["id"] == "widget-laptop-20260101")
+        self.assertEqual(entry["extra_field"], "kept")
+
+    def test_personal_windows_path_in_measured_output_is_sanitized(self):
+        # Built from parts, never as one literal string: a literal personal-looking path in
+        # this test's own source would itself trip the repository's PRIVATE_CONTENT scan
+        # (see tests/test_host_receipts.py's home-path tests for the same technique).
+        a_personal_windows_path = "/" + "mnt" + "/" + "c" + "/" + "Users" + "/" + "realname" + "/" + ".wslconfig"
+        report = {
+            "schema": "hardware-profile-report-v1", "profiles_source": "adoption/hardware-profiles.json",
+            "measured": {"wslconfig_source": a_personal_windows_path, "evidence_class": "native_proven"},
+            "recommended": {}, "limits": [],
+        }
+        exit_code, output = self._record(build_report_return=report)
+        self.assertEqual(exit_code, 0, output)
+        evidence_path = self.root / "evidence" / "artifacts" / "hw-profiles" / "widget-laptop-20260101" / "profile.json"
+        text = evidence_path.read_text(encoding="utf-8")
+        self.assertNotIn("realname", text)
+        for _description, pattern in hp.PRIVATE_CONTENT:
+            self.assertIsNone(pattern.search(text))
+
+    def _seed_unrelated_host(self, entry: dict) -> None:
+        """Add a hosts[] entry that --record-host is not touching, so a test can assert it
+        comes out byte-identical (Codex review finding: sanitize() must scope to the new
+        entry, never run over the whole document)."""
+        path = self.root / "adoption" / "hardware-profiles.json"
+        profiles = json.loads(path.read_text(encoding="utf-8"))
+        profiles.setdefault("hosts", []).append(entry)
+        path.write_text(json.dumps(profiles, indent=2, ensure_ascii=False), encoding="utf-8")
+
+    def test_current_user_string_does_not_corrupt_unrelated_hosts_entries(self):
+        # A whole-document sanitize() would replace every occurrence of $USER, and $USER is
+        # often a short common word ("runner", "mac") that legitimately appears inside an
+        # unrelated entry's id/label/note -- exactly the shipped
+        # github-macos-15-arm64-runner entry's own id.
+        unrelated = {
+            "id": "github-macos-15-arm64-runner", "label": "GitHub-hosted macos-15 arm64 runner",
+            "evidence_class": "native_proven",
+            "evidence": "GitHub Actions run 1 (some workflow): a citation, not a file path.",
+        }
+        # "ram" and "max" (Codex review finding against 48471ea): both are substrings of real
+        # keys in this very document's own `layers.ecosystem_bounded_run`
+        # (max_fraction_of_ram, default_max_gb, ceiling_max_gb, high_to_max_ratio) -- a
+        # whole-document sanitize() renamed the key itself, so the *next* recommend() call
+        # raised KeyError instead of merely showing a cosmetic corruption.
+        for fake_user in ("runner", "mac", "ram", "max"):
+            with self.subTest(user=fake_user):
+                self.setUp()
+                self._seed_unrelated_host(dict(unrelated))
+                before = json.loads((self.root / "adoption" / "hardware-profiles.json").read_text(encoding="utf-8"))
+                before_entry = next(h for h in before["hosts"] if h["id"] == "github-macos-15-arm64-runner")
+
+                with mock.patch.dict("os.environ", {"USER": fake_user}, clear=False):
+                    exit_code, output = self._record()
+                self.assertEqual(exit_code, 0, output)
+
+                after = json.loads((self.root / "adoption" / "hardware-profiles.json").read_text(encoding="utf-8"))
+                after_entry = next(h for h in after["hosts"] if h["id"] == "github-macos-15-arm64-runner")
+                self.assertEqual(after_entry, before_entry, f"USER={fake_user} corrupted an unrelated hosts[] entry")
+
+                # The layers config itself (keys, not just the unrelated host entry) survives
+                # byte-for-byte, and a subsequent recommend() call over the on-disk document
+                # does not raise KeyError.
+                self.assertEqual(after["layers"], SYNTHETIC_PROFILES["layers"],
+                                 f"USER={fake_user} corrupted the layers config")
+                hp.recommend({"cores": 8, "effective_ram_gb": 32.0, "gpu": None}, after)
+
+    def test_new_report_and_entry_keys_survive_every_fake_user(self):
+        # The new report's and entry's OWN keys must never be renamed either -- not just
+        # unrelated pre-existing content. host_receipts.sanitize() over the *whole*
+        # serialized report/entry text previously renamed "effective_ram_gb" and
+        # "ram_gb_proc_meminfo" to "effective_<user>_gb"/"<user>_gb_proc_meminfo" under
+        # USER=ram, and the bare "gpu"/"cores" keys to "<user>" under USER=gpu/USER=cores --
+        # after which the grand list silently dropped RAM or cores for that host.
+        report = {
+            "schema": "hardware-profile-report-v1", "profiles_source": "adoption/hardware-profiles.json",
+            "measured": {
+                "cores": 8, "effective_ram_gb": 32.0, "ram_gb_proc_meminfo": 32.0,
+                "gpu": {"name": "synthetic-gpu", "vram_gb": 24.0}, "evidence_class": "native_proven",
+            },
+            "recommended": {"ecosystem_job_memory_max_gb": 6.0, "workflow_concurrency_cap": 6},
+            "limits": [],
+        }
+        for fake_user in ("ram", "max", "gpu", "cores", "runner", "mac"):
+            with self.subTest(user=fake_user):
+                self.setUp()
+                with mock.patch.dict("os.environ", {"USER": fake_user}, clear=False):
+                    exit_code, output = self._record(build_report_return=report)
+                self.assertEqual(exit_code, 0, output)
+
+                evidence_path = (self.root / "evidence" / "artifacts" / "hw-profiles"
+                                 / "widget-laptop-20260101" / "profile.json")
+                written = json.loads(evidence_path.read_text(encoding="utf-8"))
+                self.assertIn("cores", written["measured"], f"USER={fake_user} renamed 'cores'")
+                self.assertIn("effective_ram_gb", written["measured"], f"USER={fake_user} renamed 'effective_ram_gb'")
+                self.assertIn("ram_gb_proc_meminfo", written["measured"],
+                              f"USER={fake_user} renamed 'ram_gb_proc_meminfo'")
+                self.assertIn("gpu", written["measured"], f"USER={fake_user} renamed 'gpu'")
+                self.assertIn("vram_gb", written["measured"]["gpu"], f"USER={fake_user} renamed 'vram_gb'")
+                self.assertIn("ecosystem_job_memory_max_gb", written["recommended"],
+                              f"USER={fake_user} renamed 'ecosystem_job_memory_max_gb'")
+
+                profiles = json.loads((self.root / "adoption" / "hardware-profiles.json").read_text(encoding="utf-8"))
+                entry = next(h for h in profiles["hosts"] if h["id"] == "widget-laptop-20260101")
+                for key in ("id", "label", "evidence_class", "evidence", "note"):
+                    self.assertIn(key, entry, f"USER={fake_user} renamed entry key {key!r}")
+
+    def test_a_preserved_entry_key_colliding_with_user_survives_a_rerecord(self):
+        # A field kept from a prior entry (something this call never itself sets) must also
+        # keep its own key name across a re-record, even when it collides with $USER.
+        self._record()
+        profiles = json.loads((self.root / "adoption" / "hardware-profiles.json").read_text(encoding="utf-8"))
+        entry = next(h for h in profiles["hosts"] if h["id"] == "widget-laptop-20260101")
+        entry["sizing_arithmetic"] = {"ecosystem_job_memory_max_gb": "max(6, round(32*0.25,1)) = 8.0"}
+        (self.root / "adoption" / "hardware-profiles.json").write_text(json.dumps(profiles), encoding="utf-8")
+
+        with mock.patch.dict("os.environ", {"USER": "max"}, clear=False):
+            exit_code, output = self._record(label="re-recorded")
+        self.assertEqual(exit_code, 0, output)
+
+        profiles = json.loads((self.root / "adoption" / "hardware-profiles.json").read_text(encoding="utf-8"))
+        entry = next(h for h in profiles["hosts"] if h["id"] == "widget-laptop-20260101")
+        self.assertIn("ecosystem_job_memory_max_gb", entry["sizing_arithmetic"],
+                      "USER=max renamed a key preserved from the prior entry")
+
+    def test_validates_before_any_write_so_a_preexisting_bad_entry_blocks_cleanly(self):
+        # A structural error in a hosts[] entry this call never touches must still fail the
+        # whole record (validate_hosts checks the whole array) -- and must do so before any
+        # I/O, leaving no evidence file, no manifest registration and no changed
+        # hardware-profiles.json.
+        self._seed_unrelated_host({"id": "already-broken", "label": "x"})  # missing evidence_class
+
+        before_profiles_text = (self.root / "adoption" / "hardware-profiles.json").read_text(encoding="utf-8")
+        before_evidence_text = (self.root / "manifests" / "evidence.json").read_text(encoding="utf-8")
+
+        exit_code, output = self._record()
+        self.assertEqual(exit_code, 1, output)
+        self.assertIn("would not validate", output)
+
+        evidence_path = self.root / "evidence" / "artifacts" / "hw-profiles" / "widget-laptop-20260101" / "profile.json"
+        self.assertFalse(evidence_path.exists(), "a failed validation must not have written the evidence file")
+        self.assertEqual(
+            (self.root / "adoption" / "hardware-profiles.json").read_text(encoding="utf-8"), before_profiles_text)
+        self.assertEqual(
+            (self.root / "manifests" / "evidence.json").read_text(encoding="utf-8"), before_evidence_text)
 
 
 if __name__ == "__main__":

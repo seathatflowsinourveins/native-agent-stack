@@ -12,9 +12,10 @@ git clone https://github.com/seathatflowsinourveins/native-agent-stack.git
 cd native-agent-stack
 git checkout "$(python3 -c "import json;print(json.load(open('adoption/manifest.json'))['source']['release_tag'])")"
 ```
-This checks out `adoption/manifest.json` `source.release_tag`
-(`v2026.09.23`, or a later tag) at `source.release_commit`
-(`bdd04ca50eb781f8366c955f481479b7a7f57cbd`), published with SLSA build
+This checks out `adoption/manifest.json` `source.release_tag` (or a later
+tag) at the commit that tag names — read `source.release_commit` from the
+manifest you actually cloned rather than trusting a commit pasted into this
+prose, which a later re-pin would leave stale — published with SLSA build
 provenance by `.github/workflows/publish-catalog.yml`. Do **not** check out
 `source.baseline_commit`: that field records the parent publication
 immediately *before* this `adoption/` directory (and `tools/adoption/`) were

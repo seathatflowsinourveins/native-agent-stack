@@ -71,7 +71,8 @@ def _init_root(root: Path, layers: list[dict], *, catalog_file="foundation.json"
 def _receipt(component_id: str, platform_id: str, *, stage="use", result="pass",
              evidence_class="native_proven", reviewed=True, second_physical_machine=True,
              os_value: str | None = None, architecture: str | None = None, version="1.0.0",
-             reviewer="reviewer-session", review_verdict="agree", observed_at="2026-09-22T01:00:00Z") -> dict:
+             reviewer="reviewer-session", review_verdict="agree", observed_at="2026-09-22T01:00:00Z",
+             qualified_models: list | None = None) -> dict:
     """A fully schema-shape-valid receipt (host_receipts.validate_receipt_shape must pass
     it with no errors): scripts/host_receipts.py's build_summary only lets a
     result=pass/native_proven/independently-reviewed receipt into
@@ -112,6 +113,7 @@ def _receipt(component_id: str, platform_id: str, *, stage="use", result="pass",
         "limitations": ["test limitation"],
         "evidence_class": evidence_class,
         "reviews": reviews,
+        **({"qualified_models": qualified_models} if qualified_models else {}),
     }
 
 
@@ -434,6 +436,57 @@ class AlternativeAndDecisionJoinTests(unittest.TestCase):
             _init_root(root, [_layer()])
             document, _flip = cm.build_document(root)
             self.assertIsNone(document["rows"][0]["open_executable_now_gaps"])
+
+
+class QualifiedModelsSurfacingTests(unittest.TestCase):
+    """scripts/host_receipts.py record --qualified-model entries must surface per platform
+    on the runtime component's winner row, and never affect the flip rule."""
+
+    def test_qualified_model_surfaces_on_the_winner_platform(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            layer = _layer(winners=[_winner(component_id="vllm", linux="conditional", macos="untested")])
+            _init_root(root, [layer])
+            qm = [{"model_id": "Qwen/Qwen3-8B-AWQ", "revision": "abc123", "runtime": "vllm",
+                  "runtime_version": "0.9.0", "bars": "20/20 tool calls, 4/5 tasks", "result": "pass"}]
+            _write_receipt(root, _receipt("vllm", "linux-wsl2-x86_64", qualified_models=qm))
+
+            document, flip_violations = cm.build_document(root)
+            self.assertEqual(flip_violations, [])
+            winner = document["rows"][0]["winners"][0]
+            linux_qm = winner["platforms"]["linux-wsl2-x86_64"]["qualified_models"]
+            self.assertEqual(len(linux_qm), 1)
+            self.assertEqual(linux_qm[0]["model_id"], "Qwen/Qwen3-8B-AWQ")
+            self.assertEqual(linux_qm[0]["runtime"], "vllm")
+            self.assertEqual(linux_qm[0]["result"], "pass")
+            self.assertIn("host_id", linux_qm[0])
+            self.assertIn("receipt_path", linux_qm[0])
+            # Never on the platform it was not recorded for.
+            self.assertEqual(winner["platforms"]["macos-arm64"]["qualified_models"], [])
+
+    def test_no_qualified_models_yields_empty_list_not_missing_key(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            layer = _layer(winners=[_winner(component_id="vllm")])
+            _init_root(root, [layer])
+            _write_receipt(root, _receipt("vllm", "linux-wsl2-x86_64"))
+            document, _flip = cm.build_document(root)
+            winner = document["rows"][0]["winners"][0]
+            self.assertEqual(winner["platforms"]["linux-wsl2-x86_64"]["qualified_models"], [])
+
+    def test_shape_invalid_receipt_never_surfaces_a_qualified_model(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            layer = _layer(winners=[_winner(component_id="vllm")])
+            _init_root(root, [layer])
+            qm = [{"model_id": "Qwen/Qwen3-8B-AWQ", "revision": "abc123", "runtime": "vllm",
+                  "runtime_version": "0.9.0", "bars": "bars", "result": "pass"}]
+            receipt = _receipt("vllm", "linux-wsl2-x86_64", qualified_models=qm)
+            receipt["result"] = "not-a-known-result"  # shape-invalid: fails the schema's result enum
+            _write_receipt(root, receipt)
+            document, _flip = cm.build_document(root)
+            winner = document["rows"][0]["winners"][0]
+            self.assertEqual(winner["platforms"]["linux-wsl2-x86_64"]["qualified_models"], [])
 
 
 if __name__ == "__main__":
