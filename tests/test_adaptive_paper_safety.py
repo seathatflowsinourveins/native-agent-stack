@@ -17,7 +17,10 @@ s = importlib.util.module_from_spec(SPEC)
 sys.modules[SPEC.name] = s
 SPEC.loader.exec_module(s)
 
-from .adaptive_paper_hermetic import patch_default_stop, restore_default_stop  # noqa: E402
+try:  # package mode (python -m unittest tests.x) or discover -s tests (top-level modules)
+    from .adaptive_paper_hermetic import patch_default_stop, restore_default_stop
+except ImportError:
+    from adaptive_paper_hermetic import patch_default_stop, restore_default_stop  # noqa: E402
 
 _HERMETIC_TOKEN = None
 

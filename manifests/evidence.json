@@ -6430,8 +6430,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "8756a625d61ed4a3b00c9f4415bff9c5171240f0c1812fcd196bc7b2e226e5b7",
-      "bytes": 4661
+      "sha256": "a3d84da6cdc757d74cf8e22c08a3feb7bb7b035850a6cd74e7f5f478814c8d35",
+      "bytes": 4767
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/strategies.py",
@@ -14800,28 +14800,28 @@
     },
     {
       "path": "tests/test_adaptive_paper_native.py",
-      "sha256": "37f8025f798c01185dbc37faf19ec4b83881c6bad2422f2547f3ff32f195b6cc",
-      "bytes": 19664
+      "sha256": "7c97707a5c19b704be9a603bbde396d9cb952dad39ca0d5b434ae1f8ebbd1f81",
+      "bytes": 19874
     },
     {
       "path": "tests/test_adaptive_paper_recovery.py",
-      "sha256": "c75a26561d53ba9c85b8ae270f1d295187dee982754ddf21019e873e2f807965",
-      "bytes": 18629
+      "sha256": "45f75c608ae6ad3451871fb5f7221278e5dfe8243e488246e7ba357a64e315c8",
+      "bytes": 18825
     },
     {
       "path": "tests/test_adaptive_paper_runner.py",
-      "sha256": "4c379d6196a60a30bdc30eefbb9442b6539e54a7c8e8d72262650f5c91cfec3b",
-      "bytes": 132265
+      "sha256": "369be21319a33adeed4b55178679ed5a6dd5938fd7ce029e96d6efa5efad7ef2",
+      "bytes": 132475
     },
     {
       "path": "tests/test_adaptive_paper_safety.py",
-      "sha256": "186c322fcf96792730f2d6f4b97bc4a325a69c89152d4ccafae39e9d8166321e",
-      "bytes": 45454
+      "sha256": "8b3d962f955b65b89d4ca071b433c33aa7be37dad82fa82b06f3a1a9f6d4a82e",
+      "bytes": 45650
     },
     {
       "path": "tests/test_adaptive_paper_sessions.py",
-      "sha256": "acf764fd4d1828b7600c9688eb4131fa0c2c33161621eff698b52ebf95b45ddc",
-      "bytes": 94261
+      "sha256": "1569c44eb63ff35afee5503e867fa8927bee2179f23d7f627518d2e82bf38c0d",
+      "bytes": 94457
     },
     {
       "path": "tests/test_adaptive_paper_strategies.py",
@@ -15075,8 +15075,8 @@
     },
     {
       "path": "tests/test_native_faults_min.py",
-      "sha256": "cc0571da72819d225700bd63d258d97bd03b6807e826f8cd95cd639700478cc9",
-      "bytes": 21068
+      "sha256": "e84e8686918b94d741e70bdb669c3c29708c4f0adaffa3aa51a55c2715fc93a2",
+      "bytes": 21264
     },
     {
       "path": "tests/test_native_maintenance.py",

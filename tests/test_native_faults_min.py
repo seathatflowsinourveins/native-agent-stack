@@ -36,7 +36,10 @@ SPEC.loader.exec_module(h)
 import safety  # noqa: E402  (same module object the harness imported)
 from transport import TERMINAL, TransportError  # noqa: E402
 
-from .adaptive_paper_hermetic import patch_default_stop, restore_default_stop  # noqa: E402
+try:  # package mode (python -m unittest tests.x) or discover -s tests (top-level modules)
+    from .adaptive_paper_hermetic import patch_default_stop, restore_default_stop
+except ImportError:
+    from adaptive_paper_hermetic import patch_default_stop, restore_default_stop  # noqa: E402
 
 _HERMETIC_TOKEN = None
 
