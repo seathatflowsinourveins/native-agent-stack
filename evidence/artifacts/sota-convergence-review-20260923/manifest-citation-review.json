@@ -205,7 +205,7 @@
   ],
   "critic-citations": [
    "item 14 not returned by the reviewer",
-   "each finding's catalog and layer come from the layer its critic claim names, checked against the manifest's foundation[]/trading[] layer ids; a finding naming a card sets component and attaches to that card, one naming only a lane candidate sets repository and stays in citation_review.general",
+   "each finding's catalog and layer come from the layer its critic claim names, checked against the manifest's foundation[]/trading[] layer ids; a finding naming a card sets component and attaches to that card, one naming only a lane candidate sets repository (no component) and stays in citation_review.general, even when its claim quotes a card id (item 16 quotes 'the Dagu workflows'; the generator does not match a candidate-only finding against cards)",
    "citations.json split three rg patterns (items 3, 4 and 16) at the first '|'; evidence rejoins them and says so",
    "reviewer line numbers into catalogs/sota-convergence/manifest-20260923.json refer to its a275ebc revision and are published as JSON pointers qualified 'at a275ebc'; other checkout lines are qualified with the commit they were verified at; lines into the private <work-dir> JSON files are published as JSON pointers"
   ]

@@ -5333,15 +5333,6 @@
      "comparison_that_would_overturn": "See scheduling-supervision.",
      "citation_review": [
       {
-       "reviewer": "critic-citations",
-       "severity": "low",
-       "claim": "critic.uncited_claims[16] unsupported: Beyond recovery-portability: casey/just, 'Project scripts and the Dagu workflows already act as task runners', has no citation.",
-       "fix": "Cite a source for 'project scripts and the Dagu workflows already act as task runners' on the casey/just candidate (a Dagu workflow path that runs project scripts), or restate the gap as unverified; catalogs/landscape/foundation.json recovery-portability names only uv, Restic and mise.",
-       "file": null,
-       "line": null,
-       "evidence": "Reviewer citation (rg pattern rejoined at '|'; citations.json split it between citation and note): rg -n \"Project scripts and the Dagu workflows already act as task runners|task runner\" <checkout> -g '*.json' -g '*.md' \u2192 only self-referencing hit in catalogs/sota-convergence/manifest-20260923.json#/foundation/14/candidates/0/demonstrated_gap and #/critic/uncited_claims/16 at a275ebc and unrelated \"task runner\" role strings for `just`/`mise` in catalogs/us-equities/star-audit.json:912 at a275ebc; no source ties Dagu to replacing `just` as a task runner. foundation.json's recovery-portability layer entry (catalogs/landscape/foundation.json, layer_id recovery-portability) cites only uv/Restic/mise, never Dagu-as-task-runner."
-      },
-      {
        "reviewer": "foundationB",
        "severity": "medium",
        "claim": "The dagu rows still describe 2.17.0 as unqualified and propose rerunning the retry recipe on 2.17.0 as the overturn. That rerun is already recorded as a qualified native_proven receipt merged in #87, and the rows do not cite it.",
@@ -12555,6 +12546,18 @@
     "reviewer": "critic-citations"
    },
    {
+    "catalog": "foundation",
+    "layer": "recovery-portability",
+    "repository": "https://github.com/casey/just",
+    "severity": "low",
+    "file": null,
+    "line": null,
+    "claim": "critic.uncited_claims[16] unsupported: Beyond recovery-portability: casey/just, 'Project scripts and the Dagu workflows already act as task runners', has no citation.",
+    "evidence": "Reviewer citation (rg pattern rejoined at '|'; citations.json split it between citation and note): rg -n \"Project scripts and the Dagu workflows already act as task runners|task runner\" <checkout> -g '*.json' -g '*.md' \u2192 only self-referencing hit in catalogs/sota-convergence/manifest-20260923.json#/foundation/14/candidates/0/demonstrated_gap and #/critic/uncited_claims/16 at a275ebc and unrelated \"task runner\" role strings for `just`/`mise` in catalogs/us-equities/star-audit.json:912 at a275ebc; no source ties Dagu to replacing `just` as a task runner. foundation.json's recovery-portability layer entry (catalogs/landscape/foundation.json, layer_id recovery-portability) cites only uv/Restic/mise, never Dagu-as-task-runner.",
+    "fix": "Cite a source for 'project scripts and the Dagu workflows already act as task runners' on the casey/just candidate (a Dagu workflow path that runs project scripts), or restate the gap as unverified; catalogs/landscape/foundation.json recovery-portability names only uv, Restic and mise.",
+    "reviewer": "critic-citations"
+   },
+   {
     "catalog": "trading",
     "layer": "research-factors-ml",
     "repository": "https://github.com/JerBouma/FinanceToolkit",
@@ -13063,9 +13066,9 @@
    "findings_in_artifact": 47,
    "findings": 40,
    "out_of_scope": 7,
-   "attached": 36,
+   "attached": 35,
    "rows_flagged": 86,
-   "general": 4
+   "general": 5
   }
  }
 }

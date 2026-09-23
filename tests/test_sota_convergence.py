@@ -2197,6 +2197,39 @@ class CitationReviewOverlayTests(unittest.TestCase):
         self.assertNotIn("citation_review", components["widget-a"])
         self.assertEqual(manifest["citation_review"]["general"], [])
 
+    def test_a_candidate_only_finding_quoting_a_card_id_stays_in_general(self):
+        # Round-2 regression (critic.uncited_claims[16]): the finding names a
+        # lane candidate's repository (not a card in the layer) and has no
+        # component; its claim quotes a card id ("card-one") in passing.
+        # It must not attach to that card.
+        citation_review = {"findings": [{
+            "reviewer": "critic-citations", "catalog": "trading", "severity": "low",
+            "layer": "layer-b", "repository": "https://github.com/other/candidate, https://github.com/other/second",
+            "file": None, "line": None,
+            "claim": "Candidate other/candidate says card-one already covers this, uncited.",
+            "evidence": "...", "fix": "...",
+        }]}
+        manifest = self._build(citation_review)
+        entries = {e["id"]: e for e in manifest["trading"][0]["entries"]}
+        self.assertNotIn("citation_review", entries["card-one"])
+        self.assertEqual([f["claim"] for f in manifest["citation_review"]["general"]],
+                         ["Candidate other/candidate says card-one already covers this, uncited."])
+        self.assertEqual(manifest["counts"]["citation_review"], {
+            "findings_in_artifact": 1, "findings": 1, "out_of_scope": 0,
+            "attached": 0, "rows_flagged": 0, "general": 1,
+        })
+
+    def test_names_only_a_candidate_is_false_for_card_repositories_components_and_non_urls(self):
+        layer_row = {"layer": "l", "entries": [
+            {"id": "card-one", "repository": "https://github.com/Example/Shared-SDK"}]}
+        f = build_manifest_mod._names_only_a_candidate
+        self.assertTrue(f({"repository": "https://github.com/other/candidate"}, layer_row))
+        self.assertFalse(f({"repository": "https://github.com/example/shared-sdk.git"}, layer_row))
+        self.assertFalse(f({"repository": "https://github.com/other/candidate, https://github.com/example/shared-sdk"}, layer_row))
+        self.assertFalse(f({"repository": "https://github.com/other/candidate", "component": "card-one"}, layer_row))
+        self.assertFalse(f({"repository": "n/a (manifest-wide)"}, layer_row))
+        self.assertFalse(f({}, layer_row))
+
     def test_a_finding_naming_no_resolvable_row_goes_to_general_and_is_not_dropped(self):
         citation_review = {"findings": [{
             "reviewer": "foundationB", "catalog": "foundation", "severity": "low",

@@ -8034,8 +8034,8 @@
     },
     {
       "path": "catalogs/sota-convergence/manifest-20260923.json",
-      "sha256": "fcc24fe7435673e4ae699da5e938e4b8b4fca3f817a3adecbcfec2a55f7b9a12",
-      "bytes": 747816
+      "sha256": "af508c44366d965993bf8269d9f3152394ae53552455fb3616dd4599f67ec448",
+      "bytes": 747906
     },
     {
       "path": "catalogs/sota-convergence/sdk-runtime-coverage-20260922.json",
@@ -12409,8 +12409,8 @@
     },
     {
       "path": "evidence/artifacts/sota-convergence-review-20260923/manifest-citation-review.json",
-      "sha256": "7eec573f20a20296cfff118da795ca2f6ae005476cb65c8c9d85de388ad0583a",
-      "bytes": 86046
+      "sha256": "4905a791f7c0571659916daab4f149e7ee0c4cb4da50225ee6d0964447e9d635",
+      "bytes": 86206
     },
     {
       "path": "evidence/artifacts/sota-refresh-20260923/hw-profiles/README.md",
@@ -14349,8 +14349,8 @@
     },
     {
       "path": "tests/test_sota_convergence.py",
-      "sha256": "cda99bfb372a865afff4e4d59f9e39b12c74a796e8a4a550f5a0ad01d2072a30",
-      "bytes": 161718
+      "sha256": "cb197ddbe88b82bfc110bcf77da80ab59197f371407c93674643718b8469dcf1",
+      "bytes": 163940
     },
     {
       "path": "tests/test_spy_parity.py",
@@ -14424,8 +14424,8 @@
     },
     {
       "path": "tools/sota-convergence/build_manifest.py",
-      "sha256": "f2c00951e33226326043539d755670bedb6db4188934c08ebeda24836174c9c4",
-      "bytes": 97069
+      "sha256": "27bb9173a1257ece29d0eb9ab3d5e2845f1c88dad8128ddda4b683387f34e90b",
+      "bytes": 98814
     },
     {
       "path": "tools/sota-convergence/build_verdicts.py",

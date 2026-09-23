@@ -1239,6 +1239,26 @@ def _component_field_targets(finding: dict, rows: list) -> list:
     return targets
 
 
+def _names_only_a_candidate(finding: dict, layer_row: dict) -> bool:
+    """True when a finding carries no ``component`` field and its
+    ``repository`` field names one or more GitHub repositories, none of
+    which is the repository of a card in ``layer_row``: the finding then
+    reviews a lane candidate, not a manifest card, and belongs in
+    ``citation_review.general``. A finding with no GitHub slug in
+    ``repository`` (absent, "n/a", a bare card name) is not affected."""
+    if finding.get("component"):
+        return False
+    slugs = {
+        f"{owner}/{repo}".lower().removesuffix(".git")
+        for owner, repo in re.findall(r"github\.com/([\w.-]+)/([\w.-]+)", str(finding.get("repository") or ""))
+    }
+    if not slugs:
+        return False
+    cards = layer_row.get("components", layer_row.get("entries", []))
+    card_slugs = {github_repo_slug(c.get("repository")) for c in cards}
+    return not (slugs & card_slugs)
+
+
 def apply_citation_review(manifest: dict, citation_review_doc) -> None:
     """G6: overlay an independent citation review's findings onto the
     manifest rows they name, at ``manifest["citation_review"]``. Data only --
@@ -1267,6 +1287,10 @@ def apply_citation_review(manifest: dict, citation_review_doc) -> None:
     resolves to zero or more than one card this way, but carries its own
     ``component`` field, is attached to every card that field names in the
     layers its ``layer`` field names (``_component_field_targets``). A
+    finding with no ``component`` whose ``repository`` names only GitHub
+    repositories that are not cards in its layer reviews a lane candidate
+    (``_names_only_a_candidate``) and is not matched against cards at all,
+    so a card id quoted in its claim cannot attach it. A
     finding that still resolves to no card is not silently dropped: it is
     appended, unchanged, to ``manifest["citation_review"]["general"]``
     instead."""
@@ -1282,6 +1306,14 @@ def apply_citation_review(manifest: dict, citation_review_doc) -> None:
         candidate_layer_id = layer_field.split("/", 1)[0].strip()
         layer_row = next((r for r in rows if r["layer"] == candidate_layer_id), None)
         card = None
+        if layer_row is not None and _names_only_a_candidate(finding, layer_row):
+            # A finding whose repository names only lane candidates (no
+            # component, and no repository slug that is a card in this
+            # layer) reviews that candidate, not a card: its claim text
+            # may still name a card id in passing (critic.uncited_claims[16]
+            # names casey/just and quotes "the Dagu workflows"), which must
+            # not attach it to that card.
+            layer_row = None
         if layer_row is not None:
             haystack = " ".join(str(finding.get(f) or "") for f in ("repository", "claim")).lower()
             cards = layer_row.get("components", layer_row.get("entries", []))
