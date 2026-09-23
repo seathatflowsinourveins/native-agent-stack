@@ -1275,6 +1275,51 @@ class QualifiedModelRecordTests(unittest.TestCase):
         exit_code, output = self._record(["--qualified-model", qm])
         self.assertEqual(exit_code, 2, output)
 
+    def _record_without_from_stack_commands(self, extra_argv: list[str], marker: Path) -> tuple[int, str]:
+        """Like _record, but with an explicit --cmd (that would touch ``marker`` if it ran)
+        instead of --from-stack-commands, so a test can assert nothing executed."""
+        buffer = io.StringIO()
+        with contextlib.redirect_stdout(buffer):
+            exit_code = _run_cli([
+                "record", "--root", str(self.root),
+                "--host-id", "test-host-20260101",
+                "--platform-id", "linux-wsl2-x86_64",
+                "--component-id", "widget",
+                "--stage", "use",
+                "--evidence-class", "synthetic",
+                "--cmd", f"touch {marker}",
+                *extra_argv,
+            ])
+        return exit_code, buffer.getvalue()
+
+    def test_overlong_bars_is_rejected_before_any_command_runs(self):
+        # Every schema constraint (not just required keys and the result enum) must be
+        # checked up front: an over-length `bars` (schema maxLength 400) previously slipped
+        # past the CLI's own ad hoc check, ran the qualification command(s), and failed only
+        # at the pre-write validate_receipt_shape() call.
+        marker = self.root / "executed.marker"
+        qm = json.dumps({
+            "model_id": "a", "revision": "r1", "runtime": "vllm", "runtime_version": "1",
+            "bars": "x" * 401, "result": "pass",
+        })
+        exit_code, output = self._record_without_from_stack_commands(["--qualified-model", qm], marker)
+        self.assertEqual(exit_code, 2, output)
+        self.assertIn("checked before running any command", output)
+        self.assertFalse(marker.exists(), "the qualification command ran despite the invalid entry")
+
+    def test_result_as_a_list_is_rejected_without_crashing(self):
+        # `entry.get("result") not in {"pass", "fail"}` raises TypeError: unhashable type on
+        # a non-hashable value like a list; the schema-driven validator's equality-based enum
+        # check must reject this cleanly (exit 2, no traceback) and run nothing.
+        marker = self.root / "executed.marker"
+        qm = json.dumps({
+            "model_id": "a", "revision": "r1", "runtime": "vllm", "runtime_version": "1",
+            "bars": "bars", "result": [],
+        })
+        exit_code, output = self._record_without_from_stack_commands(["--qualified-model", qm], marker)
+        self.assertEqual(exit_code, 2, output)
+        self.assertFalse(marker.exists(), "the qualification command ran despite the invalid entry")
+
 
 if __name__ == "__main__":
     unittest.main()

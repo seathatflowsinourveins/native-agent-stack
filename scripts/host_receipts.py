@@ -582,14 +582,23 @@ def cmd_record(args: argparse.Namespace) -> int:
                 print("error: --qualified-models-file entries must be JSON objects")
                 return 2
             qualified_models.append(entry)
-    for entry in qualified_models:
-        missing = set(QUALIFIED_MODEL_REQUIRED) - entry.keys()
-        if missing:
-            print(f"error: qualified model entry missing key(s) {sorted(missing)}: {entry!r}")
-            return 2
-        if entry.get("result") not in QUALIFIED_MODEL_RESULTS:
-            print(f"error: qualified model entry result must be one of {sorted(QUALIFIED_MODEL_RESULTS)}: {entry!r}")
-            return 2
+    if qualified_models:
+        # Full schema validation (every constraint: required keys, type, enum, maxLength, ...)
+        # against the qualified_models[] item subschema, before anything below runs a single
+        # command. A hand-rolled subset check here previously let a too-long `bars` (or any
+        # other constraint this list did not name) through to run the commands and fail only
+        # afterward at the pre-write validate_receipt_shape() call; validating up front with
+        # the same schema-driven validator used everywhere else in this module means no
+        # constraint can be missed twice, and nothing executes for a malformed entry.
+        qualified_model_schema = (load_receipt_schema(root).get("properties", {})
+                                  .get("qualified_models", {}).get("items", {}))
+        for index, entry in enumerate(qualified_models):
+            entry_errors: list[str] = []
+            validate_against_schema(entry, qualified_model_schema, f"qualified_models[{index}]", entry_errors)
+            if entry_errors:
+                print("error: --qualified-model entry would not validate (checked before running any command): "
+                      + "; ".join(entry_errors))
+                return 2
 
     commands_to_run: list[str] = []
     if args.from_stack_commands:
