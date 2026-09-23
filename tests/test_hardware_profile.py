@@ -15,6 +15,7 @@ import contextlib
 import hashlib
 import io
 import json
+import os
 import tempfile
 from pathlib import Path
 import sys
@@ -403,6 +404,15 @@ class RecordHostTests(unittest.TestCase):
     def test_rejects_malformed_host_id(self):
         exit_code, output = self._record(host_id="not-a-valid-id")
         self.assertEqual(exit_code, 2, output)
+
+    def test_rejects_a_host_id_containing_the_local_user_name(self):
+        # The id is published as is; one carrying the user name is refused up front with
+        # a clear reason, and nothing is written.
+        with mock.patch.dict(os.environ, {"USER": "ram", "LOGNAME": "ram"}):
+            exit_code, output = self._record(host_id="ramstation-20260101")
+        self.assertEqual(exit_code, 2, output)
+        self.assertIn("local user name", output)
+        self.assertFalse((self.root / "evidence" / "artifacts" / "hw-profiles" / "ramstation-20260101").exists())
 
     def test_writes_registered_evidence_and_hosts_entry(self):
         exit_code, output = self._record()

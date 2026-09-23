@@ -447,6 +447,12 @@ def cmd_record_host(args: argparse.Namespace) -> int:
         print(f"error: --record-host {host_id!r} must match {MEASURED_HOST_ID_PATTERN.pattern!r} "
               "('<name>-<yyyymmdd>')")
         return 2
+    if host_receipts.sanitize(host_id) != host_id:
+        # The id is published as is, so it must not carry the local user name or home path;
+        # refuse up front with a clear reason instead of failing the id pattern after redaction.
+        print(f"error: --record-host {host_id!r} contains the local user name or a home path; "
+              "choose an id without it (the id is published in adoption/hardware-profiles.json)")
+        return 2
 
     profiles_path = root / "adoption" / "hardware-profiles.json"
     profiles = _load_profiles(profiles_path)
