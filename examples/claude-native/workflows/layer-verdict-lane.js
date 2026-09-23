@@ -3,10 +3,10 @@ export const meta = {
   description: 'Run the Claude lane of the layer-verdict convergence: for every stripped layer packet an Opus proposer selects the winner set on retained evidence, two Opus refuters (evidence lens, challenger lens) attack it, one revision round follows any refutation or major finding and both lenses re-check the revision; a layer seals a final object only when both votes on it returned and neither refuted it, otherwise final is null and refutation.status says refuted or unknown; the script writes nothing and never promotes a candidate - the record tool applies the rules',
   whenToUse: 'After tools/sota-convergence/lane_packets.py wrote the packets: args = {repo: "<catalog checkout>", packets: [{catalog, layer_id, path, sha256}], prompt: "<lane-prompt.md text with {PACKET_PATH} {REPO_ROOT} {LANE} placeholders>", model?: {name: "opus", effort: "high"} (optional; a different value is logged and returned as caller_model, never applied, because every agent() call binds that literal)}',
   phases: [
-    { title: 'Propose', detail: 'semantic-evidence-reviewer per packet, Opus high, Read/Glob/Grep only', model: 'opus' },
-    { title: 'Refute', detail: 'evidence lens + challenger lens per proposal, semantic-evidence-reviewer, Opus high, Read/Glob/Grep only', model: 'opus' },
+    { title: 'Propose', detail: 'blind-lane-reviewer per packet, Opus high, Read/Glob/Grep only, no skills or project instructions', model: 'opus' },
+    { title: 'Refute', detail: 'evidence lens + challenger lens per proposal, blind-lane-reviewer, Opus high', model: 'opus' },
     { title: 'Revise', detail: 'one revision when any lens refutes or reports a major finding, Opus high', model: 'opus' },
-    { title: 'Re-check', detail: 'evidence lens + challenger lens re-check the revision, semantic-evidence-reviewer, Opus high, Read/Glob/Grep only', model: 'opus' },
+    { title: 'Re-check', detail: 'evidence lens + challenger lens re-check the revision, blind-lane-reviewer, Opus high', model: 'opus' },
   ],
 }
 const a = args && typeof args === 'object' ? args : {}
@@ -33,8 +33,10 @@ const PACKET = [
   'Context lanes, limited to the tools your role has (load a deferred one with ToolSearch "select:<tool name>" before calling it; skip lanes your role lacks): focused rg/Read or Serena for known symbols/references, SocratiCode for conceptual code, jCodeMunch for indexed retrieval, scoped qmd search for Markdown, ai-memory query for prior decisions, Context Mode ctx_execute for large outputs; one lane per artifact, and open the original source before judging retrieved text.',
 ].join(' ')
 // The shared PACKET above is byte-identical across saved workflows (contract suite). This lane adds a blind
-// rule after it: every agent here is Read/Glob/Grep only, and memory stores, code indexes, git history and
-// other checkouts can carry the verdict the lane must reach on the retained evidence alone.
+// rule after it. Every agent here is blind-lane-reviewer: Read/Glob/Grep only, no preloaded skill (a skill can be
+// a candidate, as typesafe-ai is in instructions-skills) and no project instructions (omitClaudeMd; agent-lab's
+// AGENTS.md names incumbent selections). Memory stores, code indexes, git history and other checkouts can carry
+// the verdict the lane must reach on the retained evidence alone.
 const BLIND = 'Blind lane: this rule overrides the context lanes above. Use only Read, Glob and Grep on the packet and on files under the repository root. Do not query memory stores, code indexes, git history or the web, and do not open another checkout or work directory.'
 const ALT = { type: 'object', properties: { key: { type: ['string', 'null'] }, name: { type: 'string' }, repository: { type: 'string', pattern: '^https://[^ ;,]+$' }, disposition: { type: 'string', enum: ['selected', 'observed_failure', 'measured_tradeoff', 'overlap', 'out_of_scope', 'unqualified', 'conditional'] }, why_not_default: { type: 'string' }, evidence_class: { type: 'string', enum: ['native_proven', 'local_integration', 'synthetic', 'source_review', 'measured_comparison'] }, evidence_refs: { type: 'array', items: { type: 'string' } } }, required: ['key', 'name', 'repository', 'disposition', 'why_not_default', 'evidence_class', 'evidence_refs'] }
 const LANE_RETURN = { type: 'object', properties: {
@@ -60,7 +62,7 @@ const LENSES = ['evidence', 'challenger']
 // lacks a boolean `refuted` is kept as refuted: null, so a lost refuter reads as unknown, never as unrefuted.
 const refute = async (p, subject, round) => {
   const got = await parallel(LENSES.map((lens) => () =>
-    agent(lensPrompt(p, subject, lens), { label: (round === 'revision' ? 'refute:recheck:' : 'refute:') + `${lens}:${p.catalog}/${p.layer_id}`, phase: round === 'revision' ? 'Re-check' : 'Refute', agentType: 'semantic-evidence-reviewer', model: 'opus', effort: 'high', schema: VOTE }).catch(() => null)))
+    agent(lensPrompt(p, subject, lens), { label: (round === 'revision' ? 'refute:recheck:' : 'refute:') + `${lens}:${p.catalog}/${p.layer_id}`, phase: round === 'revision' ? 'Re-check' : 'Refute', agentType: 'blind-lane-reviewer', model: 'opus', effort: 'high', schema: VOTE }).catch(() => null)))
   return LENSES.map((lens, i) => {
     const v = Array.isArray(got) ? got[i] : null
     return v && typeof v === 'object' && typeof v.refuted === 'boolean' ? { ...v, lens, round } : { lens, round, refuted: null, reason: 'no vote returned', findings: [], paths_checked: [] }
@@ -77,14 +79,14 @@ const layer = (p, proposal, votes, revised, revisionVotes, final, finalSource, s
   refutation: { status, final_source: finalSource, proposal_status: votes.length ? roundStatus(votes) : null, revision_status: revisionVotes.length ? roundStatus(revisionVotes) : null, votes: summary([...votes, ...revisionVotes]) },
 })
 const chain = async (p) => {
-  const proposal = await agent(PACKET + '\n' + BLIND + '\n' + fill(p) + fixed(p), { label: `propose:${p.catalog}/${p.layer_id}`, phase: 'Propose', agentType: 'semantic-evidence-reviewer', model: 'opus', effort: 'high', schema: LANE_RETURN })
+  const proposal = await agent(PACKET + '\n' + BLIND + '\n' + fill(p) + fixed(p), { label: `propose:${p.catalog}/${p.layer_id}`, phase: 'Propose', agentType: 'blind-lane-reviewer', model: 'opus', effort: 'high', schema: LANE_RETURN })
   if (!proposal) return layer(p, null, [], null, [], null, null, 'unknown')
   const votes = await refute(p, proposal, 'proposal')
   const first = roundStatus(votes)
   const majors = votes.flatMap((v) => (v.findings || []).filter((f) => f && f.severity !== 'minor'))
   // No refutation and no major finding: the proposal is final only when both votes returned.
   if (first !== 'refuted' && !majors.length) return layer(p, proposal, votes, null, [], first === 'unrefuted' ? proposal : null, first === 'unrefuted' ? 'proposal' : null, first)
-  const revised = await agent(PACKET + '\n' + BLIND + '\n' + fill(p) + fixed(p) + `\nThis is the revision round. Your earlier proposal was: ${JSON.stringify(proposal)}. Independent refuters found: ${JSON.stringify(votes)}. Resolve every blocking and major finding by re-reading the cited evidence; keep what the evidence supports, drop or correct what it does not, and add what was missing. Return the complete revised object.`, { label: `propose:revise:${p.catalog}/${p.layer_id}`, phase: 'Revise', agentType: 'semantic-evidence-reviewer', model: 'opus', effort: 'high', schema: LANE_RETURN })
+  const revised = await agent(PACKET + '\n' + BLIND + '\n' + fill(p) + fixed(p) + `\nThis is the revision round. Your earlier proposal was: ${JSON.stringify(proposal)}. Independent refuters found: ${JSON.stringify(votes)}. Resolve every blocking and major finding by re-reading the cited evidence; keep what the evidence supports, drop or correct what it does not, and add what was missing. Return the complete revised object.`, { label: `propose:revise:${p.catalog}/${p.layer_id}`, phase: 'Revise', agentType: 'blind-lane-reviewer', model: 'opus', effort: 'high', schema: LANE_RETURN })
   const revisionVotes = revised ? await refute(p, revised, 'revision') : []
   const second = revised ? roundStatus(revisionVotes) : null
   if (second === 'unrefuted') return layer(p, proposal, votes, revised, revisionVotes, revised, 'revision', 'unrefuted')
