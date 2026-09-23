@@ -6430,8 +6430,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "fbe08571a958642ec4b158b2c2a83f9cff1cd1ce118137837184b47c731eca19",
-      "bytes": 4661
+      "sha256": "a3d84da6cdc757d74cf8e22c08a3feb7bb7b035850a6cd74e7f5f478814c8d35",
+      "bytes": 4767
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/strategies.py",
@@ -14734,6 +14734,11 @@
       "bytes": 0
     },
     {
+      "path": "tests/adaptive_paper_hermetic.py",
+      "sha256": "34f2d5b07f42cb60d415abf24e4feef64b9088d1071163ab8427f0d958ebf7ee",
+      "bytes": 4061
+    },
+    {
       "path": "tests/fixtures/host-receipts/home-path-in-excerpt.json",
       "sha256": "ca1f6125a57e5095c729410e445f279f674231ed1f379621ffa5c0fafea38f8a",
       "bytes": 1086
@@ -14795,23 +14800,28 @@
     },
     {
       "path": "tests/test_adaptive_paper_native.py",
-      "sha256": "ef22d629740344962639d7c4ec8424dfa65c7202b7a0e871d7753b73c50ac398",
-      "bytes": 19404
+      "sha256": "7c97707a5c19b704be9a603bbde396d9cb952dad39ca0d5b434ae1f8ebbd1f81",
+      "bytes": 19874
     },
     {
       "path": "tests/test_adaptive_paper_recovery.py",
-      "sha256": "fb2997f89293ec7e6de8436cec6f79d1948aa44fe3ee6c64f02cf4341650509c",
-      "bytes": 18355
+      "sha256": "45f75c608ae6ad3451871fb5f7221278e5dfe8243e488246e7ba357a64e315c8",
+      "bytes": 18825
     },
     {
       "path": "tests/test_adaptive_paper_runner.py",
-      "sha256": "e16392b12dc33e9af661c265f6125c39572a3ef526dbd6d88e889faa5d8f4878",
-      "bytes": 131943
+      "sha256": "369be21319a33adeed4b55178679ed5a6dd5938fd7ce029e96d6efa5efad7ef2",
+      "bytes": 132475
     },
     {
       "path": "tests/test_adaptive_paper_safety.py",
-      "sha256": "7d0cc648452d0c832ebee67b759018ff64a851f4386112c79577e9758b9f6cc2",
-      "bytes": 45179
+      "sha256": "8b3d962f955b65b89d4ca071b433c33aa7be37dad82fa82b06f3a1a9f6d4a82e",
+      "bytes": 45650
+    },
+    {
+      "path": "tests/test_adaptive_paper_sessions.py",
+      "sha256": "1569c44eb63ff35afee5503e867fa8927bee2179f23d7f627518d2e82bf38c0d",
+      "bytes": 94457
     },
     {
       "path": "tests/test_adaptive_paper_strategies.py",
@@ -15065,8 +15075,8 @@
     },
     {
       "path": "tests/test_native_faults_min.py",
-      "sha256": "c19749376223934720fbf1a4e77b8171f4c25dac46305686f31c6b307aa549ea",
-      "bytes": 20792
+      "sha256": "e84e8686918b94d741e70bdb669c3c29708c4f0adaffa3aa51a55c2715fc93a2",
+      "bytes": 21264
     },
     {
       "path": "tests/test_native_maintenance.py",

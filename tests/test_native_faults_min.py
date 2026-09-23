@@ -36,6 +36,23 @@ SPEC.loader.exec_module(h)
 import safety  # noqa: E402  (same module object the harness imported)
 from transport import TERMINAL, TransportError  # noqa: E402
 
+try:  # package mode (python -m unittest tests.x) or discover -s tests (top-level modules)
+    from .adaptive_paper_hermetic import patch_default_stop, restore_default_stop
+except ImportError:
+    from adaptive_paper_hermetic import patch_default_stop, restore_default_stop  # noqa: E402
+
+_HERMETIC_TOKEN = None
+
+
+def setUpModule():
+    global _HERMETIC_TOKEN
+    _HERMETIC_TOKEN = patch_default_stop(h)
+
+
+def tearDownModule():
+    restore_default_stop(_HERMETIC_TOKEN)
+
+
 KEY, SECRET = "PKFAKEKEYVALUE0001", "fakesecretvalue0002"
 ACCOUNT_ID = "acct-identity-should-never-appear"
 

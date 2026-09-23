@@ -23,6 +23,23 @@ from transport import normalize_quote, normalize_trading_status  # noqa: E402
 from runner import Controller, validate_preflight  # noqa: E402
 from sessions import extended_session_close  # noqa: E402
 
+try:  # package mode (python -m unittest tests.x) or discover -s tests (top-level modules)
+    from .adaptive_paper_hermetic import patch_default_stop, restore_default_stop
+except ImportError:
+    from adaptive_paper_hermetic import patch_default_stop, restore_default_stop  # noqa: E402
+
+_HERMETIC_TOKEN = None
+
+
+def setUpModule():
+    global _HERMETIC_TOKEN
+    _HERMETIC_TOKEN = patch_default_stop()
+
+
+def tearDownModule():
+    restore_default_stop(_HERMETIC_TOKEN)
+
+
 NY = ZoneInfo("America/New_York")
 
 NATIVE = importlib.util.find_spec("nautilus_trader") is not None
