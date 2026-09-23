@@ -37,20 +37,27 @@ sys.path.insert(0, str(HERE))
 TOLERANCE_USD = D("0.01")
 
 
+TERMINAL = ("filled", "canceled", "expired", "rejected")
+
+
 def external_fills(orders, known_ids):
-    """Filled broker orders the ledger does not know, as record_external_fills input."""
+    """Every broker order the ledger does not know, filled or not, as record_external_fills
+    input; the unfilled ones are booked too so later broker history recognises them."""
     fills = []
     for o in orders:
-        qty = D(str(o["filled_qty"] or 0))
-        if o["client_order_id"] in known_ids or qty <= 0:
+        if o["client_order_id"] in known_ids:
             continue
+        if o["status"] not in TERMINAL:
+            raise SystemExit("an external order is not terminal; the account is not settled")
+        qty = D(str(o["filled_qty"] or 0))
         fills.append({"client_order_id": o["client_order_id"], "symbol": o["symbol"], "side": o["side"],
-                      "qty": str(qty), "price": str(o["filled_avg_price"]), "filled_at": str(o["filled_at"])})
+                      "qty": str(qty), "price": str(o["filled_avg_price"]) if qty else None,
+                      "filled_at": str(o["filled_at"] or o["updated_at"])})
     return fills
 
 
 def fills_cash(fills):
-    return sum((D(f["qty"]) * D(f["price"]) * (1 if f["side"] == "sell" else -1) for f in fills), D(0))
+    return sum((D(f["qty"]) * D(f["price"]) * (1 if f["side"] == "sell" else -1) for f in fills if D(f["qty"])), D(0))
 
 
 def prefix_counts(fills):
@@ -73,12 +80,13 @@ def _broker_orders(key, secret, since):
         raise SystemExit("more than 500 orders since --since: narrow the window")
     return [{"client_order_id": o.client_order_id, "symbol": o.symbol, "side": o.side.value,
              "status": o.status.value, "filled_qty": o.filled_qty, "filled_avg_price": o.filled_avg_price,
-             "filled_at": o.filled_at.isoformat() if o.filled_at else None} for o in rows]
+             "filled_at": o.filled_at.isoformat() if o.filled_at else None,
+             "updated_at": o.updated_at.isoformat() if o.updated_at else None} for o in rows]
 
 
 def main(argv=None):
     from runner import credentials, load_config
-    from safety import DEFAULT_STOP, Ledger, account_lock_fingerprint
+    from safety import DEFAULT_STOP, Ledger, SafetyError, account_lock_fingerprint
     from transport import preflight
 
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
@@ -109,6 +117,8 @@ def main(argv=None):
             raise SystemExit("the ledger's last trial is not finished; recover it first")
         since = datetime.fromtimestamp(meta["started_at"], timezone.utc)
         receipt["since"] = since.isoformat()
+        if not (state_dir / "ledger.sqlite3").is_file():
+            raise SystemExit("no durable ledger at the state root")
         ledger = Ledger(state_dir / "ledger.sqlite3", risk)
         try:
             known = ledger.known_client_ids()
@@ -116,7 +126,8 @@ def main(argv=None):
             cash = fills_cash(fills)
             before = ledger.accounting()
             gap, ok = reconciles(observation["account"]["cash"], meta["baseline_cash"], before.cash_delta_usd, cash)
-            receipt.update(external_fills=len(fills), external_prefixes=prefix_counts(fills), external_cash_usd=str(cash),
+            receipt.update(external_orders=len(fills), external_fills=sum(1 for f in fills if D(f["qty"])),
+                           external_prefixes=prefix_counts(fills), external_cash_usd=str(cash),
                            cash_gap_before_usd=str(gap), reconciles_with_external=ok and receipt["broker_flat"],
                            ledger_trial_phase=meta.get("phase"), ledger_realized_loss_before=str(before.cumulative_realized_loss_usd))
             code = 0 if receipt["reconciles_with_external"] else 3
@@ -126,7 +137,13 @@ def main(argv=None):
                 elif not fills:
                     receipt["refused"] = "nothing_to_apply"
                 else:
-                    result = ledger.record_external_fills(fills, time.time(), a.reference)
+                    try:
+                        result = ledger.record_external_fills(fills, time.time(), a.reference)
+                    except SafetyError as exc:
+                        receipt["refused"] = str(exc)
+                        result = None
+                        code = 3
+                if receipt.get("refused") is None:
                     after = ledger.accounting()
                     gap_after, ok_after = reconciles(observation["account"]["cash"], meta["baseline_cash"],
                                                      after.cash_delta_usd, D(0))

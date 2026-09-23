@@ -651,6 +651,8 @@ def reconcile(ledger, snapshot, baseline_cash):
     seen = set()
     for order in snapshot["orders"]:
         cid = order["client_order_id"]
+        if cid not in intents and ledger.external_order_matches(order):
+            continue  # booked by consolidate_external.py; history only
         if cid not in intents:
             raise SafetyError("external_order_detected")
         intent = intents[cid]
@@ -747,6 +749,8 @@ class Controller:
 
     def observe(self, order):
         known = {i.client_id for i in self.ledger.intents()}
+        if order["client_order_id"] not in known and self.ledger.external_order_matches(order):
+            return  # booked by consolidate_external.py; history only
         if order["client_order_id"] not in known:
             self.stop = True
             self.ledger.freeze("external_order_detected")

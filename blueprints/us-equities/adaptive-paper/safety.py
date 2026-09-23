@@ -962,16 +962,20 @@ class Ledger:
             return True
 
     def record_external_fills(self, fills, now, reference):
-        """Book same-account fills that were made outside this ledger (for example a trial
-        run in a separate state root) so this ledger's cash, realized P&L and realized loss
-        match the broker under its own frozen limits.
+        """Book same-account broker orders that were made outside this ledger (for example
+        a trial run in a separate state root) so this ledger's cash, realized P&L and
+        realized loss match the broker under its own frozen limits.
 
-        Refuses unless this ledger is flat with no open intent, every fill is a positive
-        whole-share quantity at a positive price, no client id is already known here or
-        already consolidated, and the batch closes every position it opens (no residual
-        or short). Losses count against realized_loss exactly as record_order counts them
-        (per closing fill, average cost). Append-only: one external_fills_consolidated
-        event keeps every fill. The caller proves broker flat and the cash gap first."""
+        ``fills`` lists every such terminal broker order, including ones that filled
+        nothing (qty 0), so later broker history can recognise all of them (see
+        ``external_order_matches``). Refuses unless this ledger is flat with no open
+        intent, every row is a whole-share quantity (a positive price when filled), no
+        client id is already known here or already booked, and the batch closes every
+        position it opens (no residual or short). Each fill updates cash, realized P&L and
+        realized loss and refreshes risk exactly as record_order does (average cost, loss
+        per closing fill, peak tracked per fill). Append-only: one
+        external_fills_consolidated event keeps every row. The caller proves broker flat
+        and the cash gap first."""
         now = instant(now)
         if type(reference) is not str or not reference or len(reference) > 200:
             raise SafetyError("external_reference_required")
@@ -980,51 +984,68 @@ class Ledger:
         with self._transaction():
             if self._positions() or any(r["status"] not in TERMINAL for r in self.db.execute("SELECT status FROM intents")):
                 raise SafetyError("external_consolidation_requires_flat_ledger")
-            known = {r[0] for r in self.db.execute("SELECT client_id FROM intents")} | self._external_ids()
+            known = {r[0] for r in self.db.execute("SELECT client_id FROM intents")} | set(self._external_orders())
             book, cash, realized, loss, recorded, ids = {}, ZERO, ZERO, ZERO, [], set()
             for f in sorted(fills, key=lambda item: (str(item["filled_at"]), str(item["client_order_id"]))):
                 cid, side, symbol = str(f["client_order_id"]), str(f["side"]), str(f["symbol"])
-                qty, price = D(str(f["qty"])), D(str(f["price"]))
+                qty = D(str(f["qty"]))
                 if cid in known or cid in ids:
                     raise SafetyError("external_fill_already_known")
-                if side not in ("buy", "sell") or not qty.is_finite() or qty <= 0 or qty != qty.to_integral_value() \
-                        or not price.is_finite() or price <= 0:
+                if side not in ("buy", "sell") or not qty.is_finite() or qty < 0 or qty != qty.to_integral_value():
                     raise SafetyError("external_fill_invalid")
                 ids.add(cid)
-                held, cost = book.get(symbol, (ZERO, ZERO))
-                if side == "buy":
-                    book[symbol] = (held + qty, cost + qty * price)
-                    cash -= qty * price
-                else:
-                    if qty > held:
-                        raise SafetyError("external_fill_would_make_short_position")
-                    basis = cost / held * qty
-                    r = qty * price - basis
-                    book[symbol] = (held - qty, cost - basis if held - qty else ZERO)
-                    cash, realized, loss = cash + qty * price, realized + r, loss + max(ZERO, -r)
-                recorded.append({"client_order_id": cid, "symbol": symbol, "side": side, "qty": str(qty),
-                                 "price": str(price), "filled_at": str(f["filled_at"])})
+                row = {"client_order_id": cid, "symbol": symbol, "side": side, "qty": str(qty),
+                       "price": None, "filled_at": str(f["filled_at"])}
+                if qty:
+                    price = D(str(f["price"]))
+                    if not price.is_finite() or price <= 0:
+                        raise SafetyError("external_fill_invalid")
+                    held, cost = book.get(symbol, (ZERO, ZERO))
+                    if side == "buy":
+                        book[symbol] = (held + qty, cost + qty * price)
+                        step_cash, step_realized = -qty * price, ZERO
+                    else:
+                        if qty > held:
+                            raise SafetyError("external_fill_would_make_short_position")
+                        basis = cost / held * qty
+                        step_cash, step_realized = qty * price, qty * price - basis
+                        book[symbol] = (held - qty, cost - basis if held - qty else ZERO)
+                    cash, realized, loss = cash + step_cash, realized + step_realized, loss + max(ZERO, -step_realized)
+                    self._set("cash_delta", D(self._get("cash_delta")) + step_cash)
+                    self._set("realized", D(self._get("realized")) + step_realized)
+                    self._set("realized_loss", D(self._get("realized_loss")) + max(ZERO, -step_realized))
+                    self._refresh_risk(now)
+                    row["price"] = str(price)
+                recorded.append(row)
             if any(held for held, _ in book.values()):
                 raise SafetyError("external_fills_leave_open_position")
-            self._set("cash_delta", D(self._get("cash_delta")) + cash)
-            self._set("realized", D(self._get("realized")) + realized)
-            self._set("realized_loss", D(self._get("realized_loss")) + loss)
             self._event("external_fills_consolidated", reference=reference, at=now, fills=recorded,
                         cash_delta=cash, realized=realized, realized_loss=loss)
-            self._refresh_risk(now)
-            return {"fills": len(recorded), "cash_delta": str(cash), "realized": str(realized),
-                    "realized_loss": str(loss), "halted_reason": self._get("halted_reason")}
+            return {"orders": len(recorded), "fills": sum(1 for r in recorded if r["price"] is not None),
+                    "cash_delta": str(cash), "realized": str(realized), "realized_loss": str(loss),
+                    "halted_reason": self._get("halted_reason")}
 
-    def _external_ids(self):
-        ids = set()
+    def _external_orders(self):
+        orders = {}
         for row in self.db.execute("SELECT payload FROM events WHERE kind='external_fills_consolidated'"):
-            ids |= {f["client_order_id"] for f in json.loads(row[0]).get("fills", [])}
-        return ids
+            for f in json.loads(row[0]).get("fills", []):
+                orders[f["client_order_id"]] = f
+        return orders
 
     def known_client_ids(self):
         """Client ids this ledger owns or has booked with record_external_fills."""
         with self._lock:
-            return {r[0] for r in self.db.execute("SELECT client_id FROM intents")} | self._external_ids()
+            return {r[0] for r in self.db.execute("SELECT client_id FROM intents")} | set(self._external_orders())
+
+    def external_order_matches(self, order):
+        """True only for a terminal broker order this ledger booked with record_external_fills
+        with the same symbol, side and filled quantity: broker history that reconciliation may
+        skip. Any other unknown order is still external."""
+        with self._lock:
+            booked = self._external_orders().get(order.get("client_order_id"))
+        return (booked is not None and order.get("status") in TERMINAL
+                and order.get("symbol") == booked["symbol"] and order.get("side") == booked["side"]
+                and D(str(order.get("filled_qty") or 0)) == D(booked["qty"]))
 
     def request_budget(self, now, kind, client_id=None):
         """Return 0 after durable reservation, or delay <=60s WITHOUT reservation.
