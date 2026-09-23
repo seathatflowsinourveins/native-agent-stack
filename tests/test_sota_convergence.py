@@ -1625,8 +1625,16 @@ class LaneReviewPrecedenceTests(unittest.TestCase):
         self.assertTrue(any("refuted" in item for item in component["evidence"]))
         self.assertEqual(len(component["other_lane_reviews"]), 1)
         other = component["other_lane_reviews"][0]
-        self.assertEqual(other, {"lane": "beyond", "status": "pin_behind_upstream",
-                                  "evidence": ["beyond evidence"], "note": "beyond note", "lane_item": {}})
+        # The fixture's pin is not compared (no freshness record), so the
+        # beyond lane's surviving pin_behind_upstream claim contradicts the
+        # row's computed pin fields: it is published as pin_status_disputed,
+        # the claim kept in disputed_lane_status and the evidence.
+        self.assertEqual(other["lane"], "beyond")
+        self.assertEqual(other["status"], "pin_status_disputed")
+        self.assertEqual(other["disputed_lane_status"], "pin_behind_upstream")
+        self.assertEqual(other["evidence"][0], "beyond evidence")
+        self.assertIn("published as pin_status_disputed", other["evidence"][1])
+        self.assertEqual((other["note"], other["lane_item"]), ("beyond note", {}))
 
     def test_verified_entry_beats_an_unverified_one_regardless_of_ownership(self):
         # foundation lane has no matching proposal at all (genuinely
@@ -2378,7 +2386,9 @@ class CitationReview20260923GeneratorFixTests(unittest.TestCase):
             foundation_components=[{"id": "plugin", "repository": plain_f + "/tree/v1.0.6", "version": "1.0.6"}],
             trading_entries=[{"id": "markdown-tool", "repository": plain_t + "/releases/tag/v0.1.7",
                               "decision": "default", "version_or_commit": "0.1.7", "layers": ["tag"]}],
-            lanes=lanes)
+            # A newer upstream release, so the lane's pin_behind_upstream
+            # status agrees with the row's computed pin fields.
+            lanes=lanes, repositories={plain_t: {"latest_release": {"tag": "v0.2.0"}}})
         component = manifest["foundation"][0]["components"][0]
         self.assertEqual(component["review_status"], "unmaintained_signal")
         self.assertEqual(component["review_lane"], "foundation")
@@ -2540,6 +2550,204 @@ class CitationReview20260923GeneratorFixTests(unittest.TestCase):
         self.assertEqual(manifest["counts"]["citation_review"], {
             "findings_in_artifact": 3, "findings": 3, "out_of_scope": 0,
             "attached": 2, "rows_flagged": 2, "general": 1})
+
+
+class PinStatusDisputeTests(unittest.TestCase):
+    """2026-09-23 critic-gap recheck of b273544: no published row may show a
+    lane pin status that contradicts the row's own computed pin fields
+    (phoenix, opensandbox, lean-alpaca, inspect-ai). Such a claim is published
+    as pin_status_disputed[_unverified], the lane's claim kept in
+    disputed_lane_status and the evidence, and the counts reconcile."""
+
+    # Reuse the fixture builders without inheriting (and re-running) that
+    # class's own tests.
+    _build = CitationReview20260923GeneratorFixTests._build
+    _lane = staticmethod(CitationReview20260923GeneratorFixTests._lane)
+
+    REPO = "https://github.com/example/tool"
+
+    def _row(self, *, status, version, latest, proposals=(), lanes_extra=()):
+        lanes = [self._lane("trading", "layer-t", [
+            {"repository": self.REPO, "status": status, "evidence": ["lane evidence"]}], proposals=proposals),
+                 *lanes_extra]
+        repositories = {self.REPO: {"latest_release": {"tag": latest}}} if latest else {}
+        manifest = self._build(
+            trading_entries=[{"id": "tool", "repository": self.REPO, "decision": "conditional",
+                              "version_or_commit": version, "layers": ["tag"]}],
+            lanes=lanes, repositories=repositories)
+        return manifest, manifest["trading"][0]["entries"][0]
+
+    def assert_consistent(self, manifest):
+        for row in manifest["trading"]:
+            for card in row["entries"]:
+                statuses = [(card["review_status"], card.get("disputed_lane_status"))] + [
+                    (review["status"], review.get("disputed_lane_status"))
+                    for review in card.get("other_lane_reviews", [])]
+                for status, _claim in statuses:
+                    if status in build_manifest_mod.PIN_BEHIND_STATUSES:
+                        self.assertIs(card["pin_behind_upstream"], True, card["id"])
+        counts = manifest["counts"]
+        self.assertEqual(sum(counts["pins_behind_upstream_by_review_status"].values()),
+                         counts["pins_behind_upstream"])
+        self.assertEqual(counts["review_status_pin_behind_upstream"], sum(
+            n for status, n in counts["pins_behind_upstream_by_review_status"].items()
+            if status in build_manifest_mod.PIN_BEHIND_STATUSES))
+
+    def test_pin_behind_claim_on_a_compared_current_pin_is_disputed(self):  # phoenix
+        manifest, row = self._row(status="pin_behind_upstream", version="20.14.0", latest="v20.14.0")
+        self.assertIs(row["pin_behind_upstream"], False)
+        self.assertEqual(row["review_status"], "pin_status_disputed")
+        self.assertEqual(row["disputed_lane_status"], "pin_behind_upstream")
+        self.assertEqual(row["evidence"][0], "lane evidence")
+        self.assertIn("trading lane status pin_behind_upstream published as pin_status_disputed",
+                      row["evidence"][-1])
+        self.assertIn("pin_behind_upstream false, pin_comparison compared", row["evidence"][-1])
+        self.assertEqual(manifest["counts"]["pin_status_disputed"], 1)
+        self.assertEqual(manifest["counts"]["pin_status_disputed_by_lane_status"], {"pin_behind_upstream": 1})
+        self.assertEqual(manifest["counts"]["review_status_pin_behind_upstream"], 0)
+        self.assert_consistent(manifest)
+
+    def test_pin_behind_claim_on_a_pin_that_was_not_compared_is_disputed(self):  # lean-alpaca, inspect-ai
+        manifest, row = self._row(status="pin_behind_upstream", version="1973f6165bee", latest=None)
+        self.assertIsNone(row["pin_behind_upstream"])
+        self.assertEqual(row["review_status"], "pin_status_disputed")
+        self.assertIn("pin_comparison_reason unversioned", row["evidence"][-1])
+        self.assert_consistent(manifest)
+
+    def test_unverified_suffix_is_kept(self):
+        manifest, row = self._row(status="pin_behind_upstream", version="2.0.0", latest="v2.0.0", proposals=[
+            {"layer": "layer-t", "repository": self.REPO, "kind": "pin_behind_upstream", "survives": None,
+             "votes": []}])
+        self.assertEqual(row["review_status"], "pin_status_disputed_unverified")
+        self.assertEqual(row["disputed_lane_status"], "pin_behind_upstream_unverified")
+        self.assert_consistent(manifest)
+
+    def test_confirmed_claim_on_a_pin_computed_behind_is_disputed(self):  # opensandbox
+        manifest, row = self._row(status="confirmed_conditional", version="0.2.3", latest="v1.1.0")
+        self.assertIs(row["pin_behind_upstream"], True)
+        self.assertEqual(row["review_status"], "pin_status_disputed")
+        self.assertEqual(row["disputed_lane_status"], "confirmed_conditional")
+        self.assertEqual(manifest["counts"]["pins_behind_upstream_by_review_status"], {"pin_status_disputed": 1})
+        self.assert_consistent(manifest)
+
+    def test_refuted_pin_claim_confirmed_pin_on_a_pin_computed_behind_is_disputed(self):
+        manifest, row = self._row(status="pin_behind_upstream", version="1.0.0", latest="v1.1.0", proposals=[
+            {"layer": "layer-t", "repository": self.REPO, "kind": "pin_behind_upstream", "survives": False,
+             "votes": [{"refuted": True}]}])
+        self.assertEqual(row["review_status"], "pin_status_disputed")
+        self.assertEqual(row["disputed_lane_status"], "confirmed_pin")
+
+    def test_consistent_claims_and_refuted_demotions_are_unchanged(self):
+        manifest, row = self._row(status="pin_behind_upstream", version="1.0.0", latest="v1.1.0")
+        self.assertEqual(row["review_status"], "pin_behind_upstream")
+        self.assertNotIn("disputed_lane_status", row)
+        self.assertEqual(manifest["counts"]["review_status_pin_behind_upstream"], 1)
+        self.assert_consistent(manifest)
+        # A refuted demotion confirms the selection only; it makes no pin claim.
+        manifest, row = self._row(status="demotion_proposed", version="1.0.0", latest="v1.1.0", proposals=[
+            {"layer": "layer-t", "repository": self.REPO, "kind": "demotion_proposed", "survives": False,
+             "votes": [{"refuted": True}]}])
+        self.assertEqual(row["review_status"], "confirmed_conditional")
+        self.assertEqual(manifest["counts"]["pin_status_disputed"], 0)
+
+    def test_other_lane_reviews_are_reconciled_too(self):
+        manifest, row = self._row(status="pin_behind_upstream", version="1.0.0", latest="v1.0.0", lanes_extra=[
+            self._lane("beyond", "layer-t", [{"repository": self.REPO, "status": "confirmed_default",
+                                              "evidence": ["beyond evidence"]}])])
+        self.assertEqual(row["review_status"], "pin_status_disputed")
+        other = row["other_lane_reviews"][0]
+        self.assertEqual((other["lane"], other["status"]), ("beyond", "confirmed_default"))
+        manifest, row = self._row(status="confirmed_default", version="1.0.0", latest="v1.0.0", lanes_extra=[
+            self._lane("beyond", "layer-t", [{"repository": self.REPO, "status": "pin_behind_upstream",
+                                              "evidence": ["beyond evidence"]}])])
+        self.assertEqual(row["review_status"], "confirmed_default")
+        other = row["other_lane_reviews"][0]
+        self.assertEqual(other["status"], "pin_status_disputed")
+        self.assertEqual(other["disputed_lane_status"], "pin_behind_upstream")
+        self.assertIn("beyond lane status pin_behind_upstream", other["evidence"][-1])
+        self.assertEqual(manifest["counts"]["other_lane_reviews_pin_status_disputed"], 1)
+        self.assert_consistent(manifest)
+
+    def test_direct_reconcile_calls(self):
+        reconcile = build_manifest_mod.reconcile_status_with_pin
+        self.assertEqual(reconcile("pin_behind_upstream", {"pin_behind_upstream": True}), ("pin_behind_upstream", None))
+        self.assertEqual(reconcile("confirmed_default", {"pin_behind_upstream": True},
+                                   lane_status="refuted_to_confirmed"), ("confirmed_default", None))
+        self.assertEqual(reconcile("keep_but_compare", {"pin_behind_upstream": None})[0], "keep_but_compare")
+        self.assertEqual(reconcile("confirmed_pin", {"pin_behind_upstream": True})[0], "pin_status_disputed")
+        # Without the computed field there is no pin state to contradict.
+        self.assertEqual(reconcile("pin_behind_upstream", {}), ("pin_behind_upstream", None))
+
+
+class UnmatchedLaneItemsTests(unittest.TestCase):
+    """2026-09-23 critic-gap recheck of b273544: a lane selected[] item at a
+    foundation/trading layer that matches no card was silently dropped (10
+    of critic-models-sources' 22, including a surviving all-MiniLM-L6-v2
+    demotion). It is now published under unmatched_lane_items and counted."""
+
+    # Reuse the fixture builders without inheriting (and re-running) that
+    # class's own tests.
+    _build = CitationReview20260923GeneratorFixTests._build
+    _lane = staticmethod(CitationReview20260923GeneratorFixTests._lane)
+
+    def test_items_without_a_card_are_published_not_dropped(self):
+        card_repo = "https://github.com/example/card"
+        lanes = [
+            self._lane("critic-models-sources", "layer-f", [
+                {"repository": "https://huggingface.co/example/minilm", "status": "demotion_proposed",
+                 "evidence": ["model card"], "note": "demote", "why_selected": "w"},
+                {"repository": card_repo, "status": "pin_behind_upstream", "evidence": ["x"],
+                 "catalog_id": "absent-card"},
+                {"repository": card_repo, "status": "confirmed_default", "evidence": ["y"]},
+            ], proposals=[{"layer": "layer-f", "repository": "https://huggingface.co/example/minilm",
+                           "kind": "demotion_proposed", "survives": True,
+                           "votes": [{"refuted": False}, {"refuted": False}]}]),
+            self._lane("beyond", "own-grouping", [
+                {"repository": "https://github.com/example/grouped", "status": "keep_but_compare",
+                 "evidence": []}]),
+        ]
+        manifest = self._build(
+            foundation_components=[{"id": "card", "repository": card_repo, "version": "1.0.0"}], lanes=lanes)
+        items = manifest["unmatched_lane_items"]
+        self.assertEqual([(i["repository"], i["reason"]) for i in items], [
+            ("https://github.com/example/card", "catalog_id_names_no_card"),
+            ("https://huggingface.co/example/minilm", "no_card_with_repository_in_layer")])
+        minilm = items[1]
+        self.assertEqual((minilm["catalog"], minilm["layer"], minilm["lane"], minilm["status"], minilm["survives"]),
+                         ("foundation", "layer-f", "critic-models-sources", "demotion_proposed", True))
+        self.assertEqual((minilm["evidence"], minilm["note"], minilm["lane_item"]),
+                         (["model card"], "demote", {"why_selected": "w"}))
+        self.assertEqual(items[0]["catalog_id"], "absent-card")
+        self.assertIsNone(items[0]["survives"])
+        # The matched item and the lane_groupings item are not listed.
+        self.assertEqual(manifest["foundation"][0]["components"][0]["review_status"], "confirmed_default")
+        self.assertEqual(manifest["lane_groupings"][0]["layer"], "own-grouping")
+        self.assertEqual(manifest["counts"]["unmatched_lane_items"], 2)
+        self.assertEqual(manifest["counts"]["unmatched_lane_items_by_lane"], {"critic-models-sources": 2})
+        keys = list(manifest)
+        self.assertLess(keys.index("lane_groupings"), keys.index("unmatched_lane_items"))
+        self.assertLess(keys.index("unmatched_lane_items"), keys.index("citation_review"))
+
+    def test_every_lane_item_is_published_somewhere(self):
+        repo = "https://github.com/example/card"
+        lanes = [self._lane(lane, "layer-f", [{"repository": repo, "status": "confirmed_default",
+                                                "evidence": [], "catalog_id": catalog_id}])
+                 for lane, catalog_id in (("a", "card"), ("b", None), ("c", "other"), ("d", "gone"))]
+        manifest = self._build(foundation_components=[
+            {"id": "card", "repository": repo, "version": "1"}, {"id": "other", "repository": repo, "version": "1"}],
+            lanes=lanes)
+        published = []
+        for card in manifest["foundation"][0]["components"]:
+            published += [card["review_lane"]] + [r["lane"] for r in card.get("other_lane_reviews", [])]
+        self.assertEqual(sorted(set(published)), ["a", "b", "c"])
+        self.assertEqual([i["lane"] for i in manifest["unmatched_lane_items"]], ["d"])
+
+    def test_general_findings_sort_with_mixed_line_types(self):
+        manifest = self._build(citation_review={"findings": [
+            {"catalog": "trading", "layer": "absent", "reviewer": "r", "claim": "a", "line": 12},
+            {"catalog": "trading", "layer": "absent", "reviewer": "r", "claim": "b", "line": "594 at a275ebc"},
+            {"catalog": "trading", "layer": "absent", "reviewer": "r", "claim": "c", "line": None}]})
+        self.assertEqual([f["claim"] for f in manifest["citation_review"]["general"]], ["c", "a", "b"])
 
 
 if __name__ == "__main__":

@@ -848,10 +848,11 @@
      "other_lane_reviews": [
       {
        "lane": "critic-foundation",
-       "status": "confirmed_conditional",
+       "status": "pin_status_disputed",
        "evidence": [
         "foundation-layers.json top_gaps[1]",
-        "docs/foundation-closure-20260921.md L94-96: accepted worker recovery 'does not establish SDK cancellation, provider billing cessation, host failure or distributed exactly-once effects'"
+        "docs/foundation-closure-20260921.md L94-96: accepted worker recovery 'does not establish SDK cancellation, provider billing cessation, host failure or distributed exactly-once effects'",
+        "critic-foundation lane status confirmed_conditional published as pin_status_disputed: it contradicts the row's computed pin fields (pin_behind_upstream true, pin_comparison compared); the lane's claim is kept in this row's evidence and disputed_lane_status"
        ],
        "note": null,
        "lane_item": {
@@ -860,7 +861,8 @@
         "role": "native-child-interruption-recovery (conditional, accepted_within_scope) with systemd supervision",
         "why_selected": "foundation-layers.json top_gaps[1] worker-cancellation-crash-resume is accepted_within_scope: 'One native inherited-tool child completed cancellation, same-child continuation, abrupt parent-runtime failure, automatic systemd descendant cleanup ... no host/provider/distributed guarantee is implied.' Its next_action says not to rerun the fixture only to refresh a green status.",
         "comparison_that_would_overturn": "The overturn_when recorded in catalogs/landscape/foundation.json scheduling-supervision (quoted in sdk-runtime-coverage-20260922.json rows[restatedev/restate] gap-first vote): 'host-loss survival, days-long waits or durable cross-host effects'. When a real task needs one of these, run Temporal against one keep_but_compare durable runtime with an incumbent arm."
-       }
+       },
+       "disputed_lane_status": "confirmed_conditional"
       }
      ],
      "why_selected": "Native subagents with owned worktrees carry the accepted same-host cancellation/continuation/parent-crash fixture (top_gaps[1]); third-party orchestrators (paperclip, orca, oh-my-claudecode - star-audit alternatives) duplicate this.",
@@ -1700,10 +1702,11 @@
        "reviewer": "critic-citations",
        "severity": "low",
        "claim": "critic.uncited_claims[4] unsupported: Foundation code-navigation: 'Serena dev pin rationale ... is not recorded in the catalog files read' names no files and no search.",
-       "fix": "why.*dev commit|dev0.*rationale\"  \u2192 1 hit (only the claim itself, catalogs/sota-convergence/manifest-20260923.json:1608) | Checked catalogs/foundation/decisions.json:576-600, recipes/README.md:107, docs/new-host-grand-list.md:44, blueprints/token-native-focus/saturation-audit.json:7602-7616 \u2014 all name the pinned dev commit c6fbd1c5 and note it's ahead of v1.7.0, but none states why the dev commit was chosen over the release; no rationale source exists in either tree.",
+       "fix": "Cite the reviewer's rg command and the four files it checked in the code-navigation open gap, and record the reason for pinning Serena dev commit c6fbd1c5 over the v1.7.0 release on the serena decision in catalogs/foundation/decisions.json (the gap stays open until that rationale exists).",
        "file": null,
        "line": null,
-       "evidence": "rg -c -i \"dev pin rationale"
+       "evidence": "Reviewer citation (rg pattern rejoined at '|'; citations.json split it between citation and note): rg -c -i \"dev pin rationale|why.*dev commit|dev0.*rationale\" <checkout> \u2192 1 hit (only the claim itself, catalogs/sota-convergence/manifest-20260923.json#/foundation/4/open_gaps/0 at a275ebc) | Checked catalogs/foundation/decisions.json:576-600 at a275ebc, recipes/README.md:107 at a275ebc, docs/new-host-grand-list.md:44 at b273544 (added after a275ebc, in 65566dc), blueprints/token-native-focus/saturation-audit.json:7602-7616 at a275ebc \u2014 all name the pinned dev commit c6fbd1c5 and note it's ahead of v1.7.0, but none states why the dev commit was chosen over the release; no rationale source exists in either tree.",
+       "component": "serena"
       }
      ]
     },
@@ -2367,10 +2370,11 @@
        "reviewer": "critic-citations",
        "severity": "low",
        "claim": "critic.uncited_claims[3] unsupported: Foundation semantic-rag: 'no re-index plan is recorded' for vLLM is an absence claim with no search command or file scope.",
-       "fix": "plan.*re-?index\"  <work-dir> \u2192 12 hits, all restatements of the same claim or unrelated (SocratiCode watcher reindex), none documenting any vLLM re-index plan | No file in either tree records a re-index plan for the vLLM/embedding pin move; the absence appears real but no source names it via search command or scope, matching the critic's original complaint.",
+       "fix": "Keep the absence claim but cite its search: add the reviewer's rg command and scope (`rg -n -i \"re-?index.*plan|plan.*re-?index\" <checkout> <work-dir>`, 12 hits, none a vLLM re-index plan) to the semantic-rag open gap, and record the re-index plan for an embedding-model or vLLM pin move (or an explicit 'no plan; re-index required') on the vllm decision in catalogs/foundation/decisions.json.",
        "file": null,
        "line": null,
-       "evidence": "rg -n -i \"re-?index.*plan"
+       "evidence": "Reviewer citation (rg pattern rejoined at '|'; citations.json split it between citation and note): rg -n -i \"re-?index.*plan|plan.*re-?index\" <checkout> <work-dir> \u2192 12 hits, all restatements of the same claim or unrelated (SocratiCode watcher reindex), none documenting any vLLM re-index plan | No file in either tree records a re-index plan for the vLLM/embedding pin move; the absence appears real but no source names it via search command or scope, matching the critic's original complaint.",
+       "component": "vllm"
       }
      ]
     }
@@ -2980,7 +2984,7 @@
         "lens": 1,
         "refuted": true,
         "confidence": "high",
-        "reasoning": "Gap-fit fails on all three points.\n\n(1) The primary critic gap asks for a benchmark, and an embedder does not supply one. The manifest's critic.gaps_without_candidate entry says 'durable-memory with no held-out memory benchmark (LongMemEval-V2 refuted)' (<host-path>/manifest-20260923.json, critic block). The missing thing is a held-out memory-recall eva"
+        "reasoning": "Gap-fit fails on all three points.\n\n(1) The primary critic gap asks for a benchmark, and an embedder does not supply one. The manifest's critic.gaps_without_candidate entry says 'durable-memory with no held-out memory benchmark (LongMemEval-V2 refuted)' (catalogs/sota-convergence/manifest-20260923.json, critic block). The missing thing is a held-out memory-recall eva"
        }
       ]
      },
@@ -3255,10 +3259,11 @@
        "reviewer": "critic-citations",
        "severity": "medium",
        "claim": "critic.uncited_claims[6] contradicted: Foundation token-efficiency: 'Five-plus docs still link the pre-rename chopratejas/headroom identity' cites only one example (closure L61) and gives no rg command.",
-       "fix": "Critic said \"only one example... no rg command,\" but the target manifest itself already records this exact rg command at <work-dir>/lanes.json:3235 (\"rg -c 'chopratejas/headroom' -g '*.md' in nas-wt-conv-20260923 -> 8 files\"), and a fresh run against nas-wt-critic reproduces 8 matching files, confirming \"five-plus docs.\"",
+       "fix": "Withdraw critic.uncited_claims[6]: the lane record already carries the rg command (<work-dir>/lanes.json#/lanes/0/proposals/16/votes/1/evidence_checked/11). Carry that command into the headroom row evidence, and update the eight listed docs to the headroomlabs-ai/headroom identity in a separate docs change.",
        "file": null,
        "line": null,
-       "evidence": "`cd  && rg -c 'chopratejas/headroom' -g '*.md'` -> 8 files (docs/foundation-closure-20260921.md, docs/token-session-handbook.md, docs/foundation-stack.md, docs/token-efficiency-stack.md, docs/landscape-freshness-notes.md, docs/stack.md, catalogs/sota-convergence/README.md, evidence/artifacts/foundation-closure-20260921/claude-review.md)"
+       "evidence": "Reviewer citation: `cd <checkout> && rg -c 'chopratejas/headroom' -g '*.md'` -> 8 files (docs/foundation-closure-20260921.md, docs/token-session-handbook.md, docs/foundation-stack.md, docs/token-efficiency-stack.md, docs/landscape-freshness-notes.md, docs/stack.md, catalogs/sota-convergence/README.md, evidence/artifacts/foundation-closure-20260921/claude-review.md) -- Reviewer observation: Critic said \"only one example... no rg command,\" but the target manifest itself already records this exact rg command at <work-dir>/lanes.json#/lanes/0/proposals/16/votes/1/evidence_checked/11 (\"rg -c 'chopratejas/headroom' -g '*.md' in nas-wt-conv-20260923 -> 8 files\"), and a fresh run against nas-wt-critic reproduces 8 matching files, confirming \"five-plus docs.\"",
+       "component": "headroom"
       }
      ]
     },
@@ -5328,6 +5333,15 @@
      "comparison_that_would_overturn": "See scheduling-supervision.",
      "citation_review": [
       {
+       "reviewer": "critic-citations",
+       "severity": "low",
+       "claim": "critic.uncited_claims[16] unsupported: Beyond recovery-portability: casey/just, 'Project scripts and the Dagu workflows already act as task runners', has no citation.",
+       "fix": "Cite a source for 'project scripts and the Dagu workflows already act as task runners' on the casey/just candidate (a Dagu workflow path that runs project scripts), or restate the gap as unverified; catalogs/landscape/foundation.json recovery-portability names only uv, Restic and mise.",
+       "file": null,
+       "line": null,
+       "evidence": "Reviewer citation (rg pattern rejoined at '|'; citations.json split it between citation and note): rg -n \"Project scripts and the Dagu workflows already act as task runners|task runner\" <checkout> -g '*.json' -g '*.md' \u2192 only self-referencing hit in catalogs/sota-convergence/manifest-20260923.json#/foundation/14/candidates/0/demonstrated_gap and #/critic/uncited_claims/16 at a275ebc and unrelated \"task runner\" role strings for `just`/`mise` in catalogs/us-equities/star-audit.json:912 at a275ebc; no source ties Dagu to replacing `just` as a task runner. foundation.json's recovery-portability layer entry (catalogs/landscape/foundation.json, layer_id recovery-portability) cites only uv/Restic/mise, never Dagu-as-task-runner."
+      },
+      {
        "reviewer": "foundationB",
        "severity": "medium",
        "claim": "The dagu rows still describe 2.17.0 as unqualified and propose rerunning the retry recipe on 2.17.0 as the overturn. That rerun is already recorded as a qualified native_proven receipt merged in #87, and the rows do not cite it.",
@@ -6347,13 +6361,13 @@
         "lens": 0,
         "refuted": false,
         "confidence": "high",
-        "reasoning": "Evidence lens: every cited fact exists and says what the claim says, checked now against live sources.\n(1) Critic quote: <host-path>/manifest-20260923.json L10213-10214 reads \"models.json: the foundation lane read only its 'entry list'. The trading and beyond lanes did not list it. No model-layer selection was checked.\" The claim's elided quote is faith"
+        "reasoning": "Evidence lens: every cited fact exists and says what the claim says, checked now against live sources.\n(1) Critic quote: catalogs/sota-convergence/manifest-20260923.json L10213-10214 reads \"models.json: the foundation lane read only its 'entry list'. The trading and beyond lanes did not list it. No model-layer selection was checked.\" The claim's elided quote is faith"
        },
        {
         "lens": 1,
         "refuted": true,
         "confidence": "high",
-        "reasoning": "Refuted on gap fit. The offered metadata is accurate, but it does not show the claimed gap closure.\n\n(1) The named gap is a gap in review coverage, not a missing capability. The manifest critic block (<host-path>/manifest-20260923.json L10214, critic.unexamined_sources) says: \"models.json: the foundation lane read only its 'entry list'. The trading and "
+        "reasoning": "Refuted on gap fit. The offered metadata is accurate, but it does not show the claimed gap closure.\n\n(1) The named gap is a gap in review coverage, not a missing capability. The manifest critic block (catalogs/sota-convergence/manifest-20260923.json L10214, critic.unexamined_sources) says: \"models.json: the foundation lane read only its 'entry list'. The trading and "
        }
       ]
      },
@@ -6575,10 +6589,11 @@
        "reviewer": "critic-citations",
        "severity": "medium",
        "claim": "critic.uncited_claims[1] contradicted: Foundation mcp-surfaces: 'mcp-inspector has no license recorded in the catalog or GitHub metadata' has no file path or command.",
-       "fix": "A license IS recorded (MIT) in nas-wt-critic's own stack manifest, and the same manifest-20260923.json:5458 citation_review flags this exact contradiction (\"But manifests/stack.json:594 records 'license': 'MIT'\"); note manifest-20260923.json:1423 separately records upstream GitHub license as null with its own evidence line.",
-       "file": null,
-       "line": null,
-       "evidence": "manifests/stack.json:594 (\"license\": \"MIT\" under id \"mcp-inspector\")"
+       "fix": "Replace critic.uncited_claims[1] in the next critic pass with the cited split: the catalog records license MIT (manifests/stack.json, component mcp-inspector, \"license\"), while the GitHub metadata license is null (<work-dir>/github-freshness.json repositories['https://github.com/modelcontextprotocol/inspector'].license, published as upstream.license on the mcp-inspector rows). Do not publish the absence claim.",
+       "file": "manifests/stack.json",
+       "line": "594 at a275ebc",
+       "evidence": "Reviewer citation: manifests/stack.json:594 at a275ebc (\"license\": \"MIT\" under id \"mcp-inspector\") -- Reviewer observation: A license IS recorded (MIT) in nas-wt-critic's own stack manifest, and the same catalogs/sota-convergence/manifest-20260923.json#/foundation/17/components/0/citation_review/1/evidence at a275ebc (a citation_review overlay) flags this exact contradiction (\"But manifests/stack.json:594 records 'license': 'MIT'\"; manifests/stack.json:594 at a275ebc); note catalogs/sota-convergence/manifest-20260923.json#/foundation/4/components/3/upstream/license at a275ebc separately records upstream GitHub license as null with its own evidence line.",
+       "component": "mcp-inspector"
       },
       {
        "reviewer": "foundationA",
@@ -8018,7 +8033,7 @@
         "lens": 0,
         "refuted": false,
         "confidence": "medium",
-        "reasoning": "Evidence lens. Every piece of cited evidence exists and says what the proposal claims (observed now, 2026-09-23).\n\n1) The gap is real and matches the quote. The critic block in <host-path>/manifest-20260923.json L10199-10205 (gaps_without_candidate) says: \"Broad-universe open gate 'Survivorship before 2020' (... README.md L69-72; gate pre-2020-delisting"
+        "reasoning": "Evidence lens. Every piece of cited evidence exists and says what the proposal claims (observed now, 2026-09-23).\n\n1) The gap is real and matches the quote. The critic block in catalogs/sota-convergence/manifest-20260923.json L10199-10205 (gaps_without_candidate) says: \"Broad-universe open gate 'Survivorship before 2020' (... README.md L69-72; gate pre-2020-delisting"
        },
        {
         "lens": 1,
@@ -8466,6 +8481,16 @@
      "why_selected": "Conditional but actually used: native Dagu history host and research-runtime packet preparation receipts; Temporal/Prefect/Dagster unexercised.",
      "comparison_that_would_overturn": "Re-running the retained research DAG on v2.17.0; a regression or a Prefect/Dagster run with better restart semantics on the same DAG.",
      "citation_review": [
+      {
+       "reviewer": "critic-citations",
+       "severity": "medium",
+       "claim": "critic.uncited_claims[10] contradicted: Trading storage-compute and data-quality-orchestration: 'No conditional in this layer is used by a receipt' gives no rg command.",
+       "fix": "Split critic.uncited_claims[10] by layer. Keep 'no storage-compute conditional is used by a receipt' only with the rg command and scope that establish it. For data-quality-orchestration, record that the conditional dagu is receipt-used (blueprints/us-equities/research-runtime/receipt.json component_ids; blueprints/convergence-practice/wsl-transport-recovery/receipt.json and receipt-attempt-1.json).",
+       "file": "blueprints/us-equities/research-runtime/receipt.json",
+       "line": "6-9 at a275ebc",
+       "evidence": "Reviewer citation: blueprints/us-equities/research-runtime/receipt.json:6-9 at a275ebc (component_ids includes \"dagu\"); dagu decision=conditional in <work-dir>/trading-by-layer.json#/layers/data-quality-orchestration/2 (id dagu) -- Reviewer observation: The claim covers storage-compute (true, no conditional receipt-used there) and data-quality-orchestration jointly, but dagu is a conditional decision there and is used by this receipt plus blueprints/convergence-practice/wsl-transport-recovery/receipt.json and receipt-attempt-1.json, so the joint claim is false.",
+       "component": "dagu"
+      },
       {
        "reviewer": "trading",
        "severity": "medium",
@@ -9465,6 +9490,16 @@
      "comparison_that_would_overturn": "spy-lean-parity gate: a rerun of blueprints/us-equities/engine-nautilus/spy-parity under mapping-manifest-v2 against the frozen LEAN oracle that still returns BLOCKED on engine-attributable checks while an alternative engine returns PASS on the same retained SPY inputs, tolerances and cost model (verdict.json /verdict).",
      "citation_review": [
       {
+       "reviewer": "critic-citations",
+       "severity": "medium",
+       "claim": "critic.uncited_claims[11] contradicted: Trading backtesting-engine: 'SimulationModule + SimulatedExchange.adjust_account exist at rc5' gives no file line within exchange.rs or modules/mod.rs.",
+       "fix": "Narrow critic.uncited_claims[11] to modules/mod.rs: cite the SimulationModule trait line in crates/backtest/src/modules/mod.rs at v2.0.0rc5 (gh api raw ...?ref=v2.0.0rc5 with its line number) on the nautilustrader row. exchange.rs lines 661 and 1674 at v2.0.0rc5 are already cited.",
+       "file": "<work-dir>/manifest-20260923.draft.json",
+       "line": "#/trading/5/entries/1/review_note and #/trading/5/entries/1/evidence/6",
+       "evidence": "Reviewer citation: <work-dir>/manifest-20260923.draft.json#/trading/5/entries/1/review_note and #/trading/5/entries/1/evidence/6 (the same text is at those pointers in catalogs/sota-convergence/manifest-20260923.json at a275ebc) (\"crates/backtest/src/exchange.rs line 661 defines `pub fn adjust_account`... exchange.rs line 1674\"); same text at <work-dir>/lanes.json#/lanes/1/result/layers/0/selected/0/note and #/lanes/1/result/layers/0/selected/0/evidence/6 -- Reviewer observation: exchange.rs does carry cited line numbers (661, 1674; nautilus_trader source lines at tag v2.0.0rc5) for adjust_account; only modules/mod.rs's SimulationModule trait is given without a line number, so \"gives no file line within exchange.rs\" is false (partially true only for modules/mod.rs).",
+       "component": "nautilustrader"
+      },
+      {
        "reviewer": "trading",
        "severity": "low",
        "claim": "An evidence citation points at the wrong card entry.",
@@ -9854,12 +9889,14 @@
      "pin_comparison": "not_compared",
      "pin_comparison_reason": "unversioned",
      "evidence_level": "native_proven",
-     "review_status": "pin_behind_upstream",
+     "review_status": "pin_status_disputed",
+     "disputed_lane_status": "pin_behind_upstream",
      "review_note": "The one-commit delta is an order-class fix in the bundled Alpaca DLL, which is relevant to execution. Re-run the native LEAN Alpaca paper receipt before moving the pin.",
      "evidence": [
       "gh api repos/QuantConnect/Lean.Brokerages.Alpaca/tags: the pin carries tags 18115-18121; tag 18122 = 5995d2081d1c",
       "gh api compare 1973f61...master: ahead_by 1, the commit 'chore: update alpaca.markets dll with the order class fix (#80)' 2026-09-22T20:11:36Z",
-      "github-freshness: 18 stars, pushed_at 2026-09-22T21:33:53Z, license None on GitHub (catalog: Apache-2.0 per README and source headers)"
+      "github-freshness: 18 stars, pushed_at 2026-09-22T21:33:53Z, license None on GitHub (catalog: Apache-2.0 per README and source headers)",
+      "critic-models-sources lane status pin_behind_upstream published as pin_status_disputed: it contradicts the row's computed pin fields (pin_behind_upstream null, pin_comparison not_compared, pin_comparison_reason unversioned); the lane's claim is kept in this row's evidence and disputed_lane_status"
      ],
      "review_lane": "critic-models-sources",
      "other_lane_reviews": [
@@ -10496,21 +10533,24 @@
      "pin_comparison": "not_compared",
      "pin_comparison_reason": "unversioned",
      "evidence_level": "source_review",
-     "review_status": "pin_behind_upstream",
+     "review_status": "pin_status_disputed",
+     "disputed_lane_status": "pin_behind_upstream",
      "review_note": null,
      "evidence": [
       "The tag-family mismatch is resolved: github-freshness latest_tag 'release/2025-11-28' is an old non-version tag. gh api repos/UKGovernmentBEIS/inspect_ai/tags lists 0.3.268, 0.3.267, 0.3.266, and the repository publishes no GitHub releases (the releases API returned empty).",
-      "PyPI inspect-ai: latest 0.3.268 uploaded 2026-09-22T23:57:40Z; 0.3.266 uploaded 2026-09-19T13:11:02Z"
+      "PyPI inspect-ai: latest 0.3.268 uploaded 2026-09-22T23:57:40Z; 0.3.266 uploaded 2026-09-19T13:11:02Z",
+      "critic-models-sources lane status pin_behind_upstream published as pin_status_disputed: it contradicts the row's computed pin fields (pin_behind_upstream null, pin_comparison not_compared, pin_comparison_reason unversioned); the lane's claim is kept in this row's evidence and disputed_lane_status"
      ],
      "review_lane": "critic-models-sources",
      "other_lane_reviews": [
       {
        "lane": "critic-trading",
-       "status": "pin_behind_upstream",
+       "status": "pin_status_disputed",
        "evidence": [
         "curl https://pypi.org/pypi/inspect-ai/json -> 0.3.268 2026-09-22T23:57:40 (catalog pin 0.3.266)",
         "evidence/artifacts/gap-resolution-20260922/evaluation-experiments/upstream-currency-sweep.json: 'inspect_ai's newest GitHub tag is still release/2025-11-28' (source_review)",
-        "rg -l -i 'inspect_ai|inspect-ai' blueprints evidence manifests -> no execution receipt"
+        "rg -l -i 'inspect_ai|inspect-ai' blueprints evidence manifests -> no execution receipt",
+        "critic-trading lane status pin_behind_upstream published as pin_status_disputed: it contradicts the row's computed pin fields (pin_behind_upstream null, pin_comparison not_compared, pin_comparison_reason unversioned); the lane's claim is kept in this row's evidence and disputed_lane_status"
        ],
        "note": null,
        "lane_item": {
@@ -10527,7 +10567,8 @@
         },
         "why_selected": "Upstream is very active, but no receipt executes it. rg over blueprints/evidence/manifests finds only verdict packets, currency sweeps and manifests/evidence.json. The lane disagreement resolves to keep_but_compare-level evidence: the beyond lane's confirmed_default has no execution receipt behind it.",
         "comparison_that_would_overturn": "One frozen inspect_ai eval on an existing extraction fixture with a pinned model (critic next_step), compared with promptfoo 0.123.1 deterministic assertions on the same fixture. If promptfoo scores the same with lower setup, the default moves."
-       }
+       },
+       "disputed_lane_status": "pin_behind_upstream"
       },
       {
        "lane": "trading",
@@ -10707,11 +10748,13 @@
      "pin_behind_upstream": false,
      "pin_comparison": "compared",
      "evidence_level": "source_review",
-     "review_status": "pin_behind_upstream",
+     "review_status": "pin_status_disputed",
+     "disputed_lane_status": "pin_behind_upstream",
      "review_note": null,
      "evidence": [
       "github-freshness latest_release '@arizeai/phoenix-mcp@4.3.13' is a different package family. gh api releases filtered to 'arize-phoenix-v': v20.15.0 2026-09-21T23:06:30Z, v20.14.0 2026-09-18T02:52:36Z",
-      "License: catalog Elastic-2.0; GitHub NOASSERTION"
+      "License: catalog Elastic-2.0; GitHub NOASSERTION",
+      "critic-models-sources lane status pin_behind_upstream published as pin_status_disputed: it contradicts the row's computed pin fields (pin_behind_upstream false, pin_comparison compared); the lane's claim is kept in this row's evidence and disputed_lane_status"
      ],
      "review_lane": "critic-models-sources"
     }
@@ -11420,7 +11463,7 @@
         "lens": 1,
         "refuted": true,
         "confidence": "high",
-        "reasoning": "The metadata is roughly right, but the gap-closure claim does not hold, and the candidate duplicates a role that already has an incumbent.\n\n1. The named gap is a gap in review coverage, not a missing capability. The critic sentence sits under \"unexamined_sources\" in <host-path>/manifest-20260923.json L10214: \"models.json: the foundation lane read only i"
+        "reasoning": "The metadata is roughly right, but the gap-closure claim does not hold, and the candidate duplicates a role that already has an incumbent.\n\n1. The named gap is a gap in review coverage, not a missing capability. The critic sentence sits under \"unexamined_sources\" in catalogs/sota-convergence/manifest-20260923.json L10214: \"models.json: the foundation lane read only i"
        }
       ]
      },
@@ -11902,10 +11945,12 @@
      "pin_behind_upstream": true,
      "pin_comparison": "compared",
      "evidence_level": "source_review",
-     "review_status": "confirmed_conditional",
+     "review_status": "pin_status_disputed",
+     "disputed_lane_status": "confirmed_conditional",
      "review_note": "Freshness per family only. The umbrella release-1.1.0 content is unexamined.",
      "evidence": [
-      "gh api releases: server/v0.2.3 2026-08-26 is the latest server tag; python/sandbox/v0.1.16 2026-08-26 is the latest stable SDK (v0.1.17.dev0 is a prerelease); release-1.1.0 2026-09-21T07:46:25Z is a separate umbrella family that this lane did not compare"
+      "gh api releases: server/v0.2.3 2026-08-26 is the latest server tag; python/sandbox/v0.1.16 2026-08-26 is the latest stable SDK (v0.1.17.dev0 is a prerelease); release-1.1.0 2026-09-21T07:46:25Z is a separate umbrella family that this lane did not compare",
+      "critic-models-sources lane status confirmed_conditional published as pin_status_disputed: it contradicts the row's computed pin fields (pin_behind_upstream true, pin_comparison compared); the lane's claim is kept in this row's evidence and disputed_lane_status"
      ],
      "review_lane": "critic-models-sources"
     },
@@ -12115,69 +12160,422 @@
   }
  ],
  "lane_groupings": [],
+ "unmatched_lane_items": [
+  {
+   "catalog": "trading",
+   "layer": "agents-models-workers",
+   "lane": "critic-models-sources",
+   "repository": "https://developers.openai.com/api/docs/models/gpt-6-astra",
+   "catalog_id": "gpt-6-astra",
+   "status": "confirmed_default",
+   "survives": null,
+   "verified": false,
+   "reason": "no_card_with_repository_in_layer",
+   "evidence": [
+    "models.json entries[id=gpt-6-astra]: default, native_proven, release_evidence_date 2026-09-03",
+    "WebFetch https://developers.openai.com/api/docs/changelog (2026-09-23): 2026-09-03 gpt-6-astra 'most capable model'; 2026-09-22 gpt-6-sol (reasoning) and gpt-6-luna ('lower pricing tier'). The fetch summarizer contradicted itself by also saying no newer model was released, so the 2026-09-22 entries need a primary-page re-read."
+   ],
+   "note": null,
+   "lane_item": {
+    "catalog_id": "gpt-6-astra",
+    "role": "Primary native research workers",
+    "why_selected": "It is native_proven with worker and routing receipts, and the changelog still lists it as OpenAI's most capable model.",
+    "comparison_that_would_overturn": "A paired native task where the cheaper gpt-6-sol or gpt-6-luna (2026-09-22) matches quality at lower allowance cost."
+   }
+  },
+  {
+   "catalog": "trading",
+   "layer": "agents-models-workers",
+   "lane": "critic-models-sources",
+   "repository": "https://huggingface.co/Qwen/Qwen3-8B-AWQ",
+   "catalog_id": "Qwen/Qwen3-8B-AWQ (local key-free worker, not in models.json)",
+   "status": "keep_but_compare",
+   "survives": null,
+   "verified": false,
+   "reason": "no_card_with_repository_in_layer",
+   "evidence": [
+    "nas-wt-critic catalogs/sota-convergence/sdk-runtime-coverage-20260922.md L178: Qwen/Qwen3-8B-AWQ on vLLM 0.29.0 with the hermes parser, 20/20 tool calls and 4/5 tasks (bars 19 and 4); 'passes exactly at the bar on one run'",
+    "docs/next-host-stages.md L72-74: 'qualified once on 2026-09-23 ... and is not served'",
+    "HF API: createdAt 2025-05-03T03:20:49Z, apache-2.0, params 8190735360, usedStorage 6110004518"
+   ],
+   "note": "This is a 2025 model with newer same-family and peer releases (Qwen3.5-9B 2026-02-27, granite-4.2-8b 2026-08-07). The latest-SOTA rule argues for comparison, not demotion, because it is the only qualified local worker.",
+   "lane_item": {
+    "catalog_id": "Qwen/Qwen3-8B-AWQ (local key-free worker, not in models.json)",
+    "role": "Key-free local mini-swe-agent worker endpoint",
+    "why_selected": "It is the only local model that passed the worker gate on this host. The prior 7B models and Qwen3-4B-Instruct-2507 (3/5) did not qualify.",
+    "comparison_that_would_overturn": "The identical gate (mini-swe-agent, vLLM, srt loopback-only egress, 5 tasks and 20 tool calls, bars 4 and 19) run with Qwen/Qwen3.5-9B and ibm-granite/granite-4.2-8b. A candidate passing above the bar across more than one run replaces this at-bar, single-run result.",
+    "upstream_now": {
+     "license": "Apache-2.0",
+     "released_at": "2025-05-03"
+    }
+   }
+  },
+  {
+   "catalog": "trading",
+   "layer": "agents-models-workers",
+   "lane": "critic-models-sources",
+   "repository": "https://platform.claude.com/docs/en/models/overview",
+   "catalog_id": "claude-opus-5[1m]",
+   "status": "pin_behind_upstream",
+   "survives": true,
+   "verified": true,
+   "reason": "no_card_with_repository_in_layer",
+   "evidence": [
+    "models.json entries: claude-opus-5[1m] default (release 2026-07-24); claude-fable-5-1 'excluded' ('preserve the user-selected exclusion')",
+    "manifests/stack.json lists claude-fable-5-1 as 'observed configured default in bounded read-only trial'. This contradicts models.json 'excluded'.",
+    "agent-lab docs/tasks/2026-09-22-opus-5-5-main-routing.md (untracked, L1-20): Opus 5.5 is the main/coordinator model and Fable 5.1 is escalation; decision status keep-but-compare; opus alias resolves claude-opus-5-5 on Claude Code >= 2.1.280",
+    "This session's harness reports model id claude-opus-5-5[1m] (observed now)"
+   ],
+   "note": "models.json is stale on hosted Claude: it has no Opus 5.5 entry, and its Fable 5.1 status disagrees with stack.json.",
+   "lane_item": {
+    "catalog_id": "claude-opus-5[1m]",
+    "role": "Native research/review companion",
+    "why_selected": "Native account flow with a retained Opus 5 research receipt.",
+    "comparison_that_would_overturn": "Record the Opus 5.5 routing decision in models.json (keep-but-compare per the agent-lab record). Opus 5 stays only if a paired run shows Opus 5.5 regressing."
+   }
+  },
+  {
+   "catalog": "trading",
+   "layer": "backtesting-engine",
+   "lane": "beyond",
+   "repository": "https://github.com/mementum/backtrader",
+   "catalog_id": "backtrader",
+   "status": "unmaintained_signal",
+   "survives": true,
+   "verified": true,
+   "reason": "no_card_with_repository_in_layer",
+   "evidence": [
+    "github-freshness.json repositories[\"https://github.com/mementum/backtrader\"]: pushed_at 2024-08-19, head date 2023-04-19, latest_tag 1.94.15.104 (differs from the catalog pin 1.9.78.123; tag ordering not verified)",
+    "trading-catalog.json entry backtrader decision alternative"
+   ],
+   "note": null,
+   "lane_item": {
+    "catalog_id": "backtrader",
+    "catalog_pin": "1.9.78.123",
+    "role": "legacy-engine (alternative)",
+    "upstream_now": {
+     "stars": 23305,
+     "pushed_at": "2024-08-19",
+     "license": "GPL-3.0"
+    },
+    "why_selected": "Kept only as an offline comparator for existing strategies. Actively maintained equivalents are already in the catalog: nautilus_trader and Lean (default), backtesting.py (pushed 2026-08-05) and vectorbt (v1.1.0 2026-07-05), both alternatives.",
+    "comparison_that_would_overturn": "None expected. Demote to excluded if no existing strategy still needs it."
+   }
+  },
+  {
+   "catalog": "foundation",
+   "layer": "document-retrieval",
+   "lane": "critic-models-sources",
+   "repository": "https://huggingface.co/Qwen/Qwen3-Reranker-0.6B",
+   "catalog_id": "QMD DEFAULT_RERANK_MODEL hf:ggml-org/Qwen3-Reranker-0.6B-Q8_0-GGUF/qwen3-reranker-0.6b-q8_0.gguf",
+   "status": "keep_but_compare",
+   "survives": null,
+   "verified": false,
+   "reason": "no_card_with_repository_in_layer",
+   "evidence": [
+    "gh api repos/tobi/qmd/contents/src/llm.ts?ref=v2.8.3 L282-283: DEFAULT_EMBED_MODEL embeddinggemma-300M-Q8_0, DEFAULT_RERANK_MODEL qwen3-reranker-0.6b-q8_0",
+    "HF API Qwen/Qwen3-Reranker-0.6B: createdAt 2025-05-29T13:30:45Z, sha e61197ed4502, apache-2.0, gated False, params 595776512",
+    "nas-wt-critic docs/landscape.md L22: 'BM25 active; QMD GGUF semantic defaults and rerankers remain separate optional choices'",
+    "models.json jinaai/jina-reranker-v3.5: excluded, cc-by-nc-4.0"
+   ],
+   "note": "This is a 2025 model, not 2022-2024. No newer Qwen text-only reranker exists; the newest Qwen reranker is Qwen3-VL-Reranker-2B (2026-01-07).",
+   "lane_item": {
+    "catalog_id": "QMD DEFAULT_RERANK_MODEL hf:ggml-org/Qwen3-Reranker-0.6B-Q8_0-GGUF/qwen3-reranker-0.6b-q8_0.gguf",
+    "role": "Optional QMD reranker (the layer default is BM25)",
+    "why_selected": "It is QMD's upstream default. It is a GGUF that node-llama-cpp's ranking context loads without a projector or fork, unlike jina-reranker-v3.5 (manifests/landscape.json L256).",
+    "comparison_that_would_overturn": "A held-out doc-retrieval set (for example the catalog's own Markdown) run through QMD with QMD_RERANK_MODEL swapped to a 2025-2026 Apache GGUF reranker, beating Qwen3-Reranker-0.6B on nDCG@10 at comparable latency."
+   }
+  },
+  {
+   "catalog": "foundation",
+   "layer": "document-retrieval",
+   "lane": "critic-models-sources",
+   "repository": "https://huggingface.co/google/embeddinggemma-300m",
+   "catalog_id": "QMD DEFAULT_EMBED_MODEL hf:ggml-org/embeddinggemma-300M-GGUF",
+   "status": "keep_but_compare",
+   "survives": null,
+   "verified": false,
+   "reason": "no_card_with_repository_in_layer",
+   "evidence": [
+    "HF API: createdAt 2025-07-17T19:53:55Z, license gemma, gated manual, params 302863104",
+    "docs/hf-memory-model-qualification.md L19: 'Unadopted compact candidate ... gated model/config access'"
+   ],
+   "note": null,
+   "lane_item": {
+    "catalog_id": "QMD DEFAULT_EMBED_MODEL hf:ggml-org/embeddinggemma-300M-GGUF",
+    "role": "Optional QMD vector index embedder",
+    "why_selected": "It is QMD's upstream default, so it is not an independent project choice.",
+    "comparison_that_would_overturn": "QMD_EMBED_MODEL swapped to a current GGUF embedder on the same held-out doc set."
+   }
+  },
+  {
+   "catalog": "foundation",
+   "layer": "durable-memory",
+   "lane": "critic-models-sources",
+   "repository": "https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2",
+   "catalog_id": "sentence-transformers/all-MiniLM-L6-v2",
+   "status": "demotion_proposed",
+   "survives": true,
+   "verified": true,
+   "reason": "no_card_with_repository_in_layer",
+   "evidence": [
+    "HF API: createdAt 2022-03-02T23:29:05Z, sha 1110a243fdf4 (equal to the pin), apache-2.0, params 22713728",
+    "manifests/stack.json models entry role: 'Supported symmetric memory baseline, not latest SOTA'; docs/next-host-stages.md L70-72: 'all-MiniLM-L6-v2 (2022), a known gap'",
+    "gh api repos/akitaonrails/ai-memory/contents/docs/local-embeddings.md: 'Pure-Rust BERT inference (candle) with all-MiniLM-L6-v2 (384-dim)'; three files sha256-pinned 2026-09-01; truncates at 512 tokens",
+    "gh api .../docs/benchmarks/retrieval-ab-r2.md (commit 79fea400, release/2.4, 470 scored): FTS vs local MiniLM hit@5 0.666->0.815, hit@10 0.694->0.891, recall@10 0.564->0.817, p50 latency 5->94 ms",
+    "MTEB results repo LongMemEval (test, 6 subsets; unweighted mean computed by this lane): MiniLM 67.94, granite-embedding-311m-r2 69.11, harrier-oss-v1-0.6b 72.46, Nemotron-3-Embed-1B-BF16 81.58 (knowledge_update 91.67 vs 73.51; temporal_reasoning 79.41 vs 54.08)"
+   ],
+   "note": "Under the latest-SOTA rule this 2022 model is not_adopted as a SOTA selection. It stays only because nothing current fits the in-process provider. A current model is reachable only through openai-compat, which adds a server dependency.",
+   "lane_item": {
+    "catalog_id": "sentence-transformers/all-MiniLM-L6-v2",
+    "catalog_pin": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41 (manifests/stack.json)",
+    "role": "ai-memory in-process local embedder, 384 dims",
+    "why_selected": "It is the only model ai-memory's in-process local provider loads. The provider is pure-Rust candle BERT with three checksum-pinned files, needs no server or key, and gives a measured upstream recall gain over FTS-only.",
+    "comparison_that_would_overturn": "Run ai-memory's own LongMemEval-S A/B harness (docs/benchmarks/retrieval-ab-r2.md: cargo run --release -p ai-memory-eval -- retrieval --fetch --candidate-embeddings ...) with openai-compat pointed at the existing Nemotron-3-Embed-1B endpoint. Demote MiniLM only if the candidate beats hit@5 0.815 / recall@10 0.817 (470 scored) at acceptable p95 latency. Keep MiniLM if unprefixed Nemotron does not beat it. Whether the eval CLI accepts an openai-compat candidate value is unverified.",
+    "upstream_now": {
+     "license": "Apache-2.0",
+     "released_at": "2022-03-02"
+    }
+   }
+  },
+  {
+   "catalog": "trading",
+   "layer": "execution-broker",
+   "lane": "critic-models-sources",
+   "repository": "https://github.com/nautechsystems/nautilus_trader",
+   "catalog_id": "nautilus-ibkr-adapter / nautilustrader",
+   "status": "keep_but_compare",
+   "survives": null,
+   "verified": false,
+   "reason": "catalog_id_names_no_card",
+   "evidence": [
+    "gh api repos/nautechsystems/nautilus_trader/releases: v2.0.0rc5 2026-09-15T06:17:23Z is the newest prerelease (no rc6); newest stable v1.231.0 2026-08-02",
+    "PyPI nautilus-trader: newest upload 2.0.0rc5 2026-09-15T06:07:55Z"
+   ],
+   "note": "The pin is current, which answers the critic's 'newer Nautilus prereleases after 2.0.0rc5 were not checked'. The adapter's evidence_level stays source_review. Gates ibkr-local-acceptance and native-fault-behaviour are not re-judged here.",
+   "lane_item": {
+    "catalog_id": "nautilus-ibkr-adapter / nautilustrader",
+    "catalog_pin": "v2.0.0rc5 (1b0a49d2)"
+   }
+  },
+  {
+   "catalog": "trading",
+   "layer": "execution-broker",
+   "lane": "trading",
+   "repository": "https://github.com/alpacahq/alpaca-py",
+   "catalog_id": "alpaca-py / data-alpaca-py",
+   "status": "confirmed_default",
+   "survives": null,
+   "verified": false,
+   "reason": "catalog_id_names_no_card",
+   "evidence": [
+    "github-freshness.json repositories['https://github.com/alpacahq/alpaca-py'].latest_release = v0.44.0",
+    "catalogs/us-equities/runtime-target.json#/next_acceptance/2",
+    "blueprints/us-equities/broad-universe/README.md 'Source pins: alpaca-py 0.44.0'"
+   ],
+   "note": null,
+   "lane_item": {
+    "catalog_id": "alpaca-py / data-alpaca-py",
+    "catalog_pin": "0.44.0 (source cc4cb3b7ba50ae250e621983c2779047fb16bb28)",
+    "role": "official Alpaca SDK for ingestion and paper lifecycle",
+    "upstream_now": {
+     "archived": false,
+     "latest_release": "v0.44.0",
+     "license": "Apache-2.0",
+     "pushed_at": "2026-09-18T11:13:19Z",
+     "released_at": "2026-08-11T10:11:55Z",
+     "stars": 1528
+    },
+    "why_selected": "Official SDK used by the accepted Alpaca paper smoke and the broad-universe data collection (native receipts); pin equals upstream latest release.",
+    "comparison_that_would_overturn": "A release changing order/asset response shapes used by the adapter, detected by rerunning the five unchanged upstream read-only tests and the 27 local lifecycle tests."
+   }
+  },
+  {
+   "catalog": "trading",
+   "layer": "observability-hosting",
+   "lane": "trading",
+   "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+   "catalog_id": "opentelemetry-collector / -contrib",
+   "status": "confirmed_default",
+   "survives": null,
+   "verified": false,
+   "reason": "catalog_id_names_no_card",
+   "evidence": [
+    "github-freshness.json repositories['https://github.com/open-telemetry/opentelemetry-collector'] and ['...-contrib']"
+   ],
+   "note": null,
+   "lane_item": {
+    "catalog_id": "opentelemetry-collector / -contrib",
+    "catalog_pin": "v0.161.0",
+    "upstream_now": {
+     "latest_release": "v0.161.0",
+     "license": "Apache-2.0"
+    },
+    "why_selected": "native_proven log/metric export; both pins current."
+   }
+  },
+  {
+   "catalog": "foundation",
+   "layer": "observation-inference",
+   "lane": "critic-models-sources",
+   "repository": "https://huggingface.co/Qwen/Qwen3.8-27B",
+   "catalog_id": "Qwen/Qwen3.8-27B (served as ggml-org/Qwen3.8-27B-GGUF Q4_K_M)",
+   "status": "confirmed_conditional",
+   "survives": null,
+   "verified": false,
+   "reason": "no_card_with_repository_in_layer",
+   "evidence": [
+    "models.json entries[id=Qwen/Qwen3.8-27B]: conditional, source_review, created 2026-08-05T08:22:59+00:00, release 2026-08-14, apache-2.0",
+    "HF API: sha 1d4bf0f2ff60 (equal to the pin), params 27781427952, gated False; ggml-org/Qwen3.8-27B-GGUF sha efbb3b1f70a2 (equal to the stack.json revision)",
+    "Card benchmark table (L60-110): Terminal Bench 2.1 (Terminus) 73.0 vs Qwen3.6-27B 63.4; SWE-bench Pro 61.7 vs 53.5 (publisher, Claude Code harness)",
+    "nvidia/Qwen3.8-27B-NVFP4 card: GPQA Diamond 88.01 (NVFP4) vs 88.92 (BF16), Terminal-Bench 74.02 vs 75.56; HF usedStorage 21934506600 bytes, which is tight on 24 GB",
+    "mlx-community/Qwen3.8-27B-4bit: created 2026-08-14, usedStorage 16074530674 bytes, apache-2.0, which fits the 64 GB Apple Silicon host by size (no MLX run observed)"
+   ],
+   "note": "Models.json's 'Local generation rests on one qualified repair on one GPU' is the only execution evidence. There is no receipt for the MLX path.",
+   "lane_item": {
+    "catalog_id": "Qwen/Qwen3.8-27B (served as ggml-org/Qwen3.8-27B-GGUF Q4_K_M)",
+    "catalog_pin": "1d4bf0f2ff6012fd82039f2fa52739d0dd7c60c0; GGUF efbb3b1f70a21d97fd4495240648405f7228554f",
+    "role": "Local generation trial (local-generation-trial = trial, accepted_within_scope)",
+    "why_selected": "This is the newest Apache-licensed dense model that fits the 24 GB host as Q4_K_M. Both pins equal the current HF heads. Its publisher agentic scores lead the Qwen3.6 predecessor in the same table.",
+    "comparison_that_would_overturn": "A bounded local extraction or summarization packet on the RTX 5090 Laptop where Nemotron-3.5-Lightning-30B-A3B-NVFP4 matches accuracy at materially higher tokens/s or lower VRAM. Financial extraction accuracy is still unmeasured (models.json limitation).",
+    "upstream_now": {
+     "released_at": "2026-08-14",
+     "license": "apache-2.0"
+    }
+   }
+  },
+  {
+   "catalog": "trading",
+   "layer": "research-factors-ml",
+   "lane": "beyond",
+   "repository": "https://github.com/baobach/mlfinpy",
+   "catalog_id": "mlfinpy",
+   "status": "unmaintained_signal",
+   "survives": null,
+   "verified": false,
+   "reason": "no_card_with_repository_in_layer",
+   "evidence": [
+    "github-freshness.json repositories[\"https://github.com/baobach/mlfinpy\"]: pushed_at 2025-01-23, no push in the last 12 months"
+   ],
+   "note": null,
+   "lane_item": {
+    "catalog_id": "mlfinpy",
+    "catalog_pin": "0.1.2",
+    "role": "labeling (watch)",
+    "upstream_now": {
+     "stars": 84,
+     "pushed_at": "2025-01-23",
+     "license": "MIT",
+     "latest_release": "0.1.2",
+     "released_at": "2024-10-09"
+    },
+    "why_selected": "It is only on watch. The catalog has no maintained equivalent for AFML-style labeling.",
+    "comparison_that_would_overturn": "Demote to excluded unless a specific labeling method is needed. Reimplement that method with tests instead."
+   }
+  },
+  {
+   "catalog": "foundation",
+   "layer": "semantic-rag",
+   "lane": "critic-models-sources",
+   "repository": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16",
+   "catalog_id": "nvidia/Nemotron-3-Embed-1B-BF16",
+   "status": "confirmed_default",
+   "survives": null,
+   "verified": false,
+   "reason": "no_card_with_repository_in_layer",
+   "evidence": [
+    "models.json entries[id=nvidia/Nemotron-3-Embed-1B-BF16]: decision=default, evidence_level=native_proven, repository_created_at 2026-07-14T07:32:18+00:00, release_evidence_date 2026-07-16, license openmdw-1.1",
+    "HF API (https://huggingface.co/api/models/nvidia/Nemotron-3-Embed-1B-BF16, fetched 2026-09-23): createdAt 2026-07-14T07:32:18Z, sha c0c9fea93ea4 (equal to the stack.json pin), gated False, params 1140918272, license other/openmdw-1.1",
+    "Model card (fetched README, section 'Properties'/'Text Retrieval benchmarks'): RTEB 72.38, ViDoRe-V3 text 57.74, MMTEB (Retrieval) 71.04, all NDCG@10 at sequence length 4096",
+    "MTEB results repo, gh api repos/embeddings-benchmark/results/contents/results/nvidia__Nemotron-3-Embed-1B-BF16/f880174635613cff04033875fc6a69296cb72006/*.json (mteb 2.18.1): Code1Retrieval 93.65, EnglishFinance1Retrieval 85.28, EnglishFinance3Retrieval 74.93. Same tasks: harrier-oss-v1-0.6b 92.02/71.33/69.86, granite-embedding-311m-multilingual-r2 87.73/65.00/63.69, all-MiniLM-L6-v2 80.03/60.02/60.47. Note: result revision f8801746 differs from pinned c0c9fea9.",
+    "nas-wt-critic evidence/artifacts/gap-wave2-20260923/semantic-rag/held-out-recall-benchmark.json result: incumbent Recall@5=0.971, MRR=0.853 vs bge-small-en-v1.5 Recall@5=0.771, MRR=0.592 on a sealed 35-question set. Limitation: one alternative only; Nemotron 8B not served.",
+    "nas-wt-critic docs/hf-memory-model-qualification.md L8-17: active SocratiCode embedder; 8B card RTEB 78.46 vs 72.38"
+   ],
+   "note": "Documented as done: native_proven (models.json). Observed now: HF head equals the pin. The held-out metric the critic called missing now exists as a wave-2 receipt, but its only comparator is a 2023 model.",
+   "lane_item": {
+    "catalog_id": "nvidia/Nemotron-3-Embed-1B-BF16",
+    "catalog_pin": "c0c9fea93ea424587517f2c59e20db9f1d6bf615 (manifests/stack.json models entry)",
+    "role": "Local text/code embeddings behind SocratiCode (2048 dims, vLLM, port 8231)",
+    "why_selected": "This is a current model (the July 2026 family). The pin matches the current HF head. It has retained native evidence and a sealed held-out recall win. On independent MTEB/RTEB result files it leads the current compact alternatives on code, finance and memory retrieval tasks.",
+    "comparison_that_would_overturn": "Re-run the sealed 35-question harness (blueprints/gap-wave2-20260923/rag-bench-eval) with Nemotron-3-Embed-8B-BF16 or a newer compact model as the arm. Overturn only if a candidate beats Recall@5=0.971 and MRR=0.853 within the shared 24,463 MiB GPU budget (the embedder plus 8B worker already peaked at 20,217 MiB).",
+    "upstream_now": {
+     "released_at": "2026-07-16",
+     "license": "openmdw-1.1"
+    }
+   }
+  },
+  {
+   "catalog": "foundation",
+   "layer": "semantic-rag",
+   "lane": "critic-models-sources",
+   "repository": "https://huggingface.co/nvidia/Nemotron-3-Embed-8B-BF16",
+   "catalog_id": "nvidia/Nemotron-3-Embed-8B-BF16",
+   "status": "keep_but_compare",
+   "survives": null,
+   "verified": false,
+   "reason": "no_card_with_repository_in_layer",
+   "evidence": [
+    "models.json entries[id=nvidia/Nemotron-3-Embed-8B-BF16]: conditional, source_review, '7.95B, 4096 dimensions, about 15.91GB BF16 weights alone. No inference or reindex performed.'",
+    "docs/hf-memory-model-qualification.md L17: RTEB 78.46 vs 72.38 for 1B",
+    "evidence/artifacts/host-upgrade-20260923/upgrade-evidence.json L10: peak 20,217 MiB with the embedder plus the Qwen3-8B-AWQ worker"
+   ],
+   "note": null,
+   "lane_item": {
+    "catalog_id": "nvidia/Nemotron-3-Embed-8B-BF16",
+    "role": "Larger embedding quality candidate",
+    "why_selected": "Same current family, and the publisher reports a higher RTEB score. It is conditional only because nothing on this host has measured it.",
+    "comparison_that_would_overturn": "The same sealed 35-question harness plus a latency/VRAM run next to the qualified worker. Promote only if recall gains survive the co-residency budget."
+   }
+  }
+ ],
  "citation_review": {
   "general": [
    {
-    "catalog": "foundation",
-    "layer": "",
-    "severity": "medium",
-    "claim": "critic.uncited_claims[15] contradicted: Beyond quality-evaluation: 'The native /security-review and security-best-practices skills already cover security review' has no citation.",
-    "evidence": "docs/native-skill-practice-20260921.md:13",
-    "fix": "Doc says security-best-practices coverage is unqualified (\"security findings and false-positive control remain unqualified\"), contradicting manifest's unqualified \"already cover security review\" claim (manifest-20260923.json:3370).",
-    "reviewer": "critic-citations"
-   },
-   {
-    "catalog": "foundation",
-    "layer": "",
-    "severity": "low",
-    "claim": "critic.uncited_claims[16] unsupported: Beyond recovery-portability: casey/just, 'Project scripts and the Dagu workflows already act as task runners', has no citation.",
-    "evidence": "rg -n \"Project scripts and the Dagu workflows already act as task runners",
-    "fix": "task runner\"  -g '*.json' -g '*.md' \u2192 only self-referencing hit in manifest-20260923.json:4575/10241 and unrelated \"task runner\" role strings for `just`/`mise` in star-audit.json:912; no source ties Dagu to replacing `just` as a task runner. foundation.json's recovery-portability layer entry (catalogs/landscape/foundation.json, layer_id recovery-portability) cites only uv/Restic/mise, never Dagu-as-task-runner.",
-    "reviewer": "critic-citations"
-   },
-   {
-    "catalog": "foundation",
-    "layer": "",
-    "severity": "low",
-    "claim": "critic.uncited_claims[17] mixed: Beyond backtesting-engine: ai-trader 'Taiwanese commission and 95% cash allocation' and pybroker 'without IBKR/Alpaca execution receipts' have no file or line.",
-    "evidence": "catalogs/us-equities/star-audit.md:78 (also star-audit.json:867)",
-    "fix": "ai-trader Taiwanese-commission/95%-cash part contradicted as uncited (star-audit.md:78 states it); pybroker IBKR/Alpaca receipts part unsupported",
-    "reviewer": "critic-citations"
-   },
-   {
-    "catalog": "foundation",
-    "layer": "",
-    "severity": "low",
-    "claim": "critic.uncited_claims[18] unsupported: Beyond research-factors-ml: JerBouma/FinanceToolkit 'fundamentals ratios overlap edgartools' has no citation.",
-    "evidence": "rg -n \"FinanceToolkit\"  (all hits) and <work-dir>/trading-by-layer.json data-edgartools entry",
-    "fix": "manifest-20260923.json:7755-7759 cites only GitHub metadata for the \"fundamentals ratios overlap edgartools\" claim; edgartools' own role text (trading-by-layer.json, id data-edgartools) never mentions ratio computation, so no file/line supports the overlap assertion.",
-    "reviewer": "critic-citations"
-   },
-   {
-    "catalog": "foundation",
-    "layer": "",
-    "severity": "medium",
-    "claim": "critic.uncited_claims[19] contradicted: Beyond scheduling-supervision: 'The star audit records that restic scheduling is absent' gives no star-audit.md line.",
-    "evidence": "catalogs/us-equities/star-audit.md:98",
-    "fix": "star-audit.md:98 reads \"...absent scheduling, off-host recovery and application-consistent live-database restores remain limitations,\" directly recording restic scheduling as absent \u2014 a real star-audit.md line, contradicting the critic's claim that none exists.",
-    "reviewer": "critic-citations"
-   },
-   {
     "catalog": "trading",
     "layer": "backtesting-engine",
+    "repository": "https://github.com/whchien/ai-trader, https://github.com/edtechre/pybroker",
+    "severity": "low",
+    "file": "catalogs/us-equities/star-audit.md",
+    "line": "78 at a275ebc",
+    "claim": "critic.uncited_claims[17] mixed: Beyond backtesting-engine: ai-trader 'Taiwanese commission and 95% cash allocation' and pybroker 'without IBKR/Alpaca execution receipts' have no file or line.",
+    "evidence": "Reviewer citation: catalogs/us-equities/star-audit.md:78 at a275ebc (also catalogs/us-equities/star-audit.json:867 at a275ebc) -- Reviewer observation: ai-trader Taiwanese-commission/95%-cash part contradicted as uncited (star-audit.md:78 at a275ebc states it); pybroker IBKR/Alpaca receipts part unsupported",
+    "fix": "Cite catalogs/us-equities/star-audit.md:78 on the whchien/ai-trader candidate. For edtechre/pybroker, add the search that establishes 'without IBKR/Alpaca execution receipts' (for example `rg -l -i pybroker blueprints evidence/receipts`) or drop the phrase.",
+    "reviewer": "critic-citations"
+   },
+   {
+    "catalog": "foundation",
+    "layer": "quality-evaluation",
+    "repository": "https://github.com/cloudflare/security-audit-skill",
     "severity": "medium",
-    "claim": "critic.uncited_claims[11] contradicted: Trading backtesting-engine: 'SimulationModule + SimulatedExchange.adjust_account exist at rc5' gives no file line within exchange.rs or modules/mod.rs.",
-    "evidence": "<work-dir>/manifest-20260923.draft.json:6663 and :6671 (\"crates/backtest/src/exchange.rs line 661 defines `pub fn adjust_account`... exchange.rs line 1674\"); same text at lanes.json:4204,4212",
-    "fix": "exchange.rs does carry cited line numbers (661, 1674) for adjust_account; only modules/mod.rs's SimulationModule trait is given without a line number, so \"gives no file line within exchange.rs\" is false (partially true only for modules/mod.rs).",
+    "file": "docs/native-skill-practice-20260921.md",
+    "line": "13 at a275ebc",
+    "claim": "critic.uncited_claims[15] contradicted: Beyond quality-evaluation: 'The native /security-review and security-best-practices skills already cover security review' has no citation.",
+    "evidence": "Reviewer citation: docs/native-skill-practice-20260921.md:13 at a275ebc -- Reviewer observation: Doc says security-best-practices coverage is unqualified (\"security findings and false-positive control remain unqualified\"), contradicting manifest's unqualified \"already cover security review\" claim (catalogs/sota-convergence/manifest-20260923.json#/foundation/10/candidates/4/demonstrated_gap at a275ebc).",
+    "fix": "In the next beyond-lane pass, restate the cloudflare/security-audit-skill demonstrated_gap with the qualification from docs/native-skill-practice-20260921.md:13 (native security review exists; its findings and false-positive control remain unqualified), cite that line, and state whether the candidate closes the qualification gap instead of recording 'no demonstrated gap'.",
     "reviewer": "critic-citations"
    },
    {
     "catalog": "trading",
-    "layer": "storage-compute",
+    "layer": "research-factors-ml",
+    "repository": "https://github.com/JerBouma/FinanceToolkit",
+    "severity": "low",
+    "file": null,
+    "line": null,
+    "claim": "critic.uncited_claims[18] unsupported: Beyond research-factors-ml: JerBouma/FinanceToolkit 'fundamentals ratios overlap edgartools' has no citation.",
+    "evidence": "Reviewer citation: rg -n \"FinanceToolkit\" <checkout> (all hits) and <work-dir>/trading-by-layer.json#/layers/research-factors-ml/8 (id data-edgartools; the same card is #/layers/market-data-reference/3) entry -- Reviewer observation: catalogs/sota-convergence/manifest-20260923.json#/trading/4/candidates/1 at a275ebc (demonstrated_gap through evidence/0) cites only GitHub metadata for the \"fundamentals ratios overlap edgartools\" claim; edgartools' own role text (<work-dir>/trading-by-layer.json#/layers/research-factors-ml/8/role) never mentions ratio computation, so no file/line supports the overlap assertion.",
+    "fix": "Run the candidate's comparison_that_would_overturn (ratios computed on the same filings with edgartools and FinanceToolkit) or cite an edgartools ratio API; until then restate 'fundamentals ratios overlap edgartools' as an unverified overlap on the JerBouma/FinanceToolkit candidate.",
+    "reviewer": "critic-citations"
+   },
+   {
+    "catalog": "foundation",
+    "layer": "scheduling-supervision",
+    "repository": "https://github.com/healthchecks/healthchecks",
     "severity": "medium",
-    "claim": "critic.uncited_claims[10] contradicted: Trading storage-compute and data-quality-orchestration: 'No conditional in this layer is used by a receipt' gives no rg command.",
-    "evidence": "blueprints/us-equities/research-runtime/receipt.json:6-9 (component_ids includes \"dagu\"); dagu decision=conditional in <work-dir>/trading-by-layer.json layers[\"data-quality-orchestration\"]",
-    "fix": "The claim covers storage-compute (true, no conditional receipt-used there) and data-quality-orchestration jointly, but dagu is a conditional decision there and is used by this receipt plus wsl-transport-recovery/receipt.json and receipt-attempt-1.json, so the joint claim is false.",
+    "file": "catalogs/us-equities/star-audit.md",
+    "line": "98 at a275ebc",
+    "claim": "critic.uncited_claims[19] contradicted: Beyond scheduling-supervision: 'The star audit records that restic scheduling is absent' gives no star-audit.md line.",
+    "evidence": "Reviewer citation: catalogs/us-equities/star-audit.md:98 at a275ebc -- Reviewer observation: star-audit.md:98 at a275ebc reads \"...absent scheduling, off-host recovery and application-consistent live-database restores remain limitations,\" directly recording restic scheduling as absent \u2014 a real star-audit.md line, contradicting the critic's claim that none exists.",
+    "fix": "Withdraw critic.uncited_claims[19] and add catalogs/us-equities/star-audit.md:98 as the citation for 'restic scheduling is absent' in the healthchecks/healthchecks candidate evidence.",
     "reviewer": "critic-citations"
    }
   ]
@@ -12617,10 +13015,23 @@
   "foundation_layers": 20,
   "trading_layers": 12,
   "trading_layers_note": "trading_layers counts only taxonomy layers with at least one selected entry, unlike foundation_layers (which counts every row); trading[] itself always has one row per taxonomy id, so len(manifest[\"trading\"]) can exceed trading_layers whenever a taxonomy layer happens to have zero selected entries",
-  "components_confirmed": 121,
+  "components_confirmed": 120,
   "pins_behind_upstream": 51,
   "candidates_total": 73,
   "pins_behind_upstream_unique_components": 25,
+  "pins_behind_upstream_by_review_status": {
+   "not_individually_reviewed": 11,
+   "pin_behind_upstream": 39,
+   "pin_status_disputed": 1
+  },
+  "review_status_pin_behind_upstream": 39,
+  "pin_status_disputed": 4,
+  "pin_status_disputed_by_lane_status": {
+   "confirmed_conditional": 1,
+   "pin_behind_upstream": 3
+  },
+  "other_lane_reviews_pin_status_disputed": 2,
+  "pin_status_note": "pins_behind_upstream counts the generator's computed pin fields; pins_behind_upstream_by_review_status splits those rows by published review_status. A row's review_status is pin_behind_upstream[_unverified] only when its computed pin_behind_upstream is true, so review_status_pin_behind_upstream equals the pin_behind_upstream[_unverified] share of that split; a lane pin claim the computed fields contradict is published as pin_status_disputed[_unverified] (the lane's claim in disputed_lane_status and the row evidence) or, on an OS-package pin, distro_managed",
   "pins_behind_note": "components with a commit-pinned version (a parenthetical hash), a non-GitHub repository, or an OS-distribution package pin (matched by an -Nubuntu/-Ndeb/+debN pin suffix, or by id via --os-package-ids, e.g. systemd even though its own repository is on GitHub) are excluded from the pin-vs-upstream comparison rather than counted either way",
   "pins_not_compared": 20,
   "pins_not_compared_by_reason": {
@@ -12641,14 +13052,20 @@
   },
   "lane_groupings": 0,
   "lane_grouping_candidates": 0,
+  "unmatched_lane_items": 14,
+  "unmatched_lane_items_by_lane": {
+   "beyond": 2,
+   "critic-models-sources": 10,
+   "trading": 2
+  },
   "lane_groupings_note": "every foundation/trading-scoped count above (candidates_total, candidates_by_disposition, components_confirmed, pins_behind_upstream, pins_behind_upstream_unique_components) is computed from all_rows = manifest['foundation'] + manifest['trading'] only, and so excludes lane_groupings[].selected rows the same way it excludes lane_groupings[].candidates; candidates inside lane_groupings (a review-lane grouping id outside the foundation/taxonomy baseline, e.g. an awesome-list survey) are counted only in lane_grouping_candidates; counts.citation_review (computed below, by apply_citation_review) is the same way scoped -- its rows_flagged/attached only ever count a foundation/trading row, never a lane_groupings[].selected row, since apply_citation_review only walks manifest['foundation'] and manifest['trading']",
   "citation_review": {
    "findings_in_artifact": 47,
    "findings": 40,
    "out_of_scope": 7,
-   "attached": 33,
+   "attached": 36,
    "rows_flagged": 86,
-   "general": 7
+   "general": 4
   }
  }
 }

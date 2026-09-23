@@ -3,7 +3,11 @@
 dated SOTA-convergence manifest with the exact key layout of
 ``catalogs/sota-convergence/manifest-20260922.json`` (``schema_version, id,
 checked_at, scope, method, taxonomy, foundation, trading, lane_groupings,
-citation_review, critic, lane_calls, lane_limits, reconciliations, counts``).
+citation_review, critic, lane_calls, lane_limits, reconciliations, counts``),
+plus ``unmatched_lane_items`` (after ``lane_groupings``): every lane
+``selected[]`` item at a foundation/trading layer that lands on no card row
+(see ``collect_unmatched_lane_items``), published instead of silently
+dropped.
 ``citation_review`` (G6) is an optional overlay of an independent citation
 review's findings onto the rows they name -- see ``apply_citation_review``;
 always present, ``{"general": []}`` when ``--citation-review`` is not given.
@@ -690,6 +694,10 @@ def merge_lanes(lanes_doc: dict, repositories: dict):
                         evidence.append(f"verdict shared from layer {shared_from}")
                 entry = {
                     "lane": lane_name,
+                    # The adversarial outcome of this item's matching
+                    # proposal (True/False/None); None also when the lane
+                    # made no proposal for it (then "verified" is False).
+                    "survives": verdict.get("survives") if verdict is not None else None,
                     # The exact repository string this lane cited, kept so a
                     # lane_groupings row joined on repo_join_key still
                     # publishes a URL the lane actually wrote.
@@ -1000,17 +1008,70 @@ def pin_comparison_fields(classification: dict) -> dict:
 # instead, the lane's original status kept in the row's evidence.
 DISTRO_MANAGED_STATUS = "distro_managed"
 PIN_BEHIND_STATUSES = ("pin_behind_upstream", "pin_behind_upstream_unverified")
+# Any other contradiction between a lane's pin claim and the row's own
+# computed pin fields (2026-09-23 critic-gap recheck: phoenix pin_behind_upstream
+# with pin_behind_upstream false, lean-alpaca and inspect-ai pin_behind_upstream
+# on a not_compared pin, opensandbox confirmed_conditional with
+# pin_behind_upstream true) is published as PIN_STATUS_DISPUTED_STATUS: the
+# generator does not pick a side, the lane's claim stays in the row evidence
+# and in ``disputed_lane_status``.
+PIN_STATUS_DISPUTED_STATUS = "pin_status_disputed"
+UNVERIFIED_SUFFIX = "_unverified"
 
 
-def reconcile_status_with_pin(status_value, pin_fields: dict):
+def _unverified_suffix(status_value) -> str:
+    return UNVERIFIED_SUFFIX if str(status_value).endswith(UNVERIFIED_SUFFIX) else ""
+
+
+def lane_status_asserts_current_pin(lane_status) -> bool:
+    """True when a lane's own selected[] status (before the refuted-marker
+    resolution) states the pin as current: a lane-returned ``confirmed_*``
+    status (the lane would have said ``pin_behind_upstream`` otherwise) or a
+    ``confirmed_pin`` from a refuted pin_behind_upstream proposal. A
+    ``REFUTED_TO_CONFIRMED_MARKER`` (a refuted demotion/unmaintained signal)
+    confirms only the selection and makes no pin claim."""
+    return str(lane_status or "").startswith("confirmed")
+
+
+def reconcile_status_with_pin(status_value, pin_fields: dict, lane_status=None, lane=None):
     """Return ``(status, note)``: ``status`` never contradicts the row's own
-    pin state; ``note`` (or None) records a remapping in the row evidence."""
+    pin state; ``note`` (or None) records a remapping in the row evidence.
+
+    ``lane_status`` is the lane's raw status before
+    ``resolve_refuted_marker`` (default: ``status_value``). The row's pin
+    state is read only when ``pin_fields`` carries ``pin_behind_upstream``:
+
+    - a pin_behind_upstream status on an OS-package pin -> ``distro_managed``;
+    - a pin_behind_upstream status on a row whose computed
+      ``pin_behind_upstream`` is not true (false, or null for a pin that was
+      not compared) -> ``pin_status_disputed``;
+    - a lane status asserting the pin as current
+      (``lane_status_asserts_current_pin``) on a row whose computed
+      ``pin_behind_upstream`` is true -> ``pin_status_disputed``.
+
+    The ``_unverified`` suffix is kept in every mapping."""
+    lane_status = status_value if lane_status is None else lane_status
+    suffix = _unverified_suffix(status_value)
     if (pin_fields.get("pin_comparison_reason") == "os_package_pin"
             and status_value in PIN_BEHIND_STATUSES):
         mapped = DISTRO_MANAGED_STATUS + status_value[len("pin_behind_upstream"):]
         return mapped, (f"lane status {status_value} published as {mapped}: an OS-distribution "
                         "package pin is not compared with upstream release tags")
-    return status_value, None
+    if "pin_behind_upstream" not in pin_fields:
+        return status_value, None
+    behind = pin_fields["pin_behind_upstream"]
+    disputed = ((status_value in PIN_BEHIND_STATUSES and behind is not True)
+                or (lane_status_asserts_current_pin(lane_status) and behind is True))
+    if not disputed:
+        return status_value, None
+    mapped = PIN_STATUS_DISPUTED_STATUS + suffix
+    pin_state = f"pin_behind_upstream {json.dumps(behind)}, pin_comparison {pin_fields.get('pin_comparison')}"
+    if pin_fields.get("pin_comparison_reason"):
+        pin_state += f", pin_comparison_reason {pin_fields['pin_comparison_reason']}"
+    who = f"{lane} lane " if lane else "lane "
+    return mapped, (f"{who}status {status_value} published as {mapped}: it contradicts the row's "
+                    f"computed pin fields ({pin_state}); the lane's claim is kept in this row's "
+                    "evidence and disputed_lane_status")
 
 
 def _classification_of(baseline_row: dict) -> dict:
@@ -1019,7 +1080,7 @@ def _classification_of(baseline_row: dict) -> dict:
 
 
 def _build_card_row(card, *, layer_id, status, row_kind, repo_counts, selection=None, decision=None,
-                     base_fields):
+                     base_fields, landed=None):
     """Shared foundation-components[]/trading-entries[] row assembly: match
     this card's lane entries (G4), pick the row's own entry by G1 precedence
     (``select_row_review``), resolve a refuted-to-confirmed marker (G2)
@@ -1029,7 +1090,11 @@ def _build_card_row(card, *, layer_id, status, row_kind, repo_counts, selection=
     ``status`` is the join index from ``index_status_by_join_key``, looked up
     on ``(layer_id, repo_join_key(card["repository"]))``; a caller passing
     merge_lanes' exact-string index directly still matches on the exact
-    ``(layer_id, card["repository"])`` key as before."""
+    ``(layer_id, card["repository"])`` key as before.
+
+    ``landed`` (a set, optional) collects ``id()`` of every lane entry this
+    row published (chosen or other_lane_reviews), so ``build_manifest`` can
+    publish the entries no card row took (``collect_unmatched_lane_items``)."""
     bucket = (status.get((layer_id, repo_join_key(card["repository"])))
               or status.get((layer_id, card["repository"])))
     entries = bucket["entries"] if bucket else []
@@ -1057,6 +1122,8 @@ def _build_card_row(card, *, layer_id, status, row_kind, repo_counts, selection=
         entry for entry in entries
         if id(entry) not in matched_ids and entry["catalog_id"] in (None, card["id"])
     ]
+    if landed is not None:
+        landed.update(id(entry) for entry in [chosen, *others])
     evidence = list(chosen["evidence"])
     if by_repository_only:
         sharing = repo_counts.get(repo_join_key(card["repository"]), repo_counts.get(card["repository"], 0))
@@ -1064,10 +1131,12 @@ def _build_card_row(card, *, layer_id, status, row_kind, repo_counts, selection=
             evidence.append(f"lane entry matched by repository only; {sharing} cards share it")
     review_status, pin_note = reconcile_status_with_pin(
         resolve_refuted_marker(chosen["status"], row_kind=row_kind, selection=selection, decision=decision),
-        base_fields)
+        base_fields, lane_status=chosen["status"], lane=chosen["lane"])
     if pin_note:
         evidence.append(pin_note)
     row["review_status"] = review_status
+    if review_status.startswith(PIN_STATUS_DISPUTED_STATUS):
+        row["disputed_lane_status"] = chosen["status"]
     row["review_note"] = chosen["note"]
     row["evidence"] = evidence
     row["review_lane"] = chosen["lane"]
@@ -1075,15 +1144,61 @@ def _build_card_row(card, *, layer_id, status, row_kind, repo_counts, selection=
         other_reviews = []
         for other in others:
             review = other_lane_review(other, row_kind=row_kind, selection=selection, decision=decision)
-            review["status"], other_pin_note = reconcile_status_with_pin(review["status"], base_fields)
+            review["status"], other_pin_note = reconcile_status_with_pin(
+                review["status"], base_fields, lane_status=other["status"], lane=other["lane"])
             if other_pin_note:
                 review["evidence"] = list(review["evidence"]) + [other_pin_note]
+            if review["status"].startswith(PIN_STATUS_DISPUTED_STATUS):
+                review["disputed_lane_status"] = other["status"]
             other_reviews.append(review)
         row["other_lane_reviews"] = other_reviews
     for field in ROW_LANE_FIELDS:
         if field in chosen["lane_item"]:
             row[field] = chosen["lane_item"][field]
     return row
+
+
+UNMATCHED_NO_CARD = "no_card_with_repository_in_layer"
+UNMATCHED_CATALOG_ID = "catalog_id_names_no_card"
+
+
+def collect_unmatched_lane_items(status: dict, landed: set, rows_by_layer: dict) -> list:
+    """Every lane ``selected[]`` entry at a foundation/trading layer that no
+    card row published (neither as the row's own review nor under its
+    other_lane_reviews), instead of dropping it silently (2026-09-23
+    critic-gap recheck: 10 of critic-models-sources' 22 items, including a
+    surviving demotion, and 4 original-lane items vanished this way).
+
+    ``status`` is the ``index_status_by_join_key`` index, ``landed`` the
+    ``id()`` set ``_build_card_row`` filled, ``rows_by_layer`` maps a
+    foundation/trading layer id to ``(catalog, cards)``. A lane-grouping
+    layer id (not in ``rows_by_layer``) is skipped: every such entry already
+    lands in ``lane_groupings``. ``reason`` is ``no_card_with_repository_in_layer``
+    when no card in the layer shares the repository, else
+    ``catalog_id_names_no_card`` (the lane's catalog_id names no card that
+    shares it). Sorted by (layer, lane, repository, catalog_id)."""
+    items = []
+    for (layer_id, join_key), bucket in status.items():
+        if layer_id not in rows_by_layer:
+            continue
+        catalog, cards = rows_by_layer[layer_id]
+        sharing = [card for card in cards if repo_join_key(card["repository"]) == join_key]
+        for entry in bucket["entries"]:
+            if id(entry) in landed:
+                continue
+            items.append({
+                "catalog": catalog, "layer": layer_id, "lane": entry["lane"],
+                "repository": entry["repository"], "catalog_id": entry["catalog_id"],
+                # No card row, so no baseline decision to resolve a refuted
+                # demotion marker against (resolve_refuted_marker's
+                # lane_groupings branch).
+                "status": resolve_refuted_marker(entry["status"], row_kind="unmatched"),
+                "survives": entry.get("survives"), "verified": entry["verified"],
+                "reason": UNMATCHED_CATALOG_ID if sharing else UNMATCHED_NO_CARD,
+                "evidence": entry["evidence"], "note": entry["note"], "lane_item": entry["lane_item"],
+            })
+    items.sort(key=lambda item: (item["layer"], item["lane"], item["repository"], item["catalog_id"] or ""))
+    return items
 
 
 # A plain ``\bID\b`` regex boundary treats a hyphen as a non-word character,
@@ -1218,7 +1333,10 @@ def apply_citation_review(manifest: dict, citation_review_doc) -> None:
             for card in row.get("components", row.get("entries", [])):
                 if "citation_review" in card:
                     card["citation_review"].sort(key=lambda f: (f["reviewer"] or "", f["severity"] or "", f["claim"] or ""))
-    general.sort(key=lambda f: (f.get("reviewer") or "", f.get("layer") or "", f.get("line") or 0, f.get("claim") or ""))
+    # str(): a finding's line may be an int or a commit-qualified string
+    # ("594 at a275ebc"); mixed types must not raise.
+    general.sort(key=lambda f: (f.get("reviewer") or "", f.get("layer") or "", str(f.get("line") or ""),
+                                f.get("claim") or ""))
     manifest["citation_review"]["general"] = general
     manifest["counts"]["citation_review"] = {
         # findings_in_artifact/out_of_scope make the in-scope subset
@@ -1252,6 +1370,7 @@ def build_manifest(*, checked_at, manifest_id, scope, foundation_layers, trading
     # exact-string status keys (see index_status_by_join_key).
     status = index_status_by_join_key(status)
     foundation_selection = foundation_decision_selection_map(foundation_layers)
+    landed = set()
 
     # Fall back to deriving retained_from_prior_runs from count - fetched_this_run
     # for an older-format freshness file that predates these top-level fields
@@ -1281,6 +1400,8 @@ def build_manifest(*, checked_at, manifest_id, scope, foundation_layers, trading
                     "not a reason to upgrade",
         },
         "taxonomy": taxonomy, "foundation": [], "trading": [], "lane_groupings": [],
+        # Filled in below by collect_unmatched_lane_items, in position.
+        "unmatched_lane_items": [],
         # Placeholder; filled in by apply_citation_review() below (G6). Set
         # here, in position, so the key stays "... lane_groupings,
         # citation_review, critic ..." even before that call runs --
@@ -1301,7 +1422,7 @@ def build_manifest(*, checked_at, manifest_id, scope, foundation_layers, trading
             selection = foundation_selection.get((layer_id, component["id"]))
             components.append(_build_card_row(
                 component, layer_id=layer_id, status=status, row_kind="foundation",
-                repo_counts=repo_counts, selection=selection, base_fields=base_fields,
+                repo_counts=repo_counts, selection=selection, base_fields=base_fields, landed=landed,
             ))
         components.sort(key=row_item_sort_key)
         manifest["foundation"].append({
@@ -1325,6 +1446,7 @@ def build_manifest(*, checked_at, manifest_id, scope, foundation_layers, trading
             entries.append(_build_card_row(
                 entry, layer_id=layer_id, status=status, row_kind="trading",
                 repo_counts=repo_counts, decision=entry.get("decision"), base_fields=base_fields,
+                landed=landed,
             ))
         entries.sort(key=row_item_sort_key)
         manifest["trading"].append({
@@ -1345,6 +1467,9 @@ def build_manifest(*, checked_at, manifest_id, scope, foundation_layers, trading
     # verbatim into its own "lane_groupings" row instead -- nothing is
     # dropped, it just stops masquerading as a taxonomy layer.
     known_layers = {row["layer"] for row in manifest["foundation"]} | {row["layer"] for row in manifest["trading"]}
+    rows_by_layer = {row["layer"]: ("foundation", row["components"]) for row in baseline_foundation}
+    rows_by_layer.update({row["layer"]: ("trading", row["entries"]) for row in baseline_trading})
+    manifest["unmatched_lane_items"] = collect_unmatched_lane_items(status, landed, rows_by_layer)
     # A lane_groupings row has no baseline card list to match a lane entry's
     # catalog_id against (see match_lane_entries for foundation/trading), so
     # every distinct catalog_id an entry set (None included) at a given
@@ -1432,6 +1557,8 @@ def build_manifest(*, checked_at, manifest_id, scope, foundation_layers, trading
     def all_components(row):
         return row.get("components", row.get("entries", []))
 
+    all_cards = [card for row in all_rows for card in all_components(row)]
+    other_reviews = [review for card in all_cards for review in card.get("other_lane_reviews", [])]
     pins_behind_unique = {
         component["id"] for row in all_rows for component in all_components(row)
         if component["pin_behind_upstream"]
@@ -1454,6 +1581,25 @@ def build_manifest(*, checked_at, manifest_id, scope, foundation_layers, trading
         ),
         "candidates_total": sum(len(row["candidates"]) for row in all_rows),
         "pins_behind_upstream_unique_components": len(pins_behind_unique),
+        "pins_behind_upstream_by_review_status": dict(sorted(Counter(
+            card["review_status"] for card in all_cards if card["pin_behind_upstream"]
+        ).items())),
+        "review_status_pin_behind_upstream": sum(
+            1 for card in all_cards if card["review_status"] in PIN_BEHIND_STATUSES),
+        "pin_status_disputed": sum(
+            1 for card in all_cards if card["review_status"].startswith(PIN_STATUS_DISPUTED_STATUS)),
+        "pin_status_disputed_by_lane_status": dict(sorted(Counter(
+            card["disputed_lane_status"] for card in all_cards if "disputed_lane_status" in card
+        ).items())),
+        "other_lane_reviews_pin_status_disputed": sum(
+            1 for review in other_reviews if review["status"].startswith(PIN_STATUS_DISPUTED_STATUS)),
+        "pin_status_note": "pins_behind_upstream counts the generator's computed pin fields; "
+                           "pins_behind_upstream_by_review_status splits those rows by published review_status. "
+                           "A row's review_status is pin_behind_upstream[_unverified] only when its computed "
+                           "pin_behind_upstream is true, so review_status_pin_behind_upstream equals the "
+                           "pin_behind_upstream[_unverified] share of that split; a lane pin claim the computed "
+                           "fields contradict is published as pin_status_disputed[_unverified] (the lane's claim in "
+                           "disputed_lane_status and the row evidence) or, on an OS-package pin, distro_managed",
         "pins_behind_note": "components with a commit-pinned version (a parenthetical hash), a "
                              "non-GitHub repository, or an OS-distribution package pin (matched by "
                              "an -Nubuntu/-Ndeb/+debN pin suffix, or by id via --os-package-ids, "
@@ -1476,6 +1622,9 @@ def build_manifest(*, checked_at, manifest_id, scope, foundation_layers, trading
         )),
         "lane_groupings": len(manifest["lane_groupings"]),
         "lane_grouping_candidates": sum(len(g["candidates"]) for g in manifest["lane_groupings"]),
+        "unmatched_lane_items": len(manifest["unmatched_lane_items"]),
+        "unmatched_lane_items_by_lane": dict(sorted(Counter(
+            item["lane"] for item in manifest["unmatched_lane_items"]).items())),
         "lane_groupings_note": "every foundation/trading-scoped count above (candidates_total, "
                                 "candidates_by_disposition, components_confirmed, pins_behind_upstream, "
                                 "pins_behind_upstream_unique_components) is computed from all_rows = "
