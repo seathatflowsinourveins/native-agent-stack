@@ -1,7 +1,7 @@
 import csv
 import hashlib
 import importlib.util
-from datetime import datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 import tempfile
 import unittest
@@ -48,6 +48,43 @@ class IngestSnapshotRows(unittest.TestCase):
                 self.assertEqual(tuple(next(csv.reader(handle))), ingest.COLUMNS)
             fixture = ROOT / "blueprints/us-equities/data/fixtures/good.csv"
             self.assertEqual(fixture.read_text().splitlines()[0], ",".join(ingest.COLUMNS))
+
+
+class IngestSnapshotCompleteness(unittest.TestCase):
+    # 2026-09-22 is a Tuesday trading day; 2026-09-21 the prior session.
+    def _bar(self, y, m, d):
+        return {"timestamp": datetime(y, m, d, 4, 0, tzinfo=timezone.utc), "open": 1, "high": 2, "low": 1,
+                "close": 2, "volume": 5}
+
+    def test_todays_bar_is_completed_only_from_17_00_new_york(self):
+        bars = {"SPY": [self._bar(2026, 9, 21), self._bar(2026, 9, 22)]}
+        before = datetime(2026, 9, 22, 20, 59, tzinfo=timezone.utc)   # 16:59 EDT
+        after = datetime(2026, 9, 22, 21, 0, tzinfo=timezone.utc)     # 17:00 EDT
+        self.assertEqual(len(ingest.completed_bars(bars, before)["SPY"]), 1)
+        self.assertEqual(len(ingest.completed_bars(bars, after)["SPY"]), 2)
+
+    def test_expected_latest_session_uses_the_trading_calendar(self):
+        trading = lambda d: d.weekday() < 5
+        prev = lambda d: d - timedelta(days=3 if d.weekday() == 0 else 1)
+        self.assertEqual(ingest.expected_latest_session(datetime(2026, 9, 23, 14, 5, tzinfo=timezone.utc), trading, prev),
+                         date(2026, 9, 22))
+        self.assertEqual(ingest.expected_latest_session(datetime(2026, 9, 22, 22, 0, tzinfo=timezone.utc), trading, prev),
+                         date(2026, 9, 22))
+        self.assertEqual(ingest.expected_latest_session(datetime(2026, 9, 28, 14, 0, tzinfo=timezone.utc), trading, prev),
+                         date(2026, 9, 25))
+
+    def test_stale_truncated_or_empty_symbols_are_reported(self):
+        full = [self._bar(2026, 9, 21), self._bar(2026, 9, 22)]
+        problems = ingest.coverage_problems({"SPY": full, "AMD": full[:1], "ASTS": [], "META": full},
+                                            2, date(2026, 9, 22))
+        self.assertEqual(problems, {"AMD": "latest_session_2026-09-21_expected_2026-09-22",
+                                    "ASTS": "no_completed_bars"})
+        self.assertEqual(ingest.coverage_problems({"SPY": full}, 3, date(2026, 9, 22)),
+                         {"SPY": "only_2_of_3_sessions"})
+
+    def test_non_positive_sessions_is_refused(self):
+        with self.assertRaises(SystemExit):
+            ingest.main(["--env-file", "x", "--out", "o.csv", "--receipt", "r.json", "--sessions", "0"])
 
 
 if __name__ == "__main__":

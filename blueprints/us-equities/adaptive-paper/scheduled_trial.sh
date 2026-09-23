@@ -5,7 +5,8 @@
 #
 # Required env: TRIAL (runner trial id, [a-z0-9-]{1,24}), ENV_FILE (0600 paper
 # credential file outside any Git worktree), STATE_ROOT, OUT_DIR.
-# Optional: CONFIG (default config-sip.json), PY, GATE_PY.
+# Optional: CONFIG (default config-sip.json), PY, GATE_PY. Run it from a frozen,
+# read-only copy of a published commit (git archive), never from a live worktree.
 set -euo pipefail
 here="$(cd "$(dirname "$0")" && pwd)"
 data="$(cd "$here/../data" && pwd)"
@@ -14,6 +15,11 @@ CONFIG="${CONFIG:-$here/config-sip.json}"
 PY="${PY:-$HOME/.local/share/codex-ecosystem/tools/adaptive-paper-20260921/bin/python}"
 GATE_PY="${GATE_PY:-$HOME/.local/share/codex-ecosystem/tools/promotion-gate-20260922/.venv/bin/python3}"
 mkdir -p "$OUT_DIR"
+# One run per OUT_DIR: the lock directory is created atomically and never removed.
+if ! mkdir "$OUT_DIR/.run-once" 2>/dev/null; then
+  echo "refused: $OUT_DIR already holds a run (remove nothing; use a new OUT_DIR and TRIAL)" >&2
+  exit 3
+fi
 exec >>"$OUT_DIR/scheduled-trial.log" 2>&1
 echo "start $(date -u +%FT%TZ) trial=$TRIAL config_sha256=$(sha256sum "$CONFIG" | cut -c1-64)"
 timeout 120 "$PY" "$data/ingest_snapshot.py" --env-file "$ENV_FILE" --config "$CONFIG" \
