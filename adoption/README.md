@@ -25,7 +25,7 @@ These adoption profiles select from the existing component catalog; they do not 
 | `semantic-rag` | HF, vLLM, Qdrant, SocratiCode | Hardware-compatible model serving, explicit project index and real retrieval/watcher behavior |
 | `recovery` | Restic plus selected ai-memory/Qdrant application state | Isolated restore, logical comparison, independent key/destination, then explicit consumer cutover |
 
-The [reference manifest](manifest.json) maps **every selected component ID** to its native guide, including optional components outside these starting profiles. The [offline HTML setup guide](../docs/ecosystem/index.html) generates current counts and embeds these recipes alongside layer/profile selection, scoped acceptance and measured baseline choices. The [lifecycle guide](lifecycle.md) covers ownership, restart, recovery and rollback. The [portability comparison](research.md) explains why native uv is the required dependency tool and other environment managers remain optional.
+The [reference manifest](manifest.json) maps **every selected component ID** to its native guide, including optional components outside these starting profiles. The offline HTML setup guide (`docs/ecosystem/index.html`) generates current counts and embeds these recipes alongside layer/profile selection, scoped acceptance and measured baseline choices; it is generated, not committed -- build it with `python3 scripts/build_ecosystem.py --write`, or download it from a `publish-catalog.yml` workflow artifact (7-day retention, `workflow_dispatch`/`v*`-tag runs only). The [lifecycle guide](lifecycle.md) covers ownership, restart, recovery and rollback. The [portability comparison](research.md) explains why native uv is the required dependency tool and other environment managers remain optional.
 
 The [latest acceptance recipes](../blueprints/us-equities/acceptance-wave/README.md)
 reuse that SDK for synthetic temporal data and offline Alpaca request models, plus
@@ -116,5 +116,15 @@ and [program plan](../blueprints/us-equities/convergence-program/plan.json) iden
 the next concrete acceptance without reloading the entire repository catalog.
 
 Load `AGENTS.md`, this guide, then [the small continuation map](manifest.json). Follow [the update protocol](update.md) and only the layer needed for the task. Open gates remain in [the convergence ledger](../catalogs/us-equities/convergence-review.json); a new checkout cannot clear them. Distinguish latest upstream metadata from the compatible version actually accepted locally.
+
+To add your own host's evidence back to this reference (another WSL host, a
+macOS host, another agent session, or CI), use
+[the host evidence contribution guide](../docs/contributing-evidence.md) with
+[`scripts/host_receipts.py`](../scripts/host_receipts.py) and
+[the receipt schema](host-receipt.schema.json). It never uploads anything; it
+only records what actually ran on your host into a reviewable PR. Use
+[the component evidence matrix](../docs/component-evidence-matrix.md) to see,
+per layer, which winners still need a host receipt or an independent lane
+review on your platform before picking what to run.
 
 Primary references: [uv locking and synchronization](https://docs.astral.sh/uv/pip/compile/), [official Codex SDK](https://learn.chatgpt.com/docs/codex-sdk), [Codex authentication](https://learn.chatgpt.com/docs/auth), [Claude authentication](https://code.claude.com/docs/en/authentication), [Claude settings](https://code.claude.com/docs/en/settings).

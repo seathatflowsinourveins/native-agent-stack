@@ -145,6 +145,21 @@ class EcosystemManifestTests(unittest.TestCase):
         text = (self.root / "docs/ecosystem/index.html").read_text()
         return Page(text), text
 
+    def check_report(self):
+        result = self.run_generator("--check")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        return json.loads(result.stdout)
+
+    def assert_check_digest_changes(self, mutate):
+        """--check no longer compares against a committed file (there isn't
+        one); a source change is instead observed as a changed input/output
+        digest in two otherwise-passing --check reports."""
+        before = self.check_report()
+        mutate()
+        after = self.check_report()
+        self.assertNotEqual(after["input_sha256"], before["input_sha256"])
+        self.assertNotEqual(after["output_sha256"], before["output_sha256"])
+
     def test_public_filter_data_preserves_review_without_inventing_execution(self):
         page, _ = self.build()
         data = json.loads(page.data)
@@ -279,15 +294,46 @@ process.stdout.write(JSON.stringify({nodes, errors, renderAttempts, navigations}
         self.save()
         self.assertNotEqual(self.run_generator("--write").returncode, 0)
 
-    def test_rebuild_check_detects_changed_source_and_changed_generated_bytes(self):
-        self.build()
-        self.assertEqual(self.run_generator("--check").returncode, 0)
-        self.review["entries"][0]["role"] = "Corrected scope"
-        self.save()
-        self.assertNotEqual(self.run_generator("--check").returncode, 0)
-        self.build()
+    def test_check_reports_deterministic_digest_without_a_committed_file(self):
+        """docs/ecosystem/index.html is no longer committed; --check builds twice
+        into temporary directories and reports the input/output digests instead
+        of comparing against an on-disk file (which it does not even read)."""
+        page, expected = self.build()
         output = self.root / "docs/ecosystem/index.html"
         output.write_text(output.read_text() + "tampered")
+        result = self.run_generator("--check")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        report = json.loads(result.stdout)
+        self.assertEqual(report["status"], "passed")
+        self.assertEqual(report["bytes"], len(expected.encode("utf-8")))
+        self.assertEqual(report["output_sha256"], hashlib.sha256(expected.encode("utf-8")).hexdigest())
+        self.assertRegex(report["input_sha256"], r"^[0-9a-f]{64}$")
+        output.unlink()
+        self.assertEqual(self.run_generator("--check").returncode, 0)
+
+        self.review["entries"][0]["role"] = "Corrected scope"
+        self.save()
+        second = self.run_generator("--check")
+        self.assertEqual(second.returncode, 0, second.stdout + second.stderr)
+        second_report = json.loads(second.stdout)
+        self.assertNotEqual(second_report["input_sha256"], report["input_sha256"])
+        self.assertNotEqual(second_report["output_sha256"], report["output_sha256"])
+
+    def test_check_input_digest_covers_the_html_template(self):
+        """A template-only change must change input_sha256, not just output_sha256."""
+        self.build()
+        first = json.loads(self.run_generator("--check").stdout)
+        template = self.root / "docs/ecosystem/template.html"
+        template.write_text(template.read_text().replace("</body>", "<!-- template-only change --></body>", 1))
+        second_run = self.run_generator("--check")
+        self.assertEqual(second_run.returncode, 0, second_run.stdout + second_run.stderr)
+        second = json.loads(second_run.stdout)
+        self.assertNotEqual(second["input_sha256"], first["input_sha256"])
+        self.assertNotEqual(second["output_sha256"], first["output_sha256"])
+
+    def test_check_still_rejects_invalid_sources(self):
+        self.records.append(self.records[0])
+        self.save()
         self.assertNotEqual(self.run_generator("--check").returncode, 0)
 
     def test_input_hashes_and_section_hash_avoid_evidence_self_reference(self):
@@ -344,8 +390,7 @@ process.stdout.write(JSON.stringify({nodes, errors, renderAttempts, navigations}
         source = next(row for row in json.loads(page.data)["inputs"]
                       if row["path"] == "docs/adoption.md")
         self.assertEqual(source["sha256"], hashlib.sha256(b"One frozen adoption boundary.").hexdigest())
-        self.write("docs/adoption.md", "A corrected adoption boundary.")
-        self.assertNotEqual(self.run_generator("--check").returncode, 0)
+        self.assert_check_digest_changes(lambda: self.write("docs/adoption.md", "A corrected adoption boundary."))
 
     def test_unpublished_curated_source_is_available_as_one_complete_offline_recipe(self):
         source = {"title": "Research", "body": "Dated and unqualified",
@@ -424,8 +469,7 @@ process.stdout.write(JSON.stringify({nodes, errors, renderAttempts, navigations}
         self.assertEqual(len(page.scripts), 2)
         self.assertEqual(next(row for row in json.loads(page.data)["setup"]["recipes"]
                               if row["path"] == "recipes/search.md")["text"], hostile)
-        self.write("recipes/search.md", "Changed native installation")
-        self.assertNotEqual(self.run_generator("--check").returncode, 0)
+        self.assert_check_digest_changes(lambda: self.write("recipes/search.md", "Changed native installation"))
         self.adoption["recipe_map"]["search"] = "../outside.md"
         self.save()
         self.assertNotEqual(self.run_generator("--write").returncode, 0)
@@ -703,9 +747,10 @@ process.stdout.write(JSON.stringify({nodes, errors, renderAttempts, navigations}
         hashes = {row["path"]: row["sha256"] for row in data["inputs"]}
         path = "catalogs/foundation/surfaces.json"
         self.assertEqual(hashes[path], hashlib.sha256((self.root / path).read_bytes()).hexdigest())
-        self.surfaces["surfaces"][0]["scope"] = "Changed surface scope"
-        self.save_surfaces()
-        self.assertNotEqual(self.run_generator("--check").returncode, 0)
+        def change_surface_scope():
+            self.surfaces["surfaces"][0]["scope"] = "Changed surface scope"
+            self.save_surfaces()
+        self.assert_check_digest_changes(change_surface_scope)
 
     def test_surface_layer_coverage_and_references_must_resolve(self):
         self.surface_fixture()
@@ -842,9 +887,11 @@ process.stdout.write(JSON.stringify({nodes, errors, renderAttempts, navigations}
             self.assertIn(path, recipes)
             self.assertIn("/blob/main/", recipes[path]["url"])
         self.assertIn("/blob/main/catalogs/foundation/", data["grand_catalogs"]["foundation"]["url"])
-        self.foundation["layers"][0]["next_gap"] = "A changed next check"
-        self.save_grand_catalogs()
-        self.assertNotEqual(self.run_generator("--check").returncode, 0)
+
+        def change_next_gap():
+            self.foundation["layers"][0]["next_gap"] = "A changed next check"
+            self.save_grand_catalogs()
+        self.assert_check_digest_changes(change_next_gap)
 
     def test_catalog_references_must_resolve_before_publication(self):
         self.grand_catalog_fixture()

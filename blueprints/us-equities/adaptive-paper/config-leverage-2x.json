@@ -1,0 +1,132 @@
+{
+  "schema_version": 1,
+  "mode": "adaptive_paper",
+  "endpoint": "https://paper-api.alpaca.markets",
+  "feed": "sip",
+  "regular_session_only": true,
+  "duration_seconds": 300,
+  "cleanup_seconds": 120,
+  "max_api_requests_per_minute": 200,
+  "max_submit_requests_per_minute": 180,
+  "strategy_scope": [
+    "trend_momentum",
+    "range_breakout",
+    "mean_reversion",
+    "relative_strength",
+    "defensive_cash"
+  ],
+  "symbols": [
+    "SPY",
+    "QQQ",
+    "IWM",
+    "DIA",
+    "NVDA",
+    "AAPL",
+    "AMZN",
+    "GOOGL",
+    "TSLA",
+    "MSFT",
+    "JNJ",
+    "JPM",
+    "PG",
+    "AMD",
+    "ARM",
+    "ASTS",
+    "AVGO",
+    "COIN",
+    "CRWD",
+    "CRWV",
+    "META",
+    "MU",
+    "INTC",
+    "SNDK"
+  ],
+  "benchmarks": [
+    "SPY",
+    "QQQ",
+    "IWM",
+    "DIA"
+  ],
+  "capital_usd": "10000",
+  "max_gross_exposure_usd": "20000",
+  "max_order_notional_usd": "2000",
+  "max_order_quantity": 100,
+  "max_held_symbols": 10,
+  "max_outstanding_orders": 20,
+  "max_gross_loss_usd": "50",
+  "max_drawdown_usd": "50",
+  "max_leverage": "2",
+  "quote_max_age_seconds": 3,
+  "max_spread_bps": "15",
+  "warmup_samples": 32,
+  "warmup_seconds": 30,
+  "minimum_edge_bps": 4,
+  "min_entry_close_seconds": 300,
+  "order_timeout_seconds": 10,
+  "min_hold_seconds": 5,
+  "max_hold_seconds": 90,
+  "stop_bps": 25,
+  "take_profit_bps": 40,
+  "trailing_bps": 15,
+  "catalyst_orders_enabled": false,
+  "extended_hours_enabled": false,
+  "sessions": {
+    "extended_hours": false,
+    "overnight_holds": false,
+    "overnight_gross_multiple": "1.0"
+  },
+  "rotation": {
+    "enabled": false
+  },
+  "notes": "G-e leverage-schedule-v1-20260922, rung 2x. Gate row 'leverage-ladder-2x' in catalogs/us-equities/gates-20260922.json flips on needs_attention == 0 at blueprints/us-equities/adaptive-paper/ladder/2x/receipt.json; see agent-lab/docs/decisions/2026-09-22-leverage-schedule-and-entitlement.md for the design record. leverage_policy is the canonical leverage-schedule-v1-20260922 block (identical across every rung; see leverage.CANONICAL_V1_BLOCK), never widened per rung -- only the top-level max_leverage dial and the per-order sizing below differ from config-sip.json. max_order_quantity and max_order_qty_mode='notional' are widened together with max_gross_exposure_usd/max_order_notional_usd (=capital_usd*2 / gross/max_held_symbols) so the schedule's ceiling is more reachable than with the config-sip.json shipped per-order sizing (gross there is bounded at about 10 x min(price,$1000), well under even the 1x rung). F2 (2026-09-22 leverage fix round 1): max_order_quantity is 100, not 10 -- PolicyConfig.max_shares (strategies_v1.py) and RiskLimits.max_order_qty (safety.py) share the same 100-share hard ceiling, and a max_order_quantity of 10 silently undercut max_order_qty_mode='notional' for most of the symbol universe (floor(max_order_notional_usd/price) exceeds 10 shares for anything cheaper than about $100-400/share at this rung's notional), so entries never reached the sizing this config's max_order_notional_usd/max_gross_exposure_usd imply. F2 (2026-09-22 leverage fix round 2): max_gross_loss_usd/max_drawdown_usd are now $50/$50, config-sip.json's base $25 x this rung's 2x multiple (see config-leverage-1x.json's notes for the scaling rationale and config-leverage-4x.json's for the $100 4x value). At this rung's $20k gross ceiling, 15bps entry spread cost alone is up to $30 -- 60% of the scaled $50 cap, the same fraction the unscaled $25 cap absorbed at config-leverage-1x.json's $10k gross ceiling -- so the drawdown ladder's step-down (2x->1x at 25% drawdown, ->0 at 75%, fractions of max_drawdown_usd) gets an equal dollar-fraction of headroom to run here as at every other rung before drawdown_cap_reached/gross_loss trips, instead of the pre-round-2 flat $25 cap giving a higher-leverage rung less relative runway than a lower one. F2 (2026-09-22 leverage fix round 3, residual review finding F2 -- reachability): this scales the drawdown/loss caps to the rung's configured ceiling, not to leverage actually achieved -- this rung establishes the 2x safety envelope (the max_leverage ceiling and the drawdown ladder's own step-downs bound what a run is PERMITTED to reach); it does not by itself guarantee a run's actual gross-to-equity exposure reaches 2x, and achieved exposure may stay below it. Every leveraged run's outcome/receipt now records the achieved peak gross-to-equity leverage, the ceiling in force at that moment, and the time spent above the next-lower (1x) rung's own ceiling (outcome['leverage'].peak_achieved_leverage/ceiling_at_peak_achieved_leverage/seconds_above_next_lower_rung_ceiling; see leverage.next_lower_rung_ceiling and runner._leverage_achievement_step), so this gate row ('leverage-ladder-2x') is not, by itself, evidence the rung's exposure was ever achieved -- that evidence is this recorded receipt (README-safety.md's Leverage schedule section); no gate row in catalogs/us-equities/gates-20260922.json currently reads peak_achieved_leverage/seconds_above_next_lower_rung_ceiling, so a gate row can still flip to established on a receipt whose achieved exposure never exceeded 1x. tests/test_adaptive_paper_runner.py's test_rung_numeric_relationships now asserts max_gross_loss_usd == max_drawdown_usd == config-sip.json's $25 x this rung's multiple. Leverage above 1x is unqualified until this gate row's needs_attention count is 0 and a preflight-proven account multiplier >= 2 is confirmed (runner.py's validate_preflight, under the policy). Request ceilings are not fill targets. Predictive catalysts, Smart Router algorithms and live trading are unqualified. rotation.enabled stays false: registry.json currently ships only evidence_class SYN (synthetic, not accepted; see blueprints/us-equities/acceptance-wave/research-protocol.json's regime_selector field), so flipping this on today would run the selector framework against the same single inline policy with no real alternative to rotate to.",
+  "max_order_qty_mode": "notional",
+  "leverage_policy": {
+    "version": "leverage-schedule-v1-20260922",
+    "decision_record": "agent-lab/docs/decisions/2026-09-22-leverage-schedule-and-entitlement.md",
+    "schedule": {
+      "RTH": {
+        "trend": "4",
+        "range": "1",
+        "risk_off": "0",
+        "unavailable": "0"
+      },
+      "PRE": {
+        "trend": "1",
+        "range": "1",
+        "risk_off": "0",
+        "unavailable": "0"
+      },
+      "POST": {
+        "trend": "1",
+        "range": "1",
+        "risk_off": "0",
+        "unavailable": "0"
+      },
+      "CLOSED": {
+        "trend": "0",
+        "range": "0",
+        "risk_off": "0",
+        "unavailable": "0"
+      }
+    },
+    "overnight_max_leverage": "2",
+    "drawdown_ladder": [
+      {
+        "from_drawdown_fraction": "0",
+        "max_leverage": "4"
+      },
+      {
+        "from_drawdown_fraction": "0.25",
+        "max_leverage": "2"
+      },
+      {
+        "from_drawdown_fraction": "0.5",
+        "max_leverage": "1"
+      },
+      {
+        "from_drawdown_fraction": "0.75",
+        "max_leverage": "0"
+      }
+    ]
+  }
+}

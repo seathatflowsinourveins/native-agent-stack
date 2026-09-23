@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "id": "fixture-host-20260101--widget--use--20260101",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "fixture-host-20260101",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": false
+  },
+  "catalog_revision": "0000000000000000000000000000000000000000",
+  "component_id": "widget",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "echo hi; exit 1",
+      "exit": 1,
+      "duration_s": 0.01,
+      "output_sha256": "98ea6e4f216f2fb4b69fff9b3a44842c38686ca685f3f55dc48c5d3fb1107be4",
+      "output_excerpt": "hi"
+    }
+  ],
+  "tool_versions": {
+    "widget": "1.0.0"
+  },
+  "observed_at_utc": "2026-01-01T00:00:00Z",
+  "result": "pass",
+  "claim": "Fixture host claims the widget use command passed even though it exited 1.",
+  "limitations": [
+    "Synthetic fixture; not a real host or a real component."
+  ],
+  "evidence_class": "synthetic",
+  "reviews": [
+    {"kind": "self", "ref": "fixture", "verdict": "agree", "at_utc": "2026-01-01T00:00:00Z"}
+  ]
+}
