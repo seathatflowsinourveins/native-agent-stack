@@ -81,6 +81,14 @@ class AssessTests(unittest.TestCase):
         self.assertEqual(report["rows"][0]["latest_bound"]["age_days"], 30)
         self.assertEqual(report["rows"][0]["flags"], [])
 
+    def test_a_newer_bound_receipt_clears_an_older_one(self):
+        report = self.assess(summary(widget={"linux-wsl2-x86_64": [
+            entry("old.json", "1.0.0", "2026-08-01T00:00:00Z"),
+            entry("new.json", "1.0.0", "2026-10-25T00:00:00Z")]}), (["1.0.0"], "landscape_winner"))
+        row = report["rows"][0]
+        self.assertEqual((row["latest_bound"]["path"], row["latest_bound"]["age_days"]), ("new.json", 5))
+        self.assertEqual((row["bound_receipts"], row["flags"]), (2, []))
+
     def test_latest_bound_is_the_newest_bound_one_not_the_newest_overall(self):
         report = self.assess(summary(widget={"linux-wsl2-x86_64": [
             entry("old-pin.json", "0.9.0", "2026-10-29T00:00:00Z"),

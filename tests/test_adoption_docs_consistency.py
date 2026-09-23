@@ -48,7 +48,7 @@ DUE_MARKER = "not in the pinned release"
 HASH_RE = re.compile(r"(?<![0-9a-f])[0-9a-f]{40}(?![0-9a-f])")
 TAG_RE = re.compile(r"(?<![\w.])v\d{4}\.\d{2}\.\d{2}(?:\.\d+)?(?![\w.])")
 RELEASE_LABEL = re.compile(r"release[_ ](?:commit|tag)|attested release|pinned release", re.I)
-FENCE_RE = re.compile(r"^```.*?^```[ \t]*$", re.M | re.S)
+FENCE_RE = re.compile(r"^[ \t]*```.*?^[ \t]*```[ \t]*$", re.M | re.S)  # list items indent their fences
 LINK_RE = re.compile(r"\[(?:[^\]\\]|\\.)*\]\(\s*<?([^)\s>]+)>?(?:\s+\"[^\"]*\")?\s*\)")
 INLINE_CODE_RE = re.compile(r"`([^`\n]+)`")
 SCRIPT_MENTION_RE = re.compile(r"(?<![\w./-])((?:\.\./)*(?:scripts|tools|adoption)/[\w./-]+\.(?:py|sh|mjs|js))\b")
@@ -70,7 +70,7 @@ def sections(text: str) -> list[str]:
 
 
 def github_slug(heading: str) -> str:
-    text = re.sub(r"[`*_]", "", heading.strip().lower())
+    text = re.sub(r"[`*]", "", heading.strip().lower())
     text = re.sub(r"\[([^\]]*)\]\([^)]*\)", r"\1", text)
     text = re.sub(r"[^\w\- ]", "", text)
     return text.replace(" ", "-")
@@ -280,6 +280,10 @@ class ExclusiveFlagTests(unittest.TestCase):
                        "`python3 scripts/release_due.py --strict --strict-if-repinned origin/main`"):
             with self.subTest(mutant=mutant):
                 self.assertEqual(len(mutually_exclusive_violations(mutant, "mutant")), 1)
+
+    def test_indented_fences_inside_list_items_are_read(self):
+        mutant = "5. **Refresh.**\n\n   ```sh\n   python3 scripts/new_host_grand_list.py \\\n     --write --check\n   ```\n"
+        self.assertEqual(len(mutually_exclusive_violations(mutant, "mutant")), 1)
 
     def test_separate_invocations_pass(self):
         text = "```sh\npython3 scripts/new_host_grand_list.py --write\npython3 scripts/new_host_grand_list.py --check\n```"

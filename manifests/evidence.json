@@ -14600,8 +14600,8 @@
     },
     {
       "path": "tests/test_adoption_docs_consistency.py",
-      "sha256": "6238bd31a3af74a0070293e0a146c4f8ba7f56da8c463c89df59397065165f11",
-      "bytes": 17323
+      "sha256": "e3c40b83b481106564ec4c8cd8542b65e8de1b924f541df8cd8606ee2a222fd5",
+      "bytes": 17639
     },
     {
       "path": "tests/test_adoption_guarded_runners.py",
@@ -14915,8 +14915,8 @@
     },
     {
       "path": "tests/test_receipt_staleness.py",
-      "sha256": "ab5b7bb12e46817337be3d64c97ca0b29774d3fd554bc923a2c0b0d116fe8b58",
-      "bytes": 13270
+      "sha256": "7d913e7d81fd2807b9e01ede482f8d45de87a32be7fa613db9ec679a71f78480",
+      "bytes": 13776
     },
     {
       "path": "tests/test_release_pin_contents.py",
