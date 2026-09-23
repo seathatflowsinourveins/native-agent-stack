@@ -2,7 +2,8 @@
 
 Reads the crosswalk at catalogs/landscape/gap-crosswalk-92bb279.json and the wave's receipts
 under evidence/artifacts/<wave>/<layer_id>/*.json (default) or <wave>/<catalog>__<layer_id>/*.json
-(--dir-style catalog__layer, where gap_refs may omit layer_id; results.json is skipped), and writes
+(--dir-style catalog__layer, where gap_refs may omit layer_id; results.json, _index.json and
+preregistration*.json are skipped and any other JSON must be a receipt), and writes
 a ledger plus a summary page:
 
   python3 tools/sota-convergence/gap_wave_ledger.py --wave gap-wave2-20260923 --owner gap-resolution [--check]
@@ -13,7 +14,10 @@ Status per crosswalk gap: settled / advanced / not_settled from the receipts' se
 has one, best over the receipts that name the gap. A receipt naming several
 gaps carries one settles_gap value, so it credits each named gap at most "advanced": only a
 single-gap receipt can settle a gap. Gaps the owner was assigned but no receipt names are
-"not_run". Nothing here changes a verdict.
+"not_run". In catalog__layer mode a receipt may instead carry gap_index and an outcome
+(settled / advanced / not_settled / deferred / covered_elsewhere); deferred and covered_elsewhere
+give no settling credit but stay visible as their own status, and a missing source_revision
+defaults to the crosswalk's (flagged source_revision_defaulted). Nothing here changes a verdict.
 """
 import argparse
 import hashlib
@@ -22,13 +26,20 @@ import pathlib
 import sys
 
 CROSSWALK = "catalogs/landscape/gap-crosswalk-92bb279.json"
-RANK = {"not_run": 0, "not_settled": 1, "advanced": 2, "settled": 3}
-SETTLES = {"true": "settled", "partially": "advanced", "false": "not_settled"}
+RANK = {"not_run": 0, "deferred": 1, "covered_elsewhere": 2, "not_settled": 3, "advanced": 4, "settled": 5}
+SETTLES = {"true": "settled", "partially": "advanced", "false": "not_settled",
+           # outcome-only receipts (catalog__layer): no settling credit, but kept visible as their own status
+           "deferred": "deferred", "covered_elsewhere": "covered_elsewhere"}
+OUTCOME_TO_SETTLES = {"settled": "true", "advanced": "partially", "not_settled": "false",
+                      "deferred": "deferred", "covered_elsewhere": "covered_elsewhere"}
+STATUS_ORDER = ("settled", "advanced", "not_settled", "covered_elsewhere", "deferred", "not_run")
 
 
 def settle_key(value):
     if isinstance(value, bool):
         return "true" if value else "false"
+    if value in ("deferred", "covered_elsewhere"):
+        return value
     key = str(value).strip().split(" ")[0].strip("(),").lower()
     if key not in SETTLES:
         raise SystemExit(f"unknown settles_gap value {value!r}")
@@ -62,10 +73,22 @@ def load_receipts(root, wave, dir_style="layer"):
     out = []
     for directory, default_layer in _receipt_dirs(base, dir_style):
         for path in sorted(directory.glob("*.json")):
-            if path.name == "results.json":
-                continue  # a per-layer index, not a receipt
+            if path.name in ("results.json", "_index.json") or path.name.startswith("preregistration"):
+                continue  # per-layer indexes and preregistration records, not receipts
             data = json.loads(path.read_text(encoding="utf-8"))
-            if not isinstance(data, dict) or "gap_refs" not in data:
+            if dir_style == "catalog__layer":
+                # Every top-level JSON here except results.json is a receipt: fail loudly, never skip.
+                if not isinstance(data, dict) or ("gap_refs" not in data and "gap_index" not in data):
+                    raise SystemExit(f"{path}: not a receipt (needs gap_refs or gap_index)")
+                if "gap_refs" not in data:
+                    gi = data["gap_index"]
+                    data = {**data, "gap_refs": gi if isinstance(gi, list) else [gi]}
+                if "settles_gap" not in data:
+                    outcome = data.get("outcome")
+                    if outcome not in OUTCOME_TO_SETTLES:
+                        raise SystemExit(f"{path}: needs settles_gap or an outcome in {sorted(OUTCOME_TO_SETTLES)}")
+                    data = {**data, "settles_gap": OUTCOME_TO_SETTLES[outcome]}
+            elif not isinstance(data, dict) or "gap_refs" not in data:
                 continue
             refs = _refs(data, default_layer, path)
             per_gap = {k: settle_key(v) for k, v in (data.get("per_gap_settles") or {}).items()}
@@ -77,6 +100,7 @@ def load_receipts(root, wave, dir_style="layer"):
             out.append({
                 "path": str(path.relative_to(root)), "id": data.get("id"),
                 "source_revision": data.get("source_revision"), "gap_refs": [list(r) for r in refs],
+                "outcome": data.get("outcome"),
                 "settles_gap": data.get("settles_gap"), "settles_key": settle_key(data.get("settles_gap")),
                 "per_gap_settles": per_gap,
                 "direction": vi.get("direction"), "evidence_class": data.get("evidence_class"),
@@ -90,6 +114,9 @@ def build(root, wave, owner, dir_style="layer"):
     receipts = load_receipts(root, wave, dir_style)
     rev = crosswalk["source_revision"]
     for r in receipts:
+        if r["source_revision"] is None and dir_style == "catalog__layer":
+            # Outcome-only receipts carry crosswalk indexes by construction; record that it was defaulted.
+            r["source_revision"], r["source_revision_defaulted"] = rev[:7], True
         if not rev.startswith(str(r["source_revision"])[:7]):
             raise SystemExit(f"{r['path']}: source_revision {r['source_revision']} is not the crosswalk's {rev}")
     by_gap = {}
@@ -125,7 +152,8 @@ def build(root, wave, owner, dir_style="layer"):
                  "credit settled/advanced/not_settled, but a receipt naming several gaps credits each at most "
                  "advanced; not_run means no receipt names the gap. No verdict changes here."),
         "counts": dict(sorted(counts.items())), "layers": layers,
-        "receipts": sorted(({k: v for k, v in r.items() if k != "settles_key" and not (k == "per_gap_settles" and not v)}
+        "receipts": sorted(({k: v for k, v in r.items() if k != "settles_key" and not (k == "per_gap_settles" and not v)
+                              and not (k == "outcome" and v is None)}
                              for r in receipts), key=lambda r: r["path"]),
     }
     return doc
@@ -138,7 +166,8 @@ def render(doc):
              f"assigned to `{doc['owner']}`, keyed to the rows at `{doc['source_revision'][:7]}`. "
              "Each receipt was reviewed by an Opus evidence reviewer and corrected in one fix round. No verdict changes here.", "",
              f"Rule: {doc['rule']}", "", "## Totals", "", "| Status | Gaps |", "| --- | ---: |"]
-    lines += [f"| {k} | {doc['counts'].get(k, 0)} |" for k in ("settled", "advanced", "not_settled", "not_run")]
+    lines += [f"| {k} | {doc['counts'].get(k, 0)} |" for k in STATUS_ORDER
+              if k in doc["counts"] or k in ("settled", "advanced", "not_settled", "not_run")]
     lines += ["", f"Receipts: {len(doc['receipts'])}; native model calls recorded: "
               f"{sum(r['model_calls'] for r in doc['receipts'])}.", "",
               "## Per gap", "", "| Layer | Gap | Status | Receipts |", "| --- | ---: | --- | --- |"]
