@@ -2,6 +2,10 @@
 
 Use native Codex and Claude as the general engineering harnesses. This policy applies to ordinary projects, research workers and harness maintenance; the trading architecture adds its own domain requirements. The [foundation catalog](../catalogs/foundation/README.md) is the maintained layer map. The [trading catalog](../catalogs/us-equities/README.md) records the separate IBKR, NautilusTrader and Alpaca destination. Neither catalog is a startup prompt or a universal ranking.
 
+## Core rule
+
+Decide by evidence and research convergence: a choice stands when current primary sources (native help, official docs, maintained upstream) and reproduced results on the actual change agree, and it carries a dated record naming the alternatives and the comparison that would overturn it. Agreement, recency, stars and extra tooling are not evidence. The defaults below apply this rule; the same sentence opens agent-lab `AGENTS.md` (agent-lab PR #16, 2026-09-23), the user-level Claude instructions and Codex's global `AGENTS.md` on the reference host.
+
 ## Decide from the task and evidence
 
 Define acceptance from the requested outcome. Verify changed behavior with relevant upstream or project checks, inspect original source, and obtain independent review for substantive changes. Resolve supported findings before claiming completion; distinguish measured results, simulations and untested boundaries. More tools, more reasoning and reviewer agreement alone do not prove quality.
