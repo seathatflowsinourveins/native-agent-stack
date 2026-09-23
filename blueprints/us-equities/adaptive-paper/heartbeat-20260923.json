@@ -1,0 +1,380 @@
+{
+  "schema_version": 1,
+  "date": "2026-09-23",
+  "kind": "native_paper_heartbeat",
+  "status": "paper_qualification_blocked_crossed_quote_handling",
+  "account_scope": "Original durable account ledger, exclusive account lock, original SIP configuration; no reset or second state root",
+  "config_sha256": "77244c396c407d20f7b21f0e9e8ad9a2c4803ad663247ac210076a47ebbc7eb3",
+  "risk": {
+    "capital_usd": "10000",
+    "gross_usd": "5000",
+    "order_usd": "1000",
+    "order_shares": "1",
+    "loss_usd": "25",
+    "drawdown_usd": "25",
+    "leverage": "1",
+    "rest_per_minute": 200,
+    "all_submissions_per_minute": 180,
+    "duration_seconds": 300,
+    "cleanup_seconds": 120,
+    "observed_trading_api_header_limit": 200,
+    "market_data_header_limit": 10000,
+    "header_scope": "Separate Trading and Market Data headers; data entitlement does not establish trading throughput."
+  },
+  "continuity": {
+    "prior_trial_status": "completed_no_signals",
+    "before": {
+      "intents": 0,
+      "positions": 0,
+      "requests": 60,
+      "trials": 1
+    },
+    "after_first_attempt": {
+      "intents": 0,
+      "positions": 0,
+      "requests": 96,
+      "trials": 2
+    },
+    "migration": "Recognize exact original canonical limits only when new sizing and overnight fields equal their legacy fixed/1 defaults; atomic and idempotent, preserves all history",
+    "separate_ledger_timer": "Stopped before its scheduled 10:05 Eastern start to preserve account risk continuity",
+    "after_recovery": {
+      "intents": 0,
+      "positions": 0,
+      "requests": 168,
+      "trials": 3,
+      "phase": "finished",
+      "status": "passed"
+    },
+    "new_ledger_requests": 108,
+    "peak_rolling_60s_requests": 36
+  },
+  "preflight": {
+    "observed_at": "2026-09-23T13:37:58.862930+00:00",
+    "status": "ready",
+    "market_open": true,
+    "account_active": true,
+    "positions": 0,
+    "open_orders": 0,
+    "valid_quotes": 24,
+    "orders_submitted": 0,
+    "feed": "iex"
+  },
+  "promotion_gate": {
+    "feed": "sip",
+    "ingested_at": "2026-09-23T13:42:53Z",
+    "rows": 480,
+    "symbols": 24,
+    "completed_sessions": 20,
+    "latest_session": "2026-09-22",
+    "coverage_problems": 0,
+    "status": "pass",
+    "checks_passed": 12,
+    "checked_at": "2026-09-23T13:43:10.762061+00:00",
+    "snapshot_sha256": "99cbacdff5b88b28721076de37f8dd2f21c71c2dcf7f5da8e2c4813548b96701"
+  },
+  "attempts": [
+    {
+      "elapsed_seconds": 14.203172979992814,
+      "decision_exit": null,
+      "shutdown_failure": null,
+      "native_quotes": 17632,
+      "native_fill_events": 0,
+      "native_rejections": 0,
+      "reconciliation": {
+        "cash_delta_usd": "0.00",
+        "cash_match": true,
+        "open_orders": 0,
+        "positions": 0,
+        "positions_match": true
+      },
+      "policy_selections": {
+        "defensive_cash": 0,
+        "mean_reversion": 0,
+        "range_breakout": 0,
+        "relative_strength": 0,
+        "trend_momentum": 0
+      },
+      "preflight_observed_at": "2026-09-23T13:47:34.184052+00:00",
+      "broker_regular_session_open": true,
+      "output_sha256": "30e66211b11391e80274ca3347a5e33a4b31bb79542db0bdde5de42bd9ab58c9",
+      "raw_status": "completed_no_signals",
+      "source_commit": "507373b",
+      "assessed_status": "premature_stop_before_warmup",
+      "requested_duration_seconds": 300,
+      "submitted_orders": 0,
+      "roundtrips": 0,
+      "execution_cost_usd": "0",
+      "cost_basis": "No submitted orders or fills; existing data subscription costs not assessed.",
+      "ledger_requests_including_preflight": 36
+    },
+    {
+      "elapsed_seconds": 2.7740933029999724,
+      "decision_exit": {
+        "cleanup_deadline_reached": false,
+        "duration_completed": false,
+        "elapsed_seconds": 2.340507440007059,
+        "reason": "transport_gap",
+        "transport_health": {
+          "authenticated": {
+            "orders": true,
+            "quotes": true
+          },
+          "callback_failure": {
+            "exception_type": "TransportError",
+            "stage": "quote_normalization"
+          },
+          "fresh_quotes": true,
+          "frozen": true,
+          "ready": false,
+          "reasons": [
+            "callback_failure"
+          ],
+          "subscriptions": {
+            "orders": true,
+            "quotes": true
+          }
+        }
+      },
+      "shutdown_failure": null,
+      "native_quotes": 3208,
+      "native_fill_events": 0,
+      "native_rejections": 0,
+      "reconciliation": {
+        "cash_delta_usd": "0.00",
+        "cash_match": true,
+        "open_orders": 0,
+        "positions": 0,
+        "positions_match": true
+      },
+      "policy_selections": {
+        "defensive_cash": 0,
+        "mean_reversion": 0,
+        "range_breakout": 0,
+        "relative_strength": 0,
+        "trend_momentum": 0
+      },
+      "preflight_observed_at": "2026-09-23T14:04:35.522997+00:00",
+      "broker_regular_session_open": true,
+      "output_sha256": "9ee9c65f1977abe2a63772da3121b8dcbb1b5b76cc3129937f00ee753e87b6b5",
+      "raw_status": "needs_attention",
+      "source_commit": "1e2c96a9c7f8f637890eda65ec144324c3dd63e9",
+      "assessed_status": "transport_gap_quote_normalization",
+      "requested_duration_seconds": 300,
+      "submitted_orders": 0,
+      "roundtrips": 0,
+      "execution_cost_usd": "0",
+      "cost_basis": "No submitted orders or fills; existing data subscription costs not assessed.",
+      "ledger_requests_including_preflight": 36
+    }
+  ],
+  "research": {
+    "observed_at": "2026-09-23T13:37:39.732776Z",
+    "feed": "iex",
+    "news_items": 50,
+    "new_article_ids_since_September21": 50,
+    "snapshots": 24,
+    "fresh_quotes": 23,
+    "fresh_quotes_within_15bps": 6,
+    "errors": 0,
+    "quarantined": 0,
+    "news_window": "capped_more_available",
+    "engine_eligible": false,
+    "benchmark_prior_close_change_pct": {
+      "SPY": -0.144,
+      "QQQ": -0.306,
+      "IWM": -0.857,
+      "DIA": -0.206
+    },
+    "scope": "Daily snapshot context; cannot establish any rolling-window family or current regime; separate from actual SIP trial",
+    "news_timestamps": "Publication, update and observation timestamps retained separately in private raw research artifact."
+  },
+  "verification": {
+    "pre_fix_adaptive_tests": {
+      "run": 498,
+      "skipped": 1
+    },
+    "compatibility_adaptive_tests": {
+      "run": 502,
+      "passed": 501,
+      "skipped": 1,
+      "seconds": 15.375
+    },
+    "independent_compatibility_review": {
+      "supported_findings": 0,
+      "safety_tests_passed": 53
+    },
+    "prior_config": "Independently byte-verified and loaded through current runner; new opt-in policy features remain off",
+    "diagnostic_adaptive_tests": {
+      "run": 512,
+      "passed": 511,
+      "skipped": 1,
+      "seconds": 39.621
+    },
+    "independent_diagnostic_review": {
+      "supported_findings": 0,
+      "stop_status_tests_passed": 9,
+      "runner_tests_passed": 78,
+      "transport_tests_passed": 49,
+      "reviewed_commit": "909122bed7a3b6c21fcb807f7e7a9ce92bf55fdf"
+    },
+    "native_claude_review": {
+      "status": "success",
+      "resolved_model": "claude-opus-5-5",
+      "requested_role": "evidence-reviewer",
+      "requested_effort": "high (project role)",
+      "duration_ms": 152779,
+      "reported_turns": 16,
+      "requested_max_turns": 12,
+      "input_tokens": 16,
+      "output_tokens": 16255,
+      "cache_read_input_tokens": 294678,
+      "cache_creation_input_tokens": 64594,
+      "scope": "Read-only source review; no commands or tests run, no direct diff inspected; broker measurements supplied by coordinator.",
+      "verdict": "No blocking status defect; keep whole-feed freeze. Machine reason codes and exceptional cleanup diagnostic preservation need correction; a late-health concern is provisional.",
+      "followup": "All three supported concerns resolved in worker6d7bc8ad218fbd2971b3498082aecebe4364f314, integrated88b5444; third late-health hypothesis reproduced offline before correction."
+    },
+    "final_diagnostic_retention": {
+      "worker_commit": "6d7bc8ad218fbd2971b3498082aecebe4364f314",
+      "run": 518,
+      "passed": 517,
+      "skipped": 1,
+      "seconds": 46.806,
+      "skip": "test_adaptive_paper_sessions.SessionClockTests.test_exchange_calendars_agreement_or_absent",
+      "skip_reason": "exchange_calendars absent in shared engine environment",
+      "independent_native_stop_lifecycle": {
+        "run": 9,
+        "skipped": 0
+      },
+      "independent_transport": 51,
+      "independent_runner": 78,
+      "remaining_supported_findings": 0,
+      "changes": "Fixed bounded rejection codes/configured symbol; retained stop/health through final snapshot/reconciliation/shutdown errors; serious late health failure remains unsuccessful; whole-feed guard and numeric/order rules unchanged."
+    },
+    "independent_public_evidence_audit": "No factual errors or material caveats found against native attempts, recovery, market research and quote probe; five original-artifact hashes matched. Ledger peak rate and pending code review outside that reader's scope."
+  },
+  "private_artifacts": {
+    "market-research.json": {
+      "sha256": "f06de7f7619fae8d8d194610f513303eac5a942ed75aec345b44306a281a35ed",
+      "bytes": 123442,
+      "published": false
+    },
+    "preflight.json": {
+      "sha256": "6be1c72abff23332fcb842fd4c765e47dfdb6e69934989abdcb47fe2d3874f03",
+      "bytes": 6485,
+      "published": false
+    },
+    "prior-frozen-config-sip.json": {
+      "sha256": "77244c396c407d20f7b21f0e9e8ad9a2c4803ad663247ac210076a47ebbc7eb3",
+      "bytes": 1470,
+      "published": false
+    },
+    "universe-daily.csv": {
+      "sha256": "99cbacdff5b88b28721076de37f8dd2f21c71c2dcf7f5da8e2c4813548b96701",
+      "bytes": 35137,
+      "published": false
+    },
+    "ingest-receipt.json": {
+      "sha256": "5be5b1b98480479e8a6eb72676bcb865c88437a53015e83cf140eb8606f76e97",
+      "bytes": 630,
+      "published": false
+    },
+    "gate-result.json": {
+      "sha256": "5bc32ee7b5080cec11a63dbdc5dbd702c076368a19159c183a625bd5cabd8ec4",
+      "bytes": 1479,
+      "published": false
+    },
+    "adaptive-tests.log": {
+      "sha256": "0c9f8e18e1250c84a8a7d686fe9542423f5f5cb750322644f9e3814974970b85",
+      "bytes": 2473,
+      "published": false
+    },
+    "adaptive-tests-fixed.log": {
+      "sha256": "8ebb9ad1fddabe676bd63541ca17744fd93692b38acc1eb29e1d6bb95edc46a3",
+      "bytes": 2486,
+      "published": false
+    },
+    "paper-output.json": {
+      "sha256": "30e66211b11391e80274ca3347a5e33a4b31bb79542db0bdde5de42bd9ab58c9",
+      "bytes": 12407,
+      "published": false
+    },
+    "paper-output-diagnostic.json": {
+      "sha256": "9ee9c65f1977abe2a63772da3121b8dcbb1b5b76cc3129937f00ee753e87b6b5",
+      "bytes": 11703,
+      "published": false
+    },
+    "recovery-diagnostic.json": {
+      "sha256": "900d1424ab5f9f3c5baf264030886d524a72662a279a2ad1373c9b2782a340cd",
+      "bytes": 9385,
+      "published": false
+    },
+    "quote-validation-shadow.py": {
+      "sha256": "0c37ba9d46cdeb73b2eb6fc0061a69c2be1e1d22e476f12d5c696cf3137b46f8",
+      "bytes": 3314,
+      "published": false
+    },
+    "quote-validation-shadow.json": {
+      "sha256": "97d6c523ed4b5a4dce17e3770d046212d44af6f5fa8811258184cf5790aa0ace",
+      "bytes": 640,
+      "published": false
+    },
+    "claude-review.json": {
+      "sha256": "33a3a12e8fc1a0159890148b502f22fdb5ce5aa45a1fda0744b97baa6ac839d2",
+      "bytes": 289162,
+      "published": false
+    },
+    "worker-diagnostic-retention-tests.log": {
+      "sha256": "91f1243338e0c27eef3a215ef99e21be22eb301014884a97a73e7c2a26af9f97",
+      "bytes": 1986,
+      "published": false
+    }
+  },
+  "limitations": [
+    "Neither native entry attempt completed the authorized 300-second decision window; zero new orders, fills or roundtrips.",
+    "The first attempt raw success-like status is retained but rejected as five-minute acceptance; its exact trigger was not recorded.",
+    "Current whole-feed quote guard remains unchanged; per-symbol quarantine is unqualified and another unchanged entry trial would not resolve this defect.",
+    "The September21 178.7/minute result is synthetic and separate; broker throughput, profitable alpha and all-family native execution remain unqualified.",
+    "News is capped and advisory; no catalyst-order signals, extra leverage, paid features or live trading enabled."
+  ],
+  "source_commit": "1e2c96a9c7f8f637890eda65ec144324c3dd63e9",
+  "recovery": {
+    "status": "passed",
+    "preflight_observed_at": "2026-09-23T14:05:51.779850+00:00",
+    "reconciliation": {
+      "cash_delta_usd": "0.00",
+      "cash_match": true,
+      "open_orders": 0,
+      "positions": 0,
+      "positions_match": true
+    },
+    "submitted_orders": 0,
+    "ledger_requests_including_preflight": 36,
+    "scope": "Account cleanup only; does not promote either interrupted entry attempt."
+  },
+  "quote_validation_shadow": {
+    "mode": "read_only_market_data",
+    "feed": "sip",
+    "status": "sample_completed",
+    "started_at": "2026-09-23T14:07:10.007634+00:00",
+    "observed_at": "2026-09-23T14:07:25.142666+00:00",
+    "sample_seconds": 15.023416395008098,
+    "received": 19438,
+    "valid": 19405,
+    "invalid": 33,
+    "invalid_crossed": 33,
+    "invalid_nonpositive_price": 0,
+    "invalid_symbols": {
+      "QQQ": 31,
+      "AVGO": 2
+    },
+    "invalid_condition_codes": {
+      "R": 33
+    },
+    "orders_submitted": 0,
+    "raw_payloads_retained": false,
+    "interpretation": "Separate later sample proves crossed quotes occur and fail current normalization; does not identify the exact raw quote that stopped either entry trial."
+  },
+  "next_acceptance": "Qualify crossed-quote invalidation and strictly newer valid-quote recovery across transport/controller/native cache and order races with native Claude/Codex review before another five-minute trial on the same ledger and frozen config.",
+  "latest_reviewed_source_commit": "88b5444db8eafaa9920d49288f79fa5ec0bb4b72",
+  "latest_reviewed_source_scope": "Post-trial diagnostic retention changes; offline native lifecycle checks only, no further broker entry trial."
+}

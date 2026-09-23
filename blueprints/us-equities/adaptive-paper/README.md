@@ -1,5 +1,7 @@
 # Adaptive equity research and paper practice
 
+Latest measured follow-up: [September 23 native paper heartbeat](heartbeat-20260923.md) and [receipt](heartbeat-20260923.json). Two SIP trials stopped before five minutes; zero orders/fills, recovered flat and cash matched. Early-stop reporting and legacy ledger compatibility were corrected. Crossed-quote handling requires separate qualification before another entry trial. The September 21 receipt below remains dated historical evidence.
+
 This lane wires five deterministic policy families into NautilusTrader2.0.0rc5
 `LiveNode`, with the official Alpaca SDK0.44.0 carrying quotes, order updates and
 paper REST requests. The native strategy, risk/execution engines and portfolio

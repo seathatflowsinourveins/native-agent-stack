@@ -1,20 +1,28 @@
 {
   "schema_version": 1,
   "id": "ibkr-nautilus-alpaca-20260920",
-  "reviewed_at": "2026-09-21",
+  "reviewed_at": "2026-09-23",
   "scope": "User-selected destination, bounded native equity replay and Alpaca paper smoke acceptance, plus native adaptive-engine integration and dated shadow market research. New adaptive broker execution and strategy merit remain separate gates.",
   "adaptive_practice": {
     "source": "blueprints/us-equities/adaptive-paper/README.md",
     "receipt": "blueprints/us-equities/adaptive-paper/receipt.json",
     "engine": "NautilusTrader2.0.0rc5 LiveNode with custom Python Alpaca adapter and alpaca-py0.44.0",
-    "policies": ["trend_momentum", "range_breakout", "mean_reversion", "relative_strength", "defensive_cash"],
+    "policies": [
+      "trend_momentum",
+      "range_breakout",
+      "mean_reversion",
+      "relative_strength",
+      "defensive_cash"
+    ],
     "max_total_requests_per_minute": 200,
     "max_submission_requests_per_minute": 180,
     "native_synthetic_capacity": "180 fills / 90 roundtrips in60.4282seconds;178.7246submissions/minute;flat;zero broker connections",
-    "broker_status": "New adaptive trial not started: regular session closed; prior one-SPY broker receipt retained",
-    "market_research": "Bounded50-provider-news-item and24-IEX-snapshot collection observed; partial news coverage; no execution eligibility",
+    "broker_status": "September23 two native SIP trials interrupted before300seconds; zero orders/fills/roundtrips; explicit recovery flat with cash matched. Crossed-quote handling qualification required before another entry trial.",
+    "market_research": "September23 bounded50-news-item/24-IEX-snapshot collection; publication/update/observation times retained; capped advisory coverage, no execution eligibility.",
     "selection": "Reuse selected native engine and official SDK; no replacement justified by repository recency",
-    "overturning_comparison": "A maintained alternative must demonstrate better operational acceptance and cost-adjusted out-of-sample strategy results on the same frozen data/risk contract"
+    "overturning_comparison": "A maintained alternative must demonstrate better operational acceptance and cost-adjusted out-of-sample strategy results on the same frozen data/risk contract",
+    "latest_receipt": "blueprints/us-equities/adaptive-paper/heartbeat-20260923.json",
+    "latest_report": "blueprints/us-equities/adaptive-paper/heartbeat-20260923.md"
   },
   "foundation_catalog": "catalogs/foundation/manifest.json",
   "north_star": "blueprints/us-equities/north-star.md",
@@ -109,6 +117,12 @@
     "blueprints/us-equities/paper-e2e-20260921/paper-receipt.json"
   ],
   "next_acceptance": [
+    {
+      "id": "adaptive-crossed-quote-handling",
+      "status": "blocked_quote_quarantine_unqualified",
+      "scope": "September23 native SIP attempts stopped before300seconds with zero orders/fills; recovery flat and cash matched. A separate read-only sample observed33crossed quotes. Qualify atomic executable-cache invalidation, strictly newer valid recovery and held/pending order-race handling before another trial on the original ledger and frozen limits.",
+      "executed_evidence_ref": "blueprints/us-equities/adaptive-paper/heartbeat-20260923.json"
+    },
     {
       "id": "retained-equity-replay",
       "status": "reported_execution_blocked_review_incomplete",

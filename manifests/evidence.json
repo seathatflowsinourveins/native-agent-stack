@@ -2958,6 +2958,24 @@
         "socraticode is the profile's documented unpinned skip and was not installed."
       ],
       "path": "evidence/receipts/adoption-macos-hosted-smoke-20260922.json"
+    },
+    {
+      "id": "adaptive-paper-heartbeat-20260923",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "nautilus-trader",
+        "alpaca-py",
+        "claude-code",
+        "codex"
+      ],
+      "claim": "Two bounded native Alpaca SIP paper attempts stopped safely with zero orders and reconciled flat; reviewed ledger continuity and early-stop reporting corrections, bounded market research and crossed-quote diagnosis retained.",
+      "limitations": [
+        "Neither entry trial completed300seconds; strategy execution, profitability and broker throughput remain unqualified.",
+        "First trial success-like raw status was rejected as premature; exact original trigger unrecorded. Later read-only sample observed crossed quotes.",
+        "Whole-feed quote guard remains unchanged; qualified cache invalidation and order-race handling must precede another trial.",
+        "200REST/minute and180all-submissions/minute limits remain; no live trading, leverage above1x, paid features or catalyst-order signals."
+      ],
+      "path": "evidence/receipts/adaptive-paper-heartbeat-20260923.json"
     }
   ],
   "files": [
@@ -5429,8 +5447,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/README.md",
-      "sha256": "ad50a78997d267a12df136697f3b82fc1529bb953f5bcd4d806f1b35d3298872",
-      "bytes": 16833
+      "sha256": "cf4681d7639a8268597b31b46462d04f1889d32c6a95d0cdc069e9e32fa51048",
+      "bytes": 17276
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/adaptive_policy_v1.receipt.json",
@@ -5514,13 +5532,13 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/runner.py",
-      "sha256": "56d3a516b1e401eb41f52685d4befbaa6a198ddb91907f39462425b6a7a48698",
-      "bytes": 76216
+      "sha256": "f1209ebcfcb00df0e4364133db8298bcf8d8cdaddac6f86167ef6388b5773732",
+      "bytes": 82248
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/safety.py",
-      "sha256": "e521cbf18f44e24cb3bd67a2eab7481fe39680c1bf748fe12374f63c926657e8",
-      "bytes": 58870
+      "sha256": "fe3648ff6cc191928a679d97c99e821fa5c98c59ebc71398049dd52a62adaa06",
+      "bytes": 60251
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/selector.py",
@@ -5539,8 +5557,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "4fa841d2460b6d15669aa182b8c43453c232f0d7f680b1f78fa4f71893489238",
-      "bytes": 4133
+      "sha256": "287ac6514010219ba77f4d2cee790e1c2892c77e14775c32cb00feeba94dfd4a",
+      "bytes": 4247
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/strategies.py",
@@ -5554,8 +5572,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/transport.py",
-      "sha256": "7287de7b96ecfb4b87776c63d7cf1de247065c751ee23646d441fdb651193b9a",
-      "bytes": 42954
+      "sha256": "5fcd8d440f3c82d216468ab8465e6d3b3d22669e17603bbdbec0707ae5b6d716",
+      "bytes": 45096
     },
     {
       "path": "blueprints/us-equities/alpaca-historical/README.md",
@@ -7444,8 +7462,8 @@
     },
     {
       "path": "catalogs/us-equities/runtime-target.json",
-      "sha256": "c69a0e4dfc18cf5a0c9c34005b12400c2a4a413baa19f1957a20ab946fba8500",
-      "bytes": 8484
+      "sha256": "1f08fac1ee4ee6612629ea206a15d4b3b07e83b40dbce1db72ca21f7190c77b2",
+      "bytes": 9421
     },
     {
       "path": "catalogs/us-equities/security-identity-review.json",
@@ -7629,8 +7647,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "693c295e2e2e6d7d20443ecd0ef3e18d8404450f1687c0e0ff7933019b1da66e",
-      "bytes": 12918618
+      "sha256": "13e27aad85386c4f8a3488ed4f27ffcb254357478f0a139e34bf3a4a4f0a0e4b",
+      "bytes": 12919910
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -11469,8 +11487,8 @@
     },
     {
       "path": "observability/grand-dashboard/state.json",
-      "sha256": "cddaec827e3a55124b5474e24b2bbc3c8ddff5e58d86dd3318b3f9f49c2c290e",
-      "bytes": 10468
+      "sha256": "5cb997fa20a27d158bfd283e39d969b1c459dff69dfac7c00f851f5807a38c5b",
+      "bytes": 10502
     },
     {
       "path": "observability/native-data/README.md",
@@ -11669,8 +11687,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_safety.py",
-      "sha256": "4bb1c10347b21fc08f27a3f33e02172f5d570ae9bdced2dd8c16e1eb06b92555",
-      "bytes": 33879
+      "sha256": "4ccac3453eb2fe8ad48c4c83fe08b6fcec4622376aa925c94fffdd26d5206794",
+      "bytes": 39051
     },
     {
       "path": "tests/test_adaptive_paper_strategies.py",
@@ -11679,8 +11697,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_transport.py",
-      "sha256": "b0a5e05bb7a6122e28267ae72a3be6e0e710881cf1b97e0758229021460bbab5",
-      "bytes": 33347
+      "sha256": "afcaa2c5544ea469f0898013023e9928ca44ba9b0935b23283f9166d325985a9",
+      "bytes": 39366
     },
     {
       "path": "tests/test_adoption_bootstrap.py",
@@ -13036,6 +13054,26 @@
       "path": "tests/test_delisting_coverage.py",
       "sha256": "c33b6dd7b33691dcac0ec84db6c600f8777abb06f6fce6d992b7f5fa2d277af5",
       "bytes": 24344
+    },
+    {
+      "path": "tests/test_adaptive_paper_stop_status.py",
+      "sha256": "f90843d3f360d983226bdd450024ccef13a310573f268e21deb52c2637c161b4",
+      "bytes": 12636
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/heartbeat-20260923.md",
+      "sha256": "90bfb30bf142ffafdd9e77370553e695b5ccf6b0acb663e2a7cdc6268ab5f8fa",
+      "bytes": 7955
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/heartbeat-20260923.json",
+      "sha256": "fd757b65fbe301bdbbd2d458c562d253fa1844641cc2ee8bdfe4a16c028cd19f",
+      "bytes": 14187
+    },
+    {
+      "path": "evidence/receipts/adaptive-paper-heartbeat-20260923.json",
+      "sha256": "39b29bf9c4106b192302fd705678223e53422a9c48ba31793a14e8070806ccc4",
+      "bytes": 1175
     }
   ],
   "convergence_records": [

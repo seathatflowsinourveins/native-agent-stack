@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "id": "adaptive-paper-heartbeat-20260923",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "nautilus-trader",
+    "alpaca-py",
+    "claude-code",
+    "codex"
+  ],
+  "claim": "Two bounded native Alpaca SIP paper attempts stopped safely with zero orders and reconciled flat; reviewed ledger continuity and early-stop reporting corrections, bounded market research and crossed-quote diagnosis retained.",
+  "limitations": [
+    "Neither entry trial completed300seconds; strategy execution, profitability and broker throughput remain unqualified.",
+    "First trial success-like raw status was rejected as premature; exact original trigger unrecorded. Later read-only sample observed crossed quotes.",
+    "Whole-feed quote guard remains unchanged; qualified cache invalidation and order-race handling must precede another trial.",
+    "200REST/minute and180all-submissions/minute limits remain; no live trading, leverage above1x, paid features or catalyst-order signals."
+  ],
+  "native_evidence": "blueprints/us-equities/adaptive-paper/heartbeat-20260923.json",
+  "source_review": "blueprints/us-equities/adaptive-paper/heartbeat-20260923.md"
+}
