@@ -200,6 +200,7 @@ def build() -> dict:
             "verdict_status": row.get("verdict_status"),
             "independent_review": row.get("independent_review"),
             "open_executable_now_gaps": row.get("open_executable_now_gaps"),
+            "open_gaps": row.get("open_gaps"),
             "winners": winners,
         })
 
@@ -269,6 +270,12 @@ def md_cell(value) -> str:
     return str(value if value not in (None, "") else "—").replace("|", "\\|").replace("\n", " ")
 
 
+def gap_cell(layer: dict) -> str:
+    """'executable now / all open' from the gap crosswalk, so a layer whose only open gap needs a
+    login, hardware or a user decision shows '0 / 1', not '0'."""
+    return f"{md_cell(layer.get('open_executable_now_gaps'))} / {md_cell(layer.get('open_gaps'))}"
+
+
 def render_md(data: dict) -> str:
     s = data["summary"]
     lines = [
@@ -310,13 +317,13 @@ def render_md(data: dict) -> str:
         lines.append(f"| {md_cell(h['label'])} | {md_cell(h['evidence_class'])} | {md_cell(gen)} | {md_cell(rag)} | {md_cell(cap)} |")
     for catalog, title in (("foundation", "Foundation layers"), ("us-equities", "Trading layers (north star)")):
         lines += ["", f"## {title}", "",
-                  "| Layer | Decision | Winner | Pin (upstream) | Evidence | WSL2 | macOS | Installed by | Open gaps |",
+                  "| Layer | Decision | Winner | Pin (upstream) | Evidence | WSL2 | macOS | Installed by | Open gaps (executable now / all) |",
                   "| --- | --- | --- | --- | --- | --- | --- | --- | --- |"]
         for layer in (l for l in data["layers"] if l["catalog"] == catalog):
             for i, w in enumerate(layer["winners"] or [None]):
                 head = f"{md_cell(layer['title'])} | {md_cell(layer['decision'])}" if i == 0 else " | "
                 if w is None:
-                    lines.append(f"| {head} | — | — | — | — | — | — | {md_cell(layer['open_executable_now_gaps'])} |")
+                    lines.append(f"| {head} | — | — | — | — | — | — | {gap_cell(layer)} |")
                     continue
                 pin = md_cell(w["pin"])
                 if w["pin_behind_upstream"] is True and w["upstream_latest"]:
@@ -325,7 +332,7 @@ def render_md(data: dict) -> str:
                 for p in PLATFORMS:
                     st = w["platforms"][p]
                     cells.append(md_cell(st["e2e_state"]) + (f", bootstrap {st['bootstrap_version']}" if st["bootstrap_pinned"] else ""))
-                gaps = md_cell(layer["open_executable_now_gaps"]) if i == 0 else ""
+                gaps = gap_cell(layer) if i == 0 else ""
                 lines.append(f"| {head} | `{w['component_id']}` | {pin} | {md_cell(w['evidence_class'])} | {cells[0]} | {cells[1]} | "
                              f"{md_cell(', '.join(w['install_profiles']))} | {gaps} |")
     lines += ["", "\"bootstrap X\" means the platform's bootstrap installs version X from a pinned, checksummed artifact; "

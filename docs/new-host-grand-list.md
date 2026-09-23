@@ -35,81 +35,81 @@ Layers: 20 foundation, 12 trading. Winners: 66 layer-winner pairs (55 distinct c
 
 ## Foundation layers
 
-| Layer | Decision | Winner | Pin (upstream) | Evidence | WSL2 | macOS | Installed by | Open gaps |
+| Layer | Decision | Winner | Pin (upstream) | Evidence | WSL2 | macOS | Installed by | Open gaps (executable now / all) |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Agent SDKs and runtime workers | retain | `codex` | 0.155.1 (behind rust-v0.156.0) | native_proven | accepted, bootstrap 0.155.1 | untested, bootstrap 0.155.1 | foundation-cpu, research-runtime, macos-arm64-foundation | 12 |
-| CI and supply chain | retain | `zizmor` | 1.30.1 | native_proven | accepted | untested | — | 9 |
+| Agent SDKs and runtime workers | retain | `codex` | 0.155.1 (behind rust-v0.156.0) | native_proven | accepted, bootstrap 0.155.1 | untested, bootstrap 0.155.1 | foundation-cpu, research-runtime, macos-arm64-foundation | 12 / 14 |
+| CI and supply chain | retain | `zizmor` | 1.30.1 | native_proven | accepted | untested | — | 9 / 14 |
 |  |  | `syft` | 1.52.0 | native_proven | accepted | untested | — |  |
 |  |  | `candidate:actions-attest` | unpinned | native_proven | accepted | untested | — |  |
-| Code navigation | retain | `serena` | 2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143 | native_proven | accepted | untested | — | 2 |
-| Documents and ingestion | keep_but_compare | `qmd` | 2.8.3 | local_integration | conditional, bootstrap 2.8.3 | untested | foundation-cpu | 5 |
+| Code navigation | retain | `serena` | 2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143 | native_proven | accepted | untested | — | 2 / 5 |
+| Documents and ingestion | keep_but_compare | `qmd` | 2.8.3 | local_integration | conditional, bootstrap 2.8.3 | untested | foundation-cpu | 5 / 7 |
 |  |  | `markitdown` | 0.1.7 (behind v0.1.8) | local_integration | conditional | untested | — |  |
 |  |  | `poppler` | 26.09.0 | local_integration | conditional | untested | — |  |
-| Durable memory | keep_but_compare | `ai-memory` | 2.3.2 (behind v2.4.0) | native_proven | accepted, bootstrap 2.3.2 | untested, bootstrap 2.3.2 | foundation-cpu, recovery, macos-arm64-foundation | 9 |
-| Git practice and GitHub automation | retain | `worktrunk` | 0.79.0 | source_review | not_established | untested | — | 11 |
+| Durable memory | keep_but_compare | `ai-memory` | 2.3.2 (behind v2.4.0) | native_proven | accepted, bootstrap 2.3.2 | untested, bootstrap 2.3.2 | foundation-cpu, recovery, macos-arm64-foundation | 9 / 13 |
+| Git practice and GitHub automation | retain | `worktrunk` | 0.79.0 | source_review | not_established | untested | — | 11 / 12 |
 |  |  | `candidate:cli-cli` | unpinned | source_review | not_established, bootstrap 2.101.0 | untested, bootstrap 2.101.0 | — |  |
 |  |  | `difftastic` | 0.71.0 | source_review | not_established | untested | — |  |
-| Application and service hosting | retain | `fastapi` | 0.141.1 | native_proven | accepted | untested | — | 6 |
+| Application and service hosting | retain | `fastapi` | 0.141.1 | native_proven | accepted | untested | — | 6 / 14 |
 |  |  | `nextjs` | 16.3.5 (behind v16.3.6) | native_proven | accepted | untested | — |  |
 |  |  | `postgresql` | 18.6 | native_proven | accepted | untested | — |  |
-| Instructions and skills | adjust | `affaan-m/ECC` | dd6ee538aee0f548d4a6b520118f875431fd749e | local_integration | conditional | untested | — | 10 |
+| Instructions and skills | adjust | `affaan-m/ECC` | dd6ee538aee0f548d4a6b520118f875431fd749e | local_integration | conditional | untested | — | 10 / 12 |
 |  |  | `candidate:typesafe-ai-skills` | unpinned | local_integration | conditional | untested | — |  |
 |  |  | `candidate:openai-skills` | unpinned | local_integration | conditional | untested | — |  |
-| Isolation | retain | `worktrunk` | 0.79.0 | native_proven | accepted | untested | — | 16 |
+| Isolation | retain | `worktrunk` | 0.79.0 | native_proven | accepted | untested | — | 16 / 19 |
 |  |  | `sandbox-runtime` | 0.0.77 | native_proven | accepted | untested | — |  |
-| MCP servers and client surfaces | retain | `mcporter` | 0.13.13 (behind v0.14.0) | native_proven | accepted, bootstrap 0.13.13 | untested, bootstrap 0.13.13 | foundation-cpu, macos-arm64-foundation | 12 |
+| MCP servers and client surfaces | retain | `mcporter` | 0.13.13 (behind v0.14.0) | native_proven | accepted, bootstrap 0.13.13 | untested, bootstrap 0.13.13 | foundation-cpu, macos-arm64-foundation | 12 / 14 |
 |  |  | `mcp-inspector` | 2.7.0 | native_proven | accepted | untested | — |  |
-| Native clients | retain | `claude-code` | 2.1.278 (behind v2.1.280) | native_proven | accepted, bootstrap 2.1.278 | untested, bootstrap 2.1.278 | foundation-cpu, research-runtime, macos-arm64-foundation | 9 |
+| Native clients | retain | `claude-code` | 2.1.278 (behind v2.1.280) | native_proven | accepted, bootstrap 2.1.278 | untested, bootstrap 2.1.278 | foundation-cpu, research-runtime, macos-arm64-foundation | 9 / 14 |
 |  |  | `codex` | 0.155.1 (behind rust-v0.156.0) | native_proven | accepted, bootstrap 0.155.1 | untested, bootstrap 0.155.1 | foundation-cpu, research-runtime, macos-arm64-foundation |  |
-| Observation and optional inference | keep_but_compare | `opentelemetry-collector-contrib` | 0.161.0 | synthetic | conditional | untested | observability | 8 |
+| Observation and optional inference | keep_but_compare | `opentelemetry-collector-contrib` | 0.161.0 | synthetic | conditional | untested | observability | 8 / 11 |
 |  |  | `prometheus` | 3.14.0 | synthetic | conditional | untested | observability |  |
 |  |  | `loki` | 3.7.8 | synthetic | conditional | untested | observability |  |
-| Quality and evaluation | retain | `promptfoo` | 0.123.1 | local_integration | conditional | untested | — | 9 |
+| Quality and evaluation | retain | `promptfoo` | 0.123.1 | local_integration | conditional | untested | — | 9 / 11 |
 |  |  | `playwright-test` | 1.63.0 | local_integration | conditional | untested | — |  |
-| Recovery and portability | keep_but_compare | `restic` | 0.19.1 | synthetic | conditional | untested | recovery | 4 |
+| Recovery and portability | keep_but_compare | `restic` | 0.19.1 | synthetic | conditional | untested | recovery | 4 / 12 |
 |  |  | `candidate:astral-sh-uv` | unpinned | synthetic | conditional, bootstrap 0.12.17 | untested, bootstrap 0.12.17 | — |  |
-| Scheduling and supervision | keep_but_compare | `dagu` | 2.16.6 (behind v2.17.0) | local_integration | conditional | untested | research-runtime | 5 |
+| Scheduling and supervision | keep_but_compare | `dagu` | 2.16.6 (behind v2.17.0) | local_integration | conditional | untested | research-runtime | 5 / 13 |
 |  |  | `systemd` | 255.4-1ubuntu8.17 | local_integration | conditional | untested | research-runtime |  |
-| Secrets and credentials | keep_but_compare | `gitleaks` | 8.30.1 | local_integration | conditional | untested | — | 5 |
-| Semantic code retrieval | keep_but_compare | `socraticode` | 1.14.0 | native_proven | accepted | untested | semantic-rag, macos-arm64-foundation | 10 |
+| Secrets and credentials | keep_but_compare | `gitleaks` | 8.30.1 | local_integration | conditional | untested | — | 5 / 9 |
+| Semantic code retrieval | keep_but_compare | `socraticode` | 1.14.0 | native_proven | accepted | untested | semantic-rag, macos-arm64-foundation | 10 / 12 |
 |  |  | `qdrant` | 1.19.1 | native_proven | accepted | untested, bootstrap 1.19.1 | semantic-rag, recovery, macos-arm64-foundation |  |
 |  |  | `vllm` | 0.25.0 (behind v0.30.0) | native_proven | accepted | untested | semantic-rag |  |
-| Context and usage efficiency | keep_but_compare | `rtk` | 0.49.0 | synthetic | conditional, bootstrap 0.49.0 | untested | foundation-cpu | 4 |
+| Context and usage efficiency | keep_but_compare | `rtk` | 0.49.0 | synthetic | conditional, bootstrap 0.49.0 | untested | foundation-cpu | 4 / 6 |
 |  |  | `headroom` | 0.37.0 (behind v0.38.0) | synthetic | conditional | untested | — |  |
 |  |  | `ccusage` | 20.0.24 | synthetic | conditional | untested | — |  |
-| Web research | retain | `tavily-cli` | 0.1.8 | local_integration | conditional | untested | — | 7 |
+| Web research | retain | `tavily-cli` | 0.1.8 | local_integration | conditional | untested | — | 7 / 9 |
 |  |  | `agent-browser` | 0.38.1 | local_integration | conditional | untested | — |  |
 |  |  | `openresearch` | 0.2.7 (behind v0.2.9) | local_integration | conditional | untested | — |  |
-| Workers and task ownership | keep_but_compare | `claude-code` | 2.1.278 (behind v2.1.280) | local_integration | conditional, bootstrap 2.1.278 | untested, bootstrap 2.1.278 | foundation-cpu, research-runtime, macos-arm64-foundation | 7 |
+| Workers and task ownership | keep_but_compare | `claude-code` | 2.1.278 (behind v2.1.280) | local_integration | conditional, bootstrap 2.1.278 | untested, bootstrap 2.1.278 | foundation-cpu, research-runtime, macos-arm64-foundation | 7 / 8 |
 |  |  | `worktrunk` | 0.79.0 | local_integration | conditional | untested | — |  |
 
 ## Trading layers (north star)
 
-| Layer | Decision | Winner | Pin (upstream) | Evidence | WSL2 | macOS | Installed by | Open gaps |
+| Layer | Decision | Winner | Pin (upstream) | Evidence | WSL2 | macOS | Installed by | Open gaps (executable now / all) |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Agents, models and workers | keep_but_compare | `codex-native-sdk` | CLI rust-v0.155.1; Python openai-codex 0.154.0 (behind rust-v0.156.0) | native_proven | accepted | untested | — | 9 |
+| Agents, models and workers | keep_but_compare | `codex-native-sdk` | CLI rust-v0.155.1; Python openai-codex 0.154.0 (behind rust-v0.156.0) | native_proven | accepted | untested | — | 9 / 15 |
 |  |  | `foundation-ai-memory` | v2.3.1 (behind v2.4.0) | native_proven | accepted, bootstrap 2.3.2 | untested, bootstrap 2.3.2 | foundation-cpu, recovery, macos-arm64-foundation |  |
 |  |  | `foundation-socraticode` | v1.14.0 | native_proven | accepted | untested | semantic-rag, macos-arm64-foundation |  |
-| Backtesting engine | keep_but_compare | `nautilustrader` | 2.0.0rc5 (tag v2.0.0rc5; source pin from evidence/receipts/native-nautilus-v2-20260920.json — commit 1b0a49d2792a9432a3aca3fcb617ce7a630d905e) | native_proven | accepted | untested | trading-nautilus | 8 |
+| Backtesting engine | keep_but_compare | `nautilustrader` | 2.0.0rc5 (tag v2.0.0rc5; source pin from evidence/receipts/native-nautilus-v2-20260920.json — commit 1b0a49d2792a9432a3aca3fcb617ce7a630d905e) | native_proven | accepted | untested | trading-nautilus | 8 / 12 |
 |  |  | `lean` | 985ef30ad3ac774218c5ac516b4cb0aa2655730f | native_proven | accepted | untested | research-runtime |  |
-| Data quality and orchestration | retain | `dagu` | v2.16.6 (behind v2.17.0) | synthetic | conditional | untested | research-runtime | 6 |
+| Data quality and orchestration | retain | `dagu` | v2.16.6 (behind v2.17.0) | synthetic | conditional | untested | research-runtime | 6 / 9 |
 |  |  | `data-pandera` | v0.33.1; source 62f55e2dccf0a199cfe4d6ce3eda0c1d29e2e4e6 | synthetic | conditional | untested | — |  |
-| Evaluation and experiments | retain | `foundation-agent-retrieval-bench` | v0.2.1 | source_review | not_established | untested | — | 8 |
+| Evaluation and experiments | retain | `foundation-agent-retrieval-bench` | v0.2.1 | source_review | not_established | untested | — | 8 / 10 |
 |  |  | `inspect-ai` | inspect-ai0.3.266; source ec4dfc6953784dc45b79de3147530c89868c6e26 | source_review | not_established | untested | — |  |
 |  |  | `data-mlflow` | v3.16.1; source 32792afe5b0183fce10532d3a023f5cfa8612d09 | source_review | not_established | untested | — |  |
-| Execution and broker adapters | keep_but_compare | — | — | — | — | — | — | 0 |
-| Identity, provenance and lineage | keep_but_compare | `data-dvc` | 3.67.1; source 356dfa03278058b02df42124f243c2c345329dae | source_review | not_established | untested | — | 2 |
-| Market data and reference | keep_but_compare | `data-alpaca-py` | v0.44.0; source cc4cb3b7ba50ae250e621983c2779047fb16bb28 | native_proven | accepted | untested | research-runtime, trading-nautilus | 8 |
+| Execution and broker adapters | keep_but_compare | — | — | — | — | — | — | 0 / 1 |
+| Identity, provenance and lineage | keep_but_compare | `data-dvc` | 3.67.1; source 356dfa03278058b02df42124f243c2c345329dae | source_review | not_established | untested | — | 2 / 5 |
+| Market data and reference | keep_but_compare | `data-alpaca-py` | v0.44.0; source cc4cb3b7ba50ae250e621983c2779047fb16bb28 | native_proven | accepted | untested | research-runtime, trading-nautilus | 8 / 17 |
 |  |  | `data-edgartools` | v5.58.0; source abe44344c56cf4bfb5443e0debca7e39342f6e7a | native_proven | accepted | untested | research-runtime |  |
 |  |  | `data-exchange-calendars` | 4.13.2; source dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a | native_proven | accepted | untested | research-runtime |  |
-| Observability and hosting | retain | — | — | — | — | — | — | 1 |
-| Portfolio and risk | keep_but_compare | `skfolio` | 1.2.9; WalkForward source c99fcf71349e2df4a7a1033ee85ca2e9ced9abee (behind v1.3.0) | native_proven | accepted | untested | research-runtime | 10 |
-| Research, factors and ML | keep_but_compare | `skfolio` | 1.2.9; WalkForward source c99fcf71349e2df4a7a1033ee85ca2e9ced9abee (behind v1.3.0) | native_proven | accepted | untested | research-runtime | 9 |
+| Observability and hosting | retain | — | — | — | — | — | — | 1 / 1 |
+| Portfolio and risk | keep_but_compare | `skfolio` | 1.2.9; WalkForward source c99fcf71349e2df4a7a1033ee85ca2e9ced9abee (behind v1.3.0) | native_proven | accepted | untested | research-runtime | 10 / 13 |
+| Research, factors and ML | keep_but_compare | `skfolio` | 1.2.9; WalkForward source c99fcf71349e2df4a7a1033ee85ca2e9ced9abee (behind v1.3.0) | native_proven | accepted | untested | research-runtime | 9 / 16 |
 |  |  | `data-edgartools` | v5.58.0; source abe44344c56cf4bfb5443e0debca7e39342f6e7a | native_proven | accepted | untested | research-runtime |  |
-| Security and supply chain | retain | `grype` | v0.119.0 | native_proven | accepted | untested | — | 12 |
+| Security and supply chain | retain | `grype` | v0.119.0 | native_proven | accepted | untested | — | 12 / 16 |
 |  |  | `syft` | v1.52.0 | native_proven | accepted | untested | — |  |
 |  |  | `gitleaks` | v8.30.1 | native_proven | accepted | untested | — |  |
-| Storage and compute | keep_but_compare | `data-duckdb` | v1.5.5; source d8cdaa33fda8df955cc76ef58a280f68f4cd43fa | native_proven | accepted | untested | research-runtime | 5 |
+| Storage and compute | keep_but_compare | `data-duckdb` | v1.5.5; source d8cdaa33fda8df955cc76ef58a280f68f4cd43fa | native_proven | accepted | untested | research-runtime | 5 / 11 |
 
 "bootstrap X" means the platform's bootstrap installs version X from a pinned, checksummed artifact; it can differ from the ledger pin in the Pin column (the ledger records what a verdict was measured on, the bootstrap what a new host installs). An E2E state of `accepted` is scoped to the recorded host; a new host proves its own.
 
