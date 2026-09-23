@@ -562,8 +562,9 @@ class LeakTests(AdjudicateFixture):
         adjudicate.claude_args(self.work, self.repo)
         self.assertEqual(adjudicate.collect_claude(self.work, self.claude_result(("AB",)), "claude-opus-5-5"),
                          [(f"{NAME}.AB", "leak")])
-        self.assertEqual(adjudicate.claude_args(self.work, self.repo)["leaked"], [f"{NAME}.AB"])
-        self.assertEqual([i["order"] for i in adjudicate.claude_args(self.work, self.repo)["items"]], ["BA"])
+        # Both orders hold the same returns, so a leak in AB suppresses BA too (Codex review of #145).
+        self.assertEqual(adjudicate.claude_args(self.work, self.repo)["leaked"], [f"{NAME}.AB", f"{NAME}.BA"])
+        self.assertEqual(adjudicate.claude_args(self.work, self.repo)["items"], [])
         # The workflow is rerun anyway and returns a clean judgment for the leaked input. claude-args left the
         # leaked AB out of its snapshot, so collect does not touch AB's leak record at all.
         self.assertEqual(adjudicate.collect_claude(self.work, self.claude_result(), "claude-opus-5-5"), [])
@@ -765,6 +766,23 @@ class FifthRereviewOf145Tests(AdjudicateFixture):
         packet.write_text(packet.read_text(encoding="utf-8") + "\n", encoding="utf-8")
         with self.assertRaisesRegex(ValueError, "packets changed after"):
             adjudicate.claude_args(self.work, self.repo)
+
+
+class SixthRereviewOf145Tests(AdjudicateFixture):
+    """Codex re-review of #145 (sixth round)."""
+
+    def test_paths_after_html_delimiters_are_scrubbed_and_caught(self):
+        text = "<code>/srv/blind/run/export/evidence/x.json</code>"
+        self.assertNotIn("/srv/blind", adjudicate.scrub_text(text, str(self.work / "packets"), ()))
+        self.assertTrue(adjudicate.unscrubbed_paths({"why": "<code>/opt/lane/x.json</code>"}))
+
+    def test_claude_args_refuses_a_git_backed_repository(self):
+        self.inputs()
+        (self.repo / ".git").mkdir()
+        code, err = quiet(adjudicate.main, ["claude-args", "--work-dir", str(self.work), "--repo", str(self.repo),
+                                            "--agent-file", str(adjudicate.VENDORED_ADJUDICATOR)])
+        self.assertEqual(code, 2)
+        self.assertIn(".git", err)
 
 
 class InputScrubTests(AdjudicateFixture):

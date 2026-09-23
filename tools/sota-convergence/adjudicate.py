@@ -140,7 +140,7 @@ def bare_paths(value, repo_roots=()):
 # any other absolute path, ~ or $HOME path, or <host-path> placeholder becomes the bare <outside-path>.
 # http(s) URLs are left alone.
 _PATH_CHARS = r"[^\s'\"|;&<>()`,]"
-_PATH_START = r"(?:^|(?<=[\s'\"(=:\[{,`]))"
+_PATH_START = r"(?:^|(?<=[\s'\"(=:\[{,`>]))"
 URL = re.compile(r"https?://\S+")
 ABSOLUTE_TEXT_PATH = re.compile(_PATH_START + r"/+[A-Za-z0-9_.]" + _PATH_CHARS + "*")
 HOME_TEXT_PATH = re.compile(r"(?:~|\$HOME\b|\$\{HOME\})(?:/" + _PATH_CHARS + r"*)?(?![\w])")
@@ -153,7 +153,7 @@ PACKET_TOKEN = "PACKET"
 RESIDUAL_PATTERNS = (
     # Independent of the replacement boundary (Codex review of #145): any "/" that starts a path segment
     # after a non-path character, so a path inside `backticks` or after other punctuation is still caught.
-    re.compile(r"(?<![\w.:/~<>-])/+[A-Za-z0-9_.]" + _PATH_CHARS + "*"),
+    re.compile(r"(?<![\w.:/~-])/+[A-Za-z0-9_.]" + _PATH_CHARS + "*"),
     re.compile(r"(?<![\w])~[\w.-]*/" + _PATH_CHARS + "*"),
     re.compile(r"\$HOME\b|\$\{HOME\}"),
     re.compile(r"<host-path>"),
@@ -717,7 +717,13 @@ def record_leaks(path: Path, index: dict, leaks) -> list:
             # A leak binds to the content that was judged when the caller knows it (the Codex call's pre-call
             # hash), so a stale leak cannot mark an input rebuilt while the call ran (Codex review of #145).
             judged = leak.get("input_sha256") or key[1]
+            # Both orders hold the same two returns, so a leak in one is a leak in both (Codex review of
+            # #145): the other order's content at leak time is recorded too, and recorded_leaks marks both.
+            layer_inputs = inputs.get(name, {})
+            both = {other: (judged if other == order else (sha256_file(Path(path)) if Path(path).is_file() else None))
+                    for other, path in layer_inputs.items()}
             record = {"input": key[0], "input_sha256": judged, "layer": name, "order": order,
+                      "inputs_sha256": {Path(layer_inputs[other]).name: sha for other, sha in both.items()},
                       "family": leak.get("family"), "stage": leak.get("stage"), "text": leak.get("text"),
                       "inputs": inputs.get(name, {})}
             if (record["input"], record["input_sha256"], record["family"], record["stage"]) in seen:
@@ -739,8 +745,14 @@ def leak_record_paths(work_dir: Path) -> list:
 def recorded_leaks(work_dir: Path) -> set:
     """{(input file name, input sha256)} with a recorded leak from either family. An input stays leaked until
     ``inputs`` rebuilds it and its sha256 changes."""
-    return {(record.get("input"), record.get("input_sha256"))
-            for path in leak_record_paths(work_dir) for record in load_leak_records(path)}
+    leaked = set()
+    for path in leak_record_paths(work_dir):
+        for record in load_leak_records(path):
+            leaked.add((record.get("input"), record.get("input_sha256")))
+            for name, sha in (record.get("inputs_sha256") or {}).items():
+                if sha:
+                    leaked.add((name, sha))
+    return leaked
 
 
 # ---------------------------------------------------------------- claude
@@ -1112,8 +1124,8 @@ def main(argv=None) -> int:
         project_role = run_dir / ".claude" / "agents" / f"{ADJUDICATOR_ROLE}.md"
         # A project-level role in the directory the workflow runs from wins over --agent-file (Codex review of
         # #145), so both must be the vendored definition.
-        refusal = (refuse_roots("--repo", [repo]) or refuse_work_dir_inside(args.work_dir, repo)
-                   or adjudicator_role_issue(args.agent_file)
+        refusal = (refuse_roots("--repo", [repo]) or refuse_git_repo(repo)
+                   or refuse_work_dir_inside(args.work_dir, repo) or adjudicator_role_issue(args.agent_file)
                    or (adjudicator_role_issue(project_role) if project_role.exists() else None))
         if refusal:
             print(refusal, file=sys.stderr)

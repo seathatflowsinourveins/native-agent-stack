@@ -1555,6 +1555,10 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
 - **Snapshot binding:** `claude-args` gives each run a `snapshot_id`, which `adjudication-lane.js` echoes.
   `claude-collect` refuses a result from another snapshot.
 - **Stale packets:** `claude-args` and `codex` refuse a packet whose bytes changed after `inputs`.
+- **Leaks cover both orders:** the AB and BA inputs hold the same two returns, so a leak recorded for one
+  order suppresses both.
+- **Git-backed roots:** `claude-args` also refuses a repository under any `.git`, as `codex` does.
+- **HTML delimiters:** `>` delimits a path, as backticks do.
 - **Run directory:** `claude-args --run-dir`, which defaults to `--repo`, also checks a project-level
   `blind-adjudicator.md` in the directory the workflow runs from.
 - **`--agent-file`:** pass the `blind-lane-reviewer` file the lane loaded. That is the user-level copy when
