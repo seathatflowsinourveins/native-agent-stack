@@ -31,8 +31,9 @@ NEW_WAVE_MODELS = {"claude": {"name": "claude-opus-5-5", "effort": "high", "fami
                    "codex": {"name": "gpt-6-astra", "effort": "high", "family": "openai"}}
 NEW_WAVE_PROVENANCE = {
     "claude": {"workflow_path": "examples/claude-native/workflows/layer-verdict-lane.js",
-               "workflow_sha256": "a" * 64, "agentlab_commit": "b" * 40, "agent_sha256": "e" * 64},
-    "codex": {"codex_lane_py_sha256": "c" * 64, "prompt_sha256": "d" * 64},
+               "workflow_sha256": "a" * 64, "agentlab_commit": "b" * 40, "agent_sha256": "e" * 64,
+               "repo_tree_sha256": "7" * 64},
+    "codex": {"codex_lane_py_sha256": "c" * 64, "prompt_sha256": "d" * 64, "repo_tree_sha256": "7" * 64},
 }
 # The fixture's tools/sota-convergence/lane-provenance.json: the lane code above is registered.
 NEW_WAVE_REGISTRY = {
@@ -938,7 +939,8 @@ class LayerVerdictSchemaV2Tests(LandscapeTests):
 
     def test_new_wave_sealed_provenance_must_be_registered_lane_code(self):
         forged = {"claude": NEW_WAVE_PROVENANCE["claude"],
-                  "codex": {"codex_lane_py_sha256": "9" * 64, "prompt_sha256": "d" * 64}}
+                  "codex": {"codex_lane_py_sha256": "9" * 64, "prompt_sha256": "d" * 64,
+                            "repo_tree_sha256": "7" * 64}}
         self.layer.update(self.recorded_fields(lanes=self.seal_new_wave(provenance=forged)))
         with self.assertRaisesRegex(ValueError, "not listed in tools/sota-convergence/lane-provenance.json"):
             self.build()

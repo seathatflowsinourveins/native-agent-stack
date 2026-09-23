@@ -1353,14 +1353,15 @@ LANE_PROMPT_BYTES = b"# fixture lane-prompt.md\n"
 VENDORED_WORKFLOW = "examples/claude-native/workflows/layer-verdict-lane.js"
 SOURCE_WORKFLOW = ".claude/workflows/layer-verdict-lane.js"
 AGENT_SHA256 = "e" * 64  # the fixture's registered blind-lane-reviewer definition hash
+REPO_TREE_SHA256 = "7" * 64  # the evidence tree both fixture lanes read (not registered: it varies per run)
 
 
 def lane_provenance(lane):
     if lane == "claude":
         return {"workflow_path": SOURCE_WORKFLOW, "workflow_sha256": WORKFLOW_SHA256, "agentlab_commit": "b" * 40,
-                "agent_sha256": AGENT_SHA256}
+                "agent_sha256": AGENT_SHA256, "repo_tree_sha256": REPO_TREE_SHA256}
     return {"codex_lane_py_sha256": hashlib.sha256(CODEX_LANE_BYTES).hexdigest(),
-            "prompt_sha256": hashlib.sha256(LANE_PROMPT_BYTES).hexdigest()}
+            "prompt_sha256": hashlib.sha256(LANE_PROMPT_BYTES).hexdigest(), "repo_tree_sha256": REPO_TREE_SHA256}
 
 
 DROP = object()  # an override value that removes the field from the lane return
@@ -1411,7 +1412,7 @@ def prepare_new_wave_root(fixture):
         "schema_version": 1,
         "claude": [{"workflow_path": SOURCE_WORKFLOW, "vendored_path": VENDORED_WORKFLOW,
                     "workflow_sha256": WORKFLOW_SHA256, "agent_sha256": AGENT_SHA256}],
-        "codex": [{key: value for key, value in lane_provenance("codex").items()}]})
+        "codex": [{key: value for key, value in lane_provenance("codex").items() if key != "repo_tree_sha256"}]})
     fixture.write("evidence/receipt.json", {"exit_code": 0, "scope": "A registered local fixture receipt"})
     receipt_bytes = (fixture.root / "evidence/receipt.json").read_bytes()
     fixture.write("manifests/evidence.json", {"schema_version": 1, "receipts": [{"path": "receipt.json"}],
@@ -1636,7 +1637,7 @@ class NewWaveProvenanceTests(NewWaveFixture):
 
     def test_codex_provenance_must_hash_to_this_checkouts_lane_code(self):
         # Before: any two well-formed hashes passed.
-        forged = {"codex_lane_py_sha256": "c" * 64, "prompt_sha256": "d" * 64}
+        forged = {"codex_lane_py_sha256": "c" * 64, "prompt_sha256": "d" * 64, "repo_tree_sha256": REPO_TREE_SHA256}
         catalog = self.both_lanes("wave-forgedcodex-layer", codex={"provenance": forged})
         code, output = self.run_wave()
         self.assertEqual(code, 1, output)

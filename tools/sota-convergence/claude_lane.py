@@ -13,9 +13,12 @@ adding the two runner-owned fields a new-wave Claude return must carry
 - ``model.family`` is ``"anthropic"``; ``model.name`` is ``--resolved-model``
   when given (the resolved child model, for example ``claude-opus-5-5`` from
   ``child-usage.mjs --latest``), else the workflow's bound alias.
-- ``provenance`` is ``{workflow_path, workflow_sha256, agentlab_commit, agent_sha256}``:
+- ``provenance`` is ``{workflow_path, workflow_sha256, agentlab_commit, agent_sha256, repo_tree_sha256}``:
   the workflow path relative to the agent-lab checkout, the sha256 of those
-  bytes, and that checkout's ``HEAD``. The script refuses (exit 2) when the
+  bytes, that checkout's ``HEAD``, the lane role's sha256, and the digest of the
+  evidence tree (``--repo``) the lane read. ``--repo-tree-sha256`` is that digest
+  taken before the lane launched; the script refuses (exit 2) when the tree no
+  longer matches it, so a return is bound to one set of evidence bytes. The script refuses (exit 2) when the
   workflow file differs from ``HEAD`` or its sha256 is not the vendored
   ``examples/claude-native/workflows/SHA256SUMS`` entry, so a return always
   names bytes a catalog-only host can rerun.
@@ -43,6 +46,8 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 CATALOG_ROOT = HERE.parent.parent
+sys.path.insert(0, str(HERE))
+from codex_lane import tree_sha256  # noqa: E402  (one evidence-tree digest for both lanes)
 VENDORED_SUMS = CATALOG_ROOT / "examples" / "claude-native" / "workflows" / "SHA256SUMS"
 # The role every lane stage runs as (layer-verdict-lane.js agentType); its definition carries the blinding
 # (Read/Glob/Grep, no skills, omitClaudeMd), so a return names the role bytes it ran with (Codex review of #145).
@@ -152,6 +157,11 @@ def parse_args(argv=None):
                         help=f"The {LANE_AGENT} definition the lane actually loaded: a project-level copy in the "
                              "directory the lane ran from wins over the user-level one, so name the loaded file "
                              "(Codex review of #145).")
+    parser.add_argument("--repo", type=Path, required=True,
+                        help="The blind export the lane read (the workflow args' repo).")
+    parser.add_argument("--repo-tree-sha256", required=True,
+                        help="codex_lane.tree_sha256 of --repo taken before the lane launched; the returns are "
+                             "refused when the tree changed since (Codex review of #145).")
     parser.add_argument("--resolved-model", default=None,
                         help="Resolved child model name (e.g. claude-opus-5-5); default keeps the bound alias.")
     return parser.parse_args(argv)
@@ -161,6 +171,11 @@ def main(argv=None) -> int:
     args = parse_args(argv)
     try:
         provenance = lane_provenance(args.agentlab_root.resolve(), args.workflow, vendored_sums(), args.agent_file)
+        current_tree = tree_sha256(args.repo.resolve())
+        if current_tree != args.repo_tree_sha256:
+            raise ProvenanceError(f"the evidence tree under --repo is {current_tree}, not the launch digest "
+                                  f"{args.repo_tree_sha256}; it changed while the lane ran, so rerun on a fixed export")
+        provenance["repo_tree_sha256"] = current_tree
     except ProvenanceError as error:
         print(error, file=sys.stderr)
         return 2

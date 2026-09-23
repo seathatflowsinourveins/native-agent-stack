@@ -20,6 +20,7 @@ import shlex
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
 TOOL_DIR = ROOT / "tools" / "sota-convergence"
@@ -244,6 +245,7 @@ class CodexLaneTests(CodexLaneFixture):
         self.assertEqual(data["provenance"], {
             "codex_lane_py_sha256": hashlib.sha256((TOOL_DIR / "codex_lane.py").read_bytes()).hexdigest(),
             "prompt_sha256": hashlib.sha256(FIXTURE_PROMPT.read_bytes()).hexdigest(),
+            "repo_tree_sha256": codex_lane.tree_sha256(self.repo),
         })
         self.assertEqual(data["model"]["family"], "openai")
         self.assertEqual(data["model"]["name"], "gpt-6-astra")
@@ -265,7 +267,7 @@ class CodexLaneTests(CodexLaneFixture):
         codex_dir = self.work_dir / "codex"
         codex_dir.mkdir()
         existing = canned_return(packet_sha256=packet_sha256,
-                                 provenance=codex_lane.lane_provenance(FIXTURE_PROMPT),
+                                 provenance=codex_lane.lane_provenance(FIXTURE_PROMPT, self.repo),
                                  model={"name": "gpt-6-astra", "effort": "high", "family": "openai"})
         out_path = codex_dir / "foundation__native-clients.json"
         out_path.write_text(json.dumps(existing, sort_keys=True, indent=1) + "\n", encoding="utf-8")
@@ -281,7 +283,7 @@ class CodexLaneTests(CodexLaneFixture):
         prompt was skipped forever and then rejected by record_verdicts.py."""
         packet_path = self.write_packet("foundation", "native-clients")
         packet_sha256 = hashlib.sha256(packet_path.read_bytes()).hexdigest()
-        current = codex_lane.lane_provenance(FIXTURE_PROMPT)
+        current = codex_lane.lane_provenance(FIXTURE_PROMPT, self.repo)
         out_path = self.out_path("foundation", "native-clients")
         out_path.parent.mkdir()
         stale = (None, {**current, "codex_lane_py_sha256": "1" * 64}, {**current, "prompt_sha256": "2" * 64})
@@ -301,7 +303,7 @@ class CodexLaneTests(CodexLaneFixture):
         """Round-2 review: a return whose model.name is "unknown", or differs from --model, was skipped."""
         packet_path = self.write_packet("foundation", "native-clients")
         packet_sha256 = hashlib.sha256(packet_path.read_bytes()).hexdigest()
-        current = codex_lane.lane_provenance(FIXTURE_PROMPT)
+        current = codex_lane.lane_provenance(FIXTURE_PROMPT, self.repo)
         out_path = self.out_path("foundation", "native-clients")
         out_path.parent.mkdir()
 
@@ -766,6 +768,33 @@ class EffortResumeTests(CodexLaneFixture):
         self.assertGreater(len(self.argv_calls()), first)
 
 
+class EvidenceTreeProvenanceTests(CodexLaneFixture):
+    """Round-9 review of #145: a return is bound to the evidence tree it read."""
+
+    def test_a_resume_against_another_export_reruns(self):
+        self.write_packet("foundation", "native-clients")
+        self.assertEqual(self.run_lane(), 0)
+        first = len(self.argv_calls())
+        self.assertEqual(self.run_lane(), 0)
+        self.assertEqual(len(self.argv_calls()), first, "same tree: resumed")
+        (self.repo / "evidence.json").write_text('{"other": "export"}', encoding="utf-8")
+        self.assertEqual(self.run_lane(), 0)
+        self.assertGreater(len(self.argv_calls()), first, "another tree: rerun")
+        data = json.loads(self.out_path("foundation", "native-clients").read_text(encoding="utf-8"))
+        self.assertEqual(data["provenance"]["repo_tree_sha256"], codex_lane.tree_sha256(self.repo))
+
+    def test_a_tree_changed_during_the_run_sets_the_returns_aside(self):
+        self.write_packet("foundation", "native-clients")
+        trees = iter(["a" * 64, "b" * 64])
+        with mock.patch.object(codex_lane, "tree_sha256", side_effect=lambda repo: next(trees)), \
+                contextlib.redirect_stderr(io.StringIO()) as err:
+            self.assertEqual(self.run_lane(), 1)
+        out_path = self.out_path("foundation", "native-clients")
+        self.assertFalse(out_path.exists())
+        self.assertTrue(out_path.with_name(out_path.name + ".tree-changed").is_file())
+        self.assertIn("the evidence tree changed during the run", err.getvalue())
+
+
 class ExactProvenanceResumeTests(CodexLaneFixture):
     """Round-8 review of #145: resume needs the recorded provenance to equal the current one exactly; a return
     carrying an extra or changed provenance field is not resumed."""
@@ -773,7 +802,7 @@ class ExactProvenanceResumeTests(CodexLaneFixture):
     def test_a_return_with_an_extra_provenance_field_reruns(self):
         packet_path = self.write_packet("foundation", "native-clients")
         packet_sha256 = hashlib.sha256(packet_path.read_bytes()).hexdigest()
-        current = codex_lane.lane_provenance(FIXTURE_PROMPT)
+        current = codex_lane.lane_provenance(FIXTURE_PROMPT, self.repo)
         out_path = self.out_path("foundation", "native-clients")
         out_path.parent.mkdir()
         existing = canned_return(packet_sha256=packet_sha256, provenance={**current, "extra": "1" * 64},

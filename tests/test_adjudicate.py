@@ -990,6 +990,82 @@ class EighthRereviewOf145Tests(AdjudicateFixture):
         self.assertEqual(index["skipped"], [{"layer": other, "reason": "the packet is missing"}])
 
 
+class NinthRereviewOf145Tests(AdjudicateFixture):
+    """Round-9 review of #145: the evidence tree is re-verified after judging, the packet snapshots are audit
+    roots, leak text is redacted, and host paths starting with any legal character are scrubbed."""
+
+    JUDGE = {"preferred": "A", "why": WHY, "evidence_refs": ["evidence/receipt.json"], "leak": False, "leak_text": ""}
+    REFUTE = {"refuted": False, "reason": "The cited receipt exists and shows the run.", "evidence_refs": [],
+              "leak": False, "leak_text": ""}
+
+    def run_codex(self, tree_values):
+        trees = iter(tree_values)
+        call = mock.Mock(side_effect=[(self.JUDGE, "gpt-6-astra", [0], None, None),
+                                      (self.REFUTE, "gpt-6-astra", [0], None, None)] * 2)
+        with mock.patch.object(adjudicate, "tree_sha256", side_effect=lambda repo: next(trees)), \
+                mock.patch.object(adjudicate, "run_codex_call", call), \
+                mock.patch.object(adjudicate.shutil, "which", return_value="/usr/bin/codex"):
+            return quiet(adjudicate.main, ["codex", "--work-dir", str(self.work), "--repo", str(self.repo),
+                                           "--model", "gpt-6-astra"])
+
+    def test_a_tree_changed_during_the_codex_run_voids_every_judgment_of_the_run(self):
+        self.inputs()
+        code, err = self.run_codex(["a" * 64, "b" * 64])
+        self.assertEqual(code, 1)
+        self.assertIn(adjudicate.TREE_CHANGED, err)
+        for order in adjudicate.ORDERS:
+            record = json.loads((self.work / "adjudication-judgments" / "codex" / f"{NAME}.{order}.json")
+                                .read_text(encoding="utf-8"))
+            self.assertEqual(record["failure"], adjudicate.TREE_CHANGED)
+            self.assertIsNone(record["judge"])
+
+    def test_an_unchanged_tree_keeps_the_judgments_and_the_snapshots_are_audit_roots(self):
+        self.inputs()
+        code, err = self.run_codex(["a" * 64, "a" * 64])
+        self.assertEqual(code, 0, err)
+        audit = json.loads((self.work / "adjudication-judgments" / "codex" / "blind-audit.json")
+                           .read_text(encoding="utf-8"))
+        self.assertIn(str(self.work / adjudicate.PACKET_SNAPSHOTS_DIR), audit["allowed_roots"])
+
+    def test_claude_collect_refuses_judgments_when_the_tree_changed_after_claude_args(self):
+        (self.repo / "evidence").mkdir()
+        (self.repo / "evidence" / "receipt.json").write_text("{}", encoding="utf-8")
+        self.inputs()
+        args = adjudicate.claude_args(self.work, self.repo)
+        result = {"snapshot_id": args["snapshot_id"],
+                  "items": [{"name": NAME, "order": order, "judge": self.JUDGE, "refuter": self.REFUTE}
+                            for order in adjudicate.ORDERS]}
+        (self.repo / "evidence" / "receipt.json").write_text('{"changed": true}', encoding="utf-8")
+        missing = adjudicate.collect_claude(self.work, result, "claude-opus-5-5", self.repo)
+        self.assertEqual({reason for _, reason in missing}, {adjudicate.TREE_CHANGED})
+        (self.repo / "evidence" / "receipt.json").write_text("{}", encoding="utf-8")
+        self.assertEqual(adjudicate.collect_claude(self.work, result, "claude-opus-5-5", self.repo), [])
+
+    def test_leak_text_is_redacted_before_it_is_retained_or_printed(self):
+        raw = "found /home/example/code/nas-wt-codex-blind/x.json, ~/notes and /évidence/private.json"
+        self.assertEqual(adjudicate.redact_leak_text(raw),
+                         "found <outside-path>, <outside-path> and <outside-path>")
+        self.inputs()
+        index = adjudicate.load_index(self.work)
+        input_path = self.work / "adjudication-inputs" / f"{NAME}.AB.json"
+        with contextlib.redirect_stderr(io.StringIO()) as err:
+            records = adjudicate.record_leaks(self.work / "leaks.json", index, [
+                (NAME, "AB", input_path, {"family": "openai", "stage": "judge", "text": raw})])
+        self.assertEqual(records[0]["text"], "found <outside-path>, <outside-path> and <outside-path>")
+        self.assertNotIn("/home/example", err.getvalue())
+        self.assertNotIn("/home/example", (self.work / "leaks.json").read_text(encoding="utf-8"))
+
+    def test_paths_starting_with_non_ascii_or_symbol_characters_are_scrubbed_and_caught(self):
+        for path in ("/évidence/private.json", "/-private/codex.json", "/@host/path"):
+            text = f"see {path} for details"
+            self.assertEqual(adjudicate.scrub_text(text, str(self.work / "packets")),
+                             "see <outside-path> for details", path)
+            self.assertTrue(adjudicate.unscrubbed_paths([text]), path)
+        for prose in ("a +/- 2% band", "and/or", "A / B", "3/4 of runs"):
+            self.assertEqual(adjudicate.scrub_text(prose, str(self.work / "packets")), prose)
+            self.assertEqual(adjudicate.unscrubbed_paths([prose]), [], prose)
+
+
 @unittest.skipUnless(os.access(FAKE_BIN / "codex", os.X_OK), "fake codex fixture is not executable")
 class CodexLeakTests(AdjudicateFixture):
     def setUp(self):

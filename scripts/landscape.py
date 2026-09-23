@@ -82,8 +82,8 @@ FAMILY_MODEL_PATTERNS = {
 SHA256_TEXT = re.compile(r"[a-f0-9]{64}")
 GIT_COMMIT_TEXT = re.compile(r"[a-f0-9]{40}")
 LANE_PROVENANCE_FIELDS = {
-    "claude": ("workflow_path", "workflow_sha256", "agentlab_commit", "agent_sha256"),
-    "codex": ("codex_lane_py_sha256", "prompt_sha256"),
+    "claude": ("workflow_path", "workflow_sha256", "agentlab_commit", "agent_sha256", "repo_tree_sha256"),
+    "codex": ("codex_lane_py_sha256", "prompt_sha256", "repo_tree_sha256"),
 }
 RUN_MANIFEST_NAME = "run-manifest.json"
 # "failed": the lane ran for the layer but returned nothing sealable (a Claude layer whose final was
@@ -298,7 +298,7 @@ def claude_refutation_issue(refutation):
 def lane_provenance_issue(lane, provenance):
     """A new-wave sealed return names what produced it: the Claude lane its workflow file, hash, agent-lab
     commit and the hash of the role definition its stages ran as; the Codex lane the hashes of codex_lane.py
-    and the prompt it filled."""
+    and the prompt it filled. Both name the digest of the evidence tree they read (repo_tree_sha256)."""
     fields = LANE_PROVENANCE_FIELDS[lane]
     if not isinstance(provenance, dict) or set(provenance) != set(fields):
         return f"provenance must be an object with exactly {', '.join(fields)} for the {lane} lane"

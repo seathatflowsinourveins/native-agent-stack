@@ -51,6 +51,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import re
 import shlex
 import shutil
@@ -473,10 +474,31 @@ def extract_events_summary(events: list):
 LANE_FAMILY = "openai"
 
 
-def lane_provenance(prompt_path: Path) -> dict:
-    """What produced a return: this runner file's and the filled prompt template's sha256."""
-    return {"codex_lane_py_sha256": sha256_file(Path(__file__).resolve()),
-            "prompt_sha256": sha256_file(Path(prompt_path))}
+def tree_sha256(repo: Path) -> str:
+    """A digest of the evidence repository's content: every regular file's relative path and sha256, sorted,
+    and each retained symlink's text. The packet names evidence paths, not their bytes, so a return (and an
+    adjudication judgment) is bound to the tree it read."""
+    digest = hashlib.sha256()
+    repo = Path(repo)
+    for path in sorted(repo.rglob("*")):
+        relative = path.relative_to(repo).as_posix()
+        if path.is_symlink():
+            # A retained internal link: its text is part of the tree, so retargeting it changes the digest.
+            digest.update(f"{relative}\0->{os.readlink(path)}\n".encode("utf-8"))
+        elif path.is_file():
+            digest.update(f"{relative}\0{sha256_file(path)}\n".encode("utf-8"))
+    return digest.hexdigest()
+
+
+def lane_provenance(prompt_path: Path, repo: Path = None) -> dict:
+    """What produced a return: this runner file's and the filled prompt template's sha256, and (given
+    ``repo``) the digest of the evidence tree the lane read, so a resume against another export reruns
+    (Codex review of #145)."""
+    provenance = {"codex_lane_py_sha256": sha256_file(Path(__file__).resolve()),
+                  "prompt_sha256": sha256_file(Path(prompt_path))}
+    if repo is not None:
+        provenance["repo_tree_sha256"] = tree_sha256(Path(repo))
+    return provenance
 
 
 def finalize_lane_return(data: dict, catalog: str, layer_id: str, packet_sha256: str,
@@ -551,7 +573,7 @@ def main(argv=None) -> int:
     events_dir = codex_dir / "events"
     usage_path = codex_dir / "usage.jsonl"
 
-    provenance = lane_provenance(prompt_path)
+    provenance = lane_provenance(prompt_path, repo)
     pending = []
     for catalog, layer_id, packet_path in packets:
         packet_sha256 = sha256_file(packet_path)
@@ -658,6 +680,14 @@ def main(argv=None) -> int:
         for item in pending:
             process(item)
 
+    if pending and tree_sha256(repo) != provenance["repo_tree_sha256"]:
+        # The evidence changed while the children read it (Codex review of #145): no return of this run is
+        # bound to one tree, so each is set aside (kept for inspection, never resumed or sealed).
+        for catalog, layer_id, _packet_path, _packet_sha256, out_path in pending:
+            if out_path.is_file():
+                out_path.replace(out_path.with_name(out_path.name + ".tree-changed"))
+            failures.append((catalog, layer_id, "the evidence tree changed during the run; rerun on a fixed export"))
+
     audit_path = codex_dir / AUDIT_NAME
     try:
         audit = json.loads(audit_path.read_text(encoding="utf-8")) if audit_path.is_file() else {}
@@ -680,8 +710,8 @@ def main(argv=None) -> int:
         failures_path.write_text(json.dumps({"lane": LANE, "failures": [
             {"catalog": catalog, "layer_id": layer_id, "reason": reason}
             for catalog, layer_id, reason in sorted(failures)]}, indent=1, sort_keys=True) + "\n", encoding="utf-8")
-        for catalog, layer_id, _reason in sorted(failures):
-            print(f"codex_lane: {catalog}__{layer_id} failed after retry", file=sys.stderr)
+        for catalog, layer_id, reason in sorted(failures):
+            print(f"codex_lane: {catalog}__{layer_id}: {reason}", file=sys.stderr)
         return 1
     failures_path.unlink(missing_ok=True)
     return 0

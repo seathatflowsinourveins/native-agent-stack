@@ -48,6 +48,11 @@ class ClaudeLaneWriterTests(unittest.TestCase):
         git(self.agentlab, "add", ".")
         git(self.agentlab, "-c", "user.name=t", "-c", "user.email=t@example.invalid", "commit", "-qm", "lane")
         self.work = self.tmp / "work"
+        # The blind export the lane read, and its digest taken before launch (Codex review of #145).
+        self.export = self.tmp / "hosts" / "blind" / "export"
+        self.export.mkdir(parents=True)
+        (self.export / "evidence.json").write_text("{}", encoding="utf-8")
+        self.tree = claude_lane.tree_sha256(self.export)
         final = {"schema_version": 1, "lane": "claude", "catalog": "foundation", "layer_id": "l1",
                  "packet_sha256": "0" * 64, "model": {"name": "opus", "effort": "high"}}
         self.unrefuted = {"status": "unrefuted", "final_source": "proposal", "proposal_status": "unrefuted",
@@ -68,7 +73,8 @@ class ClaudeLaneWriterTests(unittest.TestCase):
     def run_main(self, *extra):
         # The vendored role stands in for the host's installed copy, which CI does not have.
         return claude_lane.main(["--result", str(self.result), "--work-dir", str(self.work),
-                                 "--agentlab-root", str(self.agentlab), "--agent-file",
+                                 "--agentlab-root", str(self.agentlab), "--repo", str(self.export),
+                                 "--repo-tree-sha256", self.tree, "--agent-file",
                                  str(claude_lane.VENDORED_AGENT), *extra])
 
     def test_written_return_carries_family_and_vendored_provenance(self):
@@ -81,7 +87,16 @@ class ClaudeLaneWriterTests(unittest.TestCase):
         self.assertEqual(data["provenance"]["workflow_sha256"], claude_lane.vendored_sums()["layer-verdict-lane.js"])
         self.assertEqual(data["provenance"]["agent_sha256"],
                          hashlib.sha256(claude_lane.VENDORED_AGENT.read_bytes()).hexdigest())
+        self.assertEqual(data["provenance"]["repo_tree_sha256"], self.tree)
         self.assertFalse((self.work / "claude" / "foundation__l2.json").exists())
+
+    def test_an_evidence_tree_changed_since_launch_is_refused(self):
+        # Codex review of #145: a return must be bound to the evidence bytes the lane read.
+        (self.export / "evidence.json").write_text('{"changed": true}', encoding="utf-8")
+        with contextlib.redirect_stderr(io.StringIO()) as err:
+            self.assertEqual(self.run_main(), 2)
+        self.assertIn("changed while the lane ran", err.getvalue())
+        self.assertFalse((self.work / "claude" / "foundation__l1.json").exists())
 
     def test_a_missing_agent_file_is_a_diagnostic_not_a_traceback(self):
         role_dir = self.agentlab / ".claude" / "agents"
@@ -89,7 +104,8 @@ class ClaudeLaneWriterTests(unittest.TestCase):
         (role_dir / "blind-lane-reviewer.md").write_bytes(claude_lane.VENDORED_AGENT.read_bytes())
         with contextlib.redirect_stderr(io.StringIO()) as err:
             code = claude_lane.main(["--result", str(self.result), "--work-dir", str(self.work),
-                                     "--agentlab-root", str(self.agentlab), "--agent-file",
+                                     "--agentlab-root", str(self.agentlab), "--repo", str(self.export),
+                                 "--repo-tree-sha256", self.tree, "--agent-file",
                                      str(self.result.parent / "missing.md")])
         self.assertEqual(code, 2)
         self.assertIn("not found", err.getvalue())
@@ -110,7 +126,8 @@ class ClaudeLaneWriterTests(unittest.TestCase):
         edited.write_text(claude_lane.VENDORED_AGENT.read_text(encoding="utf-8") + "\nextra rule\n", encoding="utf-8")
         with contextlib.redirect_stderr(io.StringIO()) as err:
             code = claude_lane.main(["--result", str(self.result), "--work-dir", str(self.work),
-                                     "--agentlab-root", str(self.agentlab), "--agent-file", str(edited)])
+                                     "--agentlab-root", str(self.agentlab), "--repo", str(self.export),
+                                 "--repo-tree-sha256", self.tree, "--agent-file", str(edited)])
         self.assertEqual(code, 2)
         self.assertIn("is not the vendored", err.getvalue())
         self.assertFalse((self.work / "claude" / "foundation__l1.json").exists())

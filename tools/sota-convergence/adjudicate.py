@@ -141,8 +141,12 @@ def bare_paths(value, repo_roots=()):
 # http(s) URLs are left alone.
 _PATH_CHARS = r"[^\s'\"|;&<>()`,]"
 _PATH_START = r"(?:^|(?<=[\s'\"(=:\[{,`>]))"
+# The first character of an absolute path's first segment (Codex review of #145): any word character,
+# Unicode included (/évidence/x), or a dot; any other legal character (/-private/x, /@host/x) only when a
+# later "/" shows a path, so prose such as "+/-" is not taken for one.
+_SEGMENT_START = r"(?:[\w.]|(?!/)" + _PATH_CHARS + r"(?=" + _PATH_CHARS + r"*/))"
 URL = re.compile(r"https?://[^\s<>\"'`)\]]+")
-ABSOLUTE_TEXT_PATH = re.compile(_PATH_START + r"/+[A-Za-z0-9_.]" + _PATH_CHARS + "*")
+ABSOLUTE_TEXT_PATH = re.compile(_PATH_START + r"/+" + _SEGMENT_START + _PATH_CHARS + "*")
 HOME_TEXT_PATH = re.compile(r"(?:~|\$HOME\b|\$\{HOME\})(?:/" + _PATH_CHARS + r"*)?(?![\w])")
 HOST_PLACEHOLDER = re.compile(r"<host-path>(?:/" + _PATH_CHARS + "*)?")
 PARENT_TEXT_PATH = re.compile(_PATH_START + r"\.\.(?:/" + _PATH_CHARS + r"*)?(?![\w])")
@@ -153,7 +157,7 @@ PACKET_TOKEN = "PACKET"
 RESIDUAL_PATTERNS = (
     # Independent of the replacement boundary (Codex review of #145): any "/" that starts a path segment
     # after a non-path character, so a path inside `backticks` or after other punctuation is still caught.
-    re.compile(r"(?<![\w.:/~-])/+[A-Za-z0-9_.]" + _PATH_CHARS + "*"),
+    re.compile(r"(?<![\w.:/~-])/+" + _SEGMENT_START + _PATH_CHARS + "*"),
     re.compile(r"(?<![\w])~[\w.-]*/" + _PATH_CHARS + "*"),
     re.compile(r"\$HOME\b|\$\{HOME\}"),
     re.compile(r"<host-path>"),
@@ -696,14 +700,14 @@ def run_codex(args) -> int:
             events_dir / f"{stem}.judge.jsonl", valid_judge)
         refuter, refute_model, refute_codes = None, None, []
         if judge_leak is not None:
-            leak = {"stage": "judge", "text": judge_leak}
+            leak = {"stage": "judge", "text": redact_leak_text(judge_leak)}
         elif judge is not None:
             refuter, refute_model, refute_codes, failure, refute_leak = run_codex_call(
                 repo, schemas["refute"], out_dir / f"{stem}.refute.out.tmp", args.effort,
                 fill(refute_template, input_path, repo, judge, packets.get(name, "")), args.model, args.timeout,
                 events_dir / f"{stem}.refute.jsonl", valid_refuter)
             if refute_leak is not None:
-                leak = {"stage": "refuter", "text": refute_leak}
+                leak = {"stage": "refuter", "text": redact_leak_text(refute_leak)}
             failure = f"refuter {failure}" if failure else None
         elif failure:
             failure = f"judge {failure}"
@@ -735,8 +739,21 @@ def run_codex(args) -> int:
     else:
         for item in pending:
             process(item)
+    if pending and adjudication_provenance(args.prompt, repo) != run_provenance:
+        # The evidence tree (or the code, prompt or schemas) changed while the judges read it (Codex review of
+        # #145): no judgment of this run is bound to what it read, so none counts.
+        for name, order, _input_path, _packet_sha256, out_path in pending:
+            try:
+                record = load_json(out_path)
+            except (OSError, ValueError):
+                continue
+            record.update({"judge": None, "refuter": None, "failure": TREE_CHANGED})
+            write_json(out_path, record)
+            failures.append((f"{name}.{order}", TREE_CHANGED))
 
-    roots = [str(repo), str((work_dir / INPUTS_DIR).resolve()), str((work_dir / "packets").resolve())]
+    # The judges' labelled packet paths are the content-addressed snapshots (Codex review of #145).
+    roots = [str(repo), str((work_dir / INPUTS_DIR).resolve()), str((work_dir / "packets").resolve()),
+             str((work_dir / PACKET_SNAPSHOTS_DIR).resolve())]
     audit = {stem.name[:-len(".jsonl")]: codex_lane.blind_audit(stem, roots) for stem in sorted(events_dir.glob("*.jsonl"))}
     write_json(out_dir / "blind-audit.json", {"schema_version": 1, "allowed_roots": roots, "calls": audit})
     flagged = sorted(key for key, entry in audit.items()
@@ -754,6 +771,19 @@ def run_codex(args) -> int:
 
 LEAKS_NAME = "leaks.json"
 _LEAKS_LOCK = threading.Lock()
+TREE_CHANGED = "the evidence tree or adjudication code changed during the run; rerun on a fixed export"
+LEAK_TEXT_LIMIT = 400
+
+
+def redact_leak_text(text):
+    """A reported leak's text as it may be retained or printed (Codex review of #145): the adjudicator quotes
+    what it found, which can be a host path, so every path form the input scrubbing removes becomes
+    <outside-path> here too, and the text is bounded."""
+    if not isinstance(text, str):
+        return text
+    for pattern in (HOST_PLACEHOLDER, HOME_TEXT_PATH, ABSOLUTE_TEXT_PATH, PARENT_TEXT_PATH, *RESIDUAL_PATTERNS):
+        text = pattern.sub(OUTSIDE, text)
+    return text[:LEAK_TEXT_LIMIT]
 
 
 def input_key(input_path):
@@ -799,7 +829,8 @@ def record_leaks(path: Path, index: dict, leaks) -> list:
                                 for other, path in layer_inputs.items()}
             record = {"input": key[0], "input_sha256": judged, "layer": name, "order": order,
                       "inputs_sha256": both_by_name,
-                      "family": leak.get("family"), "stage": leak.get("stage"), "text": leak.get("text"),
+                      "family": leak.get("family"), "stage": leak.get("stage"),
+                      "text": redact_leak_text(leak.get("text")),
                       "inputs": inputs.get(name, {})}
             if (record["input"], record["input_sha256"], record["family"], record["stage"]) in seen:
                 continue
@@ -859,7 +890,9 @@ def claude_args(work_dir: Path, repo: Path, prompt_path: Path = PROMPT_PATH, lay
     # The input content each item is judged on and the provenance it runs under; claude-collect binds every
     # judgment to this snapshot through the snapshot_id the workflow echoes back.
     snapshot = {"inputs": {f"{item['name']}.{item['order']}": sha256_file(Path(item["path"])) for item in items},
-                "provenance": adjudication_provenance(prompt_path, repo)}
+                "provenance": adjudication_provenance(prompt_path, repo),
+                # claude-collect recomputes the provenance from these to catch a tree changed during the run.
+                "prompt_path": str(Path(prompt_path).resolve()), "repo": str(repo)}
     snapshot["snapshot_id"] = hashlib.sha256(json.dumps(snapshot, sort_keys=True).encode("utf-8")).hexdigest()
     write_json(Path(work_dir).resolve() / JUDGMENTS_DIR / "claude" / CLAUDE_ARGS_SNAPSHOT, snapshot)
     return {"repo": str(repo), "prompt": prompt_path.read_text(encoding="utf-8"), "items": items, "leaked": leaked,
@@ -904,6 +937,13 @@ def collect_claude(work_dir: Path, result, model: str, repo=None) -> list:
                          "the current claude-args output")
     snapshot = snapshot_doc.get("inputs") or {}
     snapshot_provenance = snapshot_doc.get("provenance")
+    # The evidence tree and code the workflow's judges read must still be what claude-args hashed (Codex
+    # review of #145); a snapshot that cannot be recomputed counts as changed.
+    try:
+        tree_changed = adjudication_provenance(Path(snapshot_doc["prompt_path"]),
+                                               Path(snapshot_doc["repo"])) != snapshot_provenance
+    except (KeyError, TypeError, OSError):
+        tree_changed = True
     for name, order, input_path, packet_sha256 in pending_items(index):
         if f"{name}.{order}" not in snapshot:
             # Only the items claude-args gave this workflow run are collected; other layers' judgment files
@@ -930,7 +970,7 @@ def collect_claude(work_dir: Path, result, model: str, repo=None) -> list:
                     leak = {"stage": stage, "text": leak_text(item.get(stage))}
                     break
         if leak is not None:
-            leak = {"stage": leak.get("stage"), "text": leak.get("text")}
+            leak = {"stage": leak.get("stage"), "text": redact_leak_text(leak.get("text"))}
             judge, refuter = None, None
             if not input_changed:
                 # A leak reported on an input rebuilt since the snapshot is about the old content: discarded,
@@ -957,6 +997,8 @@ def collect_claude(work_dir: Path, result, model: str, repo=None) -> list:
         elif packet_changed:
             # The immutable packet copy the judges read no longer holds its indexed bytes.
             failure, judge, refuter, leak = "the packet snapshot changed; rerun inputs", None, None, None
+        elif tree_changed and failure != LEAK:
+            failure, judge, refuter = TREE_CHANGED, None, None
         write_json(work_dir / JUDGMENTS_DIR / "claude" / f"{name}.{order}.json", judgment_record(
             "anthropic", name, order, input_path, packet_sha256, model, repo, judge, refuter, failure,
             leak=leak, input_sha256=judged_sha256, effort=CLAUDE_LANE_EFFORT, provenance=snapshot_provenance))
@@ -1050,19 +1092,8 @@ VENDORED_ADJUDICATOR = HERE.parents[1] / "examples" / "claude-native" / "agents"
 DEFAULT_ADJUDICATOR_FILE = Path.home() / ".claude" / "agents" / f"{ADJUDICATOR_ROLE}.md"
 
 
-def tree_sha256(repo: Path) -> str:
-    """A digest of the evidence repository's content: every regular file's relative path and sha256, sorted.
-    The packet names evidence paths, not their bytes, so a judgment is bound to the tree it read."""
-    digest = hashlib.sha256()
-    repo = Path(repo)
-    for path in sorted(repo.rglob("*")):
-        relative = path.relative_to(repo).as_posix()
-        if path.is_symlink():
-            # A retained internal link: its text is part of the tree, so retargeting it changes the digest.
-            digest.update(f"{relative}\0->{os.readlink(path)}\n".encode("utf-8"))
-        elif path.is_file():
-            digest.update(f"{relative}\0{sha256_file(path)}\n".encode("utf-8"))
-    return digest.hexdigest()
+# One digest for both the lanes and the adjudication (codex_lane.tree_sha256).
+tree_sha256 = codex_lane.tree_sha256
 
 
 def adjudication_provenance(prompt_path: Path = PROMPT_PATH, repo: Path = None) -> dict:

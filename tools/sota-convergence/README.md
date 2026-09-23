@@ -1568,6 +1568,23 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
   skipped ("the packet is missing"), so its old record is purged.
 - **Exact lane provenance (round 8):** `codex_lane` resumes a return only when its `provenance` equals the
   current one exactly; an extra or changed field reruns the layer.
+- **Evidence-tree binding (round 9):** both lanes' provenance names `repo_tree_sha256`, the
+  `codex_lane.tree_sha256` digest of the export they read (every file's path and sha256, and each kept
+  symlink's text); `scripts/landscape.py` requires it on new-wave returns.
+  - `codex_lane` hashes the tree at launch and again after its calls. If the tree changed, it sets that run's
+    returns aside as `<name>.json.tree-changed`, and a resume against another export reruns.
+  - `claude_lane.py` needs `--repo` and `--repo-tree-sha256`, the digest taken before the lane launched, and
+    refuses (exit 2) when the tree changed.
+  - `adjudicate codex` recomputes its provenance after the calls and voids that run's judgments when it
+    changed. `claude-collect` recomputes it from the `claude-args` snapshot, which now records `prompt_path`
+    and `repo`.
+- **Audit roots (round 9):** the Codex adjudication audit allows `<work-dir>/adjudication-packets/`.
+- **Leak text (round 9):** a reported leak's text has every path form the input scrubbing removes replaced by
+  `<outside-path>`, and is capped at 400 characters, before it is stored in `leaks.json`,
+  `adjudication-leaks.json` or printed.
+- **Any leading character (round 9):** an absolute path is scrubbed whatever its first character. That covers
+  Unicode word characters (`/évidence/x`), and any other legal character when a later `/` follows
+  (`/-private/x`, `/@host/x`); prose such as `+/-` or `and/or` is left alone.
 - **Gap receipts in a blind build (round 8):** `lane_packets.py` refuses `--gap-receipts` together with
   `--withhold-labels` (exit 2, nothing written).
 - **HTML delimiters:** `>` delimits a path, as backticks do.
