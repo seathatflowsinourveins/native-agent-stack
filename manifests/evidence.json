@@ -3008,8 +3008,8 @@
     },
     {
       "path": ".github/workflows/catalog-freshness.yml",
-      "sha256": "4ee4b6f4976526219f2e15329a5ba1392dc471b4351e7d8f3f45120a78cc5c47",
-      "bytes": 7835
+      "sha256": "0854b72fc1e91f0bf1feb2ced04044b49cdf09998c87d23afc16028fc5afbd21",
+      "bytes": 19983
     },
     {
       "path": ".github/workflows/native-foundation-e2e.yml",
@@ -8599,8 +8599,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "a3ea0313ebe19e9e270d2f2ce0e81988c76fa23056f35de715e5491c09a4a154",
-      "bytes": 39063
+      "sha256": "10b4ff2bba9deee86b71c2981b4c8aa18ad6a22ad615402918e54c6928e29def",
+      "bytes": 53814
     },
     {
       "path": "docs/grand-catalog-handbook.md",
@@ -14194,8 +14194,8 @@
     },
     {
       "path": "tests/test_gap_wave_ledger.py",
-      "sha256": "1ce3ed5fb281a4bca2a316e0c5db473f29c7a0b97d3773df7fdb118c03f2a883",
-      "bytes": 4174
+      "sha256": "186b9c6909939136f2f4a6177410c13709f3acdece31978e6e08ca488b4f2d23",
+      "bytes": 9020
     },
     {
       "path": "tests/test_gitleaks_config.py",
@@ -14484,8 +14484,8 @@
     },
     {
       "path": "tools/sota-convergence/gap_wave_ledger.py",
-      "sha256": "6dc6ec19d3c8db944371cbde86f8c7b0dcced125f38b4b14f8ff9fcf455f652b",
-      "bytes": 8675
+      "sha256": "8de1e940df6f214728b98fd2fb4e98d544de3a528e2b8805886283ba1cd03153",
+      "bytes": 12685
     },
     {
       "path": "tools/sota-convergence/github_freshness.py",
