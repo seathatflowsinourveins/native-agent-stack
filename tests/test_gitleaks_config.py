@@ -362,6 +362,19 @@ class GitleaksIgnoreFingerprintTests(unittest.TestCase):
         this mechanism cannot be defeated by a same-line, same-string
         adversarial addition on a commit the fingerprint does not name.
 
+        The modified line is selected by PARSING .gitleaksignore itself and
+        taking one of its own fingerprinted `path:...:line` entries for
+        NARRATIVE_FILES[0] (the lowest fingerprinted line number, currently
+        line 338) -- not by independently re-deriving a "looks like a commit
+        reference" line via a marker-word/hex regex, which previously
+        selected an unfingerprinted line (line 98, a short "source_commit
+        5f3ec40b" abbreviated hash with no 40-hex id and no corresponding
+        .gitleaksignore entry) and so passed regardless of whether
+        .gitleaksignore ignored anything at all. Selecting an actual
+        fingerprinted line makes the test's result genuinely depend on
+        .gitleaksignore's content: an empty or overly broad .gitleaksignore
+        would fail this test differently than the correct one.
+
         Uses a real, tracked narrative line (not a synthetic fixture file),
         modified in a disposable detached worktree so the injected marker
         never touches this repository's actual history or working tree."""
@@ -371,6 +384,20 @@ class GitleaksIgnoreFingerprintTests(unittest.TestCase):
         )
         if rev_parse.returncode != 0:
             self.skipTest(f"could not resolve HEAD: {rev_parse.stderr.strip()}")
+
+        target_path = self.NARRATIVE_FILES[0]
+        fingerprinted_lines = []
+        for raw in self._ignore_lines():
+            match = self.FINGERPRINT_RE.match(raw)
+            if match and match.group("path") == target_path:
+                fingerprinted_lines.append(int(match.group("line")))
+        self.assertTrue(
+            fingerprinted_lines,
+            f".gitleaksignore has no fingerprint for {target_path!r}; "
+            "this test requires a real fingerprinted line to inject into",
+        )
+        target_line_no = min(fingerprinted_lines)
+        marker_idx = target_line_no - 1  # fingerprint line numbers are 1-based
 
         worktree = Path(tempfile.mkdtemp(prefix="gitleaksignore-fp-test-"))
         worktree.rmdir()  # `git worktree add` requires the target not already exist
@@ -382,30 +409,38 @@ class GitleaksIgnoreFingerprintTests(unittest.TestCase):
             self.skipTest(f"could not create a detached worktree: {add.stderr.strip()}")
         self._worktree = worktree
 
-        target_file = worktree / self.NARRATIVE_FILES[0]
+        target_file = worktree / target_path
         lines = target_file.read_text().splitlines()
-        marker_idx = None
-        for i, line in enumerate(lines):
-            if (
-                re.search(r'\b(?:pin|pinned|commit|tree|source_pin|source_commit|source)\b', line, re.IGNORECASE)
-                and re.search(r'[0-9a-f]{8,}', line)
-                and line.rstrip().rstrip(",").endswith('"')
-            ):
-                marker_idx = i
-                break
-        self.assertIsNotNone(marker_idx, "expected at least one real commit-reference narrative line")
+        self.assertLess(
+            marker_idx, len(lines),
+            f".gitleaksignore fingerprints line {target_line_no} for {target_path!r}, "
+            f"but that file only has {len(lines)} lines",
+        )
+        selected_line = lines[marker_idx]
+        self.assertTrue(
+            re.search(r'\b(?:pin|pinned|commit|tree|source_pin|source_commit|source)\b', selected_line, re.IGNORECASE)
+            and re.search(r'[0-9a-f]{8,}', selected_line),
+            f"fingerprinted line {target_line_no} does not look like a real commit-reference "
+            f"narrative line: {selected_line!r}",
+        )
+        self.assertTrue(
+            selected_line.rstrip().rstrip(",").endswith('"'),
+            f"expected a JSON string on the fingerprinted line: {selected_line!r}",
+        )
 
         # Built at runtime from short chunks under a name with no
         # credential-like substring, never as one literal: this source file
         # is itself scanned by gitleaks, and the assembled value is
-        # deliberately shaped like a real GitHub personal access token so
-        # this test can prove it is still caught when injected into a
-        # narrative line's SAME JSON string. The literal never sits in any
-        # file committed to THIS repository's real history -- only inside the
-        # disposable worktree removed in tearDown -- so GitHub push
-        # protection is not a concern here.
-        marker_parts = ("ghp_", "wT9kLp3", "Qr7xNb2", "Yv5cMz8", "Hj4sDf6A")
+        # deliberately shaped like a real GitHub personal access token
+        # ("ghp_" followed by 36 characters) so this test can prove it is
+        # still caught when injected into a narrative line's SAME JSON
+        # string. The literal never sits in any file committed to THIS
+        # repository's real history -- only inside the disposable worktree
+        # removed in tearDown -- so GitHub push protection is not a concern
+        # here.
+        marker_parts = ("ghp_", "wT9kLp3", "Qr7xNb2", "Yv5cMz8", "Hj4sDf6A", "Zn2Jf9K")
         injected_marker = "".join(marker_parts)
+        self.assertEqual(len(injected_marker), 40, "expected a ghp_ + 36-char GitHub PAT shape")
 
         original = lines[marker_idx].rstrip()
         trailing_comma = original.endswith(",")
