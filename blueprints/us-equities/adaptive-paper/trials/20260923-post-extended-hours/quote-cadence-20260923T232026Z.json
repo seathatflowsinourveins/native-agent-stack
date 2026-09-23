@@ -1,0 +1,988 @@
+{
+  "kind": "sip_quote_cadence_sample",
+  "endpoint": "market_data_only",
+  "feed": "sip",
+  "config_sha256": "77244c396c407d20f7b21f0e9e8ad9a2c4803ad663247ac210076a47ebbc7eb3",
+  "quote_max_age_seconds": 3,
+  "interval_seconds": 2.5,
+  "samples": [
+    {
+      "observed_at": "2026-09-23T23:20:26.855361+00:00",
+      "quotes": {
+        "SPY": {
+          "age_s": 0.353,
+          "spread_bps": 0.78
+        },
+        "QQQ": {
+          "age_s": 0.132,
+          "spread_bps": 0.81
+        },
+        "IWM": {
+          "age_s": 0.553,
+          "spread_bps": 2.13
+        },
+        "DIA": {
+          "age_s": 0.328,
+          "spread_bps": 1.94
+        },
+        "NVDA": {
+          "age_s": 2.405,
+          "spread_bps": 5.33
+        },
+        "AAPL": {
+          "age_s": 21.27,
+          "spread_bps": 2.37
+        },
+        "AMZN": {
+          "age_s": 6.396,
+          "spread_bps": 8.04
+        },
+        "GOOGL": {
+          "age_s": 33.569,
+          "spread_bps": 7.08
+        },
+        "TSLA": {
+          "age_s": 12.463,
+          "spread_bps": 0.26
+        },
+        "MSFT": {
+          "age_s": 31.745,
+          "spread_bps": 6.4
+        },
+        "JNJ": {
+          "age_s": 1655.125,
+          "spread_bps": 28.66
+        },
+        "JPM": {
+          "age_s": 90.063,
+          "spread_bps": 2.37
+        },
+        "PG": {
+          "age_s": 185.643,
+          "spread_bps": 70.42
+        },
+        "AMD": {
+          "age_s": 23.783,
+          "spread_bps": 6.51
+        },
+        "ARM": {
+          "age_s": 7.579,
+          "spread_bps": 28.61
+        },
+        "ASTS": {
+          "age_s": 259.516,
+          "spread_bps": 6.65
+        },
+        "AVGO": {
+          "age_s": 12.816,
+          "spread_bps": 4.22
+        },
+        "COIN": {
+          "age_s": 0.276,
+          "spread_bps": 17.13
+        },
+        "CRWD": {
+          "age_s": 48.645,
+          "spread_bps": 13.0
+        },
+        "CRWV": {
+          "age_s": 8.262,
+          "spread_bps": 11.49
+        },
+        "META": {
+          "age_s": 0.405,
+          "spread_bps": 6.88
+        },
+        "MU": {
+          "age_s": 0.333,
+          "spread_bps": 7.25
+        },
+        "INTC": {
+          "age_s": 0.542,
+          "spread_bps": 15.5
+        },
+        "SNDK": {
+          "age_s": 0.479,
+          "spread_bps": 11.51
+        }
+      }
+    },
+    {
+      "observed_at": "2026-09-23T23:20:29.380473+00:00",
+      "quotes": {
+        "SPY": {
+          "age_s": 0.43,
+          "spread_bps": 0.91
+        },
+        "QQQ": {
+          "age_s": 0.426,
+          "spread_bps": 0.94
+        },
+        "IWM": {
+          "age_s": 0.859,
+          "spread_bps": 2.13
+        },
+        "DIA": {
+          "age_s": 0.71,
+          "spread_bps": 1.75
+        },
+        "NVDA": {
+          "age_s": 1.523,
+          "spread_bps": 6.22
+        },
+        "AAPL": {
+          "age_s": 23.795,
+          "spread_bps": 2.37
+        },
+        "AMZN": {
+          "age_s": 0.774,
+          "spread_bps": 8.04
+        },
+        "GOOGL": {
+          "age_s": 36.094,
+          "spread_bps": 7.08
+        },
+        "TSLA": {
+          "age_s": 14.988,
+          "spread_bps": 0.26
+        },
+        "MSFT": {
+          "age_s": 0.465,
+          "spread_bps": 17.61
+        },
+        "JNJ": {
+          "age_s": 1657.65,
+          "spread_bps": 28.66
+        },
+        "JPM": {
+          "age_s": 92.588,
+          "spread_bps": 2.37
+        },
+        "PG": {
+          "age_s": 188.168,
+          "spread_bps": 70.42
+        },
+        "AMD": {
+          "age_s": 26.308,
+          "spread_bps": 6.51
+        },
+        "ARM": {
+          "age_s": 10.104,
+          "spread_bps": 28.61
+        },
+        "ASTS": {
+          "age_s": 262.041,
+          "spread_bps": 6.65
+        },
+        "AVGO": {
+          "age_s": 15.341,
+          "spread_bps": 4.22
+        },
+        "COIN": {
+          "age_s": 2.801,
+          "spread_bps": 17.13
+        },
+        "CRWD": {
+          "age_s": 51.17,
+          "spread_bps": 13.0
+        },
+        "CRWV": {
+          "age_s": 10.787,
+          "spread_bps": 11.49
+        },
+        "META": {
+          "age_s": 0.285,
+          "spread_bps": 6.48
+        },
+        "MU": {
+          "age_s": 2.038,
+          "spread_bps": 8.37
+        },
+        "INTC": {
+          "age_s": 1.498,
+          "spread_bps": 13.05
+        },
+        "SNDK": {
+          "age_s": 2.343,
+          "spread_bps": 10.96
+        }
+      }
+    },
+    {
+      "observed_at": "2026-09-23T23:20:31.904469+00:00",
+      "quotes": {
+        "SPY": {
+          "age_s": 0.633,
+          "spread_bps": 0.78
+        },
+        "QQQ": {
+          "age_s": 0.738,
+          "spread_bps": 0.81
+        },
+        "IWM": {
+          "age_s": 1.634,
+          "spread_bps": 2.13
+        },
+        "DIA": {
+          "age_s": 1.138,
+          "spread_bps": 1.75
+        },
+        "NVDA": {
+          "age_s": 4.047,
+          "spread_bps": 6.22
+        },
+        "AAPL": {
+          "age_s": 26.319,
+          "spread_bps": 2.37
+        },
+        "AMZN": {
+          "age_s": 3.298,
+          "spread_bps": 8.04
+        },
+        "GOOGL": {
+          "age_s": 38.618,
+          "spread_bps": 7.08
+        },
+        "TSLA": {
+          "age_s": 17.512,
+          "spread_bps": 0.26
+        },
+        "MSFT": {
+          "age_s": 2.989,
+          "spread_bps": 17.61
+        },
+        "JNJ": {
+          "age_s": 1660.174,
+          "spread_bps": 28.66
+        },
+        "JPM": {
+          "age_s": 95.112,
+          "spread_bps": 2.37
+        },
+        "PG": {
+          "age_s": 190.692,
+          "spread_bps": 70.42
+        },
+        "AMD": {
+          "age_s": 28.832,
+          "spread_bps": 6.51
+        },
+        "ARM": {
+          "age_s": 1.305,
+          "spread_bps": 15.05
+        },
+        "ASTS": {
+          "age_s": 264.565,
+          "spread_bps": 6.65
+        },
+        "AVGO": {
+          "age_s": 17.865,
+          "spread_bps": 4.22
+        },
+        "COIN": {
+          "age_s": 2.574,
+          "spread_bps": 19.14
+        },
+        "CRWD": {
+          "age_s": 53.694,
+          "spread_bps": 13.0
+        },
+        "CRWV": {
+          "age_s": 13.311,
+          "spread_bps": 11.49
+        },
+        "META": {
+          "age_s": 0.478,
+          "spread_bps": 5.26
+        },
+        "MU": {
+          "age_s": 4.562,
+          "spread_bps": 8.37
+        },
+        "INTC": {
+          "age_s": 0.587,
+          "spread_bps": 13.87
+        },
+        "SNDK": {
+          "age_s": 4.867,
+          "spread_bps": 10.96
+        }
+      }
+    },
+    {
+      "observed_at": "2026-09-23T23:20:34.424637+00:00",
+      "quotes": {
+        "SPY": {
+          "age_s": 3.153,
+          "spread_bps": 0.78
+        },
+        "QQQ": {
+          "age_s": 1.356,
+          "spread_bps": 0.54
+        },
+        "IWM": {
+          "age_s": 4.155,
+          "spread_bps": 2.13
+        },
+        "DIA": {
+          "age_s": 2.46,
+          "spread_bps": 1.56
+        },
+        "NVDA": {
+          "age_s": 0.869,
+          "spread_bps": 6.22
+        },
+        "AAPL": {
+          "age_s": 28.839,
+          "spread_bps": 2.37
+        },
+        "AMZN": {
+          "age_s": 5.819,
+          "spread_bps": 8.04
+        },
+        "GOOGL": {
+          "age_s": 41.139,
+          "spread_bps": 7.08
+        },
+        "TSLA": {
+          "age_s": 20.033,
+          "spread_bps": 0.26
+        },
+        "MSFT": {
+          "age_s": 5.509,
+          "spread_bps": 17.61
+        },
+        "JNJ": {
+          "age_s": 1662.694,
+          "spread_bps": 28.66
+        },
+        "JPM": {
+          "age_s": 97.632,
+          "spread_bps": 2.37
+        },
+        "PG": {
+          "age_s": 193.212,
+          "spread_bps": 70.42
+        },
+        "AMD": {
+          "age_s": 31.353,
+          "spread_bps": 6.51
+        },
+        "ARM": {
+          "age_s": 3.825,
+          "spread_bps": 15.05
+        },
+        "ASTS": {
+          "age_s": 267.085,
+          "spread_bps": 6.65
+        },
+        "AVGO": {
+          "age_s": 20.385,
+          "spread_bps": 4.22
+        },
+        "COIN": {
+          "age_s": 5.094,
+          "spread_bps": 19.14
+        },
+        "CRWD": {
+          "age_s": 56.214,
+          "spread_bps": 13.0
+        },
+        "CRWV": {
+          "age_s": 15.832,
+          "spread_bps": 11.49
+        },
+        "META": {
+          "age_s": 2.373,
+          "spread_bps": 5.26
+        },
+        "MU": {
+          "age_s": 7.082,
+          "spread_bps": 8.37
+        },
+        "INTC": {
+          "age_s": 3.107,
+          "spread_bps": 13.87
+        },
+        "SNDK": {
+          "age_s": 7.387,
+          "spread_bps": 10.96
+        }
+      }
+    },
+    {
+      "observed_at": "2026-09-23T23:20:36.946896+00:00",
+      "quotes": {
+        "SPY": {
+          "age_s": 0.674,
+          "spread_bps": 0.52
+        },
+        "QQQ": {
+          "age_s": 0.472,
+          "spread_bps": 0.94
+        },
+        "IWM": {
+          "age_s": 0.566,
+          "spread_bps": 1.77
+        },
+        "DIA": {
+          "age_s": 4.982,
+          "spread_bps": 1.56
+        },
+        "NVDA": {
+          "age_s": 1.578,
+          "spread_bps": 4.0
+        },
+        "AAPL": {
+          "age_s": 31.361,
+          "spread_bps": 2.37
+        },
+        "AMZN": {
+          "age_s": 0.195,
+          "spread_bps": 4.02
+        },
+        "GOOGL": {
+          "age_s": 43.661,
+          "spread_bps": 7.08
+        },
+        "TSLA": {
+          "age_s": 22.555,
+          "spread_bps": 0.26
+        },
+        "MSFT": {
+          "age_s": 0.364,
+          "spread_bps": 11.01
+        },
+        "JNJ": {
+          "age_s": 1665.217,
+          "spread_bps": 28.66
+        },
+        "JPM": {
+          "age_s": 100.154,
+          "spread_bps": 2.37
+        },
+        "PG": {
+          "age_s": 195.735,
+          "spread_bps": 70.42
+        },
+        "AMD": {
+          "age_s": 33.875,
+          "spread_bps": 6.51
+        },
+        "ARM": {
+          "age_s": 6.348,
+          "spread_bps": 15.05
+        },
+        "ASTS": {
+          "age_s": 269.608,
+          "spread_bps": 6.65
+        },
+        "AVGO": {
+          "age_s": 22.907,
+          "spread_bps": 4.22
+        },
+        "COIN": {
+          "age_s": 7.616,
+          "spread_bps": 19.14
+        },
+        "CRWD": {
+          "age_s": 58.736,
+          "spread_bps": 13.0
+        },
+        "CRWV": {
+          "age_s": 18.354,
+          "spread_bps": 11.49
+        },
+        "META": {
+          "age_s": 4.895,
+          "spread_bps": 5.26
+        },
+        "MU": {
+          "age_s": 0.513,
+          "spread_bps": 8.37
+        },
+        "INTC": {
+          "age_s": 0.556,
+          "spread_bps": 16.32
+        },
+        "SNDK": {
+          "age_s": 9.909,
+          "spread_bps": 10.96
+        }
+      }
+    },
+    {
+      "observed_at": "2026-09-23T23:20:39.466220+00:00",
+      "quotes": {
+        "SPY": {
+          "age_s": 3.193,
+          "spread_bps": 0.52
+        },
+        "QQQ": {
+          "age_s": 0.382,
+          "spread_bps": 0.54
+        },
+        "IWM": {
+          "age_s": 3.085,
+          "spread_bps": 1.77
+        },
+        "DIA": {
+          "age_s": 7.501,
+          "spread_bps": 1.56
+        },
+        "NVDA": {
+          "age_s": 1.201,
+          "spread_bps": 4.0
+        },
+        "AAPL": {
+          "age_s": 33.881,
+          "spread_bps": 2.37
+        },
+        "AMZN": {
+          "age_s": 2.715,
+          "spread_bps": 4.02
+        },
+        "GOOGL": {
+          "age_s": 0.104,
+          "spread_bps": 5.9
+        },
+        "TSLA": {
+          "age_s": 25.074,
+          "spread_bps": 0.26
+        },
+        "MSFT": {
+          "age_s": 2.883,
+          "spread_bps": 11.01
+        },
+        "JNJ": {
+          "age_s": 1667.736,
+          "spread_bps": 28.66
+        },
+        "JPM": {
+          "age_s": 102.674,
+          "spread_bps": 2.37
+        },
+        "PG": {
+          "age_s": 198.254,
+          "spread_bps": 70.42
+        },
+        "AMD": {
+          "age_s": 36.394,
+          "spread_bps": 6.51
+        },
+        "ARM": {
+          "age_s": 8.867,
+          "spread_bps": 15.05
+        },
+        "ASTS": {
+          "age_s": 272.127,
+          "spread_bps": 6.65
+        },
+        "AVGO": {
+          "age_s": 0.628,
+          "spread_bps": 2.25
+        },
+        "COIN": {
+          "age_s": 10.136,
+          "spread_bps": 19.14
+        },
+        "CRWD": {
+          "age_s": 61.256,
+          "spread_bps": 13.0
+        },
+        "CRWV": {
+          "age_s": 1.814,
+          "spread_bps": 10.33
+        },
+        "META": {
+          "age_s": 0.774,
+          "spread_bps": 13.21
+        },
+        "MU": {
+          "age_s": 0.873,
+          "spread_bps": 8.37
+        },
+        "INTC": {
+          "age_s": 3.076,
+          "spread_bps": 16.32
+        },
+        "SNDK": {
+          "age_s": 2.268,
+          "spread_bps": 11.51
+        }
+      }
+    },
+    {
+      "observed_at": "2026-09-23T23:20:41.986137+00:00",
+      "quotes": {
+        "SPY": {
+          "age_s": 5.713,
+          "spread_bps": 0.52
+        },
+        "QQQ": {
+          "age_s": 0.783,
+          "spread_bps": 0.67
+        },
+        "IWM": {
+          "age_s": 1.838,
+          "spread_bps": 1.77
+        },
+        "DIA": {
+          "age_s": 10.021,
+          "spread_bps": 1.56
+        },
+        "NVDA": {
+          "age_s": 3.721,
+          "spread_bps": 4.0
+        },
+        "AAPL": {
+          "age_s": 36.4,
+          "spread_bps": 2.37
+        },
+        "AMZN": {
+          "age_s": 5.234,
+          "spread_bps": 4.02
+        },
+        "GOOGL": {
+          "age_s": 2.624,
+          "spread_bps": 5.9
+        },
+        "TSLA": {
+          "age_s": 27.594,
+          "spread_bps": 0.26
+        },
+        "MSFT": {
+          "age_s": 5.403,
+          "spread_bps": 11.01
+        },
+        "JNJ": {
+          "age_s": 1670.256,
+          "spread_bps": 28.66
+        },
+        "JPM": {
+          "age_s": 105.194,
+          "spread_bps": 2.37
+        },
+        "PG": {
+          "age_s": 200.774,
+          "spread_bps": 70.42
+        },
+        "AMD": {
+          "age_s": 38.914,
+          "spread_bps": 6.51
+        },
+        "ARM": {
+          "age_s": 1.379,
+          "spread_bps": 28.61
+        },
+        "ASTS": {
+          "age_s": 274.647,
+          "spread_bps": 6.65
+        },
+        "AVGO": {
+          "age_s": 3.148,
+          "spread_bps": 2.25
+        },
+        "COIN": {
+          "age_s": 12.656,
+          "spread_bps": 19.14
+        },
+        "CRWD": {
+          "age_s": 63.775,
+          "spread_bps": 13.0
+        },
+        "CRWV": {
+          "age_s": 2.27,
+          "spread_bps": 11.48
+        },
+        "META": {
+          "age_s": 3.294,
+          "spread_bps": 13.21
+        },
+        "MU": {
+          "age_s": 3.393,
+          "spread_bps": 8.37
+        },
+        "INTC": {
+          "age_s": 2.177,
+          "spread_bps": 13.87
+        },
+        "SNDK": {
+          "age_s": 4.788,
+          "spread_bps": 11.51
+        }
+      }
+    },
+    {
+      "observed_at": "2026-09-23T23:20:44.505944+00:00",
+      "quotes": {
+        "SPY": {
+          "age_s": 8.233,
+          "spread_bps": 0.52
+        },
+        "QQQ": {
+          "age_s": 1.863,
+          "spread_bps": 0.67
+        },
+        "IWM": {
+          "age_s": 4.357,
+          "spread_bps": 1.77
+        },
+        "DIA": {
+          "age_s": 12.541,
+          "spread_bps": 1.56
+        },
+        "NVDA": {
+          "age_s": 6.24,
+          "spread_bps": 4.0
+        },
+        "AAPL": {
+          "age_s": 38.92,
+          "spread_bps": 2.37
+        },
+        "AMZN": {
+          "age_s": 0.572,
+          "spread_bps": 4.02
+        },
+        "GOOGL": {
+          "age_s": 5.144,
+          "spread_bps": 5.9
+        },
+        "TSLA": {
+          "age_s": 30.114,
+          "spread_bps": 0.26
+        },
+        "MSFT": {
+          "age_s": 7.923,
+          "spread_bps": 11.01
+        },
+        "JNJ": {
+          "age_s": 1672.776,
+          "spread_bps": 28.66
+        },
+        "JPM": {
+          "age_s": 107.714,
+          "spread_bps": 2.37
+        },
+        "PG": {
+          "age_s": 203.294,
+          "spread_bps": 70.42
+        },
+        "AMD": {
+          "age_s": 41.434,
+          "spread_bps": 6.51
+        },
+        "ARM": {
+          "age_s": 3.899,
+          "spread_bps": 28.61
+        },
+        "ASTS": {
+          "age_s": 277.167,
+          "spread_bps": 6.65
+        },
+        "AVGO": {
+          "age_s": 5.668,
+          "spread_bps": 2.25
+        },
+        "COIN": {
+          "age_s": 15.175,
+          "spread_bps": 19.14
+        },
+        "CRWD": {
+          "age_s": 66.295,
+          "spread_bps": 13.0
+        },
+        "CRWV": {
+          "age_s": 0.666,
+          "spread_bps": 10.33
+        },
+        "META": {
+          "age_s": 0.736,
+          "spread_bps": 13.21
+        },
+        "MU": {
+          "age_s": 2.203,
+          "spread_bps": 8.37
+        },
+        "INTC": {
+          "age_s": 4.696,
+          "spread_bps": 13.87
+        },
+        "SNDK": {
+          "age_s": 7.308,
+          "spread_bps": 11.51
+        }
+      }
+    }
+  ],
+  "summary": {
+    "SPY": {
+      "fresh": 4,
+      "samples": 8,
+      "median_age_s": 1.9,
+      "max_age_s": 8.2,
+      "median_spread_bps": 0.7
+    },
+    "QQQ": {
+      "fresh": 8,
+      "samples": 8,
+      "median_age_s": 0.6,
+      "max_age_s": 1.9,
+      "median_spread_bps": 0.7
+    },
+    "IWM": {
+      "fresh": 5,
+      "samples": 8,
+      "median_age_s": 1.7,
+      "max_age_s": 4.4,
+      "median_spread_bps": 1.9
+    },
+    "DIA": {
+      "fresh": 4,
+      "samples": 8,
+      "median_age_s": 3.7,
+      "max_age_s": 12.5,
+      "median_spread_bps": 1.6
+    },
+    "NVDA": {
+      "fresh": 5,
+      "samples": 8,
+      "median_age_s": 2.0,
+      "max_age_s": 6.2,
+      "median_spread_bps": 4.7
+    },
+    "AAPL": {
+      "fresh": 0,
+      "samples": 8,
+      "median_age_s": 30.1,
+      "max_age_s": 38.9,
+      "median_spread_bps": 2.4
+    },
+    "AMZN": {
+      "fresh": 4,
+      "samples": 8,
+      "median_age_s": 3.0,
+      "max_age_s": 6.4,
+      "median_spread_bps": 6.0
+    },
+    "GOOGL": {
+      "fresh": 2,
+      "samples": 8,
+      "median_age_s": 34.8,
+      "max_age_s": 43.7,
+      "median_spread_bps": 7.1
+    },
+    "TSLA": {
+      "fresh": 0,
+      "samples": 8,
+      "median_age_s": 21.3,
+      "max_age_s": 30.1,
+      "median_spread_bps": 0.3
+    },
+    "MSFT": {
+      "fresh": 4,
+      "samples": 8,
+      "median_age_s": 4.2,
+      "max_age_s": 31.7,
+      "median_spread_bps": 11.0
+    },
+    "JNJ": {
+      "fresh": 0,
+      "samples": 8,
+      "median_age_s": 1664.0,
+      "max_age_s": 1672.8,
+      "median_spread_bps": 28.7
+    },
+    "JPM": {
+      "fresh": 0,
+      "samples": 8,
+      "median_age_s": 98.9,
+      "max_age_s": 107.7,
+      "median_spread_bps": 2.4
+    },
+    "PG": {
+      "fresh": 0,
+      "samples": 8,
+      "median_age_s": 194.5,
+      "max_age_s": 203.3,
+      "median_spread_bps": 70.4
+    },
+    "AMD": {
+      "fresh": 0,
+      "samples": 8,
+      "median_age_s": 32.6,
+      "max_age_s": 41.4,
+      "median_spread_bps": 6.5
+    },
+    "ARM": {
+      "fresh": 2,
+      "samples": 8,
+      "median_age_s": 5.1,
+      "max_age_s": 10.1,
+      "median_spread_bps": 21.8
+    },
+    "ASTS": {
+      "fresh": 0,
+      "samples": 8,
+      "median_age_s": 268.3,
+      "max_age_s": 277.2,
+      "median_spread_bps": 6.7
+    },
+    "AVGO": {
+      "fresh": 1,
+      "samples": 8,
+      "median_age_s": 14.1,
+      "max_age_s": 22.9,
+      "median_spread_bps": 4.2
+    },
+    "COIN": {
+      "fresh": 3,
+      "samples": 8,
+      "median_age_s": 6.4,
+      "max_age_s": 15.2,
+      "median_spread_bps": 19.1
+    },
+    "CRWD": {
+      "fresh": 0,
+      "samples": 8,
+      "median_age_s": 57.5,
+      "max_age_s": 66.3,
+      "median_spread_bps": 13.0
+    },
+    "CRWV": {
+      "fresh": 3,
+      "samples": 8,
+      "median_age_s": 9.5,
+      "max_age_s": 18.4,
+      "median_spread_bps": 11.5
+    },
+    "META": {
+      "fresh": 6,
+      "samples": 8,
+      "median_age_s": 0.8,
+      "max_age_s": 4.9,
+      "median_spread_bps": 6.7
+    },
+    "MU": {
+      "fresh": 5,
+      "samples": 8,
+      "median_age_s": 2.1,
+      "max_age_s": 7.1,
+      "median_spread_bps": 8.4
+    },
+    "INTC": {
+      "fresh": 5,
+      "samples": 8,
+      "median_age_s": 1.8,
+      "max_age_s": 4.7,
+      "median_spread_bps": 13.9
+    },
+    "SNDK": {
+      "fresh": 3,
+      "samples": 8,
+      "median_age_s": 4.8,
+      "max_age_s": 9.9,
+      "median_spread_bps": 11.2
+    }
+  }
+}
