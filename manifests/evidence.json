@@ -6380,8 +6380,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/receipt.json",
-      "sha256": "e6374030a0f91e0be291f2dee268a4fb6c60c6074421d26fc7a6267845e929f5",
-      "bytes": 60538
+      "sha256": "9bd58237bd11890010855a7508d36cb03ad3c7500774a403aadb8891757f569c",
+      "bytes": 63197
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/receipts/adaptive_policy_v1.golden.json",
@@ -6661,6 +6661,41 @@
     {
       "path": "blueprints/us-equities/adaptive-paper/trials/20260923f-first-passed/scheduled-trial.log",
       "sha256": "4cb9edeaa4d9119432f038097b31a02dd9f2658e49a04e27e1cbe09e20c086c8",
+      "bytes": 540
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923g-main-passed/README.md",
+      "sha256": "28bdd465c6e67e46d5feaf5ffc0244328d7218c2f081785c7ad731fa280cf0cf",
+      "bytes": 1479
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923g-main-passed/broker-orders.json",
+      "sha256": "7f84a869e033e4692bcb755486dcffa05278fd441e9cafb541a470de9b8047c3",
+      "bytes": 2336
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923g-main-passed/frozen-843dc8f.SHA256SUMS",
+      "sha256": "d41228aacf816f504052e5e8241359043c6ae4cd7f08d3a5deb8d9a7683f8cf7",
+      "bytes": 58949
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923g-main-passed/gate-result.json",
+      "sha256": "71d666862e781604fde9887b7c329101c2be2aafd0b5b1ddf6ee1c79f3f6de84",
+      "bytes": 1479
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923g-main-passed/ingest-receipt.json",
+      "sha256": "3f340e37b1254578197c27bc75652ee626ac6966bb43642ebf8c7f49a2df3bb4",
+      "bytes": 630
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923g-main-passed/paper-output.json",
+      "sha256": "3e2603c8c9e883ed6284e6f9b5f11dbb87b1ed127f8195b47e4e064882041c73",
+      "bytes": 58001
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923g-main-passed/scheduled-trial.log",
+      "sha256": "5a2f0def21633aa4e86ae31bb221fbed515635b1d8ebeb6a8d8cacd1680c78b2",
       "bytes": 540
     },
     {
@@ -8840,8 +8875,8 @@
     },
     {
       "path": "catalogs/us-equities/gates-20260922.json",
-      "sha256": "db9496c4b8769ec9a07756863738d311f97125f06b69917288580d03bf9bbd5e",
-      "bytes": 33100
+      "sha256": "1ce80f4026592561dde0a80f7e53ed8ab1cd8f6460f0ffb17790143744c49c82",
+      "bytes": 33691
     },
     {
       "path": "catalogs/us-equities/hosting-source-review.json",
