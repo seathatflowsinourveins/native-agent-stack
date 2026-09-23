@@ -21,6 +21,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -116,6 +117,9 @@ def main(argv=None) -> int:
     mode.add_argument("--strict", action="store_true")
     mode.add_argument("--strict-if-repinned", metavar="BASE_REF")
     args = ap.parse_args(argv)
+    if shutil.which("git") is None:
+        print(json.dumps({"status": "error", "error": "git is not on PATH; install git and rerun"}))
+        return 2
     tag, commit = pin((ROOT / "adoption/manifest.json").read_text(encoding="utf-8"))
     if git("cat-file", "-e", f"{commit}^{{commit}}").returncode:
         print(json.dumps({"status": "error", "error": f"release commit {commit} ({tag}) not in this clone"}))

@@ -442,8 +442,8 @@ class LayerVerdictSchemaV2Tests(LandscapeTests):
             self.build()
 
     def test_platform_status_vocabulary_is_per_platform(self):
-        # Codex cross-family review of PR-2: macOS may only be untested on this profile
-        # and Linux may not be untested.
+        # Codex cross-family review of PR-2: Linux may not be untested, and macOS may not
+        # claim more than its host receipts support (no receipts here, so not accepted).
         self.seal_claude_run()
         fields = self.recorded_fields()
         fields["winners"][0]["platform_status"] = {"linux-wsl2-x86_64": "accepted", "macos-arm64": "accepted"}
@@ -455,6 +455,40 @@ class LayerVerdictSchemaV2Tests(LandscapeTests):
         self.layer.update(fields)
         with self.assertRaisesRegex(ValueError, "platform_status.linux-wsl2-x86_64"):
             self.build()
+
+    def test_macos_flip_needs_a_qualifying_host_receipt(self):
+        # Peer-update audit (wf_77c0ea46-091) finding 1: macOS could never leave "untested".
+        # The declared status may now rise to what scripts/platform_status.py derives.
+        from scripts import host_receipts
+        self.seal_claude_run()
+        fields = self.recorded_fields()
+        fields["winners"][0]["platform_status"] = {"linux-wsl2-x86_64": "accepted", "macos-arm64": "accepted"}
+        self.layer.update(fields)
+        with self.assertRaisesRegex(ValueError, "supports at most 'untested'"):
+            self.build()
+        (self.root / "adoption" / "host-receipt.schema.json").write_text(
+            (Path(__file__).resolve().parents[1] / "adoption" / "host-receipt.schema.json").read_text(
+                encoding="utf-8"), encoding="utf-8")
+        recorder = {"identity_sha256": host_receipts.identity_digest("mac-recorder")}
+        reviewer = {"identity_sha256": host_receipts.identity_digest("wsl-reviewer")}
+        self.write("evidence/hosts/mac-20260923/mac-20260923--selected--use--20260923.json", {
+            "schema_version": 1, "id": "mac-20260923--selected--use--20260923", "kind": "host_acceptance",
+            "host": {"host_id": "mac-20260923", "platform_id": "macos-arm64", "os": "macos",
+                     "architecture": "arm64", "second_physical_machine": True},
+            "catalog_revision": "b" * 40, "recorded_by": recorder, "component_id": "selected", "stage": "use",
+            "commands": [{"cmd": "selected --version", "exit": 0, "duration_s": 0.1,
+                          "output_sha256": "0" * 64, "output_excerpt": "1"}],
+            "tool_versions": {"selected": "1"}, "observed_at_utc": "2026-09-23T01:00:00Z", "result": "pass",
+            "claim": "Ran on a Mac", "limitations": ["One command"], "evidence_class": "native_proven",
+            "reviews": [
+                {"kind": "self", "ref": "record", "verdict": "agree", "at_utc": "2026-09-23T01:00:00Z",
+                 "reviewer": recorder},
+                {"kind": "independent_session", "ref": "review", "verdict": "agree",
+                 "at_utc": "2026-09-23T02:00:00Z", "reviewer": reviewer},
+            ],
+        })
+        data = self.build()
+        self.assertEqual(data["layers"][0]["winners"][0]["platform_status"]["macos-arm64"], "accepted")
 
     def test_recipe_ref_must_resolve_to_a_recipe_map_key_or_an_existing_path(self):
         self.seal_claude_run()
