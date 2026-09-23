@@ -4340,7 +4340,7 @@
     },
     {
       "path": "blueprints/convergence-practice/offhost-app-state/plan.json",
-      "sha256": "631addc156b6d966d06b80cca850eaebb1f0b975bc3cb80b43c3c8268a3214bd",
+      "sha256": "7edf3711c5a9b6f17a36a822f4f22160a30c2a8c2b16c866bf99c3a715ce0139",
       "bytes": 7010
     },
     {
@@ -4350,8 +4350,8 @@
     },
     {
       "path": "blueprints/convergence-practice/offhost-app-state/run.py",
-      "sha256": "d5eddb06d7fc86218b98e11e84b70edd7ee7f72cdc31caeab454112bd1b2b950",
-      "bytes": 43926
+      "sha256": "c3fb4310142e4610f0d4802c1ebedda6c7839be2cc4c3b35ba2f1efaf7a76fcc",
+      "bytes": 44254
     },
     {
       "path": "blueprints/convergence-practice/offhost-app-state/upstream.json",
@@ -4400,7 +4400,7 @@
     },
     {
       "path": "blueprints/convergence-practice/offhost-restore/hosted-plan.json",
-      "sha256": "55e405c965943c29dacd71027e68eaf0594f42a840d562102a0a7f145c301a41",
+      "sha256": "79a85fe80778412f3ca00170ccb7fec6ff116f2144d0a10533d01734a54cb277",
       "bytes": 5714
     },
     {
@@ -4460,8 +4460,8 @@
     },
     {
       "path": "blueprints/convergence-practice/offhost-restore/verify.py",
-      "sha256": "fd51bb5c2ccdea21134b03848e53130bb0cf7dcf53840f988424533fa4bc772f",
-      "bytes": 4651
+      "sha256": "0fc7e39fb112a1d7c8aae1de68957f0e5a67e3fc78f54080672e0b81a1c9df79",
+      "bytes": 5321
     },
     {
       "path": "blueprints/convergence-practice/protocol.json",
@@ -4705,8 +4705,8 @@
     },
     {
       "path": "blueprints/convergence-practice/service-reboot/run.py",
-      "sha256": "48a22bb48ec067f92e60e1b3d96dfb2678eba83f4d4e2517d214fb34087bd875",
-      "bytes": 23469
+      "sha256": "e20faf3229d0bc2422a7fe1db18d955ec788fb7b06d8a04d218f75ae592836d0",
+      "bytes": 24210
     },
     {
       "path": "blueprints/convergence-practice/service-reboot/setup.sh",
@@ -6480,8 +6480,8 @@
     },
     {
       "path": "blueprints/us-equities/alpaca-historical/collect.py",
-      "sha256": "e2a3032167d66a91d2367d76eacf12bf9a45865d11892fbb91ac3b30bc46570f",
-      "bytes": 25735
+      "sha256": "c3655cae835cc6055f96d965b71e2eeee9b92b1f7032ff240d381d03aa29e073",
+      "bytes": 26584
     },
     {
       "path": "blueprints/us-equities/alpaca-historical/plan.json",
@@ -6660,8 +6660,8 @@
     },
     {
       "path": "blueprints/us-equities/catalyst-dataset/dataset.py",
-      "sha256": "d4ad517451b37e418a4b9a522952e9188c29e4b2cb260a7f27a041fd5a030d1b",
-      "bytes": 24438
+      "sha256": "f4b3ed430168ff10f3538cd75d1fcfe82298135a3667a2ceb129e20927a47257",
+      "bytes": 25145
     },
     {
       "path": "blueprints/us-equities/catalyst-dataset/native-receipt.json",
@@ -7900,8 +7900,8 @@
     },
     {
       "path": "blueprints/us-equities/research-efficiency/experiment.py",
-      "sha256": "cb307c4f6b80a2fa8eee66c3dc0f88fb72b71dddaaada99acac18d1192b26865",
-      "bytes": 27330
+      "sha256": "458db81bac249fad6054e031eb3af8220dfcda2199588cc3cdf5ba013cefd38b",
+      "bytes": 27968
     },
     {
       "path": "blueprints/us-equities/research-efficiency/native-receipt.json",
@@ -14410,8 +14410,8 @@
     },
     {
       "path": "scripts/catalog_decisions.py",
-      "sha256": "af621796e0c11888b7fa90ff13c9266e350416c924a4b6848ed995ca38faa552",
-      "bytes": 13435
+      "sha256": "004a08b524c92a9ba3280f361f063ab9079797da0066998ab730149a220d8729",
+      "bytes": 13797
     },
     {
       "path": "scripts/component_matrix.py",
@@ -14575,8 +14575,8 @@
     },
     {
       "path": "tests/test_adoption_bootstrap.py",
-      "sha256": "c06ad9151a2589aba290d2968530427ea29a4aebf54ae0077a6425baf0b8d06f",
-      "bytes": 22139
+      "sha256": "db7670bd987511cd3ae52747a5886c99e16858fba064fd716add1e643d7e0028",
+      "bytes": 22810
     },
     {
       "path": "tests/test_adoption_bootstrap_macos.py",
@@ -14745,8 +14745,8 @@
     },
     {
       "path": "tests/test_grand_dashboard.py",
-      "sha256": "0b60a4c8bd8443fcb668ee003c5e88a785ce430460ee1a9e872f0ac9cdf22b8c",
-      "bytes": 13225
+      "sha256": "cfb03d77270fbe02be0993e08bfa2e59972a119aec5194c50bd6d2ffb02679a0",
+      "bytes": 13618
     },
     {
       "path": "tests/test_grype_known_cve_fixture.py",
@@ -14765,8 +14765,8 @@
     },
     {
       "path": "tests/test_host_receipts.py",
-      "sha256": "5a11f68bee22d1311375cacf88c68683c66e815f229fc30f2ee3290056905fe1",
-      "bytes": 60927
+      "sha256": "84e253c22a963fdecce0d1fa68ddb3aea985f99842add1134e210bf3f1b0b89f",
+      "bytes": 61918
     },
     {
       "path": "tests/test_ibkr_acceptance.py",
@@ -14905,8 +14905,8 @@
     },
     {
       "path": "tests/test_render_config.py",
-      "sha256": "b033320e968e63abb7cf6c4c7c8850c1c14ada3d841f63ccdfb7464106ddfe69",
-      "bytes": 10573
+      "sha256": "98d96dd2597166ba9d01d8b60b0e163e4eb49f70e9eb3b9f7aaa7c4b9a430ff7",
+      "bytes": 10919
     },
     {
       "path": "tests/test_research_efficiency.py",
@@ -14965,8 +14965,8 @@
     },
     {
       "path": "tests/test_worker_recovery.py",
-      "sha256": "a72811afe7e61c1ba433e9ff29be61066e5983027b3fca14a039a1247ec6e946",
-      "bytes": 11205
+      "sha256": "9360d522838325f232d6f1d7a02dcefa36a9865a0fa02c22bec42db606a8dc0a",
+      "bytes": 11589
     },
     {
       "path": "tests/test_workflow_hardening.py",
