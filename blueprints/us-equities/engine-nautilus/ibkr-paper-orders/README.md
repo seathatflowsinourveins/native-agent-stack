@@ -296,3 +296,22 @@ or wide quote leaves the run incomplete instead of paying up.
 - Erratum: `plan-post.json`'s `revision_note` says it was frozen at 19:05 ET. It was committed at 18:54:51 ET in
   `7719a10c`, before this 18:58 run, and the receipt's `plan_sha256` (`4500c917…`) matches that file. The note is left
   as is because editing it would change the hash the receipt binds.
+
+## Review hardening, 2026-09-23 (after both runs; the runs above used the earlier bytes)
+
+- The run refuses before connecting (`refused_unpinned_runtime`, exit 3, versions recorded) unless the imported
+  NautilusTrader and ibapi are exactly the plan's `engine.version` and `engine.ibapi_version` (1.231.0 and 10.45.1).
+- The provisional `cleanup_required` receipt now carries the full run state and is rewritten after every case change,
+  order, event and fill. A kill mid-run therefore leaves the orders and fills on disk, not only the run prefix.
+- `max_notional_per_order_usd` binds every order path. The C4 flatten and cleanup sells pass their limit price to the
+  budget as the entries do; a reservation without a price is refused.
+- A fill whose commission is missing, or zero (1.231.0 maps an unreported IB commission to 0), sets
+  `roundtrip.commission_unresolved`, and the run cannot be `passed`.
+- The exact bytes behind the committed receipts are retained in `evidence/harness/`, named by the first 12 hex digits
+  of their SHA-256:
+  - `run.py.9f6c08f1835f` is the harness of both regular-session receipts, from `c23525e6`;
+  - `run.py.676a375a472a` is the harness of the after-hours receipt, from `c5468df1`;
+  - `plan.json.9f2942c49bbd` and `plan-post.json.4500c917e11e` are the plans.
+
+  A test checks that every receipt's `harness_sha256` and `plan_sha256` resolve to one of these or to a current
+  file.

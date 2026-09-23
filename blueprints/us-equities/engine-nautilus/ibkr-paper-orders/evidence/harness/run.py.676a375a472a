@@ -263,10 +263,9 @@ def quote_is_valid(bid, ask) -> bool:
 class OrderBudget:
     """Hard cap on orders created by this run, checked before every factory call."""
 
-    def __init__(self, max_orders: int, max_quantity: int, max_notional=None):
+    def __init__(self, max_orders: int, max_quantity: int):
         self.max_orders = int(max_orders)
         self.max_quantity = _dec(max_quantity)
-        self.max_notional = None if max_notional is None else _dec(max_notional)
         self.used = 0
         self.reservations: list[dict] = []
 
@@ -274,17 +273,10 @@ class OrderBudget:
     def remaining(self) -> int:
         return self.max_orders - self.used
 
-    def reserve(self, case: str, qty, price=None) -> int:
-        """Reserve one order. Every order path (entries, the flatten and cleanup sells)
-        passes its limit price, so max_notional_per_order_usd binds all of them."""
+    def reserve(self, case: str, qty) -> int:
         qty = _dec(qty)
         if qty <= 0 or qty > self.max_quantity:
             raise BudgetError(f"quantity {qty} outside (0, {self.max_quantity}]")
-        if self.max_notional is not None:
-            if price is None:
-                raise BudgetError("limit price required to check max_notional_per_order_usd")
-            if _dec(price) * qty > self.max_notional:
-                raise BudgetError(f"notional {_dec(price) * qty} above max_notional_per_order_usd {self.max_notional}")
         if self.used >= self.max_orders:
             raise BudgetError(f"max_orders {self.max_orders} reached")
         self.used += 1
@@ -621,10 +613,7 @@ class RunContext:
         self.prefix = prefix
         self.server_minus_local_s = server_minus_local_s or 0.0
         b = plan["bounds"]
-        self.budget = OrderBudget(b["max_orders"], b["max_quantity_per_order"], b["max_notional_per_order_usd"])
-        # Set by cmd_run once the provisional receipt exists: rewrites it after every state
-        # change, so a kill mid-run leaves the orders, events and fills on disk.
-        self.on_change = None
+        self.budget = OrderBudget(b["max_orders"], b["max_quantity_per_order"])
         self.cases = {cid: {"id": cid, "name": CASE_NAMES[cid], "expect": CASE_EXPECT[cid], "outcome": "not_run",
                             "reason": None, "started_at": None, "ended_at": None, "orders": [], "events": []}
                       for cid in CASE_IDS}
@@ -649,34 +638,21 @@ class RunContext:
         self.node: dict = {"built": False, "strategy_started": False, "stop_requested_by": None}
 
     # -- cases
-    def changed(self):
-        """Persist the current state through on_change; a write failure is recorded, never raised."""
-        if self.on_change is None:
-            return
-        try:
-            self.on_change()
-        except OSError as exc:
-            if len(self.errors) < 20:
-                self.errors.append(redact(f"provisional receipt write failed: {type(exc).__name__}")[:200])
-
     def begin(self, cid: str, now_ns: int):
         self.current = cid
         c = self.cases[cid]
         c["outcome"], c["started_at"] = "running", ns_to_iso(now_ns)
-        self.changed()
 
     def pass_case(self, cid: str, now_ns: int, **fields):
         c = self.cases[cid]
         c.update(fields)
         c["outcome"], c["ended_at"] = "passed", ns_to_iso(now_ns)
-        self.changed()
 
     def end_case(self, cid: str, outcome: str, reason: str, now_ns: int):
         c = self.cases[cid]
         if c["outcome"] in ("passed", "failed", "incomplete"):
             return
         c["outcome"], c["reason"], c["ended_at"] = outcome, redact(reason)[:200], ns_to_iso(now_ns)
-        self.changed()
 
     def all_passed(self) -> bool:
         return all(self.cases[c]["outcome"] == "passed" for c in CASE_IDS)
@@ -691,7 +667,6 @@ class RunContext:
                "notional_usd": str(_dec(price) * _dec(qty)), "time_in_force": "DAY", "order_number": submit_n,
                "created_at": ns_to_iso(now_ns)}
         (self.cleanup_orders if case == "cleanup" else self.cases[case]["orders"]).append(rec)
-        self.changed()
         return rec
 
     def case_for(self, client_order_id: str) -> str | None:
@@ -709,7 +684,6 @@ class RunContext:
                  "ts_init": ns_to_iso(ts_init_ns)}
         entry.update({k: (redact(v)[:200] if isinstance(v, str) else v) for k, v in extra.items()})
         (self.cleanup_events if case == "cleanup" else self.cases[target]["events"]).append(entry)
-        self.changed()
         return case
 
     def add_fill(self, case: str, client_order_id: str, side: str, price, qty, commission, currency, ts_event_ns):
@@ -722,13 +696,7 @@ class RunContext:
             # The 1.231.0 adapter maps an unset/-1 IB commission to 0 before OrderFilled.
             fill["commission_zero_note"] = "zero may mean IB had not reported the commission"
         self.fills.append(fill)
-        self.changed()
         return fill
-
-    def commission_unresolved(self) -> bool:
-        """A fill without a commission, or with the zero the 1.231.0 adapter substitutes for
-        an unreported IB commission, leaves the net P&L and the loss bound unproven."""
-        return any(f["commission"] is None or "commission_zero_note" in f for f in self.fills)
 
     def compute_roundtrip(self, nautilus_realized=None, nautilus_currency=None) -> dict:
         buys = [f for f in self.fills if f["side"] == "BUY"]
@@ -741,7 +709,6 @@ class RunContext:
         limit = _dec(self.plan["bounds"]["max_roundtrip_loss_usd"])
         self.roundtrip = {"gross_pnl_usd": str(gross), "commissions_usd": str(commissions), "net_pnl_usd": str(net),
                           "max_roundtrip_loss_usd": str(limit), "loss_bound_breached": -net > limit,
-                          "commission_unresolved": self.commission_unresolved(),
                           "nautilus_realized_pnl": None if nautilus_realized is None else str(nautilus_realized),
                           "nautilus_realized_pnl_currency": nautilus_currency}
         return self.roundtrip
@@ -771,8 +738,7 @@ class RunContext:
 def final_status(ctx: RunContext | None, flat_proof: dict | None) -> str:
     if flat_proof is None or flat_proof.get("status") != "passed":
         return "cleanup_required"
-    if (ctx is not None and ctx.all_passed() and not (ctx.roundtrip or {}).get("loss_bound_breached")
-            and not ctx.commission_unresolved()):
+    if ctx is not None and ctx.all_passed() and not (ctx.roundtrip or {}).get("loss_bound_breached"):
         return "passed"
     if ctx is not None and any(ctx.cases[c]["outcome"] == "failed" for c in CASE_IDS):
         return "failed"
@@ -916,7 +882,7 @@ def build_strategy_class():
             now = self._now()
             if not spacing_ok(now, self._last_submit_ns, self.ctx.plan["bounds"]["min_submit_spacing_seconds"]):
                 raise BudgetError("min_submit_spacing_seconds not elapsed")  # callers wait; hard backstop only
-            n = self.ctx.budget.reserve(case, qty_int, price_dec)  # raises BudgetError before any order exists
+            n = self.ctx.budget.reserve(case, qty_int)  # raises BudgetError before any order exists
             instrument = self.cache.instrument(self._iid)
             price = instrument.make_price(float(price_dec))
             qty = instrument.make_qty(qty_int)
@@ -1602,7 +1568,7 @@ def provisional_receipt(receipt: dict, ctx: RunContext) -> dict:
     """The cleanup_required receipt that stands until the final receipt replaces it."""
     out = dict(receipt)
     out.update(status="cleanup_required", evidence_class="native_paper", provisional=True, note=PROVISIONAL_NOTE,
-               run=ctx.summary(), flat_proof={"status": "not_attempted"})
+               run={"run_prefix": ctx.prefix}, flat_proof={"status": "not_attempted"})
     return out
 
 
@@ -1670,14 +1636,7 @@ def cmd_check(a, check_fn=run_check) -> int:
     return code
 
 
-def pinned_runtime(plan: dict, observed: dict) -> bool:
-    """True only when the imported NautilusTrader and ibapi are the plan's exact versions: the
-    harness relies on version-specific adapter behaviour (order tags, commission mapping)."""
-    engine = plan["engine"]
-    return observed.get("nautilus_trader") == engine["version"] and observed.get("ibapi") == engine["ibapi_version"]
-
-
-def cmd_run(a, check_fn=run_check, node_fn=run_node, now_fn=None, sleep_fn=time.sleep, versions_fn=None) -> int:
+def cmd_run(a, check_fn=run_check, node_fn=run_node, now_fn=None, sleep_fn=time.sleep) -> int:
     t0 = time.monotonic()
     if is_gate_receipt(a.receipt):
         print(json.dumps({"status": "refused_gate_receipt_path", "exit_code": 3}))
@@ -1701,10 +1660,6 @@ def cmd_run(a, check_fn=run_check, node_fn=run_node, now_fn=None, sleep_fn=time.
             receipt["plan_bounds"] = plan["bounds"]
             if a.port not in plan["paper_ports"]:
                 receipt.update(status="refused_not_paper_port")
-                return write_receipt(a.receipt, receipt)
-            observed = (versions_fn or versions)()
-            if not pinned_runtime(plan, observed):
-                receipt.update(status="refused_unpinned_runtime", runtime=observed)
                 return write_receipt(a.receipt, receipt)
             now = (now_fn or (lambda: datetime.now(timezone.utc)))()
             ok, why = rth_check(now, plan)
@@ -1761,7 +1716,6 @@ def cmd_run(a, check_fn=run_check, node_fn=run_node, now_fn=None, sleep_fn=time.
                 print(json.dumps({"status": "refused_receipt_unwritable", "exit_code": 3,
                                   "error": redact(f"{type(exc).__name__}: {exc}")[:200]}))
                 return 3
-            ctx.on_change = lambda: _write_receipt_file(a.receipt, provisional_receipt(receipt, ctx), [account])
             node_entered = True
             try:
                 node_fn(plan, account, a.port, ctx, abort_at=abort_at, hard_stop_at=hard_stop_at,
@@ -1781,8 +1735,6 @@ def cmd_run(a, check_fn=run_check, node_fn=run_node, now_fn=None, sleep_fn=time.
         receipt["interrupted"] = True
     except Exception as exc:  # noqa: BLE001
         receipt["error"] = redact(f"{type(exc).__name__}: {exc}")[:200]
-    if ctx is not None:
-        ctx.on_change = None  # the final receipt replaces the provisional one from here
     receipt["run"] = ctx.summary() if ctx else None
     receipt["flat_proof"] = flat
     if node_entered or (ctx is not None and ctx.budget.used > 0):

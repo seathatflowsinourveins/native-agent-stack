@@ -48,6 +48,25 @@ def ny(y, mo, d, h, mi, s=0):
 WEDNESDAY_10AM = ny(2026, 9, 23, 10, 0)
 
 
+class RetainedHarnessBytes(unittest.TestCase):
+    def test_every_receipt_hash_resolves_to_retained_or_current_bytes(self):
+        import hashlib
+        evidence = RUN.HERE / "evidence"
+        known = {}
+        for f in list((evidence / "harness").iterdir()) + [RUN.HERE / "run.py", RUN.HERE / "plan.json", RUN.HERE / "plan-post.json"]:
+            known[hashlib.sha256(f.read_bytes()).hexdigest()] = f.name
+        receipts = sorted(evidence.glob("receipt-*.json"))
+        self.assertTrue(receipts)
+        for path in receipts:
+            r = json.loads(path.read_text())
+            for key in ("harness_sha256", "plan_sha256"):
+                with self.subTest(receipt=path.name, key=key):
+                    self.assertIn(r[key], known)
+        for f in (evidence / "harness").iterdir():
+            with self.subTest(retained=f.name):
+                self.assertEqual(hashlib.sha256(f.read_bytes()).hexdigest()[:12], f.name.rsplit(".", 1)[1])
+
+
 class AfterHoursPlan(unittest.TestCase):
     def test_post_plan_is_the_regular_plan_with_only_the_session_changed(self):
         post, rth = RUN.load_plan(RUN.HERE / "plan-post.json"), RUN.load_plan(RUN.HERE / "plan.json")
@@ -217,6 +236,32 @@ class Budget(unittest.TestCase):
                 b.reserve("C3", qty)
         self.assertEqual(b.used, 0)
 
+    def test_notional_cap_binds_every_order_path(self):
+        b = RUN.OrderBudget(6, 1, 1000)
+        self.assertEqual(b.reserve("C3", 1, "999.99"), 1)
+        for case, price in (("C4", "1000.01"), ("cleanup", "1200"), ("C1", None)):
+            with self.subTest(case=case), self.assertRaises(RUN.BudgetError):
+                b.reserve(case, 1, price)
+        self.assertEqual(b.used, 1)
+        ctx = RUN.RunContext(PLAN, "NTP-T")
+        self.assertEqual(ctx.budget.max_notional, Decimal(str(PLAN["bounds"]["max_notional_per_order_usd"])))
+
+    def test_unresolved_commission_blocks_passed(self):
+        def ctx_with(commission):
+            ctx = RUN.RunContext(PLAN, "NTP-T")
+            for c in RUN.CASE_IDS:
+                ctx.cases[c]["outcome"] = "passed"
+            ctx.add_fill("C3", "NTP-T-C3", "BUY", "768.01", 1, commission, "USD", 0)
+            ctx.add_fill("C4", "NTP-T-C4", "SELL", "767.96", 1, "1", "USD", 0)
+            ctx.compute_roundtrip()
+            return ctx
+        self.assertEqual(RUN.final_status(ctx_with("1"), {"status": "passed"}), "passed")
+        for commission in (None, "0"):
+            with self.subTest(commission=commission):
+                ctx = ctx_with(commission)
+                self.assertTrue(ctx.roundtrip["commission_unresolved"])
+                self.assertEqual(RUN.final_status(ctx, {"status": "passed"}), "incomplete")
+
 
 class SessionWindow(unittest.TestCase):
     def test_regular_hours_and_close_buffer(self):
@@ -293,6 +338,7 @@ def _check_result(status, positions=0, open_orders=0):
 
 
 TODAY_HOURS = "20260923:0930-20260923:1600;20260924:0930-20260924:1600"
+PINNED = {"nautilus_trader": "1.231.0", "ibapi": "10.45.1"}
 
 
 class FakeChecks:
@@ -321,7 +367,8 @@ class FakeChecks:
 
 
 class RunRefusals(unittest.TestCase):
-    def _run(self, port=4002, checks=None, now=WEDNESDAY_10AM, node_fn=None, receipt=None, plan="plan.json"):
+    def _run(self, port=4002, checks=None, now=WEDNESDAY_10AM, node_fn=None, receipt=None, plan="plan.json",
+             versions=None):
         tmp = tempfile.TemporaryDirectory()
         self.addCleanup(tmp.cleanup)
         path = receipt or str(Path(tmp.name) / "r.json")
@@ -334,7 +381,8 @@ class RunRefusals(unittest.TestCase):
                 node_fn(ctx)
 
         args = SimpleNamespace(port=port, receipt=path, log_level="WARNING", plan=plan)
-        code = RUN.cmd_run(args, check_fn=checks, node_fn=fake_node, now_fn=lambda: now, sleep_fn=lambda s: None)
+        code = RUN.cmd_run(args, check_fn=checks, node_fn=fake_node, now_fn=lambda: now, sleep_fn=lambda s: None,
+                           versions_fn=lambda: versions or PINNED)
         text = Path(path).read_text() if Path(path).exists() else None
         return code, (json.loads(text) if text else None), text, checks, nodes
 
@@ -358,6 +406,32 @@ class RunRefusals(unittest.TestCase):
         self.assertEqual((code, r["status"], checks.calls), (3, "refused_outside_rth", []))
         code, r, _, checks, _ = self._run(now=WEDNESDAY_10AM, plan="plan-post.json")
         self.assertEqual((code, r["status"], checks.calls), (3, "refused_outside_rth", []))
+
+    def test_unpinned_runtime_refused_before_connecting(self):
+        for observed in ({"nautilus_trader": "1.230.0", "ibapi": "10.45.1"}, {"nautilus_trader": "1.231.0", "ibapi": "10.46.1"},
+                         {"nautilus_trader": None, "ibapi": None}):
+            with self.subTest(observed=observed):
+                code, r, _, checks, nodes = self._run(versions=observed)
+                self.assertEqual((code, r["status"], checks.calls, nodes), (3, "refused_unpinned_runtime", [], []))
+                self.assertEqual(r["runtime"], observed)
+
+    def test_orders_and_fills_are_on_disk_before_the_final_receipt(self):
+        seen = []
+
+        def mid_run(ctx):
+            ctx.register_order(ctx.client_order_id("C3"), "C3", "BUY", 1, "768.06", 1, 0)
+            ctx.add_fill("C3", ctx.client_order_id("C3"), "BUY", "768.01", 1, "1", "USD", 0)
+            seen.append(json.loads(Path(receipt).read_text()))
+
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        receipt = str(Path(tmp.name) / "r.json")
+        code, r, _, _, _ = self._run(node_fn=mid_run, receipt=receipt)
+        provisional = seen[0]
+        self.assertEqual((provisional["status"], provisional["provisional"]), ("cleanup_required", True))
+        self.assertEqual([o["limit_price"] for o in provisional["run"]["cases"][2]["orders"]], ["768.06"])
+        self.assertEqual([f["price"] for f in provisional["run"]["fills"]], ["768.01"])
+        self.assertNotIn("provisional", r)  # the final receipt replaced it
 
     def test_non_paper_port_refused_before_connecting(self):
         code, r, _, checks, nodes = self._run(port=4001)
@@ -504,7 +578,8 @@ class LiquidHoursFailClosed(unittest.TestCase):
         nodes = []
         checks = FakeChecks("passed", liquid_hours=liquid_hours)
         code = RUN.cmd_run(SimpleNamespace(port=4002, receipt=str(path), log_level="WARNING"), check_fn=checks,
-                           node_fn=lambda *a, **k: nodes.append(1), now_fn=lambda: now, sleep_fn=lambda s: None)
+                           node_fn=lambda *a, **k: nodes.append(1), now_fn=lambda: now, sleep_fn=lambda s: None,
+                           versions_fn=lambda: PINNED)
         return code, json.loads(path.read_text()), nodes, checks
 
     def test_missing_or_broken_today_refuses_the_run(self):
@@ -541,7 +616,8 @@ class RunReceiptAndFlatProof(unittest.TestCase):
                 node_fn(ctx)
 
         code = RUN.cmd_run(SimpleNamespace(port=4002, receipt=str(path), log_level="WARNING"), check_fn=checks,
-                           node_fn=fake_node, now_fn=lambda: WEDNESDAY_10AM, sleep_fn=lambda s: None)
+                           node_fn=fake_node, now_fn=lambda: WEDNESDAY_10AM, sleep_fn=lambda s: None,
+                           versions_fn=lambda: PINNED)
         text = path.read_text() if path.exists() else None
         return code, (json.loads(text) if text else None), text, seen, checks
 
@@ -570,7 +646,7 @@ class RunReceiptAndFlatProof(unittest.TestCase):
 
         for exc in (KeyboardInterrupt("signal 1"), Hangup("gone"), SystemExit(1)):
             def node(ctx, exc=exc):
-                ctx.budget.reserve("C1", 1)
+                ctx.budget.reserve("C1", 1, "383.99")
                 raise exc
 
             code, r, _, _, checks = self._run(node_fn=node)
@@ -581,7 +657,7 @@ class RunReceiptAndFlatProof(unittest.TestCase):
 
     def test_exception_from_the_node_is_never_a_pass(self):
         def node(ctx):
-            ctx.budget.reserve("C1", 1)
+            ctx.budget.reserve("C1", 1, "383.99")
             for cid in RUN.CASE_IDS:
                 ctx.pass_case(cid, 1)
             raise RuntimeError("dispose failed after a forced stop")
@@ -600,7 +676,7 @@ class RunReceiptAndFlatProof(unittest.TestCase):
 
     def test_interrupt_during_the_flat_proof_is_recorded(self):
         def node(ctx):
-            ctx.budget.reserve("C1", 1)
+            ctx.budget.reserve("C1", 1, "383.99")
 
         checks = FakeChecks("passed", post=[KeyboardInterrupt()])
         code, r, _, _, _ = self._run(node_fn=node, checks=checks)
@@ -844,8 +920,11 @@ class NautilusBacktestFlow(unittest.TestCase):
         eng = BacktestEngine(BacktestEngineConfig(
             trader_id="BACKTESTER-001", logging=LoggingConfig(bypass_logging=True),
             risk_engine=RiskEngineConfig(max_order_submit_rate=rate or PLAN["bounds"]["max_order_submit_rate"])))
+        from nautilus_trader.backtest.models import FixedFeeModel
+        # A nonzero fee: a zero commission reads as unreported (commission_unresolved) and blocks passed.
         eng.add_venue(venue=Venue("ARCA"), oms_type=OmsType.NETTING, account_type=AccountType.MARGIN,
-                      base_currency=USD, starting_balances=[Money(100_000, USD)])
+                      base_currency=USD, starting_balances=[Money(100_000, USD)],
+                      fee_model=FixedFeeModel(Money(1, USD)))
         inst = TestInstrumentProvider.equity(symbol="SPY", venue="ARCA")
         eng.add_instrument(inst)
         t0 = 1_790_000_000_000_000_000
