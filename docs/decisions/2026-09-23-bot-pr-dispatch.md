@@ -120,9 +120,10 @@ the PR URL and instructs a human to use the documented UI path instead: per
 [GitHub's fork-PR approval guidance](https://docs.github.com/en/actions/how-tos/manage-workflow-runs/approve-runs-from-forks)
 (the same UI flow it also documents for a non-fork GITHUB_TOKEN-created PR's
 approval-required runs), a collaborator with write access opens the pull
-request, clicks the **"Awaiting approval"** button near the merge box to
-open the merge status panel, and selects **"Approve workflows to run"**
-there -- not the Actions tab directly. The same page states that "workflow
+request and uses the approval banner in its merge box (the GITHUB_TOKEN
+page's wording), selecting **"Approve workflows to run"**; the fork-approval
+page reaches the same action through an **"Awaiting approval"** button that
+opens the merge status panel -- not the Actions tab directly. The same page states that "workflow
 runs that have been awaiting approval for more than 30 days are
 automatically deleted," so an evidence PR left unreviewed that long needs a
 fresh `propose` run before its checks can run.
@@ -266,8 +267,8 @@ regression tests in `tests/test_catalog_freshness_propose.py`:
 
 Fixed by giving `compute_drift()` three buckets instead of two -- `drifted`,
 `unfetched`, `no_release` -- documented in that function's own docstring and
-in `docs/github-automation.md`. `pin` is now always compared regardless of
-`latest`. A row is `unfetched` only when the rebuilt row lacks fetch
+in `docs/github-automation.md`. `pin` is now compared for every fetched row regardless of
+`latest` (a row moved to `unfetched` is reported, not compared). A row is `unfetched` only when the rebuilt row lacks fetch
 evidence (`upstream.pushed_at is None`) *or* its raw `github-freshness.json`
 record shows a fetch problem (`error` or `partial_errors`, matched by exact
 URL or normalized GitHub slug -- `_freshness_record_has_error()`, mirroring
@@ -301,9 +302,8 @@ Corrected in `catalog-freshness.yml`, `docs/github-automation.md` and this
 record: the current `GITHUB_TOKEN` docs phrase the exceptions as "...will
 not create a new workflow run, with the following exceptions: ..." (not
 "with the exception of ... will not create"), and the actual UI path to
-approve a pending run is on the pull request itself -- the **"Awaiting
-approval"** button near the merge box opens the merge status panel, which
-holds **"Approve workflows to run"** -- not the repository's Actions tab.
+approve a pending run is on the pull request itself -- the approval banner
+in the merge box, selecting **"Approve workflows to run"** -- not the repository's Actions tab.
 Runs left awaiting approval for more than 30 days are automatically
 deleted (also now stated in the workflow's job summary and in
 `docs/github-automation.md`).

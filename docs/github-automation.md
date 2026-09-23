@@ -792,9 +792,11 @@ workflow using `GITHUB_TOKEN` creates or updates a pull request, the
 resulting `pull_request` event creates workflow runs in an
 **approval-required** state." The job's last step prints the PR's URL and an
 approval instruction to the job summary. To actually approve, a repository
-collaborator with write access opens the PR itself, clicks the **"Awaiting
-approval"** button near the merge box to open the merge status panel, and
-selects **"Approve workflows to run"** there -- after that, `validate`,
+collaborator with write access opens the PR itself and uses the banner the
+GITHUB_TOKEN documentation describes in the PR's merge box, selecting
+**"Approve workflows to run"** (the fork-approval page describes the same
+action through an **"Awaiting approval"** button that opens the merge status
+panel) -- after that, `validate`,
 `token-report` and `secret-scan` run and report as ordinary `pull_request`
 checks the ruleset actually requires. [GitHub's documentation](https://docs.github.com/en/actions/how-tos/manage-workflow-runs/approve-runs-from-forks)
 also states that "workflow runs that have been awaiting approval for more

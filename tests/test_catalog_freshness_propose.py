@@ -893,11 +893,10 @@ class CatalogFreshnessWorkflowTextTests(unittest.TestCase):
         self.assertIn("https://docs.github.com/en/actions/concepts/security/github_token", body)
 
     def test_propose_job_states_the_correct_approval_ui_path(self):
-        # N3: approval happens on the PR itself (an "Awaiting approval" button near
-        # the merge box opens the merge status panel, which holds "Approve workflows
-        # to run"), not via the repository's Actions tab.
+        # N3: approval happens on the PR itself -- the GITHUB_TOKEN page's banner in the
+        # PR's merge box, selecting "Approve workflows to run" -- not via the Actions tab.
         body = self._job_body("propose")
-        self.assertIn("Awaiting approval", body)
+        self.assertIn("approval banner", body)
         self.assertIn("Approve workflows to run", body)
         self.assertIn("merge box", body)
         self.assertNotIn("Approve and run workflow", body)

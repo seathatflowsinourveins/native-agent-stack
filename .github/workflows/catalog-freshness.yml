@@ -234,9 +234,9 @@ jobs:
           set -euo pipefail
           # Recorded before the push below uses it as a --force-with-lease expectation,
           # so a concurrent run's push in between is detected and rejected instead of
-          # silently overwritten (the single top-level concurrency group already
-          # serializes runs of this workflow, so this is a second, independent guard
-          # against the same race, not the only one).
+          # silently overwritten. The lease is the primary guard: the job-scoped
+          # concurrency groups are keyed manual vs scheduled, so a manual and a
+          # scheduled propose can overlap.
           observed_sha="$(git ls-remote origin refs/heads/automation/catalog-freshness | awk '{print $1}')"
           echo "observed_sha=$observed_sha" >> "$GITHUB_OUTPUT"
           # -B always resets this local branch to the current checkout (main's tip), even
@@ -347,7 +347,7 @@ jobs:
             echo ""
             echo "A repository collaborator with write access must approve this PR's pending checks"
             echo "before validate, token-report and secret-scan actually run on it: open the PR,"
-            echo "click the \"Awaiting approval\" button near the merge box to open the merge status"
-            echo "panel, then select \"Approve workflows to run\". A run left awaiting approval for"
+            echo "use the approval banner in the PR's merge box and select \"Approve workflows to run\""
+            echo "(GITHUB_TOKEN docs). A run left awaiting approval for"
             echo "more than 30 days is automatically deleted. See docs/github-automation.md."
           } >> "$GITHUB_STEP_SUMMARY"
