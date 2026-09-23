@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""Turn a scheduled catalog-freshness run's drift artifact into a reviewable,
-report-only evidence branch: copy the artifact, write a
+"""Build the catalog-freshness drift report, and turn a detected drift into a
+reviewable, report-only evidence branch: copy the artifact, write a
 ``scripts/validate.py``-shaped receipt, register every new file's hash, and
 (only when it is still a tracked, non-build-artifact file) rebuild and rehash
 the public explorer.
@@ -11,9 +11,13 @@ This module never selects, evaluates, or writes to a catalog file:
 SOTA-convergence lane review (see ``recipes/sota-convergence-practice.md``).
 It only ever adds files under ``evidence/artifacts/`` and
 ``evidence/receipts/``, and updates ``manifests/evidence.json``'s
-registration and receipt list. It is invoked by the ``propose`` job in
-``.github/workflows/catalog-freshness.yml``; see
-``docs/decisions/2026-09-23-bot-pr-dispatch.md`` for why that job exists.
+registration and receipt list. It is invoked from two places in
+``.github/workflows/catalog-freshness.yml``: ``build_drift_report()`` from
+the ``freshness`` job's own diff step (so the drift-table header text and
+the drift-vs-unfetched rule live in exactly one place, not duplicated
+between YAML and Python), and ``main()``/``apply()`` from the ``propose``
+job. See ``docs/decisions/2026-09-23-bot-pr-dispatch.md`` for why the
+``propose`` job exists and its fix history.
 
 Every read/write here looks up a file by its ``path`` (or a receipt by its
 ``id``) rather than assuming a fixed position in ``manifests/evidence.json``'s
@@ -43,14 +47,15 @@ except ImportError:  # running as a plain script, not a package
 
 
 RECEIPT_KIND = "upstream_provenance"
-# Stack components already tracked by the freshness job's fixed CI-tool pin
-# table (tests/test_catalog_freshness_pins.py) that are also manifests/
-# stack.json component ids (actionlint and grype are pinned but are not
-# stack components, so they are not usable as a receipt component_id).
-FALLBACK_COMPONENT_IDS = ("gitleaks", "nautilus-trader", "syft", "zizmor")
+DRIFT_TABLE_HEADER = (
+    "| id | pin (published) | pin (fresh) | upstream latest (published) | "
+    "upstream latest (fresh) | behind (published) | behind (fresh) |"
+)
+DRIFT_TABLE_SEPARATOR = "| --- | --- | --- | --- | --- | --- | --- |"
 _DRIFT_ROW = re.compile(r"^\|\s*([^|]+?)\s*\|.*\|$")
 _SEPARATOR_ROW = re.compile(r"\A\|[\s:|-]+\|\Z")
 EXPLORER_PATH = "docs/ecosystem/index.html"
+PUBLISHED_MANIFEST_DIR = "catalogs/sota-convergence"
 
 
 class FreshnessProposeError(ValueError):
@@ -61,51 +66,162 @@ def utc_now() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
-def drifted_component_ids(drift_md_text: str) -> list[str]:
-    """Parse the ``| id | ... |`` drift-table body rows written by
-    ``catalog-freshness.yml``'s "Diff the rebuilt manifest" step.
+def md_cell(value) -> str:
+    """Render one drift-table cell as escaped inline code.
 
-    Returns a sorted, de-duplicated list of ids, or ``[]`` when the report
-    found no drift (its "No pin/upstream drift detected ..." sentence has no
-    table at all).
+    Cell text (a pin, or an upstream release tag fetched from an external
+    API) is untrusted formatting-wise: it could itself contain a backtick or
+    a `|`. Backtick-wrapping, with any literal backtick/pipe escaped first,
+    keeps it inert as Markdown/table syntax both in ``drift.md`` and in the
+    PR body (which embeds ``drift.md`` verbatim).
     """
-    ids: set[str] = set()
-    in_table = False
-    for line in drift_md_text.splitlines():
-        stripped = line.strip()
-        if not in_table:
-            if stripped.startswith("| id "):
-                in_table = True
+    text = "(none)" if value is None else str(value)
+    text = text.replace("`", "'").replace("|", "\\|")
+    return f"`{text}`"
+
+
+def manifest_component_rows(manifest: dict) -> dict[str, dict]:
+    """{component_id: row} for every foundation component and trading entry
+    in a catalogs/sota-convergence manifest-*.json document."""
+    rows: dict[str, dict] = {}
+    for group in manifest.get("foundation", []):
+        for component in group.get("components", []):
+            rows[component["id"]] = component
+    for group in manifest.get("trading", []):
+        for entry in group.get("entries", []):
+            rows[entry["id"]] = entry
+    return rows
+
+
+def compute_drift(published_rows: dict, rebuilt_rows: dict):
+    """Compare two manifest_component_rows() outputs.
+
+    Returns ``(drifted, unfetched)``. ``drifted`` is a list of
+    ``(id, old_pin, new_pin, old_latest, new_latest, old_behind, new_behind)``
+    tuples for a real pin/upstream change. ``unfetched`` lists ids whose
+    rebuilt row's ``upstream.latest`` is ``None`` -- ``build_manifest.py``'s
+    ``compute_upstream()`` returns ``latest=None`` when
+    ``github_freshness.py`` never fetched that repository this run (for
+    example because ``--max-repos`` bounded the run, or the API call
+    errored), so comparing that missing value against a real prior value
+    would report every such repository as "drifted" even though nothing was
+    actually observed to change. Those ids are excluded from ``drifted`` and
+    reported separately instead.
+    """
+    drifted, unfetched = [], []
+    for component_id, new in sorted(rebuilt_rows.items()):
+        old = published_rows.get(component_id)
+        if old is None:
             continue
-        if not stripped.startswith("|"):
-            break
-        if _SEPARATOR_ROW.match(stripped):
+        new_latest = (new.get("upstream") or {}).get("latest")
+        if new_latest is None:
+            unfetched.append(component_id)
             continue
-        match = _DRIFT_ROW.match(stripped)
-        if match:
-            ids.add(match.group(1).strip())
-    return sorted(ids)
+        old_latest = (old.get("upstream") or {}).get("latest")
+        if (old.get("pin") != new.get("pin") or old_latest != new_latest
+                or old.get("pin_behind_upstream") != new.get("pin_behind_upstream")):
+            drifted.append((component_id, old.get("pin"), new.get("pin"),
+                             old_latest, new_latest,
+                             old.get("pin_behind_upstream"), new.get("pin_behind_upstream")))
+    return drifted, unfetched
+
+
+def render_drift_markdown(published_path, rebuilt_path, published: dict, rebuilt: dict,
+                           drifted: list, unfetched: list) -> str:
+    lines = [
+        "# Catalog freshness drift", "",
+        f"Published manifest: `{published_path}` (counts: {published.get('counts')})",
+        f"Rebuilt manifest: `{rebuilt_path}` (counts: {rebuilt.get('counts')})", "",
+        "This diff is report-only; it changes no catalog selection.", "",
+    ]
+    if drifted:
+        lines += [DRIFT_TABLE_HEADER, DRIFT_TABLE_SEPARATOR]
+        for row in drifted:
+            lines.append("| " + " | ".join(md_cell(value) for value in row) + " |")
+    else:
+        lines.append("No pin/upstream drift detected for components present in both manifests.")
+    if unfetched:
+        lines += [
+            "",
+            f"{len(unfetched)} component(s) had no fetched upstream 'latest' this run (an "
+            "unfinished/bounded fetch or an API error, not an observed change) and are excluded "
+            "from the drift count above:",
+            "",
+            ", ".join(md_cell(component_id) for component_id in sorted(unfetched)),
+        ]
+    return "\n".join(lines) + "\n"
+
+
+def upstream_error_count(work_dir: Path) -> int:
+    """The ``errors`` count ``github_freshness.py`` records in its own output
+    document, or 0 if that file is absent or malformed. Never treated as a
+    hard failure here; ``propose``'s own job condition decides what a
+    nonzero count means for whether it may run."""
+    freshness_path = work_dir / "github-freshness.json"
+    if not freshness_path.is_file():
+        return 0
+    try:
+        document = json.loads(freshness_path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, ValueError):
+        return 0
+    count = document.get("errors") if isinstance(document, dict) else None
+    return count if isinstance(count, int) and not isinstance(count, bool) else 0
+
+
+def build_drift_report(work_dir: Path) -> dict:
+    """Rebuild ``drift.md``, ``drift-status.txt`` and ``upstream-errors.txt``
+    from the newest rebuilt manifest in ``work_dir`` and the newest published
+    manifest in the checkout (current working directory).
+
+    Called both by ``catalog-freshness.yml``'s "Diff the rebuilt manifest"
+    step (imported directly from a small inline script, not reimplemented
+    there) and by this module's own tests, so the drift-table header text
+    and the drift-vs-unfetched rule can never drift apart between the
+    workflow and this module.
+    """
+    manifests = sorted(work_dir.glob("manifest-*.json"))
+    if not manifests:
+        raise FreshnessProposeError(f"no manifest-*.json found in {work_dir}")
+    rebuilt_path = manifests[-1]
+    rebuilt = json.loads(rebuilt_path.read_text(encoding="utf-8"))
+
+    published_candidates = sorted(Path(PUBLISHED_MANIFEST_DIR).glob("manifest-*.json"))
+    if not published_candidates:
+        raise FreshnessProposeError(f"no manifest-*.json found in {PUBLISHED_MANIFEST_DIR}")
+    published_path = published_candidates[-1]
+    published = json.loads(published_path.read_text(encoding="utf-8"))
+
+    drifted, unfetched = compute_drift(manifest_component_rows(published), manifest_component_rows(rebuilt))
+    markdown = render_drift_markdown(published_path, rebuilt_path, published, rebuilt, drifted, unfetched)
+    (work_dir / "drift.md").write_text(markdown, encoding="utf-8")
+    (work_dir / "drift-status.txt").write_text("true\n" if drifted else "false\n", encoding="utf-8")
+    (work_dir / "upstream-errors.txt").write_text(f"{upstream_error_count(work_dir)}\n", encoding="utf-8")
+    return {
+        "drifted": [row[0] for row in drifted],
+        "unfetched": unfetched,
+        "published_path": published_path.as_posix(),
+        "rebuilt_path": rebuilt_path.as_posix(),
+    }
 
 
 def select_receipt_component_ids(drifted_ids, known_stack_ids) -> list[str]:
-    """Component ids the receipt claims coverage over.
+    """Component ids the receipt claims coverage over: this run's actual
+    drifted ids, narrowed to ones ``manifests/stack.json`` still recognizes
+    (a sota-convergence catalog id is not always a stack component id).
 
-    Prefers this run's actual drifted ids, narrowed to ones
-    ``manifests/stack.json`` still recognizes (a sota-convergence catalog id
-    is not always a stack component id). Falls back to the freshness table's
-    own fixed CI-tool stack components only when none of the drifted ids
-    match a known stack component. Raises when neither set yields a known
-    id, rather than emitting a receipt ``scripts/validate.py`` would reject.
+    Raises rather than falling back to an unrelated fixed component set when
+    none of the drifted ids match a known stack component: a receipt whose
+    ``component_ids`` do not actually describe what drifted would be
+    misleading. This is meant to be a rare condition, surfaced as a failed
+    job (no branch is pushed and no PR is opened), not silently papered over
+    with a fallback that names tools unrelated to the actual drift.
     """
     matched = sorted(set(drifted_ids) & set(known_stack_ids))
     if matched:
         return matched
-    fallback = sorted(set(FALLBACK_COMPONENT_IDS) & set(known_stack_ids))
-    if fallback:
-        return fallback
     raise FreshnessProposeError(
-        "no drifted component id matches a known manifests/stack.json component, and none of the "
-        "fixed fallback CI-tool ids (" + ", ".join(FALLBACK_COMPONENT_IDS) + ") are stack components either"
+        "no drifted component id matches a known manifests/stack.json component; refusing to open "
+        f"a PR with component_ids unrelated to what actually drifted (drifted ids: {sorted(set(drifted_ids))!r})"
     )
 
 
@@ -133,9 +249,10 @@ def build_receipt(receipt_id: str, component_ids: list[str], drifted_component_c
             "from the published manifest; it does not evaluate, select, or adopt any candidate, and it "
             "changes no catalog selection file.",
             "component_ids lists only this run's drifted rows whose id is also a manifests/stack.json "
-            "component (or, when none of this run's drifted ids match a stack component, a fixed "
-            "fallback of the freshness table's own CI-tool stack components); it is not a claim that "
-            "every drifted id in the full drift report was reviewed.",
+            "component; it is not a claim that every drifted id in the full drift report was reviewed.",
+            "Components with no fetched upstream 'latest' this run (an unfinished/bounded fetch or an "
+            "API error) are excluded from the drift count and from component_ids; they are not claimed "
+            "to have been checked.",
             "The rebuilt manifest and drift table are read from this run's own catalog-freshness "
             "workflow artifact; this receipt does not independently re-fetch upstream sources.",
         ],
@@ -179,26 +296,14 @@ def is_git_tracked(root: Path, relative_path: str) -> bool:
     return result.returncode == 0 and result.stdout.strip() == relative_path
 
 
-def copy_artifact(root: Path, artifact_dir: Path, date_stamp: str) -> tuple[str, str]:
-    """Copy the freshness job's drift.md and its newest manifest-*.json into
-    evidence/artifacts/catalog-freshness-<date_stamp>/, returning their two
-    repository-relative paths (drift, manifest)."""
-    manifests = sorted(artifact_dir.glob("manifest-*.json"))
-    if not manifests:
-        raise FreshnessProposeError(f"no manifest-*.json found in {artifact_dir}")
-    drift_source = artifact_dir / "drift.md"
-    if not drift_source.is_file():
-        raise FreshnessProposeError(f"drift.md not found in {artifact_dir}")
-    destination_dir = safe_file_placeholder(root, f"evidence/artifacts/catalog-freshness-{date_stamp}")
-    destination_dir.mkdir(parents=True, exist_ok=True)
-    drift_dest = destination_dir / "drift.md"
-    manifest_dest = destination_dir / manifests[-1].name
-    shutil.copyfile(drift_source, drift_dest)
-    shutil.copyfile(manifests[-1], manifest_dest)
-    return (
-        drift_dest.resolve().relative_to(root.resolve()).as_posix(),
-        manifest_dest.resolve().relative_to(root.resolve()).as_posix(),
-    )
+def refuse_if_symlink(path: Path) -> None:
+    """Raise rather than let shutil.copyfile/write_text follow an existing
+    symlink at a destination this module is about to (over)write. Without
+    this, a pre-existing symlink planted at, e.g.,
+    evidence/artifacts/catalog-freshness-<date>/drift.md would cause the
+    copy to silently write through it to wherever it points."""
+    if path.is_symlink():
+        raise FreshnessProposeError(f"refusing to write through an existing symlink: {path}")
 
 
 def safe_file_placeholder(root: Path, relative: str) -> Path:
@@ -218,8 +323,41 @@ def safe_file_placeholder(root: Path, relative: str) -> Path:
     return path
 
 
+def copy_artifact(root: Path, artifact_dir: Path, date_stamp: str) -> tuple[str, str]:
+    """Copy the freshness job's drift.md and its newest manifest-*.json into
+    evidence/artifacts/catalog-freshness-<date_stamp>/, returning their two
+    repository-relative paths (drift, manifest)."""
+    manifests = sorted(artifact_dir.glob("manifest-*.json"))
+    if not manifests:
+        raise FreshnessProposeError(f"no manifest-*.json found in {artifact_dir}")
+    drift_source = artifact_dir / "drift.md"
+    if not drift_source.is_file():
+        raise FreshnessProposeError(f"drift.md not found in {artifact_dir}")
+    destination_dir = safe_file_placeholder(root, f"evidence/artifacts/catalog-freshness-{date_stamp}")
+    destination_dir.mkdir(parents=True, exist_ok=True)
+    drift_dest = destination_dir / "drift.md"
+    manifest_dest = destination_dir / manifests[-1].name
+    refuse_if_symlink(drift_dest)
+    refuse_if_symlink(manifest_dest)
+    shutil.copyfile(drift_source, drift_dest)
+    shutil.copyfile(manifests[-1], manifest_dest)
+    return (
+        drift_dest.resolve().relative_to(root.resolve()).as_posix(),
+        manifest_dest.resolve().relative_to(root.resolve()).as_posix(),
+    )
+
+
 def rebuild_explorer(root: Path, attempts: int = 3) -> None:
     """Rebuild docs/ecosystem/index.html and converge its registered hash.
+
+    Both the ``--write`` and ``--check`` subprocess calls run with
+    ``capture_output=True``: scripts/build_ecosystem.py prints a one-line
+    JSON summary to stdout, and letting that inherit this process's stdout
+    would land inside the same stream a caller (main(), and the ``propose``
+    job's `tee`) treats as this module's own single-JSON-document output --
+    a second JSON document on the same stream makes `json.load` fail with
+    "Extra data". Diagnostic output is not discarded: it is folded into the
+    raised error's message if ``--check`` never converges.
 
     Registering the explorer's own hash only touches manifests/evidence.json's
     files[] entry, which scripts/build_ecosystem.py's EVIDENCE input-tracking
@@ -229,17 +367,23 @@ def rebuild_explorer(root: Path, attempts: int = 3) -> None:
     register + --check pass should already converge; the retry bound is a
     safety margin, not evidence that more than one pass is ever needed.
     """
-    last_returncode = None
+    last_output = ""
     for _ in range(attempts):
-        subprocess.run(["python3", "scripts/build_ecosystem.py", "--write"], cwd=root, check=True)
+        subprocess.run(
+            ["python3", "scripts/build_ecosystem.py", "--write"],
+            cwd=root, check=True, capture_output=True, text=True,
+        )
         register_file(root, EXPLORER_PATH)
-        check = subprocess.run(["python3", "scripts/build_ecosystem.py", "--check"], cwd=root, check=False)
+        check = subprocess.run(
+            ["python3", "scripts/build_ecosystem.py", "--check"],
+            cwd=root, check=False, capture_output=True, text=True,
+        )
         if check.returncode == 0:
             return
-        last_returncode = check.returncode
+        last_output = (check.stdout or "") + (check.stderr or "")
     raise FreshnessProposeError(
-        f"scripts/build_ecosystem.py --check did not converge after {attempts} attempt(s) "
-        f"(last exit {last_returncode})"
+        f"scripts/build_ecosystem.py --check did not converge after {attempts} attempt(s): "
+        f"{last_output[-2000:]}"
     )
 
 
@@ -273,6 +417,7 @@ def apply(root: Path, artifact_dir: Path, run_url: str, checked_at_utc: str | No
     receipt_relative = f"evidence/receipts/{receipt_id}.json"
     receipt = build_receipt(receipt_id, component_ids, len(drifted_ids), run_url, checked_at_utc)
     receipt_path = safe_file_placeholder(root, receipt_relative)
+    refuse_if_symlink(receipt_path)
     receipt_path.parent.mkdir(parents=True, exist_ok=True)
     receipt_path.write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8")
 
@@ -297,6 +442,34 @@ def apply(root: Path, artifact_dir: Path, run_url: str, checked_at_utc: str | No
     }
 
 
+def drifted_component_ids(drift_md_text: str) -> list[str]:
+    """Parse the DRIFT_TABLE_HEADER-led drift-table body rows written by
+    build_drift_report()/render_drift_markdown().
+
+    Returns a sorted, de-duplicated list of ids, or ``[]`` when the report
+    found no drift (its "No pin/upstream drift detected ..." sentence has no
+    table at all). Detects the header via DRIFT_TABLE_HEADER -- the exact
+    same constant render_drift_markdown() writes -- so this can never drift
+    out of sync with the text the workflow's own diff step produces.
+    """
+    ids: set[str] = set()
+    in_table = False
+    for line in drift_md_text.splitlines():
+        stripped = line.strip()
+        if not in_table:
+            if stripped == DRIFT_TABLE_HEADER:
+                in_table = True
+            continue
+        if not stripped.startswith("|"):
+            break
+        if _SEPARATOR_ROW.match(stripped):
+            continue
+        match = _DRIFT_ROW.match(stripped)
+        if match:
+            ids.add(match.group(1).strip().strip("`"))
+    return sorted(ids)
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[1])
@@ -312,6 +485,11 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main(argv: list[str] | None = None) -> int:
+    """Prints exactly one JSON document to stdout (the apply() result) and
+    nothing else -- callers (the `propose` job's `tee`, and this module's own
+    subprocess tests) rely on that single-document contract. Any diagnostic
+    output from a called subprocess (see rebuild_explorer()) is captured, not
+    inherited, so it can never land on this process's stdout."""
     args = build_parser().parse_args(argv)
     result = apply(args.root.resolve(), args.artifact_dir.resolve(), args.run_url, args.checked_at_utc)
     print(json.dumps(result, indent=2, sort_keys=True))

@@ -18,8 +18,13 @@ permissions:
   contents: read
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event_name }}
-  cancel-in-progress: true
+  # One group across every trigger (schedule and workflow_dispatch alike), so a scheduled
+  # run and a manual dispatch can never race the `propose` job's force-push of the same
+  # automation/catalog-freshness branch. cancel-in-progress is false, not true: a run must
+  # queue behind an in-progress one rather than being killed mid-push/commit, which could
+  # otherwise leave that branch in a partially written state.
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
 
 jobs:
   freshness:
@@ -27,6 +32,7 @@ jobs:
     timeout-minutes: 30
     outputs:
       drift: ${{ steps.diff.outputs.drift }}
+      upstream_errors: ${{ steps.diff.outputs.upstream_errors }}
     steps:
       - name: Harden the runner (audit-only network egress)
         uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
@@ -73,64 +79,24 @@ jobs:
       - name: Diff the rebuilt manifest against the published pins/upstream
         id: diff
         run: |
+          # Delegates to scripts/freshness_propose.py's build_drift_report() instead of
+          # reimplementing the diff here, so the drift-table header text and the
+          # drift-vs-unfetched rule live in exactly one place, shared with the `propose`
+          # job's own use of that module (docs/decisions/2026-09-23-bot-pr-dispatch.md, T3).
           python3 - "$RUNNER_TEMP/freshness" <<'PYEOF'
-          import glob, json, sys
+          import sys
           from pathlib import Path
 
+          sys.path.insert(0, ".")
+          from scripts.freshness_propose import build_drift_report
+
           work_dir = Path(sys.argv[1])
-          rebuilt_path = sorted(work_dir.glob("manifest-*.json"))[-1]
-          rebuilt = json.loads(rebuilt_path.read_text())
-          # Diff against the newest published manifest by name (manifest-YYYYMMDD.json
-          # sorts chronologically as text), not a hard-coded dated filename, so this
-          # step keeps working the next time catalogs/sota-convergence/ publishes a
-          # newer dated manifest.
-          published_path = sorted(Path("catalogs/sota-convergence").glob("manifest-*.json"))[-1]
-          published = json.loads(published_path.read_text())
-
-          def rows(manifest):
-              out = {}
-              for group in manifest.get("foundation", []):
-                  for c in group.get("components", []):
-                      out[c["id"]] = c
-              for group in manifest.get("trading", []):
-                  for c in group.get("entries", []):
-                      out[c["id"]] = c
-              return out
-
-          old_rows, new_rows = rows(published), rows(rebuilt)
-          drifted = []
-          for component_id, new in sorted(new_rows.items()):
-              old = old_rows.get(component_id)
-              if old is None:
-                  continue
-              old_latest = (old.get("upstream") or {}).get("latest")
-              new_latest = (new.get("upstream") or {}).get("latest")
-              if old.get("pin") != new.get("pin") or old_latest != new_latest \
-                      or old.get("pin_behind_upstream") != new.get("pin_behind_upstream"):
-                  drifted.append((component_id, old.get("pin"), new.get("pin"),
-                                   old_latest, new_latest,
-                                   old.get("pin_behind_upstream"), new.get("pin_behind_upstream")))
-
-          lines = ["# Catalog freshness drift",
-                   "",
-                   f"Published manifest: `{published_path}` (counts: {published.get('counts')})",
-                   f"Rebuilt manifest: `{rebuilt_path.name}` (counts: {rebuilt.get('counts')})",
-                   "",
-                   "This is a report-only diff; it never writes to the repository or opens an issue.",
-                   ""]
-          if drifted:
-              lines += ["| id | pin (published) | pin (fresh) | upstream latest (published) | upstream latest (fresh) | behind (published) | behind (fresh) |",
-                        "| --- | --- | --- | --- | --- | --- | --- |"]
-              for row in drifted:
-                  lines.append("| " + " | ".join(str(v) for v in row) + " |")
-          else:
-              lines.append("No pin/upstream drift detected for components present in both manifests.")
-          drift_md = work_dir / "drift.md"
-          drift_md.write_text("\n".join(lines) + "\n")
-          print(drift_md.read_text())
-          (work_dir / "drift-status.txt").write_text("true\n" if drifted else "false\n")
+          result = build_drift_report(work_dir)
+          print((work_dir / "drift.md").read_text())
+          print(f"drifted={len(result['drifted'])} unfetched={len(result['unfetched'])}")
           PYEOF
           echo "drift=$(cat "$RUNNER_TEMP/freshness/drift-status.txt")" >> "$GITHUB_OUTPUT"
+          echo "upstream_errors=$(cat "$RUNNER_TEMP/freshness/upstream-errors.txt")" >> "$GITHUB_OUTPUT"
       - name: Append the fixed CI-tool pin-drift table
         env:
           GH_TOKEN: ${{ github.token }}
@@ -207,18 +173,20 @@ jobs:
   # catalogs/landscape/*.json, manifests/stack.json, or layer-verdicts* (owned by the
   # separate SOTA-convergence lane review). Off by default: it only runs from an explicit
   # manual `open_pr: true` dispatch, or from a schedule when the repository variable
-  # CATALOG_FRESHNESS_PROPOSE is set to 'true'.
+  # CATALOG_FRESHNESS_PROPOSE is set to 'true' -- and, either way, only when this run's own
+  # freshness fetch was unbounded and free of upstream errors (a bounded or partly-failed
+  # fetch must not be turned into evidence that looks complete).
   propose:
     needs: freshness
     if: >-
       github.ref == 'refs/heads/main' && needs.freshness.outputs.drift == 'true' &&
+      (inputs.max_repos || 0) == 0 && needs.freshness.outputs.upstream_errors == '0' &&
       (inputs.open_pr == true || (github.event_name == 'schedule' && vars.CATALOG_FRESHNESS_PROPOSE == 'true'))
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     permissions:
       contents: write
       pull-requests: write
-      actions: write # dispatches validate.yml/token-report.yml on the evidence branch; see below
     steps:
       - name: Harden the runner (audit-only network egress)
         uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
@@ -228,6 +196,12 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+          # Full history, not the default fetch-depth: 1 (matching validate.yml's own
+          # comment): scripts/host_receipts.py validate resolves every existing receipt's
+          # pinned catalog_revision commit with `git cat-file -e`, and a shallow clone
+          # would make every one of those historical commits unresolvable, failing that
+          # step for reasons unrelated to this run's own new receipt.
+          fetch-depth: 0
       - name: Set up Python
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
@@ -238,8 +212,18 @@ jobs:
         with:
           name: catalog-freshness-${{ github.run_id }}
           path: ${{ runner.temp }}/freshness
-      - name: Force-create the automation branch from main
-        run: git checkout -B automation/catalog-freshness
+      - name: Observe the remote evidence branch, then force-create it from main
+        id: branch
+        run: |
+          set -euo pipefail
+          # Recorded before the push below uses it as a --force-with-lease expectation,
+          # so a concurrent run's push in between is detected and rejected instead of
+          # silently overwritten (the single top-level concurrency group already
+          # serializes runs of this workflow, so this is a second, independent guard
+          # against the same race, not the only one).
+          observed_sha="$(git ls-remote origin refs/heads/automation/catalog-freshness | awk '{print $1}')"
+          echo "observed_sha=$observed_sha" >> "$GITHUB_OUTPUT"
+          git checkout -B automation/catalog-freshness
       - name: Build the evidence artifact, receipt and registration
         id: build
         env:
@@ -279,14 +263,18 @@ jobs:
       - name: Push the evidence branch with the workflow token (never persisted to disk)
         env:
           GITHUB_TOKEN: ${{ github.token }}
+          OBSERVED_SHA: ${{ steps.branch.outputs.observed_sha }}
         run: |
           set -euo pipefail
-          basic_auth=$(printf 'x-access-token:%s' "$GITHUB_TOKEN" | base64 -w0)
+          basic_auth="$(printf 'x-access-token:%s' "$GITHUB_TOKEN" | base64 -w0)"
+          echo "::add-mask::$basic_auth"
           GIT_CONFIG_COUNT=1 \
           GIT_CONFIG_KEY_0="http.https://github.com/.extraheader" \
           GIT_CONFIG_VALUE_0="AUTHORIZATION: basic $basic_auth" \
-          git push --force origin HEAD:refs/heads/automation/catalog-freshness
+          git push --force-with-lease="automation/catalog-freshness:$OBSERVED_SHA" \
+            origin HEAD:refs/heads/automation/catalog-freshness
       - name: Open or update the evidence PR
+        id: pr
         env:
           GH_TOKEN: ${{ github.token }}
           RECEIPT_PATH: ${{ steps.build.outputs.receipt_path }}
@@ -305,21 +293,36 @@ jobs:
           existing="$(gh pr list --head automation/catalog-freshness --base main --state open --json number --jq '.[0].number // empty')"
           if [ -n "$existing" ]; then
             gh pr edit "$existing" --body-file "$body_file"
+            pr_url="$(gh pr view "$existing" --json url --jq '.url')"
           else
-            gh pr create --base main --head automation/catalog-freshness \
+            pr_url="$(gh pr create --base main --head automation/catalog-freshness \
               --title "Catalog freshness: report-only drift evidence ($(date -u +%Y-%m-%d))" \
-              --body-file "$body_file"
+              --body-file "$body_file")"
           fi
-      - name: Dispatch downstream checks on the evidence branch
+          echo "pr_url=$pr_url" >> "$GITHUB_OUTPUT"
+      - name: Note that this PR's own checks need write-access approval
         env:
-          GH_TOKEN: ${{ github.token }}
+          PR_URL: ${{ steps.pr.outputs.pr_url }}
         run: |
-          set -euo pipefail
-          # A push made with the default GITHUB_TOKEN does not trigger a `pull_request`-event run
-          # ("When you use the repository's GITHUB_TOKEN to perform tasks on behalf of the GitHub
-          # Actions app, ... events triggered by the GITHUB_TOKEN will not create a new workflow
-          # run" -- https://docs.github.com/en/actions/concepts/security/github_token). A
-          # `workflow_dispatch` call always creates a run regardless of who pushed the ref, so this
-          # explicitly supplies the review evidence a pull_request trigger would otherwise have.
-          gh workflow run validate.yml --ref automation/catalog-freshness
-          gh workflow run token-report.yml --ref automation/catalog-freshness
+          # This PR was opened with the workflow's own GITHUB_TOKEN, so GitHub puts its
+          # pull_request-triggered runs (validate, token-report, secret-scan, ...) into an
+          # approval-required state rather than running them automatically -- "when a
+          # workflow using GITHUB_TOKEN creates or updates a pull request, the resulting
+          # pull_request event creates workflow runs in an approval-required state ... a
+          # user with write access to the repository can start the runs by selecting
+          # Approve workflows to run" (https://docs.github.com/en/actions/concepts/security/github_token).
+          # This job deliberately does not call
+          # `gh workflow run` to work around that: a workflow_dispatch run's checks do
+          # not satisfy a required status check on this PR at all
+          # (https://docs.github.com/en/pull-requests/how-tos/merge-and-close-pull-requests/troubleshooting-required-status-checks),
+          # so dispatching would add a green-looking but not-actually-required run instead
+          # of the real one. See docs/github-automation.md for the exact approval steps.
+          {
+            echo "## Catalog freshness evidence PR opened"
+            echo ""
+            echo "$PR_URL"
+            echo ""
+            echo "A repository collaborator with write access must approve this PR's pending checks"
+            echo "(Actions tab -> the pending run -> \"Approve and run workflow\") before validate,"
+            echo "token-report and secret-scan actually run on it; see docs/github-automation.md."
+          } >> "$GITHUB_STEP_SUMMARY"

@@ -600,12 +600,19 @@ for the evidence, the alternatives considered and the overturn condition.
 
 Leaving `CATALOG_FRESHNESS_PROPOSE` unset (or anything other than `'true'`)
 keeps every scheduled run report-only exactly as before; opening a PR from a
-schedule is an explicit opt-in, not a side effect of adding the job. Set it
-with `gh api --method PATCH repos/<owner>/<repo>/actions/variables/CATALOG_FRESHNESS_PROPOSE
---input -` (`{"name": "CATALOG_FRESHNESS_PROPOSE", "value": "true"}`) or the
-repository Settings -> Secrets and variables -> Actions -> Variables UI --
-this is separate from a repository *secret* and separate from the ordinary
-Dependabot/ruleset settings already documented above.
+schedule is an explicit opt-in, not a side effect of adding the job. `propose`
+also refuses to run at all when this run's own freshness fetch was bounded
+(`inputs.max_repos` nonzero) or recorded any `github-freshness.json` fetch
+error (`needs.freshness.outputs.upstream_errors != '0'`): a partial fetch must
+not be turned into evidence that reads as a complete one.
+
+Set the variable with `gh variable set CATALOG_FRESHNESS_PROPOSE --body true`
+(not `gh api --method PATCH .../actions/variables/CATALOG_FRESHNESS_PROPOSE`:
+`PATCH` only updates a variable that already exists, so it fails the first
+time this variable is set; `gh variable set` creates or updates it in one
+call) or the repository Settings -> Secrets and variables -> Actions ->
+Variables UI -- this is separate from a repository *secret* and separate from
+the ordinary Dependabot/ruleset settings already documented above.
 
 **One-time repository setting.** By default, GitHub Actions workflows using
 the automatic `GITHUB_TOKEN` cannot open pull requests at all; the repository
@@ -627,11 +634,16 @@ artifact (`catalog-freshness-${{ github.run_id }}`, same run), force-creates
    `upstream_provenance`-kind receipt satisfying `scripts/validate.py`'s
    generic receipt rules (`kind`, nonempty `claim`/`limitations`, and
    `component_ids` that are real `manifests/stack.json` components -- the
-   run's own drifted ids narrowed to known stack components, falling back to
-   the freshness table's own CI-tool stack components (`gitleaks`,
-   `nautilus-trader`, `syft`, `zizmor`) when none of the drifted ids match a
-   stack component). Its claim states plainly that the drift is report-only,
-   that no `catalogs/sota-convergence/*`, `catalogs/landscape/*.json`,
+   run's own drifted ids narrowed to known stack components). If **none** of
+   the drifted ids match a known stack component, the job raises and stops:
+   there is deliberately no fallback to an unrelated fixed component set,
+   because a receipt whose `component_ids` do not describe what actually
+   drifted would be misleading. A rebuilt row whose `upstream.latest` came
+   back `None` this run (an unfetched or errored repository, not an
+   observed change) is excluded from the drift count and reported
+   separately as "unfetched" instead of counted as drift. Its claim states
+   plainly that the drift is report-only, that no
+   `catalogs/sota-convergence/*`, `catalogs/landscape/*.json`,
    `manifests/stack.json`, or `layer-verdicts*` file was selected or
    changed, and that a pin bump needs its own separately qualified receipt
    under `evidence/artifacts/*/` from the existing SOTA-convergence lane
@@ -642,38 +654,82 @@ artifact (`catalog-freshness-${{ github.run_id }}`, same run), force-creates
    entry into `receipts[]`, both matched by `path`/`id` rather than list
    position, since neither list's order is assumed stable; and
 4. only when `git ls-files` still tracks `docs/ecosystem/index.html`,
-   rebuild it (`scripts/build_ecosystem.py --write`), rehash it, and loop
-   until `--check` passes -- if a later change makes the explorer an
-   untracked build artifact instead, this step is skipped entirely rather
-   than failing.
+   **rewrite** it from the updated evidence (`scripts/build_ecosystem.py
+   --write` -- this regenerates the file's actual content, not only its
+   registered hash), rehash it, and loop until `--check` passes -- if a
+   later change makes the explorer an untracked build artifact instead,
+   this whole step is skipped rather than failing.
 
 `propose`'s remaining steps then re-run `scripts/validate.py` and
-`scripts/host_receipts.py validate` on the result, commit
-(`evidence/artifacts/`, `evidence/receipts/`, `manifests/evidence.json`, and
-`docs/ecosystem/index.html` only if tracked) as `github-actions[bot]`, and
-push with the job's own `GITHUB_TOKEN` supplied through
-`GIT_CONFIG_COUNT`/`GIT_CONFIG_KEY_0`/`GIT_CONFIG_VALUE_0`
+`scripts/host_receipts.py validate` on the result (its checkout uses
+`fetch-depth: 0`, matching `validate.yml`'s own full-history checkout,
+because `host_receipts.py validate` resolves every existing receipt's
+pinned `catalog_revision` commit and a shallow clone would make historical
+commits unresolvable), commit (`evidence/artifacts/`, `evidence/receipts/`,
+`manifests/evidence.json`, and `docs/ecosystem/index.html` only if tracked)
+as `github-actions[bot]`, and push with the job's own `GITHUB_TOKEN`
+supplied through `GIT_CONFIG_COUNT`/`GIT_CONFIG_KEY_0`/`GIT_CONFIG_VALUE_0`
 (`http.https://github.com/.extraheader`, a Basic-auth header built at
-runtime) rather than a persisted credential helper -- `actions/checkout`
-still runs with `persist-credentials: false`, matching every other job in
-this repository. `gh pr create` opens `automation/catalog-freshness` against
-`main` (or `gh pr edit` updates the existing one, keyed on
-`gh pr list --head automation/catalog-freshness`), with a body that includes
-the run's `drift.md` table and states plainly: "no selection or pin changed;
-pin bumps require a qualified receipt under evidence/artifacts/*/". The last
-step calls `gh workflow run validate.yml --ref automation/catalog-freshness`
-and `gh workflow run token-report.yml --ref automation/catalog-freshness`:
-a push made with the default `GITHUB_TOKEN` does not trigger a
-`pull_request`-event run ([GitHub's own token documentation](https://docs.github.com/en/actions/concepts/security/github_token)
-states this explicitly), but a `workflow_dispatch` call always creates a run
-regardless of who pushed the ref, so this supplies the same review evidence
-opening the PR normally would have produced.
+runtime and masked with `::add-mask::` before use) rather than a persisted
+credential helper -- `actions/checkout` still runs with
+`persist-credentials: false`, matching every other job in this repository.
+The push uses `--force-with-lease=automation/catalog-freshness:<observed-sha>`
+(the remote branch's tip as `git ls-remote` observed it moments earlier, or
+empty if the branch does not exist yet), not a plain `--force`, so a
+concurrent run's push in between is rejected instead of silently
+overwritten -- a second, independent guard alongside the single
+`${{ github.workflow }}` concurrency group (`cancel-in-progress: false`)
+that already serializes every run of this workflow regardless of trigger.
+`gh pr create` opens `automation/catalog-freshness` against `main` (or
+`gh pr edit` updates the existing one, keyed on `gh pr list --head
+automation/catalog-freshness`), with a body that includes the run's
+`drift.md` table (each cell rendered as escaped inline code by
+`scripts/freshness_propose.py`'s `md_cell()`, so an upstream release tag
+fetched from an external API can never break the Markdown table or smuggle
+formatting) and states plainly: "no selection or pin changed; pin bumps
+require a qualified receipt under evidence/artifacts/*/".
+
+**No workflow is dispatched from this job, and that is deliberate.** An
+earlier version of this design called `gh workflow run validate.yml
+--ref automation/catalog-freshness` (and the same for `token-report.yml`)
+on the theory that a `workflow_dispatch` run would supply the review
+evidence a `pull_request` trigger normally would. [GitHub's own
+troubleshooting documentation](https://docs.github.com/en/pull-requests/how-tos/merge-and-close-pull-requests/troubleshooting-required-status-checks)
+refutes that: "For checks created by workflow jobs to be evaluated for a
+pull request, the workflow run must be triggered by one of these events:
+`push`, `pull_request`, `pull_request_review`, `pull_request_target`,
+`deployment`, `deployment_status`" -- `workflow_dispatch` is not on that
+list, so a dispatched run's checks never satisfy a required status check on
+this PR at all, regardless of whether they pass. Dispatching would have
+produced a green-looking run that the branch ruleset simply ignores. This
+is recorded as a corrected claim, not silently dropped, in
+[the decision record](decisions/2026-09-23-bot-pr-dispatch.md).
+
+Instead, the job relies on the PR's own `pull_request`-triggered runs, and
+tells the reader they need one extra step: because this PR is opened with
+the workflow's own `GITHUB_TOKEN`, [GitHub's `GITHUB_TOKEN` reference](https://docs.github.com/en/actions/concepts/security/github_token)
+states that "the resulting `pull_request` event creates workflow runs in an
+**approval-required** state ... a user with write access to the repository
+can start the runs by selecting **Approve workflows to run**." The job's
+last step prints the PR's URL and this instruction to the job summary. A
+repository collaborator with write access opens the PR (or the repository's
+Actions tab), finds the pending run, and selects "Approve and run workflow"
+-- after that, `validate`, `token-report` and `secret-scan` run and report
+as ordinary `pull_request` checks the ruleset actually requires. The REST
+API also documents `POST /repos/{owner}/{repo}/actions/runs/{run_id}/approve`,
+but its own description scopes it to "a pull request from a public fork of
+a first time contributor" -- this repository's evidence PR is not a fork
+PR, so whether that same endpoint accepts a GITHUB_TOKEN-created same-repo
+PR's pending run is **not established by the documentation** and is left as
+a manual UI step here rather than assumed and automated; see the decision
+record's overturn condition for what would change this.
 
 `propose` is the one job in this workflow with write permissions
-(`contents: write`, `pull-requests: write`, `actions: write`, scoped to the
-job, not the workflow -- the top-level `permissions:` block stays
-`contents: read`), because it is the one job that opens a PR; it is still
-never a required check and it never merges anything by itself.
+(`contents: write`, `pull-requests: write`, scoped to the job, not the
+workflow -- the top-level `permissions:` block stays `contents: read`),
+because it is the one job that opens a PR; it needs no `actions: write`
+since it no longer dispatches other workflows. It is still never a required
+check and it never merges anything by itself.
 **Auto-merge stays off.** The evidence PR is meant to be read, not
 rubber-stamped: a human (or a review lane) reads `drift.md`, decides whether
 a real SOTA-convergence lane review is warranted, and merges or closes it
