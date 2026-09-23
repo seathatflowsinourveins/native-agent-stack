@@ -98,21 +98,29 @@
       "evidence_class": "labelled_projection",
       "assumptions": {
         "platform": "wsl",
-        "cores": 32,
+        "cores": 60,
         "physical_ram_gb": 128,
-        "wslconfig_memory_gb": 100,
-        "ram_gb_proc_meminfo_projected": 99,
-        "gpu_vram_gb": 24
+        "wslconfig_memory_gb": 112,
+        "ram_gb_proc_meminfo_projected": 111,
+        "gpu_vram_gb": 24,
+        "physical_cores": 32,
+        "logical_processors": 64,
+        "wslconfig_processors": 60,
+        "wslconfig_swap_gb": 16,
+        "wslconfig_experimental": {
+          "autoMemoryReclaim": "gradual",
+          "sparseVhd": true
+        }
       },
       "sizing_arithmetic": {
-        "workflow_concurrency_cap": "min(16, 32 - 2) = 16",
+        "workflow_concurrency_cap": "min(16, 60 - 2) = 16 (nproc inside WSL is the .wslconfig processors=60)",
         "local_generation_model_tier": "vram_gb=24 >= 20 -> large-32b-q4",
-        "effective_ram_gb": "script prefers measured /proc/meminfo over .wslconfig's configured ceiling; projected proc_meminfo=99 (wslconfig_memory_gb=100 minus ~1GB VM overhead, as observed on this-host-20260923: wslconfig=48 -> meminfo=47)",
-        "embedding_semantic_rag_tier": "ram_gb=99 >= 96 -> headroom",
-        "ecosystem_job_memory_max_gb": "max(6, round(99*0.25,1)=24.8), min(24.8, 32) = 24.8",
-        "ecosystem_job_memory_high_gb": "round(24.8*0.667,1) = 16.5"
+        "effective_ram_gb": "script prefers measured /proc/meminfo over .wslconfig's configured ceiling; projected proc_meminfo=111 (wslconfig_memory_gb=112 minus ~1GB VM overhead, as observed on this-host-20260923: wslconfig=48 -> meminfo=47)",
+        "embedding_semantic_rag_tier": "ram_gb=111 >= 96 -> headroom",
+        "ecosystem_job_memory_max_gb": "max(6, round(111*0.25,1)=27.8), min(27.8, 32) = 27.8",
+        "ecosystem_job_memory_high_gb": "round(27.8*0.667,1) = 18.5"
       },
-      "note": "Projected, not measured on this host; a fresh run of scripts/hardware_profile.py on that workstation is required before treating these numbers as native_proven."
+      "note": "Projected, not measured on this host. WSL settings are the user's 2026-09-23 decision (memory=112GB, processors=60, swap=16GB, networkingMode=mirrored, [experimental] autoMemoryReclaim=gradual, sparseVhd=true), replacing the earlier 100/96 GB proposals: laptop measurements (Windows outside WSL held about 24 GB with 9 GB free; commit charge 85.7 of 99.7 GB) showed a cap near 128 GB would page Windows. Re-measure under full load on the workstation and raise toward 116-120 GB only if Windows keeps more than 12 GB free. A fresh run of scripts/hardware_profile.py on that workstation is required before treating these numbers as native_proven."
     },
     {
       "id": "macos-arm64-48gb-projected",
