@@ -3003,8 +3003,8 @@
     },
     {
       "path": ".github/workflows/adoption-bootstrap.yml",
-      "sha256": "f658db4e87f0a2545b3e9da8f3e42c6c64c55e34957586edbe4b4b43a2130a2b",
-      "bytes": 9408
+      "sha256": "3d4358809c98d6a68e4fe40283201c53636005e018d858155e32c9e0266e9163",
+      "bytes": 15376
     },
     {
       "path": ".github/workflows/catalog-freshness.yml",
@@ -3058,8 +3058,8 @@
     },
     {
       "path": ".gitignore",
-      "sha256": "4167fa7e1c1544355b4623ace517eaafd2929997db3bf779abbac8b9a4fc4fd4",
-      "bytes": 195
+      "sha256": "03d2f7d97a6656e59131500f290331509b81e7b1ec536c51081ea376df5ee06c",
+      "bytes": 230
     },
     {
       "path": ".gitleaks.toml",
@@ -3108,8 +3108,8 @@
     },
     {
       "path": "adoption/bootstrap-macos.sh",
-      "sha256": "6352627d2289c25040d04463e913c16d0939d664435d33791e5b9aa35b16a141",
-      "bytes": 20386
+      "sha256": "8e6800b48864750c8a0286c368882adc2043669ba148b71aa5d834123e61bebd",
+      "bytes": 23868
     },
     {
       "path": "adoption/bootstrap.md",
@@ -3173,8 +3173,8 @@
     },
     {
       "path": "adoption/pins-macos-arm64.json",
-      "sha256": "cf645139500175634c9fda870935f3441a808a9b57e7939453a028b17c7ef5cd",
-      "bytes": 10170
+      "sha256": "11e486693249ec629826791346d3b92c23214f6744c897d96a265d2e9fda3001",
+      "bytes": 13449
     },
     {
       "path": "adoption/platforms/linux-wsl2.md",
@@ -3183,8 +3183,8 @@
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
-      "sha256": "8f55582741fbd1e0230ef4ea9d37bf5c7dc2f5c9569705cbc99dbe2f5cb14756",
-      "bytes": 17458
+      "sha256": "a196aa981798a45970222f586da29ce837e6be5693f3cc6c531b21cf91204786",
+      "bytes": 20432
     },
     {
       "path": "adoption/pre-login-observation.json",
@@ -7634,7 +7634,7 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "124278fe0a136a8da8ed719c7fae40cc5c1a49ee8c685b803257464c29882130",
+      "sha256": "76109cd9d2825713458ee3ede00426cee622278358c0c91c00fbac73ec1eec8c",
       "bytes": 12927198
     },
     {
@@ -11694,8 +11694,8 @@
     },
     {
       "path": "tests/test_adoption_bootstrap_macos.py",
-      "sha256": "d99bf558684c7c666884b1ef6e5c29d88999c6412b0643d53270934c7c1cccd8",
-      "bytes": 37057
+      "sha256": "8d873dee823f3956d93bdd92ffc2b1ceb9662d51fa96ac215b3b391456c66e3a",
+      "bytes": 49558
     },
     {
       "path": "tests/test_adoption_contract.py",
