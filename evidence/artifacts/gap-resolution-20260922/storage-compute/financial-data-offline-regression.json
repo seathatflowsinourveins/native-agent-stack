@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "id": "financial-data-offline-regression",
+  "date": "2026-09-22",
+  "layer_ids": [
+    "storage-compute"
+  ],
+  "gap_refs": [
+    {
+      "layer_id": "storage-compute",
+      "gap_index": 2
+    }
+  ],
+  "purpose": "Re-run the offline financial-data regression (tests/test_financial_data.py, pure-stdlib, no duckdb import, mocked HTTP) named by storage-compute gap 2's blocker text, in the same freshly rebuilt SDK-lock interpreter, to confirm decimal/currency/point-in-time fail-closed contracts still hold without a live SEC acquisition.",
+  "preregistered": "Expected result if the incumbent still holds: all 16 tests in tests.test_financial_data pass with zero failures/errors/skips, including currency-mismatch rejection, decimal-precision preservation and the fail-closed handling of partial/interrupted acquisitions. This offline rerun cannot itself establish true historical point-in-time reconstruction (financial-data/receipt.json line 24) -- that remains an inherent limitation regardless of outcome.",
+  "commands": [
+    {
+      "cmd": "/home/example/.local/share/codex-ecosystem/tools/sdk-env-baseline-20260922/bin/python3.13 -m unittest tests.test_financial_data -v   # cwd=/home/example/code/nas-wt-gap-storage-market",
+      "exit": 0,
+      "duration_s": 1.373,
+      "output_excerpt": "test_currency_mismatch_never_converts_or_chooses_other_unit ... ok\ntest_decimal_storage_boundaries_do_not_use_context_rounded_absolute_value ... ok\ntest_full_precision_decimal_and_cli_ready_packet_roundtrip ... ok\ntest_interrupted_http_body_is_a_recordable_bounded_failure ... ok\ntest_new_snapshot_cannot_leak_old_facts_into_historical_research ... ok\n... (11 more) ...\nRan 16 tests in 1.373s\nOK",
+      "output_sha256": "ccce5b1adb755e3885f2faba1e285a7895c905913b75904b909c32363b6f3048"
+    }
+  ],
+  "tool_versions": {
+    "python": "3.13.15"
+  },
+  "installs": [],
+  "result": "16/16 tests passed, 0 failures, 0 errors, 0 skips (pure-stdlib suite, unittest.mock-patched HTTP, no duckdb/network dependency). Confirms currency-unit-mismatch rejection, exact decimal preservation, and fail-closed handling of interrupted/partial acquisitions and stale-snapshot leakage still hold.",
+  "settles_gap": "partially",
+  "verdict_impact": {
+    "could_change_verdict": false,
+    "direction": "supports_incumbent",
+    "explanation": "This is an offline regression confirmation, not a new acquisition; it reconfirms the fail-closed contracts but does not and cannot establish true historical point-in-time reconstruction (financial-data/receipt.json line 24: historical_point_in_time_reconstruction=false), which the gap 2 text and this task's exclusion of live SEC EDGAR calls both leave open as an inherent, unresolved limitation of the current sources."
+  },
+  "evidence_class": "local_integration",
+  "limitations": [
+    "Offline/mocked-HTTP suite only; does not exercise a live SEC acquisition and cannot close the historical_point_in_time_reconstruction=false limitation.",
+    "Live SEC EDGAR acquisition (the other half of gap 2's two options) is out of scope for this check and recorded separately as needs_user_input.",
+    "The `preregistered` field above was written after this command had already been run and its result (16/16 passed) was known, so it is a post-hoc restatement of the expected outcome rather than a true blind prediction recorded before execution."
+  ],
+  "raw_artifacts": [
+    {
+      "path": "<scratch>/redacted-session-scratchpad/scratchpad/financial-data-regression.log",
+      "sha256": "ccce5b1adb755e3885f2faba1e285a7895c905913b75904b909c32363b6f3048"
+    }
+  ],
+  "coordinator_correction": {
+    "date": "2026-09-23",
+    "from": "native_proven",
+    "to": "local_integration",
+    "reason": "Codex blind review of PR #81 (gpt-6-astra, read-only, 2026-09-22): the suite is pure stdlib with mocked HTTP and no DuckDB or network; it checks repository code, not native execution of the storage or acquisition components."
+  }
+}

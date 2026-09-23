@@ -1,0 +1,1 @@
+2026-09-23T00:06:04.618719Z  INFO ai_memory_cli: ai-memory starting version="2.3.2" server_url=http://127.0.0.1:49412 data_dir=~/codex-ecosystem/state/gap-resolution-20260922/recovery/app-state/rerun-isolated/restored2~/codex-ecosystem/state/gap-resolution-20260922/recovery/app-state/ai-memory-copy bind=127.0.0.1:49374

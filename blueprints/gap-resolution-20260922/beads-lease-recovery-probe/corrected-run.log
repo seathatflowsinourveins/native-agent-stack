@@ -1,0 +1,58 @@
+wait2-start: 2026-09-22T22:59:20+00:00
+wait2-end: 2026-09-22T23:05:00+00:00
+=== reclaim after wait past lease_expires_at=2026-09-22T23:04:06Z ===
+Debug: loaded config from <HOME>/.beads/config.yaml
+Debug: merged config from <HOME>/.config/bd/config.yaml
+Debug: merged config from /tmp/beads-gap-probe/.beads/config.yaml
+Debug: loaded config from <HOME>/.beads/config.yaml
+Debug: merged config from <HOME>/.config/bd/config.yaml
+Debug: merged config from /tmp/beads-gap-probe/.beads/config.yaml
+{
+  "count": 1,
+  "reclaimed": [
+    {
+      "id": "beads-gap-probe-84a",
+      "previous_owner": "probe"
+    }
+  ],
+  "schema_version": 1,
+  "scoped": true
+}
+=== show after reclaim ===
+[
+  {
+    "id": "beads-gap-probe-84a",
+    "title": "worker-crash-probe-2",
+    "description": "corrected scratch issue: bare --claim only",
+    "status": "open",
+    "priority": 2,
+    "issue_type": "task",
+    "owner": "probe@example.com",
+    "created_at": "2026-09-22T22:59:05Z",
+    "created_by": "probe",
+    "updated_at": "2026-09-22T23:05:01Z",
+    "dependent_count": 0,
+    "dependency_count": 0,
+    "comment_count": 0,
+    "revision": "5138132738766402327"
+  }
+]
+=== bd ready --json (issue should be claimable again) ===
+[
+  {
+    "id": "beads-gap-probe-84a",
+    "title": "worker-crash-probe-2",
+    "description": "corrected scratch issue: bare --claim only",
+    "status": "open",
+    "priority": 2,
+    "issue_type": "task",
+    "owner": "probe@example.com",
+    "created_at": "2026-09-22T22:59:05Z",
+    "created_by": "probe",
+    "updated_at": "2026-09-22T23:05:01Z",
+    "dependency_count": 0,
+    "dependent_count": 0,
+    "comment_count": 0
+  }
+]
+DONE
