@@ -95,7 +95,8 @@ GitHub-hosted macOS runner; see
    For a partly pinned profile the script first exits 3 and prints the
    unpinned ids. Rerun it as `bootstrap-<os>.sh --profile <id> --allow-unpinned
    <the ids it printed>`: that installs the pinned components with SHA-256
-   verification and skips the named ones. Then install each skipped id through
+   verification (plus the `node`, `uv` and `gh` every run installs) and skips
+   the named ones. Then install each skipped id through
    its `recipe_map` page (the SDK lock for `research-runtime`). A profile with
    "none of N" pinned installs nothing through the script; use the recipes.
 

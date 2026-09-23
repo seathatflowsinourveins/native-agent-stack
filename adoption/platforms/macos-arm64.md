@@ -266,6 +266,8 @@ The `platform_profiles` row for `macos-arm64` names a hosted smoke job
 `75a6e0d` (PR #94, `workflow_dispatch`, runner label `macos-15`, macOS
 15.7.9 build 24G830), every job green, recorded in
 [`evidence/receipts/adoption-macos-hosted-smoke-20260923.json`](../../evidence/receipts/adoption-macos-hosted-smoke-20260923.json).
+That run and its receipt were added after `v2026.09.23`: they exercise the
+#94 script and pins, not the ones in that tag.
 Earlier runs (`35753384567`/`585032a`, `35753801691`/`9d9ce2b`, both
 recorded in the retired 2026-09-22 receipt) predate the round-3g through
 3i redesign covered here and are superseded by this one; they are not

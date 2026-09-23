@@ -3154,8 +3154,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "e2ffbfe79eab35c127fb4c665bb2e846af297088b5ebe5aca3079de9672b8c97",
-      "bytes": 12570
+      "sha256": "5594544fdc421f5413a801dd399f9965b43dec70b01f7fde0e129b2023f1fadc",
+      "bytes": 12625
     },
     {
       "path": "adoption/host-receipt.schema.json",
@@ -3254,8 +3254,8 @@
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
-      "sha256": "147a8e6e573498708368ff43275f5e636eafb3e79886fe5b905289dfcb587aef",
-      "bytes": 38879
+      "sha256": "f02e97127efcc21344e1e07839d4db52bfce48448e1e8547219581623237f901",
+      "bytes": 39001
     },
     {
       "path": "adoption/pre-login-observation.json",
