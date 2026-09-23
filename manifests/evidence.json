@@ -6014,8 +6014,8 @@
     },
     {
       "path": "blueprints/gap-wave3-20260923/native-clients-research-task/task.md",
-      "sha256": "0fb848fd68936fc6dd11ff17dc665ae14878d1e7aea826504dd3c3c9e10a1c37",
-      "bytes": 1976
+      "sha256": "f3cd0e93819e7087c4f966b1a0fd5b89db20b67d9e6ee69e7897e52a2a8838df",
+      "bytes": 4501
     },
     {
       "path": "blueprints/gap-wave3-20260923/native-clients-sdk-vs-cli/judge-packets/cli_run1.txt",
@@ -6064,8 +6064,8 @@
     },
     {
       "path": "blueprints/gap-wave3-20260923/native-clients-sdk-vs-cli/sdk-task.py",
-      "sha256": "fc5807b8bf09b464c686eb9919f6cd02f7952b3ae21bec63117cfcfad99493e2",
-      "bytes": 2630
+      "sha256": "0d1945ca05a12b87dd948791e8451684f08855373cad7eacfccd9baef32f05a4",
+      "bytes": 3483
     },
     {
       "path": "blueprints/memory-lifecycle-probe/README.md",
@@ -10254,13 +10254,13 @@
     },
     {
       "path": "evidence/artifacts/gap-wave3-20260923/native-clients/arm-comparison-research-task.json",
-      "sha256": "cfe2fc527568ebcf8c5fb0b63d8b79dec79a60531a9a88f87c4f09d54985c2ed",
-      "bytes": 13910
+      "sha256": "081060184c177ed0db5ac257a71e41677836c5e28abf488c0180b9987d974132",
+      "bytes": 21234
     },
     {
       "path": "evidence/artifacts/gap-wave3-20260923/native-clients/sdk-vs-cli-resume-comparison.json",
-      "sha256": "dfee39ff26aace7e4fd22c92cc7eac9640739aa5c1d3ebe129502399f56656ef",
-      "bytes": 15067
+      "sha256": "1689ccade88ccf64d0ed4e6455e7376c362c2565cda4fa7e321f0cdbdb4493fa",
+      "bytes": 21675
     },
     {
       "path": "evidence/artifacts/harness-rules-convergence-20260922/codex-agent-roles-source.json",

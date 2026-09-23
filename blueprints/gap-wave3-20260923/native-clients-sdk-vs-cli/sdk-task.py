@@ -34,10 +34,21 @@ async def run(mode: str, resume_id_file: str, out_file: str, id_out_file: str):
         prompt = RESUME_PROMPT
     options = ClaudeAgentOptions(**options_kwargs)
 
+    # CORRECTION (fix round): the original version of this script read only
+    # result/session_id/usage/is_error and the receipts derived from it
+    # claimed the SDK "exposes no native total_cost_usd field at all". That
+    # claim was false: claude_agent_sdk.types.ResultMessage defines a
+    # total_cost_usd: float | None field (see the installed SDK's types.py).
+    # This script simply never read it. total_cost_usd is now captured below
+    # so a future rerun of this harness records SDK-arm cost; it was not
+    # captured for the runs already recorded in this unit's receipts, and
+    # this script edit does not retroactively change or fabricate a cost
+    # figure for those already-completed runs.
     result_text = None
     session_id = None
     usage = {}
     is_error = None
+    total_cost_usd = None
     async for message in query(prompt=prompt, options=options):
         cls_name = type(message).__name__
         if cls_name == "ResultMessage":
@@ -45,12 +56,14 @@ async def run(mode: str, resume_id_file: str, out_file: str, id_out_file: str):
             session_id = getattr(message, "session_id", None)
             usage = getattr(message, "usage", None) or {}
             is_error = getattr(message, "is_error", None)
+            total_cost_usd = getattr(message, "total_cost_usd", None)
 
     payload = {
         "mode": mode,
         "result": result_text,
         "is_error": is_error,
         "usage": usage,
+        "total_cost_usd": total_cost_usd,
         "session_id_sha256_12": hashlib.sha256((session_id or "").encode()).hexdigest()[:12] if session_id else None,
     }
     with open(out_file, "w") as f:
