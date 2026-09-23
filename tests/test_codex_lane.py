@@ -9,7 +9,9 @@ optional sleep to exercise the timeout path. Modules are loaded by file path
 (tools/sota-convergence is not a dotted-import package name), matching the
 pattern already used by test_layer_verdicts.py.
 """
+import contextlib
 import importlib.util
+import io
 import json
 import os
 import tempfile
@@ -123,6 +125,20 @@ class CodexLaneFixture(unittest.TestCase):
 
     def out_path(self, catalog: str, layer_id: str) -> Path:
         return self.work_dir / "codex" / f"{catalog}__{layer_id}.json"
+
+
+class MissingCliTests(CodexLaneFixture):
+    def test_a_missing_codex_cli_exits_2_with_a_message(self):
+        self.write_packet("foundation", "native-clients")
+        empty = self.work_dir / "empty-bin"
+        empty.mkdir()
+        os.environ["PATH"] = str(empty)
+        err = io.StringIO()
+        with contextlib.redirect_stderr(err):
+            code = self.run_lane()
+        self.assertEqual(code, 2)
+        self.assertIn("codex CLI is not on PATH", err.getvalue())
+        self.assertFalse(self.argv_log.exists())
 
 
 class CodexLaneTests(CodexLaneFixture):
