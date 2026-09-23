@@ -7,7 +7,7 @@
  "change": "The host's live ai-memory now embeds with nvidia/Nemotron-3-Embed-1B-BF16 (2048 dimensions) through the resident local vLLM embedding service that also serves SocratiCode, with the publisher's query:/passage: prefixes, instead of the built-in all-MiniLM-L6-v2 (384 dimensions).",
  "pin_deviation": {
   "catalog_pin": "ai-memory 2.3.2 (stock release)",
-  "running": "ai-memory 2.3.2 plus the query/document prefix patch proposed upstream",
+  "running": "ai-memory.service runs ai-memory 2.3.2 plus the query/document prefix patch proposed upstream; the Claude and Codex hooks still run the stock 2.3.2 binary (hooks only spool and forward observations and never embed)",
   "upstream_pr": "https://github.com/akitaonrails/ai-memory/pull/859",
   "binary_sha256": "e26a701446c76fc930996e6ff79d8d6c8986d409e01f559648107f7c60dc47a2",
   "why_2_3_2_based": "stock 2.3.2 binaries invoked by the Claude and Codex hooks abort on a store migrated to the 2.4.0 schema (refinery abort_missing), so the patch was applied to 2.3.2 to keep the schema unchanged",
@@ -15,7 +15,8 @@
    "three review rounds of the upstream patch by an independent Claude reviewer and a Codex cross-family reviewer, all findings fixed",
    "an independent deploy-safety review of the 2.3.2 cherry-pick (three hunks dropped because they touch 2.4.0-only features)",
    "tests on the 2.3.2 base: llm 270/0, mcp 444/0, consolidate+wiki 409/0, cli-lib and cli suite with the same pre-existing failures as stock"
-  ]
+  ],
+  "measurement_basis": "The hybrid re-measurement ran the same patch on 2.4.0. The 2.3.2 cherry-pick was not re-measured; the embedding crate is byte-identical between 2.3.2 and 2.4.0 and the 2.3.2/2.4.0 MiniLM arms were metric-identical, which supports but does not prove equal behaviour."
  },
  "configuration": {
   "embedding_provider": "openai-compat",
@@ -31,11 +32,11 @@
   "embedding_rows": 149,
   "latest_pages_missing": 0,
   "provider_status": "ok",
-  "hook_capture": "observations continued to increase after the restart",
-  "live_query": "memory_query returned hits with all four retrieval streams active",
-  "code_search": "SocratiCode search returned results after the embedding service restart"
+  "hook_capture": "operator-observed, not in the deploy log: the observation count read 225,430 right after the re-embed and 225,519 in a status read a few minutes later, so capture continued after the restart",
+  "live_query": "operator-observed, not logged: a memory_query from a live agent session returned hits with all four retrieval streams (fts, entity, vector, graph) active",
+  "code_search": "operator-observed, not logged: a SocratiCode search returned results after the embedding service restart"
  },
- "rollback": "a backup and the previous configuration were saved before the change; rollback removes the two systemd drop-ins, restores the configuration, restarts both services and re-embeds with the built-in model. A stock ai-memory serve must not be started against the store without that re-embed: it ignores the prefixed identity for vector search and its re-embed would overwrite the prefixed vectors.",
+ "rollback": "a backup and the previous configuration were saved before the change; rollback removes the two systemd drop-ins, restores the configuration, restarts both services and re-embeds with the built-in model. A stock ai-memory serve must not be started against the store without that re-embed: it ignores the prefixed identity for vector search and its re-embed would overwrite the prefixed vectors. The rollback script has not been exercised.",
  "follow_up": "When upstream releases the prefix support, move the service and hook binaries to that release together and return to a stock pin.",
  "related_evidence": [
   "evidence/artifacts/local-model-alignment-20260923/memory-embedder-dense-benchmark.json",

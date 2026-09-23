@@ -134,7 +134,7 @@
    "The metric named recall@5 is 'any relevant page in the top 5'.",
    "Only the final lock of three survived; file times and the command log support the order; two protocol amendments (CPU thread cap, GPU for sentence-transformers arms) were relocked before their runs.",
    "Prefixes and input_type are shown by the harness code; the vLLM servers ran without request logging.",
-   "q29 and q30 score 0 because one annotator's gold page is outside the 130-page corpus."
+   "q29 and q30 have no annotator overlap because annotator 1's only gold page is outside the 130-page corpus; they are scored on annotator 2's pages."
   ]
  },
  "skipped": [

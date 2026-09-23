@@ -80,6 +80,7 @@
  "limits": [
   "62 answerable queries; the top-5 hit difference is two queries",
   "one run per arm",
-  "MCP round-trip latency includes a CLI process spawn per query"
+  "MCP round-trip latency includes a CLI process spawn per query",
+  "Q1 had one annotator; Q2 annotator 1 also wrote the queries."
  ]
 }
