@@ -8,6 +8,60 @@ and [`scripts/host_receipts.py`](../scripts/host_receipts.py). One receipt
 records one component x one host x one lifecycle stage; it never uploads
 anything, and it never certifies a platform on its own.
 
+## 0. The new-host loop, in one place
+
+For a host this repository has never measured or run on before, in order
+(each step is read-only except the write it names; nothing here selects a
+winner, records a landscape verdict, or flips a `platform_status`):
+
+1. **Bootstrap.** [`adoption/bootstrap.md`](../adoption/bootstrap.md) end to
+   end, from the pinned clone (step 0) through native sign-in.
+2. **Measure the host.**
+   `python3 scripts/hardware_profile.py --record-host <host-id>` writes the
+   measured report to `evidence/artifacts/hw-profiles/<host-id>/profile.json`,
+   registers it in `manifests/evidence.json`, and adds or updates this host's
+   `native_proven` entry in
+   [`adoption/hardware-profiles.json`](../adoption/hardware-profiles.json)
+   `hosts[]`, keeping that entry's other fields. `<host-id>` must match
+   `^[a-z0-9-]+-[0-9]{8}$` (`<name>-<yyyymmdd>`; a labelled-projection host id
+   still ends `-projected`). A plain `python3 scripts/hardware_profile.py`
+   (no `--record-host`) is unchanged: it only prints the report, read-only.
+3. **Record what ran.** `python3 scripts/host_receipts.py record ...`
+   (section 3 below) for each component you exercised on this host. When the
+   receipt is for a runtime component (`vllm`, `mlx-lm`, `llama.cpp`, ...) and
+   you qualified specific local model weights on it, add
+   `--qualified-model '{"model_id": ..., "revision": ..., "runtime": ..., "runtime_version": ..., "bars": "<short text>", "result": "pass"|"fail"}'`
+   (repeatable) or `--qualified-models-file <path to a JSON array of such
+   objects>`. This is optional and additive to the receipt; it records which
+   weights you qualified, not a platform acceptance.
+4. **Refresh the derived views.** `python3 scripts/component_matrix.py
+   --write`, then `python3 scripts/new_host_grand_list.py --write` (section 5
+   below). The grand list's "Qualified local models" section is built from
+   step 3's receipts; the runtime component's own winner row in the matrix
+   carries them per platform too.
+5. **See what could flip.** `python3 scripts/verdict_flip_candidates.py`
+   lists every layer-winner-platform row whose recorded evidence
+   (`scripts/platform_status.py`) now supports a stronger `platform_status`
+   than the catalog currently declares, with the receipts that qualify.
+   Report-only: it selects nothing and always exits 0 on well-formed input
+   (a CI step runs it and posts the output to the job summary).
+6. **Validate.** `python3 scripts/host_receipts.py validate`,
+   `python3 scripts/validate.py`, `python3 scripts/component_matrix.py
+   --check`, `python3 scripts/new_host_grand_list.py --check`, and the test
+   suite CI runs: `python3 -m unittest`. This repository's tests use the
+   standard library's `unittest`, not `pytest` (not installed); running
+   `python3 -m pytest` here does nothing useful.
+7. **A verdict flip is a separate step, owned by whoever re-records the
+   layer.** Nothing above writes `catalogs/landscape/*.json`
+   `winners[].platform_status`. A row `verdict_flip_candidates.py` names only
+   actually moves when someone re-records that catalog/layer with
+   `tools/sota-convergence/record_verdicts.py` through its own lane process
+   (section 4 below); this contribution flow deliberately does not run that
+   for you.
+
+Sections 1-9 below give the full detail behind step 3 (evidence classes,
+recording, sanitizing, validating and independently reviewing a receipt).
+
 ## 1. Who this is for
 
 - **Another WSL host.** You have a second Linux/WSL2 x86_64 machine and want

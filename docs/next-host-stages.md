@@ -4,7 +4,9 @@ Dated 2026-09-23. This page says which machine does what, what to run on each, a
 measured load justifies. The per-layer list of what to install is generated in
 [`new-host-grand-list.md`](new-host-grand-list.md); the step-by-step install is
 [`adoption/bootstrap.md`](../adoption/bootstrap.md); recording what ran is
-[`contributing-evidence.md`](contributing-evidence.md).
+[`contributing-evidence.md`](contributing-evidence.md). For the exact ordered commands
+(measure, record, refresh the derived views, check for a possible verdict flip, validate),
+see [`contributing-evidence.md`'s "The new-host loop, in one place"](contributing-evidence.md#0-the-new-host-loop-in-one-place).
 
 ## Machine roles (recommendation, not a measurement)
 
@@ -25,10 +27,13 @@ The workstation and macOS tiers are labelled projections in
    `memory=96GB processors=60 swap=16GB`; the hardware profiles assume 100 GB for the `headroom` tier,
    which 96 GB would just miss; the owners reconcile the value), then `wsl --shutdown` once.
 2. Pinned clone at the release tag, then `adoption/bootstrap-linux.sh` (bootstrap step 0 onward).
-3. `python3 scripts/hardware_profile.py`; add the measured entry to the hardware profiles.
+3. `python3 scripts/hardware_profile.py --record-host <host-id>` (`<host-id>` like
+   `wsl-workstation-20261015`); this writes the measured report and adds the entry to the
+   hardware profiles for you, replacing the earlier by-hand edit.
 4. Profiles in order: `foundation-cpu`, `research-runtime`, `observability`, `semantic-rag`,
    `recovery`, `trading-nautilus` (see the grand list's setup order).
-5. Record each component that ran with `python3 scripts/host_receipts.py record`, then
+5. Record each component that ran with `python3 scripts/host_receipts.py record`
+   (`--qualified-model` for any local runtime model you qualified there), then
    `python3 scripts/component_matrix.py --write` and `python3 scripts/new_host_grand_list.py --write`.
 6. North star on this host: the engine replay, then IBKR local acceptance and the adaptive paper
    broker trial as the gate ladder
@@ -39,9 +44,11 @@ The workstation and macOS tiers are labelled projections in
 
 1. Pinned clone, then `adoption/bootstrap-macos.sh` (the macOS clean-install work in progress adds
    Homebrew prerequisites, launchd agents and darwin pins).
-2. `python3 scripts/hardware_profile.py` and the MLX smoke; record the measured profile.
+2. `python3 scripts/hardware_profile.py --record-host <host-id>` and the MLX smoke; this writes
+   and registers the measured profile.
 3. `macos-arm64-foundation` profile; re-qualify any local model on MLX or llama.cpp Metal: a vLLM
-   result on CUDA does not transfer.
+   result on CUDA does not transfer. Record a qualified model with
+   `python3 scripts/host_receipts.py record ... --qualified-model '{"runtime": "mlx-lm", ...}'`.
 4. Record receipts as above. The first real macOS run is what moves the `macos-arm64` column of the
    grand list off `untested`.
 
