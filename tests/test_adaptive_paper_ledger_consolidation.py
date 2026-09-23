@@ -274,6 +274,45 @@ class ConsolidationTests(unittest.TestCase):
                 with self.assertRaisesRegex(self.m.ConsolidationError, "account_attestation"):
                     self.plan([self.first, source, self.second])
 
+    def test_external_local_only_terminals_cannot_attest_account_ownership(self):
+        for status in ("not_sent", "broker_refused"):
+            with self.subTest(status=status):
+                fault = self.fixture("local-" + status, 205, None, trials=False, account_path=False)
+                provenance = fault.parent / "receipt.json"
+                provenance.write_text('{"broker":"alpaca","endpoint":"paper"}')
+                with sqlite3.connect(fault) as db:
+                    attempted = int(status == "broker_refused")
+                    db.execute("INSERT INTO intents VALUES (?,?,?,?,?,?,?,?,?,?,?)",
+                               (status, "SPY", "buy", "1", "100", status, "0", None, None, attempted, None))
+                    if attempted:
+                        db.execute("INSERT INTO requests(at,kind,client_id) VALUES (206,'submit',?)", (status,))
+                        kind = "broker_refused"
+                        payload = {"http_status": 401, "evidence_required": "submission_http_refusal_then_client_id_404"}
+                    else:
+                        kind, payload = "intent_not_sent", {"reason": "risk_refused"}
+                    db.execute("INSERT INTO events(kind,client_id,payload) VALUES (?,?,?)", (kind, status, json.dumps(payload)))
+                source = self.m.Source(fault, account_fingerprint=self.fp, provenance_path=provenance)
+                with self.assertRaisesRegex(self.m.ConsolidationError, "account_attestation"):
+                    self.plan([self.first, source, self.second])
+
+    def test_repeated_rows_within_source_preserved_without_deduplication(self):
+        payload = '{"reason":"historical_quote_gap"}'
+        with sqlite3.connect(self.first) as db:
+            for _ in range(2):
+                db.execute("INSERT INTO events(kind,payload) VALUES ('risk_halt',?)", (payload,))
+                db.execute("INSERT INTO requests(at,kind) VALUES (209,'read')")
+        plan = self.plan()
+        self.apply(plan)
+        with sqlite3.connect(self.original) as db:
+            self.assertEqual(db.execute("SELECT count(*) FROM events WHERE kind='risk_halt' AND payload=?", (payload,)).fetchone()[0], 2)
+            self.assertEqual(db.execute("SELECT count(*) FROM requests WHERE at=209 AND kind='read'").fetchone()[0], 2)
+
+    def test_identical_events_across_sources_still_refused(self):
+        for path in (self.first, self.second):
+            self.edit(path, "INSERT INTO events(kind,payload) VALUES ('risk_halt',?)", ('{"reason":"historical_quote_gap"}',))
+        with self.assertRaisesRegex(self.m.ConsolidationError, "duplicate_history_row"):
+            self.plan()
+
     def test_retry_same_plan_is_idempotent_and_preserves_append_only_history(self):
         plan, proof = self.plan(), self.proof()
         first = self.apply(plan, proof)

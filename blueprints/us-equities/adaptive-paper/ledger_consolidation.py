@@ -217,7 +217,9 @@ def _validate(snapshot, fingerprint):
         paper_receipt = isinstance(provenance, dict) and (
             (provenance.get("endpoint") == PAPER and provenance.get("broker") in (None, "alpaca"))
             or (provenance.get("broker") == "alpaca" and provenance.get("endpoint") == "paper"))
-        if (source.account_fingerprint != fingerprint or not paper_receipt or not tables["intents"]):
+        broker_bound = any(isinstance(row["broker_id"], str) and row["broker_id"].strip()
+                           for row in tables["intents"])
+        if (source.account_fingerprint != fingerprint or not paper_receipt or not broker_bound):
             _fail("source_account_attestation_required")
     if source.account_fingerprint not in (None, fingerprint):
         _fail("source_account_mismatch")
@@ -374,11 +376,13 @@ def _analyze(original, sources, fingerprint):
                     ids[key].add(row[key])
             for table, keys, values in (("requests", ("at", "kind", "client_id"), request_ids),
                                          ("events", ("kind", "client_id", "payload"), event_ids)):
-                for row in data["tables"][table]:
-                    identity = tuple(row[k] for k in keys)
-                    if identity in values:
-                        _fail("duplicate_history_row")
-                    values.add(identity)
+                source_identities = {tuple(row[k] for k in keys) for row in data["tables"][table]}
+                if source_identities & values:
+                    _fail("duplicate_history_row")
+                # Repeated observations or read attempts within one source are
+                # history, not duplicates to discard. Reject only cross-source
+                # overlap; the original row lists are copied in full on apply.
+                values.update(source_identities)
             for key in counts:
                 counts[key] += len(data["tables"][key])
             # Translate each independent local high-water mark to the original
