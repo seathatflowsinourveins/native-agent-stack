@@ -1,229 +1,217 @@
 {
  "alternatives": [
   {
-   "disposition": "conditional",
-   "evidence_class": "native_proven",
-   "evidence_refs": [
-    "evidence/receipts/native-rag.json",
-    "evidence/receipts/desktop-direct-rag.json",
-    "blueprints/us-equities/state-recovery/qdrant/receipt.json",
-    "catalogs/us-equities/foundation-memory.json"
-   ],
-   "key": "c2",
-   "name": "SocratiCode",
-   "repository": "https://github.com/giancarloerra/socraticode",
-   "why_not_default": "It complements Serena as the conceptual code lane; the requirement's term is 'exact code'. Its native evidence is one limit=1 codebase_search per client, both returning tools/ecosystem/linux-usage-report.cjs lines 2-39 at score 0.6429 (native-rag.json lines 30-38 and 51-62). A cosine score is not a quality measure, and no recall or MRR receipt exists for it. Its advantages over Serena are automatic watcher freshness (add/update/delete with no tool call, native-rag.json lines 113-136) and a Desktop direct path (desktop-direct-rag.json). Neither freshness nor conceptual search is a term of the requirement. The Qdrant restore point counts (symbol_files 23, code_vectors 139) coincide with the SocratiCode index (graph_files 23, chunks 139). However, the receipt states it is 'not a semantic retrieval benchmark or SocratiCode MCP rebinding test' (qdrant/receipt.json line 57), so SocratiCode source recovery after restore is unestablished. It is AGPL-3.0. Keep it as a conceptual/freshness lane, not the exact-code winner."
-  },
-  {
-   "disposition": "overlap",
-   "evidence_class": "native_proven",
-   "evidence_refs": [
-    "blueprints/us-equities/state-recovery/qdrant/receipt.json",
-    "evidence/receipts/native-rag.json",
-    "catalogs/us-equities/foundation-memory.json"
-   ],
-   "key": "c11",
-   "name": "Qdrant",
-   "repository": "https://github.com/qdrant/qdrant",
-   "why_not_default": "It is the vector substrate under SocratiCode, not a retrieval interface. Its encrypted restore passed: 5 green collections, 201 points, exact-query ordered ids and scores matched, maximum_score_delta 0.0 (qdrant/receipt.json lines 27-37). It was one same-host drill with no off-host durability or key escrow (line 55), and it is not a retrieval-quality benchmark (line 57). No financial-document corpus is indexed."
-  },
-  {
    "disposition": "out_of_scope",
    "evidence_class": "native_proven",
    "evidence_refs": [
-    "evidence/receipts/foundation-native-20260920.json",
-    "evidence/receipts/native-context-memory.json",
-    "catalogs/us-equities/foundation-memory.json"
+    "evidence/receipts/portable-cli-artifacts.json",
+    "evidence/receipts/component-history.json"
    ],
    "key": "c1",
-   "name": "Context Mode",
-   "repository": "https://github.com/mksglu/context-mode",
-   "why_not_default": "It is a token-efficiency sandbox for large tool output, not a durable knowledge or source-retrieval store. native-context-memory.json records native ctx_execute_file and ctx_stats calls completing. foundation-native-20260920.json holds only retained event-count estimates, which it says are not measured provider usage. No retrieval-quality result exists. The license differs between sources: the packet says NOASSERTION and the catalog says Elastic-2.0."
+   "name": "foundation-toon",
+   "repository": "https://github.com/toon-format/toon",
+   "why_not_default": "evidence/receipts/portable-cli-artifacts.json records only a native CLI encode/decode roundtrip on fixtures/records.json. Both toon-encode and toon-decode returned exit 0 and the roundtrip matched. evidence/receipts/component-history.json lists native_claude, native_codex and current_desktop as 'not independently demonstrated'. Line 139 records a nested fixture growing from 69 to 94 tokens. It is a serialization aid, not a worker, memory or retrieval lane."
   },
   {
-   "disposition": "out_of_scope",
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [],
+   "key": "c2",
+   "name": "foundation-pageindex",
+   "repository": "https://github.com/VectifyAI/PageIndex",
+   "why_not_default": "The evidence is source review only: the packet cites upstream README and release URLs and no local execution. The pin (v0.2.18) is behind upstream (v0.2.19). No document-tree retrieval run on financial or code sources is retained. A source-only candidate has not failed."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [],
+   "key": "c3",
+   "name": "langgraph",
+   "repository": "https://github.com/langchain-ai/langgraph",
+   "why_not_default": "The evidence is source review only; the packet's ref is the sdk==0.4.4 README. The card says the import command is installation smoke only, not a working agent, and that InMemorySaver loses state on restart. No retained receipt shows a native graph worker completing a task."
+  },
+  {
+   "disposition": "conditional",
    "evidence_class": "native_proven",
    "evidence_refs": [
-    "evidence/receipts/native-token-ci-github-20260920.json",
-    "evidence/receipts/portable-userspace-install-20260921.json",
-    "evidence/receipts/foundation-native-20260920.json"
+    "evidence/receipts/vllm-compatibility.json",
+    "evidence/receipts/desktop-direct-rag.json",
+    "evidence/receipts/native-rag.json"
    ],
-   "key": "c10",
-   "name": "RTK",
-   "repository": "https://github.com/rtk-ai/rtk",
-   "why_not_default": "It compacts CLI output; it does not retrieve knowledge. native-token-ci-github-20260920.json shows `rtk proxy` stdout with the same raw hash as plain git, and a gain ledger going from 0 to 3 commands and 6 estimated tokens. In portable-userspace-install-20260921.json, attempt 05 failed extraction under root mapping and a later unprivileged run passed. foundation-native-20260920.json records a failed compression-preview fidelity check."
-  },
-  {
-   "disposition": "measured_tradeoff",
-   "evidence_class": "local_integration",
-   "evidence_refs": [
-    "docs/token-efficiency-stack.md",
-    "catalogs/us-equities/foundation-memory.json",
-    "evidence/receipts/foundation-native-20260920.json"
-   ],
-   "key": "c3",
-   "name": "Headroom",
-   "repository": "https://github.com/headroomlabs-ai/headroom",
-   "why_not_default": "It compresses context; it is not a retrieval store, and the catalog decision is 'alternative'. docs/token-efficiency-stack.md line 37 records a clean-prefix trial of 9,616->2,128 estimated tokens with exact recovery. Line 140 records that compression plus full recovery grew 5,105->18,777. The default ledger shows 0 saved, and the proxy/SDK path is unexecuted."
+   "key": "c4",
+   "name": "vllm",
+   "repository": "https://github.com/vllm-project/vllm",
+   "why_not_default": "It is the embedding runtime that supports the SocratiCode winner, not a worker or retrieval lane. evidence/receipts/vllm-compatibility.json records latest 0.29.0 installing but failing GPU startup with 'RuntimeError: UVA is not available'. Active 0.25.0 was restored. The failure is host-specific. evidence/receipts/desktop-direct-rag.json shows active_model_service_version 0.25.0. No serving benchmark exists."
   },
   {
    "disposition": "conditional",
-   "evidence_class": "source_review",
+   "evidence_class": "native_proven",
    "evidence_refs": [
-    "catalogs/us-equities/foundation-memory.json"
+    "blueprints/us-equities/routing/astra-receipt.json",
+    "blueprints/us-equities/routing/README.md",
+    "blueprints/us-equities/routing/health-receipt.json"
    ],
    "key": "c6",
-   "name": "Docling",
-   "repository": "https://github.com/docling-project/docling",
-   "why_not_default": "Source review only; the catalog marks it 'conditional'. It is the relevant ingestion candidate for the uncovered dated-financial-source gap (filing PDFs), but no install, run or table/unit extraction quality is recorded."
+   "name": "omniroute",
+   "repository": "https://github.com/diegosouzapw/OmniRoute",
+   "why_not_default": "blueprints/us-equities/routing/astra-receipt.json records three attempts. The first returned HTTP 400 ('requires a newer version of Codex'). The second ended with gateway 499 and no provider usage reported. After client-version alignment, one two-sentence text request completed using 136 tokens. blueprints/us-equities/routing/README.md says tools, compaction, deferred tools, full context and worker parity are still unproved. health-receipt.json is a status-only HTTP 200. It is an optional gateway, not a demonstrated worker substitute."
   },
   {
    "disposition": "conditional",
-   "evidence_class": "source_review",
+   "evidence_class": "native_proven",
    "evidence_refs": [
-    "catalogs/us-equities/foundation-memory.json"
-   ],
-   "key": "c14",
-   "name": "Haystack",
-   "repository": "https://github.com/deepset-ai/haystack",
-   "why_not_default": "Source review only. The catalog records 'No financial corpus pipeline or performance proof yet' (foundation-memory.json line 975). It would add a framework without a measured gain."
-  },
-  {
-   "disposition": "unqualified",
-   "evidence_class": "source_review",
-   "evidence_refs": [
-    "catalogs/us-equities/foundation-memory.json"
-   ],
-   "key": "c12",
-   "name": "LlamaIndex",
-   "repository": "https://github.com/run-llama/llama_index",
-   "why_not_default": "Source review only; the catalog marks it 'alternative'. Integration maintenance needs reassessment (foundation-memory.json line 1012), and no local execution is recorded."
-  },
-  {
-   "disposition": "unqualified",
-   "evidence_class": "source_review",
-   "evidence_refs": [
-    "docs/candidate-quality-review-20260921.md",
-    "catalogs/landscape/candidate-quality-review.json",
-    "catalogs/us-equities/foundation-memory.json"
-   ],
-   "key": "c18",
-   "name": "Hindsight",
-   "repository": "https://github.com/vectorize-io/hindsight",
-   "why_not_default": "It is named a 'Priority challenger' (docs/candidate-quality-review-20260921.md line 65), but its only evidence is a pinned source review: no install, no matched recall comparison, no recovery acceptance. Retention and reflection need a model."
-  },
-  {
-   "disposition": "conditional",
-   "evidence_class": "source_review",
-   "evidence_refs": [
-    "catalogs/landscape/candidate-quality-review.json",
-    "docs/candidate-quality-review-20260921.md"
+    "evidence/receipts/portable-cli-artifacts.json",
+    "evidence/receipts/component-history.json"
    ],
    "key": "c8",
-   "name": "Basic Memory",
-   "repository": "https://github.com/basicmachines-co/basic-memory",
-   "why_not_default": "It is a priority challenger, with 'Pinned source review only ... no new install, upstream test execution, native model operation, matched answer-quality comparison or recovery acceptance' (candidate-quality-review.json line 442). AGPL fit is unreviewed."
+   "name": "foundation-repomix",
+   "repository": "https://github.com/yamadashy/repomix",
+   "why_not_default": "evidence/receipts/portable-cli-artifacts.json shows a native CLI pack of two fixture files with exit 0. evidence/receipts/component-history.json (line 212) records one root pack/full/outline comparison that went from 3679 to 645 o200k tokens and was lossy. Native Claude and native Codex use is recorded as 'not independently demonstrated'. The card says compression is not adequate evidence of correctness. The pin (v1.18.0) is behind upstream (v1.18.1)."
   },
   {
    "disposition": "overlap",
-   "evidence_class": "source_review",
+   "evidence_class": "native_proven",
    "evidence_refs": [
-    "catalogs/us-equities/foundation-memory.json",
-    "catalogs/landscape/candidate-quality-review.json",
-    "docs/candidate-quality-review-20260921.md"
+    "evidence/receipts/native-context-memory.json",
+    "evidence/receipts/component-history.json"
    ],
-   "key": "c15",
-   "name": "Claude-mem",
-   "repository": "https://github.com/thedotmack/claude-mem",
-   "why_not_default": "It overlaps the ai-memory cross-harness capture, and the docs advise against running overlapping stores. Source review only. The online observer flow documents a 30-day trial (foundation-memory.json lines 649 and 672)."
+   "key": "c9",
+   "name": "Serena",
+   "repository": "https://github.com/oraios/serena",
+   "why_not_default": "evidence/receipts/native-context-memory.json records completed historical Codex find_symbol and find_referencing_symbols calls, but no returned result. evidence/receipts/component-history.json (lines 98-104) says native Claude retrieved a symbol and 3 references. It labels that inventory a provenance statement, not a new live test. Serena is a complementary exact-symbol lane; it does not replace durable memory or conceptual retrieval. Its cross-client evidence is weaker than c12's identical two-client result. The installed version is 2.0.0.dev0 @ c6fbd1c5, not the packet pin v1.7.0. No retrieval-quality measurement exists."
   },
   {
    "disposition": "unqualified",
    "evidence_class": "source_review",
-   "evidence_refs": [
-    "catalogs/us-equities/foundation-memory.json",
-    "catalogs/landscape/candidate-quality-review.json",
-    "docs/candidate-quality-review-20260921.md"
-   ],
-   "key": "c16",
-   "name": "Letta Code",
-   "repository": "https://github.com/letta-ai/letta-code",
-   "why_not_default": "It is a separate stateful harness, 'not a transparent memory plugin for Codex/Claude' (foundation-memory.json line 937). Source review only."
+   "evidence_refs": [],
+   "key": "c10",
+   "name": "foundation-pgvector",
+   "repository": "https://github.com/pgvector/pgvector",
+   "why_not_default": "The evidence is source review of the upstream README only. The card says a build is not database-extension activation. It also says pgvector adds no benefit over the current Qdrant index unless an SQL integration need is established. No local execution is retained."
   },
   {
    "disposition": "conditional",
-   "evidence_class": "source_review",
+   "evidence_class": "native_proven",
    "evidence_refs": [
-    "catalogs/us-equities/foundation-memory.json",
-    "catalogs/landscape/candidate-quality-review.json",
-    "docs/candidate-quality-review-20260921.md"
+    "blueprints/us-equities/workers/receipt.json",
+    "observability/restart-receipt.json",
+    "evidence/receipts/native-context-memory.json",
+    "evidence/receipts/artifact-reductions.json",
+    "evidence/receipts/component-history.json"
    ],
-   "key": "c17",
-   "name": "Supermemory",
-   "repository": "https://github.com/supermemoryai/supermemory",
-   "why_not_default": "Source review only; the catalog says it is not installed and duplicate automatic capture should be avoided. Local startup can print a generated API key. Export/restore and isolation are unqualified."
+   "key": "c11",
+   "name": "Context Mode",
+   "repository": "https://github.com/mksglu/context-mode",
+   "why_not_default": "In blueprints/us-equities/workers/receipt.json, ctx_execute completed but ctx_execute_file failed three times. The failures came first from the project-root restriction, then from approval policy 'never' (line 196). That left 2 extraction tasks blocked. observability/restart-receipt.json exposes 11 tools and reports estimated_tokens_saved 0 at the snapshot. evidence/receipts/native-context-memory.json records native calls that passed. It is a tool-output lane, and its file extraction inside the SDK worker is still blocked."
   },
   {
-   "disposition": "conditional",
-   "evidence_class": "source_review",
+   "disposition": "overlap",
+   "evidence_class": "native_proven",
    "evidence_refs": [
-    "catalogs/us-equities/foundation-memory.json",
-    "catalogs/landscape/candidate-quality-review.json",
-    "docs/candidate-quality-review-20260921.md"
+    "evidence/receipts/native-context-memory.json",
+    "evidence/receipts/artifact-reductions.json",
+    "evidence/receipts/component-history.json"
    ],
-   "key": "c20",
-   "name": "OpenViking",
-   "repository": "https://github.com/volcengine/openviking",
-   "why_not_default": "Source review only: 'No migration from ai-memory or measured token improvement performed'. The server is AGPL from v0.3, and it needs embedding and VLM configuration."
+   "key": "c13",
+   "name": "RTK",
+   "repository": "https://github.com/rtk-ai/rtk",
+   "why_not_default": "It is a tool-output compaction lane, not a worker or memory layer. evidence/receipts/artifact-reductions.json records a historical rtk artifact reduced from 533 to 176 tokens (66.98%). evidence/receipts/component-history.json says automatic RTK in Codex was not established, and short native Claude commands showed zero estimated reduction. These counters are estimates, not provider savings."
   },
   {
-   "disposition": "conditional",
-   "evidence_class": "source_review",
+   "disposition": "overlap",
+   "evidence_class": "native_proven",
    "evidence_refs": [
-    "catalogs/us-equities/foundation-memory.json",
-    "catalogs/landscape/candidate-quality-review.json",
-    "docs/candidate-quality-review-20260921.md"
+    "evidence/receipts/native-cli-gaps.json",
+    "evidence/receipts/desktop-cli-workflows.json",
+    "evidence/receipts/component-history.json"
    ],
-   "key": "c21",
+   "key": "c14",
+   "name": "foundation-codebase-memory-mcp",
+   "repository": "https://github.com/DeusData/codebase-memory-mcp",
+   "why_not_default": "evidence/receipts/native-cli-gaps.json records Claude running search_graph and trace_path through the mcporter CLI bridge. evidence/receipts/desktop-cli-workflows.json records a static graph search and trace in the Codex Desktop task. evidence/receipts/component-history.json records direct native_claude and native_codex use as 'not independently demonstrated'. It is a static-graph fallback that overlaps Serena and SocratiCode. No quality measurement exists."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [],
+   "key": "c15",
    "name": "Graphiti",
    "repository": "https://github.com/getzep/graphiti",
-   "why_not_default": "A temporal-graph candidate for issuer relations with 'no graph deployment or extraction accuracy proof here'. It needs a Neo4j/FalkorDB backend and an LLM, and it cannot invent historical source availability."
+   "why_not_default": "The evidence is source review of the upstream README and release only. The card says there is no graph deployment and no extraction-accuracy proof, and that the default examples need model API credentials."
+  },
+  {
+   "disposition": "overlap",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "evidence/receipts/native-rag.json",
+    "evidence/receipts/component-history.json"
+   ],
+   "key": "c16",
+   "name": "Qdrant",
+   "repository": "https://github.com/qdrant/qdrant",
+   "why_not_default": "It is the vector store behind the SocratiCode winner. evidence/receipts/native-rag.json shows collection status green with persisted add/update/delete. It has no independent retrieval role, and the card says there is no financial-document corpus yet."
   },
   {
    "disposition": "conditional",
-   "evidence_class": "source_review",
+   "evidence_class": "native_proven",
    "evidence_refs": [
-    "catalogs/us-equities/foundation-memory.json",
-    "catalogs/landscape/candidate-quality-review.json",
-    "docs/candidate-quality-review-20260921.md"
+    "blueprints/us-equities/deerflow/native-receipt.json",
+    "blueprints/us-equities/deerflow/research-receipt.json",
+    "blueprints/us-equities/deerflow/README.md"
    ],
-   "key": "c7",
-   "name": "Cognee",
-   "repository": "https://github.com/topoteretes/cognee",
-   "why_not_default": "A source-review-only research-corpus candidate. Its default LLM example uses OpenAI, and its OSS PostgreSQL graph store is described as a demo (foundation-memory.json line 559)."
+   "key": "c19",
+   "name": "codex-acp",
+   "repository": "https://github.com/agentclientprotocol/codex-acp",
+   "why_not_default": "blueprints/us-equities/deerflow/native-receipt.json covers discovery only, with no prompt. blueprints/us-equities/deerflow/research-receipt.json records one completed ACP prompt that returned the correct facts (3943/3/0/23) with 42345 cumulative tokens and 0 blocked tasks. Its ACP 'read-only' mode maps to a workspaceWrite sandbox with approvalPolicy on-request, and strict filesystem read-only enforcement is not established (research-receipt.json line 13). The direction to use the official SDK worker (c20) when read-only enforcement is required comes from blueprints/us-equities/deerflow/README.md lines 24-25 and 133, not from the receipts. That run read files with head -c rather than through Context Mode, so it is not a matched comparison with c20. It is an adapter over the same native Codex backend."
   },
   {
    "disposition": "conditional",
-   "evidence_class": "source_review",
+   "evidence_class": "native_proven",
    "evidence_refs": [
-    "catalogs/us-equities/foundation-memory.json",
-    "docs/candidate-quality-review-20260921.md"
+    "blueprints/us-equities/deerflow/research-receipt.json",
+    "blueprints/us-equities/deerflow/native-receipt.json",
+    "blueprints/us-equities/deerflow/README.md"
    ],
-   "key": "c5",
-   "name": "Mem0",
-   "repository": "https://github.com/mem0ai/mem0",
-   "why_not_default": "Not adopted. Source review only: 'no local financial-memory quality or savings evaluation', and extraction adds model calls. There is no evidence it fits better than ai-memory."
+   "key": "c21",
+   "name": "deerflow",
+   "repository": "https://github.com/bytedance/deer-flow",
+   "why_not_default": "blueprints/us-equities/deerflow/research-receipt.json records one embedded invoke_acp_agent call that returned correct counts. The call was not a planner, UI, scheduler or hosted service, and DeerFlow discarded the ACP usage. It ran on a development commit (2.1.0-rc0), not stable v2.0.0. blueprints/us-equities/deerflow/native-receipt.json covers discovery and health with memory and scheduling disabled. blueprints/us-equities/deerflow/README.md (lines 19-28) says not to adopt the ACP profile as a protected unattended worker."
   },
   {
    "disposition": "unqualified",
    "evidence_class": "source_review",
-   "evidence_refs": [
-    "catalogs/us-equities/foundation-memory.json"
-   ],
-   "key": "c4",
-   "name": "LightRAG",
-   "repository": "https://github.com/hkuds/lightrag",
-   "why_not_default": "Not adopted. Source review only. The catalog says graph retrieval is not automatically more accurate or cheaper than lexical+dense search, and no filing comparison has been run."
+   "evidence_refs": [],
+   "key": "c22",
+   "name": "foundation-agent-retrieval-bench",
+   "repository": "https://github.com/eyuansu62/agent-retrieval-bench",
+   "why_not_default": "The evidence is source review only. The card says no benchmark was downloaded or evaluated, and its 427 examples are not a financial-document benchmark. It is an evaluation harness, not a lane."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [],
+   "key": "c5",
+   "name": "loopx-project/loopx",
+   "repository": "https://github.com/loopx-project/loopx",
+   "why_not_default": "It is a non-adopted newcomer with no retained evidence refs. Its note only describes the qualifying test: restart and quota survival compared with the current coordinator."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [],
+   "key": "c17",
+   "name": "gastownhall/beads",
+   "repository": "https://github.com/gastownhall/beads",
+   "why_not_default": "It is a non-adopted newcomer with no retained evidence refs in this packet. There is no measured reduction in rework against the current coordinator."
+  },
+  {
+   "disposition": "out_of_scope",
+   "evidence_class": "source_review",
+   "evidence_refs": [],
+   "key": "c18",
+   "name": "jdx/mise",
+   "repository": "https://github.com/jdx/mise",
+   "why_not_default": "It is a non-adopted newcomer with no retained evidence. It covers runtime and toolchain reproduction, not agents, models or workers."
   }
  ],
  "catalog": "us-equities",
@@ -231,83 +219,88 @@
  "lane": "claude",
  "layer_id": "agents-models-workers",
  "limits": [
-  "I could not run commands. Nothing was re-executed; every result is from retained receipts, and the proposed baseline rerun has not been performed.",
-  "External raw.githubusercontent.com README evidence was not fetched; upstream claims are unverified.",
-  "Catalog-cited receipts that were not opened: artifact-reductions.json, component-history.json, vllm-compatibility.json and native-cli-gaps.json. native-context-memory.json was opened in this revision (lines 1-80 only).",
-  "Private raw artifacts are represented only by sha256 provenance; I could not verify them.",
-  "No TypeSafe inference results were supplied. All dispositions are my own source review; the packet withheld prior provider decisions, and none are retained. The refuter findings were verified against the cited lines before adoption: the challenger's Serena finding was accepted, and the evidence lens's harness and layer findings were accepted.",
-  "Skill path: <host-path>/SKILL.md (in context). The actual runtime model is claude-opus-5-5[1m] (Opus 5.5). The model field copies the task's fixed value, claude-opus-5/high."
+  "I could not fetch the upstream URL evidence refs for c2 PageIndex, c3 LangGraph, c10 pgvector, c15 Graphiti or c22 agent-retrieval-bench. Their dispositions rest on the packet's card text only, and those source-review claims are unverified.",
+  "I could not run commands. The overturn scripts are confirmed to exist. Their required arguments were taken from argparse greps and from the retained receipt/README command lines, but the scripts were not executed.",
+  "I read the large receipts in bounded sections (component-history, native-context-memory, astra-receipt, restart-receipt, research-receipt, portable-cli-artifacts). I read native-cli-gaps.json, desktop-cli-workflows.json and native_worker.py by grep only.",
+  "The private raw logs are referenced only by sha256 fingerprints and are not distributed. I could not check the public selected fields against them.",
+  "Revision round: I corrected the blocking c19 citation. The instruction to use the SDK for enforced read-only comes from deerflow/README.md lines 24-25 and 133, not from the receipts. I also corrected the overturn commands to use the documented interpreters and arguments, narrowed the dating claim, and added c20's read-only caveats. The refuter findings were treated as evidence and re-checked against the files.",
+  "The coordinator supplied no TypeSafe inference results, so there are no retained provider judgments. All judgments here are my own source review. The TypeSafe skill body was in context from <host-path>/SKILL.md.",
+  "The model field is the fixed packet value (opus/high). The client reports the actual model as claude-opus-5-5[1m]."
  ],
  "model": {
   "effort": "high",
   "name": "claude-opus-5-5"
  },
  "open_gaps": [
-  "The packet's label does not match its content. layer_id is 'agents-models-workers', but the requirement and all 21 candidates come from the foundation-memory group (packet lines 518-519; limitation line 526: foundation-memory, 28 entries, was chosen over agents-operations, 10, by entry count). The winners are memory, retrieval and code-retrieval tools. They must not be published as the agent/model/worker selection. codex-native-sdk, vllm, codex-acp, deerflow, langgraph, omniroute and others appear only in sota_components_not_in_candidates and remain unjudged by this verdict.",
-  "Dated financial sources are not covered by any winner. No filing corpus is indexed, and dated-source as-of retrieval has not been exercised. QMD's SEC-cutoff hit is a policy document (retrieval-evaluation/receipt.json; foundation-memory.json line 1048).",
-  "No held-out, multi-arm retrieval harness exists. run-bm25.mjs is locked to the frozen 12-query fixture, QMD 2.8.3 and BM25, so no challenger comparison is currently runnable.",
-  "No matched head-to-head was run between any winner and any alternative. A source-only candidate has not failed.",
-  "The only retrieval-quality measurement covers 12 curated queries, BM25 only, with 8/12 recall@3 and 4 misses. It is not an independent holdout and not answer accuracy.",
-  "Serena has no recall or quality-rate measurement. Its evidence is eight pass/fail exact-match checks. SocratiCode has no quality measurement either, so the Serena-over-SocratiCode choice rests on the requirement's wording and the catalog roles, not on a measured comparison.",
-  "Serena's installed version, 2.0.0.dev0 @ c6fbd1c, differs from the v1.7.0 pin (foundation-memory.json lines 245 and 251). An already-loaded Desktop connection does not reload its language settings (foundation-native-20260920.json line 33). Serena has no restore or watcher-freshness evidence.",
-  "Restore evidence for ai-memory and Qdrant is same-host only, with no off-host durability, key escrow or new-host client rebinding. The Qdrant restore is not a SocratiCode MCP rebinding test.",
-  "The ai-memory pin, v2.3.1, is behind upstream v2.4.0, and the receipts record 2.3.2 against the catalog's 2.3.1."
+  "No measured head-to-head comparison exists between the worker backends (codex-native-sdk, DeerFlow/codex-acp, OmniRoute). Each ran separately on a different task. The c19+c21 run returned the same facts in 1 of 1 tasks, with 0 blocked and 42345 cumulative tokens. c20 used 135311 tokens (204091 across all three turns). c19 read files with head -c, while c20's task required Context Mode extraction, so the numbers are not comparable.",
+  "The codex-native-sdk worker completed 1 research task. 2 follow-up extraction tasks were blocked, first by the Context Mode ctx_execute_file project-root restriction, then by the worker's own deny_all approval mode ('approval policy is \"never\"', workers/receipt.json line 196). For c20, strict read-only and unblocked extraction currently pull against each other. The turn deadline is neither a process timeout nor a spending cap.",
+  "c20's read-only filesystem mode does not restrict external MCP mutations (workers/receipt.json line 110). The recorded environment supplied no broker keys or broker tools.",
+  "The configured model/provider identity in the worker, ACP and OmniRoute receipts is not independent per-request provider attestation.",
+  "Retrieval quality rests on a single limit-1 query (score 0.6429) in native-rag.json. That is not a holdout or recall measurement. The group's 8/12 exact-source recall figure comes from the packet limitations, not from a file I opened.",
+  "Retrieval of dated financial sources is not established. The Qdrant/SocratiCode receipts record no financial-document corpus.",
+  "ai-memory has automatic briefing, embedding and LLM consolidation disabled, and there is no historical backfill. Its pin (v2.3.1) is behind upstream (v2.4.0).",
+  "The winners' native receipts are dated 2026-09-19 and were not re-executed now. desktop-direct-rag.json carries no date. Current quota and readiness are not established.",
+  "No token-savings claim is supported. Artifact reductions are lossy selections, not provider savings."
  ],
  "overturn_protocol": {
   "arms": [
-   "ai-memory v2.3.x (current)",
-   "Hindsight",
-   "Basic Memory",
-   "Serena exact-symbol lane (current)",
-   "SocratiCode + Qdrant conceptual lane",
-   "QMD BM25 (current baseline 8/12 recall@3)",
-   "QMD hybrid/semantic"
+   "c20 codex-native-sdk worker (Sandbox.read_only, ApprovalMode.deny_all)",
+   "c21+c19 DeerFlow invoke_acp_agent via codex-acp",
+   "c6 OmniRoute explicit route",
+   "c7 ai-memory + c12 SocratiCode retrieval vs c9 Serena / c14 codebase-memory-mcp / c10 pgvector / c2 PageIndex / c15 Graphiti"
   ],
   "fixture_paths": [
-   "blueprints/us-equities/retrieval-evaluation/fixture.json",
-   "blueprints/us-equities/retrieval-evaluation/run-bm25.mjs",
-   "blueprints/us-equities/state-recovery/memory/receipt.json",
-   "blueprints/us-equities/state-recovery/qdrant/receipt.json"
+   "blueprints/us-equities/workers/native_worker.py",
+   "blueprints/us-equities/deerflow/native-research.py",
+   "blueprints/us-equities/routing/omniroute-astra.py",
+   "blueprints/us-equities/workers/policy.md",
+   "tests/test_native_worker_fixture.py"
   ],
-  "metric": "Baseline: reproduction of the frozen QMD BM25 result (exact recall@3 8/12, MRR 0.56875) with run-bm25.mjs. Challengers: on a new held-out set with its own hash, frozen before running (the harness does not yet exist), measure exact intended-source recall@3 and MRR, answer fidelity with citations, correct abstention, project-isolation violations (must be 0) and restore equivalence, at a matched context budget, with measured provider and infrastructure cost reported separately."
+  "metric": "For each arm, on identical frozen inputs with the same file-extraction method: exact returned-fact correctness against the receipt ground truth (3943/3/0/23); completed vs blocked tasks; the sandbox and approval mode actually enforced; native total, cached and failed-attempt usage, each counted once. For retrieval arms: exact-source recall@3 and abstention on a held-out code/financial query set at a matched context budget."
  },
- "overturn_when": "Only one retained check is runnable today: the frozen QMD baseline, `CI=true node blueprints/us-equities/retrieval-evaluation/run-bm25.mjs --package $QMD_PACKAGE --snapshot <new private dir>/catalog-snapshot.sqlite --fixture blueprints/us-equities/retrieval-evaluation/fixture.json --output <new path>` (README.md line 125). The script accepts only the reviewed 12-query us-equities-foundation fixture, QMD 2.8.3 and the bm25 backend (run-bm25.mjs lines 23, 26-27 and 39). The QMD lane verdict changes if that rerun exits with status retrieval_execution_error or no longer reproduces exact recall@3 8/12 and MRR 0.56875 against the recorded fixture_sha256.\n\nNo runnable challenger comparison exists yet. A challenger can only overturn a winner after a new harness is built and executed. It needs a separate held-out fixture with its own hash, frozen before running, with fixed relevance judgments over financial filings, code and project memory (README.md lines 92-95). Each arm runs at the same context budget. The verdict changes if a challenger improves exact-source recall@3/MRR, answer fidelity and abstention at equal or lower measured cost. It must also keep zero project-isolation violations, native Codex/Claude behavior and encrypted restore equivalence, following the blueprints/us-equities/state-recovery/memory/receipt.json pattern.\n\nChallenger pairings: Hindsight and Basic Memory against ai-memory; SocratiCode against Serena on exact-symbol recovery; hybrid QMD against BM25 QMD. The Serena selection also changes if a rerun of its eight fresh-context symbol/source/reference checks no longer matches exact source.",
- "packet_sha256": "2342c9594122e5eddeabfe706f5ed9725c7d709b4c9e7b47d8922e5dac8b8259",
+ "overturn_when": "Run a preregistered same-task comparison on the same frozen public receipts, with a matched budget and the documented interpreters and required arguments. The three arms are:\n- c20: \"$SDK_ENV/bin/python\" blueprints/us-equities/workers/native_worker.py run --codex-bin --codex-home --workspace --receipt --prompt --deadline-seconds 180 (the command at blueprints/us-equities/workers/receipt.json line 106).\n- DeerFlow via codex-acp: \"$DEERFLOW_HOME/backend/.venv/bin/python\" blueprints/us-equities/deerflow/native-research.py --node --adapter --codex-bin --codex-home --state-dir --readiness (the command at blueprints/us-equities/deerflow/research-receipt.json line 47).\n- OmniRoute: \"$WORKER_PYTHON\" blueprints/us-equities/routing/omniroute-astra.py --base-url http://127.0.0.1:20128/v1 --output-dir (routing/README.md lines 74-78).\n\nEvery arm must use the same file-extraction method. Replace or supplement c20 if another arm returns the same facts while completing more tasks, blocking fewer extractions, enforcing a strict read-only filesystem and using fewer total and failed-attempt tokens.\n\nReplace or supplement c7 or c12 if a held-out code/financial-source retrieval set, run at the same context budget, shows a candidate with better exact-source recall, abstention and source recovery. The retrieval candidates are Serena, codebase-memory-mcp, pgvector, PageIndex and Graphiti.",
+ "packet_sha256": "0594bcc49721f0e023de97be5e7e07e5ab06a7d1040709102720e8beb8009108",
  "schema_version": 1,
  "sources_read": [
-  "<host-path>/us-equities__agents-models-workers.json (lines 28-57, 180-206, 515-534, key/adopted grep)",
-  "catalogs/us-equities/foundation-memory.json (lines 1-260, 332-370, 411-570, 642-761, 906-1175, 1361-1399)",
+  "<host-path>/us-equities__agents-models-workers.json",
+  "blueprints/us-equities/workers/receipt.json",
+  "blueprints/us-equities/workers/policy.md",
   "evidence/receipts/native-memory.json",
-  "evidence/receipts/native-rag.json (lines 25-139 re-read)",
+  "evidence/receipts/native-rag.json",
   "evidence/receipts/desktop-direct-rag.json",
-  "evidence/receipts/native-context-memory.json (lines 1-80)",
-  "evidence/receipts/foundation-native-20260920.json (lines 1-130, 380-440, lines 66-85 re-read, serena grep)",
-  "evidence/receipts/native-token-ci-github-20260920.json (lines 1-12, 250-364 plus grep)",
-  "evidence/receipts/portable-userspace-install-20260921.json (lines 1-175)",
-  "blueprints/us-equities/state-recovery/qdrant/receipt.json (lines 20-61 re-read)",
-  "blueprints/us-equities/state-recovery/memory/receipt.json",
-  "blueprints/us-equities/retrieval-evaluation/receipt.json",
-  "blueprints/us-equities/retrieval-evaluation/README.md (lines 80-127)",
-  "blueprints/us-equities/retrieval-evaluation/run-bm25.mjs (full)",
-  "docs/token-efficiency-stack.md (lines 25-44, 130-149)",
-  "docs/candidate-quality-review-20260921.md (lines 50-119)",
-  "catalogs/landscape/candidate-quality-review.json (lines 373-502 plus disposition grep)",
-  "evidence/artifacts/catalog-quality-review-20260921/sources.json (grep count only)"
+  "evidence/receipts/artifact-reductions.json",
+  "evidence/receipts/native-context-memory.json (lines 1-160)",
+  "evidence/receipts/component-history.json (lines 40-139, 200-264, 478-552 plus id grep)",
+  "evidence/receipts/portable-cli-artifacts.json (lines 1-120)",
+  "evidence/receipts/vllm-compatibility.json",
+  "evidence/receipts/native-cli-gaps.json (grep)",
+  "evidence/receipts/desktop-cli-workflows.json (grep)",
+  "observability/restart-receipt.json (lines 1-80)",
+  "blueprints/us-equities/routing/README.md (lines 1-120)",
+  "blueprints/us-equities/routing/health-receipt.json",
+  "blueprints/us-equities/routing/astra-receipt.json (lines 1-100)",
+  "blueprints/us-equities/routing/omniroute-astra.py (grep for required args)",
+  "blueprints/us-equities/deerflow/native-receipt.json",
+  "blueprints/us-equities/deerflow/research-receipt.json (lines 1-150 plus command grep)",
+  "blueprints/us-equities/deerflow/README.md (lines 17-28 plus grep for official SDK/read-only)",
+  "blueprints/us-equities/deerflow/native-research.py (grep for required args)",
+  "blueprints/us-equities/workers/native_worker.py (existence via refuter paths; command taken from receipt line 106)",
+  "tests/test_native_worker_fixture.py"
  ],
- "why_selected": "This verdict is my own source review of the retained receipts. No TypeSafe inference results were supplied, and the packet withholds prior provider decisions.\n\nThe packet requirement (line 528) reads: 'Keep durable project knowledge, exact code and dated financial sources retrievable across native clients, with source recovery, explicit project scope and measurable retrieval quality.'\n\nRevision: Serena (c9) replaces SocratiCode (c2) in the code slot. The requirement says 'exact code'. My earlier paraphrase, 'exact/conceptual', was not in the requirement. The catalog assigns exact symbol bodies and references to Serena (foundation-memory.json lines 221-223) and conceptual search to SocratiCode (lines 178-180).\n\n(1) ai-memory (c19), durable project knowledge. In evidence/receipts/native-memory.json, native Codex 0.155.1 and Claude 2.1.277 each exited 0 after retrieving the same scoped durable page, and cross_client_handoff_received=true. In blueprints/us-equities/state-recovery/memory/receipt.json, an encrypted same-host Restic restore passed: 324 files, integrity_check ok, all 56 table counts matched. In evidence/receipts/foundation-native-20260920.json (memory_rag.ai_memory), scoped status, query and page retrieval passed.\n\n(2) Serena (c9), exact code with source recovery. In foundation-native-20260920.json line 80, eight symbol/source/reference checks passed across fresh codex and claude-code MCP server contexts, and the exact Python parse_codex and CJS collect[0] source matched. That is native execution with exact-source equivalence in both clients.\n\n(3) QMD (c13), measurable retrieval quality. It is the only candidate with a measured retrieval-quality result. In blueprints/us-equities/retrieval-evaluation/receipt.json, the pinned upstream runBenchmark API ran BM25-only over 12 frozen queries: exact recall@3 8/12, recall@1 5/12, MRR 0.56875, 4 misses retained, 0 model calls.\n\nThe 'dated financial sources' part is not covered by any winner on the evidence. QMD's rank-1 hit for the SEC-cutoff query is a project policy document (financial-data/README.md), not a dated filing. foundation-memory.json line 1048 notes that installed code search does not imply a financial-document corpus exists.\n\nThese are the best-evidenced lanes, not a measured head-to-head winner set; no alternative ran on the same fixture.",
+ "why_selected": "I judged this from source review of retained receipts, against the layer title 'Agents, models and workers' and its scope terms (native-workers, sdk, durable-memory, handoff, code-retrieval). I did not observe any of these runs happening now. The native-execution receipts for the three winners are dated 2026-09-19 (workers/receipt.json line 3, native-memory.json line 5, native-rag.json line 5). desktop-direct-rag.json has no date field. artifact-reductions.json is an artifact measurement with 0 model requests, not a native execution.\n\n(1) c20 codex-native-sdk. blueprints/us-equities/workers/receipt.json records one native run with status \"completed\": configured_model gpt-6-astra, duration_ms 58410, totalTokens 135311. It returned the exact engine and DeerFlow facts: 3943 data points, 3 simulated orders, 0 failed data requests, 23 skills. Across all three native turns, 1 research task succeeded and 2 file-extraction tasks were blocked, with totalTokens 204091 (lines 215-219). blueprints/us-equities/workers/policy.md holds the research-worker policy: no orders or credential stores, one retrieval lane per artifact, and usage reported only when returned. It is the only adopted candidate that ran a native worker model through the official SDK with an explicit read_only sandbox.\n\n(2) c7 ai-memory. evidence/receipts/native-memory.json records both native clients retrieving the same scoped durable page. Codex 0.155.1 returned exit_code 0 with 8 observations. Claude 2.1.277 returned 9 observations, cross_client_handoff_received true, using explicit workspace/project scope. evidence/receipts/desktop-direct-rag.json records a direct Desktop read that the receipt labels coordinator-observed.\n\n(3) c12 SocratiCode. evidence/receipts/native-rag.json records both native clients returning the identical result for one limit-1 query: tools/ecosystem/linux-usage-report.cjs lines 2-39, score 0.6429. The index held 35 files and 139 chunks, collection status green, with real 2048-dimension local embeddings. Automatic add/update/delete watching took about 3.0 s per phase. evidence/receipts/artifact-reductions.json measures an exact artifact selection of 2731 to 491 o200k tokens. It says this is not provider savings or a retrieval-quality score.\n\nThe winner set's weakest class is native_proven. It covers workers, durable cross-client memory and exact-scope code retrieval. It is not a measured comparison against the alternatives.",
  "winner_evidence_class": "native_proven",
  "winner_evidence_refs": [
+  "blueprints/us-equities/workers/receipt.json",
+  "blueprints/us-equities/workers/policy.md",
   "evidence/receipts/native-memory.json",
-  "blueprints/us-equities/state-recovery/memory/receipt.json",
-  "evidence/receipts/foundation-native-20260920.json",
-  "evidence/receipts/native-context-memory.json",
-  "blueprints/us-equities/retrieval-evaluation/receipt.json",
-  "blueprints/us-equities/retrieval-evaluation/README.md",
-  "catalogs/us-equities/foundation-memory.json"
+  "evidence/receipts/desktop-direct-rag.json",
+  "evidence/receipts/native-rag.json",
+  "evidence/receipts/artifact-reductions.json",
+  "evidence/receipts/component-history.json"
  ],
  "winner_keys": [
-  "c19",
-  "c9",
-  "c13"
+  "c20",
+  "c7",
+  "c12"
  ]
 }

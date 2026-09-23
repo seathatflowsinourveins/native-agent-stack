@@ -78,6 +78,26 @@ WITHHELD = ["current_choice", "decision", "rationale", "candidates[].disposition
 # sota_components_not_in_candidates).
 MANIFEST_FIELDS = ("repository", "pin", "upstream", "review_status", "pin_behind_upstream")
 DECISION_FIELDS = ("id", "capability", "selection", "review_status", "evidence_scope", "limitations", "next_gap")
+# --trading-candidates manifest: the four domain catalog cards that every trading entry of the
+# sota manifest comes from (read in this order; first card holding an id wins).
+TRADING_CARD_FILES = (
+    "catalogs/us-equities/agents-operations.json", "catalogs/us-equities/data-research.json",
+    "catalogs/us-equities/engines-strategies.json", "catalogs/us-equities/foundation-memory.json",
+)
+CARD_DECISION_ADOPTED = {"default", "conditional"}
+# Manifest review labels are not carried in manifest mode: every label value, including
+# not_individually_reviewed and unmaintained_signal, correlates with the withheld card
+# decision (measured over the 112 2026-09-22 trading entries). pin_behind_upstream stays
+# as its own boolean field and the upstream metadata stays.
+LAYER_REQUIREMENT_NOTE = ("The requirement, limitations and existing_overturn_when text is shared by this layer's "
+                          "group; judge fit against the layer title and layer_scope_terms.")
+MANIFEST_CANDIDATE_SOURCE = "sota_manifest_layer_entries"
+# --withhold-labels: fields whose values track the withheld v1 disposition (measured over the
+# 2026-09-22 foundation packets: candidate review_status confirmed_default and decision selection
+# default occur only on selected candidates; decision review_status accepted_within_scope on 105
+# selected against 6 others). Evidence prose (evidence_scope, limitations, next_gap) stays.
+WITHHELD_DECISION_FIELDS = ("selection", "review_status")
+
 
 RULE_ITEM_RE = re.compile(r"\n(?=\d+\.\s)")
 RULE_PREFIX_RE = re.compile(r"^\d+\.\s*")
@@ -208,9 +228,69 @@ def build_candidate(key: str, v1_candidate: dict, *, slug_index: dict, recipe_ma
     }
 
 
+def trading_cards_by_id(root: Path) -> dict:
+    cards = {}
+    for relative in TRADING_CARD_FILES:
+        for entry in load_json(root / relative).get("entries", []):
+            if isinstance(entry, dict) and entry.get("id") and entry["id"] not in cards:
+                cards[entry["id"]] = entry
+    return cards
+
+
+def manifest_layer_candidates(layer: dict, cards: dict, ledger_names_by_slug: dict,
+                              recipe_map: dict, root: Path) -> list:
+    """Layer-specific trading candidates: the sota manifest's own entries for this
+    layer (adopted when their card decision is default or conditional), then its
+    newcomer candidates and keep-but-compare entries (never adopted). Evidence paths,
+    role and limitations come from the entry's domain catalog card; the card's
+    rationale and decision are withheld like the ledger's. The manifest id is the
+    component id directly, because two entries can share one repository."""
+    candidates = []
+    for entry in layer.get("entries", []):
+        card = cards.get(entry["id"])
+        if card is None:
+            # A missing card would silently turn an incumbent into a non-adopted candidate.
+            raise ValueError(f"manifest trading entry {entry['id']!r} has no domain catalog card")
+        repository = entry.get("repository") or card.get("repository")
+        evidence_refs = list(card.get("evidence_refs") or [])
+        candidates.append({
+            "name": ledger_names_by_slug.get(github_repo_slug(repository) if repository else None) or entry["id"],
+            "repository": repository,
+            "adopted": card.get("decision", entry.get("decision")) in CARD_DECISION_ADOPTED,
+            "evidence_kind": card.get("evidence_level"),
+            "evidence_refs": evidence_refs,
+            "role": card.get("role"),
+            "card_limitations": list(card.get("limitations") or []),
+            "component_id": entry["id"],
+            "pin": entry.get("pin"),
+            "upstream": entry.get("upstream"),
+            "review_status": None,
+            "pin_behind_upstream": entry.get("pin_behind_upstream"),
+            "recipe_ref": resolve_recipe_ref(entry["id"], recipe_map, evidence_refs, root),
+            "decisions": [],
+        })
+    seen = {github_repo_slug(c["repository"]) for c in candidates if c["repository"]}
+    for item in list(layer.get("candidates", [])) + list(layer.get("alternatives_keep_but_compare", [])):
+        repository = item.get("repository")
+        slug = github_repo_slug(repository) if repository else None
+        if not slug or slug in seen:
+            continue
+        seen.add(slug)
+        candidates.append({
+            "name": item.get("name") or item.get("id") or slug, "repository": repository, "adopted": False,
+            "evidence_kind": None, "evidence_refs": [], "role": None,
+            "card_limitations": [], "component_id": None, "pin": None, "upstream": None,
+            "review_status": None, "pin_behind_upstream": None, "newcomer": True,
+            "recipe_ref": None, "decisions": [],
+            "note": item.get("demonstrated_gap") or item.get("comparison_that_would_overturn"),
+        })
+    return candidates
+
+
 def build_packet(row: dict, *, catalog: str, sota_components: list, recipe_map: dict,
                   decisions_by_component: dict, seed: str, checked_at: str, root: Path, rules: list,
-                  catalog_components: list = None) -> dict:
+                  catalog_components: list = None, layer_candidates: list = None,
+                  layer_scope_terms: list = None) -> dict:
     """``sota_components`` is the manifest slice for this ledger layer (it feeds
     ``sota_components_not_in_candidates``); the candidate join runs by repository
     slug against the layer slice first and then the whole catalog
@@ -219,21 +299,28 @@ def build_packet(row: dict, *, catalog: str, sota_components: list, recipe_map: 
     candidate's manifest component can sit under another layer id. The other
     catalog is never consulted."""
     layer_id = row["layer_id"]
-    slug_index = manifest_index_by_slug(list(sota_components) + list(catalog_components or []))
-    ordered = list(row.get("candidates") or [])
-    make_rng(seed, catalog, layer_id).shuffle(ordered)
-    candidates = [
-        build_candidate(f"c{index}", candidate, slug_index=slug_index, recipe_map=recipe_map,
-                         decisions_by_component=decisions_by_component if catalog == "foundation" else {},
-                         root=root)
-        for index, candidate in enumerate(ordered, start=1)
-    ]
+    if layer_candidates is not None:
+        # --trading-candidates manifest: candidates were built from the manifest's own
+        # layer entries; keys follow the same seeded order as the ledger path.
+        ordered = list(layer_candidates)
+        make_rng(seed, catalog, layer_id).shuffle(ordered)
+        candidates = [{"key": f"c{index}", **candidate} for index, candidate in enumerate(ordered, start=1)]
+    else:
+        slug_index = manifest_index_by_slug(list(sota_components) + list(catalog_components or []))
+        ordered = list(row.get("candidates") or [])
+        make_rng(seed, catalog, layer_id).shuffle(ordered)
+        candidates = [
+            build_candidate(f"c{index}", candidate, slug_index=slug_index, recipe_map=recipe_map,
+                             decisions_by_component=decisions_by_component if catalog == "foundation" else {},
+                             root=root)
+            for index, candidate in enumerate(ordered, start=1)
+        ]
     matched_ids = {candidate["component_id"] for candidate in candidates if candidate["component_id"]}
     unmatched = [
         {"id": component["id"], **{field: component.get(field) for field in MANIFEST_FIELDS}}
         for component in sota_components if component["id"] not in matched_ids
     ]
-    return {
+    packet = {
         "schema_version": PACKET_SCHEMA_VERSION,
         "catalog": catalog,
         "layer_id": layer_id,
@@ -249,6 +336,14 @@ def build_packet(row: dict, *, catalog: str, sota_components: list, recipe_map: 
         "withheld": list(WITHHELD),
         "rules": rules,
     }
+    if layer_candidates is not None:
+        # Only added in manifest mode, so ledger-mode packets stay byte-identical.
+        packet["candidate_source"] = MANIFEST_CANDIDATE_SOURCE
+        packet["layer_scope_terms"] = list(layer_scope_terms or [])
+        packet["requirement_note"] = LAYER_REQUIREMENT_NOTE
+        packet["withheld"] = list(WITHHELD) + ["candidates[].card_rationale", "candidates[].card_decision",
+                                              "candidates[].review_status"]
+    return packet
 
 
 def serialize(document: dict) -> str:
@@ -263,7 +358,26 @@ def packet_filename(catalog: str, layer_id: str) -> str:
     return f"{catalog}__{layer_id}.json"
 
 
-def build_all_packets(root: Path, *, catalogs: list, seed: str, checked_at: str) -> dict:
+def withhold_labels(packet: dict) -> dict:
+    """Drop decision-bearing labels from a built packet (candidate review_status and the
+    attached decisions' selection and review_status) and record what was withheld."""
+    for candidate in packet.get("candidates", []):
+        candidate["review_status"] = None
+        candidate["decisions"] = [{key: value for key, value in decision.items() if key not in WITHHELD_DECISION_FIELDS}
+                                  for decision in candidate.get("decisions") or []]
+    for component in packet.get("sota_components_not_in_candidates", []):
+        component["review_status"] = None
+    withheld = list(packet.get("withheld", []))
+    for label in ("candidates[].review_status", "candidates[].decisions[].selection",
+                  "candidates[].decisions[].review_status", "sota_components_not_in_candidates[].review_status"):
+        if label not in withheld:
+            withheld.append(label)
+    packet["withheld"] = withheld
+    return packet
+
+
+def build_all_packets(root: Path, *, catalogs: list, seed: str, checked_at: str,
+                      trading_candidates: str = "ledger", withhold: bool = False) -> dict:
     """Returns {filename: serialized packet text}, fully built and leak-
     checked in memory before any file is written."""
     rules = load_rules()
@@ -272,17 +386,32 @@ def build_all_packets(root: Path, *, catalogs: list, seed: str, checked_at: str)
     recipe_map = load_json(root / ADOPTION_MANIFEST_PATH).get("recipe_map", {})
     decisions_doc = load_json(root / FOUNDATION_DECISIONS_PATH)
     decisions_by_component = foundation_decisions_by_component(decisions_doc)
+    manifest_mode = trading_candidates == "manifest"
+    cards = trading_cards_by_id(root) if manifest_mode else {}
+    trading_layers = {layer["layer"]: layer for layer in sota_doc.get("trading", [])}
 
     packets = {}
     for catalog in catalogs:
         ledger = load_json(root / LEDGER_FILES[catalog])
         for row in ledger.get("layers", []):
+            layer_candidates = None
+            if manifest_mode and catalog == "us-equities":
+                names = {github_repo_slug(c["repository"]): c.get("name")
+                         for c in row.get("candidates") or [] if c.get("repository")}
+                layer_candidates = manifest_layer_candidates(
+                    trading_layers.get(row["layer_id"], {}), cards, names, recipe_map, root)
             packet = build_packet(
                 row, catalog=catalog, sota_components=sota_index.get((catalog, row["layer_id"]), []),
                 catalog_components=catalog_components(sota_index, catalog),
                 recipe_map=recipe_map, decisions_by_component=decisions_by_component,
-                seed=seed, checked_at=checked_at, root=root, rules=rules,
+                seed=seed, checked_at=checked_at, root=root, rules=rules, layer_candidates=layer_candidates,
+                layer_scope_terms=(sota_doc.get("taxonomy") or {}).get(row["layer_id"]) if layer_candidates is not None
+                else None,
             )
+            if withhold and layer_candidates is None:
+                # Manifest-mode trading packets already carry no labels; leaving them untouched
+                # keeps their bytes (and every lane return sealed against them) unchanged.
+                packet = withhold_labels(packet)
             packets[packet_filename(catalog, row["layer_id"])] = serialize(packet)
     return packets
 
@@ -301,6 +430,15 @@ def parse_args(argv=None):
     parser.add_argument("--catalog", choices=sorted(LEDGER_FILES), default=None,
                          help="Build packets for one catalog only; default builds both.")
     parser.add_argument("--checked-at", default=DEFAULT_CHECKED_AT)
+    parser.add_argument("--withhold-labels", action="store_true",
+                        help="Drop decision-bearing labels (candidate and SOTA-component review_status, decision "
+                             "selection and review_status) from every ledger-built packet; manifest-built trading "
+                             "packets (--trading-candidates manifest) carry none and stay byte-identical. Off by "
+                             "default so the 2026-09-22 packets reproduce.")
+    parser.add_argument("--trading-candidates", choices=("ledger", "manifest"), default="ledger",
+                        help="Candidate source for us-equities packets: the ledger row's group-wide list "
+                             "(default; reproduces the 2026-09-22 packets) or the sota manifest's own entries "
+                             "for the layer, with evidence from their domain catalog cards.")
     return parser.parse_args(argv)
 
 
@@ -309,7 +447,8 @@ def main(argv=None) -> int:
     root = args.root.resolve()
     catalogs = [args.catalog] if args.catalog else sorted(LEDGER_FILES)
 
-    packets = build_all_packets(root, catalogs=catalogs, seed=str(args.seed), checked_at=args.checked_at)
+    packets = build_all_packets(root, catalogs=catalogs, seed=str(args.seed), checked_at=args.checked_at,
+                                trading_candidates=args.trading_candidates, withhold=args.withhold_labels)
 
     out_dir = args.out / "packets"
     out_dir.mkdir(parents=True, exist_ok=True)

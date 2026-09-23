@@ -1,0 +1,94 @@
+{
+ "alternatives": [
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "https://pypi.org/project/modal/1.5.5/"
+   ],
+   "key": "c1",
+   "name": "modal",
+   "repository": "https://github.com/modal-labs/modal-client",
+   "why_not_default": "The reviewed package page establishes SDK distribution and setup instructions, not executed research workloads. No retained cloud execution, recovery, identity preservation, telemetry reconciliation or cost comparison establishes a host-capacity advantage. See [package evidence](https://pypi.org/project/modal/1.5.5/)."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "https://github.com/temporalio/temporal/blob/v1.32.0/README.md"
+   ],
+   "key": "c2",
+   "name": "Temporal",
+   "repository": "https://github.com/temporalio/temporal",
+   "why_not_default": "The pinned README describes durable workflows and local development setup. It supplies no executed comparison of this research workload, bounded retries, cancellation, recovery or duplicate effects against Dagu. Its architectural fit does not establish acceptance."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "https://github.com/unionai-oss/pandera/blob/62f55e2dccf0a199cfe4d6ce3eda0c1d29e2e4e6/README.md"
+   ],
+   "key": "c4",
+   "name": "data-pandera",
+   "repository": "https://github.com/unionai-oss/pandera",
+   "why_not_default": "The pinned README contains dataframe schema examples, but the supplied evidence does not demonstrate executed market-data validation or rejection of invalid snapshot promotion. It remains a relevant data-quality complement whose integration is unqualified."
+  }
+ ],
+ "catalog": "us-equities",
+ "challenger_preferred": null,
+ "lane": "codex",
+ "layer_id": "data-quality-orchestration",
+ "limits": [
+  "This review inspected retained receipts and workflow definitions; it did not rerun native workloads, audit private logs or verify current host state.",
+  "GitHub and raw-source web opens failed for Temporal and Pandera; direct retrieval of both exact pinned raw README URLs subsequently succeeded.",
+  "Modal, Temporal and Pandera references provide package or documentation review, not task-specific execution acceptance."
+ ],
+ "model": {
+  "effort": "high",
+  "name": "gpt-6-astra"
+ },
+ "open_gaps": [
+  "Dagu's retained restart acceptance preserves completed history; it does not establish in-flight recovery, host-loss recovery or duplicate-effect prevention.",
+  "The paired Astra-to-Claude workflow was not executed. The successful Claude report and matching telemetry were from a standalone process.",
+  "Real market-data schemas, fail-closed snapshot promotion, provider completeness, corporate-action correctness and historical availability are not established.",
+  "Native account homes and hooks remain accessible; environment filtering does not establish operating-system isolation or comprehensive denial of broker execution authority.",
+  "Managed compute capacity, continuous off-host operation, complete coordinator-plus-worker usage and comparative operating costs remain unmeasured."
+ ],
+ "overturn_protocol": {
+  "arms": [
+   "Dagu executing the retained preparation workflow as the baseline.",
+   "Temporal executing equivalent preparation steps under the same inputs, native identity and output contract.",
+   "A Pandera-enabled preparation arm tested with valid and deliberately invalid market data before snapshot promotion."
+  ],
+  "fixture_paths": [
+   "blueprints/us-equities/research-runtime/prepare-evidence.yaml",
+   "blueprints/us-equities/hosting/research-evidence.yaml"
+  ],
+  "metric": "Compare complete output artifacts, invalid-input promotion rejection, downstream execution after failure, cancellation and descendant retirement, in-flight restart recovery, duplicate effects, retained failure history, identity preservation and reconciled usage. The comparative arms and fault injections require execution; existing receipts do not establish their results."
+ },
+ "overturn_when": "Change the orchestration default if an executed comparison using blueprints/us-equities/research-runtime/prepare-evidence.yaml and blueprints/us-equities/hosting/research-evidence.yaml shows Temporal preserves the same complete outputs, identity and telemetry while recovering interrupted work without duplicate effects and passing failure/cancellation checks. Add Pandera to the winner set when an executed preparation comparison rejects invalid market data before promotion while accepting valid inputs and retaining validation failures.",
+ "packet_sha256": "cdbe255da0593b73f77e57bc8b887984a78e5233165f3a9fa27818d427708eeb",
+ "schema_version": 1,
+ "sources_read": [
+  "<host-path>/SKILL.md",
+  "<host-path>/us-equities__data-quality-orchestration.json",
+  "blueprints/us-equities/hosting/receipt.json",
+  "blueprints/us-equities/research-runtime/receipt.json",
+  "blueprints/us-equities/hosting/research-evidence.yaml",
+  "blueprints/us-equities/research-runtime/prepare-evidence.yaml",
+  "https://pypi.org/project/modal/1.5.5/",
+  "https://github.com/temporalio/temporal/blob/v1.32.0/README.md",
+  "https://github.com/unionai-oss/pandera/blob/62f55e2dccf0a199cfe4d6ce3eda0c1d29e2e4e6/README.md",
+  "https://raw.githubusercontent.com/temporalio/temporal/v1.32.0/README.md",
+  "https://raw.githubusercontent.com/unionai-oss/pandera/62f55e2dccf0a199cfe4d6ce3eda0c1d29e2e4e6/README.md"
+ ],
+ "why_selected": "Select Dagu for the demonstrated bounded data-orchestration portion of this layer. blueprints/us-equities/hosting/receipt.json records native CLI execution of a successful three-step research workflow, an injected failure that aborted its dependent step, cancellation, systemd supervision and completed-history preservation after restart, with zero broker or model calls. blueprints/us-equities/research-runtime/receipt.json additionally records successful native packet and order_table preparation. These observations support orchestration of existing research commands; the standalone Claude report and its telemetry do not prove execution of the paired model graph. No other adopted candidate has task-specific execution evidence in its supplied references, and the data-quality portion remains unqualified.",
+ "winner_evidence_class": "native_proven",
+ "winner_evidence_refs": [
+  "blueprints/us-equities/hosting/receipt.json",
+  "blueprints/us-equities/research-runtime/receipt.json"
+ ],
+ "winner_keys": [
+  "c3"
+ ]
+}

@@ -1,39 +1,39 @@
 {
  "alternatives": [
   {
-   "disposition": "overlap",
-   "evidence_class": "source_review",
+   "disposition": "out_of_scope",
+   "evidence_class": "local_integration",
    "evidence_refs": [
-    "evidence/receipts/claude-upstream-checks-20260921.json"
+    "evidence/artifacts/claude-upstream-checks-20260921/results.json",
+    "evidence/receipts/claude-upstream-checks-20260921.json",
+    "catalogs/foundation/decisions.json"
    ],
    "key": "c1",
    "name": "MCPorter native bridge",
    "repository": "https://github.com/openclaw/mcporter",
-   "why_not_default": "It is an MCP bridge and inspection adapter used by the native clients, not a native coding client with accounts, models or resumable sessions. Its cited receipt, evidence/receipts/claude-upstream-checks-20260921.json, only lists 'mcporter' among 37 component_ids (line 25) under the claim of '38 native command rows', and its own limitation says '38 zero-exit rows are not 38 functional E2Es' (line 45). That receipt contains no per-row detail showing a coding or research task run through mcporter. The packet's decisions are 'conditional' (mcp-surface-policy is source_review only), and the pin 0.13.13 is behind upstream v0.14.0."
+   "why_not_default": "MCPorter is an MCP bridge and client surface. It is not a native coding or research client with accounts, model choice or resumable sessions. catalogs/foundation/decisions.json files native-mcp-adapters under the hosting-services, code-navigation and mcp-surfaces layers, not native-clients, and results.json line 1098 labels it 'MCP client'. Its retained evidence here is readiness only. results.json line 1136 gives evidence_class 'readiness'. Line 1128 shows 'mcporter list' reporting 'Listed 3 servers (2 healthy; 1 errors)' because the context-mode daemon had exited unexpectedly. The receipt, at line 45, adds that '38 zero-exit rows are not 38 functional E2Es'. The pin 0.13.13 is behind upstream v0.14.0. Correction from the earlier round: the class is downgraded from native_proven. The schema enum has no readiness value, so local_integration is the closest one: a zero-exit local command against locally configured servers, not a functional E2E. Bridge-recovery evidence is referenced only by ID in decisions.json, and I did not open it."
   },
   {
-   "disposition": "unqualified",
+   "disposition": "conditional",
    "evidence_class": "source_review",
    "evidence_refs": [
-    "docs/foundation-closure-20260921.md",
-    "catalogs/us-equities/agents-operations.json"
+    "docs/foundation-closure-20260921.md"
    ],
    "key": "c2",
    "name": "Claude Agent SDK",
    "repository": "https://github.com/anthropics/claude-agent-sdk-python",
-   "why_not_default": "docs/foundation-closure-20260921.md line 82 says it is the 'Preferred Claude SDK candidate when needed; not newly installed or qualified'. It also records that the PyPI 0.2.157 and GitHub 0.2.156 labels differ. catalogs/us-equities/agents-operations.json lines 1646-1683 give decision 'alternative' at evidence_level 'source_review', and the commands there are 'Prospective ... not executed'. The official docs also restrict claude.ai login use for third-party products. Lines 76-78 of the closure doc limit SDK use to applications that need structured events, custom tools or programmatic session control, a need the evidence does not show for this layer."
+   "why_not_default": "The only evidence is source review. docs/foundation-closure-20260921.md line 82 calls it the preferred Claude SDK candidate when needed, but says it was 'not newly installed or qualified'. The registry label 0.2.157 differs from the GitHub release label 0.2.156. Lines 76-78 limit SDK use to applications that need structured events, custom tools or programmatic session control. No native-account run, tool run or resume run is retained."
   },
   {
    "disposition": "unqualified",
    "evidence_class": "source_review",
    "evidence_refs": [
-    "catalogs/us-equities/agents-operations.json",
-    "docs/foundation-closure-20260921.md"
+    "catalogs/us-equities/agents-operations.json"
    ],
    "key": "c4",
    "name": "OpenAI Agents SDK",
    "repository": "https://github.com/openai/openai-agents-python",
-   "why_not_default": "catalogs/us-equities/agents-operations.json lines 1605-1643 give decision 'alternative' at evidence_level 'source_review' for v0.22.3. Its commands are prospective and were not executed, and its limitations include 'No provider API call or model comparison performed' and 'Does not inherit Codex account entitlement'. It is an API-backed agent loop, so it does not meet the requirement to use existing native accounts. It is not a subscription-backed Codex replacement (rationale line 1613). docs/foundation-closure-20260921.md lines 80-86 do not list it among the SDK candidates checked on 2026-09-21."
+   "why_not_default": "The only evidence is source review. catalogs/us-equities/agents-operations.json line 1611 describes it as API-backed. Line 1624 says 'Prospective commands; not executed'. Lines 1634-1635 say 'No provider API call or model comparison performed' and that it 'Does not inherit Codex account entitlement'. Because it is API-backed, it does not meet the requirement to use existing native accounts. Correction from the earlier round: docs/foundation-closure-20260921.md is dropped from the refs because it does not mention this SDK."
   }
  ],
  "catalog": "foundation",
@@ -41,63 +41,72 @@
  "lane": "claude",
  "layer_id": "native-clients",
  "limits": [
-  "I made no TypeSafe inference calls; the coordinator supplied no TypeSafe results. All dispositions come from my own source review. The packet withholds its provider judgments (current_choice, decision, rationale, dispositions), so none were retained or copied.",
-  "Skill path: <host-path>/SKILL.md (preloaded). The model field copies the fixed packet value 'claude-opus-5'/high as instructed. The client reports the actual running model as claude-opus-5-5[1m], and I could not verify the effort level.",
-  "I could not run commands. Glob only confirmed that blueprints/convergence-practice/native-recovery/claude/README.md and worker-recovery/README.md exist; I did not read their contents.",
-  "I did not read the rest of native-client-results.json after line 100, including the Codex tool_results detail beyond the grep hits, or independent-review.md.",
-  "I did not open the per-row results or provenance behind evidence/receipts/claude-upstream-checks-20260921.json (evidence/artifacts/claude-upstream-checks-20260921/results.json), so I did not verify mcporter's functional scope.",
-  "Non-adopted candidates c5 (Letta Code) and c6 (Letta V1 legacy server) were not opened and are left out of alternatives. Their refs point to memory-landscape and candidate-quality documents and to external URLs I could not fetch.",
-  "I did not open the external URLs in the evidence (GitHub READMEs, PyPI, official docs), and I did not independently verify upstream release metadata (stars, latest tags)."
+  "I ran no commands. The native results are judged from retained artifacts and receipts, and none were re-executed. The recovery oracles named in overturn_when were checked for existence only.",
+  "I did not open independent-review.md, the recovery independent-audit.json files or native-claude-coop-20260921/persistent-profile.json. The full private streams are not public, so the stream hashes identify retained logs but are not independent provider attestation.",
+  "catalogs/foundation/decisions.json carries selection/review_status fields that the packet withholds, and I saw them while reading. The verdict relies on the evidence_scope, limitations and receipts, not on those labels.",
+  "I did not open the evidence refs for the non-adopted Letta Code (c5) and Letta V1 legacy server (c6), so they are not in alternatives. The challenger refuter reports that they have source-review evidence only.",
+  "The schema's evidence_class enum has no readiness value. c1 is labelled local_integration as the closest non-inflating class, and its why_not_default states the readiness scope.",
+  "The TypeSafe skill was loaded from <host-path>/typesafe-ai (the base directory shown in context). I made no TypeSafe inference calls, and no provider judgments were supplied or retained. All dispositions are my own source review, revised against the refuter findings. Actual model: claude-opus-5-5[1m], reported by the client. The packet's fixed model value is opus/high."
  ],
  "model": {
   "effort": "high",
   "name": "claude-opus-5-5"
  },
  "open_gaps": [
-  "No model-quality ranking between Claude Code and Codex: the five-step read-only task has no matched baseline (docs/full-stack-convergence.md line 37), and the older fixed-order comparison left cache state uncontrolled (lines 38-40).",
-  "The Codex resume fixture ran on bundled Codex 0.155.0-alpha.9.2 on the Mac (native-recovery/README.md line 4), not on the 0.155.1 pin. Resume on 0.155.1 is not shown by this fixture.",
-  "Crash, provider cancellation, whole-host and cross-host recovery, and billing cessation are not established (decisions.json lines 1973-1976; native-recovery/README.md lines 28-32).",
-  "Neither SDK (c2, c4) has been installed or executed. Their suitability is untested, which is different from having failed.",
-  "Activation on a new host (WSL or macOS on another PC) is not established by the source-host receipts (decisions.json line 142; claude-upstream-checks limitations line 46).",
-  "MCPorter's pin 0.13.13 is behind upstream v0.14.0, and no per-row mcporter functional result was opened.",
-  "In the public projection, Claude's tool_results have status null and is_error false (native-client-results.json lines 92-100). Completion is inferred from is_error and exit_code 0, not from an explicit 'completed' status like Codex's."
+  "Codex resume ran on macOS with codex-cli 0.155.0-alpha.9.2 (native-recovery/receipt.json native_version and platform), not on the pinned 0.155.1 or on WSL. Same-thread resume is not established for the pinned version on this host.",
+  "Claude resume ran with only Bash available and MCP tools denied (native-recovery/claude/README.md lines 40-43), using an explicit claude-opus-5/ultracode scoped to that trial (claude/receipt.json limitations). Resume with the full MCP tool set, and with the default model, is not established.",
+  "The research task was one run per client with no matched baseline (native-client-results.json limitations; docs/full-stack-convergence.md line 37). It establishes neither a model-quality ranking nor a causal token difference between the clients.",
+  "The Codex 'ultra' effort for the research task is stated only in docs/full-stack-convergence.md. native-client-results.json records the model but not the effort.",
+  "Remote provider cancellation, cessation of billing, independent-host recovery and power-loss durability are not qualified for either client (both recovery receipts' limitations).",
+  "The readiness rows (claude --version, codex --version, codex login status) are zero-exit checks, not functional E2E (claude-upstream-checks-20260921.json limitations).",
+  "No new-PC or other-host activation evidence is retained. The results are source-host evidence dated 2026-09-20 and 2026-09-21.",
+  "The Claude Agent SDK and OpenAI Agents SDK have no install, account or tool execution evidence."
  ],
  "overturn_protocol": {
   "arms": [
-   "native Claude Code CLI (c7)",
-   "native Codex CLI/app-server (c3)",
-   "Claude Agent SDK programmatic session (c2)",
-   "OpenAI Agents SDK API-backed agent (c4)"
+   "native Claude Code CLI (2.1.278 or current pin)",
+   "native Codex CLI/app-server (0.155.1 or current pin)",
+   "Claude Agent SDK on the same account and fixture",
+   "Codex SDK on the same account and fixture"
   ],
   "fixture_paths": [
-   "blueprints/convergence-practice/native-recovery/README.md",
    "blueprints/convergence-practice/native-recovery/claude/README.md",
-   "blueprints/convergence-practice/worker-recovery/README.md"
+   "blueprints/convergence-practice/native-recovery/claude/receipt.json",
+   "blueprints/convergence-practice/native-recovery/README.md",
+   "blueprints/convergence-practice/native-recovery/receipt.json",
+   "tests/test_native_recovery.py"
   ],
-  "metric": "Pass/fail on the same frozen task oracle (single unchanged checkpoint, one local effect, same-session continuation), plus completed tool results with no tool-result failures and provider-reported usage counted once, on the same account and effect scope."
+  "metric": "Pass/fail of the frozen checkpoint/wait/finalize recovery: checkpoint unchanged, checkpoint executed once, same session/thread identity. Also the count of returned tool results with no tool-result error on the same bounded read-only research prompt, with native account and default model retained (model_override null)."
  },
- "overturn_when": "An application task needs structured events, custom tools or programmatic session control that the native CLI path cannot provide (the packet's existing_overturn_when), and a supported SDK (c2 Claude Agent SDK or c4 OpenAI Agents SDK) passes the same frozen task, account, effect and recovery checks. A qualifying check would be an SDK arm of python3 blueprints/convergence-practice/native-recovery/run.py (the documented native runner, which currently takes --codex and --run-dir only), or the same fixture as blueprints/convergence-practice/worker-recovery/README.md, run with native usage retained. A failed re-run of that native-recovery runner, or of the five-step read-only task, on a changed client version would also reopen the verdict.",
- "packet_sha256": "762df36a819250c1fff812847f696df1f30668ae0126bf16acb465fd3d725b4c",
+ "overturn_when": "Change the verdict only on an executed comparison, not on source review. The condition has two parts. First, the native path cannot deliver a structured-event, custom-tool or programmatic-session capability that an application needs. Second, an SDK arm (Claude Agent SDK or Codex SDK) passes the same frozen recovery fixture on the same account. The fixtures are blueprints/convergence-practice/native-recovery/claude/ (checkpoint, SIGINT, same-session finalize) and blueprints/convergence-practice/native-recovery/ (Codex interrupt and same-thread resume). The SDK arm must match the receipt checks: same session/thread ID, checkpoint unchanged and checkpoint executed once. The offline oracles must still pass: 'python3 -m unittest tests.test_native_recovery' and 'python3 -m unittest discover -s blueprints/convergence-practice/native-recovery/claude -p test_*.py'. A separate trigger: either native client fails a rerun of the same-prompt read-only research task recorded in evidence/artifacts/full-stack-convergence-20260921/native-client-results.json on the intended host. That task has 11 tool results and no tool errors.",
+ "packet_sha256": "82809ae19f1a1ba4eaa4ff6605b2ed38d83b47656a86fc4274ecb37c3bc9091f",
  "schema_version": 1,
  "sources_read": [
   "<host-path>/foundation__native-clients.json",
   "evidence/receipts/claude-upstream-checks-20260921.json",
-  "docs/foundation-closure-20260921.md (lines 40-114; grep for client/SDK names)",
-  "docs/full-stack-convergence.md (lines 25-54; grep)",
-  "catalogs/foundation/decisions.json (lines 105-214, 1950-1979; grep for decision ids)",
-  "catalogs/us-equities/agents-operations.json (lines 1604-1683)",
-  "evidence/artifacts/full-stack-convergence-20260921/native-client-results.json (lines 1-100; grep for status fields)",
-  "blueprints/convergence-practice/native-recovery/README.md (lines 1-60)",
-  "<host-path>/SKILL.md (preloaded skill body, in context)"
+  "evidence/artifacts/claude-upstream-checks-20260921/results.json (lines 9-116 and 1095-1139)",
+  "evidence/artifacts/full-stack-convergence-20260921/native-client-results.json",
+  "docs/foundation-closure-20260921.md (lines 40-114)",
+  "docs/full-stack-convergence.md (lines 1-104)",
+  "catalogs/foundation/decisions.json (matched decision entries: native-source-tasks, native-process-defaults, native-mcp-adapters, native-session-resume, native-child-interruption-recovery, agent-sdk-runtime-selection)",
+  "catalogs/us-equities/agents-operations.json (lines 1604-1644)",
+  "blueprints/convergence-practice/native-recovery/README.md",
+  "blueprints/convergence-practice/native-recovery/receipt.json",
+  "blueprints/convergence-practice/native-recovery/claude/README.md",
+  "blueprints/convergence-practice/native-recovery/claude/receipt.json",
+  "tests/test_native_recovery.py (existence via Glob only)"
  ],
- "why_selected": "Claude Code (c7) and Codex (c3) are the only adopted candidates with retained evidence from native execution on the existing signed-in accounts, which is what the requirement asks for. In evidence/artifacts/full-stack-convergence-20260921/native-client-results.json (lines 1-100), kind \"actual_native_model_read_only_integration\", Claude ran headless with \"-p --output-format stream-json\" and model_override null. It returned exit_code 0, is_error false, model_observed \"claude-fable-5-1\", tool_count 11 and provider_total_tokens 250492. docs/full-stack-convergence.md lines 25-35 record that both clients finished the same five-step read-only task with eleven tool results each and no tool-result failures: Codex 0.155.1 used GPT-6 Astra/ultra for 255,335 tokens, and Claude Code 2.1.278 used Fable 5.1 for 250,492. The layer row at line 47 is \"Native clients | Codex and Claude native accounts and streaming output\". catalogs/foundation/decisions.json lines 113-160 (native-source-tasks, default, accepted_within_scope, both component ids) and lines 1950-1979 (native-session-resume, conditional, accepted_within_scope) cover tool use and same-session resume. For resume, blueprints/convergence-practice/native-recovery/README.md lines 3-9 record one frozen synthetic Codex interruption that resumed the same thread and session, and line 25 notes a separate Claude CLI SIGINT/same-session continuation on WSL. docs/foundation-closure-20260921.md line 52 selects both clients and records that installed 2.1.278 / 0.155.1 match checked release metadata. The two clients are complementary rather than ranked: they use independent accounts and model families, and neither run had a matched baseline. So both are selected as native defaults, and no model-quality ranking is implied.",
+ "why_selected": "Claude Code (c7) and Codex (c3) are the only candidates with retained native execution against this requirement: coding and bounded research using existing native accounts, client tools, model choices and resumable sessions. I checked this against the underlying artifacts as well as the prose.\n\n(1) The bounded research task. evidence/artifacts/full-stack-convergence-20260921/native-client-results.json records both clients running the same prompt (prompt_sha256 d24422fd...) with exit_code 0, model_override null and permission_override null. So each client used its own native default model and account home, and the file's limitations state that credential stores were not read or copied. For Claude the observed model was claude-fable-5-1, with tool_count 11, every tool result is_error false and provider_total_tokens 250492. The tools were ToolSearch, Skill, RTK git log, QMD search/get, Serena find_symbol/find_referencing_symbols, the ai-memory query and Context Mode ctx_execute_file/ctx_stats. For Codex the observed model was gpt-6-astra, with tool_count 11, every tool result status completed and provider_total_tokens 255335. This matches docs/full-stack-convergence.md lines 25-35. The 'ultra' effort for that Codex run is stated only in that document, not in the artifact.\n\n(2) Resumable sessions, which I observed in the receipts. blueprints/convergence-practice/native-recovery/claude/receipt.json records status passed on Linux WSL2 with native_version 2.1.278 (Claude Code). The model requested was claude-opus-5 with effort ultracode. The checks same_native_session_id, first_cli_sigint_exit, resumed_cli_exit_zero, checkpoint_unchanged and checkpoint_executed_once are all true. blueprints/convergence-practice/native-recovery/receipt.json records status passed with same_thread_id, same_session_id, model_and_effort_preserved (gpt-6-astra/ultra) and checkpoint_executed_once all true. That Codex run was on macOS with codex-cli 0.155.0-alpha.9.2.\n\n(3) Readiness only. evidence/artifacts/claude-upstream-checks-20260921/results.json shows claude --version returning 2.1.278, codex --version returning codex-cli 0.155.1 and codex login status reporting a ChatGPT login.\n\nThe two clients serve independent accounts and model families, so both are retained and neither replaces the other. The winner class is native_proven because both the task run and the resume run are native client executions with retained stream hashes.\n\nThis is my own source review. No TypeSafe inference results were supplied. The token figures are retained provider accounting, not my measurement.",
  "winner_evidence_class": "native_proven",
  "winner_evidence_refs": [
   "evidence/artifacts/full-stack-convergence-20260921/native-client-results.json",
   "docs/full-stack-convergence.md",
-  "catalogs/foundation/decisions.json",
-  "docs/foundation-closure-20260921.md",
-  "blueprints/convergence-practice/native-recovery/README.md"
+  "blueprints/convergence-practice/native-recovery/claude/receipt.json",
+  "blueprints/convergence-practice/native-recovery/receipt.json",
+  "blueprints/convergence-practice/native-recovery/claude/README.md",
+  "blueprints/convergence-practice/native-recovery/README.md",
+  "evidence/artifacts/claude-upstream-checks-20260921/results.json",
+  "docs/foundation-closure-20260921.md"
  ],
  "winner_keys": [
   "c7",

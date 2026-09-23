@@ -1,66 +1,81 @@
 {
  "alternatives": [
   {
-   "disposition": "conditional",
+   "disposition": "overlap",
    "evidence_class": "native_proven",
    "evidence_refs": [
-    "observability/receipt.json",
-    "catalogs/us-equities/agents-operations.json",
-    "catalogs/foundation/decisions.json"
+    "docs/dashboard-rendered-acceptance.md",
+    "docs/dashboard-gap-resolution.md",
+    "docs/native-telemetry-resolution.md",
+    "observability/receipt.json"
    ],
-   "key": "c12",
-   "name": "Loki",
-   "repository": "https://github.com/grafana/loki",
-   "why_not_default": "Loki is an accepted log store in the same pipeline, not a separate path. Correction: its packet evidence_ref, docs/native-telemetry-resolution.md, never mentions Loki. The Loki evidence I verified is observability/receipt.json lines 313-330, where the synthetic privacy canary returned loki_records 1. The usage match that meets the requirement went through Prometheus and Grafana, so Loki complements the winners rather than being required for usage observation. Its limits per agents-operations.json lines 1005-1008: no HA and no full transcript archive."
+   "key": "c5",
+   "name": "Grafana",
+   "repository": "https://github.com/grafana/grafana",
+   "why_not_default": "Grafana is the display layer over the winning stores; it neither filters nor stores the data. Its native evidence is panel and query agreement and rendering. Panel queries matched native memory, Qdrant and QMD results (dashboard-rendered-acceptance.md line 29). The Claude panel showed all four categories after the native task (native-telemetry-resolution.md line 45; dashboard-gap-resolution.md line 13). Its provisioned dashboard survived a restart (observability/receipt.json lines 296-301). None of its rows carries the privacy verification or an independent usage reconciliation, so with the winner set capped at three it ranks below Loki. It remains an accepted 'use' stage in the same pipeline (decisions.json lines 2057-2061)."
   },
   {
    "disposition": "conditional",
    "evidence_class": "native_proven",
    "evidence_refs": [
+    "docs/dashboard-rendered-acceptance.md",
     "observability/receipt.json",
-    "catalogs/us-equities/agents-operations.json",
     "catalogs/foundation/decisions.json"
    ],
    "key": "c7",
    "name": "Alertmanager",
    "repository": "https://github.com/prometheus/alertmanager",
-   "why_not_default": "Alertmanager covers alert routing, not usage observation. observability/receipt.json lines 303-312 records one firing and one resolved notification on a dedicated fixture, with external_delivery_tested false. agents-operations.json lines 1047-1050 limits it to the local alert path."
+   "why_not_default": "Alertmanager adds service-outcome alerting on top of the pipeline; it is not the usage-observation path. Native amtool alert query agreed with the UI on a FreeLLMAPI readiness warning (dashboard-rendered-acceptance.md line 31). The firing/resolved route used a dedicated loopback fixture, with external_delivery_tested and elapsed_latency_claimed both false (observability/receipt.json lines 303-311). Scheduled-service and reboot persistence are not qualified (decisions.json line 2036)."
   },
   {
    "disposition": "conditional",
-   "evidence_class": "local_integration",
+   "evidence_class": "native_proven",
    "evidence_refs": [
+    "docs/dashboard-rendered-acceptance.md",
+    "observability/receipt.json",
     "docs/native-telemetry-resolution.md",
-    "docs/dashboard-gap-resolution.md",
-    "observability/receipt.json"
+    "observability/backends/telemetry-resolution-20260921.json"
    ],
    "key": "c6",
    "name": "ntfy",
    "repository": "https://github.com/binwiederhier/ntfy",
-   "why_not_default": "ntfy is a local notification sink, not usage observation. docs/native-telemetry-resolution.md lines 86-97 records two unchanged upstream tests passing and a local renderer replay, which is local integration. No production webhook was observed after deployment, so formatting of the next real notification is unverified."
+   "why_not_default": "ntfy delivers notifications; it is not the observation pipeline. Two parts were observed natively: feed delivery (native subscribe showed 23 retained records, dashboard-rendered-acceptance.md line 32) and the Prometheus to Alertmanager to ntfy route (1 firing and 1 resolved notification from a loopback fixture, with no external delivery, observability/receipt.json lines 303-311). The template fix itself rests on two unchanged upstream tests plus a local-integration renderer replay. No post-deployment production webhook was observed (native-telemetry-resolution.md lines 86-98; telemetry-resolution-20260921.json line 76)."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "evidence/receipts/native-gpu-patch-20260920.json"
+   ],
+   "key": "c11",
+   "name": "llama.cpp optional local inference",
+   "repository": "https://github.com/ggml-org/llama.cpp",
+   "why_not_default": "llama.cpp covers the requirement's optional model-route clause and is qualified only on its own workload. One pinned Qwen3.8-27B Q4_K_M partial-offload repair passed all 12 original tests on a WSL RTX4090. That is one fixture and one trial, and generation took 179.191 seconds against a 180-second cap. The receipt records no host recovery, concurrent serving or frontier comparison, so the route stays optional, not a default."
   },
   {
    "disposition": "conditional",
    "evidence_class": "native_proven",
    "evidence_refs": [
     "docs/dashboard-gap-resolution.md",
+    "docs/dashboard-rendered-acceptance.md",
     "docs/token-native-saturation.md"
    ],
    "key": "c1",
    "name": "AgentsView",
    "repository": "https://github.com/kenn-io/agentsview",
-   "why_not_default": "AgentsView is a session-history archive, not the privacy-filtered usage pipeline. docs/dashboard-gap-resolution.md line 11 records one native refresh of three selected sources (messages 3,193 to 3,697) and calls it a snapshot, not continuous ingestion. docs/token-native-saturation.md line 26 says automatic archive discovery remains unestablished. The pin 0.43.0 is behind upstream v0.44.0."
+   "why_not_default": "AgentsView inspects session history; it is not the usage pipeline. One scoped archive refresh was observed (messages 3,193 to 3,697, 17 identities retained), but the result is a snapshot, not continuous ingestion (dashboard-gap-resolution.md line 11). Automatic archive discovery is unestablished (token-native-saturation.md lines 26-27), and the 0.43.0 pin is behind upstream v0.44.0."
   },
   {
    "disposition": "conditional",
    "evidence_class": "synthetic",
    "evidence_refs": [
-    "catalogs/foundation/decisions.json"
+    "catalogs/foundation/decisions.json",
+    "catalogs/us-equities/agents-operations.json"
    ],
    "key": "c2",
    "name": "otel-tui",
    "repository": "https://github.com/ymtdzzz/otel-tui",
-   "why_not_default": "The only retained evidence is decisions.json lines 2077-2100: one synthetic loopback terminal trace was accepted. Its stated limitation is that synthetic acceptance is not production tracing completeness. The adopted Collector path has traces disabled (agents-operations.json line 882), so otel-tui serves diagnostic traces only."
+   "why_not_default": "otel-tui was accepted only on a synthetic loopback terminal trace (decisions.json lines 2097-2100). The adopted pipeline has traces disabled (agents-operations.json line 882), so otel-tui has no production trace role. Its only packet ref is the decision record, not an execution receipt."
   },
   {
    "disposition": "overlap",
@@ -72,19 +87,20 @@
    "key": "c3",
    "name": "Claude HUD",
    "repository": "https://github.com/jarrodwatts/claude-hud",
-   "why_not_default": "This is an optional status-line rendering that overlaps with native /usage. docs/foundation-closure-20260921.md lines 109-132 records a native PTY session where the HUD rendered model, project, context and usage. It explicitly does not prove exact billing reconciliation or every HUD statistic. decisions.json line 2136 says to use native usage for authoritative accounting."
+   "why_not_default": "Claude HUD is an optional statusline display; it is not the observation pipeline. Native rendering of model, project, context and usage fields was observed in Claude 2.1.278 (foundation-closure-20260921.md lines 109-132). The packet's own limitation says this does not certify every HUD statistic, exact billing reconciliation or automatic compaction."
   },
   {
-   "disposition": "conditional",
+   "disposition": "selected",
    "evidence_class": "native_proven",
    "evidence_refs": [
-    "evidence/receipts/native-gpu-patch-20260920.json",
-    "catalogs/foundation/decisions.json"
+    "observability/receipt.json",
+    "catalogs/foundation/decisions.json",
+    "docs/native-telemetry-resolution.md"
    ],
-   "key": "c11",
-   "name": "llama.cpp optional local inference",
-   "repository": "https://github.com/ggml-org/llama.cpp",
-   "why_not_default": "llama.cpp is an optional model route that is qualified for one workload only. evidence/receipts/native-gpu-patch-20260920.json records one Qwen3.8-27B Q4_K_M partial-offload repair that passed 12 original tests on an RTX4090. The receipt calls it one fixture and one trial, with generation at 179.191 seconds against a 180-second cap. It is not an interactive default, and decisions.json line 2190 keeps native workers as the default."
+   "key": "c12",
+   "name": "Loki (packet evidence_ref correction)",
+   "repository": "https://github.com/grafana/loki",
+   "why_not_default": "Loki is a winner. This row only corrects its packet evidence. Loki's only packet evidence_ref, docs/native-telemetry-resolution.md, never mentions Loki. Loki's support comes from observability/receipt.json (native query at lines 122-127, restart at lines 246-256, synthetic privacy canary at lines 313-329) and from decisions.json lines 2053-2056."
   },
   {
    "disposition": "unqualified",
@@ -95,7 +111,7 @@
    "key": "c13",
    "name": "Phoenix",
    "repository": "https://github.com/Arize-ai/phoenix",
-   "why_not_default": "The packet marks Phoenix adopted, but the evidence is source review only. agents-operations.json lines 1246-1270 give the decision as conditional and state that the server launch is prospective, no app was instrumented, and auto-instrumentation can capture prompt and tool contents. There is no native execution or privacy canary."
+   "why_not_default": "The packet marks Phoenix adopted, but its only evidence is a source review. The catalog entry is 'conditional', with evidence_level source_review. Its launch commands are prospective and were not executed, no app was instrumented, and the license is ELv2 (agents-operations.json lines 1246-1268). Phoenix would itself be the local trace store and UI. It needs OTLP/OpenInference instrumentation and a retention policy (lines 1262-1265). The current Collector has traces disabled (line 882), so Phoenix would open a second, trace-level capture path, and auto-instrumentation can capture prompt and tool contents (line 1269)."
   },
   {
    "disposition": "unqualified",
@@ -106,18 +122,7 @@
    "key": "c4",
    "name": "OpenLIT",
    "repository": "https://github.com/openlit/openlit",
-   "why_not_default": "OpenLIT is not adopted and was only source-reviewed. agents-operations.json lines 1155 and 1181-1184 state that nothing was installed, invoked or delivered. They also say it would duplicate collection and expand transcript processing."
-  },
-  {
-   "disposition": "unqualified",
-   "evidence_class": "source_review",
-   "evidence_refs": [
-    "catalogs/us-equities/agents-operations.json"
-   ],
-   "key": "c10",
-   "name": "SGLang",
-   "repository": "https://github.com/sgl-project/sglang",
-   "why_not_default": "SGLang is not adopted, and the only evidence is a prospective install and launch recipe (agents-operations.json lines 484-521). No workload was executed. The card says not to stack vLLM and SGLang as serial gateways."
+   "why_not_default": "OpenLIT is not adopted and was reviewed only from source. No install, hook invocation, inference or telemetry delivery was executed. Its hook and trace collector would duplicate collection and widen transcript and prompt capture (agents-operations.json lines 1147-1186). That conflicts with keeping one privacy-filtered pipeline."
   }
  ],
  "catalog": "foundation",
@@ -125,67 +130,79 @@
  "lane": "claude",
  "layer_id": "observation-inference",
  "limits": [
-  "Skill loaded from <host-path>/SKILL.md. No TypeSafe inference results were supplied, and no service calls were made. All judgments are my own source review, plus provider or packet judgments that I label as retained.",
-  "Actual runtime model is claude-opus-5-5[1m]. The model field copies the packet's fixed value claude-opus-5/high as instructed.",
-  "I did not run any commands. The pytest and qualify.py overturn commands are paths I confirmed exist, but I did not read or execute their contents.",
-  "I did not open observability/backends/receipt.json, observability/backends/telemetry-resolution-20260921.json, the gpu-inference receipt/experiment/preflight files, or the full SGLang card. Claims from those rest on the files I did read.",
-  "The packet withholds the current choice and rationale, so I could not compare this verdict against the catalog's recorded decision."
+  "I read the files but ran no commands. Every result above is a documented, dated observation, not something I observed now, and the named overturn commands were not executed.",
+  "I did not open the private raw receipts (claude-native-status-corrected.stdout, claude-after-series.stdout) or the claude-panel.png screenshot that telemetry-resolution-20260921.json references by hash.",
+  "I opened blueprints/convergence-practice/gpu-inference/qualify.py and its receipts only by path (an earlier glob plus the refuter's paths_checked), not their contents.",
+  "I did not open the full SGLang (c10) catalog entry, so SGLang is left out of the alternatives.",
+  "I opened tests/test_observability_backends_alerts.py only through the refuter's findings. It covers equities alert rules and promtool/amtool config checks, and I dropped it from the overturn protocol.",
+  "The c12 correction row uses disposition 'selected' only to record that Loki's packet evidence_ref does not mention Loki. Loki is a winner, not a rejected alternative.",
+  "Skill: the typesafe-ai skill body was preloaded from <host-path>/SKILL.md. No TypeSafe inference results were supplied, so every disposition here is my own source review, not a kept provider judgment.",
+  "The actual running model is Opus 5.5 (claude-opus-5-5[1m]). The model field carries the required fixed value, opus/high."
  ],
  "model": {
   "effort": "high",
   "name": "claude-opus-5-5"
  },
  "open_gaps": [
-  "Traces are disabled and no trace database is deployed (agents-operations.json line 882), so the trace side of the requirement is covered only by a synthetic otel-tui trace.",
-  "Privacy filters cover tested fields and trusted native instrumentation, not arbitrary-content DLP (observability/receipt.json line 24). The canary is synthetic.",
-  "The exact usage match in docs/native-telemetry-resolution.md covers one Claude task. I did not verify an equivalent Codex match in the refs I read.",
-  "Scheduled-service and reboot persistence, and missing task attribution, remain the next gap (decisions.json line 2036).",
-  "The only qualified optional model route is llama.cpp on one single-task trial near its time cap. vLLM (pin behind upstream: 0.25.0 vs v0.30.0) and OmniRoute are outside the candidate set, and OmniRoute has unsuccessful gateway tasks (decisions.json lines 2241-2243).",
-  "No production ntfy webhook was observed after the template deployment.",
-  "No measured comparison against alternative observation stacks exists. Selection rests on bounded native acceptance on one host."
+  "The privacy-filter evidence is one synthetic canary reviewed by a reviewer (observability/receipt.json lines 313-329). The repository has no script that re-runs it, and it covers only tested fields and trusted instrumentation, not arbitrary-content DLP (line 24).",
+  "No script or test in the repository re-runs the native usage reconciliation end to end. It exists only as retained commands in docs/native-telemetry-resolution.md lines 22-30 and observability/backends/telemetry-resolution-20260921.json lines 207-211 and 269-306.",
+  "Scheduled-service and reboot persistence are not qualified (decisions.json line 2036). check_persistence.py covers one user-service restart only.",
+  "Missing task attribution: the Prometheus counters before the task already held another Claude process's usage, so only the after-snapshot match per category is established (native-telemetry-resolution.md lines 47-49; telemetry-resolution-20260921.json line 344).",
+  "The SDK receipt lane has no automatic spool expiry and no loss/recovery acceptance under a full disk or an extended outage (observability/receipt.json line 258).",
+  "Traces are disabled and no trace database is deployed, so the pipeline answers no trace questions (agents-operations.json line 882).",
+  "No latency or elapsed-time measurement is claimed for notifications (observability/receipt.json line 311).",
+  "The ntfy template's formatting on the next real production notification has not been observed.",
+  "The llama.cpp route is qualified on one fixture and one trial only; it has no host portability, concurrency or recovery evidence.",
+  "Nothing here establishes lifetime token savings or a universal SOTA ranking."
  ],
  "overturn_protocol": {
   "arms": [
-   "otelcol-contrib 0.161.0 -> Prometheus 3.14.0 -> Grafana 13.2.2 (current)",
-   "Phoenix arize-phoenix-v20.14.0 trace path",
-   "OpenLIT openlit-2.1.0 coding instrumentation",
-   "llama.cpp b11057 vs vLLM/SGLang on the same frozen workload"
+   "current: otelcol-contrib 0.161.0 + Prometheus 3.14.0 + Loki 3.7.8, displayed through Grafana 13.2.2",
+   "challenger: OpenLIT instrumentation on the same native task in place of the current capture (no pin retained in the packet)",
+   "challenger: Phoenix arize-phoenix-v20.14.0 as the trace store and UI, used only for a trace question the current path cannot answer"
   ],
   "fixture_paths": [
+   "fixtures/observability-check.json",
+   "observability/backends/telemetry-resolution-20260921.json",
+   "observability/backends/check_persistence.py",
    "tests/test_observability.py",
-   "tests/test_observability_backends_alerts.py",
    "blueprints/convergence-practice/gpu-inference/qualify.py"
   ],
-  "metric": "The privacy canary shows forbidden_marker_absent and normalized metadata. A native task's returned usage categories match the store exactly. Required trace or usage questions are answerable without duplicate capture. For an inference route, the frozen workload's tests pass within its resource and latency cap."
+  "metric": "Per-category exact match (input, cache creation, cache read, output) between a fresh native task's returned usage and the Prometheus query 'sum by (type) (ecosystem_claude_code_token_usage_tokens_total)'. Loki per-receipt total_token_count sum equal to the written receipts. check_persistence.py checks (prometheus_historical_sample, loki_log, grafana_dashboard, grafana_datasources) all true after restart. Zero forbidden content markers in Loki, file or metric records from a new privacy canary. No latency metric is claimed, because no retained command measures it (observability/receipt.json line 311)."
  },
- "overturn_when": "The verdict changes if the current Collector-to-Prometheus-to-Grafana path cannot answer a required trace or usage question and an alternative wins an executed comparison. Traces are currently disabled (agents-operations.json line 882). An alternative such as Phoenix, OpenLIT, or Loki-first logs would need to pass that comparison. The comparison would run python3 -m pytest tests/test_observability.py tests/test_observability_backends_alerts.py and repeat the privacy canary from observability/receipt.json. It must show forbidden_marker_absent and exact counter reconciliation with a native task's returned usage, as in docs/native-telemetry-resolution.md, without duplicate capture. Separately, an optional model route changes only if blueprints/convergence-practice/gpu-inference/qualify.py passes on a frozen representative workload.",
- "packet_sha256": "f6bf5f36fa72156174eff9c90caceb985db2f7c76c0067366069221474bb85c7",
+ "overturn_when": "Change the verdict if a fresh native reconciliation no longer matches.\n\n1. Run a fresh native Claude task. Either use the claude -p invocation in docs/native-telemetry-resolution.md lines 22-27, or have the task read fixtures/observability-check.json, the prompt fixture of the native client acceptance recorded in observability/receipt.json lines 164 and 236-244. Then run the retained Prometheus query from observability/backends/telemetry-resolution-20260921.json lines 207-211: python3 -c \"import urllib.request,urllib.parse,sys;sys.stdout.buffer.write(urllib.request.urlopen(\\\"http://127.0.0.1:19090/api/v1/query?\\\"+urllib.parse.urlencode({\\\"query\\\":\\\"sum by (type) (ecosystem_claude_code_token_usage_tokens_total)\\\"}),timeout=20).read())\". The verdict changes if the input, cache-creation, cache-read and output values differ from the task's returned usage.\n\n2. The verdict also changes if the native Loki receipt query (observability/receipt.json lines 122-127) no longer returns the per-receipt totals that were written.\n\n3. Recovery: re-run python3 observability/backends/check_persistence.py with a fresh --evidence-dir and the local Grafana credential file. The verdict changes if its prometheus, loki or grafana checks fail.\n\n4. A new privacy canary that shows a content field passing the Collector transform also changes the verdict. The repository has no script for this; the receipt records only a reviewer-run canary and a historical query.\n\n5. If a required trace or evaluation question cannot be answered by this pipeline, OpenLIT or Phoenix would have to pass the same fidelity, privacy and recovery comparison on the same native task without duplicate capture.\n\nFor the optional inference route, re-run python3 blueprints/convergence-practice/gpu-inference/qualify.py on a newly frozen representative workload.\n\npython3 -m unittest tests.test_observability is only an offline regression. It covers process identity, write_observation redaction and atomic no-overwrite writes, the receipt_id query text in the Grafana dashboard panel, and refusal to replay persistence. It does not check live reconciliation or the Collector's privacy.",
+ "packet_sha256": "be95e26e136f99966d539f159045bac43c5f1dcad35914dc71d395db1ee487df",
  "schema_version": 1,
  "sources_read": [
   "<host-path>/foundation__observation-inference.json",
   "docs/native-telemetry-resolution.md",
-  "docs/dashboard-gap-resolution.md",
-  "docs/dashboard-rendered-acceptance.md (grep: Grafana/Prometheus lines 26-33, 80-84)",
-  "docs/token-native-saturation.md (grep: agentsview lines 24-28, 59)",
-  "docs/foundation-closure-20260921.md (lines 67, 100-139)",
-  "catalogs/foundation/decisions.json (lines 1995-2244)",
-  "catalogs/us-equities/agents-operations.json (lines 484-521 via grep, 800-1289)",
-  "evidence/receipts/native-gpu-patch-20260920.json",
-  "observability/receipt.json (grep plus lines 300-379)"
+  "observability/backends/telemetry-resolution-20260921.json",
+  "observability/receipt.json (lines 100-379)",
+  "docs/dashboard-rendered-acceptance.md (lines 20-44)",
+  "docs/dashboard-gap-resolution.md (lines 1-30)",
+  "docs/token-native-saturation.md (prior round)",
+  "docs/foundation-closure-20260921.md (lines 67, 100-139, prior round)",
+  "catalogs/foundation/decisions.json (lines 2001-2100)",
+  "catalogs/us-equities/agents-operations.json (lines 854-885, 1147-1194, 1238-1273)",
+  "evidence/receipts/native-gpu-patch-20260920.json (prior round)",
+  "fixtures/observability-check.json (prior round)",
+  "tests/test_observability.py",
+  "observability/backends/check_persistence.py (lines 1-80)",
+  "observability/native-data/render.py",
+  "observability/grand-dashboard/acceptance.py (grep for docstring only)"
  ],
- "why_selected": "The requirement is to observe real native usage and service outcomes through one privacy-filtered local pipeline. The retained evidence shows native execution through OTel Collector Contrib (c8), then Prometheus (c9), then Grafana (c5). The provider judgments I kept are the packet's evidence_kind native_execution and the decision loopback-usage-observation, accepted_within_scope. In my own source review, docs/native-telemetry-resolution.md lines 11-45 records a real native Claude Code 2.1.278 task. It exported OTLP to the loopback Collector with content logging disabled. Its returned usage (Input 34, Cache creation 16,402, Cache read 14,959, Output 787) \"matched the subsequent native Prometheus response exactly\" (promtool query instant, lines 28-29). The Grafana Claude panel showed all four series. docs/dashboard-gap-resolution.md line 13 repeats this. docs/dashboard-rendered-acceptance.md line 30 records a native promtool `up` query that returned 1 for all seven scrape targets. observability/receipt.json lines 313-330 records a synthetic privacy canary: logs and metrics POST returned 200, forbidden_marker_absent true and metadata_channels_normalized true. Line 371 keeps the earlier failure, where metadata fell outside the attribute maps before the fix. catalogs/us-equities/agents-operations.json line 861 names the contrib distribution as the single process that carries the privacy transform. These three components are the minimal path from filtering to storage to rendering that the observed match went through. Loki, Alertmanager and ntfy are accepted parts of the same pipeline but add log retention or alert delivery beyond the usage observation itself. This is bounded, same-host native evidence, not a measured comparison against other stacks.",
- "winner_evidence_class": "native_proven",
+ "why_selected": "The requirement asks for one privacy-filtered local pipeline that observes real native usage and service outcomes. On the retained evidence, three components do that work: the OTel Collector filters and delivers the data, Prometheus stores metrics and Loki stores logs. Grafana, the display layer, was a winner in the earlier round. It is now an alternative, because the evidence shows Loki carries both privacy verification and usage reconciliation, while Grafana's rows show only rendering and query agreement.\n\n(1) Native execution, Collector and Prometheus. In docs/native-telemetry-resolution.md lines 11-45, native Claude Code 2.1.278 exported OTLP over HTTP/protobuf to the loopback Collector with content logging disabled. The task returned 34 input, 16,402 cache-creation, 14,959 cache-read and 787 output tokens, and a native Prometheus query matched them exactly. The retained receipt, observability/backends/telemetry-resolution-20260921.json lines 46-58, records per_type_exact_match true. The query itself is a python3 urllib call at lines 207-211 of that receipt.\n\n(2) Native execution, Loki. observability/receipt.json lines 122-127 record a native Loki query returning total_tokens 80770. Lines 246-256 record the same 80770 after a Collector restart, and say the corrected Loki records held only allowed metadata and omitted bodies. Line 201 records Claude's collected_request_logs_and_metrics_match as true. Lines 296-301 record a passed restart persistence check across the backends.\n\n(3) Privacy filtering rests on weaker evidence. The privacy canary in observability/receipt.json lines 313-329 is labelled 'Independent synthetic review; not an inference task'. It recorded loki_records 1 and forbidden_marker_absent true. Line 24 limits the filters to tested fields and trusted instrumentation, not arbitrary-content DLP. Line 371 retains the earlier privacy failure and its correction. The winner set's evidence class is therefore synthetic, the weakest class among the winners, even though usage fidelity itself is native_proven.\n\n(4) Catalog records. catalogs/us-equities/agents-operations.json lines 859-882 record that the Collector supplies the privacy transform, the Prometheus exporter and delivery to Loki, and that traces are disabled. catalogs/foundation/decisions.json lines 2001-2075 record loopback-usage-observation as accepted_within_scope, selection 'conditional', with 'use' stages for all six components.\n\nThe optional llama.cpp route stays conditional on its own workload receipt. All of this is my own source review of dated retained evidence. No TypeSafe inference results were supplied, and I kept no provider judgments.",
+ "winner_evidence_class": "synthetic",
  "winner_evidence_refs": [
   "docs/native-telemetry-resolution.md",
-  "docs/dashboard-gap-resolution.md",
-  "docs/dashboard-rendered-acceptance.md",
+  "observability/backends/telemetry-resolution-20260921.json",
   "observability/receipt.json",
-  "catalogs/foundation/decisions.json",
-  "catalogs/us-equities/agents-operations.json"
+  "catalogs/us-equities/agents-operations.json",
+  "catalogs/foundation/decisions.json"
  ],
  "winner_keys": [
   "c8",
   "c9",
-  "c5"
+  "c12"
  ]
 }

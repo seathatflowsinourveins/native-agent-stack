@@ -1,0 +1,128 @@
+{
+ "alternatives": [
+  {
+   "disposition": "conditional",
+   "evidence_class": "local_integration",
+   "evidence_refs": [
+    "evidence/receipts/claude-upstream-checks-20260921.json",
+    "evidence/artifacts/claude-upstream-checks-20260921/results.json"
+   ],
+   "key": "c1",
+   "name": "MCPorter native bridge",
+   "repository": "https://github.com/openclaw/mcporter",
+   "why_not_default": "The retained row establishes version and server-list readiness, not a coding client with native accounts, model selection and resumable sessions. Its zero-exit listing reported two healthy servers and one Context Mode daemon error. Useful as a scoped bridge; insufficient as the native-client default."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "docs/foundation-closure-20260921.md",
+    "catalogs/us-equities/agents-operations.json"
+   ],
+   "key": "c2",
+   "name": "Claude Agent SDK",
+   "repository": "https://github.com/anthropics/claude-agent-sdk-python",
+   "why_not_default": "Retained source review identifies programmatic tools, events and session control, but the closure explicitly records no new installation or qualification. No matched SDK execution establishes the native account, effective settings, task completion and interruption boundaries demonstrated by Claude Code."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "docs/foundation-closure-20260921.md",
+    "catalogs/us-equities/agents-operations.json"
+   ],
+   "key": "c4",
+   "name": "OpenAI Agents SDK",
+   "repository": "https://github.com/openai/openai-agents-python",
+   "why_not_default": "The retained entry describes an application-owned API agent and explicitly records no provider call or model comparison. It does not inherit Codex account entitlement, leaving the existing-native-account requirement unmet on this evidence."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/landscape/candidate-quality-review.json"
+   ],
+   "key": "c5",
+   "name": "Letta Code",
+   "repository": "https://github.com/letta-ai/letta-code",
+   "why_not_default": "The retained pinned-source review describes persistent memory and a stateful harness, but records no native model operation, matched task-quality comparison or recovery acceptance. Native-account compatibility and migration benefits remain unestablished."
+  },
+  {
+   "disposition": "out_of_scope",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/landscape/candidate-quality-review.json"
+   ],
+   "key": "c6",
+   "name": "Letta V1 legacy server",
+   "repository": "https://github.com/letta-ai/letta",
+   "why_not_default": "The retained source review identifies V1 as a legacy server preserved on an archive branch, with active development directed to Letta Code. It supplies no executed comparison establishing the required native-client behavior."
+  }
+ ],
+ "catalog": "foundation",
+ "challenger_preferred": null,
+ "lane": "codex",
+ "layer_id": "native-clients",
+ "limits": [
+  "This verdict reviews retained public evidence; no new native model task, SDK comparison or recovery experiment was executed.",
+  "Private original streams, session identities and account stores were not inspected; sanitized artifacts and their stated boundaries were used.",
+  "Context Mode file reads were blocked by its configured project root. Authorized repository reads through the host command tool recovered the required evidence.",
+  "Upstream metadata and pinned source-review findings were not independently refreshed."
+ ],
+ "model": {
+  "effort": "high",
+  "name": "gpt-6-astra"
+ },
+ "open_gaps": [
+  "No matched execution establishes comparative model quality or causal provider savings across the candidates.",
+  "Same-session recovery is established only for bounded local fixtures. Host failure, independent-host restoration, remote provider cancellation, billing cessation and distributed exactly-once effects remain unqualified.",
+  "The Codex recovery experiment used a different recorded build from the later source-retrieval task; it does not establish recovery on every release.",
+  "Successful selected-tool retrieval does not establish every installed tool, arbitrary coding tasks, all model choices or another host's activation.",
+  "Neither SDK candidate has a retained same-task comparison preserving the required native account and recovery boundaries.",
+  "MCPorter's referenced readiness output includes a Context Mode daemon error; version and listing success do not establish functional bridge recovery."
+ ],
+ "overturn_protocol": {
+  "arms": [
+   "Codex and Claude Code using their native accounts, recorded model choices and client tools",
+   "A supported SDK or Letta Code implementation demonstrating a concrete missing capability under equivalent account, task and effect constraints"
+  ],
+  "fixture_paths": [
+   "blueprints/convergence-practice/native-recovery/README.md",
+   "blueprints/convergence-practice/native-recovery/claude/README.md",
+   "tests/test_native_recovery.py"
+  ],
+  "metric": "Require correct task output, preserved account and model boundaries, same-session continuation, unchanged checkpoint, one checkpoint execution and owned-process cleanup. Retain failures and complete usage where available; offline fixture tests alone cannot promote a challenger."
+ },
+ "overturn_when": "Change the verdict after an executed comparison using the checkpoint/interruption/finalization protocols in blueprints/convergence-practice/native-recovery/README.md and blueprints/convergence-practice/native-recovery/claude/README.md demonstrates that a challenger supplies a required capability unavailable through the native clients while preserving account boundaries, task correctness, session identity, single-effect behavior and cleanup. Passing tests/test_native_recovery.py alone is insufficient.",
+ "packet_sha256": "82809ae19f1a1ba4eaa4ff6605b2ed38d83b47656a86fc4274ecb37c3bc9091f",
+ "schema_version": 1,
+ "sources_read": [
+  "<host-path>/foundation__native-clients.json",
+  "<host-path>/SKILL.md",
+  "<host-path>/SKILL.md",
+  "docs/full-stack-convergence.md",
+  "docs/foundation-closure-20260921.md",
+  "evidence/receipts/claude-upstream-checks-20260921.json",
+  "catalogs/foundation/decisions.json",
+  "catalogs/us-equities/agents-operations.json",
+  "evidence/artifacts/claude-upstream-checks-20260921/results.json",
+  "evidence/artifacts/full-stack-convergence-20260921/native-client-results.json",
+  "blueprints/convergence-practice/native-recovery/README.md",
+  "blueprints/convergence-practice/native-recovery/claude/README.md",
+  "catalogs/landscape/candidate-quality-review.json"
+ ],
+ "why_selected": "Select Codex and Claude Code. Retained native execution in evidence/artifacts/full-stack-convergence-20260921/native-client-results.json shows both completing the same bounded source-retrieval task with existing native configuration, exit code zero and eleven tool results each without reported tool-result errors. docs/foundation-closure-20260921.md additionally records authenticated interactive Claude operation, a bounded review and continuity after manual compaction. The two blueprints/convergence-practice/native-recovery README files record actual native interruption and same-session continuation over frozen synthetic checkpoint tasks, with unchanged checkpoints and one execution. These observations directly support native accounts, client tools and resumable sessions within their recorded scopes; they do not establish universal task superiority.",
+ "winner_evidence_class": "native_proven",
+ "winner_evidence_refs": [
+  "docs/full-stack-convergence.md",
+  "docs/foundation-closure-20260921.md",
+  "catalogs/foundation/decisions.json",
+  "evidence/artifacts/full-stack-convergence-20260921/native-client-results.json",
+  "blueprints/convergence-practice/native-recovery/README.md",
+  "blueprints/convergence-practice/native-recovery/claude/README.md"
+ ],
+ "winner_keys": [
+  "c3",
+  "c7"
+ ]
+}

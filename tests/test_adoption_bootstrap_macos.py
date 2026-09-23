@@ -155,6 +155,16 @@ class PinsSchemaTests(unittest.TestCase):
         self.assertIn("@openai/codex-darwin-arm64", by_id["codex"]["install_note"])
         self.assertIn("@anthropic-ai/claude-code-darwin-arm64", by_id["claude-code"]["install_note"])
 
+    def test_mcporter_note_does_not_claim_its_tarball_is_the_whole_install(self):
+        # `npm view mcporter@0.13.13 dependencies bundleDependencies` (2026-09-22):
+        # ten registry-resolved runtime dependencies, none bundled; rolldown@1.2.8
+        # in turn selects a native darwin-arm64 binding.
+        note = {tool["id"]: tool for tool in self.pins["tools"]}["mcporter"]["install_note"]
+        self.assertNotIn("whole install", note)
+        self.assertIn("UNPINNED", note)
+        self.assertIn("rolldown", note)
+        self.assertIn("@rolldown/binding-darwin-arm64", note)
+
 
 class ProfileCoverageTests(unittest.TestCase):
     def setUp(self):
@@ -350,6 +360,90 @@ class ScriptBehaviorTests(unittest.TestCase):
                              "plan mode must not install anything")
             self.assertFalse((eco_root / "installed-versions.txt").exists())
 
+    # Every network or package-manager command the script could reach. A
+    # --plan run must invoke none of them; each shim only logs that it ran.
+    RECORDED_COMMANDS = ("curl", "wget", "brew", "npm", "npx", "node", "corepack",
+                         "git", "gh", "uv", "uvx", "pip", "pip3", "softwareupdate",
+                         "xcode-select", "installer", "nc", "ssh", "scp", "rsync")
+
+    def _recorder(self, directory: Path, log: Path) -> Path:
+        recorder = directory / "recorder"
+        recorder.mkdir()
+        for name in self.RECORDED_COMMANDS:
+            shim = recorder / name
+            shim.write_text(f'#!/bin/sh\nprintf "%s %s\\n" "{name}" "$*" >> "{log}"\nexit 0\n')
+            shim.chmod(0o755)
+        return recorder
+
+    def _plan_with_recorder(self, tmp_path: Path, args, script=None):
+        log = tmp_path / "invocations.log"
+        recorder = self._recorder(tmp_path, log)
+        shim = macos_shim(tmp_path)
+        eco_root = tmp_path / "eco"
+        result = self.run_script(
+            ["--plan", "--profile", PROFILE_ID, *args],
+            env={"PATH": f"{shim}{os.pathsep}{recorder}{os.pathsep}{os.environ['PATH']}",
+                 "ECO_INSTALL_ROOT": str(eco_root)},
+            script=script,
+        )
+        invocations = log.read_text() if log.exists() else ""
+        return result, invocations, eco_root
+
+    def test_plan_invokes_no_network_or_package_manager_command(self):
+        for args in (["--skip-system-packages"], []):
+            with self.subTest(args=args), tempfile.TemporaryDirectory() as tmp:
+                result, invocations, eco_root = self._plan_with_recorder(Path(tmp), args)
+                self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+                self.assertIn("nothing was downloaded or installed", result.stdout)
+                self.assertEqual(invocations, "",
+                                 f"--plan invoked network/package commands:\n{invocations}")
+                self.assertFalse(list(eco_root.glob("tools/*/*")))
+                self.assertFalse(list(eco_root.glob("downloads/*")))
+
+    def test_plan_recorder_catches_an_injected_network_call(self):
+        # Control: the same harness on a copy with one curl call added to the
+        # plan path must record it, so the test above cannot pass vacuously.
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            adoption_dir = tmp_path / "adoption"
+            adoption_dir.mkdir()
+            for name in ("manifest.json", "pins-macos-arm64.json"):
+                (adoption_dir / name).write_text((ROOT / "adoption" / name).read_text())
+            text = SCRIPT_PATH.read_text()
+            marker = "for core_id in node uv gh; do"
+            self.assertEqual(text.count(marker), 1)
+            script_copy = adoption_dir / "bootstrap-macos.sh"
+            script_copy.write_text(text.replace(
+                marker, "curl --silent https://example.invalid/probe\n" + marker))
+            result, invocations, _ = self._plan_with_recorder(
+                tmp_path, ["--skip-system-packages"], script=script_copy)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("curl --silent https://example.invalid/probe", invocations)
+
+    def test_install_root_that_resolves_to_home_or_root_is_refused(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            home = tmp_path / "home"
+            home.mkdir()
+            link = tmp_path / "home-link"
+            link.symlink_to(home)
+            shim = macos_shim(tmp_path)
+            roots = {"home-dot": f"{home}/.", "home-symlink": str(link),
+                     "home-parent-walk": f"{home}/../home"}
+            if not os.access("/", os.W_OK):
+                roots["filesystem-root"] = "/."
+            for label, root in roots.items():
+                with self.subTest(root=label):
+                    result = self.run_script(
+                        ["--plan", "--profile", PROFILE_ID, "--skip-system-packages"],
+                        env={"PATH": f"{shim}{os.pathsep}{os.environ['PATH']}",
+                             "HOME": str(home), "ECO_INSTALL_ROOT": root},
+                    )
+                    self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+                    self.assertIn("ECO_INSTALL_ROOT must name a dedicated", result.stderr)
+                    self.assertEqual(sorted(p.name for p in home.iterdir()), [],
+                                     "installation children were created in HOME")
+
     def test_null_hash_pin_is_refused_and_installs_nothing(self):
         with tempfile.TemporaryDirectory() as tmp:
             tmp_path = Path(tmp)
@@ -376,6 +470,60 @@ class ScriptBehaviorTests(unittest.TestCase):
             self.assertIn("no verified sha256", result.stderr)
             self.assertFalse(list(eco_root.glob("tools/*/*")),
                              "no tool files should have been installed before the refusal")
+
+
+def _shell_functions(text: str, *names: str) -> str:
+    """The source of top-level shell functions, from `name() {` to its `}`."""
+    blocks = []
+    for name in names:
+        match = re.search(rf"(?ms)^{re.escape(name)}\(\) \{{\n.*?^\}}\n", text)
+        assert match, f"function {name} not found"
+        blocks.append(match.group(0))
+    return "".join(blocks)
+
+
+class LlamaWrapperQuotingTests(unittest.TestCase):
+    """Local integration check of the generated llama-server wrapper.
+
+    install_llama_cpp and find_one are extracted verbatim from the script and
+    run with fetch stubbed out and a pre-built archive, so no network is used.
+    The install root deliberately contains shell syntax.
+    """
+
+    def test_install_path_with_shell_syntax_is_data_in_the_wrapper(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            root = tmp_path / 'eco $(touch PWNED) `touch PWNED2` "q" \'s\' $HOME'
+            for child in ("bin", "downloads", "tools"):
+                (root / child).mkdir(parents=True)
+            stage = tmp_path / "stage"
+            stage.mkdir()
+            source = tmp_path / "src" / "llama"
+            source.mkdir(parents=True)
+            server = source / "llama-server"
+            server.write_text('#!/bin/sh\nprintf "%s\\n%s\\n" "$0" "$DYLD_LIBRARY_PATH"\n')
+            server.chmod(0o755)
+            archive = root / "downloads" / "llama.tar.gz"
+            subprocess.run(["tar", "-czf", str(archive), "-C", str(source.parent), "llama"],
+                           check=True)
+            harness = tmp_path / "harness.sh"
+            harness.write_text(
+                "set -Eeuo pipefail\n"
+                + _shell_functions(SCRIPT_PATH.read_text(), "find_one", "install_llama_cpp")
+                + "fetch() { :; }\n"
+                + 'ecosystem_root=$1; bin_dir="$1/bin"; cache_dir="$1/downloads"; stage_dir=$2\n'
+                + "install_llama_cpp b1 https://example.invalid/llama.tar.gz unused\n")
+            built = subprocess.run(["bash", str(harness), str(root), str(stage)],
+                                   capture_output=True, text=True, timeout=60)
+            self.assertEqual(built.returncode, 0, built.stdout + built.stderr)
+            run = subprocess.run(["sh", str(root / "bin" / "llama-server")],
+                                 capture_output=True, text=True, timeout=60, cwd=tmp_path,
+                                 env={**os.environ, "DYLD_LIBRARY_PATH": ""})
+            self.assertFalse((tmp_path / "PWNED").exists(), "$(...) in the path was executed")
+            self.assertFalse((tmp_path / "PWNED2").exists(), "`...` in the path was executed")
+            self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+            prefix = f"{root}/tools/llama-cpp-b1"
+            self.assertEqual(run.stdout.splitlines(), [f"{prefix}/llama-server", prefix])
 
 
 class UnpinnedComponentFailClosedTests(unittest.TestCase):

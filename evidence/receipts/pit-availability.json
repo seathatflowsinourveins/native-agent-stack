@@ -1,0 +1,2896 @@
+{
+  "id": "pit-availability-20260922",
+  "kind": "artifact_measurement",
+  "evidence_class": "open_and_entitled_sources_measured",
+  "claim": "On the sample in plan.json (all 20 filings/news symbols and 5 vintage-price symbols are currently-listed survivors as of the plan's write time, and two of the 20 have a ticker-to-CIK identity break handled separately; see limitations), measures what point-in-time filing acceptance metadata, news updated_at-vs-created_at behaviour and raw-vs-adjusted price divergence establish from open (SEC data.sec.gov) and already-entitled (Alpaca paper/SIP, Benzinga news) sources. Does not establish a complete historical point-in-time reconstruction system.",
+  "plan_path": "blueprints/us-equities/pit-availability/plan.json",
+  "plan_sha256": "a7289c28b392de33a4e5fc36786bf2062f53936d27f2687af5e5c5803f9cbd3c",
+  "plan_written_utc": "2026-09-22T22:19:38+00:00",
+  "preregistered": false,
+  "plan_history": "Round 1: initial plan and measurement. Round 2: revised after review (added amendment forms, 10-K completeness check, post_close session split, created_at window filter, log-relative price-step detector, corporate-action step matching). Round 3: revised again after review (removed the hand-written plan_written_utc in favour of a stat-derived value; added filings_identity_breaks for XOM and DKNG). Because the plan was revised after seeing round-1 and round-2 results, it is not preregistered.",
+  "sources": [
+    {
+      "part": "filings",
+      "endpoint": "https://data.sec.gov/submissions/CIK{cik}.json",
+      "ticker_map": "https://www.sec.gov/files/company_tickers.json",
+      "rate_limit_per_sec": 5
+    },
+    {
+      "part": "news",
+      "endpoint": "https://data.alpaca.markets/v1beta1/news (Benzinga content)",
+      "note": "alpaca-py 0.44.0's NewsClient.get_news() does paginate automatically (BaseRestClient._get_marketdata loops on next_page_token, matching NewsRequest.page_token's docstring). Its NewsRequest.limit, however, is documented as a per-page limit but is implemented as a TOTAL cap across all pages in alpaca/common/rest.py; passing limit=50 legitimately stopped the SDK at 50 items total, not one page. Direct REST is used here instead (same host, params and APCA-API-KEY-ID/APCA-API-SECRET-KEY headers the SDK itself uses) with its own next_page_token loop and no total-item cap, which is simpler than tracking the SDK's documented-per-page-vs-implemented-as-total distinction across 11 yearly requests."
+    },
+    {
+      "part": "prices",
+      "endpoint": "alpaca-py StockHistoricalDataClient bars (feed=sip) and CorporateActionsClient"
+    }
+  ],
+  "parts": {
+    "filings": {
+      "symbols_missing_cik": [],
+      "symbols_10k_shortfall": [
+        "SOFI",
+        "UPST"
+      ],
+      "symbols_excluded_from_overall": [
+        "XOM",
+        "DKNG"
+      ],
+      "overall": {
+        "total_filings": 3488,
+        "with_acceptance_datetime": 3488,
+        "acceptance_datetime_fraction": 1.0,
+        "post_close_count": 2252,
+        "post_close_share_of_accepted": 0.6456422018348624,
+        "after_hours_count": 301,
+        "after_hours_share_of_accepted": 0.08629587155963303,
+        "filing_date_mismatch_count": 279,
+        "filing_date_mismatch_share_of_accepted": 0.07998853211009174,
+        "by_form": {
+          "8-K/A": {
+            "total": 79,
+            "with_acceptance": 79,
+            "regular_count": 23,
+            "post_close_count": 49,
+            "after_hours_count": 7,
+            "post_close_share_of_accepted": 0.620253164556962,
+            "after_hours_share_of_accepted": 0.08860759493670886
+          },
+          "10-Q": {
+            "total": 546,
+            "with_acceptance": 546,
+            "regular_count": 42,
+            "post_close_count": 376,
+            "after_hours_count": 128,
+            "post_close_share_of_accepted": 0.6886446886446886,
+            "after_hours_share_of_accepted": 0.23443223443223443
+          },
+          "8-K": {
+            "total": 2640,
+            "with_acceptance": 2640,
+            "regular_count": 845,
+            "post_close_count": 1686,
+            "after_hours_count": 109,
+            "post_close_share_of_accepted": 0.6386363636363637,
+            "after_hours_share_of_accepted": 0.04128787878787879
+          },
+          "10-K": {
+            "total": 184,
+            "with_acceptance": 184,
+            "regular_count": 19,
+            "post_close_count": 112,
+            "after_hours_count": 53,
+            "post_close_share_of_accepted": 0.6086956521739131,
+            "after_hours_share_of_accepted": 0.28804347826086957
+          },
+          "10-K/A": {
+            "total": 27,
+            "with_acceptance": 27,
+            "regular_count": 3,
+            "post_close_count": 22,
+            "after_hours_count": 2,
+            "post_close_share_of_accepted": 0.8148148148148148,
+            "after_hours_share_of_accepted": 0.07407407407407407
+          },
+          "10-Q/A": {
+            "total": 12,
+            "with_acceptance": 12,
+            "regular_count": 3,
+            "post_close_count": 7,
+            "after_hours_count": 2,
+            "post_close_share_of_accepted": 0.5833333333333334,
+            "after_hours_share_of_accepted": 0.16666666666666666
+          }
+        }
+      },
+      "per_symbol": {
+        "AAPL": {
+          "total_filings": 142,
+          "with_acceptance_datetime": 142,
+          "acceptance_datetime_fraction": 1.0,
+          "post_close_count": 101,
+          "post_close_share_of_accepted": 0.7112676056338029,
+          "after_hours_count": 23,
+          "after_hours_share_of_accepted": 0.1619718309859155,
+          "filing_date_mismatch_count": 22,
+          "filing_date_mismatch_share_of_accepted": 0.15492957746478872,
+          "by_form": {
+            "8-K/A": {
+              "total": 2,
+              "with_acceptance": 2,
+              "regular_count": 0,
+              "post_close_count": 1,
+              "after_hours_count": 1,
+              "post_close_share_of_accepted": 0.5,
+              "after_hours_share_of_accepted": 0.5
+            },
+            "10-Q": {
+              "total": 33,
+              "with_acceptance": 33,
+              "regular_count": 7,
+              "post_close_count": 11,
+              "after_hours_count": 15,
+              "post_close_share_of_accepted": 0.3333333333333333,
+              "after_hours_share_of_accepted": 0.45454545454545453
+            },
+            "8-K": {
+              "total": 97,
+              "with_acceptance": 97,
+              "regular_count": 7,
+              "post_close_count": 88,
+              "after_hours_count": 2,
+              "post_close_share_of_accepted": 0.9072164948453608,
+              "after_hours_share_of_accepted": 0.020618556701030927
+            },
+            "10-K": {
+              "total": 10,
+              "with_acceptance": 10,
+              "regular_count": 4,
+              "post_close_count": 1,
+              "after_hours_count": 5,
+              "post_close_share_of_accepted": 0.1,
+              "after_hours_share_of_accepted": 0.5
+            }
+          },
+          "sec_cik": "0000320193",
+          "sec_entity_name": "Apple Inc.",
+          "sec_current_tickers": [
+            "AAPL"
+          ],
+          "older_files_fetched": [
+            "CIK0000320193-submissions-001.json"
+          ],
+          "completeness": {
+            "actual_10k_count": 10,
+            "expected_10k_count": 10,
+            "tolerance": 2,
+            "shortfall": false
+          }
+        },
+        "MSFT": {
+          "total_filings": 149,
+          "with_acceptance_datetime": 149,
+          "acceptance_datetime_fraction": 1.0,
+          "post_close_count": 123,
+          "post_close_share_of_accepted": 0.825503355704698,
+          "after_hours_count": 2,
+          "after_hours_share_of_accepted": 0.013422818791946308,
+          "filing_date_mismatch_count": 0,
+          "filing_date_mismatch_share_of_accepted": 0.0,
+          "by_form": {
+            "8-K": {
+              "total": 105,
+              "with_acceptance": 105,
+              "regular_count": 22,
+              "post_close_count": 82,
+              "after_hours_count": 1,
+              "post_close_share_of_accepted": 0.780952380952381,
+              "after_hours_share_of_accepted": 0.009523809523809525
+            },
+            "10-K": {
+              "total": 11,
+              "with_acceptance": 11,
+              "regular_count": 1,
+              "post_close_count": 9,
+              "after_hours_count": 1,
+              "post_close_share_of_accepted": 0.8181818181818182,
+              "after_hours_share_of_accepted": 0.09090909090909091
+            },
+            "10-Q": {
+              "total": 32,
+              "with_acceptance": 32,
+              "regular_count": 0,
+              "post_close_count": 32,
+              "after_hours_count": 0,
+              "post_close_share_of_accepted": 1.0,
+              "after_hours_share_of_accepted": 0.0
+            },
+            "8-K/A": {
+              "total": 1,
+              "with_acceptance": 1,
+              "regular_count": 1,
+              "post_close_count": 0,
+              "after_hours_count": 0,
+              "post_close_share_of_accepted": 0.0,
+              "after_hours_share_of_accepted": 0.0
+            }
+          },
+          "sec_cik": "0000789019",
+          "sec_entity_name": "MICROSOFT CORP",
+          "sec_current_tickers": [
+            "MSFT"
+          ],
+          "older_files_fetched": [
+            "CIK0000789019-submissions-001.json",
+            "CIK0000789019-submissions-002.json"
+          ],
+          "completeness": {
+            "actual_10k_count": 11,
+            "expected_10k_count": 10,
+            "tolerance": 2,
+            "shortfall": false
+          }
+        },
+        "AMZN": {
+          "total_filings": 157,
+          "with_acceptance_datetime": 157,
+          "acceptance_datetime_fraction": 1.0,
+          "post_close_count": 91,
+          "post_close_share_of_accepted": 0.5796178343949044,
+          "after_hours_count": 56,
+          "after_hours_share_of_accepted": 0.35668789808917195,
+          "filing_date_mismatch_count": 54,
+          "filing_date_mismatch_share_of_accepted": 0.34394904458598724,
+          "by_form": {
+            "8-K": {
+              "total": 112,
+              "with_acceptance": 112,
+              "regular_count": 10,
+              "post_close_count": 89,
+              "after_hours_count": 13,
+              "post_close_share_of_accepted": 0.7946428571428571,
+              "after_hours_share_of_accepted": 0.11607142857142858
+            },
+            "10-Q": {
+              "total": 32,
+              "with_acceptance": 32,
+              "regular_count": 0,
+              "post_close_count": 0,
+              "after_hours_count": 32,
+              "post_close_share_of_accepted": 0.0,
+              "after_hours_share_of_accepted": 1.0
+            },
+            "10-K": {
+              "total": 11,
+              "with_acceptance": 11,
+              "regular_count": 0,
+              "post_close_count": 0,
+              "after_hours_count": 11,
+              "post_close_share_of_accepted": 0.0,
+              "after_hours_share_of_accepted": 1.0
+            },
+            "8-K/A": {
+              "total": 2,
+              "with_acceptance": 2,
+              "regular_count": 0,
+              "post_close_count": 2,
+              "after_hours_count": 0,
+              "post_close_share_of_accepted": 1.0,
+              "after_hours_share_of_accepted": 0.0
+            }
+          },
+          "sec_cik": "0001018724",
+          "sec_entity_name": "AMAZON COM INC",
+          "sec_current_tickers": [
+            "AMZN"
+          ],
+          "older_files_fetched": [
+            "CIK0001018724-submissions-001.json",
+            "CIK0001018724-submissions-002.json"
+          ],
+          "completeness": {
+            "actual_10k_count": 11,
+            "expected_10k_count": 10,
+            "tolerance": 2,
+            "shortfall": false
+          }
+        },
+        "GOOGL": {
+          "total_filings": 157,
+          "with_acceptance_datetime": 157,
+          "acceptance_datetime_fraction": 1.0,
+          "post_close_count": 95,
+          "post_close_share_of_accepted": 0.6050955414012739,
+          "after_hours_count": 47,
+          "after_hours_share_of_accepted": 0.29936305732484075,
+          "filing_date_mismatch_count": 46,
+          "filing_date_mismatch_share_of_accepted": 0.2929936305732484,
+          "by_form": {
+            "8-K": {
+              "total": 111,
+              "with_acceptance": 111,
+              "regular_count": 13,
+              "post_close_count": 91,
+              "after_hours_count": 7,
+              "post_close_share_of_accepted": 0.8198198198198198,
+              "after_hours_share_of_accepted": 0.06306306306306306
+            },
+            "10-Q": {
+              "total": 32,
+              "with_acceptance": 32,
+              "regular_count": 0,
+              "post_close_count": 2,
+              "after_hours_count": 30,
+              "post_close_share_of_accepted": 0.0625,
+              "after_hours_share_of_accepted": 0.9375
+            },
+            "10-K": {
+              "total": 11,
+              "with_acceptance": 11,
+              "regular_count": 0,
+              "post_close_count": 1,
+              "after_hours_count": 10,
+              "post_close_share_of_accepted": 0.09090909090909091,
+              "after_hours_share_of_accepted": 0.9090909090909091
+            },
+            "8-K/A": {
+              "total": 1,
+              "with_acceptance": 1,
+              "regular_count": 0,
+              "post_close_count": 1,
+              "after_hours_count": 0,
+              "post_close_share_of_accepted": 1.0,
+              "after_hours_share_of_accepted": 0.0
+            },
+            "10-K/A": {
+              "total": 2,
+              "with_acceptance": 2,
+              "regular_count": 2,
+              "post_close_count": 0,
+              "after_hours_count": 0,
+              "post_close_share_of_accepted": 0.0,
+              "after_hours_share_of_accepted": 0.0
+            }
+          },
+          "sec_cik": "0001652044",
+          "sec_entity_name": "Alphabet Inc.",
+          "sec_current_tickers": [
+            "GOOGL",
+            "GOOG",
+            "GOOGM",
+            "GOOGN"
+          ],
+          "older_files_fetched": [
+            "CIK0001652044-submissions-001.json"
+          ],
+          "completeness": {
+            "actual_10k_count": 11,
+            "expected_10k_count": 10,
+            "tolerance": 2,
+            "shortfall": false
+          }
+        },
+        "META": {
+          "total_filings": 148,
+          "with_acceptance_datetime": 148,
+          "acceptance_datetime_fraction": 1.0,
+          "post_close_count": 109,
+          "post_close_share_of_accepted": 0.7364864864864865,
+          "after_hours_count": 34,
+          "after_hours_share_of_accepted": 0.22972972972972974,
+          "filing_date_mismatch_count": 33,
+          "filing_date_mismatch_share_of_accepted": 0.22297297297297297,
+          "by_form": {
+            "10-Q": {
+              "total": 32,
+              "with_acceptance": 32,
+              "regular_count": 1,
+              "post_close_count": 10,
+              "after_hours_count": 21,
+              "post_close_share_of_accepted": 0.3125,
+              "after_hours_share_of_accepted": 0.65625
+            },
+            "8-K": {
+              "total": 100,
+              "with_acceptance": 100,
+              "regular_count": 4,
+              "post_close_count": 91,
+              "after_hours_count": 5,
+              "post_close_share_of_accepted": 0.91,
+              "after_hours_share_of_accepted": 0.05
+            },
+            "10-K": {
+              "total": 11,
+              "with_acceptance": 11,
+              "regular_count": 0,
+              "post_close_count": 3,
+              "after_hours_count": 8,
+              "post_close_share_of_accepted": 0.2727272727272727,
+              "after_hours_share_of_accepted": 0.7272727272727273
+            },
+            "8-K/A": {
+              "total": 4,
+              "with_acceptance": 4,
+              "regular_count": 0,
+              "post_close_count": 4,
+              "after_hours_count": 0,
+              "post_close_share_of_accepted": 1.0,
+              "after_hours_share_of_accepted": 0.0
+            },
+            "10-K/A": {
+              "total": 1,
+              "with_acceptance": 1,
+              "regular_count": 0,
+              "post_close_count": 1,
+              "after_hours_count": 0,
+              "post_close_share_of_accepted": 1.0,
+              "after_hours_share_of_accepted": 0.0
+            }
+          },
+          "sec_cik": "0001326801",
+          "sec_entity_name": "Meta Platforms, Inc.",
+          "sec_current_tickers": [
+            "META"
+          ],
+          "older_files_fetched": [
+            "CIK0001326801-submissions-001.json",
+            "CIK0001326801-submissions-002.json"
+          ],
+          "completeness": {
+            "actual_10k_count": 11,
+            "expected_10k_count": 10,
+            "tolerance": 2,
+            "shortfall": false
+          }
+        },
+        "JPM": {
+          "total_filings": 376,
+          "with_acceptance_datetime": 376,
+          "acceptance_datetime_fraction": 1.0,
+          "post_close_count": 249,
+          "post_close_share_of_accepted": 0.6622340425531915,
+          "after_hours_count": 10,
+          "after_hours_share_of_accepted": 0.026595744680851064,
+          "filing_date_mismatch_count": 8,
+          "filing_date_mismatch_share_of_accepted": 0.02127659574468085,
+          "by_form": {
+            "10-Q": {
+              "total": 32,
+              "with_acceptance": 32,
+              "regular_count": 0,
+              "post_close_count": 31,
+              "after_hours_count": 1,
+              "post_close_share_of_accepted": 0.96875,
+              "after_hours_share_of_accepted": 0.03125
+            },
+            "8-K": {
+              "total": 328,
+              "with_acceptance": 328,
+              "regular_count": 116,
+              "post_close_count": 204,
+              "after_hours_count": 8,
+              "post_close_share_of_accepted": 0.6219512195121951,
+              "after_hours_share_of_accepted": 0.024390243902439025
+            },
+            "10-K": {
+              "total": 11,
+              "with_acceptance": 11,
+              "regular_count": 0,
+              "post_close_count": 11,
+              "after_hours_count": 0,
+              "post_close_share_of_accepted": 1.0,
+              "after_hours_share_of_accepted": 0.0
+            },
+            "8-K/A": {
+              "total": 5,
+              "with_acceptance": 5,
+              "regular_count": 1,
+              "post_close_count": 3,
+              "after_hours_count": 1,
+              "post_close_share_of_accepted": 0.6,
+              "after_hours_share_of_accepted": 0.2
+            }
+          },
+          "sec_cik": "0000019617",
+          "sec_entity_name": "JPMORGAN CHASE & CO",
+          "sec_current_tickers": [
+            "JPM",
+            "JPM-PC",
+            "AMJB",
+            "JPM-PD",
+            "JPM-PJ",
+            "JPM-PK",
+            "JPM-PL",
+            "JPM-PM",
+            "VYLD"
+          ],
+          "older_files_fetched": [
+            "CIK0000019617-submissions-001.json",
+            "CIK0000019617-submissions-002.json",
+            "CIK0000019617-submissions-003.json",
+            "CIK0000019617-submissions-004.json",
+            "CIK0000019617-submissions-005.json",
+            "CIK0000019617-submissions-006.json",
+            "CIK0000019617-submissions-007.json",
+            "CIK0000019617-submissions-008.json",
+            "CIK0000019617-submissions-009.json",
+            "CIK0000019617-submissions-010.json",
+            "CIK0000019617-submissions-011.json",
+            "CIK0000019617-submissions-012.json",
+            "CIK0000019617-submissions-013.json",
+            "CIK0000019617-submissions-014.json",
+            "CIK0000019617-submissions-015.json",
+            "CIK0000019617-submissions-016.json",
+            "CIK0000019617-submissions-017.json",
+            "CIK0000019617-submissions-018.json",
+            "CIK0000019617-submissions-019.json",
+            "CIK0000019617-submissions-020.json",
+            "CIK0000019617-submissions-021.json",
+            "CIK0000019617-submissions-022.json",
+            "CIK0000019617-submissions-023.json",
+            "CIK0000019617-submissions-024.json",
+            "CIK0000019617-submissions-025.json",
+            "CIK0000019617-submissions-026.json",
+            "CIK0000019617-submissions-027.json",
+            "CIK0000019617-submissions-028.json",
+            "CIK0000019617-submissions-029.json",
+            "CIK0000019617-submissions-030.json",
+            "CIK0000019617-submissions-031.json",
+            "CIK0000019617-submissions-032.json",
+            "CIK0000019617-submissions-033.json",
+            "CIK0000019617-submissions-034.json",
+            "CIK0000019617-submissions-035.json",
+            "CIK0000019617-submissions-036.json",
+            "CIK0000019617-submissions-037.json",
+            "CIK0000019617-submissions-038.json",
+            "CIK0000019617-submissions-039.json",
+            "CIK0000019617-submissions-040.json",
+            "CIK0000019617-submissions-041.json",
+            "CIK0000019617-submissions-042.json",
+            "CIK0000019617-submissions-043.json",
+            "CIK0000019617-submissions-044.json",
+            "CIK0000019617-submissions-045.json",
+            "CIK0000019617-submissions-046.json",
+            "CIK0000019617-submissions-047.json",
+            "CIK0000019617-submissions-048.json",
+            "CIK0000019617-submissions-049.json",
+            "CIK0000019617-submissions-050.json",
+            "CIK0000019617-submissions-051.json",
+            "CIK0000019617-submissions-052.json",
+            "CIK0000019617-submissions-053.json",
+            "CIK0000019617-submissions-054.json",
+            "CIK0000019617-submissions-055.json",
+            "CIK0000019617-submissions-056.json",
+            "CIK0000019617-submissions-057.json",
+            "CIK0000019617-submissions-058.json",
+            "CIK0000019617-submissions-059.json",
+            "CIK0000019617-submissions-060.json",
+            "CIK0000019617-submissions-061.json",
+            "CIK0000019617-submissions-062.json",
+            "CIK0000019617-submissions-063.json",
+            "CIK0000019617-submissions-064.json",
+            "CIK0000019617-submissions-065.json",
+            "CIK0000019617-submissions-066.json",
+            "CIK0000019617-submissions-067.json",
+            "CIK0000019617-submissions-068.json",
+            "CIK0000019617-submissions-069.json",
+            "CIK0000019617-submissions-070.json"
+          ],
+          "completeness": {
+            "actual_10k_count": 11,
+            "expected_10k_count": 10,
+            "tolerance": 2,
+            "shortfall": false
+          }
+        },
+        "XOM": {
+          "total_filings": 4,
+          "with_acceptance_datetime": 4,
+          "acceptance_datetime_fraction": 1.0,
+          "post_close_count": 1,
+          "post_close_share_of_accepted": 0.25,
+          "after_hours_count": 0,
+          "after_hours_share_of_accepted": 0.0,
+          "filing_date_mismatch_count": 0,
+          "filing_date_mismatch_share_of_accepted": 0.0,
+          "by_form": {
+            "8-K": {
+              "total": 3,
+              "with_acceptance": 3,
+              "regular_count": 2,
+              "post_close_count": 1,
+              "after_hours_count": 0,
+              "post_close_share_of_accepted": 0.3333333333333333,
+              "after_hours_share_of_accepted": 0.0
+            },
+            "10-Q": {
+              "total": 1,
+              "with_acceptance": 1,
+              "regular_count": 1,
+              "post_close_count": 0,
+              "after_hours_count": 0,
+              "post_close_share_of_accepted": 0.0,
+              "after_hours_share_of_accepted": 0.0
+            }
+          },
+          "sec_cik": "0002115436",
+          "sec_entity_name": "ExxonMobil Holdings Corp",
+          "sec_current_tickers": [
+            "XOM"
+          ],
+          "older_files_fetched": [],
+          "completeness": {
+            "actual_10k_count": 0,
+            "expected_10k_count": 10,
+            "tolerance": 2,
+            "shortfall": true
+          },
+          "identity_break": {
+            "current_cik": "0002115436",
+            "historical_cik": "0000034088"
+          },
+          "excluded_from_overall": true,
+          "excluded_reason": "current-map CIK 0002115436 filings are not representative 2016-2026 coverage for XOM; see historical_cik_probe.",
+          "historical_cik_probe": {
+            "total_filings": 203,
+            "with_acceptance_datetime": 203,
+            "acceptance_datetime_fraction": 1.0,
+            "post_close_count": 68,
+            "post_close_share_of_accepted": 0.33497536945812806,
+            "after_hours_count": 5,
+            "after_hours_share_of_accepted": 0.024630541871921183,
+            "filing_date_mismatch_count": 5,
+            "filing_date_mismatch_share_of_accepted": 0.024630541871921183,
+            "by_form": {
+              "10-Q": {
+                "total": 32,
+                "with_acceptance": 32,
+                "regular_count": 32,
+                "post_close_count": 0,
+                "after_hours_count": 0,
+                "post_close_share_of_accepted": 0.0,
+                "after_hours_share_of_accepted": 0.0
+              },
+              "8-K": {
+                "total": 155,
+                "with_acceptance": 155,
+                "regular_count": 94,
+                "post_close_count": 56,
+                "after_hours_count": 5,
+                "post_close_share_of_accepted": 0.36129032258064514,
+                "after_hours_share_of_accepted": 0.03225806451612903
+              },
+              "10-K": {
+                "total": 11,
+                "with_acceptance": 11,
+                "regular_count": 0,
+                "post_close_count": 11,
+                "after_hours_count": 0,
+                "post_close_share_of_accepted": 1.0,
+                "after_hours_share_of_accepted": 0.0
+              },
+              "8-K/A": {
+                "total": 5,
+                "with_acceptance": 5,
+                "regular_count": 4,
+                "post_close_count": 1,
+                "after_hours_count": 0,
+                "post_close_share_of_accepted": 0.2,
+                "after_hours_share_of_accepted": 0.0
+              }
+            },
+            "sec_cik": "0000034088",
+            "sec_entity_name": "EXXON MOBIL CORP",
+            "sec_current_tickers": [],
+            "older_files_fetched": [
+              "CIK0000034088-submissions-001.json",
+              "CIK0000034088-submissions-002.json"
+            ],
+            "completeness": {
+              "actual_10k_count": 11,
+              "expected_10k_count": 10,
+              "tolerance": 2,
+              "shortfall": false
+            }
+          }
+        },
+        "JNJ": {
+          "total_filings": 176,
+          "with_acceptance_datetime": 176,
+          "acceptance_datetime_fraction": 1.0,
+          "post_close_count": 103,
+          "post_close_share_of_accepted": 0.5852272727272727,
+          "after_hours_count": 11,
+          "after_hours_share_of_accepted": 0.0625,
+          "filing_date_mismatch_count": 11,
+          "filing_date_mismatch_share_of_accepted": 0.0625,
+          "by_form": {
+            "8-K": {
+              "total": 129,
+              "with_acceptance": 129,
+              "regular_count": 60,
+              "post_close_count": 61,
+              "after_hours_count": 8,
+              "post_close_share_of_accepted": 0.4728682170542636,
+              "after_hours_share_of_accepted": 0.06201550387596899
+            },
+            "10-Q": {
+              "total": 32,
+              "with_acceptance": 32,
+              "regular_count": 1,
+              "post_close_count": 29,
+              "after_hours_count": 2,
+              "post_close_share_of_accepted": 0.90625,
+              "after_hours_share_of_accepted": 0.0625
+            },
+            "10-K": {
+              "total": 11,
+              "with_acceptance": 11,
+              "regular_count": 0,
+              "post_close_count": 11,
+              "after_hours_count": 0,
+              "post_close_share_of_accepted": 1.0,
+              "after_hours_share_of_accepted": 0.0
+            },
+            "8-K/A": {
+              "total": 4,
+              "with_acceptance": 4,
+              "regular_count": 1,
+              "post_close_count": 2,
+              "after_hours_count": 1,
+              "post_close_share_of_accepted": 0.5,
+              "after_hours_share_of_accepted": 0.25
+            }
+          },
+          "sec_cik": "0000200406",
+          "sec_entity_name": "JOHNSON & JOHNSON",
+          "sec_current_tickers": [
+            "JNJ"
+          ],
+          "older_files_fetched": [
+            "CIK0000200406-submissions-001.json",
+            "CIK0000200406-submissions-002.json"
+          ],
+          "completeness": {
+            "actual_10k_count": 11,
+            "expected_10k_count": 10,
+            "tolerance": 2,
+            "shortfall": false
+          }
+        },
+        "WMT": {
+          "total_filings": 201,
+          "with_acceptance_datetime": 201,
+          "acceptance_datetime_fraction": 1.0,
+          "post_close_count": 109,
+          "post_close_share_of_accepted": 0.5422885572139303,
+          "after_hours_count": 3,
+          "after_hours_share_of_accepted": 0.014925373134328358,
+          "filing_date_mismatch_count": 2,
+          "filing_date_mismatch_share_of_accepted": 0.009950248756218905,
+          "by_form": {
+            "10-Q": {
+              "total": 32,
+              "with_acceptance": 32,
+              "regular_count": 0,
+              "post_close_count": 32,
+              "after_hours_count": 0,
+              "post_close_share_of_accepted": 1.0,
+              "after_hours_share_of_accepted": 0.0
+            },
+            "8-K": {
+              "total": 152,
+              "with_acceptance": 152,
+              "regular_count": 88,
+              "post_close_count": 61,
+              "after_hours_count": 3,
+              "post_close_share_of_accepted": 0.40131578947368424,
+              "after_hours_share_of_accepted": 0.019736842105263157
+            },
+            "10-K": {
+              "total": 11,
+              "with_acceptance": 11,
+              "regular_count": 0,
+              "post_close_count": 11,
+              "after_hours_count": 0,
+              "post_close_share_of_accepted": 1.0,
+              "after_hours_share_of_accepted": 0.0
+            },
+            "8-K/A": {
+              "total": 6,
+              "with_acceptance": 6,
+              "regular_count": 1,
+              "post_close_count": 5,
+              "after_hours_count": 0,
+              "post_close_share_of_accepted": 0.8333333333333334,
+              "after_hours_share_of_accepted": 0.0
+            }
+          },
+          "sec_cik": "0000104169",
+          "sec_entity_name": "Walmart Inc.",
+          "sec_current_tickers": [
+            "WMT"
+          ],
+          "older_files_fetched": [
+            "CIK0000104169-submissions-001.json",
+            "CIK0000104169-submissions-002.json"
+          ],
+          "completeness": {
+            "actual_10k_count": 11,
+            "expected_10k_count": 10,
+            "tolerance": 2,
+            "shortfall": false
+          }
+        },
+        "NVDA": {
+          "total_filings": 153,
+          "with_acceptance_datetime": 153,
+          "acceptance_datetime_fraction": 1.0,
+          "post_close_count": 125,
+          "post_close_share_of_accepted": 0.8169934640522876,
+          "after_hours_count": 12,
+          "after_hours_share_of_accepted": 0.0784313725490196,
+          "filing_date_mismatch_count": 11,
+          "filing_date_mismatch_share_of_accepted": 0.0718954248366013,
+          "by_form": {
+            "8-K": {
+              "total": 109,
+              "with_acceptance": 109,
+              "regular_count": 16,
+              "post_close_count": 87,
+              "after_hours_count": 6,
+              "post_close_share_of_accepted": 0.7981651376146789,
+              "after_hours_share_of_accepted": 0.05504587155963303
+            },
+            "10-Q": {
+              "total": 32,
+              "with_acceptance": 32,
+              "regular_count": 0,
+              "post_close_count": 30,
+              "after_hours_count": 2,
+              "post_close_share_of_accepted": 0.9375,
+              "after_hours_share_of_accepted": 0.0625
+            },
+            "10-K": {
+              "total": 11,
+              "with_acceptance": 11,
+              "regular_count": 0,
+              "post_close_count": 8,
+              "after_hours_count": 3,
+              "post_close_share_of_accepted": 0.7272727272727273,
+              "after_hours_share_of_accepted": 0.2727272727272727
+            },
+            "8-K/A": {
+              "total": 1,
+              "with_acceptance": 1,
+              "regular_count": 0,
+              "post_close_count": 0,
+              "after_hours_count": 1,
+              "post_close_share_of_accepted": 0.0,
+              "after_hours_share_of_accepted": 1.0
+            }
+          },
+          "sec_cik": "0001045810",
+          "sec_entity_name": "NVIDIA CORP",
+          "sec_current_tickers": [
+            "NVDA"
+          ],
+          "older_files_fetched": [
+            "CIK0001045810-submissions-001.json"
+          ],
+          "completeness": {
+            "actual_10k_count": 11,
+            "expected_10k_count": 10,
+            "tolerance": 2,
+            "shortfall": false
+          }
+        },
+        "GME": {
+          "total_filings": 203,
+          "with_acceptance_datetime": 203,
+          "acceptance_datetime_fraction": 1.0,
+          "post_close_count": 148,
+          "post_close_share_of_accepted": 0.729064039408867,
+          "after_hours_count": 3,
+          "after_hours_share_of_accepted": 0.014778325123152709,
+          "filing_date_mismatch_count": 3,
+          "filing_date_mismatch_share_of_accepted": 0.014778325123152709,
+          "by_form": {
+            "10-Q": {
+              "total": 32,
+              "with_acceptance": 32,
+              "regular_count": 3,
+              "post_close_count": 29,
+              "after_hours_count": 0,
+              "post_close_share_of_accepted": 0.90625,
+              "after_hours_share_of_accepted": 0.0
+            },
+            "8-K": {
+              "total": 152,
+              "with_acceptance": 152,
+              "regular_count": 47,
+              "post_close_count": 104,
+              "after_hours_count": 1,
+              "post_close_share_of_accepted": 0.6842105263157895,
+              "after_hours_share_of_accepted": 0.006578947368421052
+            },
+            "10-K": {
+              "total": 11,
+              "with_acceptance": 11,
+              "regular_count": 1,
+              "post_close_count": 10,
+              "after_hours_count": 0,
+              "post_close_share_of_accepted": 0.9090909090909091,
+              "after_hours_share_of_accepted": 0.0
+            },
+            "10-Q/A": {
+              "total": 3,
+              "with_acceptance": 3,
+              "regular_count": 0,
+              "post_close_count": 2,
+              "after_hours_count": 1,
+              "post_close_share_of_accepted": 0.6666666666666666,
+              "after_hours_share_of_accepted": 0.3333333333333333
+            },
+            "8-K/A": {
+              "total": 3,
+              "with_acceptance": 3,
+              "regular_count": 1,
+              "post_close_count": 1,
+              "after_hours_count": 1,
+              "post_close_share_of_accepted": 0.3333333333333333,
+              "after_hours_share_of_accepted": 0.3333333333333333
+            },
+            "10-K/A": {
+              "total": 2,
+              "with_acceptance": 2,
+              "regular_count": 0,
+              "post_close_count": 2,
+              "after_hours_count": 0,
+              "post_close_share_of_accepted": 1.0,
+              "after_hours_share_of_accepted": 0.0
+            }
+          },
+          "sec_cik": "0001326380",
+          "sec_entity_name": "GameStop Corp.",
+          "sec_current_tickers": [
+            "GME",
+            "GME-WT"
+          ],
+          "older_files_fetched": [
+            "CIK0001326380-submissions-001.json"
+          ],
+          "completeness": {
+            "actual_10k_count": 11,
+            "expected_10k_count": 10,
+            "tolerance": 2,
+            "shortfall": false
+          }
+        },
+        "AMC": {
+          "total_filings": 295,
+          "with_acceptance_datetime": 295,
+          "acceptance_datetime_fraction": 1.0,
+          "post_close_count": 154,
+          "post_close_share_of_accepted": 0.5220338983050847,
+          "after_hours_count": 19,
+          "after_hours_share_of_accepted": 0.06440677966101695,
+          "filing_date_mismatch_count": 19,
+          "filing_date_mismatch_share_of_accepted": 0.06440677966101695,
+          "by_form": {
+            "8-K": {
+              "total": 239,
+              "with_acceptance": 239,
+              "regular_count": 107,
+              "post_close_count": 119,
+              "after_hours_count": 13,
+              "post_close_share_of_accepted": 0.497907949790795,
+              "after_hours_share_of_accepted": 0.05439330543933055
+            },
+            "10-Q": {
+              "total": 32,
+              "with_acceptance": 32,
+              "regular_count": 7,
+              "post_close_count": 22,
+              "after_hours_count": 3,
+              "post_close_share_of_accepted": 0.6875,
+              "after_hours_share_of_accepted": 0.09375
+            },
+            "10-K/A": {
+              "total": 3,
+              "with_acceptance": 3,
+              "regular_count": 0,
+              "post_close_count": 3,
+              "after_hours_count": 0,
+              "post_close_share_of_accepted": 1.0,
+              "after_hours_share_of_accepted": 0.0
+            },
+            "10-K": {
+              "total": 11,
+              "with_acceptance": 11,
+              "regular_count": 4,
+              "post_close_count": 5,
+              "after_hours_count": 2,
+              "post_close_share_of_accepted": 0.45454545454545453,
+              "after_hours_share_of_accepted": 0.18181818181818182
+            },
+            "8-K/A": {
+              "total": 10,
+              "with_acceptance": 10,
+              "regular_count": 4,
+              "post_close_count": 5,
+              "after_hours_count": 1,
+              "post_close_share_of_accepted": 0.5,
+              "after_hours_share_of_accepted": 0.1
+            }
+          },
+          "sec_cik": "0001411579",
+          "sec_entity_name": "AMC ENTERTAINMENT HOLDINGS, INC.",
+          "sec_current_tickers": [
+            "AMC"
+          ],
+          "older_files_fetched": [
+            "CIK0001411579-submissions-001.json"
+          ],
+          "completeness": {
+            "actual_10k_count": 11,
+            "expected_10k_count": 10,
+            "tolerance": 2,
+            "shortfall": false
+          }
+        },
+        "PLUG": {
+          "total_filings": 245,
+          "with_acceptance_datetime": 245,
+          "acceptance_datetime_fraction": 1.0,
+          "post_close_count": 115,
+          "post_close_share_of_accepted": 0.46938775510204084,
+          "after_hours_count": 10,
+          "after_hours_share_of_accepted": 0.04081632653061224,
+          "filing_date_mismatch_count": 7,
+          "filing_date_mismatch_share_of_accepted": 0.02857142857142857,
+          "by_form": {
+            "10-Q": {
+              "total": 32,
+              "with_acceptance": 32,
+              "regular_count": 2,
+              "post_close_count": 28,
+              "after_hours_count": 2,
+              "post_close_share_of_accepted": 0.875,
+              "after_hours_share_of_accepted": 0.0625
+            },
+            "8-K": {
+              "total": 194,
+              "with_acceptance": 194,
+              "regular_count": 115,
+              "post_close_count": 75,
+              "after_hours_count": 4,
+              "post_close_share_of_accepted": 0.3865979381443299,
+              "after_hours_share_of_accepted": 0.020618556701030927
+            },
+            "10-K": {
+              "total": 11,
+              "with_acceptance": 11,
+              "regular_count": 1,
+              "post_close_count": 7,
+              "after_hours_count": 3,
+              "post_close_share_of_accepted": 0.6363636363636364,
+              "after_hours_share_of_accepted": 0.2727272727272727
+            },
+            "10-K/A": {
+              "total": 4,
+              "with_acceptance": 4,
+              "regular_count": 1,
+              "post_close_count": 2,
+              "after_hours_count": 1,
+              "post_close_share_of_accepted": 0.5,
+              "after_hours_share_of_accepted": 0.25
+            },
+            "8-K/A": {
+              "total": 4,
+              "with_acceptance": 4,
+              "regular_count": 1,
+              "post_close_count": 3,
+              "after_hours_count": 0,
+              "post_close_share_of_accepted": 0.75,
+              "after_hours_share_of_accepted": 0.0
+            }
+          },
+          "sec_cik": "0001093691",
+          "sec_entity_name": "PLUG POWER INC",
+          "sec_current_tickers": [
+            "PLUG"
+          ],
+          "older_files_fetched": [
+            "CIK0001093691-submissions-001.json"
+          ],
+          "completeness": {
+            "actual_10k_count": 11,
+            "expected_10k_count": 10,
+            "tolerance": 2,
+            "shortfall": false
+          }
+        },
+        "RIOT": {
+          "total_filings": 271,
+          "with_acceptance_datetime": 271,
+          "acceptance_datetime_fraction": 1.0,
+          "post_close_count": 207,
+          "post_close_share_of_accepted": 0.7638376383763837,
+          "after_hours_count": 14,
+          "after_hours_share_of_accepted": 0.05166051660516605,
+          "filing_date_mismatch_count": 9,
+          "filing_date_mismatch_share_of_accepted": 0.033210332103321034,
+          "by_form": {
+            "8-K": {
+              "total": 205,
+              "with_acceptance": 205,
+              "regular_count": 45,
+              "post_close_count": 151,
+              "after_hours_count": 9,
+              "post_close_share_of_accepted": 0.7365853658536585,
+              "after_hours_share_of_accepted": 0.04390243902439024
+            },
+            "10-Q": {
+              "total": 32,
+              "with_acceptance": 32,
+              "regular_count": 2,
+              "post_close_count": 28,
+              "after_hours_count": 2,
+              "post_close_share_of_accepted": 0.875,
+              "after_hours_share_of_accepted": 0.0625
+            },
+            "10-K": {
+              "total": 11,
+              "with_acceptance": 11,
+              "regular_count": 1,
+              "post_close_count": 7,
+              "after_hours_count": 3,
+              "post_close_share_of_accepted": 0.6363636363636364,
+              "after_hours_share_of_accepted": 0.2727272727272727
+            },
+            "8-K/A": {
+              "total": 12,
+              "with_acceptance": 12,
+              "regular_count": 2,
+              "post_close_count": 10,
+              "after_hours_count": 0,
+              "post_close_share_of_accepted": 0.8333333333333334,
+              "after_hours_share_of_accepted": 0.0
+            },
+            "10-K/A": {
+              "total": 9,
+              "with_acceptance": 9,
+              "regular_count": 0,
+              "post_close_count": 9,
+              "after_hours_count": 0,
+              "post_close_share_of_accepted": 1.0,
+              "after_hours_share_of_accepted": 0.0
+            },
+            "10-Q/A": {
+              "total": 2,
+              "with_acceptance": 2,
+              "regular_count": 0,
+              "post_close_count": 2,
+              "after_hours_count": 0,
+              "post_close_share_of_accepted": 1.0,
+              "after_hours_share_of_accepted": 0.0
+            }
+          },
+          "sec_cik": "0001167419",
+          "sec_entity_name": "Riot Platforms, Inc.",
+          "sec_current_tickers": [
+            "RIOT"
+          ],
+          "older_files_fetched": [
+            "CIK0001167419-submissions-001.json"
+          ],
+          "completeness": {
+            "actual_10k_count": 11,
+            "expected_10k_count": 10,
+            "tolerance": 2,
+            "shortfall": false
+          }
+        },
+        "MARA": {
+          "total_filings": 249,
+          "with_acceptance_datetime": 249,
+          "acceptance_datetime_fraction": 1.0,
+          "post_close_count": 156,
+          "post_close_share_of_accepted": 0.6265060240963856,
+          "after_hours_count": 9,
+          "after_hours_share_of_accepted": 0.03614457831325301,
+          "filing_date_mismatch_count": 8,
+          "filing_date_mismatch_share_of_accepted": 0.0321285140562249,
+          "by_form": {
+            "10-Q": {
+              "total": 32,
+              "with_acceptance": 32,
+              "regular_count": 6,
+              "post_close_count": 23,
+              "after_hours_count": 3,
+              "post_close_share_of_accepted": 0.71875,
+              "after_hours_share_of_accepted": 0.09375
+            },
+            "8-K": {
+              "total": 194,
+              "with_acceptance": 194,
+              "regular_count": 69,
+              "post_close_count": 121,
+              "after_hours_count": 4,
+              "post_close_share_of_accepted": 0.6237113402061856,
+              "after_hours_share_of_accepted": 0.020618556701030927
+            },
+            "10-K": {
+              "total": 11,
+              "with_acceptance": 11,
+              "regular_count": 2,
+              "post_close_count": 7,
+              "after_hours_count": 2,
+              "post_close_share_of_accepted": 0.6363636363636364,
+              "after_hours_share_of_accepted": 0.18181818181818182
+            },
+            "10-K/A": {
+              "total": 2,
+              "with_acceptance": 2,
+              "regular_count": 0,
+              "post_close_count": 2,
+              "after_hours_count": 0,
+              "post_close_share_of_accepted": 1.0,
+              "after_hours_share_of_accepted": 0.0
+            },
+            "8-K/A": {
+              "total": 8,
+              "with_acceptance": 8,
+              "regular_count": 6,
+              "post_close_count": 2,
+              "after_hours_count": 0,
+              "post_close_share_of_accepted": 0.25,
+              "after_hours_share_of_accepted": 0.0
+            },
+            "10-Q/A": {
+              "total": 2,
+              "with_acceptance": 2,
+              "regular_count": 1,
+              "post_close_count": 1,
+              "after_hours_count": 0,
+              "post_close_share_of_accepted": 0.5,
+              "after_hours_share_of_accepted": 0.0
+            }
+          },
+          "sec_cik": "0001507605",
+          "sec_entity_name": "MARA Holdings, Inc.",
+          "sec_current_tickers": [
+            "MARA"
+          ],
+          "older_files_fetched": [
+            "CIK0001507605-submissions-001.json"
+          ],
+          "completeness": {
+            "actual_10k_count": 11,
+            "expected_10k_count": 10,
+            "tolerance": 2,
+            "shortfall": false
+          }
+        },
+        "SOFI": {
+          "total_filings": 109,
+          "with_acceptance_datetime": 109,
+          "acceptance_datetime_fraction": 1.0,
+          "post_close_count": 63,
+          "post_close_share_of_accepted": 0.5779816513761468,
+          "after_hours_count": 8,
+          "after_hours_share_of_accepted": 0.07339449541284404,
+          "filing_date_mismatch_count": 8,
+          "filing_date_mismatch_share_of_accepted": 0.07339449541284404,
+          "by_form": {
+            "10-Q": {
+              "total": 18,
+              "with_acceptance": 18,
+              "regular_count": 3,
+              "post_close_count": 14,
+              "after_hours_count": 1,
+              "post_close_share_of_accepted": 0.7777777777777778,
+              "after_hours_share_of_accepted": 0.05555555555555555
+            },
+            "8-K": {
+              "total": 81,
+              "with_acceptance": 81,
+              "regular_count": 33,
+              "post_close_count": 41,
+              "after_hours_count": 7,
+              "post_close_share_of_accepted": 0.5061728395061729,
+              "after_hours_share_of_accepted": 0.08641975308641975
+            },
+            "10-K": {
+              "total": 6,
+              "with_acceptance": 6,
+              "regular_count": 1,
+              "post_close_count": 5,
+              "after_hours_count": 0,
+              "post_close_share_of_accepted": 0.8333333333333334,
+              "after_hours_share_of_accepted": 0.0
+            },
+            "8-K/A": {
+              "total": 2,
+              "with_acceptance": 2,
+              "regular_count": 1,
+              "post_close_count": 1,
+              "after_hours_count": 0,
+              "post_close_share_of_accepted": 0.5,
+              "after_hours_share_of_accepted": 0.0
+            },
+            "10-K/A": {
+              "total": 2,
+              "with_acceptance": 2,
+              "regular_count": 0,
+              "post_close_count": 2,
+              "after_hours_count": 0,
+              "post_close_share_of_accepted": 1.0,
+              "after_hours_share_of_accepted": 0.0
+            }
+          },
+          "sec_cik": "0001818874",
+          "sec_entity_name": "SoFi Technologies, Inc.",
+          "sec_current_tickers": [
+            "SOFI"
+          ],
+          "older_files_fetched": [],
+          "completeness": {
+            "actual_10k_count": 6,
+            "expected_10k_count": 10,
+            "tolerance": 2,
+            "shortfall": true
+          }
+        },
+        "UPST": {
+          "total_filings": 76,
+          "with_acceptance_datetime": 76,
+          "acceptance_datetime_fraction": 1.0,
+          "post_close_count": 50,
+          "post_close_share_of_accepted": 0.6578947368421053,
+          "after_hours_count": 14,
+          "after_hours_share_of_accepted": 0.18421052631578946,
+          "filing_date_mismatch_count": 14,
+          "filing_date_mismatch_share_of_accepted": 0.18421052631578946,
+          "by_form": {
+            "10-Q/A": {
+              "total": 2,
+              "with_acceptance": 2,
+              "regular_count": 1,
+              "post_close_count": 1,
+              "after_hours_count": 0,
+              "post_close_share_of_accepted": 0.5,
+              "after_hours_share_of_accepted": 0.0
+            },
+            "10-Q": {
+              "total": 17,
+              "with_acceptance": 17,
+              "regular_count": 1,
+              "post_close_count": 5,
+              "after_hours_count": 11,
+              "post_close_share_of_accepted": 0.29411764705882354,
+              "after_hours_share_of_accepted": 0.6470588235294118
+            },
+            "8-K": {
+              "total": 49,
+              "with_acceptance": 49,
+              "regular_count": 7,
+              "post_close_count": 41,
+              "after_hours_count": 1,
+              "post_close_share_of_accepted": 0.8367346938775511,
+              "after_hours_share_of_accepted": 0.02040816326530612
+            },
+            "10-K": {
+              "total": 6,
+              "with_acceptance": 6,
+              "regular_count": 1,
+              "post_close_count": 3,
+              "after_hours_count": 2,
+              "post_close_share_of_accepted": 0.5,
+              "after_hours_share_of_accepted": 0.3333333333333333
+            },
+            "8-K/A": {
+              "total": 2,
+              "with_acceptance": 2,
+              "regular_count": 2,
+              "post_close_count": 0,
+              "after_hours_count": 0,
+              "post_close_share_of_accepted": 0.0,
+              "after_hours_share_of_accepted": 0.0
+            }
+          },
+          "sec_cik": "0001647639",
+          "sec_entity_name": "Upstart Holdings, Inc.",
+          "sec_current_tickers": [
+            "UPST"
+          ],
+          "older_files_fetched": [],
+          "completeness": {
+            "actual_10k_count": 6,
+            "expected_10k_count": 10,
+            "tolerance": 2,
+            "shortfall": true
+          }
+        },
+        "DKNG": {
+          "total_filings": 55,
+          "with_acceptance_datetime": 55,
+          "acceptance_datetime_fraction": 1.0,
+          "post_close_count": 19,
+          "post_close_share_of_accepted": 0.34545454545454546,
+          "after_hours_count": 0,
+          "after_hours_share_of_accepted": 0.0,
+          "filing_date_mismatch_count": 0,
+          "filing_date_mismatch_share_of_accepted": 0.0,
+          "by_form": {
+            "8-K": {
+              "total": 36,
+              "with_acceptance": 36,
+              "regular_count": 17,
+              "post_close_count": 19,
+              "after_hours_count": 0,
+              "post_close_share_of_accepted": 0.5277777777777778,
+              "after_hours_share_of_accepted": 0.0
+            },
+            "10-Q": {
+              "total": 14,
+              "with_acceptance": 14,
+              "regular_count": 14,
+              "post_close_count": 0,
+              "after_hours_count": 0,
+              "post_close_share_of_accepted": 0.0,
+              "after_hours_share_of_accepted": 0.0
+            },
+            "10-K": {
+              "total": 4,
+              "with_acceptance": 4,
+              "regular_count": 4,
+              "post_close_count": 0,
+              "after_hours_count": 0,
+              "post_close_share_of_accepted": 0.0,
+              "after_hours_share_of_accepted": 0.0
+            },
+            "8-K/A": {
+              "total": 1,
+              "with_acceptance": 1,
+              "regular_count": 1,
+              "post_close_count": 0,
+              "after_hours_count": 0,
+              "post_close_share_of_accepted": 0.0,
+              "after_hours_share_of_accepted": 0.0
+            }
+          },
+          "sec_cik": "0001883685",
+          "sec_entity_name": "DraftKings Inc.",
+          "sec_current_tickers": [
+            "DKNG"
+          ],
+          "older_files_fetched": [],
+          "completeness": {
+            "actual_10k_count": 4,
+            "expected_10k_count": 10,
+            "tolerance": 2,
+            "shortfall": true
+          },
+          "identity_break": {
+            "current_cik": "0001883685",
+            "historical_cik": "0001772757"
+          },
+          "excluded_from_overall": true,
+          "excluded_reason": "current-map CIK 0001883685 filings are not representative 2016-2026 coverage for DKNG; see historical_cik_probe.",
+          "historical_cik_probe": {
+            "total_filings": 65,
+            "with_acceptance_datetime": 65,
+            "acceptance_datetime_fraction": 1.0,
+            "post_close_count": 1,
+            "post_close_share_of_accepted": 0.015384615384615385,
+            "after_hours_count": 39,
+            "after_hours_share_of_accepted": 0.6,
+            "filing_date_mismatch_count": 3,
+            "filing_date_mismatch_share_of_accepted": 0.046153846153846156,
+            "by_form": {
+              "8-K": {
+                "total": 49,
+                "with_acceptance": 49,
+                "regular_count": 20,
+                "post_close_count": 1,
+                "after_hours_count": 28,
+                "post_close_share_of_accepted": 0.02040816326530612,
+                "after_hours_share_of_accepted": 0.5714285714285714
+              },
+              "10-K": {
+                "total": 3,
+                "with_acceptance": 3,
+                "regular_count": 0,
+                "post_close_count": 0,
+                "after_hours_count": 3,
+                "post_close_share_of_accepted": 0.0,
+                "after_hours_share_of_accepted": 1.0
+              },
+              "10-Q/A": {
+                "total": 2,
+                "with_acceptance": 2,
+                "regular_count": 2,
+                "post_close_count": 0,
+                "after_hours_count": 0,
+                "post_close_share_of_accepted": 0.0,
+                "after_hours_share_of_accepted": 0.0
+              },
+              "10-K/A": {
+                "total": 2,
+                "with_acceptance": 2,
+                "regular_count": 1,
+                "post_close_count": 0,
+                "after_hours_count": 1,
+                "post_close_share_of_accepted": 0.0,
+                "after_hours_share_of_accepted": 0.5
+              },
+              "10-Q": {
+                "total": 8,
+                "with_acceptance": 8,
+                "regular_count": 2,
+                "post_close_count": 0,
+                "after_hours_count": 6,
+                "post_close_share_of_accepted": 0.0,
+                "after_hours_share_of_accepted": 0.75
+              },
+              "8-K/A": {
+                "total": 1,
+                "with_acceptance": 1,
+                "regular_count": 0,
+                "post_close_count": 0,
+                "after_hours_count": 1,
+                "post_close_share_of_accepted": 0.0,
+                "after_hours_share_of_accepted": 1.0
+              }
+            },
+            "sec_cik": "0001772757",
+            "sec_entity_name": "DraftKings Holdings Inc.",
+            "sec_current_tickers": [],
+            "older_files_fetched": [],
+            "completeness": {
+              "actual_10k_count": 3,
+              "expected_10k_count": 10,
+              "tolerance": 2,
+              "shortfall": true
+            }
+          }
+        },
+        "CVNA": {
+          "total_filings": 169,
+          "with_acceptance_datetime": 169,
+          "acceptance_datetime_fraction": 1.0,
+          "post_close_count": 129,
+          "post_close_share_of_accepted": 0.7633136094674556,
+          "after_hours_count": 8,
+          "after_hours_share_of_accepted": 0.047337278106508875,
+          "filing_date_mismatch_count": 8,
+          "filing_date_mismatch_share_of_accepted": 0.047337278106508875,
+          "by_form": {
+            "8-K": {
+              "total": 129,
+              "with_acceptance": 129,
+              "regular_count": 31,
+              "post_close_count": 90,
+              "after_hours_count": 8,
+              "post_close_share_of_accepted": 0.6976744186046512,
+              "after_hours_share_of_accepted": 0.06201550387596899
+            },
+            "10-Q": {
+              "total": 29,
+              "with_acceptance": 29,
+              "regular_count": 1,
+              "post_close_count": 28,
+              "after_hours_count": 0,
+              "post_close_share_of_accepted": 0.9655172413793104,
+              "after_hours_share_of_accepted": 0.0
+            },
+            "10-K": {
+              "total": 9,
+              "with_acceptance": 9,
+              "regular_count": 0,
+              "post_close_count": 9,
+              "after_hours_count": 0,
+              "post_close_share_of_accepted": 1.0,
+              "after_hours_share_of_accepted": 0.0
+            },
+            "8-K/A": {
+              "total": 2,
+              "with_acceptance": 2,
+              "regular_count": 0,
+              "post_close_count": 2,
+              "after_hours_count": 0,
+              "post_close_share_of_accepted": 1.0,
+              "after_hours_share_of_accepted": 0.0
+            }
+          },
+          "sec_cik": "0001690820",
+          "sec_entity_name": "CARVANA CO.",
+          "sec_current_tickers": [
+            "CVNA"
+          ],
+          "older_files_fetched": [
+            "CIK0001690820-submissions-001.json"
+          ],
+          "completeness": {
+            "actual_10k_count": 9,
+            "expected_10k_count": 10,
+            "tolerance": 2,
+            "shortfall": false
+          }
+        },
+        "FUBO": {
+          "total_filings": 212,
+          "with_acceptance_datetime": 212,
+          "acceptance_datetime_fraction": 1.0,
+          "post_close_count": 125,
+          "post_close_share_of_accepted": 0.589622641509434,
+          "after_hours_count": 18,
+          "after_hours_share_of_accepted": 0.08490566037735849,
+          "filing_date_mismatch_count": 16,
+          "filing_date_mismatch_share_of_accepted": 0.07547169811320754,
+          "by_form": {
+            "10-Q": {
+              "total": 33,
+              "with_acceptance": 33,
+              "regular_count": 8,
+              "post_close_count": 22,
+              "after_hours_count": 3,
+              "post_close_share_of_accepted": 0.6666666666666666,
+              "after_hours_share_of_accepted": 0.09090909090909091
+            },
+            "8-K": {
+              "total": 154,
+              "with_acceptance": 154,
+              "regular_count": 55,
+              "post_close_count": 90,
+              "after_hours_count": 9,
+              "post_close_share_of_accepted": 0.5844155844155844,
+              "after_hours_share_of_accepted": 0.05844155844155844
+            },
+            "8-K/A": {
+              "total": 10,
+              "with_acceptance": 10,
+              "regular_count": 2,
+              "post_close_count": 7,
+              "after_hours_count": 1,
+              "post_close_share_of_accepted": 0.7,
+              "after_hours_share_of_accepted": 0.1
+            },
+            "10-K": {
+              "total": 10,
+              "with_acceptance": 10,
+              "regular_count": 3,
+              "post_close_count": 4,
+              "after_hours_count": 3,
+              "post_close_share_of_accepted": 0.4,
+              "after_hours_share_of_accepted": 0.3
+            },
+            "10-K/A": {
+              "total": 2,
+              "with_acceptance": 2,
+              "regular_count": 0,
+              "post_close_count": 1,
+              "after_hours_count": 1,
+              "post_close_share_of_accepted": 0.5,
+              "after_hours_share_of_accepted": 0.5
+            },
+            "10-Q/A": {
+              "total": 3,
+              "with_acceptance": 3,
+              "regular_count": 1,
+              "post_close_count": 1,
+              "after_hours_count": 1,
+              "post_close_share_of_accepted": 0.3333333333333333,
+              "after_hours_share_of_accepted": 0.3333333333333333
+            }
+          },
+          "sec_cik": "0001484769",
+          "sec_entity_name": "FuboTV Inc.",
+          "sec_current_tickers": [
+            "FUBO"
+          ],
+          "older_files_fetched": [],
+          "completeness": {
+            "actual_10k_count": 10,
+            "expected_10k_count": 10,
+            "tolerance": 2,
+            "shortfall": false
+          }
+        }
+      }
+    },
+    "news": {
+      "window_days": 7,
+      "symbols": [
+        "AAPL",
+        "MSFT",
+        "AMZN",
+        "GOOGL",
+        "META",
+        "JPM",
+        "XOM",
+        "JNJ",
+        "WMT",
+        "NVDA",
+        "GME",
+        "AMC",
+        "PLUG",
+        "RIOT",
+        "MARA",
+        "SOFI",
+        "UPST",
+        "DKNG",
+        "CVNA",
+        "FUBO"
+      ],
+      "per_year": {
+        "2016": {
+          "raw_returned": {
+            "item_count": 89,
+            "with_created_at": 89,
+            "created_at_fraction": 1.0,
+            "updated_after_created_count": 35,
+            "updated_after_created_share": 0.39325842696629215,
+            "earliest_created_at": "2016-03-14T09:19:32+00:00",
+            "latest_created_at": "2016-03-18T20:01:55+00:00"
+          },
+          "created_at_outside_window_count": 0,
+          "created_at_outside_window_share": 0.0,
+          "created_at_filtered": {
+            "item_count": 89,
+            "with_created_at": 89,
+            "created_at_fraction": 1.0,
+            "updated_after_created_count": 35,
+            "updated_after_created_share": 0.39325842696629215,
+            "earliest_created_at": "2016-03-14T09:19:32+00:00",
+            "latest_created_at": "2016-03-18T20:01:55+00:00"
+          }
+        },
+        "2017": {
+          "raw_returned": {
+            "item_count": 86,
+            "with_created_at": 86,
+            "created_at_fraction": 1.0,
+            "updated_after_created_count": 35,
+            "updated_after_created_share": 0.4069767441860465,
+            "earliest_created_at": "2017-03-13T08:24:26+00:00",
+            "latest_created_at": "2017-03-19T14:47:39+00:00"
+          },
+          "created_at_outside_window_count": 0,
+          "created_at_outside_window_share": 0.0,
+          "created_at_filtered": {
+            "item_count": 86,
+            "with_created_at": 86,
+            "created_at_fraction": 1.0,
+            "updated_after_created_count": 35,
+            "updated_after_created_share": 0.4069767441860465,
+            "earliest_created_at": "2017-03-13T08:24:26+00:00",
+            "latest_created_at": "2017-03-19T14:47:39+00:00"
+          }
+        },
+        "2018": {
+          "raw_returned": {
+            "item_count": 97,
+            "with_created_at": 97,
+            "created_at_fraction": 1.0,
+            "updated_after_created_count": 36,
+            "updated_after_created_share": 0.3711340206185567,
+            "earliest_created_at": "2018-03-12T08:04:31+00:00",
+            "latest_created_at": "2018-03-18T19:00:41+00:00"
+          },
+          "created_at_outside_window_count": 0,
+          "created_at_outside_window_share": 0.0,
+          "created_at_filtered": {
+            "item_count": 97,
+            "with_created_at": 97,
+            "created_at_fraction": 1.0,
+            "updated_after_created_count": 36,
+            "updated_after_created_share": 0.3711340206185567,
+            "earliest_created_at": "2018-03-12T08:04:31+00:00",
+            "latest_created_at": "2018-03-18T19:00:41+00:00"
+          }
+        },
+        "2019": {
+          "raw_returned": {
+            "item_count": 91,
+            "with_created_at": 91,
+            "created_at_fraction": 1.0,
+            "updated_after_created_count": 34,
+            "updated_after_created_share": 0.37362637362637363,
+            "earliest_created_at": "2019-03-11T08:55:41+00:00",
+            "latest_created_at": "2019-03-17T18:30:11+00:00"
+          },
+          "created_at_outside_window_count": 0,
+          "created_at_outside_window_share": 0.0,
+          "created_at_filtered": {
+            "item_count": 91,
+            "with_created_at": 91,
+            "created_at_fraction": 1.0,
+            "updated_after_created_count": 34,
+            "updated_after_created_share": 0.37362637362637363,
+            "earliest_created_at": "2019-03-11T08:55:41+00:00",
+            "latest_created_at": "2019-03-17T18:30:11+00:00"
+          }
+        },
+        "2020": {
+          "raw_returned": {
+            "item_count": 139,
+            "with_created_at": 139,
+            "created_at_fraction": 1.0,
+            "updated_after_created_count": 60,
+            "updated_after_created_share": 0.4316546762589928,
+            "earliest_created_at": "2020-03-09T03:04:46+00:00",
+            "latest_created_at": "2020-03-15T22:42:02+00:00"
+          },
+          "created_at_outside_window_count": 0,
+          "created_at_outside_window_share": 0.0,
+          "created_at_filtered": {
+            "item_count": 139,
+            "with_created_at": 139,
+            "created_at_fraction": 1.0,
+            "updated_after_created_count": 60,
+            "updated_after_created_share": 0.4316546762589928,
+            "earliest_created_at": "2020-03-09T03:04:46+00:00",
+            "latest_created_at": "2020-03-15T22:42:02+00:00"
+          }
+        },
+        "2021": {
+          "raw_returned": {
+            "item_count": 308,
+            "with_created_at": 308,
+            "created_at_fraction": 1.0,
+            "updated_after_created_count": 121,
+            "updated_after_created_share": 0.39285714285714285,
+            "earliest_created_at": "2021-03-08T02:30:16+00:00",
+            "latest_created_at": "2021-03-14T21:32:30+00:00"
+          },
+          "created_at_outside_window_count": 0,
+          "created_at_outside_window_share": 0.0,
+          "created_at_filtered": {
+            "item_count": 308,
+            "with_created_at": 308,
+            "created_at_fraction": 1.0,
+            "updated_after_created_count": 121,
+            "updated_after_created_share": 0.39285714285714285,
+            "earliest_created_at": "2021-03-08T02:30:16+00:00",
+            "latest_created_at": "2021-03-14T21:32:30+00:00"
+          }
+        },
+        "2022": {
+          "raw_returned": {
+            "item_count": 324,
+            "with_created_at": 324,
+            "created_at_fraction": 1.0,
+            "updated_after_created_count": 188,
+            "updated_after_created_share": 0.5802469135802469,
+            "earliest_created_at": "2022-03-11T18:52:40+00:00",
+            "latest_created_at": "2022-03-20T22:01:00+00:00"
+          },
+          "created_at_outside_window_count": 3,
+          "created_at_outside_window_share": 0.009259259259259259,
+          "created_at_filtered": {
+            "item_count": 321,
+            "with_created_at": 321,
+            "created_at_fraction": 1.0,
+            "updated_after_created_count": 185,
+            "updated_after_created_share": 0.5763239875389408,
+            "earliest_created_at": "2022-03-14T01:06:09+00:00",
+            "latest_created_at": "2022-03-20T22:01:00+00:00"
+          }
+        },
+        "2023": {
+          "raw_returned": {
+            "item_count": 337,
+            "with_created_at": 337,
+            "created_at_fraction": 1.0,
+            "updated_after_created_count": 245,
+            "updated_after_created_share": 0.7270029673590505,
+            "earliest_created_at": "2023-03-08T16:08:22+00:00",
+            "latest_created_at": "2023-03-19T22:25:08+00:00"
+          },
+          "created_at_outside_window_count": 3,
+          "created_at_outside_window_share": 0.008902077151335312,
+          "created_at_filtered": {
+            "item_count": 334,
+            "with_created_at": 334,
+            "created_at_fraction": 1.0,
+            "updated_after_created_count": 242,
+            "updated_after_created_share": 0.7245508982035929,
+            "earliest_created_at": "2023-03-13T02:16:16+00:00",
+            "latest_created_at": "2023-03-19T22:25:08+00:00"
+          }
+        },
+        "2024": {
+          "raw_returned": {
+            "item_count": 297,
+            "with_created_at": 297,
+            "created_at_fraction": 1.0,
+            "updated_after_created_count": 211,
+            "updated_after_created_share": 0.7104377104377104,
+            "earliest_created_at": "2021-11-02T20:43:25+00:00",
+            "latest_created_at": "2024-03-17T21:24:47+00:00"
+          },
+          "created_at_outside_window_count": 1,
+          "created_at_outside_window_share": 0.003367003367003367,
+          "created_at_filtered": {
+            "item_count": 296,
+            "with_created_at": 296,
+            "created_at_fraction": 1.0,
+            "updated_after_created_count": 210,
+            "updated_after_created_share": 0.7094594594594594,
+            "earliest_created_at": "2024-03-11T01:11:14+00:00",
+            "latest_created_at": "2024-03-17T21:24:47+00:00"
+          }
+        },
+        "2025": {
+          "raw_returned": {
+            "item_count": 228,
+            "with_created_at": 228,
+            "created_at_fraction": 1.0,
+            "updated_after_created_count": 144,
+            "updated_after_created_share": 0.631578947368421,
+            "earliest_created_at": "2025-03-10T02:21:12+00:00",
+            "latest_created_at": "2025-03-16T19:40:19+00:00"
+          },
+          "created_at_outside_window_count": 0,
+          "created_at_outside_window_share": 0.0,
+          "created_at_filtered": {
+            "item_count": 228,
+            "with_created_at": 228,
+            "created_at_fraction": 1.0,
+            "updated_after_created_count": 144,
+            "updated_after_created_share": 0.631578947368421,
+            "earliest_created_at": "2025-03-10T02:21:12+00:00",
+            "latest_created_at": "2025-03-16T19:40:19+00:00"
+          }
+        },
+        "2026": {
+          "raw_returned": {
+            "item_count": 278,
+            "with_created_at": 278,
+            "created_at_fraction": 1.0,
+            "updated_after_created_count": 196,
+            "updated_after_created_share": 0.7050359712230215,
+            "earliest_created_at": "2026-03-07T04:49:18+00:00",
+            "latest_created_at": "2026-03-15T19:02:03+00:00"
+          },
+          "created_at_outside_window_count": 1,
+          "created_at_outside_window_share": 0.0035971223021582736,
+          "created_at_filtered": {
+            "item_count": 277,
+            "with_created_at": 277,
+            "created_at_fraction": 1.0,
+            "updated_after_created_count": 195,
+            "updated_after_created_share": 0.703971119133574,
+            "earliest_created_at": "2026-03-09T05:05:12+00:00",
+            "latest_created_at": "2026-03-15T19:02:03+00:00"
+          }
+        }
+      }
+    },
+    "prices": {
+      "window_days_around_action": 10,
+      "per_symbol": {
+        "AAPL": {
+          "raw_bar_count": 2694,
+          "adjusted_bar_count": 2694,
+          "ratio_step_detection": {
+            "max_step": 1.3862781872943384,
+            "max_step_date": "2020-08-31",
+            "steps_found": 1,
+            "step_dates": [
+              {
+                "date": "2020-08-31",
+                "log_step": 1.3862781872943384,
+                "ratio_before": 4.127232142857143,
+                "ratio_after": 1.0318247241324163
+              }
+            ],
+            "log_threshold": 0.05
+          },
+          "corporate_action_type_counts": {
+            "cash_dividends": 43,
+            "forward_splits": 1
+          },
+          "steps_matched_to_corporate_action": 1,
+          "steps_unmatched": 0,
+          "matched_steps": [
+            {
+              "date": "2020-08-31",
+              "log_step": 1.3862781872943384,
+              "ratio_before": 4.127232142857143,
+              "ratio_after": 1.0318247241324163,
+              "matched_action_date": "2020-08-31",
+              "gap_days": 0
+            }
+          ],
+          "unmatched_steps": [],
+          "dividend_adjustment_check": {
+            "records_checked": 43,
+            "matched_count": 43,
+            "unmatched_count": 0,
+            "tolerance_ratio": 0.5,
+            "records": [
+              {
+                "ex_date": "2016-02-04",
+                "rate": 0.52,
+                "expected_log_step": 0.0054116065047038475,
+                "actual_log_step": 0.0056845629457629165,
+                "matched": true
+              },
+              {
+                "ex_date": "2016-05-05",
+                "rate": 0.57,
+                "expected_log_step": 0.006069982962801923,
+                "actual_log_step": 0.006372494338372281,
+                "matched": true
+              },
+              {
+                "ex_date": "2016-08-04",
+                "rate": 0.57,
+                "expected_log_step": 0.005402600696021942,
+                "actual_log_step": 0.005459131046829047,
+                "matched": true
+              },
+              {
+                "ex_date": "2016-11-03",
+                "rate": 0.57,
+                "expected_log_step": 0.0051210749355945495,
+                "actual_log_step": 0.005261421642135167,
+                "matched": true
+              },
+              {
+                "ex_date": "2017-02-09",
+                "rate": 0.57,
+                "expected_log_step": 0.004326218276479388,
+                "actual_log_step": 0.004348835885528368,
+                "matched": true
+              },
+              {
+                "ex_date": "2017-05-11",
+                "rate": 0.63,
+                "expected_log_step": 0.004119133615227533,
+                "actual_log_step": 0.0042317999421785935,
+                "matched": true
+              },
+              {
+                "ex_date": "2017-08-10",
+                "rate": 0.63,
+                "expected_log_step": 0.003919256004414784,
+                "actual_log_step": 0.0039012719951292407,
+                "matched": true
+              },
+              {
+                "ex_date": "2017-11-10",
+                "rate": 0.63,
+                "expected_log_step": 0.0035884183979097983,
+                "actual_log_step": 0.003722255778112249,
+                "matched": true
+              },
+              {
+                "ex_date": "2018-02-09",
+                "rate": 0.63,
+                "expected_log_step": 0.004068853096308445,
+                "actual_log_step": 0.003979792421724415,
+                "matched": true
+              },
+              {
+                "ex_date": "2018-05-11",
+                "rate": 0.73,
+                "expected_log_step": 0.0038486932969021836,
+                "actual_log_step": 0.003837712274161298,
+                "matched": true
+              },
+              {
+                "ex_date": "2018-08-10",
+                "rate": 0.73,
+                "expected_log_step": 0.00350095074988932,
+                "actual_log_step": 0.0036326910965982506,
+                "matched": true
+              },
+              {
+                "ex_date": "2018-11-08",
+                "rate": 0.73,
+                "expected_log_step": 0.0034830772145877376,
+                "actual_log_step": 0.0035450222602233517,
+                "matched": true
+              },
+              {
+                "ex_date": "2019-02-08",
+                "rate": 0.73,
+                "expected_log_step": 0.004279648917989931,
+                "actual_log_step": 0.004338517456443647,
+                "matched": true
+              },
+              {
+                "ex_date": "2019-05-10",
+                "rate": 0.77,
+                "expected_log_step": 0.003843566765340256,
+                "actual_log_step": 0.0038872132568441575,
+                "matched": true
+              },
+              {
+                "ex_date": "2019-08-09",
+                "rate": 0.77,
+                "expected_log_step": 0.003792267343689204,
+                "actual_log_step": 0.0038057136512477108,
+                "matched": true
+              },
+              {
+                "ex_date": "2019-11-07",
+                "rate": 0.77,
+                "expected_log_step": 0.0029978025604098235,
+                "actual_log_step": 0.003122521308646098,
+                "matched": true
+              },
+              {
+                "ex_date": "2020-02-07",
+                "rate": 0.77,
+                "expected_log_step": 0.002370508306233532,
+                "actual_log_step": 0.002417471650361991,
+                "matched": true
+              },
+              {
+                "ex_date": "2020-05-08",
+                "rate": 0.82,
+                "expected_log_step": 0.0027033280565014195,
+                "actual_log_step": 0.0026538640745301656,
+                "matched": true
+              },
+              {
+                "ex_date": "2020-08-07",
+                "rate": 0.82,
+                "expected_log_step": 0.0018014064625351267,
+                "actual_log_step": 0.0017573351193365117,
+                "matched": true
+              },
+              {
+                "ex_date": "2020-11-06",
+                "rate": 0.205,
+                "expected_log_step": 0.001723739679714953,
+                "actual_log_step": 0.00173296760065874,
+                "matched": true
+              },
+              {
+                "ex_date": "2021-02-05",
+                "rate": 0.205,
+                "expected_log_step": 0.001493217067035424,
+                "actual_log_step": 0.0015173738292106158,
+                "matched": true
+              },
+              {
+                "ex_date": "2021-05-07",
+                "rate": 0.22,
+                "expected_log_step": 0.0016971384155297642,
+                "actual_log_step": 0.0016814180555756487,
+                "matched": true
+              },
+              {
+                "ex_date": "2021-08-06",
+                "rate": 0.22,
+                "expected_log_step": 0.0014971081394419272,
+                "actual_log_step": 0.0015163528999353956,
+                "matched": true
+              },
+              {
+                "ex_date": "2021-11-05",
+                "rate": 0.22,
+                "expected_log_step": 0.0014584026449702137,
+                "actual_log_step": 0.0014755791148149365,
+                "matched": true
+              },
+              {
+                "ex_date": "2022-02-04",
+                "rate": 0.22,
+                "expected_log_step": 0.0012732220019682217,
+                "actual_log_step": 0.001235470920282842,
+                "matched": true
+              },
+              {
+                "ex_date": "2022-05-06",
+                "rate": 0.23,
+                "expected_log_step": 0.001468194703747372,
+                "actual_log_step": 0.001436870275962409,
+                "matched": true
+              },
+              {
+                "ex_date": "2022-08-05",
+                "rate": 0.23,
+                "expected_log_step": 0.0013880928026210881,
+                "actual_log_step": 0.0013609424153794812,
+                "matched": true
+              },
+              {
+                "ex_date": "2022-11-04",
+                "rate": 0.23,
+                "expected_log_step": 0.0016574788502534687,
+                "actual_log_step": 0.0016226721066823942,
+                "matched": true
+              },
+              {
+                "ex_date": "2023-02-10",
+                "rate": 0.23,
+                "expected_log_step": 0.0015256545030863933,
+                "actual_log_step": 0.0015656578093286022,
+                "matched": true
+              },
+              {
+                "ex_date": "2023-05-12",
+                "rate": 0.24,
+                "expected_log_step": 0.0013822498313205145,
+                "actual_log_step": 0.001418625665111195,
+                "matched": true
+              },
+              {
+                "ex_date": "2023-08-11",
+                "rate": 0.24,
+                "expected_log_step": 0.0013494519899941437,
+                "actual_log_step": 0.001354012996998678,
+                "matched": true
+              },
+              {
+                "ex_date": "2023-11-10",
+                "rate": 0.24,
+                "expected_log_step": 0.001316583656085335,
+                "actual_log_step": 0.001266907732604199,
+                "matched": true
+              },
+              {
+                "ex_date": "2024-02-09",
+                "rate": 0.24,
+                "expected_log_step": 0.0012752392801518297,
+                "actual_log_step": 0.001266197113339397,
+                "matched": true
+              },
+              {
+                "ex_date": "2024-05-10",
+                "rate": 0.25,
+                "expected_log_step": 0.001355417811673476,
+                "actual_log_step": 0.0013444486886684277,
+                "matched": true
+              },
+              {
+                "ex_date": "2024-08-12",
+                "rate": 0.25,
+                "expected_log_step": 0.001156791652030087,
+                "actual_log_step": 0.0011695976854453581,
+                "matched": true
+              },
+              {
+                "ex_date": "2024-11-08",
+                "rate": 0.25,
+                "expected_log_step": 0.0010996020548921237,
+                "actual_log_step": 0.0010909535641838797,
+                "matched": true
+              },
+              {
+                "ex_date": "2025-02-10",
+                "rate": 0.25,
+                "expected_log_step": 0.001098877058336889,
+                "actual_log_step": 0.001106171971113774,
+                "matched": true
+              },
+              {
+                "ex_date": "2025-05-12",
+                "rate": 0.26,
+                "expected_log_step": 0.0013104840585160815,
+                "actual_log_step": 0.001310431165104548,
+                "matched": true
+              },
+              {
+                "ex_date": "2025-08-11",
+                "rate": 0.26,
+                "expected_log_step": 0.0011342815979240584,
+                "actual_log_step": 0.00110334030262312,
+                "matched": true
+              },
+              {
+                "ex_date": "2025-11-10",
+                "rate": 0.26,
+                "expected_log_step": 0.0009689201026343852,
+                "actual_log_step": 0.0009812779475760485,
+                "matched": true
+              },
+              {
+                "ex_date": "2026-02-09",
+                "rate": 0.26,
+                "expected_log_step": 0.0009352855101019131,
+                "actual_log_step": 0.0009144428106152565,
+                "matched": true
+              },
+              {
+                "ex_date": "2026-05-11",
+                "rate": 0.27,
+                "expected_log_step": 0.0009209203031605995,
+                "actual_log_step": 0.0009198409145069938,
+                "matched": true
+              },
+              {
+                "ex_date": "2026-08-10",
+                "rate": 0.27,
+                "expected_log_step": 0.0008620827814036502,
+                "actual_log_step": 0.0008620827814035374,
+                "matched": true
+              }
+            ]
+          }
+        },
+        "AMZN": {
+          "raw_bar_count": 2694,
+          "adjusted_bar_count": 2694,
+          "ratio_step_detection": {
+            "max_step": 2.995732273553991,
+            "max_step_date": "2022-06-06",
+            "steps_found": 1,
+            "step_dates": [
+              {
+                "date": "2022-06-06",
+                "log_step": 2.995732273553991,
+                "ratio_before": 20.0,
+                "ratio_after": 1.0
+              }
+            ],
+            "log_threshold": 0.05
+          },
+          "corporate_action_type_counts": {
+            "cash_mergers": 1,
+            "forward_splits": 1
+          },
+          "steps_matched_to_corporate_action": 1,
+          "steps_unmatched": 0,
+          "matched_steps": [
+            {
+              "date": "2022-06-06",
+              "log_step": 2.995732273553991,
+              "ratio_before": 20.0,
+              "ratio_after": 1.0,
+              "matched_action_date": "2022-06-06",
+              "gap_days": 0
+            }
+          ],
+          "unmatched_steps": [],
+          "dividend_adjustment_check": {
+            "records_checked": 0,
+            "matched_count": 0,
+            "unmatched_count": 0,
+            "tolerance_ratio": 0.5,
+            "records": []
+          }
+        },
+        "GOOGL": {
+          "raw_bar_count": 2694,
+          "adjusted_bar_count": 2694,
+          "ratio_step_detection": {
+            "max_step": 2.9957462233214747,
+            "max_step_date": "2022-07-18",
+            "steps_found": 1,
+            "step_dates": [
+              {
+                "date": "2022-07-18",
+                "log_step": 2.9957462233214747,
+                "ratio_before": 20.191022398843934,
+                "ratio_after": 1.0095370370370371
+              }
+            ],
+            "log_threshold": 0.05
+          },
+          "corporate_action_type_counts": {
+            "cash_dividends": 10,
+            "forward_splits": 1
+          },
+          "steps_matched_to_corporate_action": 1,
+          "steps_unmatched": 0,
+          "matched_steps": [
+            {
+              "date": "2022-07-18",
+              "log_step": 2.9957462233214747,
+              "ratio_before": 20.191022398843934,
+              "ratio_after": 1.0095370370370371,
+              "matched_action_date": "2022-07-18",
+              "gap_days": 0
+            }
+          ],
+          "unmatched_steps": [],
+          "dividend_adjustment_check": {
+            "records_checked": 10,
+            "matched_count": 10,
+            "unmatched_count": 0,
+            "tolerance_ratio": 0.5,
+            "records": [
+              {
+                "ex_date": "2024-06-10",
+                "rate": 0.2,
+                "expected_log_step": 0.0011470522019321194,
+                "actual_log_step": 0.0011251443739031548,
+                "matched": true
+              },
+              {
+                "ex_date": "2024-09-09",
+                "rate": 0.2,
+                "expected_log_step": 0.0013260842680571372,
+                "actual_log_step": 0.0012989783401442878,
+                "matched": true
+              },
+              {
+                "ex_date": "2024-12-09",
+                "rate": 0.2,
+                "expected_log_step": 0.0011454098955727687,
+                "actual_log_step": 0.0011742410885754754,
+                "matched": true
+              },
+              {
+                "ex_date": "2025-03-10",
+                "rate": 0.2,
+                "expected_log_step": 0.0011510130184193557,
+                "actual_log_step": 0.001112642005110593,
+                "matched": true
+              },
+              {
+                "ex_date": "2025-06-09",
+                "rate": 0.21,
+                "expected_log_step": 0.0012098517967187306,
+                "actual_log_step": 0.0012045069606674902,
+                "matched": true
+              },
+              {
+                "ex_date": "2025-09-08",
+                "rate": 0.21,
+                "expected_log_step": 0.0008940165349926588,
+                "actual_log_step": 0.0008856691004934668,
+                "matched": true
+              },
+              {
+                "ex_date": "2025-12-08",
+                "rate": 0.21,
+                "expected_log_step": 0.0006538695296249841,
+                "actual_log_step": 0.0006405378895815847,
+                "matched": true
+              },
+              {
+                "ex_date": "2026-03-09",
+                "rate": 0.21,
+                "expected_log_step": 0.0007037180056848058,
+                "actual_log_step": 0.0007036676095798406,
+                "matched": true
+              },
+              {
+                "ex_date": "2026-06-08",
+                "rate": 0.22,
+                "expected_log_step": 0.0005971445810146747,
+                "actual_log_step": 0.0006157133197086972,
+                "matched": true
+              },
+              {
+                "ex_date": "2026-09-04",
+                "rate": 0.22,
+                "expected_log_step": 0.0006425796873852363,
+                "actual_log_step": 0.0006425796873850588,
+                "matched": true
+              }
+            ]
+          }
+        },
+        "NVDA": {
+          "raw_bar_count": 2694,
+          "adjusted_bar_count": 2694,
+          "ratio_step_detection": {
+            "max_step": 2.302590005598907,
+            "max_step_date": "2024-06-10",
+            "steps_found": 2,
+            "step_dates": [
+              {
+                "date": "2021-07-20",
+                "log_step": 1.3866694076247175,
+                "ratio_before": 40.192081326912785,
+                "ratio_after": 10.044252563410685
+              },
+              {
+                "date": "2024-06-10",
+                "log_step": 2.302590005598907,
+                "ratio_before": 10.028870084619214,
+                "ratio_after": 1.0028820816864297
+              }
+            ],
+            "log_threshold": 0.05
+          },
+          "corporate_action_type_counts": {
+            "cash_dividends": 42,
+            "cash_mergers": 1,
+            "forward_splits": 2
+          },
+          "steps_matched_to_corporate_action": 2,
+          "steps_unmatched": 0,
+          "matched_steps": [
+            {
+              "date": "2021-07-20",
+              "log_step": 1.3866694076247175,
+              "ratio_before": 40.192081326912785,
+              "ratio_after": 10.044252563410685,
+              "matched_action_date": "2021-07-20",
+              "gap_days": 0
+            },
+            {
+              "date": "2024-06-10",
+              "log_step": 2.302590005598907,
+              "ratio_before": 10.028870084619214,
+              "ratio_after": 1.0028820816864297,
+              "matched_action_date": "2024-06-10",
+              "gap_days": 0
+            }
+          ],
+          "unmatched_steps": [],
+          "dividend_adjustment_check": {
+            "records_checked": 42,
+            "matched_count": 32,
+            "unmatched_count": 10,
+            "tolerance_ratio": 0.5,
+            "records": [
+              {
+                "ex_date": "2016-02-29",
+                "rate": 0.115,
+                "expected_log_step": 0.0036366551266358016,
+                "actual_log_step": 0.003515610816236414,
+                "matched": true
+              },
+              {
+                "ex_date": "2016-05-24",
+                "rate": 0.115,
+                "expected_log_step": 0.0025934501766329277,
+                "actual_log_step": 0.0032114176587212384,
+                "matched": true
+              },
+              {
+                "ex_date": "2016-08-23",
+                "rate": 0.115,
+                "expected_log_step": 0.0018411051828586267,
+                "actual_log_step": 0.0015888286768146465,
+                "matched": true
+              },
+              {
+                "ex_date": "2016-11-23",
+                "rate": 0.14,
+                "expected_log_step": 0.0014960464427415943,
+                "actual_log_step": 0.0013641974409184243,
+                "matched": true
+              },
+              {
+                "ex_date": "2017-02-22",
+                "rate": 0.14,
+                "expected_log_step": 0.0012612614284606138,
+                "actual_log_step": 0.0013281212652738184,
+                "matched": true
+              },
+              {
+                "ex_date": "2017-05-19",
+                "rate": 0.14,
+                "expected_log_step": 0.001052631676143001,
+                "actual_log_step": 0.0008697346827233332,
+                "matched": true
+              },
+              {
+                "ex_date": "2017-08-22",
+                "rate": 0.14,
+                "expected_log_step": 0.000880060403796179,
+                "actual_log_step": 0.001067819414700466,
+                "matched": true
+              },
+              {
+                "ex_date": "2017-11-22",
+                "rate": 0.15,
+                "expected_log_step": 0.0006945248571810225,
+                "actual_log_step": 0.0006802390689379934,
+                "matched": true
+              },
+              {
+                "ex_date": "2018-02-22",
+                "rate": 0.15,
+                "expected_log_step": 0.0006212852520350864,
+                "actual_log_step": 0.0005379604375677083,
+                "matched": true
+              },
+              {
+                "ex_date": "2018-05-23",
+                "rate": 0.15,
+                "expected_log_step": 0.0006182380413299882,
+                "actual_log_step": 0.0005801665399096656,
+                "matched": true
+              },
+              {
+                "ex_date": "2018-08-29",
+                "rate": 0.15,
+                "expected_log_step": 0.0005468365641814188,
+                "actual_log_step": 0.000621656637673329,
+                "matched": true
+              },
+              {
+                "ex_date": "2018-11-29",
+                "rate": 0.16,
+                "expected_log_step": 0.0010000625872557123,
+                "actual_log_step": 0.001017608581943552,
+                "matched": true
+              },
+              {
+                "ex_date": "2019-02-28",
+                "rate": 0.16,
+                "expected_log_step": 0.0010300651139321104,
+                "actual_log_step": 0.0009024125570005204,
+                "matched": true
+              },
+              {
+                "ex_date": "2019-05-30",
+                "rate": 0.16,
+                "expected_log_step": 0.0011407387519639656,
+                "actual_log_step": 0.001002936537354504,
+                "matched": true
+              },
+              {
+                "ex_date": "2019-08-28",
+                "rate": 0.16,
+                "expected_log_step": 0.0009893644141190094,
+                "actual_log_step": 0.0008448871009112402,
+                "matched": true
+              },
+              {
+                "ex_date": "2019-11-27",
+                "rate": 0.16,
+                "expected_log_step": 0.0007375991483220545,
+                "actual_log_step": 0.0007816831269127356,
+                "matched": true
+              },
+              {
+                "ex_date": "2020-02-27",
+                "rate": 0.16,
+                "expected_log_step": 0.0005979743796675763,
+                "actual_log_step": 0.0005906118613827616,
+                "matched": true
+              },
+              {
+                "ex_date": "2020-06-04",
+                "rate": 0.16,
+                "expected_log_step": 0.00045623040426345796,
+                "actual_log_step": 0.0004568913983984402,
+                "matched": true
+              },
+              {
+                "ex_date": "2020-09-01",
+                "rate": 0.16,
+                "expected_log_step": 0.0002991213333194409,
+                "actual_log_step": 0.00043552316871409147,
+                "matched": true
+              },
+              {
+                "ex_date": "2020-12-03",
+                "rate": 0.16,
+                "expected_log_step": 0.00029536644113559163,
+                "actual_log_step": 0.0005765497017042875,
+                "matched": false
+              },
+              {
+                "ex_date": "2021-03-09",
+                "rate": 0.16,
+                "expected_log_step": 0.0003450878929962542,
+                "actual_log_step": 0.0006468777477177667,
+                "matched": false
+              },
+              {
+                "ex_date": "2021-06-09",
+                "rate": 0.16,
+                "expected_log_step": 0.00022916069994316501,
+                "actual_log_step": 0.00047799976625917395,
+                "matched": false
+              },
+              {
+                "ex_date": "2021-08-31",
+                "rate": 0.04,
+                "expected_log_step": 0.0001763201979354534,
+                "actual_log_step": 0.0005186473330498487,
+                "matched": false
+              },
+              {
+                "ex_date": "2021-12-01",
+                "rate": 0.04,
+                "expected_log_step": 0.0001224214973678528,
+                "actual_log_step": 0.000174298705445608,
+                "matched": true
+              },
+              {
+                "ex_date": "2022-03-02",
+                "rate": 0.04,
+                "expected_log_step": 0.00017039403662089114,
+                "actual_log_step": 2.896173487254572e-06,
+                "matched": false
+              },
+              {
+                "ex_date": "2022-06-08",
+                "rate": 0.04,
+                "expected_log_step": 0.00021137180378882903,
+                "actual_log_step": 0.0003705558442574919,
+                "matched": false
+              },
+              {
+                "ex_date": "2022-09-07",
+                "rate": 0.04,
+                "expected_log_step": 0.00029711060160675373,
+                "actual_log_step": 0.00014767425044670546,
+                "matched": false
+              },
+              {
+                "ex_date": "2022-11-30",
+                "rate": 0.04,
+                "expected_log_step": 0.0002558035442739026,
+                "actual_log_step": 0.0006430071434047058,
+                "matched": false
+              },
+              {
+                "ex_date": "2023-03-07",
+                "rate": 0.04,
+                "expected_log_step": 0.0001698369569300695,
+                "actual_log_step": 0.0002083236975156666,
+                "matched": true
+              },
+              {
+                "ex_date": "2023-06-07",
+                "rate": 0.04,
+                "expected_log_step": 0.00010348752984512544,
+                "actual_log_step": 0.00013967329719033472,
+                "matched": true
+              },
+              {
+                "ex_date": "2023-09-06",
+                "rate": 0.04,
+                "expected_log_step": 8.239607799342963e-05,
+                "actual_log_step": 5.257676459091698e-05,
+                "matched": true
+              },
+              {
+                "ex_date": "2023-12-05",
+                "rate": 0.04,
+                "expected_log_step": 8.789663361508104e-05,
+                "actual_log_step": 0.00015612928445163377,
+                "matched": false
+              },
+              {
+                "ex_date": "2024-03-05",
+                "rate": 0.04,
+                "expected_log_step": 4.692907843839578e-05,
+                "actual_log_step": 5.957599869743646e-05,
+                "matched": true
+              },
+              {
+                "ex_date": "2024-06-11",
+                "rate": 0.01,
+                "expected_log_step": 8.211191859164302e-05,
+                "actual_log_step": 0.00014490232680364158,
+                "matched": false
+              },
+              {
+                "ex_date": "2024-09-12",
+                "rate": 0.01,
+                "expected_log_step": 8.553954070489311e-05,
+                "actual_log_step": 5.137180058151138e-05,
+                "matched": true
+              },
+              {
+                "ex_date": "2024-12-05",
+                "rate": 0.01,
+                "expected_log_step": 6.890136771886546e-05,
+                "actual_log_step": 6.763454551708551e-05,
+                "matched": true
+              },
+              {
+                "ex_date": "2025-03-12",
+                "rate": 0.01,
+                "expected_log_step": 9.194979547633153e-05,
+                "actual_log_step": 6.903522699613918e-05,
+                "matched": true
+              },
+              {
+                "ex_date": "2025-06-11",
+                "rate": 0.01,
+                "expected_log_step": 6.94661526452478e-05,
+                "actual_log_step": 5.0353703575027175e-05,
+                "matched": true
+              },
+              {
+                "ex_date": "2025-09-11",
+                "rate": 0.01,
+                "expected_log_step": 5.6393627534845336e-05,
+                "actual_log_step": 5.43835029844196e-05,
+                "matched": true
+              },
+              {
+                "ex_date": "2025-12-04",
+                "rate": 0.01,
+                "expected_log_step": 5.568393798238702e-05,
+                "actual_log_step": 4.960253500674956e-05,
+                "matched": true
+              },
+              {
+                "ex_date": "2026-03-11",
+                "rate": 0.01,
+                "expected_log_step": 5.412280465755259e-05,
+                "actual_log_step": 6.967698265428895e-05,
+                "matched": true
+              },
+              {
+                "ex_date": "2026-06-04",
+                "rate": 0.25,
+                "expected_log_step": 0.0011648224962934606,
+                "actual_log_step": 0.0011861327931962722,
+                "matched": true
+              }
+            ]
+          }
+        },
+        "TSLA": {
+          "raw_bar_count": 2694,
+          "adjusted_bar_count": 2694,
+          "ratio_step_detection": {
+            "max_step": 1.6094579796593056,
+            "max_step_date": "2020-08-31",
+            "steps_found": 2,
+            "step_dates": [
+              {
+                "date": "2020-08-31",
+                "log_step": 1.6094579796593056,
+                "ratio_before": 15.0,
+                "ratio_after": 2.9999397989284207
+              },
+              {
+                "date": "2022-08-25",
+                "log_step": 1.098601069038245,
+                "ratio_before": 2.9999663412992255,
+                "ratio_after": 1.0
+              }
+            ],
+            "log_threshold": 0.05
+          },
+          "corporate_action_type_counts": {
+            "forward_splits": 2
+          },
+          "steps_matched_to_corporate_action": 2,
+          "steps_unmatched": 0,
+          "matched_steps": [
+            {
+              "date": "2020-08-31",
+              "log_step": 1.6094579796593056,
+              "ratio_before": 15.0,
+              "ratio_after": 2.9999397989284207,
+              "matched_action_date": "2020-08-31",
+              "gap_days": 0
+            },
+            {
+              "date": "2022-08-25",
+              "log_step": 1.098601069038245,
+              "ratio_before": 2.9999663412992255,
+              "ratio_after": 1.0,
+              "matched_action_date": "2022-08-25",
+              "gap_days": 0
+            }
+          ],
+          "unmatched_steps": [],
+          "dividend_adjustment_check": {
+            "records_checked": 0,
+            "matched_count": 0,
+            "unmatched_count": 0,
+            "tolerance_ratio": 0.5,
+            "records": []
+          }
+        }
+      }
+    }
+  },
+  "limitations": [
+    "Filing acceptanceDateTime establishes when data.sec.gov accepted the submission, not when any specific downstream consumer or feed first received or displayed it.",
+    "After-hours classification uses a fixed 06:00-17:30 America/New_York window as a proxy for the EDGAR same-business-day acceptance convention; it is not the codified EDGAR rule text.",
+    "'updated_at later than created_at' only measures a timestamp comparison the provider supplies; the API exposes no diff or content-revision history, so it is not a claim about what content actually changed, and a same-instant correction or a provider that does not bump updated_at is invisible to this measure.",
+    "The sampled news weeks are one 7-day window per year; they are not a full-year or full-history news availability measurement.",
+    "The news endpoint's start/end query parameters were found (see parts.news.per_year.*.created_at_outside_window_count/share, measured per sampled week, not asserted here) to admit items whose created_at falls outside the requested window -- i.e. its date filter can match on updated_at rather than original publication time. created_at_filtered in each year's output keeps only items whose created_at is actually inside the sampled week; the endpoint's own date filter is not a point-in-time boundary on its own.",
+    "Vintage-price comparison establishes that raw bars carry an unadjusted step at a corporate action while 'all'-adjusted bars do not; it does NOT establish a versioned historical record of later trade corrections, busted trades, or same-day price revisions -- Alpaca's raw daily bars are as-currently-served, not an audit trail of what was originally printed intraday.",
+    "All three parts measure what is available from data.sec.gov and Alpaca's paper/SIP + Benzinga news entitlement today (2026-09-22); they do not establish availability from other vendors or at other historical dates than today's request time.",
+    "The 20 filings/news symbols and 5 vintage-price symbols in plan.json are all currently listed (survivors as of 2026-09-22, not a delisted/renamed name in either list); nothing measured here establishes filing, news or price availability for a symbol that was delisted or renamed before today, and the coverage numbers should not be read as representative of the full historical universe."
+  ],
+  "observed_utc": "2026-09-22T22:23:32+00:00"
+}

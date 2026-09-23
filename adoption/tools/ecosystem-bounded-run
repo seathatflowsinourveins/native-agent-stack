@@ -26,12 +26,59 @@ done
 [[ "$job_swap" =~ ^(0|[1-9][0-9]*[KMGT]?)$ ]] || fail 'swap limit must be a finite size'
 [[ "$job_seconds" =~ ^[1-9][0-9]*$ && "$job_tasks" =~ ^[1-9][0-9]*$ ]] || fail 'runtime and task limits must be positive integers'
 
+# systemd starts a scope even when it has to mask a limit (an ancestor that
+# does not delegate the memory or pids controller), so the job's own cgroup is
+# checked from inside the scope before the command runs. The kernel keeps
+# memory.max in whole pages, rounding the requested byte count down.
+case $job_max in
+    *K) job_shift=10 ;; *M) job_shift=20 ;; *G) job_shift=30 ;; *T) job_shift=40 ;; *) job_shift=0 ;;
+esac
+job_max_count=${job_max%[KMGT]}
+(( ${#job_max_count} <= 18 && (job_max_count >> (62 - job_shift)) == 0 )) || fail 'memory limits must be positive finite sizes'
+job_page=$(/usr/bin/getconf PAGESIZE) || fail 'cannot read the page size; command was not started'
+[[ "$job_page" =~ ^[1-9][0-9]*$ ]] || fail 'cannot read the page size; command was not started'
+job_max_bytes=$(( (job_max_count << job_shift) / job_page * job_page ))
+
 # A scope inherits the caller's working directory, environment and standard IO.
 # Never fall back to running the command without containment.
 export XDG_RUNTIME_DIR="$job_runtime"
 export DBUS_SESSION_BUS_ADDRESS="unix:path=$job_runtime/bus"
 job_unit="ecosystem-job-${job_uid}-${BASHPID}-${RANDOM}.scope"
 job_pid=
+# The in-scope check creates this marker just before it execs the command, so
+# its absence afterwards means the command never started: that is a refusal
+# (78), whatever status the launcher returned.
+job_state=$(/usr/bin/mktemp -d "$job_runtime/ecosystem-job.XXXXXXXX") || fail 'cannot create the start marker; command was not started'
+job_started="$job_state/started"
+# Runs inside the scope as /bin/sh; its arguments are expanded there, not here.
+# shellcheck disable=SC2016
+job_check='
+marker=$1 unit=$2 memory=$3 tasks=$4
+shift 4
+refuse() { printf "ecosystem-bounded-run: %s; command was not started\n" "$*" >&2; exit 78; }
+cgroup=
+while IFS= read -r line; do
+    case $line in 0::/*) cgroup=${line#0::} ;; esac
+done < /proc/self/cgroup
+case $cgroup in */"$unit") ;; *) refuse "not inside $unit (cgroup ${cgroup:-unknown})" ;; esac
+read -r have_memory < "/sys/fs/cgroup$cgroup/memory.max" || refuse "memory.max is not enforced for $unit"
+read -r have_tasks < "/sys/fs/cgroup$cgroup/pids.max" || refuse "pids.max is not enforced for $unit"
+[ "$have_memory" = "$memory" ] || refuse "memory.max is $have_memory, not $memory"
+[ "$have_tasks" = "$tasks" ] || refuse "pids.max is $have_tasks, not $tasks"
+# exec only runs files, so look the name up the way exec does: a path must be an
+# executable file; a bare name must be an executable file in a PATH directory
+# (a shell builtin such as cd with no file would otherwise fail after the start).
+case $1 in
+  */*) if [ ! -f "$1" ] || [ ! -x "$1" ]; then refuse "command not found: $1"; fi ;;
+  *) found=; old_ifs=$IFS; IFS=:; set -f
+     # A trailing empty PATH entry means the current directory, as for exec.
+     case $PATH in *:) search_path="$PATH." ;; *) search_path=$PATH ;; esac
+     for dir in $search_path; do [ -f "${dir:-.}/$1" ] && [ -x "${dir:-.}/$1" ] && { found=1; break; }; done
+     set +f; IFS=$old_ifs; [ -n "$found" ] || refuse "command not found: $1" ;;
+esac
+: > "$marker" || refuse "cannot record the start"
+exec "$@"
+'
 # Invoked by the signal traps below, which ShellCheck does not follow here.
 # shellcheck disable=SC2329
 stop_job() {
@@ -43,6 +90,7 @@ stop_job() {
         kill -TERM "$job_pid" 2>/dev/null || true
         wait "$job_pid" 2>/dev/null || true
     fi
+    /usr/bin/rm -rf -- "$job_state"
     exit "$job_status"
 }
 trap 'stop_job 129' HUP
@@ -59,10 +107,14 @@ trap 'stop_job 143' TERM
     --property="RuntimeMaxSec=$job_seconds" \
     --property=TimeoutStopSec=5s \
     --property=OOMPolicy=kill \
-    -- "$@" <&0 &
+    -- /bin/sh -c "$job_check" ecosystem-bounded-run \
+    "$job_started" "$job_unit" "$job_max_bytes" "$job_tasks" "$@" <&0 &
 job_pid=$!
-if wait "$job_pid"; then
-    exit 0
-else
-    exit "$?"
+job_status=0
+wait "$job_pid" || job_status=$?
+if [[ -e "$job_started" ]]; then
+    /usr/bin/rm -rf -- "$job_state"
+    exit "$job_status"
 fi
+/usr/bin/rm -rf -- "$job_state"
+fail "containment was not established or verified (launcher exit $job_status); command was not started"

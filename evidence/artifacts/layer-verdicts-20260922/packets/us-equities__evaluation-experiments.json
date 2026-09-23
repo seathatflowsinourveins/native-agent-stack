@@ -1,0 +1,286 @@
+{
+ "candidate_source": "sota_manifest_layer_entries",
+ "candidates": [
+  {
+   "adopted": true,
+   "card_limitations": [
+    "No experiments or models were run by this review. The example would only record a synthetic local metric.",
+    "Autologging does not capture every data revision, leakage decision or external service cost; avoid unreviewed hosted telemetry and dataset uploads."
+   ],
+   "component_id": "data-mlflow",
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "https://github.com/mlflow/mlflow/blob/32792afe5b0183fce10532d3a023f5cfa8612d09/README.md"
+   ],
+   "key": "c1",
+   "name": "data-mlflow",
+   "pin": "v3.16.1; source 32792afe5b0183fce10532d3a023f5cfa8612d09",
+   "pin_behind_upstream": false,
+   "recipe_ref": null,
+   "repository": "https://github.com/mlflow/mlflow",
+   "review_status": null,
+   "role": "Local experiment runs, parameters, metrics and artifacts",
+   "upstream": {
+    "archived": false,
+    "latest": "v3.16.1",
+    "license": "Apache-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "released_at": "2026-09-17",
+    "renamed_to": null,
+    "stars": 28099
+   }
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "Eval command would perform model calls; not run here.",
+    "A judge score is not trading profitability or paper execution correctness.",
+    "Current release pin/date from PyPI because repository has no latest GitHub release."
+   ],
+   "component_id": "inspect-ai",
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "https://pypi.org/project/inspect-ai/0.3.266/"
+   ],
+   "key": "c2",
+   "name": "inspect-ai",
+   "pin": "inspect-ai0.3.266; source ec4dfc6953784dc45b79de3147530c89868c6e26",
+   "pin_behind_upstream": false,
+   "recipe_ref": null,
+   "repository": "https://github.com/UKGovernmentBEIS/inspect_ai",
+   "review_status": null,
+   "role": "Programmable task/solver/scorer evaluations",
+   "upstream": {
+    "archived": false,
+    "latest": "release/2025-11-28",
+    "license": "MIT",
+    "prerelease": null,
+    "pushed_at": "2026-09-22",
+    "released_at": null,
+    "renamed_to": null,
+    "stars": 2836
+   }
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "No tracking server or experiment recorded by this task.",
+    "Autologging can capture requests and artifacts; enable selected integrations deliberately.",
+    "A registry score is not an out-of-sample financial guarantee."
+   ],
+   "component_id": "mlflow",
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "https://github.com/mlflow/mlflow/blob/v3.16.1/README.md"
+   ],
+   "key": "c3",
+   "name": "mlflow",
+   "pin": "v3.16.1",
+   "pin_behind_upstream": false,
+   "recipe_ref": null,
+   "repository": "https://github.com/mlflow/mlflow",
+   "review_status": null,
+   "role": "Versioned experiment artifacts, model lineage and optional traces",
+   "upstream": {
+    "archived": false,
+    "latest": "v3.16.1",
+    "license": "Apache-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "released_at": "2026-09-17",
+    "renamed_to": null,
+    "stars": 28099
+   }
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "Immediate synthetic labels are not a valid financial online-evaluation assumption.",
+    "Progressive validation must model delayed fills/returns, late corrections and restart behavior; online updates do not guarantee adaptation or profitability."
+   ],
+   "component_id": "data-river",
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "https://github.com/online-ml/river/blob/64285b9dd6c606804753235fe992bcf25b9856ee/README.md"
+   ],
+   "key": "c4",
+   "name": "data-river",
+   "pin": "0.26.1; source 64285b9dd6c606804753235fe992bcf25b9856ee",
+   "pin_behind_upstream": false,
+   "recipe_ref": null,
+   "repository": "https://github.com/online-ml/river",
+   "review_status": null,
+   "role": "Incremental models, pipelines and progressive validation",
+   "upstream": {
+    "archived": false,
+    "latest": "0.26.1",
+    "license": "BSD-3-Clause",
+    "prerelease": false,
+    "pushed_at": "2026-09-21",
+    "released_at": "2026-08-21",
+    "renamed_to": null,
+    "stars": 6107
+   }
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "Public leaderboard is not independent proof for code retrieval, point-in-time filings or net trading performance."
+   ],
+   "component_id": "foundation-mteb",
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "https://github.com/embeddings-benchmark/mteb/blob/8ecdd976aad52ee9d5718772065438ec60ed388a/README.md",
+    "https://github.com/embeddings-benchmark/mteb/releases/tag/2.21.0"
+   ],
+   "key": "c5",
+   "name": "foundation-mteb",
+   "pin": "2.21.0",
+   "pin_behind_upstream": true,
+   "recipe_ref": null,
+   "repository": "https://github.com/embeddings-benchmark/mteb",
+   "review_status": null,
+   "role": "Embedding/retrieval evaluation tooling",
+   "upstream": {
+    "archived": false,
+    "latest": "2.21.6",
+    "license": "Apache-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "released_at": "2026-09-21",
+    "renamed_to": null,
+    "stars": 3431
+   }
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "ELv2 permits self-host use with restrictions; not Apache2 or unrestricted managed-service redistribution.",
+    "Server launch is prospective; no app instrumented and no judge-model calls run.",
+    "Auto-instrumentation can capture prompt/tool contents; scrub at source.",
+    "The proposed launch disables the optional MCP endpoint and hides built-in providers from the UI/catalog. PHOENIX_ALLOWED_PROVIDERS=NONE is not a backend inference authorization boundary; use a credential-free environment and appropriate access controls."
+   ],
+   "component_id": "phoenix",
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "https://github.com/Arize-ai/phoenix/blob/arize-phoenix-v20.14.0/README.md"
+   ],
+   "key": "c6",
+   "name": "phoenix",
+   "pin": "arize-phoenix-v20.14.0",
+   "pin_behind_upstream": false,
+   "recipe_ref": null,
+   "repository": "https://github.com/Arize-ai/phoenix",
+   "review_status": null,
+   "role": "Local trace inspection and evaluation workspace",
+   "upstream": {
+    "archived": false,
+    "latest": "@arizeai/phoenix-mcp@4.3.13",
+    "license": "NOASSERTION",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "released_at": "2026-09-22",
+    "renamed_to": null,
+    "stars": 11576
+   }
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "427 examples across 25 repositories are not a financial-document benchmark. Large-project concentration and no-gold cases affect interpretation.",
+    "No benchmark download/evaluation performed; freezing source and budgets is required."
+   ],
+   "component_id": "foundation-agent-retrieval-bench",
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "https://github.com/eyuansu62/agent-retrieval-bench/blob/07014c986f3deadb1548c62b32c0ffbe6a81465d/README.md",
+    "https://github.com/eyuansu62/agent-retrieval-bench/releases/tag/v0.2.1"
+   ],
+   "key": "c7",
+   "name": "foundation-agent-retrieval-bench",
+   "pin": "v0.2.1",
+   "pin_behind_upstream": false,
+   "recipe_ref": null,
+   "repository": "https://github.com/eyuansu62/agent-retrieval-bench",
+   "review_status": null,
+   "role": "File-level agent retrieval evaluation",
+   "upstream": {
+    "archived": false,
+    "latest": "v0.2.1",
+    "license": "MIT",
+    "prerelease": false,
+    "pushed_at": "2026-08-04",
+    "released_at": "2026-07-26",
+    "renamed_to": null,
+    "stars": 8
+   }
+  }
+ ],
+ "catalog": "us-equities",
+ "checked_at": "2026-09-22",
+ "enums": {
+  "disposition": [
+   "conditional",
+   "measured_tradeoff",
+   "observed_failure",
+   "out_of_scope",
+   "overlap",
+   "selected",
+   "unqualified"
+  ],
+  "evidence_class": [
+   "local_integration",
+   "measured_comparison",
+   "native_proven",
+   "source_review",
+   "synthetic"
+  ]
+ },
+ "existing_overturn_when": "Escalate to another scheduler, graph or host only when a specified long-running workflow, host-loss recovery, asset/backfill lineage or scale requirement exceeds the retained lane and the candidate passes the same failure, cancellation, output, identity and usage checks without duplicate effect owners.",
+ "group": "agents-operations",
+ "layer_id": "evaluation-experiments",
+ "layer_scope_terms": [
+  "evaluation",
+  "agent-evaluation",
+  "experiment-tracking",
+  "progressive-evaluation",
+  "validation-reporting"
+ ],
+ "limitations": [
+  "Native worker success and telemetry matching are bounded by the recorded task, process and account. They do not establish every native client/session, whole-task savings or unlimited allowance.",
+  "Dagu's older completed-history restart is not in-flight recovery. Later recovery receipts must be evaluated for their own process, host and workload rather than promoting all workflows.",
+  "Gateway transport health, routed text and ACP research acceptance do not establish native hook/tool parity or independent provider/model attestation.",
+  "Same-host recovery and configured restrictions do not establish off-host disaster recovery, a VM boundary, unattended broker operation or paid hosting.",
+  "The us-equities catalog also tags entries for this taxonomy layer under data-research (3), foundation-memory (3); agents-operations (6) was picked as the primary group by entry count."
+ ],
+ "requirement": "Run bounded research with native identity and complete returned results; supervise owned processes; retain scoped telemetry, failed attempts and recoverable state without granting research workers broker execution authority.",
+ "requirement_note": "The requirement, limitations and existing_overturn_when text is shared by this layer's group; judge fit against the layer title and layer_scope_terms.",
+ "rules": [
+  "Judge from retained evidence. Open the evidence_refs of every adopted candidate (bounded: the referenced file or its relevant section) and record every path you opened in sources_read. Do not rely on memory of the repositories.",
+  "The winner set is 1-3 adopted candidates (adopted == true) that best satisfy the requirement on the evidence. why_selected must cite at least one evidence path and state what was actually observed (native execution, measured comparison, local integration, synthetic fixture or source review), not what the project claims.",
+  "Every adopted non-winner candidate appears in alternatives with a why_not_default that states the concrete evidence gap or trade-off; add non-adopted candidates only with the same standard.",
+  "If a non-adopted candidate would satisfy the requirement better on the evidence, do not select it: record it in challenger_preferred with the comparison (a fixtures/, blueprints/ or tests/ path, or a python3/node command) that would establish it. Agreement between lanes never promotes; only an executed comparison can.",
+  "overturn_when names the concrete check that would change the verdict (a fixtures/, blueprints/ or tests/ path or a runnable python3/node command). open_gaps lists what the evidence does not establish. limits lists what you could not read or verify. Do not invent paths, numbers or results; leave evidence_refs empty rather than guess."
+ ],
+ "schema_version": 1,
+ "sota_components_not_in_candidates": [],
+ "title": "Evaluation and experiments",
+ "withheld": [
+  "current_choice",
+  "decision",
+  "rationale",
+  "candidates[].disposition",
+  "candidates[].rationale",
+  "candidates[].card_rationale",
+  "candidates[].card_decision",
+  "candidates[].review_status"
+ ]
+}

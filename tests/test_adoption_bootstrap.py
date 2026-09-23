@@ -277,6 +277,36 @@ class UnpinnedComponentFailClosedTests(unittest.TestCase):
             self.assertNotIn("some-unpinned-tool", result.stderr.split("No pin in", 1)[-1].split("\n")[0])
 
 
+class InstallRootCanonicalHomeTests(unittest.TestCase):
+    """An ECO_INSTALL_ROOT that only resolves to HOME after canonicalization
+    ("$HOME/.", a symlink to HOME, "$HOME/../<home>") must be refused before
+    bin/, tools/ or downloads/ are created in HOME (cross-family review P2)."""
+
+    def test_install_root_that_resolves_to_home_is_refused(self):
+        import os
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            home = tmp_path / "home"
+            home.mkdir()
+            link = tmp_path / "home-link"
+            link.symlink_to(home)
+            adoption_dir = UnpinnedComponentFailClosedTests()._write_fixture(tmp_path, ["some-unpinned-tool"])
+            roots = {"home-dot": f"{home}/.", "home-symlink": str(link),
+                     "home-parent-walk": f"{home}/../home"}
+            for label, root in roots.items():
+                with self.subTest(root=label):
+                    result = subprocess.run(
+                        ["bash", str(adoption_dir / "bootstrap-linux.sh"), "--profile", "test-profile",
+                         "--skip-system-packages", "--allow-unpinned", "node,uv,gh,some-unpinned-tool"],
+                        capture_output=True, text=True, timeout=30,
+                        env={**os.environ, "HOME": str(home), "ECO_INSTALL_ROOT": root},
+                    )
+                    self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+                    self.assertIn("ECO_INSTALL_ROOT must name a dedicated", result.stderr)
+                    self.assertEqual(sorted(p.name for p in home.iterdir()), [],
+                                     "installation children were created in HOME")
+
+
 class SystemPackagesBeforePrerequisiteCheckTests(unittest.TestCase):
     """Regression tests for item 4: the apt-managed prerequisite install must
     run before the curl/git/tar/jq presence check, and --skip-system-packages

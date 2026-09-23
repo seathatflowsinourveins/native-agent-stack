@@ -1,0 +1,165 @@
+{
+ "alternatives": [
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/landscape/candidate-quality-review.json",
+    "docs/candidate-quality-review-20260921.md"
+   ],
+   "key": "c1",
+   "name": "Mem0",
+   "repository": "https://github.com/mem0ai/mem0",
+   "why_not_default": "Application memory and temporal retrieval are source-supported, but retained evidence does not demonstrate native cross-client capture, recovery or improved project recall on a matched workload."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/landscape/candidate-quality-review.json",
+    "docs/candidate-quality-review-20260921.md"
+   ],
+   "key": "c2",
+   "name": "Letta Code",
+   "repository": "https://github.com/letta-ai/letta-code",
+   "why_not_default": "Its stateful harness entails a broader runtime migration. Native Codex/Claude continuity, account boundaries and restored project memory have not been demonstrated for that replacement."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/landscape/candidate-quality-review.json",
+    "docs/candidate-quality-review-20260921.md"
+   ],
+   "key": "c4",
+   "name": "OpenViking",
+   "repository": "https://github.com/volcengine/OpenViking",
+   "why_not_default": "Inspectable hierarchical context is relevant, but no retained execution establishes improved handoffs, capture, deletion or recovery across the selected native clients."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "docs/memory-landscape-maintenance.md",
+    "catalogs/landscape/candidate-quality-review.json"
+   ],
+   "key": "c7",
+   "name": "Graphiti",
+   "repository": "https://github.com/getzep/graphiti",
+   "why_not_default": "Temporal relationships could complement project memory, but extraction provenance, scoped updates and restoration remain unqualified on this workload. No measured project-continuity advantage establishes a replacement."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/landscape/candidate-quality-review.json",
+    "docs/candidate-quality-review-20260921.md"
+   ],
+   "key": "c8",
+   "name": "Cognee",
+   "repository": "https://github.com/topoteretes/cognee",
+   "why_not_default": "Graph/context assembly and local processing are plausible capabilities. The selected provider profile, native capture, project isolation and recovery lack retained execution acceptance."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/landscape/candidate-quality-review.json",
+    "docs/candidate-quality-review-20260921.md"
+   ],
+   "key": "c9",
+   "name": "Supermemory",
+   "repository": "https://github.com/supermemoryai/supermemory",
+   "why_not_default": "Local and offline routes prevent a cloud-only exclusion, but provider behavior, export/restore, isolation and representative cross-client retrieval remain unqualified."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "synthetic",
+   "evidence_refs": [
+    "blueprints/memory-lifecycle-probe/README.md",
+    "evidence/artifacts/memory-lifecycle-probe-20260921/verification.json",
+    "catalogs/landscape/candidate-quality-review.json"
+   ],
+   "key": "c10",
+   "name": "Basic Memory",
+   "repository": "https://github.com/basicmachines-co/basic-memory",
+   "why_not_default": "The retained synthetic native CLI comparison passed lexical retrieval, overwrite, deletion and index rebuilding. It exercised neither agent hooks nor real cross-client handoffs; rebuilding an index did not establish loss-of-database restoration. These results establish eligibility, not superiority over ai-memory's broader native continuity evidence."
+  }
+ ],
+ "catalog": "foundation",
+ "challenger_preferred": null,
+ "lane": "codex",
+ "layer_id": "durable-memory",
+ "limits": [
+  "This verdict reviews retained execution; no new native client, model, installation or memory benchmark was run.",
+  "All eight adopted candidates' pinned README bytes were fetched and matched the retained source hashes. This verifies source identity, not runtime behavior.",
+  "Private transcripts, original backup archives and production state were not inspected; recovery conclusions retain the published receipts' boundaries.",
+  "The existing lexical comparison has unequal recovery operations and cannot establish comparable latency, semantic quality or complete provider cost."
+ ],
+ "model": {
+  "effort": "high",
+  "name": "gpt-6-astra"
+ },
+ "open_gaps": [
+  "Useful autonomous learning remains unestablished: the retained real-session review rejected insufficient durable evidence, and scheduler admission produced no learned edits.",
+  "Representative semantic recall, decision accuracy, handoff usefulness and complete provider consumption have no matched comparison.",
+  "Capture is bounded and sanitized; it does not establish complete transcript retention or universal current-session coverage.",
+  "TTL controls default search visibility until sweep; deletion observations do not establish erasure from historical versions, logs or backups.",
+  "Same-host restored SQLite/FTS state does not establish live-client rebinding, atomic database/wiki consistency or independent disaster recovery.",
+  "The reviewed ai-memory upstream revision is not the accepted installed 2.3.2 revision; upgrade behavior remains unqualified.",
+  "The synthetic ai-memory comparison initially attempted an unwanted model download. The corrected explicit embedding opt-out passed, but network bytes were not measured."
+ ],
+ "overturn_protocol": {
+  "arms": [
+   "ai-memory 2.3.2 in an isolated store",
+   "Basic Memory 0.23.2 at the retained source pin in an isolated project"
+  ],
+  "fixture_paths": [
+   "blueprints/memory-lifecycle-probe/corpus.json",
+   "blueprints/memory-lifecycle-probe/verify.py",
+   "blueprints/blind-catalog-convergence/memory-experiment.json"
+  ],
+  "metric": "Preserve the frozen lexical facts, overwrite and deletion checks, then compare source-grounded recall and real Codex/Claude handoffs with equivalent capture, isolation and empty-target restore checks. Require improved usefulness or complete measured cost without lifecycle regressions; the existing synthetic results alone are insufficient."
+ },
+ "overturn_when": "Change the verdict after a fresh executed comparison extending blueprints/memory-lifecycle-probe/corpus.json and blueprints/blind-catalog-convergence/memory-experiment.json demonstrates better source-grounded recall or handoff usefulness while matching native capture, deletion, isolation and empty-target recovery. Rechecking blueprints/memory-lifecycle-probe/verify.py alone cannot promote a challenger.",
+ "packet_sha256": "22f71424e8377d2c83aeae5ed357f0d8935df32b190c7d9e9d4dc0aedabf62e2",
+ "schema_version": 1,
+ "sources_read": [
+  "<host-path>/SKILL.md",
+  "<host-path>/foundation__durable-memory.json",
+  "docs/memory-landscape-maintenance.md",
+  "docs/native-memory-rag-lifecycle.md",
+  "catalogs/landscape/candidate-quality-review.json",
+  "docs/candidate-quality-review-20260921.md",
+  "evidence/artifacts/catalog-quality-review-20260921/sources.json",
+  "blueprints/blind-catalog-convergence/memory-experiment.json",
+  "blueprints/memory-lifecycle-probe/README.md",
+  "blueprints/memory-lifecycle-probe/verify.py",
+  "evidence/artifacts/memory-lifecycle-probe-20260921/verification.json",
+  "evidence/receipts/memory-landscape-lifecycle-20260921.json",
+  "evidence/artifacts/memory-rag-lifecycle-20260921/native-client.json",
+  "blueprints/us-equities/memory-lifecycle/receipt.json",
+  "blueprints/us-equities/state-recovery/memory/receipt.json",
+  "https://raw.githubusercontent.com/mem0ai/mem0/a39a802bbc93e85b820078cd3c4dbaf53af25dbe/README.md",
+  "https://raw.githubusercontent.com/letta-ai/letta-code/dfb5639a4db2d97828e7ca07b808e93be85e05e7/README.md",
+  "https://raw.githubusercontent.com/volcengine/OpenViking/172c1050716f63339f4001292d58c830e6b7a315/README.md",
+  "https://raw.githubusercontent.com/akitaonrails/ai-memory/5157c6be10b5830d7adc7e29b0a4358c3ecbe6a2/README.md",
+  "https://raw.githubusercontent.com/getzep/graphiti/16cdf7045378c8d53ae01f94e2fa60d238cb0f68/README.md",
+  "https://raw.githubusercontent.com/topoteretes/cognee/663a2dc15d04bc0d7ec2733a2dd604b7ed1b8c8e/README.md",
+  "https://raw.githubusercontent.com/supermemoryai/supermemory/57b430b5b6a19106a989651f4cde853c05147682/README.md",
+  "https://raw.githubusercontent.com/basicmachines-co/basic-memory/3bf2d523c0a941f71cb144a5502e7557dd025d69/README.md"
+ ],
+ "why_selected": "Select ai-memory as the best-supported operational fit. docs/native-memory-rag-lifecycle.md records actual native Codex retrieval and a fresh Claude memory call; evidence/artifacts/memory-rag-lifecycle-20260921/native-client.json records exact stored-final readback and completed consolidation. blueprints/us-equities/memory-lifecycle/receipt.json separately records synthetic native routing, TTL and deletion checks. blueprints/us-equities/state-recovery/memory/receipt.json records native backup and isolated same-host restoration with SQLite/FTS verification. Together these cover more of the required cross-client continuity and inspectable lifecycle than the alternatives. They do not establish superior semantic recall or useful learned writes.",
+ "winner_evidence_class": "native_proven",
+ "winner_evidence_refs": [
+  "docs/native-memory-rag-lifecycle.md",
+  "docs/memory-landscape-maintenance.md",
+  "evidence/receipts/memory-landscape-lifecycle-20260921.json",
+  "evidence/artifacts/memory-rag-lifecycle-20260921/native-client.json",
+  "blueprints/us-equities/memory-lifecycle/receipt.json",
+  "blueprints/us-equities/state-recovery/memory/receipt.json"
+ ],
+ "winner_keys": [
+  "c5"
+ ]
+}

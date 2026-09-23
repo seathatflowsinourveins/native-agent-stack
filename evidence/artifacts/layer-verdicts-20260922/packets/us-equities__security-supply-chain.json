@@ -1,0 +1,223 @@
+{
+ "candidate_source": "sota_manifest_layer_entries",
+ "candidates": [
+  {
+   "adopted": true,
+   "card_limitations": [
+    "Server config is not supplied and no service starts in this task.",
+    "Development mode is unsuitable for persistent secrets; no dev-mode recipe offered.",
+    "Secret management does not reduce a token\u2019s authority by itself.",
+    "IBKR is this catalog's selected live-primary broker path; runtime-target.json broker_boundaries records only selected_path and local_broker_acceptance: not_established, not a 'live-primary' designation. Its credential handling here remains selected live-primary, unaccepted."
+   ],
+   "component_id": "openbao",
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "https://github.com/openbao/openbao/blob/v2.6.2/README.md"
+   ],
+   "key": "c1",
+   "name": "openbao",
+   "pin": "v2.6.2",
+   "pin_behind_upstream": false,
+   "recipe_ref": null,
+   "repository": "https://github.com/openbao/openbao",
+   "review_status": null,
+   "role": "Separate service identity and secret lifecycle",
+   "upstream": {
+    "archived": false,
+    "latest": "v2.6.2",
+    "license": "MPL-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "released_at": "2026-08-18",
+    "renamed_to": null,
+    "stars": 7456
+   }
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "Scan covers installed Python package metadata only (site-packages plus the adapter's requirements.txt pins); it does not cover bundled native/C extension code, host OS packages, unpinned transitive shared libraries, or code outside the scanned distributions.",
+    "Zero matches against the 2026-09-22 database do not prove exploitability elsewhere, unpublished-vulnerability absence, or runtime safety; re-scan and re-record before relying on this for a later database or dependency set."
+   ],
+   "component_id": "grype",
+   "decisions": [],
+   "evidence_kind": "native_proven",
+   "evidence_refs": [
+    "https://github.com/anchore/grype/blob/v0.119.0/README.md",
+    "blueprints/us-equities/supply-chain/scan-nautilus-rc5-20260922/receipt.json"
+   ],
+   "key": "c2",
+   "name": "grype",
+   "pin": "v0.119.0",
+   "pin_behind_upstream": false,
+   "recipe_ref": "blueprints/us-equities/supply-chain/scan-nautilus-rc5-20260922/receipt.json",
+   "repository": "https://github.com/anchore/grype",
+   "review_status": null,
+   "role": "Scan a recorded SBOM against vulnerability data",
+   "upstream": {
+    "archived": false,
+    "latest": "v0.119.0",
+    "license": "Apache-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-21",
+    "released_at": "2026-09-17",
+    "renamed_to": null,
+    "stars": 12916
+   }
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "Existing22-commit scan had0findings; this is a dated scoped result, not proof no secrets exist anywhere.",
+    "Patterns can miss novel secrets or flag benign text; avoid scanning native auth directories."
+   ],
+   "component_id": "gitleaks",
+   "decisions": [],
+   "evidence_kind": "native_proven",
+   "evidence_refs": [
+    "evidence/receipts/runtime-tools.json"
+   ],
+   "key": "c3",
+   "name": "gitleaks",
+   "pin": "v8.30.1",
+   "pin_behind_upstream": false,
+   "recipe_ref": "recipes/README.md",
+   "repository": "https://github.com/gitleaks/gitleaks",
+   "review_status": null,
+   "role": "Redacted secret scanning of code and history",
+   "upstream": {
+    "archived": false,
+    "latest": "v8.30.1",
+    "license": "MIT",
+    "prerelease": false,
+    "pushed_at": "2026-09-09",
+    "released_at": "2026-03-21",
+    "renamed_to": null,
+    "stars": 29427
+   }
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "Actual native inventory covered 36 Python packages in one selected SDK prefix; no whole-host, external interpreter or complete vendored-library coverage.",
+    "Inventory is not a vulnerability, authenticity, behavior or legal verdict. Release checksums matched; signature verification and vulnerability scanning were not performed.",
+    "License metadata was present for 34/36 packages and SPDX expressions for 31/36. Missing metadata does not establish absent licenses."
+   ],
+   "component_id": "syft",
+   "decisions": [],
+   "evidence_kind": "native_proven",
+   "evidence_refs": [
+    "https://github.com/anchore/syft/blob/v1.52.0/README.md",
+    "blueprints/us-equities/supply-chain/receipt.json"
+   ],
+   "key": "c4",
+   "name": "syft",
+   "pin": "v1.52.0",
+   "pin_behind_upstream": false,
+   "recipe_ref": "blueprints/us-equities/supply-chain/README.md",
+   "repository": "https://github.com/anchore/syft",
+   "review_status": null,
+   "role": "Native artifact dependency inventory",
+   "upstream": {
+    "archived": false,
+    "latest": "v1.52.0",
+    "license": "Apache-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-18",
+    "released_at": "2026-09-17",
+    "renamed_to": null,
+    "stars": 9598
+   }
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "Do not replace exact identity with a permissive wildcard merely to pass verification.",
+    "Signing can use OIDC and publish transparency records; no signing or identity flow initiated here.",
+    "Not all upstreams publish signatures; keep checksum evidence labeled as such."
+   ],
+   "component_id": "cosign",
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "https://github.com/sigstore/cosign/blob/v3.1.3/README.md"
+   ],
+   "key": "c5",
+   "name": "cosign",
+   "pin": "v3.1.3",
+   "pin_behind_upstream": false,
+   "recipe_ref": null,
+   "repository": "https://github.com/sigstore/cosign",
+   "review_status": null,
+   "role": "Artifact signature and identity verification",
+   "upstream": {
+    "archived": false,
+    "latest": "v3.1.3",
+    "license": "Apache-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-21",
+    "released_at": "2026-08-06",
+    "renamed_to": null,
+    "stars": 6317
+   }
+  }
+ ],
+ "catalog": "us-equities",
+ "checked_at": "2026-09-22",
+ "enums": {
+  "disposition": [
+   "conditional",
+   "measured_tradeoff",
+   "observed_failure",
+   "out_of_scope",
+   "overlap",
+   "selected",
+   "unqualified"
+  ],
+  "evidence_class": [
+   "local_integration",
+   "measured_comparison",
+   "native_proven",
+   "source_review",
+   "synthetic"
+  ]
+ },
+ "existing_overturn_when": "Escalate to another scheduler, graph or host only when a specified long-running workflow, host-loss recovery, asset/backfill lineage or scale requirement exceeds the retained lane and the candidate passes the same failure, cancellation, output, identity and usage checks without duplicate effect owners.",
+ "group": "agents-operations",
+ "layer_id": "security-supply-chain",
+ "layer_scope_terms": [
+  "security",
+  "sbom",
+  "secrets",
+  "vulnerability-analysis"
+ ],
+ "limitations": [
+  "Native worker success and telemetry matching are bounded by the recorded task, process and account. They do not establish every native client/session, whole-task savings or unlimited allowance.",
+  "Dagu's older completed-history restart is not in-flight recovery. Later recovery receipts must be evaluated for their own process, host and workload rather than promoting all workflows.",
+  "Gateway transport health, routed text and ACP research acceptance do not establish native hook/tool parity or independent provider/model attestation.",
+  "Same-host recovery and configured restrictions do not establish off-host disaster recovery, a VM boundary, unattended broker operation or paid hosting."
+ ],
+ "requirement": "Run bounded research with native identity and complete returned results; supervise owned processes; retain scoped telemetry, failed attempts and recoverable state without granting research workers broker execution authority.",
+ "requirement_note": "The requirement, limitations and existing_overturn_when text is shared by this layer's group; judge fit against the layer title and layer_scope_terms.",
+ "rules": [
+  "Judge from retained evidence. Open the evidence_refs of every adopted candidate (bounded: the referenced file or its relevant section) and record every path you opened in sources_read. Do not rely on memory of the repositories.",
+  "The winner set is 1-3 adopted candidates (adopted == true) that best satisfy the requirement on the evidence. why_selected must cite at least one evidence path and state what was actually observed (native execution, measured comparison, local integration, synthetic fixture or source review), not what the project claims.",
+  "Every adopted non-winner candidate appears in alternatives with a why_not_default that states the concrete evidence gap or trade-off; add non-adopted candidates only with the same standard.",
+  "If a non-adopted candidate would satisfy the requirement better on the evidence, do not select it: record it in challenger_preferred with the comparison (a fixtures/, blueprints/ or tests/ path, or a python3/node command) that would establish it. Agreement between lanes never promotes; only an executed comparison can.",
+  "overturn_when names the concrete check that would change the verdict (a fixtures/, blueprints/ or tests/ path or a runnable python3/node command). open_gaps lists what the evidence does not establish. limits lists what you could not read or verify. Do not invent paths, numbers or results; leave evidence_refs empty rather than guess."
+ ],
+ "schema_version": 1,
+ "sota_components_not_in_candidates": [],
+ "title": "Security and supply chain",
+ "withheld": [
+  "current_choice",
+  "decision",
+  "rationale",
+  "candidates[].disposition",
+  "candidates[].rationale",
+  "candidates[].card_rationale",
+  "candidates[].card_decision",
+  "candidates[].review_status"
+ ]
+}

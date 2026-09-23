@@ -54,6 +54,8 @@ class NewWorkflowSecurityCoverageTests(unittest.TestCase):
             "action-compatibility.yml",
             "publish-catalog.yml",
             "adoption-bootstrap.yml",
+            "scorecard.yml",
+            "dependency-review.yml",
         }
         self.assertEqual(
             actual, expected,

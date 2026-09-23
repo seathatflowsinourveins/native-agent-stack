@@ -1,218 +1,22 @@
 {
  "alternatives": [
   {
-   "disposition": "overlap",
-   "evidence_class": "native_proven",
-   "evidence_refs": [
-    "blueprints/us-equities/workers/receipt.json",
-    "adoption/paired/receipt.json",
-    "blueprints/us-equities/research-runtime/receipt.json",
-    "evidence/receipts/foundation-native-20260920.json"
-   ],
-   "key": "c2",
-   "name": "Codex",
-   "repository": "https://github.com/openai/codex",
-   "why_not_default": "Codex is equally native-proven for completion and identity. blueprints/us-equities/workers/receipt.json records run.status completed, configured_model gpt-6-astra and total usage 135311 (lines 24-47). It also retains a failed ctx_execute_file attempt (lines 75-79 and 111), which is direct evidence of failed-attempt retention. In adoption/paired/receipt.json (lines 64-99) Astra completed with report validation passed. It is ranked below c9 for three reasons. (1) Broker authority is limited by the environment, not by configuration: workers/receipt.json line 110 says read-only mode does not restrict external MCP mutations and only that 'the recorded environment supplied no broker keys or broker tools'. The paired receipt (line 29) says Astra accepted only message items, but it records no exposed-tool count. (2) The retained evidence has no research-scoped telemetry match for Codex. foundation-native-20260920.json line 35 records only that native Codex usage matched Loki and Prometheus in the foundation run. (3) blueprints/us-equities/research-runtime/receipt.json lines 90-101 recorded codex_readiness.ready false (weekly usage 100%), and lines 148-152 record an unresolved device sign-in. The later paired receipt (line 207) records readiness restored. These are quota and sign-in failures, not capability failures. Codex remains the required first worker in the paired Astra-to-Claude graph and was left out only because of the 3-winner cap. The catalog's 'default' decision label (catalogs/us-equities/agents-operations.json lines 7-16) was not used as ranking evidence."
-  },
-  {
-   "disposition": "overlap",
-   "evidence_class": "native_proven",
-   "evidence_refs": [
-    "catalogs/us-equities/agents-operations.json",
-    "blueprints/us-equities/research-runtime/receipt.json"
-   ],
-   "key": "c21",
-   "name": "OpenTelemetry Collector contrib",
-   "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
-   "why_not_default": "The Collector is a required pipeline, not a competing choice. catalogs/us-equities/agents-operations.json (opentelemetry-collector-contrib entry, lines 854-894) says it supplies the privacy transform and OTLP delivery to Loki and Prometheus, and the Loki entry requires Collector sanitization before ingestion (line 1003). It forwards telemetry but does not retain it. It was left out of the winner set only because of the 3-winner cap and remains co-required."
-  },
-  {
-   "disposition": "overlap",
-   "evidence_class": "native_proven",
-   "evidence_refs": [
-    "blueprints/us-equities/research-runtime/receipt.json",
-    "evidence/receipts/foundation-native-20260920.json",
-    "catalogs/us-equities/agents-operations.json"
-   ],
-   "key": "c4",
-   "name": "Prometheus",
-   "repository": "https://github.com/prometheus/prometheus",
-   "why_not_default": "Native usage matched Prometheus in the research-scoped query (blueprints/us-equities/research-runtime/receipt.json lines 112-113). Its series are aggregate counters (last_over_time of token_usage_tokens_total), not per-request records of failed attempts. In one run it missed the first two Claude requests during telemetry startup (evidence/receipts/foundation-native-20260920.json line 35). A fresh run that waited for initialization matched (line 36), so this is a startup-timing gap, not a proven retention defect. Prometheus complements Loki rather than replacing it."
-  },
-  {
-   "disposition": "overlap",
-   "evidence_class": "native_proven",
-   "evidence_refs": [
-    "blueprints/us-equities/state-recovery/memory/receipt.json",
-    "blueprints/us-equities/state-recovery/qdrant/receipt.json",
-    "catalogs/us-equities/agents-operations.json"
-   ],
-   "key": "c15",
-   "name": "Restic",
-   "repository": "https://github.com/restic/restic",
-   "why_not_default": "Correction from the earlier proposal: Restic is the only candidate with executed restore receipts, so it partly covers the requirement's 'recoverable state' clause and is no longer marked out_of_scope. blueprints/us-equities/state-recovery/memory/receipt.json (kind native_cli_e2e, status passed_same_host_restore, lines 4-8) preserved 324 archived files and verified SQLite/FTS state. The Qdrant state-recovery receipt reports a same-host native restore of five collections and 201 points. The catalog's us_equities_fit (catalogs/us-equities/agents-operations.json line 1740) is 'Preserve selected reproducible research/configuration artifacts'. The catalog's limitation at line 1767 ('No live SQLite/Qdrant/Loki/Prometheus database ... was backed up') describes only the earlier public-file backup, and the later state-recovery receipts supersede it for SQLite and Qdrant. Restic is not the default here for three reasons: all restores were same-host; no Dagu run state, Loki or Prometheus store, or order journal was restored; and it does not run or supervise research. It was left out because of the 3-winner cap and because it covers worker memory and vector state, not run state."
-  },
-  {
-   "disposition": "out_of_scope",
-   "evidence_class": "native_proven",
-   "evidence_refs": [
-    "docs/dashboard-rendered-acceptance.md",
-    "catalogs/us-equities/agents-operations.json"
-   ],
-   "key": "c16",
-   "name": "Grafana",
-   "repository": "https://github.com/grafana/grafana",
-   "why_not_default": "Grafana is a visualization layer. Correction from the earlier proposal: docs/dashboard-rendered-acceptance.md line 29 records that exact panel queries matched native memory, Qdrant and QMD results, not research-run telemetry. The same line says 'Claude has no current telemetry series; absence is not zero usage or savings.' Grafana does not run research, supervise processes or retain state itself."
-  },
-  {
-   "disposition": "conditional",
-   "evidence_class": "native_proven",
-   "evidence_refs": [
-    "blueprints/us-equities/deerflow/native-receipt.json",
-    "blueprints/us-equities/deerflow/research-receipt.json",
-    "docs/candidate-quality-review-20260921.md"
-   ],
-   "key": "c18",
-   "name": "DeerFlow",
-   "repository": "https://github.com/bytedance/deer-flow",
-   "why_not_default": "blueprints/us-equities/deerflow/research-receipt.json records one embedded invoke_acp_agent task that completed. The same receipt says DeerFlow discards ACP completion and usage, which had to be recovered from private adapter logs. It also says ACP read-only mode maps to workspaceWrite/on-request. No planner, UI, scheduler or hosted service was accepted. This falls short of the requirement for complete returned results and strict read-only scope."
-  },
-  {
    "disposition": "conditional",
    "evidence_class": "source_review",
-   "evidence_refs": [
-    "catalogs/us-equities/agents-operations.json"
-   ],
-   "key": "c17",
+   "evidence_refs": [],
+   "key": "c2",
    "name": "Temporal",
    "repository": "https://github.com/temporalio/temporal",
-   "why_not_default": "The only evidence is the catalog's source review (catalogs/us-equities/agents-operations.json lines 319-359). There is no failure, cancellation or restart receipt. The catalog names Temporal as the escalation choice for host-loss or multi-day durability, which is exactly the gap Dagu leaves (in-flight resumption not proved). It is untested, not failed."
+   "why_not_default": "The only evidence is an upstream README URL (https://github.com/temporalio/temporal/blob/v1.32.0/README.md). I could not open it, and I found no local receipt, fixture or test for Temporal that runs failure, cancellation, restart or in-flight recovery. Durable history and activity-level recovery would address Dagu's recorded gap (\"Restart acceptance preserves completed history; it does not prove in-flight resumption\" in blueprints/us-equities/hosting/receipt.json), but that capability is untested here, not proven. The card also warns that activities retry by default and that unlimited retries are unsuitable for uncertain broker writes. It would also add a server and SDK beyond the single-binary lane. Temporal remains conditional on a specified in-flight or host-loss recovery requirement and an executed comparison."
   },
   {
    "disposition": "unqualified",
    "evidence_class": "source_review",
-   "evidence_refs": [
-    "catalogs/us-equities/agents-operations.json"
-   ],
-   "key": "c3",
-   "name": "Prefect",
-   "repository": "https://github.com/prefecthq/prefect",
-   "why_not_default": "The only evidence is a source review (catalogs/us-equities/agents-operations.json lines 361-401). No flow was supplied or scheduled, and the catalog says Prefect would replace Dagu as the first scheduler rather than run alongside it. There is no execution receipt."
-  },
-  {
-   "disposition": "unqualified",
-   "evidence_class": "source_review",
-   "evidence_refs": [
-    "catalogs/us-equities/agents-operations.json"
-   ],
-   "key": "c13",
-   "name": "Dagster",
-   "repository": "https://github.com/dagster-io/dagster",
-   "why_not_default": "The only evidence is a source review (catalogs/us-equities/agents-operations.json lines 403-440). Dagster targets partition and backfill lineage, which the requirement does not ask for. No asset definitions were written and nothing was run."
-  },
-  {
-   "disposition": "unqualified",
-   "evidence_class": "source_review",
-   "evidence_refs": [
-    "catalogs/us-equities/agents-operations.json"
-   ],
-   "key": "c14",
-   "name": "LangGraph",
-   "repository": "https://github.com/langchain-ai/langgraph",
-   "why_not_default": "The only evidence is a source review. The catalog calls its import command an installation smoke test only (catalogs/us-equities/agents-operations.json line 262). InMemorySaver loses state on restart. The packet's upstream metadata puts the pin behind upstream."
-  },
-  {
-   "disposition": "unqualified",
-   "evidence_class": "source_review",
-   "evidence_refs": [
-    "catalogs/us-equities/agents-operations.json"
-   ],
-   "key": "c20",
-   "name": "OpenAI Agents SDK",
-   "repository": "https://github.com/openai/openai-agents-python",
-   "why_not_default": "catalogs/us-equities/agents-operations.json (lines 1605-1644) records no provider API call and says the SDK does not inherit native Codex account identity. Tracing is on by default. It is API-backed, not native identity."
-  },
-  {
-   "disposition": "unqualified",
-   "evidence_class": "source_review",
-   "evidence_refs": [
-    "docs/candidate-quality-review-20260921.md",
-    "catalogs/landscape/candidate-quality-review.json"
-   ],
-   "key": "c11",
-   "name": "Deep Agents",
-   "repository": "https://github.com/langchain-ai/deepagents",
-   "why_not_default": "docs/candidate-quality-review-20260921.md line 44 calls it a serious challenger that still needs the same source-research task, permission boundaries, recovery test and complete cost comparison. None of these have been executed. It is untested, not failed."
-  },
-  {
-   "disposition": "unqualified",
-   "evidence_class": "source_review",
-   "evidence_refs": [
-    "docs/candidate-quality-review-20260921.md",
-    "catalogs/landscape/candidate-quality-review.json"
-   ],
-   "key": "c8",
-   "name": "OpenHands SDK",
-   "repository": "https://github.com/OpenHands/software-agent-sdk",
-   "why_not_default": "docs/candidate-quality-review-20260921.md line 45 says installation, native-account and recovery acceptance remain open. It is a challenger for remote or isolated workers only."
-  },
-  {
-   "disposition": "unqualified",
-   "evidence_class": "source_review",
-   "evidence_refs": [
-    "docs/candidate-quality-review-20260921.md",
-    "catalogs/landscape/candidate-quality-review.json"
-   ],
+   "evidence_refs": [],
    "key": "c1",
-   "name": "OpenHands Agent Canvas",
-   "repository": "https://github.com/OpenHands/OpenHands",
-   "why_not_default": "docs/candidate-quality-review-20260921.md line 46 says hosting existing native workers may be useful but is not yet qualified here. There is no execution receipt."
-  },
-  {
-   "disposition": "unqualified",
-   "evidence_class": "source_review",
-   "evidence_refs": [
-    "docs/candidate-quality-review-20260921.md",
-    "catalogs/landscape/candidate-quality-review.json"
-   ],
-   "key": "c7",
-   "name": "Microsoft Agent Framework",
-   "repository": "https://github.com/microsoft/agent-framework",
-   "why_not_default": "docs/candidate-quality-review-20260921.md line 47 says it fills a discovery gap, but a required application workflow must be qualified before another runtime is added. There is no execution evidence."
-  },
-  {
-   "disposition": "out_of_scope",
-   "evidence_class": "native_proven",
-   "evidence_refs": [
-    "catalogs/us-equities/agents-operations.json",
-    "evidence/receipts/foundation-native-20260920.json"
-   ],
-   "key": "c10",
-   "name": "OmniRoute",
-   "repository": "https://github.com/diegosouzapw/omniroute",
-   "why_not_default": "Not adopted, and it belongs to the routing layer. catalogs/us-equities/agents-operations.json (lines 97-145) says gateway transport health does not establish native identity and that the Codex executor strips max_output_tokens."
-  },
-  {
-   "disposition": "out_of_scope",
-   "evidence_class": "source_review",
-   "evidence_refs": [
-    "catalogs/us-equities/agents-operations.json"
-   ],
-   "key": "c6",
-   "name": "FreeLLMAPI",
-   "repository": "https://github.com/tashfeenahmed/freellmapi",
-   "why_not_default": "Not adopted, and it is a routing alternative. catalogs/us-equities/agents-operations.json (lines 146-187) says a readiness 200 shows transport health only, and that Claude-looking aliases can route to local Qwen, so native identity is not preserved."
-  },
-  {
-   "disposition": "out_of_scope",
-   "evidence_class": "source_review",
-   "evidence_refs": [
-    "catalogs/us-equities/agents-operations.json"
-   ],
-   "key": "c12",
-   "name": "vLLM",
-   "repository": "https://github.com/vllm-project/vllm",
-   "why_not_default": "Not adopted, and it belongs to the model-serving layer. It does not supervise research runs or provide native account identity. The packet's upstream metadata puts the pin behind upstream."
+   "name": "modal",
+   "repository": "https://github.com/modal-labs/modal-client",
+   "why_not_default": "The only evidence is a PyPI URL (https://pypi.org/project/modal/1.5.5/), which I could not open. The card says `modal run` executes cloud code that may incur charges and was \"not run here\". No local execution, identity, telemetry or cost evidence exists. It covers the managed-compute scope term, not orchestration of existing native commands or data-quality validation. Paid hosting is not authorized. The packet also lists upstream latest as v1.3.1 against a 1.5.5 pin, a metadata inconsistency I could not resolve."
   }
  ],
  "catalog": "us-equities",
@@ -220,84 +24,67 @@
  "lane": "claude",
  "layer_id": "data-quality-orchestration",
  "limits": [
-  "I could not recompute or verify packet_sha256 because I cannot run commands. The value is copied from the task.",
-  "I cannot fetch URLs, so the external raw.githubusercontent.com README refs for c1, c7, c8, c11 and c18 were not opened. For those candidates I relied on the local candidate-quality-review summaries.",
-  "Large receipts and catalogs were read in bounded sections or searched with focused greps, not in full. evidence/receipts/foundation-native-20260920.json was read at lines 30-39. evidence/artifacts/catalog-quality-review-20260921/sources.json was checked by search only. In this revision round I re-opened only the Qdrant state-recovery receipt's cited status through the refuter's line references, not in full.",
-  "observability/receipt.json and observability/backends/receipt.json are cited by the catalog but not by the packet, so I did not open them.",
-  "Catalog decision labels were read but not used for ranking. The revised worker choice rests on receipt fields: exposed_tool_count, the scoped telemetry match and readiness.",
-  "Possible self-preference: this Claude lane selected Claude Code (c9) over Codex (c2). The deciding receipt fields are cited above so another lane can check them. Only an executed comparison should settle the c2-versus-c9 ranking, and lane agreement should not promote either one.",
-  "The coordinator supplied no TypeSafe inference results and I made no service calls. All dispositions are my own source review; the refuter findings were re-checked against the original receipts, not accepted on agreement. Skill path: <host-path>/SKILL.md. Actual model reported by the client: claude-opus-5-5[1m] (Opus 5.5). The requested label claude-opus-5 / high was copied as instructed."
+  "I could not open the upstream URL evidence_refs for c1 (PyPI modal 1.5.5), c2 (Temporal v1.32.0 README) or c4 (pandera README at 62f55e2). I had no web access, and the task restricts reads to the repository. Those candidates' upstream claims are unverified.",
+  "I ran no commands. The retained receipts and gate outputs are documented results from 2026-09-19 and 2026-09-22, not observed now. tests/test_promotion_gate.py skips its fixture tests when the gate venv is absent, so a pass there would not by itself show that pandera executed.",
+  "I read only lines 1-60 of tests/test_promotion_gate.py. I did not open promotion_gate.py, the null-price-cell, empty-snapshot or fractional-negative-volume gate results, the fixture CSVs, research-evidence.yaml, prepare-evidence.yaml or the service or config examples.",
+  "I did not recompute artifact sha256 values or input hashes.",
+  "Skill: typesafe-ai loaded in context from <host-path>/typesafe-ai. The coordinator supplied no TypeSafe inference results and I made no service calls, so every judgment here is my own source review; I retained no provider judgments. Model: the client exposes claude-opus-5-5[1m], and the packet's required fixed value is opus/high."
  ],
  "model": {
   "effort": "high",
   "name": "claude-opus-5-5"
  },
  "open_gaps": [
-  "Recovery of an interrupted run is not shown. Dagu's restart preserved completed history only (blueprints/us-equities/hosting/receipt.json line 100), and none of the listed fixtures contains an interruption or resume case.",
-  "The recoverable-state clause is covered only by preserved completed Dagu history and by same-host Restic restores of ai-memory and Qdrant state (blueprints/us-equities/state-recovery/memory/receipt.json line 8). No Dagu run state, telemetry store or order journal was restored, and nothing was recovered off-host.",
-  "The 'data-quality' part of the layer title has no candidate evidence. Pandera appears only under the packet's sota_components_not_in_candidates, and the requirement text (packet line 532) does not mention dataset validation.",
-  "The packet records no pin for c9 Claude Code (pin null), so the winning worker's version is not bound in this layer's evidence. The receipts record only configured_model claude-opus-5.",
-  "The Dagu pin v2.16.6 is behind upstream v2.17.0 according to the packet metadata, and the newer release has not been tested.",
-  "No research-scoped telemetry match was retained for the Codex worker. foundation-native-20260920.json line 35 records only a foundation-run match.",
-  "All evidence is from one authoring host with a bundled 2013 historical LEAN sample (adoption/paired/receipt.json lines 19-23). There is no off-host hosting, no unattended schedule (blueprints/us-equities/hosting/receipt.json line 90: recurring_schedule false) and no new-machine reproduction.",
-  "Configured model and provider are not independently attested per request (adoption/paired/receipt.json line 205). Net provider savings were not measured (blueprints/us-equities/research-runtime/receipt.json line 139: net_provider_tokens_saved null), and complete coordinator and worker usage is outside the native counters (adoption/paired/receipt.json line 133).",
-  "Codex read-only mode is requested, not a hard OS sandbox, and external MCP mutations are not restricted (blueprints/us-equities/workers/receipt.json line 110). Claude's zero-tool enforcement is a client flag, not an OS sandbox either (blueprints/us-equities/research-runtime/receipt.json line 23).",
-  "The first paired attempt was blocked because the Codex allowance was exhausted (blueprints/us-equities/research-runtime/receipt.json line 18 and lines 90-101). It succeeded only in the later run recorded in adoption/paired/receipt.json (lines 47-49). catalogs/us-equities/agents-operations.json line 309 still records the earlier blocked state.",
-  "Temporal, Prefect, Dagster, LangGraph, the OpenAI Agents SDK, Deep Agents, the OpenHands SDK and Canvas, and Microsoft Agent Framework are untested, not failed."
+  "Dagu: completed-history restart is not recovery of in-flight work (blueprints/us-equities/hosting/receipt.json limitations). No model-worker queue, continuous off-host hosting, VM boundary or trading host is established.",
+  "Dagu: the paired Astra-to-Claude model workflow was not executed (paired_model_workflow_executed false) because the Codex allowance was exhausted (usedPercent 100). The Claude Opus 5 report ran standalone, outside the Dagu graph, so complete returned results from a model worker running inside the orchestrated graph are not established.",
+  "The two Dagu records disagree on dashboard authentication. The hosting receipt (2026-09-19) records basic auth with anonymous 401 and authenticated 200 after restart. The current hosting README says the dashboard now uses upstream auth.mode none, with anonymous API reads returning 200. No retained receipt covers the current auth mode.",
+  "Dagu pin v2.16.6 is behind upstream v2.17.0 (pin_behind_upstream true). The newer release is untested; that means unknown, not failed.",
+  "pandera: evidence covers synthetic CSV fixtures only. It does not establish provider completeness, correct corporate actions, accurate prices, absence of leakage or a production bars/universe ingest. The data README states that no such ingest ships yet.",
+  "pandera: the duckdb:// input path is source-only because the duckdb package is not in the pinned gate install (blueprints/us-equities/data/README.md).",
+  "Temporal and modal have no local execution, failure, cancellation, recovery or telemetry evidence. Their capabilities are untested, not failed.",
+  "No measured comparison between orchestrators exists. The winner set rests on single-lane native and local evidence, not on a head-to-head test."
  ],
  "overturn_protocol": {
   "arms": [
-   "Current: Dagu v2.16.6 with native Claude Code (tools denied) and OTel Collector feeding Loki and Prometheus",
-   "Codex native SDK worker (native_worker.py) with the same Dagu graph, packet and telemetry, research-scoped",
-   "Temporal server with the Python SDK, same workers and telemetry",
-   "Prefect process worker, same workers and telemetry",
-   "Dagu v2.17.0 (upstream latest per packet metadata) as a pin-refresh arm"
+   "Dagu v2.16.6 local CLI plus user-service host (retained lane)",
+   "Temporal server v1.32.0 / CLI 1.9.1 / Python SDK 1.33.0, run locally in dev mode on the same fixtures",
+   "pandera 0.33.1 promotion_gate.py in its isolated venv (retained data-quality lane)"
   ],
   "fixture_paths": [
    "blueprints/us-equities/hosting/receipt.json",
-   "blueprints/us-equities/hosting/research-evidence.yaml",
-   "blueprints/us-equities/research-runtime/research-pair.yaml",
-   "blueprints/us-equities/research-runtime/prepare-evidence.yaml",
-   "blueprints/us-equities/workers/native_worker.py"
+   "blueprints/us-equities/research-runtime/receipt.json",
+   "tests/test_promotion_gate.py",
+   "blueprints/us-equities/data/fixtures/good-gate-result.json",
+   "blueprints/us-equities/data/fixtures/bad-gate-result.json"
   ],
-  "metric": "Worker comparison: exposed_tool_count, or an enforced tool-denial flag; per-request exact equality between native usage and the research-scoped Loki and Prometheus queries; report_validation status; count of retained failed attempts; broker_calls, which must be 0. Scheduler comparison: four pass/fail results: (1) the failure fixture gives failed status with the dependent step aborted; (2) the cancellation fixture gives aborted status; (3) history is preserved across service restart; (4) an interrupted run resumes. No fixture exists yet for (4); one must be authored before this check can be run."
+  "metric": "For each orchestrator: native terminal status for the success, exit-23 failure and cancellation fixtures; completed history preserved after restart; an in-flight run resumed after process or host loss without duplicate effects; zero broker calls; and scoped telemetry for every attempt. For the data gate: every retained fixture outcome (status plus the set of failing check names) reproduced exactly through the isolated venv."
  },
- "overturn_when": "Any of the following would change the verdict.\n\n- c2 over c9: a fresh native run of blueprints/us-equities/workers/native_worker.py inside blueprints/us-equities/research-runtime/research-pair.yaml shows that the Codex worker enforces zero exposed tools, or an equivalent hard tool denial, and matches a research-scoped (client_scope financial-research) Loki and Prometheus usage query exactly, while Claude Code fails either check on the same packet.\n- Dagu replaced: Temporal, Prefect or Deep Agents passes the same checks as blueprints/us-equities/hosting/receipt.json (a failure fixture with dependent-step abort, a cancellation fixture, and history preserved across restart) and also proves resumption of an interrupted run, which Dagu has not shown (hosting receipt line 100).\n- Loki demoted: a fresh native worker run shows Loki missing requests that Prometheus or the Collector file sink retained.\n\nEvery such result must be recorded with a single owner for each side effect, complete usage and failed-attempt accounting, broker_calls 0 and matching model identity.",
- "packet_sha256": "59cbc47aa76b604c40df669cb230df0614cc7a22cde4eda53bd1e0820dd4b8ad",
+ "overturn_when": "Two checks could change this verdict. First, an executed same-fixture comparison in which Temporal (server v1.32.0, Python SDK 1.33.0) passes all the checks recorded for Dagu in blueprints/us-equities/hosting/receipt.json: the exit-23 failure producing status failed with its dependent step aborted, native cancellation reporting aborted, and completed history preserved across a service restart. Temporal would also need to resume an in-flight run after worker or host process loss without a duplicate effect owner, which Dagu has not shown. Second, running `python3 -m unittest tests.test_promotion_gate` with the gate venv present, where any fixture result differs from its retained outcome in blueprints/us-equities/data/fixtures/ (for example, good-gate-result.json no longer passing or bad-gate-result.json no longer failing its five named checks).",
+ "packet_sha256": "cdbe255da0593b73f77e57bc8b887984a78e5233165f3a9fa27818d427708eeb",
  "schema_version": 1,
  "sources_read": [
   "<host-path>/us-equities__data-quality-orchestration.json",
-  "catalogs/us-equities/agents-operations.json",
-  "blueprints/us-equities/workers/receipt.json",
-  "blueprints/us-equities/research-runtime/receipt.json",
   "blueprints/us-equities/hosting/receipt.json",
-  "adoption/paired/receipt.json",
-  "blueprints/us-equities/research-efficiency/native-receipt.json",
-  "evidence/receipts/foundation-native-20260920.json",
-  "docs/foundation-closure-20260921.md",
-  "blueprints/us-equities/deerflow/native-receipt.json",
-  "blueprints/us-equities/deerflow/research-receipt.json",
-  "blueprints/us-equities/state-recovery/memory/receipt.json",
-  "blueprints/us-equities/state-recovery/qdrant/receipt.json",
-  "docs/candidate-quality-review-20260921.md",
-  "catalogs/landscape/candidate-quality-review.json",
-  "evidence/artifacts/catalog-quality-review-20260921/sources.json",
-  "docs/dashboard-rendered-acceptance.md",
-  "<host-path>/SKILL.md (skill body preloaded in context)"
+  "blueprints/us-equities/research-runtime/receipt.json",
+  "blueprints/us-equities/hosting/README.md",
+  "blueprints/us-equities/data/README.md",
+  "blueprints/us-equities/data/fixtures/good-gate-result.json",
+  "blueprints/us-equities/data/fixtures/bad-gate-result.json",
+  "tests/test_promotion_gate.py (lines 1-60)"
  ],
- "why_selected": "This verdict is my own source review of retained receipts. No provider or TypeSafe inference results were supplied or reused. Revision: the worker winner changes from c2 (Codex) to c9 (Claude Code). The challenger refuter showed that the earlier ranking depended on the catalog's decision label, not on the receipts. On re-reading the receipts, c9 has the stronger evidence on the requirement's identity, broker-authority and scoped-telemetry clauses.\n\nThe packet requirement (packet line 532) is: bounded research with native identity and complete returned results; supervision of owned processes; retention of scoped telemetry, failed attempts and recoverable state; and no broker execution authority for research workers.\n\nc9 Claude Code (native execution):\n- Standalone research run in blueprints/us-equities/research-runtime/receipt.json, lines 59-89 and 169. It used workflow independent_report, the command `claude -p --model claude-opus-5 ... --tools '' --disallowedTools '*' --permission-mode dontAsk`, and recorded process_exit_code 0, native_subtype success, reported_models [\"claude-opus-5\"], exposed_tool_count 0 and report_validation citations_values_units_and_scope_passed.\n- Its usage (total_tokens 14583) matched both stores through a research-scoped query: telemetry lines 106-114 record native_usage_equals_prometheus_and_loki true, a Loki query scoped by ecosystem_client_scope=\"financial-research\", and loki_records_for_instance 51.\n- Paired run in adoption/paired/receipt.json, lines 101-131. The same fields hold: status completed, exposed_tool_count 0 and report validation passed.\n- The broker-authority clause is enforced by an explicit tool denial. The Codex worker receipt, by contrast, records only that no broker tools happened to be present in the environment (blueprints/us-equities/workers/receipt.json line 110).\n\nc19 Dagu v2.16.6 (native execution):\n- blueprints/us-equities/hosting/receipt.json (kind native_cli_e2e): a failure fixture requested exit 23, and the run failed with the dependent step aborted. A `dagu stop` cancellation gave status aborted. History survived a service restart. The server ran as a systemd user service with restart_policy on-failure (lines 93-94) and recorded model_calls 0 and broker_calls 0 (lines 96-97).\n- blueprints/us-equities/research-runtime/receipt.json: the packet and order_table steps succeeded (lines 43-46), and retained_failures keeps the initial validation exit 1 (lines 141-147).\n- Two observations of the paired graph differ in time. The research-runtime receipt (observed 2026-09-19T16:21:52Z, line 54: paired_model_workflow_executed false) predates adoption/paired/receipt.json (observed 19:41:50Z, lines 47-49: research_pair succeeded, exit_code 0). The later receipt supersedes the earlier one for the paired graph. Catalog line 309 still records the earlier blocked state.\n\nc5 Loki v3.7.8 (native execution):\n- It retains per-request records with request content omitted, scoped by client scope (research-runtime receipt lines 106-114; all_bodies_content_omitted true).\n- evidence/receipts/foundation-native-20260920.json line 35: in the first native Claude run, Loki held all six requests while Prometheus missed the first two. Line 36 shows a fresh run that waited for telemetry initialization matched on native usage, Loki and Prometheus. The observed gap is therefore a startup-timing difference in one run, not a demonstrated retention advantage.\n- Loki is selected because it keeps per-request, scoped records. Prometheus keeps aggregate counters.\n\nAll evidence is native execution on one authoring host over a bundled 2013 historical LEAN sample.",
- "winner_evidence_class": "native_proven",
+ "why_selected": "This is my own source review of the retained files. I ran nothing and did not use any TypeSafe inference results. Two candidates win: c3 (Dagu) for orchestration and c4 (pandera) for data quality. They cover separate scope terms and do not overlap. c3 has native CLI end-to-end evidence. blueprints/us-equities/hosting/receipt.json (kind \"native_cli_e2e\", version \"2.16.6\", publisher_checksum_matched true) records a successful 3-step run, evidence-20260919-ready, with exit_code 0: summarize, baseline_evidence and catalog_evidence all \"succeeded\". The receipt keeps the earlier failures, a schema error with exit 1 and a first execution with exit 1. It also records an exit-23 failure fixture that reached status \"failed\" with its dependent step \"aborted\", and a native `dagu stop` cancellation that reached \"aborted\" even though the CLI exited 0. After service_restart_exit 0, prior_history_rows_preserved is true. The service ran with model_calls 0 and broker_calls 0, and its inherited environment was limited to \"HOME PATH DAGU_HOME only\". blueprints/us-equities/research-runtime/receipt.json (kind \"native_model_e2e\") shows Dagu 2.16.6 running the packet and order_table steps to \"succeeded\". It also records paired_model_workflow_executed false and a retained validation failure (\"entrypoint document must not define name\"). Together, these match the requirement: bounded runs, a supervised owned process, retained failed attempts and history, and no broker authority. c4 has local integration evidence on synthetic fixtures only. blueprints/us-equities/data/README.md documents a fail-closed promotion_gate.py that runs pandera 0.33.1 in an isolated venv. The retained outputs blueprints/us-equities/data/fixtures/good-gate-result.json (status \"pass\", row_count 4, 12 named checks) and bad-gate-result.json (status \"fail\"; valid_trading_session, volume_integral_non_negative, observed_at_not_future, high_ge_max_open_close and unique_symbol_session failed) show the gate separating good from bad synthetic snapshots. tests/test_promotion_gate.py reruns these fixtures, but only when the gate venv exists on the host. Because c4 rests on synthetic fixtures, the set's class is \"synthetic\", the weakest class among the winners.",
+ "winner_evidence_class": "synthetic",
  "winner_evidence_refs": [
-  "blueprints/us-equities/research-runtime/receipt.json",
-  "adoption/paired/receipt.json",
   "blueprints/us-equities/hosting/receipt.json",
-  "evidence/receipts/foundation-native-20260920.json",
-  "blueprints/us-equities/research-efficiency/native-receipt.json",
-  "docs/foundation-closure-20260921.md"
+  "blueprints/us-equities/research-runtime/receipt.json",
+  "blueprints/us-equities/hosting/README.md",
+  "blueprints/us-equities/data/README.md",
+  "blueprints/us-equities/data/fixtures/good-gate-result.json",
+  "blueprints/us-equities/data/fixtures/bad-gate-result.json",
+  "tests/test_promotion_gate.py"
  ],
  "winner_keys": [
-  "c9",
-  "c19",
-  "c5"
+  "c3",
+  "c4"
  ]
 }

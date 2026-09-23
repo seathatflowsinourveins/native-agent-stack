@@ -1,0 +1,273 @@
+{
+ "candidates": [
+  {
+   "adopted": true,
+   "component_id": "agent-browser",
+   "decisions": [
+    {
+     "capability": "Inspect and interact with selected browser pages",
+     "evidence_scope": "Selected local browser snapshot/ref interactions and the pinned Linux browser fixture passed.",
+     "id": "bounded-browser-operations",
+     "limitations": [
+      "Local fixture acceptance does not authorize unrelated websites, accounts or messages.",
+      "Browser-session recovery and arbitrary website compatibility remain unestablished."
+     ],
+     "next_gap": "Check a changed website/browser operation only when the task depends on it."
+    }
+   ],
+   "evidence_kind": "native_execution",
+   "evidence_refs": [
+    "catalogs/foundation/decisions.json",
+    "docs/dashboard-rendered-acceptance.md"
+   ],
+   "key": "c1",
+   "name": "agent-browser",
+   "pin": "0.38.1",
+   "pin_behind_upstream": false,
+   "recipe_ref": "recipes/README.md",
+   "repository": "https://github.com/vercel-labs/agent-browser",
+   "review_status": null,
+   "upstream": {
+    "archived": false,
+    "latest": "v0.38.1",
+    "license": "Apache-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "released_at": "2026-09-16",
+    "renamed_to": null,
+    "stars": 43049
+   }
+  },
+  {
+   "adopted": false,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/star-audit.json"
+   ],
+   "key": "c2",
+   "name": "Firecrawl MCP",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": "catalogs/us-equities/star-audit.json",
+   "repository": "https://github.com/firecrawl/firecrawl-mcp-server",
+   "review_status": null,
+   "upstream": null
+  },
+  {
+   "adopted": true,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "catalogs/landscape/upstream-snapshot.json",
+    "https://github.com/trycua/cua/blob/9bbfa7dd3e27ca7f1861ede70aaca390174493f9/libs/cua-driver/README.md"
+   ],
+   "key": "c3",
+   "name": "Cua Driver",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": "catalogs/landscape/upstream-snapshot.json",
+   "repository": "https://github.com/trycua/cua",
+   "review_status": null,
+   "upstream": null
+  },
+  {
+   "adopted": true,
+   "component_id": "playwright-cli",
+   "decisions": [
+    {
+     "capability": "Inspect and interact with selected browser pages",
+     "evidence_scope": "Selected local browser snapshot/ref interactions and the pinned Linux browser fixture passed.",
+     "id": "bounded-browser-operations",
+     "limitations": [
+      "Local fixture acceptance does not authorize unrelated websites, accounts or messages.",
+      "Browser-session recovery and arbitrary website compatibility remain unestablished."
+     ],
+     "next_gap": "Check a changed website/browser operation only when the task depends on it."
+    }
+   ],
+   "evidence_kind": "native_execution",
+   "evidence_refs": [
+    "catalogs/foundation/decisions.json"
+   ],
+   "key": "c4",
+   "name": "Playwright CLI",
+   "pin": "0.1.21; Playwright 1.64.0-alpha-1789764292000",
+   "pin_behind_upstream": false,
+   "recipe_ref": "recipes/README.md",
+   "repository": "https://github.com/microsoft/playwright-cli",
+   "review_status": null,
+   "upstream": {
+    "archived": false,
+    "latest": "v0.1.21",
+    "license": "Apache-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-18",
+    "released_at": "2026-09-18",
+    "renamed_to": null,
+    "stars": 13498
+   }
+  },
+  {
+   "adopted": true,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/star-audit.json"
+   ],
+   "key": "c5",
+   "name": "Crawl4AI",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": "catalogs/us-equities/star-audit.json",
+   "repository": "https://github.com/unclecode/crawl4ai",
+   "review_status": null,
+   "upstream": null
+  },
+  {
+   "adopted": false,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/star-audit.json"
+   ],
+   "key": "c6",
+   "name": "Browser Use",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": "catalogs/us-equities/star-audit.json",
+   "repository": "https://github.com/browser-use/browser-use",
+   "review_status": null,
+   "upstream": null
+  },
+  {
+   "adopted": true,
+   "component_id": "openresearch",
+   "decisions": [
+    {
+     "capability": "Discover and retrieve selected public research papers",
+     "evidence_scope": "Retained public-paper retrieval and selected extracted artifacts support the narrow research operation.",
+     "id": "public-literature-retrieval",
+     "limitations": [
+      "Discovery and extracted text do not establish paper conclusions or exhaustive literature coverage."
+     ],
+     "next_gap": "Evaluate missing/ambiguous source handling for the next research corpus."
+    }
+   ],
+   "evidence_kind": "native_execution",
+   "evidence_refs": [
+    "docs/full-stack-convergence.md",
+    "catalogs/foundation/decisions.json"
+   ],
+   "key": "c7",
+   "name": "OpenResearch",
+   "pin": "0.2.7",
+   "pin_behind_upstream": true,
+   "recipe_ref": "recipes/native-upgrades-20260921.md",
+   "repository": "https://github.com/alphaXiv/OpenResearch",
+   "review_status": null,
+   "upstream": {
+    "archived": false,
+    "latest": "v0.2.8",
+    "license": "MIT",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "released_at": "2026-09-22",
+    "renamed_to": null,
+    "stars": 5551
+   }
+  },
+  {
+   "adopted": true,
+   "component_id": "tavily-cli",
+   "decisions": [
+    {
+     "capability": "Search and extract primary web sources through the upstream Tavily CLI",
+     "evidence_scope": "Upstream CLI0.1.8 installed and authenticated; live search returned four official sources and extraction returned one result with zero failures. Eight official skills were listed for both clients and discovered by fresh Codex probes for native and Desktop homes. A later current Desktop task received the eight skill entries and used the Search/Extract skills; the broad source-search miss and useful direct extraction are retained separately.",
+     "id": "tavily-native-search-extract",
+     "limitations": [
+      "Desktop-home discovery initially failed SQLite initialization and passed only with a temporary session-specific sqlite_home; the active Desktop registry was not hot-reloaded.",
+      "Claude global skill listing and fresh Codex discovery do not prove actual model invocation of every skill. Map, Crawl and Research remain unqualified.",
+      "No causal lifetime token savings or full lifecycle recovery is measured."
+     ],
+     "next_gap": "Use the accepted CLI now; check the intended fresh client for skill activation when needed, and qualify broader operations only for a concrete task."
+    }
+   ],
+   "evidence_kind": "native_execution",
+   "evidence_refs": [
+    "catalogs/foundation/decisions.json",
+    "docs/ecosystem/tavily-receipt.json"
+   ],
+   "key": "c8",
+   "name": "Tavily CLI",
+   "pin": "0.1.8",
+   "pin_behind_upstream": false,
+   "recipe_ref": "recipes/tavily.md",
+   "repository": "https://github.com/tavily-ai/tavily-cli",
+   "review_status": null,
+   "upstream": {
+    "archived": false,
+    "latest": null,
+    "license": "MIT",
+    "prerelease": null,
+    "pushed_at": "2026-09-21",
+    "released_at": null,
+    "renamed_to": null,
+    "stars": 18
+   }
+  }
+ ],
+ "catalog": "foundation",
+ "checked_at": "2026-09-22",
+ "enums": {
+  "disposition": [
+   "conditional",
+   "measured_tradeoff",
+   "observed_failure",
+   "out_of_scope",
+   "overlap",
+   "selected",
+   "unqualified"
+  ],
+  "evidence_class": [
+   "local_integration",
+   "measured_comparison",
+   "native_proven",
+   "source_review",
+   "synthetic"
+  ]
+ },
+ "existing_overturn_when": "A defined source-coverage or ingestion task exceeds the current commands and a candidate improves attributable retrieval completeness, accuracy and total runtime/cost on the same frozen source set.",
+ "group": null,
+ "layer_id": "web-research",
+ "limitations": [
+  "Accepted public-source retrieval is not an exhaustive research-quality benchmark or a guarantee of citation correctness.",
+  "Optional hosted services, credentials and bulk crawling require task-specific qualification; source-screened alternatives were not runtime tested."
+ ],
+ "requirement": "Retrieve attributable primary sources and interact with selected pages through bounded native commands without another standing research-agent stack.",
+ "rules": [
+  "Judge from retained evidence. Open the evidence_refs of every adopted candidate (bounded: the referenced file or its relevant section) and record every path you opened in sources_read. Do not rely on memory of the repositories.",
+  "The winner set is 1-3 adopted candidates (adopted == true) that best satisfy the requirement on the evidence. why_selected must cite at least one evidence path and state what was actually observed (native execution, measured comparison, local integration, synthetic fixture or source review), not what the project claims.",
+  "Every adopted non-winner candidate appears in alternatives with a why_not_default that states the concrete evidence gap or trade-off; add non-adopted candidates only with the same standard.",
+  "If a non-adopted candidate would satisfy the requirement better on the evidence, do not select it: record it in challenger_preferred with the comparison (a fixtures/, blueprints/ or tests/ path, or a python3/node command) that would establish it. Agreement between lanes never promotes; only an executed comparison can.",
+  "overturn_when names the concrete check that would change the verdict (a fixtures/, blueprints/ or tests/ path or a runnable python3/node command). open_gaps lists what the evidence does not establish. limits lists what you could not read or verify. Do not invent paths, numbers or results; leave evidence_refs empty rather than guess."
+ ],
+ "schema_version": 1,
+ "sota_components_not_in_candidates": [],
+ "title": "Web research",
+ "withheld": [
+  "current_choice",
+  "decision",
+  "rationale",
+  "candidates[].disposition",
+  "candidates[].rationale",
+  "candidates[].review_status",
+  "candidates[].decisions[].selection",
+  "candidates[].decisions[].review_status",
+  "sota_components_not_in_candidates[].review_status"
+ ]
+}

@@ -1,0 +1,450 @@
+{
+ "catalog": "us-equities",
+ "layer_id": "evaluation-experiments",
+ "repository_root": "the repository root given in the task",
+ "return_A": {
+  "winner_keys": [
+   "c7",
+   "c2",
+   "c1"
+  ],
+  "winner_names": [
+   [
+    "foundation-agent-retrieval-bench",
+    "foundation-agent-retrieval-bench"
+   ],
+   [
+    "inspect-ai",
+    "inspect-ai"
+   ],
+   [
+    "data-mlflow",
+    "data-mlflow"
+   ]
+  ],
+  "why_selected": "I judged fit against the layer title, \"Evaluation and experiments\", and its scope terms (evaluation, agent-evaluation, experiment-tracking, progressive-evaluation, validation-reporting), as the requirement_note directs. The shared group requirement covers supervision, telemetry and broker isolation. No candidate addresses those directly. Each winner fills a different scope term.\n\nc7 (agent-retrieval-bench) is the only packet candidate with execution evidence. blueprints/convergence-practice/arb-trace2code/receipt.json records kind \"actual_upstream_offline_retrieval_evaluation\" at the unmodified v0.2.1 tag (commit b487f386...). The pinned upstream tests reported \"15 passed in 0.15s\". The lexical and bm25 runs each evaluated 101 samples with exit_code 0 and no model or provider calls. blueprints/convergence-practice/local-fixture/evaluation-receipt.json records a frozen 24-query fixture (20 positive queries, 4 no-gold) scored with the native ARB APIs: bm25 MRR 0.9666666666666666 and Recall@1 0.95; lexical MRR 0.9 and Recall@1 0.8. The fixture is source-authored, so it is a local integration check, not a held-out benchmark.\n\nc2 (inspect-ai) is the only adopted candidate for programmable task/solver/scorer agent evaluation. Its evidence is source review only. catalogs/convergence-practice/architecture-wave/UKGovernmentBEIS__inspect_ai.json holds the pinned README and an MIT license at ec4dfc69. Lines 124-125 record installation_performed false and model_calls 0. It stays in the winner set only because the only better-evidenced option for this scope term, promptfoo, is not an adopted packet candidate. Promptfoo is recorded in challenger_preferred.\n\nc1 (data-mlflow) covers experiment tracking. Its evidence is source review only. catalogs/us-equities/data-research.json lines 780-817 hold an immutable commit-pinned README reference (32792afe) and a serverless local SQLite workflow that is marked UNEXECUTED.\n\nBecause c1 and c2 are source review only, the class for the whole winner set is source_review, the weakest among the winners.",
+  "winner_evidence_class": "source_review",
+  "winner_evidence_refs": [
+   "blueprints/convergence-practice/arb-trace2code/receipt.json",
+   "blueprints/convergence-practice/local-fixture/evaluation-receipt.json",
+   "catalogs/convergence-practice/architecture-wave/UKGovernmentBEIS__inspect_ai.json",
+   "catalogs/us-equities/agents-operations.json",
+   "catalogs/us-equities/data-research.json"
+  ],
+  "alternatives": [
+   {
+    "disposition": "overlap",
+    "evidence_class": "source_review",
+    "evidence_refs": [
+     "catalogs/us-equities/agents-operations.json"
+    ],
+    "key": "c3",
+    "name": "mlflow",
+    "repository": "https://github.com/mlflow/mlflow",
+    "why_not_default": "c3 is the same repository and release (v3.16.1) as the selected c1. Its reference is a tag-pinned README rather than c1's commit-pinned one. Its prospective workflow starts a tracking server (mlflow server --host 127.0.0.1 --port 5000) instead of c1's serverless local store. The card says no tracking server or experiment was recorded (catalogs/us-equities/agents-operations.json lines 1688-1726). On this evidence it adds no capability beyond c1."
+   },
+   {
+    "disposition": "conditional",
+    "evidence_class": "source_review",
+    "evidence_refs": [
+     "catalogs/us-equities/data-research.json"
+    ],
+    "key": "c4",
+    "name": "data-river",
+    "repository": "https://github.com/online-ml/river",
+    "why_not_default": "River's progressive validation is an online-learning tool. It applies only if streaming model updates are justified. The card's own limitations say immediate synthetic labels are invalid for financial online evaluation, and that delayed fills or returns, late corrections and restarts must be modelled. The workflow is marked UNEXECUTED and the evidence is source review only (catalogs/us-equities/data-research.json lines 1304-1340)."
+   },
+   {
+    "disposition": "conditional",
+    "evidence_class": "source_review",
+    "evidence_refs": [
+     "catalogs/us-equities/foundation-memory.json",
+     "evidence/artifacts/hf-memory-models-20260921/model-manifest.json",
+     "evidence/artifacts/hf-memory-models-20260921/dashboard-observations.json",
+     "evidence/artifacts/hf-memory-models-20260921/native-results.json"
+    ],
+    "key": "c5",
+    "name": "foundation-mteb",
+    "repository": "https://github.com/embeddings-benchmark/mteb",
+    "why_not_default": "MTEB evaluates embeddings, which overlaps the executed retrieval evaluation in c7. Its pin (2.21.0) is behind upstream (2.21.6). The card says its commands were not executed (catalogs/us-equities/foundation-memory.json lines 1210-1245). Other retained artifacts mention MTEB: leaderboard Space metadata and author-reported aggregates in evidence/artifacts/hf-memory-models-20260921/model-manifest.json, and leaderboard page observations in evidence/artifacts/hf-memory-models-20260921/dashboard-observations.json lines 15-33. None of them is a run of the mteb library. native-results.json line 475 states \"No full RTEB/MTEB rerun\"."
+   },
+   {
+    "disposition": "conditional",
+    "evidence_class": "source_review",
+    "evidence_refs": [
+     "catalogs/us-equities/agents-operations.json",
+     "evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger.json"
+    ],
+    "key": "c6",
+    "name": "phoenix",
+    "repository": "https://github.com/Arize-ai/phoenix",
+    "why_not_default": "Phoenix is mainly a trace inspection workspace and overlaps the observability layer. The server launch is prospective, with no app instrumented and no judge-model calls run. The card says PHOENIX_ALLOWED_PROVIDERS=NONE is not an inference authorization boundary (catalogs/us-equities/agents-operations.json lines 1239-1280). The card licenses it as Elastic-2.0 (ELv2), which carries self-host restrictions. The packet's NOASSERTION value is GitHub's license classification, not a conflicting license (screening-ledger.json lines 6714 and 10770)."
+   },
+   {
+    "disposition": "conditional",
+    "evidence_class": "local_integration",
+    "evidence_refs": [
+     "catalogs/us-equities/agents-operations.json",
+     "evidence/artifacts/promptfoo-nemotron-upstream-20260921/qualification.json",
+     "blueprints/native-skill-practice/typesafe-result.json",
+     "blueprints/native-skill-practice/README.md"
+    ],
+    "key": null,
+    "name": "promptfoo",
+    "repository": "https://github.com/promptfoo/promptfoo",
+    "why_not_default": "Promptfoo is not a packet candidate. Its card places it in the agent-evaluation layer with version 0.123.1 and source_review evidence (catalogs/us-equities/agents-operations.json lines 1321-1361). The card's \"not run here\" is superseded by two later retained local-integration runs of promptfoo 0.123.1. (1) evidence/artifacts/promptfoo-nemotron-upstream-20260921/qualification.json ran the command 'promptfoo eval -c promptfooconfig.yaml --no-cache -j 1 -o results.json report.html' with exit_code 0 and 1 case passed, 0 failed, 0 errors. That run is a four-query embedding example with a locally authored assertion. It also records a browser report check and retains the browser-harness failures. (2) blueprints/native-skill-practice/typesafe-result.json recorded promptfoo_exit_code 100 over an 8-case frozen pack, with the assertion failures retained. Neither run is a matched comparison with inspect-ai. Neither establishes resumability or retry behaviour. It is recorded as challenger_preferred, not selected."
+   }
+  ],
+  "challenger_preferred": {
+   "key": null,
+   "name": "promptfoo",
+   "repository": "https://github.com/promptfoo/promptfoo",
+   "required_comparison": "Run the frozen 8-case pack blueprints/native-skill-practice/catalog-cases.json under two arms. Arm 1 is promptfoo 0.123.1 using only the credential-free echo exact-text-baseline provider from blueprints/native-skill-practice/promptfooconfig.yaml. Arm 2 is an inspect-ai 0.3.266 mock-model task with the same deterministic scorer. Both arms need zero provider calls, bounded concurrency and retries, a retained failure log, and an interruption-and-resume check, which matches inspect-ai's recorded next_acceptance at UKGovernmentBEIS__inspect_ai.json line 123. Run 'node --test test-contract.cjs' from blueprints/native-skill-practice/ first as the existing adapter contract check. Compare scorer reproducibility, fidelity of the retained failure log and resume success. No inspect-ai fixture exists in the repository yet, so arm 2 must be authored and frozen before the run.",
+   "why": "For the agent-evaluation scope term, promptfoo 0.123.1 has retained local-integration execution. evidence/artifacts/promptfoo-nemotron-upstream-20260921/qualification.json lines 6, 20, 25 and 34-36: version 0.123.1, eval command recorded, exit_code 0, 1 passed, 0 failed, 0 errors, cache disabled, max_concurrency 1. Line 62 records a failure filter check, and line 82 retains the browser-harness failures. blueprints/native-skill-practice/typesafe-result.json line 7 records promptfoo_exit_code 100, preserving assertion failures over the frozen 8-case pack blueprints/native-skill-practice/catalog-cases.json. Its promptfooconfig.yaml includes a deterministic echo exact-text-baseline provider that makes no service call. The adopted winner c2 (inspect-ai) has source review only (UKGovernmentBEIS__inspect_ai.json lines 124-125: installation_performed false, model_calls 0). On retained evidence, promptfoo satisfies agent-evaluation better. It is not selected because it is not an adopted packet candidate, and no matched comparison exists."
+  },
+  "overturn_when": "Any one of these would change the verdict:\n1. c7 is replaced if another candidate's evaluator, replaying the frozen retrieval fixture (blueprints/convergence-practice/local-fixture/evaluation-receipt.json, with upstream baseline blueprints/convergence-practice/arb-trace2code/receipt.json), gives a different or better-supported ranking on the same 20 positive queries and 4 no-gold queries, with failures retained.\n2. c2 is demoted if the matched agent-evaluation comparison fails for inspect-ai or is won by promptfoo. That comparison is the frozen blueprints/native-skill-practice/catalog-cases.json pack under a promptfoo 0.123.1 echo-baseline arm and an inspect-ai 0.3.266 mock-model arm, preceded by 'node --test test-contract.cjs' in blueprints/native-skill-practice/. It covers deterministic scoring, bounded retries, a retained failure log, and interruption and resume, with zero provider calls. A promptfoo win moves the agent-evaluation slot to promptfoo only after the catalog adopts it.\n3. c1 is replaced by c3 or another tracker if the experiment runs of the project's chronological evaluation (tests/test_research_evaluation.py) cannot be logged locally with exact data and code revisions and then recovered.",
+  "open_gaps": [
+   "No retained evidence shows inspect-ai, mlflow, river, mteb or phoenix installed or executed. Every workflow for them is prospective or marked UNEXECUTED.",
+   "No retained matched comparison of promptfoo and inspect-ai exists. evidence/artifacts/claude-repository-evidence-20260921/results.json near line 5730 records its absence. The inspect-ai selection is not a measured win, and promptfoo's evidence comes from different tasks: a four-query embedding example and an 8-case TypeSafe diagnostic.",
+   "No inspect-ai fixture exists under fixtures/, blueprints/ or tests/. The agent-evaluation comparison arm for c2 must be authored and frozen before it can run.",
+   "The c7 execution is recorded on Darwin arm64 (arb-trace2code receipt environment), not this PC. It evaluates file-level code retrieval (gin and click are 82 of the 101 samples), not financial-document retrieval, answer quality or net trading performance.",
+   "The local 24-query fixture is source-authored over 15 public docs. It has no abstention metric and makes no significance or default-promotion claim.",
+   "No candidate addresses the shared group requirement on its own: supervised owned processes, native identity, retained failed attempts, recoverable state, or broker-authority isolation. Those remain with the runtime and orchestration layers.",
+   "Progressive evaluation with delayed labels (c4) and validation reporting have no executed evidence in this layer.",
+   "The chronological evaluation (tests/test_research_evaluation.py) is project-local code, not an upstream candidate. No link between it and any experiment tracker is established."
+  ]
+ },
+ "return_B": {
+  "winner_keys": [
+   "c1",
+   "c2"
+  ],
+  "winner_names": [
+   [
+    "data-mlflow",
+    "data-mlflow"
+   ],
+   [
+    "inspect-ai",
+    "inspect-ai"
+   ]
+  ],
+  "why_selected": "Select c1 and c2 provisionally for the layer's experiment-tracking and agent-evaluation scope. Source review of the commit-pinned [MLflow README](https://github.com/mlflow/mlflow/blob/32792afe5b0183fce10532d3a023f5cfa8612d09/README.md), recovered through its raw URL, found explicit experiment-tracking and evaluation interfaces. Source review of the [Inspect package page](https://pypi.org/project/inspect-ai/0.3.266/) found evaluation components for tools, multi-turn tasks and scoring. These are complementary documented interfaces; no candidate execution or measured superiority was observed. blueprints/us-equities/research-evaluation/receipt.json retains a separate chronological control run, which supplies a useful comparison contract but does not upgrade either winner's evidence class.",
+  "winner_evidence_class": "source_review",
+  "winner_evidence_refs": [
+   "https://github.com/mlflow/mlflow/blob/32792afe5b0183fce10532d3a023f5cfa8612d09/README.md",
+   "https://pypi.org/project/inspect-ai/0.3.266/"
+  ],
+  "alternatives": [
+   {
+    "disposition": "overlap",
+    "evidence_class": "source_review",
+    "evidence_refs": [
+     "https://github.com/mlflow/mlflow/blob/v3.16.1/README.md"
+    ],
+    "key": "c3",
+    "name": "mlflow",
+    "repository": "https://github.com/mlflow/mlflow",
+    "why_not_default": "Duplicates c1's upstream project and experiment-tracking role. The tag README supplies no independent execution evidence; prefer the commit-pinned c1 entry without counting the same project twice."
+   },
+   {
+    "disposition": "conditional",
+    "evidence_class": "source_review",
+    "evidence_refs": [
+     "https://github.com/online-ml/river/blob/64285b9dd6c606804753235fe992bcf25b9856ee/README.md"
+    ],
+    "key": "c4",
+    "name": "data-river",
+    "repository": "https://github.com/online-ml/river",
+    "why_not_default": "The reviewed README establishes an online-learning focus. Retained evidence does not demonstrate progressive financial evaluation with delayed outcomes, corrections or restart recovery, so it remains conditional on that specialized workload."
+   },
+   {
+    "disposition": "conditional",
+    "evidence_class": "source_review",
+    "evidence_refs": [
+     "https://github.com/embeddings-benchmark/mteb/blob/8ecdd976aad52ee9d5718772065438ec60ed388a/README.md",
+     "https://github.com/embeddings-benchmark/mteb/releases/tag/2.21.0"
+    ],
+    "key": "c5",
+    "name": "foundation-mteb",
+    "repository": "https://github.com/embeddings-benchmark/mteb",
+    "why_not_default": "The reviewed sources cover embedding and retrieval evaluation, including task-cleaning changes. No retained execution qualifies it on point-in-time financial retrieval, and its specialized benchmark role does not replace general experiment tracking or agent evaluation."
+   },
+   {
+    "disposition": "overlap",
+    "evidence_class": "source_review",
+    "evidence_refs": [
+     "https://github.com/Arize-ai/phoenix/blob/arize-phoenix-v20.14.0/README.md"
+    ],
+    "key": "c6",
+    "name": "phoenix",
+    "repository": "https://github.com/Arize-ai/phoenix",
+    "why_not_default": "The reviewed README describes evaluation, versioned datasets and experiments, overlapping the selected pair. The packet retains no instrumented application, launched server or executed judge comparison demonstrating additional value or equivalent recovery and isolation."
+   },
+   {
+    "disposition": "conditional",
+    "evidence_class": "source_review",
+    "evidence_refs": [
+     "https://github.com/eyuansu62/agent-retrieval-bench/blob/07014c986f3deadb1548c62b32c0ffbe6a81465d/README.md",
+     "https://github.com/eyuansu62/agent-retrieval-bench/releases/tag/v0.2.1"
+    ],
+    "key": "c7",
+    "name": "foundation-agent-retrieval-bench",
+    "repository": "https://github.com/eyuansu62/agent-retrieval-bench",
+    "why_not_default": "The reviewed README targets coding-agent file retrieval. The release reports upstream test results, but these are not a locally observed benchmark run or financial-document evaluation. Use only for a separately frozen code-retrieval comparison."
+   }
+  ],
+  "challenger_preferred": null,
+  "overturn_when": "Replace the selected pair if an executed comparison using blueprints/us-equities/research-evaluation/plan.json and the temporal, censoring and immutable-record checks in tests/test_research_evaluation.py shows Phoenix preserves the same complete evaluation ledger and scoring contract, passes explicit failure/restart and identity/isolation checks, and improves measured cost or operational burden. Existing local tests alone do not establish this comparison.",
+  "open_gaps": [
+   "No candidate comparison establishes complete returned results, native identity preservation, scoped telemetry, failed-attempt retention or interruption recovery.",
+   "Broker execution isolation and absence of broker authority in research workers are not established by these source references.",
+   "The local chronological evaluation receipt concerns skfolio, pandas and LEAN sample data; it does not qualify MLflow, Inspect or the other packet candidates.",
+   "Delayed-label evaluation, historical revisions, original information availability and financial retrieval quality remain unqualified.",
+   "Experiment scores and judge results do not establish executable returns or trading profitability."
+  ]
+ },
+ "packet": {
+  "title": "Evaluation and experiments",
+  "requirement": "Run bounded research with native identity and complete returned results; supervise owned processes; retain scoped telemetry, failed attempts and recoverable state without granting research workers broker execution authority.",
+  "limitations": [
+   "Native worker success and telemetry matching are bounded by the recorded task, process and account. They do not establish every native client/session, whole-task savings or unlimited allowance.",
+   "Dagu's older completed-history restart is not in-flight recovery. Later recovery receipts must be evaluated for their own process, host and workload rather than promoting all workflows.",
+   "Gateway transport health, routed text and ACP research acceptance do not establish native hook/tool parity or independent provider/model attestation.",
+   "Same-host recovery and configured restrictions do not establish off-host disaster recovery, a VM boundary, unattended broker operation or paid hosting.",
+   "The us-equities catalog also tags entries for this taxonomy layer under data-research (3), foundation-memory (3); agents-operations (6) was picked as the primary group by entry count."
+  ],
+  "layer_scope_terms": [
+   "evaluation",
+   "agent-evaluation",
+   "experiment-tracking",
+   "progressive-evaluation",
+   "validation-reporting"
+  ],
+  "requirement_note": "The requirement, limitations and existing_overturn_when text is shared by this layer's group; judge fit against the layer title and layer_scope_terms.",
+  "candidates": [
+   {
+    "adopted": true,
+    "card_limitations": [
+     "No experiments or models were run by this review. The example would only record a synthetic local metric.",
+     "Autologging does not capture every data revision, leakage decision or external service cost; avoid unreviewed hosted telemetry and dataset uploads."
+    ],
+    "component_id": "data-mlflow",
+    "decisions": [],
+    "evidence_kind": "source_review",
+    "evidence_refs": [
+     "https://github.com/mlflow/mlflow/blob/32792afe5b0183fce10532d3a023f5cfa8612d09/README.md"
+    ],
+    "key": "c1",
+    "name": "data-mlflow",
+    "pin": "v3.16.1; source 32792afe5b0183fce10532d3a023f5cfa8612d09",
+    "pin_behind_upstream": false,
+    "recipe_ref": null,
+    "repository": "https://github.com/mlflow/mlflow",
+    "review_status": null,
+    "role": "Local experiment runs, parameters, metrics and artifacts",
+    "upstream": {
+     "archived": false,
+     "latest": "v3.16.1",
+     "license": "Apache-2.0",
+     "prerelease": false,
+     "pushed_at": "2026-09-22",
+     "released_at": "2026-09-17",
+     "renamed_to": null,
+     "stars": 28099
+    }
+   },
+   {
+    "adopted": true,
+    "card_limitations": [
+     "Eval command would perform model calls; not run here.",
+     "A judge score is not trading profitability or paper execution correctness.",
+     "Current release pin/date from PyPI because repository has no latest GitHub release."
+    ],
+    "component_id": "inspect-ai",
+    "decisions": [],
+    "evidence_kind": "source_review",
+    "evidence_refs": [
+     "https://pypi.org/project/inspect-ai/0.3.266/"
+    ],
+    "key": "c2",
+    "name": "inspect-ai",
+    "pin": "inspect-ai0.3.266; source ec4dfc6953784dc45b79de3147530c89868c6e26",
+    "pin_behind_upstream": false,
+    "recipe_ref": null,
+    "repository": "https://github.com/UKGovernmentBEIS/inspect_ai",
+    "review_status": null,
+    "role": "Programmable task/solver/scorer evaluations",
+    "upstream": {
+     "archived": false,
+     "latest": "release/2025-11-28",
+     "license": "MIT",
+     "prerelease": null,
+     "pushed_at": "2026-09-22",
+     "released_at": null,
+     "renamed_to": null,
+     "stars": 2836
+    }
+   },
+   {
+    "adopted": true,
+    "card_limitations": [
+     "No tracking server or experiment recorded by this task.",
+     "Autologging can capture requests and artifacts; enable selected integrations deliberately.",
+     "A registry score is not an out-of-sample financial guarantee."
+    ],
+    "component_id": "mlflow",
+    "decisions": [],
+    "evidence_kind": "source_review",
+    "evidence_refs": [
+     "https://github.com/mlflow/mlflow/blob/v3.16.1/README.md"
+    ],
+    "key": "c3",
+    "name": "mlflow",
+    "pin": "v3.16.1",
+    "pin_behind_upstream": false,
+    "recipe_ref": null,
+    "repository": "https://github.com/mlflow/mlflow",
+    "review_status": null,
+    "role": "Versioned experiment artifacts, model lineage and optional traces",
+    "upstream": {
+     "archived": false,
+     "latest": "v3.16.1",
+     "license": "Apache-2.0",
+     "prerelease": false,
+     "pushed_at": "2026-09-22",
+     "released_at": "2026-09-17",
+     "renamed_to": null,
+     "stars": 28099
+    }
+   },
+   {
+    "adopted": true,
+    "card_limitations": [
+     "Immediate synthetic labels are not a valid financial online-evaluation assumption.",
+     "Progressive validation must model delayed fills/returns, late corrections and restart behavior; online updates do not guarantee adaptation or profitability."
+    ],
+    "component_id": "data-river",
+    "decisions": [],
+    "evidence_kind": "source_review",
+    "evidence_refs": [
+     "https://github.com/online-ml/river/blob/64285b9dd6c606804753235fe992bcf25b9856ee/README.md"
+    ],
+    "key": "c4",
+    "name": "data-river",
+    "pin": "0.26.1; source 64285b9dd6c606804753235fe992bcf25b9856ee",
+    "pin_behind_upstream": false,
+    "recipe_ref": null,
+    "repository": "https://github.com/online-ml/river",
+    "review_status": null,
+    "role": "Incremental models, pipelines and progressive validation",
+    "upstream": {
+     "archived": false,
+     "latest": "0.26.1",
+     "license": "BSD-3-Clause",
+     "prerelease": false,
+     "pushed_at": "2026-09-21",
+     "released_at": "2026-08-21",
+     "renamed_to": null,
+     "stars": 6107
+    }
+   },
+   {
+    "adopted": true,
+    "card_limitations": [
+     "Public leaderboard is not independent proof for code retrieval, point-in-time filings or net trading performance."
+    ],
+    "component_id": "foundation-mteb",
+    "decisions": [],
+    "evidence_kind": "source_review",
+    "evidence_refs": [
+     "https://github.com/embeddings-benchmark/mteb/blob/8ecdd976aad52ee9d5718772065438ec60ed388a/README.md",
+     "https://github.com/embeddings-benchmark/mteb/releases/tag/2.21.0"
+    ],
+    "key": "c5",
+    "name": "foundation-mteb",
+    "pin": "2.21.0",
+    "pin_behind_upstream": true,
+    "recipe_ref": null,
+    "repository": "https://github.com/embeddings-benchmark/mteb",
+    "review_status": null,
+    "role": "Embedding/retrieval evaluation tooling",
+    "upstream": {
+     "archived": false,
+     "latest": "2.21.6",
+     "license": "Apache-2.0",
+     "prerelease": false,
+     "pushed_at": "2026-09-22",
+     "released_at": "2026-09-21",
+     "renamed_to": null,
+     "stars": 3431
+    }
+   },
+   {
+    "adopted": true,
+    "card_limitations": [
+     "ELv2 permits self-host use with restrictions; not Apache2 or unrestricted managed-service redistribution.",
+     "Server launch is prospective; no app instrumented and no judge-model calls run.",
+     "Auto-instrumentation can capture prompt/tool contents; scrub at source.",
+     "The proposed launch disables the optional MCP endpoint and hides built-in providers from the UI/catalog. PHOENIX_ALLOWED_PROVIDERS=NONE is not a backend inference authorization boundary; use a credential-free environment and appropriate access controls."
+    ],
+    "component_id": "phoenix",
+    "decisions": [],
+    "evidence_kind": "source_review",
+    "evidence_refs": [
+     "https://github.com/Arize-ai/phoenix/blob/arize-phoenix-v20.14.0/README.md"
+    ],
+    "key": "c6",
+    "name": "phoenix",
+    "pin": "arize-phoenix-v20.14.0",
+    "pin_behind_upstream": false,
+    "recipe_ref": null,
+    "repository": "https://github.com/Arize-ai/phoenix",
+    "review_status": null,
+    "role": "Local trace inspection and evaluation workspace",
+    "upstream": {
+     "archived": false,
+     "latest": "@arizeai/phoenix-mcp@4.3.13",
+     "license": "NOASSERTION",
+     "prerelease": false,
+     "pushed_at": "2026-09-22",
+     "released_at": "2026-09-22",
+     "renamed_to": null,
+     "stars": 11576
+    }
+   },
+   {
+    "adopted": true,
+    "card_limitations": [
+     "427 examples across 25 repositories are not a financial-document benchmark. Large-project concentration and no-gold cases affect interpretation.",
+     "No benchmark download/evaluation performed; freezing source and budgets is required."
+    ],
+    "component_id": "foundation-agent-retrieval-bench",
+    "decisions": [],
+    "evidence_kind": "source_review",
+    "evidence_refs": [
+     "https://github.com/eyuansu62/agent-retrieval-bench/blob/07014c986f3deadb1548c62b32c0ffbe6a81465d/README.md",
+     "https://github.com/eyuansu62/agent-retrieval-bench/releases/tag/v0.2.1"
+    ],
+    "key": "c7",
+    "name": "foundation-agent-retrieval-bench",
+    "pin": "v0.2.1",
+    "pin_behind_upstream": false,
+    "recipe_ref": null,
+    "repository": "https://github.com/eyuansu62/agent-retrieval-bench",
+    "review_status": null,
+    "role": "File-level agent retrieval evaluation",
+    "upstream": {
+     "archived": false,
+     "latest": "v0.2.1",
+     "license": "MIT",
+     "prerelease": false,
+     "pushed_at": "2026-08-04",
+     "released_at": "2026-07-26",
+     "renamed_to": null,
+     "stars": 8
+    }
+   }
+  ]
+ }
+}
