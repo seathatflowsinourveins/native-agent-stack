@@ -135,6 +135,8 @@ installed zizmor returned exit 0 and `[]` for all six workflows. The existing
 workflow-security/registry tests ran 49 tests and returned `OK`. These are local
 static and integrity results, not hosted scheduling or improved research results.
 
+The `validate` job also provisions the fail-closed promotion gate's isolated venv (pinned/checksummed `uv`, `uv pip sync --require-hashes` against `blueprints/us-equities/data/requirements.lock`) before running the test suite and sets `REQUIRE_PROMOTION_GATE_VENV=1`, so `tests/test_promotion_gate.py`'s fixture tests fail instead of silently skipping if that provisioning ever breaks. Locally (cold `uv` cache, this machine's network, not a hosted runner), that venv creation plus hash-verified sync of the 20 locked packages measured about 1.4-2.2 s.
+
 ## Advanced automation: bounded upstream adoption
 
 [GitHub Agentic Workflows](https://github.com/github/gh-aw) is the upstream candidate
@@ -269,11 +271,24 @@ re-review if no selection changed" bounded check
 documents. The job diffs the rebuilt manifest's per-component `pin` /
 `upstream.latest` / `pin_behind_upstream` against the published
 `catalogs/sota-convergence/manifest-20260922.json`, writes `drift.md`, appends
-a fixed-tool pin table (actionlint, gitleaks, syft, zizmor, `nautilus_trader`
-vs each `gh api repos/<owner>/<repo>/releases/latest`) to
+a fixed-tool pin table (actionlint, gitleaks, syft, zizmor, grype,
+`nautilus_trader` vs each `gh api repos/<owner>/<repo>/releases/latest`) to
 `$GITHUB_STEP_SUMMARY`, and uploads both as a 30-day artifact. It opens no
 issue and writes nothing back to the repository; a maintainer reads the
 summary/artifact and decides whether a real lane review is warranted.
+
+`catalog-freshness.yml`'s `python3 -m unittest` step runs on this job's
+`setup-python 3.13` interpreter, which has no `requests` package installed
+and no pip-install step for it. `tests/test_broad_universe_scan.py` marks
+its `requests`-dependent cases with `@unittest.skipUnless(HAS_REQUESTS, ...)`
+(the same convention the module already uses for its `duckdb`-dependent
+cases), so those cases report skipped rather than erroring on this
+interpreter -- `SymbolBatching`, `ProviderScreens`, and
+`NewsFetch.test_bounded_pages_and_capped_flag`. `validate.yml`'s `validate`
+job runs the same suite on a system Python that already has `requests`
+available, so those cases still execute there; only this report-only
+freshness lane's copy of the run has reduced coverage, and that reduction is
+not currently visible anywhere the job's own output is read.
 
 `sbom-vuln` reproduces `native-foundation-e2e.yml`'s pinned
 download/verify/install steps for the exact same `nautilus_trader==2.0.0rc5`
@@ -295,31 +310,27 @@ mode (full history, `fetch-depth: 0`) and `dir` mode (working tree), both
 failed scan still leaves the report retrievable; it never prints a matched
 secret to the job log. Unlike `sbom-vuln` below, this job fails on any
 detection (no `--exit-code` override, so gitleaks' non-zero default stands)
-and is already named in the *committed* `main-ruleset.json`'s
-`required_status_checks`. It is not yet a required check in the *active,
-applied* branch-protection ruleset described in "Publication and practical
-acceptance" above -- that only happens once the coordinator applies the
-committed file (see "Ruleset upgrade" below).
+and is named in `main-ruleset.json`'s `required_status_checks`. As of the
+"Ruleset upgrade, 2026-09-22" section below, this is also a required check in
+the *active, applied* branch-protection ruleset: `gh api
+repos/seathatflowsinourveins/native-agent-stack/rules/branches/main`
+(re-checked 2026-09-22 for `docs/decisions/2026-09-22-actions-hardening.md`)
+returns a `required_status_checks` rule listing `validate`, `token-report`
+and `secret-scan` under ruleset id 23739774.
 
 `supply-chain.yml`'s `sbom-vuln` job uses syft 1.52.0 (linux_amd64 tarball
 SHA-256 `caeedb81fb0491615f1ebd1761e4145d41ee86dd2cc7bf80669f9f5ad9d6133d`,
 read from `https://github.com/anchore/syft/releases/download/v1.52.0/syft_1.52.0_checksums.txt`)
-and grype 0.119.0 (`GRYPE_VERSION` in `supply-chain.yml`, a fixed pin like
-the other CI binaries on this page, linux_amd64 tarball SHA-256
-`3fa2dc4b924621ab65404cf08d0b8438d896d80ab949c9d5a4ca283c36004c9b`,
-read from `https://github.com/anchore/grype/releases/download/v0.119.0/grype_0.119.0_checksums.txt`,
-latest upstream release as of the 2026-09-22 pin date). Grype's binary
-version is pinned exactly the same way syft/gitleaks/actionlint are; what is
-NOT pinned is its vulnerability database (`grype db status`), which grype
-fetches fresh on every run regardless of the binary pin, so a binary-version
-freshness check alone would not capture the tool's actual drift surface.
-`catalog-freshness.yml`'s fixed-tool pin-drift table does not include grype
-(corrected 2026-09-22, Codex cross-family review finding: an earlier revision
-of this paragraph incorrectly claimed grype "tracks upstream's latest
-release rather than a fixed version," which `supply-chain.yml`'s
-checksum-verified `GRYPE_VERSION` pin contradicts) -- this is a gap in that
-table's coverage, not a consequence of how grype is versioned, and the pin
-should be re-checked whenever `sbom-vuln`'s own workflow path changes.
+and grype 0.119.0 (linux_amd64 tarball SHA-256
+`3fa2dc4b924621ab65404cf08d0b8438d896d80ab949c9d5a4ca283c36004c9b`, read from
+`https://github.com/anchore/grype/releases/download/v0.119.0/grype_0.119.0_checksums.txt`).
+Like the other pins on this page, grype is a fixed, checksum-verified
+version, not a floating "latest" reference; `sbom-vuln` itself never compares
+its pinned grype binary against upstream, it only runs the pinned binary to
+scan the SBOMs it generates. `catalog-freshness.yml`'s fixed-tool table
+covers grype's pin drift against upstream instead (see "Recorded decisions"
+below), so nothing about grype's report-only vulnerability-scanning role
+exempts its own version pin from freshness tracking.
 
 Receipts land as workflow artifacts only: `secret-scan-<run_id>` (30-day
 retention) and `supply-chain-<run_id>` (90-day retention, matching the SBOM's
@@ -392,9 +403,12 @@ lock actually used here is `.github/requirements-ci.lock`, a name Dependabot
 does not recognize as a Python dependency file, and four of the five pinned
 CI binaries (actionlint, gitleaks, syft, grype) are curl-downloaded release
 tarballs with no manifest Dependabot understands at all. The new
-`catalog-freshness.yml` drift table already covers all five pins (including
-`nautilus_trader`) against each tool's latest upstream release, so the gap is
-covered by a different, already-built lane rather than by Dependabot.
+`catalog-freshness.yml` drift table covers all five (actionlint, gitleaks,
+syft, zizmor, grype) plus `nautilus_trader` against each tool's latest
+upstream release (see "Secret and supply-chain scanning" above for why
+grype's own pin is fixed like the others despite `sbom-vuln`'s scanning role
+being report-only), so the gap is covered by a different, already-built lane
+rather than by Dependabot.
 Precondition to revisit: rename `.github/requirements-ci.lock` to a
 Dependabot-discoverable name (e.g. `requirements-ci.txt` with a
 `--require-hashes` format Dependabot's pip ecosystem parses) and re-evaluate.
@@ -499,4 +513,59 @@ which the `.gitleaks.toml` header records as a coordinator decision pending
 resolution before merge, not something this unit can fix. Local scans on this
 host go through the guarded `gitleaks` launcher (memory-capped, one scan per
 user); do not raise its limits to retry a failed scan.
+
+## Report-only Actions hardening, 2026-09-22
+
+Three GitHub Actions security lanes were adopted, each report-only (none is a
+required check) and recorded in
+[`docs/decisions/2026-09-22-actions-hardening.md`](decisions/2026-09-22-actions-hardening.md)
+with the exact evidence, alternatives and overturn condition.
+
+**`scorecard.yml` (OpenSSF Scorecard).** Runs `ossf/scorecard-action` pinned
+to the full commit SHA of `v2.4.4`
+(`2d1146689b8cda280b9bc96326124645441f03bc`, verified by dereferencing the
+annotated tag with `gh api repos/ossf/scorecard-action/git/tags/<sha>`) on a
+weekly schedule, `workflow_dispatch`, and push to `main`. `publish_results`
+is `false` -- results are never published to the public `api.scorecard.dev`
+dataset or badge -- and the job requests only `contents: read`; it does not
+use GitHub Advanced Security or `security-events: write`. The SARIF report is
+retained only as a workflow artifact (`scorecard-results-<run_id>`, 5-day
+retention), never uploaded to the Security tab.
+
+**`harden-runner` (step-security).** `step-security/harden-runner`, pinned to
+the full commit SHA of its latest release `v2.21.1`
+(`e14015d583714f6e62063499dc959a02595150a1`, from
+`gh api repos/step-security/harden-runner/releases/latest`), runs as the
+*first* step, before checkout, with `egress-policy: audit` (never `block`),
+on 14 of the 18 `ubuntu-24.04` jobs. The four exempt jobs are those whose
+workflows are byte-pinned by retained evidence: `source` and `destination`
+(`native-offhost-app-state.yml`, pinned in
+`blueprints/convergence-practice/offhost-app-state/plan.json`'s
+`frozen_sources`), `synthetic-restore` (`native-offhost-restore.yml`, pinned
+in `blueprints/convergence-practice/offhost-restore/hosted-plan.json`) and
+`native-token-tools` (`native-token-e2e.yml`, recorded in four dated execution
+receipts). Adding a step to one of those needs the evidence re-run and
+re-pinned. `bootstrap-macos` runs on `macos-15`, which `harden-runner` does not
+support. `tests/test_workflow_hardening.py` classifies every job: an unhardened
+`ubuntu` job outside the named exemptions fails, an unrecognized runner label
+fails, and each exemption fails as soon as its workflow drifts from the pinned
+hash. The exemptions and their overturn condition are recorded in the
+"Integration follow-up" of
+[`docs/decisions/2026-09-22-actions-hardening-fix-round.md`](decisions/2026-09-22-actions-hardening-fix-round.md).
+Audit mode only logs
+observed egress; it cannot fail a job or block a network call, so it changes
+no existing pass/fail behavior.
+
+**`dependency-review.yml` (actions/dependency-review-action).** Pinned to
+the full commit SHA of its latest release `v5.0.0`
+(`a1d282b36b6f3519aa1f3fc636f609c47dddb294`, from
+`gh api repos/actions/dependency-review-action/releases/latest`), runs on
+`pull_request` only with `warn-only: true` and `contents: read`; it is not
+in `required_status_checks` and never blocks a PR. This repository is
+public (`gh api repos/seathatflowsinourveins/native-agent-stack --jq
+.visibility` returns `public`) and needs no GitHub Advanced Security, but
+its dependency graph was not on automatically: the first hosted run failed
+until the graph was enabled through `PUT .../vulnerability-alerts` (which also
+enables Dependabot alerts), after which the re-run passed. The correction and
+its rollback are recorded in the decision record.
 

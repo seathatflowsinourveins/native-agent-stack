@@ -1,0 +1,75 @@
+{
+ "evidence_refs": [
+  "blueprints/us-equities/adaptive-paper/receipt.json",
+  "blueprints/us-equities/paper-e2e-20260921/paper-receipt.json",
+  "catalogs/us-equities/runtime-target.json",
+  "evidence/receipts/native-nautilus-v2-20260920.json"
+ ],
+ "judgments": [
+  {
+   "claude_position": "B",
+   "evidence_refs": [
+    "catalogs/us-equities/runtime-target.json",
+    "evidence/receipts/native-nautilus-v2-20260920.json",
+    "blueprints/us-equities/adaptive-paper/receipt.json",
+    "blueprints/us-equities/paper-e2e-20260921/paper-receipt.json"
+   ],
+   "packet_order": "original",
+   "preferred_lane": "codex",
+   "preferred_position": "A",
+   "refuting_votes": 0,
+   "votes": 2,
+   "why": "A and B agree on c4 (alpaca-py) and c5 (adaptive-paper-alpaca-adapter). They differ only on c7, the Nautilus IBKR adapter, which A keeps and B leaves out. The layer requirement asks for the selected NautilusTrader destination with broker-specific execution boundaries. In catalogs/us-equities/runtime-target.json, broker_boundaries (lines 44-67) names the \"Nautilus native IBKR socket adapter with signed-in TWS or IB Gateway\" as the selected IBKR path. It marks upstream_supported true and local_broker_acceptance \"not_established\". No other candidate provides an IBKR boundary, so no alternative does that job better. c7 complements the Alpaca path rather than competing with it.\n\nB is right that c7 is unqualified: evidence/receipts/native-nautilus-v2-20260920.json line 12 records \"No IBKR Gateway/TWS authentication, data entitlement, adapter connectivity\". But B applies a stricter bar to c7 than to c5, which it does select. c5 also has no broker-observed order. blueprints/us-equities/adaptive-paper/receipt.json records status \"local_integration_passed_new_broker_trial_pending\", broker_readiness \"not_started\", orders_submitted 0, and broker_connections 0 / paper_orders 0 in its capacity fixture.\n\nA keeps c7 as a conditional destination and states in its open gaps that IBKR acceptance is not established. So A claims nothing the evidence contradicts. A's other figures match the retained files: blueprints/us-equities/paper-e2e-20260921/paper-receipt.json shows write_attempts 2, realized_gross_pnl_usd -0.08, positions 0, open_orders 0, cash_delta_usd -0.08 and additional_writes 0; the adaptive receipt shows 42 upstream adapter-template tests passing.\n\nBy dropping the one component that runtime-target.json selects for the IBKR boundary, B leaves out a component the evidence supports, so A's set is better supported.",
+   "workflow": "wf_3e94965e-141"
+  },
+  {
+   "claude_position": "A",
+   "evidence_refs": [
+    "catalogs/us-equities/runtime-target.json",
+    "evidence/receipts/native-nautilus-v2-20260920.json",
+    "blueprints/us-equities/adaptive-paper/receipt.json"
+   ],
+   "packet_order": "swapped",
+   "preferred_lane": "claude",
+   "preferred_position": "A",
+   "refuting_votes": 0,
+   "votes": 2,
+   "why": "A and B differ only on c7, the Nautilus IBKR adapter. B includes it and A does not. Both sets keep c4 (alpaca-py) and c5 (adaptive-paper-alpaca-adapter), and the retained evidence supports both.\n\nc5 is supported by blueprints/us-equities/adaptive-paper/receipt.json. Line 5 has status \"local_integration_passed_new_broker_trial_pending\". Line 106 records 42 passed. Lines 60-61 show a synthetic capacity fixture with broker_connections 0 and paper_orders 0. Line 66 shows broker_readiness \"not_started\".\n\nc4 is supported by catalogs/us-equities/runtime-target.json. Line 76 records one SPY paper roundtrip that was filled, went flat, reconciled cash and wrote no duplicates, citing blueprints/us-equities/paper-e2e-20260921/paper-receipt.json. Line 9 names the engine as NautilusTrader 2.0.0rc5 LiveNode with a custom Python Alpaca adapter and alpaca-py 0.44.0.\n\nc7's only packet evidence is a source review of the nautilustrader.io IBKR page. Line 49 of runtime-target.json records local_broker_acceptance \"not_established\". Line 62 says adapter installation does not establish socket access, paper orders, cancellation races or reconnect reconciliation. Line 12 of evidence/receipts/native-nautilus-v2-20260920.json lists \"No IBKR Gateway/TWS authentication, data entitlement, adapter connectivity\" as a limitation, and that receipt covers only an offline synthetic EURUSD quickstart.\n\nThe IBKR path is recorded as the selected path (runtime-target.json line 47). Even so, no retained evidence shows c7 meeting the requirement's execution, risk and reconciliation parts as well as c4 and c5, which have local integration and native paper evidence. Adding c7 is therefore unsupported by evidence. A treats c7 as unqualified, not failed, which matches the receipts. B does not overclaim, since it calls c7 conditional and lists IBKR as unaccepted. However, B's winner evidence class falls to source_review. B has no contradicted claim, so \"neither\" does not apply.",
+   "workflow": "wf_53dd768b-bff"
+  },
+  {
+   "claude_position": "B",
+   "evidence_refs": [
+    "catalogs/us-equities/runtime-target.json",
+    "evidence/receipts/native-nautilus-v2-20260920.json",
+    "blueprints/us-equities/adaptive-paper/receipt.json"
+   ],
+   "packet_order": "original",
+   "preferred_lane": "codex",
+   "preferred_position": "A",
+   "refuting_votes": 0,
+   "votes": 2,
+   "why": "The only difference between the two sets is c7, the Nautilus IBKR adapter. A includes it and B leaves it out. The requirement asks for the selected NautilusTrader destination with broker-specific execution boundaries, plural. catalogs/us-equities/runtime-target.json lines 44-67 list two broker_boundaries. The first is \"ibkr\", with selected_path \"Nautilus native IBKR socket adapter with signed-in TWS or IB Gateway\", upstream_supported true and local_broker_acceptance \"not_established\". The second is \"alpaca\", with alpaca-py 0.44.0 and a separately qualified paper lifecycle. No other candidate in the packet provides the IBKR boundary, so no alternative does better than c7 for that role. Dropping c7 leaves the selected destination without its designated IBKR boundary. A includes c7 only as a conditional destination and states in open_gaps that IBKR connectivity, submissions, cancellation and reconnect are unaccepted. That matches evidence/receipts/native-nautilus-v2-20260920.json line 12: \"No IBKR Gateway/TWS authentication, data entitlement, adapter connectivity or Alpaca integration acceptance\". B gives lack of broker acceptance as the reason to exclude c7, yet it keeps c5. The c5 receipt, blueprints/us-equities/adaptive-paper/receipt.json, records status \"local_integration_passed_new_broker_trial_pending\" (line 5), broker_connections 0 and paper_orders 0 (lines 60-61) and broker_readiness \"not_started\" (line 66). B therefore applies the zero-broker-evidence standard unevenly. Both returns' c4/c5 claims agree with the receipts: 42 upstream template tests passed, and the full suite had 893 passed. Neither set makes a claim the evidence contradicts. A's set better covers the requirement's broker boundaries without overstating acceptance.",
+   "workflow": "wf_4b450ac4-c77"
+  },
+  {
+   "claude_position": "A",
+   "evidence_refs": [
+    "catalogs/us-equities/runtime-target.json",
+    "evidence/receipts/native-nautilus-v2-20260920.json",
+    "blueprints/us-equities/adaptive-paper/receipt.json",
+    "blueprints/us-equities/paper-e2e-20260921/paper-receipt.json"
+   ],
+   "packet_order": "swapped",
+   "preferred_lane": "claude",
+   "preferred_position": "A",
+   "refuting_votes": 0,
+   "votes": 2,
+   "why": "A and B agree on c4 (alpaca-py) and c5 (adaptive-paper-alpaca-adapter). They differ only on c7, the Nautilus IBKR adapter, which B adds and A excludes as unqualified.\n\nThe retained evidence supports both shared winners. blueprints/us-equities/paper-e2e-20260921/paper-receipt.json records write_attempts 2, realized_gross_pnl_usd \"-0.08\", cash_delta_usd \"-0.08\" and completed-trial recovery with additional_writes 0. blueprints/us-equities/adaptive-paper/receipt.json records status \"local_integration_passed_new_broker_trial_pending\", 895 tests run, the adapter-template tests scoped \"not Alpaca broker E2E\", broker_connections 0, paper_orders 0, and broker_readiness \"not_started\" because the regular session was unavailable (regular_session_window_unavailable).\n\nThe retained evidence does not show that c7 meets the requirement. evidence/receipts/native-nautilus-v2-20260920.json line 12 says there was \"No IBKR Gateway/TWS authentication, data entitlement, adapter connectivity or Alpaca integration acceptance\". Its run was an offline synthetic EURUSD quickstart. catalogs/us-equities/runtime-target.json lines 44-66 name the IBKR adapter as the selected_path but record local_broker_acceptance \"not_established\". The next_acceptance status there is \"bounded_alpaca_paper_smoke_passed_ibkr_pending\".\n\nB's only support for c7 is an external nautilustrader.io page that is not retained in the repository. Nothing retained shows IBKR numeric risk, reconciliation or equity accounting. So B adds a component to the winner set without evidence that it meets the requirement as well as c4 and c5 do. A keeps c7 as an unqualified but still intended IBKR boundary, which matches what the evidence shows.\n\nThis is not a case for \"neither\". B explicitly disclaims IBKR acceptance, so neither set makes a claim the evidence contradicts.",
+   "workflow": "wf_4b450ac4-c77"
+  }
+ ],
+ "method": "anonymous A/B adjudication: one evidence-reviewer judge and two evidence-reviewer refuters (Opus 5.5, high) per presentation order, lane identities scrubbed; two judgments per order (workflows wf_3e94965e-141, wf_53dd768b-bff and wf_4b450ac4-c77)",
+ "why": "The counterbalanced adjudication split 2-2. Each of the 4 judgments, two per presentation order, chose whichever return was shown as A, so the pick followed the presentation order rather than the evidence. The judgments list keeps each judge's reasoning. The evidence does not separate the two sets; an executed comparison must decide the layer.",
+ "winner_lane": null
+}

@@ -1,0 +1,165 @@
+{
+ "alternatives": [
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "https://github.com/sigstore/cosign/blob/v3.1.3/README.md"
+   ],
+   "key": "c1",
+   "name": "cosign",
+   "repository": "https://github.com/sigstore/cosign",
+   "why_not_default": "The reviewed README contains artifact verification examples that bind a digest to an expected signer identity and issuer. No retained execution establishes verification of this layer's datasets; signatures also do not establish historical availability, eligibility or dataset revision lineage."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/data-research.json"
+   ],
+   "key": "c3",
+   "name": "data-kafka",
+   "repository": "https://github.com/apache/kafka",
+   "why_not_default": "The retained review explicitly labels its replay workflow unexecuted. No measured recovery, consumer replay or multi-writer requirement establishes a reason to introduce a broker for reproducible snapshots. The pinned README could not be retrieved."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "evidence/receipts/native-rag.json",
+    "evidence/receipts/desktop-direct-rag.json",
+    "evidence/receipts/artifact-reductions.json",
+    "evidence/receipts/component-history.json",
+    "evidence/receipts/vllm-compatibility.json"
+   ],
+   "key": "c4",
+   "name": "foundation-socraticode",
+   "repository": "https://github.com/giancarloerra/SocratiCode",
+   "why_not_default": "Historical native receipts record successful code retrieval by both clients and independently observed add/update/delete propagation. This qualifies the index-freshness subscope, but does not demonstrate immutable equity-data snapshots, source-to-dataset lineage or historical eligibility rejection. The artifact reduction is lossy retrieval, not a provenance comparison."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/data-research.json"
+   ],
+   "key": "c5",
+   "name": "data-openlineage",
+   "repository": "https://github.com/OpenLineage/OpenLineage",
+   "why_not_default": "The retained review provides an unexecuted dataset-object example, with no emitted, persisted or replayed lineage events. Dataset-version and knowledge-cutoff facets remain an integration requirement. No executed comparison establishes a benefit over the initial snapshot manifests; the pinned README could not be retrieved."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/data-research.json"
+   ],
+   "key": "c6",
+   "name": "data-arcticdb",
+   "repository": "https://github.com/man-group/ArcticDB",
+   "why_not_default": "The retained review contains only a prospective dataframe write/read example, without executed version restoration or correction replay. Deployment licensing remains unresolved in that review. No workload measurement justifies this store over file snapshots, and the pinned README could not be retrieved."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/data-research.json"
+   ],
+   "key": "c7",
+   "name": "data-mlflow",
+   "repository": "https://github.com/mlflow/mlflow",
+   "why_not_default": "The retained review explicitly records no experiment execution; its example would log only a synthetic parameter and metric. There is no demonstrated binding of runs to exact source revisions, temporal splits and retained datasets. The pinned README could not be retrieved."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/data-research.json"
+   ],
+   "key": "c8",
+   "name": "data-iceberg",
+   "repository": "https://github.com/apache/iceberg",
+   "why_not_default": "The retained workflow is an unexecuted catalog/namespace example. It does not establish table writes, snapshot restoration, conflict handling or cross-engine consistency. No measured concurrency requirement justifies the additional catalog and storage integration; the pinned README could not be retrieved."
+  }
+ ],
+ "catalog": "us-equities",
+ "challenger_preferred": null,
+ "lane": "codex",
+ "layer_id": "identity-provenance",
+ "limits": [
+  "Context Mode rejected file access because its configured project root points to the plugin directory. Read-only shell inspection was used for local evidence.",
+  "GitHub blob URLs failed for DVC, Kafka, OpenLineage, ArcticDB, MLflow and Iceberg. DVC's exact pinned README was recovered through raw.githubusercontent.com.",
+  "Pinned raw README requests for Kafka, OpenLineage, ArcticDB, MLflow and Iceberg also failed; shell retrieval encountered DNS failure. Their assessments therefore use the retained catalog review, not independently recovered upstream contents. These attempted URLs are listed in sources_read for auditability.",
+  "No candidate was installed or executed, and no comparison or test suite was run during this verdict. Native results are historical retained receipts.",
+  "Private source artifacts underlying sanitized receipts were not opened. Current upstream release metadata and deployment licensing were not independently verified.",
+  "The additional catalog read exposed existing decision fields; the verdict rests on the inspected workflows, execution boundaries and source evidence rather than those labels."
+ ],
+ "model": {
+  "effort": "high",
+  "name": "gpt-6-astra"
+ },
+ "open_gaps": [
+  "DVC has source-review support only: no retained native add, restore and reproduction run demonstrates this repository's equity snapshot contract.",
+  "No candidate evidence establishes the complete requirement: licensed acquisition, permanent security identity, historical universe eligibility, corporate-action completeness and original publication/revision availability remain separate obligations.",
+  "The identity-readiness receipt demonstrates bounded observation-time selection and quarantine through project-local adapters. It does not qualify DVC or another candidate as the executing implementation.",
+  "Content identity, signer identity, storage commit time and code-index freshness cannot substitute for original historical information availability.",
+  "No executed comparison measures snapshot restoration fidelity, correction retention, lineage completeness, recovery, concurrency, storage cost or latency across the candidate stores.",
+  "OpenLineage event persistence and consistent version/cutoff facets, and MLflow run-to-dataset bindings, remain unqualified."
+ ],
+ "overturn_protocol": {
+  "arms": [
+   "DVC-managed snapshots with the existing deterministic temporal and identity selection contract",
+   "ArcticDB-backed versions with the same contract",
+   "Iceberg-backed snapshots with the same contract"
+  ],
+  "fixture_paths": [
+   "blueprints/us-equities/point-in-time/fixture.json",
+   "tests/test_point_in_time.py",
+   "tests/test_security_identity.py",
+   "blueprints/us-equities/identity-readiness/native-receipt.json"
+  ],
+  "metric": "Require exact restored source bytes and identical selected rows at every cutoff, retention of original and corrected versions, preservation of feed/identity/adjustment fields, and rejection of tampering and unsupported availability. Measure restore latency, storage and concurrent-write recovery on identical inputs. These are proposed comparisons; existing tests do not execute all candidate arms."
+ },
+ "overturn_when": "Change the default after an executed DVC-versus-ArcticDB-or-Iceberg comparison using blueprints/us-equities/point-in-time/fixture.json and the invariants in tests/test_point_in_time.py and tests/test_security_identity.py shows a candidate preserves exact snapshots and rejection behavior while closing a demonstrated recovery or concurrency gap. A DVC failure on those invariants would also overturn this provisional selection; merely passing the existing project-local tests would not qualify a candidate.",
+ "packet_sha256": "1863ff602e323d46a26ba0fbdd409b09d30c6f05d13bdc254ef02573844b8bfc",
+ "schema_version": 1,
+ "sources_read": [
+  "<host-path>/SKILL.md",
+  "<host-path>/us-equities__identity-provenance.json",
+  "https://github.com/sigstore/cosign/blob/v3.1.3/README.md",
+  "https://github.com/treeverse/dvc/blob/356dfa03278058b02df42124f243c2c345329dae/README.rst",
+  "https://github.com/apache/kafka/blob/26b251a451ce941d3d7a55e6487bcb7f16b5ad48/README.md",
+  "https://github.com/OpenLineage/OpenLineage/blob/8ad5c14c63fbab63fedd8ff42f9a208d86ad07fe/README.md",
+  "https://github.com/man-group/ArcticDB/blob/e620d8572a1e62c9ec07df8cbc8f5c432cd84325/README.md",
+  "https://github.com/mlflow/mlflow/blob/32792afe5b0183fce10532d3a023f5cfa8612d09/README.md",
+  "https://github.com/apache/iceberg/blob/6976e020b894f6a6777704df2b8c4458cb291ae9/README.md",
+  "https://raw.githubusercontent.com/treeverse/dvc/356dfa03278058b02df42124f243c2c345329dae/README.rst",
+  "https://raw.githubusercontent.com/apache/kafka/26b251a451ce941d3d7a55e6487bcb7f16b5ad48/README.md",
+  "https://raw.githubusercontent.com/OpenLineage/OpenLineage/8ad5c14c63fbab63fedd8ff42f9a208d86ad07fe/README.md",
+  "https://raw.githubusercontent.com/man-group/ArcticDB/e620d8572a1e62c9ec07df8cbc8f5c432cd84325/README.md",
+  "https://raw.githubusercontent.com/mlflow/mlflow/32792afe5b0183fce10532d3a023f5cfa8612d09/README.md",
+  "https://raw.githubusercontent.com/apache/iceberg/6976e020b894f6a6777704df2b8c4458cb291ae9/README.md",
+  "evidence/receipts/native-rag.json",
+  "evidence/receipts/desktop-direct-rag.json",
+  "evidence/receipts/artifact-reductions.json",
+  "evidence/receipts/component-history.json",
+  "evidence/receipts/vllm-compatibility.json",
+  "catalogs/us-equities/data-research.json",
+  "blueprints/us-equities/identity-readiness/README.md",
+  "blueprints/us-equities/identity-readiness/native-receipt.json",
+  "blueprints/us-equities/lifecycle-sample/README.md",
+  "blueprints/us-equities/catalyst-experiment/protocol.json",
+  "blueprints/us-equities/point-in-time/fixture.json",
+  "tests/test_point_in_time.py",
+  "tests/test_security_identity.py"
+ ],
+ "why_selected": "Select c2 provisionally for this layer's reproducibility and data-versioning scope. Source review of the exact pinned [DVC README](https://raw.githubusercontent.com/treeverse/dvc/356dfa03278058b02df42124f243c2c345329dae/README.rst) observed concrete add, dependency-stage, experiment and remote-storage workflows connecting versioned data with code. This is documentation inspection, not native execution. catalogs/us-equities/data-research.json explicitly marks the local workflow unexecuted. Among the adopted candidates, that bounded file-and-dependency contract is the closest supported fit to exact analytical snapshots without an unmeasured broker or lake requirement. The historical native results in blueprints/us-equities/identity-readiness/native-receipt.json separately demonstrate project-local observation cutoffs and quarantine; they are not DVC acceptance. No winner is established for the full acquisition and historical-eligibility requirement.",
+ "winner_evidence_class": "source_review",
+ "winner_evidence_refs": [
+  "https://raw.githubusercontent.com/treeverse/dvc/356dfa03278058b02df42124f243c2c345329dae/README.rst",
+  "catalogs/us-equities/data-research.json"
+ ],
+ "winner_keys": [
+  "c2"
+ ]
+}

@@ -1,0 +1,104 @@
+{
+ "alternatives": [
+  {
+   "disposition": "overlap",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "https://github.com/alpacahq/alpaca-py/blob/cc4cb3b7ba50ae250e621983c2779047fb16bb28/README.md"
+   ],
+   "key": "c1",
+   "name": "alpaca-py",
+   "repository": "https://github.com/alpacahq/alpaca-py",
+   "why_not_default": "Duplicates c4's upstream SDK and version. Its data-oriented entry adds no independently qualified execution boundary; the pinned README establishes interface availability, not broker lifecycle acceptance."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "https://github.com/QuantConnect/Lean.Brokerages.Alpaca/blob/1973f6165bee212acf656ed2f9cb0af86d4f2a18/README.md",
+    "blueprints/us-equities/engine/resolution-receipt.json"
+   ],
+   "key": "c6",
+   "name": "LEAN Alpaca brokerage",
+   "repository": "https://github.com/QuantConnect/Lean.Brokerages.Alpaca",
+   "why_not_default": "Native compilation passed, including a locally patched source-integrated variant, but adapter initialization, subscription validation and broker connectivity were not exercised. The passing unchanged LEAN backtest used the default brokerage model, not Alpaca. Preserve LEAN as an accounting oracle; these results do not justify replacing the selected Nautilus execution destination."
+  }
+ ],
+ "catalog": "us-equities",
+ "challenger_preferred": null,
+ "lane": "codex",
+ "layer_id": "execution-broker",
+ "limits": [
+  "Reviewed retained receipts and bounded source sections; no tests, broker sessions or comparative executions were run during this verdict.",
+  "The pinned Alpaca and LEAN GitHub blob pages failed to load; their exact revision README files were successfully read through raw.githubusercontent.com.",
+  "The Nautilus integration reference is a mutable latest-documentation URL; its contents do not independently verify the pinned release implementation.",
+  "Historical test counts were not treated as current-checkout results. The adaptive README explicitly records source and count drift after its dated receipt.",
+  "Private raw broker artifacts and credential stores were not opened."
+ ],
+ "model": {
+  "effort": "high",
+  "name": "gpt-6-astra"
+ },
+ "open_gaps": [
+  "Nautilus/IBKR socket connectivity, account ownership, paper submissions, cancellation races and reconnect reconciliation remain unaccepted.",
+  "The adaptive Alpaca adapter has local integration and synthetic broker evidence; its retained broker readiness records zero submissions and a trial not started because the regular session was unavailable.",
+  "The earlier Alpaca smoke covers full fills and recovery of an already completed trial. Native ambiguous submission, partial fills, disconnects, cancellation and in-flight crash recovery remain unqualified.",
+  "Continuous paper operation, historical-to-paper signal parity, fees completeness and actual execution capacity are not established.",
+  "SPY/LEAN dividend and order-semantic parity remains unaccepted; runtime-target.json records a blocked comparison requiring hardening and rerun.",
+  "Neither newcomer has retained executed comparison evidence establishing superiority."
+ ],
+ "overturn_protocol": {
+  "arms": [
+   "Selected Nautilus native IBKR adapter, qualified independently against the broker acceptance plan",
+   "Selected alpaca-py with the adaptive deterministic adapter; retain the earlier bounded Alpaca runner as a lifecycle control",
+   "LEAN Alpaca brokerage or another pinned challenger implementing the same frozen broker-specific failure contract"
+  ],
+  "fixture_paths": [
+   "tests/test_alpaca_paper.py",
+   "tests/test_adaptive_paper_recovery.py",
+   "tests/test_adaptive_paper_safety.py",
+   "tests/test_adaptive_paper_native.py",
+   "blueprints/us-equities/engine-nautilus/acceptance-plan.md"
+  ],
+  "metric": "Compare supported failures on identical order-state sequences: duplicate submissions, ownership violations, incorrect cumulative fills, numeric-risk breaches, request-budget violations and unexplained order/position/cash differences. Separately require broker-observed reconnect and restart reconciliation; synthetic passes cannot substitute for native fault acceptance."
+ },
+ "overturn_when": "Reopen the selection if an executed comparison using tests/test_alpaca_paper.py, tests/test_adaptive_paper_recovery.py, tests/test_adaptive_paper_safety.py and tests/test_adaptive_paper_native.py shows a pinned alternative fixes a selected-path failure without regressions, and it passes the applicable broker procedure in blueprints/us-equities/engine-nautilus/acceptance-plan.md. Reconsider the destination if that plan's equity accounting comparison demonstrates an unresolved required cash or order semantic.",
+ "packet_sha256": "a12fbdd9a124a2850009e3fb0dadc6aadd77c4b0284c8a69f0c65c81120f2b74",
+ "schema_version": 1,
+ "sources_read": [
+  "<host-path>/us-equities__execution-broker.json",
+  "<host-path>/SKILL.md",
+  "https://github.com/alpacahq/alpaca-py/blob/cc4cb3b7ba50ae250e621983c2779047fb16bb28/README.md",
+  "https://raw.githubusercontent.com/alpacahq/alpaca-py/cc4cb3b7ba50ae250e621983c2779047fb16bb28/README.md",
+  "https://github.com/alpacahq/alpaca-py/blob/v0.44.0/README.md",
+  "https://github.com/QuantConnect/Lean.Brokerages.Alpaca/blob/1973f6165bee212acf656ed2f9cb0af86d4f2a18/README.md",
+  "https://raw.githubusercontent.com/QuantConnect/Lean.Brokerages.Alpaca/1973f6165bee212acf656ed2f9cb0af86d4f2a18/README.md",
+  "https://nautilustrader.io/docs/latest/integrations/interactive_brokers/",
+  "blueprints/us-equities/adaptive-paper/receipt.json",
+  "blueprints/us-equities/adaptive-paper/README.md",
+  "blueprints/us-equities/engine/resolution-receipt.json",
+  "blueprints/us-equities/order-contract/README.md",
+  "catalogs/us-equities/runtime-target.json",
+  "blueprints/us-equities/paper-e2e-20260921/paper-receipt.json",
+  "tests/test_alpaca_paper.py",
+  "tests/test_adaptive_paper_recovery.py",
+  "tests/test_adaptive_paper_safety.py",
+  "tests/test_adaptive_paper_native.py",
+  "blueprints/us-equities/engine-nautilus/acceptance-plan.md"
+ ],
+ "why_selected": "Select c7 as the conditional Nautilus/IBKR destination, c4 as the separately qualified Alpaca SDK, and c5 as the local deterministic bridge into Nautilus. Source review of the [IBKR integration guide](https://nautilustrader.io/docs/latest/integrations/interactive_brokers/) establishes separate execution configuration and client-ID ownership requirements; catalogs/us-equities/runtime-target.json explicitly records IBKR acceptance as not established. Native execution retained in blueprints/us-equities/paper-e2e-20260921/paper-receipt.json shows the earlier alpaca-py runner completed one SPY roundtrip with two writes, independently matched -0.08 USD cash movement, flat final state and completed-trial recovery without additional writes. That result does not transfer to c5. For c5, blueprints/us-equities/adaptive-paper/receipt.json records local native-engine integration and 42 unchanged upstream adapter-template tests; its capacity fixture used a synthetic broker with zero broker connections and zero paper orders. These complementary selections preserve broker-specific boundaries and deterministic accounting without claiming native IBKR or adaptive-paper acceptance.",
+ "winner_evidence_class": "source_review",
+ "winner_evidence_refs": [
+  "https://nautilustrader.io/docs/latest/integrations/interactive_brokers/",
+  "https://github.com/alpacahq/alpaca-py/blob/v0.44.0/README.md",
+  "catalogs/us-equities/runtime-target.json",
+  "blueprints/us-equities/paper-e2e-20260921/paper-receipt.json",
+  "blueprints/us-equities/adaptive-paper/receipt.json",
+  "blueprints/us-equities/adaptive-paper/README.md"
+ ],
+ "winner_keys": [
+  "c7",
+  "c4",
+  "c5"
+ ]
+}

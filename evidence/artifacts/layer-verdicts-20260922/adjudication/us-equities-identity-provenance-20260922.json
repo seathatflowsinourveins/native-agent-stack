@@ -1,0 +1,49 @@
+{
+ "differing_components": [
+  {
+   "belongs_in_winner_set": false,
+   "component": "c5 data-openlineage",
+   "why": "In catalogs/us-equities/data-research.json lines 819-859, the retained decision is \"conditional\" with the rationale \"keep the initial local pipeline simpler\". The workflow is UNEXECUTED and only builds a Dataset object, with no event emission. The limitations say it is not a dataset version store. No evidence shows it meeting the snapshot/provenance requirement at least as well as the alternatives. B selects it only because it matches the scope terms."
+  }
+ ],
+ "evidence_refs": [
+  "blueprints/us-equities/identity-readiness/native-receipt.json",
+  "blueprints/us-equities/point-in-time/temporal_snapshot.py",
+  "catalogs/us-equities/data-research.json"
+ ],
+ "judgments": [
+  {
+   "claude_position": "B",
+   "evidence_refs": [
+    "catalogs/us-equities/data-research.json",
+    "blueprints/us-equities/point-in-time/temporal_snapshot.py",
+    "blueprints/us-equities/identity-readiness/native-receipt.json"
+   ],
+   "packet_order": "original",
+   "preferred_lane": "codex",
+   "preferred_position": "A",
+   "refuting_votes": 0,
+   "votes": 2,
+   "why": "A is better supported. Both returns pick DVC (c2) and differ only on OpenLineage (c5), which B adds. In catalogs/us-equities/data-research.json, data-dvc (lines 692-735) has decision \"default\" and a us_equities_fit that pins exact raw/curated snapshots and dependencies. That is the closest retained fit to the requirement for reproducible analytical snapshots. data-openlineage (lines 819-859) has decision \"conditional\", with the rationale \"Useful when several engines need interoperable lineage metadata; keep the initial local pipeline simpler\". Its native_workflow only builds a Dataset object and states \"no transport or network emission\"; it is explicitly UNEXECUTED. Its limitations say it \"is not a persistent lineage server, scheduler or dataset version store\". B promotes c5 because it matches the scope terms (data-lineage, metadata-events). No retained evidence shows c5 meeting the requirement better than the other conditional source-review candidates (Kafka, MLflow, Iceberg, ArcticDB), and the retained catalog decision itself defers it. So B adds a winner without evidence. A's claims hold up. The DVC workflow is marked unexecuted (line 711). The identity-readiness receipt exists at blueprints/us-equities/identity-readiness/native-receipt.json, and A presents it as separate from DVC acceptance. B's local-code observations also check out: validate_source is at line 68, write_snapshot at 116 with ingested_at from SEC.utc_now() at 135, and per-file sha256 at 138. Since neither set makes a contradicted claim, the only difference is c5, and on that A's set is the better supported. Limitation: I could not open the pinned upstream READMEs from this lane, so the DVC source-review claims rest on the catalog record.",
+   "workflow": "wf_3e94965e-141"
+  },
+  {
+   "claude_position": "A",
+   "evidence_refs": [
+    "catalogs/us-equities/data-research.json"
+   ],
+   "packet_order": "swapped",
+   "preferred_lane": "codex",
+   "preferred_position": "B",
+   "refuting_votes": 0,
+   "votes": 2,
+   "why": "The two returns differ only on c5 (data-openlineage): A puts it in the winner set, B does not. B's set matches the retained evidence better. In catalogs/us-equities/data-research.json, the data-dvc entry (lines 692-736) has \"decision\": \"default\" and the rationale \"Use lightweight dataset manifests and private content-addressed artifacts before adding a lake service\". Its us_equities_fit says it \"Pins exact raw/curated snapshots and preprocessing dependencies\". That fits the requirement for exact reproducible snapshots, which is why both returns keep c2. The data-openlineage entry (lines 819-859) is different. It has \"decision\": \"conditional\" and the rationale \"Useful when several engines need interoperable lineage metadata; keep the initial local pipeline simpler\". Its native_workflow is marked \"Prospective and UNEXECUTED\", and it only prints a Dataset object with \"no transport or network emission\". Its limitations say it \"is not a persistent lineage server, scheduler or dataset version store\". So the retained evidence gives c5 no role in exact snapshots or in rejecting data whose availability is unknown, and the catalog itself holds it back as conditional. A promotes c5 because its role matches the data-lineage and metadata-events scope terms. No retained evidence shows c5 meets the requirement as well as the default path. A's why_selected also admits it could not open the README, so the only retained repository evidence is this catalog card. Neither set makes a claim the evidence contradicts, so \"neither\" does not apply. Both returns rest on source review only, and no DVC run exists.",
+   "workflow": "wf_53dd768b-bff"
+  }
+ ],
+ "method": "anonymous A/B adjudication: one evidence-reviewer judge and two evidence-reviewer refuters (Opus 5.5, high) per presentation order, lane identities scrubbed from the returns; judgments lists each order's pick (workflows wf_3e94965e-141 and wf_53dd768b-bff)",
+ "refuting_votes": 0,
+ "votes": 2,
+ "why": "A is better supported. Both returns pick DVC (c2) and differ only on OpenLineage (c5), which B adds. In catalogs/us-equities/data-research.json, data-dvc (lines 692-735) has decision \"default\" and a us_equities_fit that pins exact raw/curated snapshots and dependencies. That is the closest retained fit to the requirement for reproducible analytical snapshots. data-openlineage (lines 819-859) has decision \"conditional\", with the rationale \"Useful when several engines need interoperable lineage metadata; keep the initial local pipeline simpler\". Its native_workflow only builds a Dataset object and states \"no transport or network emission\"; it is explicitly UNEXECUTED. Its limitations say it \"is not a persistent lineage server, scheduler or dataset version store\". B promotes c5 because it matches the scope terms (data-lineage, metadata-events). No retained evidence shows c5 meeting the requirement better than the other conditional source-review candidates (Kafka, MLflow, Iceberg, ArcticDB), and the retained catalog decision itself defers it. So B adds a winner without evidence. A's claims hold up. The DVC workflow is marked unexecuted (line 711). The identity-readiness receipt exists at blueprints/us-equities/identity-readiness/native-receipt.json, and A presents it as separate from DVC acceptance. B's local-code observations also check out: validate_source is at line 68, write_snapshot at 116 with ingested_at from SEC.utc_now() at 135, and per-file sha256 at 138. Since neither set makes a contradicted claim, the only difference is c5, and on that A's set is the better supported. Limitation: I could not open the pinned upstream READMEs from this lane, so the DVC source-review claims rest on the catalog record.",
+ "winner_lane": "codex"
+}

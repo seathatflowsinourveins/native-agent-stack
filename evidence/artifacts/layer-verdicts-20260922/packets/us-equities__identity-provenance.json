@@ -1,0 +1,328 @@
+{
+ "candidate_source": "sota_manifest_layer_entries",
+ "candidates": [
+  {
+   "adopted": true,
+   "card_limitations": [
+    "Do not replace exact identity with a permissive wildcard merely to pass verification.",
+    "Signing can use OIDC and publish transparency records; no signing or identity flow initiated here.",
+    "Not all upstreams publish signatures; keep checksum evidence labeled as such."
+   ],
+   "component_id": "cosign",
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "https://github.com/sigstore/cosign/blob/v3.1.3/README.md"
+   ],
+   "key": "c1",
+   "name": "cosign",
+   "pin": "v3.1.3",
+   "pin_behind_upstream": false,
+   "recipe_ref": null,
+   "repository": "https://github.com/sigstore/cosign",
+   "review_status": null,
+   "role": "Artifact signature and identity verification",
+   "upstream": {
+    "archived": false,
+    "latest": "v3.1.3",
+    "license": "Apache-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-21",
+    "released_at": "2026-08-06",
+    "renamed_to": null,
+    "stars": 6317
+   }
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "Content hashes prove identity, not data validity or point-in-time correctness.",
+    "GitHub canonical repository now resolves to treeverse/dvc; older iterative URLs redirect.",
+    "Even metadata can reveal identifiers; review public manifests separately from private data/cache."
+   ],
+   "component_id": "data-dvc",
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "https://github.com/treeverse/dvc/blob/356dfa03278058b02df42124f243c2c345329dae/README.rst"
+   ],
+   "key": "c2",
+   "name": "DVC",
+   "pin": "3.67.1; source 356dfa03278058b02df42124f243c2c345329dae",
+   "pin_behind_upstream": false,
+   "recipe_ref": null,
+   "repository": "https://github.com/treeverse/dvc",
+   "review_status": null,
+   "role": "Git-linked hashes, data dependencies and experiment pipelines",
+   "upstream": {
+    "archived": false,
+    "latest": "3.67.1",
+    "license": "Apache-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-21",
+    "released_at": "2026-03-31",
+    "renamed_to": null,
+    "stars": 15882
+   }
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "Single-node synthetic replay is a prospective smoke check, not high availability or exchange recovery evidence.",
+    "Ordering is partition-local; Kafka transactions do not make broker orders, files or all external sinks exactly-once.",
+    "GitHub has no current release entries; version/date come from Apache downloads."
+   ],
+   "component_id": "data-kafka",
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "https://github.com/apache/kafka/blob/26b251a451ce941d3d7a55e6487bcb7f16b5ad48/README.md"
+   ],
+   "key": "c3",
+   "name": "data-kafka",
+   "pin": "4.3.1; source 26b251a451ce941d3d7a55e6487bcb7f16b5ad48",
+   "pin_behind_upstream": false,
+   "recipe_ref": null,
+   "repository": "https://github.com/apache/kafka",
+   "review_status": null,
+   "role": "Durable partitioned event log for multiple independent consumers",
+   "upstream": {
+    "archived": false,
+    "latest": "show",
+    "license": "Apache-2.0",
+    "prerelease": null,
+    "pushed_at": "2026-09-22",
+    "released_at": null,
+    "renamed_to": null,
+    "stars": 33783
+   }
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "AGPL obligations or commercial license apply to relevant deployments. The lmstudio setting in this profile targets local vLLM; it does not require LM Studio.",
+    "Embedding dimension/model changes require deliberate reindexing; no automatic linked-project expansion."
+   ],
+   "component_id": "foundation-socraticode",
+   "decisions": [],
+   "evidence_kind": "native_proven",
+   "evidence_refs": [
+    "evidence/receipts/native-rag.json",
+    "evidence/receipts/desktop-direct-rag.json",
+    "evidence/receipts/artifact-reductions.json",
+    "evidence/receipts/component-history.json",
+    "evidence/receipts/vllm-compatibility.json"
+   ],
+   "key": "c4",
+   "name": "foundation-socraticode",
+   "pin": "v1.14.0",
+   "pin_behind_upstream": false,
+   "recipe_ref": "evidence/receipts/native-rag.json",
+   "repository": "https://github.com/giancarloerra/SocratiCode",
+   "review_status": null,
+   "role": "Automatic semantic code indexing and graph context",
+   "upstream": {
+    "archived": false,
+    "latest": "v1.14.0",
+    "license": "AGPL-3.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "released_at": "2026-09-16",
+    "renamed_to": null,
+    "stars": 3318
+   }
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "The client/specification is not a persistent lineage server, scheduler or dataset version store.",
+    "Lineage metadata may disclose private dataset names/URIs; never embed credentials or licensed row contents."
+   ],
+   "component_id": "data-openlineage",
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "https://github.com/OpenLineage/OpenLineage/blob/8ad5c14c63fbab63fedd8ff42f9a208d86ad07fe/README.md"
+   ],
+   "key": "c5",
+   "name": "data-openlineage",
+   "pin": "1.53.0; source 8ad5c14c63fbab63fedd8ff42f9a208d86ad07fe",
+   "pin_behind_upstream": false,
+   "recipe_ref": null,
+   "repository": "https://github.com/OpenLineage/OpenLineage",
+   "review_status": null,
+   "role": "Open job/run/dataset lineage event standard and clients",
+   "upstream": {
+    "archived": false,
+    "latest": "1.53.0",
+    "license": "Apache-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "released_at": "2026-09-01",
+    "renamed_to": null,
+    "stars": 2667
+   }
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "Current release is BSL-1.1 source-available, not blanket Apache-licensed software.",
+    "Pinned license includes an Additional Use Grant while current vendor prose describes paid production/business use; resolve the intended deployment with the licensor instead of assuming unrestricted commercial rights.",
+    "Storage version time is not proof of market information availability; do not discard revisions needed for replay."
+   ],
+   "component_id": "data-arcticdb",
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "https://github.com/man-group/ArcticDB/blob/e620d8572a1e62c9ec07df8cbc8f5c432cd84325/README.md"
+   ],
+   "key": "c6",
+   "name": "data-arcticdb",
+   "pin": "v6.26.0; source e620d8572a1e62c9ec07df8cbc8f5c432cd84325",
+   "pin_behind_upstream": false,
+   "recipe_ref": null,
+   "repository": "https://github.com/man-group/ArcticDB",
+   "review_status": null,
+   "role": "Versioned dataframe storage using LMDB or object storage",
+   "upstream": {
+    "archived": false,
+    "latest": "v6.26.0",
+    "license": "NOASSERTION",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "released_at": "2026-09-14",
+    "renamed_to": null,
+    "stars": 2519
+   }
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "No experiments or models were run by this review. The example would only record a synthetic local metric.",
+    "Autologging does not capture every data revision, leakage decision or external service cost; avoid unreviewed hosted telemetry and dataset uploads."
+   ],
+   "component_id": "data-mlflow",
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "https://github.com/mlflow/mlflow/blob/32792afe5b0183fce10532d3a023f5cfa8612d09/README.md"
+   ],
+   "key": "c7",
+   "name": "data-mlflow",
+   "pin": "v3.16.1; source 32792afe5b0183fce10532d3a023f5cfa8612d09",
+   "pin_behind_upstream": false,
+   "recipe_ref": null,
+   "repository": "https://github.com/mlflow/mlflow",
+   "review_status": null,
+   "role": "Local experiment runs, parameters, metrics and artifacts",
+   "upstream": {
+    "archived": false,
+    "latest": "v3.16.1",
+    "license": "Apache-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "released_at": "2026-09-17",
+    "renamed_to": null,
+    "stars": 28099
+   }
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "Catalog creation alone would not prove append, multi-writer conflict handling, cross-engine compatibility or time travel.",
+    "Snapshot expiry and orphan-file removal must preserve required research/audit versions; storage snapshots do not imply past information availability."
+   ],
+   "component_id": "data-iceberg",
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "https://github.com/apache/iceberg/blob/6976e020b894f6a6777704df2b8c4458cb291ae9/README.md"
+   ],
+   "key": "c8",
+   "name": "data-iceberg",
+   "pin": "Apache Iceberg 1.11.0; PyIceberg 0.12.0; source 6976e020b894f6a6777704df2b8c4458cb291ae9",
+   "pin_behind_upstream": false,
+   "recipe_ref": null,
+   "repository": "https://github.com/apache/iceberg",
+   "review_status": null,
+   "role": "Open table snapshots and schema/partition evolution",
+   "upstream": {
+    "archived": false,
+    "latest": "apache-iceberg-1.11.0",
+    "license": "Apache-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "released_at": "2026-05-20",
+    "renamed_to": null,
+    "stars": 9265
+   }
+  }
+ ],
+ "catalog": "us-equities",
+ "checked_at": "2026-09-22",
+ "enums": {
+  "disposition": [
+   "conditional",
+   "measured_tradeoff",
+   "observed_failure",
+   "out_of_scope",
+   "overlap",
+   "selected",
+   "unqualified"
+  ],
+  "evidence_class": [
+   "local_integration",
+   "measured_comparison",
+   "native_proven",
+   "source_review",
+   "synthetic"
+  ]
+ },
+ "existing_overturn_when": "Freeze required universe/history/latency, rights, correction and availability semantics; compare selected providers on representative securities including delistings, ticker reuse and corporate actions, then change the feed/store only when a candidate closes those gaps with auditable records and acceptable measured cost. Add a server or lake only after local throughput/concurrency measurements justify it.",
+ "group": "data-research",
+ "layer_id": "identity-provenance",
+ "layer_scope_terms": [
+  "provenance",
+  "data-lineage",
+  "data-versioning",
+  "object-store-versioning",
+  "versioned-store",
+  "data-branches",
+  "reproducibility",
+  "model-lineage",
+  "metadata-events",
+  "index-freshness",
+  "snapshot-store",
+  "replay-log"
+ ],
+ "limitations": [
+  "The authenticated Alpaca receipt covers 25 AAPL SIP/raw daily bars and two corporate actions over five successful pages, not a survivorship-free universe, complete history or real-time feed entitlement.",
+  "Numeric corporate-action values matched the frozen probe, but missing dividend currency prevented full cash-unit reconciliation. Original historical availability and complete action coverage remain open.",
+  "Three documentary lifecycle cases preserve observed cutoffs and source anchors; retrospective claims do not establish historical as-known eligibility or permanent security identity.",
+  "The prior SEC HTTP 403 remains a historical failure. Later corrected acquisition and parsing qualify their selected requests only; no general filing-completeness or strategy-validity claim follows.",
+  "SQL, schemas and content hashes cannot repair missing provenance, revised fundamentals, access rights or outcome-selected samples.",
+  "The us-equities catalog also tags entries for this taxonomy layer under agents-operations (1), foundation-memory (1); data-research (9) was picked as the primary group by entry count."
+ ],
+ "requirement": "Acquire licensed, source-identifiable US-equity observations; preserve feed, timestamps, identity and corporate actions; produce exact reproducible analytical snapshots and reject data whose historical availability or eligibility is unknown.",
+ "requirement_note": "The requirement, limitations and existing_overturn_when text is shared by this layer's group; judge fit against the layer title and layer_scope_terms.",
+ "rules": [
+  "Judge from retained evidence. Open the evidence_refs of every adopted candidate (bounded: the referenced file or its relevant section) and record every path you opened in sources_read. Do not rely on memory of the repositories.",
+  "The winner set is 1-3 adopted candidates (adopted == true) that best satisfy the requirement on the evidence. why_selected must cite at least one evidence path and state what was actually observed (native execution, measured comparison, local integration, synthetic fixture or source review), not what the project claims.",
+  "Every adopted non-winner candidate appears in alternatives with a why_not_default that states the concrete evidence gap or trade-off; add non-adopted candidates only with the same standard.",
+  "If a non-adopted candidate would satisfy the requirement better on the evidence, do not select it: record it in challenger_preferred with the comparison (a fixtures/, blueprints/ or tests/ path, or a python3/node command) that would establish it. Agreement between lanes never promotes; only an executed comparison can.",
+  "overturn_when names the concrete check that would change the verdict (a fixtures/, blueprints/ or tests/ path or a runnable python3/node command). open_gaps lists what the evidence does not establish. limits lists what you could not read or verify. Do not invent paths, numbers or results; leave evidence_refs empty rather than guess."
+ ],
+ "schema_version": 1,
+ "sota_components_not_in_candidates": [],
+ "title": "Identity, provenance and lineage",
+ "withheld": [
+  "current_choice",
+  "decision",
+  "rationale",
+  "candidates[].disposition",
+  "candidates[].rationale",
+  "candidates[].card_rationale",
+  "candidates[].card_decision",
+  "candidates[].review_status"
+ ]
+}

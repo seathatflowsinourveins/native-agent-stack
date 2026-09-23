@@ -1,0 +1,50 @@
+{
+ "foundation__instructions-skills": {
+  "A": "codex",
+  "B": "claude"
+ },
+ "foundation__workers": {
+  "A": "claude",
+  "B": "codex"
+ },
+ "foundation__code-navigation": {
+  "A": "codex",
+  "B": "claude"
+ },
+ "foundation__document-retrieval": {
+  "A": "codex",
+  "B": "claude"
+ },
+ "foundation__web-research": {
+  "A": "claude",
+  "B": "codex"
+ },
+ "foundation__token-efficiency": {
+  "A": "claude",
+  "B": "codex"
+ },
+ "foundation__observation-inference": {
+  "A": "codex",
+  "B": "claude"
+ },
+ "us-equities__identity-provenance": {
+  "A": "codex",
+  "B": "claude"
+ },
+ "us-equities__data-quality-orchestration": {
+  "A": "claude",
+  "B": "codex"
+ },
+ "us-equities__execution-broker": {
+  "A": "codex",
+  "B": "claude"
+ },
+ "us-equities__evaluation-experiments": {
+  "A": "claude",
+  "B": "codex"
+ },
+ "us-equities__observability-hosting": {
+  "A": "codex",
+  "B": "claude"
+ }
+}

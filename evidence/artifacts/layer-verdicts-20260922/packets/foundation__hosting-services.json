@@ -1,0 +1,400 @@
+{
+ "candidates": [
+  {
+   "adopted": true,
+   "component_id": "fastapi",
+   "decisions": [
+    {
+     "capability": "Build a typed local UI/API with persistent database state",
+     "evidence_scope": "Locked UI/API, twelve API checks, browser create/update, migration reversal and exact rows/history after restart passed on named Mac/WSL fixtures.",
+     "id": "local-typed-application",
+     "limitations": [
+      "No production authentication, cloud hosting or independent-host database restore is accepted.",
+      "The failed newer TypeScript generator attempt remains separate from the retained supported runtime."
+     ],
+     "next_gap": "Qualify independent restore and the requested deployment-specific access/runtime conditions."
+    }
+   ],
+   "evidence_kind": "native_execution",
+   "evidence_refs": [
+    "catalogs/foundation/decisions.json"
+   ],
+   "key": "c1",
+   "name": "FastAPI",
+   "pin": "0.141.1",
+   "pin_behind_upstream": false,
+   "recipe_ref": "blueprints/convergence-practice/application-delivery/README.md",
+   "repository": "https://github.com/fastapi/fastapi",
+   "review_status": null,
+   "upstream": {
+    "archived": false,
+    "latest": "0.141.1",
+    "license": "MIT",
+    "prerelease": false,
+    "pushed_at": "2026-09-18",
+    "released_at": "2026-07-29",
+    "renamed_to": null,
+    "stars": 102531
+   }
+  },
+  {
+   "adopted": true,
+   "component_id": "nextjs",
+   "decisions": [
+    {
+     "capability": "Build a typed local UI/API with persistent database state",
+     "evidence_scope": "Locked UI/API, twelve API checks, browser create/update, migration reversal and exact rows/history after restart passed on named Mac/WSL fixtures.",
+     "id": "local-typed-application",
+     "limitations": [
+      "No production authentication, cloud hosting or independent-host database restore is accepted.",
+      "The failed newer TypeScript generator attempt remains separate from the retained supported runtime."
+     ],
+     "next_gap": "Qualify independent restore and the requested deployment-specific access/runtime conditions."
+    }
+   ],
+   "evidence_kind": "native_execution",
+   "evidence_refs": [
+    "catalogs/foundation/decisions.json"
+   ],
+   "key": "c2",
+   "name": "Next.js",
+   "pin": "16.3.5",
+   "pin_behind_upstream": false,
+   "recipe_ref": "blueprints/convergence-practice/application-delivery/README.md",
+   "repository": "https://github.com/vercel/next.js",
+   "review_status": null,
+   "upstream": {
+    "archived": false,
+    "latest": "v16.3.5",
+    "license": "MIT",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "released_at": "2026-09-11",
+    "renamed_to": null,
+    "stars": 142399
+   }
+  },
+  {
+   "adopted": true,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/agents-operations.json"
+   ],
+   "key": "c3",
+   "name": "Modal",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": "catalogs/us-equities/agents-operations.json",
+   "repository": "https://github.com/modal-labs/modal-client",
+   "review_status": null,
+   "upstream": null
+  },
+  {
+   "adopted": true,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "catalogs/landscape/hosting-practice.json",
+    "docs/hosting-container-practice.md",
+    "https://github.com/docker/compose/blob/5f94fb0aa42a2cd1248c6e6c7fafb87546b9c8de/README.md"
+   ],
+   "key": "c4",
+   "name": "Docker Compose",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": "catalogs/landscape/hosting-practice.json",
+   "repository": "https://github.com/docker/compose",
+   "review_status": null,
+   "upstream": null
+  },
+  {
+   "adopted": true,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "catalogs/us-equities/agents-operations.json"
+   ],
+   "key": "c5",
+   "name": "BentoML",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": "catalogs/us-equities/agents-operations.json",
+   "repository": "https://github.com/bentoml/BentoML",
+   "review_status": null,
+   "upstream": null
+  },
+  {
+   "adopted": true,
+   "component_id": "postgresql",
+   "decisions": [
+    {
+     "capability": "Build a typed local UI/API with persistent database state",
+     "evidence_scope": "Locked UI/API, twelve API checks, browser create/update, migration reversal and exact rows/history after restart passed on named Mac/WSL fixtures.",
+     "id": "local-typed-application",
+     "limitations": [
+      "No production authentication, cloud hosting or independent-host database restore is accepted.",
+      "The failed newer TypeScript generator attempt remains separate from the retained supported runtime."
+     ],
+     "next_gap": "Qualify independent restore and the requested deployment-specific access/runtime conditions."
+    }
+   ],
+   "evidence_kind": "native_execution",
+   "evidence_refs": [
+    "catalogs/foundation/decisions.json"
+   ],
+   "key": "c6",
+   "name": "PostgreSQL",
+   "pin": "18.6",
+   "pin_behind_upstream": false,
+   "recipe_ref": "blueprints/convergence-practice/application-delivery/README.md",
+   "repository": "https://github.com/postgres/postgres",
+   "review_status": null,
+   "upstream": {
+    "archived": false,
+    "latest": "release-6-3",
+    "license": "NOASSERTION",
+    "prerelease": null,
+    "pushed_at": "2026-09-22",
+    "released_at": null,
+    "renamed_to": null,
+    "stars": 22179
+   }
+  },
+  {
+   "adopted": true,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "catalogs/landscape/hosting-practice.json",
+    "docs/hosting-container-practice.md",
+    "https://github.com/moby/moby/blob/464cd50c3d9e92877d56940ea160de6fca7bea23/README.md",
+    "https://docs.docker.com/engine/security/rootless/"
+   ],
+   "key": "c7",
+   "name": "Docker Engine / Moby",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": "catalogs/landscape/hosting-practice.json",
+   "repository": "https://github.com/moby/moby",
+   "review_status": null,
+   "upstream": null
+  },
+  {
+   "adopted": true,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "catalogs/landscape/hosting-practice.json",
+    "docs/hosting-container-practice.md",
+    "https://github.com/podman-container-tools/podman/blob/04f3aa430e6df81bea059978bc5bafbc846ba3e7/README.md",
+    "https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html"
+   ],
+   "key": "c8",
+   "name": "Podman / Quadlet",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": "catalogs/landscape/hosting-practice.json",
+   "repository": "https://github.com/podman-container-tools/podman",
+   "review_status": null,
+   "upstream": null
+  },
+  {
+   "adopted": true,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "adoption/research.json"
+   ],
+   "key": "c9",
+   "name": "Dev Containers CLI",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": "adoption/research.json",
+   "repository": "https://github.com/devcontainers/cli",
+   "review_status": null,
+   "upstream": null
+  },
+  {
+   "adopted": true,
+   "component_id": null,
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "catalogs/landscape/hosting-practice.json",
+    "docs/hosting-container-practice.md",
+    "https://github.com/gnzsnz/ib-gateway-docker/blob/e19aa0bebe5d0ddd55c6d0e25549380f9c7d1bf7/README.md",
+    "https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/docs/integrations/interactive_brokers.md"
+   ],
+   "key": "c10",
+   "name": "Dockerized IB Gateway",
+   "pin": null,
+   "pin_behind_upstream": null,
+   "recipe_ref": "catalogs/landscape/hosting-practice.json",
+   "repository": "https://github.com/gnzsnz/ib-gateway-docker",
+   "review_status": null,
+   "upstream": null
+  },
+  {
+   "adopted": true,
+   "component_id": "react",
+   "decisions": [
+    {
+     "capability": "Build a typed local UI/API with persistent database state",
+     "evidence_scope": "Locked UI/API, twelve API checks, browser create/update, migration reversal and exact rows/history after restart passed on named Mac/WSL fixtures.",
+     "id": "local-typed-application",
+     "limitations": [
+      "No production authentication, cloud hosting or independent-host database restore is accepted.",
+      "The failed newer TypeScript generator attempt remains separate from the retained supported runtime."
+     ],
+     "next_gap": "Qualify independent restore and the requested deployment-specific access/runtime conditions."
+    }
+   ],
+   "evidence_kind": "native_execution",
+   "evidence_refs": [
+    "catalogs/foundation/decisions.json"
+   ],
+   "key": "c11",
+   "name": "React",
+   "pin": "19.3.0",
+   "pin_behind_upstream": false,
+   "recipe_ref": "blueprints/convergence-practice/application-delivery/README.md",
+   "repository": "https://github.com/react/react",
+   "review_status": null,
+   "upstream": {
+    "archived": false,
+    "latest": "v19.3.0",
+    "license": "MIT",
+    "prerelease": false,
+    "pushed_at": "2026-09-18",
+    "released_at": "2026-09-09",
+    "renamed_to": null,
+    "stars": 250650
+   }
+  }
+ ],
+ "catalog": "foundation",
+ "checked_at": "2026-09-22",
+ "enums": {
+  "disposition": [
+   "conditional",
+   "measured_tradeoff",
+   "observed_failure",
+   "out_of_scope",
+   "overlap",
+   "selected",
+   "unqualified"
+  ],
+  "evidence_class": [
+   "local_integration",
+   "measured_comparison",
+   "native_proven",
+   "source_review",
+   "synthetic"
+  ]
+ },
+ "existing_overturn_when": "A defined production, remote-team or GPU deployment requirement exceeds the local fixture, and one alternative passes its account, data, networking, rollback and workload-cost acceptance.",
+ "group": null,
+ "layer_id": "hosting-services",
+ "limitations": [
+  "A local fixture and service UI are not production readiness, scalability or paid-hosting acceptance.",
+  "Gateway dashboard/lifecycle evidence is separate from a successful exact-model task; recorded route/provider refusals remain limits."
+ ],
+ "requirement": "Run the selected local typed application and supporting services reproducibly while keeping accounts, state and deployment scope explicit.",
+ "rules": [
+  "Judge from retained evidence. Open the evidence_refs of every adopted candidate (bounded: the referenced file or its relevant section) and record every path you opened in sources_read. Do not rely on memory of the repositories.",
+  "The winner set is 1-3 adopted candidates (adopted == true) that best satisfy the requirement on the evidence. why_selected must cite at least one evidence path and state what was actually observed (native execution, measured comparison, local integration, synthetic fixture or source review), not what the project claims.",
+  "Every adopted non-winner candidate appears in alternatives with a why_not_default that states the concrete evidence gap or trade-off; add non-adopted candidates only with the same standard.",
+  "If a non-adopted candidate would satisfy the requirement better on the evidence, do not select it: record it in challenger_preferred with the comparison (a fixtures/, blueprints/ or tests/ path, or a python3/node command) that would establish it. Agreement between lanes never promotes; only an executed comparison can.",
+  "overturn_when names the concrete check that would change the verdict (a fixtures/, blueprints/ or tests/ path or a runnable python3/node command). open_gaps lists what the evidence does not establish. limits lists what you could not read or verify. Do not invent paths, numbers or results; leave evidence_refs empty rather than guess."
+ ],
+ "schema_version": 1,
+ "sota_components_not_in_candidates": [
+  {
+   "id": "apple-container",
+   "pin": "1.4.1",
+   "pin_behind_upstream": false,
+   "repository": "https://github.com/apple/container",
+   "review_status": null,
+   "upstream": {
+    "archived": false,
+    "latest": "1.4.1",
+    "license": "Apache-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-09-21",
+    "released_at": "2026-09-09",
+    "renamed_to": null,
+    "stars": 50112
+   }
+  },
+  {
+   "id": "mcp-inspector",
+   "pin": "2.7.0",
+   "pin_behind_upstream": false,
+   "repository": "https://github.com/modelcontextprotocol/inspector",
+   "review_status": null,
+   "upstream": {
+    "archived": false,
+    "latest": "2.7.0",
+    "license": null,
+    "prerelease": false,
+    "pushed_at": "2026-09-19",
+    "released_at": "2026-09-16",
+    "renamed_to": null,
+    "stars": 10921
+   }
+  },
+  {
+   "id": "mcporter",
+   "pin": "0.13.13",
+   "pin_behind_upstream": true,
+   "repository": "https://github.com/openclaw/mcporter/tree/v0.13.13",
+   "review_status": null,
+   "upstream": {
+    "archived": false,
+    "latest": "v0.14.0",
+    "license": "MIT",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "released_at": "2026-09-22",
+    "renamed_to": null,
+    "stars": 5022
+   }
+  },
+  {
+   "id": "omniroute",
+   "pin": "3.8.50",
+   "pin_behind_upstream": false,
+   "repository": "https://github.com/diegosouzapw/OmniRoute",
+   "review_status": null,
+   "upstream": {
+    "archived": false,
+    "latest": "v3.8.50",
+    "license": "MIT",
+    "prerelease": false,
+    "pushed_at": "2026-09-22",
+    "released_at": "2026-08-26",
+    "renamed_to": null,
+    "stars": 69169
+   }
+  }
+ ],
+ "title": "Application and service hosting",
+ "withheld": [
+  "current_choice",
+  "decision",
+  "rationale",
+  "candidates[].disposition",
+  "candidates[].rationale",
+  "candidates[].review_status",
+  "candidates[].decisions[].selection",
+  "candidates[].decisions[].review_status",
+  "sota_components_not_in_candidates[].review_status"
+ ]
+}

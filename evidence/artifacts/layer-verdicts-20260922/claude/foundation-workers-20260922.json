@@ -5,25 +5,37 @@
    "evidence_class": "native_proven",
    "evidence_refs": [
     "catalogs/foundation/decisions.json",
+    "docs/foundation-rd-readiness.md",
     "docs/full-stack-convergence.md"
    ],
-   "key": "c6",
-   "name": "Beads",
-   "repository": "https://github.com/gastownhall/beads",
-   "why_not_default": "This is native execution, but only for queue semantics. In the decisions.json `dependency-task-queue` entry, native Beads persisted task claims and dependency transitions in one fixture. The same entry says a queue is not worker cancellation, distributed lease correctness or acceptance of a restored task effect, and records the beads stage 'recovery' as 'not_established'. Beads adds ordering on top of workers; it does not delegate, isolate or integrate work itself. Use it only when tasks have real ordering to gate."
+   "key": "c11",
+   "name": "Codex native workers",
+   "repository": "https://github.com/openai/codex",
+   "why_not_default": "Complementary cross-family worker and reviewer, not a separate default for this layer.\n\nIts retained native evidence covers two things:\n- Session resume: Codex on Mac and Claude on WSL resumed the same session (packet native-session-resume, lines 330-338).\n- Review: native Codex independently reviewed the paper-guard correction (docs/foundation-rd-readiness.md lines 39-43 and 53-55).\n\nIt does not cover an owned writing child. In lean-workflow-child-routing, the Codex agent examples 'inherit model and effort and have no end-to-end run of their own' (decisions.json line 2678). agent-sdk-runtime-selection is source_review: 'no new execution was run' (decisions.json lines 2823-2862). No retained record shows a Codex-owned bounded writing child in an owned worktree that keeps its failed results."
   },
   {
    "disposition": "conditional",
    "evidence_class": "native_proven",
    "evidence_refs": [
     "recipes/claude-codex-foreground-review.md",
-    "catalogs/foundation/decisions.json",
-    "evidence/receipts/foundation-rd-20260921.json"
+    "evidence/receipts/foundation-rd-20260921.json",
+    "catalogs/foundation/decisions.json"
    ],
    "key": "c8",
    "name": "Codex for Claude companion",
    "repository": "https://github.com/openai/codex-plugin-cc",
-   "why_not_default": "recipes/claude-codex-foreground-review.md lines 20-37 records one foreground /codex:review that returned (Codex status 0; companion 1.0.6 @ db52e28f). This is the review half of the joint c8+c11 cross-family review evidence. The packet's `companion-backend` entry is only partial_acceptance, from one read-only bridge backend task (packet lines 298-306). The companion does not expose Codex model, effort or token totals (recipe line 34). Its SessionEnd hook shuts down the workspace broker without checking which session owns it (lines 41-46). Background and concurrent same-workspace use are unqualified. It is a review lane that invokes c11, not a worker runtime."
+   "why_not_default": "Review bridge, not a delegation runtime. It has executed evidence for the review part of the requirement: one literal foreground /codex:review returned 'No actionable regressions were found' on a three-file paper-guard diff (recipes/claude-codex-foreground-review.md lines 20-37; evidence/receipts/foundation-rd-20260921.json lines 3 and 10-15).\n\nRemaining gaps:\n- The companion-backend decision is still partial_acceptance (decisions.json lines 378-424).\n- Same-workspace concurrency, Workflow background polling and interrupted reviews are unqualified (recipe lines 48-50).\n- SessionEnd shuts down the workspace broker without checking which session owns it (recipe lines 41-53)."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "catalogs/foundation/decisions.json"
+   ],
+   "key": "c6",
+   "name": "Beads",
+   "repository": "https://github.com/gastownhall/beads",
+   "why_not_default": "Complements delegation; it does not replace it. Native Beads persisted task claims and dependency transitions in the selected fixture. Its recovery stage is 'not_established', and 'A queue is not worker cancellation, distributed lease correctness or restored task-effect acceptance' (decisions.json dependency-task-queue, lines 426-476, recovery lines 469-471). Useful only when tasks have real ordering to gate."
   },
   {
    "disposition": "conditional",
@@ -32,13 +44,12 @@
     "blueprints/us-equities/deerflow/research-receipt.json",
     "blueprints/us-equities/deerflow/native-receipt.json",
     "catalogs/landscape/candidate-quality-review.json",
-    "catalogs/us-equities/agents-operations.json",
-    "docs/candidate-quality-review-20260921.md"
+    "catalogs/us-equities/agents-operations.json"
    ],
    "key": "c3",
    "name": "DeerFlow",
    "repository": "https://github.com/bytedance/deer-flow",
-   "why_not_default": "The native evidence covers a different revision and is read-only. blueprints/us-equities/deerflow/research-receipt.json records one embedded invoke_acp_agent research prompt at 42334f26, not the reviewed 656db122. That record says the ACP 'read-only' mode actually maps to workspaceWrite/on-request. native-receipt.json covers model-free discovery only. There is no owned-edit, post-review integration, recovery or matched-comparison evidence. candidate-quality-review.json also records disposition 'conditional' (line 85)."
+   "why_not_default": "Its native evidence is a historical native_model_e2e receipt at an older revision (42334f26d7025d905678f9075b079fc65f9beaf9; research-receipt.json lines 4 and 22). One embedded invoke_acp_agent research prompt completed. That was embedded tool invocation only (line 12), and the 'read-only' mode mapped to workspaceWrite with an on-request approval policy (line 13), so strict read-only enforcement was not established.\n\nNo full planner/UI, owned-edit worktree, failed-result retention or recovery was accepted. The current reviewed pin 656db1223dda8883a09e7fde23f89da3a1a7a7dc has source review only (catalogs/landscape/candidate-quality-review.json lines 81-142, disposition conditional at line 85)."
   },
   {
    "disposition": "conditional",
@@ -51,7 +62,7 @@
    "key": "c2",
    "name": "Deep Agents",
    "repository": "https://github.com/langchain-ai/deepagents",
-   "why_not_default": "Source review only, at c9926b1a. candidate-quality-review.json records disposition 'conditional' (line 147); this lane uses the same value. That review records no install, upstream test run, native model operation, matched quality comparison or recovery acceptance. docs/candidate-quality-review-20260921.md line 44 calls it a serious challenger, pending the same source-research task, permission boundaries, recovery and a full cost comparison. The condition cannot be met until it is executed against the frozen worker cases."
+   "why_not_default": "I keep the retained review's 'conditional' disposition (candidate-quality-review.json line 147); nothing I read contradicts it. The condition is unmet. The evidence is pinned source review only (c9926b1a96d204309d0b211701b288ce3bb4244b): 'no new install, upstream test execution, native model operation, matched answer-quality comparison or recovery acceptance', and measured cost is unknown (lines 143-198). docs/candidate-quality-review-20260921.md line 44 calls it a serious challenger, pending the same task, permission-boundary, recovery and cost comparison."
   },
   {
    "disposition": "conditional",
@@ -59,39 +70,36 @@
    "evidence_refs": [
     "catalogs/landscape/candidate-quality-review.json",
     "docs/candidate-quality-review-20260921.md",
-    "docs/foundation-closure-20260921.md",
-    "evidence/artifacts/catalog-quality-review-20260921/sources.json"
+    "docs/foundation-closure-20260921.md"
    ],
    "key": "c4",
    "name": "OpenHands SDK",
    "repository": "https://github.com/OpenHands/software-agent-sdk",
-   "why_not_default": "Source review only. candidate-quality-review.json records disposition 'conditional' (line 203) for its review at 9bc452eb. Installation, native-account compatibility, interruption/recovery and a matched cost comparison are open. docs/foundation-closure-20260921.md line 86 separately pins version 1.49.2 at tree 856d99d4 and makes it conditional on needing remote or container workers; installing it alone does not improve local review. The two reviewed revisions are not reconciled, and neither was executed."
+   "why_not_default": "The retained review (candidate-quality-review.json line 203) and docs/foundation-closure-20260921.md line 86 both mark it conditional for remote/container workers. I keep that disposition. The evidence is source review only (pin 9bc452ebf6b0093c531f25394c5ba5e9817ff910), with no install, native-account or recovery acceptance (lines 199-256). Installing it does not improve local review."
   },
   {
    "disposition": "conditional",
    "evidence_class": "source_review",
    "evidence_refs": [
     "catalogs/landscape/candidate-quality-review.json",
-    "docs/candidate-quality-review-20260921.md",
-    "evidence/artifacts/catalog-quality-review-20260921/sources.json"
+    "docs/candidate-quality-review-20260921.md"
    ],
    "key": "c9",
    "name": "OpenHands Agent Canvas",
    "repository": "https://github.com/OpenHands/OpenHands",
-   "why_not_default": "Source review only, at 2f8539de. candidate-quality-review.json records disposition 'conditional' (line 261). It is a possible host for the existing native Claude and Codex workers, not a replacement for them. Hosting, account boundaries, persistence and migration are unqualified (docs/candidate-quality-review-20260921.md line 46)."
+   "why_not_default": "The retained review marks it conditional (candidate-quality-review.json line 261) as a prospective host for existing native Claude/Codex ACP workers, not a replacement worker. 'Its hosting, account boundaries, persistence and migration remain unqualified here' (lines 257-314). Nothing was executed."
   },
   {
    "disposition": "conditional",
    "evidence_class": "source_review",
    "evidence_refs": [
     "catalogs/landscape/candidate-quality-review.json",
-    "docs/candidate-quality-review-20260921.md",
-    "evidence/artifacts/catalog-quality-review-20260921/sources.json"
+    "docs/candidate-quality-review-20260921.md"
    ],
    "key": "c5",
    "name": "Microsoft Agent Framework",
    "repository": "https://github.com/microsoft/agent-framework",
-   "why_not_default": "Source review only, at 98a982a1. candidate-quality-review.json records disposition 'conditional' (line 319) and says it closes a source-review coverage gap, not a demonstrated runtime gap. A required application workflow and deployment must be qualified before it is added."
+   "why_not_default": "The retained review marks it conditional (candidate-quality-review.json line 319), but 'It closes a source-review coverage gap, not a demonstrated runtime gap' (lines 315-370). There was no install, test execution or recovery acceptance."
   },
   {
    "disposition": "conditional",
@@ -103,7 +111,7 @@
    "key": "c10",
    "name": "LangGraph",
    "repository": "https://github.com/langchain-ai/langgraph",
-   "why_not_default": "docs/foundation-closure-20260921.md line 85 defers LangGraph 1.2.11 unless an application needs explicit state or checkpoint semantics. docs/foundation-rd-readiness.md line 26 keeps it keep-but-compare. The packet's `agent-sdk-runtime-selection` entry lists it as an unqualified candidate. No execution evidence is retained."
+   "why_not_default": "'Deferred unless building an application needing these semantics' (docs/foundation-closure-20260921.md line 85). It stays keep-but-compare until a concrete application or a durable cross-host requirement exceeds the native path (docs/foundation-rd-readiness.md line 26). Only version metadata was reviewed; nothing was executed."
   },
   {
    "disposition": "out_of_scope",
@@ -116,7 +124,7 @@
    "key": "c1",
    "name": "Temporal",
    "repository": "https://github.com/temporalio/temporal",
-   "why_not_default": "Not adopted, and this layer does not currently require cross-host durable ownership. catalogs/us-equities/hosting-source-review.json lines 48-64 records the Temporal server at v1.32.0 with decision 'defer_new_service'. It notes that a production service adds persistence/visibility databases, schema upgrades, payload encryption, auth and archival, and that native start-dev is developer evidence only. That file says to use Temporal only if requirements outgrow existing Dagu, and to choose it or Restate rather than both. Its execution_status is research_only. docs/foundation-closure-20260921.md line 84 separately defers the Temporal Python SDK 1.33.0 until cross-host durable ownership or replay is required. docs/foundation-rd-readiness.md line 26 keeps it keep-but-compare."
+   "why_not_default": "Not adopted; the recorded decision is defer_new_service. A production service adds persistence/visibility databases, schema upgrades, auth and archival, and start-dev is developer evidence only (catalogs/us-equities/hosting-source-review.json lines 48-65). It targets cross-host durable workflows, which this layer does not currently require (docs/foundation-closure-20260921.md line 84)."
   }
  ],
  "catalog": "foundation",
@@ -124,82 +132,81 @@
  "lane": "claude",
  "layer_id": "workers",
  "limits": [
-  "Skill: typesafe-ai, preloaded in context from <host-path>/SKILL.md. The client reports the running model as claude-opus-5-5[1m]; the fixed packet value claude-opus-5/high was copied as required. No TypeSafe inference results were supplied. Every disposition here is my own source review. The packet decision texts and both refuter reports are provider-retained judgments; I checked them against the originals cited.",
-  "Revision round. Refuter findings accepted and corrected: the freeze path is now native-exact-read-freeze.json instead of freeze.json; the Codex SDK wording is cited to lines 77-78 and line 83; c11's review evidence is credited jointly to c8+c11; the overstated 'only adopted candidates with native execution' wording is removed; the mixed evidence classes of c12 and c7 are disclosed; c2, c4, c5 and c9 dispositions are aligned to 'conditional' as recorded in candidate-quality-review.json; the OpenHands SDK revision mismatch is noted; and c1 now uses its packet-designated hosting-source-review.json. I kept c11 as a winner, but only as the second-family native runtime and review arm, not as proven for owned-write delegation.",
-  "The packet's `agent-sdk-runtime-selection` next_gap cites the foundation-closure SDK table as lines 78-84. In the current file the table is at lines 80-86. This is recorded, not corrected, in the packet.",
-  "The raw.githubusercontent.com README URLs in the evidence_refs were not fetched, because reads were restricted to the local tree.",
-  "Large JSON and Markdown files were read in bounded sections through focused Grep/Read. The full bodies of decisions.json, candidate-quality-review.json, agents-operations.json and foundation-rd-20260921.json were not read.",
-  "No command was run, so the fixture paths were confirmed by opening or Glob but were not executed."
+  "I could not run commands. tests.test_native_worker_fixture and every receipt are judged from retained text; nothing was observed running now.",
+  "I did not open the external upstream READMEs for Deep Agents, DeerFlow, OpenHands SDK, Agent Canvas or Agent Framework. Their capabilities come only from the retained quality review and the SHA-256 source snapshot.",
+  "I read evidence/receipts/foundation-rd-20260921.json and catalogs/us-equities/agents-operations.json only through grep excerpts. I did not open the worktrunk-list or native-workflow-graceful-recovery receipts named by evidence_ids, or the wsl-native-tools receipt-wsl-hardened.json. Their numbers are copied from decisions.json and the summary receipt.",
+  "No TypeSafe inference results were supplied and no TypeSafe service call was made. The winners and dispositions are my own source review. The 'conditional' dispositions for c2, c3, c4, c5 and c9 keep the project's retained judgments in candidate-quality-review.json after my review found nothing contradicting them. They are not independent verification. Refuter findings were checked against the cited originals before revision.",
+  "Skill path: <host-path>/typesafe-ai (the user-installed copy was preloaded; the project .agents/skills/typesafe-ai/SKILL.md was not read). The environment reports the model as claude-opus-5-5[1m]; the fixed model field is copied from the packet instructions."
  ],
  "model": {
   "effort": "high",
   "name": "claude-opus-5-5"
  },
  "open_gaps": [
-  "Worker reliability is established on one same-host synthetic fixture only. Host or user-manager crash, independent-host recovery, remote provider cancellation, billing cessation and distributed exactly-once effects remain unqualified (worker-recovery/README.md lines 13-17).",
-  "The accepted trial did not exercise the exact rewritten-listing approval, so its success cannot be attributed solely to that rule (worker-recovery/README.md lines 225-227). Complete parent, child and retry usage is unknown (lines 232-235).",
-  "Native Workflow recovery usage views differ by 205,701 tokens, and complete accounting is unresolved (docs/foundation-convergence-20260921.md lines 95-97).",
-  "c11 has no delegated owned-write, crash-recovery or integration fixture of its own. Its review evidence is the joint c8+c11 companion path, and its review_status is not_individually_reviewed. The packet's `lean-workflow-child-routing` entry also says the Codex agent examples have no end-to-end run of their own.",
-  "c12's `native-workflow-graceful-recovery` is a local integration fixture, not an unchanged upstream product test.",
-  "Worktrunk's Rust suite is unrun (docs/full-stack-convergence.md line 130). docs/token-native-saturation.md line 121 lists worktrunk as 'optional' while the packet says confirmed_default. The `owned-worktrees` entry does not separate native Git worktree operations from Worktrunk-specific behavior. Crash cleanup is unproven (packet line 165).",
-  "Beads recovery is 'not_established' (decisions.json `dependency-task-queue`).",
-  "The OpenHands SDK has two unreconciled reviewed revisions: 9bc452eb in candidate-quality-review and 856d99d4 / 1.49.2 in foundation-closure line 86.",
-  "No head-to-head measured comparison exists between native workers and Deep Agents, OpenHands SDK/Agent Canvas, Microsoft Agent Framework, DeerFlow at 656db122, LangGraph or Temporal.",
-  "No worker evidence has been collected on another PC (a new WSL or macOS host)."
+  "No executed head-to-head comparison exists between native workers and any challenger. The 2026-09-21 refresh installed none of them (docs/candidate-quality-review-20260921.md lines 55-58).",
+  "No model-child run used a Worktrunk worktree. The fixture used Claude's native isolation: worktree (blueprints/convergence-practice/native-worker/README.md lines 10-11 and 42-44). Worktrunk's dirty-removal refusal was observed on 0.78.0, not the 0.79.0 pin (blueprints/convergence-practice/wsl-native-tools/receipt.json line 10). docs/token-native-saturation.md line 121 rates worktrunk optional, while decisions.json line 487 selects it as default.",
+  "Native Workflow hard crash, physical-host reboot, remote provider cancellation and external exactly-once effects are unqualified (docs/foundation-convergence-20260921.md lines 95-100).",
+  "Complete accounting is unresolved: recovery native cumulative usage exceeds deduplicated persisted usage by 205701 tokens (decisions.json line 2624).",
+  "Worker recovery covers one synthetic same-host task. The restricted Bash-only role is unqualified (decisions.json lines 2348-2350).",
+  "Worktree crash cleanup that deletes no unrelated or dirty state is not proven. Worktrees do not isolate permissions, accounts or shared services (decisions.json lines 500-507). The Worktrunk Rust suite was not run (docs/full-stack-convergence.md lines 128-130).",
+  "The review workflow's strict accepted status was never returned; the gate was fix-and-commit after independent review. The project-only settings profile is not qualified (decisions.json lines 2676 and 2679).",
+  "The owned-native-child oracle is author-written and visible to the worker, so it is not a held-out benchmark (blueprints/convergence-practice/native-worker/README.md lines 35-37).",
+  "Beads queue restart and recovery are not established (decisions.json lines 469-471). Companion same-workspace concurrent sessions and interrupted reviews are unqualified (recipes/claude-codex-foreground-review.md lines 48-50)."
  ],
  "overturn_protocol": {
   "arms": [
-   "claude-native-inherited-child (c12)",
-   "codex-native-worker (c11)",
-   "deepagents-application-worker (c2)",
-   "openhands-sdk-agent-server (c4)"
+   "c12 Claude native worker with native isolation: worktree (the executed baseline)",
+   "c12 Claude native worker in a c7 Worktrunk-created owned worktree (never run on this fixture)",
+   "c11 Codex native writing child in an owned worktree",
+   "c2 Deep Agents application-owned worker",
+   "c4 OpenHands SDK local or ephemeral workspace worker",
+   "c3 DeerFlow embedded ACP delegation at a current pin"
   ],
   "fixture_paths": [
-   "blueprints/convergence-practice/worker-recovery/native-exact-read-plan.json",
-   "blueprints/convergence-practice/worker-recovery/native-exact-read-freeze.json",
-   "blueprints/convergence-practice/worker-recovery/native-exact-read-receipt.json",
-   "blueprints/convergence-practice/native-worker/plan.json",
-   "blueprints/convergence-practice/native-worker/checks.json"
+   "blueprints/convergence-practice/native-worker/README.md",
+   "blueprints/convergence-practice/worker-recovery/README.md",
+   "tests/test_native_worker_fixture.py"
   ],
-  "metric": "Pass or fail on each frozen worker case: cancellation, same-identity continuation, parent-crash containment, an unchanged checkpoint with exactly one local effect, and owned-file repair verified by frozen tests. Independent audit agreement is also required, and complete parent, child and retry usage must be retained without summing overlapping views."
+  "metric": "Measure each arm on the same frozen seed and base commit:\n- pass or fail on the 12 unchanged visible tests and on the independent permutation oracle\n- whether the primary checkout stayed clean, with changes only in the owned worktree\n- cancellation, continuation under the same identity, and single-effect finalization after a parent crash\n- whether failed or null child results were kept and not rewritten\n- whether integration was gated by independent review\n- complete provider usage, including failed attempts and retries, reported per view rather than summed across overlapping views"
  },
- "overturn_when": "The verdict changes in three cases.\n\n1. A real task needs durable multi-host state, approval waits or effect recovery beyond what native workers provide. A challenger (Deep Agents, OpenHands SDK, LangGraph or Temporal) would then have to pass the same frozen cases as the native arms: cancellation, same-identity continuation, parent-crash containment, an unchanged checkpoint with exactly one effect, and owned-file repair verified by frozen tests. The frozen inputs are blueprints/convergence-practice/worker-recovery/native-exact-read-plan.json and native-exact-read-freeze.json, the receipt is native-exact-read-receipt.json, and the owned-file cases are blueprints/convergence-practice/native-worker/plan.json and checks.json. The challenger must match or beat the native Claude and Codex arms, with complete usage retained.\n\n2. c11 is demoted to a review-only role if a Codex native worker run on the native-worker fixture (plan.json/checks.json) fails the owned-file repair.\n\n3. The Worktrunk default changes if a crash-cleanup test removes unrelated or dirty state.",
- "packet_sha256": "3b4f634dd701876e4789d39d016e926bb8ba68efe71850a544dcd60f1781f657",
+ "overturn_when": "Overturn if a real task needs durable multi-host state, approval waits or effect recovery beyond native workers, and a challenger arm matches or beats the baseline on the same frozen tasks. The candidate challengers are Deep Agents, OpenHands SDK, DeerFlow at a current pin, and Codex-owned writing children.\n\nThe baseline arm is what the fixture actually ran: a Claude native worker (c12) with the role's native `isolation: worktree`. A Worktrunk-created (c7) worktree for the same child was never run on the fixture. It is a separate, unexecuted arm.\n\nThe frozen tasks are:\n- the bounded-repair fixture in blueprints/convergence-practice/native-worker/: all 12 unchanged tests pass, the independent permutation oracle passes, and the primary checkout stays clean;\n- the cancellation, crash-continuation and single-effect case in blueprints/convergence-practice/worker-recovery/.\n\nEvery arm must also keep failed or null child results and integrate only after independent review.\n\nThe artifact replay is `python3 -m unittest -v tests.test_native_worker_fixture`. It replays offline artifacts only and launches no model, so every arm needs its own native execution receipt.",
+ "packet_sha256": "340698d20de078aff95d362debc02c9cb9858540f4f90b5cb3e391afa58ed2dc",
  "schema_version": 1,
  "sources_read": [
-  "<host-path>/foundation__workers.json",
-  "docs/candidate-quality-review-20260921.md",
-  "docs/foundation-closure-20260921.md",
-  "docs/foundation-rd-readiness.md",
-  "docs/full-stack-convergence.md",
-  "docs/foundation-convergence-20260921.md",
-  "docs/token-native-saturation.md",
-  "catalogs/foundation/decisions.json",
-  "catalogs/landscape/candidate-quality-review.json",
-  "catalogs/us-equities/hosting-source-review.json",
-  "evidence/artifacts/catalog-quality-review-20260921/sources.json",
-  "catalogs/us-equities/agents-operations.json",
-  "blueprints/us-equities/deerflow/native-receipt.json",
-  "blueprints/us-equities/deerflow/research-receipt.json",
-  "evidence/receipts/foundation-rd-20260921.json",
-  "recipes/claude-codex-foreground-review.md",
-  "blueprints/convergence-practice/worker-recovery/README.md",
-  "blueprints/convergence-practice/worker-recovery/native-exact-read-freeze.json"
+  "<host-path>/foundation__workers.json (full in first round; lines 320-359 re-read)",
+  "catalogs/landscape/candidate-quality-review.json (lines 75-374; disposition grep re-run)",
+  "docs/candidate-quality-review-20260921.md (lines 1-122)",
+  "evidence/artifacts/catalog-quality-review-20260921/sources.json (lines 1-40 plus grep)",
+  "catalogs/foundation/decisions.json (lines 330-529 with 478-521 re-read, 2320-2399, 2596-2885)",
+  "docs/foundation-convergence-20260921.md (full)",
+  "docs/full-stack-convergence.md (lines 40-139 plus grep)",
+  "docs/token-native-saturation.md (lines 100-129; 115-124 re-read)",
+  "docs/foundation-rd-readiness.md (lines 1-70 plus grep)",
+  "docs/foundation-closure-20260921.md (lines 60-99)",
+  "recipes/claude-codex-foreground-review.md (full)",
+  "evidence/receipts/foundation-rd-20260921.json (grep of lines 3-30 only)",
+  "blueprints/us-equities/deerflow/native-receipt.json (full)",
+  "blueprints/us-equities/deerflow/research-receipt.json (full)",
+  "catalogs/us-equities/agents-operations.json (DeerFlow grep only)",
+  "catalogs/us-equities/hosting-source-review.json (lines 44-68)",
+  "blueprints/convergence-practice/worker-recovery/README.md (lines 1-60)",
+  "blueprints/convergence-practice/native-worker/README.md (lines 1-50, re-read)",
+  "blueprints/convergence-practice/wsl-native-tools/receipt.json (lines 1-30)",
+  "tests/test_native_worker_fixture.py (existence confirmed via Glob in first round; not opened)"
  ],
- "why_selected": "The packet requirement (line 574) is: 'Delegate bounded independent work, preserve owned edits and actual failed results, and integrate only after relevant review.' The winners split that requirement between them. No single candidate other than c12 covers all of it.\n\nc12 (Claude native workers) covers delegation, owned edits and retained failures, all from native execution:\n- decisions.json `owned-native-child`: one foreground native Opus child repaired its owned file; twelve frozen tests and independent exhaustive checks passed.\n- decisions.json `native-child-interruption-recovery`: covers cancellation, same-child continuation, a parent SIGKILL, systemd cgroup containment and finalization.\n- worker-recovery/README.md lines 3-17 and 210-235: the accepted inherited-role trial passed in 42.656 s with two CLI invocations, one child, three runs of that same child and one final effect. The 12 frozen sources were unchanged; its frozen inputs are native-exact-read-freeze.json.\n- Earlier failed and partial trials are kept (lines 19-26, 115-130, 192-208).\n- `native-workflow-graceful-recovery` (a reviewer stop kept a failed child with a null result) is a local integration fixture, not native product evidence (packet lines 499-500).\n- docs/foundation-convergence-20260921.md lines 49-54 records one native Workflow in which both workers returned.\n\nc7 (Worktrunk) covers the isolation that keeps owned edits intact:\n- decisions.json lines 478-499 (`owned-worktrees`): native create/list/remove passed, and removal of a dirty worktree was refused without loss.\n- docs/full-stack-convergence.md lines 124-130: Worktrunk 0.79.0's native old/new comparison confirmed the corrected child working directory, but its Rust suite is unrun.\n- The packet labels c7 evidence_kind 'measured_comparison' (line 170).\n\nc11 (Codex native workers) is the second-family native runtime. Its own evidence is narrower:\n- docs/full-stack-convergence.md lines 25-34: a five-step read-only native task with eleven tool results and no tool-result failures (Codex 0.155.1, 255,335 consumed tokens).\n- Packet line 352 (`native-session-resume`): Codex on Mac resumed the same session to finish an unchanged single checkpoint.\n- The returned cross-family review (recipes/claude-codex-foreground-review.md lines 20-29, Codex status 0) ran through the c8 companion path. It is joint c8+c11 review evidence, not c11 evidence alone.\n- c11 has no delegated owned-write, crash-recovery or integration fixture, and it is not_individually_reviewed (packet line 386).\n- docs/foundation-closure-20260921.md lines 77-78 keeps the existing Codex SDK integration accepted only within its recorded tests; line 83 requires a version change to be qualified.\n\nThis is a default based on native execution within the recorded scope, with the c12 graceful-recovery part being local integration. No head-to-head measured comparison against challengers was run.",
- "winner_evidence_class": "native_proven",
+ "why_selected": "This verdict comes from my own source review of retained receipts. No head-to-head comparison was run. The requirement has three parts: delegate bounded work, keep owned edits and failed results, and integrate only after review.\n\nc12 (Claude native workers) is the only adopted candidate with retained executed evidence of an owned writing child that also keeps its failed results. c7 (Worktrunk) was qualified separately as the owned-worktree lifecycle tool. It did not provide the isolation used by the delegated child.\n\n(1) Bounded delegation, native execution (c12). On Claude Code 2.1.278, one foreground native Opus child ran with the role's native `isolation: worktree`, not a Worktrunk worktree. It changed only planner.py in that worktree. The seed failed 8 of 12 visible tests. Afterwards all 12 unchanged tests passed. An independent oracle checked all 65,536 four-node graphs, and the primary checkout stayed clean (blueprints/convergence-practice/native-worker/README.md lines 3-26 and 42-44; catalogs/foundation/decisions.json owned-native-child, lines 338-376). The oracle was author-written and visible to the worker (README lines 35-37).\n\n(2) Failed results kept, local integration fixture (c12). native-workflow-graceful-recovery (decisions.json lines 2600-2650) records a selected reviewer stop that kept a failed child and a null result. Replay reused the completed implementation. A same-session resume integrated the repair and kept later user edits. 29 visible and seven hidden checks passed. The record calls this \"a local integration fixture, not an unchanged upstream product test\".\n\n(3) Interruption recovery, native execution on one synthetic same-host task (c12). The sequence was cancellation, continuation of the same child, parent SIGKILL, systemd cgroup cleanup and finalization of the same child. It produced one effect (decisions.json lines 2324-2383; blueprints/convergence-practice/worker-recovery/README.md lines 1-17).\n\n(4) Owned edits, native execution (c7), on a synthetic repository with no model child.\n- Worktrunk 0.78.0 created and listed owned worktrees, then removed them.\n- It refused a dirty removal without loss (blueprints/convergence-practice/wsl-native-tools/receipt.json line 10 and lines 27-30).\n- decisions.json owned-worktrees (lines 478-521) marks it selection \"default\", accepted_within_scope.\n- Only a native old/new comparison of the corrected child working directory covers the packet pin 0.79.0. Its Rust suite was not run (docs/full-stack-convergence.md lines 124-130).\n- docs/token-native-saturation.md line 121 rates worktrunk only \"optional | use, cleanup | supporting workflow / 0\".\n\n(5) Review before integration: decisions.json lines 2672 and 2676 record eight native review-changes runs. The gate was fix-and-commit after independent review; the strict accepted status was never returned. c8/c11 also have executed review evidence: a native Claude-to-Codex foreground review returned (recipes/claude-codex-foreground-review.md lines 20-29). That covers only the review part, not delegation of owned edits.\n\ndocs/foundation-convergence-20260921.md line 20 records the project's decision to retain this setup. That is a claim, not extra evidence. The weakest winner evidence class is local_integration, because (2) is only a local fixture.",
+ "winner_evidence_class": "local_integration",
  "winner_evidence_refs": [
   "catalogs/foundation/decisions.json",
+  "blueprints/convergence-practice/native-worker/README.md",
   "blueprints/convergence-practice/worker-recovery/README.md",
-  "blueprints/convergence-practice/worker-recovery/native-exact-read-freeze.json",
+  "blueprints/convergence-practice/wsl-native-tools/receipt.json",
   "docs/foundation-convergence-20260921.md",
   "docs/full-stack-convergence.md",
-  "docs/foundation-closure-20260921.md",
-  "recipes/claude-codex-foreground-review.md"
+  "docs/token-native-saturation.md"
  ],
  "winner_keys": [
   "c12",
-  "c7",
-  "c11"
+  "c7"
  ]
 }

@@ -1,0 +1,182 @@
+{
+ "alternatives": [
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/landscape/candidate-quality-review.json",
+    "docs/candidate-quality-review-20260921.md",
+    "evidence/artifacts/catalog-quality-review-20260921/sources.json"
+   ],
+   "key": "c2",
+   "name": "Deep Agents",
+   "repository": "https://github.com/langchain-ai/deepagents",
+   "why_not_default": "Retained source review identifies delegation and persistence capabilities, but no executed ownership, review integration, cancellation or recovery comparison establishes them on this requirement."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "local_integration",
+   "evidence_refs": [
+    "blueprints/us-equities/deerflow/native-receipt.json",
+    "blueprints/us-equities/deerflow/research-receipt.json",
+    "catalogs/us-equities/agents-operations.json",
+    "catalogs/landscape/candidate-quality-review.json"
+   ],
+   "key": "c3",
+   "name": "DeerFlow",
+   "repository": "https://github.com/bytedance/deer-flow",
+   "why_not_default": "The older pinned embedded ACP tool completed one native evidence-review task. It did not exercise owned edits, review-gated integration or durable recovery. Its read-only mode label mapped to workspaceWrite/on-request; the newer reviewed revision has no equivalent execution acceptance."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/landscape/candidate-quality-review.json",
+    "docs/candidate-quality-review-20260921.md",
+    "evidence/artifacts/catalog-quality-review-20260921/sources.json"
+   ],
+   "key": "c4",
+   "name": "OpenHands SDK",
+   "repository": "https://github.com/OpenHands/software-agent-sdk",
+   "why_not_default": "The retained review identifies conversations, events and isolated workspaces, but installation, native-account compatibility and interruption/recovery behavior have not been qualified against the accepted local worker tasks."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/landscape/candidate-quality-review.json",
+    "docs/candidate-quality-review-20260921.md",
+    "evidence/artifacts/catalog-quality-review-20260921/sources.json"
+   ],
+   "key": "c5",
+   "name": "Microsoft Agent Framework",
+   "repository": "https://github.com/microsoft/agent-framework",
+   "why_not_default": "Checkpoints and handoffs are supported by retained source review only. No executed application workflow establishes preservation of owned edits, failed results and independently reviewed integration."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "native_proven",
+   "evidence_refs": [
+    "catalogs/foundation/decisions.json"
+   ],
+   "key": "c6",
+   "name": "Beads",
+   "repository": "https://github.com/gastownhall/beads",
+   "why_not_default": "Native task claims and dependency transitions persisted in the selected fixture. This supports coordination when dependencies warrant a queue, but does not establish worker cancellation, review integration, distributed leases or restored task effects; recovery remains unestablished."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "local_integration",
+   "evidence_refs": [
+    "evidence/receipts/foundation-rd-20260921.json",
+    "recipes/claude-codex-foreground-review.md",
+    "evidence/artifacts/foundation-rd-20260921/native-review.json"
+   ],
+   "key": "c8",
+   "name": "Codex for Claude companion",
+   "repository": "https://github.com/openai/codex-plugin-cc",
+   "why_not_default": "The literal foreground plugin review succeeded in a dedicated checkout, extending the older backend-only evidence. It remains an optional review route: concurrent same-workspace sessions, interrupted reviews and Workflow background polling are unqualified, and its Codex usage/model/effort were not exposed."
+  },
+  {
+   "disposition": "unqualified",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "catalogs/landscape/candidate-quality-review.json",
+    "docs/candidate-quality-review-20260921.md",
+    "evidence/artifacts/catalog-quality-review-20260921/sources.json"
+   ],
+   "key": "c9",
+   "name": "OpenHands Agent Canvas",
+   "repository": "https://github.com/OpenHands/OpenHands",
+   "why_not_default": "The retained review identifies a host for existing native workers. Account boundaries, persistence, migration and recovery have no task-level execution acceptance here."
+  },
+  {
+   "disposition": "conditional",
+   "evidence_class": "source_review",
+   "evidence_refs": [
+    "docs/foundation-closure-20260921.md",
+    "docs/foundation-rd-readiness.md"
+   ],
+   "key": "c10",
+   "name": "LangGraph",
+   "repository": "https://github.com/langchain-ai/langgraph",
+   "why_not_default": "The referenced review establishes an application-state/checkpoint candidate, not an executed worker comparison. No demonstrated requirement for those additional runtime semantics outweighs the accepted bounded native path."
+  }
+ ],
+ "catalog": "foundation",
+ "challenger_preferred": null,
+ "lane": "codex",
+ "layer_id": "workers",
+ "limits": [
+  "The five pinned raw GitHub README references for Deep Agents, DeerFlow, OpenHands SDK, Microsoft Agent Framework and OpenHands Agent Canvas were attempted but returned cache-miss fetch failures. Their contents could not be independently reread; retained local source reviews and source metadata were inspected.",
+  "This verdict reviews retained evidence; no new native worker, framework installation or head-to-head execution was performed.",
+  "Private original streams and host state were not inspected. Public receipts and bounded documentation sections support the historical observations.",
+  "The precise underlying model identifier and configured reasoning effort were not exposed to this lane."
+ ],
+ "model": {
+  "effort": "high",
+  "name": "gpt-6-astra"
+ },
+ "open_gaps": [
+  "No matched execution across the framework candidates establishes superior task quality, ownership preservation, recovery or complete operating cost.",
+  "Claude's owned-child repair and graceful Workflow recovery are local integration qualifications. The separate systemd-assisted crash experiment uses a synthetic local effect and does not transfer its guarantees to Workflow.",
+  "Host reboot, independent-host restoration, remote provider cancellation, billing cessation and external exactly-once effects remain unqualified.",
+  "The accepted inherited-tool role is not an OS sandbox; restricted-role failures remain relevant.",
+  "Worktrunk isolates edits, not accounts, permissions or shared services. Its Rust suite was not run, and broader crash cleanup remains unqualified.",
+  "The writing comparison passed independent code checks but retained procedural failures in both arms; Workflow used more reported tokens. Recovery usage remains incompletely reconciled.",
+  "Codex's retained review and source-task evidence does not establish every Codex child configuration or the same recovery guarantees demonstrated for Claude."
+ ],
+ "overturn_protocol": {
+  "arms": [
+   "Accepted native Claude worker path with owned worktrees and independent review; retain Codex review as a separately identified operation.",
+   "One pinned alternative implementing the same frozen task, owned-path contract, failed-result retention and review gate under declared account and permission settings."
+  ],
+  "fixture_paths": [
+   "blueprints/convergence-practice/native-worker/README.md",
+   "blueprints/convergence-practice/worker-recovery/README.md"
+  ],
+  "metric": "Require unchanged task-oracle success, exact owned-path preservation, retained failed results, review before integration, checkpoint/effect correctness and owned-process cleanup. Compare complete elapsed time and non-overlapping usage only where coverage is established; promote for a demonstrated required capability or measured improvement without contract regression."
+ },
+ "overturn_when": "Execute matched native tasks using blueprints/convergence-practice/native-worker/README.md and the cancellation/continuation cases in blueprints/convergence-practice/worker-recovery/README.md. Change the selection if an alternative passes the same ownership, failure-retention, review and recovery contract while demonstrating a required capability or measured quality/cost improvement. Offline artifact replay alone cannot overturn it.",
+ "packet_sha256": "340698d20de078aff95d362debc02c9cb9858540f4f90b5cb3e391afa58ed2dc",
+ "schema_version": 1,
+ "sources_read": [
+  "<host-path>/foundation__workers.json",
+  "<host-path>/SKILL.md",
+  "catalogs/landscape/candidate-quality-review.json",
+  "docs/candidate-quality-review-20260921.md",
+  "evidence/artifacts/catalog-quality-review-20260921/sources.json",
+  "catalogs/us-equities/agents-operations.json",
+  "blueprints/us-equities/deerflow/native-receipt.json",
+  "blueprints/us-equities/deerflow/research-receipt.json",
+  "catalogs/foundation/decisions.json",
+  "docs/full-stack-convergence.md",
+  "docs/token-native-saturation.md",
+  "evidence/receipts/foundation-rd-20260921.json",
+  "recipes/claude-codex-foreground-review.md",
+  "docs/foundation-closure-20260921.md",
+  "docs/foundation-rd-readiness.md",
+  "docs/foundation-convergence-20260921.md",
+  "blueprints/convergence-practice/native-worker/README.md",
+  "blueprints/convergence-practice/worker-recovery/README.md",
+  "docs/native-workflow-writing-recovery-20260921.md",
+  "evidence/artifacts/foundation-rd-20260921/native-review.json"
+ ],
+ "why_selected": "Select complementary native execution and ownership capabilities. blueprints/convergence-practice/native-worker/README.md records an actual Claude child repairing only its owned planner.py, passing twelve unchanged tests and independent exhaustive checks while the primary checkout remained clean. docs/native-workflow-writing-recovery-20260921.md records native execution within a local integration fixture: a stopped reviewer remained failed with a null result, replay reused implementation, and reviewed integration preserved later user edits. Worktrunk's native create/select/list/remove behavior appears in docs/token-native-saturation.md; catalogs/foundation/decisions.json records dirty removal refused without loss, and docs/full-stack-convergence.md reports an old/new comparison correcting child working directory. Codex contributes retained native review: evidence/artifacts/foundation-rd-20260921/native-review.json records a successful three-file review through the optional companion with the review checkout unchanged. These observations support bounded delegation, owned edits and relevant review; they do not establish universal runtime superiority.",
+ "winner_evidence_class": "local_integration",
+ "winner_evidence_refs": [
+  "blueprints/convergence-practice/native-worker/README.md",
+  "docs/native-workflow-writing-recovery-20260921.md",
+  "catalogs/foundation/decisions.json",
+  "docs/token-native-saturation.md",
+  "docs/full-stack-convergence.md",
+  "docs/foundation-rd-readiness.md",
+  "docs/foundation-convergence-20260921.md",
+  "evidence/artifacts/foundation-rd-20260921/native-review.json"
+ ],
+ "winner_keys": [
+  "c12",
+  "c7",
+  "c11"
+ ]
+}

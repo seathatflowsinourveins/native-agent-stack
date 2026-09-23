@@ -1,0 +1,772 @@
+{
+ "catalog": "foundation",
+ "layer_id": "observation-inference",
+ "repository_root": "the repository root given in the task",
+ "return_A": {
+  "winner_keys": [
+   "c8",
+   "c9",
+   "c5"
+  ],
+  "winner_names": [
+   [
+    "OTel Collector Contrib",
+    "opentelemetry-collector-contrib"
+   ],
+   [
+    "Prometheus",
+    "prometheus"
+   ],
+   [
+    "Grafana",
+    "grafana"
+   ]
+  ],
+  "why_selected": "Select Collector Contrib, Prometheus and Grafana as complementary collection, metrics and presentation components. observability/receipt.json records actual native Codex/Claude task execution, collected usage, loopback service queries and rendered observation; its privacy check is explicitly a synthetic canary through native exporters. docs/native-telemetry-resolution.md records a later real Claude task whose four usage categories matched Prometheus and appeared in Grafana. docs/dashboard-rendered-acceptance.md records rendered panels checked against native commands and APIs, with project-local panels identified as integration work. These observations best support the required single privacy-filtered local pipeline. Supporting log/alert components remain conditional, and optional inference retains its separate workload gate.",
+  "winner_evidence_class": "native_proven",
+  "winner_evidence_refs": [
+   "observability/receipt.json",
+   "docs/native-telemetry-resolution.md",
+   "docs/dashboard-rendered-acceptance.md",
+   "docs/dashboard-gap-resolution.md",
+   "catalogs/us-equities/agents-operations.json"
+  ],
+  "alternatives": [
+   {
+    "disposition": "conditional",
+    "evidence_class": "native_proven",
+    "evidence_refs": [
+     "docs/dashboard-gap-resolution.md",
+     "docs/token-native-saturation.md"
+    ],
+    "key": "c1",
+    "name": "AgentsView",
+    "repository": "https://github.com/kenn-io/agentsview",
+    "why_not_default": "Native archive refresh retained 17 selected session identities, but observation is a scoped snapshot requiring explicit refresh; continuous service telemetry and automatic archive discovery are not established."
+   },
+   {
+    "disposition": "conditional",
+    "evidence_class": "synthetic",
+    "evidence_refs": [
+     "catalogs/foundation/decisions.json"
+    ],
+    "key": "c2",
+    "name": "otel-tui",
+    "repository": "https://github.com/ymtdzzz/otel-tui",
+    "why_not_default": "The bounded-history-and-traces decision records a synthetic loopback terminal trace. It does not establish production trace completeness or reconciled native usage."
+   },
+   {
+    "disposition": "conditional",
+    "evidence_class": "native_proven",
+    "evidence_refs": [
+     "docs/foundation-closure-20260921.md"
+    ],
+    "key": "c3",
+    "name": "Claude HUD",
+    "repository": "https://github.com/jarrodwatts/claude-hud",
+    "why_not_default": "Recorded native terminal observations establish rendered model, project, context and usage fields. This client-specific display does not provide cross-client service observation, and every statistic and billing reconciliation remain unqualified."
+   },
+   {
+    "disposition": "unqualified",
+    "evidence_class": "source_review",
+    "evidence_refs": [
+     "catalogs/us-equities/agents-operations.json"
+    ],
+    "key": "c4",
+    "name": "OpenLIT",
+    "repository": "https://github.com/openlit/openlit",
+    "why_not_default": "No installation, hook invocation or telemetry delivery was executed. Its additional transcript instrumentation requires privacy and counter reconciliation and could duplicate collection."
+   },
+   {
+    "disposition": "conditional",
+    "evidence_class": "native_proven",
+    "evidence_refs": [
+     "docs/dashboard-gap-resolution.md",
+     "catalogs/foundation/decisions.json",
+     "observability/receipt.json"
+    ],
+    "key": "c6",
+    "name": "ntfy",
+    "repository": "https://github.com/binwiederhier/ntfy",
+    "why_not_default": "Local firing/resolved feed delivery passed, but notification delivery complements collection and accounting. Corrected formatting has renderer replay evidence without a subsequent production webhook observation."
+   },
+   {
+    "disposition": "conditional",
+    "evidence_class": "native_proven",
+    "evidence_refs": [
+     "catalogs/foundation/decisions.json",
+     "catalogs/us-equities/agents-operations.json",
+     "observability/receipt.json"
+    ],
+    "key": "c7",
+    "name": "Alertmanager",
+    "repository": "https://github.com/prometheus/alertmanager",
+    "why_not_default": "The native local alert route was exercised using a deliberately unavailable loopback fixture. Routing complements the selected observation pipeline; external paging and unattended remediation were not accepted."
+   },
+   {
+    "disposition": "unqualified",
+    "evidence_class": "source_review",
+    "evidence_refs": [
+     "catalogs/us-equities/agents-operations.json"
+    ],
+    "key": "c10",
+    "name": "SGLang",
+    "repository": "https://github.com/sgl-project/sglang",
+    "why_not_default": "Serving commands are prospective. No matched task execution, target-hardware compatibility or measured prefix-cache benefit establishes a better optional route."
+   },
+   {
+    "disposition": "conditional",
+    "evidence_class": "native_proven",
+    "evidence_refs": [
+     "evidence/receipts/native-gpu-patch-20260920.json",
+     "blueprints/convergence-practice/gpu-inference/experiment.json"
+    ],
+    "key": "c11",
+    "name": "llama.cpp optional local inference",
+    "repository": "https://github.com/ggml-org/llama.cpp",
+    "why_not_default": "One pinned partial-offload repair passed independent review and 12 original tests, but generation took 179.191 seconds near its 180-second cap. There is no matched baseline model trial, representative workload qualification or recovery acceptance supporting a default inference route."
+   },
+   {
+    "disposition": "conditional",
+    "evidence_class": "native_proven",
+    "evidence_refs": [
+     "docs/native-telemetry-resolution.md",
+     "observability/receipt.json",
+     "observability/backends/receipt.json"
+    ],
+    "key": "c12",
+    "name": "Loki",
+    "repository": "https://github.com/grafana/loki",
+    "why_not_default": "Native sanitized-log ingestion and receipt queries are established, with bounded restart evidence. It remains a useful supporting sink, but does not replace metrics reconciliation or rendered observation; removed payloads cannot be reconstructed and no trace database was accepted."
+   },
+   {
+    "disposition": "unqualified",
+    "evidence_class": "source_review",
+    "evidence_refs": [
+     "catalogs/us-equities/agents-operations.json"
+    ],
+    "key": "c13",
+    "name": "Phoenix",
+    "repository": "https://github.com/Arize-ai/phoenix",
+    "why_not_default": "Although marked adopted in the packet, retained evidence is source review: launch is prospective, no application was instrumented and no judge-model calls ran. Trace capture privacy and actual integration remain unqualified."
+   }
+  ],
+  "challenger_preferred": null,
+  "overturn_when": "Change the verdict when an executed comparison using fixtures/observability-check.json and the identity/unknown-usage contracts in tests/test_observability.py shows a candidate closes a concrete observation gap while preserving privacy, usage fidelity and recovery without duplicate capture. Promote an optional inference route only after an executed comparison against blueprints/convergence-practice/gpu-inference/experiment.json demonstrates task correctness and acceptable measured latency/resources.",
+  "open_gaps": [
+   "Privacy acceptance covers tested fields and trusted instrumentation. Its direct canary was synthetic; arbitrary-content DLP is not established.",
+   "The native SDK turn histogram remained absent. Imported completed-receipt summaries are a separate accounting path, not fresh model execution.",
+   "Process startup events, missing historical attribution and cache-category semantics prevent exact whole-account billing or causal lifetime savings claims.",
+   "Traces are disabled. Phoenix and OpenLIT lack executed trace-quality and privacy comparisons against the current pipeline.",
+   "Single-host restart checks do not establish reboot persistence, high availability, full-disk recovery or extended-outage delivery.",
+   "Optional inference is qualified only for the recorded llama.cpp repair trial; broader workloads, concurrency and host portability remain open."
+  ]
+ },
+ "return_B": {
+  "winner_keys": [
+   "c8",
+   "c9",
+   "c12"
+  ],
+  "winner_names": [
+   [
+    "OTel Collector Contrib",
+    "opentelemetry-collector-contrib"
+   ],
+   [
+    "Prometheus",
+    "prometheus"
+   ],
+   [
+    "Loki",
+    "loki"
+   ]
+  ],
+  "why_selected": "The requirement asks for one privacy-filtered local pipeline that observes real native usage and service outcomes. On the retained evidence, three components do that work: the OTel Collector filters and delivers the data, Prometheus stores metrics and Loki stores logs. Grafana, the display layer, was a winner in the earlier round. It is now an alternative, because the evidence shows Loki carries both privacy verification and usage reconciliation, while Grafana's rows show only rendering and query agreement.\n\n(1) Native execution, Collector and Prometheus. In docs/native-telemetry-resolution.md lines 11-45, native Claude Code 2.1.278 exported OTLP over HTTP/protobuf to the loopback Collector with content logging disabled. The task returned 34 input, 16,402 cache-creation, 14,959 cache-read and 787 output tokens, and a native Prometheus query matched them exactly. The retained receipt, observability/backends/telemetry-resolution-20260921.json lines 46-58, records per_type_exact_match true. The query itself is a python3 urllib call at lines 207-211 of that receipt.\n\n(2) Native execution, Loki. observability/receipt.json lines 122-127 record a native Loki query returning total_tokens 80770. Lines 246-256 record the same 80770 after a Collector restart, and say the corrected Loki records held only allowed metadata and omitted bodies. Line 201 records Claude's collected_request_logs_and_metrics_match as true. Lines 296-301 record a passed restart persistence check across the backends.\n\n(3) Privacy filtering rests on weaker evidence. The privacy canary in observability/receipt.json lines 313-329 is labelled 'Independent synthetic review; not an inference task'. It recorded loki_records 1 and forbidden_marker_absent true. Line 24 limits the filters to tested fields and trusted instrumentation, not arbitrary-content DLP. Line 371 retains the earlier privacy failure and its correction. The winner set's evidence class is therefore synthetic, the weakest class among the winners, even though usage fidelity itself is native_proven.\n\n(4) Catalog records. catalogs/us-equities/agents-operations.json lines 859-882 record that the Collector supplies the privacy transform, the Prometheus exporter and delivery to Loki, and that traces are disabled. catalogs/foundation/decisions.json lines 2001-2075 record loopback-usage-observation as accepted_within_scope, selection 'conditional', with 'use' stages for all six components.\n\nThe optional llama.cpp route stays conditional on its own workload receipt. All of this is my own source review of dated retained evidence. No TypeSafe inference results were supplied, and I kept no provider judgments.",
+  "winner_evidence_class": "synthetic",
+  "winner_evidence_refs": [
+   "docs/native-telemetry-resolution.md",
+   "observability/backends/telemetry-resolution-20260921.json",
+   "observability/receipt.json",
+   "catalogs/us-equities/agents-operations.json",
+   "catalogs/foundation/decisions.json"
+  ],
+  "alternatives": [
+   {
+    "disposition": "overlap",
+    "evidence_class": "native_proven",
+    "evidence_refs": [
+     "docs/dashboard-rendered-acceptance.md",
+     "docs/dashboard-gap-resolution.md",
+     "docs/native-telemetry-resolution.md",
+     "observability/receipt.json"
+    ],
+    "key": "c5",
+    "name": "Grafana",
+    "repository": "https://github.com/grafana/grafana",
+    "why_not_default": "Grafana is the display layer over the winning stores; it neither filters nor stores the data. Its native evidence is panel and query agreement and rendering. Panel queries matched native memory, Qdrant and QMD results (dashboard-rendered-acceptance.md line 29). The Claude panel showed all four categories after the native task (native-telemetry-resolution.md line 45; dashboard-gap-resolution.md line 13). Its provisioned dashboard survived a restart (observability/receipt.json lines 296-301). None of its rows carries the privacy verification or an independent usage reconciliation, so with the winner set capped at three it ranks below Loki. It remains an accepted 'use' stage in the same pipeline (decisions.json lines 2057-2061)."
+   },
+   {
+    "disposition": "conditional",
+    "evidence_class": "native_proven",
+    "evidence_refs": [
+     "docs/dashboard-rendered-acceptance.md",
+     "observability/receipt.json",
+     "catalogs/foundation/decisions.json"
+    ],
+    "key": "c7",
+    "name": "Alertmanager",
+    "repository": "https://github.com/prometheus/alertmanager",
+    "why_not_default": "Alertmanager adds service-outcome alerting on top of the pipeline; it is not the usage-observation path. Native amtool alert query agreed with the UI on a FreeLLMAPI readiness warning (dashboard-rendered-acceptance.md line 31). The firing/resolved route used a dedicated loopback fixture, with external_delivery_tested and elapsed_latency_claimed both false (observability/receipt.json lines 303-311). Scheduled-service and reboot persistence are not qualified (decisions.json line 2036)."
+   },
+   {
+    "disposition": "conditional",
+    "evidence_class": "native_proven",
+    "evidence_refs": [
+     "docs/dashboard-rendered-acceptance.md",
+     "observability/receipt.json",
+     "docs/native-telemetry-resolution.md",
+     "observability/backends/telemetry-resolution-20260921.json"
+    ],
+    "key": "c6",
+    "name": "ntfy",
+    "repository": "https://github.com/binwiederhier/ntfy",
+    "why_not_default": "ntfy delivers notifications; it is not the observation pipeline. Two parts were observed natively: feed delivery (native subscribe showed 23 retained records, dashboard-rendered-acceptance.md line 32) and the Prometheus to Alertmanager to ntfy route (1 firing and 1 resolved notification from a loopback fixture, with no external delivery, observability/receipt.json lines 303-311). The template fix itself rests on two unchanged upstream tests plus a local-integration renderer replay. No post-deployment production webhook was observed (native-telemetry-resolution.md lines 86-98; telemetry-resolution-20260921.json line 76)."
+   },
+   {
+    "disposition": "conditional",
+    "evidence_class": "native_proven",
+    "evidence_refs": [
+     "evidence/receipts/native-gpu-patch-20260920.json"
+    ],
+    "key": "c11",
+    "name": "llama.cpp optional local inference",
+    "repository": "https://github.com/ggml-org/llama.cpp",
+    "why_not_default": "llama.cpp covers the requirement's optional model-route clause and is qualified only on its own workload. One pinned Qwen3.8-27B Q4_K_M partial-offload repair passed all 12 original tests on a WSL RTX4090. That is one fixture and one trial, and generation took 179.191 seconds against a 180-second cap. The receipt records no host recovery, concurrent serving or frontier comparison, so the route stays optional, not a default."
+   },
+   {
+    "disposition": "conditional",
+    "evidence_class": "native_proven",
+    "evidence_refs": [
+     "docs/dashboard-gap-resolution.md",
+     "docs/dashboard-rendered-acceptance.md",
+     "docs/token-native-saturation.md"
+    ],
+    "key": "c1",
+    "name": "AgentsView",
+    "repository": "https://github.com/kenn-io/agentsview",
+    "why_not_default": "AgentsView inspects session history; it is not the usage pipeline. One scoped archive refresh was observed (messages 3,193 to 3,697, 17 identities retained), but the result is a snapshot, not continuous ingestion (dashboard-gap-resolution.md line 11). Automatic archive discovery is unestablished (token-native-saturation.md lines 26-27), and the 0.43.0 pin is behind upstream v0.44.0."
+   },
+   {
+    "disposition": "conditional",
+    "evidence_class": "synthetic",
+    "evidence_refs": [
+     "catalogs/foundation/decisions.json",
+     "catalogs/us-equities/agents-operations.json"
+    ],
+    "key": "c2",
+    "name": "otel-tui",
+    "repository": "https://github.com/ymtdzzz/otel-tui",
+    "why_not_default": "otel-tui was accepted only on a synthetic loopback terminal trace (decisions.json lines 2097-2100). The adopted pipeline has traces disabled (agents-operations.json line 882), so otel-tui has no production trace role. Its only packet ref is the decision record, not an execution receipt."
+   },
+   {
+    "disposition": "overlap",
+    "evidence_class": "native_proven",
+    "evidence_refs": [
+     "docs/foundation-closure-20260921.md",
+     "catalogs/foundation/decisions.json"
+    ],
+    "key": "c3",
+    "name": "Claude HUD",
+    "repository": "https://github.com/jarrodwatts/claude-hud",
+    "why_not_default": "Claude HUD is an optional statusline display; it is not the observation pipeline. Native rendering of model, project, context and usage fields was observed in Claude 2.1.278 (foundation-closure-20260921.md lines 109-132). The packet's own limitation says this does not certify every HUD statistic, exact billing reconciliation or automatic compaction."
+   },
+   {
+    "disposition": "selected",
+    "evidence_class": "native_proven",
+    "evidence_refs": [
+     "observability/receipt.json",
+     "catalogs/foundation/decisions.json",
+     "docs/native-telemetry-resolution.md"
+    ],
+    "key": "c12",
+    "name": "Loki (packet evidence_ref correction)",
+    "repository": "https://github.com/grafana/loki",
+    "why_not_default": "Loki is a winner. This row only corrects its packet evidence. Loki's only packet evidence_ref, docs/native-telemetry-resolution.md, never mentions Loki. Loki's support comes from observability/receipt.json (native query at lines 122-127, restart at lines 246-256, synthetic privacy canary at lines 313-329) and from decisions.json lines 2053-2056."
+   },
+   {
+    "disposition": "unqualified",
+    "evidence_class": "source_review",
+    "evidence_refs": [
+     "catalogs/us-equities/agents-operations.json"
+    ],
+    "key": "c13",
+    "name": "Phoenix",
+    "repository": "https://github.com/Arize-ai/phoenix",
+    "why_not_default": "The packet marks Phoenix adopted, but its only evidence is a source review. The catalog entry is 'conditional', with evidence_level source_review. Its launch commands are prospective and were not executed, no app was instrumented, and the license is ELv2 (agents-operations.json lines 1246-1268). Phoenix would itself be the local trace store and UI. It needs OTLP/OpenInference instrumentation and a retention policy (lines 1262-1265). The current Collector has traces disabled (line 882), so Phoenix would open a second, trace-level capture path, and auto-instrumentation can capture prompt and tool contents (line 1269)."
+   },
+   {
+    "disposition": "unqualified",
+    "evidence_class": "source_review",
+    "evidence_refs": [
+     "catalogs/us-equities/agents-operations.json"
+    ],
+    "key": "c4",
+    "name": "OpenLIT",
+    "repository": "https://github.com/openlit/openlit",
+    "why_not_default": "OpenLIT is not adopted and was reviewed only from source. No install, hook invocation, inference or telemetry delivery was executed. Its hook and trace collector would duplicate collection and widen transcript and prompt capture (agents-operations.json lines 1147-1186). That conflicts with keeping one privacy-filtered pipeline."
+   }
+  ],
+  "challenger_preferred": null,
+  "overturn_when": "Change the verdict if a fresh native reconciliation no longer matches.\n\n1. Run a fresh native Claude task. Either use the claude -p invocation in docs/native-telemetry-resolution.md lines 22-27, or have the task read fixtures/observability-check.json, the prompt fixture of the native client acceptance recorded in observability/receipt.json lines 164 and 236-244. Then run the retained Prometheus query from observability/backends/telemetry-resolution-20260921.json lines 207-211: python3 -c \"import urllib.request,urllib.parse,sys;sys.stdout.buffer.write(urllib.request.urlopen(\\\"http://127.0.0.1:19090/api/v1/query?\\\"+urllib.parse.urlencode({\\\"query\\\":\\\"sum by (type) (ecosystem_claude_code_token_usage_tokens_total)\\\"}),timeout=20).read())\". The verdict changes if the input, cache-creation, cache-read and output values differ from the task's returned usage.\n\n2. The verdict also changes if the native Loki receipt query (observability/receipt.json lines 122-127) no longer returns the per-receipt totals that were written.\n\n3. Recovery: re-run python3 observability/backends/check_persistence.py with a fresh --evidence-dir and the local Grafana credential file. The verdict changes if its prometheus, loki or grafana checks fail.\n\n4. A new privacy canary that shows a content field passing the Collector transform also changes the verdict. The repository has no script for this; the receipt records only a reviewer-run canary and a historical query.\n\n5. If a required trace or evaluation question cannot be answered by this pipeline, OpenLIT or Phoenix would have to pass the same fidelity, privacy and recovery comparison on the same native task without duplicate capture.\n\nFor the optional inference route, re-run python3 blueprints/convergence-practice/gpu-inference/qualify.py on a newly frozen representative workload.\n\npython3 -m unittest tests.test_observability is only an offline regression. It covers process identity, write_observation redaction and atomic no-overwrite writes, the receipt_id query text in the Grafana dashboard panel, and refusal to replay persistence. It does not check live reconciliation or the Collector's privacy.",
+  "open_gaps": [
+   "The privacy-filter evidence is one synthetic canary reviewed by a reviewer (observability/receipt.json lines 313-329). The repository has no script that re-runs it, and it covers only tested fields and trusted instrumentation, not arbitrary-content DLP (line 24).",
+   "No script or test in the repository re-runs the native usage reconciliation end to end. It exists only as retained commands in docs/native-telemetry-resolution.md lines 22-30 and observability/backends/telemetry-resolution-20260921.json lines 207-211 and 269-306.",
+   "Scheduled-service and reboot persistence are not qualified (decisions.json line 2036). check_persistence.py covers one user-service restart only.",
+   "Missing task attribution: the Prometheus counters before the task already held another Claude process's usage, so only the after-snapshot match per category is established (native-telemetry-resolution.md lines 47-49; telemetry-resolution-20260921.json line 344).",
+   "The SDK receipt lane has no automatic spool expiry and no loss/recovery acceptance under a full disk or an extended outage (observability/receipt.json line 258).",
+   "Traces are disabled and no trace database is deployed, so the pipeline answers no trace questions (agents-operations.json line 882).",
+   "No latency or elapsed-time measurement is claimed for notifications (observability/receipt.json line 311).",
+   "The ntfy template's formatting on the next real production notification has not been observed.",
+   "The llama.cpp route is qualified on one fixture and one trial only; it has no host portability, concurrency or recovery evidence.",
+   "Nothing here establishes lifetime token savings or a universal SOTA ranking."
+  ]
+ },
+ "packet": {
+  "title": "Observation and optional inference",
+  "requirement": "Observe real native usage/service outcomes through one privacy-filtered local pipeline and qualify any optional model route on its actual workload.",
+  "limitations": [
+   "Source time differs from scrape time; usage differs from savings. The current interactive HUD evidence does not certify every statistic or automatic compaction.",
+   "Local generation and gateway acceptance are route/workload-specific; catalog presence is not a passed exact-model task."
+  ],
+  "candidates": [
+   {
+    "adopted": true,
+    "component_id": "agentsview",
+    "decisions": [
+     {
+      "capability": "Inspect selected native session history and local traces",
+      "evidence_scope": "One scoped session archive query and a synthetic loopback terminal trace were accepted; current observations retain their separate bounds.",
+      "id": "bounded-history-and-traces",
+      "limitations": [
+       "Archive retrieval requires explicit scope/refresh and is not every native transcript or durable memory.",
+       "Synthetic trace acceptance is not production tracing completeness."
+      ],
+      "next_gap": "Test changed archive/session scope and missing attribution before drawing broader conclusions."
+     }
+    ],
+    "evidence_kind": "native_execution",
+    "evidence_refs": [
+     "docs/dashboard-gap-resolution.md",
+     "docs/token-native-saturation.md"
+    ],
+    "key": "c1",
+    "name": "AgentsView",
+    "pin": "0.43.0",
+    "pin_behind_upstream": true,
+    "recipe_ref": "recipes/README.md",
+    "repository": "https://github.com/kenn-io/agentsview",
+    "review_status": null,
+    "upstream": {
+     "archived": false,
+     "latest": "v0.44.0",
+     "license": "MIT",
+     "prerelease": false,
+     "pushed_at": "2026-09-22",
+     "released_at": "2026-09-21",
+     "renamed_to": null,
+     "stars": 5965
+    }
+   },
+   {
+    "adopted": true,
+    "component_id": "otel-tui",
+    "decisions": [
+     {
+      "capability": "Inspect selected native session history and local traces",
+      "evidence_scope": "One scoped session archive query and a synthetic loopback terminal trace were accepted; current observations retain their separate bounds.",
+      "id": "bounded-history-and-traces",
+      "limitations": [
+       "Archive retrieval requires explicit scope/refresh and is not every native transcript or durable memory.",
+       "Synthetic trace acceptance is not production tracing completeness."
+      ],
+      "next_gap": "Test changed archive/session scope and missing attribution before drawing broader conclusions."
+     }
+    ],
+    "evidence_kind": "native_execution",
+    "evidence_refs": [
+     "catalogs/foundation/decisions.json"
+    ],
+    "key": "c2",
+    "name": "otel-tui",
+    "pin": "0.7.5",
+    "pin_behind_upstream": false,
+    "recipe_ref": "recipes/README.md",
+    "repository": "https://github.com/ymtdzzz/otel-tui",
+    "review_status": null,
+    "upstream": {
+     "archived": false,
+     "latest": "v0.7.5",
+     "license": "Apache-2.0",
+     "prerelease": false,
+     "pushed_at": "2026-09-21",
+     "released_at": "2026-09-12",
+     "renamed_to": null,
+     "stars": 1088
+    }
+   },
+   {
+    "adopted": true,
+    "component_id": "claude-hud",
+    "decisions": [
+     {
+      "capability": "Render the configured HUD in a native Claude terminal",
+      "evidence_scope": "The retained foundation-closure native PTY observations show configured claude-hud 0.8.0 in Claude 2.1.278 before and after a bounded review, including model, project, context and usage fields. This catalog reconciliation reuses those observations without a new terminal or model run. Earlier onboarding and effort-overlay attempts remain retained.",
+      "id": "interactive-hud-boundary",
+      "limitations": [
+       "Evidence for the visible statusline is the original coordinator's screen observations and independent installed-plugin audit, separate from the native context export.",
+       "Not every HUD statistic, exact billing reconciliation, Windows Terminal dropdown interaction, automatic compaction or new-host activation was qualified."
+      ],
+      "next_gap": "Verify target-host activation or a specific untested statistic only when that capability is needed; reuse the accepted recorded rendering scope."
+     }
+    ],
+    "evidence_kind": "native_execution",
+    "evidence_refs": [
+     "docs/foundation-closure-20260921.md"
+    ],
+    "key": "c3",
+    "name": "Claude HUD",
+    "pin": "0.8.0",
+    "pin_behind_upstream": false,
+    "recipe_ref": "recipes/README.md",
+    "repository": "https://github.com/jarrodwatts/claude-hud",
+    "review_status": null,
+    "upstream": {
+     "archived": false,
+     "latest": "v0.8.0",
+     "license": "MIT",
+     "prerelease": false,
+     "pushed_at": "2026-09-19",
+     "released_at": "2026-08-18",
+     "renamed_to": null,
+     "stars": 28103
+    }
+   },
+   {
+    "adopted": false,
+    "component_id": null,
+    "decisions": [],
+    "evidence_kind": "source_review",
+    "evidence_refs": [
+     "catalogs/us-equities/agents-operations.json"
+    ],
+    "key": "c4",
+    "name": "OpenLIT",
+    "pin": null,
+    "pin_behind_upstream": null,
+    "recipe_ref": "catalogs/us-equities/agents-operations.json",
+    "repository": "https://github.com/openlit/openlit",
+    "review_status": null,
+    "upstream": null
+   },
+   {
+    "adopted": true,
+    "component_id": "grafana",
+    "decisions": [
+     {
+      "capability": "Observe bounded native outcomes and reconcile usage categories",
+      "evidence_scope": "Native tasks, loopback queries/dashboard and local firing/resolved notifications passed; later writer-scoped results reconcile selected native usage.",
+      "id": "loopback-usage-observation",
+      "limitations": [
+       "Liveness, checkpoint age, source attribution and consumed tokens are different observations.",
+       "Extra startup events and unlabelled historical invocations retain attribution limits; no exact causal lifetime savings are inferred."
+      ],
+      "next_gap": "Qualify scheduled-service/reboot persistence and missing task attribution only in the needed scope."
+     }
+    ],
+    "evidence_kind": "native_execution",
+    "evidence_refs": [
+     "docs/dashboard-rendered-acceptance.md",
+     "docs/dashboard-gap-resolution.md"
+    ],
+    "key": "c5",
+    "name": "Grafana",
+    "pin": "13.2.2",
+    "pin_behind_upstream": false,
+    "recipe_ref": "observability/backends/README.md",
+    "repository": "https://github.com/grafana/grafana",
+    "review_status": null,
+    "upstream": {
+     "archived": false,
+     "latest": "v13.2.2",
+     "license": "AGPL-3.0",
+     "prerelease": false,
+     "pushed_at": "2026-09-22",
+     "released_at": "2026-09-15",
+     "renamed_to": null,
+     "stars": 76856
+    }
+   },
+   {
+    "adopted": true,
+    "component_id": "ntfy",
+    "decisions": [
+     {
+      "capability": "Observe bounded native outcomes and reconcile usage categories",
+      "evidence_scope": "Native tasks, loopback queries/dashboard and local firing/resolved notifications passed; later writer-scoped results reconcile selected native usage.",
+      "id": "loopback-usage-observation",
+      "limitations": [
+       "Liveness, checkpoint age, source attribution and consumed tokens are different observations.",
+       "Extra startup events and unlabelled historical invocations retain attribution limits; no exact causal lifetime savings are inferred."
+      ],
+      "next_gap": "Qualify scheduled-service/reboot persistence and missing task attribution only in the needed scope."
+     }
+    ],
+    "evidence_kind": "native_execution",
+    "evidence_refs": [
+     "docs/dashboard-gap-resolution.md",
+     "catalogs/foundation/decisions.json"
+    ],
+    "key": "c6",
+    "name": "ntfy",
+    "pin": "2.28.0",
+    "pin_behind_upstream": false,
+    "recipe_ref": "observability/backends/README.md",
+    "repository": "https://github.com/binwiederhier/ntfy",
+    "review_status": null,
+    "upstream": {
+     "archived": false,
+     "latest": "v2.28.0",
+     "license": "Apache-2.0",
+     "prerelease": false,
+     "pushed_at": "2026-09-15",
+     "released_at": "2026-08-27",
+     "renamed_to": null,
+     "stars": 34370
+    }
+   },
+   {
+    "adopted": true,
+    "component_id": "alertmanager",
+    "decisions": [
+     {
+      "capability": "Observe bounded native outcomes and reconcile usage categories",
+      "evidence_scope": "Native tasks, loopback queries/dashboard and local firing/resolved notifications passed; later writer-scoped results reconcile selected native usage.",
+      "id": "loopback-usage-observation",
+      "limitations": [
+       "Liveness, checkpoint age, source attribution and consumed tokens are different observations.",
+       "Extra startup events and unlabelled historical invocations retain attribution limits; no exact causal lifetime savings are inferred."
+      ],
+      "next_gap": "Qualify scheduled-service/reboot persistence and missing task attribution only in the needed scope."
+     }
+    ],
+    "evidence_kind": "native_execution",
+    "evidence_refs": [
+     "catalogs/foundation/decisions.json",
+     "catalogs/us-equities/agents-operations.json"
+    ],
+    "key": "c7",
+    "name": "Alertmanager",
+    "pin": "0.34.1",
+    "pin_behind_upstream": false,
+    "recipe_ref": "observability/backends/README.md",
+    "repository": "https://github.com/prometheus/alertmanager",
+    "review_status": null,
+    "upstream": {
+     "archived": false,
+     "latest": "v0.34.1",
+     "license": "Apache-2.0",
+     "prerelease": false,
+     "pushed_at": "2026-09-22",
+     "released_at": "2026-09-17",
+     "renamed_to": null,
+     "stars": 8626
+    }
+   },
+   {
+    "adopted": true,
+    "component_id": "opentelemetry-collector-contrib",
+    "decisions": [
+     {
+      "capability": "Observe bounded native outcomes and reconcile usage categories",
+      "evidence_scope": "Native tasks, loopback queries/dashboard and local firing/resolved notifications passed; later writer-scoped results reconcile selected native usage.",
+      "id": "loopback-usage-observation",
+      "limitations": [
+       "Liveness, checkpoint age, source attribution and consumed tokens are different observations.",
+       "Extra startup events and unlabelled historical invocations retain attribution limits; no exact causal lifetime savings are inferred."
+      ],
+      "next_gap": "Qualify scheduled-service/reboot persistence and missing task attribution only in the needed scope."
+     }
+    ],
+    "evidence_kind": "native_execution",
+    "evidence_refs": [
+     "docs/native-telemetry-resolution.md",
+     "catalogs/us-equities/agents-operations.json"
+    ],
+    "key": "c8",
+    "name": "OTel Collector Contrib",
+    "pin": "0.161.0",
+    "pin_behind_upstream": false,
+    "recipe_ref": "observability/README.md",
+    "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+    "review_status": null,
+    "upstream": {
+     "archived": false,
+     "latest": "v0.161.0",
+     "license": "Apache-2.0",
+     "prerelease": false,
+     "pushed_at": "2026-09-22",
+     "released_at": "2026-09-15",
+     "renamed_to": null,
+     "stars": 4947
+    }
+   },
+   {
+    "adopted": true,
+    "component_id": "prometheus",
+    "decisions": [
+     {
+      "capability": "Observe bounded native outcomes and reconcile usage categories",
+      "evidence_scope": "Native tasks, loopback queries/dashboard and local firing/resolved notifications passed; later writer-scoped results reconcile selected native usage.",
+      "id": "loopback-usage-observation",
+      "limitations": [
+       "Liveness, checkpoint age, source attribution and consumed tokens are different observations.",
+       "Extra startup events and unlabelled historical invocations retain attribution limits; no exact causal lifetime savings are inferred."
+      ],
+      "next_gap": "Qualify scheduled-service/reboot persistence and missing task attribution only in the needed scope."
+     }
+    ],
+    "evidence_kind": "native_execution",
+    "evidence_refs": [
+     "docs/native-telemetry-resolution.md",
+     "catalogs/foundation/decisions.json"
+    ],
+    "key": "c9",
+    "name": "Prometheus",
+    "pin": "3.14.0",
+    "pin_behind_upstream": false,
+    "recipe_ref": "observability/backends/README.md",
+    "repository": "https://github.com/prometheus/prometheus",
+    "review_status": null,
+    "upstream": {
+     "archived": false,
+     "latest": "v3.14.0",
+     "license": "Apache-2.0",
+     "prerelease": false,
+     "pushed_at": "2026-09-22",
+     "released_at": "2026-08-18",
+     "renamed_to": null,
+     "stars": 66176
+    }
+   },
+   {
+    "adopted": false,
+    "component_id": null,
+    "decisions": [],
+    "evidence_kind": "source_review",
+    "evidence_refs": [
+     "catalogs/us-equities/agents-operations.json"
+    ],
+    "key": "c10",
+    "name": "SGLang",
+    "pin": null,
+    "pin_behind_upstream": null,
+    "recipe_ref": "catalogs/us-equities/agents-operations.json",
+    "repository": "https://github.com/sgl-project/sglang",
+    "review_status": null,
+    "upstream": null
+   },
+   {
+    "adopted": true,
+    "component_id": "llama-cpp",
+    "decisions": [
+     {
+      "capability": "Trial local text generation against a frozen repair oracle",
+      "evidence_scope": "One pinned partial-offload local CUDA repair passed independent source review and twelve original tests on WSL RTX4090.",
+      "id": "local-generation-trial",
+      "limitations": [
+       "Single-task trial, not general frontier parity, host portability or causal token savings.",
+       "Memory reserve, model/hash provenance and missing exact layer telemetry remain in the receipt."
+      ],
+      "next_gap": "Freeze a representative next workload and resource acceptance before expanding use."
+     }
+    ],
+    "evidence_kind": "native_execution",
+    "evidence_refs": [
+     "evidence/receipts/native-gpu-patch-20260920.json"
+    ],
+    "key": "c11",
+    "name": "llama.cpp optional local inference",
+    "pin": "b11057 (0.4.1-dev)",
+    "pin_behind_upstream": false,
+    "recipe_ref": "blueprints/convergence-practice/gpu-inference/README.md",
+    "repository": "https://github.com/ggml-org/llama.cpp",
+    "review_status": null,
+    "upstream": {
+     "archived": false,
+     "latest": "v0.4.1",
+     "license": "MIT",
+     "prerelease": false,
+     "pushed_at": "2026-09-22",
+     "released_at": "2026-09-14",
+     "renamed_to": null,
+     "stars": 129188
+    }
+   },
+   {
+    "adopted": true,
+    "component_id": "loki",
+    "decisions": [
+     {
+      "capability": "Observe bounded native outcomes and reconcile usage categories",
+      "evidence_scope": "Native tasks, loopback queries/dashboard and local firing/resolved notifications passed; later writer-scoped results reconcile selected native usage.",
+      "id": "loopback-usage-observation",
+      "limitations": [
+       "Liveness, checkpoint age, source attribution and consumed tokens are different observations.",
+       "Extra startup events and unlabelled historical invocations retain attribution limits; no exact causal lifetime savings are inferred."
+      ],
+      "next_gap": "Qualify scheduled-service/reboot persistence and missing task attribution only in the needed scope."
+     }
+    ],
+    "evidence_kind": "native_execution",
+    "evidence_refs": [
+     "docs/native-telemetry-resolution.md"
+    ],
+    "key": "c12",
+    "name": "Loki",
+    "pin": "3.7.8",
+    "pin_behind_upstream": false,
+    "recipe_ref": "observability/backends/README.md",
+    "repository": "https://github.com/grafana/loki",
+    "review_status": null,
+    "upstream": {
+     "archived": false,
+     "latest": "v3.7.8",
+     "license": "AGPL-3.0",
+     "prerelease": false,
+     "pushed_at": "2026-09-22",
+     "released_at": "2026-09-17",
+     "renamed_to": null,
+     "stars": 28932
+    }
+   },
+   {
+    "adopted": true,
+    "component_id": null,
+    "decisions": [],
+    "evidence_kind": "source_review",
+    "evidence_refs": [
+     "catalogs/us-equities/agents-operations.json"
+    ],
+    "key": "c13",
+    "name": "Phoenix",
+    "pin": null,
+    "pin_behind_upstream": null,
+    "recipe_ref": "catalogs/us-equities/agents-operations.json",
+    "repository": "https://github.com/Arize-ai/phoenix",
+    "review_status": null,
+    "upstream": null
+   }
+  ]
+ }
+}

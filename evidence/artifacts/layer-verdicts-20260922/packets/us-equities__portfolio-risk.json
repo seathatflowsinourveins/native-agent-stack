@@ -1,0 +1,196 @@
+{
+ "candidate_source": "sota_manifest_layer_entries",
+ "candidates": [
+  {
+   "adopted": true,
+   "card_limitations": [
+    "Forward-aligned return convention differs from many reports; misalignment can leak future information.",
+    "When cash returns are absent, simulator may download risk-free data; explicit final cash column avoids that path.",
+    "Research simulator is not an order gateway, and optimizer feasibility is not execution feasibility.",
+    "Prospective workflow is unexecuted; source review is not installation, broker connectivity, or performance acceptance."
+   ],
+   "component_id": "cvxportfolio",
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "https://github.com/cvxgrp/cvxportfolio/blob/1.5.1/README.rst"
+   ],
+   "key": "c1",
+   "name": "cvxportfolio",
+   "pin": "1.5.1",
+   "pin_behind_upstream": false,
+   "recipe_ref": null,
+   "repository": "https://github.com/cvxgrp/cvxportfolio",
+   "review_status": null,
+   "role": "Multi-period portfolio policies with transaction/holding cost models",
+   "upstream": {
+    "archived": false,
+    "latest": "1.5.1",
+    "license": "GPL-3.0",
+    "prerelease": false,
+    "pushed_at": "2026-04-27",
+    "released_at": "2025-07-06",
+    "renamed_to": null,
+    "stars": 1291
+   }
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "Shares import name empyrical with the older package; do not install both into one environment.",
+    "README warns optional pandas-datareader integration is incompatible with Python >=3.12; local-array workflow avoids it.",
+    "Prospective workflow is unexecuted; source review is not installation, broker connectivity, or performance acceptance."
+   ],
+   "component_id": "empyrical-reloaded",
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "https://github.com/stefan-jansen/empyrical-reloaded/blob/0.5.12/README.md"
+   ],
+   "key": "c2",
+   "name": "empyrical-reloaded",
+   "pin": "0.5.12",
+   "pin_behind_upstream": false,
+   "recipe_ref": null,
+   "repository": "https://github.com/stefan-jansen/empyrical-reloaded",
+   "review_status": null,
+   "role": "Small independent return/risk metric functions",
+   "upstream": {
+    "archived": false,
+    "latest": "0.5.12",
+    "license": "Apache-2.0",
+    "prerelease": false,
+    "pushed_at": "2025-12-12",
+    "released_at": "2025-06-01",
+    "renamed_to": null,
+    "stars": 122
+   }
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "WalkForward/CPCV purge and embargo default to zero; installing the library does not prevent leakage.",
+    "Fixed observation-count purging must be mapped to overlapping labels and timestamps; retain a final chronological holdout.",
+    "Optimization/risk estimates are not pre-trade enforcement or broker reconciliation.",
+    "Native acceptance covers WalkForward and the raw-price control study only; no new engine fills, dividend-inclusive performance, catalyst universe, alpha or broker execution."
+   ],
+   "component_id": "skfolio",
+   "decisions": [],
+   "evidence_kind": "native_proven",
+   "evidence_refs": [
+    "https://github.com/skfolio/skfolio/blob/v1.2.8/README.rst",
+    "blueprints/us-equities/research-evaluation/receipt.json"
+   ],
+   "key": "c3",
+   "name": "skfolio",
+   "pin": "1.2.9; WalkForward source c99fcf71349e2df4a7a1033ee85ca2e9ced9abee",
+   "pin_behind_upstream": true,
+   "recipe_ref": "blueprints/us-equities/research-evaluation/README.md",
+   "repository": "https://github.com/skfolio/skfolio",
+   "review_status": null,
+   "role": "Portfolio estimators with chronological validation",
+   "upstream": {
+    "archived": false,
+    "latest": "v1.3.0",
+    "license": "BSD-3-Clause",
+    "prerelease": false,
+    "pushed_at": "2026-09-21",
+    "released_at": "2026-09-20",
+    "renamed_to": null,
+    "stars": 2428
+   }
+  },
+  {
+   "adopted": true,
+   "card_limitations": [
+    "Statistics operate on return periods, not individual trade win rates.",
+    "A tear sheet is descriptive; it does not fix leakage, trial selection, poor fills or accounting errors.",
+    "Example 252-period convention must be changed for other sampling frequencies.",
+    "Prospective workflow is unexecuted; source review is not installation, broker connectivity, or performance acceptance."
+   ],
+   "component_id": "quantstats",
+   "decisions": [],
+   "evidence_kind": "source_review",
+   "evidence_refs": [
+    "https://github.com/ranaroussi/quantstats/blob/v0.0.81/README.md"
+   ],
+   "key": "c4",
+   "name": "quantstats",
+   "pin": "0.0.81",
+   "pin_behind_upstream": false,
+   "recipe_ref": null,
+   "repository": "https://github.com/ranaroussi/quantstats",
+   "review_status": null,
+   "role": "Human-readable return/risk reports",
+   "upstream": {
+    "archived": false,
+    "latest": "v0.0.81",
+    "license": "Apache-2.0",
+    "prerelease": false,
+    "pushed_at": "2026-07-20",
+    "released_at": "2026-01-13",
+    "renamed_to": null,
+    "stars": 7651
+   }
+  }
+ ],
+ "catalog": "us-equities",
+ "checked_at": "2026-09-22",
+ "enums": {
+  "disposition": [
+   "conditional",
+   "measured_tradeoff",
+   "observed_failure",
+   "out_of_scope",
+   "overlap",
+   "selected",
+   "unqualified"
+  ],
+  "evidence_class": [
+   "local_integration",
+   "measured_comparison",
+   "native_proven",
+   "source_review",
+   "synthetic"
+  ]
+ },
+ "existing_overturn_when": "Reopen the implementation choice if Nautilus cannot preserve a required cash/order semantic, fails a preregistered SPY/LEAN parity tolerance, or a broker-specific adapter cannot pass ownership, reconciliation, partial/cancel/reconnect and numeric risk cases. Compare alternatives on the same frozen inputs and failure contract; promote a strategy only after independent temporal and cost-aware evaluation.",
+ "group": "engines-strategies",
+ "layer_id": "portfolio-risk",
+ "layer_scope_terms": [
+  "portfolio-optimization",
+  "portfolio-research",
+  "performance-evaluation",
+  "legacy-metrics"
+ ],
+ "limitations": [
+  "Nautilus 2.0.0rc5 is a prerelease. The old September 19 Nautilus alternative and LEAN default cards remain historical; runtime-target.json governs the current destination.",
+  "The retained AAPL replay has 15 bars and five roundtrips per baseline/stress scenario with reconciled cash; it excludes known action dates and uses retrospective synthetic close fills with unlimited modeled depth.",
+  "SPY/LEAN dividend/cash parity is still planned. LEAN's known-crash fixtures are engineering stresses, not untouched holdout results or calibrated broker execution.",
+  "The Alpaca trial observed two actual writes, a -0.08 USD cash-matched gross result, flat/idle reconciliation and completed-trial recovery with zero additional writes. In-flight native failure cases, IBKR, live operation and continuous paper operation remain open.",
+  "No accepted point-in-time universe, extreme-mover/catalyst strategy, financing-inclusive performance or deployable profitability follows from these receipts.",
+  "Independent source review found two bare matches! expressions that do not assert denial-event variants in Nautilus risk tests, also present in v2.0.0rc5 source. Other tests assert denial and reasons. This narrow test defect is not an observed runtime failure; see docs/blind-catalog-source-adjudication-20260921.md."
+ ],
+ "requirement": "Use the selected NautilusTrader destination with broker-specific execution boundaries, deterministic numeric risk and reproducible equity accounting; preserve the prior LEAN oracle and qualify any strategy with causal data, costs and independent reconciliation.",
+ "requirement_note": "The requirement, limitations and existing_overturn_when text is shared by this layer's group; judge fit against the layer title and layer_scope_terms.",
+ "rules": [
+  "Judge from retained evidence. Open the evidence_refs of every adopted candidate (bounded: the referenced file or its relevant section) and record every path you opened in sources_read. Do not rely on memory of the repositories.",
+  "The winner set is 1-3 adopted candidates (adopted == true) that best satisfy the requirement on the evidence. why_selected must cite at least one evidence path and state what was actually observed (native execution, measured comparison, local integration, synthetic fixture or source review), not what the project claims.",
+  "Every adopted non-winner candidate appears in alternatives with a why_not_default that states the concrete evidence gap or trade-off; add non-adopted candidates only with the same standard.",
+  "If a non-adopted candidate would satisfy the requirement better on the evidence, do not select it: record it in challenger_preferred with the comparison (a fixtures/, blueprints/ or tests/ path, or a python3/node command) that would establish it. Agreement between lanes never promotes; only an executed comparison can.",
+  "overturn_when names the concrete check that would change the verdict (a fixtures/, blueprints/ or tests/ path or a runnable python3/node command). open_gaps lists what the evidence does not establish. limits lists what you could not read or verify. Do not invent paths, numbers or results; leave evidence_refs empty rather than guess."
+ ],
+ "schema_version": 1,
+ "sota_components_not_in_candidates": [],
+ "title": "Portfolio and risk",
+ "withheld": [
+  "current_choice",
+  "decision",
+  "rationale",
+  "candidates[].disposition",
+  "candidates[].rationale",
+  "candidates[].card_rationale",
+  "candidates[].card_decision",
+  "candidates[].review_status"
+ ]
+}

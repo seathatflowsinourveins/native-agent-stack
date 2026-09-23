@@ -1,0 +1,370 @@
+{
+ "catalog": "us-equities",
+ "layer_id": "execution-broker",
+ "repository_root": "the repository root given in the task",
+ "return_A": {
+  "winner_keys": [
+   "c7",
+   "c4",
+   "c5"
+  ],
+  "winner_names": [
+   [
+    "NautilusTrader",
+    "nautilus-ibkr-adapter"
+   ],
+   [
+    "alpaca-py",
+    "alpaca-py"
+   ],
+   [
+    "adaptive-paper-alpaca-adapter",
+    "adaptive-paper-alpaca-adapter"
+   ]
+  ],
+  "why_selected": "Select c7 as the conditional Nautilus/IBKR destination, c4 as the separately qualified Alpaca SDK, and c5 as the local deterministic bridge into Nautilus. Source review of the [IBKR integration guide](https://nautilustrader.io/docs/latest/integrations/interactive_brokers/) establishes separate execution configuration and client-ID ownership requirements; catalogs/us-equities/runtime-target.json explicitly records IBKR acceptance as not established. Native execution retained in blueprints/us-equities/paper-e2e-20260921/paper-receipt.json shows the earlier alpaca-py runner completed one SPY roundtrip with two writes, independently matched -0.08 USD cash movement, flat final state and completed-trial recovery without additional writes. That result does not transfer to c5. For c5, blueprints/us-equities/adaptive-paper/receipt.json records local native-engine integration and 42 unchanged upstream adapter-template tests; its capacity fixture used a synthetic broker with zero broker connections and zero paper orders. These complementary selections preserve broker-specific boundaries and deterministic accounting without claiming native IBKR or adaptive-paper acceptance.",
+  "winner_evidence_class": "source_review",
+  "winner_evidence_refs": [
+   "https://nautilustrader.io/docs/latest/integrations/interactive_brokers/",
+   "https://github.com/alpacahq/alpaca-py/blob/v0.44.0/README.md",
+   "catalogs/us-equities/runtime-target.json",
+   "blueprints/us-equities/paper-e2e-20260921/paper-receipt.json",
+   "blueprints/us-equities/adaptive-paper/receipt.json",
+   "blueprints/us-equities/adaptive-paper/README.md"
+  ],
+  "alternatives": [
+   {
+    "disposition": "overlap",
+    "evidence_class": "source_review",
+    "evidence_refs": [
+     "https://github.com/alpacahq/alpaca-py/blob/cc4cb3b7ba50ae250e621983c2779047fb16bb28/README.md"
+    ],
+    "key": "c1",
+    "name": "alpaca-py",
+    "repository": "https://github.com/alpacahq/alpaca-py",
+    "why_not_default": "Duplicates c4's upstream SDK and version. Its data-oriented entry adds no independently qualified execution boundary; the pinned README establishes interface availability, not broker lifecycle acceptance."
+   },
+   {
+    "disposition": "conditional",
+    "evidence_class": "native_proven",
+    "evidence_refs": [
+     "https://github.com/QuantConnect/Lean.Brokerages.Alpaca/blob/1973f6165bee212acf656ed2f9cb0af86d4f2a18/README.md",
+     "blueprints/us-equities/engine/resolution-receipt.json"
+    ],
+    "key": "c6",
+    "name": "LEAN Alpaca brokerage",
+    "repository": "https://github.com/QuantConnect/Lean.Brokerages.Alpaca",
+    "why_not_default": "Native compilation passed, including a locally patched source-integrated variant, but adapter initialization, subscription validation and broker connectivity were not exercised. The passing unchanged LEAN backtest used the default brokerage model, not Alpaca. Preserve LEAN as an accounting oracle; these results do not justify replacing the selected Nautilus execution destination."
+   }
+  ],
+  "challenger_preferred": null,
+  "overturn_when": "Reopen the selection if an executed comparison using tests/test_alpaca_paper.py, tests/test_adaptive_paper_recovery.py, tests/test_adaptive_paper_safety.py and tests/test_adaptive_paper_native.py shows a pinned alternative fixes a selected-path failure without regressions, and it passes the applicable broker procedure in blueprints/us-equities/engine-nautilus/acceptance-plan.md. Reconsider the destination if that plan's equity accounting comparison demonstrates an unresolved required cash or order semantic.",
+  "open_gaps": [
+   "Nautilus/IBKR socket connectivity, account ownership, paper submissions, cancellation races and reconnect reconciliation remain unaccepted.",
+   "The adaptive Alpaca adapter has local integration and synthetic broker evidence; its retained broker readiness records zero submissions and a trial not started because the regular session was unavailable.",
+   "The earlier Alpaca smoke covers full fills and recovery of an already completed trial. Native ambiguous submission, partial fills, disconnects, cancellation and in-flight crash recovery remain unqualified.",
+   "Continuous paper operation, historical-to-paper signal parity, fees completeness and actual execution capacity are not established.",
+   "SPY/LEAN dividend and order-semantic parity remains unaccepted; runtime-target.json records a blocked comparison requiring hardening and rerun.",
+   "Neither newcomer has retained executed comparison evidence establishing superiority."
+  ]
+ },
+ "return_B": {
+  "winner_keys": [
+   "c5",
+   "c4"
+  ],
+  "winner_names": [
+   [
+    "adaptive-paper-alpaca-adapter",
+    "adaptive-paper-alpaca-adapter"
+   ],
+   [
+    "alpaca-py",
+    "alpaca-py"
+   ]
+  ],
+  "why_selected": "c5 is selected because it is the only adopted candidate whose retained evidence places a broker-specific boundary inside the selected NautilusTrader 2.0.0rc5 destination. c4 (alpaca-py 0.44.0) is selected as the official SDK that carries c5's transport. It is also the only adopted broker component with a retained broker-observed paper order result.\n\nWhat the retained evidence shows, from my reading of the receipts (I did not re-run anything):\n\nc5 (adaptive-paper-alpaca-adapter):\n- blueprints/us-equities/adaptive-paper/receipt.json records status \"local_integration_passed_new_broker_trial_pending\" and pins NautilusTrader 1b0a49d2 and alpaca-py cc4cb3b7.\n- The same receipt records 42 unchanged upstream Nautilus adapter-template tests passed, scoped \"not Alpaca broker E2E\".\n- It records a full repository suite of 895 run, 893 passed and 2 skipped.\n- It records a wall-clock native-engine capacity fixture with a synthetic broker: 180 submissions, 90 roundtrips, broker_connections 0 and paper_orders 0.\n- The execution_contract block holds the deterministic numeric risk limits: 5000 USD gross exposure, 1000 USD order notional, 25 USD loss/drawdown, 200/180 per-minute request budgets and 1x maximum leverage. It also records a durable SQLite intent/fill/request journal and reconciliation-based recovery.\n- blueprints/us-equities/adaptive-paper/README.md (Lifecycle and native boundaries) describes fsync-before-send reservations, stable IDs, an account lock, a flat-start requirement and snapshot reconciliation. It says ambiguous POSTs are never blindly retried.\n- The later changes_since* blocks are all labelled evidence class SYN and are explicitly \"not a new broker E2E\".\n- broker_readiness is \"not_started\" (regular_session_window_unavailable).\n\nc4 (alpaca-py):\n- blueprints/us-equities/paper-e2e-20260921/paper-receipt.json records a native Alpaca paper SPY long-to-flat trial through the SDK, with SDK source hashes for alpaca/trading/client.py.\n- It observed 2 write attempts, both filled, and a realized gross PnL of -0.08 USD.\n- A separate fresh read-only reconciliation passed with positions 0, open orders 0 and a cash delta of -0.08 matching the PnL.\n- Completed-trial recovery made 0 additional writes.\n- blueprints/us-equities/order-contract/README.md records a network-isolated native probe of alpaca-py 0.44.0 serialization. The SDK uses float fields and silently drops advanced_instructions and unknown fields, which is why the project wraps it in a strict offline boundary.\n\nEvidence class: the winner set is local_integration, the weaker of the two. c5 has only local integration and synthetic evidence. The one native paper result belongs to a separate runner (blueprints/us-equities/alpaca-paper/paper_runner.py), not to c5.",
+  "winner_evidence_class": "local_integration",
+  "winner_evidence_refs": [
+   "blueprints/us-equities/adaptive-paper/receipt.json",
+   "blueprints/us-equities/adaptive-paper/README.md",
+   "blueprints/us-equities/paper-e2e-20260921/paper-receipt.json",
+   "blueprints/us-equities/order-contract/README.md"
+  ],
+  "alternatives": [
+   {
+    "disposition": "unqualified",
+    "evidence_class": "source_review",
+    "evidence_refs": [
+     "evidence/receipts/native-nautilus-v2-20260920.json"
+    ],
+    "key": "c7",
+    "name": "NautilusTrader Interactive Brokers adapter",
+    "repository": "https://github.com/nautechsystems/nautilus_trader",
+    "why_not_default": "Its only evidence is source review: the packet's evidence_ref is the nautilustrader.io IBKR integration page, which I could not open. evidence/receipts/native-nautilus-v2-20260920.json (limitations, line 12) records \"No IBKR Gateway/TWS authentication, data entitlement, adapter connectivity or Alpaca integration acceptance\". It also says the pinned engine run was an offline synthetic EURUSD quickstart. The packet card says local_broker_acceptance is not_established and no paper or live session has been run. The adapter is untested, not failed. It stays the intended IBKR boundary, but on this evidence it cannot be a default that is qualified for execution."
+   },
+   {
+    "disposition": "conditional",
+    "evidence_class": "native_proven",
+    "evidence_refs": [
+     "blueprints/us-equities/engine/resolution-receipt.json"
+    ],
+    "key": "c6",
+    "name": "LEAN Alpaca brokerage",
+    "repository": "https://github.com/QuantConnect/Lean.Brokerages.Alpaca",
+    "why_not_default": "blueprints/us-equities/engine/resolution-receipt.json shows the pinned adapter (1973f616) was only built with native dotnet, not run against a broker. The unmodified build exited 0 with 11 warnings and still resolved 2 advisory pairs (DotNetZip 1.16.0, System.Drawing.Common 4.7.0). The source-integrated build exited 0 with 0 advisory pairs. remaining_external_boundary is \"not_exercised_requires_operator_entitlement_and_broker_authorization\" with broker_orders_submitted 0; Initialize calls ValidateSubscription, which needs QuantConnect product 347 entitlement. It belongs to the preserved prior LEAN oracle, not the selected Nautilus destination. It would become relevant only with entitlement and separately authorized paper access."
+   },
+   {
+    "disposition": "overlap",
+    "evidence_class": "local_integration",
+    "evidence_refs": [
+     "blueprints/us-equities/adaptive-paper/receipt.json"
+    ],
+    "key": "c1",
+    "name": "alpaca-py (data component entry)",
+    "repository": "https://github.com/alpacahq/alpaca-py",
+    "why_not_default": "Same repository and the same v0.44.0 source pin (cc4cb3b7) as winner c4. The adaptive-paper receipt's broker_sdk block pins that exact commit. This entry is catalogued for the historical/streaming data role; its data-side limitations (IEX vs SIP, symbol asof, corporate actions) belong to the data layer, not execution. It adds no separate execution evidence beyond c4."
+   }
+  ],
+  "challenger_preferred": null,
+  "overturn_when": "Any of the following would change this verdict:\n- An open-session adaptive paper trial run through blueprints/us-equities/adaptive-paper/runner.py (paper, then recover) fails ownership, fresh cash/position reconciliation or numeric-risk enforcement.\n- Induced partial-fill, cancel-race, stream-loss or ambiguous-submit faults in that runner (currently covered only by tests/test_adaptive_paper_safety.py and tests/test_adaptive_paper_recovery.py) are not handled.\n- The Nautilus IBKR adapter (c7) passes the same ownership, reconciliation and partial/cancel/reconnect cases in a real paper session while c5 does not.\n- A non-adopted challenger (HKUDS/Vibe-Trading's order gate, or a pydantic strict order-intent schema) is executed against the existing lifecycle cases in tests/test_alpaca_paper.py and tests/test_order_contract.py and produces fewer failures than the current deterministic adapter and hand-written boundary.",
+  "open_gaps": [
+   "The adaptive Nautilus+Alpaca adapter (c5) has no broker-observed order. The receipt records broker_readiness not_started with orders_submitted 0. The only actual paper orders came from the separate one-SPY runner (blueprints/us-equities/alpaca-paper/paper_runner.py).",
+   "No native partial-fill, cancellation, rejection, disconnect, crash or in-flight ambiguous submission was induced against a broker. The paper receipt limitations say these paths have only synthetic test evidence, and recovery covered only a completed trial.",
+   "Cancel-then-replace, the gap-risk stop and overnight holds are opt-in SYN features with no broker-observed receipt (receipt.json changes_since_g_f_round8 limitations).",
+   "IBKR execution (c7) has no socket connection, paper session or reconciliation evidence.",
+   "Continuous operation, SIP-feed execution, Elite 1000/minute throughput and live trading are unqualified.",
+   "Historical-to-paper signal parity and the SPY/LEAN cash-parity oracle are still planned. No strategy profitability follows from any receipt read here.",
+   "alpaca-py serializes quantities and prices as floats and drops unknown/advanced fields (order-contract README). The exact-decimal envelope is not wire round-tripped.",
+   "Non-adopted HKUDS/Vibe-Trading and pydantic/pydantic have no retained evidence in this packet (empty evidence_refs). Their proposed comparisons are unexecuted, so neither can be preferred or rejected."
+  ]
+ },
+ "packet": {
+  "title": "Execution and broker adapters",
+  "requirement": "Use the selected NautilusTrader destination with broker-specific execution boundaries, deterministic numeric risk and reproducible equity accounting; preserve the prior LEAN oracle and qualify any strategy with causal data, costs and independent reconciliation.",
+  "limitations": [
+   "Nautilus 2.0.0rc5 is a prerelease. The old September 19 Nautilus alternative and LEAN default cards remain historical; runtime-target.json governs the current destination.",
+   "The retained AAPL replay has 15 bars and five roundtrips per baseline/stress scenario with reconciled cash; it excludes known action dates and uses retrospective synthetic close fills with unlimited modeled depth.",
+   "SPY/LEAN dividend/cash parity is still planned. LEAN's known-crash fixtures are engineering stresses, not untouched holdout results or calibrated broker execution.",
+   "The Alpaca trial observed two actual writes, a -0.08 USD cash-matched gross result, flat/idle reconciliation and completed-trial recovery with zero additional writes. In-flight native failure cases, IBKR, live operation and continuous paper operation remain open.",
+   "No accepted point-in-time universe, extreme-mover/catalyst strategy, financing-inclusive performance or deployable profitability follows from these receipts.",
+   "Independent source review found two bare matches! expressions that do not assert denial-event variants in Nautilus risk tests, also present in v2.0.0rc5 source. Other tests assert denial and reasons. This narrow test defect is not an observed runtime failure; see docs/blind-catalog-source-adjudication-20260921.md.",
+   "The us-equities catalog also tags entries for this taxonomy layer under data-research (1); engines-strategies (5) was picked as the primary group by entry count."
+  ],
+  "layer_scope_terms": [
+   "execution",
+   "broker-adapter",
+   "broker-sdk",
+   "conditional-broker",
+   "legacy-broker-adapter",
+   "reconciliation"
+  ],
+  "requirement_note": "The requirement, limitations and existing_overturn_when text is shared by this layer's group; judge fit against the layer title and layer_scope_terms.",
+  "candidates": [
+   {
+    "adopted": true,
+    "card_limitations": [
+     "No account, entitlement, data request or order was exercised by this catalog. An installed SDK is not acquisition evidence.",
+     "Symbol asof selects symbol interpretation; it does not reconstruct every historical revision known at that date. A present-day asset list is not a survivorship-free universe.",
+     "Corporate-action completeness and corrections require explicit policy; IEX-derived strategies may differ on consolidated data."
+    ],
+    "component_id": "data-alpaca-py",
+    "decisions": [],
+    "evidence_kind": "source_review",
+    "evidence_refs": [
+     "https://github.com/alpacahq/alpaca-py/blob/cc4cb3b7ba50ae250e621983c2779047fb16bb28/README.md"
+    ],
+    "key": "c1",
+    "name": "alpaca-py",
+    "pin": "v0.44.0; source cc4cb3b7ba50ae250e621983c2779047fb16bb28",
+    "pin_behind_upstream": false,
+    "recipe_ref": null,
+    "repository": "https://github.com/alpacahq/alpaca-py",
+    "review_status": null,
+    "role": "Official Alpaca historical/streaming data and paper-trading SDK",
+    "upstream": {
+     "archived": false,
+     "latest": "v0.44.0",
+     "license": "Apache-2.0",
+     "prerelease": false,
+     "pushed_at": "2026-09-18",
+     "released_at": "2026-08-11",
+     "renamed_to": null,
+     "stars": 1528
+    }
+   },
+   {
+    "adopted": false,
+    "card_limitations": [],
+    "component_id": null,
+    "decisions": [],
+    "evidence_kind": null,
+    "evidence_refs": [],
+    "key": "c2",
+    "name": "hkuds/vibe-trading",
+    "newcomer": true,
+    "note": "Its sdk_order_gate.py and reconciliation module passing the existing 27 local Alpaca lifecycle cases (ambiguous submit, duplicate/restart, partial/cancel, stale/clock/risk, request budget, ownership, kill) with fewer failures than the current deterministic adapter, without granting it order authority.",
+    "pin": null,
+    "pin_behind_upstream": null,
+    "recipe_ref": null,
+    "repository": "https://github.com/HKUDS/Vibe-Trading",
+    "review_status": null,
+    "role": null,
+    "upstream": null
+   },
+   {
+    "adopted": false,
+    "card_limitations": [],
+    "component_id": null,
+    "decisions": [],
+    "evidence_kind": null,
+    "evidence_refs": [],
+    "key": "c3",
+    "name": "pydantic/pydantic",
+    "newcomer": true,
+    "note": "A typed order-intent schema under ConfigDict(strict=True, extra='forbid') rejecting malformed intents that the current hand-written checks accept, demonstrated on the existing lifecycle fixtures.",
+    "pin": null,
+    "pin_behind_upstream": null,
+    "recipe_ref": null,
+    "repository": "https://github.com/pydantic/pydantic",
+    "review_status": null,
+    "role": null,
+    "upstream": null
+   },
+   {
+    "adopted": true,
+    "card_limitations": [
+     "SDK availability does not prove paper connectivity, exactly-once submission, restart recovery or entitlement.",
+     "Basic/paper-only equities data is IEX; do not equate it with consolidated SIP coverage.",
+     "On ambiguous order timeout, do not blindly resubmit; follow broker confirmation/reconciliation guidance.",
+     "Prospective workflow is unexecuted; source review is not installation, broker connectivity, or performance acceptance."
+    ],
+    "component_id": "alpaca-py",
+    "decisions": [],
+    "evidence_kind": "source_review",
+    "evidence_refs": [
+     "https://github.com/alpacahq/alpaca-py/blob/v0.44.0/README.md"
+    ],
+    "key": "c4",
+    "name": "alpaca-py",
+    "pin": "0.44.0",
+    "pin_behind_upstream": false,
+    "recipe_ref": "blueprints/us-equities/order-contract/README.md",
+    "repository": "https://github.com/alpacahq/alpaca-py",
+    "review_status": null,
+    "role": "Official Python Trading API and market-data SDK",
+    "upstream": {
+     "archived": false,
+     "latest": "v0.44.0",
+     "license": "Apache-2.0",
+     "prerelease": false,
+     "pushed_at": "2026-09-18",
+     "released_at": "2026-08-11",
+     "renamed_to": null,
+     "stars": 1528
+    }
+   },
+   {
+    "adopted": true,
+    "card_limitations": [
+     "no live broker fills claimed.",
+     "The synthetic capacity fixture used a synthetic broker and zero broker connections; it is not a paper or live execution acceptance run.",
+     "broker_readiness in the same receipt records status not_started (regular_session_window_unavailable); continuous operation and native broker fault behavior remain unqualified."
+    ],
+    "component_id": "adaptive-paper-alpaca-adapter",
+    "decisions": [],
+    "evidence_kind": "source_review",
+    "evidence_refs": [
+     "blueprints/us-equities/adaptive-paper/receipt.json",
+     "blueprints/us-equities/adaptive-paper/README.md"
+    ],
+    "key": "c5",
+    "name": "adaptive-paper-alpaca-adapter",
+    "pin": "7e7eefe28315f3de3aa4dc75cc8b6524f70829cb (blueprints/us-equities/adaptive-paper)",
+    "pin_behind_upstream": false,
+    "recipe_ref": "blueprints/us-equities/adaptive-paper/receipt.json",
+    "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
+    "review_status": null,
+    "role": "Custom deterministic Python Alpaca adapter for the adaptive-paper lane",
+    "upstream": {
+     "archived": false,
+     "latest": null,
+     "license": "MIT",
+     "prerelease": null,
+     "pushed_at": "2026-09-22",
+     "released_at": null,
+     "renamed_to": null,
+     "stars": 0
+    }
+   },
+   {
+    "adopted": true,
+    "card_limitations": [
+     "Native adapter builds were later accepted; account connection remains unexecuted; no Alpaca paper orders accepted yet.",
+     "Brokerage model defaults include NullSlippageModel; explicitly calibrate spread, slippage, fees and liquidity before evaluating a strategy.",
+     "README deployment/account prose contains dated details; use current broker docs and pinned implementation for operational decisions.",
+     "License is declared Apache-2.0 in README/source headers; GitHub license API is empty.",
+     "Prospective workflow is unexecuted; source review is not installation, broker connectivity, or performance acceptance.",
+     "Follow-up: pinned local dependency patches and source-integrated Alpaca compilation passed native runtime graph audits. This does not initialize the adapter; QuantConnect product347 entitlement and separately authorized paper access are still required."
+    ],
+    "component_id": "lean-alpaca",
+    "decisions": [],
+    "evidence_kind": "native_proven",
+    "evidence_refs": [
+     "https://github.com/QuantConnect/Lean.Brokerages.Alpaca/blob/1973f6165bee212acf656ed2f9cb0af86d4f2a18/README.md",
+     "blueprints/us-equities/engine/resolution-receipt.json"
+    ],
+    "key": "c6",
+    "name": "LEAN Alpaca brokerage",
+    "pin": "1973f6165bee212acf656ed2f9cb0af86d4f2a18",
+    "pin_behind_upstream": false,
+    "recipe_ref": "blueprints/us-equities/engine/resolution-receipt.json",
+    "repository": "https://github.com/QuantConnect/Lean.Brokerages.Alpaca",
+    "review_status": null,
+    "role": "Official LEAN Alpaca brokerage implementation",
+    "upstream": {
+     "archived": false,
+     "latest": "18120",
+     "license": null,
+     "prerelease": null,
+     "pushed_at": "2026-09-21",
+     "released_at": null,
+     "renamed_to": null,
+     "stars": 18
+    }
+   },
+   {
+    "adopted": true,
+    "card_limitations": [
+     "local_broker_acceptance not_established (runtime-target.json).",
+     "Adapter installation does not establish socket access, paper order behavior, cancellation races or reconnect reconciliation.",
+     "IBKR is selected live-primary, unaccepted: no local paper or live session has been run against this adapter."
+    ],
+    "component_id": "nautilus-ibkr-adapter",
+    "decisions": [],
+    "evidence_kind": "source_review",
+    "evidence_refs": [
+     "https://nautilustrader.io/docs/latest/integrations/interactive_brokers/"
+    ],
+    "key": "c7",
+    "name": "NautilusTrader",
+    "pin": "2.0.0rc5 (tag v2.0.0rc5; source pin from evidence/receipts/native-nautilus-v2-20260920.json \u2014 commit 1b0a49d2792a9432a3aca3fcb617ce7a630d905e)",
+    "pin_behind_upstream": false,
+    "recipe_ref": null,
+    "repository": "https://github.com/nautechsystems/nautilus_trader",
+    "review_status": null,
+    "role": "Native Interactive Brokers socket adapter for the selected destination runtime",
+    "upstream": {
+     "archived": false,
+     "latest": "v1.231.0",
+     "license": "LGPL-3.0",
+     "prerelease": false,
+     "pushed_at": "2026-09-22",
+     "released_at": "2026-08-02",
+     "renamed_to": null,
+     "stars": 29265
+    }
+   }
+  ]
+ }
+}
