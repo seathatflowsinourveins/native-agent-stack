@@ -12561,6 +12561,26 @@
       "path": "evidence/artifacts/layer-verdicts-20260922/packets/us-equities__data-quality-orchestration.json",
       "sha256": "cdbe255da0593b73f77e57bc8b887984a78e5233165f3a9fa27818d427708eeb",
       "bytes": 8782
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-runtime/README.md",
+      "sha256": "06fedf002a7f07b096179ae2068f644d87fb40d59c04e242e4ec552312e11634",
+      "bytes": 5731
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-runtime/dagu.json",
+      "sha256": "2364497a2a73c173d06527a336e414f3a77d9ae148a187143fa5c4d0a67d5010",
+      "bytes": 8520
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-runtime/skfolio.json",
+      "sha256": "512bf7694c4fdcb4135c15c0daa3fe5256c9de7ea73b7a93b3092534271aee40",
+      "bytes": 6489
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-runtime/clickhouse.json",
+      "sha256": "d55429bb783d8428dc113dd5287a85d27aeff786380c4367ee795088f9c434aa",
+      "bytes": 6498
     }
   ],
   "convergence_records": [

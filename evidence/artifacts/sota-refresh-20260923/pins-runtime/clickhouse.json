@@ -1,0 +1,49 @@
+{
+  "id": "sota-refresh-20260923-pins-runtime-clickhouse",
+  "component": "clickhouse",
+  "from_pin": "v26.8.7.19-lts",
+  "to_version": "v26.9.2.8-stable",
+  "release_published_at": "2026-09-22T14:53:49Z",
+  "release_resolved_via": "gh api repos/ClickHouse/ClickHouse/releases/latest (cross-checked against the full non-draft/non-prerelease releases list, which confirms v26.9.2.8-stable, published 2026-09-22T14:53:49Z, is newer than the newest -lts row v26.8.11.7-lts, published 2026-09-22T12:52:34Z, so the newest release overall -- not merely the newest -lts -- was selected per the task instruction)",
+  "preregistration": {
+    "written_at": "2026-09-23T00:42:00Z",
+    "expectation": "ClickHouse has NO prior native acceptance receipt in this repository at the pinned v26.8.7.19-lts version: the only retained evidence (evidence/artifacts/layer-verdicts-20260922/{claude,codex}/us-equities-storage-compute-20260922.json, packet c6) is a source_review disposition ('conditional', 'why_not_default': 'The local SQL command is only prospective. No server, cluster, throughput or reliability evidence exists') -- ClickHouse was never installed or run for the storage-compute layer; DuckDB (c4) is the actual accepted incumbent. Because there is no retained passing acceptance for this pin to re-run comparably, this check instead runs a first-time storage-compute smoke test (table create, multi-row insert, GROUP BY aggregation, Parquet write, Parquet re-read) directly against the newest release's static binary, verifying the checksum and that write/read round-trips reproduce identical aggregates.",
+    "criteria": "verdict is 'not_comparable' unless a genuine matching pass/fail on the prior pin is found; the smoke test itself passes iff the checksum matches the release manifest and the post-Parquet-round-trip GROUP BY aggregation (count/sum/avg) is byte-identical to the pre-write in-memory aggregation."
+  },
+  "acceptance_check_ref": "evidence/artifacts/layer-verdicts-20260922/claude/us-equities-storage-compute-20260922.json (packet c6, source_review only, no run) -- no native pass/fail receipt exists for ClickHouse at any version in this repository prior to this check",
+  "commands": [
+    {
+      "id": "checksum-verify",
+      "cmd": "curl -sL -o common-static.tgz https://github.com/ClickHouse/ClickHouse/releases/download/v26.9.2.8-stable/clickhouse-common-static-26.9.2.8-amd64.tgz; curl -sL -o common-static.tgz.sha512 https://github.com/ClickHouse/ClickHouse/releases/download/v26.9.2.8-stable/clickhouse-common-static-26.9.2.8-amd64.tgz.sha512; sha512sum -c common-static.tgz.sha512 (renamed alongside the .sha512 sidecar, which names the original asset filename)",
+      "exit": 0,
+      "result_excerpt": "sha512 fc3836cac1c65b9825a1ea9a09a16f368806d7448229d939d9f4335bb9b63f3c67852ca5834aa6d3ebc432ec1f7c31ae3c9dc7a62128e5ae441ea29423c1606b MATCHES the release's own .sha512 sidecar exactly."
+    },
+    {
+      "id": "storage-compute-smoke",
+      "cmd": "tar -xzf common-static.tgz; ./usr/bin/clickhouse local -n --query \"CREATE TABLE bars (symbol String, ts DateTime, open Float64, high Float64, low Float64, close Float64, volume UInt64) ENGINE = Memory; INSERT INTO bars VALUES (...3 rows...); SELECT symbol, count(), sum(volume), round(avg(close),4) FROM bars GROUP BY symbol ORDER BY symbol FORMAT CSV; INSERT INTO FUNCTION file('bars.parquet','Parquet') SELECT * FROM bars; SELECT symbol, count(), sum(volume), round(avg(close),4) FROM file('bars.parquet','Parquet') GROUP BY symbol ORDER BY symbol FORMAT CSV;\"",
+      "exit": 0,
+      "result_excerpt": "\"AAPL\",2,218000,150.95\n\"MSFT\",1,80000,300.8\n\"AAPL\",2,218000,150.95\n\"MSFT\",1,80000,300.8\n -- the post-Parquet-round-trip aggregation is identical to the pre-write in-memory aggregation for both symbols.",
+      "note": "clickhouse local --queries-file <path> hung indefinitely (observed >5 minutes at ~0.2% CPU with an open unidentified socket fd, no output, no error) on this host and was killed; -n/--query with the SQL passed inline on the command line completed in well under a second for both a single-statement smoke test and the full multi-statement script. The queries-file hang was not root-caused (plausibly an interactive-mode or stdin-wait code path); --query was used instead and is recorded as a limitation, not a workaround the release itself required."
+    },
+    {
+      "id": "version",
+      "cmd": "./usr/bin/clickhouse --version",
+      "exit": 0,
+      "result_excerpt": "ClickHouse local version 26.9.2.8 (official build)."
+    }
+  ],
+  "results": {
+    "checksum": "PASSED: downloaded clickhouse-common-static-26.9.2.8-amd64.tgz sha512 matches the release's own sidecar file exactly.",
+    "storage_compute_smoke": "PASSED: in-memory table aggregation and a full write-to-Parquet/read-from-Parquet round trip produced byte-identical GROUP BY aggregates (count, sum, avg) for both test symbols."
+  },
+  "verdict": "not_comparable",
+  "evidence_class": "native_proven",
+  "limits": [
+    "No prior native ClickHouse acceptance exists at v26.8.7.19-lts (or any version) in this repository to compare against -- the storage-compute layer's actual accepted incumbent is DuckDB, and ClickHouse's only retained evidence before this check was an unopened-README source_review disposition. 'not_comparable' reflects the absence of a comparable prior receipt, not a failure of the new version.",
+    "This smoke test is a small, synthetic, single-process, single-host check (3 rows, 2 symbols, ENGINE=Memory, no persistent MergeTree table, no cluster, no concurrent writers, no throughput or reliability measurement) and does not establish ClickHouse as qualified for the storage-compute layer's actual acceptance bar (throughput, concurrency, multi-writer, immutable-ledger semantics per the layer's open_gaps).",
+    "clickhouse local --queries-file hung indefinitely on this host for reasons not diagnosed (see command note); only the --query inline path was exercised. This is disclosed as an unresolved oddity of the new release/host combination, not swept under the rug.",
+    "Installed only into /home/example/.cache/sota-refresh-20260923/pins-runtime/clickhouse/ (a fresh static binary extracted from clickhouse-common-static-26.9.2.8-amd64.tgz); no system package, service, or PATH binary was installed or modified.",
+    "No broker/paid-API/credential use; only the anonymous public GitHub release asset was fetched."
+  ],
+  "checked_at": "2026-09-23T00:52:00Z"
+}
