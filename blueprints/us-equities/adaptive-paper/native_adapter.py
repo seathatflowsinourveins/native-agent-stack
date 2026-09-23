@@ -142,11 +142,13 @@ class NativeSession:
     def on_quote(self, row):
         try:
             sym = row["symbol"]
+            if type(row["ts_ns"]) is not int or row["ts_ns"] <= 0:
+                raise ValueError("invalid_quote")
             if row["ts_ns"] <= self.quote_tombstones.get(sym, 0):
                 return
             ins = self.instruments[sym]
             bid, ask = dec(row["bid"]), dec(row["ask"])
-            if bid <= 0 or ask < bid or type(row["ts_ns"]) is not int or row["ts_ns"] <= 0:
+            if bid <= 0 or ask < bid:
                 raise ValueError("invalid_quote")
             q = QuoteTick(ins.id, *quote_components(row), row["ts_ns"],
                           self.data.clock.timestamp_ns())

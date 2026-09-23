@@ -292,6 +292,22 @@ class Quarantine(unittest.IsolatedAsyncioTestCase):
 
 
 class NativeQueuedQuotes(unittest.TestCase):
+    def test_direct_adapter_malformed_timestamp_fails_before_tombstone_filter(self):
+        for stamp in (0, -1, False, True, None, "100"):
+            for tombstone in (None, 100):
+                with self.subTest(timestamp=stamp, tombstone=tombstone):
+                    session = NativeSession(None, [{"symbol": "SPY"}])
+                    ticks = []
+                    session.data = SimpleNamespace(clock=SimpleNamespace(timestamp_ns=time.time_ns),
+                        subscriptions={"SPY"}, _handle_data=ticks.append)
+                    if tombstone is not None:
+                        session.invalidate_quote("SPY", tombstone)
+                    session.on_quote({"symbol": "SPY", "bid": "100", "ask": "100.01",
+                                      "bid_size": "100", "ask_size": "100", "ts_ns": stamp})
+                    self.assertEqual(session.errors, ["quote_invalid_quote"])
+                    self.assertEqual(session.quotes, {})
+                    self.assertEqual(ticks, [])
+
     def test_actual_live_node_queued_old_and_equal_ticks_cannot_restore_policy(self):
         from test_adaptive_paper_native import FakePort
         from native_adapter import build_node
