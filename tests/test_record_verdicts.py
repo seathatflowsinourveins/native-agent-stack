@@ -278,7 +278,7 @@ class RecordVerdictsFixture(unittest.TestCase):
         document = json.loads((self.root / relative).read_text(encoding="utf-8"))
         return next(row for row in document["layers"] if row["layer_id"] == layer_id)
 
-    def run_main(self, *, write=True, check=False, adjudications=None, lane_roots=()):
+    def run_main(self, *, write=True, check=False, adjudications=None, lane_roots=(), run_id=None):
         args = ["--root", str(self.root), "--work-dir", str(self.work_dir), "--checked-at", "2026-09-22"]
         for lane_root in lane_roots:
             args += ["--lane-repo-root", lane_root]
@@ -287,6 +287,8 @@ class RecordVerdictsFixture(unittest.TestCase):
             args.append("--check")
         if adjudications is not None:
             args += ["--adjudications", str(adjudications)]
+        if run_id is not None:
+            args += ["--run-id", run_id]
         return record_verdicts.main(args)
 
     def build_packet_pair(self, catalog, layer_id, *, c1_component=None, c2_component=None):
@@ -1103,6 +1105,54 @@ class LaneSchemaRuleTests(unittest.TestCase):
         data = self.base_return(winner_evidence_refs=[],
                                 why_selected="Observed native execution recorded in blueprints/x/receipt.json " * 2)
         self.assertEqual(self.validate(data)["winner_evidence_refs"], [])
+
+
+class RunIdTests(RecordVerdictsFixture):
+    """--run-id parameterizes the sealed evidence directory and the recorded
+    run_id without disturbing the default (sealed 2026-09-22) wave's output."""
+
+    def test_non_default_run_id_writes_a_separate_sealed_wave_and_records_sealed_base(self):
+        catalog, layer_id = "foundation", "same-winner-layer"
+        c1, c2, digest = self.build_packet_pair(catalog, layer_id, c1_component="same-winner-component")
+        alt = make_alternative(c2)
+        write_lane(self.work_dir, "claude", catalog, layer_id,
+                   make_lane_return("claude", catalog, layer_id, digest, ["c1"], [alt]))
+        write_lane(self.work_dir, "codex", catalog, layer_id,
+                   make_lane_return("codex", catalog, layer_id, digest, ["c1"], [alt]))
+
+        self.assertEqual(self.run_main(write=True, run_id="20260923"), 0)
+        row = self.load_row(catalog, layer_id)
+        run_id = row["lanes"]["claude"]["run_id"]
+        self.assertEqual(run_id, f"{catalog}-{layer_id}-20260923")
+        self.assertEqual(row["lanes"]["sealed_base"], "evidence/artifacts/layer-verdicts-20260923")
+        sealed_path = self.root / "evidence/artifacts/layer-verdicts-20260923/claude" / f"{run_id}.json"
+        self.assertTrue(sealed_path.is_file())
+        # The default 2026-09-22 sealed directory is untouched by this run.
+        self.assertFalse((self.root / "evidence/artifacts/layer-verdicts-20260922").exists())
+
+        # The real row validator resolves the sealed file from the row's own
+        # recorded sealed_base, not from a hardcoded default.
+        build_landscape(self.root)
+
+        # --check with the same --run-id is idempotent; omitting --run-id (the
+        # default) reports the row as changed, since its lanes now differ from
+        # a fresh (never-run) fixture root's rows.
+        self.assertEqual(self.run_main(write=False, check=True, run_id="20260923"), 0)
+
+    def test_default_run_id_output_is_unaffected_by_run_id_support(self):
+        catalog, layer_id = "foundation", "same-winner-layer"
+        c1, c2, digest = self.build_packet_pair(catalog, layer_id, c1_component="same-winner-component")
+        alt = make_alternative(c2)
+        write_lane(self.work_dir, "claude", catalog, layer_id,
+                   make_lane_return("claude", catalog, layer_id, digest, ["c1"], [alt]))
+        write_lane(self.work_dir, "codex", catalog, layer_id,
+                   make_lane_return("codex", catalog, layer_id, digest, ["c1"], [alt]))
+
+        self.assertEqual(self.run_main(write=True), 0)
+        row = self.load_row(catalog, layer_id)
+        self.assertNotIn("sealed_base", row["lanes"])
+        self.assertEqual(row["lanes"]["claude"]["run_id"], f"{catalog}-{layer_id}-20260922")
+        build_landscape(self.root)
 
 
 if __name__ == "__main__":

@@ -113,8 +113,19 @@ def build_verdict_row(row: dict, sota_components: list) -> dict:
     }
 
 
-def build_document(root: Path, checked_at: str) -> dict:
-    sota_doc = load_json(root / "catalogs/sota-convergence/manifest-20260922.json")
+DEFAULT_RUN_ID = "20260922"
+
+
+def default_manifest(run_id: str) -> str:
+    return f"catalogs/sota-convergence/manifest-{run_id}.json"
+
+
+def default_out(run_id: str) -> str:
+    return f"catalogs/sota-convergence/layer-verdicts-{run_id}.json"
+
+
+def build_document(root: Path, checked_at: str, *, run_id: str = DEFAULT_RUN_ID, manifest: str = None) -> dict:
+    sota_doc = load_json(root / (manifest or default_manifest(run_id)))
     sota_index = sota_layer_index(sota_doc)
     # adoption/manifest.json's recipe_map is joined implicitly: a winner's own
     # recipe_ref is already validated (scripts/landscape.py) to resolve there
@@ -136,7 +147,7 @@ def build_document(root: Path, checked_at: str) -> dict:
 
     return {
         "schema_version": 1,
-        "id": "layer-verdicts-20260922",
+        "id": f"layer-verdicts-{run_id}",
         "checked_at": checked_at,
         "generated_by": "tools/sota-convergence/build_verdicts.py",
         "scope": "Joins the landscape ledger's layer-verdict schema v2 rows with the dated SOTA-convergence "
@@ -298,6 +309,15 @@ def parse_args(argv=None):
     parser.add_argument("--check", action="store_true",
                          help="Recompute and compare against the checked-in outputs (default).")
     parser.add_argument("--checked-at", default="2026-09-22")
+    parser.add_argument("--run-id", default=DEFAULT_RUN_ID,
+                        help="Dated wave id joined into the id field, the default --manifest "
+                             "(catalogs/sota-convergence/manifest-<run-id>.json) and the default --out "
+                             "(catalogs/sota-convergence/layer-verdicts-<run-id>.json); default reproduces the "
+                             "sealed 2026-09-22 wave byte for byte.")
+    parser.add_argument("--manifest", type=Path, default=None,
+                        help="Override the dated sota manifest this joins (default derived from --run-id).")
+    parser.add_argument("--out", type=Path, default=None,
+                        help="Override the output layer-verdicts catalog path (default derived from --run-id).")
     return parser.parse_args(argv)
 
 
@@ -305,8 +325,9 @@ def main(argv=None) -> int:
     args = parse_args(argv)
     root = args.root.resolve()
     write_mode = bool(args.write) and not args.check
+    manifest = args.manifest.as_posix() if args.manifest else None
 
-    document = build_document(root, args.checked_at)
+    document = build_document(root, args.checked_at, run_id=args.run_id, manifest=manifest)
     # Sanitize once and render both outputs from the sanitized copy: the
     # handbook markdown table is built directly from field values (e.g.
     # overturn_when), so it needs the same host-path/secret-marker redaction
@@ -318,7 +339,7 @@ def main(argv=None) -> int:
     new_handbook_text = update_handbook(handbook_text, render_handbook_section(sanitized_document))
     assert_no_leak(new_handbook_text)
 
-    out_path = root / "catalogs/sota-convergence/layer-verdicts-20260922.json"
+    out_path = root / (args.out.as_posix() if args.out else default_out(args.run_id))
 
     if write_mode:
         out_path.parent.mkdir(parents=True, exist_ok=True)

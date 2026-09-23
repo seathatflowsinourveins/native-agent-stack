@@ -102,6 +102,17 @@ def validate_verdict_row(row, key, *, root, identities, aliases, evidence, recip
 
     lanes_field = row.get("lanes")
     require(isinstance(lanes_field, dict), str(key) + ".lanes must be an object")
+    # The sealed directory a row's lanes point at is recorded on the row itself
+    # (tools/sota-convergence/record_verdicts.py's "sealed_base"), not read from
+    # a global constant here, so a later run's rows can point at a later sealed
+    # wave (evidence/artifacts/layer-verdicts-<run-id>/) while an older sealed
+    # run stays intact and verifiable. A row recorded before this field existed
+    # (or one recorded with the default run id) omits it and falls back to the
+    # sealed 2026-09-22 wave, keeping every already-checked-in row valid.
+    sealed_base = lanes_field.get("sealed_base") or "evidence/artifacts/layer-verdicts-20260922"
+    require(isinstance(sealed_base, str) and re.fullmatch(r"evidence/artifacts/layer-verdicts-[0-9A-Za-z]+",
+                                                           sealed_base),
+            str(key) + ".lanes.sealed_base must be evidence/artifacts/layer-verdicts-<run-id>")
     for lane_name in ("claude", "codex"):
         lane = lanes_field.get(lane_name)
         require(isinstance(lane, dict), str(key) + f".lanes.{lane_name} must be an object")
@@ -111,7 +122,7 @@ def validate_verdict_row(row, key, *, root, identities, aliases, evidence, recip
         if sealed:
             require(bool(re.fullmatch(r"[a-f0-9]{64}", sealed)),
                     str(key) + f".lanes.{lane_name}.sealed_sha256 must be a lowercase 64-digit hash")
-            sealed_path = f"evidence/artifacts/layer-verdicts-20260922/{lane_name}/{lane['run_id']}.json"
+            sealed_path = f"{sealed_base}/{lane_name}/{lane['run_id']}.json"
             sealed_file = safe_file(root, sealed_path)
             require(sealed_file.is_file(),
                     str(key) + f".lanes.{lane_name}.sealed_sha256 needs a sealed file: {sealed_path}")

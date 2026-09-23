@@ -120,6 +120,19 @@ default reconciliation file. No step here calls a model.
    python3 tools/sota-convergence/build_verdicts.py --check --root .
    ```
 
+   `--run-id` (default `20260922`) makes a later wave rerunnable without
+   disturbing the sealed 2026-09-22 record: it feeds the `id` field
+   (`layer-verdicts-<run-id>`) and the defaults for `--manifest`
+   (`catalogs/sota-convergence/manifest-<run-id>.json`) and `--out`
+   (`catalogs/sota-convergence/layer-verdicts-<run-id>.json`); either can
+   still be overridden directly. Omitting `--run-id` reproduces today's
+   `catalogs/sota-convergence/layer-verdicts-20260922.json` and
+   `docs/grand-catalog-handbook.md` byte for byte.
+
+   ```sh
+   python3 tools/sota-convergence/build_verdicts.py --write --root . --run-id 20260923
+   ```
+
 ## Rules encoded in `build_manifest.py`
 
 - **Pin-vs-upstream** (`classify_pin`): a component/entry only counts as
@@ -613,6 +626,25 @@ python3 tools/sota-convergence/record_verdicts.py \
 rejects both together and rejects neither) -- there is no silent default
 mode.
 
+`--run-id` (default `20260922`) reruns the pipeline on a new date without
+disturbing the sealed 2026-09-22 record: it is the trailing component of
+each recorded `run_id` (`<catalog>-<layer_id>-<run-id>`) and of the sealed
+directory (`evidence/artifacts/layer-verdicts-<run-id>/`). Pass the same
+`--run-id` to `--check` as was used for `--write`. A row recorded under a
+non-default `--run-id` also carries `lanes.sealed_base` (e.g.
+`evidence/artifacts/layer-verdicts-20260923`) so `scripts/landscape.py`
+resolves its sealed files from the row itself, not from a hardcoded
+constant; a row recorded (or never re-recorded) under the default omits
+`sealed_base` and `scripts/landscape.py` falls back to the sealed
+2026-09-22 directory, so every already-checked-in row stays valid and the
+default run's output is unaffected byte for byte.
+
+```sh
+python3 tools/sota-convergence/record_verdicts.py \
+  --root . --work-dir /path/to/work-dir --checked-at YYYY-MM-DD \
+  --run-id 20260923 --write
+```
+
 - **Per-lane validation, never aborts the run.** For every layer with at
   least one `<work-dir>/{claude,codex}/<catalog>__<layer_id>.json` file, each
   present lane file is checked against the full lane-return contract (schema
@@ -646,8 +678,9 @@ mode.
   (`sort_keys=True, indent=1` + newline -- the same convention every
   generator here uses, subject to the same `build_manifest.py`
   leak defense) and written to
-  `evidence/artifacts/layer-verdicts-20260922/<lane>/<catalog>-<layer_id>-20260922.json`;
-  its sha256 becomes the row's `lanes.<lane>.sealed_sha256`.
+  `evidence/artifacts/layer-verdicts-<run-id>/<lane>/<catalog>-<layer_id>-<run-id>.json`
+  (`<run-id>` from `--run-id`, default `20260922`); its sha256 becomes the
+  row's `lanes.<lane>.sealed_sha256`.
 - **Derived winner `pin`** (never taken from the lane): the packet's own
   manifest-joined `pin`, else the winning candidate's real v1 pin text if
   any -- the ledger's actual `candidates[]` schema carries this as
@@ -665,7 +698,7 @@ mode.
   "judgments": [{"claude_position": "A"|"B", "preferred_position": "A"|"B",
   "preferred_lane", "refuting_votes"}, ...]}`) names (the file itself is
   retained at
-  `evidence/artifacts/layer-verdicts-20260922/adjudication/<run_id>.json`).
+  `evidence/artifacts/layer-verdicts-<run-id>/adjudication/<run_id>.json`).
   The tool enforces the counterbalanced rule: the judgments must include
   both presentation orders (Claude's return shown as A and as B), each
   `preferred_lane` must follow from its positions, and `winner_lane` must be
@@ -718,6 +751,44 @@ python3 tools/sota-convergence/build_verdicts.py --write --root .
 python3 scripts/landscape.py --root .
 python3 scripts/validate.py
 ```
+
+## Blind checkout
+
+`blind_checkout.py` -- no network, no model call. Given `--source` (an
+existing git checkout), `--rev` and a `--dest` that does not yet exist, it
+runs `git worktree add --detach <dest> <rev>` and then mutates files only
+inside `<dest>`, so a lane can review candidates without seeing what a
+previous run (or the checked-in ledger) already chose.
+
+```sh
+python3 tools/sota-convergence/blind_checkout.py \
+  --source . --rev HEAD --dest /path/to/blind-checkout
+# ... run the blind lane against /path/to/blind-checkout ...
+git worktree remove --force /path/to/blind-checkout
+```
+
+It removes outright: `evidence/artifacts/layer-verdicts-*/` (recursively),
+`catalogs/sota-convergence/layer-verdicts-*.json`,
+`docs/grand-catalog-handbook.md`, `docs/ecosystem/index.html` and
+`docs/ecosystem/manifest.json`. In the two landscape ledgers
+(`catalogs/landscape/{foundation,us-equities}.json`) it resets every row's
+layer-verdict schema v2 fields to `pending_lanes` with empty
+`winners`/`alternatives`, a pending `lanes` object and an empty
+`verdict_overturn_when` (keeping `requirement`/`evidence_refs`/
+`overturn_when`), and removes the v1 label fields `current_choice`,
+`decision`, `rationale` (row level) and `disposition`, `rationale`,
+`review_status` (each `candidates[]` entry). Every other JSON file under
+`catalogs/` has `selection`, `decision`, `disposition`, `current_choice` and
+`review_status` removed wherever they appear, regardless of value; under
+`blueprints/` the same five keys are removed only when the value is itself
+a label (a closed-vocabulary string such as `selected`, `retain`,
+`confirmed_default`, `selected_destination`, or free text that states a
+selection) -- a mapping/rule value or an unrelated data value (e.g.
+`"top_20"`) under one of those keys is left alone. `<dest>/BLIND-MANIFEST.json`
+lists every removed file and every stripped JSON path together with its old
+value's sha256 (never the value itself). This tool never removes the
+worktree it creates; the caller does that with
+`git worktree remove --force <dest>` once the blind lane has finished.
 
 ## Codex lane
 
