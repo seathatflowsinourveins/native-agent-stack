@@ -18,6 +18,8 @@ not re-run for this build's. The 11:27 rerun with stop diagnostics
 (`../20260923b-needs-attention/`) recorded `callback_failure` at
 `quote_normalization`: `normalize_quote` raised. A crossed SIP quote is the most
 likely reason there. For this 10:11 run it is only a possible explanation. At
-the retained crossed-quote rates (1 in 51,116, and 13 in 186,659 in trial f)
-the chance of at least one among its 8,512 quotes is about 15 to 45 percent.
+the retained crossed-quote rates, which vary widely by minute (1 in 51,116,
+13 in 186,659 in trial f, 36 in 32,419 in a later minute, and 0 in 38,251), the
+chance of at least one among its 8,512 quotes ranges from about 15 percent to
+near certainty.
 This build recorded no stop reason, and other causes were not excluded.

@@ -6445,8 +6445,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/trials/20260923-interrupted/README.md",
-      "sha256": "473264f0f8e9a33b5a8248249361b2d4d306f7135ecdd8842b0f90d65fa96fab",
-      "bytes": 1469
+      "sha256": "f356d277af70bdc8f548cc37bd9f04e8946fca7c76e384710ec188a7036cd422",
+      "bytes": 1565
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/trials/20260923-interrupted/gate-result.json",
@@ -6475,8 +6475,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/trials/20260923b-needs-attention/README.md",
-      "sha256": "5b005a150eb4c73b75602b92046d35887123b4eb4679b81705c994b9bc19f63e",
-      "bytes": 1953
+      "sha256": "8d91fce7ff3c3217e20921e94c56987a1d258aa0e512eb7ec9a451cd776c8147",
+      "bytes": 2421
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/trials/20260923b-needs-attention/frozen-1e2c96a.SHA256SUMS",
@@ -6495,8 +6495,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/trials/20260923b-needs-attention/measure_quote_validity.py",
-      "sha256": "cc872bdc93a5cb522dbce4a446a059f3883eb91b0c008651453019d1eca0ad78",
-      "bytes": 3088
+      "sha256": "52f6a9ea1e449c99979be17424178d484f1bf50ce47600daf1a98099d183f560",
+      "bytes": 3836
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/trials/20260923b-needs-attention/observations.json",
@@ -6509,9 +6509,19 @@
       "bytes": 14377
     },
     {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923b-needs-attention/quote-validity-1e2c96a-transport-v2.json",
+      "sha256": "f465cfe9f1153f85a70eb4d9befa721c0902f43df0bf15997de2094d2771ee02",
+      "bytes": 5954
+    },
+    {
       "path": "blueprints/us-equities/adaptive-paper/trials/20260923b-needs-attention/quote-validity-1e2c96a-transport.json",
       "sha256": "76b242c915adb5b81b28bc09ece6f81c0877718c394e18725b6d6a2aabf1eb06",
       "bytes": 600
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/20260923b-needs-attention/quote-validity-fixed-transport-v2.json",
+      "sha256": "841f19131f2622e9c153b83f5e27e5c10bd3a9d9a40f2b1b96ac375c6372686f",
+      "bytes": 807
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/trials/20260923b-needs-attention/quote-validity-fixed-transport.json",
@@ -8825,8 +8835,8 @@
     },
     {
       "path": "catalogs/us-equities/gates-20260922.json",
-      "sha256": "a10d921f471ab85a4bb7617a950e9ba7f84d574e871c7e26dc8bace47ace25ac",
-      "bytes": 33016
+      "sha256": "db9496c4b8769ec9a07756863738d311f97125f06b69917288580d03bf9bbd5e",
+      "bytes": 33100
     },
     {
       "path": "catalogs/us-equities/hosting-source-review.json",

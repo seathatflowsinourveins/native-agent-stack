@@ -12,9 +12,15 @@ The run correctly reported `needs_attention` (rc 3) after 25.9 s of 300. Flat, 0
   `normalize_quote` raised on a streamed quote; the recorded fields do not say why.
 - Most likely cause: a crossed SIP quote (bid above ask across exchanges). In the
   committed read-only measurements, crossed books are the only rejection class
-  observed: 1 of 51,116 quotes against this transport, and 1 of 50,633 against
-  the fixed one. An earlier 60 s sample (9 of 56,855, all crossed) was not
-  retained; it is an operator observation. The fix in this change drops
+  observed. The first measurements found 1 of 51,116 quotes against this
+  transport and 1 of 50,633 against the fixed one. An earlier 60 s sample
+  (9 of 56,855, all crossed) was not retained; it is an operator observation.
+  The `-v2` measurements come from the revised script. It starts the window at
+  the first delivered quote and records the config hash, symbol list, script
+  hash and observed window. They found 36 of 32,419 against this transport
+  (IWM 25, GOOGL 6, SPY 5) and 0 of 38,251 against the fixed one in later
+  minutes. The rate varies widely by minute. The unversioned files came from
+  the first script revision, before those fields existed. The fix in this change drops
 crossed and one-sided quotes as untradable (counted in `health["dropped_quotes"]`)
 instead of failing the transport; malformed quotes still fail it.
 `quote-validity-fixed-transport.json` is the same measurement against the fixed

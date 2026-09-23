@@ -12,7 +12,8 @@ import json
 import sys
 import threading
 import time
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
+import hashlib
 from pathlib import Path
 
 sys.path.insert(0, ".")
@@ -28,8 +29,11 @@ def classify(raw):
         return "untradable:" + exc.reason
     except transport.TransportError:
         bp, ap = raw.get("bp"), raw.get("ap")
-        if bp and ap and Decimal(str(bp)) > Decimal(str(ap)):
-            return "crossed"
+        try:
+            if bp and ap and Decimal(str(bp)) > Decimal(str(ap)):
+                return "crossed"
+        except (InvalidOperation, ValueError):
+            return "other"
         if not bp or not ap:
             return "one_sided"
         return "other"
@@ -50,8 +54,15 @@ def main(argv=None):
     key, secret = credentials(a.env_file)
     stream = StockDataStream(key, secret, feed=DataFeed(cfg["feed"]), raw_data=True)
     counts, by_symbol, examples = collections.Counter(), collections.Counter(), []
+    first_quote = threading.Event()
+    window = {"first": None, "last": None}
 
     async def on_quote(raw):
+        now = time.time()
+        if window["first"] is None:
+            window["first"] = now
+            first_quote.set()
+        window["last"] = now
         counts["total"] += 1
         reason = classify(raw)
         if reason:
@@ -62,12 +73,18 @@ def main(argv=None):
 
     stream.subscribe_quotes(on_quote, *symbols)
     threading.Thread(target=stream.run, daemon=True).start()
-    started = time.time()
+    # The window starts at the first delivered quote, so a slow start cannot shorten it silently.
+    if not first_quote.wait(30):
+        raise SystemExit("no quote within 30 s of starting the stream")
     time.sleep(a.seconds)
     stream.stop()
-    result = {"kind": "streamed_quote_validity", "feed": cfg["feed"], "symbols": len(symbols),
-              "window_seconds": a.seconds, "started_unix": round(started, 3),
-              "transport_sha256": __import__("hashlib").sha256(Path("transport.py").read_bytes()).hexdigest(),
+    sha = lambda path: hashlib.sha256(Path(path).read_bytes()).hexdigest()
+    result = {"kind": "streamed_quote_validity", "feed": cfg["feed"], "symbols": symbols,
+              "config_sha256": sha(a.config), "script_sha256": sha(__file__),
+              "requested_window_seconds": a.seconds,
+              "observed_window_seconds": round(window["last"] - window["first"], 3),
+              "started_unix": round(window["first"], 3),
+              "transport_sha256": sha("transport.py"),
               "counts": dict(counts), "rejected_by_symbol": dict(by_symbol), "examples": examples}
     a.out.write_text(json.dumps(result, indent=2, default=str) + "\n")
     print(json.dumps({k: result[k] for k in ("counts", "rejected_by_symbol")}))
