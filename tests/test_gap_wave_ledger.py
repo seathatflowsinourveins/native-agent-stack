@@ -9,7 +9,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 LEDGER = ROOT / "catalogs/landscape/gap-wave2-20260923--gap-resolution.json"
-RANK = {"not_run": 0, "not_settled": 1, "advanced": 2, "settled": 3}
+RANK = {"not_run": 0, "deferred": 1, "covered_elsewhere": 2, "not_settled": 3, "advanced": 4, "settled": 5}
 
 
 def _tool():
@@ -57,13 +57,81 @@ class GapWaveLedgerTests(unittest.TestCase):
         with self.assertRaises(SystemExit):
             self.tool.settle_key("maybe")
 
+    def test_catalog_layer_dir_style_reads_prefixed_dirs_and_defaults_the_layer(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            base = Path(tmp) / "evidence/artifacts/wave-x"
+            (base / "foundation__native-clients").mkdir(parents=True)
+            (base / "native-clients").mkdir()
+            receipt = {"id": "r1", "source_revision": "92bb279", "gap_refs": [{"gap_index": 2}, 5],
+                       "settles_gap": "partially", "verdict_impact": {"direction": "inconclusive"}}
+            (base / "foundation__native-clients/r1.json").write_text(json.dumps(receipt))
+            (base / "foundation__native-clients/results.json").write_text(json.dumps({"gap_refs": "not a receipt"}))
+            (base / "native-clients/r2.json").write_text(json.dumps({**receipt, "id": "r2",
+                                                                      "gap_refs": [{"layer_id": "native-clients", "gap_index": 0}]}))
+            prefixed = self.tool.load_receipts(Path(tmp), "wave-x", "catalog__layer")
+            self.assertEqual([r["id"] for r in prefixed], ["r1"])
+            self.assertEqual(prefixed[0]["gap_refs"], [["native-clients", 2], ["native-clients", 5]])
+            plain = self.tool.load_receipts(Path(tmp), "wave-x", "layer")
+            self.assertEqual([r["id"] for r in plain], ["r2"])
+
+    def test_catalog_layer_accepts_outcome_only_receipts_and_rejects_non_receipts(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            layer = Path(tmp) / "evidence/artifacts/wave-y/foundation__workers"
+            (layer / "raw").mkdir(parents=True)
+            (layer / "raw/stdout.json").write_text("{}")  # subdirectories are never read
+            (layer / "results.json").write_text(json.dumps({"0": "advanced"}))
+            (layer / "_index.json").write_text("{}")
+            (layer / "preregistrations-fixround.json").write_text("{}")
+            shapes = {"a": {"gap_index": 0, "outcome": "advanced"},
+                      "b": {"gap_index": 3, "outcome": "deferred", "blocker": "needs the user"},
+                      "c": {"gap_index": 4, "outcome": "covered_elsewhere"},
+                      "d": {"gap_index": 5, "outcome": "settled"}}
+            for name, body in shapes.items():
+                (layer / f"{name}.json").write_text(json.dumps({"id": name, **body}))
+            loaded = {r["id"]: r for r in self.tool.load_receipts(Path(tmp), "wave-y", "catalog__layer")}
+            self.assertEqual(sorted(loaded), ["a", "b", "c", "d"])
+            self.assertEqual(loaded["a"]["gap_refs"], [["workers", 0]])
+            self.assertEqual(self.tool.SETTLES[loaded["a"]["settles_key"]], "advanced")
+            self.assertEqual(self.tool.SETTLES[loaded["b"]["settles_key"]], "deferred")
+            self.assertEqual(self.tool.SETTLES[loaded["c"]["settles_key"]], "covered_elsewhere")
+            self.assertEqual(self.tool.SETTLES[loaded["d"]["settles_key"]], "settled")
+            self.assertIsNone(loaded["a"]["source_revision"])  # build() defaults and flags it
+            (layer / "stray.json").write_text(json.dumps({"note": "not a receipt"}))
+            with self.assertRaises(SystemExit) as raised:
+                self.tool.load_receipts(Path(tmp), "wave-y", "catalog__layer")
+            self.assertIn("stray.json", str(raised.exception.code))
+            (layer / "stray.json").write_text(json.dumps({"gap_index": 1, "outcome": "maybe"}))
+            with self.assertRaises(SystemExit):
+                self.tool.load_receipts(Path(tmp), "wave-y", "catalog__layer")
+
+    def test_receipt_selector_never_reads_raw_capture_subdirs(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            layer = Path(tmp) / "evidence/artifacts/wave-z/foundation__document-retrieval"
+            (layer / "raw/bench-out").mkdir(parents=True)
+            (layer / "raw/bench-out/run-cold-1.json").write_text("")  # empty capture of a failed run
+            (layer / "r.json").write_text(json.dumps({"gap_index": 1, "outcome": "advanced"}))
+            names = [p.name for p, _ in self.tool.iter_receipt_files(Path(tmp), "wave-z", "catalog__layer")]
+            self.assertEqual(names, ["r.json"])
+            self.assertEqual(len(self.tool.load_receipts(Path(tmp), "wave-z", "catalog__layer")), 1)
+
+    def test_rank_keeps_deferral_below_any_executed_outcome(self):
+        rank = self.tool.RANK
+        self.assertLess(rank["not_run"], rank["deferred"])
+        self.assertLess(rank["deferred"], rank["not_settled"])
+        self.assertLess(rank["covered_elsewhere"], rank["not_settled"])
+
     def test_every_receipt_names_the_crosswalk_revision(self):
         for receipt in self.doc["receipts"]:
             self.assertTrue(self.doc["source_revision"].startswith(receipt["source_revision"][:7]), receipt["path"])
 
     def test_repo_raw_artifacts_match_their_recorded_hash(self):
         import hashlib
-        for path in sorted((ROOT / "evidence/artifacts/gap-wave2-20260923").rglob("*.json")):
+        files = [p for style in ("layer", "catalog__layer")
+                 for p, _ in self.tool.iter_receipt_files(ROOT, "gap-wave2-20260923", style)]
+        for path in files:  # the same receipt selector the ledger uses; raw captures are never parsed
             data = json.loads(path.read_text(encoding="utf-8"))
             if not isinstance(data, dict):
                 continue
