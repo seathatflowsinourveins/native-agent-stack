@@ -1,7 +1,11 @@
 version: 2
-# github-actions only. Security updates for the pip lock files are a repository
-# setting (on since 2026-09-22), not a version-update entry here; pip version
-# updates stay off (docs/decisions/2026-09-22-github-automation-closure.md).
+# Version updates: github-actions only (weekly, 7-day cooldown). Security updates for
+# every manifest in the dependency graph are a repository setting (on since
+# 2026-09-22); pip version updates for the hash-locked, cutoff-reproducible locks stay
+# off (docs/decisions/2026-09-22-github-automation-closure.md, section 8).
+# The pip entry below exists only to keep security-update PRs off the deliberately
+# vulnerable grype positive-control fixture: `ignore` also applies to security
+# updates, and open-pull-requests-limit: 0 disables its version updates.
 updates:
   - package-ecosystem: github-actions
     directory: /

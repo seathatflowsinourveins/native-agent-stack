@@ -1,0 +1,460 @@
+{
+ "protocol_id": "cmp-a-20260923",
+ "task": "Two implementations (arms) of the same change were evaluated with an identical fixed battery and single-arm reviews. Score each arm on each preregistered metric by copying the frozen value; mark unknown when the value is null. Do not rank arms or compute aggregates; closure is computed separately.",
+ "metrics": [
+  {
+   "name": "defect_weight",
+   "definition": "10 x confirmed high + 3 x confirmed medium + 1 x confirmed low defects; a defect is confirmed when an independent source-reading refuter failed to refute it",
+   "unit": "points (lower is better)"
+  },
+  {
+   "name": "battery_pass_rate",
+   "definition": "passed / applicable checks of one fixed battery run identically on each arm",
+   "unit": "fraction (higher is better)"
+  },
+  {
+   "name": "requirements_met_rate",
+   "definition": "(met + 0.5 x partial) / applicable over one shared requirement list, graded by a reviewer who saw only that arm",
+   "unit": "fraction (higher is better)"
+  },
+  {
+   "name": "own_suite_pass",
+   "definition": "1 when every acceptance command of the arm exits 0 at its head, else 0",
+   "unit": "boolean 0/1 (higher is better)"
+  }
+ ],
+ "arms": {
+  "arm-3d8f2a61": {
+   "metrics": {
+    "defect_weight": 5,
+    "battery_pass_rate": 1,
+    "requirements_met_rate": 0.9,
+    "own_suite_pass": 1
+   },
+   "frozen_outputs": {
+    "checks": [
+     {
+      "code": "K01",
+      "description": "on a findings exit the scanner job fails and still delivers a valid report",
+      "applicable": true,
+      "pass": true
+     },
+     {
+      "code": "K02",
+      "description": "on a clean exit the scanner job passes and delivers a valid report",
+      "applicable": true,
+      "pass": true
+     },
+     {
+      "code": "K03",
+      "description": "a scanner error fails the job",
+      "applicable": true,
+      "pass": true
+     },
+     {
+      "code": "K04",
+      "description": "no shell step in a results-write job receives the job token",
+      "applicable": true,
+      "pass": true
+     },
+     {
+      "code": "K05",
+      "description": "an analyzer crash never delivers an invalid report",
+      "applicable": true,
+      "pass": true
+     },
+     {
+      "code": "K06",
+      "description": "analyzer findings deliver a valid report",
+      "applicable": true,
+      "pass": true
+     },
+     {
+      "code": "K07",
+      "description": "every third-party step reference is pinned to a full commit hash",
+      "applicable": true,
+      "pass": true
+     },
+     {
+      "code": "K08",
+      "description": "every tracked dependency lock file is scanned or excluded with a reason",
+      "applicable": true,
+      "pass": true
+     },
+     {
+      "code": "K09",
+      "description": "release step is tag-only, holds the only write scope, attaches assets at creation and checks digests",
+      "applicable": true,
+      "pass": true
+     },
+     {
+      "code": "K10",
+      "description": "dependency diff review blocks high-severity advisories",
+      "applicable": true,
+      "pass": true
+     },
+     {
+      "code": "K11",
+      "description": "image-level vulnerability gate blocks high severity and reruns when its ignore policy changes",
+      "applicable": true,
+      "pass": true
+     },
+     {
+      "code": "K12",
+      "description": "target branch rules follow the recorded decisions (no signed-commit rule, non-strict, new gates required, code rule present)",
+      "applicable": true,
+      "pass": true
+     },
+     {
+      "code": "K13",
+      "description": "committed tag rules equal the live tag rules",
+      "applicable": true,
+      "pass": true
+     }
+    ],
+    "confirmed_defects": [
+     {
+      "severity": "low",
+      "summary": "[description redacted: contained an identifying name]"
+     },
+     {
+      "severity": "low",
+      "summary": "The regression tests do not actually enforce the failure-path behavior the decision record claims they guard, since removing a cancellation-guard condition from one results-upload step, or adding an always-run condition to another artifact step, would still pass the tests."
+     },
+     {
+      "severity": "low",
+      "summary": "A configuration file's header states it applies only to one dependency ecosystem and that no version-update entry belongs there, but the file now contains an entry for a second ecosystem, and several docs still claim the automated dependency updater manages only the first ecosystem's references."
+     },
+     {
+      "severity": "low",
+      "summary": "A section of the decision record claims only one job holds a sensitive write permission and rejects a proposed alternative on the grounds that it would scan twice, yet the design that was actually chosen already performs two scans on non-pull-request events, contradicting the stated rejection reason."
+     },
+     {
+      "severity": "low",
+      "summary": "The decision record omits required elements for several described changes: one section lacks any evidence or measured result and any alternatives considered, and two other sections lack any alternatives-considered discussion at all."
+     }
+    ],
+    "claimed_defects": 8,
+    "refuted_defects": 3,
+    "acceptance_commands": [
+     {
+      "code": "C1",
+      "exit_code": 0
+     },
+     {
+      "code": "C2",
+      "exit_code": 0
+     },
+     {
+      "code": "C3",
+      "exit_code": 0
+     },
+     {
+      "code": "C4",
+      "exit_code": 0
+     },
+     {
+      "code": "C5",
+      "exit_code": 0
+     },
+     {
+      "code": "C6",
+      "exit_code": 0
+     },
+     {
+      "code": "C7",
+      "exit_code": 0
+     },
+     {
+      "code": "C8",
+      "exit_code": 0
+     }
+    ],
+    "requirements": [
+     {
+      "id": "R1",
+      "status": "met"
+     },
+     {
+      "id": "R2",
+      "status": "met"
+     },
+     {
+      "id": "R3",
+      "status": "met"
+     },
+     {
+      "id": "R4",
+      "status": "met"
+     },
+     {
+      "id": "R5",
+      "status": "met"
+     },
+     {
+      "id": "R6",
+      "status": "met"
+     },
+     {
+      "id": "R7",
+      "status": "met"
+     },
+     {
+      "id": "R8",
+      "status": "met"
+     },
+     {
+      "id": "R9",
+      "status": "met"
+     },
+     {
+      "id": "R10",
+      "status": "met"
+     },
+     {
+      "id": "R11",
+      "status": "met"
+     },
+     {
+      "id": "R12",
+      "status": "met"
+     },
+     {
+      "id": "R13",
+      "status": "partial"
+     },
+     {
+      "id": "R14",
+      "status": "partial"
+     },
+     {
+      "id": "R15",
+      "status": "partial"
+     }
+    ]
+   }
+  },
+  "arm-b94c07e5": {
+   "metrics": {
+    "defect_weight": 10,
+    "battery_pass_rate": 0.9231,
+    "requirements_met_rate": 0.8333,
+    "own_suite_pass": 1
+   },
+   "frozen_outputs": {
+    "checks": [
+     {
+      "code": "K01",
+      "description": "on a findings exit the scanner job fails and still delivers a valid report",
+      "applicable": true,
+      "pass": true
+     },
+     {
+      "code": "K02",
+      "description": "on a clean exit the scanner job passes and delivers a valid report",
+      "applicable": true,
+      "pass": true
+     },
+     {
+      "code": "K03",
+      "description": "a scanner error fails the job",
+      "applicable": true,
+      "pass": true
+     },
+     {
+      "code": "K04",
+      "description": "no shell step in a results-write job receives the job token",
+      "applicable": true,
+      "pass": true
+     },
+     {
+      "code": "K05",
+      "description": "an analyzer crash never delivers an invalid report",
+      "applicable": true,
+      "pass": false
+     },
+     {
+      "code": "K06",
+      "description": "analyzer findings deliver a valid report",
+      "applicable": true,
+      "pass": true
+     },
+     {
+      "code": "K07",
+      "description": "every third-party step reference is pinned to a full commit hash",
+      "applicable": true,
+      "pass": true
+     },
+     {
+      "code": "K08",
+      "description": "every tracked dependency lock file is scanned or excluded with a reason",
+      "applicable": true,
+      "pass": true
+     },
+     {
+      "code": "K09",
+      "description": "release step is tag-only, holds the only write scope, attaches assets at creation and checks digests",
+      "applicable": true,
+      "pass": true
+     },
+     {
+      "code": "K10",
+      "description": "dependency diff review blocks high-severity advisories",
+      "applicable": true,
+      "pass": true
+     },
+     {
+      "code": "K11",
+      "description": "image-level vulnerability gate blocks high severity and reruns when its ignore policy changes",
+      "applicable": true,
+      "pass": true
+     },
+     {
+      "code": "K12",
+      "description": "target branch rules follow the recorded decisions (no signed-commit rule, non-strict, new gates required, code rule present)",
+      "applicable": true,
+      "pass": true
+     },
+     {
+      "code": "K13",
+      "description": "committed tag rules equal the live tag rules",
+      "applicable": true,
+      "pass": true
+     }
+    ],
+    "confirmed_defects": [
+     {
+      "severity": "low",
+      "summary": "When a static-analysis scanner crashes, its job still produces an empty results file and lets the downstream upload job run, which violates the stated requirement that a crash must never lead to uploading an empty or invalid results file, and reintroduces a previously fixed duplicate-failure condition."
+     },
+     {
+      "severity": "medium",
+      "summary": "One analysis job fails when it merely detects findings, contradicting the stated requirement that only a tool crash, not the findings themselves, should fail the job."
+     },
+     {
+      "severity": "low",
+      "summary": "The decision record claims an upload step now runs only when the preceding analysis job actually produced a results file, but this holds only for failures occurring before one particular step in that job, not for failures happening after it."
+     },
+     {
+      "severity": "low",
+      "summary": "Documentation still describes a dependency vulnerability-scanning job as report-only and non-blocking, even though this change made it a gating, blocking check."
+     },
+     {
+      "severity": "low",
+      "summary": "A previously recorded open gap, stating that a hosted vulnerability-scanning job has no recorded run identifier, was left unamended even though this change cites a specific hosted run identifier as its comparison baseline."
+     },
+     {
+      "severity": "low",
+      "summary": "The baseline and measured source tree referenced in the decision record do not match the actual checkout this change ships with, making the recorded scan result and its expected-failure note stale."
+     },
+     {
+      "severity": "low",
+      "summary": "An upload step also executes after a scanner error, so it can attempt to upload a missing or partial results file and introduce a second failure, because its run condition does not distinguish a findings-only exit from an actual tool error."
+     },
+     {
+      "severity": "low",
+      "summary": "A test validating suppression entries in a vulnerability-ignore configuration checks only one type of suppression entry, so other suppression settings in that same file could silently weaken a severity gate without any justification or review date being required."
+     }
+    ],
+    "claimed_defects": 11,
+    "refuted_defects": 3,
+    "acceptance_commands": [
+     {
+      "code": "C1",
+      "exit_code": 0
+     },
+     {
+      "code": "C2",
+      "exit_code": 0
+     },
+     {
+      "code": "C3",
+      "exit_code": 0
+     },
+     {
+      "code": "C4",
+      "exit_code": 0
+     },
+     {
+      "code": "C5",
+      "exit_code": 0
+     },
+     {
+      "code": "C6",
+      "exit_code": 0
+     },
+     {
+      "code": "C7",
+      "exit_code": 0
+     },
+     {
+      "code": "C8",
+      "exit_code": 0
+     }
+    ],
+    "requirements": [
+     {
+      "id": "R1",
+      "status": "met"
+     },
+     {
+      "id": "R2",
+      "status": "met"
+     },
+     {
+      "id": "R3",
+      "status": "partial"
+     },
+     {
+      "id": "R4",
+      "status": "met"
+     },
+     {
+      "id": "R5",
+      "status": "partial"
+     },
+     {
+      "id": "R6",
+      "status": "met"
+     },
+     {
+      "id": "R7",
+      "status": "met"
+     },
+     {
+      "id": "R8",
+      "status": "met"
+     },
+     {
+      "id": "R9",
+      "status": "met"
+     },
+     {
+      "id": "R10",
+      "status": "met"
+     },
+     {
+      "id": "R11",
+      "status": "met"
+     },
+     {
+      "id": "R12",
+      "status": "met"
+     },
+     {
+      "id": "R13",
+      "status": "partial"
+     },
+     {
+      "id": "R14",
+      "status": "partial"
+     },
+     {
+      "id": "R15",
+      "status": "partial"
+     }
+    ]
+   }
+  }
+ }
+}
