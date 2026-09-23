@@ -7629,8 +7629,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "693c295e2e2e6d7d20443ecd0ef3e18d8404450f1687c0e0ff7933019b1da66e",
-      "bytes": 12918618
+      "sha256": "ca4ff889cff29257e941c73415cf5b02d29fbfec354c817f0676e64c33d8558f",
+      "bytes": 12922700
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -7704,8 +7704,8 @@
     },
     {
       "path": "docs/grand-catalog-handbook.md",
-      "sha256": "676be8056c875c0775f6de08c91509942cbac93a9aa28485656ff54c97d05586",
-      "bytes": 418783
+      "sha256": "a9a0518d06139065cf6dce3dfd85b6f53caccb57cbd6bbcb95fb84c5cf6a9a88",
+      "bytes": 422803
     },
     {
       "path": "docs/harness-defaults.md",
@@ -12014,8 +12014,8 @@
     },
     {
       "path": "tests/test_workflow_security_coverage.py",
-      "sha256": "a99c55ea13b955fbde3caf00c70ed82067bfbefdb3d490044e091accb5bbb3f6",
-      "bytes": 3482
+      "sha256": "671d9df9688e979d259d74fd9ec68e6e649ae7584e3685eef20b110b07b85786",
+      "bytes": 4088
     },
     {
       "path": "tests/test_wsl_memory_maintenance.py",
@@ -13291,6 +13291,36 @@
       "path": "evidence/artifacts/sota-refresh-20260923/obs-compare/logs-fixround/egress-allowlisted-otherhost-denied.log",
       "sha256": "cadcbf90c7303f28c406bab26a124c89b1794a9626a14b487201d945d29a2a7f",
       "bytes": 5895
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/hw-profiles/README.md",
+      "sha256": "d0c84eaa61e72c7b5f69b0867f34628050cf0694b37703ad372b26cc29689d57",
+      "bytes": 9201
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json",
+      "sha256": "3a6a9a83e4e43eca8b95e70f41dafe15cceb3c6a759b8092ce3553b0e37f4cb6",
+      "bytes": 2344
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/hw-profiles/mlx-lm-hash-lock.json",
+      "sha256": "8d1583c5c2a0817d6747b3c8742028bd262e7620e2591e439c9cb4752469d5d2",
+      "bytes": 8093
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/hw-profiles/hardware-profile-tool.json",
+      "sha256": "66d3e5cf6da09d0c0fc3f1707f12eb31162732b54d7288280df05c5b3156ac1d",
+      "bytes": 5174
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/hw-profiles/review-findings-response.json",
+      "sha256": "c3a254b07e14dc1f1ffe60f8e7884549cd57aa9bd5a46a9f470e84618e91ac4c",
+      "bytes": 8316
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/hw-profiles/review-findings-response-round2.json",
+      "sha256": "5a27f214812ff65b880ee53678efb8902595ca3f35ae446e9204f0c4de32b3ff",
+      "bytes": 4315
     }
   ],
   "convergence_records": [
