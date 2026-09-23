@@ -12564,13 +12564,13 @@
     },
     {
       "path": "evidence/artifacts/sota-refresh-20260923/obs-compare/README.md",
-      "sha256": "e1590ceffe6e4cdfe0221567dbc986424f21c186a0cb2de1fa49360951b0c284",
-      "bytes": 10698
+      "sha256": "7ad30ecf39eb37d644a37d9cd36160109843dd2a068f05a118c8cb5073978177",
+      "bytes": 15054
     },
     {
       "path": "evidence/artifacts/sota-refresh-20260923/obs-compare/observability-hosting-comparison.json",
-      "sha256": "0ca838709a2de76e7a895e0f9cf0e3271198edd042fa0830d3d418c7a5dc2488",
-      "bytes": 32256
+      "sha256": "edca4be547d8011ce7c11377b1bd82713fe86c8ac95c50176e58fefc9ea3b4e7",
+      "bytes": 34957
     },
     {
       "path": "evidence/artifacts/sota-refresh-20260923/obs-compare/fixround-preregistration.md",

@@ -28,8 +28,9 @@ ports, entirely separate from the live production observability stack
 (confirmed by binding-conflict detection before choosing ports, and by
 leaving that stack's ports/processes untouched throughout):
 
-1. **Ingest**: a Python emitter (`emit_otlp.py`, kept alongside this
-   receipt's evidence, not committed to the repo) sent OTLP JSON
+1. **Ingest**: a Python emitter (`emit_otlp.py`, retained only in the host
+   scratch cache under `<host-cache-path>/sota-refresh-20260923/obs-compare/`,
+   not committed to this repo) sent OTLP JSON
    metrics/logs/traces shaped like trading-runtime events (order-fill
    latency, order-filled/risk-check logs with `receipt_id`, a `place_order`
    span) to a pinned `otelcol-contrib` instance over loopback HTTP.
@@ -43,11 +44,18 @@ leaving that stack's ports/processes untouched throughout):
    both backends simultaneously, then relaunching against the same data
    directories. Pre-kill data was present unchanged after restart; both
    backends accepted and served new data after restart.
-4. **Off-host-style recovery**: `restic backup`/`check --read-data`/`restore
-   --verify` on the live Prometheus and Loki data directories (not just
-   static files), a byte-identical `diff -rq` between original and restored
-   directories, and query parity from fresh backend instances reading the
-   restored data.
+4. **Recovery (cold, original round; hot/concurrent-write, fix round)**:
+   `restic backup`/`check --read-data`/`restore --verify` on the Prometheus
+   and Loki data directories. The original round stopped both backends
+   (SIGTERM) before backing them up -- a cold backup of stopped stores, with
+   a byte-identical `diff -rq` between original and restored directories and
+   query parity from fresh backend instances reading the restored data. The
+   fix round repeated this with both backends left running and an active
+   emitter loop, to test a genuine hot/concurrent-write backup (no `diff -rq`
+   was run for the hot case, since the live directories kept changing after
+   the snapshot was taken; see step 4 fix-round detail below). Neither round
+   used an off-host repository destination -- both write to a local restic
+   repository under the scratch directory.
 5. **Sandbox confinement**: launched the collector under `srt` (sandbox-
    runtime) with default settings and tried to reach its OTLP receiver from
    the host.
@@ -56,19 +64,37 @@ leaving that stack's ports/processes untouched throughout):
 
 Steps 1-4 passed for opentelemetry-collector-contrib, Prometheus, Loki and
 Restic — each is directly, natively demonstrated to work for this
-requirement, including exactly the live-database/off-host recovery gap both
-sealed lanes had flagged as unproven for Restic (it is now proven for the
-observability backends' own data, though not for a broker/order journal).
+requirement. For Restic specifically, the original round demonstrated only a
+cold backup (stopped stores); the fix round added a genuine hot/concurrent-
+write backup (both backends left running, an active emitter loop) and it
+also passed (`check --read-data` clean, `restore --verify` clean, correct
+partial-snapshot restore). Neither round exercised an off-host repository
+destination, key escrow, or a live broker/order-journal database — the
+live-database gap both sealed lanes flagged for Restic remains open beyond
+these two observability backends' own data.
 
-Step 5 failed: sandbox-runtime's default `bwrap --unshare-net` isolates the
-sandboxed collector into a private network namespace, so its OTLP receiver
-becomes unreachable from outside the sandbox. The collector starts and logs
-"ready," but no external emitter — including the trading runtime this layer
-exists to observe — can reach it. This is native, directly executed
-evidence that sandbox-runtime's default configuration is not currently a
-working way to confine this specific always-on, network-facing collector
-process, independent of its already-demonstrated filesystem/env
-restriction value (`evidence/receipts/runtime-tools.json`).
+Step 5 (original round) found that sandbox-runtime's default
+`bwrap --unshare-net` isolates a *sandboxed collector* into a private network
+namespace, so its OTLP receiver becomes unreachable from outside the
+sandbox. That raw observation stands, but CORRECTED (fix round): it is not a
+"failure" or "regression" for sandbox-runtime, because no lane selected srt
+to confine the collector — the Codex lane selected srt to confine research
+workers' own outbound network access (broker-authority denial), not to wrap
+an always-on listening service. The step 5 result instead confirms srt's
+`--unshare-net` network-namespace isolation is real and working as designed.
+A fix-round test of srt's actually-selected role (a sandboxed worker's
+*outbound* request) found: default settings deny egress to an external host
+by default (curl exit 56, "No matching config rule, denying"), and an
+explicit allowlist entry lets that same host through while a non-listed host
+under the same settings stays denied. This is native evidence that
+sandbox-runtime's default egress denial supports, rather than contradicts,
+the row's broker-authority-denial requirement — c3 is marked `not_comparable`
+(not `regression`) because it still was not tested end-to-end wrapping an
+actual research-worker process, and because it plays a structurally
+different role (worker confinement) than the ingest/storage pipeline
+components it was originally compared against
+(`evidence/receipts/runtime-tools.json` for its already-demonstrated
+filesystem/env restriction value).
 
 ## Per-candidate read (full detail and quoted output in the JSON receipt)
 
@@ -152,6 +178,45 @@ evidence) and corrected the record:
    (srt run from the coordinator's checkout instead of this worktree) is
    fixed for the fix-round commands; no write occurred in the original run,
    only path enumeration, per that run's own debug log.
+
+## Re-review fix (second independent Opus pass)
+
+A follow-up review of the fix round found that this README and the receipt's
+`fix_round_summary`/`preregistration.fix_round_preregistration` fields still
+carried some of the withdrawn claims even though the underlying JSON
+per-candidate verdicts were already correct. Resolved here, with no new
+commands run (all findings were about wording/citation accuracy against
+already-collected evidence):
+
+1. Step 4 / Key finding still described the *original, cold* restic backup
+   as an "off-host-style" or "exactly the live-database/off-host recovery
+   gap" result. Corrected above: the original round is a cold backup, the
+   fix round is a hot/concurrent-write backup, and neither used an off-host
+   destination.
+2. The Key finding still headlined "Step 5 failed" and framed srt as "not
+   currently a working way to confine" the collector without noting the fix
+   round's correction. Corrected above to lead with the role-mismatch
+   correction and the fix-round egress-denial result.
+3. `preregistration.fix_round_preregistration.note` in the JSON claimed the
+   committed `fixround-preregistration.md` was verbatim; it is redacted
+   (host paths replaced with placeholders), so "verbatim" was corrected to
+   describe the redaction. The same note previously implied the committed
+   preregistration covered the non-listed-host (`api.github.com`) check; that
+   check was run after the preregistration file was written and is now
+   labelled an unpreregistered addition, not a preregistered expectation.
+   The written_at timestamp is now tied to the scratch file's own mtime
+   (2026-09-22T20:40:24-04:00) rather than asserted without a cited source.
+4. `fix_round_summary` claimed the hot restic backup was verified via a
+   "diff-free restore"; no `diff -rq` was run for the hot round (the live
+   directories kept changing after the snapshot, so a diff would not be a
+   meaningful pass/fail signal). Corrected to describe verification as
+   `check --read-data` + `restore --verify` + a clean WAL replay in the
+   restored instances' own logs, and the "27/54 vs 41/82, nothing missing"
+   claim is now scoped as a bounded, consistent-subset observation rather
+   than a proven exact accounting, since no durable-write count was
+   independently captured at the instant restic ran and the hot backup
+   command's own raw output was not retained as a log file (unlike the
+   egress tests, whose raw logs are committed under `logs-fixround/`).
 
 ## Limits
 
