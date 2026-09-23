@@ -100,6 +100,10 @@ class AdjudicateFixture(unittest.TestCase):
             provenance=adjudicate.adjudication_provenance(repo=self.repo))
         adjudicate.write_json(self.work / "adjudication-judgments" / lane / f"{NAME}.{order}.json", record)
 
+    def snapshot_id(self):
+        path = self.work / "adjudication-judgments" / "claude" / adjudicate.CLAUDE_ARGS_SNAPSHOT
+        return json.loads(path.read_text(encoding="utf-8")).get("snapshot_id") if path.is_file() else None
+
     def assemble(self):
         out = self.base / "adjudications"
         code, err = quiet(adjudicate.main, ["assemble", "--work-dir", str(self.work), "--out", str(out)])
@@ -228,7 +232,7 @@ class AssembleTests(AdjudicateFixture):
         adjudicate.claude_args(self.work, self.repo)
         ab = self.work / "adjudication-inputs" / f"{NAME}.AB.json"
         ab.write_text(ab.read_text(encoding="utf-8").replace("}", " }", 1), encoding="utf-8")
-        result = {"items": [{"name": NAME, "order": order, "packet_sha256": self.sha,
+        result = {"snapshot_id": self.snapshot_id(), "items": [{"name": NAME, "order": order, "packet_sha256": self.sha,
                              "judge": {"preferred": "B", "why": WHY, "evidence_refs": []},
                              "refuter": {"refuted": False, "reason": "holds", "evidence_refs": []}}
                             for order in adjudicate.ORDERS]}
@@ -316,7 +320,7 @@ class AssembleTests(AdjudicateFixture):
     def test_claude_collect_records_a_lost_agent_as_missing(self):
         index_items = adjudicate.claude_args(self.work, self.repo)["items"]
         self.assertEqual([(i["name"], i["order"]) for i in index_items], [(NAME, "AB"), (NAME, "BA")])
-        result = {"items": [
+        result = {"snapshot_id": self.snapshot_id(), "items": [
             {"name": NAME, "order": "AB", "packet_sha256": self.sha,
              "judge": {"preferred": "B", "why": WHY, "evidence_refs": ["evidence/receipt.json"]},
              "refuter": {"refuted": False, "reason": "holds", "evidence_refs": []}},
@@ -454,12 +458,13 @@ class CodexTests(AdjudicateFixture):
     def test_a_position_biased_codex_judge_splits_the_layer(self):
         # The fake answers "B" in both orders: codex in AB, claude in BA, so counterbalancing exposes it.
         self.run_codex()
-        result = {"items": [{"name": NAME, "order": order, "packet_sha256": self.sha,
+        result = {"snapshot_id": self.snapshot_id(), "items": [{"name": NAME, "order": order, "packet_sha256": self.sha,
                              "judge": {"preferred": "B" if order == "AB" else "A", "why": WHY,
                                        "evidence_refs": ["evidence/receipt.json"]},
                              "refuter": {"refuted": False, "reason": "holds", "evidence_refs": []}}
                             for order in adjudicate.ORDERS]}
         adjudicate.claude_args(self.work, self.repo)
+        result["snapshot_id"] = self.snapshot_id()
         missing = adjudicate.collect_claude(self.work, result, "claude-opus-5-5")
         self.assertEqual(missing, [])
         code, _err, record = self.assemble()
@@ -505,7 +510,7 @@ class LeakTests(AdjudicateFixture):
         self.assertIsNotNone(adjudicate.valid_judge(dict(judge, leak=False, leak_text="")))
 
     def test_claude_leaks_at_either_stage_are_missing_and_listed(self):
-        result = {"items": [
+        result = {"snapshot_id": self.snapshot_id(), "items": [
             {"name": NAME, "order": "AB", "packet_sha256": self.sha, "judge": None, "refuter": None,
              "leak": {"stage": "judge", "text": "\"lane\": \"claude\""}},
             {"name": NAME, "order": "BA", "packet_sha256": self.sha,
@@ -513,6 +518,7 @@ class LeakTests(AdjudicateFixture):
              "refuter": {"refuted": False, "reason": "leak", "evidence_refs": [], "leak": True,
                          "leak_text": "sonnet"}}]}
         adjudicate.claude_args(self.work, self.repo)
+        result["snapshot_id"] = self.snapshot_id()
         missing = adjudicate.collect_claude(self.work, result, "claude-opus-5-5")
         self.assertEqual(missing, [(f"{NAME}.AB", "leak"), (f"{NAME}.BA", "leak")])
         for order in adjudicate.ORDERS:
@@ -548,7 +554,7 @@ class LeakTests(AdjudicateFixture):
             if order in leak_orders:
                 item.update(judge=None, refuter=None, leak={"stage": "judge", "text": "gpt-6"})
             items.append(item)
-        return {"items": items}
+        return {"snapshot_id": self.snapshot_id(), "items": items}
 
     def test_a_claude_leak_is_sticky_until_the_input_changes(self):
         """Round-2 review (adjudication round 3): a second claude-collect overwrote the leaked judgment with a
@@ -602,15 +608,15 @@ class RereviewOf145Tests(AdjudicateFixture):
             self.judgment("claude", order, "claude")
         before = (self.work / "adjudication-judgments" / "claude" / f"{NAME}.AB.json").read_bytes()
         adjudicate.write_json(self.work / "adjudication-judgments" / "claude" / adjudicate.CLAUDE_ARGS_SNAPSHOT,
-                              {"inputs": {}})
-        self.assertEqual(adjudicate.collect_claude(self.work, {"items": []}, "claude-opus-5-5"), [])
+                              {"inputs": {}, "snapshot_id": "s1"})
+        self.assertEqual(adjudicate.collect_claude(self.work, {"snapshot_id": "s1", "items": []}, "claude-opus-5-5"), [])
         self.assertEqual((self.work / "adjudication-judgments" / "claude" / f"{NAME}.AB.json").read_bytes(), before)
 
     def test_a_leak_on_an_input_rebuilt_after_claude_args_is_discarded(self):
         adjudicate.claude_args(self.work, self.repo)
         ab = self.work / "adjudication-inputs" / f"{NAME}.AB.json"
         ab.write_text(ab.read_text(encoding="utf-8").replace("}", " }", 1), encoding="utf-8")
-        result = {"items": [{"name": NAME, "order": "AB", "packet_sha256": self.sha, "leak": {"stage": "judge",
+        result = {"snapshot_id": self.snapshot_id(), "items": [{"name": NAME, "order": "AB", "packet_sha256": self.sha, "leak": {"stage": "judge",
                              "text": "the Codex lane"}}]}
         adjudicate.collect_claude(self.work, result, "claude-opus-5-5")
         self.assertEqual(adjudicate.recorded_leaks(self.work), set())
@@ -685,7 +691,7 @@ class ThirdRereviewOf145Tests(AdjudicateFixture):
         adjudicate.claude_args(self.work, self.repo)
         snapshot = json.loads((self.work / "adjudication-judgments" / "claude"
                                / adjudicate.CLAUDE_ARGS_SNAPSHOT).read_text(encoding="utf-8"))["inputs"]
-        result = {"items": [{"name": NAME, "order": "AB", "packet_sha256": self.sha,
+        result = {"snapshot_id": self.snapshot_id(), "items": [{"name": NAME, "order": "AB", "packet_sha256": self.sha,
                              "leak": {"stage": "judge", "text": "the Codex lane"}}]}
         adjudicate.collect_claude(self.work, result, "claude-opus-5-5")
         records = json.loads((self.work / "adjudication-judgments" / "claude" / "leaks.json").read_text())["leaks"]
@@ -716,6 +722,49 @@ class FourthRereviewOf145Tests(AdjudicateFixture):
         self.assertEqual(code, 1)
         self.assertIsNone(record)
         self.assertIn("different provenance", err)
+
+
+class FifthRereviewOf145Tests(AdjudicateFixture):
+    """Codex re-review of #145 (fifth round)."""
+
+    def setUp(self):
+        super().setUp()
+        self.inputs()
+
+    def test_a_result_from_another_claude_args_snapshot_is_refused(self):
+        adjudicate.claude_args(self.work, self.repo)
+        stale = self.snapshot_id()
+        (self.repo / "new-receipt.json").write_text("{}", encoding="utf-8")
+        adjudicate.claude_args(self.work, self.repo)
+        self.assertNotEqual(stale, self.snapshot_id())
+        with self.assertRaisesRegex(ValueError, "not the current claude-args snapshot"):
+            adjudicate.collect_claude(self.work, {"snapshot_id": stale, "items": []}, "claude-opus-5-5")
+
+    def test_a_project_level_adjudicator_in_the_run_dir_must_be_the_vendored_one(self):
+        run_dir = self.base / "hosts" / "blind" / "run"
+        (run_dir / ".claude" / "agents").mkdir(parents=True)
+        (run_dir / ".claude" / "agents" / "blind-adjudicator.md").write_text("broader\n", encoding="utf-8")
+        code, err = quiet(adjudicate.main, ["claude-args", "--work-dir", str(self.work), "--repo", str(self.repo),
+                                            "--agent-file", str(adjudicate.VENDORED_ADJUDICATOR),
+                                            "--run-dir", str(run_dir)])
+        self.assertEqual(code, 2)
+        self.assertIn("is not the vendored", err)
+
+    def test_a_retargeted_internal_symlink_changes_the_tree_digest(self):
+        (self.repo / "a.json").write_text("{}", encoding="utf-8")
+        (self.repo / "b.json").write_text("[]", encoding="utf-8")
+        os.symlink("a.json", self.repo / "cited.json")
+        before = adjudicate.tree_sha256(self.repo)
+        (self.repo / "cited.json").unlink()
+        os.symlink("b.json", self.repo / "cited.json")
+        self.assertNotEqual(adjudicate.tree_sha256(self.repo), before)
+
+    def test_a_packet_changed_after_inputs_is_refused(self):
+        index = json.loads((self.work / "adjudication-inputs" / "index.json").read_text(encoding="utf-8"))
+        packet = Path(index["layers"][0]["packet_path"])
+        packet.write_text(packet.read_text(encoding="utf-8") + "\n", encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "packets changed after"):
+            adjudicate.claude_args(self.work, self.repo)
 
 
 class InputScrubTests(AdjudicateFixture):

@@ -83,6 +83,17 @@ class ClaudeLaneWriterTests(unittest.TestCase):
                          hashlib.sha256(claude_lane.VENDORED_AGENT.read_bytes()).hexdigest())
         self.assertFalse((self.work / "claude" / "foundation__l2.json").exists())
 
+    def test_a_missing_agent_file_is_a_diagnostic_not_a_traceback(self):
+        role_dir = self.agentlab / ".claude" / "agents"
+        role_dir.mkdir(parents=True, exist_ok=True)
+        (role_dir / "blind-lane-reviewer.md").write_bytes(claude_lane.VENDORED_AGENT.read_bytes())
+        with contextlib.redirect_stderr(io.StringIO()) as err:
+            code = claude_lane.main(["--result", str(self.result), "--work-dir", str(self.work),
+                                     "--agentlab-root", str(self.agentlab), "--agent-file",
+                                     str(self.result.parent / "missing.md")])
+        self.assertEqual(code, 2)
+        self.assertIn("not found", err.getvalue())
+
     def test_a_differing_project_level_role_is_refused(self):
         # Codex review of #145: a project-level copy wins over the user-level one when the lane runs there.
         role_dir = self.agentlab / ".claude" / "agents"

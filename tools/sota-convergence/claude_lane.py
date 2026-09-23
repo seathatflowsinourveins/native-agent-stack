@@ -103,12 +103,13 @@ def lane_provenance(agentlab_root: Path, workflow: str, sums: dict, agent_file: 
         raise ProvenanceError(f"{agentlab_root} is not a git checkout: {head.stderr.strip()}")
     if git(agentlab_root, "diff", "--quiet", "HEAD", "--", workflow).returncode != 0:
         raise ProvenanceError(f"{workflow} differs from HEAD in {agentlab_root}; commit it before recording")
+    role_sha256 = agent_sha256(agent_file)  # a missing or unvendored file is a ProvenanceError first
     project_role = agentlab_root / ".claude" / "agents" / f"{LANE_AGENT}.md"
     if project_role.is_file() and project_role.read_bytes() != Path(agent_file).read_bytes():
         # A lane run from the agent-lab checkout loads this copy, not the one named.
         raise ProvenanceError(f"{project_role} differs from {agent_file}; name the definition the lane loaded")
     return {"workflow_path": workflow, "workflow_sha256": digest, "agentlab_commit": head.stdout.strip(),
-            "agent_sha256": agent_sha256(agent_file)}
+            "agent_sha256": role_sha256}
 
 
 def lane_return(layer: dict, provenance: dict, resolved_model=None) -> dict:

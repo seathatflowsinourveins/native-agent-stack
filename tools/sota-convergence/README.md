@@ -987,7 +987,7 @@ re-applied by `scripts/landscape.py` in CI to the sealed files):
   ```sh
   python3 tools/sota-convergence/claude_lane.py --result /path/to/lane-result.json \
     --work-dir /path/to/work-dir --agentlab-root /path/to/agent-lab \
-    --resolved-model claude-opus-5-5
+    --agent-file ~/.claude/agents/blind-lane-reviewer.md --resolved-model claude-opus-5-5
   ```
 
 **Two-family adjudication is keep-but-compare** (decision
@@ -1551,7 +1551,14 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
   A resumed Codex judgment must match the run's provenance, and a layer is assembled only when every
   counted judgment carries the same provenance.
 - **Symlinks:** `blind_checkout --export` removes any symlink that is absolute or resolves outside the
-  export, and reports it.
+  export, and reports it. The tree digest includes each kept link's text, so retargeting a link changes it.
+- **Snapshot binding:** `claude-args` gives each run a `snapshot_id`, which `adjudication-lane.js` echoes.
+  `claude-collect` refuses a result from another snapshot.
+- **Stale packets:** `claude-args` and `codex` refuse a packet whose bytes changed after `inputs`.
+- **Run directory:** `claude-args --run-dir`, which defaults to `--repo`, also checks a project-level
+  `blind-adjudicator.md` in the directory the workflow runs from.
+- **`--agent-file`:** pass the `blind-lane-reviewer` file the lane loaded. That is the user-level copy when
+  the lane runs from the blind export, which has no `.claude/`.
 
 **Limits:**
 - Writing style can still reveal a lane.

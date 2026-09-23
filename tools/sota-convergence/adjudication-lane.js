@@ -60,4 +60,5 @@ const chain = async (i) => {
 const results = await parallel(items.map((i) => () => chain(i).catch(() => null)))
 const out = items.map((i, n) => (Array.isArray(results) && results[n]) || { name: i.name, order: i.order, packet_sha256: i.packet_sha256, judge: null, refuter: null })
 log(`items: ${out.length}, ${out.filter((r) => r.judge).length} judged, ${out.filter((r) => r.refuter).length} refuter votes, ${out.filter((r) => r.refuter && r.refuter.refuted).length} refuted, ${out.filter((r) => r.leak).length} leak refusals`)
-return { family: 'anthropic', model: MODEL, repo: REPO, items: out }
+// The claude-args snapshot these items came from, echoed so claude-collect binds this result to it.
+return { family: 'anthropic', model: MODEL, repo: REPO, snapshot_id: typeof a.snapshot_id === 'string' ? a.snapshot_id : null, items: out }

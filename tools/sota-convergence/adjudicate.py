@@ -35,6 +35,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import posixpath
 import re
 import shutil
@@ -592,6 +593,10 @@ def run_codex(args) -> int:
             # Sticky: an input with a recorded leak is not rerun until `inputs` rebuilds it.
             failures.append((f"{name}.{order}", "leak recorded for this input; rebuild it with `inputs`"))
             continue
+        if packets_changed([{"name": name, "order": order, "packet_path": packets.get(name, ""),
+                             "packet_sha256": packet_sha256}]):
+            failures.append((f"{name}.{order}", "the packet changed after `inputs`; rerun inputs"))
+            continue
         try:
             existing = load_json(out_path)
             # Resume skips only a judgment made with the configured model and effort, under this run's
@@ -758,11 +763,28 @@ def claude_args(work_dir: Path, repo: Path, prompt_path: Path = PROMPT_PATH, lay
             continue
         items.append({"name": name, "order": order, "path": path, "packet_path": packets.get(name, ""),
                       "packet_sha256": sha})
-    # The input content each item is judged on; claude-collect binds every judgment to it.
-    write_json(Path(work_dir).resolve() / JUDGMENTS_DIR / "claude" / CLAUDE_ARGS_SNAPSHOT,
-               {"inputs": {f"{item['name']}.{item['order']}": sha256_file(Path(item["path"])) for item in items},
-                "provenance": adjudication_provenance(prompt_path, repo)})
-    return {"repo": str(repo), "prompt": prompt_path.read_text(encoding="utf-8"), "items": items, "leaked": leaked}
+    changed = packets_changed(items)
+    if changed:
+        raise ValueError("adjudicate: packets changed after `inputs` (rerun inputs): " + ", ".join(changed))
+    # The input content each item is judged on and the provenance it runs under; claude-collect binds every
+    # judgment to this snapshot through the snapshot_id the workflow echoes back.
+    snapshot = {"inputs": {f"{item['name']}.{item['order']}": sha256_file(Path(item["path"])) for item in items},
+                "provenance": adjudication_provenance(prompt_path, repo)}
+    snapshot["snapshot_id"] = hashlib.sha256(json.dumps(snapshot, sort_keys=True).encode("utf-8")).hexdigest()
+    write_json(Path(work_dir).resolve() / JUDGMENTS_DIR / "claude" / CLAUDE_ARGS_SNAPSHOT, snapshot)
+    return {"repo": str(repo), "prompt": prompt_path.read_text(encoding="utf-8"), "items": items, "leaked": leaked,
+            "snapshot_id": snapshot["snapshot_id"]}
+
+
+def packets_changed(items) -> list:
+    """Items whose packet file no longer has the sha256 inputs indexed (Codex review of #145): judges would
+    compare the old scrubbed returns against a different requirement or candidate set."""
+    changed = []
+    for item in items:
+        path = Path(item.get("packet_path") or "")
+        if not path.is_file() or sha256_file(path) != item.get("packet_sha256"):
+            changed.append(f"{item['name']}.{item['order']}")
+    return changed
 
 
 def collect_claude(work_dir: Path, result, model: str, repo=None) -> list:
@@ -783,6 +805,13 @@ def collect_claude(work_dir: Path, result, model: str, repo=None) -> list:
     leaked_inputs = recorded_leaks(work_dir)
     snapshot_path = work_dir / JUDGMENTS_DIR / "claude" / CLAUDE_ARGS_SNAPSHOT
     snapshot_doc = load_json(snapshot_path) if snapshot_path.is_file() else {}
+    returned_id = result.get("snapshot_id") if isinstance(result, dict) else None
+    if returned_id is None or returned_id != snapshot_doc.get("snapshot_id"):
+        # The result came from another claude-args run (Codex review of #145): its judgments ran under that
+        # snapshot's inputs and evidence tree, not this one's.
+        raise ValueError(f"adjudicate: the workflow result's snapshot_id {returned_id!r} is not the current "
+                         f"claude-args snapshot {snapshot_doc.get('snapshot_id')!r}; rerun the workflow with "
+                         "the current claude-args output")
     snapshot = snapshot_doc.get("inputs") or {}
     snapshot_provenance = snapshot_doc.get("provenance")
     for name, order, input_path, packet_sha256 in pending_items(index):
@@ -925,8 +954,13 @@ def tree_sha256(repo: Path) -> str:
     The packet names evidence paths, not their bytes, so a judgment is bound to the tree it read."""
     digest = hashlib.sha256()
     repo = Path(repo)
-    for path in sorted(p for p in repo.rglob("*") if p.is_file() and not p.is_symlink()):
-        digest.update(f"{path.relative_to(repo).as_posix()}\0{sha256_file(path)}\n".encode("utf-8"))
+    for path in sorted(repo.rglob("*")):
+        relative = path.relative_to(repo).as_posix()
+        if path.is_symlink():
+            # A retained internal link: its text is part of the tree, so retargeting it changes the digest.
+            digest.update(f"{relative}\0->{os.readlink(path)}\n".encode("utf-8"))
+        elif path.is_file():
+            digest.update(f"{relative}\0{sha256_file(path)}\n".encode("utf-8"))
     return digest.hexdigest()
 
 
@@ -1033,6 +1067,9 @@ def parse_args(argv=None):
     cargs.add_argument("--work-dir", required=True, type=Path)
     cargs.add_argument("--repo", required=True, type=Path)
     cargs.add_argument("--layers", default=None)
+    cargs.add_argument("--run-dir", type=Path, default=None,
+                       help="The directory the adjudication workflow runs from (default: --repo); a project-level "
+                            "blind-adjudicator.md there must also be the vendored one.")
     cargs.add_argument("--agent-file", type=Path, default=DEFAULT_ADJUDICATOR_FILE,
                        help="The blind-adjudicator definition the Claude judges will load (default: the user-level "
                             "copy; a project-level copy in the directory the workflow runs from wins over it).")
@@ -1071,12 +1108,21 @@ def main(argv=None) -> int:
         return run_codex(args)
     if args.command == "claude-args":
         repo = args.repo.resolve()
+        run_dir = (args.run_dir or repo).resolve()
+        project_role = run_dir / ".claude" / "agents" / f"{ADJUDICATOR_ROLE}.md"
+        # A project-level role in the directory the workflow runs from wins over --agent-file (Codex review of
+        # #145), so both must be the vendored definition.
         refusal = (refuse_roots("--repo", [repo]) or refuse_work_dir_inside(args.work_dir, repo)
-                   or adjudicator_role_issue(args.agent_file))
+                   or adjudicator_role_issue(args.agent_file)
+                   or (adjudicator_role_issue(project_role) if project_role.exists() else None))
         if refusal:
             print(refusal, file=sys.stderr)
             return 2
-        result = claude_args(args.work_dir, repo, layers=layer_set(args.layers))
+        try:
+            result = claude_args(args.work_dir, repo, layers=layer_set(args.layers))
+        except ValueError as error:
+            print(error, file=sys.stderr)
+            return 2
         for stem in result["leaked"]:
             print(f"adjudicate: {stem}: left out, a leak is recorded for this input", file=sys.stderr)
         print(json.dumps(result, indent=1))
