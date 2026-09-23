@@ -6,6 +6,8 @@ nothing else.
 Rules
 1. Judge from retained evidence. Open the evidence_refs of every adopted candidate (bounded: the referenced file or
    its relevant section) and record every path you opened in sources_read. Do not rely on memory of the repositories.
+   Read only the packet and files under the repository root: no memory stores, code indexes, MCP tools, web
+   search, git history, or other checkouts or work directories, which can carry the verdict you must reach.
 2. The winner set is 1-3 adopted candidates (adopted == true) that best satisfy the requirement on the evidence.
    why_selected must cite at least one evidence path and state what was actually observed (native execution,
    measured comparison, local integration, synthetic fixture or source review), not what the project claims.
@@ -18,6 +20,3 @@ Rules
    or a runnable python3/node command). open_gaps lists what the evidence does not establish. limits lists what
    you could not read or verify. Do not invent paths, numbers or results; leave evidence_refs empty rather than
    guess.
-6. Read only the packet and files under {REPO_ROOT}. Do not use memory stores, code indexes, MCP tools, web search,
-   git history, or any other checkout or work directory: they can carry the verdict this lane must reach on the
-   retained evidence alone.

@@ -540,10 +540,6 @@ class PromptFillTests(CodexLaneFixture):
             self.assertNotIn(marker, prompt)
 
 
-if __name__ == "__main__":
-    unittest.main()
-
-
 class BlindIsolationTests(CodexLaneFixture):
     """2026-09-23 re-record: every lane child ignores the user config and runs without hooks, in a real run
     and in the dry run's printed commands alike."""
@@ -564,3 +560,48 @@ class BlindIsolationTests(CodexLaneFixture):
         with contextlib.redirect_stdout(out), contextlib.redirect_stderr(io.StringIO()):
             self.assertEqual(self.run_lane(["--dry-run"]), 0)
         self.assertIn("--ignore-user-config -c features.hooks=false -c features.plugin_hooks=false", out.getvalue())
+
+    def test_native_web_search_is_off(self):
+        self.write_packet("foundation", "native-clients")
+        self.assertEqual(self.run_lane(), 0)
+        argv = self.argv_calls()[0]
+        self.assertIn('web_search="disabled"', [argv[index + 1] for index, arg in enumerate(argv) if arg == "-c"])
+
+    def test_a_repository_with_git_history_is_refused_unless_allowed(self):
+        self.write_packet("foundation", "native-clients")
+        (self.repo / ".git").write_text("gitdir: /elsewhere\n", encoding="utf-8")
+        err = io.StringIO()
+        with contextlib.redirect_stderr(err):
+            self.assertEqual(self.run_lane(), 2)
+        self.assertIn("--export copy", err.getvalue())
+        self.assertFalse(self.argv_log.exists())
+        self.assertEqual(self.run_lane(["--allow-git-history"]), 0)
+
+    def test_the_blind_audit_reports_what_a_child_reached_outside_the_boundary(self):
+        self.write_packet("foundation", "native-clients")
+        def done(item):
+            return json.dumps({"type": "item.completed", "item": item})
+        self.events_file.write_text("\n".join([
+            done({"type": "command_execution", "command": f"/bin/bash -lc 'sed -n 1,40p {self.repo}/catalogs/x.json'"}),
+            done({"type": "command_execution", "command": "/bin/bash -lc 'rg -n verdict /home/example/code/agent-lab/docs'"}),
+            done({"type": "command_execution", "command": "/bin/bash -lc 'git log -p -- catalogs'"}),
+            done({"type": "web_search", "query": "x"}),
+            done({"type": "mcp_tool_call", "server": "s", "tool": "t"}),
+        ]) + "\n" + CANNED_EVENTS, encoding="utf-8")
+        err = io.StringIO()
+        with contextlib.redirect_stderr(err):
+            self.assertEqual(self.run_lane(), 0)
+        audit = json.loads((self.work_dir / "codex" / "blind-audit.json").read_text(encoding="utf-8"))
+        entry = audit["layers"]["foundation__native-clients"]
+        self.assertEqual((entry["web_search"], entry["mcp_tool_calls"], entry["commands"]), (1, 1, 3))
+        flagged = {item["command"]: item["reasons"] for item in entry["flagged_commands"]}
+        self.assertEqual(len(flagged), 2, flagged)
+        self.assertTrue(any("path outside the repository and packets: /home/example/code/agent-lab/docs" in reason
+                            for reasons in flagged.values() for reason in reasons))
+        self.assertTrue(any("runs git" in reasons for reasons in flagged.values()))
+        self.assertIn("blind audit flags 1 layer(s)", err.getvalue())
+
+
+
+if __name__ == "__main__":
+    unittest.main()

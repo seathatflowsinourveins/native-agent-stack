@@ -1051,10 +1051,14 @@ previous run (or the checked-in ledger) already chose.
 
 ```sh
 python3 tools/sota-convergence/blind_checkout.py \
-  --source . --rev HEAD --dest /path/to/blind-checkout
-# ... run the blind lane against /path/to/blind-checkout ...
+  --source . --rev HEAD --dest /path/to/blind-checkout --export /path/to/blind-export
+# ... run the blind lanes against /path/to/blind-export (no .git, no BLIND-MANIFEST.json) ...
 git worktree remove --force /path/to/blind-checkout
 ```
+
+`--export` copies the stripped tree without `.git` or `BLIND-MANIFEST.json`. The worktree's `.git` reaches
+the source repository's history, so `git show <rev>:<path>` would recover every stripped value.
+Hand the lanes this copy, not the worktree.
 
 It removes outright: `evidence/artifacts/layer-verdicts-*/` (recursively),
 `catalogs/sota-convergence/layer-verdicts-*.json`,
@@ -1112,16 +1116,14 @@ records `--source`'s absolute host path.
 
 This tool never removes the worktree it creates; the caller does that with
 `git worktree remove --force <dest>` once the blind lane has finished.
-Two caveats it does not itself close: the destination is a `git worktree` of
-`--source` and so shares that repository's object store -- `git log`/
-`git diff`/`git show HEAD:<path>` run inside `<dest>` can still recover a
-stripped value from history, so a lane given raw `git` access (rather than
-just the working tree) is not actually blind; deny the lane `git`, or export
-with `git archive` instead of handing over the worktree, if that matters.
-The manifest's per-field hashes, even keyed, still let an operator (who also
-holds the key) map every stripped path to its class of change; they are an
-audit trail for the operator, not something to hand the blind lane
-unfiltered.
+The worktree itself is not blind. It is a `git worktree` of `--source` and shares that repository's
+object store, so `git log`, `git diff` or `git show HEAD:<path>` inside `<dest>` recovers every stripped
+value. `git archive` does not help either: it exports the committed tree before stripping. Use
+`--export`, which omits `.git`; `codex_lane.py` refuses a repository with `.git` unless
+`--allow-git-history`.
+
+The manifest's per-field hashes are keyed, but they still let an operator who holds the key map every
+stripped path to its class of change. They are the operator's audit trail, and `--export` leaves them out.
 
 ## Codex lane
 
@@ -1182,24 +1184,37 @@ python3 tools/sota-convergence/codex_lane.py \
   --work-dir /path/to/work-dir --repo . --dry-run   # prints the command per pending layer, writes nothing
 ```
 
-**Blind children (2026-09-23 re-record).** Every `codex exec` runs with `--ignore-user-config`, which
-skips `$CODEX_HOME/config.toml`; auth still uses `CODEX_HOME`. It also runs with lifecycle hooks off
-(`features.hooks`, `features.plugin_hooks`). Memory stores and code indexes can return the incumbent
-verdicts or the catalog's selection labels, and without the user config none of the user's MCP servers,
-plugins or profiles load. Project trust lives in that config, so no project `.codex/config.toml` loads
-either.
+**Blind children (2026-09-23 re-record).** Memory stores, code indexes, the web and git history can
+return the incumbent verdicts or the catalog's selection labels.
 
-Measured with codex-cli 0.155.1 from the agent-lab checkout at `RUST_LOG=info`:
-- A default `codex exec` initialized seven MCP servers: ai-memory, SocratiCode, jCodeMunch, Serena,
-  context-mode and two built-in OpenAI servers.
-- With these flags, only the two built-in servers initialized: plugin-runtime and OpenAI Developers MCP.
+What configuration denies. Every `codex exec` runs with:
+- `--ignore-user-config`, which skips `$CODEX_HOME/config.toml`. Auth still uses `CODEX_HOME`. The
+  user's MCP servers, plugins, profiles and project trust do not load, and without trust no project
+  `.codex/config.toml` loads either.
+- Lifecycle hooks off: `features.hooks` and `features.plugin_hooks`.
+- Native web search off: `web_search="disabled"`.
 
-Per-server `mcp_servers.<name>.enabled=false` overrides are not used. On a server the loaded config does
-not define, codex rejects the partial table ("invalid transport").
+Measured with codex-cli 0.155.1:
+- **MCP servers** (`RUST_LOG=info`, from the agent-lab checkout): a default run initialized seven MCP
+  servers (ai-memory, SocratiCode, jCodeMunch, Serena, context-mode, plugin-runtime and OpenAI
+  Developers MCP). With the flags, only plugin-runtime and OpenAI Developers MCP initialized.
+- **Web search:** a probe child without the web-search pin ran a web search. With it, the child reported
+  no web search tool.
+- **Rejected alternative:** per-server `mcp_servers.<name>.enabled=false` overrides failed with
+  "invalid transport". Codex rejects such a partial table when the loaded config does not define that
+  server.
 
-Rule 6 of `lane-prompt.md` states the same boundary for both lanes: only the packet and files under the
-repository root. The boundary is configuration plus instruction, not a sandbox: `--sandbox read-only`
-still lets a child read any host path. So give the lanes a `blind_checkout.py` export without `.git`.
+What remains and how it is handled:
+- **Shell reads:** `--sandbox read-only` still lets a child read any host path and run CLIs such as
+  ai-memory from `PATH`. Rule 1 of `lane-prompt.md` forbids it, and so does the Claude lane's blind rule.
+- **Global instructions:** a probe child quoted `$CODEX_HOME/AGENTS.md`, so that file still loads.
+- **Git history:** `codex_lane.py` refuses a `--repo` that contains `.git` unless `--allow-git-history`
+  is passed. Run the lanes on a `blind_checkout.py --export` copy.
+- **Blind audit:** after each run, `codex_lane.py` writes `<work-dir>/codex/blind-audit.json`, a
+  report-only reading of each child's events. It counts web searches and MCP tool calls, and flags
+  commands that name an absolute path outside the repository and the packets directory or that run
+  git, ai-memory, agentsview, mcporter, qmd, socraticode, jcodemunch, serena, curl or wget. A flag is
+  evidence for the coordinator to review and disclose, not a verdict.
 
 `--prompt` and `--schema` override the default `lane-prompt.md` /
 `lane-return.schema.json` paths (both otherwise resolved next to

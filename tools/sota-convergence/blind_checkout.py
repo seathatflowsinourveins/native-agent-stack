@@ -398,11 +398,23 @@ def run_blind_checkout(source: Path, rev: str, dest: Path, hmac_key: bytes = Non
     return manifest
 
 
+def export_tree(dest: Path, export: Path) -> None:
+    """Copy the stripped worktree to ``export`` without ``.git`` or ``BLIND-MANIFEST.json``: the worktree's
+    ``.git`` reaches the source repository's history, where ``git show <rev>:<path>`` recovers every
+    stripped value, and the manifest is the operator's audit trail. Lanes are given this copy."""
+    if export.exists():
+        raise SystemExit(f"--export {export} already exists")
+    shutil.copytree(dest, export, symlinks=True, ignore=shutil.ignore_patterns(".git", "BLIND-MANIFEST.json"))
+
+
 def parse_args(argv=None):
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--source", type=Path, required=True, help="An existing git checkout.")
     parser.add_argument("--rev", required=True, help="Any commit-ish --source can resolve.")
     parser.add_argument("--dest", type=Path, required=True, help="Must not already exist.")
+    parser.add_argument("--export", type=Path,
+                        help="Also copy the stripped tree here without .git or BLIND-MANIFEST.json (must not exist); "
+                             "hand this copy, not the worktree, to the lanes.")
     return parser.parse_args(argv)
 
 
@@ -410,7 +422,12 @@ def main(argv=None) -> int:
     args = parse_args(argv)
     source = args.source.resolve()
     dest = args.dest.resolve()
+    export = args.export.resolve() if args.export else None
+    if export is not None and export.exists():
+        raise SystemExit(f"--export {export} already exists")
     manifest = run_blind_checkout(source, args.rev, dest)
+    if export is not None:
+        export_tree(dest, export)
     key_path = dest.parent / f"{dest.name}.hmac-key"
     # Owner-only, created exclusively: the key reverses the keyed hashes over a small
     # vocabulary, so no lane that can read the parent directory may read it.
@@ -419,7 +436,8 @@ def main(argv=None) -> int:
         handle.write(manifest.pop("hmac_key_hex") + "\n")
     print(json.dumps({"removed_files": len(manifest["removed_files"]),
                        "stripped_fields": len(manifest["stripped_fields"]),
-                       "hmac_key_path": str(key_path)}, sort_keys=True))
+                       "hmac_key_path": str(key_path),
+                       "export": str(export) if export is not None else None}, sort_keys=True))
     return 0
 
 
