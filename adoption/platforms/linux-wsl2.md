@@ -14,7 +14,7 @@ git checkout "$(python3 -c "import json;print(json.load(open('adoption/manifest.
 ```
 
 That checkout target is `adoption/manifest.json` `source.release_tag`
-(`v2026.09.22.1` or a later tag, at `source.release_commit`, published with
+(`v2026.09.23` or a later tag, at `source.release_commit`, published with
 SLSA build provenance by `.github/workflows/publish-catalog.yml`). Do
 **not** check out `source.baseline_commit`: that field predates `adoption/`
 and `tools/adoption/` entirely and is never a checkout target (Codex
