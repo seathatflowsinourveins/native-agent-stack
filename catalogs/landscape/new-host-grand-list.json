@@ -121,7 +121,25 @@
         "local_generation_model_tier": "large-32b-q4",
         "workflow_concurrency_cap": 16
       },
-      "measured": null,
+      "measured": {
+        "cores": 24,
+        "cpu_brand": "Intel(R) Core(TM) Ultra 9 275HX",
+        "effective_ram_gb": 47.0,
+        "effective_ram_gb_source": "proc_meminfo",
+        "evidence_class": "native_proven",
+        "gpu": {
+          "evidence_class": "native_proven",
+          "name": "NVIDIA GeForce RTX 5090 Laptop GPU",
+          "vram_gb": 23.9
+        },
+        "is_wsl": true,
+        "platform": "wsl",
+        "ram_gb_proc_meminfo": 47.0,
+        "wslconfig_memory_gb": 48.0,
+        "wslconfig_memory_gb_evidence_class": "source_review",
+        "wslconfig_other_candidates": [],
+        "wslconfig_source": "/mnt/c/Users/example/.wslconfig"
+      },
       "sizing_arithmetic": null
     },
     {
