@@ -12564,8 +12564,8 @@
     },
     {
       "path": "evidence/artifacts/sota-refresh-20260923/hw-profiles/README.md",
-      "sha256": "2b47948c30992c408810d62a4f45054b3e29bd0c8cea4974f4bdb69755f37323",
-      "bytes": 7949
+      "sha256": "d0c84eaa61e72c7b5f69b0867f34628050cf0694b37703ad372b26cc29689d57",
+      "bytes": 9201
     },
     {
       "path": "evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json",
@@ -12584,8 +12584,13 @@
     },
     {
       "path": "evidence/artifacts/sota-refresh-20260923/hw-profiles/review-findings-response.json",
-      "sha256": "374ace11ba2553bd19e5702569e3024310c415eb65003a4c91506565c1b76b75",
+      "sha256": "c3a254b07e14dc1f1ffe60f8e7884549cd57aa9bd5a46a9f470e84618e91ac4c",
       "bytes": 8316
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/hw-profiles/review-findings-response-round2.json",
+      "sha256": "5a27f214812ff65b880ee53678efb8902595ca3f35ae446e9204f0c4de32b3ff",
+      "bytes": 4315
     }
   ],
   "convergence_records": [

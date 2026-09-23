@@ -1,6 +1,6 @@
 {
   "id": "sota-refresh-20260923-hw-profiles-review-findings-response",
-  "component": "Response to the independent Opus review of unit hw-profiles' first submission (all 12 findings)",
+  "component": "Response to the independent Opus review of unit hw-profiles' first submission (all 14 findings)",
   "from_pin": null,
   "to_version": null,
   "release_published_at": null,
@@ -8,7 +8,7 @@
     "written_at": "2026-09-23T00:40:00Z",
     "written_after_fix_note": "Preregistered the fix plan for each finding before implementing it in this round; this file records outcome and disposition per finding after the fixes landed.",
     "expectation": "Every blocker and major finding gets a code, data or test change; every minor finding gets either a fix or an explicit, evidenced reason it is out of scope (a protected path); no finding is silently dropped.",
-    "criteria": "This file lists all 12 findings from the review with a disposition (fixed / addressed / out_of_scope_protected_path) and points to the concrete diff or receipt for each."
+    "criteria": "This file lists all 14 findings from the review with a disposition (fixed / addressed / out_of_scope_protected_path) and points to the concrete diff or receipt for each."
   },
   "acceptance_check_ref": "tests/test_hardware_profile.py, tests/test_workflow_hardening.py, tests/test_workflow_security_coverage.py, actionlint, zizmor --offline (all re-run after the fixes; see hardware-profile-tool.json and mlx-lm-hash-lock.json for the detailed command/result records)",
   "commands": [],

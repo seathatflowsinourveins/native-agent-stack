@@ -63,7 +63,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
-          python-version: '3.13'
+          python-version: '3.12'
           check-latest: false
       - name: Run the hardware profile script (measured, native_proven for this runner)
         run: |
@@ -94,7 +94,8 @@ jobs:
             -o "$RUNNER_TEMP/hw-profile/requirements.lock.check.txt"
           diff -u tools/mlx-smoke/requirements.lock.txt "$RUNNER_TEMP/hw-profile/requirements.lock.check.txt"
       - name: Create an isolated virtual environment for the smoke test
-        run: $UV venv "$RUNNER_TEMP/mlx-smoke-venv"
+        run: |
+          "$UV" venv --python 3.12 "$RUNNER_TEMP/mlx-smoke-venv"
       - name: Install the hash-locked mlx-lm requirements into the isolated venv
         run: |
           "$UV" pip install --python "$RUNNER_TEMP/mlx-smoke-venv/bin/python3" \

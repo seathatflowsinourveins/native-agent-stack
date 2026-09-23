@@ -1,0 +1,31 @@
+{
+  "id": "sota-refresh-20260923-hw-profiles-review-findings-response-round2",
+  "component": "Response to the independent rereview of unit hw-profiles' second submission (commit 8739164, verdict accept with 2 minor findings)",
+  "from_pin": null,
+  "to_version": null,
+  "release_published_at": null,
+  "preregistration": {
+    "written_at": "2026-09-23T01:21:42Z",
+    "written_after_fix_note": "This file is written after the fixes below were implemented and checked, not before; the rereview's two findings and this response were both authored in the same cleanup pass. Labelled late per the task's timestamp-honesty instruction rather than backdated.",
+    "expectation": "Both minor findings from the rereview get a code or documentation fix; no finding is silently dropped.",
+    "criteria": "This file lists both rereview findings with a disposition and points to the concrete diff for each."
+  },
+  "acceptance_check_ref": "python3 -c \"import yaml; yaml.safe_load(...)\" for YAML validity, /tmp/actionlint-check/actionlint, and zizmor --offline --no-config --no-ignores --no-progress --persona regular --strict-collection --format json, all re-run against .github/workflows/hardware-profile-smoke.yml after this round's edits; see checks below for exact results. The macOS job itself remains unexecuted on a real runner.",
+  "commands": [
+    "python3 -c \"import yaml; yaml.safe_load(open('.github/workflows/hardware-profile-smoke.yml'))\"",
+    "/tmp/actionlint-check/actionlint .github/workflows/hardware-profile-smoke.yml",
+    "zizmor --offline --no-config --no-ignores --no-progress --persona regular --strict-collection --format json .github/workflows/hardware-profile-smoke.yml"
+  ],
+  "results": [
+    "minor (macOS job's setup-python stayed at 3.13 while the lock is resolved/diff-checked for 3.12, and `uv venv` passed no --python): fixed. The macOS job's setup-python step (the one feeding the mlx-smoke venv and recompile-check job) now requests python-version '3.12', matching the --python-version 3.12 already used in the uv pip compile step. `uv venv` now passes --python 3.12 explicitly: `\"$UV\" venv --python 3.12 \"$RUNNER_TEMP/mlx-smoke-venv\"`. The ubuntu-24.04 job's own setup-python (measurement/unit-test job, unrelated to the mlx-lm lock) is intentionally left at 3.13. The previously-unquoted $UV on that line is now quoted, matching every other use of $UV in the file.",
+    "minor (review-findings-response.json and README.md undercounted the first-round review at 'all 12 findings' when it was 14 [1 blocker, 5 major, 8 minor]; requirements.in's comment cited a requirements.lock.txt header that does not exist because the lock is compiled with --no-header): fixed. review-findings-response.json's component and preregistration.criteria fields now read 'all 14 findings' / 'lists all 14 findings'. README.md's table row and prose now say 'all 14 review findings' / 'for all 14'. requirements.in's header comment no longer points at a nonexistent lock-file header; it now states the cutoff and --no-header flag directly and points only at the workflow file, which is where both the committed-lock generation and the CI diff-check recompile actually carry --exclude-newer 2026-09-23T00:00:00Z."
+  ],
+  "verdict": "qualified",
+  "evidence_class": "source_review",
+  "limits": [
+    "This file is a disposition summary, not itself an executed check beyond the three offline lint/parse commands listed above; none of the three round-2 fixes (python-version alignment, doc counts, requirements.in comment) have been exercised by an actual macOS Actions run, which remains the largest open limit for this unit overall.",
+    "The YAML-validity, actionlint, and zizmor checks were run on this Linux host against the workflow file's static text; they cannot detect a runtime interpreter-selection problem on a real macos-15 runner, only the absence of a syntax or lint-detectable issue.",
+    "No expensive checks (full unittest suite, validate.py, build_ecosystem.py --check) were re-run for this narrowly-scoped round-2 fix, per the instruction not to re-run expensive checks unless a finding requires it; none of the two rereview findings touched code paths those suites exercise beyond the workflow YAML and two prose/comment files."
+  ],
+  "checked_at": "2026-09-23T01:21:42Z"
+}

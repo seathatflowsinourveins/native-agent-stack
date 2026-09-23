@@ -20,7 +20,7 @@ fix, not before it.
 | --- | --- | --- | --- |
 | `hardware-profile-tool.json` | `scripts/hardware_profile.py` + `adoption/hardware-profiles.json` (revised after review) | qualified | native_proven |
 | `mlx-lm-hash-lock.json` | `tools/mlx-smoke/requirements.lock.txt` + the macOS job's uv sequencing (revised after review) | not_comparable | local_integration |
-| `review-findings-response.json` | Disposition of all 12 review findings | qualified | source_review |
+| `review-findings-response.json` | Disposition of all 14 review findings | qualified | source_review |
 | `this-host.json` | Raw `scripts/hardware_profile.py` output for this host (re-run after the fixes; redaction now labelled) | (input to `hardware-profile-tool.json`) | native_proven |
 
 ## Summary
@@ -59,7 +59,7 @@ fix, not before it.
   "qualify the newest release" instruction even though the pin does not use
   it.
 - Two reproducibility/security fixes landed in the fix round (see
-  `review-findings-response.json` for all 12): (1) the macOS job's uv
+  `review-findings-response.json` for all 14): (1) the macOS job's uv
   install/venv/pip-install sequence no longer activates the venv or invokes
   `python3 -m uv` (a review-found blocker: uv is not importable inside an
   activated venv without system-site-packages); uv is now a standalone,
@@ -69,6 +69,24 @@ fix, not before it.
   publishing a new release cannot make the CI job's redundant-compile-and-diff
   check fail on an unrelated PR; re-verified byte-identical to the committed
   lock file at that cutoff.
+- A second-round rereview found the macOS job's `setup-python` step still
+  pinned `3.13` while the lock is resolved and diff-checked for `3.12`
+  (`--python-version 3.12` at the compile step), and `uv venv` was called
+  with no `--python` at all, so the smoke-test venv could have been built
+  against whichever interpreter `setup-python` put first on `PATH`. Both
+  `setup-python` steps that feed the macOS job's venv and the recompile check
+  now request `3.12` explicitly, and `uv venv` now passes `--python 3.12`.
+  The ubuntu job's own `setup-python` (measurement/unit-test job, unrelated
+  to the mlx-lm lock) is unchanged at `3.13`. This round also fixed two
+  documentation errors the rereview found: `review-findings-response.json`
+  and this README undercounted the first round's review at "12" findings
+  when it was 14 (1 blocker, 5 major, 8 minor; the response file's 15
+  disposition entries cover all 14, with one finding split across two
+  entries), and `requirements.in`'s comment pointed at a
+  `requirements.lock.txt` header that does not exist (the lock is compiled
+  with `--no-header`) -- both are corrected in place. None of these three
+  fixes have been exercised on a real macOS runner; that remains the largest
+  open limit.
 
 ## Checks run (offline / local, this host)
 
