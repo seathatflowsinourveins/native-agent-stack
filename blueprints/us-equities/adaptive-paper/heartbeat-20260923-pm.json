@@ -1,0 +1,321 @@
+{
+  "schema_version": 1,
+  "date": "2026-09-23",
+  "phase": "afternoon",
+  "kind": "native_paper_heartbeat",
+  "status": "reviewed_ready_for_bounded_paper_trial",
+  "base_commit": "54ad06c3a1a671d8582e945404958a07ab472745",
+  "config_sha256": "77244c396c407d20f7b21f0e9e8ad9a2c4803ad663247ac210076a47ebbc7eb3",
+  "account_scope": "Original private Alpaca paper account ledger and lock; no new state root.",
+  "risk": {
+    "capital_usd": "10000",
+    "gross_usd": "5000",
+    "order_usd": "1000",
+    "order_shares": "1",
+    "loss_usd": "25",
+    "drawdown_usd": "25",
+    "leverage": "1",
+    "rest_per_minute": 200,
+    "all_submissions_per_minute": 180,
+    "duration_seconds": 300,
+    "cleanup_seconds": 120,
+    "quote_max_age_seconds": 3
+  },
+  "continuity": {
+    "before": {
+      "phase": "finished",
+      "status": "passed",
+      "requests": 168,
+      "trials": 3,
+      "intents": 0,
+      "positions": 0
+    },
+    "stop_present": true,
+    "separate_ledger_timer": "remains inactive",
+    "entry_hold_reason": "Separately created same-account ledgers omit order, realized-loss and request history from the original ledger."
+  },
+  "research": {
+    "feed": "iex",
+    "finished_at": "2026-09-23T17:38:37.906678+00:00",
+    "collection_observed_at": "2026-09-23T17:38:37.869351+00:00",
+    "news_items": 50,
+    "snapshots": 24,
+    "new_article_ids_since_morning": 31,
+    "unchanged_article_revisions": 19,
+    "news_symbol_coverage": 19,
+    "news_window": "capped_more_available",
+    "publication_range_utc": [
+      "2026-09-23T09:58:32Z",
+      "2026-09-23T17:35:18Z"
+    ],
+    "timestamps": "Publication, update and observation times remain separate in the retained private artifact.",
+    "fresh_quotes": 23,
+    "fresh_quotes_within_15bps": 12,
+    "breadth": {
+      "positive": 5,
+      "negative": 19
+    },
+    "errors": 0,
+    "quarantined": 0,
+    "http_reads": 2,
+    "http_successes": 2,
+    "engine_eligible": false,
+    "benchmark_prior_close_change_pct": {
+      "SPY": -0.758,
+      "QQQ": -1.05,
+      "IWM": -1.696,
+      "DIA": -0.652
+    },
+    "strategy_interpretation": "Weaker day-return breadth than morning, using the same prior closes. This does not establish any of the five rolling-window strategy selections; IEX research remains separate from SIP execution.",
+    "artifact_sha256": "0c44116576bac87c37a48c08babfe15b09ddfab34a41c3895d618af0acb86f8e"
+  },
+  "promotion_gate": {
+    "status": "reused_same_session_input",
+    "rows": 480,
+    "symbols": 24,
+    "completed_daily_sessions": 20,
+    "through": "2026-09-22",
+    "input_sha256": "99cbacdff5b88b28721076de37f8dd2f21c71c2dcf7f5da8e2c4813548b96701",
+    "morning_checks_passed": 12
+  },
+  "qualification": {
+    "status": "passed_focused_native_checks_and_independent_reviews",
+    "contract": [
+      "Only a configured symbol with otherwise valid fresh native-compatible fields may enter crossed-only quarantine.",
+      "Invalidate executable caches and retain exact-nanosecond tombstones before yielding; reject queued stale/equal-time recovery.",
+      "Release only on a strictly newer fresh valid quote within the existing timeout; preserve valid historical windows and ledger valuations.",
+      "Block affected entries and dependent benchmark admissions; recheck reservation and before-POST races.",
+      "Affected holdings or unresolved/native pending orders retain the whole-feed stop and recovery behavior; malformed data remain fatal.",
+      "No numeric limits, configuration bytes, account history or strategy formulas change."
+    ],
+    "tests": {
+      "combined": {
+        "source_commit": "d1e5b4f2",
+        "run": 571,
+        "passed": 570,
+        "skipped": 1,
+        "seconds": 90.661,
+        "skip_reason": "exchange_calendars absent in shared native engine runtime"
+      },
+      "quote_independent": {
+        "run": 41,
+        "passed": 41,
+        "skipped": 0
+      },
+      "timestamp_followup_independent": {
+        "run": 28,
+        "passed": 28,
+        "skipped": 0
+      },
+      "recovery_activities_followup": {
+        "run": 74,
+        "passed": 74,
+        "skipped": 0
+      },
+      "consolidation_independent": {
+        "run": 27,
+        "passed": 27,
+        "skipped": 0
+      },
+      "legacy_provenance_followup": {
+        "run": 29,
+        "passed": 29,
+        "skipped": 0
+      },
+      "scope": "Local native LiveNode/mocked HTTP and temporary SQLite fixtures; test-process STOP isolation only; not broker E2E.",
+      "consolidation_final": {
+        "run": 32,
+        "passed": 32,
+        "skipped": 0,
+        "seconds": 20.939
+      },
+      "consolidation_final_independent_regressions": {
+        "run": 3,
+        "passed": 3,
+        "skipped": 0,
+        "seconds": 2.674
+      }
+    },
+    "reviews": {
+      "codex": "All supported quote and consolidation findings resolved; final three history regressions independently passed.",
+      "claude": {
+        "requested_agent": "evidence-reviewer",
+        "requested_model": "opus",
+        "requested_effort": "high",
+        "resolved_model": "claude-opus-5-5",
+        "effort_observed": "not independently observable inside reviewer",
+        "initial_review": "turn cap reached without verdict; retained",
+        "quote_final": "recovery-port finding closed through ea338f13",
+        "consolidation_final": "7908a7d3 source read: both remaining findings resolved; no new defect in narrow diff. No tests/broker calls by reviewer."
+      }
+    },
+    "limitations": [
+      "Equal-time conflict frequency in opted-in native entry remains unmeasured; conservative stop may interrupt a trial.",
+      "Benchmark invalidation before port.submit is outside decision-time synchronization coverage.",
+      "Exact-plan retry is idempotent; a caller restart after COMMIT requires reading the stored consolidation receipt before any new action."
+    ],
+    "source_refs": {
+      "quote_candidate": "ba1950f2307dd63abb028f6ae0991d6a0c47156a",
+      "timestamp_fix": "378c694059972da663bdde2d2160401f38515271",
+      "recovery_activities": "ea338f1307e76a141a24071f2f69c7b3a1b4aab4",
+      "consolidation_final": "7908a7d34b1371b1a8820e17a0335652e7906347"
+    }
+  },
+  "attempts": [],
+  "limitations": [
+    "No afternoon entry trial has run yet; the next trial is conditional on required catalog/source checks and a fresh broker session.",
+    "Morning interrupted trials remain separate failures with flat recovery.",
+    "Broker throughput, strategy profitability and all-family native order execution remain unqualified.",
+    "No live trading, added leverage, paid features or catalyst-order signals."
+  ],
+  "account_history": {
+    "status": "consolidated_into_original_ledger",
+    "broker_observed_at": "2026-09-23T17:54:14.710078+00:00",
+    "regular_session_open": true,
+    "positions": 0,
+    "open_orders": 0,
+    "cash_delta_from_original_baseline_usd": "-1.10",
+    "expected_cash_delta_usd": "-1.100",
+    "cash_match": true,
+    "known_ledger_orders": 29,
+    "native_fault_canceled_zero_fill_orders": 1,
+    "broker_orders": 30,
+    "all_order_identities_traced": true,
+    "actual_fill_increments": 35,
+    "filled_orders": 28,
+    "shares_bought": "43",
+    "shares_sold": "43",
+    "realized_loss_usd": "1.41",
+    "global_peak_pnl_usd": "0",
+    "initial_audit_requests": 605,
+    "original_ledger_reconciliation_reads_added": 6,
+    "native_fault_requests": 19,
+    "additional_request_only_diagnostic_roots": 4,
+    "limitation": "Counts describe separate historical runs and a dated proof, not a completed import or this heartbeat's entry trial. Final locked snapshots must include newer diagnostics and all reconciliation requests.",
+    "roundtrips": 14,
+    "profitable_episodes": 4,
+    "losing_episodes": 10,
+    "costs": {
+      "executed_price_pnl_usd": "-1.100",
+      "spread_slippage_attribution": "unmeasured",
+      "itemized_fees": "No non-FILL activity in the queried interval; later posting remains possible.",
+      "subscription_cost": "not measured or changed"
+    },
+    "plan": {
+      "status": "plan_only",
+      "source_ledgers_total": 15,
+      "source_imports": 14,
+      "requests": 770,
+      "trials": 16,
+      "intents": 30,
+      "events": 146,
+      "broker_calls": 0,
+      "production_imported": false
+    },
+    "historical_economic_segments": [
+      {
+        "id": "e",
+        "buy_orders_filled": 1,
+        "sell_orders_filled": 1,
+        "fill_increments": 2,
+        "shares_each_way": "1",
+        "roundtrips": 1,
+        "realized_pnl_usd": "-0.01",
+        "historical_status": "needs_attention"
+      },
+      {
+        "id": "f",
+        "buy_orders_filled": 4,
+        "sell_orders_filled": 4,
+        "fill_increments": 8,
+        "shares_each_way": "4",
+        "roundtrips": 4,
+        "realized_pnl_usd": "-0.29",
+        "historical_status": "passed"
+      },
+      {
+        "id": "g",
+        "buy_orders_filled": 2,
+        "sell_orders_filled": 2,
+        "fill_increments": 4,
+        "shares_each_way": "2",
+        "roundtrips": 2,
+        "realized_pnl_usd": "-0.28",
+        "historical_status": "passed"
+      },
+      {
+        "id": "i",
+        "buy_orders_filled": 7,
+        "sell_orders_filled": 7,
+        "fill_increments": 21,
+        "shares_each_way": "36",
+        "roundtrips": 7,
+        "realized_pnl_usd": "-0.520",
+        "historical_status": "passed",
+        "scope": "larger historical configuration, not original-cap acceptance"
+      }
+    ],
+    "consolidation": {
+      "cash_delta": "-1.100",
+      "count_scope": "Source-history rows; flat positions and stale marks are archived only",
+      "counts": {
+        "events": 146,
+        "intents": 30,
+        "marks": 217,
+        "positions": 11,
+        "requests": 777,
+        "trials": 16
+      },
+      "drawdown": "1.100",
+      "flat": true,
+      "peak_pnl": "0",
+      "realized": "-1.100",
+      "realized_loss": "1.41",
+      "sources": 14,
+      "status": "applied",
+      "plan_digest": "93c0db77bc559623ce18aa141f19c8f3af4eb70e92b431cbb54d2166958bcfe5",
+      "proof_observed_at": 1790188747.7492251,
+      "applied_at": 1790188748.2481093,
+      "limits_unchanged": true,
+      "baseline_unchanged": true,
+      "halt_unchanged": true,
+      "destination_counts": {
+        "intents": 30,
+        "positions": 0,
+        "marks": 24,
+        "requests": 777,
+        "events": 147,
+        "trials": 16
+      },
+      "source_count": 14,
+      "stop_present": true,
+      "broker_regular_session_open": true,
+      "http_reads": 7,
+      "orders_submitted": 0,
+      "orders_cancelled": 0
+    },
+    "fresh_proof": {
+      "observed_at": "2026-09-23T18:39:07.749225+00:00",
+      "elapsed_seconds": 0.39583778381347656,
+      "orders": 30,
+      "fill_activities": 35,
+      "non_fill_activities": 0,
+      "positions": 0,
+      "open_orders": 0,
+      "regular_session_open": true,
+      "http_reads": 7,
+      "scope": "Actual private Alpaca paper GETs; complete one-page activities history in the queried interval. Future posted fees remain outside this observation."
+    },
+    "recovery": {
+      "status": "passed",
+      "errors": [],
+      "cash_delta_usd": "-1.10",
+      "cash_match": true,
+      "positions": 0,
+      "open_orders": 0,
+      "unresolved_orders": 0,
+      "native_engine_resumed": false
+    }
+  },
+  "orders_submitted_this_heartbeat": 0
+}

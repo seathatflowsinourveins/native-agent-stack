@@ -17,12 +17,12 @@
     "max_total_requests_per_minute": 200,
     "max_submission_requests_per_minute": 180,
     "native_synthetic_capacity": "180 fills / 90 roundtrips in60.4282seconds;178.7246submissions/minute;flat;zero broker connections",
-    "broker_status": "September23 two native SIP trials interrupted before300seconds; zero orders/fills/roundtrips; explicit recovery flat with cash matched. Crossed-quote handling qualification required before another entry trial.",
-    "market_research": "September23 bounded50-news-item/24-IEX-snapshot collection; publication/update/observation times retained; capped advisory coverage, no execution eligibility.",
+    "broker_status": "September23 quote guard reviewed and14same-account histories consolidated into original ledger. Actual18:39UTC paper proof matched30orders/35FILL activities; flat/cash-1.10USD matched and recovery passed. Next five-minute trial pending current checks.",
+    "market_research": "September23 17:38UTC bounded50news/24IEX snapshots;31new articles, breadth5positive19negative; publication/update/observation times retained, advisory only.",
     "selection": "Reuse selected native engine and official SDK; no replacement justified by repository recency",
     "overturning_comparison": "A maintained alternative must demonstrate better operational acceptance and cost-adjusted out-of-sample strategy results on the same frozen data/risk contract",
-    "latest_receipt": "blueprints/us-equities/adaptive-paper/heartbeat-20260923.json",
-    "latest_report": "blueprints/us-equities/adaptive-paper/heartbeat-20260923.md"
+    "latest_receipt": "blueprints/us-equities/adaptive-paper/heartbeat-20260923-pm.json",
+    "latest_report": "blueprints/us-equities/adaptive-paper/heartbeat-20260923-pm.md"
   },
   "foundation_catalog": "catalogs/foundation/manifest.json",
   "north_star": "blueprints/us-equities/north-star.md",

@@ -2976,6 +2976,24 @@
         "200REST/minute and180all-submissions/minute limits remain; no live trading, leverage above1x, paid features or catalyst-order signals."
       ],
       "path": "evidence/receipts/adaptive-paper-heartbeat-20260923.json"
+    },
+    {
+      "id": "adaptive-paper-heartbeat-20260923-pm",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "nautilus-trader",
+        "alpaca-py",
+        "claude-code",
+        "codex"
+      ],
+      "claim": "Bounded native market refresh and broker reconciliation traced split same-account paper histories; crossed-quote invalidation and append-only consolidation qualified locally while original-lane paper acceptance remains conditional.",
+      "limitations": [
+        "No new afternoon entry trial yet; historical fills in other configurations do not establish original-lane five-minute acceptance.",
+        "Native LiveNode and mocked HTTP checks are local fixtures; strategy profitability, all-family execution and broker throughput remain unqualified.",
+        "Account-wide STOP is retained until reviewed original-ledger consolidation and fresh broker/activity proof pass.",
+        "Original configuration, 200REST/minute and180all-submission ceilings remain; no live trading, added leverage, paid features or catalyst orders."
+      ],
+      "path": "evidence/receipts/adaptive-paper-heartbeat-20260923-pm.json"
     }
   ],
   "files": [
@@ -5447,8 +5465,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/README.md",
-      "sha256": "cf4681d7639a8268597b31b46462d04f1889d32c6a95d0cdc069e9e32fa51048",
-      "bytes": 17276
+      "sha256": "1cef6c97989ae37d07efce9c6428aa1566865ac4e0d336906d5c2f254426fbef",
+      "bytes": 18751
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/adaptive_policy_v1.receipt.json",
@@ -5497,13 +5515,13 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/native_adapter.py",
-      "sha256": "049b1eaeee67010e25b553726e201ce9be951c1a0bc67097908a7f9d86ce86c8",
-      "bytes": 23995
+      "sha256": "dfdbf59daef032215c61574e46ed9b1e3a1a5145f447d5aa9b0e3759a25c224a",
+      "bytes": 24601
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/native_strategy.py",
-      "sha256": "03eb8ea62bb60b7aa2799fa2f3e78908d30846cce77292148d4617031fc75b4d",
-      "bytes": 61013
+      "sha256": "71719cdab1345ae8ddd536ee1ac13c4dfcdc5df7cb52852103ac5fa3714ed286",
+      "bytes": 61011
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/receipt.json",
@@ -5532,8 +5550,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/runner.py",
-      "sha256": "f1209ebcfcb00df0e4364133db8298bcf8d8cdaddac6f86167ef6388b5773732",
-      "bytes": 82248
+      "sha256": "4f0dc781ef408290d923be78186d2205be8de20274208d09a95a2d2c600a42d9",
+      "bytes": 85395
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/safety.py",
@@ -5557,13 +5575,13 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "287ac6514010219ba77f4d2cee790e1c2892c77e14775c32cb00feeba94dfd4a",
-      "bytes": 4247
+      "sha256": "5776114276f194034c632f872248c7b5a3e90a43e56cf4789d491c45ee813e48",
+      "bytes": 4624
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/strategies.py",
-      "sha256": "56e9f639f61111282de3d0795908ea11719a22058899cc59f8839e10529f86cf",
-      "bytes": 7167
+      "sha256": "b7e9046cdc21847863e03917cdd3158caf3b696a89a5aa3df2a22e45999b8077",
+      "bytes": 8390
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/strategies_v1.py",
@@ -5572,8 +5590,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/transport.py",
-      "sha256": "5fcd8d440f3c82d216468ab8465e6d3b3d22669e17603bbdbec0707ae5b6d716",
-      "bytes": 45096
+      "sha256": "db5ff05603e4e162467e8175a2bd2269c499343d59bb7ba609e1c93b6ac6b46c",
+      "bytes": 51430
     },
     {
       "path": "blueprints/us-equities/alpaca-historical/README.md",
@@ -7462,8 +7480,8 @@
     },
     {
       "path": "catalogs/us-equities/runtime-target.json",
-      "sha256": "1f08fac1ee4ee6612629ea206a15d4b3b07e83b40dbce1db72ca21f7190c77b2",
-      "bytes": 9421
+      "sha256": "16f8a82bd01e15762d510f11e8ecefd0cc852659fd2e663056f7ce15b29f0998",
+      "bytes": 9467
     },
     {
       "path": "catalogs/us-equities/security-identity-review.json",
@@ -7647,8 +7665,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "13e27aad85386c4f8a3488ed4f27ffcb254357478f0a139e34bf3a4a4f0a0e4b",
-      "bytes": 12919910
+      "sha256": "1f255d7ac72c591f13ec9103387a3b3f96da367f08bf23af1ad9a9bbf17fdce0",
+      "bytes": 12921448
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -11487,8 +11505,8 @@
     },
     {
       "path": "observability/grand-dashboard/state.json",
-      "sha256": "5cb997fa20a27d158bfd283e39d969b1c459dff69dfac7c00f851f5807a38c5b",
-      "bytes": 10502
+      "sha256": "9ab154ada4de69592e3986c1f1d74bf45f9ec191f6a314ce44c552323f280ee4",
+      "bytes": 10497
     },
     {
       "path": "observability/native-data/README.md",
@@ -11672,8 +11690,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_native.py",
-      "sha256": "8612ffe4f91e7f52d38fd9b98adbf74b95a115433b6b36bbff57fc24b150e86f",
-      "bytes": 11221
+      "sha256": "951c8512a0060cc4c085368e9655b7fef0019eafd35bc94924bd7574a3746fc4",
+      "bytes": 12782
     },
     {
       "path": "tests/test_adaptive_paper_recovery.py",
@@ -11682,8 +11700,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_runner.py",
-      "sha256": "fd0832673b12777442c4eabdd5098ff242ab5d662418a3fad63fc06082729fb7",
-      "bytes": 80715
+      "sha256": "223a8d6ac2dbe9c8f3642f88182bcda4e1b654115c41dbf50278531e6d08e57c",
+      "bytes": 82694
     },
     {
       "path": "tests/test_adaptive_paper_safety.py",
@@ -11697,8 +11715,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_transport.py",
-      "sha256": "afcaa2c5544ea469f0898013023e9928ca44ba9b0935b23283f9166d325985a9",
-      "bytes": 39366
+      "sha256": "7c0a9a94207ec1c077a54c4778341a17182c13c10f06a8614c1139510cedccea",
+      "bytes": 41728
     },
     {
       "path": "tests/test_adoption_bootstrap.py",
@@ -13057,8 +13075,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_stop_status.py",
-      "sha256": "f90843d3f360d983226bdd450024ccef13a310573f268e21deb52c2637c161b4",
-      "bytes": 12636
+      "sha256": "954e5870cb6303c0c92a301f72f43569689d632e0d33457df570f057c803aa62",
+      "bytes": 13297
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/heartbeat-20260923.md",
@@ -13074,6 +13092,36 @@
       "path": "evidence/receipts/adaptive-paper-heartbeat-20260923.json",
       "sha256": "39b29bf9c4106b192302fd705678223e53422a9c48ba31793a14e8070806ccc4",
       "bytes": 1175
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/heartbeat-20260923-pm.json",
+      "sha256": "a31765bf7fe9d5dee24163d8e1665540d66b7306663b8eea37611597b6f5375a",
+      "bytes": 11389
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/heartbeat-20260923-pm.md",
+      "sha256": "10b0c08f843bd0ec9e2693c5ee55424cc5f4bb7718620624889a9e7ef1581f3b",
+      "bytes": 6072
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/ledger_consolidation.py",
+      "sha256": "c0e66c8f668fff7c6443c38c106c740cdadf6ffe49464f0affb4a38e1c8efb8f",
+      "bytes": 28541
+    },
+    {
+      "path": "evidence/receipts/adaptive-paper-heartbeat-20260923-pm.json",
+      "sha256": "22084ebe7fc6dbfae940b11e00f0d16d75fbac4b6871a10b5bfc8be3b598f4df",
+      "bytes": 1203
+    },
+    {
+      "path": "tests/test_adaptive_paper_ledger_consolidation.py",
+      "sha256": "f7738505ada816c7d14d50f3925ff8eab2f6b6b4d5fc793153f26fcae2a52291",
+      "bytes": 31284
+    },
+    {
+      "path": "tests/test_adaptive_paper_quote_quarantine.py",
+      "sha256": "eafe76b12a0c563c235aa05fd6213403985143e343ccea609844f25de60ee39d",
+      "bytes": 20511
     }
   ],
   "convergence_records": [

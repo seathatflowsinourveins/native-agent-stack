@@ -1,6 +1,6 @@
 # Adaptive equity research and paper practice
 
-Latest measured follow-up: [September 23 native paper heartbeat](heartbeat-20260923.md) and [receipt](heartbeat-20260923.json). Two SIP trials stopped before five minutes; zero orders/fills, recovered flat and cash matched. Early-stop reporting and legacy ledger compatibility were corrected. Crossed-quote handling requires separate qualification before another entry trial. The September 21 receipt below remains dated historical evidence.
+Latest measured follow-up: [September 23 afternoon report](heartbeat-20260923-pm.md) and [receipt](heartbeat-20260923-pm.json). Crossed-quote handling passed focused checks and independent review. Separately created same-account histories were consolidated into the original ledger; fresh proof and recovery matched a flat account with cash-1.10USD. The next five-minute trial remains conditional on current checks. The [morning heartbeat](heartbeat-20260923.md) retains both interrupted attempts; these are not five-minute acceptance. Earlier receipts remain dated historical evidence.
 
 This lane wires five deterministic policy families into NautilusTrader2.0.0rc5
 `LiveNode`, with the official Alpaca SDK0.44.0 carrying quotes, order updates and
@@ -8,11 +8,11 @@ paper REST requests. The native strategy, risk/execution engines and portfolio
 are in the order path. It extends the separate, previously accepted one-SPY
 paper smoke without changing that trial's source, limits or results.
 
-Current operational status and source hashes belong in `receipt.json`.
+Current operational status belongs in the latest dated heartbeat receipt; reviewed source hashes belong in `source-hashes.json`.
 The local capacity fixture is synthetic. It does not establish broker throughput
-or strategy profitability. The September21 regular session closed while the new
-integration was being built; the retained native paper smoke remains the only
-actual order result until a subsequent open-session receipt says otherwise.
+or strategy profitability. Subsequent native trials in another checkout produced
+paper fills, but used separate account ledgers and different configuration bytes.
+Their histories require reconciliation; they do not qualify this frozen lane.
 
 ## Policies and portfolio behavior
 
@@ -54,8 +54,9 @@ unfilled during gaps; these limits cannot guarantee a maximum realized loss.
 `config.json` selects the `iex` feed. `config-sip.json` is the same frozen
 trading configuration with `feed: "sip"`, for an account whose SIP entitlement
 has been separately confirmed; the single `feed` value drives both the REST
-quote/snapshot requests and the quote stream endpoint. No SIP run has been
-executed, so nothing here qualifies SIP data quality, entitlement or cost.
+quote/snapshot requests and the quote stream endpoint. September23 SIP trials
+received data; a separate sample observed crossed quotes. This does not establish
+general data quality or authorize any paid entitlement change.
 
 Trial continuity is keyed by the SHA-256 of the selected config file, recorded
 as `config_sha256` in the state directory's `trial.json`. `config.json` and
@@ -74,17 +75,33 @@ config file's bytes, not to its trading fields, so
 `config-sip.json` changes only the feed. Comparing the frozen trading fields
 instead of the file hash would unblock it; that change is not made here.
 
-A separate `--state-root` is the remaining option and is not a neutral switch. It
-creates a second, fully independent durable ledger
+A separate `--state-root` creates a second, fully independent durable ledger
 (`<state-root>/<account-fingerprint>/adaptive/ledger.sqlite3`) for the *same*
 paper account. Its intent, fill, request, event and trial tables start empty, so
 the account-level gross-loss and drawdown budgets, the baseline cash and the
 durable request-rate history all restart from zero, while the broker account and
 its shared 200/minute limit do not. Within one ledger these are deliberately
-never reset between trials. A second ledger is therefore acceptable only when the
-SIP trial is itself the first trial in that ledger and a fresh risk budget is
-intended; two ledgers driving one account would each believe they hold the full
-loss, drawdown and request budget.
+never reset between trials. The authorized continuation must use the original
+ledger, original account lock and exact prior configuration SHA256
+`77244c396c407d20f7b21f0e9e8ad9a2c4803ad663247ac210076a47ebbc7eb3`.
+Creating another ledger is not a configuration migration. Existing split
+histories must be consolidated with provenance, without erasing failed trials,
+partial fills, cumulative losses or request history. A new baseline or imported
+relaxed limit cannot substitute for this repair. The shared STOP remains until
+the reviewed prerequisites and fresh broker reconciliation pass.
+
+`ledger_consolidation.py` is a bounded operator repair for verified flat,
+chronologically separate histories. It requires the original global account
+lock, unchanged snapshots including WAL, exact broker order/activity proof and
+a recent cash/position reconciliation. It archives source provenance and appends
+history in one transaction without copying source risk settings or clearing STOP.
+Reapplying the same in-memory plan is idempotent. A second different import is
+deliberately unsupported. If the caller exits after COMMIT but before writing its
+result file, keep STOP and read `receipt` from the original database's
+`consolidation_runs` table under the same global lock. Preserve that stored
+receipt as the import result, inspect source provenance and obtain a fresh broker
+reconciliation. Do not retry a newly generated import plan, reset the ledger or
+interpret a recovered historical receipt as fresh entry authorization.
 
 `receipt.json` stays the dated 2026-09-21 record, so some of its counts now
 understate the suites, and it is not restated here. `full_repository_suite.run`
