@@ -688,6 +688,9 @@ def process_row(row: dict, root: Path, catalog: str, layer_id: str, work_dir: Pa
     exists for this layer. ``outcomes`` (when given) receives this layer's
     per-lane outcome for the run manifest: sealed, rejected with reasons, or missing."""
     grandfathered = is_grandfathered_run(run_date)
+    if not grandfathered and status_context is None:
+        # A new wave must derive platform status from receipts; never fall back to the legacy rule silently.
+        raise ValueError(f"process_row({catalog}__{layer_id}): run {run_date} needs a platform-status context")
     lane_paths = {lane: work_dir / lane / f"{catalog}__{layer_id}.json" for lane in LANES}
     outcome = {lane: {"outcome": "missing"} for lane in LANES}
     if outcomes is not None:

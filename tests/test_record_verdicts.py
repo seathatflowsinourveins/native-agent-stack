@@ -1764,6 +1764,21 @@ class NewWavePlatformStatusTests(NewWaveFixture):
         self.assertEqual(winner["platform_status"]["macos-arm64"], "untested")
         build_landscape(self.root)
 
+    def test_a_pin_bound_receipt_without_independent_review_records_conditional(self):
+        # Bound to the winner's pin but not independently reviewed: evidence of a pass, not a qualifying one.
+        self.write_mac_receipt("wave-mac-layer-c1", "1.0", independent_review=False)
+        catalog = self.both_lanes("wave-mac-layer", claude=REGISTERED_REFS, codex=REGISTERED_REFS)
+        code, output = self.run_wave()
+        self.assertEqual(code, 0, output)
+        winner = self.load_row(catalog, "wave-mac-layer")["winners"][0]
+        self.assertEqual(winner["platform_status"]["macos-arm64"], "conditional")
+        build_landscape(self.root)
+
+    def test_a_new_wave_row_without_a_status_context_is_refused(self):
+        with self.assertRaises(ValueError):
+            record_verdicts.process_row({}, self.root, "foundation", "wave-mac-layer", self.work_dir, "2026-09-23",
+                                        None, set(), {}, {}, [], run_date="20260923", status_context=None)
+
 
 class CheckedAtDefaultTests(NewWaveFixture):
     """Re-review finding: --checked-at defaulted to 2026-09-22 whatever --run-id said."""

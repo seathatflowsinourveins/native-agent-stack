@@ -119,7 +119,9 @@ POPULARITY_RECENCY_FIELDS = ("stars", "forks", "watchers", "pushed_at", "release
 # requirement names releases, versions or maintenance. prerelease describes that same release, and
 # pin_behind_upstream is derived by comparing the pin with it, so both go with it.
 UPSTREAM_RELEASE_FIELDS = ("latest", "prerelease")
-COPY_RELEASE_FIELDS = ("pin_behind_upstream",)
+# newcomer marks a candidate as recently discovered, a recency signal of the same kind (final
+# verification, 2026-09-23), so it is withheld with them.
+COPY_RELEASE_FIELDS = ("pin_behind_upstream", "newcomer")
 _POPULARITY_TOKENS = ("star", "fork", "watcher", "subscriber", "download", "popular", "trending")
 # Kept only when the packet's requirement text names them (a requirement about licensing or
 # maintenance status makes them evidence rather than a popularity proxy).
@@ -524,7 +526,8 @@ def parse_args(argv=None):
                         help="Drop decision-bearing labels (candidate and SOTA-component review_status, decision "
                              "selection and review_status) from every ledger-built packet, and popularity/recency "
                              "fields (stars, forks, watchers, pushed_at, released_at, any *_at; archived and "
-                             "license unless the requirement names them) from every candidate and component copy "
+                             "license unless the requirement names them; always upstream.latest, upstream.prerelease, "
+                             "pin_behind_upstream and the newcomer flag) from every candidate and component copy "
                              "of every packet; each stripped field is listed in the packet's withheld list. Off by "
                              "default so the 2026-09-22 packets reproduce.")
     parser.add_argument("--trading-candidates", choices=("ledger", "manifest"), default="ledger",

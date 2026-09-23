@@ -603,6 +603,8 @@ class WithholdWithManifestModeTests(ManifestTradingCandidatesTests):
         self.assertEqual(plain["withheld"], withheld["withheld"][:len(plain["withheld"])])
         self.assertIn("candidates[].upstream.stars", withheld["withheld"])
         self.assertFalse({key for key in keys_anywhere(withheld) if key in POPULARITY_RECENCY_KEYS})
+        self.assertIn("newcomer", "".join(json.dumps(plain)), "the fixture must exercise the newcomer flag")
+        self.assertFalse({key for key in keys_anywhere(withheld) if key in RECENCY_FLAG_KEYS})
         plain_all = self.build(trading_candidates="manifest")
         withheld_all = self.build(trading_candidates="manifest", withhold=True)
         self.assertNotEqual(plain_all["foundation__layer-a.json"], withheld_all["foundation__layer-a.json"])
@@ -614,6 +616,8 @@ POPULARITY_RECENCY_KEYS = ("stars", "forks", "watchers", "pushed_at", "released_
 # Re-review 2026-09-23: the latest upstream release is withheld entirely (a date-based tag such as
 # "release/2025-11-28" is a release date), with prerelease and the pin_behind_upstream comparison.
 RELEASE_KEYS = ("latest", "prerelease", "pin_behind_upstream")
+# Final verification 2026-09-23: the newcomer flag marks a recently discovered candidate, a recency signal.
+RECENCY_FLAG_KEYS = ("newcomer",)
 
 
 def keys_anywhere(value):
@@ -631,7 +635,7 @@ def scrub_popularity(value):
     archived/license (no fixture requirement names them) removed at any depth."""
     if isinstance(value, dict):
         return {key: scrub_popularity(item) for key, item in value.items()
-                if key not in POPULARITY_RECENCY_KEYS + RELEASE_KEYS + ("archived", "license")}
+                if key not in POPULARITY_RECENCY_KEYS + RELEASE_KEYS + RECENCY_FLAG_KEYS + ("archived", "license")}
     if isinstance(value, list):
         return [scrub_popularity(item) for item in value]
     return value
