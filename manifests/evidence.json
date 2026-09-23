@@ -7634,7 +7634,7 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "298c22dea63c7280f23b7fb942a3b51cc6321c8b2caa8debf05ba8effd26f590",
+      "sha256": "37888d8555417abc7e82b58ce742414df5f04f9c125ab4b2168e43ba401c8e02",
       "bytes": 12921432
     },
     {
@@ -7704,8 +7704,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "e56528af1cac64439b63e360614af80dc10032db758b98e9b0b803c0109bd28f",
-      "bytes": 36076
+      "sha256": "94ab0cada67dd094f2b4869145c75c478ec73d78af031ce51b3e4a42c4049c3b",
+      "bytes": 36620
     },
     {
       "path": "docs/grand-catalog-handbook.md",
@@ -11819,8 +11819,8 @@
     },
     {
       "path": "tests/test_gitleaks_config.py",
-      "sha256": "7f8f3f0e6d3b8d24523d0c938f46e85455d6c366e66e9036863eaa3c36d913b3",
-      "bytes": 30126
+      "sha256": "58466e76cbd06ee3ce014149c0c936dd54d3a76feb97e7d5797cad250660c176",
+      "bytes": 30300
     },
     {
       "path": "tests/test_gpu_inference.py",

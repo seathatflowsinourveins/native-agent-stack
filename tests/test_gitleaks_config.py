@@ -285,7 +285,7 @@ class GitleaksIgnoreFingerprintTests(unittest.TestCase):
     # gitleaks' own git-mode fingerprint format: `commit:path:rule:line`, or
     # `path:rule:line` for a working-tree (non-git) finding.
     FINGERPRINT_RE = re.compile(
-        r'^(?:(?P<commit>[0-9a-f]{40}):)?(?P<path>[^:]+):(?P<rule>[^:]+):(?P<line>\d+)$'
+        r'^(?P<commit>[0-9a-f]{40}):(?P<path>[^:]+):(?P<rule>[^:]+):(?P<line>\d+)$'  # commit required: a commit-less entry would suppress every commit and dir mode
     )
 
     def setUp(self):
@@ -452,7 +452,7 @@ class GitleaksIgnoreFingerprintTests(unittest.TestCase):
 
         subprocess.run(["git", "add", "-A"], cwd=str(worktree), check=True, capture_output=True)
         commit = subprocess.run(
-            ["git", "commit", "-m", "test: inject synthetic marker for gitleaksignore fingerprint test"],
+            ["git", "-c", "user.name=gitleaks-test", "-c", "user.email=gitleaks-test@example.invalid", "commit", "--no-verify", "-m", "test: inject synthetic marker for gitleaksignore fingerprint test"],
             cwd=str(worktree), capture_output=True, text=True, check=False,
         )
         self.assertEqual(commit.returncode, 0, f"worktree commit failed: {commit.stderr}")
