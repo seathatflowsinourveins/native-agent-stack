@@ -2973,8 +2973,8 @@
     },
     {
       "path": ".github/dependabot.yml",
-      "sha256": "f6fcc6e99d307f408bc2a21f052bf8641c906bc4cca556a350e3969f1dc57745",
-      "bytes": 776
+      "sha256": "1a504bb975f17f5af05f43a17df9d0e90b7ae3177f87d0ae7a6b99f68caf6b73",
+      "bytes": 1292
     },
     {
       "path": ".github/main-ruleset.json",
@@ -8479,8 +8479,8 @@
     },
     {
       "path": "docs/decisions/2026-09-22-github-automation-closure.md",
-      "sha256": "d3937ff39c741e1b9a2d27c79678c741120090c96c9426b935e186fa08ec2183",
-      "bytes": 27995
+      "sha256": "7f98480f8de1df3557df86c5e3549bbbe3397122c6fe171a87518a7ba0c332ba",
+      "bytes": 28505
     },
     {
       "path": "docs/direct-results.md",
