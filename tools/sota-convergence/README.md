@@ -1507,6 +1507,17 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
   `judge_adjudication` and `record_verdicts.load_adjudication` ignore extra top-level keys, so the key needs
   no validator change. Nothing checks these hashes against a registry yet.
 
+**Binding.**
+- **Input content:** every judgment records the `input_sha256` of the input it judged. A resumed or
+  assembled judgment counts only while the input file still has that hash, so rebuilding an input after a
+  lane return changed invalidates its old judgments.
+- **Claude inputs:** `claude-args` snapshots each item's input hash, and `claude-collect` refuses a judgment
+  whose input changed after that snapshot.
+- **Stale records:** `assemble` deletes a layer's earlier record in `--out` whenever the layer is refused,
+  for a leak or for validation, so `record_verdicts.py --adjudications` never reads a stale winner.
+- **Paths:** a repository root or work dir containing whitespace is refused, because path scrubbing
+  tokenizes on whitespace.
+
 **Limits:**
 - Writing style can still reveal a lane.
 - The raw lane returns sit next to the adjudication inputs in the work directory

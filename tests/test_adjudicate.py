@@ -89,12 +89,14 @@ class AdjudicateFixture(unittest.TestCase):
         family = adjudicate.FAMILIES[lane]
         claude_position = adjudicate.CLAUDE_POSITION[order]
         other = "B" if claude_position == "A" else "A"
+        input_path = self.work / "adjudication-inputs" / f"{NAME}.{order}.json"
         record = adjudicate.judgment_record(
-            family, NAME, order, self.work / "adjudication-inputs" / f"{NAME}.{order}.json", self.sha,
+            family, NAME, order, input_path, self.sha,
             model or ("claude-opus-5-5" if lane == "claude" else "gpt-6-astra"), str(self.repo),
             {"preferred": claude_position if preferred_lane == "claude" else other, "why": WHY,
              "evidence_refs": [str(self.repo / "evidence/receipt.json")]},
-            {"refuted": refuted, "reason": "The cited receipt exists and shows the run.", "evidence_refs": []})
+            {"refuted": refuted, "reason": "The cited receipt exists and shows the run.", "evidence_refs": []},
+            input_sha256=adjudicate.sha256_file(input_path) if input_path.is_file() else None)
         adjudicate.write_json(self.work / "adjudication-judgments" / lane / f"{NAME}.{order}.json", record)
 
     def assemble(self):
@@ -194,6 +196,48 @@ class AssembleTests(AdjudicateFixture):
                          [("anthropic", "A"), ("anthropic", "B"), ("openai", "A"), ("openai", "B")])
         self.assertTrue(all(j["stripped_packet_sha256"] == self.sha for j in record["judgments"]))
         self.assertEqual(record["evidence_refs"], ["evidence/receipt.json"])
+
+    def test_a_judgment_of_an_older_input_does_not_count(self):
+        # Codex review of #145: an old A/B preference must not be read against rebuilt returns.
+        for lane in ("claude", "codex"):
+            for order in adjudicate.ORDERS:
+                self.judgment(lane, order, "codex")
+        ab = self.work / "adjudication-inputs" / f"{NAME}.AB.json"
+        body = json.loads(ab.read_text(encoding="utf-8"))
+        body["A"]["why_selected"] = body["A"]["why_selected"] + " (rebuilt)"
+        ab.write_text(json.dumps(body), encoding="utf-8")
+        data = json.loads((self.work / "adjudication-judgments" / "claude" / f"{NAME}.AB.json").read_text())
+        self.assertEqual(adjudicate.usable_judgment(data, "anthropic", "AB", self.sha), "judged a different input")
+        _code, _err, record = self.assemble()
+        self.assertTrue(record is None or record["winner_lane"] is None, record)
+
+    def test_a_refused_layer_loses_its_earlier_record(self):
+        # Codex review of #145: a stale record in --out must not reach record_verdicts --adjudications.
+        for lane in ("claude", "codex"):
+            for order in adjudicate.ORDERS:
+                self.judgment(lane, order, "codex")
+        code, _err, record = self.assemble()
+        self.assertEqual((code, record["winner_lane"]), (0, "codex"))
+        for lane in ("claude", "codex"):
+            (self.work / "adjudication-judgments" / lane / f"{NAME}.BA.json").unlink()
+        _code, _err, record = self.assemble()
+        self.assertIsNone(record)
+
+    def test_claude_collect_refuses_an_input_changed_after_claude_args(self):
+        adjudicate.claude_args(self.work, self.repo)
+        ab = self.work / "adjudication-inputs" / f"{NAME}.AB.json"
+        ab.write_text(ab.read_text(encoding="utf-8").replace("}", " }", 1), encoding="utf-8")
+        result = {"items": [{"name": NAME, "order": order, "packet_sha256": self.sha,
+                             "judge": {"preferred": "B", "why": WHY, "evidence_refs": []},
+                             "refuter": {"refuted": False, "reason": "holds", "evidence_refs": []}}
+                            for order in adjudicate.ORDERS]}
+        missing = dict(adjudicate.collect_claude(self.work, result, "claude-opus-5-5"))
+        self.assertIn("input changed after claude-args", missing[f"{NAME}.AB"])
+        self.assertNotIn(f"{NAME}.BA", missing)
+
+    def test_whitespace_in_a_root_or_work_dir_is_refused(self):
+        self.assertIn("whitespace", adjudicate.root_issue("/srv/blind runs/lab/export"))
+        self.assertIn("whitespace", adjudicate.refuse_work_dir_inside(self.base / "my work", self.repo))
 
     def test_single_family_is_a_split_naming_the_missing_family(self):
         for order in adjudicate.ORDERS:
@@ -400,6 +444,7 @@ class CodexTests(AdjudicateFixture):
                                        "evidence_refs": ["evidence/receipt.json"]},
                              "refuter": {"refuted": False, "reason": "holds", "evidence_refs": []}}
                             for order in adjudicate.ORDERS]}
+        adjudicate.claude_args(self.work, self.repo)
         missing = adjudicate.collect_claude(self.work, result, "claude-opus-5-5")
         self.assertEqual(missing, [])
         code, _err, record = self.assemble()
@@ -452,6 +497,7 @@ class LeakTests(AdjudicateFixture):
              "judge": {"preferred": "A", "why": WHY, "evidence_refs": []},
              "refuter": {"refuted": False, "reason": "leak", "evidence_refs": [], "leak": True,
                          "leak_text": "sonnet"}}]}
+        adjudicate.claude_args(self.work, self.repo)
         missing = adjudicate.collect_claude(self.work, result, "claude-opus-5-5")
         self.assertEqual(missing, [(f"{NAME}.AB", "leak"), (f"{NAME}.BA", "leak")])
         for order in adjudicate.ORDERS:
@@ -492,6 +538,7 @@ class LeakTests(AdjudicateFixture):
     def test_a_claude_leak_is_sticky_until_the_input_changes(self):
         """Round-2 review (adjudication round 3): a second claude-collect overwrote the leaked judgment with a
         counted one."""
+        adjudicate.claude_args(self.work, self.repo)
         self.assertEqual(adjudicate.collect_claude(self.work, self.claude_result(("AB",)), "claude-opus-5-5"),
                          [(f"{NAME}.AB", "leak")])
         self.assertEqual(adjudicate.claude_args(self.work, self.repo)["leaked"], [f"{NAME}.AB"])
