@@ -172,6 +172,19 @@ recorded in
 Its bounded claim is native operation of this script on a **GitHub-hosted macOS
 arm64 runner** — that the pinned assets download, verify against these
 SHA-256 values, extract and report versions on Apple Silicon.
+
+**Both of those runs predate the 2026-09-23 fix round** (the
+`install_platform_dependency` redesign, the `allowed_unpinned_ids` bash 3.2
+fix, the brew formula loop's install-order change, and the launchd agents):
+run `35812470345` on PR #94, at the code before that round, failed
+`bootstrap-macos` and `bootstrap-macos-brew` in their bootstrap step and
+`validate-macos` on three tests (the exact platform_dependency, bash 3.2 and
+plutil/plistlib findings this round fixed, plus a `git_revision` symlink
+portability finding in `scripts/adoption_status.py` fixed the same round).
+Neither `35753384567`/`585032a` nor `35753801691`/`9d9ce2b` re-ran after this
+round's fixes, so they establish only that an earlier version of this script
+once ran green on a hosted runner, not that the current one does; a fresh
+hosted run is what would establish that.
 That is not a workstation acceptance:
 
 - A hosted runner is not this profile's target Mac; hardware, memory (24/48 GB),

@@ -129,8 +129,19 @@ def validate_manifest(data, root: Path) -> dict:
 
 
 def git_revision(root: Path) -> str | None:
-    """Return only a native Git SHA from this root; suppress arbitrary Git errors."""
+    """Return only a native Git SHA from this root; suppress arbitrary Git errors.
+
+    ``root`` is resolved before comparison so this holds regardless of
+    whether the caller already resolved it: macOS routes its default
+    tempdir through ``/var`` -> ``/private/var`` (and any project checkout
+    can sit behind another symlink), so comparing an unresolved caller path
+    against git's own resolved --show-toplevel answer would wrongly return
+    None even for the real repository. inspect_adoption already resolves
+    root first, so this is a no-op there; a direct caller no longer needs to
+    resolve it itself first.
+    """
     try:
+        root = root.resolve()
         result = subprocess.run(
             ["git", "--no-optional-locks", "-C", str(root), "rev-parse", "--show-toplevel", "HEAD"],
             stdin=subprocess.DEVNULL, capture_output=True, text=True, timeout=5,

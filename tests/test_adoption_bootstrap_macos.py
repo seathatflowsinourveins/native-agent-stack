@@ -8,6 +8,7 @@ checksums themselves are independent observations of publisher checksum files,
 release asset digests and re-hashed downloads recorded in the pins file.
 """
 
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -40,6 +41,32 @@ PROFILE_ID = "macos-arm64-foundation"
 # undocumented gap is still caught instead of silently reusing a stale list.
 DOCUMENTED_SKIPS = set()
 SHELLCHECK = shutil.which("shellcheck")
+
+
+def _find_bash32() -> str | None:
+    """A real bash 3.2 binary, if one is reachable, for dynamic evidence.
+
+    On a real Mac /bin/bash genuinely is bash 3.2, so this finds it there
+    with no extra setup. Off Mac, set BASH32_BINARY to a real bash 3.2
+    build (this project's own 2026-09-23 fix round compiled one locally to
+    reproduce the exact hosted-CI abort dynamically, not just structurally).
+    Never bash 5: its `set -u` no longer rejects an empty array expansion at
+    all, so it cannot exercise this rule either way.
+    """
+    candidates = [os.environ.get("BASH32_BINARY", ""), "/bin/bash", shutil.which("bash") or ""]
+    for candidate in candidates:
+        if not candidate or not Path(candidate).is_file():
+            continue
+        try:
+            result = subprocess.run([candidate, "--version"], capture_output=True, text=True, timeout=5)
+        except OSError:
+            continue
+        if "version 3.2" in result.stdout:
+            return candidate
+    return None
+
+
+BASH32 = _find_bash32()
 
 
 def load(path: Path) -> dict:
@@ -267,11 +294,19 @@ class ScriptStructureTests(unittest.TestCase):
         # A stock Mac's /bin/bash is 3.2, where `set -u` rejects some
         # expansions of an empty array. The script guards every element
         # expansion with ${arr[@]+"${arr[@]}"} and counts with a plain
-        # integer instead of ${#arr[@]}, which this host's bash 5 cannot
-        # exercise; the rule is checked structurally instead.
+        # integer instead of ${#arr[@]}. This host's bash 5 cannot exercise
+        # the rule dynamically (its `set -u` no longer rejects an empty
+        # array expansion at all); it is checked structurally here, and
+        # dynamically against a real bash 3.2 binary in
+        # ScriptBehaviorUnderRealBash32Tests below when one is reachable.
+        # allowed_unpinned_ids specifically regressed this way once already
+        # (2026-09-23 hosted macos-15 CI: "bootstrap-macos.sh: line 192:
+        # allowed_unpinned_ids[@]: unbound variable"), because its assignment
+        # was guarded but a later consumption of it was not.
         self.assertNotIn("${#", self.text,
                          "use an explicit counter, not ${#array[@]}, for bash 3.2")
-        for guarded in ("${component_ids[@]+", "${allow_unpinned_ids[@]+"):
+        for guarded in ("${component_ids[@]+", "${allow_unpinned_ids[@]+",
+                        "${documented_unpinned_ids[@]+", "${allowed_unpinned_ids[@]+"):
             self.assertIn(guarded, self.text)
 
     def test_brew_prerequisite_install_precedes_the_presence_check(self):
@@ -323,6 +358,79 @@ class ScriptStructureTests(unittest.TestCase):
             capture_output=True, text=True, timeout=120, check=False,
         )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+
+@unittest.skipUnless(BASH32, "no real bash 3.2 binary reachable (set BASH32_BINARY, or run on a real Mac)")
+class ScriptBehaviorUnderRealBash32Tests(unittest.TestCase):
+    """Dynamic evidence against a genuine bash 3.2 binary, not bash 5's
+    relaxed nounset handling of an empty array (which cannot reproduce this
+    class of bug at all). See _find_bash32's docstring for how BASH32 is
+    located. No macOS host ran the full-script test below; it substitutes a
+    real bash 3.2 interpreter for bash 5 while still using the Linux
+    uname/sw_vers shim, which is exactly the gap that let the 2026-09-23
+    hosted macos-15 CI abort ("allowed_unpinned_ids[@]: unbound variable")
+    slip past this project's own bash-5-only local testing beforehand.
+    """
+
+    def test_unguarded_empty_array_expansion_actually_aborts_and_the_guard_fixes_it(self):
+        unguarded = subprocess.run(
+            [BASH32, "-c", 'set -u; a=(); for x in "${a[@]}"; do :; done'],
+            capture_output=True, text=True, timeout=10,
+        )
+        self.assertNotEqual(unguarded.returncode, 0)
+        self.assertIn("unbound variable", unguarded.stderr)
+        guarded = subprocess.run(
+            [BASH32, "-c", 'set -u; a=(); for x in ${a[@]+"${a[@]}"}; do :; done'],
+            capture_output=True, text=True, timeout=10,
+        )
+        self.assertEqual(guarded.returncode, 0, guarded.stderr)
+
+    def test_plan_mode_runs_clean_under_real_bash_32(self):
+        # Full-script smoke: the exact --plan path the offline test suite
+        # otherwise only ever runs under bash 5, now run with a real bash 3.2
+        # interpreter under the same uname/sw_vers shim, so a regression of
+        # the exact shape that broke hosted CI is caught here first.
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            shim = macos_shim(tmp_path)
+            eco_root = tmp_path / "eco"
+            result = subprocess.run(
+                [BASH32, str(SCRIPT_PATH), "--plan", "--profile", PROFILE_ID, "--skip-system-packages"],
+                capture_output=True, text=True, timeout=60,
+                env={**os.environ, "PATH": f"{shim}{os.pathsep}{os.environ['PATH']}",
+                     "ECO_INSTALL_ROOT": str(eco_root)},
+            )
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("nothing was downloaded or installed", result.stdout)
+            for tool in load(PINS_PATH)["tools"]:
+                self.assertIn(tool["sha256"], result.stdout, f"{tool['id']} sha256 not planned")
+
+    def test_unpinned_selected_component_still_exits_3_under_real_bash_32(self):
+        # The exit-3 fail-closed path (a genuinely unpinned selected
+        # component) also exercises allowed_unpinned_ids when it is empty;
+        # this is the same scenario the hosted CI abort actually hit.
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            adoption_dir = tmp_path / "adoption"
+            adoption_dir.mkdir()
+            script_copy = adoption_dir / "bootstrap-macos.sh"
+            script_copy.write_text(SCRIPT_PATH.read_text())
+            script_copy.chmod(0o755)
+            (adoption_dir / "manifest.json").write_text(MANIFEST_PATH.read_text())
+            pins = load(PINS_PATH)
+            pins["tools"] = [tool for tool in pins["tools"] if tool["id"] != "qdrant"]
+            (adoption_dir / "pins-macos-arm64.json").write_text(json.dumps(pins))
+            shim = macos_shim(tmp_path)
+            eco_root = tmp_path / "eco"
+            result = subprocess.run(
+                [BASH32, str(script_copy), "--plan", "--profile", PROFILE_ID, "--skip-system-packages"],
+                capture_output=True, text=True, timeout=60,
+                env={**os.environ, "PATH": f"{shim}{os.pathsep}{os.environ['PATH']}",
+                     "ECO_INSTALL_ROOT": str(eco_root)},
+            )
+            self.assertEqual(result.returncode, 3, result.stdout + result.stderr)
+            self.assertIn("No pin in", result.stderr)
+            self.assertIn("qdrant", result.stderr)
 
 
 class ScriptBehaviorTests(unittest.TestCase):
@@ -545,17 +653,98 @@ class LlamaWrapperQuotingTests(unittest.TestCase):
             self.assertEqual(run.stdout.splitlines(), [f"{prefix}/llama-server", prefix])
 
 
-class PlatformDependencyVerificationTests(unittest.TestCase):
-    """verify_platform_dependency and install_npm's --ignore-scripts wiring,
-    extracted verbatim from the script and run with a fixture pins file and a
-    fake `.package-lock.json` / fake `npm`, so no network or real npm install
-    is used. No macOS host ran any of this.
+NPM = shutil.which("npm")
 
-    Fake integrity/hash values below are assembled from concatenated string
-    parts rather than written as single literals, so a fixture value shaped
-    like a real secret/hash never appears as one contiguous token in this
-    source file.
+
+class RealNpmLockfileEvidenceTests(unittest.TestCase):
+    """Regression evidence for the finding that motivated
+    install_platform_dependency's design (Codex/Opus review, 2026-09-23):
+    a real `npm install --global --prefix <dir> <pkg-with-an-optional-dependency>`
+    writes no lockfile anywhere under the prefix and no package.json
+    `_integrity` field for the resolved optional dependency, which is placed
+    NESTED under the parent, not at its own top-level name. This uses real
+    npm packing and installing two tiny local packages -- not a hand-built
+    fixture -- so the on-disk layout comes from npm itself. If a future npm
+    version changes this, this test (not install_platform_dependency, which
+    no longer depends on it at all) is what will notice.
     """
+
+    @unittest.skipUnless(NPM, "native npm unavailable")
+    def test_global_prefix_install_of_an_optional_dependency_writes_no_lockfile_or_integrity_field(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            platform_dir = tmp_path / "platform-pkg"
+            platform_dir.mkdir()
+            (platform_dir / "package.json").write_text(
+                json.dumps({"name": "test-platform-dep", "version": "9.9.9"}))
+            (platform_dir / "marker.txt").write_text("marker\n")
+            subprocess.run([NPM, "pack", "--silent", "--pack-destination", str(tmp_path)],
+                            cwd=platform_dir, capture_output=True, text=True, timeout=60, check=True)
+            platform_tarball = tmp_path / "test-platform-dep-9.9.9.tgz"
+            self.assertTrue(platform_tarball.is_file())
+
+            parent_dir = tmp_path / "parent-pkg"
+            parent_dir.mkdir()
+            (parent_dir / "package.json").write_text(json.dumps({
+                "name": "test-parent-pkg", "version": "1.0.0",
+                "optionalDependencies": {"test-platform-dep": f"file:{platform_tarball}"},
+            }))
+            subprocess.run([NPM, "pack", "--silent", "--pack-destination", str(tmp_path)],
+                            cwd=parent_dir, capture_output=True, text=True, timeout=60, check=True)
+            parent_tarball = tmp_path / "test-parent-pkg-1.0.0.tgz"
+            self.assertTrue(parent_tarball.is_file())
+
+            prefix = tmp_path / "prefix"
+            result = subprocess.run(
+                [NPM, "install", "--global", "--no-audit", "--no-fund", "--prefix", str(prefix), str(parent_tarball)],
+                capture_output=True, text=True, timeout=60,
+            )
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+            lockfiles = list(prefix.rglob("*lock*"))
+            self.assertEqual(lockfiles, [], f"expected no lockfile anywhere under {prefix}, found {lockfiles}")
+
+            installed = list(prefix.rglob("test-platform-dep/package.json"))
+            self.assertEqual(len(installed), 1, installed)
+            # Nested under the parent's own node_modules, not top-level at
+            # lib/node_modules/test-platform-dep.
+            self.assertIn("test-parent-pkg/node_modules/test-platform-dep", str(installed[0]))
+            manifest = json.loads(installed[0].read_text())
+            self.assertNotIn("_integrity", manifest)
+
+
+class PlatformDependencyInstallTests(unittest.TestCase):
+    """install_platform_dependency, extracted verbatim from the script and
+    run with a fixture pins file, a real npm-packed local tarball standing
+    in for the registry download (fetch() stubbed to place it, never to
+    reach the network), and real npm for the actual `<alias>@file:<path>`
+    install. No macOS host ran any of this, and no darwin-arm64 binary is
+    involved -- only the install mechanism, which is platform-independent.
+    """
+
+    @classmethod
+    def setUpClassWithNpm(cls):
+        cls._tmp = tempfile.TemporaryDirectory()
+        tmp_path = Path(cls._tmp.name)
+        package_dir = tmp_path / "fixture-pkg"
+        package_dir.mkdir()
+        (package_dir / "package.json").write_text(
+            json.dumps({"name": "fixture-real-name", "version": "1.2.3"}))
+        (package_dir / "marker.txt").write_text("fixture platform dependency payload\n")
+        subprocess.run([NPM, "pack", "--silent", "--pack-destination", str(tmp_path)],
+                        cwd=package_dir, capture_output=True, text=True, timeout=60, check=True)
+        cls.fixture_tarball = tmp_path / "fixture-real-name-1.2.3.tgz"
+        cls.fixture_sha256 = hashlib.sha256(cls.fixture_tarball.read_bytes()).hexdigest()
+
+    @classmethod
+    def setUpClass(cls):
+        if NPM:
+            cls.setUpClassWithNpm()
+
+    @classmethod
+    def tearDownClass(cls):
+        if NPM:
+            cls._tmp.cleanup()
 
     def _pins_fixture(self, tmp_path: Path, tool: dict) -> Path:
         pins_path = tmp_path / "pins-fixture.json"
@@ -565,108 +754,74 @@ class PlatformDependencyVerificationTests(unittest.TestCase):
         }))
         return pins_path
 
-    def _run_verify(self, tmp_path: Path, pins_path: Path, dep_id: str, prefix: Path):
-        harness = tmp_path / "verify-harness.sh"
+    def _run(self, tmp_path: Path, pins_path: Path, dep_id: str, prefix: Path, fetch_body: str):
+        harness = tmp_path / "install-platform-dep-harness.sh"
         harness.write_text(
             "set -Eeuo pipefail\n"
-            + _shell_functions(SCRIPT_PATH.read_text(), "verify_platform_dependency")
+            + _shell_functions(SCRIPT_PATH.read_text(), "install_platform_dependency")
             + f'pins_path={json.dumps(str(pins_path))}\n'
-            + f'verify_platform_dependency {dep_id} {json.dumps(str(prefix))}\n'
+            + f'cache_dir={json.dumps(str(tmp_path / "downloads"))}\n'
+            + "fetch() { " + fetch_body + " ; }\n"
+            + f'install_platform_dependency {dep_id} {json.dumps(str(prefix))}\n'
         )
-        return subprocess.run(["bash", str(harness)], capture_output=True, text=True, timeout=30)
+        (tmp_path / "downloads").mkdir(exist_ok=True)
+        return subprocess.run(["bash", str(harness)], capture_output=True, text=True, timeout=60)
 
-    def test_passes_when_lock_entry_matches_the_pin(self):
-        # Assembled, not a single literal, per the fixture-value convention above.
-        fake_integrity = "sha512-" + "".join(["QUJD", "MTIz", "eHl6"]) + "=="
+    @unittest.skipUnless(NPM, "native npm unavailable")
+    def test_places_the_verified_tarball_under_its_alias_name_via_real_npm(self):
         with tempfile.TemporaryDirectory() as tmp:
             tmp_path = Path(tmp)
             prefix = tmp_path / "tools" / "widget-1.0.0"
-            lock_dir = prefix / "lib" / "node_modules"
-            lock_dir.mkdir(parents=True)
-            (lock_dir / ".package-lock.json").write_text(json.dumps({
-                "packages": {"node_modules/@scope/widget-darwin-arm64": {
-                    "version": "1.0.0-darwin-arm64", "integrity": fake_integrity,
-                }},
-            }))
             pins_path = self._pins_fixture(tmp_path, {
-                "id": "widget", "version": "1.0.0", "kind": "npm", "url": "https://registry.npmjs.org/widget/-/widget-1.0.0.tgz",
+                "id": "widget", "version": "1.0.0", "kind": "npm",
+                "url": "https://registry.npmjs.org/widget/-/widget-1.0.0.tgz",
                 "sha256": "0" * 64, "checksum_source": "npm_registry_integrity_crosscheck",
                 "checksum_ref": "test", "install_note": "test",
                 "platform_dependency": {
-                    "name": "@scope/widget-darwin-arm64", "resolved_package": "@scope/widget",
-                    "version": "1.0.0-darwin-arm64", "integrity": fake_integrity,
+                    "name": "widget-darwin-arm64", "resolved_package": "fixture-real-name",
+                    "version": "1.2.3", "url": "https://example.invalid/never-fetched.tgz",
+                    "sha256": self.fixture_sha256,
+                    "integrity": "sha512-unused-in-this-test",
                 },
             })
-            result = self._run_verify(tmp_path, pins_path, "widget", prefix)
+            # fetch() is stubbed to copy the already npm-packed fixture tarball
+            # into place instead of reaching the network; install_platform_dependency
+            # itself never sees the difference, and the real npm install below
+            # is exactly the code path production uses.
+            result = self._run(tmp_path, pins_path, "widget", prefix,
+                                f'cp {json.dumps(str(self.fixture_tarball))} "$3"')
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-            self.assertIn("Verified platform dependency", result.stdout)
+            self.assertIn("Installed verified platform dependency widget-darwin-arm64", result.stdout)
+            installed_pkg = prefix / "lib" / "node_modules" / "widget-darwin-arm64" / "package.json"
+            self.assertTrue(installed_pkg.is_file(), list(prefix.rglob("*")))
+            # The alias name governs the node_modules directory; the tarball's
+            # own internal package.json "name" field is left untouched inside it.
+            manifest = json.loads(installed_pkg.read_text())
+            self.assertEqual(manifest["name"], "fixture-real-name")
+            self.assertEqual(manifest["version"], "1.2.3")
+            marker = prefix / "lib" / "node_modules" / "widget-darwin-arm64" / "marker.txt"
+            self.assertTrue(marker.is_file())
 
-    def test_fails_closed_on_integrity_mismatch(self):
-        pinned_integrity = "sha512-" + "".join(["QUJD", "MTIz", "eHl6"]) + "=="
-        installed_integrity = "sha512-" + "".join(["ZGlm", "ZmVy", "ZW50"]) + "=="
+    def test_fails_closed_on_null_sha256_before_any_fetch_or_npm_call(self):
         with tempfile.TemporaryDirectory() as tmp:
             tmp_path = Path(tmp)
             prefix = tmp_path / "tools" / "widget-1.0.0"
-            lock_dir = prefix / "lib" / "node_modules"
-            lock_dir.mkdir(parents=True)
-            (lock_dir / ".package-lock.json").write_text(json.dumps({
-                "packages": {"node_modules/@scope/widget-darwin-arm64": {
-                    "version": "1.0.0-darwin-arm64", "integrity": installed_integrity,
-                }},
-            }))
             pins_path = self._pins_fixture(tmp_path, {
-                "id": "widget", "version": "1.0.0", "kind": "npm", "url": "https://registry.npmjs.org/widget/-/widget-1.0.0.tgz",
+                "id": "widget", "version": "1.0.0", "kind": "npm",
+                "url": "https://registry.npmjs.org/widget/-/widget-1.0.0.tgz",
                 "sha256": "0" * 64, "checksum_source": "npm_registry_integrity_crosscheck",
                 "checksum_ref": "test", "install_note": "test",
                 "platform_dependency": {
-                    "name": "@scope/widget-darwin-arm64", "resolved_package": "@scope/widget",
-                    "version": "1.0.0-darwin-arm64", "integrity": pinned_integrity,
+                    "name": "widget-darwin-arm64", "resolved_package": "widget",
+                    "version": "1.0.0-darwin-arm64", "url": "https://example.invalid/never-fetched.tgz",
+                    "sha256": None, "integrity": "sha512-unused",
                 },
             })
-            result = self._run_verify(tmp_path, pins_path, "widget", prefix)
+            result = self._run(tmp_path, pins_path, "widget", prefix, 'echo "fetch must not run" >&2; exit 1')
             self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
             self.assertIn("Refusing widget", result.stderr)
-            self.assertIn("platform dependency @scope/widget-darwin-arm64", result.stderr)
-
-    def test_falls_back_to_package_json_integrity_when_no_lockfile(self):
-        fake_integrity = "sha512-" + "".join(["cGtn", "aW50", "ZWdy"]) + "=="
-        with tempfile.TemporaryDirectory() as tmp:
-            tmp_path = Path(tmp)
-            prefix = tmp_path / "tools" / "widget-1.0.0"
-            pkg_dir = prefix / "lib" / "node_modules" / "@scope" / "widget-darwin-arm64"
-            pkg_dir.mkdir(parents=True)
-            (pkg_dir / "package.json").write_text(json.dumps({
-                "name": "@scope/widget", "version": "1.0.0-darwin-arm64", "_integrity": fake_integrity,
-            }))
-            pins_path = self._pins_fixture(tmp_path, {
-                "id": "widget", "version": "1.0.0", "kind": "npm", "url": "https://registry.npmjs.org/widget/-/widget-1.0.0.tgz",
-                "sha256": "0" * 64, "checksum_source": "npm_registry_integrity_crosscheck",
-                "checksum_ref": "test", "install_note": "test",
-                "platform_dependency": {
-                    "name": "@scope/widget-darwin-arm64", "resolved_package": "@scope/widget",
-                    "version": "1.0.0-darwin-arm64", "integrity": fake_integrity,
-                },
-            })
-            result = self._run_verify(tmp_path, pins_path, "widget", prefix)
-            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-
-    def test_fails_closed_when_neither_lockfile_nor_package_json_exist(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            tmp_path = Path(tmp)
-            prefix = tmp_path / "tools" / "widget-1.0.0"
-            (prefix / "lib" / "node_modules").mkdir(parents=True)
-            pins_path = self._pins_fixture(tmp_path, {
-                "id": "widget", "version": "1.0.0", "kind": "npm", "url": "https://registry.npmjs.org/widget/-/widget-1.0.0.tgz",
-                "sha256": "0" * 64, "checksum_source": "npm_registry_integrity_crosscheck",
-                "checksum_ref": "test", "install_note": "test",
-                "platform_dependency": {
-                    "name": "@scope/widget-darwin-arm64", "resolved_package": "@scope/widget",
-                    "version": "1.0.0-darwin-arm64", "integrity": "sha512-" + "x" * 20 + "==",
-                },
-            })
-            result = self._run_verify(tmp_path, pins_path, "widget", prefix)
-            self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
-            self.assertIn("fail closed", result.stderr)
+            self.assertIn("no verified sha256", result.stderr)
+            self.assertFalse(prefix.exists())
 
     def test_is_a_no_op_when_the_pin_has_no_platform_dependency(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -678,7 +833,7 @@ class PlatformDependencyVerificationTests(unittest.TestCase):
                 "sha256": "0" * 64, "checksum_source": "npm_registry_integrity_crosscheck",
                 "checksum_ref": "test", "install_note": "test",
             })
-            result = self._run_verify(tmp_path, pins_path, "plain", prefix)
+            result = self._run(tmp_path, pins_path, "plain", prefix, 'echo "fetch must not run" >&2; exit 1')
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertEqual(result.stdout.strip(), "")
 
@@ -718,7 +873,7 @@ class PlatformDependencyVerificationTests(unittest.TestCase):
                     harness.write_text(
                         "set -Eeuo pipefail\n"
                         + _shell_functions(SCRIPT_PATH.read_text(), "npm_package_name",
-                                           "verify_platform_dependency", "install_npm")
+                                           "install_platform_dependency", "install_npm")
                         + "fetch() { :; }\n"
                         + f'pins_path={json.dumps(str(pins_path))}\n'
                         + f'ecosystem_root={json.dumps(str(eco_root))}\n'

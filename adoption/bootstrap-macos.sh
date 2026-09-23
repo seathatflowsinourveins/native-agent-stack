@@ -95,31 +95,24 @@ macos_version="$(sw_vers -productVersion)"
 # Homebrew supplies six formulae this profile still leaves floating: jq (a
 # script prerequisite), python@3.13 (a fresh Mac's system python3 is 3.9, below
 # the acceptance_target in adoption/manifest.json), ripgrep, coreutils, restic
-# and shellcheck. Like the Linux apt block, this install runs *before* the
-# presence check below, so a Mac missing any of them yet satisfies that check
-# without a second run. `brew list --versions <formula>` is the presence
-# oracle, not `command -v`: several of these formulae (python@3.13, coreutils)
-# install commands under a different name than the formula, so a name-based
-# check would under- or over-report what is actually installed. shasum
-# replaces Linux sha256sum.
+# and shellcheck (macos-arm64.md's own `brew install jq python@3.13 ripgrep
+# coreutils restic shellcheck` line). jq is installed first and alone, right
+# here, because the --profile/pins validation further down already shells
+# out to it; the other five are deferred until after that validation
+# succeeds (below the unpinned fail-closed check), so a bad --profile or an
+# unresolved pin fails fast without installing five brew formulae the run is
+# about to abort on anyway. `command -v jq` is the presence oracle for jq
+# specifically (its formula name and command name match); the deferred five
+# use `brew list --versions <formula>` instead (not `command -v`), since
+# python@3.13 and coreutils install commands under other names, so a
+# name-based check would under- or over-report what is actually installed.
 brew_formulae=(jq python@3.13 ripgrep coreutils restic shellcheck)
-if [[ "$skip_system" == 0 && "$plan_mode" == 0 ]]; then
+if [[ "$skip_system" == 0 && "$plan_mode" == 0 ]] && ! command -v jq >/dev/null; then
   command -v brew >/dev/null || {
-    printf 'Homebrew is required to install the missing prerequisite formulae (%s); install it from https://brew.sh or rerun with --skip-system-packages.\n' \
-      "${brew_formulae[*]}" >&2
+    printf 'Homebrew is required to install the missing jq prerequisite; install it from https://brew.sh or rerun with --skip-system-packages.\n' >&2
     exit 1
   }
-  missing_formulae=()
-  missing_formula_count=0
-  for formula in "${brew_formulae[@]}"; do
-    if ! brew list --versions "$formula" >/dev/null 2>&1; then
-      missing_formulae+=("$formula")
-      missing_formula_count=$((missing_formula_count + 1))
-    fi
-  done
-  if [[ "$missing_formula_count" -gt 0 ]]; then
-    brew install "${missing_formulae[@]}"
-  fi
+  brew install jq
 elif [[ "$skip_system" == 0 && "$plan_mode" == 1 ]]; then
   printf 'plan brew formulae (installed only if brew list --versions reports them missing): %s\n' "${brew_formulae[*]}"
 fi
@@ -191,7 +184,7 @@ if [[ "$unpinned_count" -gt 0 ]]; then
   unresolved_count=0
   for unpinned_id in "${unpinned_ids[@]}"; do
     allowed=0
-    for allowed_id in "${allowed_unpinned_ids[@]}"; do
+    for allowed_id in ${allowed_unpinned_ids[@]+"${allowed_unpinned_ids[@]}"}; do
       [[ "$unpinned_id" == "$allowed_id" ]] && { allowed=1; break; }
     done
     if [[ "$allowed" == 0 ]]; then
@@ -206,6 +199,30 @@ if [[ "$unpinned_count" -gt 0 ]]; then
     exit 3
   fi
   printf 'Allowed unpinned components (documented skip or --allow-unpinned): %s\n' "${unpinned_ids[*]}"
+fi
+
+# jq was already ensured above (the validation that just ran needed it); the
+# remaining five formulae only matter to actual tool installation from here
+# on, so they wait until --profile and every selected component's pin have
+# already validated. Bash 3.2 supports this slice (introduced in bash 3.0).
+remaining_brew_formulae=("${brew_formulae[@]:1}")
+if [[ "$skip_system" == 0 && "$plan_mode" == 0 ]]; then
+  command -v brew >/dev/null || {
+    printf 'Homebrew is required to install the missing prerequisite formulae (%s); install it from https://brew.sh or rerun with --skip-system-packages.\n' \
+      "${remaining_brew_formulae[*]}" >&2
+    exit 1
+  }
+  missing_formulae=()
+  missing_formula_count=0
+  for formula in "${remaining_brew_formulae[@]}"; do
+    if ! brew list --versions "$formula" >/dev/null 2>&1; then
+      missing_formulae+=("$formula")
+      missing_formula_count=$((missing_formula_count + 1))
+    fi
+  done
+  if [[ "$missing_formula_count" -gt 0 ]]; then
+    brew install "${missing_formulae[@]}"
+  fi
 fi
 
 ecosystem_root="${ECO_INSTALL_ROOT:-$HOME/.local/share/codex-ecosystem}"
@@ -391,46 +408,50 @@ npm_package_name() {
 # codex and claude-code each carry a platform_dependency in
 # pins-macos-arm64.json: the darwin-arm64 optional dependency npm itself
 # resolves and installs at `npm install` time (the real native binary), which
-# is not covered by this tool's own sha256 archive check above. This verifies,
-# after npm has already resolved and installed it, that the name/version/
-# integrity actually placed on disk match what was reviewed there, and fails
-# closed rather than only noting drift in a log. npm >=7 writes a lockfile at
-# $prefix/lib/node_modules/.package-lock.json; older npm instead writes an
-# `_integrity` field into the installed package's own package.json, so both
-# are checked. A component with no platform_dependency pin is a silent no-op.
-verify_platform_dependency() {
+# is not covered by this tool's own sha256 archive check above.
+#
+# This does NOT trust npm's own automatic, unverified fetch of it, and does
+# NOT try to read it back afterward: measured directly against npm 11.19.0 on
+# this project's own host, `npm install --global --prefix <dir> <pkg>` writes
+# no lockfile at all (neither `<dir>/lib/node_modules/.package-lock.json` nor
+# any package-lock.json anywhere under the prefix), and every installed
+# package.json's `_integrity` field is absent (npm 7+ no longer writes it).
+# Every already-installed npm-kind prefix on this host confirms the same
+# shape. A platform-specific optional dependency is in any case placed
+# NESTED under the parent package's own node_modules by npm's dependency
+# placement algorithm, not at the top level this pin's `name` would suggest
+# checking.
+#
+# Instead, this fetches the platform tarball itself (the same sha256-verified
+# `fetch()` every other pin uses, fail-closed exactly the same way), then
+# installs that already-verified local archive explicitly with npm's
+# `<alias>@file:<path>` syntax. That syntax places the tarball's contents at
+# the chosen node_modules name regardless of the tarball's own internal
+# package.json "name" field (npm 11, measured on this host: installing
+# `my-alias@file:<archive>` places the archive's contents at
+# lib/node_modules/my-alias/, keeping the archive's own package.json name
+# untouched inside it) -- and Node's own module resolution finds a package by
+# that directory name, never by reading package.json, so this is sufficient
+# for the parent's own require() to find it. A component with no
+# platform_dependency pin is a silent no-op.
+install_platform_dependency() {
   local id="$1" prefix="$2"
   local dep
   dep="$(jq -c --arg id "$id" '.tools[] | select(.id == $id) | .platform_dependency // empty' "$pins_path")"
   [[ -n "$dep" && "$dep" != "null" ]] || return 0
-  local dep_name dep_version dep_integrity
+  local dep_name dep_url dep_sha256
   dep_name="$(jq -r '.name' <<<"$dep")"
-  dep_version="$(jq -r '.version' <<<"$dep")"
-  dep_integrity="$(jq -r '.integrity' <<<"$dep")"
-  local lock_path="$prefix/lib/node_modules/.package-lock.json"
-  local actual_version="" actual_integrity=""
-  if [[ -f "$lock_path" ]]; then
-    actual_version="$(jq -r --arg name "$dep_name" '.packages["node_modules/" + $name].version // empty' "$lock_path")"
-    actual_integrity="$(jq -r --arg name "$dep_name" '.packages["node_modules/" + $name].integrity // empty' "$lock_path")"
-  fi
-  if [[ -z "$actual_integrity" ]]; then
-    local pkg_json="$prefix/lib/node_modules/$dep_name/package.json"
-    if [[ -f "$pkg_json" ]]; then
-      actual_version="$(jq -r '.version // empty' "$pkg_json")"
-      actual_integrity="$(jq -r '._integrity // empty' "$pkg_json")"
-    fi
-  fi
-  if [[ -z "$actual_integrity" ]]; then
-    printf 'Refusing %s: platform dependency %s has no lock entry or package.json _integrity under %s (fail closed).\n' \
-      "$id" "$dep_name" "$prefix" >&2
+  dep_url="$(jq -r '.url' <<<"$dep")"
+  dep_sha256="$(jq -r '.sha256' <<<"$dep")"
+  if [[ "$dep_sha256" == "null" || -z "$dep_sha256" ]]; then
+    printf 'Refusing %s: platform dependency %s has no verified sha256 in %s (fail closed).\n' \
+      "$id" "$dep_name" "$pins_path" >&2
     exit 1
   fi
-  if [[ "$actual_version" != "$dep_version" || "$actual_integrity" != "$dep_integrity" ]]; then
-    printf 'Refusing %s: platform dependency %s pinned as %s (%s) but installed as %s (%s).\n' \
-      "$id" "$dep_name" "$dep_version" "$dep_integrity" "$actual_version" "$actual_integrity" >&2
-    exit 1
-  fi
-  printf 'Verified platform dependency %s@%s (%s)\n' "$dep_name" "$actual_version" "$actual_integrity"
+  local archive="$cache_dir/${id}-platform-dependency.tgz"
+  fetch "$dep_url" "$dep_sha256" "$archive"
+  npm install --global --no-audit --no-fund --prefix "$prefix" "${dep_name}@file:${archive}" >/dev/null
+  printf 'Installed verified platform dependency %s for %s\n' "$dep_name" "$id"
 }
 
 install_npm() {
@@ -447,7 +468,7 @@ install_npm() {
     npm_install_args+=(--ignore-scripts)
   fi
   npm install "${npm_install_args[@]}" "$archive" >/dev/null
-  verify_platform_dependency "$id" "$prefix"
+  install_platform_dependency "$id" "$prefix"
   local linked=0 executable
   if [[ -d "$prefix/bin" ]]; then
     for executable in "$prefix/bin"/*; do

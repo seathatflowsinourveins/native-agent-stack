@@ -5,11 +5,20 @@ Drafted, not run: rendering a plist here is not launchd acceptance. See
 adoption/platforms/macos-arm64.md's "What a hosted run proves" for the exact
 limits of what has actually executed on a Mac.
 
-Reuses tools/adoption/render_config.py's ``string.Template`` substitution
-(``render_one``, ``RenderError``) and its ``adoption/hosts/<host>.json``
-value-file convention (``load_host_values``, ``parse_set_values``), so the
-same host files and ``${NAME}`` placeholders that render the Claude/Codex
-client configs also render these launchd plists. This script never installs,
+Reuses tools/adoption/render_config.py's ``adoption/hosts/<host>.json``
+value-file convention (``load_host_values``, ``parse_set_values``,
+``RenderError``) so the same host files that render the Claude/Codex client
+configs also render these launchd plists, but NOT its ``render_one``: that
+function does a raw ``string.Template`` substitution on template TEXT, which
+is correct for the JSON/TOML client configs it renders but not here. A plist
+is XML, and a substituted value containing an XML metacharacter -- an ``&``
+in a real path such as ``/Volumes/R&D/eco`` is the realistic case -- would
+corrupt the document if substituted into raw text (`&D/eco` is not a valid
+XML entity). Rendering here instead parses the template as a plist first
+(plistlib tolerates the still-literal ``${NAME}`` placeholders as ordinary
+string content), substitutes inside every string leaf of the resulting
+Python structure, and re-serializes with ``plistlib.dumps``, so plistlib's
+own XML escaping covers every substituted value. This script never installs,
 bootstraps, or edits a live LaunchAgents plist; it only renders template text
 to an explicitly chosen ``--out`` directory. Use
 adoption/launchd/launchd-agents.sh for lint/install/status/remove.
@@ -18,11 +27,14 @@ adoption/launchd/launchd-agents.sh for lint/install/status/remove.
 from __future__ import annotations
 
 import argparse
+import plistlib
+import string
 import sys
 from pathlib import Path
+from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from render_config import RenderError, load_host_values, parse_set_values, render_one  # noqa: E402
+from render_config import RenderError, load_host_values, parse_set_values  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[2]
 LAUNCHD_DIR = ROOT / "adoption" / "launchd"
@@ -37,6 +49,30 @@ def discover_templates() -> dict[str, Path]:
     }
 
 
+def _substitute(node: Any, values: dict[str, str]) -> Any:
+    """Walk a parsed plist structure, substituting ${NAME} in every string leaf."""
+    if isinstance(node, str):
+        return string.Template(node).substitute(values)
+    if isinstance(node, list):
+        return [_substitute(item, values) for item in node]
+    if isinstance(node, dict):
+        return {key: _substitute(item, values) for key, item in node.items()}
+    return node
+
+
+def render_plist(template_path: Path, values: dict[str, str]) -> bytes:
+    raw = template_path.read_bytes()
+    try:
+        data = plistlib.loads(raw)
+    except Exception as error:  # plistlib raises several distinct types
+        raise RenderError(f"{template_path.name}: not a well-formed plist template ({error})") from None
+    try:
+        substituted = _substitute(data, values)
+    except KeyError as error:
+        raise RenderError(f"{template_path.name}: missing template value {error}") from None
+    return plistlib.dumps(substituted, fmt=plistlib.FMT_XML)
+
+
 def collect_values(args: argparse.Namespace) -> dict[str, str]:
     values: dict[str, str] = {}
     if args.host:
@@ -45,8 +81,8 @@ def collect_values(args: argparse.Namespace) -> dict[str, str]:
     return values
 
 
-def render_all(values: dict[str, str]) -> dict[str, str]:
-    return {name: render_one(path, values) for name, path in discover_templates().items()}
+def render_all(values: dict[str, str]) -> dict[str, bytes]:
+    return {name: render_plist(path, values) for name, path in discover_templates().items()}
 
 
 def cmd_out(args: argparse.Namespace) -> int:
@@ -61,8 +97,8 @@ def cmd_out(args: argparse.Namespace) -> int:
         return 1
     out_dir = Path(args.out)
     out_dir.mkdir(parents=True, exist_ok=True)
-    for name, text in rendered.items():
-        (out_dir / name).write_text(text, encoding="utf-8")
+    for name, content in rendered.items():
+        (out_dir / name).write_bytes(content)
         print(f"wrote {out_dir / name}")
     return 0
 

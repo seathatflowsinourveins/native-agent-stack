@@ -11,12 +11,24 @@ on:
     paths:
       - 'adoption/**'
       - 'tools/adoption/**'
+      - 'tests/test_adoption_*.py'
+      - 'scripts/validate.py'
+      - 'scripts/validate_catalogs.py'
+      - 'scripts/validate_foundation.py'
+      - 'scripts/landscape.py'
+      - 'scripts/build_ecosystem.py'
       - 'blueprints/convergence-practice/wsl-native-tools/pins.json'
       - '.github/workflows/adoption-bootstrap.yml'
   pull_request:
     paths:
       - 'adoption/**'
       - 'tools/adoption/**'
+      - 'tests/test_adoption_*.py'
+      - 'scripts/validate.py'
+      - 'scripts/validate_catalogs.py'
+      - 'scripts/validate_foundation.py'
+      - 'scripts/landscape.py'
+      - 'scripts/build_ecosystem.py'
       - 'blueprints/convergence-practice/wsl-native-tools/pins.json'
       - '.github/workflows/adoption-bootstrap.yml'
   schedule:
@@ -93,6 +105,14 @@ jobs:
     runs-on: macos-15
     timeout-minutes: 30
     steps:
+      # step-security/harden-runner's pinned version supports macOS runners
+      # in audit mode (its README: "GitHub-hosted runners (Windows, macOS):
+      # Audit mode only", read at this exact pinned commit 2026-09-23), which
+      # is the only mode this project ever uses.
+      - name: Harden the runner (audit-only network egress)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
       - name: Check out the event commit
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -198,9 +218,15 @@ jobs:
         run: |
           set -euo pipefail
           export ECO_INSTALL_ROOT="$RUNNER_TEMP/eco"
+          # qdrant is a pinned, always-selected component of
+          # macos-arm64-foundation (adoption/manifest.json, not editable from
+          # here), so it must exist after a successful bootstrap above; its
+          # absence here is a real failure to surface, not a reason to skip
+          # quietly (qdrant is not itself in required_commands, so this
+          # assertion is what actually catches its absence).
           if [ ! -x "$ECO_INSTALL_ROOT/bin/qdrant" ]; then
-            echo "qdrant binary absent at $ECO_INSTALL_ROOT/bin/qdrant; lint-only above, no bootstrap or bootout attempted."
-            exit 0
+            echo "qdrant binary absent at $ECO_INSTALL_ROOT/bin/qdrant after a bootstrap that selects it; failing." >&2
+            exit 1
           fi
           mkdir -p "$RUNNER_TEMP/qdrant-smoke-storage" "$ECO_INSTALL_ROOT/config"
           # Disposable smoke config for this run only, not a shipped default.
@@ -259,26 +285,51 @@ jobs:
     runs-on: macos-15
     timeout-minutes: 30
     steps:
+      - name: Harden the runner (audit-only network egress)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
       - name: Check out the event commit
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - name: Set up the manifest-supported Python line
-        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
-        with:
-          python-version: '3.13'
-          check-latest: false
+      # No actions/setup-python here on purpose: this job exists to exercise
+      # the real brew_formulae loop (including python@3.13), and a
+      # setup-python-provided interpreter could shadow python3.13 on PATH,
+      # making the assertion below pass without ever checking Homebrew's own
+      # install. GitHub's macos-15 image ships a system Python already,
+      # which is all the script itself (bash + jq, no Python) needs.
       - name: Run the macOS bootstrap without --skip-system-packages
         shell: bash
         run: |
           set -euo pipefail
           export ECO_INSTALL_ROOT="$RUNNER_TEMP/eco"
           bash adoption/bootstrap-macos.sh --profile macos-arm64-foundation
-      - name: Assert every brew-installed formula is actually on PATH
+      - name: Assert every brew-installed formula is actually present
         shell: bash
         run: |
           set -euo pipefail
-          python3.13 --version
+          # python@3.13 is keg-only (it does not become the default python3),
+          # and which exact opt-prefix subpath carries its own python3.13
+          # binary is not asserted identically by every source consulted for
+          # this check, so every plausible brew --prefix candidate is tried
+          # explicitly, never a bare `python3.13` resolved from PATH alone.
+          python313=""
+          for candidate in \
+            "$(brew --prefix)/bin/python3.13" \
+            "$(brew --prefix python@3.13 2>/dev/null || true)/bin/python3.13" \
+            "$(brew --prefix python@3.13 2>/dev/null || true)/libexec/bin/python3.13"; do
+            if [ -x "$candidate" ]; then
+              python313="$candidate"
+              break
+            fi
+          done
+          if [ -z "$python313" ]; then
+            echo "python3.13 not found via any brew --prefix candidate; brew list --versions python@3.13:" >&2
+            brew list --versions python@3.13 >&2 || true
+            exit 1
+          fi
+          "$python313" --version
           rg --version
           restic version
           shellcheck --version
@@ -293,6 +344,10 @@ jobs:
     runs-on: macos-15
     timeout-minutes: 20
     steps:
+      - name: Harden the runner (audit-only network egress)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
       - name: Check out the event commit
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:

@@ -25,18 +25,25 @@ usage() {
     '  install [--dir DIR] [--label ID ...]' \
     '      Copy each selected rendered plist into ~/Library/LaunchAgents and' \
     '      launchctl bootstrap it into the current GUI session; records the' \
-    '      label as one this script itself enabled.' \
+    '      label as one this script itself enabled. Refuses to overwrite an' \
+    '      existing destination plist that is not already one of its own' \
+    '      recorded labels.' \
     '  status  [--label ID ...]' \
     '      launchctl print each selected label in the current GUI session.' \
     '  remove  [--label ID ...]' \
     '      launchctl bootout each selected label, but only one this script' \
-    '      itself recorded as enabled (never one it did not install); never' \
-    '      deletes data, logs, or the copied plist file.' \
+    '      itself recorded as enabled (never one it did not install). On a' \
+    '      successful bootout, deletes the copied plist under' \
+    '      ~/Library/LaunchAgents so it cannot reload at the next login;' \
+    '      never deletes the component'"'"'s own data or logs. On a failed' \
+    '      bootout, ownership is kept (not forgotten) so a retry can find it.' \
     '' \
-    'Labels (no trailing .plist), default: every one of the three below.' \
-    '  com.native-stack.qdrant' \
-    '  com.native-stack.ai-memory' \
-    '  com.native-stack.llama-embed'
+    'Labels (no trailing .plist): com.native-stack.qdrant and' \
+    'com.native-stack.ai-memory are the default set for install/status/remove' \
+    'when no --label is given; com.native-stack.llama-embed is left out of' \
+    'that default until a model argument exists (adoption/platforms/' \
+    'macos-arm64.md), but render/lint always cover it, and an explicit' \
+    '--label com.native-stack.llama-embed still installs it.'
 }
 
 script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd -P)"
@@ -50,6 +57,13 @@ enabled_state_file="$state_dir/enabled-labels.txt"
 launch_agents_dir="$HOME/Library/LaunchAgents"
 
 all_labels=(com.native-stack.qdrant com.native-stack.ai-memory com.native-stack.llama-embed)
+# llama-embed needs a model file argument this draft does not have yet (see
+# adoption/platforms/macos-arm64.md); it stays a valid --label (still in
+# all_labels, above, for validation) but is left out of the default set for
+# install/status/remove until that exists. render/lint are unaffected: they
+# iterate every rendered template, not this list, so llama-embed can still
+# be previewed and lint-checked by default.
+default_labels=(com.native-stack.qdrant com.native-stack.ai-memory)
 
 [[ $# -ge 1 ]] || { usage >&2; exit 2; }
 subcommand="$1"
@@ -121,7 +135,7 @@ selected_labels() {
     done
   else
     local label
-    for label in "${all_labels[@]}"; do
+    for label in "${default_labels[@]}"; do
       printf '%s\n' "$label"
     done
   fi
@@ -194,6 +208,10 @@ cmd_install() {
     exit 1
   }
   mkdir -p "$launch_agents_dir"
+  # Every agent's StandardOutPath/StandardErrorPath is under state/logs;
+  # launchd does not create missing parent directories for them. qdrant's
+  # plist also names state/qdrant as its WorkingDirectory.
+  mkdir -p "$eco_root/state/logs" "$eco_root/state/qdrant"
   local label source_plist dest_plist
   while IFS= read -r label; do
     source_plist="$render_dir/$label.plist"
@@ -202,6 +220,11 @@ cmd_install() {
       exit 1
     }
     dest_plist="$launch_agents_dir/$label.plist"
+    if [[ -e "$dest_plist" ]] && ! is_enabled_label "$label"; then
+      printf 'Refusing to overwrite %s: it already exists and %s is not recorded as a label this script itself enabled (%s). Move or remove it yourself first if it is safe to replace.\n' \
+        "$dest_plist" "$label" "$enabled_state_file" >&2
+      exit 1
+    fi
     cp -- "$source_plist" "$dest_plist"
     launchctl bootstrap "gui/$(id -u)" "$dest_plist"
     record_enabled_label "$label"
@@ -218,19 +241,36 @@ cmd_status() {
 }
 
 cmd_remove() {
-  local label removed_count=0 skipped_count=0
+  local label removed_count=0 skipped_count=0 failed_count=0
   while IFS= read -r label; do
     if is_enabled_label "$label"; then
-      launchctl bootout "gui/$(id -u)/$label" || printf '%s: launchctl bootout exited %s (already unloaded?)\n' "$label" "$?" >&2
-      forget_enabled_label "$label"
-      removed_count=$((removed_count + 1))
-      printf 'Booted out %s (data and logs kept; the copied plist under %s is kept too).\n' "$label" "$launch_agents_dir"
+      if launchctl bootout "gui/$(id -u)/$label"; then
+        # Deleted, not left behind: RunAtLoad plus the plist still sitting
+        # under ~/Library/LaunchAgents would make launchd reload it at the
+        # next login regardless of this bootout. This removes only the
+        # copied unit-definition file this script itself placed there,
+        # never the component's own data or logs.
+        rm -f -- "$launch_agents_dir/$label.plist"
+        forget_enabled_label "$label"
+        removed_count=$((removed_count + 1))
+        printf 'Booted out %s and removed %s (component data and logs kept).\n' \
+          "$label" "$launch_agents_dir/$label.plist"
+      else
+        # Ownership is kept, not forgotten: a failed bootout means the
+        # plist can still reload at the next login, so this label stays
+        # this script's problem to retry, not a silently dropped one.
+        printf '%s: launchctl bootout failed; ownership kept and %s was NOT removed (it can still reload at the next login). Retry remove, or inspect launchctl print gui/%s/%s.\n' \
+          "$label" "$launch_agents_dir/$label.plist" "$(id -u)" "$label" >&2
+        failed_count=$((failed_count + 1))
+      fi
     else
       printf '%s was not enabled by this script; skipping (never removes a label it did not install).\n' "$label" >&2
       skipped_count=$((skipped_count + 1))
     fi
   done < <(selected_labels)
-  printf 'Booted out %s label(s); skipped %s not-enabled label(s).\n' "$removed_count" "$skipped_count"
+  printf 'Booted out %s label(s); skipped %s not-enabled label(s); %s failed.\n' \
+    "$removed_count" "$skipped_count" "$failed_count"
+  [[ "$failed_count" -eq 0 ]]
 }
 
 case "$subcommand" in

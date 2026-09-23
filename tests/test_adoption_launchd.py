@@ -30,6 +30,7 @@ BOOTSTRAP_SCRIPT = ROOT / "adoption" / "bootstrap-macos.sh"
 
 TEMPLATE_SUFFIX = ".plist.template"
 SHELLCHECK = shutil.which("shellcheck")
+BASH = shutil.which("bash") or "/bin/bash"
 
 FIXTURE_VALUES = {
     "HOME": "/Users/example",
@@ -106,6 +107,13 @@ class TemplateRenderAndSchemaTests(unittest.TestCase):
         self.assertIn("--port", arguments)
         self.assertEqual(arguments[arguments.index("--port") + 1], "8232")
 
+    def test_qdrant_declares_a_working_directory_under_state(self):
+        rendered = string.Template(self.templates["com.native-stack.qdrant.plist"].read_text()) \
+            .substitute(FIXTURE_VALUES)
+        data = plistlib.loads(rendered.encode("utf-8"))
+        self.assertIn("state", data["WorkingDirectory"])
+        self.assertTrue(data["WorkingDirectory"].startswith(FIXTURE_VALUES["ECO_ROOT"]))
+
     def test_no_double_hyphen_inside_any_xml_comment(self):
         # XML forbids "--" inside a comment's content (only "-->" may end it);
         # a template that violates this fails to parse on a real plutil too.
@@ -116,6 +124,30 @@ class TemplateRenderAndSchemaTests(unittest.TestCase):
 
 
 class RenderLaunchdScriptTests(unittest.TestCase):
+    def test_a_literal_ampersand_in_a_substituted_value_round_trips_through_valid_xml(self):
+        # Codex review, 2026-09-23: a naive string.Template substitution on
+        # raw template text would put an unescaped "&" directly into XML
+        # text content (e.g. ECO_ROOT=/Volumes/R&D/eco), which is not
+        # well-formed XML ("&D/eco" is not a valid entity reference).
+        # Rendering must escape it (plistlib.dumps does, by construction).
+        with tempfile.TemporaryDirectory() as tmp:
+            out_dir = Path(tmp) / "out"
+            result = subprocess.run(
+                [sys.executable, str(RENDER_SCRIPT), "--out", str(out_dir),
+                 "--set", "HOME=/Volumes/R&D/home",
+                 "--set", "ECO_ROOT=/Volumes/R&D/eco",
+                 "--set", "AI_MEMORY_URL=127.0.0.1:49374"],
+                capture_output=True, text=True, timeout=30,
+            )
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            rendered = (out_dir / "com.native-stack.qdrant.plist").read_bytes()
+            # A literal, unescaped "&" must never appear in the XML bytes;
+            # only "&amp;" (or another valid XML entity) may.
+            for match in re.finditer(rb"&(?!amp;|lt;|gt;|quot;|apos;|#)", rendered):
+                self.fail(f"unescaped & at byte offset {match.start()} in {rendered!r}")
+            data = plistlib.loads(rendered)
+            self.assertIn("/Volumes/R&D/eco/bin/qdrant", data["ProgramArguments"])
+
     def test_render_writes_every_template_to_the_output_directory(self):
         with tempfile.TemporaryDirectory() as tmp:
             out_dir = Path(tmp) / "out"
@@ -188,9 +220,18 @@ class LaunchdAgentsScriptStructureTests(unittest.TestCase):
         self.assertIn("is_enabled_label", self.text)
         self.assertIn("was not enabled by this script", self.text)
 
-    def test_remove_never_deletes_the_installed_plist_or_state(self):
-        self.assertNotIn("rm -f", self.text)
+    def test_remove_deletes_only_the_owned_plist_never_component_data_or_logs(self):
+        # A successful bootout deletes exactly the copied unit-definition
+        # file this script itself placed under ~/Library/LaunchAgents (so it
+        # cannot reload at the next login); this is the only `rm` in the
+        # script, and it must never target state/logs, state/qdrant, or the
+        # enabled-labels state file itself.
         self.assertNotIn("rm -rf", self.text)
+        rm_lines = [line.strip() for line in self.text.splitlines() if re.search(r"\brm\b", line)]
+        self.assertEqual(len(rm_lines), 1, rm_lines)
+        self.assertIn('rm -f -- "$launch_agents_dir/$label.plist"', rm_lines[0])
+        for forbidden in ("state/logs", "state/qdrant", "enabled_state_file"):
+            self.assertNotIn(forbidden, rm_lines[0])
 
     def test_formula_list_equals_the_brew_install_line_documented_in_the_platform_page(self):
         script_match = re.search(
@@ -257,6 +298,59 @@ class LaunchdAgentsScriptBehaviorTests(unittest.TestCase):
         self.assertEqual(result.returncode, 2)
         self.assertIn("Unknown --label", result.stderr)
 
+    def _render_only_dir(self, tmp_path: Path) -> Path:
+        eco_root = tmp_path / "eco"
+        result = self._run(["render"], env={**os.environ, "ECO_INSTALL_ROOT": str(eco_root)})
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        return eco_root / "state" / "launchd" / "rendered"
+
+    def test_lint_falls_back_to_plistlib_when_plutil_is_absent(self):
+        # A real Mac has plutil, so the generic end-to-end test above cannot
+        # force this path there; PATH is restricted here to exactly one
+        # directory (a real python3, no plutil) so this holds everywhere,
+        # including on a real Mac.
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            rendered_dir = self._render_only_dir(tmp_path)
+            python3 = shutil.which("python3")
+            self.assertIsNotNone(python3, "python3 must exist for this test to mean anything")
+            restricted = tmp_path / "restricted-path"
+            restricted.mkdir()
+            (restricted / "python3").symlink_to(python3)
+            result = subprocess.run(
+                [BASH, str(SCRIPT_PATH), "lint", "--dir", str(rendered_dir)],
+                capture_output=True, text=True, timeout=30,
+                env={"PATH": str(restricted), "HOME": os.environ.get("HOME", str(tmp_path))},
+            )
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("plistlib fallback", result.stdout)
+            self.assertIn("passed lint", result.stdout)
+
+    def test_lint_prefers_plutil_when_present(self):
+        # A fake plutil (not python3) so this holds on Linux too; it only
+        # needs to prove cmd_lint calls plutil, by name, when command -v
+        # finds one, and skips the plistlib fallback entirely in that case.
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            rendered_dir = self._render_only_dir(tmp_path)
+            log = tmp_path / "plutil-invocations.log"
+            log.touch()
+            shim = tmp_path / "plutil-shim"
+            shim.mkdir()
+            (shim / "plutil").write_text(
+                f'#!/bin/sh\nprintf "%s\\n" "plutil $*" >> {str(log)!r}\nexit 0\n'
+            )
+            (shim / "plutil").chmod(0o755)
+            result = subprocess.run(
+                [BASH, str(SCRIPT_PATH), "lint", "--dir", str(rendered_dir)],
+                capture_output=True, text=True, timeout=30,
+                env={"PATH": str(shim), "HOME": os.environ.get("HOME", str(tmp_path))},
+            )
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertNotIn("plistlib fallback", result.stdout)
+            invocations = log.read_text()
+            self.assertEqual(invocations.count("plutil -lint"), 3, invocations)
+
     def test_full_render_lint_install_status_remove_cycle_offline(self):
         with tempfile.TemporaryDirectory() as tmp:
             tmp_path = Path(tmp)
@@ -280,19 +374,46 @@ class LaunchdAgentsScriptBehaviorTests(unittest.TestCase):
 
             lint_result = self._run(["lint"], env=env)
             self.assertEqual(lint_result.returncode, 0, lint_result.stdout + lint_result.stderr)
-            self.assertIn("plistlib fallback", lint_result.stdout)
+            # Whichever of plutil or the plistlib fallback this host actually
+            # used (a real Mac has plutil; this dev host does not) -- which
+            # one is exercised deliberately is covered by the two dedicated
+            # tests below, each with a controlled PATH.
+            self.assertIn("passed lint", lint_result.stdout)
 
             install_result = self._run(["install"], env=env)
             self.assertEqual(install_result.returncode, 0, install_result.stdout + install_result.stderr)
             launch_agents_dir = fake_home / "Library" / "LaunchAgents"
-            for label in ("com.native-stack.qdrant", "com.native-stack.ai-memory", "com.native-stack.llama-embed"):
+            # llama-embed is left out of the default install set until a
+            # model argument exists; only qdrant and ai-memory install here.
+            for label in ("com.native-stack.qdrant", "com.native-stack.ai-memory"):
                 self.assertTrue((launch_agents_dir / f"{label}.plist").is_file(), label)
+            self.assertFalse((launch_agents_dir / "com.native-stack.llama-embed.plist").exists())
+            self.assertTrue((eco_root / "state" / "logs").is_dir())
+            self.assertTrue((eco_root / "state" / "qdrant").is_dir())
             state_file = eco_root / "state" / "launchd" / "enabled-labels.txt"
             enabled = state_file.read_text().split()
-            self.assertEqual(
-                set(enabled),
-                {"com.native-stack.qdrant", "com.native-stack.ai-memory", "com.native-stack.llama-embed"},
-            )
+            self.assertEqual(set(enabled), {"com.native-stack.qdrant", "com.native-stack.ai-memory"})
+
+            # An explicit --label still installs llama-embed even though the
+            # default set skips it.
+            explicit_install = self._run(["install", "--label", "com.native-stack.llama-embed"], env=env)
+            self.assertEqual(explicit_install.returncode, 0, explicit_install.stdout + explicit_install.stderr)
+            self.assertTrue((launch_agents_dir / "com.native-stack.llama-embed.plist").is_file())
+
+            # install refuses to overwrite a plist it does not already own.
+            unowned = launch_agents_dir / "com.native-stack.qdrant.plist"
+            forget_result = self._run(["remove", "--label", "com.native-stack.qdrant"], env=env)
+            self.assertEqual(forget_result.returncode, 0, forget_result.stdout + forget_result.stderr)
+            self.assertFalse(unowned.exists())
+            unowned.write_text("not ours")
+            refused = self._run(["install", "--label", "com.native-stack.qdrant"], env=env)
+            self.assertEqual(refused.returncode, 1, refused.stdout + refused.stderr)
+            self.assertIn("Refusing to overwrite", refused.stderr)
+            self.assertEqual(unowned.read_text(), "not ours")
+            unowned.unlink()
+            # Restore qdrant as owned again for the remainder of this test.
+            reinstall = self._run(["install", "--label", "com.native-stack.qdrant"], env=env)
+            self.assertEqual(reinstall.returncode, 0, reinstall.stdout + reinstall.stderr)
 
             status_result = self._run(["status", "--label", "com.native-stack.qdrant"], env=env)
             self.assertEqual(status_result.returncode, 0, status_result.stdout + status_result.stderr)
@@ -300,8 +421,12 @@ class LaunchdAgentsScriptBehaviorTests(unittest.TestCase):
             remove_result = self._run(["remove", "--label", "com.native-stack.qdrant"], env=env)
             self.assertEqual(remove_result.returncode, 0, remove_result.stdout + remove_result.stderr)
             self.assertIn("Booted out 1 label(s); skipped 0", remove_result.stdout)
-            # The plist file and its parent LaunchAgents copy are never deleted.
-            self.assertTrue((launch_agents_dir / "com.native-stack.qdrant.plist").is_file())
+            # A successful bootout deletes the copied plist (so it cannot
+            # reload at the next login); it never touches component data or
+            # logs (state/logs, state/qdrant are untouched, still directories).
+            self.assertFalse((launch_agents_dir / "com.native-stack.qdrant.plist").exists())
+            self.assertTrue((eco_root / "state" / "logs").is_dir())
+            self.assertTrue((eco_root / "state" / "qdrant").is_dir())
             remaining = state_file.read_text().split()
             self.assertEqual(set(remaining), {"com.native-stack.ai-memory", "com.native-stack.llama-embed"})
 
@@ -313,10 +438,48 @@ class LaunchdAgentsScriptBehaviorTests(unittest.TestCase):
             self.assertIn("Booted out 0 label(s); skipped 1", second_remove.stdout)
 
             invocations = log.read_text()
-            self.assertEqual(invocations.count("launchctl bootstrap"), 3)
+            self.assertEqual(invocations.count("launchctl bootstrap"), 4)
             self.assertEqual(invocations.count("launchctl print"), 1)
-            self.assertEqual(invocations.count("launchctl bootout"), 1,
-                              "the second remove must not invoke bootout again")
+            self.assertEqual(invocations.count("launchctl bootout"), 2,
+                              "one for the mid-test forget, one for the final remove; "
+                              "the trailing no-op remove must not invoke bootout again")
+
+    def test_remove_keeps_ownership_and_the_plist_when_bootout_fails(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            eco_root = tmp_path / "eco"
+            fake_home = tmp_path / "home"
+            fake_home.mkdir()
+            failing_shim = tmp_path / "failing-shim"
+            failing_shim.mkdir()
+            # bootstrap must still succeed (install uses it); only bootout
+            # fails, so the failure exercised here is specific to remove.
+            (failing_shim / "launchctl").write_text(
+                '#!/bin/sh\ncase "$1" in\n  bootout) exit 1 ;;\n  *) exit 0 ;;\nesac\n'
+            )
+            (failing_shim / "launchctl").chmod(0o755)
+            env = {
+                **os.environ,
+                "PATH": f"{failing_shim}{os.pathsep}{os.environ['PATH']}",
+                "ECO_INSTALL_ROOT": str(eco_root),
+                "HOME": str(fake_home),
+            }
+            self.assertEqual(self._run(["render"], env=env).returncode, 0)
+            install_result = self._run(["install"], env=env)
+            self.assertEqual(install_result.returncode, 0, install_result.stdout + install_result.stderr)
+            launch_agents_dir = fake_home / "Library" / "LaunchAgents"
+            self.assertTrue((launch_agents_dir / "com.native-stack.qdrant.plist").is_file())
+
+            remove_result = self._run(["remove", "--label", "com.native-stack.qdrant"], env=env)
+            self.assertNotEqual(remove_result.returncode, 0, remove_result.stdout + remove_result.stderr)
+            self.assertIn("bootout failed", remove_result.stderr)
+            self.assertIn("ownership kept", remove_result.stderr)
+            # The plist survives a failed bootout, and the label is still
+            # recorded as enabled, so a retry (with a working launchctl) can
+            # find and finish the job.
+            self.assertTrue((launch_agents_dir / "com.native-stack.qdrant.plist").is_file())
+            state_file = eco_root / "state" / "launchd" / "enabled-labels.txt"
+            self.assertIn("com.native-stack.qdrant", state_file.read_text().split())
 
 
 if __name__ == "__main__":
