@@ -754,7 +754,83 @@ Hosted and live results after merge. Evidence class: hosted runs and GitHub API 
   - *Residual.* A `codex_absent` row relabelled `pending_lanes` with `lanes.single_lane_decision`
     removed is what `record_verdicts.py` writes without `--allow-single-lane`, and the run manifest
     does not record the decision, so it cannot be told apart and passes. It withdraws a
-    single-family verdict; it cannot add one.
+    single-family verdict. It cannot add one only since the fourth review (G2): until then the
+    authorization was read from the head alone, so a PR could add it with the row it authorized.
+- **Fourth review of the gate (2026-09-23).** A fourth independent review raised two medium and
+  two low findings. All four are closed.
+  - **G1 (platform_status forgery, medium).** The gate compared a winner's repository, recipe
+    reference, evidence class, `why_selected` and packet pin, but not its `evidence_refs`, and not
+    its pin when the packet had none. `platform_status` was then derived from the head winner's own
+    refs and pin. A row could cite any registered `evidence/` file, or add a pin matching some host
+    receipt, and raise its status. Each winner apart from `platform_status` must now equal
+    `record_verdicts.build_winners` output (refs normalized against the head, the packet pin, else
+    the row's v1 candidate pin, else `unpinned`, and no other key). `platform_status` is derived
+    from the sealed refs and a sealed pin: the packet pin, else a pin the base's row candidates
+    already carry, else `unpinned`, which binds no receipt. A platform-only change is resolved the
+    same way.
+  - **G2 (same-PR single-lane authorization, medium).** The decision record named by
+    `lanes.single_lane_decision` must exist at the base with the same bytes (`git show
+    <base>:<path>`). An authorization added or edited in the PR that adds its row fails, and the
+    derived status is then `pending_lanes`.
+  - **G3 (hand-written read list, low).** The test that claimed to derive the rule inputs listed
+    three constants. It now records every file opened (a `sys.addaudithook`, in a subprocess)
+    while the gate judges a fixture that reaches the agreeing, adjudicated and single-lane paths,
+    and while `scripts/landscape.py` and `build_verdicts.py --check` check this checkout. Every
+    head-side read of the gate must be a `TRUST_PATHS` file or verdict data named in
+    `HEAD_DATA_BINDINGS` with what binds it. Every code, schema or tool-registry read of the
+    validators must be a `TRUST_PATHS` file. The derivation found two unbound rule inputs, both
+    now bound. The first is the canonical repository index (`sources.repository_index`), which
+    decides the derived alternatives and status: a changed row must derive the same alternatives
+    with the base's index. The second is `adoption/manifest.json#/platform_profiles`, read by
+    `host_receipts.platform_profile_map` to decide a receipt's platform identity. It is a
+    `RULE_INPUT_FIELDS` entry under the trust-base rule; the rest of that file stays data.
+  - **G4 (merge-commit premise, low).** On `pull_request` the job now requires HEAD to have
+    exactly two parents, the second equal to the payload's `pull_request.head.sha` (through
+    `env`), and fails closed otherwise. `tests/test_workflow_hardening.py` asserts the text and
+    executes the step's script against a scratch repository. The merge commit passes and calls
+    the gate with its first parent. Three cases exit 1 without calling it: the PR head checked
+    out, a merge commit of another head, and an empty payload head.
+  - *Round-three lows, re-checked.* Fail-open git errors: the base tree read now uses
+    `git ls-tree` and exits 2 when the listing fails, because `git cat-file -e` exits 128 both for
+    an absent path and for a broken repository. Duplicate JSON keys: every gate parse, including
+    the new base index and platform profiles reads, uses `unique_json`. The name-alignment test
+    still asserts #124's pinned literals unconditionally. The free-form published fields remain
+    the recorded residual: `open_gaps` text and the wave document's `title`, `group`,
+    `overturn_when` (the handbook fallback) and `checked_at` are layer metadata or recording
+    dates that no sealed lane return produces, so there is nothing to derive them from.
+- **Measured (fourth review, 2026-09-23).** `tests/test_verdict_review_gate.py` has 127
+  synthetic-fixture tests (107 before), and `tests/test_workflow_hardening.py` has 9
+  `VerdictReviewGateTests` (7 before). Run against the pre-fix gate (09ff4e9), all nine new
+  negative controls fail and the four positive controls pass. The negative controls are forged
+  `evidence_refs`, a pin added where the packet has none (with and without a matching head
+  candidate), a pin changed to match an unrelated receipt, an extra winner key, an authorization
+  added or edited in the same PR, an index edit that withdraws a verdict, and a `platform_profiles`
+  change with a verdict change.
+
+  Real-checkout mutations ran in a scratch detached worktree of b76cd704, which was then
+  removed. It held a committed decision record and a constructed sealed 20260923 wave for four
+  real foundation layers, laid out as the gate requires (#124's retained packets). On it, the
+  gate's own rules (`evaluate`, validators off) pass all four rows. Mutations against that
+  base, gate's own rules:
+  - forged `evidence_refs` on `workers` (a registered `evidence/receipts/` file) with linux
+    `accepted`: fails on the refs and on the derived `conditional`. The pre-fix gate passes it;
+  - `token-efficiency`'s `rtk` pin set to 0.49.0 (the real `evidence/hosts` rtk receipt) with
+    linux `conditional`: fails on the pin and on the derived `not_established`. With a head
+    candidate `source_pin` added too, it fails on the status alone, derived at the sealed pin
+    `unpinned`. The pre-fix gate passes both;
+  - `quality-evaluation`'s `shellcheck` pin changed from the packet's 0.10.0 to the receipt's
+    0.11.0: fails on the pin and on the status. The pre-fix gate fails on the pin only;
+  - the single-lane record edited in the same comparison: fails (`differs from its base copy`).
+    The pre-fix gate passes it;
+  - the same wave judged against the commit before the record landed (authorization in the same
+    PR): fails (`is not at the base`). The pre-fix gate passes it;
+  - control, an `open_gaps` edit: passes.
+
+  The CLI runs with validators, and every one of these runs, the control included, exits 1. The
+  reason is that `scripts/landscape.py` and `build_verdicts.py --check` reject the constructed
+  wave itself: its placeholder wave document and its lane returns have no lane provenance. That
+  exit code is therefore not evidence for these findings. The evidence is the gate's own
+  violation list.
 - **Accepted residual: the PR's own workflow can disable the job (finding 2, 2026-09-23).** A
   `pull_request` run takes the job definition from the PR's `validate.yml`. A PR that edits the
   `verdict-review-gate` job so that it no longer runs the base's gate is therefore not blocked by
