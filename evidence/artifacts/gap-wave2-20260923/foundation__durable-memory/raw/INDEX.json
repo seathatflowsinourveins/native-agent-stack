@@ -1,0 +1,311 @@
+{
+ "transformations": "Commit raw outputs already on disk (session transcript tool results and probe scripts) that the\ndurable-memory gap-wave-2 receipts cite. No command is re-run: every byte comes from files that\nexisted before this reconciliation. Transformations: host home -> $HOME, session scratchpad ->\n$SCRATCHPAD, session UUID -> <session-id-redacted>, every other UUID-form identifier (ai-memory workspace, project,\npage and session ids) -> <uuid-N> (same N for the same id across all raw files), ANSI colour escapes removed. Privacy sweep 2026-09-23: host username -> <user>.",
+ "source_transcripts": {
+  "first_pass": "$HOME/.claude/projects/-home-<user>-code-agent-lab/<session-id-redacted>/subagents/workflows/wf_781062eb-0fd/agent-ab7cf2b462d276834.jsonl",
+  "fix_round": "$HOME/.claude/projects/-home-<user>-code-agent-lab/<session-id-redacted>/subagents/workflows/wf_781062eb-0fd/agent-a078fd7a62919cd3f.jsonl"
+ },
+ "files": [
+  {
+   "path": "raw/first-pass-gap11-ttl-probe-incident.txt",
+   "transcript": "first_pass",
+   "calls": [
+    {
+     "call_index": 14,
+     "tool_use_id": "toolu_01RfHAh8soUguukWw9Kawq63",
+     "called_at": "2026-09-23T01:13:46.082Z",
+     "result_at": "2026-09-23T01:14:02.093Z"
+    },
+    {
+     "call_index": 15,
+     "tool_use_id": "toolu_01CBkTnP6Ydjmn9xCcsg7xUx",
+     "called_at": "2026-09-23T01:14:16.250Z",
+     "result_at": "2026-09-23T01:14:16.617Z"
+    },
+    {
+     "call_index": 16,
+     "tool_use_id": "toolu_01Who7Ve1LjjfX7ugiEQbNVv",
+     "called_at": "2026-09-23T01:14:25.057Z",
+     "result_at": "2026-09-23T01:14:27.127Z"
+    }
+   ],
+   "cited_by_gaps": [
+    11,
+    1,
+    8
+   ],
+   "source_sha256_before_redaction": "6d6628641fb22a3fa1aab25d3d62cbe670b6979a625e767ef36c724a890b8b65",
+   "sha256": "8b92cf37e9dcb19a7023d75a38060f710c36eb2340295ef0f2c4f57cd581f534",
+   "bytes": 12063,
+   "published": false,
+   "retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+  },
+  {
+   "path": "raw/fix-round-live-status-before-gap14.txt",
+   "transcript": "fix_round",
+   "calls": [
+    {
+     "call_index": 7,
+     "tool_use_id": "toolu_01GkKrqxB177FhvBZeGCRfhw",
+     "called_at": "2026-09-23T01:22:21.418Z",
+     "result_at": "2026-09-23T01:22:21.744Z"
+    }
+   ],
+   "cited_by_gaps": [
+    2,
+    14
+   ],
+   "source_sha256_before_redaction": "12e370be8e0f7a280946e129baab45d9c9ae5fde2e6a916bff68def9e8a158f1",
+   "sha256": "6ac97f4ee171f900b01a1ee498d63dcfe5e523cfbbab7d2505adad68a0ddff5b",
+   "bytes": 4346,
+   "published": false,
+   "retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+  },
+  {
+   "path": "raw/fix-round-gap14-netns-probe.txt",
+   "transcript": "fix_round",
+   "calls": [
+    {
+     "call_index": 12,
+     "tool_use_id": "toolu_016XSy3weAdBdDuLgW1einjt",
+     "called_at": "2026-09-23T01:23:12.702Z",
+     "result_at": "2026-09-23T01:23:15.139Z"
+    },
+    {
+     "call_index": 13,
+     "tool_use_id": "toolu_01LM9yDXy8CizYdVsXRH6DsG",
+     "called_at": "2026-09-23T01:23:25.817Z",
+     "result_at": "2026-09-23T01:23:26.166Z"
+    }
+   ],
+   "cited_by_gaps": [
+    14,
+    1
+   ],
+   "source_sha256_before_redaction": "cbed099a2a68fa8d8b99b3d92def8321cef281349a43534fcb9e6120e068e33d",
+   "sha256": "9bb03430c78ed01ec1dad2fd6fae001178a0f4a8759cd312ce96a2a4b29d8d02",
+   "bytes": 11545,
+   "published": false,
+   "retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+  },
+  {
+   "path": "raw/fix-round-gap1-env-and-help.txt",
+   "transcript": "fix_round",
+   "calls": [
+    {
+     "call_index": 14,
+     "tool_use_id": "toolu_01AN1jZ6gfTEsnzwBDqdwDP8",
+     "called_at": "2026-09-23T01:23:35.156Z",
+     "result_at": "2026-09-23T01:23:35.408Z"
+    }
+   ],
+   "cited_by_gaps": [
+    1,
+    8
+   ],
+   "source_sha256_before_redaction": "80c37fe6d686bfb8ea44f715fe346225a8ec61f87dd458e3485daa9d6a8bccc1",
+   "sha256": "21ab5e33307108eba9d5209dea56ffb093942d7398c9cbe5aaa85b7085af47b0",
+   "bytes": 1484,
+   "published": false,
+   "retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+  },
+  {
+   "path": "raw/fix-round-gap5-13-find.txt",
+   "transcript": "fix_round",
+   "calls": [
+    {
+     "call_index": 15,
+     "tool_use_id": "toolu_01ApCrnwfAq6283My4fA2pSp",
+     "called_at": "2026-09-23T01:23:40.700Z",
+     "result_at": "2026-09-23T01:23:40.875Z"
+    }
+   ],
+   "cited_by_gaps": [
+    5,
+    13
+   ],
+   "source_sha256_before_redaction": "b66529b1686ad19500bcdbf583cf442cb8ad75fccd2a1dce1c2b8fd7cb1e0c62",
+   "sha256": "e53c7624eff9af8d1a4f1709f1641be32ff1dbf517105226fe0e0fc846b79cc0",
+   "bytes": 444,
+   "published": false,
+   "retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+  },
+  {
+   "path": "raw/fix-round-gap11-posthoc-residue.txt",
+   "transcript": "fix_round",
+   "calls": [
+    {
+     "call_index": 17,
+     "tool_use_id": "toolu_01RTgXB2iZBRGXRRkVLtcfpL",
+     "called_at": "2026-09-23T01:24:27.624Z",
+     "result_at": "2026-09-23T01:24:28.052Z"
+    },
+    {
+     "call_index": 18,
+     "tool_use_id": "toolu_01NnCPTzXrvjJAfXs1uj4MwR",
+     "called_at": "2026-09-23T01:24:35.984Z",
+     "result_at": "2026-09-23T01:24:36.567Z"
+    }
+   ],
+   "cited_by_gaps": [
+    11
+   ],
+   "source_sha256_before_redaction": "57d8c4ddf624a64e718203df5cf6de397df3f61c8fcce3ca477e6472483a8ea1",
+   "sha256": "b0b1381a37ea8a0985c19bfc719672c6961568743be81446500442f0501e7197",
+   "bytes": 3064,
+   "published": false,
+   "retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+  },
+  {
+   "path": "raw/fix-round-gap12b-attempts.txt",
+   "transcript": "fix_round",
+   "calls": [
+    {
+     "call_index": 19,
+     "tool_use_id": "toolu_01PxhJfQV8RrNey4XNRyUFeK",
+     "called_at": "2026-09-23T01:25:11.515Z",
+     "result_at": "2026-09-23T01:26:41.629Z"
+    },
+    {
+     "call_index": 20,
+     "tool_use_id": "toolu_0143us4yS7HuPPiEjiKyUBvc",
+     "called_at": "2026-09-23T01:26:55.388Z",
+     "result_at": "2026-09-23T01:26:55.523Z"
+    },
+    {
+     "call_index": 21,
+     "tool_use_id": "toolu_015jqjdAoKAE4iYiHGqsZ585",
+     "called_at": "2026-09-23T01:26:58.833Z",
+     "result_at": "2026-09-23T01:26:58.910Z"
+    },
+    {
+     "call_index": 22,
+     "tool_use_id": "toolu_019GQcXGompbEp88WXMa2Tfm",
+     "called_at": "2026-09-23T01:27:05.269Z",
+     "result_at": "2026-09-23T01:27:05.431Z"
+    },
+    {
+     "call_index": 23,
+     "tool_use_id": "toolu_01GPcnLGw8QjsnTmPUHqc6fk",
+     "called_at": "2026-09-23T01:27:08.492Z",
+     "result_at": "2026-09-23T01:27:08.707Z"
+    },
+    {
+     "call_index": 24,
+     "tool_use_id": "toolu_01WkrajngTN52sjWDDXKaEYU",
+     "called_at": "2026-09-23T01:27:20.638Z",
+     "result_at": "2026-09-23T01:27:20.896Z"
+    },
+    {
+     "call_index": 25,
+     "tool_use_id": "toolu_01QPN8uQXYn99VbAHxF8wpPR",
+     "called_at": "2026-09-23T01:27:23.809Z",
+     "result_at": "2026-09-23T01:27:24.122Z"
+    },
+    {
+     "call_index": 26,
+     "tool_use_id": "toolu_01AX8KdGYojZENj8G5swyrML",
+     "called_at": "2026-09-23T01:27:29.131Z",
+     "result_at": "2026-09-23T01:27:30.849Z"
+    },
+    {
+     "call_index": 27,
+     "tool_use_id": "toolu_019V2SLik8HLrCix9JPYmPgN",
+     "called_at": "2026-09-23T01:27:41.654Z",
+     "result_at": "2026-09-23T01:27:43.657Z"
+    },
+    {
+     "call_index": 28,
+     "tool_use_id": "toolu_013GrnYftrbgfsXpa1HRe31q",
+     "called_at": "2026-09-23T01:27:50.689Z",
+     "result_at": "2026-09-23T01:27:50.872Z"
+    },
+    {
+     "call_index": 29,
+     "tool_use_id": "toolu_012rDA29VZU8LRgfxtdguUeX",
+     "called_at": "2026-09-23T01:28:01.319Z",
+     "result_at": "2026-09-23T01:28:01.463Z"
+    }
+   ],
+   "cited_by_gaps": [
+    12
+   ],
+   "source_sha256_before_redaction": "790bb6370e0649fef7702bff19d8e54943946a8a4338f987a99cc8842bb4eb99",
+   "sha256": "2b03437ee567b03c1752e3a26d74e2f49de2688de454c530407c5ee1d54fdec2",
+   "bytes": 15578,
+   "published": false,
+   "retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+  },
+  {
+   "path": "raw/fix-round-gap0-gap8-grep.txt",
+   "transcript": "fix_round",
+   "calls": [
+    {
+     "call_index": 30,
+     "tool_use_id": "toolu_01VxgUz19iqgw4QCnmahiyXq",
+     "called_at": "2026-09-23T01:28:14.021Z",
+     "result_at": "2026-09-23T01:28:14.231Z"
+    }
+   ],
+   "cited_by_gaps": [
+    0,
+    8
+   ],
+   "source_sha256_before_redaction": "af3d86c6e8208b7630a25c72588c8864e91849267dd7ac35d25eda8e71c27e35",
+   "sha256": "b1e1213162d2b83a304402611c4113d33937eb9b0fbcfed36a5cea321181f96a",
+   "bytes": 2125,
+   "published": false,
+   "retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+  },
+  {
+   "path": "raw/fix-round-final-live-status.txt",
+   "transcript": "fix_round",
+   "calls": [
+    {
+     "call_index": 50,
+     "tool_use_id": "toolu_012K1xWk6VkDTCRCix6ahfyq",
+     "called_at": "2026-09-23T01:36:21.405Z",
+     "result_at": "2026-09-23T01:36:21.627Z"
+    },
+    {
+     "call_index": 51,
+     "tool_use_id": "toolu_01XuVq8Skf4KLymF9nUGyaA9",
+     "called_at": "2026-09-23T01:36:24.761Z",
+     "result_at": "2026-09-23T01:36:25.037Z"
+    }
+   ],
+   "cited_by_gaps": [
+    11,
+    14
+   ],
+   "source_sha256_before_redaction": "74a4888f5508f6e48369bffc833e58ae14fdbe905dd2ea83f3c0987786cb8729",
+   "sha256": "359553face278ba8a98ea9956f0b7c09c6a996ce084444b4180d3f8e26b6d4d2",
+   "bytes": 1161,
+   "published": false,
+   "retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+  },
+  {
+   "path": "raw/gap14-probe.sh",
+   "source": "$SCRATCHPAD/gap14-probe.sh",
+   "note": "Exact script run by fix-round call [12] (unshare -rn bash gap14-probe.sh).",
+   "cited_by_gaps": [
+    14
+   ],
+   "source_sha256_before_redaction": "06a0877a3e3569f65b9e057bdd1ca563f83b180b6ab6f9e068436404b3653f0a",
+   "source_mtime_epoch": 1790126592,
+   "sha256": "5400724c3c6b635d79c3ae63f464decfaaf9ec211c328110198e5c570080191a",
+   "bytes": 1137
+  },
+  {
+   "path": "raw/gap12-half2-probe.sh",
+   "source": "$SCRATCHPAD/gap12-half2-probe.sh",
+   "note": "Last version written by fix-round call [20]; its run exited 144 with no output file. The data-producing run was the inline command in call [27] (port 49592), recorded in fix-round-gap12b-attempts.txt.",
+   "cited_by_gaps": [
+    12
+   ],
+   "source_sha256_before_redaction": "cac69db4c4672d5f84ac4b7f8e8fcbc9893def6ef72bb50c73ad1afc4dd99cd1",
+   "source_mtime_epoch": 1790126711,
+   "sha256": "bdf8fd766ffc7519144f17778e077251421a83ec57b1030c745b8edbb86dd20e",
+   "bytes": 1920
+  }
+ ]
+}

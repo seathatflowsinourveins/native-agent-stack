@@ -1,0 +1,41 @@
+{
+ "task": "t2",
+ "arm": "with",
+ "exit": 0,
+ "started_at": "2026-09-23T07:38:40Z",
+ "wall_seconds": 16.62,
+ "turns": 1,
+ "usage_sum": {
+  "input_tokens": 62148,
+  "cached_input_tokens": 51072,
+  "output_tokens": 264,
+  "reasoning_output_tokens": 0,
+  "total_tokens": 62412
+ },
+ "tool_calls": [
+  {
+   "type": "command_execution",
+   "name": "/bin/bash -lc \"sed -n '1,200p' $HOME/.codex/plugins/cache/context-mode/context-mode/1.0.169/skills/context-mode/SK",
+   "status": "completed",
+   "error": null,
+   "output_chars": 10471
+  },
+  {
+   "type": "mcp_tool_call",
+   "name": "ctx_execute",
+   "status": "completed",
+   "error": null,
+   "output_chars": 0
+  }
+ ],
+ "failed_tool_calls": 0,
+ "final": "{\"receipt_entries\":99,\"receipt_bytes_total\":2272055}",
+ "score": {
+  "correct": 2,
+  "total": 2,
+  "per_key": {
+   "receipt_entries": true,
+   "receipt_bytes_total": true
+  }
+ }
+}

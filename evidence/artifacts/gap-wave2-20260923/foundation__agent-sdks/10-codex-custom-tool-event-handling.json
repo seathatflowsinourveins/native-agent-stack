@@ -1,0 +1,548 @@
+{
+  "id": "gap-wave2-20260923/foundation/agent-sdks/10-codex-custom-tool-event-handling",
+  "gap_index": 10,
+  "gap_text_sha256": "a18623155612da53f520cbbbb0fccee25035bb91e3bbeb48f65f230f4e17aba6",
+  "preregistration": {
+    "written_at": "2026-09-23T03:24:52Z",
+    "expectation": "A new dynamic tool is registered through the SDK and called; every received notification is typed by the SDK registry, but one turn cannot emit every documented notification type.",
+    "criteria": [
+      "tool registered via thread/start dynamicTools (not an MCP server) and called",
+      "received notification types all typed (not UnknownNotification)",
+      "settled only if every documented notification type is received and handled; otherwise advanced"
+    ]
+  },
+  "commands": [
+    "env -i HOME=$HOME PATH=$HOME/.local/share/codex-ecosystem/bin:/usr/bin:/bin timeout 300 $HOME/.cache/gap-wave2-20260923/agent-sdks/codex-sdk-01551/bin/python blueprints/gap-wave2-20260923/foundation__agent-sdks/codex_probe.py tool-turn --codex-bin $HOME/.local/share/codex-ecosystem/bin/codex --codex-home $HOME/.codex --workspace $HOME/.cache/gap-wave2-20260923/agent-sdks/ws-probe --out $HOME/.cache/gap-wave2-20260923/agent-sdks/runs/tool-turn.json --state $HOME/.cache/gap-wave2-20260923/agent-sdks/runs/tool-state.json --deadline 180",
+    "codex app-server generate-json-schema --experimental --out $HOME/.cache/gap-wave2-20260923/agent-sdks/schema-exp"
+  ],
+  "results": {
+    "tool_registration": "dynamicTools (not an MCP server)",
+    "tool_round_trip": true,
+    "received_notification_types": {
+      "turn/started": 1,
+      "item/started": 6,
+      "item/completed": 6,
+      "item/agentMessage/delta": 11,
+      "thread/tokenUsage/updated": 2,
+      "turn/completed": 1
+    },
+    "untyped_received": [],
+    "documented_notification_types_in_sdk_registry": 82,
+    "documented_types_not_received": 76,
+    "other_server_requests": [],
+    "detection": "untyped = coerced to UnknownNotification by the SDK (client._coerce_notification); a validation failure would appear in untyped_received"
+  },
+  "raw_outputs": [
+    {
+      "path": "raw/tool-turn.json",
+      "sha256": "90e6125e799907067c571bb5801f0c41b1a503f974a70f27c19ca1e342969962"
+    }
+  ],
+  "outcome": "advanced",
+  "evidence_class": "native_proven",
+  "remaining": "Native receipt of the other 51 documented notification types (listed in round_4.results.union_rounds_3_4 by complement), several of which need a signed-in account, a realtime session, Windows, hooks or an MCP server.",
+  "rule_deviations": [
+    {
+      "rule": "wait while 2 or more real codex exec processes run",
+      "status": "unresolved",
+      "observed": "The first Codex SDK model call (tool-turn.json, 03:24:59Z) started while pgrep counted 3 processes matching 'codex exec'. A substring count can include processes that are not codex exec runs (at 04:37Z a similar substring filter matched two codex-linux-sandbox helpers); the 3 were never classified, so the rule may have been broken for this call. Later calls waited; the fix-round-2 driver classifies by argv (worker-tool-runs.json slot_checks: 1 real codex exec before each call)."
+    }
+  ],
+  "limits": [
+    "One turn received 6 of the documented notification types; the rest (realtime, goals, fs, compaction, approvals, errors, ...) were not emitted, so 'every documented type handled' is not shown."
+  ],
+  "checked_at": "2026-09-23T14:28:08Z",
+  "round_1_remaining": "A turn corpus or recorded app-server stream that emits each documented notification type (or an SDK-level validation test over the upstream schema samples).",
+  "round_3": {
+    "preregistration": {
+      "file": "preregistration-round3.json",
+      "written_at": "2026-09-23T12:56:16Z",
+      "expectation": "(a) codex 0.155.1 `app-server generate-json-schema --experimental` (no inference) lists the same 82 server-notification methods as the SDK's NOTIFICATION_MODELS. (b) Synthetic: for every method, a minimal and a maximal params sample generated from the native schema validate against the native schema (jsonschema) and are typed (not UnknownNotification) by the SDK's CodexClient._coerce_notification, and a MessageRouter delivers them; negative control: dropping a required field yields UnknownNotification. (c) One native turn in the isolated namespace that asks for a dynamic tool call, a plan update, a shell command and a file edit receives more documented types than round 1's 6, every received type typed.",
+      "criteria": [
+        "(a) set equality of native schema methods and SDK registry keys",
+        "(b) count of methods whose samples are native-valid and SDK-typed; negative control flips to UnknownNotification (detector works)",
+        "(c) received documented types listed from a collector that drains both the turn queue and the global queue",
+        "settled only if every documented type is received natively and handled; the synthetic arm alone yields advanced"
+      ]
+    },
+    "commands": [
+      "python3 blueprints/gap-wave2-20260923/foundation__agent-sdks/round3.py events",
+      "python3 blueprints/gap-wave2-20260923/foundation__agent-sdks/round3.py schema",
+      "pasta --config-net -T none -U none -t none -u none --no-map-gw --quiet -- unshare --mount --pid --fork --mount-proc bash blueprints/gap-wave2-20260923/foundation__agent-sdks/iso_ns.sh STAGE PROFILE -- CMD (issued by round3.py for every in-namespace command)",
+      "(schema step) codex app-server generate-json-schema --experimental --out $HOME/.cache/gap-wave2-20260923/agent-sdks/round3/schema"
+    ],
+    "raw_outputs": [
+      {
+        "path": "raw/round3/step-events.json",
+        "sha256": "c6de783e4eca4fe1b040e5a76ce6498bab5bcb7ba7a0ad0cdc4dccfca15cb68a"
+      },
+      {
+        "path": "raw/round3/events-turn.json",
+        "sha256": "215ac123aabda432b3bb0e1b545b8b45d3171e9b9d82d8f629b610e32b7cbcc4"
+      },
+      {
+        "path": "raw/round3/step-schema.json",
+        "sha256": "f979313f75307273aa1b4ae7f20cac9caa0369fff536131a1a02db3f13466854"
+      },
+      {
+        "path": "raw/round3/schema-dispatch.json",
+        "sha256": "a547c3c7dba2ce4f9990752e8df1cea73504df18465d6b895f0e779cceb9a47c"
+      },
+      {
+        "path": "raw/round3/native-schema-servernotification.json",
+        "sha256": "8c066b74c5d62e70ad20e3d9e0db2af0dfc0f8ffcff10f996d6cb74327efe443"
+      },
+      {
+        "path": "raw/round3/step-schema-attempt1.json",
+        "sha256": "1a48906feb5eaadcea472e168846bf9e678ce3859a7e3325a030a853dc0fcccb"
+      },
+      {
+        "path": "raw/round3/step-schema-attempt2.json",
+        "sha256": "3b8045be6249d41de500481b6a307f3bfbacbc9240cbe6f68ffa651e370e1677"
+      },
+      {
+        "path": "raw/round3/step-schema-attempt3.json",
+        "sha256": "2d1af8aeb194352f9005bf89cf03121bc23d1f6c69436be15e6a7f6e935516ae"
+      },
+      {
+        "path": "raw/round3/step-schema-attempt4.json",
+        "sha256": "55edeb9ad549851d9baedb35757bb5ac0717e18e50e2931cdcd8508ec38153c6"
+      },
+      {
+        "path": "raw/round3/step-schema-attempt5-prereview.json",
+        "sha256": "eb709bebefa8c758a8d572079abbc2eddaaeff5bb785c89edd540cc6272cfac7"
+      }
+    ],
+    "results": {
+      "native_turn": {
+        "turn_status": "completed",
+        "received_documented_count": 13,
+        "received_documented": [
+          "account/rateLimits/updated",
+          "item/agentMessage/delta",
+          "item/completed",
+          "item/started",
+          "mcpServer/startupStatus/updated",
+          "remoteControl/status/changed",
+          "thread/settings/updated",
+          "thread/started",
+          "thread/status/changed",
+          "thread/tokenUsage/updated",
+          "turn/completed",
+          "turn/diff/updated",
+          "turn/started"
+        ],
+        "received_undocumented": [],
+        "untyped_methods": [],
+        "server_requests": [
+          "item/tool/call"
+        ],
+        "final_answer_has_tool_value": true,
+        "notes_txt_created": true
+      },
+      "native_turn_item_types": [
+        "agentMessage",
+        "commandExecution",
+        "dynamicToolCall",
+        "fileChange",
+        "reasoning",
+        "userMessage"
+      ],
+      "native_turn_note": "Round 1 received 6 documented types; this turn received the counts above. No plan update (turn/plan/updated) arrived although the prompt asked for one. The two mcpServer/startupStatus/updated notifications came from the provider-delivered openai-api-key-local-confirmation server (gap 2 round 3).",
+      "synthetic_schema_dispatch": {
+        "native_methods": 82,
+        "sdk_registry": 82,
+        "native_equals_sdk_registry": true,
+        "native_only": [],
+        "sdk_only": [],
+        "samples_native_valid_both": 82,
+        "typed_minimal": 82,
+        "typed_maximal": 82,
+        "typed_both_among_native_valid": 82,
+        "untyped_among_native_valid": [],
+        "negative_controls": 80,
+        "negative_controls_untyped": 79,
+        "delivered": {
+          "turn": 59,
+          "login": 1,
+          "global": 104,
+          "not_delivered": 0
+        },
+        "sdk_more_lenient_than_native": [
+          "thread/project/updated"
+        ],
+        "not_native_valid": []
+      },
+      "synthetic_note": "Samples are generated from the native 0.155.1 schema (only the first valid branch of each oneOf/anyOf, so not every item variant), validated with jsonschema 4.26.0, then passed to the SDK's CodexClient._coerce_notification and, one at a time, to a fresh MessageRouter with the matching turn, login or global consumer registered; `delivered` counts both variants of all 82 methods received by that consumer. The negative control (drop one required field) turned 79 of 80 untyped; thread/project/updated stayed typed, so the SDK model is more lenient than the native schema there. The generator failed or produced invalid samples in the first attempts (a crash on boolean subschemas, then 72, 79 and 82 methods with valid samples as oneOf merging was fixed). Attempt 5 (pre-review) routed only minimal samples without consumers; after the cross-family review the delivery check was added and the cited run is the post-review rerun."
+    },
+    "checked_at": "2026-09-23T13:20:28Z"
+  },
+  "evidence_class_note": "native_proven for the native turns; the round-3 schema dispatch is synthetic",
+  "pre_round_4_remaining": "Native receipt of the other documented notification types (69 not seen in any native turn here), for example through a recorded app-server stream covering realtime, approvals, goals, hooks, fs and errors.",
+  "round_4": {
+    "preregistration": {
+      "file": "preregistration-round4.json",
+      "written_at": null,
+      "written_window": {
+        "not_before": "2026-09-23T14:11:57Z",
+        "not_after": "2026-09-23T14:12:27Z"
+      },
+      "written_at_note": "Written between 14:11:57Z (a date call just before writing) and 14:12:27Z (commit 1ce3105 time); the first draft carried 14:13:00Z, which was later than its own commit and is corrected here in an amended commit. Written before the round-4 model download, before the local vLLM server started and before any round-4 inference.",
+      "expectation": "Against the local provider (no account use), client-driven app-server requests (thread/name/set, thread/archive and unarchive, thread/compact/start, a turn with a plan update and a command) raise the count of natively received documented notification types above round 3's 13. Not every documented type can be triggered on this host (for example login, Windows sandbox and realtime types).",
+      "criteria": [
+        "received documented types listed from a collector draining turn and global queues; every received type typed",
+        "settled only if all 82 documented types are received natively; otherwise advanced with the count"
+      ]
+    },
+    "commands": [
+      "ECOSYSTEM_JOB_SECONDS=1200 $HOME/codex-ecosystem/bin/ecosystem-bounded-run env -u HF_TOKEN HF_HOME=$HOME/.cache/gap-wave2-20260923/agent-sdks/hf HF_HUB_DISABLE_TELEMETRY=1 $HOME/.local/share/codex-ecosystem/tools/vllm-0.25.0/bin/python -c \"from huggingface_hub import snapshot_download; snapshot_download('Qwen/Qwen3-4B-Instruct-2507-FP8', revision='8591804019c8b22094c3b5b4454e0edc05dffc98')\"  # 4.9 GB download from huggingface.co",
+      "ECOSYSTEM_JOB_MEMORY_HIGH=10G ECOSYSTEM_JOB_MEMORY_MAX=14G ECOSYSTEM_JOB_SECONDS=10800 ECOSYSTEM_JOB_TASKS_MAX=1024 $HOME/codex-ecosystem/bin/ecosystem-bounded-run $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/serve.sh  # contents in raw/round4/serve.sh (pasta netns, only 127.0.0.1:28431 forwarded); three earlier launches failed or were replaced, logs retained",
+      "kill -TERM <vllm api-server pid inside the pasta namespace>  # stop at 14:37:38Z; nvidia-smi before/after in raw/round4/gpu-before.txt, gpu-after.txt",
+      "(review fix round) the same serve.sh restarted at about 14:56:36Z and stopped the same way at 15:03:19Z; gpu-before-fix.txt, gpu-after-fix.txt",
+      "(second review fix) blueprints/gap-wave2-20260923/foundation__agent-sdks/r4_fix2_remote.sh restarted it at 15:46:08Z; its stop step failed and the api-server was stopped by pid at 15:49:59Z (see receipt 8, round_4.results.provider_stop_rule_gpu)",
+      "$HOME/.cache/gap-wave2-20260923/agent-sdks/codex-sdk-01551/bin/python blueprints/gap-wave2-20260923/foundation__agent-sdks/r4_codex.py events --codex-bin $HOME/.local/share/codex-ecosystem/bin/codex --codex-home $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/codex-home --workspace $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/ws-codex-events --state $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/private/events-state.json --out $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/codex-events.json",
+      "$HOME/.cache/gap-wave2-20260923/agent-sdks/codex-sdk-01551/bin/python blueprints/gap-wave2-20260923/foundation__agent-sdks/r4_codex.py events2 --codex-bin $HOME/.local/share/codex-ecosystem/bin/codex --codex-home $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/codex-home --workspace $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/ws-codex-events2 --state $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/private/events2-state.json --out $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/codex-events2.json --deadline 240"
+    ],
+    "raw_outputs": [
+      {
+        "path": "raw/round4/codex-events.json",
+        "sha256": "d81ccdea0e3fe3df0ff236e319e9dd2a9b5a5a556993d9a2794e7ac29ab12654"
+      },
+      {
+        "path": "raw/round4/codex-events2.json",
+        "sha256": "c1f10efff9d4008f759288519f40c858c4cadd72fe76b4c79046cde70c7f3159"
+      }
+    ],
+    "results": {
+      "events": {
+        "received_documented_count": 16,
+        "received_documented": [
+          "account/rateLimits/updated",
+          "fuzzyFileSearch/sessionCompleted",
+          "fuzzyFileSearch/sessionUpdated",
+          "item/agentMessage/delta",
+          "item/completed",
+          "item/started",
+          "remoteControl/status/changed",
+          "thread/archived",
+          "thread/name/updated",
+          "thread/started",
+          "thread/status/changed",
+          "thread/tokenUsage/updated",
+          "thread/unarchived",
+          "turn/completed",
+          "turn/started",
+          "warning"
+        ],
+        "untyped_methods": [],
+        "steps": [
+          {
+            "step": "thread/name/set",
+            "ok": true,
+            "keys": []
+          },
+          {
+            "step": "thread/compact/start",
+            "ok": true,
+            "keys": []
+          },
+          {
+            "step": "thread/archive",
+            "ok": true,
+            "keys": []
+          },
+          {
+            "step": "thread/unarchive",
+            "ok": true,
+            "keys": [
+              "thread"
+            ]
+          },
+          {
+            "step": "fuzzyFileSearch/sessionStart",
+            "ok": true,
+            "keys": []
+          },
+          {
+            "step": "fuzzyFileSearch/sessionUpdate",
+            "ok": true,
+            "keys": []
+          },
+          {
+            "step": "fuzzyFileSearch/sessionStop",
+            "ok": true,
+            "keys": []
+          },
+          {
+            "step": "command/exec",
+            "ok": false,
+            "error": "InvalidRequestError: JSON-RPC error -32600: command/exec tty or streaming requires a client-supplied processId"
+          },
+          {
+            "step": "thread/unsubscribe",
+            "ok": true,
+            "keys": [
+              "status"
+            ]
+          }
+        ],
+        "notes_txt_created": true
+      },
+      "events2": {
+        "received_documented_count": 24,
+        "received_documented": [
+          "account/rateLimits/updated",
+          "command/exec/outputDelta",
+          "deprecationNotice",
+          "error",
+          "fs/changed",
+          "item/agentMessage/delta",
+          "item/completed",
+          "item/started",
+          "process/exited",
+          "process/outputDelta",
+          "remoteControl/status/changed",
+          "serverRequest/resolved",
+          "skills/changed",
+          "thread/deleted",
+          "thread/goal/cleared",
+          "thread/goal/updated",
+          "thread/queue/changed",
+          "thread/settings/updated",
+          "thread/started",
+          "thread/status/changed",
+          "thread/tokenUsage/updated",
+          "turn/completed",
+          "turn/started",
+          "warning"
+        ],
+        "untyped_methods": [],
+        "received_undocumented": [],
+        "steps": [
+          {
+            "step": "fs/watch",
+            "ok": true,
+            "at": 1790173627.7928154,
+            "result_keys": [
+              "path"
+            ]
+          },
+          {
+            "step": "fs/writeFile",
+            "ok": true,
+            "at": 1790173627.7935176,
+            "result_keys": []
+          },
+          {
+            "step": "process/spawn",
+            "ok": true,
+            "at": 1790173629.801233,
+            "result_keys": []
+          },
+          {
+            "step": "command/exec",
+            "ok": true,
+            "at": 1790173631.8481965,
+            "result_keys": [
+              "exitCode",
+              "stderr",
+              "stdout"
+            ]
+          },
+          {
+            "step": "thread/settings/update",
+            "ok": true,
+            "at": 1790173632.8491051,
+            "result_keys": []
+          },
+          {
+            "step": "turn/start(untrusted)",
+            "ok": true,
+            "at": 1790173652.5566025,
+            "result_keys": [
+              "turn"
+            ]
+          },
+          {
+            "step": "thread/shellCommand",
+            "ok": true,
+            "at": 1790173652.5572486,
+            "result_keys": []
+          },
+          {
+            "step": "wait(shellCommand)",
+            "ok": true,
+            "at": 1790173652.5655086,
+            "result_keys": [
+              "turns"
+            ]
+          },
+          {
+            "step": "thread/compact/start",
+            "ok": true,
+            "at": 1790173652.5663915,
+            "result_keys": []
+          },
+          {
+            "step": "wait(compact)",
+            "ok": true,
+            "at": 1790173659.6062682,
+            "result_keys": [
+              "turns"
+            ]
+          },
+          {
+            "step": "thread/goal/set",
+            "ok": true,
+            "at": 1790173659.6100595,
+            "result_keys": [
+              "goal"
+            ]
+          },
+          {
+            "step": "wait(goal)",
+            "ok": true,
+            "at": 1790173667.6546183,
+            "result_keys": [
+              "turns"
+            ]
+          },
+          {
+            "step": "thread/goal/clear",
+            "ok": true,
+            "at": 1790173667.6560087,
+            "result_keys": [
+              "cleared"
+            ]
+          },
+          {
+            "step": "thread/queue/add",
+            "ok": true,
+            "at": 1790173669.6662521,
+            "result_keys": [
+              "queuedSubmission"
+            ]
+          },
+          {
+            "step": "wait(queue)",
+            "ok": true,
+            "at": 1790173672.6746485,
+            "result_keys": [
+              "turns"
+            ]
+          },
+          {
+            "step": "thread/rollback",
+            "ok": false,
+            "at": 1790173672.6751566,
+            "error": "InvalidRequestError: JSON-RPC error -32600: paginated threads do not support thread/rollback"
+          },
+          {
+            "step": "project/create",
+            "ok": false,
+            "at": 1790173673.6757543,
+            "error": "InvalidRequestError: JSON-RPC error -32600: Invalid request: invalid type: string \"$HOME/.cache/gap-wave2-20260923/agent-sdks/round4/ws-codex-events2\", expected struct ProjectRoot"
+          },
+          {
+            "step": "skills/extraRoots/set",
+            "ok": true,
+            "at": 1790173674.6770027,
+            "result_keys": []
+          },
+          {
+            "step": "thread/fork",
+            "ok": true,
+            "at": 1790173675.7572021,
+            "result_keys": [
+              "activePermissionProfile",
+              "approvalPolicy",
+              "approvalsReviewer",
+              "cwd",
+              "instructionSources",
+              "model",
+              "modelProvider",
+              "multiAgentMode",
+              "reasoningEffort",
+              "runtimeWorkspaceRoots",
+              "sandbox",
+              "serviceTier"
+            ]
+          },
+          {
+            "step": "turn/start(bad model)",
+            "ok": true,
+            "at": 1790173683.0730433,
+            "result_keys": [
+              "turn"
+            ]
+          },
+          {
+            "step": "thread/delete(fork)",
+            "ok": true,
+            "at": 1790173684.1066036,
+            "result_keys": []
+          },
+          {
+            "step": "thread/unsubscribe",
+            "ok": true,
+            "at": 1790173685.1072428,
+            "result_keys": [
+              "status"
+            ]
+          }
+        ],
+        "other_server_requests": [
+          "item/commandExecution/requestApproval"
+        ],
+        "collector": "tap on openai_codex MessageRouter.route_notification (private attribute) plus a global drain"
+      },
+      "union_rounds_3_4": {
+        "count": 31,
+        "of": 82,
+        "types": [
+          "account/rateLimits/updated",
+          "command/exec/outputDelta",
+          "deprecationNotice",
+          "error",
+          "fs/changed",
+          "fuzzyFileSearch/sessionCompleted",
+          "fuzzyFileSearch/sessionUpdated",
+          "item/agentMessage/delta",
+          "item/completed",
+          "item/started",
+          "mcpServer/startupStatus/updated",
+          "process/exited",
+          "process/outputDelta",
+          "remoteControl/status/changed",
+          "serverRequest/resolved",
+          "skills/changed",
+          "thread/archived",
+          "thread/deleted",
+          "thread/goal/cleared",
+          "thread/goal/updated",
+          "thread/name/updated",
+          "thread/queue/changed",
+          "thread/settings/updated",
+          "thread/started",
+          "thread/status/changed",
+          "thread/tokenUsage/updated",
+          "thread/unarchived",
+          "turn/completed",
+          "turn/diff/updated",
+          "turn/started",
+          "warning"
+        ],
+        "not_received": 51
+      },
+      "untyped_in_round_4": [],
+      "not_received_note": "Not received: account/login and account/updated, authRecovery, oauth and externalAgentConfig (need a sign-in or would read the real ~/.claude), 13 realtime types (audio session), 2 Windows types, guardian/autoApprovalReview/safety/moderation/model reroute and verification (hosted-model features), reasoning deltas (the local model emits none), hook/*, mcpServer/event stream and mcpToolCall/progress (no hook or MCP server configured in the fresh home), plan/diff/fileChange/commandExecution item deltas (the model did not call update_plan; apply_patch and shell ran without them in this run), thread/compacted (compaction ran, the notification did not arrive), thread/closed, thread/reverted (rollback refused: 'paginated threads do not support thread/rollback'), project/changed and thread/project/updated (project/create rejected the roots shape), thread/attachment/updated and thread/environment/*."
+    },
+    "evidence_class": "local_integration",
+    "limits": [
+      "The events2 collector wraps the SDK's private MessageRouter.route_notification to see turn-routed notifications of turns the script never subscribed to; it observes what the SDK receives, but it uses a private attribute.",
+      "The Codex app-server in the `events` phase ran with the parent HOME (CODEX_HOME was fresh); `events2` set HOME to a temp directory.",
+      "The provider is an open-weight model (Qwen3-4B-Instruct-2507-FP8) on a vLLM server this unit started; neither the hosted OpenAI nor the hosted Anthropic service was involved, so hosted-model behaviour and hosted billing are not shown."
+    ],
+    "checked_at": "2026-09-23T14:28:08Z"
+  }
+}

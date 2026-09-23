@@ -1,0 +1,21 @@
+{
+ "id": "gap4-tavily-gold-labelled-benchmark",
+ "gap_index": 4,
+ "gap_text_sha256": "2c9703deccecd59c2c92f369d6c5feace255120608274432d490f4d7cae3f8a2",
+ "preregistration": {
+  "written_at": "2026-09-23T01:20:00Z",
+  "expectation": "This check requires live Tavily Search/Map/Crawl/Research API calls, which are billed API usage.",
+  "criteria": "N/A -- not executed, see outcome_detail."
+ },
+ "commands": [],
+ "results": {},
+ "outcome": "deferred",
+ "outcome_detail": "The dispatching brief's hard rules for this unit state: 'No paid API, no credential reads.' Tavily Search/Map/Crawl/Research is a metered, billed API (a key exists at ~/.config/typesafe/agent-lab.env for a different, unrelated service scope and was not read). Running the ~20-query preregistered search set or the gold-labelled recall/accuracy benchmark this gap calls for would require live paid Tavily calls, which this unit is not authorized to make.",
+ "evidence_class": "source_review",
+ "limits": [
+  "Blocked by the dispatching brief's 'no paid API' rule, not by a technical or time constraint.",
+  "No Tavily credential was read or used by this unit."
+ ],
+ "checked_at": "2026-09-23T01:20:00Z",
+ "deferred_reason": "owner: requires paid Tavily API usage, outside this unit's authorization (no paid API rule)"
+}

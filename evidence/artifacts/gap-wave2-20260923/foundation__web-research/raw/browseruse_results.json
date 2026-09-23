@@ -1,0 +1,14 @@
+[
+ {
+  "task": "navigate_fixture",
+  "success": true,
+  "ms": 262,
+  "title": "127.0.0.1:8317/greeting.html"
+ },
+ {
+  "task": "navigate_public_site",
+  "success": true,
+  "ms": 125,
+  "title": "example.com"
+ }
+]

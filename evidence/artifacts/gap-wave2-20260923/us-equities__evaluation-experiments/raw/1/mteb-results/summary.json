@@ -1,0 +1,16 @@
+{
+ "mteb": "2.21.0",
+ "torch": "2.14.0+cpu",
+ "cuda_available": false,
+ "task": "STSBenchmark",
+ "task_dataset": {
+  "path": "mteb/stsbenchmark-sts",
+  "revision": "b0fddb56ed78048fa8b90373c8a3cfc37b684831"
+ },
+ "model": "sentence-transformers/all-MiniLM-L6-v2",
+ "model_revision": "8b3219a92973c328a8e22fadcfa821b5dc75636a",
+ "split": "test",
+ "main_score": 0.8203246731235654,
+ "cosine_spearman": 0.8203246731235654,
+ "evaluation_seconds": 43.86
+}

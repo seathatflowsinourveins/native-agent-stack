@@ -1,0 +1,178 @@
+{
+ "id": "gap-wave2-20260923/us-equities__agents-models-workers/0-worker-backend-head-to-head",
+ "catalog": "us-equities",
+ "layer_id": "agents-models-workers",
+ "gap_index": 0,
+ "gap_text": "No measured head-to-head comparison exists between the worker backends (codex-native-sdk, DeerFlow/codex-acp, OmniRoute). Each ran separately on a different task. The c19+c21 run returned the same facts in 1 of 1 tasks, with 0 blocked and 42345 cumulative tokens. c20 used 135311 tokens (204091 across all three turns). c19 read files with head -c, while c20's task required Context Mode extraction, so the numbers are not comparable.",
+ "gap_text_sha256": "fcfbdfdf46b1c0f69295803783810bd662e2b02738f80069e48c5419c46651f5",
+ "next_check": "Run codex-native-sdk, DeerFlow/codex-acp and OmniRoute on one identical preregistered task with the same file-reading method. Record facts returned, blocks and cumulative provider tokens per backend.",
+ "base_commit": "41d39b3",
+ "preregistration": {
+  "written_at": "2026-09-23T07:23:05Z",
+  "file": "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/prereg/0-worker-backend-head-to-head.json",
+  "commit": "5480a9c (2026-09-23T07:23:50Z, before any check ran)",
+  "expectation": "codex-native-sdk and DeerFlow/codex-acp both complete one identical read-only fact-extraction task (same two input files copied into each arm's own workspace, same instruction to read them only with `head -c 24000`) and return all gold facts; cumulative provider tokens are of the same order (tens of thousands) and differ mainly by per-backend prompt overhead. OmniRoute is expected NOT to be runnable here: no Linux-side gateway with a Codex OAuth connection exists on this host (the recorded gateway ran on Windows at port 20128 and is not listening).",
+  "criteria": [
+   "Task, input files, gold facts and the scoring script are committed before any arm runs.",
+   "Per arm record: facts correct / total (mechanical match against gold), blocked or failed tool calls, cumulative native usage (input, cached input, output, total) from the owning SDK/adapter event, wall time, sandbox policy.",
+   "Arms run sequentially, one Codex call at a time, with native hooks disabled (-c features.hooks=false, features.plugin_hooks=false) so no ai-memory hook call reaches the live store.",
+   "settled only if all three named backends ran; with OmniRoute blocked the best outcome is advanced.",
+   "A backend whose returned facts cannot be scored or whose usage is unavailable is reported as such, not imputed."
+  ],
+  "fix_round2_amendments": [
+   {
+    "file": "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/prereg/0-worker-backend-head-to-head.trust-probe.fix-round2.json",
+    "written_at": "2026-09-23T16:17:16Z",
+    "label": "fix-round-2 preregistration, written after the second independent review; covers only the trust-persistence probe, not the gap-0 arms",
+    "written_before_results": true,
+    "expectation": "T1 writes a [projects.\"<ws>\"] trust_level = \"trusted\" table to the temp config.toml; T0 does not. That would identify the app-server's handling of the codex-acp session-config trust override as the writer.",
+    "criteria": [
+     "Detection method: byte comparison of the temp CODEX_HOME config.toml before/after each arm (absent before); the control arm shows the probe does not report a write that thread/start makes unconditionally.",
+     "No credential is read or copied; the temp CODEX_HOME has no auth, so thread/start may fail. If it fails before any write, the mechanism stays inferred from source and the result is reported as inconclusive, not as proof.",
+     "The live $HOME/.codex/config.toml is not edited by this unit; removal of the stale entry is the coordinator's decision."
+    ]
+   },
+   {
+    "file": "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/prereg/0-worker-backend-head-to-head.trust-probe-arms2.fix-round2.json",
+    "written_at": "2026-09-23T16:18:02Z",
+    "label": "fix-round-2 addendum, written AFTER the T0/T1 results (neither wrote config.toml) and BEFORE running T2/T3",
+    "written_before_results": true,
+    "expectation": "Uncertain. If T2 writes the trust table and T3 does not, the second thread/start inherits and persists the first thread's override. If neither writes, the write is tied to the turn (turn/start or turn completion), which cannot run here without auth; the writer is then attributed from timing and source as the native codex app-server process serving the codex-acp session, with the exact persisting call unconfirmed.",
+    "criteria": [
+     "Same detection method as T0/T1 (temp config.toml absent before, read after).",
+     "No auth, no turn/start, no live CODEX_HOME contact; live config.toml mtime checked before/after."
+    ]
+   },
+   {
+    "file": "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/prereg/0-worker-backend-head-to-head.trust-probe-positive.fix-round2.json",
+    "written_at": "2026-09-23T16:18:25Z",
+    "label": "fix-round-2 addendum, written after T0-T3 (no arm wrote config.toml) and before this positive control",
+    "written_before_results": true,
+    "expectation": "The temp config.toml appears with a [projects.\"<ws>\"] trust_level = \"trusted\" table, showing the probe's read-after check detects a persisted trust write; T0-T3 negatives are then real negatives for thread/start.",
+    "criteria": [
+     "If P writes nothing, the T0-T3 negatives are not evidence of anything and are reported as such."
+    ]
+   }
+  ]
+ },
+ "commands": [
+  "python3 blueprints/gap-wave2-20260923/us-equities__agents-models-workers/workers/score_facts.py blueprints/gap-wave2-20260923/us-equities__agents-models-workers/workers/gold.json  # gold verified mechanically from the two inputs before any arm ran",
+  "$HOME/.local/share/codex-ecosystem/tools/equity-worker-sdk/bin/python blueprints/gap-wave2-20260923/us-equities__agents-models-workers/workers/sdk_arm.py run --workspace $GAPCACHE/ws/g0-sdk --prompt blueprints/gap-wave2-20260923/us-equities__agents-models-workers/workers/task-prompt.md --receipt $GAPCACHE/runs/g0-sdk.json",
+  "cd $HOME/.local/share/codex-ecosystem/tools/deer-flow-42334f2/backend && .venv/bin/python $WT/blueprints/gap-wave2-20260923/us-equities__agents-models-workers/workers/deerflow_arm.py --state-dir $GAPCACHE/runs/g0-deerflow --prompt $WT/blueprints/gap-wave2-20260923/us-equities__agents-models-workers/workers/task-prompt.md --input worker-receipt.json=$WT/blueprints/us-equities/workers/receipt.json --input acp-research-receipt.json=$WT/blueprints/us-equities/deerflow/research-receipt.json  # RECONSTRUCTED (fix round): $WT=$HOME/code/nas-wt-g2-agents-models-workers. The first-round record gave worktree-relative paths, which cannot resolve from the backend directory (deerflow_arm.py copies --input paths relative to the cwd); the original command line was not retained. The run's receipt records inputs_sha256 equal to the worktree files' hashes, so the inputs did resolve.",
+  "python3 blueprints/gap-wave2-20260923/us-equities__agents-models-workers/workers/redact_adapter_log.py $GAPCACHE/runs/g0-deerflow/adapter-logs/app-server.log evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/raw/0-deerflow-adapter-log.redacted.log  # fix round: commit the adapter log with account/config/skills/remote-control/rate-limit payloads withheld",
+  "ss -ltn (no listener on 20128); ls -la $HOME/.omniroute  # OmniRoute feasibility check",
+  "grep -n g0-deerflow -A1 $HOME/.codex/config.toml; stat -c %y $HOME/.codex/config.toml  # fix round 2: only this unit's entry was read",
+  "grep -n trust_level $HOME/.local/share/codex-ecosystem/tools/codex-acp-1.12.0/lib/node_modules/@agentclientprotocol/codex-acp/dist/index.js  # source of the trust override",
+  "python3 blueprints/gap-wave2-20260923/us-equities__agents-models-workers/workers/trust_persist_probe.py evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/raw/0-trust-persist-probe.json  # fix round 2, arms T0/T1, 16:17:33-16:17:38Z",
+  "python3 blueprints/gap-wave2-20260923/us-equities__agents-models-workers/workers/trust_persist_probe.py evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/raw/0-trust-persist-probe-arms2.json arms2  # arms T2/T3, 16:18:02-16:18:07Z",
+  "python3 blueprints/gap-wave2-20260923/us-equities__agents-models-workers/workers/trust_persist_probe.py evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/raw/0-trust-persist-probe-positive.json positive  # arm P, 16:18:32-16:18:34Z",
+  "python3 blueprints/gap-wave2-20260923/us-equities__agents-models-workers/redact_raw.py evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/raw/0-trust-persist-probe*.json  # $HOME, UUIDs and host name redacted"
+ ],
+ "results": {
+  "task": "6 facts from two JSON receipts, read only with `head -c 24000 -- worker-receipt.json acp-research-receipt.json`; same prompt, same inputs, same model gpt-6-astra, arms run sequentially 2026-09-23T07:28Z",
+  "codex-native-sdk (c20, openai-codex 0.154.0 + codex-cli 0.155.1, Sandbox.read_only)": {
+   "facts_correct": "6/6",
+   "blocked_or_failed_tool_calls": 0,
+   "commands": [
+    "/bin/bash -lc 'head -c 24000 -- worker-receipt.json acp-research-receipt.json' (completed)"
+   ],
+   "native_usage_total": {
+    "inputTokens": 40904,
+    "cachedInputTokens": 29696,
+    "outputTokens": 135,
+    "totalTokens": 41039
+   },
+   "turn_duration_ms": 8831,
+   "wall_seconds": 9.71
+  },
+  "DeerFlow 42334f2 invoke_acp_agent -> codex-acp 1.12.0 (c21+c19, ACP mode read-only = workspaceWrite, networkAccess false)": {
+   "facts_correct": "6/6",
+   "blocked_or_failed_tool_calls": 0,
+   "commands": [
+    "/bin/bash -lc 'head -c 24000 -- worker-receipt.json acp-research-receipt.json'"
+   ],
+   "native_usage_cumulative_last_event": {
+    "inputTokens": 43178,
+    "cachedInputTokens": 31488,
+    "outputTokens": 135,
+    "totalTokens": 43313
+   },
+   "elapsed_seconds": 11.24,
+   "hook_notifications_in_adapter_log": 0,
+   "effective_policy": "sandboxPolicy {type: workspaceWrite, networkAccess: false}, approvalPolicy on-request (per adapter log extract)"
+  },
+  "OmniRoute (c6)": {
+   "ran": false,
+   "blocker": "No Linux-side OmniRoute gateway with a Codex OAuth provider connection exists on this host: the recorded gateway (blueprints/us-equities/routing/README.md) ran on Windows on port 20128, which is not listening; $HOME/.omniroute holds only an .env. Running it here needs either an interactive native OAuth sign-in into a fresh isolated gateway store (user action) or starting the gateway on an existing credential store (out of bounds: may refresh/write tokens)."
+  },
+  "fix_round_2_trust_side_effect": {
+   "evidence_class": "local_integration",
+   "shared_config_entry": "[projects.\"$HOME/.cache/gap-wave2-20260923/agents-models-workers/runs/g0-deerflow/runtime/acp-workspace\"] / trust_level = \"trusted\" ($HOME/.codex/config.toml lines 41-42)",
+   "codex_acp_source": "createSessionConfig(): projects: Object.fromEntries(sessionRoots.map((root) => [root, { trust_level: \"trusted\" }]))",
+   "adapter_log_line_30": "[IN] thread/start params.config.projects {\"$HOME/.cache/.../g0-deerflow/runtime/acp-workspace\": {\"trust_level\": \"trusted\"}}",
+   "probe": {
+    "T0 control thread/start": "no config.toml",
+    "T1 thread/start + override": "no config.toml",
+    "T2 override then ephemeral thread/start": "no config.toml",
+    "T3 ephemeral thread/start only": "no config.toml",
+    "P config/value/write positive control": "[projects.\"$HOME/.cache/.../trustprobe/P-positive-control-aev1p18k/ws\"] trust_level = \"trusted\""
+   },
+   "detection_method": "read of the temp CODEX_HOME/config.toml after each arm (absent before); arm P shows a persisted trust write is detected"
+  },
+  "comparison": "On this identical task and file-reading method the SDK and DeerFlow/ACP arms returned the same 6/6 facts with 0 blocks; cumulative provider tokens 41,039 vs 43,313 (+5.5% for ACP), turn/elapsed 8.8 s vs 11.2 s."
+ },
+ "outcome": "advanced",
+ "what_remains": "OmniRoute arm (blocked: interactive OAuth sign-in or live credential store); repetitions (n=1 per arm, no variance estimate).",
+ "evidence_class": "native_proven",
+ "limits": [
+  "n=1 per arm; token differences of a few percent are within plausible run-to-run variation (cache hits differ: 29,696 vs 31,488 cached).",
+  "The ACP adapter log is committed redacted (raw/0-deerflow-adapter-log.redacted.log, fix round): the params/results of 6 account/read, 2 config/read, 6 skills/list, 1 remoteControl/status/changed and 2 account/rateLimits/updated messages are withheld (account identity, the full user Codex config, local skill paths, host name, quota); e-mail, host name, /home/<user> and UUIDs are replaced. The private original (152,882 bytes) keeps sha256 beafe372...06e0 as recorded in the extract; the tokenUsage, sandboxPolicy, approvalPolicy and command lines the receipt cites are retained verbatim.",
+  "Side effect on shared native configuration (fix round 2 correction; the earlier text called the writer undetermined, which was wrong): the DeerFlow/codex-acp arm left [projects.\"$HOME/.cache/gap-wave2-20260923/agents-models-workers/runs/g0-deerflow/runtime/acp-workspace\"] trust_level = \"trusted\" in the shared $HOME/.codex/config.toml (lines 41-42 when checked 2026-09-23T16:17Z; file mtime 07:28:59.234Z, 3 ms after the arm's turn/completed at 07:28:59.231Z). Cause: codex-acp 1.12.0 createSessionConfig() merges projects.<session root>.trust_level = trusted into every session config (dist/index.js line 28706), and the adapter sent it in thread/start (redacted adapter log line 30). codex-acp sent no config write request (its only config call was config/read), so the process that persisted it is the native codex 0.155.1 app-server that codex-acp spawned with CODEX_HOME=$HOME/.codex. Isolated probe (empty temp CODEX_HOME and HOME, no auth, no turn): thread/start with the override (T1), the override followed by the ephemeral thread/start codex-acp sends after a prompt (T2), and controls T0/T3 wrote no config.toml, while a config/value/write positive control (P) did. The write is therefore tied to the turn, which cannot run without auth in an isolated home; the exact persisting call is unconfirmed. The 2026-09-19 DeerFlow run left the same kind of entry for its own acp-workspace (line 23). The entry only trusts a directory inside this unit's cache; this unit did not edit the shared config, and removing lines 41-42 is left to the coordinator. Future ACP arms should disclose this up front or run under a separately signed-in isolated CODEX_HOME.",
+  "Probe disclosure (fix round 2): each unauthenticated isolated app-server attempted a websocket to wss://api.openai.com/v1/responses on thread/start and got HTTP 401 (raw stderr_tail); no credential was present, no inference ran, and the live $HOME/.codex/config.toml mtime was unchanged (1790148539) before and after every probe arm.",
+  "Native hooks were disabled in both arms (isolation rule), unlike the historical c19/c20 runs; hook overhead is therefore excluded from both.",
+  "The DeerFlow arm reuses the committed native-research.py path but through this unit's parametrised copy; the upstream DeerFlow/ACP code was not modified.",
+  "The ACP arm's sandbox is workspaceWrite (upstream mode mapping), the SDK arm's is read-only: identical task, not identical enforcement.",
+  "Isolation: disposable Qdrant 1.19.1 on 127.0.0.1:27333/27334 (storage under $HOME/.cache/gap-wave2-20260923/agents-models-workers/qdrant-storage), isolated ai-memory 2.3.2 `serve` on 127.0.0.1:27374 with a temp --data-dir and temp HOME, and AI_MEMORY_SERVER_URL=http://127.0.0.1:27374 exported for the gap-9 and gap-11 ai-memory CLI calls; both started by this unit and stopped at the end (ports verified free). Correction (fix round): the first-round gap-6 CLI calls did NOT point at that server (--version/--help/backfill --help ran with no AI_MEMORY_SERVER_URL set, and init with http://127.0.0.1:1, a closed port); no live-store contact is possible from those commands, and they were re-run in the fix round against isolated 2.3.2 (127.0.0.1:27374) and 2.4.0 (127.0.0.1:27375) servers started for that purpose (gap-6 receipt). Every Codex run disabled native lifecycle hooks (-c features.hooks=false -c features.plugin_hooks=false) so no ai-memory hook call could reach the live service; the one Claude call used --setting-sources project from a temp cwd (user-settings hooks not loaded) and --strict-mcp-config. Embeddings: read-only POST /v1/embeddings calls to the running Nemotron-3-Embed-1B vLLM endpoint 127.0.0.1:8231 (the adopted SocratiCode profile); that service was not restarted or reconfigured. Start/stop evidence for the main-round Qdrant and ai-memory 2.3.2 services (fix round 2): raw/services-main-round.txt has the exact commands and outputs, exported without re-running from this unit's own session transcript by services/export_main_round_services.py."
+ ],
+ "raw_artifacts": [
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/raw/0-sdk-arm.json",
+   "sha256": "b7fc4c005b44bd09c4796cf69fae30eeedbd7cb9b6843cb80d1fad1a3e99a7a3"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/raw/0-deerflow-arm-receipt.json",
+   "sha256": "1b9a4a1dbd8d4bc6dcfa2d39bdb6788769d72eed89206d83c077ea3ecb4a2e58"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/raw/0-deerflow-adapter-log-extract.json",
+   "sha256": "7819ade14483e37676c048dc2533734fdb0da7797bfdb33949c67e5fa271a241"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/raw/0-deerflow-adapter-log.redacted.log",
+   "sha256": "f0c2ca324d9957e14b80cc6d473429452f8d1d6e00cdad4696f699a832844f28"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/raw/0-trust-persist-probe.json",
+   "sha256": "568f80a04e1b4e88ac1273c4aebb2ccf641b636f2cf0cb0a818d7baf74a04f7d"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/raw/0-trust-persist-probe-arms2.json",
+   "sha256": "9cac25b8f453c7aa8c93a3051e695effea8048ef4ffdae98cc34d6b99fffc373"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/raw/0-trust-persist-probe-positive.json",
+   "sha256": "a76ca6620233cca921e98b3f9a85b05fef6aeb1e14edbfb4fafeb7b29f31e4f2"
+  }
+ ],
+ "helpers": [
+  "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/workers/task-prompt.md",
+  "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/workers/gold.json",
+  "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/workers/score_facts.py",
+  "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/workers/sdk_arm.py",
+  "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/workers/deerflow_arm.py",
+  "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/workers/codex_slots.sh",
+  "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/workers/redact_adapter_log.py",
+  "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/workers/trust_persist_probe.py"
+ ],
+ "checked_at": "2026-09-23"
+}

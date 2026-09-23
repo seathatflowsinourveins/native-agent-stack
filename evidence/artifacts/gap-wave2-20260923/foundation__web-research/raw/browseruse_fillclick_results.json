@@ -1,0 +1,24 @@
+[
+ {
+  "task": "resolve_indices",
+  "success": false,
+  "name_idx": 2,
+  "greet_idx": 4,
+  "status_idx": null
+ },
+ {
+  "task": "fill_name",
+  "success": true,
+  "ms": 544
+ },
+ {
+  "task": "click_greet",
+  "success": true,
+  "ms": 692
+ },
+ {
+  "task": "read_status_after_click",
+  "success": true,
+  "status_text": "Hello, Gap Wave 2 Fix!"
+ }
+]

@@ -1,0 +1,6 @@
+2026-09-23T06:51:21Z
+git log origin/main -1 -- evidence/artifacts/sota-refresh-20260923/pins-runtime/skfolio.json:
+43bb931f3f20d70d8369c3f6b0867bdf5303f213 2026-09-22 SOTA refresh evidence wave: pin qualification, observability comparison, hardware profiles (#87)
+sha256 of origin/main blob:
+ca4b22a6e450d4960a31407aec68cb27fb4cc83155fa3a4707a6f49ebe49f457  -
+verdict qualified to_version 1.3.0 evidence_class native_proven

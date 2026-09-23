@@ -1,0 +1,4 @@
+File-tool scope check. Use the Context Mode ctx_execute_file tool on ./engine-receipt.json and on
+./deerflow-native-receipt.json (paths inside this workspace) to extract: engine data_points, simulated_orders,
+failed_data_requests; DeerFlow upstream_skill_count, the ACP configured model and ACP prompt_calls.
+Reply with one JSON object of those six values and name the tool used. If the tool fails, report the exact failure and stop.

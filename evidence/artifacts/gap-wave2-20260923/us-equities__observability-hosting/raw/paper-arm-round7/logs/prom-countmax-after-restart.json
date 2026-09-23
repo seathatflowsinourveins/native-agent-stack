@@ -1,0 +1,1 @@
+{"status":"error","errorType":"execution","error":"vector cannot contain metrics with the same labelset"}

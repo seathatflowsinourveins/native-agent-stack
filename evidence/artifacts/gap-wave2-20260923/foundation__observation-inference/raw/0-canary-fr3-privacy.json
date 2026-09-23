@@ -1,0 +1,169 @@
+{
+  "mode": "privacy",
+  "run": "d65acbd1",
+  "started_at": "2026-09-23T14:15:47Z",
+  "otlp_post_status": {
+    "logs": 200,
+    "metrics": 200
+  },
+  "arrival": {
+    "prom": true,
+    "loki_otlp": true,
+    "loki_sdk": true
+  },
+  "negative_fields": [
+    "logs.attr.api_key",
+    "logs.attr.error.message",
+    "logs.attr.prompt",
+    "logs.attr.tool_input",
+    "logs.attr.user.account_uuid",
+    "logs.attr.user.email",
+    "logs.body",
+    "logs.event_name",
+    "logs.resource.host.name",
+    "logs.resource.process.command_line",
+    "logs.resource.schema_url",
+    "logs.resource.user.email",
+    "logs.scope.attr",
+    "logs.scope.name",
+    "logs.scope.schema_url",
+    "logs.scope.version",
+    "logs.severity_text",
+    "metrics.attr.prompt",
+    "metrics.attr.session.id",
+    "metrics.attr.user.account_uuid",
+    "metrics.attr.user.email",
+    "metrics.description",
+    "metrics.exemplar.attr",
+    "metrics.metadata",
+    "metrics.resource.host.name",
+    "metrics.resource.organization.id",
+    "metrics.resource.schema_url",
+    "metrics.resource.user.email",
+    "metrics.scope.attr",
+    "metrics.scope.name",
+    "metrics.scope.schema_url",
+    "metrics.scope.version",
+    "sdk.cwd",
+    "sdk.error",
+    "sdk.final_response",
+    "sdk.items.text",
+    "sdk.prompt"
+  ],
+  "negative_count": 37,
+  "backends_searched": {
+    "collector_prometheus_exporter": {
+      "bytes": 509
+    },
+    "prometheus_federate": {
+      "bytes": 1023
+    },
+    "prometheus_metadata": {
+      "bytes": 202
+    },
+    "loki_query_range": {
+      "bytes": 4400
+    },
+    "loki_labels_and_values": {
+      "bytes": 123
+    },
+    "collector_file_events": {
+      "bytes": 1503
+    }
+  },
+  "leaks": [],
+  "leak_count": 0,
+  "positive_controls_found_in": {
+    "logs.resource.ecosystem.task.id(allowlisted)": [
+      "collector_file_events",
+      "loki_query_range"
+    ],
+    "logs.attr.tool_name(allowlisted)": [
+      "collector_file_events",
+      "loki_query_range"
+    ],
+    "metrics.name(boundary)": [
+      "collector_prometheus_exporter",
+      "prometheus_federate",
+      "prometheus_metadata"
+    ],
+    "metrics.attr.model(allowlisted)": [
+      "collector_prometheus_exporter",
+      "prometheus_federate"
+    ],
+    "sdk.configured_model(allowlisted-as-model)": [
+      "collector_file_events",
+      "loki_query_range"
+    ]
+  },
+  "canary_sha256_prefix": {
+    "logs.resource.user.email": "37318505b637",
+    "logs.resource.host.name": "e64f705cb02e",
+    "logs.resource.process.command_line": "d45c04e696c8",
+    "logs.resource.ecosystem.task.id(allowlisted)": "e8864c14962e",
+    "logs.attr.prompt": "f2a6873fc4ed",
+    "logs.attr.tool_input": "e02b3e8cae4f",
+    "logs.attr.user.account_uuid": "5cbd59b93dca",
+    "logs.attr.api_key": "b5ac7e015918",
+    "logs.attr.user.email": "566ca52b4cbc",
+    "logs.attr.error.message": "5767f1876237",
+    "logs.attr.tool_name(allowlisted)": "03530037b162",
+    "logs.resource.schema_url": "3a579a616539",
+    "logs.scope.name": "99b916c76ba4",
+    "logs.scope.version": "961974592e02",
+    "logs.scope.attr": "143959ddcd24",
+    "logs.scope.schema_url": "31a5205f89e2",
+    "logs.severity_text": "db50dd7b03cf",
+    "logs.event_name": "ed9d88ec75db",
+    "logs.body": "02a921d19575",
+    "metrics.name(boundary)": "dd23bb9e10ec",
+    "metrics.resource.user.email": "4fc9335d8afa",
+    "metrics.resource.host.name": "b16f99c8dda1",
+    "metrics.resource.organization.id": "f14e4c350cb9",
+    "metrics.attr.user.email": "b7fc52ba4fa7",
+    "metrics.attr.session.id": "c5cd02d926c9",
+    "metrics.attr.prompt": "db84fe9d780c",
+    "metrics.attr.user.account_uuid": "8ca7a63f9ab0",
+    "metrics.attr.model(allowlisted)": "9ffe47bc665e",
+    "metrics.resource.schema_url": "c15aa0c6e51b",
+    "metrics.scope.name": "f205611159f3",
+    "metrics.scope.version": "c0e1892ab707",
+    "metrics.scope.attr": "4d8c270f62e6",
+    "metrics.scope.schema_url": "d86343e9428a",
+    "metrics.description": "d09c24abeca8",
+    "metrics.metadata": "817997675373",
+    "metrics.exemplar.attr": "fdb25b851fef",
+    "sdk.configured_model(allowlisted-as-model)": "5aa5cb9a91cb",
+    "sdk.final_response": "4995ed34ab15",
+    "sdk.items.text": "8086aa8d4810",
+    "sdk.error": "bedcc448ce04",
+    "sdk.prompt": "7eb7eccca45a",
+    "sdk.cwd": "0d3c2c9032c8"
+  },
+  "positive_control_expected_backends": {
+    "logs.resource.ecosystem.task.id(allowlisted)": [
+      "collector_file_events",
+      "loki_query_range"
+    ],
+    "logs.attr.tool_name(allowlisted)": [
+      "collector_file_events",
+      "loki_query_range"
+    ],
+    "sdk.configured_model(allowlisted-as-model)": [
+      "collector_file_events",
+      "loki_query_range"
+    ],
+    "metrics.attr.model(allowlisted)": [
+      "collector_prometheus_exporter",
+      "prometheus_federate"
+    ],
+    "metrics.name(boundary)": [
+      "collector_prometheus_exporter",
+      "prometheus_federate",
+      "prometheus_metadata"
+    ]
+  },
+  "positive_control_missing": {},
+  "status": "passed",
+  "stopped_at": "2026-09-23T14:16:19Z"
+}

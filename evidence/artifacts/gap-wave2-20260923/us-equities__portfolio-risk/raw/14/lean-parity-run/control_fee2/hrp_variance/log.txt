@@ -1,0 +1,107 @@
+2026-09-23T16:04:07.8029746Z TRACE:: Engine.Main(): LEAN ALGORITHMIC TRADING ENGINE v2.5.0.0 Mode: DEBUG (64bit) Host: HOST-redacted
+2026-09-23T16:04:07.8048678Z TRACE:: Engine.Main(): Started 16:04
+2026-09-23T16:04:07.8181898Z TRACE:: JobQueue.NextJob(): Selected /run/build/WeightScheduleParity.dll
+2026-09-23T16:04:07.8411504Z TRACE:: AlgorithmManager.CreateTokenBucket(): Initializing LeakyBucket: Capacity: 120 RefillAmount: 18 TimeInterval: 1440
+2026-09-23T16:04:07.8450622Z TRACE:: Engine.Run(): Resource limits '0' CPUs. 2147483647 MB RAM.
+2026-09-23T16:04:07.8453151Z TRACE:: TextSubscriptionDataSourceReader.SetCacheSize(): Setting cache size to 71582788 items
+2026-09-23T16:04:08.2476494Z TRACE:: Loader.TryCreateILAlgorithm(): Loading only the algorithm assembly
+2026-09-23T16:04:08.3616868Z TRACE:: Loader.TryCreateILAlgorithm(): Loaded WeightScheduleParityAlgorithm
+2026-09-23T16:04:08.3632948Z TRACE:: LocalObjectStore.Initialize(): Storage Root: /run/control_fee2/hrp_variance/storage. StorageFileCount 10000. StorageLimit 10240MB. StoragePermissions Read=True Write=True Delete=True
+2026-09-23T16:04:08.3734472Z TRACE:: HistoryProviderManager.Initialize(): history providers [SubscriptionDataReaderHistoryProvider]
+2026-09-23T16:04:08.3759057Z TRACE:: BaseSetupHandler.Setup(LocalPlatform): UID: 0, PID: 0, Version: 2.5.0.0, Source: WebIDE
+2026-09-23T16:04:08.4561424Z TRACE:: WeightedWorkScheduler(): will use 24 workers and MaxWorkWeight is 400
+2026-09-23T16:04:08.4608307Z TRACE:: BaseSetupHandler.SetupCurrencyConversions():
+Account Type: Margin
+
+Symbol      Quantity    Conversion = Value in USD
+USD: $     1000000.00 @       1.00 = $1000000
+-------------------------------------------------
+CashBook Total Value:                $1000000
+
+2026-09-23T16:04:08.4618520Z TRACE:: Total margin information: TotalMarginUsed: 0.00, MarginRemaining: 1000000.00
+2026-09-23T16:04:08.4620197Z TRACE:: SetUp Backtesting: User: 0 ProjectId: 0 AlgoId: WeightScheduleParityAlgorithm
+2026-09-23T16:04:08.4621243Z TRACE:: Dates: Start: 01/12/2016 End: 03/31/2021 Cash: ¤1,000,000.00 MaximumRuntime: 100.00:00:00 MaxOrders: 2147483647
+2026-09-23T16:04:08.4648533Z TRACE:: BacktestingResultHandler(): Sample Period Set: 686.16
+2026-09-23T16:04:08.4651822Z TRACE:: JOB HANDLERS:
+         DataFeed:             QuantConnect.Lean.Engine.DataFeeds.FileSystemDataFeed
+         Setup:                QuantConnect.Lean.Engine.Setup.BacktestingSetupHandler
+         RealTime:             QuantConnect.Lean.Engine.RealTime.BacktestingRealTimeHandler
+         Results:              QuantConnect.Lean.Engine.Results.BacktestingResultHandler
+         Transactions:         QuantConnect.Lean.Engine.TransactionHandlers.BacktestingTransactionHandler
+         Object Store:         QuantConnect.Lean.Engine.Storage.LocalObjectStore
+         History Provider:     QuantConnect.Lean.Engine.HistoricalData.HistoryProviderManager
+         Brokerage:            QuantConnect.Brokerages.Backtesting.BacktestingBrokerage
+         Data Provider:        QuantConnect.Lean.Engine.DataFeeds.DefaultDataProvider
+
+2026-09-23T16:04:08.4738810Z TRACE:: Event Name "Daily Sampling", scheduled to run.
+2026-09-23T16:04:08.4739557Z TRACE:: AlgorithmManager.Run(): Begin DataStream - Start: 01/12/2016 00:00:00 Stop: 03/31/2021 23:59:59 Time: 01/12/2016 00:00:00 Warmup: False
+2026-09-23T16:04:08.4957282Z TRACE:: Extensions.IsDirectoryEmpty(): directory '/data/equity/usa/factor_files' not found or empty
+2026-09-23T16:04:08.5092682Z TRACE:: Debug: 2016-01-12 00:00:00 Launching analysis for WeightScheduleParityAlgorithm with LEAN Engine v2.5.0.0
+2026-09-23T16:04:08.5439642Z TRACE:: UniverseSelection.AddPendingInternalDataFeeds(): Adding internal benchmark data feed SPY,#0,SPY,Hour,TradeBar,Trade,Adjusted,OpenInterest,Internal
+2026-09-23T16:04:09.0135897Z TRACE:: Synchronizer.GetEnumerator(): Exited thread.
+2026-09-23T16:04:09.0143647Z TRACE:: AlgorithmManager.Run(): Firing On End Of Algorithm...
+2026-09-23T16:04:09.0167878Z TRACE:: Engine.Run(): Exiting Algorithm Manager
+2026-09-23T16:04:09.0178401Z TRACE:: OrderRequestProcessingPool.Dispose(): completed
+2026-09-23T16:04:09.0183936Z TRACE:: StopSafely(): Waiting for 'Isolator Thread' thread to stop...
+2026-09-23T16:04:09.0186892Z TRACE:: FileSystemDataFeed.Exit(): Start. Setting cancellation token...
+2026-09-23T16:04:09.0196568Z TRACE:: FileSystemDataFeed.Exit(): Exit Finished.
+2026-09-23T16:04:09.0198001Z TRACE:: BacktestingResultHandler.Exit(): starting...
+2026-09-23T16:04:09.0199084Z TRACE:: BacktestingResultHandler.Exit(): Saving logs...
+2026-09-23T16:04:09.0205791Z TRACE:: Debug: 2021-03-31 16:00:00 Algorithm Id:(WeightScheduleParityAlgorithm) completed in 0.55 seconds at 24k data points per second. Processing total of 13,115 data points.
+2026-09-23T16:04:09.0205883Z TRACE:: Debug: 2021-03-31 16:00:00 Your log was successfully created and can be retrieved from: /run/control_fee2/hrp_variance/WeightScheduleParityAlgorithm-log.txt
+2026-09-23T16:04:09.0205906Z TRACE:: BacktestingResultHandler.Run(): Ending Thread...
+2026-09-23T16:04:09.0205994Z TRACE:: StopSafely(): Waiting for 'Result Thread' thread to stop...
+2026-09-23T16:04:09.5807397Z TRACE:: 
+STATISTICS:: Total Orders 66
+STATISTICS:: Average Win 2.92%
+STATISTICS:: Average Loss 0%
+STATISTICS:: Compounding Annual Return 17.098%
+STATISTICS:: Drawdown 35.000%
+STATISTICS:: Expectancy 0
+STATISTICS:: Start Equity 1000000
+STATISTICS:: End Equity 2279729.07
+STATISTICS:: Net Profit 127.973%
+STATISTICS:: Sharpe Ratio 0.682
+STATISTICS:: Sortino Ratio 0.637
+STATISTICS:: Probabilistic Sharpe Ratio 16.437%
+STATISTICS:: Loss Rate 0%
+STATISTICS:: Win Rate 100%
+STATISTICS:: Profit-Loss Ratio 0
+STATISTICS:: Alpha 0.013
+STATISTICS:: Beta 1.052
+STATISTICS:: Annual Standard Deviation 0.169
+STATISTICS:: Annual Variance 0.028
+STATISTICS:: Information Ratio 0.469
+STATISTICS:: Tracking Error 0.039
+STATISTICS:: Treynor Ratio 0.109
+STATISTICS:: Total Fees $132.00
+STATISTICS:: Estimated Strategy Capacity $970000000.00
+STATISTICS:: Lowest Capacity Asset IWM RV0PWMLXVHPH
+STATISTICS:: Portfolio Turnover 0.22%
+STATISTICS:: Drawdown Recovery 447
+STATISTICS:: OrderListHash ac3ff0dce182b9086cb7916e520be7d2
+2026-09-23T16:04:09.5807575Z TRACE:: BacktestingResultHandler.SendAnalysisResult(): Processed final packet
+2026-09-23T16:04:09.5810372Z TRACE:: Engine.Run(): Disconnecting from brokerage...
+2026-09-23T16:04:09.5810760Z TRACE:: Engine.Run(): Disposing of setup handler...
+2026-09-23T16:04:09.5810930Z TRACE:: Engine.Main(): Analysis Completed and Results Posted.
+2026-09-23T16:04:09.5812347Z TRACE:: DataMonitor.Exit(): start...
+2026-09-23T16:04:09.5812610Z TRACE:: StopSafely(): Waiting for '' thread to stop...
+2026-09-23T16:04:09.5822273Z TRACE:: DataMonitor.GenerateReport():
+DATA USAGE:: Total data requests 5
+DATA USAGE:: Succeeded data requests 5
+DATA USAGE:: Failed data requests 0
+DATA USAGE:: Failed data requests percentage 0%
+DATA USAGE:: Total universe data requests 0
+DATA USAGE:: Succeeded universe data requests 0
+DATA USAGE:: Failed universe data requests 0
+DATA USAGE:: Failed universe data requests percentage 0%
+2026-09-23T16:04:09.5853027Z TRACE:: DataMonitor.Exit(): end
+2026-09-23T16:04:09.5857705Z TRACE:: Engine.Main(): Packet removed from queue: WeightScheduleParityAlgorithm
+2026-09-23T16:04:09.5858348Z TRACE:: LeanEngineSystemHandlers.Dispose(): start...
+2026-09-23T16:04:09.5867550Z TRACE:: LeanEngineSystemHandlers.Dispose(): Disposed of system handlers.
+2026-09-23T16:04:09.5869583Z TRACE:: LeanEngineAlgorithmHandlers.Dispose(): start...
+2026-09-23T16:04:09.5871104Z TRACE:: LocalObjectStore.Dispose(): start...
+2026-09-23T16:04:09.5873113Z TRACE:: LocalObjectStore.Dispose(): end
+2026-09-23T16:04:09.5874742Z TRACE:: LeanEngineAlgorithmHandlers.Dispose(): Disposed of algorithm handlers.
+2026-09-23T16:04:09.5875894Z TRACE:: StopSafely(): Waiting for 'CpuPerformance' thread to stop...
+2026-09-23T16:04:09.5880438Z TRACE:: Program.Main(): Exiting Lean...

@@ -1,0 +1,2 @@
+{"network": {"allowedDomains": [], "deniedDomains": []},
+ "filesystem": {"denyRead": ["$HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-5/decoy"], "allowRead": [], "allowWrite": ["$HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-5/work"], "denyWrite": []}}

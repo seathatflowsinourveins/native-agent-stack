@@ -1,0 +1,4 @@
+2026-09-23T13:28:04Z
++ unshare -rn $HOME/.cache/gap-wave2-20260923/identity-provenance/venv-mlflow/bin/python blueprints/gap-wave2-20260923/us-equities__identity-provenance/verify_lineage_fixround3.py --original $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/lineage-fix-20260923T053153Z/work/openlineage-events.ndjson --expected-source-sha256 6356b077266baba83804538bfadab91a5a467e31e170c292b4c6d5c9aca07d9f --published evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/lineage/work__openlineage-events.ndjson --spec $HOME/.cache/gap-wave2-20260923/identity-provenance/spec/OpenLineage-2-0-2.json
+verify_exit=0
+2026-09-23T13:28:04Z

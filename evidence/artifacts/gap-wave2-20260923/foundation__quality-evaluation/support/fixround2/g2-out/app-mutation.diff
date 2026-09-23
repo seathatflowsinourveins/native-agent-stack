@@ -1,0 +1,6 @@
+88,89c88
+<         conn.execute("INSERT INTO run_events(run_id,revision,status) VALUES (%s,%s,%s)",
+<                      (run_id, row["revision"], body.status.value))
+---
+>         # injected regression: the update no longer records a history event
+diff exit (1 = mutation applied): 1

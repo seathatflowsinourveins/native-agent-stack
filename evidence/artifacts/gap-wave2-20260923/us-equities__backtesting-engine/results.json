@@ -1,0 +1,34 @@
+{
+  "0": {
+    "outcome": "covered_elsewhere",
+    "receipt": "0-spy-lean-parity-peer.json"
+  },
+  "1": {
+    "outcome": "advanced",
+    "receipt": "1-nautilus-alpaca-bars-corporate-actions.json"
+  },
+  "2": {
+    "outcome": "settled",
+    "receipt": "2-nautilus-latest-stable-release.json"
+  },
+  "4": {
+    "outcome": "advanced",
+    "receipt": "4-lean-oracle-alpaca-brokerage-model.json"
+  },
+  "6": {
+    "outcome": "settled",
+    "receipt": "6-comparator-modes-and-review-count.json"
+  },
+  "7": {
+    "outcome": "covered_elsewhere",
+    "receipt": "7-one-zero-distributions-fill-rule-peer.json"
+  },
+  "8": {
+    "outcome": "advanced",
+    "receipt": "8-aapl-action-window-replay.json"
+  },
+  "9": {
+    "outcome": "covered_elsewhere",
+    "receipt": "9-stress-margin-adaptive-parity-peer.json"
+  }
+}

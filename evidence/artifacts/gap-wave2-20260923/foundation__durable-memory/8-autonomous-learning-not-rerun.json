@@ -1,0 +1,42 @@
+{
+  "id": "8-autonomous-learning-deferred",
+  "gap_index": 8,
+  "gap_text_sha256": "33293df36fd1dabbbe12c5ad2f1d74433e06e06925801bb0c05e8f7f53691d4b",
+  "preregistration": {
+    "written_at": "2026-09-23T01:31:24Z",
+    "late": true,
+    "late_reason": "Written by the fix round at 01:31:24Z, after its grep ran at 01:28:14Z.",
+    "expectation": "Same as gap 1: requires an isolated disposable-serve rerun of the scheduler + auto-improve pipeline against a live-store snapshot, followed by independent-reviewer grading of any learned edits, which additionally requires a configured LLM provider.",
+    "criteria": "Settled only by an executed scheduler+auto-improve run on a disposable snapshot with independent-reviewer usefulness grading of any resulting learned edits, using a configured LLM provider.",
+    "timestamp_note": "Timestamps reconciled on 2026-09-23T02:30:41Z from the unit workers' session transcripts (tool-call times, listed in raw/INDEX.json). The earlier value 2026-09-23T01:20:00Z was shared by every receipt, fell after the first-pass commit (01:19:05Z) and matched no recorded event."
+  },
+  "commands": [
+    {
+      "cmd": "grep -n \"no learned edits\\|no validated proposals\\|insufficient durable evidence\\|scheduler admi\" docs/memory-landscape-maintenance.md",
+      "exit": 0,
+      "output_excerpt": "Line 135: 'One real completed Codex session reviewed: no validated proposals; one rejected for insufficient durable evidence.' Line 137: 'Native read-only telemetry includes the manual review and scheduler admission records. A scheduler log saying `reviewed=1` does not imply a model call.' (Corrected in this fix round: the earlier version of this receipt quoted 'scheduler admission produced no learned edits', which does not appear in this file; the real text is quoted above.)",
+      "raw": "evidence/artifacts/gap-wave2-20260923/foundation__durable-memory/raw/fix-round-gap0-gap8-grep.txt",
+      "note": "Corrected on reconciliation to the grep actually run (transcript call [30]); the quoted lines are unchanged.",
+      "raw_published": false,
+      "raw_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    }
+  ],
+  "results": "Not executed. Same weak deferral as gap 1: the blocker 'no LLM provider is configured on this host' is contradicted by the live service's status (`llm: codex/gpt-5.6-luna ok`, raw/first-pass-gap11-ttl-probe-incident.txt), and Codex-account calls were allowed. No scheduler or auto-improve run on a disposable snapshot was attempted and no learned edit was graded. Outcome: not_settled.",
+  "outcome": "not_settled",
+  "evidence_class": "source_review",
+  "limits": [
+    "No execution; evidence_class stays source_review.",
+    "Remaining: on a disposable snapshot or synthetic-session store served on its own loopback port, run the scheduler and `ai-memory auto-improve` with the native codex provider, record whether learned edits appear, and have an independent reviewer judge their usefulness."
+  ],
+  "checked_at": "2026-09-23T01:28:14Z",
+  "checked_at_note": "Time of the recorded doc grep (fix-round transcript Bash call [30]).",
+  "reconciliation": {
+    "reconciled_at": "2026-09-23T02:30:41Z",
+    "new_checks_run": false,
+    "changes": [
+      "deferred -> not_settled (blocker contradicted by raw output).",
+      "Command corrected to the grep actually run.",
+      "Real timestamps."
+    ]
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "gap_index": 3,
+  "written_at": "2026-09-22T22:42:40-04:00",
+  "expectation": "Per the dispatch, stale-pin upgrades are covered_elsewhere by evidence/artifacts/sota-refresh-20260923/ merged in #87 (origin/main 43bb931). Expect pins-runtime/dagu.json there to record the 2.17.0 job-recovery rerun (passed) and the SIGKILL/stale-lock rerun (inconclusive), and to not cover the service-reboot protocol or upstream retry tests at v2.17.0.",
+  "criteria": "covered_elsewhere iff the cited artifact exists on origin/main and addresses the 2.17.0 re-qualification; the receipt lists the arms that artifact did not cover so the owner can see what remains."
+}

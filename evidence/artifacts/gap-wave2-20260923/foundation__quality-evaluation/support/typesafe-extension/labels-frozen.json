@@ -1,0 +1,82 @@
+{
+ "C1": {
+  "label": "supported",
+  "label_origin": "frozen 2026-09-21 catalog-cases.json (independent reviewer before inference)"
+ },
+ "C2": {
+  "label": "insufficient",
+  "label_origin": "frozen 2026-09-21 catalog-cases.json (independent reviewer before inference)"
+ },
+ "C3": {
+  "label": "supported",
+  "label_origin": "frozen 2026-09-21 catalog-cases.json (independent reviewer before inference)"
+ },
+ "C4": {
+  "label": "insufficient",
+  "label_origin": "frozen 2026-09-21 catalog-cases.json (independent reviewer before inference)"
+ },
+ "C5": {
+  "label": "contradicted",
+  "label_origin": "frozen 2026-09-21 catalog-cases.json (independent reviewer before inference)"
+ },
+ "C6": {
+  "label": "supported",
+  "label_origin": "frozen 2026-09-21 catalog-cases.json (independent reviewer before inference)"
+ },
+ "C7": {
+  "label": "contradicted",
+  "label_origin": "frozen 2026-09-21 catalog-cases.json (independent reviewer before inference)"
+ },
+ "C8": {
+  "label": "insufficient",
+  "label_origin": "frozen 2026-09-21 catalog-cases.json (independent reviewer before inference)"
+ },
+ "C9": {
+  "label": "supported",
+  "label_origin": "authored by the gap-wave-2 agent before any model call; not independently reviewed"
+ },
+ "C10": {
+  "label": "contradicted",
+  "label_origin": "authored by the gap-wave-2 agent before any model call; not independently reviewed"
+ },
+ "C11": {
+  "label": "contradicted",
+  "label_origin": "authored by the gap-wave-2 agent before any model call; not independently reviewed"
+ },
+ "C12": {
+  "label": "supported",
+  "label_origin": "authored by the gap-wave-2 agent before any model call; not independently reviewed"
+ },
+ "C13": {
+  "label": "insufficient",
+  "label_origin": "authored by the gap-wave-2 agent before any model call; not independently reviewed"
+ },
+ "C14": {
+  "label": "contradicted",
+  "label_origin": "authored by the gap-wave-2 agent before any model call; not independently reviewed"
+ },
+ "C15": {
+  "label": "supported",
+  "label_origin": "authored by the gap-wave-2 agent before any model call; not independently reviewed"
+ },
+ "C16": {
+  "label": "insufficient",
+  "label_origin": "authored by the gap-wave-2 agent before any model call; not independently reviewed"
+ },
+ "C17": {
+  "label": "contradicted",
+  "label_origin": "authored by the gap-wave-2 agent before any model call; not independently reviewed"
+ },
+ "C18": {
+  "label": "supported",
+  "label_origin": "authored by the gap-wave-2 agent before any model call; not independently reviewed"
+ },
+ "C19": {
+  "label": "contradicted",
+  "label_origin": "authored by the gap-wave-2 agent before any model call; not independently reviewed"
+ },
+ "C20": {
+  "label": "insufficient",
+  "label_origin": "authored by the gap-wave-2 agent before any model call; not independently reviewed"
+ }
+}

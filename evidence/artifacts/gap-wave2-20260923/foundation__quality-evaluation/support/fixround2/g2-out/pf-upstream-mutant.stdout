@@ -1,0 +1,29 @@
+Cache is disabled.
+Starting evaluation eval-eXd-2026-09-23T12:50:10
+Running 1 test cases (up to 1 at a time)...
+
+[90m┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐[39m
+[90m│[39m[1m[34m [NVIDIA published example via native Python and local vLLM] NVIDIA's four published retrieval queries and documents    [39m[22m[90m│[39m
+[90m│[39m[1m[34m (the upstream script owns the inputs)                                                                                  [39m[22m[90m│[39m
+[90m├────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤[39m
+[90m│[39m [FAIL] Similarity scores:                                                                                              [90m│[39m
+[90m│[39m           d[0]      d[1]      d[2]      d[3]                                                                           [90m│[39m
+[90m│[39m q[0]    0.8110    0.0250   -0.0311    0.0005                                                                           [90m│[39m
+[90m│[39m q[1]    0.0445    0.6472    0.0384   -0.0512                                                                           [90m│[39m
+[90m│[39m q[2]   -0.0099   -0.0404    0.0999    0.6464                                                                           [90m│[39m
+[90m│[39m q[3]   -0.0223    0.0220    0.7688    0.1208                                                                           [90m│[39m
+[90m└────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘[39m
+✓ Eval complete (ID: eval-eXd-2026-09-23T12:50:10)
+
+» View results: promptfoo view
+» Share with your team: https://promptfoo.app
+» Feedback: https://promptfoo.dev/feedback
+
+
+Results:
+  0 passed (0%)
+  ✗ 1 failed (100%)
+  0 errors (0%)
+Duration: 1s (concurrency: 1)
+
+Writing output to $HOME/.cache/gap-wave2-20260923/quality-evaluation/fixround2/g2/pf-upstream/results-mutant.json

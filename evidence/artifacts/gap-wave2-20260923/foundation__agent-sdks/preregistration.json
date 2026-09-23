@@ -1,0 +1,169 @@
+{
+  "written_at": "2026-09-23T03:24:52Z",
+  "author": "gap-wave-2 agent-sdks unit",
+  "preregistrations": {
+    "0": {
+      "expectation": "advanced: a judge pin (model IDs plus prompt sha256) can be authored here; the recovery re-run needs 18 submissions including two Claude arms, which the reserved Claude account forbids, so closure cannot be rerun.",
+      "criteria": [
+        "settled only if (a) a judge is pinned by model ID and prompt sha256, (b) the recovery step (RECOVERY_INDICES [4,5,6], 3 arms) is executed, and (c) closure is rerun and retain/overturn/unresolved recorded in summary.json",
+        "advanced if only (a) or only the Codex-arm resume prerequisite is shown"
+      ]
+    },
+    "1": {
+      "expectation": "Codex arm executable: an SDK turn interrupted mid-stream reports token usage via thread/tokenUsage/updated that equals the rollout token_count total, and the rollout stops growing after turn_aborted. Claude arm uses the single allowed bounded Claude call.",
+      "criteria": [
+        "Codex: interrupted turn completes with status interrupted; SDK-reported last total == rollout last token_count total_token_usage; no token_count after the abort event across two settle windows; rate-limit usedPercent before/after recorded (integer granularity stated)",
+        "Claude: one ClaudeSDKClient query interrupted mid-turn; ResultMessage usage (or its absence) compared against session JSONL assistant usage sums",
+        "settled only if both arms executed and compared; advanced if one arm only"
+      ]
+    },
+    "2": {
+      "expectation": "With per-process overrides (hooks, plugin_hooks, apps off; every plugin and MCP server the parent enables for the cwd disabled; OTLP off) and an env -i minimal parent env, mcpServerStatus/list and hooks/list are empty and a worker turn emits zero mcpToolCall items. An isolated CODEX_HOME is not possible without a new native sign-in into that home.",
+      "criteria": [
+        "effective config diff parent vs worker recorded (config/read, mcpServerStatus/list, hooks/list)",
+        "worker turn's item stream contains zero mcpToolCall items; detection: the same collector records mcpToolCall items with server names (baseline c4 receipt had 5 context-mode calls)",
+        "settled requires an isolated CODEX_HOME; config overrides on the native home yield advanced"
+      ],
+      "late_note": "The no-inference config-diff arm ran at about 03:23Z, before this preregistration; the worker-turn arm is preregistered."
+    },
+    "3": {
+      "expectation": "A persistent thread (ephemeral false) with one dynamic tool registered via thread/start dynamicTools and answered through the SDK CodexClient approval_handler; a new process resumes by thread ID and recalls the random tool value.",
+      "criteria": [
+        "turn 1: item/tool/call server request answered, dynamicToolCall item completed",
+        "turn 2 in a new OS process via thread/resume: final answer equals a 12-hex random value never present in the turn-2 prompt",
+        "native_worker.py gains --persistent/--resume-thread-id and a resumed run is executed through it",
+        "settled if all three hold"
+      ]
+    },
+    "4": {
+      "expectation": "With the extraction files inside the worker workspace (cwd), a workspace-write sandbox and non-interactive approval, all three c4 turns extract the six expected values (3943, 3, 0, 23, gpt-6-astra, 0).",
+      "criteria": [
+        "three turns rerun through native_worker.py with SDK 0.155.1 and native 0.155.1",
+        "per-turn extraction success = each expected value present in the final response",
+        "settled if all three turns are rerun and per-turn success recorded (whatever the per-turn result)"
+      ]
+    },
+    "6": {
+      "expectation": "openai-codex 0.155.1 installs in a fresh prefix and native_worker.py runs against native codex-cli 0.155.1 with matching versions.",
+      "criteria": [
+        "fresh venv install of openai-codex==0.155.1 recorded",
+        "inspect + run receipts record SDK 0.155.1 and native 0.155.1",
+        "settled if a completed run receipt with matching versions exists"
+      ]
+    },
+    "8": {
+      "expectation": "LangGraph checkpoint save/resume and a Temporal dev-server worker restart with replay execute locally; OpenHands SDK conversation needs an LLM, so it runs only with a local mocked LLM (no paid API).",
+      "criteria": [
+        "LangGraph: interrupt then resume from a SqliteSaver checkpoint in a new process, state carries over",
+        "Temporal: local dev server, worker killed mid-workflow, new worker completes, Replayer replays history without nondeterminism",
+        "OpenHands: a Conversation runs at least one tool action locally; with a mocked LLM this is local_integration, not provider E2E",
+        "settled only if all three run with a real conversation; advanced otherwise"
+      ]
+    },
+    "9": {
+      "expectation": "Codex arm of the matched task (same custom tool, interrupt, resume) is executable; the Claude arm needs several Claude calls and is deferred under the account reservation.",
+      "criteria": [
+        "preregistered checklist: structured events typed, custom-tool round trip, mid-turn interrupt status, resume recall",
+        "settled only if both SDKs are scored; advanced if Codex only"
+      ]
+    },
+    "10": {
+      "expectation": "A new dynamic tool is registered through the SDK and called; every received notification is typed by the SDK registry, but one turn cannot emit every documented notification type.",
+      "criteria": [
+        "tool registered via thread/start dynamicTools (not an MCP server) and called",
+        "received notification types all typed (not UnknownNotification)",
+        "settled only if every documented notification type is received and handled; otherwise advanced"
+      ]
+    },
+    "11": {
+      "expectation": "Codex cancellation stops rollout token accounting; Claude arm uses the single call; exactly-once on one host is shown by killing a Temporal worker mid-activity with an idempotency-keyed sqlite effect; distributed recovery and provider billing remain unqualified.",
+      "criteria": [
+        "Codex cancel as in gap 1",
+        "kill -9 of worker mid-effect, restart, effect row count == 1 with the idempotency key while the activity executed at least twice",
+        "settled needs provider billing and distributed recovery evidence, not available here"
+      ]
+    },
+    "12": {
+      "expectation": "Rerunning the failing file-tool turn with the file inside the workspace root and non-interactive approval completes without the MCP override.",
+      "criteria": [
+        "ctx_execute_file (or equivalent file tool) call completes; extraction values present; no --context-mode-start override used",
+        "settled if the turn completes without override"
+      ]
+    },
+    "13": {
+      "expectation": "Codex SDK resume by thread ID in a new process recalls turn-1 context; the Claude Agent SDK resume arm needs two Claude calls and is deferred.",
+      "criteria": [
+        "Codex as in gap 3 turn 2",
+        "Claude resume option in a new process",
+        "settled only if both; advanced if Codex only"
+      ]
+    }
+  },
+  "fix_round": {
+    "written_at": "2026-09-23T04:22:00Z",
+    "label": "fix-round preregistration, written after the Codex cross-family review (review findings 3-6); not back-dated",
+    "items": {
+      "6": {
+        "expectation": "A second fresh prefix installs openai-codex==0.155.1 with its log retained; native_worker.py inspect against native 0.155.1 completes with no model call.",
+        "criteria": [
+          "retained install log lists openai-codex 0.155.1 and openai-codex-cli-bin 0.155.1",
+          "inspect receipt status discovery_complete with sdk_version 0.155.1",
+          "settled if both hold alongside the already-retained completed turn receipts"
+        ]
+      },
+      "8": {
+        "expectation": "Rerunning the three runtime checks under one driver records exit codes 0 and installed versions from importlib.metadata; outputs replace the earlier ones.",
+        "criteria": [
+          "gap8-runs.json has exit_code per run and versions per venv",
+          "outcome stays advanced (OpenHands model is scripted)"
+        ]
+      },
+      "1": {
+        "note": "outcome re-evaluated to advanced: the provider-consumption clause stays open (review finding 1)"
+      },
+      "12": {
+        "note": "outcome re-evaluated to advanced: the preregistered criterion 'completes without override' failed (review finding 2)"
+      }
+    }
+  },
+  "fix_round_2": {
+    "written_at": "2026-09-23T04:38:21Z",
+    "label": "fix-round-2 preregistration, written after the independent Opus review and before the two new worker turns; not back-dated",
+    "items": {
+      "3": {
+        "expectation": "The committed native_worker.py (new --lookup-tool option) registers one custom tool (vault_lookup) through the SDK's CodexClient thread_start dynamicTools and answers it through CodexClient(approval_handler). Turn 1 runs in a persistent thread and the model calls the tool; turn 2 runs in a new worker process that resumes the thread by id with a decoy tool file and answers with the turn-1 value without calling the tool.",
+        "criteria": [
+          "t1: status completed, thread_mode persistent, dynamic_tool.registered true, at least one answered call for key alpha, a dynamicToolCall item with status completed in the event stream",
+          "t2: status completed, thread_mode resumed, dynamic_tool.calls empty (a call would return the decoy), final response equals the t1 value, t2 prompt does not contain the value",
+          "both receipts carry native_runtime as a dict (the committed revision) and worker_sha256 in worker-tool-runs.json equals the committed file",
+          "settled if all hold; advanced if any fails"
+        ],
+        "detection": "A turn-2 tool call is recorded in dynamic_tool.calls and would return 'decoy-not-the-value'; a missing tool call in turn 1 leaves dynamic_tool.calls empty."
+      },
+      "13": {
+        "note": "the new worker-tool-t1/t2 receipts replace worker-persist-t1/worker-resume-t2 (produced by an uncommitted intermediate revision of native_worker.py whose native_runtime was a string) as the native_worker resume evidence; outcome stays advanced (Claude arm)"
+      },
+      "6": {
+        "note": "runs_with_matching_versions cites worker-tool-t2.json instead of the stale-revision worker-resume-t2.json"
+      },
+      "2": {
+        "note": "remaining gains shell-level access to host MCP tooling (mcporter on PATH, readable plugin cache) seen in c4-t1 commandExecution items; no new run"
+      },
+      "4": {
+        "note": "per-turn summaries gain commandExecution items; Context Mode side effects enumerated by mtime (post hoc) plus the 03:31/03:35Z name listings"
+      },
+      "side_effects": {
+        "expectation": "With the Context Mode plugin disabled, the before/after listing of ~/.codex/context-mode shows no file attributable to these runs; ~/.codex/sessions gains or changes only this thread's rollout (other concurrent sessions may also change files).",
+        "detection": "name, size and mtime listing of both trees before turn 1 and after turn 2"
+      }
+    },
+    "errata": {
+      "written_at": "2026-09-23T04:38:21Z",
+      "items": [
+        "The note 'config-diff arm ran at about 03:23Z' is inexact: raw/config-diff.json started_at is 03:24:08Z, 44 s before written_at 03:24:52Z.",
+        "raw/limits.json (started 03:23:46Z, no inference) also predates written_at 03:24:52Z and is labelled late in the receipts.",
+        "The original text above is left unchanged; this erratum is dated when written."
+      ]
+    }
+  }
+}

@@ -1,0 +1,30 @@
+OpenBao v2.6.2 (dd9c19c37a878cf4a81b18efb8d6f0599c7da923), committed 2026-08-18T15:48:19Z
+server pid=1972744 listen=127.0.0.1:(ephemeral) storage=inmem
+listening on 127.0.0.1:<port>
+listening on 127.0.0.1:59785
+policy-broker-reader exit=0 expected=0 as_expected 
+policy-research exit=0 expected=0 as_expected 
+kv-put-v1 exit=0 expected=0 as_expected 
+research-put-note exit=0 expected=0 as_expected 
+token-create-broker exit=0 expected=0 as_expected 
+token-create-research exit=0 expected=0 as_expected 
+broker-token-read-v1 exit=0 expected=0 as_expected 
+  read value matches v1: yes sha=45f5f2408c9149c8
+research-token-read-broker-DENIED exit=2 expected=2 as_expected err=[Code: 403]
+research-token-read-own-path exit=0 expected=0 as_expected 
+broker-token-write-DENIED exit=2 expected=2 as_expected err=[Code: 403]
+kv-rotate-v2 exit=0 expected=0 as_expected 
+broker-token-read-after-rotation exit=0 expected=0 as_expected 
+  read value matches v2: yes; differs from v1: yes
+kv-destroy-v1 exit=0 expected=0 as_expected 
+read-destroyed-v1 exit=2 expected=2 as_expected 
+kv-metadata exit=0 expected=0 as_expected 
+  metadata: current_version 2 {'1': True, '2': False}
+token-revoke-broker exit=0 expected=0 as_expected 
+broker-token-read-after-revoke-DENIED exit=2 expected=2 as_expected err=[Code: 403]
+broker-token-lookup-after-revoke-DENIED exit=2 expected=2 as_expected err=[Code: 403]
+research-token-still-valid exit=0 expected=0 as_expected 
+token-revoke-research exit=0 expected=0 as_expected 
+server stopped exit_signal=0
+listeners_left_on_port=0
+unexpected_steps=0

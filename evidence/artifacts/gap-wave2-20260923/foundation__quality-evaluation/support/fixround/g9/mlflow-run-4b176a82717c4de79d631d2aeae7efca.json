@@ -1,0 +1,104 @@
+{
+  "run": {
+    "info": {
+      "run_uuid": "4b176a82717c4de79d631d2aeae7efca",
+      "experiment_id": "1",
+      "run_name": "security_guide",
+      "user_id": "<user>",
+      "status": "FINISHED",
+      "start_time": 1790131892139,
+      "end_time": 1790131892312,
+      "artifact_uri": "$HOME/.cache/gap-wave2-20260923/quality-evaluation/fixround/g9/mlflow-artifacts/1/4b176a82717c4de79d631d2aeae7efca/artifacts",
+      "lifecycle_stage": "active",
+      "run_id": "4b176a82717c4de79d631d2aeae7efca"
+    },
+    "data": {
+      "metrics": [
+        {
+          "key": "model_graded_fact.accuracy",
+          "value": 0.6875,
+          "timestamp": 1790131892187,
+          "step": 0
+        },
+        {
+          "key": "model_graded_fact.stderr",
+          "value": 0.11967838846954226,
+          "timestamp": 1790131892217,
+          "step": 0
+        },
+        {
+          "key": "usage.input_tokens",
+          "value": 5590.0,
+          "timestamp": 1790131892249,
+          "step": 0
+        },
+        {
+          "key": "usage.output_tokens",
+          "value": 3920.0,
+          "timestamp": 1790131892261,
+          "step": 0
+        },
+        {
+          "key": "usage.total_tokens",
+          "value": 9510.0,
+          "timestamp": 1790131892285,
+          "step": 0
+        }
+      ],
+      "params": [
+        {
+          "key": "task",
+          "value": "security_guide"
+        },
+        {
+          "key": "model",
+          "value": "vllm/qwen2.5-7b-instruct-awq"
+        },
+        {
+          "key": "inspect_version",
+          "value": "0.3.268"
+        },
+        {
+          "key": "samples",
+          "value": "16"
+        },
+        {
+          "key": "inspect_status",
+          "value": "success"
+        }
+      ],
+      "tags": [
+        {
+          "key": "mlflow.user",
+          "value": "<user>"
+        },
+        {
+          "key": "mlflow.source.name",
+          "value": "$HOME/code/nas-wt-g2-quality-evaluation/blueprints/gap-wave2-20260923/foundation__quality-evaluation/log_inspect_to_mlflow.py"
+        },
+        {
+          "key": "mlflow.source.type",
+          "value": "LOCAL"
+        },
+        {
+          "key": "mlflow.source.git.commit",
+          "value": "ebf6ac1371c8898521056b602cb69f37475e1671"
+        },
+        {
+          "key": "mlflow.source.git.branch",
+          "value": "claude/g2-quality-evaluation-20260923"
+        },
+        {
+          "key": "mlflow.source.git.repoURL",
+          "value": "https://github.com/seathatflowsinourveins/native-agent-stack.git"
+        },
+        {
+          "key": "mlflow.runName",
+          "value": "security_guide"
+        }
+      ]
+    },
+    "inputs": {},
+    "outputs": {}
+  }
+}

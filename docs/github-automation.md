@@ -926,6 +926,225 @@ opening its own PR, and requesting independent review remains the primary
 way this catalog gains evidence; read that chapter for the full flow.
 
 
+## Verdict review gate, 2026-09-23
+
+The repository has one maintainer and the main ruleset requires 0 approvals,
+so a PR that changes a layer verdict could merge with no review at all.
+`validate.yml`'s `verdict-review-gate` job is the control instead. It runs
+[`scripts/verdict_review_gate.py`](../scripts/verdict_review_gate.py) on every
+pull request (no path filter, so it can be required) and on each push to
+`main`. The job has `contents: read`, starts with harden-runner in audit mode,
+and checks out full history without persisted credentials. The event values
+reach the script only through `env`. On a pull request the job first asserts
+that the checked-out HEAD is the PR merge commit: it has exactly two parents
+and the second is the payload's `pull_request.head.sha`, or the job fails
+(otherwise `HEAD^1` could be the PR's own previous commit and the gate would
+judge only the last commit). The base is then the merge commit's first parent
+(`git rev-parse HEAD^1`), and the payload's `pull_request.base.sha` must be
+its ancestor; if neither is available the job fails. On a push to `main` the base is
+`github.event.before`, and the job fails on an empty or all-zero value (a
+branch-creating push has no base). A manual dispatch compares with the
+parent. The job runs the base commit's copy of
+the script (from a detached worktree of the base) against the PR checkout, so a
+PR is judged by the rules it started from, not by rules it edits. Only the PR
+that adds the gate runs its own copy.
+
+The script compares the ledger rows at the PR's merge base with the head,
+keyed by `(catalog, layer_id, run_id)`. It always reads the ledgers the wave
+documents are published from (`build_verdicts.LEDGER_FILES`), and it fails if
+the head's `catalogs/landscape/manifest.json` names any other files. It then
+checks each row that is added or changed in `winners`, `platform_status`,
+`lanes`, `verdict_status`, `alternatives`, `verdict_overturn_when`,
+`overturn_protocol` or `open_gaps` and does not belong to the grandfathered
+20260922 wave. Such a row passes only
+when all of these hold at the head:
+
+- its wave document is registered in `layer-verdict-waves.json`;
+- its `run-manifest.json` is registered in `manifests/evidence.json`, lists
+  the row and has the sha256 the row stores in `lanes.run_manifest_sha256`;
+- each sealed lane return exists, matches the row's `sealed_sha256` and is
+  registered with that sha256, and the two lanes come from distinct model
+  families;
+- the agreement recomputed from the two sealed returns equals the recorded
+  one;
+- the row's winners equal the chosen lane's `winner_keys`, resolved through
+  the wave's sealed packet, and each winner apart from `platform_status` is
+  exactly what `record_verdicts.build_winners` writes: the packet candidate's
+  repository and recipe reference, that lane's evidence class,
+  `why_selected` and `winner_evidence_refs` (normalized against the head),
+  the packet pin (else the row's v1 candidate pin, else `unpinned`), and no
+  other key.
+  The packet is the one the row's run-manifest entry names by
+  `packet_sha256`, found through the manifest's `retained_packets` under
+  `<sealed_base>/packets/`. `packets/SHA256SUMS` must list it and equal the
+  manifest's `packets_sha256sums`. At no depth may the packet carry a withheld
+  key: `stars`, `forks`, `watchers`, any key ending in `_at` (except the
+  packet's own top-level `checked_at`), `latest`, `prerelease`,
+  `pin_behind_upstream`, `newcomer` and the other keys in the policy of the
+  tooling PR #124. Without a sealed packet, the row fails closed;
+- the published `alternatives` (on the fields the wave document publishes),
+  `verdict_overturn_when` and `overturn_protocol` are the ones
+  `record_verdicts.py` derives from the sealed returns. `open_gaps` is
+  re-checked with the row but its text is not re-derived. The derivation
+  reads the canonical repository index the head's landscape manifest names
+  (`sources.repository_index`), so it must give the same alternatives with the
+  base's index: an index change that alters a changed row lands first;
+- a recorded `disagree` row has an adjudication in which judges from both
+  lane families agree in both presentation orders with no refuting vote. Its
+  sha256 is stored in `lanes.adjudication_sha256` and in the run-manifest
+  entry's `adjudication` `{outcome: sealed, sha256}`;
+- a recorded `codex_absent` row names a `docs/decisions/` record that carries
+  `single-lane-authorization: <catalog>/<layer_id>`, and stores that record's
+  sha256 in `lanes.single_lane_decision_sha256`. The record must already be
+  at the base with the same bytes, so an authorization lands (and is seen) in
+  its own earlier PR; one added or edited in the PR that adds the row fails;
+- the row's `verdict_status` is the one `record_verdicts.py` writes for that
+  evidence: `recorded` for agreeing lanes, for a disagreement whose sealed
+  adjudication chooses a lane and for a `codex_absent` row whose named decision
+  record authorizes it, unless no indexed alternative remains; `pending_lanes`
+  otherwise. A new-wave row is never `no_selection`. A recorded verdict
+  therefore cannot be withdrawn by relabelling its row and clearing its
+  winners.
+
+If any of these `lanes` hashes is absent, the row fails.
+
+Every `(catalog, layer_id)` row at the base must still exist at the head, and
+there is one row per layer. The head row's run id may not be older than the
+base row's (run ids are dates, and the grandfathered 20260922 wave is the
+oldest). A row may not move from a new wave back to grandfathered content. A
+row may change its run id only to the newest registered wave, and it then
+needs all the new-wave evidence above.
+
+Rows, wave documents and the wave registry are compared by their parsed
+values, not their bytes. A pure formatting change of a generated wave
+document or ledger therefore passes, as long as `build_verdicts.py --check`
+passes and no row field value changes. A reformatted frozen wave document
+also needs its registry sha256 updated to the new bytes. Such a change is not
+a verdict change for the trust-base rule, so a generator format change can
+land together with its regenerated documents. Sealed artifacts count by their
+bytes.
+
+Any change of a row field value in a non-grandfathered wave needs a new
+recorded wave. The gate re-derives `verdict_status`, `winners` (apart from
+`platform_status`), `alternatives`, `verdict_overturn_when`,
+`overturn_protocol` and `lanes.agreement` from the wave's sealed returns,
+packet, adjudication and run manifest, so a changed value of those fields
+that those files do not derive fails. A `platform_status` value is checked
+against the registered receipts instead. The remaining fields are free-form
+within the newest wave and are not checked: `open_gaps` text (a change still
+counts as a row change and triggers the checks above, but its text is not
+re-derived), and the wave document's `title`, `group`, `overturn_when` (the
+handbook fallback) and `checked_at`, which are layer metadata outside
+`VERDICT_FIELDS`. A frozen wave's document is compared whole, so these fields
+cannot change there. Each row's published `sota_components` come from the
+SOTA manifest the wave's registry entry names. The manifest every base
+registry entry names, the newest included, must keep its pointer and parsed
+value, but a wave registered for the first time brings its manifest with it
+unbound. The gate does not stop a PR from rewriting the newest wave's sealed
+files together with their registrations, so a new recorded wave remains a
+rule for the author rather than a byte-level block. The sealed files are
+self-attested: the gate shows that a row is consistent with the lane returns
+its wave registers and that their declared families differ, not that a
+cross-family review ran (the decision record's accepted residual).
+
+Rows, wave documents, the registry and sealed files are parsed without
+duplicate object keys: a duplicate is not equivalent to anything and fails a
+frozen document comparison, and a ledger, landscape manifest or registry with
+one exits 2. A git command that fails while listing changed paths, reading a
+base tree or finding the merge base also exits 2 instead of counting as "no
+changed paths" (the merge base falls back to the given base only when git
+reports no common history).
+
+Every changed `platform_status` value must be the one
+`scripts/platform_status.py` derives for the winner's sealed pin and
+evidence refs, not for the head winner's own values: the chosen lane's
+`winner_evidence_refs`, and the packet pin, else a pin the base's row
+candidates already carry, else `unpinned` (which binds no receipt). A PR can
+therefore neither cite an unrelated registered file nor introduce a pin that
+matches some receipt to raise a status. A changed value may also rank no
+higher than the same derivation from only the cited evidence files and host
+receipts that are already at the base with the same bytes and registered
+there with that sha256. Evidence or a receipt that raises a status therefore
+lands in its own earlier PR, as a single-lane authorization does; a lower
+value is not held to the base. A change to `platform_status` alone
+needs nothing else; its row is still resolved against the sealed evidence for
+that pin and those refs. The newest registered
+wave is the only one that may change, and only while the PR registers no newer
+wave: a PR that registers a newer wave must leave the base's newest wave's
+registry entry (its sha256 included) and document byte for byte as they are,
+because once that wave is no longer current `build_verdicts.py --check` checks
+only its own rows and sha256 while its document holds every row. For the same
+reason a PR registers at most one new wave, and it must be the head's newest
+and newer than every base wave, so the only new wave is always the current one
+that `build_verdicts.py --check` regenerates. Frozen values
+compare type-strictly (`1`, `1.0` and `true` differ), and changed paths are
+listed NUL-separated, so a path with a space, newline or non-ASCII byte is not
+lost to git's quoting. A PR that changes a verdict row, a wave
+or a sealed verdict artifact fails if it also changes the gate's trust base
+(`TRUST_PATHS`), so a rules change lands on its own first. The trust base is
+the gate script, every repository module the gate and its validators import
+(transitively, which brings in `scripts/validate.py` through
+`scripts/host_receipts.py`), the rule inputs they read (the lane-provenance
+registry `tools/sota-convergence/lane-provenance.json`, the host-receipt and
+lane-return schemas) and `validate.yml`. A rule input held inside a data file
+counts too: `adoption/manifest.json#/platform_profiles` (which host
+os/architecture a receipt's platform binds) changed together with verdict
+data fails the same way (`RULE_INPUT_FIELDS`). The tests derive the list
+rather than restate it: one walks the modules' imports with `ast`, and one
+records every file opened (a `sys.addaudithook`, in a subprocess) while the
+gate judges a fixture that reaches every row path and while the validators
+check this checkout. Every head-side file the gate reads must be a
+`TRUST_PATHS` file or verdict data the gate binds (`HEAD_DATA_BINDINGS`
+names what binds each class), and every code, schema or tool-registry file
+the validators read must be a `TRUST_PATHS` file. The validators' catalog
+reads are data: they can only add failures to the gate's own verdict. A base
+file that exists but cannot be read or parsed, and a base tree that cannot be
+listed, exit 2 instead of counting as absent.
+Whenever a row, a wave or a file under
+the sealed verdict artifacts, `catalogs/landscape/` or
+`catalogs/sota-convergence/` changes, the job also runs `scripts/landscape.py`
+and `build_verdicts.py --check`. Run it locally with:
+
+```sh
+python3 scripts/verdict_review_gate.py --base origin/main
+```
+
+The workflow's `pull_request` trigger adds the `edited` type to the default
+three, so a PR whose base branch changes runs again, and the job fails closed
+on any `pull_request` event whose base branch (`GITHUB_BASE_REF`, passed
+through the step's environment) is not `main`. A PR first judged against
+another branch and then retargeted to `main` therefore cannot merge on its
+earlier green run. The merge commit's first parent, which the gate compares
+with, must also be a commit on `origin/main`, so a merge commit still built on
+a branch that merely contains `main`'s tip fails closed.
+
+After a retarget, the `edited` run checks out the merge commit still built on
+the old base. This was measured on 2026-09-23 with throwaway PR #143, and the
+decision record has the run IDs. The gate therefore fails once, and re-running
+the job cannot help, because a re-run keeps the same commit. Close and reopen
+the pull request, or push a commit, to rebuild the merge commit on `main`; the
+next run judges it.
+
+The job runs the head's own copy of the gate only when the
+base has none and this change adds `scripts/verdict_review_gate.py` (the
+bootstrap PR); a base without the gate otherwise fails closed.
+
+One residual is accepted. A pull request runs the job definition from its
+own `validate.yml`, so a PR that rewrites this job's step can disable the
+check for itself. The tests that pin the job's shape
+(`tests/test_workflow_hardening.py`) and the gate's rules
+(`tests/test_verdict_review_gate.py`) are the head's copies too, so such a PR
+can edit them in the same change. No `pull_request_target` or `workflow_run` job is added,
+because the strict zizmor gate rejects those triggers, and ruleset-required
+workflows exist only for organizations. The decision record lists the
+mitigations and the overturn.
+
+`.github/main-ruleset.json` adds `verdict-review-gate` to the required checks.
+The coordinator applies it with the ruleset PUT above after this change
+merges. The decision record is "verdict-review-gate (2026-09-23)" in
+[`docs/decisions/2026-09-22-github-automation-closure.md`](decisions/2026-09-22-github-automation-closure.md).
+
+
 ## Automation closure, 2026-09-22
 
 The closure record

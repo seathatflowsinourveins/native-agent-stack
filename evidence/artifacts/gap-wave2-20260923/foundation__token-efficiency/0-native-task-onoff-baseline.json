@@ -1,0 +1,34 @@
+{
+  "id": "0-native-task-onoff-baseline",
+  "gap_index": 0,
+  "gap_text_sha256": "49265929858497b4726f62c034d3de79c542c91ef0d4ea91891f97aa50e39ef7",
+  "preregistration": {
+    "written_at": null,
+    "expectation": "A matched on/off native-task baseline needs several repeated, randomized-order, fresh-session Claude runs with the token stack enabled and disabled, comparing `ccusage claude session --json` counters per arm. That multi-session comparison is out of scope this run: the shared Claude account is reserved for another session's long-horizon comparison, and one bounded single call cannot supply the several-repeats matched design the gap specifies. This receipt instead verifies only that the measurement mechanism itself (ccusage session reporting) functions on this host, which is a precondition for any future A/B run, not evidence of a baseline.",
+    "criteria": "Pass/settle only if `ccusage claude session --json` returns well-formed per-model token/cost data; this alone cannot settle the gap (no A/B arms were run).",
+    "written_at_note": "Reconciliation 2026-09-23: timestamps set to null because the recorded values are impossible or unverifiable. First-pass commit 0699663 was made at 2026-09-23T01:49:24Z yet carried first-pass times as late as 01:57Z; fix-round commit f796901 was made at 02:06:06Z yet carried fix-round times as late as 02:22Z. This preregistration is present in first-pass commit 0699663, so it was written before 01:49:24Z; the exact time is unknown."
+  },
+  "commands": [
+    "ccusage claude session --json --offline --no-cost  (fix round: corrected from the superseded receipt's bare `ccusage session --json`, which is not the gap's next_check command)"
+  ],
+  "results": {
+    "raw_output": "raw/gap0/ccusage-claude-session-snapshot-b.json (source mtime 2026-09-23T02:02:06Z; see raw/raw-manifest.json for attribution and sha256)",
+    "ccusage_claude_session_json_head": "326 sessions. sessions[0]: cacheCreationTokens 24258582, cacheReadTokens 1344697610, inputTokens 20082, modelBreakdowns for claude-fable-5-1 (input 11294, output 716948), claude-sonnet-5 (input 5284, output 1824344), claude-opus-5 (input 2222, output 1160071), claude-opus-5-5 (input 1282, output 525808).",
+    "observation": "`ccusage claude session --json` (the command form the gap's next_check names) returns per-model token breakdowns on this host. No on/off arms were run; this is not a baseline measurement."
+  },
+  "outcome": "deferred",
+  "deferred_reason": "owner: this session, once the shared Claude account is free. Real blocker: the wave brief reserved the shared Claude account for a peer session's long-horizon comparison from 2026-09-23 00:33 UTC and allowed one bounded single call. The next_check needs several repeated, randomized, fresh-session on/off runs measured with `ccusage claude session --json`, which one call cannot supply. A Codex-only arm would not be measured by the counter the next_check names. The first version also cited the 20-minute per-gap time-box; a time-box is not a blocker and is withdrawn as a reason. The reservation text is from the wave brief and is not stored in this repository.",
+  "evidence_class": "local_integration",
+  "limits": [
+    "No A/B arms were executed; only the measurement tool's basic function was confirmed.",
+    "Session data shown includes unrelated prior activity on this host, not a controlled fixture task.",
+    "Does not touch the sealed model-comparison-20260922 audited run or its inputs."
+  ],
+  "checked_at": null,
+  "checked_at_note": "Reconciliation 2026-09-23: timestamps set to null because the recorded values are impossible or unverifiable. First-pass commit 0699663 was made at 2026-09-23T01:49:24Z yet carried first-pass times as late as 01:57Z; fix-round commit f796901 was made at 02:06:06Z yet carried fix-round times as late as 02:22Z. The fix-round ccusage output (raw/gap0/...snapshot-b.json) was written at 02:02:06Z and this receipt at 02:02:14Z (file mtimes); the recorded 01:41Z predates the fix round.",
+  "reconciliation": [
+    "The fix round's excerpt mixed two snapshots: cacheCreationTokens 23630420 and '325 sessions' come from snapshot a (01:56:16Z), inputTokens 20082 from snapshot b (02:02:06Z). It also placed the editorial '(approx, host-wide)' inside a quoted JSON value. The excerpt is replaced with snapshot b's values, and snapshot b is committed as the raw output.",
+    "checked_at and written_at set to null with bounds (see the notes).",
+    "The time-box is withdrawn as a deferral reason; the account reservation is the only named blocker."
+  ]
+}

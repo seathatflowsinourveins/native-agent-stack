@@ -1,0 +1,85 @@
+{
+  "controller_pid": 162853,
+  "server_address_is_loopback": true,
+  "worker_a_pid": 163002,
+  "worker_a_stopped_at": 1790174089.9169948,
+  "worker_b_pid": 163092,
+  "result": {
+    "activity": "attempt=2 keyed_applied=True pid=163092",
+    "key": "effect-{workflow_id}"
+  },
+  "workflow_completed_at": 1790174114.91242,
+  "effects_before_resume": [
+    {
+      "key": "effect-{workflow_id}",
+      "attempt": 2,
+      "pid": 163092
+    }
+  ],
+  "worker_a_resumed_at": 1790174114.912736,
+  "workflow_status_after_resume": "2",
+  "history_events": 17,
+  "activity_events": [
+    "activity_task_scheduled_event_attributes",
+    "activity_task_started_event_attributes",
+    "activity_task_completed_event_attributes"
+  ],
+  "replay_failure": null,
+  "attempts": [
+    {
+      "attempt": 1,
+      "pid": 163002,
+      "phase": "start",
+      "at": 1790174089.827435
+    },
+    {
+      "attempt": 1,
+      "pid": 163002,
+      "phase": "slow",
+      "at": 1790174089.8315065
+    },
+    {
+      "attempt": 2,
+      "pid": 163092,
+      "phase": "start",
+      "at": 1790174094.840749
+    }
+  ],
+  "writes": [
+    {
+      "attempt": 2,
+      "pid": 163092,
+      "keyed_applied": 1,
+      "at": 1790174094.844123
+    }
+  ],
+  "effects": [
+    {
+      "key": "effect-{workflow_id}",
+      "attempt": 2,
+      "pid": 163092
+    }
+  ],
+  "effects_nokey": [
+    {
+      "key": "effect-{workflow_id}",
+      "attempt": 2,
+      "pid": 163092
+    }
+  ],
+  "server_stopped": true,
+  "worker_a_log_lines_mentioning_completion_or_not_found": [
+    "Completing activity as failed ({'activity_id': '1', 'activity_type': 'apply_effect', 'attempt': 1, 'namespace': 'default', 'task_queue': 'gap11-zombie-queue', 'workflow_id': 'gap11-zombie-wf', 'workflow_run_id': 'redacted-id:22af89e4c373ca7e', 'workflow_type': 'ZombieWorkflow'})"
+  ],
+  "worker_b_log_lines_mentioning_completion_or_not_found": [],
+  "checks": {
+    "attempt1_on_worker_a": true,
+    "attempt2_on_worker_b": true,
+    "result_from_worker_b": true,
+    "stale_write_attempted_after_resume": false,
+    "stale_keyed_write_refused": false,
+    "keyed_effect_rows": 1,
+    "unkeyed_control_rows": 1,
+    "replay_clean": true
+  }
+}

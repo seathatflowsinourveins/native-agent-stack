@@ -1,0 +1,2 @@
+venv-syft exit=1 seconds=0
+venv-grype exit=1 seconds=4

@@ -1,0 +1,26 @@
+{
+  "id": "4-restricted-role-recovery-deferred",
+  "gap_index": 4,
+  "gap_text_sha256": "2e89bb0abf6b285f68d1eeebf80f380e2709c20519ba9f99b07796db7cbe2442",
+  "preregistration": {
+    "written_at": "2026-09-23T00:47:23Z",
+    "expectation": "Rerunning the native-worker recovery fixture with a restricted Bash-only role (e.g. source-scout) on a real repository task, interrupting it mid-run, would show whether recovery still holds under the narrower toolset.",
+    "criteria": "Settled if a restricted-role subagent is actually launched, interrupted mid-task, and observed to resume/recover correctly; not_settled if interruption cannot be reliably timed; deferred if it cannot be attempted at all.",
+    "timing": "post_hoc: written 2026-09-23T00:47:23Z by the first-round receipt generator, which hard-coded 00:55:00Z (later than the write and the first commit 1a4448c at 00:50:10Z, so not a real time). No check ran, so no result preceded it. Timing label first added in the fix round at 01:03:20Z and corrected in the reconciliation pass."
+  },
+  "commands": [
+    {
+      "cmd": "(not run — see limits)",
+      "exit": null,
+      "duration_s": 0,
+      "output_excerpt": "n/a",
+      "output_sha256": null
+    }
+  ],
+  "results": "Not run. Deferred. Real blocker: the restricted role (source-scout) is a Claude (Sonnet) agent. A launch, an external interrupt and a relaunch are at least two Claude runs, beyond the one bounded single call the unit rules allow while the shared Claude account is reserved. The earlier statement that there is 'no mechanism to interrupt a dispatched subagent asynchronously' was wrong: a separate headless client process can be killed by PID, as the gap 2 receipt notes. The 20-minute time-box is a stop rule for checks that run, not a deferral reason. Isolated alternatives (temp HOME, `unshare`) do not change account use, and a Codex substitute would not test the Claude restricted role.",
+  "outcome": "deferred",
+  "evidence_class": "source_review",
+  "limits": "Deferred. Owner: needs a harness-level test with an external process able to time and deliver the interrupt, and explicit budget for a Claude-family restricted-role child beyond this run's one-bounded-call allowance.",
+  "checked_at": "2026-09-23T00:47:23Z",
+  "reconciliation": "reconciliation 2026-09-23T02:21:44Z (no new checks; claims aligned to the transcripts and files on disk, see README 'Reconciliation'): fictitious 00:55:00Z timestamps replaced by the real write time; stated blocker corrected to the account-reservation rule."
+}

@@ -1,0 +1,1028 @@
+{
+ "bridge": "mcporter-0.14.0",
+ "started_at": "2026-09-23T04:18:25Z",
+ "fixture_root": "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z",
+ "daemon_dir": "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/d/lc0140041825/daemon",
+ "shared_daemon_before": {
+  "metadata_mtime_ns": 1790132456915116162,
+  "metadata_pid": 2276114,
+  "socket_inode": 2215748,
+  "metadata_pid_alive": true
+ },
+ "stages": {
+  "persistence": {
+   "started": "2026-09-23T04:18:25Z",
+   "keepalive_calls": [
+    {
+     "argv": [
+      "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/mcporter-0.14.0/node_modules/.bin/mcporter",
+      "--config",
+      "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/state/mcporter.json",
+      "call",
+      "context-mode.ctx_execute",
+      "--args",
+      "{\"language\": \"javascript\", \"code\": \"console.log('PPID=' + process.ppid)\"}",
+      "--output",
+      "json",
+      "--no-oauth"
+     ],
+     "cwd": "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/project",
+     "exit": 0,
+     "elapsed_ms": 1187,
+     "stdout": "{\n  \"content\": [\n    {\n      \"type\": \"text\",\n      \"text\": \"```javascript\\nconsole.log('PPID=' + process.ppid)\\n```\\n\\nPPID=3490964\\n\"\n    }\n  ]\n}\n",
+     "stderr": "",
+     "stdout_sha256": "44b651b32a8428ba49169f389ca856e37be4c2faf1b2ed3410a8f4deb127d163",
+     "server_pid": 3490964,
+     "server": {
+      "pid": 3490964,
+      "alive": true,
+      "cmd": "$HOME/.local/share/codex-ecosystem/bin/node $HOME/.local/share/codex-ecosystem/tools/context-mode-1.0.169/node_modules/context-mode/cli.bundle.mjs ",
+      "cwd": "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/project"
+     }
+    },
+    {
+     "argv": [
+      "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/mcporter-0.14.0/node_modules/.bin/mcporter",
+      "--config",
+      "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/state/mcporter.json",
+      "call",
+      "context-mode.ctx_execute",
+      "--args",
+      "{\"language\": \"javascript\", \"code\": \"console.log('PPID=' + process.ppid)\"}",
+      "--output",
+      "json",
+      "--no-oauth"
+     ],
+     "cwd": "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/project",
+     "exit": 0,
+     "elapsed_ms": 388,
+     "stdout": "{\n  \"content\": [\n    {\n      \"type\": \"text\",\n      \"text\": \"```javascript\\nconsole.log('PPID=' + process.ppid)\\n```\\n\\nPPID=3490964\\n\"\n    }\n  ]\n}\n",
+     "stderr": "",
+     "stdout_sha256": "44b651b32a8428ba49169f389ca856e37be4c2faf1b2ed3410a8f4deb127d163",
+     "server_pid": 3490964,
+     "server": {
+      "pid": 3490964,
+      "alive": true,
+      "cmd": "$HOME/.local/share/codex-ecosystem/bin/node $HOME/.local/share/codex-ecosystem/tools/context-mode-1.0.169/node_modules/context-mode/cli.bundle.mjs ",
+      "cwd": "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/project"
+     }
+    },
+    {
+     "argv": [
+      "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/mcporter-0.14.0/node_modules/.bin/mcporter",
+      "--config",
+      "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/state/mcporter.json",
+      "call",
+      "context-mode.ctx_execute",
+      "--args",
+      "{\"language\": \"javascript\", \"code\": \"console.log('PPID=' + process.ppid)\"}",
+      "--output",
+      "json",
+      "--no-oauth"
+     ],
+     "cwd": "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/project",
+     "exit": 0,
+     "elapsed_ms": 373,
+     "stdout": "{\n  \"content\": [\n    {\n      \"type\": \"text\",\n      \"text\": \"```javascript\\nconsole.log('PPID=' + process.ppid)\\n```\\n\\nPPID=3490964\\n\"\n    }\n  ]\n}\n",
+     "stderr": "",
+     "stdout_sha256": "44b651b32a8428ba49169f389ca856e37be4c2faf1b2ed3410a8f4deb127d163",
+     "server_pid": 3490964,
+     "server": {
+      "pid": 3490964,
+      "alive": true,
+      "cmd": "$HOME/.local/share/codex-ecosystem/bin/node $HOME/.local/share/codex-ecosystem/tools/context-mode-1.0.169/node_modules/context-mode/cli.bundle.mjs ",
+      "cwd": "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/project"
+     }
+    }
+   ],
+   "ephemeral_calls": [
+    {
+     "argv": [
+      "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/mcporter-0.14.0/node_modules/.bin/mcporter",
+      "--config",
+      "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/state/mcporter.json",
+      "call",
+      "context-mode-eph.ctx_execute",
+      "--args",
+      "{\"language\": \"javascript\", \"code\": \"console.log('PPID=' + process.ppid)\"}",
+      "--output",
+      "json",
+      "--no-oauth"
+     ],
+     "cwd": "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/project",
+     "exit": 0,
+     "elapsed_ms": 800,
+     "stdout": "{\n  \"content\": [\n    {\n      \"type\": \"text\",\n      \"text\": \"```javascript\\nconsole.log('PPID=' + process.ppid)\\n```\\n\\nPPID=3491609\\n\"\n    }\n  ]\n}\n",
+     "stderr": "",
+     "stdout_sha256": "21183eb869b64dea3c80d158feb690c8a368ad3d30b959b465cd1b0c653368a0",
+     "server_pid": 3491609,
+     "server": {
+      "pid": 3491609,
+      "alive": false
+     }
+    },
+    {
+     "argv": [
+      "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/mcporter-0.14.0/node_modules/.bin/mcporter",
+      "--config",
+      "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/state/mcporter.json",
+      "call",
+      "context-mode-eph.ctx_execute",
+      "--args",
+      "{\"language\": \"javascript\", \"code\": \"console.log('PPID=' + process.ppid)\"}",
+      "--output",
+      "json",
+      "--no-oauth"
+     ],
+     "cwd": "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/project",
+     "exit": 0,
+     "elapsed_ms": 711,
+     "stdout": "{\n  \"content\": [\n    {\n      \"type\": \"text\",\n      \"text\": \"```javascript\\nconsole.log('PPID=' + process.ppid)\\n```\\n\\nPPID=3491953\\n\"\n    }\n  ]\n}\n",
+     "stderr": "",
+     "stdout_sha256": "8a91e871dc51a3851545a30c78de69b9bc6e3ce3ce6d5996c08f48ec0c70cc22",
+     "server_pid": 3491953,
+     "server": {
+      "pid": 3491953,
+      "alive": false
+     }
+    },
+    {
+     "argv": [
+      "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/mcporter-0.14.0/node_modules/.bin/mcporter",
+      "--config",
+      "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/state/mcporter.json",
+      "call",
+      "context-mode-eph.ctx_execute",
+      "--args",
+      "{\"language\": \"javascript\", \"code\": \"console.log('PPID=' + process.ppid)\"}",
+      "--output",
+      "json",
+      "--no-oauth"
+     ],
+     "cwd": "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/project",
+     "exit": 0,
+     "elapsed_ms": 738,
+     "stdout": "{\n  \"content\": [\n    {\n      \"type\": \"text\",\n      \"text\": \"```javascript\\nconsole.log('PPID=' + process.ppid)\\n```\\n\\nPPID=3492242\\n\"\n    }\n  ]\n}\n",
+     "stderr": "",
+     "stdout_sha256": "f778349ecc73d32af4cf134d50b17059098cb809168fac97b636f29ca843a9b4",
+     "server_pid": 3492242,
+     "server": {
+      "pid": 3492242,
+      "alive": false
+     }
+    }
+   ],
+   "daemon_status": {
+    "exit": 0,
+    "pid": 3490518,
+    "servers": [
+     {
+      "name": "uuid-1",
+      "connectionId": "uuid-1",
+      "connectionGeneration": 1,
+      "connected": true,
+      "activeCalls": 0,
+      "lastUsedAt": 1790137107491
+     }
+    ],
+    "views": 0,
+    "generation": "uuid-2"
+   },
+   "keepalive_distinct_pids": 1,
+   "ephemeral_distinct_pids": 3,
+   "passed": true
+  },
+  "restart": {
+   "started": "2026-09-23T04:18:32Z",
+   "status_before": {
+    "exit": 0,
+    "pid": 3490518,
+    "servers": [
+     {
+      "name": "uuid-1",
+      "connectionId": "uuid-1",
+      "connectionGeneration": 1,
+      "connected": true,
+      "activeCalls": 0,
+      "lastUsedAt": 1790137107491
+     }
+    ],
+    "views": 0,
+    "generation": "uuid-2"
+   },
+   "stop": {
+    "argv": [
+     "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/mcporter-0.14.0/node_modules/.bin/mcporter",
+     "daemon",
+     "stop"
+    ],
+    "cwd": "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z",
+    "exit": 0,
+    "elapsed_ms": 439,
+    "stdout": "Daemon stopped (if it was running).\n",
+    "stderr": "",
+    "stdout_sha256": "d7791c58499cc72fdded0b839da7a27920fd95360ac9efa10ae0f58f14ee9904"
+   },
+   "after_stop": {
+    "owned": {
+     "daemon_pids": [],
+     "fixture_processes": [],
+     "daemon_dir": [
+      "user.key"
+     ]
+    },
+    "old_daemon": {
+     "pid": 3490518,
+     "alive": false
+    },
+    "old_server": {
+     "pid": 3490964,
+     "alive": false
+    }
+   },
+   "next_call": {
+    "argv": [
+     "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/mcporter-0.14.0/node_modules/.bin/mcporter",
+     "--config",
+     "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/state/mcporter.json",
+     "call",
+     "context-mode.ctx_execute",
+     "--args",
+     "{\"language\": \"javascript\", \"code\": \"console.log('PPID=' + process.ppid)\"}",
+     "--output",
+     "json",
+     "--no-oauth"
+    ],
+    "cwd": "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/project",
+    "exit": 0,
+    "elapsed_ms": 1029,
+    "stdout": "{\n  \"content\": [\n    {\n      \"type\": \"text\",\n      \"text\": \"```javascript\\nconsole.log('PPID=' + process.ppid)\\n```\\n\\nPPID=3493548\\n\"\n    }\n  ]\n}\n",
+    "stderr": "",
+    "stdout_sha256": "233c0726341fd02a80fc71e1b8a1775e2c3380e12bc48dba2525133b6d651161",
+    "server_pid": 3493548,
+    "server": {
+     "pid": 3493548,
+     "alive": true,
+     "cmd": "$HOME/.local/share/codex-ecosystem/bin/node $HOME/.local/share/codex-ecosystem/tools/context-mode-1.0.169/node_modules/context-mode/cli.bundle.mjs ",
+     "cwd": "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/project"
+    }
+   },
+   "status_after": {
+    "exit": 0,
+    "pid": 3493419,
+    "servers": [
+     {
+      "name": "uuid-3",
+      "connectionId": "uuid-3",
+      "connectionGeneration": 1,
+      "connected": true,
+      "activeCalls": 0,
+      "lastUsedAt": 1790137112824
+     }
+    ],
+    "views": 0,
+    "generation": "uuid-4"
+   },
+   "passed": true,
+   "restart_cmd": {
+    "argv": [
+     "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/mcporter-0.14.0/node_modules/.bin/mcporter",
+     "daemon",
+     "restart"
+    ],
+    "cwd": "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z",
+    "exit": 0,
+    "elapsed_ms": 839,
+    "stdout": "Daemon stopped (if it was running).\nSingle-user daemon started.\n",
+    "stderr": "",
+    "stdout_sha256": "491b010ccea29d859a63ee27ad758b7f640e135beee81d3726421c8727b27f6d"
+   },
+   "after_restart_call": {
+    "argv": [
+     "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/mcporter-0.14.0/node_modules/.bin/mcporter",
+     "--config",
+     "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/state/mcporter.json",
+     "call",
+     "context-mode.ctx_execute",
+     "--args",
+     "{\"language\": \"javascript\", \"code\": \"console.log('PPID=' + process.ppid)\"}",
+     "--output",
+     "json",
+     "--no-oauth"
+    ],
+    "cwd": "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/project",
+    "exit": 0,
+    "elapsed_ms": 738,
+    "stdout": "{\n  \"content\": [\n    {\n      \"type\": \"text\",\n      \"text\": \"```javascript\\nconsole.log('PPID=' + process.ppid)\\n```\\n\\nPPID=3495500\\n\"\n    }\n  ]\n}\n",
+    "stderr": "",
+    "stdout_sha256": "a37fc19226fced839bca13bc02dd47bf2317c26b0b017b54b1a3aab90c930a9e",
+    "server_pid": 3495500,
+    "server": {
+     "pid": 3495500,
+     "alive": true,
+     "cmd": "$HOME/.local/share/codex-ecosystem/bin/node $HOME/.local/share/codex-ecosystem/tools/context-mode-1.0.169/node_modules/context-mode/cli.bundle.mjs ",
+     "cwd": "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/project"
+    }
+   },
+   "status_after_restart": {
+    "exit": 0,
+    "pid": 3494874,
+    "servers": [
+     {
+      "name": "uuid-5",
+      "connectionId": "uuid-5",
+      "connectionGeneration": 1,
+      "connected": true,
+      "activeCalls": 0,
+      "lastUsedAt": 1790137114982
+     }
+    ],
+    "views": 0,
+    "generation": "uuid-6"
+   },
+   "restart_cmd_passed": true
+  },
+  "cleanup": {
+   "started": "2026-09-23T04:18:37Z",
+   "stop": {
+    "argv": [
+     "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/mcporter-0.14.0/node_modules/.bin/mcporter",
+     "daemon",
+     "stop"
+    ],
+    "cwd": "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z",
+    "exit": 0,
+    "elapsed_ms": 440,
+    "stdout": "Daemon stopped (if it was running).\n",
+    "stderr": "",
+    "stdout_sha256": "d7791c58499cc72fdded0b839da7a27920fd95360ac9efa10ae0f58f14ee9904"
+   },
+   "server_pid_before": 3495500,
+   "daemon_pid_before": 3494874,
+   "after": {
+    "daemon_pids": [],
+    "fixture_processes": [],
+    "daemon_dir": [
+     "user.key"
+    ]
+   },
+   "server_after": {
+    "pid": 3495500,
+    "alive": false
+   },
+   "daemon_after": {
+    "pid": 3494874,
+    "alive": false
+   },
+   "passed": true
+  },
+  "scoped_registration_cleanup": {
+   "started": "2026-09-23T04:18:39Z",
+   "a_idle_call": {
+    "argv": [
+     "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/mcporter-0.14.0/node_modules/.bin/mcporter",
+     "--config",
+     "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/state/mcporter-a.json",
+     "call",
+     "cm-a-idle.ctx_execute",
+     "--args",
+     "{\"language\": \"javascript\", \"code\": \"console.log('PPID=' + process.ppid)\"}",
+     "--output",
+     "json",
+     "--no-oauth"
+    ],
+    "cwd": "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/project",
+    "exit": 0,
+    "elapsed_ms": 1163,
+    "stdout": "{\n  \"content\": [\n    {\n      \"type\": \"text\",\n      \"text\": \"```javascript\\nconsole.log('PPID=' + process.ppid)\\n```\\n\\nPPID=3497684\\n\"\n    }\n  ]\n}\n",
+    "stderr": "",
+    "stdout_sha256": "8d7a9845e5e37e4f0ab5e747dd6b13f1550284737971e231b7a431db4bb148a8",
+    "server_pid": 3497684,
+    "server": {
+     "pid": 3497684,
+     "alive": true,
+     "cmd": "$HOME/.local/share/codex-ecosystem/bin/node $HOME/.local/share/codex-ecosystem/tools/context-mode-1.0.169/node_modules/context-mode/cli.bundle.mjs ",
+     "cwd": "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/project"
+    }
+   },
+   "a_plain_call": {
+    "argv": [
+     "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/mcporter-0.14.0/node_modules/.bin/mcporter",
+     "--config",
+     "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/state/mcporter-a.json",
+     "call",
+     "cm-a-plain.ctx_execute",
+     "--args",
+     "{\"language\": \"javascript\", \"code\": \"console.log('PPID=' + process.ppid)\"}",
+     "--output",
+     "json",
+     "--no-oauth"
+    ],
+    "cwd": "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/project",
+    "exit": 0,
+    "elapsed_ms": 704,
+    "stdout": "{\n  \"content\": [\n    {\n      \"type\": \"text\",\n      \"text\": \"```javascript\\nconsole.log('PPID=' + process.ppid)\\n```\\n\\nPPID=3498441\\n\"\n    }\n  ]\n}\n",
+    "stderr": "",
+    "stdout_sha256": "77b05b59fa678dd976194f69c76a6a25ba2a9d8688ab7258f6f47d0b21faf801",
+    "server_pid": 3498441,
+    "server": {
+     "pid": 3498441,
+     "alive": true,
+     "cmd": "$HOME/.local/share/codex-ecosystem/bin/node $HOME/.local/share/codex-ecosystem/tools/context-mode-1.0.169/node_modules/context-mode/cli.bundle.mjs ",
+     "cwd": "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/project"
+    }
+   },
+   "b_call": {
+    "argv": [
+     "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/mcporter-0.14.0/node_modules/.bin/mcporter",
+     "--config",
+     "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/state/mcporter-b.json",
+     "call",
+     "cm-b.ctx_execute",
+     "--args",
+     "{\"language\": \"javascript\", \"code\": \"console.log('PPID=' + process.ppid)\"}",
+     "--output",
+     "json",
+     "--no-oauth"
+    ],
+    "cwd": "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/project",
+    "exit": 0,
+    "elapsed_ms": 623,
+    "stdout": "{\n  \"content\": [\n    {\n      \"type\": \"text\",\n      \"text\": \"```javascript\\nconsole.log('PPID=' + process.ppid)\\n```\\n\\nPPID=3498974\\n\"\n    }\n  ]\n}\n",
+    "stderr": "",
+    "stdout_sha256": "fdc4c011e82239df81e9184651094ae21544000433b46604330b7278339c7598",
+    "server_pid": 3498974,
+    "server": {
+     "pid": 3498974,
+     "alive": true,
+     "cmd": "$HOME/.local/share/codex-ecosystem/bin/node $HOME/.local/share/codex-ecosystem/tools/context-mode-1.0.169/node_modules/context-mode/cli.bundle.mjs ",
+     "cwd": "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/project"
+    }
+   },
+   "status_three_servers": {
+    "exit": 0,
+    "pid": 3497227,
+    "servers": [
+     {
+      "name": "uuid-7",
+      "connectionId": "uuid-7",
+      "connectionGeneration": 1,
+      "connected": true,
+      "activeCalls": 0,
+      "lastUsedAt": 1790137118189,
+      "idleTimeoutMs": 4000
+     },
+     {
+      "name": "uuid-8",
+      "connectionId": "uuid-8",
+      "connectionGeneration": 1,
+      "connected": true,
+      "activeCalls": 0,
+      "lastUsedAt": 1790137118890
+     },
+     {
+      "name": "uuid-9",
+      "connectionId": "uuid-9",
+      "connectionGeneration": 1,
+      "connected": true,
+      "activeCalls": 0,
+      "lastUsedAt": 1790137119523
+     }
+    ],
+    "views": 0,
+    "generation": "uuid-10"
+   },
+   "view_a_list_after_removal": {
+    "argv": [
+     "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/mcporter-0.14.0/node_modules/.bin/mcporter",
+     "--config",
+     "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/state/mcporter-a.json",
+     "list",
+     "--no-oauth"
+    ],
+    "cwd": "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/project",
+    "exit": 0,
+    "elapsed_ms": 784,
+    "stdout": "mcporter 0.14.0 — Listing 1 server(s) (per-server timeout: 30s)\n- context-mode-eph (11 tools, 0.3s)\n✔ Listed 1 server (1 healthy).\n",
+    "stderr": "",
+    "stdout_sha256": "cc69080e33d5303b9ca6c37a074a8fac0bb7202b8bf37e0e5ef084275b68b6a0"
+   },
+   "a_idle_server_after": {
+    "pid": 3497684,
+    "alive": false
+   },
+   "a_plain_server_after": {
+    "pid": 3498441,
+    "alive": true,
+    "cmd": "$HOME/.local/share/codex-ecosystem/bin/node $HOME/.local/share/codex-ecosystem/tools/context-mode-1.0.169/node_modules/context-mode/cli.bundle.mjs ",
+    "cwd": "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/project"
+   },
+   "b_call_after": {
+    "argv": [
+     "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/mcporter-0.14.0/node_modules/.bin/mcporter",
+     "--config",
+     "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/state/mcporter-b.json",
+     "call",
+     "cm-b.ctx_execute",
+     "--args",
+     "{\"language\": \"javascript\", \"code\": \"console.log('PPID=' + process.ppid)\"}",
+     "--output",
+     "json",
+     "--no-oauth"
+    ],
+    "cwd": "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/project",
+    "exit": 0,
+    "elapsed_ms": 326,
+    "stdout": "{\n  \"content\": [\n    {\n      \"type\": \"text\",\n      \"text\": \"```javascript\\nconsole.log('PPID=' + process.ppid)\\n```\\n\\nPPID=3498974\\n\"\n    }\n  ]\n}\n",
+    "stderr": "",
+    "stdout_sha256": "fdc4c011e82239df81e9184651094ae21544000433b46604330b7278339c7598",
+    "server_pid": 3498974,
+    "server": {
+     "pid": 3498974,
+     "alive": true,
+     "cmd": "$HOME/.local/share/codex-ecosystem/bin/node $HOME/.local/share/codex-ecosystem/tools/context-mode-1.0.169/node_modules/context-mode/cli.bundle.mjs ",
+     "cwd": "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/project"
+    }
+   },
+   "status_after_removal": {
+    "exit": 0,
+    "pid": 3497227,
+    "servers": [
+     {
+      "name": "uuid-7",
+      "connectionId": "uuid-7",
+      "connectionGeneration": 1,
+      "connected": false,
+      "activeCalls": 0,
+      "lastUsedAt": 1790137118189,
+      "idleTimeoutMs": 4000
+     },
+     {
+      "name": "uuid-8",
+      "connectionId": "uuid-8",
+      "connectionGeneration": 1,
+      "connected": true,
+      "activeCalls": 0,
+      "lastUsedAt": 1790137118890
+     },
+     {
+      "name": "uuid-9",
+      "connectionId": "uuid-9",
+      "connectionGeneration": 1,
+      "connected": true,
+      "activeCalls": 0,
+      "lastUsedAt": 1790137129902
+     }
+    ],
+    "views": 0,
+    "generation": "uuid-10"
+   },
+   "views_released_after_calls": true,
+   "b_unaffected": true,
+   "idle_configured_server_retired": true,
+   "plain_server_retired_by_config_removal": false,
+   "passed": true,
+   "after_stop": {
+    "stop": {
+     "argv": [
+      "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/mcporter-0.14.0/node_modules/.bin/mcporter",
+      "daemon",
+      "stop"
+     ],
+     "cwd": "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z",
+     "exit": 0,
+     "elapsed_ms": 512,
+     "stdout": "Daemon stopped (if it was running).\n",
+     "stderr": "",
+     "stdout_sha256": "d7791c58499cc72fdded0b839da7a27920fd95360ac9efa10ae0f58f14ee9904"
+    },
+    "a_plain_server": {
+     "pid": 3498441,
+     "alive": false
+    },
+    "b_server": {
+     "pid": 3498974,
+     "alive": false
+    },
+    "owned": {
+     "daemon_pids": [],
+     "fixture_processes": [],
+     "daemon_dir": [
+      "user.key"
+     ]
+    }
+   }
+  },
+  "changed_process_root": {
+   "started": "2026-09-23T04:18:53Z",
+   "first_read_root1": {
+    "argv": [
+     "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/mcporter-0.14.0/node_modules/.bin/mcporter",
+     "--config",
+     "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/state/mcporter.json",
+     "call",
+     "context-mode.ctx_execute_file",
+     "--args",
+     "{\"path\": \"marker.txt\", \"language\": \"python\", \"code\": \"print('MARK=' + FILE_CONTENT.strip())\"}",
+     "--output",
+     "json",
+     "--no-oauth"
+    ],
+    "cwd": "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/launch-dir",
+    "exit": 0,
+    "elapsed_ms": 787,
+    "stdout": "{\n  \"content\": [\n    {\n      \"type\": \"text\",\n      \"text\": \"path=marker.txt\\n```python\\nprint('MARK=' + FILE_CONTENT.strip())\\n```\\n\\nMARK=ROOT1\\n\"\n    }\n  ]\n}\n",
+    "stderr": "",
+    "stdout_sha256": "ebc24a6b14b5351f4fef8dac9f610c30976658da4f5c66896ebbd293f9c73b3f",
+    "marker": "ROOT1"
+   },
+   "daemon_after_launch": {
+    "pid": 3506077,
+    "alive": true,
+    "cmd": "$HOME/.local/share/codex-ecosystem/tools/node-v24.21.0/bin/node $HOME/.cache/gap-wave2-20260923/mcp-surfaces/mcporter-0.14.0/node_modules/mcporter/d",
+    "cwd": "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/launch-dir"
+   },
+   "second_read_after_root_change": {
+    "argv": [
+     "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/mcporter-0.14.0/node_modules/.bin/mcporter",
+     "--config",
+     "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/state/mcporter.json",
+     "call",
+     "context-mode.ctx_execute_file",
+     "--args",
+     "{\"path\": \"marker.txt\", \"language\": \"python\", \"code\": \"print('MARK=' + FILE_CONTENT.strip())\"}",
+     "--output",
+     "json",
+     "--no-oauth"
+    ],
+    "cwd": "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/project-root2",
+    "exit": 0,
+    "elapsed_ms": 545,
+    "stdout": "{\n  \"content\": [\n    {\n      \"type\": \"text\",\n      \"text\": \"path=marker.txt\\n```python\\nprint('MARK=' + FILE_CONTENT.strip())\\n```\\n\\nMARK=ROOT2\\n\"\n    }\n  ]\n}\n",
+    "stderr": "",
+    "stdout_sha256": "f596664c1b5e04db02316af4f9fd664cb070a01dd3b30c58ef3834ff3aeb81ad",
+    "marker": "ROOT2"
+   },
+   "server_after_root_change": {
+    "argv": [
+     "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/mcporter-0.14.0/node_modules/.bin/mcporter",
+     "--config",
+     "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/state/mcporter.json",
+     "call",
+     "context-mode.ctx_execute",
+     "--args",
+     "{\"language\": \"javascript\", \"code\": \"console.log('PPID=' + process.ppid)\"}",
+     "--output",
+     "json",
+     "--no-oauth"
+    ],
+    "cwd": "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/project-root2",
+    "exit": 0,
+    "elapsed_ms": 298,
+    "stdout": "{\n  \"content\": [\n    {\n      \"type\": \"text\",\n      \"text\": \"```javascript\\nconsole.log('PPID=' + process.ppid)\\n```\\n\\nPPID=3506358\\n\"\n    }\n  ]\n}\n",
+    "stderr": "",
+    "stdout_sha256": "5d369a5551d7a7021aba50469ba7eef322a89fd12d86cc78eae44d5ca625bf1b",
+    "server_pid": 3506358,
+    "server": {
+     "pid": 3506358,
+     "alive": true,
+     "cmd": "$HOME/.local/share/codex-ecosystem/bin/node $HOME/.local/share/codex-ecosystem/tools/context-mode-1.0.169/node_modules/context-mode/cli.bundle.mjs ",
+     "cwd": "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/project-root2"
+    }
+   },
+   "status": {
+    "exit": 0,
+    "pid": 3506077,
+    "servers": [
+     {
+      "name": "uuid-11",
+      "connectionId": "uuid-11",
+      "connectionGeneration": 1,
+      "connected": true,
+      "activeCalls": 0,
+      "lastUsedAt": 1790137132446
+     },
+     {
+      "name": "uuid-12",
+      "connectionId": "uuid-12",
+      "connectionGeneration": 1,
+      "connected": true,
+      "activeCalls": 0,
+      "lastUsedAt": 1790137133482
+     }
+    ],
+    "views": 0,
+    "generation": "uuid-13"
+   },
+   "passed": true
+  },
+  "stale_metadata_sigkill": {
+   "started": "2026-09-23T04:18:57Z",
+   "warm_call": {
+    "argv": [
+     "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/mcporter-0.14.0/node_modules/.bin/mcporter",
+     "--config",
+     "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/state/mcporter.json",
+     "call",
+     "context-mode.ctx_execute",
+     "--args",
+     "{\"language\": \"javascript\", \"code\": \"console.log('PPID=' + process.ppid)\"}",
+     "--output",
+     "json",
+     "--no-oauth"
+    ],
+    "cwd": "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/project",
+    "exit": 0,
+    "elapsed_ms": 761,
+    "stdout": "{\n  \"content\": [\n    {\n      \"type\": \"text\",\n      \"text\": \"```javascript\\nconsole.log('PPID=' + process.ppid)\\n```\\n\\nPPID=3507624\\n\"\n    }\n  ]\n}\n",
+    "stderr": "",
+    "stdout_sha256": "be4286c6eb8deb68e53edf92c7e2f8c0bedde31afaf33b84c648ed4b0efca536",
+    "server_pid": 3507624,
+    "server": {
+     "pid": 3507624,
+     "alive": true,
+     "cmd": "$HOME/.local/share/codex-ecosystem/bin/node $HOME/.local/share/codex-ecosystem/tools/context-mode-1.0.169/node_modules/context-mode/cli.bundle.mjs ",
+     "cwd": "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/project"
+    }
+   },
+   "killed_daemon_pid": 3507576,
+   "metadata_after_kill": {
+    "user.json": {
+     "pid": 3507576,
+     "protocolVersion": 3,
+     "startedAt": 1790137135668,
+     "configPath": "",
+     "socketPath": "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/d/lc0140041825/daemon/daemon/user.sock",
+     "generation": "uuid-14",
+     "views": 0,
+     "servers": [],
+     "idleShutdownBlocked": false
+    },
+    "user.key": "present",
+    "user.sock": "present"
+   },
+   "server_after_daemon_kill": {
+    "pid": 3507624,
+    "alive": false
+   },
+   "next_call": {
+    "argv": [
+     "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/mcporter-0.14.0/node_modules/.bin/mcporter",
+     "--config",
+     "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/state/mcporter.json",
+     "call",
+     "context-mode.ctx_execute",
+     "--args",
+     "{\"language\": \"javascript\", \"code\": \"console.log('PPID=' + process.ppid)\"}",
+     "--output",
+     "json",
+     "--no-oauth"
+    ],
+    "cwd": "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/project",
+    "exit": 1,
+    "elapsed_ms": 361,
+    "stdout": "{\n  \"server\": \"context-mode\",\n  \"tool\": \"ctx_execute\",\n  \"error\": \"Previous daemon exited unexpectedly; verify retirement of its transports before deliberate recovery. No replacement was launched.\",\n  \"issue\": {\n    \"kind\": \"other\",\n    \"rawMessage\": \"Previous daemon exited unexpectedly; verify retirement of its transports before deliberate recovery. No replacement was launched.\"\n  }\n}\n",
+    "stderr": "",
+    "stdout_sha256": "e598d0a9ebdbcbc49dfada96a1bb9f68f15f98ad27ffd31688a06aed018193b4",
+    "server_pid": null
+   },
+   "second_call": {
+    "argv": [
+     "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/mcporter-0.14.0/node_modules/.bin/mcporter",
+     "--config",
+     "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/state/mcporter.json",
+     "call",
+     "context-mode.ctx_execute",
+     "--args",
+     "{\"language\": \"javascript\", \"code\": \"console.log('PPID=' + process.ppid)\"}",
+     "--output",
+     "json",
+     "--no-oauth"
+    ],
+    "cwd": "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/project",
+    "exit": 1,
+    "elapsed_ms": 258,
+    "stdout": "{\n  \"server\": \"context-mode\",\n  \"tool\": \"ctx_execute\",\n  \"error\": \"Previous daemon exited unexpectedly; verify retirement of its transports before deliberate recovery. No replacement was launched.\",\n  \"issue\": {\n    \"kind\": \"other\",\n    \"rawMessage\": \"Previous daemon exited unexpectedly; verify retirement of its transports before deliberate recovery. No replacement was launched.\"\n  }\n}\n",
+    "stderr": "",
+    "stdout_sha256": "e598d0a9ebdbcbc49dfada96a1bb9f68f15f98ad27ffd31688a06aed018193b4",
+    "server_pid": null
+   },
+   "auto_recovered": false,
+   "manual_steps": [
+    "archived daemon/user.json only (key and config kept)"
+   ],
+   "call_after_manual_step": {
+    "argv": [
+     "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/mcporter-0.14.0/node_modules/.bin/mcporter",
+     "--config",
+     "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/state/mcporter.json",
+     "call",
+     "context-mode.ctx_execute",
+     "--args",
+     "{\"language\": \"javascript\", \"code\": \"console.log('PPID=' + process.ppid)\"}",
+     "--output",
+     "json",
+     "--no-oauth"
+    ],
+    "cwd": "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/project",
+    "exit": 0,
+    "elapsed_ms": 804,
+    "stdout": "{\n  \"content\": [\n    {\n      \"type\": \"text\",\n      \"text\": \"```javascript\\nconsole.log('PPID=' + process.ppid)\\n```\\n\\nPPID=3509089\\n\"\n    }\n  ]\n}\n",
+    "stderr": "",
+    "stdout_sha256": "29c0b6e8097d594c9217a9e6b974e301187c6242e07721154a5753c957d756e0",
+    "server_pid": 3509089,
+    "server": {
+     "pid": 3509089,
+     "alive": true,
+     "cmd": "$HOME/.local/share/codex-ecosystem/bin/node $HOME/.local/share/codex-ecosystem/tools/context-mode-1.0.169/node_modules/context-mode/cli.bundle.mjs ",
+     "cwd": "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/project"
+    }
+   },
+   "orphan_server_after_recovery": {
+    "pid": 3507624,
+    "alive": false
+   }
+  },
+  "unresponsive_daemon_sigstop": {
+   "started": "2026-09-23T04:21:01Z",
+   "stopped_daemon_pid": 3509616,
+   "next_call": {
+    "argv": [
+     "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/mcporter-0.14.0/node_modules/.bin/mcporter",
+     "--config",
+     "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/state/mcporter.json",
+     "call",
+     "context-mode.ctx_execute",
+     "--args",
+     "{\"language\": \"javascript\", \"code\": \"console.log('PPID=' + process.ppid)\"}",
+     "--output",
+     "json",
+     "--no-oauth"
+    ],
+    "cwd": "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/project",
+    "exit": 1,
+    "elapsed_ms": 60278,
+    "stdout": "{\n  \"server\": \"context-mode\",\n  \"tool\": \"ctx_execute\",\n  \"error\": \"Call to context-mode.ctx_execute timed out after 60000ms. Override MCPORTER_CALL_TIMEOUT or pass --timeout to adjust.\",\n  \"issue\": {\n    \"kind\": \"offline\",\n    \"rawMessage\": \"Call to context-mode.ctx_execute timed out after 60000ms. Override MCPORTER_CALL_TIMEOUT or pass --timeout to adjust.\"\n  }\n}\n",
+    "stderr": "[mcporter] context-mode appears offline (Call to context-mode.ctx_execute timed out after 60000ms. Override MCPORTER_CALL_TIMEOUT or pass --timeout to adjust.).\n",
+    "stdout_sha256": "32b84cdc5999e96bbba0653f763c4bbe7012344fd54f00202751febf839834cb",
+    "server_pid": null
+   },
+   "next_call_wall_s": 60.3,
+   "second_call": {
+    "argv": [
+     "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/mcporter-0.14.0/node_modules/.bin/mcporter",
+     "--config",
+     "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/state/mcporter.json",
+     "call",
+     "context-mode.ctx_execute",
+     "--args",
+     "{\"language\": \"javascript\", \"code\": \"console.log('PPID=' + process.ppid)\"}",
+     "--output",
+     "json",
+     "--no-oauth"
+    ],
+    "cwd": "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/project",
+    "exit": 1,
+    "elapsed_ms": 60266,
+    "stdout": "{\n  \"server\": \"context-mode\",\n  \"tool\": \"ctx_execute\",\n  \"error\": \"Call to context-mode.ctx_execute timed out after 60000ms. Override MCPORTER_CALL_TIMEOUT or pass --timeout to adjust.\",\n  \"issue\": {\n    \"kind\": \"offline\",\n    \"rawMessage\": \"Call to context-mode.ctx_execute timed out after 60000ms. Override MCPORTER_CALL_TIMEOUT or pass --timeout to adjust.\"\n  }\n}\n",
+    "stderr": "[mcporter] context-mode appears offline (Call to context-mode.ctx_execute timed out after 60000ms. Override MCPORTER_CALL_TIMEOUT or pass --timeout to adjust.).\n",
+    "stdout_sha256": "32b84cdc5999e96bbba0653f763c4bbe7012344fd54f00202751febf839834cb",
+    "server_pid": null
+   },
+   "auto_recovered": false,
+   "call_after_daemon_killed": {
+    "argv": [
+     "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/mcporter-0.14.0/node_modules/.bin/mcporter",
+     "--config",
+     "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/state/mcporter.json",
+     "call",
+     "context-mode.ctx_execute",
+     "--args",
+     "{\"language\": \"javascript\", \"code\": \"console.log('PPID=' + process.ppid)\"}",
+     "--output",
+     "json",
+     "--no-oauth"
+    ],
+    "cwd": "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/project",
+    "exit": 1,
+    "elapsed_ms": 237,
+    "stdout": "{\n  \"server\": \"context-mode\",\n  \"tool\": \"ctx_execute\",\n  \"error\": \"Previous daemon exited unexpectedly; verify retirement of its transports before deliberate recovery. No replacement was launched.\",\n  \"issue\": {\n    \"kind\": \"other\",\n    \"rawMessage\": \"Previous daemon exited unexpectedly; verify retirement of its transports before deliberate recovery. No replacement was launched.\"\n  }\n}\n",
+    "stderr": "",
+    "stdout_sha256": "e598d0a9ebdbcbc49dfada96a1bb9f68f15f98ad27ffd31688a06aed018193b4",
+    "server_pid": null
+   },
+   "auto_recovered_after_kill": false,
+   "manual_steps": [
+    "archived daemon/user.json only"
+   ],
+   "call_after_manual_step": {
+    "argv": [
+     "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/mcporter-0.14.0/node_modules/.bin/mcporter",
+     "--config",
+     "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/state/mcporter.json",
+     "call",
+     "context-mode.ctx_execute",
+     "--args",
+     "{\"language\": \"javascript\", \"code\": \"console.log('PPID=' + process.ppid)\"}",
+     "--output",
+     "json",
+     "--no-oauth"
+    ],
+    "cwd": "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/project",
+    "exit": 0,
+    "elapsed_ms": 644,
+    "stdout": "{\n  \"content\": [\n    {\n      \"type\": \"text\",\n      \"text\": \"```javascript\\nconsole.log('PPID=' + process.ppid)\\n```\\n\\nPPID=3548375\\n\"\n    }\n  ]\n}\n",
+    "stderr": "",
+    "stdout_sha256": "36330ed8ff3aaae4f5cb90bb0b56514e1fbb26a512987b9a3c697ec6a27372b9",
+    "server_pid": 3548375,
+    "server": {
+     "pid": 3548375,
+     "alive": true,
+     "cmd": "$HOME/.local/share/codex-ecosystem/bin/node $HOME/.local/share/codex-ecosystem/tools/context-mode-1.0.169/node_modules/context-mode/cli.bundle.mjs ",
+     "cwd": "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/project"
+    }
+   }
+  },
+  "startup_timeout_held_lock": {
+   "started": "2026-09-23T04:21:50Z",
+   "lock_holder_pid": 3548782,
+   "first_call": {
+    "argv": [
+     "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/mcporter-0.14.0/node_modules/.bin/mcporter",
+     "--config",
+     "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/state/mcporter.json",
+     "call",
+     "context-mode.ctx_execute",
+     "--args",
+     "{\"language\": \"javascript\", \"code\": \"console.log('PPID=' + process.ppid)\"}",
+     "--output",
+     "json",
+     "--no-oauth"
+    ],
+    "cwd": "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/project",
+    "exit": 1,
+    "elapsed_ms": 45234,
+    "stdout": "{\n  \"server\": \"context-mode\",\n  \"tool\": \"ctx_execute\",\n  \"error\": \"MCPorter daemon did not become ready within 45 seconds. Run 'mcporter daemon start --foreground --log' to diagnose startup.\",\n  \"issue\": {\n    \"kind\": \"other\",\n    \"rawMessage\": \"MCPorter daemon did not become ready within 45 seconds. Run 'mcporter daemon start --foreground --log' to diagnose startup.\"\n  }\n}\n",
+    "stderr": "[mcporter] Daemon startup is taking longer than usual; Chrome relay discovery can take up to 30 seconds.\n",
+    "stdout_sha256": "ff38d5666093f108e1b5975a9975cab5ae86395ef42fc7a245f747a6085411d3",
+    "server_pid": null
+   },
+   "first_call_wall_s": 45.2,
+   "daemon_dir_after_first": [
+    "archived-before-lock-stage.user.json.stale-archived",
+    "archived-before-lock-stage.user.json.stale-archived-2",
+    "user.json.lock",
+    "user.key",
+    "user.json.lock"
+   ],
+   "owned_daemon_pids_after_first": [],
+   "next_call_after_holder_exit": {
+    "argv": [
+     "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/mcporter-0.14.0/node_modules/.bin/mcporter",
+     "--config",
+     "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/state/mcporter.json",
+     "call",
+     "context-mode.ctx_execute",
+     "--args",
+     "{\"language\": \"javascript\", \"code\": \"console.log('PPID=' + process.ppid)\"}",
+     "--output",
+     "json",
+     "--no-oauth"
+    ],
+    "cwd": "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/project",
+    "exit": 0,
+    "elapsed_ms": 638,
+    "stdout": "{\n  \"content\": [\n    {\n      \"type\": \"text\",\n      \"text\": \"```javascript\\nconsole.log('PPID=' + process.ppid)\\n```\\n\\nPPID=3559223\\n\"\n    }\n  ]\n}\n",
+    "stderr": "",
+    "stdout_sha256": "37cc9181a554e230aaa28e670111e3c652e84e985af8b962f8e0270bf88bb120",
+    "server_pid": 3559223,
+    "server": {
+     "pid": 3559223,
+     "alive": true,
+     "cmd": "$HOME/.local/share/codex-ecosystem/bin/node $HOME/.local/share/codex-ecosystem/tools/context-mode-1.0.169/node_modules/context-mode/cli.bundle.mjs ",
+     "cwd": "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/lc0140-20260923T041825Z/project"
+    }
+   },
+   "auto_recovered_after_holder_exit": true,
+   "manual_steps": []
+  }
+ },
+ "leftover_after_stop": [],
+ "owned_after_stop": {
+  "daemon_pids": [],
+  "fixture_processes": [],
+  "daemon_dir": [
+   "archived-before-lock-stage.user.json.stale-archived",
+   "archived-before-lock-stage.user.json.stale-archived-2",
+   "user.key"
+  ]
+ },
+ "shared_daemon_after": {
+  "metadata_mtime_ns": 1790132456915116162,
+  "metadata_pid": 2276114,
+  "socket_inode": 2215748,
+  "metadata_pid_alive": true
+ },
+ "shared_daemon_unchanged": true,
+ "ended_at": "2026-09-23T04:21:53Z"
+}

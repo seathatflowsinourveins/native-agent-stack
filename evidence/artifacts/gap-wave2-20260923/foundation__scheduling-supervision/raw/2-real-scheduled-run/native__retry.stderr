@@ -1,0 +1,4 @@
+time=2026-09-22T22:48:11.118-04:00 level=INFO msg="Dag-run retry initiated" dag=realmaint run-id=034TZZGmlL3sTFRU6oK7Mi step=finalize file=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g2-real-1790131602/dagu-home/logs/realmaint/dag-run_20260923_024800Z_034TZZGmlL3sTFRU6oK7Mi/dag-run_20260922.224800.031.034TZZGm.log
+time=2026-09-22T22:48:11.136-04:00 level=INFO msg="DAG run retry started" dag=realmaint run-id=034TZZGmlL3sTFRU6oK7Mi worker-id=local attempt-id=eb483c retry-target-attempt-id=ff82b1
+time=2026-09-22T22:48:11.137-04:00 level=INFO msg="Step started" dag=realmaint run-id=034TZZGmlL3sTFRU6oK7Mi worker-id=local attempt-id=eb483c step=finalize
+time=2026-09-22T22:48:16.886-04:00 level=INFO msg="DAG run finished" dag=realmaint run-id=034TZZGmlL3sTFRU6oK7Mi worker-id=local attempt-id=eb483c status=succeeded started-at=2026-09-22T22:48:11-04:00 finished-at=2026-09-22T22:48:16-04:00

@@ -1,0 +1,8 @@
+# 2026-09-23T02:52:16Z post-stop verification for temporary MLflow (15005)
+listeners on :15005: 0
+mlflow processes: 2 (self-match: this pgrep pattern also matched the invoking shell command line; see the recheck below)
+15005 TimeoutError timed out
+15999 TimeoutError timed out
+note: on this host a connect to any closed loopback port times out instead of being refused; 15999 is an unused control port showing the same behaviour
+# 2026-09-23T02:52:39Z recheck: ps -eo args filtered for python|mlflow executables running 'mlflow ... server' (excludes this shell): count=0
+# 2026-09-23T02:52:39Z temporary vLLM chat (18431) stopped with SIGTERM: listeners on :18431 = 0; GPU memory.used back to 5540 MiB

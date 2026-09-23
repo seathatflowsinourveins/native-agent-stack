@@ -1,0 +1,64 @@
+{
+  "source": "gap-wave-2 unit list (crosswalk at main 92bb279, PR #85), backtesting-engine entry, copied verbatim as data",
+  "layer_id": "backtesting-engine",
+  "catalog": "us-equities",
+  "base": "41d39b3",
+  "gaps": [
+    {
+      "index": 0,
+      "status": "open",
+      "text": "The SPY/LEAN parity gate has not passed. verdict.json is BLOCKED with 4 failed checks. mapping-manifest.json marks market_on_open_proxy and distributions_and_cash as unsupported in Nautilus 2.0.0rc5. The comparison statuses for one_stress, two_zero, two_stress, adaptive_stress and over_limit remain blocked on costs_and_rounding_stress and margin_and_adaptive_state.",
+      "next_check": "Resolve or explicitly model costs_and_rounding_stress and margin_and_adaptive_state in the spy-parity mapping, rerun the comparator on all blocked cases, and record the new verdict.json.",
+      "receipts": []
+    },
+    {
+      "index": 1,
+      "status": "open",
+      "text": "Nautilus's only unchanged upstream native run is on synthetic FX data. Its US-equity evidence is local integration only: the SPY replay (evidence class HIST) and the AAPL diagnostic. The AAPL diagnostic uses synthetic scheduled fills over 15 sessions and deliberately avoids corporate-action dates.",
+      "next_check": "Run an unchanged Nautilus equity backtest example on free Alpaca historical bars for a symbol and window containing a split or dividend, and record the fills and the corporate-action handling.",
+      "receipts": []
+    },
+    {
+      "index": 2,
+      "status": "open",
+      "text": "Nautilus 2.0.0rc5 is a prerelease (runtime-target.json line 29: prerelease true). The packet's upstream metadata lists v1.231.0 as the latest non-prerelease. That version comes from packet-generated metadata, not a retained receipt.",
+      "next_check": "Run `gh release list --repo nautechsystems/nautilus_trader --exclude-pre-releases --limit 3` and retain the output as a dated receipt.",
+      "receipts": []
+    },
+    {
+      "index": 4,
+      "status": "open",
+      "text": "The LEAN oracle's SPY simulations run on bundled upstream sample files, not an accepted vendor dataset. Its status is scoped to known stress exposure and margin mechanics only. The Alpaca brokerage model and adapter initialization were not exercised.",
+      "next_check": "Run the LEAN SPY oracle with SetBrokerageModel(BrokerageName.Alpaca), initialize the Alpaca adapter against paper endpoints, and record the results.",
+      "receipts": []
+    },
+    {
+      "index": 6,
+      "status": "open",
+      "text": "The spy-parity README says the acceptance set exercises only the --lean-data comparator mode. The independent review count (21 of 24 claims) is not retained in the repository.",
+      "next_check": "Run the spy-parity acceptance set in each comparator mode other than --lean-data and retain the result. Separately, commit or drop the unretained 21-of-24 review-count claim.",
+      "receipts": []
+    },
+    {
+      "index": 7,
+      "status": "open",
+      "text": "SPY one_zero parity remains BLOCKED: four failed checks concern entry/exit prices and ending cash. Native ending cash differs from LEAN by -655.12 USD, explained by fill-price differences and unposted distributions.",
+      "next_check": "Post the SPY distributions in the Nautilus replay, align the fill-price rule with LEAN, rerun one_zero parity, and report the ending-cash delta against the -655.12 USD baseline.",
+      "receipts": []
+    },
+    {
+      "index": 8,
+      "status": "open",
+      "text": "Nautilus equity evidence is a local integration over 15 retained AAPL bars with synthetic close fills, unlimited modeled depth, and known corporate-action dates excluded.",
+      "next_check": "Replay AAPL over a window that includes a dividend or split with Alpaca historical bars and quote-based fills, and record the fills and position/cash reconciliation.",
+      "receipts": []
+    },
+    {
+      "index": 9,
+      "status": "open",
+      "text": "Stressed costs, margin, adaptive state, realistic liquidity, and broader corporate-action semantics remain unqualified.",
+      "next_check": "Run the stress and adaptive/margin parity cases (one_stress, two_stress, adaptive_stress, over_limit) in LEAN and Nautilus and compare the margin and cost outcomes.",
+      "receipts": []
+    }
+  ]
+}

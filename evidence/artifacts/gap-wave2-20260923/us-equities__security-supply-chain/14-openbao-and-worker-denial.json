@@ -1,0 +1,106 @@
+{
+  "id": "gap-wave2-20260923/us-equities/security-supply-chain/14",
+  "gap_index": 14,
+  "gap_text": "Secret issuance, rotation, revocation, and denial of broker execution authority to research workers remain unestablished by these candidates' receipts.",
+  "gap_text_sha256": "c394dc2d13e891a945eab0b9451d1b1f366416d2796b38c4fc2feb3b3e657f12",
+  "next_check": "With a pinned OpenBao dev server, issue a scoped token for a test secret, rotate the secret, revoke the token and confirm that reads fail. Also run a research-worker environment check showing that it cannot obtain the broker credential.",
+  "preregistration": {
+    "written_at": "2026-09-23T08:13:16Z",
+    "expectation": "OpenBao dev lifecycle succeeds (issue scoped token, rotate, revoke, read fails after revoke); research-worker token under a research policy is denied the broker path; worker environment has no broker variables when launched as documented.",
+    "criteria": [
+      "settled if both arms run: OpenBao lifecycle incl. post-revoke read failure and research-policy denial, and research-worker env check with a positive control",
+      "advanced if the env check shows broker canaries can reach worker tool shells under some documented launch, or if an arm cannot run"
+    ]
+  },
+  "commands": [
+    "bash blueprints/gap-wave2-20260923/us-equities__security-supply-chain/openbao_install.sh   # curl the v2.6.2 linux/amd64 archive, checksums.txt and .sigstore.json bundles into the isolated cache",
+    "sha256sum -c against the GitHub asset digest and the publisher checksums.txt",
+    "cosign verify-blob --bundle checksums.txt.sigstore.json --certificate-identity https://github.com/openbao/openbao/.github/workflows/release.yml@refs/heads/release/2.6.x --certificate-oidc-issuer https://token.actions.githubusercontent.com checksums.txt (and the archive)",
+    "bash blueprints/gap-wave2-20260923/us-equities__security-supply-chain/openbao_lifecycle.sh   # bao server -dev -dev-listen-address=127.0.0.1:<ephemeral> -dev-root-token-id=<random> -dev-no-store-token, temp HOME",
+    "bao policy write broker-reader / research; bao kv put secret/broker/alpaca-paper (synthetic); bao token create -policy=broker-reader|research -ttl=15m",
+    "bao kv get (broker token, research token); bao kv put (rotation); bao kv destroy -versions=1; bao token revoke; bao kv get / token lookup after revoke",
+    "bash blueprints/gap-wave2-20260923/us-equities__security-supply-chain/worker_env_check.sh",
+    "A: equity-worker-sdk python: CodexClient(CodexConfig(codex_bin=<stub that records env names>, env={CODEX_HOME, CONTEXT_MODE_PROJECT_DIR, OTEL_RESOURCE_ATTRIBUTES})).start()  # exactly the env overlay native_worker.py passes",
+    "A1 launcher env + synthetic canaries for APCA_API_KEY_ID APCA_API_SECRET_KEY APCA_API_BASE_URL ALPACA_API_KEY ALPACA_SECRET_KEY TWS_USERNAME TWS_PASSWORD TWS_ACCOUNT IBKR_ACCOUNT_ID; A2 env -i PATH=/usr/bin:/bin HOME=<temp>",
+    "B: CODEX_HOME=<temp empty> codex sandbox -- /bin/sh -c '<list broker var names; count /proc/*/environ containing the canary>'  (default shell_environment_policy); control: same probe unsandboxed",
+    "B2: codex sandbox -c shell_environment_policy.inherit=none -- ...; B3: codex sandbox -c shell_environment_policy.ignore_default_excludes=false -- ..."
+  ],
+  "results": [
+    "github asset digest exit=0; publisher checksum list exit=0; cosign verify-blob checksums.txt exit=0 'Verified OK'; archive exit=0 'Verified OK'; NEGATIVE tampered archive exit=1; NEGATIVE wrong identity (tag ref) exit=1",
+    "first identity attempt (tag-ref regexp) exit=1: SAN was .../release.yml@refs/heads/release/2.6.x (retained log)",
+    "OpenBao v2.6.2 (dd9c19c37a878cf4a81b18efb8d6f0599c7da923); bao sha256 8d180523...3b00",
+    "policy-broker-reader exit=0; policy-research exit=0; kv-put-v1 exit=0; token-create-broker exit=0; token-create-research exit=0",
+    "broker-token-read-v1 exit=0 (read value matches v1: yes)",
+    "research-token-read-broker-DENIED exit=2 err=[Code: 403]; research-token-read-own-path exit=0; broker-token-write-DENIED exit=2 err=[Code: 403]",
+    "kv-rotate-v2 exit=0; broker-token-read-after-rotation exit=0 (matches v2: yes; differs from v1: yes); kv-destroy-v1 exit=0; read-destroyed-v1 exit=2; metadata current_version 2 {'1': True, '2': False} (destroyed flags)",
+    "token-revoke-broker exit=0; broker-token-read-after-revoke-DENIED exit=2 err=[Code: 403]; broker-token-lookup-after-revoke-DENIED exit=2 err=[Code: 403]; research-token-still-valid exit=0; token-revoke-research exit=0",
+    "server stopped; listeners_left_on_port=0; unexpected_steps=0 (the driver's final `grep -c UNEXPECTED` returned 1 because the count was 0)",
+    "A:launcher-with-broker-env exit=0 broker_vars_in_codex_child=[ALPACA_ACCOUNT_PROFILE,ALPACA_API_KEY,ALPACA_PAPER,ALPACA_PAPER_ENDPOINT,ALPACA_SECRET_KEY,APCA_API_BASE_URL,APCA_API_KEY_ID,APCA_API_SECRET_KEY,IBKR_ACCOUNT_ID,TWS_ACCOUNT,TWS_PASSWORD,TWS_USERNAME]",
+    "A:dedicated-research-env exit=0 broker_vars_in_codex_child=[]",
+    "B:codex-sandbox-default-policy exit=0 broker_vars_in_shell=[<same 12 names>] procs_with_canary_in_environ=2",
+    "B:control-unsandboxed broker_vars_in_shell=[<same 12 names>] procs_with_canary_in_environ=1",
+    "B2:codex-sandbox-inherit-none exit=0 broker_vars_in_shell=[] procs_with_canary_in_environ=0",
+    "B3:codex-sandbox-default-excludes-on exit=0 broker_vars_in_shell=[ALPACA_ACCOUNT_PROFILE,ALPACA_PAPER,ALPACA_PAPER_ENDPOINT,APCA_API_BASE_URL,IBKR_ACCOUNT_ID,TWS_ACCOUNT,TWS_PASSWORD,TWS_USERNAME] procs_with_canary_in_environ=2",
+    "ambient_launcher_broker_var_names=[ALPACA_ACCOUNT_PROFILE,ALPACA_API_KEY,ALPACA_PAPER,ALPACA_PAPER_ENDPOINT,ALPACA_SECRET_KEY,APCA_API_BASE_URL,APCA_API_KEY_ID,APCA_API_SECRET_KEY] (names only; values were not read and may be empty)",
+    "codex-cli 0.155.1"
+  ],
+  "outcome": "advanced",
+  "evidence_class": "local_integration",
+  "limits": [
+    "Detection method: per-run random canary values placed in the launcher environment; a variable is reported present when its NAME reaches the child, and /proc/*/environ is searched for the canary VALUE. A1 and the unsandboxed control show the probe detects presence.",
+    "The SDK child was a stub standing in for the codex binary (no model call, no account access); `codex sandbox` exercises the Linux sandbox and shell_environment_policy directly, not a full model-driven turn.",
+    "The Alpaca paper-order attempt arm needs broker contact; it is deferred to peer session sota-workflow-resolution (owner of broker/paper lanes and gate rows).",
+    "Ambient broker variable names were observed in this host's launcher environment; their values were not read, so whether they hold live credentials is unknown.",
+    "native_worker.py was not changed; enforcing a scrubbed environment (env -i launch or shell_environment_policy.inherit=none plus an SDK-side environment allowlist) is a follow-up for the worker owner.",
+    "OpenBao limits as in gap 6."
+  ],
+  "checked_at": "2026-09-23T17:01:14Z",
+  "outcome_note": "Issuance, rotation, revocation, post-revoke read failure and research-policy denial (403) were shown on OpenBao. The worker environment check shows the SDK overlays its env onto the parent environment and nothing enforces the documented launch (blueprints/us-equities/workers/README.md: launch from a dedicated research environment with no broker secrets): the documented launch (A2) gave the codex child zero broker variables, but an undocumented launch from this host's launcher (A1) forwarded every broker variable to the codex child and, under Codex's default shell policy, into sandboxed tool shells; only env -i or shell_environment_policy.inherit=none removed them. Remains: denial of broker authority to research workers is not established by default, and the paper-order arm is deferred to sota-workflow-resolution.",
+  "raw_outputs": [
+    {
+      "path": "raw/openbao/install.log",
+      "sha256": "05232abdb2904b5179292c1f4559b17060bab329655fb218004f4826c5fc55ca"
+    },
+    {
+      "path": "raw/openbao/install.attempt1-wrong-identity-regexp.log",
+      "sha256": "19de32e8811a07a925a0255879b41e90b06a472c131beb5ad54e9ffe9bf6eb19"
+    },
+    {
+      "path": "raw/openbao/lifecycle.log",
+      "sha256": "a9e1321a0c3bdab9cb1253bab63c74b88899a7f74c13618a9f85f53d13902221"
+    },
+    {
+      "path": "raw/worker-env/results.log",
+      "sha256": "c829b1e82ef0b7c5819943380d3be82c46cf1d528231ae4fdc579c0a4318f576"
+    }
+  ],
+  "helper_scripts": [
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/classify_findings.py",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/collect_raw.py",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/gitleaks_fix_round.sh",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/gitleaks_scans.sh",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/grype_sdk.sh",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/inventory_diff.py",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/openbao_install.sh",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/openbao_lifecycle.sh",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/prereg.py",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/prereg_fix_round.py",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/scanner_comparison.sh",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/syft_binary_coverage.sh",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/verify_signatures.sh",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/worker_env_check.sh",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/write_receipts.py"
+  ],
+  "timeline": {
+    "preregistration_written_at": "2026-09-23T08:13:16Z",
+    "first_pass": "2026-09-23T08:13:24Z..08:27:10Z (same unit, earlier session)",
+    "this_pass": "2026-09-23T16:26Z..2026-09-23T17:01:14Z",
+    "post_preregistration_additions": "all-refs gitleaks scan, oversized-file dir scan, SDK interpreter and IB Gateway scans, B2/B3 sandbox policy arms, and the attestation-lookup positive control were added after preregistration as stronger checks of the same claims",
+    "fix_round": "after the independent Opus review: fix_round_preregistration written 2026-09-23T16:56:53Z (commit d67f77a) before the oversized-blob, merge first-parent and control scans (16:58Z..17:00Z) and the osv/inventory re-analysis"
+  },
+  "deferred_arm": {
+    "arm": "Alpaca paper order attempt from the research worker must fail",
+    "owner": "sota-workflow-resolution",
+    "blocker": "broker contact / paper-account calls belong to the peer session's lanes"
+  }
+}

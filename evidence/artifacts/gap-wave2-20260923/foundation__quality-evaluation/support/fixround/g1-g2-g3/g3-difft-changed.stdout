@@ -1,0 +1,5 @@
+file.sh --- Bash
+1 #!/bin/bash                1 #!/bin/bash
+2 echo "hello"               2 echo "hello"
+3 echo "world"               3 echo "there"
+

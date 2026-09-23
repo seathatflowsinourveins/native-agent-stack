@@ -1,0 +1,20 @@
+{
+  "chosen": "momentum60",
+  "evaluation_cutoff": "2016-10-11",
+  "id": "development-4",
+  "latest_training_exit": "2016-10-10",
+  "plan_sha256": "b8d1beba6eddd0388957ca0d9e9c46ebfb2ca538f076419d5a8dcaaaf82be4a7",
+  "scores": {
+    "cash": "0.000",
+    "momentum120": "-0.0003932977402935774943993860667",
+    "momentum20": "-0.001725989475774619586801205322",
+    "momentum60": "0.0006410786719478264446319042373"
+  },
+  "test_first": "2016-10-11",
+  "test_last": "2017-01-10",
+  "test_sessions": 63,
+  "train_first": "2015-10-02",
+  "train_last": "2016-09-30",
+  "train_sessions": 252,
+  "training_episode_count": 51
+}

@@ -103,7 +103,12 @@ class NativeStreamSummaryTests(unittest.TestCase):
         for path in ['/tmp/fixture*','/tmp/fixture?','/tmp/fixture(x)','/tmp/fixture;pwd']:
             with self.subTest(path=path),self.assertRaisesRegex(ValueError,'literal_owned_path'):
                 self.module.exact_read_rule(path)
-        self.assertEqual(self.module.exact_read_rule('/tmp/owned/fixture'),'Bash(rtk ls -la /tmp/owned/fixture)')
+        # exact_read_rule canonicalises its input (Path.resolve()) before embedding
+        # it in the rule, so a system-level symlink ancestor of /tmp (macOS's
+        # /tmp -> /private/tmp) legitimately changes the expected string; compute
+        # it the same way rather than hardcoding the Linux-only literal form.
+        canonical = str(Path('/tmp/owned/fixture').resolve())
+        self.assertEqual(self.module.exact_read_rule('/tmp/owned/fixture'), 'Bash(rtk ls -la ' + canonical + ')')
 
 
 class InheritedNativeProtocolTests(unittest.TestCase):

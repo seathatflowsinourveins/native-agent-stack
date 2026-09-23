@@ -1,0 +1,19 @@
+{
+  "gap_index": 0,
+  "slug": "promptfoo-inspect-two-arm",
+  "gap_text_sha256": "5a655b079b32df47121484b0da94fdb99843be24a7927e4d8621c961cd694159",
+  "next_check": "Run `node --test test-contract.cjs` in blueprints/native-skill-practice/. Author and freeze an inspect-ai 0.3.266 mock-model task using the same scorer, then run both arms on catalog-cases.json with bounded concurrency and retries, including an interrupt-and-resume. Compare scorer reproducibility, failure-log fidelity and resume success.",
+  "preregistration": {
+    "written_at": "2026-09-23T07:18:31Z",
+    "expectation": "Contract check passes (6 node tests). Both arms score the frozen 8 cases (catalog-cases.json sha256 7cc28c50...) with zero provider calls and produce identical per-case verdict/eligible/disposition vectors, because arm 2 applies the same containment transform and invokes the same gate.cjs plus the same three assertions. The exact-text baseline is expected to match 3/8 frozen verdict labels (as recorded in blueprints/native-skill-practice/README.md), so promptfoo is expected to exit 100 (assertion failures) rather than 0. Two clean repeats of each arm are expected to be identical. Both harnesses are expected to resume an interrupted run to 8 complete results.",
+    "criteria": [
+      "node --test test-contract.cjs exits 0 with 6 passing tests before any arm runs.",
+      "Frozen case file sha256 equals 7cc28c50afb9842de3d8dc923e80159bf99d0f0e9acd643684a99b61b3ad3a40 before and after the runs.",
+      "Zero provider calls: both arms run inside an unshare -rn network namespace (only an unconfigured loopback), TYPESAFE_API_KEY absent; promptfoo filtered to provider label exact-text-baseline-v1. Detection: any HTTP provider attempt in the namespace would fail and surface as an ERROR result or sample error, and promptfoo results would list a second provider; both are checked.",
+      "Bounded concurrency: promptfoo --max-concurrency 1; inspect --max-samples 1 --max-connections 1. Bounded retries: promptfoo HTTP maxRetries 0 is unchanged (echo provider makes no retry); inspect --retry-on-error 1. A fault-injection diagnostic (separately labelled, derived config/task) raises one transient error in case C3 on its first attempt in each arm and checks that the error text is retained and the bounded retry path recovers it (promptfoo via eval --retry-errors, inspect via retry-on-error).",
+      "Failure-log fidelity: for each arm, the retained output must identify each failed case, which assertion failed and the observed verdict, and must retain the injected error text. Scored per arm as the count of the 8 cases whose failure detail is recoverable from the retained log alone.",
+      "Interrupt and resume: each arm run with a per-case delay and concurrency 1, SIGINT after at least 2 but fewer than 8 cases complete, then resumed with the native command (promptfoo eval --resume; inspect eval-retry). Success = final result has exactly 8 cases, no duplicates, outcome vector equal to the uninterrupted run, and the pre-interrupt completed cases were not re-executed (checked by result ids/timestamps).",
+      "Settled only if every arm above executes; any arm not executed makes the outcome advanced."
+    ]
+  }
+}

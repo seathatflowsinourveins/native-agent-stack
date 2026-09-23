@@ -1,0 +1,7 @@
+{
+  "file": "ServerNotification.json",
+  "generated_by": "codex app-server generate-json-schema --experimental (codex-cli 0.155.1)",
+  "sha256": "49a787f49a8ba46034fbea8664f4cbfe10211abd57e34b8281430a7dc033b42b",
+  "bytes": 204389,
+  "schema_files": 437
+}

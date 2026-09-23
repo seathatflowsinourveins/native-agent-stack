@@ -1,0 +1,41 @@
+{
+  "id": "13-stale-pin-covered-elsewhere",
+  "gap_index": 13,
+  "gap_text_sha256": "05e4319195df348c911db3feeadaa8cc1e141a51d88ce3e377d002ce8b57afe1",
+  "preregistration": {
+    "written_at": "2026-09-23T01:16:49Z",
+    "late": true,
+    "late_reason": "First written by gen_receipts.py at 01:16:49Z after the first-pass find had run; late labels added by the fix round at about 01:31:46Z.",
+    "expectation": "Same routing as gap 5: this is a stale-pin-upgrade qualification gap (installed 2.3.2 vs reviewed 5157c6b/v2.4.0), explicitly assigned to the sota-refresh-20260923 units.",
+    "criteria": "covered_elsewhere per the assignment's explicit routing for this gap class.",
+    "timestamp_note": "Timestamps reconciled on 2026-09-23T02:30:41Z from the unit workers' session transcripts (tool-call times, listed in raw/INDEX.json). The earlier value 2026-09-23T01:20:00Z was shared by every receipt, fell after the first-pass commit (01:19:05Z) and matched no recorded event."
+  },
+  "commands": [
+    {
+      "cmd": "rm -rf $HOME/.cache/gap-wave2-20260923/durable-memory/ttl-probe; find evidence/artifacts -maxdepth 1 -iname 'sota-refresh*'; cd $HOME/code/nas-wt-g2-durable-memory && find evidence/artifacts -maxdepth 1 -iname 'sota-refresh*'; echo done",
+      "exit": 0,
+      "raw": "evidence/artifacts/gap-wave2-20260923/foundation__durable-memory/raw/fix-round-gap5-13-find.txt",
+      "output_excerpt": "done",
+      "note": "Empty find result: the directory is absent from this branch (base 41d39b3). Corrected on reconciliation: the previous entry recorded a home-wide `find /home/example -maxdepth 6` whose output is not on disk.",
+      "raw_published": false,
+      "raw_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    }
+  ],
+  "results": "Routed per the assignment's hard rule to the sota-refresh-20260923 units. The cited directory is absent from this branch (base 41d39b3), but it is not absent from the host: on reconciliation (a file-existence read, no check re-run) it exists on origin/main 5dcf451, including evidence/artifacts/sota-refresh-20260923/pins-mem/ai-memory.json (2.3.2 -> 2.4.0, verdict 'not_comparable'). Whether that receipt closes this gap is for the sota-refresh owner to decide; this worker installed nothing.",
+  "outcome": "covered_elsewhere",
+  "evidence_class": "source_review",
+  "limits": [
+    "The earlier claim that the sota-refresh directory 'does not exist on this host' was wrong; it is absent only from this branch.",
+    "This receipt does not judge whether the sota-refresh ai-memory receipt closes the gap."
+  ],
+  "checked_at": "2026-09-23T01:23:40Z",
+  "checked_at_note": "Time of the recorded find (fix-round transcript Bash call [15]). The first-pass find (call [7]) output was RTK-filtered and its recall hash does not resolve to it, so it is not used.",
+  "reconciliation": {
+    "reconciled_at": "2026-09-23T02:30:41Z",
+    "new_checks_run": false,
+    "changes": [
+      "Corrected the absence claim and the recorded command; raw find output committed.",
+      "Real timestamps."
+    ]
+  }
+}

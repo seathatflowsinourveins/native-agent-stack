@@ -1,0 +1,26 @@
+{
+  "id": "7-sealed-oracle-deferred",
+  "gap_index": 7,
+  "gap_text_sha256": "68abc18d030bbd64675415c6d027d68f5d517d8eb3cd9e4824de0863b1ea3267",
+  "preregistration": {
+    "written_at": "2026-09-23T00:47:23Z",
+    "expectation": "Building a sealed, worker-unreadable oracle packet and rerunning the owned-native-child task scored by it would remove the author-visibility confound.",
+    "criteria": "Settled if the rerun is scored by a demonstrably sealed oracle the worker could not read; not_settled if sealing cannot be verified.",
+    "timing": "post_hoc: written 2026-09-23T00:47:23Z by the first-round receipt generator, which hard-coded 00:55:00Z (later than the write and the first commit 1a4448c at 00:50:10Z, so not a real time). No check ran, so no result preceded it. Timing label first added in the fix round at 01:03:20Z and corrected in the reconciliation pass."
+  },
+  "commands": [
+    {
+      "cmd": "(not run — see limits)",
+      "exit": null,
+      "duration_s": 0,
+      "output_excerpt": "n/a",
+      "output_sha256": null
+    }
+  ],
+  "results": "Not run. Deferred. Real blocker: rerunning the owned-native-child task means a Claude coordinator dispatching a native worktree-isolated Claude child, and a blind-judge oracle adds an Opus judge. That is a Claude multi-agent run, which the unit rules defer while the shared Claude account is reserved. A deterministic sealed oracle script would avoid the judge dispatch but not the native child. The 20-minute time-box cited earlier is a stop rule for checks that run, not a deferral reason. A Codex substitute would not test the native Claude child's oracle.",
+  "outcome": "deferred",
+  "evidence_class": "source_review",
+  "limits": "Deferred. Owner: a unit with budget for a multi-stage blind-judge exercise (worker + sealed packet + separate judge dispatch), which exceeds this run's per-gap time-box and Claude-account allowance.",
+  "checked_at": "2026-09-23T00:47:23Z",
+  "reconciliation": "reconciliation 2026-09-23T02:21:44Z (no new checks; claims aligned to the transcripts and files on disk, see README 'Reconciliation'): fictitious 00:55:00Z timestamps replaced by the real write time; stated blocker corrected to the account-reservation rule."
+}

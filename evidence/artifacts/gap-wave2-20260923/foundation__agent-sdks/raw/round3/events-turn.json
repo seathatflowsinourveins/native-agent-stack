@@ -1,0 +1,152 @@
+{
+  "started_at": "2026-09-23T12:59:59Z",
+  "global_drain_end": "TransportClosedError",
+  "turn_status": "completed",
+  "turn_error": null,
+  "method_counts": {
+    "account/rateLimits/updated": 4,
+    "item/agentMessage/delta": 108,
+    "item/completed": 9,
+    "item/started": 9,
+    "mcpServer/startupStatus/updated": 2,
+    "remoteControl/status/changed": 1,
+    "thread/settings/updated": 1,
+    "thread/started": 1,
+    "thread/status/changed": 2,
+    "thread/tokenUsage/updated": 4,
+    "turn/completed": 1,
+    "turn/diff/updated": 4,
+    "turn/started": 1
+  },
+  "sources": {
+    "account/rateLimits/updated": [
+      "global"
+    ],
+    "item/agentMessage/delta": [
+      "turn"
+    ],
+    "item/completed": [
+      "turn"
+    ],
+    "item/started": [
+      "turn"
+    ],
+    "mcpServer/startupStatus/updated": [
+      "global"
+    ],
+    "remoteControl/status/changed": [
+      "global"
+    ],
+    "thread/settings/updated": [
+      "global"
+    ],
+    "thread/started": [
+      "global"
+    ],
+    "thread/status/changed": [
+      "global"
+    ],
+    "thread/tokenUsage/updated": [
+      "turn"
+    ],
+    "turn/completed": [
+      "turn"
+    ],
+    "turn/diff/updated": [
+      "turn"
+    ],
+    "turn/started": [
+      "turn"
+    ]
+  },
+  "untyped_methods": [],
+  "documented_types": 82,
+  "received_documented": [
+    "account/rateLimits/updated",
+    "item/agentMessage/delta",
+    "item/completed",
+    "item/started",
+    "mcpServer/startupStatus/updated",
+    "remoteControl/status/changed",
+    "thread/settings/updated",
+    "thread/started",
+    "thread/status/changed",
+    "thread/tokenUsage/updated",
+    "turn/completed",
+    "turn/diff/updated",
+    "turn/started"
+  ],
+  "received_undocumented": [],
+  "server_requests": [
+    "item/tool/call"
+  ],
+  "completed_items": [
+    {
+      "type": "userMessage",
+      "status": null,
+      "text": null,
+      "tool": null,
+      "exitCode": null
+    },
+    {
+      "type": "agentMessage",
+      "status": null,
+      "text": "I don\u2019t have a plan tool available, so I\u2019ll track the three steps here: run the command, create `notes.txt`, then look up `alpha`.\n",
+      "tool": null,
+      "exitCode": null
+    },
+    {
+      "type": "commandExecution",
+      "status": "completed",
+      "text": null,
+      "tool": null,
+      "exitCode": 0
+    },
+    {
+      "type": "reasoning",
+      "status": null,
+      "text": null,
+      "tool": null,
+      "exitCode": null
+    },
+    {
+      "type": "agentMessage",
+      "status": null,
+      "text": "1. Run command \u2014 complete.\n2. Create `notes.txt` \u2014 in progress.\n3. Look up `alpha` \u2014 pending.\n",
+      "tool": null,
+      "exitCode": null
+    },
+    {
+      "type": "fileChange",
+      "status": "completed",
+      "text": null,
+      "tool": null,
+      "exitCode": null
+    },
+    {
+      "type": "agentMessage",
+      "status": null,
+      "text": "1. Run command \u2014 complete.\n2. Create `notes.txt` \u2014 complete.\n3. Look up `alpha` \u2014 in progress.\n",
+      "tool": null,
+      "exitCode": null
+    },
+    {
+      "type": "dynamicToolCall",
+      "status": "completed",
+      "text": null,
+      "tool": "vault_lookup",
+      "exitCode": null
+    },
+    {
+      "type": "agentMessage",
+      "status": null,
+      "text": "All three steps complete. Returned value: `ve-64c0572d99ac`",
+      "tool": null,
+      "exitCode": null
+    }
+  ],
+  "final_answer_has_tool_value": true,
+  "finished_at": "2026-09-23T13:00:26Z",
+  "received_documented_count": 13,
+  "notes_txt_created": true
+}

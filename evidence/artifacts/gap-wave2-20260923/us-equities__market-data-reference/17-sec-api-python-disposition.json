@@ -1,0 +1,96 @@
+{
+ "id": "gap-wave2-20260923/us-equities__market-data-reference/17-sec-api-python-disposition",
+ "gap_index": 17,
+ "layer_id": "market-data-reference",
+ "catalog": "us-equities",
+ "gap_text": "unindexed alternative sec-api-io/sec-api-python https://github.com/SEC-API-io/sec-api-python",
+ "gap_text_sha256": "d8caee8808e5ed06c50169127f368f8c96d1ce580cad20908d53a0ba4cb84a35",
+ "next_check": "Run `gh api repos/SEC-API-io/sec-api-python` plus a latest-release and license lookup, review the README against the SEC acquisition requirement, and record a catalog disposition.",
+ "preregistration": {
+  "written_at": "2026-09-23T04:22:33Z",
+  "expectation": "SEC-API-io/sec-api-python is an MIT-licensed thin client for the commercial sec-api.io paid API; disposition: reject/keep-out for the SEC acquisition requirement because EdgarTools/direct EDGAR are free primary sources and sec-api requires a paid key.",
+  "criteria": "settled if repo metadata, latest release/tag, license and README are retrieved and a disposition with reasons is recorded; otherwise advanced.",
+  "source": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/preregistration.json",
+  "committed_in": "c6846f1"
+ },
+ "fix_round_preregistration": null,
+ "fix_round2_preregistration": null,
+ "fix_round3_preregistration": null,
+ "eol_fix_preregistration": null,
+ "independent_review_round3": null,
+ "independent_review_round2": {
+  "reviewer": "independent Opus review of fe8b66e (findings relayed by the coordinator)",
+  "findings_for_this_gap": "minor: catalog-write standard inconsistent with gap 1 - outcome changed settled -> advanced (ledger write not executed by this unit)"
+ },
+ "independent_review": {
+  "reviewer": "codex exec --sandbox read-only --ephemeral (codex-cli 0.155.1); invocation 1 stalled reading stdin and was stopped without output, invocation 2 (stdin from /dev/null) completed, 62,448 tokens",
+  "output": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/review-codex-round1.txt",
+  "findings_for_this_gap": "none (helpers for this gap were not in the review scope)"
+ },
+ "commands": [
+  "bash blueprints/gap-wave2-20260923/us-equities__market-data-reference/repo_review.sh SEC-API-io/sec-api-python evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/17-gh",
+  "curl -sS https://pypi.org/pypi/sec-api/json"
+ ],
+ "results": [
+  "repo: MIT license, 320 stars, 41 forks, 1 open issue, created 2021-06-12, pushed 2026-04-13, not archived, homepage https://sec-api.io; single contributor janlukasschroeder (45 commits)",
+  "latest release v1.0.36 published 2026-04-13; PyPI sec-api 1.0.36 uploaded 2026-04-13",
+  "README: 'Get your free API key on sec-api.io ... replace YOUR_API_KEY'; client for the sec-api.io hosted API (20M+ filings, 'survivorship-bias free' entities, datasets download); package is a thin HTTP client (sec_api/index.py) with no local EDGAR parsing",
+  "Disposition: not adopted for the SEC acquisition requirement. It requires a third-party sec-api.io account/API key (hosted, metered service beyond a free tier) and returns derived data whose own terms would govern reuse, whereas the requirement is met by free primary EDGAR access (EdgarTools / direct EDGAR, public information per SEC). Keep as a catalogued paid alternative (keep-but-compare) for bulk historical filings if direct EDGAR access stays rate-blocked; overturn: a measured comparison where direct EDGAR cannot supply a required filing set within fair-access limits and sec-api terms permit the intended storage."
+ ],
+ "detection_method": "gh api exit codes retained per endpoint; 404s would be recorded as errors (none for this repository).",
+ "outcome": "advanced",
+ "evidence_class": "source_review",
+ "limits": [
+  "sec-api.io pricing/terms pages not fetched; the paid-service characterization rests on the README's API-key requirement and the hosted-API design.",
+  "Outcome advanced, not settled (fix round 2, same standard as gap 1): the next_check's 'record a catalog disposition' arm is not executed. The disposition is drafted in this receipt only; this unit may not edit catalogs/landscape/*.json, so the alternative stays unindexed until the coordinator writes the disposition to the ledger."
+ ],
+ "raw_artifacts": [
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/17-gh-repo.json",
+   "sha256": "b6938e2592d3fd71b38c4ca73b91ea42bd77ed12d0846b239fc250dc7254176c"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/17-gh-release-latest.json",
+   "sha256": "700d0b96e02903b8f114064c6183d0bae7759510bb27f5220e48ddd24286af19"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/17-gh-releases.json",
+   "sha256": "78e2e1571de0daa9a23e8aeca0eeef6055373ae648d3cdd806c2eed376c513b9"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/17-gh-tags.json",
+   "sha256": "20c5cab88adf537f1089982b93d1fbbc66981dc70a9d689db4fd3c7235c8e5aa"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/17-gh-license.json",
+   "sha256": "9db821de61f36454e86041928f19dee28f278c4577ef967a2495b0463376bf93"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/17-gh-commits.json",
+   "sha256": "6daad5257dbc4823bdbab41d290733b1d4683391d636087c595a69d546976e48"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/17-gh-readme.json",
+   "sha256": "d1c1316a06b3974460604da579e99b4b9b7b26af5897e21e9d6d8e3ce517e8d3"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/17-gh-tree.json",
+   "sha256": "4e8710271e70726d8d278e85a580c6e0ef1a54c357d5eb542df2e35f26a8bfd1"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/17-gh-contributors.json",
+   "sha256": "8394d37db3e9ffbd0bca0293a17473ddbd475abab67bd49f3262b06b8d7344d6"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/17-pypi-sec-api.json",
+   "sha256": "b689894797f7fc07e85ace29d99ed152d968b5547f665c6e741e6d15b615262a"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/REDACTIONS.json",
+   "sha256": "7d08a65951826ef4a8d0bd6fd9a21aa747305527b3e2b1daa42173cffe090c69"
+  }
+ ],
+ "checked_at": "2026-09-23T04:31:58Z",
+ "checked_at_source": "UTC mtime of the latest raw output the receipt cites (sed path-redaction can postdate the run by seconds)",
+ "host_paths": "host paths are written as $HOME; private Alpaca payloads stay outside the repository"
+}

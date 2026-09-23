@@ -1,0 +1,20 @@
+{
+  "chosen": "momentum20",
+  "evaluation_cutoff": "2012-10-01",
+  "id": "reserved-extended",
+  "latest_training_exit": "2012-09-25",
+  "plan_sha256": "a2f698706bb8809f91facf48fc8028c3a374ff4fb9db9edb7b48c5a0d662e38d",
+  "scores": {
+    "cash": "0.000",
+    "momentum120": "-0.000437648807744881051197986178",
+    "momentum20": "0.000819723120623386559660643222",
+    "momentum60": "0.000291675214467413345693376942"
+  },
+  "test_first": "2012-10-01",
+  "test_last": "2013-09-30",
+  "test_sessions": 250,
+  "train_first": "2011-09-22",
+  "train_last": "2012-09-20",
+  "train_sessions": 252,
+  "training_episode_count": 50
+}

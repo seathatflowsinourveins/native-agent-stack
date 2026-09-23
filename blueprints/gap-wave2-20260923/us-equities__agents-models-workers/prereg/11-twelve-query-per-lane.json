@@ -1,0 +1,13 @@
+{
+ "gap_index": 11,
+ "slug": "twelve-query-per-lane",
+ "written_at": "2026-09-23T07:23:05Z",
+ "written_before_results": true,
+ "expectation": "SocratiCode (dense+hybrid) will recover more of the twelve intended sources in the top 3 than QMD BM25 (8/12), especially the two vocabulary-mismatch queries; ai-memory search over the same 18 documents written as isolated pages (embedding provider none, i.e. FTS) will behave like a lexical lane (around QMD's level).",
+ "criteria": [
+  "Same twelve frozen queries (fixture.json, unchanged), same 18 eligible documents restored byte-identically from bfd03bc (hash-verified).",
+  "SocratiCode: disposable Qdrant, limit 10, minScore 0; results deduplicated to documents in rank order.",
+  "ai-memory 2.3.2: isolated server with temp --data-dir, AI_MEMORY_SERVER_URL set to it; each document written as a page at its relative path; `search --json` limit 10.",
+  "Report exact-source recall@1/@3/@5 and MRR per lane beside the recorded QMD numbers."
+ ]
+}

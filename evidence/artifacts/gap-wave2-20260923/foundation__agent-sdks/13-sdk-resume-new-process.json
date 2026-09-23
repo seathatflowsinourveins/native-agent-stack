@@ -1,0 +1,139 @@
+{
+  "id": "gap-wave2-20260923/foundation/agent-sdks/13-sdk-resume-new-process",
+  "gap_index": 13,
+  "gap_text_sha256": "54edc56a7cb62fed73a30c5892aec3ea35a794b22145cf36f82467f4da5bca2e",
+  "preregistration": {
+    "written_at": "2026-09-23T03:24:52Z",
+    "expectation": "Codex SDK resume by thread ID in a new process recalls turn-1 context; the Claude Agent SDK resume arm needs two Claude calls and is deferred.",
+    "criteria": [
+      "Codex as in gap 3 turn 2",
+      "Claude resume option in a new process",
+      "settled only if both; advanced if Codex only"
+    ],
+    "fix_round_2": {
+      "written_at": "2026-09-23T04:38:21Z",
+      "label": "fix-round-2 preregistration, written after the independent Opus review and before the two new worker turns; not back-dated",
+      "note": "the new worker-tool-t1/t2 receipts replace worker-persist-t1/worker-resume-t2 (produced by an uncommitted intermediate revision of native_worker.py whose native_runtime was a string) as the native_worker resume evidence; outcome stays advanced (Claude arm)"
+    }
+  },
+  "commands": [
+    "env -i HOME=$HOME PATH=$HOME/.local/share/codex-ecosystem/bin:/usr/bin:/bin timeout 300 $HOME/.cache/gap-wave2-20260923/agent-sdks/codex-sdk-01551/bin/python blueprints/gap-wave2-20260923/foundation__agent-sdks/codex_probe.py tool-turn --codex-bin $HOME/.local/share/codex-ecosystem/bin/codex --codex-home $HOME/.codex --workspace $HOME/.cache/gap-wave2-20260923/agent-sdks/ws-probe --out $HOME/.cache/gap-wave2-20260923/agent-sdks/runs/tool-turn.json --state $HOME/.cache/gap-wave2-20260923/agent-sdks/runs/tool-state.json --deadline 180",
+    "env -i HOME=$HOME PATH=$HOME/.local/share/codex-ecosystem/bin:/usr/bin:/bin timeout 300 $HOME/.cache/gap-wave2-20260923/agent-sdks/codex-sdk-01551/bin/python blueprints/gap-wave2-20260923/foundation__agent-sdks/codex_probe.py resume-turn --codex-bin $HOME/.local/share/codex-ecosystem/bin/codex --codex-home $HOME/.codex --workspace $HOME/.cache/gap-wave2-20260923/agent-sdks/ws-probe --out $HOME/.cache/gap-wave2-20260923/agent-sdks/runs/resume-turn.json --state $HOME/.cache/gap-wave2-20260923/agent-sdks/runs/tool-state.json --deadline 180",
+    "python3 blueprints/gap-wave2-20260923/foundation__agent-sdks/run_worker_tool.py $HOME/.cache/gap-wave2-20260923/agent-sdks $HOME/.cache/gap-wave2-20260923/agent-sdks/runs",
+    "(inside run_worker_tool.py) env -i HOME=$HOME PATH=$HOME/.local/share/codex-ecosystem/bin:/usr/bin:/bin timeout --signal=TERM --kill-after=10s 300s $HOME/.cache/gap-wave2-20260923/agent-sdks/codex-sdk-01551/bin/python blueprints/us-equities/workers/native_worker.py run --codex-bin $HOME/.local/share/codex-ecosystem/bin/codex --codex-home $HOME/.codex --workspace $HOME/.cache/gap-wave2-20260923/agent-sdks/ws-probe --prompt $HOME/.cache/gap-wave2-20260923/agent-sdks/runs/worker-tool-t1.prompt --receipt $HOME/.cache/gap-wave2-20260923/agent-sdks/runs/worker-tool-t1.json --turn-deadline-seconds 180 --persistent --lookup-tool $HOME/.cache/gap-wave2-20260923/agent-sdks/runs/worker-tool-values.json --config-override features.hooks=false --config-override features.plugin_hooks=false --config-override features.apps=false --config-override 'otel.exporter=\"none\"' --config-override 'otel.metrics_exporter=\"none\"' --config-override analytics.enabled=false --config-override 'plugins={\"context-mode@context-mode\"={enabled=false}}'",
+    "(inside run_worker_tool.py) env -i HOME=$HOME PATH=$HOME/.local/share/codex-ecosystem/bin:/usr/bin:/bin timeout --signal=TERM --kill-after=10s 300s $HOME/.cache/gap-wave2-20260923/agent-sdks/codex-sdk-01551/bin/python blueprints/us-equities/workers/native_worker.py run --codex-bin $HOME/.local/share/codex-ecosystem/bin/codex --codex-home $HOME/.codex --workspace $HOME/.cache/gap-wave2-20260923/agent-sdks/ws-probe --prompt $HOME/.cache/gap-wave2-20260923/agent-sdks/runs/worker-tool-t2.prompt --receipt $HOME/.cache/gap-wave2-20260923/agent-sdks/runs/worker-tool-t2.json --turn-deadline-seconds 180 --resume-thread-id <thread_id from the private worker-tool-t1 receipt> --lookup-tool $HOME/.cache/gap-wave2-20260923/agent-sdks/runs/worker-tool-decoy.json --config-override features.hooks=false --config-override features.plugin_hooks=false --config-override features.apps=false --config-override 'otel.exporter=\"none\"' --config-override 'otel.metrics_exporter=\"none\"' --config-override analytics.enabled=false --config-override 'plugins={\"context-mode@context-mode\"={enabled=false}}'"
+  ],
+  "results": {
+    "codex_sdk": {
+      "resume_turn": {
+        "new_process_pid": 2724584,
+        "resumed_thread_matches": true,
+        "turns_in_thread": 2,
+        "final_answer_matches_turn1_tool_value": true
+      },
+      "native_worker": {
+        "t2_status": "completed",
+        "t2_thread_mode": "resumed",
+        "t2_tool_calls": [],
+        "t2_final_matches_t1_value": true,
+        "committed_worker_sha256": "084f82399cf4104996488210440581c7759a6d5a05d2b6abe202b8789cdba74f"
+      }
+    },
+    "claude_agent_sdk": "run in round 3: see round_3.results (resumed the round-1 session in a new process; the answer names the subject only the round-1 first message contained)",
+    "claude_agent_sdk_round_1": "not run (resume needs two calls; one bounded call was allowed and spent on the interrupt)"
+  },
+  "raw_outputs": [
+    {
+      "path": "raw/resume-turn.json",
+      "sha256": "e9773ec026504f2b5680a95f76445aba4a12dd19b529d205bef56fe5bf38a065"
+    },
+    {
+      "path": "raw/worker-tool-t2.json",
+      "sha256": "32032cf7dce311d0cdd454878e940005cb266cd176f4b045c9671d3530df1663"
+    },
+    {
+      "path": "raw/worker-tool-runs.json",
+      "sha256": "2d8170b7087d25b0295260666e20f7fc97bd7db5d54c3681c38630689ed45878"
+    },
+    {
+      "path": "raw/worker-tool-t2.prompt",
+      "sha256": "40b54c6edfda2f1462a0878f7298ce8618f2df30f62d7d18d70cb0a964d8b24e"
+    }
+  ],
+  "outcome": "settled",
+  "evidence_class": "native_proven",
+  "note": "Fix round 2: the worker arm now cites worker-tool-t2.json (committed native_worker.py); worker-resume-t2.json came from an uncommitted intermediate revision.",
+  "rechecked_at": "2026-09-23T04:38:53Z",
+  "rule_deviations": [
+    {
+      "rule": "wait while 2 or more real codex exec processes run",
+      "status": "unresolved",
+      "observed": "The first Codex SDK model call (tool-turn.json, 03:24:59Z) started while pgrep counted 3 processes matching 'codex exec'. A substring count can include processes that are not codex exec runs (at 04:37Z a similar substring filter matched two codex-linux-sandbox helpers); the 3 were never classified, so the rule may have been broken for this call. Later calls waited; the fix-round-2 driver classifies by argv (worker-tool-runs.json slot_checks: 1 real codex exec before each call)."
+    }
+  ],
+  "limits": [
+    "Claude arm: one bounded haiku query (claude-haiku-4-5-20251001), the single Claude call of this dispatch; round 1 of this unit made one other. It resumed the round-1 interrupted session, whose turn 1 was a user prompt plus a partial, interrupted answer.",
+    "The Claude init still listed the account-level claude.ai Claude Docs MCP server with setting_sources=[] (same as round 1)."
+  ],
+  "checked_at": "2026-09-23T13:01:16Z",
+  "round_3": {
+    "preregistration": {
+      "file": "preregistration-round3.json",
+      "written_at": "2026-09-23T12:56:16Z",
+      "expectation": "Claude arm: one bounded query in a new process with ClaudeAgentOptions(resume=<the round-1 interrupted session id>, setting_sources=[], tools=[], max_turns=1, model haiku) and cwd equal to that session's workspace, asking which subject the first message requested, without naming it. The answer names double-entry bookkeeping. This is the single bounded Claude call of this dispatch (round 1 of this unit also made one; both are disclosed).",
+      "criteria": [
+        "the turn-2 prompt does not contain 'bookkeeping' or 'double-entry'",
+        "answer contains 'double-entry' or 'double entry' (case-insensitive); detection: without the resumed context the subject is unguessable, and a failed resume would start an empty session",
+        "ResultMessage session_id equals the resumed id (or the fork is recorded)",
+        "settled if this holds, since the Codex arm (new-process thread/resume) is already shown in round 1"
+      ],
+      "review2_fix": {
+        "written_at": "2026-09-23T13:30:48Z",
+        "label": "written after the second independent Opus review of round 3 (5 minor findings) and before any fix or probe; not back-dated",
+        "plan": "2 (supported): receipt 13's top-level results.claude_agent_sdk still says 'not run'. Plan: build_round3 replaces it with a pointer to round_3 and keeps the old text under claude_agent_sdk_round_1."
+      }
+    },
+    "commands": [
+      "python3 blueprints/gap-wave2-20260923/foundation__agent-sdks/round3.py claude-resume",
+      "(inside) env -i HOME=$HOME PATH=$HOME/.local/share/codex-ecosystem/bin:/usr/bin:/bin timeout 240 $HOME/.cache/gap-wave2-20260923/agent-sdks/claude-sdk/bin/python blueprints/gap-wave2-20260923/foundation__agent-sdks/claude_resume.py --session-file <private round-1 output> --workspace $HOME/.cache/gap-wave2-20260923/agent-sdks/ws-claude --out <private>"
+    ],
+    "raw_outputs": [
+      {
+        "path": "raw/round3/step-claude-resume.json",
+        "sha256": "d925a9dd229705801588ec00212ed2a18f57def762e31a02655a0490cb27e65e"
+      },
+      {
+        "path": "raw/round3/claude-resume.json",
+        "sha256": "b1f013f9ed499b4694e0f2eb3a9325072ff8626fba515b1b89a796d64d1b5884"
+      },
+      {
+        "path": "raw/round3/claude-resume.session-appended-excerpt.jsonl",
+        "sha256": "a57db5c69de3afae72be31637024e9840dac0f75a7fb5e9f3cf9855b4daad8a5"
+      }
+    ],
+    "results": {
+      "prompt": "Look back at my first message in this conversation. Which subject did it ask you to write an essay about? Reply with only the subject, in at most six words.",
+      "prompt_mentions_subject": false,
+      "answer": "The history of double-entry bookkeeping.",
+      "answer_names_subject": true,
+      "status": "ok",
+      "session_jsonl_lines_before": 17,
+      "session_jsonl_lines_after": 30,
+      "result": {
+        "subtype": "success",
+        "is_error": false,
+        "num_turns": 1,
+        "session_id_equals_resumed": true,
+        "total_cost_usd": 0.005969
+      },
+      "model": "claude-haiku-4-5-20251001",
+      "detection": "The subject appears only in the round-1 first message; a failed resume starts an empty session, which cannot name it."
+    },
+    "checked_at": "2026-09-23T13:01:16Z"
+  },
+  "round_1_outcome": "advanced",
+  "round_1_remaining": "Claude Agent SDK resume (ClaudeAgentOptions.resume) in a new process when the Claude account is free.",
+  "round_1_limits": [
+    "Codex arm only."
+  ]
+}

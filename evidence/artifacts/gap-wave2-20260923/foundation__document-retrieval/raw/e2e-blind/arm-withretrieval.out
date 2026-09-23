@@ -1,0 +1,34 @@
+Reading additional input from stdin...
+OpenAI Codex v0.155.1
+--------
+workdir: $HOME/.cache/gap-wave2-20260923/document-retrieval/e2e-blind
+model: gpt-6-astra
+provider: openai
+approval: never
+sandbox: read-only
+reasoning effort: ultra
+reasoning summaries: none
+session id: <session-id-redacted>
+--------
+user
+Using ONLY this retrieved excerpt from financial-data/README.md, answer in one or two sentences: Can a fact be used before we first observed the SEC snapshot containing it?
+
+Retrieved excerpt:
+Availability is max(acceptance_at, first_observed_at) using the later first observation of the companyfacts and submissions snapshots. Today's API payload cannot establish what this system knew years ago. Newly observed snapshots are unavailable to earlier cutoffs. This conservative design also delays previously known individual facts when their containing snapshot changes. It favors avoiding leakage over reconstructing their earliest possible knowledge.
+hook: SessionStart
+hook: SessionStart
+hook: SessionStart Completed
+hook: SessionStart Completed
+hook: UserPromptSubmit
+hook: UserPromptSubmit
+hook: UserPromptSubmit Completed
+hook: UserPromptSubmit Completed
+codex
+No. A fact cannot be used before the later of SEC acceptance and the first observation of both required snapshots, even if that individual fact was previously known.
+hook: Stop
+hook: Stop
+hook: Stop Completed
+hook: Stop Completed
+tokens used
+7,405
+No. A fact cannot be used before the later of SEC acceptance and the first observation of both required snapshots, even if that individual fact was previously known.

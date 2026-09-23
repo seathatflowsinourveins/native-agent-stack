@@ -1,0 +1,8 @@
+{
+  "status": "failed",
+  "error_type": "InvalidRequestError",
+  "error": "JSON-RPC error -32600: no active turn to interrupt",
+  "sdk": "openai-codex",
+  "started_at": 1790173229.0008605,
+  "finished_at": 1790173236.1162372
+}

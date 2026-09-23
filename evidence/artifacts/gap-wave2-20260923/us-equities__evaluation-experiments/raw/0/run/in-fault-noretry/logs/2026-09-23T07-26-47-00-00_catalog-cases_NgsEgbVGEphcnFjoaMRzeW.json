@@ -1,0 +1,1414 @@
+{
+  "version": 2,
+  "status": "error",
+  "eval": {
+    "eval_id": "bHbxdbrW4tedZ4ShBrdZPb",
+    "run_id": "Ha264JLLCA7AT2j2zM5Znf",
+    "created": "2026-09-23T07:26:47+00:00",
+    "task": "catalog_cases",
+    "task_id": "NgsEgbVGEphcnFjoaMRzeW",
+    "task_version": 0,
+    "task_file": "catalog_task.py",
+    "task_display_name": "catalog_cases",
+    "task_registry_name": "catalog_cases",
+    "task_attribs": {},
+    "task_args": {
+      "delay": 0.0,
+      "fail_once_case": "C3",
+      "marker_dir": "$HOME/.cache/gap-wave2-20260923/evaluation-experiments/raw/0/run/in-fault-noretry/markers"
+    },
+    "task_args_passed": {
+      "fail_once_case": "C3",
+      "marker_dir": "$HOME/.cache/gap-wave2-20260923/evaluation-experiments/raw/0/run/in-fault-noretry/markers"
+    },
+    "dataset": {
+      "samples": 8,
+      "sample_ids": [
+        "C1",
+        "C2",
+        "C3",
+        "C4",
+        "C5",
+        "C6",
+        "C7",
+        "C8"
+      ],
+      "shuffled": false
+    },
+    "model": "mockllm/model",
+    "model_generate_config": {},
+    "model_args": {
+      "custom_outputs": null
+    },
+    "config": {
+      "epochs": 1,
+      "fail_on_error": true,
+      "continue_on_fail": false,
+      "score_on_error": false,
+      "max_samples": 1,
+      "sandbox_cleanup": true,
+      "sandbox_prebuilt": false,
+      "log_samples": true,
+      "log_realtime": true,
+      "log_images": true,
+      "log_shared": 0,
+      "score_display": true
+    },
+    "revision": {
+      "type": "git",
+      "origin": "https://github.com/seathatflowsinourveins/native-agent-stack.git",
+      "commit": "11d1e6c",
+      "dirty": true
+    },
+    "packages": {
+      "inspect_ai": "0.3.266"
+    },
+    "scorers": [
+      {
+        "name": "promptfoo_equivalent_assertions",
+        "options": {},
+        "metrics": [
+          {
+            "name": "inspect_ai/accuracy",
+            "options": {}
+          }
+        ],
+        "metadata": {}
+      }
+    ]
+  },
+  "plan": {
+    "name": "plan",
+    "steps": [
+      {
+        "solver": "fault_and_delay",
+        "params": {
+          "delay": 0.0,
+          "fail_once_case": "C3",
+          "marker_dir": "$HOME/.cache/gap-wave2-20260923/evaluation-experiments/raw/0/run/in-fault-noretry/markers"
+        },
+        "params_passed": {
+          "delay": 0.0,
+          "fail_once_case": "C3",
+          "marker_dir": "$HOME/.cache/gap-wave2-20260923/evaluation-experiments/raw/0/run/in-fault-noretry/markers"
+        }
+      },
+      {
+        "solver": "generate",
+        "params": {
+          "tool_calls": "loop"
+        },
+        "params_passed": {}
+      }
+    ],
+    "config": {
+      "max_connections": 1
+    }
+  },
+  "stats": {
+    "started_at": "2026-09-23T07:26:47+00:00",
+    "completed_at": "2026-09-23T07:26:47+00:00",
+    "model_usage": {
+      "mockllm/model": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "total_tokens": 0
+      }
+    },
+    "role_usage": {},
+    "connection_limit_history": []
+  },
+  "error": {
+    "message": "RuntimeError('injected transient failure for C3 (first attempt)')",
+    "traceback": "Traceback (most recent call last):\n  File \"$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/lib/python3.13/site-packages/inspect_ai/_eval/task/run.py\", line 1810, in task_run\n    keyed_results = await sample_scheduler.run(seed_plan, run_sample)\n                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/lib/python3.13/site-packages/inspect_ai/_eval/task/scheduler.py\", line 333, in run\n    raise ex.exceptions[0] from None\n  File \"$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/lib/python3.13/site-packages/anyio/_core/_tasks.py\", line 327, in _run_coro\n    retval = await self._coro\n             ^^^^^^^^^^^^^^^^\n  File \"$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/lib/python3.13/site-packages/inspect_ai/_eval/task/scheduler.py\", line 300, in run_one\n    result = await run_sample(sample_index, epoch, entry)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/lib/python3.13/site-packages/inspect_ai/_eval/task/run.py\", line 1512, in run_sample\n    return await task_run_sample(\n           ^^^^^^^^^^^^^^^^^^^^^^\n    ...<43 lines>...\n    )\n    ^\n  File \"$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/lib/python3.13/site-packages/inspect_ai/_eval/task/run.py\", line 2203, in task_run_sample\n    result = await _task_run_sample_attempt(\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    ...<42 lines>...\n    )\n    ^\n  File \"$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/lib/python3.13/site-packages/inspect_ai/_eval/task/run.py\", line 3281, in _task_run_sample_attempt\n    raise raise_error\n  File \"$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/lib/python3.13/site-packages/inspect_ai/_eval/task/run.py\", line 2849, in _task_run_sample_attempt\n    raise inner_exception(ex)\n  File \"$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/lib/python3.13/site-packages/anyio/_core/_tasks.py\", line 327, in _run_coro\n    retval = await self._coro\n             ^^^^^^^^^^^^^^^^\n  File \"$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/lib/python3.13/site-packages/inspect_ai/_eval/task/run.py\", line 2719, in run\n    state = await plan(state, generate)\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/lib/python3.13/site-packages/inspect_ai/solver/_plan.py\", line 106, in __call__\n    state = await solver(state, generate)\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"$HOME/code/nas-wt-g2-evaluation-experiments/blueprints/gap-wave2-20260923/us-equities__evaluation-experiments/inspect-arm/catalog_task.py\", line 80, in solve\n    raise RuntimeError(f\"injected transient failure for {fail_once_case} (first attempt)\")\nRuntimeError: injected transient failure for C3 (first attempt)\n",
+    "traceback_ansi": "\u001b[31m┌─\u001b[0m\u001b[31m────────────────────\u001b[0m\u001b[31m \u001b[0m\u001b[1;31mTraceback \u001b[0m\u001b[1;2;31m(most recent call last)\u001b[0m\u001b[31m \u001b[0m\u001b[31m────────────────────\u001b[0m\u001b[31m─┐\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2m$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/l\u001b[0m \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2mib/python3.13/site-packages/inspect_ai/_eval/task/\u001b[0m\u001b[1mrun.py\u001b[0m:1810 in task_run   \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m                                                                             \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2m$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/l\u001b[0m \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2mib/python3.13/site-packages/inspect_ai/_eval/task/\u001b[0m\u001b[1mscheduler.py\u001b[0m:333 in run   \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m                                                                             \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2m$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/l\u001b[0m \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2mib/python3.13/site-packages/anyio/_core/\u001b[0m\u001b[1m_tasks.py\u001b[0m:327 in _run_coro          \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m                                                                             \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m324 \u001b[0m\u001b[2m│   │   \u001b[0m                                                              \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m325 \u001b[0m\u001b[2m│   │   \u001b[0m\u001b[94mwith\u001b[0m \u001b[96mself\u001b[0m._cancel_scope:                                      \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m326 \u001b[0m\u001b[2m│   │   │   \u001b[0m\u001b[94mtry\u001b[0m:                                                      \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[31m> \u001b[0m327 \u001b[2m│   │   │   │   \u001b[0mretval = \u001b[94mawait\u001b[0m \u001b[96mself\u001b[0m._coro                             \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m328 \u001b[0m\u001b[2m│   │   │   \u001b[0m\u001b[94mexcept\u001b[0m \u001b[96mBaseException\u001b[0m \u001b[94mas\u001b[0m exc:                              \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m329 \u001b[0m\u001b[2m│   │   │   │   \u001b[0m\u001b[96mself\u001b[0m._exception = exc                                 \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m330 \u001b[0m\u001b[2m│   │   │   │   \u001b[0m\u001b[94mraise\u001b[0m                                                 \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m                                                                             \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2m$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/l\u001b[0m \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2mib/python3.13/site-packages/inspect_ai/_eval/task/\u001b[0m\u001b[1mscheduler.py\u001b[0m:300 in       \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m run_one                                                                     \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m                                                                             \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2m$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/l\u001b[0m \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2mib/python3.13/site-packages/inspect_ai/_eval/task/\u001b[0m\u001b[1mrun.py\u001b[0m:1512 in run_sample \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m                                                                             \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2m$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/l\u001b[0m \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2mib/python3.13/site-packages/inspect_ai/_eval/task/\u001b[0m\u001b[1mrun.py\u001b[0m:2203 in            \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m task_run_sample                                                             \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m                                                                             \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2m$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/l\u001b[0m \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2mib/python3.13/site-packages/inspect_ai/_eval/task/\u001b[0m\u001b[1mrun.py\u001b[0m:3281 in            \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m _task_run_sample_attempt                                                    \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m                                                                             \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2m$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/l\u001b[0m \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2mib/python3.13/site-packages/inspect_ai/_eval/task/\u001b[0m\u001b[1mrun.py\u001b[0m:2849 in            \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m _task_run_sample_attempt                                                    \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m                                                                             \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2m$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/l\u001b[0m \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2mib/python3.13/site-packages/anyio/_core/\u001b[0m\u001b[1m_tasks.py\u001b[0m:327 in _run_coro          \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m                                                                             \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m324 \u001b[0m\u001b[2m│   │   \u001b[0m                                                              \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m325 \u001b[0m\u001b[2m│   │   \u001b[0m\u001b[94mwith\u001b[0m \u001b[96mself\u001b[0m._cancel_scope:                                      \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m326 \u001b[0m\u001b[2m│   │   │   \u001b[0m\u001b[94mtry\u001b[0m:                                                      \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[31m> \u001b[0m327 \u001b[2m│   │   │   │   \u001b[0mretval = \u001b[94mawait\u001b[0m \u001b[96mself\u001b[0m._coro                             \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m328 \u001b[0m\u001b[2m│   │   │   \u001b[0m\u001b[94mexcept\u001b[0m \u001b[96mBaseException\u001b[0m \u001b[94mas\u001b[0m exc:                              \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m329 \u001b[0m\u001b[2m│   │   │   │   \u001b[0m\u001b[96mself\u001b[0m._exception = exc                                 \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m330 \u001b[0m\u001b[2m│   │   │   │   \u001b[0m\u001b[94mraise\u001b[0m                                                 \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m                                                                             \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2m$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/l\u001b[0m \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2mib/python3.13/site-packages/inspect_ai/_eval/task/\u001b[0m\u001b[1mrun.py\u001b[0m:2719 in run        \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m                                                                             \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2m$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/l\u001b[0m \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2mib/python3.13/site-packages/inspect_ai/solver/\u001b[0m\u001b[1m_plan.py\u001b[0m:106 in __call__      \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m                                                                             \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2m$HOME/code/nas-wt-g2-evaluation-experiments/blueprints/gap-wave2-2026\u001b[0m \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2m0923/us-equities__evaluation-experiments/inspect-arm/\u001b[0m\u001b[1mcatalog_task.py\u001b[0m:80 in  \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m solve                                                                       \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m                                                                             \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 77 \u001b[0m\u001b[2m│   │   │   \u001b[0mmarker = Path(marker_dir) / \u001b[33mf\u001b[0m\u001b[33m\"\u001b[0m\u001b[33m{\u001b[0mfail_once_case\u001b[33m}\u001b[0m\u001b[33m.failed-onc\u001b[0m \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 78 \u001b[0m\u001b[2m│   │   │   \u001b[0m\u001b[94mif\u001b[0m \u001b[95mnot\u001b[0m marker.exists():                                   \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 79 \u001b[0m\u001b[2m│   │   │   │   \u001b[0mmarker.write_text(\u001b[33m\"\u001b[0m\u001b[33m1\u001b[0m\u001b[33m\"\u001b[0m)                                \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[31m> \u001b[0m 80 \u001b[2m│   │   │   │   \u001b[0m\u001b[1;4;94mraise\u001b[0m\u001b[1;4m \u001b[0m\u001b[1;4;96mRuntimeError\u001b[0m\u001b[1;4m(\u001b[0m\u001b[1;4;33mf\u001b[0m\u001b[1;4;33m\"\u001b[0m\u001b[1;4;33minjected transient failure for \u001b[0m\u001b[1;4;33m{\u001b[0m \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 81 \u001b[0m\u001b[2m│   │   \u001b[0m\u001b[94mreturn\u001b[0m state                                                  \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 82 \u001b[0m\u001b[2m│   \u001b[0m\u001b[94mreturn\u001b[0m solve                                                      \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 83 \u001b[0m                                                                      \u001b[31m│\u001b[0m\n\u001b[31m└─────────────────────────────────────────────────────────────────────────────┘\u001b[0m\n\u001b[1;91mRuntimeError: \u001b[0minjected transient failure for C3 \u001b[1m(\u001b[0mfirst attempt\u001b[1m)\u001b[0m\n"
+  },
+  "invalidated": false,
+  "tags": [],
+  "metadata": {},
+  "samples": [
+    {
+      "id": "C1",
+      "epoch": 1,
+      "input": "{\"source\": \"{\\n  \\\"schema_version\\\": 1,\\n  \\\"trigger\\\": \\\"manual\\\",\\n  \\\"native_metadata\\\": {\\n    \\\"preTokens\\\": 87434,\\n    \\\"postTokens\\\": 14934,\\n    \\\"cumulativeDroppedTokens\\\": 72500,\\n    \\\"durationMs\\\": 42506\\n  },\\n  \\\"precompact_hook_observation\\\": {\\n    \\\"ai-memory_success\\\": true,\\n    \\\"context-mode_success\\\": true\\n  },\\n  \\\"continuity_responses\\\": [\\n    \\\"review-contract = foundation-20260921.\\\\nProvider savings were not established — they remain unknown; no causal session or lifetime saving is claimed, and compression/cache counters cannot be summed into them.\\\\nBrokers: IBKR paper and Alpaca paper each remain independently qualified and separate from engine/FX replay and authenticated Alpaca data; existing paper authorization persists.\\\",\\n    \\\"No — this was a bounded read-only document review of two files and establishes nothing about broker execution; IBKR paper and Alpaca paper acceptance remain separate, independently qualified work.\\\"\\n  ],\\n  \\\"post_boundary_model_tool_calls\\\": [],\\n  \\\"oracle\\\": {\\n    \\\"identifier\\\": \\\"foundation-20260921\\\",\\n    \\\"provider_savings\\\": \\\"unknown\\\",\\n    \\\"broker_acceptance\\\": \\\"not established by document review; separate per broker\\\"\\n  },\\n  \\\"limitations\\\": [\\n    \\\"Manual compaction and three selected facts only; automatic compaction and all-fact preservation untested.\\\",\\n    \\\"Context-size change is not provider savings; compaction consumes inference.\\\",\\n    \\\"Initial broker wording was ambiguous; a follow-up asked whether any broker acceptance was established and returned explicit No. Both responses retained.\\\"\\n  ]\\n}\\n\", \"claim\": \"Manual compaction returned successful Context Mode and ai-memory PreCompact hook observations.\"}",
+      "target": "supported",
+      "messages": [
+        {
+          "id": "47UcjsFpz8MwMdCKRczc32",
+          "content": "{\"source\": \"{\\n  \\\"schema_version\\\": 1,\\n  \\\"trigger\\\": \\\"manual\\\",\\n  \\\"native_metadata\\\": {\\n    \\\"preTokens\\\": 87434,\\n    \\\"postTokens\\\": 14934,\\n    \\\"cumulativeDroppedTokens\\\": 72500,\\n    \\\"durationMs\\\": 42506\\n  },\\n  \\\"precompact_hook_observation\\\": {\\n    \\\"ai-memory_success\\\": true,\\n    \\\"context-mode_success\\\": true\\n  },\\n  \\\"continuity_responses\\\": [\\n    \\\"review-contract = foundation-20260921.\\\\nProvider savings were not established — they remain unknown; no causal session or lifetime saving is claimed, and compression/cache counters cannot be summed into them.\\\\nBrokers: IBKR paper and Alpaca paper each remain independently qualified and separate from engine/FX replay and authenticated Alpaca data; existing paper authorization persists.\\\",\\n    \\\"No — this was a bounded read-only document review of two files and establishes nothing about broker execution; IBKR paper and Alpaca paper acceptance remain separate, independently qualified work.\\\"\\n  ],\\n  \\\"post_boundary_model_tool_calls\\\": [],\\n  \\\"oracle\\\": {\\n    \\\"identifier\\\": \\\"foundation-20260921\\\",\\n    \\\"provider_savings\\\": \\\"unknown\\\",\\n    \\\"broker_acceptance\\\": \\\"not established by document review; separate per broker\\\"\\n  },\\n  \\\"limitations\\\": [\\n    \\\"Manual compaction and three selected facts only; automatic compaction and all-fact preservation untested.\\\",\\n    \\\"Context-size change is not provider savings; compaction consumes inference.\\\",\\n    \\\"Initial broker wording was ambiguous; a follow-up asked whether any broker acceptance was established and returned explicit No. Both responses retained.\\\"\\n  ]\\n}\\n\", \"claim\": \"Manual compaction returned successful Context Mode and ai-memory PreCompact hook observations.\"}",
+          "source": "input",
+          "role": "user"
+        },
+        {
+          "id": "2bkR7aZvMmNZo7zssy9rHk",
+          "content": "insufficient",
+          "source": "generate",
+          "role": "assistant",
+          "model": "mockllm/model"
+        }
+      ],
+      "output": {
+        "model": "mockllm/model",
+        "choices": [
+          {
+            "message": {
+              "id": "2bkR7aZvMmNZo7zssy9rHk",
+              "content": "insufficient",
+              "source": "generate",
+              "role": "assistant",
+              "model": "mockllm/model"
+            },
+            "stop_reason": "stop"
+          }
+        ],
+        "completion": "insufficient",
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "total_tokens": 0
+        },
+        "time": 0.024283457998535596
+      },
+      "scores": {
+        "promptfoo_equivalent_assertions": {
+          "value": "I",
+          "answer": "insufficient",
+          "explanation": "FAILED JSON.parse(output).verdict === context.vars.expected; FAILED JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+          "metadata": {
+            "gated": {
+              "verdict": "insufficient",
+              "eligible": true,
+              "disposition": "advisory_insufficient",
+              "source_sha256": "85eb14433d6e4b61fbe60670647f61c65ef4db1ce75408b853860f8a4f26ddc3",
+              "schema_version": 1
+            },
+            "assertions": [
+              {
+                "value": "JSON.parse(output).verdict === context.vars.expected",
+                "pass": false,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).eligible === context.vars.expected_eligible",
+                "pass": true,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+                "pass": false,
+                "error": null
+              }
+            ]
+          },
+          "history": []
+        }
+      },
+      "metadata": {
+        "vars": {
+          "source_available_at": "2026-09-20T10:00:00Z",
+          "decision_at": "2026-09-20T11:00:00Z",
+          "expected_eligible": true,
+          "source": "{\n  \"schema_version\": 1,\n  \"trigger\": \"manual\",\n  \"native_metadata\": {\n    \"preTokens\": 87434,\n    \"postTokens\": 14934,\n    \"cumulativeDroppedTokens\": 72500,\n    \"durationMs\": 42506\n  },\n  \"precompact_hook_observation\": {\n    \"ai-memory_success\": true,\n    \"context-mode_success\": true\n  },\n  \"continuity_responses\": [\n    \"review-contract = foundation-20260921.\\nProvider savings were not established — they remain unknown; no causal session or lifetime saving is claimed, and compression/cache counters cannot be summed into them.\\nBrokers: IBKR paper and Alpaca paper each remain independently qualified and separate from engine/FX replay and authenticated Alpaca data; existing paper authorization persists.\",\n    \"No — this was a bounded read-only document review of two files and establishes nothing about broker execution; IBKR paper and Alpaca paper acceptance remain separate, independently qualified work.\"\n  ],\n  \"post_boundary_model_tool_calls\": [],\n  \"oracle\": {\n    \"identifier\": \"foundation-20260921\",\n    \"provider_savings\": \"unknown\",\n    \"broker_acceptance\": \"not established by document review; separate per broker\"\n  },\n  \"limitations\": [\n    \"Manual compaction and three selected facts only; automatic compaction and all-fact preservation untested.\",\n    \"Context-size change is not provider savings; compaction consumes inference.\",\n    \"Initial broker wording was ambiguous; a follow-up asked whether any broker acceptance was established and returned explicit No. Both responses retained.\"\n  ]\n}\n",
+          "claim": "Manual compaction returned successful Context Mode and ai-memory PreCompact hook observations.",
+          "expected": "supported"
+        },
+        "description": "C1 manual-hook-supported"
+      },
+      "store": {},
+      "events": [
+        {
+          "uuid": "VkHvEjbEzJVGtXwrxCFvdM",
+          "span_id": "QGNLkazotEYW88oPYqX2SM",
+          "timestamp": "2026-09-23T07:26:47.213198+00:00",
+          "working_start": 59334.573824307,
+          "event": "span_begin",
+          "id": "QGNLkazotEYW88oPYqX2SM",
+          "type": "init",
+          "name": "init"
+        },
+        {
+          "uuid": "6snWD367wDWWju6PVn5YsD",
+          "span_id": "QGNLkazotEYW88oPYqX2SM",
+          "timestamp": "2026-09-23T07:26:47.213688+00:00",
+          "working_start": 59334.57431281,
+          "event": "sample_init",
+          "sample": {
+            "input": "attachment://c48837c6b5cd04d96e990059063801b9",
+            "target": "supported",
+            "id": "C1",
+            "metadata": {
+              "vars": {
+                "source_available_at": "2026-09-20T10:00:00Z",
+                "decision_at": "2026-09-20T11:00:00Z",
+                "expected_eligible": true,
+                "source": "{\n  \"schema_version\": 1,\n  \"trigger\": \"manual\",\n  \"native_metadata\": {\n    \"preTokens\": 87434,\n    \"postTokens\": 14934,\n    \"cumulativeDroppedTokens\": 72500,\n    \"durationMs\": 42506\n  },\n  \"precompact_hook_observation\": {\n    \"ai-memory_success\": true,\n    \"context-mode_success\": true\n  },\n  \"continuity_responses\": [\n    \"review-contract = foundation-20260921.\\nProvider savings were not established — they remain unknown; no causal session or lifetime saving is claimed, and compression/cache counters cannot be summed into them.\\nBrokers: IBKR paper and Alpaca paper each remain independently qualified and separate from engine/FX replay and authenticated Alpaca data; existing paper authorization persists.\",\n    \"No — this was a bounded read-only document review of two files and establishes nothing about broker execution; IBKR paper and Alpaca paper acceptance remain separate, independently qualified work.\"\n  ],\n  \"post_boundary_model_tool_calls\": [],\n  \"oracle\": {\n    \"identifier\": \"foundation-20260921\",\n    \"provider_savings\": \"unknown\",\n    \"broker_acceptance\": \"not established by document review; separate per broker\"\n  },\n  \"limitations\": [\n    \"Manual compaction and three selected facts only; automatic compaction and all-fact preservation untested.\",\n    \"Context-size change is not provider savings; compaction consumes inference.\",\n    \"Initial broker wording was ambiguous; a follow-up asked whether any broker acceptance was established and returned explicit No. Both responses retained.\"\n  ]\n}\n",
+                "claim": "Manual compaction returned successful Context Mode and ai-memory PreCompact hook observations.",
+                "expected": "supported"
+              },
+              "description": "C1 manual-hook-supported"
+            }
+          },
+          "state": {
+            "messages": [
+              {
+                "id": "47UcjsFpz8MwMdCKRczc32",
+                "content": "attachment://c48837c6b5cd04d96e990059063801b9",
+                "source": "input",
+                "role": "user"
+              }
+            ],
+            "tools": [],
+            "tool_choice": null,
+            "store": {},
+            "output": {
+              "model": "mockllm/model",
+              "choices": [],
+              "completion": ""
+            },
+            "completed": false,
+            "metadata": {
+              "vars": {
+                "source_available_at": "2026-09-20T10:00:00Z",
+                "decision_at": "2026-09-20T11:00:00Z",
+                "expected_eligible": true,
+                "source": "attachment://cbd1b2df440489f785dfdeb0ce584866",
+                "claim": "Manual compaction returned successful Context Mode and ai-memory PreCompact hook observations.",
+                "expected": "supported"
+              },
+              "description": "C1 manual-hook-supported"
+            }
+          }
+        },
+        {
+          "uuid": "cavt39g3gKS9p6pkJ9HrK3",
+          "span_id": "QGNLkazotEYW88oPYqX2SM",
+          "timestamp": "2026-09-23T07:26:47.213909+00:00",
+          "working_start": 59334.574532811,
+          "event": "span_end",
+          "id": "QGNLkazotEYW88oPYqX2SM"
+        },
+        {
+          "uuid": "KMY8UunCBdkRh8ULjXBssM",
+          "span_id": "QaY4cv7UsazvCpBv6q8rGQ",
+          "timestamp": "2026-09-23T07:26:47.214257+00:00",
+          "working_start": 0.0002435019996482879,
+          "event": "span_begin",
+          "id": "QaY4cv7UsazvCpBv6q8rGQ",
+          "type": "solvers",
+          "name": "solvers"
+        },
+        {
+          "uuid": "n6tiy6QpNg9g6y3oDxvhgP",
+          "span_id": "7YD43bnyJTRMmo64a5gS5H",
+          "timestamp": "2026-09-23T07:26:47.214474+00:00",
+          "working_start": 0.0004604029963957146,
+          "event": "span_begin",
+          "id": "7YD43bnyJTRMmo64a5gS5H",
+          "parent_id": "QaY4cv7UsazvCpBv6q8rGQ",
+          "type": "solver",
+          "name": "fault_and_delay"
+        },
+        {
+          "uuid": "42KQvxVTAW9SpZu2FBEZMn",
+          "span_id": "7YD43bnyJTRMmo64a5gS5H",
+          "timestamp": "2026-09-23T07:26:47.214687+00:00",
+          "working_start": 0.0006731039975420572,
+          "event": "span_end",
+          "id": "7YD43bnyJTRMmo64a5gS5H"
+        },
+        {
+          "uuid": "cGUugBRdbYFgwHfyqpYPfa",
+          "span_id": "ErD2igsgnzrSiNB6qJr6vr",
+          "timestamp": "2026-09-23T07:26:47.214774+00:00",
+          "working_start": 0.0007599050004500896,
+          "event": "span_begin",
+          "id": "ErD2igsgnzrSiNB6qJr6vr",
+          "parent_id": "QaY4cv7UsazvCpBv6q8rGQ",
+          "type": "solver",
+          "name": "generate"
+        },
+        {
+          "uuid": "GpRZYJuDcTdmMoqydVcuFd",
+          "span_id": "ErD2igsgnzrSiNB6qJr6vr",
+          "timestamp": "2026-09-23T07:26:47.214933+00:00",
+          "working_start": 0.0009197059989674017,
+          "event": "model",
+          "model": "mockllm/model",
+          "input": [],
+          "input_refs": [
+            [
+              0,
+              1
+            ]
+          ],
+          "tools": [],
+          "tool_choice": "none",
+          "config": {
+            "max_connections": 1
+          },
+          "output": {
+            "model": "mockllm/model",
+            "choices": [
+              {
+                "message": {
+                  "id": "2bkR7aZvMmNZo7zssy9rHk",
+                  "content": "insufficient",
+                  "source": "generate",
+                  "role": "assistant",
+                  "model": "mockllm/model"
+                },
+                "stop_reason": "stop"
+              }
+            ],
+            "completion": "insufficient",
+            "usage": {
+              "input_tokens": 0,
+              "output_tokens": 0,
+              "total_tokens": 0
+            },
+            "time": 0.024283457998535596
+          },
+          "call": {
+            "request": {
+              "model": "model"
+            },
+            "response": {
+              "content": "insufficient"
+            },
+            "call_refs": [
+              [
+                0,
+                1
+              ]
+            ],
+            "call_key": "messages"
+          },
+          "completed": "2026-09-23T07:26:47.312255+00:00",
+          "working_time": 0.024283457998535596
+        },
+        {
+          "uuid": "gMAiAmwCjjaM8Z6GKi5So5",
+          "span_id": "ErD2igsgnzrSiNB6qJr6vr",
+          "timestamp": "2026-09-23T07:26:47.312838+00:00",
+          "working_start": 0.02598836900142487,
+          "event": "state",
+          "changes": [
+            {
+              "op": "add",
+              "path": "/output/time",
+              "value": 0.024283457998535596
+            },
+            {
+              "op": "add",
+              "path": "/output/usage",
+              "value": {
+                "input_tokens": 0,
+                "output_tokens": 0,
+                "total_tokens": 0
+              }
+            },
+            {
+              "op": "add",
+              "path": "/output/choices/0",
+              "value": {
+                "message": {
+                  "id": "2bkR7aZvMmNZo7zssy9rHk",
+                  "content": "insufficient",
+                  "source": "generate",
+                  "role": "assistant",
+                  "model": "mockllm/model"
+                },
+                "stop_reason": "stop"
+              }
+            },
+            {
+              "op": "replace",
+              "path": "/output/completion",
+              "value": "insufficient",
+              "replaced": ""
+            },
+            {
+              "op": "add",
+              "path": "/messages/1",
+              "value": {
+                "id": "2bkR7aZvMmNZo7zssy9rHk",
+                "content": "insufficient",
+                "source": "generate",
+                "role": "assistant",
+                "model": "mockllm/model"
+              }
+            }
+          ]
+        },
+        {
+          "uuid": "mDgQC8CuVsBCvUM4h2E8oW",
+          "span_id": "ErD2igsgnzrSiNB6qJr6vr",
+          "timestamp": "2026-09-23T07:26:47.313086+00:00",
+          "working_start": 0.0262361700006295,
+          "event": "span_end",
+          "id": "ErD2igsgnzrSiNB6qJr6vr"
+        },
+        {
+          "uuid": "m4rYBdFzJhTgHcEZHbTcHD",
+          "span_id": "QaY4cv7UsazvCpBv6q8rGQ",
+          "timestamp": "2026-09-23T07:26:47.313194+00:00",
+          "working_start": 0.026344071004132275,
+          "event": "span_end",
+          "id": "QaY4cv7UsazvCpBv6q8rGQ"
+        },
+        {
+          "uuid": "hGqdxFtRfznRXtfCBktRso",
+          "span_id": "24j8oxq3vu8PD742JmX8PZ",
+          "timestamp": "2026-09-23T07:26:47.313516+00:00",
+          "working_start": 0.02666547300032107,
+          "event": "span_begin",
+          "id": "24j8oxq3vu8PD742JmX8PZ",
+          "type": "scorers",
+          "name": "scorers"
+        },
+        {
+          "uuid": "EVHmVUenS8YXuHstwwc3Dh",
+          "span_id": "GigPHyXi3EQzkfCyBTApGb",
+          "timestamp": "2026-09-23T07:26:47.313603+00:00",
+          "working_start": 0.026752473000669852,
+          "event": "span_begin",
+          "id": "GigPHyXi3EQzkfCyBTApGb",
+          "parent_id": "24j8oxq3vu8PD742JmX8PZ",
+          "type": "scorer",
+          "name": "promptfoo_equivalent_assertions"
+        },
+        {
+          "uuid": "4B2fJeZwLTv4w7KuvkdXm2",
+          "span_id": "GigPHyXi3EQzkfCyBTApGb",
+          "timestamp": "2026-09-23T07:26:47.337511+00:00",
+          "working_start": 0.0506666290020803,
+          "event": "score",
+          "score": {
+            "value": "I",
+            "answer": "insufficient",
+            "explanation": "FAILED JSON.parse(output).verdict === context.vars.expected; FAILED JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+            "metadata": {
+              "gated": {
+                "verdict": "insufficient",
+                "eligible": true,
+                "disposition": "advisory_insufficient",
+                "source_sha256": "85eb14433d6e4b61fbe60670647f61c65ef4db1ce75408b853860f8a4f26ddc3",
+                "schema_version": 1
+              },
+              "assertions": [
+                {
+                  "value": "JSON.parse(output).verdict === context.vars.expected",
+                  "pass": false,
+                  "error": null
+                },
+                {
+                  "value": "JSON.parse(output).eligible === context.vars.expected_eligible",
+                  "pass": true,
+                  "error": null
+                },
+                {
+                  "value": "JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+                  "pass": false,
+                  "error": null
+                }
+              ]
+            },
+            "history": []
+          },
+          "target": "supported",
+          "intermediate": false,
+          "scorer": "promptfoo_equivalent_assertions",
+          "scorer_args": {},
+          "model_usage": {
+            "mockllm/model": {
+              "input_tokens": 0,
+              "output_tokens": 0,
+              "total_tokens": 0
+            }
+          }
+        },
+        {
+          "uuid": "5a7KR2UGGjaV6TDDdezjYr",
+          "span_id": "GigPHyXi3EQzkfCyBTApGb",
+          "timestamp": "2026-09-23T07:26:47.337992+00:00",
+          "working_start": 0.05114323199813953,
+          "event": "span_end",
+          "id": "GigPHyXi3EQzkfCyBTApGb"
+        },
+        {
+          "uuid": "6B6dzPYLSUd5edJ3uAFech",
+          "span_id": "24j8oxq3vu8PD742JmX8PZ",
+          "timestamp": "2026-09-23T07:26:47.338141+00:00",
+          "working_start": 0.05129083299834747,
+          "event": "span_end",
+          "id": "24j8oxq3vu8PD742JmX8PZ"
+        }
+      ],
+      "model_usage": {
+        "mockllm/model": {
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "total_tokens": 0
+        }
+      },
+      "role_usage": {},
+      "started_at": "2026-09-23T07:26:47.214016+00:00",
+      "completed_at": "2026-09-23T07:26:47.338429+00:00",
+      "total_time": 0.124,
+      "working_time": 0.052,
+      "uuid": "7PCUwJy5Ba6sULrTmrfCLN",
+      "error_retries": [],
+      "attachments": {
+        "c48837c6b5cd04d96e990059063801b9": "{\"source\": \"{\\n  \\\"schema_version\\\": 1,\\n  \\\"trigger\\\": \\\"manual\\\",\\n  \\\"native_metadata\\\": {\\n    \\\"preTokens\\\": 87434,\\n    \\\"postTokens\\\": 14934,\\n    \\\"cumulativeDroppedTokens\\\": 72500,\\n    \\\"durationMs\\\": 42506\\n  },\\n  \\\"precompact_hook_observation\\\": {\\n    \\\"ai-memory_success\\\": true,\\n    \\\"context-mode_success\\\": true\\n  },\\n  \\\"continuity_responses\\\": [\\n    \\\"review-contract = foundation-20260921.\\\\nProvider savings were not established — they remain unknown; no causal session or lifetime saving is claimed, and compression/cache counters cannot be summed into them.\\\\nBrokers: IBKR paper and Alpaca paper each remain independently qualified and separate from engine/FX replay and authenticated Alpaca data; existing paper authorization persists.\\\",\\n    \\\"No — this was a bounded read-only document review of two files and establishes nothing about broker execution; IBKR paper and Alpaca paper acceptance remain separate, independently qualified work.\\\"\\n  ],\\n  \\\"post_boundary_model_tool_calls\\\": [],\\n  \\\"oracle\\\": {\\n    \\\"identifier\\\": \\\"foundation-20260921\\\",\\n    \\\"provider_savings\\\": \\\"unknown\\\",\\n    \\\"broker_acceptance\\\": \\\"not established by document review; separate per broker\\\"\\n  },\\n  \\\"limitations\\\": [\\n    \\\"Manual compaction and three selected facts only; automatic compaction and all-fact preservation untested.\\\",\\n    \\\"Context-size change is not provider savings; compaction consumes inference.\\\",\\n    \\\"Initial broker wording was ambiguous; a follow-up asked whether any broker acceptance was established and returned explicit No. Both responses retained.\\\"\\n  ]\\n}\\n\", \"claim\": \"Manual compaction returned successful Context Mode and ai-memory PreCompact hook observations.\"}",
+        "cbd1b2df440489f785dfdeb0ce584866": "{\n  \"schema_version\": 1,\n  \"trigger\": \"manual\",\n  \"native_metadata\": {\n    \"preTokens\": 87434,\n    \"postTokens\": 14934,\n    \"cumulativeDroppedTokens\": 72500,\n    \"durationMs\": 42506\n  },\n  \"precompact_hook_observation\": {\n    \"ai-memory_success\": true,\n    \"context-mode_success\": true\n  },\n  \"continuity_responses\": [\n    \"review-contract = foundation-20260921.\\nProvider savings were not established — they remain unknown; no causal session or lifetime saving is claimed, and compression/cache counters cannot be summed into them.\\nBrokers: IBKR paper and Alpaca paper each remain independently qualified and separate from engine/FX replay and authenticated Alpaca data; existing paper authorization persists.\",\n    \"No — this was a bounded read-only document review of two files and establishes nothing about broker execution; IBKR paper and Alpaca paper acceptance remain separate, independently qualified work.\"\n  ],\n  \"post_boundary_model_tool_calls\": [],\n  \"oracle\": {\n    \"identifier\": \"foundation-20260921\",\n    \"provider_savings\": \"unknown\",\n    \"broker_acceptance\": \"not established by document review; separate per broker\"\n  },\n  \"limitations\": [\n    \"Manual compaction and three selected facts only; automatic compaction and all-fact preservation untested.\",\n    \"Context-size change is not provider savings; compaction consumes inference.\",\n    \"Initial broker wording was ambiguous; a follow-up asked whether any broker acceptance was established and returned explicit No. Both responses retained.\"\n  ]\n}\n"
+      },
+      "events_data": {
+        "messages": [
+          {
+            "id": "47UcjsFpz8MwMdCKRczc32",
+            "content": "attachment://c48837c6b5cd04d96e990059063801b9",
+            "source": "input",
+            "role": "user"
+          }
+        ],
+        "calls": [
+          {
+            "id": "47UcjsFpz8MwMdCKRczc32",
+            "content": "attachment://c48837c6b5cd04d96e990059063801b9",
+            "source": "input",
+            "metadata": null,
+            "role": "user",
+            "tool_call_id": null
+          }
+        ]
+      },
+      "turn_count": 1
+    },
+    {
+      "id": "C2",
+      "epoch": 1,
+      "input": "{\"source\": \"{\\n  \\\"schema_version\\\": 1,\\n  \\\"trigger\\\": \\\"manual\\\",\\n  \\\"native_metadata\\\": {\\n    \\\"preTokens\\\": 87434,\\n    \\\"postTokens\\\": 14934,\\n    \\\"cumulativeDroppedTokens\\\": 72500,\\n    \\\"durationMs\\\": 42506\\n  },\\n  \\\"precompact_hook_observation\\\": {\\n    \\\"ai-memory_success\\\": true,\\n    \\\"context-mode_success\\\": true\\n  },\\n  \\\"continuity_responses\\\": [\\n    \\\"review-contract = foundation-20260921.\\\\nProvider savings were not established — they remain unknown; no causal session or lifetime saving is claimed, and compression/cache counters cannot be summed into them.\\\\nBrokers: IBKR paper and Alpaca paper each remain independently qualified and separate from engine/FX replay and authenticated Alpaca data; existing paper authorization persists.\\\",\\n    \\\"No — this was a bounded read-only document review of two files and establishes nothing about broker execution; IBKR paper and Alpaca paper acceptance remain separate, independently qualified work.\\\"\\n  ],\\n  \\\"post_boundary_model_tool_calls\\\": [],\\n  \\\"oracle\\\": {\\n    \\\"identifier\\\": \\\"foundation-20260921\\\",\\n    \\\"provider_savings\\\": \\\"unknown\\\",\\n    \\\"broker_acceptance\\\": \\\"not established by document review; separate per broker\\\"\\n  },\\n  \\\"limitations\\\": [\\n    \\\"Manual compaction and three selected facts only; automatic compaction and all-fact preservation untested.\\\",\\n    \\\"Context-size change is not provider savings; compaction consumes inference.\\\",\\n    \\\"Initial broker wording was ambiguous; a follow-up asked whether any broker acceptance was established and returned explicit No. Both responses retained.\\\"\\n  ]\\n}\\n\", \"claim\": \"Automatic compaction preserves every fact.\"}",
+      "target": "insufficient",
+      "messages": [
+        {
+          "id": "7jGaVip6EUB373jHp8mq7D",
+          "content": "{\"source\": \"{\\n  \\\"schema_version\\\": 1,\\n  \\\"trigger\\\": \\\"manual\\\",\\n  \\\"native_metadata\\\": {\\n    \\\"preTokens\\\": 87434,\\n    \\\"postTokens\\\": 14934,\\n    \\\"cumulativeDroppedTokens\\\": 72500,\\n    \\\"durationMs\\\": 42506\\n  },\\n  \\\"precompact_hook_observation\\\": {\\n    \\\"ai-memory_success\\\": true,\\n    \\\"context-mode_success\\\": true\\n  },\\n  \\\"continuity_responses\\\": [\\n    \\\"review-contract = foundation-20260921.\\\\nProvider savings were not established — they remain unknown; no causal session or lifetime saving is claimed, and compression/cache counters cannot be summed into them.\\\\nBrokers: IBKR paper and Alpaca paper each remain independently qualified and separate from engine/FX replay and authenticated Alpaca data; existing paper authorization persists.\\\",\\n    \\\"No — this was a bounded read-only document review of two files and establishes nothing about broker execution; IBKR paper and Alpaca paper acceptance remain separate, independently qualified work.\\\"\\n  ],\\n  \\\"post_boundary_model_tool_calls\\\": [],\\n  \\\"oracle\\\": {\\n    \\\"identifier\\\": \\\"foundation-20260921\\\",\\n    \\\"provider_savings\\\": \\\"unknown\\\",\\n    \\\"broker_acceptance\\\": \\\"not established by document review; separate per broker\\\"\\n  },\\n  \\\"limitations\\\": [\\n    \\\"Manual compaction and three selected facts only; automatic compaction and all-fact preservation untested.\\\",\\n    \\\"Context-size change is not provider savings; compaction consumes inference.\\\",\\n    \\\"Initial broker wording was ambiguous; a follow-up asked whether any broker acceptance was established and returned explicit No. Both responses retained.\\\"\\n  ]\\n}\\n\", \"claim\": \"Automatic compaction preserves every fact.\"}",
+          "source": "input",
+          "role": "user"
+        },
+        {
+          "id": "dF38Yr7hDK7T73UBx5qMeL",
+          "content": "insufficient",
+          "source": "generate",
+          "role": "assistant",
+          "model": "mockllm/model"
+        }
+      ],
+      "output": {
+        "model": "mockllm/model",
+        "choices": [
+          {
+            "message": {
+              "id": "dF38Yr7hDK7T73UBx5qMeL",
+              "content": "insufficient",
+              "source": "generate",
+              "role": "assistant",
+              "model": "mockllm/model"
+            },
+            "stop_reason": "stop"
+          }
+        ],
+        "completion": "insufficient",
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "total_tokens": 0
+        },
+        "time": 0.02482876199792372
+      },
+      "scores": {
+        "promptfoo_equivalent_assertions": {
+          "value": "C",
+          "answer": "insufficient",
+          "explanation": "all 3 assertions passed",
+          "metadata": {
+            "gated": {
+              "verdict": "insufficient",
+              "eligible": true,
+              "disposition": "advisory_insufficient",
+              "source_sha256": "85eb14433d6e4b61fbe60670647f61c65ef4db1ce75408b853860f8a4f26ddc3",
+              "schema_version": 1
+            },
+            "assertions": [
+              {
+                "value": "JSON.parse(output).verdict === context.vars.expected",
+                "pass": true,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).eligible === context.vars.expected_eligible",
+                "pass": true,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+                "pass": true,
+                "error": null
+              }
+            ]
+          },
+          "history": []
+        }
+      },
+      "metadata": {
+        "vars": {
+          "source_available_at": "2026-09-20T10:00:00Z",
+          "decision_at": "2026-09-20T11:00:00Z",
+          "expected_eligible": true,
+          "source": "{\n  \"schema_version\": 1,\n  \"trigger\": \"manual\",\n  \"native_metadata\": {\n    \"preTokens\": 87434,\n    \"postTokens\": 14934,\n    \"cumulativeDroppedTokens\": 72500,\n    \"durationMs\": 42506\n  },\n  \"precompact_hook_observation\": {\n    \"ai-memory_success\": true,\n    \"context-mode_success\": true\n  },\n  \"continuity_responses\": [\n    \"review-contract = foundation-20260921.\\nProvider savings were not established — they remain unknown; no causal session or lifetime saving is claimed, and compression/cache counters cannot be summed into them.\\nBrokers: IBKR paper and Alpaca paper each remain independently qualified and separate from engine/FX replay and authenticated Alpaca data; existing paper authorization persists.\",\n    \"No — this was a bounded read-only document review of two files and establishes nothing about broker execution; IBKR paper and Alpaca paper acceptance remain separate, independently qualified work.\"\n  ],\n  \"post_boundary_model_tool_calls\": [],\n  \"oracle\": {\n    \"identifier\": \"foundation-20260921\",\n    \"provider_savings\": \"unknown\",\n    \"broker_acceptance\": \"not established by document review; separate per broker\"\n  },\n  \"limitations\": [\n    \"Manual compaction and three selected facts only; automatic compaction and all-fact preservation untested.\",\n    \"Context-size change is not provider savings; compaction consumes inference.\",\n    \"Initial broker wording was ambiguous; a follow-up asked whether any broker acceptance was established and returned explicit No. Both responses retained.\"\n  ]\n}\n",
+          "claim": "Automatic compaction preserves every fact.",
+          "expected": "insufficient"
+        },
+        "description": "C2 untested-not-failed"
+      },
+      "store": {},
+      "events": [
+        {
+          "uuid": "KVzyWd9DLoPKrxDUsTVen8",
+          "span_id": "TGjppMjjhNArb76ngyYcRF",
+          "timestamp": "2026-09-23T07:26:47.340217+00:00",
+          "working_start": 59334.700841134,
+          "event": "span_begin",
+          "id": "TGjppMjjhNArb76ngyYcRF",
+          "type": "init",
+          "name": "init"
+        },
+        {
+          "uuid": "VCEMm2dYvSm9V8sLyNN2Xf",
+          "span_id": "TGjppMjjhNArb76ngyYcRF",
+          "timestamp": "2026-09-23T07:26:47.340469+00:00",
+          "working_start": 59334.701093635,
+          "event": "sample_init",
+          "sample": {
+            "input": "attachment://729e21f4d46bc208559897b9a14ce1ab",
+            "target": "insufficient",
+            "id": "C2",
+            "metadata": {
+              "vars": {
+                "source_available_at": "2026-09-20T10:00:00Z",
+                "decision_at": "2026-09-20T11:00:00Z",
+                "expected_eligible": true,
+                "source": "{\n  \"schema_version\": 1,\n  \"trigger\": \"manual\",\n  \"native_metadata\": {\n    \"preTokens\": 87434,\n    \"postTokens\": 14934,\n    \"cumulativeDroppedTokens\": 72500,\n    \"durationMs\": 42506\n  },\n  \"precompact_hook_observation\": {\n    \"ai-memory_success\": true,\n    \"context-mode_success\": true\n  },\n  \"continuity_responses\": [\n    \"review-contract = foundation-20260921.\\nProvider savings were not established — they remain unknown; no causal session or lifetime saving is claimed, and compression/cache counters cannot be summed into them.\\nBrokers: IBKR paper and Alpaca paper each remain independently qualified and separate from engine/FX replay and authenticated Alpaca data; existing paper authorization persists.\",\n    \"No — this was a bounded read-only document review of two files and establishes nothing about broker execution; IBKR paper and Alpaca paper acceptance remain separate, independently qualified work.\"\n  ],\n  \"post_boundary_model_tool_calls\": [],\n  \"oracle\": {\n    \"identifier\": \"foundation-20260921\",\n    \"provider_savings\": \"unknown\",\n    \"broker_acceptance\": \"not established by document review; separate per broker\"\n  },\n  \"limitations\": [\n    \"Manual compaction and three selected facts only; automatic compaction and all-fact preservation untested.\",\n    \"Context-size change is not provider savings; compaction consumes inference.\",\n    \"Initial broker wording was ambiguous; a follow-up asked whether any broker acceptance was established and returned explicit No. Both responses retained.\"\n  ]\n}\n",
+                "claim": "Automatic compaction preserves every fact.",
+                "expected": "insufficient"
+              },
+              "description": "C2 untested-not-failed"
+            }
+          },
+          "state": {
+            "messages": [
+              {
+                "id": "7jGaVip6EUB373jHp8mq7D",
+                "content": "attachment://729e21f4d46bc208559897b9a14ce1ab",
+                "source": "input",
+                "role": "user"
+              }
+            ],
+            "tools": [],
+            "tool_choice": null,
+            "store": {},
+            "output": {
+              "model": "mockllm/model",
+              "choices": [],
+              "completion": ""
+            },
+            "completed": false,
+            "metadata": {
+              "vars": {
+                "source_available_at": "2026-09-20T10:00:00Z",
+                "decision_at": "2026-09-20T11:00:00Z",
+                "expected_eligible": true,
+                "source": "attachment://cbd1b2df440489f785dfdeb0ce584866",
+                "claim": "Automatic compaction preserves every fact.",
+                "expected": "insufficient"
+              },
+              "description": "C2 untested-not-failed"
+            }
+          }
+        },
+        {
+          "uuid": "J3qax7HwWizje9DwykPvBq",
+          "span_id": "TGjppMjjhNArb76ngyYcRF",
+          "timestamp": "2026-09-23T07:26:47.340631+00:00",
+          "working_start": 59334.701255236,
+          "event": "span_end",
+          "id": "TGjppMjjhNArb76ngyYcRF"
+        },
+        {
+          "uuid": "TXbhHxmBJpwbVzx4XgYeNN",
+          "span_id": "NCwkJ8Trb3ZPLPnBiWsUZ2",
+          "timestamp": "2026-09-23T07:26:47.340929+00:00",
+          "working_start": 0.0002302009961567819,
+          "event": "span_begin",
+          "id": "NCwkJ8Trb3ZPLPnBiWsUZ2",
+          "type": "solvers",
+          "name": "solvers"
+        },
+        {
+          "uuid": "Ht8q3w8j35vXx66z52oFPY",
+          "span_id": "PkeStkzbPoSd7dVPG5LLJE",
+          "timestamp": "2026-09-23T07:26:47.341024+00:00",
+          "working_start": 0.00032510199525859207,
+          "event": "span_begin",
+          "id": "PkeStkzbPoSd7dVPG5LLJE",
+          "parent_id": "NCwkJ8Trb3ZPLPnBiWsUZ2",
+          "type": "solver",
+          "name": "fault_and_delay"
+        },
+        {
+          "uuid": "Uze5WpyfUyB6iLGQtrx8E9",
+          "span_id": "PkeStkzbPoSd7dVPG5LLJE",
+          "timestamp": "2026-09-23T07:26:47.341155+00:00",
+          "working_start": 0.00045610299275722355,
+          "event": "span_end",
+          "id": "PkeStkzbPoSd7dVPG5LLJE"
+        },
+        {
+          "uuid": "mVQw9W2HpCzZShkvZw8Yy8",
+          "span_id": "juVSoEDAuYCgMLannBpHDk",
+          "timestamp": "2026-09-23T07:26:47.341227+00:00",
+          "working_start": 0.0005284029975882731,
+          "event": "span_begin",
+          "id": "juVSoEDAuYCgMLannBpHDk",
+          "parent_id": "NCwkJ8Trb3ZPLPnBiWsUZ2",
+          "type": "solver",
+          "name": "generate"
+        },
+        {
+          "uuid": "mefSHMp9muVZ5tUdGbpfAk",
+          "span_id": "juVSoEDAuYCgMLannBpHDk",
+          "timestamp": "2026-09-23T07:26:47.341401+00:00",
+          "working_start": 0.0007023039943305776,
+          "event": "model",
+          "model": "mockllm/model",
+          "input": [],
+          "input_refs": [
+            [
+              0,
+              1
+            ]
+          ],
+          "tools": [],
+          "tool_choice": "none",
+          "config": {
+            "max_connections": 1
+          },
+          "output": {
+            "model": "mockllm/model",
+            "choices": [
+              {
+                "message": {
+                  "id": "dF38Yr7hDK7T73UBx5qMeL",
+                  "content": "insufficient",
+                  "source": "generate",
+                  "role": "assistant",
+                  "model": "mockllm/model"
+                },
+                "stop_reason": "stop"
+              }
+            ],
+            "completion": "insufficient",
+            "usage": {
+              "input_tokens": 0,
+              "output_tokens": 0,
+              "total_tokens": 0
+            },
+            "time": 0.02482876199792372
+          },
+          "call": {
+            "request": {
+              "model": "model"
+            },
+            "response": {
+              "content": "insufficient"
+            },
+            "call_refs": [
+              [
+                0,
+                1
+              ]
+            ],
+            "call_key": "messages"
+          },
+          "completed": "2026-09-23T07:26:47.367693+00:00",
+          "working_time": 0.02482876199792372
+        },
+        {
+          "uuid": "arU7PrVHCZhVXjfV6mNesS",
+          "span_id": "juVSoEDAuYCgMLannBpHDk",
+          "timestamp": "2026-09-23T07:26:47.368049+00:00",
+          "working_start": 0.026054270994791295,
+          "event": "state",
+          "changes": [
+            {
+              "op": "add",
+              "path": "/output/time",
+              "value": 0.02482876199792372
+            },
+            {
+              "op": "add",
+              "path": "/output/usage",
+              "value": {
+                "input_tokens": 0,
+                "output_tokens": 0,
+                "total_tokens": 0
+              }
+            },
+            {
+              "op": "add",
+              "path": "/output/choices/0",
+              "value": {
+                "message": {
+                  "id": "dF38Yr7hDK7T73UBx5qMeL",
+                  "content": "insufficient",
+                  "source": "generate",
+                  "role": "assistant",
+                  "model": "mockllm/model"
+                },
+                "stop_reason": "stop"
+              }
+            },
+            {
+              "op": "replace",
+              "path": "/output/completion",
+              "value": "insufficient",
+              "replaced": ""
+            },
+            {
+              "op": "add",
+              "path": "/messages/1",
+              "value": {
+                "id": "dF38Yr7hDK7T73UBx5qMeL",
+                "content": "insufficient",
+                "source": "generate",
+                "role": "assistant",
+                "model": "mockllm/model"
+              }
+            }
+          ]
+        },
+        {
+          "uuid": "B6bFZACbAzCUYRPZAohieG",
+          "span_id": "juVSoEDAuYCgMLannBpHDk",
+          "timestamp": "2026-09-23T07:26:47.368176+00:00",
+          "working_start": 0.02618127199821174,
+          "event": "span_end",
+          "id": "juVSoEDAuYCgMLannBpHDk"
+        },
+        {
+          "uuid": "VtzRBi7BixKWBuaj49vMXt",
+          "span_id": "NCwkJ8Trb3ZPLPnBiWsUZ2",
+          "timestamp": "2026-09-23T07:26:47.368311+00:00",
+          "working_start": 0.026315572999010328,
+          "event": "span_end",
+          "id": "NCwkJ8Trb3ZPLPnBiWsUZ2"
+        },
+        {
+          "uuid": "o3gKtVkGzGoX4TnPkLE7FJ",
+          "span_id": "3FtQYbzexhTv9nrgBHgWxa",
+          "timestamp": "2026-09-23T07:26:47.368611+00:00",
+          "working_start": 0.02661627499765018,
+          "event": "span_begin",
+          "id": "3FtQYbzexhTv9nrgBHgWxa",
+          "type": "scorers",
+          "name": "scorers"
+        },
+        {
+          "uuid": "NuvQWpAYn5PSoJgM6eY5zu",
+          "span_id": "GDarQ2zfKYCwaCQrdfDaZW",
+          "timestamp": "2026-09-23T07:26:47.368696+00:00",
+          "working_start": 0.02670097499503754,
+          "event": "span_begin",
+          "id": "GDarQ2zfKYCwaCQrdfDaZW",
+          "parent_id": "3FtQYbzexhTv9nrgBHgWxa",
+          "type": "scorer",
+          "name": "promptfoo_equivalent_assertions"
+        },
+        {
+          "uuid": "Y4EWFTDiz4pUt2wZZbPSFp",
+          "span_id": "GDarQ2zfKYCwaCQrdfDaZW",
+          "timestamp": "2026-09-23T07:26:47.394647+00:00",
+          "working_start": 0.052657643995189574,
+          "event": "score",
+          "score": {
+            "value": "C",
+            "answer": "insufficient",
+            "explanation": "all 3 assertions passed",
+            "metadata": {
+              "gated": {
+                "verdict": "insufficient",
+                "eligible": true,
+                "disposition": "advisory_insufficient",
+                "source_sha256": "85eb14433d6e4b61fbe60670647f61c65ef4db1ce75408b853860f8a4f26ddc3",
+                "schema_version": 1
+              },
+              "assertions": [
+                {
+                  "value": "JSON.parse(output).verdict === context.vars.expected",
+                  "pass": true,
+                  "error": null
+                },
+                {
+                  "value": "JSON.parse(output).eligible === context.vars.expected_eligible",
+                  "pass": true,
+                  "error": null
+                },
+                {
+                  "value": "JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+                  "pass": true,
+                  "error": null
+                }
+              ]
+            },
+            "history": []
+          },
+          "target": "insufficient",
+          "intermediate": false,
+          "scorer": "promptfoo_equivalent_assertions",
+          "scorer_args": {},
+          "model_usage": {
+            "mockllm/model": {
+              "input_tokens": 0,
+              "output_tokens": 0,
+              "total_tokens": 0
+            }
+          }
+        },
+        {
+          "uuid": "aAATiDecioZZLs5jiY7yX3",
+          "span_id": "GDarQ2zfKYCwaCQrdfDaZW",
+          "timestamp": "2026-09-23T07:26:47.394994+00:00",
+          "working_start": 0.05299984599696472,
+          "event": "span_end",
+          "id": "GDarQ2zfKYCwaCQrdfDaZW"
+        },
+        {
+          "uuid": "Tvhq5V9WypkTGYZiScCC6k",
+          "span_id": "3FtQYbzexhTv9nrgBHgWxa",
+          "timestamp": "2026-09-23T07:26:47.395105+00:00",
+          "working_start": 0.05311034699843731,
+          "event": "span_end",
+          "id": "3FtQYbzexhTv9nrgBHgWxa"
+        }
+      ],
+      "model_usage": {
+        "mockllm/model": {
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "total_tokens": 0
+        }
+      },
+      "role_usage": {},
+      "started_at": "2026-09-23T07:26:47.340701+00:00",
+      "completed_at": "2026-09-23T07:26:47.395344+00:00",
+      "total_time": 0.055,
+      "working_time": 0.053,
+      "uuid": "jnUy2ptdxCW3X4EkQMF8ar",
+      "error_retries": [],
+      "attachments": {
+        "729e21f4d46bc208559897b9a14ce1ab": "{\"source\": \"{\\n  \\\"schema_version\\\": 1,\\n  \\\"trigger\\\": \\\"manual\\\",\\n  \\\"native_metadata\\\": {\\n    \\\"preTokens\\\": 87434,\\n    \\\"postTokens\\\": 14934,\\n    \\\"cumulativeDroppedTokens\\\": 72500,\\n    \\\"durationMs\\\": 42506\\n  },\\n  \\\"precompact_hook_observation\\\": {\\n    \\\"ai-memory_success\\\": true,\\n    \\\"context-mode_success\\\": true\\n  },\\n  \\\"continuity_responses\\\": [\\n    \\\"review-contract = foundation-20260921.\\\\nProvider savings were not established — they remain unknown; no causal session or lifetime saving is claimed, and compression/cache counters cannot be summed into them.\\\\nBrokers: IBKR paper and Alpaca paper each remain independently qualified and separate from engine/FX replay and authenticated Alpaca data; existing paper authorization persists.\\\",\\n    \\\"No — this was a bounded read-only document review of two files and establishes nothing about broker execution; IBKR paper and Alpaca paper acceptance remain separate, independently qualified work.\\\"\\n  ],\\n  \\\"post_boundary_model_tool_calls\\\": [],\\n  \\\"oracle\\\": {\\n    \\\"identifier\\\": \\\"foundation-20260921\\\",\\n    \\\"provider_savings\\\": \\\"unknown\\\",\\n    \\\"broker_acceptance\\\": \\\"not established by document review; separate per broker\\\"\\n  },\\n  \\\"limitations\\\": [\\n    \\\"Manual compaction and three selected facts only; automatic compaction and all-fact preservation untested.\\\",\\n    \\\"Context-size change is not provider savings; compaction consumes inference.\\\",\\n    \\\"Initial broker wording was ambiguous; a follow-up asked whether any broker acceptance was established and returned explicit No. Both responses retained.\\\"\\n  ]\\n}\\n\", \"claim\": \"Automatic compaction preserves every fact.\"}",
+        "cbd1b2df440489f785dfdeb0ce584866": "{\n  \"schema_version\": 1,\n  \"trigger\": \"manual\",\n  \"native_metadata\": {\n    \"preTokens\": 87434,\n    \"postTokens\": 14934,\n    \"cumulativeDroppedTokens\": 72500,\n    \"durationMs\": 42506\n  },\n  \"precompact_hook_observation\": {\n    \"ai-memory_success\": true,\n    \"context-mode_success\": true\n  },\n  \"continuity_responses\": [\n    \"review-contract = foundation-20260921.\\nProvider savings were not established — they remain unknown; no causal session or lifetime saving is claimed, and compression/cache counters cannot be summed into them.\\nBrokers: IBKR paper and Alpaca paper each remain independently qualified and separate from engine/FX replay and authenticated Alpaca data; existing paper authorization persists.\",\n    \"No — this was a bounded read-only document review of two files and establishes nothing about broker execution; IBKR paper and Alpaca paper acceptance remain separate, independently qualified work.\"\n  ],\n  \"post_boundary_model_tool_calls\": [],\n  \"oracle\": {\n    \"identifier\": \"foundation-20260921\",\n    \"provider_savings\": \"unknown\",\n    \"broker_acceptance\": \"not established by document review; separate per broker\"\n  },\n  \"limitations\": [\n    \"Manual compaction and three selected facts only; automatic compaction and all-fact preservation untested.\",\n    \"Context-size change is not provider savings; compaction consumes inference.\",\n    \"Initial broker wording was ambiguous; a follow-up asked whether any broker acceptance was established and returned explicit No. Both responses retained.\"\n  ]\n}\n"
+      },
+      "events_data": {
+        "messages": [
+          {
+            "id": "7jGaVip6EUB373jHp8mq7D",
+            "content": "attachment://729e21f4d46bc208559897b9a14ce1ab",
+            "source": "input",
+            "role": "user"
+          }
+        ],
+        "calls": [
+          {
+            "id": "7jGaVip6EUB373jHp8mq7D",
+            "content": "attachment://729e21f4d46bc208559897b9a14ce1ab",
+            "source": "input",
+            "metadata": null,
+            "role": "user",
+            "tool_call_id": null
+          }
+        ]
+      },
+      "turn_count": 1
+    },
+    {
+      "id": "C3",
+      "epoch": 1,
+      "input": "{\"source\": \"# Native Workflow writing and recovery qualification\\n\\nThe bounded writing pilot produced correct code in both arms. It did **not**\\nestablish a fully compliant or superior multi-agent workflow: both arms piped\\nnative test output, and the Workflow arm omitted the required authoring skill.\\nIndependent unpiped verification accepted both repairs. Keep a capable single\\nagent as the economical choice for this small repair; this one ordered pair is\\nnot a cross-task model ranking.\", \"claim\": \"Independent verification accepted both repairs in this small repair comparison.\"}",
+      "target": "supported",
+      "messages": [
+        {
+          "id": "DhXfWpQXGfFTwsKB8qRFPS",
+          "content": "{\"source\": \"# Native Workflow writing and recovery qualification\\n\\nThe bounded writing pilot produced correct code in both arms. It did **not**\\nestablish a fully compliant or superior multi-agent workflow: both arms piped\\nnative test output, and the Workflow arm omitted the required authoring skill.\\nIndependent unpiped verification accepted both repairs. Keep a capable single\\nagent as the economical choice for this small repair; this one ordered pair is\\nnot a cross-task model ranking.\", \"claim\": \"Independent verification accepted both repairs in this small repair comparison.\"}",
+          "source": "input",
+          "role": "user"
+        }
+      ],
+      "output": {
+        "model": "mockllm/model",
+        "choices": [],
+        "completion": ""
+      },
+      "scores": {},
+      "metadata": {
+        "vars": {
+          "source_available_at": "2026-09-20T10:00:00Z",
+          "decision_at": "2026-09-20T11:00:00Z",
+          "expected_eligible": true,
+          "source": "# Native Workflow writing and recovery qualification\n\nThe bounded writing pilot produced correct code in both arms. It did **not**\nestablish a fully compliant or superior multi-agent workflow: both arms piped\nnative test output, and the Workflow arm omitted the required authoring skill.\nIndependent unpiped verification accepted both repairs. Keep a capable single\nagent as the economical choice for this small repair; this one ordered pair is\nnot a cross-task model ranking.",
+          "claim": "Independent verification accepted both repairs in this small repair comparison.",
+          "expected": "supported"
+        },
+        "description": "C3 bounded-writing-acceptance"
+      },
+      "store": {},
+      "events": [
+        {
+          "uuid": "Bh3HYVV9cMimkuhwRvRzE2",
+          "span_id": "37MqZtm3g6bPUTSpKNoaYe",
+          "timestamp": "2026-09-23T07:26:47.396681+00:00",
+          "working_start": 59334.757305601,
+          "event": "span_begin",
+          "id": "37MqZtm3g6bPUTSpKNoaYe",
+          "type": "init",
+          "name": "init"
+        },
+        {
+          "uuid": "VfypA2UHTyPmvKXdkf89jv",
+          "span_id": "37MqZtm3g6bPUTSpKNoaYe",
+          "timestamp": "2026-09-23T07:26:47.396925+00:00",
+          "working_start": 59334.757549203,
+          "event": "sample_init",
+          "sample": {
+            "input": "attachment://d1d67a6ad6e81f9acf119f87035f8968",
+            "target": "supported",
+            "id": "C3",
+            "metadata": {
+              "vars": {
+                "source_available_at": "2026-09-20T10:00:00Z",
+                "decision_at": "2026-09-20T11:00:00Z",
+                "expected_eligible": true,
+                "source": "# Native Workflow writing and recovery qualification\n\nThe bounded writing pilot produced correct code in both arms. It did **not**\nestablish a fully compliant or superior multi-agent workflow: both arms piped\nnative test output, and the Workflow arm omitted the required authoring skill.\nIndependent unpiped verification accepted both repairs. Keep a capable single\nagent as the economical choice for this small repair; this one ordered pair is\nnot a cross-task model ranking.",
+                "claim": "Independent verification accepted both repairs in this small repair comparison.",
+                "expected": "supported"
+              },
+              "description": "C3 bounded-writing-acceptance"
+            }
+          },
+          "state": {
+            "messages": [
+              {
+                "id": "DhXfWpQXGfFTwsKB8qRFPS",
+                "content": "attachment://d1d67a6ad6e81f9acf119f87035f8968",
+                "source": "input",
+                "role": "user"
+              }
+            ],
+            "tools": [],
+            "tool_choice": null,
+            "store": {},
+            "output": {
+              "model": "mockllm/model",
+              "choices": [],
+              "completion": ""
+            },
+            "completed": false,
+            "metadata": {
+              "vars": {
+                "source_available_at": "2026-09-20T10:00:00Z",
+                "decision_at": "2026-09-20T11:00:00Z",
+                "expected_eligible": true,
+                "source": "attachment://f22f49a8fc2203cc711a16c73ba54d72",
+                "claim": "Independent verification accepted both repairs in this small repair comparison.",
+                "expected": "supported"
+              },
+              "description": "C3 bounded-writing-acceptance"
+            }
+          }
+        },
+        {
+          "uuid": "ZakJbF9ibjKvLQCnyUxMRk",
+          "span_id": "37MqZtm3g6bPUTSpKNoaYe",
+          "timestamp": "2026-09-23T07:26:47.397071+00:00",
+          "working_start": 59334.757695304,
+          "event": "span_end",
+          "id": "37MqZtm3g6bPUTSpKNoaYe"
+        },
+        {
+          "uuid": "EqzvaaX4mxpjbekTT3FG86",
+          "span_id": "U7bWChBHhSrfL6hhbhMFSB",
+          "timestamp": "2026-09-23T07:26:47.397343+00:00",
+          "working_start": 0.00021040199499111623,
+          "event": "span_begin",
+          "id": "U7bWChBHhSrfL6hhbhMFSB",
+          "type": "solvers",
+          "name": "solvers"
+        },
+        {
+          "uuid": "2tPfGXn3MbCgebRkvXDyjm",
+          "span_id": "jJo8b34pzXyFo2eTipzFRn",
+          "timestamp": "2026-09-23T07:26:47.397428+00:00",
+          "working_start": 0.00029630199423991144,
+          "event": "span_begin",
+          "id": "jJo8b34pzXyFo2eTipzFRn",
+          "parent_id": "U7bWChBHhSrfL6hhbhMFSB",
+          "type": "solver",
+          "name": "fault_and_delay"
+        },
+        {
+          "uuid": "SFTK5ypRzm6PkBdSMMG6vA",
+          "span_id": "jJo8b34pzXyFo2eTipzFRn",
+          "timestamp": "2026-09-23T07:26:47.397637+00:00",
+          "working_start": 0.0005053040003986098,
+          "event": "span_end",
+          "id": "jJo8b34pzXyFo2eTipzFRn"
+        },
+        {
+          "uuid": "6DhyntsTko2BCoGF4e857P",
+          "span_id": "U7bWChBHhSrfL6hhbhMFSB",
+          "timestamp": "2026-09-23T07:26:47.397710+00:00",
+          "working_start": 0.0005773039956693538,
+          "event": "span_end",
+          "id": "U7bWChBHhSrfL6hhbhMFSB"
+        },
+        {
+          "uuid": "HXPAjSEyQznLWYbVCZXcAq",
+          "timestamp": "2026-09-23T07:26:47.456436+00:00",
+          "working_start": 0.05930938600067748,
+          "event": "error",
+          "error": {
+            "message": "RuntimeError('injected transient failure for C3 (first attempt)')",
+            "traceback": "  + Exception Group Traceback (most recent call last):\n  |   File \"$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/lib/python3.13/site-packages/inspect_ai/_eval/task/run.py\", line 2846, in _task_run_sample_attempt\n  |     async with anyio.create_task_group() as tg:\n  |                ~~~~~~~~~~~~~~~~~~~~~~~^^\n  |   File \"$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/lib/python3.13/site-packages/anyio/_backends/_asyncio.py\", line 847, in __aexit__\n  |     raise BaseExceptionGroup(\n  |         \"unhandled errors in a TaskGroup\", self._exceptions\n  |     ) from None\n  | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)\n  +-+---------------- 1 ----------------\n    | Traceback (most recent call last):\n    |   File \"$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/lib/python3.13/site-packages/inspect_ai/_eval/task/run.py\", line 2849, in _task_run_sample_attempt\n    |     raise inner_exception(ex)\n    |   File \"$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/lib/python3.13/site-packages/anyio/_core/_tasks.py\", line 327, in _run_coro\n    |     retval = await self._coro\n    |              ^^^^^^^^^^^^^^^^\n    |   File \"$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/lib/python3.13/site-packages/inspect_ai/_eval/task/run.py\", line 2719, in run\n    |     state = await plan(state, generate)\n    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    |   File \"$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/lib/python3.13/site-packages/inspect_ai/solver/_plan.py\", line 106, in __call__\n    |     state = await solver(state, generate)\n    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    |   File \"$HOME/code/nas-wt-g2-evaluation-experiments/blueprints/gap-wave2-20260923/us-equities__evaluation-experiments/inspect-arm/catalog_task.py\", line 80, in solve\n    |     raise RuntimeError(f\"injected transient failure for {fail_once_case} (first attempt)\")\n    | RuntimeError: injected transient failure for C3 (first attempt)\n    +------------------------------------\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/lib/python3.13/site-packages/inspect_ai/_eval/task/run.py\", line 2849, in _task_run_sample_attempt\n    raise inner_exception(ex)\n  File \"$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/lib/python3.13/site-packages/anyio/_core/_tasks.py\", line 327, in _run_coro\n    retval = await self._coro\n             ^^^^^^^^^^^^^^^^\n  File \"$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/lib/python3.13/site-packages/inspect_ai/_eval/task/run.py\", line 2719, in run\n    state = await plan(state, generate)\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/lib/python3.13/site-packages/inspect_ai/solver/_plan.py\", line 106, in __call__\n    state = await solver(state, generate)\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"$HOME/code/nas-wt-g2-evaluation-experiments/blueprints/gap-wave2-20260923/us-equities__evaluation-experiments/inspect-arm/catalog_task.py\", line 80, in solve\n    raise RuntimeError(f\"injected transient failure for {fail_once_case} (first attempt)\")\nRuntimeError: injected transient failure for C3 (first attempt)\n",
+            "traceback_ansi": "\u001b[31m┌─\u001b[0m\u001b[31m────────────────────\u001b[0m\u001b[31m \u001b[0m\u001b[1;31mTraceback \u001b[0m\u001b[1;2;31m(most recent call last)\u001b[0m\u001b[31m \u001b[0m\u001b[31m────────────────────\u001b[0m\u001b[31m─┐\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2m$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/l\u001b[0m \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2mib/python3.13/site-packages/inspect_ai/_eval/task/\u001b[0m\u001b[1mrun.py\u001b[0m:2846 in            \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m _task_run_sample_attempt                                                    \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m                                                                             \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2m$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/l\u001b[0m \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2mib/python3.13/site-packages/anyio/_backends/\u001b[0m\u001b[1m_asyncio.py\u001b[0m:847 in __aexit__    \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m                                                                             \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 844 \u001b[0m\u001b[2m│   │   │   │   │   \u001b[0m\u001b[2m# added to self._exceptions so it's ok to break \u001b[0m \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 845 \u001b[0m\u001b[2m│   │   │   │   │   \u001b[0m\u001b[2m# chaining and avoid adding a \"During handling o\u001b[0m \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 846 \u001b[0m\u001b[2m│   │   │   │   │   \u001b[0m\u001b[2m# for each nesting level.\u001b[0m                        \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[31m> \u001b[0m 847 \u001b[2m│   │   │   │   │   \u001b[0m\u001b[94mraise\u001b[0m BaseExceptionGroup(                        \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 848 \u001b[0m\u001b[2m│   │   │   │   │   │   \u001b[0m\u001b[33m\"\u001b[0m\u001b[33munhandled errors in a TaskGroup\u001b[0m\u001b[33m\"\u001b[0m, \u001b[96mself\u001b[0m._exc \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 849 \u001b[0m\u001b[2m│   │   │   │   │   \u001b[0m) \u001b[94mfrom\u001b[0m\u001b[90m \u001b[0m\u001b[94mNone\u001b[0m                                      \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 850 \u001b[0m\u001b[2m│   │   │   │   \u001b[0m\u001b[94melif\u001b[0m exc_val:                                        \u001b[31m│\u001b[0m\n\u001b[31m└─────────────────────────────────────────────────────────────────────────────┘\u001b[0m\n\u001b[1;91mExceptionGroup: \u001b[0munhandled errors in a TaskGroup \u001b[1m(\u001b[0m\u001b[1;36m1\u001b[0m sub-exception\u001b[1m)\u001b[0m\n\n\u001b[35m┌─\u001b[0m\u001b[35m────────────────────────────\u001b[0m\u001b[35m Sub-exception #1 \u001b[0m\u001b[35m─────────────────────────────\u001b[0m\u001b[35m─┐\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m┌─\u001b[0m\u001b[31m──────────────────\u001b[0m\u001b[31m \u001b[0m\u001b[1;31mTraceback \u001b[0m\u001b[1;2;31m(most recent call last)\u001b[0m\u001b[31m \u001b[0m\u001b[31m──────────────────\u001b[0m\u001b[31m─┐\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m \u001b[2m$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspe\u001b[0m \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m \u001b[2mct/lib/python3.13/site-packages/inspect_ai/_eval/task/\u001b[0m\u001b[1mrun.py\u001b[0m:2849 in    \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m _task_run_sample_attempt                                                \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m                                                                         \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m \u001b[2m$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspe\u001b[0m \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m \u001b[2mct/lib/python3.13/site-packages/anyio/_core/\u001b[0m\u001b[1m_tasks.py\u001b[0m:327 in _run_coro  \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m                                                                         \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m   \u001b[2m324 \u001b[0m\u001b[2m│   │   \u001b[0m                                                          \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m   \u001b[2m325 \u001b[0m\u001b[2m│   │   \u001b[0m\u001b[94mwith\u001b[0m \u001b[96mself\u001b[0m._cancel_scope:                                  \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m   \u001b[2m326 \u001b[0m\u001b[2m│   │   │   \u001b[0m\u001b[94mtry\u001b[0m:                                                  \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m \u001b[31m> \u001b[0m327 \u001b[2m│   │   │   │   \u001b[0mretval = \u001b[94mawait\u001b[0m \u001b[96mself\u001b[0m._coro                         \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m   \u001b[2m328 \u001b[0m\u001b[2m│   │   │   \u001b[0m\u001b[94mexcept\u001b[0m \u001b[96mBaseException\u001b[0m \u001b[94mas\u001b[0m exc:                          \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m   \u001b[2m329 \u001b[0m\u001b[2m│   │   │   │   \u001b[0m\u001b[96mself\u001b[0m._exception = exc                             \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m   \u001b[2m330 \u001b[0m\u001b[2m│   │   │   │   \u001b[0m\u001b[94mraise\u001b[0m                                             \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m                                                                         \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m \u001b[2m$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspe\u001b[0m \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m \u001b[2mct/lib/python3.13/site-packages/inspect_ai/_eval/task/\u001b[0m\u001b[1mrun.py\u001b[0m:2719 in    \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m run                                                                     \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m                                                                         \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m \u001b[2m$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspe\u001b[0m \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m \u001b[2mct/lib/python3.13/site-packages/inspect_ai/solver/\u001b[0m\u001b[1m_plan.py\u001b[0m:106 in       \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m __call__                                                                \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m                                                                         \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m \u001b[2m$HOME/code/nas-wt-g2-evaluation-experiments/blueprints/gap-wave2-\u001b[0m \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m \u001b[2m20260923/us-equities__evaluation-experiments/inspect-arm/\u001b[0m\u001b[1mcatalog_task.p\u001b[0m \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m \u001b[1my\u001b[0m:80 in solve                                                           \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m                                                                         \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m   \u001b[2m 77 \u001b[0m\u001b[2m│   │   │   \u001b[0mmarker = Path(marker_dir) / \u001b[33mf\u001b[0m\u001b[33m\"\u001b[0m\u001b[33m{\u001b[0mfail_once_case\u001b[33m}\u001b[0m\u001b[33m.failed\u001b[0m \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m   \u001b[2m 78 \u001b[0m\u001b[2m│   │   │   \u001b[0m\u001b[94mif\u001b[0m \u001b[95mnot\u001b[0m marker.exists():                               \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m   \u001b[2m 79 \u001b[0m\u001b[2m│   │   │   │   \u001b[0mmarker.write_text(\u001b[33m\"\u001b[0m\u001b[33m1\u001b[0m\u001b[33m\"\u001b[0m)                            \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m \u001b[31m> \u001b[0m 80 \u001b[2m│   │   │   │   \u001b[0m\u001b[1;4;94mraise\u001b[0m\u001b[1;4m \u001b[0m\u001b[1;4;96mRuntimeError\u001b[0m\u001b[1;4m(\u001b[0m\u001b[1;4;33mf\u001b[0m\u001b[1;4;33m\"\u001b[0m\u001b[1;4;33minjected transient failure f\u001b[0m \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m   \u001b[2m 81 \u001b[0m\u001b[2m│   │   \u001b[0m\u001b[94mreturn\u001b[0m state                                              \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m   \u001b[2m 82 \u001b[0m\u001b[2m│   \u001b[0m\u001b[94mreturn\u001b[0m solve                                                  \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m   \u001b[2m 83 \u001b[0m                                                                  \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m└─────────────────────────────────────────────────────────────────────────┘\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[1;91mRuntimeError: \u001b[0minjected transient failure for C3 \u001b[1m(\u001b[0mfirst attempt\u001b[1m)\u001b[0m             \u001b[35m│\u001b[0m\n\u001b[35m└─────────────────────────────────────────────────────────────────────────────┘\u001b[0m\n\n\u001b[3mDuring handling of the above exception, another exception occurred:\u001b[0m\n\n\u001b[31m┌─\u001b[0m\u001b[31m────────────────────\u001b[0m\u001b[31m \u001b[0m\u001b[1;31mTraceback \u001b[0m\u001b[1;2;31m(most recent call last)\u001b[0m\u001b[31m \u001b[0m\u001b[31m────────────────────\u001b[0m\u001b[31m─┐\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2m$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/l\u001b[0m \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2mib/python3.13/site-packages/inspect_ai/_eval/task/\u001b[0m\u001b[1mrun.py\u001b[0m:2849 in            \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m _task_run_sample_attempt                                                    \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m                                                                             \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2m$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/l\u001b[0m \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2mib/python3.13/site-packages/anyio/_core/\u001b[0m\u001b[1m_tasks.py\u001b[0m:327 in _run_coro          \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m                                                                             \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m324 \u001b[0m\u001b[2m│   │   \u001b[0m                                                              \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m325 \u001b[0m\u001b[2m│   │   \u001b[0m\u001b[94mwith\u001b[0m \u001b[96mself\u001b[0m._cancel_scope:                                      \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m326 \u001b[0m\u001b[2m│   │   │   \u001b[0m\u001b[94mtry\u001b[0m:                                                      \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[31m> \u001b[0m327 \u001b[2m│   │   │   │   \u001b[0mretval = \u001b[94mawait\u001b[0m \u001b[96mself\u001b[0m._coro                             \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m328 \u001b[0m\u001b[2m│   │   │   \u001b[0m\u001b[94mexcept\u001b[0m \u001b[96mBaseException\u001b[0m \u001b[94mas\u001b[0m exc:                              \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m329 \u001b[0m\u001b[2m│   │   │   │   \u001b[0m\u001b[96mself\u001b[0m._exception = exc                                 \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m330 \u001b[0m\u001b[2m│   │   │   │   \u001b[0m\u001b[94mraise\u001b[0m                                                 \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m                                                                             \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2m$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/l\u001b[0m \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2mib/python3.13/site-packages/inspect_ai/_eval/task/\u001b[0m\u001b[1mrun.py\u001b[0m:2719 in run        \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m                                                                             \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2m$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/l\u001b[0m \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2mib/python3.13/site-packages/inspect_ai/solver/\u001b[0m\u001b[1m_plan.py\u001b[0m:106 in __call__      \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m                                                                             \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2m$HOME/code/nas-wt-g2-evaluation-experiments/blueprints/gap-wave2-2026\u001b[0m \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2m0923/us-equities__evaluation-experiments/inspect-arm/\u001b[0m\u001b[1mcatalog_task.py\u001b[0m:80 in  \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m solve                                                                       \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m                                                                             \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 77 \u001b[0m\u001b[2m│   │   │   \u001b[0mmarker = Path(marker_dir) / \u001b[33mf\u001b[0m\u001b[33m\"\u001b[0m\u001b[33m{\u001b[0mfail_once_case\u001b[33m}\u001b[0m\u001b[33m.failed-onc\u001b[0m \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 78 \u001b[0m\u001b[2m│   │   │   \u001b[0m\u001b[94mif\u001b[0m \u001b[95mnot\u001b[0m marker.exists():                                   \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 79 \u001b[0m\u001b[2m│   │   │   │   \u001b[0mmarker.write_text(\u001b[33m\"\u001b[0m\u001b[33m1\u001b[0m\u001b[33m\"\u001b[0m)                                \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[31m> \u001b[0m 80 \u001b[2m│   │   │   │   \u001b[0m\u001b[1;4;94mraise\u001b[0m\u001b[1;4m \u001b[0m\u001b[1;4;96mRuntimeError\u001b[0m\u001b[1;4m(\u001b[0m\u001b[1;4;33mf\u001b[0m\u001b[1;4;33m\"\u001b[0m\u001b[1;4;33minjected transient failure for \u001b[0m\u001b[1;4;33m{\u001b[0m \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 81 \u001b[0m\u001b[2m│   │   \u001b[0m\u001b[94mreturn\u001b[0m state                                                  \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 82 \u001b[0m\u001b[2m│   \u001b[0m\u001b[94mreturn\u001b[0m solve                                                      \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 83 \u001b[0m                                                                      \u001b[31m│\u001b[0m\n\u001b[31m└─────────────────────────────────────────────────────────────────────────────┘\u001b[0m\n\u001b[1;91mRuntimeError: \u001b[0minjected transient failure for C3 \u001b[1m(\u001b[0mfirst attempt\u001b[1m)\u001b[0m\n"
+          }
+        }
+      ],
+      "model_usage": {},
+      "role_usage": {},
+      "started_at": "2026-09-23T07:26:47.397134+00:00",
+      "completed_at": "2026-09-23T07:26:47.457058+00:00",
+      "total_time": 0.06,
+      "working_time": 0.06,
+      "uuid": "UJpM2er6rnffrxt7yAiH2W",
+      "error": {
+        "message": "RuntimeError('injected transient failure for C3 (first attempt)')",
+        "traceback": "  + Exception Group Traceback (most recent call last):\n  |   File \"$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/lib/python3.13/site-packages/inspect_ai/_eval/task/run.py\", line 2846, in _task_run_sample_attempt\n  |     async with anyio.create_task_group() as tg:\n  |                ~~~~~~~~~~~~~~~~~~~~~~~^^\n  |   File \"$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/lib/python3.13/site-packages/anyio/_backends/_asyncio.py\", line 847, in __aexit__\n  |     raise BaseExceptionGroup(\n  |         \"unhandled errors in a TaskGroup\", self._exceptions\n  |     ) from None\n  | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)\n  +-+---------------- 1 ----------------\n    | Traceback (most recent call last):\n    |   File \"$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/lib/python3.13/site-packages/inspect_ai/_eval/task/run.py\", line 2849, in _task_run_sample_attempt\n    |     raise inner_exception(ex)\n    |   File \"$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/lib/python3.13/site-packages/anyio/_core/_tasks.py\", line 327, in _run_coro\n    |     retval = await self._coro\n    |              ^^^^^^^^^^^^^^^^\n    |   File \"$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/lib/python3.13/site-packages/inspect_ai/_eval/task/run.py\", line 2719, in run\n    |     state = await plan(state, generate)\n    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    |   File \"$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/lib/python3.13/site-packages/inspect_ai/solver/_plan.py\", line 106, in __call__\n    |     state = await solver(state, generate)\n    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    |   File \"$HOME/code/nas-wt-g2-evaluation-experiments/blueprints/gap-wave2-20260923/us-equities__evaluation-experiments/inspect-arm/catalog_task.py\", line 80, in solve\n    |     raise RuntimeError(f\"injected transient failure for {fail_once_case} (first attempt)\")\n    | RuntimeError: injected transient failure for C3 (first attempt)\n    +------------------------------------\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/lib/python3.13/site-packages/inspect_ai/_eval/task/run.py\", line 2849, in _task_run_sample_attempt\n    raise inner_exception(ex)\n  File \"$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/lib/python3.13/site-packages/anyio/_core/_tasks.py\", line 327, in _run_coro\n    retval = await self._coro\n             ^^^^^^^^^^^^^^^^\n  File \"$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/lib/python3.13/site-packages/inspect_ai/_eval/task/run.py\", line 2719, in run\n    state = await plan(state, generate)\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/lib/python3.13/site-packages/inspect_ai/solver/_plan.py\", line 106, in __call__\n    state = await solver(state, generate)\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"$HOME/code/nas-wt-g2-evaluation-experiments/blueprints/gap-wave2-20260923/us-equities__evaluation-experiments/inspect-arm/catalog_task.py\", line 80, in solve\n    raise RuntimeError(f\"injected transient failure for {fail_once_case} (first attempt)\")\nRuntimeError: injected transient failure for C3 (first attempt)\n",
+        "traceback_ansi": "\u001b[31m┌─\u001b[0m\u001b[31m────────────────────\u001b[0m\u001b[31m \u001b[0m\u001b[1;31mTraceback \u001b[0m\u001b[1;2;31m(most recent call last)\u001b[0m\u001b[31m \u001b[0m\u001b[31m────────────────────\u001b[0m\u001b[31m─┐\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2m$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/l\u001b[0m \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2mib/python3.13/site-packages/inspect_ai/_eval/task/\u001b[0m\u001b[1mrun.py\u001b[0m:2846 in            \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m _task_run_sample_attempt                                                    \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m                                                                             \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2m$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/l\u001b[0m \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2mib/python3.13/site-packages/anyio/_backends/\u001b[0m\u001b[1m_asyncio.py\u001b[0m:847 in __aexit__    \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m                                                                             \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 844 \u001b[0m\u001b[2m│   │   │   │   │   \u001b[0m\u001b[2m# added to self._exceptions so it's ok to break \u001b[0m \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 845 \u001b[0m\u001b[2m│   │   │   │   │   \u001b[0m\u001b[2m# chaining and avoid adding a \"During handling o\u001b[0m \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 846 \u001b[0m\u001b[2m│   │   │   │   │   \u001b[0m\u001b[2m# for each nesting level.\u001b[0m                        \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[31m> \u001b[0m 847 \u001b[2m│   │   │   │   │   \u001b[0m\u001b[94mraise\u001b[0m BaseExceptionGroup(                        \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 848 \u001b[0m\u001b[2m│   │   │   │   │   │   \u001b[0m\u001b[33m\"\u001b[0m\u001b[33munhandled errors in a TaskGroup\u001b[0m\u001b[33m\"\u001b[0m, \u001b[96mself\u001b[0m._exc \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 849 \u001b[0m\u001b[2m│   │   │   │   │   \u001b[0m) \u001b[94mfrom\u001b[0m\u001b[90m \u001b[0m\u001b[94mNone\u001b[0m                                      \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 850 \u001b[0m\u001b[2m│   │   │   │   \u001b[0m\u001b[94melif\u001b[0m exc_val:                                        \u001b[31m│\u001b[0m\n\u001b[31m└─────────────────────────────────────────────────────────────────────────────┘\u001b[0m\n\u001b[1;91mExceptionGroup: \u001b[0munhandled errors in a TaskGroup \u001b[1m(\u001b[0m\u001b[1;36m1\u001b[0m sub-exception\u001b[1m)\u001b[0m\n\n\u001b[35m┌─\u001b[0m\u001b[35m────────────────────────────\u001b[0m\u001b[35m Sub-exception #1 \u001b[0m\u001b[35m─────────────────────────────\u001b[0m\u001b[35m─┐\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m┌─\u001b[0m\u001b[31m──────────────────\u001b[0m\u001b[31m \u001b[0m\u001b[1;31mTraceback \u001b[0m\u001b[1;2;31m(most recent call last)\u001b[0m\u001b[31m \u001b[0m\u001b[31m──────────────────\u001b[0m\u001b[31m─┐\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m \u001b[2m$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspe\u001b[0m \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m \u001b[2mct/lib/python3.13/site-packages/inspect_ai/_eval/task/\u001b[0m\u001b[1mrun.py\u001b[0m:2849 in    \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m _task_run_sample_attempt                                                \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m                                                                         \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m \u001b[2m$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspe\u001b[0m \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m \u001b[2mct/lib/python3.13/site-packages/anyio/_core/\u001b[0m\u001b[1m_tasks.py\u001b[0m:327 in _run_coro  \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m                                                                         \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m   \u001b[2m324 \u001b[0m\u001b[2m│   │   \u001b[0m                                                          \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m   \u001b[2m325 \u001b[0m\u001b[2m│   │   \u001b[0m\u001b[94mwith\u001b[0m \u001b[96mself\u001b[0m._cancel_scope:                                  \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m   \u001b[2m326 \u001b[0m\u001b[2m│   │   │   \u001b[0m\u001b[94mtry\u001b[0m:                                                  \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m \u001b[31m> \u001b[0m327 \u001b[2m│   │   │   │   \u001b[0mretval = \u001b[94mawait\u001b[0m \u001b[96mself\u001b[0m._coro                         \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m   \u001b[2m328 \u001b[0m\u001b[2m│   │   │   \u001b[0m\u001b[94mexcept\u001b[0m \u001b[96mBaseException\u001b[0m \u001b[94mas\u001b[0m exc:                          \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m   \u001b[2m329 \u001b[0m\u001b[2m│   │   │   │   \u001b[0m\u001b[96mself\u001b[0m._exception = exc                             \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m   \u001b[2m330 \u001b[0m\u001b[2m│   │   │   │   \u001b[0m\u001b[94mraise\u001b[0m                                             \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m                                                                         \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m \u001b[2m$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspe\u001b[0m \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m \u001b[2mct/lib/python3.13/site-packages/inspect_ai/_eval/task/\u001b[0m\u001b[1mrun.py\u001b[0m:2719 in    \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m run                                                                     \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m                                                                         \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m \u001b[2m$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspe\u001b[0m \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m \u001b[2mct/lib/python3.13/site-packages/inspect_ai/solver/\u001b[0m\u001b[1m_plan.py\u001b[0m:106 in       \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m __call__                                                                \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m                                                                         \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m \u001b[2m$HOME/code/nas-wt-g2-evaluation-experiments/blueprints/gap-wave2-\u001b[0m \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m \u001b[2m20260923/us-equities__evaluation-experiments/inspect-arm/\u001b[0m\u001b[1mcatalog_task.p\u001b[0m \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m \u001b[1my\u001b[0m:80 in solve                                                           \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m                                                                         \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m   \u001b[2m 77 \u001b[0m\u001b[2m│   │   │   \u001b[0mmarker = Path(marker_dir) / \u001b[33mf\u001b[0m\u001b[33m\"\u001b[0m\u001b[33m{\u001b[0mfail_once_case\u001b[33m}\u001b[0m\u001b[33m.failed\u001b[0m \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m   \u001b[2m 78 \u001b[0m\u001b[2m│   │   │   \u001b[0m\u001b[94mif\u001b[0m \u001b[95mnot\u001b[0m marker.exists():                               \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m   \u001b[2m 79 \u001b[0m\u001b[2m│   │   │   │   \u001b[0mmarker.write_text(\u001b[33m\"\u001b[0m\u001b[33m1\u001b[0m\u001b[33m\"\u001b[0m)                            \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m \u001b[31m> \u001b[0m 80 \u001b[2m│   │   │   │   \u001b[0m\u001b[1;4;94mraise\u001b[0m\u001b[1;4m \u001b[0m\u001b[1;4;96mRuntimeError\u001b[0m\u001b[1;4m(\u001b[0m\u001b[1;4;33mf\u001b[0m\u001b[1;4;33m\"\u001b[0m\u001b[1;4;33minjected transient failure f\u001b[0m \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m   \u001b[2m 81 \u001b[0m\u001b[2m│   │   \u001b[0m\u001b[94mreturn\u001b[0m state                                              \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m   \u001b[2m 82 \u001b[0m\u001b[2m│   \u001b[0m\u001b[94mreturn\u001b[0m solve                                                  \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m│\u001b[0m   \u001b[2m 83 \u001b[0m                                                                  \u001b[31m│\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[31m└─────────────────────────────────────────────────────────────────────────┘\u001b[0m \u001b[35m│\u001b[0m\n\u001b[35m│\u001b[0m \u001b[1;91mRuntimeError: \u001b[0minjected transient failure for C3 \u001b[1m(\u001b[0mfirst attempt\u001b[1m)\u001b[0m             \u001b[35m│\u001b[0m\n\u001b[35m└─────────────────────────────────────────────────────────────────────────────┘\u001b[0m\n\n\u001b[3mDuring handling of the above exception, another exception occurred:\u001b[0m\n\n\u001b[31m┌─\u001b[0m\u001b[31m────────────────────\u001b[0m\u001b[31m \u001b[0m\u001b[1;31mTraceback \u001b[0m\u001b[1;2;31m(most recent call last)\u001b[0m\u001b[31m \u001b[0m\u001b[31m────────────────────\u001b[0m\u001b[31m─┐\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2m$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/l\u001b[0m \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2mib/python3.13/site-packages/inspect_ai/_eval/task/\u001b[0m\u001b[1mrun.py\u001b[0m:2849 in            \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m _task_run_sample_attempt                                                    \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m                                                                             \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2m$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/l\u001b[0m \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2mib/python3.13/site-packages/anyio/_core/\u001b[0m\u001b[1m_tasks.py\u001b[0m:327 in _run_coro          \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m                                                                             \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m324 \u001b[0m\u001b[2m│   │   \u001b[0m                                                              \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m325 \u001b[0m\u001b[2m│   │   \u001b[0m\u001b[94mwith\u001b[0m \u001b[96mself\u001b[0m._cancel_scope:                                      \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m326 \u001b[0m\u001b[2m│   │   │   \u001b[0m\u001b[94mtry\u001b[0m:                                                      \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[31m> \u001b[0m327 \u001b[2m│   │   │   │   \u001b[0mretval = \u001b[94mawait\u001b[0m \u001b[96mself\u001b[0m._coro                             \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m328 \u001b[0m\u001b[2m│   │   │   \u001b[0m\u001b[94mexcept\u001b[0m \u001b[96mBaseException\u001b[0m \u001b[94mas\u001b[0m exc:                              \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m329 \u001b[0m\u001b[2m│   │   │   │   \u001b[0m\u001b[96mself\u001b[0m._exception = exc                                 \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m330 \u001b[0m\u001b[2m│   │   │   │   \u001b[0m\u001b[94mraise\u001b[0m                                                 \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m                                                                             \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2m$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/l\u001b[0m \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2mib/python3.13/site-packages/inspect_ai/_eval/task/\u001b[0m\u001b[1mrun.py\u001b[0m:2719 in run        \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m                                                                             \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2m$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/l\u001b[0m \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2mib/python3.13/site-packages/inspect_ai/solver/\u001b[0m\u001b[1m_plan.py\u001b[0m:106 in __call__      \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m                                                                             \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2m$HOME/code/nas-wt-g2-evaluation-experiments/blueprints/gap-wave2-2026\u001b[0m \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2m0923/us-equities__evaluation-experiments/inspect-arm/\u001b[0m\u001b[1mcatalog_task.py\u001b[0m:80 in  \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m solve                                                                       \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m                                                                             \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 77 \u001b[0m\u001b[2m│   │   │   \u001b[0mmarker = Path(marker_dir) / \u001b[33mf\u001b[0m\u001b[33m\"\u001b[0m\u001b[33m{\u001b[0mfail_once_case\u001b[33m}\u001b[0m\u001b[33m.failed-onc\u001b[0m \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 78 \u001b[0m\u001b[2m│   │   │   \u001b[0m\u001b[94mif\u001b[0m \u001b[95mnot\u001b[0m marker.exists():                                   \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 79 \u001b[0m\u001b[2m│   │   │   │   \u001b[0mmarker.write_text(\u001b[33m\"\u001b[0m\u001b[33m1\u001b[0m\u001b[33m\"\u001b[0m)                                \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[31m> \u001b[0m 80 \u001b[2m│   │   │   │   \u001b[0m\u001b[1;4;94mraise\u001b[0m\u001b[1;4m \u001b[0m\u001b[1;4;96mRuntimeError\u001b[0m\u001b[1;4m(\u001b[0m\u001b[1;4;33mf\u001b[0m\u001b[1;4;33m\"\u001b[0m\u001b[1;4;33minjected transient failure for \u001b[0m\u001b[1;4;33m{\u001b[0m \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 81 \u001b[0m\u001b[2m│   │   \u001b[0m\u001b[94mreturn\u001b[0m state                                                  \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 82 \u001b[0m\u001b[2m│   \u001b[0m\u001b[94mreturn\u001b[0m solve                                                      \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 83 \u001b[0m                                                                      \u001b[31m│\u001b[0m\n\u001b[31m└─────────────────────────────────────────────────────────────────────────────┘\u001b[0m\n\u001b[1;91mRuntimeError: \u001b[0minjected transient failure for C3 \u001b[1m(\u001b[0mfirst attempt\u001b[1m)\u001b[0m\n"
+      },
+      "error_retries": [],
+      "attachments": {
+        "d1d67a6ad6e81f9acf119f87035f8968": "{\"source\": \"# Native Workflow writing and recovery qualification\\n\\nThe bounded writing pilot produced correct code in both arms. It did **not**\\nestablish a fully compliant or superior multi-agent workflow: both arms piped\\nnative test output, and the Workflow arm omitted the required authoring skill.\\nIndependent unpiped verification accepted both repairs. Keep a capable single\\nagent as the economical choice for this small repair; this one ordered pair is\\nnot a cross-task model ranking.\", \"claim\": \"Independent verification accepted both repairs in this small repair comparison.\"}",
+        "f22f49a8fc2203cc711a16c73ba54d72": "# Native Workflow writing and recovery qualification\n\nThe bounded writing pilot produced correct code in both arms. It did **not**\nestablish a fully compliant or superior multi-agent workflow: both arms piped\nnative test output, and the Workflow arm omitted the required authoring skill.\nIndependent unpiped verification accepted both repairs. Keep a capable single\nagent as the economical choice for this small repair; this one ordered pair is\nnot a cross-task model ranking."
+      },
+      "events_data": {
+        "messages": [],
+        "calls": []
+      },
+      "turn_count": 0
+    },
+    {
+      "id": "C4",
+      "epoch": 1,
+      "input": "{\"source\": \"# Native Workflow writing and recovery qualification\\n\\nThe bounded writing pilot produced correct code in both arms. It did **not**\\nestablish a fully compliant or superior multi-agent workflow: both arms piped\\nnative test output, and the Workflow arm omitted the required authoring skill.\\nIndependent unpiped verification accepted both repairs. Keep a capable single\\nagent as the economical choice for this small repair; this one ordered pair is\\nnot a cross-task model ranking.\", \"claim\": \"The native multi-agent workflow is the most efficient runtime for all task types.\"}",
+      "target": "insufficient",
+      "messages": [
+        {
+          "id": "JQuB6NVY7hKpyj9DjYhjL8",
+          "content": "{\"source\": \"# Native Workflow writing and recovery qualification\\n\\nThe bounded writing pilot produced correct code in both arms. It did **not**\\nestablish a fully compliant or superior multi-agent workflow: both arms piped\\nnative test output, and the Workflow arm omitted the required authoring skill.\\nIndependent unpiped verification accepted both repairs. Keep a capable single\\nagent as the economical choice for this small repair; this one ordered pair is\\nnot a cross-task model ranking.\", \"claim\": \"The native multi-agent workflow is the most efficient runtime for all task types.\"}",
+          "source": "input",
+          "role": "user"
+        }
+      ],
+      "output": {
+        "model": "mockllm/model",
+        "choices": [],
+        "completion": ""
+      },
+      "scores": {},
+      "metadata": {
+        "vars": {
+          "source_available_at": "2026-09-20T10:00:00Z",
+          "decision_at": "2026-09-20T11:00:00Z",
+          "expected_eligible": true,
+          "source": "# Native Workflow writing and recovery qualification\n\nThe bounded writing pilot produced correct code in both arms. It did **not**\nestablish a fully compliant or superior multi-agent workflow: both arms piped\nnative test output, and the Workflow arm omitted the required authoring skill.\nIndependent unpiped verification accepted both repairs. Keep a capable single\nagent as the economical choice for this small repair; this one ordered pair is\nnot a cross-task model ranking.",
+          "claim": "The native multi-agent workflow is the most efficient runtime for all task types.",
+          "expected": "insufficient"
+        },
+        "description": "C4 universal-worker-ranking"
+      },
+      "store": {},
+      "events": [
+        {
+          "uuid": "GzHZVAJGvReVQetAEgvoh2",
+          "span_id": "iX3SrEL4ncq59XZXupn8mS",
+          "timestamp": "2026-09-23T07:26:47.458273+00:00",
+          "working_start": 59334.818897402,
+          "event": "span_begin",
+          "id": "iX3SrEL4ncq59XZXupn8mS",
+          "type": "init",
+          "name": "init"
+        },
+        {
+          "uuid": "aCZdZicRiwy2sBHqKrCnjN",
+          "span_id": "iX3SrEL4ncq59XZXupn8mS",
+          "timestamp": "2026-09-23T07:26:47.458618+00:00",
+          "working_start": 59334.819242505,
+          "event": "sample_init",
+          "sample": {
+            "input": "attachment://944c03f42c0508dd3fd2271585127dc1",
+            "target": "insufficient",
+            "id": "C4",
+            "metadata": {
+              "vars": {
+                "source_available_at": "2026-09-20T10:00:00Z",
+                "decision_at": "2026-09-20T11:00:00Z",
+                "expected_eligible": true,
+                "source": "# Native Workflow writing and recovery qualification\n\nThe bounded writing pilot produced correct code in both arms. It did **not**\nestablish a fully compliant or superior multi-agent workflow: both arms piped\nnative test output, and the Workflow arm omitted the required authoring skill.\nIndependent unpiped verification accepted both repairs. Keep a capable single\nagent as the economical choice for this small repair; this one ordered pair is\nnot a cross-task model ranking.",
+                "claim": "The native multi-agent workflow is the most efficient runtime for all task types.",
+                "expected": "insufficient"
+              },
+              "description": "C4 universal-worker-ranking"
+            }
+          },
+          "state": {
+            "messages": [
+              {
+                "id": "JQuB6NVY7hKpyj9DjYhjL8",
+                "content": "attachment://944c03f42c0508dd3fd2271585127dc1",
+                "source": "input",
+                "role": "user"
+              }
+            ],
+            "tools": [],
+            "tool_choice": null,
+            "store": {},
+            "output": {
+              "model": "mockllm/model",
+              "choices": [],
+              "completion": ""
+            },
+            "completed": false,
+            "metadata": {
+              "vars": {
+                "source_available_at": "2026-09-20T10:00:00Z",
+                "decision_at": "2026-09-20T11:00:00Z",
+                "expected_eligible": true,
+                "source": "attachment://f22f49a8fc2203cc711a16c73ba54d72",
+                "claim": "The native multi-agent workflow is the most efficient runtime for all task types.",
+                "expected": "insufficient"
+              },
+              "description": "C4 universal-worker-ranking"
+            }
+          }
+        },
+        {
+          "uuid": "e2qFJa2mvxQo3fqQadRCp4",
+          "span_id": "iX3SrEL4ncq59XZXupn8mS",
+          "timestamp": "2026-09-23T07:26:47.458781+00:00",
+          "working_start": 59334.819404706,
+          "event": "span_end",
+          "id": "iX3SrEL4ncq59XZXupn8mS"
+        },
+        {
+          "uuid": "QPLutxENg8WzAy5mbPaqqG",
+          "span_id": "PUXfmaZqp8CykuD5wvVecq",
+          "timestamp": "2026-09-23T07:26:47.459079+00:00",
+          "working_start": 0.00023160199634730816,
+          "event": "span_begin",
+          "id": "PUXfmaZqp8CykuD5wvVecq",
+          "type": "solvers",
+          "name": "solvers"
+        },
+        {
+          "uuid": "eQAYb2toe9J8b6waEijHzG",
+          "span_id": "58Bzb9BWPS3yfFM48wSRi2",
+          "timestamp": "2026-09-23T07:26:47.459168+00:00",
+          "working_start": 0.00032060199737316,
+          "event": "span_begin",
+          "id": "58Bzb9BWPS3yfFM48wSRi2",
+          "parent_id": "PUXfmaZqp8CykuD5wvVecq",
+          "type": "solver",
+          "name": "fault_and_delay"
+        },
+        {
+          "uuid": "8RDW5kVQtFqEGvHBLJJC8Q",
+          "span_id": "58Bzb9BWPS3yfFM48wSRi2",
+          "timestamp": "2026-09-23T07:26:47.459318+00:00",
+          "working_start": 0.0004705030005425215,
+          "event": "span_end",
+          "id": "58Bzb9BWPS3yfFM48wSRi2"
+        },
+        {
+          "uuid": "A4AxZFETk2dKGaCX2bQkzs",
+          "span_id": "FMGMSh4C6JrWFuFzoAdPw9",
+          "timestamp": "2026-09-23T07:26:47.459484+00:00",
+          "working_start": 0.000638903999060858,
+          "event": "span_begin",
+          "id": "FMGMSh4C6JrWFuFzoAdPw9",
+          "parent_id": "PUXfmaZqp8CykuD5wvVecq",
+          "type": "solver",
+          "name": "generate"
+        },
+        {
+          "uuid": "iHsx3C7dZxiVfYutktDtav",
+          "span_id": "FMGMSh4C6JrWFuFzoAdPw9",
+          "timestamp": "2026-09-23T07:26:47.460207+00:00",
+          "working_start": 0.0009554059943184257,
+          "event": "span_end",
+          "id": "FMGMSh4C6JrWFuFzoAdPw9"
+        },
+        {
+          "uuid": "AP34ASkkehBMQVb2TK6xtL",
+          "span_id": "PUXfmaZqp8CykuD5wvVecq",
+          "timestamp": "2026-09-23T07:26:47.460310+00:00",
+          "working_start": 0.0010584069968899712,
+          "event": "span_end",
+          "id": "PUXfmaZqp8CykuD5wvVecq"
+        },
+        {
+          "uuid": "4J3EwfwURpXKaJ3xAzGU5Q",
+          "timestamp": "2026-09-23T07:26:47.505483+00:00",
+          "working_start": 0.04623660099605331,
+          "event": "error",
+          "error": {
+            "message": "CancelledError('Cancelled via cancel scope 703c03cd4cd0')",
+            "traceback": "Traceback (most recent call last):\n  File \"$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/lib/python3.13/site-packages/inspect_ai/_eval/task/run.py\", line 2846, in _task_run_sample_attempt\n    async with anyio.create_task_group() as tg:\n               ~~~~~~~~~~~~~~~~~~~~~~~^^\n  File \"$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/lib/python3.13/site-packages/anyio/_backends/_asyncio.py\", line 851, in __aexit__\n    raise exc_val\n  File \"$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/lib/python3.13/site-packages/anyio/_backends/_asyncio.py\", line 820, in __aexit__\n    await self._on_completed_fut\nasyncio.exceptions.CancelledError: Cancelled via cancel scope 703c03cd4cd0\n",
+            "traceback_ansi": "\u001b[31m┌─\u001b[0m\u001b[31m────────────────────\u001b[0m\u001b[31m \u001b[0m\u001b[1;31mTraceback \u001b[0m\u001b[1;2;31m(most recent call last)\u001b[0m\u001b[31m \u001b[0m\u001b[31m────────────────────\u001b[0m\u001b[31m─┐\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2m$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/l\u001b[0m \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2mib/python3.13/site-packages/inspect_ai/_eval/task/\u001b[0m\u001b[1mrun.py\u001b[0m:2846 in            \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m _task_run_sample_attempt                                                    \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m                                                                             \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2m$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/l\u001b[0m \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2mib/python3.13/site-packages/anyio/_backends/\u001b[0m\u001b[1m_asyncio.py\u001b[0m:851 in __aexit__    \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m                                                                             \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 848 \u001b[0m\u001b[2m│   │   │   │   │   │   \u001b[0m\u001b[33m\"\u001b[0m\u001b[33munhandled errors in a TaskGroup\u001b[0m\u001b[33m\"\u001b[0m, \u001b[96mself\u001b[0m._exc \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 849 \u001b[0m\u001b[2m│   │   │   │   │   \u001b[0m) \u001b[94mfrom\u001b[0m\u001b[90m \u001b[0m\u001b[94mNone\u001b[0m                                      \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 850 \u001b[0m\u001b[2m│   │   │   │   \u001b[0m\u001b[94melif\u001b[0m exc_val:                                        \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[31m> \u001b[0m 851 \u001b[2m│   │   │   │   │   \u001b[0m\u001b[94mraise\u001b[0m exc_val                                    \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 852 \u001b[0m\u001b[2m│   │   │   \u001b[0m\u001b[94mexcept\u001b[0m \u001b[96mBaseException\u001b[0m \u001b[94mas\u001b[0m exc:                             \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 853 \u001b[0m\u001b[2m│   │   │   │   \u001b[0m\u001b[94mif\u001b[0m \u001b[96mself\u001b[0m.cancel_scope.\u001b[92m__exit__\u001b[0m(\u001b[96mtype\u001b[0m(exc), exc, exc.__ \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 854 \u001b[0m\u001b[2m│   │   │   │   │   \u001b[0m\u001b[94mreturn\u001b[0m \u001b[94mTrue\u001b[0m                                      \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m                                                                             \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2m$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/l\u001b[0m \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2mib/python3.13/site-packages/anyio/_backends/\u001b[0m\u001b[1m_asyncio.py\u001b[0m:820 in __aexit__    \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m                                                                             \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 817 \u001b[0m\u001b[2m│   │   │   │   │   │   │   \u001b[0m\u001b[96mself\u001b[0m._on_completed_fut = loop.create_fut \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 818 \u001b[0m\u001b[2m│   │   │   │   │   │   │   \u001b[0m                                         \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 819 \u001b[0m\u001b[2m│   │   │   │   │   │   │   \u001b[0m\u001b[94mtry\u001b[0m:                                     \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[31m> \u001b[0m 820 \u001b[2m│   │   │   │   │   │   │   │   \u001b[0m\u001b[94mawait\u001b[0m \u001b[96mself\u001b[0m._on_completed_fut         \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 821 \u001b[0m\u001b[2m│   │   │   │   │   │   │   \u001b[0m\u001b[94mexcept\u001b[0m CancelledError \u001b[94mas\u001b[0m exc:            \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 822 \u001b[0m\u001b[2m│   │   │   │   │   │   │   │   \u001b[0m\u001b[2m# Shield the scope against further c\u001b[0m \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 823 \u001b[0m\u001b[2m│   │   │   │   │   │   │   │   \u001b[0m\u001b[2m# as they're not productive (#695)\u001b[0m   \u001b[31m│\u001b[0m\n\u001b[31m└─────────────────────────────────────────────────────────────────────────────┘\u001b[0m\n\u001b[1;91mCancelledError: \u001b[0mCancelled via cancel scope 703c03cd4cd0\n"
+          }
+        }
+      ],
+      "model_usage": {},
+      "role_usage": {},
+      "started_at": "2026-09-23T07:26:47.458849+00:00",
+      "completed_at": "2026-09-23T07:26:47.506013+00:00",
+      "total_time": 0.047,
+      "working_time": 0.047,
+      "uuid": "nqfW3LKvANwZiHMqJdgsdy",
+      "error": {
+        "message": "CancelledError('Cancelled via cancel scope 703c03cd4cd0')",
+        "traceback": "Traceback (most recent call last):\n  File \"$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/lib/python3.13/site-packages/inspect_ai/_eval/task/run.py\", line 2846, in _task_run_sample_attempt\n    async with anyio.create_task_group() as tg:\n               ~~~~~~~~~~~~~~~~~~~~~~~^^\n  File \"$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/lib/python3.13/site-packages/anyio/_backends/_asyncio.py\", line 851, in __aexit__\n    raise exc_val\n  File \"$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/lib/python3.13/site-packages/anyio/_backends/_asyncio.py\", line 820, in __aexit__\n    await self._on_completed_fut\nasyncio.exceptions.CancelledError: Cancelled via cancel scope 703c03cd4cd0\n",
+        "traceback_ansi": "\u001b[31m┌─\u001b[0m\u001b[31m────────────────────\u001b[0m\u001b[31m \u001b[0m\u001b[1;31mTraceback \u001b[0m\u001b[1;2;31m(most recent call last)\u001b[0m\u001b[31m \u001b[0m\u001b[31m────────────────────\u001b[0m\u001b[31m─┐\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2m$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/l\u001b[0m \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2mib/python3.13/site-packages/inspect_ai/_eval/task/\u001b[0m\u001b[1mrun.py\u001b[0m:2846 in            \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m _task_run_sample_attempt                                                    \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m                                                                             \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2m$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/l\u001b[0m \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2mib/python3.13/site-packages/anyio/_backends/\u001b[0m\u001b[1m_asyncio.py\u001b[0m:851 in __aexit__    \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m                                                                             \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 848 \u001b[0m\u001b[2m│   │   │   │   │   │   \u001b[0m\u001b[33m\"\u001b[0m\u001b[33munhandled errors in a TaskGroup\u001b[0m\u001b[33m\"\u001b[0m, \u001b[96mself\u001b[0m._exc \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 849 \u001b[0m\u001b[2m│   │   │   │   │   \u001b[0m) \u001b[94mfrom\u001b[0m\u001b[90m \u001b[0m\u001b[94mNone\u001b[0m                                      \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 850 \u001b[0m\u001b[2m│   │   │   │   \u001b[0m\u001b[94melif\u001b[0m exc_val:                                        \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[31m> \u001b[0m 851 \u001b[2m│   │   │   │   │   \u001b[0m\u001b[94mraise\u001b[0m exc_val                                    \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 852 \u001b[0m\u001b[2m│   │   │   \u001b[0m\u001b[94mexcept\u001b[0m \u001b[96mBaseException\u001b[0m \u001b[94mas\u001b[0m exc:                             \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 853 \u001b[0m\u001b[2m│   │   │   │   \u001b[0m\u001b[94mif\u001b[0m \u001b[96mself\u001b[0m.cancel_scope.\u001b[92m__exit__\u001b[0m(\u001b[96mtype\u001b[0m(exc), exc, exc.__ \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 854 \u001b[0m\u001b[2m│   │   │   │   │   \u001b[0m\u001b[94mreturn\u001b[0m \u001b[94mTrue\u001b[0m                                      \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m                                                                             \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2m$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/l\u001b[0m \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2mib/python3.13/site-packages/anyio/_backends/\u001b[0m\u001b[1m_asyncio.py\u001b[0m:820 in __aexit__    \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m                                                                             \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 817 \u001b[0m\u001b[2m│   │   │   │   │   │   │   \u001b[0m\u001b[96mself\u001b[0m._on_completed_fut = loop.create_fut \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 818 \u001b[0m\u001b[2m│   │   │   │   │   │   │   \u001b[0m                                         \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 819 \u001b[0m\u001b[2m│   │   │   │   │   │   │   \u001b[0m\u001b[94mtry\u001b[0m:                                     \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[31m> \u001b[0m 820 \u001b[2m│   │   │   │   │   │   │   │   \u001b[0m\u001b[94mawait\u001b[0m \u001b[96mself\u001b[0m._on_completed_fut         \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 821 \u001b[0m\u001b[2m│   │   │   │   │   │   │   \u001b[0m\u001b[94mexcept\u001b[0m CancelledError \u001b[94mas\u001b[0m exc:            \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 822 \u001b[0m\u001b[2m│   │   │   │   │   │   │   │   \u001b[0m\u001b[2m# Shield the scope against further c\u001b[0m \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 823 \u001b[0m\u001b[2m│   │   │   │   │   │   │   │   \u001b[0m\u001b[2m# as they're not productive (#695)\u001b[0m   \u001b[31m│\u001b[0m\n\u001b[31m└─────────────────────────────────────────────────────────────────────────────┘\u001b[0m\n\u001b[1;91mCancelledError: \u001b[0mCancelled via cancel scope 703c03cd4cd0\n"
+      },
+      "error_retries": [],
+      "attachments": {
+        "944c03f42c0508dd3fd2271585127dc1": "{\"source\": \"# Native Workflow writing and recovery qualification\\n\\nThe bounded writing pilot produced correct code in both arms. It did **not**\\nestablish a fully compliant or superior multi-agent workflow: both arms piped\\nnative test output, and the Workflow arm omitted the required authoring skill.\\nIndependent unpiped verification accepted both repairs. Keep a capable single\\nagent as the economical choice for this small repair; this one ordered pair is\\nnot a cross-task model ranking.\", \"claim\": \"The native multi-agent workflow is the most efficient runtime for all task types.\"}",
+        "f22f49a8fc2203cc711a16c73ba54d72": "# Native Workflow writing and recovery qualification\n\nThe bounded writing pilot produced correct code in both arms. It did **not**\nestablish a fully compliant or superior multi-agent workflow: both arms piped\nnative test output, and the Workflow arm omitted the required authoring skill.\nIndependent unpiped verification accepted both repairs. Keep a capable single\nagent as the economical choice for this small repair; this one ordered pair is\nnot a cross-task model ranking."
+      },
+      "events_data": {
+        "messages": [],
+        "calls": []
+      },
+      "turn_count": 0
+    }
+  ]
+}

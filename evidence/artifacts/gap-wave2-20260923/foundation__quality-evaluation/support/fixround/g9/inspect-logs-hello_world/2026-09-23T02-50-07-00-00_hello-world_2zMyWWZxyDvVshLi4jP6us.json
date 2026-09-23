@@ -1,0 +1,557 @@
+{
+  "version": 2,
+  "status": "success",
+  "eval": {
+    "eval_id": "3rf8hvmF3RVebuVQBjer7d",
+    "run_id": "ATHk7hmmxKAUxQdvRF7Qof",
+    "created": "2026-09-23T02:50:07+00:00",
+    "task": "hello_world",
+    "task_id": "2zMyWWZxyDvVshLi4jP6us",
+    "task_version": 0,
+    "task_file": "hello_world.py",
+    "task_display_name": "hello_world",
+    "task_registry_name": "hello_world",
+    "task_attribs": {},
+    "task_args": {},
+    "task_args_passed": {},
+    "dataset": {
+      "samples": 1,
+      "sample_ids": [
+        1
+      ],
+      "shuffled": false
+    },
+    "model": "vllm/qwen2.5-7b-instruct-awq",
+    "model_generate_config": {
+      "max_connections": 4
+    },
+    "model_args": {},
+    "config": {
+      "epochs": 1,
+      "fail_on_error": true,
+      "continue_on_fail": false,
+      "score_on_error": false,
+      "sandbox_cleanup": true,
+      "sandbox_prebuilt": false,
+      "log_samples": true,
+      "log_realtime": true,
+      "log_images": true,
+      "log_shared": 0,
+      "score_display": true
+    },
+    "revision": {
+      "type": "git",
+      "origin": "https://github.com/UKGovernmentBEIS/inspect_ai.git",
+      "commit": "f9837f6",
+      "dirty": false
+    },
+    "packages": {
+      "inspect_ai": "0.3.268"
+    },
+    "scorers": [
+      {
+        "name": "exact",
+        "options": {},
+        "metrics": [
+          {
+            "name": "inspect_ai/mean",
+            "options": {}
+          },
+          {
+            "name": "inspect_ai/stderr",
+            "options": {}
+          }
+        ],
+        "metadata": {}
+      }
+    ]
+  },
+  "plan": {
+    "name": "plan",
+    "steps": [
+      {
+        "solver": "generate",
+        "params": {
+          "tool_calls": "loop"
+        },
+        "params_passed": {}
+      }
+    ],
+    "config": {
+      "max_connections": 4
+    }
+  },
+  "results": {
+    "total_samples": 1,
+    "completed_samples": 1,
+    "scores": [
+      {
+        "name": "exact",
+        "scorer": "exact",
+        "scored_samples": 1,
+        "unscored_samples": 0,
+        "params": {},
+        "metrics": {
+          "mean": {
+            "name": "mean",
+            "value": 1.0,
+            "params": {}
+          },
+          "stderr": {
+            "name": "stderr",
+            "value": 0.0,
+            "params": {}
+          }
+        }
+      }
+    ],
+    "headline": {
+      "scorer": "exact",
+      "score": "exact",
+      "metric": "mean"
+    }
+  },
+  "stats": {
+    "started_at": "2026-09-23T02:50:07+00:00",
+    "completed_at": "2026-09-23T02:50:54+00:00",
+    "model_usage": {
+      "vllm/qwen2.5-7b-instruct-awq": {
+        "input_tokens": 34,
+        "output_tokens": 3,
+        "total_tokens": 37
+      }
+    },
+    "role_usage": {},
+    "connection_limit_history": []
+  },
+  "invalidated": false,
+  "tags": [],
+  "metadata": {},
+  "samples": [
+    {
+      "id": 1,
+      "epoch": 1,
+      "input": "Just reply with Hello World",
+      "target": "Hello World",
+      "messages": [
+        {
+          "id": "5zVxaFbYSWEJHarFn8x39F",
+          "content": "Just reply with Hello World",
+          "source": "input",
+          "role": "user"
+        },
+        {
+          "id": "NSzCmM3kF4MaknbNyBuXdu",
+          "content": "Hello World",
+          "source": "generate",
+          "role": "assistant",
+          "model": "qwen2.5-7b-instruct-awq"
+        }
+      ],
+      "output": {
+        "model": "qwen2.5-7b-instruct-awq",
+        "choices": [
+          {
+            "message": {
+              "id": "NSzCmM3kF4MaknbNyBuXdu",
+              "content": "Hello World",
+              "source": "generate",
+              "role": "assistant",
+              "model": "qwen2.5-7b-instruct-awq"
+            },
+            "stop_reason": "stop"
+          }
+        ],
+        "completion": "Hello World",
+        "usage": {
+          "input_tokens": 34,
+          "output_tokens": 3,
+          "total_tokens": 37
+        },
+        "time": 46.89979878399754
+      },
+      "scores": {
+        "exact": {
+          "value": "C",
+          "answer": "Hello World",
+          "history": []
+        }
+      },
+      "metadata": {},
+      "store": {},
+      "events": [
+        {
+          "uuid": "JwvB9mBBgTWgh2CgoYKQXr",
+          "span_id": "3Bq9AHHo2bV7UAfBQjn3FX",
+          "timestamp": "2026-09-23T02:50:07.092940+00:00",
+          "working_start": 42734.453567034,
+          "event": "span_begin",
+          "id": "3Bq9AHHo2bV7UAfBQjn3FX",
+          "type": "init",
+          "name": "init"
+        },
+        {
+          "uuid": "PZUPPS9njMeAXbpMdZSpbW",
+          "span_id": "3Bq9AHHo2bV7UAfBQjn3FX",
+          "timestamp": "2026-09-23T02:50:07.093592+00:00",
+          "working_start": 42734.454218043,
+          "event": "sample_init",
+          "sample": {
+            "input": "Just reply with Hello World",
+            "target": "Hello World",
+            "id": 1
+          },
+          "state": {
+            "messages": [
+              {
+                "id": "5zVxaFbYSWEJHarFn8x39F",
+                "content": "Just reply with Hello World",
+                "source": "input",
+                "role": "user"
+              }
+            ],
+            "tools": [],
+            "tool_choice": null,
+            "store": {},
+            "output": {
+              "model": "vllm/qwen2.5-7b-instruct-awq",
+              "choices": [],
+              "completion": ""
+            },
+            "completed": false,
+            "metadata": {}
+          }
+        },
+        {
+          "uuid": "neVDoJRq4fgXxKhU5nLJvf",
+          "span_id": "3Bq9AHHo2bV7UAfBQjn3FX",
+          "timestamp": "2026-09-23T02:50:07.093856+00:00",
+          "working_start": 42734.454480447,
+          "event": "span_end",
+          "id": "3Bq9AHHo2bV7UAfBQjn3FX"
+        },
+        {
+          "uuid": "ig6XwWDbr4zYRJJw293oer",
+          "span_id": "dAkQvUG5oHyeqxiu9tVZak",
+          "timestamp": "2026-09-23T02:50:07.094380+00:00",
+          "working_start": 0.0003734049969352782,
+          "event": "span_begin",
+          "id": "dAkQvUG5oHyeqxiu9tVZak",
+          "type": "solvers",
+          "name": "solvers"
+        },
+        {
+          "uuid": "NtbY54Qpakituw5fpCn7RY",
+          "span_id": "M3QqUvcRDsRvfPa6HaU7mP",
+          "timestamp": "2026-09-23T02:50:07.094678+00:00",
+          "working_start": 0.0006709090012009256,
+          "event": "span_begin",
+          "id": "M3QqUvcRDsRvfPa6HaU7mP",
+          "parent_id": "dAkQvUG5oHyeqxiu9tVZak",
+          "type": "solver",
+          "name": "generate"
+        },
+        {
+          "uuid": "Jw8M3P2Vc8rR5h4Rrxvy8p",
+          "span_id": "M3QqUvcRDsRvfPa6HaU7mP",
+          "timestamp": "2026-09-23T02:50:07.094915+00:00",
+          "working_start": 0.0009081120006158017,
+          "event": "model",
+          "model": "vllm/qwen2.5-7b-instruct-awq",
+          "input": [],
+          "input_refs": [
+            [
+              0,
+              1
+            ]
+          ],
+          "tools": [],
+          "tool_choice": "none",
+          "config": {
+            "max_connections": 4
+          },
+          "output": {
+            "model": "qwen2.5-7b-instruct-awq",
+            "choices": [
+              {
+                "message": {
+                  "id": "NSzCmM3kF4MaknbNyBuXdu",
+                  "content": "Hello World",
+                  "source": "generate",
+                  "role": "assistant",
+                  "model": "qwen2.5-7b-instruct-awq"
+                },
+                "stop_reason": "stop"
+              }
+            ],
+            "completion": "Hello World",
+            "usage": {
+              "input_tokens": 34,
+              "output_tokens": 3,
+              "total_tokens": 37
+            },
+            "time": 46.89979878399754
+          },
+          "call": {
+            "request": {
+              "tools": null,
+              "tool_choice": null,
+              "extra_headers": {
+                "x-irid": "5DRWZzFQcZN6MtG5xpCHdi"
+              },
+              "model": "qwen2.5-7b-instruct-awq"
+            },
+            "response": {
+              "id": "chatcmpl-bb520d488868ead8",
+              "choices": [
+                {
+                  "finish_reason": "stop",
+                  "index": 0,
+                  "logprobs": null,
+                  "message": {
+                    "content": "Hello World",
+                    "refusal": null,
+                    "role": "assistant",
+                    "annotations": null,
+                    "audio": null,
+                    "function_call": null,
+                    "tool_calls": null,
+                    "reasoning": null
+                  },
+                  "stop_reason": null,
+                  "token_ids": null,
+                  "routed_experts": null
+                }
+              ],
+              "created": 1790131807,
+              "model": "qwen2.5-7b-instruct-awq",
+              "object": "chat.completion",
+              "metadata": null,
+              "moderation": null,
+              "service_tier": null,
+              "system_fingerprint": "vllm-0.25.0-d8860527",
+              "usage": {
+                "completion_tokens": 3,
+                "prompt_tokens": 34,
+                "total_tokens": 37,
+                "completion_tokens_details": null,
+                "prompt_tokens_details": null
+              },
+              "prompt_logprobs": null,
+              "prompt_token_ids": null,
+              "prompt_text": null,
+              "kv_transfer_params": null,
+              "metrics": null
+            },
+            "time": 46.89979878399754,
+            "call_refs": [
+              [
+                0,
+                1
+              ]
+            ],
+            "call_key": "messages"
+          },
+          "completed": "2026-09-23T02:50:54.212121+00:00",
+          "working_time": 46.89979878399754
+        },
+        {
+          "uuid": "L5yEjaLs3vQgWVdKEZGu7e",
+          "span_id": "M3QqUvcRDsRvfPa6HaU7mP",
+          "timestamp": "2026-09-23T02:50:07.284439+00:00",
+          "working_start": 0.19038338999962434,
+          "event": "logger",
+          "message": {
+            "level": "info",
+            "message": "sample=1\nvLLM server reports max_model_len=4096 for qwen2.5-7b-instruct-awq; using it as the context window (model not in catalog).",
+            "created": 1790131807284.215,
+            "filename": "vllm.py",
+            "module": "vllm",
+            "lineno": 362
+          }
+        },
+        {
+          "uuid": "QwtfTB3QSJNecvWMtZ8ZNL",
+          "span_id": "M3QqUvcRDsRvfPa6HaU7mP",
+          "timestamp": "2026-09-23T02:50:54.212679+00:00",
+          "working_start": 46.90162890799547,
+          "event": "state",
+          "changes": [
+            {
+              "op": "add",
+              "path": "/output/usage",
+              "value": {
+                "input_tokens": 34,
+                "output_tokens": 3,
+                "total_tokens": 37
+              }
+            },
+            {
+              "op": "add",
+              "path": "/output/time",
+              "value": 46.89979878399754
+            },
+            {
+              "op": "add",
+              "path": "/output/choices/0",
+              "value": {
+                "message": {
+                  "id": "NSzCmM3kF4MaknbNyBuXdu",
+                  "content": "Hello World",
+                  "source": "generate",
+                  "role": "assistant",
+                  "model": "qwen2.5-7b-instruct-awq"
+                },
+                "stop_reason": "stop"
+              }
+            },
+            {
+              "op": "replace",
+              "path": "/output/completion",
+              "value": "Hello World",
+              "replaced": ""
+            },
+            {
+              "op": "replace",
+              "path": "/output/model",
+              "value": "qwen2.5-7b-instruct-awq",
+              "replaced": "vllm/qwen2.5-7b-instruct-awq"
+            },
+            {
+              "op": "add",
+              "path": "/messages/1",
+              "value": {
+                "id": "NSzCmM3kF4MaknbNyBuXdu",
+                "content": "Hello World",
+                "source": "generate",
+                "role": "assistant",
+                "model": "qwen2.5-7b-instruct-awq"
+              }
+            }
+          ]
+        },
+        {
+          "uuid": "Yt8JpEra82kpdC3i7pAnbm",
+          "span_id": "M3QqUvcRDsRvfPa6HaU7mP",
+          "timestamp": "2026-09-23T02:50:54.212893+00:00",
+          "working_start": 46.90184190999571,
+          "event": "span_end",
+          "id": "M3QqUvcRDsRvfPa6HaU7mP"
+        },
+        {
+          "uuid": "2gQepJpfLcN8BUjWthkBLY",
+          "span_id": "dAkQvUG5oHyeqxiu9tVZak",
+          "timestamp": "2026-09-23T02:50:54.213051+00:00",
+          "working_start": 46.901999211993825,
+          "event": "span_end",
+          "id": "dAkQvUG5oHyeqxiu9tVZak"
+        },
+        {
+          "uuid": "ehWV9L7eQgZy3zNebv5s9m",
+          "span_id": "ZspCmZ5W2axMoNMYWdiMJ5",
+          "timestamp": "2026-09-23T02:50:54.213492+00:00",
+          "working_start": 46.90244061699195,
+          "event": "span_begin",
+          "id": "ZspCmZ5W2axMoNMYWdiMJ5",
+          "type": "scorers",
+          "name": "scorers"
+        },
+        {
+          "uuid": "ibpiQyaw8DiR9W5uobk9GV",
+          "span_id": "8m6Y8JnFmoe74j8vedBqQK",
+          "timestamp": "2026-09-23T02:50:54.213605+00:00",
+          "working_start": 46.90255401799368,
+          "event": "span_begin",
+          "id": "8m6Y8JnFmoe74j8vedBqQK",
+          "parent_id": "ZspCmZ5W2axMoNMYWdiMJ5",
+          "type": "scorer",
+          "name": "exact"
+        },
+        {
+          "uuid": "eZSyf8MxEhVEgPNzT8GKn7",
+          "span_id": "8m6Y8JnFmoe74j8vedBqQK",
+          "timestamp": "2026-09-23T02:50:54.213841+00:00",
+          "working_start": 46.902789120991656,
+          "event": "score",
+          "score": {
+            "value": "C",
+            "answer": "Hello World",
+            "history": []
+          },
+          "target": "Hello World",
+          "intermediate": false,
+          "scorer": "exact",
+          "scorer_args": {},
+          "model_usage": {
+            "vllm/qwen2.5-7b-instruct-awq": {
+              "input_tokens": 34,
+              "output_tokens": 3,
+              "total_tokens": 37
+            }
+          }
+        },
+        {
+          "uuid": "GS6XWt7mAEHwJeLrCm3WPT",
+          "span_id": "8m6Y8JnFmoe74j8vedBqQK",
+          "timestamp": "2026-09-23T02:50:54.213993+00:00",
+          "working_start": 46.902941422995355,
+          "event": "span_end",
+          "id": "8m6Y8JnFmoe74j8vedBqQK"
+        },
+        {
+          "uuid": "SLc6pPDfZDXDikfCLGTgK4",
+          "span_id": "ZspCmZ5W2axMoNMYWdiMJ5",
+          "timestamp": "2026-09-23T02:50:54.214069+00:00",
+          "working_start": 46.903017722994264,
+          "event": "span_end",
+          "id": "ZspCmZ5W2axMoNMYWdiMJ5"
+        }
+      ],
+      "model_usage": {
+        "vllm/qwen2.5-7b-instruct-awq": {
+          "input_tokens": 34,
+          "output_tokens": 3,
+          "total_tokens": 37
+        }
+      },
+      "role_usage": {},
+      "started_at": "2026-09-23T02:50:07.094010+00:00",
+      "completed_at": "2026-09-23T02:50:54.214339+00:00",
+      "total_time": 47.12,
+      "working_time": 46.903,
+      "uuid": "Tj4zesfun2f9TBBAJdhfaB",
+      "error_retries": [],
+      "attachments": {},
+      "events_data": {
+        "messages": [
+          {
+            "id": "5zVxaFbYSWEJHarFn8x39F",
+            "content": "Just reply with Hello World",
+            "source": "input",
+            "role": "user"
+          }
+        ],
+        "calls": [
+          {
+            "role": "user",
+            "content": "Just reply with Hello World"
+          }
+        ]
+      },
+      "turn_count": 1
+    }
+  ],
+  "reductions": [
+    {
+      "scorer": "exact",
+      "samples": [
+        {
+          "value": 1.0,
+          "answer": "Hello World",
+          "history": [],
+          "sample_id": 1
+        }
+      ]
+    }
+  ]
+}

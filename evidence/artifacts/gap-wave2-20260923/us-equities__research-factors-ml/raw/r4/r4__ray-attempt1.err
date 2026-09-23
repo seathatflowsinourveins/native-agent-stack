@@ -1,0 +1,29 @@
+Traceback (most recent call last):
+  File "$HOME/code/nas-wt-g2-research-factors-ml/blueprints/gap-wave2-20260923/us-equities__research-factors-ml/extra_arms.py", line 299, in <module>
+    main()
+    ~~~~^^
+  File "$HOME/code/nas-wt-g2-research-factors-ml/blueprints/gap-wave2-20260923/us-equities__research-factors-ml/extra_arms.py", line 162, in main
+    from ray import serve
+  File "$HOME/.cache/gap-wave2-20260923/research-factors-ml/venv-r4-ray/lib/python3.13/site-packages/ray/serve/__init__.py", line 37, in <module>
+    raise e
+  File "$HOME/.cache/gap-wave2-20260923/research-factors-ml/venv-r4-ray/lib/python3.13/site-packages/ray/serve/__init__.py", line 5, in <module>
+    from ray.serve.api import (
+    ...<21 lines>...
+    )
+  File "$HOME/.cache/gap-wave2-20260923/research-factors-ml/venv-r4-ray/lib/python3.13/site-packages/ray/serve/api.py", line 29, in <module>
+    from ray.serve._private.local_testing_mode import make_local_deployment_handle
+  File "$HOME/.cache/gap-wave2-20260923/research-factors-ml/venv-r4-ray/lib/python3.13/site-packages/ray/serve/_private/local_testing_mode.py", line 26, in <module>
+    from ray.serve._private.replica import UserCallableWrapper
+  File "$HOME/.cache/gap-wave2-20260923/research-factors-ml/venv-r4-ray/lib/python3.13/site-packages/ray/serve/_private/replica.py", line 48, in <module>
+    from ray.serve import metrics
+  File "$HOME/.cache/gap-wave2-20260923/research-factors-ml/venv-r4-ray/lib/python3.13/site-packages/ray/serve/metrics.py", line 4, in <module>
+    from ray.serve import context
+  File "$HOME/.cache/gap-wave2-20260923/research-factors-ml/venv-r4-ray/lib/python3.13/site-packages/ray/serve/context.py", line 15, in <module>
+    from ray.serve._private.client import ServeControllerClient
+  File "$HOME/.cache/gap-wave2-20260923/research-factors-ml/venv-r4-ray/lib/python3.13/site-packages/ray/serve/_private/client.py", line 27, in <module>
+    from ray.serve._private.controller import ServeController
+  File "$HOME/.cache/gap-wave2-20260923/research-factors-ml/venv-r4-ray/lib/python3.13/site-packages/ray/serve/_private/controller.py", line 68, in <module>
+    from ray.serve._private.haproxy import HAProxyManager
+  File "$HOME/.cache/gap-wave2-20260923/research-factors-ml/venv-r4-ray/lib/python3.13/site-packages/ray/serve/_private/haproxy.py", line 19, in <module>
+    from jinja2 import Environment
+ModuleNotFoundError: No module named 'jinja2'. You can run `pip install "ray[serve]"` to install all Ray Serve dependencies.

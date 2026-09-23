@@ -1,0 +1,20 @@
+🔄 Retrying ERROR results from latest evaluation...
+Found 1 ERROR results to retry
+🔄 Running evaluation with resume mode to retry 1 test cases...
+Cache is disabled.
+Starting evaluation eval-Sqm-2026-09-23T07:26:43
+Resuming: skipping 7 previously completed cases
+Running 1 test cases (up to 1 at a time)...
+✓ Eval complete (ID: eval-Sqm-2026-09-23T07:26:43)
+
+» View results: promptfoo view
+» Feedback: https://promptfoo.dev/feedback
+
+
+Results:
+  ✓ 3 passed (37.50%)
+  ✗ 5 failed (62.50%)
+  0 errors (0%)
+Duration: 0s (concurrency: 1)
+
+Writing output to $HOME/.cache/gap-wave2-20260923/evaluation-experiments/raw/0/run/pf-fault/results.json

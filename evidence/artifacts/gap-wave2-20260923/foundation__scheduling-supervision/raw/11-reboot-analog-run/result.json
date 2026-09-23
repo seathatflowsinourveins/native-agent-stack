@@ -1,0 +1,117 @@
+{
+  "both_oracles_passed": true,
+  "completed_at_utc": "2026-09-23T02:54:19.644706+00:00",
+  "frozen": {
+    "dagu_binary_sha256": "20de7ae94e16999ff997db0386dced9504db37c87de333837fd15b4892b98bd7",
+    "inputs": {
+      "codex_cancel_probe.py": "7ca7838a3f41e3388a40197a35bc56744ccb59ca6640bd1328334b0777b6da49",
+      "dagu_common.py": "1ce91e2b253a36611e08f4de5897b889df671aaf4d0735c3111d357c56610d7d",
+      "ns_init.py": "da477a1829bc970cc22318db7aa2670906269ca40f402ccd05dff8de6bf13c9b",
+      "real_scheduled_recovery.py": "44057b5facf2fefcf598d4d305cebb2d25e427c79845b8df763ed486c30587c8",
+      "real_steps.py": "fe8787054a719222b1a6aeb3570f6cadd665a06e0ba84fdb0c4dd4bd385bc7a7",
+      "reboot_analog.py": "2bee3b39455135d475ea0bb1b88a5ac4762f8f7deea7f874860dca4941f5ea81"
+    }
+  },
+  "platform": "Linux 6.18.33.2-microsoft-standard-WSL2",
+  "python_version": "3.12.3",
+  "real_workflow_restart_analog": {
+    "boot1_init_alive_at_boot2": false,
+    "boot1_shutdown": {
+      "orderly_seconds": 0.05,
+      "pids_at_shutdown": [
+        2,
+        20,
+        21,
+        22
+      ],
+      "pids_left_for_kernel_kill": [],
+      "shutdown_requested": true,
+      "start_exit": 0,
+      "start_exit_before_shutdown": null
+    },
+    "boot2_service": {
+      "pids_after_retry": [],
+      "retry_exit": 0
+    },
+    "boot_identities": [
+      {
+        "at": 1790132047.8002658,
+        "boot_token": "b8cbc8d2107a4202",
+        "phase": "boot1",
+        "pid_in_namespace": 1,
+        "pid_namespace": "pid:[4026532245]"
+      },
+      {
+        "at": 1790132053.1096318,
+        "boot_token": "e5bb9853224fdb3d",
+        "phase": "boot2",
+        "pid_in_namespace": 1,
+        "pid_namespace": "pid:[4026532246]"
+      }
+    ],
+    "checks": {
+      "after_retry_succeeded_same_run_id": true,
+      "boot1_processes_retired": true,
+      "boot2_retry_exit_zero": true,
+      "boot_identity_changed": true,
+      "checkpoint_unchanged_count_one": true,
+      "ecosystem_equals_reference": true,
+      "no_completed_effect_before_boot2": true,
+      "running_before_shutdown": true,
+      "status_after_shutdown": "aborted",
+      "validate_equals_reference": true
+    },
+    "command_exit_codes": {
+      "history-after-boot2": 0,
+      "history-after-shutdown": 0,
+      "history-before-shutdown": 0,
+      "validate": 0,
+      "version": 0
+    },
+    "native_attempts": [
+      {
+        "attempt_dir": "a_20260923_025407_827Z_fe06cc",
+        "status": 3,
+        "triggerType": 2
+      },
+      {
+        "attempt_dir": "a_20260923_025413_138Z_524db0",
+        "status": 4,
+        "triggerType": 5
+      }
+    ],
+    "reference": {
+      "ecosystem": "{\"bytes\": 12918618, \"sha256\": \"693c295e2e2e6d7d20443ecd0ef3e18d8404450f1687c0e0ff7933019b1da66e\", \"status\": \"passed\"}",
+      "validate": "{\"components\": 69, \"hashed_files\": 2012, \"profiles\": 4, \"receipts\": 140, \"status\": \"passed\"}"
+    },
+    "run_id": "realboot-59dd2fcf40df9ebc",
+    "snapshot": {
+      "archive_sha256": "25dd92d1ebef69c44ebbd396485778ff47a4d5c9418c7bb9368289478d4340aa",
+      "commit": "41d39b3"
+    },
+    "status": "passed",
+    "timeline_utc": {
+      "boot1_exited": "2026-09-23T02:54:13.046350+00:00",
+      "boot2_exited": "2026-09-23T02:54:19.616337+00:00",
+      "finalize_ready": "2026-09-23T02:54:12.890988+00:00",
+      "shutdown_requested": "2026-09-23T02:54:12.932592+00:00"
+    }
+  },
+  "started_at_utc": "2026-09-23T02:53:14.275014+00:00",
+  "upstream_retry_tests": {
+    "archive_sha256": "8f4b1095a88bb037b582f8b5e337360b1702879f1abb9cfc319643ef1a775746",
+    "command": "go test -count=1 -run '^TestRetryCommand($|_)' -timeout 12m -v ./internal/cmd",
+    "exit_code": 0,
+    "fail_records": 0,
+    "final_line": "ok  \tgithub.com/dagucloud/dagu/v2/internal/cmd\t5.615s",
+    "go_version": "go version go1.27.0 linux/amd64",
+    "report_sha256": "558ae56fa0ca59aa02341ab979708811b2144f22387d401510c515f654beb0a4",
+    "seconds": 45.9,
+    "skip_records": 0,
+    "source_files": 3261,
+    "source_revision": "58fed633d58c1dd1319091fdb2c2f6158ecfa053",
+    "source_unchanged": true,
+    "subtest_pass": 12,
+    "top_level_pass": 3
+  }
+}

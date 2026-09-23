@@ -1,0 +1,10 @@
+# Jaeger 2.21.0 install record (gap 5)
+downloaded_at: 2026-09-23T02:57:30Z..02:57:32Z (61.3 MiB tarball + 206 B sha256sum file)
+url: https://github.com/jaegertracing/jaeger/releases/download/v2.21.0/jaeger-2.21.0-linux-amd64.tar.gz
+github_api_digest: sha256:f5741318ea2c3a2e64a1e1fffafcd1b03872ed0783ec5e7675fb6c686bfc7a5a
+local_sha256: f5741318ea2c3a2e64a1e1fffafcd1b03872ed0783ec5e7675fb6c686bfc7a5a
+inner_sha256sum_check:
+jaeger-2.21.0-linux-amd64/example-hotrod: OK
+jaeger-2.21.0-linux-amd64/jaeger: OK
+version: {"gitCommit":"d5a2608097b01bdf631e49d6480819295e4aadab","gitVersion":"v2.21.0","buildDate":"2026-09-14T23:32:12Z"}
+upstream_config_reference: cmd/jaeger/internal/all-in-one.yaml@v2.21.0 sha256 ecfb896656eacb7ce6ffb0c950643de287558fd182fc3613718fa13ca89b67d6

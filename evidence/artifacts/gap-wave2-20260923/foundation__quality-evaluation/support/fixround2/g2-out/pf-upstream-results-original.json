@@ -1,0 +1,232 @@
+{
+  "evalId": "eval-Vpc-2026-09-23T12:49:57",
+  "results": {
+    "version": 3,
+    "timestamp": "2026-09-23T12:49:57.115Z",
+    "prompts": [
+      {
+        "id": "9dac3957c7b8310d371eb931da0cd2ed5a9c5c8416d5aa3c77a6c821cc7ca465",
+        "raw": "NVIDIA's four published retrieval queries and documents (the upstream script owns the inputs)",
+        "label": "NVIDIA's four published retrieval queries and documents (the upstream script owns the inputs)",
+        "provider": "NVIDIA published example via native Python and local vLLM",
+        "metrics": {
+          "score": 1,
+          "testPassCount": 1,
+          "testFailCount": 0,
+          "testErrorCount": 0,
+          "assertPassCount": 1,
+          "assertFailCount": 0,
+          "totalLatencyMs": 858,
+          "tokenUsage": {
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "total": 0,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            },
+            "assertions": {
+              "total": 0,
+              "prompt": 0,
+              "completion": 0,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0,
+                "cacheReadInputTokens": 0,
+                "cacheCreationInputTokens": 0
+              }
+            }
+          },
+          "namedScores": {},
+          "namedScoresCount": {},
+          "namedScoreWeights": {},
+          "cost": 0
+        }
+      }
+    ],
+    "results": [
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "4/4 NVIDIA published queries ranked the paired document first; winners=[[0],[1],[2],[3]]. Local source-derived assertion on rounded upstream stdout, not a benchmark. Provider token usage is not reported.",
+              "assertion": {
+                "type": "javascript",
+                "value": "const rows = output.split(/\\r?\\n/)\n  .map(line => line.match(/^q\\[(\\d+)\\]\\s+(.+)$/))\n  .filter(Boolean);\nif (rows.length !== 4) {\n  return {pass: false, score: 0, reason: 'Expected four rows from the upstream example; received ' + rows.length};\n}\nconst best = [];\nlet correct = 0;\nfor (let i = 0; i < rows.length; i++) {\n  const values = rows[i][2].trim().split(/\\s+/).map(Number);\n  if (Number(rows[i][1]) !== i || values.length !== 4 || !values.every(Number.isFinite)) {\n    return {pass: false, score: 0, reason: 'Upstream matrix row has invalid shape or nonfinite values'};\n  }\n  const maximum = Math.max(...values);\n  const winners = values.map((v, j) => v === maximum ? j : -1).filter(j => j >= 0);\n  best.push(winners);\n  if (winners.length === 1 && winners[0] === i) correct++;\n}\nreturn {\n  pass: correct === 4,\n  score: correct / 4,\n  reason: correct + '/4 NVIDIA published queries ranked the paired document first; winners=' + JSON.stringify(best) + '. Local source-derived assertion on rounded upstream stdout, not a benchmark. Provider token usage is not reported.'\n};\n"
+              }
+            }
+          ]
+        },
+        "id": "<uuid-redacted>",
+        "latencyMs": 858,
+        "namedScores": {},
+        "prompt": {
+          "raw": "NVIDIA's four published retrieval queries and documents (the upstream script owns the inputs)",
+          "label": "NVIDIA's four published retrieval queries and documents (the upstream script owns the inputs)",
+          "config": {}
+        },
+        "promptId": "9dac3957c7b8310d371eb931da0cd2ed5a9c5c8416d5aa3c77a6c821cc7ca465",
+        "promptIdx": 0,
+        "provider": {
+          "id": "exec:python upstream-example.py",
+          "label": "NVIDIA published example via native Python and local vLLM"
+        },
+        "response": {
+          "output": "Similarity scores:\n          d[0]      d[1]      d[2]      d[3]\nq[0]    0.8110    0.0249    0.0002   -0.0311\nq[1]    0.0444    0.6472   -0.0513    0.0383\nq[2]   -0.0099   -0.0409    0.6469    0.1009\nq[3]   -0.0222    0.0216    0.1211    0.7690"
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "Published four-query retrieval example; local source-derived ranking assertion. Script token usage is UNKNOWN; displayed zero counters mean unavailable.",
+          "assert": [
+            {
+              "type": "javascript",
+              "value": "const rows = output.split(/\\r?\\n/)\n  .map(line => line.match(/^q\\[(\\d+)\\]\\s+(.+)$/))\n  .filter(Boolean);\nif (rows.length !== 4) {\n  return {pass: false, score: 0, reason: 'Expected four rows from the upstream example; received ' + rows.length};\n}\nconst best = [];\nlet correct = 0;\nfor (let i = 0; i < rows.length; i++) {\n  const values = rows[i][2].trim().split(/\\s+/).map(Number);\n  if (Number(rows[i][1]) !== i || values.length !== 4 || !values.every(Number.isFinite)) {\n    return {pass: false, score: 0, reason: 'Upstream matrix row has invalid shape or nonfinite values'};\n  }\n  const maximum = Math.max(...values);\n  const winners = values.map((v, j) => v === maximum ? j : -1).filter(j => j >= 0);\n  best.push(winners);\n  if (winners.length === 1 && winners[0] === i) correct++;\n}\nreturn {\n  pass: correct === 4,\n  score: correct / 4,\n  reason: correct + '/4 NVIDIA published queries ranked the paired document first; winners=' + JSON.stringify(best) + '. Local source-derived assertion on rounded upstream stdout, not a benchmark. Provider token usage is not reported.'\n};\n"
+            }
+          ],
+          "vars": {},
+          "options": {},
+          "metadata": {}
+        },
+        "testIdx": 0,
+        "tokenUsage": {
+          "prompt": 0,
+          "completion": 0,
+          "cached": 0,
+          "total": 0,
+          "numRequests": 1,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          },
+          "assertions": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            }
+          }
+        },
+        "vars": {},
+        "metadata": {
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      }
+    ],
+    "stats": {
+      "successes": 1,
+      "failures": 0,
+      "errors": 0,
+      "tokenUsage": {
+        "prompt": 0,
+        "completion": 0,
+        "cached": 0,
+        "total": 0,
+        "numRequests": 1,
+        "completionDetails": {
+          "reasoning": 0,
+          "acceptedPrediction": 0,
+          "rejectedPrediction": 0,
+          "cacheReadInputTokens": 0,
+          "cacheCreationInputTokens": 0
+        },
+        "assertions": {
+          "total": 0,
+          "prompt": 0,
+          "completion": 0,
+          "cached": 0,
+          "numRequests": 0,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          }
+        }
+      },
+      "durationMs": 900,
+      "evaluationDurationMs": 900
+    }
+  },
+  "config": {
+    "tags": {},
+    "description": "NVIDIA Nemotron upstream retrieval example — live endpoint check; usage not reported",
+    "prompts": [
+      "NVIDIA's four published retrieval queries and documents (the upstream script owns the inputs)"
+    ],
+    "providers": [
+      {
+        "id": "exec:python upstream-example.py",
+        "label": "NVIDIA published example via native Python and local vLLM"
+      }
+    ],
+    "tests": [
+      {
+        "description": "Published four-query retrieval example; local source-derived ranking assertion. Script token usage is UNKNOWN; displayed zero counters mean unavailable.",
+        "assert": [
+          {
+            "type": "javascript",
+            "value": "const rows = output.split(/\\r?\\n/)\n  .map(line => line.match(/^q\\[(\\d+)\\]\\s+(.+)$/))\n  .filter(Boolean);\nif (rows.length !== 4) {\n  return {pass: false, score: 0, reason: 'Expected four rows from the upstream example; received ' + rows.length};\n}\nconst best = [];\nlet correct = 0;\nfor (let i = 0; i < rows.length; i++) {\n  const values = rows[i][2].trim().split(/\\s+/).map(Number);\n  if (Number(rows[i][1]) !== i || values.length !== 4 || !values.every(Number.isFinite)) {\n    return {pass: false, score: 0, reason: 'Upstream matrix row has invalid shape or nonfinite values'};\n  }\n  const maximum = Math.max(...values);\n  const winners = values.map((v, j) => v === maximum ? j : -1).filter(j => j >= 0);\n  best.push(winners);\n  if (winners.length === 1 && winners[0] === i) correct++;\n}\nreturn {\n  pass: correct === 4,\n  score: correct / 4,\n  reason: correct + '/4 NVIDIA published queries ranked the paired document first; winners=' + JSON.stringify(best) + '. Local source-derived assertion on rounded upstream stdout, not a benchmark. Provider token usage is not reported.'\n};\n"
+          }
+        ]
+      }
+    ],
+    "env": {},
+    "outputPath": [
+      "$HOME/.cache/gap-wave2-20260923/quality-evaluation/fixround2/g2/pf-upstream/results-original.json"
+    ],
+    "extensions": [],
+    "metadata": {},
+    "evaluateOptions": {}
+  },
+  "shareableUrl": null,
+  "metadata": {
+    "promptfooVersion": "0.123.1",
+    "nodeVersion": "v24.21.0",
+    "platform": "linux",
+    "arch": "x64",
+    "exportedAt": "2026-09-23T12:49:58.116Z",
+    "evaluationCreatedAt": "2026-09-23T12:49:57.115Z"
+  },
+  "runtimeOptions": {
+    "eventSource": "cli",
+    "showProgressBar": true,
+    "repeat": 1,
+    "maxConcurrency": 1,
+    "cache": false
+  }
+}

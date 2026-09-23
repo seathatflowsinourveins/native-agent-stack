@@ -1,0 +1,19 @@
+{
+  "gap_index": 1,
+  "slug": "five-package-installs",
+  "gap_text_sha256": "c271f8c9c0e12cc07cadc78bc08b8d97705c1eff76b4fc43bd506628a151d4ce",
+  "next_check": "Install each pinned package in its own new uv prefix. Run its catalog native_workflow snippet, or a minimal local run, and retain the outputs as executed receipts.",
+  "preregistration": {
+    "written_at": "2026-09-23T07:18:31Z",
+    "expectation": "Each of inspect-ai 0.3.266, mlflow 3.16.1, river 0.26.1, mteb 2.21.0 and arize-phoenix 20.14.0 installs into its own new uv environment under the cache directory and completes its catalog native_workflow snippet or a minimal local run with exit 0. mteb and phoenix have the largest dependency trees; mteb needs a CPU torch wheel and a small public model/dataset download.",
+    "criteria": [
+      "Each package installed into a separate new uv venv; installed version read back with importlib.metadata equals the pin.",
+      "inspect-ai: `inspect --help` plus the gap-3 mock-model task `inspect eval` run exit 0.",
+      "mlflow: the data-research native_workflow snippet (sqlite tracking in a temp dir) exits 0; the agents-operations `mlflow server --host 127.0.0.1` on a free loopback port answers /health and is stopped.",
+      "river: the data-research native_workflow snippet exits 0 and prints an MAE value.",
+      "mteb: `pip install mteb==2.21.0` succeeds and a minimal local evaluation (one small public task, one small public model, CPU) returns a score object with exit 0; if the minimal evaluation cannot run, record why and the outcome cannot be settled.",
+      "phoenix: `phoenix serve` with PHOENIX_HOST=127.0.0.1, telemetry off, MCP off, providers NONE, temp working dir and non-default HTTP/gRPC ports answers its health endpoint, accepts one OTLP span and returns it on readback, then is stopped.",
+      "Settled only if all five packages meet their criterion."
+    ]
+  }
+}

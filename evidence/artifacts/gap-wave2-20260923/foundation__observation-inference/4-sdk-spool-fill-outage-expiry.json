@@ -1,0 +1,193 @@
+{
+  "id": "gap-wave2-20260923-foundation-observation-inference-4",
+  "gap_index": 4,
+  "gap_text_sha256": "beb28cc8f4ed3bc9d488229b2a6fadaa5895a22f0191b8c28d97d56f1cda252a",
+  "gap_text": "The SDK receipt lane has no automatic spool expiry and no loss/recovery acceptance under a full disk or an extended outage (observability/receipt.json line 258).",
+  "next_check": "Point the SDK receipt spool at a size-limited tmpfs, fill it, stop the collector for an extended interval, then restore both and count lost versus replayed receipts. Add and test an expiry policy.",
+  "arms": [
+    {
+      "arm": "point the SDK receipt spool at a size-limited tmpfs and fill it",
+      "status": "executed",
+      "detail": "128 KiB tmpfs in an unprivileged user+mount namespace; unchanged write_observation()"
+    },
+    {
+      "arm": "stop the collector for an extended interval",
+      "status": "executed",
+      "detail": "180.0 s; plus a Loki-only outage of about 335 s and an overlapping collector+Loki outage"
+    },
+    {
+      "arm": "restore both and count lost versus replayed receipts",
+      "status": "executed",
+      "detail": "counted by observation_id in Loki and in the collector file/events receipt"
+    },
+    {
+      "arm": "add and test an expiry policy",
+      "status": "executed (not scheduled)",
+      "detail": "spool_expiry.py, 6 unit tests, live run on the tmpfs spool"
+    }
+  ],
+  "preregistration": {
+    "written_at": "2026-09-23T02:46:44Z",
+    "expectation": "Inside an unprivileged user+mount namespace, a size-limited tmpfs spool (e.g. 256 KiB) will fill; the SDK receipt writer will fail atomically on ENOSPC without partial files; with the collector stopped for an extended interval and later restarted, file_log will replay every complete receipt into an isolated Loki with no duplicates; an added expiry policy script will delete only receipts older than the TTL whose ingestion is confirmed.",
+    "criteria": "Count: receipts attempted, receipts written, ENOSPC refusals, partial files (must be 0), receipts in Loki after restore (must equal written, distinct receipt_id), duplicates (must be 0). Expiry policy test: unit tests plus a run on the tmpfs spool that frees space and allows new writes. Extended interval = at least 3 minutes collector down and Loki down for part of it.",
+    "late": false,
+    "committed_in": "1a59606 (2026-09-23T02:46:44Z, before any check ran)",
+    "followup": {
+      "written_at": "2026-09-23T03:13:09Z",
+      "label": "follow-up preregistration, written after the first gap-4 run (raw/4-spool-outage.json) and before the follow-up runs",
+      "expectation": "(a) Space freed by the expiry policy is released only after the collector file receiver closes its handles on deleted files, so writes fail for a short interval after expiry and then succeed. (b) With otlphttp/loki retry_on_failure.max_elapsed_time set to 0s (retry indefinitely, persistent queue already configured), a 330 s Loki outage loses 0 of 8 receipts; the unchanged configuration loses them (as in the first run).",
+      "criteria": "(a) Record deleted-but-open file descriptors held by otelcol right after expiry (count of /proc/<pid>/fd links ending in '(deleted)'), time until statvfs free bytes > 0, and whether a write succeeds after that. (b) Run the Loki-outage phase with the overlay; pass = 8/8 in Loki after restore, no duplicates. Both variants use the same isolated harness."
+    },
+    "fix_round": {
+      "written_at": "2026-09-23T03:28:46Z",
+      "label": "fix-round preregistration (after the independent Codex review in raw/review-codex-round1.txt), written before the fix-round runs",
+      "expectation": "Overlapping outage with the unchanged configuration: collector down 0-180 s, Loki down 60-240 s; receipts written during the collector outage are replayed at 180 s into the persistent queue and delivered after Loki returns (within the 300 s retry window), so 0 are lost and none duplicated.",
+      "criteria": "lost_in_loki == 0 and duplicates == {} for receipts written while the collector was down.",
+      "committed_in": "the commit 'Record the Codex review and preregister the fix round' (2026-09-23T03:28:46Z, before the fix-round runs)"
+    }
+  },
+  "commands": [
+    "cd $HOME/code/nas-wt-g2-observation-inference && python3 blueprints/gap-wave2-20260923/foundation__observation-inference/spool_outage.py --out evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/4-spool-outage.json   (re-execs under unshare --user --map-root-user --mount; first attempt died in a result-parsing bug after phase C and is retained as 4-spool-outage-attempt1-scriptbug.*)",
+    "cd blueprints/gap-wave2-20260923/foundation__observation-inference && python3 -m unittest -v test_spool_expiry",
+    "cd $HOME/code/nas-wt-g2-observation-inference && for v in baseline noexpiry; do python3 blueprints/gap-wave2-20260923/foundation__observation-inference/spool_followup.py --variant $v --out evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/4-followup-$v.json & done; wait",
+    "cd $HOME/code/nas-wt-g2-observation-inference && python3 blueprints/gap-wave2-20260923/foundation__observation-inference/spool_combined.py --out evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/4-combined.json   (fix round)"
+  ],
+  "results": [
+    "A baseline: {\"written\": 5, \"in_loki\": 5, \"seconds_to_all\": 2.1}",
+    "B collector stopped 180.0 s while filling: write_outcomes={'ok': 27, 'enospc': 10}, pending_leftovers=0, invalid_json_files=0, free_bytes_when_full=0",
+    "C collector restored: expected_distinct=32, loki_distinct=32, lost_in_loki=[], loki_duplicates={}, events_file_distinct=32",
+    "D expiry (min_free 64 KiB, Loki-confirmed only): {\"scanned\": 32, \"confirmed_known\": 32, \"deleted\": 16, \"orphans_removed\": 0, \"unconfirmed_kept\": 0, \"oldest_unconfirmed_age_s\": null, \"free_bytes_before\": 0, \"free_bytes_after\": 0, \"dry_run\": false}; writes attempted immediately after: ['enospc', 'enospc', 'enospc']",
+    "E Loki stopped 334.6 s (> otlphttp/loki retry max_elapsed_time 300s): written_ok=8, in_events_file_during_outage=8, in_loki_after_restore=0, lost_in_loki=8, still_in_spool=8; collector log {'Exporting failed': 1, 'Dropping data': 1, 'dropped': 1, 'no more retries left': 1, 'max elapsed time': 0, 'Retrying': 0}",
+    "follow-up (a), both variants: deleted-but-open fds held by otelcol right after expiry = 16/16; free space > 0 after 0.38/0.39 s measured from the start of the expiry call (includes its Loki confirmation query); a write after release succeeded = True/True",
+    "follow-up (b) unchanged config: Loki down 334.7 s, lost_in_loki=8/8, collector log {'Exporting failed': 2, 'Dropping data': 2, 'no more retries left': 2}",
+    "follow-up (b) overlay retry_on_failure.max_elapsed_time: 0s: Loki down 334.6 s, lost_in_loki=0/8, duplicates={}, collector log {'Exporting failed': 0, 'Dropping data': 0, 'no more retries left': 0}",
+    "fix round, overlapping outage (unchanged config; recorded timeline: collector down 0-180.4 s, Loki down 60.6-261.5 s, Loki end = restart plus readiness): written=8, in_events_file_before_loki_back=8, in_loki_after_both_back=8, lost_in_loki=0, duplicates={}, collector log {'Exporting failed': 0, 'Dropping data': 0, 'no more retries left': 0}",
+    "expiry unit tests: Ran 6 tests in 10.032s OK exit=0"
+  ],
+  "outcome": "advanced",
+  "note": "Measured on a size-limited tmpfs spool with the unchanged write_observation() helper. A full disk refuses new receipts atomically (ENOSPC, no partial or pending files). A 180 s collector outage replayed all 32 receipts with no loss or duplicates, and an overlapping collector+Loki outage within the retry window lost 0. A Loki outage longer than the exporter retry window (about 335 s) dropped every receipt sent in it (8/8, reproduced twice) from Loki; they stayed in the spool and file/events receipt, and file_log does not re-read them. Setting otlphttp/loki retry_on_failure.max_elapsed_time to 0s lost 0/8 in the same test. A Loki-confirmed-only expiry policy (spool_expiry.py, 6 unit tests) frees space once the file receiver closes its handles on the deleted files. Remaining: apply the max_elapsed_time change to observability/collector/collector.yaml (outside this unit's paths) and schedule spool_expiry.py so expiry is automatic; collector queue-directory exhaustion and multi-hour outages were not tested.",
+  "evidence_class": "local_integration",
+  "limits": [
+    "Isolated collector + Loki in an unprivileged user/mount namespace; not the live spool or services.",
+    "\"Extended\" here means 180 s (collector), about 335 s (Loki) and an overlapping window of 261.5 s; multi-hour outages and a full collector queue directory were not exercised.",
+    "Loss is counted in Loki by observation_id; the collector file/events receipt had every record throughout.",
+    "The expiry policy is a script plus tests; it is not wired into any timer or unit."
+  ],
+  "checked_at": "2026-09-23T03:35:43.669745+00:00",
+  "independent_review": {
+    "round1": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/review-codex-round1.txt",
+    "round2": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/review-codex-round2.txt"
+  },
+  "raw_evidence": [
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/4-spool-outage.json",
+      "sha256": "4f4938d8d9825b9cbabc283a333177123d779f1744dac02962e9dc3e82d52bc7"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/4-spool-outage.stdout.txt",
+      "sha256": "a4795f987b74b4322d24ccb264862258911235f61c78e0e8cfe85c5df07650d1"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/4-spool-outage.exit.txt",
+      "sha256": "a98d81e276951893bd4f76d26e7c460e92bff2841ad7f7dc8c693dc97f2a33cc"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/4-spool-outage.started.txt",
+      "sha256": "8f94b89d6eb01cf4d8b4e40ca762e40e7ce91bc9c6cd9655365872ceea469437"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/4-spool-outage-attempt1-scriptbug.stdout.txt",
+      "sha256": "c2b909c0fd75fbdb13bc89d7356b644a68452adac30ed0c19cf803834b402609"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/4-spool-outage-attempt1-scriptbug.exit.txt",
+      "sha256": "1f0996e48c3cc8c97a72da4b2129e131283dc6d0976e3fac18416adaa655e318"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/4-spool-outage-attempt1-scriptbug.started.txt",
+      "sha256": "59dfb3f147d9f280843e2eaf6a15141fd9ef03218e65b1838159480c0ca06b31"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/4-expiry-unittest.txt",
+      "sha256": "4142a407bb2dc3fcee172e57adfbe77f6ed54f567fbb52195a5738b102655067"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/4-followup-baseline.json",
+      "sha256": "33571cc76224a01c9eff3ea0e6fe6965680d5d037955b4971d962dea4cd2aef8"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/4-followup-baseline.stdout.txt",
+      "sha256": "75136ada2cbb949fd609e5abb8a5f3829fedbd0ab12aa85db82bd15e9bb051d9"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/4-followup-baseline.exit.txt",
+      "sha256": "dca1c5cd6fe9567fea5150ac156a4e17a8f8f9dcef20b9dd66909028f9115cdb"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/4-followup-noexpiry.json",
+      "sha256": "10f15ad3923babe75f5cafdbcfd1f7e001f1d54b286a6d1cf140fd47a6a1a901"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/4-followup-noexpiry.stdout.txt",
+      "sha256": "4a2ad8df013ba76aa57cf0d8faa52c3e56d65335d6c9d8d7214b56417f48a6bf"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/4-followup-noexpiry.exit.txt",
+      "sha256": "32e2ea0a75208058bf5f3b914eb3609558bcb77ef6c8dfe3d5727d90132a308f"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/4-followup.started.txt",
+      "sha256": "374739e08846436377b795db899bee3bbccf71ad6b28ccf96cfb8959ff004f86"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/4-combined.json",
+      "sha256": "1cfa9ab1838c64490d0c03e5e12b0f81a6ee2a332a210e6a86598eed907dc502"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/4-combined.stdout.txt",
+      "sha256": "0ea6f98bef77d89e05961360f84a4c669400e41588696de0486fe4a59c93f8df"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/4-combined.exit.txt",
+      "sha256": "b58b27a1098444757dfcdc3f5f300336b6896eac6d419c5512e6fe88d890b9c7"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/4-combined.started.txt",
+      "sha256": "9e4b5e306b735eec8d55f834db9caf359e8f4dc620253a5f7a2fa8936f5b679e"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/review-codex-round1.txt",
+      "sha256": "ad7cc8072536345565f1a9ad0ca6688e80b71c6d5ea0eacfc765479718b31ee8"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/review-codex-round2.txt",
+      "sha256": "a1cc543a79e7f621f9ce7d338b3d36d15ba88ee5297b3dd2b49e299ffa91c15b"
+    }
+  ],
+  "helper_scripts": [
+    {
+      "file": "blueprints/gap-wave2-20260923/foundation__observation-inference/isostack.py",
+      "sha256": "0fe3cb2014d707aef0d0dfeafa4e2175a43ee44a78da31906ee6f04b0e3ee9e9"
+    },
+    {
+      "file": "blueprints/gap-wave2-20260923/foundation__observation-inference/spool_outage.py",
+      "sha256": "7c7354cce372732e45c10ca2751aae207253f260ae39878630682034e674c0b0"
+    },
+    {
+      "file": "blueprints/gap-wave2-20260923/foundation__observation-inference/spool_followup.py",
+      "sha256": "fa167bc8a7b953cd406e5c27c1ca5b8befec4343459001fe893a6f3bc80a0d9f"
+    },
+    {
+      "file": "blueprints/gap-wave2-20260923/foundation__observation-inference/spool_combined.py",
+      "sha256": "9dee010bf0f7dca8c4c9469c82392ec31c459552f7a7e510e26fed8fba0f07c7"
+    },
+    {
+      "file": "blueprints/gap-wave2-20260923/foundation__observation-inference/spool_expiry.py",
+      "sha256": "811f975063591575a77be1dc88f286db1809d0f34278af154b37ba5861c4860a"
+    },
+    {
+      "file": "blueprints/gap-wave2-20260923/foundation__observation-inference/test_spool_expiry.py",
+      "sha256": "4a9f75370da8f05218e04320f7b9906ac264f60502651b6adc27e0a2c7d59909"
+    }
+  ]
+}

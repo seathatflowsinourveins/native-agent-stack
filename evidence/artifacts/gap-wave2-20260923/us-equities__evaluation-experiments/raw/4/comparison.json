@@ -1,0 +1,42 @@
+{
+ "rankers": {
+  "lexical": {
+   "local_details_sha256": "2eb08ad2e7f35549ec823f6911bf4150c7ccddb5a037998c3a357a03d2c22cd4",
+   "darwin_details_sha256": "2eb08ad2e7f35549ec823f6911bf4150c7ccddb5a037998c3a357a03d2c22cd4",
+   "details_byte_identical": true,
+   "evaluated": 101,
+   "summary_fields_compared": 85,
+   "summary_fields_differing": [
+    "runtime.wall_time_seconds"
+   ],
+   "differing_fields_all_timing": true,
+   "headline": {
+    "Recall@5": 0.3432343234323432,
+    "Recall@10": 0.48184818481848185,
+    "Recall@20": 0.6963696369636964,
+    "MRR": 0.20745277382862923
+   },
+   "per_sample_gold_rank_mismatches": [],
+   "samples_compared": 101
+  },
+  "bm25": {
+   "local_details_sha256": "3c5e53999c89b48a5df55ef870484a85786e8939b91d6c9ee3a0f29e08c40b87",
+   "darwin_details_sha256": "3c5e53999c89b48a5df55ef870484a85786e8939b91d6c9ee3a0f29e08c40b87",
+   "details_byte_identical": true,
+   "evaluated": 101,
+   "summary_fields_compared": 85,
+   "summary_fields_differing": [
+    "runtime.wall_time_seconds"
+   ],
+   "differing_fields_all_timing": true,
+   "headline": {
+    "Recall@5": 0.22277227722772278,
+    "Recall@10": 0.3217821782178218,
+    "Recall@20": 0.49339933993399343,
+    "MRR": 0.16384832699974178
+   },
+   "per_sample_gold_rank_mismatches": [],
+   "samples_compared": 101
+  }
+ }
+}

@@ -1,0 +1,13 @@
+# Lines of annual-report-layout.txt (sha256 8781387f4a4aadda2792cbe07e43ff0159ef98a7f14d94be3abc0dfb77ca9d80) lines 1-8 and 64-65 (performance table header, first rows and summary rows) plus the lines matching the two phrases cited in receipt 3; line-numbered.
+1:                                                                             Berkshire’s Performance vs. the S&P 500
+2:                                                                                                                                                                 Annual Percentage Change
+3:                                                                                                                                                           in Per-Share             in S&P 500
+4:                                                                                                                                                          Market Value of          with Dividends
+5: Year                                                                                                                                                        Berkshire                Included
+6: 1965 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .              49.5                  10.0
+7: 1966 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .             (3.4)                (11.7)
+8: 1967 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .              13.3                  30.9
+64: Compounded Annual Gain – 1965-2022 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .                                    19.8%                    9.9%
+65: Overall Gain – 1964-2022 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .                   3,787,464%                24,708%
+77:       Charlie Munger, my long-time partner, and I have the job of managing the savings of a
+457: February 25, 2023                    Warren E. Buffett

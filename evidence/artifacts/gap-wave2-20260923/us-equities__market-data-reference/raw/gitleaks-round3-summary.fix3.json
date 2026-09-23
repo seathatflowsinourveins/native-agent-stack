@@ -1,0 +1,34 @@
+{
+ "scanner": "$HOME/codex-ecosystem/bin/gitleaks-guarded (gitleaks 8.30.1), dir mode, --redact",
+ "scan_1": {
+  "finished_at": "2026-09-23T13:14:11Z",
+  "target": "scratch copy of the round-3 raw files (14-*), archive_calendar_check.py and make_receipts.py, before any round-3 commit",
+  "findings_total": 4,
+  "findings": [
+   {
+    "file": "14-wayback-ice-bush-20250108195503.html",
+    "rule": "generic-api-key",
+    "count": 2,
+    "context": "Q4ApiKey in a <script> block and apikey= in a widget URL (ir.theice.com site's embedded public Q4 API key)"
+   },
+   {
+    "file": "14-wayback-ice-carter-20241230155348.html",
+    "rule": "generic-api-key",
+    "count": 2,
+    "context": "same two locations"
+   }
+  ],
+  "action": "the ICE pages are published as tag-stripped text only (ice_text_publish.py); secret values are not recorded"
+ },
+ "scan_2": {
+  "finished_at": "2026-09-23T13:24:38Z",
+  "target": "scratch copy of the whole layer evidence directory and helper directory (119 files, ~3.11 MB) after the text publication and receipt regeneration",
+  "findings_total": 0
+ },
+ "lock_waits": "both scans waited for another unit's scan to release the per-user lock (exit 75 retries, 20 s apart)",
+ "scan_3": {
+  "finished_at": "2026-09-23T13:30:05Z",
+  "target": "scratch copy of the 16 files changed after scan 2 (Business Wire path redaction, EOL fix outputs, regenerated receipts, README, manifest, helpers)",
+  "findings_total": 0
+ }
+}

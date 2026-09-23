@@ -1,0 +1,20 @@
+# DVC 3.67.1 pipeline for the identity-readiness adapter chain (security-identity probe -> quality ->
+# ledger -> select with quarantine). It runs in a `dvc init --no-scm` repo because probe.py refuses to
+# write a capture inside any git work tree (private_output_must_be_outside_git). Synthetic transport only.
+stages:
+  id_capture:
+    cmd: mkdir -p data && python stages/stage.py id-capture --code code --out-dir data/id_capture --out data/id_capture.json
+    deps: [stages/stage.py, code/security-identity/probe.py, code/security-identity/plan.json, code/alpaca-historical/collect.py]
+    outs: [data/id_capture, data/id_capture.json]
+  id_quality:
+    cmd: python stages/stage.py id-quality --code code --capture data/id_capture --capture-json data/id_capture.json --out-dir data/id_quality --out data/id_quality.json
+    deps: [stages/stage.py, code/security-identity/quality.py, data/id_capture, data/id_capture.json]
+    outs: [data/id_quality, data/id_quality.json]
+  id_ledger:
+    cmd: python stages/stage.py id-ledger --code code --quality data/id_quality --quality-json data/id_quality.json --out-dir data/id_ledger --out data/id_ledger.json
+    deps: [stages/stage.py, code/security-identity/ledger.py, code/security-identity/select.sql, data/id_quality, data/id_quality.json]
+    outs: [data/id_ledger, data/id_ledger.json]
+  id_select:
+    cmd: python stages/stage.py id-select --code code --ledger data/id_ledger --ledger-json data/id_ledger.json --out out/id_select.json
+    deps: [stages/stage.py, data/id_ledger, data/id_ledger.json]
+    outs: [out/id_select.json]

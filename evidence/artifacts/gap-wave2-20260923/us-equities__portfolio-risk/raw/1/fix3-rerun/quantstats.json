@@ -1,0 +1,16 @@
+{
+  "inputs_unchanged": true,
+  "library": "quantstats",
+  "plan_sha256": "b8d1beba6eddd0388957ca0d9e9c46ebfb2ca538f076419d5a8dcaaaf82be4a7",
+  "python": "3.13.15",
+  "result": {
+    "cagr": 0.1333834965440508,
+    "max_drawdown": -0.34421684988050694,
+    "observations": 1510,
+    "series": "equal-weight SPY/QQQ/IWM daily close-to-close raw returns 2015-01-05..2020-12-31",
+    "sharpe": 0.7341197404624837,
+    "sortino": 1.0035236417923024,
+    "volatility": 0.197320567606012
+  },
+  "version": "0.0.81"
+}

@@ -1,0 +1,6 @@
+resident 8231 /v1/models:
+['nvidia/Nemotron-3-Embed-1B-BF16']
+resident 8231 POST /v1/chat/completions status: 404
+temporary 18431 /v1/models:
+['qwen2.5-7b-instruct-awq']
+temporary 18431 POST /v1/chat/completions status: 200

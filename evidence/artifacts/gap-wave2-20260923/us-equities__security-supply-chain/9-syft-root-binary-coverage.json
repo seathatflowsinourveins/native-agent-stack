@@ -1,0 +1,119 @@
+{
+  "id": "gap-wave2-20260923/us-equities/security-supply-chain/9",
+  "gap_index": 9,
+  "gap_text": "Python metadata inventory excludes complete bundled native-library, host OS, external interpreter, and broker-side coverage.",
+  "gap_text_sha256": "e844cee2f6767a052709cfae5bb6c8efb991ef2132eeaf7baf9a6b117135fcf9",
+  "next_check": "Run `syft dir:/` with the binary cataloger enabled and scan it with grype, then record which native libraries and OS packages are now covered.",
+  "preregistration": {
+    "written_at": "2026-09-23T08:13:16Z",
+    "expectation": "syft dir:/ (excluding /proc, /sys, /dev, /mnt, /run, /tmp and user home trees) with binary catalogers enabled catalogs dpkg OS packages plus some ELF/binary packages; grype yields OS-package matches.",
+    "criteria": [
+      "advanced if the scan runs and records covered OS packages/native library counts; external interpreter coverage recorded; broker-side coverage cannot be scanned on this host and remains open",
+      "not_settled if the scan exceeds 20 minutes"
+    ]
+  },
+  "commands": [
+    "bash blueprints/gap-wave2-20260923/us-equities__security-supply-chain/syft_binary_coverage.sh venv   # syft scan dir:<nautilus rc5 venv> --select-catalogers +binary-classifier-cataloger,+elf-binary-package-cataloger,+cargo-auditable-binary-cataloger,+go-module-binary-cataloger ; grype sbom:<that>",
+    "first attempt with --select-catalogers +binary: exit=1 'invalid expression: \"binary\": tags are not allowed with this operation (must use exact names)'",
+    "bash blueprints/gap-wave2-20260923/us-equities__security-supply-chain/syft_binary_coverage.sh root   # ecosystem-bounded-run (1200 s, 8G) syft scan dir:/ (same catalogers) --exclude ./proc/** ./sys/** ./dev/** ./mnt/** ./run/** ./tmp/** ./home/** ./root/** ./lost+found/** ./var/tmp/** ; grype sbom:<that>; dpkg-query -W",
+    "bash blueprints/gap-wave2-20260923/us-equities__security-supply-chain/syft_binary_coverage.sh interp   # syft dir:<uv-managed CPython 3.13.15 used by the SDK venv> ; grype",
+    "bash blueprints/gap-wave2-20260923/us-equities__security-supply-chain/syft_binary_coverage.sh ibkr   # syft dir:$HOME/Jts/ibgateway/1050/{jars,jre} (data/ not read) and dir:<ibkr-lane venv>; grype each"
+  ],
+  "results": [
+    "venv-syft exit=0 seconds=8; venv-grype exit=0: 21 packages, all python-installed-package-cataloger; 74 .so files (ELF metadata recorded for all 74); 0 .so files tied to a package identity; binary-identified packages: none; grype matches 0",
+    "root-syft exit=0 seconds=608; root-grype exit=0 seconds=20: 3034 packages (linux-kernel-module 961, binary 842 [PE], deb 834 [677 dpkg-db + 157 deb-archive], go-module 277, python 61, dotnet 55, java-archive 4)",
+    "dpkg-db packages 677 == dpkg-query 677 (both 677, dpkg-query-only 0)",
+    "host .so files with ELF metadata 1221, of which 1159 related to a package (dpkg ownership)",
+    "root grype matches 5433: deb 3036, go-module 2397; severities Medium 3952, High 1012, Low 254, Critical 184, Negligible 21, Unknown 10 (Grype DB built 2026-09-23T06:31:39Z)",
+    "Nautilus venv interpreter is /usr/bin/python3.12 (pyvenv.cfg home=/usr/bin): covered by dpkg python3.12 3.12.3-1ubuntu0.17; grype 17 matches on each python3.12 deb package",
+    "SDK interpreter (uv CPython 3.13.15, under $HOME, outside the root scan): binary-classifier identified python 3.13.15; grype 8 matches (cpe-based)",
+    "IB Gateway 1050 jars: 25 java-archive packages, grype 17 matches (High 9, Medium 8), e.g. jackson-databind 2.12.3 (9), jackson-core 2.12.3 (3), log4j-core 2.25.3 (3, Medium), commons-io 2.11.0 (1, High)",
+    "IB Gateway bundled JRE: openjdk 25.0.2.0.101 identified by binary classifier, grype 22 matches (cpe-match; High 5, Medium 10, Low 7)",
+    "IBKR adapter venv (nautilus_ibapi 10.45.1, protobuf 5.29.6, defusedxml 0.7.1): grype 0 matches"
+  ],
+  "outcome": "advanced",
+  "evidence_class": "native_proven",
+  "limits": [
+    "Bundled native code inside wheels (Rust in nautilus_trader/_libnautilus, Cython/C extensions, numpy.libs OpenBLAS/gfortran, duckdb) is inventoried as ELF files but gets no package identity: no cargo-auditable data or binary classifier matched, so vulnerabilities in statically linked crates/libraries are not matched.",
+    "Root scan excluded /home, /root, /tmp, /var/tmp, /mnt (Windows drives), /run, /proc, /sys, /dev and lost+found; permission-denied paths (e.g. /etc/ssl/private, /var/spool/cron/crontabs) were skipped (see root.syft.stderr.txt). Software under $HOME was covered only for the targeted directories named above.",
+    "IBKR server-side software and the IB Gateway's runtime-downloaded components are not scannable from this host; only the locally installed Gateway jars/JRE were scanned.",
+    "Grype matches are database matches (exact-direct for Java/Python, CPE for binaries and some OS packages), not reachability or exploitability findings; CPE matches can be false positives.",
+    "The full root/venv Syft and Grype JSON (31.6 MB and 50.7 MB for root) are not committed; syft-summaries.json and grype-summaries.json record their sizes and SHA-256 and deterministic summaries."
+  ],
+  "checked_at": "2026-09-23T17:01:14Z",
+  "outcome_note": "syft dir:/ with binary catalogers + grype ran (3034 packages, 5433 matches); OS packages fully covered (677 = dpkg-query), both external interpreters covered (dpkg python3.12; uv CPython 3.13.15 by binary classifier), local IB Gateway scanned. Remains: complete bundled native-library coverage and broker-side coverage.",
+  "raw_outputs": [
+    {
+      "path": "raw/syft-binary/exits.log",
+      "sha256": "3587b9500ad53b465889275b3c492caa679e0e11c6b6a6747ef3de4c8c739346"
+    },
+    {
+      "path": "raw/syft-binary/exits.attempt1-tag-rejected.log",
+      "sha256": "4b01d88577e25fd42c0bd3197dad6f8493586eee160730419ade49432c92dc6c"
+    },
+    {
+      "path": "raw/syft-binary/venv.syft.attempt1.stderr",
+      "sha256": "96ad0752fecdeab16bb7ce768e193cc5ca389b52a073d3ae104f713275a5fb8e"
+    },
+    {
+      "path": "raw/syft-binary/venv-so-files.txt",
+      "sha256": "194bb3683b61caa54ad0212f1e25eb980d15a9457c8f052c3fd5f37123d2e15a"
+    },
+    {
+      "path": "raw/syft-binary/venv.grype.json",
+      "sha256": "05e2b17424ba6b4802de29457ddb10dd3e273b2f8771246c9b2ce90a997981c3"
+    },
+    {
+      "path": "raw/syft-binary/syft-summaries.json",
+      "sha256": "dae4ab7bc44a113b2e1fc636a7234f2e9f8f84c4af300d634cfb146ff0f5b04f"
+    },
+    {
+      "path": "raw/syft-binary/grype-summaries.json",
+      "sha256": "af3ff502575413420bb041ae8e064389a00cee93e2c04fcf6b8486f8f08bca81"
+    },
+    {
+      "path": "raw/syft-binary/dpkg-query.tsv",
+      "sha256": "633d19ddb2d0639301ed026e60bb41616baaa3102204127360b51cb259e5d17e"
+    },
+    {
+      "path": "raw/syft-binary/root.syft.stderr.txt",
+      "sha256": "7ae6d9f6db10208d55d152d72b3a5098bc55d447f7df7478a4a6b888c45e4f6b"
+    },
+    {
+      "path": "raw/syft-binary/root.grype.stderr",
+      "sha256": "39ce423cc92c818027a353b516b13695c289c47593a5bf776f5d67c3d3839063"
+    },
+    {
+      "path": "raw/syft-binary/interp.grype.json",
+      "sha256": "5731c393bdcb693f3cb6d6a2564068dd66ee2c0bc46e0ce6f9e9f6447696fb5f"
+    },
+    {
+      "path": "raw/syft-binary/ibkr-venv.grype.json",
+      "sha256": "02d60ec6209e1ce4393cf9e37d4eba2f93787d9502f033b8ce50026c13ccf1be"
+    }
+  ],
+  "helper_scripts": [
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/classify_findings.py",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/collect_raw.py",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/gitleaks_fix_round.sh",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/gitleaks_scans.sh",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/grype_sdk.sh",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/inventory_diff.py",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/openbao_install.sh",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/openbao_lifecycle.sh",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/prereg.py",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/prereg_fix_round.py",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/scanner_comparison.sh",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/syft_binary_coverage.sh",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/verify_signatures.sh",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/worker_env_check.sh",
+    "blueprints/gap-wave2-20260923/us-equities__security-supply-chain/write_receipts.py"
+  ],
+  "timeline": {
+    "preregistration_written_at": "2026-09-23T08:13:16Z",
+    "first_pass": "2026-09-23T08:13:24Z..08:27:10Z (same unit, earlier session)",
+    "this_pass": "2026-09-23T16:26Z..2026-09-23T17:01:14Z",
+    "post_preregistration_additions": "all-refs gitleaks scan, oversized-file dir scan, SDK interpreter and IB Gateway scans, B2/B3 sandbox policy arms, and the attestation-lookup positive control were added after preregistration as stronger checks of the same claims",
+    "fix_round": "after the independent Opus review: fix_round_preregistration written 2026-09-23T16:56:53Z (commit d67f77a) before the oversized-blob, merge first-parent and control scans (16:58Z..17:00Z) and the osv/inventory re-analysis"
+  }
+}

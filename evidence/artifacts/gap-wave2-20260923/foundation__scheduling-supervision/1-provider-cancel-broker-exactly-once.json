@@ -1,0 +1,62 @@
+{
+  "id": "gap-wave2-20260923-scheduling-supervision-1",
+  "gap_index": 1,
+  "gap_text_sha256": "96f02ba51e2045e455fc4448cc04438678d3ad4b3edd1c630713e3c110718638",
+  "preregistration": {
+    "written_at": "2026-09-22T22:42:40-04:00",
+    "expectation": "Arm A (executable here): run one bounded `codex exec --json --sandbox read-only --ephemeral` streaming request as the only step of a Dagu 2.16.6 DAG in an isolated DAGU_HOME, issue native `dagu stop` a few seconds after the stream has emitted `turn.started` but before `turn.completed`, and capture every JSONL event the CLI emitted. Expect: Dagu history reports aborted; the codex process tree is gone; no `turn.completed` event and therefore no provider-returned usage object is surfaced for the aborted request. Arm B (broker exactly-once with an Alpaca paper order and a fixed client_order_id) is NOT run: broker/paper-account calls belong to peer session sota-workflow-resolution. Billing cessation is unverifiable without provider console access.",
+    "criteria": "Arm A counts as executed iff Dagu reports aborted, the stream had started (turn.started seen) before stop, and the full event log is retained. Detection method for usage: parse every JSONL line and search recursively for any `usage` key; the detector is validated on the gap-2 run's completed codex call, which must show a `usage` object in `turn.completed`. Outcome can be at most `advanced` because the broker arm is deferred (owner: sota-workflow-resolution) and billing cessation stays unverified.",
+    "committed_before_running": "git commit 7802cab (preregistrations/1.json)"
+  },
+  "commands": [
+    "python3 blueprints/gap-wave2-20260923/foundation__scheduling-supervision/codex_cancel_probe.py --work $HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g1-cancel-1790131730",
+    "(inside the probe) dagu start --run-id cancelprobe-ba0a1b8f27ff cancelprobe.yaml  # one step: codex exec --json --sandbox read-only --ephemeral --skip-git-repo-check -C <dir> '<1500-word cron explanation prompt>' > events.jsonl",
+    "(inside the probe) dagu stop --run-id cancelprobe-ba0a1b8f27ff cancelprobe.yaml  # issued 5 s after turn.started appeared in events.jsonl",
+    "(inside the probe) dagu history --run-id cancelprobe-ba0a1b8f27ff --format json",
+    "detector control: real_steps.find_usage() over raw/2-real-scheduled-run/model-events.jsonl (completed call)"
+  ],
+  "results": [
+    "timeline (UTC): start_issued 02:48:51.148, turn_started_seen 02:48:51.399, stop_issued 02:48:56.547, processes_retired 02:48:56.697 (raw/1-provider-cancel/result.json)",
+    "turn_completed_before_stop=false; dagu_status_after_stop='aborted'; owned_processes_at_stop=['MainThread','MainThread','codex','sh','sh','sh']; owned_processes_remaining_after_stop=0",
+    "events emitted by the aborted request (raw/1-provider-cancel/events.jsonl, complete): {\"type\":\"thread.started\",...} {\"type\":\"turn.started\"} -- no item.*, no turn.completed; usage_found=null",
+    "detector control: the completed gap-2 model call's events end with {\"type\":\"turn.completed\",\"usage\":{\"input_tokens\":18720,\"cached_input_tokens\":11520,\"cache_write_input_tokens\":0,\"output_tokens\":17,\"reasoning_output_tokens\":10}}, which the same find_usage() returned, so the probe can see usage when the CLI surfaces it",
+    "codex-stderr.txt: 'Reading additional input from stdin...' only; codex-cli 0.155.1; dagu 2.16.6"
+  ],
+  "outcome": "advanced",
+  "outcome_detail": "The client side of the model-provider cancellation arm ran: a scheduler-issued `dagu stop` terminated an in-flight streaming `codex exec` client and its whole local process tree within 150 ms, and the client surfaced no usage object for the aborted request (the last event was turn.started). This shows local termination of the client process tree and the absence of a client-surfaced usage object; it does not show that the provider cancelled anything server-side, which is not observable here. Remaining: (a) server-side cancellation and when billing stops remain unverified: no provider console or billing API is reachable without credential reads; (b) the broker exactly-once arm (Alpaca paper order with a fixed client_order_id, interrupted and retried) is deferred, owner: sota-workflow-resolution (broker/paper-account calls belong to that session); (c) distributed exactly-once effects in general are not exercised.",
+  "evidence_class": "local_integration",
+  "limits": [
+    "One aborted request, one delay (5 s after turn.started); not repeated.",
+    "`codex exec --json` emits whole items rather than token deltas, so 'mid-stream' means after turn.started and before any item/turn.completed; whether the provider had begun generating tokens server-side is not observable here.",
+    "Absence of a usage object is what the CLI surfaced to the client; it does not show the provider did not bill the partial request.",
+    "Uses the native Codex sign-in via codex itself (no credential file was read by this harness); no paid API key; no broker contact.",
+    "Codex concurrency rule (wait while 2 or more real codex exec processes run): no process-count check was performed or recorded before this call, so compliance cannot be shown for it. Fix round 1 added dagu_common.codex_gate() to codex_cancel_probe.py for any rerun; this probe was not re-run.",
+    "Unit-level isolation (fix round 2 cross-reference): this receipt's isolation statements cover this gap's own runs only. During fix round 1, between the fix-round preregistration and the F1/F2/F3 reruns, an unquoted heredoc started an unintended `dagu scheduler` (PATH dagu, default config) that wrote state into the default Dagu home $HOME/.local/share/dagu/data and bound :8090 on all interfaces for about 2 min 15 s, and an unintended `codex exec` that was killed while waiting for stdin. Fix round 2 verified that the running host `dagu server` (pid 366, the dagu-equities service) uses DAGU_HOME=$HOME/.local/share/codex-ecosystem/dagu-equities, a different store. See incidents/2026-09-22-fix-round-heredoc-substitution.json.",
+    "Helper change after execution (fix round 3): dagu_common.py was edited after this receipt's runs. codex_gate() now raises CodexGateTimeout instead of returning when 2 or more other `codex exec` processes still run at max_wait, and codex_exec_processes() also counts `codex <global options> exec` and the `e` alias. The executed revisions named in this receipt are unchanged and remain the ones that ran. Only one gated model call was made in the whole unit (fix-round F3, gap 2); it waited 0 s with 0 other processes counted by the old matcher, so the timeout path was not reached. Whether the broader matcher would have counted more processes at that time cannot be re-observed. Synthetic test: raw/fix3/codex-gate-test.txt."
+  ],
+  "raw_outputs": "evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/raw/1-provider-cancel/ (MANIFEST.json lists raw and committed sha256 per file)",
+  "checked_at": "2026-09-22T22:49:10-04:00",
+  "fix_round_1": {
+    "edited_at": "2026-09-22T23:28:40-04:00",
+    "changes": [
+      "outcome_detail reworded: local client-process termination plus no client-surfaced usage, not server-side provider cancellation (review finding 7)",
+      "limit added: no Codex concurrency check was recorded before the original call (review finding 5)"
+    ],
+    "outcome_changed": false
+  },
+  "fix_round_2": {
+    "edited_at": "2026-09-23T08:50:58-04:00",
+    "changes": "Receipt text only; no check re-run. Added the unit-level isolation cross-reference."
+  },
+  "fix_round_3": {
+    "edited_at": "2026-09-23T10:18:07-04:00",
+    "preregistration": "preregistrations/fix-round-3.json (written 2026-09-23T10:15:57-04:00, before the fix-round-3 observations)",
+    "review_findings_addressed": [
+      4
+    ],
+    "changes": "Added the helper-change limit. No check re-run; outcome unchanged.",
+    "raw_output": [
+      "raw/fix3/codex-gate-test.txt"
+    ]
+  }
+}

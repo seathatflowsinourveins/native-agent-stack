@@ -1,0 +1,38 @@
+== date
+2026-09-23T10:17:11-04:00
+$ git cat-file -e 43bb931:evidence/artifacts/sota-refresh-20260923/pins-runtime/dagu.json
+exit=0
+$ git show 43bb931:evidence/artifacts/sota-refresh-20260923/pins-runtime/dagu.json | sha256sum
+246f4b7ca3e672efd6bdbd86780bd093c39257b8afe2d8ef91bdf3e8947bbb8b  -
+$ git merge-base --is-ancestor 43bb931 origin/main
+exit=0
+$ git merge-base --is-ancestor 43bb931 HEAD
+exit=1
+$ git rev-parse origin/main HEAD
+05e134fd975ed82c3fbd5cbd025bf8edff4c5ddf
+44783fa3c45d6568ce241154e6dc0df53212452e
+$ test -e evidence/artifacts/sota-refresh-20260923/pins-runtime/dagu.json (this tree)
+exit=1
+$ git show 43bb931:evidence/artifacts/sota-refresh-20260923/pins-runtime/dagu.json | grep -n 'PASSED on 2.17.0'
+42:    "job_recovery_acceptance": "PASSED on 2.17.0, matching the 2.16.6 retained receipt shape exactly (graceful stop -> targeted --step retry -> succeeded, checkpoint reused, 12/12 tests, same run-id). A first attempt at this same rerun (see job-recovery-rerun-2170-attempt1-no-result above) produced no result and is disclosed rather than omitted; the reported pass is from the second, completed attempt.",
+$ git show 43bb931:evidence/artifacts/sota-refresh-20260923/pins-runtime/dagu.json | grep -c -E 'service-reboot|TestRetryCommand'
+0
+$ sed -n 145,152p blueprints/convergence-practice/service-reboot/run.py
+def run(work):
+    if not work.is_absolute() or work.exists() or work.is_symlink() or any(p.is_symlink() for p in work.parents):
+        raise ValueError('--work must be a new absolute path without symlink ancestors')
+    # Execution is intentionally unavailable on an existing desktop host.
+    if os.environ.get('GITHUB_ACTIONS') != 'true' or os.environ.get('RUNNER_ENVIRONMENT') != 'github-hosted':
+        raise ValueError('Execution requires the declared disposable GitHub-hosted runner')
+    os.umask(0o077)
+    work.mkdir(mode=0o700)
+== qemu / kvm observations (read-only)
+qemu-system-x86_64: absent
+qemu-img: absent
+cloud-localds: absent
+apt-get: /usr/bin/apt-get
+dpkg: /usr/bin/dpkg
+crw-rw---- 1 root kvm 10, 232 Sep 22 20:46 /dev/kvm
+<user> adm cdrom sudo dip plugdev users
+== end
+2026-09-23T10:17:11-04:00

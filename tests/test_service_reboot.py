@@ -239,6 +239,25 @@ class ServiceRebootTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'new absolute path'):
             DRIVER.run(self.work)
 
+    def test_driver_refuses_a_non_root_owned_symlink_even_set_as_tmpdir(self):
+        # Round-2 security review: the TMPDIR exemption trusted $TMPDIR
+        # unconditionally, so an attacker-controlled symlink set as TMPDIR
+        # was tolerated. Must fail on c1f30cb and pass now that run() only
+        # tolerates a root-owned, non-writable boundary link.
+        # self.work.parent is /tmp itself (shared with every other test and
+        # process on the host), so this uses its own fresh, unique scratch
+        # directory rather than creating fixtures directly under it.
+        with tempfile.TemporaryDirectory() as scratch:
+            scratch = Path(scratch)
+            real = scratch / 'real'; real.mkdir()
+            alias = scratch / 'alias-as-tmpdir'; alias.symlink_to(real)
+            saved_tempdir = tempfile.tempdir
+            self.addCleanup(setattr, tempfile, 'tempdir', saved_tempdir)
+            tempfile.tempdir = None
+            with mock.patch.dict('os.environ', {'TMPDIR': str(alias)}, clear=True):
+                with self.assertRaisesRegex(ValueError, 'new absolute path'):
+                    DRIVER.run(alias / 'victim')
+
 
 if __name__ == '__main__':
     unittest.main()

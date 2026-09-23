@@ -1,0 +1,18 @@
+$ next build
+▲ Next.js 16.3.5 (Turbopack)
+✓ Running next.config.ts took 19ms
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 2.3s
+  Running TypeScript ...
+  Finished TypeScript in 1692ms ...
+  Collecting page data using 5 workers ...
+  Generating static pages using 5 workers (0/4) ...
+Warning: Failed to load CA certificates off thread: resource temporarily unavailable
+
+thread '<unnamed>' (2735340) panicked at /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-1.52.1/src/runtime/scheduler/multi_thread/worker.rs:495:13:
+OS can't spawn worker thread: Resource temporarily unavailable (os error 11)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+fatal runtime error: failed to initiate panic, error 5, aborting
+⨯ Next.js build worker exited with code: null and signal: SIGABRT
+[ELIFECYCLE] Command failed with exit code 1.

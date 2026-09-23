@@ -1,0 +1,16 @@
+Your flow 'recovery' is being served and polling for scheduled runs!
+
+To trigger a run for this flow, use the following command:
+
+        $ prefect deployment run 'recovery/recovery-deploy'
+
+You can also run your flow via the Prefect UI: http://127.0.0.1:57430/deployments/deployment/<uuid-5>
+
+Your flow 'recovery' is being served and polling for scheduled runs!
+
+To trigger a run for this flow, use the following command:
+
+        $ prefect deployment run 'recovery/recovery-deploy'
+
+You can also run your flow via the Prefect UI: http://127.0.0.1:57430/deployments/deployment/<uuid-5>
+

@@ -1,0 +1,609 @@
+{
+  "id": "gap-wave2-20260923/foundation/agent-sdks/11-cancel-billing-exactly-once",
+  "gap_index": 11,
+  "gap_text_sha256": "33f651a5e81affb150abf1035b8f09b0e0efe6d1f3b8ded5af8eeae237f10554",
+  "preregistration": {
+    "written_at": "2026-09-23T03:24:52Z",
+    "expectation": "Codex cancellation stops rollout token accounting; Claude arm uses the single call; exactly-once on one host is shown by killing a Temporal worker mid-activity with an idempotency-keyed sqlite effect; distributed recovery and provider billing remain unqualified.",
+    "criteria": [
+      "Codex cancel as in gap 1",
+      "kill -9 of worker mid-effect, restart, effect row count == 1 with the idempotency key while the activity executed at least twice",
+      "settled needs provider billing and distributed recovery evidence, not available here"
+    ]
+  },
+  "commands": [
+    "env -i HOME=$HOME PATH=$HOME/.local/share/codex-ecosystem/bin:/usr/bin:/bin timeout 400 $HOME/.cache/gap-wave2-20260923/agent-sdks/codex-sdk-01551/bin/python blueprints/gap-wave2-20260923/foundation__agent-sdks/codex_probe.py cancel --codex-bin $HOME/.local/share/codex-ecosystem/bin/codex --codex-home $HOME/.codex --workspace $HOME/.cache/gap-wave2-20260923/agent-sdks/ws-probe --out $HOME/.cache/gap-wave2-20260923/agent-sdks/runs/cancel-streaming.json --deadline 120 --interrupt-after 90 --settle 30 --effort low",
+    "env -i HOME=$HOME PATH=$HOME/.local/share/codex-ecosystem/bin:/usr/bin:/bin timeout 240 $HOME/.cache/gap-wave2-20260923/agent-sdks/claude-sdk/bin/python blueprints/gap-wave2-20260923/foundation__agent-sdks/claude_probe.py --workspace $HOME/.cache/gap-wave2-20260923/agent-sdks/ws-claude --out $HOME/.cache/gap-wave2-20260923/agent-sdks/runs/claude-interrupt.json",
+    "python3 blueprints/gap-wave2-20260923/foundation__agent-sdks/run_gap8.py $HOME/.cache/gap-wave2-20260923/agent-sdks $HOME/.cache/gap-wave2-20260923/agent-sdks/runs $HOME/.cache/gap-wave2-20260923/agent-sdks/tmp-VB16/cli  # produced the retained raw/temporal-restart.json (04:22:05-04:22:37Z); it runs temporal_restart.py controller under ecosystem-bounded-run",
+    "(first pass, output replaced) timeout 600 $HOME/codex-ecosystem/bin/ecosystem-bounded-run $HOME/.cache/gap-wave2-20260923/agent-sdks/temporal/bin/python blueprints/gap-wave2-20260923/foundation__agent-sdks/temporal_restart.py controller $HOME/.cache/gap-wave2-20260923/agent-sdks/tmp-VB16 $HOME/.cache/gap-wave2-20260923/agent-sdks/runs/temporal-restart.json"
+  ],
+  "results": {
+    "codex_cancel": {
+      "streaming_observed_before_interrupt": true,
+      "method_counts": {
+        "turn/started": 1,
+        "item/started": 3,
+        "item/completed": 2,
+        "item/agentMessage/delta": 68,
+        "turn/completed": 1
+      },
+      "turn_status": "interrupted",
+      "sdk_last_token_usage": null,
+      "rollout_entries_after_two_settle_windows": [
+        {
+          "timestamp": "2026-09-23T03:27:22.649Z",
+          "event": "task_started",
+          "reason": null
+        },
+        {
+          "timestamp": "2026-09-23T03:27:29.242Z",
+          "total": null,
+          "last": null
+        },
+        {
+          "timestamp": "2026-09-23T03:27:29.248Z",
+          "event": "turn_aborted",
+          "reason": "interrupted"
+        }
+      ],
+      "rollout_unchanged_between_settles": true,
+      "rate_limit_primary_used_percent_before_after": [
+        12,
+        12
+      ]
+    },
+    "claude_cancel": {
+      "init_model": "claude-haiku-4-5-20251001",
+      "cli_version": "2.1.280",
+      "init_mcp_servers": [
+        {
+          "name": "claude.ai Claude Docs",
+          "status": "connected",
+          "source": "claudeai"
+        }
+      ],
+      "streaming_observed_before_interrupt": true,
+      "event_type_counts": {
+        "SystemMessage:init": 1,
+        "SystemMessage:status": 1,
+        "RateLimitEvent": 1,
+        "StreamEvent:message_start": 1,
+        "StreamEvent:content_block_start": 2,
+        "SystemMessage:thinking_tokens": 2,
+        "StreamEvent:content_block_delta": 68,
+        "AssistantMessage": 2,
+        "StreamEvent:content_block_stop": 1,
+        "UserMessage": 1,
+        "ResultMessage": 1
+      },
+      "result": {
+        "subtype": "error_during_execution",
+        "terminal_reason": "aborted_streaming",
+        "usage": {
+          "output_tokens_details": {
+            "thinking_tokens": 0
+          },
+          "input_tokens": 0,
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 0,
+          "output_tokens": 0,
+          "server_tool_use": {
+            "web_search_requests": 0,
+            "web_fetch_requests": 0
+          },
+          "service_tier": "standard",
+          "cache_creation": {
+            "ephemeral_1h_input_tokens": 0,
+            "ephemeral_5m_input_tokens": 0
+          },
+          "inference_geo": "",
+          "iterations": [],
+          "speed": "standard"
+        },
+        "model_usage": {
+          "claude-haiku-4-5-20251001": {
+            "inputTokens": 921,
+            "outputTokens": 17,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0,
+            "webSearchRequests": 0,
+            "costUSD": 0.001006,
+            "contextWindow": 200000,
+            "maxOutputTokens": 32000,
+            "thinkingTokens": 0,
+            "canonicalModel": "claude-haiku-4-5",
+            "provider": "firstParty",
+            "costBasis": "list"
+          }
+        },
+        "total_cost_usd": 0.001006
+      },
+      "session_jsonl_final_usage_per_message": [
+        {
+          "timestamp": "2026-09-23T03:29:29.736Z",
+          "message_id": "msg_011CfKfPAhe8EYFzStGd9Dgc",
+          "stop_reason": null,
+          "input_tokens": 3346,
+          "output_tokens": 4,
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 0
+        }
+      ],
+      "model_usage_reading": "Unexplained, labelled as such. model_usage (921 input / 17 output, costUSD 0.001006) matches no message in the stream or the session JSONL (3346 input / 4 output for the one streamed message). Most likely reading, not confirmed: the CLI made a separate auxiliary Haiku request that completed (the bundled 2.1.280 CLI contains a generateSessionTitle path; num_turns is 2), while the interrupted main message never reached model_usage. If so, the one SDK query produced two provider requests, and model_usage cannot be read as the interrupted turn's usage.",
+      "session_log_unchanged_between_settles": true
+    },
+    "exactly_once_one_host": {
+      "attempts": [
+        {
+          "n": 1,
+          "attempt": 1,
+          "pid": 3562607,
+          "at": 1790137328.3412135
+        },
+        {
+          "n": 2,
+          "attempt": 2,
+          "pid": 3562776,
+          "at": 1790137337.2957098
+        }
+      ],
+      "effects": [
+        {
+          "key": "effect-gap8-wf",
+          "pid": 3562607,
+          "at": 1790137328.341282
+        }
+      ],
+      "result": {
+        "activity": "attempt=2 applied_now=False pid=3562776",
+        "key": "effect-gap8-wf"
+      },
+      "reading": "activity executed twice (at-least-once); the idempotency key kept the effect to one row (effectively-once)"
+    }
+  },
+  "raw_outputs": [
+    {
+      "path": "raw/cancel-streaming.json",
+      "sha256": "b9e107bbff9042291d1f5c0ac3c3c91f09fc17a6b8e5d0a4b4aadebe8e7f8c3f"
+    },
+    {
+      "path": "raw/claude-interrupt.json",
+      "sha256": "edb4fca8670353452d37f6ea0aad066613925e0a0494e7cfd053e9e059d000e4"
+    },
+    {
+      "path": "raw/temporal-restart.json",
+      "sha256": "0e176203c63cf8d58c48a667b8034b08cfaa82c6121522fee4f983847eeedc4f"
+    },
+    {
+      "path": "raw/gap8-runs.json",
+      "sha256": "d58f8b63ca52595b47145e6419bc4cf065f6eccfd483b2453ec6650c97c379c7"
+    },
+    {
+      "path": "raw/cancel-streaming.rollout-excerpt.jsonl",
+      "sha256": "45ca4c88c3d878a4ca3ab5762dc8636201bf369764441bd6a40264478fc8b24c"
+    },
+    {
+      "path": "raw/claude-interrupt.session-usage-excerpt.jsonl",
+      "sha256": "943d8babedef7233ee3cae4b67961247519e1e48c861a0b71ad280aa0c251269"
+    }
+  ],
+  "outcome": "advanced",
+  "evidence_class": "local_integration",
+  "note": "Fix round 2: the retained temporal-restart.json came from the fix-round run_gap8.py driver (attempt 1 at 04:22:08Z, inside gap8-runs.json's 04:22:05-04:22:37Z window), not the first-pass command; the commands list now says so (as receipt 8 does).",
+  "checked_at": "2026-09-23T15:47:16Z",
+  "round_4": {
+    "preregistration": {
+      "cancel": {
+        "file": "preregistration-round4.json",
+        "written_at": null,
+        "written_window": {
+          "not_before": "2026-09-23T14:11:57Z",
+          "not_after": "2026-09-23T14:12:27Z"
+        },
+        "written_at_note": "Written between 14:11:57Z (a date call just before writing) and 14:12:27Z (commit 1ce3105 time); the first draft carried 14:13:00Z, which was later than its own commit and is corrected here in an amended commit. Written before the round-4 model download, before the local vLLM server started and before any round-4 inference.",
+        "expectation": "For each SDK, a long generation interrupted after streaming starts makes the local provider stop generating: vllm:num_requests_running returns to 0 within 10 s of the interrupt, and vllm:generation_tokens_total does not grow across two later settle windows. The native logs (Codex rollout token_count, Claude session JSONL usage and ResultMessage usage) will under-report the interrupted request against the provider's prompt and generation token deltas.",
+        "criteria": [
+          "provider metrics sampled before the turn, at interrupt, after settle 1 and after settle 2 (10 s each), with the per-SDK request isolated (no other client on the server)",
+          "consumption stops: generation_tokens_total(settle2) == generation_tokens_total(settle1) and num_requests_running == 0 at settle1",
+          "detector: a control request that is not interrupted must show generation_tokens_total growing by its completion_tokens, so the counter can see consumption",
+          "provider-side prompt and generation deltas recorded next to the SDK-reported usage and the native session-log usage for the same request",
+          "gap 1 stays advanced unless hosted-provider consumption becomes observable; the local provider is a substitute channel, not the hosted accounts",
+          "gap 11 stays advanced: hosted billing and multi-host recovery are not tested; the zombie-worker arm below only strengthens the one-host exactly-once evidence"
+        ]
+      },
+      "zombie": {
+        "file": "preregistration-round4.json",
+        "written_at": null,
+        "written_window": {
+          "not_before": "2026-09-23T14:11:57Z",
+          "not_after": "2026-09-23T14:12:27Z"
+        },
+        "written_at_note": "Written between 14:11:57Z (a date call just before writing) and 14:12:27Z (commit 1ce3105 time); the first draft carried 14:13:00Z, which was later than its own commit and is corrected here in an amended commit. Written before the round-4 model download, before the local vLLM server started and before any round-4 inference.",
+        "expectation": "A Temporal worker paused with SIGSTOP mid-activity (a stand-in for a partition or long GC pause) loses its activity to a second worker after the heartbeat timeout; when resumed with SIGCONT, the stale worker's effect write is rejected by the idempotency key and its completion is not accepted by the server. The effect row count stays 1.",
+        "criteria": [
+          "attempt 1 on worker A (paused), attempt 2 on worker B completes the workflow",
+          "after SIGCONT, worker A's effect attempt is recorded as refused (key exists) and the workflow result is from worker B",
+          "effect rows == 1; negative control without the idempotency key writes 2 rows (detector)",
+          "one host only; labelled local_integration"
+        ]
+      }
+    },
+    "commands": [
+      "ECOSYSTEM_JOB_SECONDS=1200 $HOME/codex-ecosystem/bin/ecosystem-bounded-run env -u HF_TOKEN HF_HOME=$HOME/.cache/gap-wave2-20260923/agent-sdks/hf HF_HUB_DISABLE_TELEMETRY=1 $HOME/.local/share/codex-ecosystem/tools/vllm-0.25.0/bin/python -c \"from huggingface_hub import snapshot_download; snapshot_download('Qwen/Qwen3-4B-Instruct-2507-FP8', revision='8591804019c8b22094c3b5b4454e0edc05dffc98')\"  # 4.9 GB download from huggingface.co",
+      "ECOSYSTEM_JOB_MEMORY_HIGH=10G ECOSYSTEM_JOB_MEMORY_MAX=14G ECOSYSTEM_JOB_SECONDS=10800 ECOSYSTEM_JOB_TASKS_MAX=1024 $HOME/codex-ecosystem/bin/ecosystem-bounded-run $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/serve.sh  # contents in raw/round4/serve.sh (pasta netns, only 127.0.0.1:28431 forwarded); three earlier launches failed or were replaced, logs retained",
+      "kill -TERM <vllm api-server pid inside the pasta namespace>  # stop at 14:37:38Z; nvidia-smi before/after in raw/round4/gpu-before.txt, gpu-after.txt",
+      "(review fix round) the same serve.sh restarted at about 14:56:36Z and stopped the same way at 15:03:19Z; gpu-before-fix.txt, gpu-after-fix.txt",
+      "(second review fix) blueprints/gap-wave2-20260923/foundation__agent-sdks/r4_fix2_remote.sh restarted it at 15:46:08Z; its stop step failed and the api-server was stopped by pid at 15:49:59Z (see receipt 8, round_4.results.provider_stop_rule_gpu)",
+      "$HOME/.cache/gap-wave2-20260923/agent-sdks/codex-sdk-01551/bin/python blueprints/gap-wave2-20260923/foundation__agent-sdks/r4_codex.py session --codex-bin $HOME/.local/share/codex-ecosystem/bin/codex --codex-home $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/codex-home --workspace $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/ws-codex --state $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/private/codex-state.json --out $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/codex-session.json  # and -rep2/-rep3 with their own state files",
+      "env -i PATH=/usr/bin:/bin HOME=$HOME/.cache/gap-wave2-20260923/agent-sdks/round4/claude-home CLAUDE_CONFIG_DIR=$HOME/.cache/gap-wave2-20260923/agent-sdks/round4/claude-home/.claude ANTHROPIC_BASE_URL=http://127.0.0.1:28431 ANTHROPIC_API_KEY=dummy-local ANTHROPIC_DEFAULT_HAIKU_MODEL=qwen3-4b ANTHROPIC_DEFAULT_SONNET_MODEL=qwen3-4b ANTHROPIC_DEFAULT_OPUS_MODEL=qwen3-4b ANTHROPIC_SMALL_FAST_MODEL=qwen3-4b CLAUDE_CODE_MAX_OUTPUT_TOKENS=8192 CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 DISABLE_TELEMETRY=1 DISABLE_AUTOUPDATER=1 DISABLE_ERROR_REPORTING=1 $HOME/.cache/gap-wave2-20260923/agent-sdks/claude-sdk/bin/python blueprints/gap-wave2-20260923/foundation__agent-sdks/r4_claude.py session --workspace $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/ws-claude --state $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/private/claude-state.json --out $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/claude-session.json  # and -rep2/-rep3",
+      "(fix round) the same two commands with --tap, state codex-state-fix<i>.json / claude-state-fix<i>.json and outputs codex-session-fix<i>.json / claude-session-fix<i>.json for i = 1, 2, 3",
+      "ECOSYSTEM_JOB_SECONDS=600 $HOME/codex-ecosystem/bin/ecosystem-bounded-run $HOME/.cache/gap-wave2-20260923/agent-sdks/temporal/bin/python blueprints/gap-wave2-20260923/foundation__agent-sdks/temporal_zombie.py controller $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/temporal-zombie $HOME/.cache/gap-wave2-20260923/agent-sdks/tmp-VB16/cli $HOME/.cache/gap-wave2-20260923/agent-sdks/round4/temporal-zombie.json  # run 2 (cited); run 1 used the first revision of the activity, output temporal-zombie-run1.json"
+    ],
+    "raw_outputs": [
+      {
+        "path": "raw/round4/temporal-zombie.json",
+        "sha256": "415f96ad5ad2df7338255c4766b0d65ac398f45601b2e59b68abd18355bdc4e9"
+      },
+      {
+        "path": "raw/round4/temporal-zombie__worker-A.err",
+        "sha256": "00ea151bc0b6cc6f65e4df87b649f0752f99850e73e2593af5f6c63cf2b18959"
+      },
+      {
+        "path": "raw/round4/temporal-zombie-run1.json",
+        "sha256": "a5cd55e938f1427425cba91bcd3837e0e33cec8b4e29d48b77afa30efae47641"
+      },
+      {
+        "path": "raw/round4/temporal-zombie-run1__worker-A.err",
+        "sha256": "8586ad803e113f4fd089639a13018d7324f63d61ab5d49f80f06ea53aa971ad6"
+      },
+      {
+        "path": "raw/round4/codex-session.json",
+        "sha256": "c12325246e4a9961e41224dabc4f4992cb1782dede19c3a9317f19f2fdf5510c"
+      },
+      {
+        "path": "raw/round4/codex-session-rep2.json",
+        "sha256": "f65d47e65ed1659b4b76ab6a94c7f536e1947ab707152616e20fd8536788192f"
+      },
+      {
+        "path": "raw/round4/codex-session-rep3.json",
+        "sha256": "fe4f3b101d6bdab16f7a6cbe2716368df2b9890af9f71abadcc1e873a2da2752"
+      },
+      {
+        "path": "raw/round4/codex-session-fix1.json",
+        "sha256": "ef7afbfa18eeb983ace11cb23788724033901ee79ccd176ceeb5f3a199bd0536"
+      },
+      {
+        "path": "raw/round4/codex-session-fix2.json",
+        "sha256": "90e331ca667699cbd37b7305d4a158f6ec5945c00782374fb52af4ecc057c519"
+      },
+      {
+        "path": "raw/round4/codex-session-fix3.json",
+        "sha256": "c310a4b8e36e0c0edf7390f15c4f5e2f3a99ef82ec3e6e5d989583dc3bed3024"
+      },
+      {
+        "path": "raw/round4/claude-session.json",
+        "sha256": "01ee25e5b5ff83c7960b4e27b234f2a9348b7ccdd1a8aa62083086930a0efb7f"
+      },
+      {
+        "path": "raw/round4/claude-session-rep2.json",
+        "sha256": "55f01c937b6c00ee17de4b31dc1e7cab44f07e016efc4d1785bde6480bd8e150"
+      },
+      {
+        "path": "raw/round4/claude-session-rep3.json",
+        "sha256": "454a9c310e1407f1c347b1aa85e428c70adfc15cf3ae331a626f23d249c9b64c"
+      },
+      {
+        "path": "raw/round4/claude-session-fix1.json",
+        "sha256": "9fd3608ac79c4d78c526f63814ac344caadbae4b8cb3b1b734472694deddc156"
+      },
+      {
+        "path": "raw/round4/claude-session-fix2.json",
+        "sha256": "f53995364deb22b0207a18f21be77f2e30bbf0e1d4e91ac54b202f314c8262f3"
+      },
+      {
+        "path": "raw/round4/claude-session-fix3.json",
+        "sha256": "6182042b77db39337ed5f0bbc47e0acf4a7f3cc20191c47740b9ee19031795ee"
+      }
+    ],
+    "results": {
+      "cancel_consumption": {
+        "all_consumption_stopped": true,
+        "all_running_zero_at_settle1": true,
+        "detector": {
+          "method": "vLLM Prometheus counters read over /metrics; for every completed (not interrupted) request the counter deltas equal the client-reported usage, so the counters see consumption that the clients also see",
+          "codex_turn1_counter_equals_rollout_total": true,
+          "claude_turn1_counter_equals_model_usage": true,
+          "openhands_counter_equals_sdk_metrics": true,
+          "inline_control_not_retained": "Two direct /v1/chat/completions control requests (120 and 200 tokens) matched the counters exactly (between 14:18:57Z and about 14:20:20Z); their output was printed to the terminal only and is not a retained file, so the retained detector is the completed-request equality above.",
+          "natural_finish_detector": "a request that ends by itself increments request_success_total (stop/length, seen for every completed turn); the interrupted requests added no finished_reason count, so they did not end naturally. vLLM 0.25.0 also did not count them under finished_reason=abort."
+        },
+        "sampling_note": "The sample named after_completed_1s/after_result_1s is taken immediately (about 0.01-0.03 s) after the SDK reported the terminal state; num_requests_running was still 1 there in 10 of 12 runs (the server-side abort lags the client) and 0 at settle1 in 12 of 12. Settle1 falls 10.02-10.04 s after the interrupt request, so the preregistered 'within 10 s' holds only to within that sampling slack. Between the interrupt sample and settle1, 0-1 further tokens were generated."
+      },
+      "cancel_per_run": {
+        "codex_sdk": [
+          {
+            "turn_status": "interrupted",
+            "provider_interrupted_request": {
+              "prompt_tokens": 10795.0,
+              "generation_tokens": 127.0,
+              "generation_tokens_at_interrupt_sample": 127.0,
+              "finished_by_reason_delta": {}
+            },
+            "generation_settle1_to_settle2": 0.0,
+            "running_at_settle1": 0.0
+          },
+          {
+            "turn_status": "interrupted",
+            "provider_interrupted_request": {
+              "prompt_tokens": 10795.0,
+              "generation_tokens": 157.0,
+              "generation_tokens_at_interrupt_sample": 157.0,
+              "finished_by_reason_delta": {}
+            },
+            "generation_settle1_to_settle2": 0.0,
+            "running_at_settle1": 0.0
+          },
+          {
+            "turn_status": "interrupted",
+            "provider_interrupted_request": {
+              "prompt_tokens": 10793.0,
+              "generation_tokens": 132.0,
+              "generation_tokens_at_interrupt_sample": 131.0,
+              "finished_by_reason_delta": {}
+            },
+            "generation_settle1_to_settle2": 0.0,
+            "running_at_settle1": 0.0
+          },
+          {
+            "turn_status": "interrupted",
+            "provider_interrupted_request": {
+              "prompt_tokens": 10795.0,
+              "generation_tokens": 121.0,
+              "generation_tokens_at_interrupt_sample": 121.0,
+              "finished_by_reason_delta": {}
+            },
+            "generation_settle1_to_settle2": 0.0,
+            "running_at_settle1": 0.0
+          },
+          {
+            "turn_status": "interrupted",
+            "provider_interrupted_request": {
+              "prompt_tokens": 10797.0,
+              "generation_tokens": 139.0,
+              "generation_tokens_at_interrupt_sample": 138.0,
+              "finished_by_reason_delta": {}
+            },
+            "generation_settle1_to_settle2": 0.0,
+            "running_at_settle1": 0.0
+          },
+          {
+            "turn_status": "interrupted",
+            "provider_interrupted_request": {
+              "prompt_tokens": 10795.0,
+              "generation_tokens": 99.0,
+              "generation_tokens_at_interrupt_sample": 98.0,
+              "finished_by_reason_delta": {}
+            },
+            "generation_settle1_to_settle2": 0.0,
+            "running_at_settle1": 0.0
+          }
+        ],
+        "claude_agent_sdk": [
+          {
+            "terminal_reason": "aborted_streaming",
+            "provider_interrupted_request": {
+              "prompt_tokens": 484.0,
+              "generation_tokens": 150.0,
+              "generation_tokens_at_interrupt_sample": 150.0,
+              "finished_by_reason_delta": {}
+            },
+            "generation_settle1_to_settle2": 0.0,
+            "running_at_settle1": 0.0
+          },
+          {
+            "terminal_reason": "aborted_streaming",
+            "provider_interrupted_request": {
+              "prompt_tokens": 480.0,
+              "generation_tokens": 133.0,
+              "generation_tokens_at_interrupt_sample": 133.0,
+              "finished_by_reason_delta": {}
+            },
+            "generation_settle1_to_settle2": 0.0,
+            "running_at_settle1": 0.0
+          },
+          {
+            "terminal_reason": "aborted_streaming",
+            "provider_interrupted_request": {
+              "prompt_tokens": 488.0,
+              "generation_tokens": 137.0,
+              "generation_tokens_at_interrupt_sample": 136.0,
+              "finished_by_reason_delta": {}
+            },
+            "generation_settle1_to_settle2": 0.0,
+            "running_at_settle1": 0.0
+          },
+          {
+            "terminal_reason": "aborted_streaming",
+            "provider_interrupted_request": {
+              "prompt_tokens": 486.0,
+              "generation_tokens": 140.0,
+              "generation_tokens_at_interrupt_sample": 140.0,
+              "finished_by_reason_delta": {}
+            },
+            "generation_settle1_to_settle2": 0.0,
+            "running_at_settle1": 0.0
+          },
+          {
+            "terminal_reason": "aborted_streaming",
+            "provider_interrupted_request": {
+              "prompt_tokens": 484.0,
+              "generation_tokens": 98.0,
+              "generation_tokens_at_interrupt_sample": 98.0,
+              "finished_by_reason_delta": {}
+            },
+            "generation_settle1_to_settle2": 0.0,
+            "running_at_settle1": 0.0
+          },
+          {
+            "terminal_reason": "aborted_streaming",
+            "provider_interrupted_request": {
+              "prompt_tokens": 486.0,
+              "generation_tokens": 88.0,
+              "generation_tokens_at_interrupt_sample": 88.0,
+              "finished_by_reason_delta": {}
+            },
+            "generation_settle1_to_settle2": 0.0,
+            "running_at_settle1": 0.0
+          }
+        ]
+      },
+      "zombie_run_2": {
+        "checks": {
+          "attempt1_on_worker_a": true,
+          "attempt2_on_worker_b": true,
+          "result_from_worker_b": true,
+          "stale_write_attempted_after_resume": true,
+          "stale_keyed_write_refused": true,
+          "keyed_effect_rows": 1,
+          "unkeyed_control_rows": 5,
+          "replay_clean": true
+        },
+        "result": {
+          "activity": "attempt=4 keyed_applied=True pid=177972",
+          "key": "effect-{workflow_id}"
+        },
+        "attempts": [
+          {
+            "attempt": 1,
+            "pid": 177912,
+            "phase": "start",
+            "at": 1790174186.2509325
+          },
+          {
+            "attempt": 1,
+            "pid": 177912,
+            "phase": "slow",
+            "at": 1790174186.2641227
+          },
+          {
+            "attempt": 4,
+            "pid": 177972,
+            "phase": "start",
+            "at": 1790174203.2494912
+          },
+          {
+            "attempt": 2,
+            "pid": 177912,
+            "phase": "start",
+            "at": 1790174223.3396418
+          },
+          {
+            "attempt": 3,
+            "pid": 177912,
+            "phase": "start",
+            "at": 1790174223.3734775
+          },
+          {
+            "attempt": 1,
+            "pid": 177912,
+            "phase": "cancel-during-write:CancelledError",
+            "at": 1790174223.3736317
+          }
+        ],
+        "writes": [
+          {
+            "attempt": 4,
+            "pid": 177972,
+            "keyed_applied": 1,
+            "at": 1790174203.2530541
+          },
+          {
+            "attempt": 1,
+            "pid": 177912,
+            "keyed_applied": 0,
+            "at": 1790174223.332305
+          },
+          {
+            "attempt": 2,
+            "pid": 177912,
+            "keyed_applied": 0,
+            "at": 1790174223.353305
+          },
+          {
+            "attempt": 3,
+            "pid": 177912,
+            "keyed_applied": 0,
+            "at": 1790174223.381871
+          },
+          {
+            "attempt": 1,
+            "pid": 177912,
+            "keyed_applied": 0,
+            "at": 1790174223.3975534
+          }
+        ],
+        "effects": [
+          {
+            "key": "effect-{workflow_id}",
+            "attempt": 4,
+            "pid": 177972
+          }
+        ],
+        "effects_nokey_rows": 5,
+        "workflow_status_after_resume": "2",
+        "worker_a_log": [
+          "Completing activity as failed ({'activity_id': '1', 'activity_type': 'apply_effect', 'attempt': 2, 'namespace': 'default', 'task_queue': 'gap11-zombie-queue', 'workflow_id': 'gap11-zombie-wf', 'workflow_run_id': 'redacted-id:b7fd3c13d0e17b54', 'workflow_type': 'ZombieWorkflow'})",
+          "Completing activity as failed ({'activity_id': '1', 'activity_type': 'apply_effect', 'attempt': 3, 'namespace': 'default', 'task_queue': 'gap11-zombie-queue', 'workflow_id': 'gap11-zombie-wf', 'workflow_run_id': 'redacted-id:b7fd3c13d0e17b54', 'workflow_type': 'ZombieWorkflow'})"
+        ],
+        "replay_failure": null
+      },
+      "zombie_run_2_reading": "While worker A was frozen, the server timed out attempt 1 (heartbeat timeout 3 s) and handed attempts 2 and 3 to A's already-open poll, where they also timed out; attempt 4 ran on worker B and completed the workflow. After SIGCONT, A executed the stale attempts 1, 2 and 3: every keyed write was refused (keyed_applied 0, 1 keyed row) while the unkeyed control gained 4 duplicate rows (5 total). Attempt 1 wrote twice because a cancellation landed after its commit and the harness retry ran again (a harness artifact, also refused). Worker A's log shows the SDK completing the stale attempts 2 and 3 as failed after a worker-side CancelledError; the server's response to those late completions was not observed. The history holds one activity scheduled/started/completed triple, the workflow result is attempt 4 from worker B, and the replay is clean.",
+      "retry_on_worker_b": {
+        "attempt": 4,
+        "pid_is_worker_b": true,
+        "note": "the raw check key 'attempt2_on_worker_b' tests attempt >= 2 on worker B; the retry that ran there was attempt 4"
+      },
+      "zombie_run_1": {
+        "checks": {
+          "attempt1_on_worker_a": true,
+          "attempt2_on_worker_b": true,
+          "result_from_worker_b": true,
+          "stale_write_attempted_after_resume": false,
+          "stale_keyed_write_refused": false,
+          "keyed_effect_rows": 1,
+          "unkeyed_control_rows": 1,
+          "replay_clean": true
+        },
+        "writes": [
+          {
+            "attempt": 2,
+            "pid": 163092,
+            "keyed_applied": 1,
+            "at": 1790174094.844123
+          }
+        ],
+        "effects_nokey_rows": 1,
+        "reading": "First revision (no retry of the stale write): after SIGCONT the SDK injected a CancelledError into A's resumed thread inside the effect transaction, which rolled back before commit, so no stale write landed and the unkeyed control stayed at 1 row. The detector could not fire in that run; run 2 makes the stale write land."
+      }
+    },
+    "evidence_class": "local_integration",
+    "limits": [
+      "The provider is an open-weight model (Qwen3-4B-Instruct-2507-FP8) on a vLLM server this unit started; neither the hosted OpenAI nor the hosted Anthropic service was involved, so hosted-model behaviour and hosted billing are not shown.",
+      "SIGSTOP/SIGCONT on one host stands in for a partition or pause; no second host, network partition between hosts, clock skew or server failover was tested.",
+      "Effectively-once comes from the idempotency key in one SQLite store; the server does not prevent a zombie from executing its side effect (run 2).",
+      "Whether the server rejected worker A's late completions is not observed; only the worker-side log and the unchanged history are."
+    ],
+    "checked_at": "2026-09-23T15:47:16Z"
+  },
+  "pre_round_4_remaining": "Provider-side billing evidence for an interrupted turn, and a multi-host recovery test.",
+  "pre_round_4_limits": [
+    "Local accounting stops after the abort (rollout and session log unchanged over two settle windows), but provider billing cessation is not observable: no billing API was used (no paid API) and usedPercent is integer-granular.",
+    "Exactly-once is idempotency-keyed effectively-once on one host with one sqlite effect store; distributed recovery (multiple hosts, partitions) was not exercised."
+  ],
+  "limits": [
+    "Hosted billing is not observable here (no billing API, integer usedPercent).",
+    "Distributed recovery is shown only on one host (SIGKILL restart in round 1, SIGSTOP zombie in round 4).",
+    "Exactly-once means one keyed effect row with at-least-once execution; the unkeyed control duplicates."
+  ],
+  "remaining": "Hosted-provider billing cessation for an interrupted turn, and recovery across real hosts (network partition, server failover). Round 4 showed consumption stopping at a local provider for both SDKs and effectively-once effects under a paused worker on one host."
+}

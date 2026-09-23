@@ -1,0 +1,496 @@
+{
+  "id": "identity-provenance-g0-dvc-repro-restore-contract",
+  "gap_index": 0,
+  "gap_text_sha256": "e8b076d2f50f3ad2858109366abf52e5e4f4a6da934a5611963361482728e8ab",
+  "gap_text": "DVC has source-review support only: no retained native add, restore and reproduction run demonstrates this repository's equity snapshot contract.",
+  "preregistration": {
+    "written_at": "2026-09-23T04:57:25Z",
+    "written_at_note": "written_at is approximate (between the 04:57:11Z shell stamp and the 04:57:40Z first commit). Written and committed before any gap-wave-2 check for this layer ran. Each receipt copies its entry verbatim.",
+    "committed_in": "7078d05 (Preregister gap-wave-2 checks for us-equities identity-provenance), before any check ran",
+    "source": "blueprints/gap-wave2-20260923/us-equities__identity-provenance/preregistration.json",
+    "expectation": "A dvc.yaml pipeline in a fresh git+DVC 3.67.1 scratch repo, whose stages run replay.py materialize and replay.py select over the tracked fixture, completes under `dvc repro`, records a dvc.lock, and after deleting the outputs `dvc checkout` restores them byte-identically. replay.py select against the DVC-restored snapshot returns per-cutoff records and selection_sql_sha256 equal to the project-local path (materialize+select outside DVC), and the unknown-availability mutations still exit 2 when fed through the DVC-restored source.",
+    "criteria": [
+      "C0.1 `dvc repro` exits 0 and dvc.lock pins md5 of every stage dep and out.",
+      "C0.2 A second `dvc repro` with unchanged deps skips every stage (reproduction is cache-aware), and `dvc status` reports up to date.",
+      "C0.3 After `rm -rf` of every out, `dvc checkout` restores the tree; the sha256 list equals the pre-delete list.",
+      "C0.4 For each cutoff in the replay test suite (…099Z, …100Z, …200Z, …201Z) replay.py select on the DVC-restored snapshot returns the same row_ids as tests/test_nanosecond_replay.py asserts and the same canonical records sha256 and selection_sql_sha256 as the project-local arm.",
+      "C0.5 Unknown-availability mutations of the DVC-restored source.json (observation available_at removed, universe available_at removed, available_at null) make replay.py materialize exit 2 with status rejected; a detector control (unmutated restored source) exits 0, so the probe can see a non-rejection.",
+      "C0.6 `dvc repro --force` regenerates a snapshot whose three data files are byte-identical to the first run and whose snapshot.json differs only in ingested_at; that is the recorded expectation, not a failure.",
+      "Refutation: any C0.x failing marks the gap not_settled with the observed failure."
+    ],
+    "amendments_after_preregistration": [
+      {
+        "at": "2026-09-23T05:01Z (approx.)",
+        "late": true,
+        "change": "Installed pytz==2026.3.post1 (pinned in adoption/sdk/requirements-linux-x86_64-py313.lock) after a debug run showed temporal_snapshot.py select needs it for DuckDB TIMESTAMPTZ fetch."
+      },
+      {
+        "at": "2026-09-23T05:02Z (approx.)",
+        "late": true,
+        "change": "Attempt 1 (one git+DVC repo) failed: security-identity probe.py refuses to write inside a git work tree (ValueError private_output_must_be_outside_git). The identity chain moved to a `dvc init --no-scm` repo. Log kept: raw/dvc/attempt1-run.log."
+      },
+      {
+        "at": "2026-09-23T05:05Z (approx.)",
+        "late": true,
+        "change": "Attempt 2 passed; attempt 3 (cited) added an explicit native `dvc add` / delete / `dvc checkout` / select arm. Log kept: raw/dvc/attempt2-run.log."
+      },
+      {
+        "at": "2026-09-23T05:04Z (approx.)",
+        "late": true,
+        "change": "C0.3 raw diff flags data/.gitignore and out/.gitignore. These are git-tracked files that DVC writes and git restores. The comparison reports them separately and checks the 14 DVC-tracked files on their own."
+      },
+      {
+        "at": "2026-09-23T13:20:19Z",
+        "late": true,
+        "change": "Fix round 3, preregistered in preregistration-fixround3.json (commit 9f84cc9) after the independent Opus review: the 05:04Z amendment above was written after the C0.3 result, so it cannot rescue the original run, which is not_settled under the original refutation rule. Fix round 3 reran C0.3 on a fresh git+DVC repo with a corrected full-tree criterion (G0.3c: git restores the two .gitignore files, then dvc checkout; G0.3d: delete only the DVC outs), kept the as-written arm as a detector (G0.3b) and added a one-byte tamper control (G0.3e). The gap-0 outcome follows the fix-round-3 rule."
+      }
+    ],
+    "fix_round_3": {
+      "label": "fix-round 3 preregistration (after the independent Opus review of the fix-round-2 handoff, 2026-09-23)",
+      "written_at": "2026-09-23T13:20:19Z",
+      "written_at_note": "shell stamp taken immediately before writing this file; committed before any fix-round-3 check ran. This is a fix-round preregistration written after the original C0.3 result was seen; it is labelled as such and does not replace the original criterion, whose failure stays recorded.",
+      "committed_in": "9f84cc9 (Preregister identity-provenance fix round 3 ...), before any fix-round-3 check ran",
+      "source": "blueprints/gap-wave2-20260923/us-equities__identity-provenance/preregistration-fixround3.json",
+      "review_findings_addressed": [
+        "major gap 0: C0.3 as written (full-tree sha256 list after `rm -rf` of every out and `dvc checkout` equals the pre-delete list) failed with git_restore_diff_exit=1, the original refutation rule makes the original run not_settled, and the settled outcome rested on an amendment written after the result",
+        "minor gap 4: fix-round-2 R4.1 named 'Iceberg: rows/5; ArcticDB: rows/5' as store-reported units, but the code used the Iceberg snapshot count and ArcticDB versions minus the seed, with no amendment recorded",
+        "minor gap 4: the 'highest retry attempt 3/4' limit rests on stderr truncated to its last 300 characters",
+        "minor gap 5: the C5.1 listing shows only an identical 8-character runId prefix for both runs, and the redacted published ndjson no longer satisfies the uuid format of the schema"
+      ],
+      "criteria": [
+        "G0.3a Fresh git+DVC 3.67.1 scratch repo with the same dvc.yaml and stage driver: `dvc repro` exits 0, dvc.lock and the DVC-written .gitignore files are committed, and a second `dvc repro` skips all six stages (re-observes C0.1/C0.2 in this run).",
+        "G0.3b As-written arm, kept as the detector: `rm -rf data out; dvc checkout`, then the full-tree sha256 list of data/ and out/ is diffed against the pre-delete list. Expected: the diff exits 1 and the only differing entries are data/.gitignore and out/.gitignore (dvc checkout does not restore git-tracked files). Any other differing entry fails G0.3.",
+        "G0.3c Corrected full-tree restore: `rm -rf data out; git checkout -- data/.gitignore out/.gitignore && dvc checkout`, then the full-tree sha256 list diff against the pre-delete list exits 0, and `dvc status` reports up to date.",
+        "G0.3d Outs-only delete: remove only the eight DVC outs declared in dvc.yaml (keeping the git-tracked .gitignore files), `dvc checkout`, then the full-tree diff exits 0 and `dvc status` reports up to date.",
+        "G0.3e Detector control: after G0.3d, overwrite one byte of data/ns_materialized/observations.parquet; the full-tree diff must exit 1 naming that file and `dvc status` must report a change. Then `dvc checkout --force` restores it and the full-tree diff exits 0 again.",
+        "Outcome rule for gap 0: the original run's C0.3 as written stays recorded as failed. Gap 0 is settled only if G0.3a-G0.3e all pass on this fresh run and the original C0.1, C0.2, C0.4, C0.5 and C0.6 results stand; if any G0.3 arm fails, gap 0 is not_settled with the observed failure."
+      ]
+    }
+  },
+  "commands": [
+    "bash blueprints/gap-wave2-20260923/us-equities__identity-provenance/run_dvc_arm.sh $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z",
+    "$HOME/.cache/gap-wave2-20260923/identity-provenance/venv-core/bin/python blueprints/gap-wave2-20260923/us-equities__identity-provenance/compare_dvc_arm.py $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/dvc-20260923T050541Z $PWD > comparison.json",
+    "bash blueprints/gap-wave2-20260923/us-equities__identity-provenance/run_c03_fixround3.sh $HOME/.cache/gap-wave2-20260923/identity-provenance/runs/c03-fix3-20260923T132058Z   (fix round 3, C0.3 rerun)",
+    "(inside run_c03_fixround3.sh, cwd = fresh scratch git+DVC repo) dvc repro; git add -A; git commit; dvc repro; dvc status; [b] rm -rf data out; dvc checkout; diff; [c] rm -rf data out; git checkout -- data/.gitignore out/.gitignore; dvc checkout; diff; dvc status; [d] rm -rf <the eight DVC outs>; dvc checkout; diff; dvc status; [e] dd one byte into data/ns_materialized/observations.parquet; diff; dvc status; dvc checkout --force; diff; dvc status",
+    "(inside run_dvc_arm.sh, cwd = scratch git+DVC repo) dvc init; dvc add tracked/ns_added; rm -rf tracked/ns_added; dvc checkout tracked/ns_added.dvc; dvc repro; dvc repro; dvc status; dvc dag; rm -rf data out; dvc checkout; stage.py ns-select/ns-quarantine/pit-select/pit-quarantine on the restored data; replay.py select --snapshot-sha256 000…0; dvc repro --force"
+  ],
+  "results": {
+    "exit_codes": {
+      "dvc_add_exit": "0",
+      "add_checkout_exit": "0",
+      "add_restore_diff_exit": "0",
+      "add_restored_ns_select_exit": "0",
+      "git_repro1_exit": "0",
+      "git_repro2_exit": "0",
+      "git_checkout_exit": "0",
+      "git_restore_diff_exit": "1",
+      "restored_ns_select_exit": "0",
+      "restored_ns_quarantine_exit": "0",
+      "restored_pit_select_exit": "0",
+      "restored_pit_quarantine_exit": "0",
+      "restored_wrong_digest_cli_exit": "2",
+      "git_repro_force_exit": "0"
+    },
+    "C0.1_repro_and_lock": "dvc repro exit 0 for 6 stages (ns_materialize, ns_select, ns_quarantine, pit_snapshot, pit_select, pit_quarantine); dvc.lock pins md5 and size for every dep and out (raw/dvc/run.log `cat dvc.lock`; post-force copy raw/dvc/repo-git__dvc.lock).",
+    "C0.2_second_repro_skips": [
+      "ns_materialize",
+      "ns_select",
+      "ns_quarantine",
+      "pit_snapshot",
+      "pit_select",
+      "pit_quarantine"
+    ],
+    "C0.3_restore_original_run_as_written": {
+      "differing": [
+        "data/.gitignore",
+        "out/.gitignore"
+      ],
+      "differing_are_only_git_tracked_gitignores": true,
+      "dvc_tracked_files_identical": true,
+      "files_after": 14,
+      "files_before": 16,
+      "criterion_as_written_passed": false,
+      "note": "git_restore_diff_exit=1: dvc checkout alone did not restore the git-tracked data/.gitignore and out/.gitignore; under the original refutation rule this makes the original run not_settled"
+    },
+    "G0.3_fixround3": {
+      "exit_codes": {
+        "repro1_exit": "0",
+        "repro2_exit": "0",
+        "status_exit": "0",
+        "b_checkout_exit": "0",
+        "b_diff_exit": "1",
+        "c_git_checkout_exit": "0",
+        "c_checkout_exit": "0",
+        "c_diff_exit": "0",
+        "c_status_exit": "0",
+        "d_checkout_exit": "0",
+        "d_diff_exit": "0",
+        "d_status_exit": "0",
+        "e_tamper_exit": "0",
+        "e_tamper_diff_exit": "1",
+        "e_status_exit": "0",
+        "e_force_checkout_exit": "0",
+        "e_restore_diff_exit": "0",
+        "e_status_after_restore_exit": "0"
+      },
+      "arms": {
+        "b": {
+          "files_before": 16,
+          "files_after": 14,
+          "differing": [
+            "data/.gitignore",
+            "out/.gitignore"
+          ]
+        },
+        "c": {
+          "files_before": 16,
+          "files_after": 16,
+          "differing": []
+        },
+        "d": {
+          "files_before": 16,
+          "files_after": 16,
+          "differing": []
+        },
+        "e_tampered": {
+          "files_before": 16,
+          "files_after": 16,
+          "differing": [
+            "data/ns_materialized/observations.parquet"
+          ]
+        },
+        "e_restored": {
+          "files_before": 16,
+          "files_after": 16,
+          "differing": []
+        }
+      },
+      "criteria_passed": {
+        "G0.3a": true,
+        "G0.3b": true,
+        "G0.3c": true,
+        "G0.3d": true,
+        "G0.3e": true
+      },
+      "pre_delete_files": 16,
+      "quoted_excerpts": [
+        "< 71701562b963f283a25b2ab12ba2e6ca26a65acdeeb898434b6b240806050b88  data/.gitignore / < 0dd351f92574166a1b410905304bc4a8bdb032586269719c640c1da3af2f372c  out/.gitignore / b_diff_exit=1 (G0.3b, as written)",
+        "c_git_checkout_exit=0, c_checkout_exit=0, c_diff_exit=0, 'Data and pipelines are up to date.' (G0.3c)",
+        "d_diff_exit=0 (G0.3d)",
+        "e_tamper_diff_exit=1, 'modified:           data/ns_materialized', e_force_checkout_exit=0, e_restore_diff_exit=0 (G0.3e)"
+      ]
+    },
+    "native_dvc_add_arm": {
+      "all_test_assertions": true,
+      "files": 4,
+      "records_and_sql_hash_equal_to_local": true,
+      "restore_identical": true
+    },
+    "C0.4_per_cutoff": {
+      "2025-02-01T21:00:00.000000099Z": {
+        "row_ids_all_arms_match_test": true,
+        "records_equal_all_arms": true,
+        "selection_sql_sha256_equal_all_arms": true,
+        "selection_sql_sha256": "5612f05d1f01e054e50bf9102527ae87a8abbbe4c370f666d8c54ea38972e6af"
+      },
+      "2025-02-01T21:00:00.000000100Z": {
+        "row_ids_all_arms_match_test": true,
+        "records_equal_all_arms": true,
+        "selection_sql_sha256_equal_all_arms": true,
+        "selection_sql_sha256": "5612f05d1f01e054e50bf9102527ae87a8abbbe4c370f666d8c54ea38972e6af"
+      },
+      "2025-02-01T21:00:00.000000200Z": {
+        "row_ids_all_arms_match_test": true,
+        "records_equal_all_arms": true,
+        "selection_sql_sha256_equal_all_arms": true,
+        "selection_sql_sha256": "5612f05d1f01e054e50bf9102527ae87a8abbbe4c370f666d8c54ea38972e6af"
+      },
+      "2025-02-01T21:00:00.000000201Z": {
+        "row_ids_all_arms_match_test": true,
+        "records_equal_all_arms": true,
+        "selection_sql_sha256_equal_all_arms": true,
+        "selection_sql_sha256": "5612f05d1f01e054e50bf9102527ae87a8abbbe4c370f666d8c54ea38972e6af"
+      }
+    },
+    "C0.4_point_in_time_queries_all_equal": {
+      "records": true,
+      "sql_hash": true,
+      "test_assertions": true
+    },
+    "C0.5_unknown_availability_on_restored_source": {
+      "replay": {
+        "materialize:control_unmutated": {
+          "dvc_repro": 0,
+          "dvc_restored_rerun": 0,
+          "expected": 0,
+          "project_local": 0
+        },
+        "materialize:obs_available_at_date_only": {
+          "dvc_repro": 2,
+          "dvc_restored_rerun": 2,
+          "expected": 2,
+          "project_local": 2
+        },
+        "materialize:obs_available_at_null": {
+          "dvc_repro": 2,
+          "dvc_restored_rerun": 2,
+          "expected": 2,
+          "project_local": 2
+        },
+        "materialize:obs_available_at_removed": {
+          "dvc_repro": 2,
+          "dvc_restored_rerun": 2,
+          "expected": 2,
+          "project_local": 2
+        },
+        "materialize:obs_backdated_event_after_availability": {
+          "dvc_repro": 2,
+          "dvc_restored_rerun": 2,
+          "expected": 2,
+          "project_local": 2
+        },
+        "materialize:universe_available_at_removed": {
+          "dvc_repro": 2,
+          "dvc_restored_rerun": 2,
+          "expected": 2,
+          "project_local": 2
+        },
+        "select:control_restored_snapshot": {
+          "dvc_repro": 0,
+          "dvc_restored_rerun": 0,
+          "expected": 0,
+          "project_local": 0
+        },
+        "select:parquet_tamper": {
+          "dvc_repro": 2,
+          "dvc_restored_rerun": 2,
+          "expected": 2,
+          "project_local": 2
+        },
+        "select:wrong_snapshot_sha256": {
+          "dvc_repro": 2,
+          "dvc_restored_rerun": 2,
+          "expected": 2,
+          "project_local": 2
+        }
+      },
+      "temporal_snapshot": {
+        "snapshot:availability_basis_unknown": {
+          "dvc_repro": 2,
+          "dvc_restored_rerun": 2,
+          "expected": 2,
+          "project_local": 2
+        },
+        "snapshot:availability_evidence_empty": {
+          "dvc_repro": 2,
+          "dvc_restored_rerun": 2,
+          "expected": 2,
+          "project_local": 2
+        },
+        "snapshot:available_at_date_only": {
+          "dvc_repro": 2,
+          "dvc_restored_rerun": 2,
+          "expected": 2,
+          "project_local": 2
+        },
+        "snapshot:available_at_null": {
+          "dvc_repro": 2,
+          "dvc_restored_rerun": 2,
+          "expected": 2,
+          "project_local": 2
+        },
+        "snapshot:available_at_removed": {
+          "dvc_repro": 2,
+          "dvc_restored_rerun": 2,
+          "expected": 2,
+          "project_local": 2
+        },
+        "snapshot:control_unmutated": {
+          "dvc_repro": 0,
+          "dvc_restored_rerun": 0,
+          "expected": 0,
+          "project_local": 0
+        }
+      },
+      "all_ok": true
+    },
+    "C0.6_forced_regeneration": {
+      "git_repo_changed_files": [
+        "data/ns_materialize.json",
+        "data/ns_materialized/snapshot.json",
+        "data/pit_snapshot.json",
+        "data/pit_snapshot/snapshot.json",
+        "out/ns_select.json",
+        "out/pit_select.json"
+      ],
+      "ns": {
+        "data_file_hashes_equal": true,
+        "differing_manifest_keys": [
+          "ingested_at"
+        ]
+      },
+      "pit": {
+        "data_file_hashes_equal": true,
+        "differing_manifest_keys": [
+          "ingested_at"
+        ]
+      }
+    },
+    "quoted_excerpts": [
+      "Stage 'ns_materialize' didn't change, skipping (raw/dvc/run.log, second dvc repro)",
+      "{\"status\": \"rejected\", \"reason\": \"snapshot_manifest_hash_mismatch\"} then restored_wrong_digest_cli_exit=2 (raw/dvc/run.log)"
+    ]
+  },
+  "outcome": "settled",
+  "outcome_reason": "Under the original preregistration the original run is not_settled: C0.3 as written (full-tree sha256 list after `rm -rf data out; dvc checkout` equals the pre-delete list) failed with git_restore_diff_exit=1, because `dvc checkout` alone does not restore the git-tracked data/.gitignore and out/.gitignore. C0.1, C0.2, C0.4, C0.5 and C0.6 passed as written on native DVC 3.67.1 CLI runs with live-captured logs. The outcome 'settled' follows the fix-round-3 rule (preregistration-fixround3.json, written at 13:20:19Z after the original C0.3 result was seen, committed in 9f84cc9 before the rerun). On a fresh git+DVC repo: G0.3a repro and cache-aware second repro passed; G0.3b (as written, kept as the detector) reproduced exactly the two .gitignore differences; G0.3c (`git checkout -- data/.gitignore out/.gitignore && dvc checkout`) full-tree diff exit 0 on all 16 files; G0.3d (delete only the eight DVC outs, then `dvc checkout`) exit 0 on all 16 files; G0.3e (one-byte overwrite detected by the diff and `dvc status`, then `dvc checkout --force` restores) passed. The runs cover add, restore and pipeline reproduction: a native `dvc add` of a replay.py snapshot directory was restored byte-identically by `dvc checkout`; a dvc.yaml pipeline wrapping replay.py materialize/select and temporal_snapshot.py snapshot/select ran under `dvc repro` with a dvc.lock, and a second repro skipped all six stages; on the DVC-restored snapshots, per-cutoff records and selection_sql_sha256 equal the project-local path and the regression-test assertions; the unknown-availability mutations of the restored source.json exit 2 while the unmutated control exits 0.",
+  "evidence_class": "native_proven",
+  "limits": [
+    "Synthetic repository fixtures only (replay: 5 observations, 2 universe rows; point-in-time fixture). No real or licensed market data, and no scale measurement.",
+    "Local DVC cache only; no remote storage was configured or tested.",
+    "`dvc repro --force` re-materializes a new snapshot.json: ingested_at changes, so snapshot_sha256 changes, while the three data files stay byte-identical. A caller holding the old digest must restore through DVC (checkout) rather than repro. This is the documented contract, recorded as C0.6.",
+    "Restore contract: `dvc checkout` restores DVC outs only. After a whole-directory delete, the git-tracked .gitignore files that DVC wrote at repro time come back only from git (`git checkout -- data/.gitignore out/.gitignore`), so a complete restore is git checkout plus dvc checkout (fix round 3, G0.3b/G0.3c).",
+    "The fix-round-3 C0.3 criterion was written after the original C0.3 failure was seen; the original run stays recorded as failing C0.3 as written. C0.4-C0.6 were not re-run in fix round 3; they come from the original run.",
+    "The DVC stage driver (stage.py) is project harness code. It calls the project CLIs by subprocess, so exit codes are the CLIs' own."
+  ],
+  "raw_artifacts": [
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/dvc/run.log",
+      "sha256": "a39ec6cb789d60c088f80efbd08d9fc8198446229e9ed8c7d366162b8de311a8"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/dvc/attempt1-run.log",
+      "sha256": "ad9a05e951b2d543df97f70a5a01065de7ad0f1de199bb15322ab1384177073f"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/dvc/attempt2-run.log",
+      "sha256": "5840f67e626441017e06b4bba332f884be56cd2edaef7d376c4ccb9cef176420"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/dvc/comparison.json",
+      "sha256": "e578bf3dedadcb349e380b6d1ef7d37a4adeb1e5009938d9059dc1d51134b983"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/dvc/add-pre-delete.sha256",
+      "sha256": "f5a8caaeb12bf42435b71af1ca026f3c101d1bf3b45d8caf48f71d7b21f6ede9"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/dvc/add-post-checkout.sha256",
+      "sha256": "f5a8caaeb12bf42435b71af1ca026f3c101d1bf3b45d8caf48f71d7b21f6ede9"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/dvc/add-restored-ns_select.json",
+      "sha256": "084cf98907349a32fec46b7889815a7810d3d1d68fc1aa630eacb0cdbd820ca4"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/dvc/git-pre-delete.sha256",
+      "sha256": "0bea53e7332c51792294d9043401d2857d746d1cffdf0408e39e5080c7dd9731"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/dvc/git-post-checkout.sha256",
+      "sha256": "536430d7428502a693cc916e49f0f15120cfc22538c822e5c0521ac782f2f162"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/dvc/git-post-force.sha256",
+      "sha256": "3a01e25c5ce8a528eecca8e8aae0103457541d4da9ade09fa4caeafb7068324f"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/dvc/first-ns-snapshot.json",
+      "sha256": "3b9dbed12f028aa9093264cc66e2123f3eb470aa7e805c70ca84ed0eefd2ed92"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/dvc/forced-ns-snapshot.json",
+      "sha256": "d25c2955fe454eb10428fee0128193b9e1ddedb705e03b90bb778bcbac7fde0e"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/dvc/first-pit-snapshot.json",
+      "sha256": "cc0cbb999b11fee53a87090d6929d34ed704c81ca43884e874b546c8aee03413"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/dvc/forced-pit-snapshot.json",
+      "sha256": "4ed69dd49a48dad6eb06489c933c53324894a6d9b00c1a34f25934da07d4a0fb"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/dvc/restored-rerun__ns_select.json",
+      "sha256": "17cca797a5ae5b1ebbb6a94f8f3f56d34a02e71fe86342f2543d8fe7d6e81e67"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/dvc/restored-rerun__ns_quarantine.json",
+      "sha256": "466d09d79e29aea9e593de4192e57d1a788afb69bb919ecb6ab231329ad6a84a"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/dvc/restored-rerun__pit_select.json",
+      "sha256": "9cc0e4e85c463367355747f24d5fcc44bf98ca4538981779a36dc5d5b146a95d"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/dvc/restored-rerun__pit_quarantine.json",
+      "sha256": "c06115156ef5f5f0b201c20bc2c7f23bd0ea11f78a57c47d1ba25786f651f332"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/dvc/git-repro-out__ns_select.json",
+      "sha256": "17cca797a5ae5b1ebbb6a94f8f3f56d34a02e71fe86342f2543d8fe7d6e81e67"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/dvc/local__ns_select.json",
+      "sha256": "341da777474418374b4ef58f5968bc5210f46e4693d72a720873d23f5e78e04c"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/dvc/local__ns_quarantine.json",
+      "sha256": "96c8854805fef4f3b891e346202454519297f74762beba2ae40d4e933e161f80"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/dvc/repo-git__dvc.lock",
+      "sha256": "75e20f5e168137deb30eeb5b35b93846392b79aa9101d8cefe7ca773d1b33c28"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/install/install.log",
+      "sha256": "968b6d62eb58a1269859da5e8f5258313629a2b1b0db87429e750be60eb283da"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/install/venv-core.freeze.txt",
+      "sha256": "6e5c1bff1b0f3136f1f08d1b974a567427e67e74667f253772546f0cf85600a2"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/dvc-fixround3/run.log",
+      "sha256": "2bc3b35419d09d6f0b5167e1cf7d1069a1e0e19705e140bb21e5bee21a11159c"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/dvc-fixround3/pre-delete.sha256",
+      "sha256": "f4c3f18b21e9020bf6a05abfde07c3ecd8e97140b80b5a8bac28268e1a6fefcf"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/dvc-fixround3/b-post-checkout.sha256",
+      "sha256": "00bc87af1afdf11291e943fb526881609c4d36b0f449bca55be13bf5c697e8dc"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/dvc-fixround3/c-post-checkout.sha256",
+      "sha256": "f4c3f18b21e9020bf6a05abfde07c3ecd8e97140b80b5a8bac28268e1a6fefcf"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/dvc-fixround3/d-post-checkout.sha256",
+      "sha256": "f4c3f18b21e9020bf6a05abfde07c3ecd8e97140b80b5a8bac28268e1a6fefcf"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/dvc-fixround3/e-tampered.sha256",
+      "sha256": "10ced66d536d628dcf1ef4e175469a04d09fba4507ebb655b57246a921d36220"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/dvc-fixround3/e-post-force-checkout.sha256",
+      "sha256": "f4c3f18b21e9020bf6a05abfde07c3ecd8e97140b80b5a8bac28268e1a6fefcf"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/dvc-fixround3/repo-git__dvc.lock",
+      "sha256": "c5a70d850e9a78bcdac248487d3e10498ea4cd504ce64c0719c082f85d837cea"
+    }
+  ],
+  "helpers": [
+    "blueprints/gap-wave2-20260923/us-equities__identity-provenance/run_dvc_arm.sh",
+    "blueprints/gap-wave2-20260923/us-equities__identity-provenance/dvc.yaml",
+    "blueprints/gap-wave2-20260923/us-equities__identity-provenance/stage.py",
+    "blueprints/gap-wave2-20260923/us-equities__identity-provenance/compare_dvc_arm.py",
+    "blueprints/gap-wave2-20260923/us-equities__identity-provenance/run_c03_fixround3.sh",
+    "blueprints/gap-wave2-20260923/us-equities__identity-provenance/preregistration-fixround3.json"
+  ],
+  "checked_at": "2026-09-23T13:28:31Z",
+  "layer": "us-equities/identity-provenance",
+  "crosswalk": "main 92bb279, crosswalk PR #85"
+}

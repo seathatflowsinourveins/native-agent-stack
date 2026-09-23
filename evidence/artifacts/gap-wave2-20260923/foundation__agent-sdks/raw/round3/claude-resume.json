@@ -1,0 +1,85 @@
+{
+  "mode": "claude-resume",
+  "resumed_session": "redacted-id:22f3ca86d8ec873d",
+  "prompt": "Look back at my first message in this conversation. Which subject did it ask you to write an essay about? Reply with only the subject, in at most six words.",
+  "prompt_mentions_subject": false,
+  "init": {
+    "model": "claude-haiku-4-5-20251001",
+    "session_id": "redacted-id:22f3ca86d8ec873d",
+    "mcp_servers": [
+      {
+        "name": "claude.ai Claude Docs",
+        "status": "connected",
+        "source": "claudeai"
+      }
+    ],
+    "claude_code_version": "2.1.280"
+  },
+  "result": {
+    "subtype": "success",
+    "is_error": false,
+    "num_turns": 1,
+    "session_id": "redacted-id:22f3ca86d8ec873d",
+    "session_id_equals_resumed": true,
+    "usage": {
+      "input_tokens": 3858,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "output_tokens": 221,
+      "output_tokens_details": {
+        "thinking_tokens": 205
+      },
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "not_available",
+      "iterations": [
+        {
+          "input_tokens": 3858,
+          "output_tokens": 221,
+          "cache_read_input_tokens": 0,
+          "cache_creation_input_tokens": 0,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 0
+          },
+          "type": "message"
+        }
+      ],
+      "speed": "standard"
+    },
+    "total_cost_usd": 0.005969,
+    "duration_ms": 2481,
+    "model_usage": {
+      "claude-haiku-4-5-20251001": {
+        "inputTokens": 4779,
+        "outputTokens": 238,
+        "thinkingTokens": 205,
+        "cacheReadInputTokens": 0,
+        "cacheCreationInputTokens": 0,
+        "webSearchRequests": 0,
+        "costUSD": 0.005969,
+        "contextWindow": 200000,
+        "maxOutputTokens": 32000,
+        "canonicalModel": "claude-haiku-4-5",
+        "provider": "firstParty",
+        "costBasis": "list"
+      }
+    }
+  },
+  "answer": "The history of double-entry bookkeeping.",
+  "answer_names_subject": true,
+  "status": "ok",
+  "sdk": "claude-agent-sdk",
+  "new_process_pid": 2975049,
+  "started_at": 1790168471.6080978,
+  "finished_at": 1790168476.1283658,
+  "session_jsonl_lines_before": 17,
+  "session_jsonl_lines_after": 30
+}

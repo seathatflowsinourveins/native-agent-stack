@@ -4,7 +4,11 @@ Dated 2026-09-23. This page says which machine does what, what to run on each, a
 measured load justifies. The per-layer list of what to install is generated in
 [`new-host-grand-list.md`](new-host-grand-list.md); the step-by-step install is
 [`adoption/bootstrap.md`](../adoption/bootstrap.md); recording what ran is
-[`contributing-evidence.md`](contributing-evidence.md).
+[`contributing-evidence.md`](contributing-evidence.md). For the exact ordered commands
+(measure, record, refresh the derived views, check for a possible verdict flip, validate),
+see [`contributing-evidence.md`'s "The new-host loop, in one place"](contributing-evidence.md#0-the-new-host-loop-in-one-place);
+moving a set-up host to a later release is
+[moving a host to a new release](../adoption/update.md#moving-a-host-to-a-new-release).
 
 ## Machine roles (recommendation, not a measurement)
 
@@ -16,19 +20,44 @@ measured load justifies. The per-layer list of what to install is generated in
 
 The workstation and macOS tiers are labelled projections in
 [`adoption/hardware-profiles.json`](../adoption/hardware-profiles.json) until
-`python3 scripts/hardware_profile.py` runs on each host and replaces them.
+`python3 scripts/hardware_profile.py --record-host <host-id>` runs on each host. It adds a
+dated, `native_proven` measured entry next to the projection -- it does not remove or
+overwrite the projection entry itself -- so once a host has a measured entry, prefer that one
+and treat the projection as superseded guidance rather than looking for it to have vanished.
 
 ## Workstation (WSL2) next steps
 
-1. Windows side: raise `.wslconfig` memory from WSL's default of half the physical RAM, using the
-   [workstation runtime profile](new-workstation-runtime-profile-20260922.md) (it proposes
-   `memory=96GB processors=60 swap=16GB`; the hardware profiles assume 100 GB for the `headroom` tier,
-   which 96 GB would just miss; the owners reconcile the value), then `wsl --shutdown` once.
+1. Windows side: set `%UserProfile%\.wslconfig` to the decided workstation profile, then
+   `wsl --shutdown` once:
+
+   ```ini
+   [wsl2]
+   memory=112GB
+   processors=60
+   swap=16GB
+   networkingMode=mirrored
+   [experimental]
+   autoMemoryReclaim=gradual
+   sparseVhd=true
+   ```
+
+   Decided 2026-09-23 (user decision, evidence in the upgrade manifest below): the workstation's main
+   work is the native LLM ecosystem, the foundation and the north star, so WSL gets about 88% of the
+   128 GB and Windows keeps 16 GB. On the measured laptop (63.4 GB physical, WSL capped at 48 GB)
+   Windows outside WSL held about 24 GB with 9 GB free, and commit charge was 85.7 of 99.7 GB, so a
+   cap near the full 128 GB would leave Windows paging under load. `autoMemoryReclaim=gradual` returns
+   idle Linux cache to Windows. After setup, re-measure under full load; raise toward 116-120 GB only
+   if Windows keeps more than 12 GB free. This replaces the 96 GB proposal in the
+   [workstation runtime profile](new-workstation-runtime-profile-20260922.md), which under the
+   profiles' own arithmetic would just miss the `headroom` tier.
 2. Pinned clone at the release tag, then `adoption/bootstrap-linux.sh` (bootstrap step 0 onward).
-3. `python3 scripts/hardware_profile.py`; add the measured entry to the hardware profiles.
+3. `python3 scripts/hardware_profile.py --record-host <host-id>` (`<host-id>` like
+   `wsl-workstation-20261015`); this writes the measured report and adds the entry to the
+   hardware profiles for you, replacing the earlier by-hand edit.
 4. Profiles in order: `foundation-cpu`, `research-runtime`, `observability`, `semantic-rag`,
    `recovery`, `trading-nautilus` (see the grand list's setup order).
-5. Record each component that ran with `python3 scripts/host_receipts.py record`, then
+5. Record each component that ran with `python3 scripts/host_receipts.py record`
+   (`--qualified-model` for any local runtime model you qualified there), then
    `python3 scripts/component_matrix.py --write` and `python3 scripts/new_host_grand_list.py --write`.
 6. North star on this host: the engine replay, then IBKR local acceptance and the adaptive paper
    broker trial as the gate ladder
@@ -37,11 +66,18 @@ The workstation and macOS tiers are labelled projections in
 
 ## macOS (64 GB) next steps
 
-1. Pinned clone, then `adoption/bootstrap-macos.sh` (the macOS clean-install work in progress adds
-   Homebrew prerequisites, launchd agents and darwin pins).
-2. `python3 scripts/hardware_profile.py` and the MLX smoke; record the measured profile.
+1. Pinned clone, then `adoption/bootstrap-macos.sh`. The Homebrew prerequisite install, the
+   `socraticode`, darwin-binary and embedding-model pins, the launchd agents and the embedding
+   acceptance script all came in #94, after `v2026.09.23`: at that tag the script brews only `jq`
+   and installs 7 of the 8 `macos-arm64-foundation` components, and the launchd and embedding steps
+   run from a default-branch clone, as the [macOS page](../adoption/platforms/macos-arm64.md) marks.
+   A release cut after #94 and re-pinned ([moving a host to a new release](../adoption/update.md#moving-a-host-to-a-new-release))
+   removes these differences.
+2. `python3 scripts/hardware_profile.py --record-host <host-id>` and the MLX smoke; this writes
+   and registers the measured profile.
 3. `macos-arm64-foundation` profile; re-qualify any local model on MLX or llama.cpp Metal: a vLLM
-   result on CUDA does not transfer.
+   result on CUDA does not transfer. Record a qualified model with
+   `python3 scripts/host_receipts.py record ... --qualified-model '{"runtime": "mlx-lm", ...}'`.
 4. Record receipts as above. The first real macOS run is what moves the `macos-arm64` column of the
    grand list off `untested`.
 
@@ -52,7 +88,7 @@ The manifest is
 
 | Item | Verdict | Evidence in one line |
 | --- | --- | --- |
-| Workstation WSL memory above the 64 GB default | Needed at setup | The `headroom` tier needs about 96 GB visible |
+| Workstation WSL memory: 112 GB (decided) | Needed at setup | `headroom` tier needs about 96 GB visible; Windows keeps 16 GB (measured Windows-side use about 24 GB on the laptop) |
 | CPU limit in `ecosystem-bounded-run` | Needed now (software) | Unlimited Gitleaks scans were 72% of measured CPU, up to 8.4 cores |
 | Retention for per-wave state and caches | Needed now (software) | About 65 GiB of wave caches and state with no retention rule |
 | GPU memory above 24 GB | Not needed now | Median GPU use 6.5%; embedder plus 8B worker peaked at 20,217 of 24,463 MiB |

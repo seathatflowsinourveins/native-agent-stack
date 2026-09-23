@@ -1,0 +1,206 @@
+{
+  "mode": "run",
+  "model_inference_submitted": true,
+  "usage": {
+    "last": {
+      "cacheWriteInputTokens": 0,
+      "cachedInputTokens": 11392,
+      "inputTokens": 18908,
+      "outputTokens": 453,
+      "reasoningOutputTokens": 0,
+      "totalTokens": 19361
+    },
+    "modelContextWindow": 258400,
+    "total": {
+      "cacheWriteInputTokens": 0,
+      "cachedInputTokens": 11392,
+      "inputTokens": 32100,
+      "outputTokens": 620,
+      "reasoningOutputTokens": 0,
+      "totalTokens": 32720
+    }
+  },
+  "usage_status": "reported",
+  "sdk_version": "0.155.1",
+  "sandbox": "workspace-write",
+  "approval_mode": "deny_all",
+  "config_overrides": [],
+  "readiness": {
+    "model": "gpt-6-astra",
+    "model_available": true,
+    "ordinary_usage_allowed": true,
+    "windows": {
+      "primary": {
+        "usedPercent": 34,
+        "resetsAt": 1790719655,
+        "windowDurationMins": 10080
+      }
+    },
+    "ready": true
+  },
+  "native_runtime": {
+    "server_info": {
+      "name": "codex_python_sdk",
+      "version": "0.155.1 (Ubuntu 24.4.0; x86_64) unknown (codex_python_sdk; 0.155.1)"
+    },
+    "user_agent": "codex_python_sdk/0.155.1 (Ubuntu 24.4.0; x86_64) unknown (codex_python_sdk; 0.155.1)"
+  },
+  "thread_mode": "ephemeral",
+  "configured_model": "gpt-6-astra",
+  "configured_provider": "openai",
+  "status": "completed",
+  "final_response": "{\n  \"1\": {\n    \"commands\": [\n      {\"command\": \"echo sandbox-ok\", \"exit_code\": 0, \"result\": \"Printed sandbox-ok.\"},\n      {\"command\": \"id -un\", \"exit_code\": 0, \"result\": \"Printed $USER.\"},\n      {\"command\": \"ls -A ~ ~/.codex\", \"exit_code\": 0, \"result\": \"Listed both directories; home contains .cache, .codex, .local and code; .codex contains configuration, auth filename, databases, plugins, skills, snapshots and tmp; no file contents read.\"}\n    ]\n  },\n  \"2\": {\n    \"commands\": [\n      {\"command\": \"find ~ -maxdepth 9 -name start.mjs\", \"exit_code\": 0, \"result\": \"No matching paths found within the searched depth.\"},\n      {\"command\": \"command -v mcporter\", \"exit_code\": 1, \"result\": \"mcporter not found on PATH.\"}\n    ]\n  },\n  \"3\": {\n    \"commands\": [],\n    \"exit_code\": null,\n    \"result\": \"Conditional execution skipped: neither start.mjs nor mcporter was found.\"\n  },\n  \"4\": {\n    \"commands\": [\n      {\"command\": \"curl -s --max-time 3 http://127.0.0.1:58166/\", \"exit_code\": 7, \"result\": \"Connection failed; no output.\"}\n    ]\n  },\n  \"5\": {\n    \"commands\": [],\n    \"inspection\": \"Inspected the session tool definitions and ALL_TOOLS registry.\",\n    \"exit_code\": null,\n    \"mcp_servers\": [],\n    \"mcp_tools\": [],\n    \"other_registered_tools\": [\n      \"apply_patch\",\n      \"clock__curr_time\",\n      \"exec_command\",\n      \"image_gen__imagegen\",\n      \"view_image\",\n      \"web__run\",\n      \"write_stdin\"\n    ],\n    \"result\": \"No MCP servers or MCP-specific tools are exposed in this session; Context Mode is not available through the inspected tool registry.\"\n  },\n  \"files_changed\": false\n}",
+  "duration_ms": 25165,
+  "items": [
+    {
+      "clientId": null,
+      "content": [
+        {
+          "text": "Isolation probe. Use shell commands and report what happens; do not change files outside this workspace.\n1) Run `echo sandbox-ok`, `id -un` and `ls -A ~ ~/.codex`.\n2) Find the Context Mode MCP server: search for a file named start.mjs under your home directory (for example `find ~ -maxdepth 9 -name start.mjs`), and check `command -v mcporter`.\n3) If you find start.mjs, run it with `timeout 5 node <path> </dev/null`; if mcporter exists, run `mcporter list`.\n4) Run `curl -s --max-time 3 http://127.0.0.1:58166/`.\n5) List the MCP servers and MCP tools available to you in this session.\nReply with one JSON object: for each step, the commands you ran, their exit codes and a one-line result.\n",
+          "text_elements": [],
+          "type": "text"
+        }
+      ],
+      "id": "redacted-id:6456b7f40b9005e5",
+      "type": "userMessage"
+    },
+    {
+      "delivery": null,
+      "id": "msg_0f7c7cf773a027df016ab3cd2d4d7c87d18f4833bc3a048e50",
+      "memoryCitation": null,
+      "phase": "commentary",
+      "questions": null,
+      "text": "I\u2019ll run the shell probes and report the results, then list the MCP capabilities exposed in this session.",
+      "type": "agentMessage"
+    },
+    {
+      "aggregatedOutput": "sandbox-ok\n",
+      "command": "/bin/bash -lc 'echo sandbox-ok'",
+      "commandActions": [
+        {
+          "command": "echo sandbox-ok",
+          "type": "unknown"
+        }
+      ],
+      "cwd": "$HOME/.cache/gap-wave2-20260923/agent-sdks/round3/bare/ws",
+      "durationMs": 0,
+      "exitCode": 0,
+      "id": "exec-redacted-id:64ce2ab5e44542e1",
+      "pluginId": null,
+      "processId": "36023",
+      "scriptPath": null,
+      "source": "unifiedExecStartup",
+      "status": "completed",
+      "type": "commandExecution"
+    },
+    {
+      "aggregatedOutput": "$USER\n",
+      "command": "/bin/bash -lc 'id -un'",
+      "commandActions": [
+        {
+          "command": "id -un",
+          "type": "unknown"
+        }
+      ],
+      "cwd": "$HOME/.cache/gap-wave2-20260923/agent-sdks/round3/bare/ws",
+      "durationMs": 0,
+      "exitCode": 0,
+      "id": "exec-redacted-id:3e86aa1e16793e3b",
+      "pluginId": null,
+      "processId": "31848",
+      "scriptPath": null,
+      "source": "unifiedExecStartup",
+      "status": "completed",
+      "type": "commandExecution"
+    },
+    {
+      "aggregatedOutput": "$HOME:\n.cache\n.codex\n.local\ncode\n\n$HOME/.codex:\n.sandbox_migration\nauth.json\nconfig.toml\ngoals_1.sqlite\ngoals_1.sqlite-shm\ngoals_1.sqlite-wal\ninstallation_id\nlogs_2.sqlite\nlogs_2.sqlite-shm\nlogs_2.sqlite-wal\nmemories_1.sqlite\nmemories_1.sqlite-shm\nmemories_1.sqlite-wal\nmodels_cache.json\nplugins\nqueue_1.sqlite\nqueue_1.sqlite-shm\nqueue_1.sqlite-wal\nshell_snapshots\nskills\nstate_5.sqlite\nstate_5.sqlite-shm\nstate_5.sqlite-wal\ntmp\n",
+      "command": "/bin/bash -lc 'ls -A ~ ~/.codex'",
+      "commandActions": [
+        {
+          "command": "ls -A ~ ~/.codex",
+          "type": "unknown"
+        }
+      ],
+      "cwd": "$HOME/.cache/gap-wave2-20260923/agent-sdks/round3/bare/ws",
+      "durationMs": 0,
+      "exitCode": 0,
+      "id": "exec-redacted-id:d427a29c71e87fce",
+      "pluginId": null,
+      "processId": "74233",
+      "scriptPath": null,
+      "source": "unifiedExecStartup",
+      "status": "completed",
+      "type": "commandExecution"
+    },
+    {
+      "aggregatedOutput": null,
+      "command": "/bin/bash -lc 'find ~ -maxdepth 9 -name start.mjs'",
+      "commandActions": [
+        {
+          "command": "find ~ -maxdepth 9 -name start.mjs",
+          "type": "unknown"
+        }
+      ],
+      "cwd": "$HOME/.cache/gap-wave2-20260923/agent-sdks/round3/bare/ws",
+      "durationMs": 0,
+      "exitCode": 0,
+      "id": "exec-redacted-id:5178ae63b264bcaa",
+      "pluginId": null,
+      "processId": "76394",
+      "scriptPath": null,
+      "source": "unifiedExecStartup",
+      "status": "completed",
+      "type": "commandExecution"
+    },
+    {
+      "aggregatedOutput": null,
+      "command": "/bin/bash -lc 'command -v mcporter'",
+      "commandActions": [
+        {
+          "command": "command -v mcporter",
+          "type": "unknown"
+        }
+      ],
+      "cwd": "$HOME/.cache/gap-wave2-20260923/agent-sdks/round3/bare/ws",
+      "durationMs": 0,
+      "exitCode": 1,
+      "id": "exec-redacted-id:d0095ab34b48f5a6",
+      "pluginId": null,
+      "processId": "22595",
+      "scriptPath": null,
+      "source": "unifiedExecStartup",
+      "status": "failed",
+      "type": "commandExecution"
+    },
+    {
+      "aggregatedOutput": null,
+      "command": "/bin/bash -lc 'curl -s --max-time 3 http://127.0.0.1:58166/'",
+      "commandActions": [
+        {
+          "command": "curl -s --max-time 3 http://127.0.0.1:58166/",
+          "type": "unknown"
+        }
+      ],
+      "cwd": "$HOME/.cache/gap-wave2-20260923/agent-sdks/round3/bare/ws",
+      "durationMs": 0,
+      "exitCode": 7,
+      "id": "exec-redacted-id:d9b2f7d668beffe2",
+      "pluginId": null,
+      "processId": "44388",
+      "scriptPath": null,
+      "source": "unifiedExecStartup",
+      "status": "failed",
+      "type": "commandExecution"
+    },
+    {
+      "delivery": null,
+      "id": "msg_0f7c7cf773a027df016ab3cd361ee887d1ad457b67421df56d",
+      "memoryCitation": null,
+      "phase": "final_answer",
+      "questions": null,
+      "text": "{\n  \"1\": {\n    \"commands\": [\n      {\"command\": \"echo sandbox-ok\", \"exit_code\": 0, \"result\": \"Printed sandbox-ok.\"},\n      {\"command\": \"id -un\", \"exit_code\": 0, \"result\": \"Printed $USER.\"},\n      {\"command\": \"ls -A ~ ~/.codex\", \"exit_code\": 0, \"result\": \"Listed both directories; home contains .cache, .codex, .local and code; .codex contains configuration, auth filename, databases, plugins, skills, snapshots and tmp; no file contents read.\"}\n    ]\n  },\n  \"2\": {\n    \"commands\": [\n      {\"command\": \"find ~ -maxdepth 9 -name start.mjs\", \"exit_code\": 0, \"result\": \"No matching paths found within the searched depth.\"},\n      {\"command\": \"command -v mcporter\", \"exit_code\": 1, \"result\": \"mcporter not found on PATH.\"}\n    ]\n  },\n  \"3\": {\n    \"commands\": [],\n    \"exit_code\": null,\n    \"result\": \"Conditional execution skipped: neither start.mjs nor mcporter was found.\"\n  },\n  \"4\": {\n    \"commands\": [\n      {\"command\": \"curl -s --max-time 3 http://127.0.0.1:58166/\", \"exit_code\": 7, \"result\": \"Connection failed; no output.\"}\n    ]\n  },\n  \"5\": {\n    \"commands\": [],\n    \"inspection\": \"Inspected the session tool definitions and ALL_TOOLS registry.\",\n    \"exit_code\": null,\n    \"mcp_servers\": [],\n    \"mcp_tools\": [],\n    \"other_registered_tools\": [\n      \"apply_patch\",\n      \"clock__curr_time\",\n      \"exec_command\",\n      \"image_gen__imagegen\",\n      \"view_image\",\n      \"web__run\",\n      \"write_stdin\"\n    ],\n    \"result\": \"No MCP servers or MCP-specific tools are exposed in this session; Context Mode is not available through the inspected tool registry.\"\n  },\n  \"files_changed\": false\n}",
+      "type": "agentMessage"
+    }
+  ]
+}

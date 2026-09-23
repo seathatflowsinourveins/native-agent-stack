@@ -1,0 +1,18 @@
+{
+ "meanrisk_min_variance": {
+  "orders": 33,
+  "ending_cash_native": "2009391.95",
+  "total_pnl_usd": "1009391.95",
+  "native_total_return": "1.00939195",
+  "skfolio_descriptive_total_return_daily_rebalanced_cost_free": "1.052380565851879817881153792",
+  "unmodelled_dividend_cash_usd": "132234.25"
+ },
+ "hrp_variance": {
+  "orders": 66,
+  "ending_cash_native": "2279895.57",
+  "total_pnl_usd": "1279895.57",
+  "native_total_return": "1.27989557",
+  "skfolio_descriptive_total_return_daily_rebalanced_cost_free": "1.327499155268176563006856958",
+  "unmodelled_dividend_cash_usd": "107478.79"
+ }
+}

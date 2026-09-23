@@ -1,0 +1,110 @@
+{
+ "step1_started_before_kill": true,
+ "kill": {
+  "t": 2.3,
+  "signal": "SIGKILL to the dagu start process group",
+  "reaped": true
+ },
+ "immediately_after_kill": {
+  "status": "running",
+  "ps": "DAG            RUN_ID           ATTEMPT  STARTED               GROUP          FRESH\ng2k2166b-kill  g2k2166b-kill-1  5f76b3   2026-09-23T05:26:18Z  g2k2166b-kill  yes\n"
+ },
+ "manual_retries_without_scheduler": [
+  {
+   "seconds_after_kill": 35.1,
+   "retry_exit": 1,
+   "retry_stderr_tail": "2166b-kill run-id=g2k2166b-kill-1 err=\"already running. dag-run ID=g2k2166b-kill-1, socket=/tmp/@dagu_g2k2166b-kill_dc928d.sock\"\nError: failed to execute the dag-run g2k2166b-kill (dag-run ID: g2k2166b-kill-1): already running. dag-run ID=g2k2166b-kill-1, socket=/tmp/@dagu_g2k2166b-kill_dc928d.sock\n",
+   "retry_stdout_tail": "Failed - 2026-09-23 01:26:55\n\ndag: g2k2166b-kill\n\u2502\n\u251c\u2500step1\n\u2502 \n\u2514\u2500step2\n\nResult: Failed\n\n",
+   "status_after": "running"
+  },
+  {
+   "seconds_after_kill": 95.1,
+   "retry_exit": 1,
+   "retry_stderr_tail": "2166b-kill run-id=g2k2166b-kill-1 err=\"already running. dag-run ID=g2k2166b-kill-1, socket=/tmp/@dagu_g2k2166b-kill_dc928d.sock\"\nError: failed to execute the dag-run g2k2166b-kill (dag-run ID: g2k2166b-kill-1): already running. dag-run ID=g2k2166b-kill-1, socket=/tmp/@dagu_g2k2166b-kill_dc928d.sock\n",
+   "retry_stdout_tail": "Failed - 2026-09-23 01:27:55\n\ndag: g2k2166b-kill\n\u2502\n\u251c\u2500step1\n\u2502 \n\u2514\u2500step2\n\nResult: Failed\n\n",
+   "status_after": "running"
+  }
+ ],
+ "scheduler_phase": {
+  "scheduler_started_seconds_after_kill": 95.1,
+  "polls": [
+   {
+    "seconds_after_kill": 95.1,
+    "status": "running"
+   },
+   {
+    "seconds_after_kill": 110.2,
+    "status": "running"
+   },
+   {
+    "seconds_after_kill": 125.2,
+    "status": "running"
+   },
+   {
+    "seconds_after_kill": 140.3,
+    "status": "running"
+   },
+   {
+    "seconds_after_kill": 155.3,
+    "status": "running"
+   },
+   {
+    "seconds_after_kill": 170.3,
+    "status": "running"
+   },
+   {
+    "seconds_after_kill": 185.4,
+    "status": "running"
+   },
+   {
+    "seconds_after_kill": 200.4,
+    "status": "running"
+   },
+   {
+    "seconds_after_kill": 215.4,
+    "status": "running"
+   },
+   {
+    "seconds_after_kill": 230.5,
+    "status": "failed"
+   }
+  ],
+  "status_when_poll_ended": "failed",
+  "retry_after_scheduler": {
+   "seconds_after_kill": 250.8,
+   "exit": 0,
+   "stderr_tail": "id=g2k2166b-kill-1 worker-id=local attempt-id=b421b7 step=step2\ntime=2026-09-23T01:30:31.221-04:00 level=INFO msg=\"DAG run finished\" dag=g2k2166b-kill run-id=g2k2166b-kill-1 worker-id=local attempt-id=b421b7 status=succeeded started-at=2026-09-23T01:30:11-04:00 finished-at=2026-09-23T01:30:31-04:00\n",
+   "status_after": "succeeded"
+  }
+ },
+ "final_status": "succeeded",
+ "markers": {
+  "step1.finished": [
+   "1790141431"
+  ],
+  "step1.started": [
+   "1790141178",
+   "1790141411"
+  ],
+  "step2.ran": [
+   "1790141431"
+  ]
+ },
+ "telemetry": {
+  "endpoint": "/api/v1/metrics",
+  "http": 200,
+  "dagu_metric_lines": [
+   "dagu_cache_entries_total{cache=\"dag_definition\"} 0",
+   "dagu_cache_entries_total{cache=\"dag_run_status\"} 1",
+   "dagu_dag_run_duration_seconds_bucket{dag=\"g2k2166b-kill\",le=\"1\"} 0",
+   "dagu_dag_run_duration_seconds_bucket{dag=\"g2k2166b-kill\",le=\"5\"} 0",
+   "dagu_dag_run_duration_seconds_bucket{dag=\"g2k2166b-kill\",le=\"15\"} 0",
+   "dagu_dag_run_duration_seconds_bucket{dag=\"g2k2166b-kill\",le=\"30\"} 1",
+   "dagu_dag_run_duration_seconds_bucket{dag=\"g2k2166b-kill\",le=\"60\"} 1",
+   "dagu_dag_run_duration_seconds_bucket{dag=\"g2k2166b-kill\",le=\"120\"} 1",
+   "dagu_dag_run_duration_seconds_bucket{dag=\"g2k2166b-kill\",le=\"300\"} 1",
+   "dagu_dag_run_duration_seconds_bucket{dag=\"g2k2166b-kill\",le=\"600\"} 1",
+   "dagu_dag_run_duration_seconds_bucket{dag=\"g2k2166b-kill\",le=\"1800\"} 1",
+   "dagu_dag_run_duration_seconds_bucket{dag=\"g2k2166b-kill\",le=\"3600\"} 1",
+   "dagu_dag
+exit 0

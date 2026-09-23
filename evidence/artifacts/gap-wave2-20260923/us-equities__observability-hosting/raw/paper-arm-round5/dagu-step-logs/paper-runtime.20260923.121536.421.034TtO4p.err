@@ -1,0 +1,8 @@
+[SandboxDebug] Initializing sandbox...
+[SandboxDebug] [SeccompFilter] Looking for apply-seccomp binary for architecture: x64
+[SandboxDebug] [SeccompFilter] Found apply-seccomp binary: $HOME/.local/share/codex-ecosystem/tools/sandbox-runtime-0.0.77/lib/node_modules/@anthropic-ai/sandbox-runtime/vendor/seccomp/x64/apply-seccomp (x64)
+[SandboxDebug] mux: HTTP backend listening on $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-5/work/srt-mux-1497012-0.sock
+[SandboxDebug] Mux proxy (HTTP+SOCKS) listening on localhost:58158
+[SandboxDebug] Starting HTTP bridge: socat UNIX-LISTEN:$HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-5/work/claude-http-bdeb07aeac2680e0.sock,fork,reuseaddr TCP:localhost:58158,keepalive,keepidle=10,keepintvl=5,keepcnt=3
+[SandboxDebug] HTTP bridge process exited with code 1, signal null
+Error: Failed to create bridge sockets after 5 attempts

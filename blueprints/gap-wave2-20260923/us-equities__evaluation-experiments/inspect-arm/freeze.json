@@ -1,0 +1,14 @@
+{
+  "kind": "inspect_arm_freeze",
+  "frozen_at": "2026-09-23T07:21:37Z",
+  "before": "first scored inspect eval run (compile/syntax checks only before this freeze)",
+  "inspect_ai": "0.3.266",
+  "model": "mockllm/model with custom_outputs callable (exact-text-baseline-v1 transform evaluated by node)",
+  "files": {
+    "blueprints/gap-wave2-20260923/us-equities__evaluation-experiments/inspect-arm/catalog_task.py": "b667435ddfe809fc804b0cfd1a7bb5ff3f680e52c6ba343711522c650194ca7b",
+    "blueprints/gap-wave2-20260923/us-equities__evaluation-experiments/inspect-arm/bridge.cjs": "05c3aead62ebe8058f06859cc3ec96c9fa97b553fa0e67b7d56c7d1fcdebcc1b",
+    "blueprints/native-skill-practice/catalog-cases.json": "7cc28c50afb9842de3d8dc923e80159bf99d0f0e9acd643684a99b61b3ad3a40",
+    "blueprints/native-skill-practice/promptfooconfig.yaml": "fab8b7e8d9493c61ce58c89333f30b8af63659410d4b609a2daa8e67944f18cb",
+    "blueprints/native-skill-practice/gate.cjs": "e7e94404b06e67b389ea1bb8348457f5fe67f25d4bc7b7286e1f37f733c2ffcc"
+  }
+}

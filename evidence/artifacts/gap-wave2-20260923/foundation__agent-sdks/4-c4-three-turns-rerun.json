@@ -1,0 +1,377 @@
+{
+  "id": "gap-wave2-20260923/foundation/agent-sdks/4-c4-three-turns-rerun",
+  "gap_index": 4,
+  "gap_text_sha256": "0357fbdfa9054e35cae44341d6b5045d2a78357efb7c3641ec8506b0ea2e1066",
+  "preregistration": {
+    "written_at": "2026-09-23T03:24:52Z",
+    "expectation": "With the extraction files inside the worker workspace (cwd), a workspace-write sandbox and non-interactive approval, all three c4 turns extract the six expected values (3943, 3, 0, 23, gpt-6-astra, 0).",
+    "criteria": [
+      "three turns rerun through native_worker.py with SDK 0.155.1 and native 0.155.1",
+      "per-turn extraction success = each expected value present in the final response",
+      "settled if all three turns are rerun and per-turn success recorded (whatever the per-turn result)"
+    ],
+    "fix_round_2": {
+      "written_at": "2026-09-23T04:38:21Z",
+      "label": "fix-round-2 preregistration, written after the independent Opus review and before the two new worker turns; not back-dated",
+      "note": "per-turn summaries gain commandExecution items; Context Mode side effects enumerated by mtime (post hoc) plus the 03:31/03:35Z name listings"
+    }
+  },
+  "commands": [
+    "env -i HOME=$HOME PATH=$HOME/.local/share/codex-ecosystem/bin:/usr/bin:/bin timeout 360s $HOME/.cache/gap-wave2-20260923/agent-sdks/codex-sdk-01551/bin/python blueprints/us-equities/workers/native_worker.py inspect --codex-bin $HOME/.local/share/codex-ecosystem/bin/codex --codex-home $HOME/.codex --workspace $HOME/.cache/gap-wave2-20260923/agent-sdks/c4-ws --receipt $HOME/.cache/gap-wave2-20260923/agent-sdks/runs/c4-inspect.json --config-override features.hooks=false --config-override features.plugin_hooks=false --config-override features.apps=false --config-override 'otel.exporter=\"none\"' --config-override 'otel.metrics_exporter=\"none\"' --config-override analytics.enabled=false --sandbox workspace-write --approval-mode auto_review",
+    "env -i HOME=$HOME PATH=$HOME/.local/share/codex-ecosystem/bin:/usr/bin:/bin timeout --signal=TERM --kill-after=10s 360s $HOME/.cache/gap-wave2-20260923/agent-sdks/codex-sdk-01551/bin/python blueprints/us-equities/workers/native_worker.py run --codex-bin $HOME/.local/share/codex-ecosystem/bin/codex --codex-home $HOME/.codex --workspace $HOME/.cache/gap-wave2-20260923/agent-sdks/c4-ws --prompt $HOME/.cache/gap-wave2-20260923/agent-sdks/runs/c4-t1.prompt --receipt $HOME/.cache/gap-wave2-20260923/agent-sdks/runs/c4-t1.json --turn-deadline-seconds 300 --config-override features.hooks=false --config-override features.plugin_hooks=false --config-override features.apps=false --config-override 'otel.exporter=\"none\"' --config-override 'otel.metrics_exporter=\"none\"' --config-override analytics.enabled=false --sandbox workspace-write --approval-mode auto_review",
+    "env -i HOME=$HOME PATH=$HOME/.local/share/codex-ecosystem/bin:/usr/bin:/bin timeout --signal=TERM --kill-after=10s 360s $HOME/.cache/gap-wave2-20260923/agent-sdks/codex-sdk-01551/bin/python blueprints/us-equities/workers/native_worker.py run --codex-bin $HOME/.local/share/codex-ecosystem/bin/codex --codex-home $HOME/.codex --workspace $HOME/.cache/gap-wave2-20260923/agent-sdks/c4-ws --prompt $HOME/.cache/gap-wave2-20260923/agent-sdks/runs/c4-t2.prompt --receipt $HOME/.cache/gap-wave2-20260923/agent-sdks/runs/c4-t2.json --turn-deadline-seconds 300 --config-override features.hooks=false --config-override features.plugin_hooks=false --config-override features.apps=false --config-override 'otel.exporter=\"none\"' --config-override 'otel.metrics_exporter=\"none\"' --config-override analytics.enabled=false --sandbox workspace-write --approval-mode auto_review",
+    "env -i HOME=$HOME PATH=$HOME/.local/share/codex-ecosystem/bin:/usr/bin:/bin timeout --signal=TERM --kill-after=10s 360s $HOME/.cache/gap-wave2-20260923/agent-sdks/codex-sdk-01551/bin/python blueprints/us-equities/workers/native_worker.py run --codex-bin $HOME/.local/share/codex-ecosystem/bin/codex --codex-home $HOME/.codex --workspace $HOME/.cache/gap-wave2-20260923/agent-sdks/c4-ws --prompt $HOME/.cache/gap-wave2-20260923/agent-sdks/runs/c4-t3.prompt --receipt $HOME/.cache/gap-wave2-20260923/agent-sdks/runs/c4-t3.json --turn-deadline-seconds 300 --context-mode-start $HOME/.codex/plugins/cache/context-mode/context-mode/1.0.169/start.mjs --config-override features.hooks=false --config-override features.plugin_hooks=false --config-override features.apps=false --config-override 'otel.exporter=\"none\"' --config-override 'otel.metrics_exporter=\"none\"' --config-override analytics.enabled=false --sandbox workspace-write --approval-mode auto_review",
+    "env -i HOME=$HOME PATH=$HOME/.local/share/codex-ecosystem/bin:/usr/bin:/bin timeout --signal=TERM --kill-after=10s 360s $HOME/.cache/gap-wave2-20260923/agent-sdks/codex-sdk-01551/bin/python blueprints/us-equities/workers/native_worker.py run --codex-bin $HOME/.local/share/codex-ecosystem/bin/codex --codex-home $HOME/.codex --workspace $HOME/.cache/gap-wave2-20260923/agent-sdks/c4-ws --prompt $HOME/.cache/gap-wave2-20260923/agent-sdks/runs/c4-t1.prompt --receipt $HOME/.cache/gap-wave2-20260923/agent-sdks/runs/c4-t1-root.json --turn-deadline-seconds 300 --context-mode-start $HOME/.codex/plugins/cache/context-mode/context-mode/1.0.169/start.mjs --config-override features.hooks=false --config-override features.plugin_hooks=false --config-override features.apps=false --config-override 'otel.exporter=\"none\"' --config-override 'otel.metrics_exporter=\"none\"' --config-override analytics.enabled=false --sandbox workspace-write --approval-mode auto_review",
+    "python3 blueprints/gap-wave2-20260923/foundation__agent-sdks/ctxmode_window.py $HOME/.cache/gap-wave2-20260923/agent-sdks/runs  # fix round 2, read-only mtime scan"
+  ],
+  "results": {
+    "per_turn": {
+      "c4-t1.json": {
+        "file": "c4-t1.json",
+        "status": "completed",
+        "sdk_version": "0.155.1",
+        "thread_mode": "ephemeral",
+        "sandbox": "workspace-write",
+        "approval_mode": "auto_review",
+        "final_response_excerpt": "{\n  \"engine_data_points\": {\n    \"value\": null,\n    \"source\": \"engine-receipt.json\",\n    \"status\": \"Extraction failed\"\n  },\n  \"engine_simulated_orders\": {\n    \"value\": null,\n    \"source\": \"engine-receipt.json\",\n    \"status\": \"Extraction failed\"\n  },\n  \"engine_failed_data_requests\": {\n    \"value\": null,\n    \"source\": \"engine-receipt.json\",\n    \"status\": \"Extraction failed\"\n  },\n  \"deerflow_skills\": ",
+        "tool_items": [
+          {
+            "server": "context-mode",
+            "tool": "ctx_execute_file",
+            "status": "failed"
+          },
+          {
+            "server": "context-mode",
+            "tool": "ctx_execute_file",
+            "status": "failed"
+          }
+        ],
+        "command_items": {
+          "count": 11,
+          "commands": [
+            {
+              "command": "/bin/bash -lc pwd",
+              "exitCode": 0,
+              "status": "completed"
+            },
+            {
+              "command": "/bin/bash -lc \"sed -n '1,220p' $HOME/.codex/plugins/cache/context-mode/context-mode/1.0.169/skills/context-mode/SKILL.md\"",
+              "exitCode": 0,
+              "status": "completed"
+            },
+            {
+              "command": "/bin/bash -lc \"rg --files -g 'AGENTS.md' -g '*receipt.json' -g '\"'!node_modules'\"' -g '\"'!vendor'\"'\"",
+              "exitCode": 0,
+              "status": "completed"
+            },
+            {
+              "command": "/bin/bash -lc \"sed -n '1,180p' $HOME/.codex/RTK.md\"",
+              "exitCode": 0,
+              "status": "completed"
+            },
+            {
+              "command": "/bin/bash -lc \"rg -n -C 7 'root|repair|ctx_execute|mcporter' $HOME/codex-ecosystem/docs/native-token-workflow.md\"",
+              "exitCode": 0,
+              "status": "completed"
+            },
+            {
+              "command": "/bin/bash -lc \"rtk proxy rg -n -C 4 'context-mode|ctx_execute|--stdio' $HOME/codex-ecosystem/docs/native-session-commands.md\"",
+              "exitCode": 0,
+              "status": "completed"
+            },
+            {
+              "command": "/bin/bash -lc \"rtk proxy rg --files $HOME/.codex/plugins/cache/context-mode/context-mode/1.0.169 -g 'start.mjs'\"",
+              "exitCode": 0,
+              "status": "completed"
+            },
+            {
+              "command": "/bin/bash -lc 'rtk proxy mcporter call --help'",
+              "exitCode": 0,
+              "status": "completed"
+            },
+            {
+              "command": "/bin/bash -lc \"rtk proxy mcporter call --stdio 'node $HOME/.codex/plugins/cache/context-mode/context-mode/1.0.169/start.mjs' --cwd '$HOME/.cache/gap-wave2-20260923/agent-sdks/c4-ws' --env 'CONTEXT_MODE_PROJECT_DIR=$HOME/",
+              "exitCode": 1,
+              "status": "failed"
+            },
+            {
+              "command": "/bin/bash -lc \"rtk proxy mcporter call --stdio 'node $HOME/.codex/plugins/cache/context-mode/context-mode/1.0.169/start.mjs' --cwd '$HOME/.cache/gap-wave2-20260923/agent-sdks/c4-ws' --env 'CONTEXT_MODE_PROJECT_DIR=$HOME/",
+              "exitCode": 1,
+              "status": "failed"
+            },
+            {
+              "command": "/bin/bash -lc 'rtk proxy node $HOME/.codex/plugins/cache/context-mode/context-mode/1.0.169/start.mjs'",
+              "exitCode": 0,
+              "status": "completed"
+            }
+          ]
+        },
+        "usage_total": {
+          "cacheWriteInputTokens": 0,
+          "cachedInputTokens": 232960,
+          "inputTokens": 266821,
+          "outputTokens": 3346,
+          "reasoningOutputTokens": 1426,
+          "totalTokens": 270167
+        },
+        "extraction_success": false
+      },
+      "c4-t2.json": {
+        "file": "c4-t2.json",
+        "status": "completed",
+        "sdk_version": "0.155.1",
+        "thread_mode": "ephemeral",
+        "sandbox": "workspace-write",
+        "approval_mode": "auto_review",
+        "final_response_excerpt": "{\n  \"tool\": \"mcp__context_mode__ctx_execute_file\",\n  \"exit_code\": 1,\n  \"error\": \"ENOENT: no such file or directory, open '$HOME/code/nas-wt-codex-review96/engine-receipt.json'\",\n  \"stopped\": true,\n  \"deerflow_attempted\": false\n}",
+        "tool_items": [
+          {
+            "server": "context-mode",
+            "tool": "ctx_execute_file",
+            "status": "failed"
+          }
+        ],
+        "command_items": {
+          "count": 1,
+          "commands": [
+            {
+              "command": "/bin/bash -lc \"sed -n '1,220p' $HOME/.codex/plugins/cache/context-mode/context-mode/1.0.169/skills/context-mode/SKILL.md\"",
+              "exitCode": 0,
+              "status": "completed"
+            }
+          ]
+        },
+        "usage_total": {
+          "cacheWriteInputTokens": 0,
+          "cachedInputTokens": 39296,
+          "inputTokens": 62297,
+          "outputTokens": 477,
+          "reasoningOutputTokens": 106,
+          "totalTokens": 62774
+        },
+        "extraction_success": false
+      },
+      "c4-t3.json": {
+        "file": "c4-t3.json",
+        "status": "completed",
+        "sdk_version": "0.155.1",
+        "thread_mode": "ephemeral",
+        "sandbox": "workspace-write",
+        "approval_mode": "auto_review",
+        "final_response_excerpt": "{\n  \"engine_data_points\": 3943,\n  \"engine_simulated_orders\": 3,\n  \"engine_failed_data_requests\": 0,\n  \"deerflow_upstream_skill_count\": 23,\n  \"acp_configured_model\": \"gpt-6-astra\",\n  \"acp_prompt_calls\": 0,\n  \"tool_used\": \"mcp__context_mode__ctx_execute_file\"\n}",
+        "tool_items": [
+          {
+            "server": "context-mode",
+            "tool": "ctx_execute_file",
+            "status": "completed"
+          },
+          {
+            "server": "context-mode",
+            "tool": "ctx_execute_file",
+            "status": "completed"
+          }
+        ],
+        "command_items": {
+          "count": 1,
+          "commands": [
+            {
+              "command": "/bin/bash -lc \"sed -n '1,220p' $HOME/.codex/plugins/cache/context-mode/context-mode/1.0.169/skills/context-mode/SKILL.md\"",
+              "exitCode": 0,
+              "status": "completed"
+            }
+          ]
+        },
+        "usage_total": {
+          "cacheWriteInputTokens": 0,
+          "cachedInputTokens": 73728,
+          "inputTokens": 85888,
+          "outputTokens": 756,
+          "reasoningOutputTokens": 197,
+          "totalTokens": 86644
+        },
+        "extraction_success": true
+      },
+      "c4-t1-root.json": {
+        "file": "c4-t1-root.json",
+        "status": "completed",
+        "sdk_version": "0.155.1",
+        "thread_mode": "ephemeral",
+        "sandbox": "workspace-write",
+        "approval_mode": "auto_review",
+        "final_response_excerpt": "{\n  \"engine_data_points\": {\n    \"value\": 3943,\n    \"source\": \"engine-receipt.json \u2192 $.backtest.data_points\"\n  },\n  \"engine_simulated_orders\": {\n    \"value\": 3,\n    \"source\": \"engine-receipt.json \u2192 $.backtest.simulated_orders\"\n  },\n  \"engine_failed_data_requests\": {\n    \"value\": 0,\n    \"scope\": \"Engine local-data-provider requests, not network API requests.\",\n    \"source\": \"engine-receipt.json \u2192 $.",
+        "tool_items": [
+          {
+            "server": "context-mode",
+            "tool": "ctx_execute_file",
+            "status": "completed"
+          },
+          {
+            "server": "context-mode",
+            "tool": "ctx_execute_file",
+            "status": "failed"
+          },
+          {
+            "server": "context-mode",
+            "tool": "ctx_execute_file",
+            "status": "completed"
+          }
+        ],
+        "command_items": {
+          "count": 2,
+          "commands": [
+            {
+              "command": "/bin/bash -lc \"sed -n '1,200p' $HOME/.codex/plugins/cache/context-mode/context-mode/1.0.169/skills/context-mode/SKILL.md\"",
+              "exitCode": 0,
+              "status": "completed"
+            },
+            {
+              "command": "/bin/bash -lc \"sed -n '1,160p' $HOME/.codex/RTK.md\"",
+              "exitCode": 0,
+              "status": "completed"
+            }
+          ]
+        },
+        "usage_total": {
+          "cacheWriteInputTokens": 0,
+          "cachedInputTokens": 100096,
+          "inputTokens": 115613,
+          "outputTokens": 2131,
+          "reasoningOutputTokens": 811,
+          "totalTokens": 117744
+        },
+        "extraction_success": true
+      }
+    },
+    "turn_map": {
+      "turn 1 research": [
+        "c4-t1.json (cwd only)",
+        "c4-t1-root.json (Context Mode root scoped to the workspace)"
+      ],
+      "turn 2 file-scope": [
+        "c4-t2.json (cwd only)"
+      ],
+      "turn 3 scoped override": [
+        "c4-t3.json (root scoped; same prompt as turn 2)"
+      ]
+    },
+    "root_cause_of_cwd_only_failures": "With cwd only, the plugin's Context Mode server resolved its project root to another concurrently active worktree ($HOME/code/nas-wt-codex-review96): its bundled resolver falls back to the most recent Codex transcript (transcriptMaxAgeMs 300000) because the plugin launches from its install dir (source: server.bundle.mjs function Et, start.mjs safeOriginalCwd).",
+    "context_mode_side_effects": {
+      "method": "(a) name listings of $HOME/.codex/context-mode taken at 03:31:35Z (before c4-t1) and 03:35:03Z (after c4-t3); (b) a post-hoc read-only mtime scan for 03:31:30-03:38:00Z (covers c4-t1-root) run in fix round 2 by ctxmode_window.py",
+      "name_listing_diff": {
+        "added": [
+          "stats-pid-2792946.json",
+          "stats-pid-2814784.json",
+          "stats-pid-2820499.json"
+        ],
+        "removed": []
+      },
+      "mtime_window_files": [
+        {
+          "path": "content/c8dec9624e21bd03.db",
+          "mtime": "2026-09-23T03:35:44.202Z",
+          "candidate_runs_by_interval": null
+        },
+        {
+          "path": "sessions/stats-pid-2779837.json",
+          "mtime": "2026-09-23T03:35:44.193Z",
+          "candidate_runs_by_interval": [
+            "c4-t1-root.json"
+          ],
+          "stats_total_calls": 14,
+          "stats_bytes_indexed": 554254
+        },
+        {
+          "path": "sessions/stats-pid-2792946.json",
+          "mtime": "2026-09-23T03:33:55.487Z",
+          "candidate_runs_by_interval": [
+            "c4-t1.json"
+          ],
+          "stats_total_calls": 6,
+          "stats_bytes_indexed": 0
+        },
+        {
+          "path": "sessions/stats-pid-2814784.json",
+          "mtime": "2026-09-23T03:34:19.947Z",
+          "candidate_runs_by_interval": [
+            "c4-t2.json"
+          ],
+          "stats_total_calls": 15,
+          "stats_bytes_indexed": 0
+        },
+        {
+          "path": "sessions/stats-pid-2820499.json",
+          "mtime": "2026-09-23T03:34:57.391Z",
+          "candidate_runs_by_interval": [
+            "c4-t3.json"
+          ],
+          "stats_total_calls": 2,
+          "stats_bytes_indexed": 0
+        },
+        {
+          "path": "sessions/stats-pid-2832580.json",
+          "mtime": "2026-09-23T03:36:46.766Z",
+          "candidate_runs_by_interval": [
+            "c4-t1-root.json"
+          ],
+          "stats_total_calls": 3,
+          "stats_bytes_indexed": 0
+        }
+      ],
+      "receipt_mcp_tool_calls": {
+        "c4-t1.json": 2,
+        "c4-t2.json": 1,
+        "c4-t3.json": 2,
+        "c4-t1-root.json": 3
+      },
+      "reading": "Four stats-pid files follow this unit's four c4 turns (the earlier receipt named three; stats-pid-2832580 belongs to c4-t1-root, which ran after the second listing). For the root-scoped turns (c4-t3, c4-t1-root) stats total_calls equals the receipt's MCP call count (2, 3); for the cwd-only turns (c4-t1, c4-t2) it is larger (6 vs 2, 15 vs 1), consistent with those servers accounting against another session's state. stats-pid-2779837 and content/c8dec9624e21bd03.db (both 03:35:44Z, 554254 bytes indexed) fall in c4-t1-root's interval but its call count (14) and indexing match no worker receipt; they are not attributed to this unit. No session or content database was added by name in 03:31:35-03:35:03Z."
+    }
+  },
+  "raw_outputs": [
+    {
+      "path": "raw/c4-inspect.json",
+      "sha256": "34dd13430e3c2d0d5860bec7a423d95765521df62e83947c3129a42c5dc1db8f"
+    },
+    {
+      "path": "raw/c4-t1.json",
+      "sha256": "95ee68fbdc8374d65ab51174d5eee6d45d1c8a5ba64666e5383b2c3e3a430184"
+    },
+    {
+      "path": "raw/c4-t2.json",
+      "sha256": "a721e434ebac0ced93b4920d3f13e1e33196f83146aa3444757c58f43c640eb0"
+    },
+    {
+      "path": "raw/c4-t3.json",
+      "sha256": "49dc7513e5025475e2fc790a6de22bcecd534fce0e0ab55e05848ef4cc9857a5"
+    },
+    {
+      "path": "raw/c4-t1-root.json",
+      "sha256": "8e307a51dd64f176ac320c67d8dfd3bb66fcb3ad35e38f8dfd312f519c6ebaa0"
+    },
+    {
+      "path": "raw/c4-t1.prompt",
+      "sha256": "799748f3284fd688e326236cc0846b7730a22fa4b6aee1d4cbdb697c308e0224"
+    },
+    {
+      "path": "raw/c4-t2.prompt",
+      "sha256": "40dcd7a39c3312a580a9249c59ff520c99c6146dea73aad423b265649a51513e"
+    },
+    {
+      "path": "raw/c4-t3.prompt",
+      "sha256": "40dcd7a39c3312a580a9249c59ff520c99c6146dea73aad423b265649a51513e"
+    },
+    {
+      "path": "raw/ctxmode-c4-window.json",
+      "sha256": "537bfa56a4951289da286c936b5b26f38b7a3205dc61ebeb9ef1b8b629fedfba"
+    }
+  ],
+  "outcome": "settled",
+  "evidence_class": "native_proven",
+  "limits": [
+    "Prompts are reconstructions (the 2026-09-19 prompts are private; only their sha256 is published). Workspace files are copies of blueprints/us-equities/engine/receipt.json and deerflow/native-receipt.json.",
+    "Host hooks, apps and OTLP export were disabled (to keep ai-memory hooks off the live store); the original c4 run had them on.",
+    "auto_review approvals are not visible in the worker receipt, so whether the reviewer approved a request or none was raised is unobserved.",
+    "Context Mode wrote four stats-pid-*.json files under $HOME/.codex/context-mode/sessions (left in place; see context_mode_side_effects). The enumeration cannot see content changes to existing files between the listings, nor files written in the window and rewritten later (their mtime moves out of the window); a pre-existing database written by a cwd-only turn and later by its owning session would be missed.",
+    "The c4 turns ran shell commands as well as MCP calls (command_items per turn); c4-t1 read host files and started the host Context Mode server through mcporter/node itself (see gap 2)."
+  ],
+  "checked_at": "2026-09-23T04:23:16Z"
+}

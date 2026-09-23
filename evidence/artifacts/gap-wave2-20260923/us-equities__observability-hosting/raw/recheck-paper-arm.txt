@@ -1,0 +1,58 @@
+== round 5
+PASS exact line: backup exit=0
+PASS exact line: check exit=0
+PASS exact line: restore exit=0
+PASS exact line: hot check exit=0
+PASS exact line: hot restore exit=0
+PASS exact line: diff -rq work exit=0 lines=0
+PASS exact line: diff -rq dagu exit=0 lines=0
+FAIL loki body multiset equals step-log MARK lines before-kill 0 0
+FAIL loki body multiset equals step-log MARK lines after-restart 0 0
+FAIL loki pre-kill (ts, body) pairs all present after-restart
+FAIL loki body multiset equals step-log MARK lines restored 0 0
+FAIL loki pre-kill (ts, body) pairs all present restored
+PASS span series before kill {'Step: paper-runtime': '1', 'Step: hot-backup': '1', 'DAG: obsgap-paper': '1'}
+PASS span values equal to pre-kill after-restart {'Step: paper-runtime': '1', 'Step: hot-backup': '1', 'DAG: obsgap-paper': '1'}
+PASS span values equal to pre-kill restored {'Step: paper-runtime': '1', 'Step: hot-backup': '1', 'DAG: obsgap-paper': '1'}
+FAIL hot snapshot time inside workload window None 1790180151.317571 None
+FAIL hot journal integrity {'error': "OperationalError('no such table: intents')"}
+INFO hot vs cold journal counts: hot=None cold=None
+== round 6
+PASS exact line: backup exit=0
+PASS exact line: check exit=0
+PASS exact line: restore exit=0
+PASS exact line: hot check exit=0
+PASS exact line: hot restore exit=0
+PASS exact line: diff -rq work exit=0 lines=0
+PASS exact line: diff -rq dagu exit=0 lines=0
+PASS loki body multiset equals step-log MARK lines before-kill 311 311
+FAIL loki body multiset equals step-log MARK lines after-restart 622 311
+PASS loki pre-kill (ts, body) pairs all present after-restart
+FAIL loki body multiset equals step-log MARK lines restored 622 311
+PASS loki pre-kill (ts, body) pairs all present restored
+PASS span series before kill {'Step: hot-backup': '1', 'DAG: obsgap-paper': '1', 'Step: paper-runtime': '1'}
+PASS span values equal to pre-kill after-restart {'Step: hot-backup': '1', 'DAG: obsgap-paper': '1', 'Step: paper-runtime': '1'}
+PASS span values equal to pre-kill restored {'Step: hot-backup': '1', 'DAG: obsgap-paper': '1', 'Step: paper-runtime': '1'}
+PASS hot snapshot time inside workload window 1790180312.6988344 1790180327.248257 1790180343.2347684
+PASS hot journal integrity {'integrity': 'ok', 'counts': {'intents': 20, 'requests': 21, 'events': 41, 'positions': 2, 'marks': 6, 'trials': 0}}
+INFO hot vs cold journal counts: hot={'intents': 20, 'requests': 21, 'events': 41, 'positions': 2, 'marks': 6, 'trials': 0} cold={'intents': 20, 'requests': 22, 'events': 41, 'positions': 2, 'marks': 6, 'trials': 0}
+== round 8
+PASS exact line: backup exit=0
+PASS exact line: check exit=0
+PASS exact line: restore exit=0
+PASS exact line: hot check exit=0
+PASS exact line: hot restore exit=0
+PASS exact line: diff -rq work exit=0 lines=0
+PASS exact line: diff -rq dagu exit=0 lines=0
+PASS loki body multiset equals step-log MARK lines before-kill 300 300
+PASS loki body multiset equals step-log MARK lines after-restart 300 300
+PASS loki pre-kill (ts, body) pairs all present after-restart
+PASS loki body multiset equals step-log MARK lines restored 300 300
+PASS loki pre-kill (ts, body) pairs all present restored
+PASS span series before kill {'Step: hot-backup': '1', 'DAG: obsgap-paper': '1', 'Step: paper-runtime': '1'}
+PASS span values equal to pre-kill after-restart {'Step: hot-backup': '1', 'DAG: obsgap-paper': '1', 'Step: paper-runtime': '1'}
+PASS span values equal to pre-kill restored {'Step: hot-backup': '1', 'DAG: obsgap-paper': '1', 'Step: paper-runtime': '1'}
+PASS hot snapshot time inside workload window 1790180772.7387433 1790180786.638537 1790180803.4371452
+PASS hot journal integrity {'integrity': 'ok', 'counts': {'intents': 16, 'requests': 17, 'events': 33, 'positions': 2, 'marks': 6, 'trials': 0}}
+INFO hot vs cold journal counts: hot={'intents': 16, 'requests': 17, 'events': 33, 'positions': 2, 'marks': 6, 'trials': 0} cold={'intents': 16, 'requests': 18, 'events': 33, 'positions': 2, 'marks': 6, 'trials': 0}
+{"5": {"pass": 10, "fail": 7}, "6": {"pass": 15, "fail": 2}, "8": {"pass": 17, "fail": 0}}

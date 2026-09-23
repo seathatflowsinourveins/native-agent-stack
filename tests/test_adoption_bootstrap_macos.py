@@ -28,12 +28,16 @@ PAGE_PATH = ROOT / "adoption/platforms/macos-arm64.md"
 STACK_PATH = ROOT / "manifests/stack.json"
 
 SHA256_HEX = re.compile(r"[0-9a-f]{64}\Z")
-VALID_KINDS = {"tarball", "zip", "npm"}
+VALID_KINDS = {"tarball", "zip", "npm", "native"}
 VALID_CHECKSUM_SOURCES = {
     "publisher_checksum_file",
     "publisher_checksum_sidecar",
     "github_release_asset_digest_plus_local_rehash",
     "npm_registry_integrity_crosscheck",
+    # 2026-09-23: claude-code's native pin's checksum is cross-checked
+    # against the release manifest.json plus an independent re-download and
+    # re-hash of the actual served binary (see NativeClaudeCodePinTests).
+    "manifest_crosscheck",
 }
 PROFILE_ID = "macos-arm64-foundation"
 # Every macos-arm64-foundation component now has a pin (socraticode's npm pin
@@ -158,8 +162,13 @@ class PinsSchemaTests(unittest.TestCase):
                 self.assertTrue(tool["url"].startswith("https://registry.npmjs.org/"), tool["id"])
             else:
                 asset = tool["url"].rsplit("/", 1)[-1]
+                # A native pin (2026-09-23: claude-code) encodes the platform
+                # in a URL path segment (.../darwin-arm64/claude), not the
+                # bare filename, so check the whole URL there instead of
+                # just its last segment.
+                haystack = tool["url"] if tool.get("kind") == "native" else asset
                 self.assertRegex(
-                    asset,
+                    haystack,
                     r"(darwin-arm64|aarch64-apple-darwin|macOS_arm64|macos-aarch64|macos-arm64)",
                     f"{tool['id']} asset {asset} does not name a darwin/arm64 build",
                 )
@@ -181,18 +190,52 @@ class PinsSchemaTests(unittest.TestCase):
                                  f"{tool['id']} is the same registry tarball; hash must match")
 
     def test_client_npm_pins_name_and_pin_their_darwin_arm64_platform_dependency(self):
-        # Once documented as "unpinned" (round 1); each now carries a real
+        # Once documented as "unpinned" (round 1); codex still carries a real
         # platform_dependency with its own verified sha256, so this checks
         # both that install_note still names it and that it is genuinely
-        # pinned, not merely mentioned.
+        # pinned, not merely mentioned. claude-code moved to a native pin
+        # (2026-09-23, see NativeClaudeCodePinTests below) and no longer has
+        # a platform_dependency to check here.
         by_id = {tool["id"]: tool for tool in self.pins["tools"]}
         self.assertIn("@openai/codex-darwin-arm64", by_id["codex"]["install_note"])
-        self.assertIn("@anthropic-ai/claude-code-darwin-arm64", by_id["claude-code"]["install_note"])
-        for tool_id, dep_name in (("codex", "@openai/codex-darwin-arm64"),
-                                   ("claude-code", "@anthropic-ai/claude-code-darwin-arm64")):
-            dep = by_id[tool_id]["platform_dependency"]
-            self.assertEqual(dep["name"], dep_name)
-            self.assertRegex(dep["sha256"], SHA256_HEX)
+        dep = by_id["codex"]["platform_dependency"]
+        self.assertEqual(dep["name"], "@openai/codex-darwin-arm64")
+        self.assertRegex(dep["sha256"], SHA256_HEX)
+
+
+class NativeClaudeCodePinTests(unittest.TestCase):
+    """2026-09-23: claude-code moved from an npm wrapper + platform_dependency
+    postinstall-copy pin to the native self-installing binary, matching the
+    linux-x86_64 pin and ~/codex-ecosystem/bin/bootstrap-linux.sh's
+    own claude-code step."""
+
+    def setUp(self):
+        self.pins = json.loads(PINS_PATH.read_text())
+        self.linux_pins = json.loads(LINUX_PINS_PATH.read_text())
+        self.by_id = {tool["id"]: tool for tool in self.pins["tools"]}
+        self.linux_by_id = {tool["id"]: tool for tool in self.linux_pins["tools"]}
+
+    def test_claude_code_is_a_native_pin(self):
+        tool = self.by_id["claude-code"]
+        self.assertEqual(tool["kind"], "native")
+        self.assertEqual(tool["version"], "2.1.280")
+        self.assertEqual(tool["version"], self.linux_by_id["claude-code"]["version"])
+        self.assertRegex(tool["sha256"], SHA256_HEX)
+        self.assertIn("darwin-arm64", tool["url"])
+        self.assertIn("2.1.280", tool["url"])
+        self.assertNotIn("platform_dependency", tool)
+
+    def test_claude_code_sha256_differs_from_linux_binary(self):
+        # Different platform binaries, so different bytes and different
+        # checksums; this pin must not accidentally reuse the linux hash.
+        self.assertNotEqual(self.by_id["claude-code"]["sha256"],
+                             self.linux_by_id["claude-code"]["sha256"])
+
+    def test_bootstrap_macos_has_a_native_pin_case(self):
+        text = SCRIPT_PATH.read_text()
+        self.assertIn("install_native()", text)
+        self.assertIn("*-native)", text)
+        self.assertIn('"$download" install "$version"', text)
 
     def test_mcporter_note_does_not_claim_its_tarball_is_the_whole_install(self):
         # `npm view mcporter@0.13.13 dependencies bundleDependencies` (2026-09-22):

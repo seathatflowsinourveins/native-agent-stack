@@ -1,0 +1,105 @@
+{
+  "id": "gap-wave2-20260923-foundation-observation-inference-6",
+  "gap_index": 6,
+  "gap_text_sha256": "caf4b236a8d1f1ad5ba1f567f1192e6ef7071431f05070d677ef6abd1a60a600",
+  "gap_text": "No latency or elapsed-time measurement is claimed for notifications (observability/receipt.json line 311).",
+  "next_check": "Fire a synthetic test alert through Alertmanager to ntfy N times, timestamp the alert and the ntfy receipt, and report the latency distribution.",
+  "arms": [
+    {
+      "arm": "fire a synthetic test alert through Alertmanager to ntfy N times",
+      "status": "executed",
+      "detail": "N=20, repository route and ntfy template, twice"
+    },
+    {
+      "arm": "timestamp the alert and the ntfy receipt",
+      "status": "executed",
+      "detail": "one monotonic clock; POST time taken before sending (fix round also for resolve)"
+    },
+    {
+      "arm": "report the latency distribution",
+      "status": "executed",
+      "detail": "min/median/p90/max/mean/stdev for firing and resolved"
+    }
+  ],
+  "preregistration": {
+    "written_at": "2026-09-23T02:46:44Z",
+    "expectation": "Firing N=20 distinct synthetic alerts through an isolated Alertmanager 0.34.1 using the repository route (group_wait 5s) into an isolated ntfy 2.28.0 with the repository alertmanager template will give an end-to-end latency near group_wait (about 5 s) with small spread.",
+    "criteria": "Report min/median/p90/max of (ntfy stream arrival time - alert POST time) over N alerts, count delivered/lost. Pass = all N delivered and a distribution recorded; the number itself is not pass/fail.",
+    "late": false,
+    "committed_in": "1a59606 (2026-09-23T02:46:44Z, before any check ran)",
+    "fix_round": {
+      "written_at": "2026-09-23T03:28:46Z",
+      "label": "fix-round preregistration (after the independent Codex review in raw/review-codex-round1.txt), written before the fix-round runs",
+      "expectation": "Timestamping the resolve POST before sending (as for firing) leaves the distributions essentially unchanged (firing about 5 s; resolved within group_interval 30 s).",
+      "criteria": "20/20 delivered for firing and resolved; distribution reported; the earlier run stays retained as run1.",
+      "committed_in": "the commit 'Record the Codex review and preregister the fix round' (2026-09-23T03:28:46Z, before the fix-round runs)"
+    }
+  },
+  "commands": [
+    "cd $HOME/code/nas-wt-g2-observation-inference && python3 blueprints/gap-wave2-20260923/foundation__observation-inference/alert_latency.py -n 20 --out evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/6-alert-latency.json   (fix round; first run retained as 6-alert-latency-run1.*)"
+  ],
+  "results": [
+    "route: {\"group_wait\": \"5s\", \"group_interval\": \"30s\", \"source\": \"observability/backends/templates/ecosystem-alertmanager.yml.example\"}",
+    "fix round firing latency, n=20: {\"n\": 20, \"min_s\": 5.002, \"median_s\": 5.003, \"p90_s\": 5.004, \"max_s\": 5.004, \"mean_s\": 5.003, \"stdev_s\": 0.0}; lost=0",
+    "fix round resolved latency (all 20 resolved at once; timestamp before each resolve POST), n=20: {\"n\": 20, \"min_s\": 10.979, \"median_s\": 20.48, \"p90_s\": 28.088, \"max_s\": 29.993, \"mean_s\": 20.481, \"stdev_s\": 5.771}; lost=0",
+    "run1 firing: {\"n\": 20, \"min_s\": 5.004, \"median_s\": 5.008, \"p90_s\": 5.015, \"max_s\": 5.119, \"mean_s\": 5.014, \"stdev_s\": 0.024}; run1 resolved (timestamp taken after the resolve POST returned): {\"n\": 20, \"min_s\": 10.707, \"median_s\": 20.244, \"p90_s\": 27.879, \"max_s\": 29.782, \"mean_s\": 20.245, \"stdev_s\": 5.79}",
+    "sample firing notification: {\"title\": \"🚨 Alert: SyntheticLatency033053N00\", \"message\": \"Status: Firing\\nReceiver: local-ntfy\\n\\nAlert: SyntheticLatency033053N00\\nSeverity: info\\nStarts at: 2026-09-23T03:30:55.1445Z\\nSummary: Synthetic latency fixture; no service affected.\\nSource: http://127.0.0.1/synthetic\"}"
+  ],
+  "outcome": "settled",
+  "note": "Twenty synthetic alerts through Alertmanager 0.34.1 to ntfy 2.28.0 with the repository route and ntfy template all arrived in both runs. Firing median 5.003 s (range 5.002-5.004 s), set by group_wait 5s; resolved median 20.48 s (range 10.979-29.993 s), spread across group_interval 30s.",
+  "evidence_class": "local_integration",
+  "limits": [
+    "Isolated Alertmanager + ntfy with the repository templates on free loopback ports, not the live services.",
+    "Excludes Prometheus rule evaluation and for: durations and any browser or push delivery beyond the ntfy JSON stream.",
+    "Both timestamps come from one process clock; two runs of 20 alerts."
+  ],
+  "checked_at": "2026-09-23T03:31:49.228616+00:00",
+  "independent_review": {
+    "round1": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/review-codex-round1.txt",
+    "round2": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/review-codex-round2.txt"
+  },
+  "raw_evidence": [
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/6-alert-latency.json",
+      "sha256": "d3f20c31c78a6116e2c07219608f9dc0e0d3bc010db633473280b2c868134278"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/6-alert-latency.stdout.txt",
+      "sha256": "41493c28728e530b07d575872d9b5586e9d340e873b351c5dd186bfdbd2fa3e4"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/6-alert-latency.exit.txt",
+      "sha256": "a2b3f64282482f6a7cb3eaa23d4e40aa477da8b88d953e327c6611690a1894ec"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/6-alert-latency-run1.json",
+      "sha256": "6fe18995b9910a63bbcf4940476c6e6c92a9902a2d81e504d45e8d31bb11edf5"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/6-alert-latency-run1.stdout.txt",
+      "sha256": "6ab9c003636b975412257e50deb12021f49e56c3e843a7bde930bbc5ae7430a2"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/6-alert-latency-run1.exit.txt",
+      "sha256": "19eaf43821a7660ec323a87c8457bf74823beb296c39f5e01aa8a683aa50f061"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/review-codex-round1.txt",
+      "sha256": "ad7cc8072536345565f1a9ad0ca6688e80b71c6d5ea0eacfc765479718b31ee8"
+    },
+    {
+      "file": "evidence/artifacts/gap-wave2-20260923/foundation__observation-inference/raw/review-codex-round2.txt",
+      "sha256": "a1cc543a79e7f621f9ce7d338b3d36d15ba88ee5297b3dd2b49e299ffa91c15b"
+    }
+  ],
+  "helper_scripts": [
+    {
+      "file": "blueprints/gap-wave2-20260923/foundation__observation-inference/isostack.py",
+      "sha256": "0fe3cb2014d707aef0d0dfeafa4e2175a43ee44a78da31906ee6f04b0e3ee9e9"
+    },
+    {
+      "file": "blueprints/gap-wave2-20260923/foundation__observation-inference/alert_latency.py",
+      "sha256": "18b61e73ba1ceff08f2f49bde844b37871521b5fee14a458fe89b976f6f8237b"
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "layer_id": "research-factors-ml",
+  "generated_from": "receipts on disk by blueprints/gap-wave2-20260923/us-equities__research-factors-ml/build_receipts.py",
+  "results": {
+    "0": {
+      "outcome": "advanced",
+      "receipt": "evidence/artifacts/gap-wave2-20260923/us-equities__research-factors-ml/0-nautilus-frozen-selections.json",
+      "receipt_sha256": "b79cb3201fb860419b379a7498c20fe06243bce77b608868c11bbaf7ab512ebb"
+    },
+    "1": {
+      "outcome": "advanced",
+      "receipt": "evidence/artifacts/gap-wave2-20260923/us-equities__research-factors-ml/1-purge-embargo-fold-boundary.json",
+      "receipt_sha256": "653c7252de8a8ec2365c119e2f97a1480f74273dc47688e5221f06061ac01e29"
+    },
+    "5": {
+      "outcome": "advanced",
+      "receipt": "evidence/artifacts/gap-wave2-20260923/us-equities__research-factors-ml/5-factor-forecast-econometrics-executions.json",
+      "receipt_sha256": "070042a293d64a3b22d32efc78c00b358c5d9bd87d8fb22b6a417c92ea0c0952"
+    },
+    "6": {
+      "outcome": "advanced",
+      "receipt": "evidence/artifacts/gap-wave2-20260923/us-equities__research-factors-ml/6-statsforecast-vs-chronos-folds.json",
+      "receipt_sha256": "02d898cc381e740ff7f7d29eb1da91040d5afb6d13aaa00bf5e8d31a990457a3"
+    },
+    "7": {
+      "outcome": "advanced",
+      "receipt": "evidence/artifacts/gap-wave2-20260923/us-equities__research-factors-ml/7-kronos-small-vs-naive.json",
+      "receipt_sha256": "c518597a3117c5d50c7d7f2a0e5f7847b2ed88290846c99a19a814d374b0f0fe"
+    },
+    "9": {
+      "outcome": "deferred",
+      "receipt": "evidence/artifacts/gap-wave2-20260923/us-equities__research-factors-ml/9-alpaca-paper-pipeline.json",
+      "receipt_sha256": "2293a7f61c2f91a5b80d96c5f7fb6bd345b0ba63e48d3e7cc843193ff9933f63"
+    },
+    "10": {
+      "outcome": "advanced",
+      "receipt": "evidence/artifacts/gap-wave2-20260923/us-equities__research-factors-ml/10-nautilus-dividend-fee-cash.json",
+      "receipt_sha256": "3c08cf7b84170ff340661a12ac511a83ad6c44f58f88692a6680ad19c5bd47c2"
+    },
+    "13": {
+      "outcome": "advanced",
+      "receipt": "evidence/artifacts/gap-wave2-20260923/us-equities__research-factors-ml/13-forecast-econometric-matched-comparison.json",
+      "receipt_sha256": "dbbd414f285877463c649456ae398db21d2e54a2e38a3ce60f83b3832ce639e3"
+    },
+    "14": {
+      "outcome": "advanced",
+      "receipt": "evidence/artifacts/gap-wave2-20260923/us-equities__research-factors-ml/14-kronos-and-trading-skills-seeded-defects.json",
+      "receipt_sha256": "a9780a10850885a12910c643e119fc70b648adc87bab9e252eafbe10bcd5d0fa"
+    }
+  }
+}

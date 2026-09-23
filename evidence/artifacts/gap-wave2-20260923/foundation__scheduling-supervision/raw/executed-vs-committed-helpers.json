@@ -1,0 +1,103 @@
+[
+  {
+    "record": "g2-real-1790131602/freeze.json",
+    "file": "config.yaml",
+    "status": "not a committed helper"
+  },
+  {
+    "record": "g2-real-1790131602/freeze.json",
+    "key": "inputs",
+    "file": "dagu_common.py",
+    "status": "identical after inverse home-path substitution",
+    "compared_with": "git b7aec6b"
+  },
+  {
+    "record": "g2-real-1790131602/freeze.json",
+    "key": "inputs",
+    "file": "real_scheduled_recovery.py",
+    "status": "identical",
+    "compared_with": "git b7aec6b"
+  },
+  {
+    "record": "g2-real-1790131602/freeze.json",
+    "key": "inputs",
+    "file": "real_steps.py",
+    "status": "identical",
+    "compared_with": "git b7aec6b"
+  },
+  {
+    "record": "g2-real-1790131602/freeze.json",
+    "file": "realmaint.yaml",
+    "status": "not a committed helper"
+  },
+  {
+    "record": "g11-run-1790131994/freeze.json",
+    "key": "inputs",
+    "file": "codex_cancel_probe.py",
+    "status": "identical",
+    "compared_with": "git b7aec6b"
+  },
+  {
+    "record": "g11-run-1790131994/freeze.json",
+    "key": "inputs",
+    "file": "dagu_common.py",
+    "status": "identical after inverse home-path substitution",
+    "compared_with": "git b7aec6b"
+  },
+  {
+    "record": "g11-run-1790131994/freeze.json",
+    "key": "inputs",
+    "file": "ns_init.py",
+    "status": "identical",
+    "compared_with": "git b7aec6b"
+  },
+  {
+    "record": "g11-run-1790131994/freeze.json",
+    "key": "inputs",
+    "file": "real_scheduled_recovery.py",
+    "status": "identical",
+    "compared_with": "git b7aec6b"
+  },
+  {
+    "record": "g11-run-1790131994/freeze.json",
+    "key": "inputs",
+    "file": "real_steps.py",
+    "status": "identical",
+    "compared_with": "git b7aec6b"
+  },
+  {
+    "record": "g11-run-1790131994/freeze.json",
+    "key": "inputs",
+    "file": "reboot_analog.py",
+    "status": "identical after inverse home-path substitution",
+    "compared_with": "git b7aec6b"
+  },
+  {
+    "record": "cmp-run-1790132622/result.json",
+    "key": "inputs",
+    "file": "compare.py",
+    "status": "identical after inverse home-path substitution",
+    "compared_with": "git b7aec6b"
+  },
+  {
+    "record": "cmp-run-1790132622/result.json",
+    "key": "inputs",
+    "file": "prefect_ctl.py",
+    "status": "identical",
+    "compared_with": "git b7aec6b"
+  },
+  {
+    "record": "cmp-run-1790132622/result.json",
+    "key": "inputs",
+    "file": "prefect_flow.py",
+    "status": "identical",
+    "compared_with": "git b7aec6b"
+  },
+  {
+    "record": "cmp-run-1790132622/result.json",
+    "key": "inputs",
+    "file": "temporal_worker.py",
+    "status": "identical",
+    "compared_with": "git b7aec6b"
+  }
+]

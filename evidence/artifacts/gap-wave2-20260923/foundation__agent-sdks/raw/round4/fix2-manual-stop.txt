@@ -1,0 +1,6 @@
+manual stop after the script's stop step failed (see below)
+2026-09-23T15:49:59Z
+    PID    PPID COMMAND
+1146122 1252899 vllm
+1155940 1252899 agent-server
+wait exit 124

@@ -1,0 +1,9 @@
+
+Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+
+Fetching 10 files:  20%|██        | 2/10 [00:00<00:00, 19.02it/s]
+Fetching 10 files:  80%|████████  | 8/10 [00:00<00:00, 39.28it/s]
+Fetching 10 files:  90%|█████████ | 9/10 [00:20<00:00, 39.28it/s]
+Fetching 10 files: 100%|██████████| 10/10 [00:57<00:00,  8.02s/it]
+Fetching 10 files: 100%|██████████| 10/10 [00:57<00:00,  5.77s/it]
+$HOME/.cache/gap-wave2-20260923/agent-sdks/hf/hub/models--Qwen--Qwen3-4B-Instruct-2507-FP8/snapshots/8591804019c8b22094c3b5b4454e0edc05dffc98

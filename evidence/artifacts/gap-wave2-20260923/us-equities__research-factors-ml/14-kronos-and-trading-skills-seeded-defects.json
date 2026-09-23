@@ -1,0 +1,124 @@
+{
+  "id": "gap-wave2-20260923-research-factors-ml-14-kronos-and-trading-skills-seeded-defects",
+  "layer_id": "research-factors-ml",
+  "catalog": "us-equities",
+  "gap_index": 14,
+  "gap_text_sha256": "c7f732efea015062698050c0e3da7940d285b7795981336d6d7a306e63cf2879",
+  "gap_text": "The non-adopted candidates c13 and c16 have no evidence_refs. Their packet notes do not establish an executed defect-finding or forecast-superiority comparison.",
+  "preregistration": {
+    "written_at": "2026-09-23T06:19:39Z",
+    "written_at_note": "Upper bound: the commit time of the first preregistration commit (4484138). Written between 06:18:35Z and that commit; corrected in the same unpushed commit before any check ran.",
+    "source": "preregistration.json gaps.14",
+    "expectation": "c16 Kronos vs naive as in gap 7. c13: the pinned tradermonty/claude-trading-skills backtest-expert skill (commit bc5515644c70abc90fbc20d15c838c47808ca893) is supplied as context to codex exec (read-only, ephemeral) reviewing a seeded-defect backtest fixture, against a control arm with the same prompt and no skill text; two runs per arm, sequential.",
+    "criteria": [
+      "Fixture has five seeded defects at declared line ranges (look-ahead signal, survivorship universe, no costs, full-sample parameter search reported as out-of-sample, overlapping forward labels without purge) and correct decoy sections.",
+      "Model output must be JSON [{line, category, explanation}]; a seeded defect is detected when any reported line falls inside its declared range. Scoring is deterministic by script.",
+      "Report detected-defect counts and out-of-range findings per run. With two runs per arm, no superiority claim is made unless every skill run beats every control run.",
+      "Evidence class local_integration: the skill runs under Codex, not Claude."
+    ],
+    "fix_rounds": [
+      {
+        "written_at": "2026-09-23T06:48:47Z",
+        "label": "fix round 2 (gaps 5, 6, 7, 13, 14 forecast comparison), written after attempt 1 was stopped",
+        "trigger": "Attempt 1 (single process, all arms, CPU) started 06:22:36Z under ecosystem-bounded-run with a 1200 s limit. The statsforecast, statsmodels and chronos stages finished within about 30 s (Kronos weights were loading by 06:23:05Z), then the Kronos-small CPU stage (sample_count=20, 21 folds) ran until the 1200 s limit stopped the job at about 06:42:36Z; no results.json was written. statsforecast n_jobs=-1 also exhausted the job's 256-task limit (OpenBLAS 'blas_thread_init' and tqdm 'can't start new thread' warnings). Attempt 1 is retained as a stopped attempt, not a result.",
+        "change": "Split into two bounded processes with identical origins, context, target and seeds: (A) naive, statsforecast, statsmodels, chronos on CPU with OPENBLAS_NUM_THREADS=1, OMP_NUM_THREADS=1 and statsforecast n_jobs=4; (B) Kronos-small with the same parameters (pred_len=5, T=1.0, top_p=0.9, sample_count=20, torch seed 0) on the local CUDA GPU instead of CPU, a deviation from the CPU wording of the original preregistration. A merge step computes the preregistered metrics and bootstrap intervals from both forecast files after checking that the (fold, asset, decision) keys and targets are identical. Each process is again bounded to 20 minutes; a Kronos stop at the limit is recorded as not_settled for the Kronos clauses.",
+        "criteria": "Unchanged from the original entries for gaps 6, 7, 13 and 14."
+      }
+    ]
+  },
+  "commands": [
+    "python3 blueprints/gap-wave2-20260923/us-equities__research-factors-ml/c13_run.py $HOME/.cache/gap-wave2-20260923/research-factors-ml/src/cts $HOME/.cache/gap-wave2-20260923/research-factors-ml/c13-work $HOME/.cache/gap-wave2-20260923/research-factors-ml/run-c13   # exit 0; runs codex exec --sandbox read-only --ephemeral --skip-git-repo-check -C $HOME/.cache/gap-wave2-20260923/research-factors-ml/c13-work -o <run>.last.txt - sequentially, waiting while >=2 codex exec processes run",
+    "Kronos: see receipt 7"
+  ],
+  "results": {
+    "c13_runs": "control-1: 5/5 seeded defects detected, 14 findings, 7 out-of-range, 140.3 s, 12,582 tokens; skill-1: 5/5, 11 findings, 4 out-of-range, 192.4 s, 19,917 tokens; control-2: 5/5, 14 findings, 6 out-of-range, 121.2 s, 11,970 tokens; skill-2: 5/5, 13 findings, 6 out-of-range, 147.0 s, 23,020 tokens. Model reported by codex: gpt-6-astra, reasoning effort ultra.",
+    "c13_reading": "Ceiling effect: both arms found every seeded defect, so this fixture cannot discriminate the backtest-expert skill from the control. Skill runs produced slightly fewer out-of-range findings (4 and 6 vs 7 and 6) at 1.6-1.9x the tokens; with n=2 per arm this is not a superiority claim (the preregistered rule required every skill run to beat every control run).",
+    "c16": "Kronos-small worse than naive (receipt 7)."
+  },
+  "outcome": "advanced",
+  "evidence_class": "local_integration",
+  "detection_method": "The scorer was self-tested before the runs: a finding with a matching line but the wrong category scores 0/5, and a synthetic all-correct list scores 5/5 with one out-of-range. Fixture and defects.json were committed in 99efc32 before any run (sha256 4f606a21... and 94b2b032...).",
+  "remaining": "Both executions exist as receipts, but they are not linked as packet evidence_refs (read-only here). The c13 fixture hit a ceiling, so a harder fixture or more runs would be needed to separate the skill from the control. The skill ran under Codex, not in its native Claude harness.",
+  "limits": [
+    "The c13 skill text (SKILL.md plus references/*.md) was inlined into the prompt; the skill's scripts were not run.",
+    "The categories were offered to both arms, which may make detection easier."
+  ],
+  "raw_outputs": [
+    {
+      "path": "raw/c13/run-c13__scores.json",
+      "committed_sha256": "e637f5606f497a6266d581f2b3bed6ba79f5e8f982d4e42de65a97856a9226cd",
+      "original_sha256": "e637f5606f497a6266d581f2b3bed6ba79f5e8f982d4e42de65a97856a9226cd",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/c13/logs__c13.stdout",
+      "committed_sha256": "bfd2157092f648b85c963bcda51cf8b7a4e3b0a69d981a6083cc79b0a0f67a19",
+      "original_sha256": "bfd2157092f648b85c963bcda51cf8b7a4e3b0a69d981a6083cc79b0a0f67a19",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/c13/run-c13__prompt-control.txt",
+      "committed_sha256": "99f9e0d83964035750709c19f474eec075d37b7a30d9716429ffe355c6ad7341",
+      "original_sha256": "99f9e0d83964035750709c19f474eec075d37b7a30d9716429ffe355c6ad7341",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/c13/run-c13__prompt-skill.txt",
+      "committed_sha256": "635ed2167c5bcc8833daf70c4016fa4a009172e3cf1c764c7e859fe51480a6fc",
+      "original_sha256": "635ed2167c5bcc8833daf70c4016fa4a009172e3cf1c764c7e859fe51480a6fc",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/c13/run-c13__control-1.last.txt",
+      "committed_sha256": "19908d571f470a99d64221ab70a28ce7920d651aef7e8f4b314af0011def3056",
+      "original_sha256": "19908d571f470a99d64221ab70a28ce7920d651aef7e8f4b314af0011def3056",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/c13/run-c13__skill-1.last.txt",
+      "committed_sha256": "4af784a2808f9cb6bb5b4b4113020f0a86fac1d5da2b3debeb7d7cd814aab9ed",
+      "original_sha256": "4af784a2808f9cb6bb5b4b4113020f0a86fac1d5da2b3debeb7d7cd814aab9ed",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/c13/run-c13__control-2.last.txt",
+      "committed_sha256": "0894d94f53cab6a199577bd9877337b3b135a32df30d0916e819c50008bfd7a1",
+      "original_sha256": "0894d94f53cab6a199577bd9877337b3b135a32df30d0916e819c50008bfd7a1",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/c13/run-c13__skill-2.last.txt",
+      "committed_sha256": "fce5f8c3d4782eba9a3612896c70131db6e115394b938f31c6b61e47a11d1ac7",
+      "original_sha256": "fce5f8c3d4782eba9a3612896c70131db6e115394b938f31c6b61e47a11d1ac7",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/c13/run-c13__control-1.stderr.txt",
+      "committed_sha256": "953d8ec0fea2fb05e2871d4df4eadb82d3ab0516adb1b749a745afff12697ddd",
+      "original_sha256": "d9860ea5c5124d3d86edd2404ce5cd8673841b37df504c3c6c1f1c4edfb078a0",
+      "uuids_redacted": 1
+    },
+    {
+      "path": "raw/c13/run-c13__skill-1.stderr.txt",
+      "committed_sha256": "a09a7f4ed7123698c4ab332a027475126f9948e201458d26b0f9179c8efd4ddd",
+      "original_sha256": "8d64879e63edb31988cd8d261bbe0f6b620c21f06d7f74b9ce2000760f5fd8f9",
+      "uuids_redacted": 1
+    },
+    {
+      "path": "raw/c13/run-c13__control-2.stderr.txt",
+      "committed_sha256": "d95e0d332982c7897ffd5fb2f6f6e5538a33520d5869acaf030b40d0375b809f",
+      "original_sha256": "94f5cdd9d78de396dc3046074417c34540d460864080b0d2fd9cc936f8a8f2ce",
+      "uuids_redacted": 1
+    },
+    {
+      "path": "raw/c13/run-c13__skill-2.stderr.txt",
+      "committed_sha256": "c5a683e1aa838f6d5400de251e5fbc6a8a1d9d985f567b2b7a0a2bd2aaef3068",
+      "original_sha256": "da10706410471b0074e1a24426e027b6e898061742daec76793044c82c128a9f",
+      "uuids_redacted": 2
+    }
+  ],
+  "checked_at": "2026-09-23T07:09:07Z",
+  "checked_at_note": "mtime of the last check output, $CACHE/run-fcmp-merged-r2/results.json. Corrected from 07:15:00Z, which post-dated its own commit 01e6054 (07:11:23Z); correction written 2026-09-23 after 13:37Z.",
+  "base_commit": "41d39b3",
+  "branch": "claude/g2-research-factors-ml-20260923"
+}

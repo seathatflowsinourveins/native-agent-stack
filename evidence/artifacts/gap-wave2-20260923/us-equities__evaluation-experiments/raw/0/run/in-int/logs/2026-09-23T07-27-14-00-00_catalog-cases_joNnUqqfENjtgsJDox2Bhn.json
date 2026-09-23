@@ -1,0 +1,1803 @@
+{
+  "version": 2,
+  "status": "cancelled",
+  "eval": {
+    "eval_id": "9Y8VzYeJneZMwycav9FbHm",
+    "run_id": "LWQKzz7uVsrSVPVxFnSc4J",
+    "created": "2026-09-23T07:27:14+00:00",
+    "task": "catalog_cases",
+    "task_id": "joNnUqqfENjtgsJDox2Bhn",
+    "task_version": 0,
+    "task_file": "catalog_task.py",
+    "task_display_name": "catalog_cases",
+    "task_registry_name": "catalog_cases",
+    "task_attribs": {},
+    "task_args": {
+      "delay": 1.5,
+      "fail_once_case": "",
+      "marker_dir": ""
+    },
+    "task_args_passed": {
+      "delay": 1.5
+    },
+    "dataset": {
+      "samples": 8,
+      "sample_ids": [
+        "C1",
+        "C2",
+        "C3",
+        "C4",
+        "C5",
+        "C6",
+        "C7",
+        "C8"
+      ],
+      "shuffled": false
+    },
+    "model": "mockllm/model",
+    "model_generate_config": {},
+    "model_args": {
+      "custom_outputs": null
+    },
+    "config": {
+      "epochs": 1,
+      "fail_on_error": true,
+      "continue_on_fail": false,
+      "retry_on_error": 1,
+      "score_on_error": false,
+      "max_samples": 1,
+      "sandbox_cleanup": true,
+      "sandbox_prebuilt": false,
+      "log_samples": true,
+      "log_realtime": true,
+      "log_images": true,
+      "log_shared": 0,
+      "score_display": true
+    },
+    "revision": {
+      "type": "git",
+      "origin": "https://github.com/seathatflowsinourveins/native-agent-stack.git",
+      "commit": "11d1e6c",
+      "dirty": true
+    },
+    "packages": {
+      "inspect_ai": "0.3.266"
+    },
+    "scorers": [
+      {
+        "name": "promptfoo_equivalent_assertions",
+        "options": {},
+        "metrics": [
+          {
+            "name": "inspect_ai/accuracy",
+            "options": {}
+          }
+        ],
+        "metadata": {}
+      }
+    ]
+  },
+  "plan": {
+    "name": "plan",
+    "steps": [
+      {
+        "solver": "fault_and_delay",
+        "params": {
+          "delay": 1.5,
+          "fail_once_case": "",
+          "marker_dir": ""
+        },
+        "params_passed": {
+          "delay": 1.5,
+          "fail_once_case": "",
+          "marker_dir": ""
+        }
+      },
+      {
+        "solver": "generate",
+        "params": {
+          "tool_calls": "loop"
+        },
+        "params_passed": {}
+      }
+    ],
+    "config": {
+      "max_connections": 1
+    }
+  },
+  "results": {
+    "total_samples": 8,
+    "completed_samples": 3,
+    "scores": [
+      {
+        "name": "promptfoo_equivalent_assertions",
+        "scorer": "promptfoo_equivalent_assertions",
+        "scored_samples": 3,
+        "unscored_samples": 0,
+        "params": {},
+        "metrics": {
+          "accuracy": {
+            "name": "accuracy",
+            "value": 0.3333333333333333,
+            "params": {}
+          }
+        }
+      }
+    ],
+    "headline": {
+      "scorer": "promptfoo_equivalent_assertions",
+      "score": "promptfoo_equivalent_assertions",
+      "metric": "accuracy"
+    }
+  },
+  "stats": {
+    "started_at": "2026-09-23T07:27:14+00:00",
+    "completed_at": "2026-09-23T07:27:20+00:00",
+    "model_usage": {
+      "mockllm/model": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "total_tokens": 0
+      }
+    },
+    "role_usage": {},
+    "connection_limit_history": []
+  },
+  "invalidated": false,
+  "tags": [],
+  "metadata": {},
+  "samples": [
+    {
+      "id": "C1",
+      "epoch": 1,
+      "input": "{\"source\": \"{\\n  \\\"schema_version\\\": 1,\\n  \\\"trigger\\\": \\\"manual\\\",\\n  \\\"native_metadata\\\": {\\n    \\\"preTokens\\\": 87434,\\n    \\\"postTokens\\\": 14934,\\n    \\\"cumulativeDroppedTokens\\\": 72500,\\n    \\\"durationMs\\\": 42506\\n  },\\n  \\\"precompact_hook_observation\\\": {\\n    \\\"ai-memory_success\\\": true,\\n    \\\"context-mode_success\\\": true\\n  },\\n  \\\"continuity_responses\\\": [\\n    \\\"review-contract = foundation-20260921.\\\\nProvider savings were not established — they remain unknown; no causal session or lifetime saving is claimed, and compression/cache counters cannot be summed into them.\\\\nBrokers: IBKR paper and Alpaca paper each remain independently qualified and separate from engine/FX replay and authenticated Alpaca data; existing paper authorization persists.\\\",\\n    \\\"No — this was a bounded read-only document review of two files and establishes nothing about broker execution; IBKR paper and Alpaca paper acceptance remain separate, independently qualified work.\\\"\\n  ],\\n  \\\"post_boundary_model_tool_calls\\\": [],\\n  \\\"oracle\\\": {\\n    \\\"identifier\\\": \\\"foundation-20260921\\\",\\n    \\\"provider_savings\\\": \\\"unknown\\\",\\n    \\\"broker_acceptance\\\": \\\"not established by document review; separate per broker\\\"\\n  },\\n  \\\"limitations\\\": [\\n    \\\"Manual compaction and three selected facts only; automatic compaction and all-fact preservation untested.\\\",\\n    \\\"Context-size change is not provider savings; compaction consumes inference.\\\",\\n    \\\"Initial broker wording was ambiguous; a follow-up asked whether any broker acceptance was established and returned explicit No. Both responses retained.\\\"\\n  ]\\n}\\n\", \"claim\": \"Manual compaction returned successful Context Mode and ai-memory PreCompact hook observations.\"}",
+      "target": "supported",
+      "messages": [
+        {
+          "id": "mYDA6HiLegkw5qaRhzGuKT",
+          "content": "{\"source\": \"{\\n  \\\"schema_version\\\": 1,\\n  \\\"trigger\\\": \\\"manual\\\",\\n  \\\"native_metadata\\\": {\\n    \\\"preTokens\\\": 87434,\\n    \\\"postTokens\\\": 14934,\\n    \\\"cumulativeDroppedTokens\\\": 72500,\\n    \\\"durationMs\\\": 42506\\n  },\\n  \\\"precompact_hook_observation\\\": {\\n    \\\"ai-memory_success\\\": true,\\n    \\\"context-mode_success\\\": true\\n  },\\n  \\\"continuity_responses\\\": [\\n    \\\"review-contract = foundation-20260921.\\\\nProvider savings were not established — they remain unknown; no causal session or lifetime saving is claimed, and compression/cache counters cannot be summed into them.\\\\nBrokers: IBKR paper and Alpaca paper each remain independently qualified and separate from engine/FX replay and authenticated Alpaca data; existing paper authorization persists.\\\",\\n    \\\"No — this was a bounded read-only document review of two files and establishes nothing about broker execution; IBKR paper and Alpaca paper acceptance remain separate, independently qualified work.\\\"\\n  ],\\n  \\\"post_boundary_model_tool_calls\\\": [],\\n  \\\"oracle\\\": {\\n    \\\"identifier\\\": \\\"foundation-20260921\\\",\\n    \\\"provider_savings\\\": \\\"unknown\\\",\\n    \\\"broker_acceptance\\\": \\\"not established by document review; separate per broker\\\"\\n  },\\n  \\\"limitations\\\": [\\n    \\\"Manual compaction and three selected facts only; automatic compaction and all-fact preservation untested.\\\",\\n    \\\"Context-size change is not provider savings; compaction consumes inference.\\\",\\n    \\\"Initial broker wording was ambiguous; a follow-up asked whether any broker acceptance was established and returned explicit No. Both responses retained.\\\"\\n  ]\\n}\\n\", \"claim\": \"Manual compaction returned successful Context Mode and ai-memory PreCompact hook observations.\"}",
+          "source": "input",
+          "role": "user"
+        },
+        {
+          "id": "SXfuYeAX3LnG827NJ7SNnu",
+          "content": "insufficient",
+          "source": "generate",
+          "role": "assistant",
+          "model": "mockllm/model"
+        }
+      ],
+      "output": {
+        "model": "mockllm/model",
+        "choices": [
+          {
+            "message": {
+              "id": "SXfuYeAX3LnG827NJ7SNnu",
+              "content": "insufficient",
+              "source": "generate",
+              "role": "assistant",
+              "model": "mockllm/model"
+            },
+            "stop_reason": "stop"
+          }
+        ],
+        "completion": "insufficient",
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "total_tokens": 0
+        },
+        "time": 0.024119403002259787
+      },
+      "scores": {
+        "promptfoo_equivalent_assertions": {
+          "value": "I",
+          "answer": "insufficient",
+          "explanation": "FAILED JSON.parse(output).verdict === context.vars.expected; FAILED JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+          "metadata": {
+            "gated": {
+              "verdict": "insufficient",
+              "eligible": true,
+              "disposition": "advisory_insufficient",
+              "source_sha256": "85eb14433d6e4b61fbe60670647f61c65ef4db1ce75408b853860f8a4f26ddc3",
+              "schema_version": 1
+            },
+            "assertions": [
+              {
+                "value": "JSON.parse(output).verdict === context.vars.expected",
+                "pass": false,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).eligible === context.vars.expected_eligible",
+                "pass": true,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+                "pass": false,
+                "error": null
+              }
+            ]
+          },
+          "history": []
+        }
+      },
+      "metadata": {
+        "vars": {
+          "source_available_at": "2026-09-20T10:00:00Z",
+          "decision_at": "2026-09-20T11:00:00Z",
+          "expected_eligible": true,
+          "source": "{\n  \"schema_version\": 1,\n  \"trigger\": \"manual\",\n  \"native_metadata\": {\n    \"preTokens\": 87434,\n    \"postTokens\": 14934,\n    \"cumulativeDroppedTokens\": 72500,\n    \"durationMs\": 42506\n  },\n  \"precompact_hook_observation\": {\n    \"ai-memory_success\": true,\n    \"context-mode_success\": true\n  },\n  \"continuity_responses\": [\n    \"review-contract = foundation-20260921.\\nProvider savings were not established — they remain unknown; no causal session or lifetime saving is claimed, and compression/cache counters cannot be summed into them.\\nBrokers: IBKR paper and Alpaca paper each remain independently qualified and separate from engine/FX replay and authenticated Alpaca data; existing paper authorization persists.\",\n    \"No — this was a bounded read-only document review of two files and establishes nothing about broker execution; IBKR paper and Alpaca paper acceptance remain separate, independently qualified work.\"\n  ],\n  \"post_boundary_model_tool_calls\": [],\n  \"oracle\": {\n    \"identifier\": \"foundation-20260921\",\n    \"provider_savings\": \"unknown\",\n    \"broker_acceptance\": \"not established by document review; separate per broker\"\n  },\n  \"limitations\": [\n    \"Manual compaction and three selected facts only; automatic compaction and all-fact preservation untested.\",\n    \"Context-size change is not provider savings; compaction consumes inference.\",\n    \"Initial broker wording was ambiguous; a follow-up asked whether any broker acceptance was established and returned explicit No. Both responses retained.\"\n  ]\n}\n",
+          "claim": "Manual compaction returned successful Context Mode and ai-memory PreCompact hook observations.",
+          "expected": "supported"
+        },
+        "description": "C1 manual-hook-supported"
+      },
+      "store": {},
+      "events": [
+        {
+          "uuid": "AMPLcuUd5SQKa9i2XKXRca",
+          "span_id": "a2i4xxYAiuwnzKhQmXQh4k",
+          "timestamp": "2026-09-23T07:27:14.831895+00:00",
+          "working_start": 59362.192521359,
+          "event": "span_begin",
+          "id": "a2i4xxYAiuwnzKhQmXQh4k",
+          "type": "init",
+          "name": "init"
+        },
+        {
+          "uuid": "eKwJGgi5ygjVP495MiBQVd",
+          "span_id": "a2i4xxYAiuwnzKhQmXQh4k",
+          "timestamp": "2026-09-23T07:27:14.832419+00:00",
+          "working_start": 59362.193044263,
+          "event": "sample_init",
+          "sample": {
+            "input": "attachment://c48837c6b5cd04d96e990059063801b9",
+            "target": "supported",
+            "id": "C1",
+            "metadata": {
+              "vars": {
+                "source_available_at": "2026-09-20T10:00:00Z",
+                "decision_at": "2026-09-20T11:00:00Z",
+                "expected_eligible": true,
+                "source": "{\n  \"schema_version\": 1,\n  \"trigger\": \"manual\",\n  \"native_metadata\": {\n    \"preTokens\": 87434,\n    \"postTokens\": 14934,\n    \"cumulativeDroppedTokens\": 72500,\n    \"durationMs\": 42506\n  },\n  \"precompact_hook_observation\": {\n    \"ai-memory_success\": true,\n    \"context-mode_success\": true\n  },\n  \"continuity_responses\": [\n    \"review-contract = foundation-20260921.\\nProvider savings were not established — they remain unknown; no causal session or lifetime saving is claimed, and compression/cache counters cannot be summed into them.\\nBrokers: IBKR paper and Alpaca paper each remain independently qualified and separate from engine/FX replay and authenticated Alpaca data; existing paper authorization persists.\",\n    \"No — this was a bounded read-only document review of two files and establishes nothing about broker execution; IBKR paper and Alpaca paper acceptance remain separate, independently qualified work.\"\n  ],\n  \"post_boundary_model_tool_calls\": [],\n  \"oracle\": {\n    \"identifier\": \"foundation-20260921\",\n    \"provider_savings\": \"unknown\",\n    \"broker_acceptance\": \"not established by document review; separate per broker\"\n  },\n  \"limitations\": [\n    \"Manual compaction and three selected facts only; automatic compaction and all-fact preservation untested.\",\n    \"Context-size change is not provider savings; compaction consumes inference.\",\n    \"Initial broker wording was ambiguous; a follow-up asked whether any broker acceptance was established and returned explicit No. Both responses retained.\"\n  ]\n}\n",
+                "claim": "Manual compaction returned successful Context Mode and ai-memory PreCompact hook observations.",
+                "expected": "supported"
+              },
+              "description": "C1 manual-hook-supported"
+            }
+          },
+          "state": {
+            "messages": [
+              {
+                "id": "mYDA6HiLegkw5qaRhzGuKT",
+                "content": "attachment://c48837c6b5cd04d96e990059063801b9",
+                "source": "input",
+                "role": "user"
+              }
+            ],
+            "tools": [],
+            "tool_choice": null,
+            "store": {},
+            "output": {
+              "model": "mockllm/model",
+              "choices": [],
+              "completion": ""
+            },
+            "completed": false,
+            "metadata": {
+              "vars": {
+                "source_available_at": "2026-09-20T10:00:00Z",
+                "decision_at": "2026-09-20T11:00:00Z",
+                "expected_eligible": true,
+                "source": "attachment://cbd1b2df440489f785dfdeb0ce584866",
+                "claim": "Manual compaction returned successful Context Mode and ai-memory PreCompact hook observations.",
+                "expected": "supported"
+              },
+              "description": "C1 manual-hook-supported"
+            }
+          }
+        },
+        {
+          "uuid": "SWYUiyLaFKge2UKxYLBckF",
+          "span_id": "a2i4xxYAiuwnzKhQmXQh4k",
+          "timestamp": "2026-09-23T07:27:14.832645+00:00",
+          "working_start": 59362.193269464,
+          "event": "span_end",
+          "id": "a2i4xxYAiuwnzKhQmXQh4k"
+        },
+        {
+          "uuid": "WJBQmGciDWsDQu3K4romqF",
+          "span_id": "UxEEwrSWJtLMyLjKxPmjFt",
+          "timestamp": "2026-09-23T07:27:14.833037+00:00",
+          "working_start": 0.00028560200007632375,
+          "event": "span_begin",
+          "id": "UxEEwrSWJtLMyLjKxPmjFt",
+          "type": "solvers",
+          "name": "solvers"
+        },
+        {
+          "uuid": "mcw5tmn3F6WYMwVLg5FHvQ",
+          "span_id": "bPFai8kSkPfKQv6beuw3Km",
+          "timestamp": "2026-09-23T07:27:14.833276+00:00",
+          "working_start": 0.0005247029985184781,
+          "event": "span_begin",
+          "id": "bPFai8kSkPfKQv6beuw3Km",
+          "parent_id": "UxEEwrSWJtLMyLjKxPmjFt",
+          "type": "solver",
+          "name": "fault_and_delay"
+        },
+        {
+          "uuid": "b9BFwDdgtVfucLxoMjCz7J",
+          "span_id": "bPFai8kSkPfKQv6beuw3Km",
+          "timestamp": "2026-09-23T07:27:16.334644+00:00",
+          "working_start": 1.5018980889944942,
+          "event": "span_end",
+          "id": "bPFai8kSkPfKQv6beuw3Km"
+        },
+        {
+          "uuid": "FKSkpYL9yiSkqs6qKkPwtb",
+          "span_id": "HbuXiQStuPWzaLAbaqySeP",
+          "timestamp": "2026-09-23T07:27:16.335006+00:00",
+          "working_start": 1.5022544899984496,
+          "event": "span_begin",
+          "id": "HbuXiQStuPWzaLAbaqySeP",
+          "parent_id": "UxEEwrSWJtLMyLjKxPmjFt",
+          "type": "solver",
+          "name": "generate"
+        },
+        {
+          "uuid": "FiQqQDQwadk5dBfh6a4jNd",
+          "span_id": "HbuXiQStuPWzaLAbaqySeP",
+          "timestamp": "2026-09-23T07:27:16.335236+00:00",
+          "working_start": 1.5024847909953678,
+          "event": "model",
+          "model": "mockllm/model",
+          "input": [],
+          "input_refs": [
+            [
+              0,
+              1
+            ]
+          ],
+          "tools": [],
+          "tool_choice": "none",
+          "config": {
+            "max_connections": 1
+          },
+          "output": {
+            "model": "mockllm/model",
+            "choices": [
+              {
+                "message": {
+                  "id": "SXfuYeAX3LnG827NJ7SNnu",
+                  "content": "insufficient",
+                  "source": "generate",
+                  "role": "assistant",
+                  "model": "mockllm/model"
+                },
+                "stop_reason": "stop"
+              }
+            ],
+            "completion": "insufficient",
+            "usage": {
+              "input_tokens": 0,
+              "output_tokens": 0,
+              "total_tokens": 0
+            },
+            "time": 0.024119403002259787
+          },
+          "call": {
+            "request": {
+              "model": "model"
+            },
+            "response": {
+              "content": "insufficient"
+            },
+            "call_refs": [
+              [
+                0,
+                1
+              ]
+            ],
+            "call_key": "messages"
+          },
+          "completed": "2026-09-23T07:27:16.435343+00:00",
+          "working_time": 0.024119403002259787
+        },
+        {
+          "uuid": "93VHBy8kSzzJjgxGuFpSdy",
+          "span_id": "HbuXiQStuPWzaLAbaqySeP",
+          "timestamp": "2026-09-23T07:27:16.435948+00:00",
+          "working_start": 1.5275012989950483,
+          "event": "state",
+          "changes": [
+            {
+              "op": "add",
+              "path": "/messages/1",
+              "value": {
+                "id": "SXfuYeAX3LnG827NJ7SNnu",
+                "content": "insufficient",
+                "source": "generate",
+                "role": "assistant",
+                "model": "mockllm/model"
+              }
+            },
+            {
+              "op": "add",
+              "path": "/output/time",
+              "value": 0.024119403002259787
+            },
+            {
+              "op": "add",
+              "path": "/output/usage",
+              "value": {
+                "input_tokens": 0,
+                "output_tokens": 0,
+                "total_tokens": 0
+              }
+            },
+            {
+              "op": "replace",
+              "path": "/output/completion",
+              "value": "insufficient",
+              "replaced": ""
+            },
+            {
+              "op": "add",
+              "path": "/output/choices/0",
+              "value": {
+                "message": {
+                  "id": "SXfuYeAX3LnG827NJ7SNnu",
+                  "content": "insufficient",
+                  "source": "generate",
+                  "role": "assistant",
+                  "model": "mockllm/model"
+                },
+                "stop_reason": "stop"
+              }
+            }
+          ]
+        },
+        {
+          "uuid": "dHLjz7Fh56RjnH5Gwgj9a9",
+          "span_id": "HbuXiQStuPWzaLAbaqySeP",
+          "timestamp": "2026-09-23T07:27:16.436178+00:00",
+          "working_start": 1.5277300000016112,
+          "event": "span_end",
+          "id": "HbuXiQStuPWzaLAbaqySeP"
+        },
+        {
+          "uuid": "CV5uX4Qsvi5xL6qj2R5Nga",
+          "span_id": "UxEEwrSWJtLMyLjKxPmjFt",
+          "timestamp": "2026-09-23T07:27:16.436284+00:00",
+          "working_start": 1.5278360000011162,
+          "event": "span_end",
+          "id": "UxEEwrSWJtLMyLjKxPmjFt"
+        },
+        {
+          "uuid": "BiBPUBnizkMLosf4Vv3hyu",
+          "span_id": "hA26AytmjtawtnmgTtwS5F",
+          "timestamp": "2026-09-23T07:27:16.436642+00:00",
+          "working_start": 1.528194202001032,
+          "event": "span_begin",
+          "id": "hA26AytmjtawtnmgTtwS5F",
+          "type": "scorers",
+          "name": "scorers"
+        },
+        {
+          "uuid": "CPt34tAX6xPGkLbNMrpJKS",
+          "span_id": "eU67rYP3r6TRWUTHfGLtoS",
+          "timestamp": "2026-09-23T07:27:16.436740+00:00",
+          "working_start": 1.5282920019963058,
+          "event": "span_begin",
+          "id": "eU67rYP3r6TRWUTHfGLtoS",
+          "parent_id": "hA26AytmjtawtnmgTtwS5F",
+          "type": "scorer",
+          "name": "promptfoo_equivalent_assertions"
+        },
+        {
+          "uuid": "ao2B5AzZr4UyVXEera49ny",
+          "span_id": "eU67rYP3r6TRWUTHfGLtoS",
+          "timestamp": "2026-09-23T07:27:16.460542+00:00",
+          "working_start": 1.5520994039979996,
+          "event": "score",
+          "score": {
+            "value": "I",
+            "answer": "insufficient",
+            "explanation": "FAILED JSON.parse(output).verdict === context.vars.expected; FAILED JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+            "metadata": {
+              "gated": {
+                "verdict": "insufficient",
+                "eligible": true,
+                "disposition": "advisory_insufficient",
+                "source_sha256": "85eb14433d6e4b61fbe60670647f61c65ef4db1ce75408b853860f8a4f26ddc3",
+                "schema_version": 1
+              },
+              "assertions": [
+                {
+                  "value": "JSON.parse(output).verdict === context.vars.expected",
+                  "pass": false,
+                  "error": null
+                },
+                {
+                  "value": "JSON.parse(output).eligible === context.vars.expected_eligible",
+                  "pass": true,
+                  "error": null
+                },
+                {
+                  "value": "JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+                  "pass": false,
+                  "error": null
+                }
+              ]
+            },
+            "history": []
+          },
+          "target": "supported",
+          "intermediate": false,
+          "scorer": "promptfoo_equivalent_assertions",
+          "scorer_args": {},
+          "model_usage": {
+            "mockllm/model": {
+              "input_tokens": 0,
+              "output_tokens": 0,
+              "total_tokens": 0
+            }
+          }
+        },
+        {
+          "uuid": "a67HXsjuKXTq6a6JPq9yqd",
+          "span_id": "eU67rYP3r6TRWUTHfGLtoS",
+          "timestamp": "2026-09-23T07:27:16.461011+00:00",
+          "working_start": 1.5525643059954746,
+          "event": "span_end",
+          "id": "eU67rYP3r6TRWUTHfGLtoS"
+        },
+        {
+          "uuid": "QrEfQGZfebxwTTnXKDtH3e",
+          "span_id": "hA26AytmjtawtnmgTtwS5F",
+          "timestamp": "2026-09-23T07:27:16.461145+00:00",
+          "working_start": 1.5526969069978804,
+          "event": "span_end",
+          "id": "hA26AytmjtawtnmgTtwS5F"
+        }
+      ],
+      "model_usage": {
+        "mockllm/model": {
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "total_tokens": 0
+        }
+      },
+      "role_usage": {},
+      "started_at": "2026-09-23T07:27:14.832754+00:00",
+      "completed_at": "2026-09-23T07:27:16.461435+00:00",
+      "total_time": 1.629,
+      "working_time": 1.553,
+      "uuid": "kfBCN8Fzk4yCffXBwLA8KC",
+      "error_retries": [],
+      "attachments": {
+        "c48837c6b5cd04d96e990059063801b9": "{\"source\": \"{\\n  \\\"schema_version\\\": 1,\\n  \\\"trigger\\\": \\\"manual\\\",\\n  \\\"native_metadata\\\": {\\n    \\\"preTokens\\\": 87434,\\n    \\\"postTokens\\\": 14934,\\n    \\\"cumulativeDroppedTokens\\\": 72500,\\n    \\\"durationMs\\\": 42506\\n  },\\n  \\\"precompact_hook_observation\\\": {\\n    \\\"ai-memory_success\\\": true,\\n    \\\"context-mode_success\\\": true\\n  },\\n  \\\"continuity_responses\\\": [\\n    \\\"review-contract = foundation-20260921.\\\\nProvider savings were not established — they remain unknown; no causal session or lifetime saving is claimed, and compression/cache counters cannot be summed into them.\\\\nBrokers: IBKR paper and Alpaca paper each remain independently qualified and separate from engine/FX replay and authenticated Alpaca data; existing paper authorization persists.\\\",\\n    \\\"No — this was a bounded read-only document review of two files and establishes nothing about broker execution; IBKR paper and Alpaca paper acceptance remain separate, independently qualified work.\\\"\\n  ],\\n  \\\"post_boundary_model_tool_calls\\\": [],\\n  \\\"oracle\\\": {\\n    \\\"identifier\\\": \\\"foundation-20260921\\\",\\n    \\\"provider_savings\\\": \\\"unknown\\\",\\n    \\\"broker_acceptance\\\": \\\"not established by document review; separate per broker\\\"\\n  },\\n  \\\"limitations\\\": [\\n    \\\"Manual compaction and three selected facts only; automatic compaction and all-fact preservation untested.\\\",\\n    \\\"Context-size change is not provider savings; compaction consumes inference.\\\",\\n    \\\"Initial broker wording was ambiguous; a follow-up asked whether any broker acceptance was established and returned explicit No. Both responses retained.\\\"\\n  ]\\n}\\n\", \"claim\": \"Manual compaction returned successful Context Mode and ai-memory PreCompact hook observations.\"}",
+        "cbd1b2df440489f785dfdeb0ce584866": "{\n  \"schema_version\": 1,\n  \"trigger\": \"manual\",\n  \"native_metadata\": {\n    \"preTokens\": 87434,\n    \"postTokens\": 14934,\n    \"cumulativeDroppedTokens\": 72500,\n    \"durationMs\": 42506\n  },\n  \"precompact_hook_observation\": {\n    \"ai-memory_success\": true,\n    \"context-mode_success\": true\n  },\n  \"continuity_responses\": [\n    \"review-contract = foundation-20260921.\\nProvider savings were not established — they remain unknown; no causal session or lifetime saving is claimed, and compression/cache counters cannot be summed into them.\\nBrokers: IBKR paper and Alpaca paper each remain independently qualified and separate from engine/FX replay and authenticated Alpaca data; existing paper authorization persists.\",\n    \"No — this was a bounded read-only document review of two files and establishes nothing about broker execution; IBKR paper and Alpaca paper acceptance remain separate, independently qualified work.\"\n  ],\n  \"post_boundary_model_tool_calls\": [],\n  \"oracle\": {\n    \"identifier\": \"foundation-20260921\",\n    \"provider_savings\": \"unknown\",\n    \"broker_acceptance\": \"not established by document review; separate per broker\"\n  },\n  \"limitations\": [\n    \"Manual compaction and three selected facts only; automatic compaction and all-fact preservation untested.\",\n    \"Context-size change is not provider savings; compaction consumes inference.\",\n    \"Initial broker wording was ambiguous; a follow-up asked whether any broker acceptance was established and returned explicit No. Both responses retained.\"\n  ]\n}\n"
+      },
+      "events_data": {
+        "messages": [
+          {
+            "id": "mYDA6HiLegkw5qaRhzGuKT",
+            "content": "attachment://c48837c6b5cd04d96e990059063801b9",
+            "source": "input",
+            "role": "user"
+          }
+        ],
+        "calls": [
+          {
+            "id": "mYDA6HiLegkw5qaRhzGuKT",
+            "content": "attachment://c48837c6b5cd04d96e990059063801b9",
+            "source": "input",
+            "metadata": null,
+            "role": "user",
+            "tool_call_id": null
+          }
+        ]
+      },
+      "turn_count": 1
+    },
+    {
+      "id": "C2",
+      "epoch": 1,
+      "input": "{\"source\": \"{\\n  \\\"schema_version\\\": 1,\\n  \\\"trigger\\\": \\\"manual\\\",\\n  \\\"native_metadata\\\": {\\n    \\\"preTokens\\\": 87434,\\n    \\\"postTokens\\\": 14934,\\n    \\\"cumulativeDroppedTokens\\\": 72500,\\n    \\\"durationMs\\\": 42506\\n  },\\n  \\\"precompact_hook_observation\\\": {\\n    \\\"ai-memory_success\\\": true,\\n    \\\"context-mode_success\\\": true\\n  },\\n  \\\"continuity_responses\\\": [\\n    \\\"review-contract = foundation-20260921.\\\\nProvider savings were not established — they remain unknown; no causal session or lifetime saving is claimed, and compression/cache counters cannot be summed into them.\\\\nBrokers: IBKR paper and Alpaca paper each remain independently qualified and separate from engine/FX replay and authenticated Alpaca data; existing paper authorization persists.\\\",\\n    \\\"No — this was a bounded read-only document review of two files and establishes nothing about broker execution; IBKR paper and Alpaca paper acceptance remain separate, independently qualified work.\\\"\\n  ],\\n  \\\"post_boundary_model_tool_calls\\\": [],\\n  \\\"oracle\\\": {\\n    \\\"identifier\\\": \\\"foundation-20260921\\\",\\n    \\\"provider_savings\\\": \\\"unknown\\\",\\n    \\\"broker_acceptance\\\": \\\"not established by document review; separate per broker\\\"\\n  },\\n  \\\"limitations\\\": [\\n    \\\"Manual compaction and three selected facts only; automatic compaction and all-fact preservation untested.\\\",\\n    \\\"Context-size change is not provider savings; compaction consumes inference.\\\",\\n    \\\"Initial broker wording was ambiguous; a follow-up asked whether any broker acceptance was established and returned explicit No. Both responses retained.\\\"\\n  ]\\n}\\n\", \"claim\": \"Automatic compaction preserves every fact.\"}",
+      "target": "insufficient",
+      "messages": [
+        {
+          "id": "dQLpE3FXFswCCWe59sZYWU",
+          "content": "{\"source\": \"{\\n  \\\"schema_version\\\": 1,\\n  \\\"trigger\\\": \\\"manual\\\",\\n  \\\"native_metadata\\\": {\\n    \\\"preTokens\\\": 87434,\\n    \\\"postTokens\\\": 14934,\\n    \\\"cumulativeDroppedTokens\\\": 72500,\\n    \\\"durationMs\\\": 42506\\n  },\\n  \\\"precompact_hook_observation\\\": {\\n    \\\"ai-memory_success\\\": true,\\n    \\\"context-mode_success\\\": true\\n  },\\n  \\\"continuity_responses\\\": [\\n    \\\"review-contract = foundation-20260921.\\\\nProvider savings were not established — they remain unknown; no causal session or lifetime saving is claimed, and compression/cache counters cannot be summed into them.\\\\nBrokers: IBKR paper and Alpaca paper each remain independently qualified and separate from engine/FX replay and authenticated Alpaca data; existing paper authorization persists.\\\",\\n    \\\"No — this was a bounded read-only document review of two files and establishes nothing about broker execution; IBKR paper and Alpaca paper acceptance remain separate, independently qualified work.\\\"\\n  ],\\n  \\\"post_boundary_model_tool_calls\\\": [],\\n  \\\"oracle\\\": {\\n    \\\"identifier\\\": \\\"foundation-20260921\\\",\\n    \\\"provider_savings\\\": \\\"unknown\\\",\\n    \\\"broker_acceptance\\\": \\\"not established by document review; separate per broker\\\"\\n  },\\n  \\\"limitations\\\": [\\n    \\\"Manual compaction and three selected facts only; automatic compaction and all-fact preservation untested.\\\",\\n    \\\"Context-size change is not provider savings; compaction consumes inference.\\\",\\n    \\\"Initial broker wording was ambiguous; a follow-up asked whether any broker acceptance was established and returned explicit No. Both responses retained.\\\"\\n  ]\\n}\\n\", \"claim\": \"Automatic compaction preserves every fact.\"}",
+          "source": "input",
+          "role": "user"
+        },
+        {
+          "id": "oEK8qy92hc4iq9xou5m973",
+          "content": "insufficient",
+          "source": "generate",
+          "role": "assistant",
+          "model": "mockllm/model"
+        }
+      ],
+      "output": {
+        "model": "mockllm/model",
+        "choices": [
+          {
+            "message": {
+              "id": "oEK8qy92hc4iq9xou5m973",
+              "content": "insufficient",
+              "source": "generate",
+              "role": "assistant",
+              "model": "mockllm/model"
+            },
+            "stop_reason": "stop"
+          }
+        ],
+        "completion": "insufficient",
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "total_tokens": 0
+        },
+        "time": 0.024799108003207948
+      },
+      "scores": {
+        "promptfoo_equivalent_assertions": {
+          "value": "C",
+          "answer": "insufficient",
+          "explanation": "all 3 assertions passed",
+          "metadata": {
+            "gated": {
+              "verdict": "insufficient",
+              "eligible": true,
+              "disposition": "advisory_insufficient",
+              "source_sha256": "85eb14433d6e4b61fbe60670647f61c65ef4db1ce75408b853860f8a4f26ddc3",
+              "schema_version": 1
+            },
+            "assertions": [
+              {
+                "value": "JSON.parse(output).verdict === context.vars.expected",
+                "pass": true,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).eligible === context.vars.expected_eligible",
+                "pass": true,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+                "pass": true,
+                "error": null
+              }
+            ]
+          },
+          "history": []
+        }
+      },
+      "metadata": {
+        "vars": {
+          "source_available_at": "2026-09-20T10:00:00Z",
+          "decision_at": "2026-09-20T11:00:00Z",
+          "expected_eligible": true,
+          "source": "{\n  \"schema_version\": 1,\n  \"trigger\": \"manual\",\n  \"native_metadata\": {\n    \"preTokens\": 87434,\n    \"postTokens\": 14934,\n    \"cumulativeDroppedTokens\": 72500,\n    \"durationMs\": 42506\n  },\n  \"precompact_hook_observation\": {\n    \"ai-memory_success\": true,\n    \"context-mode_success\": true\n  },\n  \"continuity_responses\": [\n    \"review-contract = foundation-20260921.\\nProvider savings were not established — they remain unknown; no causal session or lifetime saving is claimed, and compression/cache counters cannot be summed into them.\\nBrokers: IBKR paper and Alpaca paper each remain independently qualified and separate from engine/FX replay and authenticated Alpaca data; existing paper authorization persists.\",\n    \"No — this was a bounded read-only document review of two files and establishes nothing about broker execution; IBKR paper and Alpaca paper acceptance remain separate, independently qualified work.\"\n  ],\n  \"post_boundary_model_tool_calls\": [],\n  \"oracle\": {\n    \"identifier\": \"foundation-20260921\",\n    \"provider_savings\": \"unknown\",\n    \"broker_acceptance\": \"not established by document review; separate per broker\"\n  },\n  \"limitations\": [\n    \"Manual compaction and three selected facts only; automatic compaction and all-fact preservation untested.\",\n    \"Context-size change is not provider savings; compaction consumes inference.\",\n    \"Initial broker wording was ambiguous; a follow-up asked whether any broker acceptance was established and returned explicit No. Both responses retained.\"\n  ]\n}\n",
+          "claim": "Automatic compaction preserves every fact.",
+          "expected": "insufficient"
+        },
+        "description": "C2 untested-not-failed"
+      },
+      "store": {},
+      "events": [
+        {
+          "uuid": "kVKkQhyiA5z5XUR7pbnSf9",
+          "span_id": "cTFi3MEoNcvX5ptRtGN94m",
+          "timestamp": "2026-09-23T07:27:16.463517+00:00",
+          "working_start": 59363.824140706,
+          "event": "span_begin",
+          "id": "cTFi3MEoNcvX5ptRtGN94m",
+          "type": "init",
+          "name": "init"
+        },
+        {
+          "uuid": "NuuVcLAC52iw5K4kJRjavy",
+          "span_id": "cTFi3MEoNcvX5ptRtGN94m",
+          "timestamp": "2026-09-23T07:27:16.463781+00:00",
+          "working_start": 59363.824405307,
+          "event": "sample_init",
+          "sample": {
+            "input": "attachment://729e21f4d46bc208559897b9a14ce1ab",
+            "target": "insufficient",
+            "id": "C2",
+            "metadata": {
+              "vars": {
+                "source_available_at": "2026-09-20T10:00:00Z",
+                "decision_at": "2026-09-20T11:00:00Z",
+                "expected_eligible": true,
+                "source": "{\n  \"schema_version\": 1,\n  \"trigger\": \"manual\",\n  \"native_metadata\": {\n    \"preTokens\": 87434,\n    \"postTokens\": 14934,\n    \"cumulativeDroppedTokens\": 72500,\n    \"durationMs\": 42506\n  },\n  \"precompact_hook_observation\": {\n    \"ai-memory_success\": true,\n    \"context-mode_success\": true\n  },\n  \"continuity_responses\": [\n    \"review-contract = foundation-20260921.\\nProvider savings were not established — they remain unknown; no causal session or lifetime saving is claimed, and compression/cache counters cannot be summed into them.\\nBrokers: IBKR paper and Alpaca paper each remain independently qualified and separate from engine/FX replay and authenticated Alpaca data; existing paper authorization persists.\",\n    \"No — this was a bounded read-only document review of two files and establishes nothing about broker execution; IBKR paper and Alpaca paper acceptance remain separate, independently qualified work.\"\n  ],\n  \"post_boundary_model_tool_calls\": [],\n  \"oracle\": {\n    \"identifier\": \"foundation-20260921\",\n    \"provider_savings\": \"unknown\",\n    \"broker_acceptance\": \"not established by document review; separate per broker\"\n  },\n  \"limitations\": [\n    \"Manual compaction and three selected facts only; automatic compaction and all-fact preservation untested.\",\n    \"Context-size change is not provider savings; compaction consumes inference.\",\n    \"Initial broker wording was ambiguous; a follow-up asked whether any broker acceptance was established and returned explicit No. Both responses retained.\"\n  ]\n}\n",
+                "claim": "Automatic compaction preserves every fact.",
+                "expected": "insufficient"
+              },
+              "description": "C2 untested-not-failed"
+            }
+          },
+          "state": {
+            "messages": [
+              {
+                "id": "dQLpE3FXFswCCWe59sZYWU",
+                "content": "attachment://729e21f4d46bc208559897b9a14ce1ab",
+                "source": "input",
+                "role": "user"
+              }
+            ],
+            "tools": [],
+            "tool_choice": null,
+            "store": {},
+            "output": {
+              "model": "mockllm/model",
+              "choices": [],
+              "completion": ""
+            },
+            "completed": false,
+            "metadata": {
+              "vars": {
+                "source_available_at": "2026-09-20T10:00:00Z",
+                "decision_at": "2026-09-20T11:00:00Z",
+                "expected_eligible": true,
+                "source": "attachment://cbd1b2df440489f785dfdeb0ce584866",
+                "claim": "Automatic compaction preserves every fact.",
+                "expected": "insufficient"
+              },
+              "description": "C2 untested-not-failed"
+            }
+          }
+        },
+        {
+          "uuid": "MpM8ZAqxaeVfQHWP5DUWCy",
+          "span_id": "cTFi3MEoNcvX5ptRtGN94m",
+          "timestamp": "2026-09-23T07:27:16.463967+00:00",
+          "working_start": 59363.824591308,
+          "event": "span_end",
+          "id": "cTFi3MEoNcvX5ptRtGN94m"
+        },
+        {
+          "uuid": "KCKH4o9a73XPJ6ND4yuhs7",
+          "span_id": "o59o8VPUH8CYzBYevmr6jF",
+          "timestamp": "2026-09-23T07:27:16.464260+00:00",
+          "working_start": 0.00021900099818594754,
+          "event": "span_begin",
+          "id": "o59o8VPUH8CYzBYevmr6jF",
+          "type": "solvers",
+          "name": "solvers"
+        },
+        {
+          "uuid": "DRVDBQUsj8gFFEQMPWe4TV",
+          "span_id": "ZfxNLSXapbJZEJTcNVcK5K",
+          "timestamp": "2026-09-23T07:27:16.464353+00:00",
+          "working_start": 0.00031190099980449304,
+          "event": "span_begin",
+          "id": "ZfxNLSXapbJZEJTcNVcK5K",
+          "parent_id": "o59o8VPUH8CYzBYevmr6jF",
+          "type": "solver",
+          "name": "fault_and_delay"
+        },
+        {
+          "uuid": "bb2Pag5YUCyqfiN5yF3LhR",
+          "span_id": "ZfxNLSXapbJZEJTcNVcK5K",
+          "timestamp": "2026-09-23T07:27:17.965431+00:00",
+          "working_start": 1.5013948929990875,
+          "event": "span_end",
+          "id": "ZfxNLSXapbJZEJTcNVcK5K"
+        },
+        {
+          "uuid": "bGrKVrTM8tjVvQH26eW6c6",
+          "span_id": "jJ9ZnyASrhMVcBxMfXhoM3",
+          "timestamp": "2026-09-23T07:27:17.965796+00:00",
+          "working_start": 1.5017553949946887,
+          "event": "span_begin",
+          "id": "jJ9ZnyASrhMVcBxMfXhoM3",
+          "parent_id": "o59o8VPUH8CYzBYevmr6jF",
+          "type": "solver",
+          "name": "generate"
+        },
+        {
+          "uuid": "JPpTZYrwhw8kfN8b2NbppT",
+          "span_id": "jJ9ZnyASrhMVcBxMfXhoM3",
+          "timestamp": "2026-09-23T07:27:17.966028+00:00",
+          "working_start": 1.5019875959987985,
+          "event": "model",
+          "model": "mockllm/model",
+          "input": [],
+          "input_refs": [
+            [
+              0,
+              1
+            ]
+          ],
+          "tools": [],
+          "tool_choice": "none",
+          "config": {
+            "max_connections": 1
+          },
+          "output": {
+            "model": "mockllm/model",
+            "choices": [
+              {
+                "message": {
+                  "id": "oEK8qy92hc4iq9xou5m973",
+                  "content": "insufficient",
+                  "source": "generate",
+                  "role": "assistant",
+                  "model": "mockllm/model"
+                },
+                "stop_reason": "stop"
+              }
+            ],
+            "completion": "insufficient",
+            "usage": {
+              "input_tokens": 0,
+              "output_tokens": 0,
+              "total_tokens": 0
+            },
+            "time": 0.024799108003207948
+          },
+          "call": {
+            "request": {
+              "model": "model"
+            },
+            "response": {
+              "content": "insufficient"
+            },
+            "call_refs": [
+              [
+                0,
+                1
+              ]
+            ],
+            "call_key": "messages"
+          },
+          "completed": "2026-09-23T07:27:17.992397+00:00",
+          "working_time": 0.024799108003207948
+        },
+        {
+          "uuid": "RsvfTY3dTgCWCGRNaWLzVM",
+          "span_id": "jJ9ZnyASrhMVcBxMfXhoM3",
+          "timestamp": "2026-09-23T07:27:17.992798+00:00",
+          "working_start": 1.5273686070067924,
+          "event": "state",
+          "changes": [
+            {
+              "op": "add",
+              "path": "/messages/1",
+              "value": {
+                "id": "oEK8qy92hc4iq9xou5m973",
+                "content": "insufficient",
+                "source": "generate",
+                "role": "assistant",
+                "model": "mockllm/model"
+              }
+            },
+            {
+              "op": "add",
+              "path": "/output/time",
+              "value": 0.024799108003207948
+            },
+            {
+              "op": "add",
+              "path": "/output/usage",
+              "value": {
+                "input_tokens": 0,
+                "output_tokens": 0,
+                "total_tokens": 0
+              }
+            },
+            {
+              "op": "replace",
+              "path": "/output/completion",
+              "value": "insufficient",
+              "replaced": ""
+            },
+            {
+              "op": "add",
+              "path": "/output/choices/0",
+              "value": {
+                "message": {
+                  "id": "oEK8qy92hc4iq9xou5m973",
+                  "content": "insufficient",
+                  "source": "generate",
+                  "role": "assistant",
+                  "model": "mockllm/model"
+                },
+                "stop_reason": "stop"
+              }
+            }
+          ]
+        },
+        {
+          "uuid": "ncAWCrog4tYMzFzB2gtyMe",
+          "span_id": "jJ9ZnyASrhMVcBxMfXhoM3",
+          "timestamp": "2026-09-23T07:27:17.992956+00:00",
+          "working_start": 1.5275261080023483,
+          "event": "span_end",
+          "id": "jJ9ZnyASrhMVcBxMfXhoM3"
+        },
+        {
+          "uuid": "XjkjcS7KZKpVjUWjefzm48",
+          "span_id": "o59o8VPUH8CYzBYevmr6jF",
+          "timestamp": "2026-09-23T07:27:17.993102+00:00",
+          "working_start": 1.5276715080035501,
+          "event": "span_end",
+          "id": "o59o8VPUH8CYzBYevmr6jF"
+        },
+        {
+          "uuid": "HMZJonVdTGJN842X3uAZWC",
+          "span_id": "ABCbmB5B3mtL5obem4eQ4F",
+          "timestamp": "2026-09-23T07:27:17.993445+00:00",
+          "working_start": 1.5280147100056638,
+          "event": "span_begin",
+          "id": "ABCbmB5B3mtL5obem4eQ4F",
+          "type": "scorers",
+          "name": "scorers"
+        },
+        {
+          "uuid": "FWyjcgERG8joLV7TVNNh97",
+          "span_id": "FcUqxUde3WN2A48CCtfMrB",
+          "timestamp": "2026-09-23T07:27:17.993539+00:00",
+          "working_start": 1.5281085100068594,
+          "event": "span_begin",
+          "id": "FcUqxUde3WN2A48CCtfMrB",
+          "parent_id": "ABCbmB5B3mtL5obem4eQ4F",
+          "type": "scorer",
+          "name": "promptfoo_equivalent_assertions"
+        },
+        {
+          "uuid": "2puEjw6cvcFv2b7zkC5Dqz",
+          "span_id": "FcUqxUde3WN2A48CCtfMrB",
+          "timestamp": "2026-09-23T07:27:18.016719+00:00",
+          "working_start": 1.551293712007464,
+          "event": "score",
+          "score": {
+            "value": "C",
+            "answer": "insufficient",
+            "explanation": "all 3 assertions passed",
+            "metadata": {
+              "gated": {
+                "verdict": "insufficient",
+                "eligible": true,
+                "disposition": "advisory_insufficient",
+                "source_sha256": "85eb14433d6e4b61fbe60670647f61c65ef4db1ce75408b853860f8a4f26ddc3",
+                "schema_version": 1
+              },
+              "assertions": [
+                {
+                  "value": "JSON.parse(output).verdict === context.vars.expected",
+                  "pass": true,
+                  "error": null
+                },
+                {
+                  "value": "JSON.parse(output).eligible === context.vars.expected_eligible",
+                  "pass": true,
+                  "error": null
+                },
+                {
+                  "value": "JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+                  "pass": true,
+                  "error": null
+                }
+              ]
+            },
+            "history": []
+          },
+          "target": "insufficient",
+          "intermediate": false,
+          "scorer": "promptfoo_equivalent_assertions",
+          "scorer_args": {},
+          "model_usage": {
+            "mockllm/model": {
+              "input_tokens": 0,
+              "output_tokens": 0,
+              "total_tokens": 0
+            }
+          }
+        },
+        {
+          "uuid": "Sj7B67gFHoKk5fxUzn4DsK",
+          "span_id": "FcUqxUde3WN2A48CCtfMrB",
+          "timestamp": "2026-09-23T07:27:18.017065+00:00",
+          "working_start": 1.5516353130078642,
+          "event": "span_end",
+          "id": "FcUqxUde3WN2A48CCtfMrB"
+        },
+        {
+          "uuid": "kwnMc3D9cqrCa3DSHybV46",
+          "span_id": "ABCbmB5B3mtL5obem4eQ4F",
+          "timestamp": "2026-09-23T07:27:18.017198+00:00",
+          "working_start": 1.5517680140037555,
+          "event": "span_end",
+          "id": "ABCbmB5B3mtL5obem4eQ4F"
+        }
+      ],
+      "model_usage": {
+        "mockllm/model": {
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "total_tokens": 0
+        }
+      },
+      "role_usage": {},
+      "started_at": "2026-09-23T07:27:16.464043+00:00",
+      "completed_at": "2026-09-23T07:27:18.017439+00:00",
+      "total_time": 1.553,
+      "working_time": 1.552,
+      "uuid": "Kq2ZubLbgb8UVxD8qnQ7U2",
+      "error_retries": [],
+      "attachments": {
+        "729e21f4d46bc208559897b9a14ce1ab": "{\"source\": \"{\\n  \\\"schema_version\\\": 1,\\n  \\\"trigger\\\": \\\"manual\\\",\\n  \\\"native_metadata\\\": {\\n    \\\"preTokens\\\": 87434,\\n    \\\"postTokens\\\": 14934,\\n    \\\"cumulativeDroppedTokens\\\": 72500,\\n    \\\"durationMs\\\": 42506\\n  },\\n  \\\"precompact_hook_observation\\\": {\\n    \\\"ai-memory_success\\\": true,\\n    \\\"context-mode_success\\\": true\\n  },\\n  \\\"continuity_responses\\\": [\\n    \\\"review-contract = foundation-20260921.\\\\nProvider savings were not established — they remain unknown; no causal session or lifetime saving is claimed, and compression/cache counters cannot be summed into them.\\\\nBrokers: IBKR paper and Alpaca paper each remain independently qualified and separate from engine/FX replay and authenticated Alpaca data; existing paper authorization persists.\\\",\\n    \\\"No — this was a bounded read-only document review of two files and establishes nothing about broker execution; IBKR paper and Alpaca paper acceptance remain separate, independently qualified work.\\\"\\n  ],\\n  \\\"post_boundary_model_tool_calls\\\": [],\\n  \\\"oracle\\\": {\\n    \\\"identifier\\\": \\\"foundation-20260921\\\",\\n    \\\"provider_savings\\\": \\\"unknown\\\",\\n    \\\"broker_acceptance\\\": \\\"not established by document review; separate per broker\\\"\\n  },\\n  \\\"limitations\\\": [\\n    \\\"Manual compaction and three selected facts only; automatic compaction and all-fact preservation untested.\\\",\\n    \\\"Context-size change is not provider savings; compaction consumes inference.\\\",\\n    \\\"Initial broker wording was ambiguous; a follow-up asked whether any broker acceptance was established and returned explicit No. Both responses retained.\\\"\\n  ]\\n}\\n\", \"claim\": \"Automatic compaction preserves every fact.\"}",
+        "cbd1b2df440489f785dfdeb0ce584866": "{\n  \"schema_version\": 1,\n  \"trigger\": \"manual\",\n  \"native_metadata\": {\n    \"preTokens\": 87434,\n    \"postTokens\": 14934,\n    \"cumulativeDroppedTokens\": 72500,\n    \"durationMs\": 42506\n  },\n  \"precompact_hook_observation\": {\n    \"ai-memory_success\": true,\n    \"context-mode_success\": true\n  },\n  \"continuity_responses\": [\n    \"review-contract = foundation-20260921.\\nProvider savings were not established — they remain unknown; no causal session or lifetime saving is claimed, and compression/cache counters cannot be summed into them.\\nBrokers: IBKR paper and Alpaca paper each remain independently qualified and separate from engine/FX replay and authenticated Alpaca data; existing paper authorization persists.\",\n    \"No — this was a bounded read-only document review of two files and establishes nothing about broker execution; IBKR paper and Alpaca paper acceptance remain separate, independently qualified work.\"\n  ],\n  \"post_boundary_model_tool_calls\": [],\n  \"oracle\": {\n    \"identifier\": \"foundation-20260921\",\n    \"provider_savings\": \"unknown\",\n    \"broker_acceptance\": \"not established by document review; separate per broker\"\n  },\n  \"limitations\": [\n    \"Manual compaction and three selected facts only; automatic compaction and all-fact preservation untested.\",\n    \"Context-size change is not provider savings; compaction consumes inference.\",\n    \"Initial broker wording was ambiguous; a follow-up asked whether any broker acceptance was established and returned explicit No. Both responses retained.\"\n  ]\n}\n"
+      },
+      "events_data": {
+        "messages": [
+          {
+            "id": "dQLpE3FXFswCCWe59sZYWU",
+            "content": "attachment://729e21f4d46bc208559897b9a14ce1ab",
+            "source": "input",
+            "role": "user"
+          }
+        ],
+        "calls": [
+          {
+            "id": "dQLpE3FXFswCCWe59sZYWU",
+            "content": "attachment://729e21f4d46bc208559897b9a14ce1ab",
+            "source": "input",
+            "metadata": null,
+            "role": "user",
+            "tool_call_id": null
+          }
+        ]
+      },
+      "turn_count": 1
+    },
+    {
+      "id": "C3",
+      "epoch": 1,
+      "input": "{\"source\": \"# Native Workflow writing and recovery qualification\\n\\nThe bounded writing pilot produced correct code in both arms. It did **not**\\nestablish a fully compliant or superior multi-agent workflow: both arms piped\\nnative test output, and the Workflow arm omitted the required authoring skill.\\nIndependent unpiped verification accepted both repairs. Keep a capable single\\nagent as the economical choice for this small repair; this one ordered pair is\\nnot a cross-task model ranking.\", \"claim\": \"Independent verification accepted both repairs in this small repair comparison.\"}",
+      "target": "supported",
+      "messages": [
+        {
+          "id": "Le3yxPcTacfpNiCPJYG4rq",
+          "content": "{\"source\": \"# Native Workflow writing and recovery qualification\\n\\nThe bounded writing pilot produced correct code in both arms. It did **not**\\nestablish a fully compliant or superior multi-agent workflow: both arms piped\\nnative test output, and the Workflow arm omitted the required authoring skill.\\nIndependent unpiped verification accepted both repairs. Keep a capable single\\nagent as the economical choice for this small repair; this one ordered pair is\\nnot a cross-task model ranking.\", \"claim\": \"Independent verification accepted both repairs in this small repair comparison.\"}",
+          "source": "input",
+          "role": "user"
+        },
+        {
+          "id": "WY7RAZXKi9g4FnrGNpqad4",
+          "content": "insufficient",
+          "source": "generate",
+          "role": "assistant",
+          "model": "mockllm/model"
+        }
+      ],
+      "output": {
+        "model": "mockllm/model",
+        "choices": [
+          {
+            "message": {
+              "id": "WY7RAZXKi9g4FnrGNpqad4",
+              "content": "insufficient",
+              "source": "generate",
+              "role": "assistant",
+              "model": "mockllm/model"
+            },
+            "stop_reason": "stop"
+          }
+        ],
+        "completion": "insufficient",
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "total_tokens": 0
+        },
+        "time": 0.023229103993799072
+      },
+      "scores": {
+        "promptfoo_equivalent_assertions": {
+          "value": "I",
+          "answer": "insufficient",
+          "explanation": "FAILED JSON.parse(output).verdict === context.vars.expected; FAILED JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+          "metadata": {
+            "gated": {
+              "verdict": "insufficient",
+              "eligible": true,
+              "disposition": "advisory_insufficient",
+              "source_sha256": "46573cdc7d0087f64fcf0ce70410841ec9d40b1cda9d6e55d194447f3bb024c9",
+              "schema_version": 1
+            },
+            "assertions": [
+              {
+                "value": "JSON.parse(output).verdict === context.vars.expected",
+                "pass": false,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).eligible === context.vars.expected_eligible",
+                "pass": true,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+                "pass": false,
+                "error": null
+              }
+            ]
+          },
+          "history": []
+        }
+      },
+      "metadata": {
+        "vars": {
+          "source_available_at": "2026-09-20T10:00:00Z",
+          "decision_at": "2026-09-20T11:00:00Z",
+          "expected_eligible": true,
+          "source": "# Native Workflow writing and recovery qualification\n\nThe bounded writing pilot produced correct code in both arms. It did **not**\nestablish a fully compliant or superior multi-agent workflow: both arms piped\nnative test output, and the Workflow arm omitted the required authoring skill.\nIndependent unpiped verification accepted both repairs. Keep a capable single\nagent as the economical choice for this small repair; this one ordered pair is\nnot a cross-task model ranking.",
+          "claim": "Independent verification accepted both repairs in this small repair comparison.",
+          "expected": "supported"
+        },
+        "description": "C3 bounded-writing-acceptance"
+      },
+      "store": {},
+      "events": [
+        {
+          "uuid": "Dsson4x2MX9AZr34eHv9qn",
+          "span_id": "hzbBXsPGnjBo2LvpXsfXqX",
+          "timestamp": "2026-09-23T07:27:18.019089+00:00",
+          "working_start": 59365.379712835,
+          "event": "span_begin",
+          "id": "hzbBXsPGnjBo2LvpXsfXqX",
+          "type": "init",
+          "name": "init"
+        },
+        {
+          "uuid": "do8vQuATApusGhiFuRXgMn",
+          "span_id": "hzbBXsPGnjBo2LvpXsfXqX",
+          "timestamp": "2026-09-23T07:27:18.019351+00:00",
+          "working_start": 59365.379975236,
+          "event": "sample_init",
+          "sample": {
+            "input": "attachment://d1d67a6ad6e81f9acf119f87035f8968",
+            "target": "supported",
+            "id": "C3",
+            "metadata": {
+              "vars": {
+                "source_available_at": "2026-09-20T10:00:00Z",
+                "decision_at": "2026-09-20T11:00:00Z",
+                "expected_eligible": true,
+                "source": "# Native Workflow writing and recovery qualification\n\nThe bounded writing pilot produced correct code in both arms. It did **not**\nestablish a fully compliant or superior multi-agent workflow: both arms piped\nnative test output, and the Workflow arm omitted the required authoring skill.\nIndependent unpiped verification accepted both repairs. Keep a capable single\nagent as the economical choice for this small repair; this one ordered pair is\nnot a cross-task model ranking.",
+                "claim": "Independent verification accepted both repairs in this small repair comparison.",
+                "expected": "supported"
+              },
+              "description": "C3 bounded-writing-acceptance"
+            }
+          },
+          "state": {
+            "messages": [
+              {
+                "id": "Le3yxPcTacfpNiCPJYG4rq",
+                "content": "attachment://d1d67a6ad6e81f9acf119f87035f8968",
+                "source": "input",
+                "role": "user"
+              }
+            ],
+            "tools": [],
+            "tool_choice": null,
+            "store": {},
+            "output": {
+              "model": "mockllm/model",
+              "choices": [],
+              "completion": ""
+            },
+            "completed": false,
+            "metadata": {
+              "vars": {
+                "source_available_at": "2026-09-20T10:00:00Z",
+                "decision_at": "2026-09-20T11:00:00Z",
+                "expected_eligible": true,
+                "source": "attachment://f22f49a8fc2203cc711a16c73ba54d72",
+                "claim": "Independent verification accepted both repairs in this small repair comparison.",
+                "expected": "supported"
+              },
+              "description": "C3 bounded-writing-acceptance"
+            }
+          }
+        },
+        {
+          "uuid": "JFUpkpGNMKaE2kA9yNLBbM",
+          "span_id": "hzbBXsPGnjBo2LvpXsfXqX",
+          "timestamp": "2026-09-23T07:27:18.019549+00:00",
+          "working_start": 59365.380172937,
+          "event": "span_end",
+          "id": "hzbBXsPGnjBo2LvpXsfXqX"
+        },
+        {
+          "uuid": "ZnYBXDqrCQ7doCeUcoEy5f",
+          "span_id": "fXgJe5UgPJtZDDxyEBxMrZ",
+          "timestamp": "2026-09-23T07:27:18.019826+00:00",
+          "working_start": 0.00021290099539328367,
+          "event": "span_begin",
+          "id": "fXgJe5UgPJtZDDxyEBxMrZ",
+          "type": "solvers",
+          "name": "solvers"
+        },
+        {
+          "uuid": "jSCRkweox9MqvVEXv9J7hx",
+          "span_id": "iNagfofVc7ebFRRn849jen",
+          "timestamp": "2026-09-23T07:27:18.019913+00:00",
+          "working_start": 0.00029900099616497755,
+          "event": "span_begin",
+          "id": "iNagfofVc7ebFRRn849jen",
+          "parent_id": "fXgJe5UgPJtZDDxyEBxMrZ",
+          "type": "solver",
+          "name": "fault_and_delay"
+        },
+        {
+          "uuid": "Au3Z2uLzJFx8QtLPDHkYFf",
+          "span_id": "iNagfofVc7ebFRRn849jen",
+          "timestamp": "2026-09-23T07:27:19.520840+00:00",
+          "working_start": 1.5012315579951974,
+          "event": "span_end",
+          "id": "iNagfofVc7ebFRRn849jen"
+        },
+        {
+          "uuid": "H7d8BoTAVvqJXFsFj5msbg",
+          "span_id": "fVpHcV6kaWUvJ6vf8xB4YE",
+          "timestamp": "2026-09-23T07:27:19.521180+00:00",
+          "working_start": 1.5015669589993195,
+          "event": "span_begin",
+          "id": "fVpHcV6kaWUvJ6vf8xB4YE",
+          "parent_id": "fXgJe5UgPJtZDDxyEBxMrZ",
+          "type": "solver",
+          "name": "generate"
+        },
+        {
+          "uuid": "4QaY6RfgtgbFBZgoUebzh3",
+          "span_id": "fVpHcV6kaWUvJ6vf8xB4YE",
+          "timestamp": "2026-09-23T07:27:19.521403+00:00",
+          "working_start": 1.5017893599942909,
+          "event": "model",
+          "model": "mockllm/model",
+          "input": [],
+          "input_refs": [
+            [
+              0,
+              1
+            ]
+          ],
+          "tools": [],
+          "tool_choice": "none",
+          "config": {
+            "max_connections": 1
+          },
+          "output": {
+            "model": "mockllm/model",
+            "choices": [
+              {
+                "message": {
+                  "id": "WY7RAZXKi9g4FnrGNpqad4",
+                  "content": "insufficient",
+                  "source": "generate",
+                  "role": "assistant",
+                  "model": "mockllm/model"
+                },
+                "stop_reason": "stop"
+              }
+            ],
+            "completion": "insufficient",
+            "usage": {
+              "input_tokens": 0,
+              "output_tokens": 0,
+              "total_tokens": 0
+            },
+            "time": 0.023229103993799072
+          },
+          "call": {
+            "request": {
+              "model": "model"
+            },
+            "response": {
+              "content": "insufficient"
+            },
+            "call_refs": [
+              [
+                0,
+                1
+              ]
+            ],
+            "call_key": "messages"
+          },
+          "completed": "2026-09-23T07:27:19.546636+00:00",
+          "working_time": 0.023229103993799072
+        },
+        {
+          "uuid": "9UdUJJq8S6hDDGqJH7ms9j",
+          "span_id": "fVpHcV6kaWUvJ6vf8xB4YE",
+          "timestamp": "2026-09-23T07:27:19.547166+00:00",
+          "working_start": 1.5257128669982194,
+          "event": "state",
+          "changes": [
+            {
+              "op": "add",
+              "path": "/messages/1",
+              "value": {
+                "id": "WY7RAZXKi9g4FnrGNpqad4",
+                "content": "insufficient",
+                "source": "generate",
+                "role": "assistant",
+                "model": "mockllm/model"
+              }
+            },
+            {
+              "op": "add",
+              "path": "/output/time",
+              "value": 0.023229103993799072
+            },
+            {
+              "op": "add",
+              "path": "/output/usage",
+              "value": {
+                "input_tokens": 0,
+                "output_tokens": 0,
+                "total_tokens": 0
+              }
+            },
+            {
+              "op": "replace",
+              "path": "/output/completion",
+              "value": "insufficient",
+              "replaced": ""
+            },
+            {
+              "op": "add",
+              "path": "/output/choices/0",
+              "value": {
+                "message": {
+                  "id": "WY7RAZXKi9g4FnrGNpqad4",
+                  "content": "insufficient",
+                  "source": "generate",
+                  "role": "assistant",
+                  "model": "mockllm/model"
+                },
+                "stop_reason": "stop"
+              }
+            }
+          ]
+        },
+        {
+          "uuid": "8iM5pvdEkywkeqRnKyZLjr",
+          "span_id": "fVpHcV6kaWUvJ6vf8xB4YE",
+          "timestamp": "2026-09-23T07:27:19.547343+00:00",
+          "working_start": 1.5258850669924868,
+          "event": "span_end",
+          "id": "fVpHcV6kaWUvJ6vf8xB4YE"
+        },
+        {
+          "uuid": "Dj7fGC4SwsQyz9RCSS5eEt",
+          "span_id": "fXgJe5UgPJtZDDxyEBxMrZ",
+          "timestamp": "2026-09-23T07:27:19.547511+00:00",
+          "working_start": 1.5260534679982811,
+          "event": "span_end",
+          "id": "fXgJe5UgPJtZDDxyEBxMrZ"
+        },
+        {
+          "uuid": "bcssaB4mPuStpx5azNCFw3",
+          "span_id": "G4tStkB4r5mtXc3JgJz5Di",
+          "timestamp": "2026-09-23T07:27:19.547805+00:00",
+          "working_start": 1.5263469689962221,
+          "event": "span_begin",
+          "id": "G4tStkB4r5mtXc3JgJz5Di",
+          "type": "scorers",
+          "name": "scorers"
+        },
+        {
+          "uuid": "5kxngFqTchwoYecKmM4uEr",
+          "span_id": "koC26GEcqxkJvzyrtXPUnD",
+          "timestamp": "2026-09-23T07:27:19.547892+00:00",
+          "working_start": 1.5264340699941386,
+          "event": "span_begin",
+          "id": "koC26GEcqxkJvzyrtXPUnD",
+          "parent_id": "G4tStkB4r5mtXc3JgJz5Di",
+          "type": "scorer",
+          "name": "promptfoo_equivalent_assertions"
+        },
+        {
+          "uuid": "Wjt2LdLEPWmFHFeDn7Q9mA",
+          "span_id": "koC26GEcqxkJvzyrtXPUnD",
+          "timestamp": "2026-09-23T07:27:19.572268+00:00",
+          "working_start": 1.550815878996218,
+          "event": "score",
+          "score": {
+            "value": "I",
+            "answer": "insufficient",
+            "explanation": "FAILED JSON.parse(output).verdict === context.vars.expected; FAILED JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+            "metadata": {
+              "gated": {
+                "verdict": "insufficient",
+                "eligible": true,
+                "disposition": "advisory_insufficient",
+                "source_sha256": "46573cdc7d0087f64fcf0ce70410841ec9d40b1cda9d6e55d194447f3bb024c9",
+                "schema_version": 1
+              },
+              "assertions": [
+                {
+                  "value": "JSON.parse(output).verdict === context.vars.expected",
+                  "pass": false,
+                  "error": null
+                },
+                {
+                  "value": "JSON.parse(output).eligible === context.vars.expected_eligible",
+                  "pass": true,
+                  "error": null
+                },
+                {
+                  "value": "JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+                  "pass": false,
+                  "error": null
+                }
+              ]
+            },
+            "history": []
+          },
+          "target": "supported",
+          "intermediate": false,
+          "scorer": "promptfoo_equivalent_assertions",
+          "scorer_args": {},
+          "model_usage": {
+            "mockllm/model": {
+              "input_tokens": 0,
+              "output_tokens": 0,
+              "total_tokens": 0
+            }
+          }
+        },
+        {
+          "uuid": "7ragwhub8v75QRYkeJxEjR",
+          "span_id": "koC26GEcqxkJvzyrtXPUnD",
+          "timestamp": "2026-09-23T07:27:19.572609+00:00",
+          "working_start": 1.5511516809929162,
+          "event": "span_end",
+          "id": "koC26GEcqxkJvzyrtXPUnD"
+        },
+        {
+          "uuid": "ZPdhadxErxJbVUgzzXt5kc",
+          "span_id": "G4tStkB4r5mtXc3JgJz5Di",
+          "timestamp": "2026-09-23T07:27:19.572742+00:00",
+          "working_start": 1.5512841809977544,
+          "event": "span_end",
+          "id": "G4tStkB4r5mtXc3JgJz5Di"
+        }
+      ],
+      "model_usage": {
+        "mockllm/model": {
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "total_tokens": 0
+        }
+      },
+      "role_usage": {},
+      "started_at": "2026-09-23T07:27:18.019615+00:00",
+      "completed_at": "2026-09-23T07:27:19.572957+00:00",
+      "total_time": 1.553,
+      "working_time": 1.551,
+      "uuid": "G6pdyjTvxCHrZQuMvz7moW",
+      "error_retries": [],
+      "attachments": {
+        "d1d67a6ad6e81f9acf119f87035f8968": "{\"source\": \"# Native Workflow writing and recovery qualification\\n\\nThe bounded writing pilot produced correct code in both arms. It did **not**\\nestablish a fully compliant or superior multi-agent workflow: both arms piped\\nnative test output, and the Workflow arm omitted the required authoring skill.\\nIndependent unpiped verification accepted both repairs. Keep a capable single\\nagent as the economical choice for this small repair; this one ordered pair is\\nnot a cross-task model ranking.\", \"claim\": \"Independent verification accepted both repairs in this small repair comparison.\"}",
+        "f22f49a8fc2203cc711a16c73ba54d72": "# Native Workflow writing and recovery qualification\n\nThe bounded writing pilot produced correct code in both arms. It did **not**\nestablish a fully compliant or superior multi-agent workflow: both arms piped\nnative test output, and the Workflow arm omitted the required authoring skill.\nIndependent unpiped verification accepted both repairs. Keep a capable single\nagent as the economical choice for this small repair; this one ordered pair is\nnot a cross-task model ranking."
+      },
+      "events_data": {
+        "messages": [
+          {
+            "id": "Le3yxPcTacfpNiCPJYG4rq",
+            "content": "attachment://d1d67a6ad6e81f9acf119f87035f8968",
+            "source": "input",
+            "role": "user"
+          }
+        ],
+        "calls": [
+          {
+            "id": "Le3yxPcTacfpNiCPJYG4rq",
+            "content": "attachment://d1d67a6ad6e81f9acf119f87035f8968",
+            "source": "input",
+            "metadata": null,
+            "role": "user",
+            "tool_call_id": null
+          }
+        ]
+      },
+      "turn_count": 1
+    },
+    {
+      "id": "C4",
+      "epoch": 1,
+      "input": "{\"source\": \"# Native Workflow writing and recovery qualification\\n\\nThe bounded writing pilot produced correct code in both arms. It did **not**\\nestablish a fully compliant or superior multi-agent workflow: both arms piped\\nnative test output, and the Workflow arm omitted the required authoring skill.\\nIndependent unpiped verification accepted both repairs. Keep a capable single\\nagent as the economical choice for this small repair; this one ordered pair is\\nnot a cross-task model ranking.\", \"claim\": \"The native multi-agent workflow is the most efficient runtime for all task types.\"}",
+      "target": "insufficient",
+      "messages": [
+        {
+          "id": "JbotQdFvzT2aaf99YC6853",
+          "content": "{\"source\": \"# Native Workflow writing and recovery qualification\\n\\nThe bounded writing pilot produced correct code in both arms. It did **not**\\nestablish a fully compliant or superior multi-agent workflow: both arms piped\\nnative test output, and the Workflow arm omitted the required authoring skill.\\nIndependent unpiped verification accepted both repairs. Keep a capable single\\nagent as the economical choice for this small repair; this one ordered pair is\\nnot a cross-task model ranking.\", \"claim\": \"The native multi-agent workflow is the most efficient runtime for all task types.\"}",
+          "source": "input",
+          "role": "user"
+        }
+      ],
+      "output": {
+        "model": "mockllm/model",
+        "choices": [],
+        "completion": ""
+      },
+      "scores": {},
+      "metadata": {
+        "vars": {
+          "source_available_at": "2026-09-20T10:00:00Z",
+          "decision_at": "2026-09-20T11:00:00Z",
+          "expected_eligible": true,
+          "source": "# Native Workflow writing and recovery qualification\n\nThe bounded writing pilot produced correct code in both arms. It did **not**\nestablish a fully compliant or superior multi-agent workflow: both arms piped\nnative test output, and the Workflow arm omitted the required authoring skill.\nIndependent unpiped verification accepted both repairs. Keep a capable single\nagent as the economical choice for this small repair; this one ordered pair is\nnot a cross-task model ranking.",
+          "claim": "The native multi-agent workflow is the most efficient runtime for all task types.",
+          "expected": "insufficient"
+        },
+        "description": "C4 universal-worker-ranking"
+      },
+      "store": {},
+      "events": [
+        {
+          "uuid": "9QSudCpwMoK89v2idMGTHw",
+          "span_id": "HvcsFbKntwvxC6bgXxU45S",
+          "timestamp": "2026-09-23T07:27:19.574560+00:00",
+          "working_start": 59366.935184136,
+          "event": "span_begin",
+          "id": "HvcsFbKntwvxC6bgXxU45S",
+          "type": "init",
+          "name": "init"
+        },
+        {
+          "uuid": "dkjYcEHzvsyxQ7LWvdSkG3",
+          "span_id": "HvcsFbKntwvxC6bgXxU45S",
+          "timestamp": "2026-09-23T07:27:19.574801+00:00",
+          "working_start": 59366.935425637,
+          "event": "sample_init",
+          "sample": {
+            "input": "attachment://944c03f42c0508dd3fd2271585127dc1",
+            "target": "insufficient",
+            "id": "C4",
+            "metadata": {
+              "vars": {
+                "source_available_at": "2026-09-20T10:00:00Z",
+                "decision_at": "2026-09-20T11:00:00Z",
+                "expected_eligible": true,
+                "source": "# Native Workflow writing and recovery qualification\n\nThe bounded writing pilot produced correct code in both arms. It did **not**\nestablish a fully compliant or superior multi-agent workflow: both arms piped\nnative test output, and the Workflow arm omitted the required authoring skill.\nIndependent unpiped verification accepted both repairs. Keep a capable single\nagent as the economical choice for this small repair; this one ordered pair is\nnot a cross-task model ranking.",
+                "claim": "The native multi-agent workflow is the most efficient runtime for all task types.",
+                "expected": "insufficient"
+              },
+              "description": "C4 universal-worker-ranking"
+            }
+          },
+          "state": {
+            "messages": [
+              {
+                "id": "JbotQdFvzT2aaf99YC6853",
+                "content": "attachment://944c03f42c0508dd3fd2271585127dc1",
+                "source": "input",
+                "role": "user"
+              }
+            ],
+            "tools": [],
+            "tool_choice": null,
+            "store": {},
+            "output": {
+              "model": "mockllm/model",
+              "choices": [],
+              "completion": ""
+            },
+            "completed": false,
+            "metadata": {
+              "vars": {
+                "source_available_at": "2026-09-20T10:00:00Z",
+                "decision_at": "2026-09-20T11:00:00Z",
+                "expected_eligible": true,
+                "source": "attachment://f22f49a8fc2203cc711a16c73ba54d72",
+                "claim": "The native multi-agent workflow is the most efficient runtime for all task types.",
+                "expected": "insufficient"
+              },
+              "description": "C4 universal-worker-ranking"
+            }
+          }
+        },
+        {
+          "uuid": "XV7GM3Qm4CaTGHeP232pQD",
+          "span_id": "HvcsFbKntwvxC6bgXxU45S",
+          "timestamp": "2026-09-23T07:27:19.574942+00:00",
+          "working_start": 59366.935565738,
+          "event": "span_end",
+          "id": "HvcsFbKntwvxC6bgXxU45S"
+        },
+        {
+          "uuid": "aAJPqKAnS5jaqrS3wN424j",
+          "span_id": "BfWeRNAxyi3rn7LWPnyTvD",
+          "timestamp": "2026-09-23T07:27:19.575210+00:00",
+          "working_start": 0.00020670099911512807,
+          "event": "span_begin",
+          "id": "BfWeRNAxyi3rn7LWPnyTvD",
+          "type": "solvers",
+          "name": "solvers"
+        },
+        {
+          "uuid": "ataavHKnqihdtUdNkHjmLw",
+          "span_id": "dUSMuvmZuZ8rhD6LZkVDi3",
+          "timestamp": "2026-09-23T07:27:19.575295+00:00",
+          "working_start": 0.00029180200363043696,
+          "event": "span_begin",
+          "id": "dUSMuvmZuZ8rhD6LZkVDi3",
+          "parent_id": "BfWeRNAxyi3rn7LWPnyTvD",
+          "type": "solver",
+          "name": "fault_and_delay"
+        },
+        {
+          "uuid": "BHXdRz25dGkVaexpUq77cL",
+          "span_id": "dUSMuvmZuZ8rhD6LZkVDi3",
+          "timestamp": "2026-09-23T07:27:20.863324+00:00",
+          "working_start": 1.288324424000166,
+          "event": "span_end",
+          "id": "dUSMuvmZuZ8rhD6LZkVDi3"
+        },
+        {
+          "uuid": "dBCHoUKdoLAJi8qbYP2viB",
+          "span_id": "BfWeRNAxyi3rn7LWPnyTvD",
+          "timestamp": "2026-09-23T07:27:20.863645+00:00",
+          "working_start": 1.2886421260045609,
+          "event": "span_end",
+          "id": "BfWeRNAxyi3rn7LWPnyTvD"
+        },
+        {
+          "uuid": "MyfiFYDdSnwjQSmF776VLM",
+          "timestamp": "2026-09-23T07:27:20.922551+00:00",
+          "working_start": 1.347553693005466,
+          "event": "error",
+          "error": {
+            "message": "CancelledError(\"Cancelled via cancel scope 73c96c32ef30 by <Task cancelling name='inspect_ai._util.asyncfiles.with_async_fs.<locals>.wrapper' coro=<with_async_fs.<locals>.wrapper() running at $HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/lib/python3.13/site-packages/anyio/_backends/_asyncio.py:2531> cb=[_run_until_complete_cb() at $HOME/.local/share/codex-ecosystem/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/asyncio/base_events.py:181, <1 more>, WorkerThread.stop()]>\")",
+            "traceback": "Traceback (most recent call last):\n  File \"$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/lib/python3.13/site-packages/inspect_ai/_eval/task/run.py\", line 2846, in _task_run_sample_attempt\n    async with anyio.create_task_group() as tg:\n               ~~~~~~~~~~~~~~~~~~~~~~~^^\n  File \"$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/lib/python3.13/site-packages/anyio/_backends/_asyncio.py\", line 851, in __aexit__\n    raise exc_val\n  File \"$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/lib/python3.13/site-packages/anyio/_backends/_asyncio.py\", line 820, in __aexit__\n    await self._on_completed_fut\nasyncio.exceptions.CancelledError: Cancelled via cancel scope 73c96c32ef30 by <Task cancelling name='inspect_ai._util.asyncfiles.with_async_fs.<locals>.wrapper' coro=<with_async_fs.<locals>.wrapper() running at $HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/lib/python3.13/site-packages/anyio/_backends/_asyncio.py:2531> cb=[_run_until_complete_cb() at $HOME/.local/share/codex-ecosystem/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/asyncio/base_events.py:181, <1 more>, WorkerThread.stop()]>\n",
+            "traceback_ansi": "\u001b[31m┌─\u001b[0m\u001b[31m────────────────────\u001b[0m\u001b[31m \u001b[0m\u001b[1;31mTraceback \u001b[0m\u001b[1;2;31m(most recent call last)\u001b[0m\u001b[31m \u001b[0m\u001b[31m────────────────────\u001b[0m\u001b[31m─┐\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2m$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/l\u001b[0m \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2mib/python3.13/site-packages/inspect_ai/_eval/task/\u001b[0m\u001b[1mrun.py\u001b[0m:2846 in            \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m _task_run_sample_attempt                                                    \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m                                                                             \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2m$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/l\u001b[0m \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2mib/python3.13/site-packages/anyio/_backends/\u001b[0m\u001b[1m_asyncio.py\u001b[0m:851 in __aexit__    \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m                                                                             \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 848 \u001b[0m\u001b[2m│   │   │   │   │   │   \u001b[0m\u001b[33m\"\u001b[0m\u001b[33munhandled errors in a TaskGroup\u001b[0m\u001b[33m\"\u001b[0m, \u001b[96mself\u001b[0m._exc \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 849 \u001b[0m\u001b[2m│   │   │   │   │   \u001b[0m) \u001b[94mfrom\u001b[0m\u001b[90m \u001b[0m\u001b[94mNone\u001b[0m                                      \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 850 \u001b[0m\u001b[2m│   │   │   │   \u001b[0m\u001b[94melif\u001b[0m exc_val:                                        \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[31m> \u001b[0m 851 \u001b[2m│   │   │   │   │   \u001b[0m\u001b[94mraise\u001b[0m exc_val                                    \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 852 \u001b[0m\u001b[2m│   │   │   \u001b[0m\u001b[94mexcept\u001b[0m \u001b[96mBaseException\u001b[0m \u001b[94mas\u001b[0m exc:                             \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 853 \u001b[0m\u001b[2m│   │   │   │   \u001b[0m\u001b[94mif\u001b[0m \u001b[96mself\u001b[0m.cancel_scope.\u001b[92m__exit__\u001b[0m(\u001b[96mtype\u001b[0m(exc), exc, exc.__ \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 854 \u001b[0m\u001b[2m│   │   │   │   │   \u001b[0m\u001b[94mreturn\u001b[0m \u001b[94mTrue\u001b[0m                                      \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m                                                                             \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2m$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/l\u001b[0m \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2mib/python3.13/site-packages/anyio/_backends/\u001b[0m\u001b[1m_asyncio.py\u001b[0m:820 in __aexit__    \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m                                                                             \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 817 \u001b[0m\u001b[2m│   │   │   │   │   │   │   \u001b[0m\u001b[96mself\u001b[0m._on_completed_fut = loop.create_fut \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 818 \u001b[0m\u001b[2m│   │   │   │   │   │   │   \u001b[0m                                         \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 819 \u001b[0m\u001b[2m│   │   │   │   │   │   │   \u001b[0m\u001b[94mtry\u001b[0m:                                     \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[31m> \u001b[0m 820 \u001b[2m│   │   │   │   │   │   │   │   \u001b[0m\u001b[94mawait\u001b[0m \u001b[96mself\u001b[0m._on_completed_fut         \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 821 \u001b[0m\u001b[2m│   │   │   │   │   │   │   \u001b[0m\u001b[94mexcept\u001b[0m CancelledError \u001b[94mas\u001b[0m exc:            \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 822 \u001b[0m\u001b[2m│   │   │   │   │   │   │   │   \u001b[0m\u001b[2m# Shield the scope against further c\u001b[0m \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 823 \u001b[0m\u001b[2m│   │   │   │   │   │   │   │   \u001b[0m\u001b[2m# as they're not productive (#695)\u001b[0m   \u001b[31m│\u001b[0m\n\u001b[31m└─────────────────────────────────────────────────────────────────────────────┘\u001b[0m\n\u001b[1;91mCancelledError: \u001b[0mCancelled via cancel scope 73c96c32ef30 by \u001b[1m<\u001b[0m\u001b[1;95mTask\u001b[0m\u001b[39m cancelling \u001b[0m\n\u001b[33mname\u001b[0m\u001b[39m=\u001b[0m\u001b[32m'inspect_ai._util.asyncfiles.with_async_fs.<locals>.wrapper'\u001b[0m\u001b[39m \u001b[0m\n\u001b[33mcoro\u001b[0m\u001b[39m=<with_async_fs.<locals>\u001b[0m\u001b[1;35m.wrapper\u001b[0m\u001b[1;39m(\u001b[0m\u001b[1;39m)\u001b[0m\u001b[39m running at \u001b[0m\n\u001b[35m$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/lib/p\u001b[0m\n\u001b[35mython3.13/site-packages/anyio/_backends/\u001b[0m\u001b[95m_asyncio.py\u001b[0m\u001b[39m:\u001b[0m\u001b[1;36m2531\u001b[0m\u001b[39m> \u001b[0m\n\u001b[33mcb\u001b[0m\u001b[39m=\u001b[0m\u001b[1;39m[\u001b[0m\u001b[1;35m_run_until_complete_cb\u001b[0m\u001b[1;39m(\u001b[0m\u001b[1;39m)\u001b[0m\u001b[39m at \u001b[0m\n\u001b[35m$HOME/.local/share/codex-ecosystem/python/cpython-3.13.15-linux-x86_64-gn\u001b[0m\n\u001b[35mu/lib/python3.13/asyncio/\u001b[0m\u001b[95mbase_events.py\u001b[0m\u001b[39m:\u001b[0m\u001b[1;36m181\u001b[0m\u001b[39m, <\u001b[0m\u001b[1;36m1\u001b[0m\u001b[39m more>, \u001b[0m\u001b[1;35mWorkerThread.stop\u001b[0m\u001b[1;39m(\u001b[0m\u001b[1;39m)\u001b[0m\u001b[1;39m]\u001b[0m\u001b[1m>\u001b[0m\n"
+          }
+        }
+      ],
+      "model_usage": {},
+      "role_usage": {},
+      "started_at": "2026-09-23T07:27:19.575005+00:00",
+      "completed_at": "2026-09-23T07:27:20.923186+00:00",
+      "total_time": 1.348,
+      "working_time": 1.348,
+      "uuid": "nvLob8rexYgdVP8GsP3bjj",
+      "error": {
+        "message": "CancelledError(\"Cancelled via cancel scope 73c96c32ef30 by <Task cancelling name='inspect_ai._util.asyncfiles.with_async_fs.<locals>.wrapper' coro=<with_async_fs.<locals>.wrapper() running at $HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/lib/python3.13/site-packages/anyio/_backends/_asyncio.py:2531> cb=[_run_until_complete_cb() at $HOME/.local/share/codex-ecosystem/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/asyncio/base_events.py:181, <1 more>, WorkerThread.stop()]>\")",
+        "traceback": "Traceback (most recent call last):\n  File \"$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/lib/python3.13/site-packages/inspect_ai/_eval/task/run.py\", line 2846, in _task_run_sample_attempt\n    async with anyio.create_task_group() as tg:\n               ~~~~~~~~~~~~~~~~~~~~~~~^^\n  File \"$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/lib/python3.13/site-packages/anyio/_backends/_asyncio.py\", line 851, in __aexit__\n    raise exc_val\n  File \"$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/lib/python3.13/site-packages/anyio/_backends/_asyncio.py\", line 820, in __aexit__\n    await self._on_completed_fut\nasyncio.exceptions.CancelledError: Cancelled via cancel scope 73c96c32ef30 by <Task cancelling name='inspect_ai._util.asyncfiles.with_async_fs.<locals>.wrapper' coro=<with_async_fs.<locals>.wrapper() running at $HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/lib/python3.13/site-packages/anyio/_backends/_asyncio.py:2531> cb=[_run_until_complete_cb() at $HOME/.local/share/codex-ecosystem/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/asyncio/base_events.py:181, <1 more>, WorkerThread.stop()]>\n",
+        "traceback_ansi": "\u001b[31m┌─\u001b[0m\u001b[31m────────────────────\u001b[0m\u001b[31m \u001b[0m\u001b[1;31mTraceback \u001b[0m\u001b[1;2;31m(most recent call last)\u001b[0m\u001b[31m \u001b[0m\u001b[31m────────────────────\u001b[0m\u001b[31m─┐\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2m$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/l\u001b[0m \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2mib/python3.13/site-packages/inspect_ai/_eval/task/\u001b[0m\u001b[1mrun.py\u001b[0m:2846 in            \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m _task_run_sample_attempt                                                    \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m                                                                             \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2m$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/l\u001b[0m \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2mib/python3.13/site-packages/anyio/_backends/\u001b[0m\u001b[1m_asyncio.py\u001b[0m:851 in __aexit__    \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m                                                                             \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 848 \u001b[0m\u001b[2m│   │   │   │   │   │   \u001b[0m\u001b[33m\"\u001b[0m\u001b[33munhandled errors in a TaskGroup\u001b[0m\u001b[33m\"\u001b[0m, \u001b[96mself\u001b[0m._exc \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 849 \u001b[0m\u001b[2m│   │   │   │   │   \u001b[0m) \u001b[94mfrom\u001b[0m\u001b[90m \u001b[0m\u001b[94mNone\u001b[0m                                      \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 850 \u001b[0m\u001b[2m│   │   │   │   \u001b[0m\u001b[94melif\u001b[0m exc_val:                                        \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[31m> \u001b[0m 851 \u001b[2m│   │   │   │   │   \u001b[0m\u001b[94mraise\u001b[0m exc_val                                    \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 852 \u001b[0m\u001b[2m│   │   │   \u001b[0m\u001b[94mexcept\u001b[0m \u001b[96mBaseException\u001b[0m \u001b[94mas\u001b[0m exc:                             \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 853 \u001b[0m\u001b[2m│   │   │   │   \u001b[0m\u001b[94mif\u001b[0m \u001b[96mself\u001b[0m.cancel_scope.\u001b[92m__exit__\u001b[0m(\u001b[96mtype\u001b[0m(exc), exc, exc.__ \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 854 \u001b[0m\u001b[2m│   │   │   │   │   \u001b[0m\u001b[94mreturn\u001b[0m \u001b[94mTrue\u001b[0m                                      \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m                                                                             \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2m$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/l\u001b[0m \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[2mib/python3.13/site-packages/anyio/_backends/\u001b[0m\u001b[1m_asyncio.py\u001b[0m:820 in __aexit__    \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m                                                                             \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 817 \u001b[0m\u001b[2m│   │   │   │   │   │   │   \u001b[0m\u001b[96mself\u001b[0m._on_completed_fut = loop.create_fut \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 818 \u001b[0m\u001b[2m│   │   │   │   │   │   │   \u001b[0m                                         \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 819 \u001b[0m\u001b[2m│   │   │   │   │   │   │   \u001b[0m\u001b[94mtry\u001b[0m:                                     \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m \u001b[31m> \u001b[0m 820 \u001b[2m│   │   │   │   │   │   │   │   \u001b[0m\u001b[94mawait\u001b[0m \u001b[96mself\u001b[0m._on_completed_fut         \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 821 \u001b[0m\u001b[2m│   │   │   │   │   │   │   \u001b[0m\u001b[94mexcept\u001b[0m CancelledError \u001b[94mas\u001b[0m exc:            \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 822 \u001b[0m\u001b[2m│   │   │   │   │   │   │   │   \u001b[0m\u001b[2m# Shield the scope against further c\u001b[0m \u001b[31m│\u001b[0m\n\u001b[31m│\u001b[0m   \u001b[2m 823 \u001b[0m\u001b[2m│   │   │   │   │   │   │   │   \u001b[0m\u001b[2m# as they're not productive (#695)\u001b[0m   \u001b[31m│\u001b[0m\n\u001b[31m└─────────────────────────────────────────────────────────────────────────────┘\u001b[0m\n\u001b[1;91mCancelledError: \u001b[0mCancelled via cancel scope 73c96c32ef30 by \u001b[1m<\u001b[0m\u001b[1;95mTask\u001b[0m\u001b[39m cancelling \u001b[0m\n\u001b[33mname\u001b[0m\u001b[39m=\u001b[0m\u001b[32m'inspect_ai._util.asyncfiles.with_async_fs.<locals>.wrapper'\u001b[0m\u001b[39m \u001b[0m\n\u001b[33mcoro\u001b[0m\u001b[39m=<with_async_fs.<locals>\u001b[0m\u001b[1;35m.wrapper\u001b[0m\u001b[1;39m(\u001b[0m\u001b[1;39m)\u001b[0m\u001b[39m running at \u001b[0m\n\u001b[35m$HOME/.cache/gap-wave2-20260923/evaluation-experiments/venv-inspect/lib/p\u001b[0m\n\u001b[35mython3.13/site-packages/anyio/_backends/\u001b[0m\u001b[95m_asyncio.py\u001b[0m\u001b[39m:\u001b[0m\u001b[1;36m2531\u001b[0m\u001b[39m> \u001b[0m\n\u001b[33mcb\u001b[0m\u001b[39m=\u001b[0m\u001b[1;39m[\u001b[0m\u001b[1;35m_run_until_complete_cb\u001b[0m\u001b[1;39m(\u001b[0m\u001b[1;39m)\u001b[0m\u001b[39m at \u001b[0m\n\u001b[35m$HOME/.local/share/codex-ecosystem/python/cpython-3.13.15-linux-x86_64-gn\u001b[0m\n\u001b[35mu/lib/python3.13/asyncio/\u001b[0m\u001b[95mbase_events.py\u001b[0m\u001b[39m:\u001b[0m\u001b[1;36m181\u001b[0m\u001b[39m, <\u001b[0m\u001b[1;36m1\u001b[0m\u001b[39m more>, \u001b[0m\u001b[1;35mWorkerThread.stop\u001b[0m\u001b[1;39m(\u001b[0m\u001b[1;39m)\u001b[0m\u001b[1;39m]\u001b[0m\u001b[1m>\u001b[0m\n"
+      },
+      "error_retries": [],
+      "attachments": {
+        "944c03f42c0508dd3fd2271585127dc1": "{\"source\": \"# Native Workflow writing and recovery qualification\\n\\nThe bounded writing pilot produced correct code in both arms. It did **not**\\nestablish a fully compliant or superior multi-agent workflow: both arms piped\\nnative test output, and the Workflow arm omitted the required authoring skill.\\nIndependent unpiped verification accepted both repairs. Keep a capable single\\nagent as the economical choice for this small repair; this one ordered pair is\\nnot a cross-task model ranking.\", \"claim\": \"The native multi-agent workflow is the most efficient runtime for all task types.\"}",
+        "f22f49a8fc2203cc711a16c73ba54d72": "# Native Workflow writing and recovery qualification\n\nThe bounded writing pilot produced correct code in both arms. It did **not**\nestablish a fully compliant or superior multi-agent workflow: both arms piped\nnative test output, and the Workflow arm omitted the required authoring skill.\nIndependent unpiped verification accepted both repairs. Keep a capable single\nagent as the economical choice for this small repair; this one ordered pair is\nnot a cross-task model ranking."
+      },
+      "events_data": {
+        "messages": [],
+        "calls": []
+      },
+      "turn_count": 0
+    }
+  ],
+  "reductions": [
+    {
+      "scorer": "promptfoo_equivalent_assertions",
+      "samples": [
+        {
+          "value": 0.0,
+          "answer": "insufficient",
+          "explanation": "FAILED JSON.parse(output).verdict === context.vars.expected; FAILED JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+          "metadata": {
+            "gated": {
+              "verdict": "insufficient",
+              "eligible": true,
+              "disposition": "advisory_insufficient",
+              "source_sha256": "85eb14433d6e4b61fbe60670647f61c65ef4db1ce75408b853860f8a4f26ddc3",
+              "schema_version": 1
+            },
+            "assertions": [
+              {
+                "value": "JSON.parse(output).verdict === context.vars.expected",
+                "pass": false,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).eligible === context.vars.expected_eligible",
+                "pass": true,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+                "pass": false,
+                "error": null
+              }
+            ]
+          },
+          "history": [],
+          "sample_id": "C1"
+        },
+        {
+          "value": 1.0,
+          "answer": "insufficient",
+          "explanation": "all 3 assertions passed",
+          "metadata": {
+            "gated": {
+              "verdict": "insufficient",
+              "eligible": true,
+              "disposition": "advisory_insufficient",
+              "source_sha256": "85eb14433d6e4b61fbe60670647f61c65ef4db1ce75408b853860f8a4f26ddc3",
+              "schema_version": 1
+            },
+            "assertions": [
+              {
+                "value": "JSON.parse(output).verdict === context.vars.expected",
+                "pass": true,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).eligible === context.vars.expected_eligible",
+                "pass": true,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+                "pass": true,
+                "error": null
+              }
+            ]
+          },
+          "history": [],
+          "sample_id": "C2"
+        },
+        {
+          "value": 0.0,
+          "answer": "insufficient",
+          "explanation": "FAILED JSON.parse(output).verdict === context.vars.expected; FAILED JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+          "metadata": {
+            "gated": {
+              "verdict": "insufficient",
+              "eligible": true,
+              "disposition": "advisory_insufficient",
+              "source_sha256": "46573cdc7d0087f64fcf0ce70410841ec9d40b1cda9d6e55d194447f3bb024c9",
+              "schema_version": 1
+            },
+            "assertions": [
+              {
+                "value": "JSON.parse(output).verdict === context.vars.expected",
+                "pass": false,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).eligible === context.vars.expected_eligible",
+                "pass": true,
+                "error": null
+              },
+              {
+                "value": "JSON.parse(output).disposition === (context.vars.expected_eligible ? 'advisory_' + context.vars.expected : 'reject_evidence')",
+                "pass": false,
+                "error": null
+              }
+            ]
+          },
+          "history": [],
+          "sample_id": "C3"
+        }
+      ]
+    }
+  ]
+}

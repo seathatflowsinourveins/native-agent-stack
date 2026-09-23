@@ -1,0 +1,14 @@
+created restic repository e1ac8b34a5 at $HOME/.cache/gap-wave2-20260923/observability-hosting/paper-arm-7/restic-hot
+
+Please note that knowledge of your password is required to access
+the repository. Losing your password means that your data is
+irrecoverably lost.
+no parent snapshot found, will read all files
+
+Files:           3 new,     0 changed,     0 unmodified
+Dirs:            7 new,     0 changed,     0 unmodified
+Added to the repository: 1.709 MiB (24.675 KiB stored)
+
+processed 3 files, 1.705 MiB in 0:00
+snapshot 5c71d91d saved
+HOT_BACKUP_OK

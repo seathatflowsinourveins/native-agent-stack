@@ -1,0 +1,71 @@
++ cd $HOME/.cache/gap-wave2-20260923/identity-provenance
++ for v in core iceberg arctic mlflow
++ uv venv -q --python $HOME/.local/share/codex-ecosystem/bin/python3.13 --no-python-downloads $HOME/.cache/gap-wave2-20260923/identity-provenance/venv-core
++ for v in core iceberg arctic mlflow
++ uv venv -q --python $HOME/.local/share/codex-ecosystem/bin/python3.13 --no-python-downloads $HOME/.cache/gap-wave2-20260923/identity-provenance/venv-iceberg
++ for v in core iceberg arctic mlflow
++ uv venv -q --python $HOME/.local/share/codex-ecosystem/bin/python3.13 --no-python-downloads $HOME/.cache/gap-wave2-20260923/identity-provenance/venv-arctic
++ for v in core iceberg arctic mlflow
++ uv venv -q --python $HOME/.local/share/codex-ecosystem/bin/python3.13 --no-python-downloads $HOME/.cache/gap-wave2-20260923/identity-provenance/venv-mlflow
++ uv pip install -q --python $HOME/.cache/gap-wave2-20260923/identity-provenance/venv-core/bin/python duckdb==1.5.5 pandas==3.0.6 numpy==2.5.3 dvc==3.67.1 openlineage-python==1.53.0
++ uv pip install -q --python $HOME/.cache/gap-wave2-20260923/identity-provenance/venv-iceberg/bin/python 'pyiceberg[pyarrow,sql-sqlite]==0.12.0' duckdb==1.5.5 pandas==3.0.6 numpy==2.5.3
++ uv pip install -q --python $HOME/.cache/gap-wave2-20260923/identity-provenance/venv-arctic/bin/python arcticdb==6.26.0 duckdb==1.5.5 pyarrow
++ uv pip install -q --python $HOME/.cache/gap-wave2-20260923/identity-provenance/venv-mlflow/bin/python mlflow==3.16.1 duckdb==1.5.5 openlineage-python==1.53.0
++ for v in core iceberg arctic mlflow
++ echo '== core'
+== core
++ uv pip freeze --python $HOME/.cache/gap-wave2-20260923/identity-provenance/venv-core/bin/python
++ grep -iE '^(dvc|duckdb|pandas|numpy|pyarrow|pyiceberg|arcticdb|mlflow|mlflow-skinny|openlineage-python|sqlalchemy)=='
+Using Python 3.13.15 environment at: venv-core
+duckdb==1.5.5
+dvc==3.67.1
+numpy==2.5.3
+openlineage-python==1.53.0
+pandas==3.0.6
++ du -sh $HOME/.cache/gap-wave2-20260923/identity-provenance/venv-core
+266M	$HOME/.cache/gap-wave2-20260923/identity-provenance/venv-core
++ for v in core iceberg arctic mlflow
++ echo '== iceberg'
+== iceberg
++ uv pip freeze --python $HOME/.cache/gap-wave2-20260923/identity-provenance/venv-iceberg/bin/python
++ grep -iE '^(dvc|duckdb|pandas|numpy|pyarrow|pyiceberg|arcticdb|mlflow|mlflow-skinny|openlineage-python|sqlalchemy)=='
+Using Python 3.13.15 environment at: venv-iceberg
+duckdb==1.5.5
+numpy==2.5.3
+pandas==3.0.6
+pyarrow==25.0.1
+pyiceberg==0.12.0
+sqlalchemy==2.0.54
++ du -sh $HOME/.cache/gap-wave2-20260923/identity-provenance/venv-iceberg
+380M	$HOME/.cache/gap-wave2-20260923/identity-provenance/venv-iceberg
++ for v in core iceberg arctic mlflow
++ echo '== arctic'
+== arctic
++ uv pip freeze --python $HOME/.cache/gap-wave2-20260923/identity-provenance/venv-arctic/bin/python
++ grep -iE '^(dvc|duckdb|pandas|numpy|pyarrow|pyiceberg|arcticdb|mlflow|mlflow-skinny|openlineage-python|sqlalchemy)=='
+Using Python 3.13.15 environment at: venv-arctic
+arcticdb==6.26.0
+duckdb==1.5.5
+numpy==2.5.3
+pandas==2.3.3
+pyarrow==25.0.1
++ du -sh $HOME/.cache/gap-wave2-20260923/identity-provenance/venv-arctic
+394M	$HOME/.cache/gap-wave2-20260923/identity-provenance/venv-arctic
++ for v in core iceberg arctic mlflow
++ echo '== mlflow'
+== mlflow
++ uv pip freeze --python $HOME/.cache/gap-wave2-20260923/identity-provenance/venv-mlflow/bin/python
++ grep -iE '^(dvc|duckdb|pandas|numpy|pyarrow|pyiceberg|arcticdb|mlflow|mlflow-skinny|openlineage-python|sqlalchemy)=='
+Using Python 3.13.15 environment at: venv-mlflow
+duckdb==1.5.5
+mlflow==3.16.1
+mlflow-skinny==3.16.1
+numpy==2.5.3
+openlineage-python==1.53.0
+pandas==3.0.6
+pyarrow==25.0.1
+sqlalchemy==2.0.54
++ du -sh $HOME/.cache/gap-wave2-20260923/identity-provenance/venv-mlflow
+662M	$HOME/.cache/gap-wave2-20260923/identity-provenance/venv-mlflow
+pytz add: pytz==2026.3.post1 into core,iceberg,arctic,mlflow
+jsonschema add + curl openlineage spec 2-0-2 2026-09-23T05:18:34Z

@@ -1,0 +1,23 @@
+time=2026-09-22T22:46:51.645-04:00 level=INFO msg="Scheduler initialization" dir=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g2-real-1790131602/dags log-format=text
+time=2026-09-22T22:46:51.645-04:00 level=INFO msg="Starting service registry" service=scheduler service-id=<host>-2055217-1790131611 host=<host> port=8090 status=inactive
+time=2026-09-22T22:46:51.651-04:00 level=INFO msg="Registered with service registry as inactive" service-id=<host>-2055217-1790131611 host=<host> port=8090
+time=2026-09-22T22:46:51.695-04:00 level=INFO msg="Waiting to acquire scheduler lock"
+time=2026-09-22T22:46:51.695-04:00 level=INFO msg="Starting health check server" service=scheduler port=8090
+time=2026-09-22T22:46:51.695-04:00 level=INFO msg="Acquired scheduler lock"
+time=2026-09-22T22:46:51.701-04:00 level=INFO msg="Updated scheduler status to active"
+time=2026-09-22T22:46:51.715-04:00 level=INFO msg="Loading DAGs" dir=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g2-real-1790131602/dags
+time=2026-09-22T22:46:51.720-04:00 level=INFO msg="Loaded scheduler watermark" lastTick=0001-01-01T00:00:00.000Z dagCount=1
+time=2026-09-22T22:46:51.743-04:00 level=INFO msg="Scheduler started"
+time=2026-09-22T22:46:51.743-04:00 level=INFO msg="Started retry scanner" interval=30s retry_failure_window=24h0m0s
+2026/09/22 22:46:51 INFO DAG run notification monitor started
+time=2026-09-22T22:46:51.743-04:00 level=INFO msg="Started zombie detector" interval=45s
+2026/09/22 22:46:51 INFO Acquired notification lock; DAG run notifications are active lock_dir=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g2-real-1790131602/dagu-home/data/notifications/monitor-state.json.lock
+2026/09/22 22:46:51 INFO DAG run notification monitor started
+2026/09/22 22:46:51 INFO Acquired notification lock; DAG run notifications are active lock_dir=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/g2-real-1790131602/dagu-home/data/incidents/monitor-state.json.lock
+time=2026-09-22T22:48:00.000-04:00 level=INFO msg="Dispatching planned run" dag=realmaint scheduleType=Start scheduledTime=2026-09-22T22:48:00-04:00
+2026/09/22 22:48:16 INFO DAG run notification monitor stopped
+2026/09/22 22:48:16 INFO DAG run notification monitor stopped
+time=2026-09-22T22:48:16.955-04:00 level=INFO msg="Stopping health check server" service=scheduler
+time=2026-09-22T22:48:16.956-04:00 level=INFO msg="Stopping service registry" service=scheduler service-id=<host>-2055217-1790131611 host=<host> port=8090
+time=2026-09-22T22:48:16.956-04:00 level=INFO msg="Scheduler stopped"
+time=2026-09-22T22:48:16.967-04:00 level=INFO msg="Stopping zombie detector"

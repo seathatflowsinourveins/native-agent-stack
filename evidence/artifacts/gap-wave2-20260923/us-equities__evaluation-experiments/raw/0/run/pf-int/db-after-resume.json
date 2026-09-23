@@ -1,0 +1,108 @@
+{
+ "tables": [
+  "__drizzle_migrations",
+  "blob_assets",
+  "blob_references",
+  "configs",
+  "datasets",
+  "eval_results",
+  "evals",
+  "evals_to_datasets",
+  "evals_to_prompts",
+  "evals_to_tags",
+  "model_audits",
+  "prompts",
+  "spans",
+  "tags",
+  "traces"
+ ],
+ "evals": [
+  {
+   "id": "eval-jFU-2026-09-23T07:26:48",
+   "created_at": 1790148408781,
+   "is_redteam": 0
+  }
+ ],
+ "eval_results": [
+  {
+   "id": "<uuid-42>",
+   "eval_id": "eval-jFU-2026-09-23T07:26:48",
+   "test_idx": 0,
+   "prompt_idx": 0,
+   "success": 0,
+   "created_at": "2026-09-23 07:26:51",
+   "updated_at": "2026-09-23 07:26:51",
+   "failure_reason": 1
+  },
+  {
+   "id": "<uuid-43>",
+   "eval_id": "eval-jFU-2026-09-23T07:26:48",
+   "test_idx": 1,
+   "prompt_idx": 0,
+   "success": 1,
+   "created_at": "2026-09-23 07:26:54",
+   "updated_at": "2026-09-23 07:26:54",
+   "failure_reason": 0
+  },
+  {
+   "id": "<uuid-44>",
+   "eval_id": "eval-jFU-2026-09-23T07:26:48",
+   "test_idx": 2,
+   "prompt_idx": 0,
+   "success": 0,
+   "created_at": "2026-09-23 07:26:58",
+   "updated_at": "2026-09-23 07:26:58",
+   "failure_reason": 1
+  },
+  {
+   "id": "<uuid-45>",
+   "eval_id": "eval-jFU-2026-09-23T07:26:48",
+   "test_idx": 3,
+   "prompt_idx": 0,
+   "success": 1,
+   "created_at": "2026-09-23 07:27:01",
+   "updated_at": "2026-09-23 07:27:01",
+   "failure_reason": 0
+  },
+  {
+   "id": "<uuid-46>",
+   "eval_id": "eval-jFU-2026-09-23T07:26:48",
+   "test_idx": 4,
+   "prompt_idx": 0,
+   "success": 0,
+   "created_at": "2026-09-23 07:27:04",
+   "updated_at": "2026-09-23 07:27:04",
+   "failure_reason": 1
+  },
+  {
+   "id": "<uuid-47>",
+   "eval_id": "eval-jFU-2026-09-23T07:26:48",
+   "test_idx": 5,
+   "prompt_idx": 0,
+   "success": 0,
+   "created_at": "2026-09-23 07:27:07",
+   "updated_at": "2026-09-23 07:27:07",
+   "failure_reason": 1
+  },
+  {
+   "id": "<uuid-48>",
+   "eval_id": "eval-jFU-2026-09-23T07:26:48",
+   "test_idx": 6,
+   "prompt_idx": 0,
+   "success": 0,
+   "created_at": "2026-09-23 07:27:10",
+   "updated_at": "2026-09-23 07:27:10",
+   "failure_reason": 1
+  },
+  {
+   "id": "<uuid-49>",
+   "eval_id": "eval-jFU-2026-09-23T07:26:48",
+   "test_idx": 7,
+   "prompt_idx": 0,
+   "success": 1,
+   "created_at": "2026-09-23 07:27:13",
+   "updated_at": "2026-09-23 07:27:13",
+   "failure_reason": 0
+  }
+ ]
+}

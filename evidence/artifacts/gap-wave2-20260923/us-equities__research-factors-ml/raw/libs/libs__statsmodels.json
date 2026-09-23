@@ -1,0 +1,1 @@
+{"aic": -1242.8696, "arm": "statsmodels", "forecast_log_close_5": [5.92264, 5.923359, 5.92296, 5.923181, 5.923058], "last_log_close": 5.923935, "ljung_box_resid_pvalue": {"lag10": 0.0, "lag5": 0.0624}, "params": {"ar.L1": -0.554985, "ma.L1": 0.262383, "sigma2": 0.000404}, "plan_sha256": "b8d1beba6eddd0388957ca0d9e9c46ebfb2ca538f076419d5a8dcaaaf82be4a7", "version": "0.15.0"}

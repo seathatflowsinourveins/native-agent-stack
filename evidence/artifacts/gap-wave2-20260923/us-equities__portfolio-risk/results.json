@@ -1,0 +1,55 @@
+{
+  "catalog": "us-equities",
+  "layer_id": "portfolio-risk",
+  "generated_from": "receipt outcome fields by finish_receipts.py",
+  "results": {
+    "0": {
+      "outcome": "settled",
+      "receipt": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/0-skfolio-cpcv-prior-estimator.json"
+    },
+    "1": {
+      "outcome": "settled",
+      "receipt": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/1-candidate-libs-execution.json"
+    },
+    "2": {
+      "outcome": "settled",
+      "receipt": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/2-walkforward-source-hash-match.json"
+    },
+    "3": {
+      "outcome": "advanced",
+      "receipt": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/3-evaluate-rerun-hash-compare.json"
+    },
+    "4": {
+      "outcome": "advanced",
+      "receipt": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/4-nautilus-weights-accounting.json"
+    },
+    "5": {
+      "outcome": "advanced",
+      "receipt": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/5-extended-reserved-significance.json"
+    },
+    "6": {
+      "outcome": "advanced",
+      "receipt": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/6-nautilus-riskengine-denial.json"
+    },
+    "7": {
+      "outcome": "covered_elsewhere",
+      "receipt": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/7-skfolio-130-upgrade.json"
+    },
+    "9": {
+      "outcome": "advanced",
+      "receipt": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/9-matched-four-candidate-runner.json"
+    },
+    "10": {
+      "outcome": "settled",
+      "receipt": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/10-nautilus-optimizer-pnl.json"
+    },
+    "11": {
+      "outcome": "advanced",
+      "receipt": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/11-nautilus-study-episodes-fees.json"
+    },
+    "14": {
+      "outcome": "advanced",
+      "receipt": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/14-parity-and-paper.json"
+    }
+  }
+}

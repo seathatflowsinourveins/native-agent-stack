@@ -1,0 +1,75 @@
+{
+  "id": "gap-wave2-20260923-research-factors-ml-10-nautilus-dividend-fee-cash",
+  "layer_id": "research-factors-ml",
+  "catalog": "us-equities",
+  "gap_index": 10,
+  "gap_text_sha256": "e65e53caf1a8b9f99c1a0d168b6f20d9d60df59a5b904fe0c97b89ec5f876284",
+  "gap_text": "Skfolio acceptance covers chronological splitting in a project-local raw-price label study. It excludes dividend-inclusive returns, financing, realistic fills, capacity and portfolio cash reconciliation.",
+  "preregistration": {
+    "written_at": "2026-09-23T06:19:39Z",
+    "written_at_note": "Upper bound: the commit time of the first preregistration commit (4484138). Written between 06:18:35Z and that commit; corrected in the same unpushed commit before any check ran.",
+    "source": "preregistration.json gaps.10",
+    "expectation": "Same Nautilus run as gap 0; the ADJ arm supplies dividend-inclusive bars, the MakerTakerFeeModel supplies fees, cash is reconciled; a daily-volume participation admission check (order qty <= 1% of session volume) is reported.",
+    "criteria": [
+      "As gap 0 criteria for fills, fees and cash.",
+      "Outcome ceiling: advanced; realistic fills (queue, spread, impact), financing and in-engine dividend crediting remain."
+    ],
+    "fix_rounds": [
+      {
+        "written_at": "2026-09-23T06:37:00Z",
+        "label": "fix round 1 (gaps 0 and 10), written after round-1 Nautilus output was seen",
+        "trigger": "Round 1: RAW arms reconciled exactly; both ADJ arms failed the cash-sequence audit ('cash sequence mismatch', 'final cash 89651.82 != independent 89651.9250'; reserved '100814.92 != 100814.9167') and the realized-PnL identity. ADJ prices have 4 decimals, so qty*price has sub-cent notional; the independent arithmetic did not round it.",
+        "diagnosis": "Testing five rounding rules against round-1 development-ADJ reports: per-fill notional rounded to cents with ROUND_HALF_EVEN matched all 276 cash transitions (HALF_UP 163, DOWN/FLOOR 5, CEILING 6). Per-position realized PnL matched round_half_even(qty*(exit-entry)) - fees in 136/138 positions; the 2 others differ by 0.01 at exact half-cent ties (consistent with binary floating-point rounding).",
+        "change": "Audit v2 rounds each fill notional to cents with ROUND_HALF_EVEN before the cash update (declared engine currency-precision convention, fitted on development-ADJ round 1; the reserved-ADJ arm's 20 fills act as a check that was not used for fitting). Realized PnL is checked per position with tolerance 0.01 USD; the sum residual against the cash delta is reported, not asserted. Strategy, schedule, prices and engine configuration are unchanged; round-1 outputs are retained.",
+        "criteria": [
+          "All four arms: every cash transition equals independent arithmetic under the declared rule.",
+          "Per-position realized PnL within 0.01 USD of independent value; report count of exact matches and total residual."
+        ]
+      }
+    ]
+  },
+  "commands": [
+    "see receipt 0 (same nautilus_rerun.py rounds 1 and 2)"
+  ],
+  "results": {
+    "summary": "The skfolio study's frozen selections ran through Nautilus 2.0.0rc5 with dividend-inclusive back-adjusted bars (ADJ arm) and MakerTakerFeeModel 10 bp per side; portfolio cash reconciled exactly in all four arms under audit v2 (development ADJ: 276 fills, fees 27407.36 USD, ending cash 89651.82). Participation at most 0.0000844 of session volume (1% admission rule met). Financing is zero by construction (cash account, no margin or short).",
+    "details": "receipt 0 results.round2"
+  },
+  "outcome": "advanced",
+  "evidence_class": "local_integration",
+  "detection_method": "As receipt 0: the exact cash audit caught the sub-cent rounding in round 1.",
+  "remaining": "Realistic fills (spread, queue, impact, partial fills), capacity beyond a volume-participation ratio, and financing models are not exercised. Dividend-inclusive bars are back-adjusted, so their prices were not tradable historically. In-engine dividend cash crediting is peer-owned (dividend SimulationModule, sota-workflow-resolution).",
+  "limits": [
+    "Same limits as receipt 0."
+  ],
+  "raw_outputs": [
+    {
+      "path": "raw/nautilus/run-nautilus__summary.json",
+      "committed_sha256": "1089e537363c9af3f58f664e0ec4c47b1c8b0cedc59b729808b472c33a90662c",
+      "original_sha256": "1089e537363c9af3f58f664e0ec4c47b1c8b0cedc59b729808b472c33a90662c",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/nautilus/run-nautilus__development-ADJ.reports.json",
+      "committed_sha256": "a0157d406ae45f91cab2e999515d2780e9d106cd641101d3d6abd9c7fd9c984f",
+      "original_sha256": "bcab98572a1cac2e87e609c379fec7c31e814f54f1b65fae8ca67344e2c43048",
+      "uuids_redacted": 687
+    },
+    {
+      "path": "raw/nautilus/run-nautilus__reserved-ADJ.reports.json",
+      "committed_sha256": "f755fa98632dcf4eeb767b9830cfe57419c0eb45bbd5aa5f94d1fb61525a1a00",
+      "original_sha256": "706408b6ee474cb633b82ee4902f46f1890a549e54e4a86216e0a409c69e1001",
+      "uuids_redacted": 47
+    },
+    {
+      "path": "raw/nautilus-round1/run-nautilus-round1__summary.json",
+      "committed_sha256": "d8272a08f8578330d02a11685d95fbc57872eeb42da07607edba868a6d1a0729",
+      "original_sha256": "d8272a08f8578330d02a11685d95fbc57872eeb42da07607edba868a6d1a0729",
+      "uuids_redacted": 0
+    }
+  ],
+  "checked_at": "2026-09-23T07:09:07Z",
+  "checked_at_note": "mtime of the last check output, $CACHE/run-fcmp-merged-r2/results.json. Corrected from 07:15:00Z, which post-dated its own commit 01e6054 (07:11:23Z); correction written 2026-09-23 after 13:37Z.",
+  "base_commit": "41d39b3",
+  "branch": "claude/g2-research-factors-ml-20260923"
+}

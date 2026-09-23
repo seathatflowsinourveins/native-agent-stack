@@ -1,0 +1,1 @@
+{"cold": {"integrity": "ok", "counts": {"intents": 20, "requests": 22, "events": 41, "positions": 2, "marks": 6, "trials": 0}}, "hot": {"integrity": "ok", "counts": {"intents": 20, "requests": 21, "events": 41, "positions": 2, "marks": 6, "trials": 0}}}

@@ -1,0 +1,7 @@
+{
+  "phase": "boot2",
+  "pid_in_namespace": 1,
+  "pid_namespace": "pid:[4026532246]",
+  "boot_token": "8a51434035b165d3",
+  "at": 1790131971.3925216
+}

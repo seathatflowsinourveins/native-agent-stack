@@ -1,0 +1,88 @@
+{
+ "id": "gap5-openresearch-discovery-and-currency",
+ "gap_index": 5,
+ "gap_text_sha256": "564d1d190c42e555a5587af2d81131f2b7dbb2a25f81697b9dc21d0bb35be0f5",
+ "preregistration": {
+  "written_at": "2026-09-23T01:35:00Z",
+  "expectation": "cargo/rustc are not installed on this host and are not on any allowed PATH-modifying install target for this bounded unit; a functional CLI-level check using a released binary is the strongest check available here. Discovery on a nonsense query and paper lookup on a missing/ambiguous id should either return nothing/clear errors, or reveal a quality gap if they silently return unrelated results.",
+  "criteria": "Record the actual current upstream release tag, exercise discover-keyword on a real and a gibberish query, and paper fetch on a valid, a missing, and an ambiguous id, recording exit codes and output.",
+  "written_late": true,
+  "written_late_note": "FIX ROUND: written_at is identical to checked_at (rounded to the same minute) in the original submission, which cannot demonstrate the preregistration preceded execution. It is relabelled late here: the expectation/criteria below were drafted as part of planning this check but recorded concurrently with, not strictly before, the run."
+ },
+ "commands": [
+  "curl -s https://api.github.com/repos/alphaXiv/OpenResearch/releases/latest",
+  "curl -sL .../releases/download/v0.2.9/openresearch-cli-x86_64-unknown-linux-musl.tar.xz -o or.tar.xz && tar xJf or.tar.xz",
+  "./orx --version",
+  "./orx --no-telemetry discover keyword 'nautilus trading platform adapter'",
+  "./orx --no-telemetry discover keyword 'zzqxvbnm nonexistent gibberish query 98234'",
+  "./orx --no-telemetry paper 2609.05760",
+  "./orx --no-telemetry paper 9999.99999",
+  "./orx --no-telemetry paper not-a-real-id-format",
+  "FIX ROUND: RUSTUP_HOME=.../rust/rustup CARGO_HOME=.../rust/cargo sh rustup-init.sh -y --no-modify-path --default-toolchain stable --profile minimal",
+  "FIX ROUND: git clone --depth 1 --branch v0.2.9 https://github.com/alphaXiv/OpenResearch.git openresearch-src",
+  "FIX ROUND: cargo test --locked  (in openresearch-src, with the cache-prefix CARGO_HOME/RUSTUP_HOME on PATH)"
+ ],
+ "results": {
+  "orx_version_run": "orx 0.2.9",
+  "upstream_latest_at_check_time": "v0.2.9 (published 2026-09-23T01:02:34Z, i.e. same day as this check)",
+  "project_pin_before_this_check": "0.2.7 (recipes/native-upgrades-20260921.md)",
+  "cases": [
+   {
+    "case": "keyword_valid_nautilus_terms",
+    "returncode": 0,
+    "ms": 405,
+    "stdout": "[\n  {\n    \"source\": \"alphaxiv\",\n    \"id\": \"2605.11665\",\n    \"title\": \"Nautilus: From One Prompt to Plug-and-Play Robot Learning\",\n    \"abstract\": \"Robot learning research is fragmented across policy families, benchmark suites, and real robots; each implementation is entangled with the others in a complex combination matrix, making it an engineering nightmare to port any single element. General-purpose coding agents may occasionally bridge specific setups, but cannot close this gap at scale becau",
+    "stderr": ""
+   },
+   {
+    "case": "keyword_gibberish",
+    "returncode": 0,
+    "ms": 2263,
+    "stdout": "[\n  {\n    \"source\": \"alphaxiv\",\n    \"id\": \"2609.19209\",\n    \"title\": \"Generative Query Suggestion via Intent Coverage and Query-Level Credit Assignment\",\n    \"abstract\": \"Generative query suggestion aims to enhance user engagement by anticipating user intents and recommending relevant follow-up queries. A central challenge is to generate slates whose individual queries are useful while the slate covers distinct intents. We propose an Intent-Driven Query Suggestion Framework with dual-stage optim",
+    "stderr": ""
+   },
+   {
+    "case": "paper_known_2609_05760",
+    "returncode": 0,
+    "ms": 409,
+    "stdout": "alphaXiv: https://www.alphaxiv.org/abs/2609.05760\n\nRAGMark: A Comprehensive Framework for Benchmarking\nRetrieval-Augmented Generation Systems\nZlatan Feric\n\u2217\n, Amir Taherin\n\u2217\n, Bin Ren\n\u2021\n, Yanzhi Wang\n\u2217\n, Jennifer Dy\n\u2217\n, David Kaeli\n\u2217\n\u2217\nNortheastern University, Boston, MA, USA \n\u2021\nCollege of William & Mary, VA, USA\n{feric.z, taherin.a, yanzhiwang, j.dy, d.kaeli}@northeastern.edu\nbren@cs.wm.edu\nAbstract\u2014We present RAGMark, a modular benchmarking\nframework for advanced Retrieval-Augmented Generation",
+    "stderr": ""
+   },
+   {
+    "case": "paper_missing_id",
+    "returncode": 1,
+    "ms": 1018,
+    "stdout": "",
+    "stderr": "No report or extracted text available for 9999.99999 yet. Open the paper on alphaXiv: https://www.alphaxiv.org/abs/9999.99999"
+   },
+   {
+    "case": "paper_ambiguous_id",
+    "returncode": 1,
+    "ms": 272,
+    "stdout": "",
+    "stderr": "No report or extracted text available for not-a-real-id-format yet. Open the paper on alphaXiv: https://www.alphaxiv.org/abs/not-a-real-id-format"
+   }
+  ],
+  "cargo_test_fix_round": {
+   "toolchain": "rustc 1.98.1 (48a229cea 2026-09-01) / cargo 1.98.1 (797e8a9bc 2026-08-05), installed via rustup into a new cache-prefix RUSTUP_HOME/CARGO_HOME",
+   "source_tag": "v0.2.9 (git tag, commit 678f47798231de3db6afe3dc19e3ed128b6799a0)",
+   "command": "cargo test --locked",
+   "returncode": 0,
+   "wall_time_install_to_test": "approx. 6 minutes (rustup install ~10s given a warm mirror, clone ~5s, compile+test ~70s)",
+   "summary_line": "test result: ok. 914 passed; 0 failed; 3 ignored; 0 measured; 0 filtered out; finished in 3.50s",
+   "raw_log": "raw/cargo_test_tail.log"
+  }
+ },
+ "outcome": "advanced",
+ "outcome_detail": "Narrows the gap on all three points, including the cargo test qualification the first pass skipped. (1) Currency: upstream has moved to v0.2.9 (published today), two releases ahead of the project's 0.2.7 pin -- the pin is more stale than the gap text anticipated (it named v0.2.8). Ran functionally at v0.2.9 via the official musl release binary, and separately confirmed by building from source. (2) Missing/ambiguous paper IDs: both '9999.99999' and 'not-a-real-id-format' fail cleanly (exit 1, clear stderr pointing to the alphaXiv URL); no crash, no silent wrong answer. Note that 'not-a-real-id-format' is a malformed string, not an id that is genuinely ambiguous between two real papers -- so this exercises 'garbage input' handling, not id-ambiguity resolution specifically; no true ambiguous-id case was constructed. (3) Discovery quality: `discover keyword` on a gibberish/nonsense query does NOT return empty or an error; it returns unrelated, real papers ('Generative Query Suggestion via Intent Coverage...') with no signal that the match was poor. This is a real, reproducible observation from a single probe; calling it a 'defect' is this receipt's interpretation of what a nearest-neighbour/semantic search returning its closest hits on a nonsense query means, not a documented spec violation -- softened to 'quality observation' here. (4) FIX ROUND: `cargo test` for the Rust source WAS run this round. rustup/cargo were installed into this unit's own cache prefix (RUSTUP_HOME/CARGO_HOME under ~/.cache/gap-wave2-20260923/web-research/rust/, which the isolation hard rule explicitly allows), and the OpenResearch source was cloned at tag v0.2.9 (v0.2.8 no longer exists as a distinct tag; upstream had already moved past it) into the same prefix. `cargo test` completed in 3.50s: 914 passed, 0 failed, 3 ignored (raw/cargo_test_tail.log). This closes the unit-test portion of the gap for the current source tree; it does not by itself cover the discovery-quality or ambiguous-id behavior above, which are runtime/network behaviors a unit-test suite would not be expected to exercise.",
+ "evidence_class": "local_integration",
+ "limits": [
+  "FIX ROUND correction: the prior receipt said cargo/rustc unavailability was 'judged to exceed this check's time-box' -- that implied an observed overrun that never happened; the accurate statement is that cargo test was simply not attempted in the original pass, because the preregistration (incorrectly) treated a cache-prefix rustup install as outside this unit's allowed install targets. It is allowed, was attempted this round, and completed in about 6 minutes end to end (rustup install + git clone + cargo test), well inside the 20-minute time-box.",
+  "The rustup/cargo toolchain and OpenResearch source clone live under ~/.cache/gap-wave2-20260923/web-research/rust/ and .../openresearch-src (host-local, not committed); only the tail of cargo_test.log and the rustup install log head are retained in raw/.",
+  "Discovery exhaustiveness/coverage benchmarking (beyond the one gibberish-query probe) was not attempted; this is a small, illustrative sample, not a benchmark. The 'gibberish query returns unrelated results' finding is a single-probe observation and this receipt's interpretation of it as undesirable, not a confirmed spec violation.",
+  "'not-a-real-id-format' tests malformed-input handling, not true id-ambiguity (no case with two real papers sharing an ambiguous identifier was constructed); the gap's 'ambiguous paper id' wording is not fully addressed.",
+  "No login/API key was used; `discover`/`paper` worked unauthenticated in this run, so authenticated-only behavior (if any) is unqualified.",
+  "cargo test exercises the CLI's own Rust unit-test suite (config, telemetry, update-checking, local job/session state, etc.); it does not exercise or validate the live discovery/paper HTTP behavior above, which remains only black-box/functionally tested via the release binary."
+ ],
+ "checked_at": "2026-09-23T01:35:00Z"
+}

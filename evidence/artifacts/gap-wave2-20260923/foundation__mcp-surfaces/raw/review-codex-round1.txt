@@ -1,0 +1,29 @@
+1. gap 0: finding (severity low): The receipt’s **2205 bytes / 15 CR characters** are hardcoded and absent from cited raw evidence; raw records only normalized **2190 bytes**. Retain the original-file measurement or remove those numbers. Otherwise settlement is supported.
+
+2. gap 1: finding (severity medium): Matched results agree with raw, but installation integrity and distribution-diff claims lack retained raw output. Preserve package identity/install evidence and the cited diff before treating those claims as verified.
+
+3. gap 2: ok — lifecycle stages ran, numbers match, and failed automatic recovery is disclosed.
+
+4. gap 3: ok — all four commands, fresh results, and retained definitions are published; quoted counts match.
+
+5. gap 4: ok — “advanced” correctly preserves the untested plugin/hooks/Desktop clauses and records Serena’s failure.
+
+6. gap 5: ok — project/scratch listings and approval controls match raw; the addendum precedes execution.
+
+7. gap 6: ok — “advanced” correctly acknowledges incomplete alternative listing; reported measurements match raw.
+
+8. gap 7: ok — pinned source excerpts support the bounded source-review disposition; execution is not claimed.
+
+9. gap 8: ok — inside/outside scope checks match raw; “advanced” preserves outstanding clauses.
+
+10. gap 9: finding (severity medium): `run_lifecycle.py:285` kills the lock holder before the retry, yet reports `manual_steps: []` and recovery “with no manual step.” This establishes recovery **after harness removal of the obstruction**. Disclose that intervention, qualify the conclusion, and retain “advanced” until the required intervention-free retry is tested.
+
+11. gap 10: finding (severity high): Unchanged PID/socket inode/metadata mtime cannot detect ordinary contact with the shared daemon. Consequently, the isolation probe cannot establish its claimed absence, leaving “settled” unsupported. Use enforced socket isolation or connection tracing validated against an owned control; retain “advanced” meanwhile. No actual live-service contact was demonstrated.
+
+12. gap 12: finding (severity high): Five alternative list operations were skipped and represented by synthetic `unsupported` rows (`run_bridges.py:167`), not executed three times. Only eight operation types ran under that bridge. Change to “advanced,” distinguish skipped from failed operations, and complete the matched listing arms before claiming settlement.
+
+other findings:
+
+- The shared “no contact” proof in multiple receipts has gap 10’s limitation.
+- Several lifecycle `started` timestamps are assigned **after** the measured actions; capture actual starts or rename the fields.
+- Preregistration/addendum ordering is otherwise consistent. Cited file hashes and recalculated bridge summaries match. No files were modified.

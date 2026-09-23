@@ -1,0 +1,11 @@
+{
+  "snapshot_sha256": "3b9dbed12f028aa9093264cc66e2123f3eb470aa7e805c70ca84ed0eefd2ed92",
+  "source_sha256": "40aeafbc144eb39ebd017af449d6d136f5539caf484ebd8b310bb4fbf213eb5d",
+  "counts": {
+    "observations": 5,
+    "universe": 2
+  },
+  "synthetic": true,
+  "pandas_version": "3.0.6",
+  "duckdb_version": "1.5.5"
+}

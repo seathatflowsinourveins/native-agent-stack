@@ -1,0 +1,13 @@
+{
+  "gap_index": 8,
+  "fix_round": 1,
+  "label": "fix-round preregistration, written after the round-1 Codex review and before the fix-1 run",
+  "written_at": "2026-09-23T07:50:35Z",
+  "trigger": "Round-1 review: the readback comparison excluded the logged evaluate_exit_code metric, so a stored exit code of 999 would not have been detected.",
+  "expectation": "With evaluate_exit_code included, a fresh run in a new work directory reads back every logged param and metric (17 of 18 from results.json plus evaluate_exit_code 0) with 0 mismatches; two negative probes (ledger_records+1, evaluate_exit_code=999) are each detected as exactly one mismatch.",
+  "criteria": [
+    "compare() iterates over every logged metric including evaluate_exit_code.",
+    "Both negative probes detected.",
+    "Replay hashes still equal the 2026-09-19 receipt."
+  ]
+}

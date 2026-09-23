@@ -1,0 +1,14 @@
+gap 0: 0-retained-bridge-rerun.json outcome=settled class=local_integration gap_text_sha256_recomputed_match=True gap_text_match=True cited_files_checked=11
+gap 1: 1-mcporter-0.14.0-matched.json outcome=settled class=local_integration gap_text_sha256_recomputed_match=True gap_text_match=True cited_files_checked=10
+gap 2: 2-owned-daemon-lifecycle-stages.json outcome=settled class=local_integration gap_text_sha256_recomputed_match=True gap_text_match=True cited_files_checked=6
+gap 3: 3-retained-operation-ids-defined.json outcome=settled class=local_integration gap_text_sha256_recomputed_match=True gap_text_match=True cited_files_checked=8
+gap 4: 4-inspector-tools-list-local-servers.json outcome=advanced class=local_integration gap_text_sha256_recomputed_match=True gap_text_match=True cited_files_checked=7
+gap 5: 5-project-config-without-registry.json outcome=settled class=native_proven gap_text_sha256_recomputed_match=True gap_text_match=True cited_files_checked=21
+gap 6: 6-alternative-bridge-comparison.json outcome=settled class=local_integration gap_text_sha256_recomputed_match=True gap_text_match=True cited_files_checked=12
+gap 7: 7-awesome-mcp-servers-recovery-review.json outcome=settled class=source_review gap_text_sha256_recomputed_match=True gap_text_match=True cited_files_checked=2
+gap 8: 8-inspector-project-file-scope.json outcome=advanced class=local_integration gap_text_sha256_recomputed_match=True gap_text_match=True cited_files_checked=2
+gap 9: 9-induced-stale-metadata-and-startup-timeout.json outcome=settled class=local_integration gap_text_sha256_recomputed_match=True gap_text_match=True cited_files_checked=9
+gap 10: 10-disposable-daemon-lifecycle-fixture.json outcome=settled class=local_integration gap_text_sha256_recomputed_match=True gap_text_match=True cited_files_checked=7
+gap 12: 12-matched-set-three-bridges.json outcome=settled class=local_integration gap_text_sha256_recomputed_match=True gap_text_match=True cited_files_checked=10
+results.json equals the 12 receipt outcomes
+all checks passed

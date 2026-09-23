@@ -1,0 +1,7 @@
+{
+  "gap_index": 10,
+  "written_at": "2026-09-23T05:15:15Z",
+  "expectation": "Same pinned four-store harness as gap 3, extended with: mixed phases (N writers plus N readers concurrently, N=1,4,8) reporting p50/p95/p99 writer-batch and reader-query latency; a kill-and-recover test per store (SIGKILL of the server for ClickHouse and QuestDB, of the writer process for DuckDB and pyiceberg, during acknowledged batch inserts) checking that every acknowledged batch survives and measuring time to ready; and on-disk footprint plus peak/idle RSS as operational-cost proxies. Expected: acknowledged rows survive SIGKILL in all four (process kill, not power loss); pyiceberg may leave orphan data files; ClickHouse and QuestDB server RSS far exceeds the embedded stores.",
+  "criteria": "settled if every store completes mixed percentiles, kill-and-recover and footprint with raw results retained. advanced if any store/arm is missing (named). Power-loss durability is out of scope and stays a stated limit either way.",
+  "note": "Written before the check's commands were run."
+}

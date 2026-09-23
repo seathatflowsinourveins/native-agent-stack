@@ -1,0 +1,2243 @@
+[
+ {
+  "fold": "development-1",
+  "candidate": "cash",
+  "decision": "2016-01-14",
+  "entry": "2016-01-15",
+  "exit": "2016-01-25",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-1",
+  "candidate": "cash",
+  "decision": "2016-01-22",
+  "entry": "2016-01-25",
+  "exit": "2016-02-01",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-1",
+  "candidate": "cash",
+  "decision": "2016-01-29",
+  "entry": "2016-02-01",
+  "exit": "2016-02-08",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-1",
+  "candidate": "cash",
+  "decision": "2016-02-05",
+  "entry": "2016-02-08",
+  "exit": "2016-02-16",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-1",
+  "candidate": "cash",
+  "decision": "2016-02-12",
+  "entry": "2016-02-16",
+  "exit": "2016-02-23",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-1",
+  "candidate": "cash",
+  "decision": "2016-02-22",
+  "entry": "2016-02-23",
+  "exit": "2016-03-01",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-1",
+  "candidate": "cash",
+  "decision": "2016-02-29",
+  "entry": "2016-03-01",
+  "exit": "2016-03-08",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-1",
+  "candidate": "cash",
+  "decision": "2016-03-07",
+  "entry": "2016-03-08",
+  "exit": "2016-03-15",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-1",
+  "candidate": "cash",
+  "decision": "2016-03-14",
+  "entry": "2016-03-15",
+  "exit": "2016-03-22",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-1",
+  "candidate": "cash",
+  "decision": "2016-03-21",
+  "entry": "2016-03-22",
+  "exit": "2016-03-30",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-1",
+  "candidate": "cash",
+  "decision": "2016-03-29",
+  "entry": "2016-03-30",
+  "exit": "2016-04-06",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-1",
+  "candidate": "cash",
+  "decision": "2016-04-05",
+  "entry": "2016-04-06",
+  "exit": "2016-04-13",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-1",
+  "candidate": "cash",
+  "decision": "2016-04-12",
+  "entry": "2016-04-13",
+  "exit": "2016-04-20",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-2",
+  "candidate": "cash",
+  "decision": "2016-04-19",
+  "entry": "2016-04-20",
+  "exit": "2016-04-27",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-2",
+  "candidate": "cash",
+  "decision": "2016-04-26",
+  "entry": "2016-04-27",
+  "exit": "2016-05-04",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-2",
+  "candidate": "cash",
+  "decision": "2016-05-03",
+  "entry": "2016-05-04",
+  "exit": "2016-05-11",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-2",
+  "candidate": "cash",
+  "decision": "2016-05-10",
+  "entry": "2016-05-11",
+  "exit": "2016-05-18",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-2",
+  "candidate": "cash",
+  "decision": "2016-05-17",
+  "entry": "2016-05-18",
+  "exit": "2016-05-25",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-2",
+  "candidate": "cash",
+  "decision": "2016-05-24",
+  "entry": "2016-05-25",
+  "exit": "2016-06-02",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-2",
+  "candidate": "cash",
+  "decision": "2016-06-01",
+  "entry": "2016-06-02",
+  "exit": "2016-06-09",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-2",
+  "candidate": "cash",
+  "decision": "2016-06-08",
+  "entry": "2016-06-09",
+  "exit": "2016-06-16",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-2",
+  "candidate": "cash",
+  "decision": "2016-06-15",
+  "entry": "2016-06-16",
+  "exit": "2016-06-23",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-2",
+  "candidate": "cash",
+  "decision": "2016-06-22",
+  "entry": "2016-06-23",
+  "exit": "2016-06-30",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-2",
+  "candidate": "cash",
+  "decision": "2016-06-29",
+  "entry": "2016-06-30",
+  "exit": "2016-07-08",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-2",
+  "candidate": "cash",
+  "decision": "2016-07-07",
+  "entry": "2016-07-08",
+  "exit": "2016-07-15",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-3",
+  "candidate": "cash",
+  "decision": "2016-07-14",
+  "entry": "2016-07-15",
+  "exit": "2016-07-22",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-3",
+  "candidate": "cash",
+  "decision": "2016-07-21",
+  "entry": "2016-07-22",
+  "exit": "2016-07-29",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-3",
+  "candidate": "cash",
+  "decision": "2016-07-28",
+  "entry": "2016-07-29",
+  "exit": "2016-08-05",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-3",
+  "candidate": "cash",
+  "decision": "2016-08-04",
+  "entry": "2016-08-05",
+  "exit": "2016-08-12",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-3",
+  "candidate": "cash",
+  "decision": "2016-08-11",
+  "entry": "2016-08-12",
+  "exit": "2016-08-19",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-3",
+  "candidate": "cash",
+  "decision": "2016-08-18",
+  "entry": "2016-08-19",
+  "exit": "2016-08-26",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-3",
+  "candidate": "cash",
+  "decision": "2016-08-25",
+  "entry": "2016-08-26",
+  "exit": "2016-09-02",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-3",
+  "candidate": "cash",
+  "decision": "2016-09-01",
+  "entry": "2016-09-02",
+  "exit": "2016-09-12",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-3",
+  "candidate": "cash",
+  "decision": "2016-09-09",
+  "entry": "2016-09-12",
+  "exit": "2016-09-19",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-3",
+  "candidate": "cash",
+  "decision": "2016-09-16",
+  "entry": "2016-09-19",
+  "exit": "2016-09-26",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-3",
+  "candidate": "cash",
+  "decision": "2016-09-23",
+  "entry": "2016-09-26",
+  "exit": "2016-10-03",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-3",
+  "candidate": "cash",
+  "decision": "2016-09-30",
+  "entry": "2016-10-03",
+  "exit": "2016-10-10",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-3",
+  "candidate": "cash",
+  "decision": "2016-10-07",
+  "entry": "2016-10-10",
+  "exit": "2016-10-17",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-4",
+  "candidate": "momentum60",
+  "decision": "2016-10-14",
+  "entry": "2016-10-17",
+  "exit": "2016-10-24",
+  "asset": "QQQ",
+  "gross_price_label": "0.015977443609022556390977444"
+ },
+ {
+  "fold": "development-4",
+  "candidate": "momentum60",
+  "decision": "2016-10-21",
+  "entry": "2016-10-24",
+  "exit": "2016-10-31",
+  "asset": "QQQ",
+  "gross_price_label": "-0.0116054158607350096711798839"
+ },
+ {
+  "fold": "development-4",
+  "candidate": "momentum60",
+  "decision": "2016-10-28",
+  "entry": "2016-10-31",
+  "exit": "2016-11-07",
+  "asset": "QQQ",
+  "gross_price_label": "-0.0173572704841317110524972347"
+ },
+ {
+  "fold": "development-4",
+  "candidate": "momentum60",
+  "decision": "2016-11-04",
+  "entry": "2016-11-07",
+  "exit": "2016-11-14",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-4",
+  "candidate": "momentum60",
+  "decision": "2016-11-11",
+  "entry": "2016-11-14",
+  "exit": "2016-11-21",
+  "asset": "IWM",
+  "gross_price_label": "0.018614752191111455828744280"
+ },
+ {
+  "fold": "development-4",
+  "candidate": "momentum60",
+  "decision": "2016-11-18",
+  "entry": "2016-11-21",
+  "exit": "2016-11-29",
+  "asset": "IWM",
+  "gross_price_label": "0.008832711490139343638163405"
+ },
+ {
+  "fold": "development-4",
+  "candidate": "momentum60",
+  "decision": "2016-11-28",
+  "entry": "2016-11-29",
+  "exit": "2016-12-06",
+  "asset": "IWM",
+  "gross_price_label": "0.007774171635595139255792890"
+ },
+ {
+  "fold": "development-4",
+  "candidate": "momentum60",
+  "decision": "2016-12-05",
+  "entry": "2016-12-06",
+  "exit": "2016-12-13",
+  "asset": "IWM",
+  "gross_price_label": "0.030182744158178550029958059"
+ },
+ {
+  "fold": "development-4",
+  "candidate": "momentum60",
+  "decision": "2016-12-12",
+  "entry": "2016-12-13",
+  "exit": "2016-12-20",
+  "asset": "IWM",
+  "gross_price_label": "-0.0026172300981461286804798255"
+ },
+ {
+  "fold": "development-4",
+  "candidate": "momentum60",
+  "decision": "2016-12-19",
+  "entry": "2016-12-20",
+  "exit": "2016-12-28",
+  "asset": "IWM",
+  "gross_price_label": "-0.0024054231357970697572709381"
+ },
+ {
+  "fold": "development-4",
+  "candidate": "momentum60",
+  "decision": "2016-12-27",
+  "entry": "2016-12-28",
+  "exit": "2017-01-05",
+  "asset": "IWM",
+  "gross_price_label": "0.004676311559257635539967850"
+ },
+ {
+  "fold": "development-4",
+  "candidate": "momentum60",
+  "decision": "2017-01-04",
+  "entry": "2017-01-05",
+  "exit": "2017-01-12",
+  "asset": "IWM",
+  "gross_price_label": "-0.0098909090909090909090909091"
+ },
+ {
+  "fold": "development-5",
+  "candidate": "momentum60",
+  "decision": "2017-01-11",
+  "entry": "2017-01-12",
+  "exit": "2017-01-20",
+  "asset": "IWM",
+  "gross_price_label": "-0.0142500367268987806669604819"
+ },
+ {
+  "fold": "development-5",
+  "candidate": "momentum60",
+  "decision": "2017-01-19",
+  "entry": "2017-01-20",
+  "exit": "2017-01-27",
+  "asset": "IWM",
+  "gross_price_label": "0.018852459016393442622950820"
+ },
+ {
+  "fold": "development-5",
+  "candidate": "momentum60",
+  "decision": "2017-01-26",
+  "entry": "2017-01-27",
+  "exit": "2017-02-03",
+  "asset": "IWM",
+  "gross_price_label": "-0.0054121260879104805090323996"
+ },
+ {
+  "fold": "development-5",
+  "candidate": "momentum60",
+  "decision": "2017-02-02",
+  "entry": "2017-02-03",
+  "exit": "2017-02-10",
+  "asset": "IWM",
+  "gross_price_label": "0.013089197735127582910508126"
+ },
+ {
+  "fold": "development-5",
+  "candidate": "momentum60",
+  "decision": "2017-02-09",
+  "entry": "2017-02-10",
+  "exit": "2017-02-17",
+  "asset": "QQQ",
+  "gross_price_label": "0.014303678088651367494498585"
+ },
+ {
+  "fold": "development-5",
+  "candidate": "momentum60",
+  "decision": "2017-02-16",
+  "entry": "2017-02-17",
+  "exit": "2017-02-27",
+  "asset": "QQQ",
+  "gross_price_label": "0.007438400743840074384007438"
+ },
+ {
+  "fold": "development-5",
+  "candidate": "momentum60",
+  "decision": "2017-02-24",
+  "entry": "2017-02-27",
+  "exit": "2017-03-06",
+  "asset": "QQQ",
+  "gross_price_label": "0.004383940932164282418089525"
+ },
+ {
+  "fold": "development-5",
+  "candidate": "momentum60",
+  "decision": "2017-03-03",
+  "entry": "2017-03-06",
+  "exit": "2017-03-13",
+  "asset": "QQQ",
+  "gross_price_label": "0.005743165632896852745233173"
+ },
+ {
+  "fold": "development-5",
+  "candidate": "momentum60",
+  "decision": "2017-03-10",
+  "entry": "2017-03-13",
+  "exit": "2017-03-20",
+  "asset": "QQQ",
+  "gross_price_label": "0.002360286279884269834018578"
+ },
+ {
+  "fold": "development-5",
+  "candidate": "momentum60",
+  "decision": "2017-03-17",
+  "entry": "2017-03-20",
+  "exit": "2017-03-27",
+  "asset": "QQQ",
+  "gross_price_label": "-0.0148120015191796429927838967"
+ },
+ {
+  "fold": "development-5",
+  "candidate": "momentum60",
+  "decision": "2017-03-24",
+  "entry": "2017-03-27",
+  "exit": "2017-04-03",
+  "asset": "QQQ",
+  "gross_price_label": "0.021511179645335389360061681"
+ },
+ {
+  "fold": "development-5",
+  "candidate": "momentum60",
+  "decision": "2017-03-31",
+  "entry": "2017-04-03",
+  "exit": "2017-04-10",
+  "asset": "QQQ",
+  "gross_price_label": "-0.0029436183862933051551060457"
+ },
+ {
+  "fold": "development-5",
+  "candidate": "momentum60",
+  "decision": "2017-04-07",
+  "entry": "2017-04-10",
+  "exit": "2017-04-18",
+  "asset": "QQQ",
+  "gross_price_label": "-0.0080242240726722180166540500"
+ },
+ {
+  "fold": "development-6",
+  "candidate": "momentum60",
+  "decision": "2017-04-17",
+  "entry": "2017-04-18",
+  "exit": "2017-04-25",
+  "asset": "QQQ",
+  "gross_price_label": "0.027167277167277167277167277"
+ },
+ {
+  "fold": "development-6",
+  "candidate": "momentum60",
+  "decision": "2017-04-24",
+  "entry": "2017-04-25",
+  "exit": "2017-05-02",
+  "asset": "QQQ",
+  "gross_price_label": "0.020579494799405646359583952"
+ },
+ {
+  "fold": "development-6",
+  "candidate": "momentum60",
+  "decision": "2017-05-01",
+  "entry": "2017-05-02",
+  "exit": "2017-05-09",
+  "asset": "QQQ",
+  "gross_price_label": "0.004950134672781538909514450"
+ },
+ {
+  "fold": "development-6",
+  "candidate": "momentum60",
+  "decision": "2017-05-08",
+  "entry": "2017-05-09",
+  "exit": "2017-05-16",
+  "asset": "QQQ",
+  "gross_price_label": "0.009779065555957986236870699"
+ },
+ {
+  "fold": "development-6",
+  "candidate": "momentum60",
+  "decision": "2017-05-15",
+  "entry": "2017-05-16",
+  "exit": "2017-05-23",
+  "asset": "QQQ",
+  "gross_price_label": "0.000071736011477761836441894"
+ },
+ {
+  "fold": "development-6",
+  "candidate": "momentum60",
+  "decision": "2017-05-22",
+  "entry": "2017-05-23",
+  "exit": "2017-05-31",
+  "asset": "QQQ",
+  "gross_price_label": "0.017430600387346675274370562"
+ },
+ {
+  "fold": "development-6",
+  "candidate": "momentum60",
+  "decision": "2017-05-30",
+  "entry": "2017-05-31",
+  "exit": "2017-06-07",
+  "asset": "QQQ",
+  "gross_price_label": "0.010011280315848843767625494"
+ },
+ {
+  "fold": "development-6",
+  "candidate": "momentum60",
+  "decision": "2017-06-06",
+  "entry": "2017-06-07",
+  "exit": "2017-06-14",
+  "asset": "QQQ",
+  "gross_price_label": "-0.0162641351389082786541951696"
+ },
+ {
+  "fold": "development-6",
+  "candidate": "momentum60",
+  "decision": "2017-06-13",
+  "entry": "2017-06-14",
+  "exit": "2017-06-21",
+  "asset": "QQQ",
+  "gross_price_label": "-0.0088696516000851486553608174"
+ },
+ {
+  "fold": "development-6",
+  "candidate": "momentum60",
+  "decision": "2017-06-20",
+  "entry": "2017-06-21",
+  "exit": "2017-06-28",
+  "asset": "QQQ",
+  "gross_price_label": "-0.0081615120274914089347079038"
+ },
+ {
+  "fold": "development-6",
+  "candidate": "momentum60",
+  "decision": "2017-06-27",
+  "entry": "2017-06-28",
+  "exit": "2017-07-06",
+  "asset": "QQQ",
+  "gross_price_label": "-0.0148693518117511188104518551"
+ },
+ {
+  "fold": "development-6",
+  "candidate": "momentum60",
+  "decision": "2017-07-05",
+  "entry": "2017-07-06",
+  "exit": "2017-07-13",
+  "asset": "IWM",
+  "gross_price_label": "0.009075966554705924390766812"
+ },
+ {
+  "fold": "development-6",
+  "candidate": "momentum60",
+  "decision": "2017-07-12",
+  "entry": "2017-07-13",
+  "exit": "2017-07-20",
+  "asset": "QQQ",
+  "gross_price_label": "0.024703627457939944629800525"
+ },
+ {
+  "fold": "development-7",
+  "candidate": "momentum60",
+  "decision": "2017-07-19",
+  "entry": "2017-07-20",
+  "exit": "2017-07-27",
+  "asset": "QQQ",
+  "gross_price_label": "0.010183581572566678212677520"
+ },
+ {
+  "fold": "development-7",
+  "candidate": "momentum60",
+  "decision": "2017-07-26",
+  "entry": "2017-07-27",
+  "exit": "2017-08-03",
+  "asset": "QQQ",
+  "gross_price_label": "-0.0118639418461116444932108078"
+ },
+ {
+  "fold": "development-7",
+  "candidate": "momentum60",
+  "decision": "2017-08-02",
+  "entry": "2017-08-03",
+  "exit": "2017-08-10",
+  "asset": "QQQ",
+  "gross_price_label": "-0.0054826844333402734402109792"
+ },
+ {
+  "fold": "development-7",
+  "candidate": "momentum60",
+  "decision": "2017-08-09",
+  "entry": "2017-08-10",
+  "exit": "2017-08-17",
+  "asset": "QQQ",
+  "gross_price_label": "0.002930914166085136078157711"
+ },
+ {
+  "fold": "development-7",
+  "candidate": "momentum60",
+  "decision": "2017-08-16",
+  "entry": "2017-08-17",
+  "exit": "2017-08-24",
+  "asset": "QQQ",
+  "gross_price_label": "-0.0049401614249930420261619816"
+ },
+ {
+  "fold": "development-7",
+  "candidate": "momentum60",
+  "decision": "2017-08-23",
+  "entry": "2017-08-24",
+  "exit": "2017-08-31",
+  "asset": "SPY",
+  "gross_price_label": "0.007142857142857142857142857"
+ },
+ {
+  "fold": "development-7",
+  "candidate": "momentum60",
+  "decision": "2017-08-30",
+  "entry": "2017-08-31",
+  "exit": "2017-09-08",
+  "asset": "QQQ",
+  "gross_price_label": "0.001516613814973114573280022"
+ },
+ {
+  "fold": "development-7",
+  "candidate": "momentum60",
+  "decision": "2017-09-07",
+  "entry": "2017-09-08",
+  "exit": "2017-09-15",
+  "asset": "QQQ",
+  "gross_price_label": "0.001720814977973568281938326"
+ },
+ {
+  "fold": "development-7",
+  "candidate": "momentum60",
+  "decision": "2017-09-14",
+  "entry": "2017-09-15",
+  "exit": "2017-09-22",
+  "asset": "QQQ",
+  "gross_price_label": "-0.0105132962275819418676561534"
+ },
+ {
+  "fold": "development-7",
+  "candidate": "momentum60",
+  "decision": "2017-09-21",
+  "entry": "2017-09-22",
+  "exit": "2017-09-29",
+  "asset": "QQQ",
+  "gross_price_label": "0.004861111111111111111111111"
+ },
+ {
+  "fold": "development-7",
+  "candidate": "momentum60",
+  "decision": "2017-09-28",
+  "entry": "2017-09-29",
+  "exit": "2017-10-06",
+  "asset": "QQQ",
+  "gross_price_label": "0.015618521078092605390463027"
+ },
+ {
+  "fold": "development-7",
+  "candidate": "momentum60",
+  "decision": "2017-10-05",
+  "entry": "2017-10-06",
+  "exit": "2017-10-13",
+  "asset": "IWM",
+  "gross_price_label": "0.001202244189153085760085493"
+ },
+ {
+  "fold": "development-8",
+  "candidate": "momentum20",
+  "decision": "2017-10-12",
+  "entry": "2017-10-13",
+  "exit": "2017-10-20",
+  "asset": "IWM",
+  "gross_price_label": "0.002735156771180787191460974"
+ },
+ {
+  "fold": "development-8",
+  "candidate": "momentum20",
+  "decision": "2017-10-19",
+  "entry": "2017-10-20",
+  "exit": "2017-10-27",
+  "asset": "IWM",
+  "gross_price_label": "-0.0095136717450602089016033531"
+ },
+ {
+  "fold": "development-8",
+  "candidate": "momentum20",
+  "decision": "2017-10-26",
+  "entry": "2017-10-27",
+  "exit": "2017-11-03",
+  "asset": "SPY",
+  "gross_price_label": "0.005263773540765001754591180"
+ },
+ {
+  "fold": "development-8",
+  "candidate": "momentum20",
+  "decision": "2017-11-02",
+  "entry": "2017-11-03",
+  "exit": "2017-11-10",
+  "asset": "QQQ",
+  "gross_price_label": "0.006366500393804148070359674"
+ },
+ {
+  "fold": "development-8",
+  "candidate": "momentum20",
+  "decision": "2017-11-09",
+  "entry": "2017-11-10",
+  "exit": "2017-11-17",
+  "asset": "QQQ",
+  "gross_price_label": "0.008152351138068218874323355"
+ },
+ {
+  "fold": "development-8",
+  "candidate": "momentum20",
+  "decision": "2017-11-16",
+  "entry": "2017-11-17",
+  "exit": "2017-11-27",
+  "asset": "QQQ",
+  "gross_price_label": "0.010544701772544960538232630"
+ },
+ {
+  "fold": "development-8",
+  "candidate": "momentum20",
+  "decision": "2017-11-24",
+  "entry": "2017-11-27",
+  "exit": "2017-12-04",
+  "asset": "QQQ",
+  "gross_price_label": "-0.0048012291146533512579220280"
+ },
+ {
+  "fold": "development-8",
+  "candidate": "momentum20",
+  "decision": "2017-12-01",
+  "entry": "2017-12-04",
+  "exit": "2017-12-11",
+  "asset": "IWM",
+  "gross_price_label": "-0.0211090310502872635723968756"
+ },
+ {
+  "fold": "development-8",
+  "candidate": "momentum20",
+  "decision": "2017-12-08",
+  "entry": "2017-12-11",
+  "exit": "2017-12-18",
+  "asset": "IWM",
+  "gross_price_label": "0.013584806119757319968346083"
+ },
+ {
+  "fold": "development-8",
+  "candidate": "momentum20",
+  "decision": "2017-12-15",
+  "entry": "2017-12-18",
+  "exit": "2017-12-26",
+  "asset": "SPY",
+  "gross_price_label": "-0.0040283476314807907497202536"
+ },
+ {
+  "fold": "development-8",
+  "candidate": "momentum20",
+  "decision": "2017-12-22",
+  "entry": "2017-12-26",
+  "exit": "2018-01-03",
+  "asset": "SPY",
+  "gross_price_label": "0.007377724515017601677776946"
+ },
+ {
+  "fold": "development-8",
+  "candidate": "momentum20",
+  "decision": "2018-01-02",
+  "entry": "2018-01-03",
+  "exit": "2018-01-10",
+  "asset": "QQQ",
+  "gross_price_label": "0.020171457387796268280383258"
+ },
+ {
+  "fold": "development-8",
+  "candidate": "momentum20",
+  "decision": "2018-01-09",
+  "entry": "2018-01-10",
+  "exit": "2018-01-18",
+  "asset": "QQQ",
+  "gross_price_label": "0.022800296589223924864063272"
+ },
+ {
+  "fold": "development-9",
+  "candidate": "momentum20",
+  "decision": "2018-01-17",
+  "entry": "2018-01-18",
+  "exit": "2018-01-25",
+  "asset": "QQQ",
+  "gross_price_label": "0.024406452002658128435933063"
+ },
+ {
+  "fold": "development-9",
+  "candidate": "momentum20",
+  "decision": "2018-01-24",
+  "entry": "2018-01-25",
+  "exit": "2018-02-01",
+  "asset": "QQQ",
+  "gross_price_label": "-0.0086689862593619154331544495"
+ },
+ {
+  "fold": "development-9",
+  "candidate": "momentum20",
+  "decision": "2018-01-31",
+  "entry": "2018-02-01",
+  "exit": "2018-02-08",
+  "asset": "QQQ",
+  "gross_price_label": "-0.0444973230220107079119571684"
+ },
+ {
+  "fold": "development-9",
+  "candidate": "momentum20",
+  "decision": "2018-02-07",
+  "entry": "2018-02-08",
+  "exit": "2018-02-15",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-9",
+  "candidate": "momentum20",
+  "decision": "2018-02-14",
+  "entry": "2018-02-15",
+  "exit": "2018-02-23",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-9",
+  "candidate": "momentum20",
+  "decision": "2018-02-22",
+  "entry": "2018-02-23",
+  "exit": "2018-03-02",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-9",
+  "candidate": "momentum20",
+  "decision": "2018-03-01",
+  "entry": "2018-03-02",
+  "exit": "2018-03-09",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-9",
+  "candidate": "momentum20",
+  "decision": "2018-03-08",
+  "entry": "2018-03-09",
+  "exit": "2018-03-16",
+  "asset": "QQQ",
+  "gross_price_label": "0.004384170222715847313965044"
+ },
+ {
+  "fold": "development-9",
+  "candidate": "momentum20",
+  "decision": "2018-03-15",
+  "entry": "2018-03-16",
+  "exit": "2018-03-23",
+  "asset": "QQQ",
+  "gross_price_label": "-0.0536026073798160866022581772"
+ },
+ {
+  "fold": "development-9",
+  "candidate": "momentum20",
+  "decision": "2018-03-22",
+  "entry": "2018-03-23",
+  "exit": "2018-04-02",
+  "asset": "IWM",
+  "gross_price_label": "-0.0131578947368421052631578947"
+ },
+ {
+  "fold": "development-9",
+  "candidate": "momentum20",
+  "decision": "2018-03-29",
+  "entry": "2018-04-02",
+  "exit": "2018-04-09",
+  "asset": "IWM",
+  "gross_price_label": "-0.0006600660066006600660066007"
+ },
+ {
+  "fold": "development-9",
+  "candidate": "momentum20",
+  "decision": "2018-04-06",
+  "entry": "2018-04-09",
+  "exit": "2018-04-16",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-10",
+  "candidate": "momentum120",
+  "decision": "2018-04-13",
+  "entry": "2018-04-16",
+  "exit": "2018-04-23",
+  "asset": "QQQ",
+  "gross_price_label": "0.003630769230769230769230769"
+ },
+ {
+  "fold": "development-10",
+  "candidate": "momentum120",
+  "decision": "2018-04-20",
+  "entry": "2018-04-23",
+  "exit": "2018-04-30",
+  "asset": "QQQ",
+  "gross_price_label": "-0.0038015819486173278557851493"
+ },
+ {
+  "fold": "development-10",
+  "candidate": "momentum120",
+  "decision": "2018-04-27",
+  "entry": "2018-04-30",
+  "exit": "2018-05-07",
+  "asset": "QQQ",
+  "gross_price_label": "0.019511294392810980488705607"
+ },
+ {
+  "fold": "development-10",
+  "candidate": "momentum120",
+  "decision": "2018-05-04",
+  "entry": "2018-05-07",
+  "exit": "2018-05-14",
+  "asset": "QQQ",
+  "gross_price_label": "0.025416566046848587297754166"
+ },
+ {
+  "fold": "development-10",
+  "candidate": "momentum120",
+  "decision": "2018-05-11",
+  "entry": "2018-05-14",
+  "exit": "2018-05-21",
+  "asset": "QQQ",
+  "gross_price_label": "-0.0064174271415955254636443921"
+ },
+ {
+  "fold": "development-10",
+  "candidate": "momentum120",
+  "decision": "2018-05-18",
+  "entry": "2018-05-21",
+  "exit": "2018-05-29",
+  "asset": "IWM",
+  "gross_price_label": "-0.0091155457009115545700911555"
+ },
+ {
+  "fold": "development-10",
+  "candidate": "momentum120",
+  "decision": "2018-05-25",
+  "entry": "2018-05-29",
+  "exit": "2018-06-05",
+  "asset": "QQQ",
+  "gross_price_label": "0.034092926901450133175495709"
+ },
+ {
+  "fold": "development-10",
+  "candidate": "momentum120",
+  "decision": "2018-06-04",
+  "entry": "2018-06-05",
+  "exit": "2018-06-12",
+  "asset": "QQQ",
+  "gross_price_label": "0.002518459160895197756281838"
+ },
+ {
+  "fold": "development-10",
+  "candidate": "momentum120",
+  "decision": "2018-06-11",
+  "entry": "2018-06-12",
+  "exit": "2018-06-19",
+  "asset": "QQQ",
+  "gross_price_label": "-0.0050242649157864687410790751"
+ },
+ {
+  "fold": "development-10",
+  "candidate": "momentum120",
+  "decision": "2018-06-18",
+  "entry": "2018-06-19",
+  "exit": "2018-06-26",
+  "asset": "QQQ",
+  "gross_price_label": "-0.0130257646181213060193951914"
+ },
+ {
+  "fold": "development-10",
+  "candidate": "momentum120",
+  "decision": "2018-06-25",
+  "entry": "2018-06-26",
+  "exit": "2018-07-03",
+  "asset": "QQQ",
+  "gross_price_label": "0.008430232558139534883720930"
+ },
+ {
+  "fold": "development-10",
+  "candidate": "momentum120",
+  "decision": "2018-07-02",
+  "entry": "2018-07-03",
+  "exit": "2018-07-11",
+  "asset": "IWM",
+  "gross_price_label": "0.017481031866464339908952959"
+ },
+ {
+  "fold": "development-10",
+  "candidate": "momentum120",
+  "decision": "2018-07-10",
+  "entry": "2018-07-11",
+  "exit": "2018-07-18",
+  "asset": "QQQ",
+  "gross_price_label": "0.024782583982265673847553004"
+ },
+ {
+  "fold": "development-11",
+  "candidate": "momentum120",
+  "decision": "2018-07-17",
+  "entry": "2018-07-18",
+  "exit": "2018-07-25",
+  "asset": "QQQ",
+  "gross_price_label": "0.000499195740196350324477231"
+ },
+ {
+  "fold": "development-11",
+  "candidate": "momentum120",
+  "decision": "2018-07-24",
+  "entry": "2018-07-25",
+  "exit": "2018-08-01",
+  "asset": "IWM",
+  "gross_price_label": "-0.0070118662351672060409924488"
+ },
+ {
+  "fold": "development-11",
+  "candidate": "momentum120",
+  "decision": "2018-07-31",
+  "entry": "2018-08-01",
+  "exit": "2018-08-08",
+  "asset": "IWM",
+  "gross_price_label": "0.012251795521757498943810731"
+ },
+ {
+  "fold": "development-11",
+  "candidate": "momentum120",
+  "decision": "2018-08-07",
+  "entry": "2018-08-08",
+  "exit": "2018-08-15",
+  "asset": "QQQ",
+  "gross_price_label": "-0.0087555066079295154185022026"
+ },
+ {
+  "fold": "development-11",
+  "candidate": "momentum120",
+  "decision": "2018-08-14",
+  "entry": "2018-08-15",
+  "exit": "2018-08-22",
+  "asset": "IWM",
+  "gross_price_label": "0.017292784734645199761478831"
+ },
+ {
+  "fold": "development-11",
+  "candidate": "momentum120",
+  "decision": "2018-08-21",
+  "entry": "2018-08-22",
+  "exit": "2018-08-29",
+  "asset": "IWM",
+  "gross_price_label": "0.008323563892145369284876905"
+ },
+ {
+  "fold": "development-11",
+  "candidate": "momentum120",
+  "decision": "2018-08-28",
+  "entry": "2018-08-29",
+  "exit": "2018-09-06",
+  "asset": "IWM",
+  "gross_price_label": "0.000871991628880362748517614"
+ },
+ {
+  "fold": "development-11",
+  "candidate": "momentum120",
+  "decision": "2018-09-05",
+  "entry": "2018-09-06",
+  "exit": "2018-09-13",
+  "asset": "IWM",
+  "gross_price_label": "-0.0051112272753673694604170297"
+ },
+ {
+  "fold": "development-11",
+  "candidate": "momentum120",
+  "decision": "2018-09-12",
+  "entry": "2018-09-13",
+  "exit": "2018-09-20",
+  "asset": "QQQ",
+  "gross_price_label": "0.001306335728282168517308948"
+ },
+ {
+  "fold": "development-11",
+  "candidate": "momentum120",
+  "decision": "2018-09-19",
+  "entry": "2018-09-20",
+  "exit": "2018-09-27",
+  "asset": "QQQ",
+  "gross_price_label": "0.005762122200478364861926506"
+ },
+ {
+  "fold": "development-11",
+  "candidate": "momentum120",
+  "decision": "2018-09-26",
+  "entry": "2018-09-27",
+  "exit": "2018-10-04",
+  "asset": "QQQ",
+  "gross_price_label": "0.000972867798075883688249919"
+ },
+ {
+  "fold": "development-11",
+  "candidate": "momentum120",
+  "decision": "2018-10-03",
+  "entry": "2018-10-04",
+  "exit": "2018-10-11",
+  "asset": "QQQ",
+  "gross_price_label": "-0.0765658747300215982721382289"
+ },
+ {
+  "fold": "development-11",
+  "candidate": "momentum120",
+  "decision": "2018-10-10",
+  "entry": "2018-10-11",
+  "exit": "2018-10-18",
+  "asset": "QQQ",
+  "gross_price_label": "0.032744708221260671266518536"
+ },
+ {
+  "fold": "development-12",
+  "candidate": "momentum120",
+  "decision": "2018-10-17",
+  "entry": "2018-10-18",
+  "exit": "2018-10-25",
+  "asset": "QQQ",
+  "gross_price_label": "-0.0493149133733439021628354660"
+ },
+ {
+  "fold": "development-12",
+  "candidate": "momentum120",
+  "decision": "2018-10-24",
+  "entry": "2018-10-25",
+  "exit": "2018-11-01",
+  "asset": "QQQ",
+  "gross_price_label": "0.012864034304091477577273539"
+ },
+ {
+  "fold": "development-12",
+  "candidate": "momentum120",
+  "decision": "2018-10-31",
+  "entry": "2018-11-01",
+  "exit": "2018-11-08",
+  "asset": "QQQ",
+  "gross_price_label": "0.028164873287469865349561945"
+ },
+ {
+  "fold": "development-12",
+  "candidate": "momentum120",
+  "decision": "2018-11-07",
+  "entry": "2018-11-08",
+  "exit": "2018-11-15",
+  "asset": "QQQ",
+  "gross_price_label": "-0.0569598535971634450417476839"
+ },
+ {
+  "fold": "development-12",
+  "candidate": "momentum120",
+  "decision": "2018-11-14",
+  "entry": "2018-11-15",
+  "exit": "2018-11-23",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-12",
+  "candidate": "momentum120",
+  "decision": "2018-11-21",
+  "entry": "2018-11-23",
+  "exit": "2018-11-30",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-12",
+  "candidate": "momentum120",
+  "decision": "2018-11-29",
+  "entry": "2018-11-30",
+  "exit": "2018-12-10",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-12",
+  "candidate": "momentum120",
+  "decision": "2018-12-07",
+  "entry": "2018-12-10",
+  "exit": "2018-12-17",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-12",
+  "candidate": "momentum120",
+  "decision": "2018-12-14",
+  "entry": "2018-12-17",
+  "exit": "2018-12-24",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-12",
+  "candidate": "momentum120",
+  "decision": "2018-12-21",
+  "entry": "2018-12-24",
+  "exit": "2019-01-02",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-12",
+  "candidate": "momentum120",
+  "decision": "2018-12-31",
+  "entry": "2019-01-02",
+  "exit": "2019-01-09",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-12",
+  "candidate": "momentum120",
+  "decision": "2019-01-08",
+  "entry": "2019-01-09",
+  "exit": "2019-01-16",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-13",
+  "candidate": "cash",
+  "decision": "2019-01-15",
+  "entry": "2019-01-16",
+  "exit": "2019-01-24",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-13",
+  "candidate": "cash",
+  "decision": "2019-01-23",
+  "entry": "2019-01-24",
+  "exit": "2019-01-31",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-13",
+  "candidate": "cash",
+  "decision": "2019-01-30",
+  "entry": "2019-01-31",
+  "exit": "2019-02-07",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-13",
+  "candidate": "cash",
+  "decision": "2019-02-06",
+  "entry": "2019-02-07",
+  "exit": "2019-02-14",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-13",
+  "candidate": "cash",
+  "decision": "2019-02-13",
+  "entry": "2019-02-14",
+  "exit": "2019-02-22",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-13",
+  "candidate": "cash",
+  "decision": "2019-02-21",
+  "entry": "2019-02-22",
+  "exit": "2019-03-01",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-13",
+  "candidate": "cash",
+  "decision": "2019-02-28",
+  "entry": "2019-03-01",
+  "exit": "2019-03-08",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-13",
+  "candidate": "cash",
+  "decision": "2019-03-07",
+  "entry": "2019-03-08",
+  "exit": "2019-03-15",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-13",
+  "candidate": "cash",
+  "decision": "2019-03-14",
+  "entry": "2019-03-15",
+  "exit": "2019-03-22",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-13",
+  "candidate": "cash",
+  "decision": "2019-03-21",
+  "entry": "2019-03-22",
+  "exit": "2019-03-29",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-13",
+  "candidate": "cash",
+  "decision": "2019-03-28",
+  "entry": "2019-03-29",
+  "exit": "2019-04-05",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-13",
+  "candidate": "cash",
+  "decision": "2019-04-04",
+  "entry": "2019-04-05",
+  "exit": "2019-04-12",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-13",
+  "candidate": "cash",
+  "decision": "2019-04-11",
+  "entry": "2019-04-12",
+  "exit": "2019-04-22",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-14",
+  "candidate": "momentum60",
+  "decision": "2019-04-18",
+  "entry": "2019-04-22",
+  "exit": "2019-04-29",
+  "asset": "QQQ",
+  "gross_price_label": "0.021868467599292490754140537"
+ },
+ {
+  "fold": "development-14",
+  "candidate": "momentum60",
+  "decision": "2019-04-26",
+  "entry": "2019-04-29",
+  "exit": "2019-05-06",
+  "asset": "QQQ",
+  "gross_price_label": "-0.0188827694728560188827694729"
+ },
+ {
+  "fold": "development-14",
+  "candidate": "momentum60",
+  "decision": "2019-05-03",
+  "entry": "2019-05-06",
+  "exit": "2019-05-13",
+  "asset": "QQQ",
+  "gross_price_label": "-0.0361400695001336541031809677"
+ },
+ {
+  "fold": "development-14",
+  "candidate": "momentum60",
+  "decision": "2019-05-10",
+  "entry": "2019-05-13",
+  "exit": "2019-05-20",
+  "asset": "QQQ",
+  "gross_price_label": "0.001109323867103000721060514"
+ },
+ {
+  "fold": "development-14",
+  "candidate": "momentum60",
+  "decision": "2019-05-17",
+  "entry": "2019-05-20",
+  "exit": "2019-05-28",
+  "asset": "QQQ",
+  "gross_price_label": "-0.0101390658762258296858551720"
+ },
+ {
+  "fold": "development-14",
+  "candidate": "momentum60",
+  "decision": "2019-05-24",
+  "entry": "2019-05-28",
+  "exit": "2019-06-04",
+  "asset": "QQQ",
+  "gross_price_label": "-0.0371095936415537893204970335"
+ },
+ {
+  "fold": "development-14",
+  "candidate": "momentum60",
+  "decision": "2019-06-03",
+  "entry": "2019-06-04",
+  "exit": "2019-06-11",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-14",
+  "candidate": "momentum60",
+  "decision": "2019-06-10",
+  "entry": "2019-06-11",
+  "exit": "2019-06-18",
+  "asset": "QQQ",
+  "gross_price_label": "0.004593104938938722576461688"
+ },
+ {
+  "fold": "development-14",
+  "candidate": "momentum60",
+  "decision": "2019-06-17",
+  "entry": "2019-06-18",
+  "exit": "2019-06-25",
+  "asset": "SPY",
+  "gross_price_label": "0.007859152996087583224655090"
+ },
+ {
+  "fold": "development-14",
+  "candidate": "momentum60",
+  "decision": "2019-06-24",
+  "entry": "2019-06-25",
+  "exit": "2019-07-02",
+  "asset": "QQQ",
+  "gross_price_label": "0.006222411317342977184491836"
+ },
+ {
+  "fold": "development-14",
+  "candidate": "momentum60",
+  "decision": "2019-07-01",
+  "entry": "2019-07-02",
+  "exit": "2019-07-10",
+  "asset": "QQQ",
+  "gross_price_label": "0.013847780126849894291754757"
+ },
+ {
+  "fold": "development-14",
+  "candidate": "momentum60",
+  "decision": "2019-07-09",
+  "entry": "2019-07-10",
+  "exit": "2019-07-17",
+  "asset": "SPY",
+  "gross_price_label": "0.004591152815013404825737265"
+ },
+ {
+  "fold": "development-15",
+  "candidate": "cash",
+  "decision": "2019-07-16",
+  "entry": "2019-07-17",
+  "exit": "2019-07-24",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-15",
+  "candidate": "cash",
+  "decision": "2019-07-23",
+  "entry": "2019-07-24",
+  "exit": "2019-07-31",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-15",
+  "candidate": "cash",
+  "decision": "2019-07-30",
+  "entry": "2019-07-31",
+  "exit": "2019-08-07",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-15",
+  "candidate": "cash",
+  "decision": "2019-08-06",
+  "entry": "2019-08-07",
+  "exit": "2019-08-14",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-15",
+  "candidate": "cash",
+  "decision": "2019-08-13",
+  "entry": "2019-08-14",
+  "exit": "2019-08-21",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-15",
+  "candidate": "cash",
+  "decision": "2019-08-20",
+  "entry": "2019-08-21",
+  "exit": "2019-08-28",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-15",
+  "candidate": "cash",
+  "decision": "2019-08-27",
+  "entry": "2019-08-28",
+  "exit": "2019-09-05",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-15",
+  "candidate": "cash",
+  "decision": "2019-09-04",
+  "entry": "2019-09-05",
+  "exit": "2019-09-12",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-15",
+  "candidate": "cash",
+  "decision": "2019-09-11",
+  "entry": "2019-09-12",
+  "exit": "2019-09-19",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-15",
+  "candidate": "cash",
+  "decision": "2019-09-18",
+  "entry": "2019-09-19",
+  "exit": "2019-09-26",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-15",
+  "candidate": "cash",
+  "decision": "2019-09-25",
+  "entry": "2019-09-26",
+  "exit": "2019-10-03",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-15",
+  "candidate": "cash",
+  "decision": "2019-10-02",
+  "entry": "2019-10-03",
+  "exit": "2019-10-10",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-15",
+  "candidate": "cash",
+  "decision": "2019-10-09",
+  "entry": "2019-10-10",
+  "exit": "2019-10-17",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-16",
+  "candidate": "cash",
+  "decision": "2019-10-16",
+  "entry": "2019-10-17",
+  "exit": "2019-10-24",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-16",
+  "candidate": "cash",
+  "decision": "2019-10-23",
+  "entry": "2019-10-24",
+  "exit": "2019-10-31",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-16",
+  "candidate": "cash",
+  "decision": "2019-10-30",
+  "entry": "2019-10-31",
+  "exit": "2019-11-07",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-16",
+  "candidate": "cash",
+  "decision": "2019-11-06",
+  "entry": "2019-11-07",
+  "exit": "2019-11-14",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-16",
+  "candidate": "cash",
+  "decision": "2019-11-13",
+  "entry": "2019-11-14",
+  "exit": "2019-11-21",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-16",
+  "candidate": "cash",
+  "decision": "2019-11-20",
+  "entry": "2019-11-21",
+  "exit": "2019-11-29",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-16",
+  "candidate": "cash",
+  "decision": "2019-11-27",
+  "entry": "2019-11-29",
+  "exit": "2019-12-06",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-16",
+  "candidate": "cash",
+  "decision": "2019-12-05",
+  "entry": "2019-12-06",
+  "exit": "2019-12-13",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-16",
+  "candidate": "cash",
+  "decision": "2019-12-12",
+  "entry": "2019-12-13",
+  "exit": "2019-12-20",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-16",
+  "candidate": "cash",
+  "decision": "2019-12-19",
+  "entry": "2019-12-20",
+  "exit": "2019-12-30",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-16",
+  "candidate": "cash",
+  "decision": "2019-12-27",
+  "entry": "2019-12-30",
+  "exit": "2020-01-07",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-16",
+  "candidate": "cash",
+  "decision": "2020-01-06",
+  "entry": "2020-01-07",
+  "exit": "2020-01-14",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-16",
+  "candidate": "cash",
+  "decision": "2020-01-13",
+  "entry": "2020-01-14",
+  "exit": "2020-01-22",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-17",
+  "candidate": "momentum120",
+  "decision": "2020-01-21",
+  "entry": "2020-01-22",
+  "exit": "2020-01-29",
+  "asset": "QQQ",
+  "gross_price_label": "-0.0077091038723764538122187068"
+ },
+ {
+  "fold": "development-17",
+  "candidate": "momentum120",
+  "decision": "2020-01-28",
+  "entry": "2020-01-29",
+  "exit": "2020-02-05",
+  "asset": "QQQ",
+  "gross_price_label": "0.033815340398778516256511586"
+ },
+ {
+  "fold": "development-17",
+  "candidate": "momentum120",
+  "decision": "2020-02-04",
+  "entry": "2020-02-05",
+  "exit": "2020-02-12",
+  "asset": "QQQ",
+  "gross_price_label": "0.013770036054037617827201251"
+ },
+ {
+  "fold": "development-17",
+  "candidate": "momentum120",
+  "decision": "2020-02-11",
+  "entry": "2020-02-12",
+  "exit": "2020-02-20",
+  "asset": "QQQ",
+  "gross_price_label": "0.013283057674179449824320850"
+ },
+ {
+  "fold": "development-17",
+  "candidate": "momentum120",
+  "decision": "2020-02-19",
+  "entry": "2020-02-20",
+  "exit": "2020-02-27",
+  "asset": "QQQ",
+  "gross_price_label": "-0.1081698240866035182679296346"
+ },
+ {
+  "fold": "development-17",
+  "candidate": "momentum120",
+  "decision": "2020-02-26",
+  "entry": "2020-02-27",
+  "exit": "2020-03-05",
+  "asset": "QQQ",
+  "gross_price_label": "0.007728781412991939307728781"
+ },
+ {
+  "fold": "development-17",
+  "candidate": "momentum120",
+  "decision": "2020-03-04",
+  "entry": "2020-03-05",
+  "exit": "2020-03-12",
+  "asset": "QQQ",
+  "gross_price_label": "-0.1432268385639674398908389404"
+ },
+ {
+  "fold": "development-17",
+  "candidate": "momentum120",
+  "decision": "2020-03-11",
+  "entry": "2020-03-12",
+  "exit": "2020-03-19",
+  "asset": "QQQ",
+  "gross_price_label": "-0.0365753198967543522433961228"
+ },
+ {
+  "fold": "development-17",
+  "candidate": "momentum120",
+  "decision": "2020-03-18",
+  "entry": "2020-03-19",
+  "exit": "2020-03-26",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-17",
+  "candidate": "momentum120",
+  "decision": "2020-03-25",
+  "entry": "2020-03-26",
+  "exit": "2020-04-02",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-17",
+  "candidate": "momentum120",
+  "decision": "2020-04-01",
+  "entry": "2020-04-02",
+  "exit": "2020-04-09",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-17",
+  "candidate": "momentum120",
+  "decision": "2020-04-08",
+  "entry": "2020-04-09",
+  "exit": "2020-04-17",
+  "asset": "QQQ",
+  "gross_price_label": "0.068297504324190758586607363"
+ },
+ {
+  "fold": "development-18",
+  "candidate": "cash",
+  "decision": "2020-04-16",
+  "entry": "2020-04-17",
+  "exit": "2020-04-24",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-18",
+  "candidate": "cash",
+  "decision": "2020-04-23",
+  "entry": "2020-04-24",
+  "exit": "2020-05-01",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-18",
+  "candidate": "cash",
+  "decision": "2020-04-30",
+  "entry": "2020-05-01",
+  "exit": "2020-05-08",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-18",
+  "candidate": "cash",
+  "decision": "2020-05-07",
+  "entry": "2020-05-08",
+  "exit": "2020-05-15",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-18",
+  "candidate": "cash",
+  "decision": "2020-05-14",
+  "entry": "2020-05-15",
+  "exit": "2020-05-22",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-18",
+  "candidate": "cash",
+  "decision": "2020-05-21",
+  "entry": "2020-05-22",
+  "exit": "2020-06-01",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-18",
+  "candidate": "cash",
+  "decision": "2020-05-29",
+  "entry": "2020-06-01",
+  "exit": "2020-06-08",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-18",
+  "candidate": "cash",
+  "decision": "2020-06-05",
+  "entry": "2020-06-08",
+  "exit": "2020-06-15",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-18",
+  "candidate": "cash",
+  "decision": "2020-06-12",
+  "entry": "2020-06-15",
+  "exit": "2020-06-22",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-18",
+  "candidate": "cash",
+  "decision": "2020-06-19",
+  "entry": "2020-06-22",
+  "exit": "2020-06-29",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-18",
+  "candidate": "cash",
+  "decision": "2020-06-26",
+  "entry": "2020-06-29",
+  "exit": "2020-07-07",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-18",
+  "candidate": "cash",
+  "decision": "2020-07-06",
+  "entry": "2020-07-07",
+  "exit": "2020-07-14",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-18",
+  "candidate": "cash",
+  "decision": "2020-07-13",
+  "entry": "2020-07-14",
+  "exit": "2020-07-21",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-19",
+  "candidate": "momentum20",
+  "decision": "2020-07-20",
+  "entry": "2020-07-21",
+  "exit": "2020-07-28",
+  "asset": "QQQ",
+  "gross_price_label": "-0.0338673621460506706408345753"
+ },
+ {
+  "fold": "development-19",
+  "candidate": "momentum20",
+  "decision": "2020-07-27",
+  "entry": "2020-07-28",
+  "exit": "2020-08-04",
+  "asset": "QQQ",
+  "gross_price_label": "0.036828506420886197986965408"
+ },
+ {
+  "fold": "development-19",
+  "candidate": "momentum20",
+  "decision": "2020-08-03",
+  "entry": "2020-08-04",
+  "exit": "2020-08-11",
+  "asset": "IWM",
+  "gross_price_label": "0.066068679295802931923154160"
+ },
+ {
+  "fold": "development-19",
+  "candidate": "momentum20",
+  "decision": "2020-08-10",
+  "entry": "2020-08-11",
+  "exit": "2020-08-18",
+  "asset": "IWM",
+  "gross_price_label": "-0.0088534471932688685168906191"
+ },
+ {
+  "fold": "development-19",
+  "candidate": "momentum20",
+  "decision": "2020-08-17",
+  "entry": "2020-08-18",
+  "exit": "2020-08-25",
+  "asset": "IWM",
+  "gross_price_label": "-0.0065885334178017104846373139"
+ },
+ {
+  "fold": "development-19",
+  "candidate": "momentum20",
+  "decision": "2020-08-24",
+  "entry": "2020-08-25",
+  "exit": "2020-09-01",
+  "asset": "QQQ",
+  "gross_price_label": "0.052292896793126613159848672"
+ },
+ {
+  "fold": "development-19",
+  "candidate": "momentum20",
+  "decision": "2020-08-31",
+  "entry": "2020-09-01",
+  "exit": "2020-09-09",
+  "asset": "QQQ",
+  "gross_price_label": "-0.0738525636717962502519991936"
+ },
+ {
+  "fold": "development-19",
+  "candidate": "momentum20",
+  "decision": "2020-09-08",
+  "entry": "2020-09-09",
+  "exit": "2020-09-16",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-19",
+  "candidate": "momentum20",
+  "decision": "2020-09-15",
+  "entry": "2020-09-16",
+  "exit": "2020-09-23",
+  "asset": "QQQ",
+  "gross_price_label": "-0.0277976275546662855509504073"
+ },
+ {
+  "fold": "development-19",
+  "candidate": "momentum20",
+  "decision": "2020-09-22",
+  "entry": "2020-09-23",
+  "exit": "2020-09-30",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-19",
+  "candidate": "momentum20",
+  "decision": "2020-09-29",
+  "entry": "2020-09-30",
+  "exit": "2020-10-07",
+  "asset": null,
+  "gross_price_label": "0"
+ },
+ {
+  "fold": "development-19",
+  "candidate": "momentum20",
+  "decision": "2020-10-06",
+  "entry": "2020-10-07",
+  "exit": "2020-10-14",
+  "asset": "IWM",
+  "gross_price_label": "0.027870609748407844126363579"
+ },
+ {
+  "fold": "development-20",
+  "candidate": "momentum20",
+  "decision": "2020-10-13",
+  "entry": "2020-10-14",
+  "exit": "2020-10-21",
+  "asset": "IWM",
+  "gross_price_label": "-0.0131280289552788172504754310"
+ },
+ {
+  "fold": "development-20",
+  "candidate": "momentum20",
+  "decision": "2020-10-20",
+  "entry": "2020-10-21",
+  "exit": "2020-10-28",
+  "asset": "IWM",
+  "gross_price_label": "-0.0387269223596692981910859700"
+ },
+ {
+  "fold": "development-20",
+  "candidate": "momentum20",
+  "decision": "2020-10-27",
+  "entry": "2020-10-28",
+  "exit": "2020-11-04",
+  "asset": "IWM",
+  "gross_price_label": "0.020111226073460941541645111"
+ },
+ {
+  "fold": "development-20",
+  "candidate": "momentum20",
+  "decision": "2020-11-03",
+  "entry": "2020-11-04",
+  "exit": "2020-11-11",
+  "asset": "IWM",
+  "gross_price_label": "0.098827258320126782884310618"
+ },
+ {
+  "fold": "development-20",
+  "candidate": "momentum20",
+  "decision": "2020-11-10",
+  "entry": "2020-11-11",
+  "exit": "2020-11-18",
+  "asset": "IWM",
+  "gross_price_label": "0.032306449751932617976231683"
+ },
+ {
+  "fold": "development-20",
+  "candidate": "momentum20",
+  "decision": "2020-11-17",
+  "entry": "2020-11-18",
+  "exit": "2020-11-25",
+  "asset": "IWM",
+  "gross_price_label": "0.025483402257740024589247793"
+ },
+ {
+  "fold": "development-20",
+  "candidate": "momentum20",
+  "decision": "2020-11-24",
+  "entry": "2020-11-25",
+  "exit": "2020-12-03",
+  "asset": "IWM",
+  "gross_price_label": "-0.0008719346049046321525885559"
+ },
+ {
+  "fold": "development-20",
+  "candidate": "momentum20",
+  "decision": "2020-12-02",
+  "entry": "2020-12-03",
+  "exit": "2020-12-10",
+  "asset": "IWM",
+  "gross_price_label": "0.024162757717901167230282535"
+ },
+ {
+  "fold": "development-20",
+  "candidate": "momentum20",
+  "decision": "2020-12-09",
+  "entry": "2020-12-10",
+  "exit": "2020-12-17",
+  "asset": "IWM",
+  "gross_price_label": "0.037066624061351653618788944"
+ },
+ {
+  "fold": "development-20",
+  "candidate": "momentum20",
+  "decision": "2020-12-16",
+  "entry": "2020-12-17",
+  "exit": "2020-12-24",
+  "asset": "IWM",
+  "gross_price_label": "0.026703640938735685307862168"
+ }
+]

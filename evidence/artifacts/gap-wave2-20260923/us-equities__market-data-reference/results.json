@@ -1,0 +1,42 @@
+{
+ "1": {
+  "outcome": "advanced",
+  "receipt": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/1-ca-currency-field.json"
+ },
+ "4": {
+  "outcome": "settled",
+  "receipt": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/4-alpaca-py-latest-seams.json"
+ },
+ "5": {
+  "outcome": "advanced",
+  "receipt": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/5-parameterized-comparator.json"
+ },
+ "6": {
+  "outcome": "advanced",
+  "receipt": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/6-us-venue-calendars-extended-hours.json"
+ },
+ "7": {
+  "outcome": "advanced",
+  "receipt": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/7-data-licensing-clauses.json"
+ },
+ "8": {
+  "outcome": "advanced",
+  "receipt": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/8-feast-pit-join.json"
+ },
+ "12": {
+  "outcome": "advanced",
+  "receipt": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/12-ca-currency-shared-capture.json"
+ },
+ "14": {
+  "outcome": "advanced",
+  "receipt": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/14-adhoc-closures-nyse-corroboration.json"
+ },
+ "17": {
+  "outcome": "advanced",
+  "receipt": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/17-sec-api-python-disposition.json"
+ },
+ "18": {
+  "outcome": "advanced",
+  "receipt": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/18-rossod4-quantlab-disposition.json"
+ }
+}

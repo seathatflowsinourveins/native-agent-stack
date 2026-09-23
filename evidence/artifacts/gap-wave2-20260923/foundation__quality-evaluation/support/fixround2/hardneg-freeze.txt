@@ -1,0 +1,3 @@
+hardneg-cases.json sha256 be64ae45405313961624b102cba7b7a25cee97061ef3a251293d59c70a068576
+source: author-out/codex-author-last-message.json cases array, unchanged (30 cases, 3 distractors each, 30 distinct queries)
+frozen_at 2026-09-23T12:46:41Z before any embedding call on this set

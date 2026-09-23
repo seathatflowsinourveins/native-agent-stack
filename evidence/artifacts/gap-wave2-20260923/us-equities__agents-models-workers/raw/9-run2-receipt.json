@@ -1,0 +1,260 @@
+{
+ "mode": "run",
+ "overrides": [
+  "features.hooks=false",
+  "features.plugin_hooks=false",
+  "mcp_servers.ai-memory.url=\"http://127.0.0.1:27374/mcp\"",
+  "mcp_servers.ai-memory.default_tools_approval_mode=\"approve\"",
+  "mcp_servers.ai-memory.enabled_tools=[\"memory_handoff_begin\",\"memory_handoff_accept\",\"memory_handoff_list\"]",
+  "mcp_servers.socraticode.command=\"$HOME/.local/share/codex-ecosystem/bin/node\"",
+  "mcp_servers.socraticode.args=[\"$HOME/.local/share/codex-ecosystem/tools/socraticode-1.14.0/lib/node_modules/socraticode/dist/index.js\"]",
+  "mcp_servers.socraticode.cwd=\"$HOME/.cache/gap-wave2-20260923/agents-models-workers/corpus-scripts\"",
+  "mcp_servers.socraticode.startup_timeout_sec=120",
+  "mcp_servers.socraticode.default_tools_approval_mode=\"approve\"",
+  "mcp_servers.socraticode.enabled_tools=[\"codebase_search\",\"codebase_status\"]",
+  "mcp_servers.socraticode.env.HOME=\"$HOME/.cache/gap-wave2-20260923/agents-models-workers/sc-home\"",
+  "mcp_servers.socraticode.env.SOCRATICODE_GLOBAL_CONFIG_DIR=\"$HOME/.cache/gap-wave2-20260923/agents-models-workers/sc-home/.socraticode\"",
+  "mcp_servers.socraticode.env.QDRANT_MODE=\"external\"",
+  "mcp_servers.socraticode.env.QDRANT_URL=\"http://127.0.0.1:27333\"",
+  "mcp_servers.socraticode.env.QDRANT_COLLECTION_PREFIX=\"g2amw_\"",
+  "mcp_servers.socraticode.env.EMBEDDING_PROVIDER=\"lmstudio\"",
+  "mcp_servers.socraticode.env.LMSTUDIO_URL=\"http://127.0.0.1:8231/v1\"",
+  "mcp_servers.socraticode.env.EMBEDDING_MODEL=\"nvidia/Nemotron-3-Embed-1B-BF16\"",
+  "mcp_servers.socraticode.env.EMBEDDING_DIMENSIONS=\"2048\"",
+  "mcp_servers.socraticode.env.EMBEDDING_CONTEXT_LENGTH=\"4096\"",
+  "mcp_servers.socraticode.env.EMBEDDING_QUERY_PREFIX=\"query: \"",
+  "mcp_servers.socraticode.env.EMBEDDING_DOCUMENT_PREFIX=\"passage: \"",
+  "mcp_servers.socraticode.env.EMBEDDING_DOCUMENT_INCLUDE_PATH=\"true\"",
+  "mcp_servers.socraticode.env.RESPECT_GITIGNORE=\"true\"",
+  "mcp_servers.socraticode.env.INCLUDE_DOT_FILES=\"false\"",
+  "mcp_servers.socraticode.env.SOCRATICODE_WATCHER=\"off\"",
+  "mcp_servers.socraticode.env.SOCRATICODE_AUTO_RESUME=\"off\"",
+  "mcp_servers.socraticode.env.SEARCH_DEFAULT_LIMIT=\"10\"",
+  "mcp_servers.socraticode.env.PATH=\"$HOME/.local/share/codex-ecosystem/bin:$HOME/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/wsl/lib:/mnt/c/WINDOWS/system32:/mnt/c/WINDOWS:/mnt/c/WINDOWS/System32/Wbem:/mnt/c/WINDOWS/System32/WindowsPowerShell/v1.0/:/mnt/c/WINDOWS/System32/OpenSSH/:/mnt/c/Program Files/dotnet/:/mnt/c/Program Files/Git/cmd:/mnt/c/Users/<user>/AppData/Local/Microsoft/WindowsApps:/mnt/c/Users/<user>/AppData/Local/Programs/Zed/bin:/mnt/c/Users/<user>/AppData/Local/Packages/OpenAI.Codex_2p2nqsd0c76g0/LocalCache/Local/CodexEcosystem/tools/bin:/mnt/c/Users/<user>/AppData/Local/Packages/OpenAI.Codex_2p2nqsd0c76g0/LocalCache/Local/CodexEcosystem/tools/gh-2.101.0/bin:/mnt/c/Users/<user>/AppData/Local/Packages/OpenAI.Codex_2p2nqsd0c76g0/LocalCache/Local/CodexEcosystem/tools/uv-0.12.16:/mnt/c/Users/<user>/AppData/Local/Packages/OpenAI.Codex_2p2nqsd0c76g0/LocalCache/Local/CodexEcosystem/tools/node-v24.21.0/node-v24.21.0-win-x64:/mnt/c/Users/<user>/.local/bin:/mnt/c/Users/<user>/AppData/Local/Packages/OpenAI.Codex_2p2nqsd0c76g0/LocalCache/Local/CodexEcosystem/tools/npm:/mnt/c/Users/<user>/AppData/Local/Packages/OpenAI.Codex_2p2nqsd0c76g0/LocalCache/Roaming/uv/python/cpython-3.13.15-windows-x86_64-none:/mnt/c/Users/<user>/AppData/Local/Programs/agent-orchestrator/resources/daemon:/mnt/c/Users/<user>/AppData/Local/Packages/OpenAI.Codex_2p2nqsd0c76g0/LocalCache/Local/CodexEcosystem/tools/ripgrep-15.2.0/ripgrep-15.2.0-x86_64-pc-windows-msvc:/mnt/c/Users/<user>/AppData/Local/Packages/OpenAI.Codex_2p2nqsd0c76g0/LocalCache/Local/CodexEcosystem/tools/rtk-0.49.0:$HOME/.claude/plugins/cache/context-mode/context-mode/1.0.169/bin:$HOME/.claude/plugins/cache/claude-hud/claude-hud/0.8.0/bin:$HOME/.claude/plugins/cache/openai-codex/codex/1.0.6/bin\""
+ ],
+ "started_at": "2026-09-23T07:36:07Z",
+ "model_inference_submitted": true,
+ "readiness": {
+  "model": "gpt-6-astra",
+  "model_available": true,
+  "ordinary_usage_allowed": true,
+  "windows": {
+   "primary": {
+    "usedPercent": 32,
+    "resetsAt": 1790719654,
+    "windowDurationMins": 10080
+   }
+  },
+  "ready": true
+ },
+ "configured_model": "gpt-6-astra",
+ "configured_provider": "openai",
+ "status": "completed",
+ "final_response": "{\"sha256_files\":[\"scripts/build_ecosystem.py\",\"scripts/landscape.py\",\"scripts/native_token_ci.py\",\"scripts/validate.py\",\"scripts/validate_convergence.py\",\"scripts/verify_nautilus_ci.py\"],\"subprocess_files\":[\"scripts/adoption_status.py\",\"scripts/native_token_ci.py\",\"scripts/validate.py\"],\"recovered_from_handoff\":[\"step-1 sha256_files from handoff <id-1>\"],\"redone_steps\":[]}",
+ "duration_ms": 37286,
+ "usage_status": "reported",
+ "items": [
+  {
+   "clientId": null,
+   "content": [
+    {
+     "text": "You are resuming a task another worker started and could not finish. Use only these MCP tools:\nai-memory handoff tools (always pass workspace=\"g2amw\" and project=\"g9-composed\") and\nsocraticode codebase_search (always pass projectPath=$HOME/.cache/gap-wave2-20260923/agents-models-workers/corpus-scripts and limit=10). If a tool is\ndeferred, you may load it with the tool-discovery tool. Do not run shell commands.\n\nFirst call memory_handoff_list, then memory_handoff_accept for the open handoff, and read what was\ndone and what remains. Do not redo completed steps; reuse the recorded step-1 result. Complete the\nremaining step with SocratiCode. Final answer: ONLY a JSON object\n{\"sha256_files\": [...], \"subprocess_files\": [...], \"recovered_from_handoff\": [\"...\"], \"redone_steps\": [...]}.\n",
+     "text_elements": [],
+     "type": "text"
+    }
+   ],
+   "id": "<id-2>",
+   "type": "userMessage"
+  },
+  {
+   "delivery": null,
+   "id": "msg_0e9b5e2b8bb33904016ab3816d71bc87d1806afd3dd41cbab9",
+   "memoryCitation": null,
+   "phase": "commentary",
+   "questions": null,
+   "text": "I\u2019ll read and accept the open handoff, reuse its completed result, and finish the remaining search with SocratiCode.\n",
+   "type": "agentMessage"
+  },
+  {
+   "appContext": null,
+   "arguments": {
+    "workspace": "g2amw",
+    "project": "g9-composed"
+   },
+   "durationMs": 2,
+   "error": null,
+   "id": "exec-<id-3>",
+   "mcpAppResourceUri": null,
+   "pluginId": null,
+   "readOnlyHint": null,
+   "result": {
+    "_meta": null,
+    "content": [
+     {
+      "type": "text",
+      "text": "{\n  \"handoffs\": [\n    {\n      \"id\": \"<id-1>\",\n      \"workspace_id\": \"<id-4>\",\n      \"project_id\": \"<id-5>\",\n      \"from_session_id\": null,\n      \"from_agent\": \"other\",\n      \"to_agent\": null,\n      \"cwd\": null,\n      \"owner_user\": null,\n      \"summary\": \"step 1 done. step-1 file list: [\\\"scripts/build_ecosystem.py\\\", \\\"scripts/landscape.py\\\", \\\"scripts/native_token_ci.py\\\", \\\"scripts/validate.py\\\", \\\"scripts/validate_convergence.py\\\", \\\"scripts/verify_nautilus_ci.py\\\"].\",\n      \"open_questions\": [],\n      \"next_steps\": [\n        \"remaining: step 2 = find which files launch subprocesses (subprocess.run / check_output / Popen) and return final JSON\"\n      ],\n      \"files_touched\": [],\n      \"state\": \"open\",\n      \"created_at\": \"2026-09-23T07:36:04.515444Z\",\n      \"accepted_by\": null,\n      \"accepted_at\": null,\n      \"accepted_by_session\": null,\n      \"accepted_by_user\": null\n    }\n  ]\n}"
+     }
+    ],
+    "structuredContent": null
+   },
+   "server": "ai-memory",
+   "status": "completed",
+   "tool": "memory_handoff_list",
+   "type": "mcpToolCall"
+  },
+  {
+   "appContext": null,
+   "arguments": {
+    "workspace": "g2amw",
+    "project": "g9-composed",
+    "handoff_id": "<id-1>"
+   },
+   "durationMs": 1,
+   "error": null,
+   "id": "exec-<id-6>",
+   "mcpAppResourceUri": null,
+   "pluginId": null,
+   "readOnlyHint": null,
+   "result": {
+    "_meta": null,
+    "content": [
+     {
+      "type": "text",
+      "text": "{\n  \"handoff\": {\n    \"id\": \"<id-1>\",\n    \"workspace_id\": \"<id-4>\",\n    \"project_id\": \"<id-5>\",\n    \"from_session_id\": null,\n    \"from_agent\": \"other\",\n    \"to_agent\": null,\n    \"cwd\": null,\n    \"owner_user\": null,\n    \"summary\": \"step 1 done. step-1 file list: [\\\"scripts/build_ecosystem.py\\\", \\\"scripts/landscape.py\\\", \\\"scripts/native_token_ci.py\\\", \\\"scripts/validate.py\\\", \\\"scripts/validate_convergence.py\\\", \\\"scripts/verify_nautilus_ci.py\\\"].\",\n    \"open_questions\": [],\n    \"next_steps\": [\n      \"remaining: step 2 = find which files launch subprocesses (subprocess.run / check_output / Popen) and return final JSON\"\n    ],\n    \"files_touched\": [],\n    \"state\": \"open\",\n    \"created_at\": \"2026-09-23T07:36:04.515444Z\",\n    \"accepted_by\": null,\n    \"accepted_at\": null,\n    \"accepted_by_session\": null,\n    \"accepted_by_user\": null\n  }\n}"
+     }
+    ],
+    "structuredContent": null
+   },
+   "server": "ai-memory",
+   "status": "completed",
+   "tool": "memory_handoff_accept",
+   "type": "mcpToolCall"
+  },
+  {
+   "appContext": null,
+   "arguments": {
+    "projectPath": "$HOME/.cache/gap-wave2-20260923/agents-models-workers/corpus-scripts",
+    "limit": 10,
+    "query": "Files that launch subprocesses with subprocess.run, subprocess.check_output, or subprocess.Popen"
+   },
+   "durationMs": 216,
+   "error": null,
+   "id": "exec-<id-7>",
+   "mcpAppResourceUri": null,
+   "pluginId": null,
+   "readOnlyHint": null,
+   "result": {
+    "_meta": null,
+    "content": [
+     {
+      "type": "text",
+      "text": "Search results for \"Files that launch subprocesses with subprocess.run, subprocess.check_output, or subprocess.Popen\" (10 matches):\n\n\n\u2139 INDEX SNAPSHOT: File watching is disabled by SOCRATICODE_WATCHER=off.\n  Results reflect the last explicit codebase_index or codebase_update.\n--- scripts/native_token_ci.py (lines 146-181) [python] score: 1.0000 ---\n        process = subprocess.Popen(argv, cwd=cwd or self.work, env=self.env,\n                                   stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,\n                                   stderr=subprocess.PIPE, start_new_session=True)\n        try:\n            stdout, stderr = process.communicate(timeout=timeout)\n        except subprocess.TimeoutExpired:\n            timed_out = True\n            os.killpg(process.pid, signal.SIGTERM)\n            try:\n                stdout, stderr = process.communicate(timeout=5)\n            except subprocess.TimeoutExpired:\n                os.killpg(process.pid, signal.SIGKILL)\n                stdout, stderr = process.communicate()\n        entry = {\"label\": label, \"argv\": [self.clean(arg) for arg in argv],\n                 \"cwd\": self.clean(str(cwd or self.work)), \"exit_code\": process.returncode,\n                 \"expected_exit\": \"nonzero\" if nonzero else \"zero\", \"timed_out\": timed_out,\n                 \"elapsed_seconds\": round(time.monotonic() - start, 3),\n                 \"stdout_raw_sha256\": digest(stdout), \"stderr_raw_sha256\": digest(stderr),\n                 \"stdout\": self.clean(stdout.decode(\"utf-8\", errors=\"replace\")),\n                 \"stderr\": self.clean(stderr.decode(\"utf-8\", errors=\"replace\"))}\n        self.report[\"commands\"].append(entry)\n        self.flush()\n        require(not timed_out, f\"{label}: timed out\")\n        require((process.returncode != 0) if nonzero else (process.returncode == 0),\n                f\"{label}: unexpected exit {process.returncode}\")\n        return stdout.decode(\"utf-8\")\n\n    def check(self, label: str, condition: bool) -> None:\n        self.report[\"checks\"].append({\"label\": label, \"passed\": bool(condition)})\n        self.flush()\n        require(condition, label)\n\n    def artifact(self, name: str, source: Path) -> None:\n        raw = source.read_bytes()\n        public = self.clean(raw.decode(\"utf-8\")).encode()\n        (self.output / name).write_bytes(public)\n\n\n--- scripts/validate.py (lines 199-205) [python] score: 0.5000 ---\n                top = subprocess.run(\n                    [\"git\", \"--no-optional-locks\", \"-C\", str(self.root), \"rev-parse\", \"--show-toplevel\"],\n                    env=environment, capture_output=True, check=True,\n                )\n                if Path(os.fsdecode(top.stdout).rstrip(\"\\r\\n\")).resolve() != self.root:\n                    raise ValueError(\"Git top level differs from publication root\")\n                listing = subprocess.run(\n\n--- scripts/adoption_status.py (lines 1-34) [python] score: 0.5000 ---\n#!/usr/bin/env python3\n\"\"\"Read-only adoption prerequisite report. No installation or runtime acceptance.\n\nChecks command presence with shutil.which; it never invokes those commands. The\nonly subprocess is a bounded native Git revision query. No credentials, client\nconfiguration, service/process state, network endpoints, or model APIs are read.\n\"\"\"\n\nfrom __future__ import annotations\n\nimport argparse\nimport json\nfrom pathlib import Path, PurePosixPath\nimport platform\nimport re\nimport shutil\nimport subprocess\nimport sys\nfrom urllib.parse import urlsplit\n\n\nSHA = re.compile(r\"[0-9a-f]{40}\\Z\")\nNAME = re.compile(r\"[a-zA-Z0-9][a-zA-Z0-9_.-]*\\Z\")\n# Grafana's Linux x86-64 archive keeps this basename after extraction:\n# https://grafana.com/docs/loki/latest/setup/install/local/\nCOMMAND_ALIASES = {(\"loki\", \"linux\", \"x86_64\"): (\"loki-linux-amd64\",)}\nLIMITATIONS = [\n    \"Executable presence does not verify its version, installation integrity, activation, or E2E behavior.\",\n    \"Historical acceptance remains historical; no provider, service, GPU, hook, or broker acceptance runs here.\",\n    \"Git comparison reports source identity only; changed worktree files are not inspected.\",\n    \"No credentials, client configuration, environment values, network endpoints, or running processes are inspected.\",\n]\n\n\n\n--- scripts/validate.py (lines 196-225) [python] score: 0.4762 ---\n            # checkout or hide tracked files in an alternate index.\n            environment = {key: value for key, value in os.environ.items() if not key.startswith(\"GIT_\")}\n            try:\n                top = subprocess.run(\n                    [\"git\", \"--no-optional-locks\", \"-C\", str(self.root), \"rev-parse\", \"--show-toplevel\"],\n                    env=environment, capture_output=True, check=True,\n                )\n                if Path(os.fsdecode(top.stdout).rstrip(\"\\r\\n\")).resolve() != self.root:\n                    raise ValueError(\"Git top level differs from publication root\")\n                listing = subprocess.run(\n                    [\"git\", \"--no-optional-locks\", \"-C\", str(self.root), \"ls-files\", \"--cached\",\n                     \"--others\", \"--exclude-standard\", \"-z\"],\n                    env=environment, capture_output=True, check=True,\n                )\n                if listing.stdout and not listing.stdout.endswith(b\"\\0\"):\n                    raise ValueError(\"Git listing is not NUL terminated\")\n                paths.update(os.fsdecode(item) for item in listing.stdout.split(b\"\\0\") if item)\n            except (OSError, subprocess.CalledProcessError, ValueError):\n                # Do not fall back to a success on an incomplete or redirected\n                # Git listing, and do not echo Git's possibly private stderr.\n                self.error(\"Git publication enumeration failed at the exact root\")\n        else:\n            # A source archive can be inside some unrelated parent repository.\n            # Never borrow that ancestor's ignores. Prune only Git metadata and\n            # generated Python cache directories, without hiding cache symlinks.\n            def walk_error(_error):\n                self.error(\"Cannot enumerate publication archive\")\n\n            for directory, folders, filenames in os.walk(self.root, onerror=walk_error):\n                parent = Path(directory)\n\n\n--- scripts/adoption_status.py (lines 129-144) [python] score: 0.2435 ---\n\n\ndef git_revision(root: Path) -> str | None:\n    \"\"\"Return only a native Git SHA from this root; suppress arbitrary Git errors.\"\"\"\n    try:\n        result = subprocess.run(\n            [\"git\", \"--no-optional-locks\", \"-C\", str(root), \"rev-parse\", \"--show-toplevel\", \"HEAD\"],\n            stdin=subprocess.DEVNULL, capture_output=True, text=True, timeout=5,\n            check=False,\n        )\n        lines = result.stdout.splitlines()\n        if result.returncode == 0 and len(lines) == 2 and Path(lines[0]).resolve() == root and SHA.fullmatch(lines[1]):\n            return lines[1]\n    except (OSError, ValueError, UnicodeError, subprocess.TimeoutExpired):\n        pass\n    return None\n\n--- scripts/adoption_status.py (lines 145-152) [python] score: 0.2357 ---\n\n\ndef command_present(name: str, host: dict) -> bool:\n    \"\"\"Check PATH only, preferring the conventional name; never run candidates.\"\"\"\n    if shutil.which(name) is not None:\n        return True\n    aliases = COMMAND_ALIASES.get((name, host[\"os\"], host[\"architecture\"]), ())\n    return any(shutil.which(alias) is not None for alias in aliases)\n\n--- scripts/verify_nautilus_ci.py (lines 144-148) [python] score: 0.1667 ---\n\n\nif __name__ == \"__main__\":\n    raise SystemExit(main())\n\n\n--- scripts/native_token_ci.py (lines 269-294) [python] score: 0.1429 ---\n\n\ndef repomix_fixture(run: Run) -> None:\n    inputs = run.work / \"pack-fixture\"\n    inputs.mkdir()\n    originals = {}\n    for name in (\"before.py\", \"after.py\"):\n        originals[name] = (ROOT / \"fixtures\" / name).read_text()\n        (inputs / name).write_text(originals[name])\n    (inputs / \"unselected.txt\").write_text(\"DO_NOT_PACK_CI_UNSELECTED\\n\")\n    config = run.work / \"repomix.config.json\"\n    config.write_text(\"{}\\n\")\n    packed = run.work / \"selected.xml\"\n    base = [run.tools[\"repomix\"], str(inputs), \"--config\", str(config), \"--include\",\n            \"before.py,after.py\", \"--style\", \"xml\", \"--parsable-style\",\n            \"--token-count-encoding\", \"o200k_base\", \"--no-file-summary\", \"--no-directory-structure\"]\n    run.command(\"repomix-selected-originals\", base + [\"--output\", str(packed)])\n    verify_pack(packed.read_text(), originals)\n    run.check(\"repomix-source-fidelity-and-selection\", True)\n    run.artifact(\"repomix-originals.xml\", packed)\n    compressed = run.work / \"selected-compressed.xml\"\n    run.command(\"repomix-selected-structure\", base + [\"--compress\", \"--output\", str(compressed)])\n    content = compressed.read_text()\n    run.check(\"repomix-structural-output-only\", all(name in content for name in originals)\n              and \"greeting\" in content and \"DO_NOT_PACK_CI_UNSELECTED\" not in content)\n    run.artifact(\"repomix-structure.xml\", compressed)\n\n--- scripts/native_token_ci.py (lines 1-30) [python] score: 0.1422 ---\n#!/usr/bin/env python3\n\"\"\"Real, scoped native-tool fixtures; no providers, account reads or model commands.\n\nOnly sanitized fixture outputs survive cleanup. --install uses upstream commands\nin a new temporary prefix; omission reuses explicit installed executables.\n\"\"\"\n\nfrom __future__ import annotations\n\nimport argparse\nfrom datetime import datetime, timezone\nimport hashlib\nimport json\nimport os\nfrom pathlib import Path\nimport re\nimport shutil\nimport signal\nimport subprocess\nimport tarfile\nimport tempfile\nimport time\nimport xml.etree.ElementTree as ET\n\n\nROOT = Path(__file__).resolve().parents[1]\nPINS = {\"rtk\": \"0.49.0\", \"qmd\": \"2.8.3\", \"repomix\": \"1.18.1\", \"toon\": \"4.1.1\"}\nPACKAGES = {\"qmd\": \"@tobilu/qmd\", \"repomix\": \"repomix\", \"toon\": \"@toon-format/cli\"}\n\n\n\n--- scripts/native_token_ci.py (lines 343-361) [python] score: 0.1250 ---\n            run.report[\"failures\"].append({\"component\": \"harness\", \"error\": run.clean(str(error))})\n        finally:\n            if not completed and not run.report[\"failures\"]:\n                run.report[\"failures\"].append({\"component\": \"harness\", \"error\": \"Execution interrupted before completion\"})\n            work = run.work\n            # Only this newly created TemporaryDirectory is removed; no shared state or install.\n            try:\n                shutil.rmtree(work)\n            except OSError as error:\n                run.report[\"failures\"].append({\"component\": \"cleanup\", \"error\": run.clean(str(error))})\n            run.report[\"cleanup\"] = {\"owned_temporary_directory_absent\": not work.exists(),\n                                     \"retained_output_exists\": output.is_dir()}\n            run.report[\"execution_completed\"] = completed\n            run.report[\"status\"] = \"passed\" if completed and not run.report[\"failures\"] else \"failed\"\n            run.flush()\n    print(json.dumps({\"status\": run.report[\"status\"], \"commands\": len(run.report[\"commands\"]),\n                      \"checks\": len(run.report[\"checks\"]), \"failures\": run.report[\"failures\"],\n                      \"cleanup\": run.report[\"cleanup\"]}))\n    return 0 if run.report[\"status\"] == \"passed\" else 1\n"
+     }
+    ],
+    "structuredContent": null
+   },
+   "server": "socraticode",
+   "status": "completed",
+   "tool": "codebase_search",
+   "type": "mcpToolCall"
+  },
+  {
+   "content": [],
+   "id": "rs_0e9b5e2b8bb33904016ab3817e34d087d18643afd579271299",
+   "summary": [],
+   "type": "reasoning"
+  },
+  {
+   "appContext": null,
+   "arguments": {
+    "projectPath": "$HOME/.cache/gap-wave2-20260923/agents-models-workers/corpus-scripts",
+    "limit": 10,
+    "query": "subprocess.check_output"
+   },
+   "durationMs": 159,
+   "error": null,
+   "id": "exec-<id-8>",
+   "mcpAppResourceUri": null,
+   "pluginId": null,
+   "readOnlyHint": null,
+   "result": {
+    "_meta": null,
+    "content": [
+     {
+      "type": "text",
+      "text": "Search results for \"subprocess.check_output\" (10 matches):\n\n\n\u2139 INDEX SNAPSHOT: File watching is disabled by SOCRATICODE_WATCHER=off.\n  Results reflect the last explicit codebase_index or codebase_update.\n--- scripts/validate.py (lines 199-205) [python] score: 0.8333 ---\n                top = subprocess.run(\n                    [\"git\", \"--no-optional-locks\", \"-C\", str(self.root), \"rev-parse\", \"--show-toplevel\"],\n                    env=environment, capture_output=True, check=True,\n                )\n                if Path(os.fsdecode(top.stdout).rstrip(\"\\r\\n\")).resolve() != self.root:\n                    raise ValueError(\"Git top level differs from publication root\")\n                listing = subprocess.run(\n\n--- scripts/native_token_ci.py (lines 146-181) [python] score: 0.7000 ---\n        process = subprocess.Popen(argv, cwd=cwd or self.work, env=self.env,\n                                   stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,\n                                   stderr=subprocess.PIPE, start_new_session=True)\n        try:\n            stdout, stderr = process.communicate(timeout=timeout)\n        except subprocess.TimeoutExpired:\n            timed_out = True\n            os.killpg(process.pid, signal.SIGTERM)\n            try:\n                stdout, stderr = process.communicate(timeout=5)\n            except subprocess.TimeoutExpired:\n                os.killpg(process.pid, signal.SIGKILL)\n                stdout, stderr = process.communicate()\n        entry = {\"label\": label, \"argv\": [self.clean(arg) for arg in argv],\n                 \"cwd\": self.clean(str(cwd or self.work)), \"exit_code\": process.returncode,\n                 \"expected_exit\": \"nonzero\" if nonzero else \"zero\", \"timed_out\": timed_out,\n                 \"elapsed_seconds\": round(time.monotonic() - start, 3),\n                 \"stdout_raw_sha256\": digest(stdout), \"stderr_raw_sha256\": digest(stderr),\n                 \"stdout\": self.clean(stdout.decode(\"utf-8\", errors=\"replace\")),\n                 \"stderr\": self.clean(stderr.decode(\"utf-8\", errors=\"replace\"))}\n        self.report[\"commands\"].append(entry)\n        self.flush()\n        require(not timed_out, f\"{label}: timed out\")\n        require((process.returncode != 0) if nonzero else (process.returncode == 0),\n                f\"{label}: unexpected exit {process.returncode}\")\n        return stdout.decode(\"utf-8\")\n\n    def check(self, label: str, condition: bool) -> None:\n        self.report[\"checks\"].append({\"label\": label, \"passed\": bool(condition)})\n        self.flush()\n        require(condition, label)\n\n    def artifact(self, name: str, source: Path) -> None:\n        raw = source.read_bytes()\n        public = self.clean(raw.decode(\"utf-8\")).encode()\n        (self.output / name).write_bytes(public)\n\n\n--- scripts/adoption_status.py (lines 129-144) [python] score: 0.4762 ---\n\n\ndef git_revision(root: Path) -> str | None:\n    \"\"\"Return only a native Git SHA from this root; suppress arbitrary Git errors.\"\"\"\n    try:\n        result = subprocess.run(\n            [\"git\", \"--no-optional-locks\", \"-C\", str(root), \"rev-parse\", \"--show-toplevel\", \"HEAD\"],\n            stdin=subprocess.DEVNULL, capture_output=True, text=True, timeout=5,\n            check=False,\n        )\n        lines = result.stdout.splitlines()\n        if result.returncode == 0 and len(lines) == 2 and Path(lines[0]).resolve() == root and SHA.fullmatch(lines[1]):\n            return lines[1]\n    except (OSError, ValueError, UnicodeError, subprocess.TimeoutExpired):\n        pass\n    return None\n\n--- scripts/validate.py (lines 196-225) [python] score: 0.4500 ---\n            # checkout or hide tracked files in an alternate index.\n            environment = {key: value for key, value in os.environ.items() if not key.startswith(\"GIT_\")}\n            try:\n                top = subprocess.run(\n                    [\"git\", \"--no-optional-locks\", \"-C\", str(self.root), \"rev-parse\", \"--show-toplevel\"],\n                    env=environment, capture_output=True, check=True,\n                )\n                if Path(os.fsdecode(top.stdout).rstrip(\"\\r\\n\")).resolve() != self.root:\n                    raise ValueError(\"Git top level differs from publication root\")\n                listing = subprocess.run(\n                    [\"git\", \"--no-optional-locks\", \"-C\", str(self.root), \"ls-files\", \"--cached\",\n                     \"--others\", \"--exclude-standard\", \"-z\"],\n                    env=environment, capture_output=True, check=True,\n                )\n                if listing.stdout and not listing.stdout.endswith(b\"\\0\"):\n                    raise ValueError(\"Git listing is not NUL terminated\")\n                paths.update(os.fsdecode(item) for item in listing.stdout.split(b\"\\0\") if item)\n            except (OSError, subprocess.CalledProcessError, ValueError):\n                # Do not fall back to a success on an incomplete or redirected\n                # Git listing, and do not echo Git's possibly private stderr.\n                self.error(\"Git publication enumeration failed at the exact root\")\n        else:\n            # A source archive can be inside some unrelated parent repository.\n            # Never borrow that ancestor's ignores. Prune only Git metadata and\n            # generated Python cache directories, without hiding cache symlinks.\n            def walk_error(_error):\n                self.error(\"Cannot enumerate publication archive\")\n\n            for directory, folders, filenames in os.walk(self.root, onerror=walk_error):\n                parent = Path(directory)\n\n\n--- scripts/verify_nautilus_ci.py (lines 123-143) [python] score: 0.3125 ---\n\n\ndef main(argv=None):\n    parser = argparse.ArgumentParser(description=__doc__)\n    parser.add_argument(\"--output\", required=True, type=Path)\n    args = parser.parse_args(argv)\n    args.output.mkdir(parents=True, exist_ok=True)\n    receipt = {\"recorded_at\": datetime.now(timezone.utc).isoformat(), \"status\": \"failed\", \"native_acceptance\": False,\n        \"scope\": \"Fresh CI host: unchanged upstream synthetic EUR/USD example and fresh-process replay only.\",\n        \"limitations\": [\"No equity dataset, strategy, broker, account entitlement or order-recovery acceptance.\",\n                        \"Network denial is namespace isolation, not a measured count of attempted external transports.\"]}\n    try:\n        receipt[\"results\"] = verify(args.output)\n        receipt.update(status=\"passed\", native_acceptance=True)\n    except (OSError, ValueError, KeyError, TypeError, SyntaxError, ArithmeticError) as error:\n        receipt[\"error\"] = str(error)\n    receipt[\"artifacts\"] = {str(path.relative_to(args.output)): {\"sha256\": digest(path), \"bytes\": path.stat().st_size}\n        for path in sorted(args.output.rglob(\"*\")) if path.is_file() and path.name != \"verification.json\"}\n    (args.output / \"verification.json\").write_text(json.dumps(receipt, indent=2) + \"\\n\")\n    print(json.dumps({\"status\": receipt[\"status\"], \"error\": receipt.get(\"error\"), \"receipt\": str(args.output / \"verification.json\")}))\n    return 0 if receipt[\"status\"] == \"passed\" else 1\n\n--- scripts/verify_nautilus_ci.py (lines 76-103) [python] score: 0.2917 ---\n\n\ndef verify(output):\n    require(digest(output / \"quickstart.py\") == SOURCE_SHA256, \"upstream source hash differs\")\n    require(digest(output / \"observe_quickstart.py\") == OBSERVER_SHA256, \"observer hash differs\")\n    versions = {line.replace(\"_\", \"-\") for line in (output / \"freeze.txt\").read_text().splitlines() if line}\n    require(versions == DISTRIBUTIONS, \"installed distribution pins differ\")\n    host_namespace = (output / \"host-network-namespace.txt\").read_text().strip()\n    require(bool(re.fullmatch(r\"net:\\[\\d+\\]\", host_namespace)), \"host network namespace missing\")\n    summaries, reports, checks = [], [], []\n    for run in (\"run-1\", \"run-2\"):\n        directory = output / run\n        require((directory / \"exit-code.txt\").read_text().strip() == \"0\", run + \" upstream command failed\")\n        check_isolation(json.loads((directory / \"isolation.json\").read_text()), host_namespace)\n        summary = json.loads((directory / \"summary.json\").read_text())\n        require(summary[\"version\"] == \"2.0.0rc5\" and summary[\"generated_bars\"] == 10000\n                and summary[\"seed\"] == 42 and summary[\"instrument\"] == \"EUR/USD.SIM\", \"fixture identity differs\")\n        native = summary[\"native_result\"]\n        require([native[key] for key in (\"iterations\", \"total_events\", \"total_orders\", \"total_positions\")]\n                == [10000, 1804, 902, 451], \"native result counts differ\")\n        tables = {}\n        for name, count in ((\"account.csv\", 903), (\"positions.csv\", 451), (\"fills.csv\", 902)):\n            with (directory / name).open(newline=\"\") as stream:\n                reader = csv.DictReader(stream)\n                tables[name] = list(reader)\n                require(len(reader.fieldnames or []) == len(set(reader.fieldnames or [])), \"duplicate report columns\")\n            require(len(tables[name]) == count and all(None not in row and None not in row.values()\n                    for row in tables[name]), \"native report count or shape differs: \" + name)\n\n\n--- scripts/validate_convergence.py (lines 1-21) [python] score: 0.1944 ---\n#!/usr/bin/env python3\n\"\"\"Check declared convergence evidence offline; never execute or certify it.\"\"\"\n\nimport argparse\nfrom collections import defaultdict\nimport hashlib\nimport json\nfrom pathlib import Path\nimport re\n\nif __package__:\n    from .validate import Validator, _json_without_duplicates\nelse:\n    from validate import Validator, _json_without_duplicates\n\nREPO = Path(__file__).resolve().parents[1]\nCONTRACT = REPO / \"blueprints/convergence-practice\"\nEXECUTION = {\"offline_artifact_check\", \"native_cli_execution\", \"model_task_execution\", \"recovery_execution\"}\nINPUT_OUTPUT = (\"uncached_input\", \"cache_creation\", \"cache_read\", \"output\")\n\n\n\n--- scripts/adoption_status.py (lines 1-34) [python] score: 0.1905 ---\n#!/usr/bin/env python3\n\"\"\"Read-only adoption prerequisite report. No installation or runtime acceptance.\n\nChecks command presence with shutil.which; it never invokes those commands. The\nonly subprocess is a bounded native Git revision query. No credentials, client\nconfiguration, service/process state, network endpoints, or model APIs are read.\n\"\"\"\n\nfrom __future__ import annotations\n\nimport argparse\nimport json\nfrom pathlib import Path, PurePosixPath\nimport platform\nimport re\nimport shutil\nimport subprocess\nimport sys\nfrom urllib.parse import urlsplit\n\n\nSHA = re.compile(r\"[0-9a-f]{40}\\Z\")\nNAME = re.compile(r\"[a-zA-Z0-9][a-zA-Z0-9_.-]*\\Z\")\n# Grafana's Linux x86-64 archive keeps this basename after extraction:\n# https://grafana.com/docs/loki/latest/setup/install/local/\nCOMMAND_ALIASES = {(\"loki\", \"linux\", \"x86_64\"): (\"loki-linux-amd64\",)}\nLIMITATIONS = [\n    \"Executable presence does not verify its version, installation integrity, activation, or E2E behavior.\",\n    \"Historical acceptance remains historical; no provider, service, GPU, hook, or broker acceptance runs here.\",\n    \"Git comparison reports source identity only; changed worktree files are not inspected.\",\n    \"No credentials, client configuration, environment values, network endpoints, or running processes are inspected.\",\n]\n\n\n\n--- scripts/native_token_ci.py (lines 343-361) [python] score: 0.1833 ---\n            run.report[\"failures\"].append({\"component\": \"harness\", \"error\": run.clean(str(error))})\n        finally:\n            if not completed and not run.report[\"failures\"]:\n                run.report[\"failures\"].append({\"component\": \"harness\", \"error\": \"Execution interrupted before completion\"})\n            work = run.work\n            # Only this newly created TemporaryDirectory is removed; no shared state or install.\n            try:\n                shutil.rmtree(work)\n            except OSError as error:\n                run.report[\"failures\"].append({\"component\": \"cleanup\", \"error\": run.clean(str(error))})\n            run.report[\"cleanup\"] = {\"owned_temporary_directory_absent\": not work.exists(),\n                                     \"retained_output_exists\": output.is_dir()}\n            run.report[\"execution_completed\"] = completed\n            run.report[\"status\"] = \"passed\" if completed and not run.report[\"failures\"] else \"failed\"\n            run.flush()\n    print(json.dumps({\"status\": run.report[\"status\"], \"commands\": len(run.report[\"commands\"]),\n                      \"checks\": len(run.report[\"checks\"]), \"failures\": run.report[\"failures\"],\n                      \"cleanup\": run.report[\"cleanup\"]}))\n    return 0 if run.report[\"status\"] == \"passed\" else 1\n\n--- scripts/native_token_ci.py (lines 1-30) [python] score: 0.1667 ---\n#!/usr/bin/env python3\n\"\"\"Real, scoped native-tool fixtures; no providers, account reads or model commands.\n\nOnly sanitized fixture outputs survive cleanup. --install uses upstream commands\nin a new temporary prefix; omission reuses explicit installed executables.\n\"\"\"\n\nfrom __future__ import annotations\n\nimport argparse\nfrom datetime import datetime, timezone\nimport hashlib\nimport json\nimport os\nfrom pathlib import Path\nimport re\nimport shutil\nimport signal\nimport subprocess\nimport tarfile\nimport tempfile\nimport time\nimport xml.etree.ElementTree as ET\n\n\nROOT = Path(__file__).resolve().parents[1]\nPINS = {\"rtk\": \"0.49.0\", \"qmd\": \"2.8.3\", \"repomix\": \"1.18.1\", \"toon\": \"4.1.1\"}\nPACKAGES = {\"qmd\": \"@tobilu/qmd\", \"repomix\": \"repomix\", \"toon\": \"@toon-format/cli\"}\n\n\n"
+     }
+    ],
+    "structuredContent": null
+   },
+   "server": "socraticode",
+   "status": "completed",
+   "tool": "codebase_search",
+   "type": "mcpToolCall"
+  },
+  {
+   "appContext": null,
+   "arguments": {
+    "projectPath": "$HOME/.cache/gap-wave2-20260923/agents-models-workers/corpus-scripts",
+    "limit": 10,
+    "query": "subprocess.run"
+   },
+   "durationMs": 124,
+   "error": null,
+   "id": "exec-<id-9>",
+   "mcpAppResourceUri": null,
+   "pluginId": null,
+   "readOnlyHint": null,
+   "result": {
+    "_meta": null,
+    "content": [
+     {
+      "type": "text",
+      "text": "Search results for \"subprocess.run\" (10 matches):\n\n\n\u2139 INDEX SNAPSHOT: File watching is disabled by SOCRATICODE_WATCHER=off.\n  Results reflect the last explicit codebase_index or codebase_update.\n--- scripts/validate.py (lines 199-205) [python] score: 0.8333 ---\n                top = subprocess.run(\n                    [\"git\", \"--no-optional-locks\", \"-C\", str(self.root), \"rev-parse\", \"--show-toplevel\"],\n                    env=environment, capture_output=True, check=True,\n                )\n                if Path(os.fsdecode(top.stdout).rstrip(\"\\r\\n\")).resolve() != self.root:\n                    raise ValueError(\"Git top level differs from publication root\")\n                listing = subprocess.run(\n\n--- scripts/native_token_ci.py (lines 146-181) [python] score: 0.6667 ---\n        process = subprocess.Popen(argv, cwd=cwd or self.work, env=self.env,\n                                   stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,\n                                   stderr=subprocess.PIPE, start_new_session=True)\n        try:\n            stdout, stderr = process.communicate(timeout=timeout)\n        except subprocess.TimeoutExpired:\n            timed_out = True\n            os.killpg(process.pid, signal.SIGTERM)\n            try:\n                stdout, stderr = process.communicate(timeout=5)\n            except subprocess.TimeoutExpired:\n                os.killpg(process.pid, signal.SIGKILL)\n                stdout, stderr = process.communicate()\n        entry = {\"label\": label, \"argv\": [self.clean(arg) for arg in argv],\n                 \"cwd\": self.clean(str(cwd or self.work)), \"exit_code\": process.returncode,\n                 \"expected_exit\": \"nonzero\" if nonzero else \"zero\", \"timed_out\": timed_out,\n                 \"elapsed_seconds\": round(time.monotonic() - start, 3),\n                 \"stdout_raw_sha256\": digest(stdout), \"stderr_raw_sha256\": digest(stderr),\n                 \"stdout\": self.clean(stdout.decode(\"utf-8\", errors=\"replace\")),\n                 \"stderr\": self.clean(stderr.decode(\"utf-8\", errors=\"replace\"))}\n        self.report[\"commands\"].append(entry)\n        self.flush()\n        require(not timed_out, f\"{label}: timed out\")\n        require((process.returncode != 0) if nonzero else (process.returncode == 0),\n                f\"{label}: unexpected exit {process.returncode}\")\n        return stdout.decode(\"utf-8\")\n\n    def check(self, label: str, condition: bool) -> None:\n        self.report[\"checks\"].append({\"label\": label, \"passed\": bool(condition)})\n        self.flush()\n        require(condition, label)\n\n    def artifact(self, name: str, source: Path) -> None:\n        raw = source.read_bytes()\n        public = self.clean(raw.decode(\"utf-8\")).encode()\n        (self.output / name).write_bytes(public)\n\n\n--- scripts/adoption_status.py (lines 129-144) [python] score: 0.3958 ---\n\n\ndef git_revision(root: Path) -> str | None:\n    \"\"\"Return only a native Git SHA from this root; suppress arbitrary Git errors.\"\"\"\n    try:\n        result = subprocess.run(\n            [\"git\", \"--no-optional-locks\", \"-C\", str(root), \"rev-parse\", \"--show-toplevel\", \"HEAD\"],\n            stdin=subprocess.DEVNULL, capture_output=True, text=True, timeout=5,\n            check=False,\n        )\n        lines = result.stdout.splitlines()\n        if result.returncode == 0 and len(lines) == 2 and Path(lines[0]).resolve() == root and SHA.fullmatch(lines[1]):\n            return lines[1]\n    except (OSError, ValueError, UnicodeError, subprocess.TimeoutExpired):\n        pass\n    return None\n\n--- scripts/validate.py (lines 196-225) [python] score: 0.2900 ---\n            # checkout or hide tracked files in an alternate index.\n            environment = {key: value for key, value in os.environ.items() if not key.startswith(\"GIT_\")}\n            try:\n                top = subprocess.run(\n                    [\"git\", \"--no-optional-locks\", \"-C\", str(self.root), \"rev-parse\", \"--show-toplevel\"],\n                    env=environment, capture_output=True, check=True,\n                )\n                if Path(os.fsdecode(top.stdout).rstrip(\"\\r\\n\")).resolve() != self.root:\n                    raise ValueError(\"Git top level differs from publication root\")\n                listing = subprocess.run(\n                    [\"git\", \"--no-optional-locks\", \"-C\", str(self.root), \"ls-files\", \"--cached\",\n                     \"--others\", \"--exclude-standard\", \"-z\"],\n                    env=environment, capture_output=True, check=True,\n                )\n                if listing.stdout and not listing.stdout.endswith(b\"\\0\"):\n                    raise ValueError(\"Git listing is not NUL terminated\")\n                paths.update(os.fsdecode(item) for item in listing.stdout.split(b\"\\0\") if item)\n            except (OSError, subprocess.CalledProcessError, ValueError):\n                # Do not fall back to a success on an incomplete or redirected\n                # Git listing, and do not echo Git's possibly private stderr.\n                self.error(\"Git publication enumeration failed at the exact root\")\n        else:\n            # A source archive can be inside some unrelated parent repository.\n            # Never borrow that ancestor's ignores. Prune only Git metadata and\n            # generated Python cache directories, without hiding cache symlinks.\n            def walk_error(_error):\n                self.error(\"Cannot enumerate publication archive\")\n\n            for directory, folders, filenames in os.walk(self.root, onerror=walk_error):\n                parent = Path(directory)\n\n\n--- scripts/adoption_status.py (lines 1-34) [python] score: 0.2588 ---\n#!/usr/bin/env python3\n\"\"\"Read-only adoption prerequisite report. No installation or runtime acceptance.\n\nChecks command presence with shutil.which; it never invokes those commands. The\nonly subprocess is a bounded native Git revision query. No credentials, client\nconfiguration, service/process state, network endpoints, or model APIs are read.\n\"\"\"\n\nfrom __future__ import annotations\n\nimport argparse\nimport json\nfrom pathlib import Path, PurePosixPath\nimport platform\nimport re\nimport shutil\nimport subprocess\nimport sys\nfrom urllib.parse import urlsplit\n\n\nSHA = re.compile(r\"[0-9a-f]{40}\\Z\")\nNAME = re.compile(r\"[a-zA-Z0-9][a-zA-Z0-9_.-]*\\Z\")\n# Grafana's Linux x86-64 archive keeps this basename after extraction:\n# https://grafana.com/docs/loki/latest/setup/install/local/\nCOMMAND_ALIASES = {(\"loki\", \"linux\", \"x86_64\"): (\"loki-linux-amd64\",)}\nLIMITATIONS = [\n    \"Executable presence does not verify its version, installation integrity, activation, or E2E behavior.\",\n    \"Historical acceptance remains historical; no provider, service, GPU, hook, or broker acceptance runs here.\",\n    \"Git comparison reports source identity only; changed worktree files are not inspected.\",\n    \"No credentials, client configuration, environment values, network endpoints, or running processes are inspected.\",\n]\n\n\n\n--- scripts/validate.py (lines 428-432) [python] score: 0.2500 ---\n\n\nif __name__ == \"__main__\":\n    raise SystemExit(main())\n\n\n--- scripts/native_token_ci.py (lines 79-109) [python] score: 0.2051 ---\n\n\nclass Run:\n    def __init__(self, output: Path, work: Path):\n        self.output, self.work = output, work\n        self.tools: dict[str, str] = {}\n        self.report = {\n            \"schema_version\": 1, \"kind\": \"native_cli_e2e\",\n            \"captured_at\": datetime.now(timezone.utc).isoformat(),\n            \"pins\": PINS, \"status\": \"running\", \"commands\": [], \"checks\": [],\n            \"failures\": [], \"artifacts\": {},\n            \"scope\": \"Fresh Linux fixture state; selected upstream CLIs, no native model task\",\n            \"limits\": [\"Not a new-PC, native Codex/Claude, GPU or provider acceptance\",\n                       \"Top-level package pins; npm transitive ranges resolve at installation\",\n                       \"RTK counters are fixture-local estimates, not provider savings\",\n                       \"No token-saving requirement: fidelity may need the larger representation\",\n                       \"Retained text replaces local paths; raw byte hashes precede sanitization\"],\n        }\n        # A fresh allowlist excludes tokens, provider routing and inherited tool-state overrides.\n        self.env = {key: os.environ[key] for key in (\"PATH\", \"HOME\") if key in os.environ}\n        self.env.update({\n            \"LANG\": \"C.UTF-8\", \"LC_ALL\": \"C.UTF-8\", \"TZ\": \"UTC\", \"TERM\": \"dumb\",\n            \"CI\": \"true\", \"NO_COLOR\": \"1\", \"GIT_CONFIG_NOSYSTEM\": \"1\",\n            \"GIT_CONFIG_GLOBAL\": \"/dev/null\", \"GIT_CONFIG_SYSTEM\": \"/dev/null\",\n            \"XDG_CONFIG_HOME\": str(work / \"config\"), \"XDG_CACHE_HOME\": str(work / \"cache\"),\n            \"XDG_DATA_HOME\": str(work / \"data\"), \"XDG_STATE_HOME\": str(work / \"state\"),\n            \"TMPDIR\": str(work / \"tmp\"), \"RTK_DB_PATH\": str(work / \"data/rtk/history.db\"),\n            \"RTK_TELEMETRY_DISABLED\": \"1\",\n            \"QMD_CONFIG_DIR\": str(work / \"config/qmd\"), \"QMD_FORCE_CPU\": \"1\",\n            \"INDEX_PATH\": str(work / \"cache/qmd/native-ci-docs.sqlite\"),\n            \"NODE_LLAMA_CPP_SKIP_DOWNLOAD\": \"true\",\n\n\n--- scripts/build_ecosystem.py (lines 729-733) [python] score: 0.2000 ---\n\n\nif __name__ == \"__main__\":\n    raise SystemExit(main())\n\n\n--- scripts/native_token_ci.py (lines 343-361) [python] score: 0.1806 ---\n            run.report[\"failures\"].append({\"component\": \"harness\", \"error\": run.clean(str(error))})\n        finally:\n            if not completed and not run.report[\"failures\"]:\n                run.report[\"failures\"].append({\"component\": \"harness\", \"error\": \"Execution interrupted before completion\"})\n            work = run.work\n            # Only this newly created TemporaryDirectory is removed; no shared state or install.\n            try:\n                shutil.rmtree(work)\n            except OSError as error:\n                run.report[\"failures\"].append({\"component\": \"cleanup\", \"error\": run.clean(str(error))})\n            run.report[\"cleanup\"] = {\"owned_temporary_directory_absent\": not work.exists(),\n                                     \"retained_output_exists\": output.is_dir()}\n            run.report[\"execution_completed\"] = completed\n            run.report[\"status\"] = \"passed\" if completed and not run.report[\"failures\"] else \"failed\"\n            run.flush()\n    print(json.dumps({\"status\": run.report[\"status\"], \"commands\": len(run.report[\"commands\"]),\n                      \"checks\": len(run.report[\"checks\"]), \"failures\": run.report[\"failures\"],\n                      \"cleanup\": run.report[\"cleanup\"]}))\n    return 0 if run.report[\"status\"] == \"passed\" else 1\n\n--- scripts/native_token_ci.py (lines 1-30) [python] score: 0.1762 ---\n#!/usr/bin/env python3\n\"\"\"Real, scoped native-tool fixtures; no providers, account reads or model commands.\n\nOnly sanitized fixture outputs survive cleanup. --install uses upstream commands\nin a new temporary prefix; omission reuses explicit installed executables.\n\"\"\"\n\nfrom __future__ import annotations\n\nimport argparse\nfrom datetime import datetime, timezone\nimport hashlib\nimport json\nimport os\nfrom pathlib import Path\nimport re\nimport shutil\nimport signal\nimport subprocess\nimport tarfile\nimport tempfile\nimport time\nimport xml.etree.ElementTree as ET\n\n\nROOT = Path(__file__).resolve().parents[1]\nPINS = {\"rtk\": \"0.49.0\", \"qmd\": \"2.8.3\", \"repomix\": \"1.18.1\", \"toon\": \"4.1.1\"}\nPACKAGES = {\"qmd\": \"@tobilu/qmd\", \"repomix\": \"repomix\", \"toon\": \"@toon-format/cli\"}\n\n\n"
+     }
+    ],
+    "structuredContent": null
+   },
+   "server": "socraticode",
+   "status": "completed",
+   "tool": "codebase_search",
+   "type": "mcpToolCall"
+  },
+  {
+   "content": [],
+   "id": "rs_0e9b5e2b8bb33904016ab38186106887d1b412c13a68b6de41",
+   "summary": [],
+   "type": "reasoning"
+  },
+  {
+   "delivery": null,
+   "id": "msg_0e9b5e2b8bb33904016ab3818a5f4087d1b7d884666433050d",
+   "memoryCitation": null,
+   "phase": "final_answer",
+   "questions": null,
+   "text": "{\"sha256_files\":[\"scripts/build_ecosystem.py\",\"scripts/landscape.py\",\"scripts/native_token_ci.py\",\"scripts/validate.py\",\"scripts/validate_convergence.py\",\"scripts/verify_nautilus_ci.py\"],\"subprocess_files\":[\"scripts/adoption_status.py\",\"scripts/native_token_ci.py\",\"scripts/validate.py\"],\"recovered_from_handoff\":[\"step-1 sha256_files from handoff <id-1>\"],\"redone_steps\":[]}",
+   "type": "agentMessage"
+  }
+ ],
+ "usage": {
+  "last": {
+   "cacheWriteInputTokens": 0,
+   "cachedInputTokens": 30208,
+   "inputTokens": 37036,
+   "outputTokens": 261,
+   "reasoningOutputTokens": 142,
+   "totalTokens": 37297
+  },
+  "modelContextWindow": 258400,
+  "total": {
+   "cacheWriteInputTokens": 0,
+   "cachedInputTokens": 139904,
+   "inputTokens": 166169,
+   "outputTokens": 713,
+   "reasoningOutputTokens": 188,
+   "totalTokens": 166882
+  }
+ },
+ "wall_seconds": 38.53,
+ "finished_at": "2026-09-23T07:36:46Z"
+}

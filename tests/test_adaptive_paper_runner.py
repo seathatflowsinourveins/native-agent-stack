@@ -44,6 +44,23 @@ import safety as safety_module
 from runner import credentials, validate_preflight as validate_preflight_always
 from safety import SafetyError as SafetyErrorAlways
 
+try:  # package mode (python -m unittest tests.x) or discover -s tests (top-level modules)
+    from .adaptive_paper_hermetic import patch_default_stop, restore_default_stop
+except ImportError:
+    from adaptive_paper_hermetic import patch_default_stop, restore_default_stop  # noqa: E402
+
+_HERMETIC_TOKEN = None
+
+
+def setUpModule():
+    global _HERMETIC_TOKEN
+    extra = (native_strategy_module,) if NATIVE else ()
+    _HERMETIC_TOKEN = patch_default_stop(*extra)
+
+
+def tearDownModule():
+    restore_default_stop(_HERMETIC_TOKEN)
+
 
 @unittest.skipUnless(NATIVE, "requires pinned combined native runtime")
 class IntegratedRunner(unittest.TestCase):
@@ -2079,6 +2096,55 @@ class LeverageMarginEntitlementTests(unittest.TestCase):
             runner_module._check_margin_entitlement(
                 self.account(pattern_day_trader=True, equity="10000"), self.config(),
                 self.leverage_policy("4"), {"overnight_holds": False})
+
+    def current_schema_account(self, **overrides):
+        # Alpaca's GetAccount schema after FINRA's intraday margin rule: no
+        # daytrading_buying_power, pattern_day_trader or daytrade_count.
+        account = {"multiplier": "4", "buying_power": "40000", "regt_buying_power": "20000", "equity": "10000",
+                   "maintenance_margin": "0"}
+        account.update(overrides)
+        return account
+
+    def test_current_alpaca_schema_uses_buying_power(self):
+        mult = runner_module._check_margin_entitlement(self.current_schema_account(), self.config(),
+                                                        self.leverage_policy("4"), {"overnight_holds": False})
+        self.assertEqual(mult, Decimal("4"))
+        self.assertEqual(runner_module.intraday_buying_power(self.current_schema_account()), ("40000", "buying_power"))
+        self.assertEqual(runner_module.intraday_buying_power(self.account()), ("40000", "daytrading_buying_power"))
+
+    def test_current_alpaca_schema_insufficient_buying_power_refused(self):
+        with self.assertRaisesRegex(SafetyErrorAlways, "account_daytrading_buying_power_insufficient"):
+            runner_module._check_margin_entitlement(self.current_schema_account(buying_power="100"), self.config(),
+                                                     self.leverage_policy("4"), {"overnight_holds": False})
+
+    def test_buying_power_is_bounded_by_current_equity(self):
+        # A stale or prior-close buying_power can never admit more than current equity supports.
+        account = self.current_schema_account(buying_power="40000", equity="10000", maintenance_margin="5000")
+        self.assertEqual(runner_module.intraday_buying_power(account),
+                         ("20000", "multiplier*(equity-maintenance_margin)"))
+        with self.assertRaisesRegex(SafetyErrorAlways, "account_daytrading_buying_power_insufficient"):
+            runner_module._check_margin_entitlement(account, self.config(), self.leverage_policy("4"),
+                                                     {"overnight_holds": False})
+        consistent = self.current_schema_account(buying_power="40000", equity="10000", maintenance_margin="0")
+        self.assertEqual(runner_module.intraday_buying_power(consistent), ("40000", "buying_power"))
+
+    def test_bound_is_required_and_applies_to_the_legacy_field_too(self):
+        no_margin = self.current_schema_account()
+        del no_margin["maintenance_margin"]
+        self.assertIsNone(runner_module.intraday_buying_power(no_margin))
+        with self.assertRaisesRegex(SafetyErrorAlways, "account_margin_fields_missing"):
+            runner_module._check_margin_entitlement(no_margin, self.config(), self.leverage_policy("4"),
+                                                     {"overnight_holds": False})
+        stale_legacy = self.account(daytrading_buying_power="80000", equity="10000")
+        self.assertEqual(runner_module.intraday_buying_power(stale_legacy),
+                         ("40000", "multiplier*(equity-maintenance_margin)"))
+
+    def test_no_intraday_buying_power_field_is_missing(self):
+        account = self.current_schema_account()
+        del account["buying_power"]
+        with self.assertRaisesRegex(SafetyErrorAlways, "account_margin_fields_missing"):
+            runner_module._check_margin_entitlement(account, self.config(), self.leverage_policy("4"),
+                                                     {"overnight_holds": False})
 
     def test_sufficient_account_returns_multiplier(self):
         mult = runner_module._check_margin_entitlement(self.account(), self.config(),

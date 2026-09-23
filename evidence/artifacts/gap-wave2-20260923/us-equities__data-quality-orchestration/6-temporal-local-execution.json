@@ -1,0 +1,434 @@
+{
+  "id": "gap-wave2-20260923-us-equities-data-quality-orchestration-6-temporal-local-execution",
+  "gap_index": 6,
+  "gap_text_sha256": "f3e108dec2599831cdce142c8e00ec51f12ccd64df34c639ef148cf440fa010b",
+  "gap_text": "Temporal and modal have no local execution, failure, cancellation, recovery or telemetry evidence. Their capabilities are untested, not failed.",
+  "next_check": "Start `temporal server start-dev` in a new prefix and run a two-activity workflow on it. Test an activity failure with retry, cancellation, and a worker SIGKILL followed by restart, recording the event history and OTel spans. Record Modal as needing user login.",
+  "preregistration": {
+    "written_at": "2026-09-23T05:16:19Z",
+    "expectation": "temporal CLI 1.9.1 (checksum-verified download into the cache prefix) runs `temporal server start-dev` on loopback ports with a temp sqlite file; a Python temporalio worker runs a two-activity workflow. Expected: happy path completes; an activity that raises on attempt 1 is retried and succeeds on attempt 2 (history shows attempt 2); `temporal workflow cancel` ends the workflow Canceled; SIGKILL of the worker mid-activity followed by a new worker completes the workflow after the heartbeat timeout; the SDK TracingInterceptor exports spans to a local JSON file. Modal is recorded as needing user login: its client run with an empty temp HOME reports a missing token.",
+    "criteria": "Temporal arms pass iff each scenario's `temporal workflow show -o json` event history contains the expected terminal event (Completed, Completed with attempt 2 ActivityTaskStarted, Canceled, Completed after a timed-out attempt) and the span file contains workflow and activity spans. The gap's Modal clause cannot be closed without a user login, so the maximum outcome is advanced even if every Temporal arm passes."
+  },
+  "commands": [
+    "cd $C/temporal && curl -sfL -o temporal_cli_1.9.1_linux_amd64.tar.gz https://github.com/temporalio/cli/releases/download/v1.9.1/temporal_cli_1.9.1_linux_amd64.tar.gz && curl -sfL -o checksums.txt https://github.com/temporalio/cli/releases/download/v1.9.1/checksums.txt && grep linux_amd64.tar.gz checksums.txt | sha256sum --check --strict && tar -xzf temporal_cli_1.9.1_linux_amd64.tar.gz && ./temporal --version",
+    "$UV venv -q --python /usr/bin/python3 $C/tvenv && $UV pip install -q --python $C/tvenv/bin/python3 temporalio opentelemetry-sdk   (resolved temporalio 1.33.0, opentelemetry-sdk 1.44.0)",
+    "fix round 2 (cited): timeout 900 bash $H/run_temporal.sh $T $C/tvenv/bin/python3 $C/w-temporal-fr2 17733 17740",
+    "(inside) $T server start-dev --headless --ip 127.0.0.1 --port 17733 --http-port 17734 --metrics-port 17740 --db-filename $C/w-temporal-fr2/temporal.db --log-level warn; python temporal_arm.py drive ...; $T workflow show --workflow-id <id> --output json; $T workflow cancel --workflow-id g2-cancel; $T workflow list --output json before and after a server stop/start; curl -s http://127.0.0.1:17740/metrics",
+    "rtk proxy grep -E '^(workflow_success|workflow_failed|workflow_cancel|activity_success|activity_fail|activity_task_fail)[a-z_]*\\{' $C/w-temporal-fr2/server-metrics.txt > 6-temporal-server-metrics-outcomes-fr2.txt   (full scrape 12172 lines, sha256 810a5f2aab10a373ab086a7d5ff0f9c3829444c3eafedf3787e389c684f5d7f0, kept in the cache)",
+    "round 1 (superseded, retained): timeout 900 bash $H/run_temporal.sh $T $C/tvenv/bin/python3 $C/w-temporal 17733 17740 at 05:21:49Z-05:22:35Z",
+    "$UV venv -q --python /usr/bin/python3 $C/modalvenv && $UV pip install -q --python $C/modalvenv/bin/python3 modal; MH=$(mktemp -d $C/modal-home.XXXX); env -i HOME=$MH PATH=/usr/bin:/bin timeout 60 $C/modalvenv/bin/modal app list",
+    "provenance (post-hoc, 05:42:46Z): sha256sum temporal_cli_1.9.1_linux_amd64.tar.gz; grep linux_amd64.tar.gz checksums.txt | sha256sum --check --strict; stat -c '%n %s bytes mtime %y' ...; ./temporal --version; modal --version; uv pip list (temporalio, opentelemetry, modal) > 0-provenance-reverification.txt"
+  ],
+  "results": {
+    "download": "raw/0-provenance-reverification.txt: \"09a0326a51db84d02735e53542b9ebd8c4758daf47482a9ab0abce15844e60d5  temporal_cli_1.9.1_linux_amd64.tar.gz\", \"temporal_cli_1.9.1_linux_amd64.tar.gz: OK\", \"45298806 bytes mtime 2026-09-23 01:16:24 -0400\", \"temporal version 1.9.1 (Server 1.32.0, UI 2.54.1)\"; temporalio 1.33.0, opentelemetry-sdk 1.44.0, modal client 1.5.5. The same checks printed the same hash and OK at download time (05:16Z), but that terminal output was not retained; this is a labelled re-verification of the same files.",
+    "run_stdout_fr2": "run started 2026-09-23T05:41:48Z / server 1 healthy / drive exit 0 / metrics lines 12172 / server 1 stopped / server 2 healthy / server 2 stopped / run finished 2026-09-23T05:42:35Z",
+    "execution_happy": {
+      "result": [
+        "step1 done attempt 1",
+        "step2 done"
+      ],
+      "events": [
+        {
+          "type": "WORKFLOW_EXECUTION_STARTED",
+          "attempt": 1
+        },
+        {
+          "type": "ACTIVITY_TASK_SCHEDULED",
+          "activity": "step1"
+        },
+        {
+          "type": "ACTIVITY_TASK_STARTED",
+          "attempt": 1
+        },
+        {
+          "type": "ACTIVITY_TASK_COMPLETED"
+        },
+        {
+          "type": "ACTIVITY_TASK_SCHEDULED",
+          "activity": "step2"
+        },
+        {
+          "type": "ACTIVITY_TASK_STARTED",
+          "attempt": 1
+        },
+        {
+          "type": "ACTIVITY_TASK_COMPLETED"
+        },
+        {
+          "type": "WORKFLOW_EXECUTION_COMPLETED"
+        }
+      ]
+    },
+    "failure_with_retry": {
+      "result": [
+        "step1 done attempt 2",
+        "step2 done"
+      ],
+      "events": [
+        {
+          "type": "WORKFLOW_EXECUTION_STARTED",
+          "attempt": 1
+        },
+        {
+          "type": "ACTIVITY_TASK_SCHEDULED",
+          "activity": "step1"
+        },
+        {
+          "type": "ACTIVITY_TASK_STARTED",
+          "attempt": 2,
+          "lastFailure": "injected failure on attempt 1"
+        },
+        {
+          "type": "ACTIVITY_TASK_COMPLETED"
+        },
+        {
+          "type": "ACTIVITY_TASK_SCHEDULED",
+          "activity": "step2"
+        },
+        {
+          "type": "ACTIVITY_TASK_STARTED",
+          "attempt": 1
+        },
+        {
+          "type": "ACTIVITY_TASK_COMPLETED"
+        },
+        {
+          "type": "WORKFLOW_EXECUTION_COMPLETED"
+        }
+      ],
+      "markers": [
+        "1790142115 attempt=1 pid=674921",
+        "1790142116 attempt=2 pid=674921"
+      ]
+    },
+    "failure_non_retryable_retained": {
+      "workflow_failure": "ActivityError",
+      "events": [
+        {
+          "type": "WORKFLOW_EXECUTION_STARTED",
+          "attempt": 1
+        },
+        {
+          "type": "ACTIVITY_TASK_SCHEDULED",
+          "activity": "step1"
+        },
+        {
+          "type": "ACTIVITY_TASK_STARTED",
+          "attempt": 1
+        },
+        {
+          "type": "ACTIVITY_TASK_FAILED",
+          "failure": "injected non-retryable failure"
+        },
+        {
+          "type": "WORKFLOW_EXECUTION_FAILED",
+          "failure": "Activity task failed"
+        }
+      ]
+    },
+    "cancellation": {
+      "cancel_cli_exit": 0,
+      "cancel_cli_stdout": "Canceled workflow\n",
+      "result": "CancelledError",
+      "step1_finished_marker": false,
+      "events": [
+        {
+          "type": "WORKFLOW_EXECUTION_STARTED",
+          "attempt": 1
+        },
+        {
+          "type": "ACTIVITY_TASK_SCHEDULED",
+          "activity": "step1"
+        },
+        {
+          "type": "WORKFLOW_EXECUTION_CANCEL_REQUESTED"
+        },
+        {
+          "type": "ACTIVITY_TASK_CANCEL_REQUESTED"
+        },
+        {
+          "type": "WORKFLOW_EXECUTION_CANCELED"
+        }
+      ]
+    },
+    "worker_sigkill_recovery": {
+      "result": [
+        "step1 done attempt 2",
+        "step2 done"
+      ],
+      "seconds_from_kill_to_completion": 24.8,
+      "status_immediately_after_kill": "WORKFLOW_EXECUTION_STATUS_RUNNING",
+      "pending_after_kill": [
+        {
+          "activity": "step1",
+          "state": "PENDING_ACTIVITY_STATE_STARTED",
+          "attempt": 1
+        }
+      ],
+      "second_worker_launched_s_after_kill": 3.1,
+      "kill_at_utc": "2026-09-23T05:42:05Z",
+      "events": [
+        {
+          "type": "WORKFLOW_EXECUTION_STARTED",
+          "attempt": 1
+        },
+        {
+          "type": "ACTIVITY_TASK_SCHEDULED",
+          "activity": "step1"
+        },
+        {
+          "type": "ACTIVITY_TASK_STARTED",
+          "attempt": 2,
+          "lastFailure": "activity Heartbeat timeout"
+        },
+        {
+          "type": "ACTIVITY_TASK_COMPLETED"
+        },
+        {
+          "type": "ACTIVITY_TASK_SCHEDULED",
+          "activity": "step2"
+        },
+        {
+          "type": "ACTIVITY_TASK_STARTED",
+          "attempt": 1
+        },
+        {
+          "type": "ACTIVITY_TASK_COMPLETED"
+        },
+        {
+          "type": "WORKFLOW_EXECUTION_COMPLETED"
+        }
+      ],
+      "markers": {
+        "g2-kill.step1.finished": [
+          "1790142150 attempt=2 pid=678083"
+        ],
+        "g2-kill.step1.started": [
+          "1790142123 attempt=1 pid=674921",
+          "1790142130 attempt=2 pid=678083"
+        ],
+        "g2-kill.step2.ran": [
+          "1790142150 pid=678083"
+        ]
+      }
+    },
+    "history_across_server_restart": "workflow list before and after stop/start of the dev server (same sqlite file): g2-cancel CANCELED, g2-fail-hard FAILED, g2-happy COMPLETED, g2-kill COMPLETED, g2-retry COMPLETED in both; g2-kill history after restart: 17 events ending EVENT_TYPE_WORKFLOW_EXECUTION_COMPLETED",
+    "otel_spans": "32 spans via temporalio.contrib.opentelemetry.TracingInterceptor (raw/6-temporal-spans-*.jsonl.txt): client StartWorkflow:TwoStep x5; worker RunWorkflow:TwoStep x5, CompleteWorkflow:TwoStep x5, StartActivity:step1 x5, RunActivity:step1 x6, StartActivity:step2 x3, RunActivity:step2 x3; one trace id per workflow id (5 traces). The killed attempt-1 RunActivity:step1 span of g2-kill was never exported (the process died before the span ended).",
+    "server_metrics": "fix-round-2 scrape: workflow_success 2, workflow_failed 1, workflow_cancel 1, activity_success 2 (two series), activity_fail 1, activity_task_fail 2. Three workflows completed per the histories and workflow list, so the success counter lagged at scrape time (the round-1 scrape, same scenarios, showed workflow_success 3). Server metrics are not used as an exact count.",
+    "round_1_superseded": "Round 1 (05:21:49Z-05:22:35Z; raw/6-temporal-r1-drive.json) gave the same scenario outcomes; its kill scenario completed 24.9 s after the kill; it reported the second-worker delay as a hardcoded 3 s (review finding 7).",
+    "modal": "modal client version: 1.5.5; with an empty temp HOME and no MODAL_* env: \"Token missing. Could not authenticate client. ... register an account at modal.com, then run `modal token new`.\" exit 1 (raw/6-modal-no-login.txt, round 1, mtime 05:23:02Z)"
+  },
+  "outcome": "advanced",
+  "evidence_class": "local_integration",
+  "limits": [
+    "temporal server start-dev is the single-binary development server with sqlite; production persistence, multi-node history and upgrades are untested.",
+    "Workflow sandbox was disabled (UnsandboxedWorkflowRunner) to keep the harness in one file; determinism checks of the sandbox were not exercised.",
+    "The worker SIGKILL recovery relied on a 5 s heartbeat timeout and re-ran step1 from scratch (attempt 2 on a new pid); no heartbeat-details checkpoint was tested. The server itself was not killed mid-run; the restart check was a clean stop/start after all workflows finished.",
+    "Spans were exported with a SimpleSpanProcessor to local JSON-lines files, not to an OTel collector; the killed attempt's span is lost, so span data alone under-reports killed work while the event history keeps it (lastFailure \"activity Heartbeat timeout\").",
+    "Network: downloaded the 45,298,806-byte temporal CLI archive from GitHub releases and the temporalio, opentelemetry and modal wheels from PyPI; modal made no authenticated call.",
+    "Two runs (round 1 and fix round 2) on one WSL2 host with the same outcomes; loopback ports 17733/17734/17740; all processes were stopped."
+  ],
+  "checked_at": "2026-09-23T05:42:47Z",
+  "command_variables": {
+    "C": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration",
+    "R": "worktree root (claude/g2-data-quality-orchestration-20260923)",
+    "H": "R/blueprints/gap-wave2-20260923/us-equities__data-quality-orchestration",
+    "UV": "$HOME/.local/share/codex-ecosystem/tools/uv-0.12.17/uv (uv 0.12.17, the CI-pinned version)",
+    "T": "$C/temporal/temporal (temporal CLI 1.9.1, Server 1.32.0)"
+  },
+  "remaining": "Modal: execution, failure, cancellation, recovery and telemetry remain untested; they need a user Modal account login (`modal token new`), which this unit cannot perform. Temporal: covered locally on the dev server only (see limits).",
+  "raw_artifacts": [
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/6-temporal-run-fr2.stdout.txt",
+      "original_sha256": "9abe4671e8e62aff86202108903734a1526c3b43a08969d425f77c7afa707e2a",
+      "source": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/raw/6-temporal-run-fr2.stdout.txt",
+      "uuids_redacted": 0,
+      "base64_payloads_sanitized": 0,
+      "sha256": "9abe4671e8e62aff86202108903734a1526c3b43a08969d425f77c7afa707e2a",
+      "bytes": 218
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/6-temporal-drive-fr2.json",
+      "original_sha256": "899652c15edd68e611aa273ff904ea6b6846b8dc03a4749be6d3b53091495b42",
+      "source": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/w-temporal-fr2/drive.json",
+      "uuids_redacted": 0,
+      "base64_payloads_sanitized": 0,
+      "sha256": "899652c15edd68e611aa273ff904ea6b6846b8dc03a4749be6d3b53091495b42",
+      "bytes": 10496
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/6-temporal-history-g2-happy.json",
+      "original_sha256": "5ad326f884ace60817ca468afef9d60ee44cd460323d15ea8e93741132bc97ee",
+      "source": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/w-temporal-fr2/history-g2-happy.json",
+      "uuids_redacted": 7,
+      "base64_payloads_sanitized": 3,
+      "sha256": "326fff7a4e2b0e6f1746a41338570277b0624fc1c17338f48ade1869462934a7",
+      "bytes": 11755
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/6-temporal-history-g2-retry.json",
+      "original_sha256": "6815da5a637c2d4d034a8025a12df58e0aeaa310f050a92a4cc0f196d53b14be",
+      "source": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/w-temporal-fr2/history-g2-retry.json",
+      "uuids_redacted": 7,
+      "base64_payloads_sanitized": 3,
+      "sha256": "ab21ce7d598d0e8f19ecbc2a8e49f8d7a4581cf0aff000f12395b027706ee2ec",
+      "bytes": 13492
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/6-temporal-history-g2-fail-hard.json",
+      "original_sha256": "9e89de85f3e55d35e3133095c7679bec921651827224f4f6eeea8b28c786e17c",
+      "source": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/w-temporal-fr2/history-g2-fail-hard.json",
+      "uuids_redacted": 5,
+      "base64_payloads_sanitized": 2,
+      "sha256": "470c5d7ea2088a8f68579e08441025564abe18e317aad903f9fbf9e3a089a37a",
+      "bytes": 11351
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/6-temporal-history-g2-cancel.json",
+      "original_sha256": "103bd4b1ea3746e09a1394157968493697654e743d0caca92be457a5aa630322",
+      "source": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/w-temporal-fr2/history-g2-cancel.json",
+      "uuids_redacted": 4,
+      "base64_payloads_sanitized": 2,
+      "sha256": "7da6666536126aee3d86b2575f3dad450c1d8858ac635a3e5faa0c394ba633f3",
+      "bytes": 7055
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/6-temporal-history-g2-kill.json",
+      "original_sha256": "9af9ad85ccbcf4d862467c018456266773f589e14048d20ee5a2fbf7a8695b56",
+      "source": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/w-temporal-fr2/history-g2-kill.json",
+      "uuids_redacted": 7,
+      "base64_payloads_sanitized": 3,
+      "sha256": "08649f131736016b87a2c00dc287372e8ac485b95feaa79882594e75597bef21",
+      "bytes": 11964
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/6-temporal-history-g2-kill-after-restart.json",
+      "original_sha256": "9af9ad85ccbcf4d862467c018456266773f589e14048d20ee5a2fbf7a8695b56",
+      "source": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/w-temporal-fr2/history-g2-kill-after-restart.json",
+      "uuids_redacted": 7,
+      "base64_payloads_sanitized": 3,
+      "sha256": "08649f131736016b87a2c00dc287372e8ac485b95feaa79882594e75597bef21",
+      "bytes": 11964
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/6-temporal-list-before-restart.json",
+      "original_sha256": "a7f3d8252b115d74abfd7c269e1ca23d24be53305f828aa10a974d03cf958425",
+      "source": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/w-temporal-fr2/list-before-restart.json",
+      "uuids_redacted": 10,
+      "base64_payloads_sanitized": 0,
+      "sha256": "5457daffa11708b03e8b3802fc4dc0eb9bb8cef61f538cac55527ee1c904ca5d",
+      "bytes": 4412
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/6-temporal-list-after-restart.json",
+      "original_sha256": "a7f3d8252b115d74abfd7c269e1ca23d24be53305f828aa10a974d03cf958425",
+      "source": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/w-temporal-fr2/list-after-restart.json",
+      "uuids_redacted": 10,
+      "base64_payloads_sanitized": 0,
+      "sha256": "5457daffa11708b03e8b3802fc4dc0eb9bb8cef61f538cac55527ee1c904ca5d",
+      "bytes": 4412
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/6-temporal-spans-client.jsonl.txt",
+      "original_sha256": "a8de3f242270ae50ebbdc5f40399cb2ab7ad1c0f0d10f095942c8009f7a66bd4",
+      "source": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/w-temporal-fr2/spans-client.jsonl",
+      "uuids_redacted": 0,
+      "base64_payloads_sanitized": 0,
+      "sha256": "a8de3f242270ae50ebbdc5f40399cb2ab7ad1c0f0d10f095942c8009f7a66bd4",
+      "bytes": 1509
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/6-temporal-spans-worker-1.jsonl.txt",
+      "original_sha256": "9329dfbd613ec5008d218e9429338a01d6730266a84154825466e8d572f94197",
+      "source": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/w-temporal-fr2/spans-worker-1.jsonl",
+      "uuids_redacted": 23,
+      "base64_payloads_sanitized": 0,
+      "sha256": "98e95cc58a44903b4825fa5cc2fc1b8dbb1d2421db607a5b986b4106b4db0da7",
+      "bytes": 8250
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/6-temporal-spans-worker-2.jsonl.txt",
+      "original_sha256": "8aa8cad4f5173f87d4c01d73715dcf50ab039ce2c05e4074343b0ef005a71221",
+      "source": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/w-temporal-fr2/spans-worker-2.jsonl",
+      "uuids_redacted": 4,
+      "base64_payloads_sanitized": 0,
+      "sha256": "c98fec18df19cc018151d710d9ee89353873227848bfafdfa591039fda59394b",
+      "bytes": 1451
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/6-temporal-server-metrics-outcomes-fr2.txt",
+      "original_sha256": "78bab9d6bcfd9d73405fe932b6cabd402db63201dd1870c5c6565c0fa3a97e0f",
+      "source": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/raw/6-temporal-server-metrics-outcomes-fr2.txt",
+      "uuids_redacted": 0,
+      "base64_payloads_sanitized": 0,
+      "sha256": "78bab9d6bcfd9d73405fe932b6cabd402db63201dd1870c5c6565c0fa3a97e0f",
+      "bytes": 1325
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/6-modal-no-login.txt",
+      "original_sha256": "b68c1eebcc6d1292049a2d4843c4227f0c4b1239eb49cb0c1cd69731aadf0152",
+      "source": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/raw/6-modal-no-login.txt",
+      "uuids_redacted": 0,
+      "base64_payloads_sanitized": 0,
+      "sha256": "b68c1eebcc6d1292049a2d4843c4227f0c4b1239eb49cb0c1cd69731aadf0152",
+      "bytes": 730
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/6-temporal-r1-run.stdout.txt",
+      "original_sha256": "2eb27d6879f52d3e3035072bf940bf8d538b5e10a466f4d1ec3711301f54ebc2",
+      "source": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/raw/6-temporal-run.stdout.txt",
+      "uuids_redacted": 0,
+      "base64_payloads_sanitized": 0,
+      "sha256": "2eb27d6879f52d3e3035072bf940bf8d538b5e10a466f4d1ec3711301f54ebc2",
+      "bytes": 151
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/6-temporal-r1-drive.json",
+      "original_sha256": "ba3e1645540cf0429b1e20c23fd08b06359643018a4424b6fb83efd9022f334f",
+      "source": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/w-temporal/drive.json",
+      "uuids_redacted": 0,
+      "base64_payloads_sanitized": 0,
+      "sha256": "ba3e1645540cf0429b1e20c23fd08b06359643018a4424b6fb83efd9022f334f",
+      "bytes": 10359
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/0-provenance-reverification.txt",
+      "original_sha256": "e2694d900d4e93e3e875589ad8b8c5483ad2307a7533ed5b322efc0c06409ae2",
+      "source": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/raw/0-provenance-reverification.txt",
+      "uuids_redacted": 0,
+      "base64_payloads_sanitized": 0,
+      "sha256": "e57790c6b19c3590fb8020873e0775879bb326286c45bf44dcf72d4c5a456a8a",
+      "bytes": 1573
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/0-first-round-mtimes.txt",
+      "original_sha256": "fceb908f904dd1025b954ecf94a4b634a25c7b33e1ed4416253aef02f1b0d6ce",
+      "source": "$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/raw/0-first-round-mtimes.txt",
+      "uuids_redacted": 0,
+      "base64_payloads_sanitized": 0,
+      "sha256": "fceb908f904dd1025b954ecf94a4b634a25c7b33e1ed4416253aef02f1b0d6ce",
+      "bytes": 923
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/0-codex-review-r1.md",
+      "original_sha256": "765352de082804501782e86a64029211bf1504edbf823d3aba4f8ae77753b7c8",
+      "source": "<ephemeral session scratchpad>/g2dqo-review.md",
+      "uuids_redacted": 0,
+      "base64_payloads_sanitized": 0,
+      "sha256": "dd0283b76a5c85ea9aff1c3506538b1aa02fc7f221fd12b8f361d9576ca254f4",
+      "bytes": 3926
+    }
+  ],
+  "fixround2_preregistration": {
+    "written_at": "2026-09-23T05:40:45Z",
+    "label": "fix round 2, written after the independent review and before the reruns",
+    "reason": "Independent Codex review (codex exec --sandbox read-only --ephemeral, 2026-09-23) found: base64 Temporal payloads still carried the host home path; *.jsonl raw files were gitignored and so not committed; several provenance claims (checksum verification, archive size, modal version, fresh --require-hashes sync, installed versions) had no retained raw output; raw outputs lacked capture timestamps; and the Temporal harness hardcoded the second-worker launch delay as 3 s.",
+    "expectation": "Rerun run_temporal.sh (UTC start/finish, measured second-worker launch delay, wall-clock kill time) in a new work dir and re-verify the archive checksum/size and record `modal --version` in a retained log. Expect the same scenario outcomes as the first run; the measured launch delay will exceed 3 s by the describe-call latency.",
+    "criteria": "The rerun replaces the first run as cited evidence; outcomes that differ from the first run are reported. The Modal clause still caps the outcome at advanced."
+  },
+  "review": {
+    "reviewer": "one codex exec --sandbox read-only --ephemeral call (Codex account) with blueprints/gap-wave2-20260923/us-equities__data-quality-orchestration/review_prompt.md; output retained as raw/0-codex-review-r1.md",
+    "raw": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/0-codex-review-r1.md",
+    "findings_for_this_receipt": "Finding 1: base64 payloads in the histories carried the host home path -> collector now decodes, sanitizes and re-encodes (6 files, 16 payloads); a decode-and-search probe finds none in the committed files and finds 3 in an unsanitized original (control). Finding 2: *.jsonl spans were gitignored -> committed as *.jsonl.txt. Finding 5: checksum/size/modal version lacked raw output -> raw/0-provenance-reverification.txt (post-hoc). Finding 7: hardcoded 3 s -> measured (3.1 s) in the fix-round-2 rerun, which replaces round 1 as cited evidence."
+  }
+}

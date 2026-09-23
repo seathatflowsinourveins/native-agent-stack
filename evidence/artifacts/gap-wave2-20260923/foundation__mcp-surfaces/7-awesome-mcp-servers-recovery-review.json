@@ -1,0 +1,119 @@
+{
+ "id": "gap-wave2-20260923-foundation-mcp-surfaces-7",
+ "gap_index": 7,
+ "gap_text_sha256": "cfb7fd93ae930dafa307983d2776856c17b0b426082e1ea44703eb17138d2df5",
+ "gap_text": "No registry entry from punkpeye/awesome-mcp-servers was reviewed against a concrete MCP surface gap.",
+ "next_check": "Choose one concrete gap (e.g. mcporter automatic recovery), pick the matching entries in punkpeye/awesome-mcp-servers at a pinned commit, and source-review them against that gap with a recorded disposition.",
+ "preregistration": {
+  "written_at": "2026-09-23T03:54:03Z",
+  "expectation": "Aggregator/proxy entries in punkpeye/awesome-mcp-servers at a pinned commit that host stdio servers persistently (e.g. mcpproxy-go, TBXark/mcp-proxy, sparfenyuk/mcp-proxy) include some reconnect/restart logic; none is a drop-in CLI bridge replacement for mcporter's per-user daemon.",
+  "criteria": "settled if one concrete gap (mcporter automatic recovery from stale daemon state) is named, the matching entries at a pinned list commit are listed, each candidate is source-reviewed at a pinned repository commit with file/line citations, and a disposition is recorded (evidence_class source_review).",
+  "source": "evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/preregistrations.json",
+  "addenda": [
+   {
+    "written_at": "2026-09-23T13:07:02Z",
+    "label": "FIX ROUND 3, written after the round-4 independent Opus review (raw/review-opus-round4.json) and before the chrishayuk/mcp-cli clone and review",
+    "expectation": "chrishayuk/mcp-cli (a Python CLI chat/command client) spawns stdio servers per invocation and has no persistent bridge daemon, so it has no daemon-recovery role and is rejected for the gap-7 concrete gap. Source citations at a pinned commit will show how it launches servers and whether any persistent/reconnect state exists.",
+    "criteria": "Gap 7 stays settled only if chrishayuk/mcp-cli is reviewed at a pinned commit with verbatim citations and a disposition, and the receipt's disposition arm lists every section-rule entry (wong2 included with its role). If its source shows a persistent daemon with automatic stale-state recovery, it becomes keep-but-compare instead. Gaps 1, 3, 5: presentation/sanitization fixes only; outcomes unchanged unless the regenerated receipts contradict them. A committed verify_receipts.py recomputes sha256 of each g2-units.json gap text and checks it, the required receipt fields, and results.json equality."
+   }
+  ]
+ },
+ "checked_at": "2026-09-23T13:09:10Z",
+ "arms": [
+  {
+   "arm": "choose one concrete gap",
+   "status": "executed",
+   "detail": "mcporter 0.13.13/0.14.0 refuses to launch a replacement daemon after its daemon dies ('Previous daemon exited unexpectedly ... No replacement was launched', dist/daemon/client.js ensureDaemon); recovery needs a manual metadata archive (observed in raw/lifecycle-mcporter-*.json stale_metadata_sigkill)."
+  },
+  {
+   "arm": "pick matching entries in punkpeye/awesome-mcp-servers at a pinned commit",
+   "status": "executed",
+   "detail": {
+    "commit": "fbc52bcf301a3468954f6ee4fd12b75b853c93cf",
+    "rule": "Aggregators section (README lines 138-279) entries that host local stdio servers persistently, i.e. could own the daemon/recovery role; plus the CLI testers listed under Other Tools and Integrations.",
+    "entry_lines": {
+     "1mcp-app/agent": 150,
+     "ni-c/mcp-hub": 231,
+     "smart-mcp-proxy/mcpproxy-go": 248,
+     "chrishayuk/mcp-cli": 4527,
+     "wong2/mcp-cli": 4667
+    }
+   }
+  },
+  {
+   "arm": "source-review them against that gap with a recorded disposition",
+   "status": "executed",
+   "detail": {
+    "1mcp-app/agent": {
+     "commit": "c147b07b8499d2d90bb42fc6b57860bbfa3bbe84",
+     "disposition": "keep-but-compare: closest match to the gap (automatic stale-PID cleanup without the manual archive step, at the cost of mcporter's transport-retirement proof). Not adopted: no executed comparison yet."
+    },
+    "ni-c/mcp-hub": {
+     "commit": "8c393a17bd2dd6d169bc880ef176bd81d48ac3b3",
+     "disposition": "rejected for this gap: a container HTTP hub, not a per-user CLI bridge; it does not address recovery of a local bridge daemon's own stale state."
+    },
+    "smart-mcp-proxy/mcpproxy-go": {
+     "commit": "0600d4d98a444b241006154ba04ad08eb74a2519",
+     "disposition": "rejected for this gap: upstream reconnect is not the missing piece, and its own stale-lock recovery is explicitly unimplemented."
+    },
+    "wong2/mcp-cli": {
+     "commit": "7d12b4648b1c3e2a7341113407002c1b0f700d1b",
+     "disposition": "used as the reviewed registry alternative in the executed comparison (gaps 6 and 12); not a replacement."
+    },
+    "chrishayuk/mcp-cli": {
+     "commit": "6d806241be6a4b28186c95cb6e7144864b7cf5d7",
+     "disposition": "rejected for this gap: no persistent daemon, so no stale daemon state to recover; like wong2/mcp-cli it trades recovery for a fresh spawn per invocation. Not used in the executed comparison (wong2 was the reviewed CLI alternative there)."
+    }
+   },
+   "coverage": {
+    "section_rule_entries": [
+     "1mcp-app/agent",
+     "chrishayuk/mcp-cli",
+     "ni-c/mcp-hub",
+     "smart-mcp-proxy/mcpproxy-go",
+     "wong2/mcp-cli"
+    ],
+    "reviewed": [
+     "1mcp-app/agent",
+     "chrishayuk/mcp-cli",
+     "ni-c/mcp-hub",
+     "smart-mcp-proxy/mcpproxy-go",
+     "wong2/mcp-cli"
+    ],
+    "all_selected_entries_reviewed": true
+   }
+  }
+ ],
+ "commands": [
+  "git clone --depth 1 https://github.com/punkpeye/awesome-mcp-servers.git   # fbc52bcf301a3468954f6ee4fd12b75b853c93cf",
+  "git clone --depth 1 https://github.com/1mcp-app/agent.git; ...ni-c/mcp-hub; ...smart-mcp-proxy/mcpproxy-go; ...wong2/mcp-cli",
+  "git clone --depth 1 https://github.com/chrishayuk/mcp-cli.git   # fix round 3, 2026-09-23T13:07Z; 8.7 MB network download",
+  "python3 blueprints/gap-wave2-20260923/foundation__mcp-surfaces/source_review.py evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/raw/7-source-review.json"
+ ],
+ "results": [
+  "1mcp-app/agent @ c147b07b8499: Tier-1 stale PID handling: a PID file whose process is dead (identity-checked) is removed automatically and the runtime reported not-running; a live-but-unreachable owner keeps its PID file (tier 2). Backend stdio servers restart on unexpected exit with backoff when restartOnExit is set. `1mcp run <server>/<tool>` calls tools against a RUNNING serve instance; it does not launch one. -> keep-but-compare: closest match to the gap (automatic stale-PID cleanup without the manual archive step, at the cost of mcporter's transport-retirement proof). Not adopted: no executed comparison yet.",
+  "ni-c/mcp-hub @ 8c393a17bd2d: Supervises child stdio servers (sleep when idle, backoff restart, give up after unused restarts) and publishes them over HTTPS/Streamable HTTP from one container. The cited container spec deliberately gives sandboxed children no Docker restart policy because the hub itself supervises them; recovery of the hub process's own state was not found in the reviewed files (not searched exhaustively). -> rejected for this gap: a container HTTP hub, not a per-user CLI bridge; it does not address recovery of a local bridge daemon's own stale state.",
+  "smart-mcp-proxy/mcpproxy-go @ 0600d4d98a44: Reconnects upstream servers (managed client tryReconnect with in-progress guard); its own core database-lock failure has no automatic stale-lock cleanup ('Could implement automatic stale lock cleanup here'). Ships a tray, web UI and self-update path (AUTOUPDATE.md). -> rejected for this gap: upstream reconnect is not the missing piece, and its own stale-lock recovery is explicitly unimplemented.",
+  "wong2/mcp-cli @ 7d12b4648b1c: CLI tester. Non-interactive mode supports call-tool/read-resource/get-prompt only, always through a StdioClientTransport built from the config entry (an HTTP entry cannot be called non-interactively); listing exists only inside the interactive autocomplete prompt. No daemon: every call spawns the server. -> used as the reviewed registry alternative in the executed comparison (gaps 6 and 12); not a replacement.",
+  "chrishayuk/mcp-cli @ 6d806241be6a: Python CLI tester/chat client. Each command builds an in-process ToolManager/StreamManager that starts the configured servers and is always closed in `finally` when the command ends; there is no persistent bridge daemon, pid file or socket to go stale. A tool call that fails with a connection error is diagnosed with a health check and the status appended to the error; it is not reconnected. DEFAULT_RECONNECT_ON_FAILURE / DEFAULT_MAX_RECONNECT_ATTEMPTS are defined in config/defaults.py but have no other reference in src/ (outside src/ only examples/safety/tier2_efficiency_demo.py prints them). -> rejected for this gap: no persistent daemon, so no stale daemon state to recover; like wong2/mcp-cli it trades recovery for a fresh spawn per invocation. Not used in the executed comparison (wong2 was the reviewed CLI alternative there)."
+ ],
+ "outcome": "settled",
+ "note": "The concrete gap is that mcporter does not recover automatically from stale daemon metadata, as observed in gaps 2 and 9. All five entries selected by the section rule were source-reviewed at pinned commits, with verbatim line excerpts (chrishayuk/mcp-cli was added in fix round 3 after the round-4 review found it selected but unreviewed). 1mcp-app/agent is keep-but-compare: it automatically removes a dead-PID file and restarts backends with backoff, and it is the closest match. ni-c/mcp-hub is rejected: it is an HTTP container hub, not a CLI bridge. smart-mcp-proxy/mcpproxy-go is rejected: its own stale-lock cleanup is explicitly unimplemented. The two CLI testers have no daemon to go stale: wong2/mcp-cli was the reviewed alternative in the executed comparison (gaps 6 and 12), and chrishayuk/mcp-cli is rejected (per-command in-process servers, closed on exit; its declared reconnect defaults are not referenced in src/). No candidate is adopted.",
+ "evidence_class": "source_review",
+ "limits": [
+  "Source review only, of shallow clones; no candidate was executed.",
+  "Section rule picks self-described persistent hosts; other list sections were keyword-searched, not read in full (4,735 lines)."
+ ],
+ "raw_evidence": [
+  {
+   "file": "evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/raw/7-source-review.json",
+   "sha256": "36bb6030433beaaeb93218c25dd3159e16e488ab685df7c58078423071982fac"
+  }
+ ],
+ "helper_scripts": [
+  {
+   "file": "blueprints/gap-wave2-20260923/foundation__mcp-surfaces/source_review.py",
+   "sha256": "641006af15ec23fe65927679cf48d70f5f669cb29596d52cb59df01d8922269c"
+  }
+ ]
+}

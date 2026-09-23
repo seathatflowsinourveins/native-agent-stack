@@ -1,0 +1,37 @@
+
+Running 1 test using 1 worker
+
+  ✘  1 [chromium] › tests/todo-creation/add-single-todo.spec.ts:6:7 › Todo Creation › Add a single todo (6.4s)
+
+
+  1) [chromium] › tests/todo-creation/add-single-todo.spec.ts:6:7 › Todo Creation › Add a single todo 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByText('1 item left')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByText('1 item left') with timeout 5000ms
+      - waiting for getByText('1 item left')
+
+
+      25 |
+      26 |     // Post Condition - The todo counter shows '1 item left'
+    > 27 |     await expect(page.getByText('1 item left')).toBeVisible();
+         |                                                 ^
+      28 |
+      29 |     // Post Condition - The new todo is unchecked (active state)
+      30 |     await expect(page.getByRole('checkbox', { name: 'Toggle Todo' })).not.toBeChecked();
+        at $HOME/.cache/gap-wave2-20260923/quality-evaluation/playwright-upstream/repo/examples/todomvc/tests/todo-creation/add-single-todo.spec.ts:27:49
+
+    attachment #1: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/todo-creation-add-single-t-ada09--Creation-Add-a-single-todo-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/todo-creation-add-single-t-ada09--Creation-Add-a-single-todo-chromium/error-context.md
+
+  1 failed
+    [chromium] › tests/todo-creation/add-single-todo.spec.ts:6:7 › Todo Creation › Add a single todo 

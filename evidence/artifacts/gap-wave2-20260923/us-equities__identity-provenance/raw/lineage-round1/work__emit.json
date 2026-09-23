@@ -1,0 +1,57 @@
+{
+  "cutoff": "2025-02-01T21:00:00.000000200Z",
+  "cutoff_ns": "1738443600000000200",
+  "events_path": "openlineage-events.jsonl",
+  "files": {
+    "observations.parquet": "0cf15579cd80a02b1c5411bdda50483808e2b2948126da659ecca596bb3821f3",
+    "source.json": "40aeafbc144eb39ebd017af449d6d136f5539caf484ebd8b310bb4fbf213eb5d",
+    "universe.parquet": "b0785843154bdabb234de6ef9b105ee937c40703d4aa87343b7dfae9b07a2c2c"
+  },
+  "fixture_sha256": "40aeafbc144eb39ebd017af449d6d136f5539caf484ebd8b310bb4fbf213eb5d",
+  "horizon": "2025-02-01T21:00:00.000000201Z",
+  "horizon_ns": "1738443600000000201",
+  "materialize_run_id": "uuid-redacted-03",
+  "mlflow": {
+    "bindings": {
+      "materialize:fixture.observations": {
+        "digest": "c36188b4",
+        "file_sha256": "40aeafbc144eb39ebd017af449d6d136f5539caf484ebd8b310bb4fbf213eb5d",
+        "name": "fixture.observations"
+      },
+      "materialize:fixture.universe": {
+        "digest": "7526bc37",
+        "file_sha256": "40aeafbc144eb39ebd017af449d6d136f5539caf484ebd8b310bb4fbf213eb5d",
+        "name": "fixture.universe"
+      },
+      "select:observations": {
+        "digest": "7332d160",
+        "file_sha256": "0cf15579cd80a02b1c5411bdda50483808e2b2948126da659ecca596bb3821f3",
+        "name": "observations"
+      },
+      "select:universe": {
+        "digest": "7252fbe9",
+        "file_sha256": "b0785843154bdabb234de6ef9b105ee937c40703d4aa87343b7dfae9b07a2c2c",
+        "name": "universe"
+      }
+    },
+    "digest_attempts": {
+      "observations": "project sha256 refused as digest: MlflowException: 'digest' exceeds the maximum length of 36 characters",
+      "universe": "project sha256 refused as digest: MlflowException: 'digest' exceeds the maximum length of 36 characters"
+    },
+    "materialize_run_id": "f7a90bf2c6644a9388c40b88db272f40",
+    "run_id": "89662df4f19c41cbb65ddabf202e18e6",
+    "tracking_uri": "sqlite:///<work>/mlflow.db"
+  },
+  "select_run_id": "uuid-redacted-04",
+  "selected_row_ids": [
+    "correction",
+    "future-member"
+  ],
+  "snapshot_sha256": "b9eae52ab9751d77f0f9dd2afff8a615c6bcb3ca819115856ef3caa0b7f0d591",
+  "versions": {
+    "duckdb": "1.5.5",
+    "mlflow": "3.16.1",
+    "openlineage-python": "1.53.0",
+    "pandas": "3.0.6"
+  }
+}

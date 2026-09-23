@@ -1,0 +1,262 @@
+{
+  "events": [
+    {
+      "eventId": "1",
+      "eventTime": "2026-09-23T05:41:58.574640315Z",
+      "eventType": "EVENT_TYPE_WORKFLOW_EXECUTION_STARTED",
+      "taskId": "1048690",
+      "workflowExecutionStartedEventAttributes": {
+        "workflowType": {
+          "name": "TwoStep"
+        },
+        "taskQueue": {
+          "name": "g2dqo-two-step",
+          "kind": "TASK_QUEUE_KIND_NORMAL"
+        },
+        "input": {
+          "payloads": [
+            {
+              "metadata": {
+                "encoding": "anNvbi9wbGFpbg=="
+              },
+              "data": "eyJtYXJrcyI6IiRIT01FLy5jYWNoZS9nYXAtd2F2ZTItMjAyNjA5MjMvZGF0YS1xdWFsaXR5LW9yY2hlc3RyYXRpb24vdy10ZW1wb3JhbC1mcjIvbWFya3MiLCJtb2RlIjoiZmFpbF9oYXJkIiwic2xlZXAiOjIsIndpZCI6ImcyLWZhaWwtaGFyZCJ9"
+            }
+          ]
+        },
+        "workflowExecutionTimeout": "300s",
+        "workflowRunTimeout": "300s",
+        "workflowTaskTimeout": "10s",
+        "originalExecutionRunId": "uuid-redacted-13",
+        "identity": "674838@<hostname>",
+        "firstExecutionRunId": "uuid-redacted-13",
+        "attempt": 1,
+        "workflowExecutionExpirationTime": "2026-09-23T05:46:58.574Z",
+        "firstWorkflowTaskBackoff": "0s",
+        "header": {
+          "fields": {
+            "_tracer-data": {
+              "metadata": {
+                "encoding": "anNvbi9wbGFpbg=="
+              },
+              "data": "eyJ0cmFjZXBhcmVudCI6IjAwLWVjOWNiZjc1MWQ2ZWNjNzk1ZTcxZjEyNmM4ZTA1M2EyLTkzNTBlODRiNWQxMDQ4MTctMDMifQ=="
+            }
+          }
+        },
+        "workflowId": "g2-fail-hard",
+        "priority": {}
+      }
+    },
+    {
+      "eventId": "2",
+      "eventTime": "2026-09-23T05:41:58.574750016Z",
+      "eventType": "EVENT_TYPE_WORKFLOW_TASK_SCHEDULED",
+      "taskId": "1048691",
+      "workflowTaskScheduledEventAttributes": {
+        "taskQueue": {
+          "name": "g2dqo-two-step",
+          "kind": "TASK_QUEUE_KIND_NORMAL"
+        },
+        "startToCloseTimeout": "10s",
+        "attempt": 1
+      }
+    },
+    {
+      "eventId": "3",
+      "eventTime": "2026-09-23T05:41:58.621127120Z",
+      "eventType": "EVENT_TYPE_WORKFLOW_TASK_STARTED",
+      "taskId": "1048697",
+      "workflowTaskStartedEventAttributes": {
+        "scheduledEventId": "2",
+        "identity": "674921@<hostname>",
+        "requestId": "uuid-redacted-14",
+        "historySizeBytes": "565",
+        "workerVersion": {
+          "buildId": "3871241361d6f22777de68551a877966"
+        }
+      }
+    },
+    {
+      "eventId": "4",
+      "eventTime": "2026-09-23T05:41:58.665551808Z",
+      "eventType": "EVENT_TYPE_WORKFLOW_TASK_COMPLETED",
+      "taskId": "1048702",
+      "workflowTaskCompletedEventAttributes": {
+        "scheduledEventId": "2",
+        "startedEventId": "3",
+        "identity": "674921@<hostname>",
+        "workerVersion": {
+          "buildId": "3871241361d6f22777de68551a877966"
+        },
+        "sdkMetadata": {
+          "coreUsedFlags": [
+            2,
+            1,
+            3
+          ],
+          "sdkName": "temporal-python",
+          "sdkVersion": "1.33.0"
+        },
+        "meteringMetadata": {}
+      }
+    },
+    {
+      "eventId": "5",
+      "eventTime": "2026-09-23T05:41:58.665702910Z",
+      "eventType": "EVENT_TYPE_ACTIVITY_TASK_SCHEDULED",
+      "taskId": "1048703",
+      "activityTaskScheduledEventAttributes": {
+        "activityId": "1",
+        "activityType": {
+          "name": "step1"
+        },
+        "taskQueue": {
+          "name": "g2dqo-two-step",
+          "kind": "TASK_QUEUE_KIND_NORMAL"
+        },
+        "header": {
+          "fields": {
+            "_tracer-data": {
+              "metadata": {
+                "encoding": "anNvbi9wbGFpbg=="
+              },
+              "data": "eyJ0cmFjZXBhcmVudCI6IjAwLWVjOWNiZjc1MWQ2ZWNjNzk1ZTcxZjEyNmM4ZTA1M2EyLTQ1NmQxMTExNWQwOGEzN2ItMDMifQ=="
+            }
+          }
+        },
+        "input": {
+          "payloads": [
+            {
+              "metadata": {
+                "encoding": "anNvbi9wbGFpbg=="
+              },
+              "data": "eyJtYXJrcyI6IiRIT01FLy5jYWNoZS9nYXAtd2F2ZTItMjAyNjA5MjMvZGF0YS1xdWFsaXR5LW9yY2hlc3RyYXRpb24vdy10ZW1wb3JhbC1mcjIvbWFya3MiLCJtb2RlIjoiZmFpbF9oYXJkIiwic2xlZXAiOjIsIndpZCI6ImcyLWZhaWwtaGFyZCJ9"
+            }
+          ]
+        },
+        "scheduleToCloseTimeout": "300s",
+        "scheduleToStartTimeout": "300s",
+        "startToCloseTimeout": "120s",
+        "heartbeatTimeout": "5s",
+        "workflowTaskCompletedEventId": "4",
+        "retryPolicy": {
+          "initialInterval": "1s",
+          "backoffCoefficient": 2,
+          "maximumInterval": "100s",
+          "maximumAttempts": 5
+        },
+        "useWorkflowBuildId": true,
+        "priority": {}
+      }
+    },
+    {
+      "eventId": "6",
+      "eventTime": "2026-09-23T05:41:58.665761510Z",
+      "eventType": "EVENT_TYPE_ACTIVITY_TASK_STARTED",
+      "taskId": "1048707",
+      "activityTaskStartedEventAttributes": {
+        "scheduledEventId": "5",
+        "identity": "674921@<hostname>",
+        "requestId": "uuid-redacted-15",
+        "attempt": 1,
+        "workerVersion": {
+          "buildId": "3871241361d6f22777de68551a877966"
+        }
+      }
+    },
+    {
+      "eventId": "7",
+      "eventTime": "2026-09-23T05:41:58.691972339Z",
+      "eventType": "EVENT_TYPE_ACTIVITY_TASK_FAILED",
+      "taskId": "1048708",
+      "activityTaskFailedEventAttributes": {
+        "failure": {
+          "message": "injected non-retryable failure",
+          "stackTrace": "  File \"$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/tvenv/lib/python3.12/site-packages/temporalio/worker/_activity.py\", line 351, in _handle_start_activity_task\n    result = await self._execute_activity(\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n  File \"$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/tvenv/lib/python3.12/site-packages/temporalio/worker/_activity.py\", line 681, in _execute_activity\n    return await impl.execute_activity(input)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n  File \"$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/tvenv/lib/python3.12/site-packages/temporalio/contrib/opentelemetry/_interceptor.py\", line 384, in execute_activity\n    return await super().execute_activity(input)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n  File \"$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/tvenv/lib/python3.12/site-packages/temporalio/worker/_interceptor.py\", line 135, in execute_activity\n    return await self.next.execute_activity(input)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n  File \"$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/tvenv/lib/python3.12/site-packages/temporalio/worker/_activity.py\", line 889, in execute_activity\n    return await input.fn(*input.args)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n  File \"$HOME/code/nas-wt-g2-data-quality-orchestration/blueprints/gap-wave2-20260923/us-equities__data-quality-orchestration/temporal_arm.py\", line 78, in step1\n    raise ApplicationError(\"injected non-retryable failure\", non_retryable=True)\n",
+          "applicationFailureInfo": {
+            "nonRetryable": true
+          }
+        },
+        "scheduledEventId": "5",
+        "startedEventId": "6",
+        "identity": "674921@<hostname>",
+        "retryState": "RETRY_STATE_NON_RETRYABLE_FAILURE"
+      }
+    },
+    {
+      "eventId": "8",
+      "eventTime": "2026-09-23T05:41:58.692169441Z",
+      "eventType": "EVENT_TYPE_WORKFLOW_TASK_SCHEDULED",
+      "taskId": "1048709",
+      "workflowTaskScheduledEventAttributes": {
+        "taskQueue": {
+          "name": "674921@<hostname>-6a7ea8c0590e46a89eb1e64a7fd41b32",
+          "kind": "TASK_QUEUE_KIND_STICKY",
+          "normalName": "g2dqo-two-step"
+        },
+        "startToCloseTimeout": "10s",
+        "attempt": 1
+      }
+    },
+    {
+      "eventId": "9",
+      "eventTime": "2026-09-23T05:41:58.708102580Z",
+      "eventType": "EVENT_TYPE_WORKFLOW_TASK_STARTED",
+      "taskId": "1048713",
+      "workflowTaskStartedEventAttributes": {
+        "scheduledEventId": "8",
+        "identity": "674921@<hostname>",
+        "requestId": "uuid-redacted-16",
+        "historySizeBytes": "3159",
+        "workerVersion": {
+          "buildId": "3871241361d6f22777de68551a877966"
+        }
+      }
+    },
+    {
+      "eventId": "10",
+      "eventTime": "2026-09-23T05:41:58.733989706Z",
+      "eventType": "EVENT_TYPE_WORKFLOW_TASK_COMPLETED",
+      "taskId": "1048717",
+      "workflowTaskCompletedEventAttributes": {
+        "scheduledEventId": "8",
+        "startedEventId": "9",
+        "identity": "674921@<hostname>",
+        "workerVersion": {
+          "buildId": "3871241361d6f22777de68551a877966"
+        },
+        "sdkMetadata": {},
+        "meteringMetadata": {}
+      }
+    },
+    {
+      "eventId": "11",
+      "eventTime": "2026-09-23T05:41:58.734117107Z",
+      "eventType": "EVENT_TYPE_WORKFLOW_EXECUTION_FAILED",
+      "taskId": "1048718",
+      "workflowExecutionFailedEventAttributes": {
+        "failure": {
+          "message": "Activity task failed",
+          "cause": {
+            "message": "injected non-retryable failure",
+            "stackTrace": "  File \"$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/tvenv/lib/python3.12/site-packages/temporalio/worker/_activity.py\", line 351, in _handle_start_activity_task\n    result = await self._execute_activity(\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n  File \"$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/tvenv/lib/python3.12/site-packages/temporalio/worker/_activity.py\", line 681, in _execute_activity\n    return await impl.execute_activity(input)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n  File \"$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/tvenv/lib/python3.12/site-packages/temporalio/contrib/opentelemetry/_interceptor.py\", line 384, in execute_activity\n    return await super().execute_activity(input)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n  File \"$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/tvenv/lib/python3.12/site-packages/temporalio/worker/_interceptor.py\", line 135, in execute_activity\n    return await self.next.execute_activity(input)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n  File \"$HOME/.cache/gap-wave2-20260923/data-quality-orchestration/tvenv/lib/python3.12/site-packages/temporalio/worker/_activity.py\", line 889, in execute_activity\n    return await input.fn(*input.args)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n  File \"$HOME/code/nas-wt-g2-data-quality-orchestration/blueprints/gap-wave2-20260923/us-equities__data-quality-orchestration/temporal_arm.py\", line 78, in step1\n    raise ApplicationError(\"injected non-retryable failure\", non_retryable=True)\n",
+            "applicationFailureInfo": {
+              "nonRetryable": true
+            }
+          },
+          "activityFailureInfo": {
+            "scheduledEventId": "5",
+            "startedEventId": "6",
+            "identity": "674921@<hostname>",
+            "activityType": {
+              "name": "step1"
+            },
+            "activityId": "1",
+            "retryState": "RETRY_STATE_NON_RETRYABLE_FAILURE"
+          }
+        },
+        "retryState": "RETRY_STATE_RETRY_POLICY_NOT_SET",
+        "workflowTaskCompletedEventId": "10"
+      }
+    }
+  ]
+}

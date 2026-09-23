@@ -139,7 +139,11 @@ class RenderConfigTests(unittest.TestCase):
             capture_output=True, text=True, check=False, cwd=str(self.tmp_path),
         )
         self.assertNotIn(str(ROOT / ".codex" / "config.toml"), result.stdout + result.stderr)
-        self.assertIn(str(self.tmp_path / ".codex" / "config.toml"), result.stdout + result.stderr)
+        # default_project_root() falls back to Path.cwd(), and the OS getcwd() syscall
+        # always returns the fully resolved directory (POSIX; e.g. macOS's
+        # /tmp -> /private/tmp, /var -> /private/var, or a symlinked TMPDIR), never the
+        # possibly-symlinked path the subprocess was launched with; compare resolved.
+        self.assertIn(str(self.tmp_path.resolve() / ".codex" / "config.toml"), result.stdout + result.stderr)
 
     def test_default_project_live_path_honors_adoption_project_root_env(self):
         import os

@@ -1,0 +1,24 @@
+{
+  "id": "gap-wave2-20260923-scheduling-supervision-fix-round-2",
+  "written_at": "2026-09-23T08:49:00-04:00",
+  "written_at_note": "Written with the editor tool after `date -Iseconds` returned 08:48:47-04:00 and after a read-only `ps -p 366` (pid 366 still running, started Tue Sep 22 11:04:18). No other observation of the live Dagu directory or of pid 366 had been made in this round. Correction (made after the observation ran): the value first written here was a guessed 08:49:30, which is later than the observation's first timestamp (08:49:14); it is replaced by this file's filesystem birth time, `stat %w` = 2026-09-23 08:49:00.498 -04:00. No other field was changed after the observation. Added after this preregistration (not preregistered): a find -newermt check of the dagu-equities tree over the incident window and a b7aec6b-vs-HEAD helper hash table for gap 11 (raw/incident-1/fix-round-2-equities-store-and-helper-revisions.txt).",
+  "scope": "Fix round 2 answers the independent review's three findings. It re-runs no gap check; it makes read-only observations for the incident record and edits receipt text.",
+  "checks": [
+    {
+      "name": "pid-366-data-dir",
+      "expectation": "pid 366 (dagu server, no arguments) resolves the default Dagu home, so its data directory is $HOME/.local/share/dagu/data, the directory the accidental scheduler wrote.",
+      "criteria": "Confirmed if (a) /proc/366/environ has no DAGU_HOME/DAGU_DATA_DIR-type override and no XDG_DATA_HOME/XDG_CONFIG_HOME pointing elsewhere, AND (b) /proc/366/fd or /proc/366/maps or lsof shows at least one open path under $HOME/.local/share/dagu or $HOME/.config/dagu, OR the server's config file resolves there. Refuted if an override points elsewhere or its open files are under a different home. Inconclusive otherwise. Only the names and values of variables whose name matches DAGU_*HOME*, DAGU_*DIR*, DAGU_*PATH*, DAGU_*CONFIG*, XDG_*, HOME are printed; no other variable value is read into output (credential rule). Detection: an override would appear as a matching variable; a different home would show as open paths outside the default tree."
+    },
+    {
+      "name": "birth-times-all-28",
+      "expectation": "Most of the 17 paths without a recorded birth time predate 23:22:40 (they are directories the server created earlier); a few created by the scheduler-only code paths (for example notifications/*, incidents/* subdirectories) may have been born at 23:22:42.",
+      "criteria": "`stat -c '%w %y %n'` on every one of the 28 paths from the incident's find list. A path counts as created by the accidental scheduler if its birth time is in [23:22:40, 23:26:00]; as pre-existing if earlier; unknown if %w is '-' or the path is gone. Detection: %w is filesystem birth time (ext4 statx), so a path created in the window shows a birth time in the window."
+    },
+    {
+      "name": "no-live-writes",
+      "expectation": "No write to the live store in this round.",
+      "criteria": "Only stat, ls, ps, readlink, cat of /proc/366/{cmdline,maps} and a filtered environ read. No removal: the leave/remove decision is recorded as pending for the coordinator or user, with the observations it needs."
+    }
+  ],
+  "receipt_edits": "Receipts 1, 2, 4, 6 and 11 get an isolation note that cross-references the incident file and scopes their isolation claim to their own run; receipt 11 names b7aec6b as its executed helper revision, backed by raw/executed-vs-committed-helpers.json and a fresh diff of b7aec6b..HEAD for the helpers it ran."
+}

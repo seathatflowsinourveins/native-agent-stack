@@ -1,0 +1,164 @@
+{
+  "id": "gap-wave2-20260923/us-equities/backtesting-engine/1-nautilus-alpaca-bars-corporate-actions",
+  "gap_index": 1,
+  "gap_text_sha256": "af57d3a526310f0826a65869555e234ea5ae2afa6e13820f5fbb7b359e4b64d6",
+  "preregistration": {
+    "written_at": "2026-09-23T06:21:22Z",
+    "expectation": "advanced: retained authenticated Alpaca AAPL daily bars (25 sessions 2020-08-03..2020-09-04, receipt a59c6ed7) include the 2020-08-07 cash dividend ex-date and the 2020-08-31 4:1 split ex-date. A native Nautilus 2.0.0rc5 backtest holding 10 shares from the 2020-08-03 close through the 2020-09-04 close is expected to fill at raw bar closes, post no dividend cash, keep position quantity 10 across the split (no split adjustment) and therefore book a split-induced spurious loss of roughly three quarters of the entry notional. No unchanged upstream equity backtest example is expected to exist at pin 1b0a49d.",
+    "criteria": [
+      "settled only if an UNCHANGED upstream Nautilus equity example runs on Alpaca bars spanning a dividend or split and fills plus corporate-action handling are recorded",
+      "advanced if the native engine runs over the retained Alpaca bars spanning both actions and fills, cash and position across both ex-dates are recorded and independently reconciled, while the unchanged-example arm remains unmet",
+      "detection: the independent Decimal ledger compares native account cash and position quantity after each ex-date; any native dividend credit or quantity change would appear as a cash or quantity delta not explained by fills"
+    ],
+    "source": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/preregistration.json (committed in 2b93d4d before any check ran)"
+  },
+  "next_check": "Run an unchanged Nautilus equity backtest example on free Alpaca historical bars for a symbol and window containing a split or dividend, and record the fills and the corporate-action handling.",
+  "commands": [
+    "NENV=$HOME/.local/share/codex-ecosystem/tools/nautilus-2.0.0rc5; REPO=$HOME/code/nas-wt-g2-backtesting-engine; C=$HOME/.cache/gap-wave2-20260923/backtesting-engine",
+    "bwrap --unshare-all --die-with-parent --new-session --clearenv --ro-bind /usr /usr --symlink usr/bin /bin --symlink usr/lib /lib --symlink usr/lib64 /lib64 --proc /proc --dev /dev --tmpfs /tmp --ro-bind $NENV $NENV --ro-bind $REPO /repo --ro-bind $HOME/codex-ecosystem/state/authenticated-data-20260920/alpaca-run-1 /data --bind $C/ca-window /out --chdir /repo --setenv LANG C.UTF-8 --setenv PATH /usr/bin:/bin --setenv PYTHONDONTWRITEBYTECODE 1 --setenv OPENBLAS_NUM_THREADS 1 --setenv OMP_NUM_THREADS 1 $NENV/bin/python -I /repo/blueprints/gap-wave2-20260923/us-equities__backtesting-engine/ca_window_replay.py --run /data --out /out/native",
+    "gh api 'repos/nautechsystems/nautilus_trader/git/trees/1b0a49d2792a9432a3aca3fcb617ce7a630d905e?recursive=1' --jq '.tree[].path'",
+    "gh api 'repos/nautechsystems/nautilus_trader/contents/docs/concepts/instruments/equity.md?ref=1b0a49d2792a9432a3aca3fcb617ce7a630d905e' --jq .content | base64 -d",
+    "rg -n -i 'dividend|stock.?split|corporate.?action' --glob '*.pyi' <rc5 site-packages>/nautilus_trader",
+    "python3 blueprints/gap-wave2-20260923/us-equities__backtesting-engine/detection_probe.py  (fix round 1, synthetic)"
+  ],
+  "results": {
+    "exit_code": 0,
+    "input": "Retained authenticated Alpaca AAPL 1Day SIP raw bars, 25 sessions 2020-08-03..2020-09-04, verified by the existing collector against receipt a59c6ed7 (no new data request, no credential read).",
+    "actions_in_window": [
+      {
+        "type": "cash_dividend",
+        "ex_date": "2020-08-07",
+        "payable_date": "2020-08-13",
+        "rate": "0.82"
+      },
+      {
+        "type": "forward_split",
+        "ex_date": "2020-08-31",
+        "old_rate": "1",
+        "new_rate": "4"
+      }
+    ],
+    "fills": [
+      {
+        "side": "BUY",
+        "qty": 10,
+        "avg_px": "435.7500",
+        "ts": "2020-08-03T20:00:00Z (16:00 NY), raw close"
+      },
+      {
+        "side": "SELL",
+        "qty": 10,
+        "avg_px": "120.9600",
+        "ts": "2020-09-04T20:00:00Z (16:00 NY), raw close"
+      }
+    ],
+    "account_totals_usd": [
+      "100000.00",
+      "95642.50",
+      "96852.10"
+    ],
+    "position": {
+      "peak_qty": "10",
+      "realized_pnl": "-3147.90 USD",
+      "adjustments": []
+    },
+    "corporate_action_handling_observed": "none: net position stayed 10 on every held bar including 2020-08-31 (close 499.23 on 08-28 -> 129.04 on 08-31), cash stayed 95642.50 through the 08-07 ex-date and 08-13 payable date, no account event besides the two fills, and the position report shows adjustments [].",
+    "reconciliation_checks": {
+      "fill_count": true,
+      "fill_BUY_at_raw_close": true,
+      "fill_SELL_at_raw_close": true,
+      "fill_BUY_at_bar_instant": true,
+      "fill_SELL_at_bar_instant": true,
+      "native_final_cash_equals_fill_only_ledger": true,
+      "account_events_equal_fills_plus_initial": true,
+      "one_mark_per_bar": true,
+      "terminal_flat": true,
+      "position_quantity_constant_10_while_held": true,
+      "cash_constant_while_held": true
+    },
+    "fix_round_1": "After the independent review the runner was hardened (fill timestamps, one mark per bar, flat terminal state, explicit refusal without a qualified dividend and split in the window; runner sha256 d4e0bd73...). The rerun in a fresh private directory reproduced the same fills, account totals and economic reference with all 13 checks true.",
+    "fix_round_2": "The Codex re-review found fill instants compared at whole-second precision (a +1 ms shift passed). The check now compares exact integer nanoseconds (runner sha256 099519fb...); the rerun in a fresh private directory again reproduced the same fills, totals and all 13 checks true. The cited raw stdout and published excerpt are from this fix-round-2 run.",
+    "detection_probe": "Synthetic (no engine, no provider data): reconcile() on a clean synthetic result passes all checks; a synthetic +5 USD dividend credit on held bars fails cash_constant_while_held; a synthetic 10->40 quantity change after the split fails position_quantity_constant_10_while_held; a synthetic BUY fill stamped 1 ms after its bar instant fails fill_BUY_at_bar_instant (exit 0, fix round 2).",
+    "economic_reference": {
+      "split_ratio": "4",
+      "dividend_cash_usd": "8.20",
+      "final_cash_usd": "100489.10",
+      "native_minus_economic_usd": "-3637.00",
+      "missing_split_adjustment_usd": "3628.80",
+      "unposted_dividend_usd": "8.20"
+    },
+    "upstream_example_search": "At pin 1b0a49d the upstream tree (5,645 paths) has no equity backtest example: examples/backtest holds FX, crypto, Architect AX, Databento futures/options/order-book and Tardis examples only; the wheel ships no examples package. docs/concepts/instruments/equity.md mentions no split, dividend, corporate action or adjustment (grep: 0 matches).",
+    "rc5_stub_scan": "No split or dividend data type in the rc5 .pyi stubs; the only matches are options-greeks flat_dividend_yield parameters and an IB_DIVIDENDS tick type."
+  },
+  "raw_outputs": [
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/1-8-ca-window-replay-published.json",
+      "sha256": "7e5aed60c381b07e164e3fe1a8fed7a64a40838eea60f8fe0bc64e6309d822a3"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/1-8-ca-window-replay.stdout.txt",
+      "sha256": "3eb5368f544fa58a74d842b0d8ce9a753b3c2e990881ecc638b378f5655b8979"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/1-8-ca-window-replay.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/1-8-detection-probe.stdout.txt",
+      "sha256": "1fd85f273b95e1b982d4c6d4b93ce3d29a51343598dab0048d69acd31e04151e"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/1-8-detection-probe.exit.txt",
+      "sha256": "ae3e2ffa5ab55995ba59b41af3a1b00d8c09049621d7c2847d2ccaa37240cd73"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/1-8-ca-window-replay.exit.txt",
+      "sha256": "19eaf43821a7660ec323a87c8457bf74823beb296c39f5e01aa8a683aa50f061"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/1-8-ca-window-replay.started_at.txt",
+      "sha256": "eea41b5cabf5f14c3b7457892b6e2a14aac0cb73fbfe60d38dc45f88930e9812"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/1-8-rc5-stub-corporate-action-scan.txt",
+      "sha256": "096ad3063aa6d852110cae0bfc5e9458d2bdae02b7954f42cd6edc4268cc1fba"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/1-upstream-equity-doc-1b0a49d.md",
+      "sha256": "b2bb259314a6e9f83453d08da103a583df40e8d5d845675f787cb36087f35db8"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/1-upstream-tree-1b0a49d.txt",
+      "sha256": "e7be71490969053bda4aaf00ccb0995dd66a99de400207da8df965fd21b67326"
+    }
+  ],
+  "outcome": "advanced",
+  "evidence_class": "local_integration",
+  "remaining": "The 'unchanged Nautilus equity backtest example' arm cannot be met at pin 1b0a49d because no upstream equity backtest example exists; the run uses the repo's own minimal strategy on native engine APIs, so the evidence stays local integration. Corporate-action handling is measured as absent; an engine-supported path is the peer-owned dividend-sim-module gate.",
+  "limits": [
+    "Detection method: per-bar native net_position and account balance marks plus the account report; a native credit or quantity change would show as a delta on a bar without a fill. Because rc5 exposes no dividend or split data type, no action data could be fed, so 'absent' means the engine does not act on price discontinuities by itself.",
+    "Daily bars with a declared 16:00 New York publication convention; market orders fill at the completed bar close (not a realizable closing auction).",
+    "Raw provider rows and native report CSVs stay private under $HOME/.cache/gap-wave2-20260923/backtesting-engine/ca-window; a curated excerpt with the private summary sha256 is committed.",
+    "Preregistered numeric expectation said roughly three quarters of the entry notional would be lost; the measured total realized loss is 3147.90 USD on 4357.50 notional (72%), consistent. Of the 3637.00 USD gap to the economic reference, 3628.80 is the missing split adjustment (30 extra shares x 120.96) and 8.20 the unposted dividend.",
+    "Scope of 'absent': this replay fed raw bars only, because rc5 exposes no dividend or split data type to feed; it shows the engine makes no adjustment by itself and that no engine-supported ingestion path was found in the rc5 stubs, not that every possible custom-data or module route is impossible."
+  ],
+  "checked_at": "2026-09-23T07:09:55Z",
+  "fix_round_2": {
+    "preregistration_written_at": "2026-09-23T07:09:27Z",
+    "label": "fix-round 2 preregistration, written after the Codex re-review of faebb70 and before the fix-round-2 rerun",
+    "expectation": "With exact nanosecond instant comparison, the rerun reproduces the same fills, cash 96852.10 and all 13 checks true; the synthetic probe additionally fails fill_BUY_at_bar_instant for a +1 ms fill shift.",
+    "criteria": [
+      "outcome stays advanced; any new failing check is reported verbatim"
+    ],
+    "source": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/preregistration-fix2.json (committed in e1fa1b3 before the fix-round-2 run)"
+  },
+  "fix_round_1": {
+    "preregistration_written_at": "2026-09-23T07:00:03Z",
+    "label": "fix-round 1 preregistration, written after the independent Codex review of c6c7f07/e951e32 and before any fix-round run; the original preregistration.json (2b93d4d) is unchanged",
+    "expectation": "The hardened ca_window_replay.py (fill timestamps equal the 16:00 NY bar instants, exactly 25 marks with 24 held bars, flat terminal state, explicit refusal without a split/dividend record) reproduces the same fills, cash 96852.10 and all checks true in a fresh private directory.",
+    "criteria": [
+      "outcome stays advanced (the unchanged-example arm cannot be met at pin 1b0a49d); any new failing check is reported verbatim"
+    ],
+    "source": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/preregistration-fix1.json (committed in 43a2f90 before the fix-round runs)"
+  }
+}

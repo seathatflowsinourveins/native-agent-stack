@@ -1,0 +1,67 @@
+{
+ "id": "gap-wave2-20260923/us-equities__market-data-reference/1-ca-currency-field",
+ "gap_index": 1,
+ "layer_id": "market-data-reference",
+ "catalog": "us-equities",
+ "gap_text": "Corporate-action reconciliation is incomplete: dividend currency is missing, so cash units cannot be fully reconciled (native-receipt.json lines 118-130).",
+ "gap_text_sha256": "bfd1accd6d51fad05e219e2b5a96421272ec9cf2d5eb5bb5cf6bf5b139cad845",
+ "next_check": "Request AAPL corporate actions with the configured Alpaca paper credentials, retain the raw JSON response, and record whether a currency field exists. If none does, make a documented USD assumption explicit in the catalog.",
+ "preregistration": {
+  "written_at": "2026-09-23T04:22:33Z",
+  "expectation": "Alpaca's public corporate-actions contract (OpenAPI/docs) and the alpaca-py CashDividend model expose no currency field; the retained 2026-09-20 private actions bodies also carry no currency key. A fresh credentialed AAPL request cannot run in this unit (credential reads and broker/paper contact belong to sota-workflow-resolution).",
+  "criteria": "settled only if a fresh credentialed raw AAPL capture is retained AND the currency result or a USD assumption is recorded in the catalog; advanced if public schema + installed-model + retained-capture key inspection establish the field result and a documented USD assumption is drafted for coordinator integration; detection method: key-name scan of JSON (recursive) that reports every key, so a present 'currency' key would be listed.",
+  "source": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/preregistration.json",
+  "committed_in": "c6846f1"
+ },
+ "fix_round_preregistration": null,
+ "fix_round2_preregistration": null,
+ "fix_round3_preregistration": null,
+ "eol_fix_preregistration": null,
+ "independent_review_round3": null,
+ "independent_review_round2": {
+  "reviewer": "independent Opus review of fe8b66e (findings relayed by the coordinator)",
+  "findings_for_this_gap": "minor (standard applied to gaps 17/18): no change; the catalog USD-assumption arm stays open"
+ },
+ "independent_review": {
+  "reviewer": "codex exec --sandbox read-only --ephemeral (codex-cli 0.155.1); invocation 1 stalled reading stdin and was stopped without output, invocation 2 (stdin from /dev/null) completed, 62,448 tokens",
+  "output": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/review-codex-round1.txt",
+  "findings_for_this_gap": "none (helpers for this gap were not in the review scope)"
+ },
+ "commands": [
+  "curl -sSL -o $HOME/.cache/gap-wave2-20260923/market-data-reference/docs/ca-docs.html https://docs.alpaca.markets/us/reference/corporateactions-1",
+  "$HOME/.cache/gap-wave2-20260923/market-data-reference/alpaca-latest/bin/python blueprints/gap-wave2-20260923/us-equities__market-data-reference/ca_currency_probe.py $HOME/.cache/gap-wave2-20260923/market-data-reference/docs/ca-docs.html $HOME/codex-ecosystem/state/authenticated-data-20260920/alpaca-run-1 > evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/1-ca-currency-probe.json",
+  "python3 blueprints/gap-wave2-20260923/us-equities__market-data-reference/docs_excerpt.py $HOME/.cache/gap-wave2-20260923/market-data-reference/docs/ca-docs.html > evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/1-alpaca-corporateactions-docs.excerpt.json   # publication step; full page withheld (gitleaks flagged its public site keys and example tokens)"
+ ],
+ "results": [
+  "docs HTTP 200, 989491 bytes; REST schema cash_dividend.properties includes 'currency' ($ref #/components/schemas/currency); required = [id, symbol, cusip, rate, special, foreign, process_date, ex_date] (currency NOT required)",
+  "components.schemas.currency.description: \"The ISO 4217 currency code associated with the corporate action.\\nEmpty value can mean USD, non-applicable (e.g. for name changes) or unknown\\n(can change later to a valid currency).\"",
+  "alpaca-py 0.44.0 (latest PyPI) CashDividend fields: id, corporate_action_type, symbol, cusip, rate, special, foreign, process_date, ex_date, record_date, payable_date, due_bill_on_date, due_bill_off_date -> currency_field false",
+  "retained 2026-09-20 private capture: actions-001.json (cash_dividends) currency_key_present=false; actions-002.json (forward_splits) currency_key_present=false (key paths only, no values)",
+  "positive control: the same key scanner finds 'currency' in the docs' own SSE CashDividend example -> true"
+ ],
+ "detection_method": "Recursive key-path scan lists every key in each body; its positive control on the docs SSE example (which carries currency=USD) returned true, so a present currency key would have been reported.",
+ "outcome": "advanced",
+ "evidence_class": "source_review",
+ "limits": [
+  "No fresh credentialed AAPL corporate-actions request: credential reads and Alpaca/broker contact belong to peer session sota-workflow-resolution (brief hard rule). That arm is deferred to that owner, so this gap is advanced, not settled.",
+  "The catalog was not edited (ledgers are frozen for this wave). Proposed catalog text for the coordinator: 'Alpaca cash_dividends.currency is optional; an absent/empty value means USD, not-applicable or unknown per the REST contract. Treat absent currency on a US-listed (foreign=false) cash dividend as USD for reconciliation, record the row as currency_assumed_usd, and keep it distinct from provider-stated USD.'",
+  "The retained capture predates this docs fetch by 3 days; the provider may now emit currency on some rows (the SSE example does)."
+ ],
+ "raw_artifacts": [
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/1-ca-currency-probe.json",
+   "sha256": "d0a6eade4eaf0365d4d69fce09dc3d6c9846f3d6de389743aaf6f932e319b96c"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/1-alpaca-corporateactions-docs.excerpt.json",
+   "sha256": "f4489cadad9cc796a9bc3030b98468abadee7838dcfef25e0a4df817942188b2"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/REDACTIONS.json",
+   "sha256": "7d08a65951826ef4a8d0bd6fd9a21aa747305527b3e2b1daa42173cffe090c69"
+  }
+ ],
+ "checked_at": "2026-09-23T04:24:19Z",
+ "checked_at_source": "UTC mtime of the latest raw output the receipt cites (sed path-redaction can postdate the run by seconds)",
+ "host_paths": "host paths are written as $HOME; private Alpaca payloads stay outside the repository"
+}

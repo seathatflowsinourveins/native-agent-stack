@@ -1,0 +1,165 @@
+{
+  "completed_at": "2026-09-23T03:01:10.764030+00:00",
+  "engines": {
+    "prefect": {
+      "case_table": {
+        "checkpoint_reuse": true,
+        "retry": true,
+        "sigkill": false,
+        "stop": false
+      },
+      "scenario_a": {
+        "after_retry_status": "COMPLETED",
+        "before_retry_status": "CANCELLED",
+        "cases": {
+          "checkpoint_reuse": true,
+          "retry": true,
+          "stop": false
+        },
+        "completed_at": "2026-09-23T03:00:03.646860+00:00",
+        "completed_before_retry": false,
+        "frozen": {
+          "expected": {
+            "planner.py": "3a33c48346221e2a103d4fb89d5675d2edaa97e651b7f08cf3a79b7ce0b8d7ef",
+            "test_planner.py": "ee6c07d845bb60545786b2e7507f6b3836c46e005d5ce2b9b60b616e325e0937"
+          },
+          "fixture_sha256": "fccbfe64bc2ed4793010daa3a1b9b2d8ebb83ff1d51a4db37daa4b6d0b7300d7"
+        },
+        "native_run": "<uuid-1>",
+        "observed_owned_processes_remaining": 1,
+        "oracle": {
+          "checkpoint_execution_count": 1,
+          "checkpoint_sha256": "59cb2038939b9cd2840eeaed6618634cad75ffe0f9a3b689a44f420f7847a1d0",
+          "checkpoint_sha256_unchanged": true,
+          "checkpoint_tests": 12,
+          "completed": {
+            "checkpoint_sha256": "59cb2038939b9cd2840eeaed6618634cad75ffe0f9a3b689a44f420f7847a1d0",
+            "execution_count": 1,
+            "tests": 12
+          },
+          "completed_matches": true,
+          "final_tests": 12,
+          "retry_ready_written": true
+        },
+        "owned_processes_observed": 3,
+        "prefect_state_after": {
+          "flow_run_id": "<uuid-1>",
+          "run_count": 2,
+          "state_name": "Completed",
+          "state_type": "COMPLETED",
+          "task_runs": [
+            {
+              "name": "checkpoint-8c9",
+              "run_count": 1,
+              "state_name": "Cached",
+              "state_type": "COMPLETED"
+            },
+            {
+              "name": "checkpoint-8c9",
+              "run_count": 1,
+              "state_name": "Completed",
+              "state_type": "COMPLETED"
+            },
+            {
+              "name": "finalize-8e3",
+              "run_count": 1,
+              "state_name": "Completed",
+              "state_type": "COMPLETED"
+            },
+            {
+              "name": "finalize-f7a",
+              "run_count": 1,
+              "state_name": "Crashed",
+              "state_type": "CRASHED"
+            }
+          ]
+        },
+        "remaining_process_commands": [
+          "$HOME/.cache/gap-wave2-20260923/scheduling-supervision/challengers/prefect-3.8.6/bin/python -c from multiprocessing.resource_tracker import main;main(16)"
+        ],
+        "retry_finalizer_remaining": false,
+        "same_native_run_id": true,
+        "started_at": "2026-09-23T02:59:15.439057+00:00"
+      },
+      "scenario_b": {
+        "alive_after_kill": [],
+        "all_killed": true,
+        "cases": {
+          "sigkill": false
+        },
+        "completed_at": "2026-09-23T03:01:09.384510+00:00",
+        "final_status": "RUNNING",
+        "frozen": {
+          "expected": {
+            "planner.py": "3a33c48346221e2a103d4fb89d5675d2edaa97e651b7f08cf3a79b7ce0b8d7ef",
+            "test_planner.py": "ee6c07d845bb60545786b2e7507f6b3836c46e005d5ce2b9b60b616e325e0937"
+          },
+          "fixture_sha256": "fccbfe64bc2ed4793010daa3a1b9b2d8ebb83ff1d51a4db37daa4b6d0b7300d7"
+        },
+        "killed_process_count": 4,
+        "native_run": "<uuid-2>",
+        "operational_steps": [
+          "restart the flow.serve runner",
+          "prefect flow-run retry <id> every 15 s"
+        ],
+        "oracle": {
+          "checkpoint_execution_count": 1,
+          "checkpoint_sha256": "59cb2038939b9cd2840eeaed6618634cad75ffe0f9a3b689a44f420f7847a1d0",
+          "checkpoint_sha256_unchanged": true,
+          "checkpoint_tests": 12,
+          "completed": null,
+          "completed_matches": false,
+          "final_tests": 0,
+          "retry_ready_written": false
+        },
+        "recovery_attempts": [
+          {
+            "at": "2026-09-23T03:00:39.009317+00:00",
+            "exit": 1,
+            "output_tail": "Flow run '<uuid-2>' is in state 'RUNNING' and cannot\nbe retried. Only flow runs in terminal states (COMPLETED, FAILED, CANCELLED, \nCRASHED) can be retried.\n",
+            "state_name": "Running",
+            "status_after": "RUNNING",
+            "verb": "prefect flow-run retry"
+          },
+          {
+            "at": "2026-09-23T03:01:07.459724+00:00",
+            "exit": 1,
+            "output_tail": "Flow run '<uuid-2>' is in state 'RUNNING' and cannot\nbe retried. Only flow runs in terminal states (COMPLETED, FAILED, CANCELLED, \nCRASHED) can be retried.\n",
+            "state_name": "Running",
+            "status_after": "RUNNING",
+            "verb": "prefect flow-run retry"
+          }
+        ],
+        "recovery_seconds": 58.1,
+        "started_at": "2026-09-23T03:00:03.647659+00:00",
+        "status_after_kill": "RUNNING",
+        "status_after_kill_2s": "RUNNING",
+        "window_seconds": 45
+      },
+      "setup": {
+        "install": "uv venv + `uv pip install prefect==3.8.6` in a new prefix (network download of the wheel tree)",
+        "long_running_processes": [
+          "prefect server start (loopback, sqlite under the work dir)",
+          "prefect_flow.py serve runner (flow.serve)"
+        ],
+        "server_ready": true,
+        "server_ready_seconds": 6.0,
+        "version": "Version:              3.8.6"
+      }
+    }
+  },
+  "inputs": {
+    "compare.py": "0ca7bc8139687821e2e438b424cb8fdb273e03d265b9f2ecd78dfa57414a41a3",
+    "prefect_ctl.py": "68d19902bd4f8e3a1d8096f9eedd8ed72edda6bf9ba2e06773ab63a11feaf35e",
+    "prefect_flow.py": "7c49fb35afaa7f418a9c77cc99f2ee586af1f86031b4995c410165b2eaa379ac",
+    "temporal_worker.py": "7df916a18e743c42486aeb58682644637ea2d5a7ca153a7abffddb67a0ec3055"
+  },
+  "job_recovery_fixture_sha256": "fccbfe64bc2ed4793010daa3a1b9b2d8ebb83ff1d51a4db37daa4b6d0b7300d7",
+  "leftover_processes_mentioning_work_dir": [
+    "2260893 timeout 900 python3 compare.py --engines prefect --window 45 --work $HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/cmp-debug-p2-1790132347",
+    "2260895 python3 compare.py --engines prefect --window 45 --work $HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/cmp-debug-p2-1790132347"
+  ],
+  "platform": "Linux 6.18.33.2-microsoft-standard-WSL2",
+  "python": "3.12.3",
+  "started_at": "2026-09-23T02:59:07.925381+00:00"
+}

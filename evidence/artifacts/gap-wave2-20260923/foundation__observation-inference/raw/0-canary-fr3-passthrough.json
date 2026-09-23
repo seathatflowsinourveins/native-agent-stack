@@ -1,0 +1,402 @@
+{
+  "mode": "passthrough",
+  "run": "c7a66669",
+  "started_at": "2026-09-23T14:16:19Z",
+  "otlp_post_status": {
+    "logs": 200,
+    "metrics": 200
+  },
+  "arrival": {
+    "prom": true,
+    "loki_otlp": true,
+    "loki_sdk": true
+  },
+  "negative_fields": [
+    "logs.attr.api_key",
+    "logs.attr.error.message",
+    "logs.attr.prompt",
+    "logs.attr.tool_input",
+    "logs.attr.user.account_uuid",
+    "logs.attr.user.email",
+    "logs.body",
+    "logs.event_name",
+    "logs.resource.host.name",
+    "logs.resource.process.command_line",
+    "logs.resource.schema_url",
+    "logs.resource.user.email",
+    "logs.scope.attr",
+    "logs.scope.name",
+    "logs.scope.schema_url",
+    "logs.scope.version",
+    "logs.severity_text",
+    "metrics.attr.prompt",
+    "metrics.attr.session.id",
+    "metrics.attr.user.account_uuid",
+    "metrics.attr.user.email",
+    "metrics.description",
+    "metrics.exemplar.attr",
+    "metrics.metadata",
+    "metrics.resource.host.name",
+    "metrics.resource.organization.id",
+    "metrics.resource.schema_url",
+    "metrics.resource.user.email",
+    "metrics.scope.attr",
+    "metrics.scope.name",
+    "metrics.scope.schema_url",
+    "metrics.scope.version",
+    "sdk.cwd",
+    "sdk.error",
+    "sdk.final_response",
+    "sdk.items.text",
+    "sdk.prompt"
+  ],
+  "negative_count": 37,
+  "backends_searched": {
+    "collector_prometheus_exporter": {
+      "bytes": 606
+    },
+    "prometheus_federate": {
+      "bytes": 1203
+    },
+    "prometheus_metadata": {
+      "bytes": 144
+    },
+    "loki_query_range": {
+      "bytes": 5643
+    },
+    "loki_labels_and_values": {
+      "bytes": 123
+    },
+    "collector_file_events": {
+      "bytes": 3704
+    }
+  },
+  "leaks": [
+    {
+      "field": "logs.resource.user.email",
+      "backend": "collector_file_events"
+    },
+    {
+      "field": "logs.resource.host.name",
+      "backend": "loki_query_range"
+    },
+    {
+      "field": "logs.resource.host.name",
+      "backend": "collector_file_events"
+    },
+    {
+      "field": "logs.resource.process.command_line",
+      "backend": "loki_query_range"
+    },
+    {
+      "field": "logs.resource.process.command_line",
+      "backend": "collector_file_events"
+    },
+    {
+      "field": "logs.attr.prompt",
+      "backend": "loki_query_range"
+    },
+    {
+      "field": "logs.attr.prompt",
+      "backend": "collector_file_events"
+    },
+    {
+      "field": "logs.attr.tool_input",
+      "backend": "loki_query_range"
+    },
+    {
+      "field": "logs.attr.tool_input",
+      "backend": "collector_file_events"
+    },
+    {
+      "field": "logs.attr.user.account_uuid",
+      "backend": "loki_query_range"
+    },
+    {
+      "field": "logs.attr.user.account_uuid",
+      "backend": "collector_file_events"
+    },
+    {
+      "field": "logs.attr.api_key",
+      "backend": "loki_query_range"
+    },
+    {
+      "field": "logs.attr.api_key",
+      "backend": "collector_file_events"
+    },
+    {
+      "field": "logs.attr.user.email",
+      "backend": "loki_query_range"
+    },
+    {
+      "field": "logs.attr.user.email",
+      "backend": "collector_file_events"
+    },
+    {
+      "field": "logs.attr.error.message",
+      "backend": "loki_query_range"
+    },
+    {
+      "field": "logs.attr.error.message",
+      "backend": "collector_file_events"
+    },
+    {
+      "field": "logs.resource.schema_url",
+      "backend": "collector_file_events"
+    },
+    {
+      "field": "logs.scope.name",
+      "backend": "loki_query_range"
+    },
+    {
+      "field": "logs.scope.name",
+      "backend": "collector_file_events"
+    },
+    {
+      "field": "logs.scope.version",
+      "backend": "loki_query_range"
+    },
+    {
+      "field": "logs.scope.version",
+      "backend": "collector_file_events"
+    },
+    {
+      "field": "logs.scope.attr",
+      "backend": "loki_query_range"
+    },
+    {
+      "field": "logs.scope.attr",
+      "backend": "collector_file_events"
+    },
+    {
+      "field": "logs.scope.schema_url",
+      "backend": "collector_file_events"
+    },
+    {
+      "field": "logs.severity_text",
+      "backend": "loki_query_range"
+    },
+    {
+      "field": "logs.severity_text",
+      "backend": "collector_file_events"
+    },
+    {
+      "field": "logs.event_name",
+      "backend": "collector_file_events"
+    },
+    {
+      "field": "logs.body",
+      "backend": "loki_query_range"
+    },
+    {
+      "field": "logs.body",
+      "backend": "collector_file_events"
+    },
+    {
+      "field": "metrics.attr.user.email",
+      "backend": "collector_prometheus_exporter"
+    },
+    {
+      "field": "metrics.attr.user.email",
+      "backend": "prometheus_federate"
+    },
+    {
+      "field": "metrics.attr.session.id",
+      "backend": "collector_prometheus_exporter"
+    },
+    {
+      "field": "metrics.attr.session.id",
+      "backend": "prometheus_federate"
+    },
+    {
+      "field": "metrics.attr.prompt",
+      "backend": "collector_prometheus_exporter"
+    },
+    {
+      "field": "metrics.attr.prompt",
+      "backend": "prometheus_federate"
+    },
+    {
+      "field": "metrics.attr.user.account_uuid",
+      "backend": "collector_prometheus_exporter"
+    },
+    {
+      "field": "metrics.attr.user.account_uuid",
+      "backend": "prometheus_federate"
+    },
+    {
+      "field": "metrics.scope.name",
+      "backend": "collector_prometheus_exporter"
+    },
+    {
+      "field": "metrics.scope.name",
+      "backend": "prometheus_federate"
+    },
+    {
+      "field": "metrics.scope.version",
+      "backend": "collector_prometheus_exporter"
+    },
+    {
+      "field": "metrics.scope.version",
+      "backend": "prometheus_federate"
+    },
+    {
+      "field": "metrics.scope.attr",
+      "backend": "collector_prometheus_exporter"
+    },
+    {
+      "field": "metrics.scope.attr",
+      "backend": "prometheus_federate"
+    },
+    {
+      "field": "metrics.scope.schema_url",
+      "backend": "collector_prometheus_exporter"
+    },
+    {
+      "field": "metrics.scope.schema_url",
+      "backend": "prometheus_federate"
+    },
+    {
+      "field": "metrics.description",
+      "backend": "collector_prometheus_exporter"
+    },
+    {
+      "field": "metrics.description",
+      "backend": "prometheus_metadata"
+    },
+    {
+      "field": "sdk.final_response",
+      "backend": "loki_query_range"
+    },
+    {
+      "field": "sdk.final_response",
+      "backend": "collector_file_events"
+    },
+    {
+      "field": "sdk.items.text",
+      "backend": "loki_query_range"
+    },
+    {
+      "field": "sdk.items.text",
+      "backend": "collector_file_events"
+    },
+    {
+      "field": "sdk.error",
+      "backend": "loki_query_range"
+    },
+    {
+      "field": "sdk.error",
+      "backend": "collector_file_events"
+    },
+    {
+      "field": "sdk.prompt",
+      "backend": "loki_query_range"
+    },
+    {
+      "field": "sdk.prompt",
+      "backend": "collector_file_events"
+    },
+    {
+      "field": "sdk.cwd",
+      "backend": "loki_query_range"
+    },
+    {
+      "field": "sdk.cwd",
+      "backend": "collector_file_events"
+    }
+  ],
+  "leak_count": 58,
+  "positive_controls_found_in": {
+    "logs.resource.ecosystem.task.id(allowlisted)": [
+      "collector_file_events",
+      "loki_query_range"
+    ],
+    "logs.attr.tool_name(allowlisted)": [
+      "collector_file_events",
+      "loki_query_range"
+    ],
+    "metrics.name(boundary)": [
+      "collector_prometheus_exporter",
+      "prometheus_federate",
+      "prometheus_metadata"
+    ],
+    "metrics.attr.model(allowlisted)": [
+      "collector_prometheus_exporter",
+      "prometheus_federate"
+    ],
+    "sdk.configured_model(allowlisted-as-model)": [
+      "collector_file_events",
+      "loki_query_range"
+    ]
+  },
+  "canary_sha256_prefix": {
+    "logs.resource.user.email": "622835db543b",
+    "logs.resource.host.name": "d409c8814665",
+    "logs.resource.process.command_line": "e3e8bd8d35d6",
+    "logs.resource.ecosystem.task.id(allowlisted)": "a386b368fc29",
+    "logs.attr.prompt": "6681bdab53ef",
+    "logs.attr.tool_input": "488cc5de775e",
+    "logs.attr.user.account_uuid": "0526c03953fd",
+    "logs.attr.api_key": "02b906da2661",
+    "logs.attr.user.email": "b008e57cbc38",
+    "logs.attr.error.message": "c79774e8a96b",
+    "logs.attr.tool_name(allowlisted)": "4a5d4c128d81",
+    "logs.resource.schema_url": "1bb36fed24f2",
+    "logs.scope.name": "fd4b43370e22",
+    "logs.scope.version": "e6bf440772c6",
+    "logs.scope.attr": "706860541a10",
+    "logs.scope.schema_url": "cde9e5995e8f",
+    "logs.severity_text": "30e83d8bff85",
+    "logs.event_name": "f8786067211f",
+    "logs.body": "11121d6e783c",
+    "metrics.name(boundary)": "04e489d300a3",
+    "metrics.resource.user.email": "759e6f9d5535",
+    "metrics.resource.host.name": "66434007493b",
+    "metrics.resource.organization.id": "602cbce5485b",
+    "metrics.attr.user.email": "3ace39edb992",
+    "metrics.attr.session.id": "771de3f59814",
+    "metrics.attr.prompt": "22f8c2483229",
+    "metrics.attr.user.account_uuid": "cc69b939c047",
+    "metrics.attr.model(allowlisted)": "0565498a076a",
+    "metrics.resource.schema_url": "01dbb7d62c61",
+    "metrics.scope.name": "0e2935e43a98",
+    "metrics.scope.version": "9a6bd4bc928f",
+    "metrics.scope.attr": "31842776b0db",
+    "metrics.scope.schema_url": "e4d3347105e4",
+    "metrics.description": "22fca382dc5d",
+    "metrics.metadata": "8ca0f0d5720a",
+    "metrics.exemplar.attr": "4e620086b23d",
+    "sdk.configured_model(allowlisted-as-model)": "fcb6b8571ec4",
+    "sdk.final_response": "208fdd3dc19b",
+    "sdk.items.text": "322dc1d629ef",
+    "sdk.error": "22b4f1608f40",
+    "sdk.prompt": "c41e5a68881b",
+    "sdk.cwd": "1d89b4e2e50c"
+  },
+  "positive_control_expected_backends": {
+    "logs.resource.ecosystem.task.id(allowlisted)": [
+      "collector_file_events",
+      "loki_query_range"
+    ],
+    "logs.attr.tool_name(allowlisted)": [
+      "collector_file_events",
+      "loki_query_range"
+    ],
+    "sdk.configured_model(allowlisted-as-model)": [
+      "collector_file_events",
+      "loki_query_range"
+    ],
+    "metrics.attr.model(allowlisted)": [
+      "collector_prometheus_exporter",
+      "prometheus_federate"
+    ],
+    "metrics.name(boundary)": [
+      "collector_prometheus_exporter",
+      "prometheus_federate",
+      "prometheus_metadata"
+    ]
+  },
+  "positive_control_missing": {},
+  "status": "leak",
+  "stopped_at": "2026-09-23T14:16:53Z"
+}

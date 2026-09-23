@@ -1,0 +1,145 @@
+{
+ "id": "gap-wave2-20260923/us-equities__agents-models-workers/6-ai-memory-pin-and-features",
+ "catalog": "us-equities",
+ "layer_id": "agents-models-workers",
+ "gap_index": 6,
+ "gap_text": "ai-memory has automatic briefing, embedding and LLM consolidation disabled, and there is no historical backfill. Its pin (v2.3.1) is behind upstream (v2.4.0).",
+ "gap_text_sha256": "1530ce878aaf00f63fc926423505fac1565ac5efc07957ca4f91c86a664138eb",
+ "next_check": "Install ai-memory v2.4.0 in a new prefix with a disposable --data-dir and run its upstream tests plus the disposable lifecycle check. Record `status` provider lines, and correct the catalog pin text from v2.3.1 to the installed 2.3.2.",
+ "base_commit": "41d39b3",
+ "preregistration": {
+  "written_at": "2026-09-23T07:23:05Z",
+  "file": "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/prereg/6-ai-memory-pin-and-features.json",
+  "commit": "5480a9c (2026-09-23T07:23:50Z, before any check ran)",
+  "expectation": "The v2.4.0 install, isolated lifecycle and status provider lines are already recorded by sota-refresh-20260923/pins-mem/ai-memory.json (merged in #87); upstream tests were not run there. This unit will check the 2.4.0 CLI surface for briefing, consolidation and backfill commands against an isolated data dir only, and will not edit catalog pin text (catalog ledgers are out of bounds for this unit).",
+  "criteria": [
+   "Cite the sota-refresh receipt for install/lifecycle/status.",
+   "Any 2.4.0 command runs only with --data-dir under this unit's cache and AI_MEMORY_SERVER_URL set to an isolated loopback server.",
+   "Outcome at most advanced: upstream test suite and catalog pin correction remain."
+  ],
+  "late_amendment": {
+   "written_at": "2026-09-23T07:52:54Z",
+   "commit": "06d5548",
+   "file": "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/prereg/6-ai-memory-pin-and-features.fix-round.json",
+   "label": "fix-round preregistration, written after the first-round receipt and an independent review; covers only the new fix-round runs",
+   "expectation": "R1: 2.3.2 and 2.4.0 share the backfill/bootstrap/embed/briefing/consolidate surface and identical default non-comment config; status shows the embedding provider line. R2: the build either completes and the suite passes (possibly with ignored network tests), or exceeds the 20-minute cap and is recorded not run to completion.",
+   "criteria": [
+    "Every ai-memory call carries --data-dir under the unit cache and AI_MEMORY_SERVER_URL=http://127.0.0.1:27374 (2.3.2) or :27375 (2.4.0); detection: server logs show the requests, and the live port 49374 is not referenced.",
+    "Settled only if R2's upstream suite runs to completion with its pass/fail counts recorded AND the pin-text correction is done; the pin text is in coordinator-owned catalog files, so the outcome stays at most advanced.",
+    "Downloads (rustup toolchain, crates, git clone, any model files) are disclosed with sizes."
+   ]
+  }
+ },
+ "commands": [
+  "git show origin/main:evidence/artifacts/sota-refresh-20260923/pins-mem/ai-memory.json  # covered elsewhere: 2.4.0 release install into a new prefix, published sha256 sidecar match",
+  "bash blueprints/gap-wave2-20260923/us-equities__agents-models-workers/aimem/r1_surface.sh $GAPCACHE/out/fix6  # fix round 07:54:30-07:55:27Z: isolated 2.3.2 serve on 127.0.0.1:27374 and 2.4.0 serve on 127.0.0.1:27375 (temp --data-dir, temp HOME); every CLI call with HOME=<temp> AI_MEMORY_SERVER_URL=<matching isolated server>: --version, --help, backfill/bootstrap/embed --help, init into a fresh temp data dir, status, status --json, MCP initialize + tools/list; 2.4.0 lifecycle write-page/search/read-page/handoffs/status/backup; diff of non-comment default configs (token_pepper excluded); `command -v cargo rustc` on the default PATH",
+  "bash blueprints/gap-wave2-20260923/us-equities__agents-models-workers/aimem/r1b_default_embedding.sh $GAPCACHE/out/fix6/6-default-embedding.txt  # fix round 08:01:38-08:01:57Z: isolated 2.4.0 serve on 127.0.0.1:27375, embedding_provider unset; status before and after the server's own model fetch and a restart",
+  "curl -sSf https://sh.rustup.rs -o rustup-init.sh && ecosystem-bounded-run env RUSTUP_HOME=$GAPCACHE/rust/rustup CARGO_HOME=$GAPCACHE/rust/cargo HOME=$GAPCACHE/rust/home sh rustup-init.sh -y --no-modify-path --profile minimal --default-toolchain 1.95 -c rustfmt -c clippy  # network download, rustc 1.95.0 (the repo's rust-toolchain.toml channel), 614 MB unpacked",
+  "git clone --depth 1 --branch v2.4.0 https://github.com/akitaonrails/ai-memory $GAPCACHE/src/ai-memory-2.4.0  # network download, 24 MB, tag commit b1b25219b507cf56cb7334ac1a408dc9b09eaa50",
+  "cargo fetch --locked  # network download, 492 crates, 85 MB of crate archives",
+  "ECOSYSTEM_JOB_SECONDS=1200 ECOSYSTEM_JOB_MEMORY_MAX=16G ecosystem-bounded-run env RUSTUP_HOME=... CARGO_HOME=... CARGO_TARGET_DIR=$GAPCACHE/rust/target HOME=$GAPCACHE/rust/home AI_MEMORY_SERVER_URL=http://127.0.0.1:27375 cargo test --workspace --all-targets --locked --no-run -j 12  # build, 07:53:51-07:55:34Z, rc 0",
+  "ECOSYSTEM_JOB_SECONDS=1200 ecosystem-bounded-run unshare -rn blueprints/gap-wave2-20260923/us-equities__agents-models-workers/aimem/run_tests.sh  # upstream CI command `cargo test --workspace --all-targets --locked --offline --no-fail-fast` in a fresh network namespace (loopback only, host services unreachable), dropped back to uid 1000 in a nested user namespace, env -i with temp HOME/TMPDIR; 07:56:01-07:59:24Z, rc 101",
+  "ln -s $GAPCACHE/src/ai-memory-2.4.0/hooks $GAPCACHE/rust/hooks && ecosystem-bounded-run unshare -rn blueprints/gap-wave2-20260923/us-equities__agents-models-workers/aimem/run_tests_rerun.sh  # diagnostic rerun of the one failing target (`-p ai-memory-cli --test suite`) after the failure was observed (not preregistered); 07:59:59-08:00:40Z, rc 0"
+ ],
+ "results": {
+  "covered_elsewhere": "sota-refresh-20260923/pins-mem/ai-memory.json (merged in #87): 2.4.0 release tarball matched its published sha256 sidecar; isolated write/search/read/handoffs/status/backup passed with embedding_provider explicitly set to none; restore not exercised end-to-end.",
+  "binaries": "raw/6-r1-transcript.txt: 2.3.2 = $HOME/.local/share/codex-ecosystem/bin/ai-memory sha256 93eeb2994343f8d5427328650d3fc2ec85250332e2308c163d27169d8b5cfed0 ('ai-memory 2.3.2'); 2.4.0 = sota-refresh prefix sha256 360b9dff30537cc514876eab0c4df0d57b9c8c8bb1c62d4a9240f0264e246344 ('ai-memory 2.4.0')",
+  "isolation_detection": "raw/6-r1-transcript.txt: both isolated servers listening (ss) before the calls and none after; `status` prints 'server: http://127.0.0.1:27374' / 'bind: 127.0.0.1:27374' (2.3.2) and ':27375' (2.4.0), values only the isolated servers report (the CLI's own freshly-initialised config says bind 127.0.0.1:49374, a default it does not connect to); MCP initialize returned serverInfo version 2.3.2 and 2.4.0 respectively.",
+  "feature_surface": "raw/6-r1-transcript.txt --help of both versions lists `backfill` ('One-time import of this project's existing local harness session history into a brand-new (empty) ai-memory store'), `bootstrap` ('... Requires AI_MEMORY_LLM_PROVIDER configured on the server') and `embed` ('Compute + store embeddings for every latest page'); raw/6-mcp-tools-v23.txt and -v24.txt: both servers' tools/list include memory_briefing and memory_consolidate (23 tools each, identical names).",
+  "llm_consolidation_default": "raw/6-serve24.log: 'AI_MEMORY_LLM_PROVIDER unset; memory_consolidate disabled, PreCompact falls back to rule-based checkpoint, lint runs rule-based only' and 'auto-improve scheduler enabled but no LLM provider is configured; job not started'; status 'llm: disabled' on both versions.",
+  "default_config_diff_2.3.2_vs_2.4.0": "raw/6-r1-transcript.txt: '[diff exit 0]' between raw/6-config-noncomment-v23.toml and -v24.toml (identical non-comment defaults, token_pepper excluded); the commented default says 'Unset = the 2.0 default: in-process local embeddings (all-MiniLM-L6-v2, 384-dim) ... The ~87 MB model is fetched once into <data_dir>/models/ in the background ... hybrid search enables on the next start'.",
+  "status_provider_lines": {
+   "2.3.2 fresh": "llm: disabled / embedding: disabled",
+   "2.4.0 fresh": "llm: disabled / embedding: disabled",
+   "2.4.0 after its own model fetch and restart (raw/6-default-embedding.txt)": "embedding: local/all-MiniLM-L6-v2 (384d) unknown (no calls yet); after one write-page: 'embedding: local/all-MiniLM-L6-v2 (384d) ok', 'embeddings: 1 rows'"
+  },
+  "embedding_reconciliation": "The unset default is local MiniLM, but a fresh store reports 'embedding: disabled' until the background fetch finishes and the server restarts (measured: fetch 12 s, then 'embedder enabled provider=\"local\" model=\"all-MiniLM-L6-v2\" dim=384'). The sota-refresh finding 'embedding disabled' used embedding_provider = \"none\" explicitly, which opts out. The two observations agree.",
+  "disposable_lifecycle_2.4.0": "write-page -> '✓ wrote notes/probe.md ... under g2fix/lifecycle'; search --json -> 1 hit with snippet '... <mark>zebra-quartz</mark>'; read-page -> page body; handoffs -> 'No open handoffs for g2fix/lifecycle.'; status -> pages 1, fts pages 1/1; backup -> 'wrote backup ... (39.06 KiB)'; all exit 0.",
+  "upstream_tests_v2.4.0": {
+   "source": "tag v2.4.0 commit b1b25219b507cf56cb7334ac1a408dc9b09eaa50, rustc 1.95.0",
+   "command": "cargo test --workspace --all-targets (the upstream CI command) with --locked --offline --no-fail-fast",
+   "full_run": "15 test binaries: 3,513 passed, 2 failed, 14 ignored (raw/6-cargo-test-full.log); wall 3 min 23 s",
+   "failures": "ai-memory-cli tests/suite: removal::install_then_uninstall_round_trip_claude_hooks and removal::relocated_claude_uninstall_sweeps_active_and_legacy_installs -> 'Error: could not locate hooks directory. Tried: [\"$HOME/.cache/.../rust/hooks/claude-code\", ...]' (the binary looks for hooks/ beside its target dir; this unit put CARGO_TARGET_DIR outside the source tree)",
+   "diagnostic_rerun": "after linking $GAPCACHE/rust/hooks -> the checkout's hooks/ (the in-tree layout): `-p ai-memory-cli --test suite` 126 passed, 0 failed, 1 ignored (raw/6-cargo-test-cli-suite-rerun.log)",
+   "combined": "3,515 passed, 0 failed, 14 ignored; every ignored test carries an upstream #[ignore] (MiniLM model files, live LLM keys, release binary + dataset, throughput/manual), which CI also skips"
+  },
+  "toolchain_probe": "raw/6-r1-transcript.txt: `command -v cargo rustc` on the default PATH -> no output, exit 1 (the fix-round toolchain lives only under $GAPCACHE/rust and was never put on PATH)"
+ },
+ "outcome": "advanced",
+ "what_remains": "Correct the catalog pin text (v2.3.1 -> installed 2.3.2): it lives in catalogs/landscape/us-equities.json and docs/grand-catalog-handbook.md, which this unit may not modify (coordinator-owned). Observe the LIVE service's briefing/embedding/consolidation/backfill state; this unit's isolation rule forbids any call to the live store.",
+ "evidence_class": "local_integration",
+ "limits": [
+  "No live-store inspection: whether automatic briefing, embedding, LLM consolidation or backfill are enabled on the running service was not re-observed; the isolated results describe the shipped defaults only.",
+  "Catalog pin text was not edited by this unit.",
+  "Upstream tests ran from the v2.4.0 source tag, not against the release binary; Linux only (CI's macOS leg, the TAILWIND_BUILD=1 stylesheet regeneration step and the separate companions/ai-memory-importer suite were not run). The two failures are attributed to this unit's CARGO_TARGET_DIR placement by the passing diagnostic rerun, which was not preregistered.",
+  "Network downloads in the fix round: rustup-init.sh (29,915 bytes, sha256 7d0ea0f8...70af) and the Rust 1.95.0 minimal toolchain with rustfmt and clippy (614 MB unpacked); the ai-memory v2.4.0 shallow clone (24 MB); 492 crates (85 MB archives); all-MiniLM-L6-v2 from huggingface.co fetched by the isolated 2.4.0 server itself (91.3 MB: model.safetensors 90,868,376 + tokenizer.json 466,247 + config.json 612 bytes). The r1_surface.sh servers also began that background fetch and were stopped about 3 s later with nothing persisted (empty models dir). Everything is under $HOME/.cache/gap-wave2-20260923/agents-models-workers/.",
+  "First-round gap-6 commands (exact times not recorded; --version/--help/backfill --help with no AI_MEMORY_SERVER_URL, init with AI_MEMORY_SERVER_URL=http://127.0.0.1:1) kept no raw output and did not point at an isolated server; the fix round supersedes them and every claim above cites a fix-round raw file.",
+  "Isolation: disposable Qdrant 1.19.1 on 127.0.0.1:27333/27334 (storage under $HOME/.cache/gap-wave2-20260923/agents-models-workers/qdrant-storage), isolated ai-memory 2.3.2 `serve` on 127.0.0.1:27374 with a temp --data-dir and temp HOME, and AI_MEMORY_SERVER_URL=http://127.0.0.1:27374 exported for the gap-9 and gap-11 ai-memory CLI calls; both started by this unit and stopped at the end (ports verified free). Correction (fix round): the first-round gap-6 CLI calls did NOT point at that server (--version/--help/backfill --help ran with no AI_MEMORY_SERVER_URL set, and init with http://127.0.0.1:1, a closed port); no live-store contact is possible from those commands, and they were re-run in the fix round against isolated 2.3.2 (127.0.0.1:27374) and 2.4.0 (127.0.0.1:27375) servers started for that purpose (gap-6 receipt). Every Codex run disabled native lifecycle hooks (-c features.hooks=false -c features.plugin_hooks=false) so no ai-memory hook call could reach the live service; the one Claude call used --setting-sources project from a temp cwd (user-settings hooks not loaded) and --strict-mcp-config. Embeddings: read-only POST /v1/embeddings calls to the running Nemotron-3-Embed-1B vLLM endpoint 127.0.0.1:8231 (the adopted SocratiCode profile); that service was not restarted or reconfigured. Start/stop evidence for the main-round Qdrant and ai-memory 2.3.2 services (fix round 2): raw/services-main-round.txt has the exact commands and outputs, exported without re-running from this unit's own session transcript by services/export_main_round_services.py."
+ ],
+ "raw_artifacts": [
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/raw/6-r1-transcript.txt",
+   "sha256": "7975c9ced783875a24e8e7046f8d25abc2b22f778ca55e7fe0f6613a0c18df12"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/raw/6-config-noncomment-v23.toml",
+   "sha256": "7d4276494961c255d22658f1ee8877d2b377b7a0baddf0776a898a58c9e3b08e"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/raw/6-config-noncomment-v24.toml",
+   "sha256": "7d4276494961c255d22658f1ee8877d2b377b7a0baddf0776a898a58c9e3b08e"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/raw/6-mcp-tools-v23.txt",
+   "sha256": "cac2307b84fcdf8d6e215bb4b4016959d1a900fd00df51d6f29ab57f373fbfdb"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/raw/6-mcp-tools-v24.txt",
+   "sha256": "52fad270fd7787bbbd1792f330c6abf7748fc00a3333ba171ded89e409eded03"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/raw/6-serve23.log",
+   "sha256": "3fd02a0c8bca57723f6da1c48d9f42a5a3f130e10d13b07b2ffa111dd3d9d837"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/raw/6-serve24.log",
+   "sha256": "797eefa074876ac3916ede68b55580f33b799768705bcbe8e174798f8146270c"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/raw/6-default-embedding.txt",
+   "sha256": "d25066f7b2ea7abe29855ffd220e86ead33e131f0c0e41adec7ae30d47207618"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/raw/6-rustup-install.log",
+   "sha256": "5bb9d206e106d91e43369a27b80bf236e2a48f66ba761e7c31a8097fc3841db3"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/raw/6-cargo-fetch.log",
+   "sha256": "54a9e36c2f836b9ff8847fff569e41ec8256fa3c0ea3486f7ace20b8bc109d5e"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/raw/6-cargo-test-build.log",
+   "sha256": "107f478d61f119e3e75f2650317d16ea2208ce822dbf1e03ef98dc99c9b0cb1a"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/raw/6-cargo-test-full.log",
+   "sha256": "8dfd49611002e66d79f82eb7d71253b4a6f71e90444f5ee5334d88b8975b0569"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/raw/6-cargo-test-cli-suite-rerun.log",
+   "sha256": "881669465f2302ff7f7d3242f0e0203526a76928cdcad71d1a98d5eb4532a3d6"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/raw/6-upstream-run-meta.txt",
+   "sha256": "18e6d3008c22337685e9c09149523a741ccceebe657ca362c93903587e4662bf"
+  }
+ ],
+ "helpers": [
+  "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/aimem/r1_surface.sh",
+  "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/aimem/r1b_default_embedding.sh",
+  "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/aimem/run_tests.sh",
+  "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/aimem/run_tests_rerun.sh"
+ ],
+ "checked_at": "2026-09-23",
+ "covered_elsewhere_part": "evidence/artifacts/sota-refresh-20260923/pins-mem/ai-memory.json (merged in #87)"
+}

@@ -1,0 +1,26 @@
+=== agent-browser --version ===
+agent-browser 0.38.1
+=== uname -srm ===
+Linux 6.18.33.2-microsoft-standard-WSL2 x86_64
+=== open ===
+[agent-browser] launched browser
+✓ Local browser command check
+  file://~/code/nas-wt-g2-web-research/fixtures/greeting.html
+exit=0
+=== snapshot ===
+- heading "Local browser command check" [level=1, ref=e1]
+- textbox "Name" [ref=e2]
+- button "Greet" [ref=e3]
+exit=0
+=== fill ===
+✓ Done
+exit=0
+=== click ===
+✓ Done
+exit=0
+=== get text ===
+Hello, Gap Wave 2!
+exit=0
+=== close ===
+✓ Browser closed
+exit=0

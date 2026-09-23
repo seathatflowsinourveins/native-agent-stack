@@ -25,13 +25,22 @@ Layers: 20 foundation, 12 trading. Winners: 66 layer-winner pairs (55 distinct c
 
 ## Hosts and hardware tiers
 
-| Host | Evidence | Generation tier | Semantic-RAG tier | Concurrency cap |
-| --- | --- | --- | --- | --- |
-| This host (measured) | native_proven | large-32b-q4 | standard | 16 |
-| 128 GB WSL workstation (labelled projection) | labelled_projection | large-32b-q4 | headroom | 60) |
-| macOS arm64, 48 GB unified memory (labelled projection) | labelled_projection | large-32b-q4 | full | 10 |
-| macOS arm64, 64 GB unified memory (labelled projection) | labelled_projection | large-32b-q4 | full | 12 |
-| GitHub-hosted macos-15 arm64 runner | native_proven | — | — | — |
+| Host | Evidence | Generation tier | Semantic-RAG tier | Concurrency cap | Measured |
+| --- | --- | --- | --- | --- | --- |
+| This host (measured) | native_proven | large-32b-q4 | standard | 16 | cpu_brand=Intel(R) Core(TM) Ultra 9 275HX; cores=24; effective_ram_gb=47.0 |
+| 128 GB WSL workstation (labelled projection) | labelled_projection | large-32b-q4 | headroom | 16 | — |
+| macOS arm64, 48 GB unified memory (labelled projection) | labelled_projection | large-32b-q4 | full | 10 | — |
+| macOS arm64, 64 GB unified memory (labelled projection) | labelled_projection | large-32b-q4 | full | 12 | — |
+| GitHub-hosted macos-15 arm64 runner | native_proven | — | — | — | cpu_brand=Apple M1 (Virtual); cores=3; unified_memory_gb=7.0; mlx_smoke: mlx-community/Qwen2.5-0.5B-Instruct-4bit@a5339a4, 146.57 tok/s, 32 tokens |
+
+## Qualified local models
+
+Locally-run model weights a host receipt recorded qualifying on a runtime component's winner row (`scripts/host_receipts.py record --qualified-model`). This is per-host, per-runtime evidence, not a verdict: it never marks anything `accepted` by itself, and the platform-status flip rule (`scripts/platform_status.py`) still governs whether that runtime's own row may claim more.
+
+| Model | Revision | Runtime | Version | Host | Platform | Result | Receipt |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Qwen/Qwen3-8B-AWQ | 4da05a8e | vllm | 0.29.0 | rtx5090-laptop-20260923 | linux-wsl2-x86_64 | pass | evidence/hosts/rtx5090-laptop-20260923/rtx5090-laptop-20260923--vllm--use--20260923.json |
+| nvidia/Nemotron-3-Embed-1B-BF16 | c0c9fea93ea424587517f2c59e20db9f1d6bf615 | vllm | 0.25.0 | rtx5090-laptop-20260923 | linux-wsl2-x86_64 | pass | evidence/hosts/rtx5090-laptop-20260923/rtx5090-laptop-20260923--vllm--use--20260923.json |
 
 ## Foundation layers
 
@@ -43,7 +52,7 @@ Layers: 20 foundation, 12 trading. Winners: 66 layer-winner pairs (55 distinct c
 |  |  | `candidate:actions-attest` | unpinned | native_proven | accepted | untested | — |  |
 | Code navigation | retain | `serena` | 2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143 | native_proven | accepted | untested | — | 2 / 5 |
 | Documents and ingestion | keep_but_compare | `qmd` | 2.8.3 | local_integration | conditional, bootstrap 2.8.3 | untested | foundation-cpu | 5 / 7 |
-|  |  | `markitdown` | 0.1.7 (behind v0.1.8) | local_integration | conditional | untested | — |  |
+|  |  | `markitdown` | 0.1.7 (behind v0.1.8) | local_integration | conditional, bootstrap 0.1.7 | untested | — |  |
 |  |  | `poppler` | 26.09.0 | local_integration | conditional | untested | — |  |
 | Durable memory | keep_but_compare | `ai-memory` | 2.3.2 (behind v2.4.0) | native_proven | accepted, bootstrap 2.3.2 | untested, bootstrap 2.3.2 | foundation-cpu, recovery, macos-arm64-foundation | 9 / 13 |
 | Git practice and GitHub automation | retain | `worktrunk` | 0.79.0 | source_review | not_established | untested | — | 11 / 12 |
@@ -59,7 +68,7 @@ Layers: 20 foundation, 12 trading. Winners: 66 layer-winner pairs (55 distinct c
 |  |  | `sandbox-runtime` | 0.0.77 | native_proven | accepted | untested | — |  |
 | MCP servers and client surfaces | retain | `mcporter` | 0.13.13 (behind v0.14.0) | native_proven | accepted, bootstrap 0.13.13 | untested, bootstrap 0.13.13 | foundation-cpu, macos-arm64-foundation | 12 / 14 |
 |  |  | `mcp-inspector` | 2.7.0 | native_proven | accepted | untested | — |  |
-| Native clients | retain | `claude-code` | 2.1.278 (behind v2.1.280) | native_proven | accepted, bootstrap 2.1.278 | untested, bootstrap 2.1.278 | foundation-cpu, research-runtime, macos-arm64-foundation | 9 / 14 |
+| Native clients | retain | `claude-code` | 2.1.278 (behind v2.1.280) | native_proven | accepted, bootstrap 2.1.280 | untested, bootstrap 2.1.280 | foundation-cpu, research-runtime, macos-arm64-foundation | 9 / 14 |
 |  |  | `codex` | 0.155.1 (behind rust-v0.156.0) | native_proven | accepted, bootstrap 0.155.1 | untested, bootstrap 0.155.1 | foundation-cpu, research-runtime, macos-arm64-foundation |  |
 | Observation and optional inference | keep_but_compare | `opentelemetry-collector-contrib` | 0.161.0 | synthetic | conditional | untested | observability | 8 / 11 |
 |  |  | `prometheus` | 3.14.0 | synthetic | conditional | untested | observability |  |
@@ -77,10 +86,10 @@ Layers: 20 foundation, 12 trading. Winners: 66 layer-winner pairs (55 distinct c
 | Context and usage efficiency | keep_but_compare | `rtk` | 0.49.0 | synthetic | conditional, bootstrap 0.49.0 | untested | foundation-cpu | 4 / 6 |
 |  |  | `headroom` | 0.37.0 (behind v0.38.0) | synthetic | conditional | untested | — |  |
 |  |  | `ccusage` | 20.0.24 | synthetic | conditional | untested | — |  |
-| Web research | retain | `tavily-cli` | 0.1.8 | local_integration | conditional | untested | — | 7 / 9 |
-|  |  | `agent-browser` | 0.38.1 | local_integration | conditional | untested | — |  |
-|  |  | `openresearch` | 0.2.7 (behind v0.2.9) | local_integration | conditional | untested | — |  |
-| Workers and task ownership | keep_but_compare | `claude-code` | 2.1.278 (behind v2.1.280) | local_integration | conditional, bootstrap 2.1.278 | untested, bootstrap 2.1.278 | foundation-cpu, research-runtime, macos-arm64-foundation | 7 / 8 |
+| Web research | retain | `tavily-cli` | 0.1.8 | local_integration | conditional, bootstrap 0.1.8 | untested | — | 7 / 9 |
+|  |  | `agent-browser` | 0.38.1 | local_integration | conditional, bootstrap 0.38.1 | untested | — |  |
+|  |  | `openresearch` | 0.2.7 (behind v0.2.9) | local_integration | conditional, bootstrap 0.2.7 | untested | — |  |
+| Workers and task ownership | keep_but_compare | `claude-code` | 2.1.278 (behind v2.1.280) | local_integration | conditional, bootstrap 2.1.280 | untested, bootstrap 2.1.280 | foundation-cpu, research-runtime, macos-arm64-foundation | 7 / 8 |
 |  |  | `worktrunk` | 0.79.0 | local_integration | conditional | untested | — |  |
 
 ## Trading layers (north star)

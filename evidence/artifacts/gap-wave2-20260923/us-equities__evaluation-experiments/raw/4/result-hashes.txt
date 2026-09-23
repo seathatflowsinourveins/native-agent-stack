@@ -1,0 +1,4 @@
+3c5e53999c89b48a5df55ef870484a85786e8939b91d6c9ee3a0f29e08c40b87  results/bm25-details.jsonl
+84d72f483f3a6245c6d3812872911973b4cc00c7e76bf6ccbfd915ee2bd24682  results/bm25-summary.json
+2eb08ad2e7f35549ec823f6911bf4150c7ccddb5a037998c3a357a03d2c22cd4  results/lexical-details.jsonl
+fa513be38598988b6bba011852b2992fc46f536fe64c238a328d7ac5008f03bf  results/lexical-summary.json

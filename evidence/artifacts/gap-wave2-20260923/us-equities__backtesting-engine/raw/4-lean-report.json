@@ -1,0 +1,920 @@
+{
+  "plan_sha256": "60959a050a3b004abf5346d376930b3b2f563096c725dc96e5427703ea203632",
+  "algorithm_sha256": "a8f0bf3c6b48fdcac8fe756ecb56611e6d54cbe90eeef29cdd901bb502eb1d15",
+  "inserted_line": "SetBrokerageModel(QuantConnect.Brokerages.BrokerageName.Alpaca, AccountType.Margin);",
+  "variants": {
+    "control": {
+      "compile": {
+        "name": "compile",
+        "started_utc": "2026-09-23T06:23:36.039175+00:00",
+        "exit_code": 0,
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "source_sha256": "a8f0bf3c6b48fdcac8fe756ecb56611e6d54cbe90eeef29cdd901bb502eb1d15"
+      },
+      "cases": [
+        {
+          "name": "one_zero",
+          "started_utc": "2026-09-23T06:23:36.957426+00:00",
+          "exit_code": 0,
+          "stdout": {
+            "bytes": 7814,
+            "sha256": "7825931836978e5363bfef823cc06032b3f9d740706bc87eb6306ccadbfeef18"
+          },
+          "stderr": {
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "ledger": {
+            "audit_present": true,
+            "audit_sha256": "92e0a9354ae413a23e39c0b2658a20854e2b2c3fa69f94073cc1706e43627dcb",
+            "intents": [
+              {
+                "local": "2019-12-31T16:00:00.0000000",
+                "order_id": 1,
+                "quantity": 304,
+                "reason": "entry",
+                "status": "Submitted"
+              },
+              {
+                "local": "2020-04-29T16:00:00.0000000",
+                "order_id": 2,
+                "quantity": -304,
+                "reason": "exit",
+                "status": "Submitted"
+              }
+            ],
+            "order_events": [
+              {
+                "order_id": 1,
+                "status": "Submitted",
+                "message": "",
+                "quantity": 0,
+                "price": 0
+              },
+              {
+                "order_id": 1,
+                "status": "Filled",
+                "message": "",
+                "quantity": 304,
+                "price": 323.58
+              },
+              {
+                "order_id": 2,
+                "status": "Submitted",
+                "message": "",
+                "quantity": 0,
+                "price": 0
+              },
+              {
+                "order_id": 2,
+                "status": "Filled",
+                "message": "",
+                "quantity": -304,
+                "price": 291.69
+              }
+            ],
+            "fills": 2,
+            "invalid": 0,
+            "dividends": 2,
+            "margin_calls": 0,
+            "final": {
+              "kind": "final",
+              "utc_seconds": 1588276800,
+              "cash": 90734.08,
+              "equity": 90734.08,
+              "quantity": 0
+            }
+          },
+          "original_analysis": {
+            "accepted": true,
+            "native_end_equity_usd": "90734.08",
+            "fill_count": 2,
+            "invalid_count": 0
+          },
+          "native_state": {
+            "Status": "Completed",
+            "RuntimeError": ""
+          }
+        },
+        {
+          "name": "one_stress",
+          "started_utc": "2026-09-23T06:23:39.733877+00:00",
+          "exit_code": 0,
+          "stdout": {
+            "bytes": 7820,
+            "sha256": "be207501afa847b27d79e1dd99a763d79b72e4bcfbe6d2526aaef1608fb0ce11"
+          },
+          "stderr": {
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "ledger": {
+            "audit_present": true,
+            "audit_sha256": "a3bf226d9244c77e5683b0464f7512e59cf1df51357b37c4c5fffffe738d9bd5",
+            "intents": [
+              {
+                "local": "2019-12-31T16:00:00.0000000",
+                "order_id": 1,
+                "quantity": 304,
+                "reason": "entry",
+                "status": "Submitted"
+              },
+              {
+                "local": "2020-04-29T16:00:00.0000000",
+                "order_id": 2,
+                "quantity": -304,
+                "reason": "exit",
+                "status": "Submitted"
+              }
+            ],
+            "order_events": [
+              {
+                "order_id": 1,
+                "status": "Submitted",
+                "message": "",
+                "quantity": 0,
+                "price": 0
+              },
+              {
+                "order_id": 1,
+                "status": "Filled",
+                "message": "",
+                "quantity": 304,
+                "price": 324.22716
+              },
+              {
+                "order_id": 2,
+                "status": "Submitted",
+                "message": "",
+                "quantity": 0,
+                "price": 0
+              },
+              {
+                "order_id": 2,
+                "status": "Filled",
+                "message": "",
+                "quantity": -304,
+                "price": 291.10662
+              }
+            ],
+            "fills": 2,
+            "invalid": 0,
+            "dividends": 2,
+            "margin_calls": 0,
+            "final": {
+              "kind": "final",
+              "utc_seconds": 1588276800,
+              "cash": 90357.99584,
+              "equity": 90357.99584,
+              "quantity": 0
+            }
+          },
+          "original_analysis": {
+            "accepted": true,
+            "native_end_equity_usd": "90358.00",
+            "fill_count": 2,
+            "invalid_count": 0
+          },
+          "native_state": {
+            "Status": "Completed",
+            "RuntimeError": ""
+          }
+        },
+        {
+          "name": "two_zero",
+          "started_utc": "2026-09-23T06:23:42.576022+00:00",
+          "exit_code": 0,
+          "stdout": {
+            "bytes": 7815,
+            "sha256": "333248005a4768cd0672808c0c1dff8eba04590351e0e8013b839aad6dfea974"
+          },
+          "stderr": {
+            "bytes": 381,
+            "sha256": "e46a45d9c68a8501336dde0e3083749c62fc9c980d9b4e0f561016b1972c1801"
+          },
+          "ledger": {
+            "audit_present": true,
+            "audit_sha256": "f1c56d7f711a1d3216969d34f004039a7eed1b5f8080ecc830ae6aefa1161692",
+            "intents": [
+              {
+                "local": "2019-12-31T16:00:00.0000000",
+                "order_id": 1,
+                "quantity": 608,
+                "reason": "entry",
+                "status": "Submitted"
+              },
+              {
+                "local": "2020-04-29T16:00:00.0000000",
+                "order_id": 5,
+                "quantity": -435,
+                "reason": "exit",
+                "status": "Submitted"
+              }
+            ],
+            "order_events": [
+              {
+                "order_id": 1,
+                "status": "Submitted",
+                "message": "",
+                "quantity": 0,
+                "price": 0
+              },
+              {
+                "order_id": 1,
+                "status": "Filled",
+                "message": "",
+                "quantity": 608,
+                "price": 323.58
+              },
+              {
+                "order_id": 2,
+                "status": "Submitted",
+                "message": "",
+                "quantity": 0,
+                "price": 0
+              },
+              {
+                "order_id": 2,
+                "status": "Filled",
+                "message": "Warning: No quote information available at 02/28/2020 10:00:00 America/New_York, order filled using TradeBar data",
+                "quantity": -65,
+                "price": 287.59
+              },
+              {
+                "order_id": 3,
+                "status": "Submitted",
+                "message": "",
+                "quantity": 0,
+                "price": 0
+              },
+              {
+                "order_id": 3,
+                "status": "Filled",
+                "message": "Warning: No quote information available at 03/12/2020 10:00:00 America/New_York, order filled using TradeBar data",
+                "quantity": -61,
+                "price": 258.62
+              },
+              {
+                "order_id": 4,
+                "status": "Submitted",
+                "message": "",
+                "quantity": 0,
+                "price": 0
+              },
+              {
+                "order_id": 4,
+                "status": "Filled",
+                "message": "Warning: No quote information available at 03/18/2020 13:00:00 America/New_York, order filled using TradeBar data",
+                "quantity": -47,
+                "price": 235.73
+              },
+              {
+                "order_id": 5,
+                "status": "Submitted",
+                "message": "",
+                "quantity": 0,
+                "price": 0
+              },
+              {
+                "order_id": 5,
+                "status": "Filled",
+                "message": "",
+                "quantity": -435,
+                "price": 291.69
+              }
+            ],
+            "fills": 5,
+            "invalid": 0,
+            "dividends": 2,
+            "margin_calls": 3,
+            "final": {
+              "kind": "final",
+              "utc_seconds": 1588276800,
+              "cash": 76310.34,
+              "equity": 76310.34,
+              "quantity": 0
+            }
+          },
+          "original_analysis": {
+            "accepted": true,
+            "native_end_equity_usd": "76310.34",
+            "fill_count": 5,
+            "invalid_count": 0
+          },
+          "native_state": {
+            "Status": "Completed",
+            "RuntimeError": ""
+          }
+        },
+        {
+          "name": "two_stress",
+          "started_utc": "2026-09-23T06:23:45.378520+00:00",
+          "exit_code": 0,
+          "stdout": {
+            "bytes": 7818,
+            "sha256": "a6b404256b2607c32d4c4d3d25626f581506765648836e38197bcff99f44c3f9"
+          },
+          "stderr": {
+            "bytes": 390,
+            "sha256": "cf4655346947b3649edb5ec0255c3df46d6fc3282f78825691a9f6270b75088a"
+          },
+          "ledger": {
+            "audit_present": true,
+            "audit_sha256": "fa7aebd8fc3bcf7d92bfe34c04633d74dc278c52d86f07e2b1785e566b27d30b",
+            "intents": [
+              {
+                "local": "2019-12-31T16:00:00.0000000",
+                "order_id": 1,
+                "quantity": 608,
+                "reason": "entry",
+                "status": "Submitted"
+              },
+              {
+                "local": "2020-04-29T16:00:00.0000000",
+                "order_id": 5,
+                "quantity": -433,
+                "reason": "exit",
+                "status": "Submitted"
+              }
+            ],
+            "order_events": [
+              {
+                "order_id": 1,
+                "status": "Submitted",
+                "message": "",
+                "quantity": 0,
+                "price": 0
+              },
+              {
+                "order_id": 1,
+                "status": "Filled",
+                "message": "",
+                "quantity": 608,
+                "price": 324.22716
+              },
+              {
+                "order_id": 2,
+                "status": "Submitted",
+                "message": "",
+                "quantity": 0,
+                "price": 0
+              },
+              {
+                "order_id": 2,
+                "status": "Filled",
+                "message": "Warning: No quote information available at 02/28/2020 10:00:00 America/New_York, order filled using TradeBar data",
+                "quantity": -68,
+                "price": 287.01482
+              },
+              {
+                "order_id": 3,
+                "status": "Submitted",
+                "message": "",
+                "quantity": 0,
+                "price": 0
+              },
+              {
+                "order_id": 3,
+                "status": "Filled",
+                "message": "Warning: No quote information available at 03/12/2020 10:00:00 America/New_York, order filled using TradeBar data",
+                "quantity": -61,
+                "price": 258.10276
+              },
+              {
+                "order_id": 4,
+                "status": "Submitted",
+                "message": "",
+                "quantity": 0,
+                "price": 0
+              },
+              {
+                "order_id": 4,
+                "status": "Filled",
+                "message": "Warning: No quote information available at 03/18/2020 13:00:00 America/New_York, order filled using TradeBar data",
+                "quantity": -46,
+                "price": 235.25854
+              },
+              {
+                "order_id": 5,
+                "status": "Submitted",
+                "message": "",
+                "quantity": 0,
+                "price": 0
+              },
+              {
+                "order_id": 5,
+                "status": "Filled",
+                "message": "",
+                "quantity": -433,
+                "price": 291.10662
+              }
+            ],
+            "fills": 5,
+            "invalid": 0,
+            "dividends": 2,
+            "margin_calls": 3,
+            "final": {
+              "kind": "final",
+              "utc_seconds": 1588276800,
+              "cash": 75607.75214,
+              "equity": 75607.75214,
+              "quantity": 0
+            }
+          },
+          "original_analysis": {
+            "accepted": true,
+            "native_end_equity_usd": "75607.75",
+            "fill_count": 5,
+            "invalid_count": 0
+          },
+          "native_state": {
+            "Status": "Completed",
+            "RuntimeError": ""
+          }
+        },
+        {
+          "name": "adaptive_stress",
+          "started_utc": "2026-09-23T06:23:48.628592+00:00",
+          "exit_code": 0,
+          "stdout": {
+            "bytes": 7843,
+            "sha256": "b93256e3f4d5610f3f61deea6d5f5b093ac6c0f68c858d6177c48411f5ad2b73"
+          },
+          "stderr": {
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "ledger": {
+            "audit_present": true,
+            "audit_sha256": "82935c33a035276ed35caf03476cf11120214426d4e76546e4130f7e30025c11",
+            "intents": [
+              {
+                "local": "2019-12-31T16:00:00.0000000",
+                "order_id": 1,
+                "quantity": 608,
+                "reason": "entry",
+                "status": "Submitted"
+              },
+              {
+                "local": "2020-01-27T16:00:00.0000000",
+                "order_id": 2,
+                "quantity": -458,
+                "reason": "reduce",
+                "status": "Submitted"
+              },
+              {
+                "local": "2020-04-29T16:00:00.0000000",
+                "order_id": 3,
+                "quantity": -150,
+                "reason": "exit",
+                "status": "Submitted"
+              }
+            ],
+            "order_events": [
+              {
+                "order_id": 1,
+                "status": "Submitted",
+                "message": "",
+                "quantity": 0,
+                "price": 0
+              },
+              {
+                "order_id": 1,
+                "status": "Filled",
+                "message": "",
+                "quantity": 608,
+                "price": 324.22716
+              },
+              {
+                "order_id": 2,
+                "status": "Submitted",
+                "message": "",
+                "quantity": 0,
+                "price": 0
+              },
+              {
+                "order_id": 2,
+                "status": "Filled",
+                "message": "",
+                "quantity": -458,
+                "price": 324.40988
+              },
+              {
+                "order_id": 3,
+                "status": "Submitted",
+                "message": "",
+                "quantity": 0,
+                "price": 0
+              },
+              {
+                "order_id": 3,
+                "status": "Filled",
+                "message": "",
+                "quantity": -150,
+                "price": 291.10662
+              }
+            ],
+            "fills": 3,
+            "invalid": 0,
+            "dividends": 2,
+            "margin_calls": 0,
+            "final": {
+              "kind": "final",
+              "utc_seconds": 1588276800,
+              "cash": 95324.10476,
+              "equity": 95324.10476,
+              "quantity": 0
+            }
+          },
+          "original_analysis": {
+            "accepted": true,
+            "native_end_equity_usd": "95324.10",
+            "fill_count": 3,
+            "invalid_count": 0
+          },
+          "native_state": {
+            "Status": "Completed",
+            "RuntimeError": ""
+          }
+        },
+        {
+          "name": "over_limit",
+          "started_utc": "2026-09-23T06:23:51.716866+00:00",
+          "exit_code": 0,
+          "stdout": {
+            "bytes": 7726,
+            "sha256": "5ed69f9029a1e649a38ce102fd6a9ca783a82f7bc9c2afe08f1c432f2558d0d0"
+          },
+          "stderr": {
+            "bytes": 202,
+            "sha256": "e369db801da3abc45f4e024ecea22de83dd0a472d0120414ceb012cc70e2352d"
+          },
+          "ledger": {
+            "audit_present": true,
+            "audit_sha256": "b26b715d71cc3ac599a9243725aa0dccca77736690ff08a370fba724c431d819",
+            "intents": [
+              {
+                "local": "2019-12-31T16:00:00.0000000",
+                "order_id": 1,
+                "quantity": 1217,
+                "reason": "entry",
+                "status": "Invalid"
+              }
+            ],
+            "order_events": [
+              {
+                "order_id": 1,
+                "status": "Invalid",
+                "message": "Order Error: ids: [1], Insufficient buying power to complete orders (Value:[391703.62]), Reason: Id: 1, Initial Margin: 195852.81, Free Margin: 100000.",
+                "quantity": 0,
+                "price": 0
+              }
+            ],
+            "fills": 0,
+            "invalid": 1,
+            "dividends": 2,
+            "margin_calls": 0,
+            "final": {
+              "kind": "final",
+              "utc_seconds": 1588276800,
+              "cash": 100000.0,
+              "equity": 100000.0,
+              "quantity": 0
+            }
+          },
+          "original_analysis": {
+            "accepted": true,
+            "native_end_equity_usd": "100000",
+            "fill_count": 0,
+            "invalid_count": 1
+          },
+          "native_state": {
+            "Status": "Completed",
+            "RuntimeError": ""
+          }
+        }
+      ]
+    },
+    "alpaca": {
+      "compile": {
+        "name": "compile",
+        "started_utc": "2026-09-23T06:23:54.543947+00:00",
+        "exit_code": 0,
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "source_sha256": "b73742117b77031b32bcff993c58f69ff50ff6fddac033ad4cd05fbde055d95c"
+      },
+      "cases": [
+        {
+          "name": "one_zero",
+          "started_utc": "2026-09-23T06:23:55.448730+00:00",
+          "exit_code": 1,
+          "stdout": {
+            "bytes": 7634,
+            "sha256": "2b998f936ed38b8a13fb5ba3982f2194928716690993777fc482dda4fb32da0c"
+          },
+          "stderr": {
+            "bytes": 1992,
+            "sha256": "e0c1ad66de245315d4b69fff23948e5142d9709a4ca60a56bd0b8d73269369c7"
+          },
+          "ledger": {
+            "audit_present": true,
+            "audit_sha256": "71944d92bfeabcfd8d31da2bda67420e947f8135c38f1541c0c861f81ae2d70c",
+            "intents": [
+              {
+                "local": "2019-12-31T16:00:00.0000000",
+                "order_id": 1,
+                "quantity": 304,
+                "reason": "entry",
+                "status": "Invalid"
+              }
+            ],
+            "order_events": [
+              {
+                "order_id": 1,
+                "status": "Invalid",
+                "message": "BrokerageModel declared unable to submit order: [1] Warning - Code: NotSupported - MarketOnOpen submission time is invalid. Valid local times are  07:00\u2013 09:28. Consider setting DailyPreciseEndTime = false or using Schedule.On.",
+                "quantity": 0,
+                "price": 0
+              }
+            ],
+            "fills": 0,
+            "invalid": 1,
+            "dividends": 2,
+            "margin_calls": 0,
+            "final": null
+          },
+          "original_analysis": {
+            "accepted": false,
+            "error": "ValueError: native algorithm failed"
+          },
+          "native_state": {
+            "Status": "RuntimeError",
+            "RuntimeError": "2020-04-29 16:00:00 Runtime Error: Expected a nonzero stress order. in AlgorithmManager.cs:line 585"
+          }
+        },
+        {
+          "name": "one_stress",
+          "started_utc": "2026-09-23T06:23:58.372814+00:00",
+          "exit_code": 1,
+          "stdout": {
+            "bytes": 7640,
+            "sha256": "c607b5eac9f8718f0ab531abe160874764add9358c6116e30f8e1070d0554a93"
+          },
+          "stderr": {
+            "bytes": 1992,
+            "sha256": "e9d7194ad6c77e44c25683068f51bee87f88fe41037b32db610dd4d4639a50a9"
+          },
+          "ledger": {
+            "audit_present": true,
+            "audit_sha256": "71944d92bfeabcfd8d31da2bda67420e947f8135c38f1541c0c861f81ae2d70c",
+            "intents": [
+              {
+                "local": "2019-12-31T16:00:00.0000000",
+                "order_id": 1,
+                "quantity": 304,
+                "reason": "entry",
+                "status": "Invalid"
+              }
+            ],
+            "order_events": [
+              {
+                "order_id": 1,
+                "status": "Invalid",
+                "message": "BrokerageModel declared unable to submit order: [1] Warning - Code: NotSupported - MarketOnOpen submission time is invalid. Valid local times are  07:00\u2013 09:28. Consider setting DailyPreciseEndTime = false or using Schedule.On.",
+                "quantity": 0,
+                "price": 0
+              }
+            ],
+            "fills": 0,
+            "invalid": 1,
+            "dividends": 2,
+            "margin_calls": 0,
+            "final": null
+          },
+          "original_analysis": {
+            "accepted": false,
+            "error": "ValueError: native algorithm failed"
+          },
+          "native_state": {
+            "Status": "RuntimeError",
+            "RuntimeError": "2020-04-29 16:00:00 Runtime Error: Expected a nonzero stress order. in AlgorithmManager.cs:line 585"
+          }
+        },
+        {
+          "name": "two_zero",
+          "started_utc": "2026-09-23T06:24:01.179260+00:00",
+          "exit_code": 1,
+          "stdout": {
+            "bytes": 7634,
+            "sha256": "0ac9e35bbcee48272859f2fd74ff6cc64817dcdf0c62fbf4ad1b57fd7e1dcb3b"
+          },
+          "stderr": {
+            "bytes": 1992,
+            "sha256": "1861d8614ada1c2e0a828d958bfdb6bbd2dbb397430864c50716b84e6240556b"
+          },
+          "ledger": {
+            "audit_present": true,
+            "audit_sha256": "5f019751fae56b6a4ab715dbb8634b65068547bd4858305af49c90dd6e8ef347",
+            "intents": [
+              {
+                "local": "2019-12-31T16:00:00.0000000",
+                "order_id": 1,
+                "quantity": 608,
+                "reason": "entry",
+                "status": "Invalid"
+              }
+            ],
+            "order_events": [
+              {
+                "order_id": 1,
+                "status": "Invalid",
+                "message": "BrokerageModel declared unable to submit order: [1] Warning - Code: NotSupported - MarketOnOpen submission time is invalid. Valid local times are  07:00\u2013 09:28. Consider setting DailyPreciseEndTime = false or using Schedule.On.",
+                "quantity": 0,
+                "price": 0
+              }
+            ],
+            "fills": 0,
+            "invalid": 1,
+            "dividends": 2,
+            "margin_calls": 0,
+            "final": null
+          },
+          "original_analysis": {
+            "accepted": false,
+            "error": "ValueError: native algorithm failed"
+          },
+          "native_state": {
+            "Status": "RuntimeError",
+            "RuntimeError": "2020-04-29 16:00:00 Runtime Error: Expected a nonzero stress order. in AlgorithmManager.cs:line 585"
+          }
+        },
+        {
+          "name": "two_stress",
+          "started_utc": "2026-09-23T06:24:04.067780+00:00",
+          "exit_code": 1,
+          "stdout": {
+            "bytes": 7640,
+            "sha256": "23b3d6819471dc1ab54e2f304610dd9d268b605071cfacd5640f056c1a6a8a1c"
+          },
+          "stderr": {
+            "bytes": 1992,
+            "sha256": "2601c0055a3adad700caa8c82d7dea73aff7c6f9c5f5c8df9f23a12eb2210154"
+          },
+          "ledger": {
+            "audit_present": true,
+            "audit_sha256": "5f019751fae56b6a4ab715dbb8634b65068547bd4858305af49c90dd6e8ef347",
+            "intents": [
+              {
+                "local": "2019-12-31T16:00:00.0000000",
+                "order_id": 1,
+                "quantity": 608,
+                "reason": "entry",
+                "status": "Invalid"
+              }
+            ],
+            "order_events": [
+              {
+                "order_id": 1,
+                "status": "Invalid",
+                "message": "BrokerageModel declared unable to submit order: [1] Warning - Code: NotSupported - MarketOnOpen submission time is invalid. Valid local times are  07:00\u2013 09:28. Consider setting DailyPreciseEndTime = false or using Schedule.On.",
+                "quantity": 0,
+                "price": 0
+              }
+            ],
+            "fills": 0,
+            "invalid": 1,
+            "dividends": 2,
+            "margin_calls": 0,
+            "final": null
+          },
+          "original_analysis": {
+            "accepted": false,
+            "error": "ValueError: native algorithm failed"
+          },
+          "native_state": {
+            "Status": "RuntimeError",
+            "RuntimeError": "2020-04-29 16:00:00 Runtime Error: Expected a nonzero stress order. in AlgorithmManager.cs:line 585"
+          }
+        },
+        {
+          "name": "adaptive_stress",
+          "started_utc": "2026-09-23T06:24:06.896945+00:00",
+          "exit_code": 1,
+          "stdout": {
+            "bytes": 7655,
+            "sha256": "5d733b29c471440a68ede5cbb342665a20c09efafb769893cbafedf2e450048e"
+          },
+          "stderr": {
+            "bytes": 1992,
+            "sha256": "73a76d0c0e65904021034920ed3e61422e252c152f782bcd61b77de466ff0f64"
+          },
+          "ledger": {
+            "audit_present": true,
+            "audit_sha256": "5f019751fae56b6a4ab715dbb8634b65068547bd4858305af49c90dd6e8ef347",
+            "intents": [
+              {
+                "local": "2019-12-31T16:00:00.0000000",
+                "order_id": 1,
+                "quantity": 608,
+                "reason": "entry",
+                "status": "Invalid"
+              }
+            ],
+            "order_events": [
+              {
+                "order_id": 1,
+                "status": "Invalid",
+                "message": "BrokerageModel declared unable to submit order: [1] Warning - Code: NotSupported - MarketOnOpen submission time is invalid. Valid local times are  07:00\u2013 09:28. Consider setting DailyPreciseEndTime = false or using Schedule.On.",
+                "quantity": 0,
+                "price": 0
+              }
+            ],
+            "fills": 0,
+            "invalid": 1,
+            "dividends": 2,
+            "margin_calls": 0,
+            "final": null
+          },
+          "original_analysis": {
+            "accepted": false,
+            "error": "ValueError: native algorithm failed"
+          },
+          "native_state": {
+            "Status": "RuntimeError",
+            "RuntimeError": "2020-04-29 16:00:00 Runtime Error: Expected a nonzero stress order. in AlgorithmManager.cs:line 585"
+          }
+        },
+        {
+          "name": "over_limit",
+          "started_utc": "2026-09-23T06:24:10.073238+00:00",
+          "exit_code": 0,
+          "stdout": {
+            "bytes": 7722,
+            "sha256": "7f2b3d5ef2c4351fb2f86839eaaa40663d005f9421ddb4a2d4aa1468e32d2424"
+          },
+          "stderr": {
+            "bytes": 202,
+            "sha256": "08a4d678dc47a33d82e7c113daa4185225d004b47a78988697f8e65eb6fe8b03"
+          },
+          "ledger": {
+            "audit_present": true,
+            "audit_sha256": "b26b715d71cc3ac599a9243725aa0dccca77736690ff08a370fba724c431d819",
+            "intents": [
+              {
+                "local": "2019-12-31T16:00:00.0000000",
+                "order_id": 1,
+                "quantity": 1217,
+                "reason": "entry",
+                "status": "Invalid"
+              }
+            ],
+            "order_events": [
+              {
+                "order_id": 1,
+                "status": "Invalid",
+                "message": "Order Error: ids: [1], Insufficient buying power to complete orders (Value:[391703.62]), Reason: Id: 1, Initial Margin: 195852.81, Free Margin: 100000.",
+                "quantity": 0,
+                "price": 0
+              }
+            ],
+            "fills": 0,
+            "invalid": 1,
+            "dividends": 2,
+            "margin_calls": 0,
+            "final": {
+              "kind": "final",
+              "utc_seconds": 1588276800,
+              "cash": 100000.0,
+              "equity": 100000.0,
+              "quantity": 0
+            }
+          },
+          "original_analysis": {
+            "accepted": true,
+            "native_end_equity_usd": "100000",
+            "fill_count": 0,
+            "invalid_count": 1
+          },
+          "native_state": {
+            "Status": "Completed",
+            "RuntimeError": ""
+          }
+        }
+      ]
+    }
+  }
+}

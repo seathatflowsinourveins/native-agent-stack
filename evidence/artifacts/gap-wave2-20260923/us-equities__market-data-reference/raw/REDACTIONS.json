@@ -1,0 +1,155 @@
+{
+ "1-alpaca-corporateactions-docs.excerpt.json": {
+  "note": "full page not published (embeds public site keys and example tokens flagged by gitleaks); schema fragments only, UUIDs redacted; full page kept at $HOME/.cache/gap-wave2-20260923/market-data-reference/docs/ca-docs.html",
+  "original_bytes": 989491,
+  "original_sha256": "ee3a3fbb730e2a4bec7dc32439f67929b26046bbdbf7ae3ef30c567f36636de8"
+ },
+ "14-wayback-ice-bush-20250108195503.txt": {
+  "home_path_redactions": 2,
+  "original_bytes": 72785,
+  "original_sha256": "13e39a3099bb059e6d681457f1914cfaf18a3f5db657ff1f0dc514eca7dee1bc",
+  "published_as": "tag-stripped text (scripts, styles and tags removed); full HTML withheld because guarded gitleaks flagged the site's embedded public Q4 API key (generic-api-key)",
+  "published_sha256": "548127fe5b845554447b6836bea1542ff33a48beca0c36f76306df1f8a8a1e3e",
+  "uuid_redactions": 0
+ },
+ "14-wayback-ice-carter-20241230155348.txt": {
+  "home_path_redactions": 0,
+  "original_bytes": 71377,
+  "original_sha256": "ea4d74e47babed59481977b0ff5950a189015a099901702cadd72582d667501e",
+  "published_as": "tag-stripped text (scripts, styles and tags removed); full HTML withheld because guarded gitleaks flagged the site's embedded public Q4 API key (generic-api-key)",
+  "published_sha256": "c2c45bd4b63f17123283b01dba526333e19a96ad605e4760d349ced26d16e3a2",
+  "uuid_redactions": 0
+ },
+ "14-wayback-nyse-20160108005018.html": {
+  "crlf_count": 309,
+  "crlf_published_sha256": "16bdf2ac83afb14fd294208ff7b5d018700e39d75e94e0d35653fb0e43a08646",
+  "eol_normalized_to_lf": true,
+  "original_bytes": 77443,
+  "original_sha256": "928bbc19a1fa194603d15233d5004a9d34d3bb78da930c839dca92427f7b8f81",
+  "published_sha256": "a4fa3e02b8d391a7052b1754dbd029273ac26ff6d9045c61252be34a9bdeb79c",
+  "uuid_redactions": 6
+ },
+ "14-wayback-nyse-20170301172132.html": {
+  "crlf_count": 95,
+  "crlf_published_sha256": "38fcc416f6cbe065b4b6cf2668bc9626a05f8c3cdf70af1add2c3ac59ffa217a",
+  "eol_normalized_to_lf": true,
+  "original_bytes": 232865,
+  "original_sha256": "81e984b95a909a42e01ab9da823894991a1b133a92ec363651fd906ca04afa39",
+  "published_sha256": "d0e150530e79f6e873861b8b09023c6a1061dafd0b93b4ad00ba26acb832891a",
+  "uuid_redactions": 38
+ },
+ "14-wayback-nyse-20181215174802.html": {
+  "crlf_count": 11,
+  "crlf_published_sha256": "a72fe9fb9fefdede85ccb235fc466054e7b3e7cc3028665e160421236695c48c",
+  "eol_normalized_to_lf": true,
+  "original_bytes": 94980,
+  "original_sha256": "8eadbdc9bf1b63ef8d78b3ea86ff95f6a098303c72e72d8ada3781cfe2001526",
+  "published_sha256": "4a432da747fd5941a77e20b1ee14defcef23e39cf4ea419f2f0446e9d47dddc3",
+  "uuid_redactions": 191
+ },
+ "14-wayback-nyse-20210111130129.html": {
+  "original_bytes": 207301,
+  "original_sha256": "ad00ff3a1b8d751593848e7b203813f30b4ffa5c492873a908e29558d89b9da4",
+  "published_sha256": "4e50fc36bdb85a9d5a67cc17368975f75856e057ed2c9acf6e3837fdb4fd20b9",
+  "uuid_redactions": 406
+ },
+ "14-wayback-nyse-20220706011712.html": {
+  "home_path_redactions": 2,
+  "original_bytes": 99787,
+  "original_sha256": "f50d241477129d52da1312d3496391ced87501a3bfaf1ea1f102252e3092dd70",
+  "published_sha256": "c008ba82c32c774014884f7c6f56951ea07b70f2281d33cd625ef89ece2d55ea",
+  "uuid_redactions": 339
+ },
+ "14-wayback-nyse-20240111002222.html": {
+  "home_path_redactions": 2,
+  "original_bytes": 127218,
+  "original_sha256": "9b02f75db96aa8f0bf4ebfae2c991ed5a19c391ca703974b49176b5d1ae4bc40",
+  "published_sha256": "adbcdb88cf6336537c0853cacbdaa3d81b31270c74ad4d8b97903a9c1cd259a0",
+  "uuid_redactions": 366
+ },
+ "17-pypi-sec-api.json": {
+  "original_bytes": 188124,
+  "original_sha256": "18a426b7a86fcda8cdf468776e26c7facf77fd7ab6956558862f17636df4ed95",
+  "published_sha256": "b689894797f7fc07e85ace29d99ed152d968b5547f665c6e741e6d15b615262a",
+  "uuid_redactions": 3
+ },
+ "4-pypi-alpaca-py.json": {
+  "original_bytes": 165355,
+  "original_sha256": "307ab2dec1484d06935a61f7a08ee302a51f12e0e560b13ec8491ede623e9a20",
+  "published_sha256": "307ab2dec1484d06935a61f7a08ee302a51f12e0e560b13ec8491ede623e9a20",
+  "uuid_redactions": 0
+ },
+ "6-cboe-hours-holidays.html": {
+  "original_bytes": 382879,
+  "original_sha256": "79ff3fdc9909ba007853195e1c0f865fc5b1304b559d61b43c3613a0c543bb0b",
+  "published_sha256": "882cc187beac422a3722d5ba7bf2e9d0708ec36e4c10b9ed8fb628302768f829",
+  "uuid_redactions": 2
+ },
+ "6-nasdaqtrader-holiday-calendar.html": {
+  "crlf_count": 883,
+  "crlf_published_sha256": "bec2e99e0ab46330d5a0c246ea4d491045bc88973a2686e2f772d77e9e37c02d",
+  "eol_normalized_to_lf": true,
+  "home_path_redactions": 2,
+  "original_bytes": 54661,
+  "original_sha256": "81490eccbb0ae933a7ba7d768e8e44e2c52adedbed161174f6ae8846f5e820c8",
+  "published_sha256": "8fbccb34565e1d755a6295fd97b01e58f9f7b9983ebfb6e718fdedfed00afbe6",
+  "uuid_redactions": 2
+ },
+ "6-nyse-hours-calendars.html": {
+  "original_bytes": 109133,
+  "original_sha256": "b7c8c2fa1923de735a0bc29a4697b94957a6cc6ad7e219739282fea871d2de6f",
+  "published_sha256": "06c1061151ddacfa85fa917a587c40bed428d18e6298c3b13ae85d86fc076886",
+  "uuid_redactions": 373
+ },
+ "7-AcctAppMarginAndCustAgmt.pypdf.txt": {
+  "original_bytes": 138838,
+  "original_sha256": "91e9dcaaf34843c834c006269c83d25507d34fe66559021ded7a5448432bd32a",
+  "published_sha256": "91e9dcaaf34843c834c006269c83d25507d34fe66559021ded7a5448432bd32a",
+  "uuid_redactions": 0
+ },
+ "7-NASDAQ_OMX_Global_Subscriber_Agreement.pypdf.txt": {
+  "original_bytes": 42262,
+  "original_sha256": "2a03882e63c8e95fb3cd256d8639023b740e3df55fc9de1a1bb2b71a7b5c6742",
+  "published_sha256": "2a03882e63c8e95fb3cd256d8639023b740e3df55fc9de1a1bb2b71a7b5c6742",
+  "uuid_redactions": 0
+ },
+ "7-NYSE_Market_Data_Display_Services_Agreement.pypdf.txt": {
+  "original_bytes": 11406,
+  "original_sha256": "cdf7da75bd5e7404611440b2bd4296bac45e59fb07ac84d2152eb582fbeb4f1f",
+  "published_sha256": "cdf7da75bd5e7404611440b2bd4296bac45e59fb07ac84d2152eb582fbeb4f1f",
+  "uuid_redactions": 0
+ },
+ "7-TermsAndConditions.pypdf.txt": {
+  "original_bytes": 22467,
+  "original_sha256": "bacb70eb1d5455f1117e0659955a6ade77e5581243312604d3b303ef683a489f",
+  "published_sha256": "bacb70eb1d5455f1117e0659955a6ade77e5581243312604d3b303ef683a489f",
+  "uuid_redactions": 0
+ },
+ "7-quantconnect-terms.html": {
+  "crlf_count": 871,
+  "crlf_published_sha256": "7e09d4242285213f521f2bce719ec30f4144104787aca64a34c2cc448260b198",
+  "eol_normalized_to_lf": true,
+  "original_bytes": 79948,
+  "original_sha256": "7e09d4242285213f521f2bce719ec30f4144104787aca64a34c2cc448260b198",
+  "published_sha256": "b0061581c86f8e9d8eb0750aa1802c432188a5f94bf4015fb5e393f3f15f50db",
+  "uuid_redactions": 0
+ },
+ "7-sec-accessing-edgar-data-wb20260821.html": {
+  "original_bytes": 79786,
+  "original_sha256": "8d6378b888c1de4708d36b0b808a053fe2cfe2fa6c43d3b9f1c7be5eb87278d8",
+  "published_sha256": "c3380a32963b9e68d6edcbfd82c659ad8cbe60e08a419024f074e88e904576cc",
+  "uuid_redactions": 3
+ },
+ "7-sec-live-403-response.html": {
+  "original_bytes": 1925,
+  "original_sha256": "26537ebfdae04ffbdba670f71b52334efac5f5e7f347b337d64fb34d8c536034",
+  "published_sha256": "26537ebfdae04ffbdba670f71b52334efac5f5e7f347b337d64fb34d8c536034",
+  "uuid_redactions": 0
+ },
+ "7-sec-privacy-information-wb20260919.html": {
+  "original_bytes": 90345,
+  "original_sha256": "752ce594f103b1b7b13c948535de24130bf348859f010ccbd22708d8cd59e9c7",
+  "published_sha256": "a8897135a1f720fa60bb019e1e0407b947a42cab6a82002ddcc57b54fa49628d",
+  "uuid_redactions": 5
+ }
+}

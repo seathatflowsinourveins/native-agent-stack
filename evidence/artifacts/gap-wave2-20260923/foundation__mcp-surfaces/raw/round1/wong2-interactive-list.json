@@ -1,0 +1,51 @@
+{
+ "started_at": "2026-09-23T04:27:02Z",
+ "runs": {
+  "context-mode-stdio": {
+   "elapsed_ms": 2960,
+   "connected": true,
+   "tools_rendered": [
+    "ctx_batch_execute",
+    "ctx_doctor",
+    "ctx_execute",
+    "ctx_execute_file",
+    "ctx_fetch_and_index",
+    "ctx_index",
+    "ctx_purge",
+    "ctx_search",
+    "ctx_stats",
+    "ctx_upgrade"
+   ],
+   "screen_excerpt": "its own per-command timeout (no shared budget); concurrency=1 preserves the legacy shared-budget cascading-skip-on-timeout path. Use 4-8 for I/O-bound batches; keep at 1 for CPU work or shared-state commands; lower the value when target hosts enforce per-IP rate limits.\r\n    \r\n    EXAMPLE: ctx_batch_execute(\r\n     commands: [\r\n     {label: \"issue 1\", command: \"gh issue view 1\"},\r\n     {label: \"issue 2\", command: \"gh issue view 2\"},\r\n     {label: \"summarize\", command: \"echo done\"}\r\n     ],\r\n     queries: [\"root cause\", \"proposed fix\"],\r\n     concurrency: 2\r\n    )\r\n    tool(ctx_stats)\r\n    Returns context consumption statistics for the current session. Shows total bytes returned to context, breakdown by tool, call counts, estimated token usage, and context savings ratio.\r\n    tool(ctx_doctor)\r\n    Diagnose context-mode installation. Runs all checks server-side and returns a plain-text status report with [OK]/[FAIL]/[WARN] prefixes (renderer-safe across MCP clients). No CLI execution needed.\r\n    tool(ctx_upgrade)\r\n    Upgrade context-mode to the latest version. Returns a shell command to execute. You MUST run the returned command using your shell tool (Bash, shell_execute, run_in_terminal, etc.) and display the output as a checklist. Tell the user to restart their session after upgrade.\r\n  ↓ tool(ctx_purge)\r\n    DESTRUCTIVE: permanently delete indexed content. Cannot be undone. Requires confirm:true and exactly one scope.\r\n    \r\n    WHEN:\r\n     - User explicitly asks to clear a specific session ('purge this session', 'wipe this conversation')\r\n     - User explicitly asks to reset the whole project ('reset everything', 'wipe the knowledge base')\r\n    \r\n    WHEN NOT:\r\n     - User says 'reset', 'clear', or 'wipe' without naming a scope -> ask which scope before calling\r\n     - User wants to free memory or improve performance -> recommend ctx_stats first, do not purge\r\n    \r\n    SCOPES (pass exactly one):\r\n     - Per-session: ctx_purge(confirm: true, sessionId: \"<uuid>\") deletes that session's events (auto-captured decisions, errors, plans, user prompts, rejected approaches, etc.) and per-session FTS5 chunks; sibling sessions and stats file are preserved.\r\n     - Per-project: ctx_purge(confirm: true, scope: \"project\") wipes FTS5 knowledge base, every session DB row, events markdown, and resets the stats file. Use ctx_stats first to preview category counts before purging.\r\n    \r\n    CONTRACT:\r\n     - confirm:true is required; confirm:false returns 'purge cancelled'.\r\n     - sessionId and scope:'project' together return 'ambiguous - pick one'.\r\n     - scope:'session' without sessionId throws (sessionId required).\r\n     - Bare {confirm:true} is deprecated: maps to scope:'project' with a stderr warning; will hard-error in a future major.\r\n    \r\n    RETURNS:\r\n     A summary of removed rows + the resolved scope.\r\n    \r\n    EXAMPLE: ctx_purge(confirm: true, sessionId: \"7c8a-1234-5678-9abc-def012345678\")\r\n    EXAMPLE: ctx_purge(confirm: true, scope: \"project\")",
+   "argv": [
+    "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/wong2-mcp-cli-2.0.0/node_modules/.bin/mcp-cli",
+    "-c",
+    "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/runs/wong2pty-20260923T042702Z/state/mcp-cm.json"
+   ]
+  },
+  "ai-memory-http": {
+   "elapsed_ms": 2874,
+   "connected": true,
+   "tools_rendered": [
+    "memory_auto_improve",
+    "memory_briefing",
+    "memory_consolidate",
+    "memory_delete_page",
+    "memory_explore",
+    "memory_feedback",
+    "memory_forget_sweep",
+    "memory_handoff_accept",
+    "memory_handoff_begin",
+    "memory_handoff_cancel"
+   ],
+   "screen_excerpt": "removed, keeps every row. This pass is DISABLED by default (observation_retention_days = 0) and deletes nothing until an operator opts in; when off, observations_pruned is 0. The report's expired / hard_deleted / observations_pruned counts come from passes 1, 3 and 4. Pass dry_run=true to preview.\r\n    tool(memory_handoff_accept)\r\n    Fetch an OPEN cross-agent handoff and mark it accepted. IMPORTANT: handoffs are SINGLE-USE. The SessionStart hook automatically consumes the handoff at session-start and prepends the content to your context — when you see a block starting with '📥 ai-memory: pending handoff from previous session' anywhere in your context, that IS the handoff. A subsequent call to this tool will return `{ \"handoff\": null }` because the hook already consumed it. Do NOT interpret null as 'no handoff exists' — check your context for the prepended block first, and answer the user from there. Call this tool only when you BOTH don't see a prepended block AND the user explicitly asks for a handoff (e.g. a hook script ran with no stdout capture). Prefer memory_handoff_list first in that case, then pass the listed `handoff_id` here to claim that exact row. Omitting `handoff_id` claims the latest eligible open handoff. Returns the handoff body only when THIS call wins the claim.\r\n    tool(memory_handoff_begin)\r\n    Record a cross-agent handoff snapshot for the NEXT agent that opens this project (e.g. Codex picking up after Claude Code). Use this ONLY when ending/wrapping up the current session or when the user explicitly says to save context for the next session. DO NOT use this to check project status, get a briefing, or summarize work mid-session. The next session's SessionStart hook automatically consumes the handoff and prepends its content to the agent's context — no manual fetch needed. Write style: keep `summary` to 2-3 SHORT sentences (what just happened + what state the project's in). Put actionable detail in `open_questions` and `next_steps` as bullet-sized strings — the next agent reads those first; long prose summaries make the TUI rendering ugly. `files_touched` is a hint, not exhaustive. By default the handoff BELONGS TO YOU: on a server shared by several operators, a teammate's session will not consume it. Pass `shared: true` to hand the baton to whoever opens the project next. `cwd` is recorded for reference; it does not restrict who receives a handoff created here.\r\n  ↓ tool(memory_handoff_cancel)\r\n    Cancel/discard a mistakenly-created OPEN handoff by exact `handoff_id` returned from `memory_handoff_begin` or `memory_handoff_list`. Use this ONLY when you realize you called `memory_handoff_begin` by mistake or the user explicitly asks to discard a pending handoff. This is a cleanup tool, not a status/briefing tool. It marks the handoff expired so the next SessionStart hook will not consume it. Follow the client-aware project-scope instructions: static clients pass `workspace` + `project` together for every project-scoped call.",
+   "argv": [
+    "$HOME/.cache/gap-wave2-20260923/mcp-surfaces/wong2-mcp-cli-2.0.0/node_modules/.bin/mcp-cli",
+    "--url",
+    "http://127.0.0.1:<owned port>/mcp"
+   ]
+  }
+ },
+ "leftover": [],
+ "ended_at": "2026-09-23T04:27:09Z"
+}

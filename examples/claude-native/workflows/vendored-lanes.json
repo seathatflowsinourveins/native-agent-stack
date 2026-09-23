@@ -1,13 +1,14 @@
 {
  "files": [
   {
-   "agentlab_commit": "440da1d0e86ad5108760f46741c8afb4cd4ddd54",
+   "agentlab_commit": "aacd93774f8aadfff4d650feeb5a15c074f8b2b0",
    "path": "layer-verdict-lane.js",
-   "records_in_its_return": "model {name: 'opus', effort: 'high'} only; tools/sota-convergence/claude_lane.py writes <work-dir>/claude/<catalog>__<layer_id>.json from the workflow result and adds model.family 'anthropic', the resolved model name (--resolved-model, for example claude-opus-5-5 from child-usage.mjs) and provenance {workflow_path, workflow_sha256, agentlab_commit}, refusing workflow bytes that are uncommitted or differ from this SHA256SUMS entry",
-   "sha256": "5cbf6becbc9cc5d15a070afebab322df895242b76f62a85a1aa620960984dd4a",
+   "records_in_its_return": "model {name: 'opus', effort: 'high'} and, per layer, refutation {status, final_source, proposal_status, revision_status, votes} (both lens votes are required on the sealed object; final is null when it was refuted or a vote is missing); tools/sota-convergence/claude_lane.py writes <work-dir>/claude/<catalog>__<layer_id>.json from the workflow result, copying refutation and adding model.family 'anthropic', the resolved model name (--resolved-model, for example claude-opus-5-5 from child-usage.mjs) and provenance {workflow_path, workflow_sha256, agentlab_commit}, refusing workflow bytes that are uncommitted or differ from this SHA256SUMS entry, and lists every layer without a final in <work-dir>/claude/failures.json",
+   "sha256": "0d66c9a11ad017c1fa84678f010e72fd7492e9902829f9a9185516695a4a3a72",
    "source_path": ".claude/workflows/layer-verdict-lane.js",
    "source_repository": "agent-lab",
-   "verified_identical_at_agentlab_commit": "c042ea75e96b66e6ab9abdbf38f4ac4e7e3ca385"
+   "supersedes_sha256": "2eb9c10d40db7dd058376d03c973c55433b30d6e0d86f72e563da6627d8e7fbb",
+   "verified_identical_at_agentlab_commit": "aacd93774f8aadfff4d650feeb5a15c074f8b2b0"
   }
  ],
  "schema_version": 1,

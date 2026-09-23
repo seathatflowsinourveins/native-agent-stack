@@ -1,0 +1,889 @@
+OpenAI Codex v0.155.1
+--------
+workdir: $HOME/.cache/gap-wave2-20260923/research-factors-ml/c13-work
+model: gpt-6-astra
+provider: openai
+approval: never
+sandbox: read-only
+reasoning effort: ultra
+reasoning summaries: none
+session id: <uuid-redacted>
+--------
+user
+Apply the following skill (SKILL.md and its references from tradermonty/claude-trading-skills backtest-expert at commit bc5515644c70abc90fbc20d15c838c47808ca893) to the task after it.
+
+=== SKILL.md ===
+---
+name: backtest-expert
+description: Expert guidance for systematic backtesting of trading strategies. Use when developing, testing, stress-testing, or validating quantitative trading strategies. Covers "beating ideas to death" methodology, parameter robustness testing, slippage modeling, bias prevention, and interpreting backtest results. Applicable when user asks about backtesting, strategy validation, robustness testing, avoiding overfitting, or systematic trading development.
+---
+
+# Backtest Expert
+
+Systematic approach to backtesting trading strategies based on professional methodology that prioritizes robustness over optimistic results.
+
+## Core Philosophy
+
+**Goal**: Find strategies that "break the least", not strategies that "profit the most" on paper.
+
+**Principle**: Add friction, stress test assumptions, and see what survives. If a strategy holds up under pessimistic conditions, it's more likely to work in live trading.
+
+## When to Use This Skill
+
+Use this skill when:
+- Developing or validating systematic trading strategies
+- Evaluating whether a trading idea is robust enough for live implementation
+- Troubleshooting why a backtest might be misleading
+- Learning proper backtesting methodology
+- Avoiding common pitfalls (curve-fitting, look-ahead bias, survivorship bias)
+- Assessing parameter sensitivity and regime dependence
+- Setting realistic expectations for slippage and execution costs
+
+## Prerequisites
+
+- Python 3.9+ (for evaluation script)
+- No API keys required
+- No external data dependencies — metrics are user-provided
+
+## Workflow
+
+### 1. State the Hypothesis
+
+Define the edge in one sentence.
+
+**Example**: "Stocks that gap up >3% on earnings and pull back to previous day's close within first hour provide mean-reversion opportunity."
+
+If you can't articulate the edge clearly, don't proceed to testing.
+
+### 2. Codify Rules with Zero Discretion
+
+Define with complete specificity:
+- **Entry**: Exact conditions, timing, price type
+- **Exit**: Stop loss, profit target, time-based exit
+- **Position sizing**: Fixed $$, % of portfolio, volatility-adjusted
+- **Filters**: Market cap, volume, sector, volatility conditions
+- **Universe**: What instruments are eligible
+
+**Critical**: No subjective judgment allowed. Every decision must be rule-based and unambiguous.
+
+### 3. Run Initial Backtest
+
+Test over:
+- **Minimum 5 years** (preferably 10+)
+- **Multiple market regimes** (bull, bear, high/low volatility)
+- **Realistic costs**: Commissions + conservative slippage
+
+Examine initial results for basic viability. If fundamentally broken, iterate on hypothesis.
+
+### 4. Stress Test the Strategy
+
+This is where 80% of testing time should be spent.
+
+**Parameter sensitivity**:
+- Test stop loss at 50%, 75%, 100%, 125%, 150% of baseline
+- Test profit target at 80%, 90%, 100%, 110%, 120% of baseline
+- Vary entry/exit timing by ±15-30 minutes
+- Look for "plateaus" of stable performance, not narrow spikes
+
+**Execution friction**:
+- Increase slippage to 1.5-2x typical estimates
+- Model worst-case fills (buy at ask+1 tick, sell at bid-1 tick)
+- Add realistic order rejection scenarios
+- Test with pessimistic commission structures
+
+**Time robustness**:
+- Analyze year-by-year performance
+- Require positive expectancy in majority of years
+- Ensure strategy doesn't rely on 1-2 exceptional periods
+- Test in different market regimes separately
+
+**Sample size**:
+- Absolute minimum: 30 trades
+- Preferred: 100+ trades
+- High confidence: 200+ trades
+
+### 5. Out-of-Sample Validation
+
+**Walk-forward analysis**:
+1. Optimize on training period (e.g., Year 1-3)
+2. Test on validation period (Year 4)
+3. Roll forward and repeat
+4. Compare in-sample vs out-of-sample performance
+
+**Warning signs**:
+- Out-of-sample <50% of in-sample performance
+- Need frequent parameter re-optimization
+- Parameters change dramatically between periods
+
+### 6. Evaluate Results
+
+**Questions to answer**:
+- Does edge survive pessimistic assumptions?
+- Is performance stable across parameter variations?
+- Does strategy work in multiple market regimes?
+- Is sample size sufficient for statistical confidence?
+- Are results realistic, not "too good to be true"?
+
+**Decision criteria**:
+- ✅ **Deploy**: Survives all stress tests with acceptable performance
+- 🔄 **Refine**: Core logic sound but needs parameter adjustment
+- ❌ **Abandon**: Fails stress tests or relies on fragile assumptions
+
+Use the evaluation script for a structured, quantitative assessment:
+
+```bash
+python3 skills/backtest-expert/scripts/evaluate_backtest.py \
+  --total-trades 150 \
+  --win-rate 62 \
+  --avg-win-pct 1.8 \
+  --avg-loss-pct 1.2 \
+  --max-drawdown-pct 15 \
+  --years-tested 8 \
+  --num-parameters 3 \
+  --slippage-tested \
+  --output-dir reports/
+```
+
+The script scores across 5 dimensions (Sample Size, Expectancy, Risk Management, Robustness, Execution Realism), detects red flags, and outputs a Deploy/Refine/Abandon verdict.
+
+## Key Testing Principles
+
+### Punish the Strategy
+
+Add friction everywhere:
+- Commissions higher than reality
+- Slippage 1.5-2x typical
+- Worst-case fills
+- Order rejections
+- Partial fills
+
+**Rationale**: Strategies that survive pessimistic assumptions often outperform in live trading.
+
+### Seek Plateaus, Not Peaks
+
+Look for parameter ranges where performance is stable, not optimal values that create performance spikes.
+
+**Good**: Strategy profitable with stop loss anywhere from 1.5% to 3.0%
+**Bad**: Strategy only works with stop loss at exactly 2.13%
+
+Stable performance indicates genuine edge; narrow optima suggest curve-fitting.
+
+### Test All Cases, Not Cherry-Picked Examples
+
+**Wrong approach**: Study hand-picked "market leaders" that worked
+**Right approach**: Test every stock that met criteria, including those that failed
+
+Selective examples create survivorship bias and overestimate strategy quality.
+
+### Separate Idea Generation from Validation
+
+**Intuition**: Useful for generating hypotheses
+**Validation**: Must be purely data-driven
+
+Never let attachment to an idea influence interpretation of test results.
+
+## Common Failure Patterns
+
+Recognize these patterns early to save time:
+
+1. **Parameter sensitivity**: Only works with exact parameter values
+2. **Regime-specific**: Great in some years, terrible in others
+3. **Slippage sensitivity**: Unprofitable when realistic costs added
+4. **Small sample**: Too few trades for statistical confidence
+5. **Look-ahead bias**: "Too good to be true" results
+6. **Over-optimization**: Many parameters, poor out-of-sample results
+
+See `references/failed_tests.md` for detailed examples and diagnostic framework.
+
+## Output
+
+- `reports/backtest_eval_<timestamp>.json` — structured evaluation with per-dimension scores, red flags, and verdict
+- `reports/backtest_eval_<timestamp>.md` — human-readable report with dimension table, key metrics, and red flag details
+
+## Resources
+
+### Methodology Reference
+**File**: `references/methodology.md`
+
+**When to read**: For detailed guidance on specific testing techniques.
+
+**Contents**:
+- Stress testing methods
+- Parameter sensitivity analysis
+- Slippage and friction modeling
+- Sample size requirements
+- Market regime classification
+- Common biases and pitfalls (survivorship, look-ahead, curve-fitting, etc.)
+
+### Failed Tests Reference
+**File**: `references/failed_tests.md`
+
+**When to read**: When strategy fails tests, or learning from past mistakes.
+
+**Contents**:
+- Why failures are valuable
+- Common failure patterns with examples
+- Case study documentation framework
+- Red flags checklist for evaluating backtests
+
+## Critical Reminders
+
+**Time allocation**: Spend 20% generating ideas, 80% trying to break them.
+
+**Context-free requirement**: If strategy requires "perfect context" to work, it's not robust enough for systematic trading.
+
+**Red flag**: If backtest results look too good (>90% win rate, minimal drawdowns, perfect timing), audit carefully for look-ahead bias or data issues.
+
+**Tool limitations**: Understand your backtesting platform's quirks (interpolation methods, handling of low liquidity, data alignment issues).
+
+**Statistical significance**: Small edges require large sample sizes to prove. 5% edge per trade needs 100+ trades to distinguish from luck.
+
+## Discretionary vs Systematic Differences
+
+This skill focuses on **systematic/quantitative** backtesting where:
+- All rules are codified in advance
+- No discretion or "feel" in execution
+- Testing happens on all historical examples, not cherry-picked cases
+- Context (news, macro) is deliberately stripped out
+
+Discretionary traders study differently—this skill may not apply to setups requiring subjective judgment.
+
+
+=== references/failed_tests.md ===
+# Learning from Failed Backtests
+
+## Table of Contents
+
+1. Why Failed Ideas Are Valuable
+2. Common Failure Patterns
+3. Case Study Framework
+4. Red Flags Checklist
+
+## 1. Why Failed Ideas Are Valuable
+
+### The Value of Failures
+
+**Key insights**:
+- Failed tests save capital by preventing live implementation
+- Failure patterns reveal which assumptions don't hold
+- Understanding what doesn't work narrows the search space
+- Failed tests build experience in recognizing fragile strategies
+
+### Documentation Discipline
+
+**Record for each failed idea**:
+- The hypothesis being tested
+- Why you thought it would work
+- What the data showed
+- Specific breaking points
+- Lessons learned
+
+**Purpose**: Build a library of "anti-patterns" to avoid repeating mistakes.
+
+## 2. Common Failure Patterns
+
+### Pattern 1: Parameter Sensitivity
+
+**Symptom**: Strategy only works with very specific parameter values.
+
+**Example scenario**:
+- Strategy profitable with stop loss at exactly 2.5%
+- Increasing to 3% or decreasing to 2% causes significant performance drop
+- No "plateau" of stable performance
+
+**Why it fails**: Real markets have noise; if small changes break the strategy, it likely captured noise, not signal.
+
+**Lesson**: Seek strategies with stable performance across parameter ranges.
+
+### Pattern 2: Regime-Specific Performance
+
+**Symptom**: Strategy works brilliantly in some years, terribly in others.
+
+**Example scenario**:
+- Great performance in 2017-2019 (low volatility bull market)
+- Catastrophic losses in 2020 (high volatility)
+- Poor performance in 2022 (downtrend)
+
+**Why it fails**: Strategy dependent on specific market conditions, not robust enough for diverse environments.
+
+**Lesson**: Require acceptable (not necessarily best) performance across all regimes.
+
+### Pattern 3: Slippage Sensitivity
+
+**Symptom**: Strategy becomes unprofitable when realistic trading costs added.
+
+**Example scenario**:
+- Backtest shows 0.5% average gain per trade
+- Adding 0.1% slippage per side (0.2% round-trip) eliminates profits
+- Strategy requires unrealistic fills to be profitable
+
+**Why it fails**: Edge too small to survive real-world friction.
+
+**Lesson**: Edge must be large enough to survive pessimistic assumptions about costs.
+
+### Pattern 4: Sample Size Issues
+
+**Symptom**: Strong results based on small number of trades.
+
+**Example scenario**:
+- Backtest shows 80% win rate
+- Only 15 total trades in 5 years
+- A few different outcomes would dramatically change results
+
+**Why it fails**: Insufficient data to distinguish edge from luck.
+
+**Lesson**: Require minimum 100 trades for meaningful conclusions, preferably 200+.
+
+### Pattern 5: Look-Ahead Bias
+
+**Symptom**: Perfect or near-perfect backtest results.
+
+**Example scenario**:
+- Strategy shows 95%+ win rate
+- Unrealistically good entry/exit timing
+- Performance too good to be realistic
+
+**Why it fails**: Likely using information not available at time of trade.
+
+**Lesson**: Be suspicious of "too good to be true" results; audit data alignment carefully.
+
+### Pattern 6: Over-Optimization (Curve Fitting)
+
+**Symptom**: Complex strategy with many parameters shows excellent in-sample results but poor out-of-sample.
+
+**Example scenario**:
+- Strategy uses 8-10 different indicators with specific thresholds
+- In-sample performance: 40% annual return
+- Out-of-sample performance: -5% annual return
+- Parameters needed constant re-optimization
+
+**Why it fails**: Fitted to historical noise rather than genuine market structure.
+
+**Lesson**: Prefer simple strategies with fewer parameters; demand strong out-of-sample results.
+
+## 3. Case Study Framework
+
+### Template for Documenting Failed Ideas
+
+Use this framework when a backtest fails:
+
+#### 1. Initial Hypothesis
+- **What edge were you trying to capture?**
+- **Why did you think this would work?**
+- **What was the logical basis?**
+
+#### 2. Implementation Details
+- **Entry rules** (specific and complete)
+- **Exit rules** (stop loss, profit target, time-based)
+- **Position sizing**
+- **Filters or conditions**
+
+#### 3. Test Results
+- **Basic metrics**:
+  - Total trades
+  - Win rate
+  - Average win/loss
+  - Max drawdown
+  - Annual returns by year
+
+- **Parameter sensitivity**:
+  - How results changed with parameter variations
+  - Whether "plateau" of stable performance existed
+
+- **Regime analysis**:
+  - Performance in different market conditions
+  - Which regimes caused problems
+
+#### 4. Breaking Points
+- **What specifically caused the strategy to fail?**
+  - Slippage too high?
+  - Parameter sensitivity?
+  - Regime-specific?
+  - Insufficient sample size?
+
+#### 5. Lessons Learned
+- **What assumptions were wrong?**
+- **What would you test differently next time?**
+- **Are there salvageable elements?**
+
+### Example: Failed Momentum Reversal Strategy
+
+#### 1. Initial Hypothesis
+Tried to capture mean reversion after strong momentum moves. Hypothesis: Stocks that gap up 5%+ on earnings often pull back 2-3% before continuing, providing short-term reversal opportunity.
+
+#### 2. Implementation
+- Entry: Short when stock gaps up 5%+ on earnings at market open
+- Exit: Cover at 2% profit or 3% stop loss
+- Holding period: Maximum 3 days
+- Filters: Market cap >$2B, average volume >500K shares
+
+#### 3. Test Results
+- 67 trades over 5 years
+- Win rate: 58%
+- Avg win: 2.1%, Avg loss: 3.2%
+- Max drawdown: 18%
+- 2019-2021: Profitable
+- 2022-2023: Significant losses
+
+#### 4. Breaking Points
+- Strategy failed during strong momentum environments (2021 meme stocks)
+- Stop losses hit frequently during continued upward momentum
+- Gap-ups that continued higher immediately caused outsized losses
+- Small sample size (67 trades) provided low statistical confidence
+- Slippage on short entries during high volatility eliminated thin edge
+
+#### 5. Lessons Learned
+- Mean reversion strategies vulnerable during momentum regimes
+- Need regime filter (e.g., only trade during high VIX or weak market)
+- 5-year test insufficient for momentum strategies; need 10+ years
+- Edge too small (2% target vs 3% stop) to survive slippage
+- Better approach: Wait for actual pullback, then enter, rather than fade immediately
+
+## 4. Red Flags Checklist
+
+Use this checklist when evaluating any backtest:
+
+### Data Quality Issues
+- [ ] Has survivorship bias been addressed?
+- [ ] Are delisted stocks included in test?
+- [ ] Is data alignment correct (no look-ahead bias)?
+- [ ] Are corporate actions (splits, dividends) handled correctly?
+
+### Sample Size Concerns
+- [ ] At least 100 trades? (Preferably 200+)
+- [ ] At least 5 years of data? (Preferably 10+)
+- [ ] Includes full market cycle?
+- [ ] Tested across multiple market regimes?
+
+### Parameter Robustness
+- [ ] Does strategy work with nearby parameter values?
+- [ ] Are there "plateaus" of stable performance?
+- [ ] Minimal parameters (ideally <5)?
+- [ ] Parameters based on logical reasoning, not pure optimization?
+
+### Execution Realism
+- [ ] Realistic commissions included?
+- [ ] Slippage modeled conservatively (1.5-2x typical)?
+- [ ] Worst-case fills considered?
+- [ ] Order rejection/partial fills addressed?
+
+### Performance Characteristics
+- [ ] Positive expectancy in majority of years?
+- [ ] Acceptable performance in all major regimes?
+- [ ] No catastrophic drawdowns (>50%)?
+- [ ] Edge large enough to survive friction?
+
+### Bias Prevention
+- [ ] Strategy defined before testing?
+- [ ] Hypothesis has economic logic?
+- [ ] Results aren't "too good to be true"?
+- [ ] Out-of-sample testing performed?
+- [ ] No cherry-picking of examples?
+
+### Tool Limitations
+- [ ] Aware of testing platform's interpolation methods?
+- [ ] Understand how platform handles low-liquidity situations?
+- [ ] Know quirks specific to data provider?
+
+**If more than 2-3 items aren't checked, the backtest requires additional work before considering live implementation.**
+
+
+=== references/methodology.md ===
+# Backtesting Methodology Reference
+
+## Table of Contents
+
+1. Core Testing Techniques
+2. Stress Testing Methods
+3. Parameter Sensitivity Analysis
+4. Slippage and Friction Modeling
+5. Sample Size Guidelines
+6. Market Regime Analysis
+7. Common Pitfalls and Biases
+
+## 1. Core Testing Techniques
+
+### "Beat Ideas to Death" Approach
+
+**Core principle**: Add friction and punishment to find strategies that break the least, not those that profit the most on paper.
+
+**Key techniques**:
+- Multiple stop loss variations
+- Different profit targets
+- Realistic + exaggerated commissions
+- Worst-case fills
+- Extended time periods
+- Multiple market regimes
+
+### The 80/20 Rule for R&D Time
+
+- 20% generating and codifying ideas
+- 80% stress testing and trying to break them
+
+## 2. Stress Testing Methods
+
+### Execution Friction Tests
+
+**Required friction additions**:
+- Realistic commissions (actual broker rates)
+- Pessimistic slippage (1.5-2x typical)
+- Worst-case entry fills (ask + 1-2 ticks)
+- Worst-case exit fills (bid - 1-2 ticks)
+- Order rejection scenarios
+- Partial fills
+
+### Parameter Robustness Tests
+
+Test across multiple configurations:
+- Entry timing variations (±15-30 minutes)
+- Stop loss distances (50%, 75%, 100%, 125%, 150% of baseline)
+- Profit targets (80%, 90%, 100%, 110%, 120% of baseline)
+- Position sizing rules
+- Filter thresholds
+
+**Goal**: Find "plateau" performance where small parameter changes don't drastically alter results.
+
+### Time-Based Robustness
+
+**Minimum requirements**:
+- Test across at least 5-10 years
+- Include multiple market regimes:
+  - Bull markets
+  - Bear markets
+  - High volatility periods
+  - Low volatility periods
+  - Trending markets
+  - Range-bound markets
+
+**Year-by-year analysis**: Strategy should show positive expectancy in majority of years, not rely on 1-2 exceptional years.
+
+## 3. Parameter Sensitivity Analysis
+
+### Heat Map Analysis
+
+Create 2D heat maps varying two parameters simultaneously:
+- Profit target (rows) × Stop loss (columns)
+- Entry time (rows) × Exit time (columns)
+- Volatility filter (rows) × Volume filter (columns)
+
+**Interpretation**:
+- Robust strategies show "plateaus" of consistent performance
+- Fragile strategies show "spikes" or narrow optimal ranges
+- Avoid strategies with performance cliffs at parameter boundaries
+
+### Walk-Forward Analysis
+
+1. Optimize parameters on training period (e.g., Year 1-2)
+2. Test with those parameters on validation period (Year 3)
+3. Roll forward and repeat
+4. Compare in-sample vs out-of-sample performance
+
+**Warning signs**:
+- Out-of-sample performance <50% of in-sample
+- Frequent need to re-optimize parameters
+- Parameters that change dramatically between periods
+
+### Profit Factor Scoring in Evaluation Script
+
+The evaluation script scores profit factor (PF) as one component of the Risk Management dimension (0-8 points out of 20). The mapping uses continuous linear interpolation with integer truncation:
+
+- PF < 1.0 → 0 points (unprofitable)
+- PF 1.0 to 3.0 → linear 0 to 8 points: `int((PF - 1.0) / 2.0 * 8)`
+- PF >= 3.0 → 8 points (capped)
+
+The `int()` truncation creates discrete 1-point steps (e.g., PF 1.25→1 pt, PF 1.50→2 pt). This is intentional — integer scoring avoids false precision from fractional differences in profit factor.
+
+## 4. Slippage and Friction Modeling
+
+### Realistic Slippage Assumptions
+
+**By market capitalization**:
+- Mega cap (>$200B): 0.01-0.02%
+- Large cap ($10B-$200B): 0.02-0.05%
+- Mid cap ($2B-$10B): 0.05-0.10%
+- Small cap ($300M-$2B): 0.10-0.20%
+- Micro cap (<$300M): 0.20-0.50%+
+
+**By order type**:
+- Market orders: Higher slippage
+- Limit orders: Lower slippage but potential non-fills
+- Stop orders: Significant slippage in volatile conditions
+
+### Conservative Testing Approach
+
+Use 1.5-2x typical slippage estimates for stress testing:
+- If typical slippage is 0.05%, test with 0.075-0.10%
+- If typical is 0.10%, test with 0.15-0.20%
+
+**Rationale**: Strategies that survive pessimistic assumptions often perform better in practice than in backtests.
+
+## 5. Sample Size Guidelines
+
+### Minimum Trade Requirements
+
+**Statistical significance thresholds**:
+- Absolute minimum: 30 trades
+- Preferred minimum: 100 trades
+- High confidence: 200+ trades
+
+**Why large samples matter**:
+- Reduces impact of outliers
+- Provides statistical confidence
+- Reveals true edge vs luck
+
+### Time Period Considerations
+
+**Minimum testing period**: 5 years
+**Preferred testing period**: 10+ years
+
+**Must include**:
+- At least one full market cycle
+- Multiple volatility regimes
+- Different Federal Reserve policy environments
+
+## 6. Market Regime Analysis
+
+### Regime Classification
+
+**Volatility-based regimes**:
+- Low volatility: VIX <15
+- Normal volatility: VIX 15-25
+- High volatility: VIX 25-35
+- Extreme volatility: VIX >35
+
+**Trend-based regimes**:
+- Strong uptrend: Market +10%+ over 6 months
+- Moderate uptrend: Market +5% to +10% over 6 months
+- Sideways: Market -5% to +5% over 6 months
+- Downtrend: Market <-5% over 6 months
+
+### Performance Requirements by Regime
+
+**Robust strategy characteristics**:
+- Positive expectancy in majority of regimes
+- Acceptable (not necessarily best) in all regimes
+- No catastrophic failures in any single regime
+- Understanding of which regime causes weakness
+
+## 7. Common Pitfalls and Biases
+
+### Survivorship Bias
+
+**Issue**: Testing only on currently-trading stocks ignores delisted/bankrupt companies.
+
+**Solution**: Use survivorship-bias-free datasets that include historical delistings.
+
+### Look-Ahead Bias
+
+**Issue**: Using information not available at the time of trade.
+
+**Examples**:
+- Using EOD data for intraday decisions
+- Using next-day's open for today's close decisions
+- Calculating indicators with future data points
+
+**Prevention**: Strict timestamp control and data alignment checks.
+
+### Curve-Fitting (Over-Optimization)
+
+**Warning signs**:
+- Too many parameters (>=7 triggers over-optimization flag; <=4 is ideal, 5-6 acceptable)
+- Highly specific parameter values (e.g., RSI = 37.3)
+- Perfect backtest results
+- Large performance drop in validation period
+
+**Prevention techniques**:
+- Limit parameters to essential ones only
+- Use round numbers when possible
+- Require out-of-sample testing
+- Analyze parameter sensitivity
+
+### Sample Selection Bias
+
+**Issue**: Testing only on hand-picked examples (e.g., known market leaders).
+
+**Problem**: Ignoring all stocks that met criteria but failed creates false impression of strategy quality.
+
+**Solution**: Test on ALL historical examples meeting the criteria, not just successful outcomes.
+
+### Hindsight Bias
+
+**Issue**: Using outcome knowledge to influence decisions.
+
+**Prevention for systematic trading**:
+- Define all rules in advance
+- No manual intervention based on hindsight
+- Test rules across all cases, not cherry-picked examples
+
+### Data Mining Bias
+
+**Issue**: Testing hundreds of strategies until finding one that "works" by random chance.
+
+**Risk**: With enough attempts, random data will produce seemingly profitable patterns.
+
+**Mitigation**:
+- Have hypothesis before testing
+- Require economic logic for the edge
+- Use Bonferroni correction for multiple comparisons
+- Demand higher significance thresholds (p < 0.01 instead of p < 0.05)
+
+
+=== TASK ===
+You are reviewing a Python backtest for methodological defects that would make its reported results misleading. Read the file momentum_backtest.py (line-numbered below). Report every defect you find. Output ONLY a JSON array; each element is {"line": <int line number where the defect is most directly located>, "category": <one of ["look_ahead", "survivorship", "transaction_costs", "in_sample_selection", "overfitting_multiple_testing", "label_leakage_cv", "data_quality", "risk_metric_error", "position_sizing", "other"]>, "explanation": <one sentence>}. Do not run any commands.
+
+momentum_backtest.py:
+  1  """Daily cross-sectional momentum backtest for US large caps (review fixture)."""
+  2  import itertools
+  3  
+  4  import numpy as np
+  5  import pandas as pd
+  6  
+  7  
+  8  def load_prices(path):
+  9      prices = pd.read_csv(path, index_col=0, parse_dates=True)
+ 10      prices = prices.sort_index()
+ 11      if prices.index.has_duplicates:
+ 12          raise ValueError("duplicate session")
+ 13      return prices
+ 14  
+ 15  
+ 16  def load_universe(path):
+ 17      # Tickers that are in the S&P 500 as of the download date (2026-09-01).
+ 18      members = pd.read_csv(path)
+ 19      return sorted(members["ticker"].unique())
+ 20  
+ 21  
+ 22  def momentum_signal(prices, lookback):
+ 23      score = prices / prices.shift(lookback) - 1
+ 24      ranks = score.rank(axis=1, ascending=False)
+ 25      return (ranks <= 10).astype(float) / 10
+ 26  
+ 27  
+ 28  def forward_labels(prices, horizon):
+ 29      return prices.shift(-horizon) / prices - 1
+ 30  
+ 31  
+ 32  def run_backtest(prices, lookback):
+ 33      weights = momentum_signal(prices, lookback)
+ 34      daily_returns = prices.pct_change()
+ 35      strategy = (weights * daily_returns).sum(axis=1)
+ 36      return strategy
+ 37  
+ 38  
+ 39  def sharpe(returns):
+ 40      returns = returns.dropna()
+ 41      if returns.std() == 0:
+ 42          return 0.0
+ 43      return float(np.sqrt(252) * returns.mean() / returns.std())
+ 44  
+ 45  
+ 46  def max_drawdown(returns):
+ 47      equity = (1 + returns.fillna(0)).cumprod()
+ 48      peak = equity.cummax()
+ 49      return float((equity / peak - 1).min())
+ 50  
+ 51  
+ 52  def train_classifier(prices, horizon=20):
+ 53      from sklearn.linear_model import LogisticRegression
+ 54      from sklearn.model_selection import KFold
+ 55      features = prices.pct_change(5).stack().to_frame("ret5")
+ 56      labels = (forward_labels(prices, horizon).stack() > 0).astype(int)
+ 57      frame = features.join(labels.rename("up")).dropna()
+ 58      scores = []
+ 59      for train, test in KFold(n_splits=5, shuffle=True, random_state=0).split(frame):
+ 60          model = LogisticRegression().fit(frame.iloc[train][["ret5"]], frame.iloc[train]["up"])
+ 61          scores.append(model.score(frame.iloc[test][["ret5"]], frame.iloc[test]["up"]))
+ 62      return float(np.mean(scores))
+ 63  
+ 64  
+ 65  def main(price_path, universe_path):
+ 66      prices = load_prices(price_path)
+ 67      universe = load_universe(universe_path)
+ 68      prices = prices[[t for t in universe if t in prices.columns]]
+ 69      results = {}
+ 70      for lookback in [20, 60, 120, 250]:
+ 71          results[lookback] = sharpe(run_backtest(prices, lookback))
+ 72      best = max(results, key=results.get)
+ 73      oos = run_backtest(prices, best)
+ 74      print("best lookback", best)
+ 75      print("out-of-sample sharpe", sharpe(oos))
+ 76      print("max drawdown", max_drawdown(oos))
+ 77      print("classifier accuracy", train_classifier(prices))
+ 78  
+ 79  
+ 80  if __name__ == "__main__":
+ 81      import sys
+ 82      main(sys.argv[1], sys.argv[2])
+
+hook: SessionStart
+hook: SessionStart
+hook: SessionStart Completed
+hook: SessionStart Completed
+hook: UserPromptSubmit
+hook: UserPromptSubmit
+hook: UserPromptSubmit Completed
+hook: UserPromptSubmit Completed
+codex
+[
+  {
+    "line": 17,
+    "category": "survivorship",
+    "explanation": "Applying the download-date S&P 500 membership throughout history excludes former constituents and includes current constituents before their historical admission."
+  },
+  {
+    "line": 25,
+    "category": "position_sizing",
+    "explanation": "Default average ranks can admit more than ten stocks when scores tie at the cutoff, so dividing every selected position by ten can create unintended leverage."
+  },
+  {
+    "line": 34,
+    "category": "data_quality",
+    "explanation": "Leaving missing-price handling to pandas' version-dependent pct_change default can forward-fill gaps into artificial zero returns, and the feature calculation has the same issue."
+  },
+  {
+    "line": 35,
+    "category": "look_ahead",
+    "explanation": "Weights calculated using today's closing prices receive today's close-to-close returns, crediting the strategy with returns earned before its selection information was available."
+  },
+  {
+    "line": 35,
+    "category": "transaction_costs",
+    "explanation": "Daily portfolio rebalancing incurs no commissions, bid-ask spread, slippage, or market impact in the reported returns."
+  },
+  {
+    "line": 35,
+    "category": "data_quality",
+    "explanation": "The default skip-NA summation silently ignores missing asset returns and converts entirely missing rows to zero, potentially concealing unavailable valuations and delisting losses."
+  },
+  {
+    "line": 59,
+    "category": "label_leakage_cv",
+    "explanation": "Shuffling stacked stock-date observations trains models on future dates and on other securities from validation dates, so the accuracy does not represent prospective prediction."
+  },
+  {
+    "line": 59,
+    "category": "label_leakage_cv",
+    "explanation": "The folds do not purge overlapping 20-session label intervals, allowing training outcomes to incorporate price movements occurring within validation outcome windows."
+  },
+  {
+    "line": 68,
+    "category": "data_quality",
+    "explanation": "Silently excluding universe members absent from the price file conditions the tested universe on data availability and hides coverage-related selection bias."
+  },
+  {
+    "line": 72,
+    "category": "overfitting_multiple_testing",
+    "explanation": "Selecting the highest historical Sharpe across four lookbacks without accounting for the parameter search produces an optimistically selected performance estimate."
+  },
+  {
+    "line": 73,
+    "category": "in_sample_selection",
+    "explanation": "The purported out-of-sample backtest reuses exactly the price history used to select the winning lookback, leaving no independent validation period."
+  }
+]
+hook: Stop
+hook: Stop
+hook: Stop Completed
+hook: Stop Completed
+tokens used
+19,917

@@ -1,0 +1,98 @@
+{
+ "IBM": {
+  "2016": {
+   "compared": 252,
+   "different": 62,
+   "max_abs": "0.1000"
+  },
+  "2017": {
+   "compared": 251,
+   "different": 40,
+   "max_abs": "0.1200"
+  },
+  "2018": {
+   "compared": 251,
+   "different": 54,
+   "max_abs": "0.9900"
+  },
+  "2019": {
+   "compared": 252,
+   "different": 27,
+   "max_abs": "0.4500"
+  },
+  "2020": {
+   "compared": 253,
+   "different": 28,
+   "max_abs": "2.2100"
+  },
+  "2021": {
+   "compared": 61,
+   "different": 0,
+   "max_abs": "0"
+  }
+ },
+ "SPY": {
+  "2016": {
+   "compared": 252,
+   "different": 229,
+   "max_abs": "0.2400"
+  },
+  "2017": {
+   "compared": 251,
+   "different": 229,
+   "max_abs": "0.2000"
+  },
+  "2018": {
+   "compared": 251,
+   "different": 229,
+   "max_abs": "0.4500"
+  },
+  "2019": {
+   "compared": 252,
+   "different": 230,
+   "max_abs": "0.2300"
+  },
+  "2020": {
+   "compared": 253,
+   "different": 239,
+   "max_abs": "7.1300"
+  },
+  "2021": {
+   "compared": 61,
+   "different": 58,
+   "max_abs": "0.3500"
+  }
+ },
+ "AAPL": {
+  "2016": {
+   "compared": 252,
+   "different": 2,
+   "max_abs": "0.0500"
+  },
+  "2017": {
+   "compared": 251,
+   "different": 8,
+   "max_abs": "0.1320"
+  },
+  "2018": {
+   "compared": 251,
+   "different": 9,
+   "max_abs": "0.1300"
+  },
+  "2019": {
+   "compared": 252,
+   "different": 3,
+   "max_abs": "0.2500"
+  },
+  "2020": {
+   "compared": 253,
+   "different": 17,
+   "max_abs": "0.3400"
+  },
+  "2021": {
+   "compared": 61,
+   "different": 4,
+   "max_abs": "0.0600"
+  }
+ }
+}

@@ -1,0 +1,5 @@
+346c346
+<         return count === 1 ? word : word + 's';
+---
+>         return count === 0 ? word : word + 's';
+diff exit (1 = mutation applied): 1

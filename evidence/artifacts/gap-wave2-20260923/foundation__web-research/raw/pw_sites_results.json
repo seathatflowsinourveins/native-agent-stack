@@ -1,0 +1,32 @@
+[
+ {
+  "url": "https://example.com",
+  "success": true,
+  "ms": 131,
+  "title": "Example Domain"
+ },
+ {
+  "url": "https://en.wikipedia.org/wiki/Special:Random",
+  "success": true,
+  "ms": 691,
+  "title": "Slovakia men's national ball hockey team - Wikipedia"
+ },
+ {
+  "url": "https://www.iana.org/domains/reserved",
+  "success": true,
+  "ms": 300,
+  "title": "IANA-managed Reserved Domains"
+ },
+ {
+  "url": "https://playwright.dev",
+  "success": true,
+  "ms": 273,
+  "title": "Playwright"
+ },
+ {
+  "url": "https://httpstat.us/200",
+  "success": true,
+  "ms": 13386,
+  "title": "404 Not Found"
+ }
+]

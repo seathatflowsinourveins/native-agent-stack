@@ -1,0 +1,13 @@
+{
+ "gap_index": 12,
+ "slug": "exhaustive-source-recovery",
+ "written_at": "2026-09-23T07:23:05Z",
+ "written_before_results": true,
+ "expectation": "SocratiCode will find at least one gold location for most queries (recall@10 >= 0.8) but completeness will be much lower for multi-location concerns (mean completeness@10 perhaps 0.4-0.6), because top-k chunk search is not an exhaustive enumerator.",
+ "criteria": [
+  "Sealed 32-query set (gap12_queries.json, sha256 recorded before indexing) with exhaustive pattern-defined gold over scripts/*.py at 41d39b3 (176 locations).",
+  "SocratiCode 1.14.0 against a disposable Qdrant; codebase_search limit 10, minScore 0.",
+  "A gold line counts as recovered at k when a top-k chunk has the same file and its line range contains the line.",
+  "Report hit@5/@10, MRR, mean completeness@5/@10 and fully-complete@10 fraction; list per-query misses."
+ ]
+}

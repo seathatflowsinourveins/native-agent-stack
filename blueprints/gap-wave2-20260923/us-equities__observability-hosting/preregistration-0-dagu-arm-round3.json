@@ -1,0 +1,7 @@
+{
+ "written_at": "2026-09-23T08:04:37Z",
+ "label": "round-3 preregistration, written after the second independent Codex review (of commit 09c77d0) and before round 3 ran",
+ "deviation": "Review finding: rounds 1 and 2 configured Loki with ports only, so Loki's HTTP (33100/33110) and gRPC (33101/33111) listeners bound all interfaces, contradicting the 'loopback only' claim. Round 3 binds Loki's http_listen_address and grpc_listen_address to 127.0.0.1, records every listening socket owned by the run's processes (ss -ltnp) as a probe that can detect a non-loopback bind, asserts query results in-script (PASS/FAIL lines: 4 span names before kill, after restart and from the restored TSDB; the pre-kill Loki marker timestamps present after restart and in the restored store), and records a process count for the scratch path after stop (pgrep -f).",
+ "expectation": "Every listener of the run's processes is on 127.0.0.1; all PASS lines; zero processes left for the scratch path; same substantive results as round 2.",
+ "criteria": "Any non-loopback listener or FAIL line is reported verbatim and kept in the receipt; rounds 1 and 2 stay in the record with the wildcard-bind disclosure."
+}

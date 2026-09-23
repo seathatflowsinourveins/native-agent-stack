@@ -1,0 +1,37 @@
+{
+ "inputs": [
+  "raw/compare/syft.summary.json#package_list",
+  "raw/compare/trivy.json#Results[].Packages"
+ ],
+ "normalization": "PEP 503: re.sub(r'[-_.]+', '-', name).lower(); versions compared verbatim",
+ "syft_packages": 21,
+ "trivy_packages": 21,
+ "raw": {
+  "syft_only": [
+   [
+    "pydantic-core",
+    "2.46.5"
+   ],
+   [
+    "typing-extensions",
+    "4.16.0"
+   ]
+  ],
+  "trivy_only": [
+   [
+    "pydantic_core",
+    "2.46.5"
+   ],
+   [
+    "typing_extensions",
+    "4.16.0"
+   ]
+  ],
+  "both": 19
+ },
+ "normalized": {
+  "syft_only": [],
+  "trivy_only": [],
+  "both": 21
+ }
+}

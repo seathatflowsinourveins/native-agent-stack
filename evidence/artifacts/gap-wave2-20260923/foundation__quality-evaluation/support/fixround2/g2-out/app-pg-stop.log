@@ -1,0 +1,3 @@
+.runtime/postgresql/18.6/bin/pg_ctl -D .runtime/native-pgdata -m fast -w stop
+waiting for server to shut down.... done
+server stopped

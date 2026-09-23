@@ -1,0 +1,54 @@
+{
+  "id": "14-network-bytes-advanced",
+  "gap_index": 14,
+  "gap_text_sha256": "bb4226e64975e466e8c1df05c248cb7f664b080c87403c8670cedea8bfe9c0f8",
+  "preregistration": {
+    "written_at": "2026-09-23T01:30:40Z",
+    "late": true,
+    "expectation": "Rerun the synthetic ai-memory comparison with the embedding opt-out (AI_MEMORY_EMBEDDING_PROVIDER=none) inside `unshare -rn` (a fresh network namespace with only `lo`, brought up manually, and no other network device), against a disposable data dir on an alternate port, with AI_MEMORY_SERVER_URL pointed at that alternate port. Because the namespace has no non-loopback device at all, the live ai-memory.service on the host's default port is also unreachable from inside it, independently forcing correct isolation (unlike gap 11's incident, which relied only on a port change). Expect either a measured zero external-network-byte delta, or -- if any non-lo interface exists in the namespace -- a zero byte delta on it during the writes.",
+    "criteria": "As written after the run: a byte count around the opt-out path. Settling the gap needs both next_check arms and a probe that can detect an attempted egress.",
+    "late_reason": "Written by the fix round at 01:30:40Z, after the 01:23:12Z run; the transcript contains no earlier preregistration. The previous late:false and 01:20:00Z were wrong.",
+    "timestamp_note": "Timestamps reconciled on 2026-09-23T02:30:41Z from the unit workers' session transcripts (tool-call times, listed in raw/INDEX.json). The earlier value 2026-09-23T01:20:00Z was shared by every receipt, fell after the first-pass commit (01:19:05Z) and matched no recorded event."
+  },
+  "commands": [
+    {
+      "cmd": "timeout 60 unshare -rn bash $SCRATCHPAD/gap14-probe.sh 2>&1 | tail -100   (script committed as raw/gap14-probe.sh)",
+      "exit": 0,
+      "raw": "evidence/artifacts/gap-wave2-20260923/foundation__durable-memory/raw/fix-round-gap14-netns-probe.txt",
+      "output_excerpt": "BEFORE: lo: 0 0 ... 0 0 (the only interface in /proc/net/dev)\nstatus: server http://127.0.0.1:49590, data-dir $HOME/.cache/gap-wave2-20260923/durable-memory/net-probe, pages 0, providers llm: disabled, embedding: disabled\n✓ wrote scratch/net-probe.md (page_id=01a0cbdc) under disposable-ws/disposable-proj\nAFTER: lo: 3299 20 ... 3299 20\nserve.log: AI_MEMORY_EMBEDDING_PROVIDER unset; vector search disabled (FTS5 + entity + graph active)",
+      "note": "The script exported AI_MEMORY_EMBEDDING_PROVIDER=none and AI_MEMORY_SERVER_URL=http://127.0.0.1:49590 for every client call. The 3299 lo bytes cover `ai-memory status`, `write-page` and a 0.5 s sleep between the two reads, not one write-page call. `ip addr show` output was cut by `tail -100`; the only-lo claim rests on /proc/net/dev.",
+      "raw_published": false,
+      "raw_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    {
+      "cmd": "timeout 20 ai-memory status 2>&1 | head -20 (call [7], 01:22:21Z) and ai-memory status 2>&1 | grep -E \"pages|data-dir\" (call [13], 01:23:25Z)",
+      "exit": 0,
+      "raw": "evidence/artifacts/gap-wave2-20260923/foundation__durable-memory/raw/fix-round-live-status-before-gap14.txt",
+      "output_excerpt": "before: pages 120 (all versions: 405); after: pages 120 (all versions: 405)",
+      "note": "These were CLI calls to the LIVE service (read-only), which breaks the rule that every ai-memory CLI call targets an isolated server. After-output is in raw/fix-round-gap14-netns-probe.txt.",
+      "raw_published": false,
+      "raw_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    }
+  ],
+  "results": "Advanced, not settled. What the raw output shows: inside `unshare -rn`, with lo the only interface, a disposable instance with AI_MEMORY_EMBEDDING_PROVIDER=none served on 127.0.0.1:49590 and completed init, status and write-page with no network device; /proc/net/dev moved from 0 to 3299 bytes on lo across status plus write-page. What it cannot show: whether the opt-out path still attempts egress. In a namespace without a route, a connect() to any non-loopback address fails (ENETUNREACH) before any byte is counted, so /proc/net/dev cannot detect an attempted download, which was the original problem. Only the last 30 serve.log lines were captured, so the log does not rule out an attempt either. Remaining: (1) the next_check's separate arm, a /proc/net/dev or nethogs byte delta with a real network device present, or `strace -f -e trace=connect` evidence that no non-loopback connect is attempted; (2) the full synthetic comparison sequence rather than init/serve/status/write-page.",
+  "outcome": "advanced",
+  "evidence_class": "local_integration",
+  "limits": [
+    "Detection method: /proc/net/dev byte counters inside a device-less namespace. They can show that no non-loopback bytes were sent, but cannot detect a failed connection attempt.",
+    "Only one write-page (plus two status calls) was exercised, not the synthetic comparison.",
+    "The live-store status reads were CLI calls to the live service; read-only, but a rule break.",
+    "Disposable data dir and serve process were removed afterwards (transcript calls [13], [29], [51])."
+  ],
+  "checked_at": "2026-09-23T01:23:12Z",
+  "checked_at_note": "Time of the probe run (fix-round transcript Bash call [12]); the probe script was written in the same call.",
+  "reconciliation": {
+    "reconciled_at": "2026-09-23T02:30:41Z",
+    "new_checks_run": false,
+    "changes": [
+      "settled -> advanced (reviewer finding: netns arm only; cannot detect attempted egress; not the full comparison).",
+      "3299-byte delta re-described as spanning status + write-page.",
+      "late:false/01:20:00Z replaced with the real written_at (late) and run time.",
+      "Before/after live status commands now recorded, with raw output, and disclosed as rule breaks."
+    ]
+  }
+}

@@ -1,0 +1,347 @@
+State Recv-Q Send-Q Local Address:Port Peer Address:PortProcess
+   Compiling slab v0.4.12
+   Compiling hyper v1.9.0
+   Compiling futures-util v0.3.32
+   Compiling hyper-util v0.1.20
+   Compiling tower v0.5.3
+   Compiling tokio-util v0.7.18
+   Compiling futures-executor v0.3.32
+   Compiling sse-stream v0.2.6
+   Compiling rstest v0.26.1
+   Compiling futures v0.3.32
+   Compiling tower-http v0.6.11
+   Compiling hyper-rustls v0.27.9
+   Compiling axum v0.8.9
+   Compiling reqwest v0.12.28
+   Compiling reqwest v0.13.4
+   Compiling rmcp v2.2.0
+   Compiling ai-memory-llm v2.4.0 ($HOME/.cache/gap-wave2-20260923/agents-models-workers/src/ai-memory-2.4.0/crates/ai-memory-llm)
+   Compiling ai-memory-wiki v2.4.0 ($HOME/.cache/gap-wave2-20260923/agents-models-workers/src/ai-memory-2.4.0/crates/ai-memory-wiki)
+   Compiling ai-memory-consolidate v2.4.0 ($HOME/.cache/gap-wave2-20260923/agents-models-workers/src/ai-memory-2.4.0/crates/ai-memory-consolidate)
+   Compiling ai-memory-web v2.4.0 ($HOME/.cache/gap-wave2-20260923/agents-models-workers/src/ai-memory-2.4.0/crates/ai-memory-web)
+   Compiling ai-memory-hooks v2.4.0 ($HOME/.cache/gap-wave2-20260923/agents-models-workers/src/ai-memory-2.4.0/crates/ai-memory-hooks)
+   Compiling ai-memory-mcp v2.4.0 ($HOME/.cache/gap-wave2-20260923/agents-models-workers/src/ai-memory-2.4.0/crates/ai-memory-mcp)
+   Compiling ai-memory-cli v2.4.0 ($HOME/.cache/gap-wave2-20260923/agents-models-workers/src/ai-memory-2.4.0/crates/ai-memory-cli)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 37.46s
+     Running tests/suite/main.rs ($HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/target/debug/deps/suite-44adb8d18a69a95f)
+
+running 127 tests
+test completions::an_unknown_shell_fails_without_emitting_a_script ... ok
+test hook_drain::hook_drain_is_hidden_from_top_level_help ... ok
+test hook_drain::hidden_hook_drain_empty_spool_writes_no_stdout ... ok
+test completions::scripts_cover_subcommands_from_across_the_tree ... ok
+test hook_payload::codex_capture_off_does_not_capture_assistant_message ... ok
+test autoscope_env::pascalcase_mode_fails_fast ... ok
+test autoscope_env::empty_mode_string_fails_fast ... ok
+test autoscope_env::invalid_mode_value_fails_fast ... ok
+test completions::every_supported_shell_emits_a_script_naming_the_binary ... ok
+test hook_payload::codex_opted_in_stop_captures_and_sanitizes_assistant_message ... ok
+test hook_payload::malformed_native_hook_payload_warns_without_leaking_or_spooling ... ok
+test autoscope_env::ttl_and_max_entries_via_env ... ok
+test autoscope_env::per_actor_mode_via_env ... ok
+test autoscope_env::session_ttl_zero_clamps_and_starts ... ok
+test autoscope_env::single_mode_is_still_selectable_via_env ... ok
+test autoscope_env::max_entries_zero_clamps_and_starts ... ok
+test packaging::aur_packages_install_all_native_assets ... ok
+test autoscope_env::per_session_mode_via_env ... ok
+test packaging::docker_context_excludes_operator_deployment_files ... ok
+test packaging::docker_source_build_uses_vendored_tailwind ... ok
+test packaging::docker_publish_jobs_use_prebuilt_binaries ... ok
+test packaging::launchd_agent_plist_is_home_independent_and_unthrottled ... ok
+test packaging::dev_loop_is_wired_consistently ... ok
+test packaging::macos_release_tarball_ships_the_launchd_agent_plist ... ok
+test packaging::github_actions_are_pinned_to_full_commits ... ok
+test packaging::docker_wrappers_keep_stdin_attached_independently_of_tty_allocation ... ok
+test packaging::macos_docs_use_valid_install_commands_and_release_body_points_to_them ... ok
+test packaging::powershell_wrapper_lists_subscription_oauth_tokens_in_its_env_allowlist ... ok
+test packaging::powershell_wrapper_trims_paths_with_single_character_separators ... ok
+test packaging::powershell_wrapper_forwards_every_supported_provider_api_key ... ok
+test autoscope_env::default_mode_is_per_actor ... ok
+test hook_payload::opted_in_non_stop_event_is_inert ... ok
+test hook_payload::spool_files_never_leak_the_assistant_field_on_disk ... ok
+test hook_payload::opted_in_stop_splices_protocol_and_capture_flag ... ok
+test packaging::posix_wrapper_auto_selects_podman_when_docker_is_unavailable ... ok
+test packaging::slow::docker_wrapper_completions_preserve_helper_failure_without_partial_output ... ok
+test packaging::slow::fake_macos_rootful_docker_keeps_default_uid_for_host_config_commands ... ok
+test hook_payload::stop_hook_strips_last_assistant_message_from_spool_and_stderr ... ok
+test packaging::slow::custom_data_dir_makes_thin_commands_touch_host_files ... ok
+test packaging::slow::hook_installer_rejects_a_checksum_mismatch_before_writing_scripts ... ok
+test marker_scope::a_tree_without_a_marker_is_unchanged ... ok
+test packaging::slow::fake_macos_rootless_docker_keeps_root_uid_for_host_config_commands ... ok
+test packaging::slow::bootstrap_gets_host_file_treatment_because_it_reads_the_repo ... ok
+test packaging::slow::managed_host_commands_use_native_path_and_remote_server_without_docker ... ok
+test packaging::slow::posix_wrapper_forwards_subscription_oauth_tokens_without_putting_values_in_argv ... ok
+test packaging::slow::hook_installer_writes_only_command_code_stable_events ... ok
+test marker_scope::explicit_workspace_flag_beats_the_marker ... ok
+test packaging::slow::explicit_config_gets_host_file_treatment ... ok
+test packaging::slow::rootful_docker_keeps_host_uid_for_host_config_commands ... ok
+test marker_scope::ignore_marker_env_restores_the_default_workspace ... ok
+test packaging::systemd_units_use_explicit_native_paths ... ok
+test packaging::slow::hook_installer_writes_only_expected_files_from_a_verified_archive ... ok
+test packaging::workflows_keep_fixed_rust_jobs_on_the_fixed_toolchain ... ok
+test packaging::wrapper_forwards_every_supported_provider_api_key ... ok
+test packaging::wrapper_updates_and_install_docs_use_verified_release_assets ... ok
+test hook_payload::every_spooled_event_carries_a_persistent_ingest_key ... ok
+test marker_scope::marker_workspace_is_used_and_announced ... ok
+test packaging::slow::wrapper_forwards_claude_config_dir_to_helper_container ... ok
+test packaging::slow::wrapper_upgrade_does_not_claim_an_updated_remote_server_is_stale ... ok
+test packaging::slow::wrapper_keeps_stdin_attached_when_it_is_a_pipe ... ok
+test removal::purge_data_refuses_when_sibling_alive ... ignored
+test packaging::slow::wrapper_self_upgrade_installs_and_runs_a_verified_payload ... ok
+test marker_scope::mounted_scope_cwd_reads_marker_while_host_cwd_keeps_project_identity ... ok
+test packaging::slow::wrapper_self_upgrade_rejects_a_checksum_mismatch ... ok
+test hook_payload::native_hook_accepts_plain_and_bom_prefixed_json ... ok
+test packaging::slow::selinux_label_exception_requires_enforcement_and_daemon_support ... ok
+test removal::default_uninstall_removes_installed_kimi_code_flavored_url ... ok
+test packaging::slow::docker_wrapper_completions_tolerate_an_early_reader_close ... ok
+test packaging::slow::podman_gates_still_respect_engine_and_host_state ... ok
+test removal::default_uninstall_removes_managed_skills_across_roots_and_preserves_user_content ... ok
+test hook_payload::oversized_core_bodies_are_capped_before_the_local_spool ... ok
+test packaging::slow::macos_wrapper_routes_urls_by_real_subcommand ... ok
+test backfill_dry_run::dry_run_preserves_sentinel_for_empty_populated_and_opted_out_projects ... ok
+test removal::install_skills_then_uninstall_only_skills_round_trips ... ok
+[2m2026-09-23T08:00:37.844840Z[0m [32m INFO[0m [2mai_memory_cli[0m[2m:[0m ai-memory starting [3mversion[0m[2m=[0m"2.4.0" [3mserver_url[0m[2m=[0mhttp://127.0.0.1:49374 [3mdata_dir[0m[2m=[0m$HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/tmp/.tmpD7A6Ct/.ai-memory-data [3mbind[0m[2m=[0m127.0.0.1:49374
+[ai-memory] capture-policy capability v1 enforced by this selected integration; re-run --apply to refresh existing installs.
+capture mode: denylist
+✓ staged 18 hook script(s) → $HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/tmp/.tmpD7A6Ct/.ai-memory-data/hooks/claude-code
+✓ updated $HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/tmp/.tmpD7A6Ct/.claude/settings.json (backup written next to it)
+[2m2026-09-23T08:00:37.861683Z[0m [32m INFO[0m [2mai_memory_cli[0m[2m:[0m ai-memory starting [3mversion[0m[2m=[0m"2.4.0" [3mserver_url[0m[2m=[0mhttp://127.0.0.1:49374 [3mdata_dir[0m[2m=[0m$HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/tmp/.tmpD7A6Ct/.ai-memory-data [3mbind[0m[2m=[0m127.0.0.1:49374
+would remove SessionStart, UserPromptSubmit, PreToolUse, PostToolUse, PreCompact, Stop, SessionEnd, SubagentStart, SubagentStop from $HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/tmp/.tmpD7A6Ct/.claude/settings.json
+✓ updated $HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/tmp/.tmpD7A6Ct/.claude/settings.json
+
+Wiring removed. ai-memory's server + data live in its container/volume —
+tear those down manually:
+  docker compose -f docker/docker-compose.yml down -v
+  docker volume rm ai-memory-data   # if you used the default volume
+  rm -f bin/ai-memory               # the wrapper script, if installed
+
+Local data dir was left intact. To wipe it: `ai-memory reset --confirm` (or re-run with --purge-data).
+test removal::install_then_uninstall_round_trip_claude_hooks ... ok
+[2m2026-09-23T08:00:37.877424Z[0m [32m INFO[0m [2mai_memory_cli[0m[2m:[0m ai-memory starting [3mversion[0m[2m=[0m"2.4.0" [3mserver_url[0m[2m=[0mhttp://127.0.0.1:49374 [3mdata_dir[0m[2m=[0m$HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/tmp/.tmpJnUy2Y/.ai-memory-data [3mbind[0m[2m=[0m127.0.0.1:49374
+would remove SessionStart from $HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/tmp/.tmpJnUy2Y/.gemini/settings.json
+test packaging::slow::rootless_docker_uses_root_uid_only_for_host_config_commands ... ok
+✓ updated $HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/tmp/.tmpJnUy2Y/.gemini/settings.json
+
+Wiring removed. ai-memory's server + data live in its container/volume —
+tear those down manually:
+  docker compose -f docker/docker-compose.yml down -v
+  docker volume rm ai-memory-data   # if you used the default volume
+  rm -f bin/ai-memory               # the wrapper script, if installed
+
+Local data dir was left intact. To wipe it: `ai-memory reset --confirm` (or re-run with --purge-data).
+test removal::only_hooks_preserves_mcp_in_same_file ... ok
+test packaging::slow::selinux_enforcing_disables_labels_only_for_host_file_commands ... ok
+test packaging::slow::podman_rootless_and_selinux_are_detected_without_the_docker_only_field ... ok
+test removal::relocated_claude_uninstall_sweeps_active_and_legacy_installs ... ok
+test removal::swival_mcp_install_and_uninstall_round_trip_from_nested_directory ... ok
+[2m2026-09-23T08:00:38.059904Z[0m [32m INFO[0m [2mai_memory_cli[0m[2m:[0m ai-memory starting [3mversion[0m[2m=[0m"2.4.0" [3mserver_url[0m[2m=[0mhttp://127.0.0.1:49374 [3mdata_dir[0m[2m=[0m$HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/tmp/.tmpzis1rK/.ai-memory-data [3mbind[0m[2m=[0m127.0.0.1:49374
+would remove ai-memory.PreInvocation, ai-memory.Stop from $HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/tmp/.tmpzis1rK/.gemini/config/hooks.json
+✓ updated $HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/tmp/.tmpzis1rK/.gemini/config/hooks.json
+
+Wiring removed. ai-memory's server + data live in its container/volume —
+tear those down manually:
+  docker compose -f docker/docker-compose.yml down -v
+  docker volume rm ai-memory-data   # if you used the default volume
+  rm -f bin/ai-memory               # the wrapper script, if installed
+
+Local data dir was left intact. To wipe it: `ai-memory reset --confirm` (or re-run with --purge-data).
+test removal::uninstall_antigravity_hooks_preserves_user_entries ... ok
+[2m2026-09-23T08:00:38.076446Z[0m [32m INFO[0m [2mai_memory_cli[0m[2m:[0m ai-memory starting [3mversion[0m[2m=[0m"2.4.0" [3mserver_url[0m[2m=[0mhttp://127.0.0.1:49374 [3mdata_dir[0m[2m=[0m$HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/tmp/.tmpLqHbd6/.ai-memory-data [3mbind[0m[2m=[0m127.0.0.1:49374
+would remove Stop from $HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/tmp/.tmpLqHbd6/.claude/settings.json
+✓ updated $HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/tmp/.tmpLqHbd6/.claude/settings.json
+
+Wiring removed. ai-memory's server + data live in its container/volume —
+tear those down manually:
+  docker compose -f docker/docker-compose.yml down -v
+  docker volume rm ai-memory-data   # if you used the default volume
+  rm -f bin/ai-memory               # the wrapper script, if installed
+
+Local data dir was left intact. To wipe it: `ai-memory reset --confirm` (or re-run with --purge-data).
+[2m2026-09-23T08:00:38.090241Z[0m [32m INFO[0m [2mai_memory_cli[0m[2m:[0m ai-memory starting [3mversion[0m[2m=[0m"2.4.0" [3mserver_url[0m[2m=[0mhttp://127.0.0.1:49374 [3mdata_dir[0m[2m=[0m$HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/tmp/.tmpLqHbd6/.ai-memory-data [3mbind[0m[2m=[0m127.0.0.1:49374
+Nothing to remove. ai-memory wiring not found.
+test removal::uninstall_apply_is_idempotent ... ok
+test repo_layout::integration_tests_cost_at_most_one_binary_per_crate ... ok
+[2m2026-09-23T08:00:38.102917Z[0m [32m INFO[0m [2mai_memory_cli[0m[2m:[0m ai-memory starting [3mversion[0m[2m=[0m"2.4.0" [3mserver_url[0m[2m=[0mhttp://127.0.0.1:49374 [3mdata_dir[0m[2m=[0m$HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/tmp/.tmpP5b4P6/.ai-memory-data [3mbind[0m[2m=[0m127.0.0.1:49374
+would delete $HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/tmp/.tmpP5b4P6/.config/opencode/plugins/ai-memory.ts (OpenCode plugin)
+✓ deleted $HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/tmp/.tmpP5b4P6/.config/opencode/plugins/ai-memory.ts
+
+Wiring removed. ai-memory's server + data live in its container/volume —
+tear those down manually:
+  docker compose -f docker/docker-compose.yml down -v
+  docker volume rm ai-memory-data   # if you used the default volume
+  rm -f bin/ai-memory               # the wrapper script, if installed
+
+Local data dir was left intact. To wipe it: `ai-memory reset --confirm` (or re-run with --purge-data).
+test removal::uninstall_deletes_generated_opencode_plugin_only ... ok
+test routing_instructions::compact_install_instructions_writes_compact_snippet ... ok
+[2m2026-09-23T08:00:38.114702Z[0m [32m INFO[0m [2mai_memory_cli[0m[2m:[0m ai-memory starting [3mversion[0m[2m=[0m"2.4.0" [3mserver_url[0m[2m=[0mhttp://127.0.0.1:49374 [3mdata_dir[0m[2m=[0m$HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/tmp/.tmpQ5CTqw/.ai-memory-data [3mbind[0m[2m=[0m127.0.0.1:49374
+would remove SessionStart, SessionEnd from $HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/tmp/.tmpQ5CTqw/.devin/hooks.v1.json
+test routing_instructions::compact_print_shows_compact_snippet_without_mutating ... ok
+✓ updated $HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/tmp/.tmpQ5CTqw/.devin/hooks.v1.json
+
+Wiring removed. ai-memory's server + data live in its container/volume —
+tear those down manually:
+  docker compose -f docker/docker-compose.yml down -v
+  docker volume rm ai-memory-data   # if you used the default volume
+  rm -f bin/ai-memory               # the wrapper script, if installed
+
+Local data dir was left intact. To wipe it: `ai-memory reset --confirm` (or re-run with --purge-data).
+test removal::uninstall_devin_hooks_preserves_user_entries ... ok
+test routing_instructions::devin_install_instructions_targets_agents_md ... ok
+[2m2026-09-23T08:00:38.131696Z[0m [32m INFO[0m [2mai_memory_cli[0m[2m:[0m ai-memory starting [3mversion[0m[2m=[0m"2.4.0" [3mserver_url[0m[2m=[0mhttp://127.0.0.1:49374 [3mdata_dir[0m[2m=[0m$HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/tmp/.tmpZWGivT/.ai-memory-data [3mbind[0m[2m=[0m127.0.0.1:49374
+would remove SessionStart from $HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/tmp/.tmpZWGivT/.devin/hooks.v1.json
+would remove SessionStart from $HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/tmp/.tmpZWGivT/.devin/config.json
+✓ updated $HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/tmp/.tmpZWGivT/.devin/hooks.v1.json
+✓ updated $HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/tmp/.tmpZWGivT/.devin/config.json
+
+Wiring removed. ai-memory's server + data live in its container/volume —
+tear those down manually:
+  docker compose -f docker/docker-compose.yml down -v
+  docker volume rm ai-memory-data   # if you used the default volume
+  rm -f bin/ai-memory               # the wrapper script, if installed
+
+Local data dir was left intact. To wipe it: `ai-memory reset --confirm` (or re-run with --purge-data).
+test removal::uninstall_devin_removes_from_both_targets ... ok
+[2m2026-09-23T08:00:38.150373Z[0m [32m INFO[0m [2mai_memory_cli[0m[2m:[0m ai-memory starting [3mversion[0m[2m=[0m"2.4.0" [3mserver_url[0m[2m=[0mhttp://127.0.0.1:49374 [3mdata_dir[0m[2m=[0m$HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/tmp/.tmp6lLp3S/.ai-memory-data [3mbind[0m[2m=[0m127.0.0.1:49374
+would remove Stop from $HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/tmp/.tmp6lLp3S/.claude/settings.json
+(dry-run; pass --apply to remove)
+test removal::uninstall_dry_run_changes_nothing ... ok
+test routing_instructions::devin_install_instructions_writes_project_devin_skills ... ok
+test routing_instructions::explicit_skill_scope_and_agent_override_instruction_target_inference ... ok
+test removal::uninstall_dry_run_previews_purge ... ok
+test routing_instructions::explicit_skill_overrides_win_over_instruction_target_inference ... ok
+test routing_instructions::install_instructions_updates_only_markered_block_and_backs_up_original ... ok
+[2m2026-09-23T08:00:38.175982Z[0m [32m INFO[0m [2mai_memory_cli[0m[2m:[0m ai-memory starting [3mversion[0m[2m=[0m"2.4.0" [3mserver_url[0m[2m=[0mhttp://127.0.0.1:49374 [3mdata_dir[0m[2m=[0m$HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/tmp/.tmpDXQga3/.ai-memory-data [3mbind[0m[2m=[0m127.0.0.1:49374
+would remove kimi-code.SessionStart, kimi-code.Stop from $HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/tmp/.tmpDXQga3/.kimi-code/config.toml
+test routing_instructions::no_skills_print_omits_skill_plan_and_does_not_mutate ... ok
+test routing_instructions::print_shows_only_snippet_without_mutating ... ok
+✓ updated $HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/tmp/.tmpDXQga3/.kimi-code/config.toml
+
+Wiring removed. ai-memory's server + data live in its container/volume —
+tear those down manually:
+  docker compose -f docker/docker-compose.yml down -v
+  docker volume rm ai-memory-data   # if you used the default volume
+  rm -f bin/ai-memory               # the wrapper script, if installed
+
+Local data dir was left intact. To wipe it: `ai-memory reset --confirm` (or re-run with --purge-data).
+test routing_instructions::legacy_long_marker_block_rerun_upgrades_in_place_to_slim_snippet ... ok
+test removal::uninstall_kimi_code_hooks_preserves_user_entries ... ok
+test routing_instructions::no_skills_writes_only_instruction_snippet ... ok
+test routing_instructions::kimi_code_install_instructions_targets_agents_md ... ok
+test backfill_e2e::slow::backfill_imports_local_history_into_an_empty_store_and_is_searchable ... ok
+test routing_skills::install_skills_print_outputs_plan_without_mutating_target_dir ... ok
+[2m2026-09-23T08:00:38.201039Z[0m [32m INFO[0m [2mai_memory_cli[0m[2m:[0m ai-memory starting [3mversion[0m[2m=[0m"2.4.0" [3mserver_url[0m[2m=[0mhttp://127.0.0.1:49374 [3mdata_dir[0m[2m=[0m$HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/tmp/.tmpi8BZ75/.ai-memory-data [3mbind[0m[2m=[0m127.0.0.1:49374
+would remove stop from $HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/tmp/.tmpcksEsa/.kiro/agents/local.json
+would remove agentSpawn, stop from $HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/tmp/.tmpi8BZ75/.kiro/agents/dev.json
+would remove kiro-cli-v3.SessionStart from $HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/tmp/.tmpi8BZ75/.kiro/hooks/ai-memory.json
+✓ updated $HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/tmp/.tmpcksEsa/.kiro/agents/local.json
+✓ updated $HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/tmp/.tmpi8BZ75/.kiro/agents/dev.json
+✓ updated $HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/tmp/.tmpi8BZ75/.kiro/hooks/ai-memory.json
+
+Wiring removed. ai-memory's server + data live in its container/volume —
+tear those down manually:
+  docker compose -f docker/docker-compose.yml down -v
+  docker volume rm ai-memory-data   # if you used the default volume
+  rm -f bin/ai-memory               # the wrapper script, if installed
+
+Local data dir was left intact. To wipe it: `ai-memory reset --confirm` (or re-run with --purge-data).
+test removal::uninstall_kiro_cli_hooks_removes_v2_and_v3_entries_but_preserves_user_hooks ... ok
+test doctor_e2e::slow::doctor_flags_an_uncaptured_harness_then_clears_it_after_backfill ... ok
+[2m2026-09-23T08:00:38.235470Z[0m [32m INFO[0m [2mai_memory_cli[0m[2m:[0m ai-memory starting [3mversion[0m[2m=[0m"2.4.0" [3mserver_url[0m[2m=[0mhttp://127.0.0.1:49374 [3mdata_dir[0m[2m=[0m$HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/tmp/.tmpxcxw0O/.ai-memory-data [3mbind[0m[2m=[0m127.0.0.1:49374
+would remove custom-memory from $HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/tmp/.tmpxcxw0O/.gemini/config/mcp_config.json
+✓ updated $HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/tmp/.tmpxcxw0O/.gemini/config/mcp_config.json
+
+Wiring removed. ai-memory's server + data live in its container/volume —
+tear those down manually:
+  docker compose -f docker/docker-compose.yml down -v
+  docker volume rm ai-memory-data   # if you used the default volume
+  rm -f bin/ai-memory               # the wrapper script, if installed
+
+Local data dir was left intact. To wipe it: `ai-memory reset --confirm` (or re-run with --purge-data).
+test routing_instructions::skill_conflict_preflight_keeps_instruction_file_unchanged_until_force ... ok
+test removal::uninstall_mcp_custom_url_removes_antigravity_only_by_endpoint ... ok
+[2m2026-09-23T08:00:38.249864Z[0m [32m INFO[0m [2mai_memory_cli[0m[2m:[0m ai-memory starting [3mversion[0m[2m=[0m"2.4.0" [3mserver_url[0m[2m=[0mhttp://127.0.0.1:49374 [3mdata_dir[0m[2m=[0m$HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/tmp/.tmpHSvZLh/.ai-memory-data [3mbind[0m[2m=[0m127.0.0.1:49374
+would remove custom-memory from $HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/tmp/.tmpHSvZLh/custom-kimi-home/mcp.json
+test shutdown_signals::native_selector::interrupt_releases_native_selector_without_enter ... ok
+✓ updated $HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/tmp/.tmpHSvZLh/custom-kimi-home/mcp.json
+
+Wiring removed. ai-memory's server + data live in its container/volume —
+tear those down manually:
+  docker compose -f docker/docker-compose.yml down -v
+  docker volume rm ai-memory-data   # if you used the default volume
+  rm -f bin/ai-memory               # the wrapper script, if installed
+
+Local data dir was left intact. To wipe it: `ai-memory reset --confirm` (or re-run with --purge-data).
+test removal::uninstall_mcp_custom_url_removes_kimi_code_only_by_endpoint ... ok
+test routing_instructions::inferred_instruction_targets_select_matching_skill_agents ... ok
+[2m2026-09-23T08:00:38.264996Z[0m [32m INFO[0m [2mai_memory_cli[0m[2m:[0m ai-memory starting [3mversion[0m[2m=[0m"2.4.0" [3mserver_url[0m[2m=[0mhttp://127.0.0.1:49374 [3mdata_dir[0m[2m=[0m$HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/tmp/.tmp1jNt9E/.ai-memory-data [3mbind[0m[2m=[0m127.0.0.1:49374
+would remove ai-memory from $HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/tmp/.tmp1jNt9E/.claude.json
+✓ updated $HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/tmp/.tmp1jNt9E/.claude.json
+
+Wiring removed. ai-memory's server + data live in its container/volume —
+tear those down manually:
+  docker compose -f docker/docker-compose.yml down -v
+  docker volume rm ai-memory-data   # if you used the default volume
+  rm -f bin/ai-memory               # the wrapper script, if installed
+
+Local data dir was left intact. To wipe it: `ai-memory reset --confirm` (or re-run with --purge-data).
+test removal::uninstall_mcp_name_narrows_endpoint_match ... ok
+[2m2026-09-23T08:00:38.280755Z[0m [32m INFO[0m [2mai_memory_cli[0m[2m:[0m ai-memory starting [3mversion[0m[2m=[0m"2.4.0" [3mserver_url[0m[2m=[0mhttp://127.0.0.1:49374 [3mdata_dir[0m[2m=[0m$HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/tmp/.tmpex6WDL/.ai-memory-data [3mbind[0m[2m=[0m127.0.0.1:49374
+would remove ai-memory from $HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/tmp/.tmpex6WDL/.devin/config.json
+✓ updated $HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/tmp/.tmpex6WDL/.devin/config.json
+
+Wiring removed. ai-memory's server + data live in its container/volume —
+tear those down manually:
+  docker compose -f docker/docker-compose.yml down -v
+  docker volume rm ai-memory-data   # if you used the default volume
+  rm -f bin/ai-memory               # the wrapper script, if installed
+
+Local data dir was left intact. To wipe it: `ai-memory reset --confirm` (or re-run with --purge-data).
+test removal::uninstall_mcp_removes_devin_only ... ok
+[2m2026-09-23T08:00:38.298531Z[0m [32m INFO[0m [2mai_memory_cli[0m[2m:[0m ai-memory starting [3mversion[0m[2m=[0m"2.4.0" [3mserver_url[0m[2m=[0mhttp://127.0.0.1:49374 [3mdata_dir[0m[2m=[0m$HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/tmp/.tmpePWmev/.ai-memory-data [3mbind[0m[2m=[0m127.0.0.1:49374
+Nothing to remove. ai-memory wiring not found.
+[2m2026-09-23T08:00:38.309694Z[0m [32m INFO[0m [2mai_memory_cli[0m[2m:[0m ai-memory starting [3mversion[0m[2m=[0m"2.4.0" [3mserver_url[0m[2m=[0mhttp://127.0.0.1:49374 [3mdata_dir[0m[2m=[0m$HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/tmp/.tmpePWmev/.ai-memory-data [3mbind[0m[2m=[0m127.0.0.1:49374
+would delete $HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/tmp/.tmpePWmev/.omp/agent/extensions/ai-memory-omp.ts (OMP extension)
+✓ deleted $HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/tmp/.tmpePWmev/.omp/agent/extensions/ai-memory-omp.ts
+
+Wiring removed. ai-memory's server + data live in its container/volume —
+tear those down manually:
+  docker compose -f docker/docker-compose.yml down -v
+  docker volume rm ai-memory-data   # if you used the default volume
+  rm -f bin/ai-memory               # the wrapper script, if installed
+
+Local data dir was left intact. To wipe it: `ai-memory reset --confirm` (or re-run with --purge-data).
+test removal::uninstall_omp_extension_deletes_only_generated_file ... ok
+test shutdown_signals::http_server_exits_on_sigterm ... ok
+test shutdown_signals::stdio_server_exits_on_sigint ... ok
+test shutdown_signals::stdio_server_exits_on_sigterm_after_initialize ... ok
+test removal::uninstall_only_skills_leaves_custom_target_dir_for_manual_cleanup ... ok
+[2m2026-09-23T08:00:38.358135Z[0m [32m INFO[0m [2mai_memory_cli[0m[2m:[0m ai-memory starting [3mversion[0m[2m=[0m"2.4.0" [3mserver_url[0m[2m=[0mhttp://127.0.0.1:49374 [3mdata_dir[0m[2m=[0m$HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/tmp/.tmp9jO7fe/.ai-memory-data [3mbind[0m[2m=[0m127.0.0.1:49374
+Nothing to remove. ai-memory wiring not found.
+[2m2026-09-23T08:00:38.367442Z[0m [32m INFO[0m [2mai_memory_cli[0m[2m:[0m ai-memory starting [3mversion[0m[2m=[0m"2.4.0" [3mserver_url[0m[2m=[0mhttp://127.0.0.1:49374 [3mdata_dir[0m[2m=[0m$HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/tmp/.tmp9jO7fe/.ai-memory-data [3mbind[0m[2m=[0m127.0.0.1:49374
+would delete $HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/tmp/.tmp9jO7fe/.pi/agent/extensions/ai-memory-pi.ts (Pi extension)
+✓ deleted $HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/tmp/.tmp9jO7fe/.pi/agent/extensions/ai-memory-pi.ts
+
+Wiring removed. ai-memory's server + data live in its container/volume —
+tear those down manually:
+  docker compose -f docker/docker-compose.yml down -v
+  docker volume rm ai-memory-data   # if you used the default volume
+  rm -f bin/ai-memory               # the wrapper script, if installed
+
+Local data dir was left intact. To wipe it: `ai-memory reset --confirm` (or re-run with --purge-data).
+test removal::uninstall_pi_extension_deletes_only_generated_bridge_file ... ok
+[2m2026-09-23T08:00:38.377863Z[0m [32m INFO[0m [2mai_memory_cli[0m[2m:[0m ai-memory starting [3mversion[0m[2m=[0m"2.4.0" [3mserver_url[0m[2m=[0mhttp://127.0.0.1:49374 [3mdata_dir[0m[2m=[0m$HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/tmp/.tmp6D4tug/.ai-memory-data [3mbind[0m[2m=[0m127.0.0.1:49374
+Nothing to remove. ai-memory wiring not found.
+test removal::uninstall_preserves_user_openclaw_package_at_ai_memory_path ... ok
+[2m2026-09-23T08:00:38.388051Z[0m [32m INFO[0m [2mai_memory_cli[0m[2m:[0m ai-memory starting [3mversion[0m[2m=[0m"2.4.0" [3mserver_url[0m[2m=[0mhttp://127.0.0.1:49374 [3mdata_dir[0m[2m=[0m$HOME/.cache/gap-wave2-20260923/agents-models-workers/rust/tmp/.tmpUobtYf/.ai-memory-data [3mbind[0m[2m=[0m127.0.0.1:49374
+Nothing to remove. ai-memory wiring not found.
+test removal::uninstall_preserves_user_opencode_plugin_at_ai_memory_path ... ok
+test serve_shutdown::slow::stdio_serve_exits_when_interrupted ... ok
+test removal::uninstall_purge_data_apply_wipes ... ok
+test removal::uninstall_skills_dry_run_reports_plan_without_mutating ... ok
+test message_e2e::slow::message_round_trips_across_projects_with_claim_once_and_cancel ... ok
+test removal::zcode_mcp_install_and_uninstall_round_trip_preserves_siblings ... ok
+test backfill_failures::import_failures_are_errors_in_human_json_and_quiet_modes ... ok
+
+test result: ok. 126 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 2.58s
+

@@ -1,0 +1,70 @@
+{
+  "arm": "iceberg",
+  "concurrent_writers": {
+    "appends_each": 30,
+    "content": {
+      "batches": 60,
+      "content_ok": true,
+      "decoded_rows": 300,
+      "problems": []
+    },
+    "detector_controls": {
+      "corrupted_row_flagged": true,
+      "dropped_row_flagged": true,
+      "foreign_row_flagged": true
+    },
+    "no_silent_loss": true,
+    "reported_successful_appends": 60,
+    "retry_summary_full_stderr": {
+      "attempt_histogram": {
+        "1": 2,
+        "2": 2,
+        "3": 1
+      },
+      "commit_failed_exception_lines": 0,
+      "detector_control_parses_4_of_4": true,
+      "max_attempt": 3,
+      "retry_lines": 5,
+      "stderr_bytes": {
+        "a": 134,
+        "b": 201
+      }
+    },
+    "rows_expected_from_reported_successes": 300,
+    "rows_found": 300,
+    "rows_lost_after_reported_success": 0,
+    "state": {
+      "content": {
+        "batches": 60,
+        "content_ok": true,
+        "decoded_rows": 300,
+        "problems": []
+      },
+      "detector_controls": {
+        "corrupted_row_flagged": true,
+        "dropped_row_flagged": true,
+        "foreign_row_flagged": true
+      },
+      "readable": true,
+      "rows": 300,
+      "snapshots": 60
+    },
+    "stderr_full_files": {
+      "a": "$HOME/.cache/gap-wave2-20260923/identity-provenance/runs/iceberg-retry-fix3-20260923T132130Z/conc30-iceberg-1/conc-a.stderr",
+      "b": "$HOME/.cache/gap-wave2-20260923/identity-provenance/runs/iceberg-retry-fix3-20260923T132130Z/conc30-iceberg-1/conc-b.stderr"
+    },
+    "stderr_tail": {
+      "a": "Commit failed due to a concurrent update, retrying (1/4) in 102 ms\nCommit failed due to a concurrent update, retrying (2/4) in 204 ms\n",
+      "b": "Commit failed due to a concurrent update, retrying (1/4) in 108 ms\nCommit failed due to a concurrent update, retrying (2/4) in 214 ms\nCommit failed due to a concurrent update, retrying (3/4) in 432 ms\n"
+    },
+    "writer_error_counts": {
+      "a": 0,
+      "b": 0
+    },
+    "writer_error_examples": {
+      "a": [],
+      "b": []
+    },
+    "writers": 2
+  }
+}

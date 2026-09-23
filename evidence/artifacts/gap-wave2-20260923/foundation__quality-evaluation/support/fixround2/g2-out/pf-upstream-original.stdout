@@ -1,0 +1,29 @@
+Cache is disabled.
+Starting evaluation eval-Vpc-2026-09-23T12:49:57
+Running 1 test cases (up to 1 at a time)...
+
+[90m┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐[39m
+[90m│[39m[1m[34m [NVIDIA published example via native Python and local vLLM] NVIDIA's four published retrieval queries and documents    [39m[22m[90m│[39m
+[90m│[39m[1m[34m (the upstream script owns the inputs)                                                                                  [39m[22m[90m│[39m
+[90m├────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤[39m
+[90m│[39m [PASS] Similarity scores:                                                                                              [90m│[39m
+[90m│[39m           d[0]      d[1]      d[2]      d[3]                                                                           [90m│[39m
+[90m│[39m q[0]    0.8110    0.0249    0.0002   -0.0311                                                                           [90m│[39m
+[90m│[39m q[1]    0.0444    0.6472   -0.0513    0.0383                                                                           [90m│[39m
+[90m│[39m q[2]   -0.0099   -0.0409    0.6469    0.1009                                                                           [90m│[39m
+[90m│[39m q[3]   -0.0222    0.0216    0.1211    0.7690                                                                           [90m│[39m
+[90m└────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘[39m
+✓ Eval complete (ID: eval-Vpc-2026-09-23T12:49:57)
+
+» View results: promptfoo view
+» Share with your team: https://promptfoo.app
+» Feedback: https://promptfoo.dev/feedback
+
+
+Results:
+  ✓ 1 passed (100%)
+  0 failed (0%)
+  0 errors (0%)
+Duration: 1s (concurrency: 1)
+
+Writing output to $HOME/.cache/gap-wave2-20260923/quality-evaluation/fixround2/g2/pf-upstream/results-original.json

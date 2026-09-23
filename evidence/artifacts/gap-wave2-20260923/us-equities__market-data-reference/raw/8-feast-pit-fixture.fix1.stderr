@@ -1,0 +1,2 @@
+$HOME/code/nas-wt-g2-market-data-reference/blueprints/gap-wave2-20260923/us-equities__market-data-reference/feast_pit_fixture.py:52: DeprecationWarning: Entity value_type will be mandatory in the next release. Please specify a value_type for entity 'symbol'.
+  symbol = Entity(name="symbol", join_keys=["symbol"])

@@ -1,0 +1,49 @@
+{
+  "id": "gap-wave2-20260923/us-equities/backtesting-engine/0-spy-lean-parity-peer",
+  "gap_index": 0,
+  "gap_text_sha256": "d8b9300e15e6aab1aa28acf22fb888a84b1f09a79c2ca2331fd88523b1eecbd4",
+  "preregistration": {
+    "written_at": "2026-09-23T06:21:22Z",
+    "expectation": "covered_elsewhere: the SPY/LEAN parity gate (spy-lean-parity) and the dividend-sim-module gate are owned by peer:sota-workflow-resolution; this unit runs no parity rerun or mapping change.",
+    "criteria": [
+      "covered_elsewhere if gates-20260922.json assigns spy-lean-parity and dividend-sim-module to peer:sota-workflow-resolution and the verdict file still reads BLOCKED on main at base 41d39b3"
+    ],
+    "source": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/preregistration.json (committed in 2b93d4d before any check ran)"
+  },
+  "next_check": "Resolve or explicitly model costs_and_rounding_stress and margin_and_adaptive_state in the spy-parity mapping, rerun the comparator on all blocked cases, and record the new verdict.json.",
+  "commands": [
+    "python3 -c \"read catalogs/us-equities/gates-20260922.json gates spy-lean-parity, dividend-sim-module\"",
+    "sha256sum blueprints/us-equities/engine-nautilus/spy-parity/verdict.json"
+  ],
+  "results": {
+    "spy-lean-parity": {
+      "owner": "peer:sota-workflow-resolution",
+      "status": "blocked",
+      "flip_condition": "/verdict == PASS in spy-parity/verdict.json"
+    },
+    "dividend-sim-module": {
+      "owner": "peer:sota-workflow-resolution",
+      "status": "not_established"
+    },
+    "verdict_sha256_at_base": "b7b898a861492348ae864de25551c127a0367e4638ef5dfa65152f233a6b0d10",
+    "incidental_observation": "Gap 6's fresh bwrap replay and three comparator modes on 2026-09-23 reproduced BLOCKED (25 PASS / 4 FAIL, 0 unattributed) byte-identically; the stress/margin comparison statuses were not touched."
+  },
+  "raw_outputs": [
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/6-compare-lean-data.verdict.json",
+      "sha256": "b7b898a861492348ae864de25551c127a0367e4638ef5dfa65152f233a6b0d10"
+    }
+  ],
+  "outcome": "covered_elsewhere",
+  "evidence_class": "source_review",
+  "remaining": "Owned by peer:sota-workflow-resolution under its preregistration: model or resolve costs_and_rounding_stress and margin_and_adaptive_state and rerun the blocked comparisons.",
+  "limits": [
+    "No mapping-manifest, tolerance, gate or verdict file was changed by this unit (hard rule: gate rows belong to the peer)."
+  ],
+  "checked_at": "2026-09-23T07:09:55Z",
+  "covered_by": {
+    "owner": "peer:sota-workflow-resolution",
+    "gate_file": "catalogs/us-equities/gates-20260922.json",
+    "rule": "SPY/LEAN parity and the dividend sim module are covered_elsewhere under the peer's preregistration (unit brief)."
+  }
+}

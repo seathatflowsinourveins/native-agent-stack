@@ -1,0 +1,3394 @@
+[
+  {
+    "asset": "SPY",
+    "client_order_id": "O-20160322-133000-001-000-1",
+    "date": "2016-03-22",
+    "episode": 9,
+    "qty": 490,
+    "side": "BUY"
+  },
+  {
+    "asset": "SPY",
+    "client_order_id": "O-20160330-133000-001-000-2",
+    "date": "2016-03-30",
+    "episode": 9,
+    "qty": 490,
+    "side": "SELL"
+  },
+  {
+    "asset": "SPY",
+    "client_order_id": "O-20160406-133000-001-000-3",
+    "date": "2016-04-06",
+    "episode": 11,
+    "qty": 489,
+    "side": "BUY"
+  },
+  {
+    "asset": "SPY",
+    "client_order_id": "O-20160413-133000-001-000-4",
+    "date": "2016-04-13",
+    "episode": 11,
+    "qty": 489,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20160413-133000-001-000-5",
+    "date": "2016-04-13",
+    "episode": 12,
+    "qty": 904,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20160420-133000-001-000-6",
+    "date": "2016-04-20",
+    "episode": 12,
+    "qty": 904,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20160420-133000-001-000-7",
+    "date": "2016-04-20",
+    "episode": 13,
+    "qty": 881,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20160427-133000-001-000-8",
+    "date": "2016-04-27",
+    "episode": 13,
+    "qty": 881,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20160427-133000-001-000-9",
+    "date": "2016-04-27",
+    "episode": 14,
+    "qty": 873,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20160504-133000-001-000-10",
+    "date": "2016-05-04",
+    "episode": 14,
+    "qty": 873,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20160504-133000-001-000-11",
+    "date": "2016-05-04",
+    "episode": 15,
+    "qty": 900,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20160511-133000-001-000-12",
+    "date": "2016-05-11",
+    "episode": 15,
+    "qty": 900,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20160511-133000-001-000-13",
+    "date": "2016-05-11",
+    "episode": 16,
+    "qty": 892,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20160518-133000-001-000-14",
+    "date": "2016-05-18",
+    "episode": 16,
+    "qty": 892,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20160518-133000-001-000-15",
+    "date": "2016-05-18",
+    "episode": 17,
+    "qty": 918,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20160525-133000-001-000-16",
+    "date": "2016-05-25",
+    "episode": 17,
+    "qty": 918,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20160525-133000-001-000-17",
+    "date": "2016-05-25",
+    "episode": 18,
+    "qty": 882,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20160602-133000-001-000-18",
+    "date": "2016-06-02",
+    "episode": 18,
+    "qty": 882,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20160602-133000-001-000-19",
+    "date": "2016-06-02",
+    "episode": 19,
+    "qty": 865,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20160609-133000-001-000-20",
+    "date": "2016-06-09",
+    "episode": 19,
+    "qty": 865,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20160609-133000-001-000-21",
+    "date": "2016-06-09",
+    "episode": 20,
+    "qty": 847,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20160616-133000-001-000-22",
+    "date": "2016-06-16",
+    "episode": 20,
+    "qty": 847,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20160616-133000-001-000-23",
+    "date": "2016-06-16",
+    "episode": 21,
+    "qty": 879,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20160623-133000-001-000-24",
+    "date": "2016-06-23",
+    "episode": 21,
+    "qty": 879,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20160623-133000-001-000-25",
+    "date": "2016-06-23",
+    "episode": 22,
+    "qty": 863,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20160630-133000-001-000-26",
+    "date": "2016-06-30",
+    "episode": 22,
+    "qty": 863,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20160630-133000-001-000-27",
+    "date": "2016-06-30",
+    "episode": 23,
+    "qty": 884,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20160708-133000-001-000-28",
+    "date": "2016-07-08",
+    "episode": 23,
+    "qty": 884,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20160708-133000-001-000-29",
+    "date": "2016-07-08",
+    "episode": 24,
+    "qty": 867,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20160715-133000-001-000-30",
+    "date": "2016-07-15",
+    "episode": 24,
+    "qty": 867,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20160715-133000-001-000-31",
+    "date": "2016-07-15",
+    "episode": 25,
+    "qty": 833,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20160722-133000-001-000-32",
+    "date": "2016-07-22",
+    "episode": 25,
+    "qty": 833,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20160722-133000-001-000-33",
+    "date": "2016-07-22",
+    "episode": 26,
+    "qty": 836,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20160729-133000-001-000-34",
+    "date": "2016-07-29",
+    "episode": 26,
+    "qty": 836,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20160729-133000-001-000-35",
+    "date": "2016-07-29",
+    "episode": 27,
+    "qty": 868,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20160805-133000-001-000-36",
+    "date": "2016-08-05",
+    "episode": 27,
+    "qty": 868,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20160805-133000-001-000-37",
+    "date": "2016-08-05",
+    "episode": 28,
+    "qty": 860,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20160812-133000-001-000-38",
+    "date": "2016-08-12",
+    "episode": 28,
+    "qty": 860,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20160812-133000-001-000-39",
+    "date": "2016-08-12",
+    "episode": 29,
+    "qty": 820,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20160819-133000-001-000-40",
+    "date": "2016-08-19",
+    "episode": 29,
+    "qty": 820,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20160819-133000-001-000-41",
+    "date": "2016-08-19",
+    "episode": 30,
+    "qty": 814,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20160826-133000-001-000-42",
+    "date": "2016-08-26",
+    "episode": 30,
+    "qty": 814,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20160826-133000-001-000-43",
+    "date": "2016-08-26",
+    "episode": 31,
+    "qty": 810,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20160902-133000-001-000-44",
+    "date": "2016-09-02",
+    "episode": 31,
+    "qty": 810,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20160902-133000-001-000-45",
+    "date": "2016-09-02",
+    "episode": 32,
+    "qty": 852,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20160912-133000-001-000-46",
+    "date": "2016-09-12",
+    "episode": 32,
+    "qty": 852,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20160912-133000-001-000-47",
+    "date": "2016-09-12",
+    "episode": 33,
+    "qty": 879,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20160919-133000-001-000-48",
+    "date": "2016-09-19",
+    "episode": 33,
+    "qty": 879,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20160919-133000-001-000-49",
+    "date": "2016-09-19",
+    "episode": 34,
+    "qty": 850,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20160926-133000-001-000-50",
+    "date": "2016-09-26",
+    "episode": 34,
+    "qty": 850,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20160926-133000-001-000-51",
+    "date": "2016-09-26",
+    "episode": 35,
+    "qty": 849,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20161003-133000-001-000-52",
+    "date": "2016-10-03",
+    "episode": 35,
+    "qty": 849,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20161003-133000-001-000-53",
+    "date": "2016-10-03",
+    "episode": 36,
+    "qty": 843,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20161010-133000-001-000-54",
+    "date": "2016-10-10",
+    "episode": 36,
+    "qty": 843,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20161010-133000-001-000-55",
+    "date": "2016-10-10",
+    "episode": 37,
+    "qty": 839,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20161017-133000-001-000-56",
+    "date": "2016-10-17",
+    "episode": 37,
+    "qty": 839,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20161017-133000-001-000-57",
+    "date": "2016-10-17",
+    "episode": 38,
+    "qty": 854,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20161024-133000-001-000-58",
+    "date": "2016-10-24",
+    "episode": 38,
+    "qty": 854,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20161024-133000-001-000-59",
+    "date": "2016-10-24",
+    "episode": 39,
+    "qty": 840,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20161031-133000-001-000-60",
+    "date": "2016-10-31",
+    "episode": 39,
+    "qty": 840,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20161031-133000-001-000-61",
+    "date": "2016-10-31",
+    "episode": 40,
+    "qty": 850,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20161107-143000-001-000-62",
+    "date": "2016-11-07",
+    "episode": 40,
+    "qty": 850,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20161114-143000-001-000-63",
+    "date": "2016-11-14",
+    "episode": 42,
+    "qty": 775,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20161121-143000-001-000-64",
+    "date": "2016-11-21",
+    "episode": 42,
+    "qty": 775,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20161121-143000-001-000-65",
+    "date": "2016-11-21",
+    "episode": 43,
+    "qty": 761,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20161129-143000-001-000-66",
+    "date": "2016-11-29",
+    "episode": 43,
+    "qty": 761,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20161129-143000-001-000-67",
+    "date": "2016-11-29",
+    "episode": 44,
+    "qty": 754,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20161206-143000-001-000-68",
+    "date": "2016-12-06",
+    "episode": 44,
+    "qty": 754,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20161206-143000-001-000-69",
+    "date": "2016-12-06",
+    "episode": 45,
+    "qty": 748,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20161213-143000-001-000-70",
+    "date": "2016-12-13",
+    "episode": 45,
+    "qty": 748,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20161213-143000-001-000-71",
+    "date": "2016-12-13",
+    "episode": 46,
+    "qty": 727,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20161220-143000-001-000-72",
+    "date": "2016-12-20",
+    "episode": 46,
+    "qty": 727,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20161220-143000-001-000-73",
+    "date": "2016-12-20",
+    "episode": 47,
+    "qty": 728,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20161228-143000-001-000-74",
+    "date": "2016-12-28",
+    "episode": 47,
+    "qty": 728,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20161228-143000-001-000-75",
+    "date": "2016-12-28",
+    "episode": 48,
+    "qty": 730,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20170105-143000-001-000-76",
+    "date": "2017-01-05",
+    "episode": 48,
+    "qty": 730,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20170105-143000-001-000-77",
+    "date": "2017-01-05",
+    "episode": 49,
+    "qty": 727,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20170112-143000-001-000-78",
+    "date": "2017-01-12",
+    "episode": 49,
+    "qty": 727,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20170112-143000-001-000-79",
+    "date": "2017-01-12",
+    "episode": 50,
+    "qty": 734,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20170120-143000-001-000-80",
+    "date": "2017-01-20",
+    "episode": 50,
+    "qty": 734,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20170120-143000-001-000-81",
+    "date": "2017-01-20",
+    "episode": 51,
+    "qty": 745,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20170127-143000-001-000-82",
+    "date": "2017-01-27",
+    "episode": 51,
+    "qty": 745,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20170127-143000-001-000-83",
+    "date": "2017-01-27",
+    "episode": 52,
+    "qty": 731,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20170203-143000-001-000-84",
+    "date": "2017-02-03",
+    "episode": 52,
+    "qty": 731,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20170203-143000-001-000-85",
+    "date": "2017-02-03",
+    "episode": 53,
+    "qty": 735,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20170210-143000-001-000-86",
+    "date": "2017-02-10",
+    "episode": 53,
+    "qty": 735,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20170210-143000-001-000-87",
+    "date": "2017-02-10",
+    "episode": 54,
+    "qty": 785,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20170217-143000-001-000-88",
+    "date": "2017-02-17",
+    "episode": 54,
+    "qty": 785,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20170217-143000-001-000-89",
+    "date": "2017-02-17",
+    "episode": 55,
+    "qty": 774,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20170227-143000-001-000-90",
+    "date": "2017-02-27",
+    "episode": 55,
+    "qty": 774,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20170227-143000-001-000-91",
+    "date": "2017-02-27",
+    "episode": 56,
+    "qty": 769,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20170306-143000-001-000-92",
+    "date": "2017-03-06",
+    "episode": 56,
+    "qty": 769,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20170306-143000-001-000-93",
+    "date": "2017-03-06",
+    "episode": 57,
+    "qty": 765,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20170313-133000-001-000-94",
+    "date": "2017-03-13",
+    "episode": 57,
+    "qty": 765,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20170313-133000-001-000-95",
+    "date": "2017-03-13",
+    "episode": 58,
+    "qty": 761,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20170320-133000-001-000-96",
+    "date": "2017-03-20",
+    "episode": 58,
+    "qty": 761,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20170320-133000-001-000-97",
+    "date": "2017-03-20",
+    "episode": 59,
+    "qty": 759,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20170327-133000-001-000-98",
+    "date": "2017-03-27",
+    "episode": 59,
+    "qty": 759,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20170327-133000-001-000-99",
+    "date": "2017-03-27",
+    "episode": 60,
+    "qty": 771,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20170403-133000-001-000-100",
+    "date": "2017-04-03",
+    "episode": 60,
+    "qty": 771,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20170403-133000-001-000-101",
+    "date": "2017-04-03",
+    "episode": 61,
+    "qty": 754,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20170410-133000-001-000-102",
+    "date": "2017-04-10",
+    "episode": 61,
+    "qty": 754,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20170410-133000-001-000-103",
+    "date": "2017-04-10",
+    "episode": 62,
+    "qty": 757,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20170418-133000-001-000-104",
+    "date": "2017-04-18",
+    "episode": 62,
+    "qty": 757,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20170418-133000-001-000-105",
+    "date": "2017-04-18",
+    "episode": 63,
+    "qty": 763,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20170425-133000-001-000-106",
+    "date": "2017-04-25",
+    "episode": 63,
+    "qty": 763,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20170425-133000-001-000-107",
+    "date": "2017-04-25",
+    "episode": 64,
+    "qty": 742,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20170502-133000-001-000-108",
+    "date": "2017-05-02",
+    "episode": 64,
+    "qty": 742,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20170502-133000-001-000-109",
+    "date": "2017-05-02",
+    "episode": 65,
+    "qty": 727,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20170509-133000-001-000-110",
+    "date": "2017-05-09",
+    "episode": 65,
+    "qty": 727,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20170509-133000-001-000-111",
+    "date": "2017-05-09",
+    "episode": 66,
+    "qty": 724,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20170516-133000-001-000-112",
+    "date": "2017-05-16",
+    "episode": 66,
+    "qty": 724,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20170516-133000-001-000-113",
+    "date": "2017-05-16",
+    "episode": 67,
+    "qty": 717,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20170523-133000-001-000-114",
+    "date": "2017-05-23",
+    "episode": 67,
+    "qty": 717,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20170523-133000-001-000-115",
+    "date": "2017-05-23",
+    "episode": 68,
+    "qty": 717,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20170531-133000-001-000-116",
+    "date": "2017-05-31",
+    "episode": 68,
+    "qty": 717,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20170531-133000-001-000-117",
+    "date": "2017-05-31",
+    "episode": 69,
+    "qty": 705,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20170607-133000-001-000-118",
+    "date": "2017-06-07",
+    "episode": 69,
+    "qty": 705,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20170607-133000-001-000-119",
+    "date": "2017-06-07",
+    "episode": 70,
+    "qty": 698,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20170614-133000-001-000-120",
+    "date": "2017-06-14",
+    "episode": 70,
+    "qty": 698,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20170614-133000-001-000-121",
+    "date": "2017-06-14",
+    "episode": 71,
+    "qty": 709,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20170621-133000-001-000-122",
+    "date": "2017-06-21",
+    "episode": 71,
+    "qty": 709,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20170621-133000-001-000-123",
+    "date": "2017-06-21",
+    "episode": 72,
+    "qty": 715,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20170628-133000-001-000-124",
+    "date": "2017-06-28",
+    "episode": 72,
+    "qty": 715,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20170628-133000-001-000-125",
+    "date": "2017-06-28",
+    "episode": 73,
+    "qty": 721,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20170706-133000-001-000-126",
+    "date": "2017-07-06",
+    "episode": 73,
+    "qty": 721,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20170706-133000-001-000-127",
+    "date": "2017-07-06",
+    "episode": 74,
+    "qty": 714,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20170713-133000-001-000-128",
+    "date": "2017-07-13",
+    "episode": 74,
+    "qty": 714,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20170713-133000-001-000-129",
+    "date": "2017-07-13",
+    "episode": 75,
+    "qty": 709,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20170720-133000-001-000-130",
+    "date": "2017-07-20",
+    "episode": 75,
+    "qty": 709,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20170720-133000-001-000-131",
+    "date": "2017-07-20",
+    "episode": 76,
+    "qty": 692,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20170727-133000-001-000-132",
+    "date": "2017-07-27",
+    "episode": 76,
+    "qty": 692,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20170727-133000-001-000-133",
+    "date": "2017-07-27",
+    "episode": 77,
+    "qty": 685,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20170803-133000-001-000-134",
+    "date": "2017-08-03",
+    "episode": 77,
+    "qty": 685,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20170803-133000-001-000-135",
+    "date": "2017-08-03",
+    "episode": 78,
+    "qty": 694,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20170810-133000-001-000-136",
+    "date": "2017-08-10",
+    "episode": 78,
+    "qty": 694,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20170810-133000-001-000-137",
+    "date": "2017-08-10",
+    "episode": 79,
+    "qty": 697,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20170817-133000-001-000-138",
+    "date": "2017-08-17",
+    "episode": 79,
+    "qty": 697,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20170817-133000-001-000-139",
+    "date": "2017-08-17",
+    "episode": 80,
+    "qty": 695,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20170824-133000-001-000-140",
+    "date": "2017-08-24",
+    "episode": 80,
+    "qty": 695,
+    "side": "SELL"
+  },
+  {
+    "asset": "SPY",
+    "client_order_id": "O-20170824-133000-001-000-141",
+    "date": "2017-08-24",
+    "episode": 81,
+    "qty": 408,
+    "side": "BUY"
+  },
+  {
+    "asset": "SPY",
+    "client_order_id": "O-20170831-133000-001-000-142",
+    "date": "2017-08-31",
+    "episode": 81,
+    "qty": 408,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20170831-133000-001-000-143",
+    "date": "2017-08-31",
+    "episode": 82,
+    "qty": 689,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20170908-133000-001-000-144",
+    "date": "2017-09-08",
+    "episode": 82,
+    "qty": 689,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20170908-133000-001-000-145",
+    "date": "2017-09-08",
+    "episode": 83,
+    "qty": 688,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20170915-133000-001-000-146",
+    "date": "2017-09-15",
+    "episode": 83,
+    "qty": 688,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20170915-133000-001-000-147",
+    "date": "2017-09-15",
+    "episode": 84,
+    "qty": 687,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20170922-133000-001-000-148",
+    "date": "2017-09-22",
+    "episode": 84,
+    "qty": 687,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20170922-133000-001-000-149",
+    "date": "2017-09-22",
+    "episode": 85,
+    "qty": 694,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20170929-133000-001-000-150",
+    "date": "2017-09-29",
+    "episode": 85,
+    "qty": 694,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20170929-133000-001-000-151",
+    "date": "2017-09-29",
+    "episode": 86,
+    "qty": 691,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20171006-133000-001-000-152",
+    "date": "2017-10-06",
+    "episode": 86,
+    "qty": 691,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20171006-133000-001-000-153",
+    "date": "2017-10-06",
+    "episode": 87,
+    "qty": 667,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20171013-133000-001-000-154",
+    "date": "2017-10-13",
+    "episode": 87,
+    "qty": 667,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20171013-133000-001-000-155",
+    "date": "2017-10-13",
+    "episode": 88,
+    "qty": 667,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20171020-133000-001-000-156",
+    "date": "2017-10-20",
+    "episode": 88,
+    "qty": 667,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20171020-133000-001-000-157",
+    "date": "2017-10-20",
+    "episode": 89,
+    "qty": 665,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20171027-133000-001-000-158",
+    "date": "2017-10-27",
+    "episode": 89,
+    "qty": 665,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20171027-133000-001-000-159",
+    "date": "2017-10-27",
+    "episode": 90,
+    "qty": 671,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20171103-133000-001-000-160",
+    "date": "2017-11-03",
+    "episode": 90,
+    "qty": 671,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20171103-133000-001-000-161",
+    "date": "2017-11-03",
+    "episode": 91,
+    "qty": 673,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20171110-143000-001-000-162",
+    "date": "2017-11-10",
+    "episode": 91,
+    "qty": 673,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20171110-143000-001-000-163",
+    "date": "2017-11-10",
+    "episode": 92,
+    "qty": 681,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20171117-143000-001-000-164",
+    "date": "2017-11-17",
+    "episode": 92,
+    "qty": 681,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20171117-143000-001-000-165",
+    "date": "2017-11-17",
+    "episode": 93,
+    "qty": 679,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20171127-143000-001-000-166",
+    "date": "2017-11-27",
+    "episode": 93,
+    "qty": 679,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20171127-143000-001-000-167",
+    "date": "2017-11-27",
+    "episode": 94,
+    "qty": 660,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20171204-143000-001-000-168",
+    "date": "2017-12-04",
+    "episode": 94,
+    "qty": 660,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20171204-143000-001-000-169",
+    "date": "2017-12-04",
+    "episode": 95,
+    "qty": 645,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20171211-143000-001-000-170",
+    "date": "2017-12-11",
+    "episode": 95,
+    "qty": 645,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20171211-143000-001-000-171",
+    "date": "2017-12-11",
+    "episode": 96,
+    "qty": 659,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20171218-143000-001-000-172",
+    "date": "2017-12-18",
+    "episode": 96,
+    "qty": 659,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20171218-143000-001-000-173",
+    "date": "2017-12-18",
+    "episode": 97,
+    "qty": 631,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20171226-143000-001-000-174",
+    "date": "2017-12-26",
+    "episode": 97,
+    "qty": 631,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20171226-143000-001-000-175",
+    "date": "2017-12-26",
+    "episode": 98,
+    "qty": 639,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20180103-143000-001-000-176",
+    "date": "2018-01-03",
+    "episode": 98,
+    "qty": 639,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20180103-143000-001-000-177",
+    "date": "2018-01-03",
+    "episode": 99,
+    "qty": 630,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20180110-143000-001-000-178",
+    "date": "2018-01-10",
+    "episode": 99,
+    "qty": 630,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20180110-143000-001-000-179",
+    "date": "2018-01-10",
+    "episode": 100,
+    "qty": 617,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20180118-143000-001-000-180",
+    "date": "2018-01-18",
+    "episode": 100,
+    "qty": 617,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20180118-143000-001-000-181",
+    "date": "2018-01-18",
+    "episode": 101,
+    "qty": 604,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20180125-143000-001-000-182",
+    "date": "2018-01-25",
+    "episode": 101,
+    "qty": 604,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20180125-143000-001-000-183",
+    "date": "2018-01-25",
+    "episode": 102,
+    "qty": 589,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20180201-143000-001-000-184",
+    "date": "2018-02-01",
+    "episode": 102,
+    "qty": 589,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20180201-143000-001-000-185",
+    "date": "2018-02-01",
+    "episode": 103,
+    "qty": 594,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20180208-143000-001-000-186",
+    "date": "2018-02-08",
+    "episode": 103,
+    "qty": 594,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20180208-143000-001-000-187",
+    "date": "2018-02-08",
+    "episode": 104,
+    "qty": 622,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20180215-143000-001-000-188",
+    "date": "2018-02-15",
+    "episode": 104,
+    "qty": 622,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20180215-143000-001-000-189",
+    "date": "2018-02-15",
+    "episode": 105,
+    "qty": 609,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20180223-143000-001-000-190",
+    "date": "2018-02-23",
+    "episode": 105,
+    "qty": 609,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20180223-143000-001-000-191",
+    "date": "2018-02-23",
+    "episode": 106,
+    "qty": 601,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20180302-143000-001-000-192",
+    "date": "2018-03-02",
+    "episode": 106,
+    "qty": 601,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20180302-143000-001-000-193",
+    "date": "2018-03-02",
+    "episode": 107,
+    "qty": 615,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20180309-143000-001-000-194",
+    "date": "2018-03-09",
+    "episode": 107,
+    "qty": 615,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20180309-143000-001-000-195",
+    "date": "2018-03-09",
+    "episode": 108,
+    "qty": 584,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20180316-133000-001-000-196",
+    "date": "2018-03-16",
+    "episode": 108,
+    "qty": 584,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20180316-133000-001-000-197",
+    "date": "2018-03-16",
+    "episode": 109,
+    "qty": 582,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20180323-133000-001-000-198",
+    "date": "2018-03-23",
+    "episode": 109,
+    "qty": 582,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20180323-133000-001-000-199",
+    "date": "2018-03-23",
+    "episode": 110,
+    "qty": 614,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20180402-133000-001-000-200",
+    "date": "2018-04-02",
+    "episode": 110,
+    "qty": 614,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20180402-133000-001-000-201",
+    "date": "2018-04-02",
+    "episode": 111,
+    "qty": 628,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20180409-133000-001-000-202",
+    "date": "2018-04-09",
+    "episode": 111,
+    "qty": 628,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20180507-133000-001-000-203",
+    "date": "2018-05-07",
+    "episode": 116,
+    "qty": 640,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20180514-133000-001-000-204",
+    "date": "2018-05-14",
+    "episode": 116,
+    "qty": 640,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20180514-133000-001-000-205",
+    "date": "2018-05-14",
+    "episode": 117,
+    "qty": 624,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20180521-133000-001-000-206",
+    "date": "2018-05-21",
+    "episode": 117,
+    "qty": 624,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20180521-133000-001-000-207",
+    "date": "2018-05-21",
+    "episode": 118,
+    "qty": 615,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20180529-133000-001-000-208",
+    "date": "2018-05-29",
+    "episode": 118,
+    "qty": 615,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20180529-133000-001-000-209",
+    "date": "2018-05-29",
+    "episode": 119,
+    "qty": 621,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20180605-133000-001-000-210",
+    "date": "2018-06-05",
+    "episode": 119,
+    "qty": 621,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20180605-133000-001-000-211",
+    "date": "2018-06-05",
+    "episode": 120,
+    "qty": 607,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20180612-133000-001-000-212",
+    "date": "2018-06-12",
+    "episode": 120,
+    "qty": 607,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20180612-133000-001-000-213",
+    "date": "2018-06-12",
+    "episode": 121,
+    "qty": 599,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20180619-133000-001-000-214",
+    "date": "2018-06-19",
+    "episode": 121,
+    "qty": 599,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20180619-133000-001-000-215",
+    "date": "2018-06-19",
+    "episode": 122,
+    "qty": 596,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20180626-133000-001-000-216",
+    "date": "2018-06-26",
+    "episode": 122,
+    "qty": 596,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20180626-133000-001-000-217",
+    "date": "2018-06-26",
+    "episode": 123,
+    "qty": 605,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20180703-133000-001-000-218",
+    "date": "2018-07-03",
+    "episode": 123,
+    "qty": 605,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20180703-133000-001-000-219",
+    "date": "2018-07-03",
+    "episode": 124,
+    "qty": 576,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20180711-133000-001-000-220",
+    "date": "2018-07-11",
+    "episode": 124,
+    "qty": 576,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20180711-133000-001-000-221",
+    "date": "2018-07-11",
+    "episode": 125,
+    "qty": 568,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20180718-133000-001-000-222",
+    "date": "2018-07-18",
+    "episode": 125,
+    "qty": 568,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20180718-133000-001-000-223",
+    "date": "2018-07-18",
+    "episode": 126,
+    "qty": 554,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20180725-133000-001-000-224",
+    "date": "2018-07-25",
+    "episode": 126,
+    "qty": 554,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20180725-133000-001-000-225",
+    "date": "2018-07-25",
+    "episode": 127,
+    "qty": 554,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20180801-133000-001-000-226",
+    "date": "2018-08-01",
+    "episode": 127,
+    "qty": 554,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20180801-133000-001-000-227",
+    "date": "2018-08-01",
+    "episode": 128,
+    "qty": 565,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20180808-133000-001-000-228",
+    "date": "2018-08-08",
+    "episode": 128,
+    "qty": 565,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20180808-133000-001-000-229",
+    "date": "2018-08-08",
+    "episode": 129,
+    "qty": 550,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20180815-133000-001-000-230",
+    "date": "2018-08-15",
+    "episode": 129,
+    "qty": 550,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20180815-133000-001-000-231",
+    "date": "2018-08-15",
+    "episode": 130,
+    "qty": 555,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20180822-133000-001-000-232",
+    "date": "2018-08-22",
+    "episode": 130,
+    "qty": 555,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20180822-133000-001-000-233",
+    "date": "2018-08-22",
+    "episode": 131,
+    "qty": 555,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20180829-133000-001-000-234",
+    "date": "2018-08-29",
+    "episode": 131,
+    "qty": 555,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20180829-133000-001-000-235",
+    "date": "2018-08-29",
+    "episode": 132,
+    "qty": 540,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20180906-133000-001-000-236",
+    "date": "2018-09-06",
+    "episode": 132,
+    "qty": 540,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20180906-133000-001-000-237",
+    "date": "2018-09-06",
+    "episode": 133,
+    "qty": 544,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20180913-133000-001-000-238",
+    "date": "2018-09-13",
+    "episode": 133,
+    "qty": 544,
+    "side": "SELL"
+  },
+  {
+    "asset": "SPY",
+    "client_order_id": "O-20180913-133000-001-000-239",
+    "date": "2018-09-13",
+    "episode": 134,
+    "qty": 344,
+    "side": "BUY"
+  },
+  {
+    "asset": "SPY",
+    "client_order_id": "O-20180920-133000-001-000-240",
+    "date": "2018-09-20",
+    "episode": 134,
+    "qty": 344,
+    "side": "SELL"
+  },
+  {
+    "asset": "SPY",
+    "client_order_id": "O-20180920-133000-001-000-241",
+    "date": "2018-09-20",
+    "episode": 135,
+    "qty": 341,
+    "side": "BUY"
+  },
+  {
+    "asset": "SPY",
+    "client_order_id": "O-20180927-133000-001-000-242",
+    "date": "2018-09-27",
+    "episode": 135,
+    "qty": 341,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20180927-133000-001-000-243",
+    "date": "2018-09-27",
+    "episode": 136,
+    "qty": 540,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20181004-133000-001-000-244",
+    "date": "2018-10-04",
+    "episode": 136,
+    "qty": 540,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20181004-133000-001-000-245",
+    "date": "2018-10-04",
+    "episode": 137,
+    "qty": 539,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20181011-133000-001-000-246",
+    "date": "2018-10-11",
+    "episode": 137,
+    "qty": 539,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20190214-143000-001-000-247",
+    "date": "2019-02-14",
+    "episode": 155,
+    "qty": 586,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20190222-143000-001-000-248",
+    "date": "2019-02-22",
+    "episode": 155,
+    "qty": 586,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20190222-143000-001-000-249",
+    "date": "2019-02-22",
+    "episode": 156,
+    "qty": 581,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20190301-143000-001-000-250",
+    "date": "2019-03-01",
+    "episode": 156,
+    "qty": 581,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20190301-143000-001-000-251",
+    "date": "2019-03-01",
+    "episode": 157,
+    "qty": 633,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20190308-143000-001-000-252",
+    "date": "2019-03-08",
+    "episode": 157,
+    "qty": 633,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20190308-143000-001-000-253",
+    "date": "2019-03-08",
+    "episode": 158,
+    "qty": 589,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20190315-133000-001-000-254",
+    "date": "2019-03-15",
+    "episode": 158,
+    "qty": 589,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20190315-133000-001-000-255",
+    "date": "2019-03-15",
+    "episode": 159,
+    "qty": 647,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20190322-133000-001-000-256",
+    "date": "2019-03-22",
+    "episode": 159,
+    "qty": 647,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20190322-133000-001-000-257",
+    "date": "2019-03-22",
+    "episode": 160,
+    "qty": 550,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20190329-133000-001-000-258",
+    "date": "2019-03-29",
+    "episode": 160,
+    "qty": 550,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20190329-133000-001-000-259",
+    "date": "2019-03-29",
+    "episode": 161,
+    "qty": 556,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20190405-133000-001-000-260",
+    "date": "2019-04-05",
+    "episode": 161,
+    "qty": 556,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20190405-133000-001-000-261",
+    "date": "2019-04-05",
+    "episode": 162,
+    "qty": 542,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20190412-133000-001-000-262",
+    "date": "2019-04-12",
+    "episode": 162,
+    "qty": 542,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20190412-133000-001-000-263",
+    "date": "2019-04-12",
+    "episode": 163,
+    "qty": 538,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20190422-133000-001-000-264",
+    "date": "2019-04-22",
+    "episode": 163,
+    "qty": 538,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20190422-133000-001-000-265",
+    "date": "2019-04-22",
+    "episode": 164,
+    "qty": 535,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20190429-133000-001-000-266",
+    "date": "2019-04-29",
+    "episode": 164,
+    "qty": 535,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20190429-133000-001-000-267",
+    "date": "2019-04-29",
+    "episode": 165,
+    "qty": 524,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20190506-133000-001-000-268",
+    "date": "2019-05-06",
+    "episode": 165,
+    "qty": 524,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20190506-133000-001-000-269",
+    "date": "2019-05-06",
+    "episode": 166,
+    "qty": 534,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20190513-133000-001-000-270",
+    "date": "2019-05-13",
+    "episode": 166,
+    "qty": 534,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20190513-133000-001-000-271",
+    "date": "2019-05-13",
+    "episode": 167,
+    "qty": 554,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20190520-133000-001-000-272",
+    "date": "2019-05-20",
+    "episode": 167,
+    "qty": 554,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20190520-133000-001-000-273",
+    "date": "2019-05-20",
+    "episode": 168,
+    "qty": 554,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20190528-133000-001-000-274",
+    "date": "2019-05-28",
+    "episode": 168,
+    "qty": 554,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20190528-133000-001-000-275",
+    "date": "2019-05-28",
+    "episode": 169,
+    "qty": 559,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20190604-133000-001-000-276",
+    "date": "2019-06-04",
+    "episode": 169,
+    "qty": 559,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20190611-133000-001-000-277",
+    "date": "2019-06-11",
+    "episode": 171,
+    "qty": 540,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20190618-133000-001-000-278",
+    "date": "2019-06-18",
+    "episode": 171,
+    "qty": 540,
+    "side": "SELL"
+  },
+  {
+    "asset": "SPY",
+    "client_order_id": "O-20190618-133000-001-000-279",
+    "date": "2019-06-18",
+    "episode": 172,
+    "qty": 343,
+    "side": "BUY"
+  },
+  {
+    "asset": "SPY",
+    "client_order_id": "O-20190625-133000-001-000-280",
+    "date": "2019-06-25",
+    "episode": 172,
+    "qty": 343,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20190625-133000-001-000-281",
+    "date": "2019-06-25",
+    "episode": 173,
+    "qty": 531,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20190702-133000-001-000-282",
+    "date": "2019-07-02",
+    "episode": 173,
+    "qty": 531,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20190702-133000-001-000-283",
+    "date": "2019-07-02",
+    "episode": 174,
+    "qty": 528,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20190710-133000-001-000-284",
+    "date": "2019-07-10",
+    "episode": 174,
+    "qty": 528,
+    "side": "SELL"
+  },
+  {
+    "asset": "SPY",
+    "client_order_id": "O-20190710-133000-001-000-285",
+    "date": "2019-07-10",
+    "episode": 175,
+    "qty": 335,
+    "side": "BUY"
+  },
+  {
+    "asset": "SPY",
+    "client_order_id": "O-20190717-133000-001-000-286",
+    "date": "2019-07-17",
+    "episode": 175,
+    "qty": 335,
+    "side": "SELL"
+  },
+  {
+    "asset": "SPY",
+    "client_order_id": "O-20190717-133000-001-000-287",
+    "date": "2019-07-17",
+    "episode": 176,
+    "qty": 333,
+    "side": "BUY"
+  },
+  {
+    "asset": "SPY",
+    "client_order_id": "O-20190724-133000-001-000-288",
+    "date": "2019-07-24",
+    "episode": 176,
+    "qty": 333,
+    "side": "SELL"
+  },
+  {
+    "asset": "SPY",
+    "client_order_id": "O-20190724-133000-001-000-289",
+    "date": "2019-07-24",
+    "episode": 177,
+    "qty": 334,
+    "side": "BUY"
+  },
+  {
+    "asset": "SPY",
+    "client_order_id": "O-20190731-133000-001-000-290",
+    "date": "2019-07-31",
+    "episode": 177,
+    "qty": 334,
+    "side": "SELL"
+  },
+  {
+    "asset": "SPY",
+    "client_order_id": "O-20190731-133000-001-000-291",
+    "date": "2019-07-31",
+    "episode": 178,
+    "qty": 332,
+    "side": "BUY"
+  },
+  {
+    "asset": "SPY",
+    "client_order_id": "O-20190807-133000-001-000-292",
+    "date": "2019-08-07",
+    "episode": 178,
+    "qty": 332,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20190814-133000-001-000-293",
+    "date": "2019-08-14",
+    "episode": 180,
+    "qty": 539,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20190821-133000-001-000-294",
+    "date": "2019-08-21",
+    "episode": 180,
+    "qty": 539,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20190821-133000-001-000-295",
+    "date": "2019-08-21",
+    "episode": 181,
+    "qty": 530,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20190828-133000-001-000-296",
+    "date": "2019-08-28",
+    "episode": 181,
+    "qty": 530,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20190828-133000-001-000-297",
+    "date": "2019-08-28",
+    "episode": 182,
+    "qty": 543,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20190905-133000-001-000-298",
+    "date": "2019-09-05",
+    "episode": 182,
+    "qty": 543,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20190905-133000-001-000-299",
+    "date": "2019-09-05",
+    "episode": 183,
+    "qty": 525,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20190912-133000-001-000-300",
+    "date": "2019-09-12",
+    "episode": 183,
+    "qty": 525,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20190912-133000-001-000-301",
+    "date": "2019-09-12",
+    "episode": 184,
+    "qty": 516,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20190919-133000-001-000-302",
+    "date": "2019-09-19",
+    "episode": 184,
+    "qty": 516,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20190919-133000-001-000-303",
+    "date": "2019-09-19",
+    "episode": 185,
+    "qty": 637,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20190926-133000-001-000-304",
+    "date": "2019-09-26",
+    "episode": 185,
+    "qty": 637,
+    "side": "SELL"
+  },
+  {
+    "asset": "SPY",
+    "client_order_id": "O-20190926-133000-001-000-305",
+    "date": "2019-09-26",
+    "episode": 186,
+    "qty": 335,
+    "side": "BUY"
+  },
+  {
+    "asset": "SPY",
+    "client_order_id": "O-20191003-133000-001-000-306",
+    "date": "2019-10-03",
+    "episode": 186,
+    "qty": 335,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20191031-133000-001-000-307",
+    "date": "2019-10-31",
+    "episode": 191,
+    "qty": 506,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20191107-143000-001-000-308",
+    "date": "2019-11-07",
+    "episode": 191,
+    "qty": 506,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20191107-143000-001-000-309",
+    "date": "2019-11-07",
+    "episode": 192,
+    "qty": 498,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20191114-143000-001-000-310",
+    "date": "2019-11-14",
+    "episode": 192,
+    "qty": 498,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20191114-143000-001-000-311",
+    "date": "2019-11-14",
+    "episode": 193,
+    "qty": 497,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20191121-143000-001-000-312",
+    "date": "2019-11-21",
+    "episode": 193,
+    "qty": 497,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20191121-143000-001-000-313",
+    "date": "2019-11-21",
+    "episode": 194,
+    "qty": 495,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20191129-143000-001-000-314",
+    "date": "2019-11-29",
+    "episode": 194,
+    "qty": 495,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20191129-143000-001-000-315",
+    "date": "2019-11-29",
+    "episode": 195,
+    "qty": 615,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20191206-143000-001-000-316",
+    "date": "2019-12-06",
+    "episode": 195,
+    "qty": 615,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20191206-143000-001-000-317",
+    "date": "2019-12-06",
+    "episode": 196,
+    "qty": 489,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20191213-143000-001-000-318",
+    "date": "2019-12-13",
+    "episode": 196,
+    "qty": 489,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20191213-143000-001-000-319",
+    "date": "2019-12-13",
+    "episode": 197,
+    "qty": 484,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20191220-143000-001-000-320",
+    "date": "2019-12-20",
+    "episode": 197,
+    "qty": 484,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20191220-143000-001-000-321",
+    "date": "2019-12-20",
+    "episode": 198,
+    "qty": 472,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20191230-143000-001-000-322",
+    "date": "2019-12-30",
+    "episode": 198,
+    "qty": 472,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20191230-143000-001-000-323",
+    "date": "2019-12-30",
+    "episode": 199,
+    "qty": 468,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20200107-143000-001-000-324",
+    "date": "2020-01-07",
+    "episode": 199,
+    "qty": 468,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20200107-143000-001-000-325",
+    "date": "2020-01-07",
+    "episode": 200,
+    "qty": 463,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20200114-143000-001-000-326",
+    "date": "2020-01-14",
+    "episode": 200,
+    "qty": 463,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20200114-143000-001-000-327",
+    "date": "2020-01-14",
+    "episode": 201,
+    "qty": 452,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20200122-143000-001-000-328",
+    "date": "2020-01-22",
+    "episode": 201,
+    "qty": 452,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20200122-143000-001-000-329",
+    "date": "2020-01-22",
+    "episode": 202,
+    "qty": 445,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20200129-143000-001-000-330",
+    "date": "2020-01-29",
+    "episode": 202,
+    "qty": 445,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20200129-143000-001-000-331",
+    "date": "2020-01-29",
+    "episode": 203,
+    "qty": 449,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20200205-143000-001-000-332",
+    "date": "2020-02-05",
+    "episode": 203,
+    "qty": 449,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20200205-143000-001-000-333",
+    "date": "2020-02-05",
+    "episode": 204,
+    "qty": 434,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20200212-143000-001-000-334",
+    "date": "2020-02-12",
+    "episode": 204,
+    "qty": 434,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20200212-143000-001-000-335",
+    "date": "2020-02-12",
+    "episode": 205,
+    "qty": 428,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20200220-143000-001-000-336",
+    "date": "2020-02-20",
+    "episode": 205,
+    "qty": 428,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20200220-143000-001-000-337",
+    "date": "2020-02-20",
+    "episode": 206,
+    "qty": 422,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20200227-143000-001-000-338",
+    "date": "2020-02-27",
+    "episode": 206,
+    "qty": 422,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20200227-143000-001-000-339",
+    "date": "2020-02-27",
+    "episode": 207,
+    "qty": 474,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20200305-143000-001-000-340",
+    "date": "2020-03-05",
+    "episode": 207,
+    "qty": 474,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20200305-143000-001-000-341",
+    "date": "2020-03-05",
+    "episode": 208,
+    "qty": 470,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20200312-133000-001-000-342",
+    "date": "2020-03-12",
+    "episode": 208,
+    "qty": 470,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20200522-133000-001-000-343",
+    "date": "2020-05-22",
+    "episode": 219,
+    "qty": 437,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20200601-133000-001-000-344",
+    "date": "2020-06-01",
+    "episode": 219,
+    "qty": 437,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20200601-133000-001-000-345",
+    "date": "2020-06-01",
+    "episode": 220,
+    "qty": 430,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20200608-133000-001-000-346",
+    "date": "2020-06-08",
+    "episode": 220,
+    "qty": 430,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20200608-133000-001-000-347",
+    "date": "2020-06-08",
+    "episode": 221,
+    "qty": 417,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20200615-133000-001-000-348",
+    "date": "2020-06-15",
+    "episode": 221,
+    "qty": 417,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20200615-133000-001-000-349",
+    "date": "2020-06-15",
+    "episode": 222,
+    "qty": 750,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20200622-133000-001-000-350",
+    "date": "2020-06-22",
+    "episode": 222,
+    "qty": 750,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20200622-133000-001-000-351",
+    "date": "2020-06-22",
+    "episode": 223,
+    "qty": 410,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20200629-133000-001-000-352",
+    "date": "2020-06-29",
+    "episode": 223,
+    "qty": 410,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20200629-133000-001-000-353",
+    "date": "2020-06-29",
+    "episode": 224,
+    "qty": 416,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20200707-133000-001-000-354",
+    "date": "2020-07-07",
+    "episode": 224,
+    "qty": 416,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20200707-133000-001-000-355",
+    "date": "2020-07-07",
+    "episode": 225,
+    "qty": 387,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20200714-133000-001-000-356",
+    "date": "2020-07-14",
+    "episode": 225,
+    "qty": 387,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20200714-133000-001-000-357",
+    "date": "2020-07-14",
+    "episode": 226,
+    "qty": 390,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20200721-133000-001-000-358",
+    "date": "2020-07-21",
+    "episode": 226,
+    "qty": 390,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20200721-133000-001-000-359",
+    "date": "2020-07-21",
+    "episode": 227,
+    "qty": 372,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20200728-133000-001-000-360",
+    "date": "2020-07-28",
+    "episode": 227,
+    "qty": 372,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20200728-133000-001-000-361",
+    "date": "2020-07-28",
+    "episode": 228,
+    "qty": 385,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20200804-133000-001-000-362",
+    "date": "2020-08-04",
+    "episode": 228,
+    "qty": 385,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20200804-133000-001-000-363",
+    "date": "2020-08-04",
+    "episode": 229,
+    "qty": 371,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20200811-133000-001-000-364",
+    "date": "2020-08-11",
+    "episode": 229,
+    "qty": 371,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20200811-133000-001-000-365",
+    "date": "2020-08-11",
+    "episode": 230,
+    "qty": 627,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20200818-133000-001-000-366",
+    "date": "2020-08-18",
+    "episode": 230,
+    "qty": 627,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20200818-133000-001-000-367",
+    "date": "2020-08-18",
+    "episode": 231,
+    "qty": 361,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20200825-133000-001-000-368",
+    "date": "2020-08-25",
+    "episode": 231,
+    "qty": 361,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20200825-133000-001-000-369",
+    "date": "2020-08-25",
+    "episode": 232,
+    "qty": 353,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20200901-133000-001-000-370",
+    "date": "2020-09-01",
+    "episode": 232,
+    "qty": 353,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20200901-133000-001-000-371",
+    "date": "2020-09-01",
+    "episode": 233,
+    "qty": 335,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20200909-133000-001-000-372",
+    "date": "2020-09-09",
+    "episode": 233,
+    "qty": 335,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20200909-133000-001-000-373",
+    "date": "2020-09-09",
+    "episode": 234,
+    "qty": 362,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20200916-133000-001-000-374",
+    "date": "2020-09-16",
+    "episode": 234,
+    "qty": 362,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20200916-133000-001-000-375",
+    "date": "2020-09-16",
+    "episode": 235,
+    "qty": 357,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20200923-133000-001-000-376",
+    "date": "2020-09-23",
+    "episode": 235,
+    "qty": 357,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20200923-133000-001-000-377",
+    "date": "2020-09-23",
+    "episode": 236,
+    "qty": 367,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20200930-133000-001-000-378",
+    "date": "2020-09-30",
+    "episode": 236,
+    "qty": 367,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20200930-133000-001-000-379",
+    "date": "2020-09-30",
+    "episode": 237,
+    "qty": 362,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20201007-133000-001-000-380",
+    "date": "2020-10-07",
+    "episode": 237,
+    "qty": 362,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20201007-133000-001-000-381",
+    "date": "2020-10-07",
+    "episode": 238,
+    "qty": 630,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20201014-133000-001-000-382",
+    "date": "2020-10-14",
+    "episode": 238,
+    "qty": 630,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20201014-133000-001-000-383",
+    "date": "2020-10-14",
+    "episode": 239,
+    "qty": 613,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20201021-133000-001-000-384",
+    "date": "2020-10-21",
+    "episode": 239,
+    "qty": 613,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20201021-133000-001-000-385",
+    "date": "2020-10-21",
+    "episode": 240,
+    "qty": 351,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20201028-133000-001-000-386",
+    "date": "2020-10-28",
+    "episode": 240,
+    "qty": 351,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20201028-133000-001-000-387",
+    "date": "2020-10-28",
+    "episode": 241,
+    "qty": 646,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20201104-143000-001-000-388",
+    "date": "2020-11-04",
+    "episode": 241,
+    "qty": 646,
+    "side": "SELL"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20201104-143000-001-000-389",
+    "date": "2020-11-04",
+    "episode": 242,
+    "qty": 352,
+    "side": "BUY"
+  },
+  {
+    "asset": "QQQ",
+    "client_order_id": "O-20201111-143000-001-000-390",
+    "date": "2020-11-11",
+    "episode": 242,
+    "qty": 352,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20201111-143000-001-000-391",
+    "date": "2020-11-11",
+    "episode": 243,
+    "qty": 576,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20201118-143000-001-000-392",
+    "date": "2020-11-18",
+    "episode": 243,
+    "qty": 576,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20201118-143000-001-000-393",
+    "date": "2020-11-18",
+    "episode": 244,
+    "qty": 558,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20201125-143000-001-000-394",
+    "date": "2020-11-25",
+    "episode": 244,
+    "qty": 558,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20201125-143000-001-000-395",
+    "date": "2020-11-25",
+    "episode": 245,
+    "qty": 544,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20201203-143000-001-000-396",
+    "date": "2020-12-03",
+    "episode": 245,
+    "qty": 544,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20201203-143000-001-000-397",
+    "date": "2020-12-03",
+    "episode": 246,
+    "qty": 545,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20201210-143000-001-000-398",
+    "date": "2020-12-10",
+    "episode": 246,
+    "qty": 545,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20201210-143000-001-000-399",
+    "date": "2020-12-10",
+    "episode": 247,
+    "qty": 532,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20201217-143000-001-000-400",
+    "date": "2020-12-17",
+    "episode": 247,
+    "qty": 532,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20201217-143000-001-000-401",
+    "date": "2020-12-17",
+    "episode": 248,
+    "qty": 513,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20201224-143000-001-000-402",
+    "date": "2020-12-24",
+    "episode": 248,
+    "qty": 513,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20210111-143000-001-000-403",
+    "date": "2021-01-11",
+    "episode": 249,
+    "qty": 487,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20210119-143000-001-000-404",
+    "date": "2021-01-19",
+    "episode": 249,
+    "qty": 487,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20210119-143000-001-000-405",
+    "date": "2021-01-19",
+    "episode": 250,
+    "qty": 468,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20210126-143000-001-000-406",
+    "date": "2021-01-26",
+    "episode": 250,
+    "qty": 468,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20210126-143000-001-000-407",
+    "date": "2021-01-26",
+    "episode": 251,
+    "qty": 462,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20210202-143000-001-000-408",
+    "date": "2021-02-02",
+    "episode": 251,
+    "qty": 462,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20210202-143000-001-000-409",
+    "date": "2021-02-02",
+    "episode": 252,
+    "qty": 469,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20210209-143000-001-000-410",
+    "date": "2021-02-09",
+    "episode": 252,
+    "qty": 469,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20210209-143000-001-000-411",
+    "date": "2021-02-09",
+    "episode": 253,
+    "qty": 440,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20210217-143000-001-000-412",
+    "date": "2021-02-17",
+    "episode": 253,
+    "qty": 440,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20210217-143000-001-000-413",
+    "date": "2021-02-17",
+    "episode": 254,
+    "qty": 447,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20210224-143000-001-000-414",
+    "date": "2021-02-24",
+    "episode": 254,
+    "qty": 447,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20210224-143000-001-000-415",
+    "date": "2021-02-24",
+    "episode": 255,
+    "qty": 449,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20210303-143000-001-000-416",
+    "date": "2021-03-03",
+    "episode": 255,
+    "qty": 449,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20210303-143000-001-000-417",
+    "date": "2021-03-03",
+    "episode": 256,
+    "qty": 449,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20210310-143000-001-000-418",
+    "date": "2021-03-10",
+    "episode": 256,
+    "qty": 449,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20210310-143000-001-000-419",
+    "date": "2021-03-10",
+    "episode": 257,
+    "qty": 443,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20210317-133000-001-000-420",
+    "date": "2021-03-17",
+    "episode": 257,
+    "qty": 443,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20210317-133000-001-000-421",
+    "date": "2021-03-17",
+    "episode": 258,
+    "qty": 436,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20210324-133000-001-000-422",
+    "date": "2021-03-24",
+    "episode": 258,
+    "qty": 436,
+    "side": "SELL"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20210324-133000-001-000-423",
+    "date": "2021-03-24",
+    "episode": 259,
+    "qty": 454,
+    "side": "BUY"
+  },
+  {
+    "asset": "IWM",
+    "client_order_id": "O-20210331-133000-001-000-424",
+    "date": "2021-03-31",
+    "episode": 259,
+    "qty": 454,
+    "side": "SELL"
+  }
+]

@@ -1,0 +1,16 @@
+╭──────────────────────────────────────────────────────────────────────────────╮
+│security_guide (16 samples): vllm/qwen2.5-7b-instruct-awq                     │
+╰──────────────────────────────────────────────────────────────────────────────╯
+max_connections: 4, dataset: security_guide                                     
+                                                                                
+total time:                           0:00:21                                   
+vllm/qwen2.5-7b-instruct-awq          9,510 tokens [I: 5,590, O: 3,920]         
+                                                                                
+model_graded_fact                                                               
+accuracy           0.688                                                        
+stderr             0.120                                                        
+                                                                                
+Log:                                                                            
+../../g9/inspect-logs-security_guide/2026-09-23T02-50-56-00-00_security-guide_MQ
+bpCtg98yuepH7XioeQTe.json                                                       
+                                                                                

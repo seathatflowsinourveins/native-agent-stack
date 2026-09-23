@@ -12,6 +12,22 @@ sys.path.insert(0, str(SOURCE))
 from safety import Ledger, Quote, RiskLimits, SafetyError
 from recovery import recover
 
+try:  # package mode (python -m unittest tests.x) or discover -s tests (top-level modules)
+    from .adaptive_paper_hermetic import patch_default_stop, restore_default_stop
+except ImportError:
+    from adaptive_paper_hermetic import patch_default_stop, restore_default_stop  # noqa: E402
+
+_HERMETIC_TOKEN = None
+
+
+def setUpModule():
+    global _HERMETIC_TOKEN
+    _HERMETIC_TOKEN = patch_default_stop()
+
+
+def tearDownModule():
+    restore_default_stop(_HERMETIC_TOKEN)
+
 
 def proof(ledger, snapshot, baseline):
     """Independent fake-broker oracle; the integration default is runner.reconcile."""

@@ -1,0 +1,357 @@
+{
+  "source_dir": "$HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/fix-f1-dagu-prereg-1790134073",
+  "substitution": "host home path -> $HOME; UUID-shaped identifiers -> <uuid-N> (same id, same N)",
+  "files": [
+    {
+      "source": "result.json",
+      "committed_as": "result.json",
+      "raw_sha256": "0842cb3d5cce529871488df472ffe6832f9a73ebc63d83661ef20ac3bd10f270",
+      "committed_sha256": "8d7ec032b8c042127c752fef1a02b4101484c2e064366826fc5e6da2babfbb05",
+      "bytes": 10507
+    },
+    {
+      "source": "dagu/sigkill/checkpoint-started.json",
+      "committed_as": "dagu__sigkill__checkpoint-started.json",
+      "raw_sha256": "b2845c6042555a2d116bbea41631666e3eed78a03a8b94615d1fe00c5f70a837",
+      "committed_sha256": "b2845c6042555a2d116bbea41631666e3eed78a03a8b94615d1fe00c5f70a837",
+      "bytes": 27
+    },
+    {
+      "source": "dagu/sigkill/checkpoint.json",
+      "committed_as": "dagu__sigkill__checkpoint.json",
+      "raw_sha256": "59cb2038939b9cd2840eeaed6618634cad75ffe0f9a3b689a44f420f7847a1d0",
+      "committed_sha256": "59cb2038939b9cd2840eeaed6618634cad75ffe0f9a3b689a44f420f7847a1d0",
+      "bytes": 238
+    },
+    {
+      "source": "dagu/sigkill/expected.json",
+      "committed_as": "dagu__sigkill__expected.json",
+      "raw_sha256": "b71639f796b744d6d3bf2897e34f64e9646b808e0136f6dd5222a0c6c47b1893",
+      "committed_sha256": "b71639f796b744d6d3bf2897e34f64e9646b808e0136f6dd5222a0c6c47b1893",
+      "bytes": 176
+    },
+    {
+      "source": "dagu/sigkill/finalize-ready.json",
+      "committed_as": "dagu__sigkill__finalize-ready.json",
+      "raw_sha256": "57444d97825bf8964c134c197983d0952157dfe0383e8b932231022ea4ab12b0",
+      "committed_sha256": "57444d97825bf8964c134c197983d0952157dfe0383e8b932231022ea4ab12b0",
+      "bytes": 21
+    },
+    {
+      "source": "dagu/stop-retry/checkpoint-started.json",
+      "committed_as": "dagu__stop-retry__checkpoint-started.json",
+      "raw_sha256": "b2845c6042555a2d116bbea41631666e3eed78a03a8b94615d1fe00c5f70a837",
+      "committed_sha256": "b2845c6042555a2d116bbea41631666e3eed78a03a8b94615d1fe00c5f70a837",
+      "bytes": 27
+    },
+    {
+      "source": "dagu/stop-retry/checkpoint.json",
+      "committed_as": "dagu__stop-retry__checkpoint.json",
+      "raw_sha256": "59cb2038939b9cd2840eeaed6618634cad75ffe0f9a3b689a44f420f7847a1d0",
+      "committed_sha256": "59cb2038939b9cd2840eeaed6618634cad75ffe0f9a3b689a44f420f7847a1d0",
+      "bytes": 238
+    },
+    {
+      "source": "dagu/stop-retry/completed.json",
+      "committed_as": "dagu__stop-retry__completed.json",
+      "raw_sha256": "382717ea740e3d3dbb68f704b2581baa6f8d4b6292c83328a06d2ec44a435376",
+      "committed_sha256": "382717ea740e3d3dbb68f704b2581baa6f8d4b6292c83328a06d2ec44a435376",
+      "bytes": 133
+    },
+    {
+      "source": "dagu/stop-retry/expected.json",
+      "committed_as": "dagu__stop-retry__expected.json",
+      "raw_sha256": "b71639f796b744d6d3bf2897e34f64e9646b808e0136f6dd5222a0c6c47b1893",
+      "committed_sha256": "b71639f796b744d6d3bf2897e34f64e9646b808e0136f6dd5222a0c6c47b1893",
+      "bytes": 176
+    },
+    {
+      "source": "dagu/stop-retry/finalize-ready.json",
+      "committed_as": "dagu__stop-retry__finalize-ready.json",
+      "raw_sha256": "688441cc3b1736d0c602b2475175d788facbae3c97982d9989d317d0103e618a",
+      "committed_sha256": "688441cc3b1736d0c602b2475175d788facbae3c97982d9989d317d0103e618a",
+      "bytes": 21
+    },
+    {
+      "source": "dagu/stop-retry/retry-ready.json",
+      "committed_as": "dagu__stop-retry__retry-ready.json",
+      "raw_sha256": "653596c7a962ba9cddca8a05b7100102acbcd576686bce29b17d9b7bfe379052",
+      "committed_sha256": "653596c7a962ba9cddca8a05b7100102acbcd576686bce29b17d9b7bfe379052",
+      "bytes": 21
+    },
+    {
+      "source": "dagu/sigkill/config.yaml",
+      "committed_as": "dagu__sigkill__config.yaml",
+      "raw_sha256": "217214edf67ec8e86a52e6714dcbc17acda992d1e315b35c73a7da92779b5959",
+      "committed_sha256": "217214edf67ec8e86a52e6714dcbc17acda992d1e315b35c73a7da92779b5959",
+      "bytes": 42
+    },
+    {
+      "source": "dagu/stop-retry/config.yaml",
+      "committed_as": "dagu__stop-retry__config.yaml",
+      "raw_sha256": "217214edf67ec8e86a52e6714dcbc17acda992d1e315b35c73a7da92779b5959",
+      "committed_sha256": "217214edf67ec8e86a52e6714dcbc17acda992d1e315b35c73a7da92779b5959",
+      "bytes": 42
+    },
+    {
+      "source": "dagu/sigkill/dags/recovery.yaml",
+      "committed_as": "dagu__sigkill__dags__recovery.yaml",
+      "raw_sha256": "1126df5bd19a66ceb099e5f59869b1d2a9005919d3ee787473ad1b26a4b03f78",
+      "committed_sha256": "e577105d9e658ab09198a26b4cb957dc81e90b7ca1c6af93d1b8dc03436bf9a8",
+      "bytes": 751
+    },
+    {
+      "source": "dagu/stop-retry/dags/recovery.yaml",
+      "committed_as": "dagu__stop-retry__dags__recovery.yaml",
+      "raw_sha256": "74708238db7e63fca9f7e822fd2646a84ec38b78593e195b3920ff2ba999bc8d",
+      "committed_sha256": "07861e93bce957966c18c1aa30277d628233bd7f8465ba69f7b86836f83fe8e1",
+      "bytes": 766
+    },
+    {
+      "source": "dagu/sigkill/native/history.stderr",
+      "committed_as": "dagu__sigkill__native__history.stderr",
+      "raw_sha256": "4b33a5fdce243e34e723f8c033448ac95b831b2913c659d9cb2735c45dfa8e9e",
+      "committed_sha256": "4b33a5fdce243e34e723f8c033448ac95b831b2913c659d9cb2735c45dfa8e9e",
+      "bytes": 203
+    },
+    {
+      "source": "dagu/sigkill/native/history.stdout",
+      "committed_as": "dagu__sigkill__native__history.stdout",
+      "raw_sha256": "ce38ccdaa6a4256c2f3573f2754974f00af222814c18f2b9367699d3146e944e",
+      "committed_sha256": "ce38ccdaa6a4256c2f3573f2754974f00af222814c18f2b9367699d3146e944e",
+      "bytes": 201
+    },
+    {
+      "source": "dagu/sigkill/native/recover-retry-1.stderr",
+      "committed_as": "dagu__sigkill__native__recover-retry-1.stderr",
+      "raw_sha256": "5353ae021b0a9406a056b2266367f00be13b1f4ca3132131d8665e003e8985f0",
+      "committed_sha256": "cf643a295aa6af9b0cac1f81c8f47939251cb787e8862461d6d478efc5586a14",
+      "bytes": 766
+    },
+    {
+      "source": "dagu/sigkill/native/recover-retry-1.stdout",
+      "committed_as": "dagu__sigkill__native__recover-retry-1.stdout",
+      "raw_sha256": "0b448378014f99ec7445bbd151b0bee9ccd4cc27d079f9ef0696fb7b1066197f",
+      "committed_sha256": "0b448378014f99ec7445bbd151b0bee9ccd4cc27d079f9ef0696fb7b1066197f",
+      "bytes": 102
+    },
+    {
+      "source": "dagu/sigkill/native/recover-retry-10.stderr",
+      "committed_as": "dagu__sigkill__native__recover-retry-10.stderr",
+      "raw_sha256": "c609e47a658f3e0a7a05136623fcd20cf7a34a160690f244d2a7de70988b198c",
+      "committed_sha256": "04434e3d5ebd30d6e13e0e3b68b7cb23cbd9546ab5e54dfdce923e883d33d2b0",
+      "bytes": 766
+    },
+    {
+      "source": "dagu/sigkill/native/recover-retry-10.stdout",
+      "committed_as": "dagu__sigkill__native__recover-retry-10.stdout",
+      "raw_sha256": "abf0abe72c2c6785962ce39e7eaf3d101f1e43179701fb05b7805655722da6bf",
+      "committed_sha256": "abf0abe72c2c6785962ce39e7eaf3d101f1e43179701fb05b7805655722da6bf",
+      "bytes": 102
+    },
+    {
+      "source": "dagu/sigkill/native/recover-retry-2.stderr",
+      "committed_as": "dagu__sigkill__native__recover-retry-2.stderr",
+      "raw_sha256": "5216977711681a465e2f5799028cbe2bce4d741f1859b89055a4bc7844634c3b",
+      "committed_sha256": "3b9d78f20f0f5698c328146ebbbc4a2868c5697f2cd483e3784b95802f942abc",
+      "bytes": 766
+    },
+    {
+      "source": "dagu/sigkill/native/recover-retry-2.stdout",
+      "committed_as": "dagu__sigkill__native__recover-retry-2.stdout",
+      "raw_sha256": "abc281c6f53d816684c04ae767f44dacd6e96b687b6898130461a044b9b416b5",
+      "committed_sha256": "abc281c6f53d816684c04ae767f44dacd6e96b687b6898130461a044b9b416b5",
+      "bytes": 102
+    },
+    {
+      "source": "dagu/sigkill/native/recover-retry-3.stderr",
+      "committed_as": "dagu__sigkill__native__recover-retry-3.stderr",
+      "raw_sha256": "d9aa9c03ade7a4b74cd6852b181c2ce6aa6eda9758a4929bb00efd511fb3ddb0",
+      "committed_sha256": "48ee2538808f248cb1702dfbab81a3796d8bf77ba5ac3a68e3ddb2189ede7b8f",
+      "bytes": 766
+    },
+    {
+      "source": "dagu/sigkill/native/recover-retry-3.stdout",
+      "committed_as": "dagu__sigkill__native__recover-retry-3.stdout",
+      "raw_sha256": "3bb3f831442e71ae6a766cfbfb86ec324f31523cd2841a1da8adff27db9ab0e7",
+      "committed_sha256": "3bb3f831442e71ae6a766cfbfb86ec324f31523cd2841a1da8adff27db9ab0e7",
+      "bytes": 102
+    },
+    {
+      "source": "dagu/sigkill/native/recover-retry-4.stderr",
+      "committed_as": "dagu__sigkill__native__recover-retry-4.stderr",
+      "raw_sha256": "41ca3383a534b190d31e4d23550de2d92d350c57ecfa9155ecd1636f5fb4c285",
+      "committed_sha256": "50aff57201d6106605b3b0063ad94ea6466a21493db4a77a90f3a11250395caa",
+      "bytes": 766
+    },
+    {
+      "source": "dagu/sigkill/native/recover-retry-4.stdout",
+      "committed_as": "dagu__sigkill__native__recover-retry-4.stdout",
+      "raw_sha256": "876e7a7c84a739a8de73fded37605bb0a55e5c271f883a35a1e528864f6de067",
+      "committed_sha256": "876e7a7c84a739a8de73fded37605bb0a55e5c271f883a35a1e528864f6de067",
+      "bytes": 102
+    },
+    {
+      "source": "dagu/sigkill/native/recover-retry-5.stderr",
+      "committed_as": "dagu__sigkill__native__recover-retry-5.stderr",
+      "raw_sha256": "2db71a67b973441c20fa86b7a1dca2798e0c98fbbbfa2feec586900d4496479e",
+      "committed_sha256": "e6ae9c1c314af93fedd614971c6b2bfcf3b63a5cf8398d29c2c3629fb90e3dd6",
+      "bytes": 766
+    },
+    {
+      "source": "dagu/sigkill/native/recover-retry-5.stdout",
+      "committed_as": "dagu__sigkill__native__recover-retry-5.stdout",
+      "raw_sha256": "729cc4a29ebaa66a4002d6e00f6a0a3f64182b8e75a9b068c209ca7673ad40ad",
+      "committed_sha256": "729cc4a29ebaa66a4002d6e00f6a0a3f64182b8e75a9b068c209ca7673ad40ad",
+      "bytes": 102
+    },
+    {
+      "source": "dagu/sigkill/native/recover-retry-6.stderr",
+      "committed_as": "dagu__sigkill__native__recover-retry-6.stderr",
+      "raw_sha256": "ebaf9dc4a0fd7a754ea8ff978e3a7472e455734afc30e83339aa9ccdd36e0b6b",
+      "committed_sha256": "3c0dbdf283c755d0fe14b11ab58831e280c068ef2a3606c4e32f1b4e89eeb709",
+      "bytes": 766
+    },
+    {
+      "source": "dagu/sigkill/native/recover-retry-6.stdout",
+      "committed_as": "dagu__sigkill__native__recover-retry-6.stdout",
+      "raw_sha256": "da3ae5185d2eee04e0d0bca67360d56b8c7389aa40bdac5fb9eed3c0a1f4554d",
+      "committed_sha256": "da3ae5185d2eee04e0d0bca67360d56b8c7389aa40bdac5fb9eed3c0a1f4554d",
+      "bytes": 102
+    },
+    {
+      "source": "dagu/sigkill/native/recover-retry-7.stderr",
+      "committed_as": "dagu__sigkill__native__recover-retry-7.stderr",
+      "raw_sha256": "6f6b5604ac1ffc46ff7a0f76a00c10eb0c2bf96432c9e9a40f6a624afe03e70f",
+      "committed_sha256": "bbe2113db0f78c033ce317f85c756104c36832c2eabc9e8d2f8cdff8bae20f5c",
+      "bytes": 766
+    },
+    {
+      "source": "dagu/sigkill/native/recover-retry-7.stdout",
+      "committed_as": "dagu__sigkill__native__recover-retry-7.stdout",
+      "raw_sha256": "dfc760a901c8c3410ada04c42499468f574ba50e5b53c17c70bcafdda8a29c57",
+      "committed_sha256": "dfc760a901c8c3410ada04c42499468f574ba50e5b53c17c70bcafdda8a29c57",
+      "bytes": 102
+    },
+    {
+      "source": "dagu/sigkill/native/recover-retry-8.stderr",
+      "committed_as": "dagu__sigkill__native__recover-retry-8.stderr",
+      "raw_sha256": "c404ad4ce46074fc09ceb8067606cbe0510ce2c6b57d2dd33657151108ce4ee4",
+      "committed_sha256": "0316d54ec151439474aba2d020363dd3da5715f6fddfbef775ab5b16a9d1cb40",
+      "bytes": 766
+    },
+    {
+      "source": "dagu/sigkill/native/recover-retry-8.stdout",
+      "committed_as": "dagu__sigkill__native__recover-retry-8.stdout",
+      "raw_sha256": "f626080b8c8da96c530a0a0f63cdb5b6d08fa1b800467b6d151fe06279201f2a",
+      "committed_sha256": "f626080b8c8da96c530a0a0f63cdb5b6d08fa1b800467b6d151fe06279201f2a",
+      "bytes": 102
+    },
+    {
+      "source": "dagu/sigkill/native/recover-retry-9.stderr",
+      "committed_as": "dagu__sigkill__native__recover-retry-9.stderr",
+      "raw_sha256": "6919dc47631eeb4b10d0fecf063ee074e68569e69cebe29a4672a900c4091911",
+      "committed_sha256": "af4f2e1aa954e83fbdbe74bad009740e2bc8b74abe09880d702e1717cc93daa5",
+      "bytes": 766
+    },
+    {
+      "source": "dagu/sigkill/native/recover-retry-9.stdout",
+      "committed_as": "dagu__sigkill__native__recover-retry-9.stdout",
+      "raw_sha256": "99ab2f4b7b97d57e654730b9d4c234a7db83326fff3d6b3e37fe26e943b8a827",
+      "committed_sha256": "99ab2f4b7b97d57e654730b9d4c234a7db83326fff3d6b3e37fe26e943b8a827",
+      "bytes": 102
+    },
+    {
+      "source": "dagu/sigkill/native/start.stderr",
+      "committed_as": "dagu__sigkill__native__start.stderr",
+      "raw_sha256": "b6ba59a2b5863b47e1498611f30f266b13300ac73f4a8d6c1ea6942253e19109",
+      "committed_sha256": "6d9cfc9d3c771c1dda26eff99203fa0d97466fd4dd62cda68f5033000d71e43d",
+      "bytes": 947
+    },
+    {
+      "source": "dagu/sigkill/native/start.stdout",
+      "committed_as": "dagu__sigkill__native__start.stdout",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "committed_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "source": "dagu/stop-retry/native/history.stderr",
+      "committed_as": "dagu__stop-retry__native__history.stderr",
+      "raw_sha256": "9a1c239707baf3811968197101173330a4a3adc5f6c08e44b8c4be93b29d4167",
+      "committed_sha256": "9a1c239707baf3811968197101173330a4a3adc5f6c08e44b8c4be93b29d4167",
+      "bytes": 203
+    },
+    {
+      "source": "dagu/stop-retry/native/history.stdout",
+      "committed_as": "dagu__stop-retry__native__history.stdout",
+      "raw_sha256": "44b2479553565ad101906922daaa3ff68cc2d39aec42d6c7f77f32933aca9b98",
+      "committed_sha256": "44b2479553565ad101906922daaa3ff68cc2d39aec42d6c7f77f32933aca9b98",
+      "bytes": 254
+    },
+    {
+      "source": "dagu/stop-retry/native/retry.stderr",
+      "committed_as": "dagu__stop-retry__native__retry.stderr",
+      "raw_sha256": "cd6fab6be70931db5818f0b9a878aa08e80899e7a2c1dbeb06c9b14a4d9aa627",
+      "committed_sha256": "07e88d259ce7053ead90f8c0c59f260d731ee9d5d7b7bc4262163e239dfdc225",
+      "bytes": 948
+    },
+    {
+      "source": "dagu/stop-retry/native/retry.stdout",
+      "committed_as": "dagu__stop-retry__native__retry.stdout",
+      "raw_sha256": "5132b9fe0fce8d683cfd4eff5f026d6a3ae2d328518e05ca1dfa7cc6f529ccda",
+      "committed_sha256": "ff601f24797ff4b20cb425cffc5c6587aa5cbf4bc1d1679c496127abfb89a246",
+      "bytes": 970
+    },
+    {
+      "source": "dagu/stop-retry/native/start.stderr",
+      "committed_as": "dagu__stop-retry__native__start.stderr",
+      "raw_sha256": "400e37a668c1788f992ac9e684fd081010594fb1280ec64d2f7ffe3061b7edf7",
+      "committed_sha256": "cbd5083b7685fb4b0183ccda3b6562af484a7934cfcea0c5a57de5b0bd098528",
+      "bytes": 1962
+    },
+    {
+      "source": "dagu/stop-retry/native/start.stdout",
+      "committed_as": "dagu__stop-retry__native__start.stdout",
+      "raw_sha256": "aa510ff3faca876db6acae4e7a6d8d7dfeb412f5f148d54ddb84aae9b15ceb4a",
+      "committed_sha256": "ff095c920a491d0f9734c863c6ae548c5c80e74a54bf35a81a02d82b21e7ec96",
+      "bytes": 673
+    },
+    {
+      "source": "dagu/stop-retry/native/stop.stderr",
+      "committed_as": "dagu__stop-retry__native__stop.stderr",
+      "raw_sha256": "c57b16de80259745bc33937d75d44e7a439f70adeef0f516dff986176a0eca0a",
+      "committed_sha256": "c6a53770e880a9d60bf0c707aca068083e9cbfa819819c8349ed2d16c2aeae6a",
+      "bytes": 1147
+    },
+    {
+      "source": "dagu/stop-retry/native/stop.stdout",
+      "committed_as": "dagu__stop-retry__native__stop.stdout",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "committed_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "source": "dagu/sigkill/dagu-home/data/dag-runs/recovery/dag-runs/2026/09/23/dag-run_20260923_032754Z_recovery-a0235d718230f171/a_20260923_032754_031Z_a5ef6d/status.jsonl",
+      "committed_as": "dagu__sigkill__dagu-home__data__dag-runs__recovery__dag-runs__2026__09__23__dag-run_20260923_032754Z_recovery-a0235d718230f171__a_20260923_032754_031Z_a5ef6d__status.jsonl",
+      "raw_sha256": "56479332ad8a33db19b46710b80dd95a6a154048952a720d3aaca3b2517bb466",
+      "committed_sha256": "a95145298c79c8f067a88882b9ed45db6dcb155e5cc155cb344fddbf645fe480",
+      "bytes": 16933
+    },
+    {
+      "source": "dagu/stop-retry/dagu-home/data/dag-runs/recovery/dag-runs/2026/09/23/dag-run_20260923_032753Z_recovery-37b04d106c4b5a53/a_20260923_032753_520Z_ce1d39/status.jsonl",
+      "committed_as": "dagu__stop-retry__dagu-home__data__dag-runs__recovery__dag-runs__2026__09__23__dag-run_20260923_032753Z_recovery-37b04d106c4b5a53__a_20260923_032753_520Z_ce1d39__status.jsonl",
+      "raw_sha256": "4e4de7e1474ed15dfca825579d6c700d7c4461ac2992f5cc48a2449d221f6c57",
+      "committed_sha256": "f44824097df7d339206be9a7378b2303dad79519778ae06382b021503fe91af9",
+      "bytes": 3583
+    },
+    {
+      "source": "dagu/stop-retry/dagu-home/data/dag-runs/recovery/dag-runs/2026/09/23/dag-run_20260923_032753Z_recovery-37b04d106c4b5a53/a_20260923_032753_858Z_3ae24e/status.jsonl",
+      "committed_as": "dagu__stop-retry__dagu-home__data__dag-runs__recovery__dag-runs__2026__09__23__dag-run_20260923_032753Z_recovery-37b04d106c4b5a53__a_20260923_032753_858Z_3ae24e__status.jsonl",
+      "raw_sha256": "36c70f191a17daf012c50a2590748fae4ead281911dc78a79e9bf9b48280d124",
+      "committed_sha256": "6b0dfadc387b10240fa927d4697c465acdcfb8d41a72b6f0f3e729cdf1eef82c",
+      "bytes": 3568
+    }
+  ],
+  "uuid_placeholders": 0
+}

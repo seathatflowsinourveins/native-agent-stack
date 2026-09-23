@@ -1,0 +1,1 @@
+{"arm": "arch", "convergence_flag": 0, "loglik": -1844.243, "n": 1511, "params": {"alpha[1]": 0.242925, "beta[1]": 0.735408, "mu": 0.088622, "omega": 0.038823}, "plan_sha256": "b8d1beba6eddd0388957ca0d9e9c46ebfb2ca538f076419d5a8dcaaaf82be4a7", "variance_forecast_pct2": [0.311237, 0.343317, 0.374702, 0.405407, 0.435446], "version": "8.0.0"}

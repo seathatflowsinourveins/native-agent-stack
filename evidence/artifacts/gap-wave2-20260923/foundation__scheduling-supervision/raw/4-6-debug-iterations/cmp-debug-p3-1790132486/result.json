@@ -1,0 +1,277 @@
+{
+  "completed_at": "2026-09-23T03:03:35.438970+00:00",
+  "engines": {
+    "dagu": {
+      "case_table": {
+        "checkpoint_reuse": true,
+        "retry": true,
+        "sigkill": false,
+        "stop": true
+      },
+      "scenario_a": {
+        "after_retry_status": "succeeded",
+        "before_retry_status": "aborted",
+        "cases": {
+          "checkpoint_reuse": true,
+          "retry": true,
+          "stop": true
+        },
+        "completed_at": "2026-09-23T03:03:02.670909+00:00",
+        "completed_before_retry": false,
+        "executor_helpers_not_run_scoped": [
+          "/bin/sh -c if IFS= read -r line <&3 && [ \"$line\" = \"ok\" ]; then exit 0; fi; kill -KILL -\"$1\" 2>/dev/null; exit 0 dagu-parent-exit-watcher 2301376"
+        ],
+        "frozen": {
+          "expected": {
+            "planner.py": "3a33c48346221e2a103d4fb89d5675d2edaa97e651b7f08cf3a79b7ce0b8d7ef",
+            "test_planner.py": "ee6c07d845bb60545786b2e7507f6b3836c46e005d5ce2b9b60b616e325e0937"
+          },
+          "fixture_sha256": "fccbfe64bc2ed4793010daa3a1b9b2d8ebb83ff1d51a4db37daa4b6d0b7300d7"
+        },
+        "native_run": "recovery-c67fca951b77fdb5",
+        "observed_owned_processes_remaining": 0,
+        "oracle": {
+          "checkpoint_execution_count": 1,
+          "checkpoint_sha256": "59cb2038939b9cd2840eeaed6618634cad75ffe0f9a3b689a44f420f7847a1d0",
+          "checkpoint_sha256_unchanged": true,
+          "checkpoint_tests": 12,
+          "completed": {
+            "checkpoint_sha256": "59cb2038939b9cd2840eeaed6618634cad75ffe0f9a3b689a44f420f7847a1d0",
+            "execution_count": 1,
+            "tests": 12
+          },
+          "completed_matches": true,
+          "final_tests": 12,
+          "retry_ready_written": true
+        },
+        "owned_processes_observed": 3,
+        "remaining_process_commands": [],
+        "retry_finalizer_remaining": false,
+        "same_native_run_id": true,
+        "started_at": "2026-09-23T03:03:02.071867+00:00"
+      },
+      "scenario_b": {
+        "alive_after_kill": [],
+        "all_killed": true,
+        "cases": {
+          "sigkill": false
+        },
+        "completed_at": "2026-09-23T03:03:35.426162+00:00",
+        "final_status": "running",
+        "frozen": {
+          "expected": {
+            "planner.py": "3a33c48346221e2a103d4fb89d5675d2edaa97e651b7f08cf3a79b7ce0b8d7ef",
+            "test_planner.py": "ee6c07d845bb60545786b2e7507f6b3836c46e005d5ce2b9b60b616e325e0937"
+          },
+          "fixture_sha256": "fccbfe64bc2ed4793010daa3a1b9b2d8ebb83ff1d51a4db37daa4b6d0b7300d7"
+        },
+        "killed_process_count": 4,
+        "native_run": "recovery-aa083fe40a373251",
+        "operational_steps": [
+          "dagu scheduler started after the kill (zombie detection)",
+          "dagu retry --run-id --step finalize every 15 s"
+        ],
+        "oracle": {
+          "checkpoint_execution_count": 1,
+          "checkpoint_sha256": "59cb2038939b9cd2840eeaed6618634cad75ffe0f9a3b689a44f420f7847a1d0",
+          "checkpoint_sha256_unchanged": true,
+          "checkpoint_tests": 12,
+          "completed": null,
+          "completed_matches": false,
+          "final_tests": 0,
+          "retry_ready_written": false
+        },
+        "recovery_attempts": [
+          {
+            "at": "2026-09-23T03:03:20.296161+00:00",
+            "exit": 1,
+            "status_after": "running",
+            "stderr_tail": "y-aa083fe40a373251 err=\"already running. dag-run ID=recovery-aa083fe40a373251, socket=/tmp/@dagu_recovery_5a9852.sock\"\nError: failed to execute the dag-run recovery (dag-run ID: recovery-aa083fe40a373251): already running. dag-run ID=recovery-aa083fe40a373251, socket=/tmp/@dagu_recovery_5a9852.sock\n",
+            "verb": "dagu retry --step finalize"
+          },
+          {
+            "at": "2026-09-23T03:03:35.362260+00:00",
+            "exit": 1,
+            "status_after": "running",
+            "stderr_tail": "y-aa083fe40a373251 err=\"already running. dag-run ID=recovery-aa083fe40a373251, socket=/tmp/@dagu_recovery_5a9852.sock\"\nError: failed to execute the dag-run recovery (dag-run ID: recovery-aa083fe40a373251): already running. dag-run ID=recovery-aa083fe40a373251, socket=/tmp/@dagu_recovery_5a9852.sock\n",
+            "verb": "dagu retry --step finalize"
+          }
+        ],
+        "recovery_seconds": 30.3,
+        "started_at": "2026-09-23T03:03:02.671484+00:00",
+        "status_after_kill": "running",
+        "status_after_kill_2s": "running",
+        "window_seconds": 30
+      },
+      "setup": {
+        "install": "existing pinned binary (sha256 20de7ae94e16999ff997db0386dced9504db37c87de333837fd15b4892b98bd7), no new download",
+        "long_running_processes": [
+          "none for stop/retry (dagu start runs the DAG in-process)",
+          "dagu scheduler during SIGKILL recovery only"
+        ],
+        "version": "2.16.6"
+      }
+    },
+    "prefect": {
+      "case_table": {
+        "checkpoint_reuse": true,
+        "retry": true,
+        "sigkill": false,
+        "stop": true
+      },
+      "scenario_a": {
+        "after_retry_status": "COMPLETED",
+        "before_retry_status": "CANCELLED",
+        "cases": {
+          "checkpoint_reuse": true,
+          "retry": true,
+          "stop": true
+        },
+        "completed_at": "2026-09-23T03:01:55.147161+00:00",
+        "completed_before_retry": false,
+        "executor_helpers_not_run_scoped": [
+          "$HOME/.cache/gap-wave2-20260923/scheduling-supervision/challengers/prefect-3.8.6/bin/python -c from multiprocessing.resource_tracker import main;main(16)"
+        ],
+        "frozen": {
+          "expected": {
+            "planner.py": "3a33c48346221e2a103d4fb89d5675d2edaa97e651b7f08cf3a79b7ce0b8d7ef",
+            "test_planner.py": "ee6c07d845bb60545786b2e7507f6b3836c46e005d5ce2b9b60b616e325e0937"
+          },
+          "fixture_sha256": "fccbfe64bc2ed4793010daa3a1b9b2d8ebb83ff1d51a4db37daa4b6d0b7300d7"
+        },
+        "native_run": "<uuid-1>",
+        "observed_owned_processes_remaining": 0,
+        "oracle": {
+          "checkpoint_execution_count": 1,
+          "checkpoint_sha256": "59cb2038939b9cd2840eeaed6618634cad75ffe0f9a3b689a44f420f7847a1d0",
+          "checkpoint_sha256_unchanged": true,
+          "checkpoint_tests": 12,
+          "completed": {
+            "checkpoint_sha256": "59cb2038939b9cd2840eeaed6618634cad75ffe0f9a3b689a44f420f7847a1d0",
+            "execution_count": 1,
+            "tests": 12
+          },
+          "completed_matches": true,
+          "final_tests": 12,
+          "retry_ready_written": true
+        },
+        "owned_processes_observed": 2,
+        "prefect_state_after": {
+          "flow_run_id": "<uuid-1>",
+          "run_count": 2,
+          "state_name": "Completed",
+          "state_type": "COMPLETED",
+          "task_runs": [
+            {
+              "name": "checkpoint-bfd",
+              "run_count": 1,
+              "state_name": "Completed",
+              "state_type": "COMPLETED"
+            },
+            {
+              "name": "checkpoint-cd5",
+              "run_count": 1,
+              "state_name": "Cached",
+              "state_type": "COMPLETED"
+            },
+            {
+              "name": "finalize-d4a",
+              "run_count": 1,
+              "state_name": "Crashed",
+              "state_type": "CRASHED"
+            },
+            {
+              "name": "finalize-f75",
+              "run_count": 1,
+              "state_name": "Completed",
+              "state_type": "COMPLETED"
+            }
+          ]
+        },
+        "remaining_process_commands": [],
+        "retry_finalizer_remaining": false,
+        "same_native_run_id": true,
+        "started_at": "2026-09-23T03:01:36.300733+00:00"
+      },
+      "scenario_b": {
+        "alive_after_kill": [],
+        "all_killed": true,
+        "cases": {
+          "sigkill": false
+        },
+        "completed_at": "2026-09-23T03:03:00.811952+00:00",
+        "final_status": "RUNNING",
+        "frozen": {
+          "expected": {
+            "planner.py": "3a33c48346221e2a103d4fb89d5675d2edaa97e651b7f08cf3a79b7ce0b8d7ef",
+            "test_planner.py": "ee6c07d845bb60545786b2e7507f6b3836c46e005d5ce2b9b60b616e325e0937"
+          },
+          "fixture_sha256": "fccbfe64bc2ed4793010daa3a1b9b2d8ebb83ff1d51a4db37daa4b6d0b7300d7"
+        },
+        "killed_process_count": 4,
+        "native_run": "<uuid-2>",
+        "operational_steps": [
+          "restart the flow.serve runner",
+          "prefect flow-run retry <id> every 15 s"
+        ],
+        "oracle": {
+          "checkpoint_execution_count": 1,
+          "checkpoint_sha256": "59cb2038939b9cd2840eeaed6618634cad75ffe0f9a3b689a44f420f7847a1d0",
+          "checkpoint_sha256_unchanged": true,
+          "checkpoint_tests": 12,
+          "completed": null,
+          "completed_matches": false,
+          "final_tests": 0,
+          "retry_ready_written": false
+        },
+        "recovery_attempts": [
+          {
+            "at": "2026-09-23T03:02:28.892331+00:00",
+            "exit": 1,
+            "output_tail": "Flow run '<uuid-2>' is in state 'RUNNING' and cannot\nbe retried. Only flow runs in terminal states (COMPLETED, FAILED, CANCELLED, \nCRASHED) can be retried.\n",
+            "state_name": "Running",
+            "status_after": "RUNNING",
+            "verb": "prefect flow-run retry"
+          },
+          {
+            "at": "2026-09-23T03:02:58.207838+00:00",
+            "exit": 1,
+            "output_tail": "Flow run '<uuid-2>' is in state 'RUNNING' and cannot\nbe retried. Only flow runs in terminal states (COMPLETED, FAILED, CANCELLED, \nCRASHED) can be retried.\n",
+            "state_name": "Running",
+            "status_after": "RUNNING",
+            "verb": "prefect flow-run retry"
+          }
+        ],
+        "recovery_seconds": 58.6,
+        "started_at": "2026-09-23T03:01:55.147733+00:00",
+        "status_after_kill": "RUNNING",
+        "status_after_kill_2s": "RUNNING",
+        "window_seconds": 30
+      },
+      "setup": {
+        "install": "uv venv + `uv pip install prefect==3.8.6` in a new prefix (network download of the wheel tree)",
+        "long_running_processes": [
+          "prefect server start (loopback, sqlite under the work dir)",
+          "prefect_flow.py serve runner (flow.serve)"
+        ],
+        "server_ready": true,
+        "server_ready_seconds": 8.1,
+        "version": "Version:              3.8.6"
+      }
+    }
+  },
+  "inputs": {
+    "compare.py": "1ababe8c381f72d93ebbd226b9e3fed6f52a2d9493ba8f1fa6e27590d29c7da2",
+    "prefect_ctl.py": "68d19902bd4f8e3a1d8096f9eedd8ed72edda6bf9ba2e06773ab63a11feaf35e",
+    "prefect_flow.py": "7c49fb35afaa7f418a9c77cc99f2ee586af1f86031b4995c410165b2eaa379ac",
+    "temporal_worker.py": "7df916a18e743c42486aeb58682644637ea2d5a7ca153a7abffddb67a0ec3055"
+  },
+  "job_recovery_fixture_sha256": "fccbfe64bc2ed4793010daa3a1b9b2d8ebb83ff1d51a4db37daa4b6d0b7300d7",
+  "leftover_processes_mentioning_work_dir": [
+    "2282363 timeout 900 python3 compare.py --engines prefect,dagu --window 30 --work $HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/cmp-debug-p3-1790132486",
+    "2282366 python3 compare.py --engines prefect,dagu --window 30 --work $HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/cmp-debug-p3-1790132486"
+  ],
+  "platform": "Linux 6.18.33.2-microsoft-standard-WSL2",
+  "python": "3.12.3",
+  "started_at": "2026-09-23T03:01:26.235117+00:00"
+}

@@ -1,0 +1,239 @@
+You are an evidence reviewer. For each case below, judge the CLAIM only against its SOURCE excerpt.
+Do not use tools, files, the network or outside knowledge.
+verdict = supported if the source states or directly entails the claim; contradicted if the source states something incompatible with the claim; insufficient if the source neither entails nor contradicts it.
+Return one JSON object matching the provided schema, with exactly one entry per case_id, in order, and a one-sentence rationale each.
+
+=== C1 (source_ref: evidence/artifacts/foundation-closure-20260921/compaction.json)
+SOURCE:
+{
+  "schema_version": 1,
+  "trigger": "manual",
+  "native_metadata": {
+    "preTokens": 87434,
+    "postTokens": 14934,
+    "cumulativeDroppedTokens": 72500,
+    "durationMs": 42506
+  },
+  "precompact_hook_observation": {
+    "ai-memory_success": true,
+    "context-mode_success": true
+  },
+  "continuity_responses": [
+    "review-contract = foundation-20260921.\nProvider savings were not established — they remain unknown; no causal session or lifetime saving is claimed, and compression/cache counters cannot be summed into them.\nBrokers: IBKR paper and Alpaca paper each remain independently qualified and separate from engine/FX replay and authenticated Alpaca data; existing paper authorization persists.",
+    "No — this was a bounded read-only document review of two files and establishes nothing about broker execution; IBKR paper and Alpaca paper acceptance remain separate, independently qualified work."
+  ],
+  "post_boundary_model_tool_calls": [],
+  "oracle": {
+    "identifier": "foundation-20260921",
+    "provider_savings": "unknown",
+    "broker_acceptance": "not established by document review; separate per broker"
+  },
+  "limitations": [
+    "Manual compaction and three selected facts only; automatic compaction and all-fact preservation untested.",
+    "Context-size change is not provider savings; compaction consumes inference.",
+    "Initial broker wording was ambiguous; a follow-up asked whether any broker acceptance was established and returned explicit No. Both responses retained."
+  ]
+}
+
+CLAIM: Manual compaction returned successful Context Mode and ai-memory PreCompact hook observations.
+
+=== C2 (source_ref: evidence/artifacts/foundation-closure-20260921/compaction.json)
+SOURCE:
+{
+  "schema_version": 1,
+  "trigger": "manual",
+  "native_metadata": {
+    "preTokens": 87434,
+    "postTokens": 14934,
+    "cumulativeDroppedTokens": 72500,
+    "durationMs": 42506
+  },
+  "precompact_hook_observation": {
+    "ai-memory_success": true,
+    "context-mode_success": true
+  },
+  "continuity_responses": [
+    "review-contract = foundation-20260921.\nProvider savings were not established — they remain unknown; no causal session or lifetime saving is claimed, and compression/cache counters cannot be summed into them.\nBrokers: IBKR paper and Alpaca paper each remain independently qualified and separate from engine/FX replay and authenticated Alpaca data; existing paper authorization persists.",
+    "No — this was a bounded read-only document review of two files and establishes nothing about broker execution; IBKR paper and Alpaca paper acceptance remain separate, independently qualified work."
+  ],
+  "post_boundary_model_tool_calls": [],
+  "oracle": {
+    "identifier": "foundation-20260921",
+    "provider_savings": "unknown",
+    "broker_acceptance": "not established by document review; separate per broker"
+  },
+  "limitations": [
+    "Manual compaction and three selected facts only; automatic compaction and all-fact preservation untested.",
+    "Context-size change is not provider savings; compaction consumes inference.",
+    "Initial broker wording was ambiguous; a follow-up asked whether any broker acceptance was established and returned explicit No. Both responses retained."
+  ]
+}
+
+CLAIM: Automatic compaction preserves every fact.
+
+=== C3 (source_ref: docs/native-workflow-writing-recovery-20260921.md)
+SOURCE:
+# Native Workflow writing and recovery qualification
+
+The bounded writing pilot produced correct code in both arms. It did **not**
+establish a fully compliant or superior multi-agent workflow: both arms piped
+native test output, and the Workflow arm omitted the required authoring skill.
+Independent unpiped verification accepted both repairs. Keep a capable single
+agent as the economical choice for this small repair; this one ordered pair is
+not a cross-task model ranking.
+CLAIM: Independent verification accepted both repairs in this small repair comparison.
+
+=== C4 (source_ref: docs/native-workflow-writing-recovery-20260921.md)
+SOURCE:
+# Native Workflow writing and recovery qualification
+
+The bounded writing pilot produced correct code in both arms. It did **not**
+establish a fully compliant or superior multi-agent workflow: both arms piped
+native test output, and the Workflow arm omitted the required authoring skill.
+Independent unpiped verification accepted both repairs. Keep a capable single
+agent as the economical choice for this small repair; this one ordered pair is
+not a cross-task model ranking.
+CLAIM: The native multi-agent workflow is the most efficient runtime for all task types.
+
+=== C5 (source_ref: docs/landscape-foundation-notes.md)
+SOURCE:
+BM25 and hybrid had equal recall@3/5 on 12 queries, at reported average latency
+of 5 ms and 10,328 ms. The incomplete corpus seal and single ordered run limit
+this to a reason to keep the present default pending a representative repeated
+comparison.
+CLAIM: Hybrid retrieval had lower average latency than BM25 in this diagnostic.
+
+=== C6 (source_ref: docs/landscape-foundation-notes.md)
+SOURCE:
+BM25 and hybrid had equal recall@3/5 on 12 queries, at reported average latency
+of 5 ms and 10,328 ms. The incomplete corpus seal and single ordered run limit
+this to a reason to keep the present default pending a representative repeated
+comparison.
+CLAIM: The diagnostic gives a bounded reason to retain the present default pending a representative repeated comparison.
+
+=== C7 (source_ref: https://github.com/typesafe-ai/skills/blob/65a39f393687675ce170e6094757de20370365b9/skills/typesafe-ai/SKILL.md)
+SOURCE:
+Typed output guarantees the interface, not truth.
+CLAIM: A typed output guarantees that the model judgment is true.
+
+=== C8 (source_ref: https://github.com/typesafe-ai/skills/blob/65a39f393687675ce170e6094757de20370365b9/skills/typesafe-ai/SKILL.md)
+SOURCE:
+Typed output guarantees the interface, not truth.
+CLAIM: Jev is qualified as a profitable trading signal across all markets.
+
+=== C9 (source_ref: docs/promptfoo-upstream-retrieval.md#L15-L22)
+SOURCE:
+The September 21 execution returned **4/4 paired documents first**, one passing
+Promptfoo case, zero failures and zero errors. The report displays the complete
+returned matrix. The detail drawer, search and failure filter were exercised,
+and the screenshot was inspected. Served bytes match the native HTML export.
+
+This is upstream-example compatibility, not MTEB, a held-out benchmark or
+evidence of general retrieval superiority. The assertion operates on NVIDIA's
+rounded printed scores. The native report remains a static captured export.
+
+CLAIM: The September 21 execution ranked all four paired documents first.
+
+=== C10 (source_ref: docs/promptfoo-upstream-retrieval.md#L15-L22)
+SOURCE:
+The September 21 execution returned **4/4 paired documents first**, one passing
+Promptfoo case, zero failures and zero errors. The report displays the complete
+returned matrix. The detail drawer, search and failure filter were exercised,
+and the screenshot was inspected. Served bytes match the native HTML export.
+
+This is upstream-example compatibility, not MTEB, a held-out benchmark or
+evidence of general retrieval superiority. The assertion operates on NVIDIA's
+rounded printed scores. The native report remains a static captured export.
+
+CLAIM: The execution is evidence of general retrieval superiority.
+
+=== C11 (source_ref: docs/promptfoo-upstream-retrieval.md#L15-L22)
+SOURCE:
+The September 21 execution returned **4/4 paired documents first**, one passing
+Promptfoo case, zero failures and zero errors. The report displays the complete
+returned matrix. The detail drawer, search and failure filter were exercised,
+and the screenshot was inspected. Served bytes match the native HTML export.
+
+This is upstream-example compatibility, not MTEB, a held-out benchmark or
+evidence of general retrieval superiority. The assertion operates on NVIDIA's
+rounded printed scores. The native report remains a static captured export.
+
+CLAIM: The execution had two failing Promptfoo cases.
+
+=== C12 (source_ref: docs/promptfoo-upstream-retrieval.md#L64-L68)
+SOURCE:
+Separate vLLM metric snapshots increased by 336 prompt tokens and eight completed
+sequences during the final evaluation window, consistent with the example's
+eight texts in two HTTP requests. This is model-scoped observation, not exclusive
+per-evaluation billing or a lifetime-savings figure. Do not sum the two repeated
+successful evaluations as independent quality evidence.
+
+CLAIM: vLLM metric snapshots rose by 336 prompt tokens during the final evaluation window.
+
+=== C13 (source_ref: docs/promptfoo-upstream-retrieval.md#L64-L68)
+SOURCE:
+Separate vLLM metric snapshots increased by 336 prompt tokens and eight completed
+sequences during the final evaluation window, consistent with the example's
+eight texts in two HTTP requests. This is model-scoped observation, not exclusive
+per-evaluation billing or a lifetime-savings figure. Do not sum the two repeated
+successful evaluations as independent quality evidence.
+
+CLAIM: The run cost less in US dollars than a hosted embedding API would have.
+
+=== C14 (source_ref: docs/promptfoo-upstream-retrieval.md#L64-L68)
+SOURCE:
+Separate vLLM metric snapshots increased by 336 prompt tokens and eight completed
+sequences during the final evaluation window, consistent with the example's
+eight texts in two HTTP requests. This is model-scoped observation, not exclusive
+per-evaluation billing or a lifetime-savings figure. Do not sum the two repeated
+successful evaluations as independent quality evidence.
+
+CLAIM: The 336-token figure is exclusive per-evaluation billing.
+
+=== C15 (source_ref: docs/native-skill-practice-20260921.md#L116-L118)
+SOURCE:
+Fresh **Codex 0.155.1** and **Claude Code 2.1.278** invocations completed the
+bounded source review. Both returned all eight judgments, corrected C4 to
+`insufficient` and kept C6's deterministic availability rejection. Claude's
+
+CLAIM: Both native reviews returned all eight judgments.
+
+=== C16 (source_ref: docs/native-skill-practice-20260921.md#L116-L118)
+SOURCE:
+Fresh **Codex 0.155.1** and **Claude Code 2.1.278** invocations completed the
+bounded source review. Both returned all eight judgments, corrected C4 to
+`insufficient` and kept C6's deterministic availability rejection. Claude's
+
+CLAIM: The Claude review finished faster than the Codex review.
+
+=== C17 (source_ref: docs/native-skill-practice-20260921.md#L116-L118)
+SOURCE:
+Fresh **Codex 0.155.1** and **Claude Code 2.1.278** invocations completed the
+bounded source review. Both returned all eight judgments, corrected C4 to
+`insufficient` and kept C6's deterministic availability rejection. Claude's
+
+CLAIM: The Codex review accepted a 'contradicted' label for C4.
+
+=== C18 (source_ref: docs/native-skill-practice-20260921.md#L107-L109)
+SOURCE:
+contains the commands and frozen case-pack hash. Eight uncached TypeSafe requests
+used `jev-1.13.0`, returned zero service errors and matched **7/8** independently
+frozen labels, versus **3/8** for weak literal containment. The
+
+CLAIM: TypeSafe matched more frozen labels than the literal-containment baseline.
+
+=== C19 (source_ref: docs/native-skill-practice-20260921.md#L107-L109)
+SOURCE:
+contains the commands and frozen case-pack hash. Eight uncached TypeSafe requests
+used `jev-1.13.0`, returned zero service errors and matched **7/8** independently
+frozen labels, versus **3/8** for weak literal containment. The
+
+CLAIM: The TypeSafe requests returned two service errors.
+
+=== C20 (source_ref: docs/native-skill-practice-20260921.md#L107-L109)
+SOURCE:
+contains the commands and frozen case-pack hash. Eight uncached TypeSafe requests
+used `jev-1.13.0`, returned zero service errors and matched **7/8** independently
+frozen labels, versus **3/8** for weak literal containment. The
+
+CLAIM: TypeSafe's 7/8 result generalizes to a representative domain benchmark.

@@ -1,0 +1,128 @@
+2026-09-23T14:18:08Z
+{
+ "label": "post-hoc, not preregistered; descriptive only",
+ "window": [
+  "2026-09-23T02:50:00Z",
+  "2026-09-23T03:05:00Z"
+ ],
+ "haiku": {
+  "status": "success",
+  "series_returned": 28,
+  "series_changed_in_window": 2,
+  "series_first_seen_in_window": 4,
+  "delta_by_type": {
+   "input": 118692.0,
+   "output": 4518.0
+  },
+  "changed_or_new_series": [
+   {
+    "labels": {
+     "app_version": "2.1.280",
+     "client_scope": "native-claude",
+     "instance": "<live-instance-id>",
+     "job": "claude-code",
+     "model": "claude-haiku-4-5-20251001",
+     "otel_scope_name": "native-agent-telemetry",
+     "query_source": "auxiliary",
+     "type": "input"
+    },
+    "first_sample_in_window": "2026-09-23T02:50:00+00:00",
+    "value_first_in_window": 449187.0,
+    "value_last_in_window": 567879.0,
+    "last_value_before_window": 449187.0
+   },
+   {
+    "labels": {
+     "app_version": "2.1.280",
+     "client_scope": "native-claude",
+     "instance": "<live-instance-id>",
+     "job": "claude-code",
+     "model": "claude-haiku-4-5-20251001",
+     "otel_scope_name": "native-agent-telemetry",
+     "query_source": "auxiliary",
+     "type": "output"
+    },
+    "first_sample_in_window": "2026-09-23T02:50:00+00:00",
+    "value_first_in_window": 13502.0,
+    "value_last_in_window": 18020.0,
+    "last_value_before_window": 13502.0
+   },
+   {
+    "labels": {
+     "app_version": "2.1.280",
+     "instance": "unscoped",
+     "job": "claude-code",
+     "model": "claude-haiku-4-5-20251001",
+     "otel_scope_name": "native-agent-telemetry",
+     "query_source": "auxiliary",
+     "type": "cacheCreation"
+    },
+    "first_sample_in_window": "2026-09-23T02:50:00+00:00",
+    "value_first_in_window": 0.0,
+    "value_last_in_window": 0.0,
+    "last_value_before_window": null
+   },
+   {
+    "labels": {
+     "app_version": "2.1.280",
+     "instance": "unscoped",
+     "job": "claude-code",
+     "model": "claude-haiku-4-5-20251001",
+     "otel_scope_name": "native-agent-telemetry",
+     "query_source": "auxiliary",
+     "type": "cacheRead"
+    },
+    "first_sample_in_window": "2026-09-23T02:50:00+00:00",
+    "value_first_in_window": 0.0,
+    "value_last_in_window": 0.0,
+    "last_value_before_window": null
+   },
+   {
+    "labels": {
+     "app_version": "2.1.280",
+     "instance": "unscoped",
+     "job": "claude-code",
+     "model": "claude-haiku-4-5-20251001",
+     "otel_scope_name": "native-agent-telemetry",
+     "query_source": "auxiliary",
+     "type": "input"
+    },
+    "first_sample_in_window": "2026-09-23T02:50:00+00:00",
+    "value_first_in_window": 917.0,
+    "value_last_in_window": 917.0,
+    "last_value_before_window": null
+   },
+   {
+    "labels": {
+     "app_version": "2.1.280",
+     "instance": "unscoped",
+     "job": "claude-code",
+     "model": "claude-haiku-4-5-20251001",
+     "otel_scope_name": "native-agent-telemetry",
+     "query_source": "auxiliary",
+     "type": "output"
+    },
+    "first_sample_in_window": "2026-09-23T02:50:00+00:00",
+    "value_first_in_window": 12.0,
+    "value_last_in_window": 12.0,
+    "last_value_before_window": null
+   }
+  ]
+ },
+ "control_opus_1m": {
+  "status": "success",
+  "series_returned": 112,
+  "series_changed_in_window": 23,
+  "series_first_seen_in_window": 0,
+  "delta_by_type": {
+   "cacheCreation": 814402.0,
+   "cacheRead": 11676725.0,
+   "input": 40734.0,
+   "output": 72915.0
+  }
+ },
+ "change_detection_demonstrated": true,
+ "haiku_change_or_new_series_in_window": 6,
+ "child_value_match": []
+}
+exit=0 2026-09-23T14:18:08Z

@@ -1,0 +1,338 @@
+{
+ "cboe": {
+  "early_close_time_published": false,
+  "early_closes": [
+   "2026-11-27",
+   "2026-12-24"
+  ],
+  "hours": {
+   "Cboe BYX and EDGA Equities Trading Hours": [
+    [
+     "Early Trading Session",
+     "7:00 a.m.",
+     "8:00 a.m."
+    ],
+    [
+     "Pre-Market Session",
+     "8:00 a.m.",
+     "9:30 a.m."
+    ],
+    [
+     "Regular Trading Session",
+     "9:30 a.m.",
+     "4:00 p.m."
+    ],
+    [
+     "Post Market Session",
+     "4:00 p.m.",
+     "8:00 p.m."
+    ]
+   ],
+   "Cboe BZX and EDGX Equities Trading Hours": [
+    [
+     "Early Trading Session",
+     "4:00 a.m.",
+     "8:00 a.m."
+    ],
+    [
+     "Pre-Market Trading Session",
+     "8:00 a.m.",
+     "9:30 a.m."
+    ],
+    [
+     "Regular Trading Session",
+     "9:30 a.m.",
+     "4:00 p.m."
+    ],
+    [
+     "Post-Market Session",
+     "4:00 p.m.",
+     "8:00 p.m."
+    ]
+   ]
+  },
+  "n_holidays": 10,
+  "rows": [
+   [
+    "New Year's Day",
+    "January",
+    "1"
+   ],
+   [
+    "Martin Luther King, Jr. Day",
+    "January",
+    "19"
+   ],
+   [
+    "Presidents' Day",
+    "February",
+    "16"
+   ],
+   [
+    "Good Friday",
+    "April",
+    "3"
+   ],
+   [
+    "Memorial Day",
+    "May",
+    "25"
+   ],
+   [
+    "Juneteenth Holiday",
+    "June",
+    "19"
+   ],
+   [
+    "Independence Day Observed",
+    "July",
+    "3"
+   ],
+   [
+    "Labor Day",
+    "September",
+    "7"
+   ],
+   [
+    "Thanksgiving Day",
+    "November",
+    "26"
+   ],
+   [
+    "Thanksgiving Early Close",
+    "November",
+    "27"
+   ],
+   [
+    "Christmas Early Close",
+    "December",
+    "24"
+   ],
+   [
+    "Christmas Day",
+    "December",
+    "25"
+   ]
+  ],
+  "year": 2026
+ },
+ "comparisons_2026": {
+  "cboe_vs_pmc_BATS": {
+   "agree": true,
+   "early_only_library": [],
+   "early_only_page": [],
+   "early_time_mismatch": [],
+   "holidays_only_library": [],
+   "holidays_only_page": []
+  },
+  "cboe_vs_xcals_XNYS": {
+   "agree": true,
+   "early_only_library": [],
+   "early_only_page": [],
+   "early_time_mismatch": [],
+   "holidays_only_library": [],
+   "holidays_only_page": []
+  },
+  "nasdaqtrader_vs_pmc_NASDAQ": {
+   "agree": true,
+   "early_only_library": [],
+   "early_only_page": [],
+   "early_time_mismatch": [],
+   "holidays_only_library": [],
+   "holidays_only_page": []
+  },
+  "nasdaqtrader_vs_pmc_NYSE": {
+   "agree": true,
+   "early_only_library": [],
+   "early_only_page": [],
+   "early_time_mismatch": [],
+   "holidays_only_library": [],
+   "holidays_only_page": []
+  },
+  "nasdaqtrader_vs_xcals_XNAS": {
+   "agree": true,
+   "early_only_library": [],
+   "early_only_page": [],
+   "early_time_mismatch": [],
+   "holidays_only_library": [],
+   "holidays_only_page": []
+  },
+  "nasdaqtrader_vs_xcals_XNYS": {
+   "agree": true,
+   "early_only_library": [],
+   "early_only_page": [],
+   "early_time_mismatch": [],
+   "holidays_only_library": [],
+   "holidays_only_page": []
+  }
+ },
+ "library_aliases": {
+  "consequence": "XNAS, ARCX, XASE (xcals) and NASDAQ, BATS (pmc) are the NYSE rule set; library-vs-library agreement for those venues is one comparison repeated, not per-venue evidence.",
+  "pmc_resolved_class": {
+   "BATS": "NYSEExchangeCalendar",
+   "IEX": "IEXExchangeCalendar",
+   "NASDAQ": "NYSEExchangeCalendar",
+   "NYSE": "NYSEExchangeCalendar"
+  },
+  "xcals_alias_table": {
+   "ARCX": "XNYS",
+   "BATS": "XNYS",
+   "NASDAQ": "XNYS",
+   "NYSE": "XNYS",
+   "XASE": "XNYS",
+   "XNAS": "XNYS"
+  },
+  "xcals_resolved_class": {
+   "ARCX": "XNYSExchangeCalendar",
+   "BATS": "XNYSExchangeCalendar",
+   "XASE": "XNYSExchangeCalendar",
+   "XNAS": "XNYSExchangeCalendar",
+   "XNYS": "XNYSExchangeCalendar"
+  }
+ },
+ "nasdaqtrader": {
+  "early_closes": {
+   "2026-11-27": "13:00",
+   "2026-12-24": "13:00"
+  },
+  "footnote": [
+   "Nasdaq will continue to send alerts to notify customers of days when the Market will close early. Please refer to those alerts for full information, including system operating times. "
+  ],
+  "heading": "U.S. Equity and Options Markets Holiday Schedule 2026 | 2026",
+  "n_holidays": 10,
+  "rows": [
+   [
+    "January",
+    "1",
+    "2026",
+    "New Years Day (Observed)",
+    "Closed"
+   ],
+   [
+    "January",
+    "19",
+    "2026",
+    "Martin Luther King, Jr. Day",
+    "Closed"
+   ],
+   [
+    "February",
+    "16",
+    "2026",
+    "President's Day - U.S.",
+    "Closed"
+   ],
+   [
+    "April",
+    "3",
+    "2026",
+    "Good Friday",
+    "Closed"
+   ],
+   [
+    "May",
+    "25",
+    "2026",
+    "Memorial Day - U.S.",
+    "Closed"
+   ],
+   [
+    "June",
+    "19",
+    "2026",
+    "Juneteenth Holiday (Observed)",
+    "Closed"
+   ],
+   [
+    "July",
+    "3",
+    "2026",
+    "Independence Day - U.S. (Observed)",
+    "Closed"
+   ],
+   [
+    "September",
+    "7",
+    "2026",
+    "Labor Day - U.S.",
+    "Closed"
+   ],
+   [
+    "November",
+    "26",
+    "2026",
+    "Thanksgiving Day - U.S.",
+    "Closed"
+   ],
+   [
+    "November",
+    "27",
+    "2026",
+    "Early Close* - U.S.",
+    "1:00 p.m."
+   ],
+   [
+    "December",
+    "24",
+    "2026",
+    "Early Close* - U.S.",
+    "1:00 p.m."
+   ],
+   [
+    "December",
+    "25",
+    "2026",
+    "Christmas Holiday - U.S.",
+    "Closed"
+   ]
+  ],
+  "years": [
+   2026
+  ]
+ },
+ "nyse_page_extended_hours": {
+  "NYSE American": [
+   "7:00 a.m. to 9:30 a.m. ET"
+  ],
+  "NYSE Arca Equities": [
+   "4:00 a.m. to 9:30 a.m. ET"
+  ],
+  "NYSE National": [
+   "7:00 a.m. to 9:30 a.m. ET"
+  ],
+  "NYSE Texas": [
+   "7:00 a.m. to 9:30 a.m. ET"
+  ]
+ },
+ "nyse_page_scope_statement": [
+  "All NYSE markets observe U.S. holidays as listed below for 2026, 2027, and 2028. "
+ ],
+ "parser_detection_ok": true,
+ "self_test_2026": {
+  "detected": true,
+  "injected": [
+   "2026-03-10 holiday",
+   "2026-11-27 14:00 close"
+  ],
+  "result": {
+   "agree": false,
+   "early_only_library": [],
+   "early_only_page": [],
+   "early_time_mismatch": [
+    [
+     "2026-11-27",
+     "14:00",
+     "13:00"
+    ]
+   ],
+   "holidays_only_library": [],
+   "holidays_only_page": [
+    "2026-03-10"
+   ]
+  }
+ },
+ "versions": {
+  "exchange_calendars": "4.13.2",
+  "pandas_market_calendars": "5.4.0"
+ }
+}

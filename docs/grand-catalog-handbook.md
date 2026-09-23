@@ -287,7 +287,7 @@ than repeating commands.
 | Platform | Status | What exists |
 | --- | --- | --- |
 | Linux / WSL2 x86_64 | Accepted | [Platform page](../adoption/platforms/linux-wsl2.md), pinned `bootstrap-linux.sh` that fails closed on unpinned components, weekly hosted bootstrap lane |
-| macOS arm64 | Drafted, not accepted | [Platform page](../adoption/platforms/macos-arm64.md), `bootstrap-macos.sh`, one [hosted-runner smoke run](../evidence/receipts/adoption-macos-hosted-smoke-20260922.json); nothing ran on a Mac workstation |
+| macOS arm64 | Drafted, not accepted | [Platform page](../adoption/platforms/macos-arm64.md), `bootstrap-macos.sh`, the current [hosted-runner smoke run](../evidence/receipts/adoption-macos-hosted-smoke-20260923.json) (run `35875188590`: pinned install, `qdrant`/`llama-embed` LaunchAgents, embedding acceptance, recording smoke); nothing ran on a Mac workstation |
 
 The macOS profile targets Apple Silicon with 24 GB of unified memory. Its
 embedding backend is llama.cpp Metal serving embeddinggemma-300M. Moving to
@@ -301,15 +301,25 @@ renders `~/.claude/settings.json`, `~/.codex/config.toml` and the project Codex
 configuration with host-specific paths, and `--check` confirms byte identity with
 the live files. Credentials are never transferred; each host signs in natively.
 
-| Order | Profile / action | Destination acceptance |
-| --- | --- | --- |
-| 1 | Pinned checkout and portable validators | Exact revision, intact hashes and explicit installation paths |
-| 2 | `foundation-cpu` (or `macos-arm64-foundation`) | Native Codex/Claude sign-in, tool discovery, a useful QMD/context call and scoped memory retrieval |
-| 3 | Shared skills and workers | One bounded source/build/review task with owned changes |
-| 4 | `research-runtime` | Recreate the SDK lock in a new prefix and run the retained research fixture |
-| 5 | `observability` and `recovery` when selected | Real event delivery and an isolated logical restore |
-| 6 | `semantic-rag` when hardware fits | Actual inference, scoped index/watch queries and recovered state |
-| 7 | `trading-nautilus` | Engine replay; each broker's operation is qualified separately |
+Install profiles in the order of the generated
+[setup-order table](new-host-grand-list.md#setup-order-install-profiles), which
+`scripts/new_host_grand_list.py` builds from `adoption/manifest.json`'s
+`profiles`; start with the pinned checkout and portable validators (exact
+revision, intact hashes, explicit installation paths), and add shared skills
+and workers after the foundation profile (one bounded source/build/review task
+with owned changes). On macOS, `macos-arm64-foundation` takes
+`foundation-cpu`'s place at order 1 (the table lists it later because
+`foundation-cpu` comes first on Linux/WSL2). Each profile's destination
+acceptance:
+
+| Profile / action | Destination acceptance |
+| --- | --- |
+| `foundation-cpu` (or `macos-arm64-foundation`) | Native Codex/Claude sign-in, tool discovery, a useful QMD/context call and scoped memory retrieval |
+| `research-runtime` | Recreate the SDK lock in a new prefix and run the retained research fixture |
+| `observability` when selected | Real event delivery |
+| `semantic-rag` when hardware fits | Actual inference, scoped index/watch queries and recovered state |
+| `recovery` when selected | An isolated logical restore |
+| `trading-nautilus` | Engine replay; each broker's operation is qualified separately |
 
 The prerequisite report only detects executables and platform requirements. A
 clean prefix on the existing host proves that prefix's reproducibility, not a
@@ -343,16 +353,19 @@ own authorization after every required paper and live gate is established, not
 a condition any checker can evaluate. `python3 scripts/trading_gates.py --check`
 verifies the other 19 gates' ladder arithmetically; a status changes only
 through a dated commit after the checker lists the gate as a flip candidate,
-except `live-go`, which only the user can flip. On September 22:
+except `live-go`, which only the user can flip. On September 23 (the checker's
+`rung_ready` and `blocking` fields are the current source):
 
 | Rung | Established | Open |
 | --- | --- | --- |
-| Simulation | Offline equity replay, rc5 supply-chain scan, fail-closed snapshot gate (synthetic), exchange_calendars in the stack | SPY/LEAN parity (blocked on two unsupported mappings), dividend module, pre-2020 delisting, dated security identity, point-in-time news and filings, paid data arm |
+| Simulation | Offline equity replay, SPY/LEAN parity (qualifying parity v2 replay), dividend module, rc5 supply-chain scan, fail-closed snapshot gate (synthetic), exchange_calendars in the stack | Not required for the rung: pre-2020 delisting, dated security identity, point-in-time news and filings, paid data arm |
 | Paper | Alpaca paper smoke, broker-path alert rules (synthetic), credential handling | Adaptive-paper broker trial |
 | Live | None | Leverage ladder 1x/2x/4x, native fault behaviour, IBKR local acceptance, explicit live go |
 
-No rung is ready. Catalog inclusion does not authorize live configuration, paid
-data or hosting, or orders.
+The simulation rung is ready by the checker's arithmetic (every required sim
+gate established); paper and live are not, blocked on the adaptive-paper
+broker trial and the live gates. Catalog inclusion does not authorize live
+configuration, paid data or hosting, or orders.
 
 ## Hardware profiles
 

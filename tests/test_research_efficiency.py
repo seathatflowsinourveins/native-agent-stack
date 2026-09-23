@@ -3,6 +3,7 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+import unittest.mock
 
 ROOT = Path(__file__).resolve().parents[1]
 PATH = ROOT / 'blueprints/us-equities/research-efficiency/experiment.py'
@@ -77,6 +78,24 @@ class ResearchEfficiencyTests(unittest.TestCase):
             (p / 'source.txt').write_text('changed')
             with self.assertRaises(ValueError):
                 self.m.verify_files(p, manifest['files'])
+
+    def test_safe_refuses_a_non_root_owned_symlink_even_set_as_tmpdir(self):
+        # Round-2 security review: the TMPDIR exemption trusted $TMPDIR
+        # unconditionally, so an attacker-controlled symlink set as TMPDIR
+        # (e.g. TMPDIR=/tmp/shared with an attacker-owned link) was tolerated.
+        # This must fail on c1f30cb (which had no ownership check at all) and
+        # pass now that safe() only tolerates a root-owned, non-writable
+        # boundary link -- never a exemption based on $TMPDIR itself.
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            real = root / 'real'; real.mkdir()
+            alias = root / 'alias-as-tmpdir'; alias.symlink_to(real)
+            saved_tempdir = tempfile.tempdir
+            self.addCleanup(setattr, tempfile, 'tempdir', saved_tempdir)
+            tempfile.tempdir = None  # force TMPDIR re-detection, as a fresh process would see
+            with unittest.mock.patch.dict('os.environ', {'TMPDIR': str(alias)}):
+                with self.assertRaisesRegex(ValueError, 'symlink refused'):
+                    self.m.safe(alias / 'victim')
 
     def test_failure_keeps_usage_and_raw_answers(self):
         result = self.m.summarize_native('claude', [{'type': 'result', 'subtype': 'error_max_turns', 'is_error': True, 'usage': {'input_tokens': 5, 'cache_creation_input_tokens': 0, 'cache_read_input_tokens': 0, 'output_tokens': 2}, 'result': 'partial'}], [])

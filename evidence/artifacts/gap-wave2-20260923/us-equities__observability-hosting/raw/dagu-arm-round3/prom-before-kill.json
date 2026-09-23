@@ -1,0 +1,1 @@
+{"status":"success","data":{"resultType":"vector","result":[{"metric":{"span_name":"DAG: obsgap"},"value":[1790150731.707,"1"]},{"metric":{"span_name":"Step: fill-log"},"value":[1790150731.707,"1"]},{"metric":{"span_name":"Step: risk-check"},"value":[1790150731.707,"1"]},{"metric":{"span_name":"Step: sandboxed-worker"},"value":[1790150731.707,"1"]}]}}

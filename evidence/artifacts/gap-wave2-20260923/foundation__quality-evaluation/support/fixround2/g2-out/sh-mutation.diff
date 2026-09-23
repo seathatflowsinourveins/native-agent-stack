@@ -1,0 +1,5 @@
+3c3
+< printf "%s\n" "native stack fixture"
+---
+> printf "%s\n" $1
+diff exit (1 = mutation applied): 1

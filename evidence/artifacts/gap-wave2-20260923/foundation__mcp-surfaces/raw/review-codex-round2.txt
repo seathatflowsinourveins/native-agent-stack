@@ -1,0 +1,19 @@
+finding 1: resolved - Gap 0’s `raw/0-readme-measure.txt` retains 2205 bytes, 15 CRs, and the matching normalized 2190-byte hash.
+
+finding 2: resolved - Gap 1’s `raw/1-install-identity.txt` retains package versions/integrities, 41 distribution differences, and identical `daemon/client.js` hashes.
+
+finding 10: resolved - Both lifecycle raw files’ `stages.startup_timeout_held_lock` record natural exit at 95 seconds, returncode 0, and successful retry. `run_lifecycle.py:287–309` waits without killing the holder.
+
+finding 11: resolved - Gap 10 now has enforced isolation: `enforce.py:26–27` hides the shared socket; lifecycle `enforcement_probe_start` reports ENOENT and `stages.persistence.owned_socket_control` reports connected.
+
+finding 12: resolved - The skipped-arm defect is fixed: `raw/wong2-interactive-list.json.runs` contains all five servers × three executions. Interpretation has new problems below.
+
+finding 13: resolved - Round-1’s unnumbered shared no-contact finding is addressed by enforced bridge/lifecycle reruns and `ns-exact-config.json.enforcement_probe` plus its owned control.
+
+finding 14: resolved - Round-1’s unnumbered timestamp finding is fixed: lifecycle starts precede actions (`run_lifecycle.py:110,123,145,173`). Fix executions follow the committed 04:36:13Z addendum.
+
+new findings:
+
+- **High — Listing incompleteness is not established.** `wong2_pty_list.py:46–53` selects the server, captures the initial page, then cancels without scrolling. Upstream `src/mcp.js:86–99` supplies all primitives to an autocomplete; its `prompts` dependency defaults to ten visible choices and supports navigation. Thus receipts 6/12 and README’s “0/5 complete” and “7/13” conflate unseen tools with missing tools. **Fix:** traverse/search the choices, compare tool identities, then recompute scores and reassess settlement in receipts/results/README. Preserve the demonstrated jcodemunch failure.
+
+- **Medium — Listing latency is not matched.** `wong2_pty_list.py:51–61` includes over two seconds of deliberate waiting plus 0.5 seconds of teardown in `elapsed_ms`; receipts 6/12 compare these medians with ordinary CLI execution times. **Fix:** measure time to listing readiness, or explicitly label these as harness durations unsuitable for latency comparison.

@@ -1,0 +1,34 @@
+[2026-09-23T08:15:25Z] versions dagu=2.16.6 otel=otelcol-contrib version 0.161.0 prom=prometheus, version 3.14.0 (branch: HEAD, revision: d7598b7141418fa35be2b5ec5d0fefb634199610) loki=loki, version 3.7.8 (branch: release-3.7.x, revision: 09e6ce2f) restic=restic 0.19.1 compiled with go1.26.4 on linux/amd64 srt=1.0.0
+[2026-09-23T08:15:50Z] stack pids prom=2153258 loki=2153259 otel=2154420 ready_prom=Prometheus Server is Ready. ready_loki=ready
+[2026-09-23T08:15:50Z] listeners initial: 127.0.0.1:33100 127.0.0.1:33101 127.0.0.1:34317 127.0.0.1:34318 127.0.0.1:39090 
+[2026-09-23T08:15:50Z] dagu start
+[2026-09-23T08:15:52Z] dagu start exit=1
+[2026-09-23T08:15:52Z] dagu status exit=0
+[2026-09-23T08:16:04Z] before-kill prom={"status":"success","data":{"resultType":"vector","result":[{"metric":{"span_name":"DAG: obsgap"},"value":[1790151364.082,"1"]},{"metric":{"span_name":"Step: fill-log"},"value":[1790151364.082,"1"]},{"metric":{"span_name":"Step: risk-check"},"value":[1790151364.082,"1"]},{"metric":{"span_name":"Step: sandboxed-worker"},"value":[1790151364.082,"1"]}]}}
+[2026-09-23T08:16:04Z] before-kill loki_lines=2
+[2026-09-23T08:16:04Z] srt step output: time=2026-09-23T04:15:52.035-04:00 level=ERROR msg="Failed to execute dag-run" err="exit status 56\nrecent stderr (tail):\n not within allowed paths: $HOME/.cache/gap-wave2-20260923/observability-hosting/dagu-arm-4/dagu/data/dag-run-work/obsgap/qlgysgrwbqduyzfiqh3un6pgmi/root/.idea\n[SandboxDebug] [Sandbox Linux] Skipping non-existent deny path not within allowed paths: $HOME/.cache/gap-wave2-20260923/observability-hosting/dagu-arm-4/dagu/data/dag-run-work/obsgap/qlgysgrwbqduyzfiqh3un6pgmi/root/.claude/commands\n[SandboxDebug] [Sandbox Linux] Skipping non-existent deny path not within allowed paths: $HOME/.cache/gap-wave2-20260923/observability-hosting/dagu-arm-4/dagu/data/dag-run-work/obsgap/qlgysgrwbqduyzfiqh3un6pgmi/root/.claude/agents\n[SandboxDebug] [Sandbox Linux] Wrapped command with bwrap (network, filesystem, seccomp(unix-block) restrictions)\n[SandboxDebug] No matching config rule, denying: example.com:443\n[SandboxDebug] Connection blocked to example.com:443\ncurl: (56) CONNECT tunnel failed, response 403\n[SandboxDebug] Sent SIGTERM to HTTP bridge process\n[SandboxDebug] Sent SIGTERM to SOCKS bridge process\n" [SandboxDebug] Command string mode (-c): sleep 1; curl -sS -m 8 -o /dev/null -w "HTTPSTATUS:%{http_code} EXIT:%{exitcode}\n" https://example.com [SandboxDebug] No matching config rule, denying: example.com:443 curl: (56) CONNECT tunnel failed, response 403 HTTPSTATUS:000 EXIT:56 
+[2026-09-23T08:16:04Z] kill -9
+[2026-09-23T08:16:29Z] stack pids prom=2158030 loki=2158031 otel=2159512 ready_prom=Prometheus Server is Ready. ready_loki=ready
+[2026-09-23T08:16:29Z] listeners after-restart: 127.0.0.1:33100 127.0.0.1:33101 127.0.0.1:34317 127.0.0.1:34318 127.0.0.1:39090 
+[2026-09-23T08:16:37Z] after-restart prom={"status":"success","data":{"resultType":"vector","result":[{"metric":{"span_name":"DAG: obsgap"},"value":[1790151397.125,"1"]},{"metric":{"span_name":"Step: fill-log"},"value":[1790151397.125,"1"]},{"metric":{"span_name":"Step: risk-check"},"value":[1790151397.125,"1"]},{"metric":{"span_name":"Step: sandboxed-worker"},"value":[1790151397.125,"1"]}]}}
+[2026-09-23T08:16:37Z] after-restart loki_lines=4
+[2026-09-23T08:16:37Z] restic hot backup (stack running)
+[2026-09-23T08:16:40Z] backup exit=0
+[2026-09-23T08:16:41Z] check exit=0
+[2026-09-23T08:16:42Z] restore exit=0
+[2026-09-23T08:16:42Z] diff -rq dagu exit=0 lines=0
+[2026-09-23T08:16:42Z] dagu history on restored home exit=0
+[2026-09-23T08:16:42Z] dagu status on restored home exit=0
+[2026-09-23T08:17:04Z] restored prom={"status":"success","data":{"resultType":"vector","result":[{"metric":{"span_name":"DAG: obsgap"},"value":[1790151424.289,"1"]},{"metric":{"span_name":"Step: fill-log"},"value":[1790151424.289,"1"]},{"metric":{"span_name":"Step: risk-check"},"value":[1790151424.289,"1"]},{"metric":{"span_name":"Step: sandboxed-worker"},"value":[1790151424.289,"1"]}]}}
+[2026-09-23T08:17:04Z] restored loki_lines=4
+[2026-09-23T08:17:04Z] listeners restored: 127.0.0.1:33110 127.0.0.1:33111 127.0.0.1:39091 
+PASS prom span names before-kill ['DAG: obsgap', 'Step: fill-log', 'Step: risk-check', 'Step: sandboxed-worker']
+PASS prom span names after-restart ['DAG: obsgap', 'Step: fill-log', 'Step: risk-check', 'Step: sandboxed-worker']
+PASS prom span names restored ['DAG: obsgap', 'Step: fill-log', 'Step: risk-check', 'Step: sandboxed-worker']
+PASS loki marker lines before kill 2
+PASS loki pre-kill timestamps present after-restart 4
+PASS loki pre-kill timestamps present restored 4
+[2026-09-23T08:17:04Z] stop stack
+[2026-09-23T08:17:28Z] processes left for scratch path: 4
+[2026-09-23T08:17:28Z] listeners left: 0
+MARK=obsgap-081525

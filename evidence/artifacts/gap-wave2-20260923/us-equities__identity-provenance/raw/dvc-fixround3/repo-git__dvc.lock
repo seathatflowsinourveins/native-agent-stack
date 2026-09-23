@@ -1,0 +1,160 @@
+schema: '2.0'
+stages:
+  ns_materialize:
+    cmd: mkdir -p data && python code/nanosecond-replay/replay.py materialize 
+      --source code/nanosecond-replay/fixture.json --output data/ns_materialized
+      > data/ns_materialize.json
+    deps:
+    - path: code/financial-data/sec_data.py
+      hash: md5
+      md5: d576dad5f31cef3a80d8f303578045b7
+      size: 27151
+    - path: code/nanosecond-replay/fixture.json
+      hash: md5
+      md5: ccac29b2f379d156db7953daa84343ad
+      size: 2522
+    - path: code/nanosecond-replay/replay.py
+      hash: md5
+      md5: 43f04eca44d52e610c49ac404d78b01a
+      size: 10184
+    - path: code/point-in-time/temporal_snapshot.py
+      hash: md5
+      md5: 18163b8efee92eb2e8f400aa510baf71
+      size: 11998
+    outs:
+    - path: data/ns_materialize.json
+      hash: md5
+      md5: d1d1e03ddeccefdecde0fcc96eddf4ff
+      size: 318
+    - path: data/ns_materialized
+      hash: md5
+      md5: 6f7315e6c760e896b9baff49ed3240a8.dir
+      size: 7302
+      nfiles: 4
+  ns_select:
+    cmd: python stages/stage.py ns-select --code code --materialized 
+      data/ns_materialized --manifest data/ns_materialize.json --out 
+      out/ns_select.json
+    deps:
+    - path: code/nanosecond-replay/select.sql
+      hash: md5
+      md5: 6c89578efae9b006f1bd2d5944e8c5eb
+      size: 1008
+    - path: data/ns_materialize.json
+      hash: md5
+      md5: d1d1e03ddeccefdecde0fcc96eddf4ff
+      size: 318
+    - path: data/ns_materialized
+      hash: md5
+      md5: 6f7315e6c760e896b9baff49ed3240a8.dir
+      size: 7302
+      nfiles: 4
+    - path: stages/stage.py
+      hash: md5
+      md5: 5f056c3f3011b40fb45e61721f41889f
+      size: 17594
+    outs:
+    - path: out/ns_select.json
+      hash: md5
+      md5: 9676b80f759d6224d2c7b94ba7e89f71
+      size: 8496
+  ns_quarantine:
+    cmd: python stages/stage.py ns-quarantine --code code --materialized 
+      data/ns_materialized --manifest data/ns_materialize.json --out 
+      out/ns_quarantine.json
+    deps:
+    - path: data/ns_materialize.json
+      hash: md5
+      md5: d1d1e03ddeccefdecde0fcc96eddf4ff
+      size: 318
+    - path: data/ns_materialized
+      hash: md5
+      md5: 6f7315e6c760e896b9baff49ed3240a8.dir
+      size: 7302
+      nfiles: 4
+    - path: stages/stage.py
+      hash: md5
+      md5: 5f056c3f3011b40fb45e61721f41889f
+      size: 17594
+    outs:
+    - path: out/ns_quarantine.json
+      hash: md5
+      md5: d156cbad4bce8909b39d566e454fe1de
+      size: 2044
+  pit_snapshot:
+    cmd: mkdir -p data && python code/point-in-time/temporal_snapshot.py 
+      snapshot --source code/point-in-time/fixture.json --output 
+      data/pit_snapshot > data/pit_snapshot.json
+    deps:
+    - path: code/financial-data/sec_data.py
+      hash: md5
+      md5: d576dad5f31cef3a80d8f303578045b7
+      size: 27151
+    - path: code/point-in-time/fixture.json
+      hash: md5
+      md5: 05fa1cae50700a96f0b0e7c921b93464
+      size: 6716
+    - path: code/point-in-time/temporal_snapshot.py
+      hash: md5
+      md5: 18163b8efee92eb2e8f400aa510baf71
+      size: 11998
+    outs:
+    - path: data/pit_snapshot
+      hash: md5
+      md5: e253903d6275f5f3b73995bfe1eeba58.dir
+      size: 13182
+      nfiles: 4
+    - path: data/pit_snapshot.json
+      hash: md5
+      md5: d97a167dae4d4f1436be9dd9eea89e6f
+      size: 322
+  pit_select:
+    cmd: python stages/stage.py pit-select --code code --materialized 
+      data/pit_snapshot --manifest data/pit_snapshot.json --out 
+      out/pit_select.json
+    deps:
+    - path: code/point-in-time/select.sql
+      hash: md5
+      md5: 6e636212ad42632d1f6fb2129bda7396
+      size: 1332
+    - path: data/pit_snapshot
+      hash: md5
+      md5: e253903d6275f5f3b73995bfe1eeba58.dir
+      size: 13182
+      nfiles: 4
+    - path: data/pit_snapshot.json
+      hash: md5
+      md5: d97a167dae4d4f1436be9dd9eea89e6f
+      size: 322
+    - path: stages/stage.py
+      hash: md5
+      md5: 5f056c3f3011b40fb45e61721f41889f
+      size: 17594
+    outs:
+    - path: out/pit_select.json
+      hash: md5
+      md5: c3d22205c1f425cc1af8b7766272156c
+      size: 15230
+  pit_quarantine:
+    cmd: python stages/stage.py pit-quarantine --code code --materialized 
+      data/pit_snapshot --manifest data/pit_snapshot.json --out 
+      out/pit_quarantine.json
+    deps:
+    - path: data/pit_snapshot
+      hash: md5
+      md5: e253903d6275f5f3b73995bfe1eeba58.dir
+      size: 13182
+      nfiles: 4
+    - path: data/pit_snapshot.json
+      hash: md5
+      md5: d97a167dae4d4f1436be9dd9eea89e6f
+      size: 322
+    - path: stages/stage.py
+      hash: md5
+      md5: 5f056c3f3011b40fb45e61721f41889f
+      size: 17594
+    outs:
+    - path: out/pit_quarantine.json
+      hash: md5
+      md5: 912caf114dacc6bdf17a14e7a4a3efe2
+      size: 1302

@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "layer": "us-equities/identity-provenance",
+  "label": "fix-round 2 preregistration (after the Codex re-review of 2026-09-23T05:37-05:44Z)",
+  "written_at": "2026-09-23T05:44:56Z",
+  "written_at_note": "approximate: the shell stamp was 05:44:57Z at write time and the commit is 05:44:57Z; written before the gap-4 rerun",
+  "review_findings_addressed": [
+    "P2 gap 4: the recovery predicate used committed_versions for the baseline and accepted whole-batch loss or empty decoded rows (content_check passes on empty input)",
+    "P3 gap 4: the attempt-1 log citation pointed to raw/stores/ instead of raw/stores-round1/"
+  ],
+  "gaps": {
+    "4": {
+      "criteria": [
+        "R4.1 Recovery passes only if decoded whole batches (content_check.batches, minus the seed batch for ArcticDB) equal the committed units the store reports (baseline: hash-verified manifests; DVC: batch files in the committed .dvc; Iceberg: rows/5; ArcticDB: rows/5), and that count is the writer's last recorded count or one more.",
+        "R4.2 When at least one commit is recorded, empty decoded rows fail.",
+        "R4.3 New detector controls, each of which must be flagged: whole-batch loss (one batch removed while the committed count is unchanged) and an empty result.",
+        "Outcome rule: unchanged from the fix round; settled only if R4.1-R4.3 pass for all four arms on a fresh rerun."
+      ]
+    }
+  }
+}

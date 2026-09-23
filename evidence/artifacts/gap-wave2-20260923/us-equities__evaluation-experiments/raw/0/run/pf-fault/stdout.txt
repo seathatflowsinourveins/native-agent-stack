@@ -1,0 +1,40 @@
+Cache is disabled.
+Starting evaluation eval-Sqm-2026-09-23T07:26:43
+Running 8 test cases (up to 1 at a time)...
+Error in transform function
+{
+  "error": {
+    "name": "Error",
+    "message": "injected transient failure for C3 (first attempt)"
+  },
+  "message": "injected transient failure for C3 (first attempt)",
+  "transform": "[inline transform]: (process.env.INJECT_FAIL === '1' && context.vars.claim.startsWith(process.env.C…"
+}
+Provider call failed during eval
+{
+  "providerId": "echo",
+  "providerLabel": "exact-text-baseline-v1",
+  "promptIdx": 0,
+  "testIdx": 2,
+  "error": {
+    "name": "Error",
+    "message": "Transform failed ([inline transform]: (process.env.INJECT_FAIL === '1' && context.vars.claim.startsWith(process.env.C…): injected transient failure for C3 (first attempt)"
+  }
+}
+✓ Eval complete (ID: eval-Sqm-2026-09-23T07:26:43)
+
+» View results: promptfoo view
+» Feedback: https://promptfoo.dev/feedback
+
+
+Results:
+  ✓ 3 passed (37.50%)
+  ✗ 4 failed (50.00%)
+  ✗ 1 error (12.50%)
+Duration: 0s (concurrency: 1)
+
+Writing output to $HOME/.cache/gap-wave2-20260923/evaluation-experiments/raw/0/run/pf-fault/results.json
+
+There were some errors during the operation. See logs for more details.
+Error log: $HOME/.cache/gap-wave2-20260923/evaluation-experiments/raw/0/run/pf-fault/cfg-home/logs/promptfoo-error-2026-09-23_07-26-43-274Z.log
+Debug log: $HOME/.cache/gap-wave2-20260923/evaluation-experiments/raw/0/run/pf-fault/cfg-home/logs/promptfoo-debug-2026-09-23_07-26-43-274Z.log

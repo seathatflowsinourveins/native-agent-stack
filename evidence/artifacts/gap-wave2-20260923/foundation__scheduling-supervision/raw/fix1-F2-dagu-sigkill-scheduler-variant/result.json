@@ -1,0 +1,406 @@
+{
+  "completed_at": "2026-09-23T03:30:58.843985+00:00",
+  "engines": {
+    "dagu": {
+      "case_table": {
+        "checkpoint_reuse": true,
+        "retry": true,
+        "sigkill": true,
+        "stop": true
+      },
+      "scenario_a": {
+        "after_retry_status": "succeeded",
+        "before_retry_status": "aborted",
+        "cases": {
+          "checkpoint_reuse": true,
+          "retry": true,
+          "stop": true
+        },
+        "completed_at": "2026-09-23T03:27:53.929945+00:00",
+        "completed_before_retry": false,
+        "executor_helpers_not_run_scoped": [],
+        "frozen": {
+          "expected": {
+            "planner.py": "3a33c48346221e2a103d4fb89d5675d2edaa97e651b7f08cf3a79b7ce0b8d7ef",
+            "test_planner.py": "ee6c07d845bb60545786b2e7507f6b3836c46e005d5ce2b9b60b616e325e0937"
+          },
+          "fixture_sha256": "fccbfe64bc2ed4793010daa3a1b9b2d8ebb83ff1d51a4db37daa4b6d0b7300d7"
+        },
+        "native_run": "recovery-9b635241c9f95a5a",
+        "observed_owned_processes_remaining": 0,
+        "oracle": {
+          "checkpoint_execution_count": 1,
+          "checkpoint_sha256": "59cb2038939b9cd2840eeaed6618634cad75ffe0f9a3b689a44f420f7847a1d0",
+          "checkpoint_sha256_unchanged": true,
+          "checkpoint_tests": 12,
+          "completed": {
+            "checkpoint_sha256": "59cb2038939b9cd2840eeaed6618634cad75ffe0f9a3b689a44f420f7847a1d0",
+            "execution_count": 1,
+            "tests": 12
+          },
+          "completed_matches": true,
+          "final_tests": 12,
+          "retry_ready_written": true
+        },
+        "owned_processes_observed": 4,
+        "remaining_process_commands": [],
+        "retry_finalizer_remaining": false,
+        "same_native_run_id": true,
+        "started_at": "2026-09-23T03:27:53.472395+00:00"
+      },
+      "scenario_b": {
+        "alive_after_kill": [],
+        "all_killed": true,
+        "cases": {
+          "sigkill": true
+        },
+        "completed_at": "2026-09-23T03:30:58.831738+00:00",
+        "final_status": "succeeded",
+        "frozen": {
+          "expected": {
+            "planner.py": "3a33c48346221e2a103d4fb89d5675d2edaa97e651b7f08cf3a79b7ce0b8d7ef",
+            "test_planner.py": "ee6c07d845bb60545786b2e7507f6b3836c46e005d5ce2b9b60b616e325e0937"
+          },
+          "fixture_sha256": "fccbfe64bc2ed4793010daa3a1b9b2d8ebb83ff1d51a4db37daa4b6d0b7300d7"
+        },
+        "killed_process_count": 4,
+        "native_run": "recovery-009523a6a8fb9c1d",
+        "operational_steps": [
+          "dagu scheduler started after the kill (zombie detection), private config scheduler.port 0",
+          "dagu retry --run-id --step finalize every 15 s"
+        ],
+        "oracle": {
+          "checkpoint_execution_count": 1,
+          "checkpoint_sha256": "59cb2038939b9cd2840eeaed6618634cad75ffe0f9a3b689a44f420f7847a1d0",
+          "checkpoint_sha256_unchanged": true,
+          "checkpoint_tests": 12,
+          "completed": {
+            "checkpoint_sha256": "59cb2038939b9cd2840eeaed6618634cad75ffe0f9a3b689a44f420f7847a1d0",
+            "execution_count": 1,
+            "tests": 12
+          },
+          "completed_matches": true,
+          "final_tests": 12,
+          "retry_ready_written": true
+        },
+        "recovery_attempts": [
+          {
+            "at": "2026-09-23T03:28:11.399009+00:00",
+            "exit": 1,
+            "status_after": "running",
+            "stderr_tail": "y-009523a6a8fb9c1d err=\"already running. dag-run ID=recovery-009523a6a8fb9c1d, socket=/tmp/@dagu_recovery_7a3abb.sock\"\nError: failed to execute the dag-run recovery (dag-run ID: recovery-009523a6a8fb9c1d): already running. dag-run ID=recovery-009523a6a8fb9c1d, socket=/tmp/@dagu_recovery_7a3abb.sock\n",
+            "verb": "dagu retry --step finalize"
+          },
+          {
+            "at": "2026-09-23T03:28:26.555062+00:00",
+            "exit": 1,
+            "status_after": "running",
+            "stderr_tail": "y-009523a6a8fb9c1d err=\"already running. dag-run ID=recovery-009523a6a8fb9c1d, socket=/tmp/@dagu_recovery_7a3abb.sock\"\nError: failed to execute the dag-run recovery (dag-run ID: recovery-009523a6a8fb9c1d): already running. dag-run ID=recovery-009523a6a8fb9c1d, socket=/tmp/@dagu_recovery_7a3abb.sock\n",
+            "verb": "dagu retry --step finalize"
+          },
+          {
+            "at": "2026-09-23T03:28:41.738379+00:00",
+            "exit": 1,
+            "status_after": "running",
+            "stderr_tail": "y-009523a6a8fb9c1d err=\"already running. dag-run ID=recovery-009523a6a8fb9c1d, socket=/tmp/@dagu_recovery_7a3abb.sock\"\nError: failed to execute the dag-run recovery (dag-run ID: recovery-009523a6a8fb9c1d): already running. dag-run ID=recovery-009523a6a8fb9c1d, socket=/tmp/@dagu_recovery_7a3abb.sock\n",
+            "verb": "dagu retry --step finalize"
+          },
+          {
+            "at": "2026-09-23T03:28:56.963591+00:00",
+            "exit": 1,
+            "status_after": "running",
+            "stderr_tail": "y-009523a6a8fb9c1d err=\"already running. dag-run ID=recovery-009523a6a8fb9c1d, socket=/tmp/@dagu_recovery_7a3abb.sock\"\nError: failed to execute the dag-run recovery (dag-run ID: recovery-009523a6a8fb9c1d): already running. dag-run ID=recovery-009523a6a8fb9c1d, socket=/tmp/@dagu_recovery_7a3abb.sock\n",
+            "verb": "dagu retry --step finalize"
+          },
+          {
+            "at": "2026-09-23T03:29:12.202494+00:00",
+            "exit": 1,
+            "status_after": "running",
+            "stderr_tail": "y-009523a6a8fb9c1d err=\"already running. dag-run ID=recovery-009523a6a8fb9c1d, socket=/tmp/@dagu_recovery_7a3abb.sock\"\nError: failed to execute the dag-run recovery (dag-run ID: recovery-009523a6a8fb9c1d): already running. dag-run ID=recovery-009523a6a8fb9c1d, socket=/tmp/@dagu_recovery_7a3abb.sock\n",
+            "verb": "dagu retry --step finalize"
+          },
+          {
+            "at": "2026-09-23T03:29:27.436107+00:00",
+            "exit": 1,
+            "status_after": "running",
+            "stderr_tail": "y-009523a6a8fb9c1d err=\"already running. dag-run ID=recovery-009523a6a8fb9c1d, socket=/tmp/@dagu_recovery_7a3abb.sock\"\nError: failed to execute the dag-run recovery (dag-run ID: recovery-009523a6a8fb9c1d): already running. dag-run ID=recovery-009523a6a8fb9c1d, socket=/tmp/@dagu_recovery_7a3abb.sock\n",
+            "verb": "dagu retry --step finalize"
+          },
+          {
+            "at": "2026-09-23T03:29:42.649487+00:00",
+            "exit": 1,
+            "status_after": "running",
+            "stderr_tail": "y-009523a6a8fb9c1d err=\"already running. dag-run ID=recovery-009523a6a8fb9c1d, socket=/tmp/@dagu_recovery_7a3abb.sock\"\nError: failed to execute the dag-run recovery (dag-run ID: recovery-009523a6a8fb9c1d): already running. dag-run ID=recovery-009523a6a8fb9c1d, socket=/tmp/@dagu_recovery_7a3abb.sock\n",
+            "verb": "dagu retry --step finalize"
+          },
+          {
+            "at": "2026-09-23T03:29:57.888717+00:00",
+            "exit": 1,
+            "status_after": "running",
+            "stderr_tail": "y-009523a6a8fb9c1d err=\"already running. dag-run ID=recovery-009523a6a8fb9c1d, socket=/tmp/@dagu_recovery_7a3abb.sock\"\nError: failed to execute the dag-run recovery (dag-run ID: recovery-009523a6a8fb9c1d): already running. dag-run ID=recovery-009523a6a8fb9c1d, socket=/tmp/@dagu_recovery_7a3abb.sock\n",
+            "verb": "dagu retry --step finalize"
+          },
+          {
+            "at": "2026-09-23T03:30:13.058451+00:00",
+            "exit": 1,
+            "status_after": "running",
+            "stderr_tail": "y-009523a6a8fb9c1d err=\"already running. dag-run ID=recovery-009523a6a8fb9c1d, socket=/tmp/@dagu_recovery_7a3abb.sock\"\nError: failed to execute the dag-run recovery (dag-run ID: recovery-009523a6a8fb9c1d): already running. dag-run ID=recovery-009523a6a8fb9c1d, socket=/tmp/@dagu_recovery_7a3abb.sock\n",
+            "verb": "dagu retry --step finalize"
+          },
+          {
+            "at": "2026-09-23T03:30:28.199439+00:00",
+            "exit": 1,
+            "status_after": "running",
+            "stderr_tail": "y-009523a6a8fb9c1d err=\"already running. dag-run ID=recovery-009523a6a8fb9c1d, socket=/tmp/@dagu_recovery_7a3abb.sock\"\nError: failed to execute the dag-run recovery (dag-run ID: recovery-009523a6a8fb9c1d): already running. dag-run ID=recovery-009523a6a8fb9c1d, socket=/tmp/@dagu_recovery_7a3abb.sock\n",
+            "verb": "dagu retry --step finalize"
+          },
+          {
+            "at": "2026-09-23T03:30:43.358334+00:00",
+            "exit": 1,
+            "status_after": "running",
+            "stderr_tail": "y-009523a6a8fb9c1d err=\"already running. dag-run ID=recovery-009523a6a8fb9c1d, socket=/tmp/@dagu_recovery_7a3abb.sock\"\nError: failed to execute the dag-run recovery (dag-run ID: recovery-009523a6a8fb9c1d): already running. dag-run ID=recovery-009523a6a8fb9c1d, socket=/tmp/@dagu_recovery_7a3abb.sock\n",
+            "verb": "dagu retry --step finalize"
+          },
+          {
+            "at": "2026-09-23T03:30:58.798172+00:00",
+            "exit": 0,
+            "status_after": "succeeded",
+            "stderr_tail": "a6a8fb9c1d worker-id=local attempt-id=27b247 step=finalize\ntime=2026-09-22T23:30:58.760-04:00 level=INFO msg=\"DAG run finished\" dag=recovery run-id=recovery-009523a6a8fb9c1d worker-id=local attempt-id=27b247 status=succeeded started-at=2026-09-22T23:30:58-04:00 finished-at=2026-09-22T23:30:58-04:00\n",
+            "verb": "dagu retry --step finalize"
+          }
+        ],
+        "recovery_seconds": 182.6,
+        "scheduler_isolation": {
+          "health_server_disabled_logged": true,
+          "health_server_started_logged": false,
+          "listener_probe_self_test": {
+            "control_port": 57380,
+            "detected": true,
+            "rows": [
+              "LISTEN 0 1 127.0.0.1:57380 0.0.0.0:* users:((\"python3\",pid=2749436,fd=3))"
+            ]
+          },
+          "listener_rows_owned_by_scheduler_tree": 0,
+          "sample_count": 36,
+          "samples": [
+            {
+              "at": "2026-09-23T03:28:01.256258+00:00",
+              "listeners": [],
+              "scheduler_tree_pids": 1
+            },
+            {
+              "at": "2026-09-23T03:28:06.287636+00:00",
+              "listeners": [],
+              "scheduler_tree_pids": 1
+            },
+            {
+              "at": "2026-09-23T03:28:11.318972+00:00",
+              "listeners": [],
+              "scheduler_tree_pids": 1
+            },
+            {
+              "at": "2026-09-23T03:28:16.405502+00:00",
+              "listeners": [],
+              "scheduler_tree_pids": 1
+            },
+            {
+              "at": "2026-09-23T03:28:21.437395+00:00",
+              "listeners": [],
+              "scheduler_tree_pids": 1
+            },
+            {
+              "at": "2026-09-23T03:28:26.469288+00:00",
+              "listeners": [],
+              "scheduler_tree_pids": 1
+            },
+            {
+              "at": "2026-09-23T03:28:31.561486+00:00",
+              "listeners": [],
+              "scheduler_tree_pids": 1
+            },
+            {
+              "at": "2026-09-23T03:28:36.593186+00:00",
+              "listeners": [],
+              "scheduler_tree_pids": 1
+            },
+            {
+              "at": "2026-09-23T03:28:41.627422+00:00",
+              "listeners": [],
+              "scheduler_tree_pids": 1
+            },
+            {
+              "at": "2026-09-23T03:28:46.748842+00:00",
+              "listeners": [],
+              "scheduler_tree_pids": 1
+            },
+            {
+              "at": "2026-09-23T03:28:51.788092+00:00",
+              "listeners": [],
+              "scheduler_tree_pids": 1
+            },
+            {
+              "at": "2026-09-23T03:28:56.829711+00:00",
+              "listeners": [],
+              "scheduler_tree_pids": 1
+            },
+            {
+              "at": "2026-09-23T03:29:01.976890+00:00",
+              "listeners": [],
+              "scheduler_tree_pids": 1
+            },
+            {
+              "at": "2026-09-23T03:29:07.016416+00:00",
+              "listeners": [],
+              "scheduler_tree_pids": 1
+            },
+            {
+              "at": "2026-09-23T03:29:12.060851+00:00",
+              "listeners": [],
+              "scheduler_tree_pids": 1
+            },
+            {
+              "at": "2026-09-23T03:29:17.209515+00:00",
+              "listeners": [],
+              "scheduler_tree_pids": 1
+            },
+            {
+              "at": "2026-09-23T03:29:22.234348+00:00",
+              "listeners": [],
+              "scheduler_tree_pids": 1
+            },
+            {
+              "at": "2026-09-23T03:29:27.284665+00:00",
+              "listeners": [],
+              "scheduler_tree_pids": 1
+            },
+            {
+              "at": "2026-09-23T03:29:32.447889+00:00",
+              "listeners": [],
+              "scheduler_tree_pids": 1
+            },
+            {
+              "at": "2026-09-23T03:29:37.480844+00:00",
+              "listeners": [],
+              "scheduler_tree_pids": 1
+            },
+            {
+              "at": "2026-09-23T03:29:42.521676+00:00",
+              "listeners": [],
+              "scheduler_tree_pids": 1
+            },
+            {
+              "at": "2026-09-23T03:29:47.660495+00:00",
+              "listeners": [],
+              "scheduler_tree_pids": 1
+            },
+            {
+              "at": "2026-09-23T03:29:52.704202+00:00",
+              "listeners": [],
+              "scheduler_tree_pids": 1
+            },
+            {
+              "at": "2026-09-23T03:29:57.746876+00:00",
+              "listeners": [],
+              "scheduler_tree_pids": 1
+            },
+            {
+              "at": "2026-09-23T03:30:02.895874+00:00",
+              "listeners": [],
+              "scheduler_tree_pids": 1
+            },
+            {
+              "at": "2026-09-23T03:30:07.932099+00:00",
+              "listeners": [],
+              "scheduler_tree_pids": 1
+            },
+            {
+              "at": "2026-09-23T03:30:12.969791+00:00",
+              "listeners": [],
+              "scheduler_tree_pids": 1
+            },
+            {
+              "at": "2026-09-23T03:30:18.065262+00:00",
+              "listeners": [],
+              "scheduler_tree_pids": 1
+            },
+            {
+              "at": "2026-09-23T03:30:23.087856+00:00",
+              "listeners": [],
+              "scheduler_tree_pids": 1
+            },
+            {
+              "at": "2026-09-23T03:30:28.118984+00:00",
+              "listeners": [],
+              "scheduler_tree_pids": 1
+            },
+            {
+              "at": "2026-09-23T03:30:33.205984+00:00",
+              "listeners": [],
+              "scheduler_tree_pids": 1
+            },
+            {
+              "at": "2026-09-23T03:30:38.236756+00:00",
+              "listeners": [],
+              "scheduler_tree_pids": 1
+            },
+            {
+              "at": "2026-09-23T03:30:43.267234+00:00",
+              "listeners": [],
+              "scheduler_tree_pids": 1
+            },
+            {
+              "at": "2026-09-23T03:30:48.365158+00:00",
+              "listeners": [],
+              "scheduler_tree_pids": 1
+            },
+            {
+              "at": "2026-09-23T03:30:53.398189+00:00",
+              "listeners": [],
+              "scheduler_tree_pids": 1
+            },
+            {
+              "at": "2026-09-23T03:30:58.551543+00:00",
+              "listeners": [],
+              "scheduler_tree_pids": 1
+            }
+          ]
+        },
+        "sigkill_within_preregistered_150s": false,
+        "started_at": "2026-09-23T03:27:53.930466+00:00",
+        "status_after_kill": "running",
+        "status_after_kill_2s": "running",
+        "window_seconds": 270
+      },
+      "setup": {
+        "install": "existing pinned binary (sha256 20de7ae94e16999ff997db0386dced9504db37c87de333837fd15b4892b98bd7), no new download",
+        "long_running_processes": [
+          "none for stop/retry (dagu start runs the DAG in-process)",
+          "dagu scheduler during SIGKILL recovery only (--dagu-recovery scheduler)"
+        ],
+        "private_config": "check_updates: false\nscheduler:\n  port: 0\n",
+        "sigkill_recovery_mode": "scheduler",
+        "version": "2.16.6"
+      }
+    }
+  },
+  "inputs": {
+    "compare.py": "973e602ece0b253d606162456198dc041ebedd8918bed55de22b7cf6e894fc7e",
+    "dagu_common.py": "7e47c8d6d07a3ecbba27888db7affa2eec32e66af7b637e6b1f05429d5b664b4",
+    "prefect_ctl.py": "68d19902bd4f8e3a1d8096f9eedd8ed72edda6bf9ba2e06773ab63a11feaf35e",
+    "prefect_flow.py": "7c49fb35afaa7f418a9c77cc99f2ee586af1f86031b4995c410165b2eaa379ac",
+    "temporal_worker.py": "7df916a18e743c42486aeb58682644637ea2d5a7ca153a7abffddb67a0ec3055"
+  },
+  "job_recovery_fixture_sha256": "fccbfe64bc2ed4793010daa3a1b9b2d8ebb83ff1d51a4db37daa4b6d0b7300d7",
+  "leftover_processes_mentioning_work_dir": [
+    "2749436 python3 blueprints/gap-wave2-20260923/foundation__scheduling-supervision/challenger/compare.py --engines dagu --dagu-recovery scheduler --window 270 --work $HOME/.cache/gap-wave2-2026092",
+    "2777368 timeout 295 bash -c until [ -f $HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/fix-f2-dagu-sched-1790134073/result.json ]; do sleep 5; done",
+    "2777369 bash -c until [ -f $HOME/.cache/gap-wave2-20260923/scheduling-supervision/work/fix-f2-dagu-sched-1790134073/result.json ]; do sleep 5; done"
+  ],
+  "platform": "Linux 6.18.33.2-microsoft-standard-WSL2",
+  "protocol": {
+    "dagu_recovery": "scheduler",
+    "window_seconds": 270
+  },
+  "python": "3.12.3",
+  "started_at": "2026-09-23T03:27:53.446732+00:00"
+}

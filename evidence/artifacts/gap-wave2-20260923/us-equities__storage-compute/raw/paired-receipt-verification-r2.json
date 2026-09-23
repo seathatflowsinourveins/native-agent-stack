@@ -1,0 +1,56 @@
+{
+ "receipt": "adoption/paired/receipt.json",
+ "receipt_sha256": "9b00455d09dba24ed47cd5be8cc09b573573f122c9ca10e931f68146e7e57730",
+ "file_sha256": {
+  "astra.report.json": "b396469ae54867014a174852e93ab042ecde68a179a2cd6444c22b2688c6573c",
+  "claude.report.json": "1b65a75fbd41f65bc1c93640436908193f70fec4e75c9405508c9a6f030be179",
+  "packet.json": "c9c0a26829aa4336e8339dc6da84ead9e29a0e83951c5ef2fe49adb3e2bd8490",
+  "observation.json": "1a24e0d90853d3873665aca278efb668e2ceebe33195eddb7cfa53fd69bab5fe"
+ },
+ "checks": {
+  "research_pair_status_succeeded": true,
+  "native_history_status_verified": true,
+  "astra_completed_gpt_6_astra": true,
+  "claude_completed_claude_opus_5": true,
+  "both_roles_workflow_astra_then_claude": true,
+  "same_packet_both_roles": true,
+  "astra_report_hash_matches_file": true,
+  "claude_report_hash_matches_file": true,
+  "both_reports_validated": true,
+  "usage_recorded_both_roles": true,
+  "model_calls_two": true,
+  "astra_prompt_reconstructs": true,
+  "claude_prompt_embeds_accepted_astra_report": true
+ },
+ "all_pass": true,
+ "research_pair_window_utc": [
+  "2026-09-19T19:41:23Z",
+  "2026-09-19T19:41:50Z"
+ ],
+ "models": [
+  "gpt-6-astra",
+  [
+   "claude-opus-5"
+  ]
+ ],
+ "usage": {
+  "astra_total_tokens": 20776,
+  "claude_total_tokens": 16293
+ },
+ "claude_report_keys": [
+  "as_of",
+  "evidence",
+  "findings",
+  "limitations",
+  "status",
+  "trading_authorized"
+ ],
+ "astra_report_keys": [
+  "as_of",
+  "evidence",
+  "findings",
+  "limitations",
+  "status",
+  "trading_authorized"
+ ]
+}

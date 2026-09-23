@@ -1,0 +1,1715 @@
+{
+ "collection": "g2amw_fomc_statements",
+ "qdrant": "http://127.0.0.1:27333",
+ "embedding_model": "nvidia/Nemotron-3-Embed-1B-BF16",
+ "docs": 31,
+ "vector_dim": 2048,
+ "index_seconds": 0.77,
+ "checked_at": "2026-09-23T07:27:17Z",
+ "summary": {
+  "dense": {
+   "queries": 30,
+   "recall@1": 1.0,
+   "recall@3": 1.0,
+   "recall@5": 1.0,
+   "mrr@5": 1.0,
+   "top1_date_correct": 1.0,
+   "top1_answer_correct": 1.0
+  },
+  "dense_date_filter": {
+   "queries": 30,
+   "recall@1": 1.0,
+   "recall@3": 1.0,
+   "recall@5": 1.0,
+   "mrr@5": 1.0,
+   "top1_date_correct": 1.0,
+   "top1_answer_correct": 1.0
+  }
+ },
+ "results": {
+  "dense": [
+   {
+    "id": "monetary20230201a",
+    "gold_date": "2023-02-01",
+    "rank": 1,
+    "top1_date": "2023-02-01",
+    "top1_date_correct": true,
+    "top1_answer_correct": true,
+    "ranked": [
+     {
+      "doc_id": "monetary20230201a",
+      "date": "2023-02-01",
+      "score": 0.6306,
+      "target_range": "4-1/2 to 4-3/4"
+     },
+     {
+      "doc_id": "monetary20230322a",
+      "date": "2023-03-22",
+      "score": 0.56237,
+      "target_range": "4-3/4 to 5"
+     },
+     {
+      "doc_id": "monetary20230503a",
+      "date": "2023-05-03",
+      "score": 0.52611,
+      "target_range": "5 to 5-1/4"
+     },
+     {
+      "doc_id": "monetary20240320a",
+      "date": "2024-03-20",
+      "score": 0.51334,
+      "target_range": "5-1/4 to 5-1/2"
+     },
+     {
+      "doc_id": "monetary20260318a",
+      "date": "2026-03-18",
+      "score": 0.51101,
+      "target_range": "3-1/2 to 3-3/4"
+     }
+    ]
+   },
+   {
+    "id": "monetary20230322a",
+    "gold_date": "2023-03-22",
+    "rank": 1,
+    "top1_date": "2023-03-22",
+    "top1_date_correct": true,
+    "top1_answer_correct": true,
+    "ranked": [
+     {
+      "doc_id": "monetary20230322a",
+      "date": "2023-03-22",
+      "score": 0.62591,
+      "target_range": "4-3/4 to 5"
+     },
+     {
+      "doc_id": "monetary20240320a",
+      "date": "2024-03-20",
+      "score": 0.58808,
+      "target_range": "5-1/4 to 5-1/2"
+     },
+     {
+      "doc_id": "monetary20260318a",
+      "date": "2026-03-18",
+      "score": 0.58263,
+      "target_range": "3-1/2 to 3-3/4"
+     },
+     {
+      "doc_id": "monetary20230503a",
+      "date": "2023-05-03",
+      "score": 0.55362,
+      "target_range": "5 to 5-1/4"
+     },
+     {
+      "doc_id": "monetary20230201a",
+      "date": "2023-02-01",
+      "score": 0.53156,
+      "target_range": "4-1/2 to 4-3/4"
+     }
+    ]
+   },
+   {
+    "id": "monetary20230503a",
+    "gold_date": "2023-05-03",
+    "rank": 1,
+    "top1_date": "2023-05-03",
+    "top1_date_correct": true,
+    "top1_answer_correct": true,
+    "ranked": [
+     {
+      "doc_id": "monetary20230503a",
+      "date": "2023-05-03",
+      "score": 0.63325,
+      "target_range": "5 to 5-1/4"
+     },
+     {
+      "doc_id": "monetary20240501a",
+      "date": "2024-05-01",
+      "score": 0.58411,
+      "target_range": "5-1/4 to 5-1/2"
+     },
+     {
+      "doc_id": "monetary20250507a",
+      "date": "2025-05-07",
+      "score": 0.57538,
+      "target_range": "4-1/4 to 4-1/2"
+     },
+     {
+      "doc_id": "monetary20230322a",
+      "date": "2023-03-22",
+      "score": 0.5431,
+      "target_range": "4-3/4 to 5"
+     },
+     {
+      "doc_id": "monetary20230614a",
+      "date": "2023-06-14",
+      "score": 0.53722,
+      "target_range": "5 to 5-1/4"
+     }
+    ]
+   },
+   {
+    "id": "monetary20230614a",
+    "gold_date": "2023-06-14",
+    "rank": 1,
+    "top1_date": "2023-06-14",
+    "top1_date_correct": true,
+    "top1_answer_correct": true,
+    "ranked": [
+     {
+      "doc_id": "monetary20230614a",
+      "date": "2023-06-14",
+      "score": 0.6204,
+      "target_range": "5 to 5-1/4"
+     },
+     {
+      "doc_id": "monetary20240612a",
+      "date": "2024-06-12",
+      "score": 0.5983,
+      "target_range": "5-1/4 to 5-1/2"
+     },
+     {
+      "doc_id": "monetary20250618a",
+      "date": "2025-06-18",
+      "score": 0.57509,
+      "target_range": "4-1/4 to 4-1/2"
+     },
+     {
+      "doc_id": "monetary20260617a",
+      "date": "2026-06-17",
+      "score": 0.55473,
+      "target_range": "3-1/2 to 3-3/4"
+     },
+     {
+      "doc_id": "monetary20240501a",
+      "date": "2024-05-01",
+      "score": 0.541,
+      "target_range": "5-1/4 to 5-1/2"
+     }
+    ]
+   },
+   {
+    "id": "monetary20230726a",
+    "gold_date": "2023-07-26",
+    "rank": 1,
+    "top1_date": "2023-07-26",
+    "top1_date_correct": true,
+    "top1_answer_correct": true,
+    "ranked": [
+     {
+      "doc_id": "monetary20230726a",
+      "date": "2023-07-26",
+      "score": 0.61138,
+      "target_range": "5-1/4 to 5-1/2"
+     },
+     {
+      "doc_id": "monetary20240731a",
+      "date": "2024-07-31",
+      "score": 0.59779,
+      "target_range": "5-1/4 to 5-1/2"
+     },
+     {
+      "doc_id": "monetary20250730a",
+      "date": "2025-07-30",
+      "score": 0.59148,
+      "target_range": "4-1/4 to 4-1/2"
+     },
+     {
+      "doc_id": "monetary20260729a",
+      "date": "2026-07-29",
+      "score": 0.56029,
+      "target_range": "3-1/2 to 3-3/4"
+     },
+     {
+      "doc_id": "monetary20230614a",
+      "date": "2023-06-14",
+      "score": 0.54375,
+      "target_range": "5 to 5-1/4"
+     }
+    ]
+   },
+   {
+    "id": "monetary20230920a",
+    "gold_date": "2023-09-20",
+    "rank": 1,
+    "top1_date": "2023-09-20",
+    "top1_date_correct": true,
+    "top1_answer_correct": true,
+    "ranked": [
+     {
+      "doc_id": "monetary20230920a",
+      "date": "2023-09-20",
+      "score": 0.62565,
+      "target_range": "5-1/4 to 5-1/2"
+     },
+     {
+      "doc_id": "monetary20240918a",
+      "date": "2024-09-18",
+      "score": 0.58835,
+      "target_range": "4-3/4 to 5"
+     },
+     {
+      "doc_id": "monetary20250917a",
+      "date": "2025-09-17",
+      "score": 0.56291,
+      "target_range": "4 to 4-1/4"
+     },
+     {
+      "doc_id": "monetary20231101a",
+      "date": "2023-11-01",
+      "score": 0.54073,
+      "target_range": "5-1/4 to 5-1/2"
+     },
+     {
+      "doc_id": "monetary20231213a",
+      "date": "2023-12-13",
+      "score": 0.52579,
+      "target_range": "5-1/4 to 5-1/2"
+     }
+    ]
+   },
+   {
+    "id": "monetary20231101a",
+    "gold_date": "2023-11-01",
+    "rank": 1,
+    "top1_date": "2023-11-01",
+    "top1_date_correct": true,
+    "top1_answer_correct": true,
+    "ranked": [
+     {
+      "doc_id": "monetary20231101a",
+      "date": "2023-11-01",
+      "score": 0.64105,
+      "target_range": "5-1/4 to 5-1/2"
+     },
+     {
+      "doc_id": "monetary20241107a",
+      "date": "2024-11-07",
+      "score": 0.58936,
+      "target_range": "4-1/2 to 4-3/4"
+     },
+     {
+      "doc_id": "monetary20231213a",
+      "date": "2023-12-13",
+      "score": 0.53333,
+      "target_range": "5-1/4 to 5-1/2"
+     },
+     {
+      "doc_id": "monetary20260318a",
+      "date": "2026-03-18",
+      "score": 0.49613,
+      "target_range": "3-1/2 to 3-3/4"
+     },
+     {
+      "doc_id": "monetary20230920a",
+      "date": "2023-09-20",
+      "score": 0.49369,
+      "target_range": "5-1/4 to 5-1/2"
+     }
+    ]
+   },
+   {
+    "id": "monetary20231213a",
+    "gold_date": "2023-12-13",
+    "rank": 1,
+    "top1_date": "2023-12-13",
+    "top1_date_correct": true,
+    "top1_answer_correct": true,
+    "ranked": [
+     {
+      "doc_id": "monetary20231213a",
+      "date": "2023-12-13",
+      "score": 0.62913,
+      "target_range": "5-1/4 to 5-1/2"
+     },
+     {
+      "doc_id": "monetary20241218a",
+      "date": "2024-12-18",
+      "score": 0.61024,
+      "target_range": "4-1/4 to 4-1/2"
+     },
+     {
+      "doc_id": "monetary20251210a",
+      "date": "2025-12-10",
+      "score": 0.57954,
+      "target_range": "3-1/2 to 3-3/4"
+     },
+     {
+      "doc_id": "monetary20240131a",
+      "date": "2024-01-31",
+      "score": 0.54605,
+      "target_range": "5-1/4 to 5-1/2"
+     },
+     {
+      "doc_id": "monetary20231101a",
+      "date": "2023-11-01",
+      "score": 0.53944,
+      "target_range": "5-1/4 to 5-1/2"
+     }
+    ]
+   },
+   {
+    "id": "monetary20240131a",
+    "gold_date": "2024-01-31",
+    "rank": 1,
+    "top1_date": "2024-01-31",
+    "top1_date_correct": true,
+    "top1_answer_correct": true,
+    "ranked": [
+     {
+      "doc_id": "monetary20240131a",
+      "date": "2024-01-31",
+      "score": 0.65886,
+      "target_range": "5-1/4 to 5-1/2"
+     },
+     {
+      "doc_id": "monetary20260128a",
+      "date": "2026-01-28",
+      "score": 0.5993,
+      "target_range": "3-1/2 to 3-3/4"
+     },
+     {
+      "doc_id": "monetary20241218a",
+      "date": "2024-12-18",
+      "score": 0.58319,
+      "target_range": "4-1/4 to 4-1/2"
+     },
+     {
+      "doc_id": "monetary20250129a",
+      "date": "2025-01-29",
+      "score": 0.58169,
+      "target_range": "4-1/4 to 4-1/2"
+     },
+     {
+      "doc_id": "monetary20240320a",
+      "date": "2024-03-20",
+      "score": 0.55865,
+      "target_range": "5-1/4 to 5-1/2"
+     }
+    ]
+   },
+   {
+    "id": "monetary20240320a",
+    "gold_date": "2024-03-20",
+    "rank": 1,
+    "top1_date": "2024-03-20",
+    "top1_date_correct": true,
+    "top1_answer_correct": true,
+    "ranked": [
+     {
+      "doc_id": "monetary20240320a",
+      "date": "2024-03-20",
+      "score": 0.64565,
+      "target_range": "5-1/4 to 5-1/2"
+     },
+     {
+      "doc_id": "monetary20260318a",
+      "date": "2026-03-18",
+      "score": 0.59283,
+      "target_range": "3-1/2 to 3-3/4"
+     },
+     {
+      "doc_id": "monetary20230322a",
+      "date": "2023-03-22",
+      "score": 0.5704,
+      "target_range": "4-3/4 to 5"
+     },
+     {
+      "doc_id": "monetary20240131a",
+      "date": "2024-01-31",
+      "score": 0.54456,
+      "target_range": "5-1/4 to 5-1/2"
+     },
+     {
+      "doc_id": "monetary20250319a",
+      "date": "2025-03-19",
+      "score": 0.54234,
+      "target_range": "4-1/4 to 4-1/2"
+     }
+    ]
+   },
+   {
+    "id": "monetary20240501a",
+    "gold_date": "2024-05-01",
+    "rank": 1,
+    "top1_date": "2024-05-01",
+    "top1_date_correct": true,
+    "top1_answer_correct": true,
+    "ranked": [
+     {
+      "doc_id": "monetary20240501a",
+      "date": "2024-05-01",
+      "score": 0.64142,
+      "target_range": "5-1/4 to 5-1/2"
+     },
+     {
+      "doc_id": "monetary20250507a",
+      "date": "2025-05-07",
+      "score": 0.58996,
+      "target_range": "4-1/4 to 4-1/2"
+     },
+     {
+      "doc_id": "monetary20230503a",
+      "date": "2023-05-03",
+      "score": 0.56976,
+      "target_range": "5 to 5-1/4"
+     },
+     {
+      "doc_id": "monetary20240612a",
+      "date": "2024-06-12",
+      "score": 0.55612,
+      "target_range": "5-1/4 to 5-1/2"
+     },
+     {
+      "doc_id": "monetary20240320a",
+      "date": "2024-03-20",
+      "score": 0.54956,
+      "target_range": "5-1/4 to 5-1/2"
+     }
+    ]
+   },
+   {
+    "id": "monetary20240612a",
+    "gold_date": "2024-06-12",
+    "rank": 1,
+    "top1_date": "2024-06-12",
+    "top1_date_correct": true,
+    "top1_answer_correct": true,
+    "ranked": [
+     {
+      "doc_id": "monetary20240612a",
+      "date": "2024-06-12",
+      "score": 0.65992,
+      "target_range": "5-1/4 to 5-1/2"
+     },
+     {
+      "doc_id": "monetary20250618a",
+      "date": "2025-06-18",
+      "score": 0.58955,
+      "target_range": "4-1/4 to 4-1/2"
+     },
+     {
+      "doc_id": "monetary20240501a",
+      "date": "2024-05-01",
+      "score": 0.58859,
+      "target_range": "5-1/4 to 5-1/2"
+     },
+     {
+      "doc_id": "monetary20260617a",
+      "date": "2026-06-17",
+      "score": 0.57185,
+      "target_range": "3-1/2 to 3-3/4"
+     },
+     {
+      "doc_id": "monetary20230614a",
+      "date": "2023-06-14",
+      "score": 0.56754,
+      "target_range": "5 to 5-1/4"
+     }
+    ]
+   },
+   {
+    "id": "monetary20240731a",
+    "gold_date": "2024-07-31",
+    "rank": 1,
+    "top1_date": "2024-07-31",
+    "top1_date_correct": true,
+    "top1_answer_correct": true,
+    "ranked": [
+     {
+      "doc_id": "monetary20240731a",
+      "date": "2024-07-31",
+      "score": 0.65578,
+      "target_range": "5-1/4 to 5-1/2"
+     },
+     {
+      "doc_id": "monetary20250730a",
+      "date": "2025-07-30",
+      "score": 0.59874,
+      "target_range": "4-1/4 to 4-1/2"
+     },
+     {
+      "doc_id": "monetary20240612a",
+      "date": "2024-06-12",
+      "score": 0.5749,
+      "target_range": "5-1/4 to 5-1/2"
+     },
+     {
+      "doc_id": "monetary20260729a",
+      "date": "2026-07-29",
+      "score": 0.57427,
+      "target_range": "3-1/2 to 3-3/4"
+     },
+     {
+      "doc_id": "monetary20230726a",
+      "date": "2023-07-26",
+      "score": 0.56383,
+      "target_range": "5-1/4 to 5-1/2"
+     }
+    ]
+   },
+   {
+    "id": "monetary20240918a",
+    "gold_date": "2024-09-18",
+    "rank": 1,
+    "top1_date": "2024-09-18",
+    "top1_date_correct": true,
+    "top1_answer_correct": true,
+    "ranked": [
+     {
+      "doc_id": "monetary20240918a",
+      "date": "2024-09-18",
+      "score": 0.64627,
+      "target_range": "4-3/4 to 5"
+     },
+     {
+      "doc_id": "monetary20230920a",
+      "date": "2023-09-20",
+      "score": 0.57307,
+      "target_range": "5-1/4 to 5-1/2"
+     },
+     {
+      "doc_id": "monetary20250917a",
+      "date": "2025-09-17",
+      "score": 0.56802,
+      "target_range": "4 to 4-1/4"
+     },
+     {
+      "doc_id": "monetary20240731a",
+      "date": "2024-07-31",
+      "score": 0.55122,
+      "target_range": "5-1/4 to 5-1/2"
+     },
+     {
+      "doc_id": "monetary20260916a",
+      "date": "2026-09-16",
+      "score": 0.53721,
+      "target_range": "3-3/4 to 4"
+     }
+    ]
+   },
+   {
+    "id": "monetary20241107a",
+    "gold_date": "2024-11-07",
+    "rank": 1,
+    "top1_date": "2024-11-07",
+    "top1_date_correct": true,
+    "top1_answer_correct": true,
+    "ranked": [
+     {
+      "doc_id": "monetary20241107a",
+      "date": "2024-11-07",
+      "score": 0.63224,
+      "target_range": "4-1/2 to 4-3/4"
+     },
+     {
+      "doc_id": "monetary20231101a",
+      "date": "2023-11-01",
+      "score": 0.59253,
+      "target_range": "5-1/4 to 5-1/2"
+     },
+     {
+      "doc_id": "monetary20241218a",
+      "date": "2024-12-18",
+      "score": 0.54249,
+      "target_range": "4-1/4 to 4-1/2"
+     },
+     {
+      "doc_id": "monetary20240131a",
+      "date": "2024-01-31",
+      "score": 0.52667,
+      "target_range": "5-1/4 to 5-1/2"
+     },
+     {
+      "doc_id": "monetary20240731a",
+      "date": "2024-07-31",
+      "score": 0.51232,
+      "target_range": "5-1/4 to 5-1/2"
+     }
+    ]
+   },
+   {
+    "id": "monetary20241218a",
+    "gold_date": "2024-12-18",
+    "rank": 1,
+    "top1_date": "2024-12-18",
+    "top1_date_correct": true,
+    "top1_answer_correct": true,
+    "ranked": [
+     {
+      "doc_id": "monetary20241218a",
+      "date": "2024-12-18",
+      "score": 0.65184,
+      "target_range": "4-1/4 to 4-1/2"
+     },
+     {
+      "doc_id": "monetary20231213a",
+      "date": "2023-12-13",
+      "score": 0.58083,
+      "target_range": "5-1/4 to 5-1/2"
+     },
+     {
+      "doc_id": "monetary20240131a",
+      "date": "2024-01-31",
+      "score": 0.57392,
+      "target_range": "5-1/4 to 5-1/2"
+     },
+     {
+      "doc_id": "monetary20251210a",
+      "date": "2025-12-10",
+      "score": 0.57028,
+      "target_range": "3-1/2 to 3-3/4"
+     },
+     {
+      "doc_id": "monetary20241107a",
+      "date": "2024-11-07",
+      "score": 0.54534,
+      "target_range": "4-1/2 to 4-3/4"
+     }
+    ]
+   },
+   {
+    "id": "monetary20250129a",
+    "gold_date": "2025-01-29",
+    "rank": 1,
+    "top1_date": "2025-01-29",
+    "top1_date_correct": true,
+    "top1_answer_correct": true,
+    "ranked": [
+     {
+      "doc_id": "monetary20250129a",
+      "date": "2025-01-29",
+      "score": 0.62918,
+      "target_range": "4-1/4 to 4-1/2"
+     },
+     {
+      "doc_id": "monetary20260128a",
+      "date": "2026-01-28",
+      "score": 0.59098,
+      "target_range": "3-1/2 to 3-3/4"
+     },
+     {
+      "doc_id": "monetary20240131a",
+      "date": "2024-01-31",
+      "score": 0.58906,
+      "target_range": "5-1/4 to 5-1/2"
+     },
+     {
+      "doc_id": "monetary20251210a",
+      "date": "2025-12-10",
+      "score": 0.56773,
+      "target_range": "3-1/2 to 3-3/4"
+     },
+     {
+      "doc_id": "monetary20250730a",
+      "date": "2025-07-30",
+      "score": 0.54182,
+      "target_range": "4-1/4 to 4-1/2"
+     }
+    ]
+   },
+   {
+    "id": "monetary20250319a",
+    "gold_date": "2025-03-19",
+    "rank": 1,
+    "top1_date": "2025-03-19",
+    "top1_date_correct": true,
+    "top1_answer_correct": true,
+    "ranked": [
+     {
+      "doc_id": "monetary20250319a",
+      "date": "2025-03-19",
+      "score": 0.59829,
+      "target_range": "4-1/4 to 4-1/2"
+     },
+     {
+      "doc_id": "monetary20260318a",
+      "date": "2026-03-18",
+      "score": 0.57743,
+      "target_range": "3-1/2 to 3-3/4"
+     },
+     {
+      "doc_id": "monetary20240320a",
+      "date": "2024-03-20",
+      "score": 0.57488,
+      "target_range": "5-1/4 to 5-1/2"
+     },
+     {
+      "doc_id": "monetary20230322a",
+      "date": "2023-03-22",
+      "score": 0.5448,
+      "target_range": "4-3/4 to 5"
+     },
+     {
+      "doc_id": "monetary20250129a",
+      "date": "2025-01-29",
+      "score": 0.53388,
+      "target_range": "4-1/4 to 4-1/2"
+     }
+    ]
+   },
+   {
+    "id": "monetary20250507a",
+    "gold_date": "2025-05-07",
+    "rank": 1,
+    "top1_date": "2025-05-07",
+    "top1_date_correct": true,
+    "top1_answer_correct": true,
+    "ranked": [
+     {
+      "doc_id": "monetary20250507a",
+      "date": "2025-05-07",
+      "score": 0.63592,
+      "target_range": "4-1/4 to 4-1/2"
+     },
+     {
+      "doc_id": "monetary20240501a",
+      "date": "2024-05-01",
+      "score": 0.59059,
+      "target_range": "5-1/4 to 5-1/2"
+     },
+     {
+      "doc_id": "monetary20250618a",
+      "date": "2025-06-18",
+      "score": 0.55949,
+      "target_range": "4-1/4 to 4-1/2"
+     },
+     {
+      "doc_id": "monetary20250730a",
+      "date": "2025-07-30",
+      "score": 0.55054,
+      "target_range": "4-1/4 to 4-1/2"
+     },
+     {
+      "doc_id": "monetary20230503a",
+      "date": "2023-05-03",
+      "score": 0.54585,
+      "target_range": "5 to 5-1/4"
+     }
+    ]
+   },
+   {
+    "id": "monetary20250618a",
+    "gold_date": "2025-06-18",
+    "rank": 1,
+    "top1_date": "2025-06-18",
+    "top1_date_correct": true,
+    "top1_answer_correct": true,
+    "ranked": [
+     {
+      "doc_id": "monetary20250618a",
+      "date": "2025-06-18",
+      "score": 0.64634,
+      "target_range": "4-1/4 to 4-1/2"
+     },
+     {
+      "doc_id": "monetary20240612a",
+      "date": "2024-06-12",
+      "score": 0.59122,
+      "target_range": "5-1/4 to 5-1/2"
+     },
+     {
+      "doc_id": "monetary20250730a",
+      "date": "2025-07-30",
+      "score": 0.57265,
+      "target_range": "4-1/4 to 4-1/2"
+     },
+     {
+      "doc_id": "monetary20260617a",
+      "date": "2026-06-17",
+      "score": 0.55873,
+      "target_range": "3-1/2 to 3-3/4"
+     },
+     {
+      "doc_id": "monetary20240501a",
+      "date": "2024-05-01",
+      "score": 0.54755,
+      "target_range": "5-1/4 to 5-1/2"
+     }
+    ]
+   },
+   {
+    "id": "monetary20250730a",
+    "gold_date": "2025-07-30",
+    "rank": 1,
+    "top1_date": "2025-07-30",
+    "top1_date_correct": true,
+    "top1_answer_correct": true,
+    "ranked": [
+     {
+      "doc_id": "monetary20250730a",
+      "date": "2025-07-30",
+      "score": 0.64445,
+      "target_range": "4-1/4 to 4-1/2"
+     },
+     {
+      "doc_id": "monetary20240731a",
+      "date": "2024-07-31",
+      "score": 0.58071,
+      "target_range": "5-1/4 to 5-1/2"
+     },
+     {
+      "doc_id": "monetary20260729a",
+      "date": "2026-07-29",
+      "score": 0.56527,
+      "target_range": "3-1/2 to 3-3/4"
+     },
+     {
+      "doc_id": "monetary20250618a",
+      "date": "2025-06-18",
+      "score": 0.56287,
+      "target_range": "4-1/4 to 4-1/2"
+     },
+     {
+      "doc_id": "monetary20230726a",
+      "date": "2023-07-26",
+      "score": 0.54952,
+      "target_range": "5-1/4 to 5-1/2"
+     }
+    ]
+   },
+   {
+    "id": "monetary20250917a",
+    "gold_date": "2025-09-17",
+    "rank": 1,
+    "top1_date": "2025-09-17",
+    "top1_date_correct": true,
+    "top1_answer_correct": true,
+    "ranked": [
+     {
+      "doc_id": "monetary20250917a",
+      "date": "2025-09-17",
+      "score": 0.62147,
+      "target_range": "4 to 4-1/4"
+     },
+     {
+      "doc_id": "monetary20240918a",
+      "date": "2024-09-18",
+      "score": 0.5638,
+      "target_range": "4-3/4 to 5"
+     },
+     {
+      "doc_id": "monetary20251210a",
+      "date": "2025-12-10",
+      "score": 0.55364,
+      "target_range": "3-1/2 to 3-3/4"
+     },
+     {
+      "doc_id": "monetary20230920a",
+      "date": "2023-09-20",
+      "score": 0.54748,
+      "target_range": "5-1/4 to 5-1/2"
+     },
+     {
+      "doc_id": "monetary20250730a",
+      "date": "2025-07-30",
+      "score": 0.54265,
+      "target_range": "4-1/4 to 4-1/2"
+     }
+    ]
+   },
+   {
+    "id": "monetary20251029a",
+    "gold_date": "2025-10-29",
+    "rank": 1,
+    "top1_date": "2025-10-29",
+    "top1_date_correct": true,
+    "top1_answer_correct": true,
+    "ranked": [
+     {
+      "doc_id": "monetary20251029a",
+      "date": "2025-10-29",
+      "score": 0.59172,
+      "target_range": "3-3/4 to 4"
+     },
+     {
+      "doc_id": "monetary20251210a",
+      "date": "2025-12-10",
+      "score": 0.53388,
+      "target_range": "3-1/2 to 3-3/4"
+     },
+     {
+      "doc_id": "monetary20250917a",
+      "date": "2025-09-17",
+      "score": 0.51953,
+      "target_range": "4 to 4-1/4"
+     },
+     {
+      "doc_id": "monetary20250129a",
+      "date": "2025-01-29",
+      "score": 0.50867,
+      "target_range": "4-1/4 to 4-1/2"
+     },
+     {
+      "doc_id": "monetary20250730a",
+      "date": "2025-07-30",
+      "score": 0.50847,
+      "target_range": "4-1/4 to 4-1/2"
+     }
+    ]
+   },
+   {
+    "id": "monetary20251210a",
+    "gold_date": "2025-12-10",
+    "rank": 1,
+    "top1_date": "2025-12-10",
+    "top1_date_correct": true,
+    "top1_answer_correct": true,
+    "ranked": [
+     {
+      "doc_id": "monetary20251210a",
+      "date": "2025-12-10",
+      "score": 0.63179,
+      "target_range": "3-1/2 to 3-3/4"
+     },
+     {
+      "doc_id": "monetary20241218a",
+      "date": "2024-12-18",
+      "score": 0.57426,
+      "target_range": "4-1/4 to 4-1/2"
+     },
+     {
+      "doc_id": "monetary20250129a",
+      "date": "2025-01-29",
+      "score": 0.56501,
+      "target_range": "4-1/4 to 4-1/2"
+     },
+     {
+      "doc_id": "monetary20231213a",
+      "date": "2023-12-13",
+      "score": 0.55476,
+      "target_range": "5-1/4 to 5-1/2"
+     },
+     {
+      "doc_id": "monetary20251029a",
+      "date": "2025-10-29",
+      "score": 0.55274,
+      "target_range": "3-3/4 to 4"
+     }
+    ]
+   },
+   {
+    "id": "monetary20260128a",
+    "gold_date": "2026-01-28",
+    "rank": 1,
+    "top1_date": "2026-01-28",
+    "top1_date_correct": true,
+    "top1_answer_correct": true,
+    "ranked": [
+     {
+      "doc_id": "monetary20260128a",
+      "date": "2026-01-28",
+      "score": 0.6485,
+      "target_range": "3-1/2 to 3-3/4"
+     },
+     {
+      "doc_id": "monetary20260318a",
+      "date": "2026-03-18",
+      "score": 0.56883,
+      "target_range": "3-1/2 to 3-3/4"
+     },
+     {
+      "doc_id": "monetary20260429a",
+      "date": "2026-04-29",
+      "score": 0.55172,
+      "target_range": "3-1/2 to 3-3/4"
+     },
+     {
+      "doc_id": "monetary20240131a",
+      "date": "2024-01-31",
+      "score": 0.54595,
+      "target_range": "5-1/4 to 5-1/2"
+     },
+     {
+      "doc_id": "monetary20260729a",
+      "date": "2026-07-29",
+      "score": 0.53407,
+      "target_range": "3-1/2 to 3-3/4"
+     }
+    ]
+   },
+   {
+    "id": "monetary20260318a",
+    "gold_date": "2026-03-18",
+    "rank": 1,
+    "top1_date": "2026-03-18",
+    "top1_date_correct": true,
+    "top1_answer_correct": true,
+    "ranked": [
+     {
+      "doc_id": "monetary20260318a",
+      "date": "2026-03-18",
+      "score": 0.63296,
+      "target_range": "3-1/2 to 3-3/4"
+     },
+     {
+      "doc_id": "monetary20260429a",
+      "date": "2026-04-29",
+      "score": 0.56063,
+      "target_range": "3-1/2 to 3-3/4"
+     },
+     {
+      "doc_id": "monetary20260128a",
+      "date": "2026-01-28",
+      "score": 0.5597,
+      "target_range": "3-1/2 to 3-3/4"
+     },
+     {
+      "doc_id": "monetary20240320a",
+      "date": "2024-03-20",
+      "score": 0.54343,
+      "target_range": "5-1/4 to 5-1/2"
+     },
+     {
+      "doc_id": "monetary20230322a",
+      "date": "2023-03-22",
+      "score": 0.51562,
+      "target_range": "4-3/4 to 5"
+     }
+    ]
+   },
+   {
+    "id": "monetary20260429a",
+    "gold_date": "2026-04-29",
+    "rank": 1,
+    "top1_date": "2026-04-29",
+    "top1_date_correct": true,
+    "top1_answer_correct": true,
+    "ranked": [
+     {
+      "doc_id": "monetary20260429a",
+      "date": "2026-04-29",
+      "score": 0.6227,
+      "target_range": "3-1/2 to 3-3/4"
+     },
+     {
+      "doc_id": "monetary20260318a",
+      "date": "2026-03-18",
+      "score": 0.57176,
+      "target_range": "3-1/2 to 3-3/4"
+     },
+     {
+      "doc_id": "monetary20260128a",
+      "date": "2026-01-28",
+      "score": 0.56183,
+      "target_range": "3-1/2 to 3-3/4"
+     },
+     {
+      "doc_id": "monetary20250319a",
+      "date": "2025-03-19",
+      "score": 0.51177,
+      "target_range": "4-1/4 to 4-1/2"
+     },
+     {
+      "doc_id": "monetary20260617a",
+      "date": "2026-06-17",
+      "score": 0.5082,
+      "target_range": "3-1/2 to 3-3/4"
+     }
+    ]
+   },
+   {
+    "id": "monetary20260617a",
+    "gold_date": "2026-06-17",
+    "rank": 1,
+    "top1_date": "2026-06-17",
+    "top1_date_correct": true,
+    "top1_answer_correct": true,
+    "ranked": [
+     {
+      "doc_id": "monetary20260617a",
+      "date": "2026-06-17",
+      "score": 0.64765,
+      "target_range": "3-1/2 to 3-3/4"
+     },
+     {
+      "doc_id": "monetary20260729a",
+      "date": "2026-07-29",
+      "score": 0.56787,
+      "target_range": "3-1/2 to 3-3/4"
+     },
+     {
+      "doc_id": "monetary20240612a",
+      "date": "2024-06-12",
+      "score": 0.55531,
+      "target_range": "5-1/4 to 5-1/2"
+     },
+     {
+      "doc_id": "monetary20260128a",
+      "date": "2026-01-28",
+      "score": 0.55339,
+      "target_range": "3-1/2 to 3-3/4"
+     },
+     {
+      "doc_id": "monetary20250618a",
+      "date": "2025-06-18",
+      "score": 0.55223,
+      "target_range": "4-1/4 to 4-1/2"
+     }
+    ]
+   },
+   {
+    "id": "monetary20260729a",
+    "gold_date": "2026-07-29",
+    "rank": 1,
+    "top1_date": "2026-07-29",
+    "top1_date_correct": true,
+    "top1_answer_correct": true,
+    "ranked": [
+     {
+      "doc_id": "monetary20260729a",
+      "date": "2026-07-29",
+      "score": 0.64636,
+      "target_range": "3-1/2 to 3-3/4"
+     },
+     {
+      "doc_id": "monetary20230726a",
+      "date": "2023-07-26",
+      "score": 0.56698,
+      "target_range": "5-1/4 to 5-1/2"
+     },
+     {
+      "doc_id": "monetary20260617a",
+      "date": "2026-06-17",
+      "score": 0.56319,
+      "target_range": "3-1/2 to 3-3/4"
+     },
+     {
+      "doc_id": "monetary20250730a",
+      "date": "2025-07-30",
+      "score": 0.54887,
+      "target_range": "4-1/4 to 4-1/2"
+     },
+     {
+      "doc_id": "monetary20260128a",
+      "date": "2026-01-28",
+      "score": 0.54596,
+      "target_range": "3-1/2 to 3-3/4"
+     }
+    ]
+   },
+   {
+    "id": "monetary20260916a",
+    "gold_date": "2026-09-16",
+    "rank": 1,
+    "top1_date": "2026-09-16",
+    "top1_date_correct": true,
+    "top1_answer_correct": true,
+    "ranked": [
+     {
+      "doc_id": "monetary20260916a",
+      "date": "2026-09-16",
+      "score": 0.61832,
+      "target_range": "3-3/4 to 4"
+     },
+     {
+      "doc_id": "monetary20260128a",
+      "date": "2026-01-28",
+      "score": 0.54419,
+      "target_range": "3-1/2 to 3-3/4"
+     },
+     {
+      "doc_id": "monetary20260318a",
+      "date": "2026-03-18",
+      "score": 0.54083,
+      "target_range": "3-1/2 to 3-3/4"
+     },
+     {
+      "doc_id": "monetary20260429a",
+      "date": "2026-04-29",
+      "score": 0.53558,
+      "target_range": "3-1/2 to 3-3/4"
+     },
+     {
+      "doc_id": "monetary20260729a",
+      "date": "2026-07-29",
+      "score": 0.53513,
+      "target_range": "3-1/2 to 3-3/4"
+     }
+    ]
+   }
+  ],
+  "dense_date_filter": [
+   {
+    "id": "monetary20230201a",
+    "gold_date": "2023-02-01",
+    "rank": 1,
+    "top1_date": "2023-02-01",
+    "top1_date_correct": true,
+    "top1_answer_correct": true,
+    "ranked": [
+     {
+      "doc_id": "monetary20230201a",
+      "date": "2023-02-01",
+      "score": 0.6306,
+      "target_range": "4-1/2 to 4-3/4"
+     }
+    ]
+   },
+   {
+    "id": "monetary20230322a",
+    "gold_date": "2023-03-22",
+    "rank": 1,
+    "top1_date": "2023-03-22",
+    "top1_date_correct": true,
+    "top1_answer_correct": true,
+    "ranked": [
+     {
+      "doc_id": "monetary20230322a",
+      "date": "2023-03-22",
+      "score": 0.62591,
+      "target_range": "4-3/4 to 5"
+     }
+    ]
+   },
+   {
+    "id": "monetary20230503a",
+    "gold_date": "2023-05-03",
+    "rank": 1,
+    "top1_date": "2023-05-03",
+    "top1_date_correct": true,
+    "top1_answer_correct": true,
+    "ranked": [
+     {
+      "doc_id": "monetary20230503a",
+      "date": "2023-05-03",
+      "score": 0.63325,
+      "target_range": "5 to 5-1/4"
+     }
+    ]
+   },
+   {
+    "id": "monetary20230614a",
+    "gold_date": "2023-06-14",
+    "rank": 1,
+    "top1_date": "2023-06-14",
+    "top1_date_correct": true,
+    "top1_answer_correct": true,
+    "ranked": [
+     {
+      "doc_id": "monetary20230614a",
+      "date": "2023-06-14",
+      "score": 0.6204,
+      "target_range": "5 to 5-1/4"
+     }
+    ]
+   },
+   {
+    "id": "monetary20230726a",
+    "gold_date": "2023-07-26",
+    "rank": 1,
+    "top1_date": "2023-07-26",
+    "top1_date_correct": true,
+    "top1_answer_correct": true,
+    "ranked": [
+     {
+      "doc_id": "monetary20230726a",
+      "date": "2023-07-26",
+      "score": 0.61138,
+      "target_range": "5-1/4 to 5-1/2"
+     }
+    ]
+   },
+   {
+    "id": "monetary20230920a",
+    "gold_date": "2023-09-20",
+    "rank": 1,
+    "top1_date": "2023-09-20",
+    "top1_date_correct": true,
+    "top1_answer_correct": true,
+    "ranked": [
+     {
+      "doc_id": "monetary20230920a",
+      "date": "2023-09-20",
+      "score": 0.62565,
+      "target_range": "5-1/4 to 5-1/2"
+     }
+    ]
+   },
+   {
+    "id": "monetary20231101a",
+    "gold_date": "2023-11-01",
+    "rank": 1,
+    "top1_date": "2023-11-01",
+    "top1_date_correct": true,
+    "top1_answer_correct": true,
+    "ranked": [
+     {
+      "doc_id": "monetary20231101a",
+      "date": "2023-11-01",
+      "score": 0.64105,
+      "target_range": "5-1/4 to 5-1/2"
+     }
+    ]
+   },
+   {
+    "id": "monetary20231213a",
+    "gold_date": "2023-12-13",
+    "rank": 1,
+    "top1_date": "2023-12-13",
+    "top1_date_correct": true,
+    "top1_answer_correct": true,
+    "ranked": [
+     {
+      "doc_id": "monetary20231213a",
+      "date": "2023-12-13",
+      "score": 0.62913,
+      "target_range": "5-1/4 to 5-1/2"
+     }
+    ]
+   },
+   {
+    "id": "monetary20240131a",
+    "gold_date": "2024-01-31",
+    "rank": 1,
+    "top1_date": "2024-01-31",
+    "top1_date_correct": true,
+    "top1_answer_correct": true,
+    "ranked": [
+     {
+      "doc_id": "monetary20240131a",
+      "date": "2024-01-31",
+      "score": 0.65886,
+      "target_range": "5-1/4 to 5-1/2"
+     }
+    ]
+   },
+   {
+    "id": "monetary20240320a",
+    "gold_date": "2024-03-20",
+    "rank": 1,
+    "top1_date": "2024-03-20",
+    "top1_date_correct": true,
+    "top1_answer_correct": true,
+    "ranked": [
+     {
+      "doc_id": "monetary20240320a",
+      "date": "2024-03-20",
+      "score": 0.64565,
+      "target_range": "5-1/4 to 5-1/2"
+     }
+    ]
+   },
+   {
+    "id": "monetary20240501a",
+    "gold_date": "2024-05-01",
+    "rank": 1,
+    "top1_date": "2024-05-01",
+    "top1_date_correct": true,
+    "top1_answer_correct": true,
+    "ranked": [
+     {
+      "doc_id": "monetary20240501a",
+      "date": "2024-05-01",
+      "score": 0.64142,
+      "target_range": "5-1/4 to 5-1/2"
+     }
+    ]
+   },
+   {
+    "id": "monetary20240612a",
+    "gold_date": "2024-06-12",
+    "rank": 1,
+    "top1_date": "2024-06-12",
+    "top1_date_correct": true,
+    "top1_answer_correct": true,
+    "ranked": [
+     {
+      "doc_id": "monetary20240612a",
+      "date": "2024-06-12",
+      "score": 0.65992,
+      "target_range": "5-1/4 to 5-1/2"
+     }
+    ]
+   },
+   {
+    "id": "monetary20240731a",
+    "gold_date": "2024-07-31",
+    "rank": 1,
+    "top1_date": "2024-07-31",
+    "top1_date_correct": true,
+    "top1_answer_correct": true,
+    "ranked": [
+     {
+      "doc_id": "monetary20240731a",
+      "date": "2024-07-31",
+      "score": 0.65578,
+      "target_range": "5-1/4 to 5-1/2"
+     }
+    ]
+   },
+   {
+    "id": "monetary20240918a",
+    "gold_date": "2024-09-18",
+    "rank": 1,
+    "top1_date": "2024-09-18",
+    "top1_date_correct": true,
+    "top1_answer_correct": true,
+    "ranked": [
+     {
+      "doc_id": "monetary20240918a",
+      "date": "2024-09-18",
+      "score": 0.64627,
+      "target_range": "4-3/4 to 5"
+     }
+    ]
+   },
+   {
+    "id": "monetary20241107a",
+    "gold_date": "2024-11-07",
+    "rank": 1,
+    "top1_date": "2024-11-07",
+    "top1_date_correct": true,
+    "top1_answer_correct": true,
+    "ranked": [
+     {
+      "doc_id": "monetary20241107a",
+      "date": "2024-11-07",
+      "score": 0.63224,
+      "target_range": "4-1/2 to 4-3/4"
+     }
+    ]
+   },
+   {
+    "id": "monetary20241218a",
+    "gold_date": "2024-12-18",
+    "rank": 1,
+    "top1_date": "2024-12-18",
+    "top1_date_correct": true,
+    "top1_answer_correct": true,
+    "ranked": [
+     {
+      "doc_id": "monetary20241218a",
+      "date": "2024-12-18",
+      "score": 0.65184,
+      "target_range": "4-1/4 to 4-1/2"
+     }
+    ]
+   },
+   {
+    "id": "monetary20250129a",
+    "gold_date": "2025-01-29",
+    "rank": 1,
+    "top1_date": "2025-01-29",
+    "top1_date_correct": true,
+    "top1_answer_correct": true,
+    "ranked": [
+     {
+      "doc_id": "monetary20250129a",
+      "date": "2025-01-29",
+      "score": 0.62918,
+      "target_range": "4-1/4 to 4-1/2"
+     }
+    ]
+   },
+   {
+    "id": "monetary20250319a",
+    "gold_date": "2025-03-19",
+    "rank": 1,
+    "top1_date": "2025-03-19",
+    "top1_date_correct": true,
+    "top1_answer_correct": true,
+    "ranked": [
+     {
+      "doc_id": "monetary20250319a",
+      "date": "2025-03-19",
+      "score": 0.59829,
+      "target_range": "4-1/4 to 4-1/2"
+     }
+    ]
+   },
+   {
+    "id": "monetary20250507a",
+    "gold_date": "2025-05-07",
+    "rank": 1,
+    "top1_date": "2025-05-07",
+    "top1_date_correct": true,
+    "top1_answer_correct": true,
+    "ranked": [
+     {
+      "doc_id": "monetary20250507a",
+      "date": "2025-05-07",
+      "score": 0.63592,
+      "target_range": "4-1/4 to 4-1/2"
+     }
+    ]
+   },
+   {
+    "id": "monetary20250618a",
+    "gold_date": "2025-06-18",
+    "rank": 1,
+    "top1_date": "2025-06-18",
+    "top1_date_correct": true,
+    "top1_answer_correct": true,
+    "ranked": [
+     {
+      "doc_id": "monetary20250618a",
+      "date": "2025-06-18",
+      "score": 0.64634,
+      "target_range": "4-1/4 to 4-1/2"
+     }
+    ]
+   },
+   {
+    "id": "monetary20250730a",
+    "gold_date": "2025-07-30",
+    "rank": 1,
+    "top1_date": "2025-07-30",
+    "top1_date_correct": true,
+    "top1_answer_correct": true,
+    "ranked": [
+     {
+      "doc_id": "monetary20250730a",
+      "date": "2025-07-30",
+      "score": 0.64445,
+      "target_range": "4-1/4 to 4-1/2"
+     }
+    ]
+   },
+   {
+    "id": "monetary20250917a",
+    "gold_date": "2025-09-17",
+    "rank": 1,
+    "top1_date": "2025-09-17",
+    "top1_date_correct": true,
+    "top1_answer_correct": true,
+    "ranked": [
+     {
+      "doc_id": "monetary20250917a",
+      "date": "2025-09-17",
+      "score": 0.62147,
+      "target_range": "4 to 4-1/4"
+     }
+    ]
+   },
+   {
+    "id": "monetary20251029a",
+    "gold_date": "2025-10-29",
+    "rank": 1,
+    "top1_date": "2025-10-29",
+    "top1_date_correct": true,
+    "top1_answer_correct": true,
+    "ranked": [
+     {
+      "doc_id": "monetary20251029a",
+      "date": "2025-10-29",
+      "score": 0.59172,
+      "target_range": "3-3/4 to 4"
+     }
+    ]
+   },
+   {
+    "id": "monetary20251210a",
+    "gold_date": "2025-12-10",
+    "rank": 1,
+    "top1_date": "2025-12-10",
+    "top1_date_correct": true,
+    "top1_answer_correct": true,
+    "ranked": [
+     {
+      "doc_id": "monetary20251210a",
+      "date": "2025-12-10",
+      "score": 0.63179,
+      "target_range": "3-1/2 to 3-3/4"
+     }
+    ]
+   },
+   {
+    "id": "monetary20260128a",
+    "gold_date": "2026-01-28",
+    "rank": 1,
+    "top1_date": "2026-01-28",
+    "top1_date_correct": true,
+    "top1_answer_correct": true,
+    "ranked": [
+     {
+      "doc_id": "monetary20260128a",
+      "date": "2026-01-28",
+      "score": 0.6485,
+      "target_range": "3-1/2 to 3-3/4"
+     }
+    ]
+   },
+   {
+    "id": "monetary20260318a",
+    "gold_date": "2026-03-18",
+    "rank": 1,
+    "top1_date": "2026-03-18",
+    "top1_date_correct": true,
+    "top1_answer_correct": true,
+    "ranked": [
+     {
+      "doc_id": "monetary20260318a",
+      "date": "2026-03-18",
+      "score": 0.63296,
+      "target_range": "3-1/2 to 3-3/4"
+     }
+    ]
+   },
+   {
+    "id": "monetary20260429a",
+    "gold_date": "2026-04-29",
+    "rank": 1,
+    "top1_date": "2026-04-29",
+    "top1_date_correct": true,
+    "top1_answer_correct": true,
+    "ranked": [
+     {
+      "doc_id": "monetary20260429a",
+      "date": "2026-04-29",
+      "score": 0.6227,
+      "target_range": "3-1/2 to 3-3/4"
+     }
+    ]
+   },
+   {
+    "id": "monetary20260617a",
+    "gold_date": "2026-06-17",
+    "rank": 1,
+    "top1_date": "2026-06-17",
+    "top1_date_correct": true,
+    "top1_answer_correct": true,
+    "ranked": [
+     {
+      "doc_id": "monetary20260617a",
+      "date": "2026-06-17",
+      "score": 0.64765,
+      "target_range": "3-1/2 to 3-3/4"
+     }
+    ]
+   },
+   {
+    "id": "monetary20260729a",
+    "gold_date": "2026-07-29",
+    "rank": 1,
+    "top1_date": "2026-07-29",
+    "top1_date_correct": true,
+    "top1_answer_correct": true,
+    "ranked": [
+     {
+      "doc_id": "monetary20260729a",
+      "date": "2026-07-29",
+      "score": 0.64636,
+      "target_range": "3-1/2 to 3-3/4"
+     }
+    ]
+   },
+   {
+    "id": "monetary20260916a",
+    "gold_date": "2026-09-16",
+    "rank": 1,
+    "top1_date": "2026-09-16",
+    "top1_date_correct": true,
+    "top1_answer_correct": true,
+    "ranked": [
+     {
+      "doc_id": "monetary20260916a",
+      "date": "2026-09-16",
+      "score": 0.61832,
+      "target_range": "3-3/4 to 4"
+     }
+    ]
+   }
+  ]
+ }
+}

@@ -1,0 +1,13 @@
+{
+  "shutdown_requested": true,
+  "start_exit_before_shutdown": null,
+  "pids_at_shutdown": [
+    2,
+    20,
+    21,
+    22
+  ],
+  "start_exit": 0,
+  "pids_left_for_kernel_kill": [],
+  "orderly_seconds": 0.05
+}

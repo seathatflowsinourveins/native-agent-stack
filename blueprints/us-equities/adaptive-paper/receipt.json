@@ -2,7 +2,7 @@
   "schema_version": 1,
   "recorded_at_utc": "2026-09-21T21:12:00Z",
   "kind": "native_engine_integration_and_shadow_research",
-  "status": "local_integration_passed_new_broker_trial_pending",
+  "status": "paper_broker_trial_passed",
   "engine": {
     "name": "NautilusTrader",
     "version": "2.0.0rc5",
@@ -62,19 +62,90 @@
     "limitations": "Fixed alternating intents, immediate limit-price fills, zero fees; no market liquidity or network latency; not adaptive strategy performance"
   },
   "broker_readiness": {
-    "observed_at": "2026-09-21T21:02:23.669121+00:00",
-    "status": "not_started",
-    "reason": "regular_session_window_unavailable",
-    "account_status": "ACTIVE",
-    "positions": 0,
-    "open_orders": 0,
-    "orders_submitted": 0,
-    "valid_quotes": 15,
-    "invalid_closed_market_quotes": 9,
-    "http_gets": 29,
+    "observed_at": "2026-09-23T16:52:05Z",
+    "status": "passed",
+    "evidence_class": "native_paper",
+    "trial_id": "adaptive-20260923g",
+    "source_commit": "843dc8f",
+    "frozen_copy": "read-only git archive of 843dc8f (blueprints/us-equities); hashes in blueprints/us-equities/adaptive-paper/trials/20260923g-main-passed/frozen-843dc8f.SHA256SUMS",
+    "config": "config-sip.json",
+    "config_sha256": "3587653104e68fdfc9bbb9170825c611abcf7e2e1be1004327a056031c34555a",
+    "feed": "sip",
+    "leverage": "1x (max_leverage 1, cash)",
+    "duration_seconds": 300.5,
+    "orders_submitted": 5,
+    "cancels": 1,
+    "native_fill_events": 4,
+    "round_trips": [
+      {
+        "symbol": "INTC",
+        "buy_fill": "120.57",
+        "sell_fill": "120.55"
+      },
+      {
+        "symbol": "GOOGL",
+        "buy_fill": "338.61",
+        "sell_fill": "338.35",
+        "note": "first exit limit 338.42 canceled, replaced at 338.33"
+      }
+    ],
+    "reconciliation": {
+      "cash_delta_usd": "-0.28",
+      "cash_match": true,
+      "open_orders": 0,
+      "positions": 0,
+      "positions_match": true
+    },
+    "realized_pnl_usd": "-0.28",
+    "dropped_quotes": {
+      "by_reason": {
+        "crossed": 134
+      },
+      "by_symbol": {
+        "AAPL": 1,
+        "AMZN": 4,
+        "CRWD": 1,
+        "GOOGL": 1,
+        "IWM": 85,
+        "MU": 3,
+        "QQQ": 38,
+        "TSLA": 1
+      }
+    },
+    "policy_selections": {
+      "defensive_cash": 0,
+      "mean_reversion": 0,
+      "range_breakout": 0,
+      "relative_strength": 2,
+      "trend_momentum": 0
+    },
     "observed_trading_api_limit": 200,
-    "next_regular_open_utc": "2026-09-22T13:30:00Z",
-    "prior_smoke": "../paper-e2e-20260921/paper-receipt.json"
+    "evidence": {
+      "engine_output": "blueprints/us-equities/adaptive-paper/trials/20260923g-main-passed/paper-output.json",
+      "broker_readback": "blueprints/us-equities/adaptive-paper/trials/20260923g-main-passed/broker-orders.json",
+      "engine_output_sha256": "3e2603c8c9e883ed6284e6f9b5f11dbb87b1ed127f8195b47e4e064882041c73",
+      "broker_readback_sha256": "7f84a869e033e4692bcb755486dcffa05278fd441e9cafb541a470de9b8047c3"
+    },
+    "earlier_attempts_2026_09_23": "trials/20260923-interrupted, 20260923b-needs-attention, 20260923c-reconcile-refusal, 20260923e-first-roundtrip, 20260923f-first-passed (integration build 5e1d512)",
+    "limitations": [
+      "One 5-minute window at 1x with 1-share orders: evidence of engine and broker order flow, reconciliation and cleanup, not of strategy edge.",
+      "main's runner does not yet carry Codex's interrupted-run reporting (1e2c96a); this run's 300.5 s elapsed and duration completion were checked directly in paper-output.json."
+    ],
+    "previous": {
+      "observed_at": "2026-09-21T21:02:23.669121+00:00",
+      "status": "not_started",
+      "reason": "regular_session_window_unavailable",
+      "account_status": "ACTIVE",
+      "positions": 0,
+      "open_orders": 0,
+      "orders_submitted": 0,
+      "valid_quotes": 15,
+      "invalid_closed_market_quotes": 9,
+      "http_gets": 29,
+      "observed_trading_api_limit": 200,
+      "next_regular_open_utc": "2026-09-22T13:30:00Z",
+      "prior_smoke": "../paper-e2e-20260921/paper-receipt.json"
+    }
   },
   "market_research": {
     "observed_at": "2026-09-21T21:11:37.523756Z",

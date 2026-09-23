@@ -1,0 +1,65 @@
+{
+  "id": "gap-wave2-20260923-research-factors-ml-13-forecast-econometric-matched-comparison",
+  "layer_id": "research-factors-ml",
+  "catalog": "us-equities",
+  "gap_index": 13,
+  "gap_text_sha256": "46cd03b3e1994fc37fe7575e0d461c10537ebee351d049f6ab0606786325e15b",
+  "gap_text": "No retained comparison establishes superiority among the forecasting, feature-extraction, econometric or financial-NLP alternatives.",
+  "preregistration": {
+    "written_at": "2026-09-23T06:19:39Z",
+    "written_at_note": "Upper bound: the commit time of the first preregistration commit (4484138). Written between 06:18:35Z and that commit; corrected in the same unpushed commit before any check ran.",
+    "source": "preregistration.json gaps.13",
+    "expectation": "The fcmp comparison covers statsforecast, chronos-bolt-small and statsmodels ARIMA with per-fold errors and bootstrap intervals for each pairwise difference.",
+    "criteria": [
+      "Per-fold MAE for each of statsforecast, chronos, statsmodels ARIMA, naive; pairwise mean differences with 95% bootstrap intervals.",
+      "Outcome ceiling: advanced, because feature-extraction and financial-NLP alternatives named in the gap text are not compared."
+    ],
+    "fix_rounds": [
+      {
+        "written_at": "2026-09-23T06:48:47Z",
+        "label": "fix round 2 (gaps 5, 6, 7, 13, 14 forecast comparison), written after attempt 1 was stopped",
+        "trigger": "Attempt 1 (single process, all arms, CPU) started 06:22:36Z under ecosystem-bounded-run with a 1200 s limit. The statsforecast, statsmodels and chronos stages finished within about 30 s (Kronos weights were loading by 06:23:05Z), then the Kronos-small CPU stage (sample_count=20, 21 folds) ran until the 1200 s limit stopped the job at about 06:42:36Z; no results.json was written. statsforecast n_jobs=-1 also exhausted the job's 256-task limit (OpenBLAS 'blas_thread_init' and tqdm 'can't start new thread' warnings). Attempt 1 is retained as a stopped attempt, not a result.",
+        "change": "Split into two bounded processes with identical origins, context, target and seeds: (A) naive, statsforecast, statsmodels, chronos on CPU with OPENBLAS_NUM_THREADS=1, OMP_NUM_THREADS=1 and statsforecast n_jobs=4; (B) Kronos-small with the same parameters (pred_len=5, T=1.0, top_p=0.9, sample_count=20, torch seed 0) on the local CUDA GPU instead of CPU, a deviation from the CPU wording of the original preregistration. A merge step computes the preregistered metrics and bootstrap intervals from both forecast files after checking that the (fold, asset, decision) keys and targets are identical. Each process is again bounded to 20 minutes; a Kronos stop at the limit is recorded as not_settled for the Kronos clauses.",
+        "criteria": "Unchanged from the original entries for gaps 6, 7, 13 and 14."
+      }
+    ]
+  },
+  "commands": [
+    "see receipt 6 (fcmp parts A and B and merge)"
+  ],
+  "results": {
+    "pairwise_dev_bootstrap": {
+      "chronos_vs_statsforecast": "-0.000832 [-0.001787, 0.0000076] no difference resolved",
+      "statsmodels_arima111_vs_statsforecast": "-0.000825 [-0.002049, 0.0000176] no difference resolved (11/20 folds)",
+      "chronos_vs_statsmodels_arima111": "-0.0000066 [-0.000653, 0.000691] no difference resolved (13/20)",
+      "statsmodels_arima111_vs_naive": "-0.0000520 [-0.000142, 0.0000318] no difference resolved",
+      "kronos_vs_chronos": "+0.02473 [0.01782, 0.03197] chronos better"
+    },
+    "reading": "No superiority is established among statsforecast, chronos-bolt-small and statsmodels ARIMA, or of any of them over the naive random walk; Kronos-small is worse than all."
+  },
+  "outcome": "advanced",
+  "evidence_class": "local_integration",
+  "detection_method": "As receipt 6.",
+  "remaining": "The gap also names feature-extraction (tsfresh, c6) and financial-NLP alternatives, which were not compared (tsfresh only executed, receipt 5). The forecasting/econometric comparison shows no resolved superiority.",
+  "limits": [
+    "As receipt 6."
+  ],
+  "raw_outputs": [
+    {
+      "path": "raw/fcmp/run-fcmp-merged-r2__results.json",
+      "committed_sha256": "d49339dd07c09cb2367cd8f61a4c8904713399419d9fbea1d0a093365e43975c",
+      "original_sha256": "6c6c030a0d636932dcef280526921c724a14499ef90a910bd92b3d694c7f43df",
+      "uuids_redacted": 0
+    },
+    {
+      "path": "raw/fcmp/run-fcmp-merged__forecasts.json",
+      "committed_sha256": "8829d98c059f377713882ea56cec4b27c0ff5bd0e0b96087c95ca741edeb9d14",
+      "original_sha256": "8829d98c059f377713882ea56cec4b27c0ff5bd0e0b96087c95ca741edeb9d14",
+      "uuids_redacted": 0
+    }
+  ],
+  "checked_at": "2026-09-23T07:09:07Z",
+  "checked_at_note": "mtime of the last check output, $CACHE/run-fcmp-merged-r2/results.json. Corrected from 07:15:00Z, which post-dated its own commit 01e6054 (07:11:23Z); correction written 2026-09-23 after 13:37Z.",
+  "base_commit": "41d39b3",
+  "branch": "claude/g2-research-factors-ml-20260923"
+}

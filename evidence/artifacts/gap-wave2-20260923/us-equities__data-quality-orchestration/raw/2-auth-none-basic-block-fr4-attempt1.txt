@@ -1,0 +1,2 @@
+# fix round 4 attempt 1: script killed by timeout 120 (rc=124) while curl blocked on the closed loopback port; server.log of that attempt:
+Error: initialization error: failed to build config: auth.basic credentials are set but auth.mode is "none"; set auth.mode to 'basic' or remove the auth.basic section

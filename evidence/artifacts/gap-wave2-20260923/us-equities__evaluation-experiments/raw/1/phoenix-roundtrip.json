@@ -1,0 +1,12 @@
+{
+ "sent_trace_id": "6aa507586b7cc41e37bc450a8a62f2c4",
+ "readback_endpoint": "/v1/projects/default/spans",
+ "attempts": 2,
+ "found": true,
+ "readback_trace_id": "6aa507586b7cc41e37bc450a8a62f2c4",
+ "readback_name": "synthetic-evaluation-probe",
+ "readback_attributes": {
+  "probe.kind": "synthetic"
+ },
+ "last_body_if_missing": null
+}

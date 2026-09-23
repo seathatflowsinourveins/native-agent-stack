@@ -1,0 +1,1 @@
+{"arm": "qlib", "codes": ["IWM", "QQQ", "SPY"], "dump_bin_sha256": "b8f34c57ce1ef4b1772f3909735e66058f21b25bd7ab8a5f16318822401fe53f", "export_sha256": "f161e6cb34c0ce81acb367691a254d112897e4611f59cc29ea193f49f715edd7", "mismatches": 0, "negative_control_shift1_mismatches": 9048, "passed": true, "python": "3.11.16", "rows": 4533, "values_checked": 9066, "version": "0.9.7"}

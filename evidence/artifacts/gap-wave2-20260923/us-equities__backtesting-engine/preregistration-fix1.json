@@ -1,0 +1,38 @@
+{
+  "written_at": "2026-09-23T07:00:03Z",
+  "label": "fix-round 1 preregistration, written after the independent Codex review of c6c7f07/e951e32 and before any fix-round run; the original preregistration.json (2b93d4d) is unchanged",
+  "review_findings_addressed": [
+    "gap 6: the acceptance set (two unit suites, replay, comparator, verdict line) was not re-run per mode",
+    "ca_window_replay.py: fill timestamps unchecked, missing marks and terminal state accepted, StopIteration without a split",
+    "narrative: corporate-action generalisation, 'byte-identical' scope, 'split-induced loss' mislabel",
+    "receipt 4: argv not retained",
+    "raw LEAN logs retain the machine hostname"
+  ],
+  "gaps": {
+    "6": {
+      "expectation": "tests.test_spy_parity (92 tests) and tests.test_nautilus_equity_replay (8 tests) pass unchanged; the verdict line (verdict, complete, failed count, blocking_mappings, unattributed, skipped, rejected) reads 'BLOCKED True 4 [distributions_and_cash, market_on_open_proxy] [] [] []' for --bars and --lean-data and 'FAIL False 4 ... 4 unattributed, 1 skipped' for the no-evidence mode.",
+      "criteria": [
+        "settled if both suites pass and the verdict line is recorded for every comparator mode alongside the already retained replay and comparator runs",
+        "advanced if any acceptance command fails or cannot be run"
+      ]
+    },
+    "1": {
+      "expectation": "The hardened ca_window_replay.py (fill timestamps equal the 16:00 NY bar instants, exactly 25 marks with 24 held bars, flat terminal state, explicit refusal without a split/dividend record) reproduces the same fills, cash 96852.10 and all checks true in a fresh private directory.",
+      "criteria": [
+        "outcome stays advanced (the unchanged-example arm cannot be met at pin 1b0a49d); any new failing check is reported verbatim"
+      ]
+    },
+    "8": {
+      "expectation": "Same hardened rerun as gap 1; bar-based fills reconcile.",
+      "criteria": [
+        "outcome stays advanced (quote-based fills remain)"
+      ]
+    },
+    "4": {
+      "expectation": "Rerunning the LEAN helper with per-command argv recorded reproduces control and Alpaca-variant outcomes exactly (same exit codes, fills, Invalid messages, end equities).",
+      "criteria": [
+        "outcome stays advanced (adapter paper-endpoint arm deferred); any difference from the first run is reported"
+      ]
+    }
+  }
+}

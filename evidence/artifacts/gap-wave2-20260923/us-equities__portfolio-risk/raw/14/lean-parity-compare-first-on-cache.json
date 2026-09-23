@@ -1,0 +1,211 @@
+{
+  "compare_sha256": "fb324b0a1998c09468bed223155627918a5c4a4c69434731c00a48a663d603cc",
+  "lean_run": {
+    "runner_sha256": "c346ecc89bcbec3303ac5bbf249392ce8f78b9731d9024068d7371593f3512ae",
+    "algorithm_sha256": "a1b2f07efe269c1176cec1a4f69a5effdf69989ea3356e53fc6bb10395932ca5",
+    "weights_sha256": "30e9b17a989c288357889b4c4d91254450c2b52c97dca509ec20139161f81765",
+    "dll_sha256": "a320288dc396a072f96a5e309cad76dbf361dfa6fc9e4c7493852d376400c47a",
+    "mounted_input_files": 1465,
+    "mounted_inputs_unchanged": true,
+    "commands": [
+      {
+        "started_utc": "2026-09-23T16:03:51.764171+00:00",
+        "exit_code": 0,
+        "finished_utc": "2026-09-23T16:03:52.429611+00:00",
+        "argv_tail": [
+          "1",
+          "/dotnet/dotnet",
+          "/dotnet/sdk/10.0.401/Roslyn/bincore/csc.dll",
+          "@/run/build/compiler.rsp"
+        ]
+      },
+      {
+        "started_utc": "2026-09-23T16:03:52.430388+00:00",
+        "exit_code": 0,
+        "finished_utc": "2026-09-23T16:03:55.200847+00:00",
+        "argv_tail": [
+          "/dotnet/dotnet",
+          "/engine/QuantConnect.Lean.Launcher.dll",
+          "--config",
+          "/run/no_dividends/meanrisk_min_variance/config.json"
+        ]
+      },
+      {
+        "started_utc": "2026-09-23T16:03:55.201485+00:00",
+        "exit_code": 0,
+        "finished_utc": "2026-09-23T16:03:58.121940+00:00",
+        "argv_tail": [
+          "/dotnet/dotnet",
+          "/engine/QuantConnect.Lean.Launcher.dll",
+          "--config",
+          "/run/no_dividends/hrp_variance/config.json"
+        ]
+      },
+      {
+        "started_utc": "2026-09-23T16:03:58.122500+00:00",
+        "exit_code": 0,
+        "finished_utc": "2026-09-23T16:04:00.893616+00:00",
+        "argv_tail": [
+          "/dotnet/dotnet",
+          "/engine/QuantConnect.Lean.Launcher.dll",
+          "--config",
+          "/run/dividends/meanrisk_min_variance/config.json"
+        ]
+      },
+      {
+        "started_utc": "2026-09-23T16:04:00.894217+00:00",
+        "exit_code": 0,
+        "finished_utc": "2026-09-23T16:04:03.766379+00:00",
+        "argv_tail": [
+          "/dotnet/dotnet",
+          "/engine/QuantConnect.Lean.Launcher.dll",
+          "--config",
+          "/run/dividends/hrp_variance/config.json"
+        ]
+      },
+      {
+        "started_utc": "2026-09-23T16:04:03.766981+00:00",
+        "exit_code": 0,
+        "finished_utc": "2026-09-23T16:04:06.691509+00:00",
+        "argv_tail": [
+          "/dotnet/dotnet",
+          "/engine/QuantConnect.Lean.Launcher.dll",
+          "--config",
+          "/run/control_fee2/meanrisk_min_variance/config.json"
+        ]
+      },
+      {
+        "started_utc": "2026-09-23T16:04:06.692107+00:00",
+        "exit_code": 0,
+        "finished_utc": "2026-09-23T16:04:09.619215+00:00",
+        "argv_tail": [
+          "/dotnet/dotnet",
+          "/engine/QuantConnect.Lean.Launcher.dll",
+          "--config",
+          "/run/control_fee2/hrp_variance/config.json"
+        ]
+      }
+    ]
+  },
+  "cases": {
+    "no_dividends": {
+      "meanrisk_min_variance": {
+        "compared_with": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4-10/nautilus-run-fix2/meanrisk_min_variance",
+        "result": {
+          "fills_matched": 33,
+          "decisions_matched": 22,
+          "cash_points_matched": 33,
+          "dividend_credits_matched": 0,
+          "nonzero_dividend_credits": 0,
+          "dividend_cash_usd": "0",
+          "fees_usd": "33.0",
+          "ending_cash_usd": "2009391.95",
+          "lean_summary_end_equity": "2009391.95",
+          "lean_summary_total_fees": "$33.00"
+        },
+        "match": true,
+        "mutation_self_tests": {
+          "fill_price_plus_0.0001": "fill mismatch: {'index': 1, 'lean': \"('2016-01-12 16:00:00', 'SPY', 'BUY', Decimal('4154.0'), Decimal('193.6601'), Decimal('1.0'))\", 'nautilus': \"('2016-01-12 16:00:00', 'SPY', 'BUY', Decimal('4154'),",
+          "fill_time_plus_one_hour": "fill mismatch: {'index': 1, 'lean': \"('2016-01-12 17:00:00', 'SPY', 'BUY', Decimal('4154.0'), Decimal('193.66'), Decimal('1.0'))\", 'nautilus': \"('2016-01-12 16:00:00', 'SPY', 'BUY', Decimal('4154'), D",
+          "fill_fee_plus_0.01": "fill mismatch: {'index': 1, 'lean': \"('2016-01-12 16:00:00', 'SPY', 'BUY', Decimal('4154.0'), Decimal('193.66'), Decimal('1.01'))\", 'nautilus': \"('2016-01-12 16:00:00', 'SPY', 'BUY', Decimal('4154'), ",
+          "last_fill_removed": "fill mismatch: {'index': 31, 'lean': \"('2021-03-31 16:00:00', 'SPY', 'SELL', Decimal('4801.0'), Decimal('396.33'), Decimal('1.0'))\", 'nautilus': \"('2021-03-31 16:00:00', 'QQQ', 'SELL', Decimal('274'),",
+          "first_cash_transition_plus_0.01": "cash sequence mismatch: {'index': 0, 'lean': \"('2016-01-12 16:00:00', 'fill', Decimal('195535.37'))\", 'nautilus': \"('2016-01-12 16:00:00', 'fill', Decimal('195535.36'))\"}",
+          "decision_equity_plus_0.01": "decision mismatch: {'index': 0, 'lean': \"('2016-01-12', Decimal('1000000.0100'), {'SPY': 4154, 'QQQ': 0, 'IWM': 1788})\", 'nautilus': \"('2016-01-12', Decimal('1000000.0000'), {'IWM': 1788, 'QQQ': 0, 'S"
+        }
+      },
+      "hrp_variance": {
+        "compared_with": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4-10/nautilus-run-fix2/hrp_variance",
+        "result": {
+          "fills_matched": 66,
+          "decisions_matched": 22,
+          "cash_points_matched": 66,
+          "dividend_credits_matched": 0,
+          "nonzero_dividend_credits": 0,
+          "dividend_cash_usd": "0",
+          "fees_usd": "66.0",
+          "ending_cash_usd": "2279895.57",
+          "lean_summary_end_equity": "2279895.57",
+          "lean_summary_total_fees": "$66.00"
+        },
+        "match": true,
+        "mutation_self_tests": {
+          "fill_price_plus_0.0001": "fill mismatch: {'index': 2, 'lean': \"('2016-01-12 16:00:00', 'SPY', 'BUY', Decimal('1494.0'), Decimal('193.6601'), Decimal('1.0'))\", 'nautilus': \"('2016-01-12 16:00:00', 'SPY', 'BUY', Decimal('1494'),",
+          "fill_time_plus_one_hour": "fill mismatch: {'index': 2, 'lean': \"('2016-01-12 17:00:00', 'SPY', 'BUY', Decimal('1494.0'), Decimal('193.66'), Decimal('1.0'))\", 'nautilus': \"('2016-01-12 16:00:00', 'SPY', 'BUY', Decimal('1494'), D",
+          "fill_fee_plus_0.01": "fill mismatch: {'index': 2, 'lean': \"('2016-01-12 16:00:00', 'SPY', 'BUY', Decimal('1494.0'), Decimal('193.66'), Decimal('1.01'))\", 'nautilus': \"('2016-01-12 16:00:00', 'SPY', 'BUY', Decimal('1494'), ",
+          "last_fill_removed": "fill mismatch: {'index': 63, 'lean': \"('2021-03-31 16:00:00', 'QQQ', 'SELL', Decimal('1842.0'), Decimal('319.13'), Decimal('1.0'))\", 'nautilus': \"('2021-03-31 16:00:00', 'IWM', 'SELL', Decimal('4429')",
+          "first_cash_transition_plus_0.01": "cash sequence mismatch: {'index': 0, 'lean': \"('2016-01-12 16:00:00', 'fill', Decimal('710670.97'))\", 'nautilus': \"('2016-01-12 16:00:00', 'fill', Decimal('710670.96'))\"}",
+          "decision_equity_plus_0.01": "decision mismatch: {'index': 0, 'lean': \"('2016-01-12', Decimal('1000000.0100'), {'SPY': 1494, 'QQQ': 2060, 'IWM': 4657})\", 'nautilus': \"('2016-01-12', Decimal('1000000.0000'), {'IWM': 4657, 'QQQ': 20"
+        }
+      }
+    },
+    "dividends": {
+      "meanrisk_min_variance": {
+        "compared_with": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4/nautilus-dividends-run-fix3/meanrisk_min_variance",
+        "result": {
+          "fills_matched": 34,
+          "decisions_matched": 22,
+          "cash_points_matched": 91,
+          "dividend_credits_matched": 63,
+          "nonzero_dividend_credits": 30,
+          "dividend_cash_usd": "138948.42",
+          "fees_usd": "34.0",
+          "ending_cash_usd": "2207656.15",
+          "lean_summary_end_equity": "2207656.15",
+          "lean_summary_total_fees": "$34.00"
+        },
+        "match": true,
+        "mutation_self_tests": {
+          "fill_price_plus_0.0001": "fill mismatch: {'index': 1, 'lean': \"('2016-01-12 16:00:00', 'SPY', 'BUY', Decimal('4154.0'), Decimal('193.6601'), Decimal('1.0'))\", 'nautilus': \"('2016-01-12 16:00:00', 'SPY', 'BUY', Decimal('4154'),",
+          "fill_time_plus_one_hour": "fill mismatch: {'index': 1, 'lean': \"('2016-01-12 17:00:00', 'SPY', 'BUY', Decimal('4154.0'), Decimal('193.66'), Decimal('1.0'))\", 'nautilus': \"('2016-01-12 16:00:00', 'SPY', 'BUY', Decimal('4154'), D",
+          "fill_fee_plus_0.01": "fill mismatch: {'index': 1, 'lean': \"('2016-01-12 16:00:00', 'SPY', 'BUY', Decimal('4154.0'), Decimal('193.66'), Decimal('1.01'))\", 'nautilus': \"('2016-01-12 16:00:00', 'SPY', 'BUY', Decimal('4154'), ",
+          "last_fill_removed": "fill mismatch: {'index': 32, 'lean': \"('2021-03-31 16:00:00', 'SPY', 'SELL', Decimal('5258.0'), Decimal('396.33'), Decimal('1.0'))\", 'nautilus': \"('2021-03-31 16:00:00', 'QQQ', 'SELL', Decimal('301'),",
+          "first_cash_transition_plus_0.01": "cash sequence mismatch: {'index': 0, 'lean': \"('2016-01-12 16:00:00', 'fill', Decimal('195535.37'))\", 'nautilus': \"('2016-01-12 16:00:00', 'fill', Decimal('195535.36'))\"}",
+          "decision_equity_plus_0.01": "decision mismatch: {'index': 0, 'lean': \"('2016-01-12', Decimal('1000000.0100'), {'SPY': 4154, 'QQQ': 0, 'IWM': 1788})\", 'nautilus': \"('2016-01-12', Decimal('1000000.0000'), {'IWM': 1788, 'QQQ': 0, 'S",
+          "one_nonzero_dividend_credit_removed": "dividend credit mismatch: {'index': 1, 'lean': \"('2016-03-23', 'IWM', 1788, Decimal('590.04'))\", 'nautilus': \"('2016-03-18', 'SPY', 4154, Decimal('4361.70'))\"}"
+        }
+      },
+      "hrp_variance": {
+        "compared_with": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4/nautilus-dividends-run-fix3/hrp_variance",
+        "result": {
+          "fills_matched": 66,
+          "decisions_matched": 22,
+          "cash_points_matched": 123,
+          "dividend_credits_matched": 63,
+          "nonzero_dividend_credits": 63,
+          "dividend_cash_usd": "111669.90",
+          "fees_usd": "66.0",
+          "ending_cash_usd": "2451556.98",
+          "lean_summary_end_equity": "2451556.98",
+          "lean_summary_total_fees": "$66.00"
+        },
+        "match": true,
+        "mutation_self_tests": {
+          "fill_price_plus_0.0001": "fill mismatch: {'index': 2, 'lean': \"('2016-01-12 16:00:00', 'SPY', 'BUY', Decimal('1494.0'), Decimal('193.6601'), Decimal('1.0'))\", 'nautilus': \"('2016-01-12 16:00:00', 'SPY', 'BUY', Decimal('1494'),",
+          "fill_time_plus_one_hour": "fill mismatch: {'index': 2, 'lean': \"('2016-01-12 17:00:00', 'SPY', 'BUY', Decimal('1494.0'), Decimal('193.66'), Decimal('1.0'))\", 'nautilus': \"('2016-01-12 16:00:00', 'SPY', 'BUY', Decimal('1494'), D",
+          "fill_fee_plus_0.01": "fill mismatch: {'index': 2, 'lean': \"('2016-01-12 16:00:00', 'SPY', 'BUY', Decimal('1494.0'), Decimal('193.66'), Decimal('1.01'))\", 'nautilus': \"('2016-01-12 16:00:00', 'SPY', 'BUY', Decimal('1494'), ",
+          "last_fill_removed": "fill mismatch: {'index': 63, 'lean': \"('2021-03-31 16:00:00', 'QQQ', 'SELL', Decimal('1976.0'), Decimal('319.13'), Decimal('1.0'))\", 'nautilus': \"('2021-03-31 16:00:00', 'IWM', 'SELL', Decimal('4753')",
+          "first_cash_transition_plus_0.01": "cash sequence mismatch: {'index': 0, 'lean': \"('2016-01-12 16:00:00', 'fill', Decimal('710670.97'))\", 'nautilus': \"('2016-01-12 16:00:00', 'fill', Decimal('710670.96'))\"}",
+          "decision_equity_plus_0.01": "decision mismatch: {'index': 0, 'lean': \"('2016-01-12', Decimal('1000000.0100'), {'SPY': 1494, 'QQQ': 2060, 'IWM': 4657})\", 'nautilus': \"('2016-01-12', Decimal('1000000.0000'), {'IWM': 4657, 'QQQ': 20",
+          "one_nonzero_dividend_credit_removed": "dividend credit mismatch: {'index': 0, 'lean': \"('2016-03-18', 'SPY', 1494, Decimal('1568.70'))\", 'nautilus': \"('2016-03-18', 'QQQ', 2060, Decimal('659.20'))\"}"
+        }
+      }
+    },
+    "control_fee2": {
+      "meanrisk_min_variance": {
+        "compared_with": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4-10/nautilus-run-fix2/meanrisk_min_variance",
+        "match": false,
+        "difference": "fill mismatch: {'index': 0, 'lean': \"('2016-01-12 16:00:00', 'IWM', 'BUY', Decimal('1788.0'), Decimal('103.72'), Decimal('2.0'))\", 'nautilus': \"('2016-01-12 16:00:00', 'IWM', 'BUY', Decimal('1788'), Decimal('103.7200'), Decimal('1.00'))\"}",
+        "expected": "mismatch (negative control)",
+        "detected": true
+      },
+      "hrp_variance": {
+        "compared_with": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/4-10/nautilus-run-fix2/hrp_variance",
+        "match": false,
+        "difference": "fill mismatch: {'index': 0, 'lean': \"('2016-01-12 16:00:00', 'IWM', 'BUY', Decimal('4657.0'), Decimal('103.72'), Decimal('2.0'))\", 'nautilus': \"('2016-01-12 16:00:00', 'IWM', 'BUY', Decimal('4657'), Decimal('103.7200'), Decimal('1.00'))\"}",
+        "expected": "mismatch (negative control)",
+        "detected": true
+      }
+    }
+  },
+  "all_criteria_met": true
+}

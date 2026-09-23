@@ -1,0 +1,376 @@
+{
+  "all_match": true,
+  "arm_code": "code",
+  "queries": {
+    "default-feb": {
+      "exit": 0,
+      "expected_values": {
+        "AAPL": "100",
+        "MSFT": "200"
+      },
+      "matches_test_assertion": true,
+      "records_sha256": "9a2cecd0fd38c3094c308e7ae9c618444e8a7afe099e46e3c22160167548e576",
+      "result": {
+        "adjustment": "raw",
+        "availability_evidence_authenticated": false,
+        "cutoff": "2025-02-10T00:00:00Z",
+        "entitlement_verified": false,
+        "feed": "fixture-feed-a",
+        "field": "Assets",
+        "records": [
+          {
+            "adjustment": "raw",
+            "adjustment_available_at": "2025-02-01T21:00:00Z",
+            "adjustment_reference": "fixture:no-adjustment",
+            "asset_id": "fixture:AAPL",
+            "availability_basis": "captured_observation",
+            "availability_evidence": "fixture:original-capture",
+            "available_at": "2025-02-01T21:00:00Z",
+            "event_at": "2024-12-31T21:00:00Z",
+            "feed": "fixture-feed-a",
+            "field": "Assets",
+            "first_observed_at": "2025-02-01T21:00:00Z",
+            "row_id": "aapl-original",
+            "symbol": "AAPL",
+            "unit": "USD",
+            "universe_available_at": "2025-01-01T00:00:00Z",
+            "universe_effective_at": "2025-01-01T00:00:00Z",
+            "universe_row_id": "membership-aapl",
+            "value_text": "100"
+          },
+          {
+            "adjustment": "raw",
+            "adjustment_available_at": "2025-02-01T21:00:00Z",
+            "adjustment_reference": "fixture:no-adjustment",
+            "asset_id": "fixture:MSFT",
+            "availability_basis": "source_publication",
+            "availability_evidence": "fixture:asserted-historical-publication-unverified",
+            "available_at": "2025-02-01T21:00:00Z",
+            "event_at": "2024-12-31T21:00:00Z",
+            "feed": "fixture-feed-a",
+            "field": "Assets",
+            "first_observed_at": "2026-09-19T12:00:00Z",
+            "row_id": "msft-source-publication",
+            "symbol": "MSFT",
+            "unit": "USD",
+            "universe_available_at": "2025-01-01T00:00:00Z",
+            "universe_effective_at": "2025-01-01T00:00:00Z",
+            "universe_row_id": "membership-msft",
+            "value_text": "200"
+          }
+        ],
+        "schema_version": 1,
+        "scope": "realized_observations_and_effective_universe_state",
+        "selection_sql_sha256": "03dd720cd855a60cb321f0e2d38cca2a8fea39ee8f6cfbc1916c4324586753ca",
+        "snapshot_sha256": "cc0cbb999b11fee53a87090d6929d34ed704c81ca43884e874b546c8aee03413",
+        "source_sha256": "f5d0ebf62889db580fdfd5e2f774c1ada9d01434dcba904019247f23f8ac2f3a",
+        "synthetic": true,
+        "unit": "USD",
+        "universe_id": "fixture-selected"
+      },
+      "selection_sql_sha256": "03dd720cd855a60cb321f0e2d38cca2a8fea39ee8f6cfbc1916c4324586753ca",
+      "values": {
+        "AAPL": "100",
+        "MSFT": "200"
+      }
+    },
+    "feed-b": {
+      "exit": 0,
+      "expected_values": {
+        "AAPL": "999"
+      },
+      "matches_test_assertion": true,
+      "records_sha256": "f98303e74d498a6b01740efdf5791b8df0f6898c48467d06be94ca7d316ff218",
+      "result": {
+        "adjustment": "raw",
+        "availability_evidence_authenticated": false,
+        "cutoff": "2025-02-10T00:00:00Z",
+        "entitlement_verified": false,
+        "feed": "fixture-feed-b",
+        "field": "Assets",
+        "records": [
+          {
+            "adjustment": "raw",
+            "adjustment_available_at": "2025-02-01T21:00:00Z",
+            "adjustment_reference": "fixture:no-adjustment",
+            "asset_id": "fixture:AAPL",
+            "availability_basis": "captured_observation",
+            "availability_evidence": "fixture:original-capture",
+            "available_at": "2025-02-01T21:00:00Z",
+            "event_at": "2024-12-31T21:00:00Z",
+            "feed": "fixture-feed-b",
+            "field": "Assets",
+            "first_observed_at": "2025-02-01T21:00:00Z",
+            "row_id": "aapl-other-feed",
+            "symbol": "AAPL",
+            "unit": "USD",
+            "universe_available_at": "2025-01-01T00:00:00Z",
+            "universe_effective_at": "2025-01-01T00:00:00Z",
+            "universe_row_id": "membership-aapl",
+            "value_text": "999"
+          }
+        ],
+        "schema_version": 1,
+        "scope": "realized_observations_and_effective_universe_state",
+        "selection_sql_sha256": "03dd720cd855a60cb321f0e2d38cca2a8fea39ee8f6cfbc1916c4324586753ca",
+        "snapshot_sha256": "cc0cbb999b11fee53a87090d6929d34ed704c81ca43884e874b546c8aee03413",
+        "source_sha256": "f5d0ebf62889db580fdfd5e2f774c1ada9d01434dcba904019247f23f8ac2f3a",
+        "synthetic": true,
+        "unit": "USD",
+        "universe_id": "fixture-selected"
+      },
+      "selection_sql_sha256": "03dd720cd855a60cb321f0e2d38cca2a8fea39ee8f6cfbc1916c4324586753ca",
+      "values": {
+        "AAPL": "999"
+      }
+    },
+    "future-universe-apr": {
+      "exit": 0,
+      "expected_values": {
+        "AAPL": "90",
+        "SPY": "300"
+      },
+      "matches_test_assertion": true,
+      "records_sha256": "e37db775b29238ec42a30a8e8d394651e7ee9aee5f1bf6a2629d1fc21f91daa8",
+      "result": {
+        "adjustment": "raw",
+        "availability_evidence_authenticated": false,
+        "cutoff": "2025-04-10T00:00:00Z",
+        "entitlement_verified": false,
+        "feed": "fixture-feed-a",
+        "field": "Assets",
+        "records": [
+          {
+            "adjustment": "raw",
+            "adjustment_available_at": "2025-02-01T21:00:00Z",
+            "adjustment_reference": "fixture:no-adjustment",
+            "asset_id": "fixture:AAPL",
+            "availability_basis": "captured_observation",
+            "availability_evidence": "fixture:late-correction",
+            "available_at": "2025-03-01T21:00:00Z",
+            "event_at": "2024-12-31T21:00:00Z",
+            "feed": "fixture-feed-a",
+            "field": "Assets",
+            "first_observed_at": "2025-03-01T21:00:00Z",
+            "row_id": "aapl-correction",
+            "symbol": "AAPL",
+            "unit": "USD",
+            "universe_available_at": "2025-01-01T00:00:00Z",
+            "universe_effective_at": "2025-01-01T00:00:00Z",
+            "universe_row_id": "membership-aapl",
+            "value_text": "90"
+          },
+          {
+            "adjustment": "raw",
+            "adjustment_available_at": "2025-02-01T21:00:00Z",
+            "adjustment_reference": "fixture:no-adjustment",
+            "asset_id": "fixture:SPY",
+            "availability_basis": "captured_observation",
+            "availability_evidence": "fixture:original-capture",
+            "available_at": "2025-02-01T21:00:00Z",
+            "event_at": "2024-12-31T21:00:00Z",
+            "feed": "fixture-feed-a",
+            "field": "Assets",
+            "first_observed_at": "2025-02-01T21:00:00Z",
+            "row_id": "spy-future-universe",
+            "symbol": "SPY",
+            "unit": "USD",
+            "universe_available_at": "2025-01-15T00:00:00Z",
+            "universe_effective_at": "2025-04-01T00:00:00Z",
+            "universe_row_id": "membership-spy-announced",
+            "value_text": "300"
+          }
+        ],
+        "schema_version": 1,
+        "scope": "realized_observations_and_effective_universe_state",
+        "selection_sql_sha256": "03dd720cd855a60cb321f0e2d38cca2a8fea39ee8f6cfbc1916c4324586753ca",
+        "snapshot_sha256": "cc0cbb999b11fee53a87090d6929d34ed704c81ca43884e874b546c8aee03413",
+        "source_sha256": "f5d0ebf62889db580fdfd5e2f774c1ada9d01434dcba904019247f23f8ac2f3a",
+        "synthetic": true,
+        "unit": "USD",
+        "universe_id": "fixture-selected"
+      },
+      "selection_sql_sha256": "03dd720cd855a60cb321f0e2d38cca2a8fea39ee8f6cfbc1916c4324586753ca",
+      "values": {
+        "AAPL": "90",
+        "SPY": "300"
+      }
+    },
+    "late-correction-mar": {
+      "exit": 0,
+      "expected_values": {
+        "AAPL": "90"
+      },
+      "matches_test_assertion": true,
+      "records_sha256": "b0105f02ee5fff9a1069a780e4be6a99d9eaa424da2bf1383f1ad6b5ba606a5b",
+      "result": {
+        "adjustment": "raw",
+        "availability_evidence_authenticated": false,
+        "cutoff": "2025-03-10T00:00:00Z",
+        "entitlement_verified": false,
+        "feed": "fixture-feed-a",
+        "field": "Assets",
+        "records": [
+          {
+            "adjustment": "raw",
+            "adjustment_available_at": "2025-02-01T21:00:00Z",
+            "adjustment_reference": "fixture:no-adjustment",
+            "asset_id": "fixture:AAPL",
+            "availability_basis": "captured_observation",
+            "availability_evidence": "fixture:late-correction",
+            "available_at": "2025-03-01T21:00:00Z",
+            "event_at": "2024-12-31T21:00:00Z",
+            "feed": "fixture-feed-a",
+            "field": "Assets",
+            "first_observed_at": "2025-03-01T21:00:00Z",
+            "row_id": "aapl-correction",
+            "symbol": "AAPL",
+            "unit": "USD",
+            "universe_available_at": "2025-01-01T00:00:00Z",
+            "universe_effective_at": "2025-01-01T00:00:00Z",
+            "universe_row_id": "membership-aapl",
+            "value_text": "90"
+          }
+        ],
+        "schema_version": 1,
+        "scope": "realized_observations_and_effective_universe_state",
+        "selection_sql_sha256": "03dd720cd855a60cb321f0e2d38cca2a8fea39ee8f6cfbc1916c4324586753ca",
+        "snapshot_sha256": "cc0cbb999b11fee53a87090d6929d34ed704c81ca43884e874b546c8aee03413",
+        "source_sha256": "f5d0ebf62889db580fdfd5e2f774c1ada9d01434dcba904019247f23f8ac2f3a",
+        "synthetic": true,
+        "unit": "USD",
+        "universe_id": "fixture-selected"
+      },
+      "selection_sql_sha256": "03dd720cd855a60cb321f0e2d38cca2a8fea39ee8f6cfbc1916c4324586753ca",
+      "values": {
+        "AAPL": "90"
+      }
+    },
+    "other-universe": {
+      "exit": 0,
+      "expected_values": {
+        "ZZZ": "777"
+      },
+      "matches_test_assertion": true,
+      "records_sha256": "2cde14f926d6274fcf0dca3f2bc24d9b8a6df1a6183617ca62e017671234a242",
+      "result": {
+        "adjustment": "raw",
+        "availability_evidence_authenticated": false,
+        "cutoff": "2025-02-10T00:00:00Z",
+        "entitlement_verified": false,
+        "feed": "fixture-feed-a",
+        "field": "Assets",
+        "records": [
+          {
+            "adjustment": "raw",
+            "adjustment_available_at": "2025-02-01T21:00:00Z",
+            "adjustment_reference": "fixture:no-adjustment",
+            "asset_id": "fixture:ZZZ",
+            "availability_basis": "captured_observation",
+            "availability_evidence": "fixture:original-capture",
+            "available_at": "2025-02-01T21:00:00Z",
+            "event_at": "2024-12-31T21:00:00Z",
+            "feed": "fixture-feed-a",
+            "field": "Assets",
+            "first_observed_at": "2025-02-01T21:00:00Z",
+            "row_id": "zzz-other-universe",
+            "symbol": "ZZZ",
+            "unit": "USD",
+            "universe_available_at": "2025-01-01T00:00:00Z",
+            "universe_effective_at": "2025-01-01T00:00:00Z",
+            "universe_row_id": "membership-zzz-other",
+            "value_text": "777"
+          }
+        ],
+        "schema_version": 1,
+        "scope": "realized_observations_and_effective_universe_state",
+        "selection_sql_sha256": "03dd720cd855a60cb321f0e2d38cca2a8fea39ee8f6cfbc1916c4324586753ca",
+        "snapshot_sha256": "cc0cbb999b11fee53a87090d6929d34ed704c81ca43884e874b546c8aee03413",
+        "source_sha256": "f5d0ebf62889db580fdfd5e2f774c1ada9d01434dcba904019247f23f8ac2f3a",
+        "synthetic": true,
+        "unit": "USD",
+        "universe_id": "fixture-other"
+      },
+      "selection_sql_sha256": "03dd720cd855a60cb321f0e2d38cca2a8fea39ee8f6cfbc1916c4324586753ca",
+      "values": {
+        "ZZZ": "777"
+      }
+    },
+    "split-adjustment": {
+      "exit": 0,
+      "expected_values": {
+        "AAPL": "50"
+      },
+      "matches_test_assertion": true,
+      "records_sha256": "e727b567ebb74c6558eafaeb5fbd3fc4717fdd13f7b104d7dfb7296aa9089b78",
+      "result": {
+        "adjustment": "split",
+        "availability_evidence_authenticated": false,
+        "cutoff": "2025-02-10T00:00:00Z",
+        "entitlement_verified": false,
+        "feed": "fixture-feed-a",
+        "field": "Assets",
+        "records": [
+          {
+            "adjustment": "split",
+            "adjustment_available_at": "2025-02-01T21:00:00Z",
+            "adjustment_reference": "fixture:illustrative-split-only",
+            "asset_id": "fixture:AAPL",
+            "availability_basis": "captured_observation",
+            "availability_evidence": "fixture:original-capture",
+            "available_at": "2025-02-01T21:00:00Z",
+            "event_at": "2024-12-31T21:00:00Z",
+            "feed": "fixture-feed-a",
+            "field": "Assets",
+            "first_observed_at": "2025-02-01T21:00:00Z",
+            "row_id": "aapl-adjusted",
+            "symbol": "AAPL",
+            "unit": "USD",
+            "universe_available_at": "2025-01-01T00:00:00Z",
+            "universe_effective_at": "2025-01-01T00:00:00Z",
+            "universe_row_id": "membership-aapl",
+            "value_text": "50"
+          }
+        ],
+        "schema_version": 1,
+        "scope": "realized_observations_and_effective_universe_state",
+        "selection_sql_sha256": "03dd720cd855a60cb321f0e2d38cca2a8fea39ee8f6cfbc1916c4324586753ca",
+        "snapshot_sha256": "cc0cbb999b11fee53a87090d6929d34ed704c81ca43884e874b546c8aee03413",
+        "source_sha256": "f5d0ebf62889db580fdfd5e2f774c1ada9d01434dcba904019247f23f8ac2f3a",
+        "synthetic": true,
+        "unit": "USD",
+        "universe_id": "fixture-selected"
+      },
+      "selection_sql_sha256": "03dd720cd855a60cb321f0e2d38cca2a8fea39ee8f6cfbc1916c4324586753ca",
+      "values": {
+        "AAPL": "50"
+      }
+    },
+    "unavailable-feed": {
+      "exit": 0,
+      "expected_values": {},
+      "matches_test_assertion": true,
+      "records_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "result": {
+        "adjustment": "raw",
+        "availability_evidence_authenticated": false,
+        "cutoff": "2025-02-10T00:00:00Z",
+        "entitlement_verified": false,
+        "feed": "unavailable-feed",
+        "field": "Assets",
+        "records": [],
+        "schema_version": 1,
+        "scope": "realized_observations_and_effective_universe_state",
+        "selection_sql_sha256": "03dd720cd855a60cb321f0e2d38cca2a8fea39ee8f6cfbc1916c4324586753ca",
+        "snapshot_sha256": "cc0cbb999b11fee53a87090d6929d34ed704c81ca43884e874b546c8aee03413",
+        "source_sha256": "f5d0ebf62889db580fdfd5e2f774c1ada9d01434dcba904019247f23f8ac2f3a",
+        "synthetic": true,
+        "unit": "USD",
+        "universe_id": "fixture-selected"
+      },
+      "selection_sql_sha256": "03dd720cd855a60cb321f0e2d38cca2a8fea39ee8f6cfbc1916c4324586753ca",
+      "values": {}
+    }
+  },
+  "snapshot_sha256_used": "cc0cbb999b11fee53a87090d6929d34ed704c81ca43884e874b546c8aee03413"
+}

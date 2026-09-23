@@ -144,6 +144,35 @@ thinking-token or global effort environment overrides. See [Claude model
 configuration](https://code.claude.com/docs/en/model-config) and
 [settings lifecycle](https://code.claude.com/docs/en/settings).
 
+**2026-09-23 correction: the top-level `effortLevel` above stops covering Opus
+5.5 and later.** Per the same settings-reference docs (fetched 2026-09-23), a
+USER-scope top-level `effortLevel` applies only to Opus 5, Fable 5.1 and
+earlier models; Opus 5.5 (`claude-opus-5-5`) and later ignore it and start at
+their own default (observed: `medium`). Project, local and managed settings'
+top-level `effortLevel` are unaffected by this and still apply to every
+model. To keep Opus 5.5 at `xhigh` in USER settings, save a per-model entry
+instead (what `/effort xhigh` writes once the model is active):
+
+```json
+{
+  "effortLevel": "xhigh",
+  "modelSettings": {
+    "claude-opus-5-5": {"effortLevel": "xhigh"}
+  }
+}
+```
+
+The top-level `effortLevel` is still worth keeping for Fable 5.1 and any
+earlier model a session might fall back to; it is simply not sufficient by
+itself once Opus 5.5 is the active model. This host's own
+`adoption/hooks/claude/effort-default-guard.py` (installed at
+`~/.claude/hooks/effort-default-guard.py`) automates exactly this: it warns
+at `SessionStart` when the resolved effort for the active model is below
+`xhigh`, and at `SessionEnd` it self-heals a `modelSettings.<model>.effortLevel`
+save when the session ran below `xhigh` only because no level was ever saved
+for that model anywhere -- it never overwrites a level someone (or a prior
+run) deliberately saved, even a low one.
+
 Saved effort defaults apply to fresh sessions. Already-open sessions can retain
 their previous selection; Claude supports `/effort` for the current session.
 Do not interrupt active work to reload a default. [Codex worker settings](https://learn.chatgpt.com/docs/agent-configuration/subagents)

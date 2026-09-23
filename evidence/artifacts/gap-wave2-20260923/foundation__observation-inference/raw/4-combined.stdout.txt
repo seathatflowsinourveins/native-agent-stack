@@ -1,0 +1,23 @@
+{
+ "helper_function_sha256": "9bce397536064e7dbfb64447a2ead6aa6f8e296193e871e843255bae792145e2",
+ "config": "repository collector.yaml unchanged",
+ "started_at": "2026-09-23T03:30:53.721921+00:00",
+ "timeline": {
+  "collector_stopped": "2026-09-23T03:31:21.617604+00:00",
+  "loki_stopped": "2026-09-23T03:32:22.206525+00:00",
+  "collector_restarted_loki_still_down": "2026-09-23T03:34:21.990122+00:00",
+  "loki_restarted": "2026-09-23T03:35:43.070596+00:00"
+ },
+ "written": 8,
+ "in_events_file_before_loki_back": 8,
+ "in_loki_after_both_back": 8,
+ "lost_in_loki": 0,
+ "loki_duplicates": {},
+ "seconds_after_loki_restart_to_all": 0.0,
+ "collector_log_signals": {
+  "Exporting failed": 0,
+  "Dropping data": 0,
+  "no more retries left": 0
+ },
+ "stopped_at": "2026-09-23T03:35:43.669745+00:00"
+}

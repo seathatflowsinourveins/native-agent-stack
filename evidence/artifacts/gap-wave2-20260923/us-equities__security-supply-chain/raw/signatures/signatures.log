@@ -1,0 +1,98 @@
+### syft verify-blob exact identity
+$ $HOME/.cache/gap-wave2-20260923/security-supply-chain/bin/cosign verify-blob --certificate syft_1.52.0_checksums.txt.pem --signature syft_1.52.0_checksums.txt.sig --certificate-identity https://github.com/anchore/syft/.github/workflows/release.yaml@refs/heads/main --certificate-oidc-issuer https://token.actions.githubusercontent.com --certificate-github-workflow-sha 02ba369d13b4248395b20a504eca94b0cab564d8 syft_1.52.0_checksums.txt
+Flag --certificate has been deprecated, please use --bundle with --trusted-root to provide the public certificate
+Flag --signature has been deprecated, please use --bundle to provide a signature
+Verified OK
+exit=0
+
+### syft verify-blob identity regexp
+$ $HOME/.cache/gap-wave2-20260923/security-supply-chain/bin/cosign verify-blob --certificate syft_1.52.0_checksums.txt.pem --signature syft_1.52.0_checksums.txt.sig --certificate-identity-regexp ^https://github\.com/anchore/syft/\.github/workflows/.+ --certificate-oidc-issuer https://token.actions.githubusercontent.com syft_1.52.0_checksums.txt
+Flag --certificate has been deprecated, please use --bundle with --trusted-root to provide the public certificate
+Flag --signature has been deprecated, please use --bundle to provide a signature
+Verified OK
+exit=0
+
+### syft NEGATIVE tampered blob
+$ $HOME/.cache/gap-wave2-20260923/security-supply-chain/bin/cosign verify-blob --certificate syft_1.52.0_checksums.txt.pem --signature syft_1.52.0_checksums.txt.sig --certificate-identity https://github.com/anchore/syft/.github/workflows/release.yaml@refs/heads/main --certificate-oidc-issuer https://token.actions.githubusercontent.com $HOME/.cache/gap-wave2-20260923/security-supply-chain/work/signatures/syft_1.52.0_checksums.txt.tampered
+Flag --certificate has been deprecated, please use --bundle with --trusted-root to provide the public certificate
+Flag --signature has been deprecated, please use --bundle to provide a signature
+Error: searching log query: [POST /api/v1/log/entries/retrieve][400] searchLogQueryBadRequest {"code":400,"message":"verifying signature: invalid signature when validating ASN.1 encoded signature"}
+error during command execution: searching log query: [POST /api/v1/log/entries/retrieve][400] searchLogQueryBadRequest {"code":400,"message":"verifying signature: invalid signature when validating ASN.1 encoded signature"}
+exit=1
+
+### syft NEGATIVE wrong identity
+$ $HOME/.cache/gap-wave2-20260923/security-supply-chain/bin/cosign verify-blob --certificate syft_1.52.0_checksums.txt.pem --signature syft_1.52.0_checksums.txt.sig --certificate-identity https://github.com/anchore/other/.github/workflows/release.yaml@refs/heads/main --certificate-oidc-issuer https://token.actions.githubusercontent.com syft_1.52.0_checksums.txt
+Flag --certificate has been deprecated, please use --bundle with --trusted-root to provide the public certificate
+Flag --signature has been deprecated, please use --bundle to provide a signature
+Error: none of the expected identities matched what was in the certificate, got subjects [https://github.com/anchore/syft/.github/workflows/release.yaml@refs/heads/main] with issuer https://token.actions.githubusercontent.com
+error during command execution: none of the expected identities matched what was in the certificate, got subjects [https://github.com/anchore/syft/.github/workflows/release.yaml@refs/heads/main] with issuer https://token.actions.githubusercontent.com
+exit=1
+
+### syft archive checksum in signed list
+$ sha256sum --ignore-missing -c syft_1.52.0_checksums.txt
+syft_1.52.0_linux_amd64.tar.gz: OK
+exit=0
+
+### grype verify-blob exact identity
+$ $HOME/.cache/gap-wave2-20260923/security-supply-chain/bin/cosign verify-blob --certificate grype_0.119.0_checksums.txt.pem --signature grype_0.119.0_checksums.txt.sig --certificate-identity https://github.com/anchore/grype/.github/workflows/release.yaml@refs/heads/main --certificate-oidc-issuer https://token.actions.githubusercontent.com --certificate-github-workflow-sha b6f5194537747ee7f705f4113069ac9eb269919f grype_0.119.0_checksums.txt
+Flag --certificate has been deprecated, please use --bundle with --trusted-root to provide the public certificate
+Flag --signature has been deprecated, please use --bundle to provide a signature
+Verified OK
+exit=0
+
+### grype verify-blob identity regexp
+$ $HOME/.cache/gap-wave2-20260923/security-supply-chain/bin/cosign verify-blob --certificate grype_0.119.0_checksums.txt.pem --signature grype_0.119.0_checksums.txt.sig --certificate-identity-regexp ^https://github\.com/anchore/grype/\.github/workflows/.+ --certificate-oidc-issuer https://token.actions.githubusercontent.com grype_0.119.0_checksums.txt
+Flag --certificate has been deprecated, please use --bundle with --trusted-root to provide the public certificate
+Flag --signature has been deprecated, please use --bundle to provide a signature
+Verified OK
+exit=0
+
+### grype NEGATIVE tampered blob
+$ $HOME/.cache/gap-wave2-20260923/security-supply-chain/bin/cosign verify-blob --certificate grype_0.119.0_checksums.txt.pem --signature grype_0.119.0_checksums.txt.sig --certificate-identity https://github.com/anchore/grype/.github/workflows/release.yaml@refs/heads/main --certificate-oidc-issuer https://token.actions.githubusercontent.com $HOME/.cache/gap-wave2-20260923/security-supply-chain/work/signatures/grype_0.119.0_checksums.txt.tampered
+Flag --certificate has been deprecated, please use --bundle with --trusted-root to provide the public certificate
+Flag --signature has been deprecated, please use --bundle to provide a signature
+Error: searching log query: [POST /api/v1/log/entries/retrieve][400] searchLogQueryBadRequest {"code":400,"message":"verifying signature: invalid signature when validating ASN.1 encoded signature"}
+error during command execution: searching log query: [POST /api/v1/log/entries/retrieve][400] searchLogQueryBadRequest {"code":400,"message":"verifying signature: invalid signature when validating ASN.1 encoded signature"}
+exit=1
+
+### grype NEGATIVE wrong identity
+$ $HOME/.cache/gap-wave2-20260923/security-supply-chain/bin/cosign verify-blob --certificate grype_0.119.0_checksums.txt.pem --signature grype_0.119.0_checksums.txt.sig --certificate-identity https://github.com/anchore/other/.github/workflows/release.yaml@refs/heads/main --certificate-oidc-issuer https://token.actions.githubusercontent.com grype_0.119.0_checksums.txt
+Flag --certificate has been deprecated, please use --bundle with --trusted-root to provide the public certificate
+Flag --signature has been deprecated, please use --bundle to provide a signature
+Error: none of the expected identities matched what was in the certificate, got subjects [https://github.com/anchore/grype/.github/workflows/release.yaml@refs/heads/main] with issuer https://token.actions.githubusercontent.com
+error during command execution: none of the expected identities matched what was in the certificate, got subjects [https://github.com/anchore/grype/.github/workflows/release.yaml@refs/heads/main] with issuer https://token.actions.githubusercontent.com
+exit=1
+
+### grype archive checksum in signed list
+$ sha256sum --ignore-missing -c grype_0.119.0_checksums.txt
+grype_0.119.0_linux_amd64.tar.gz: OK
+exit=0
+
+### gitleaks archive checksum in unsigned list
+$ sha256sum --ignore-missing -c gitleaks_8.30.1_checksums.txt
+gitleaks_8.30.1_linux_x64.tar.gz: OK
+exit=0
+
+### installed vs archive binary sha256
+15a52d0122953081d16e6695f48055216a4de293bb005948663bb739a63880f9  $HOME/.cache/gap-wave2-20260923/security-supply-chain/work/signatures/extract/syft/syft
+15a52d0122953081d16e6695f48055216a4de293bb005948663bb739a63880f9  $HOME/.local/share/codex-ecosystem/tools/syft-1.52.0/syft
+e02ba25615668c6bae03473e3c6493b6dfffc2e4e419f65f9bd62555ac10cd0e  $HOME/.cache/gap-wave2-20260923/security-supply-chain/work/signatures/extract/grype/grype
+e02ba25615668c6bae03473e3c6493b6dfffc2e4e419f65f9bd62555ac10cd0e  $HOME/.local/share/codex-ecosystem/tools/grype-0.119.0/grype
+88f91962aa2f93ac6ab281d553b9e125f5197bbbce38f9f2437f7299c32e5509  $HOME/.cache/gap-wave2-20260923/security-supply-chain/work/signatures/extract/gitleaks/gitleaks
+88f91962aa2f93ac6ab281d553b9e125f5197bbbce38f9f2437f7299c32e5509  $HOME/.local/share/codex-ecosystem/tools/gitleaks-8.30.1/gitleaks
+### gitleaks release assets
+$ curl -sS https://api.github.com/repos/gitleaks/gitleaks/releases/tags/v8.30.1 -o $HOME/.cache/gap-wave2-20260923/security-supply-chain/work/signatures/gitleaks-release.json
+exit=0
+
+assets: ['gitleaks_8.30.1_checksums.txt', 'gitleaks_8.30.1_darwin_arm64.tar.gz', 'gitleaks_8.30.1_darwin_x64.tar.gz', 'gitleaks_8.30.1_linux_arm64.tar.gz', 'gitleaks_8.30.1_linux_armv6.tar.gz', 'gitleaks_8.30.1_linux_armv7.tar.gz', 'gitleaks_8.30.1_linux_x32.tar.gz', 'gitleaks_8.30.1_linux_x64.tar.gz', 'gitleaks_8.30.1_windows_arm64.zip', 'gitleaks_8.30.1_windows_x32.zip', 'gitleaks_8.30.1_windows_x64.zip']
+### gitleaks attestation lookup by archive digest
+$ curl -sS -w \nhttp_status=%{http_code}\n https://api.github.com/repos/gitleaks/gitleaks/attestations/sha256:551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb
+{
+  "message": "Not Found",
+  "documentation_url": "https://docs.github.com/rest/repos/attestations#list-attestations",
+  "status": "404"
+}
+
+http_status=404
+exit=0
+

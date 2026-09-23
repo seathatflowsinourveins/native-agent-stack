@@ -1,0 +1,39 @@
+{
+  "id": "gap-wave2-20260923/us-equities/backtesting-engine/9-stress-margin-adaptive-parity-peer",
+  "gap_index": 9,
+  "gap_text_sha256": "62fcf6999e960825fd8e1c386485030c2e645e0cf7350b124d6522cb1067be73",
+  "preregistration": {
+    "written_at": "2026-09-23T06:21:22Z",
+    "expectation": "covered_elsewhere: the stress and adaptive/margin parity cases (one_stress, two_stress, adaptive_stress, over_limit) are the blocked comparison statuses of the spy-lean-parity gate owned by peer:sota-workflow-resolution.",
+    "criteria": [
+      "covered_elsewhere if the gate row names that owner at base 41d39b3"
+    ],
+    "source": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/preregistration.json (committed in 2b93d4d before any check ran)"
+  },
+  "next_check": "Run the stress and adaptive/margin parity cases (one_stress, two_stress, adaptive_stress, over_limit) in LEAN and Nautilus and compare the margin and cost outcomes.",
+  "commands": [
+    "python3 -c \"read catalogs/us-equities/gates-20260922.json gate spy-lean-parity\""
+  ],
+  "results": {
+    "spy-lean-parity": "owner peer:sota-workflow-resolution; the one_stress, two_stress, adaptive_stress and over_limit comparisons are its blocked statuses",
+    "incidental_observation": "Gap 4's control run re-executed the LEAN side of all six cases on 2026-09-23 and reproduced the retained end equities (90358.00, 75607.75, 95324.10, 100000); no Nautilus side or comparison was run here."
+  },
+  "raw_outputs": [
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/raw/4-lean-report.json",
+      "sha256": "67ed354e10c85efd8a90ec2102385d365e82d39d5b33b96f81d82e6714b80107"
+    }
+  ],
+  "outcome": "covered_elsewhere",
+  "evidence_class": "source_review",
+  "remaining": "Owned by peer:sota-workflow-resolution: run the stress and adaptive/margin cases in Nautilus and compare margin and cost outcomes. Realistic liquidity stays unqualified; corporate-action semantics advanced by gaps 1/8 (measured as absent in rc5).",
+  "limits": [
+    "No Nautilus stress or margin replay was attempted (peer-owned parity lane)."
+  ],
+  "checked_at": "2026-09-23T07:09:55Z",
+  "covered_by": {
+    "owner": "peer:sota-workflow-resolution",
+    "gate_file": "catalogs/us-equities/gates-20260922.json",
+    "rule": "SPY/LEAN parity and the dividend sim module are covered_elsewhere under the peer's preregistration (unit brief)."
+  }
+}

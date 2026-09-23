@@ -1,0 +1,141 @@
+{
+  "id": "11-ttl-forget-sweep-live-store-incident",
+  "gap_index": 11,
+  "gap_text_sha256": "3db7ec1037e5ca5f92853fc860767c49e1333d6712b55951258f849c498f45f0",
+  "preregistration": {
+    "written_at": "2026-09-23T01:28:59Z",
+    "late": true,
+    "late_reason": "No preregistration was written before the 01:13:46Z probe (the first-pass transcript contains none); this text was written by the fix round at 01:28:59Z.",
+    "expectation": "Preregistered before running: write a token page with expires_at, run forget-sweep, back up, compact --confirm, grep wiki/db/WAL/backup for the token, entirely inside a disposable --data-dir. Expected result: deletion/eviction removes the token from search/wiki but the token is still recoverable via raw filesystem grep of the SQLite file or WAL, per the existing deletion-erasure-probe.json finding for delete-page.",
+    "criteria": "Settled only if every command in the sequence provably operated on the disposable data dir throughout, and the erasure question (index-only vs byte-level) is answered by grep evidence.",
+    "timestamp_note": "Timestamps reconciled on 2026-09-23T02:30:41Z from the unit workers' session transcripts (tool-call times, listed in raw/INDEX.json). The earlier value 2026-09-23T01:20:00Z was shared by every receipt, fell after the first-pass commit (01:19:05Z) and matched no recorded event."
+  },
+  "commands": [
+    {
+      "cmd": "D=/home/example/.cache/gap-wave2-20260923/durable-memory/ttl-probe; ai-memory init --data-dir $D",
+      "exit": 0,
+      "output_excerpt": "init log line shows data_dir=$D but ALSO server_url=http://127.0.0.1:49374 bind=127.0.0.1:49374; directory layout (wiki/raw/db/models/config.toml) was created locally under $D. This server_url line was visible in this command's own output, before any of the following commands ran, and it matches the exact hazard already documented in evidence/artifacts/gap-resolution-20260922/durable-memory/deletion-erasure-probe.json's remediation step (serve on an alternate bind + AI_MEMORY_SERVER_URL override). That documented fix was not applied here before proceeding.",
+      "raw": "evidence/artifacts/gap-wave2-20260923/foundation__durable-memory/raw/first-pass-gap11-ttl-probe-incident.txt",
+      "raw_published": false,
+      "raw_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    {
+      "cmd": "ai-memory status --data-dir $D",
+      "exit": 0,
+      "output_excerpt": "Returned status for data-dir: /home/example/.local/share/ai-memory (THE LIVE STORE), pages: 120, sessions: 179, observations: 152909 -- NOT the disposable $D. --data-dir was silently ignored.",
+      "raw": "evidence/artifacts/gap-wave2-20260923/foundation__durable-memory/raw/first-pass-gap11-ttl-probe-incident.txt",
+      "raw_published": false,
+      "raw_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    {
+      "cmd": "TOKEN=XYZZY-ttl-erasure-<ts>; ai-memory write-page --data-dir $D --path scratch/ttl-probe.md --body '# TTL probe...' --tier episodic --workspace disposable-ws --project disposable-proj",
+      "exit": 0,
+      "output_excerpt": "wrote scratch/ttl-probe.md (page_id=01a0cbd3) -- this landed in the LIVE store under a synthetic disposable-ws/disposable-proj scope, confirmed by the subsequent live `ai-memory status` page count rising from 120 to 121.",
+      "raw": "evidence/artifacts/gap-wave2-20260923/foundation__durable-memory/raw/first-pass-gap11-ttl-probe-incident.txt",
+      "raw_published": false,
+      "raw_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    {
+      "cmd": "ai-memory forget-sweep --data-dir $D --dry-run --workspace disposable-ws --project disposable-proj ; ai-memory forget-sweep --data-dir $D --workspace disposable-ws --project disposable-proj",
+      "exit": 0,
+      "output_excerpt": "{\"dry_run\":true,\"candidates_evaluated\":1,\"evicted\":[],\"expired\":[],\"hard_deleted\":0,...} and identical non-dry-run result -- the fresh page was not evicted (write-page has no --expires-at flag in 2.3.2's CLI; forget-sweep uses tier-based age decay, so a brand-new page cannot be forced to expire without waiting out the decay window).",
+      "raw": "evidence/artifacts/gap-wave2-20260923/foundation__durable-memory/raw/first-pass-gap11-ttl-probe-incident.txt",
+      "raw_published": false,
+      "raw_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    {
+      "cmd": "ai-memory backup --data-dir $D --to $D/../ttl-probe-backup.tar.gz",
+      "exit": 0,
+      "output_excerpt": "wrote backup to .../ttl-probe-backup.tar.gz (130.07 MiB) -- size and wiki/ page-id prefixes inside the tarball (wiki/01a0cb54-...) confirm this was a snapshot of the LIVE store (223.7 MiB), not the empty disposable $D, leaking live memory content into the disposable cache dir. Before the shred, the same first-pass command ran `zgrep -al \"$TOKEN\" <backup>`, which printed the tarball path, i.e. the token was found in the backup. That only shows the backup captured the page while it was live; it says nothing about erasure after deletion.",
+      "raw": "evidence/artifacts/gap-wave2-20260923/foundation__durable-memory/raw/first-pass-gap11-ttl-probe-incident.txt",
+      "raw_published": false,
+      "raw_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    {
+      "cmd": "ai-memory compact --data-dir $D --confirm",
+      "exit": 0,
+      "output_excerpt": "Compacted: 223.7 MiB -> 207.9 MiB (15.8 MiB reclaimed) -- this ran a real VACUUM against the LIVE database file, not $D, WHILE the synthetic ttl-probe.md page was still active (compact ran before the purge-project remediation below), so the VACUUM rewrote and defragmented live pages that still included the synthetic token. The live systemd service (ai-memory.service, active, 10h uptime) remained running throughout and after.",
+      "raw": "evidence/artifacts/gap-wave2-20260923/foundation__durable-memory/raw/first-pass-gap11-ttl-probe-incident.txt",
+      "raw_published": false,
+      "raw_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    {
+      "cmd": "INCIDENT REMEDIATION: ai-memory purge-project --workspace disposable-ws --project disposable-proj --confirm",
+      "exit": 0,
+      "output_excerpt": "Purged disposable-ws/disposable-proj: 1 pages, 0 sessions, 0 observations, 1 embeddings. Note: this was a logical delete ... bytes remain in the database file until it is rewritten. Live status afterward showed the synthetic project's page removed from active counts. This purge ran AFTER compact, so no subsequent VACUUM has run to reclaim the freed pages.",
+      "raw": "evidence/artifacts/gap-wave2-20260923/foundation__durable-memory/raw/first-pass-gap11-ttl-probe-incident.txt",
+      "raw_published": false,
+      "raw_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    {
+      "cmd": "REMEDIATION: shred -u /home/example/.cache/gap-wave2-20260923/durable-memory/ttl-probe-backup.tar.gz",
+      "exit": 0,
+      "output_excerpt": "Deleted the 130 MiB backup tarball that had leaked live-store content into the disposable cache dir.",
+      "raw": "evidence/artifacts/gap-wave2-20260923/foundation__durable-memory/raw/first-pass-gap11-ttl-probe-incident.txt",
+      "raw_published": false,
+      "raw_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    {
+      "cmd": "systemctl --user status ai-memory ; curl -s http://127.0.0.1:49374/health",
+      "exit": 0,
+      "output_excerpt": "ai-memory.service: Active: active (running) since Tue 2026-09-22 10:52:37 EDT; 10h ago, throughout and after the incident -- confirms the live service kept running (not crashed, not restarted).",
+      "raw": "evidence/artifacts/gap-wave2-20260923/foundation__durable-memory/raw/first-pass-gap11-ttl-probe-incident.txt",
+      "raw_published": false,
+      "raw_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    {
+      "cmd": "POST-HOC (read-only, fix round): python3 subprocess.run(['grep','-c','ttl-probe','$HOME/.local/share/ai-memory/db/memory.sqlite'])",
+      "exit": 0,
+      "raw": "evidence/artifacts/gap-wave2-20260923/foundation__durable-memory/raw/fix-round-gap11-posthoc-residue.txt",
+      "output_excerpt": "grep exit 0 13",
+      "note": "Corrected on reconciliation. `grep -c ttl-probe` counts newline-delimited byte runs containing the substring 'ttl-probe'. It matches the page path 'scratch/ttl-probe.md' (and any version, FTS or audit row holding that path), not the marker token XYZZY-ttl-erasure-1790126026; the body heading '# TTL probe' does not match case-sensitively. So 13 is not a count of the token, and the token's byte-level presence in the live database file was not measured.",
+      "raw_published": false,
+      "raw_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    {
+      "cmd": "POST-HOC RESIDUE VERIFICATION (read-only): cd /home/example/.local/share/ai-memory/wiki && git log --oneline --all -- '*ttl-probe*'",
+      "exit": 0,
+      "output_excerpt": "bb0b205 write-page disposable-ws/disposable-proj: scratch/ttl-probe.md\\n4be633d purge-project disposable-ws/disposable-proj -- `git show bb0b205` confirms the full page body, including the literal marker token 'XYZZY-ttl-erasure-1790126026', is committed verbatim and remains reachable in the live wiki git history; purge-project's commit 4be633d removes the working-tree file but does not rewrite or prune bb0b205. This residue is permanent under ai-memory's current supersession-not-destruction model unless the live wiki repo is later rewritten/gc'd, which this worker did not do and was not authorized to do.",
+      "note": "Read-only git log/show against the live store's git repository; no commit, checkout, reset, gc, or filter-branch was run. This does not further mutate the live store.",
+      "raw": "evidence/artifacts/gap-wave2-20260923/foundation__durable-memory/raw/fix-round-gap11-posthoc-residue.txt",
+      "raw_published": false,
+      "raw_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    {
+      "cmd": "POST-HOC (fix round, transcript calls [13] at 01:23:25Z and [50] at 01:36:21Z): ai-memory status 2>&1 | grep -E \"pages|data-dir\"",
+      "exit": 0,
+      "output_excerpt": "[13]: pages: 120 (all versions: 405); fts: pages 405/405; observations 154355/154355. [50]: pages: 120 (all versions: 405); observations 155961/155961. Corrected on reconciliation: the previous excerpt combined these with 'sessions: 179' from call [7]. These were CLI calls to the LIVE service. They are read-only, but they break the rule that every ai-memory CLI call targets an isolated server.",
+      "raw": [
+        "evidence/artifacts/gap-wave2-20260923/foundation__durable-memory/raw/fix-round-gap14-netns-probe.txt",
+        "evidence/artifacts/gap-wave2-20260923/foundation__durable-memory/raw/fix-round-final-live-status.txt"
+      ],
+      "raw_published": false,
+      "raw_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    }
+  ],
+  "results": "Not settled. The preregistered sequence did not run on a disposable store: after `init`, every subcommand reached the live service on 127.0.0.1:49374 and operated on the live store, a known hazard whose fix (own port plus AI_MEMORY_SERVER_URL) was already recorded in deletion-erasure-probe.json and visible in this run's own init output. Nothing new about TTL or erasure was learned relative to the prior deletion-erasure-probe: (1) TTL was not exercised; the CLI write-page lacks --expires-at, but the MCP/HTTP memory_write_page tool accepts expires_at (this project's AGENTS.md: 'For time-bounded memory, set expires_at'), so a disposable serve could have exercised it; (2) the backup contained the token (zgrep matched) only because it was taken while the page was live, and it was shredded without a post-deletion check; (3) `compact --confirm` ran before `purge-project`, so the run says nothing about compact-based erasure; (4) the post-hoc `grep -c ttl-probe` = 13 counts lines holding the page path, not the marker token. What the raw output does show: the full page body with the literal token is committed in the live wiki's git history (bb0b205, `git show` output), unaffected by the purge commit 4be633d. The live store was mutated (a page write and purge, a VACUUM of the 223.7 MiB database, a 130 MiB backup of live content written and then shredded). This is an unremediated isolation breach that needs an operator decision; see the layer README.",
+  "outcome": "not_settled",
+  "evidence_class": "local_integration",
+  "limits": [
+    "Ran against the live store by accident; not a controlled experiment and not evidence for the TTL/erasure protocol.",
+    "TTL not exercised: the CLI lacks --expires-at, but MCP/HTTP memory_write_page accepts expires_at on a disposable serve.",
+    "Token residue in the live database file is unmeasured (the grep counted a path substring); token residue in the live wiki git history (bb0b205) is shown by git show.",
+    "Remaining: the whole next_check on a disposable instance (own loopback port, AI_MEMORY_SERVER_URL exported, ideally inside unshare -rn): write a token page with expires_at via MCP/HTTP, forget-sweep, backup, compact --confirm, then `grep -a -o TOKEN | wc -l` over wiki, wiki/.git, sqlite, WAL and the backup archive.",
+    "Fix-round read-only follow-ups also contacted the live store: grep and git log/show on its files, and `ai-memory status` CLI calls to the live service (transcript calls [7], [13], [50]). They changed nothing recorded, but the status calls break the ai-memory isolation rule.",
+    "Home-directory paths are written as $HOME or /home/example; raw outputs under raw/ use $HOME (see raw/INDEX.json for transformations and source hashes)."
+  ],
+  "checked_at": "2026-09-23T01:13:46Z",
+  "checked_at_note": "Probe time (first-pass transcript Bash call [14]); read-only post-hoc residue commands ran at 01:24:27Z and 01:24:36Z (fix-round calls [17], [18]).",
+  "reconciliation": {
+    "reconciled_at": "2026-09-23T02:30:41Z",
+    "new_checks_run": false,
+    "changes": [
+      "advanced -> not_settled (reviewer finding: nothing new learned; criteria required a disposable store).",
+      "Residue grep reinterpreted: 13 counts lines with the path substring, not the token.",
+      "Backup: the first-pass zgrep did find the token before the shred (raw output); clarified what that shows.",
+      "TTL-not-exercisable overstatement corrected (MCP/HTTP accepts expires_at).",
+      "Live-store status calls in the fix round disclosed as rule breaks.",
+      "Real timestamps; raw outputs committed."
+    ]
+  }
+}

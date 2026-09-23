@@ -1,0 +1,877 @@
+{
+  "id": "gap-wave2-20260923-us-equities-portfolio-risk-11-nautilus-study-episodes-fees",
+  "catalog": "us-equities",
+  "layer_id": "portfolio-risk",
+  "gap_index": 11,
+  "gap_text": "The retained study omits dividend-inclusive returns, realistic fills, financing, borrowing, liquidity and capacity; its fixed cost deduction is illustrative.",
+  "gap_text_sha256": "6219c5d10185269418cdf5cb2b59584b4dab04c896a1fae8470b0e2e7e32b429",
+  "next_check": "Re-run the study in a NautilusTrader backtest with dividend-inclusive bars and explicit fee and financing settings, and compare the result with the fixed 20bp proxy.",
+  "preregistration": {
+    "written_at": "2026-09-23T06:32:44Z",
+    "expectation": "Every observed evaluation episode of the retained research-evaluation study (development folds and reserved 2021Q1, all five candidates, taken from the regenerated candidate ledger of gap 3) is executed in native NautilusTrader 2.0.0rc5: buy integer shares for 100000 USD notional at the t+1 open, sell at the t+6 open, using synthetic open-print bars. Cases: FixedFeeModel $1/order; and $1/order plus OneTickSlippageFillModel. Financing is explicitly zero (CASH account, long only, no borrowing; rc5 backtest modules offer only FX rollover and CFD swap financing). Per-candidate mean net return per episode is compared with the study's gross label and the fixed 20bp proxy. Expected outcome: advanced, because dividend-inclusive bars depend on the peer's dividend simulation module and no equity financing model exists to exercise.",
+    "criteria": "advanced iff both cases exit 0, every fill reconciles to the ledger's entry/exit open prices (plus declared slippage) and integer shares, and the comparison table against the 20bp proxy is reported; settled would additionally need dividend-inclusive bars and a financing model. Detection: per-episode Decimal reconciliation; a mismatch raises.",
+    "fix_round_addendum": {
+      "written_at": "2026-09-23T07:12:07Z",
+      "label": "fix-round preregistration, written after round-1 results and the review, before the fix-round reruns",
+      "text": "Fix round after independent Codex review: the preregistered fixed-fee plus OneTickSlippageFillModel case was not run in round 1 (replaced by a per-share fee case without an addendum). This addendum restores it (tick 0.0001 because LEAN opens have sub-penny values) and keeps the per-share case as an added arm; fills must match instrument and date, and mutation self-tests must each be detected. Rerun into raw/11/nautilus-episodes-run-fix1."
+    },
+    "fix_round_2_addendum": {
+      "written_at": "2026-09-23T07:22:02Z",
+      "label": "fix-round-2 preregistration, written after the round-2 review and before the fix-round-2 reruns",
+      "text": "Fix round 2 after the round-2 independent review: fill checks now compare the exact New York fill time (16:00 close bars; 09:30 open-print bars) instead of the date only, and a one-hour time-shift mutation must be detected. All Nautilus runners (portfolio, dividend-inclusive portfolio, RiskEngine probe, episodes) rerun into *-fix2 outputs; expected economic results identical to fix round 1."
+    },
+    "fix_round_4_addendum": {
+      "written_at": "2026-09-23T16:01:45Z",
+      "label": "fix-round-4 preregistration, written after the second independent Opus review and before the fix-round-4 runs",
+      "text": "Fix round 4 after the Opus review (dividend-inclusive episodes feasible but not run): a new runner nautilus_episodes_dividends.py replays the fixed-fee case (FixedFeeModel 1 USD) of every invested candidate with the vendored peer DistributionModule (sha256 eefee070b0dbe6ad3a1e68755ca959b5fff081fad61af8b84902a438996b126b) per instrument, so native ex-date cash is credited for shares held at each ex-date instant (00:00 New York). An independent Decimal ledger merges fills (09:30 open prints, cent-rounded notionals as in fix round 2) and dividend credits chronologically and must match every native account transition, every module emission and every fill; episode returns include the credits for the episode's legs. Mutation self-tests (emission removed, emission amount +0.01, dividend account row removed, fill time +1 h) must each be detected. Reported per candidate: credited dividend cash and mean native net return per episode with dividends, beside the fixed-fee result without them. Expected: credited cash is close to the previously reported unmodelled_dividend_cash_usd (same ex-date rule), differing only by the module's per-share cent rounding; the difference is reported. Outcome stays advanced: the financing model and fill/liquidity realism clauses remain open."
+    },
+    "fix_round_4_review_addendum": {
+      "written_at": "2026-09-23T16:33:32Z",
+      "label": "fix-round-4 review-rerun preregistration, written after the Codex round-4 review and before the reruns",
+      "text": "Fix round 4, review rerun (after the Codex round-4 review, raw/review/codex-review-round4.md, finding 2): nautilus_episodes_dividends.py will compare every native account row as (timestamp, balance) against the ledger (dividend credits at the ex-date instant 00:00 New York, fills at 09:30), and every module emission's ts_now_ns and ex_instant_ns against the ledger instant of its ex-date. Added mutations: first nonzero dividend account row shifted to 01:00, first nonzero emission instant shifted by one hour; both must be detected along with the existing six. Rerun into $CACHE/episodes-dividends-rerun1 and publish as raw/11/nautilus-episodes-dividends-run-fix4b. Expected: economic results identical to the first fix-round-4 run."
+    }
+  },
+  "commands": [
+    {
+      "cmd": "LEAN_SOURCE=$HOME/.local/share/codex-ecosystem/tools/lean-985ef30 $HOME/.cache/gap-wave2-20260923/portfolio-risk/venv-nautilus/bin/python blueprints/gap-wave2-20260923/us-equities__portfolio-risk/nautilus_episodes.py --ledger evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/3/regenerated/run-1/candidate-ledger.json.gz --out evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run",
+      "exit": 0,
+      "started_utc": "2026-09-23T06:46:18Z",
+      "note": "round 1: fixed and per-share cases only (the preregistered slippage case was omitted); outputs in git at b482b86",
+      "development_attempts": "first scratch attempt failed constructing the strategy (Strategy.log is read-only); second scratch run exited 0 with economic results identical to round 1"
+    },
+    {
+      "cmd": "gzip -n -9 -c evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/3/regenerated/run-1/candidate-ledger.json > $CACHE/ledger-fix1.json.gz && LEAN_SOURCE=$HOME/.local/share/codex-ecosystem/tools/lean-985ef30 $HOME/.cache/gap-wave2-20260923/portfolio-risk/venv-nautilus/bin/python blueprints/gap-wave2-20260923/us-equities__portfolio-risk/nautilus_episodes.py --ledger $CACHE/ledger-fix1.json.gz --out evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix1",
+      "attempt_1_utc": "2026-09-23T07:12:24Z",
+      "attempt_1_exit": 1,
+      "attempt_1_cause": "the restored slippage case produced sub-cent notionals; the native USD account settles each fill rounded to the cent and the ledger did not, so the transition check failed (raw/11/fix1-attempt-1.stderr.txt)",
+      "attempt_2_utc": "2026-09-23T07:12:56Z",
+      "attempt_2_exit": 0,
+      "attempt_2_change": "ledger rounds each fill notional to the cent (half-even); fixed and per-share results unchanged; outputs in git at 8bab001"
+    },
+    {
+      "cmd": "LEAN_SOURCE=$HOME/.local/share/codex-ecosystem/tools/lean-985ef30 $HOME/.cache/gap-wave2-20260923/portfolio-risk/venv-nautilus/bin/python blueprints/gap-wave2-20260923/us-equities__portfolio-risk/nautilus_episodes.py --ledger $CACHE/ledger-fix1.json.gz --out evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix2",
+      "exit": 0,
+      "started_utc": "2026-09-23T07:22:13Z",
+      "note": "fix round 2 (07:22Z, after the round-2 review): exact 16:00/09:30 New York fill times enforced and a one-hour time-shift mutation added; economic results identical to fix round 1; fix-round-1 outputs retained in git at 8bab001"
+    },
+    {
+      "cmd": "LEAN_SOURCE=$HOME/.local/share/codex-ecosystem/tools/lean-985ef30 $HOME/.cache/gap-wave2-20260923/portfolio-risk/venv-nautilus/bin/python blueprints/gap-wave2-20260923/us-equities__portfolio-risk/nautilus_episodes_dividends.py --ledger evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/3/regenerated/run-1/candidate-ledger.json --no-dividend-summary evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix2/summary.json --out $CACHE/episodes-dividends-attempt1",
+      "exit": 0,
+      "started_utc": "2026-09-23T16:07:28Z",
+      "finished_utc": "2026-09-23T16:07:29Z",
+      "note": "fix round 4 (preregistered 16:01:45Z, after the second Opus review): fixed-fee case with the vendored DistributionModule per instrument; first and only execution; outputs copied to raw/11/nautilus-episodes-dividends-run-fix4 (fills.csv engine UUIDs redacted afterwards, see raw/REDACTIONS.json)"
+    },
+    {
+      "cmd": "LEAN_SOURCE=$HOME/.local/share/codex-ecosystem/tools/lean-985ef30 $HOME/.cache/gap-wave2-20260923/portfolio-risk/venv-nautilus/bin/python blueprints/gap-wave2-20260923/us-equities__portfolio-risk/gap11_dividend_rounding_check.py evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/3/regenerated/run-1/candidate-ledger.json $CACHE/episodes-dividends-attempt1/summary.json",
+      "exit": 0,
+      "started_utc": "2026-09-23T16:07:49Z",
+      "output": "raw/11/dividend-rounding-check.stdout.txt",
+      "purpose": "explain credited-minus-unmodelled: the earlier estimate used unrounded per-share amounts; with per-share rounded half-even to the cent it must equal the native credited cash exactly"
+    },
+    {
+      "cmd": "LEAN_SOURCE=$HOME/.local/share/codex-ecosystem/tools/lean-985ef30 $HOME/.cache/gap-wave2-20260923/portfolio-risk/venv-nautilus/bin/python blueprints/gap-wave2-20260923/us-equities__portfolio-risk/nautilus_episodes_dividends.py --ledger evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/3/regenerated/run-1/candidate-ledger.json --no-dividend-summary evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix2/summary.json --out $CACHE/episodes-dividends-rerun1",
+      "exit": 0,
+      "started_utc": "2026-09-23T16:34:25Z",
+      "finished_utc": "2026-09-23T16:34:28Z",
+      "note": "fix-round-4 review rerun (preregistered 16:33:32Z in 81e1c86, after the Codex round-4 review finding 2): account rows compared as (timestamp, balance) and emission instants checked against 00:00 New York on each ex-date; 2 timestamp mutations added (8 per candidate, all detected); economic results identical to the first fix-round-4 run; outputs in raw/11/nautilus-episodes-dividends-run-fix4b (the reported results), first run kept in raw/11/nautilus-episodes-dividends-run-fix4"
+    }
+  ],
+  "results": {
+    "cash": {
+      "episodes": 260,
+      "invested_episodes": 0,
+      "mean_gross_price_label": "0",
+      "mean_net_cost_proxy_label_20bp": "0.000",
+      "unmodelled_dividend_cash_usd": "0.00",
+      "cases": {
+        "fixed": {
+          "note": "no invested episode; engine not needed",
+          "orders": 0
+        },
+        "fixed_one_tick_slippage": {
+          "note": "no invested episode; engine not needed",
+          "orders": 0
+        },
+        "per_share": {
+          "note": "no invested episode; engine not needed",
+          "orders": 0
+        }
+      }
+    },
+    "equalweight": {
+      "episodes": 260,
+      "invested_episodes": 260,
+      "mean_gross_price_label": "0.003791554409528185485714460015",
+      "mean_net_cost_proxy_label_20bp": "0.001791554409528185485714460017",
+      "unmodelled_dividend_cash_usd": "7157.64",
+      "cases": {
+        "fixed": {
+          "account_rows": 1561,
+          "ending_cash_native_equals_ledger": "1096785.31",
+          "fees_usd": "1560",
+          "fills_reconciled": 1560,
+          "mean_effective_cost_vs_gross_label": "0.000069042486451262408791383092",
+          "mean_native_minus_net_proxy": "0.001930957513548737591208616906",
+          "mean_native_net_return_per_episode": "0.003722511923076923076923076923",
+          "mutation_self_tests": {
+            "cash_corrupted_first_transition": "cash transitions differ: native rows 1561, ledger 1560, ending native 1096785.31 ledger 1096785.31",
+            "fill_time_1900": "fill mismatch {'client_order_id': 'O-20160115-143000-001-000-1', 'episode': 0, 'date': '2016-01-15', 'asset': 'IWM', 'side': 'BUY', 'qty': 336}",
+            "fill_time_shifted_one_hour": "fill mismatch {'client_order_id': 'O-20160115-143000-001-000-1', 'episode': 0, 'date': '2016-01-15', 'asset': 'IWM', 'side': 'BUY', 'qty': 336}",
+            "wrong_instrument_first_fill": "fill mismatch {'client_order_id': 'O-20160115-143000-001-000-1', 'episode': 0, 'date': '2016-01-15', 'asset': 'IWM', 'side': 'BUY', 'qty': 336}"
+          },
+          "orders": 1560,
+          "total_pnl_usd": "96785.31"
+        },
+        "fixed_one_tick_slippage": {
+          "account_rows": 1561,
+          "ending_cash_native_equals_ledger": "1096757.01",
+          "fees_usd": "1560",
+          "fills_reconciled": 1560,
+          "mean_effective_cost_vs_gross_label": "0.000070130947989723947252921553",
+          "mean_native_minus_net_proxy": "0.001929869052010276052747078445",
+          "mean_native_net_return_per_episode": "0.003721423461538461538461538462",
+          "mutation_self_tests": {
+            "cash_corrupted_first_transition": "cash transitions differ: native rows 1561, ledger 1560, ending native 1096757.01 ledger 1096757.01",
+            "fill_time_1900": "fill mismatch {'client_order_id': 'O-20160115-143000-001-000-1', 'episode': 0, 'date': '2016-01-15', 'asset': 'IWM', 'side': 'BUY', 'qty': 336}",
+            "fill_time_shifted_one_hour": "fill mismatch {'client_order_id': 'O-20160115-143000-001-000-1', 'episode': 0, 'date': '2016-01-15', 'asset': 'IWM', 'side': 'BUY', 'qty': 336}",
+            "wrong_instrument_first_fill": "fill mismatch {'client_order_id': 'O-20160115-143000-001-000-1', 'episode': 0, 'date': '2016-01-15', 'asset': 'IWM', 'side': 'BUY', 'qty': 336}"
+          },
+          "orders": 1560,
+          "total_pnl_usd": "96757.01"
+        },
+        "per_share": {
+          "account_rows": 1561,
+          "ending_cash_native_equals_ledger": "1095421.59",
+          "fees_usd": "2923.72",
+          "fills_reconciled": 1560,
+          "mean_effective_cost_vs_gross_label": "0.000121493255682031639560613861",
+          "mean_native_minus_net_proxy": "0.001878506744317968360439386137",
+          "mean_native_net_return_per_episode": "0.003670061153846153846153846154",
+          "mutation_self_tests": {
+            "cash_corrupted_first_transition": "cash transitions differ: native rows 1561, ledger 1560, ending native 1095421.59 ledger 1095421.59",
+            "fill_time_1900": "fill mismatch {'client_order_id': 'O-20160115-143000-001-000-1', 'episode': 0, 'date': '2016-01-15', 'asset': 'IWM', 'side': 'BUY', 'qty': 336}",
+            "fill_time_shifted_one_hour": "fill mismatch {'client_order_id': 'O-20160115-143000-001-000-1', 'episode': 0, 'date': '2016-01-15', 'asset': 'IWM', 'side': 'BUY', 'qty': 336}",
+            "wrong_instrument_first_fill": "fill mismatch {'client_order_id': 'O-20160115-143000-001-000-1', 'episode': 0, 'date': '2016-01-15', 'asset': 'IWM', 'side': 'BUY', 'qty': 336}"
+          },
+          "orders": 1560,
+          "total_pnl_usd": "95421.59"
+        }
+      }
+    },
+    "momentum120": {
+      "episodes": 260,
+      "invested_episodes": 227,
+      "mean_gross_price_label": "0.003669413222858226001110052234",
+      "mean_net_cost_proxy_label_20bp": "0.001923259376704379847263898388",
+      "unmodelled_dividend_cash_usd": "5219.07",
+      "cases": {
+        "fixed": {
+          "account_rows": 455,
+          "ending_cash_native_equals_ledger": "1094896.26",
+          "fees_usd": "454",
+          "fills_reconciled": 454,
+          "mean_effective_cost_vs_gross_label": "0.000019557069012072154956206080",
+          "mean_native_minus_net_proxy": "0.001726596777141773998889947766",
+          "mean_native_net_return_per_episode": "0.003649856153846153846153846154",
+          "mutation_self_tests": {
+            "cash_corrupted_first_transition": "cash transitions differ: native rows 455, ledger 454, ending native 1094896.26 ledger 1094896.26",
+            "fill_time_1900": "fill mismatch {'client_order_id': 'O-20160301-143000-001-000-1', 'episode': 6, 'date': '2016-03-01', 'asset': 'SPY', 'side': 'BUY', 'qty': 512}",
+            "fill_time_shifted_one_hour": "fill mismatch {'client_order_id': 'O-20160301-143000-001-000-1', 'episode': 6, 'date': '2016-03-01', 'asset': 'SPY', 'side': 'BUY', 'qty': 512}",
+            "wrong_instrument_first_fill": "fill mismatch {'client_order_id': 'O-20160301-143000-001-000-1', 'episode': 6, 'date': '2016-03-01', 'asset': 'SPY', 'side': 'BUY', 'qty': 512}"
+          },
+          "orders": 454,
+          "total_pnl_usd": "94896.26"
+        },
+        "fixed_one_tick_slippage": {
+          "account_rows": 455,
+          "ending_cash_native_equals_ledger": "1094869.86",
+          "fees_usd": "454",
+          "fills_reconciled": 454,
+          "mean_effective_cost_vs_gross_label": "0.000020572453627456770340821465",
+          "mean_native_minus_net_proxy": "0.001725581392526389383505332381",
+          "mean_native_net_return_per_episode": "0.003648840769230769230769230769",
+          "mutation_self_tests": {
+            "cash_corrupted_first_transition": "cash transitions differ: native rows 455, ledger 454, ending native 1094869.86 ledger 1094869.86",
+            "fill_time_1900": "fill mismatch {'client_order_id': 'O-20160301-143000-001-000-1', 'episode': 6, 'date': '2016-03-01', 'asset': 'SPY', 'side': 'BUY', 'qty': 512}",
+            "fill_time_shifted_one_hour": "fill mismatch {'client_order_id': 'O-20160301-143000-001-000-1', 'episode': 6, 'date': '2016-03-01', 'asset': 'SPY', 'side': 'BUY', 'qty': 512}",
+            "wrong_instrument_first_fill": "fill mismatch {'client_order_id': 'O-20160301-143000-001-000-1', 'episode': 6, 'date': '2016-03-01', 'asset': 'SPY', 'side': 'BUY', 'qty': 512}"
+          },
+          "orders": 454,
+          "total_pnl_usd": "94869.86"
+        },
+        "per_share": {
+          "account_rows": 455,
+          "ending_cash_native_equals_ledger": "1092695.78",
+          "fees_usd": "2654.48",
+          "fills_reconciled": 454,
+          "mean_effective_cost_vs_gross_label": "0.000104190915165918308802359926",
+          "mean_native_minus_net_proxy": "0.001641962930987927845043793920",
+          "mean_native_net_return_per_episode": "0.003565222307692307692307692308",
+          "mutation_self_tests": {
+            "cash_corrupted_first_transition": "cash transitions differ: native rows 455, ledger 454, ending native 1092695.78 ledger 1092695.78",
+            "fill_time_1900": "fill mismatch {'client_order_id': 'O-20160301-143000-001-000-1', 'episode': 6, 'date': '2016-03-01', 'asset': 'SPY', 'side': 'BUY', 'qty': 512}",
+            "fill_time_shifted_one_hour": "fill mismatch {'client_order_id': 'O-20160301-143000-001-000-1', 'episode': 6, 'date': '2016-03-01', 'asset': 'SPY', 'side': 'BUY', 'qty': 512}",
+            "wrong_instrument_first_fill": "fill mismatch {'client_order_id': 'O-20160301-143000-001-000-1', 'episode': 6, 'date': '2016-03-01', 'asset': 'SPY', 'side': 'BUY', 'qty': 512}"
+          },
+          "orders": 454,
+          "total_pnl_usd": "92695.78"
+        }
+      }
+    },
+    "momentum20": {
+      "episodes": 260,
+      "invested_episodes": 206,
+      "mean_gross_price_label": "0.002625816040226568298490841387",
+      "mean_net_cost_proxy_label_20bp": "0.001041200655611183683106226002",
+      "unmodelled_dividend_cash_usd": "5176.01",
+      "cases": {
+        "fixed": {
+          "account_rows": 413,
+          "ending_cash_native_equals_ledger": "1067827.60",
+          "fees_usd": "412",
+          "fills_reconciled": 412,
+          "mean_effective_cost_vs_gross_label": "0.000017062194072722144644687541",
+          "mean_native_minus_net_proxy": "0.001567553190542662470739927844",
+          "mean_native_net_return_per_episode": "0.002608753846153846153846153846",
+          "mutation_self_tests": {
+            "cash_corrupted_first_transition": "cash transitions differ: native rows 413, ledger 412, ending native 1067827.60 ledger 1067827.60",
+            "fill_time_1900": "fill mismatch {'client_order_id': 'O-20160223-143000-001-000-1', 'episode': 5, 'date': '2016-02-23', 'asset': 'SPY', 'side': 'BUY', 'qty': 515}",
+            "fill_time_shifted_one_hour": "fill mismatch {'client_order_id': 'O-20160223-143000-001-000-1', 'episode': 5, 'date': '2016-02-23', 'asset': 'SPY', 'side': 'BUY', 'qty': 515}",
+            "wrong_instrument_first_fill": "fill mismatch {'client_order_id': 'O-20160223-143000-001-000-1', 'episode': 5, 'date': '2016-02-23', 'asset': 'SPY', 'side': 'BUY', 'qty': 515}"
+          },
+          "orders": 412,
+          "total_pnl_usd": "67827.60"
+        },
+        "fixed_one_tick_slippage": {
+          "account_rows": 413,
+          "ending_cash_native_equals_ledger": "1067802.08",
+          "fees_usd": "412",
+          "fills_reconciled": 412,
+          "mean_effective_cost_vs_gross_label": "0.000018043732534260606183149079",
+          "mean_native_minus_net_proxy": "0.001566571652081124009201466306",
+          "mean_native_net_return_per_episode": "0.002607772307692307692307692308",
+          "mutation_self_tests": {
+            "cash_corrupted_first_transition": "cash transitions differ: native rows 413, ledger 412, ending native 1067802.08 ledger 1067802.08",
+            "fill_time_1900": "fill mismatch {'client_order_id': 'O-20160223-143000-001-000-1', 'episode': 5, 'date': '2016-02-23', 'asset': 'SPY', 'side': 'BUY', 'qty': 515}",
+            "fill_time_shifted_one_hour": "fill mismatch {'client_order_id': 'O-20160223-143000-001-000-1', 'episode': 5, 'date': '2016-02-23', 'asset': 'SPY', 'side': 'BUY', 'qty': 515}",
+            "wrong_instrument_first_fill": "fill mismatch {'client_order_id': 'O-20160223-143000-001-000-1', 'episode': 5, 'date': '2016-02-23', 'asset': 'SPY', 'side': 'BUY', 'qty': 515}"
+          },
+          "orders": 412,
+          "total_pnl_usd": "67802.08"
+        },
+        "per_share": {
+          "account_rows": 413,
+          "ending_cash_native_equals_ledger": "1065684.54",
+          "fees_usd": "2555.06",
+          "fills_reconciled": 412,
+          "mean_effective_cost_vs_gross_label": "0.000099487578688106760029302925",
+          "mean_native_minus_net_proxy": "0.001485127805927277855355312460",
+          "mean_native_net_return_per_episode": "0.002526328461538461538461538462",
+          "mutation_self_tests": {
+            "cash_corrupted_first_transition": "cash transitions differ: native rows 413, ledger 412, ending native 1065684.54 ledger 1065684.54",
+            "fill_time_1900": "fill mismatch {'client_order_id': 'O-20160223-143000-001-000-1', 'episode': 5, 'date': '2016-02-23', 'asset': 'SPY', 'side': 'BUY', 'qty': 515}",
+            "fill_time_shifted_one_hour": "fill mismatch {'client_order_id': 'O-20160223-143000-001-000-1', 'episode': 5, 'date': '2016-02-23', 'asset': 'SPY', 'side': 'BUY', 'qty': 515}",
+            "wrong_instrument_first_fill": "fill mismatch {'client_order_id': 'O-20160223-143000-001-000-1', 'episode': 5, 'date': '2016-02-23', 'asset': 'SPY', 'side': 'BUY', 'qty': 515}"
+          },
+          "orders": 412,
+          "total_pnl_usd": "65684.54"
+        }
+      }
+    },
+    "momentum60": {
+      "episodes": 260,
+      "invested_episodes": 212,
+      "mean_gross_price_label": "0.002665154746893804428543657945",
+      "mean_net_cost_proxy_label_20bp": "0.001034385516124573659312888714",
+      "unmodelled_dividend_cash_usd": "4858.55",
+      "cases": {
+        "fixed": {
+          "account_rows": 425,
+          "ending_cash_native_equals_ledger": "1068833.59",
+          "fees_usd": "424",
+          "fills_reconciled": 424,
+          "mean_effective_cost_vs_gross_label": "0.000017708977663035197774427176",
+          "mean_native_minus_net_proxy": "0.001613060253106195571456342055",
+          "mean_native_net_return_per_episode": "0.002647445769230769230769230769",
+          "mutation_self_tests": {
+            "cash_corrupted_first_transition": "cash transitions differ: native rows 425, ledger 424, ending native 1068833.59 ledger 1068833.59",
+            "fill_time_1900": "fill mismatch {'client_order_id': 'O-20160322-133000-001-000-1', 'episode': 9, 'date': '2016-03-22', 'asset': 'SPY', 'side': 'BUY', 'qty': 490}",
+            "fill_time_shifted_one_hour": "fill mismatch {'client_order_id': 'O-20160322-133000-001-000-1', 'episode': 9, 'date': '2016-03-22', 'asset': 'SPY', 'side': 'BUY', 'qty': 490}",
+            "wrong_instrument_first_fill": "fill mismatch {'client_order_id': 'O-20160322-133000-001-000-1', 'episode': 9, 'date': '2016-03-22', 'asset': 'SPY', 'side': 'BUY', 'qty': 490}"
+          },
+          "orders": 424,
+          "total_pnl_usd": "68833.59"
+        },
+        "fixed_one_tick_slippage": {
+          "account_rows": 425,
+          "ending_cash_native_equals_ledger": "1068807.83",
+          "fees_usd": "424",
+          "fills_reconciled": 424,
+          "mean_effective_cost_vs_gross_label": "0.000018699746893804428543657945",
+          "mean_native_minus_net_proxy": "0.001612069483875426340687111286",
+          "mean_native_net_return_per_episode": "0.002646455",
+          "mutation_self_tests": {
+            "cash_corrupted_first_transition": "cash transitions differ: native rows 425, ledger 424, ending native 1068807.83 ledger 1068807.83",
+            "fill_time_1900": "fill mismatch {'client_order_id': 'O-20160322-133000-001-000-1', 'episode': 9, 'date': '2016-03-22', 'asset': 'SPY', 'side': 'BUY', 'qty': 490}",
+            "fill_time_shifted_one_hour": "fill mismatch {'client_order_id': 'O-20160322-133000-001-000-1', 'episode': 9, 'date': '2016-03-22', 'asset': 'SPY', 'side': 'BUY', 'qty': 490}",
+            "wrong_instrument_first_fill": "fill mismatch {'client_order_id': 'O-20160322-133000-001-000-1', 'episode': 9, 'date': '2016-03-22', 'asset': 'SPY', 'side': 'BUY', 'qty': 490}"
+          },
+          "orders": 424,
+          "total_pnl_usd": "68807.83"
+        },
+        "per_share": {
+          "account_rows": 425,
+          "ending_cash_native_equals_ledger": "1066674.45",
+          "fees_usd": "2583.14",
+          "fills_reconciled": 424,
+          "mean_effective_cost_vs_gross_label": "0.000100752823816881351620581022",
+          "mean_native_minus_net_proxy": "0.001530016406952349417610188209",
+          "mean_native_net_return_per_episode": "0.002564401923076923076923076923",
+          "mutation_self_tests": {
+            "cash_corrupted_first_transition": "cash transitions differ: native rows 425, ledger 424, ending native 1066674.45 ledger 1066674.45",
+            "fill_time_1900": "fill mismatch {'client_order_id': 'O-20160322-133000-001-000-1', 'episode': 9, 'date': '2016-03-22', 'asset': 'SPY', 'side': 'BUY', 'qty': 490}",
+            "fill_time_shifted_one_hour": "fill mismatch {'client_order_id': 'O-20160322-133000-001-000-1', 'episode': 9, 'date': '2016-03-22', 'asset': 'SPY', 'side': 'BUY', 'qty': 490}",
+            "wrong_instrument_first_fill": "fill mismatch {'client_order_id': 'O-20160322-133000-001-000-1', 'episode': 9, 'date': '2016-03-22', 'asset': 'SPY', 'side': 'BUY', 'qty': 490}"
+          },
+          "orders": 424,
+          "total_pnl_usd": "66674.45"
+        }
+      }
+    },
+    "financing": "explicit zero: CASH account, long only, no borrowing",
+    "cases": {
+      "fixed": {
+        "kind": "FixedFeeModel",
+        "slippage_ticks": 0,
+        "usd": "1"
+      },
+      "fixed_one_tick_slippage": {
+        "kind": "FixedFeeModel",
+        "slippage_ticks": 1,
+        "usd": "1"
+      },
+      "per_share": {
+        "kind": "PerContractFeeModel",
+        "slippage_ticks": 0,
+        "usd": "0.01"
+      }
+    },
+    "dividends_fix4": {
+      "case": "fixed (FixedFeeModel 1 USD per order) with DistributionModule per instrument",
+      "distribution_events": {
+        "IWM": 21,
+        "QQQ": 21,
+        "SPY": 21
+      },
+      "candidates": {
+        "equalweight": {
+          "episodes": 260,
+          "orders": 1560,
+          "account_rows": 1624,
+          "distribution_credits": 63,
+          "nonzero_distribution_credits": 63,
+          "credited_dividend_cash_usd": "7156.72",
+          "previously_reported_unmodelled_dividend_cash_usd": "7157.64",
+          "credited_minus_unmodelled_usd": "-0.92",
+          "total_pnl_usd": "103942.03",
+          "fixed_case_total_pnl_without_dividends_usd": "96785.31",
+          "mean_native_net_return_per_episode_with_dividends": "0.003997770384615384615384615385",
+          "mean_native_net_return_per_episode_without_dividends": "0.003722511923076923076923076923",
+          "dividend_contribution_per_episode": "0.000275258461538461538461538462",
+          "alerts_fired": 57,
+          "mutation_self_tests_detected": {
+            "cash_corrupted_first_transition": true,
+            "dividend_account_row_removed": true,
+            "dividend_account_row_shifted_to_0100": true,
+            "dividend_account_transition_off_by_one_cent": true,
+            "emission_amount_off_by_one_cent": true,
+            "emission_instant_shifted_one_hour": true,
+            "emission_removed": true,
+            "fill_time_shifted_one_hour": true
+          }
+        },
+        "momentum120": {
+          "episodes": 260,
+          "orders": 454,
+          "account_rows": 518,
+          "distribution_credits": 63,
+          "nonzero_distribution_credits": 19,
+          "credited_dividend_cash_usd": "5221.74",
+          "previously_reported_unmodelled_dividend_cash_usd": "5219.07",
+          "credited_minus_unmodelled_usd": "2.67",
+          "total_pnl_usd": "100118.00",
+          "fixed_case_total_pnl_without_dividends_usd": "94896.26",
+          "mean_native_net_return_per_episode_with_dividends": "0.003850692307692307692307692308",
+          "mean_native_net_return_per_episode_without_dividends": "0.003649856153846153846153846154",
+          "dividend_contribution_per_episode": "0.000200836153846153846153846154",
+          "alerts_fired": 57,
+          "mutation_self_tests_detected": {
+            "cash_corrupted_first_transition": true,
+            "dividend_account_row_removed": true,
+            "dividend_account_row_shifted_to_0100": true,
+            "dividend_account_transition_off_by_one_cent": true,
+            "emission_amount_off_by_one_cent": true,
+            "emission_instant_shifted_one_hour": true,
+            "emission_removed": true,
+            "fill_time_shifted_one_hour": true
+          }
+        },
+        "momentum20": {
+          "episodes": 260,
+          "orders": 412,
+          "account_rows": 476,
+          "distribution_credits": 63,
+          "nonzero_distribution_credits": 16,
+          "credited_dividend_cash_usd": "5172.13",
+          "previously_reported_unmodelled_dividend_cash_usd": "5176.01",
+          "credited_minus_unmodelled_usd": "-3.88",
+          "total_pnl_usd": "72999.73",
+          "fixed_case_total_pnl_without_dividends_usd": "67827.60",
+          "mean_native_net_return_per_episode_with_dividends": "0.002807681923076923076923076923",
+          "mean_native_net_return_per_episode_without_dividends": "0.002608753846153846153846153846",
+          "dividend_contribution_per_episode": "0.000198928076923076923076923077",
+          "alerts_fired": 57,
+          "mutation_self_tests_detected": {
+            "cash_corrupted_first_transition": true,
+            "dividend_account_row_removed": true,
+            "dividend_account_row_shifted_to_0100": true,
+            "dividend_account_transition_off_by_one_cent": true,
+            "emission_amount_off_by_one_cent": true,
+            "emission_instant_shifted_one_hour": true,
+            "emission_removed": true,
+            "fill_time_shifted_one_hour": true
+          }
+        },
+        "momentum60": {
+          "episodes": 260,
+          "orders": 424,
+          "account_rows": 488,
+          "distribution_credits": 63,
+          "nonzero_distribution_credits": 16,
+          "credited_dividend_cash_usd": "4852.58",
+          "previously_reported_unmodelled_dividend_cash_usd": "4858.55",
+          "credited_minus_unmodelled_usd": "-5.97",
+          "total_pnl_usd": "73686.17",
+          "fixed_case_total_pnl_without_dividends_usd": "68833.59",
+          "mean_native_net_return_per_episode_with_dividends": "0.002834083461538461538461538462",
+          "mean_native_net_return_per_episode_without_dividends": "0.002647445769230769230769230769",
+          "dividend_contribution_per_episode": "0.000186637692307692307692307693",
+          "alerts_fired": 57,
+          "mutation_self_tests_detected": {
+            "cash_corrupted_first_transition": true,
+            "dividend_account_row_removed": true,
+            "dividend_account_row_shifted_to_0100": true,
+            "dividend_account_transition_off_by_one_cent": true,
+            "emission_amount_off_by_one_cent": true,
+            "emission_instant_shifted_one_hour": true,
+            "emission_removed": true,
+            "fill_time_shifted_one_hour": true
+          }
+        }
+      },
+      "cash_candidate": "no invested episode; engine not needed",
+      "reported_run": "raw/11/nautilus-episodes-dividends-run-fix4b (timestamp-checked review rerun)",
+      "rounding_check": "credited cash equals the unrounded-estimate recomputed with per-share rounded half-even to the cent, exactly, for all 4 candidates (raw/11/dividend-rounding-check.stdout.txt)",
+      "inputs_unchanged": true
+    }
+  },
+  "outcome": "advanced",
+  "evidence_class": "local_integration",
+  "limits": [
+    "The one-tick slippage case uses a 0.0001 USD tick (LEAN opens have sub-penny values), so its slippage is negligible; the per-share fee case was added without an amendment in round 1 and is labelled as an added arm in the fix-round addendum.",
+    "The round-1 command read raw/3/regenerated/run-1/candidate-ledger.json.gz; that gzip was later decompressed in place for publication (raw/REDACTIONS.json records both hashes; the decompressed ledger sha256 is 08ea5309...). Committed fills/orders files had engine event UUIDs replaced by 'uuid-redacted'; summary report_sha256 values refer to the pre-redaction CSVs.",
+    "Dividend clause (second Opus review, fix round 4): dividend-inclusive episode accounting now ran natively for the fixed-fee case of all 4 invested candidates with the vendored peer DistributionModule; every fill, module emission (amount, quantity, ex-date and emission instant) and account transition (timestamp and balance) reconciles and all 8 mutations per candidate were detected. The first fix-round-4 run compared balances only; the Codex round-4 review showed a dividend row shifted to 01:00 would have passed, so the review rerun added timestamp checks and two timestamp mutations, with identical economics. Only the fixed-fee case was run with dividends (not the slippage or per-share cases). Remaining: any financing model (rc5 has none for cash equities; financing is only declared zero for a long-only CASH account), and realistic fills, liquidity and capacity (synthetic open-print bars fill at the raw open with unlimited depth).",
+    "PerContractFeeModel uses 0.01 USD per share because USD Money has two decimals; it is an illustrative broker-like fee, not a quote.",
+    "Native effective cost versus the gross label is about 0.2-1.2 bp per episode against the 20bp proxy; this compares fee models, not execution quality.",
+    "Scope of native execution (Opus review): 905 invested episodes across 4 candidates (equalweight 260, momentum120 227, momentum20 206, momentum60 212) reached the engine in each case; the cash candidate's 260 episodes have no legs and were not run through the engine (0 orders)."
+  ],
+  "checked_at": "2026-09-23T16:34:25Z",
+  "raw_artifacts": [
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/dividend-rounding-check.stdout.txt",
+      "sha256": "34654d3d44c340bdd8c08e2cd7e270450368f87a02fce14dc834bcb6cea42467"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/fix1-attempt-1.stderr.txt",
+      "sha256": "64f40eddf38baf462bd22f191ee725d53d5c159aca17b8a56d78b78d7307dfba"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-dividends-run-fix4/equalweight/account.csv",
+      "sha256": "0bf9384b19abe498b1cf4fdc7612dcde09ac75ac0abe0447ae6c5b7970579c19"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-dividends-run-fix4/equalweight/fills.csv",
+      "sha256": "0af672b5bb7eafc5de588f4eb825393ed9984ac0fb70223786a1383409e17b62"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-dividends-run-fix4/equalweight/modules.json",
+      "sha256": "ef16d4749c932f98cf231f7c9f344ed3cf22c5fcb5984cc54be7aac3160faf82"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-dividends-run-fix4/equalweight/orders.json",
+      "sha256": "2d15e90c7e2d55f87ac04432f35af90881cdb96ea141fca4a5838689fb32eb82"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-dividends-run-fix4/momentum120/account.csv",
+      "sha256": "c6100df86fd1cfc9447a5f2048b3443f496f27786751ffdb4a1a635265b1292d"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-dividends-run-fix4/momentum120/fills.csv",
+      "sha256": "a766cfedee9b8fb69960755b82f64b0299eecfa675f7fe158af2c38dd6150580"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-dividends-run-fix4/momentum120/modules.json",
+      "sha256": "cd43178b25eb006c96cac5afa0769d16ed92ced5ce969facccfe1f4a70f41d04"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-dividends-run-fix4/momentum120/orders.json",
+      "sha256": "95f2a69b033b5ac409a3f456c0624dd8cbeb017dac56cd687a1b5e6a002ad23d"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-dividends-run-fix4/momentum20/account.csv",
+      "sha256": "8812a0dc5b35d86c0847da4f202185b49c42922c0f947b5ff38a8f1ad834acc9"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-dividends-run-fix4/momentum20/fills.csv",
+      "sha256": "adf839cf6cf70359d14395387964cb875505c6216263ae1797077eff06f1e273"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-dividends-run-fix4/momentum20/modules.json",
+      "sha256": "d2df3477497f6ceb7636612cd526fe08404fb552404b71f73b9abc3e7eef5a5e"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-dividends-run-fix4/momentum20/orders.json",
+      "sha256": "66feb2d4aae2c17ab20547d8db398e93e6db5d3f5462b625caa1e79ded1f29d0"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-dividends-run-fix4/momentum60/account.csv",
+      "sha256": "a084e9005eea3b108120beffad9c9537f1b9cb5214eab8773e6a3e0de6fc2bf3"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-dividends-run-fix4/momentum60/fills.csv",
+      "sha256": "2a3e3e8b29cc570c971c28fd75d61ee23d1360352554de87fa06c76ac54e4bc7"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-dividends-run-fix4/momentum60/modules.json",
+      "sha256": "1a11e010cbfad20ad499dbbd3305d077317889b73b88db20a4ffdfa3117b77fb"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-dividends-run-fix4/momentum60/orders.json",
+      "sha256": "7f2a7962b11e7b20c39c0a96e5fb4127a334ce7625c9c03d2e374bbca0eb907f"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-dividends-run-fix4/summary.json",
+      "sha256": "3bd38953e7d015db213498f0aad5c3334722222a21be2e7506fda66c6cf78e6b"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-dividends-run-fix4.stderr.txt",
+      "sha256": "4a4070f710d348ca4d3e62f5f7264e2ef2a0d0c5ef0276c93a88d53b2cd5883a"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-dividends-run-fix4.stdout.txt",
+      "sha256": "871ad1847615bc120d708975c9692778f5c6132403da569bc403a80f02c7f18a"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-dividends-run-fix4b/equalweight/account.csv",
+      "sha256": "0bf9384b19abe498b1cf4fdc7612dcde09ac75ac0abe0447ae6c5b7970579c19"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-dividends-run-fix4b/equalweight/fills.csv",
+      "sha256": "0af672b5bb7eafc5de588f4eb825393ed9984ac0fb70223786a1383409e17b62"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-dividends-run-fix4b/equalweight/modules.json",
+      "sha256": "ef16d4749c932f98cf231f7c9f344ed3cf22c5fcb5984cc54be7aac3160faf82"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-dividends-run-fix4b/equalweight/orders.json",
+      "sha256": "2d15e90c7e2d55f87ac04432f35af90881cdb96ea141fca4a5838689fb32eb82"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-dividends-run-fix4b/momentum120/account.csv",
+      "sha256": "c6100df86fd1cfc9447a5f2048b3443f496f27786751ffdb4a1a635265b1292d"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-dividends-run-fix4b/momentum120/fills.csv",
+      "sha256": "a766cfedee9b8fb69960755b82f64b0299eecfa675f7fe158af2c38dd6150580"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-dividends-run-fix4b/momentum120/modules.json",
+      "sha256": "cd43178b25eb006c96cac5afa0769d16ed92ced5ce969facccfe1f4a70f41d04"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-dividends-run-fix4b/momentum120/orders.json",
+      "sha256": "95f2a69b033b5ac409a3f456c0624dd8cbeb017dac56cd687a1b5e6a002ad23d"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-dividends-run-fix4b/momentum20/account.csv",
+      "sha256": "8812a0dc5b35d86c0847da4f202185b49c42922c0f947b5ff38a8f1ad834acc9"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-dividends-run-fix4b/momentum20/fills.csv",
+      "sha256": "adf839cf6cf70359d14395387964cb875505c6216263ae1797077eff06f1e273"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-dividends-run-fix4b/momentum20/modules.json",
+      "sha256": "d2df3477497f6ceb7636612cd526fe08404fb552404b71f73b9abc3e7eef5a5e"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-dividends-run-fix4b/momentum20/orders.json",
+      "sha256": "66feb2d4aae2c17ab20547d8db398e93e6db5d3f5462b625caa1e79ded1f29d0"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-dividends-run-fix4b/momentum60/account.csv",
+      "sha256": "a084e9005eea3b108120beffad9c9537f1b9cb5214eab8773e6a3e0de6fc2bf3"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-dividends-run-fix4b/momentum60/fills.csv",
+      "sha256": "2a3e3e8b29cc570c971c28fd75d61ee23d1360352554de87fa06c76ac54e4bc7"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-dividends-run-fix4b/momentum60/modules.json",
+      "sha256": "1a11e010cbfad20ad499dbbd3305d077317889b73b88db20a4ffdfa3117b77fb"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-dividends-run-fix4b/momentum60/orders.json",
+      "sha256": "7f2a7962b11e7b20c39c0a96e5fb4127a334ce7625c9c03d2e374bbca0eb907f"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-dividends-run-fix4b/summary.json",
+      "sha256": "5ac2bb785f3dffc715064da1c7087891c7c3ed21cbf8f8e956d00e15d216cba0"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-dividends-run-fix4b.stderr.txt",
+      "sha256": "530d85ae08cace62048e5905d119e48bffa4ce9e29428ba86612ec4b91ca32da"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-dividends-run-fix4b.stdout.txt",
+      "sha256": "871ad1847615bc120d708975c9692778f5c6132403da569bc403a80f02c7f18a"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix1.stderr.txt",
+      "sha256": "b147bf916f65fb29fca4184cc17cba985d52adaa557ad3f184c03e3b3a1a19ee"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix1.stdout.txt",
+      "sha256": "9d68ffd885c41af3d6a5affb258b9565d3e1c418063e1a8db95d037581fb1c24"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix2/equalweight/fixed/account.csv",
+      "sha256": "67bdef4b6fdd5adb206d558f71290f83d184e293facb2cfd6842c08717bd5eb8"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix2/equalweight/fixed/fills.csv",
+      "sha256": "0af672b5bb7eafc5de588f4eb825393ed9984ac0fb70223786a1383409e17b62"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix2/equalweight/fixed/orders.json",
+      "sha256": "2d15e90c7e2d55f87ac04432f35af90881cdb96ea141fca4a5838689fb32eb82"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix2/equalweight/fixed_one_tick_slippage/account.csv",
+      "sha256": "30ebae6deece51d019bfa656539b2853ae7330918ec8b31ce512051f01f17c8f"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix2/equalweight/fixed_one_tick_slippage/fills.csv",
+      "sha256": "3ed525bc7feb5775968345bf85b5be603eebe3c68c178ac6b86d6d230b40980c"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix2/equalweight/fixed_one_tick_slippage/orders.json",
+      "sha256": "2d15e90c7e2d55f87ac04432f35af90881cdb96ea141fca4a5838689fb32eb82"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix2/equalweight/per_share/account.csv",
+      "sha256": "88d35601ed81eeb3304aa69d3ce22b42665c6d139b8413f7afb9c0fdc083a53a"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix2/equalweight/per_share/fills.csv",
+      "sha256": "8470c6ea67033a3527b86f0c8d5eed5365330b7d8b36ac975e9c22cad58c9d36"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix2/equalweight/per_share/orders.json",
+      "sha256": "2d15e90c7e2d55f87ac04432f35af90881cdb96ea141fca4a5838689fb32eb82"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix2/momentum120/fixed/account.csv",
+      "sha256": "620c8c0192447b8f3b0343eb0fc54be8b7e70652d76bceb87738d6f28c42afcc"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix2/momentum120/fixed/fills.csv",
+      "sha256": "a766cfedee9b8fb69960755b82f64b0299eecfa675f7fe158af2c38dd6150580"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix2/momentum120/fixed/orders.json",
+      "sha256": "95f2a69b033b5ac409a3f456c0624dd8cbeb017dac56cd687a1b5e6a002ad23d"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix2/momentum120/fixed_one_tick_slippage/account.csv",
+      "sha256": "f900b1268f5aa2a1622675dc389cbd687a82273889fab9c9c315c317195f97e1"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix2/momentum120/fixed_one_tick_slippage/fills.csv",
+      "sha256": "2f3ab16d4325193c29c695481470ee4a2fdb41b910bcbd7990b358a4afe72f06"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix2/momentum120/fixed_one_tick_slippage/orders.json",
+      "sha256": "95f2a69b033b5ac409a3f456c0624dd8cbeb017dac56cd687a1b5e6a002ad23d"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix2/momentum120/per_share/account.csv",
+      "sha256": "07c44b3f6da5125d202d415fb6ec112cb973aca1b4aab0b853639251408a53f2"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix2/momentum120/per_share/fills.csv",
+      "sha256": "4c501aa5668b7b8903233a02ce4904e1cfb62e3c9baee3b6c118927ea66b67fb"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix2/momentum120/per_share/orders.json",
+      "sha256": "95f2a69b033b5ac409a3f456c0624dd8cbeb017dac56cd687a1b5e6a002ad23d"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix2/momentum20/fixed/account.csv",
+      "sha256": "23466a70306c0977585d4fb5237efb6806dd07b1c3586dcac4a3f2536028d2a6"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix2/momentum20/fixed/fills.csv",
+      "sha256": "adf839cf6cf70359d14395387964cb875505c6216263ae1797077eff06f1e273"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix2/momentum20/fixed/orders.json",
+      "sha256": "66feb2d4aae2c17ab20547d8db398e93e6db5d3f5462b625caa1e79ded1f29d0"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix2/momentum20/fixed_one_tick_slippage/account.csv",
+      "sha256": "ecc00b49cb8b0684eb1166e823d28fd1ccab6947a5bc4764f8c0685ca22341a3"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix2/momentum20/fixed_one_tick_slippage/fills.csv",
+      "sha256": "eb8e059a980c670f874aeb3c620367ea05cb2fd1cd5ae22596711e8c47d8cd37"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix2/momentum20/fixed_one_tick_slippage/orders.json",
+      "sha256": "66feb2d4aae2c17ab20547d8db398e93e6db5d3f5462b625caa1e79ded1f29d0"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix2/momentum20/per_share/account.csv",
+      "sha256": "ca30a2ff5ea1bf7b4f1fd8bab000b4adbcfddfc893c6a4e62beac2c782bd2e6f"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix2/momentum20/per_share/fills.csv",
+      "sha256": "12ee3a5d410827180c79ad0b70f8cc41e620bbc12919b093bbb6b0ea5a869394"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix2/momentum20/per_share/orders.json",
+      "sha256": "66feb2d4aae2c17ab20547d8db398e93e6db5d3f5462b625caa1e79ded1f29d0"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix2/momentum60/fixed/account.csv",
+      "sha256": "edcf6df2325dff8fa719ec53027254c3a7a53bdc39544ed7a562ecdb4ade2ad0"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix2/momentum60/fixed/fills.csv",
+      "sha256": "2a3e3e8b29cc570c971c28fd75d61ee23d1360352554de87fa06c76ac54e4bc7"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix2/momentum60/fixed/orders.json",
+      "sha256": "7f2a7962b11e7b20c39c0a96e5fb4127a334ce7625c9c03d2e374bbca0eb907f"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix2/momentum60/fixed_one_tick_slippage/account.csv",
+      "sha256": "440f51da09b1c8cad172d797f7f59d926e29abc207dde62cdd458b60fe93aa96"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix2/momentum60/fixed_one_tick_slippage/fills.csv",
+      "sha256": "f2b11449621007192f2ed4641b89203bd5acce07789f2b97b28cdaa44878bb1c"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix2/momentum60/fixed_one_tick_slippage/orders.json",
+      "sha256": "7f2a7962b11e7b20c39c0a96e5fb4127a334ce7625c9c03d2e374bbca0eb907f"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix2/momentum60/per_share/account.csv",
+      "sha256": "f492af6e2e8a76a6aa962e0f3e7ff6e099ca87f56c2ea913a2481da4d8ed5ffc"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix2/momentum60/per_share/fills.csv",
+      "sha256": "f4041c141e9e01dec6ed5053a7938b4c2dd024bbc59bc0724b51f1d84e99e4ef"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix2/momentum60/per_share/orders.json",
+      "sha256": "7f2a7962b11e7b20c39c0a96e5fb4127a334ce7625c9c03d2e374bbca0eb907f"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix2/summary.json",
+      "sha256": "6b2caa703307c04396093ef651a1404f86839b8f2491f94db28ff9ae3a77b96a"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix2.stderr.txt",
+      "sha256": "b147bf916f65fb29fca4184cc17cba985d52adaa557ad3f184c03e3b3a1a19ee"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run-fix2.stdout.txt",
+      "sha256": "9d68ffd885c41af3d6a5affb258b9565d3e1c418063e1a8db95d037581fb1c24"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run.stderr.txt",
+      "sha256": "9197033f6017a09222e7298caefe4275b06455548ec46db7261673750d595473"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/11/nautilus-episodes-run.stdout.txt",
+      "sha256": "d614ea76697bcbcc107b72719a17223d9563173b600345e84fedd3a631f0db74"
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/us-equities__portfolio-risk/nautilus_episodes.py",
+      "sha256": "7d34d52ac5b9f7666e9378c1e59e68557e7f2b873bb9d4aecc7783a338628fbe"
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/us-equities__portfolio-risk/nautilus_episodes_dividends.py",
+      "sha256": "0db727fef6e8cce90789506657f5d04233cbd1549fe591e47bb4f702ea4b64ad"
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/us-equities__portfolio-risk/gap11_dividend_rounding_check.py",
+      "sha256": "04eb64ee7a90c14dad8571e266a04757d287c25a0a533b453ec8ba39a439d750"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/codex-review-round1.md",
+      "sha256": "143b21745ccc3c0db8a8272a775208d2c62f7c77311ec469afcec2cb0fc684d7"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/codex-review-round2.md",
+      "sha256": "8f2096917a932fe40ee73bd26b84a3c34b62c986f752a530adf22a685fa7a4b2"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/codex-review-round4.md",
+      "sha256": "9aae92f05dda99374540121632494936a26067720e522d7c9dfb2106a4bfc888"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/opus-review-round3.json",
+      "sha256": "565734f27cf8e401468dbd9c04c4d807cb255894d9ccbc43bc098b2ea7f7e510"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/opus-review-round4.json",
+      "sha256": "82d9e7bbfe289a8774bc54d27692e0e71e65a9aec037fb5dbbc96614353293ba"
+    }
+  ],
+  "independent_review": {
+    "reviewer": "Codex CLI 0.155.1 (gpt-6-astra), codex exec --sandbox read-only --ephemeral, one bounded call",
+    "record": [
+      "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/codex-review-round1.md",
+      "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/codex-review-round2.md"
+    ],
+    "round_2": "round-2: 09:30 to 10:30 shift passed -> exact 09:30 fill time enforced; fix round 2 reran with the shift mutation detected",
+    "findings_and_resolution": "major: preregistered slippage case replaced by a per-share case without an addendum -> slippage case restored in a labelled fix round, per-share kept as an added arm; major: fills not checked for instrument/time -> checks and mutation self-tests added",
+    "round_3": {
+      "record": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/opus-review-round3.json",
+      "resolution": "minor: '1300 episodes ran in native Nautilus' overclaimed -> 905 invested episodes (4 candidates) reached the engine; cash's 260 had no legs; README and limits corrected"
+    },
+    "round_4": {
+      "record": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/opus-review-round4.json",
+      "resolution": "minor: dividend-inclusive episodes were feasible and not run -> fix round 4 ran them natively with the vendored DistributionModule (all 4 invested candidates reconcile; credited cash equals the cent-rounded estimate exactly); outcome stays advanced on financing and fill/liquidity realism"
+    },
+    "round_4_codex": {
+      "record": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/codex-review-round4.md",
+      "reviewer": "Codex CLI (codex exec --sandbox read-only --ephemeral), one bounded call on commits 6ed9709..a4cbcf8",
+      "resolution": "P2: dividend reconciliation ignored account-row and emission timestamps (a row shifted to 01:00 passed) -> timestamps compared, 2 timestamp mutations added, review rerun fix4b with identical economics"
+    }
+  }
+}

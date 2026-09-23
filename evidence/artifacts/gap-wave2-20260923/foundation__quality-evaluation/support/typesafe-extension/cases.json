@@ -1,0 +1,122 @@
+[
+ {
+  "case_id": "C1",
+  "source_ref": "evidence/artifacts/foundation-closure-20260921/compaction.json",
+  "source": "{\n  \"schema_version\": 1,\n  \"trigger\": \"manual\",\n  \"native_metadata\": {\n    \"preTokens\": 87434,\n    \"postTokens\": 14934,\n    \"cumulativeDroppedTokens\": 72500,\n    \"durationMs\": 42506\n  },\n  \"precompact_hook_observation\": {\n    \"ai-memory_success\": true,\n    \"context-mode_success\": true\n  },\n  \"continuity_responses\": [\n    \"review-contract = foundation-20260921.\\nProvider savings were not established — they remain unknown; no causal session or lifetime saving is claimed, and compression/cache counters cannot be summed into them.\\nBrokers: IBKR paper and Alpaca paper each remain independently qualified and separate from engine/FX replay and authenticated Alpaca data; existing paper authorization persists.\",\n    \"No — this was a bounded read-only document review of two files and establishes nothing about broker execution; IBKR paper and Alpaca paper acceptance remain separate, independently qualified work.\"\n  ],\n  \"post_boundary_model_tool_calls\": [],\n  \"oracle\": {\n    \"identifier\": \"foundation-20260921\",\n    \"provider_savings\": \"unknown\",\n    \"broker_acceptance\": \"not established by document review; separate per broker\"\n  },\n  \"limitations\": [\n    \"Manual compaction and three selected facts only; automatic compaction and all-fact preservation untested.\",\n    \"Context-size change is not provider savings; compaction consumes inference.\",\n    \"Initial broker wording was ambiguous; a follow-up asked whether any broker acceptance was established and returned explicit No. Both responses retained.\"\n  ]\n}\n",
+  "claim": "Manual compaction returned successful Context Mode and ai-memory PreCompact hook observations."
+ },
+ {
+  "case_id": "C2",
+  "source_ref": "evidence/artifacts/foundation-closure-20260921/compaction.json",
+  "source": "{\n  \"schema_version\": 1,\n  \"trigger\": \"manual\",\n  \"native_metadata\": {\n    \"preTokens\": 87434,\n    \"postTokens\": 14934,\n    \"cumulativeDroppedTokens\": 72500,\n    \"durationMs\": 42506\n  },\n  \"precompact_hook_observation\": {\n    \"ai-memory_success\": true,\n    \"context-mode_success\": true\n  },\n  \"continuity_responses\": [\n    \"review-contract = foundation-20260921.\\nProvider savings were not established — they remain unknown; no causal session or lifetime saving is claimed, and compression/cache counters cannot be summed into them.\\nBrokers: IBKR paper and Alpaca paper each remain independently qualified and separate from engine/FX replay and authenticated Alpaca data; existing paper authorization persists.\",\n    \"No — this was a bounded read-only document review of two files and establishes nothing about broker execution; IBKR paper and Alpaca paper acceptance remain separate, independently qualified work.\"\n  ],\n  \"post_boundary_model_tool_calls\": [],\n  \"oracle\": {\n    \"identifier\": \"foundation-20260921\",\n    \"provider_savings\": \"unknown\",\n    \"broker_acceptance\": \"not established by document review; separate per broker\"\n  },\n  \"limitations\": [\n    \"Manual compaction and three selected facts only; automatic compaction and all-fact preservation untested.\",\n    \"Context-size change is not provider savings; compaction consumes inference.\",\n    \"Initial broker wording was ambiguous; a follow-up asked whether any broker acceptance was established and returned explicit No. Both responses retained.\"\n  ]\n}\n",
+  "claim": "Automatic compaction preserves every fact."
+ },
+ {
+  "case_id": "C3",
+  "source_ref": "docs/native-workflow-writing-recovery-20260921.md",
+  "source": "# Native Workflow writing and recovery qualification\n\nThe bounded writing pilot produced correct code in both arms. It did **not**\nestablish a fully compliant or superior multi-agent workflow: both arms piped\nnative test output, and the Workflow arm omitted the required authoring skill.\nIndependent unpiped verification accepted both repairs. Keep a capable single\nagent as the economical choice for this small repair; this one ordered pair is\nnot a cross-task model ranking.",
+  "claim": "Independent verification accepted both repairs in this small repair comparison."
+ },
+ {
+  "case_id": "C4",
+  "source_ref": "docs/native-workflow-writing-recovery-20260921.md",
+  "source": "# Native Workflow writing and recovery qualification\n\nThe bounded writing pilot produced correct code in both arms. It did **not**\nestablish a fully compliant or superior multi-agent workflow: both arms piped\nnative test output, and the Workflow arm omitted the required authoring skill.\nIndependent unpiped verification accepted both repairs. Keep a capable single\nagent as the economical choice for this small repair; this one ordered pair is\nnot a cross-task model ranking.",
+  "claim": "The native multi-agent workflow is the most efficient runtime for all task types."
+ },
+ {
+  "case_id": "C5",
+  "source_ref": "docs/landscape-foundation-notes.md",
+  "source": "BM25 and hybrid had equal recall@3/5 on 12 queries, at reported average latency\nof 5 ms and 10,328 ms. The incomplete corpus seal and single ordered run limit\nthis to a reason to keep the present default pending a representative repeated\ncomparison.",
+  "claim": "Hybrid retrieval had lower average latency than BM25 in this diagnostic."
+ },
+ {
+  "case_id": "C6",
+  "source_ref": "docs/landscape-foundation-notes.md",
+  "source": "BM25 and hybrid had equal recall@3/5 on 12 queries, at reported average latency\nof 5 ms and 10,328 ms. The incomplete corpus seal and single ordered run limit\nthis to a reason to keep the present default pending a representative repeated\ncomparison.",
+  "claim": "The diagnostic gives a bounded reason to retain the present default pending a representative repeated comparison."
+ },
+ {
+  "case_id": "C7",
+  "source_ref": "https://github.com/typesafe-ai/skills/blob/65a39f393687675ce170e6094757de20370365b9/skills/typesafe-ai/SKILL.md",
+  "source": "Typed output guarantees the interface, not truth.",
+  "claim": "A typed output guarantees that the model judgment is true."
+ },
+ {
+  "case_id": "C8",
+  "source_ref": "https://github.com/typesafe-ai/skills/blob/65a39f393687675ce170e6094757de20370365b9/skills/typesafe-ai/SKILL.md",
+  "source": "Typed output guarantees the interface, not truth.",
+  "claim": "Jev is qualified as a profitable trading signal across all markets."
+ },
+ {
+  "case_id": "C9",
+  "source_ref": "docs/promptfoo-upstream-retrieval.md#L15-L22",
+  "source": "The September 21 execution returned **4/4 paired documents first**, one passing\nPromptfoo case, zero failures and zero errors. The report displays the complete\nreturned matrix. The detail drawer, search and failure filter were exercised,\nand the screenshot was inspected. Served bytes match the native HTML export.\n\nThis is upstream-example compatibility, not MTEB, a held-out benchmark or\nevidence of general retrieval superiority. The assertion operates on NVIDIA's\nrounded printed scores. The native report remains a static captured export.\n",
+  "claim": "The September 21 execution ranked all four paired documents first."
+ },
+ {
+  "case_id": "C10",
+  "source_ref": "docs/promptfoo-upstream-retrieval.md#L15-L22",
+  "source": "The September 21 execution returned **4/4 paired documents first**, one passing\nPromptfoo case, zero failures and zero errors. The report displays the complete\nreturned matrix. The detail drawer, search and failure filter were exercised,\nand the screenshot was inspected. Served bytes match the native HTML export.\n\nThis is upstream-example compatibility, not MTEB, a held-out benchmark or\nevidence of general retrieval superiority. The assertion operates on NVIDIA's\nrounded printed scores. The native report remains a static captured export.\n",
+  "claim": "The execution is evidence of general retrieval superiority."
+ },
+ {
+  "case_id": "C11",
+  "source_ref": "docs/promptfoo-upstream-retrieval.md#L15-L22",
+  "source": "The September 21 execution returned **4/4 paired documents first**, one passing\nPromptfoo case, zero failures and zero errors. The report displays the complete\nreturned matrix. The detail drawer, search and failure filter were exercised,\nand the screenshot was inspected. Served bytes match the native HTML export.\n\nThis is upstream-example compatibility, not MTEB, a held-out benchmark or\nevidence of general retrieval superiority. The assertion operates on NVIDIA's\nrounded printed scores. The native report remains a static captured export.\n",
+  "claim": "The execution had two failing Promptfoo cases."
+ },
+ {
+  "case_id": "C12",
+  "source_ref": "docs/promptfoo-upstream-retrieval.md#L64-L68",
+  "source": "Separate vLLM metric snapshots increased by 336 prompt tokens and eight completed\nsequences during the final evaluation window, consistent with the example's\neight texts in two HTTP requests. This is model-scoped observation, not exclusive\nper-evaluation billing or a lifetime-savings figure. Do not sum the two repeated\nsuccessful evaluations as independent quality evidence.\n",
+  "claim": "vLLM metric snapshots rose by 336 prompt tokens during the final evaluation window."
+ },
+ {
+  "case_id": "C13",
+  "source_ref": "docs/promptfoo-upstream-retrieval.md#L64-L68",
+  "source": "Separate vLLM metric snapshots increased by 336 prompt tokens and eight completed\nsequences during the final evaluation window, consistent with the example's\neight texts in two HTTP requests. This is model-scoped observation, not exclusive\nper-evaluation billing or a lifetime-savings figure. Do not sum the two repeated\nsuccessful evaluations as independent quality evidence.\n",
+  "claim": "The run cost less in US dollars than a hosted embedding API would have."
+ },
+ {
+  "case_id": "C14",
+  "source_ref": "docs/promptfoo-upstream-retrieval.md#L64-L68",
+  "source": "Separate vLLM metric snapshots increased by 336 prompt tokens and eight completed\nsequences during the final evaluation window, consistent with the example's\neight texts in two HTTP requests. This is model-scoped observation, not exclusive\nper-evaluation billing or a lifetime-savings figure. Do not sum the two repeated\nsuccessful evaluations as independent quality evidence.\n",
+  "claim": "The 336-token figure is exclusive per-evaluation billing."
+ },
+ {
+  "case_id": "C15",
+  "source_ref": "docs/native-skill-practice-20260921.md#L116-L118",
+  "source": "Fresh **Codex 0.155.1** and **Claude Code 2.1.278** invocations completed the\nbounded source review. Both returned all eight judgments, corrected C4 to\n`insufficient` and kept C6's deterministic availability rejection. Claude's\n",
+  "claim": "Both native reviews returned all eight judgments."
+ },
+ {
+  "case_id": "C16",
+  "source_ref": "docs/native-skill-practice-20260921.md#L116-L118",
+  "source": "Fresh **Codex 0.155.1** and **Claude Code 2.1.278** invocations completed the\nbounded source review. Both returned all eight judgments, corrected C4 to\n`insufficient` and kept C6's deterministic availability rejection. Claude's\n",
+  "claim": "The Claude review finished faster than the Codex review."
+ },
+ {
+  "case_id": "C17",
+  "source_ref": "docs/native-skill-practice-20260921.md#L116-L118",
+  "source": "Fresh **Codex 0.155.1** and **Claude Code 2.1.278** invocations completed the\nbounded source review. Both returned all eight judgments, corrected C4 to\n`insufficient` and kept C6's deterministic availability rejection. Claude's\n",
+  "claim": "The Codex review accepted a 'contradicted' label for C4."
+ },
+ {
+  "case_id": "C18",
+  "source_ref": "docs/native-skill-practice-20260921.md#L107-L109",
+  "source": "contains the commands and frozen case-pack hash. Eight uncached TypeSafe requests\nused `jev-1.13.0`, returned zero service errors and matched **7/8** independently\nfrozen labels, versus **3/8** for weak literal containment. The\n",
+  "claim": "TypeSafe matched more frozen labels than the literal-containment baseline."
+ },
+ {
+  "case_id": "C19",
+  "source_ref": "docs/native-skill-practice-20260921.md#L107-L109",
+  "source": "contains the commands and frozen case-pack hash. Eight uncached TypeSafe requests\nused `jev-1.13.0`, returned zero service errors and matched **7/8** independently\nfrozen labels, versus **3/8** for weak literal containment. The\n",
+  "claim": "The TypeSafe requests returned two service errors."
+ },
+ {
+  "case_id": "C20",
+  "source_ref": "docs/native-skill-practice-20260921.md#L107-L109",
+  "source": "contains the commands and frozen case-pack hash. Eight uncached TypeSafe requests\nused `jev-1.13.0`, returned zero service errors and matched **7/8** independently\nfrozen labels, versus **3/8** for weak literal containment. The\n",
+  "claim": "TypeSafe's 7/8 result generalizes to a representative domain benchmark."
+ }
+]

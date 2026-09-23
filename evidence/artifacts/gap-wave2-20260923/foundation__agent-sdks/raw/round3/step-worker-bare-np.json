@@ -1,0 +1,101 @@
+{
+  "step": "worker-bare-np",
+  "started_at": "2026-09-23T13:06:55Z",
+  "controls_outside": {
+    "mcporter_on_path": "yes:$HOME/.local/share/codex-ecosystem/bin/mcporter",
+    "context_mode_start_mjs": "exists",
+    "context_mode_start_mjs_found_under_home": "6",
+    "codex_home_agents_md": "exists",
+    "claude_dir": "exists",
+    "agent_lab_checkout": "exists",
+    "ecosystem_bin": "exists",
+    "windows_drive": "exists",
+    "user_bus": "exists",
+    "own_loopback_listener": "reached",
+    "process_count": "508"
+  },
+  "controls_inside": {
+    "mcporter_on_path": "no",
+    "context_mode_start_mjs": "absent",
+    "context_mode_start_mjs_found_under_home": "0",
+    "codex_home_agents_md": "absent",
+    "claude_dir": "absent",
+    "agent_lab_checkout": "absent",
+    "ecosystem_bin": "absent",
+    "windows_drive": "absent",
+    "user_bus": "absent",
+    "own_loopback_listener": "unreachable",
+    "process_count": "4",
+    "node_start_mjs_exit": "1"
+  },
+  "controls_inside_run": {
+    "exit_code": 0,
+    "seconds": 0.16,
+    "stderr_tail": []
+  },
+  "controls_differ": {
+    "agent_lab_checkout": [
+      "exists",
+      "absent"
+    ],
+    "claude_dir": [
+      "exists",
+      "absent"
+    ],
+    "codex_home_agents_md": [
+      "exists",
+      "absent"
+    ],
+    "context_mode_start_mjs": [
+      "exists",
+      "absent"
+    ],
+    "context_mode_start_mjs_found_under_home": [
+      "6",
+      "0"
+    ],
+    "ecosystem_bin": [
+      "exists",
+      "absent"
+    ],
+    "mcporter_on_path": [
+      "yes:$HOME/.local/share/codex-ecosystem/bin/mcporter",
+      "no"
+    ],
+    "node_start_mjs_exit": [
+      null,
+      "1"
+    ],
+    "own_loopback_listener": [
+      "reached",
+      "unreachable"
+    ],
+    "process_count": [
+      "508",
+      "4"
+    ],
+    "user_bus": [
+      "exists",
+      "absent"
+    ],
+    "windows_drive": [
+      "exists",
+      "absent"
+    ]
+  },
+  "worker_slot_checks": [
+    {
+      "at": "2026-09-23T13:07:04Z",
+      "real_codex_exec": 0
+    }
+  ],
+  "worker_started_at": "2026-09-23T13:07:04Z",
+  "worker_run": {
+    "exit_code": 0,
+    "seconds": 35.57,
+    "stdout": "{\"status\": \"completed\", \"model_inference_submitted\": true, \"observation_status\": \"not_configured\"}\n",
+    "stderr_tail": []
+  },
+  "worker_finished_at": "2026-09-23T13:07:40Z",
+  "finished_at": "2026-09-23T13:07:40Z"
+}

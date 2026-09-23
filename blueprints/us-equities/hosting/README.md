@@ -69,8 +69,15 @@ not the scheduler, with a minimal inherited environment and no provider or broke
 credentials. It is enabled for future user-service sessions. The current local
 dashboard uses upstream `auth.mode: none`: anonymous API reads return 200 without
 a Basic-auth challenge. The previous Basic mode returned 401 and repeatedly
-prompted the browser. Remove its `auth.basic` subsection when changing modes;
-upstream rejects Basic credentials under `none`.
+prompted the browser. Remove its `auth.basic` subsection when changing modes:
+upstream config validation rejects an `auth.basic` block under `none`, and the
+server refuses to start (re-observed on 2.16.6 on 2026-09-23). Basic headers on
+requests are a separate matter: under `none` they are ignored. On 2026-09-23 the
+running service served `authMode: "none"` and answered 200 to both an anonymous
+and a dummy-Basic GET of `/api/v1/dags`, while loopback control instances of the
+same binary returned 401 anonymous under `basic`; that
+[dated receipt](../../../evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/2-dashboard-auth-mode.json)
+supersedes the 2026-09-19 basic-auth status codes in [receipt.json](receipt.json).
 
 DAG execution and DAG/wiki writes remain disabled by `run_dags: false` and
 `write_dags: false`. These are not blanket read-only controls: base configuration,

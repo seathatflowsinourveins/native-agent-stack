@@ -1,0 +1,19 @@
+# Round-2 review. Attempt 1 (medium effort, broad scope) started 2026-09-23T03:36:41Z and hit the 1000 s timeout (rc=124) with empty output. Attempt 2 (low effort, narrowed file list) follows.
+Statuses reflect only the permitted files; receipt-only corrections were not independently rerun.
+
+1. **Resolved** — All eight receipts now include `next_check` and explicit executed/unexecuted arms.
+2. **Resolved** — Positive controls now require every expected field/backend pair.
+3. **Resolved** — `verdict()` requires result-usage equality, attribution, an empty baseline and exit zero; retained negative checks fail.
+4. **Resolved** — Receipt 2 corrects timeout timestamps to 09:36:31 EDT, includes signal lines and removes `TimeoutStartSec=90`.
+5. **Partial** — Counts now use subsequent starts, but the note still attributes them to the timer despite explicitly allowing manual starts.
+6. **Partial** — Live probing was added, but `settled` contradicts the fix-round criterion: positive-control hits remain zero; the replacement signature detector was devised afterward.
+7. **Partial** — Receipts identify both built-in plugins; correction of the README and script description cannot be verified within the permitted scope.
+8. **Resolved** — The combined-outage raw receipt demonstrates overlapping downtime and recovery of all eight receipts; outcome remains `advanced`.
+9. **Resolved** — Receipt 4 explicitly measures elapsed time from expiry invocation, including its Loki query.
+10. **Resolved** — Originally no finding; receipt 5 retains `advanced` and its deployment/privacy/sampling limitations.
+11. **Resolved** — Receipt 6 reports a rerun timestamped before resolve POSTs and correctly labels the earlier measurements.
+12. **Resolved** — Originally no finding; receipt 8 retains `advanced` and its portability/repetition/quality limitations.
+
+New concrete problems:
+
+- **Receipt 4 timing mismatch:** Its results describe collector downtime as 0–180 s and Loki downtime as 60–240 s. `raw/4-combined.json` records approximately **0–180.37 s** and **60.59–261.45 s**, respectively. The claimed 240-second overall window understates the recorded window by approximately 21.45 seconds.

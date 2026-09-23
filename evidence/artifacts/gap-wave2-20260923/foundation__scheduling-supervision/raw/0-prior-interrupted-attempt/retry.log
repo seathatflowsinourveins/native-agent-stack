@@ -1,0 +1,27 @@
+time=2026-09-22T22:07:30.752-04:00 level=INFO msg="Dag-run retry initiated" dag=real_workflow run-id=realwf-1790129230 file=$HOME/.cache/gap-wave2-20260923/scheduling-supervision/dagu-home/logs/real_workflow/dag-run_20260923_020710Z_realwf-1790129230/dag-run_20260922.220710.353.realwf-1.log
+time=2026-09-22T22:07:30.768-04:00 level=INFO msg="DAG run retry started" dag=real_workflow run-id=realwf-1790129230 worker-id=local attempt-id=08b545 retry-target-attempt-id=91c05d
+time=2026-09-22T22:07:30.770-04:00 level=INFO msg="Step started" dag=real_workflow run-id=realwf-1790129230 worker-id=local attempt-id=08b545 step=ecosystem_check
+time=2026-09-22T22:07:57.106-04:00 level=INFO msg="DAG run finished" dag=real_workflow run-id=realwf-1790129230 worker-id=local attempt-id=08b545 status=succeeded started-at=2026-09-22T22:07:30-04:00 finished-at=2026-09-22T22:07:57-04:00
+Succeeded - 2026-09-22T22:07:30-04:00
+
+dag: real_workflow (27.0s)
+├─log: $HOME/.cache/gap-wave2-20260923/scheduling-supervision/dagu-home/logs/real_workflow/dag-run_20260923_020710Z_realwf-1790129230/dag-run_20260922.220710.353.realwf-1.log
+│
+├─validate (5.0s) [succeeded]
+│ ├─python3 scripts/validate.py
+│ │
+│ └─stdout: $HOME/.cache/gap-wave2-20260923/scheduling-supervision/dagu-home/logs/real_workflow/dag-run_20260923_020710Z_realwf-1790129230/run_20260923_020710Z_91c05d/validate.20260922.220710.391.realwf-1.out
+│     {"components": 69, "hashed_files": 2012, "profiles": 4, "receipts": 140,
+│     "status": "passed"}
+│     Integrity and scope checks only; no live provider or GPU execution.
+│ 
+└─ecosystem_check (27.0s) [succeeded]
+  ├─bash -c 'sleep 25 && python3 scripts/build_ecosystem.py --check'
+  │
+  └─stdout: $HOME/.cache/gap-wave2-20260923/scheduling-supervision/dagu-home/logs/real_workflow/dag-run_20260923_020710Z_realwf-1790129230/run_20260923_020730Z_08b545/ecosystem_check.20260922.220730.771.realwf-1.out
+      {"bytes": 12918618, "sha256":
+      "693c295e2e2e6d7d20443ecd0ef3e18d8404450f1687c0e0ff7933019b1da66e",
+      "status": "passed"}
+
+Result: Succeeded
+

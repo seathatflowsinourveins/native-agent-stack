@@ -1,0 +1,13 @@
+{
+  "experiments": [
+    {
+      "experiment_id": "0",
+      "name": "Default",
+      "artifact_location": "$HOME/.cache/gap-wave2-20260923/evaluation-experiments/tmp-mlflow-server-SZYZ/artifacts/0",
+      "lifecycle_stage": "active",
+      "last_update_time": 1790148531591,
+      "creation_time": 1790148531591,
+      "workspace": "default"
+    }
+  ]
+}

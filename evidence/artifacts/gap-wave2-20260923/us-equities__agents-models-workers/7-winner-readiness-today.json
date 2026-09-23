@@ -1,0 +1,89 @@
+{
+ "id": "gap-wave2-20260923/us-equities__agents-models-workers/7-winner-readiness-today",
+ "catalog": "us-equities",
+ "layer_id": "agents-models-workers",
+ "gap_index": 7,
+ "gap_text": "The winners' native receipts are dated 2026-09-19 and were not re-executed now. desktop-direct-rag.json carries no date. Current quota and readiness are not established.",
+ "gap_text_sha256": "6c33c53ef64712030b1502474441c25515fb9122983661e3a316e4ce219ead6c",
+ "next_check": "Re-run native memory_status from Claude and Codex MCP, a SocratiCode search and a codex-native-sdk task today. Record dates, versions and any quota/readiness errors.",
+ "base_commit": "41d39b3",
+ "preregistration": {
+  "written_at": "2026-09-23T07:23:05Z",
+  "file": "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/prereg/7-winner-readiness-today.json",
+  "commit": "5480a9c (2026-09-23T07:23:50Z, before any check ran)",
+  "expectation": "Today's native readiness can be re-observed for codex-native-sdk (model list + account/rateLimits/read via the SDK inspect path, then one real task), SocratiCode (index + search in a disposable Qdrant), and native memory_status through Codex MCP and Claude MCP clients pointed at an isolated ai-memory 2.3.2 server (the live server is out of bounds).",
+  "criteria": [
+   "Record UTC timestamps, client/tool versions and every quota/readiness error verbatim.",
+   "memory_status must return from each MCP client (Codex via url MCP registration override, Claude via one bounded claude -p call with --strict-mcp-config).",
+   "desktop-direct-rag.json date: derive from git history (first commit date) and state that it is a commit date, not an execution date.",
+   "settled only if all four observations complete today; live-store readiness itself is not re-observed (isolation rule), which is stated as a limit."
+  ]
+ },
+ "commands": [
+  "sdk_arm.py inspect --workspace $GAPCACHE/ws/inspect  # model/list + account/rateLimits/read, 2026-09-23T07:27:59Z",
+  "(gap 0) sdk_arm.py run ... # codex-native-sdk task 2026-09-23T07:28:14Z",
+  "(gap 12/11) socraticode_eval.py ... # SocratiCode 1.14.0 index + 44 searches 2026-09-23T07:24-07:25Z",
+  "codex exec --sandbox read-only --ephemeral --skip-git-repo-check -c features.hooks=false -c features.plugin_hooks=false -c 'mcp_servers.ai-memory.url=\"http://127.0.0.1:27374/mcp\"' --json - < memory-status-prompt.md  # native registration shape",
+  "... same + -c 'mcp_servers.ai-memory.tools.memory_status.approval_mode=\"approve\"' (attempt 1: memory-status-prompt.md; attempt 2: memory-status-prompt-v2.md)",
+  "claude -p \"$(cat memory-status-prompt-v2.md)\" --setting-sources project --strict-mcp-config --mcp-config '{\"mcpServers\":{\"ai-memory\":{\"type\":\"http\",\"url\":\"http://127.0.0.1:27374/mcp\"}}}' --allowedTools mcp__ai-memory__memory_status --max-turns 4 --no-session-persistence --model sonnet --output-format json",
+  "git log --follow --format='%h %cI' -- evidence/receipts/desktop-direct-rag.json"
+ ],
+ "results": {
+  "codex_native_sdk_readiness": {
+   "at": "2026-09-23T07:27:59Z",
+   "codex_cli": "0.155.1",
+   "openai_codex_sdk": "0.154.0",
+   "model": "gpt-6-astra",
+   "model_available": true,
+   "ordinary_usage_allowed": true,
+   "weekly_window_used_percent": 32,
+   "ready": true
+  },
+  "codex_native_sdk_task": "gap-0 arm completed 2026-09-23T07:28:24Z, 6/6 facts, 41,039 tokens",
+  "socraticode_search": "SocratiCode 1.14.0 indexed 195 chunks in 9.6 s and answered 32+12 searches (disposable Qdrant, adopted embedding profile); no errors",
+  "codex_mcp_memory_status": {
+   "native_shape (url only)": "FAILED: 'MCP tool call requires approval, but approval policy is never' (36,297 in / 770 out tokens)",
+   "approve attempt 1": "not called: tool was deferred and this unit's prompt forbade calling the discovery tool (17,754 in / 222 out) -- a prompt error by this unit, counted as a failed attempt",
+   "approve attempt 2": "completed: memory_status -> {\"counts\": {\"pages_latest\": 0, \"pages_all\": 0, \"sessions\": 0, \"observations\": 0}} (60,608 in / 189 out)"
+  },
+  "claude_mcp_memory_status": "Claude Code 2.1.280, claude-sonnet-5, 3 turns, 4.25 s, success: same counts JSON (cost reported 0.0709516 USD list-basis on the subscription account)",
+  "memory_status_scope_note": "Both clients returned zero counts because memory_status without workspace/project resolved to an empty scope; the isolated store held 19 pages in g2amw/*.",
+  "desktop-direct-rag.json": "first and only commit 13cc51f at 2026-09-19T05:26:40Z (a commit date, not an execution date; the file itself has no date field)"
+ },
+ "outcome": "advanced",
+ "what_remains": "memory_status against the LIVE ai-memory service through the actual native registrations (url http://127.0.0.1:49374/mcp) was not re-run: this unit's isolation rule forbids any ai-memory call to the live store. Today's readiness of the live service itself therefore remains unobserved here.",
+ "evidence_class": "native_proven",
+ "limits": [
+  "ai-memory readiness was observed on an isolated 2.3.2 server started by this unit, not the running service.",
+  "The native Codex exec path needs an explicit MCP tool approval override for non-interactive runs; the agent-lab registration has none (finding, not a fix).",
+  "Isolation: disposable Qdrant 1.19.1 on 127.0.0.1:27333/27334 (storage under $HOME/.cache/gap-wave2-20260923/agents-models-workers/qdrant-storage), isolated ai-memory 2.3.2 `serve` on 127.0.0.1:27374 with a temp --data-dir and temp HOME, and AI_MEMORY_SERVER_URL=http://127.0.0.1:27374 exported for the gap-9 and gap-11 ai-memory CLI calls; both started by this unit and stopped at the end (ports verified free). Correction (fix round): the first-round gap-6 CLI calls did NOT point at that server (--version/--help/backfill --help ran with no AI_MEMORY_SERVER_URL set, and init with http://127.0.0.1:1, a closed port); no live-store contact is possible from those commands, and they were re-run in the fix round against isolated 2.3.2 (127.0.0.1:27374) and 2.4.0 (127.0.0.1:27375) servers started for that purpose (gap-6 receipt). Every Codex run disabled native lifecycle hooks (-c features.hooks=false -c features.plugin_hooks=false) so no ai-memory hook call could reach the live service; the one Claude call used --setting-sources project from a temp cwd (user-settings hooks not loaded) and --strict-mcp-config. Embeddings: read-only POST /v1/embeddings calls to the running Nemotron-3-Embed-1B vLLM endpoint 127.0.0.1:8231 (the adopted SocratiCode profile); that service was not restarted or reconfigured. Start/stop evidence for the main-round Qdrant and ai-memory 2.3.2 services (fix round 2): raw/services-main-round.txt has the exact commands and outputs, exported without re-running from this unit's own session transcript by services/export_main_round_services.py."
+ ],
+ "raw_artifacts": [
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/raw/7-sdk-inspect.json",
+   "sha256": "7eba6f79a535234238b560ae2ffb32da47d89d7721bb84fbf041cd8a4bdd0138"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/raw/7-codex-mcp-native-shape.events.jsonl",
+   "sha256": "df5ce9bfbb2e530f3fca6dd2cc0376f79c060807e55a35065e495fe9607f006f"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/raw/7-codex-mcp-approved-attempt1.events.jsonl",
+   "sha256": "f35626faca6767d9cff94c798106b6793ff8ac6188f92874206623cebab5bcba"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/raw/7-codex-mcp-approved-attempt2.events.jsonl",
+   "sha256": "490e2143bb4d166aee6742341a6b21cc54ef6c3ce00663b2adb05fe498fe908b"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/raw/7-claude-mcp.json",
+   "sha256": "b490033f56ab4f3abf26e181faeb94f1f89c2ebd89e27b1dfa326b0d33fd0669"
+  }
+ ],
+ "helpers": [
+  "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/workers/memory-status-prompt.md",
+  "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/workers/memory-status-prompt-v2.md",
+  "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/workers/sdk_arm.py"
+ ],
+ "checked_at": "2026-09-23"
+}

@@ -1,0 +1,11 @@
+[
+  {
+    "name": "recovery",
+    "dagRunId": "recovery-8ab1458b1edffaf9",
+    "status": "succeeded",
+    "startedAt": "2026-09-22T23:03:46-04:00",
+    "finishedAt": "2026-09-22T23:03:47-04:00",
+    "duration": "1s",
+    "workerId": "local"
+  }
+]

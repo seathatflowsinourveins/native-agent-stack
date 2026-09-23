@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "written_at": "2026-09-23T03:41Z",
+  "status": "proposed_protocol_amendment_not_sealed",
+  "applies_to": {
+    "comparison": "workers/SDK (arms: native Claude CLI, Codex SDK via native_worker.py, Claude Agent SDK)",
+    "metric": "artifact_acceptance_rate",
+    "sealed_protocol_prefix": "0034d6c7",
+    "unresolved_reason_source": "agent-lab tools/compare/workers/lib/constants.mjs UNRESOLVED_METRICS.artifact_acceptance_rate (two independent blind judges plus a pinned third-judge adjudicator)"
+  },
+  "judges": [
+    {
+      "role": "blind_judge_1",
+      "family": "openai",
+      "model_id": "gpt-6-astra",
+      "runner": "codex exec --sandbox read-only --ephemeral (native Codex 0.155.1)",
+      "prompt": "judge-prompt.md",
+      "prompt_sha256": "4f061b611a0b51fa5e4532ba6afd04b6a8735cadb2d5a29472e1f670ab8127a3"
+    },
+    {
+      "role": "blind_judge_2",
+      "family": "anthropic",
+      "model_id": "claude-opus-5-5",
+      "runner": "agent-lab project agent blind-judge (Read only, effort high, omitClaudeMd)",
+      "agent_definition_sha256": "629ff7df616fe0ad78f978bcd6ba6d91456662c3a3a80732f011caccfe55a1e6",
+      "prompt": "judge-prompt.md",
+      "prompt_sha256": "4f061b611a0b51fa5e4532ba6afd04b6a8735cadb2d5a29472e1f670ab8127a3"
+    },
+    {
+      "role": "adjudicator",
+      "family": "openai",
+      "model_id": "gpt-6-astra",
+      "runner": "codex exec --sandbox read-only --ephemeral",
+      "prompt": "adjudicator-prompt.md",
+      "prompt_sha256": "ac2eadd39f903ff9c30156c1f5586533024ca87dfe2b878c7354e9b2b4823767"
+    }
+  ],
+  "known_limits": [
+    "Both judge families also appear as arms; the packet is label-blinded but self-family bias is not excluded.",
+    "Adjudicator shares judge_1's family; a disagreement adjudication therefore needs a recorded blinded-packet leak check.",
+    "This pin is proposed here; it becomes binding only when the coordinator seals it into the next protocol instance before any judging run."
+  ]
+}

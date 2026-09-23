@@ -1,0 +1,50 @@
+{
+ "variant": "baseline",
+ "overlay": null,
+ "helper_function_sha256": "9bce397536064e7dbfb64447a2ead6aa6f8e296193e871e843255bae792145e2",
+ "started_at": "2026-09-23T03:13:33.743295+00:00",
+ "a_filled": {
+  "written": 32,
+  "in_loki": 32
+ },
+ "a_expiry": {
+  "scanned": 32,
+  "confirmed_known": 32,
+  "deleted": 16,
+  "orphans_removed": 0,
+  "unconfirmed_kept": 0,
+  "oldest_unconfirmed_age_s": null,
+  "free_bytes_before": 0,
+  "free_bytes_after": 0,
+  "dry_run": false
+ },
+ "a_deleted_open_fds_right_after": 16,
+ "a_space_released_after_s": 0.38,
+ "a_samples_first_last": [
+  [
+   0.18,
+   0,
+   16
+  ],
+  [
+   0.38,
+   65536,
+   0
+  ]
+ ],
+ "a_write_after_release": true,
+ "b_loki_stopped_at": "2026-09-23T03:14:04.108774+00:00",
+ "b_written": 8,
+ "b_in_events_file_during_outage": 8,
+ "b_loki_down_s": 334.7,
+ "b_in_loki_after_restore": 0,
+ "b_lost_in_loki": 8,
+ "b_duplicates": {},
+ "b_seconds_to_all": null,
+ "collector_log_signals": {
+  "Exporting failed": 2,
+  "Dropping data": 2,
+  "no more retries left": 2
+ },
+ "stopped_at": "2026-09-23T03:22:37.789562+00:00"
+}

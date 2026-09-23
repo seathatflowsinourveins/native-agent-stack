@@ -1,0 +1,20 @@
+{
+  "chosen": "momentum20",
+  "evaluation_cutoff": "2020-10-13",
+  "id": "development-20",
+  "latest_training_exit": "2020-10-07",
+  "plan_sha256": "b8d1beba6eddd0388957ca0d9e9c46ebfb2ca538f076419d5a8dcaaaf82be4a7",
+  "scores": {
+    "cash": "0.000",
+    "momentum120": "0.00373497903732126789810644379",
+    "momentum20": "0.004774543548185575226696762256",
+    "momentum60": "0.00094539241954506248974342982"
+  },
+  "test_first": "2020-10-13",
+  "test_last": "2020-12-31",
+  "test_sessions": 56,
+  "train_first": "2019-10-04",
+  "train_last": "2020-10-02",
+  "train_sessions": 252,
+  "training_episode_count": 50
+}

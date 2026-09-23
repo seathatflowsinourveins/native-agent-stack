@@ -1,0 +1,11 @@
+{
+  "step": "mcp-startup-np",
+  "started_at": "2026-09-23T13:06:40Z",
+  "run": {
+    "exit_code": 0,
+    "seconds": 9.5,
+    "stdout": "{\"model_inference_submitted\": false, \"startup_status\": [], \"global_methods\": [\"remoteControl/status/changed\", \"thread/started\"], \"mcp_status_after_thread_start\": []}\n",
+    "stderr_tail": []
+  },
+  "finished_at": "2026-09-23T13:06:50Z"
+}

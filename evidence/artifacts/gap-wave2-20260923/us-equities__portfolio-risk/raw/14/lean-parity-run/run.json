@@ -1,0 +1,87 @@
+{
+  "runner_sha256": "c346ecc89bcbec3303ac5bbf249392ce8f78b9731d9024068d7371593f3512ae",
+  "algorithm_sha256": "a1b2f07efe269c1176cec1a4f69a5effdf69989ea3356e53fc6bb10395932ca5",
+  "weights_sha256": "30e9b17a989c288357889b4c4d91254450c2b52c97dca509ec20139161f81765",
+  "dll_sha256": "a320288dc396a072f96a5e309cad76dbf361dfa6fc9e4c7493852d376400c47a",
+  "mounted_input_files": 1465,
+  "mounted_inputs_unchanged": true,
+  "commands": [
+    {
+      "started_utc": "2026-09-23T16:03:51.764171+00:00",
+      "exit_code": 0,
+      "finished_utc": "2026-09-23T16:03:52.429611+00:00",
+      "argv_tail": [
+        "1",
+        "/dotnet/dotnet",
+        "/dotnet/sdk/10.0.401/Roslyn/bincore/csc.dll",
+        "@/run/build/compiler.rsp"
+      ]
+    },
+    {
+      "started_utc": "2026-09-23T16:03:52.430388+00:00",
+      "exit_code": 0,
+      "finished_utc": "2026-09-23T16:03:55.200847+00:00",
+      "argv_tail": [
+        "/dotnet/dotnet",
+        "/engine/QuantConnect.Lean.Launcher.dll",
+        "--config",
+        "/run/no_dividends/meanrisk_min_variance/config.json"
+      ]
+    },
+    {
+      "started_utc": "2026-09-23T16:03:55.201485+00:00",
+      "exit_code": 0,
+      "finished_utc": "2026-09-23T16:03:58.121940+00:00",
+      "argv_tail": [
+        "/dotnet/dotnet",
+        "/engine/QuantConnect.Lean.Launcher.dll",
+        "--config",
+        "/run/no_dividends/hrp_variance/config.json"
+      ]
+    },
+    {
+      "started_utc": "2026-09-23T16:03:58.122500+00:00",
+      "exit_code": 0,
+      "finished_utc": "2026-09-23T16:04:00.893616+00:00",
+      "argv_tail": [
+        "/dotnet/dotnet",
+        "/engine/QuantConnect.Lean.Launcher.dll",
+        "--config",
+        "/run/dividends/meanrisk_min_variance/config.json"
+      ]
+    },
+    {
+      "started_utc": "2026-09-23T16:04:00.894217+00:00",
+      "exit_code": 0,
+      "finished_utc": "2026-09-23T16:04:03.766379+00:00",
+      "argv_tail": [
+        "/dotnet/dotnet",
+        "/engine/QuantConnect.Lean.Launcher.dll",
+        "--config",
+        "/run/dividends/hrp_variance/config.json"
+      ]
+    },
+    {
+      "started_utc": "2026-09-23T16:04:03.766981+00:00",
+      "exit_code": 0,
+      "finished_utc": "2026-09-23T16:04:06.691509+00:00",
+      "argv_tail": [
+        "/dotnet/dotnet",
+        "/engine/QuantConnect.Lean.Launcher.dll",
+        "--config",
+        "/run/control_fee2/meanrisk_min_variance/config.json"
+      ]
+    },
+    {
+      "started_utc": "2026-09-23T16:04:06.692107+00:00",
+      "exit_code": 0,
+      "finished_utc": "2026-09-23T16:04:09.619215+00:00",
+      "argv_tail": [
+        "/dotnet/dotnet",
+        "/engine/QuantConnect.Lean.Launcher.dll",
+        "--config",
+        "/run/control_fee2/hrp_variance/config.json"
+      ]
+    }
+  ]
+}

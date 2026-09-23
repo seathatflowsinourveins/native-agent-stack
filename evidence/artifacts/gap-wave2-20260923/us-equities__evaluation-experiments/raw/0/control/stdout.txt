@@ -1,0 +1,108 @@
+Cache is disabled.
+Starting evaluation eval-YPh-2026-09-23T07:28:19
+Running 16 test cases (up to 1 at a time)...
+Provider call failed during eval
+{
+  "providerId": "https://api.typesafe.ai/v1/systemone",
+  "providerLabel": "typesafe-jev-1.13.0-evidence-v1",
+  "promptIdx": 1,
+  "testIdx": 0,
+  "error": {
+    "name": "Error",
+    "message": "Request failed after 0 retries: TypeError: fetch failed (Cause: Error: getaddrinfo EAI_AGAIN api.typesafe.ai)"
+  }
+}
+Provider call failed during eval
+{
+  "providerId": "https://api.typesafe.ai/v1/systemone",
+  "providerLabel": "typesafe-jev-1.13.0-evidence-v1",
+  "promptIdx": 1,
+  "testIdx": 1,
+  "error": {
+    "name": "Error",
+    "message": "Request failed after 0 retries: TypeError: fetch failed (Cause: Error: getaddrinfo EAI_AGAIN api.typesafe.ai)"
+  }
+}
+Provider call failed during eval
+{
+  "providerId": "https://api.typesafe.ai/v1/systemone",
+  "providerLabel": "typesafe-jev-1.13.0-evidence-v1",
+  "promptIdx": 1,
+  "testIdx": 2,
+  "error": {
+    "name": "Error",
+    "message": "Request failed after 0 retries: TypeError: fetch failed (Cause: Error: getaddrinfo EAI_AGAIN api.typesafe.ai)"
+  }
+}
+Provider call failed during eval
+{
+  "providerId": "https://api.typesafe.ai/v1/systemone",
+  "providerLabel": "typesafe-jev-1.13.0-evidence-v1",
+  "promptIdx": 1,
+  "testIdx": 3,
+  "error": {
+    "name": "Error",
+    "message": "Request failed after 0 retries: TypeError: fetch failed (Cause: Error: getaddrinfo EAI_AGAIN api.typesafe.ai)"
+  }
+}
+Provider call failed during eval
+{
+  "providerId": "https://api.typesafe.ai/v1/systemone",
+  "providerLabel": "typesafe-jev-1.13.0-evidence-v1",
+  "promptIdx": 1,
+  "testIdx": 4,
+  "error": {
+    "name": "Error",
+    "message": "Request failed after 0 retries: TypeError: fetch failed (Cause: Error: getaddrinfo EAI_AGAIN api.typesafe.ai)"
+  }
+}
+Provider call failed during eval
+{
+  "providerId": "https://api.typesafe.ai/v1/systemone",
+  "providerLabel": "typesafe-jev-1.13.0-evidence-v1",
+  "promptIdx": 1,
+  "testIdx": 5,
+  "error": {
+    "name": "Error",
+    "message": "Request failed after 0 retries: TypeError: fetch failed (Cause: Error: getaddrinfo EAI_AGAIN api.typesafe.ai)"
+  }
+}
+Provider call failed during eval
+{
+  "providerId": "https://api.typesafe.ai/v1/systemone",
+  "providerLabel": "typesafe-jev-1.13.0-evidence-v1",
+  "promptIdx": 1,
+  "testIdx": 6,
+  "error": {
+    "name": "Error",
+    "message": "Request failed after 0 retries: TypeError: fetch failed (Cause: Error: getaddrinfo EAI_AGAIN api.typesafe.ai)"
+  }
+}
+Provider call failed during eval
+{
+  "providerId": "https://api.typesafe.ai/v1/systemone",
+  "providerLabel": "typesafe-jev-1.13.0-evidence-v1",
+  "promptIdx": 1,
+  "testIdx": 7,
+  "error": {
+    "name": "Error",
+    "message": "Request failed after 0 retries: TypeError: fetch failed (Cause: Error: getaddrinfo EAI_AGAIN api.typesafe.ai)"
+  }
+}
+✓ Eval complete (ID: eval-YPh-2026-09-23T07:28:19)
+
+» View results: promptfoo view
+» Feedback: https://promptfoo.dev/feedback
+
+
+Results:
+  ✓ 3 passed (18.75%)
+  ✗ 5 failed (31.25%)
+  ✗ 8 errors (50.00%)
+Duration: 0s (concurrency: 1)
+
+Writing output to $HOME/.cache/gap-wave2-20260923/evaluation-experiments/raw/0/control/results.json
+
+There were some errors during the operation. See logs for more details.
+Error log: $HOME/.cache/gap-wave2-20260923/evaluation-experiments/raw/0/control/cfg-home/logs/promptfoo-error-2026-09-23_07-28-19-717Z.log
+Debug log: $HOME/.cache/gap-wave2-20260923/evaluation-experiments/raw/0/control/cfg-home/logs/promptfoo-debug-2026-09-23_07-28-19-717Z.log

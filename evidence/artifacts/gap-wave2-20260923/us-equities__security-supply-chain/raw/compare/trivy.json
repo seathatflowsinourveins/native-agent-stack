@@ -1,0 +1,293 @@
+{
+  "SchemaVersion": 2,
+  "Trivy": {
+    "Version": "0.74.0"
+  },
+  "ReportID": "<uuid>",
+  "CreatedAt": "2026-09-23T12:42:11.89164073-04:00",
+  "ArtifactName": "$HOME/.local/share/codex-ecosystem/tools/adaptive-paper-20260921/lib/python3.12/site-packages",
+  "ArtifactType": "filesystem",
+  "Results": [
+    {
+      "Target": "Python",
+      "Class": "lang-pkgs",
+      "Type": "python-pkg",
+      "Packages": [
+        {
+          "Name": "alpaca-py",
+          "Identifier": {
+            "PURL": "pkg:pypi/alpaca-py@0.44.0",
+            "UID": "30f1045d54fa90f8"
+          },
+          "Version": "0.44.0",
+          "Licenses": [
+            "Apache-2.0"
+          ],
+          "FilePath": "alpaca_py-0.44.0.dist-info/METADATA",
+          "AnalyzedBy": "python-pkg"
+        },
+        {
+          "Name": "annotated-types",
+          "Identifier": {
+            "PURL": "pkg:pypi/annotated-types@0.8.0",
+            "UID": "c97d11aa4bc47b69"
+          },
+          "Version": "0.8.0",
+          "Licenses": [
+            "MIT"
+          ],
+          "FilePath": "annotated_types-0.8.0.dist-info/METADATA",
+          "AnalyzedBy": "python-pkg"
+        },
+        {
+          "Name": "certifi",
+          "Identifier": {
+            "PURL": "pkg:pypi/certifi@2026.7.22",
+            "UID": "8a267f1ee428664d"
+          },
+          "Version": "2026.7.22",
+          "Licenses": [
+            "MPL-2.0"
+          ],
+          "FilePath": "certifi-2026.7.22.dist-info/METADATA",
+          "AnalyzedBy": "python-pkg"
+        },
+        {
+          "Name": "charset-normalizer",
+          "Identifier": {
+            "PURL": "pkg:pypi/charset-normalizer@3.5.1",
+            "UID": "98f090d2a1b6c8d7"
+          },
+          "Version": "3.5.1",
+          "Licenses": [
+            "MIT"
+          ],
+          "FilePath": "charset_normalizer-3.5.1.dist-info/METADATA",
+          "AnalyzedBy": "python-pkg"
+        },
+        {
+          "Name": "duckdb",
+          "Identifier": {
+            "PURL": "pkg:pypi/duckdb@1.5.5",
+            "UID": "f6b7c914fd4bbf9c"
+          },
+          "Version": "1.5.5",
+          "Licenses": [
+            "MIT"
+          ],
+          "FilePath": "duckdb-1.5.5.dist-info/METADATA",
+          "AnalyzedBy": "python-pkg"
+        },
+        {
+          "Name": "idna",
+          "Identifier": {
+            "PURL": "pkg:pypi/idna@3.20",
+            "UID": "a011aecc97cc0f8c"
+          },
+          "Version": "3.20",
+          "Licenses": [
+            "BSD-3-Clause"
+          ],
+          "FilePath": "idna-3.20.dist-info/METADATA",
+          "AnalyzedBy": "python-pkg"
+        },
+        {
+          "Name": "msgpack",
+          "Identifier": {
+            "PURL": "pkg:pypi/msgpack@1.2.2",
+            "UID": "c2e92665f521410"
+          },
+          "Version": "1.2.2",
+          "Licenses": [
+            "Apache-2.0"
+          ],
+          "FilePath": "msgpack-1.2.2.dist-info/METADATA",
+          "AnalyzedBy": "python-pkg"
+        },
+        {
+          "Name": "nautilus-trader",
+          "Identifier": {
+            "PURL": "pkg:pypi/nautilus-trader@2.0.0rc5",
+            "UID": "3a6ddd2a7941f94f"
+          },
+          "Version": "2.0.0rc5",
+          "Licenses": [
+            "LGPL-3.0-only"
+          ],
+          "FilePath": "nautilus_trader-2.0.0rc5.dist-info/METADATA",
+          "AnalyzedBy": "python-pkg"
+        },
+        {
+          "Name": "numpy",
+          "Identifier": {
+            "PURL": "pkg:pypi/numpy@2.5.3",
+            "UID": "2b07fa8af6356d12"
+          },
+          "Version": "2.5.3",
+          "Licenses": [
+            "BSD-3-Clause AND 0BSD AND MIT AND Zlib AND CC0-1.0"
+          ],
+          "FilePath": "numpy-2.5.3.dist-info/METADATA",
+          "AnalyzedBy": "python-pkg"
+        },
+        {
+          "Name": "pandas",
+          "Identifier": {
+            "PURL": "pkg:pypi/pandas@3.0.6",
+            "UID": "99183276bd572920"
+          },
+          "Version": "3.0.6",
+          "Licenses": [
+            "BSD-3-Clause"
+          ],
+          "FilePath": "pandas-3.0.6.dist-info/METADATA",
+          "AnalyzedBy": "python-pkg"
+        },
+        {
+          "Name": "pydantic",
+          "Identifier": {
+            "PURL": "pkg:pypi/pydantic@2.13.5",
+            "UID": "5b0f520a0fe0142c"
+          },
+          "Version": "2.13.5",
+          "Licenses": [
+            "MIT"
+          ],
+          "FilePath": "pydantic-2.13.5.dist-info/METADATA",
+          "AnalyzedBy": "python-pkg"
+        },
+        {
+          "Name": "pydantic_core",
+          "Identifier": {
+            "PURL": "pkg:pypi/pydantic-core@2.46.5",
+            "UID": "bea1b4249f3d22b5"
+          },
+          "Version": "2.46.5",
+          "Licenses": [
+            "MIT"
+          ],
+          "FilePath": "pydantic_core-2.46.5.dist-info/METADATA",
+          "AnalyzedBy": "python-pkg"
+        },
+        {
+          "Name": "python-dateutil",
+          "Identifier": {
+            "PURL": "pkg:pypi/python-dateutil@2.9.0.post0",
+            "UID": "51549ef07390bbbb"
+          },
+          "Version": "2.9.0.post0",
+          "Licenses": [
+            "BSD-3-Clause",
+            "Apache-2.0"
+          ],
+          "FilePath": "python_dateutil-2.9.0.post0.dist-info/METADATA",
+          "AnalyzedBy": "python-pkg"
+        },
+        {
+          "Name": "pytz",
+          "Identifier": {
+            "PURL": "pkg:pypi/pytz@2026.3.post1",
+            "UID": "efe2a02e951008e2"
+          },
+          "Version": "2026.3.post1",
+          "Licenses": [
+            "MIT"
+          ],
+          "FilePath": "pytz-2026.3.post1.dist-info/METADATA",
+          "AnalyzedBy": "python-pkg"
+        },
+        {
+          "Name": "requests",
+          "Identifier": {
+            "PURL": "pkg:pypi/requests@2.34.2",
+            "UID": "7d02c858eb65622c"
+          },
+          "Version": "2.34.2",
+          "Licenses": [
+            "Apache-2.0"
+          ],
+          "FilePath": "requests-2.34.2.dist-info/METADATA",
+          "AnalyzedBy": "python-pkg"
+        },
+        {
+          "Name": "six",
+          "Identifier": {
+            "PURL": "pkg:pypi/six@1.17.0",
+            "UID": "c6ae6f052706735a"
+          },
+          "Version": "1.17.0",
+          "Licenses": [
+            "MIT"
+          ],
+          "FilePath": "six-1.17.0.dist-info/METADATA",
+          "AnalyzedBy": "python-pkg"
+        },
+        {
+          "Name": "sseclient-py",
+          "Identifier": {
+            "PURL": "pkg:pypi/sseclient-py@1.9.0",
+            "UID": "8c0549c7787d4432"
+          },
+          "Version": "1.9.0",
+          "Licenses": [
+            "Apache-2.0"
+          ],
+          "FilePath": "sseclient_py-1.9.0.dist-info/METADATA",
+          "AnalyzedBy": "python-pkg"
+        },
+        {
+          "Name": "typing-inspection",
+          "Identifier": {
+            "PURL": "pkg:pypi/typing-inspection@0.4.4",
+            "UID": "fdaa95b1e18520c2"
+          },
+          "Version": "0.4.4",
+          "Licenses": [
+            "MIT"
+          ],
+          "FilePath": "typing_inspection-0.4.4.dist-info/METADATA",
+          "AnalyzedBy": "python-pkg"
+        },
+        {
+          "Name": "typing_extensions",
+          "Identifier": {
+            "PURL": "pkg:pypi/typing-extensions@4.16.0",
+            "UID": "b4faa8fb4e216ad6"
+          },
+          "Version": "4.16.0",
+          "Licenses": [
+            "PSF-2.0"
+          ],
+          "FilePath": "typing_extensions-4.16.0.dist-info/METADATA",
+          "AnalyzedBy": "python-pkg"
+        },
+        {
+          "Name": "urllib3",
+          "Identifier": {
+            "PURL": "pkg:pypi/urllib3@2.8.0",
+            "UID": "bf288730650d3e58"
+          },
+          "Version": "2.8.0",
+          "Licenses": [
+            "MIT"
+          ],
+          "FilePath": "urllib3-2.8.0.dist-info/METADATA",
+          "AnalyzedBy": "python-pkg"
+        },
+        {
+          "Name": "websockets",
+          "Identifier": {
+            "PURL": "pkg:pypi/websockets@17.1",
+            "UID": "e3b02b5b128e1fe9"
+          },
+          "Version": "17.1",
+          "Licenses": [
+            "BSD-3-Clause"
+          ],
+          "FilePath": "websockets-17.1.dist-info/METADATA",
+          "AnalyzedBy": "python-pkg"
+        }
+      ]
+    }
+  ]
+}

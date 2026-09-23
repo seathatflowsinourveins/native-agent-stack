@@ -1,0 +1,102 @@
+{
+  "account": "CASH, NETTING, long only, no financing or borrowing",
+  "bars_per_asset": 1314,
+  "capital_usd": "1000000",
+  "engine": "2.0.0rc5",
+  "fee_per_order_usd": "1",
+  "first_bar": "2016-01-12",
+  "inputs_unchanged": true,
+  "invest_fraction": "0.99",
+  "last_bar": "2021-03-31",
+  "mutation_self_tests": {
+    "hrp_variance": {
+      "all_decisions_removed": "decision count 0 != ledger 22",
+      "cash_corrupted_first_transition": "cash transition mismatch",
+      "fill_time_1900": "fill mismatch: [(('1899-12-31 19:00:00.000000', 'SPY', 'BUY', Decimal('1494'), Decimal('193.6600'), Decimal('1.00')), ('2016-01-12 16:00:00.000000', 'IWM', 'BUY",
+      "fill_time_shifted_one_hour": "fill mismatch: [(('2016-01-12 17:00:00.000000', 'SPY', 'BUY', Decimal('1494'), Decimal('193.6600'), Decimal('1.00')), ('2016-01-12 16:00:00.000000', 'SPY', 'BUY",
+      "wrong_instrument_first_fill": "fill mismatch: [(('2016-01-12 16:00:00.000000', 'WRONG', 'BUY', Decimal('1494'), Decimal('193.6600'), Decimal('1.00')), ('2016-01-12 16:00:00.000000', 'SPY', 'B"
+    },
+    "meanrisk_min_variance": {
+      "all_decisions_removed": "decision count 0 != ledger 22",
+      "cash_corrupted_first_transition": "cash transition mismatch",
+      "fill_time_1900": "fill mismatch: [(('1899-12-31 19:00:00.000000', 'SPY', 'BUY', Decimal('4154'), Decimal('193.6600'), Decimal('1.00')), ('2016-01-12 16:00:00.000000', 'IWM', 'BUY",
+      "fill_time_shifted_one_hour": "fill mismatch: [(('2016-01-12 17:00:00.000000', 'SPY', 'BUY', Decimal('4154'), Decimal('193.6600'), Decimal('1.00')), ('2016-01-12 16:00:00.000000', 'SPY', 'BUY",
+      "wrong_instrument_first_fill": "fill mismatch: [(('2016-01-12 16:00:00.000000', 'WRONG', 'BUY', Decimal('4154'), Decimal('193.6600'), Decimal('1.00')), ('2016-01-12 16:00:00.000000', 'SPY', 'B"
+    }
+  },
+  "optimizers": {
+    "hrp_variance": {
+      "cash_transitions_matched": 66,
+      "decisions_matched": 22,
+      "dividend_events_in_span": 63,
+      "ending_cash_ledger": "2279895.57",
+      "ending_cash_native": "2279895.57",
+      "fees_usd": "66",
+      "fills_matched": 66,
+      "final_shares": {
+        "IWM": 0,
+        "QQQ": 0,
+        "SPY": 0
+      },
+      "frictionless_fractional_buy_and_hold_total_return": "1.297305868630022657402159042",
+      "native_total_return": "1.27989557",
+      "open_orders": 0,
+      "open_positions": 0,
+      "orders": 66,
+      "positions_realized_equals_cash_pnl": false,
+      "positions_realized_pnl_sum": "1279895.58",
+      "positions_report_rows": 3,
+      "report_sha256": {
+        "account": "b401dad64c5977389042913b1afe3211d16b0710f7c1261affa77b3962a64c91",
+        "fills": "f46c52842c9405ae9d4e942166e402685cfaeabcbd3140f1c05576cadad71f78",
+        "positions": "8ab57da379165bb7e46c3e4bb1ca5fcc1e85c08bce9b91dcef068b943e3d195d"
+      },
+      "skfolio_descriptive_total_return_daily_rebalanced_cost_free": "1.327499155268176563006856958",
+      "total_pnl_usd": "1279895.57",
+      "unmodelled_dividend_cash_usd": "107478.79"
+    },
+    "meanrisk_min_variance": {
+      "cash_transitions_matched": 33,
+      "decisions_matched": 22,
+      "dividend_events_in_span": 63,
+      "ending_cash_ledger": "2009391.95",
+      "ending_cash_native": "2009391.95",
+      "fees_usd": "33",
+      "fills_matched": 33,
+      "final_shares": {
+        "IWM": 0,
+        "QQQ": 0,
+        "SPY": 0
+      },
+      "frictionless_fractional_buy_and_hold_total_return": "1.022587074738642738990100006",
+      "native_total_return": "1.00939195",
+      "open_orders": 0,
+      "open_positions": 0,
+      "orders": 33,
+      "positions_realized_equals_cash_pnl": false,
+      "positions_realized_pnl_sum": "1009391.94",
+      "positions_report_rows": 4,
+      "report_sha256": {
+        "account": "e43d1ff20b54c8c9d347012fabfce6d3df0d3c682ff97f9ad869d79b2dd832d4",
+        "fills": "25516f38390620a469171a985a11380b2eb44b820772c76afc975146b6bf2f34",
+        "positions": "210079af20c532535c150af9acda45ce27a89b3e752264ecfea45af2c115f3e2"
+      },
+      "skfolio_descriptive_total_return_daily_rebalanced_cost_free": "1.052380565851879817881153792",
+      "total_pnl_usd": "1009391.95",
+      "unmodelled_dividend_cash_usd": "132234.25"
+    }
+  },
+  "plan_sha256": "b8d1beba6eddd0388957ca0d9e9c46ebfb2ca538f076419d5a8dcaaaf82be4a7",
+  "runner_sha256": "51e554e3bf908065015b4a161bb07eeafbd8b2e839b4be3c20a80f364b044da7",
+  "self_test": {
+    "hrp_variance": {
+      "detected": "fill mismatch: [(('2016-01-12 16:00:00.000000', 'IWM', 'BUY', Decimal('4657'), Decimal('103.7200'), Decimal('1.00')), ('2016-01-12 16:00:00.000000', 'IWM', 'BUY', Decimal('4657'), Decimal('103.72'), Decimal('1.01'))), (('2016-01-12 16:00:00.000000', 'QQQ', 'BUY', Decimal('2060'), Decimal('105.5400'), Decimal('1.00')), ('2016-01-12 16:00:00.000000', 'QQQ', 'BUY', Decimal('2060'), Decimal('105.54'), Decimal('1.01'))), (('2016-01-12 16:00:00.000000', 'SPY', 'BUY', Decimal('1494'), Decimal('193.6600'), Decimal('1.00')), ('2016-01-12 16:00:00.000000', 'SPY', 'BUY', Decimal('1494'), Decimal('193.66'), Decimal('1.01'))), (('2016-04-13 16:00:00.000000', 'IWM', 'SELL', Decimal('183'), Decimal('112.3000'), Decimal('1.00')), ('2016-04-13 16:00:00.000000', 'IWM', 'SELL', Decimal('183'), Decimal('112.3'), Decimal('1.01'))), (('2016-04-13 16:00:00.000000', 'QQQ', 'BUY', Decimal('19'), Decimal('110.9100'), Decimal('1.00')), ('2016-04-13 16:00:00.000000', 'QQQ', 'BUY', Decimal('19'), Decimal('110.91'), Decimal('1.01')))]",
+      "perturbation": "ledger fee +0.01 USD"
+    },
+    "meanrisk_min_variance": {
+      "detected": "fill mismatch: [(('2016-01-12 16:00:00.000000', 'IWM', 'BUY', Decimal('1788'), Decimal('103.7200'), Decimal('1.00')), ('2016-01-12 16:00:00.000000', 'IWM', 'BUY', Decimal('1788'), Decimal('103.72'), Decimal('1.01'))), (('2016-01-12 16:00:00.000000', 'SPY', 'BUY', Decimal('4154'), Decimal('193.6600'), Decimal('1.00')), ('2016-01-12 16:00:00.000000', 'SPY', 'BUY', Decimal('4154'), Decimal('193.66'), Decimal('1.01'))), (('2016-04-13 16:00:00.000000', 'IWM', 'SELL', Decimal('1568'), Decimal('112.3000'), Decimal('1.00')), ('2016-04-13 16:00:00.000000', 'IWM', 'SELL', Decimal('1568'), Decimal('112.3'), Decimal('1.01'))), (('2016-04-13 16:00:00.000000', 'SPY', 'BUY', Decimal('842'), Decimal('208.0400'), Decimal('1.00')), ('2016-04-13 16:00:00.000000', 'SPY', 'BUY', Decimal('842'), Decimal('208.04'), Decimal('1.01'))), (('2016-07-13 16:00:00.000000', 'IWM', 'SELL', Decimal('220'), Decimal('119.2500'), Decimal('1.00')), ('2016-07-13 16:00:00.000000', 'IWM', 'SELL', Decimal('220'), Decimal('119.25'), Decimal('1.01')))]",
+      "perturbation": "ledger fee +0.01 USD"
+    }
+  },
+  "weights_sha256": "30e9b17a989c288357889b4c4d91254450c2b52c97dca509ec20139161f81765"
+}

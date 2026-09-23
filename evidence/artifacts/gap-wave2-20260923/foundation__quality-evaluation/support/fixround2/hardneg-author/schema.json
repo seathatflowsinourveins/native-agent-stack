@@ -1,0 +1,21 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["cases"],
+  "properties": {
+    "cases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "query", "correct", "distractors"],
+        "properties": {
+          "id": {"type": "string"},
+          "query": {"type": "string"},
+          "correct": {"type": "string"},
+          "distractors": {"type": "array", "items": {"type": "string"}}
+        }
+      }
+    }
+  }
+}

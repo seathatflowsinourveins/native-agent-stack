@@ -1,0 +1,99 @@
+{
+ "id": "gap-wave2-20260923/us-equities__agents-models-workers/9-composed-sdk-worker-restart-handoff",
+ "catalog": "us-equities",
+ "layer_id": "agents-models-workers",
+ "gap_index": 9,
+ "gap_text": "The three selected components have separate native receipts; a single composed SDK worker using both ai-memory and SocratiCode through restart and handoff is not established.",
+ "gap_text_sha256": "89bf5e877bb75eadc9d5a7bb282ef351bfe0823e0df862f690a0d1c531a09737",
+ "next_check": "Configure one codex-native-sdk worker with the ai-memory and SocratiCode MCPs, run a bounded task, kill and restart it, then complete it via an ai-memory handoff. Record what is recovered.",
+ "base_commit": "41d39b3",
+ "preregistration": {
+  "written_at": "2026-09-23T07:23:05Z",
+  "file": "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/prereg/9-composed-sdk-worker-restart-handoff.json",
+  "commit": "5480a9c (2026-09-23T07:23:50Z, before any check ran)",
+  "expectation": "One codex-native-sdk worker configured with an isolated ai-memory MCP and a disposable-Qdrant SocratiCode MCP can run a bounded two-step task, be killed after step 1, and a fresh worker can recover progress from an ai-memory handoff and finish step 2. Recovered state is exactly what was written to ai-memory; in-process thread state is lost (ephemeral thread).",
+  "criteria": [
+   "Run 1: worker searches SocratiCode for step-1 facts and writes a handoff/page to isolated ai-memory, then the process group is SIGKILLed.",
+   "Run 2: new worker process reads the handoff via ai-memory MCP, completes step 2 using SocratiCode, returns final JSON.",
+   "Record: which facts were recovered, whether any SocratiCode index had to be rebuilt, tool calls per run, usage per run, and whether the handoff content matched.",
+   "Detection: the kill is verified by process exit status/signal; the handoff is verified by reading the isolated store after the kill."
+  ]
+ },
+ "commands": [
+  "# main-round services (exact commands in raw/services-main-round.txt, exported fix round 2, not re-run): 07:18:45Z qdrant --config-path $GAPCACHE/qdrant.yaml --disable-telemetry (yaml: host 127.0.0.1, http 27333, grpc 27334, storage/snapshots under $GAPCACHE); 07:25:00Z HOME=$GAPCACHE/aim-home AI_MEMORY_SERVER_URL=http://127.0.0.1:27374 AI_MEMORY_EMBEDDING_PROVIDER=none ai-memory-2.3.2 --data-dir $GAPCACHE/aim-data init; 07:25:03Z sed -i on aim-data/config.toml: bind = 127.0.0.1:27374, embedding_provider = none; 07:25:07Z same env, setsid nohup ai-memory-2.3.2 --data-dir $GAPCACHE/aim-data serve --transport http (log: bind=127.0.0.1:27374, providers llm disabled, embedding disabled); 07:39:45Z kill of both PIDs, ports 27333/27334/27374 verified free",
+  "python3 blueprints/gap-wave2-20260923/us-equities__agents-models-workers/services/export_main_round_services.py <this unit's session transcript .jsonl> evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/raw/services-main-round.txt  # fix round 2 export",
+  "python3 blueprints/gap-wave2-20260923/us-equities__agents-models-workers/workers/g9_composed.py $GAPCACHE/runs/g9",
+  "ai-memory --data-dir $GAPCACHE/aim-data handoffs --workspace g2amw --project g9-composed  # polled every 0.5 s, AI_MEMORY_SERVER_URL=http://127.0.0.1:27374",
+  "os.killpg(<run-1 process group>, SIGKILL) when the handoff appeared",
+  "rg g2amw_codebase_780df9a835e7 $GAPCACHE/logs/qdrant.log  # which SocratiCode searches happened in which run window"
+ ],
+ "results": {
+  "worker_config": "one codex-native-sdk worker (sdk_arm.py) with mcp_servers.ai-memory (url 127.0.0.1:27374/mcp, enabled_tools handoff_begin/accept/list) and mcp_servers.socraticode (node SocratiCode 1.14.0 on the disposable Qdrant, enabled_tools codebase_search/status), both default_tools_approval_mode approve, read-only sandbox, hooks off",
+  "run_1": "started 07:35:47Z; SocratiCode search at 07:35:57.76Z (Qdrant access log); memory_handoff_begin created handoff 01a0cd31-<redacted>; process group SIGKILLed 17.68 s after start; returncode -9; no SDK receipt written; no leftover run-1 processes",
+  "run_1_usage": "UNAVAILABLE: the worker's thread was ephemeral (no rollout file) and the process was SIGKILLed before turn/completed, so sdk_arm.py never received or wrote result.usage (9-orchestration.json: receipt_written false, stdout empty). Run 1 consumed provider tokens that this receipt cannot report.",
+  "run_1_tool_calls": "not itemised (no SDK item list); observed side effects: 1 SocratiCode search (Qdrant access log) and 1 memory_handoff_begin (the handoff it created)",
+  "handoff_between_runs": "Open handoffs for g2amw/g9-composed: id 01a0cd31-<redacted>; summary begins 'step 1 done. step-1 file list: [\"scripts/build_ecosystem.py\", \"scripts/landscape.py\", ...'",
+  "run_2": "fresh worker 07:36:07-07:36:46Z: memory_handoff_list -> memory_handoff_accept -> 3 x codebase_search (Qdrant log 07:36:28, 07:36:36 x2) -> final JSON; usage 166,882 total tokens",
+  "whole_task_usage": "run 2: 166,882 total tokens (reported); run 1: unavailable (killed before usage was reported). The whole-task total is therefore at least 166,882 tokens and is not known exactly.",
+  "final_answer": {
+   "sha256_files": [
+    "scripts/build_ecosystem.py",
+    "scripts/landscape.py",
+    "scripts/native_token_ci.py",
+    "scripts/validate.py",
+    "scripts/validate_convergence.py",
+    "scripts/verify_nautilus_ci.py"
+   ],
+   "subprocess_files": [
+    "scripts/adoption_status.py",
+    "scripts/native_token_ci.py",
+    "scripts/validate.py"
+   ],
+   "recovered_from_handoff": [
+    "step-1 sha256_files from handoff 01a0cd31-<redacted>"
+   ],
+   "redone_steps": []
+  },
+  "gold_check": "sha256 files 6/6 and subprocess files 3/3 equal the rg-computed gold over scripts/*.py at 41d39b3",
+  "recovered": "step-1 result (6 files) from the ai-memory handoff; SocratiCode index persisted in Qdrant (no reindex); the in-process thread (ephemeral) was lost and not needed",
+  "handoff_after_run_2": "No open handoffs (accepted, single-use)"
+ },
+ "outcome": "settled",
+ "what_remains": null,
+ "evidence_class": "native_proven",
+ "limits": [
+  "Isolated ai-memory and disposable SocratiCode/Qdrant instances, not the live services; n=1.",
+  "Run-1 SocratiCode use is shown by the Qdrant access log timing, since the killed run left no SDK item list.",
+  "Preregistered usage per run is incomplete: run-1 provider usage is unavailable (see results.run_1_usage), so whole-task usage is a lower bound (fix round: previously omitted without saying so).",
+  "Approval mode 'approve' was set on both MCP servers for non-interactive operation.",
+  "Isolation: disposable Qdrant 1.19.1 on 127.0.0.1:27333/27334 (storage under $HOME/.cache/gap-wave2-20260923/agents-models-workers/qdrant-storage), isolated ai-memory 2.3.2 `serve` on 127.0.0.1:27374 with a temp --data-dir and temp HOME, and AI_MEMORY_SERVER_URL=http://127.0.0.1:27374 exported for the gap-9 and gap-11 ai-memory CLI calls; both started by this unit and stopped at the end (ports verified free). Correction (fix round): the first-round gap-6 CLI calls did NOT point at that server (--version/--help/backfill --help ran with no AI_MEMORY_SERVER_URL set, and init with http://127.0.0.1:1, a closed port); no live-store contact is possible from those commands, and they were re-run in the fix round against isolated 2.3.2 (127.0.0.1:27374) and 2.4.0 (127.0.0.1:27375) servers started for that purpose (gap-6 receipt). Every Codex run disabled native lifecycle hooks (-c features.hooks=false -c features.plugin_hooks=false) so no ai-memory hook call could reach the live service; the one Claude call used --setting-sources project from a temp cwd (user-settings hooks not loaded) and --strict-mcp-config. Embeddings: read-only POST /v1/embeddings calls to the running Nemotron-3-Embed-1B vLLM endpoint 127.0.0.1:8231 (the adopted SocratiCode profile); that service was not restarted or reconfigured. Start/stop evidence for the main-round Qdrant and ai-memory 2.3.2 services (fix round 2): raw/services-main-round.txt has the exact commands and outputs, exported without re-running from this unit's own session transcript by services/export_main_round_services.py."
+ ],
+ "raw_artifacts": [
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/raw/9-orchestration.json",
+   "sha256": "63fd9f76e5a2223184d34d03ef155ebccf609a8dfe6740a5c99bc5e50fe575a3"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/raw/9-run2-receipt.json",
+   "sha256": "08f24084632b87ce7dcfe2e3dad1e2a9b1dea0d6720ba43020791b600253226b"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/raw/9-qdrant-access-log-run-window.txt",
+   "sha256": "133a3b5811a0184fdae7b4c38c83687efbe17d6317c690da55726535b4d7fd6a"
+  },
+  {
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__agents-models-workers/raw/services-main-round.txt",
+   "sha256": "d1109be89f5b729b21737ae6a579d34abf0f9a9a0b4bc74e5c61833c221a03a1",
+   "published": false,
+   "retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+  }
+ ],
+ "helpers": [
+  "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/workers/g9_composed.py",
+  "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/workers/g9-step1-prompt.md",
+  "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/workers/g9-step2-prompt.md",
+  "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/workers/sdk_arm.py",
+  "blueprints/gap-wave2-20260923/us-equities__agents-models-workers/services/export_main_round_services.py"
+ ],
+ "checked_at": "2026-09-23"
+}

@@ -1,0 +1,7 @@
+temporal version 1.9.1 (Server 1.32.0, UI 2.54.1)
+server 1 healthy
+drive exit 0
+metrics lines 12058
+server 1 stopped
+server 2 healthy
+server 2 stopped

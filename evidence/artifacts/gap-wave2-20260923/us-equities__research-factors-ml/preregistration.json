@@ -1,0 +1,152 @@
+{
+  "schema_version": 1,
+  "id": "gap-wave2-20260923-research-factors-ml-preregistration",
+  "written_at": "2026-09-23T06:19:39Z",
+  "written_at_note": "Upper bound: the commit time of the first preregistration commit (4484138). Written between 06:18:35Z and that commit; corrected in the same unpushed commit before any check ran.",
+  "note": "Written and committed before any check below was executed. Only clones of the Kronos and claude-trading-skills repositories (source inspection, no execution) and PyPI/Hugging Face version lookups preceded it. Receipts copy the relevant entry verbatim; any later change is a separately dated fix-round entry.",
+  "shared_inputs": {
+    "plan": "blueprints/us-equities/research-evaluation/plan.json (sha256 b8d1beba6eddd0388957ca0d9e9c46ebfb2ca538f076419d5a8dcaaaf82be4a7 per the prior receipt; re-hashed at run time)",
+    "data": "LEAN bundled daily zips/factor/map files for SPY, QQQ, IWM verified against plan.json input hashes by evaluate.verify_inputs; loaded by evaluate.load_panel (unmodified).",
+    "folds": "skfolio 1.2.9 WalkForward(train_size=252, test_size=63, purged_size=6, reduce_test=True) over eligible development sessions, as in evaluate.py (20 development folds expected), plus the reserved 2021Q1 segment reported separately."
+  },
+  "gaps": {
+    "0": {
+      "expectation": "The frozen selections (each development fold's chosen candidate applied to its evaluation episodes, and the reserved-2021Q1 momentum20 selection) execute in a NautilusTrader 2.0.0rc5 BacktestEngine with fills at session opens, a 10 bp/side taker fee, and every cash transition reconciling exactly. Raw-price per-episode price ratios equal evaluate.py gross_price_label. Dividends are handled in two arms: RAW bars with dividends computed independently from LEAN factor files (not credited in engine cash), and ADJ bars (raw price times LEAN price factor, dividend-inclusive).",
+      "criteria": [
+        "Every scheduled order fills once at the arm's session open price; independent fill audit passes for every fill (side, qty, price, commission).",
+        "Every account-report cash transition equals independent Decimal arithmetic; final open orders and positions are zero.",
+        "RAW arm: fill price ratio exit_open/entry_open per episode equals evaluate.py gross_price_label + 1 for the traded asset (exact Decimal).",
+        "Strategy-internal momentum decision recomputed from the close ticks it receives equals the frozen schedule's weights at every decision.",
+        "Dividend amounts reported per ex-date held; ADJ minus RAW ending equity is compared to credited-equivalent dividend income as a consistency check (sign and order of magnitude, not exact, because ADJ reinvests).",
+        "Outcome ceiling: advanced. PIT universe, total-return labels inside evaluate.py, episode count, alpha and in-engine dividend cash crediting (peer-owned dividend SimulationModule) remain outside this check."
+      ]
+    },
+    "1": {
+      "expectation": "A wrapper (evaluate_purge.py) that imports evaluate.py helpers unchanged runs four arms: Z-check (purged_size=0, embargo=0, existing overlap assertion on) is expected to raise 'training label overlap'; Z-leaky (purged_size=0, embargo=0, overlapping training labels retained, assertion bypassed) is a labelled leaky reference; P6 (plan: purged_size=6, embargo=0) must reproduce the accepted receipt (20 folds, 6605 ledger records, reserved momentum20); P6E5 (purged_size=6, embargo=5 sessions dropped from the tail of each training window, and fold-boundary censoring of evaluation labels whose exit falls after the fold's last test session).",
+      "criteria": [
+        "New assertion: in P6E5 no observed training label exit is on/after the first test decision and none within the embargo; no observed evaluation label has exit after its fold's test_last. Detection is demonstrated by running the same assertion on P6 (expected to fire for fold-crossing evaluation labels) and Z-check (expected to raise).",
+        "Per-fold chosen candidate compared across Z-leaky, P6 and P6E5; report count of differing folds and the reserved selection for each arm.",
+        "Ljung-Box (statsmodels 0.15.0, lags 1-4) on each selection candidate's reserved-training episode net labels reported as a diagnostic only; non-rejection is not evidence of independence.",
+        "Outcome ceiling: advanced, because statistical independence of samples cannot be established by purge/embargo."
+      ]
+    },
+    "5": {
+      "expectation": "A fresh uv venv with pinned alphalens-reloaded 0.4.6, statsmodels 0.15.0, arch 8.0.0 and statsforecast 2.1.1 runs each library on the frozen SPY/QQQ/IWM data; chronos 2.3.2 (chronos-bolt-small) runs in the forecast comparison. Optional extra arms if pinned wheels install cleanly: sktime 1.1.0, tsfresh 0.21.2, river 0.26.1, arcticdb 6.26.0.",
+      "criteria": [
+        "alphalens: momentum20/60/120 factor IC for 1- and 5-session forward returns over development sessions; exit 0; output hashed.",
+        "statsmodels: ARIMA(1,1,1) on SPY log close (last 252 development sessions) with a 5-step forecast plus Ljung-Box; exit 0; hashed.",
+        "arch: GARCH(1,1) on SPY daily percent log returns 2015-2020 with a 5-step variance forecast; exit 0; hashed.",
+        "statsforecast: AutoARIMA(season_length=1) on log close of all three assets, h=5; exit 0; hashed.",
+        "Outcome: advanced unless all 15 listed candidates execute; list the remaining candidates by id."
+      ]
+    },
+    "6": {
+      "expectation": "Matched forecast comparison (fcmp) on the same frozen series and the 20 skfolio WalkForward development folds: origins are episode decision sessions t (global stride-5 anchor) inside each test fold with t+5 inside the segment; context is the 252 sessions ending at t; target r = ln(close[t+5]/close[t]) per asset.",
+      "criteria": [
+        "Arms: naive (r_hat=0), statsforecast 2.1.1 AutoARIMA on log close, statsmodels 0.15.0 ARIMA(1,1,1) on log close, chronos-bolt-small (HF amazon/chronos-bolt-small at 772f3d25d38aec6d914c8949dab4462e2d46f5d8, chronos-forecasting 2.3.2, CPU) median at step 5, Kronos-small (gap 7/14).",
+        "Preregistered primary metric: per-fold MAE of r_hat vs r across all origins and assets in the fold; secondary: per-fold RMSE and MAE ratio to naive.",
+        "Interval: 95% percentile bootstrap over the 20 development folds (10,000 resamples, seed 20260923) of the mean per-fold MAE difference; a model is called better only if the interval excludes zero.",
+        "Reserved 2021Q1 fold reported separately and not used for any choice.",
+        "Settled for gap 6 if statsforecast and chronos both run on every fold and per-fold metrics are retained."
+      ]
+    },
+    "7": {
+      "expectation": "Kronos-small (HF NeoQuasar/Kronos-small 901c26c1332695a2a8f243eb2f37243a37bea320, tokenizer NeoQuasar/Kronos-Tokenizer-base 0e0117387f39004a9016484a186a908917e22426, source shiyu-coder/Kronos 67b630e67f6a18c9e9be918d9b4337c960db1e9a) runs in the fcmp comparison on OHLCV context (amount derived by the upstream predictor), pred_len=5, T=1.0, top_p=0.9, sample_count=20, torch seed 0, CPU.",
+      "criteria": [
+        "Per-fold MAE for Kronos vs naive on the same origins; bootstrap interval as in gap 6.",
+        "The receipt is the c16 evidence_ref candidate; the packet itself is not edited (layer-verdict artifacts are read-only for this unit).",
+        "Gap 7 also names c13; settled only if the c13 check (gap 14) also executes."
+      ]
+    },
+    "9": {
+      "expectation": "Not executed here: requires Alpaca paper-account contact and gate rows owned by peer session sota-workflow-resolution.",
+      "criteria": [
+        "Record deferred with owner sota-workflow-resolution."
+      ]
+    },
+    "10": {
+      "expectation": "Same Nautilus run as gap 0; the ADJ arm supplies dividend-inclusive bars, the MakerTakerFeeModel supplies fees, cash is reconciled; a daily-volume participation admission check (order qty <= 1% of session volume) is reported.",
+      "criteria": [
+        "As gap 0 criteria for fills, fees and cash.",
+        "Outcome ceiling: advanced; realistic fills (queue, spread, impact), financing and in-engine dividend crediting remain."
+      ]
+    },
+    "13": {
+      "expectation": "The fcmp comparison covers statsforecast, chronos-bolt-small and statsmodels ARIMA with per-fold errors and bootstrap intervals for each pairwise difference.",
+      "criteria": [
+        "Per-fold MAE for each of statsforecast, chronos, statsmodels ARIMA, naive; pairwise mean differences with 95% bootstrap intervals.",
+        "Outcome ceiling: advanced, because feature-extraction and financial-NLP alternatives named in the gap text are not compared."
+      ]
+    },
+    "14": {
+      "expectation": "c16 Kronos vs naive as in gap 7. c13: the pinned tradermonty/claude-trading-skills backtest-expert skill (commit bc5515644c70abc90fbc20d15c838c47808ca893) is supplied as context to codex exec (read-only, ephemeral) reviewing a seeded-defect backtest fixture, against a control arm with the same prompt and no skill text; two runs per arm, sequential.",
+      "criteria": [
+        "Fixture has five seeded defects at declared line ranges (look-ahead signal, survivorship universe, no costs, full-sample parameter search reported as out-of-sample, overlapping forward labels without purge) and correct decoy sections.",
+        "Model output must be JSON [{line, category, explanation}]; a seeded defect is detected when any reported line falls inside its declared range. Scoring is deterministic by script.",
+        "Report detected-defect counts and out-of-range findings per run. With two runs per arm, no superiority claim is made unless every skill run beats every control run.",
+        "Evidence class local_integration: the skill runs under Codex, not Claude."
+      ]
+    }
+  },
+  "fix_rounds": [
+    {
+      "written_at": "2026-09-23T06:37:00Z",
+      "label": "fix round 1 (gaps 0 and 10), written after round-1 Nautilus output was seen",
+      "trigger": "Round 1: RAW arms reconciled exactly; both ADJ arms failed the cash-sequence audit ('cash sequence mismatch', 'final cash 89651.82 != independent 89651.9250'; reserved '100814.92 != 100814.9167') and the realized-PnL identity. ADJ prices have 4 decimals, so qty*price has sub-cent notional; the independent arithmetic did not round it.",
+      "diagnosis": "Testing five rounding rules against round-1 development-ADJ reports: per-fill notional rounded to cents with ROUND_HALF_EVEN matched all 276 cash transitions (HALF_UP 163, DOWN/FLOOR 5, CEILING 6). Per-position realized PnL matched round_half_even(qty*(exit-entry)) - fees in 136/138 positions; the 2 others differ by 0.01 at exact half-cent ties (consistent with binary floating-point rounding).",
+      "change": "Audit v2 rounds each fill notional to cents with ROUND_HALF_EVEN before the cash update (declared engine currency-precision convention, fitted on development-ADJ round 1; the reserved-ADJ arm's 20 fills act as a check that was not used for fitting). Realized PnL is checked per position with tolerance 0.01 USD; the sum residual against the cash delta is reported, not asserted. Strategy, schedule, prices and engine configuration are unchanged; round-1 outputs are retained.",
+      "criteria": [
+        "All four arms: every cash transition equals independent arithmetic under the declared rule.",
+        "Per-position realized PnL within 0.01 USD of independent value; report count of exact matches and total residual."
+      ]
+    },
+    {
+      "written_at": "2026-09-23T06:48:47Z",
+      "label": "fix round 2 (gaps 5, 6, 7, 13, 14 forecast comparison), written after attempt 1 was stopped",
+      "trigger": "Attempt 1 (single process, all arms, CPU) started 06:22:36Z under ecosystem-bounded-run with a 1200 s limit. The statsforecast, statsmodels and chronos stages finished within about 30 s (Kronos weights were loading by 06:23:05Z), then the Kronos-small CPU stage (sample_count=20, 21 folds) ran until the 1200 s limit stopped the job at about 06:42:36Z; no results.json was written. statsforecast n_jobs=-1 also exhausted the job's 256-task limit (OpenBLAS 'blas_thread_init' and tqdm 'can't start new thread' warnings). Attempt 1 is retained as a stopped attempt, not a result.",
+      "change": "Split into two bounded processes with identical origins, context, target and seeds: (A) naive, statsforecast, statsmodels, chronos on CPU with OPENBLAS_NUM_THREADS=1, OMP_NUM_THREADS=1 and statsforecast n_jobs=4; (B) Kronos-small with the same parameters (pred_len=5, T=1.0, top_p=0.9, sample_count=20, torch seed 0) on the local CUDA GPU instead of CPU, a deviation from the CPU wording of the original preregistration. A merge step computes the preregistered metrics and bootstrap intervals from both forecast files after checking that the (fold, asset, decision) keys and targets are identical. Each process is again bounded to 20 minutes; a Kronos stop at the limit is recorded as not_settled for the Kronos clauses.",
+      "criteria": "Unchanged from the original entries for gaps 6, 7, 13 and 14."
+    },
+    {
+      "written_at": "2026-09-23T07:08:30Z",
+      "label": "fix round 3 (gaps 1 and 5, plus merge metadata), written after an independent Codex review of commit 5516759",
+      "trigger": "The review found: (a) the Z-check arm raised the wrapper's 'incomplete training label' check (the one evaluate.main performs), not evaluate.choose's overlap detector, and the preregistered 'same assertion on P6' was only run in report mode; (b) the ARIMA residual Ljung-Box used model_df=0; (c) the merged forecast metadata recorded the merge CLI's kronos_device default ('cpu').",
+      "change": "(a) Add two arms to evaluate_purge.py and rerun into a new output dir: Z-choose (purge 0, full-segment training panel so overlapping labels are observed, unmodified evaluate.choose) is expected to raise 'training label overlap with evaluation decision'; P6-assert (plan purge 6, embargo 0, no censoring, the P6E5 fold-boundary assertion enforced) is expected to raise AssertionError on the first fold whose evaluation labels cross the fold end. Existing arms are unchanged and must reproduce their earlier results. (b) Add a statsmodels_lb_df2 arm: the same ARIMA(1,1,1) residuals with acorr_ljungbox(model_df=2); report both values. (c) The merge records per-model execution metadata from the source results files; rerun the merge into a new dir, and the metrics must be identical.",
+      "criteria": [
+        "Z-choose raises the overlap ValueError; P6-assert raises AssertionError; Z-check, Z-leaky, P6 and P6E5 outputs are unchanged.",
+        "statsmodels_lb_df2 exits 0; both p-values are reported.",
+        "The merged metrics equal the earlier merge."
+      ]
+    },
+    {
+      "written_at": "2026-09-23T15:36:22Z",
+      "label": "fix round 4 (gap 5 only), written before any fix-round-4 command ran, on a re-dispatch of this unit",
+      "trigger": "Gap 5 remained advanced with six listed candidates unexecuted: c9 haystack, c14 docling, c17 ray-serve, c18 timesfm, c21 sentence-transformers, c24 Qlib. Each installs on this host without credentials, so the preregistered 'all 15 execute' criterion is reachable.",
+      "change": "Add six arms in a new script extra_arms.py, each in its own uv venv under $CACHE, bounded to 20 minutes through ecosystem-bounded-run. All arms read one export of the frozen data (export step: the existing venv runs fcmp.load_ohlcv, which cross-checks evaluate.load_panel after evaluate.verify_inputs, and writes frozen_ohlcv.json with its sha256); each arm refuses to run if the export sha256 differs. Pins: haystack-ai==3.1.1; docling==2.129.0; ray[serve]==2.58.0; timesfm from source tag v3.0.0 with the [torch] extra and google/timesfm-2.5-200m-pytorch@1d952420fba87f3c6dee4f240de0f1a0fbc790e3 (925 MB download, disclosed); sentence-transformers==6.1.0 with sentence-transformers/all-MiniLM-L6-v2@1110a243fdf4706b3f48f1d95db1a4f5529b4d41; pyqlib==0.9.7 on CPython 3.11 (no 3.13 wheel) with scripts/dump_bin.py fetched from the v0.9.7 tag. HF downloads go to the isolated HF_HOME $CACHE/hf. Ray binds 127.0.0.1 only, uses a temp dir under $CACHE, and is shut down; the absence of leftover raylet/gcs_server processes is checked with pgrep afterwards.",
+      "criteria": [
+        "Documents (c9, c21): one text document per (asset, calendar month) for 2015-01..2020-12 (216 documents) stating asset, month, monthly close-to-close return in percent and last close.",
+        "c9 haystack: an InMemoryDocumentStore + InMemoryBM25Retriever Pipeline; for all 216 keyed queries '<ASSET> <YYYY-MM>' the top-1 document's meta (asset, month) equals the query key (pass: 216/216). Negative control: query 'SPY 1999-01' has no matching document, so its top-1 meta must differ from the key (the check can fail). Exit 0.",
+        "c14 docling: HTML and CSV files of SPY 2020 month-end closes (12 rows, 3 columns) converted with DocumentConverter; every extracted table cell equals the source cell string (pass: 36/36 data cells plus header per format). Negative control: the same comparison against a copy with one perturbed cell reports exactly 1 mismatch. PDF/OCR paths are out of scope and listed as a limit.",
+        "c17 ray-serve: a Serve deployment computes the evaluate.py momentum20 decision (highest positive close[t]/close[t-20]-1, ties alphabetical, else cash) for 40 development decision dates; responses through a DeploymentHandle and through one loopback HTTP request equal the in-process computation (pass: 40/40 and HTTP equal). Negative control: a deliberately wrong lookback (19) disagrees on at least one of the 40 dates, or the control is reported as unable to detect. Ray and Serve are shut down and no ray processes remain.",
+        "c18 timesfm: TimesFM 2.5 point forecast of close at step 5 from the 252-session raw-close context for every (fold, asset, decision) key of run-fcmp-merged-r2/forecasts.json (sha256 8829d98c...); predicted r = ln(forecast) - ln(close[t]); keys and targets identical; all forecasts finite. Report per-fold MAE, dev mean and the fcmp paired fold bootstrap (seed 20260923, 10000 draws) against naive and chronos_bolt_small. The comparison is reported, not pass/fail; no superiority claim is preregistered.",
+        "c21 sentence-transformers: encode the 216 documents and the 216 keyed queries; embedding dimension 384; two encodes of the documents agree within 1e-5 max abs; report top-1 key accuracy by cosine similarity (measured, not pass/fail) next to the c9 BM25 accuracy.",
+        "c24 Qlib: dump the export to Qlib binary format with the tag's dump_bin.py, qlib.init(provider_uri=<temp>, region='us'), and read $close and the expression $close/Ref($close,20)-1 via D.features for SPY, QQQ and IWM over 2015-01-02..2020-12-31; every value equals the pandas computation from the export within 1e-5 relative (float32 storage). Negative control: comparing against a one-session-shifted pandas series reports mismatches.",
+        "Outcome: gap 5 is settled only if all six arms meet their pass criteria (so all 15 listed candidates have a retained execution); otherwise advanced, listing what failed. The executions remain run-on-frozen-data evidence, not accuracy or alpha acceptance."
+      ]
+    },
+    {
+      "written_at": "2026-09-23T15:59:30Z",
+      "label": "fix round 5 (gap 5 only), written after an independent Codex review of commits 4d82f63..332b0e2 and before any fix-round-5 command ran",
+      "trigger": "The review found: (1) the Qlib arm added atol=1e-6 for the momentum expression, so it did not apply the preregistered 1e-5 relative tolerance; (2) the haystack absent-key control cannot fail, TimesFM and MiniLM had no injected negative control, and the Ray expected decisions came from the same helper the deployment used; (3) the Ray cleanup observation (pgrep count 0) and (4) the TimesFM weight size, sha256 and LFS match were not retained as raw files; (5) the Ray attempt-2 listener start time was misquoted.",
+      "change": "Rerun into new r5 outputs (r4 outputs stay as they are). (1) Qlib reports mismatches under the preregistered rtol=1e-5 with atol=0 as the criterion of record, and the atol=1e-6 count as a labelled deviation. (2) haystack adds a permuted-meta control (each document's meta rotated by one within the store); its keyed top-1 hits must fall to at most 5 of 216. TimesFM adds an offset-key control (decision index t+1 instead of t) that must make the key/target check fail. MiniLM adds a perturbed-text control (last-close digits changed) whose embeddings must differ by more than 1e-5 from the originals. Ray compares served responses with evaluate.weights(panel, t, 'momentum20') decisions computed in the plan venv with Decimal arithmetic and written, with a sha256, to expected_momentum20.json; the served rule must match 40/40, and the lookback-19 control stays. (3) The Ray run is followed by a retained pgrep count of raylet/gcs_server processes. (4) Retain stat size and sha256 of the TimesFM and MiniLM weight files and the Hugging Face tree API's LFS oid for each. (5) Correct the quoted time from the retained log. The ray run again uses the loopback-only network namespace; docling and the fcmp arms are not rerun.",
+      "criteria": [
+        "c24 passes only with 0 mismatches under rtol=1e-5, atol=0; otherwise c24 is recorded as failing its preregistered criterion, with the atol variant reported as a deviation.",
+        "c9 permuted-meta control hits <= 5/216; the main criterion is unchanged (216/216).",
+        "c18 offset-key control makes keys_and_targets_identical false; the main run reproduces the r4 forecasts_sha256.",
+        "c21 perturbed-text control max abs embedding difference > 1e-5; the repeat-encode check is unchanged.",
+        "c17 served decisions equal the evaluate.weights decisions on 40/40 dates; leftover ray process count 0 is retained.",
+        "Gap 5 outcome rule unchanged from fix round 4."
+      ]
+    }
+  ]
+}

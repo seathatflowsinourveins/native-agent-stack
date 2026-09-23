@@ -1,0 +1,9 @@
+{
+  "gap_index": 10,
+  "written_at": "2026-09-23T05:52:16Z",
+  "round": 2,
+  "label": "fix-round (late relative to round 1, written before round 2)",
+  "expectation": "Round 2 kill test logs a start marker before and an ack marker after every batch (fsynced), kills only while the last marker is a start (writer inside an insert), and after recovery verifies per batch index: every acknowledged batch has exactly 10,000 rows, 10,000 distinct timestamps and the deterministic expected sum(volume); the in-flight batch is either absent or complete; no other batch index, torn batch or duplicate row appears. Recovery time is measured from restart/reopen to the first successful recovery count query. Expected: all four stores pass, with the in-flight batch absent or complete.",
+  "criteria": "settled if every store passes the per-batch verification with an in-flight batch proven at the kill instant (start marker before the kill time and no ack); advanced if the in-flight write cannot be shown for a store or any check fails.",
+  "note": "Fix-round preregistration, written after round 1 and the Codex gpt-6-astra read-only review of a0f57fa, before any round-2 command ran."
+}

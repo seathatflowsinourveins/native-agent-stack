@@ -1,0 +1,14 @@
+╭──────────────────────────────────────────────────────────────────────────────╮
+│heldout_retrieval (30 samples): none/none                                     │
+╰──────────────────────────────────────────────────────────────────────────────╯
+dataset: (samples)                                                              
+                                                                                
+total time:                                   0:00:02                           
+                                                                                
+exact_index_match                                                               
+accuracy           0.867                                                        
+                                                                                
+Log:                                                                            
+inspect-logs/2026-09-23T02-48-20-00-00_heldout-retrieval_Xri4Z3bBXAED7TqqX5TezC.
+json                                                                            
+                                                                                

@@ -1,0 +1,13 @@
+test_clean_interval_and_neighbor_actions (tests.test_nautilus_equity_replay.ReplayTests.test_clean_interval_and_neighbor_actions) ... ok
+test_incomplete_source_and_overlapping_actions (tests.test_nautilus_equity_replay.ReplayTests.test_incomplete_source_and_overlapping_actions) ... ok
+test_missing_duplicate_and_reordered_sessions (tests.test_nautilus_equity_replay.ReplayTests.test_missing_duplicate_and_reordered_sessions) ... ok
+test_numeric_and_participation_refusals (tests.test_nautilus_equity_replay.ReplayTests.test_numeric_and_participation_refusals) ... ok
+test_oracle_rejects_intermediate_cash_even_when_final_matches (tests.test_nautilus_equity_replay.ReplayTests.test_oracle_rejects_intermediate_cash_even_when_final_matches) ... ok
+test_oracle_rejects_price_schedule_fee_currency_and_identity_changes (tests.test_nautilus_equity_replay.ReplayTests.test_oracle_rejects_price_schedule_fee_currency_and_identity_changes) ... ok
+test_oracle_requires_flat_position_and_realized_pnl (tests.test_nautilus_equity_replay.ReplayTests.test_oracle_requires_flat_position_and_realized_pnl) ... ok
+test_synthetic_oracle_control (tests.test_nautilus_equity_replay.ReplayTests.test_synthetic_oracle_control) ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.002s
+
+OK

@@ -1,0 +1,204 @@
+{
+  "account_totals": [
+    "100000.00",
+    "95642.50",
+    "96852.10"
+  ],
+  "actions_in_window": [
+    {
+      "ex_date": "2020-08-07",
+      "new_rate": null,
+      "old_rate": null,
+      "payable_date": "2020-08-13",
+      "qualification": "qualified",
+      "rate": "0.82",
+      "record_date": "2020-08-10",
+      "type": "cash_dividend"
+    },
+    {
+      "ex_date": "2020-08-31",
+      "new_rate": "4",
+      "old_rate": "1",
+      "payable_date": "2020-08-28",
+      "qualification": "qualified",
+      "rate": null,
+      "record_date": "2020-08-24",
+      "type": "forward_split"
+    }
+  ],
+  "classification": "local integration with retained historical market data (Alpaca, authenticated 2026-09-20)",
+  "completed_utc": "2026-09-23T07:09:40.568825+00:00",
+  "engine_version": "2.0.0rc5",
+  "environment_names": [
+    "LANG",
+    "OMP_NUM_THREADS",
+    "OPENBLAS_NUM_THREADS",
+    "PATH",
+    "PWD",
+    "PYTHONDONTWRITEBYTECODE"
+  ],
+  "fills": [
+    {
+      "avg_px": "435.7500",
+      "commissions": [
+        "0.00 USD"
+      ],
+      "filled_qty": "10",
+      "liquidity_side": "TAKER",
+      "quantity": "10",
+      "side": "BUY",
+      "status": "FILLED",
+      "ts_init": "2020-08-03T20:00:00.000Z",
+      "ts_last": "2020-08-03T20:00:00.000Z",
+      "type": "MARKET"
+    },
+    {
+      "avg_px": "120.9600",
+      "commissions": [
+        "0.00 USD"
+      ],
+      "filled_qty": "10",
+      "liquidity_side": "TAKER",
+      "quantity": "10",
+      "side": "SELL",
+      "status": "FILLED",
+      "ts_init": "2020-09-04T20:00:00.000Z",
+      "ts_last": "2020-09-04T20:00:00.000Z",
+      "type": "MARKET"
+    }
+  ],
+  "input_receipt_sha256": "a59c6ed74e839ca43ee704033e207865ed938a22e4738afce22ec197e91b6bcd",
+  "iterations": 25,
+  "network_interfaces": [
+    [
+      1,
+      "lo"
+    ]
+  ],
+  "note": "Curated excerpt of the fix-round-2 private run summary (sha256 below). Raw provider rows and native report CSVs stay private per the equity-replay README; only this run's two simulated fills, per-bar marks around the action dates and the reconciliation are published. The first run (started 2026-09-23T06:25:21Z) and the fix-round-1 run (started 2026-09-23T07:01:06Z) produced the same fills, account totals and economic reference.",
+  "open_orders": 0,
+  "open_positions": 0,
+  "positions": [
+    {
+      "adjustments": [],
+      "avg_px_close": 120.96,
+      "avg_px_open": 435.75,
+      "peak_qty": "10",
+      "quantity": "0",
+      "realized_pnl": "-3147.90 USD",
+      "side": "FLAT",
+      "ts_closed": "2020-09-04T20:00:00.000Z",
+      "ts_opened": "2020-08-03T20:00:00.000Z"
+    }
+  ],
+  "private_summary_sha256": "ceff130f66c18ec3e548d3533f197b368c058a76c5a8a9d29190d2498c9de523",
+  "reconciliation": {
+    "all_checks_pass": true,
+    "checks": {
+      "account_events_equal_fills_plus_initial": true,
+      "cash_constant_while_held": true,
+      "fill_BUY_at_bar_instant": true,
+      "fill_BUY_at_raw_close": true,
+      "fill_BUY_side_qty": true,
+      "fill_SELL_at_bar_instant": true,
+      "fill_SELL_at_raw_close": true,
+      "fill_SELL_side_qty": true,
+      "fill_count": true,
+      "native_final_cash_equals_fill_only_ledger": true,
+      "one_mark_per_bar": true,
+      "position_quantity_constant_10_while_held": true,
+      "terminal_flat": true
+    },
+    "economic_reference": {
+      "dividend_cash_usd": "8.20",
+      "dividend_per_share": "0.82",
+      "final_cash_usd": "100489.10",
+      "missing_split_adjustment_usd": "3628.80",
+      "native_minus_economic_usd": "-3637.00",
+      "realized_pnl_usd": "489.10",
+      "split_ratio": "4",
+      "unposted_dividend_usd": "8.20"
+    },
+    "fill_ledger": [
+      {
+        "cash_after": "95642.5000",
+        "price": "435.7500",
+        "qty": 10,
+        "raw_close": "435.75",
+        "session_date": "2020-08-03",
+        "side": "BUY"
+      },
+      {
+        "cash_after": "96852.1000",
+        "price": "120.9600",
+        "qty": 10,
+        "raw_close": "120.96",
+        "session_date": "2020-09-04",
+        "side": "SELL"
+      }
+    ],
+    "marks_around_actions": [
+      {
+        "bar_index": 3,
+        "cash_total": "95642.50 USD",
+        "close": "455.6100",
+        "net_position": "10",
+        "phase": "before_order",
+        "session_date": "2020-08-06"
+      },
+      {
+        "bar_index": 4,
+        "cash_total": "95642.50 USD",
+        "close": "444.4500",
+        "net_position": "10",
+        "phase": "before_order",
+        "session_date": "2020-08-07"
+      },
+      {
+        "bar_index": 8,
+        "cash_total": "95642.50 USD",
+        "close": "460.0400",
+        "net_position": "10",
+        "phase": "before_order",
+        "session_date": "2020-08-13"
+      },
+      {
+        "bar_index": 19,
+        "cash_total": "95642.50 USD",
+        "close": "499.2300",
+        "net_position": "10",
+        "phase": "before_order",
+        "session_date": "2020-08-28"
+      },
+      {
+        "bar_index": 20,
+        "cash_total": "95642.50 USD",
+        "close": "129.0400",
+        "net_position": "10",
+        "phase": "before_order",
+        "session_date": "2020-08-31"
+      }
+    ],
+    "native_final_cash_usd": "96852.10",
+    "native_realized_pnl_usd": "-3147.90",
+    "split_ex_date_bar": {
+      "ex_close": "129.04",
+      "pre_close": "499.23",
+      "session_dates": [
+        "2020-08-28",
+        "2020-08-31"
+      ]
+    }
+  },
+  "report_sha256": {
+    "account": "87039b173def6243a9f4d3946c5bd61c956b7d5a5600d0f9fe3bfce185595ab8",
+    "fills": "8dd5235c97f7905c8521902398c2316d336447d69e506a1c7e75e76317cdb334",
+    "positions": "127b35642a2c75af23463f63bda488a347c9163cb1414bb146ffc7b8c1beedd5"
+  },
+  "runner_sha256": "099519fb63a731dbb55f432096eaf4d9fdb2620109de05a1d01b844b61fc354e",
+  "sessions": 25,
+  "window": [
+    "2020-08-03",
+    "2020-09-04"
+  ]
+}

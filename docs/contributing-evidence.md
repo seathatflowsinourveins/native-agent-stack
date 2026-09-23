@@ -8,6 +8,60 @@ and [`scripts/host_receipts.py`](../scripts/host_receipts.py). One receipt
 records one component x one host x one lifecycle stage; it never uploads
 anything, and it never certifies a platform on its own.
 
+## 0. The new-host loop, in one place
+
+For a host this repository has never measured or run on before, in order
+(each step is read-only except the write it names; nothing here selects a
+winner, records a landscape verdict, or flips a `platform_status`):
+
+1. **Bootstrap.** [`adoption/bootstrap.md`](../adoption/bootstrap.md) end to
+   end, from the pinned clone (step 0) through native sign-in.
+2. **Measure the host.**
+   `python3 scripts/hardware_profile.py --record-host <host-id>` writes the
+   measured report to `evidence/artifacts/hw-profiles/<host-id>/profile.json`,
+   registers it in `manifests/evidence.json`, and adds or updates this host's
+   `native_proven` entry in
+   [`adoption/hardware-profiles.json`](../adoption/hardware-profiles.json)
+   `hosts[]`, keeping that entry's other fields. `<host-id>` must match
+   `^[a-z0-9-]+-[0-9]{8}$` (`<name>-<yyyymmdd>`; a labelled-projection host id
+   still ends `-projected`). A plain `python3 scripts/hardware_profile.py`
+   (no `--record-host`) is unchanged: it only prints the report, read-only.
+3. **Record what ran.** `python3 scripts/host_receipts.py record ...`
+   (section 3 below) for each component you exercised on this host. When the
+   receipt is for a runtime component (`vllm`, `mlx-lm`, `llama.cpp`, ...) and
+   you qualified specific local model weights on it, add
+   `--qualified-model '{"model_id": ..., "revision": ..., "runtime": ..., "runtime_version": ..., "bars": "<short text>", "result": "pass"|"fail"}'`
+   (repeatable) or `--qualified-models-file <path to a JSON array of such
+   objects>`. This is optional and additive to the receipt; it records which
+   weights you qualified, not a platform acceptance.
+4. **Refresh the derived views.** `python3 scripts/component_matrix.py
+   --write`, then `python3 scripts/new_host_grand_list.py --write` (section 5
+   below). The grand list's "Qualified local models" section is built from
+   step 3's receipts; the runtime component's own winner row in the matrix
+   carries them per platform too.
+5. **See what could flip.** `python3 scripts/verdict_flip_candidates.py`
+   lists every layer-winner-platform row whose recorded evidence
+   (`scripts/platform_status.py`) now supports a stronger `platform_status`
+   than the catalog currently declares, with the receipts that qualify.
+   Report-only: it selects nothing and always exits 0 on well-formed input
+   (a CI step runs it and posts the output to the job summary).
+6. **Validate.** `python3 scripts/host_receipts.py validate`,
+   `python3 scripts/validate.py`, `python3 scripts/component_matrix.py
+   --check`, `python3 scripts/new_host_grand_list.py --check`, and the test
+   suite CI runs: `python3 -m unittest`. This repository's tests use the
+   standard library's `unittest`, not `pytest` (not installed); running
+   `python3 -m pytest` here does nothing useful.
+7. **A verdict flip is a separate step, owned by whoever re-records the
+   layer.** Nothing above writes `catalogs/landscape/*.json`
+   `winners[].platform_status`. A row `verdict_flip_candidates.py` names only
+   actually moves when someone re-records that catalog/layer with
+   `tools/sota-convergence/record_verdicts.py` through its own lane process
+   (section 4 below); this contribution flow deliberately does not run that
+   for you.
+
+Sections 1-9 below give the full detail behind step 3 (evidence classes,
+recording, sanitizing, validating and independently reviewing a receipt).
+
 ## 1. Who this is for
 
 - **Another WSL host.** You have a second Linux/WSL2 x86_64 machine and want
@@ -60,7 +114,13 @@ machine (`host.second_physical_machine: true`), independently reviewed.
    [`manifests/stack.json`](../manifests/stack.json) `components[]` that have
    plain-string `commands` you can actually run) to decide which components
    most need a receipt from your host and platform.
-3. **Record.** Run the recorder from the repository root:
+3. **Record.** Run the recorder from the repository root. Who you are decides
+   one flag: inside a Claude Code session `$CLAUDE_CODE_SESSION_ID` is the
+   identity and `--identity` is refused (exit 2); a Codex session, a human
+   shell or CI has no such variable and must pass `--identity` with a random
+   per-session token.
+
+   From a Claude Code session:
 
    ```sh
    python3 scripts/host_receipts.py record \
@@ -69,7 +129,21 @@ machine (`host.second_physical_machine: true`), independently reviewed.
      --component-id <a manifests/stack.json component id> \
      --stage use \
      --evidence-class native_proven \
-     --identity <random-per-session-token> \
+     --from-stack-commands
+   ```
+
+   From a Codex session, a human shell or CI (generate the token once per
+   session and reuse it; a new token per command is a new identity each time):
+
+   ```sh
+   identity="$(python3 -c 'import secrets; print(secrets.token_hex(16))')"
+   python3 scripts/host_receipts.py record \
+     --host-id <your-host-id-yyyymmdd> \
+     --platform-id <linux-wsl2-x86_64|macos-arm64> \
+     --component-id <a manifests/stack.json component id> \
+     --stage use \
+     --evidence-class native_proven \
+     --identity "$identity" \
      --from-stack-commands
    ```
 
@@ -238,7 +312,17 @@ recorder:
 - **`tools/sota-convergence/gap_crosswalk.py`** regenerates the crosswalk
   between open gaps and recorded evidence; rerun it after adding receipts
   that close or narrow a gap so the crosswalk reflects the new evidence
-  rather than going stale.
+  rather than going stale. `gap_crosswalk.py build --check` and
+  `gap_wave_ledger.py --check` run in CI (`validate.yml`), but only prove
+  each checked-in file still reproduces from its own fixed inputs
+  (`gap_crosswalk.py`'s `CURRENT_REV`, a pinned historical commit whose
+  `catalogs/landscape/*.json` `open_gaps` it read; the ledger's checked-in
+  `--wave`/`--owner` receipts). Neither check reads the *current*
+  `catalogs/landscape/*.json` `open_gaps`, so neither one can detect that a
+  layer re-recorded since `CURRENT_REV` has made the crosswalk stale; that
+  drift needs a human or maintainer to notice and rerun `gap_crosswalk.py`
+  (a new `CURRENT_REV` and a fresh TypeSafe/review pass) against the current
+  rows.
 - **The catalog-freshness report** (`docs/github-automation.md`'s
   `catalog-freshness.yml` lane, built on
   `tools/sota-convergence/github_freshness.py`) is a separate, report-only,
@@ -267,22 +351,41 @@ for running them.
   next re-record writes it. `scripts/landscape.py` and
   `scripts/component_matrix.py --check` (both run in CI) reject a declared
   `macos-arm64` status that claims more than the receipts support; a weaker,
-  not-yet-re-recorded status is allowed. `accepted` needs a recorded receipt
-  for that `component_id` that is `result: pass`,
-  `evidence_class: native_proven`, stage `use` or `install`, bound to the
-  winner's current pin, independently reviewed (step 8) with no standing
-  dissent, declares `host.second_physical_machine: true`, and has
-  `host.os`/`host.architecture` consistent with `adoption/manifest.json`'s
-  `platform_profiles[]` entry for that platform id. A `native_proven` fail at
-  `use` or `install` that is the latest receipt for its host and stage blocks
-  `accepted`, whatever its review, until that host records a later pass.
-  `conditional` needs a pin-bound, non-`synthetic` pass from a declared
-  second physical machine with no standing dissent; `not_established` means
-  pin-bound receipts exist but none is such a pass. A receipt recorded
-  and reviewed entirely on a single WSL host, with `second_physical_machine`
-  left at its default `false`, cannot make a winner `accepted`. The Linux
-  rule, and when CI starts enforcing it, is described in that module's
-  docstring.
+  not-yet-re-recorded status is allowed.
+
+  A *qualifying* receipt, on either platform, is one for that `component_id`
+  that is `result: pass`, `evidence_class: native_proven`, stage `use` or
+  `install`, bound to the winner's current pin, independently reviewed (step
+  8) with no standing dissent, declares `host.second_physical_machine: true`,
+  and has `host.os`/`host.architecture` consistent with
+  `adoption/manifest.json`'s `platform_profiles[]` entry for that platform id.
+  A `native_proven` fail at `use` or `install` that is the latest receipt for
+  its host and stage is *blocking*, whatever its review, until that host
+  records a later pass. The two platforms then differ:
+
+  - **`macos-arm64`.** `accepted` needs a qualifying receipt and no blocking
+    fail; there is no other route. `conditional` needs a pin-bound,
+    non-`synthetic` pass from a declared second physical machine with no
+    standing dissent; `not_established` means pin-bound receipts exist but
+    none is such a pass; otherwise `untested`. A receipt recorded and reviewed
+    entirely on a single host, with `second_physical_machine` left at its
+    default `false`, cannot make a macOS winner `accepted`.
+  - **`linux-wsl2-x86_64`.** `accepted` needs a qualifying receipt, or a
+    winner whose own `evidence_class` is `native_proven` or
+    `measured_comparison` and whose `evidence_refs` cite at least one
+    `evidence/` file registered in `manifests/evidence.json` (not a sealed
+    layer-verdict packet, lane return or adjudication), and in both cases no
+    blocking fail. The second route needs no host receipt and no second
+    physical machine, so a single WSL host's receipt is not what makes a
+    Linux winner `accepted`; it can only add a passing receipt (towards
+    `conditional`) or a blocking fail. Otherwise `conditional` or
+    `not_established`, as that module's docstring lists.
+
+  CI currently enforces the derived ceiling on every platform for rows a new
+  wave records, but only on `macos-arm64` for the older grandfathered rows:
+  `ENFORCED_PLATFORMS` in [`scripts/landscape.py`](../scripts/landscape.py)
+  and the comment above it say Linux joins that set when the grandfathered
+  rows are re-recorded.
 - **`adoption/manifest.json` `platform_profiles[].status`.** This is a
   separate field, owned by another unit, and moving a platform from
   `drafted_not_accepted` to `accepted` is presently a maintainer judgment

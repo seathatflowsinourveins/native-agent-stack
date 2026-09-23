@@ -1,0 +1,11 @@
+{
+  "dagu_binary_sha256": "20de7ae94e16999ff997db0386dced9504db37c87de333837fd15b4892b98bd7",
+  "inputs": {
+    "codex_cancel_probe.py": "7ca7838a3f41e3388a40197a35bc56744ccb59ca6640bd1328334b0777b6da49",
+    "dagu_common.py": "1ce91e2b253a36611e08f4de5897b889df671aaf4d0735c3111d357c56610d7d",
+    "ns_init.py": "da477a1829bc970cc22318db7aa2670906269ca40f402ccd05dff8de6bf13c9b",
+    "real_scheduled_recovery.py": "44057b5facf2fefcf598d4d305cebb2d25e427c79845b8df763ed486c30587c8",
+    "real_steps.py": "fe8787054a719222b1a6aeb3570f6cadd665a06e0ba84fdb0c4dd4bd385bc7a7",
+    "reboot_analog.py": "2bee3b39455135d475ea0bb1b88a5ac4762f8f7deea7f874860dca4941f5ea81"
+  }
+}

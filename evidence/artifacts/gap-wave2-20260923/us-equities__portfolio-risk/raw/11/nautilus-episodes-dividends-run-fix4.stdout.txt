@@ -1,0 +1,37 @@
+{
+ "momentum20": {
+  "episodes": 260,
+  "credited_dividend_cash_usd": "5172.13",
+  "credited_minus_unmodelled_usd": "-3.88",
+  "mean_native_net_return_per_episode_with_dividends": "0.002807681923076923076923076923",
+  "dividend_contribution_per_episode": "0.000198928076923076923076923077"
+ },
+ "momentum60": {
+  "episodes": 260,
+  "credited_dividend_cash_usd": "4852.58",
+  "credited_minus_unmodelled_usd": "-5.97",
+  "mean_native_net_return_per_episode_with_dividends": "0.002834083461538461538461538462",
+  "dividend_contribution_per_episode": "0.000186637692307692307692307693"
+ },
+ "momentum120": {
+  "episodes": 260,
+  "credited_dividend_cash_usd": "5221.74",
+  "credited_minus_unmodelled_usd": "2.67",
+  "mean_native_net_return_per_episode_with_dividends": "0.003850692307692307692307692308",
+  "dividend_contribution_per_episode": "0.000200836153846153846153846154"
+ },
+ "cash": {
+  "episodes": 260,
+  "credited_dividend_cash_usd": null,
+  "credited_minus_unmodelled_usd": null,
+  "mean_native_net_return_per_episode_with_dividends": null,
+  "dividend_contribution_per_episode": null
+ },
+ "equalweight": {
+  "episodes": 260,
+  "credited_dividend_cash_usd": "7156.72",
+  "credited_minus_unmodelled_usd": "-0.92",
+  "mean_native_net_return_per_episode_with_dividends": "0.003997770384615384615384615385",
+  "dividend_contribution_per_episode": "0.000275258461538461538461538462"
+ }
+}

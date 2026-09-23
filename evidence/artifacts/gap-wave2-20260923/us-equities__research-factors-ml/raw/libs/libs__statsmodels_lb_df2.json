@@ -1,0 +1,1 @@
+{"arm": "statsmodels_lb_df2", "ljung_box_model_df0_pvalue": {"lag10": 2e-06, "lag5": 0.062374}, "ljung_box_model_df2_pvalue": {"lag10": 0.0, "lag5": 0.014798}, "plan_sha256": "b8d1beba6eddd0388957ca0d9e9c46ebfb2ca538f076419d5a8dcaaaf82be4a7", "version": "0.15.0"}

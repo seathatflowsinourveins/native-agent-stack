@@ -1,0 +1,172 @@
+[
+{
+  "execution": {
+    "workflowId": "g2-kill",
+    "runId": "uuid-redacted-20"
+  },
+  "type": {
+    "name": "TwoStep"
+  },
+  "startTime": "2026-09-23T05:42:03.400745Z",
+  "closeTime": "2026-09-23T05:42:30.479254Z",
+  "status": "WORKFLOW_EXECUTION_STATUS_COMPLETED",
+  "historyLength": "17",
+  "executionTime": "2026-09-23T05:42:03.400745Z",
+  "memo": {},
+  "searchAttributes": {
+    "indexedFields": {
+      "BuildIds": {
+        "metadata": {
+          "encoding": "anNvbi9wbGFpbg==",
+          "type": "S2V5d29yZExpc3Q="
+        },
+        "data": "WyJ1bnZlcnNpb25lZCIsInVudmVyc2lvbmVkOjM4NzEyNDEzNjFkNmYyMjc3N2RlNjg1NTFhODc3OTY2Il0="
+      }
+    }
+  },
+  "taskQueue": "g2dqo-two-step",
+  "stateTransitionCount": "23",
+  "historySizeBytes": "2859",
+  "executionDuration": "27.078508963s",
+  "rootExecution": {
+    "workflowId": "g2-kill",
+    "runId": "uuid-redacted-20"
+  }
+},
+{
+  "execution": {
+    "workflowId": "g2-cancel",
+    "runId": "uuid-redacted-17"
+  },
+  "type": {
+    "name": "TwoStep"
+  },
+  "startTime": "2026-09-23T05:41:58.842895Z",
+  "closeTime": "2026-09-23T05:42:01.245176Z",
+  "status": "WORKFLOW_EXECUTION_STATUS_CANCELED",
+  "historyLength": "11",
+  "executionTime": "2026-09-23T05:41:58.842895Z",
+  "memo": {},
+  "searchAttributes": {
+    "indexedFields": {
+      "BuildIds": {
+        "metadata": {
+          "encoding": "anNvbi9wbGFpbg==",
+          "type": "S2V5d29yZExpc3Q="
+        },
+        "data": "WyJ1bnZlcnNpb25lZCIsInVudmVyc2lvbmVkOjM4NzEyNDEzNjFkNmYyMjc3N2RlNjg1NTFhODc3OTY2Il0="
+      }
+    }
+  },
+  "taskQueue": "g2dqo-two-step",
+  "stateTransitionCount": "7",
+  "historySizeBytes": "1658",
+  "executionDuration": "2.402280613s",
+  "rootExecution": {
+    "workflowId": "g2-cancel",
+    "runId": "uuid-redacted-17"
+  }
+},
+{
+  "execution": {
+    "workflowId": "g2-fail-hard",
+    "runId": "uuid-redacted-13"
+  },
+  "type": {
+    "name": "TwoStep"
+  },
+  "startTime": "2026-09-23T05:41:58.574640Z",
+  "closeTime": "2026-09-23T05:41:58.734117Z",
+  "status": "WORKFLOW_EXECUTION_STATUS_FAILED",
+  "historyLength": "11",
+  "executionTime": "2026-09-23T05:41:58.574640Z",
+  "memo": {},
+  "searchAttributes": {
+    "indexedFields": {
+      "BuildIds": {
+        "metadata": {
+          "encoding": "anNvbi9wbGFpbg==",
+          "type": "S2V5d29yZExpc3Q="
+        },
+        "data": "WyJ1bnZlcnNpb25lZCIsInVudmVyc2lvbmVkOjM4NzEyNDEzNjFkNmYyMjc3N2RlNjg1NTFhODc3OTY2Il0="
+      }
+    }
+  },
+  "taskQueue": "g2dqo-two-step",
+  "stateTransitionCount": "6",
+  "historySizeBytes": "5123",
+  "executionDuration": "0.159476792s",
+  "rootExecution": {
+    "workflowId": "g2-fail-hard",
+    "runId": "uuid-redacted-13"
+  }
+},
+{
+  "execution": {
+    "workflowId": "g2-retry",
+    "runId": "uuid-redacted-7"
+  },
+  "type": {
+    "name": "TwoStep"
+  },
+  "startTime": "2026-09-23T05:41:55.244324Z",
+  "closeTime": "2026-09-23T05:41:58.482804Z",
+  "status": "WORKFLOW_EXECUTION_STATUS_COMPLETED",
+  "historyLength": "17",
+  "executionTime": "2026-09-23T05:41:55.244324Z",
+  "memo": {},
+  "searchAttributes": {
+    "indexedFields": {
+      "BuildIds": {
+        "metadata": {
+          "encoding": "anNvbi9wbGFpbg==",
+          "type": "S2V5d29yZExpc3Q="
+        },
+        "data": "WyJ1bnZlcnNpb25lZCIsInVudmVyc2lvbmVkOjM4NzEyNDEzNjFkNmYyMjc3N2RlNjg1NTFhODc3OTY2Il0="
+      }
+    }
+  },
+  "taskQueue": "g2dqo-two-step",
+  "stateTransitionCount": "12",
+  "historySizeBytes": "4434",
+  "executionDuration": "3.238479489s",
+  "rootExecution": {
+    "workflowId": "g2-retry",
+    "runId": "uuid-redacted-7"
+  }
+},
+{
+  "execution": {
+    "workflowId": "g2-happy",
+    "runId": "uuid-redacted-1"
+  },
+  "type": {
+    "name": "TwoStep"
+  },
+  "startTime": "2026-09-23T05:41:52.757499Z",
+  "closeTime": "2026-09-23T05:41:55.116967Z",
+  "status": "WORKFLOW_EXECUTION_STATUS_COMPLETED",
+  "historyLength": "17",
+  "executionTime": "2026-09-23T05:41:52.757499Z",
+  "memo": {},
+  "searchAttributes": {
+    "indexedFields": {
+      "BuildIds": {
+        "metadata": {
+          "encoding": "anNvbi9wbGFpbg==",
+          "type": "S2V5d29yZExpc3Q="
+        },
+        "data": "WyJ1bnZlcnNpb25lZCIsInVudmVyc2lvbmVkOjM4NzEyNDEzNjFkNmYyMjc3N2RlNjg1NTFhODc3OTY2Il0="
+      }
+    }
+  },
+  "taskQueue": "g2dqo-two-step",
+  "stateTransitionCount": "10",
+  "historySizeBytes": "2808",
+  "executionDuration": "2.359467651s",
+  "rootExecution": {
+    "workflowId": "g2-happy",
+    "runId": "uuid-redacted-1"
+  }
+}
+]

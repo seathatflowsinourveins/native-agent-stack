@@ -1,0 +1,22 @@
+{
+ "firing": {
+  "n": 20,
+  "min_s": 5.002,
+  "median_s": 5.003,
+  "p90_s": 5.004,
+  "max_s": 5.004,
+  "mean_s": 5.003,
+  "stdev_s": 0.0
+ },
+ "resolved": {
+  "n": 20,
+  "min_s": 10.979,
+  "median_s": 20.48,
+  "p90_s": 28.088,
+  "max_s": 29.993,
+  "mean_s": 20.481,
+  "stdev_s": 5.771
+ },
+ "fire_lost": 0,
+ "resolved_lost": 0
+}

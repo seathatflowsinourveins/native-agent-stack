@@ -1,0 +1,32 @@
+{
+ "feast": "0.66.0",
+ "pandas": "2.3.3",
+ "rows_returned": 3,
+ "checks": [
+  {
+   "symbol": "AAA",
+   "entity_ts": "2020-02-01T00:00:00+00:00",
+   "feast": 1.0,
+   "oracle": 1.0,
+   "match": true
+  },
+  {
+   "symbol": "AAA",
+   "entity_ts": "2020-05-01T00:00:00+00:00",
+   "feast": 1.15,
+   "oracle": 1.15,
+   "match": true
+  },
+  {
+   "symbol": "AAA",
+   "entity_ts": "2020-06-30T00:00:00+00:00",
+   "feast": 1.15,
+   "oracle": 1.15,
+   "match": true
+  }
+ ],
+ "future_value_leaked": false,
+ "restatement_wins": true,
+ "ttl_null_for_stale": false,
+ "all_match_oracle": false
+}

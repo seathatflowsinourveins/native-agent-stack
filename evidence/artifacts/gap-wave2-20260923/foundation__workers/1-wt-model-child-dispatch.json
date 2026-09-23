@@ -1,0 +1,117 @@
+{
+  "id": "1-wt-model-child-dispatch",
+  "gap_index": 1,
+  "gap_text_sha256": "aa84830f40dffc506238c51749c06c8ee23e91230a139db5a3370da5e29c538f",
+  "preregistration": {
+    "written_at": "2026-09-23T00:59:51Z",
+    "expectation": "Creating a worktree with `wt switch --create <branch> --no-cd --format=json` on the installed wt 0.79.0, then dispatching one bounded native model child (workspace-write, `--ephemeral`) with cwd set to that worktree, will show the child operating inside the correct branch/path and able to make an owned change that is independently verifiable afterward; `wt remove` without `--force` on the now-dirty worktree should refuse per the 0.79.0 dirty-removal behavior, and `wt remove --force --foreground` should then cleanly delete it.",
+    "criteria": "Settled if the child's own commands report the worktree's branch/path, the owned change is independently observed on disk/in git status after the child exits, and the dirty-removal refusal plus forced removal both behave as expected on the 0.79.0 pin. Settled-with-caveat if the model family used is Codex rather than Claude (rule prefers Codex for gaps that allow either family; this gap text does not require Claude specifically).",
+    "timing": "post_hoc fix-round preregistration: written at 2026-09-23T00:59:51Z (Write tool call in the fix-round transcript), after the rerun it describes had already run (00:58:23Z-00:58:56Z). The receipt previously showed 01:20:00Z, which is later than the fix-round commit ddf4b2e (01:08:43Z) and was not a real time.",
+    "reconciliation_note": "These post-hoc criteria left out the next_check's final step (reconcile the token-native-saturation.md vs decisions.json wording). Judged against the full next_check, the outcome is advanced."
+  },
+  "commands": [
+    {
+      "cmd": "cd $HOME/code/nas-wt-g2-workers && which wt; wt --version 2>&1; wt remove --help 2>&1 | head -40",
+      "exit": 0,
+      "started_at": "2026-09-23T00:54:22.571Z",
+      "duration_s": 0.425,
+      "output_excerpt": "which wt -> $HOME/.local/share/codex-ecosystem/bin/wt; wt v0.79.0; `wt remove --help` documents --foreground ('Run removal in foreground (block until complete)') and -f/--force ('Without this flag, removal fails if the worktree has any uncommitted changes').",
+      "output_sha256": "b57d20b37df65e194ee02a77d7f1be6121f45ef0c5662c2eed531f1fc59937a0",
+      "raw_output": "raw/gap5-transcript-extract.json#toolu_01TxKUCR42xZHwifwJy4Cj4Y",
+      "raw_output_published": false,
+      "raw_output_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    {
+      "cmd": "codex exec --help 2>&1 | grep -i ephemeral; codex exec --help 2>&1 | wc -l; codex --version",
+      "exit": 0,
+      "started_at": "2026-09-23T00:58:18.918Z",
+      "duration_s": 0.263,
+      "output_excerpt": "--ephemeral is a listed `codex exec` option; codex-cli 0.155.1",
+      "output_sha256": "2f705c2ab0949c6fde25fe1d2ae4094b902543aee0f2329fe40f2d0639f2c466",
+      "raw_output": "raw/gap1-transcript-extract.json#toolu_011hU8nX96ZaQDAKiBprvX7a",
+      "raw_output_published": false,
+      "raw_output_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    {
+      "cmd": "mkdir -p $HOME/.cache/gap-wave2-20260923/workers/fix1 && cd $HOME/.cache/gap-wave2-20260923/workers/fix1\nrm -rf wt-repo* 2>/dev/null\ngit init -q wt-repo && cd wt-repo && git commit -q --allow-empty -m init\nwt -C . switch --create codex-child-test2 --no-cd --format=json -y\nls -d ../wt-repo.codex-child-test2",
+      "exit": 0,
+      "started_at": "2026-09-23T00:58:23.552Z",
+      "duration_s": 0.304,
+      "output_excerpt": "{\"action\":\"created\",\"branch\":\"codex-child-test2\",\"path\":\"$HOME/.cache/gap-wave2-20260923/workers/fix1/wt-repo.codex-child-test2\",\"created_branch\":true,\"base_branch\":\"master\"}",
+      "output_sha256": "05542c371e105d6cb3475a45fc71ce7a1036af2671597231c12fa8e6b3076feb",
+      "raw_output": "raw/gap1-transcript-extract.json#toolu_01DSU4DMSHUfQhyxaRmNPuhE",
+      "raw_output_published": false,
+      "raw_output_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    {
+      "cmd": "cd $HOME/.cache/gap-wave2-20260923/workers/fix1\nWTPATH=\"$HOME/.cache/gap-wave2-20260923/workers/fix1/wt-repo.codex-child-test2\"\ntimeout 120 codex exec --sandbox workspace-write --ephemeral --cd \"$WTPATH\" \"Print pwd, git rev-parse --abbrev-ref HEAD, git status --short. Then create a file named owned-change.txt containing the text hello-from-child, and print git status --short again to confirm it is untracked/new.\" 2>&1 | tee codex-out.txt | tail -40",
+      "exit": 0,
+      "started_at": "2026-09-23T00:58:27.343Z",
+      "duration_s": 24.926,
+      "output_excerpt": "child printed pwd=$HOME/.cache/gap-wave2-20260923/workers/fix1/wt-repo.codex-child-test2, branch codex-child-test2, status (clean); created owned-change.txt (diff shows +hello-from-child); status '?? owned-change.txt'; 'tokens used 8,861'",
+      "output_sha256": "3049787047b47e3fa9f964b770741a85c9fb4f7644b2110310a853ab02b34277",
+      "raw_output": "raw/gap1-transcript-extract.json#toolu_01A4VBFECNHS2oeEXNc5ahCA",
+      "raw_output_published": false,
+      "raw_output_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    {
+      "cmd": "WTPATH=\"$HOME/.cache/gap-wave2-20260923/workers/fix1/wt-repo.codex-child-test2\"\necho \"== independent verify ==\"\ncat \"$WTPATH/owned-change.txt\" 2>&1\ngit -C \"$WTPATH\" status --porcelain\necho \"== attempt remove WITHOUT --force on dirty worktree (0.79.0 dirty-removal refusal) ==\"\nwt -C $HOME/.cache/gap-wave2-20260923/workers/fix1/wt-repo remove codex-child-test2 -y 2>&1\necho \"exit=$?\"\nls -d \"$WTPATH\" 2>&1\necho \"== now remove WITH --force ==\"\nwt -C $HOME/.cache/gap-wave2-20260923/workers/fix1/wt-repo remove codex-child-test2 -y --force --foreground 2>&1\necho \"exit=$?\"\nls -d \"$WTPATH\" 2>&1",
+      "exit": 2,
+      "started_at": "2026-09-23T00:58:56.715Z",
+      "duration_s": 0.167,
+      "output_excerpt": "independent read after the child exited: 'hello-from-child' and '?? owned-change.txt'; `wt remove` without --force: '✗ Cannot remove worktree: codex-child-test2 has uncommitted changes' exit=1, directory still present; with --force --foreground: '✓ Removed codex-child-test2 worktree (--force) & branch' exit=0; final `ls -d` of the path fails (directory gone), which is the block's exit status 2.",
+      "output_sha256": "c7f56ce0a774c14e14ec9ecf9c3899526a927813fcdb4f5086325c09d3dcc61a",
+      "raw_output": "raw/gap1-transcript-extract.json#toolu_01LesbvR6szLwGLarAe8TjD8",
+      "note": "exit is the Bash block's status (its last command, the confirming `ls -d` of the removed path); the two wt exits are printed inside the output.",
+      "raw_output_published": false,
+      "raw_output_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    {
+      "cmd": "cd $HOME/.cache/gap-wave2-20260923/workers\nWT=$HOME/.local/share/codex-ecosystem/bin/wt\nREPO=wt-crash-probe\n$WT -C $REPO remove codex-child-test -y --force 2>&1 | tail -5\nls -d ${REPO}.codex-child-test 2>&1\necho \"--- reconcile token-native-saturation.md line 121 vs decisions.json line 487 ---\"\ngrep -n \"worktrunk\" $HOME/code/nas-wt-g2-workers/docs/token-native-saturation.md | sed -n '1,10p'\necho ---\nsed -n '115,125p' $HOME/code/nas-wt-g2-workers/docs/token-native-saturation.md\necho ---\ngrep -n \"worktrunk\" $HOME/code/nas-wt-g2-workers/decisions.json | head -5\nsed -n '480,492p' $HOME/code/nas-wt-g2-workers/decisions.json",
+      "exit": 2,
+      "started_at": "2026-09-23T00:45:01.236Z",
+      "duration_s": 5.499,
+      "output_excerpt": "first-round block (00:45:01Z): docs/token-native-saturation.md:121 '| `worktrunk` | optional | use, cleanup | supporting workflow / 0 |'; the decisions.json path in this block was wrong (repo root), located at catalogs/foundation/decisions.json in the next calls.",
+      "output_sha256": "4f26634ac7c18d759bbb5a136e4aa48f989cf1a15adaa717539931ac86d87a5a",
+      "raw_output": "raw/gap1-transcript-extract.json#toolu_014wy6BhWnps6YmU3qjxaKnw",
+      "note": "the same block also ran the superseded first-round `wt remove --force` (background) on an earlier worktree; that part is not used by this receipt.",
+      "raw_output_published": false,
+      "raw_output_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    },
+    {
+      "cmd": "sed -n '480,495p' $HOME/code/nas-wt-g2-workers/catalogs/foundation/decisions.json",
+      "exit": 0,
+      "started_at": "2026-09-23T00:45:14.629Z",
+      "duration_s": 0.121,
+      "output_excerpt": "catalogs/foundation/decisions.json lines 480-495: capability_key owned-worktrees, selection 'default', component_ids ['worktrunk']",
+      "output_sha256": "00d83dce5b86be4f4cf0e2a1c2d9133321df0a71bd6c5428793fb80cddfc1c6e",
+      "raw_output": "raw/gap1-transcript-extract.json#toolu_011pbboMtKuKVfATLeY2Fa6h",
+      "raw_output_published": false,
+      "raw_output_retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)"
+    }
+  ],
+  "results": "Advanced, not settled. Executed (Codex child, one bounded single call): a worktree created by wt v0.79.0 `wt switch --create codex-child-test2 --no-cd --format=json` in a scratch repo under the unit cache prefix; `codex exec --sandbox workspace-write --ephemeral --cd <worktree>` reported the worktree's own path and branch and created owned-change.txt; the file and the '?? owned-change.txt' status were read independently after the child exited; `wt remove` without --force refused the dirty worktree (exit 1) and `wt remove --force --foreground` removed worktree and branch (exit 0). This closes the first clause of the gap (no model-child run had used a Worktrunk worktree) for one Codex trial. The second clause (dirty-removal refusal observed only on 0.78.0) was already closed by the existing receipt evidence/artifacts/gap-resolution-20260922/git-github-automation/worktrunk-0-79-0-requalify.json ('wt v0.79.0 ... dirty_removal_refused=true'); this run is a second 0.79.0 observation, now in a model-child worktree. The earlier text saying the refusal was 'previously only verified on 0.78.0' was wrong. Remaining: the third clause and the next_check's last step, 'Reconcile the token-native-saturation.md line 121 vs decisions.json line 487 wording'. Both texts were read and are still inconsistent (docs/token-native-saturation.md:121 rates worktrunk 'optional'; catalogs/foundation/decisions.json owned-worktrees has selection 'default', component_ids ['worktrunk']). Nothing forbade editing either file: the unit's forbidden paths were catalogs/landscape, catalogs/sota-convergence, catalogs/us-equities/gates-*, docs/grand-catalog-handbook.md and evidence/artifacts/layer-verdicts-*, and no assigned-path limit covered docs/token-native-saturation.md. The earlier stated reason ('out of this unit's assigned path', 'must not edit' decisions.json) was therefore wrong. The wording was left unreconciled because this pass may not run new checks and choosing 'optional' or 'default' is a catalog decision that needs its own evidence record. That remainder keeps the gap at advanced.",
+  "outcome": "advanced",
+  "evidence_class": "local_integration",
+  "limits": "One Codex trial on a synthetic empty-commit scratch repo. The unit rules named `codex exec --sandbox read-only --ephemeral` as the preferred Codex form; this rerun used workspace-write so the child could make the owned change the next_check asks to verify, confined to the scratch worktree. No Claude-family child used a Worktrunk worktree. The optional/default wording reconciliation is not done. Raw outputs: raw/gap1-transcript-extract.json (+ raw/gap5-transcript-extract.json for the wt version call). The Codex output file the run tee'd (fix1/codex-out.txt) was deleted with the fix1 scratch directory at 01:08:50Z. The transcript copy in the extract is the surviving record. Privacy sweep 2026-09-23: the transcript extract(s) are retained host-local and not published; the published support is each command's cmd, exit, output_excerpt and output_sha256.",
+  "checked_at": "2026-09-23T00:58:56Z",
+  "reconciliation": "reconciliation 2026-09-23T02:21:44Z (no new checks; claims aligned to the transcripts and files on disk, see README 'Reconciliation'): outcome settled -> advanced (wording clause open); false 0.78.0-only statement and false forbidden-path reason corrected; commands replaced by the exact transcript commands; timestamps corrected from the fictitious 01:20:00Z.",
+  "raw_evidence": [
+    {
+      "file": "raw/gap5-transcript-extract.json",
+      "sha256": "7d36a67a2cd3c8d3135a6797ad66149710c940c2be181f26aacb6d62d9d15764",
+      "bytes": 29761,
+      "published": false,
+      "retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)",
+      "published_support": "each command's cmd, exit, output_excerpt and output_sha256 in this receipt"
+    },
+    {
+      "file": "raw/gap1-transcript-extract.json",
+      "sha256": "d15fbaf5378794648fb7e51d2e5a5c81f1df9f56ed505a682a67a1e04fef8d8d",
+      "bytes": 8917,
+      "published": false,
+      "retention": "host-local, owner-only; not published under the catalog rule against raw conversations (PR #132 review)",
+      "published_support": "each command's cmd, exit, output_excerpt and output_sha256 in this receipt"
+    }
+  ]
+}

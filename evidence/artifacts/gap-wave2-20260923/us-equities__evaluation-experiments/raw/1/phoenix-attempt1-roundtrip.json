@@ -1,0 +1,12 @@
+{
+ "sent_trace_id": "dec321127091756da8175f7650f3851c",
+ "readback_endpoint": "/v1/projects/default/spans",
+ "attempts": 20,
+ "found": false,
+ "readback_trace_id": null,
+ "readback_name": null,
+ "readback_attributes": null,
+ "last_body_if_missing": {
+  "error": "URLError(ConnectionRefusedError(111, 'Connection refused'))"
+ }
+}

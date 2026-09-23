@@ -1,0 +1,368 @@
+## original compare.py (AAPL, hard-coded)
+exit=0
+{
+  "actions": {
+    "ambiguous": 0,
+    "compared": 2,
+    "different": 0,
+    "equal": 1,
+    "missing": 0,
+    "numeric_values_equal": 2,
+    "provider_records": 2,
+    "reference_events": 2,
+    "scope": "qualified ex-date/type candidates; cash per raw share and old/new split ratio; process-date window may omit events",
+    "status": "reconciliation_incomplete",
+    "unknown_currency": 1
+  },
+  "bars": {
+    "compared": 25,
+    "different": 0,
+    "equal": 25,
+    "extra": 0,
+    "maximum_absolute_close_difference": "0.00",
+    "missing": 0,
+    "status": "equal"
+  },
+  "basis": "raw daily close by New York session date",
+  "input_hashes": {
+    "alpaca_receipt": "a59c6ed74e839ca43ee704033e207865ed938a22e4738afce22ec197e91b6bcd",
+    "comparison_code": "7a2b258624d0219daf2c3bf8582f974a91ec84c8e190db73ed190e4312b37439",
+    "lean_native_results": "b31c282c90367c3baf87232772fc78a7bc36a8c64229faa2ef86a9068e88b25b"
+  },
+  "original_historical_availability": "not_established",
+  "reference_sessions": 25,
+  "strategy_or_return_computed": false
+}
+## compare_multi AAPL lean-probe vs alpaca-run
+exit=0
+{
+  "input_hashes": {
+    "alpaca_receipt": "a59c6ed74e839ca43ee704033e207865ed938a22e4738afce22ec197e91b6bcd",
+    "comparison_code": "b41ee92fad2b4af455310e0a29638666dd58c5ff371e9da8b1b7b93c34dd0f5f",
+    "lean_native_results": "b31c282c90367c3baf87232772fc78a7bc36a8c64229faa2ef86a9068e88b25b",
+    "original_comparison_code": "7a2b258624d0219daf2c3bf8582f974a91ec84c8e190db73ed190e4312b37439"
+  },
+  "provider": "alpaca-run",
+  "reference": "lean-probe",
+  "results": {
+    "AAPL": {
+      "actions": {
+        "ambiguous": 0,
+        "compared": 2,
+        "different": 0,
+        "equal": 1,
+        "missing": 0,
+        "numeric_values_equal": 2,
+        "provider_records": 2,
+        "reference_events": 2,
+        "scope": "qualified ex-date/type candidates; cash per raw share and old/new split ratio; process-date window may omit events",
+        "status": "reconciliation_incomplete",
+        "unknown_currency": 1
+      },
+      "bars": {
+        "compared": 25,
+        "different": 0,
+        "equal": 25,
+        "extra": 0,
+        "maximum_absolute_close_difference": "0.00",
+        "missing": 0,
+        "status": "equal"
+      },
+      "basis": "raw daily close by New York session date",
+      "original_historical_availability": "not_established",
+      "reference_sessions": 25,
+      "strategy_or_return_computed": false
+    }
+  },
+  "session_range": [
+    "2020-08-03",
+    "2020-09-04"
+  ],
+  "symbols": [
+    "AAPL"
+  ]
+}
+## equality of per-symbol result vs original (input_hashes excluded)
+{"identical": true, "keys_only_original": [], "keys_only_multi": []}
+## AAPL lean-probe vs alpaca-parquet (broad-market store)
+exit=0
+{
+  "input_hashes": {
+    "alpaca_parquet_bytes": 887953123,
+    "comparison_code": "b41ee92fad2b4af455310e0a29638666dd58c5ff371e9da8b1b7b93c34dd0f5f",
+    "lean_native_results": "b31c282c90367c3baf87232772fc78a7bc36a8c64229faa2ef86a9068e88b25b",
+    "original_comparison_code": "7a2b258624d0219daf2c3bf8582f974a91ec84c8e190db73ed190e4312b37439"
+  },
+  "provider": "alpaca-parquet",
+  "reference": "lean-probe",
+  "results": {
+    "AAPL": {
+      "actions": {
+        "compared": 0,
+        "reason": "reference has no events or provider has no action stage",
+        "status": "not_scored"
+      },
+      "bars": {
+        "compared": 25,
+        "different": 0,
+        "equal": 25,
+        "extra": 0,
+        "maximum_absolute_close_difference": "0.00",
+        "missing": 0,
+        "status": "equal"
+      },
+      "basis": "raw daily close by New York session date",
+      "original_historical_availability": "not_established",
+      "reference_sessions": 25,
+      "strategy_or_return_computed": false
+    }
+  },
+  "session_range": [
+    "2020-08-03",
+    "2020-09-04"
+  ],
+  "symbols": [
+    "AAPL"
+  ]
+}
+## second symbols IBM,SPY lean-daily vs alpaca-parquet, same 25-session window
+exit=0
+{
+  "input_hashes": {
+    "alpaca_parquet_bytes": 887953123,
+    "comparison_code": "b41ee92fad2b4af455310e0a29638666dd58c5ff371e9da8b1b7b93c34dd0f5f",
+    "lean_daily_IBM": "dbc2eb8db4793506612cdc2426047e35fb170f97271d05760b7faf418c63127e",
+    "lean_daily_SPY": "aaa1febad0cb8f91011212c92ff7caac6d4d6415a3b7f73c4b98c438db4274ad",
+    "original_comparison_code": "7a2b258624d0219daf2c3bf8582f974a91ec84c8e190db73ed190e4312b37439"
+  },
+  "provider": "alpaca-parquet",
+  "reference": "lean-daily",
+  "results": {
+    "IBM": {
+      "actions": {
+        "compared": 0,
+        "reason": "reference has no events or provider has no action stage",
+        "status": "not_scored"
+      },
+      "bars": {
+        "compared": 25,
+        "different": 1,
+        "equal": 24,
+        "extra": 0,
+        "maximum_absolute_close_difference": "0.0200",
+        "missing": 0,
+        "status": "differences"
+      },
+      "basis": "raw daily close by New York session date",
+      "original_historical_availability": "not_established",
+      "reference_sessions": 25,
+      "strategy_or_return_computed": false
+    },
+    "SPY": {
+      "actions": {
+        "compared": 0,
+        "reason": "reference has no events or provider has no action stage",
+        "status": "not_scored"
+      },
+      "bars": {
+        "compared": 25,
+        "different": 24,
+        "equal": 1,
+        "extra": 0,
+        "maximum_absolute_close_difference": "0.5106",
+        "missing": 0,
+        "status": "differences"
+      },
+      "basis": "raw daily close by New York session date",
+      "original_historical_availability": "not_established",
+      "reference_sessions": 25,
+      "strategy_or_return_computed": false
+    }
+  },
+  "session_range": [
+    "2020-08-03",
+    "2020-09-04"
+  ],
+  "symbols": [
+    "IBM",
+    "SPY"
+  ]
+}
+## IBM,SPY,AAPL lean-daily vs alpaca-parquet 2016-01-04..2021-03-31
+exit=0
+{
+  "input_hashes": {
+    "alpaca_parquet_bytes": 887953123,
+    "comparison_code": "b41ee92fad2b4af455310e0a29638666dd58c5ff371e9da8b1b7b93c34dd0f5f",
+    "lean_daily_AAPL": "a6f609711a1f550252f95a4edfaa5ac2c6dd75ca9a1fbbb417e853d1516831fe",
+    "lean_daily_IBM": "dbc2eb8db4793506612cdc2426047e35fb170f97271d05760b7faf418c63127e",
+    "lean_daily_SPY": "aaa1febad0cb8f91011212c92ff7caac6d4d6415a3b7f73c4b98c438db4274ad",
+    "original_comparison_code": "7a2b258624d0219daf2c3bf8582f974a91ec84c8e190db73ed190e4312b37439"
+  },
+  "provider": "alpaca-parquet",
+  "reference": "lean-daily",
+  "results": {
+    "AAPL": {
+      "actions": {
+        "compared": 0,
+        "reason": "reference has no events or provider has no action stage",
+        "status": "not_scored"
+      },
+      "bars": {
+        "compared": 1320,
+        "different": 43,
+        "equal": 1277,
+        "extra": 0,
+        "maximum_absolute_close_difference": "0.3400",
+        "missing": 0,
+        "status": "differences"
+      },
+      "basis": "raw daily close by New York session date",
+      "original_historical_availability": "not_established",
+      "reference_sessions": 1320,
+      "strategy_or_return_computed": false
+    },
+    "IBM": {
+      "actions": {
+        "compared": 0,
+        "reason": "reference has no events or provider has no action stage",
+        "status": "not_scored"
+      },
+      "bars": {
+        "compared": 1320,
+        "different": 211,
+        "equal": 1109,
+        "extra": 0,
+        "maximum_absolute_close_difference": "2.2100",
+        "missing": 0,
+        "status": "differences"
+      },
+      "basis": "raw daily close by New York session date",
+      "original_historical_availability": "not_established",
+      "reference_sessions": 1320,
+      "strategy_or_return_computed": false
+    },
+    "SPY": {
+      "actions": {
+        "compared": 0,
+        "reason": "reference has no events or provider has no action stage",
+        "status": "not_scored"
+      },
+      "bars": {
+        "compared": 1320,
+        "different": 1214,
+        "equal": 106,
+        "extra": 0,
+        "maximum_absolute_close_difference": "7.1300",
+        "missing": 0,
+        "status": "differences"
+      },
+      "basis": "raw daily close by New York session date",
+      "original_historical_availability": "not_established",
+      "reference_sessions": 1320,
+      "strategy_or_return_computed": false
+    }
+  },
+  "session_range": [
+    "2016-01-04",
+    "2021-03-31"
+  ],
+  "symbols": [
+    "IBM",
+    "SPY",
+    "AAPL"
+  ]
+}
+## normalized-csv positive control (IBM, unchanged)
+exit=0
+{
+  "input_hashes": {
+    "comparison_code": "b41ee92fad2b4af455310e0a29638666dd58c5ff371e9da8b1b7b93c34dd0f5f",
+    "lean_daily_IBM": "dbc2eb8db4793506612cdc2426047e35fb170f97271d05760b7faf418c63127e",
+    "normalized_csv": "7ecfeb5c40be655b07f9a84fd04500e337dc73897e9f0c1713a7d64de6f52070",
+    "original_comparison_code": "7a2b258624d0219daf2c3bf8582f974a91ec84c8e190db73ed190e4312b37439"
+  },
+  "provider": "normalized-csv",
+  "reference": "lean-daily",
+  "results": {
+    "IBM": {
+      "actions": {
+        "compared": 0,
+        "reason": "reference has no events or provider has no action stage",
+        "status": "not_scored"
+      },
+      "bars": {
+        "compared": 25,
+        "different": 0,
+        "equal": 25,
+        "extra": 0,
+        "maximum_absolute_close_difference": "0.0000",
+        "missing": 0,
+        "status": "equal"
+      },
+      "basis": "raw daily close by New York session date",
+      "original_historical_availability": "not_established",
+      "reference_sessions": 25,
+      "strategy_or_return_computed": false
+    }
+  },
+  "session_range": [
+    "2020-08-03",
+    "2020-09-04"
+  ],
+  "symbols": [
+    "IBM"
+  ]
+}
+## normalized-csv negative control (IBM, one close +0.01)
+exit=0
+{
+  "input_hashes": {
+    "comparison_code": "b41ee92fad2b4af455310e0a29638666dd58c5ff371e9da8b1b7b93c34dd0f5f",
+    "lean_daily_IBM": "dbc2eb8db4793506612cdc2426047e35fb170f97271d05760b7faf418c63127e",
+    "normalized_csv": "ccf7806036ce680da99abdaa43f461531b1df1a76bf115614413ae226436a5f6",
+    "original_comparison_code": "7a2b258624d0219daf2c3bf8582f974a91ec84c8e190db73ed190e4312b37439"
+  },
+  "provider": "normalized-csv",
+  "reference": "lean-daily",
+  "results": {
+    "IBM": {
+      "actions": {
+        "compared": 0,
+        "reason": "reference has no events or provider has no action stage",
+        "status": "not_scored"
+      },
+      "bars": {
+        "compared": 25,
+        "different": 1,
+        "equal": 24,
+        "extra": 0,
+        "maximum_absolute_close_difference": "0.0100",
+        "missing": 0,
+        "status": "differences"
+      },
+      "basis": "raw daily close by New York session date",
+      "original_historical_availability": "not_established",
+      "reference_sessions": 25,
+      "strategy_or_return_computed": false
+    }
+  },
+  "session_range": [
+    "2020-08-03",
+    "2020-09-04"
+  ],
+  "symbols": [
+    "IBM"
+  ]
+}
+## expect-sessions guard (IBM 24 expected, 25 present)
+exit=1
+    "results": compare(reference, provider, symbols, args.expect_sessions),
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "$HOME/code/nas-wt-g2-market-data-reference/blueprints/gap-wave2-20260923/us-equities__market-data-reference/compare_multi.py", line 220, in compare
+    raise ValueError("unsupported_reference_session_count")
+ValueError: unsupported_reference_session_count
+## fix-round controls
+unavailable_reference: {"status": "unavailable", "reason": "reference_request_failed", "compared": 0}
+symbol_absent_from_reference: {"status": "unavailable", "reason": "no_reference_sessions", "compared": 0}
+filtered_action_rows: [{"symbol": "AAPL", "ex_date": "2020-08-07"}]

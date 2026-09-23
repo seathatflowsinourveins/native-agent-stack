@@ -1,0 +1,69 @@
+{
+  "L5.1": {
+    "original_sha256": "6356b077266baba83804538bfadab91a5a467e31e170c292b4c6d5c9aca07d9f",
+    "original_sha256_matches_raw_index_source": true,
+    "events": [
+      {
+        "job": "nanosecond-replay.materialize",
+        "eventType": "START",
+        "run_id_published_placeholder": "uuid-redacted-01"
+      },
+      {
+        "job": "nanosecond-replay.materialize",
+        "eventType": "COMPLETE",
+        "run_id_published_placeholder": "uuid-redacted-01"
+      },
+      {
+        "job": "nanosecond-replay.select",
+        "eventType": "START",
+        "run_id_published_placeholder": "uuid-redacted-02"
+      },
+      {
+        "job": "nanosecond-replay.select",
+        "eventType": "COMPLETE",
+        "run_id_published_placeholder": "uuid-redacted-02"
+      }
+    ],
+    "per_job": {
+      "nanosecond-replay.materialize": {
+        "run_id_published_placeholder": "uuid-redacted-01",
+        "start_complete_same_run_id": true
+      },
+      "nanosecond-replay.select": {
+        "run_id_published_placeholder": "uuid-redacted-02",
+        "start_complete_same_run_id": true
+      }
+    },
+    "two_distinct_run_ids": true,
+    "problems": [],
+    "detector_control": {
+      "mutation": "nanosecond-replay.select COMPLETE runId replaced by the nanosecond-replay.materialize runId",
+      "problems": [
+        "nanosecond-replay.select: START and COMPLETE runIds differ"
+      ],
+      "flagged": true
+    },
+    "passed": true
+  },
+  "L5.2": {
+    "published_sha256": "e89b90f6795aff1a60f9984a7cd049a4b8dc324eae8cba278a2bfe020b35d5da",
+    "spec_sha256": "69f68bee00b9beac88a87059c0102410e7bb05f3f43c46d02a0409831eceb0d2",
+    "spec_id": "https://openlineage.io/spec/2-0-2/OpenLineage.json",
+    "format_checker": "jsonschema.FormatChecker()",
+    "jsonschema_version": "4.26.0",
+    "published_events": 4,
+    "runids_mapped_from_placeholder": 4,
+    "mapping": "only run.runId values matching ^uuid-redacted-NN$ -> 00000000-0000-4000-8000-0000000000NN, in memory",
+    "published_errors_after_runid_mapping": [],
+    "detector_control": {
+      "input": "the published bytes unmapped",
+      "format_errors": [
+        "'uuid-redacted-01' is not a 'uuid'",
+        "'uuid-redacted-02' is not a 'uuid'"
+      ],
+      "error_count": 8,
+      "flagged": true
+    },
+    "passed": true
+  }
+}

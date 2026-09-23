@@ -3,6 +3,7 @@
 import argparse
 from datetime import datetime, timezone
 import hashlib
+import importlib.util
 import io
 import json
 import os
@@ -18,6 +19,9 @@ import urllib.request
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[2]
+_PATH_SAFETY_SPEC = importlib.util.spec_from_file_location("path_safety", ROOT / "scripts/path_safety.py")
+_path_safety = importlib.util.module_from_spec(_PATH_SAFETY_SPEC)
+_PATH_SAFETY_SPEC.loader.exec_module(_path_safety)
 MARKER = 'NATIVE_REBOOT_OBSERVER '
 GUEST_ARCHIVE = ('sudo /usr/bin/tar --exclude=./dagu-home/data/auth '
                  '-C /var/lib/service-reboot -czf - .')
@@ -143,8 +147,12 @@ def audit_guest(guest, observations, host, frozen):
 
 
 def run(work):
-    if not work.is_absolute() or work.exists() or work.is_symlink() or any(p.is_symlink() for p in work.parents):
+    if not work.is_absolute() or work.exists() or work.is_symlink():
         raise ValueError('--work must be a new absolute path without symlink ancestors')
+    # See scripts/path_safety.py: a symlink is tolerated only when it is a
+    # trusted OS-level boundary link (root-owned, not group/world-writable,
+    # e.g. macOS's /tmp -> /private/tmp); $TMPDIR grants no exemption.
+    _path_safety.refuse_untrusted_symlinks(work, '--work must be a new absolute path without symlink ancestors')
     # Execution is intentionally unavailable on an existing desktop host.
     if os.environ.get('GITHUB_ACTIONS') != 'true' or os.environ.get('RUNNER_ENVIRONMENT') != 'github-hosted':
         raise ValueError('Execution requires the declared disposable GitHub-hosted runner')
@@ -245,8 +253,13 @@ def run(work):
         device_help = command('qemu-block-device-help', ['qemu-system-x86_64', '-device', 'virtio-blk-pci,help'])
         verify_block_device_help((device_help.stdout + device_help.stderr).decode())
         command('runner-packages', ['dpkg-query', '-W', 'qemu-system-x86', 'qemu-utils', 'cloud-image-utils', 'ubuntu-cloudimage-keyring'])
+        # scripts/path_safety.py is a host-side-only dependency of run()'s own
+        # symlink-ancestor check, never shipped to the guest -- tracked here
+        # (not in source_paths, which is copied into payload/) so a changed
+        # helper still shows up in repository_inputs.
         inputs = sorted(set(source_paths + [p for p in HERE.iterdir() if p.is_file()] +
-                            [ROOT / '.github/workflows/native-service-reboot.yml', ROOT / 'tests/test_service_reboot.py']))
+                            [ROOT / '.github/workflows/native-service-reboot.yml', ROOT / 'tests/test_service_reboot.py',
+                             ROOT / 'scripts/path_safety.py']))
         frozen = {'repository_inputs': {str(p.relative_to(ROOT)): digest(p) for p in inputs},
                   'payload_hashes': {p.name: digest(p) for p in payload.iterdir()},
                   'image_sha256': digest(image_path), 'dagu_archive_sha256': digest(archive),

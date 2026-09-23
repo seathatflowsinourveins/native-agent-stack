@@ -1,0 +1,20 @@
+2026-09-23T07:26:43.460Z [ERROR]: Error in transform function
+{
+  "error": {
+    "name": "Error",
+    "message": "injected transient failure for C3 (first attempt)"
+  },
+  "message": "injected transient failure for C3 (first attempt)",
+  "transform": "[inline transform]: (process.env.INJECT_FAIL === '1' && context.vars.claim.startsWith(process.env.C…"
+}
+2026-09-23T07:26:43.461Z [ERROR]: Provider call failed during eval
+{
+  "providerId": "echo",
+  "providerLabel": "exact-text-baseline-v1",
+  "promptIdx": 0,
+  "testIdx": 2,
+  "error": {
+    "name": "Error",
+    "message": "Transform failed ([inline transform]: (process.env.INJECT_FAIL === '1' && context.vars.claim.startsWith(process.env.C…): injected transient failure for C3 (first attempt)"
+  }
+}

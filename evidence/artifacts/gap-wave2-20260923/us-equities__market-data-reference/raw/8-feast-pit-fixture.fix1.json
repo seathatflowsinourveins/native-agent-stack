@@ -1,0 +1,51 @@
+{
+ "feast": "0.66.0",
+ "pandas": "2.3.3",
+ "rows_returned": 4,
+ "checks": [
+  {
+   "symbol": "AAA",
+   "entity_ts": "2020-02-01T00:00:00+00:00",
+   "feast": 1.0,
+   "oracle": 1.0,
+   "match": true
+  },
+  {
+   "symbol": "AAA",
+   "entity_ts": "2020-05-01T00:00:00+00:00",
+   "feast": 1.15,
+   "oracle": 1.15,
+   "match": true
+  },
+  {
+   "symbol": "AAA",
+   "entity_ts": "2020-06-30T00:00:00+00:00",
+   "feast": 1.15,
+   "oracle": 1.15,
+   "match": true
+  },
+  {
+   "symbol": "CCC",
+   "entity_ts": "2020-06-30T00:00:00+00:00",
+   "feast": null,
+   "oracle": null,
+   "match": true
+  }
+ ],
+ "future_value_leaked": false,
+ "restatement_wins": true,
+ "stale_value_never_returned": true,
+ "entity_rows_in": 5,
+ "entity_rows_dropped": [
+  {
+   "symbol": "BBB",
+   "entity_ts": "2020-06-30T00:00:00+00:00",
+   "oracle": null
+  }
+ ],
+ "dropped_rows_all_have_null_oracle": true,
+ "returned_rows_match_oracle": true,
+ "join_cardinality_ok": true,
+ "self_test_duplicate_row_rejected": true,
+ "self_test_unrequested_row_rejected": true
+}

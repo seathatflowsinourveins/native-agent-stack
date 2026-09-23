@@ -1,0 +1,297 @@
+{
+  "id": "gap-wave2-20260923-us-equities-portfolio-risk-3-evaluate-rerun-hash-compare",
+  "catalog": "us-equities",
+  "layer_id": "portfolio-risk",
+  "gap_index": 3,
+  "gap_text": "The 42 run artifacts (ledger, selections, stdout/stderr) are private and not in the repository. Only their hashes are retained. The independent review did not re-run scoring.",
+  "gap_text_sha256": "472b3b2e8eb256513a7cbb2913ad9c05d3b95bcefe965ba9e0703d65359f711a",
+  "next_check": "Re-run evaluate.py in the pinned 3.13.15 venv on plan.json, then compare the sha256 of each regenerated ledger, selections and stdout artifact with the 42 retained hashes. Record the matches and mismatches.",
+  "preregistration": {
+    "written_at": "2026-09-23T06:32:44Z",
+    "expectation": "A fresh Python 3.13.15 venv synced from requirements.lock re-runs evaluate.py on plan.json into a fresh directory. Scoring artifacts without clocks (candidate-ledger.json, 21 selection files, run-1.stdout.txt, run-1.stderr.txt) match the retained hashes byte for byte. freeze.json differs only in frozen_utc and results.json only in freeze_sha256 (which depends on freeze.json). Setup logs (venv/sync/compile/check/freeze stdout/stderr) differ where they embed paths or timings.",
+    "criteria": "settled iff all 42 retained entries are compared (match, mismatch-explained or not-regenerable listed individually), every scoring artifact (ledger, 21 selections, stdout, stderr) matches or its mismatch is shown by a normalized semantic diff to leave every scored value unchanged, and the regenerated scoring artifacts are committed (ledger gzip-compressed) so they are no longer private. Detection: exact sha256 comparison per file; for mismatches a JSON diff after removing only the declared clock/hash fields must be empty or the item counts as unexplained."
+  },
+  "commands": [
+    {
+      "cmd": "bash blueprints/gap-wave2-20260923/us-equities__portfolio-risk/gap3_rerun.sh $CACHE/g3-wave",
+      "exit": 0,
+      "started_utc": "2026-09-23T06:33:39Z",
+      "step_exits": {
+        "compile": 0,
+        "compile-final": 0,
+        "venv": 0,
+        "sync-final": 0,
+        "check": 0,
+        "freeze": 0,
+        "run-1": 0
+      }
+    },
+    {
+      "cmd": "python3 blueprints/gap-wave2-20260923/us-equities__portfolio-risk/gap3_compare.py $CACHE/g3-wave > evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/3/compare.json",
+      "exit": 0
+    }
+  ],
+  "results": {
+    "counts": {
+      "match": 29,
+      "mismatch": 9,
+      "not_regenerated": 4
+    },
+    "non_matching": {
+      "run-1/freeze.json": "mismatch",
+      "run-1/results.json": "mismatch",
+      "setup/api.stderr.txt": "not_regenerated",
+      "setup/api.stdout.txt": "not_regenerated",
+      "setup/check.stderr.txt": "mismatch",
+      "setup/compile-final.stderr.txt": "mismatch",
+      "setup/compile.stderr.txt": "mismatch",
+      "setup/compile.stdout.txt": "mismatch",
+      "setup/freeze.stderr.txt": "mismatch",
+      "setup/sync-final.stderr.txt": "mismatch",
+      "setup/sync.stderr.txt": "not_regenerated",
+      "setup/sync.stdout.txt": "not_regenerated",
+      "setup/venv.stderr.txt": "mismatch"
+    },
+    "reconstruction": {
+      "retained_frozen_utc_substituted": "2026-09-19T22:55:35.365101+00:00",
+      "reconstructed_freeze_sha256": "8cefddb1be8c6dc0384856d97ba54705e017e43630c912ef1e160e495dfe8fed",
+      "reconstructed_freeze_equals_retained": true,
+      "reconstructed_results_sha256": "79d146d0a9506ecea3124ce084bcce701b33427d78fd4bba417deb4c6cd91c49",
+      "reconstructed_results_equals_retained": true,
+      "results_equal_public_receipt_results": {
+        "assets": true,
+        "auxiliary": true,
+        "development_folds": true,
+        "inputs_unchanged": true,
+        "kind": true,
+        "ledger_records": true,
+        "ledger_sha256": true,
+        "no_pnl_or_execution_claim": true,
+        "plan_sha256": true,
+        "reserved": true,
+        "session_counts": true,
+        "versions": true
+      },
+      "results_ledger_records": 6605,
+      "results_inputs_unchanged": true
+    },
+    "scoring_artifacts": "candidate-ledger.json, 21 selection files, run-1.stdout.txt and run-1.stderr.txt match the retained sha256 byte for byte; freeze.json and results.json reproduce the retained hashes exactly after substituting the retained public frozen_utc (and the resulting freeze hash), so all 26 run-1 artifacts are reproduced",
+    "setup_logs": "venv/sync-final/check/freeze/compile-final stderr differ only in host paths and timings; the initial DuckDB compile input is unknown (guess differs); api stdout/stderr and the first sync were not regenerated because their commands are not recorded",
+    "regenerated_artifacts_committed": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/3/regenerated (ledger stored uncompressed, sha256 08ea5309... equal to the retained hash; setup logs with $HOME substitution; see raw/REDACTIONS.json)"
+  },
+  "outcome": "advanced",
+  "evidence_class": "local_integration",
+  "limits": [
+    "Remaining (why advanced, per the independent review): 4 of the 42 retained entries (setup/api.stdout, setup/api.stderr, setup/sync.stdout, setup/sync.stderr) have no recorded command and were not regenerated, so they remain private; of the 7 setup-log mismatches, 5 are host-path/timing text (venv, sync-final, check, freeze stderr; compile-final stderr timing) and 2 (initial compile stdout/stderr) come from an unknown DuckDB-era input. Every scoring artifact (ledger, 21 selections, results, freeze, stdout, stderr) is reproduced and committed.",
+    "This replay re-scores inspected evidence; it does not reset the 2021Q1 reserved segment's status."
+  ],
+  "checked_at": "2026-09-23T06:33:39Z",
+  "raw_artifacts": [
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/3/compare.json",
+      "sha256": "3088ee97ac6af8a63a923bd11189255c6cca857e03d57c1e44617f0a9ca46cf4"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/3/regenerated/run-1/candidate-ledger.json",
+      "sha256": "08ea5309466045574ba4b9c8524608ed66c91edb22cb592a5bad84e1e2f42672"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/3/regenerated/run-1/development-1.selection.json",
+      "sha256": "f2fe53d5aaaceaecd0a6b0b738cfb7b4628cc0c23ec43a9d6e3550385ee26923"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/3/regenerated/run-1/development-10.selection.json",
+      "sha256": "ad077a9704ce51eb73566eed750345ee41f9bd28818837992f7a89540fbdc734"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/3/regenerated/run-1/development-11.selection.json",
+      "sha256": "49ef82009925ce18836489222eb719424dd45b4c0e24e3f620239870380259e1"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/3/regenerated/run-1/development-12.selection.json",
+      "sha256": "8c1ae0b4002ca3f992597e26148ae4a4890a2d7cdfe031d1e70aead543d1c64f"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/3/regenerated/run-1/development-13.selection.json",
+      "sha256": "e418690b33c6ff01098f37fa90ab18970f732226b104a67f309b5d85b6b1f287"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/3/regenerated/run-1/development-14.selection.json",
+      "sha256": "d444ba303a2c3a3b497e4e7593cdb34a3761579da1fbb20f1afbcb3df6ca30d3"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/3/regenerated/run-1/development-15.selection.json",
+      "sha256": "63c8c0adb217032f9ba442b12bebfaa1353fa214ef908cee28c17333d91e1258"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/3/regenerated/run-1/development-16.selection.json",
+      "sha256": "728e27c32f5a2e5e5c85070445f0746f3c84b74cb9119150164e876f6d4440ee"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/3/regenerated/run-1/development-17.selection.json",
+      "sha256": "460908c76ce232255dad6653dfe2bacb6ee1d77bb7084e9568849034a0c7a48e"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/3/regenerated/run-1/development-18.selection.json",
+      "sha256": "c0bf777becb5a8ac33bec6c36ac08e7568667bbdb473c03e11aeaa5ce51ca4ee"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/3/regenerated/run-1/development-19.selection.json",
+      "sha256": "a09bdff38ac6aaa88448f1e252437af7273063f7bc8b8de87581bb8f0a1ddf8b"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/3/regenerated/run-1/development-2.selection.json",
+      "sha256": "83dd49d44cdfda69ad7c200bb6f7028a9566242baeac32d7980fc7c2a6f5f0a8"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/3/regenerated/run-1/development-20.selection.json",
+      "sha256": "6f00ade9fbc616cc0eb5430ebb4307650725f73166f35dd3b2062fc363393220"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/3/regenerated/run-1/development-3.selection.json",
+      "sha256": "2b450c795b1bd1e5f76453923355d724a6573fc423e1448c35cd66aaf7bb577d"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/3/regenerated/run-1/development-4.selection.json",
+      "sha256": "8664efef859eb7deb2e0210f4d283c1396740438f21615517fbe668e77b979e8"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/3/regenerated/run-1/development-5.selection.json",
+      "sha256": "61712ac9dcdb72fe452cb64b5d3f0ce4ed7a83286de2718eaf2a76f778d31ef0"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/3/regenerated/run-1/development-6.selection.json",
+      "sha256": "7dff682665670ee0f10a3723f55d08a3ec3dca20dfa76309574641eaa583da36"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/3/regenerated/run-1/development-7.selection.json",
+      "sha256": "ba3e35563ef001fccec34df18517067e1189aa9ee79a346cb171fe33ab8f72f4"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/3/regenerated/run-1/development-8.selection.json",
+      "sha256": "f310bf598c0b117d19eeae263ae1cc220ce53160b04e2304466ac10eed04910a"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/3/regenerated/run-1/development-9.selection.json",
+      "sha256": "f1ad609019950172385224d8d0d8d974e4a22abc44b3a976ff0c965709300d47"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/3/regenerated/run-1/freeze.json",
+      "sha256": "7eef3be01cf065af046c190d0091eca503ddde7a5a8168cadb33d6d48b681dfe"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/3/regenerated/run-1/reserved-2021q1.selection.json",
+      "sha256": "7c78902a3c8014a62ce6e0eb71093b3ca5c850cb6b9418029873df602adc19fc"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/3/regenerated/run-1/results.json",
+      "sha256": "1e217c9c636a97929696a92aaff1b5061db0d4831328d6cf1cf5553f4914eb7c"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/3/regenerated/run-1.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/3/regenerated/run-1.stdout.txt",
+      "sha256": "524801ce4afdaef5de44d68525cbbb206a86e67d76385fe4342f4033e514a62b"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/3/regenerated/setup/check.stderr.txt",
+      "sha256": "03af27dabc36badd135c97440bb1d3a516abfc4a5d19d6ef850e4a001c852f6b"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/3/regenerated/setup/check.stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/3/regenerated/setup/compile-final.stderr.txt",
+      "sha256": "f0e6f40f164a08ad9c2d8be383f7ecd9a16142bdf20574debfbe9ad155dd3a10"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/3/regenerated/setup/compile-final.stdout.txt",
+      "sha256": "bb82ec0446011a74f5d1ee47ef3b02b62e56151d8a2937f6b7554d30fd7bcc27"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/3/regenerated/setup/compile.stderr.txt",
+      "sha256": "e5cfd39c8c20ab3f089057dde3044dd796126fe8812946075811e8d1aacc459b"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/3/regenerated/setup/compile.stdout.txt",
+      "sha256": "9401be641e59e5067176ac2fdafd1c9e6045177cd606cb98d7a74f9221ca3de9"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/3/regenerated/setup/freeze.stderr.txt",
+      "sha256": "a2728fc7d7fe201ad7a91325786ef56243f995316aa74e195751ea5b3b3e7878"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/3/regenerated/setup/freeze.stdout.txt",
+      "sha256": "ac8e8d95c94e10a81ec1735bbd134d6c1a2028e4a185ab704d8155f0329731a8"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/3/regenerated/setup/sync-final.stderr.txt",
+      "sha256": "947f47695daeb941ae547b7ce3bb9c1f8c630b8d044fadb716f5fdc94c9db1fe"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/3/regenerated/setup/sync-final.stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/3/regenerated/setup/venv.stderr.txt",
+      "sha256": "881f323a06046eeb4344642d27206c4552e997525c3a937f6be84c25f60d45f3"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/3/regenerated/setup/venv.stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/us-equities__portfolio-risk/gap3_rerun.sh",
+      "sha256": "8dea567bc5df45c4e874280c84aff2c2a911274ec9ec77ecbc43d9ecde8f8650"
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/us-equities__portfolio-risk/gap3_compare.py",
+      "sha256": "6479542cc1ac75da3419f10f946bd75d479e74d62ac195e0cb484d3afeb5bd15"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/codex-review-round1.md",
+      "sha256": "143b21745ccc3c0db8a8272a775208d2c62f7c77311ec469afcec2cb0fc684d7"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/codex-review-round2.md",
+      "sha256": "8f2096917a932fe40ee73bd26b84a3c34b62c986f752a530adf22a685fa7a4b2"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/codex-review-round4.md",
+      "sha256": "9aae92f05dda99374540121632494936a26067720e522d7c9dfb2106a4bfc888"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/opus-review-round3.json",
+      "sha256": "565734f27cf8e401468dbd9c04c4d807cb255894d9ccbc43bc098b2ea7f7e510"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/opus-review-round4.json",
+      "sha256": "82d9e7bbfe289a8774bc54d27692e0e71e65a9aec037fb5dbbc96614353293ba"
+    }
+  ],
+  "independent_review": {
+    "reviewer": "Codex CLI 0.155.1 (gpt-6-astra), codex exec --sandbox read-only --ephemeral, one bounded call",
+    "record": [
+      "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/codex-review-round1.md",
+      "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/codex-review-round2.md"
+    ],
+    "round_2": "no round-2 finding for this gap",
+    "findings_and_resolution": "major: settled overclaimed (4 unregenerated setup artifacts; 2 mismatches from unknown input) -> outcome changed to advanced and limits corrected",
+    "round_3": {
+      "record": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/opus-review-round3.json",
+      "resolution": "no round-3 finding for this gap"
+    },
+    "round_4": {
+      "record": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/opus-review-round4.json",
+      "resolution": "no round-4 finding for this gap"
+    },
+    "round_4_codex": {
+      "record": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/raw/review/codex-review-round4.md",
+      "reviewer": "Codex CLI (codex exec --sandbox read-only --ephemeral), one bounded call on commits 6ed9709..a4cbcf8",
+      "resolution": "no finding for this gap"
+    }
+  }
+}

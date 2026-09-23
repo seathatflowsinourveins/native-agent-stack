@@ -121,6 +121,25 @@
         "local_generation_model_tier": "large-32b-q4",
         "workflow_concurrency_cap": 16
       },
+      "measured": {
+        "cores": 24,
+        "cpu_brand": "Intel(R) Core(TM) Ultra 9 275HX",
+        "effective_ram_gb": 47.0,
+        "effective_ram_gb_source": "proc_meminfo",
+        "evidence_class": "native_proven",
+        "gpu": {
+          "evidence_class": "native_proven",
+          "name": "NVIDIA GeForce RTX 5090 Laptop GPU",
+          "vram_gb": 23.9
+        },
+        "is_wsl": true,
+        "platform": "wsl",
+        "ram_gb_proc_meminfo": 47.0,
+        "wslconfig_memory_gb": 48.0,
+        "wslconfig_memory_gb_evidence_class": "source_review",
+        "wslconfig_other_candidates": [],
+        "wslconfig_source": "/mnt/c/Users/example/.wslconfig"
+      },
       "sizing_arithmetic": null
     },
     {
@@ -144,6 +163,7 @@
         }
       },
       "measured_tiers": null,
+      "measured": null,
       "sizing_arithmetic": {
         "workflow_concurrency_cap": "min(16, 60 - 2) = 16 (nproc inside WSL is the .wslconfig processors=60)",
         "local_generation_model_tier": "vram_gb=24 >= 20 -> large-32b-q4",
@@ -164,6 +184,7 @@
         "unified_memory_gb": 48
       },
       "measured_tiers": null,
+      "measured": null,
       "sizing_arithmetic": {
         "workflow_concurrency_cap": "min(16, 12 - 2) = 10",
         "local_generation_model_tier": "vram_gb(unified)=round(48*0.6,1)=28.8 >= 20 -> large-32b-q4",
@@ -184,6 +205,7 @@
         "unified_memory_gb": 64
       },
       "measured_tiers": null,
+      "measured": null,
       "sizing_arithmetic": {
         "workflow_concurrency_cap": "min(16, 14 - 2) = 12",
         "local_generation_model_tier": "vram_gb(unified)=round(64*0.6,1)=38.4 >= 20 -> large-32b-q4",
@@ -199,6 +221,20 @@
       "evidence_class": "native_proven",
       "assumptions": null,
       "measured_tiers": null,
+      "measured": {
+        "cpu_brand": "Apple M1 (Virtual)",
+        "cores": 3,
+        "unified_memory_gb": 7.0,
+        "arm64": true,
+        "mlx_smoke": {
+          "model": "mlx-community/Qwen2.5-0.5B-Instruct-4bit",
+          "revision": "a5339a4131f135d0fdc6a5c8b5bbed2753bbe0f3",
+          "generation_tokens": 32,
+          "tokens_per_second": 146.57,
+          "elapsed_seconds": 1.3029,
+          "peak_memory_gb": 0.288
+        }
+      },
       "sizing_arithmetic": null
     }
   ],
@@ -406,8 +442,8 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "e2e_state": "conditional",
-              "bootstrap_pinned": false,
-              "bootstrap_version": null
+              "bootstrap_pinned": true,
+              "bootstrap_version": "0.1.7"
             },
             "macos-arm64": {
               "e2e_state": "untested",
@@ -870,12 +906,12 @@
             "linux-wsl2-x86_64": {
               "e2e_state": "accepted",
               "bootstrap_pinned": true,
-              "bootstrap_version": "2.1.278"
+              "bootstrap_version": "2.1.280"
             },
             "macos-arm64": {
               "e2e_state": "untested",
               "bootstrap_pinned": true,
-              "bootstrap_version": "2.1.278"
+              "bootstrap_version": "2.1.280"
             }
           }
         },
@@ -1406,8 +1442,8 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "e2e_state": "conditional",
-              "bootstrap_pinned": false,
-              "bootstrap_version": null
+              "bootstrap_pinned": true,
+              "bootstrap_version": "0.1.8"
             },
             "macos-arm64": {
               "e2e_state": "untested",
@@ -1429,8 +1465,8 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "e2e_state": "conditional",
-              "bootstrap_pinned": false,
-              "bootstrap_version": null
+              "bootstrap_pinned": true,
+              "bootstrap_version": "0.38.1"
             },
             "macos-arm64": {
               "e2e_state": "untested",
@@ -1452,8 +1488,8 @@
           "platforms": {
             "linux-wsl2-x86_64": {
               "e2e_state": "conditional",
-              "bootstrap_pinned": false,
-              "bootstrap_version": null
+              "bootstrap_pinned": true,
+              "bootstrap_version": "0.2.7"
             },
             "macos-arm64": {
               "e2e_state": "untested",
@@ -1492,12 +1528,12 @@
             "linux-wsl2-x86_64": {
               "e2e_state": "conditional",
               "bootstrap_pinned": true,
-              "bootstrap_version": "2.1.278"
+              "bootstrap_version": "2.1.280"
             },
             "macos-arm64": {
               "e2e_state": "untested",
               "bootstrap_pinned": true,
-              "bootstrap_version": "2.1.278"
+              "bootstrap_version": "2.1.280"
             }
           }
         },
@@ -2180,6 +2216,36 @@
       ]
     }
   ],
+  "qualified_models": [
+    {
+      "catalog": "foundation",
+      "layer_id": "semantic-rag",
+      "component_id": "vllm",
+      "platform": "linux-wsl2-x86_64",
+      "bars": "local worker for mini-swe-agent/pydantic-ai, hermes tool-call parser, thinking off: 20/20 valid tool calls (bar 19) and 4/5 exact-content tasks (bar 4), one run, exactly at the task bar; evidence/artifacts/sdk-runtime-coverage-20260922/gated-items-20260923.json",
+      "host_id": "rtx5090-laptop-20260923",
+      "model_id": "Qwen/Qwen3-8B-AWQ",
+      "receipt_path": "evidence/hosts/rtx5090-laptop-20260923/rtx5090-laptop-20260923--vllm--use--20260923.json",
+      "result": "pass",
+      "revision": "4da05a8e",
+      "runtime": "vllm",
+      "runtime_version": "0.29.0"
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "semantic-rag",
+      "component_id": "vllm",
+      "platform": "linux-wsl2-x86_64",
+      "bars": "ai-memory hybrid retrieval with query:/passage: prefixes at max-model-len 8192: nDCG@10 +0.078 over all-MiniLM-L6-v2 (95% CI 0.037-0.128, bar 0.03), top-5 hits not lower, 130/130 pages; evidence/artifacts/local-model-alignment-20260923/",
+      "host_id": "rtx5090-laptop-20260923",
+      "model_id": "nvidia/Nemotron-3-Embed-1B-BF16",
+      "receipt_path": "evidence/hosts/rtx5090-laptop-20260923/rtx5090-laptop-20260923--vllm--use--20260923.json",
+      "result": "pass",
+      "revision": "c0c9fea93ea424587517f2c59e20db9f1d6bf615",
+      "runtime": "vllm",
+      "runtime_version": "0.25.0"
+    }
+  ],
   "summary": {
     "layers": {
       "foundation": 20,
@@ -2215,15 +2281,19 @@
     },
     "bootstrap_pinned": {
       "linux-wsl2-x86_64": [
+        "agent-browser",
         "ai-memory",
         "candidate:astral-sh-uv",
         "candidate:cli-cli",
         "claude-code",
         "codex",
         "foundation-ai-memory",
+        "markitdown",
         "mcporter",
+        "openresearch",
         "qmd",
-        "rtk"
+        "rtk",
+        "tavily-cli"
       ],
       "macos-arm64": [
         "ai-memory",

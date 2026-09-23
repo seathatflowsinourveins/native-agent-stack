@@ -1,0 +1,5 @@
+20a21,23
+> # injected regression: documents 2 and 3 swapped, so queries 2 and 3 lose their paired document
+> DOCUMENTS[2], DOCUMENTS[3] = DOCUMENTS[3], DOCUMENTS[2]
+> 
+diff exit (1 = mutation applied): 1

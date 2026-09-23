@@ -1,0 +1,8 @@
+{
+  "execution_count": 1,
+  "validate": {
+    "exit": 0,
+    "stdout_first_line": "{\"components\": 69, \"hashed_files\": 2012, \"profiles\": 4, \"receipts\": 140, \"status\": \"passed\"}",
+    "stdout_first_line_sha256": "941352217aafbe965f2cb9ec5498d6b763d818f9ee6ef61310dde86bfd8e9632"
+  }
+}

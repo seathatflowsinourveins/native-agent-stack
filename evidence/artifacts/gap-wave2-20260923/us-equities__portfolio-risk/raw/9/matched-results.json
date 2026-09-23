@@ -1,0 +1,672 @@
+{
+  "cost_proxy": {
+    "charged": "once per fold on the first test day x invested weight",
+    "round_trip_fraction": 0.002
+  },
+  "folds": [
+    {
+      "cvxportfolio_execute_time": "2016-01-04 00:00:00",
+      "cvxportfolio_history_rows": 252,
+      "fold": 1,
+      "test_first": "2016-01-13",
+      "test_last": "2016-04-13",
+      "test_rows": 63,
+      "train_first": "2015-01-05",
+      "train_last": "2016-01-04",
+      "train_rows": 252,
+      "weights": {
+        "cvxportfolio_spo_min_variance": {
+          "IWM": 0.18731390326633512,
+          "QQQ": 0.0,
+          "SPY": 0.8126860967336648
+        },
+        "equal_weight_control": {
+          "IWM": 0.3333333333333333,
+          "QQQ": 0.3333333333333333,
+          "SPY": 0.3333333333333333
+        },
+        "skfolio_meanrisk_min_variance": {
+          "IWM": 0.18734495436921597,
+          "QQQ": 2.6055372958621934e-07,
+          "SPY": 0.8126547850770545
+        }
+      }
+    },
+    {
+      "cvxportfolio_execute_time": "2016-04-05 00:00:00",
+      "cvxportfolio_history_rows": 252,
+      "fold": 2,
+      "test_first": "2016-04-14",
+      "test_last": "2016-07-13",
+      "test_rows": 63,
+      "train_first": "2015-04-07",
+      "train_last": "2016-04-05",
+      "train_rows": 252,
+      "weights": {
+        "cvxportfolio_spo_min_variance": {
+          "IWM": 0.023536952796677668,
+          "QQQ": 0.0,
+          "SPY": 0.9764630472033224
+        },
+        "equal_weight_control": {
+          "IWM": 0.3333333333333333,
+          "QQQ": 0.3333333333333333,
+          "SPY": 0.3333333333333333
+        },
+        "skfolio_meanrisk_min_variance": {
+          "IWM": 0.023285028109391773,
+          "QQQ": 1.2634769846239354e-07,
+          "SPY": 0.9767148455429097
+        }
+      }
+    },
+    {
+      "cvxportfolio_execute_time": "2016-07-05 00:00:00",
+      "cvxportfolio_history_rows": 252,
+      "fold": 3,
+      "test_first": "2016-07-14",
+      "test_last": "2016-10-11",
+      "test_rows": 63,
+      "train_first": "2015-07-07",
+      "train_last": "2016-07-05",
+      "train_rows": 252,
+      "weights": {
+        "cvxportfolio_spo_min_variance": {
+          "IWM": 1.719740828249369e-22,
+          "QQQ": 1.7196311427111902e-22,
+          "SPY": 1.0
+        },
+        "equal_weight_control": {
+          "IWM": 0.3333333333333333,
+          "QQQ": 0.3333333333333333,
+          "SPY": 0.3333333333333333
+        },
+        "skfolio_meanrisk_min_variance": {
+          "IWM": 6.089171923761337e-06,
+          "QQQ": 1.116661420096123e-06,
+          "SPY": 0.999992794166655
+        }
+      }
+    },
+    {
+      "cvxportfolio_execute_time": "2016-10-03 00:00:00",
+      "cvxportfolio_history_rows": 252,
+      "fold": 4,
+      "test_first": "2016-10-12",
+      "test_last": "2017-01-11",
+      "test_rows": 63,
+      "train_first": "2015-10-05",
+      "train_last": "2016-10-03",
+      "train_rows": 252,
+      "weights": {
+        "cvxportfolio_spo_min_variance": {
+          "IWM": 1.7203266898418193e-22,
+          "QQQ": 1.7203187846714698e-22,
+          "SPY": 1.0
+        },
+        "equal_weight_control": {
+          "IWM": 0.3333333333333333,
+          "QQQ": 0.3333333333333333,
+          "SPY": 0.3333333333333333
+        },
+        "skfolio_meanrisk_min_variance": {
+          "IWM": 1.2731339072827287e-07,
+          "QQQ": 5.000948198291684e-07,
+          "SPY": 0.9999993725917895
+        }
+      }
+    },
+    {
+      "cvxportfolio_execute_time": "2017-01-03 00:00:00",
+      "cvxportfolio_history_rows": 252,
+      "fold": 5,
+      "test_first": "2017-01-12",
+      "test_last": "2017-04-12",
+      "test_rows": 63,
+      "train_first": "2016-01-05",
+      "train_last": "2017-01-03",
+      "train_rows": 252,
+      "weights": {
+        "cvxportfolio_spo_min_variance": {
+          "IWM": 1.7201435367701927e-22,
+          "QQQ": 1.7194797210890168e-22,
+          "SPY": 1.0
+        },
+        "equal_weight_control": {
+          "IWM": 0.3333333333333333,
+          "QQQ": 0.3333333333333333,
+          "SPY": 0.3333333333333333
+        },
+        "skfolio_meanrisk_min_variance": {
+          "IWM": 5.813199840341682e-08,
+          "QQQ": 3.087439176772188e-07,
+          "SPY": 0.9999996331240838
+        }
+      }
+    },
+    {
+      "cvxportfolio_execute_time": "2017-04-04 00:00:00",
+      "cvxportfolio_history_rows": 252,
+      "fold": 6,
+      "test_first": "2017-04-13",
+      "test_last": "2017-07-13",
+      "test_rows": 63,
+      "train_first": "2016-04-06",
+      "train_last": "2017-04-04",
+      "train_rows": 252,
+      "weights": {
+        "cvxportfolio_spo_min_variance": {
+          "IWM": 1.7200720511893734e-22,
+          "QQQ": 1.7201930153333877e-22,
+          "SPY": 1.0
+        },
+        "equal_weight_control": {
+          "IWM": 0.3333333333333333,
+          "QQQ": 0.3333333333333333,
+          "SPY": 0.3333333333333333
+        },
+        "skfolio_meanrisk_min_variance": {
+          "IWM": 3.137924662018549e-07,
+          "QQQ": 4.193899522564642e-06,
+          "SPY": 0.9999954923080112
+        }
+      }
+    },
+    {
+      "cvxportfolio_execute_time": "2017-07-05 00:00:00",
+      "cvxportfolio_history_rows": 252,
+      "fold": 7,
+      "test_first": "2017-07-14",
+      "test_last": "2017-10-11",
+      "test_rows": 63,
+      "train_first": "2016-07-06",
+      "train_last": "2017-07-05",
+      "train_rows": 252,
+      "weights": {
+        "cvxportfolio_spo_min_variance": {
+          "IWM": 1.7199618100930568e-22,
+          "QQQ": 1.7199477439502662e-22,
+          "SPY": 1.0
+        },
+        "equal_weight_control": {
+          "IWM": 0.3333333333333333,
+          "QQQ": 0.3333333333333333,
+          "SPY": 0.3333333333333333
+        },
+        "skfolio_meanrisk_min_variance": {
+          "IWM": 4.3613265874221305e-08,
+          "QQQ": 1.7612529612043407e-07,
+          "SPY": 0.9999997802614379
+        }
+      }
+    },
+    {
+      "cvxportfolio_execute_time": "2017-10-03 00:00:00",
+      "cvxportfolio_history_rows": 252,
+      "fold": 8,
+      "test_first": "2017-10-12",
+      "test_last": "2018-01-11",
+      "test_rows": 63,
+      "train_first": "2016-10-04",
+      "train_last": "2017-10-03",
+      "train_rows": 252,
+      "weights": {
+        "cvxportfolio_spo_min_variance": {
+          "IWM": 1.7199944828537854e-22,
+          "QQQ": 1.7199942621545405e-22,
+          "SPY": 1.0
+        },
+        "equal_weight_control": {
+          "IWM": 0.3333333333333333,
+          "QQQ": 0.3333333333333333,
+          "SPY": 0.3333333333333333
+        },
+        "skfolio_meanrisk_min_variance": {
+          "IWM": 7.012189574945848e-07,
+          "QQQ": 3.228002460491277e-06,
+          "SPY": 0.999996070778582
+        }
+      }
+    },
+    {
+      "cvxportfolio_execute_time": "2018-01-03 00:00:00",
+      "cvxportfolio_history_rows": 252,
+      "fold": 9,
+      "test_first": "2018-01-12",
+      "test_last": "2018-04-13",
+      "test_rows": 63,
+      "train_first": "2017-01-04",
+      "train_last": "2018-01-03",
+      "train_rows": 252,
+      "weights": {
+        "cvxportfolio_spo_min_variance": {
+          "IWM": 1.7199883285796233e-22,
+          "QQQ": 1.720040023471356e-22,
+          "SPY": 1.0
+        },
+        "equal_weight_control": {
+          "IWM": 0.3333333333333333,
+          "QQQ": 0.3333333333333333,
+          "SPY": 0.3333333333333333
+        },
+        "skfolio_meanrisk_min_variance": {
+          "IWM": 3.3653886520319792e-06,
+          "QQQ": 7.0990226847443165e-06,
+          "SPY": 0.9999895355886631
+        }
+      }
+    },
+    {
+      "cvxportfolio_execute_time": "2018-04-05 00:00:00",
+      "cvxportfolio_history_rows": 252,
+      "fold": 10,
+      "test_first": "2018-04-16",
+      "test_last": "2018-07-13",
+      "test_rows": 63,
+      "train_first": "2017-04-05",
+      "train_last": "2018-04-05",
+      "train_rows": 252,
+      "weights": {
+        "cvxportfolio_spo_min_variance": {
+          "IWM": 0.035013465653723604,
+          "QQQ": 7.027067773240264e-07,
+          "SPY": 0.964985831639499
+        },
+        "equal_weight_control": {
+          "IWM": 0.3333333333333333,
+          "QQQ": 0.3333333333333333,
+          "SPY": 0.3333333333333333
+        },
+        "skfolio_meanrisk_min_variance": {
+          "IWM": 0.03505340330448954,
+          "QQQ": 7.697253488266473e-08,
+          "SPY": 0.9649465197229757
+        }
+      }
+    },
+    {
+      "cvxportfolio_execute_time": "2018-07-05 00:00:00",
+      "cvxportfolio_history_rows": 252,
+      "fold": 11,
+      "test_first": "2018-07-16",
+      "test_last": "2018-10-11",
+      "test_rows": 63,
+      "train_first": "2017-07-06",
+      "train_last": "2018-07-05",
+      "train_rows": 252,
+      "weights": {
+        "cvxportfolio_spo_min_variance": {
+          "IWM": 0.2335466949113308,
+          "QQQ": 0.0,
+          "SPY": 0.7664533050886693
+        },
+        "equal_weight_control": {
+          "IWM": 0.3333333333333333,
+          "QQQ": 0.3333333333333333,
+          "SPY": 0.3333333333333333
+        },
+        "skfolio_meanrisk_min_variance": {
+          "IWM": 0.23351869088596847,
+          "QQQ": 4.399426813155263e-08,
+          "SPY": 0.7664812651197636
+        }
+      }
+    },
+    {
+      "cvxportfolio_execute_time": "2018-10-03 00:00:00",
+      "cvxportfolio_history_rows": 252,
+      "fold": 12,
+      "test_first": "2018-10-12",
+      "test_last": "2019-01-14",
+      "test_rows": 63,
+      "train_first": "2017-10-04",
+      "train_last": "2018-10-03",
+      "train_rows": 252,
+      "weights": {
+        "cvxportfolio_spo_min_variance": {
+          "IWM": 0.3070440907573159,
+          "QQQ": 0.0,
+          "SPY": 0.692955909242684
+        },
+        "equal_weight_control": {
+          "IWM": 0.3333333333333333,
+          "QQQ": 0.3333333333333333,
+          "SPY": 0.3333333333333333
+        },
+        "skfolio_meanrisk_min_variance": {
+          "IWM": 0.30681303245891484,
+          "QQQ": 2.9551926960335484e-08,
+          "SPY": 0.6931869379891581
+        }
+      }
+    },
+    {
+      "cvxportfolio_execute_time": "2019-01-04 00:00:00",
+      "cvxportfolio_history_rows": 252,
+      "fold": 13,
+      "test_first": "2019-01-15",
+      "test_last": "2019-04-15",
+      "test_rows": 63,
+      "train_first": "2018-01-04",
+      "train_last": "2019-01-04",
+      "train_rows": 252,
+      "weights": {
+        "cvxportfolio_spo_min_variance": {
+          "IWM": 0.25622802080284407,
+          "QQQ": 0.0,
+          "SPY": 0.7437719791971559
+        },
+        "equal_weight_control": {
+          "IWM": 0.3333333333333333,
+          "QQQ": 0.3333333333333333,
+          "SPY": 0.3333333333333333
+        },
+        "skfolio_meanrisk_min_variance": {
+          "IWM": 0.25631696217284905,
+          "QQQ": 2.6807009482458194e-08,
+          "SPY": 0.7436830110201416
+        }
+      }
+    },
+    {
+      "cvxportfolio_execute_time": "2019-04-05 00:00:00",
+      "cvxportfolio_history_rows": 252,
+      "fold": 14,
+      "test_first": "2019-04-16",
+      "test_last": "2019-07-16",
+      "test_rows": 63,
+      "train_first": "2018-04-06",
+      "train_last": "2019-04-05",
+      "train_rows": 252,
+      "weights": {
+        "cvxportfolio_spo_min_variance": {
+          "IWM": 1.7204649219878188e-22,
+          "QQQ": 1.7201909421852606e-22,
+          "SPY": 1.0
+        },
+        "equal_weight_control": {
+          "IWM": 0.3333333333333333,
+          "QQQ": 0.3333333333333333,
+          "SPY": 0.3333333333333333
+        },
+        "skfolio_meanrisk_min_variance": {
+          "IWM": 1.5861957768975138e-05,
+          "QQQ": 4.260669030630947e-07,
+          "SPY": 0.999983711975328
+        }
+      }
+    },
+    {
+      "cvxportfolio_execute_time": "2019-07-08 00:00:00",
+      "cvxportfolio_history_rows": 252,
+      "fold": 15,
+      "test_first": "2019-07-17",
+      "test_last": "2019-10-14",
+      "test_rows": 63,
+      "train_first": "2018-07-06",
+      "train_last": "2019-07-08",
+      "train_rows": 252,
+      "weights": {
+        "cvxportfolio_spo_min_variance": {
+          "IWM": 1.7198611985086075e-22,
+          "QQQ": 1.7193737205896993e-22,
+          "SPY": 1.0
+        },
+        "equal_weight_control": {
+          "IWM": 0.3333333333333333,
+          "QQQ": 0.3333333333333333,
+          "SPY": 0.3333333333333333
+        },
+        "skfolio_meanrisk_min_variance": {
+          "IWM": 4.613301076366624e-06,
+          "QQQ": 4.568788851590137e-07,
+          "SPY": 0.9999949298200363
+        }
+      }
+    },
+    {
+      "cvxportfolio_execute_time": "2019-10-04 00:00:00",
+      "cvxportfolio_history_rows": 252,
+      "fold": 16,
+      "test_first": "2019-10-15",
+      "test_last": "2020-01-14",
+      "test_rows": 63,
+      "train_first": "2018-10-04",
+      "train_last": "2019-10-04",
+      "train_rows": 252,
+      "weights": {
+        "cvxportfolio_spo_min_variance": {
+          "IWM": 1.7207175735577563e-22,
+          "QQQ": 1.7211121616040382e-22,
+          "SPY": 1.0
+        },
+        "equal_weight_control": {
+          "IWM": 0.3333333333333333,
+          "QQQ": 0.3333333333333333,
+          "SPY": 0.3333333333333333
+        },
+        "skfolio_meanrisk_min_variance": {
+          "IWM": 6.933652561078928e-07,
+          "QQQ": 9.108383115835104e-08,
+          "SPY": 0.9999992155509128
+        }
+      }
+    },
+    {
+      "cvxportfolio_execute_time": "2020-01-06 00:00:00",
+      "cvxportfolio_history_rows": 252,
+      "fold": 17,
+      "test_first": "2020-01-15",
+      "test_last": "2020-04-15",
+      "test_rows": 63,
+      "train_first": "2019-01-07",
+      "train_last": "2020-01-06",
+      "train_rows": 252,
+      "weights": {
+        "cvxportfolio_spo_min_variance": {
+          "IWM": 1.7194968434741699e-22,
+          "QQQ": 1.719586522530049e-22,
+          "SPY": 1.0
+        },
+        "equal_weight_control": {
+          "IWM": 0.3333333333333333,
+          "QQQ": 0.3333333333333333,
+          "SPY": 0.3333333333333333
+        },
+        "skfolio_meanrisk_min_variance": {
+          "IWM": 5.179472111505966e-08,
+          "QQQ": 2.1152069882641533e-08,
+          "SPY": 0.999999927053209
+        }
+      }
+    },
+    {
+      "cvxportfolio_execute_time": "2020-04-06 00:00:00",
+      "cvxportfolio_history_rows": 252,
+      "fold": 18,
+      "test_first": "2020-04-16",
+      "test_last": "2020-07-15",
+      "test_rows": 63,
+      "train_first": "2019-04-08",
+      "train_last": "2020-04-06",
+      "train_rows": 252,
+      "weights": {
+        "cvxportfolio_spo_min_variance": {
+          "IWM": 1.72284124625831e-22,
+          "QQQ": 1.721387883710571e-22,
+          "SPY": 1.0
+        },
+        "equal_weight_control": {
+          "IWM": 0.3333333333333333,
+          "QQQ": 0.3333333333333333,
+          "SPY": 0.3333333333333333
+        },
+        "skfolio_meanrisk_min_variance": {
+          "IWM": 1.8524658682568772e-07,
+          "QQQ": 5.737766117890622e-07,
+          "SPY": 0.9999992409768014
+        }
+      }
+    },
+    {
+      "cvxportfolio_execute_time": "2020-07-07 00:00:00",
+      "cvxportfolio_history_rows": 252,
+      "fold": 19,
+      "test_first": "2020-07-16",
+      "test_last": "2020-10-13",
+      "test_rows": 63,
+      "train_first": "2019-07-09",
+      "train_last": "2020-07-07",
+      "train_rows": 252,
+      "weights": {
+        "cvxportfolio_spo_min_variance": {
+          "IWM": 0.0,
+          "QQQ": 0.31731384827241815,
+          "SPY": 0.6826861517275817
+        },
+        "equal_weight_control": {
+          "IWM": 0.3333333333333333,
+          "QQQ": 0.3333333333333333,
+          "SPY": 0.3333333333333333
+        },
+        "skfolio_meanrisk_min_variance": {
+          "IWM": 1.1680656709631724e-08,
+          "QQQ": 0.3174732518749319,
+          "SPY": 0.6825267364444115
+        }
+      }
+    },
+    {
+      "cvxportfolio_execute_time": "2020-10-05 00:00:00",
+      "cvxportfolio_history_rows": 252,
+      "fold": 20,
+      "test_first": "2020-10-14",
+      "test_last": "2020-12-31",
+      "test_rows": 55,
+      "train_first": "2019-10-07",
+      "train_last": "2020-10-05",
+      "train_rows": 252,
+      "weights": {
+        "cvxportfolio_spo_min_variance": {
+          "IWM": 0.0,
+          "QQQ": 0.07264790693626826,
+          "SPY": 0.9273520930637318
+        },
+        "equal_weight_control": {
+          "IWM": 0.3333333333333333,
+          "QQQ": 0.3333333333333333,
+          "SPY": 0.3333333333333333
+        },
+        "skfolio_meanrisk_min_variance": {
+          "IWM": 4.2222994392567304e-08,
+          "QQQ": 0.07252259843383681,
+          "SPY": 0.9274773593431689
+        }
+      }
+    }
+  ],
+  "inputs_unchanged": true,
+  "max_abs_weight_difference_skfolio_vs_cvxportfolio": 0.00025192468728589545,
+  "periods_per_year": 252,
+  "plan_sha256": "b8d1beba6eddd0388957ca0d9e9c46ebfb2ca538f076419d5a8dcaaaf82be4a7",
+  "python": "3.13.15",
+  "risk_free": 0.0,
+  "series": {
+    "cvxportfolio_spo_min_variance": {
+      "conventions": {
+        "empyrical-reloaded": "geometric annual_return (CAGR); downside deviation below 0",
+        "quantstats": "CAGR over calendar years of the index; sortino downside over all periods",
+        "skfolio.measures": "arithmetic mean x 252; semi_deviation below 0; compounded max drawdown"
+      },
+      "empyrical-reloaded": {
+        "annualized_return": 0.13034467231551305,
+        "annualized_volatility": 0.19157692614505592,
+        "max_drawdown": -0.3410474670449846,
+        "sharpe": 0.7360944041270081,
+        "sortino": 1.0089116804750717
+      },
+      "observations": 1252,
+      "quantstats": {
+        "annualized_return": 0.13034467231551305,
+        "annualized_volatility": 0.19157692614505592,
+        "max_drawdown": -0.34104746704498456,
+        "sharpe": 0.7360944041270077,
+        "sortino": 1.0089116804750717
+      },
+      "skfolio.measures": {
+        "annualized_return": 0.14101870329522867,
+        "annualized_volatility": 0.19157692614505592,
+        "max_drawdown": -0.34104746704498456,
+        "sharpe": 0.7360944041270077,
+        "sortino": 1.0085086799874634
+      },
+      "total_compounded_return": 0.838083445890486
+    },
+    "equal_weight_control": {
+      "conventions": {
+        "empyrical-reloaded": "geometric annual_return (CAGR); downside deviation below 0",
+        "quantstats": "CAGR over calendar years of the index; sortino downside over all periods",
+        "skfolio.measures": "arithmetic mean x 252; semi_deviation below 0; compounded max drawdown"
+      },
+      "empyrical-reloaded": {
+        "annualized_return": 0.16673061882808793,
+        "annualized_volatility": 0.20364390620417105,
+        "max_drawdown": -0.3442168498805069,
+        "sharpe": 0.8601492354273239,
+        "sortino": 1.175356332177878
+      },
+      "observations": 1252,
+      "quantstats": {
+        "annualized_return": 0.16673061882808793,
+        "annualized_volatility": 0.20364390620417105,
+        "max_drawdown": -0.34421684988050694,
+        "sharpe": 0.8601492354273251,
+        "sortino": 1.1753563321778797
+      },
+      "skfolio.measures": {
+        "annualized_return": 0.17516415022095164,
+        "annualized_volatility": 0.2036439062041711,
+        "max_drawdown": -0.34421684988050694,
+        "sharpe": 0.8601492354273249,
+        "sortino": 1.1748868469056328
+      },
+      "total_compounded_return": 1.151428542335386
+    },
+    "skfolio_meanrisk_min_variance": {
+      "conventions": {
+        "empyrical-reloaded": "geometric annual_return (CAGR); downside deviation below 0",
+        "quantstats": "CAGR over calendar years of the index; sortino downside over all periods",
+        "skfolio.measures": "arithmetic mean x 252; semi_deviation below 0; compounded max drawdown"
+      },
+      "empyrical-reloaded": {
+        "annualized_return": 0.13034584390844106,
+        "annualized_volatility": 0.19157718573448376,
+        "max_drawdown": -0.3410474692891481,
+        "sharpe": 0.7360990837790674,
+        "sortino": 1.008917990142776
+      },
+      "observations": 1252,
+      "quantstats": {
+        "annualized_return": 0.13034584390844106,
+        "annualized_volatility": 0.19157718573448376,
+        "max_drawdown": -0.3410474692891481,
+        "sharpe": 0.7360990837790693,
+        "sortino": 1.0089179901427787
+      },
+      "skfolio.measures": {
+        "annualized_return": 0.14101979089212605,
+        "annualized_volatility": 0.19157718573448376,
+        "max_drawdown": -0.3410474692891481,
+        "sharpe": 0.7360990837790693,
+        "sortino": 1.008514987134832
+      },
+      "total_compounded_return": 0.8380929112203759
+    }
+  },
+  "versions": {
+    "cvxportfolio": "1.5.1",
+    "empyrical-reloaded": "0.5.12",
+    "quantstats": "0.0.81",
+    "skfolio": "1.2.9"
+  }
+}
