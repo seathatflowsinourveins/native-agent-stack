@@ -3079,8 +3079,8 @@
     },
     {
       "path": ".github/workflows/receipt-staleness.yml",
-      "sha256": "0d5bc9e0654d6b3a21b697f88237d51f7ed2086b23729ca769104d8f02120715",
-      "bytes": 2292
+      "sha256": "0db13d5f5907550cc856a8afc0deb872cf19e15c43967815892fca5d67c5fcf4",
+      "bytes": 2502
     },
     {
       "path": ".github/workflows/supply-chain.yml",
@@ -3154,8 +3154,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "5594544fdc421f5413a801dd399f9965b43dec70b01f7fde0e129b2023f1fadc",
-      "bytes": 12625
+      "sha256": "8e4a13dd367d2a41c65b519a0c773c0d62773f0151ef5ee8760912fe45278009",
+      "bytes": 12786
     },
     {
       "path": "adoption/host-receipt.schema.json",
@@ -3249,13 +3249,13 @@
     },
     {
       "path": "adoption/platforms/linux-wsl2.md",
-      "sha256": "48ef17810bea18c3f7f1acbf5157abb928e8d1abff27a1076c4efa9bd8a1bf4c",
-      "bytes": 5842
+      "sha256": "1d7cfdc6cdc6157c3727c0f386e8acaad7046b099d0dbccf8827e76203c4c4ca",
+      "bytes": 5929
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
-      "sha256": "f02e97127efcc21344e1e07839d4db52bfce48448e1e8547219581623237f901",
-      "bytes": 39001
+      "sha256": "c9a66b577c29b797b97592bd913e0a372fa20fb5f46b5584ae27295595785cf2",
+      "bytes": 39507
     },
     {
       "path": "adoption/pre-login-observation.json",
@@ -3324,8 +3324,8 @@
     },
     {
       "path": "adoption/update.md",
-      "sha256": "eb01b8486799e3a42f392e957de6cc6d5b031d1738bcb9d90992a49e01bcc270",
-      "bytes": 16395
+      "sha256": "34052c3aca3a02d6a27213e3e31b603492bde71a830319751428c64042106f3d",
+      "bytes": 16401
     },
     {
       "path": "blueprints/blind-catalog-convergence/README.md",
@@ -14915,8 +14915,8 @@
     },
     {
       "path": "tests/test_receipt_staleness.py",
-      "sha256": "038e623034fabe19bf762a4a7d46504ea70ebf8707f50feadc6480fb447c85b3",
-      "bytes": 16252
+      "sha256": "2bdc341d92af83099d3c7c1f5556e97529228f14847f9502ae390db35976b990",
+      "bytes": 16955
     },
     {
       "path": "tests/test_release_pin_contents.py",

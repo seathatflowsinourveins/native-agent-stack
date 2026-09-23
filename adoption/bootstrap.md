@@ -18,7 +18,7 @@ python3 scripts/release_due.py   # on the default branch (added after v2026.09.2
 tag="$(python3 -c "import json;print(json.load(open('adoption/manifest.json'))['source']['release_tag'])")"
 commit="$(python3 -c "import json;print(json.load(open('adoption/manifest.json'))['source']['release_commit'])")"
 git checkout "$tag"
-test "$(git rev-parse HEAD)" = "$commit" && echo "at $tag ($commit)"
+if test "$(git rev-parse HEAD)" = "$commit"; then echo "at $tag ($commit)"; else echo "error: $tag is not the pinned release commit $commit" >&2; false; fi
 ```
 This checks out `adoption/manifest.json` `source.release_tag` (or a later tag)
 and confirms it resolves to `source.release_commit`, published with SLSA build
@@ -98,7 +98,8 @@ GitHub-hosted macOS runner; see
    verification (plus the `node`, `uv` and `gh` every run installs) and skips
    the named ones. Then install each skipped id through
    its `recipe_map` page (the SDK lock for `research-runtime`). A profile with
-   "none of N" pinned installs nothing through the script; use the recipes.
+   "none of N" pinned installs none of its own components through the script
+   (only the `node`, `uv` and `gh` every run installs); use the recipes.
 
    The macOS script and pins changed after `v2026.09.23`. At `v2026.09.23`,
    `adoption/bootstrap-macos.sh` installs only a missing `jq` through Homebrew

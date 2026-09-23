@@ -14,7 +14,7 @@ python3 scripts/release_due.py   # on the default branch (added after v2026.09.2
 tag="$(python3 -c "import json;print(json.load(open('adoption/manifest.json'))['source']['release_tag'])")"
 commit="$(python3 -c "import json;print(json.load(open('adoption/manifest.json'))['source']['release_commit'])")"
 git checkout "$tag"
-test "$(git rev-parse HEAD)" = "$commit" && echo "at $tag ($commit)"
+if test "$(git rev-parse HEAD)" = "$commit"; then echo "at $tag ($commit)"; else echo "error: $tag is not the pinned release commit $commit" >&2; false; fi
 ```
 
 That checkout target is `adoption/manifest.json` `source.release_tag` (or a

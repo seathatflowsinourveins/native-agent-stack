@@ -48,8 +48,8 @@ gh release list --repo seathatflowsinourveins/native-agent-stack --limit 5
 
 If the default branch pins a different tag than the host's checkout, a re-pin
 has landed: move the host (steps 3 and 4). `release_due.py` printing
-`"status": "release_due"` means main documents steps that no release has yet (a
-release is due, not yet cut); the pages that use them mark those steps "added
+`"status": "release_due"` means main documents steps that the pinned release
+lacks (a release is due, not yet cut); the pages that use them mark those steps "added
 after `<release_tag>`". A published release that main does not pin
 yet is not a target; wait for its re-pin PR.
 

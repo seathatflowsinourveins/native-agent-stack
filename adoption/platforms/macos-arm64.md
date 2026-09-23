@@ -30,7 +30,7 @@ python3 scripts/release_due.py   # on the default branch (added after v2026.09.2
 tag="$(python3 -c "import json;print(json.load(open('adoption/manifest.json'))['source']['release_tag'])")"
 commit="$(python3 -c "import json;print(json.load(open('adoption/manifest.json'))['source']['release_commit'])")"
 git checkout "$tag"
-test "$(git rev-parse HEAD)" = "$commit" && echo "at $tag ($commit)"
+if test "$(git rev-parse HEAD)" = "$commit"; then echo "at $tag ($commit)"; else echo "error: $tag is not the pinned release commit $commit" >&2; false; fi
 ```
 
 Read both values before the checkout, as above: the release's own manifest
@@ -65,8 +65,14 @@ release, the note is history and the step is in your checkout (`test -e
    with this host's own `adoption/hosts/<host>.json`).
 4. launchd services and the embedding acceptance ("launchd services" and
    "Embedding backend decision" below). `adoption/launchd/launchd-agents.sh`
-   and `tools/adoption/embed_acceptance.py` were added after `v2026.09.23`; at
-   that tag run them from a default-branch clone, as the note at the top says.
+   and `tools/adoption/embed_acceptance.py` were added after `v2026.09.23`, and
+   so were their inputs: at that tag `bootstrap-macos.sh` neither downloads the
+   embedding model (`models[0]` in main's darwin pins) into `state/models` nor
+   writes `config/qdrant.yaml`, which the qdrant and llama-embed agents need.
+   **Until main is re-pinned to a release that contains the macOS clean install
+   (#94), run this page from step 2 onward from a default-branch clone** and
+   record the receipts with that clone's `catalog_revision` (main-only
+   evidence, labelled as such).
 5. `python3 scripts/adoption_status.py --profile macos-arm64-foundation --json`,
    then the per-host receipt ([`adoption/bootstrap.md`](../bootstrap.md) steps 6–7).
 6. Contribute what ran: record host receipts with `scripts/host_receipts.py`

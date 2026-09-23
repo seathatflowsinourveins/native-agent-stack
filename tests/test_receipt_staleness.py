@@ -295,5 +295,18 @@ class RepositoryRunTests(unittest.TestCase):
         self.assertEqual(before, after)
 
 
+class ReceiptReadingWorkflowsCheckOutFullHistory(unittest.TestCase):
+    """host_receipts validates each receipt's catalog_revision with `git cat-file -e`, which a
+    shallow clone never contains, so every workflow that reads receipts must fetch full history."""
+
+    def test_receipt_readers_set_fetch_depth_zero(self):
+        workflows = Path(__file__).resolve().parents[1] / ".github/workflows"
+        readers = [path for path in sorted(workflows.glob("*.yml"))
+                   if "receipt_staleness.py" in path.read_text(encoding="utf-8")]
+        self.assertTrue(readers)
+        for path in readers:
+            self.assertIn("fetch-depth: 0", path.read_text(encoding="utf-8"), path.name)
+
+
 if __name__ == "__main__":
     unittest.main()
