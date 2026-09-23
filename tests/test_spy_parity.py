@@ -1587,7 +1587,9 @@ class V2RunnerRecordTests(unittest.TestCase):
         for expected in ("dev1-dev5", "dev9", "late-emission-experiment", "bwrap-db8bad7",
                          "bwrap-8c4d7e7", "bwrap-f079f6c"):
             self.assertIn(expected, ids)
-        self.assertFalse(any(r["reviewed_before_run"] for r in history["replays"]))
+        # Only the single qualifying replay of the reviewed harness ran after review.
+        self.assertEqual([r["id"] for r in history["replays"] if r["reviewed_before_run"]],
+                         ["bwrap-cc4503f-qualifying"])
         # Every replay from f079f6c (the harness the pre-run review changed) is superseded.
         from_f079f6c = [r for r in history["replays"] if "f079f6c" in r["harness"]]
         self.assertTrue(from_f079f6c)
@@ -1632,16 +1634,19 @@ class V2PublishedResultTests(unittest.TestCase):
 
     # The published receipt ran the f079f6c harness; the 2026-09-23 pre-run
     # review round changed exactly these files, so the receipt is superseded.
-    CHANGED_SINCE_PUBLISHED_RUN = {"compare.py", "run.py"}
 
-    def test_published_receipt_is_superseded_only_by_the_review_fix_files(self):
+    def test_published_receipt_is_the_qualifying_run_of_the_harness_on_disk(self):
         changed = {name for name, recorded in self.receipt["local_source_sha256"].items()
                    if hashlib.sha256((SOURCE / name).read_bytes()).hexdigest() != recorded}
-        self.assertEqual(changed, self.CHANGED_SINCE_PUBLISHED_RUN)
-        entry = next(r for r in RUN.load_replay_history()["replays"] if r["id"] == "bwrap-f079f6c")
-        self.assertTrue(entry["status"].startswith("superseded"))
+        self.assertEqual(changed, set())
+        entry = next(r for r in RUN.load_replay_history()["replays"] if r["id"] == "bwrap-cc4503f-qualifying")
+        self.assertTrue(entry["reviewed_before_run"])
+        self.assertTrue(entry["status"].startswith("qualifying"))
         self.assertEqual(entry["harness_local_source_sha256"],
                          {f: self.receipt["local_source_sha256"][f] for f in RUN.REVIEWED_HARNESS_FILES})
+        self.assertEqual(entry["receipt_sha256"], [hashlib.sha256((SOURCE / "receipt-v2.json").read_bytes()).hexdigest()])
+        superseded = next(r for r in RUN.load_replay_history()["replays"] if r["id"] == "bwrap-f079f6c")
+        self.assertTrue(superseded["status"].startswith("superseded"))
 
     def test_published_v2_receipt_reconciles_without_bars(self):
         oracle = COMPARE.oracle_case(json.loads(LEAN_RECEIPT.read_text()), self.receipt["case"])
@@ -1658,9 +1663,9 @@ class V2PublishedResultTests(unittest.TestCase):
         recorded = [d["id"] for d in self.receipt["preregistration_deviations"]]
         current = [d["id"] for d in RUN.PREREGISTRATION_DEVIATIONS]
         self.assertIn("review_before_first_run", recorded)
-        # The review-fix round only added a deviation; none was withdrawn.
-        self.assertEqual([i for i in current if i in recorded], recorded)
-        self.assertEqual(sorted(set(current) - set(recorded)), ["isolation_partially_observed"])
+        # The qualifying run declares exactly the harness's current deviations, in order.
+        self.assertEqual(recorded, current)
+        self.assertIn("first_v2_run_preceded_review", recorded)
 
     def test_receipt_lists_every_earlier_replay(self):
         recorded = self.receipt["preconditions"]["prior_v2_replays"]["replays"]
@@ -1776,9 +1781,13 @@ class V2DeviationAcceptanceTests(unittest.TestCase):
         self.assertIn(("precondition_review", "deviation_acceptance.path"),
                       _failing_fields(self._verdict(receipt)))
 
-    def test_the_harness_does_not_ship_an_acceptance(self):
-        self.assertFalse((SOURCE / COMPARE.DEVIATION_ACCEPTANCE).exists())
-        self.assertIsNone(RUN.load_deviation_acceptance())
+    def test_the_committed_acceptance_binds_the_reviewed_harness(self):
+        # The gate owner committed the acceptance (not the harness) before the qualifying run.
+        acceptance = RUN.load_deviation_acceptance()
+        self.assertIsNotNone(acceptance)
+        self.assertEqual(acceptance["deviation_id"], COMPARE.ACCEPTED_DEVIATION)
+        self.assertEqual(acceptance["reviewed_harness_local_source_sha256"],
+                         {f: hashlib.sha256((SOURCE / f).read_bytes()).hexdigest() for f in RUN.REVIEWED_HARNESS_FILES})
         self.assertEqual(COMPARE.DEVIATION_ACCEPTANCE_FIELDS, RUN.DEVIATION_ACCEPTANCE_FIELDS)
         self.assertEqual(COMPARE.REPLAY_HISTORY, RUN.REPLAY_HISTORY)
         self.assertIn(COMPARE.ACCEPTED_DEVIATION, [d["id"] for d in RUN.PREREGISTRATION_DEVIATIONS])

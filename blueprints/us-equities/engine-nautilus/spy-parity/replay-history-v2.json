@@ -2,42 +2,124 @@
   "schema": "spy-parity-v2-replay-history/1",
   "note": "Every v2 execution of the harness on the frozen SPY inputs, in time order, enumerated from the retained private output directories of the implementing session. run.py copies this list into each new receipt under preconditions.prior_v2_replays; after a run, the operator appends that run here before the next one. Runs whose output directory was not retained cannot be enumerated from disk; none is known. The sealed probes under probes/v2 are preregistration evidence recorded in mapping-manifest-v2.json and are not listed here. Receipt hashes name private files that are not published. Every replay listed is superseded; none was reviewed before it ran. harness_local_source_sha256, where present, is the replay's reviewed-harness file set as run.py hashed it; compare.py fails a run whose reviewed files equal any listed replay's, and re-hashes this file at comparison time, accepting only an append-only extension of the list the run recorded.",
   "replays": [
-    {"id": "dev1-dev5", "observed_utc": ["2026-09-23T02:48:29.014822+00:00", "2026-09-23T02:48:29.660935+00:00", "2026-09-23T02:48:30.271356+00:00", "2026-09-23T02:48:30.869954+00:00", "2026-09-23T02:48:31.471769+00:00"],
-     "harness": "uncommitted working tree whose harness files hash as at db8bad7 (run.py 8fc9f4272e0a..., fixture_strategy.py cb6830320e8a..., distribution_module.py eefee070b0db..., compare.py e88546a0fd9e...)",
-     "isolation": "none: host process with the host network namespace and inherited environment (not the documented bwrap replay)",
-     "outcome": "five two-run replays; each: fills +304 @ 323.5800 and -304 @ 291.6900, distributions 0.00 and 428.64 engine-posted, native end cash 90734.08, zero ERROR lines, two runs equal after UUID normalization",
-     "receipt_sha256": ["34996806d39515c86f35ff4fcac110db2b3f8fe8bc4a4e175d4cbafb63c834eb", "03d8004bb0049d3fde48a44a98d235824cafc6ec619b25c6310ecbca47d08b2c", "2f793c5f1c29ee72bacfd13cc8e163666c6ee8f1094dfc8f84c29837be6c96ad", "5a3d3adf1cf1bd9c0f59a54fe3b7315e9ce01f5dcebe92c673c83ddba0ac49a5", "36463c0daebd26db283c95695ffb047ff90df340288150fb2cdd49997bbc9ca8"],
-     "reviewed_before_run": false, "status": "superseded development run"},
-    {"id": "dev9", "observed_utc": ["2026-09-23T02:51:30.035940+00:00"],
-     "harness": "same harness files as dev1-dev5",
-     "isolation": "none: host process (not the documented bwrap replay)",
-     "outcome": "same fills, distributions, native end cash 90734.08 and determinism as dev1-dev5",
-     "receipt_sha256": ["23aab3194964e56fde186e0d58b1f39694968e44d6cce4f749bd622e7d257463"],
-     "reviewed_before_run": false, "status": "superseded development run"},
-    {"id": "late-emission-experiment", "observed_utc": ["2026-09-23T02:51:40Z (output file times)"],
-     "harness": "the dev9 harness driven by a scratch script that monkeypatched build_strategy to register no ex-date alerts, so the module could only see each ex-date late",
-     "isolation": "none: host process, one engine run",
-     "outcome": "refused by the runner after engine.run() (no summary.json written); the native account report shows no distribution posted (end total 90305.44 = 90734.08 - 428.64); account report sha256 c89bfbbc1713a58eb6d7b1fc07183129111c51caec593a9e03d0dae6115855a1 (reports.private.json)",
-     "receipt_sha256": [],
-     "reviewed_before_run": false, "status": "experiment on a modified harness; not a replay of the committed harness"},
-    {"id": "bwrap-db8bad7", "observed_utc": ["2026-09-23T02:52:41.011275+00:00"],
-     "harness": "commit db8bad7ce24c6e22b295b717b10558816467d66a",
-     "isolation": "documented bwrap two-run replay (loopback only, cleared environment)",
-     "outcome": "same fills, distributions, native end cash 90734.08 and determinism as the development runs; compare.py PASS under the harness of that commit",
-     "receipt_sha256": ["4dd2d1fb126b7a93ceb02a5ba1126ff77a75c853e628ba91082e2b44bac8ad7d"],
-     "reviewed_before_run": false, "status": "superseded by bwrap-8c4d7e7 before publication"},
-    {"id": "bwrap-8c4d7e7", "observed_utc": ["2026-09-23T02:53:40.574318+00:00"],
-     "harness": "commit 8c4d7e777f285bbbbc9a4eecc2a47e745a407b24",
-     "isolation": "documented bwrap two-run replay (loopback only, cleared environment)",
-     "outcome": "published as receipt-v2.json at 9d55cb4 with verdict-v2.json PASS (93 checks); the 2026-09-23 independent review found that verdict unqualified because precondition 0 was unmet",
-     "receipt_sha256": ["8e751148ee88a4bb40e6634c6e1b2a36a998c6c78be0fa01f3cee1dd38a5f3b8"],
-     "reviewed_before_run": false, "status": "superseded by the next run from the review-fix harness"},
-    {"id": "bwrap-f079f6c", "observed_utc": ["2026-09-23T03:10:54.832732+00:00"],
-     "harness": "commit f079f6cf41db50fd266f9a429ee6b7a58e6f05c7 (review-fix harness)",
-     "isolation": "documented bwrap two-run replay (loopback only, cleared environment, read-only harness and data mounts)",
-     "outcome": "published as receipt-v2.json with verdict-v2.json FAIL: 96/96 execution checks pass, precondition_review fails because no retained review preceded the run",
-     "receipt_sha256": ["c1bd4b8acee7e7f21a800bf745f793fc6c1e8970390c68143dd1c9e12f4042ba"],
-     "harness_local_source_sha256": {"compare.py": "598bffafe5ae875fb97a95d2a5234bf713ccbac6d3e33b01e94d1eb1f656e74b", "convert.py": "08cba0a2aac938e9306935f91c2889b181dfc880b532b5943e0ccda395592c65", "distribution_module.py": "eefee070b0dbe6ad3a1e68755ca959b5fff081fad61af8b84902a438996b126b", "fixture_strategy.py": "59649ac50f26c8b6090dc976e4ec0b3b7e2121cc214674f6c122fbbca9b143f1", "run.py": "b2c0cf6e704779053babb6e62ed5ace0c16ea00df79a54d34ec8f04cc499aac4"},
-     "reviewed_before_run": false, "status": "superseded: the 2026-09-23 pre-run review changed the harness after this run (compare.py and run.py), so no run from f079f6c can qualify; this is the only replay known from f079f6c"}
+    {
+      "id": "dev1-dev5",
+      "observed_utc": [
+        "2026-09-23T02:48:29.014822+00:00",
+        "2026-09-23T02:48:29.660935+00:00",
+        "2026-09-23T02:48:30.271356+00:00",
+        "2026-09-23T02:48:30.869954+00:00",
+        "2026-09-23T02:48:31.471769+00:00"
+      ],
+      "harness": "uncommitted working tree whose harness files hash as at db8bad7 (run.py 8fc9f4272e0a..., fixture_strategy.py cb6830320e8a..., distribution_module.py eefee070b0db..., compare.py e88546a0fd9e...)",
+      "isolation": "none: host process with the host network namespace and inherited environment (not the documented bwrap replay)",
+      "outcome": "five two-run replays; each: fills +304 @ 323.5800 and -304 @ 291.6900, distributions 0.00 and 428.64 engine-posted, native end cash 90734.08, zero ERROR lines, two runs equal after UUID normalization",
+      "receipt_sha256": [
+        "34996806d39515c86f35ff4fcac110db2b3f8fe8bc4a4e175d4cbafb63c834eb",
+        "03d8004bb0049d3fde48a44a98d235824cafc6ec619b25c6310ecbca47d08b2c",
+        "2f793c5f1c29ee72bacfd13cc8e163666c6ee8f1094dfc8f84c29837be6c96ad",
+        "5a3d3adf1cf1bd9c0f59a54fe3b7315e9ce01f5dcebe92c673c83ddba0ac49a5",
+        "36463c0daebd26db283c95695ffb047ff90df340288150fb2cdd49997bbc9ca8"
+      ],
+      "reviewed_before_run": false,
+      "status": "superseded development run"
+    },
+    {
+      "id": "dev9",
+      "observed_utc": [
+        "2026-09-23T02:51:30.035940+00:00"
+      ],
+      "harness": "same harness files as dev1-dev5",
+      "isolation": "none: host process (not the documented bwrap replay)",
+      "outcome": "same fills, distributions, native end cash 90734.08 and determinism as dev1-dev5",
+      "receipt_sha256": [
+        "23aab3194964e56fde186e0d58b1f39694968e44d6cce4f749bd622e7d257463"
+      ],
+      "reviewed_before_run": false,
+      "status": "superseded development run"
+    },
+    {
+      "id": "late-emission-experiment",
+      "observed_utc": [
+        "2026-09-23T02:51:40Z (output file times)"
+      ],
+      "harness": "the dev9 harness driven by a scratch script that monkeypatched build_strategy to register no ex-date alerts, so the module could only see each ex-date late",
+      "isolation": "none: host process, one engine run",
+      "outcome": "refused by the runner after engine.run() (no summary.json written); the native account report shows no distribution posted (end total 90305.44 = 90734.08 - 428.64); account report sha256 c89bfbbc1713a58eb6d7b1fc07183129111c51caec593a9e03d0dae6115855a1 (reports.private.json)",
+      "receipt_sha256": [],
+      "reviewed_before_run": false,
+      "status": "experiment on a modified harness; not a replay of the committed harness"
+    },
+    {
+      "id": "bwrap-db8bad7",
+      "observed_utc": [
+        "2026-09-23T02:52:41.011275+00:00"
+      ],
+      "harness": "commit db8bad7ce24c6e22b295b717b10558816467d66a",
+      "isolation": "documented bwrap two-run replay (loopback only, cleared environment)",
+      "outcome": "same fills, distributions, native end cash 90734.08 and determinism as the development runs; compare.py PASS under the harness of that commit",
+      "receipt_sha256": [
+        "4dd2d1fb126b7a93ceb02a5ba1126ff77a75c853e628ba91082e2b44bac8ad7d"
+      ],
+      "reviewed_before_run": false,
+      "status": "superseded by bwrap-8c4d7e7 before publication"
+    },
+    {
+      "id": "bwrap-8c4d7e7",
+      "observed_utc": [
+        "2026-09-23T02:53:40.574318+00:00"
+      ],
+      "harness": "commit 8c4d7e777f285bbbbc9a4eecc2a47e745a407b24",
+      "isolation": "documented bwrap two-run replay (loopback only, cleared environment)",
+      "outcome": "published as receipt-v2.json at 9d55cb4 with verdict-v2.json PASS (93 checks); the 2026-09-23 independent review found that verdict unqualified because precondition 0 was unmet",
+      "receipt_sha256": [
+        "8e751148ee88a4bb40e6634c6e1b2a36a998c6c78be0fa01f3cee1dd38a5f3b8"
+      ],
+      "reviewed_before_run": false,
+      "status": "superseded by the next run from the review-fix harness"
+    },
+    {
+      "id": "bwrap-f079f6c",
+      "observed_utc": [
+        "2026-09-23T03:10:54.832732+00:00"
+      ],
+      "harness": "commit f079f6cf41db50fd266f9a429ee6b7a58e6f05c7 (review-fix harness)",
+      "isolation": "documented bwrap two-run replay (loopback only, cleared environment, read-only harness and data mounts)",
+      "outcome": "published as receipt-v2.json with verdict-v2.json FAIL: 96/96 execution checks pass, precondition_review fails because no retained review preceded the run",
+      "receipt_sha256": [
+        "c1bd4b8acee7e7f21a800bf745f793fc6c1e8970390c68143dd1c9e12f4042ba"
+      ],
+      "harness_local_source_sha256": {
+        "compare.py": "598bffafe5ae875fb97a95d2a5234bf713ccbac6d3e33b01e94d1eb1f656e74b",
+        "convert.py": "08cba0a2aac938e9306935f91c2889b181dfc880b532b5943e0ccda395592c65",
+        "distribution_module.py": "eefee070b0dbe6ad3a1e68755ca959b5fff081fad61af8b84902a438996b126b",
+        "fixture_strategy.py": "59649ac50f26c8b6090dc976e4ec0b3b7e2121cc214674f6c122fbbca9b143f1",
+        "run.py": "b2c0cf6e704779053babb6e62ed5ace0c16ea00df79a54d34ec8f04cc499aac4"
+      },
+      "reviewed_before_run": false,
+      "status": "superseded: the 2026-09-23 pre-run review changed the harness after this run (compare.py and run.py), so no run from f079f6c can qualify; this is the only replay known from f079f6c"
+    },
+    {
+      "id": "bwrap-cc4503f-qualifying",
+      "observed_utc": [
+        "2026-09-23T04:15:06.507331+00:00"
+      ],
+      "harness": "commit cc4503fb85b488ab9ac56fbb0144c411290eee79 (independently reviewed; review record review-record-v2-cc4503f.json and deviation acceptance deviation-acceptance-v2.json committed at efcdb113cc0f212cc3a4726e04eeb8953d358bcc before the run)",
+      "isolation": "documented bwrap two-run replay (README command plus --review-record and --harness-commit), run by the gate-owner session, not the implementer",
+      "outcome": "published as receipt-v2.json with verdict-v2.json PASS: preregistration_qualifying true, 136 checks, 0 failed, 0 skipped, 106/106 execution checks",
+      "receipt_sha256": [
+        "f881ee3208317c9f954639c5229a7c1e2c785b196d6ea7cfbac1e1d3088f041c"
+      ],
+      "verdict_sha256": "1816835f9cf2ea2fa3134e4f5c44a57dc48158499efc7d1fc649e0ed715c9fcd",
+      "harness_local_source_sha256": {
+        "compare.py": "c70386f869e45bcdc54602100991235a450d2a5854445d98ffe45b849454a5ec",
+        "convert.py": "08cba0a2aac938e9306935f91c2889b181dfc880b532b5943e0ccda395592c65",
+        "distribution_module.py": "eefee070b0dbe6ad3a1e68755ca959b5fff081fad61af8b84902a438996b126b",
+        "fixture_strategy.py": "59649ac50f26c8b6090dc976e4ec0b3b7e2121cc214674f6c122fbbca9b143f1",
+        "run.py": "c3917c2f6446ffb1bcfe411cc2339ffc1f804a87904ed3a1f1a67e51817ad2f2"
+      },
+      "reviewed_before_run": true,
+      "status": "qualifying: the first and only replay from the reviewed harness cc4503f; no retry from cc4503f can qualify"
+    }
   ]
 }
