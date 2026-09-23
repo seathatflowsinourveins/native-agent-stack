@@ -1,0 +1,139 @@
+{
+  "id": "obs-compare-us-equities-observability-hosting-20260923",
+  "component": "us-equities observability-hosting contested set (opentelemetry-collector-contrib, loki, prometheus, restic, sandbox-runtime)",
+  "from_pin": {
+    "opentelemetry-collector-contrib": "0.161.0",
+    "loki": "3.7.8",
+    "prometheus": "3.14.0",
+    "restic": "0.19.1",
+    "sandbox-runtime": "0.0.77 (anthropic-experimental/sandbox-runtime, srt CLI, node lib/node_modules/@anthropic-ai/sandbox-runtime)"
+  },
+  "to_version": {
+    "note": "gh api repos/<owner>/<repo>/releases/latest resolved at run time; every pin already matched the newest published release, so no upgrade was exercised. This receipt is an executed comparison of the contested candidate set at the current pins, not a version-bump qualification.",
+    "opentelemetry-collector-contrib": {"repo": "open-telemetry/opentelemetry-collector-releases", "latest_tag": "v0.161.0", "published_at": "2026-09-16T02:42:37Z", "matches_pin": true},
+    "loki": {"repo": "grafana/loki", "latest_tag": "v3.7.8", "published_at": "2026-09-17T15:51:10Z", "matches_pin": true},
+    "prometheus": {"repo": "prometheus/prometheus", "latest_tag": "v3.14.0", "published_at": "2026-08-18T08:49:40Z", "matches_pin": true},
+    "restic": {"repo": "restic/restic", "latest_tag": "v0.19.1", "published_at": "2026-07-05T08:13:33Z", "matches_pin": true},
+    "sandbox-runtime": {"note": "no gh releases API checked (repository not addressed in task's pin list beyond the installed binary); the installed 0.0.77 CLI was located under <host-tools-path>/codex-ecosystem/tools/sandbox-runtime-0.0.77 and used as-is; not re-resolved against upstream latest in this run", "matches_pin": "not_checked"}
+  },
+  "release_published_at": "see to_version per component",
+  "preregistration": {
+    "written_at": "2026-09-22T23:55:00Z",
+    "note": "Written from the dispatched task's discriminating-test plan just before executing the first backend start command; this receipt file itself (with results) was authored after the run completed, so treat the run order as: preregistration drafted from the assigned test design -> commands executed -> results and verdict recorded here together. No result was known before the criteria below were fixed.",
+    "expectation": "A single otelcol-contrib instance receiving OTLP metrics/logs/traces for trading-runtime-shaped payloads (order fill latency, order-filled and risk-check log lines, a place_order span, tagged with receipt_id) will (1) accept and forward metrics to Prometheus and logs to Loki, both queryable back with the original attributes; (2) survive kill -9 of the collector and each backend with no loss of already-ingested data, and resume accepting new data after restart; (3) restic will back up the Prometheus and Loki data directories, restic check --read-data will report no errors, and restoring into an empty target will be byte-identical and let a fresh Prometheus/Loki instance serve the same queries with the same result counts; (4) running the collector under sandbox-runtime (srt, default settings, no allowed hosts) will either still let it ingest OTLP over loopback while blocking configured egress, or will fail to ingest at all if the sandbox isolates the network namespace -- this receipt reports which outcome was observed rather than assuming either in advance.",
+    "criteria": "Pass/fail per step, quoting exact query results and exit codes; label each candidate's evidence_class as native_proven only for commands actually executed in this run."
+  },
+  "acceptance_check_ref": "This layer has no repository test file exercising these behaviors (grep found none under tests/); the retained receipts cited by both sealed lanes (observability/receipt.json, observability/backends/receipt.json, blueprints/us-equities/hosting/backup/receipt.json, evidence/receipts/runtime-tools.json) are the prior native_proven evidence this run re-executes.",
+  "commands": [
+    "gh api repos/open-telemetry/opentelemetry-collector-releases/releases/latest --jq '{tag:.tag_name,published:.published_at}'",
+    "gh api repos/grafana/loki/releases/latest --jq '{tag:.tag_name,published:.published_at}'",
+    "gh api repos/prometheus/prometheus/releases/latest --jq '{tag:.tag_name,published:.published_at}'",
+    "gh api repos/restic/restic/releases/latest --jq '{tag:.tag_name,published:.published_at}'",
+    "prometheus --config.file=.../prometheus.yml --storage.tsdb.path=.../data/prometheus --web.listen-address=127.0.0.1:29090 --web.enable-remote-write-receiver",
+    "loki-linux-amd64 -config.file=.../loki.yml (http_listen_port 23100, filesystem storage, allow_structured_metadata: true after first attempt failed with it false)",
+    "otelcol-contrib --config=.../otelcol.yml (otlp receiver grpc 24317 / http 24318; exporters prometheusremotewrite -> 127.0.0.1:29090/api/v1/write, otlphttp/loki -> 127.0.0.1:23100/otlp/v1/logs, debug for traces)",
+    "python3 emit_otlp.py <tag> <receipt_id>  # posts OTLP JSON /v1/metrics /v1/logs /v1/traces to 127.0.0.1:24318",
+    "curl http://127.0.0.1:29090/api/v1/query?query=trading_order_fill_latency_ms",
+    "curl -G http://127.0.0.1:23100/loki/api/v1/query_range --data-urlencode 'query={service_name=\"us-equities-trading-runtime\"}'",
+    "kill -9 <otelcol_pid> <prometheus_pid> <loki_pid>; relaunch same binaries against the same data dirs; re-query before and after a fresh emit",
+    "restic -r <repo> init; restic -r <repo> backup <prometheus_data_dir> <loki_data_dir> --tag obs-compare",
+    "restic -r <repo> check --read-data",
+    "restic -r <repo> restore latest --target <empty_dir> --verify",
+    "diff -rq <original_data_dirs> <restored_data_dirs>",
+    "launch fresh prometheus/loki instances pointed at the restored directories on new ports (29190/23200); re-run the same queries",
+    "node .../sandbox-runtime-0.0.77/bin/srt -d -c '<otelcol-contrib --config=...>'  # default settings, no allowedHosts",
+    "python3 emit_otlp.py sandboxed ord-sandbox-1  # against the sandboxed collector's port 24318"
+  ],
+  "results": [
+    {
+      "step": "gh api latest releases",
+      "output": "otelcol-contrib-releases v0.161.0 (2026-09-16); loki v3.7.8 (2026-09-17); prometheus v3.14.0 (2026-08-18); restic v0.19.1 (2026-07-05). All four equal the pinned binaries under <host-tools-path>/codex-ecosystem/tools; no upgrade was available or exercised."
+    },
+    {
+      "step": "collector ingest + query-back (step 1-2 of the discriminating test)",
+      "output": "otelcol-contrib validate exited 0 after fixing exporter names (prometheusremotewrite, otlphttp/loki -- no native 'loki' exporter exists in this contrib build; its list of valid exporter type ids does not include 'loki'). First log push attempt failed: Loki returned HTTP 400 'includes structured metadata, but this feature is disallowed' until allow_structured_metadata: true was set. After that fix: emit_otlp.py returned {\"metrics\":{\"status\":200},\"logs\":{\"status\":200},\"traces\":{\"status\":200}} with empty partialSuccess (no ingest errors). Prometheus query for trading_order_fill_latency_ms returned 1 vector result with receipt_id=ord-000123, value 42.5. The counter ecosystem_codex_turn_token_usage_sum was exported as ecosystem_codex_turn_token_usage_sum_total=40518 (OTel cumulative-sum-to-counter renaming). Loki query_range for {service_name=\"us-equities-trading-runtime\"} returned 2 streams (order_filled, risk_check) with the original receipt_id and event attributes intact. Traces were only sent to the debug exporter (no trace backend was in the pinned/candidate set); the debug log confirmed the ResourceSpans arrived with the correct span name and attributes, but no trace store was queried since none is a contested candidate here."
+    },
+    {
+      "step": "retention across kill -9 + restart (step 3)",
+      "output": "kill -9 issued to the otelcol, prometheus and loki PIDs simultaneously; ps -p on all three PIDs returned no output afterward (confirmed dead). Relaunching prometheus and loki against the *same* data directories and re-querying *before* emitting anything new returned the pre-kill data unchanged: 1 Prometheus series, 2 Loki streams. Restarting otelcol-contrib against the same config and emitting a second payload (tag=after_restart, receipt_id=ord-000456) succeeded (200/200/200) and both backends then showed 2 Prometheus series and 4 Loki streams (old + new), i.e. nothing was lost across the forced kill and no already-ingested data disappeared. What could still be lost is unmeasured here: any request in flight to the collector at the instant of kill -9 (none was in flight in this run), and Prometheus/Loki's own WAL segment not yet fsynced is a general property of both stores not specifically exercised by this test."
+    },
+    {
+      "step": "restic backup / check / restore / query parity (step 4)",
+      "output": "restic init created a fresh local repository. Backends were stopped before backup for file-level consistency. `restic backup <prometheus_dir> <loki_dir> --tag obs-compare` reported '8 new, 0 changed, 0 unmodified' files, 84.747 KiB, snapshot 6b872b18. `restic check --read-data` reported 'no errors were found' (100% of 1 snapshot, 2 packs read). `restic restore latest --target <empty_dir> --verify` reported 'Restored 34 files/dirs (84.747 KiB)' and 'finished verifying 8 files' with no verify failures. `diff -rq` between the original and restored prometheus and loki data directories returned no differences (exit 0), i.e. byte-identical restore. Fresh Prometheus and Loki instances launched against the restored directories on new ports (29190, 23200) returned identical query results to the pre-backup instances: 2 Prometheus series (receipt_id ord-000123 and ord-000456) and 4 Loki streams (both receipt_ids x both events). This restic run covered only the Prometheus TSDB and Loki chunk/index directories created in this test; it did not cover a live broker/order-journal SQLite database, which neither sealed lane's restic receipt covered either (both flagged live_databases: 0)."
+    },
+    {
+      "step": "sandbox-runtime confinement of the collector (step 5)",
+      "output": "`srt -d -c '<otelcol-contrib ...>'` launched successfully; debug log showed 'Wrapped command with bwrap (network, filesystem, seccomp(unix-block) restrictions)' and the collector logged 'Everything is ready' with its OTLP gRPC/HTTP receivers bound to 127.0.0.1:24317/24318 *inside the sandbox*. Sending the same emit_otlp.py payload to that port from the host then failed: Python raised `TimeoutError` / `URLError: <urlopen error timed out>` after a 10s timeout, and `curl -sv http://127.0.0.1:24318/` also timed out and was killed. `ps aux` confirmed the actual bwrap command line includes `--unshare-net`, which places the child in a new network namespace; the sandbox's HTTP/SOCKS egress proxy sockets (a Unix socket bridged via socat) are for the *sandboxed process's own outbound* requests, not for exposing its listening ports back to the host. Net result: under sandbox-runtime's default settings, the collector's own OTLP receiver becomes unreachable from outside the sandbox, so it cannot serve as the trading-runtime's ingest point while sandboxed this way. Whether the collector could still reach Prometheus/Loki as an *egress* target from inside the sandbox (the reverse direction) was not reached, since the receiver itself is already unreachable, making the layer non-functional end-to-end in this configuration. This is evidence against using sandbox-runtime's default bwrap network isolation to confine the collector process while it needs to receive external OTLP traffic; a network-allowed or shared-netns sandbox mode was not tested (not offered by `srt`'s CLI flags observed: only -s settings file, -c command, --control-fd; no explicit '--allow-listen' or 'shared netns' flag was found in `srt --help`)."
+    }
+  ],
+  "per_component_verdicts": [
+    {
+      "key": "c14",
+      "name": "opentelemetry-collector-contrib",
+      "in_claude_set": true,
+      "in_codex_set": true,
+      "needed": true,
+      "works_under_requirement": true,
+      "verdict": "qualified",
+      "evidence_class": "native_proven",
+      "summary": "Both lanes already selected it and this run re-confirms it end to end unsandboxed: validates, ingests trading-shaped OTLP metrics/logs/traces on loopback, and forwards to both Prometheus and Loki with attributes preserved. It is the one candidate common to both contested sets and the only viable ingest path exercised. Its own exporter catalog has no dedicated 'loki' exporter type in this 0.161.0 contrib build; the working path is otlphttp against Loki's native OTLP endpoint, which is a routing detail neither sealed lane's receipt documents explicitly."
+    },
+    {
+      "key": "c5",
+      "name": "prometheus",
+      "in_claude_set": true,
+      "in_codex_set": false,
+      "needed": true,
+      "works_under_requirement": true,
+      "verdict": "qualified",
+      "evidence_class": "native_proven",
+      "summary": "Successfully stored and served back the collector's forwarded metrics, survived kill -9 with no loss of already-ingested samples, and was byte-identically restored via restic with full query parity. It is a required, working half of the retained telemetry path; the requirement's 'storage and query-back' clause is not met without a metrics store, and restic alone (Codex's set) has no query interface."
+    },
+    {
+      "key": "c6",
+      "name": "loki",
+      "in_claude_set": true,
+      "in_codex_set": false,
+      "needed": true,
+      "works_under_requirement": true,
+      "verdict": "qualified",
+      "evidence_class": "native_proven",
+      "summary": "Successfully stored and served back the collector's forwarded logs (after correcting allow_structured_metadata, which is not on by default and neither sealed lane's receipt flags as a configuration gotcha), survived kill -9 with no loss, and was byte-identically restored via restic with full query parity. Required for the requirement's log-retention clause; the contested Codex set has no log store at all."
+    },
+    {
+      "key": "c8",
+      "name": "restic",
+      "in_claude_set": false,
+      "in_codex_set": true,
+      "needed": true,
+      "works_under_requirement": true,
+      "verdict": "qualified",
+      "evidence_class": "native_proven",
+      "summary": "This run directly exercises the off-host-style recovery gap both sealed lanes flagged as untested: restic backup of the live Prometheus and Loki data directories (not just the 22 static reference files from the prior receipt), restic check --read-data with no errors, and restore --verify into an empty target with byte-identical diff and full query parity from fresh backend instances reading the restored data. This closes exactly the 'live_databases 0' limitation both prior lane receipts recorded, for these two backends. It remains untested here for a live broker/order-journal database, off-host destination, key escrow, or restore under concurrent write load, so it does not close every restic limitation on record -- but for the observability backends specifically, restic is now demonstrated to work, which the claude lane's set (lacking restic) cannot claim for recovery at all."
+    },
+    {
+      "key": "c3",
+      "name": "sandbox-runtime",
+      "in_claude_set": false,
+      "in_codex_set": true,
+      "needed": "unclear",
+      "works_under_requirement": false,
+      "verdict": "regression",
+      "evidence_class": "native_proven",
+      "summary": "Directly executed and found to defeat the requirement it was picked for: running the collector under srt's default settings (--unshare-net via bwrap) isolates the collector's OTLP receiver into a private network namespace, making it unreachable from the host or any other process on the same machine. The collector still starts and logs 'ready', but a real emitter cannot reach it, so a sandboxed collector cannot serve as this layer's ingest point without additional network-sharing configuration that srt's CLI does not appear to expose (no such flag in `srt --help`). This is native, directly observed evidence that sandbox-runtime's filesystem/env restrictions (already covered by evidence/receipts/runtime-tools.json, allowed-write/denied-read/denied-write) are a distinct, separately-useful capability from network confinement of a listening service, and that confining the collector process itself with the default settings breaks the observability pipeline rather than hardening it. This does not settle whether sandbox-runtime is useful elsewhere in the layer (e.g. confining a one-shot research worker with no listening service), only that it is not currently a working way to confine the always-on collector."
+    }
+  ],
+  "verdict": "not_comparable",
+  "evidence_class": "native_proven",
+  "limits": [
+    "Preregistration for this run was drafted from the coordinator-dispatched test design just before the first backend was started, but this receipt file (with results filled in) was written after the full run completed; see preregistration.note.",
+    "All four version-pinned components (opentelemetry-collector-contrib, loki, prometheus, restic) already matched the newest upstream release at run time, so this is an executed same-version comparison of the contested candidate set, not a version-upgrade qualification. sandbox-runtime's upstream latest release was not separately resolved via gh api in this run.",
+    "Traces were sent only to the debug exporter; no trace backend is in either contested set, so trace storage/query-back was not exercised beyond confirming the collector accepts and logs OTLP trace data.",
+    "The kill -9 test used one simultaneous kill of all three processes with no in-flight request at the moment of the kill; a request that is mid-flight during a real crash, or an unflushed WAL segment older than the last successful checkpoint, is not covered.",
+    "Restic backup/restore covered only the Prometheus TSDB and Loki chunk/index directories created fresh in this test session; it did not cover a live broker/order-journal database, an off-host repository destination, independent key escrow, or restore performed while the source is still under concurrent write load -- the same live-database gap both sealed lanes already flagged for restic remains open for anything beyond these two observability backends.",
+    "The sandbox-runtime test used only srt's default settings with an empty allowedHosts list and did not attempt every possible srt configuration (e.g. a settings file that might permit shared network namespace or explicit loopback allowances); the conclusion is that the *default* invocation breaks inbound listening, not that no configuration could work. `srt --help` did not surface an obvious flag for this, but the full settings-file schema was not read.",
+    "This comparison did not touch or modify the live production observability stack running on this host (prometheus pid 386/386-successor, loki pid 370, otelcol pid 381 on the ecosystem's regular ports 19090/13100); all test instances used distinct loopback ports (24317/24318, 29090, 23100, 29190, 23200) and a scratch data directory under <host-cache-path>/sota-refresh-20260923/obs-compare, which was fully cleaned up (all test processes killed, ports freed) at the end of this run.",
+    "Grafana, Alertmanager and ntfy (part of the retained 'current_choice' but not in either contested three-item set) were not re-exercised in this run; this receipt only adjudicates the specific contested candidates named in the task."
+  ],
+  "checked_at": "2026-09-23T00:28:05Z"
+}

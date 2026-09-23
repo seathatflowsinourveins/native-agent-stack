@@ -12561,6 +12561,16 @@
       "path": "evidence/artifacts/layer-verdicts-20260922/packets/us-equities__data-quality-orchestration.json",
       "sha256": "cdbe255da0593b73f77e57bc8b887984a78e5233165f3a9fa27818d427708eeb",
       "bytes": 8782
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/obs-compare/README.md",
+      "sha256": "8c68442f07309bc1672964db1277e0168a169248a257e9e6376522ca293216d0",
+      "bytes": 5697
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/obs-compare/observability-hosting-comparison.json",
+      "sha256": "1daba1d9bd2e9def88a326fb483744f01e9e75c8df994752208e058c6283a252",
+      "bytes": 19671
     }
   ],
   "convergence_records": [
