@@ -12569,18 +12569,18 @@
     },
     {
       "path": "evidence/artifacts/sota-refresh-20260923/pins-runtime/dagu.json",
-      "sha256": "8b145ad3b1b9e92679fc0d14d4149242837baf7f97a750edef1f0d03b8df790d",
-      "bytes": 13243
+      "sha256": "fb877f598d98bd305604620fc758a5a72fd1473d887524b6f94acec3d4bb4b46",
+      "bytes": 15376
     },
     {
       "path": "evidence/artifacts/sota-refresh-20260923/pins-runtime/skfolio.json",
-      "sha256": "207dc0eeb86d02f545e9246cda0d82e9bb85c54944a2f3b763d5bb330a5f7602",
-      "bytes": 7659
+      "sha256": "4965d7b2430fc6db9b546820ce915f4c1f8679fdb24b49f1e85f037988dde887",
+      "bytes": 8959
     },
     {
       "path": "evidence/artifacts/sota-refresh-20260923/pins-runtime/clickhouse.json",
-      "sha256": "744506b67444c6dd5dab530d694c38b8185c77e15b5d6c81e3ea1c9ac2c30805",
-      "bytes": 7434
+      "sha256": "ab969677284b0f27b10ce153718cfe805db7256c5a28d361d7b657cb5a54cb1a",
+      "bytes": 8193
     },
     {
       "path": "evidence/artifacts/sota-refresh-20260923/pins-runtime/patched-harnesses/skfolio-run-optimizer-130.py",
