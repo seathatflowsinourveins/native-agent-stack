@@ -5923,6 +5923,16 @@
       "bytes": 236
     },
     {
+      "path": "blueprints/gap-wave3-20260923/forced-skill-ab/cases.json",
+      "sha256": "b40d720fc5831deae3035829eaeab7e59f22c8744a1bb521c6d4011ce5a579a0",
+      "bytes": 9193
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/forced-skill-ab/scored-results.json",
+      "sha256": "a94c29379c9a0185916333a26f245c8b3f758c05767776bc4b95fb56c03de7c3",
+      "bytes": 2887
+    },
+    {
       "path": "blueprints/gap-wave3-20260923/native-clients-research-task/extract-summary.json",
       "sha256": "3ca8f07fcd60e4e650828cd878347bb47de05f8ca4de4ef5e71dd9bfbeb7fb1d",
       "bytes": 9361
@@ -6081,6 +6091,11 @@
       "path": "blueprints/gap-wave3-20260923/native-clients-sdk-vs-cli/sdk-task.py",
       "sha256": "0d1945ca05a12b87dd948791e8451684f08855373cad7eacfccd9baef32f05a4",
       "bytes": 3483
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/typesafe-extended/cases.json",
+      "sha256": "7adef5c4578f4636a1596ff3e67f5dab43c051f6015c1d0e477f071579168462",
+      "bytes": 16076
     },
     {
       "path": "blueprints/memory-lifecycle-probe/README.md",
@@ -10278,14 +10293,29 @@
       "bytes": 19163
     },
     {
+      "path": "evidence/artifacts/gap-wave3-20260923/instructions-skills/forced-skill-arm-ab.json",
+      "sha256": "f2408f7025ac80f3d68da1dd566f4cdcff04173966157eac8e57783be1619067",
+      "bytes": 18847
+    },
+    {
+      "path": "evidence/artifacts/gap-wave3-20260923/instructions-skills/typesafe-extended-label-set.json",
+      "sha256": "54df68836b6e3aa5aacc5016fb309bc0b382317fb4825c1c137b322cb4928678",
+      "bytes": 22286
+    },
+    {
+      "path": "evidence/artifacts/gap-wave3-20260923/instructions-skills/worker-skill-preload-probe.json",
+      "sha256": "2d9b5f889fb0adbe37e1c0956293c676f3855ce62307b803d410ac74b7fbc80c",
+      "bytes": 5097
+    },
+    {
       "path": "evidence/artifacts/gap-wave3-20260923/native-clients/arm-comparison-research-task.json",
-      "sha256": "081060184c177ed0db5ac257a71e41677836c5e28abf488c0180b9987d974132",
-      "bytes": 21234
+      "sha256": "deec6936987a8ea658bc915678f15ce37fcbe87de6209de4214773af0fe3d4a5",
+      "bytes": 21975
     },
     {
       "path": "evidence/artifacts/gap-wave3-20260923/native-clients/sdk-vs-cli-resume-comparison.json",
-      "sha256": "1689ccade88ccf64d0ed4e6455e7376c362c2565cda4fa7e321f0cdbdb4493fa",
-      "bytes": 21675
+      "sha256": "a0bb04f3c0e5de439994051ba8f55613a306d8a3d873e9c7d47cb9aaf6e05099",
+      "bytes": 22524
     },
     {
       "path": "evidence/artifacts/harness-rules-convergence-20260922/codex-agent-roles-source.json",
@@ -14364,8 +14394,8 @@
     },
     {
       "path": "tests/test_gap_wave_ledger.py",
-      "sha256": "186b9c6909939136f2f4a6177410c13709f3acdece31978e6e08ca488b4f2d23",
-      "bytes": 9020
+      "sha256": "63f6ef113311cf13f1ec442f3c8bf1b44008942760ded5791fe34becf7d1b650",
+      "bytes": 9753
     },
     {
       "path": "tests/test_gitleaks_config.py",
@@ -14644,8 +14674,8 @@
     },
     {
       "path": "tools/sota-convergence/gap_wave_ledger.py",
-      "sha256": "8de1e940df6f214728b98fd2fb4e98d544de3a528e2b8805886283ba1cd03153",
-      "bytes": 12685
+      "sha256": "142eb93021eb2f299900cd1a2443f842c22d642d0b047f5cf714fd038dc71492",
+      "bytes": 13299
     },
     {
       "path": "tools/sota-convergence/github_freshness.py",
@@ -14696,31 +14726,6 @@
       "path": "tools/token-report/token_manifest.py",
       "sha256": "7b1c0511e9a56f587392309330e447bb190e5c819950892997a44065f2714e33",
       "bytes": 50793
-    },
-    {
-      "path": "blueprints/gap-wave3-20260923/forced-skill-ab/cases.json",
-      "sha256": "b40d720fc5831deae3035829eaeab7e59f22c8744a1bb521c6d4011ce5a579a0",
-      "bytes": 9193
-    },
-    {
-      "path": "blueprints/gap-wave3-20260923/forced-skill-ab/scored-results.json",
-      "sha256": "a94c29379c9a0185916333a26f245c8b3f758c05767776bc4b95fb56c03de7c3",
-      "bytes": 2887
-    },
-    {
-      "path": "blueprints/gap-wave3-20260923/typesafe-extended/cases.json",
-      "sha256": "7adef5c4578f4636a1596ff3e67f5dab43c051f6015c1d0e477f071579168462",
-      "bytes": 16076
-    },
-    {
-      "path": "evidence/artifacts/gap-wave3-20260923/instructions-skills/forced-skill-arm-ab.json",
-      "sha256": "64cd19ab64d8b2aa464b8e93cf1e06b4e3525fa6ee1504f9b5add9bde80553d6",
-      "bytes": 17731
-    },
-    {
-      "path": "evidence/artifacts/gap-wave3-20260923/instructions-skills/typesafe-extended-label-set.json",
-      "sha256": "50494d641afaec49f351c5952a4fb4d0c06b017e3ac91d6ebd65378c729fcd01",
-      "bytes": 21655
     }
   ],
   "convergence_records": [
