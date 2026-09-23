@@ -848,12 +848,14 @@ def process_row(row: dict, root: Path, catalog: str, layer_id: str, work_dir: Pa
             adjudication_relative = f"{sealed_base}/adjudication/{run_id}.json"
             sealed_writes.append((root / sealed_base / "adjudication" / f"{run_id}.json", adjudication_text))
             adjudication_sha256 = hashlib.sha256(adjudication_text.encode("utf-8")).hexdigest()
+            outcome["adjudication"] = {"outcome": "sealed", "sha256": adjudication_sha256}
             add_gap(f"lanes disagreed: {ids_text}; adjudicated by {adjudication_relative}")
             verdict_status = "recorded"
         elif adjudication is not None and adjudication["winner_lane"] is None:
             adjudication_relative = f"{sealed_base}/adjudication/{run_id}.json"
             sealed_writes.append((root / sealed_base / "adjudication" / f"{run_id}.json", adjudication_text))
             adjudication_sha256 = hashlib.sha256(adjudication_text.encode("utf-8")).hexdigest()
+            outcome["adjudication"] = {"outcome": "sealed", "sha256": adjudication_sha256}
             tally = adjudication["tally"]
             reason = f"; {adjudication['split_reason']}" if adjudication.get("split_reason") else ""
             add_gap(f"lanes disagreed: {ids_text}; the counterbalanced adjudication did not agree "
@@ -1034,7 +1036,10 @@ def run_manifest_document(work_dir: Path, run_date: str, sealed_base: str, outco
                  "lanes": {lane: manifest_value(outcome[lane]) for lane in LANES}}
         adjudication = [manifest_reason(item["reason"]) for item in rejections
                         if (item["catalog"], item["layer_id"], item["lane"]) == (catalog, layer_id, "adjudication")]
-        if adjudication:
+        if outcome.get("adjudication"):
+            # A sealed adjudication's sha256 is listed like a sealed return's (review of the #122 fix round).
+            entry["adjudication"] = dict(outcome["adjudication"])
+        elif adjudication:
             entry["adjudication"] = {"outcome": "rejected", "reasons": adjudication}
         entries.append(entry)
         if digest is not None:

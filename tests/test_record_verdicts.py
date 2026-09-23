@@ -14,12 +14,13 @@ import hashlib
 import importlib.util
 import io
 import json
+import re
 import shutil
 import tempfile
 import unittest
 from pathlib import Path
 
-from scripts.landscape import build_landscape
+from scripts.landscape import build_landscape, withhold_policy_labels
 
 ROOT = Path(__file__).resolve().parents[1]
 TOOL_DIR = ROOT / "tools" / "sota-convergence"
@@ -87,8 +88,9 @@ def make_packet(catalog, layer_id, candidates):
                                       "source_review", "synthetic"],
                   "disposition": ["conditional", "measured_tradeoff", "observed_failure", "out_of_scope",
                                   "overlap", "selected", "unqualified"]},
+        # A --withhold-labels packet lists every policy label (CI rejects a retained packet lacking one).
         "withheld": ["current_choice", "decision", "rationale", "candidates[].disposition",
-                     "candidates[].rationale"],
+                     "candidates[].rationale"] + withhold_policy_labels("Requirement text"),
         "rules": ["Judge from retained evidence."],
     }
 
@@ -1981,6 +1983,42 @@ class ReviewOf122Tests(NewWaveFixture):
         with self.assertRaisesRegex(SystemExit, "carries withheld keys .*upstream.latest"):
             self.run_wave()
         self.assertFalse(self.sealed_base().exists())
+
+    def test_a_packet_carrying_a_disposition_label_or_a_nested_withheld_key_is_refused(self):
+        # Review of the #122 fix round: --write re-checked only the positions withhold_popularity
+        # strips, so a disposition label or a nested release/popularity key reached the sealed wave.
+        changes = {
+            "candidates[].review_status": lambda c: c.update(review_status="confirmed_default"),
+            "candidates[].decisions[].selection": lambda c: c.update(decisions=[{"id": "d1", "selection": "default"}]),
+            "candidates[].upstream.latest_flag": lambda c: c.update(upstream={"latest_flag": {"tag": "release/2025-11-28"}}),
+            "candidates[].evidence.stars": lambda c: c.update(evidence={"stars": 9}),
+        }
+        for label, change in changes.items():
+            with self.subTest(label):
+                self.packets = PacketWriter(self.work_dir)
+                c2 = make_candidate("c2", "wave-withheld-layer", "c2")
+                change(c2)
+                self.packets.write("foundation", "wave-withheld-layer", make_packet(
+                    "foundation", "wave-withheld-layer", [make_candidate("c1", "wave-withheld-layer", "c1"), c2]))
+                self.packets.flush()
+                with self.assertRaisesRegex(SystemExit, "carries withheld keys .*" + re.escape(label)):
+                    self.run_wave()
+                self.assertFalse(self.sealed_base().exists())
+
+    def test_the_run_manifest_lists_each_sealed_adjudication(self):
+        # Review of the #122 fix round: a sealed adjudication was bound only by its row.
+        catalog = self.record_disagreement()
+        lanes = self.load_row(catalog, "wave-crossfamily-layer")["lanes"]
+        manifest = json.loads((self.sealed_base() / "run-manifest.json").read_text(encoding="utf-8"))
+        entry = next(item for item in manifest["packets"] if item["layer_id"] == "wave-crossfamily-layer")
+        self.assertEqual(entry["adjudication"], {"outcome": "sealed", "sha256": lanes["adjudication_sha256"]})
+        adjudication = self.sealed_base() / "adjudication" / f"{lanes['claude']['run_id']}.json"
+        adjudication.write_text(adjudication.read_text(encoding="utf-8").replace("retained", "Retained"),
+                                encoding="utf-8")
+        digest = hashlib.sha256(adjudication.read_bytes()).hexdigest()
+        self.write_ledger_row("wave-crossfamily-layer", lambda row: row["lanes"].update(adjudication_sha256=digest))
+        with self.assertRaisesRegex(ValueError, "run manifest's sealed adjudication .* differs from the row's"):
+            build_landscape(self.root)
 
     # Finding 7 -------------------------------------------------------------------------------
     def test_a_lane_failure_is_recorded_as_failed_with_its_reason(self):

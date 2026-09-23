@@ -116,6 +116,44 @@ overturn comparison) exists only on non-adopted candidates and only hints at the
 now withheld with `newcomer` and listed as `candidates[].note`; no packet requirement or prompt rule
 reads it.
 
+**Review of the fix round (2026-09-23, head `fcee72b`).** An independent review found one medium
+and two low defects; each is fixed with a regression test that fails on `fcee72b`
+(`tests/test_lane_packets.py` `RecursiveWithheldKeyTests`, `tests/test_landscape.py`
+`test_retained_packets_are_checked_at_every_depth`, `test_a_sealed_adjudication_is_bound_by_the_run_manifest`
+and `test_a_layer_verdicts_folder_no_row_can_name_is_rejected`, `tests/test_record_verdicts.py`
+`ReviewOf122Tests` `test_a_packet_carrying_a_disposition_label_or_a_nested_withheld_key_is_refused` and
+`test_the_run_manifest_lists_each_sealed_adjudication`):
+
+- *Withheld keys at any depth (medium).* `withheld_packet_keys` checked only the positions
+  `withhold_popularity` strips, so a nested release date, `evidence.stars`, a top-level `newcomers`
+  list, a non-null `review_status` or a `decisions[].selection` passed CI and `--write`. The check now
+  walks the whole packet. At any depth it rejects a popularity/recency key, `pin_behind_upstream`,
+  `newcomer`, `note`, and any key naming the latest version, a release or a newcomer. On a
+  candidate or component copy it also rejects `selection`, `disposition`, `rationale`,
+  `current_choice` and a non-null `review_status`. At the top level it rejects `current_choice`,
+  `decision` and `rationale`. It also requires every always-listed policy label in `withheld[]`,
+  which confirms the packet was built with `--withhold-labels`. The only exemptions are
+  `archived`/`license` when the requirement names them and the packet's own `checked_at`.
+  `lane_packets.withhold_popularity` strips with the same predicate at any depth.
+  The review also exposed one leak in real packets: `upstream.latest_flag`, whose tag-listing
+  fallback can be date-shaped (`release/2025-11-28` in the 2026-09-23 manifest's packets). It is now
+  withheld and listed. The default (2026-09-22) build is byte-identical.
+- *Adjudication bound by the manifest (low).* The run manifest entry of a row with a sealed
+  adjudication (recorded or split) carries `adjudication: {outcome: sealed, sha256}`. `landscape.py`
+  requires it to equal the row's `lanes.adjudication_sha256` and re-hashes the file against it. A
+  rewrite therefore has to change the manifest and every row's `run_manifest_sha256`, the same as a
+  sealed return.
+- *Stray wave folders (low).* A `layer-verdicts-<id>` folder whose id is not alphanumeric is now
+  rejected instead of skipped.
+- *Kept deliberately: a proposal after a failed revision.* The lane (agent-lab `6aab001`) still seals
+  a never-refuted proposal when the revision ran only for a major finding and that revision is then
+  refuted or comes back unknown. The lens prompts define such a major finding as not refuting the
+  winner (for example a stronger non-adopted candidate missing from `challenger_preferred`). Both
+  lenses returned unrefuted on the proposal, and the sealed Claude return records `revision_status`, so the
+  unresolved major finding is visible. Discarding the proposal would turn a failed attempt to add
+  detail into no verdict. Overturn: a re-record in which a sealed proposal with a refuted revision
+  is shown wrong by its retained evidence.
+
 **Left for a later PR:** finding 4 (a CI step comparing `layer-verdict-waves.json` with the base
 branch so a single PR cannot rewrite an older wave's document, registry hash and rows together) and
 finding 8 (the Claude lane's model name taken from the workflow's `result["model"]` and bound to a

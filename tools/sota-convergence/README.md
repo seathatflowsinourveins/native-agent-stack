@@ -637,7 +637,10 @@ listed in the packet's `withheld` list (for example
 always, not only when it is date-shaped (the stricter of the two options; no
 packet requirement names releases, versions or maintenance), together with
 `upstream.prerelease`, which describes that release, and the copy's
-`pin_behind_upstream`, which is derived by comparing the pin with it. The pin
+`pin_behind_upstream`, which is derived by comparing the pin with it, and
+`upstream.latest_flag`, the flagged tag-listing fallback (it can be
+date-shaped, such as `release/2025-11-28`). The strip reaches any depth of a
+copy, not only the copy and its `upstream` record. The pin
 itself and `upstream.renamed_to` stay. The default mode is byte-identical, so the retained
 2026-09-22 packets still reproduce; they were built before this rule and carry
 those fields.
@@ -848,19 +851,30 @@ re-applied by `scripts/landscape.py` in CI to the sealed files):
   lanes accounted for and its packet hash in the recorded SHA256SUMS text.
 - *Retained packets.* A new wave's `--write` copies the packets and their
   `SHA256SUMS` into `<sealed_base>/packets/` and refuses a packet that still
-  carries a withheld key (`scripts/landscape.py` `withheld_packet_keys`:
-  popularity counts, any `*_at`, `upstream.latest`, `upstream.prerelease`,
-  `pin_behind_upstream`, `newcomer`, the candidate-only `note`). CI re-reads
-  each retained packet (hash and withheld keys), requires each row's packet
-  there, and binds the adjudication judgments' `stripped_packet_sha256` to it.
+  carries a withheld key (`scripts/landscape.py` `withheld_packet_keys`, which
+  walks the whole packet: at any depth a popularity count, any `*_at` other
+  than the packet's own `checked_at`, `pin_behind_upstream`, `newcomer`,
+  `note`, or a key naming the latest version, a release or a newcomer --
+  `upstream.latest`, `upstream.prerelease`, `upstream.latest_flag`, a nested
+  `release` or a top-level `newcomers` list; `archived`/`license` unless the
+  requirement names them; on a candidate or component copy `selection`,
+  `disposition`, `rationale`, `current_choice` or a non-null `review_status`;
+  and any always-listed policy label missing from `withheld[]`, which shows
+  the packet was not built with `--withhold-labels`). `withhold_popularity`
+  strips with the same predicate at any depth. CI re-reads each retained
+  packet (hash and withheld keys), requires each row's packet there, and binds
+  the adjudication judgments' `stripped_packet_sha256` to it.
 - *A sealed wave is never rewritten.* A new wave's `--write` refuses once its
   `run-manifest.json` exists, unless `--append-rows CATALOG/LAYER_ID[,...]`
   names only rows absent from it (the manifest keeps its entries and gains
   those rows), and never overwrites a sealed file with other bytes. Each row
   stores `lanes.run_manifest_sha256` (an append re-binds the wave's rows) and,
-  when an adjudication was sealed for it, `lanes.adjudication_sha256`;
-  `scripts/landscape.py` verifies both and rejects any file under a new wave's
-  sealed folder that no row and not the run manifest references.
+  when an adjudication was sealed for it, `lanes.adjudication_sha256`, which
+  the manifest entry also lists (`adjudication: {outcome: sealed, sha256}`);
+  `scripts/landscape.py` verifies each against the other and the file, rejects
+  any file under a new wave's sealed folder that no row and not the run
+  manifest references, and rejects a `layer-verdicts-<id>` folder whose id is
+  not alphanumeric (no row can name it).
 - *Platform status (one shared rule).* `record_verdicts.platform_status_for`
   calls `scripts/platform_status.py` `platform_status(platform_id, winner,
   context)` for every platform, with `context = load_context(root)` read once

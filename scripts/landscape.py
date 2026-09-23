@@ -107,9 +107,26 @@ RETAINED_PACKETS_DIR = "packets"
 # withhold_popularity, which imports these).
 POPULARITY_RECENCY_FIELDS = ("stars", "forks", "watchers", "pushed_at", "released_at")
 POPULARITY_TOKENS = ("star", "fork", "watcher", "subscriber", "download", "popular", "trending")
-UPSTREAM_RELEASE_FIELDS = ("latest", "prerelease")
+UPSTREAM_RELEASE_FIELDS = ("latest", "prerelease", "latest_flag")
 COPY_WITHHELD_FIELDS = ("pin_behind_upstream", "newcomer", "note")
 PACKET_UPSTREAM_COPIES = ("candidates", "sota_components_not_in_candidates")
+# Review of the #122 fix round (2026-09-23): the withheld-key check walks every depth of the packet,
+# not only the two positions withhold_popularity stripped. At any depth a key is withheld when it is
+# a popularity/recency key, one of COPY_WITHHELD_FIELDS, or names the latest version, any release,
+# a newcomer or a pin-behind comparison (for example upstream.latest_release, upstream.release,
+# upstream.latest_flag, whose tag-listing fallback can be date-shaped, or a top-level newcomers
+# list). archived/license are kept only where the requirement names them (REQUIREMENT_GATED_FIELDS).
+# The packet's own checked_at is its build date, not a candidate signal. On a candidate or component
+# copy the disposition labels are withheld at any depth too: selection, disposition, rationale and
+# current_choice never appear and review_status is null (lane_packets.withhold_labels); at the top
+# level current_choice, decision and rationale never appear (lane_packets.WITHHELD). A packet whose
+# withheld[] lacks a policy label was not built with --withhold-labels.
+WITHHELD_KEY_TOKENS = ("latest", "release", "newcomer", "pin_behind")
+REQUIREMENT_GATED_FIELDS = {"archived": ("archiv", "maintained", "maintenance"), "license": ("licen",)}
+PACKET_OWN_KEYS = ("checked_at",)
+COPY_DISPOSITION_KEYS = ("selection", "disposition", "rationale", "current_choice")
+COPY_NULL_ONLY_KEYS = ("review_status",)
+TOP_LEVEL_WITHHELD_KEYS = ("current_choice", "decision", "rationale")
 # The Claude lane's refutation summary (layer-verdict-lane.js): both lens votes are required on the
 # object it seals (2026-09-23 review of #122, finding 5).
 REFUTATION_LENSES = ("evidence", "challenger")
@@ -155,22 +172,66 @@ def is_popularity_or_recency_key(key):
             or any(token in lowered for token in POPULARITY_TOKENS))
 
 
+def requirement_names(field, requirement):
+    """True when the packet requirement names a REQUIREMENT_GATED_FIELDS field (licensing or
+    maintenance status), which makes it evidence rather than a popularity proxy."""
+    text = requirement.lower() if isinstance(requirement, str) else ""
+    return any(token in text for token in REQUIREMENT_GATED_FIELDS[field])
+
+
+def is_withheld_packet_key(key, kept_gated=()):
+    """Whether a --withhold-labels packet may carry ``key`` at any depth (the shared policy of
+    lane_packets.withhold_popularity and withheld_packet_keys); ``kept_gated`` are the
+    REQUIREMENT_GATED_FIELDS the packet's requirement names."""
+    lowered = key.lower()
+    if lowered in REQUIREMENT_GATED_FIELDS:
+        return lowered not in kept_gated
+    return (is_popularity_or_recency_key(key) or lowered in COPY_WITHHELD_FIELDS or lowered == "notes"
+            or any(token in lowered for token in WITHHELD_KEY_TOKENS))
+
+
+def withhold_policy_labels(requirement=None):
+    """The withheld[] labels lane_packets.withhold_popularity always lists for each copy
+    collection; a packet lacking one was not built with --withhold-labels."""
+    gated = [field for field in REQUIREMENT_GATED_FIELDS if not requirement_names(field, requirement)]
+    return sorted(f"{collection}[].{label}" for collection in PACKET_UPSTREAM_COPIES
+                  for label in [f"upstream.{field}" for field in
+                                list(POPULARITY_RECENCY_FIELDS) + list(UPSTREAM_RELEASE_FIELDS) + gated]
+                  + list(COPY_WITHHELD_FIELDS))
+
+
 def withheld_packet_keys(packet):
-    """Labels ("candidates[].upstream.stars", ...) of every withheld key a packet still carries on a
-    candidate or unclaimed-component copy; empty for a --withhold-labels packet."""
+    """Labels ("candidates[].upstream.stars", "newcomers", ...) of every withheld key a packet still
+    carries at any depth, plus "withheld[] lacks <label>" for each policy label missing from its
+    withheld list; empty only for a --withhold-labels packet."""
+    if not isinstance(packet, dict):
+        return ["<packet is not a JSON object>"]
+    requirement = packet.get("requirement")
+    kept_gated = {field for field in REQUIREMENT_GATED_FIELDS if requirement_names(field, requirement)}
     found = set()
-    for collection in PACKET_UPSTREAM_COPIES:
-        for item in (packet.get(collection) or []) if isinstance(packet, dict) else []:
-            if not isinstance(item, dict):
-                continue
-            for key in item:
-                if key != "upstream" and (is_popularity_or_recency_key(key) or key in COPY_WITHHELD_FIELDS):
-                    found.add(f"{collection}[].{key}")
-            upstream = item.get("upstream")
-            if isinstance(upstream, dict):
-                for key in upstream:
-                    if is_popularity_or_recency_key(key) or key in UPSTREAM_RELEASE_FIELDS:
-                        found.add(f"{collection}[].upstream.{key}")
+
+    def walk(value, label, in_copy):
+        if isinstance(value, dict):
+            for key, item in value.items():
+                path = f"{label}.{key}" if label else key
+                lowered = key.lower() if isinstance(key, str) else ""
+                if not label and lowered in PACKET_OWN_KEYS:
+                    continue
+                if (is_withheld_packet_key(key, kept_gated)
+                        or (not label and lowered in TOP_LEVEL_WITHHELD_KEYS)
+                        or (in_copy and (lowered in COPY_DISPOSITION_KEYS
+                                         or (lowered in COPY_NULL_ONLY_KEYS and item is not None)))):
+                    found.add(path)
+                    continue
+                walk(item, path, in_copy or (not label and key in PACKET_UPSTREAM_COPIES))
+        elif isinstance(value, list):
+            for item in value:
+                walk(item, f"{label}[]", in_copy)
+
+    walk(packet, "", False)
+    listed = packet.get("withheld")
+    listed = set(listed) if isinstance(listed, list) and all(isinstance(item, str) for item in listed) else set()
+    found |= {f"withheld[] lacks {label}" for label in withhold_policy_labels(requirement) if label not in listed}
     return sorted(found)
 
 
@@ -421,6 +482,14 @@ def run_manifest_row_issue(manifest, run_id, catalog, layer_id, lanes_field):
                     and all(isinstance(reason, str) and reason for reason in outcome["reasons"])):
                 return (f"the run manifest's {outcome['outcome']} {lane} lane of {catalog}/{layer_id} "
                         "needs its reasons")
+    # A sealed adjudication is bound by the manifest as well as by the row (review of the #122 fix
+    # round), so rewriting one means rewriting the manifest and every row's run_manifest_sha256.
+    adjudication = entry.get("adjudication")
+    manifest_sha256 = (adjudication.get("sha256") if isinstance(adjudication, dict)
+                       and adjudication.get("outcome") == "sealed" else None)
+    if manifest_sha256 != lanes_field.get("adjudication_sha256"):
+        return (f"the run manifest's sealed adjudication of {catalog}/{layer_id} ({manifest_sha256!r}) differs from "
+                f"the row's lanes.adjudication_sha256 ({lanes_field.get('adjudication_sha256')!r})")
     return None
 
 
@@ -440,8 +509,13 @@ def verify_sealed_waves(root, wave_refs):
     if artifacts.is_dir():
         waves |= {path.name[len("layer-verdicts-"):] for path in artifacts.glob("layer-verdicts-*") if path.is_dir()}
     for wave in sorted(waves):
-        if is_grandfathered_run(wave) or not re.fullmatch(r"[0-9A-Za-z]+", wave):
+        if is_grandfathered_run(wave):
             continue
+        # A folder whose id no row can name (the sealed_base pattern) is rejected, not skipped, so
+        # no sealed-looking file sits in evidence/artifacts unchecked (review of the #122 fix round).
+        require(re.fullmatch(r"[0-9A-Za-z]+", wave),
+                f"{SEALED_BASE_PREFIX}{wave} is not a sealed wave folder: a wave id is alphanumeric "
+                "(record_verdicts.py --run-id); move or remove it")
         base = SEALED_BASE_PREFIX + wave
         folder = safe_file(Path(root), base)
         if not folder.is_dir():
@@ -487,6 +561,13 @@ def verify_sealed_waves(root, wave_refs):
                     require(sha256_of(root, f"{base}/{relative}") == outcome.get("sealed_sha256"),
                             f"wave {wave}: sealed return {relative} differs from its run-manifest sha256")
                     referenced.add(relative)
+            adjudication = entry.get("adjudication")
+            if isinstance(adjudication, dict) and adjudication.get("outcome") == "sealed":
+                # The manifest lists each sealed adjudication's sha256 as it lists each sealed return's.
+                relative = f"adjudication/{entry.get('catalog')}-{entry.get('layer_id')}-{wave}.json"
+                require(sha256_of(root, f"{base}/{relative}") == adjudication.get("sha256"),
+                        f"wave {wave}: sealed adjudication {relative} differs from its run-manifest sha256")
+                referenced.add(relative)
         for path in sorted(folder.rglob("*")):
             if path.is_file():
                 relative = path.relative_to(folder).as_posix()

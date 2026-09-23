@@ -14319,8 +14319,8 @@
     },
     {
       "path": "scripts/landscape.py",
-      "sha256": "5685b917fe2f5fcfcf63c7981ae8bfabeded3ab19218d09d102a19e06ce6e9d6",
-      "bytes": 80380
+      "sha256": "40c76b6f3da2a274c7e6ee836750e0df7d712f0271036b70bbb96b8b662bb423",
+      "bytes": 85948
     },
     {
       "path": "scripts/native_token_ci.py",
@@ -14669,8 +14669,8 @@
     },
     {
       "path": "tests/test_landscape.py",
-      "sha256": "efed587983a082860e3b4a6fadeb1febf632f55ef6736980b7bccae5e84f1540",
-      "bytes": 72611
+      "sha256": "23c920916e72deb0143d76058507cd50b2b800d031f508508360cb7d578a5d18",
+      "bytes": 77628
     },
     {
       "path": "tests/test_layer_verdicts.py",
@@ -14889,8 +14889,8 @@
     },
     {
       "path": "tools/sota-convergence/README.md",
-      "sha256": "8999aa0c715226892e075dc380375ecad9ac7ff6438c74fd7b497a609c310ce2",
-      "bytes": 78618
+      "sha256": "91dfee540be37f8efa4338b887d67df4430f9f9da8625f99e496d9883cf83d11",
+      "bytes": 79618
     },
     {
       "path": "tools/sota-convergence/build_manifest.py",

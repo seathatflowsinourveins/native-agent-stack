@@ -3,11 +3,13 @@
 import copy
 import hashlib
 import json
+import re
 from pathlib import Path
 import tempfile
 import unittest
 
-from scripts.landscape import MANIFEST, build_landscape, judge_adjudication
+from scripts.landscape import (MANIFEST, build_landscape, judge_adjudication, verify_sealed_waves,
+                               withhold_policy_labels)
 from scripts import platform_status
 
 
@@ -432,7 +434,7 @@ class LayerVerdictSchemaV2Tests(LandscapeTests):
                        "adopted": True, "upstream": {}},
                       {"key": "c2", "component_id": None, "repository": "https://github.com/example/alternative",
                        "adopted": True, "upstream": {}}],
-                  "sota_components_not_in_candidates": [], "withheld": ["candidates[].upstream.stars"],
+                  "sota_components_not_in_candidates": [], "withheld": withhold_policy_labels("Find the source"),
                   **(packet_extra or {})}
         name = f"foundation__{layer_id}.json"
         self.write(f"{NEW_WAVE_BASE}/packets/{name}", packet)
@@ -789,7 +791,15 @@ class LayerVerdictSchemaV2Tests(LandscapeTests):
                         "evidence_refs": ["receipt.json"], "judgments": judgments}
         self.write(f"{base}/adjudication/{run_id}.json", adjudication)
         if lanes is not None:
-            lanes["adjudication_sha256"] = hashlib.sha256(json.dumps(adjudication).encode("utf-8")).hexdigest()
+            digest = hashlib.sha256(json.dumps(adjudication).encode("utf-8")).hexdigest()
+            lanes["adjudication_sha256"] = digest
+            if base == NEW_WAVE_BASE and (self.root / NEW_WAVE_BASE / "run-manifest.json").is_file():
+                # record_verdicts.py lists a sealed adjudication's sha256 in its manifest entry too.
+                def seal(manifest):
+                    for entry in manifest["packets"]:
+                        if f"{entry['catalog']}-{entry['layer_id']}-{NEW_WAVE}" == run_id:
+                            entry["adjudication"] = {"outcome": "sealed", "sha256": digest}
+                self.edit_manifest(lanes, seal)
 
     def packet_sha256(self, layer_id="retrieval"):
         path = self.root / NEW_WAVE_BASE / "packets" / f"foundation__{layer_id}.json"
@@ -962,6 +972,9 @@ class LayerVerdictSchemaV2Tests(LandscapeTests):
         lanes = self.recorded_disagreement()
         lanes["agreement"] = "same_winner"
         lanes.pop("adjudication_sha256")
+        # A thorough editor also drops the manifest's adjudication binding; the recomputed agreement
+        # still objects.
+        self.edit_manifest(lanes, lambda manifest: manifest["packets"][0].pop("adjudication"))
         with self.assertRaisesRegex(ValueError, "agreement 'same_winner' is not what its sealed returns establish "
                                                 "\\('disagree'"):
             self.build()
@@ -1074,6 +1087,63 @@ class LayerVerdictSchemaV2Tests(LandscapeTests):
         self.build()
         sums.write_text(sums.read_text(encoding="utf-8") + "0" * 64 + "  foundation__other.json\n", encoding="utf-8")
         with self.assertRaisesRegex(ValueError, "SHA256SUMS must be retained and equal"):
+            self.build()
+
+    def test_retained_packets_are_checked_at_every_depth(self):
+        # Review of the #122 fix round: CI only looked where withhold_popularity strips, so a nested
+        # release date, a top-level newcomers list or a disposition label passed.
+        c1 = {"key": "c1", "component_id": "selected", "repository": self.candidate["repository"],
+              "adopted": True, "review_status": None, "upstream": {}}
+        c2 = {"key": "c2", "component_id": None, "repository": "https://github.com/example/alternative",
+              "adopted": True, "review_status": None, "upstream": {}}
+        cases = {
+            "candidates[].upstream.latest_flag": {"candidates": [
+                c1, dict(c2, upstream={"latest_flag": {"tag": "release/2025-11-28"}})]},
+            "candidates[].evidence.stars": {"candidates": [c1, dict(c2, evidence={"stars": 9})]},
+            "candidates[].review_status": {"candidates": [c1, dict(c2, review_status="confirmed_default")]},
+            "candidates[].decisions[].selection": {"candidates": [
+                c1, dict(c2, decisions=[{"id": "d1", "selection": "default"}])]},
+            "newcomers": {"newcomers": ["c2"]},
+            "withheld[] lacks candidates[].upstream.stars": {"withheld": ["candidates[].upstream.forks"]},
+        }
+        for label, extra in cases.items():
+            with self.subTest(label):
+                self.layer.update(self.recorded_fields(lanes=self.seal_new_wave(packet_extra=extra)))
+                with self.assertRaisesRegex(ValueError, "carries withheld keys .*" + re.escape(label)):
+                    self.build()
+        self.layer.update(self.recorded_fields(lanes=self.seal_new_wave(packet_extra={"candidates": [c1, c2]})))
+        self.build()
+
+    def test_a_sealed_adjudication_is_bound_by_the_run_manifest(self):
+        # Review of the #122 fix round: only the row's lanes.adjudication_sha256 bound an adjudication,
+        # so rewriting it (and its winner_lane) needed one row edit; the manifest now lists it too.
+        lanes = self.recorded_disagreement()
+        manifest = json.loads((self.root / NEW_WAVE_BASE / "run-manifest.json").read_text(encoding="utf-8"))
+        self.assertEqual(manifest["packets"][0]["adjudication"],
+                         {"outcome": "sealed", "sha256": lanes["adjudication_sha256"]})
+        path = self.root / NEW_WAVE_BASE / "adjudication" / f"{lanes['claude']['run_id']}.json"
+        rewritten = dict(json.loads(path.read_text(encoding="utf-8")), why="A rewritten reason.")
+        self.write(path.relative_to(self.root).as_posix(), rewritten)
+        lanes["adjudication_sha256"] = hashlib.sha256(json.dumps(rewritten).encode("utf-8")).hexdigest()
+        with self.assertRaisesRegex(ValueError, "run manifest's sealed adjudication of foundation/retrieval .* differs "
+                                                "from the row's lanes.adjudication_sha256"):
+            self.build()
+        # The wave check re-hashes the file against the manifest entry as it does a sealed return.
+        lanes["adjudication_sha256"] = manifest["packets"][0]["adjudication"]["sha256"]
+        self.layer["lanes"] = lanes
+        with self.assertRaisesRegex(ValueError, "adjudication_sha256 does not match"):
+            self.build()
+        with self.assertRaisesRegex(ValueError, "wave 20260923: sealed adjudication adjudication/foundation-retrieval-"
+                                                "20260923.json differs from its run-manifest sha256"):
+            verify_sealed_waves(self.root, {})
+
+    def test_a_layer_verdicts_folder_no_row_can_name_is_rejected(self):
+        # Review of the #122 fix round: evidence/artifacts/layer-verdicts-<id> with a non-alphanumeric
+        # id was skipped silently, so sealed-looking files could sit there unchecked.
+        self.layer.update(self.recorded_fields(lanes=self.seal_new_wave()))
+        self.build()
+        self.write("evidence/artifacts/layer-verdicts-2026-09-24/claude/foundation-retrieval.json", {"lane": "claude"})
+        with self.assertRaisesRegex(ValueError, "layer-verdicts-2026-09-24 is not a sealed wave folder"):
             self.build()
 
     def test_a_failed_lane_outcome_carries_its_reason(self):

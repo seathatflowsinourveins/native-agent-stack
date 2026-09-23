@@ -728,6 +728,90 @@ class WithholdPopularityAndRecencyTests(LanePacketsFixture):
         packet = json.loads(plain["foundation__layer-a.json"])
         self.assertTrue(any((c.get("upstream") or {}).get("stars") is not None for c in packet["candidates"]))
 
+class RecursiveWithheldKeyTests(unittest.TestCase):
+    """Review of the #122 fix round (2026-09-23): withheld_packet_keys only looked at the positions
+    withhold_popularity stripped (a copy's own keys and one level under upstream), so a withheld key
+    anywhere else, a disposition label and a packet built without --withhold-labels all passed both
+    record_verdicts.py and scripts/landscape.py. Each position below returned [] on fcee72b."""
+
+    def withheld_packet(self, requirement="Run the tool."):
+        return lane_packets.withhold_popularity({
+            "schema_version": 1, "requirement": requirement, "checked_at": "2026-09-23",
+            "enums": {"disposition": ["selected", "conditional"]}, "withheld": [],
+            "candidates": [{"key": "c1", "pin": "1.0", "review_status": None, "adopted": True,
+                            "decisions": [{"id": "d1", "capability": "x", "evidence_scope": "y"}],
+                            "upstream": {"renamed_to": None}}],
+            "sota_components_not_in_candidates": [{"id": "x", "pin": "1.0", "review_status": None,
+                                                   "upstream": {}}]})
+
+    def test_a_withhold_labels_packet_is_clean(self):
+        # Controls: a null review_status, the packet's own checked_at and the output enums stay.
+        self.assertEqual(withheld_packet_keys(self.withheld_packet()), [])
+
+    def test_every_withheld_key_position_is_rejected(self):
+        positions = {
+            "candidates[].prerelease": lambda p: p["candidates"][0].update(prerelease=False),
+            "candidates[].latest": lambda p: p["candidates"][0].update(latest="2.0"),
+            "candidates[].upstream.newcomer": lambda p: p["candidates"][0]["upstream"].update(newcomer=True),
+            "candidates[].upstream.pin_behind_upstream":
+                lambda p: p["candidates"][0]["upstream"].update(pin_behind_upstream=True),
+            "candidates[].upstream.latest_release":
+                lambda p: p["candidates"][0]["upstream"].update(latest_release="2.0"),
+            "candidates[].upstream.latest_flag": lambda p: p["candidates"][0]["upstream"].update(
+                latest_flag={"tag": "release/2025-11-28", "reason": "tag_listing_only_not_version_shaped"}),
+            "candidates[].upstream.release":
+                lambda p: p["candidates"][0]["upstream"].update(release={"published_at": "2026-09-01"}),
+            "candidates[].evidence.published_at":
+                lambda p: p["candidates"][0].update(evidence={"published_at": "2026-09-01"}),
+            "candidates[].evidence.stars": lambda p: p["candidates"][0].update(evidence={"stars": 9}),
+            "candidates[].decisions[].note": lambda p: p["candidates"][0]["decisions"][0].update(note="gap"),
+            "sota_components_not_in_candidates[].upstream.stars":
+                lambda p: p["sota_components_not_in_candidates"][0]["upstream"].update(stars=9),
+            "newcomers": lambda p: p.update(newcomers=[{"key": "c1"}]),
+            "candidates[].upstream.license": lambda p: p["candidates"][0]["upstream"].update(license="MIT"),
+            "candidates[].upstream.archived": lambda p: p["candidates"][0]["upstream"].update(archived=False),
+            # The disposition labels lane_packets.withhold_labels removes.
+            "candidates[].review_status": lambda p: p["candidates"][0].update(review_status="confirmed_default"),
+            "sota_components_not_in_candidates[].review_status":
+                lambda p: p["sota_components_not_in_candidates"][0].update(review_status="confirmed_default"),
+            "candidates[].decisions[].selection": lambda p: p["candidates"][0]["decisions"][0].update(selection="default"),
+            "candidates[].decisions[].review_status":
+                lambda p: p["candidates"][0]["decisions"][0].update(review_status="accepted_within_scope"),
+            "candidates[].disposition": lambda p: p["candidates"][0].update(disposition="selected"),
+            "current_choice": lambda p: p.update(current_choice="Native selected tool"),
+            # A packet built without --withhold-labels lacks the policy labels in withheld[].
+            "withheld[] lacks candidates[].upstream.stars": lambda p: p["withheld"].remove("candidates[].upstream.stars"),
+        }
+        for label, change in positions.items():
+            with self.subTest(label):
+                packet = self.withheld_packet()
+                change(packet)
+                self.assertIn(label, withheld_packet_keys(packet))
+
+    def test_archived_and_license_pass_only_where_the_requirement_names_them(self):
+        packet = self.withheld_packet("Use a permissively licensed, maintained tool.")
+        packet["candidates"][0]["upstream"].update(license="MIT", archived=False)
+        self.assertEqual(withheld_packet_keys(packet), [])
+
+    def test_the_builder_strips_every_position_the_check_rejects(self):
+        packet = self.withheld_packet()
+        raw = {"requirement": "Run the tool.", "withheld": [],
+               "candidates": [{"key": "c1", "evidence": {"stars": 9, "kept": 1},
+                               "upstream": {"latest_flag": {"tag": "release/2025-11-28"},
+                                            "release": {"published_at": "2026-09-01", "tag": "v1"}}}],
+               "sota_components_not_in_candidates": []}
+        built = lane_packets.withhold_popularity(copy.deepcopy(raw))
+        self.assertNotIn("2025-11-28", json.dumps(built))
+        self.assertEqual(built["candidates"][0]["evidence"], {"kept": 1})
+        self.assertEqual(built["candidates"][0]["upstream"], {})
+        for label in ("candidates[].evidence.stars", "candidates[].upstream.latest_flag",
+                      "candidates[].upstream.release"):
+            self.assertIn(label, built["withheld"])
+        self.assertEqual(withheld_packet_keys(built), [])
+        self.assertEqual(raw["candidates"][0]["evidence"]["stars"], 9, "the input is never mutated")
+        self.assertEqual(withheld_packet_keys(packet), [])
+
+
 if __name__ == "__main__":
     unittest.main()
 
