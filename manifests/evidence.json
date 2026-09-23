@@ -13081,6 +13081,36 @@
       "path": "tests/test_delisting_coverage.py",
       "sha256": "c33b6dd7b33691dcac0ec84db6c600f8777abb06f6fce6d992b7f5fa2d277af5",
       "bytes": 24344
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-mem/README.md",
+      "sha256": "451eeb8f421ed98e92b3369ed92f0482e60bc5a25a2226115180caf6b446e0a0",
+      "bytes": 11563
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-mem/markitdown.json",
+      "sha256": "719469a6809de442b1872ee3580e35ee1533771e039dc2179bf8ca78583dcca4",
+      "bytes": 5539
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-mem/pageindex.json",
+      "sha256": "d7bd5530e8e3c141ec8aab64eebaac26d1e3860230630de77fb00895c6eb4764",
+      "bytes": 5148
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-mem/repomix.json",
+      "sha256": "6daa8ac2054b323740b0aaea014bb96491f6c2889e801611a2bec9c168fa1efb",
+      "bytes": 4498
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-mem/ai-memory.json",
+      "sha256": "a524ed359611ef76a7723917334e15aa6c30b8ac76e66466218efa44f95a0c21",
+      "bytes": 16896
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-mem/mteb.json",
+      "sha256": "d3ff2011dafc09060ca4dd15abc4cf6469a77f9eedfb27d255eb2aaa0208cc47",
+      "bytes": 4375
     }
   ],
   "convergence_records": [
