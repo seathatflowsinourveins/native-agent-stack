@@ -4,7 +4,10 @@ No network, no real catalogs -- a minimal fixture root is built per test.
 Modules are loaded by file path (tools/sota-convergence is not a dotted-import
 package name), matching the pattern already used by test_sota_convergence.py.
 """
+import contextlib
+import hashlib
 import importlib.util
+import io
 import json
 import tempfile
 import unittest
@@ -108,19 +111,45 @@ class BuildVerdictsTests(LayerVerdictFixture):
         self.assertEqual(document["counts"]["us-equities"]["layers"], 1)
         self.assertEqual(build_verdicts.main(["--check", "--root", str(self.root)]), 0)
 
+    def later_wave(self):
+        """A non-grandfathered wave (20260923) with the same manifest: the current wave can be
+        rewritten, while a registered grandfathered one (20260922, which the fixture's pending
+        rows name) never is."""
+        if not self.out_path().exists():
+            self.assertEqual(build_verdicts.main(["--write", "--root", str(self.root)]), 0)
+        manifest = (self.root / "catalogs/sota-convergence/manifest-20260922.json").read_text(encoding="utf-8")
+        (self.root / "catalogs/sota-convergence/manifest-20260923.json").write_text(manifest, encoding="utf-8")
+        return ["--root", str(self.root), "--run-id", "20260923"]
+
     def test_check_is_deterministic_and_idempotent_across_repeated_runs(self):
-        self.assertEqual(build_verdicts.main(["--write", "--root", str(self.root)]), 0)
-        first_json = self.out_path().read_text(encoding="utf-8")
+        wave = self.later_wave()
+        out_path = self.root / "catalogs/sota-convergence/layer-verdicts-20260923.json"
+        self.assertEqual(build_verdicts.main(["--write", *wave]), 0)
+        first_json = out_path.read_text(encoding="utf-8")
         first_handbook = self.handbook_text()
         for _ in range(3):
             self.assertEqual(build_verdicts.main(["--check", "--root", str(self.root)]), 0)
-        self.assertEqual(self.out_path().read_text(encoding="utf-8"), first_json)
+        self.assertEqual(out_path.read_text(encoding="utf-8"), first_json)
         self.assertEqual(self.handbook_text(), first_handbook)
         # Re-running --write on an already-current fixture root must not grow
         # the handbook file (the marker-replacement bug this guards against
         # appended a fresh trailing newline on every run).
-        self.assertEqual(build_verdicts.main(["--write", "--root", str(self.root)]), 0)
+        self.assertEqual(build_verdicts.main(["--write", *wave]), 0)
         self.assertEqual(self.handbook_text(), first_handbook)
+        self.assertEqual(out_path.read_text(encoding="utf-8"), first_json)
+
+    def test_a_registered_grandfathered_wave_is_never_rewritten_even_as_the_newest(self):
+        # Review finding: with 20260922 the only (so current) wave, --write rewrote its document
+        # and replaced its registered sha256; a grandfathered wave is frozen once registered.
+        self.assertEqual(build_verdicts.main(["--write", "--root", str(self.root)]), 0)
+        registry_before = (self.root / build_verdicts.WAVE_REGISTRY).read_bytes()
+        document_before = self.out_path().read_bytes()
+        for argv in (["--write", "--root", str(self.root)],
+                     ["--write", "--root", str(self.root), "--run-id", "20260922"]):
+            with self.assertRaisesRegex(SystemExit, "grandfathered"):
+                build_verdicts.main(argv)
+        self.assertEqual((self.root / build_verdicts.WAVE_REGISTRY).read_bytes(), registry_before)
+        self.assertEqual(self.out_path().read_bytes(), document_before)
 
     def test_run_id_option_derives_a_dated_manifest_and_out_path_and_id_field(self):
         self.write("catalogs/sota-convergence/manifest-20260923.json", {
@@ -185,8 +214,9 @@ class BuildVerdictsTests(LayerVerdictFixture):
         self.assertIn("## Per-layer verdicts (generated)", text)
         self.assertIn("Existing content.", text)  # original content preserved
         self.assertEqual(text.count(build_verdicts.MARKER_BEGIN), 1)
-        # A second write must replace the same block, not append another one.
-        self.assertEqual(build_verdicts.main(["--write", "--root", str(self.root)]), 0)
+        # A second write (of the current, non-grandfathered wave) must replace the same block,
+        # not append another one.
+        self.assertEqual(build_verdicts.main(["--write", *self.later_wave()]), 0)
         self.assertEqual(self.handbook_text().count(build_verdicts.MARKER_BEGIN), 1)
 
     def test_pending_rows_render_as_pending_in_the_handbook_table(self):
@@ -311,6 +341,157 @@ class BuildVerdictsTests(LayerVerdictFixture):
         narrative_heading = text.index("### foundation (per-layer narrative)")
         row_heading = text.index("#### Native clients (native-clients)")
         self.assertLess(narrative_heading, row_heading)
+
+
+class WaveFreezeTests(LayerVerdictFixture):
+    """Per-wave CI (2026-09-23 peer audit): a later wave must not break the default
+    ``--check``. Each wave document is frozen and hash-registered; only the newest wave and
+    the handbook block are regenerated from the current rows."""
+
+    LATER = "20260923"
+
+    def later_manifest(self):
+        self.write(f"catalogs/sota-convergence/manifest-{self.LATER}.json", {
+            "foundation": [{"layer": "native-clients", "title": "Native clients", "components": [
+                {"id": "codex-native-sdk", "pin": "2.0", "upstream": {"latest": "2.0"},
+                 "review_status": "confirmed_default", "pin_behind_upstream": False}]}],
+            "trading": [{"layer": "market-data-reference", "entries": [
+                {"id": "alpaca-py", "pin": "3.0", "upstream": {"latest": "3.0"},
+                 "review_status": "confirmed_default", "pin_behind_upstream": False}]}],
+        })
+
+    def record_later_wave_on_the_foundation_row(self, gap="re-recorded in the later wave"):
+        """What record_verdicts.py --run-id 20260923 --write does to a row: new lanes pointing
+        at the later sealed base and changed verdict fields; the trading row stays on 20260922."""
+        foundation = json.loads((self.root / "catalogs/landscape/foundation.json").read_text())
+        row = foundation["layers"][0]
+        row["open_gaps"] = [gap]
+        row["checked_at"] = "2026-09-23"
+        row["lanes"] = {"claude": {"run_id": f"foundation-native-clients-{self.LATER}", "sealed_sha256": ""},
+                        "codex": {"run_id": "", "sealed_sha256": ""}, "agreement": "pending",
+                        "sealed_base": f"evidence/artifacts/layer-verdicts-{self.LATER}"}
+        self.write("catalogs/landscape/foundation.json", foundation)
+
+    def two_waves(self):
+        self.assertEqual(build_verdicts.main(["--write", "--root", str(self.root)]), 0)
+        self.first_wave_bytes = self.out_path().read_bytes()
+        self.later_manifest()
+        self.record_later_wave_on_the_foundation_row()
+        self.assertEqual(build_verdicts.main(
+            ["--write", "--root", str(self.root), "--run-id", self.LATER, "--checked-at", "2026-09-23"]), 0)
+
+    def later_out(self):
+        return self.root / f"catalogs/sota-convergence/layer-verdicts-{self.LATER}.json"
+
+    def check(self, *extra):
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            code = build_verdicts.main(["--check", "--root", str(self.root), *extra])
+        return code, output.getvalue()
+
+    def test_a_later_wave_leaves_the_default_check_passing(self):
+        self.two_waves()
+        code, output = self.check()
+        self.assertEqual(code, 0, output)
+        # The frozen first wave was not regenerated from the changed rows.
+        self.assertEqual(self.out_path().read_bytes(), self.first_wave_bytes)
+        later = json.loads(self.later_out().read_text(encoding="utf-8"))
+        self.assertEqual(later["id"], f"layer-verdicts-{self.LATER}")
+        self.assertIn("re-recorded in the later wave", self.handbook_text())
+
+    def test_each_wave_is_registered_by_hash(self):
+        self.two_waves()
+        registry = json.loads((self.root / build_verdicts.WAVE_REGISTRY).read_text(encoding="utf-8"))
+        by_run = {wave["run_id"]: wave for wave in registry["waves"]}
+        self.assertEqual(set(by_run), {"20260922", self.LATER})
+        self.assertEqual(by_run["20260922"]["sha256"], hashlib.sha256(self.first_wave_bytes).hexdigest())
+        self.assertEqual(by_run[self.LATER]["sha256"], hashlib.sha256(self.later_out().read_bytes()).hexdigest())
+
+    def test_a_hand_edited_frozen_wave_fails_its_registered_hash(self):
+        self.two_waves()
+        self.out_path().write_bytes(self.first_wave_bytes.replace(b'"schema_version": 1', b'"schema_version":  1'))
+        code, output = self.check()
+        self.assertEqual(code, 1)
+        self.assertIn("registered sha256", output)
+
+    def test_a_row_still_naming_the_frozen_wave_cannot_change(self):
+        self.two_waves()
+        trading = json.loads((self.root / "catalogs/landscape/us-equities.json").read_text())
+        trading["layers"][0]["open_gaps"] = ["edited after the wave was frozen"]
+        self.write("catalogs/landscape/us-equities.json", trading)
+        code, output = self.check()
+        self.assertEqual(code, 1)
+        self.assertIn("us-equities/market-data-reference", output)
+        self.assertIn("20260922", output)
+
+    def test_the_newest_wave_is_regenerated_from_the_current_rows(self):
+        self.two_waves()
+        self.record_later_wave_on_the_foundation_row(gap="a second correction in the same wave")
+        self.assertEqual(self.check()[0], 1)
+        # --write without --run-id rewrites the current (newest) wave only.
+        self.assertEqual(build_verdicts.main(["--write", "--root", str(self.root)]), 0)
+        self.assertEqual(self.check()[0], 0)
+        self.assertEqual(self.out_path().read_bytes(), self.first_wave_bytes)
+        self.assertIn("a second correction in the same wave", self.later_out().read_text(encoding="utf-8"))
+
+    def test_an_older_wave_cannot_be_rewritten(self):
+        self.two_waves()
+        with self.assertRaises(SystemExit):
+            build_verdicts.main(["--write", "--root", str(self.root), "--run-id", "20260922"])
+        self.assertEqual(self.out_path().read_bytes(), self.first_wave_bytes)
+
+    def test_rows_of_an_unregistered_wave_fail_the_check(self):
+        self.assertEqual(build_verdicts.main(["--write", "--root", str(self.root)]), 0)
+        self.later_manifest()
+        self.record_later_wave_on_the_foundation_row()
+        code, output = self.check()
+        self.assertEqual(code, 1)
+        self.assertIn(self.LATER, output)
+
+
+# The committed grandfathered wave (catalog main 38847e5), pinned so that no tool run or hand edit
+# can change it without failing CI's python3 -m unittest, independent of whether a later wave exists.
+GRANDFATHERED_DOCUMENT = "catalogs/sota-convergence/layer-verdicts-20260922.json"
+GRANDFATHERED_DOCUMENT_SHA256 = "2fef6da7468a8e97a319fdc6f75f73374cd34b412bf93de90fd0c2a7504159de"
+GRANDFATHERED_SEALED_BASE = "evidence/artifacts/layer-verdicts-20260922"
+GRANDFATHERED_SEALED_FILE_COUNT = 122
+# sha256 of the "<sha256>  <path relative to the sealed base>\n" listing of every file there, sorted.
+GRANDFATHERED_SEALED_LISTING_SHA256 = "d1ba4bc301d3fc73fbb89d368f4301867e074649816fe4a5ab029be1f9840b3f"
+
+
+class GrandfatheredWavePinTests(unittest.TestCase):
+    """Review finding: the 2026-09-22 wave was frozen only once a later wave existed, so a
+    --run-id-less record_verdicts --write plus build_verdicts --write could rewrite it and its
+    registered hash while --check and landscape.py (grandfathered) still passed."""
+
+    def test_the_grandfathered_rule_covers_only_the_20260922_wave(self):
+        from scripts.landscape import GRANDFATHERED_RUN_IDS
+        self.assertEqual(GRANDFATHERED_RUN_IDS, frozenset({"20260922"}))
+
+    def test_the_committed_wave_document_and_its_registration_are_unchanged(self):
+        self.assertEqual(hashlib.sha256((ROOT / GRANDFATHERED_DOCUMENT).read_bytes()).hexdigest(),
+                         GRANDFATHERED_DOCUMENT_SHA256)
+        registry = json.loads((ROOT / build_verdicts.WAVE_REGISTRY).read_text(encoding="utf-8"))
+        wave = next(item for item in registry["waves"] if item["run_id"] == "20260922")
+        self.assertEqual((wave["path"], wave["sha256"]), (GRANDFATHERED_DOCUMENT, GRANDFATHERED_DOCUMENT_SHA256))
+
+    def test_the_committed_sealed_directory_is_unchanged_and_has_no_run_manifest(self):
+        base = ROOT / GRANDFATHERED_SEALED_BASE
+        files = sorted(path for path in base.rglob("*") if path.is_file())
+        listing = "".join(f"{hashlib.sha256(path.read_bytes()).hexdigest()}  {path.relative_to(base).as_posix()}\n"
+                          for path in files)
+        self.assertFalse((base / "run-manifest.json").exists(), "no run manifest is fabricated for 20260922")
+        self.assertEqual(len(files), GRANDFATHERED_SEALED_FILE_COUNT)
+        self.assertEqual(hashlib.sha256(listing.encode("utf-8")).hexdigest(), GRANDFATHERED_SEALED_LISTING_SHA256)
+
+    def test_the_tools_refuse_to_rewrite_the_committed_wave(self):
+        with contextlib.redirect_stdout(io.StringIO()), self.assertRaisesRegex(SystemExit, "grandfathered"):
+            build_verdicts.main(["--write", "--root", str(ROOT), "--run-id", "20260922"])
+        record_verdicts = load_module("record_verdicts_pin", "record_verdicts.py")
+        with tempfile.TemporaryDirectory() as work_dir, self.assertRaisesRegex(SystemExit, "grandfathered"):
+            record_verdicts.main(["--root", str(ROOT), "--work-dir", work_dir, "--run-id", "20260922", "--write"])
+        self.test_the_committed_wave_document_and_its_registration_are_unchanged()
+        self.test_the_committed_sealed_directory_is_unchanged_and_has_no_run_manifest()
 
 
 if __name__ == "__main__":

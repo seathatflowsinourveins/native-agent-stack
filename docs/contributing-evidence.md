@@ -260,12 +260,11 @@ for running them.
   per-platform `platform_status` field is written by the recorded verdict
   process above, not by this recorder. Both the verdict recorder and the
   validators derive it through one function,
-  [`scripts/platform_status.py`](../scripts/platform_status.py). The
-  validators use it now. The verdict recorder
-  (`tools/sota-convergence/record_verdicts.py`) switches to it in agent-lab-17's
-  verdict-integrity change and still writes `macos-arm64: untested` until
-  then, so today a Mac's merged receipts raise what a row may declare, and
-  the first re-record after that change writes it. `scripts/landscape.py` and
+  [`scripts/platform_status.py`](../scripts/platform_status.py): the
+  validators, and the verdict recorder
+  (`tools/sota-convergence/record_verdicts.py`) for every platform of a new
+  wave. A Mac's merged receipts raise what a row may declare, and the row's
+  next re-record writes it. `scripts/landscape.py` and
   `scripts/component_matrix.py --check` (both run in CI) reject a declared
   `macos-arm64` status that claims more than the receipts support; a weaker,
   not-yet-re-recorded status is allowed. `accepted` needs a recorded receipt
