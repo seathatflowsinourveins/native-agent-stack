@@ -625,6 +625,11 @@ def build_all_packets(root: Path, *, catalogs: list, seed: str, checked_at: str,
     cards = trading_cards_by_id(root) if manifest_mode else {}
     trading_layers = {layer["layer"]: layer for layer in sota_doc.get("trading", [])}
     receipts_index = registered_receipts_index(root, sota_doc) if registered_receipts else None
+    if gap_receipts and withhold:
+        # Gap receipts are checks run against the previous winner; a blind (label-withheld) build must not carry
+        # them, and refusing here stops lanes from ever opening them (Codex review of #145).
+        raise ValueError("--gap-receipts cannot be combined with --withhold-labels: gap receipts name the "
+                         "previous winner")
     gap_index = gap_receipts_index(root) if gap_receipts else None
 
     packets = {}
@@ -713,6 +718,10 @@ def main(argv=None) -> int:
     root = args.root.resolve()
     catalogs = [args.catalog] if args.catalog else sorted(LEDGER_FILES)
 
+    if args.gap_receipts and args.withhold_labels:
+        print("lane_packets: --gap-receipts cannot be combined with --withhold-labels: gap receipts name the "
+              "previous winner", file=sys.stderr)
+        return 2
     packets = build_all_packets(root, catalogs=catalogs, seed=str(args.seed), checked_at=args.checked_at,
                                 trading_candidates=args.trading_candidates, withhold=args.withhold_labels,
                                 manifest=str(args.manifest) if args.manifest else None,

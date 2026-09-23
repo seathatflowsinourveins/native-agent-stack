@@ -210,8 +210,9 @@ def existing_output_is_valid(out_path: Path, catalog: str, layer_id: str, packet
     if existing_hash and existing_hash != packet_sha256:
         return False
     if provenance is not None:
-        existing = data.get("provenance")
-        if not isinstance(existing, dict) or any(existing.get(key) != value for key, value in provenance.items()):
+        # Field for field and nothing more: landscape.py rejects a provenance object with extra keys, so a
+        # return carrying one is rerun, not skipped (Codex review of #145).
+        if data.get("provenance") != provenance:
             return False
     model = data.get("model") if isinstance(data.get("model"), dict) else {}
     if model.get("name") in (None, "", "unknown"):

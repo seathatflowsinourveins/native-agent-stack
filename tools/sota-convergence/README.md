@@ -678,7 +678,8 @@ set of checks run against the previous winner. Carrying only paths does not hide
   winner;
 - file names such as `7-winner-readiness-today.json` and `0-nautilus-frozen-selections.json` name it too.
 
-The flag and its code stay for non-blind runs. `scripts/landscape.py` lists `gap_receipts` and
+The flag and its code stay for non-blind runs, and `lane_packets.py` refuses it together with
+`--withhold-labels` (exit 2, nothing written). `scripts/landscape.py` also lists `gap_receipts` and
 `gap_receipts_note` in `TOP_LEVEL_WITHHELD_KEYS`, so `withheld_packet_keys` rejects a packet that carries
 either. As a result, `record_verdicts.py --write` refuses to seal a new wave whose packets were built with
 the flag, and CI rejects a sealed one. The grandfathered 2026-09-22 packets are not re-checked and do not
@@ -1558,6 +1559,17 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
 - **Leaks cover both orders:** the AB and BA inputs hold the same two returns, so a leak recorded for one
   order suppresses both.
 - **Git-backed roots:** `claude-args` also refuses a repository under any `.git`, as `codex` does.
+- **Packet snapshots (round 8):** judges never read the live packet. `inputs` copies each indexed packet to
+  `<work-dir>/adjudication-packets/<sha256>/packets/<name>.json`, and `index.json` names that copy.
+  `codex` rechecks the copy after each call and voids the judgment ("the packet snapshot changed during the
+  call") if it changed. `claude-collect` records a judgment as missing when the copy no longer matches.
+- **Selective rebuilds (round 8):** `inputs --layers` keeps every other layer's earlier index entry, so
+  `assemble` still purges or rebuilds their records. A selected layer whose packet is gone is listed as
+  skipped ("the packet is missing"), so its old record is purged.
+- **Exact lane provenance (round 8):** `codex_lane` resumes a return only when its `provenance` equals the
+  current one exactly; an extra or changed field reruns the layer.
+- **Gap receipts in a blind build (round 8):** `lane_packets.py` refuses `--gap-receipts` together with
+  `--withhold-labels` (exit 2, nothing written).
 - **HTML delimiters:** `>` delimits a path, as backticks do.
 - **Edited inputs:** `claude-args` and `codex` refuse an input whose bytes differ from the sha256 `inputs`
   indexed.

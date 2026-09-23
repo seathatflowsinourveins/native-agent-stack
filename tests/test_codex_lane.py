@@ -766,5 +766,26 @@ class EffortResumeTests(CodexLaneFixture):
         self.assertGreater(len(self.argv_calls()), first)
 
 
+class ExactProvenanceResumeTests(CodexLaneFixture):
+    """Round-8 review of #145: resume needs the recorded provenance to equal the current one exactly; a return
+    carrying an extra or changed provenance field is not resumed."""
+
+    def test_a_return_with_an_extra_provenance_field_reruns(self):
+        packet_path = self.write_packet("foundation", "native-clients")
+        packet_sha256 = hashlib.sha256(packet_path.read_bytes()).hexdigest()
+        current = codex_lane.lane_provenance(FIXTURE_PROMPT)
+        out_path = self.out_path("foundation", "native-clients")
+        out_path.parent.mkdir()
+        existing = canned_return(packet_sha256=packet_sha256, provenance={**current, "extra": "1" * 64},
+                                 model={"name": "gpt-6-astra", "effort": "high", "family": "openai"})
+        out_path.write_text(json.dumps(existing), encoding="utf-8")
+        self.assertFalse(codex_lane.existing_output_is_valid(out_path, "foundation", "native-clients",
+                                                              packet_sha256, current))
+        existing["provenance"] = current
+        out_path.write_text(json.dumps(existing), encoding="utf-8")
+        self.assertTrue(codex_lane.existing_output_is_valid(out_path, "foundation", "native-clients",
+                                                             packet_sha256, current))
+
+
 if __name__ == "__main__":
     unittest.main()

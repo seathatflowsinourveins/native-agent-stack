@@ -839,6 +839,18 @@ class GapReceiptsTests(LanePacketsFixture):
         for text in self.build().values():
             self.assertNotIn("gap_receipts", text)
 
+    def test_gap_receipts_are_refused_with_withhold_labels(self):
+        """Round-8 review of #145: gap receipts name the previous winner, so a blind build refuses them."""
+        with self.assertRaisesRegex(ValueError, "cannot be combined with --withhold-labels"):
+            self.build(gap_receipts=True, withhold=True)
+        err = io.StringIO()
+        with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(err):
+            code = lane_packets.main(["--root", str(self.root), "--out", str(self.out), "--gap-receipts",
+                                      "--withhold-labels"])
+        self.assertEqual(code, 2)
+        self.assertIn("cannot be combined with --withhold-labels", err.getvalue())
+        self.assertFalse(self.out.exists(), "nothing is written")
+
 
 class RegisteredReceiptsTests(LanePacketsFixture):
     """2026-09-23 re-record: --registered-receipts attaches each component's registered receipts, so a

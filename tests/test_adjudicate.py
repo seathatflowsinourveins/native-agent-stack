@@ -100,6 +100,10 @@ class AdjudicateFixture(unittest.TestCase):
             provenance=adjudicate.adjudication_provenance(repo=self.repo))
         adjudicate.write_json(self.work / "adjudication-judgments" / lane / f"{NAME}.{order}.json", record)
 
+    def snapshot_packet(self, name=NAME, sha=None):
+        """The immutable packet copy judges read (Codex review of #145, round 8)."""
+        return self.work / adjudicate.PACKET_SNAPSHOTS_DIR / (sha or self.sha) / "packets" / f"{name}.json"
+
     def snapshot_id(self):
         path = self.work / "adjudication-judgments" / "claude" / adjudicate.CLAUDE_ARGS_SNAPSHOT
         return json.loads(path.read_text(encoding="utf-8")).get("snapshot_id") if path.is_file() else None
@@ -496,7 +500,7 @@ class LeakTests(AdjudicateFixture):
             packet = adjudicate.packet_paths(adjudicate.load_index(self.work))[NAME]
             text = adjudicate.fill(template, input_path, self.repo, {"preferred": "A"}, packet)
             self.assertIn(f"Input file: {input_path}\n", text)
-            self.assertIn(f"Packet file: {self.work / 'packets' / (NAME + '.json')}\n", text)
+            self.assertIn(f"Packet file: {self.snapshot_packet()}\n", text)
             self.assertIn(f"Repository root: {self.repo}\n", text)
             self.assertLess(text.index("Leak check"), text.index("Blind rule"))
             for words in ("claude-opus", "o3", "not a leak", "as data"):
@@ -843,8 +847,9 @@ class InputScrubTests(AdjudicateFixture):
         self.assertEqual(adjudicate.unscrubbed_paths(body), [])
         self.assertNotIn(str(self.base), json.dumps(body))
         index = adjudicate.load_index(self.work)
-        self.assertEqual(adjudicate.packet_paths(index)[NAME], str(packet))
-        self.assertEqual(adjudicate.claude_args(self.work, self.repo)["items"][0]["packet_path"], str(packet))
+        self.assertEqual(adjudicate.packet_paths(index)[NAME], str(self.snapshot_packet()))
+        self.assertEqual(adjudicate.claude_args(self.work, self.repo)["items"][0]["packet_path"],
+                         str(self.snapshot_packet()))
 
     def test_lane_repo_root_is_required(self):
         with contextlib.redirect_stderr(io.StringIO()), self.assertRaises(SystemExit) as raised:
@@ -896,6 +901,94 @@ class RootDepthTests(AdjudicateFixture):
         self.assertIsNone(adjudicate.refuse_work_dir_inside(self.work, self.repo))
 
 
+class EighthRereviewOf145Tests(AdjudicateFixture):
+    """Round-8 review of #145: judges read an immutable packet snapshot that is verified before and after
+    judging, and a selective rebuild keeps every other layer in the index."""
+
+    def second_layer(self):
+        name = "foundation__other-layer"
+        packet = dict(PACKET, layer_id="other-layer")
+        path = self.work / "packets" / f"{name}.json"
+        path.write_text(json.dumps(packet), encoding="utf-8")
+        sha = hashlib.sha256(path.read_bytes()).hexdigest()
+        self.write_return("claude", "c1", name=name, sha=sha, refutation={"status": "unrefuted"},
+                          final_source="proposal")
+        self.write_return("codex", "c2", name=name, sha=sha)
+        return name
+
+    def test_judges_read_a_snapshot_that_edits_to_the_live_packet_do_not_reach(self):
+        live = self.work / "packets" / f"{NAME}.json"
+        original = live.read_bytes()
+        self.inputs()
+        live.write_text(json.dumps(dict(PACKET, requirement="edited after inputs")), encoding="utf-8")
+        snapshot = self.snapshot_packet()
+        self.assertEqual(snapshot.read_bytes(), original)
+        self.assertEqual(adjudicate.claude_args(self.work, self.repo)["items"][0]["packet_path"], str(snapshot))
+
+    def test_a_tampered_snapshot_is_refused_by_claude_args_and_collect(self):
+        self.inputs()
+        args = adjudicate.claude_args(self.work, self.repo)
+        self.snapshot_packet().write_text(json.dumps(dict(PACKET, requirement="tampered")), encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "packets changed after `inputs`"):
+            adjudicate.claude_args(self.work, self.repo)
+        verdict = {"preferred": "A", "why": WHY, "evidence_refs": ["evidence/receipt.json"], "leak": False,
+                   "leak_text": ""}
+        refute = {"refuted": False, "reason": "The cited receipt exists and shows the run.", "evidence_refs": [],
+                  "leak": False, "leak_text": ""}
+        result = {"snapshot_id": args["snapshot_id"],
+                  "items": [{"name": NAME, "order": order, "judge": verdict, "refuter": refute}
+                            for order in adjudicate.ORDERS]}
+        missing = adjudicate.collect_claude(self.work, result, "claude-opus-5-5", self.repo)
+        self.assertEqual({reason for _, reason in missing}, {"the packet snapshot changed; rerun inputs"})
+
+    def test_a_snapshot_changed_during_a_codex_call_voids_the_judgment(self):
+        self.inputs()
+        calls = []
+
+        def changed_after_first_check(items):
+            calls.append(items)
+            return [] if len(calls) == 1 else [f"{item['name']}.{item['order']}" for item in items]
+
+        judge = {"preferred": "A", "why": WHY, "evidence_refs": ["evidence/receipt.json"], "leak": False,
+                 "leak_text": ""}
+        refute = {"refuted": False, "reason": "The cited receipt exists and shows the run.", "evidence_refs": [],
+                  "leak": False, "leak_text": ""}
+        call = mock.Mock(side_effect=[(judge, "gpt-6-astra", [0], None, None),
+                                      (refute, "gpt-6-astra", [0], None, None)])
+        with mock.patch.object(adjudicate, "packets_changed", side_effect=changed_after_first_check), \
+                mock.patch.object(adjudicate, "run_codex_call", call), \
+                mock.patch.object(adjudicate.shutil, "which", return_value="/usr/bin/codex"):
+            code, _ = quiet(adjudicate.main, ["codex", "--work-dir", str(self.work), "--repo", str(self.repo),
+                                              "--model", "gpt-6-astra", "--jobs", "1"])
+        self.assertEqual(code, 1)
+        records = [json.loads(path.read_text(encoding="utf-8")) for path in
+                   (self.work / "adjudication-judgments" / "codex").glob(f"{NAME}.*.json")]
+        self.assertTrue(records)
+        voided = [record for record in records if record.get("failure") ==
+                  "the packet snapshot changed during the call"]
+        self.assertTrue(voided, records)
+        for record in voided:
+            self.assertIsNone(record.get("judge"))
+
+    def test_a_selective_rebuild_keeps_other_layers_and_skips_a_selected_layer_whose_packet_is_gone(self):
+        other = self.second_layer()
+        self.inputs()
+        self.assertEqual({entry["layer"] for entry in adjudicate.load_index(self.work)["layers"]}, {NAME, other})
+        code, err = quiet(adjudicate.main, ["inputs", "--work-dir", str(self.work), "--lane-repo-root",
+                                            str(self.repo), "--layers", "native-clients"])
+        self.assertEqual(code, 0, err)
+        index = adjudicate.load_index(self.work)
+        self.assertEqual({entry["layer"] for entry in index["layers"]}, {NAME, other})
+        (self.work / "packets" / f"{other}.json").unlink()
+        code, err = quiet(adjudicate.main, ["inputs", "--work-dir", str(self.work), "--lane-repo-root",
+                                            str(self.repo), "--layers", "other-layer"])
+        self.assertEqual(code, 1, err)
+        self.assertIn("skipped foundation__other-layer: the packet is missing", err)
+        index = adjudicate.load_index(self.work)
+        self.assertEqual([entry["layer"] for entry in index["layers"]], [NAME])
+        self.assertEqual(index["skipped"], [{"layer": other, "reason": "the packet is missing"}])
+
+
 @unittest.skipUnless(os.access(FAKE_BIN / "codex", os.X_OK), "fake codex fixture is not executable")
 class CodexLeakTests(AdjudicateFixture):
     def setUp(self):
@@ -921,7 +1014,7 @@ class CodexLeakTests(AdjudicateFixture):
         self.assertEqual(code, 1)
         calls = [json.loads(line) for line in self.argv_log.read_text(encoding="utf-8").splitlines()]
         self.assertEqual(len(calls), 2, "one judge call per order: no retry and no refuter after a leak")
-        self.assertIn(f"Packet file: {self.work / 'packets' / (NAME + '.json')}\n", calls[0][-1])
+        self.assertIn(f"Packet file: {self.snapshot_packet()}\n", calls[0][-1])
         for order in adjudicate.ORDERS:
             data = json.loads((self.work / "adjudication-judgments" / "codex" / f"{NAME}.{order}.json")
                               .read_text(encoding="utf-8"))

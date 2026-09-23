@@ -312,6 +312,9 @@ def components_list(components) -> list:
     return sorted([component_id, repository] for component_id, repository in components)
 
 
+PACKET_SNAPSHOTS_DIR = "adjudication-packets"
+
+
 def build_inputs(work_dir: Path, layers=None, repo_roots=()) -> dict:
     """Write the counterbalanced input files and index.json; return the index. ``repo_roots`` are the
     checkouts the lanes were given (their absolute evidence paths become repository-relative). An input is
@@ -362,7 +365,13 @@ def build_inputs(work_dir: Path, layers=None, repo_roots=()) -> dict:
         if reasons:
             index["skipped"].append({"layer": name, "reason": "; ".join(reasons)})
             continue
-        entry = {"layer": name, "packet_path": str(packet_path), "packet_sha256": packet_sha256,
+        # Judges read an immutable, content-addressed copy of the packet bytes this index was built from
+        # (Codex review of #145), never the live packet: <work-dir>/adjudication-packets/<sha>/packets/<name>.json.
+        snapshot_packet = work_dir / PACKET_SNAPSHOTS_DIR / packet_sha256 / "packets" / packet_path.name
+        if not snapshot_packet.is_file() or sha256_file(snapshot_packet) != packet_sha256:
+            snapshot_packet.parent.mkdir(parents=True, exist_ok=True)
+            snapshot_packet.write_bytes(packet_path.read_bytes())
+        entry = {"layer": name, "packet_path": str(snapshot_packet), "packet_sha256": packet_sha256,
                  "components": {lane: components_list(components[lane]) for lane in FAMILIES}}
         if components["claude"] == components["codex"]:
             entry["agreement"] = "agree"
@@ -388,6 +397,28 @@ def build_inputs(work_dir: Path, layers=None, repo_roots=()) -> dict:
             entry["inputs"][order] = str(input_path)
             entry["input_sha256"][order] = sha256_file(input_path)
         index["layers"].append(entry)
+    if layers:
+        # A selective rebuild keeps every other layer's earlier entry, so assemble still purges (or rebuilds)
+        # their records instead of leaving them unrepresented (Codex review of #145).
+        previous_path = out_dir / "index.json"
+        previous = load_json(previous_path) if previous_path.is_file() else {}
+        rebuilt = {item["layer"] for item in index["layers"] + index["skipped"]}
+
+        def selected(name):
+            return name in layers or str(name).split("__", 1)[-1] in layers
+
+        kept = {"layers": [], "skipped": []}
+        for key in ("layers", "skipped"):
+            for item in previous.get(key) or []:
+                if not isinstance(item, dict) or item.get("layer") in rebuilt:
+                    continue
+                if selected(item.get("layer")):
+                    # Selected but its packet is gone: skipped, so assemble purges its old record.
+                    kept["skipped"].append({"layer": item["layer"], "reason": "the packet is missing"})
+                else:
+                    kept[key].append(item)
+        for key in ("layers", "skipped"):
+            index[key] = kept[key] + index[key]
     write_json(out_dir / "index.json", index)
     return index
 
@@ -681,6 +712,10 @@ def run_codex(args) -> int:
             with lock:
                 leaks.append((name, order, input_path, {**leak, "family": "openai", "input_sha256": judged_sha256,
                                                         "inputs_sha256": both_sha256}))
+        if packets_changed([{"name": name, "order": order, "packet_path": packets.get(name, ""),
+                             "packet_sha256": packet_sha256}]):
+            # The packet copy changed while the judges ran: nothing they returned counts.
+            judge, refuter, leak, failure = None, None, None, "the packet snapshot changed during the call"
         # The configured --model first, as codex_lane.py records it; the event stream only reports.
         model = args.model or judge_model or "unknown"
         write_json(out_path, judgment_record(
@@ -877,6 +912,9 @@ def collect_claude(work_dir: Path, result, model: str, repo=None) -> list:
         item = returned.get((name, order)) or {}
         judged_sha256 = snapshot.get(f"{name}.{order}")
         input_changed = judged_sha256 != sha256_file(Path(input_path))
+        packet_changed = bool(packets_changed([{"name": name, "order": order,
+                                                "packet_path": packet_paths(index).get(name, ""),
+                                                "packet_sha256": packet_sha256}]))
         if input_key(input_path) in leaked_inputs:
             # Sticky: a judgment of an input with a recorded leak never counts, whatever the workflow returned.
             write_json(work_dir / JUDGMENTS_DIR / "claude" / f"{name}.{order}.json", judgment_record(
@@ -916,6 +954,9 @@ def collect_claude(work_dir: Path, result, model: str, repo=None) -> list:
         if input_changed:
             # The input changed since claude-args built the workflow's items.
             failure, judge, refuter, leak = "the input changed after claude-args; rerun claude-args", None, None, None
+        elif packet_changed:
+            # The immutable packet copy the judges read no longer holds its indexed bytes.
+            failure, judge, refuter, leak = "the packet snapshot changed; rerun inputs", None, None, None
         write_json(work_dir / JUDGMENTS_DIR / "claude" / f"{name}.{order}.json", judgment_record(
             "anthropic", name, order, input_path, packet_sha256, model, repo, judge, refuter, failure,
             leak=leak, input_sha256=judged_sha256, effort=CLAUDE_LANE_EFFORT, provenance=snapshot_provenance))
