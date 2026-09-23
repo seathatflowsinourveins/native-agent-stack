@@ -68,7 +68,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             },
             "macos-arm64": {
               "catalog_status": "untested",
@@ -82,7 +83,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             }
           },
           "repository": "https://github.com/openai/codex"
@@ -159,7 +161,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             },
             "macos-arm64": {
               "catalog_status": "untested",
@@ -173,7 +176,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             }
           },
           "repository": "https://github.com/zizmorcore/zizmor"
@@ -201,7 +205,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             },
             "macos-arm64": {
               "catalog_status": "untested",
@@ -215,7 +220,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             }
           },
           "repository": "https://github.com/anchore/syft"
@@ -238,7 +244,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             },
             "macos-arm64": {
               "catalog_status": "untested",
@@ -252,7 +259,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             }
           },
           "repository": "https://github.com/actions/attest"
@@ -322,7 +330,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             },
             "macos-arm64": {
               "catalog_status": "untested",
@@ -336,7 +345,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             }
           },
           "repository": "https://github.com/oraios/serena"
@@ -399,7 +409,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             },
             "macos-arm64": {
               "catalog_status": "untested",
@@ -413,7 +424,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             }
           },
           "repository": "https://github.com/tobi/qmd"
@@ -441,7 +453,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             },
             "macos-arm64": {
               "catalog_status": "untested",
@@ -455,7 +468,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             }
           },
           "repository": "https://github.com/microsoft/markitdown"
@@ -483,7 +497,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             },
             "macos-arm64": {
               "catalog_status": "untested",
@@ -497,7 +512,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             }
           },
           "repository": "https://github.com/tsdgeos/poppler_mirror"
@@ -622,7 +638,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             },
             "macos-arm64": {
               "catalog_status": "untested",
@@ -636,7 +653,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             }
           },
           "repository": "https://github.com/akitaonrails/ai-memory"
@@ -685,7 +703,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             },
             "macos-arm64": {
               "catalog_status": "untested",
@@ -699,7 +718,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             }
           },
           "repository": "https://github.com/max-sixty/worktrunk"
@@ -722,7 +742,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             },
             "macos-arm64": {
               "catalog_status": "untested",
@@ -736,7 +757,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             }
           },
           "repository": "https://github.com/cli/cli"
@@ -764,7 +786,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": "2026-09-23T01:05:55Z",
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             },
             "macos-arm64": {
               "catalog_status": "untested",
@@ -778,7 +801,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             }
           },
           "repository": "https://github.com/Wilfred/difftastic"
@@ -892,7 +916,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             },
             "macos-arm64": {
               "catalog_status": "untested",
@@ -906,7 +931,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             }
           },
           "repository": "https://github.com/fastapi/fastapi"
@@ -950,7 +976,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             },
             "macos-arm64": {
               "catalog_status": "untested",
@@ -964,7 +991,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             }
           },
           "repository": "https://github.com/vercel/next.js"
@@ -1008,7 +1036,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             },
             "macos-arm64": {
               "catalog_status": "untested",
@@ -1022,7 +1051,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             }
           },
           "repository": "https://github.com/postgres/postgres"
@@ -1113,7 +1143,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             },
             "macos-arm64": {
               "catalog_status": "untested",
@@ -1127,7 +1158,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             }
           },
           "repository": "https://github.com/affaan-m/ECC"
@@ -1150,7 +1182,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             },
             "macos-arm64": {
               "catalog_status": "untested",
@@ -1164,7 +1197,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             }
           },
           "repository": "https://github.com/typesafe-ai/skills"
@@ -1187,7 +1221,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             },
             "macos-arm64": {
               "catalog_status": "untested",
@@ -1201,7 +1236,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             }
           },
           "repository": "https://github.com/openai/skills"
@@ -1278,7 +1314,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             },
             "macos-arm64": {
               "catalog_status": "untested",
@@ -1292,7 +1329,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             }
           },
           "repository": "https://github.com/max-sixty/worktrunk"
@@ -1320,7 +1358,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             },
             "macos-arm64": {
               "catalog_status": "untested",
@@ -1334,7 +1373,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             }
           },
           "repository": "https://github.com/anthropics/sandbox-runtime"
@@ -1383,7 +1423,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             },
             "macos-arm64": {
               "catalog_status": "untested",
@@ -1397,7 +1438,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             }
           },
           "repository": "https://github.com/openclaw/mcporter"
@@ -1425,7 +1467,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             },
             "macos-arm64": {
               "catalog_status": "untested",
@@ -1439,7 +1482,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             }
           },
           "repository": "https://github.com/modelcontextprotocol/inspector"
@@ -1520,7 +1564,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             },
             "macos-arm64": {
               "catalog_status": "untested",
@@ -1534,7 +1579,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             }
           },
           "repository": "https://github.com/anthropics/claude-code"
@@ -1566,7 +1612,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             },
             "macos-arm64": {
               "catalog_status": "untested",
@@ -1580,7 +1627,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             }
           },
           "repository": "https://github.com/openai/codex"
@@ -1692,7 +1740,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             },
             "macos-arm64": {
               "catalog_status": "untested",
@@ -1706,7 +1755,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             }
           },
           "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib"
@@ -1734,7 +1784,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             },
             "macos-arm64": {
               "catalog_status": "untested",
@@ -1748,7 +1799,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             }
           },
           "repository": "https://github.com/prometheus/prometheus"
@@ -1776,7 +1828,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             },
             "macos-arm64": {
               "catalog_status": "untested",
@@ -1790,7 +1843,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             }
           },
           "repository": "https://github.com/grafana/loki"
@@ -1881,7 +1935,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             },
             "macos-arm64": {
               "catalog_status": "untested",
@@ -1895,7 +1950,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             }
           },
           "repository": "https://github.com/promptfoo/promptfoo"
@@ -1923,7 +1979,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             },
             "macos-arm64": {
               "catalog_status": "untested",
@@ -1937,7 +1994,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             }
           },
           "repository": "https://github.com/microsoft/playwright"
@@ -2030,7 +2088,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             },
             "macos-arm64": {
               "catalog_status": "untested",
@@ -2044,7 +2103,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             }
           },
           "repository": "https://github.com/restic/restic"
@@ -2067,7 +2127,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             },
             "macos-arm64": {
               "catalog_status": "untested",
@@ -2081,7 +2142,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             }
           },
           "repository": "https://github.com/astral-sh/uv"
@@ -2167,7 +2229,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             },
             "macos-arm64": {
               "catalog_status": "untested",
@@ -2181,7 +2244,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             }
           },
           "repository": "https://github.com/dagucloud/dagu"
@@ -2225,7 +2289,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             },
             "macos-arm64": {
               "catalog_status": "untested",
@@ -2239,7 +2304,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             }
           },
           "repository": "https://github.com/systemd/systemd"
@@ -2288,7 +2354,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             },
             "macos-arm64": {
               "catalog_status": "untested",
@@ -2302,7 +2369,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             }
           },
           "repository": "https://github.com/gitleaks/gitleaks"
@@ -2387,7 +2455,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             },
             "macos-arm64": {
               "catalog_status": "untested",
@@ -2401,7 +2470,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             }
           },
           "repository": "https://github.com/giancarloerra/SocratiCode"
@@ -2445,7 +2515,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             },
             "macos-arm64": {
               "catalog_status": "untested",
@@ -2459,7 +2530,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             }
           },
           "repository": "https://github.com/qdrant/qdrant"
@@ -2487,7 +2559,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             },
             "macos-arm64": {
               "catalog_status": "untested",
@@ -2501,7 +2574,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             }
           },
           "repository": "https://github.com/vllm-project/vllm"
@@ -2571,7 +2645,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": "2026-09-23T01:05:22Z",
                 "pass": 1
-              }
+              },
+              "qualified_models": []
             },
             "macos-arm64": {
               "catalog_status": "untested",
@@ -2585,7 +2660,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             }
           },
           "repository": "https://github.com/rtk-ai/rtk"
@@ -2629,7 +2705,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             },
             "macos-arm64": {
               "catalog_status": "untested",
@@ -2643,7 +2720,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             }
           },
           "repository": "https://github.com/headroomlabs-ai/headroom"
@@ -2671,7 +2749,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             },
             "macos-arm64": {
               "catalog_status": "untested",
@@ -2685,7 +2764,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             }
           },
           "repository": "https://github.com/ccusage/ccusage"
@@ -2762,7 +2842,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             },
             "macos-arm64": {
               "catalog_status": "untested",
@@ -2776,7 +2857,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             }
           },
           "repository": "https://github.com/tavily-ai/tavily-cli"
@@ -2804,7 +2886,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             },
             "macos-arm64": {
               "catalog_status": "untested",
@@ -2818,7 +2901,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             }
           },
           "repository": "https://github.com/vercel-labs/agent-browser"
@@ -2846,7 +2930,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             },
             "macos-arm64": {
               "catalog_status": "untested",
@@ -2860,7 +2945,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             }
           },
           "repository": "https://github.com/alphaXiv/OpenResearch"
@@ -2976,7 +3062,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             },
             "macos-arm64": {
               "catalog_status": "untested",
@@ -2990,7 +3077,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             }
           },
           "repository": "https://github.com/anthropics/claude-code"
@@ -3018,7 +3106,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             },
             "macos-arm64": {
               "catalog_status": "untested",
@@ -3032,7 +3121,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             }
           },
           "repository": "https://github.com/max-sixty/worktrunk"
@@ -3202,7 +3292,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             },
             "macos-arm64": {
               "catalog_status": "untested",
@@ -3216,7 +3307,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             }
           },
           "repository": "https://github.com/openai/codex"
@@ -3239,7 +3331,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             },
             "macos-arm64": {
               "catalog_status": "untested",
@@ -3253,7 +3346,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             }
           },
           "repository": "https://github.com/akitaonrails/ai-memory"
@@ -3276,7 +3370,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             },
             "macos-arm64": {
               "catalog_status": "untested",
@@ -3290,7 +3385,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             }
           },
           "repository": "https://github.com/giancarloerra/SocratiCode"
@@ -3355,7 +3451,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             },
             "macos-arm64": {
               "catalog_status": "untested",
@@ -3369,7 +3466,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             }
           },
           "repository": "https://github.com/nautechsystems/nautilus_trader"
@@ -3392,7 +3490,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             },
             "macos-arm64": {
               "catalog_status": "untested",
@@ -3406,7 +3505,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             }
           },
           "repository": "https://github.com/QuantConnect/Lean"
@@ -3478,7 +3578,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             },
             "macos-arm64": {
               "catalog_status": "untested",
@@ -3492,7 +3593,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             }
           },
           "repository": "https://github.com/dagucloud/dagu"
@@ -3515,7 +3617,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             },
             "macos-arm64": {
               "catalog_status": "untested",
@@ -3529,7 +3632,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             }
           },
           "repository": "https://github.com/unionai-oss/pandera"
@@ -3594,7 +3698,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             },
             "macos-arm64": {
               "catalog_status": "untested",
@@ -3608,7 +3713,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             }
           },
           "repository": "https://github.com/eyuansu62/agent-retrieval-bench"
@@ -3631,7 +3737,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             },
             "macos-arm64": {
               "catalog_status": "untested",
@@ -3645,7 +3752,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             }
           },
           "repository": "https://github.com/UKGovernmentBEIS/inspect_ai"
@@ -3668,7 +3776,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             },
             "macos-arm64": {
               "catalog_status": "untested",
@@ -3682,7 +3791,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             }
           },
           "repository": "https://github.com/mlflow/mlflow"
@@ -3780,7 +3890,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             },
             "macos-arm64": {
               "catalog_status": "untested",
@@ -3794,7 +3905,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             }
           },
           "repository": "https://github.com/treeverse/dvc"
@@ -3894,7 +4006,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             },
             "macos-arm64": {
               "catalog_status": "untested",
@@ -3908,7 +4021,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             }
           },
           "repository": "https://github.com/alpacahq/alpaca-py"
@@ -3931,7 +4045,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             },
             "macos-arm64": {
               "catalog_status": "untested",
@@ -3945,7 +4060,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             }
           },
           "repository": "https://github.com/dgunning/edgartools"
@@ -3968,7 +4084,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             },
             "macos-arm64": {
               "catalog_status": "untested",
@@ -3982,7 +4099,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             }
           },
           "repository": "https://github.com/gerrymanoim/exchange_calendars"
@@ -4052,7 +4170,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             },
             "macos-arm64": {
               "catalog_status": "untested",
@@ -4066,7 +4185,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             }
           },
           "repository": "https://github.com/skfolio/skfolio"
@@ -4243,7 +4363,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             },
             "macos-arm64": {
               "catalog_status": "untested",
@@ -4257,7 +4378,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             }
           },
           "repository": "https://github.com/skfolio/skfolio"
@@ -4280,7 +4402,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             },
             "macos-arm64": {
               "catalog_status": "untested",
@@ -4294,7 +4417,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             }
           },
           "repository": "https://github.com/dgunning/edgartools"
@@ -4345,7 +4469,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             },
             "macos-arm64": {
               "catalog_status": "untested",
@@ -4359,7 +4484,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             }
           },
           "repository": "https://github.com/anchore/grype"
@@ -4387,7 +4513,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             },
             "macos-arm64": {
               "catalog_status": "untested",
@@ -4401,7 +4528,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             }
           },
           "repository": "https://github.com/anchore/syft"
@@ -4429,7 +4557,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             },
             "macos-arm64": {
               "catalog_status": "untested",
@@ -4443,7 +4572,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             }
           },
           "repository": "https://github.com/gitleaks/gitleaks"
@@ -4550,7 +4680,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             },
             "macos-arm64": {
               "catalog_status": "untested",
@@ -4564,7 +4695,8 @@
                 "independently_reviewed_pass": 0,
                 "latest": null,
                 "pass": 0
-              }
+              },
+              "qualified_models": []
             }
           },
           "repository": "https://github.com/duckdb/duckdb"
