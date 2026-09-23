@@ -136,6 +136,8 @@ jobs:
           EVENT_NAME: ${{ github.event_name }}
           # Cross-check only: the base is the checked-out merge commit's first parent.
           PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          # The checked-out HEAD must be the merge commit whose second parent is this PR head.
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
           # The pushed range's previous commit on main.
           PUSH_BEFORE_SHA: ${{ github.event.before }}
         run: |
@@ -143,7 +145,15 @@ jobs:
           case "$EVENT_NAME" in
             pull_request)
               # actions/checkout checks out the PR merge commit; its first parent is the base-branch
-              # commit the PR is merged into, which is what the gate must compare with.
+              # commit the PR is merged into, which is what the gate must compare with. Assert that
+              # premise: HEAD has exactly two parents and the second is the payload's PR head, or
+              # HEAD^1 could be the PR's own previous commit and the gate would judge only the last one.
+              second_parent="$(git rev-parse --verify --quiet 'HEAD^2^{commit}' || true)"
+              if [ -z "${PR_HEAD_SHA:-}" ] || [ "$second_parent" != "$PR_HEAD_SHA" ] \
+                || git rev-parse --verify --quiet 'HEAD^3^{commit}' >/dev/null; then
+                echo "::error::verdict-review-gate: HEAD is not the merge commit of the PR head '${PR_HEAD_SHA:-}' (second parent '$second_parent'); failing closed"
+                exit 1
+              fi
               first_parent="$(git rev-parse --verify --quiet 'HEAD^1^{commit}' || true)"
               payload="${PR_BASE_SHA:-}"
               if [ -n "$first_parent" ] && [ -n "$payload" ]; then

@@ -935,10 +935,13 @@ so a PR that changes a layer verdict could merge with no review at all.
 pull request (no path filter, so it can be required) and on each push to
 `main`. The job has `contents: read`, starts with harden-runner in audit mode,
 and checks out full history without persisted credentials. The event values
-reach the script only through `env`. On a pull request the base is the first
-parent of the checked-out merge commit (`git rev-parse HEAD^1`), and the
-payload's `pull_request.base.sha` must be its ancestor; if neither is
-available the job fails. On a push to `main` the base is
+reach the script only through `env`. On a pull request the job first asserts
+that the checked-out HEAD is the PR merge commit: it has exactly two parents
+and the second is the payload's `pull_request.head.sha`, or the job fails
+(otherwise `HEAD^1` could be the PR's own previous commit and the gate would
+judge only the last commit). The base is then the merge commit's first parent
+(`git rev-parse HEAD^1`), and the payload's `pull_request.base.sha` must be
+its ancestor; if neither is available the job fails. On a push to `main` the base is
 `github.event.before`, and the job fails on an empty or all-zero value (a
 branch-creating push has no base). A manual dispatch compares with the
 parent. The job runs the base commit's copy of
@@ -965,8 +968,12 @@ when all of these hold at the head:
 - the agreement recomputed from the two sealed returns equals the recorded
   one;
 - the row's winners equal the chosen lane's `winner_keys`, resolved through
-  the wave's sealed packet, and carry the packet candidate's repository,
-  recipe reference and pin and that lane's evidence class and `why_selected`.
+  the wave's sealed packet, and each winner apart from `platform_status` is
+  exactly what `record_verdicts.build_winners` writes: the packet candidate's
+  repository and recipe reference, that lane's evidence class,
+  `why_selected` and `winner_evidence_refs` (normalized against the head),
+  the packet pin (else the row's v1 candidate pin, else `unpinned`), and no
+  other key.
   The packet is the one the row's run-manifest entry names by
   `packet_sha256`, found through the manifest's `retained_packets` under
   `<sealed_base>/packets/`. `packets/SHA256SUMS` must list it and equal the
@@ -978,14 +985,19 @@ when all of these hold at the head:
 - the published `alternatives` (on the fields the wave document publishes),
   `verdict_overturn_when` and `overturn_protocol` are the ones
   `record_verdicts.py` derives from the sealed returns. `open_gaps` is
-  re-checked with the row but its text is not re-derived;
+  re-checked with the row but its text is not re-derived. The derivation
+  reads the canonical repository index the head's landscape manifest names
+  (`sources.repository_index`), so it must give the same alternatives with the
+  base's index: an index change that alters a changed row lands first;
 - a recorded `disagree` row has an adjudication in which judges from both
   lane families agree in both presentation orders with no refuting vote. Its
   sha256 is stored in `lanes.adjudication_sha256` and in the run-manifest
   entry's `adjudication` `{outcome: sealed, sha256}`;
 - a recorded `codex_absent` row names a `docs/decisions/` record that carries
   `single-lane-authorization: <catalog>/<layer_id>`, and stores that record's
-  sha256 in `lanes.single_lane_decision_sha256`;
+  sha256 in `lanes.single_lane_decision_sha256`. The record must already be
+  at the base with the same bytes, so an authorization lands (and is seen) in
+  its own earlier PR; one added or edited in the PR that adds the row fails;
 - the row's `verdict_status` is the one `record_verdicts.py` writes for that
   evidence: `recorded` for agreeing lanes, for a disagreement whose sealed
   adjudication chooses a lane and for a `codex_absent` row whose named decision
@@ -1035,8 +1047,14 @@ one exits 2. A git command that fails while listing changed paths also exits
 2 instead of counting as "no changed paths".
 
 Every changed `platform_status` value must be the one
-`scripts/platform_status.py` derives; a change to `platform_status` alone
-needs nothing else. The newest registered
+`scripts/platform_status.py` derives for the winner's sealed pin and
+evidence refs, not for the head winner's own values: the chosen lane's
+`winner_evidence_refs`, and the packet pin, else a pin the base's row
+candidates already carry, else `unpinned` (which binds no receipt). A PR can
+therefore neither cite an unrelated registered file nor introduce a pin that
+matches some receipt to raise a status. A change to `platform_status` alone
+needs nothing else; its row is still resolved against the sealed evidence for
+that pin and those refs. The newest registered
 wave is the only one that may change. A PR that changes a verdict row, a wave
 or a sealed verdict artifact fails if it also changes the gate's trust base
 (`TRUST_PATHS`), so a rules change lands on its own first. The trust base is
@@ -1044,10 +1062,20 @@ the gate script, every repository module the gate and its validators import
 (transitively, which brings in `scripts/validate.py` through
 `scripts/host_receipts.py`), the rule inputs they read (the lane-provenance
 registry `tools/sota-convergence/lane-provenance.json`, the host-receipt and
-lane-return schemas) and `validate.yml`. A test derives the imports and those
-paths from the modules themselves and fails if one is missing from the
-list. A base file that
-exists but cannot be read or parsed exits 2 instead of counting as absent.
+lane-return schemas) and `validate.yml`. A rule input held inside a data file
+counts too: `adoption/manifest.json#/platform_profiles` (which host
+os/architecture a receipt's platform binds) changed together with verdict
+data fails the same way (`RULE_INPUT_FIELDS`). The tests derive the list
+rather than restate it: one walks the modules' imports with `ast`, and one
+records every file opened (a `sys.addaudithook`, in a subprocess) while the
+gate judges a fixture that reaches every row path and while the validators
+check this checkout. Every head-side file the gate reads must be a
+`TRUST_PATHS` file or verdict data the gate binds (`HEAD_DATA_BINDINGS`
+names what binds each class), and every code, schema or tool-registry file
+the validators read must be a `TRUST_PATHS` file. The validators' catalog
+reads are data: they can only add failures to the gate's own verdict. A base
+file that exists but cannot be read or parsed, and a base tree that cannot be
+listed, exit 2 instead of counting as absent.
 Whenever a row, a wave or a file under
 the sealed verdict artifacts, `catalogs/landscape/` or
 `catalogs/sota-convergence/` changes, the job also runs `scripts/landscape.py`

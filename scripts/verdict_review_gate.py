@@ -35,18 +35,23 @@ For each changed row outside ``GRANDFATHERED_RUN_IDS`` it requires, at the head:
   bound by ``lanes.adjudication_sha256`` and by the run manifest entry's ``adjudication``;
 - a recorded ``codex_absent`` row: a ``docs/decisions/`` record carrying the line
   ``single-lane-authorization: <catalog>/<layer_id>`` and bound by
-  ``lanes.single_lane_decision_sha256`` (review finding 2);
+  ``lanes.single_lane_decision_sha256`` (review finding 2), already present with the same bytes at
+  the base, so an authorization lands in its own earlier pull request (fourth review, G2);
 - a ``verdict_status`` equal to the one ``record_verdicts.py`` writes for that evidence
   (``recorded`` for agreeing lanes, an adjudicated disagreement or an authorized single lane,
   unless no indexed alternative remains; else ``pending_lanes``; never ``no_selection``), so a
   recorded verdict cannot be withdrawn by relabelling its row (third review, finding 1).
 
-Each winner's ``repository``, ``recipe_ref``, ``evidence_class``, ``why_selected`` and packet ``pin``
-must be what ``record_verdicts.build_winners`` copies from the chosen lane and the packet; the
+Each winner, apart from ``platform_status``, must be exactly what ``record_verdicts.build_winners``
+writes from the chosen lane, the packet and the row's candidates (``repository``, ``recipe_ref``,
+``evidence_class``, ``why_selected``, ``evidence_refs`` and ``pin``, and no other key); the
 published ``alternatives``, ``verdict_overturn_when`` and ``overturn_protocol`` must be the ones
-``record_verdicts`` derives from the sealed returns (``open_gaps`` is not re-derived); and
-every changed ``platform_status`` value must be what ``scripts/platform_status.py``
-``platform_status()`` derives; a row whose only change is ``platform_status`` needs nothing else. A changed
+``record_verdicts`` derives from the sealed returns (``open_gaps`` is not re-derived), and deriving
+them with the base's canonical repository index must give the same result as with the head's. Every
+changed ``platform_status`` value must be what ``scripts/platform_status.py`` ``platform_status()``
+derives for the winner's sealed pin and evidence_refs (fourth review, G1): the packet candidate's pin,
+else a pin the base's row candidates already carry, else ``unpinned``, and the chosen lane's
+``winner_evidence_refs``. A row whose only change is ``platform_status`` needs nothing else. A changed
 grandfathered row is reported and passes here (``build_verdicts.py --check`` freezes it). Every
 row of the base keeps a row at the head whose run id is not older, never moves from a new wave back
 to the grandfathered one and changes only to the newest registered wave (review of #123, finding 1).
@@ -63,7 +68,7 @@ when the same comparison also changes a ``TRUST_PATHS`` file, so a weakening of 
 (and be seen) in its own pull request first. Exit 0 prints one line when nothing of that changed;
 otherwise every violation is printed with its row key and the exit code is 1 (2 for an unresolvable
 revision, an unreadable or malformed base or head ledger, manifest or wave registry, or a git
-command that fails while listing the changed paths).
+command that fails while listing the changed paths or a base tree).
 """
 
 from __future__ import annotations
@@ -90,13 +95,13 @@ from scripts.landscape import (  # noqa: E402
     SEALED_BASE_PREFIX, judge_adjudication, lane_model_issue, run_id_of, run_manifest_row_issue,
 )
 from scripts import platform_status as platform_evidence  # noqa: E402
-from scripts.catalog_decisions import safe_file, unique_json  # noqa: E402
+from scripts.catalog_decisions import identity, safe_file, unique_json  # noqa: E402
 from scripts.host_receipts import evidence_files  # noqa: E402
 from build_manifest import sanitize_value  # noqa: E402
 from build_verdicts import LEDGER_FILES, WAVE_REGISTRY  # noqa: E402
 from record_verdicts import (  # noqa: E402
-    build_alternatives, canonical, choose_overturn_protocol, derive_component_id, load_canonical_index,
-    parse_sha256sums, safe_identity,
+    build_alternatives, build_winners, canonical, choose_overturn_protocol, derive_component_id,
+    index_v1_candidates_by_repository, parse_sha256sums, safe_identity, v1_pin_text,
 )
 
 # Review finding 6, aligned with the tooling owner's #124 (claude/verdict-integrity-2-20260923,
@@ -143,7 +148,10 @@ PUBLISHED_ALTERNATIVE_FIELDS = ("name", "repository", "disposition", "why_not_de
 # (scripts/host_receipts.py imports scripts/validate.py), and the rule inputs they read from a
 # checkout: the lane-provenance registry scripts/landscape.py reads from --root, the host-receipt
 # schema scripts/host_receipts.py reads and the lane-return schema record_verdicts.py reads.
-# tests/test_verdict_review_gate.py derives the imports and those paths from the modules themselves.
+# tests/test_verdict_review_gate.py derives both: the imports by walking the modules' ast, and the
+# files read by recording every open() (a sys.addaudithook) while the gate judges a fixture and the
+# validators check this checkout. Every head-side read must be a TRUST_PATHS file or verdict data the
+# gate binds (HEAD_DATA_BINDINGS), so a new rule input cannot be read from the head unnoticed.
 TRUST_PATHS = (
     "scripts/verdict_review_gate.py", "scripts/landscape.py", "scripts/platform_status.py",
     "scripts/catalog_decisions.py", "scripts/host_receipts.py", "scripts/validate.py",
@@ -155,6 +163,29 @@ TRUST_PATHS = (
 # Any change under these paths runs the repository validators even when no row changed: a PR
 # that only deletes or rewrites a sealed lane file must still meet scripts/landscape.py.
 VERDICT_PATHSPECS = (SEALED_BASE_PREFIX + "*", "catalogs/landscape/", "catalogs/sota-convergence/")
+# Head-side files the gate reads that are verdict data, not rules, each with what binds it; the
+# read-derivation test fails on any other head-side read outside TRUST_PATHS.
+HEAD_DATA_BINDINGS = (
+    ("catalogs/landscape/", "the ledgers (compared with the base row by row) and the landscape manifest "
+     "(must name build_verdicts.LEDGER_FILES; its repository index is compared with the base's)"),
+    ("catalogs/sota-convergence/", "the wave registry and documents (registered by sha256; every wave but the "
+     "newest frozen)"),
+    (SEALED_BASE_PREFIX, "sealed lane returns, packets, adjudications and run manifests (bound by the row's "
+     "sha256 fields and manifests/evidence.json)"),
+    ("manifests/evidence.json", "the evidence registration the sealed files and receipts are checked against"),
+    ("evidence/hosts/", "host receipts (platform_status derives from receipts bound to the sealed pin)"),
+    (SINGLE_LANE_DECISION_DIR, "single-lane authorizations (must be byte-identical at the base)"),
+    ("catalogs/us-equities/decision-index.json", "the canonical repository index (the derived alternatives and "
+     "status must be the same with the base's index)"),
+    ("adoption/manifest.json", "its platform_profiles, a platform_status rule input (RULE_INPUT_FIELDS)"),
+)
+# Rule inputs held in a head-side data file: (path, top-level key, what reads it). A change to one in
+# the same comparison as a verdict change fails like a TRUST_PATHS change; the rest of the file is data.
+RULE_INPUT_FIELDS = (
+    ("adoption/manifest.json", "platform_profiles",
+     "scripts/host_receipts.py platform_profile_map: the host os/architecture a receipt's platform_id binds, "
+     "which decides whether it counts for platform_status"),
+)
 REPO_VALIDATORS = (
     ("scripts/landscape.py", ("scripts/landscape.py", "--root")),
     ("tools/sota-convergence/build_verdicts.py --check",
@@ -204,9 +235,16 @@ class Side:
 
     def read(self, path):
         if self.commit is not None:
-            # Absent from the tree is None; any other failure to read an object that exists is an error,
-            # so a read failure cannot pass for "the base had no wave registry".
-            if git(self.root, "cat-file", "-e", f"{self.commit}:{path}", check=False).returncode != 0:
+            # Absent from the tree is None; a failure to list the tree or to read an object that exists
+            # is an error, so a read failure cannot pass for "the base had no wave registry" (`git
+            # cat-file -e` exits 128 both for an absent path and for a broken repository).
+            listing = git(self.root, "ls-tree", "-z", "--full-tree", self.commit, "--", path, check=False)
+            if listing.returncode != 0:
+                raise ReadError(f"cannot list {path} at {self.commit[:12]}: "
+                                f"{listing.stderr.decode(errors='replace').strip()}")
+            entries = [entry.split(b"\t", 1) for entry in listing.stdout.split(b"\0") if entry]
+            if not any(len(entry) == 2 and entry[1].decode(errors="replace") == path
+                       and entry[0].split()[1:2] == [b"blob"] for entry in entries):
                 return None
             result = git(self.root, "show", f"{self.commit}:{path}", check=False)
             if result.returncode != 0:
@@ -229,6 +267,19 @@ class Side:
         except ValueError as error:
             where = self.commit[:12] if self.commit is not None else "the head"
             raise ReadError(f"{path} at {where} is not JSON ({error})") from None
+
+
+def canonical_index(side):
+    """(identities, aliases) of the canonical repository index at this side: the lines
+    record_verdicts.load_canonical_index runs, read through ``side`` so the base's index can be
+    compared with the head's."""
+    manifest = side.json(MANIFEST)
+    index = side.json(manifest["sources"]["repository_index"])
+    if not isinstance(index, dict):
+        raise ValueError(f"the repository index {manifest['sources']['repository_index']!r} is absent")
+    aliases = index.get("aliases", {}) or {}
+    identities = {identity(row["repository"]) for row in index.get("records", [])}
+    return identities, aliases
 
 
 def row_waves(catalog, row):
@@ -438,10 +489,16 @@ def two_family_adjudication_issue(raw, chosen_lanes):
 
 
 class RowCheck:
-    def __init__(self, head, key, row, registered, waves, violations):
+    def __init__(self, head, key, row, registered, waves, violations, base=None, base_row=None):
         self.head, self.key, self.row = head, key, row
         self.registered, self.waves, self.violations = registered, waves, violations
+        # The base side and the base's row for the same (catalog, layer_id), whatever its run id.
+        self.base, self.base_row = base, base_row if isinstance(base_row, dict) else {}
         self.lanes = row.get("lanes") if isinstance(row.get("lanes"), dict) else {}
+        # component_id -> {"pin", "evidence_refs"} the sealed evidence binds (check_winner_fields);
+        # platform_status is derived from these, never from the head winner's own values (G1).
+        self.sealed_bindings = {}
+        self.index_diverged = False
 
     def fail(self, message):
         self.violations.append({"row": label(self.key), "message": message})
@@ -543,7 +600,8 @@ class RowCheck:
             chosen, why = "claude", "both lanes name the same winners"
         elif recomputed == "codex_absent":
             if self.single_lane_issues(binding=False):
-                return "pending_lanes", "codex lane absent and no single-lane decision record names this layer"
+                return "pending_lanes", ("codex lane absent and no single-lane decision record, unchanged since "
+                                         "the base, names this layer")
             chosen, why = "claude", "codex lane absent, single-lane decision record names this layer"
         else:
             chosen, why = self.adjudicated_lane(sealed_base, packet_sha256, set(returns))
@@ -584,39 +642,87 @@ class RowCheck:
 
     def derived_alternatives(self, returns, winner_repositories):
         """The alternatives record_verdicts.py publishes: build_alternatives over the sealed returns,
-        without any that is (canonically) one of the winners."""
-        identities, aliases = load_canonical_index(self.head.root)
-        computed, _gaps = build_alternatives(returns, identities, aliases, None, None)
-        winner_ids = {canonical(safe_identity(repository), aliases) for repository in winner_repositories
-                      if safe_identity(repository)}
-        return [alternative for alternative in sanitize_value(computed)
-                if canonical(safe_identity(alternative["repository"]), aliases) not in winner_ids]
+        without any that is (canonically) one of the winners. The canonical repository index is a
+        head-side rule input (its identities and aliases decide which alternatives remain, and so the
+        status), so the same derivation with the base's index must agree (fourth review, G3): an index
+        change that alters a changed row's derivation lands in its own pull request first."""
+        def derive(index):
+            identities, aliases = index
+            computed, _gaps = build_alternatives(returns, identities, aliases, None, None)
+            winner_ids = {canonical(safe_identity(repository), aliases) for repository in winner_repositories
+                          if safe_identity(repository)}
+            return [alternative for alternative in sanitize_value(computed)
+                    if canonical(safe_identity(alternative["repository"]), aliases) not in winner_ids]
+
+        head = derive(canonical_index(self.head))
+        if self.base is not None:
+            try:
+                base = derive(canonical_index(self.base))
+            except (OSError, KeyError, TypeError, ValueError):
+                base = None
+            if base != head and not self.index_diverged:
+                self.index_diverged = True
+                self.fail("the head's canonical repository index (catalogs/landscape/manifest.json "
+                          "sources.repository_index) derives other alternatives for this row than the base's "
+                          f"(base {[a.get('repository') for a in base or []] if base is not None else 'unloadable'}, "
+                          f"head {[a.get('repository') for a in head]}); land the index change in its own pull "
+                          "request first")
+        return head
 
     def check_winner_fields(self, sealed_return, lane, winners, candidates):
-        """The fields record_verdicts.build_winners copies from the chosen lane and the packet."""
-        chosen = {derive_component_id(candidates[key]): candidates[key]
-                  for key in sealed_return.get("winner_keys") or [] if key in candidates}
-        pins = {component_id: candidate.get("pin") for component_id, candidate in chosen.items()}
-        why_selected = sanitize_value(sealed_return.get("why_selected"))
+        """Each winner, apart from platform_status, is exactly what record_verdicts.build_winners
+        writes (fourth review, G1): repository and recipe_ref from the packet candidate, evidence_class,
+        why_selected and evidence_refs (normalized against the head) from the chosen lane, the pin
+        from the packet, else the row's v1 candidate, else "unpinned", and no other key. Records
+        self.sealed_bindings: the pin and evidence_refs platform_status is derived from. A pin the
+        packet does not carry binds receipts only when the base's row candidates already carry it,
+        so a pull request cannot introduce a pin (with a matching candidate) that raises a status."""
         ledger_path = LEDGER_FILES.get(self.key[0])
+        try:
+            expected = sanitize_value(build_winners(sealed_return, candidates, ledger_path,
+                                                    index_v1_candidates_by_repository(self.row), self.head.root,
+                                                    [], status_context=None))
+        except (KeyError, TypeError, ValueError) as error:
+            self.fail(f"the {lane} lane return's winners cannot be built as record_verdicts.py does ({error!r})")
+            return
+        base_v1 = index_v1_candidates_by_repository(self.base_row)
+        expected_by_id = {winner["component_id"]: winner for winner in expected}
+        by_key = {derive_component_id(candidates[key]): candidates[key]
+                  for key in sealed_return.get("winner_keys") or [] if key in candidates}
         for winner in winners:
             component_id = winner.get("component_id")
-            candidate = chosen.get(component_id) or {}
-            if winner.get("repository") != candidate.get("repository"):
+            want = expected_by_id.get(component_id) or {}
+            candidate = by_key.get(component_id) or {}
+            if winner.get("repository") != want.get("repository"):
                 self.fail(f"winner {component_id}: repository {winner.get('repository')!r} is not the sealed packet "
-                          f"candidate's {candidate.get('repository')!r}")
-            recipe_ref = candidate.get("recipe_ref") or ledger_path
-            if winner.get("recipe_ref") != recipe_ref:
-                self.fail(f"winner {component_id}: recipe_ref {winner.get('recipe_ref')!r} is not {recipe_ref!r} "
-                          "(the sealed packet candidate's, else the row's ledger)")
-            if winner.get("evidence_class") != sealed_return.get("winner_evidence_class"):
+                          f"candidate's {want.get('repository')!r}")
+            if winner.get("recipe_ref") != want.get("recipe_ref"):
+                self.fail(f"winner {component_id}: recipe_ref {winner.get('recipe_ref')!r} is not "
+                          f"{want.get('recipe_ref')!r} (the sealed packet candidate's, else the row's ledger)")
+            if winner.get("evidence_class") != want.get("evidence_class"):
                 self.fail(f"winner {component_id}: evidence_class {winner.get('evidence_class')!r} is not the {lane} "
-                          f"lane's winner_evidence_class {sealed_return.get('winner_evidence_class')!r}")
-            if winner.get("why_selected") != why_selected:
+                          f"lane's winner_evidence_class {want.get('evidence_class')!r}")
+            if winner.get("why_selected") != want.get("why_selected"):
                 self.fail(f"winner {component_id}: why_selected differs from the sealed {lane} lane return")
-            if pins.get(component_id) and winner.get("pin") != pins[component_id]:
-                self.fail(f"winner {component_id}: pin {winner.get('pin')!r} is not the sealed packet's "
-                          f"{pins[component_id]!r}")
+            if winner.get("evidence_refs") != want.get("evidence_refs"):
+                self.fail(f"winner {component_id}: evidence_refs {winner.get('evidence_refs')!r} are not the sealed "
+                          f"{lane} lane's winner_evidence_refs as record_verdicts.py normalizes them "
+                          f"({want.get('evidence_refs')!r})")
+            if winner.get("pin") != want.get("pin"):
+                source = ("the sealed packet's" if candidate.get("pin")
+                          else "the one record_verdicts.py writes without a packet pin (the row's v1 candidate pin, "
+                               "else 'unpinned'):")
+                self.fail(f"winner {component_id}: pin {winner.get('pin')!r} is not {source} {want.get('pin')!r}")
+            extra = sorted(set(winner) - set(want) - {"platform_status"}) if want else []
+            if extra:
+                self.fail(f"winner {component_id}: carries {extra}, which record_verdicts.build_winners does not write")
+            if not want:
+                continue
+            pin = want["pin"]
+            if not candidate.get("pin") and pin != v1_pin_text(base_v1.get(want.get("repository"))):
+                # Not sealed and not already carried at the base: it binds no receipt.
+                pin = "unpinned"
+            self.sealed_bindings[component_id] = {"pin": pin, "evidence_refs": list(want.get("evidence_refs") or [])}
 
     def check_published_alternatives(self, returns, lane, winners):
         """The alternatives and verdict_overturn_when record_verdicts.py derives from the sealed
@@ -846,6 +952,16 @@ class RowCheck:
         if data is None:
             return [f"lanes.single_lane_decision {path!r} does not exist"]
         issues = []
+        # Fourth review, G2: the authorization must already be at the base, byte for byte, so it lands
+        # (and is seen) in its own earlier pull request, never in the one adding the row it authorizes.
+        base_data = self.base.read(path) if self.base is not None else None
+        if base_data is None:
+            issues.append(f"lanes.single_lane_decision {path!r} is not at the base: a single-lane authorization "
+                          "lands in its own pull request before the verdict it authorizes")
+        elif base_data != data:
+            issues.append(f"lanes.single_lane_decision {path!r} differs from its base copy (base sha256 "
+                          f"{sha256(base_data)}, head {sha256(data)}): an authorization is edited in its own pull "
+                          "request first")
         stored = self.lanes.get(SINGLE_LANE_DECISION_SHA256_FIELD)
         if not binding:
             pass
@@ -864,7 +980,13 @@ class RowCheck:
             self.fail(issue)
 
 
-def platform_status_violations(key, old, new, context):
+UNBOUND_WINNER = {"pin": "unpinned", "evidence_refs": []}
+
+
+def platform_status_violations(key, old, new, context, sealed_bindings):
+    """Every changed platform value must be the one platform_status() derives for the winner's
+    SEALED pin and evidence_refs (fourth review, G1), never the head winner's own: a winner whose
+    sealed evidence cannot be resolved is derived as unpinned with no evidence_refs."""
     violations = []
     old_winners = {winner.get("component_id"): winner for winner in old.get("winners") or [] if isinstance(winner, dict)}
     for winner in new.get("winners") or []:
@@ -872,15 +994,17 @@ def platform_status_violations(key, old, new, context):
             continue
         before = (old_winners.get(winner.get("component_id")) or {}).get("platform_status") or {}
         declared = winner.get("platform_status") if isinstance(winner.get("platform_status"), dict) else {}
+        sealed = {**winner, **sealed_bindings.get(winner.get("component_id"), UNBOUND_WINNER)}
         for platform in platform_evidence.PLATFORMS:
             if declared.get(platform) == before.get(platform):
                 continue
-            derived = platform_evidence.platform_status(platform, winner, context)
+            derived = platform_evidence.platform_status(platform, sealed, context)
             if declared.get(platform) != derived.status:
                 violations.append({"row": label(key), "message": (
                     f"winner {winner.get('component_id')}: platform_status.{platform} changed to "
                     f"{declared.get(platform)!r} but scripts/platform_status.py derives {derived.status!r} "
-                    f"({derived.reason}) from the registered receipts")})
+                    f"({derived.reason}) from the registered receipts bound to the sealed pin "
+                    f"{sealed.get('pin')!r} and evidence_refs {sealed.get('evidence_refs')!r}")})
     return violations
 
 
@@ -1038,6 +1162,18 @@ def changed_trust_paths(head_root, base):
     return changed_paths(head_root, base, TRUST_PATHS)
 
 
+def changed_rule_input_fields(base, head):
+    """``path#/key`` of every RULE_INPUT_FIELDS value that differs between the two sides (parsed
+    without duplicate keys; a malformed file is a ReadError)."""
+    changed = []
+    for path, key, _reader in RULE_INPUT_FIELDS:
+        values = [document.get(key) if isinstance(document, dict) else None
+                  for document in (base.json(path), head.json(path))]
+        if values[0] != values[1]:
+            changed.append(f"{path}#/{key}")
+    return changed
+
+
 def run_repo_validators(head_root):
     violations = []
     for name, (script, *arguments) in REPO_VALIDATORS:
@@ -1058,6 +1194,7 @@ def evaluate(root, base, head_root=None, *, validators=run_repo_validators):
     base_waves, head_waves = load_waves(base_side), load_waves(head_side)
     changes, violations = [], []
     registered = evidence_files(head_root)
+    base_by_layer = {key[:2]: row for key, row in base_rows.items()}
     context = None
     for key, row in sorted(head_rows.items(), key=lambda item: tuple(map(str, item[0]))):
         kind = change_kind(base_rows.get(key), row)
@@ -1068,12 +1205,17 @@ def evaluate(root, base, head_root=None, *, validators=run_repo_validators):
         changes.append({"row": label(key), "kind": kind, "grandfathered": grandfathered})
         if grandfathered:
             continue
-        # Every changed platform value of a non-grandfathered row must be the one the receipts derive;
-        # a change to platform_status alone needs nothing else.
+        # A changed row meets every sealed-evidence rule. A change to platform_status alone needs
+        # nothing else: its row is still resolved against the sealed evidence, but only for the pin
+        # and evidence_refs the platform values derive from (its other findings are not reported).
+        check = RowCheck(head_side, key, row, registered, head_waves,
+                         violations if kind != "platform_status" else [], base_side, base_by_layer.get(key[:2]))
+        check.run()
+        # Every changed platform value of a non-grandfathered row must be the one the receipts bound to
+        # the winner's sealed pin and evidence_refs derive.
         context = context or platform_evidence.load_context(head_root)
-        violations.extend(platform_status_violations(key, base_rows.get(key) or {}, row, context))
-        if kind != "platform_status":
-            RowCheck(head_side, key, row, registered, head_waves, violations).run()
+        violations.extend(platform_status_violations(key, base_rows.get(key) or {}, row, context,
+                                                     check.sealed_bindings))
     removed = [label(key) for key in sorted(set(base_rows) - set(head_rows), key=lambda k: tuple(map(str, k)))]
     violations.extend(row_continuity_violations(base_rows, head_rows, head_waves))
     violations.extend(wave_freeze_violations(base_side, head_side, base_waves, head_waves))
@@ -1096,14 +1238,16 @@ def evaluate(root, base, head_root=None, *, validators=run_repo_validators):
     verdict_changed = bool(changes or removed or waves_changed
                            or any(not path.startswith("catalogs/landscape/") for path in value_changes))
     trust = changed_trust_paths(head_root, base)
-    if verdict_changed and trust:
+    rule_inputs = changed_rule_input_fields(base_side, head_side)
+    if verdict_changed and (trust or rule_inputs):
         violations.append({"row": "repository", "message": (
             f"this change edits verdict rows, waves or sealed verdict artifacts and also the gate's trust base "
-            f"({', '.join(trust)}); land the rules change in its own pull request first")})
+            f"({', '.join(trust + rule_inputs)}); land the rules change in its own pull request first")})
     if touched and validators is not None:
         violations.extend(validators(head_root))
     return {"base": base, "changes": changes, "removed": removed, "waves_changed": waves_changed,
             "changed_paths": artifacts, "value_changed_paths": value_changes, "trust_paths_changed": trust,
+            "rule_inputs_changed": rule_inputs,
             "touched": touched, "violations": violations,
             "status": "failed" if violations else "passed"}
 

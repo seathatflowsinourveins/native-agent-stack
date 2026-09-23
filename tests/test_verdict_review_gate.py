@@ -55,10 +55,14 @@ def dump(value) -> bytes:
     return (json.dumps(value, indent=1, sort_keys=True) + "\n").encode()
 
 
-def winner(component_id, linux="not_established", macos="untested"):
-    repository = next(c["repository"] for c in PACKET["candidates"] if c["component_id"] == component_id)
-    return {"component_id": component_id, "repository": repository, "pin": "1.0", "evidence_class": "source_review",
-            "why_selected": "fixture", "evidence_refs": [], "recipe_ref": LEDGERS["foundation"],
+def winner(component_id, linux="not_established", macos="untested", evidence_class="source_review",
+           evidence_refs=(), pin=None):
+    """The winner record_verdicts.build_winners writes: the packet pin, else "unpinned" (the fixture
+    rows carry no v1 candidates unless a test adds them)."""
+    candidate = next(c for c in PACKET["candidates"] if c["component_id"] == component_id)
+    return {"component_id": component_id, "repository": candidate["repository"],
+            "pin": pin or candidate.get("pin") or "unpinned", "evidence_class": evidence_class,
+            "why_selected": "fixture", "evidence_refs": list(evidence_refs), "recipe_ref": LEDGERS["foundation"],
             "platform_status": {"linux-wsl2-x86_64": linux, "macos-arm64": macos}}
 
 
@@ -179,7 +183,8 @@ class GateFixture(unittest.TestCase):
 
     def record(self, layer_id="beta", *, claude_keys=("c1",), codex_keys=("c1",), codex=True, codex_model=OPENAI,
                codex_packet=None, agreement=None, winners=None, judged=None, packets=True, single_lane=None,
-               register_lanes=True, in_run_manifest=True, register_wave=True, status="recorded", packet=None):
+               register_lanes=True, in_run_manifest=True, register_wave=True, status="recorded", packet=None,
+               evidence_class="source_review", evidence_refs=(), linux="not_established"):
         """Seal a new-wave (20260923) row the way record_verdicts.py would, then add it to the ledger."""
         self.new_wave = True
         packet_bytes = dump(packet if packet is not None else PACKET)
@@ -199,7 +204,8 @@ class GateFixture(unittest.TestCase):
         for lane, keys, model, packet_sha in sealed:
             data = dump({"schema_version": 1, "lane": lane, "catalog": "foundation", "layer_id": layer_id,
                          "packet_sha256": packet_sha, "model": model, "winner_keys": list(keys),
-                         "winner_evidence_class": "source_review", "why_selected": "fixture",
+                         "winner_evidence_class": evidence_class, "winner_evidence_refs": list(evidence_refs),
+                         "why_selected": "fixture",
                          "overturn_when": f"{lane} overturn", "overturn_protocol": PROTOCOL,
                          "alternatives": [ALTERNATIVE]})
             path = f"{SEALED}/{lane}/{run_id}.json"
@@ -232,7 +238,9 @@ class GateFixture(unittest.TestCase):
         row = self.grandfathered_row(layer_id)
         recorded = status == "recorded"
         row.update(verdict_status=status, checked_at="2026-09-23", lanes=lanes,
-                   winners=winners if winners is not None else [winner(COMPONENTS[key]) for key in chosen_keys],
+                   winners=winners if winners is not None else [
+                       winner(COMPONENTS[key], linux=linux, evidence_class=evidence_class, evidence_refs=evidence_refs)
+                       for key in chosen_keys],
                    alternatives=[{**ALTERNATIVE, "source": "lane:claude"}] if recorded else [],
                    verdict_overturn_when=f"{chosen_lane} overturn" if recorded else "",
                    overturn_protocol=PROTOCOL)
@@ -329,7 +337,9 @@ class EvidencedRowTests(GateFixture):
         self.assertPasses(self.report())
 
     def test_single_lane_row_with_its_own_authorization_line_passes(self):
+        # The authorization is at the base (fourth review, G2): it landed in an earlier pull request.
         self.decision("# Single lane\n\nsingle-lane-authorization: foundation/beta\n")
+        self.rebase()
         self.record(codex=False, single_lane=DECISION)
         self.assertPasses(self.report())
 
@@ -497,6 +507,7 @@ class SingleLaneTests(GateFixture):
 
     def test_stored_decision_sha256_must_match(self):
         self.decision("single-lane-authorization: foundation/beta\n")
+        self.rebase()
         row = self.record(codex=False, single_lane=DECISION)
         row["lanes"][gate.SINGLE_LANE_DECISION_SHA256_FIELD] = "a" * 64
         self.assertFails(self.report(), f"lanes.{gate.SINGLE_LANE_DECISION_SHA256_FIELD} " + "a" * 64)
@@ -1014,9 +1025,218 @@ class FailClosedTests(GateFixture):
             gate.evaluate(self.root, self.base, self.root, validators=lambda _root: [])
 
 
+class SealedWinnerBindingTests(GateFixture):
+    """Fourth review, G1: a winner's evidence_refs and pin are the sealed ones, and platform_status
+    derives from receipts bound to the sealed pin and evidence_refs, never from the head winner's."""
+
+    UNRELATED = "evidence/receipts/unrelated.json"
+
+    def with_receipt(self, component_id, version):
+        """Patch platform_status's context with one qualifying linux receipt for ``component_id`` at
+        ``version`` (an independently reviewed native_proven install pass on a second machine)."""
+        real = gate.platform_evidence.load_context
+        receipt = {"shape_ok": True, "platform_identity_ok": True, "component_version": version,
+                   "evidence_class": "native_proven", "stage": "install", "result": "pass",
+                   "second_physical_machine": True, "review_state": "agree", "host_id": "second-host",
+                   "observed_at_utc": "2026-09-23T00:00:00Z", "path": f"evidence/hosts/second-host/{component_id}.json"}
+
+        def load(root):
+            summary = {"components": {component_id: {"platforms": {"linux-wsl2-x86_64": {"receipts": [receipt]}}}}}
+            return gate.platform_evidence.StatusContext(summary=summary, registered_paths=real(root).registered_paths)
+
+        patcher = mock.patch.object(gate.platform_evidence, "load_context", load)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
+    def unrelated_evidence(self):
+        self.write(self.UNRELATED, b'{"unrelated": true}\n')
+        self.register(self.UNRELATED)
+
+    def test_forged_evidence_refs_raising_linux_to_accepted_fail(self):
+        # native_proven with no registered ref derives linux 'conditional'; citing any registered
+        # evidence/ file would derive 'accepted' from the head winner's own refs.
+        self.unrelated_evidence()
+        row = self.record(evidence_class="native_proven", linux="conditional")
+        self.rebase()
+        row["winners"][0]["evidence_refs"] = [self.UNRELATED]
+        row["winners"][0]["platform_status"]["linux-wsl2-x86_64"] = "accepted"
+        report = self.report()
+        self.assertEqual(report["changes"][0]["kind"], "changed")
+        self.assertFails(report, f"winner comp-one: evidence_refs ['{self.UNRELATED}'] are not the sealed claude "
+                                 "lane's winner_evidence_refs")
+        self.assertIn("platform_status.linux-wsl2-x86_64 changed to 'accepted' but scripts/platform_status.py derives "
+                      "'conditional'", self.messages(report))
+
+    def test_sealed_evidence_refs_citing_registered_evidence_pass(self):
+        self.unrelated_evidence()
+        self.record(evidence_class="native_proven", evidence_refs=[self.UNRELATED], linux="accepted")
+        self.assertPasses(self.report())
+
+    def test_pin_added_where_the_packet_has_none_fails(self):
+        self.with_receipt("comp-two", "9.9")
+        row = self.record(claude_keys=("c2",), codex_keys=("c2",))
+        self.rebase()
+        row["winners"][0].update(pin="9.9")
+        row["winners"][0]["platform_status"]["linux-wsl2-x86_64"] = "accepted"
+        report = self.report()
+        self.assertFails(report, "winner comp-two: pin '9.9' is not the one record_verdicts.py writes without a "
+                                 "packet pin")
+        self.assertIn("changed to 'accepted' but scripts/platform_status.py derives 'not_established'",
+                      self.messages(report))
+
+    def test_pin_added_with_a_matching_head_candidate_binds_no_receipt(self):
+        # The head row's candidates carry the pin, so build_winners would write it; the base's row does
+        # not, so it binds no receipt and the raised status fails.
+        self.with_receipt("comp-two", "9.9")
+        row = self.record(claude_keys=("c2",), codex_keys=("c2",))
+        self.rebase()
+        row["candidates"] = [{"repository": PACKET["candidates"][1]["repository"], "source_pin": "9.9"}]
+        row["winners"][0].update(pin="9.9")
+        row["winners"][0]["platform_status"]["linux-wsl2-x86_64"] = "accepted"
+        report = self.report()
+        self.assertFails(report, "changed to 'accepted' but scripts/platform_status.py derives 'not_established'")
+        self.assertIn("the sealed pin 'unpinned'", self.messages(report))
+        self.assertNotIn("pin '9.9' is not", self.messages(report))
+
+    def test_pin_the_base_candidates_already_carry_binds_its_receipt(self):
+        candidates = [{"repository": PACKET["candidates"][1]["repository"], "source_pin": "9.9"}]
+        self.ledger["foundation"][0]["candidates"] = candidates
+        self.rebase()
+        self.with_receipt("comp-two", "9.9")
+        del self.ledger["foundation"][0]
+        row = self.record("alpha", claude_keys=("c2",), codex_keys=("c2",),
+                          winners=[winner("comp-two", linux="accepted", pin="9.9")])
+        row["candidates"] = candidates
+        self.assertPasses(self.report())
+
+    def test_pin_changed_to_one_matching_an_unrelated_receipt_fails(self):
+        self.with_receipt("comp-one", "3.0")
+        row = self.record()
+        self.rebase()
+        row["winners"][0].update(pin="3.0")
+        row["winners"][0]["platform_status"]["linux-wsl2-x86_64"] = "accepted"
+        report = self.report()
+        self.assertFails(report, "winner comp-one: pin '3.0' is not the sealed packet's '1.0'")
+        self.assertIn("derives 'not_established'", self.messages(report))
+        self.assertIn("the sealed pin '1.0'", self.messages(report))
+
+    def test_platform_only_upgrade_a_receipt_at_the_sealed_pin_supports_passes(self):
+        row = self.record()
+        self.rebase()
+        self.with_receipt("comp-one", "1.0")
+        row["winners"][0]["platform_status"]["linux-wsl2-x86_64"] = "accepted"
+        report = self.report()
+        self.assertEqual(report["changes"][0]["kind"], "platform_status")
+        self.assertPasses(report)
+
+    def test_winner_with_a_key_build_winners_does_not_write_fails(self):
+        row = self.record()
+        self.rebase()
+        row["winners"][0]["accepted_by"] = "maintainer"
+        self.assertFails(self.report(), "winner comp-one: carries ['accepted_by'], which record_verdicts.build_winners "
+                                        "does not write")
+
+
+class CanonicalIndexBindingTests(GateFixture):
+    """Fourth review, G3: the canonical repository index is a head-side rule input of the derived
+    alternatives and status, so a changed row must derive the same with the base's index."""
+
+    def test_index_edit_that_empties_the_alternatives_cannot_withdraw_a_verdict(self):
+        row = self.record()
+        self.rebase()
+        index = json.loads((self.root / INDEX).read_bytes())
+        index["records"] = [record for record in index["records"] if record["repository"] != ALTERNATIVE["repository"]]
+        self.write(INDEX, dump(index))
+        row.update(verdict_status="pending_lanes", winners=[], alternatives=[], verdict_overturn_when="")
+        self.assertFails(self.report(), "derives other alternatives for this row than the base's")
+
+    def test_index_edit_that_does_not_change_the_row_passes(self):
+        row = self.record()
+        self.rebase()
+        index = json.loads((self.root / INDEX).read_bytes())
+        index["records"].append({"repository": "https://github.com/example/unrelated"})
+        self.write(INDEX, dump(index))
+        row["open_gaps"] = ["edited"]
+        self.assertPasses(self.report())
+
+    def test_the_gates_index_reader_matches_record_verdicts(self):
+        import record_verdicts
+        self.flush()
+        self.assertEqual(gate.canonical_index(gate.Side(self.root)), record_verdicts.load_canonical_index(self.root))
+        self.assertEqual(gate.canonical_index(gate.Side(self.root, self.base)),
+                         record_verdicts.load_canonical_index(self.root))
+
+    def test_platform_profiles_change_with_a_verdict_change_fails_the_trust_rule(self):
+        self.write("adoption/manifest.json", dump({"platform_profiles": [{"id": "macos-arm64", "os": "darwin",
+                                                                          "architecture": "arm64"}]}))
+        self.rebase()
+        self.write("adoption/manifest.json", dump({"platform_profiles": [{"id": "macos-arm64", "os": "linux",
+                                                                          "architecture": "x86_64"}]}))
+        self.record()
+        report = self.report()
+        self.assertFails(report, "also the gate's trust base (adoption/manifest.json#/platform_profiles)")
+        self.assertEqual(report["rule_inputs_changed"], ["adoption/manifest.json#/platform_profiles"])
+
+    def test_other_adoption_manifest_changes_are_data(self):
+        self.write("adoption/manifest.json", dump({"platform_profiles": [], "components": []}))
+        self.rebase()
+        self.write("adoption/manifest.json", dump({"platform_profiles": [], "components": ["new"]}))
+        self.record()
+        self.assertPasses(self.report())
+
+
+class SingleLaneBaseTests(GateFixture):
+    """Fourth review, G2: a single-lane authorization is byte-identical at the base, so it cannot be
+    added or edited in the pull request that adds the row it authorizes."""
+
+    def test_authorization_added_in_the_same_pull_request_fails(self):
+        self.decision("single-lane-authorization: foundation/beta\n")
+        self.record(codex=False, single_lane=DECISION)
+        report = self.report()
+        self.assertFails(report, f"lanes.single_lane_decision '{DECISION}' is not at the base")
+        self.assertIn("verdict_status is 'recorded' but record_verdicts.py writes 'pending_lanes'", self.messages(report))
+
+    def test_authorization_edited_in_the_same_pull_request_fails(self):
+        self.decision("single-lane-authorization: foundation/alpha\n")
+        self.rebase()
+        self.decision("single-lane-authorization: foundation/alpha\nsingle-lane-authorization: foundation/beta\n")
+        self.record(codex=False, single_lane=DECISION)
+        self.assertFails(self.report(), f"lanes.single_lane_decision '{DECISION}' differs from its base copy")
+
+    def test_authorization_present_at_the_base_passes(self):
+        self.decision("single-lane-authorization: foundation/beta\n")
+        self.rebase()
+        self.record(codex=False, single_lane=DECISION)
+        self.assertPasses(self.report())
+
+
+class BaseTreeReadTests(GateFixture):
+    """Third review, finding 3 (re-checked): a failing base tree listing is a read error, not an absent file."""
+
+    def test_directory_at_the_base_is_not_a_file(self):
+        self.assertIsNone(gate.Side(self.root, self.base).read("catalogs/landscape"))
+        self.assertIsNone(gate.Side(self.root, self.base).read("catalogs/landscape/absent.json"))
+        self.assertIsNotNone(gate.Side(self.root, self.base).read(MANIFEST))
+
+    def test_failing_ls_tree_is_a_read_error_and_exits_2(self):
+        real = gate.git
+
+        def failing(root, *args, check=True):
+            if args and args[0] == "ls-tree":
+                return subprocess.CompletedProcess(args, 128, b"", b"fatal: stubbed failure")
+            return real(root, *args, check=check)
+
+        with mock.patch.object(gate, "git", failing), contextlib.redirect_stdout(io.StringIO()) as output:
+            code = gate.main(["--root", str(self.root), "--base", self.base])
+        self.assertEqual(code, 2, output.getvalue())
+        self.assertIn("cannot list", output.getvalue())
+
+
 class TrustPathDerivationTests(unittest.TestCase):
-    """Review of #123, finding 4: TRUST_PATHS covers every repository module the gate and the validators
-    import (transitively) and the rule inputs they read, derived from the modules themselves."""
+    """Review of #123, finding 4, and fourth review G3: TRUST_PATHS covers every repository module the
+    gate and the validators import (transitively) and every head-side rule input they read, derived
+    from the modules (an ast walk of the imports) and from what they actually open (a sys.addaudithook
+    recording every read while the gate judges a fixture and the validators check this checkout)."""
 
     ROOT = Path(gate.__file__).resolve().parents[1]
     ENTRY_POINTS = ("scripts/verdict_review_gate.py", "scripts/landscape.py", "scripts/platform_status.py",
@@ -1058,13 +1278,105 @@ class TrustPathDerivationTests(unittest.TestCase):
         self.assertIn("scripts/validate.py", seen)  # scripts/host_receipts.py imports it
         self.assertEqual(sorted(seen - set(gate.TRUST_PATHS)), [])
 
-    def test_rule_inputs_the_modules_read_are_trust_paths(self):
+    # Runs in a subprocess: an audit hook cannot be removed once added. It records every file opened
+    # for reading under the data root and every module imported from the repository.
+    READ_TRACER = r"""
+import json, os, runpy, sys
+repository, data_root, mode, *rest = sys.argv[1:]
+repository, data_root = os.path.realpath(repository), os.path.realpath(data_root)
+reads = set()
+
+def hook(event, args):
+    if event != "open" or not args or not isinstance(args[0], (str, bytes, os.PathLike)):
+        return
+    flags = args[1] if len(args) > 1 else "r"
+    if isinstance(flags, str) and any(char in flags for char in "wax+"):
+        return
+    if flags is None and len(args) > 2 and isinstance(args[2], int) and args[2] & (os.O_WRONLY | os.O_RDWR | os.O_CREAT):
+        return
+    path = os.path.realpath(os.fsdecode(args[0]))
+    if path.startswith(data_root + os.sep) and "__pycache__" not in path:
+        reads.add(os.path.relpath(path, data_root))
+
+sys.path[:0] = [repository, os.path.join(repository, "tools", "sota-convergence")]
+sys.addaudithook(hook)
+code = 0
+if mode == "gate":
+    from scripts import verdict_review_gate as gate
+    report = gate.evaluate(data_root, rest[0], data_root, validators=None)
+    code = report["violations"]
+else:
+    sys.path.insert(0, os.path.dirname(os.path.join(repository, mode)))
+    sys.argv = [os.path.join(repository, mode), *rest]
+    try:
+        runpy.run_path(sys.argv[0], run_name="__main__")
+    except SystemExit as error:
+        code = error.code
+modules = sorted({os.path.relpath(os.path.realpath(module.__file__), repository) for module in list(sys.modules.values())
+                  if getattr(module, "__file__", None)
+                  and os.path.realpath(module.__file__).startswith(repository + os.sep)})
+print(json.dumps({"code": code, "reads": sorted(reads), "modules": modules}))
+"""
+
+    def trace(self, data_root, mode, *arguments):
+        import sys
+        environment = {key: value for key, value in os.environ.items() if not key.startswith("GIT_")}
+        result = subprocess.run([sys.executable, "-c", self.READ_TRACER, str(self.ROOT), str(data_root), mode,
+                                 *map(str, arguments)], capture_output=True, text=True, env=environment,
+                                cwd=str(self.ROOT))
+        self.assertEqual(result.returncode, 0, result.stderr)
+        return json.loads(result.stdout.strip().splitlines()[-1])
+
+    @staticmethod
+    def bound(path):
+        return path in gate.TRUST_PATHS or any(path == prefix or path.startswith(prefix)
+                                               for prefix, _why in gate.HEAD_DATA_BINDINGS)
+
+    def test_every_head_side_file_the_gate_reads_is_a_trust_path_or_bound_verdict_data(self):
+        # A fixture that reaches every RowCheck path: an agreeing row, an adjudicated disagreement and
+        # an authorized single-lane row (its decision record at the base), with the rules' own inputs
+        # absent so that their attempted reads are recorded too.
+        fixture = GateFixture("setUp")
+        fixture.setUp()
+        self.addCleanup(fixture.doCleanups)
+        fixture.decision("single-lane-authorization: foundation/delta\n")
+        fixture.rebase()
+        fixture.record("beta")
+        fixture.record("gamma", claude_keys=("c1",), codex_keys=("c2",), judged=adjudication())
+        fixture.record("delta", codex=False, single_lane=DECISION)
+        fixture.assertPasses(fixture.report())
+        traced = self.trace(fixture.root, "gate", fixture.base)
+        self.assertEqual(traced["code"], [])
+        unbound = sorted(path for path in traced["reads"] if not self.bound(path))
+        self.assertEqual(unbound, [], "a head-side read that is neither a trust path nor bound verdict data")
+        # Non-vacuous: the reads include the rule inputs each binding names.
+        for path in (INDEX, DECISION, MANIFEST, f"{SEALED}/run-manifest.json", f"{SEALED}/packets/foundation__beta.json",
+                     f"{SEALED}/adjudication/foundation-gamma-{RUN}.json", "manifests/evidence.json",
+                     "adoption/manifest.json"):
+            self.assertIn(path, traced["reads"])
+        self.assertEqual(sorted(set(traced["modules"]) - set(gate.TRUST_PATHS)), [])
+
+    def test_every_rule_input_the_validators_read_from_this_checkout_is_a_trust_path(self):
+        # The validators can only add failures to the gate's own verdict, so their catalog data reads
+        # are not rule inputs; their code, schemas and tool registries are.
+        for script, *arguments in (("scripts/landscape.py", "--root", self.ROOT),
+                                   ("tools/sota-convergence/build_verdicts.py", "--check", "--root", self.ROOT)):
+            with self.subTest(script):
+                traced = self.trace(self.ROOT, script, *arguments)
+                self.assertEqual(traced["code"], 0, script)
+                rules = sorted(path for path in traced["reads"] + traced["modules"] + [script]
+                               if path.endswith((".py", ".schema.json")) and path.startswith(("scripts/", "tools/"))
+                               or path.endswith(".schema.json")
+                               or path.startswith(("tools/", ".github/")) and not path.endswith(".py"))
+                self.assertTrue(rules)
+                self.assertEqual(sorted(set(rules) - set(gate.TRUST_PATHS)), [], script)
+
+    def test_rule_inputs_named_by_the_modules_are_trust_paths(self):
         from scripts import host_receipts, landscape
         import record_verdicts
         inputs = {landscape.LANE_PROVENANCE_REGISTRY, host_receipts.SCHEMA_RELATIVE_PATH,
                   Path(record_verdicts.SCHEMA_PATH).resolve().relative_to(self.ROOT).as_posix()}
         self.assertEqual(sorted(inputs - set(gate.TRUST_PATHS)), [])
-        self.assertIn("tools/sota-convergence/lane-provenance.json", gate.TRUST_PATHS)
         for path in gate.TRUST_PATHS:
             self.assertTrue((self.ROOT / path).is_file(), path)
 
