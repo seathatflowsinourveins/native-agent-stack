@@ -282,7 +282,6 @@ jobs:
           git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
             commit -m "Catalog freshness: report-only drift evidence ($(date -u +%Y-%m-%d))"
       - name: Push the evidence branch with the workflow token (never persisted to disk)
-        id: push
         env:
           GITHUB_TOKEN: ${{ github.token }}
           OBSERVED_SHA: ${{ steps.branch.outputs.observed_sha }}
@@ -295,34 +294,23 @@ jobs:
           GIT_CONFIG_VALUE_0="AUTHORIZATION: basic $basic_auth" \
           git push --force-with-lease="automation/catalog-freshness:$OBSERVED_SHA" \
             origin HEAD:refs/heads/automation/catalog-freshness
-          echo "pushed_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
       - name: Open or update the evidence PR
         id: pr
         env:
           GH_TOKEN: ${{ github.token }}
-          RECEIPT_PATH: ${{ steps.build.outputs.receipt_path }}
-          PUSHED_SHA: ${{ steps.push.outputs.pushed_sha }}
         run: |
           set -euo pipefail
-          # A manual and a scheduled propose can overlap (separate concurrency groups).
-          # Only the run whose commit is still the branch head may write the PR
-          # description, so the description always matches the branch's evidence.
-          # A window of seconds remains between this check and `gh pr edit`.
-          current_sha="$(git ls-remote origin refs/heads/automation/catalog-freshness | awk '{print $1}')"
-          if [ "$current_sha" != "$PUSHED_SHA" ]; then
-            echo "automation/catalog-freshness moved to $current_sha after this run pushed $PUSHED_SHA; the newer run owns the PR description, skipping the update."
-            echo "pr_url=" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
+          # The description is deliberately run-independent: it points at the evidence the
+          # branch head carries instead of embedding this run's report. A manual and a
+          # scheduled propose can overlap (separate concurrency groups), and a
+          # run-specific body could then describe an older commit than the branch holds.
           body_file="$RUNNER_TEMP/freshness/pr-body.md"
           {
             echo "## Catalog freshness: report-only drift evidence"
             echo ""
-            cat "$RUNNER_TEMP/freshness/drift.md"
+            echo "The evidence is the current head of \`automation/catalog-freshness\`: the drift report under \`evidence/artifacts/catalog-freshness-<date>/drift.md\` and the receipt under \`evidence/receipts/catalog-freshness-<date>.json\` in this PR's diff. The workflow run that produced the head commit is linked from that receipt."
             echo ""
             echo "This PR is report-only; no selection or pin changed; pin bumps require a qualified receipt under evidence/artifacts/*/."
-            echo ""
-            echo "Receipt: \`$RECEIPT_PATH\`"
           } > "$body_file"
           existing="$(gh pr list --head automation/catalog-freshness --base main --state open --json number --jq '.[0].number // empty')"
           if [ -n "$existing" ]; then

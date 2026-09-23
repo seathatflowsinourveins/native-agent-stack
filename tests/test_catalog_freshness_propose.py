@@ -906,14 +906,17 @@ class CatalogFreshnessWorkflowTextTests(unittest.TestCase):
         self.assertIn("approval-required", body)
         self.assertIn("https://docs.github.com/en/actions/concepts/security/github_token", body)
 
-    def test_pr_description_update_is_guarded_by_the_branch_head(self):
-        """Codex verification of 7a483f7: overlapping manual and scheduled proposals
-        could leave the PR description describing an older run's evidence. Only the
-        run whose pushed commit is still the branch head may update the PR."""
+    def test_pr_description_is_run_independent(self):
+        """Codex verification of 52d136a: a branch-head check narrowed but could not
+        close the overlap race (A checks, B pushes and edits, A edits). The body now
+        embeds no run-specific report or receipt, so overlapping runs cannot leave it
+        describing an older commit than the branch holds."""
         body = self._job_body("propose")
-        self.assertIn('echo "pushed_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"', body)
-        self.assertIn("PUSHED_SHA: ${{ steps.push.outputs.pushed_sha }}", body)
-        self.assertIn('if [ "$current_sha" != "$PUSHED_SHA" ]; then', body)
+        pr_step = body[body.index("- name: Open or update the evidence PR"):body.index("- name: Note that this PR")]
+        self.assertNotIn('cat "$RUNNER_TEMP/freshness/drift.md"', pr_step)
+        self.assertNotIn("RECEIPT_PATH", pr_step)
+        self.assertNotIn("current_sha", pr_step)
+        self.assertIn("current head of", pr_step)
 
     def test_propose_job_states_the_correct_approval_ui_path(self):
         # N3: approval happens on the PR itself -- the GITHUB_TOKEN page's banner in the

@@ -213,7 +213,8 @@ def render_drift_markdown(published_path, rebuilt_name: str, published: dict, re
             "",
             f"{len(unfetched)} component(s) have no reliable upstream data this run (an "
             "unfinished/bounded fetch, or a releases/tags/commit fetch problem for that repository) "
-            "and are excluded from the drift count above:",
+            "so their upstream comparison is excluded above (a pin change on such a row is still "
+            "listed as drift, with its fresh upstream fields empty):",
             "",
             ", ".join(md_cell(component_id) for component_id in sorted(unfetched)),
         ]
