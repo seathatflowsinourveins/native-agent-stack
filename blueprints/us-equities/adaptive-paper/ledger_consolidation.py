@@ -20,6 +20,8 @@ may overlap. A ledger outside the account fingerprint directory requires an expl
 Source(account_fingerprint=..., provenance_path=...) attestation, a paper receipt,
 and broker-bound order identities. Historical configurations and table contents are
 preserved as private provenance. This is local integration, not upstream acceptance.
+Legacy native-fault provenance may use the exact broker="alpaca", endpoint="paper"
+pair. That compatibility applies only to its retained receipt, never broker proof.
 """
 from dataclasses import dataclass, field
 from decimal import Decimal, InvalidOperation, localcontext
@@ -211,8 +213,11 @@ def _validate(snapshot, fingerprint):
     if meta.get("schema_version") != "1":
         _fail("unsupported_schema")
     if fingerprint not in source.db_path.parts:
-        if (source.account_fingerprint != fingerprint or not data["provenance"]
-                or data["provenance"].get("endpoint") != PAPER or not tables["intents"]):
+        provenance = data["provenance"]
+        paper_receipt = isinstance(provenance, dict) and (
+            (provenance.get("endpoint") == PAPER and provenance.get("broker") in (None, "alpaca"))
+            or (provenance.get("broker") == "alpaca" and provenance.get("endpoint") == "paper"))
+        if (source.account_fingerprint != fingerprint or not paper_receipt or not tables["intents"]):
             _fail("source_account_attestation_required")
     if source.account_fingerprint not in (None, fingerprint):
         _fail("source_account_mismatch")

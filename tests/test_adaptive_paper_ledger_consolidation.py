@@ -243,6 +243,37 @@ class ConsolidationTests(unittest.TestCase):
         self.assertEqual(receipt["counts"]["intents"], 9)
         self.assertEqual(receipt["counts"]["trials"], 3)
 
+    def test_native_fault_legacy_receipt_pair_preserved_without_changing_broker_proof(self):
+        fault = self.fixture("legacy-fault", 205, None, trials=False, account_path=False, canceled=True)
+        provenance = fault.parent / "receipt.json"
+        original = b'{"broker":"alpaca", "endpoint":"paper", "status":"native_faults_incomplete"}\n'
+        provenance.write_bytes(original)
+        source = self.m.Source(fault, account_fingerprint=self.fp, provenance_path=provenance)
+        sources = [self.first, source, self.second]
+        plan, proof = self.plan(sources), self.proof(sources)
+        enum_proof = dict(proof, endpoint="paper")
+        with self.assertRaisesRegex(self.m.ConsolidationError, "not_paper"):
+            self.apply(plan, enum_proof)
+        receipt = self.apply(plan, proof)
+        self.assertEqual(receipt["counts"]["intents"], 9)
+        self.assertEqual(provenance.read_bytes(), original)
+        with sqlite3.connect(self.original) as db:
+            archived = json.loads(db.execute("SELECT payload FROM consolidation_sources WHERE path=?", (str(fault),)).fetchone()[0])
+        self.assertEqual(archived["provenance"]["endpoint"], "paper")
+        self.assertEqual(archived["provenance"]["broker"], "alpaca")
+
+    def test_legacy_fault_provenance_wrong_broker_or_live_endpoint_refused(self):
+        fault = self.fixture("bad-provenance", 205, None, trials=False, account_path=False, canceled=True)
+        provenance = fault.parent / "receipt.json"
+        source = self.m.Source(fault, account_fingerprint=self.fp, provenance_path=provenance)
+        for broker, endpoint in (("other", "paper"), ("alpaca", "live"),
+                                 ("alpaca", "https://api.alpaca.markets"), (None, "paper"),
+                                 ("other", "https://paper-api.alpaca.markets")):
+            with self.subTest(broker=broker, endpoint=endpoint):
+                provenance.write_text(json.dumps({"broker": broker, "endpoint": endpoint}))
+                with self.assertRaisesRegex(self.m.ConsolidationError, "account_attestation"):
+                    self.plan([self.first, source, self.second])
+
     def test_retry_same_plan_is_idempotent_and_preserves_append_only_history(self):
         plan, proof = self.plan(), self.proof()
         first = self.apply(plan, proof)
