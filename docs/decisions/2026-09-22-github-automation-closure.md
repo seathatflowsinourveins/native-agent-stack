@@ -173,25 +173,39 @@ locally with `GH_TOKEN` set and no `--offline`, using
   check. Off PRs, the same scan writes SARIF, uploaded by
   `github/codeql-action/upload-sarif@1c5b675653bb5c22dbe9b12b556ec555138e09fd`
   (v4.38.1, annotated tag `c23de5a8…` dereferenced) with category
-  `osv-scanner`. At the time this job was added, it was the only job holding
-  `security-events: write`; **stale as of section 4's 2026-09-23 token
-  split**, `zizmor-sarif-upload` also holds it now, so two jobs in
-  `security-scan.yml` hold `security-events: write`. CodeQL Action
+  `osv-scanner`. This job has never been the only holder of
+  `security-events: write`: the same founding commit (`a9e5180`) gave
+  `zizmor-online` that permission too, and after section 4's 2026-09-23
+  token split the second holder is `zizmor-sarif-upload` instead. Verified
+  with `git show <c>:.github/workflows/security-scan.yml | grep -c
+  'security-events: write'`, which returns 2 at `a9e5180`, `e4737e5`,
+  `da000f8`, `ad72b16` and `4e4aab0`. Two jobs in `security-scan.yml` hold
+  `security-events: write` today. CodeQL Action
   v3 is deprecated in December 2026
   ([changelog](https://github.blog/changelog/2025-10-28-upcoming-deprecation-of-codeql-action-v3/)).
 - **Alternatives.** Dependency review only (sees only a PR's changes). grype
-  over every lock (it needs SBOMs per ecosystem). A separate upload job, which
-  keeps `security-events: write` off the PR run but scans twice -- **this
-  rationale does not describe the design actually chosen.** The `osv-scanner`
-  job itself invokes `osv-scanner scan source` twice on non-PR events (once
-  for the exit-code table, again with `--format sarif` for the upload), so
-  the in-job design does not avoid a second scan either. Section 4's later
-  `zizmor-sarif-upload` job is a separate write-scoped job that avoids a
-  second scan by downloading the first job's SARIF artifact instead of
-  re-running the analyzer; that pattern was not applied here because
-  OSV-Scanner has no cheaper way to produce SARIF than a second invocation
-  with `--format sarif`, not because a separate job would need one.
-- **Overturn.** OSV-Scanner fixes its version ordering, so resolved results
+  over every lock (it needs SBOMs per ecosystem). A separate upload job fed by
+  the scan job's SARIF artifact, matching section 4's `zizmor-sarif-upload`
+  pattern (**rejected, keep-but-compare**). The rejection is not that it would
+  scan twice: `osv-scanner scan source` already runs twice on non-PR events
+  in the current job (once for the exit-code table, once with `--format
+  sarif`), and the table run's `status` already carries the findings exit
+  code, so a split job would need no extra scan -- it would just download the
+  first job's SARIF, the same as zizmor. The real trade-off is that today's
+  in-job design gives the `osv-scanner` job's `security-events: write`
+  permission to the job that also runs the curl-installed, checksum-verified
+  OSV-Scanner binary and parses every tracked lockfile, on every event
+  including PRs (job-level `permissions:` apply regardless of whether the
+  upload step's `if:` runs, the same risk section 4 named for zizmor before
+  splitting it). No measured incident or finding tied that write scope to the
+  installed binary here, and the OSV binary's provenance is checksum-verified
+  against a value pinned in this same workflow (unlike zizmor, which was
+  additionally installed with `--require-hashes` from a lockfile but audits
+  untrusted third-party workflow YAML as its primary function), so the design
+  is kept without a positive incident to justify the split.
+- **Overturn.** A split matching `zizmor-sarif-upload` removes the risk at no
+  scan cost, so keeping the in-job design needs a reason beyond inertia; or
+  OSV-Scanner fixes its version ordering, so resolved results
   match a pip resolution of the same manifest (then drop `--no-resolve`). Or
   30 days of PR runs produce only findings that another required check also
   reports.
@@ -228,7 +242,11 @@ locally with `GH_TOKEN` set and no `--offline`, using
   audits need network egress and a token on every PR, and 0 findings on
   `168a3a8` give no evidence yet that it would not be noisy). Drop online
   zizmor and keep only `validate.yml`'s offline `regular` gate (rejected:
-  offline analysis covers no online advisory, secrets or provenance class).
+  offline analysis covers no online-only audit class, such as impostor
+  commit, known-vulnerable action or ref-confusion checks that need the
+  GitHub API and an advisory database; zizmor's secrets audits, such as
+  `secrets-inherit`, `overprovisioned-secrets` and `unredacted-secrets`, are
+  static and already run offline in `validate.yml`).
 - **Decision.** Keep the two-job split: `zizmor-online` (`contents: read`,
   push/schedule/dispatch only) produces the SARIF artifact, and
   `zizmor-sarif-upload` (`security-events: write`, no shell step or
@@ -245,12 +263,17 @@ locally with `GH_TOKEN` set and no `--offline`, using
   5-day workflow artifact and, in the same job, through
   `github/codeql-action/upload-sarif@1c5b675653bb5c22dbe9b12b556ec555138e09fd`
   (v4.38.1). The upload step and its job-scoped `security-events: write` were
-  added on `main` in commit `4970ba0` (PR #108, 2026-09-22); that commit's
-  `scorecard.yml` diff adds the "Upload Scorecard SARIF to code scanning"
-  step directly after the existing artifact-upload step, matching
-  `ossf/scorecard-action`'s own documented layout (`results_file`/
-  `results_format` feed a local SARIF file that the caller uploads itself;
-  the action does not upload to code scanning on its own). `analysis` is the
+  added on `main` in commit `4970ba0` (PR #108, 2026-09-22), matching
+  `ossf/scorecard-action`'s own documented example workflow at the same
+  pinned SHA (`2d1146689b8cda280b9bc96326124645441f03bc`, its README's
+  `results_file`/`results_format` step feeding a local SARIF file that the
+  caller uploads itself with `github/codeql-action/upload-sarif`; the action
+  does not upload to code scanning on its own). Observed, not just
+  configured: the first push run on `4970ba0` succeeded with "Scorecard,
+  with its SARIF uploaded" (post-merge section below), and dispatch run
+  35824151483 (post-merge Scorecard-after table, same section) shows the
+  code-scanning-derived score deltas that only follow a successful upload.
+  `analysis` is the
   only job in the workflow, and it is the only one with `security-events:
   write` (`tests/test_workflow_hardening.py` `ScorecardTests`).
 - **Alternatives.** Set `publish_results: true` (rejected: publishes to the
@@ -272,8 +295,11 @@ locally with `GH_TOKEN` set and no `--offline`, using
   the graph correction removed the only blocker to gating, and a report-only
   advisory scan that nobody must act on does not close the gap). Gate at
   `critical` instead of `high` (rejected: leaves high-severity advisories
-  with a fix available unblocked, and #97/#98 show high-severity PRs pass in
-  seconds when there is nothing to flag). Gate at `moderate` (rejected,
+  with a fix available unblocked; #97 and #98 are the only measured samples
+  of the gate running at `high`, and both are Dependabot security-fix PRs
+  that passed in 12-17 s, so they show the gate's latency is low, not that
+  a `high` threshold would stay quiet on a PR introducing a new advisory).
+  Gate at `moderate` (rejected,
   keep-but-compare: no measured 30-day run at `moderate` exists yet to show
   its false-positive rate on this repository's dependency set).
 - **Decision.** `fail-on-severity: high`, `warn-only` removed, and

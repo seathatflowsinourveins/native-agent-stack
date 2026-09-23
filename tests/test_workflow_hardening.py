@@ -49,6 +49,37 @@ def first_step(job_text):
     return match.group(1) if match else ""
 
 
+def step_block(job_text, name_fragment):
+    """The text of the step whose ``name:`` line contains ``name_fragment``, from right
+    after that fragment through the next step boundary (or the end of the job). Unlike
+    slicing a fixed number of lines after the marker, this does not assume ``if:`` (or
+    any other key) sits at a particular line offset within the step."""
+    after = job_text.split(name_fragment, 1)[1]
+    return after.split("\n      - name:", 1)[0]
+
+
+def block_if(block_text):
+    """A step's or job's own ``if:`` value, found anywhere in ``block_text`` (not tied
+    to a fixed line offset, so reordering keys within the block does not defeat the
+    search) and resolved however it is written: a plain one-line scalar, or a ``>``/``|``
+    folded or literal block scalar whose value spans the following more-indented lines.
+    Returns ``None`` if the block has no ``if:`` key of its own."""
+    match = re.search(r"(?m)^([ \t]*)if:[ \t]*(.*)$", block_text)
+    if not match:
+        return None
+    indent, value = match.group(1), match.group(2).strip()
+    if not value or value[0] in ">|":
+        lines = []
+        for line in block_text[match.end():].splitlines():
+            if not line.strip():
+                continue
+            if len(line) - len(line.lstrip(" \t")) <= len(indent):
+                break
+            lines.append(line.strip())
+        value = " ".join(lines)
+    return value
+
+
 def permission_blocks(text):
     """Every block-form permissions mapping in a workflow, as {scope: access} dicts."""
     blocks = []
@@ -196,26 +227,39 @@ class SecurityScanTests(unittest.TestCase):
     def test_failure_path_semantics_keep_findings_uploadable(self):
         # (a) The OSV SARIF upload step must still run when the scan step failed
         # (a findings exit) so code scanning still receives the report; only a
-        # cancelled run should skip it.
+        # cancelled run should skip it. block_if() searches the whole step block
+        # rather than a fixed line offset, so this still catches a missing/weakened
+        # guard even if `uses:` were reordered ahead of `if:`.
         osv_job = jobs(self.text)["osv-scanner"]
-        osv_upload_if = osv_job.split("Upload OSV-Scanner SARIF", 1)[1].split("\n", 2)[1]
+        osv_upload_step = step_block(osv_job, "Upload OSV-Scanner SARIF")
+        osv_upload_if = block_if(osv_upload_step)
+        self.assertIsNotNone(osv_upload_if, "the OSV SARIF upload step must have its own if: guard")
         self.assertRegex(osv_upload_if, r"!\s*cancelled\(\)|always\(\)",
                           "the OSV SARIF upload step's if: must keep !cancelled() or always() "
                           "so a findings exit (the scan step failing) does not skip the upload")
 
-        # (b) The zizmor artifact-upload step must have no if: that would let it
-        # (and, downstream, the upload job) run after the analyzer step failed.
+        # (b) The zizmor analyzer step must not have continue-on-error: true, and the
+        # artifact-upload step must have no if: that would let it (and, downstream,
+        # the upload job) run after the analyzer step failed. Without both guards, a
+        # crashed analyzer could still upload a partial or empty SARIF.
         zizmor_online = jobs(self.text)["zizmor-online"]
-        keep_step = zizmor_online.split("Keep the zizmor SARIF for the upload job", 1)[1]
-        keep_step = keep_step.split("\n      - name:", 1)[0]
+        analyzer_step = step_block(zizmor_online, "Audit GitHub workflows with zizmor's online audits")
+        self.assertNotIn("continue-on-error", analyzer_step,
+                          "the zizmor analyzer step must not continue past a crash "
+                          "(continue-on-error would let a partial/empty SARIF reach the upload)")
+        keep_step = step_block(zizmor_online, "Keep the zizmor SARIF for the upload job")
         self.assertNotRegex(keep_step, r"(?m)^\s*if:.*\b(always|cancelled|failure)\s*\(\)",
                              "the artifact-upload step must not force a run after the analyzer "
                              "step failed; its default (skip-on-failure) behavior is required")
 
         # (c) The zizmor-sarif-upload job's own if: must not force it to run after a
         # cancelled or failed zizmor-online run either (it only skips on pull_request).
-        upload_job_text = self.text.split("\njobs:\n", 1)[1].split("\n  zizmor-sarif-upload:", 1)[1]
-        job_if = upload_job_text.split("\n    if:", 1)[1].split("\n", 1)[0]
+        # block_if() also resolves a folded/literal (`>`/`|`) block-scalar if:, which a
+        # fixed single-line slice would read as the literal folding marker and pass
+        # vacuously.
+        upload_job = jobs(self.text)["zizmor-sarif-upload"]
+        job_if = block_if(upload_job)
+        self.assertIsNotNone(job_if, "zizmor-sarif-upload must have its own if: guard")
         self.assertNotRegex(job_if, r"\b(always|cancelled)\s*\(\)",
                              "zizmor-sarif-upload's if: must not add always()/!cancelled(); it "
                              "should only run after zizmor-online actually produced an artifact")

@@ -221,10 +221,13 @@ leave unrelated settings intact. Reverting the workflow/dependency commit restor
 prior scheduling. Dependabot has no auto-merge; its version PRs still need reviewed
 source/hash updates. The automation maintainer owns the actionlint release/checksum,
 CI lock and ruleset; Dependabot owns GitHub Actions references plus, since
-2026-09-22, the ignored `pip` fixture entry in `.github/dependabot.yml`
-(`blueprints/gap-wave2-20260923/grype-known-cve-fixture`, `open-pull-requests-limit: 0`)
-that keeps a deliberately vulnerable pin's alert visible without proposing an
-update; it owns no real Python or binary pin.
+2026-09-22, the `pip` fixture entry in `.github/dependabot.yml`
+(`blueprints/gap-wave2-20260923/grype-known-cve-fixture`, `ignore: urllib3`,
+`open-pull-requests-limit: 0`), which suppresses security-update PRs for that
+pin (`ignore` applies to security updates; `exclude-paths` and the PR limit
+apply only to version updates) while its alerts still appear via the
+dependency graph and are dismissed `not_used`; it owns no real Python or
+binary pin.
 
 [Native artifact attestations](catalog-provenance.md) identify the producing
 workflow and revision for a manually published catalog/evidence archive. The
@@ -489,10 +492,12 @@ generating catalogs and running local scripts.
 **Ownership.** The GitHub automation maintainer owns binary pins (actionlint,
 gitleaks, syft, grype, and workflow-declared package pins like
 `nautilus_trader`) and repository rulesets. Dependabot owns GitHub Actions
-references, plus (since 2026-09-22) the ignored `pip` fixture entry
+references, plus (since 2026-09-22) the `pip` fixture entry in
 `.github/dependabot.yml` added for the intentionally vulnerable
-`grype-known-cve-fixture` pin (`open-pull-requests-limit: 0`, no real
-update ever proposed) -- it does not, and per the decision above still does
+`grype-known-cve-fixture` pin (`ignore: urllib3` suppresses security-update
+PRs for that pin; `open-pull-requests-limit: 0` also stops version-update
+PRs; the dependency graph still raises alerts on it regardless, dismissed
+`not_used`) -- it does not, and per the decision above still does
 not, own any real Python or binary pin. (2026-09-22: repository-level
 security updates may now propose a fix for an alerted lock; a maintainer
 still owns the reviewed relock.)

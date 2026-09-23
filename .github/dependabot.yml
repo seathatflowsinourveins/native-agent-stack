@@ -1,8 +1,11 @@
 version: 2
-# github-actions version updates, plus one ignored pip entry below for a
-# deliberately vulnerable fixture (open-pull-requests-limit: 0, so it never
-# opens a PR; it only keeps that pin's alert visible for
-# tests/test_grype_known_cve_fixture.py). Security updates for the real pip
+# github-actions version updates, plus one pip entry below scoped to a
+# deliberately vulnerable fixture: `ignore: urllib3` suppresses
+# security-update PRs for that pin (exclude-paths and the PR limit apply only
+# to version updates, not security updates), and open-pull-requests-limit: 0
+# also keeps version-update PRs off. Alerts still come from the dependency
+# graph regardless of this file and are dismissed as not_used
+# (tests/test_grype_known_cve_fixture.py). Security updates for the real pip
 # lock files are a repository setting (on since 2026-09-22), not a
 # version-update entry here; pip version updates for those locks stay off
 # (docs/decisions/2026-09-22-github-automation-closure.md).

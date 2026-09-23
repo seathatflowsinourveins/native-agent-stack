@@ -2988,8 +2988,8 @@
     },
     {
       "path": ".github/dependabot.yml",
-      "sha256": "d9c19e9828038aef64c82ab12a08c6eacddcce4a2bc0022d3f54b831aaed7711",
-      "bytes": 1540
+      "sha256": "f2b393a87510eb6143a082b6ad19123f539eebc579c05f0fad0301d99328fb3c",
+      "bytes": 1762
     },
     {
       "path": ".github/main-ruleset.json",
@@ -8154,8 +8154,8 @@
     },
     {
       "path": "catalogs/landscape/foundation.json",
-      "sha256": "121da0fab62f34b1229dd80565fbef312547dce993e55497297b78425749982e",
-      "bytes": 469228
+      "sha256": "68decc71b9d393077e5e070c6cb65c4ab0f2b445992c9f06d1331238c2ea6fcb",
+      "bytes": 469338
     },
     {
       "path": "catalogs/landscape/gap-crosswalk-92bb279.json",
@@ -8224,8 +8224,8 @@
     },
     {
       "path": "catalogs/sota-convergence/layer-verdicts-20260922.json",
-      "sha256": "33e8c4d6da9d9174d3adbdc7fa3474795fc0b38aa996e17ba6fb5bab6d363c5f",
-      "bytes": 609355
+      "sha256": "01bc18e70d61e2d6a392c4d722a134ca575406974aa2d09ecc2804166e3e0016",
+      "bytes": 608911
     },
     {
       "path": "catalogs/sota-convergence/manifest-20260922.json",
@@ -8679,8 +8679,8 @@
     },
     {
       "path": "docs/decisions/2026-09-22-github-automation-closure.md",
-      "sha256": "2271d0911513547098efa2e72f80ba512a45244f1531ebc46f1ab8471a725a70",
-      "bytes": 38865
+      "sha256": "0e8778bf4c9bda11259a7bd0f9556ecc6f18dff35edbd04bb43c692756ff9f6a",
+      "bytes": 40632
     },
     {
       "path": "docs/direct-results.md",
@@ -8789,13 +8789,13 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "3a4003df346ef3a76477051b0446cb3fdea4ab1259ee19f69c44b78f4b18c82d",
-      "bytes": 63959
+      "sha256": "39168bbf22f59e006acda136e58d17b4148523ace5f95533022f43001d14a4cf",
+      "bytes": 64262
     },
     {
       "path": "docs/grand-catalog-handbook.md",
-      "sha256": "790f705a45ca8a8e98ab0026ea2d638df615a7dc4de153505647598764433fd6",
-      "bytes": 425465
+      "sha256": "e4ea0b6e6e0e1096fce33695f354c4e53265faa3939502215d17672577ce6f30",
+      "bytes": 425021
     },
     {
       "path": "docs/harness-defaults.md",
