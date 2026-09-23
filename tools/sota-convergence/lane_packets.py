@@ -42,6 +42,7 @@ import argparse
 import hashlib
 import json
 import os
+import posixpath
 import random
 import re
 import sys
@@ -321,7 +322,8 @@ def trading_cards_by_id(root: Path) -> dict:
 
 
 def manifest_layer_candidates(layer: dict, cards: dict, ledger_names_by_slug: dict,
-                              recipe_map: dict, root: Path) -> list:
+                              recipe_map: dict, root: Path, evidence_files: dict = None,
+                              withhold: bool = False) -> list:
     """Layer-specific trading candidates: the sota manifest's own entries for this
     layer (adopted when their card decision is default or conditional), then its
     newcomer candidates and keep-but-compare entries (never adopted). Evidence paths,
@@ -353,27 +355,80 @@ def manifest_layer_candidates(layer: dict, cards: dict, ledger_names_by_slug: di
             "decisions": [],
         })
     seen = {github_repo_slug(c["repository"]) for c in candidates if c["repository"]}
-    for item in list(layer.get("candidates", [])) + list(layer.get("alternatives_keep_but_compare", [])):
+    for newcomer in manifest_newcomers(layer, seen, evidence_files, root, withhold):
+        candidates.append({**newcomer, "role": None, "card_limitations": []})
+    return candidates
+
+
+# --manifest-newcomers (2026-09-23 landscape sweep): a manifest candidate whose discovery was refuted is not
+# carried, and a newcomer's evidence_refs are the repository-relative evidence/ paths its manifest evidence[]
+# lists that manifests/evidence.json registers in files[] with the file's current sha256.
+REFUTED_DISPOSITION_PREFIX = "refuted_"
+
+
+def registered_evidence_files(root: Path) -> dict:
+    """Repository-relative path -> sha256 for every file manifests/evidence.json lists in files[]."""
+    return {entry["path"]: entry.get("sha256") for entry in load_json(root / EVIDENCE_MANIFEST_PATH).get("files") or []
+            if isinstance(entry, dict) and isinstance(entry.get("path"), str)}
+
+
+def newcomer_evidence_refs(item: dict, evidence_files: dict, root: Path, withhold: bool) -> list:
+    """The evidence[] strings that are exactly a registered, unchanged evidence/ file. Command/result prose,
+    a path with a suffix such as "(lines 1-9)", an unregistered or edited file, and (under ``withhold``) a
+    path naming a selection role are left out."""
+    refs = []
+    for value in item.get("evidence") or []:
+        if (not isinstance(value, str) or not value.startswith("evidence/") or posixpath.normpath(value) != value
+                or value in refs or value not in evidence_files):
+            continue
+        path = root / value
+        if not path.is_file() or hashlib.sha256(path.read_bytes()).hexdigest() != evidence_files[value]:
+            continue
+        if withhold and LABEL_BEARING_RECEIPT.search(value):
+            continue
+        refs.append(value)
+    return refs
+
+
+def manifest_newcomers(layer: dict, seen: set, evidence_files: dict = None, root: Path = None,
+                       withhold: bool = False) -> list:
+    """Candidate records for a manifest layer's candidates and keep-but-compare alternatives whose repository
+    slug is not in ``seen`` (updated; first seen wins). Without ``evidence_files`` (the default build) every
+    such item is carried with no evidence_refs, as the 2026-09-22 packets were; with it (--manifest-newcomers),
+    a refuted discovery is left out and the registered evidence files are attached."""
+    newcomers = []
+    items = list(layer.get("candidates", [])) + list(layer.get("alternatives_keep_but_compare", []))
+    # A repository refuted in any of its entries is left out entirely, even where another list repeats it
+    # without a disposition.
+    refuted = {github_repo_slug(item["repository"]) for item in items if item.get("repository")
+               and str(item.get("disposition") or "").startswith(REFUTED_DISPOSITION_PREFIX)}
+    for item in items:
         repository = item.get("repository")
         slug = github_repo_slug(repository) if repository else None
-        if not slug or slug in seen:
+        if not slug or slug in seen or (evidence_files is not None and slug in refuted):
             continue
         seen.add(slug)
-        candidates.append({
+        newcomers.append({
             "name": item.get("name") or item.get("id") or slug, "repository": repository, "adopted": False,
-            "evidence_kind": None, "evidence_refs": [], "role": None,
-            "card_limitations": [], "component_id": None, "pin": None, "upstream": None,
+            "evidence_kind": None,
+            "evidence_refs": newcomer_evidence_refs(item, evidence_files, root, withhold)
+            if evidence_files is not None else [],
+            "component_id": None, "pin": None, "upstream": None,
             "review_status": None, "pin_behind_upstream": None, "newcomer": True,
             "recipe_ref": None, "decisions": [],
             "note": item.get("demonstrated_gap") or item.get("comparison_that_would_overturn"),
         })
-    return candidates
+    return newcomers
+
+
+# Marks a newcomer record inside build_packet's shuffled list (a ledger candidate never has this key).
+NEWCOMER_SLOT = "__manifest_newcomer__"
 
 
 def build_packet(row: dict, *, catalog: str, sota_components: list, recipe_map: dict,
                   decisions_by_component: dict, seed: str, checked_at: str, root: Path, rules: list,
                   catalog_components: list = None, layer_candidates: list = None,
-                  layer_scope_terms: list = None) -> dict:
+                  layer_scope_terms: list = None, newcomers: list = None) -> dict:
     """``sota_components`` is the manifest slice for this ledger layer (it feeds
     ``sota_components_not_in_candidates``); the candidate join runs by repository
     slug against the layer slice first and then the whole catalog
@@ -390,12 +445,15 @@ def build_packet(row: dict, *, catalog: str, sota_components: list, recipe_map: 
         candidates = [{"key": f"c{index}", **candidate} for index, candidate in enumerate(ordered, start=1)]
     else:
         slug_index = manifest_index_by_slug(list(sota_components) + list(catalog_components or []))
-        ordered = list(row.get("candidates") or [])
+        # --manifest-newcomers: newcomers are shuffled together with the ledger candidates, so a key's
+        # position does not tell them apart. Without newcomers the order is the 2026-09-22 one.
+        ordered = list(row.get("candidates") or []) + [{NEWCOMER_SLOT: newcomer} for newcomer in newcomers or []]
         make_rng(seed, catalog, layer_id).shuffle(ordered)
         candidates = [
+            {"key": f"c{index}", **candidate[NEWCOMER_SLOT]} if NEWCOMER_SLOT in candidate else
             build_candidate(f"c{index}", candidate, slug_index=slug_index, recipe_map=recipe_map,
-                             decisions_by_component=decisions_by_component if catalog == "foundation" else {},
-                             root=root)
+                            decisions_by_component=decisions_by_component if catalog == "foundation" else {},
+                            root=root)
             for index, candidate in enumerate(ordered, start=1)
         ]
     matched_ids = {candidate["component_id"] for candidate in candidates if candidate["component_id"]}
@@ -986,7 +1044,8 @@ def seal_candidate_fields(packet: dict) -> tuple:
 def build_all_packets(root: Path, *, catalogs: list, seed: str, checked_at: str,
                       trading_candidates: str = "ledger", withhold: bool = False,
                       manifest: str = None, registered_receipts: bool = False,
-                      gap_receipts: bool = False, sealed_keys: dict = None, removed_refs: dict = None) -> dict:
+                      gap_receipts: bool = False, manifest_newcomers_on: bool = False,
+                      sealed_keys: dict = None, removed_refs: dict = None) -> dict:
     """Returns {filename: serialized packet text}, fully built and leak-
     checked in memory before any file is written. ``manifest`` overrides the
     dated sota manifest joined in (default reproduces the 2026-09-22
@@ -1011,6 +1070,9 @@ def build_all_packets(root: Path, *, catalogs: list, seed: str, checked_at: str,
         raise ValueError("--gap-receipts cannot be combined with --withhold-labels: gap receipts name the "
                          "previous winner")
     gap_index = gap_receipts_index(root) if gap_receipts else None
+    evidence_files = registered_evidence_files(root) if manifest_newcomers_on else None
+    manifest_rows = {"foundation": {layer["layer"]: layer for layer in sota_doc.get("foundation", [])},
+                     "us-equities": trading_layers}
 
     # Every catalog candidate's name, so no packet's prose names another layer's incumbent.
     catalog_candidates = [candidate for relative in LEDGER_FILES.values()
@@ -1031,14 +1093,21 @@ def build_all_packets(root: Path, *, catalogs: list, seed: str, checked_at: str,
                 names = {github_repo_slug(c["repository"]): c.get("name")
                          for c in row.get("candidates") or [] if c.get("repository")}
                 layer_candidates = manifest_layer_candidates(
-                    trading_layers.get(row["layer_id"], {}), cards, names, recipe_map, root)
+                    trading_layers.get(row["layer_id"], {}), cards, names, recipe_map, root, evidence_files,
+                    withhold)
+            newcomers = None
+            if evidence_files is not None and layer_candidates is None:
+                # --manifest-newcomers on a ledger-built packet: the manifest row's surviving newcomers.
+                seen = {github_repo_slug(c["repository"]) for c in row.get("candidates") or [] if c.get("repository")}
+                newcomers = manifest_newcomers(manifest_rows[catalog].get(row["layer_id"], {}), seen,
+                                               evidence_files, root, withhold)
             packet = build_packet(
                 row, catalog=catalog, sota_components=sota_index.get((catalog, row["layer_id"]), []),
                 catalog_components=catalog_components(sota_index, catalog),
                 recipe_map=recipe_map, decisions_by_component=decisions_by_component,
                 seed=seed, checked_at=checked_at, root=root, rules=rules, layer_candidates=layer_candidates,
                 layer_scope_terms=(sota_doc.get("taxonomy") or {}).get(row["layer_id"]) if layer_candidates is not None
-                else None,
+                else None, newcomers=newcomers,
             )
             if withhold and layer_candidates is None:
                 # Manifest-mode trading packets already carry no decision labels.
@@ -1119,6 +1188,13 @@ def parse_args(argv=None):
                              "Not blind: the receipts are checks of the previous winner and many name it, so a "
                              "blind wave must not pass this (a new wave's retained packets refuse it). Off by "
                              "default: the default build path is unchanged.")
+    parser.add_argument("--manifest-newcomers", action="store_true",
+                        help="Carry the dated manifest's newcomer candidates and keep-but-compare alternatives in "
+                             "every packet (foundation included, shuffled with the ledger candidates), leave out "
+                             "any whose discovery was refuted (disposition refuted_*), and attach as a newcomer's "
+                             "evidence_refs each evidence[] entry that is exactly an evidence/ path registered in "
+                             "manifests/evidence.json files[] with its current sha256. Off by default so the "
+                             "2026-09-22 packets reproduce.")
     parser.add_argument("--trading-candidates", choices=("ledger", "manifest"), default="ledger",
                         help="Candidate source for us-equities packets: the ledger row's group-wide list "
                              "(default; reproduces the 2026-09-22 packets) or the sota manifest's own entries "
@@ -1179,7 +1255,8 @@ def main(argv=None) -> int:
                                 trading_candidates=args.trading_candidates, withhold=args.withhold_labels,
                                 manifest=manifest_relative,
                                 registered_receipts=args.registered_receipts, gap_receipts=args.gap_receipts,
-                                sealed_keys=sealed_keys, removed_refs=removed_refs)
+                                manifest_newcomers_on=args.manifest_newcomers, sealed_keys=sealed_keys,
+                                removed_refs=removed_refs)
 
     out_dir = args.out / "packets"
     out_dir.mkdir(parents=True, exist_ok=True)

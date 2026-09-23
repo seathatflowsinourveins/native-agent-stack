@@ -961,6 +961,106 @@ class WithheldProseTests(unittest.TestCase):
         self.assertEqual(lane_packets.withhold_prose(packet)["requirement"], "Reproduce the ledger with deterministic fills.")
 
 
+class ManifestNewcomersTests(LanePacketsFixture):
+    """--manifest-newcomers (2026-09-23 landscape sweep): the dated manifest's surviving newcomers reach
+    foundation packets too, shuffled with the ledger candidates, with their registered evidence files."""
+
+    SWEEP = "evidence/artifacts/landscape-sweep-20260923"
+
+    def setUp(self):
+        super().setUp()
+        registered = {}
+        for name in ("new-alpha.json", "new-gamma-default.json", "stale.json", "new-beta.json"):
+            self.write(f"{self.SWEEP}/{name}", {"evidence_class": "source_review", "file": name})
+            registered[f"{self.SWEEP}/{name}"] = hashlib.sha256(
+                (self.root / self.SWEEP / name).read_bytes()).hexdigest()
+        registered[f"{self.SWEEP}/stale.json"] = "0" * 64  # edited after registration
+        self.write(f"{self.SWEEP}/unregistered.json", {"evidence_class": "source_review"})
+        self.write("manifests/evidence.json", {"schema_version": 1, "convergence_records": [], "receipts": [],
+                                               "files": [{"path": path, "sha256": sha, "bytes": 1}
+                                                         for path, sha in registered.items()]})
+        manifest = self.read(lane_packets.SOTA_MANIFEST_PATH)
+        row = manifest["foundation"][0]
+        row["candidates"] = [
+            {"repository": "https://github.com/new/alpha", "disposition": "keep_but_compare",
+             "demonstrated_gap": "a gap", "evidence": [
+                 f"{self.SWEEP}/new-alpha.json", "gh api graphql repository(new/alpha): license MIT",
+                 f"{self.SWEEP}/new-alpha.json (lines 1-9)", f"{self.SWEEP}/unregistered.json",
+                 f"{self.SWEEP}/stale.json", f"{self.SWEEP}/../{self.SWEEP}/new-alpha.json"]},
+            {"repository": "https://github.com/new/beta", "disposition": "refuted_keep_but_compare",
+             "evidence": [f"{self.SWEEP}/new-beta.json"]},
+            {"repository": "https://github.com/acme/widget-one", "disposition": "keep_but_compare"},
+        ]
+        row["alternatives_keep_but_compare"] = [
+            {"repository": "https://github.com/new/beta", "comparison_that_would_overturn": "repeated, unrefuted"},
+            {"repository": "https://github.com/new/gamma-default",
+             "comparison_that_would_overturn": "a run", "evidence": [f"{self.SWEEP}/new-gamma-default.json"]},
+        ]
+        self.write(lane_packets.SOTA_MANIFEST_PATH, manifest)
+
+    def candidates(self, **kwargs):
+        packet = self.packet("foundation", "layer-a", self.build(**kwargs))
+        return packet, {c["repository"]: c for c in packet["candidates"]}
+
+    def test_the_default_build_carries_no_manifest_newcomer(self):
+        _, by_repository = self.candidates()
+        self.assertEqual(set(by_repository), {"https://github.com/acme/widget-one", None})
+
+    def test_surviving_newcomers_carry_only_registered_unchanged_evidence_files(self):
+        _, by_repository = self.candidates(manifest_newcomers_on=True)
+        self.assertEqual(set(by_repository), {"https://github.com/acme/widget-one", None,
+                                              "https://github.com/new/alpha", "https://github.com/new/gamma-default"})
+        alpha = by_repository["https://github.com/new/alpha"]
+        self.assertEqual(alpha["evidence_refs"], [f"{self.SWEEP}/new-alpha.json"])
+        self.assertFalse(alpha["adopted"])
+        self.assertIsNone(alpha["component_id"])
+        self.assertEqual(by_repository["https://github.com/new/gamma-default"]["evidence_refs"],
+                         [f"{self.SWEEP}/new-gamma-default.json"])
+
+    def test_newcomers_are_shuffled_with_the_ledger_candidates(self):
+        packet, _ = self.candidates(manifest_newcomers_on=True)
+        ledger = self.read(lane_packets.LEDGER_FILES["foundation"])["layers"][0]["candidates"]
+        expected = [c.get("repository") for c in ledger] + ["https://github.com/new/alpha",
+                                                            "https://github.com/new/gamma-default"]
+        lane_packets.make_rng(lane_packets.DEFAULT_SEED, "foundation", "layer-a").shuffle(expected)
+        self.assertEqual([c["repository"] for c in packet["candidates"]], expected)
+        self.assertEqual([c["key"] for c in packet["candidates"]], ["c1", "c2", "c3", "c4"])
+
+    def test_a_blind_build_drops_label_bearing_paths_and_newcomer_markers(self):
+        packet, by_repository = self.candidates(manifest_newcomers_on=True, withhold=True)
+        self.assertEqual(by_repository["https://github.com/new/gamma-default"]["evidence_refs"], [])
+        self.assertEqual(by_repository["https://github.com/new/alpha"]["evidence_refs"], [f"{self.SWEEP}/new-alpha.json"])
+        for candidate in packet["candidates"]:
+            self.assertNotIn("newcomer", candidate)
+            self.assertNotIn("note", candidate)
+        self.assertEqual(withheld_packet_keys(packet), [])
+
+    def test_the_cli_flag_reaches_the_packets(self):
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(lane_packets.main(["--root", str(self.root), "--out", str(self.out),
+                                                "--manifest-newcomers", "--withhold-labels"]), 0)
+        packet = json.loads((self.out / "packets" / "foundation__layer-a.json").read_text(encoding="utf-8"))
+        self.assertIn("https://github.com/new/alpha", [c["repository"] for c in packet["candidates"]])
+
+
+class ManifestNewcomersTradingTests(ManifestTradingCandidatesTests):
+    """--manifest-newcomers in manifest-mode trading packets: a refuted discovery is left out."""
+
+    def test_a_refuted_newcomer_is_left_out_in_manifest_mode(self):
+        self.write("manifests/evidence.json", {"schema_version": 1, "convergence_records": [], "receipts": [],
+                                               "files": []})
+        manifest = self.read(lane_packets.SOTA_MANIFEST_PATH)
+        manifest["trading"][0]["candidates"][0]["disposition"] = "refuted_targeted_candidate"
+        self.write(lane_packets.SOTA_MANIFEST_PATH, manifest)
+        default = self.packet("us-equities", "layer-b", self.build(trading_candidates="manifest"))
+        self.assertIn("https://github.com/acme/newcomer", [c["repository"] for c in default["candidates"]])
+        packet = self.packet("us-equities", "layer-b", self.build(trading_candidates="manifest",
+                                                                  manifest_newcomers_on=True))
+        repositories = [c["repository"] for c in packet["candidates"]]
+        self.assertNotIn("https://github.com/acme/newcomer", repositories)
+        self.assertIn("https://github.com/acme/kbc-only", repositories)
+
+
 class GapReceiptsTests(LanePacketsFixture):
     """2026-09-23 re-record: --gap-receipts gives each packet the receipt paths the gap-wave owner ledgers list
     for its layer, and never the gap text (it derives from the previous verdict's open_gaps)."""

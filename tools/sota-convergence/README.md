@@ -696,6 +696,28 @@ same receipts without the flag. The export keeps `evidence/artifacts/gap-wave2-2
 `blind_checkout.py` strips only label keys from them, not gap text. A coordinator discloses this with the
 wave.
 
+**Manifest newcomers** (`--manifest-newcomers`, 2026-09-23 landscape sweep). Before this flag, only
+manifest-mode trading packets carried the dated manifest's newcomer candidates. Foundation packets took their
+candidates from the frozen v1 ledger, so a repository discovered after the ledger never reached a foundation
+lane. With the flag:
+- **Foundation packets gain newcomers.** Each takes its manifest row's `candidates` and
+  `alternatives_keep_but_compare` whose repository is not already a candidate. They are shuffled together
+  with the ledger candidates, so a key's position does not tell them apart.
+- **Refuted discoveries are left out.** In both catalogs, a repository with a `refuted_*` disposition in any
+  of its entries is left out, even where another list repeats it.
+- **Registered evidence is attached.** A newcomer's `evidence_refs` hold each `evidence[]` string that is
+  exactly a repository-relative `evidence/` path, is listed in `manifests/evidence.json` `files[]`, and still
+  has its listed sha256. Command/result prose, a path with a suffix, and an unregistered or edited file are
+  not attached. Under `--withhold-labels`, a path that names a selection role is not attached either.
+
+The flag is off by default, so the 2026-09-22 packets reproduce. With `manifest-20260923.json`, the flag adds
+29 foundation newcomers and removes 9 refuted trading newcomers across the 32 blind packets (306 candidates).
+
+A newcomer is never adopted, and the lane contract forbids a non-adopted winner
+(`scripts/landscape.py lane_winner_components`). A lane can prefer one as its challenger
+(`challenger_preferred`) with an overturn protocol. Promoting it takes the measured comparison that protocol
+names.
+
 **Popularity and recency are withheld too** (2026-09-23 peer audit: 132
 foundation-packet objects still carried GitHub `stars` and `pushed_at` through
 `candidates[].upstream`). Under `--withhold-labels` every packet -- manifest-mode
