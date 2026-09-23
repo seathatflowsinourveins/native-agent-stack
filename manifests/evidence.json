@@ -2978,8 +2978,8 @@
     },
     {
       "path": ".github/main-ruleset.json",
-      "sha256": "0023f78bb23fc41dfd486b1acbc87656aabfc9280592d7259afa2f6dce8bbaaf",
-      "bytes": 1561
+      "sha256": "6c7f79c59b1e667531e71b5b2981626d24bd3f0d3c28ce39d98525450b23caac",
+      "bytes": 1562
     },
     {
       "path": ".github/pull_request_template.md",
@@ -7909,8 +7909,8 @@
     },
     {
       "path": "catalogs/foundation/automation.json",
-      "sha256": "9c21fca2741bc803a67a6640c29819d6bde0f27b8d879fab6990291ebb480299",
-      "bytes": 30436
+      "sha256": "7c741ea93598961b9bd5164f177189e68da7cfb6040662b992471bcc8e4392b9",
+      "bytes": 31651
     },
     {
       "path": "catalogs/foundation/community-practice-20260920.json",
@@ -7959,8 +7959,8 @@
     },
     {
       "path": "catalogs/landscape/foundation.json",
-      "sha256": "1db003ec3c8ff1bde160191e9225bfbdcf744a512bb3e3ee1368453f8b2ddf76",
-      "bytes": 469452
+      "sha256": "c2ee606f29d43519e407f34f7c1f8aa81329f4649dee4215f7b99c941036eb77",
+      "bytes": 468999
     },
     {
       "path": "catalogs/landscape/gap-crosswalk-92bb279.json",
@@ -8024,8 +8024,8 @@
     },
     {
       "path": "catalogs/sota-convergence/layer-verdicts-20260922.json",
-      "sha256": "d42ae32cfe50891f6bf31e6778b33784abdee2615d3d455f2b1eb3f5dca936e2",
-      "bytes": 609579
+      "sha256": "2fef6da7468a8e97a319fdc6f75f73374cd34b412bf93de90fd0c2a7504159de",
+      "bytes": 609126
     },
     {
       "path": "catalogs/sota-convergence/manifest-20260922.json",
@@ -8479,8 +8479,8 @@
     },
     {
       "path": "docs/decisions/2026-09-22-github-automation-closure.md",
-      "sha256": "4e9a41c7cf675def24a70a392a20dfc4c86e79cea5fab56df5028f90c3b1a102",
-      "bytes": 21062
+      "sha256": "8904c64d64618582c0aa30645f2bb74c0940f8abd7d6a15c2f3954775f38226e",
+      "bytes": 27915
     },
     {
       "path": "docs/direct-results.md",
@@ -8584,13 +8584,13 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "88b2d519904c2a2fb9480769d244cf92efffe1e2b9f2ab98390257a6f77368cf",
-      "bytes": 61193
+      "sha256": "8cd762fbd171bb95f8e5cfb664f67703ef31837298e30498a43ce43e6d1cec1e",
+      "bytes": 62460
     },
     {
       "path": "docs/grand-catalog-handbook.md",
-      "sha256": "1ce012986e4a127b32679fe4c6eb57bbb7863fe5b66fe590ecff1ba38b40cc37",
-      "bytes": 424229
+      "sha256": "e7aa905f082b1cdd43897b8f7651061bba4e8d9beff9e093db0a0b6bdf9d468e",
+      "bytes": 425236
     },
     {
       "path": "docs/harness-defaults.md",

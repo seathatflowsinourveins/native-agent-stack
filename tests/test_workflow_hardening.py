@@ -203,6 +203,39 @@ class PublishReleaseTests(unittest.TestCase):
         self.assertIn(".isImmutable == true", job)
 
 
+    def test_publish_outputs_name_existing_step_ids(self):
+        job = jobs(self.text)["publish"]
+        ids = set(re.findall(r"(?m)^        id: ([A-Za-z0-9_-]+)$", job))
+        outputs = re.findall(r"\$\{\{ steps\.([A-Za-z0-9_-]+)\.outputs\.[A-Za-z0-9_-]+ \}\}",
+                             job.split("\n    outputs:\n", 1)[1].split("\n    steps:\n", 1)[0])
+        self.assertEqual(len(outputs), 4)
+        self.assertEqual(sorted(set(outputs) - ids), [])
+        for step in ("archive-digest", "sbom-digest"):
+            body = job.split(f"id: {step}\n", 1)[1].split("\n      - name:", 1)[0]
+            self.assertIn('>> "$GITHUB_OUTPUT"', body, step)
+
+
+class TargetRulesetTests(unittest.TestCase):
+    """The committed target main ruleset (docs/decisions/2026-09-22-github-automation-closure.md, section 10)."""
+
+    ruleset = __import__("json").loads((ROOT / ".github/main-ruleset.json").read_text(encoding="utf-8"))
+
+    def rule(self, kind):
+        return [rule for rule in self.ruleset["rules"] if rule["type"] == kind]
+
+    def test_strict_up_to_date_checks_stay_off_and_required_signatures_stays_out(self):
+        (checks,) = self.rule("required_status_checks")
+        self.assertIs(checks["parameters"]["strict_required_status_checks_policy"], False)
+        self.assertEqual(self.rule("required_signatures"), [])
+
+    def test_target_requires_the_security_gates_from_github_actions(self):
+        (checks,) = self.rule("required_status_checks")
+        contexts = {check["context"]: check.get("integration_id") for check in checks["parameters"]["required_status_checks"]}
+        for context in ("validate", "token-report", "secret-scan", "dependency-review", "osv-scanner"):
+            self.assertEqual(contexts.get(context), 15368, context)
+        self.assertEqual(len(self.rule("code_scanning")), 1)
+
+
 class SupplyChainGateTests(unittest.TestCase):
     text = (WORKFLOWS / "supply-chain.yml").read_text(encoding="utf-8")
 

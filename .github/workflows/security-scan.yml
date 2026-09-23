@@ -2,7 +2,8 @@ name: Dependency and workflow security scan
 
 # osv-scanner checks every tracked lockfile and manifest named in
 # .github/osv-scanner-lockfiles.json (tests/test_osv_lockfile_coverage.py fails
-# when a tracked one is missing) and fails on any vulnerability not ignored in
+# when a tracked one is missing; its "excluded" list names deliberately vulnerable
+# test fixtures, each with a reason) and fails on any vulnerability not ignored in
 # .github/osv-scanner.toml; its pull_request run is a required check. On push,
 # schedule and dispatch it also uploads SARIF to code scanning, and
 # zizmor-online adds zizmor's online audits as SARIF (validate.yml keeps the

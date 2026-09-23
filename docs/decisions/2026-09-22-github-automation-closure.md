@@ -1,7 +1,8 @@
 # Decision: GitHub automation closure (2026-09-22)
 
 **Decided by:** unit `catalog-automation`, an owned worktree of this
-repository, branch `claude/github-automation-closure`, base commit `168a3a8`.
+repository, branch `claude/github-automation-closure`, cut from `168a3a8` and
+rebased on 2026-09-23 onto `origin/main` `8faca90` (after #96, #99-#104, #106).
 Repository settings were applied by the coordinator on 2026-09-22 at about
 23:35 EDT (2026-09-23 03:35 UTC), with before/after `gh api` GETs. This unit
 changed files only. Timestamps from GitHub are UTC, so several fall on
@@ -29,7 +30,7 @@ changelog dates are given where they exist.
 
 | Setting | Before | After |
 | --- | --- | --- |
-| CodeQL default setup | `not-configured` | `configured`; languages `actions`, `csharp`, `javascript`, `javascript-typescript`, `python`, `typescript`; `default` suite; weekly schedule (`GET .../code-scanning/default-setup` at 2026-09-23T04:24:29Z, `updated_at` 2026-09-23T03:39:52Z; the GET right after configuration still showed `languages: []`, `schedule: null`); setup run 35815088202 (success, `168a3a8`) |
+| CodeQL default setup | `not-configured` | `configured`; `default` suite; weekly schedule. Fresh `gh api repos/seathatflowsinourveins/native-agent-stack/code-scanning/default-setup` at 2026-09-23T04:47:34Z: languages `actions`, `csharp`, `go`, `javascript`, `javascript-typescript`, `python`, `rust`, `typescript`, `query_suite: default`, `schedule: weekly`, `updated_at` 2026-09-23T04:40:46Z (an earlier GET at 04:24:29Z listed six languages without `go`/`rust`; the GET right after configuration showed `languages: []`, `schedule: null`); setup run 35815088202 (success, `168a3a8`); first-analysis alerts resolved in #104 ([record](2026-09-22-codeql-first-analysis.md)) |
 | Dependabot security updates | `disabled` | `enabled` |
 | Actions `sha_pinning_required` | `false` | `true` |
 | Merge methods | merge, squash, rebase; no auto-merge; branches kept | squash only; `allow_auto_merge: true`; `delete_branch_on_merge: true` |
@@ -126,6 +127,21 @@ locally with `GH_TOKEN` set and no `--offline`, using
   `covered_by_lockfile` with their sibling lock. `tests/test_osv_lockfile_coverage.py`
   fails when a tracked lockfile is not listed. A negative control that
   deleted one entry failed as expected.
+- **Excluded fixture (2026-09-23).** #101 added
+  `blueprints/gap-wave2-20260923/grype-known-cve-fixture/requirements.txt`,
+  a deliberately vulnerable positive control (`urllib3==1.26.4`, gap
+  ci-supply-chain[13]) that `tests/test_grype_known_cve_fixture.py` requires
+  grype to flag. Scanned on its own, OSV-Scanner 2.6.0 `--no-resolve` exits 1
+  with 9 advisories (GHSA-q2q7-5pp4-w6pg and eight others). Nothing installs
+  it, so it is listed under the inventory's `excluded` key with a reason and
+  an evidence path instead of being ignored per advisory. The unit test
+  accepts an exclusion only for a tracked lockfile, only with a non-empty
+  reason naming a fixture and an existing evidence file, and never for a file
+  that is also scanned; every other tracked lockfile still fails the test
+  when unlisted. Negative controls: emptying `excluded` failed the coverage
+  test on that path, and a reason without "fixture" failed the exclusion
+  test. **Overturn:** the fixture becomes an installed dependency, or a second
+  exclusion is proposed for a file that is not a test fixture.
 - **`--no-resolve` (measured).** With transitive resolution, three unlocked
   manifests reported versions that no lockfile installs. OSV's resolver picked
   `httpx2`/`httpcore2` 2.9.1 (PyPI latest 2.13.0) and `six` 1.9.0 (latest
@@ -144,6 +160,10 @@ locally with `GH_TOKEN` set and no `--offline`, using
   handoff. The six advisories are **not ignored**. The relock on
   `claude/mlx-smoke-security-20260923` (`0a40330`, merged as #99) scanned
   clean: its lock and `requirements.in` both returned exit 0.
+- **Rebased-head result (2026-09-23, on `8faca90`).** The CI command over the
+  37 listed lockfiles (the excluded fixture is not among them) exited 0,
+  "No issues found", 175 local packages filtered. #99's relock of
+  `tools/mlx-smoke` (mlx-lm 0.31.3) removed the six base-commit advisories.
 - **Ignores.** None. `.github/osv-scanner.toml` documents the policy: `id`,
   a concrete `reason`, and `ignoreUntil` no more than 90 days away, all
   enforced by the unit test.
@@ -234,6 +254,24 @@ noisy alerts that nobody triages for 30 days.
   uv-compiled with hashes and an `--exclude-newer` cutoff, and a single-package
   bump does not reproduce it. The reviewed relock (#99) fixed the advisories.
   Both PRs are closed.
+- **Redundant mlx branch dropped.** This unit's own mlx relock branch was not
+  integrated because #99 landed the same fix first. A read-only
+  `gh api .../dependabot/alerts` at 2026-09-23T04:47:34Z shows alerts 1-6
+  (`tools/mlx-smoke/requirements.lock.txt`) `fixed` at 03:47:28-03:47:30Z and
+  0 open alerts: 6 -> 0 after #99.
+- **Fixture alerts dismissed.** Alerts 7-15, all on the #101 positive-control
+  fixture `blueprints/gap-wave2-20260923/grype-known-cve-fixture/requirements.txt`,
+  were dismissed by the coordinator as `not_used`, and Dependabot PR #105
+  ("Bump urllib3 from 1.26.4 to 2.7.0", closed 2026-09-23T04:40:57Z) was
+  closed: upgrading urllib3 would destroy the fixture's purpose, and nothing
+  installs the file (same reason as the OSV exclusion in section 3).
+- **Security updates stay on.** Dependabot security updates are free, gave the
+  fastest signal here (#97/#98 within minutes of enabling), and auto-close
+  their alerts when a fix lands (alerts 1-6 closed on #99's merge). The cost is
+  a PR that fails `macos-profile` on a hash-locked uv lock and must be closed
+  by hand. **Overturn:** recurring unfixable security-update PRs (more than
+  two in 30 days that must be closed without merging for a reason other than
+  a fixture).
 - **Overturn.** A Dependabot pip or uv PR passes the recompile-and-diff check on
   a real lock.
 
@@ -272,13 +310,26 @@ noisy alerts that nobody triages for 30 days.
 - `.github/main-ruleset.json` is the **target** for 23739774. It keeps the live
   rules, including the server defaults `required_reviewers: []` and
   `require_extra_approval_for_unattributed_changes: true`. It adds
-  `dependency-review` and `osv-scanner` (integration 15368), sets
-  `strict_required_status_checks_policy: true`, and adds `code_scanning`
+  `dependency-review` and `osv-scanner` (integration 15368), keeps
+  `strict_required_status_checks_policy: false` (see below), and adds `code_scanning`
   (CodeQL, `high_or_higher`, `errors`) and `allowed_merge_methods:
   ["squash"]`. The coordinator applies it after merge
   ([available rules](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets)).
-- **Overturn.** The `code_scanning` rule blocks a PR that introduces no alert,
-  or strict checks stall auto-merge repeatedly.
+- **Overturn.** The `code_scanning` rule blocks a PR that introduces no alert.
+- **Strict up-to-date checks: off (2026-09-23).** An earlier draft set
+  `strict_required_status_checks_policy: true`. With auto-merge on and no
+  merge queue (unavailable for personal repositories, section 11), strict
+  mode makes every open PR stall on a manual branch update whenever `main`
+  moves, and this host runs many concurrent PR sessions (#96 and #99-#104,
+  seven PRs, merged between 03:41 and 04:42 UTC on 2026-09-23 while this
+  change was open, per `gh pr list --state merged`). No `main`
+  failure has been traced to merge skew; every required check still runs on
+  each PR and on push to `main`. **Alternatives:** strict on (serializes
+  merges by hand); a merge queue (unavailable). **Overturn:** a `main` failure
+  traced to two PRs merging close together.
+- **`can_approve_pull_request_reviews`** (the Actions workflow-permissions
+  setting) is owned by another session's #95 and is deliberately not part of
+  this target; this change neither reads nor sets it.
 - **`required_signatures`: not in the target (keep-but-compare, 2026-09-23).**
   An earlier draft of this change added it because every `main` commit is a
   GitHub-signed squash merge. The coordinator measured the rule on agent-lab
@@ -292,7 +343,9 @@ noisy alerts that nobody triages for 30 days.
   every current writer); apply it after every writer signs (a registered SSH
   signing key plus `commit.gpgsign=true` in each worktree). **Overturn:** add
   the rule once a signed-commit workflow is set up for every writer and one
-  signed PR is observed to merge under it.
+  signed PR is observed to merge under it. The measurement is the
+  coordinator's `required-signatures-finding.txt` (2026-09-23T04:00Z) with
+  the before/after ruleset GETs for agent-lab ruleset 23859430.
 
 ## 11. Recorded non-adoptions and verdicts
 
@@ -315,6 +368,48 @@ noisy alerts that nobody triages for 30 days.
   gitleaks `secret-scan` stays the required gate.
 - **SaaS verdict: none needed.** Every selected control is free for this public
   repository. No paid plan, hosted scanner or external service is adopted.
+
+## 12. Catalog rows and the gap ledger (2026-09-23)
+
+An earlier draft appended "Update 2026-09-22" sentences to four
+`ci-supply-chain` `open_gaps` entries in `catalogs/landscape/foundation.json`
+(gaps 2, 4, 5 and 6 in [the crosswalk](../gap-crosswalk-92bb279.md) numbering).
+`open_gaps` is lane-recorded text, and the landscape row schema
+(`scripts/landscape.py`) has no field for a resolved or superseded gap, so the
+lane text is restored verbatim and the resolution is recorded here and in the
+gap ledgers instead:
+
+- **Gap 2 (no hosted `sbom-vuln` run ID)** and **gap 5 (offline zizmor misses
+  online audits)** are already recorded as `advanced` in the wave-2 ledger
+  [`catalogs/landscape/gap-wave2-20260923--gap-resolution.json`](../../catalogs/landscape/gap-wave2-20260923--gap-resolution.json)
+  (receipts `supply-chain-hosted-run-and-wider-syft` and `zizmor-online-audit`).
+  That zizmor receipt found `known-vulnerable-actions` did not fire on a known
+  compromised action, so this change's `zizmor-online` job does not settle gap 5.
+- **Gap 4 (Dependabot timing and grouping)** is `time_gated` and **gap 6 (no
+  vulnerability threshold policy)** is `needs_user_decision` in the crosswalk;
+  `tools/sota-convergence/gap_wave_ledger.py` tracks only `executable_now`
+  gaps, so neither has a ledger row. Their resolution is sections 7-8 above:
+  the weekly run is observed with no nonempty group, and the threshold policy
+  is committed (grype `--fail-on high`, dependency review `high`, OSV-Scanner
+  on every listed lockfile) with no hosted gate run yet. Both stay open in the
+  row until a re-record.
+- The rows' `catalogs/foundation/automation.json line N` citations went stale
+  when this change edited that file. They now name the entry by JSON path at
+  the row's recording revision, for example
+  `catalogs/foundation/automation.json@92bb279 considered_not_activated[repository=github/codeql-action].decision`
+  (the cited entries start at the same line numbers at `92bb279` and
+  `168a3a8`). Their
+  `docs/github-automation.md lines N` citations are left unchanged: several did
+  not match that file even at `92bb279`, so they predate this change and need
+  the lane's own source revision to repair.
+- `catalogs/sota-convergence/layer-verdicts-20260922.json` and the handbook's
+  generated verdict section were regenerated with
+  `python3 tools/sota-convergence/build_verdicts.py --write`, then `--check`.
+- `catalogs/foundation/automation.json` now keeps gating lanes (`sbom-vuln`,
+  `osv-scanner`, `dependency-review`) in `security_gate_lanes`, each with a
+  boolean `required_check` (the live state) and `target_required_check` (the
+  target ruleset). `scheduled_report_only_lanes` keeps only lanes that do not
+  fail on findings.
 
 ## Evidence class
 

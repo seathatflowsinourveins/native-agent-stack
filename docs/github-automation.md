@@ -188,7 +188,7 @@ closure, 2026-09-22"). A separate [tag ruleset](https://github.com/seathatflowsi
 
 The committed [main-ruleset.json](../.github/main-ruleset.json) is the reviewed
 *target*, not this applied state: it adds `dependency-review` and `osv-scanner`
-to the required checks, turns on the strict up-to-date policy, and adds a
+to the required checks, keeps the strict up-to-date policy off, and adds a
 CodeQL `code_scanning` rule and squash-only merges (see "Automation closure,
 2026-09-22" below). It does not add `required_signatures`: a measured run
 blocked PRs whose branch commits are unsigned, even with signed squash merges. The coordinator applies it after
@@ -908,8 +908,14 @@ The closure record
 holds the evidence, alternatives and overturn comparison for each item.
 
 - **Repository settings (applied by the coordinator, before/after GETs in the
-  record).** CodeQL default setup configured (actions, C#, JavaScript/TypeScript,
-  Python; weekly plus push/PR; first run 35815088202); Dependabot security
+  record).** CodeQL default setup configured (a fresh
+  `gh api repos/seathatflowsinourveins/native-agent-stack/code-scanning/default-setup`
+  GET at 2026-09-23T04:47:34Z returned `state: configured`, languages
+  `actions`, `csharp`, `go`, `javascript`, `javascript-typescript`, `python`,
+  `rust`, `typescript`, `query_suite: default`, `schedule: weekly`,
+  `updated_at` 2026-09-23T04:40:46Z; first run 35815088202; the
+  first-analysis alerts were resolved in #104,
+  [`docs/decisions/2026-09-22-codeql-first-analysis.md`](decisions/2026-09-22-codeql-first-analysis.md)); Dependabot security
   updates on; Actions `sha_pinning_required: true`; squash-only merges with
   auto-merge allowed and branches deleted on merge; immutable releases on;
   private vulnerability reporting on.
@@ -919,7 +925,11 @@ holds the evidence, alternatives and overturn comparison for each item.
   vulnerability not ignored in `.github/osv-scanner.toml`; it runs on every PR
   (a required check in the target ruleset) and uploads SARIF (category
   `osv-scanner`) off PRs. `tests/test_osv_lockfile_coverage.py` fails when a
-  tracked lockfile is missing from the list. The `zizmor-online` job
+  tracked lockfile is missing from the list. Its `excluded` list may name only
+  a deliberately vulnerable test fixture, with a reason and an evidence path:
+  today only `blueprints/gap-wave2-20260923/grype-known-cve-fixture/requirements.txt`
+  (urllib3 1.26.4, the grype positive control for gap ci-supply-chain[13];
+  OSV-Scanner reports its 9 advisories, exit 1, when scanned on its own). The `zizmor-online` job
   (push/schedule/dispatch) reuses the hash-locked zizmor with its online
   audits and uploads SARIF (category `zizmor`); findings do not fail it. The
   offline zizmor PR gate in `validate.yml` is unchanged.
@@ -927,7 +937,7 @@ holds the evidence, alternatives and overturn comparison for each item.
   `supply-chain.yml`'s grype scan fails at `--fail-on high` with the reviewed
   `.grype.yaml`; Scorecard SARIF goes to code scanning.
 - **Target main ruleset.** `.github/main-ruleset.json` adds `dependency-review`
-  and `osv-scanner`, `strict_required_status_checks_policy: true`, a
+  and `osv-scanner`, keeps `strict_required_status_checks_policy: false`, a
   `code_scanning` rule for CodeQL (`security_alerts_threshold:
   high_or_higher`, `alerts_threshold: errors`) and `allowed_merge_methods:
   ["squash"]`. The coordinator applies it with the PUT above after this change
@@ -935,7 +945,13 @@ holds the evidence, alternatives and overturn comparison for each item.
   (2026-09-23) it blocked PRs #19 and #20, whose branch commits were unsigned,
   although GitHub signs the squash merge; removing only that rule unblocked
   them. Add it after every writer signs commits and one signed PR merges
-  under it.
+  under it. Strict up-to-date checks stay off: with auto-merge and no merge
+  queue (unavailable for this personal repository), strict mode stalls every
+  open PR on a manual branch update whenever `main` moves, this host runs many
+  concurrent PR sessions, and no `main` failure has been traced to merge skew.
+  Overturn: a `main` failure traced to two PRs merging close together.
+  `can_approve_pull_request_reviews` is owned by another session's #95 and is
+  not part of this target.
 - **Releases.** `publish-catalog.yml`'s tag-only `release` job (see
   "Publication on tags") creates an immutable release with the attested
   archive and SBOM attached at creation.

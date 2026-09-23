@@ -44,7 +44,7 @@
       "osv-scanner"
     ],
     "target_ruleset_file": ".github/main-ruleset.json",
-    "target_ruleset_status": "Committed target, applied by the coordinator after this change merges: adds dependency-review and osv-scanner, strict up-to-date checks, a CodeQL code_scanning rule (security alerts high_or_higher, alerts errors) and squash-only merges. required_signatures is not in the target (keep-but-compare): on 2026-09-23 it blocked agent-lab PRs #19/#20 with unsigned branch commits despite GitHub-signed squash merges. required_checks above is the live state read on 2026-09-22.",
+    "target_ruleset_status": "Committed target, applied by the coordinator after this change merges: adds dependency-review and osv-scanner, keeps strict up-to-date checks off (with auto-merge and no merge queue, strict mode stalls every open PR whenever main moves; overturn: a main failure traced to two PRs merging close together), a CodeQL code_scanning rule (security alerts high_or_higher, alerts errors) and squash-only merges. required_signatures is not in the target (keep-but-compare): on 2026-09-23 it blocked agent-lab PRs #19/#20 with unsigned branch commits despite GitHub-signed squash merges. required_checks above is the live state read on 2026-09-22.",
     "tag_rulesets": {
       "23829417": {
         "file": ".github/tag-ruleset.json",
@@ -72,7 +72,7 @@
       "immutable_releases": true,
       "dependabot_security_updates": "enabled",
       "private_vulnerability_reporting": true,
-      "codeql_default_setup": "configured; languages actions, csharp, javascript-typescript, python; weekly schedule; first run 35815088202",
+      "codeql_default_setup": "configured; GET repos/seathatflowsinourveins/native-agent-stack/code-scanning/default-setup at 2026-09-23T04:47:34Z: languages actions, csharp, go, javascript, javascript-typescript, python, rust, typescript; query_suite default; schedule weekly; updated_at 2026-09-23T04:40:46Z; first run 35815088202; first-analysis alerts resolved in #104 (docs/decisions/2026-09-22-codeql-first-analysis.md)",
       "secret_scanning": "enabled with push protection; non-provider patterns and validity checks not available free on this plan"
     },
     "dependabot_weekly_run": 35583086998,
@@ -199,7 +199,7 @@
       "repository": "github/codeql (default setup)",
       "version": "GitHub-managed bundle (codeql-bundle-v2.27.1 latest on 2026-09-22)",
       "source": "https://docs.github.com/en/code-security/code-scanning/enabling-code-scanning/configuring-default-setup-for-code-scanning",
-      "selection": "Repository-setting code scanning, free for public repositories; languages actions, csharp, javascript-typescript, python; default query suite; weekly plus push/PR. First analysis of 168a3a8 (run 35815088202): 8 results (python 6, javascript-typescript 2, actions 0, csharp 0), 10 open high alerts after 796f759. The target main ruleset's code_scanning rule blocks PRs at high_or_higher security alerts and error alerts.",
+      "selection": "Repository-setting code scanning, free for public repositories; languages actions, csharp, go, javascript, javascript-typescript, python, rust, typescript (default-setup GET at 2026-09-23T04:47:34Z); default query suite; weekly plus push/PR. First analysis of 168a3a8 (run 35815088202): 8 results (python 6, javascript-typescript 2, actions 0, csharp 0), 10 open high alerts after 796f759, resolved in #104 (docs/decisions/2026-09-22-codeql-first-analysis.md). The target main ruleset's code_scanning rule blocks PRs at high_or_higher security alerts and error alerts.",
       "floating_version_note": "The CodeQL bundle is GitHub-managed and not pinned by this repository; accepted for a repository setting that runs outside our workflows (closure record)."
     },
     {
@@ -216,13 +216,6 @@
       "job": "freshness",
       "schedule": "17 6 * * 1",
       "purpose": "Reruns extract_layers.py + github_freshness.py, rebuilds a manifest with build_manifest.py against an empty lanes.json (skips interactive lane review, still recomputes the real pin/upstream baseline), diffs it against catalogs/sota-convergence/manifest-20260922.json, and appends a fixed-tool pin-drift table to the job summary. Writes and commits nothing; uploads a 30-day artifact.",
-      "required_check": false
-    },
-    {
-      "workflow": ".github/workflows/supply-chain.yml",
-      "job": "sbom-vuln",
-      "schedule": "29 7 * * 1",
-      "purpose": "SBOM (syft) + vulnerability scan (grype) of the reproduced native-foundation-e2e.yml nautilus_trader install venv. Gate: --fail-on high with reviewed .grype.yaml ignores (none on 2026-09-22); lower severities reported only; 90-day artifact retention. Path-filtered on PRs, so not a required check.",
       "required_check": false
     },
     {
@@ -243,10 +236,10 @@
     },
     {
       "workflow": ".github/workflows/security-scan.yml",
-      "job": "osv-scanner, zizmor-online",
+      "job": "zizmor-online",
       "schedule": "37 5 * * 3",
-      "purpose": "osv-scanner runs on every PR (required check) and push/schedule/dispatch, failing on unignored vulnerabilities; zizmor-online runs off PRs and reports online-audit findings as SARIF without failing.",
-      "required_check": "osv-scanner (target ruleset)"
+      "purpose": "Runs off PRs (push/schedule/dispatch) with zizmor's online audits and uploads SARIF (category zizmor) without failing on findings; validate.yml keeps the offline zizmor PR gate.",
+      "required_check": false
     },
     {
       "workflow": ".github/workflows/scorecard.yml",
@@ -254,13 +247,34 @@
       "schedule": "13 5 * * 1",
       "purpose": "OpenSSF Scorecard, publish_results false; SARIF uploaded to code scanning (job-scoped security-events: write) and kept as a 5-day artifact.",
       "required_check": false
+    }
+  ],
+  "security_gate_lanes": [
+    {
+      "workflow": ".github/workflows/supply-chain.yml",
+      "job": "sbom-vuln",
+      "schedule": "29 7 * * 1",
+      "purpose": "SBOM (syft) + vulnerability scan (grype) of the reproduced native-foundation-e2e.yml nautilus_trader install venv. Gate: --fail-on high with reviewed .grype.yaml ignores (none on 2026-09-22); lower severities reported only; 90-day artifact retention. Path-filtered on PRs, so not a required check.",
+      "required_check": false,
+      "target_required_check": false
+    },
+    {
+      "workflow": ".github/workflows/security-scan.yml",
+      "job": "osv-scanner",
+      "schedule": "37 5 * * 3",
+      "purpose": "Runs on every PR and on push/schedule/dispatch, failing on any unignored vulnerability in the lockfiles listed in .github/osv-scanner-lockfiles.json (a reasoned excluded list names the deliberately vulnerable grype fixture); off PRs it also uploads SARIF (category osv-scanner).",
+      "required_check": false,
+      "target_required_check": true,
+      "required_check_context": "osv-scanner"
     },
     {
       "workflow": ".github/workflows/dependency-review.yml",
       "job": "dependency-review",
       "schedule": null,
       "purpose": "PR-only dependency review with fail-on-severity: high (warn-only removed 2026-09-22).",
-      "required_check": "dependency-review (target ruleset)"
+      "required_check": false,
+      "target_required_check": true,
+      "required_check_context": "dependency-review"
     }
   ],
   "selected_upgrade_qualification": {
