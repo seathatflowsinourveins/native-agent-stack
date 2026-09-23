@@ -4340,8 +4340,8 @@
     },
     {
       "path": "blueprints/convergence-practice/offhost-app-state/plan.json",
-      "sha256": "5d56220f81d6092df0456d088a60339fb58034274f3f865a16e74941ae59a30d",
-      "bytes": 7010
+      "sha256": "d8afd7d5d1400ef7c7af0f2b56e33e4e9d0c17333c4edc1a4b678d8182457449",
+      "bytes": 7146
     },
     {
       "path": "blueprints/convergence-practice/offhost-app-state/qdrant-oracle.json",
@@ -4400,8 +4400,8 @@
     },
     {
       "path": "blueprints/convergence-practice/offhost-restore/hosted-plan.json",
-      "sha256": "ed989cfa76699a0de3bea0cb94fb4d0bb4e06c9bf1991a2e08b3ab775f2ffce1",
-      "bytes": 5714
+      "sha256": "3d7bc154189b906b4af8473d23b046b29ffd7f545d80f6f52fa293fcfcce786d",
+      "bytes": 5850
     },
     {
       "path": "blueprints/convergence-practice/offhost-restore/input.json",
@@ -4705,8 +4705,8 @@
     },
     {
       "path": "blueprints/convergence-practice/service-reboot/run.py",
-      "sha256": "445f5f44bcc8aa7e9597df9fa637aaba7bf4615b35ba6bde2b51847cc0f53c82",
-      "bytes": 24005
+      "sha256": "b40f231ef01cd20267eb185746f0a75cd63f147ae1970667419d67e5e0eb408a",
+      "bytes": 24353
     },
     {
       "path": "blueprints/convergence-practice/service-reboot/setup.sh",
@@ -8085,8 +8085,8 @@
     },
     {
       "path": "blueprints/us-equities/research-efficiency/experiment.py",
-      "sha256": "f0029e50bf361463bcb31568ebb14a6d8825b1378d3b746f177dbe49ec19897e",
-      "bytes": 27699
+      "sha256": "4e5234dbeb11d661f01a70fc37bd8f0d1c25fb4a31caca40f74308bb88e681bd",
+      "bytes": 28210
     },
     {
       "path": "blueprints/us-equities/research-efficiency/native-receipt.json",
@@ -14635,8 +14635,8 @@
     },
     {
       "path": "scripts/path_safety.py",
-      "sha256": "230425f29426ccfc39d661090995fafc212e022df5b5b1c21c51b8bdea9f2c94",
-      "bytes": 2253
+      "sha256": "228edf3968176c04c557078c59502b2d90141e000e1acf2917e87cc67316e703",
+      "bytes": 3308
     },
     {
       "path": "scripts/platform_status.py",
@@ -14730,8 +14730,8 @@
     },
     {
       "path": "tests/test_active_recovery_plans.py",
-      "sha256": "316a457f792412232b899d874297f7cc05c36a8b4a0ce8a4ef58e6bc37603a1c",
-      "bytes": 1238
+      "sha256": "ac2228a5a5bed963bb60e1af589eecb7bea87acdd57b48b57a66abeb25a7d42f",
+      "bytes": 3143
     },
     {
       "path": "tests/test_adaptive_market_research.py",
@@ -14970,8 +14970,8 @@
     },
     {
       "path": "tests/test_host_receipts.py",
-      "sha256": "1a35b5ce9c04aebe57a72c6658e11535fcad064e501049123469570480aa203f",
-      "bytes": 69596
+      "sha256": "99cea6e3a7aea9be0c8e65bd51d7956e5779870681bb742460ea6e3004d10c4a",
+      "bytes": 69997
     },
     {
       "path": "tests/test_ibkr_acceptance.py",
@@ -15065,8 +15065,8 @@
     },
     {
       "path": "tests/test_offhost_app_state.py",
-      "sha256": "25e8f0fb241e6348f03e974babd1592249486660f3f7b17aee9a50b3ec9e70bd",
-      "bytes": 10575
+      "sha256": "b00b8335a3e6bf902442f0a3b4319611a5433dd85063c104c606c43c917e5cdc",
+      "bytes": 11455
     },
     {
       "path": "tests/test_offhost_restore.py",
@@ -15080,8 +15080,8 @@
     },
     {
       "path": "tests/test_path_safety.py",
-      "sha256": "a90bbc71fc94d8e43c7e6e24d04bc281c1f4363e6b5aa8486c1307c5b420d42b",
-      "bytes": 4974
+      "sha256": "3ef5408df71c98eca31ddfd8e065594ee0bb09d61b37108df9d73c8e66c4acaf",
+      "bytes": 7047
     },
     {
       "path": "tests/test_pit_availability.py",
