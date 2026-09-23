@@ -28,9 +28,10 @@
   "result": "pass",
   "claim": "On the catalog's authoring WSL host, shellcheck's documented use command ran against the tracked example fixture.",
   "limitations": [
-    "Covers only 'shellcheck fixtures/example.sh' on this host; no other script, config or second physical machine is exercised."
+    "Covers only 'shellcheck fixtures/example.sh' on this host; no other script, config or second physical machine is exercised.",
+    "Runs against this repository's own tracked fixture (fixtures/example.sh), not an external real-world script; per docs/contributing-evidence.md Section 2 this is local_integration, not native_proven."
   ],
-  "evidence_class": "native_proven",
+  "evidence_class": "local_integration",
   "reviews": [
     {
       "kind": "self",

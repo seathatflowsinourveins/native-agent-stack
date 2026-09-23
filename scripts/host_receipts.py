@@ -47,8 +47,8 @@ SHA_PATTERN = re.compile(r"^[0-9a-f]{40}$")
 SHA256_PATTERN = re.compile(r"^[0-9a-f]{64}$")
 ISO_UTC_PATTERN = re.compile(r"^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$")
 ID_PATTERN = re.compile(
-    r"^[a-z0-9-]+-[0-9]{8}--[A-Za-z0-9][A-Za-z0-9._/-]*--"
-    r"(install|use|restart|recovery|persistence|cleanup)--[0-9]{8}$"
+    r"^(?P<host_id>[a-z0-9-]+-[0-9]{8})--(?P<component_id>[A-Za-z0-9][A-Za-z0-9._/:-]*)--"
+    r"(?P<stage>install|use|restart|recovery|persistence|cleanup)--(?P<date>[0-9]{8})$"
 )
 
 TOP_LEVEL_REQUIRED = [
@@ -170,6 +170,39 @@ def platform_ids(root: Path) -> set[str]:
         for profile in manifest.get("platform_profiles", [])
         if isinstance(profile, dict)
     }
+
+
+def platform_profile_map(root: Path) -> dict[str, dict[str, str]]:
+    """Map adoption/manifest.json platform_profiles[].id to its declared os/architecture.
+
+    Read-only: this only reads adoption/manifest.json (owned by another unit) to cross-check
+    that a receipt's host.os/host.architecture are consistent with the platform_id it claims.
+    """
+    try:
+        manifest = load_json(root, "adoption/manifest.json")
+    except (OSError, UnicodeError, ValueError, InvalidDecisionIndex):
+        return {}
+    result: dict[str, dict[str, str]] = {}
+    for profile in manifest.get("platform_profiles", []):
+        if not isinstance(profile, dict):
+            continue
+        profile_id, os_name, architecture = profile.get("id"), profile.get("os"), profile.get("architecture")
+        if isinstance(profile_id, str) and isinstance(os_name, str) and isinstance(architecture, str):
+            result[profile_id] = {"os": os_name, "architecture": architecture}
+    return result
+
+
+def receipt_filename_stem(receipt_id: str) -> str:
+    """Filesystem-safe filename stem for a receipt id.
+
+    ``id`` may legitimately contain '/' (for example a stack component id like
+    ``affaan-m/ECC``), which cannot appear inside a single path segment. It is
+    percent-escaped here so every receipt is a flat file directly under
+    ``evidence/hosts/<host_id>/`` rather than silently creating a nested directory
+    that ``_iter_receipt_files`` would never glob. '%' is not a character the id
+    pattern permits, so this encoding cannot collide with a literal id.
+    """
+    return receipt_id.replace("/", "%2F")
 
 
 def evidence_files(root: Path) -> dict[str, dict]:
@@ -312,7 +345,7 @@ def cmd_record(args: argparse.Namespace) -> int:
     if args.hardware_profile_ref:
         receipt["host"]["hardware_profile_ref"] = args.hardware_profile_ref
 
-    relative_path = f"evidence/hosts/{host_id}/{receipt_id}.json"
+    relative_path = f"evidence/hosts/{host_id}/{receipt_filename_stem(receipt_id)}.json"
     target = root / relative_path
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8")
@@ -481,10 +514,25 @@ def validate_receipt_cross_references(root: Path, host_dir_name: str, path: Path
     receipt_id = receipt.get("id", "")
     host_id = host.get("host_id", "")
     _require(host_dir_name == host_id, errors, f"{label}: directory {host_dir_name!r} does not match host.host_id {host_id!r}")
-    _require(path.stem == receipt_id, errors, f"{label}: filename {path.stem!r} does not match id {receipt_id!r}")
-    if isinstance(receipt_id, str) and ID_PATTERN.fullmatch(receipt_id):
-        id_host_id = receipt_id.split("--", 1)[0]
+    expected_stem = receipt_filename_stem(receipt_id) if isinstance(receipt_id, str) else receipt_id
+    _require(path.stem == expected_stem, errors, f"{label}: filename {path.stem!r} does not match id {receipt_id!r}")
+    id_match = ID_PATTERN.fullmatch(receipt_id) if isinstance(receipt_id, str) else None
+    if id_match is not None:
+        id_host_id = id_match.group("host_id")
         _require(id_host_id == host_id, errors, f"{label}: id host segment {id_host_id!r} does not match host.host_id {host_id!r}")
+        id_component_id = id_match.group("component_id")
+        _require(id_component_id == component_id, errors,
+                  f"{label}: id component segment {id_component_id!r} does not match component_id {component_id!r}")
+        id_stage = id_match.group("stage")
+        stage_value = receipt.get("stage")
+        _require(id_stage == stage_value, errors,
+                  f"{label}: id stage segment {id_stage!r} does not match stage {stage_value!r}")
+        observed_at = receipt.get("observed_at_utc")
+        if isinstance(observed_at, str) and ISO_UTC_PATTERN.fullmatch(observed_at):
+            id_date = id_match.group("date")
+            expected_date = observed_at[:10].replace("-", "")
+            _require(id_date == expected_date, errors,
+                      f"{label}: id date segment {id_date!r} does not match observed_at_utc date {expected_date!r}")
 
     commands = receipt.get("commands") if isinstance(receipt.get("commands"), list) else []
     result = receipt.get("result")
@@ -504,9 +552,10 @@ def validate_receipt_cross_references(root: Path, host_dir_name: str, path: Path
                 ["git", "--no-optional-locks", "-C", str(root), "cat-file", "-e", f"{catalog_revision}^{{commit}}"],
                 capture_output=True, timeout=5, check=False,
             )
-            if check.returncode not in (0, 1):
-                pass  # git unavailable/unexpected error; skip this bonus check rather than fail spuriously
-            elif check.returncode == 1:
+            if check.returncode != 0:
+                # git cat-file -e exits 1 for a missing object and 128 for a well-formed
+                # SHA that git cannot resolve to a commit (for example a shallow checkout
+                # or a fabricated SHA); both mean "not present", not "git unavailable".
                 errors.append(f"{label}: catalog_revision {catalog_revision} is not a commit present in this checkout")
         except (OSError, subprocess.TimeoutExpired):
             pass
@@ -571,11 +620,21 @@ def build_summary(root: Path) -> dict:
     Each platform bucket additionally reports
     ``independently_reviewed_native_proven_pass_stages``: the sorted list of
     lifecycle stages with at least one receipt that is ``result: pass``,
-    ``evidence_class: native_proven`` and carries a non-``self`` review with
-    verdict ``agree``. Callers needing that stricter combination (for example
-    ``scripts/component_matrix.py``'s macOS-acceptance flip rule) can check
-    that list directly instead of re-deriving it from raw receipts.
+    ``evidence_class: native_proven``, carries a non-``self`` review with
+    verdict ``agree``, declares ``host.second_physical_machine: true``, has a
+    ``host.os``/``host.architecture`` consistent with the claimed
+    ``platform_id`` (when ``adoption/manifest.json`` records one), and passes
+    ``validate_receipt_shape`` (a fabricated or malformed receipt cannot enter
+    this stricter list even though it may still appear in the looser
+    per-stage pass/fail counts above). Callers needing that stricter
+    combination (for example ``scripts/component_matrix.py``'s
+    macOS-acceptance flip rule) can check that list directly instead of
+    re-deriving it from raw receipts. This function does not re-run the full
+    cross-reference checks (catalog_revision presence, evidence.json
+    registration, id/path coherence): CI runs ``host_receipts.py validate``
+    as a separate, earlier gate for that.
     """
+    platform_profiles = platform_profile_map(root)
     components: dict[str, dict] = {}
     for _host_dir_name, path in _iter_receipt_files(root):
         try:
@@ -583,7 +642,8 @@ def build_summary(root: Path) -> dict:
         except (OSError, UnicodeError, ValueError, InvalidDecisionIndex):
             continue
         component_id = receipt.get("component_id")
-        platform_id = (receipt.get("host") or {}).get("platform_id")
+        host = receipt.get("host") if isinstance(receipt.get("host"), dict) else {}
+        platform_id = host.get("platform_id")
         stage = receipt.get("stage")
         result = receipt.get("result")
         evidence_class = receipt.get("evidence_class")
@@ -614,7 +674,16 @@ def build_summary(root: Path) -> dict:
         if result == "pass" and independently_reviewed:
             platform_bucket["independently_reviewed_passes"] += 1
             if evidence_class == "native_proven" and isinstance(stage, str):
-                platform_bucket["independently_reviewed_native_proven_pass_stages"].add(stage)
+                second_physical_machine = host.get("second_physical_machine") is True
+                expected_profile = platform_profiles.get(platform_id)
+                platform_identity_ok = expected_profile is None or (
+                    host.get("os") == expected_profile.get("os")
+                    and host.get("architecture") == expected_profile.get("architecture")
+                )
+                shape_errors: list[str] = []
+                validate_receipt_shape(receipt, path.relative_to(root).as_posix(), shape_errors)
+                if second_physical_machine and platform_identity_ok and not shape_errors:
+                    platform_bucket["independently_reviewed_native_proven_pass_stages"].add(stage)
 
     for component_bucket in components.values():
         for platform_bucket in component_bucket["platforms"].values():

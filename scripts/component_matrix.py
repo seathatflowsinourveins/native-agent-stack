@@ -416,10 +416,13 @@ def render_markdown(document: dict) -> str:
         "run `python3 scripts/component_matrix.py --write` and commit both files. "
         "`python3 scripts/component_matrix.py --check` (run in CI) recomputes both outputs and also enforces "
         "the flip rule: a winner cannot show `macos-arm64` `platform_status: accepted` without at least one "
-        "independently reviewed passing `native_proven` host receipt for that platform at stage `use` or "
-        "`install`. Never edit `platform_status` in the landscape files to make this page pass; add the "
-        "underlying host receipt instead, following "
-        "[`docs/contributing-evidence.md`](contributing-evidence.md).",
+        "host receipt for that platform at stage `use` or `install` that is `result: pass`, "
+        "`evidence_class: native_proven`, carries a non-self independently-reviewed `agree` verdict, declares "
+        "`host.second_physical_machine: true`, and has `host.os`/`host.architecture` consistent with "
+        "`adoption/manifest.json`'s `platform_profiles[]` entry for that platform id (a receipt recorded and "
+        "reviewed entirely on one host, without `second_physical_machine`, does not satisfy it). Never edit "
+        "`platform_status` in the landscape files to make this page pass; add the underlying host receipt "
+        "instead, following [`docs/contributing-evidence.md`](contributing-evidence.md).",
         "",
     ]
     return "\n".join(lines)
@@ -456,6 +459,11 @@ def main(argv=None) -> int:
         md_path.parent.mkdir(parents=True, exist_ok=True)
         json_path.write_text(json_text, encoding="utf-8")
         md_path.write_text(md_text, encoding="utf-8")
+        # Keep manifests/evidence.json's registered hashes for these two generated
+        # outputs current: otherwise any contributor who adds a receipt/review and
+        # reruns --write leaves scripts/validate.py reporting a stale hash for them.
+        host_receipts.register_file(root, OUTPUT_JSON)
+        host_receipts.register_file(root, OUTPUT_MD)
         print(json.dumps({
             "status": "written", "rows": len(document["rows"]),
             "flip_rule_violations": len(flip_violations),

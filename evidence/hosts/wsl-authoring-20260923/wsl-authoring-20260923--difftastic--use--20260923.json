@@ -29,9 +29,10 @@
   "claim": "On the catalog's authoring WSL host, difftastic's documented use command ran a structural diff of the tracked before/after fixtures and printed the expected structural diff.",
   "limitations": [
     "Covers only 'difft --exit-code --color never fixtures/before.py fixtures/after.py' on this host; no other language grammar or second physical machine is exercised.",
-    "The command's exit code is 1 (not 0) by difftastic's own --exit-code contract, because the two fixtures are intentionally different; that is the tool's documented differences-found signal, not an install or runtime failure, and the schema has no expected_exit override wired through this recorder's flags, so 'result' is honestly recorded as 'fail' rather than special-cased to 'pass'."
+    "The command's exit code is 1 (not 0) by difftastic's own --exit-code contract, because the two fixtures are intentionally different; that is the tool's documented differences-found signal, not an install or runtime failure, and the schema has no expected_exit override wired through this recorder's flags, so 'result' is honestly recorded as 'fail' rather than special-cased to 'pass'.",
+    "Runs against this repository's own tracked fixtures (fixtures/before.py, fixtures/after.py), not an external real-world diff; per docs/contributing-evidence.md Section 2 this is local_integration, not native_proven."
   ],
-  "evidence_class": "native_proven",
+  "evidence_class": "local_integration",
   "reviews": [
     {
       "kind": "self",

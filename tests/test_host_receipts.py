@@ -9,6 +9,7 @@ import contextlib
 import hashlib
 import io
 import json
+import re
 import subprocess
 import tempfile
 import unittest
@@ -120,6 +121,27 @@ class SchemaSyncTests(unittest.TestCase):
         self.assertEqual(self.schema["properties"]["host"]["properties"]["host_id"]["pattern"],
                           hr.HOST_ID_PATTERN.pattern)
 
+    def test_id_pattern_accepts_colon_and_slash_in_component_segment(self):
+        # manifests/stack.json and catalogs/landscape/*.json component ids legitimately
+        # contain '/' (a repository-style id like "affaan-m/ECC") and ':' (a landscape
+        # "candidate:*" alternative id); both the schema and the code must accept them
+        # inside the id's component segment.
+        schema_pattern = re.compile(self.schema["properties"]["id"]["pattern"])
+        for candidate in (
+            "host-20260101--candidate:astral-sh-uv--use--20260101",
+            "host-20260101--affaan-m/ECC--use--20260101",
+        ):
+            self.assertTrue(schema_pattern.fullmatch(candidate), candidate)
+            self.assertTrue(hr.ID_PATTERN.fullmatch(candidate), candidate)
+
+    def test_id_pattern_rejects_percent(self):
+        # '%' is reserved by receipt_filename_stem() to percent-escape '/' in filenames;
+        # it must never be a valid id character in either the schema or the code.
+        schema_pattern = re.compile(self.schema["properties"]["id"]["pattern"])
+        candidate = "host-20260101--weird%2Fname--use--20260101"
+        self.assertIsNone(schema_pattern.fullmatch(candidate))
+        self.assertIsNone(hr.ID_PATTERN.fullmatch(candidate))
+
 
 class ValidateFixtureTests(unittest.TestCase):
     def setUp(self):
@@ -201,6 +223,60 @@ class ValidateFixtureTests(unittest.TestCase):
         self.assertEqual(exit_code, 1)
         self.assertIn("does not match id", output)
 
+    def test_id_component_segment_mismatch_is_rejected(self):
+        # id says "widget" but component_id claims something else: previously only the
+        # id's host segment and the filename stem were cross-checked against the receipt.
+        self._place("valid.json", patch=lambda data: data.__setitem__("component_id", "not-widget"))
+        exit_code, output = self._validate()
+        self.assertEqual(exit_code, 1)
+        self.assertIn("id component segment", output)
+        self.assertIn("does not match component_id", output)
+
+    def test_id_stage_segment_mismatch_is_rejected(self):
+        # id says stage "use" but the receipt's own stage field claims "install".
+        self._place("valid.json", patch=lambda data: data.__setitem__("stage", "install"))
+        exit_code, output = self._validate()
+        self.assertEqual(exit_code, 1)
+        self.assertIn("id stage segment", output)
+        self.assertIn("does not match stage", output)
+
+    def test_id_date_segment_mismatch_is_rejected(self):
+        # id says 20260101 but observed_at_utc claims a different day.
+        self._place("valid.json", patch=lambda data: data.__setitem__("observed_at_utc", "2026-01-02T00:00:00Z"))
+        exit_code, output = self._validate()
+        self.assertEqual(exit_code, 1)
+        self.assertIn("id date segment", output)
+        self.assertIn("does not match observed_at_utc date", output)
+
+    def test_fabricated_catalog_revision_is_rejected(self):
+        # A well-formed but nonexistent 40-hex SHA: git cat-file -e exits 128 for this,
+        # not 1, and that must count as "missing", not "git unavailable, skip".
+        self._place("valid.json", patch=lambda data: data.__setitem__("catalog_revision", "1" * 40))
+        exit_code, output = self._validate()
+        self.assertEqual(exit_code, 1)
+        self.assertIn("is not a commit present in this checkout", output)
+
+    def test_slash_component_id_filename_is_percent_escaped(self):
+        # A component id containing '/' (for example a repository-style stack id) cannot
+        # be its own filename: the recorder must escape it rather than creating a nested
+        # directory that _iter_receipt_files would silently skip.
+        stack_path = self.root / "manifests" / "stack.json"
+        stack = json.loads(stack_path.read_text(encoding="utf-8"))
+        stack["components"].append(
+            {"id": "vendor/tool", "version": "1.0.0", "profile": "core", "commands": ["echo hi"]})
+        stack_path.write_text(json.dumps(stack), encoding="utf-8")
+
+        def substitute(data):
+            data["id"] = "fixture-host-20260101--vendor/tool--use--20260101"
+            data["component_id"] = "vendor/tool"
+
+        path = self._place("valid.json", filename="fixture-host-20260101--vendor%2Ftool--use--20260101.json",
+                            patch=substitute)
+        self.assertTrue(path.is_file())
+        self.assertNotIn("/", path.name)
+        exit_code, output = self._validate()
+        self.assertEqual(exit_code, 0, output)
+
 
 class RecorderRoundTripTests(unittest.TestCase):
     def setUp(self):
@@ -247,6 +323,45 @@ class RecorderRoundTripTests(unittest.TestCase):
         with contextlib.redirect_stdout(validate_buffer):
             validate_exit = hr.cmd_validate(argparse.Namespace(root=self.root))
         self.assertEqual(validate_exit, 0, validate_buffer.getvalue())
+
+    def test_record_percent_escapes_slash_in_component_id_filename(self):
+        # manifests/stack.json and catalogs/landscape winners can carry a repository-style
+        # component id like "vendor/tool"; recording it must not create a nested directory
+        # under evidence/hosts/<host>/ that _iter_receipt_files would then silently skip.
+        stack_path = self.root / "manifests" / "stack.json"
+        stack = json.loads(stack_path.read_text(encoding="utf-8"))
+        stack["components"].append(
+            {"id": "vendor/tool", "version": "1.0.0", "profile": "core", "commands": ["echo hi"]})
+        stack_path.write_text(json.dumps(stack), encoding="utf-8")
+
+        buffer = io.StringIO()
+        with contextlib.redirect_stdout(buffer):
+            exit_code = self._run([
+                "record", "--root", str(self.root),
+                "--host-id", "test-host-20260101",
+                "--platform-id", "linux-wsl2-x86_64",
+                "--component-id", "vendor/tool",
+                "--stage", "use",
+                "--evidence-class", "synthetic",
+                "--from-stack-commands",
+            ])
+        self.assertEqual(exit_code, 0, buffer.getvalue())
+        relative_path = buffer.getvalue().strip()
+        self.assertTrue(relative_path.startswith(
+            "evidence/hosts/test-host-20260101/test-host-20260101--vendor%2Ftool--use--"))
+        self.assertTrue(relative_path.endswith(".json"))
+        written = self.root / relative_path
+        self.assertTrue(written.is_file())
+        # No nested "vendor" directory was created under the host directory.
+        self.assertEqual(sorted(p.name for p in written.parent.iterdir()), [written.name])
+
+        validate_buffer = io.StringIO()
+        with contextlib.redirect_stdout(validate_buffer):
+            validate_exit = hr.cmd_validate(argparse.Namespace(root=self.root))
+        self.assertEqual(validate_exit, 0, validate_buffer.getvalue())
+
+        summary = hr.build_summary(self.root)
+        self.assertIn("vendor/tool", summary["components"])
 
     def test_record_rejects_malformed_host_id(self):
         buffer = io.StringIO()
@@ -334,6 +449,81 @@ class RecorderRoundTripTests(unittest.TestCase):
         summary = json.loads(summary_buffer.getvalue())
         stage_counts = summary["components"]["widget"]["platforms"]["linux-wsl2-x86_64"]["stages"]["use"]
         self.assertEqual(stage_counts["pass"], 1)
+
+
+class FlipRuleGatingTests(unittest.TestCase):
+    """A receipt recorded and reviewed entirely by one host must not, on its own, enter
+    build_summary's independently_reviewed_native_proven_pass_stages (the list
+    scripts/component_matrix.py's macOS-acceptance flip rule reads): it also needs
+    host.second_physical_machine: true and a host.os/architecture consistent with the
+    claimed platform_id."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.root = Path(self.tmp.name)
+        self.commit = _init_support_tree(self.root)
+
+    def _write_receipt(self, *, second_physical_machine: bool, os_value: str = "linux",
+                        architecture: str = "x86_64", platform_id: str = "linux-wsl2-x86_64") -> None:
+        receipt = {
+            "schema_version": 1,
+            "id": "test-host-20260101--widget--use--20260101",
+            "kind": "host_acceptance",
+            "host": {
+                "host_id": "test-host-20260101", "platform_id": platform_id, "os": os_value,
+                "architecture": architecture, "second_physical_machine": second_physical_machine,
+            },
+            "catalog_revision": self.commit,
+            "component_id": "widget",
+            "stage": "use",
+            "commands": [{
+                "cmd": "echo hi", "exit": 0, "duration_s": 0.01,
+                "output_sha256": hashlib.sha256(b"hi\n").hexdigest(), "output_excerpt": "hi",
+            }],
+            "tool_versions": {},
+            "observed_at_utc": "2026-01-01T00:00:00Z",
+            "result": "pass",
+            "claim": "test claim",
+            "limitations": ["test limitation"],
+            "evidence_class": "native_proven",
+            "reviews": [
+                {"kind": "self", "ref": "record", "verdict": "agree", "at_utc": "2026-01-01T00:00:00Z"},
+                {"kind": "independent_session", "ref": "another session", "verdict": "agree",
+                 "at_utc": "2026-01-01T01:00:00Z"},
+            ],
+        }
+        host_dir = self.root / "evidence" / "hosts" / "test-host-20260101"
+        host_dir.mkdir(parents=True, exist_ok=True)
+        (host_dir / f"{receipt['id']}.json").write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8")
+
+    def test_reviewed_native_proven_pass_without_second_physical_machine_does_not_flip(self):
+        self._write_receipt(second_physical_machine=False)
+        summary = hr.build_summary(self.root)
+        stages = summary["components"]["widget"]["platforms"]["linux-wsl2-x86_64"][
+            "independently_reviewed_native_proven_pass_stages"]
+        self.assertEqual(stages, [])
+
+    def test_reviewed_native_proven_pass_with_second_physical_machine_flips(self):
+        self._write_receipt(second_physical_machine=True)
+        summary = hr.build_summary(self.root)
+        stages = summary["components"]["widget"]["platforms"]["linux-wsl2-x86_64"][
+            "independently_reviewed_native_proven_pass_stages"]
+        self.assertEqual(stages, ["use"])
+
+    def test_platform_identity_mismatch_does_not_flip(self):
+        # adoption/manifest.json (written by _init_support_tree) declares linux-wsl2-x86_64
+        # as os=linux/architecture=x86_64; a receipt claiming that platform_id while
+        # self-declaring a different os/architecture must not satisfy the flip rule.
+        self._write_receipt(second_physical_machine=True, os_value="macos", architecture="arm64")
+        summary = hr.build_summary(self.root)
+        stages = summary["components"]["widget"]["platforms"]["linux-wsl2-x86_64"][
+            "independently_reviewed_native_proven_pass_stages"]
+        self.assertEqual(stages, [])
+
+    def test_platform_profile_map_reads_adoption_manifest(self):
+        profiles = hr.platform_profile_map(self.root)
+        self.assertEqual(profiles["linux-wsl2-x86_64"], {"os": "linux", "architecture": "x86_64"})
 
 
 if __name__ == "__main__":

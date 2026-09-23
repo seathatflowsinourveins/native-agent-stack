@@ -52,13 +52,27 @@ def _winner(component_id="widget", *, linux="accepted", macos="untested",
 def _init_root(root: Path, layers: list[dict], *, catalog_file="foundation.json") -> None:
     (root / "catalogs" / "landscape").mkdir(parents=True, exist_ok=True)
     (root / "evidence" / "hosts").mkdir(parents=True, exist_ok=True)
+    (root / "manifests").mkdir(parents=True, exist_ok=True)
     _write_json(root / "catalogs" / "landscape" / catalog_file, {
         "schema_version": 2, "checked_at": "2026-09-22", "scope": "test fixture", "layers": layers,
     })
+    # component_matrix.py --write self-registers its two outputs in manifests/evidence.json;
+    # a real repository checkout always has this file.
+    _write_json(root / "manifests" / "evidence.json", {"schema_version": 1, "receipts": [], "files": []})
 
 
 def _receipt(component_id: str, platform_id: str, *, stage="use", result="pass",
-             evidence_class="native_proven", reviewed=True) -> dict:
+             evidence_class="native_proven", reviewed=True, second_physical_machine=True,
+             os_value: str | None = None, architecture: str | None = None) -> dict:
+    """A fully schema-shape-valid receipt (host_receipts.validate_receipt_shape must pass
+    it with no errors): scripts/host_receipts.py's build_summary only lets a
+    result=pass/native_proven/independently-reviewed receipt into
+    independently_reviewed_native_proven_pass_stages (what the macOS flip rule reads) when
+    it is also shape-valid, so a malformed test fixture would silently never satisfy it."""
+    if os_value is None:
+        os_value = "macos" if platform_id == "macos-arm64" else "linux"
+    if architecture is None:
+        architecture = "arm64" if platform_id == "macos-arm64" else "x86_64"
     reviews = [{"kind": "self", "ref": "record", "verdict": "agree", "at_utc": "2026-09-22T00:00:00Z"}]
     if reviewed:
         reviews.append({
@@ -66,13 +80,27 @@ def _receipt(component_id: str, platform_id: str, *, stage="use", result="pass",
             "at_utc": "2026-09-22T01:00:00Z",
         })
     return {
+        "schema_version": 1,
         "id": f"test-host-20260922--{component_id}--{stage}--20260922",
+        "kind": "host_acceptance",
+        "host": {
+            "host_id": "test-host-20260922", "platform_id": platform_id, "os": os_value,
+            "architecture": architecture, "second_physical_machine": second_physical_machine,
+        },
+        "catalog_revision": "0" * 40,
         "component_id": component_id,
-        "host": {"host_id": "test-host-20260922", "platform_id": platform_id},
         "stage": stage,
-        "result": result,
-        "evidence_class": evidence_class,
+        "commands": [{
+            "cmd": "echo hi", "exit": 0, "duration_s": 0.01,
+            "output_sha256": "98ea6e4f216f2fb4b69fff9b3a44842c38686ca685f3f55dc48c5d3fb1107be4",
+            "output_excerpt": "hi",
+        }],
+        "tool_versions": {},
         "observed_at_utc": "2026-09-22T01:00:00Z",
+        "result": result,
+        "claim": "test claim",
+        "limitations": ["test limitation"],
+        "evidence_class": evidence_class,
         "reviews": reviews,
     }
 
@@ -212,6 +240,46 @@ class FlipRuleTests(unittest.TestCase):
 
             _document, flip_violations = cm.build_document(root)
             self.assertEqual(len(flip_violations), 1)
+
+    def test_receipt_without_second_physical_machine_does_not_satisfy_flip_rule(self):
+        # The described bypass: a recorder runs `record --platform-id macos-arm64` and
+        # `review --kind human --verdict agree` on any single host, with
+        # second_physical_machine left at its default (false). That alone must not flip
+        # the winner's macos-arm64 e2e_state to host_verified.
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            layer = _layer(winners=[_winner(macos="accepted")])
+            _init_root(root, [layer])
+            _write_receipt(root, _receipt("widget", "macos-arm64", stage="use", second_physical_machine=False))
+
+            document, flip_violations = cm.build_document(root)
+            self.assertEqual(len(flip_violations), 1)
+            winner_row = document["rows"][0]["winners"][0]
+            self.assertEqual(winner_row["platforms"]["macos-arm64"]["e2e_state"], "accepted")
+
+    def test_receipt_with_mismatched_os_architecture_does_not_satisfy_flip_rule(self):
+        # A WSL host self-declaring host.os/architecture for macos-arm64 while
+        # adoption/manifest.json records that platform as macos/arm64 must not flip it.
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            layer = _layer(winners=[_winner(macos="accepted")])
+            _init_root(root, [layer])
+            (root / "adoption").mkdir(parents=True, exist_ok=True)
+            _write_json(root / "adoption" / "manifest.json", {
+                "schema_version": 1,
+                "platform_profiles": [
+                    {"id": "macos-arm64", "os": "macos", "architecture": "arm64", "status": "drafted_not_accepted"},
+                ],
+            })
+            _write_receipt(root, _receipt(
+                "widget", "macos-arm64", stage="use", second_physical_machine=True,
+                os_value="linux", architecture="x86_64",
+            ))
+
+            document, flip_violations = cm.build_document(root)
+            self.assertEqual(len(flip_violations), 1)
+            winner_row = document["rows"][0]["winners"][0]
+            self.assertEqual(winner_row["platforms"]["macos-arm64"]["e2e_state"], "accepted")
 
     def test_non_accepted_macos_status_never_flips(self):
         with tempfile.TemporaryDirectory() as tmp:
