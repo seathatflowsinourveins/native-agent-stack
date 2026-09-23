@@ -5704,8 +5704,8 @@
     },
     {
       "path": "blueprints/gap-wave2-20260923/qdrant-restart-reconnect/gap9_qdrant_restart.py",
-      "sha256": "18588ad20ac6cb04b1bbf4c57f674487c72dda4019c4a62798c1efb4b2d25343",
-      "bytes": 3909
+      "sha256": "e9bee7aa500343bfaf128ccb050d90b9c75db23f09d2e1eed42c975939416cc0",
+      "bytes": 3979
     },
     {
       "path": "blueprints/gap-wave2-20260923/rag-bench-eval/SEALED_AT.txt",
@@ -9989,7 +9989,7 @@
     },
     {
       "path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/qdrant-restart-reconnect.json",
-      "sha256": "acc96d04ada904d2580f9b24ca0f5d6e572a53d038a770bab6cc681f47b5ea93",
+      "sha256": "a1c904e005417130fc4619b242599338cd4a0c4363701ea7e9146ce1f8d94a15",
       "bytes": 5816
     },
     {
@@ -14159,8 +14159,8 @@
     },
     {
       "path": "tests/test_grype_known_cve_fixture.py",
-      "sha256": "4d0bd971c4f32167a1ea154b6d2b79c4a151fa1e50c22d950cf428668e3e5dff",
-      "bytes": 3956
+      "sha256": "9d8d907c96f6549607af6ed1403aa044afefce6baa08bca93b439717922a2377",
+      "bytes": 4283
     },
     {
       "path": "tests/test_historical_comparison.py",

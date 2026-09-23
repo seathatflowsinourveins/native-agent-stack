@@ -59,7 +59,7 @@
     {
       "path": "blueprints/gap-wave2-20260923/qdrant-restart-reconnect/gap9_qdrant_restart.py",
       "sha256": "b91d1be6606be12317b904b3cc4c586e5e20b58a5da56392ca866309f777092b",
-      "published_sha256": "18588ad20ac6cb04b1bbf4c57f674487c72dda4019c4a62798c1efb4b2d25343",
+      "published_sha256": "e9bee7aa500343bfaf128ccb050d90b9c75db23f09d2e1eed42c975939416cc0",
       "published_note": "Published copy differs from the run's file: home paths were sanitized to ~/ at publication, and the coordinator then made helper paths expand at run time (review of PR #101). sha256 is the file as run; published_sha256 is the committed file."
     }
   ]

@@ -1,5 +1,5 @@
 import sys, json, time, os, subprocess, urllib.request
-sys.path.insert(0, os.path.dirname(__file__))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "watcher-kill-restart-recovery"))
 from mcp_client import spawn
 QDRANT="http://127.0.0.1:26333"
 HOME_DIR=os.path.join(os.path.dirname(__file__), "mcp-home")

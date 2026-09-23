@@ -41,8 +41,12 @@ class GrypeKnownCveFixtureTests(unittest.TestCase):
         self.assertIn(f"{EXPECTED_PACKAGE}=={EXPECTED_VERSION}", text)
 
     def test_grype_detects_the_published_cve_in_the_fixture(self) -> None:
-        # Offline and read-only: never check for app updates, never download or update the
-        # vulnerability database, and skip when no local database exists.
+        # Opt-in: default discovery never runs the scanner. When enabled it runs offline and
+        # read-only (grype maps these GRYPE_* variables onto check-for-app-update,
+        # db.auto-update and db.validate-age; `grype config --load` shows them applied) and skips
+        # when no local database exists.
+        if os.environ.get("NAS_RUN_GRYPE_FIXTURE") != "1":
+            self.skipTest("set NAS_RUN_GRYPE_FIXTURE=1 to run the scanner (off by default: no network or cache use)")
         env = dict(os.environ, GRYPE_CHECK_FOR_APP_UPDATE="false", GRYPE_DB_AUTO_UPDATE="false",
                    GRYPE_DB_VALIDATE_AGE="false")
         status = subprocess.run([GRYPE, "db", "status"], capture_output=True, text=True,
