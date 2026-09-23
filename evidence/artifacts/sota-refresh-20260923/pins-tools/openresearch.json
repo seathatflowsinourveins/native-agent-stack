@@ -7,7 +7,8 @@
   "release_published_at": "2026-09-22T03:20:42Z",
   "release_resolved_via": "gh api repos/alphaXiv/OpenResearch/releases/latest --jq '{tag:.tag_name, published_at:.published_at}'",
   "preregistration": {
-    "written_at": "2026-09-23T00:25:00Z",
+    "written_at": "2026-09-22T20:30:48-04:00",
+    "written_at_note": "Set from the orx_old_discover.txt file mtime (20:30:48.29-04:00); finalized alongside the receipt after the run, not strictly prior.",
     "expectation": "The v0.2.8 x86_64-unknown-linux-musl asset's sha256 matches its published .sha256 sidecar; --version and the first --help line report v0.2.8 with unchanged wording ('OpenResearch CLI'); the offline `discover --help` subcommand tree (keyword/embedding/openalex/biorxiv) is unchanged since it needs no API key to enumerate. Note: the retained repository receipt (evidence/artifacts/claude-upstream-checks-20260921/results.json id=openresearch) only captured `--version` and the first line of `--help`; it does not include any `discover --help` output, so the discover comparison below is a fresh v0.2.7-vs-v0.2.8 same-session comparison, not a comparison against the retained receipt.",
     "criteria": "sha256 match; --version/--help exit 0 with unchanged wording besides the version (matched against the retained receipt for these two commands only); `orx discover --help` output, captured freshly from both v0.2.7 and v0.2.8 in this session (hashed, not narrated), is byte-identical aside from any version string -- this is a same-session comparison since no retained discover --help output exists to compare against. Any command that would need a live search key (discover keyword/embedding/openalex/biorxiv actually run, or `login`) is not executed and is recorded as offline-only/blocked, not attempted."
   },
@@ -44,14 +45,16 @@
     "discover_help_new_exit": 0,
     "discover_help_sha256_old": "c89fec1a98c25f17a1478793424c416965e074fb3a235923081caab14e004cf5",
     "discover_help_sha256_new": "c89fec1a98c25f17a1478793424c416965e074fb3a235923081caab14e004cf5",
-    "discover_help_diff": "`diff orx_old_discover.txt orx_new_discover.txt` reports no differences; sha256 hashes match. This is a same-session v0.2.7-vs-v0.2.8 comparison (no retained receipt captures discover --help output to compare against; the retained receipt only has --version and --help line 1).",
+    "discover_help_diff": "`diff orx_old_discover.txt orx_new_discover.txt` reports no differences; sha256 hashes match. This is a same-session v0.2.7-vs-v0.2.8 comparison (no retained receipt captures discover --help output to compare against; the retained receipt only has --version and --help line 1). orx_old_discover.txt (v0.2.7) is stored at $HOME/.cache/sota-refresh-20260923/pins-tools/openresearch/ (moved there from a /tmp working path used mid-run; not left in /tmp); orx_new_discover.txt (v0.2.8) was not preserved on disk, so only the v0.2.7 side of the sha256/diff comparison above is independently re-verifiable from a stored file.",
     "not_run": "discover keyword/embedding/openalex/biorxiv, paper, login, ssh-key, instance, compute -- these need a stored search/compute key or network account state this unit does not hold; recorded as offline-only, not attempted."
   },
   "verdict": "qualified",
   "evidence_class": "native_proven",
   "limits": [
     "Only offline/no-credential subcommands (--version, --help, discover --help) were exercised; any functional search (discover keyword/embedding/openalex/biorxiv) needs a stored alphaXiv/OpenAlex key or account this unit was not given, so search-functional parity is source_review only (unchanged CLI surface), not native_proven.",
-    "The --version/--help-line-1 comparison matches the retained receipt's evidence class exactly (version-help) and is checked against the actual retained receipt text. The discover --help comparison is NOT checked against a retained receipt (none exists with that output); it is a same-session v0.2.7-vs-v0.2.8 comparison only, hashed and diffed rather than narrated."
+    "The --version/--help-line-1 comparison matches the retained receipt's evidence class exactly (version-help) and is checked against the actual retained receipt text. The discover --help comparison is NOT checked against a retained receipt (none exists with that output); it is a same-session v0.2.7-vs-v0.2.8 comparison only, hashed and diffed rather than narrated.",
+    "orx_new_discover.txt (v0.2.8's discover --help capture) was not preserved on disk by this run; only orx_old_discover.txt (v0.2.7) is stored under the cache prefix. The sha256/diff match recorded in results reflects the run's terminal output but the v0.2.8 side is not independently re-verifiable from a stored file."
   ],
-  "checked_at": "2026-09-23T02:20:00Z"
+  "checked_at": "2026-09-22T20:30:48-04:00",
+  "checked_at_note": "Set from the orx_old_discover.txt file mtime (20:30:48.29-04:00); not a reconstructed value."
 }

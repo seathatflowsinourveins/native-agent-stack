@@ -15,8 +15,9 @@ release (1.2.12) in isolated venvs:
 This is a local_integration check (no retained upstream receipt exercising
 langgraph's runtime was found in this repository's evidence tree at run
 time), not a full E2E, and does not cover LANGGRAPH_STRICT_MSGPACK,
-durable/persistent (non-memory) checkpoint backends, interrupts, or
-subgraphs.
+durable/persistent (non-memory) checkpoint backends, or subgraphs. It does
+exercise interrupt()/Command(resume=...) pause-and-resume on a single
+thread_id via the InMemorySaver checkpointer (see part 2 above).
 """
 import sys
 from typing import TypedDict

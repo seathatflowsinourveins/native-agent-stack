@@ -7,7 +7,8 @@
   "release_published_at": "2026-09-22T09:54:57Z",
   "release_resolved_via": "gh api repos/openclaw/mcporter/releases/latest --jq '{tag:.tag_name, published_at:.published_at}'",
   "preregistration": {
-    "written_at": "2026-09-23T00:23:00Z",
+    "written_at": "2026-09-22T20:30:40-04:00",
+    "written_at_note": "Set from the mp_old_help.txt/mp_new_help.txt file mtimes (20:30:55.09-20:30:55.19-04:00) and the surrounding list/version commands, not a reconstructed clock value; finalized alongside the receipt after the run.",
     "expectation": "mcporter 0.14.0 installs from npm into an isolated prefix, reports its new version via --version, and `list` against a copied (not live) copy of $ECOSYSTEM_REPO/config/mcporter.json produces the same server/tool-count summary as the retained 0.13.13 receipt (context-mode daemon-exited error, ai-memory 23 tools, socraticode 26 tools).",
     "criteria": "Exit 0 on --version and --help; `list` output against the config copy matches the retained receipt's server names, tool counts and health/error text (version string aside); no live config file is written to."
   },
@@ -29,10 +30,10 @@
     "new_0_14_0_version_exit": 0,
     "new_0_14_0_list_exit": 0,
     "new_0_14_0_list": "mcporter 0.14.0 — Listing 3 server(s) (per-server timeout: 30s)\n- context-mode (Previous daemon exited unexpectedly; verify retirement of its transports before deliberate recovery. No replacement was launched., 0.0s)\n- ai-memory (23 tools, 0.1s)\n- socraticode (26 tools, 0.5s)\n✔ Listed 3 servers (2 healthy; 1 errors).",
-    "list_comparison": "Server names, per-server tool counts (ai-memory 23, socraticode 26) and health status (2 healthy, 1 errors, same context-mode daemon-exited error text) are identical across the retained 0.13.13 receipt in evidence/artifacts/claude-upstream-checks-20260921/results.json:1128 (socraticode 26 tools, 0.2s), this unit's same-session 0.13.13 re-run (socraticode 26 tools, 0.4s) and the 0.14.0 run (socraticode 26 tools, 0.5s). The comparison against the retained receipt is limited to names/counts/health text, since per-server timings are not deterministic across sessions/hosts and differ even between the retained receipt and this unit's own 0.13.13 re-run; only the version string in the banner line differs between the two runs made in this session.",
+    "list_comparison": "Server names, per-server tool counts (ai-memory 23, socraticode 26) and health status (2 healthy, 1 errors, same context-mode daemon-exited error text) are identical across the retained 0.13.13 receipt in evidence/artifacts/claude-upstream-checks-20260921/results.json:1128 (socraticode 26 tools, 0.2s), this unit's same-session 0.13.13 re-run (socraticode 26 tools, 0.4s) and the 0.14.0 run (socraticode 26 tools, 0.5s). The comparison against the retained receipt is limited to names/counts/health text, since per-server timings are not deterministic across sessions/hosts and differ even between the retained receipt and this unit's own 0.13.13 re-run. The two same-session runs (0.13.13 re-run vs 0.14.0) also differ from each other only in the banner version string and the socraticode timing (0.4s vs 0.5s, itself non-deterministic); there is no byte-for-byte-identical same-session `list` output to claim, only matching names/counts/health text. The raw mp_old_list_rerun.txt/mp_new_list.txt outputs were not retained; the quoted text above is the full recorded output.",
     "help_exit_old": 0,
     "help_exit_new": 0,
-    "help_diff": "`diff mp_old_help.txt mp_new_help.txt` reports the files are byte-identical (confirmed separately via sha256sum, both 1746701a12d9a2bd1d11d6cf396afbde1571236276e8c2ef6cfdfbefde406856); 0.14.0's --help output is unchanged from 0.13.13's."
+    "help_diff": "`diff mp_old_help.txt mp_new_help.txt` reports the files are byte-identical (confirmed separately via sha256sum, both 1746701a12d9a2bd1d11d6cf396afbde1571236276e8c2ef6cfdfbefde406856); 0.14.0's --help output is unchanged from 0.13.13's. Both files are stored at $HOME/.cache/sota-refresh-20260923/pins-tools/mcporter/mp_old_help.txt and mp_new_help.txt (moved there from a /tmp working path used mid-run; not left in /tmp)."
   },
   "verdict": "qualified",
   "evidence_class": "native_proven",
@@ -42,5 +43,6 @@
     "context-mode server shows a pre-existing daemon-exited condition unrelated to this version bump (present identically under both 0.13.13 and 0.14.0).",
     "Used a copy of the live mcporter.json (no secrets present in that file; only a loopback baseUrl and local command paths) rather than the live file, per isolation rule."
   ],
-  "checked_at": "2026-09-23T02:20:00Z"
+  "checked_at": "2026-09-22T20:30:55-04:00",
+  "checked_at_note": "Set from the mp_new_help.txt file mtime (20:30:55.19-04:00), the last command run for this component; not a reconstructed value."
 }

@@ -7,7 +7,8 @@
   "release_published_at": "2026-09-21T13:56:12Z",
   "release_resolved_via": "gh api repos/kenn-io/agentsview/releases/latest --jq '{tag:.tag_name, published_at:.published_at}'",
   "preregistration": {
-    "written_at": "2026-09-23T00:24:00Z",
+    "written_at": "2026-09-22T20:30:40-04:00",
+    "written_at_note": "Set from the av_old_help.txt file mtime (20:30:40.71-04:00); finalized alongside the receipt after the run, not strictly prior.",
     "expectation": "The v0.44.0 linux_amd64 release asset's sha256 matches the published SHA256SUMS entry, and both --version and the first line of --help report the new version with unchanged wording ('local web viewer for AI agent sessions') matching the retained 0.43.0 version-help receipt's shape.",
     "criteria": "sha256 of downloaded tarball equals the value in the release's SHA256SUMS file; --version exits 0 and reports v0.44.0; --help exits 0 and its first stdout line only differs from the retained receipt by the version number."
   },
@@ -35,7 +36,7 @@
     "old_0_43_0_help_line1": "agentsview v0.43.0 - local web viewer for AI agent sessions",
     "new_0_44_0_help_exit": 0,
     "new_0_44_0_help_line1": "agentsview v0.44.0 - local web viewer for AI agent sessions",
-    "help_line1_diff": "First line differs only by version number, matching the retained receipt's version-help scope (evidence/artifacts/claude-upstream-checks-20260921/results.json:1051-1084, id=agentsview).",
+    "help_line1_diff": "First line differs only by version number, matching the retained receipt's version-help scope (evidence/artifacts/claude-upstream-checks-20260921/results.json:1051-1084, id=agentsview). av_old_help.txt (the 0.43.0 capture) is stored at $HOME/.cache/sota-refresh-20260923/pins-tools/agentsview/ (moved there from a /tmp working path used mid-run; not left in /tmp). av_new_help.txt (the 0.44.0 capture) was not preserved by this run; the full-body diff below was recorded from the run's terminal output at the time and is not independently re-verifiable from a stored file -- this is disclosed as a limitation rather than re-claimed as reproducible.",
     "help_full_body_diff": "The full --help bodies (beyond line 1, which is outside the retained receipt's captured scope) are NOT identical: 0.44.0 adds a `clickhouse` command group (push/serve/service/status), an `export conversations` and `export range` subcommand, an `insight` command group (generate/get/list), and new CLINE_DIR/CODEBUDDY_DIR environment variables not present in 0.43.0's --help. This is new functional surface, not a wording-only change, and is reported here since it goes beyond what the preregistered criteria (first-line wording match) checked."
   },
   "verdict": "qualified",
@@ -43,7 +44,9 @@
   "limits": [
     "Matches the retained receipt's evidence class exactly (version-help): did not run a full sync/serve E2E against real session data, matching the scope of the accepted prior receipt rather than exceeding it.",
     "Did not install the binary onto PATH; ran it from an extracted directory under the unit-owned cache prefix.",
-    "0.44.0 adds new subcommands (clickhouse push/serve/service/status, export conversations/range, insight generate/get/list) beyond what --version/--help first-line parity checks; none of these were exercised functionally, so this receipt does not qualify the new surface, only confirms the previously-accepted version-help check still passes."
+    "0.44.0 adds new subcommands (clickhouse push/serve/service/status, export conversations/range, insight generate/get/list) beyond what --version/--help first-line parity checks; none of these were exercised functionally, so this receipt does not qualify the new surface, only confirms the previously-accepted version-help check still passes.",
+    "av_new_help.txt (0.44.0's full --help capture) was not preserved on disk by this run; only av_old_help.txt (0.43.0) is stored under the cache prefix. The full-body diff recorded in results.help_full_body_diff reflects the run's terminal output but is not independently re-verifiable from a stored file for the 0.44.0 side."
   ],
-  "checked_at": "2026-09-23T02:20:00Z"
+  "checked_at": "2026-09-22T20:30:40-04:00",
+  "checked_at_note": "Set from the av_old_help.txt file mtime (20:30:40.71-04:00); not a reconstructed value."
 }

@@ -7,7 +7,8 @@
   "release_published_at": "2026-09-21T07:46:25Z",
   "release_resolved_via": "gh api repos/opensandbox-group/OpenSandbox/releases/latest --jq '{tag:.tag_name, published_at:.published_at}'",
   "preregistration": {
-    "written_at": "2026-09-23T01:10:00Z",
+    "written_at": "2026-09-22T20:29:00-04:00",
+    "written_at_note": "LATE: finalized alongside the receipt after this fix round's checks ran (docker/podman/compose/socket checks and server_help_old.txt are timestamped 20:29-20:31:30-04:00 by file mtime; server_help_new.txt and the pip/import checks ran through 20:31:37-04:00). Set from actual `date -u`/file-mtime evidence, not a reconstructed prior-to-run value.",
     "expectation": "This repository's own catalog (catalogs/us-equities/agents-operations.json id=opensandbox) lists two offline, no-container commands as its native_workflow surface: `uvx --from opensandbox-server==0.2.3 opensandbox-server --help` and `python -m pip install opensandbox==0.1.16`, with limitations text already noting 'help/import is not isolation proof' -- i.e. these were always understood as a partial, non-functional surface, matching the version-help pattern used for openresearch/agentsview. Expectation before running anything: (a) `opensandbox-server --help` and a `python -c 'import opensandbox'` SDK-import smoke check can run without Docker/Kubernetes at both the retained pin and release-1.1.0, since they do not start the server or create a sandbox; (b) any actual sandbox creation/connect operation requires a running server, which upstream's README states needs Docker or Kubernetes; (c) this host has neither, which will be confirmed (not assumed) by checking `which docker podman docker-compose` and `test -S /var/run/docker.sock` before drawing that conclusion.",
     "criteria": "`uvx --from opensandbox-server==1.1.0 opensandbox-server --help` exits 0 without a running Docker/Kubernetes backend, and its subcommand surface is compared against the retained-pin (0.2.3) `--help` output; `python -m pip install opensandbox==1.1.0` into an isolated venv exits 0, and `import opensandbox` exits 0 and exposes the same public API name set as the 0.1.16 SDK (or the diff is reported); `which docker podman docker-compose` and `test -S /var/run/docker.sock` are run and their exit codes recorded before any conclusion about missing Docker is stated; if all three are absent, full sandbox-creation functional parity is recorded as blocked (not attempted), citing the exact upstream requirement and its source line."
   },
@@ -34,7 +35,7 @@
     "latest_release_published_at": "2026-09-21T07:46:25Z",
     "release_commit_sha": "b1a29cf93a823a95913f7943010febb3f29de05c",
     "release_notes_excerpt": "From `gh api .../releases/latest --jq '.body'` (the GitHub release body itself, not the README): 'First unified umbrella release: every artifact ships at 1.1.0 from tag release-1.1.0, with a Sigstore-signed BOM as the digest authority... First release of the Fast Sandbox integration: a Firecracker microVM runtime... Snapshot persistence gains an opt-in PostgreSQL store with multi-process HA and a SQLite migration command, and sandboxes gain preStart/periodic lifecycle hooks.'",
-    "docker_requirement_source": "README.md at commit b1a29cf93a823a95913f7943010febb3f29de05c (tag release-1.1.0), 'Getting Started > Requirements' section, lines 166-169: 'Requirements:\\n\\n- Docker (required for local execution)\\n- Python 3.10+ (required for examples and local runtime)'",
+    "docker_requirement_source": "README.md at commit b1a29cf93a823a95913f7943010febb3f29de05c (tag release-1.1.0), 'Getting Started > Requirements' section, lines 166-169: 'Requirements:\\n\\n- Docker (required for local execution)\\n- Python 3.10+ (required for examples and local runtime)'. Fetched and stored at $HOME/.cache/sota-refresh-20260923/pins-tools/opensandbox/opensandbox_readme.md (sha256 ab78736660038f0f08365302d511c10b01c48af9678d71dd5844abf09e8b026b); `grep -n` against that file confirms 'Requirements:' at line 166 and the two quoted bullets at lines 168-169.",
     "docker_present": {"checked": true, "exit": 1, "output": ""},
     "podman_present": {"checked": true, "exit": 1, "output": ""},
     "docker_compose_present": {"checked": true, "exit": 1, "output": ""},
@@ -64,5 +65,6 @@
     "The offline help/import surface is unchanged in scope from what the repository's own catalog listed as prospective before this refresh; this receipt executes that same surface at both the retained pin and release-1.1.0 rather than inventing a new one.",
     "Could not compare actual sandbox-runtime behavior between server v0.2.3 and release-1.1.0; only the CLI help text and SDK import surface were compared."
   ],
-  "checked_at": "2026-09-23T01:45:00Z"
+  "checked_at": "2026-09-22T20:31:37-04:00",
+  "checked_at_note": "Set from the last check's output file mtime (pip_install_new.txt, 20:31:37.072598465-04:00); not a reconstructed value."
 }

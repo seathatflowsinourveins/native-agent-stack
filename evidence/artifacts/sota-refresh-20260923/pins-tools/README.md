@@ -8,7 +8,11 @@ installed onto PATH, `~/.config`, or any live service).
 This is the fix round after an independent Opus review of the first pass.
 Every finding below was investigated and resolved by re-running the affected
 checks with corrected commands and honest, verbatim evidence; see "Fix round
-changes" for what changed and why.
+changes" for what changed and why. A second independent re-review then found
+five more findings (one major, four minor) in that fix round itself, all
+about timestamp accuracy, citation line numbers and raw-output storage, not
+about the underlying checks; see "Re-review fix round" below for what
+changed in response.
 
 | component | from | to | published_at | verdict | evidence class | receipt |
 |---|---|---|---|---|---|---|
@@ -101,6 +105,56 @@ changes" for what changed and why.
   `export range` and `insight` subcommands plus new environment variables --
   new functional surface not exercised by this version-help-scoped receipt,
   called out explicitly in `limits`.
+
+## Re-review fix round
+
+- **Timestamps (major)**: the fix round's first attempt set `written_at` and
+  `checked_at` to values later than both the actual runs and the commit that
+  recorded them (e.g. commit 7bec2c3 at `2026-09-22T20:38:37-04:00` but
+  `checked_at` values of `01:45Z`-`02:20Z`, which is in the future relative
+  to that commit and to the review clock). All five receipts now set
+  `written_at`/`checked_at` from the actual file mtimes of the commands' raw
+  outputs (recorded alongside each field as a `*_note` explaining the exact
+  file and mtime used), and label the preregistration text as written
+  alongside the receipt after the run (LATE / same-round), not strictly
+  prior to it. The same pattern in the original 2ab0819 commit (checked_at
+  ahead of its own commit timestamp) is superseded by these corrected
+  values.
+- **mcporter same-session comparison (minor)**: dropped the false claim that
+  "only the version string in the banner line differs between the two runs
+  made in this session" -- the same-session 0.13.13 re-run and 0.14.0 run
+  also differ in the non-deterministic socraticode timing (0.4s vs 0.5s).
+  The receipt now says plainly that names, counts and health text match and
+  timings are not comparable, with no byte-for-byte claim for the `list`
+  output (the `--help` byte-for-byte claim, which is backed by a stored
+  diff/sha256, is unaffected and unchanged).
+- **langgraph docstring (minor)**: `smoke_test.py`'s module docstring
+  incorrectly said the test doesn't cover interrupts even though it now
+  calls `interrupt()`/`Command(resume=...)`; corrected, and
+  `manifests/evidence.json` re-hashed for the changed file.
+- **langgraph citations (minor)**: `catalogs/us-equities/agents-operations.json`
+  line references corrected from :262-263 to :253-254 (the actual
+  `InMemorySaver` import command lines; :262 is a limitation, not a
+  command), and `catalogs/us-equities/architecture/foundation.json` from
+  :851-859 to :850 for the `acceptance_gate` field (the `uv sync --frozen
+  --group test --no-dev` upstream command is correctly at :859, unchanged).
+- **Raw-output storage (minor)**: the `mp_old_help.txt`/`mp_new_help.txt`
+  (mcporter), `av_old_help.txt` (agentsview) and `orx_old_discover.txt`
+  (openresearch) captures that the receipts hash and diff against were left
+  in `/tmp` after the fix round instead of the cache prefix; they are now
+  copied into `$HOME/.cache/sota-refresh-20260923/pins-tools/{mcporter,agentsview,openresearch}/`
+  with their original mtimes preserved (sha256 values unchanged and
+  re-verified against the receipts). `av_new_help.txt` and
+  `orx_new_discover.txt` (the newer-version captures) were never written to
+  disk by the original run and could not be recovered; each affected receipt
+  now discloses this as a limitation rather than implying both sides of the
+  diff are stored. For opensandbox, the `README.md` the Docker requirement
+  is quoted from was re-fetched at the exact cited commit
+  (`b1a29cf93a823a95913f7943010febb3f29de05c`) and stored at
+  `$HOME/.cache/sota-refresh-20260923/pins-tools/opensandbox/opensandbox_readme.md`
+  (sha256 `ab78736660038f0f08365302d511c10b01c48af9678d71dd5844abf09e8b026b`);
+  `grep -n` against that file confirms 'Requirements:' at line 166 and the
+  two quoted bullets at lines 168-169, exactly as cited.
 
 ## Notes (carried from the original pass, still accurate)
 
