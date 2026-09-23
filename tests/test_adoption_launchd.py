@@ -150,6 +150,24 @@ class RenderLaunchdScriptTests(unittest.TestCase):
                 module.render_plist(bad_template, {})
             self.assertIn("invalid placeholder", str(ctx.exception))
 
+    def test_a_control_character_from_a_substituted_value_raises_render_error(self):
+        # plistlib.dumps raises ValueError for a control character (XML
+        # plist text content cannot represent one) -- this must happen
+        # inside the same try as _substitute, not after it, or it would be
+        # an uncaught exception instead of the usual RenderError.
+        module = _load_render_launchd_module()
+        with tempfile.TemporaryDirectory() as tmp:
+            template = Path(tmp) / "control-char.plist.template"
+            template.write_text(
+                '<?xml version="1.0" encoding="UTF-8"?>\n'
+                '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" '
+                '"http://www.apple.com/DTDs/PropertyList-1.0.dtd">\n'
+                '<plist version="1.0"><dict><key>Label</key>'
+                '<string>${VALUE}</string></dict></plist>\n'
+            )
+            with self.assertRaises(module.RenderError) as ctx:
+                module.render_plist(template, {"VALUE": "bad\x01char"})
+            self.assertIn("control character", str(ctx.exception))
 
     def test_a_literal_ampersand_in_a_substituted_value_round_trips_through_valid_xml(self):
         # Codex review, 2026-09-23: a naive string.Template substitution on
@@ -251,16 +269,19 @@ class LaunchdAgentsScriptStructureTests(unittest.TestCase):
         # Every `rm` in the script targets exactly the copied unit-definition
         # file this script itself placed under ~/Library/LaunchAgents (on a
         # successful bootout, on removing an already-unloaded label, or on
-        # rolling back a failed bootstrap during install); none may ever
+        # rolling back a failed bootstrap during install), or the install
+        # subcommand's own temporary backup of that same file; none may ever
         # target state/logs, state/qdrant, or the enabled-labels state file.
         self.assertNotIn("rm -rf", self.text)
         rm_lines = [line.strip() for line in self.text.splitlines() if re.search(r"\brm\b", line)]
         self.assertGreaterEqual(len(rm_lines), 1, rm_lines)
+        allowed_targets = (
+            'rm -f -- "$launch_agents_dir/$label.plist"',
+            'rm -f -- "$dest_plist"',
+            'rm -f -- "$backup_plist"',
+        )
         for rm_line in rm_lines:
-            self.assertTrue(
-                'rm -f -- "$launch_agents_dir/$label.plist"' in rm_line or 'rm -f -- "$dest_plist"' in rm_line,
-                rm_line,
-            )
+            self.assertTrue(any(target in rm_line for target in allowed_targets), rm_line)
             for forbidden in ("state/logs", "state/qdrant", "enabled_state_file"):
                 self.assertNotIn(forbidden, rm_line)
 
@@ -295,10 +316,32 @@ class LaunchdAgentsScriptBehaviorTests(unittest.TestCase):
     launchctl/id on PATH; no macOS host and no real launchd session."""
 
     def _launchctl_shim(self, directory: Path, log: Path) -> Path:
+        # Stateful, one marker file per label, mirroring real launchctl:
+        # bootstrap "loads" the label its plist path names; print reports
+        # loaded (0) once that label's marker exists, else 113 ("Could not
+        # find service"); bootout always succeeds and clears the marker.
+        # install's own pre-bootstrap print check relies on this to tell a
+        # genuine first install (nothing loaded yet) from a reinstall of an
+        # already-loaded label.
         shim = directory / "shim"
         shim.mkdir(exist_ok=True)
         (shim / "launchctl").write_text(
-            f'#!/bin/sh\nprintf "%s\\n" "launchctl $*" >> {str(log)!r}\nexit 0\n'
+            '#!/bin/sh\n'
+            f'printf "%s\\n" "launchctl $*" >> {str(log)!r}\n'
+            'case "$1" in\n'
+            '  bootstrap)\n'
+            '    label="$(basename "$3" .plist)"\n'
+            f'    touch "{shim!s}/$label.loaded.marker"\n'
+            '    exit 0 ;;\n'
+            '  print)\n'
+            '    label="$(basename "$2")"\n'
+            f'    [ -f "{shim!s}/$label.loaded.marker" ] && exit 0 || exit 113 ;;\n'
+            '  bootout)\n'
+            '    label="$(basename "$2")"\n'
+            f'    rm -f "{shim!s}/$label.loaded.marker"\n'
+            '    exit 0 ;;\n'
+            '  *) exit 0 ;;\n'
+            'esac\n'
         )
         (shim / "launchctl").chmod(0o755)
         return shim
@@ -470,13 +513,16 @@ class LaunchdAgentsScriptBehaviorTests(unittest.TestCase):
 
             invocations = log.read_text()
             self.assertEqual(invocations.count("launchctl bootstrap"), 4)
-            # One explicit `status`, plus one `launchctl print` per remove
-            # attempt that actually reaches an enabled label (cmd_remove
-            # checks whether a label is loaded before calling bootout); the
-            # trailing no-op remove never reaches that check at all (the
-            # label is no longer enabled), so it adds neither a print nor a
-            # bootout call.
-            self.assertEqual(invocations.count("launchctl print"), 3)
+            # cmd_install now also calls launchctl print once per label
+            # reached (to check whether a reinstall needs an unload first):
+            # 2 (the default install) + 1 (explicit llama-embed) + 1 (mid-test
+            # forget's remove) + 1 (the reinstall after the unowned-file
+            # test) + 1 (the explicit `status`) + 1 (the final remove) = 7.
+            # The refused install (an unowned destination) never reaches its
+            # own print call, and the trailing no-op remove never reaches
+            # its print or bootout call either (the label is no longer
+            # enabled by that point).
+            self.assertEqual(invocations.count("launchctl print"), 7)
             self.assertEqual(invocations.count("launchctl bootout"), 2,
                               "one for the mid-test forget, one for the final remove; "
                               "the trailing no-op remove must not invoke bootout again")
@@ -489,10 +535,28 @@ class LaunchdAgentsScriptBehaviorTests(unittest.TestCase):
             fake_home.mkdir()
             failing_shim = tmp_path / "failing-shim"
             failing_shim.mkdir()
-            # bootstrap must still succeed (install uses it); only bootout
-            # fails, so the failure exercised here is specific to remove.
+            # A stateful shim, one marker file per label: bootstrap "loads"
+            # the label its plist path names; print reports loaded (0) once
+            # that label's marker exists, else 113 ("not found"); bootout
+            # always fails. This lets install's own pre-check (print -> 113,
+            # nothing loaded yet) proceed straight to a normal first install
+            # for EVERY label in the default set, while remove's later print
+            # (that label's marker now present) reports loaded, so remove
+            # reaches -- and fails on -- bootout, which is what this test
+            # actually exercises.
             (failing_shim / "launchctl").write_text(
-                '#!/bin/sh\ncase "$1" in\n  bootout) exit 1 ;;\n  *) exit 0 ;;\nesac\n'
+                '#!/bin/sh\n'
+                'case "$1" in\n'
+                '  bootstrap)\n'
+                '    label="$(basename "$3" .plist)"\n'
+                '    touch "$(dirname "$0")/$label.loaded.marker"\n'
+                '    exit 0 ;;\n'
+                '  print)\n'
+                '    label="$(basename "$2")"\n'
+                '    [ -f "$(dirname "$0")/$label.loaded.marker" ] && exit 0 || exit 113 ;;\n'
+                '  bootout) exit 1 ;;\n'
+                '  *) exit 0 ;;\n'
+                'esac\n'
             )
             (failing_shim / "launchctl").chmod(0o755)
             env = {
@@ -555,6 +619,63 @@ class LaunchdAgentsScriptBehaviorTests(unittest.TestCase):
             retry = self._run(["install", "--label", "com.native-stack.qdrant"], env=working_env)
             self.assertEqual(retry.returncode, 0, retry.stdout + retry.stderr)
 
+    def test_reinstalling_an_already_loaded_label_unloads_it_first_and_restores_on_a_failed_bootstrap(self):
+        # Medium finding: re-running install on a label that is owned AND
+        # already loaded (e.g. after a re-render) used to have cp overwrite
+        # the live plist in place, bootstrap fail on an already-bootstrapped
+        # label, and the rollback then delete the just-overwritten file out
+        # from under the still-running service. install must unload it
+        # first (so bootstrap has a chance to succeed), and if bootstrap
+        # still fails, restore -- never delete -- a destination that already
+        # existed before this reinstall.
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            eco_root = tmp_path / "eco"
+            fake_home = tmp_path / "home"
+            fake_home.mkdir()
+            log = tmp_path / "launchctl.log"
+            log.touch()
+            working_shim = self._launchctl_shim(tmp_path, log)
+            env = {
+                **os.environ,
+                "PATH": f"{working_shim}{os.pathsep}{os.environ['PATH']}",
+                "ECO_INSTALL_ROOT": str(eco_root),
+                "HOME": str(fake_home),
+            }
+            self.assertEqual(self._run(["render"], env=env).returncode, 0)
+            first_install = self._run(["install", "--label", "com.native-stack.qdrant"], env=env)
+            self.assertEqual(first_install.returncode, 0, first_install.stdout + first_install.stderr)
+            launch_agents_dir = fake_home / "Library" / "LaunchAgents"
+            dest_plist = launch_agents_dir / "com.native-stack.qdrant.plist"
+            original_content = dest_plist.read_bytes()
+
+            # Now make bootstrap fail, but keep print/bootout working (the
+            # label really is loaded, from the first install above).
+            (working_shim / "launchctl").write_text(
+                '#!/bin/sh\n'
+                f'printf "%s\\n" "launchctl $*" >> {str(log)!r}\n'
+                'case "$1" in\n'
+                '  bootstrap) exit 1 ;;\n'
+                '  print) [ -f "' + str(working_shim) + '/com.native-stack.qdrant.loaded.marker" ] && exit 0 || exit 113 ;;\n'
+                '  bootout) rm -f "' + str(working_shim) + '/com.native-stack.qdrant.loaded.marker"; exit 0 ;;\n'
+                '  *) exit 0 ;;\n'
+                'esac\n'
+            )
+            reinstall = self._run(["install", "--label", "com.native-stack.qdrant"], env=env)
+            self.assertNotEqual(reinstall.returncode, 0, reinstall.stdout + reinstall.stderr)
+            self.assertIn("bootstrap failed", reinstall.stderr)
+            self.assertIn("restored", reinstall.stderr)
+            # The destination is restored to its original content, never
+            # deleted (it existed and was owned before this reinstall).
+            self.assertTrue(dest_plist.is_file())
+            self.assertEqual(dest_plist.read_bytes(), original_content)
+            # Still owned: the label was enabled before this reinstall and
+            # stays that way.
+            state_file = eco_root / "state" / "launchd" / "enabled-labels.txt"
+            self.assertIn("com.native-stack.qdrant", state_file.read_text().split())
+            invocations = log.read_text()
+            self.assertIn("launchctl bootout", invocations)
+
     def test_remove_on_an_unloaded_owned_label_cleans_up_without_calling_bootout(self):
         # Low finding: bootout always fails on a label that is owned but not
         # currently loaded (already unloaded outside this script, crashed,
@@ -569,14 +690,17 @@ class LaunchdAgentsScriptBehaviorTests(unittest.TestCase):
             log.touch()
             shim = tmp_path / "shim"
             shim.mkdir()
-            # print reports "not loaded" (nonzero); bootout would exit 0 if
-            # ever called, so a bootout invocation in the log would prove
-            # the fix is NOT skipping it as intended.
+            # print reports "not loaded" (113, launchctl's own "Could not
+            # find service"); bootout would exit 0 if ever called, so a
+            # bootout invocation in the log would prove the fix is NOT
+            # skipping it as intended. install's own pre-check also calls
+            # print first; 113 there means nothing loaded yet either, so a
+            # first install proceeds normally without trying to bootout.
             (shim / "launchctl").write_text(
                 "#!/bin/sh\n"
                 f'printf "%s\\n" "launchctl $*" >> {str(log)!r}\n'
                 'case "$1" in\n'
-                '  print) exit 1 ;;\n'
+                '  print) exit 113 ;;\n'
                 '  *) exit 0 ;;\n'
                 'esac\n'
             )

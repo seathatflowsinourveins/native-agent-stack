@@ -236,11 +236,29 @@ cmd_install() {
       exit 1
     }
     dest_plist="$launch_agents_dir/$label.plist"
-    if [[ -e "$dest_plist" ]] && ! is_enabled_label "$label"; then
+    local dest_existed=0
+    [[ -e "$dest_plist" ]] && dest_existed=1
+    if [[ "$dest_existed" == 1 ]] && ! is_enabled_label "$label"; then
       printf 'Refusing to overwrite %s: it already exists and %s is not recorded as a label this script itself enabled (%s). Move or remove it yourself first if it is safe to replace.\n' \
         "$dest_plist" "$label" "$enabled_state_file" >&2
       exit 1
     fi
+
+    # A re-run on an owned label that is still loaded (e.g. reinstalling
+    # after a re-render) would otherwise have `cp` overwrite the live
+    # service's plist in place, then `launchctl bootstrap` fail because the
+    # label is already bootstrapped (launchctl error 5), and the failure
+    # path below would then delete the just-overwritten file out from under
+    # the still-running service. Unload it first, so the fresh bootstrap
+    # further down actually applies.
+    if launchctl print "gui/$(id -u)/$label" >/dev/null 2>&1; then
+      if ! launchctl bootout "gui/$(id -u)/$label"; then
+        printf 'Refusing to reinstall %s: it is currently loaded and launchctl bootout failed; leaving it running, unmodified.\n' \
+          "$label" >&2
+        exit 1
+      fi
+    fi
+
     # Every directory this plist writes into or runs from comes from ITS OWN
     # declared StandardOutPath/StandardErrorPath/WorkingDirectory, never
     # this shell's ECO_INSTALL_ROOT: a plist rendered with --host against a
@@ -254,8 +272,29 @@ cmd_install() {
     declared_path="$(plist_value "$source_plist" WorkingDirectory)"
     [[ -n "$declared_path" ]] && mkdir -p "$declared_path"
 
+    # Only ever delete the destination on a failed bootstrap below when it
+    # did not already exist (a genuine first install: nothing to lose,
+    # nothing else could still reference it). When it did exist -- a
+    # previously working, owned install -- back it up first and restore it
+    # (file and, best effort, its loaded state) instead of destroying a
+    # config that was working before this reinstall was attempted.
+    local backup_plist=""
+    if [[ "$dest_existed" == 1 ]]; then
+      backup_plist="$dest_plist.backup.$$"
+      cp -- "$dest_plist" "$backup_plist"
+    fi
     cp -- "$source_plist" "$dest_plist"
-    if ! launchctl bootstrap "gui/$(id -u)" "$dest_plist"; then
+    if launchctl bootstrap "gui/$(id -u)" "$dest_plist"; then
+      [[ -n "$backup_plist" ]] && rm -f -- "$backup_plist"
+      record_enabled_label "$label"
+      printf 'Installed and bootstrapped %s (%s)\n' "$label" "$dest_plist"
+    elif [[ -n "$backup_plist" ]]; then
+      mv -f -- "$backup_plist" "$dest_plist"
+      launchctl bootstrap "gui/$(id -u)" "$dest_plist" >/dev/null 2>&1 || true
+      printf 'launchctl bootstrap failed for %s; restored the previous %s (best-effort reloaded).\n' \
+        "$label" "$dest_plist" >&2
+      exit 1
+    else
       # Undo the copy: an unowned, bootstrap-failed plist left under
       # ~/Library/LaunchAgents would still load at the next login, and
       # neither a retry (the ownership check above) nor remove (which never
@@ -265,8 +304,6 @@ cmd_install() {
         "$label" "$dest_plist" >&2
       exit 1
     fi
-    record_enabled_label "$label"
-    printf 'Installed and bootstrapped %s (%s)\n' "$label" "$dest_plist"
   done < <(selected_labels)
 }
 
@@ -282,16 +319,26 @@ cmd_remove() {
   local label removed_count=0 skipped_count=0 failed_count=0
   while IFS= read -r label; do
     if is_enabled_label "$label"; then
-      if ! launchctl print "gui/$(id -u)/$label" >/dev/null 2>&1; then
-        # Not currently loaded (already unloaded outside this script,
-        # crashed, or never finished bootstrapping): `launchctl bootout`
-        # would just fail on something that is not there. Clean up
-        # directly instead of calling it.
+      local print_status=0
+      launchctl print "gui/$(id -u)/$label" >/dev/null 2>&1 || print_status=$?
+      if [[ "$print_status" == 113 ]]; then
+        # 113 is launchctl's own "Could not find service" -- genuinely not
+        # loaded (already unloaded outside this script, crashed, or never
+        # finished bootstrapping), so `bootout` would just fail on something
+        # that is not there. Clean up directly instead of calling it.
         rm -f -- "$launch_agents_dir/$label.plist"
         forget_enabled_label "$label"
         removed_count=$((removed_count + 1))
         printf '%s was not loaded; removed %s directly (component data and logs kept).\n' \
           "$label" "$launch_agents_dir/$label.plist"
+      elif [[ "$print_status" -ne 0 ]]; then
+        # Any other launchctl print failure (permission, launchd itself
+        # unresponsive, ...) is not confidently "not loaded", so this is
+        # neither a safe direct cleanup nor a safe bootout target. Keep
+        # ownership and report, rather than guess either way.
+        printf '%s: launchctl print failed with exit %s (not 113/"not found"); ownership kept, nothing removed. Investigate launchctl print gui/%s/%s.\n' \
+          "$label" "$print_status" "$(id -u)" "$label" >&2
+        failed_count=$((failed_count + 1))
       elif launchctl bootout "gui/$(id -u)/$label"; then
         # Deleted, not left behind: RunAtLoad plus the plist still sitting
         # under ~/Library/LaunchAgents would make launchd reload it at the

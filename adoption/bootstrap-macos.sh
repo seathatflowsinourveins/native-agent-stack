@@ -458,15 +458,16 @@ npm_package_name() {
 # (3)'s replacement alone is what matters. A component with no
 # platform_dependency pin is a silent no-op.
 install_platform_dependency() {
-  local id="$1" prefix="$2"
+  local id="$1" prefix="$2" wrapper_ignore_scripts="${3:-false}"
   local dep
   dep="$(jq -c --arg id "$id" '.tools[] | select(.id == $id) | .platform_dependency // empty' "$pins_path")"
   [[ -n "$dep" && "$dep" != "null" ]] || return 0
-  local dep_name dep_url dep_sha256 dep_version
+  local dep_name dep_url dep_sha256 dep_version dep_resolved_package
   dep_name="$(jq -r '.name' <<<"$dep")"
   dep_url="$(jq -r '.url' <<<"$dep")"
   dep_sha256="$(jq -r '.sha256' <<<"$dep")"
   dep_version="$(jq -r '.version' <<<"$dep")"
+  dep_resolved_package="$(jq -r '.resolved_package' <<<"$dep")"
   if [[ "$dep_sha256" == "null" || -z "$dep_sha256" ]]; then
     printf 'Refusing %s: platform dependency %s has no verified sha256 in %s (fail closed).\n' \
       "$id" "$dep_name" "$pins_path" >&2
@@ -479,6 +480,7 @@ install_platform_dependency() {
   wrapper_url="$(jq -r --arg id "$id" '.tools[] | select(.id == $id) | .url' "$pins_path")"
   package="$(npm_package_name "$wrapper_url")"
   local wrapper_dir="$prefix/lib/node_modules/$package"
+  local expected_nested="$wrapper_dir/node_modules/$dep_name/package.json"
   local resolved=""
   resolved="$(node -e '
     try {
@@ -489,18 +491,24 @@ install_platform_dependency() {
   ' "$dep_name" "$wrapper_dir" 2>/dev/null)" || resolved=""
 
   local target_dir
-  if [[ -n "$resolved" ]]; then
+  if [[ "$resolved" == "$expected_nested" ]]; then
     target_dir="$(dirname -- "$resolved")"
     rm -rf -- "$target_dir"
   else
-    # Node found nothing to resolve at all (a genuine platform mismatch, or a
-    # future npm change that actually suppresses the fetch): fall back to a
-    # top-level alias next to the wrapper, which the same require.resolve
-    # search below also covers via Node's own directory walk-up.
+    # Node's require.resolve, even given an explicit `paths` array, still
+    # searches its GLOBAL_FOLDERS fallback (NODE_PATH entries,
+    # $HOME/.node_modules, etc. -- Node's own module docs) -- measured
+    # directly: setting NODE_PATH to a decoy directory made this resolve
+    # OUTSIDE the prefix entirely. Only the EXACT nested path this wrapper's
+    # own node_modules would use is ever trusted enough to delete; anything
+    # else (a genuinely absent nested copy, a platform mismatch, or a decoy
+    # resolved from outside the prefix) falls back to a top-level alias
+    # inside this prefix, never touching whatever `resolved` actually named.
     target_dir="$prefix/lib/node_modules/$dep_name"
   fi
   mkdir -p "$target_dir"
   local extract_dir="$stage_dir/${id}-platform-dependency"
+  rm -rf -- "$extract_dir"
   mkdir -p "$extract_dir"
   tar -xzf "$archive" -C "$extract_dir"
   cp -R "$extract_dir/package/." "$target_dir/"
@@ -509,19 +517,62 @@ install_platform_dependency() {
   local verify
   verify="$(node -e '
     const resolvedPath = require.resolve(process.argv[1] + "/package.json", { paths: [process.argv[2]] });
-    console.log(require(resolvedPath).version);
-  ' "$dep_name" "$wrapper_dir" 2>&1)" || {
-    printf 'Refusing %s: platform dependency %s does not resolve from %s after installing the verified copy (fail closed): %s\n' \
-      "$id" "$dep_name" "$wrapper_dir" "$verify" >&2
+    if (resolvedPath !== process.argv[3]) {
+      console.error("resolved to " + resolvedPath + ", expected " + process.argv[3]);
+      process.exit(1);
+    }
+    const pkg = require(resolvedPath);
+    console.log(pkg.version);
+    console.log(pkg.name);
+  ' "$dep_name" "$wrapper_dir" "$target_dir/package.json" 2>&1)" || {
+    printf 'Refusing %s: platform dependency %s does not resolve to %s after installing the verified copy (fail closed): %s\n' \
+      "$id" "$dep_name" "$target_dir/package.json" "$verify" >&2
     exit 1
   }
-  if [[ "$verify" != "$dep_version" ]]; then
+  local verify_version verify_name
+  verify_version="$(sed -n '1p' <<<"$verify")"
+  verify_name="$(sed -n '2p' <<<"$verify")"
+  if [[ "$verify_version" != "$dep_version" ]]; then
     printf 'Refusing %s: platform dependency %s resolves as version %s, pinned as %s (fail closed).\n' \
-      "$id" "$dep_name" "$verify" "$dep_version" >&2
+      "$id" "$dep_name" "$verify_version" "$dep_version" >&2
     exit 1
   fi
-  printf 'Installed and verified platform dependency %s@%s for %s (resolves from %s)\n' \
-    "$dep_name" "$verify" "$id" "$wrapper_dir"
+  if [[ "$verify_name" != "$dep_resolved_package" ]]; then
+    printf 'Refusing %s: platform dependency %s resolves with package.json name %s, pinned resolved_package is %s (fail closed).\n' \
+      "$id" "$dep_name" "$verify_name" "$dep_resolved_package" >&2
+    exit 1
+  fi
+  printf 'Installed and verified platform dependency %s@%s (%s) for %s (resolves from %s)\n' \
+    "$dep_name" "$verify_version" "$verify_name" "$id" "$wrapper_dir"
+
+  if [[ "$wrapper_ignore_scripts" != "true" ]]; then
+    # npm's own documented way to run the lifecycle scripts the
+    # --ignore-scripts install (in install_npm) deferred, now that the
+    # dependency it resolves is the verified one. --ignore-scripts=false is
+    # explicit: a user-level .npmrc with ignore-scripts=true would otherwise
+    # make this call return early without running anything.
+    npm rebuild --global --no-audit --no-fund --ignore-scripts=false --prefix "$prefix" "$package" >/dev/null
+
+    local binary_check
+    binary_check="$(jq -c '.postinstall_binary_check // empty' <<<"$dep")"
+    if [[ -n "$binary_check" && "$binary_check" != "null" ]]; then
+      # A wrapper whose own postinstall copies/hard-links from the platform
+      # dependency into its own bin/ (claude-code's install.cjs) can only be
+      # confirmed by comparing what actually landed there against the
+      # already fully verified source, byte for byte -- cmp works whether
+      # install.cjs used a hardlink or fell back to a plain copy.
+      local platform_file wrapper_file
+      platform_file="$(jq -r '.platform_file' <<<"$binary_check")"
+      wrapper_file="$(jq -r '.wrapper_file' <<<"$binary_check")"
+      if ! cmp -s "$wrapper_dir/$wrapper_file" "$target_dir/$platform_file"; then
+        printf 'Refusing %s: %s does not match the verified %s byte for byte after npm rebuild (fail closed; a lifecycle script may have used an unverified source).\n' \
+          "$id" "$wrapper_dir/$wrapper_file" "$target_dir/$platform_file" >&2
+        exit 1
+      fi
+      printf 'Verified %s is byte-identical to the verified platform dependency binary %s\n' \
+        "$wrapper_dir/$wrapper_file" "$target_dir/$platform_file"
+    fi
+  fi
 }
 
 install_npm() {
@@ -529,14 +580,31 @@ install_npm() {
   command -v npm >/dev/null || { printf 'npm is required to install %s; install node first.\n' "$id" >&2; exit 1; }
   local archive="$cache_dir/${id}-${version}.tgz"
   fetch "$url" "$sha256" "$archive"
-  local prefix="$ecosystem_root/tools/$id-$version"
-  mkdir -p "$prefix"
+  local final_prefix="$ecosystem_root/tools/$id-$version"
   local package
   package="$(npm_package_name "$url")"
   local has_platform_dependency=0
   if [[ "$(jq -r --arg id "$id" '.tools[] | select(.id == $id) | .platform_dependency // empty' "$pins_path")" != "" ]]; then
     has_platform_dependency=1
   fi
+
+  local prefix="$final_prefix"
+  if [[ "$has_platform_dependency" == 1 ]]; then
+    # Staged, not installed directly into a live prefix: a re-run into an
+    # already-populated final_prefix would otherwise leave a window where
+    # the wrapper's newly-updated files point at whatever platform
+    # dependency npm's own install just auto-fetched, unverified, before
+    # install_platform_dependency's fix-up below replaces it. mv onto the
+    # same filesystem is a single atomic rename, so the live final_prefix is
+    # always either the old, complete install or the new one, never a
+    # partially verified one in between; bin_dir's existing symlinks (from a
+    # prior install of this same id/version, if any) keep resolving to a
+    # real, fully verified prefix throughout.
+    prefix="$stage_dir/${id}-${version}-staged"
+    rm -rf -- "$prefix"
+  fi
+  mkdir -p "$prefix"
+
   local npm_install_args=(--global --no-audit --no-fund --prefix "$prefix")
   if [[ "$ignore_scripts" == "true" || "$has_platform_dependency" == 1 ]]; then
     # A platform_dependency needs the wrapper's own lifecycle scripts
@@ -546,11 +614,12 @@ install_npm() {
   fi
   npm install "${npm_install_args[@]}" "$archive" >/dev/null
   if [[ "$has_platform_dependency" == 1 ]]; then
-    install_platform_dependency "$id" "$prefix"
-    if [[ "$ignore_scripts" != "true" ]]; then
-      npm rebuild --global --no-audit --no-fund --prefix "$prefix" "$package" >/dev/null
-    fi
+    install_platform_dependency "$id" "$prefix" "$ignore_scripts"
+    rm -rf -- "$final_prefix"
+    mv -- "$prefix" "$final_prefix"
+    prefix="$final_prefix"
   fi
+
   local linked=0 executable
   if [[ -d "$prefix/bin" ]]; then
     for executable in "$prefix/bin"/*; do

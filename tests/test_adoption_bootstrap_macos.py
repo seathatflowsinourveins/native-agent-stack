@@ -179,10 +179,19 @@ class PinsSchemaTests(unittest.TestCase):
                 self.assertEqual(tool["sha256"], linux[tool["id"]]["sha256"],
                                  f"{tool['id']} is the same registry tarball; hash must match")
 
-    def test_client_npm_pins_name_their_unpinned_darwin_arm64_dependency(self):
+    def test_client_npm_pins_name_and_pin_their_darwin_arm64_platform_dependency(self):
+        # Once documented as "unpinned" (round 1); each now carries a real
+        # platform_dependency with its own verified sha256, so this checks
+        # both that install_note still names it and that it is genuinely
+        # pinned, not merely mentioned.
         by_id = {tool["id"]: tool for tool in self.pins["tools"]}
         self.assertIn("@openai/codex-darwin-arm64", by_id["codex"]["install_note"])
         self.assertIn("@anthropic-ai/claude-code-darwin-arm64", by_id["claude-code"]["install_note"])
+        for tool_id, dep_name in (("codex", "@openai/codex-darwin-arm64"),
+                                   ("claude-code", "@anthropic-ai/claude-code-darwin-arm64")):
+            dep = by_id[tool_id]["platform_dependency"]
+            self.assertEqual(dep["name"], dep_name)
+            self.assertRegex(dep["sha256"], SHA256_HEX)
 
     def test_mcporter_note_does_not_claim_its_tarball_is_the_whole_install(self):
         # `npm view mcporter@0.13.13 dependencies bundleDependencies` (2026-09-22):
@@ -808,14 +817,18 @@ class PlatformDependencyInstallTests(unittest.TestCase):
         }))
         return pins_path
 
-    def _platform_dependency_pin(self) -> dict:
-        return {
+    def _platform_dependency_pin(self, binary_check: dict | None = None) -> dict:
+        pin = {
             "name": "widget-darwin-arm64", "resolved_package": "fixture-real-name",
             "version": "1.2.3", "url": "https://example.invalid/verified-platform-dep.tgz",
             "sha256": self.verified_sha256, "integrity": "sha512-unused-in-this-test",
         }
+        if binary_check:
+            pin["postinstall_binary_check"] = binary_check
+        return pin
 
-    def _run(self, tmp_path: Path, pins_path: Path, dep_id: str, prefix: Path, fetch_body: str):
+    def _run(self, tmp_path: Path, pins_path: Path, dep_id: str, prefix: Path, fetch_body: str,
+             extra_env: dict | None = None):
         harness = tmp_path / "install-platform-dep-harness.sh"
         harness.write_text(
             "set -Eeuo pipefail\n"
@@ -828,17 +841,18 @@ class PlatformDependencyInstallTests(unittest.TestCase):
         )
         (tmp_path / "downloads").mkdir(exist_ok=True)
         (tmp_path / "stage").mkdir(exist_ok=True)
-        return subprocess.run(["bash", str(harness)], capture_output=True, text=True, timeout=60)
+        return subprocess.run(["bash", str(harness)], capture_output=True, text=True, timeout=60,
+                               env={**os.environ, **(extra_env or {})})
 
     def _run_install_npm(self, tmp_path: Path, pins_path: Path, id_: str, version: str,
                           wrapper_archive: Path, wrapper_sha256: str, npm_package: str,
-                          ignore_scripts: str = "false"):
+                          ignore_scripts: str = "false", extra_env: dict | None = None):
         eco_root = tmp_path / "eco"
-        (eco_root / "downloads").mkdir(parents=True)
-        (eco_root / "tools").mkdir(parents=True)
-        (eco_root / "bin").mkdir(parents=True)
+        (eco_root / "downloads").mkdir(parents=True, exist_ok=True)
+        (eco_root / "tools").mkdir(parents=True, exist_ok=True)
+        (eco_root / "bin").mkdir(parents=True, exist_ok=True)
         stage_dir = tmp_path / "stage"
-        stage_dir.mkdir()
+        stage_dir.mkdir(exist_ok=True)
         # npm_package_name derives the package name from this URL's own
         # path structure (matching a real registry tarball URL's
         # convention), which must equal the fixture tarball's actual
@@ -867,7 +881,8 @@ class PlatformDependencyInstallTests(unittest.TestCase):
             + "}\n"
             + f'install_npm {id_} {version} {wrapper_url} {wrapper_sha256} {ignore_scripts}\n'
         )
-        result = subprocess.run(["bash", str(harness)], capture_output=True, text=True, timeout=60)
+        result = subprocess.run(["bash", str(harness)], capture_output=True, text=True, timeout=60,
+                                 env={**os.environ, **(extra_env or {})})
         return result, eco_root
 
     @unittest.skipUnless(NPM, "native npm unavailable")
@@ -930,10 +945,69 @@ class PlatformDependencyInstallTests(unittest.TestCase):
             self.assertEqual(content.stdout.strip(), "VERIFIED_CONTENT")
 
     @unittest.skipUnless(NPM, "native npm unavailable")
+    def test_a_decoy_node_modules_outside_the_prefix_is_never_deleted_or_trusted(self):
+        # Medium finding: Node's require.resolve, even given an explicit
+        # `paths` array, still searches its GLOBAL_FOLDERS fallback (NODE_PATH
+        # entries, $HOME/.node_modules, etc. -- Node's own module docs).
+        # Measured directly: with no wrapper installed yet (nothing nested to
+        # find in `paths`), setting NODE_PATH to a decoy directory makes
+        # require.resolve return a path OUTSIDE the prefix entirely. Before
+        # this fix, install_platform_dependency would have treated that as
+        # the nested copy and `rm -rf`'d whatever NODE_PATH happened to name
+        # -- a real, exploitable arbitrary-path deletion, not merely a
+        # theoretical one. This proves the decoy survives completely
+        # untouched and the verified content still lands correctly, in the
+        # top-level alias fallback this same function already uses for a
+        # genuine platform mismatch.
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            decoy_dir = tmp_path / "decoy-node-path"
+            decoy_pkg = decoy_dir / "widget-darwin-arm64"
+            decoy_pkg.mkdir(parents=True)
+            (decoy_pkg / "package.json").write_text(
+                json.dumps({"name": "decoy-package", "version": "0.0.1-DECOY"}))
+            (decoy_pkg / "marker.txt").write_text("DECOY_CONTENT\n")
+            decoy_mtime_before = (decoy_pkg / "marker.txt").stat().st_mtime
+
+            prefix = tmp_path / "tools" / "widget-1.0.0"
+            # No wrapper is ever installed at prefix/lib/node_modules/widget:
+            # require.resolve's explicit `paths` search finds nothing there,
+            # so (without this fix) it would fall through to NODE_PATH and
+            # resolve the decoy instead.
+            pins_path = self._pins_fixture(tmp_path, {
+                "id": "widget", "version": "1.0.0", "kind": "npm",
+                "url": "https://registry.npmjs.org/widget/-/widget-1.0.0.tgz",
+                "sha256": "0" * 64, "checksum_source": "npm_registry_integrity_crosscheck",
+                "checksum_ref": "test", "install_note": "test",
+                "platform_dependency": self._platform_dependency_pin(),
+            })
+            result = self._run(tmp_path, pins_path, "widget", prefix,
+                                f'cp {json.dumps(str(self.verified_tarball))} "$3"',
+                                extra_env={"NODE_PATH": str(decoy_dir)})
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+            # The decoy is completely untouched: still present, same content,
+            # same mtime (never rm -rf'd and never overwritten in place).
+            self.assertTrue(decoy_pkg.is_dir())
+            self.assertEqual((decoy_pkg / "marker.txt").read_text(), "DECOY_CONTENT\n")
+            self.assertEqual((decoy_pkg / "marker.txt").stat().st_mtime, decoy_mtime_before)
+
+            # The verified content still lands correctly, at the top-level
+            # alias fallback -- the decoy is never trusted as the nested copy.
+            fallback_pkg = prefix / "lib" / "node_modules" / "widget-darwin-arm64"
+            self.assertTrue(fallback_pkg.is_dir())
+            manifest = json.loads((fallback_pkg / "package.json").read_text())
+            self.assertEqual(manifest["name"], "fixture-real-name")
+            self.assertEqual(manifest["version"], "1.2.3")
+
+    @unittest.skipUnless(NPM, "native npm unavailable")
     def test_claude_code_like_wrapper_postinstall_copies_the_verified_dependency(self):
         # Same High finding, for the postinstall-copies-at-install-time shape
         # (install.cjs): the copy must happen AFTER the fix-up, or it copies
         # the unverified bytes into bin/ once and the later fix-up is moot.
+        # postinstall_binary_check exercises install_npm's own cmp assertion
+        # (Low finding: confirm what actually landed in bin/, not just that
+        # npm rebuild exited 0), matching the real pin's field for claude-code.
         with tempfile.TemporaryDirectory() as tmp:
             tmp_path = Path(tmp)
             pins_path = self._pins_fixture(tmp_path, {
@@ -941,12 +1015,14 @@ class PlatformDependencyInstallTests(unittest.TestCase):
                 "url": "https://registry.npmjs.org/fixture-claude-like/-/fixture-claude-like-1.0.0.tgz",
                 "sha256": self.claude_like_sha256, "checksum_source": "npm_registry_integrity_crosscheck",
                 "checksum_ref": "test", "install_note": "test",
-                "platform_dependency": self._platform_dependency_pin(),
+                "platform_dependency": self._platform_dependency_pin(
+                    binary_check={"platform_file": "native-bin", "wrapper_file": "bin/claude-like.exe"}),
             })
             result, eco_root = self._run_install_npm(
                 tmp_path, pins_path, "claudelike", "1.0.0", self.claude_like_tarball, self.claude_like_sha256,
                 npm_package="fixture-claude-like")
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("byte-identical", result.stdout)
             # npm rebuild's own stdout (including the postinstall's
             # console.log) is redirected to /dev/null, matching every other
             # npm invocation in install_npm; the file it actually wrote is
@@ -954,6 +1030,53 @@ class PlatformDependencyInstallTests(unittest.TestCase):
             wrapper_dir = eco_root / "tools" / "claudelike-1.0.0" / "lib" / "node_modules" / "fixture-claude-like"
             final_bin = (wrapper_dir / "bin" / "claude-like.exe").read_text().strip()
             self.assertEqual(final_bin, "VERIFIED_CONTENT")
+
+    @unittest.skipUnless(NPM, "native npm unavailable")
+    def test_postinstall_binary_check_fails_closed_on_a_mismatch(self):
+        # A postinstall that (by bug or tampering) copies from somewhere
+        # other than the verified platform dependency must be caught, not
+        # silently accepted just because npm rebuild itself exited 0.
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            wrong_source_dir = tmp_path / "wrong-postinstall-source"
+            wrong_source_dir.mkdir()
+            package_dir = wrong_source_dir / "claude-like-pkg"
+            (package_dir / "bin").mkdir(parents=True)
+            (package_dir / "bin" / "claude-like.exe").write_text("STUB\n")
+            (package_dir / "postinstall.js").write_text(
+                # Deliberately does NOT resolve the platform dependency;
+                # copies fixed wrong content instead, mimicking a bug or a
+                # tampered lifecycle script that ignores the verified source.
+                'const fs = require("fs");\n'
+                'const path = require("path");\n'
+                'fs.writeFileSync(path.join(__dirname, "bin", "claude-like.exe"), "WRONG_CONTENT\\n");\n'
+                'console.log("POSTINSTALL_WROTE_WRONG_CONTENT");\n'
+            )
+            (package_dir / "package.json").write_text(json.dumps({
+                "name": "fixture-claude-like-wrong", "version": "1.0.0",
+                "bin": {"claude-like": "bin/claude-like.exe"},
+                "optionalDependencies": {"widget-darwin-arm64": f"file:{self.unverified_tarball}"},
+                "scripts": {"postinstall": "node postinstall.js"},
+            }))
+            subprocess.run([NPM, "pack", "--silent", "--pack-destination", str(tmp_path)],
+                            cwd=package_dir, capture_output=True, text=True, timeout=60, check=True)
+            wrong_tarball = tmp_path / "fixture-claude-like-wrong-1.0.0.tgz"
+            wrong_sha256 = hashlib.sha256(wrong_tarball.read_bytes()).hexdigest()
+
+            pins_path = self._pins_fixture(tmp_path, {
+                "id": "claudewrong", "version": "1.0.0", "kind": "npm",
+                "url": "https://registry.npmjs.org/fixture-claude-like-wrong/-/fixture-claude-like-wrong-1.0.0.tgz",
+                "sha256": wrong_sha256, "checksum_source": "npm_registry_integrity_crosscheck",
+                "checksum_ref": "test", "install_note": "test",
+                "platform_dependency": self._platform_dependency_pin(
+                    binary_check={"platform_file": "native-bin", "wrapper_file": "bin/claude-like.exe"}),
+            })
+            result, eco_root = self._run_install_npm(
+                tmp_path, pins_path, "claudewrong", "1.0.0", wrong_tarball, wrong_sha256,
+                npm_package="fixture-claude-like-wrong")
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("does not match the verified", result.stderr)
+            self.assertIn("fail closed", result.stderr)
 
     def test_fails_closed_on_null_sha256_before_any_fetch_or_npm_call(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -976,6 +1099,35 @@ class PlatformDependencyInstallTests(unittest.TestCase):
             self.assertIn("no verified sha256", result.stderr)
             self.assertFalse(prefix.exists())
 
+    @unittest.skipUnless(NPM, "native npm unavailable")
+    def test_fails_closed_when_resolved_package_name_does_not_match_the_pin(self):
+        # Medium finding: resolved_package is pinned but was not previously
+        # read by anything; this checks the extracted package's own
+        # package.json "name" against it and fails closed on a mismatch,
+        # even though the sha256/version both verified correctly (a real
+        # tarball could still be published under a name the pin does not
+        # expect, e.g. a registry mixup).
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            prefix = tmp_path / "tools" / "widget-1.0.0"
+            pins_path = self._pins_fixture(tmp_path, {
+                "id": "widget", "version": "1.0.0", "kind": "npm",
+                "url": "https://registry.npmjs.org/widget/-/widget-1.0.0.tgz",
+                "sha256": "0" * 64, "checksum_source": "npm_registry_integrity_crosscheck",
+                "checksum_ref": "test", "install_note": "test",
+                "platform_dependency": {
+                    "name": "widget-darwin-arm64", "resolved_package": "totally-different-package",
+                    "version": "1.2.3", "url": "https://example.invalid/verified-platform-dep.tgz",
+                    "sha256": self.verified_sha256, "integrity": "sha512-unused-in-this-test",
+                },
+            })
+            result = self._run(tmp_path, pins_path, "widget", prefix,
+                                f'cp {json.dumps(str(self.verified_tarball))} "$3"')
+            self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+            self.assertIn("Refusing widget", result.stderr)
+            self.assertIn("resolved_package is totally-different-package", result.stderr)
+            self.assertIn("fixture-real-name", result.stderr)
+
     def test_is_a_no_op_when_the_pin_has_no_platform_dependency(self):
         with tempfile.TemporaryDirectory() as tmp:
             tmp_path = Path(tmp)
@@ -989,6 +1141,54 @@ class PlatformDependencyInstallTests(unittest.TestCase):
             result = self._run(tmp_path, pins_path, "plain", prefix, 'echo "fetch must not run" >&2; exit 1')
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertEqual(result.stdout.strip(), "")
+
+    @unittest.skipUnless(NPM, "native npm unavailable")
+    def test_a_rerun_into_an_already_populated_prefix_stages_and_swaps_atomically(self):
+        # Low finding: re-running install_npm for the same id/version into an
+        # already-populated final_prefix would otherwise install directly
+        # into a live prefix, leaving a window where the wrapper's freshly
+        # updated files point at whatever platform dependency npm's own
+        # install just auto-fetched, unverified, before the fix-up runs.
+        # Staging under stage_dir and moving the finished, fully verified
+        # result into place means the live final_prefix is always either the
+        # complete old install or the complete new one. This runs install_npm
+        # twice for the same id/version and checks: both succeed, the
+        # staging directory never survives either run, and the final content
+        # is still fully verified after the second (re-)run.
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            pins_path = self._pins_fixture(tmp_path, {
+                "id": "codexlike", "version": "1.0.0", "kind": "npm",
+                "url": "https://registry.npmjs.org/fixture-codex-like/-/fixture-codex-like-1.0.0.tgz",
+                "sha256": self.codex_like_sha256, "checksum_source": "npm_registry_integrity_crosscheck",
+                "checksum_ref": "test", "install_note": "test",
+                "platform_dependency": self._platform_dependency_pin(),
+            })
+            first, eco_root = self._run_install_npm(
+                tmp_path, pins_path, "codexlike", "1.0.0", self.codex_like_tarball, self.codex_like_sha256,
+                npm_package="fixture-codex-like")
+            self.assertEqual(first.returncode, 0, first.stdout + first.stderr)
+            staged_dir = tmp_path / "stage" / "codexlike-1.0.0-staged"
+            self.assertFalse(staged_dir.exists(), "the staging directory must not survive a successful run")
+
+            second, eco_root = self._run_install_npm(
+                tmp_path, pins_path, "codexlike", "1.0.0", self.codex_like_tarball, self.codex_like_sha256,
+                npm_package="fixture-codex-like")
+            self.assertEqual(second.returncode, 0, second.stdout + second.stderr)
+            self.assertFalse(staged_dir.exists(), "the staging directory must not survive the re-run either")
+
+            wrapper_dir = eco_root / "tools" / "codexlike-1.0.0" / "lib" / "node_modules" / "fixture-codex-like"
+            self.assertTrue(wrapper_dir.is_dir())
+            content = subprocess.run(
+                ["node", "-e",
+                 'const p = require.resolve("widget-darwin-arm64/package.json", {paths: [process.argv[1]]});'
+                 'const fs = require("fs"), path = require("path");'
+                 'process.stdout.write(fs.readFileSync(path.join(path.dirname(p), "native-bin"), "utf8").trim());',
+                 str(wrapper_dir)],
+                capture_output=True, text=True, timeout=30,
+            )
+            self.assertEqual(content.returncode, 0, content.stdout + content.stderr)
+            self.assertEqual(content.stdout.strip(), "VERIFIED_CONTENT")
 
     def test_install_npm_passes_ignore_scripts_only_when_the_pin_sets_it(self):
         with tempfile.TemporaryDirectory() as tmp:

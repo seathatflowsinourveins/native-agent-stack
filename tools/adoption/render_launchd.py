@@ -68,6 +68,12 @@ def render_plist(template_path: Path, values: dict[str, str]) -> bytes:
         raise RenderError(f"{template_path.name}: not a well-formed plist template ({error})") from None
     try:
         substituted = _substitute(data, values)
+        # Inside the same try as _substitute: plistlib.dumps also raises
+        # ValueError (e.g. a substituted value containing a control
+        # character, which XML plist text content cannot represent), and
+        # that must become the same RenderError every other failure here
+        # does, not an uncaught exception from outside this block.
+        return plistlib.dumps(substituted, fmt=plistlib.FMT_XML)
     except KeyError as error:
         raise RenderError(f"{template_path.name}: missing template value {error}") from None
     except ValueError as error:
@@ -75,7 +81,6 @@ def render_plist(template_path: Path, values: dict[str, str]) -> bytes:
         # malformed placeholder, e.g. a bare trailing "$" or "$" followed by
         # a character that cannot start an identifier.
         raise RenderError(f"{template_path.name}: invalid placeholder ({error})") from None
-    return plistlib.dumps(substituted, fmt=plistlib.FMT_XML)
 
 
 def collect_values(args: argparse.Namespace) -> dict[str, str]:
