@@ -544,6 +544,7 @@ jobs:
                 --component-id codex \
                 --stage install \
                 --evidence-class native_proven \
+                --identity "ci-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-${label}" \
                 --from-stack-commands
               "$python_bin" scripts/host_receipts.py validate
               "$python_bin" scripts/component_matrix.py --write

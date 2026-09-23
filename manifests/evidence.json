@@ -3018,8 +3018,8 @@
     },
     {
       "path": ".github/workflows/adoption-bootstrap.yml",
-      "sha256": "a4144873840e0d8643c9ac180675b94a10e997e4907acb66067775bfd04c83a7",
-      "bytes": 29991
+      "sha256": "d97fc5c08288c6dae0ba2ae74d12764d5e16087973022b0e319a7fec104ce4d8",
+      "bytes": 30073
     },
     {
       "path": ".github/workflows/catalog-freshness.yml",
