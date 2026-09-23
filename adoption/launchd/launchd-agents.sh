@@ -183,7 +183,51 @@ forget_enabled_label() {
 #
 # `set +e`: must never itself become fatal under the script's own `set -e`,
 # whether invoked as an ordinary call or as the EXIT trap.
+# Round 3f (Codex Medium: tri-state print / an unrelated loaded label):
+# reports one of FOUR states for a label, never collapsing to a binary
+# loaded/not-loaded the way a single `launchctl print; $?` check did:
+#   loaded_here      print succeeded AND its own "path = " line names
+#                    dest_plist itself -- the only state that confirms the
+#                    RUNNING instance is genuinely this plist, not a
+#                    same-labeled but unrelated service holding the label
+#                    from somewhere else entirely.
+#   loaded_elsewhere print succeeded but the path does not match dest_plist
+#                    (or no path line could be read at all).
+#   not_found        exit 113 -- genuinely unloaded.
+#   unknown          any other exit code (permission, launchd itself
+#                    unresponsive, ...).
+# Callers must never take a destructive or ownership-claiming action on
+# loaded_elsewhere or unknown.
+launchctl_label_state() {
+  local label="$1" dest_plist="$2"
+  local print_output print_status
+  print_output="$(launchctl print "gui/$(id -u)/$label" 2>/dev/null)"
+  print_status=$?
+  if [[ "$print_status" == 113 ]]; then
+    printf 'not_found\n'
+    return 0
+  fi
+  if [[ "$print_status" != 0 ]]; then
+    printf 'unknown\n'
+    return 0
+  fi
+  local loaded_path
+  loaded_path="$(printf '%s\n' "$print_output" | sed -n 's/^[[:space:]]*path = //p' | head -n 1)"
+  if [[ -n "$loaded_path" ]] && [[ "$loaded_path" -ef "$dest_plist" ]]; then
+    printf 'loaded_here\n'
+  else
+    printf 'loaded_elsewhere\n'
+  fi
+}
+
 current_install_label=""
+# Set by cmd_install right after a successful `launchctl bootout` it issued
+# this run, cleared once reconcile_install has resolved whatever ambiguity
+# that leaves (round 3f finding 4: delayed teardown). A bootout returning
+# success does not guarantee launchd has actually finished tearing the old
+# instance down; while this flag is set, a "loaded" read is a transitional
+# snapshot, not a settled one.
+current_install_bootout_pending=""
 reconcile_install() {
   set +e
   local label="$current_install_label"
@@ -194,59 +238,133 @@ reconcile_install() {
   local dest_plist="$launch_agents_dir/$label.plist"
   local backup_plist="$dest_plist.bak"
   local result=0
+  local state
 
   if [[ ! -e "$backup_plist" ]]; then
     # No backup: either a genuine first install for this label (nothing to
     # compare dest_plist against) or an earlier reconcile already resolved
-    # and removed it. If dest_plist exists but is not loaded, converge by
-    # loading it; otherwise there is nothing here to reconcile (an earlier,
-    # already-reported refusal covers a still-absent dest_plist).
-    if [[ -e "$dest_plist" ]]; then
-      if ! launchctl print "gui/$(id -u)/$label" >/dev/null 2>&1 \
-         && ! launchctl bootstrap "gui/$(id -u)" "$dest_plist" >/dev/null 2>&1; then
-        printf 'WARNING: %s needs attention: it is on disk but not loaded, and no backup exists to fall back to. Re-running "launchd-agents.sh install --label %s" converges it, the way brew services does.\n' \
-          "$label" "$label" >&2
-        result=1
-      fi
+    # and removed it. Ownership is recorded HERE, never earlier (round 3f
+    # finding 3): only once state confirms dest_plist's OWN content, by
+    # path, is what launchd actually has loaded, so a later run's L2
+    # bootout gate can never be tricked into tearing down an unrelated
+    # service that merely happens to share this label.
+    #
+    # This whole verify-or-remove path applies ONLY when the label is not
+    # already owned: an ALREADY-owned, previously-confirmed install with no
+    # backup here simply means nothing is currently mid-reinstall for it --
+    # there is nothing to reconcile, and a transient launchctl print hiccup
+    # at this exact moment must never delete a working install. cmd_install
+    # 's own bootout-gate check (with its own launchctl_label_state call,
+    # immediately before it would do anything destructive) is where an
+    # already-owned label's CURRENT load state is actually verified.
+    if [[ -e "$dest_plist" ]] && ! is_enabled_label "$label"; then
+      state="$(launchctl_label_state "$label" "$dest_plist")"
+      case "$state" in
+        loaded_here)
+          record_enabled_label "$label"
+          ;;
+        not_found)
+          if launchctl bootstrap "gui/$(id -u)" "$dest_plist" >/dev/null 2>&1; then
+            record_enabled_label "$label"
+            printf 'Converged %s: loaded a fresh install.\n' "$label" >&2
+          else
+            rm -f -- "$dest_plist"
+            printf 'WARNING: %s could not be loaded; removed the unconfirmed %s (never recorded as enabled). Re-running "launchd-agents.sh install --label %s" starts fresh.\n' \
+              "$label" "$dest_plist" "$label" >&2
+            result=1
+          fi
+          ;;
+        loaded_elsewhere|unknown)
+          # Never claim it, never touch what might be running under it:
+          # only the FILE this run itself wrote (never loaded, never
+          # recorded) is removed.
+          rm -f -- "$dest_plist"
+          printf 'WARNING: %s: refusing to claim it (%s); removed the unconfirmed %s, touched nothing else. Re-running "launchd-agents.sh install --label %s" retries.\n' \
+            "$label" "$([[ "$state" == unknown ]] && printf 'its load state could not be confirmed' || printf 'it is already loaded from a different path')" \
+            "$dest_plist" "$label" >&2
+          result=1
+          ;;
+      esac
     fi
+    current_install_bootout_pending=""
     set -Eeuo pipefail
     return "$result"
   fi
 
-  local loaded=0
-  launchctl print "gui/$(id -u)/$label" >/dev/null 2>&1 && loaded=1
+  state="$(launchctl_label_state "$label" "$dest_plist")"
+  # Round 3f finding 4 (delayed teardown): if this run attempted a bootout
+  # and state still reads as loaded (either identity), that may simply be
+  # launchd not having finished tearing the old instance down yet -- a
+  # transitional read. Re-derive it with the SAME bounded poll the
+  # pre-bootstrap check already uses (never a fresh, unbounded one) rather
+  # than trusting a single snapshot a moment later would have read
+  # differently.
+  if [[ "$current_install_bootout_pending" == 1 ]] \
+     && { [[ "$state" == loaded_here ]] || [[ "$state" == loaded_elsewhere ]]; }; then
+    if wait_until_unloaded "$label"; then
+      state=not_found
+    else
+      state=unknown
+    fi
+  fi
+  current_install_bootout_pending=""
+
+  if [[ "$state" == unknown ]]; then
+    # Finding 2: on unknown, no destructive action and no bootstrap either
+    # way -- keep the backup and report, regardless of which branch below
+    # would otherwise apply.
+    printf 'WARNING: %s needs attention: its load state could not be confirmed (backup at %s, kept). Re-running "launchd-agents.sh install --label %s" converges it, the way brew services does.\n' \
+      "$label" "$backup_plist" "$label" >&2
+    set -Eeuo pipefail
+    return 1
+  fi
 
   if [[ -e "$dest_plist" ]] && [[ "$dest_plist" -ef "$backup_plist" ]]; then
     # dest_plist is still the backup's own original (untouched, or already
-    # restored by an earlier reconcile).
-    if [[ "$loaded" == 1 ]]; then
-      rm -f -- "$backup_plist"
-    elif launchctl bootstrap "gui/$(id -u)" "$dest_plist" >/dev/null 2>&1; then
-      rm -f -- "$backup_plist"
-      printf 'Converged %s: reloaded the previous install.\n' "$label" >&2
-    else
-      printf 'WARNING: %s needs attention (backup at %s). Re-running "launchd-agents.sh install --label %s" converges it, the way brew services does.\n' \
-        "$label" "$backup_plist" "$label" >&2
-      result=1
-    fi
-  elif [[ -e "$dest_plist" ]]; then
-    # A different identity from the backup: the new plist is on disk.
-    if [[ "$loaded" == 1 ]]; then
-      rm -f -- "$backup_plist"
-    elif launchctl bootstrap "gui/$(id -u)" "$dest_plist" >/dev/null 2>&1; then
-      rm -f -- "$backup_plist"
-      printf 'Converged %s: reloaded the new install.\n' "$label" >&2
-    elif mv -f -- "$backup_plist" "$dest_plist" 2>/dev/null; then
+    # restored by an earlier reconcile). Dropping the backup NAME is always
+    # harmless in this branch regardless of state (the invariant): the same
+    # data stays reachable via dest_plist's own name either way.
+    if [[ "$state" == not_found ]]; then
       if launchctl bootstrap "gui/$(id -u)" "$dest_plist" >/dev/null 2>&1; then
-        printf 'Converged %s: the new install would not load; restored and reloaded the previous one.\n' "$label" >&2
+        rm -f -- "$backup_plist"
+        printf 'Converged %s: reloaded the previous install.\n' "$label" >&2
       else
-        printf 'WARNING: %s needs attention: restored the previous plist, but it also failed to reload. Run: launchctl bootstrap "gui/%s" %q\n' \
-          "$label" "$(id -u)" "$dest_plist" >&2
+        printf 'WARNING: %s needs attention (backup at %s). Re-running "launchd-agents.sh install --label %s" converges it, the way brew services does.\n' \
+          "$label" "$backup_plist" "$label" >&2
         result=1
       fi
     else
-      printf 'WARNING: %s needs attention (backup at %s). Re-running "launchd-agents.sh install --label %s" converges it, the way brew services does.\n' \
-        "$label" "$backup_plist" "$label" >&2
+      rm -f -- "$backup_plist"
+    fi
+  elif [[ -e "$dest_plist" ]]; then
+    # A different identity from the backup: the new plist is on disk. Per
+    # the invariant, the backup is deleted or consumed ONLY once the
+    # service is confirmed loaded from dest_plist itself.
+    if [[ "$state" == loaded_here ]]; then
+      rm -f -- "$backup_plist"
+    elif [[ "$state" == not_found ]]; then
+      if launchctl bootstrap "gui/$(id -u)" "$dest_plist" >/dev/null 2>&1; then
+        rm -f -- "$backup_plist"
+        printf 'Converged %s: reloaded the new install.\n' "$label" >&2
+      elif mv -f -- "$backup_plist" "$dest_plist" 2>/dev/null; then
+        if launchctl bootstrap "gui/$(id -u)" "$dest_plist" >/dev/null 2>&1; then
+          printf 'Converged %s: the new install would not load; restored and reloaded the previous one.\n' "$label" >&2
+        else
+          printf 'WARNING: %s needs attention: restored the previous plist, but it also failed to reload. Run: launchctl bootstrap "gui/%s" %q\n' \
+            "$label" "$(id -u)" "$dest_plist" >&2
+          result=1
+        fi
+      else
+        printf 'WARNING: %s needs attention (backup at %s). Re-running "launchd-agents.sh install --label %s" converges it, the way brew services does.\n' \
+          "$label" "$backup_plist" "$label" >&2
+        result=1
+      fi
+    else
+      # loaded_elsewhere: never confirmed as OUR content, so never drop or
+      # consume the backup, and never attempt bootstrap either -- exactly
+      # what an unrelated, already-loaded label needs: touched nothing.
+      printf 'WARNING: %s needs attention: it is loaded from somewhere other than %s (backup at %s, kept). Re-running "launchd-agents.sh install --label %s" converges it, the way brew services does.\n' \
+        "$label" "$dest_plist" "$backup_plist" "$label" >&2
       result=1
     fi
   else
@@ -358,7 +476,7 @@ with open(sys.argv[1], "rb") as handle:
   printf 'All %s rendered plist(s) passed lint.\n' "$checked_count"
 }
 
-# --- cmd_install step table (round 3e) ------------------------------------
+# --- cmd_install step table (round 3f) ------------------------------------
 # INT, TERM and HUP are explicitly trapped (script-wide; see above), so bash
 # always defers a caught signal until whatever foreign command is currently
 # running finishes -- every step's outcome is the same whether it fails
@@ -367,30 +485,46 @@ with open(sys.argv[1], "rb") as handle:
 # services` does): reconcile_install (called both explicitly at the end of
 # a normal attempt and via the EXIT trap) is the ONLY recovery logic, and it
 # is a pure function of what is actually on disk and actually loaded, never
-# a replay of a specific step.
+# a replay of a specific step. Round 3f moved TWO things relative to round
+# 3e's table, both load-bearing for the fixes below: ownership
+# (record_enabled_label) is no longer recorded at step 1 -- only inside
+# reconcile_install (step 9), once launchctl_label_state has path-confirmed
+# dest_plist itself is what is actually loaded -- and a failed preflight
+# (step 2) now ABORTS this run instead of continuing past it.
 # Step                                    | State this can leave behind                                   | What reconcile_install does with it
-# 1. record_enabled_label + set           | is_enabled_label now true; dest_plist/backup untouched         | (a pure bookkeeping step; nothing to
-#    current_install_label                |                                                                 | reconcile from it alone)
-# 2. reconcile any stale backup from a    | (reconcile_install is itself idempotent/safe to interrupt)     | re-run install again; it re-reconciles
-#    previous run (pre-flight)            |                                                                 |
+# 1. snapshot was_already_enabled + set   | dest_plist/backup untouched; ownership NOT yet recorded even   | (a pure bookkeeping step; nothing to
+#    current_install_label                | for a fresh install (round 3f: moved to step 9)                | reconcile from it alone)
+# 2. reconcile any stale backup from a    | (reconcile_install is itself idempotent/safe to interrupt)     | round 3f High: this call's OWN
+#    previous run (pre-flight)            |                                                                 | failure now aborts (`|| exit 1`) --
+#                                         |                                                                 | it no longer continues past an
+#                                         |                                                                 | unresolved prior backup into step 3
 # 3. ln dest_plist -> backup_plist        | either exists completely or not at all (a hard link is atomic) | dest_plist -ef backup_plist: "old"
 #    (hard link, only if dest existed)    |                                                                 | case below
-# 4. bootout, if loaded (L2)              | dest_plist still == backup (old); loaded state now unknown     | re-derives loaded via launchctl print
-#                                         | until reconcile re-checks it                                    | itself; bootstraps dest_plist if not
-# 5. wait_until_unloaded (L4, best        | same as 4                                                       | loaded (still the OLD content)
-#    effort -- its own timeout is not     |                                                                 |
-#    itself a failure branch)             |                                                                 |
-# 6. cp source_plist -> dest_plist.new    | dest_plist unchanged; dest_plist.new may be partial (inert,    | same as 4 (dest_plist still "old")
+# 4. bootout gate (only if                | round 3f findings 2 and 3: launchctl_label_state must confirm  | refuses and exits BEFORE any of
+#    was_already_enabled): launchctl_     | loaded_here (a path match, not just any successful print) --   | steps 5-8 run at all on
+#    label_state, then bootout if         | loaded_elsewhere or unknown refuses outright, touching nothing | loaded_elsewhere/unknown; re-derives
+#    loaded_here                          |                                                                 | loaded via launchctl print itself
+# 5. wait_until_unloaded (best effort --  | current_install_bootout_pending=1 while this is unresolved     | otherwise (steps 5-8 proceed as
+#    its own timeout is not itself a      | (round 3f finding 4: a bootout success does not guarantee      | before)
+#    failure branch, but install DOES     | teardown has actually finished)                                |
+#    refuse if it never resolves)         |                                                                 |
+# 6. cp source_plist -> dest_plist.new    | dest_plist unchanged; dest_plist.new may be partial (inert,    | same as 4-5 (dest_plist still "old")
 #    (staging)                            | never read by anything live)                                   |
 # 7. mv dest_plist.new -> dest_plist      | dest_plist now the NEW content (a different inode from backup) | dest_plist not -ef backup_plist:
-#    (same-directory rename-into-place)  |                                                                 | "new" case -- loaded, or bootstraps
-#                                         |                                                                 | it, or (if that fails) restores the
-#                                         |                                                                 | backup by rename and bootstraps THAT
+#    (same-directory rename-into-place)  |                                                                 | "new" case -- loaded_here drops the
+#                                         |                                                                 | backup and records ownership; not_
+#                                         |                                                                 | found bootstraps it or (that failing)
+#                                         |                                                                 | restores+reloads the backup;
+#                                         |                                                                 | loaded_elsewhere/unknown never
+#                                         |                                                                 | touches the backup or bootstraps
 # 8. launchctl bootstrap (best effort --  | dest_plist is NEW; loaded state unknown until reconcile checks | same as 7
 #    its own success/failure is not       |                                                                 |
 #    itself a failure branch)             |                                                                 |
-# 9. reconcile_install (explicit, always  | converged: backup dropped (success) or kept with the exact     | (this IS the recovery step; nothing
-#    called -- see above)                 | manual command printed (needs attention)                       | further to reconcile from it)
+# 9. reconcile_install (explicit, always  | converged: backup dropped and ownership recorded (only once    | (this IS the recovery step; nothing
+#    called -- see above)                 | loaded_here is path-confirmed), or kept with the exact manual  | further to reconcile from it). If
+#                                         | command printed (needs attention). Round 3f finding 4: if this | current_install_bootout_pending is
+#                                         | run's own bootout is still pending, re-polls (reusing step 5's | still set here, re-polls before
+#                                         | wait_until_unloaded) rather than trusting one transitional read| trusting a "loaded" read (see step 5)
 # ---------------------------------------------------------------------------
 cmd_install() {
   [[ -d "$render_dir" ]] || {
@@ -419,18 +553,24 @@ cmd_install() {
     fi
 
     # Only from here on is this label's own state this run's responsibility
-    # to reconcile, including via the EXIT trap: recorded as owned
-    # immediately, before anything below could leave it in a state a retry
-    # needs to recognize as this script's own.
+    # to reconcile, including via the EXIT trap. Ownership itself is
+    # recorded inside reconcile_install, never here (round 3f finding 3):
+    # only once a label's state is confirmed loaded from dest_plist's own
+    # path can a later run's L2 bootout gate safely trust it.
     current_install_label="$label"
-    record_enabled_label "$label"
     backup_plist="$dest_plist.bak"
 
     # Converge any incomplete attempt from an EARLIER run for this exact
     # label first (brew-services style): a leftover backup here means a
     # previous install never finished, and building this run on top of that
-    # would only compound it.
-    reconcile_install || true
+    # would only compound it. Round 3f High: its OWN failure to reach a
+    # clean, converged state must abort this run -- continuing past it
+    # (the previous design's `|| true`) let execution reach the backup
+    # step below with an UNRESOLVED prior backup still describing the last
+    # known-good install, immediately overwriting that description with a
+    # fresh hard link to whatever (possibly unusable) content dest_plist
+    # currently holds, permanently losing the only way back.
+    reconcile_install || exit 1
 
     # Every directory this plist writes into or runs from comes from ITS
     # OWN declared StandardOutPath/StandardErrorPath/WorkingDirectory, never
@@ -470,37 +610,56 @@ cmd_install() {
     # plist yet, never previously recorded as enabled -- is never this
     # script's to bootout.
     if [[ "$was_already_enabled" == 1 ]]; then
-      local print_status=0
-      launchctl print "gui/$(id -u)/$label" >/dev/null 2>&1 || print_status=$?
-      if [[ "$print_status" == 0 ]]; then
-        if ! launchctl bootout "gui/$(id -u)/$label"; then
-          printf 'Refusing to reinstall %s: it is currently loaded and launchctl bootout failed; leaving it running, unmodified.\n' \
-            "$label" >&2
+      local pre_bootout_state
+      pre_bootout_state="$(launchctl_label_state "$label" "$dest_plist")"
+      case "$pre_bootout_state" in
+        loaded_here)
+          if ! launchctl bootout "gui/$(id -u)/$label"; then
+            printf 'Refusing to reinstall %s: it is currently loaded and launchctl bootout failed; leaving it running, unmodified.\n' \
+              "$label" >&2
+            exit 1
+          fi
+          # Round 3f finding 4: bootout returning success does not
+          # guarantee teardown has actually finished. Flagged for
+          # reconcile_install (below, and the EXIT trap): if a signal or an
+          # error reaches it before wait_until_unloaded resolves this, it
+          # re-derives the settled state with the same bounded poll rather
+          # than trusting a transitional "still loaded" read.
+          current_install_bootout_pending=1
+          # Never bootstrap the new content over a service that never
+          # actually stopped.
+          if ! wait_until_unloaded "$label"; then
+            printf 'Refusing to reinstall %s: launchctl bootout succeeded but the service did not report unloaded (launchctl print never returned 113) within the bounded wait; leaving it as is.\n' \
+              "$label" >&2
+            exit 1
+          fi
+          current_install_bootout_pending=""
+          ;;
+        not_found)
+          : # Nothing loaded under this label; proceed straight to staging.
+          ;;
+        loaded_elsewhere)
+          # Round 3f finding 3: even for a label this script has recorded
+          # owning before, never bootout something whose CURRENT loaded
+          # instance is not confirmed to be dest_plist itself -- an
+          # unrelated service could have since taken the same label.
+          # Refuse and touch nothing.
+          printf 'Refusing to reinstall %s: it is loaded from somewhere other than %s; leaving it running, unmodified. Investigate launchctl print gui/%s/%s.\n' \
+            "$label" "$dest_plist" "$(id -u)" "$label" >&2
           exit 1
-        fi
-        # L4: bootout can return before the service has actually finished
-        # tearing down; only proceed once launchctl print confirms it,
-        # within a bounded wait, never trusting bootout's exit code alone --
-        # never bootstrap the new content over a service that never
-        # actually stopped. reconcile_install's own convergence logic
-        # (below, and the EXIT trap) is for what happens once install has
-        # genuinely started replacing dest_plist, not a substitute for this
-        # refusal.
-        if ! wait_until_unloaded "$label"; then
-          printf 'Refusing to reinstall %s: launchctl bootout succeeded but the service did not report unloaded (launchctl print never returned 113) within the bounded wait; leaving it as is.\n' \
-            "$label" >&2
+          ;;
+        unknown)
+          # L5: only exit 113 ("Could not find service") is confidently
+          # "not loaded"; any other launchctl print failure (permission,
+          # launchd itself unresponsive, ...) must refuse rather than
+          # silently assume "not loaded" and bootstrap over state print
+          # could not determine -- exactly what remove already does for
+          # the same exit code, below.
+          printf 'Refusing to reinstall %s: launchctl print did not confidently report loaded, not-found, or a matching path; leaving it as is. Investigate launchctl print gui/%s/%s.\n' \
+            "$label" "$(id -u)" "$label" >&2
           exit 1
-        fi
-      elif [[ "$print_status" != 113 ]]; then
-        # L5: only exit 113 ("Could not find service") is confidently "not
-        # loaded"; any other launchctl print failure (permission, launchd
-        # itself unresponsive, ...) must refuse rather than silently assume
-        # "not loaded" and bootstrap over state print could not determine --
-        # exactly what remove already does for the same exit code, below.
-        printf 'Refusing to reinstall %s: launchctl print failed with exit %s (not 113/"not found"); not confidently unloaded, leaving it as is. Investigate launchctl print gui/%s/%s.\n' \
-          "$label" "$print_status" "$(id -u)" "$label" >&2
-        exit 1
-      fi
+          ;;
+      esac
     fi
 
     # Stage in the same directory, then rename into place: a failed `cp`

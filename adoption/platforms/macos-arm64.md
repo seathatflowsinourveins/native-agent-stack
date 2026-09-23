@@ -327,6 +327,26 @@ script's own state file recorded as enabled, never deleting data). None of
 the three agents has been bootstrapped, kickstarted or booted out on any Mac,
 hosted or otherwise; this stays true after this update.
 
+**Untested boundary for real-Mac acceptance: asynchronous launchd teardown was
+modelled, not observed natively.** `launchd-agents.sh`'s `reconcile_install`
+assumes a `launchctl bootout` that returns success can still leave the old
+instance tearing down for a bounded time afterward -- a `launchctl print`
+moments later can keep reporting it loaded during that window -- and re-polls
+(reusing the same bounded `wait_until_unloaded` helper the main install path
+uses) rather than trusting one such read and declaring convergence with zero
+reload attempts. This is source-supported inference from `launchctl(1)`'s own
+documented behavior (a real Mac's `man launchctl`; `bootout` and `bootstrap`
+are documented as asynchronous relative to the daemon's own teardown/startup)
+and the shimmed/simulated evidence in `tests/test_adoption_launchd.py` (a
+mock `launchctl` models the delayed-loaded
+window with a bounded call counter), never a native observation of an actual
+delayed teardown on real launchd: no Mac, hosted or otherwise, has produced a
+`launchctl bootout` whose corresponding `launchctl print` stayed loaded for
+any measured, non-zero duration afterward. A real Mac run should specifically
+try to reproduce that window (e.g. a service with a slow `KeepAlive` shutdown
+path) rather than assume the bounded re-poll alone is proof it converges
+correctly there.
+
 ## Qdrant collections
 
 Qdrant collections are **re-indexed on the new host, never copied** — the same

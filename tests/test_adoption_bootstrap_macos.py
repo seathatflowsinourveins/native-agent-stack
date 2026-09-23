@@ -1650,6 +1650,236 @@ class PlatformDependencyInstallTests(unittest.TestCase):
             self.assertEqual(self._resolved_content(migrated_wrapper), original_content)
             self.assertIn(migrating[0].name, second.stderr)
 
+    @unittest.skipUnless(NPM, "native npm unavailable")
+    def test_a_failed_npm_install_leaves_final_prefix_untouched(self):
+        # Step 1 (build tree), failure mode: the wrapper's own `npm install`
+        # fails outright, before final_prefix (a live symlink from an
+        # earlier successful install) is ever referenced. final_prefix must
+        # be left exactly as it was: still the same symlink, to the same
+        # verified content.
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            pins_path = self._codex_like_pins(tmp_path)
+            first, eco_root = self._run_install_npm(
+                tmp_path, pins_path, "codexlike", "1.0.0", self.codex_like_tarball, self.codex_like_sha256,
+                npm_package="fixture-codex-like")
+            self.assertEqual(first.returncode, 0, first.stdout + first.stderr)
+            final_prefix = eco_root / "tools" / "codexlike-1.0.0"
+            self.assertTrue(final_prefix.is_symlink())
+            original_target = final_prefix.resolve()
+            wrapper_dir = final_prefix / "lib" / "node_modules" / "fixture-codex-like"
+            self.assertEqual(self._resolved_content(wrapper_dir), "VERIFIED_CONTENT")
+
+            real_npm = shutil.which("npm")
+            self.assertIsNotNone(real_npm)
+            failing_npm_shim = tmp_path / "failing-npm-shim"
+            failing_npm_shim.mkdir()
+            # Real npm, except the wrapper's own top-level `install`
+            # subcommand always fails; `npm rebuild` (install_platform_
+            # dependency's own, later call) and any version probe are
+            # unaffected.
+            (failing_npm_shim / "npm").write_text(
+                "#!/bin/sh\n"
+                'if [ "$1" = "install" ]; then\n'
+                "  echo 'npm: injected install failure for testing' >&2\n"
+                "  exit 1\n"
+                "fi\n"
+                f'exec {real_npm} "$@"\n'
+            )
+            (failing_npm_shim / "npm").chmod(0o755)
+
+            second, _ = self._run_install_npm(
+                tmp_path, pins_path, "codexlike", "1.0.0", self.codex_like_tarball, self.codex_like_sha256,
+                npm_package="fixture-codex-like",
+                extra_env={"PATH": f"{failing_npm_shim}{os.pathsep}{os.environ['PATH']}"})
+            self.assertNotEqual(second.returncode, 0, second.stdout + second.stderr)
+            self.assertTrue(final_prefix.is_symlink())
+            self.assertEqual(final_prefix.resolve(), original_target)
+            self.assertEqual(self._resolved_content(wrapper_dir), "VERIFIED_CONTENT")
+
+    @unittest.skipUnless(NPM, "native npm unavailable")
+    def test_a_signal_during_npm_install_leaves_final_prefix_untouched(self):
+        # Step 1 (build tree), signal mode: a signal lands right after the
+        # wrapper's own `npm install` completes -- before final_prefix is
+        # ever referenced by anything later in install_npm. final_prefix
+        # must be left exactly as it was, the same way a failure there does.
+        for signal_name in ("TERM", "INT"):
+            with self.subTest(signal=signal_name):
+                with tempfile.TemporaryDirectory() as tmp:
+                    tmp_path = Path(tmp)
+                    pins_path = self._codex_like_pins(tmp_path)
+                    first, eco_root = self._run_install_npm(
+                        tmp_path, pins_path, "codexlike", "1.0.0", self.codex_like_tarball, self.codex_like_sha256,
+                        npm_package="fixture-codex-like")
+                    self.assertEqual(first.returncode, 0, first.stdout + first.stderr)
+                    final_prefix = eco_root / "tools" / "codexlike-1.0.0"
+                    original_target = final_prefix.resolve()
+                    wrapper_dir = final_prefix / "lib" / "node_modules" / "fixture-codex-like"
+
+                    real_npm = shutil.which("npm")
+                    self.assertIsNotNone(real_npm)
+                    signal_npm_shim = tmp_path / f"signal-npm-{signal_name}-shim"
+                    signal_npm_shim.mkdir()
+                    (signal_npm_shim / "npm").write_text(
+                        "#!/bin/sh\n"
+                        'if [ "$1" = "install" ]; then\n'
+                        f'  {real_npm} "$@" || exit $?\n'
+                        f'  kill -{signal_name} "$PPID"\n'
+                        "  sleep 0.3\n"
+                        "  exit 0\n"
+                        "fi\n"
+                        f'exec {real_npm} "$@"\n'
+                    )
+                    (signal_npm_shim / "npm").chmod(0o755)
+
+                    second, _ = self._run_install_npm(
+                        tmp_path, pins_path, "codexlike", "1.0.0", self.codex_like_tarball, self.codex_like_sha256,
+                        npm_package="fixture-codex-like",
+                        extra_env={"PATH": f"{signal_npm_shim}{os.pathsep}{os.environ['PATH']}"})
+                    self.assertNotEqual(second.returncode, 0, second.stdout + second.stderr)
+                    self.assertTrue(final_prefix.is_symlink())
+                    self.assertEqual(final_prefix.resolve(), original_target)
+                    self.assertEqual(self._resolved_content(wrapper_dir), "VERIFIED_CONTENT")
+
+    @unittest.skipUnless(NPM, "native npm unavailable")
+    def test_a_failed_migration_mv_alone_leaves_the_real_directory_untouched(self):
+        # Step 2 (one-time migration), failure mode on its own (not paired
+        # with a step-5 flip failure, unlike test_a_failed_migration_
+        # rollback... above): the migration mv itself fails before ever
+        # moving the real, pre-3d final_prefix aside. final_prefix must be
+        # exactly what it was -- still the same real directory, never a
+        # dangling ".migrating." name, and cleanup() must not report a
+        # phantom pending migration for a move that never actually happened.
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            pins_path = self._codex_like_pins(tmp_path)
+            first, eco_root = self._run_install_npm(
+                tmp_path, pins_path, "codexlike", "1.0.0", self.codex_like_tarball, self.codex_like_sha256,
+                npm_package="fixture-codex-like")
+            self.assertEqual(first.returncode, 0, first.stdout + first.stderr)
+            final_prefix = eco_root / "tools" / "codexlike-1.0.0"
+            self._downgrade_final_prefix_to_a_real_directory(eco_root, final_prefix)
+            self.assertTrue(final_prefix.is_dir() and not final_prefix.is_symlink())
+            wrapper_dir = final_prefix / "lib" / "node_modules" / "fixture-codex-like"
+            original_content = self._resolved_content(wrapper_dir)
+
+            failing_migration_mv_shim = tmp_path / "failing-migration-mv-shim"
+            failing_migration_mv_shim.mkdir()
+            (failing_migration_mv_shim / "mv").write_text(
+                "#!/bin/sh\n"
+                'dest=""\n'
+                'for arg in "$@"; do dest="$arg"; done\n'
+                'case "$dest" in\n'
+                "  *.migrating.*)\n"
+                "    echo 'mv: injected migration failure for testing' >&2\n"
+                "    exit 1\n"
+                "    ;;\n"
+                "esac\n"
+                'exec /bin/mv "$@"\n'
+            )
+            (failing_migration_mv_shim / "mv").chmod(0o755)
+
+            second, _ = self._run_install_npm(
+                tmp_path, pins_path, "codexlike", "1.0.0", self.codex_like_tarball, self.codex_like_sha256,
+                npm_package="fixture-codex-like",
+                extra_env={"PATH": f"{failing_migration_mv_shim}{os.pathsep}{os.environ['PATH']}"})
+            self.assertNotEqual(second.returncode, 0, second.stdout + second.stderr)
+            self.assertTrue(final_prefix.is_dir(), "final_prefix must not be left absent")
+            self.assertFalse(final_prefix.is_symlink(), "the untouched real directory, not a phantom flip")
+            self.assertEqual(self._resolved_content(wrapper_dir), original_content)
+            leftover_migrating = [p.name for p in (eco_root / "tools").iterdir() if ".migrating." in p.name]
+            self.assertEqual(leftover_migrating, [], leftover_migrating)
+
+    @unittest.skipUnless(NPM, "native npm unavailable")
+    def test_a_failed_tmp_link_creation_leaves_final_prefix_untouched(self):
+        # Step 4 (ln -s tmp_link), failure mode: creating the NEW symlink
+        # under stage_dir fails before the atomic os.replace flip is ever
+        # attempted. final_prefix must be exactly as it was (absent for a
+        # first install; still the previous target for a reinstall).
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            pins_path = self._codex_like_pins(tmp_path)
+            first, eco_root = self._run_install_npm(
+                tmp_path, pins_path, "codexlike", "1.0.0", self.codex_like_tarball, self.codex_like_sha256,
+                npm_package="fixture-codex-like")
+            self.assertEqual(first.returncode, 0, first.stdout + first.stderr)
+            final_prefix = eco_root / "tools" / "codexlike-1.0.0"
+            original_target = final_prefix.resolve()
+            wrapper_dir = final_prefix / "lib" / "node_modules" / "fixture-codex-like"
+
+            stage_dir = tmp_path / "stage"
+            failing_ln_shim = tmp_path / "failing-ln-shim"
+            failing_ln_shim.mkdir()
+            (failing_ln_shim / "ln").write_text(
+                "#!/bin/sh\n"
+                'dest=""\n'
+                'for arg in "$@"; do dest="$arg"; done\n'
+                f'case "$dest" in\n'
+                f"  {stage_dir}/*-link.*)\n"
+                "    echo 'ln: injected tmp_link failure for testing' >&2\n"
+                "    exit 1\n"
+                "    ;;\n"
+                "esac\n"
+                'exec /bin/ln "$@"\n'
+            )
+            (failing_ln_shim / "ln").chmod(0o755)
+
+            second, _ = self._run_install_npm(
+                tmp_path, pins_path, "codexlike", "1.0.0", self.codex_like_tarball, self.codex_like_sha256,
+                npm_package="fixture-codex-like",
+                extra_env={"PATH": f"{failing_ln_shim}{os.pathsep}{os.environ['PATH']}"})
+            self.assertNotEqual(second.returncode, 0, second.stdout + second.stderr)
+            self.assertTrue(final_prefix.is_symlink())
+            self.assertEqual(final_prefix.resolve(), original_target)
+            self.assertEqual(self._resolved_content(wrapper_dir), "VERIFIED_CONTENT")
+
+    @unittest.skipUnless(NPM, "native npm unavailable")
+    def test_a_signal_after_creating_tmp_link_leaves_final_prefix_untouched(self):
+        # Step 4 (ln -s tmp_link), signal mode: a signal lands right after
+        # tmp_link is created but before the atomic os.replace flip ever
+        # runs. final_prefix must be exactly as it was; the orphaned
+        # tmp_link under stage_dir is inert (nothing live ever reads it).
+        for signal_name in ("TERM", "INT"):
+            with self.subTest(signal=signal_name):
+                with tempfile.TemporaryDirectory() as tmp:
+                    tmp_path = Path(tmp)
+                    pins_path = self._codex_like_pins(tmp_path)
+                    first, eco_root = self._run_install_npm(
+                        tmp_path, pins_path, "codexlike", "1.0.0", self.codex_like_tarball, self.codex_like_sha256,
+                        npm_package="fixture-codex-like")
+                    self.assertEqual(first.returncode, 0, first.stdout + first.stderr)
+                    final_prefix = eco_root / "tools" / "codexlike-1.0.0"
+                    original_target = final_prefix.resolve()
+                    wrapper_dir = final_prefix / "lib" / "node_modules" / "fixture-codex-like"
+
+                    stage_dir = tmp_path / "stage"
+                    signal_ln_shim = tmp_path / f"signal-ln-{signal_name}-shim"
+                    signal_ln_shim.mkdir()
+                    (signal_ln_shim / "ln").write_text(
+                        "#!/bin/sh\n"
+                        'dest=""\n'
+                        'for arg in "$@"; do dest="$arg"; done\n'
+                        f'case "$dest" in\n'
+                        f"  {stage_dir}/*-link.*)\n"
+                        '    /bin/ln "$@" || exit $?\n'
+                        f'    kill -{signal_name} "$PPID"\n'
+                        "    sleep 0.3\n"
+                        "    exit 0\n"
+                        "    ;;\n"
+                        "esac\n"
+                        'exec /bin/ln "$@"\n'
+                    )
+                    (signal_ln_shim / "ln").chmod(0o755)
+
+                    second, _ = self._run_install_npm(
+                        tmp_path, pins_path, "codexlike", "1.0.0", self.codex_like_tarball, self.codex_like_sha256,
+                        npm_package="fixture-codex-like",
+                        extra_env={"PATH": f"{signal_ln_shim}{os.pathsep}{os.environ['PATH']}"})
+                    self.assertNotEqual(second.returncode, 0, second.stdout + second.stderr)
+                    self.assertTrue(final_prefix.is_symlink())
+                    self.assertEqual(final_prefix.resolve(), original_target)
+                    self.assertEqual(self._resolved_content(wrapper_dir), "VERIFIED_CONTENT")
+
     def test_install_npm_passes_ignore_scripts_only_when_the_pin_sets_it(self):
         with tempfile.TemporaryDirectory() as tmp:
             tmp_path = Path(tmp)
