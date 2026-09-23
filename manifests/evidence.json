@@ -3098,13 +3098,13 @@
     },
     {
       "path": "adoption/bootstrap-linux.sh",
-      "sha256": "384858498777de6ab634164eb69d7b23146383eaf4182676e4e00bf31eaf9a67",
-      "bytes": 14458
+      "sha256": "5a7310884ab3d805202b207cf9e1e30a98991ed807e135700ae747c546c8dd45",
+      "bytes": 14909
     },
     {
       "path": "adoption/bootstrap-macos.sh",
-      "sha256": "7b588ea862d1035ba13b645c777f625bf09caa463b81955b6decf6db91aad96b",
-      "bytes": 19343
+      "sha256": "6352627d2289c25040d04463e913c16d0939d664435d33791e5b9aa35b16a141",
+      "bytes": 20386
     },
     {
       "path": "adoption/bootstrap.md",
@@ -3168,8 +3168,8 @@
     },
     {
       "path": "adoption/pins-macos-arm64.json",
-      "sha256": "b994497271c4a188429069e4678b94b8effb9e722a8b039c9cf7e48de754c006",
-      "bytes": 9694
+      "sha256": "cf645139500175634c9fda870935f3441a808a9b57e7939453a028b17c7ef5cd",
+      "bytes": 10170
     },
     {
       "path": "adoption/platforms/linux-wsl2.md",
@@ -3233,13 +3233,13 @@
     },
     {
       "path": "adoption/tools/README.md",
-      "sha256": "0187674fd9ee0241a34bc445c02ba3ebad21df3aa2bdd0ac2635c55310589ae9",
-      "bytes": 12840
+      "sha256": "f905ea9c5c90a5493679ff6b79a2fdabc1f44fb4998db68337c2dd175e93583d",
+      "bytes": 16611
     },
     {
       "path": "adoption/tools/ecosystem-bounded-run",
-      "sha256": "7680fe1173b35a8472023772c8973c4a9b65c4e444414ac44efa199cbabe17db",
-      "bytes": 2744
+      "sha256": "77c47d2dfea465a64ec7c7af8c80fe932d4bc43047d7608eee45ef13f6838a70",
+      "bytes": 5949
     },
     {
       "path": "adoption/tools/gitleaks-guarded",
@@ -11504,13 +11504,13 @@
     },
     {
       "path": "tests/test_adoption_bootstrap.py",
-      "sha256": "e42089d0ea4d0f48e92a3e9386869f6afcb1c8987817af1eb7187cf658d16a25",
-      "bytes": 20197
+      "sha256": "9dda4e75569c4e3c2d063594e66f25f221c3919fb0dc342287c8ad67fa3490d5",
+      "bytes": 21911
     },
     {
       "path": "tests/test_adoption_bootstrap_macos.py",
-      "sha256": "fc882bffe36d2d3116e49bcdfca79274eed2c3f1c3eb96e2b9612731d1ff78a5",
-      "bytes": 28953
+      "sha256": "d99bf558684c7c666884b1ef6e5c29d88999c6412b0643d53270934c7c1cccd8",
+      "bytes": 37057
     },
     {
       "path": "tests/test_adoption_contract.py",
@@ -11519,8 +11519,8 @@
     },
     {
       "path": "tests/test_adoption_guarded_runners.py",
-      "sha256": "9fe7155745db79cfa2ae673465c28907042aa0776b35834ddf17968ecd226a91",
-      "bytes": 21198
+      "sha256": "bf515ac2b8cd6900809cfa16ffb4da9f09a495fd1e10ed30e273e37a4292e66d",
+      "bytes": 30901
     },
     {
       "path": "tests/test_adoption_status.py",
