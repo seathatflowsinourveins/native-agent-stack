@@ -17,6 +17,19 @@ s = importlib.util.module_from_spec(SPEC)
 sys.modules[SPEC.name] = s
 SPEC.loader.exec_module(s)
 
+from .adaptive_paper_hermetic import patch_default_stop, restore_default_stop  # noqa: E402
+
+_HERMETIC_TOKEN = None
+
+
+def setUpModule():
+    global _HERMETIC_TOKEN
+    _HERMETIC_TOKEN = patch_default_stop(s)
+
+
+def tearDownModule():
+    restore_default_stop(_HERMETIC_TOKEN)
+
 
 class SafetyTests(unittest.TestCase):
     def setUp(self):

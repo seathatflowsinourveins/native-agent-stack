@@ -18,6 +18,19 @@ if NATIVE:
     ADAPTER = importlib.util.module_from_spec(SPEC)
     SPEC.loader.exec_module(ADAPTER)
 
+from .adaptive_paper_hermetic import patch_default_stop, restore_default_stop
+
+_HERMETIC_TOKEN = None
+
+
+def setUpModule():
+    global _HERMETIC_TOKEN
+    _HERMETIC_TOKEN = patch_default_stop()
+
+
+def tearDownModule():
+    restore_default_stop(_HERMETIC_TOKEN)
+
 
 class FakePort:
     def __init__(self, mode="fills"):

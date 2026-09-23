@@ -44,6 +44,20 @@ import safety as safety_module
 from runner import credentials, validate_preflight as validate_preflight_always
 from safety import SafetyError as SafetyErrorAlways
 
+from .adaptive_paper_hermetic import patch_default_stop, restore_default_stop
+
+_HERMETIC_TOKEN = None
+
+
+def setUpModule():
+    global _HERMETIC_TOKEN
+    extra = (native_strategy_module,) if NATIVE else ()
+    _HERMETIC_TOKEN = patch_default_stop(*extra)
+
+
+def tearDownModule():
+    restore_default_stop(_HERMETIC_TOKEN)
+
 
 @unittest.skipUnless(NATIVE, "requires pinned combined native runtime")
 class IntegratedRunner(unittest.TestCase):
