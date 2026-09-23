@@ -1,4 +1,8 @@
-name: Supply-chain SBOM and vulnerability scan (report-only)
+name: Supply-chain SBOM and vulnerability scan
+
+# grype gates the reproduced venv at --fail-on high; reviewed ignores live in
+# .grype.yaml (docs/decisions/2026-09-22-github-automation-closure.md). Medium
+# and lower findings are reported in summary.json without failing the job.
 
 on:
   push:
@@ -7,11 +11,13 @@ on:
       - '.github/workflows/supply-chain.yml'
       - 'blueprints/us-equities/supply-chain/**'
       - '.github/workflows/native-foundation-e2e.yml'
+      - '.grype.yaml'
   pull_request:
     paths:
       - '.github/workflows/supply-chain.yml'
       - 'blueprints/us-equities/supply-chain/**'
       - '.github/workflows/native-foundation-e2e.yml'
+      - '.grype.yaml'
   schedule:
     - cron: '29 7 * * 1'
   workflow_dispatch:
@@ -99,12 +105,15 @@ jobs:
           "$RUNNER_TEMP/syft/syft" scan "dir:$SCAN_ROOT/venv" \
             -o "spdx-json=$SCAN_ROOT/sbom/venv.spdx.json" \
             -o "cyclonedx-json=$SCAN_ROOT/sbom/venv.cyclonedx.json"
-      - name: Scan SBOM for known vulnerabilities (report-only)
+      - name: Scan SBOM for known vulnerabilities (fails on high or critical)
         run: |
-          "$RUNNER_TEMP/grype/grype" "sbom:$SCAN_ROOT/sbom/venv.spdx.json" \
-            -o json > "$SCAN_ROOT/sbom/grype-findings.json"
+          "$RUNNER_TEMP/grype/grype" db update
           "$RUNNER_TEMP/grype/grype" db status > "$SCAN_ROOT/sbom/grype-db-status.txt"
+          "$RUNNER_TEMP/grype/grype" "sbom:$SCAN_ROOT/sbom/venv.spdx.json" \
+            --config .grype.yaml --fail-on high \
+            -o json > "$SCAN_ROOT/sbom/grype-findings.json"
       - name: Write scan summary
+        if: ${{ !cancelled() }}
         run: |
           python3 - "$SCAN_ROOT" <<'PYEOF'
           import json, sys
@@ -123,7 +132,8 @@ jobs:
               "grype_db_status": (scan_root / "sbom/grype-db-status.txt").read_text().strip(),
               "package_count": len(spdx.get("packages", [])),
               "findings_by_severity": by_severity,
-              "note": "Report-only: no --fail-on threshold is applied by this job.",
+              "ignored_by_config": len(findings.get("ignoredMatches") or []),
+              "note": "Gate: grype --fail-on high with reviewed ignores in .grype.yaml; lower severities are reported only.",
           }
           (scan_root / "sbom/summary.json").write_text(json.dumps(summary, indent=2) + "\n")
           print(json.dumps(summary, indent=2))
