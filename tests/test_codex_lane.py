@@ -599,6 +599,7 @@ class BlindIsolationTests(CodexLaneFixture):
             done({"type": "command_execution", "command": "/bin/bash -lc 'cat $HOME/code/agent-lab/docs/x.md'"}),
             done({"type": "command_execution", "command": "/bin/bash -lc 'rg verdict ../../agent-lab/docs'"}),
             done({"type": "command_execution", "command": "/bin/bash -lc 'sqlite3 db.sqlite .dump'"}),
+            done({"type": "command_execution", "command": "/bin/bash -lc 'cd /; rg -l verdict home'"}),
             done({"type": "command_execution", "command": "/bin/bash -lc 'sed -n 1,20p catalogs/landscape/foundation.json'"}),
             done({"type": "web_search", "query": "x"}),
             done({"type": "mcp_tool_call", "server": "s", "tool": "t"}),
@@ -608,13 +609,14 @@ class BlindIsolationTests(CodexLaneFixture):
             self.assertEqual(self.run_lane(), 0)
         audit = json.loads((self.work_dir / "codex" / "blind-audit.json").read_text(encoding="utf-8"))
         entry = audit["layers"]["foundation__native-clients"]
-        self.assertEqual((entry["web_search"], entry["mcp_tool_calls"], entry["commands"]), (1, 1, 8))
+        self.assertEqual((entry["web_search"], entry["mcp_tool_calls"], entry["commands"]), (1, 1, 9))
         flagged = {item["command"]: item["reasons"] for item in entry["flagged_commands"]}
-        self.assertEqual(len(flagged), 6, flagged)
+        self.assertEqual(len(flagged), 7, flagged)
         self.assertFalse(any("catalogs/landscape/foundation.json" in command for command in flagged), flagged)
         joined = " ".join(reason for reasons in flagged.values() for reason in reasons)
         for expected in ("home-relative path: ~/code/agent-lab/docs/tasks", "home-relative path: $HOME/code/agent-lab/docs/x.md",
-                         "path climbs out of the working directory: ../../agent-lab/docs", "runs sqlite3"):
+                         "path climbs out of the working directory: ../../agent-lab/docs", "runs sqlite3",
+                         "names the filesystem root /"):
             self.assertIn(expected, joined)
         self.assertTrue(any("path outside the repository and packets: /home/example/code/agent-lab/docs" in reason
                             for reasons in flagged.values() for reason in reasons))

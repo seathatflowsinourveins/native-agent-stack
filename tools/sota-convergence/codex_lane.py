@@ -252,6 +252,7 @@ AUDIT_TOOLS = ("git", "ai-memory", "agentsview", "mcporter", "qmd", "socraticode
 ABSOLUTE_PATH = re.compile(r"(?<![\w.~}-])(/[^\s'\"|;&<>()`]+)")
 HOME_PATH = re.compile(r"(?:~|\$HOME|\$\{HOME\})(?:/[^\s'\"|;&<>()`]*)?")
 PARENT_PATH = re.compile(r"(?:^|[\s'\"=:])((?:[^\s'\"|;&<>()`]*/)?\.\.(?:/[^\s'\"|;&<>()`]*)?)")
+ROOT_PATH = re.compile(r"(?:^|[\s'\"=])/(?=$|[\s'\";&|)])")
 SYSTEM_PREFIXES = ("/bin/", "/usr/", "/dev/null")
 
 
@@ -282,6 +283,7 @@ def blind_audit(events_path: Path, allowed_roots) -> dict:
                        for path in ABSOLUTE_PATH.findall(command)
                        if not path.startswith(SYSTEM_PREFIXES)
                        and not any(path == root or path.startswith(root.rstrip("/") + "/") for root in allowed_roots)]
+            reasons += ["names the filesystem root /"] if ROOT_PATH.search(command) else []
             reasons += [f"home-relative path: {path}" for path in HOME_PATH.findall(command)]
             reasons += [f"path climbs out of the working directory: {path}" for path in PARENT_PATH.findall(command)]
             words = set(re.findall(r"[A-Za-z][\w.-]*", command))
