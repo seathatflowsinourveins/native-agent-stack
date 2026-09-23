@@ -150,7 +150,12 @@ def git_revision(root: Path) -> str | None:
         lines = result.stdout.splitlines()
         if result.returncode == 0 and len(lines) == 2 and Path(lines[0]).resolve() == root and SHA.fullmatch(lines[1]):
             return lines[1]
-    except (OSError, ValueError, UnicodeError, subprocess.TimeoutExpired):
+    # RuntimeError: Path.resolve() on Python before 3.13 raises it for a
+    # symlink loop (3.13+ instead returns the unresolved remainder); either
+    # way this is a Git-adjacent environment condition to suppress, not a
+    # reason to propagate an uncaught exception out of a "return None on any
+    # failure" helper.
+    except (OSError, ValueError, UnicodeError, RuntimeError, subprocess.TimeoutExpired):
         pass
     return None
 

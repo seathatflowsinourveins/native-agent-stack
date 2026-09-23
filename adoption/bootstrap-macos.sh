@@ -422,27 +422,51 @@ npm_package_name() {
 # placement algorithm, not at the top level this pin's `name` would suggest
 # checking.
 #
-# Instead, this fetches the platform tarball itself (the same sha256-verified
-# `fetch()` every other pin uses, fail-closed exactly the same way), then
-# installs that already-verified local archive explicitly with npm's
-# `<alias>@file:<path>` syntax. That syntax places the tarball's contents at
-# the chosen node_modules name regardless of the tarball's own internal
-# package.json "name" field (npm 11, measured on this host: installing
-# `my-alias@file:<archive>` places the archive's contents at
-# lib/node_modules/my-alias/, keeping the archive's own package.json name
-# untouched inside it) -- and Node's own module resolution finds a package by
-# that directory name, never by reading package.json, so this is sufficient
-# for the parent's own require() to find it. A component with no
+# Measured directly on this host (npm 11.19.0): a plain `<alias>@file:<path>`
+# top-level install (this function's earlier design) is NOT what the parent's
+# own require() actually finds, because installing the WRAPPER package
+# itself already auto-fetches this same optional dependency, unverified, and
+# nests it under the wrapper's own node_modules -- and Node's resolution
+# checks that nested copy before ever considering a top-level sibling.
+# --omit=optional, --no-optional and NPM_CONFIG_OMIT=optional were each
+# tried against a real fixture (a plain optionalDependency, no lockfile,
+# `npm install --global --prefix <dir> <pkg>`); none of them suppressed the
+# physical on-disk fetch -- npm's own docs describe `omit` in terms of a
+# package-lock.json this install path never has. Pre-placing verified
+# content at the nested path before installing the wrapper was also tried;
+# npm still overwrote it during the wrapper's own install ("changed N
+# packages"). So this instead: (1) installs the wrapper with
+# --ignore-scripts, deferring its lifecycle scripts so nothing consumes the
+# unverified fetch yet; (2) asks Node itself, via require.resolve with the
+# wrapper's own directory as the search path, exactly where it would resolve
+# this dependency from (nested, in every case measured); (3) deletes that
+# path and extracts the independently sha256-verified tarball there
+# instead (falling back to a top-level alias if Node found nothing there at
+# all, e.g. a genuine platform mismatch); (4) re-verifies resolution and the
+# resolved package's own version against the pin, fail closed on either
+# mismatch; (5) then runs `npm rebuild` for the wrapper, which is npm's own
+# documented way to run the lifecycle scripts an --ignore-scripts install
+# deferred, now that the dependency it resolves is the verified one.
+# claude-code's own postinstall (install.cjs) does exactly this: it calls
+# require.resolve for its platform package and copies/hard-links from
+# wherever that resolves into its own bin/claude.exe -- verified end to end
+# with a real npm install + real npm rebuild against a fixture that mimics
+# that exact copy-on-postinstall shape, confirming the final bin/ file
+# carries the verified bytes, not the unverified ones npm fetched first.
+# codex has no lifecycle scripts at all; it resolves its platform package at
+# every invocation of bin/codex.js, so step (5) is a no-op for it and step
+# (3)'s replacement alone is what matters. A component with no
 # platform_dependency pin is a silent no-op.
 install_platform_dependency() {
   local id="$1" prefix="$2"
   local dep
   dep="$(jq -c --arg id "$id" '.tools[] | select(.id == $id) | .platform_dependency // empty' "$pins_path")"
   [[ -n "$dep" && "$dep" != "null" ]] || return 0
-  local dep_name dep_url dep_sha256
+  local dep_name dep_url dep_sha256 dep_version
   dep_name="$(jq -r '.name' <<<"$dep")"
   dep_url="$(jq -r '.url' <<<"$dep")"
   dep_sha256="$(jq -r '.sha256' <<<"$dep")"
+  dep_version="$(jq -r '.version' <<<"$dep")"
   if [[ "$dep_sha256" == "null" || -z "$dep_sha256" ]]; then
     printf 'Refusing %s: platform dependency %s has no verified sha256 in %s (fail closed).\n' \
       "$id" "$dep_name" "$pins_path" >&2
@@ -450,8 +474,54 @@ install_platform_dependency() {
   fi
   local archive="$cache_dir/${id}-platform-dependency.tgz"
   fetch "$dep_url" "$dep_sha256" "$archive"
-  npm install --global --no-audit --no-fund --prefix "$prefix" "${dep_name}@file:${archive}" >/dev/null
-  printf 'Installed verified platform dependency %s for %s\n' "$dep_name" "$id"
+
+  local wrapper_url package
+  wrapper_url="$(jq -r --arg id "$id" '.tools[] | select(.id == $id) | .url' "$pins_path")"
+  package="$(npm_package_name "$wrapper_url")"
+  local wrapper_dir="$prefix/lib/node_modules/$package"
+  local resolved=""
+  resolved="$(node -e '
+    try {
+      console.log(require.resolve(process.argv[1] + "/package.json", { paths: [process.argv[2]] }));
+    } catch (error) {
+      process.exit(1);
+    }
+  ' "$dep_name" "$wrapper_dir" 2>/dev/null)" || resolved=""
+
+  local target_dir
+  if [[ -n "$resolved" ]]; then
+    target_dir="$(dirname -- "$resolved")"
+    rm -rf -- "$target_dir"
+  else
+    # Node found nothing to resolve at all (a genuine platform mismatch, or a
+    # future npm change that actually suppresses the fetch): fall back to a
+    # top-level alias next to the wrapper, which the same require.resolve
+    # search below also covers via Node's own directory walk-up.
+    target_dir="$prefix/lib/node_modules/$dep_name"
+  fi
+  mkdir -p "$target_dir"
+  local extract_dir="$stage_dir/${id}-platform-dependency"
+  mkdir -p "$extract_dir"
+  tar -xzf "$archive" -C "$extract_dir"
+  cp -R "$extract_dir/package/." "$target_dir/"
+  rm -rf -- "$extract_dir"
+
+  local verify
+  verify="$(node -e '
+    const resolvedPath = require.resolve(process.argv[1] + "/package.json", { paths: [process.argv[2]] });
+    console.log(require(resolvedPath).version);
+  ' "$dep_name" "$wrapper_dir" 2>&1)" || {
+    printf 'Refusing %s: platform dependency %s does not resolve from %s after installing the verified copy (fail closed): %s\n' \
+      "$id" "$dep_name" "$wrapper_dir" "$verify" >&2
+    exit 1
+  }
+  if [[ "$verify" != "$dep_version" ]]; then
+    printf 'Refusing %s: platform dependency %s resolves as version %s, pinned as %s (fail closed).\n' \
+      "$id" "$dep_name" "$verify" "$dep_version" >&2
+    exit 1
+  fi
+  printf 'Installed and verified platform dependency %s@%s for %s (resolves from %s)\n' \
+    "$dep_name" "$verify" "$id" "$wrapper_dir"
 }
 
 install_npm() {
@@ -463,12 +533,24 @@ install_npm() {
   mkdir -p "$prefix"
   local package
   package="$(npm_package_name "$url")"
+  local has_platform_dependency=0
+  if [[ "$(jq -r --arg id "$id" '.tools[] | select(.id == $id) | .platform_dependency // empty' "$pins_path")" != "" ]]; then
+    has_platform_dependency=1
+  fi
   local npm_install_args=(--global --no-audit --no-fund --prefix "$prefix")
-  if [[ "$ignore_scripts" == "true" ]]; then
+  if [[ "$ignore_scripts" == "true" || "$has_platform_dependency" == 1 ]]; then
+    # A platform_dependency needs the wrapper's own lifecycle scripts
+    # deferred until install_platform_dependency has replaced whatever npm
+    # auto-fetched with the verified copy; see that function's comment.
     npm_install_args+=(--ignore-scripts)
   fi
   npm install "${npm_install_args[@]}" "$archive" >/dev/null
-  install_platform_dependency "$id" "$prefix"
+  if [[ "$has_platform_dependency" == 1 ]]; then
+    install_platform_dependency "$id" "$prefix"
+    if [[ "$ignore_scripts" != "true" ]]; then
+      npm rebuild --global --no-audit --no-fund --prefix "$prefix" "$package" >/dev/null
+    fi
+  fi
   local linked=0 executable
   if [[ -d "$prefix/bin" ]]; then
     for executable in "$prefix/bin"/*; do

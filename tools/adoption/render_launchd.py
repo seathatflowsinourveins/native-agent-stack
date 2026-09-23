@@ -70,6 +70,11 @@ def render_plist(template_path: Path, values: dict[str, str]) -> bytes:
         substituted = _substitute(data, values)
     except KeyError as error:
         raise RenderError(f"{template_path.name}: missing template value {error}") from None
+    except ValueError as error:
+        # string.Template.substitute raises ValueError (not KeyError) for a
+        # malformed placeholder, e.g. a bare trailing "$" or "$" followed by
+        # a character that cannot start an identifier.
+        raise RenderError(f"{template_path.name}: invalid placeholder ({error})") from None
     return plistlib.dumps(substituted, fmt=plistlib.FMT_XML)
 
 

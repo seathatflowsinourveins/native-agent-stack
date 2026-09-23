@@ -160,6 +160,26 @@ forget_enabled_label() {
   mv -- "$enabled_state_file.tmp" "$enabled_state_file"
 }
 
+# Reads one string-valued key from a plist file. Empty (never an error exit
+# under set -e's callers, since this is always read with `$(...)`) when the
+# key is absent. Prefers plutil (present on every real Mac); falls back to
+# python3 plistlib where plutil is absent, same as cmd_lint.
+plist_value() {
+  local path="$1" key="$2"
+  if command -v plutil >/dev/null; then
+    plutil -extract "$key" raw -o - "$path" 2>/dev/null || true
+  else
+    python3 -c '
+import plistlib, sys
+with open(sys.argv[1], "rb") as handle:
+    data = plistlib.load(handle)
+value = data.get(sys.argv[2])
+if isinstance(value, str):
+    print(value)
+' "$path" "$key" 2>/dev/null || true
+  fi
+}
+
 cmd_render() {
   mkdir -p "$render_dir"
   local render_args=(--out "$render_dir")
@@ -208,10 +228,6 @@ cmd_install() {
     exit 1
   }
   mkdir -p "$launch_agents_dir"
-  # Every agent's StandardOutPath/StandardErrorPath is under state/logs;
-  # launchd does not create missing parent directories for them. qdrant's
-  # plist also names state/qdrant as its WorkingDirectory.
-  mkdir -p "$eco_root/state/logs" "$eco_root/state/qdrant"
   local label source_plist dest_plist
   while IFS= read -r label; do
     source_plist="$render_dir/$label.plist"
@@ -225,8 +241,30 @@ cmd_install() {
         "$dest_plist" "$label" "$enabled_state_file" >&2
       exit 1
     fi
+    # Every directory this plist writes into or runs from comes from ITS OWN
+    # declared StandardOutPath/StandardErrorPath/WorkingDirectory, never
+    # this shell's ECO_INSTALL_ROOT: a plist rendered with --host against a
+    # different host's value file can point anywhere, and launchd does not
+    # create missing parent directories for any of the three on its own.
+    local declared_path key
+    for key in StandardOutPath StandardErrorPath; do
+      declared_path="$(plist_value "$source_plist" "$key")"
+      [[ -n "$declared_path" ]] && mkdir -p "$(dirname -- "$declared_path")"
+    done
+    declared_path="$(plist_value "$source_plist" WorkingDirectory)"
+    [[ -n "$declared_path" ]] && mkdir -p "$declared_path"
+
     cp -- "$source_plist" "$dest_plist"
-    launchctl bootstrap "gui/$(id -u)" "$dest_plist"
+    if ! launchctl bootstrap "gui/$(id -u)" "$dest_plist"; then
+      # Undo the copy: an unowned, bootstrap-failed plist left under
+      # ~/Library/LaunchAgents would still load at the next login, and
+      # neither a retry (the ownership check above) nor remove (which never
+      # touches an unrecorded label) could ever reach it again otherwise.
+      rm -f -- "$dest_plist"
+      printf 'launchctl bootstrap failed for %s; removed %s (never recorded as enabled).\n' \
+        "$label" "$dest_plist" >&2
+      exit 1
+    fi
     record_enabled_label "$label"
     printf 'Installed and bootstrapped %s (%s)\n' "$label" "$dest_plist"
   done < <(selected_labels)
@@ -244,7 +282,17 @@ cmd_remove() {
   local label removed_count=0 skipped_count=0 failed_count=0
   while IFS= read -r label; do
     if is_enabled_label "$label"; then
-      if launchctl bootout "gui/$(id -u)/$label"; then
+      if ! launchctl print "gui/$(id -u)/$label" >/dev/null 2>&1; then
+        # Not currently loaded (already unloaded outside this script,
+        # crashed, or never finished bootstrapping): `launchctl bootout`
+        # would just fail on something that is not there. Clean up
+        # directly instead of calling it.
+        rm -f -- "$launch_agents_dir/$label.plist"
+        forget_enabled_label "$label"
+        removed_count=$((removed_count + 1))
+        printf '%s was not loaded; removed %s directly (component data and logs kept).\n' \
+          "$label" "$launch_agents_dir/$label.plist"
+      elif launchctl bootout "gui/$(id -u)/$label"; then
         # Deleted, not left behind: RunAtLoad plus the plist still sitting
         # under ~/Library/LaunchAgents would make launchd reload it at the
         # next login regardless of this bootout. This removes only the

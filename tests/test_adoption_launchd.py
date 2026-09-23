@@ -9,6 +9,7 @@ has been bootstrapped, kickstarted or booted out on a real Mac (see
 adoption/platforms/macos-arm64.md, "What a hosted run proves").
 """
 
+import importlib.util
 import json
 import os
 from pathlib import Path
@@ -123,7 +124,33 @@ class TemplateRenderAndSchemaTests(unittest.TestCase):
                 self.assertNotIn("--", match.group(1), template_path.name)
 
 
+def _load_render_launchd_module():
+    spec = importlib.util.spec_from_file_location("render_launchd_direct", RENDER_SCRIPT)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
 class RenderLaunchdScriptTests(unittest.TestCase):
+    def test_a_malformed_placeholder_raises_render_error_not_an_uncaught_valueerror(self):
+        # string.Template.substitute raises ValueError (not KeyError) for a
+        # malformed placeholder, e.g. a bare trailing "$"; render_plist must
+        # turn that into the same RenderError every other failure mode uses.
+        module = _load_render_launchd_module()
+        with tempfile.TemporaryDirectory() as tmp:
+            bad_template = Path(tmp) / "bad.plist.template"
+            bad_template.write_text(
+                '<?xml version="1.0" encoding="UTF-8"?>\n'
+                '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" '
+                '"http://www.apple.com/DTDs/PropertyList-1.0.dtd">\n'
+                '<plist version="1.0"><dict><key>Label</key>'
+                '<string>trailing-dollar-$</string></dict></plist>\n'
+            )
+            with self.assertRaises(module.RenderError) as ctx:
+                module.render_plist(bad_template, {})
+            self.assertIn("invalid placeholder", str(ctx.exception))
+
+
     def test_a_literal_ampersand_in_a_substituted_value_round_trips_through_valid_xml(self):
         # Codex review, 2026-09-23: a naive string.Template substitution on
         # raw template text would put an unescaped "&" directly into XML
@@ -221,17 +248,21 @@ class LaunchdAgentsScriptStructureTests(unittest.TestCase):
         self.assertIn("was not enabled by this script", self.text)
 
     def test_remove_deletes_only_the_owned_plist_never_component_data_or_logs(self):
-        # A successful bootout deletes exactly the copied unit-definition
-        # file this script itself placed under ~/Library/LaunchAgents (so it
-        # cannot reload at the next login); this is the only `rm` in the
-        # script, and it must never target state/logs, state/qdrant, or the
-        # enabled-labels state file itself.
+        # Every `rm` in the script targets exactly the copied unit-definition
+        # file this script itself placed under ~/Library/LaunchAgents (on a
+        # successful bootout, on removing an already-unloaded label, or on
+        # rolling back a failed bootstrap during install); none may ever
+        # target state/logs, state/qdrant, or the enabled-labels state file.
         self.assertNotIn("rm -rf", self.text)
         rm_lines = [line.strip() for line in self.text.splitlines() if re.search(r"\brm\b", line)]
-        self.assertEqual(len(rm_lines), 1, rm_lines)
-        self.assertIn('rm -f -- "$launch_agents_dir/$label.plist"', rm_lines[0])
-        for forbidden in ("state/logs", "state/qdrant", "enabled_state_file"):
-            self.assertNotIn(forbidden, rm_lines[0])
+        self.assertGreaterEqual(len(rm_lines), 1, rm_lines)
+        for rm_line in rm_lines:
+            self.assertTrue(
+                'rm -f -- "$launch_agents_dir/$label.plist"' in rm_line or 'rm -f -- "$dest_plist"' in rm_line,
+                rm_line,
+            )
+            for forbidden in ("state/logs", "state/qdrant", "enabled_state_file"):
+                self.assertNotIn(forbidden, rm_line)
 
     def test_formula_list_equals_the_brew_install_line_documented_in_the_platform_page(self):
         script_match = re.search(
@@ -439,7 +470,13 @@ class LaunchdAgentsScriptBehaviorTests(unittest.TestCase):
 
             invocations = log.read_text()
             self.assertEqual(invocations.count("launchctl bootstrap"), 4)
-            self.assertEqual(invocations.count("launchctl print"), 1)
+            # One explicit `status`, plus one `launchctl print` per remove
+            # attempt that actually reaches an enabled label (cmd_remove
+            # checks whether a label is loaded before calling bootout); the
+            # trailing no-op remove never reaches that check at all (the
+            # label is no longer enabled), so it adds neither a print nor a
+            # bootout call.
+            self.assertEqual(invocations.count("launchctl print"), 3)
             self.assertEqual(invocations.count("launchctl bootout"), 2,
                               "one for the mid-test forget, one for the final remove; "
                               "the trailing no-op remove must not invoke bootout again")
@@ -480,6 +517,131 @@ class LaunchdAgentsScriptBehaviorTests(unittest.TestCase):
             self.assertTrue((launch_agents_dir / "com.native-stack.qdrant.plist").is_file())
             state_file = eco_root / "state" / "launchd" / "enabled-labels.txt"
             self.assertIn("com.native-stack.qdrant", state_file.read_text().split())
+
+    def test_install_removes_the_orphan_when_bootstrap_fails(self):
+        # Medium finding: cp ran before launchctl bootstrap, so a failed
+        # bootstrap left an unowned plist under ~/Library/LaunchAgents that
+        # would load at the next login, and neither a retry (the ownership
+        # check) nor remove (never touches an unrecorded label) could ever
+        # reach it again.
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            eco_root = tmp_path / "eco"
+            fake_home = tmp_path / "home"
+            fake_home.mkdir()
+            failing_shim = tmp_path / "failing-shim"
+            failing_shim.mkdir()
+            (failing_shim / "launchctl").write_text("#!/bin/sh\ncase \"$1\" in\n  bootstrap) exit 1 ;;\n  *) exit 0 ;;\nesac\n")
+            (failing_shim / "launchctl").chmod(0o755)
+            env = {
+                **os.environ,
+                "PATH": f"{failing_shim}{os.pathsep}{os.environ['PATH']}",
+                "ECO_INSTALL_ROOT": str(eco_root),
+                "HOME": str(fake_home),
+            }
+            self.assertEqual(self._run(["render"], env=env).returncode, 0)
+            install_result = self._run(["install", "--label", "com.native-stack.qdrant"], env=env)
+            self.assertNotEqual(install_result.returncode, 0, install_result.stdout + install_result.stderr)
+            self.assertIn("bootstrap failed", install_result.stderr)
+            launch_agents_dir = fake_home / "Library" / "LaunchAgents"
+            self.assertFalse((launch_agents_dir / "com.native-stack.qdrant.plist").exists())
+            state_file = eco_root / "state" / "launchd" / "enabled-labels.txt"
+            enabled = state_file.read_text().split() if state_file.exists() else []
+            self.assertNotIn("com.native-stack.qdrant", enabled)
+            # A retry with a working launchctl succeeds cleanly, proving the
+            # rollback did not leave anything behind that would block it.
+            working_shim = self._launchctl_shim(tmp_path, tmp_path / "working-launchctl.log")
+            working_env = {**env, "PATH": f"{working_shim}{os.pathsep}{os.environ['PATH']}"}
+            retry = self._run(["install", "--label", "com.native-stack.qdrant"], env=working_env)
+            self.assertEqual(retry.returncode, 0, retry.stdout + retry.stderr)
+
+    def test_remove_on_an_unloaded_owned_label_cleans_up_without_calling_bootout(self):
+        # Low finding: bootout always fails on a label that is owned but not
+        # currently loaded (already unloaded outside this script, crashed,
+        # or never finished bootstrapping); check launchctl print first and
+        # clean up directly instead of guaranteeing a failed bootout call.
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            eco_root = tmp_path / "eco"
+            fake_home = tmp_path / "home"
+            fake_home.mkdir()
+            log = tmp_path / "launchctl.log"
+            log.touch()
+            shim = tmp_path / "shim"
+            shim.mkdir()
+            # print reports "not loaded" (nonzero); bootout would exit 0 if
+            # ever called, so a bootout invocation in the log would prove
+            # the fix is NOT skipping it as intended.
+            (shim / "launchctl").write_text(
+                "#!/bin/sh\n"
+                f'printf "%s\\n" "launchctl $*" >> {str(log)!r}\n'
+                'case "$1" in\n'
+                '  print) exit 1 ;;\n'
+                '  *) exit 0 ;;\n'
+                'esac\n'
+            )
+            (shim / "launchctl").chmod(0o755)
+            env = {
+                **os.environ,
+                "PATH": f"{shim}{os.pathsep}{os.environ['PATH']}",
+                "ECO_INSTALL_ROOT": str(eco_root),
+                "HOME": str(fake_home),
+            }
+            self.assertEqual(self._run(["render"], env=env).returncode, 0)
+            install_result = self._run(["install", "--label", "com.native-stack.qdrant"], env=env)
+            self.assertEqual(install_result.returncode, 0, install_result.stdout + install_result.stderr)
+
+            remove_result = self._run(["remove", "--label", "com.native-stack.qdrant"], env=env)
+            self.assertEqual(remove_result.returncode, 0, remove_result.stdout + remove_result.stderr)
+            self.assertIn("was not loaded", remove_result.stdout)
+            launch_agents_dir = fake_home / "Library" / "LaunchAgents"
+            self.assertFalse((launch_agents_dir / "com.native-stack.qdrant.plist").exists())
+            state_file = eco_root / "state" / "launchd" / "enabled-labels.txt"
+            self.assertNotIn("com.native-stack.qdrant", state_file.read_text().split())
+            invocations = log.read_text()
+            self.assertNotIn("bootout", invocations, "bootout must not be called on an unloaded label")
+
+    def test_install_creates_directories_from_the_plists_own_declared_paths_not_eco_install_root(self):
+        # Low finding: --host renders can point ECO_ROOT somewhere entirely
+        # different from this shell's own ECO_INSTALL_ROOT; the directories
+        # install creates must come from the rendered plist's own
+        # StandardOutPath/StandardErrorPath/WorkingDirectory, not the shell.
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            fake_home = tmp_path / "home"
+            fake_home.mkdir()
+            other_root = tmp_path / "elsewhere" / "eco-root"
+            host_file = ROOT / "adoption" / "hosts" / "test-launchd-other-host.json"
+            host_file.write_text(json.dumps({
+                "HOME": str(fake_home), "ECO_ROOT": str(other_root), "AI_MEMORY_URL": "127.0.0.1:49374",
+            }))
+            self.addCleanup(host_file.unlink, missing_ok=True)
+            log = tmp_path / "launchctl.log"
+            log.touch()
+            shim = self._launchctl_shim(tmp_path, log)
+            eco_root_unused = tmp_path / "eco-unused"
+            env = {
+                **os.environ,
+                "PATH": f"{shim}{os.pathsep}{os.environ['PATH']}",
+                # Deliberately different from --host's own ECO_ROOT, so a
+                # bug that used $eco_root instead of the plist's own paths
+                # would create directories in the WRONG (this) location.
+                "ECO_INSTALL_ROOT": str(eco_root_unused),
+                "HOME": str(fake_home),
+            }
+            render_result = self._run(["render", "--host", "test-launchd-other-host"], env=env)
+            self.assertEqual(render_result.returncode, 0, render_result.stdout + render_result.stderr)
+            install_result = self._run(["install", "--label", "com.native-stack.qdrant"], env=env)
+            self.assertEqual(install_result.returncode, 0, install_result.stdout + install_result.stderr)
+            self.assertTrue((other_root / "state" / "logs").is_dir())
+            self.assertTrue((other_root / "state" / "qdrant").is_dir())
+            # eco_root_unused/state/launchd/rendered legitimately exists (the
+            # render step's own output directory); state/logs and
+            # state/qdrant specifically -- what the old ECO_INSTALL_ROOT-based
+            # bug would have created here instead of under other_root -- must
+            # not.
+            self.assertFalse((eco_root_unused / "state" / "logs").exists())
+            self.assertFalse((eco_root_unused / "state" / "qdrant").exists())
 
 
 if __name__ == "__main__":

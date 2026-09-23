@@ -714,27 +714,81 @@ class RealNpmLockfileEvidenceTests(unittest.TestCase):
 
 
 class PlatformDependencyInstallTests(unittest.TestCase):
-    """install_platform_dependency, extracted verbatim from the script and
-    run with a fixture pins file, a real npm-packed local tarball standing
-    in for the registry download (fetch() stubbed to place it, never to
-    reach the network), and real npm for the actual `<alias>@file:<path>`
-    install. No macOS host ran any of this, and no darwin-arm64 binary is
-    involved -- only the install mechanism, which is platform-independent.
+    """install_platform_dependency and install_npm's shadow-defeating
+    ordering, extracted verbatim from the script and run against real
+    npm-packed local fixtures (fetch() stubbed to copy them into place
+    instead of reaching the network). No macOS host ran any of this, and no
+    darwin-arm64 binary is involved -- only the install mechanism, which is
+    platform-independent; two fixture wrappers mimic codex's (no lifecycle
+    scripts, resolves at runtime) and claude-code's (postinstall copies from
+    wherever require.resolve finds the platform package) actual shapes.
     """
 
     @classmethod
     def setUpClassWithNpm(cls):
         cls._tmp = tempfile.TemporaryDirectory()
         tmp_path = Path(cls._tmp.name)
-        package_dir = tmp_path / "fixture-pkg"
-        package_dir.mkdir()
-        (package_dir / "package.json").write_text(
-            json.dumps({"name": "fixture-real-name", "version": "1.2.3"}))
-        (package_dir / "marker.txt").write_text("fixture platform dependency payload\n")
-        subprocess.run([NPM, "pack", "--silent", "--pack-destination", str(tmp_path)],
-                        cwd=package_dir, capture_output=True, text=True, timeout=60, check=True)
-        cls.fixture_tarball = tmp_path / "fixture-real-name-1.2.3.tgz"
-        cls.fixture_sha256 = hashlib.sha256(cls.fixture_tarball.read_bytes()).hexdigest()
+
+        def pack(directory: Path, dest: Path) -> None:
+            subprocess.run([NPM, "pack", "--silent", "--pack-destination", str(dest)],
+                            cwd=directory, capture_output=True, text=True, timeout=60, check=True)
+
+        # The independently reviewed, sha256-verified platform dependency.
+        verified_dir = tmp_path / "verified-platform-dep"
+        verified_dir.mkdir()
+        (verified_dir / "package.json").write_text(json.dumps({"name": "fixture-real-name", "version": "1.2.3"}))
+        (verified_dir / "native-bin").write_text("VERIFIED_CONTENT\n")
+        pack(verified_dir, tmp_path)
+        cls.verified_tarball = tmp_path / "fixture-real-name-1.2.3.tgz"
+        cls.verified_sha256 = hashlib.sha256(cls.verified_tarball.read_bytes()).hexdigest()
+
+        # A same-name, same-version, DIFFERENT-content tarball standing in
+        # for what an npm registry fetch (never independently verified)
+        # could return; a shadow-defeating fix must never let this win.
+        unverified_dir = tmp_path / "unverified-platform-dep"
+        unverified_dir.mkdir()
+        (unverified_dir / "package.json").write_text(json.dumps({"name": "fixture-real-name", "version": "1.2.3"}))
+        (unverified_dir / "native-bin").write_text("UNVERIFIED_CONTENT\n")
+        registry_sim = tmp_path / "registry-sim"
+        registry_sim.mkdir()
+        pack(unverified_dir, registry_sim)
+        cls.unverified_tarball = registry_sim / "fixture-real-name-1.2.3.tgz"
+
+        # codex-like: no lifecycle scripts; resolves the platform dependency
+        # at (simulated) runtime, matching bin/codex.js's own shape.
+        codex_like_dir = tmp_path / "codex-like-pkg"
+        codex_like_dir.mkdir()
+        (codex_like_dir / "package.json").write_text(json.dumps({
+            "name": "fixture-codex-like", "version": "1.0.0",
+            "optionalDependencies": {"widget-darwin-arm64": f"file:{cls.unverified_tarball}"},
+        }))
+        pack(codex_like_dir, tmp_path)
+        cls.codex_like_tarball = tmp_path / "fixture-codex-like-1.0.0.tgz"
+        cls.codex_like_sha256 = hashlib.sha256(cls.codex_like_tarball.read_bytes()).hexdigest()
+
+        # claude-code-like: a postinstall that resolves the platform
+        # dependency and copies its native-bin into its own bin/ file,
+        # matching install.cjs's own copy-on-postinstall shape exactly.
+        claude_like_dir = tmp_path / "claude-like-pkg"
+        (claude_like_dir / "bin").mkdir(parents=True)
+        (claude_like_dir / "bin" / "claude-like.exe").write_text("STUB\n")
+        (claude_like_dir / "postinstall.js").write_text(
+            'const fs = require("fs");\n'
+            'const path = require("path");\n'
+            'const src = path.dirname(require.resolve("widget-darwin-arm64/package.json"));\n'
+            'const content = fs.readFileSync(path.join(src, "native-bin"));\n'
+            'fs.writeFileSync(path.join(__dirname, "bin", "claude-like.exe"), content);\n'
+            'console.log("POSTINSTALL_COPIED:" + content.toString().trim());\n'
+        )
+        (claude_like_dir / "package.json").write_text(json.dumps({
+            "name": "fixture-claude-like", "version": "1.0.0",
+            "bin": {"claude-like": "bin/claude-like.exe"},
+            "optionalDependencies": {"widget-darwin-arm64": f"file:{cls.unverified_tarball}"},
+            "scripts": {"postinstall": "node postinstall.js"},
+        }))
+        pack(claude_like_dir, tmp_path)
+        cls.claude_like_tarball = tmp_path / "fixture-claude-like-1.0.0.tgz"
+        cls.claude_like_sha256 = hashlib.sha256(cls.claude_like_tarball.read_bytes()).hexdigest()
 
     @classmethod
     def setUpClass(cls):
@@ -754,21 +808,74 @@ class PlatformDependencyInstallTests(unittest.TestCase):
         }))
         return pins_path
 
+    def _platform_dependency_pin(self) -> dict:
+        return {
+            "name": "widget-darwin-arm64", "resolved_package": "fixture-real-name",
+            "version": "1.2.3", "url": "https://example.invalid/verified-platform-dep.tgz",
+            "sha256": self.verified_sha256, "integrity": "sha512-unused-in-this-test",
+        }
+
     def _run(self, tmp_path: Path, pins_path: Path, dep_id: str, prefix: Path, fetch_body: str):
         harness = tmp_path / "install-platform-dep-harness.sh"
         harness.write_text(
             "set -Eeuo pipefail\n"
-            + _shell_functions(SCRIPT_PATH.read_text(), "install_platform_dependency")
+            + _shell_functions(SCRIPT_PATH.read_text(), "npm_package_name", "install_platform_dependency")
             + f'pins_path={json.dumps(str(pins_path))}\n'
             + f'cache_dir={json.dumps(str(tmp_path / "downloads"))}\n'
+            + f'stage_dir={json.dumps(str(tmp_path / "stage"))}\n'
             + "fetch() { " + fetch_body + " ; }\n"
             + f'install_platform_dependency {dep_id} {json.dumps(str(prefix))}\n'
         )
         (tmp_path / "downloads").mkdir(exist_ok=True)
+        (tmp_path / "stage").mkdir(exist_ok=True)
         return subprocess.run(["bash", str(harness)], capture_output=True, text=True, timeout=60)
 
+    def _run_install_npm(self, tmp_path: Path, pins_path: Path, id_: str, version: str,
+                          wrapper_archive: Path, wrapper_sha256: str, npm_package: str,
+                          ignore_scripts: str = "false"):
+        eco_root = tmp_path / "eco"
+        (eco_root / "downloads").mkdir(parents=True)
+        (eco_root / "tools").mkdir(parents=True)
+        (eco_root / "bin").mkdir(parents=True)
+        stage_dir = tmp_path / "stage"
+        stage_dir.mkdir()
+        # npm_package_name derives the package name from this URL's own
+        # path structure (matching a real registry tarball URL's
+        # convention), which must equal the fixture tarball's actual
+        # package.json "name" -- not necessarily this tool's own id_.
+        wrapper_url = f"https://registry.npmjs.org/{npm_package}/-/{npm_package}-{version}.tgz"
+        dep_url = "https://example.invalid/verified-platform-dep.tgz"
+        harness = tmp_path / "install-npm-e2e-harness.sh"
+        harness.write_text(
+            "set -Eeuo pipefail\n"
+            + _shell_functions(SCRIPT_PATH.read_text(), "npm_package_name",
+                                "install_platform_dependency", "install_npm")
+            + f'pins_path={json.dumps(str(pins_path))}\n'
+            + f'ecosystem_root={json.dumps(str(eco_root))}\n'
+            + f'bin_dir={json.dumps(str(eco_root / "bin"))}\n'
+            + f'cache_dir={json.dumps(str(eco_root / "downloads"))}\n'
+            + f'stage_dir={json.dumps(str(stage_dir))}\n'
+            # fetch() must distinguish the wrapper's own archive url from the
+            # platform_dependency's url, each copied from a real local path
+            # standing in for the network, never actually reaching one.
+            + "fetch() {\n"
+            + "  case \"$1\" in\n"
+            + f"    {wrapper_url}) cp {json.dumps(str(wrapper_archive))} \"$3\" ;;\n"
+            + f"    {dep_url}) cp {json.dumps(str(self.verified_tarball))} \"$3\" ;;\n"
+            + "    *) echo \"fetch: unexpected url $1\" >&2; exit 1 ;;\n"
+            + "  esac\n"
+            + "}\n"
+            + f'install_npm {id_} {version} {wrapper_url} {wrapper_sha256} {ignore_scripts}\n'
+        )
+        result = subprocess.run(["bash", str(harness)], capture_output=True, text=True, timeout=60)
+        return result, eco_root
+
     @unittest.skipUnless(NPM, "native npm unavailable")
-    def test_places_the_verified_tarball_under_its_alias_name_via_real_npm(self):
+    def test_places_the_verified_tarball_under_its_alias_name_when_no_wrapper_shadows_it(self):
+        # install_platform_dependency called in isolation (no wrapper ever
+        # installed at prefix/lib/node_modules/widget): require.resolve finds
+        # nothing to shadow it, so it falls back to a top-level alias --
+        # still Node-resolvable, still exercised end to end.
         with tempfile.TemporaryDirectory() as tmp:
             tmp_path = Path(tmp)
             prefix = tmp_path / "tools" / "widget-1.0.0"
@@ -777,30 +884,76 @@ class PlatformDependencyInstallTests(unittest.TestCase):
                 "url": "https://registry.npmjs.org/widget/-/widget-1.0.0.tgz",
                 "sha256": "0" * 64, "checksum_source": "npm_registry_integrity_crosscheck",
                 "checksum_ref": "test", "install_note": "test",
-                "platform_dependency": {
-                    "name": "widget-darwin-arm64", "resolved_package": "fixture-real-name",
-                    "version": "1.2.3", "url": "https://example.invalid/never-fetched.tgz",
-                    "sha256": self.fixture_sha256,
-                    "integrity": "sha512-unused-in-this-test",
-                },
+                "platform_dependency": self._platform_dependency_pin(),
             })
-            # fetch() is stubbed to copy the already npm-packed fixture tarball
-            # into place instead of reaching the network; install_platform_dependency
-            # itself never sees the difference, and the real npm install below
-            # is exactly the code path production uses.
             result = self._run(tmp_path, pins_path, "widget", prefix,
-                                f'cp {json.dumps(str(self.fixture_tarball))} "$3"')
+                                f'cp {json.dumps(str(self.verified_tarball))} "$3"')
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-            self.assertIn("Installed verified platform dependency widget-darwin-arm64", result.stdout)
+            self.assertIn("Installed and verified platform dependency widget-darwin-arm64", result.stdout)
             installed_pkg = prefix / "lib" / "node_modules" / "widget-darwin-arm64" / "package.json"
             self.assertTrue(installed_pkg.is_file(), list(prefix.rglob("*")))
-            # The alias name governs the node_modules directory; the tarball's
-            # own internal package.json "name" field is left untouched inside it.
             manifest = json.loads(installed_pkg.read_text())
             self.assertEqual(manifest["name"], "fixture-real-name")
             self.assertEqual(manifest["version"], "1.2.3")
-            marker = prefix / "lib" / "node_modules" / "widget-darwin-arm64" / "marker.txt"
-            self.assertTrue(marker.is_file())
+
+    @unittest.skipUnless(NPM, "native npm unavailable")
+    def test_codex_like_wrapper_resolves_the_verified_dependency_not_the_shadowed_one(self):
+        # High finding: installing the wrapper WITHOUT --omit=optional (etc.)
+        # auto-fetches the unverified tarball, unverified, and nests it under
+        # the wrapper's own node_modules -- which Node's require.resolve
+        # checks before a top-level sibling. This proves install_npm's full
+        # sequence (install --ignore-scripts, fix up, npm rebuild) makes the
+        # ACTUAL resolved content the verified one, not the shadowed one.
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            pins_path = self._pins_fixture(tmp_path, {
+                "id": "codexlike", "version": "1.0.0", "kind": "npm",
+                "url": "https://registry.npmjs.org/fixture-codex-like/-/fixture-codex-like-1.0.0.tgz",
+                "sha256": self.codex_like_sha256, "checksum_source": "npm_registry_integrity_crosscheck",
+                "checksum_ref": "test", "install_note": "test",
+                "platform_dependency": self._platform_dependency_pin(),
+            })
+            result, eco_root = self._run_install_npm(
+                tmp_path, pins_path, "codexlike", "1.0.0", self.codex_like_tarball, self.codex_like_sha256,
+                npm_package="fixture-codex-like")
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            wrapper_dir = eco_root / "tools" / "codexlike-1.0.0" / "lib" / "node_modules" / "fixture-codex-like"
+            content = subprocess.run(
+                ["node", "-e",
+                 'const p = require.resolve("widget-darwin-arm64/package.json", {paths: [process.argv[1]]});'
+                 'const fs = require("fs"), path = require("path");'
+                 'process.stdout.write(fs.readFileSync(path.join(path.dirname(p), "native-bin"), "utf8").trim());',
+                 str(wrapper_dir)],
+                capture_output=True, text=True, timeout=30,
+            )
+            self.assertEqual(content.returncode, 0, content.stdout + content.stderr)
+            self.assertEqual(content.stdout.strip(), "VERIFIED_CONTENT")
+
+    @unittest.skipUnless(NPM, "native npm unavailable")
+    def test_claude_code_like_wrapper_postinstall_copies_the_verified_dependency(self):
+        # Same High finding, for the postinstall-copies-at-install-time shape
+        # (install.cjs): the copy must happen AFTER the fix-up, or it copies
+        # the unverified bytes into bin/ once and the later fix-up is moot.
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            pins_path = self._pins_fixture(tmp_path, {
+                "id": "claudelike", "version": "1.0.0", "kind": "npm",
+                "url": "https://registry.npmjs.org/fixture-claude-like/-/fixture-claude-like-1.0.0.tgz",
+                "sha256": self.claude_like_sha256, "checksum_source": "npm_registry_integrity_crosscheck",
+                "checksum_ref": "test", "install_note": "test",
+                "platform_dependency": self._platform_dependency_pin(),
+            })
+            result, eco_root = self._run_install_npm(
+                tmp_path, pins_path, "claudelike", "1.0.0", self.claude_like_tarball, self.claude_like_sha256,
+                npm_package="fixture-claude-like")
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            # npm rebuild's own stdout (including the postinstall's
+            # console.log) is redirected to /dev/null, matching every other
+            # npm invocation in install_npm; the file it actually wrote is
+            # the real evidence.
+            wrapper_dir = eco_root / "tools" / "claudelike-1.0.0" / "lib" / "node_modules" / "fixture-claude-like"
+            final_bin = (wrapper_dir / "bin" / "claude-like.exe").read_text().strip()
+            self.assertEqual(final_bin, "VERIFIED_CONTENT")
 
     def test_fails_closed_on_null_sha256_before_any_fetch_or_npm_call(self):
         with tempfile.TemporaryDirectory() as tmp:

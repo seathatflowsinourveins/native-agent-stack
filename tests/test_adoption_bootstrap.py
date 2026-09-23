@@ -415,7 +415,10 @@ class AdoptionWorkflowPythonVersionTests(unittest.TestCase):
         # run. Assert a Python 3.13 setup step precedes the status step.
         text = WORKFLOW_PATH.read_text()
         setup_index = text.index("actions/setup-python@")
-        status_index = text.index("scripts/adoption_status.py")
+        # The literal invocation, not a bare path-filter list entry or a
+        # comment mentioning the script by name -- both of which can sit
+        # earlier in the file than the first job's own setup-python step.
+        status_index = text.index("python3 scripts/adoption_status.py")
         self.assertLess(setup_index, status_index)
         setup_step = text[setup_index:status_index]
         self.assertIn("python-version: '3.13'", setup_step)

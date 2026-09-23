@@ -3,6 +3,7 @@
 import contextlib
 import io
 import json
+import os
 from pathlib import Path
 from shutil import which as native_which
 import subprocess
@@ -226,6 +227,18 @@ class AdoptionStatusTests(unittest.TestCase):
             self.assertIsNone(git_revision(self.root))
             run.side_effect = subprocess.TimeoutExpired(["git"], 5)
             self.assertIsNone(git_revision(self.root))
+
+    def test_a_symlink_loop_in_root_returns_none_not_an_uncaught_runtimeerror(self):
+        # Path.resolve() on Python before 3.13 raises RuntimeError for a
+        # symlink loop (3.13+ instead returns the unresolved remainder);
+        # either way git_revision must return None, not propagate it.
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            link_a = tmp_path / "a"
+            link_b = tmp_path / "b"
+            os.symlink(link_b, link_a)
+            os.symlink(link_a, link_b)
+            self.assertIsNone(git_revision(link_a))
 
     def test_manifest_outside_explicit_root_is_rejected(self):
         result = inspect_adoption(self.path, self.root / "recipes")
