@@ -4,12 +4,16 @@ tier strings reduce to their result, and the checked-in outputs are fresh."""
 
 from __future__ import annotations
 
+import argparse
 import contextlib
 import io
 import json
+import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
+from scripts import hardware_profile as hp
 from scripts import new_host_grand_list as g
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -138,6 +142,62 @@ class BuildHostsTests(unittest.TestCase):
         hw = {"hosts": [{"id": "wsl-projected", "label": "x", "evidence_class": "labelled_projection"}]}
         hosts = g.build_hosts(hw)
         self.assertIsNone(hosts[0]["measured"])
+
+    def test_measured_is_read_from_the_evidence_file_when_the_entry_has_none(self):
+        # Mirrors exactly what scripts/hardware_profile.py --record-host produces: a
+        # native_proven entry with no inline `measured`, only an `evidence` .json path.
+        # Previously only the entry's own (absent) `measured` was read, so a --record-host
+        # host's real measurements never reached the grand list.
+        hw = {"hosts": [{
+            "id": "this-host-20260923", "label": "measured host", "evidence_class": "native_proven",
+            "evidence": "evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json",
+        }]}
+        hosts = g.build_hosts(hw)
+        self.assertIsNotNone(hosts[0]["measured"])
+        self.assertIn("cores", hosts[0]["measured"])
+
+    def test_entrys_own_measured_wins_over_the_evidence_files(self):
+        hw = {"hosts": [{
+            "id": "this-host-20260923", "label": "measured host", "evidence_class": "native_proven",
+            "evidence": "evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json",
+            "measured": {"cores": 999},
+        }]}
+        hosts = g.build_hosts(hw)
+        self.assertEqual(hosts[0]["measured"]["cores"], 999)
+
+
+class RecordHostToGrandListTests(unittest.TestCase):
+    """End to end: scripts/hardware_profile.py --record-host writes a hosts[] entry with no
+    inline `measured`; scripts/new_host_grand_list.py's join must still surface non-null
+    measured values for it (Codex review finding against 48471ea)."""
+
+    def test_recorded_host_gets_non_null_measured_in_the_grand_list(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "adoption").mkdir(parents=True)
+            (root / "adoption" / "hardware-profiles.json").write_text(
+                json.dumps({"hosts": []}), encoding="utf-8")
+            (root / "manifests").mkdir()
+            (root / "manifests" / "evidence.json").write_text(
+                json.dumps({"schema_version": 1, "files": []}), encoding="utf-8")
+
+            patched_report = {
+                "schema": "hardware-profile-report-v1", "profiles_source": "adoption/hardware-profiles.json",
+                "measured": {"cores": 12, "effective_ram_gb": 64.0, "evidence_class": "native_proven"},
+                "recommended": {"workflow_concurrency_cap": 10}, "limits": [],
+            }
+            with mock.patch.object(hp, "build_report", return_value=patched_report):
+                exit_code = hp.cmd_record_host(
+                    argparse.Namespace(record_host="recorded-host-20260101", label=None, root=root))
+            self.assertEqual(exit_code, 0)
+
+            hw = json.loads((root / "adoption" / "hardware-profiles.json").read_text(encoding="utf-8"))
+            with mock.patch.object(g, "ROOT", root):
+                hosts = g.build_hosts(hw)
+            entry = next(h for h in hosts if h["id"] == "recorded-host-20260101")
+            self.assertIsNotNone(entry["measured"])
+            self.assertEqual(entry["measured"]["cores"], 12)
+            self.assertEqual(entry["measured"]["effective_ram_gb"], 64.0)
 
 
 class MeasuredCellTests(unittest.TestCase):

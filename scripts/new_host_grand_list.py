@@ -160,12 +160,18 @@ def build_hosts(hw: dict) -> list[dict]:
     ``SystemExit``) when such an entry names an evidence file that does not exist, instead of
     silently emitting ``measured_tiers: null``; a ``native_proven`` entry whose evidence is
     prose (for example a hosted-CI-run citation, not a report path) is not held to that check.
+
     Every host's own ``measured`` block (arbitrary shape -- a plain hardware_profile.py
     measurement, or something like a hosted runner's ``measured.mlx_smoke``) is carried
-    through unchanged so it reaches the generated JSON and Markdown."""
+    through so it reaches the generated JSON and Markdown. That block can live directly on
+    the ``hosts[]`` entry (as the shipped ``github-macos-15-arm64-runner`` entry has it) or,
+    for an entry ``scripts/hardware_profile.py --record-host`` wrote, only in the evidence
+    file's own ``measured`` key (that command does not copy it onto the entry): an entry's
+    own ``measured`` wins when both are present, else the evidence file's is used."""
     hosts = []
     for host in hw.get("hosts", []):
         tiers = None
+        measured = host.get("measured")
         evidence = host.get("evidence")
         if host.get("evidence_class") == "native_proven" and isinstance(evidence, str) and evidence.endswith(".json"):
             path = ROOT / evidence
@@ -175,14 +181,17 @@ def build_hosts(hw: dict) -> list[dict]:
                     f"evidence file {evidence!r}, which does not exist; record it (scripts/hardware_profile.py "
                     "--record-host) or fix the evidence path in adoption/hardware-profiles.json instead of "
                     "leaving a dangling reference")
-            tiers = json.loads(path.read_text(encoding="utf-8")).get("recommended")
+            evidence_doc = json.loads(path.read_text(encoding="utf-8"))
+            tiers = evidence_doc.get("recommended")
+            if measured is None:
+                measured = evidence_doc.get("measured")
         hosts.append({
             "id": host.get("id"),
             "label": host.get("label"),
             "evidence_class": host.get("evidence_class"),
             "assumptions": host.get("assumptions"),
             "measured_tiers": tiers,
-            "measured": host.get("measured"),
+            "measured": measured,
             "sizing_arithmetic": host.get("sizing_arithmetic"),
         })
     return hosts
