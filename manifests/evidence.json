@@ -2988,8 +2988,8 @@
     },
     {
       "path": ".github/dependabot.yml",
-      "sha256": "1a504bb975f17f5af05f43a17df9d0e90b7ae3177f87d0ae7a6b99f68caf6b73",
-      "bytes": 1292
+      "sha256": "a42818ebdf0eceb6167453cbce129e8b1653a4dca2cf8a54b20440aa053c2e77",
+      "bytes": 1616
     },
     {
       "path": ".github/main-ruleset.json",
@@ -8679,8 +8679,8 @@
     },
     {
       "path": "docs/decisions/2026-09-22-github-automation-closure.md",
-      "sha256": "68742b9b91af2b9ae8d6daa036f0f166db39a5b3ea8669a31393a438ba08854c",
-      "bytes": 32406
+      "sha256": "0eace745964cb3dd3c83a0dd4f5334ff192da9a44b0b857e606e6a77c0fd9c78",
+      "bytes": 41656
     },
     {
       "path": "docs/direct-results.md",
@@ -8789,8 +8789,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "0291d8ebdb209f293896bae915ca74a25ae024c6d239a6d5cd90a3cac009f5fc",
-      "bytes": 63228
+      "sha256": "0480471e3546be71ac48189079fa479bc278e54d80aa1f978e9fa7d1092d087b",
+      "bytes": 64405
     },
     {
       "path": "docs/grand-catalog-handbook.md",
@@ -9111,6 +9111,51 @@
       "path": "evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger.json",
       "sha256": "5f989503c33774e3086287d6183ff10e51d5756958fe880d204be3fc0bf5b84e",
       "bytes": 590235
+    },
+    {
+      "path": "evidence/artifacts/blind-comparison-20260923/PREREGISTRATION.md",
+      "sha256": "6ef62ccf8c72c2f7405ea6af872693efb0f2af6b3f55307b248444f0e257749b",
+      "bytes": 4067
+    },
+    {
+      "path": "evidence/artifacts/blind-comparison-20260923/README.md",
+      "sha256": "c23f365c29c8443242af0a9244d9a311226c631530d69c5e9f2486521e4d0e31",
+      "bytes": 1655
+    },
+    {
+      "path": "evidence/artifacts/blind-comparison-20260923/battery_catalog.py",
+      "sha256": "84c2ae1c0f7aa5eb21e9b16c501fcdc6217fdbd08b2a8360b60e94922fe96145",
+      "bytes": 9515
+    },
+    {
+      "path": "evidence/artifacts/blind-comparison-20260923/closure-cmp-a-20260923.json",
+      "sha256": "0c5ce0ce49aa9a2dc6d718e74f21518bd00c3b31bb309f33f3a72e35c42a2fcf",
+      "bytes": 671
+    },
+    {
+      "path": "evidence/artifacts/blind-comparison-20260923/judgments-cmp-a-20260923.redacted.json",
+      "sha256": "cbf106603380b661755964724366a8225adfa8127b8ade98a9de27839377e886",
+      "bytes": 8480
+    },
+    {
+      "path": "evidence/artifacts/blind-comparison-20260923/packet-cmp-a-20260923.json",
+      "sha256": "43a48b2ef0f3b86c55bd65ddca48aebe91c51ff0e84367ddfc8a61a6f195a91f",
+      "bytes": 12730
+    },
+    {
+      "path": "evidence/artifacts/blind-comparison-20260923/protocol-cmp-a.json",
+      "sha256": "804349c9de90426727afcbf32a7899c588db55efe6cdc59f0be0bae8e8a5b246",
+      "bytes": 866
+    },
+    {
+      "path": "evidence/artifacts/blind-comparison-20260923/spec-catalog.md",
+      "sha256": "7d70f7a6e36b6ef252946317c7e8b3a3b7e0906a17cae9f2bbb4bf69469f259b",
+      "bytes": 3879
+    },
+    {
+      "path": "evidence/artifacts/blind-comparison-20260923/wfemu.py",
+      "sha256": "4765600792da23c3e9c3efe598a2052a7e0fa27ff9da4a2b2dbbb45f8d6b7719",
+      "bytes": 11363
     },
     {
       "path": "evidence/artifacts/catalog-clean-install-20260921/04-locked-sdk-sync.log",
