@@ -1,7 +1,7 @@
 # Adaptive paper 1x trial, 2026-09-23 12:47 ET: main-built pass (gate receipt)
 
 This trial ran from a read-only `git archive` of main `843dc8f`, which includes the three engine fixes from #123. The
-hashes are in `frozen-843dc8f.SHA256SUMS`, and all 443 match the tree at this commit. It used the bounded run-once
+hashes are in `frozen-843dc8f.SHA256SUMS`, and all 443 match `git archive 843dc8f -- blueprints/us-equities`. It used the bounded run-once
 `scheduled_trial.sh`, the frozen `config-sip.json` (sha256 `3587653104e6…`), 1x cash and the SIP feed.
 
 Result (`paper-output.json`):
