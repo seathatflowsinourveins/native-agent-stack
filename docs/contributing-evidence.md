@@ -72,10 +72,12 @@ machine (`host.second_physical_machine: true`), independently reviewed.
    `my-macbook-20261015`). `--component-id` accepts a `manifests/stack.json`
    id or a `catalogs/landscape/*.json` `winners[]`/`alternatives[]`
    `component_id`, including a repository-style id containing `/` (for
-   example `affaan-m/ECC`) or a `candidate:*` alternative id; a `/` in the id
-   is percent-escaped (`%2F`) only in the receipt's filename, never in the
-   `id` field itself, so it stays a flat file under
-   `evidence/hosts/<host_id>/`. `--from-stack-commands` reuses the
+   example `affaan-m/ECC`) or a `candidate:*` alternative id containing `:`
+   (for example `candidate:cli-cli`); `/` and `:` are each percent-escaped to
+   a distinct, reversible filename token (`/` -> `%2F`, `:` -> `%3A`) only in
+   the receipt's filename, never in the `id` field itself, so it stays a flat
+   file under `evidence/hosts/<host_id>/` instead of crashing on a `:` a
+   filesystem path segment cannot contain. `--from-stack-commands` reuses the
    component's own documented command(s) from `manifests/stack.json`; add
    explicit `--cmd "<shell command>"` flags (repeatable) instead or in
    addition when you need a different check. Pass `--second-physical-machine`

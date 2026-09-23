@@ -53,6 +53,12 @@ def _init_root(root: Path, layers: list[dict], *, catalog_file="foundation.json"
     (root / "catalogs" / "landscape").mkdir(parents=True, exist_ok=True)
     (root / "evidence" / "hosts").mkdir(parents=True, exist_ok=True)
     (root / "manifests").mkdir(parents=True, exist_ok=True)
+    # component_matrix.py's --write/--check paths call host_receipts.build_summary(), which
+    # now loads adoption/host-receipt.schema.json directly (single source of truth for
+    # validate_receipt_shape); every fixture root needs a real copy of it.
+    (root / "adoption").mkdir(parents=True, exist_ok=True)
+    (root / "adoption" / "host-receipt.schema.json").write_text(
+        (REPO_ROOT / "adoption" / "host-receipt.schema.json").read_text(encoding="utf-8"), encoding="utf-8")
     _write_json(root / "catalogs" / "landscape" / catalog_file, {
         "schema_version": 2, "checked_at": "2026-09-22", "scope": "test fixture", "layers": layers,
     })

@@ -110,6 +110,122 @@ def sanitize(text: str) -> str:
     return text
 
 
+def iter_receipt_strings(value):
+    """Yield every decoded string in a JSON value: dict keys, dict values and list items,
+    recursively. Used by the privacy scan so a JSON escape (for example ``\\u002f`` in place
+    of a literal ``/``) cannot hide prohibited content from a scan of only the serialized
+    file bytes: this walks the *decoded* structure instead."""
+    if isinstance(value, str):
+        yield value
+    elif isinstance(value, dict):
+        for key, item in value.items():
+            if isinstance(key, str):
+                yield key
+            yield from iter_receipt_strings(item)
+    elif isinstance(value, list):
+        for item in value:
+            yield from iter_receipt_strings(item)
+
+
+# ----------------------------------------------------------- minimal JSON Schema subset
+#
+# adoption/host-receipt.schema.json is the single source of truth for host-receipt
+# structural validation; validate_against_schema() below implements exactly the subset of
+# JSON Schema (draft 2020-12) keywords that file uses. SCHEMA_SUPPORTED_KEYWORDS and
+# tests/test_host_receipts.py's schema-coverage test fail loudly if the schema is ever
+# edited to use a keyword this validator does not implement, so structural drift between
+# the schema and the code cannot silently pass.
+
+SCHEMA_META_KEYWORDS = {"$schema", "$id", "title", "description"}
+SCHEMA_SUPPORTED_KEYWORDS = {
+    "type", "enum", "const", "required", "properties", "additionalProperties",
+    "items", "minItems", "minLength", "maxLength", "minimum", "pattern",
+}
+
+
+def schema_nodes(schema):
+    """Yield every JSON-Schema object reachable from ``schema`` (itself, each
+    ``properties`` value and ``items``), without descending into arbitrary property
+    *names* as if they were schema keywords."""
+    if not isinstance(schema, dict):
+        return
+    yield schema
+    for subschema in schema.get("properties", {}).values():
+        yield from schema_nodes(subschema)
+    items = schema.get("items")
+    if isinstance(items, dict):
+        yield from schema_nodes(items)
+
+
+def _schema_type_ok(instance, type_name: str) -> bool:
+    if type_name == "object":
+        return isinstance(instance, dict)
+    if type_name == "array":
+        return isinstance(instance, list)
+    if type_name == "string":
+        return isinstance(instance, str)
+    if type_name == "integer":
+        return isinstance(instance, int) and not isinstance(instance, bool)
+    if type_name == "number":
+        return isinstance(instance, (int, float)) and not isinstance(instance, bool)
+    if type_name == "boolean":
+        return isinstance(instance, bool)
+    return True  # pragma: no cover - every type used in the schema is listed above
+
+
+def validate_against_schema(instance, schema: dict, path: str, errors: list[str]) -> None:
+    """Validate ``instance`` against ``schema`` (a JSON Schema object or subschema),
+    appending human-readable messages to ``errors``. Supports exactly
+    SCHEMA_SUPPORTED_KEYWORDS; see the module comment above."""
+    if "const" in schema and instance != schema["const"]:
+        errors.append(f"{path}: must equal {schema['const']!r}")
+    if "enum" in schema and instance not in schema["enum"]:
+        errors.append(f"{path}: must be one of {schema['enum']!r}")
+    if "type" in schema and not _schema_type_ok(instance, schema["type"]):
+        errors.append(f"{path}: must be of type {schema['type']!r}")
+        return  # wrong-typed instance: do not cascade further shape-specific checks
+
+    if isinstance(instance, str):
+        if "minLength" in schema and len(instance) < schema["minLength"]:
+            errors.append(f"{path}: must be at least {schema['minLength']} character(s)")
+        if "maxLength" in schema and len(instance) > schema["maxLength"]:
+            errors.append(f"{path}: must be at most {schema['maxLength']} character(s)")
+        if "pattern" in schema and not re.search(schema["pattern"], instance):
+            errors.append(f"{path}: must match pattern {schema['pattern']!r}")
+
+    if isinstance(instance, (int, float)) and not isinstance(instance, bool):
+        if "minimum" in schema and instance < schema["minimum"]:
+            errors.append(f"{path}: must be >= {schema['minimum']}")
+
+    if isinstance(instance, list):
+        if "minItems" in schema and len(instance) < schema["minItems"]:
+            errors.append(f"{path}: must have at least {schema['minItems']} item(s)")
+        item_schema = schema.get("items")
+        if isinstance(item_schema, dict):
+            for index, item in enumerate(instance):
+                validate_against_schema(item, item_schema, f"{path}[{index}]", errors)
+
+    if isinstance(instance, dict):
+        for key in schema.get("required", []):
+            if key not in instance:
+                errors.append(f"{path}: missing required key {key!r}")
+        properties = schema.get("properties", {})
+        if schema.get("additionalProperties") is False:
+            for key in instance:
+                if key not in properties:
+                    errors.append(f"{path}: unexpected additional property {key!r}")
+        for key, subschema in properties.items():
+            if key in instance:
+                validate_against_schema(instance[key], subschema, f"{path}.{key}", errors)
+
+
+def load_receipt_schema(root: Path) -> dict:
+    """Load adoption/host-receipt.schema.json fresh every call (no caching): this CLI is a
+    short-lived process per invocation, and caching by root path risks stale results if a
+    caller (for example a test) mutates the schema file on disk between calls."""
+    return load_json(root, SCHEMA_RELATIVE_PATH)
+
+
 def stack_component_ids(root: Path) -> set[str]:
     try:
         stack = load_json(root, "manifests/stack.json")
@@ -192,17 +308,30 @@ def platform_profile_map(root: Path) -> dict[str, dict[str, str]]:
     return result
 
 
+# receipt_filename_stem() escapes; '%' is escaped first so it can never collide with an
+# escape token produced by escaping '/' or ':' (the id pattern never permits a literal '%',
+# so this ordering is unambiguous and fully reversible).
+FILENAME_ESCAPES = (("%", "%25"), ("/", "%2F"), (":", "%3A"))
+
+
 def receipt_filename_stem(receipt_id: str) -> str:
     """Filesystem-safe filename stem for a receipt id.
 
     ``id`` may legitimately contain '/' (for example a stack component id like
-    ``affaan-m/ECC``), which cannot appear inside a single path segment. It is
-    percent-escaped here so every receipt is a flat file directly under
-    ``evidence/hosts/<host_id>/`` rather than silently creating a nested directory
-    that ``_iter_receipt_files`` would never glob. '%' is not a character the id
-    pattern permits, so this encoding cannot collide with a literal id.
+    ``affaan-m/ECC``) or ':' (for example a landscape ``candidate:*`` alternative id like
+    ``candidate:cli-cli``), neither of which is safe inside a single filesystem path
+    segment (``safe_file`` rejects ':' outright, and '/' would create a nested directory).
+    Each is percent-escaped here to a distinct, reversible token (``/`` -> ``%2F``, ``:`` ->
+    ``%3A``) so every receipt is a flat file directly under ``evidence/hosts/<host_id>/``
+    rather than silently creating a nested directory (or crashing register_file) that
+    ``_iter_receipt_files`` would never glob. The ``id`` field itself is never escaped; only
+    the filename is. '%' is not a character the id pattern permits, so this encoding cannot
+    collide with a literal id.
     """
-    return receipt_id.replace("/", "%2F")
+    stem = receipt_id
+    for character, token in FILENAME_ESCAPES:
+        stem = stem.replace(character, token)
+    return stem
 
 
 def evidence_files(root: Path) -> dict[str, dict]:
@@ -346,17 +475,38 @@ def cmd_record(args: argparse.Namespace) -> int:
         receipt["host"]["hardware_profile_ref"] = args.hardware_profile_ref
 
     relative_path = f"evidence/hosts/{host_id}/{receipt_filename_stem(receipt_id)}.json"
-    target = root / relative_path
+    try:
+        target = safe_file(root, relative_path)
+    except InvalidDecisionIndex as error:
+        print(f"error: cannot record a receipt at {relative_path!r}: {error}")
+        return 2
+
+    # Validate (and register) before/around the final write, rolling back the file on any
+    # registration failure, so a crash here can never leave a written-but-unregistered
+    # receipt behind (the receipt file and manifests/evidence.json stay coherent together).
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8")
-    register_file(root, relative_path)
+    try:
+        register_file(root, relative_path)
+    except Exception as error:
+        target.unlink(missing_ok=True)
+        print(f"error: could not register {relative_path!r} in manifests/evidence.json ({error}); rolled back")
+        return 1
     print(relative_path)
     return 0
 
 
+# adoption/manifest.json platform_profiles uses "macos" (not Python's platform.system()
+# value "Darwin"/"darwin") and "linux" (which already matches); keep this normalization in
+# sync with that vocabulary so a host recording with default flags produces host.os values
+# consistent with the platform_profiles entry its --platform-id claims.
+OS_NORMALIZATION = {"darwin": "macos", "linux": "linux"}
+
+
 def _default_os() -> str:
     import platform as _platform
-    return _platform.system().lower()
+    raw = _platform.system().lower()
+    return OS_NORMALIZATION.get(raw, raw)
 
 
 def _default_architecture() -> str:
@@ -413,99 +563,40 @@ def _require(condition: bool, errors: list[str], message: str) -> None:
         errors.append(message)
 
 
-def validate_receipt_shape(receipt, label: str, errors: list[str]) -> None:
-    if not isinstance(receipt, dict):
-        errors.append(f"{label}: expected a JSON object")
-        return
-    for key in TOP_LEVEL_REQUIRED:
-        _require(key in receipt, errors, f"{label}: missing required key {key!r}")
-    _require(receipt.get("schema_version") == 1, errors, f"{label}: schema_version must be 1")
-    _require(receipt.get("kind") == "host_acceptance", errors, f"{label}: kind must be 'host_acceptance'")
-    _require(isinstance(receipt.get("id"), str) and bool(ID_PATTERN.fullmatch(receipt["id"])), errors,
-              f"{label}: id must match <host_id>--<component_id>--<stage>--<yyyymmdd>")
-
-    host = receipt.get("host")
-    if isinstance(host, dict):
-        for key in HOST_REQUIRED:
-            _require(key in host, errors, f"{label}.host: missing required key {key!r}")
-        _require(isinstance(host.get("host_id"), str) and bool(HOST_ID_PATTERN.fullmatch(host["host_id"])),
-                  errors, f"{label}.host.host_id: must match ^[a-z0-9-]+-[0-9]{{8}}$")
-        _require(isinstance(host.get("second_physical_machine"), bool), errors,
-                  f"{label}.host.second_physical_machine: must be boolean")
-    else:
-        errors.append(f"{label}.host: expected a JSON object")
-
-    _require(isinstance(receipt.get("catalog_revision"), str) and bool(SHA_PATTERN.fullmatch(receipt["catalog_revision"])),
-              errors, f"{label}.catalog_revision: must be a 40-hex commit SHA")
-    _require(isinstance(receipt.get("component_id"), str) and bool(receipt["component_id"]), errors,
-              f"{label}.component_id: must be nonempty text")
-    _require(receipt.get("stage") in STAGES, errors, f"{label}.stage: must be one of {sorted(STAGES)}")
-
-    commands = receipt.get("commands")
-    if isinstance(commands, list) and commands:
-        for index, command in enumerate(commands):
-            command_label = f"{label}.commands[{index}]"
-            if not isinstance(command, dict):
-                errors.append(f"{command_label}: expected a JSON object")
-                continue
-            for key in COMMAND_REQUIRED:
-                _require(key in command, errors, f"{command_label}: missing required key {key!r}")
-            _require(isinstance(command.get("exit"), int) and not isinstance(command.get("exit"), bool),
-                      errors, f"{command_label}.exit: must be an integer")
-            _require(isinstance(command.get("output_sha256"), str) and bool(SHA256_PATTERN.fullmatch(command["output_sha256"])),
-                      errors, f"{command_label}.output_sha256: must be 64-hex")
-            excerpt = command.get("output_excerpt")
-            _require(isinstance(excerpt, str) and len(excerpt) <= MAX_EXCERPT_CHARS, errors,
-                      f"{command_label}.output_excerpt: must be text of at most {MAX_EXCERPT_CHARS} characters")
-    else:
-        errors.append(f"{label}.commands: must be a nonempty array")
-
-    _require(isinstance(receipt.get("tool_versions"), dict), errors, f"{label}.tool_versions: must be an object")
-    _require(isinstance(receipt.get("observed_at_utc"), str) and bool(ISO_UTC_PATTERN.fullmatch(receipt["observed_at_utc"])),
-              errors, f"{label}.observed_at_utc: must be an ISO-8601 UTC timestamp")
-    _require(receipt.get("result") in RESULTS, errors, f"{label}.result: must be one of {sorted(RESULTS)}")
-    _require(isinstance(receipt.get("claim"), str) and bool(receipt["claim"]), errors, f"{label}.claim: must be nonempty text")
-
-    limitations = receipt.get("limitations")
-    _require(isinstance(limitations, list) and bool(limitations)
-              and all(isinstance(item, str) and item for item in limitations), errors,
-              f"{label}.limitations: must be a nonempty array of nonempty strings")
-
-    _require(receipt.get("evidence_class") in EVIDENCE_CLASSES, errors,
-              f"{label}.evidence_class: must be one of {sorted(EVIDENCE_CLASSES)}")
-
-    reviews = receipt.get("reviews")
-    if isinstance(reviews, list) and reviews:
-        for index, review in enumerate(reviews):
-            review_label = f"{label}.reviews[{index}]"
-            if not isinstance(review, dict):
-                errors.append(f"{review_label}: expected a JSON object")
-                continue
-            for key in REVIEW_REQUIRED:
-                _require(key in review, errors, f"{review_label}: missing required key {key!r}")
-            _require(review.get("kind") in REVIEW_KINDS, errors, f"{review_label}.kind: must be one of {sorted(REVIEW_KINDS)}")
-            _require(review.get("verdict") in REVIEW_VERDICTS, errors,
-                      f"{review_label}.verdict: must be one of {sorted(REVIEW_VERDICTS)}")
-    else:
-        errors.append(f"{label}.reviews: must be a nonempty array")
-
-    for layer_ref in receipt.get("layer_refs", []) if isinstance(receipt.get("layer_refs"), list) else []:
-        if not isinstance(layer_ref, dict) or not layer_ref.get("catalog") or not layer_ref.get("layer_id"):
-            errors.append(f"{label}.layer_refs: each entry needs nonempty 'catalog' and 'layer_id'")
+def validate_receipt_shape(root: Path, receipt, label: str, errors: list[str]) -> None:
+    """Validate ``receipt`` against every constraint in
+    ``adoption/host-receipt.schema.json`` (type, enum, required, properties,
+    additionalProperties, items, minItems, minLength, maxLength, minimum and pattern),
+    via validate_against_schema(). This is the single source of truth: nothing here
+    hand-duplicates a constraint the schema already states, so the two cannot drift."""
+    schema = load_receipt_schema(root)
+    validate_against_schema(receipt, schema, label, errors)
 
 
 def validate_receipt_cross_references(root: Path, host_dir_name: str, path: Path, receipt: dict,
                                        errors: list[str], known_platforms: set[str],
                                        known_stack_ids: set[str], known_landscape_ids: set[str],
-                                       known_files: dict[str, dict]) -> None:
+                                       known_files: dict[str, dict],
+                                       known_platform_profiles: dict[str, dict[str, str]] | None = None) -> None:
     label = path.relative_to(root).as_posix()
     if not isinstance(receipt, dict):
         return
+    if known_platform_profiles is None:
+        known_platform_profiles = {}
 
     host = receipt.get("host") if isinstance(receipt.get("host"), dict) else {}
     platform_id = host.get("platform_id")
     if known_platforms and platform_id not in known_platforms:
         errors.append(f"{label}: host.platform_id {platform_id!r} is not a known adoption/manifest.json platform_profiles id")
+
+    expected_profile = known_platform_profiles.get(platform_id) if isinstance(platform_id, str) else None
+    if expected_profile is not None:
+        actual_os, actual_architecture = host.get("os"), host.get("architecture")
+        if actual_os != expected_profile.get("os") or actual_architecture != expected_profile.get("architecture"):
+            errors.append(
+                f"{label}: host.os={actual_os!r}/host.architecture={actual_architecture!r} is inconsistent with "
+                f"adoption/manifest.json platform_profiles {platform_id!r} "
+                f"(expected os={expected_profile.get('os')!r}, architecture={expected_profile.get('architecture')!r})")
 
     component_id = receipt.get("component_id")
     if (known_stack_ids or known_landscape_ids) and component_id not in known_stack_ids and component_id not in known_landscape_ids:
@@ -577,11 +668,20 @@ def validate_receipt_cross_references(root: Path, host_dir_name: str, path: Path
     for description, pattern in PRIVATE_CONTENT:
         if pattern.search(content):
             errors.append(f"{label}: contains possible {description}")
+    # The raw-text scan above misses content a JSON escape hides (for example / in
+    # place of a literal '/', or \/ ): scan every decoded string value AND every key,
+    # recursively, from the parsed receipt as well.
+    if isinstance(receipt, dict):
+        for decoded_string in iter_receipt_strings(receipt):
+            for description, pattern in PRIVATE_CONTENT:
+                if pattern.search(decoded_string):
+                    errors.append(f"{label}: contains possible {description} (decoded JSON value or key)")
 
 
 def cmd_validate(args: argparse.Namespace) -> int:
     root = repo_root(args.root)
     known_platforms = platform_ids(root)
+    known_platform_profiles = platform_profile_map(root)
     known_stack_ids = stack_component_ids(root)
     known_landscape_ids = landscape_component_ids(root)
     known_files = evidence_files(root)
@@ -596,10 +696,11 @@ def cmd_validate(args: argparse.Namespace) -> int:
         except (OSError, UnicodeError, ValueError, InvalidDecisionIndex) as error:
             errors.append(f"{label}: invalid JSON ({type(error).__name__})")
             continue
-        validate_receipt_shape(receipt, label, errors)
+        validate_receipt_shape(root, receipt, label, errors)
         validate_receipt_cross_references(
             root, host_dir_name, path, receipt, errors,
             known_platforms, known_stack_ids, known_landscape_ids, known_files,
+            known_platform_profiles,
         )
 
     if errors:
@@ -681,7 +782,7 @@ def build_summary(root: Path) -> dict:
                     and host.get("architecture") == expected_profile.get("architecture")
                 )
                 shape_errors: list[str] = []
-                validate_receipt_shape(receipt, path.relative_to(root).as_posix(), shape_errors)
+                validate_receipt_shape(root, receipt, path.relative_to(root).as_posix(), shape_errors)
                 if second_physical_machine and platform_identity_ok and not shape_errors:
                     platform_bucket["independently_reviewed_native_proven_pass_stages"].add(stage)
 

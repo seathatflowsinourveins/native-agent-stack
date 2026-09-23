@@ -14,6 +14,7 @@ import subprocess
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 from scripts import host_receipts as hr
 
@@ -36,6 +37,11 @@ def _init_support_tree(root: Path) -> str:
     (root / "manifests").mkdir(parents=True, exist_ok=True)
     (root / "catalogs" / "landscape").mkdir(parents=True, exist_ok=True)
     (root / "evidence" / "hosts").mkdir(parents=True, exist_ok=True)
+    # validate_receipt_shape() now loads adoption/host-receipt.schema.json directly (single
+    # source of truth); the tmp tree needs a real copy of it, not just the fixture/support
+    # files this module writes by hand.
+    (root / "adoption" / "host-receipt.schema.json").write_text(
+        SCHEMA_PATH.read_text(encoding="utf-8"), encoding="utf-8")
     (root / "adoption" / "manifest.json").write_text(json.dumps({
         "schema_version": 1,
         "platform_profiles": [
@@ -143,7 +149,11 @@ class SchemaSyncTests(unittest.TestCase):
         self.assertIsNone(hr.ID_PATTERN.fullmatch(candidate))
 
 
-class ValidateFixtureTests(unittest.TestCase):
+class _ReceiptFixtureCase(unittest.TestCase):
+    """Shared tmp-tree/fixture/validate helpers, not itself collected as a test case
+    (its name does not start with ``Test``... it does start with an underscore, which
+    unittest's default discovery also skips)."""
+
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
@@ -172,6 +182,8 @@ class ValidateFixtureTests(unittest.TestCase):
             exit_code = hr.cmd_validate(argparse.Namespace(root=self.root))
         return exit_code, buffer.getvalue()
 
+
+class ValidateFixtureTests(_ReceiptFixtureCase):
     def test_valid_fixture_passes(self):
         self._place("valid.json")
         exit_code, output = self._validate()
@@ -277,6 +289,197 @@ class ValidateFixtureTests(unittest.TestCase):
         exit_code, output = self._validate()
         self.assertEqual(exit_code, 0, output)
 
+    def test_platform_os_architecture_mismatch_is_rejected(self):
+        # A receipt claiming linux-wsl2-x86_64 (adoption/manifest.json: os=linux,
+        # architecture=x86_64) while self-declaring os=darwin/architecture=arm64 is
+        # internally contradictory; validate must reject it directly, not only exclude it
+        # from build_summary's stricter macOS flip-rule list.
+        def substitute(data):
+            data["host"]["os"] = "darwin"
+            data["host"]["architecture"] = "arm64"
+
+        self._place("valid.json", patch=substitute)
+        exit_code, output = self._validate()
+        self.assertEqual(exit_code, 1)
+        self.assertIn("inconsistent with adoption/manifest.json platform_profiles", output)
+
+    def test_json_escaped_personal_home_path_in_value_is_rejected(self):
+        # A JSON / escape decodes to '/', hiding a personal home path from a scan of
+        # only the file's raw serialized bytes. Built from parts/escapes at runtime, never
+        # as one literal path string (a literal one here would also trip scripts/validate.py's
+        # repo-wide PRIVATE_CONTENT scan of this tracked test file).
+        backslash = chr(92)
+        a_personal_home_path = "/" + "home" + "/" + "alice"
+        escaped_home_path = backslash + "u002f" + "home" + backslash + "u002f" + "alice"
+        data = json.loads((FIXTURES / "valid.json").read_text(encoding="utf-8"))
+        data["catalog_revision"] = self.commit
+        data["claim"] = "MARKER"
+        text = json.dumps(data, indent=2) + "\n"
+        self.assertNotIn(a_personal_home_path, text)  # sanity: the raw bytes never contain it
+        text = text.replace("MARKER", escaped_home_path)
+        decoded_claim = json.loads(text)["claim"]
+        self.assertIn(a_personal_home_path, decoded_claim)  # sanity: decoding really hides it
+
+        host_dir = self.root / "evidence" / "hosts" / data["host"]["host_id"]
+        host_dir.mkdir(parents=True, exist_ok=True)
+        path = host_dir / f"{data['id']}.json"
+        path.write_text(text, encoding="utf-8")
+        _register(self.root, path.relative_to(self.root).as_posix())
+
+        exit_code, output = self._validate()
+        self.assertEqual(exit_code, 1, output)
+        self.assertIn("personal home path", output)
+
+    def test_json_escaped_personal_home_path_in_key_is_rejected(self):
+        # The same JSON-escape hiding technique, but in an object *key* (tool_versions is an
+        # open object per the schema); the privacy scan must walk keys, not only values.
+        # Built from parts, never as one literal string (see the comment in the value-case
+        # test above).
+        backslash = chr(92)
+        a_personal_home_path = "/" + "home" + "/" + "alice"
+        escaped_home_path = backslash + "u002f" + "home" + backslash + "u002f" + "alice"
+        data = json.loads((FIXTURES / "valid.json").read_text(encoding="utf-8"))
+        data["catalog_revision"] = self.commit
+        data["tool_versions"] = {"MARKERKEY": "1.0.0"}
+        text = json.dumps(data, indent=2) + "\n"
+        self.assertNotIn(a_personal_home_path, text)
+        text = text.replace("MARKERKEY", escaped_home_path)
+        decoded_key = next(iter(json.loads(text)["tool_versions"]))
+        self.assertIn(a_personal_home_path, decoded_key)
+
+        host_dir = self.root / "evidence" / "hosts" / data["host"]["host_id"]
+        host_dir.mkdir(parents=True, exist_ok=True)
+        path = host_dir / f"{data['id']}.json"
+        path.write_text(text, encoding="utf-8")
+        _register(self.root, path.relative_to(self.root).as_posix())
+
+        exit_code, output = self._validate()
+        self.assertEqual(exit_code, 1, output)
+        self.assertIn("personal home path", output)
+
+
+class FullSchemaValidationTests(_ReceiptFixtureCase):
+    """Codex review cases the previous hand-written validate_receipt_shape() missed:
+    it checked required keys and a few enums/patterns but not the schema's full
+    additionalProperties/minimum/minLength constraints. validate_receipt_shape() is now
+    driven directly by adoption/host-receipt.schema.json (validate_against_schema()), so
+    these must all fail."""
+
+    def test_null_command_cmd_is_rejected(self):
+        self._place("valid.json", patch=lambda data: data["commands"][0].__setitem__("cmd", None))
+        exit_code, output = self._validate()
+        self.assertEqual(exit_code, 1, output)
+        self.assertIn("commands[0].cmd", output)
+
+    def test_negative_duration_is_rejected(self):
+        self._place("valid.json", patch=lambda data: data["commands"][0].__setitem__("duration_s", -1))
+        exit_code, output = self._validate()
+        self.assertEqual(exit_code, 1, output)
+        self.assertIn("commands[0].duration_s", output)
+
+    def test_extra_top_level_property_is_rejected(self):
+        self._place("valid.json", patch=lambda data: data.__setitem__("unexpected_extra_field", "x"))
+        exit_code, output = self._validate()
+        self.assertEqual(exit_code, 1, output)
+        self.assertIn("unexpected additional property 'unexpected_extra_field'", output)
+
+    def test_empty_review_ref_is_rejected(self):
+        self._place("valid.json", patch=lambda data: data["reviews"][0].__setitem__("ref", ""))
+        exit_code, output = self._validate()
+        self.assertEqual(exit_code, 1, output)
+        self.assertIn("reviews[0].ref", output)
+
+    def test_null_review_at_utc_is_rejected(self):
+        self._place("valid.json", patch=lambda data: data["reviews"][0].__setitem__("at_utc", None))
+        exit_code, output = self._validate()
+        self.assertEqual(exit_code, 1, output)
+        self.assertIn("reviews[0].at_utc", output)
+
+
+class SchemaKeywordCoverageTests(unittest.TestCase):
+    """Drift protection for the 'load the schema and implement its keyword subset'
+    approach: if adoption/host-receipt.schema.json is ever edited to use a JSON Schema
+    keyword validate_against_schema() does not implement, that keyword would silently
+    stop constraining anything. Fail loudly instead."""
+
+    def test_every_schema_keyword_is_supported(self):
+        schema = _load_schema()
+        used_keywords: set[str] = set()
+        for node in hr.schema_nodes(schema):
+            used_keywords.update(node.keys())
+        used_keywords -= hr.SCHEMA_META_KEYWORDS
+        unsupported = used_keywords - hr.SCHEMA_SUPPORTED_KEYWORDS
+        self.assertEqual(unsupported, set(),
+                          f"schema uses keyword(s) validate_against_schema() does not implement: {unsupported}")
+
+    def test_supported_keywords_are_all_actually_used(self):
+        # Catches the opposite drift: a keyword implemented in code that the schema no
+        # longer uses, which would be dead/untested validation logic.
+        schema = _load_schema()
+        used_keywords: set[str] = set()
+        for node in hr.schema_nodes(schema):
+            used_keywords.update(node.keys())
+        used_keywords -= hr.SCHEMA_META_KEYWORDS
+        self.assertEqual(hr.SCHEMA_SUPPORTED_KEYWORDS - used_keywords, set())
+
+
+class DefaultOsNormalizationTests(unittest.TestCase):
+    """A Mac's platform.system() returns 'Darwin'; adoption/manifest.json's macos-arm64
+    platform_profiles entry expects host.os == 'macos'. _default_os() must normalize."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.root = Path(self.tmp.name)
+        _init_support_tree(self.root)
+        manifest_path = self.root / "adoption" / "manifest.json"
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        manifest["platform_profiles"].append(
+            {"id": "macos-arm64", "os": "macos", "architecture": "arm64", "status": "drafted_not_accepted"})
+        manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+
+    def _run(self, argv: list[str]) -> int:
+        args = hr.build_parser().parse_args(argv)
+        return args.func(args)
+
+    def test_default_os_normalizes_darwin_to_macos(self):
+        with mock.patch("platform.system", return_value="Darwin"):
+            self.assertEqual(hr._default_os(), "macos")
+
+    def test_default_os_leaves_linux_as_linux(self):
+        with mock.patch("platform.system", return_value="Linux"):
+            self.assertEqual(hr._default_os(), "linux")
+
+    def test_mac_record_with_default_flags_satisfies_platform_identity(self):
+        with mock.patch("platform.system", return_value="Darwin"), \
+             mock.patch("platform.machine", return_value="arm64"):
+            buffer = io.StringIO()
+            with contextlib.redirect_stdout(buffer):
+                exit_code = self._run([
+                    "record", "--root", str(self.root),
+                    "--host-id", "test-mac-20260101",
+                    "--platform-id", "macos-arm64",
+                    "--component-id", "widget",
+                    "--stage", "use",
+                    "--evidence-class", "native_proven",
+                    "--second-physical-machine",
+                    "--from-stack-commands",
+                ])
+        self.assertEqual(exit_code, 0, buffer.getvalue())
+        relative_path = buffer.getvalue().strip()
+        receipt = json.loads((self.root / relative_path).read_text(encoding="utf-8"))
+        self.assertEqual(receipt["host"]["os"], "macos")
+        self.assertEqual(receipt["host"]["architecture"], "arm64")
+
+        profiles = hr.platform_profile_map(self.root)
+        self.assertEqual(receipt["host"]["os"], profiles["macos-arm64"]["os"])
+        self.assertEqual(receipt["host"]["architecture"], profiles["macos-arm64"]["architecture"])
+
+        validate_buffer = io.StringIO()
+        with contextlib.redirect_stdout(validate_buffer):
+            validate_exit = hr.cmd_validate(argparse.Namespace(root=self.root))
+        self.assertEqual(validate_exit, 0, validate_buffer.getvalue())
+
 
 class RecorderRoundTripTests(unittest.TestCase):
     def setUp(self):
@@ -362,6 +565,71 @@ class RecorderRoundTripTests(unittest.TestCase):
 
         summary = hr.build_summary(self.root)
         self.assertIn("vendor/tool", summary["components"])
+
+    def test_record_percent_escapes_colon_in_component_id_filename(self):
+        # A landscape "candidate:*" alternative id like "candidate:cli-cli" previously
+        # crashed register_file (safe_file rejects ':' in a path) after the receipt file
+        # had already been written by target.write_text(), leaving an unregistered file on
+        # disk. The colon must now be percent-escaped in the filename just like '/'.
+        stack_path = self.root / "manifests" / "stack.json"
+        stack = json.loads(stack_path.read_text(encoding="utf-8"))
+        stack["components"].append(
+            {"id": "candidate:cli-cli", "version": "1.0.0", "profile": "core", "commands": ["echo hi"]})
+        stack_path.write_text(json.dumps(stack), encoding="utf-8")
+
+        buffer = io.StringIO()
+        with contextlib.redirect_stdout(buffer):
+            exit_code = self._run([
+                "record", "--root", str(self.root),
+                "--host-id", "test-host-20260101",
+                "--platform-id", "linux-wsl2-x86_64",
+                "--component-id", "candidate:cli-cli",
+                "--stage", "use",
+                "--evidence-class", "synthetic",
+                "--from-stack-commands",
+            ])
+        self.assertEqual(exit_code, 0, buffer.getvalue())
+        relative_path = buffer.getvalue().strip()
+        self.assertTrue(relative_path.startswith(
+            "evidence/hosts/test-host-20260101/test-host-20260101--candidate%3Acli-cli--use--"))
+        self.assertNotIn(":", Path(relative_path).name)
+        written = self.root / relative_path
+        self.assertTrue(written.is_file())
+
+        receipt = json.loads(written.read_text(encoding="utf-8"))
+        # The escaping applies only to the filename; the JSON id/component_id fields keep
+        # the literal ':'.
+        self.assertEqual(receipt["component_id"], "candidate:cli-cli")
+        self.assertIn(":", receipt["id"])
+
+        evidence = json.loads((self.root / "manifests" / "evidence.json").read_text(encoding="utf-8"))
+        registered_paths = {entry["path"] for entry in evidence["files"]}
+        self.assertIn(relative_path, registered_paths)
+
+        validate_buffer = io.StringIO()
+        with contextlib.redirect_stdout(validate_buffer):
+            validate_exit = hr.cmd_validate(argparse.Namespace(root=self.root))
+        self.assertEqual(validate_exit, 0, validate_buffer.getvalue())
+
+    def test_record_rolls_back_receipt_file_when_registration_fails(self):
+        # If registering the just-written receipt in manifests/evidence.json fails for any
+        # reason, record() must not leave a written-but-unregistered receipt file behind.
+        buffer = io.StringIO()
+        with mock.patch.object(hr, "register_file", side_effect=OSError("simulated registration failure")):
+            with contextlib.redirect_stdout(buffer):
+                exit_code = self._run([
+                    "record", "--root", str(self.root),
+                    "--host-id", "test-host-20260101",
+                    "--platform-id", "linux-wsl2-x86_64",
+                    "--component-id", "widget",
+                    "--stage", "use",
+                    "--evidence-class", "synthetic",
+                    "--from-stack-commands",
+                ])
+        self.assertEqual(exit_code, 1, buffer.getvalue())
+        host_dir = self.root / "evidence" / "hosts" / "test-host-20260101"
+        leftover = list(host_dir.glob("*.json")) if host_dir.is_dir() else []
+        self.assertEqual(leftover, [], f"receipt file(s) left on disk after a rolled-back record: {leftover}")
 
     def test_record_rejects_malformed_host_id(self):
         buffer = io.StringIO()
@@ -465,7 +733,8 @@ class FlipRuleGatingTests(unittest.TestCase):
         self.commit = _init_support_tree(self.root)
 
     def _write_receipt(self, *, second_physical_machine: bool, os_value: str = "linux",
-                        architecture: str = "x86_64", platform_id: str = "linux-wsl2-x86_64") -> None:
+                        architecture: str = "x86_64", platform_id: str = "linux-wsl2-x86_64",
+                        independent_review_ref: str = "another session") -> None:
         receipt = {
             "schema_version": 1,
             "id": "test-host-20260101--widget--use--20260101",
@@ -489,7 +758,7 @@ class FlipRuleGatingTests(unittest.TestCase):
             "evidence_class": "native_proven",
             "reviews": [
                 {"kind": "self", "ref": "record", "verdict": "agree", "at_utc": "2026-01-01T00:00:00Z"},
-                {"kind": "independent_session", "ref": "another session", "verdict": "agree",
+                {"kind": "independent_session", "ref": independent_review_ref, "verdict": "agree",
                  "at_utc": "2026-01-01T01:00:00Z"},
             ],
         }
@@ -516,6 +785,17 @@ class FlipRuleGatingTests(unittest.TestCase):
         # as os=linux/architecture=x86_64; a receipt claiming that platform_id while
         # self-declaring a different os/architecture must not satisfy the flip rule.
         self._write_receipt(second_physical_machine=True, os_value="macos", architecture="arm64")
+        summary = hr.build_summary(self.root)
+        stages = summary["components"]["widget"]["platforms"]["linux-wsl2-x86_64"][
+            "independently_reviewed_native_proven_pass_stages"]
+        self.assertEqual(stages, [])
+
+    def test_malformed_review_does_not_flip(self):
+        # A review with an empty ref (schema: reviews[].ref minLength 1) is structurally
+        # invalid; build_summary's stricter macOS-flip list must exclude a receipt whose
+        # only independent review is malformed, even though it is otherwise
+        # native_proven/pass/second_physical_machine/platform-identity-consistent.
+        self._write_receipt(second_physical_machine=True, independent_review_ref="")
         summary = hr.build_summary(self.root)
         stages = summary["components"]["widget"]["platforms"]["linux-wsl2-x86_64"][
             "independently_reviewed_native_proven_pass_stages"]

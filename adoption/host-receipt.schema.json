@@ -74,7 +74,7 @@
     "component_id": {
       "type": "string",
       "minLength": 1,
-      "description": "A manifests/stack.json components[].id or a catalogs/landscape/*.json layers[].winners[].component_id"
+      "description": "A manifests/stack.json components[].id or a catalogs/landscape/*.json layers[].winners[].component_id. May legitimately contain '/' (for example 'affaan-m/ECC') or ':' (for example 'candidate:cli-cli'); scripts/host_receipts.py's receipt_filename_stem() percent-escapes each to a distinct, reversible filename token ('/' -> '%2F', ':' -> '%3A', and a literal '%' itself -> '%25' first) so the receipt stays a flat file under evidence/hosts/<host_id>/. This escaping applies only to the filename, never to this field or the 'id' field."
     },
     "layer_refs": {
       "type": "array",

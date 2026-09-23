@@ -918,7 +918,7 @@
         "prometheus",
         "loki"
       ],
-      "claim": "After native sign-in restored readiness, the freshly reproduced SDK completed a real LEAN backtest→Dagu→DuckDB→GPT-6 Astra→Claude Opus 5 prepared-packet research workflow; both native reports passed structural citation/value/unit/scope checks and the accepted Astra report was bound into Claude's prompt by verified hashes.",
+      "claim": "After native sign-in restored readiness, the freshly reproduced SDK completed a real LEAN backtest\u2192Dagu\u2192DuckDB\u2192GPT-6 Astra\u2192Claude Opus 5 prepared-packet research workflow; both native reports passed structural citation/value/unit/scope checks and the accepted Astra report was bound into Claude's prompt by verified hashes.",
       "limitations": [
         "This validates a bounded historical simulation research workflow on the authoring host, not a profitable strategy, current market source, broker execution or unattended production service.",
         "The two reported model tasks used no model tools. Their native hooks and telemetry remain separate evidence; this does not repeat every MCP, memory or GPU-RAG behavior.",
@@ -1900,7 +1900,7 @@
       "component_ids": [
         "ai-memory"
       ],
-      "claim": "Mac arm64 synthetic2.3.1→2.3.2 migration, scoped exact reads/FTS, reserved and Unicode paths, restart and no-capture checks passed.",
+      "claim": "Mac arm64 synthetic2.3.1\u21922.3.2 migration, scoped exact reads/FTS, reserved and Unicode paths, restart and no-capture checks passed.",
       "limitations": [
         "Separate synthetic store and explicit no-model policy only; no production migration claimed by this receipt.",
         "OS filesystem/network confinement was not established; failed restricted-sandbox attempt retained. Native execution succeeded without security overrides; Gatekeeper assessment rejected the ad-hoc distribution.",
@@ -13099,18 +13099,18 @@
     },
     {
       "path": "adoption/host-receipt.schema.json",
-      "sha256": "a350aa68a60e00003e6c5623f393ad90e0069c34fd88e8b4945e755d07ab831f",
-      "bytes": 5314
+      "sha256": "8153fdebc1351e45aadfb7d7d3417e2ec9d8f69187d8100795f8c2ea17a27410",
+      "bytes": 5747
     },
     {
       "path": "scripts/host_receipts.py",
-      "sha256": "3274dc2606554e0176df530a373f08ab1f49576e54a5a0825b50510a9aa018a5",
-      "bytes": 35724
+      "sha256": "0e75f2863a6a21c6baf8798731952305aef804a97ef6590378f6f712c0580c79",
+      "bytes": 40136
     },
     {
       "path": "tests/test_host_receipts.py",
-      "sha256": "df25534bac97468bd16cf8e5f26047291c20cdcd4e3051a6e33f72ca45a32d69",
-      "bytes": 24770
+      "sha256": "88408598c06f3c5e64e2f6cb59b7b024fc8ec10e292614583ea58f500fc424c5",
+      "bytes": 39671
     },
     {
       "path": "tests/fixtures/host-receipts/valid.json",
@@ -13149,8 +13149,8 @@
     },
     {
       "path": "docs/contributing-evidence.md",
-      "sha256": "edcc937d1d1a487fae92de39d215e813490cfb9d2edade2a8b9a7a6424f46af2",
-      "bytes": 12074
+      "sha256": "1bd7ca8e5b4f2a22adfd4d54df87a8ae8329198359c181c542b0498d896bd576",
+      "bytes": 12263
     },
     {
       "path": "scripts/component_matrix.py",
@@ -13169,8 +13169,8 @@
     },
     {
       "path": "tests/test_component_matrix.py",
-      "sha256": "6aeedc2a71216db41dcc9994896707361cf3324f968a4b73e7586c7c8a3b21d3",
-      "bytes": 17572
+      "sha256": "8675685fb0f139d074717a552f7f90c1a67acbbe6ad27be2b970d992cd6e568c",
+      "bytes": 18059
     }
   ],
   "convergence_records": [
