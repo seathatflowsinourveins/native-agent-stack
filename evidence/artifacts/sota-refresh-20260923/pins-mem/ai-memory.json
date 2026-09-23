@@ -1,0 +1,55 @@
+{
+  "id": "sota-refresh-20260923-pins-mem-ai-memory",
+  "component": "ai-memory",
+  "repository": "https://github.com/akitaonrails/ai-memory",
+  "from_pin": "2.3.2",
+  "to_version": "2.4.0",
+  "release_published_at": "2026-09-21T23:45:13Z",
+  "preregistration": {
+    "written_at": "2026-09-23T00:23:00Z",
+    "note": "Written immediately before running the isolated checks below (concurrent with, not after, execution) but after resolving the target version via `gh api repos/akitaonrails/ai-memory/releases/latest`.",
+    "expectation": "The v2.4.0 binary installs cleanly from the published GitHub release archive (checksum match), reports its own version, and the CLI's local-data-dir commands (write-page, search, read-page, backup, restore) operate correctly against an isolated data directory and isolated loopback server, matching the behavior the retained 2.3.1->2.3.2 receipt (evidence/receipts/native-ai-memory-maintenance-20260920.json) recorded for the current pin: binary version check, scoped search, and a functioning store.",
+    "criteria": "pass: checksum verified; `ai-memory --version` reports 2.4.0; a page written into the isolated data-dir is found by a scoped `search` and by `read-page`, and physically exists only under the isolated data-dir (not the live store); `backup` produces a non-empty archive. fail: checksum mismatch, wrong version string, isolated write leaking into or reading from the live store, or backup/restore corrupting data."
+  },
+  "acceptance_check_ref": "evidence/receipts/native-ai-memory-maintenance-20260920.json (checks: published SHA256 sidecar matches archive; binary reports version; native status reports version; explicit project-scoped native search; configured direct MCP memory_status)",
+  "isolation": {
+    "prefix": "$HOME/.cache/sota-refresh-20260923/pins-mem/ai-memory-2.4.0",
+    "binary": "ai-memory-linux-x86_64.tar.gz extracted binary, never installed onto PATH or over the live executable",
+    "data_dir": "$HOME/.cache/sota-refresh-20260923/pins-mem/ai-memory-2.4.0/data (and a second data-restored dir), never $HOME/.local/share/ai-memory",
+    "server": "own `ai-memory serve` process bound to loopback port 58217 (config.toml bind edited from the 49374 default), started and stopped by this check; the live production service (pid 365, port 49374, workspace/project agent-lab) was never started, stopped, or reconfigured",
+    "live_service_untouched": true
+  },
+  "commands": [
+    "curl -sSL -o ai-memory-linux-x86_64.tar.gz https://github.com/akitaonrails/ai-memory/releases/download/v2.4.0/ai-memory-linux-x86_64.tar.gz",
+    "sha256sum ai-memory-linux-x86_64.tar.gz  # compared against the published .sha256 sidecar",
+    "./ai-memory --version",
+    "sed -i 's/^bind = .*/bind = \"127.0.0.1:58217\"/' data/config.toml",
+    "./ai-memory --data-dir data serve --transport http   # isolated server, backgrounded, killed at the end",
+    "./ai-memory --data-dir data write-page --path canary/test.md --body '# <unique-canary>...'",
+    "./ai-memory --data-dir data search '<unique-canary>'",
+    "./ai-memory --data-dir data backup --to backup.tar.gz",
+    "./ai-memory --data-dir data-restored init",
+    "./ai-memory --data-dir data-restored restore --from backup.tar.gz",
+    "./ai-memory --data-dir data-restored read-page --path canary/test.md",
+    "kill <isolated serve pid>"
+  ],
+  "results": {
+    "checksum": "sha256 of the downloaded archive matched the published ai-memory-linux-x86_64.tar.gz.sha256 sidecar exactly (590f75dd...795076).",
+    "version_check": "`ai-memory --version` -> `ai-memory 2.4.0`. Passed.",
+    "write_and_search": "write-page created a page under the isolated data dir (verified physically: `find $DATA/wiki -iname '*canary*'` located the new page's UUID directory; the same search against $HOME/.local/share/ai-memory found nothing). `search '<unique-canary>'` returned 1 result with the written body. Passed.",
+    "backup": "`backup --to backup.tar.gz` wrote a 120.89 MiB archive (log: 'backup written ... bytes=126761271'). Passed.",
+    "restore": "BLOCKED, not a version regression: restore refused with `Error: refusing to restore: 2 other ai-memory process(es) running (pids: [365, 3690993]). Stop them first, then re-run.` This safety check enumerates ai-memory processes host-wide, not scoped to the target data-dir, so it correctly refuses while the live production service (pid 365) is running. Completing this check would require stopping the live service, which the isolation contract forbids. The restore path is unverified on 2.4.0 in this run; it also refused to write anything (the restored dir stayed empty), which is the safe failure mode.",
+    "read_page_after_restore": "Because restore did not run, the canary page found by read-page against the restored (empty) data-dir was in fact served by the CLI's scope-based routing back to the still-running isolated serve instance on port 58217 rather than a direct file read of data-restored -- see regression_finding below.",
+    "regression_finding": "`ai-memory status --json` on 2.4.0 ignored both `--data-dir` and `AI_MEMORY_BIND`/the isolated data-dir's own `config.toml` bind override, and instead reported live counters (pages_all, sessions, observations, ingest.accepted growing between calls) from the already-running production service on the hardcoded default 127.0.0.1:49374. This was discovered, not exploited: 3 read-only status calls were made while diagnosing the isolation before the cause was identified; no writes were made to the live store and its wiki directory was independently confirmed unchanged. `read-page`/`search`/`write-page` were confirmed (via on-disk verification) to operate on the isolated data-dir, so the client-vs-server routing appears specific to `status` and possibly scope-name collisions rather than a universal bypass, but this was not fully root-caused given the isolation constraints of this run."
+  },
+  "verdict": "not_comparable",
+  "evidence_class": "native_proven",
+  "limits": [
+    "The retained current-pin receipt's 'active service executable resolves to installed binary' and 'configured direct MCP memory_status' checks were not re-run at all: isolation rules forbid replacing the live executable or touching the configured/live MCP.",
+    "The 'native status reports 2.4.0' check could not be completed cleanly: status queried the live server instead of the isolated one (see regression_finding), so it is BLOCKED rather than passed or failed for this version.",
+    "The restore check is BLOCKED by a host-wide (not data-dir-scoped) running-process safety guard while the live service is up; not a demonstrated regression, but not a demonstrated pass either.",
+    "3 incidental read-only status queries touched the live server's HTTP endpoint before the cause was understood; no data was written or altered on the live store (independently verified by filesystem diff), but this is an isolation-boundary deviation worth flagging honestly.",
+    "Overall verdict is 'not_comparable' rather than 'qualified' or 'regression' because two of the five retained check categories (status, MCP) could not be safely or completely re-run in isolation on this host with a live instance present."
+  ],
+  "checked_at": "2026-09-23T00:27:00Z"
+}

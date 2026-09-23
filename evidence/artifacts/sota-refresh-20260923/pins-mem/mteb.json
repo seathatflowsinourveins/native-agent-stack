@@ -1,0 +1,38 @@
+{
+  "id": "sota-refresh-20260923-pins-mem-mteb",
+  "component": "mteb",
+  "repository": "https://github.com/embeddings-benchmark/mteb",
+  "from_pin": "2.21.0",
+  "to_version": "2.21.6",
+  "release_published_at": "2026-09-21T22:39:20Z",
+  "preregistration": {
+    "written_at": "2026-09-23T00:27:00Z",
+    "note": "Written concurrently with running the check below, after resolving the target version via `gh api repos/embeddings-benchmark/mteb/releases/latest`.",
+    "expectation": "catalogs/us-equities/foundation-memory.json records mteb's retained usage as a bare `pip install mteb` (component id foundation-mteb, cited README/release URLs only) plus a reference from evidence/receipts/hf-memory-models-20260921.json to the public MTEB leaderboard as a benchmark citation, not an executed evaluation run. There is no retained receipt that runs `mteb.MTEB(...).run(...)` on this host. The only reproducible re-run is pip install + import + version check at the new pin.",
+    "criteria": "qualified-for-install-only: pip install mteb==2.21.6 succeeds and `import mteb; mteb.__version__ == '2.21.6'`. not_comparable for behavior: no retained functional evaluation receipt exists to reproduce."
+  },
+  "acceptance_check_ref": "catalogs/us-equities/foundation-memory.json (component id=foundation-mteb, retained usage: \"pip install mteb\", citing https://github.com/embeddings-benchmark/mteb/releases/tag/2.21.0); no retained native evaluation-run receipt was found by rg over evidence/, blueprints/, catalogs/.",
+  "isolation": {
+    "prefix": "$HOME/.cache/sota-refresh-20260923/pins-mem/venvs/mteb-2.21.6",
+    "install": "uv venv + uv pip install mteb==2.21.6 into a unit-owned venv; no HF dataset download, model download or benchmark task execution was performed (out of scope: would require downloading external model/eval-set assets beyond this task's bound)"
+  },
+  "commands": [
+    "gh api repos/embeddings-benchmark/mteb/releases/latest",
+    "uv venv $HOME/.cache/sota-refresh-20260923/pins-mem/venvs/mteb-2.21.6 --python 3.13",
+    "uv pip install --python <venv>/bin/python mteb==2.21.6",
+    "<venv>/bin/python -c \"import mteb; print('mteb', mteb.__version__)\""
+  ],
+  "results": {
+    "latest_release": "tag_name=2.21.6, published_at=2026-09-21T22:39:20Z.",
+    "install": "uv pip install mteb==2.21.6 succeeded, pulling torch 2.14.0, transformers 5.17.0, tokenizers 0.23.2, etc.",
+    "version_check": "`import mteb; mteb.__version__` -> `2.21.6`. Matches the requested pin exactly."
+  },
+  "verdict": "not_comparable",
+  "evidence_class": "source_review",
+  "limits": [
+    "The retained current-pin usage for mteb is a bare install command, not an executed evaluation; this unit reproduced the same bar (install + import) at the new version rather than a functional benchmark run, so there is nothing behaviorally comparable between 2.21.0 and 2.21.6 in this repository's evidence.",
+    "Running an actual MTEB task (e.g. a retrieval or STS task on a small model) was out of scope for this check: it would require downloading a Hugging Face model and/or dataset, which is a meaningfully larger and slower operation than the isolation/timeboxing for this unit's other four components, and no such run is retained to reproduce.",
+    "No paid API or broker involvement; purely local pip install and import."
+  ],
+  "checked_at": "2026-09-23T00:27:00Z"
+}

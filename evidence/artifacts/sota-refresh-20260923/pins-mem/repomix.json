@@ -1,0 +1,37 @@
+{
+  "id": "sota-refresh-20260923-pins-mem-repomix",
+  "component": "repomix",
+  "repository": "https://github.com/yamadashy/repomix",
+  "from_pin": "1.18.0 (as named in the assigned task)",
+  "to_version": "1.18.1",
+  "release_published_at": "2026-09-21T08:34:49Z",
+  "preregistration": {
+    "written_at": "2026-09-23T00:26:00Z",
+    "note": "Written concurrently with, not strictly before, the version-resolution and install commands below; the acceptance criteria were fixed before interpreting the result.",
+    "expectation": "The task names a 1.18.0 -> 1.18.1 upgrade, but the in-repo pin (scripts/native_token_ci.py PINS['repomix']) and the retained receipt evidence/artifacts/full-stack-convergence-20260921/ccusage-repomix-upgrades.json already record repomix at 1.18.1 (upgraded 2026-09-21, before this wave). `gh api repos/yamadashy/repomix/releases/latest` should confirm 1.18.1 is still the newest release, i.e. there is no pending upgrade for this unit to perform.",
+    "criteria": "pass/qualified: gh api latest release == 1.18.1 and an isolated install of repomix@1.18.1 reports the matching version; the retained receipt's test run (148/148 passing across the 5 scoped upstream test files) is reused as native_proven evidence for that exact version. fail: a newer release exists beyond 1.18.1, or the isolated install reports a different version than the retained receipt."
+  },
+  "acceptance_check_ref": "evidence/artifacts/full-stack-convergence-20260921/ccusage-repomix-upgrades.json (repomix test command: `npm test -- --run tests/core/git/gitCommand.test.ts tests/core/file/fileManipulate.test.ts tests/core/output/flagFullDirectoryStructure.test.ts tests/core/file/truncateBase64.test.ts tests/shared/sizeParse.test.ts`, 5 test files / 148 tests passed, 0 failed); scripts/native_token_ci.py PINS['repomix'] = '1.18.1'",
+  "isolation": {
+    "prefix": "$HOME/.cache/sota-refresh-20260923/pins-mem/repomix-check",
+    "install": "npm install --prefix <prefix> --no-save repomix@1.18.1, never touching a repository-wide node_modules or PATH binary"
+  },
+  "commands": [
+    "gh api repos/yamadashy/repomix/releases/latest",
+    "npm install --prefix $HOME/.cache/sota-refresh-20260923/pins-mem/repomix-check --no-save repomix@1.18.1",
+    "$HOME/.cache/sota-refresh-20260923/pins-mem/repomix-check/node_modules/.bin/repomix --version"
+  ],
+  "results": {
+    "latest_release": "tag_name=v1.18.1, published_at=2026-09-21T08:34:49Z -- identical to the version already pinned in scripts/native_token_ci.py and already tested in the retained 20260921 receipt.",
+    "isolated_install": "npm install completed (171 packages added, 0 vulnerabilities); `repomix --version` -> `1.18.1`. Matches the retained receipt's tested version exactly.",
+    "retained_test_reuse": "Reused evidence/artifacts/full-stack-convergence-20260921/ccusage-repomix-upgrades.json: repomix's own upstream test suite at the v1.18.1 source tag passed 148/148 across the 5 scoped files (tests/core/git/gitCommand.test.ts, tests/core/file/fileManipulate.test.ts, tests/core/output/flagFullDirectoryStructure.test.ts, tests/core/file/truncateBase64.test.ts, tests/shared/sizeParse.test.ts), exit_code 0. This was not re-executed in this unit's run because the version, source commit (80b4280a9196feace092fc672dfe2b5fac62ef08) and scope are unchanged from that receipt's inputs -- reusing valid results rather than re-running an unchanged check."
+  },
+  "verdict": "qualified",
+  "evidence_class": "native_proven",
+  "limits": [
+    "There is no version delta to qualify: the current pin (1.18.1) already equals the newest upstream release resolved at run time. This receipt confirms 'already current, no regression' rather than testing a new upgrade.",
+    "The 148/148 upstream test result is reused from a prior receipt at the same source commit rather than re-executed in this session; the isolated install in this session only re-verified the installed version string, not the full upstream test suite.",
+    "npm registry install, not a from-source reproducible build; the retained receipt already notes upstream source tests are release-tag source, not reproducible-binary attestation."
+  ],
+  "checked_at": "2026-09-23T00:27:00Z"
+}

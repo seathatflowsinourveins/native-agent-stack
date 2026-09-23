@@ -12561,6 +12561,36 @@
       "path": "evidence/artifacts/layer-verdicts-20260922/packets/us-equities__data-quality-orchestration.json",
       "sha256": "cdbe255da0593b73f77e57bc8b887984a78e5233165f3a9fa27818d427708eeb",
       "bytes": 8782
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-mem/README.md",
+      "sha256": "d5f9f5883220c89e7a136eb4ba7e36ca379222ec1430b5e1079273b5edb88955",
+      "bytes": 5905
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-mem/markitdown.json",
+      "sha256": "0a71a5144735375535a070d873c155e73651d93e7802d88e26eae05541f882b4",
+      "bytes": 3498
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-mem/pageindex.json",
+      "sha256": "f5c67cdde88e63fe24a84b660e4a9e3dd3b73479e3d2b6e9a55d9b5a0ca98823",
+      "bytes": 4805
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-mem/repomix.json",
+      "sha256": "bbefaa9abd6e75dbbecf3aa296e7ea4fd3b1b94c77364c3b3ce66db610df6960",
+      "bytes": 4227
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-mem/ai-memory.json",
+      "sha256": "2ba92bef013ad8c47e6c96a7a3024374817a900cb1fc534b64357337867c346c",
+      "bytes": 7277
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-mem/mteb.json",
+      "sha256": "405eef7d4b53f85ee8443e06e43ac921c8a1ee60e3bd7d69874d23cf686711f3",
+      "bytes": 3376
     }
   ],
   "convergence_records": [
