@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "scored_at": "2026-09-23",
+  "scoring_note": "Scored 0-2 per case per arm against the frozen rubric in cases.json, by this receipt's author (the acting agent) reading each transcript's final answer. Single-rater diagnostic scoring, not blinded or independently adjudicated. C5/C6 score 1/2 on both arms because the model's answer ('insufficient') disagrees with the frozen 'supported' label (point_a fails) but the reasoning does engage the intended numeric-range/paraphrase relationship (partial credit for point_b-style reasoning quality), matching wave 2's scoring convention for the same two cases.",
+  "rows": [
+    {"case_id": "C3", "with_skill_forced": 2, "without_skill": 2, "max_score": 2, "skill_valid_with_skill_forced": true},
+    {"case_id": "C4", "with_skill_forced": 2, "without_skill": 2, "max_score": 2, "skill_valid_with_skill_forced": true},
+    {"case_id": "C5", "with_skill_forced": 1, "without_skill": 1, "max_score": 2, "skill_valid_with_skill_forced": true, "note": "Both arms answer 'insufficient'; frozen label is 'supported'. Partial credit for engaging the $45-55M range relationship in reasoning."},
+    {"case_id": "C6", "with_skill_forced": 1, "without_skill": 1, "max_score": 2, "skill_valid_with_skill_forced": true, "note": "Both arms answer 'insufficient'; frozen label is 'supported'. Partial credit for engaging the paraphrase relationship in reasoning."},
+    {"case_id": "C7", "with_skill_forced": 2, "without_skill": 2, "max_score": 2, "skill_valid_with_skill_forced": true},
+    {"case_id": "C8", "with_skill_forced": 2, "without_skill": 2, "max_score": 2, "skill_valid_with_skill_forced": true},
+    {"case_id": "C9", "with_skill_forced": 2, "without_skill": 2, "max_score": 2, "skill_valid_with_skill_forced": true},
+    {"case_id": "C10", "with_skill_forced": 2, "without_skill": 2, "max_score": 2, "skill_valid_with_skill_forced": true}
+  ],
+  "totals": {
+    "with_skill_forced": {"score": 14, "max": 16},
+    "without_skill": {"score": 14, "max": 16},
+    "difference": 0
+  },
+  "usage_totals": {
+    "with_skill_forced": {"calls": 8, "input_tokens": 48, "output_tokens": 6508, "cache_creation_input_tokens": 192274, "cache_read_input_tokens": 595675, "total_cost_usd": 1.787679},
+    "without_skill": {"calls": 8, "input_tokens": 16, "output_tokens": 3579, "cache_creation_input_tokens": 106930, "cache_read_input_tokens": 121520, "total_cost_usd": 0.951388}
+  }
+}

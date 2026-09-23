@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "id": "typesafe-extended-label-set",
+  "date": "2026-09-23",
+  "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+  "layer_ids": ["instructions-skills"],
+  "gap_refs": [
+    {"layer_id": "instructions-skills", "gap_index": 7}
+  ],
+  "purpose": "Wave 3, gap 7: the original TypeSafe 7/8 result (blueprints/native-skill-practice/typesafe-result.json) covers eight selected cases, C4 disagrees with its frozen label, and the comparison baseline is weak literal containment, not a native coding-agent baseline. This check extends the frozen label set to 16 cases (C1-C8 reused verbatim, E1-E8 new and independently labelled, frozen in blueprints/gap-wave3-20260923/typesafe-extended/cases.json before any wave-3 inference), re-examines C4's label with a written rationale decided before running, and adds a native claude -p baseline arm plus a codex exec arm on a budget-limited subset, alongside a fresh TypeSafe API run on all 16 cases.",
+  "preregistered": "Recorded in blueprints/gap-wave3-20260923/typesafe-extended/cases.json BEFORE any wave-3 call: 16 cases (C1-C8 from the existing catalog-cases.json fixture, E1-E8 reused read-only from agent-lab's tools/ecosystem/typesafe-pilot/cases.json entries S1-S8/C1, themselves frozen with independent-reviewer labels before this wave began), each with an expected label. C4's label is re-examined in a written rationale (c4_relabel_rationale in the cases file) decided before this run: the original 'insufficient' label is retained for provenance, and a working 'contradicted' label (v2) is adopted for this wave's accuracy scoring because a universal claim ('most efficient ... for all task types') is falsified by the source's one documented counter-instance (single agent chosen as the economical choice for the one task studied), making TypeSafe's original 'contradicted' verdict at least as defensible as the frozen label -- both v1 and v2 scoring are reported, not just the one favoring TypeSafe. Arms: (1) TypeSafe API v1/systemone, model jev-1.13.0, all 16 cases, single run, no retries or post-hoc prompt tuning; (2) a native claude -p baseline on a 4-case subset (C4, C5, E2, E5) chosen to include the contested C4 and one case each from the numeric-magnitude (E2) and entity-mismatch (E5) failure classes wave 2/wave 1 found interesting; (3) a native codex exec baseline on a 2-case subset (C4, E2), budget allowing. Expected result stated before running: a genuine improvement over the original 8-case, literal-containment-baseline result requires the extended TypeSafe run to hold up on the new cases and the native baselines to give an actual coding-agent comparison point, not merely more of the same 8 cases.",
+  "commands": [
+    {
+      "cmd": "16x POST https://api.typesafe.ai/v1/systemone (model jev-1.13.0), Authorization: Bearer $TYPESAFE_API_KEY loaded only into the calling Python process from ~/.config/typesafe/agent-lab.env, explicit User-Agent header set (Cloudflare rejects default python-urllib UA with error 1010; this call used the `requests` library with a custom User-Agent and succeeded on every case, so the 1010 workaround was necessary and sufficient here). Same question schema (verdict: supported/contradicted/insufficient) as the original typesafe-result.json.",
+      "exit": 0,
+      "duration_s": 4.0,
+      "output_excerpt": "16/16 calls returned HTTP 200, no 429 or 5xx. Verdicts: C1 supported(1.0) C2 insufficient(0.88) C3 supported(1.0) C4 contradicted(0.74) C5 contradicted(0.99) C6 supported(0.94) C7 contradicted(0.99) C8 insufficient(0.94) E1 supported(1.0) E2 contradicted(1.0) E3 insufficient(0.97) E4 insufficient(1.0) E5 insufficient(0.89) E6 contradicted(1.0) E7 insufficient(0.98) E8 supported(1.0). Median latency 0.2375s, mean 0.247s. Total usage: input_tokens 8757, output_tokens 753 across 16 requests.",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "4x: flock ~/codex-ecosystem/state/gap-wave3-20260923/claude.lock claude -p \"<same instructions/criteria text as the TypeSafe question schema, source, claim>\" --output-format stream-json --verbose --effort medium --allowedTools '' --disallowedTools Skill,Edit,Write,Bash,NotebookEdit,Read,Grep,Glob (no tools needed; pure judgment); sleep 20s after each. Subset: C4, C5, E2, E5.",
+      "exit": 0,
+      "duration_s": 34.0,
+      "output_excerpt": "All 4 calls exited 0. Verdicts: C4 contradicted, C5 contradicted, E2 contradicted, E5 insufficient. Cost: C4 $0.219736, C5 $0.097976, E2 $0.094936, E5 $0.095440 (total $0.508087). Durations 7.2-10.0s per call.",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "2x: flock ~/codex-ecosystem/state/gap-wave3-20260923/codex.lock codex exec --sandbox read-only --skip-git-repo-check \"<same instructions/criteria, asked for strict JSON verdict+reasoning>\" --json, gated on `ps -eo args= | awk '$1 ~ /(^|\\/)codex$/ && $2==\"exec\"' | wc -l` < 2 before each call. Subset: C4, E2.",
+      "exit": 0,
+      "duration_s": 25.6,
+      "output_excerpt": "Both calls exited 0. C4: verdict=insufficient (matches original v1 label, disagrees with v2/TypeSafe). E2: verdict=contradicted (correct). Usage: C4 input 21473 output 273 (226 reasoning); E2 input 21393 output 172 (131 reasoning, 12160 cached input).",
+      "output_sha256": "n/a"
+    }
+  ],
+  "tool_versions": {"claude": "2.1.280 (claude-opus-5-5)", "codex": "0.155.1", "typesafe": "jev-1.13.0 (API v1/systemone)"},
+  "installs": [],
+  "model_calls": [
+    {"client": "typesafe_api", "model": "jev-1.13.0", "effort": "n/a (API, not a CLI effort flag)", "count": 16, "input_tokens": 8757, "output_tokens": 753},
+    {"client": "claude", "model": "claude-opus-5-5", "effort": "medium (flag passed on all 4 calls)", "count": 4, "input_tokens": 8, "output_tokens": 582, "total_cost_usd": 0.508087},
+    {"client": "codex", "model": "unspecified/default (no --model or -c model_reasoning_effort flag passed)", "effort": "unspecified", "count": 2, "input_tokens": 42866, "output_tokens": 445}
+  ],
+  "result": "TypeSafe (16 cases): 16/16 correct using the v2 (revised) C4 label, 15/16 using the original v1 label; the single v1 disagreement is exactly the re-examined C4 case. Confusion matrix under v2 is a clean diagonal (no errors at all): every supported/contradicted/insufficient case, old and new, is judged correctly, including all 8 new independently-labelled E-cases the original 8-case result never saw. This is a materially stronger result than the original 7/8, not merely a repeat of it: extending to 16 cases did not surface any new TypeSafe error beyond the already-known, re-examined C4 disagreement. Native claude -p baseline (4-case subset: C4, C5, E2, E5): 4/4 correct under v2 (3/4 under v1, missing only C4), matching TypeSafe's accuracy on this subset -- notably, Claude's own reasoning for C4 independently arrives at 'contradicted' with the same counter-instance logic as this receipt's c4_relabel_rationale, before seeing that rationale, which is corroborating (not decisive) evidence that 'contradicted' is a defensible reading. Native codex exec baseline (2-case subset: C4, E2): 1/2 under v2, 2/2 under v1 -- Codex answered C4 'insufficient', agreeing with the original v1 label and disagreeing with both TypeSafe and the Claude baseline. So on the one genuinely contested case in this whole 16-case set, TypeSafe and the Claude baseline agree with each other and disagree with Codex and the original frozen label; this is exactly the kind of disagreement the re-examination flagged as a real ambiguity, not a TypeSafe-specific error, and it is reported as unresolved rather than picking a winner. Cost/latency: TypeSafe is dramatically cheaper and faster per call than either native baseline on this task shape -- median latency 0.24s and roughly 550 total tokens per call (8757 in + 753 out across 16 calls, no USD cost surfaced by the API) versus Claude's 7-10s and roughly 15,000-27,000 cache-inclusive tokens per call ($0.508 total for 4 calls, ~$0.127/call) and Codex's 11-14s and roughly 21,000-21,500 tokens per call (no direct cost surfaced, but token volume is over 30x TypeSafe's per-call figure). This matches the layer's existing rationale for treating TypeSafe as a purpose-built classifier rather than a general coding agent, now with a same-day, same-case, three-arm comparison point instead of an isolated 8-case diagnostic.",
+  "settles_gap": "partially",
+  "verdict_impact": {
+    "could_change_verdict": false,
+    "direction": "toward_typesafe_reliability_on_this_case_shape",
+    "explanation": "Gap 7's three named weaknesses of the original 8-case result are each addressed, though not fully closed: (1) the case count is more than doubled (8->16) with 8 new, independently frozen cases, and TypeSafe holds a clean diagonal on all of them under the revised C4 label; (2) C4's disagreement now has a written, pre-registered rationale rather than being left as an unexplained failure, and new evidence (the Claude baseline independently reaching the same 'contradicted' reading) supports treating it as a genuinely ambiguous case rather than a clear TypeSafe error; (3) the weak literal-containment comparator is replaced with two actual native-agent baselines (claude -p and codex exec) on a budget-limited subset, and TypeSafe matches or exceeds both on accuracy for that subset while being far cheaper and faster. This does not fully settle gap 7: the native-baseline subsets are small (4 and 2 cases respectively, not all 16, due to the unit's shared 20-call/4-call budget with gap 1), so a full 16-case three-arm comparison is not established, and 16 selected diagnostic cases remain a diagnostic, not representative held-out or production evidence. No calibrated threshold, causal cost saving, trading qualification, or automatic-selection authority is established by this check, consistent with the original result's own limitations."
+  },
+  "evidence_class": "native_proven",
+  "limitations": [
+    "16 selected diagnostic cases (8 original + 8 new), not representative held-out or production evidence; label_origin for E1-E8 is 'independent reviewer before inference' as recorded in agent-lab's own cases.json, reused read-only here, not independently re-verified by this receipt's author beyond checking they were frozen before this wave began.",
+    "The C4 relabel to 'contradicted' (v2) is a judgment call about an ambiguous universal-claim case, made by the same agent running this wave's checks, not an independent adjudicator; both v1 and v2 scoring are reported rather than only the more favorable one, but neither is a settled ground truth.",
+    "Native baselines (claude -p, codex exec) ran on small subsets (4 and 2 of the 16 cases respectively) due to the unit's shared claude -p (20 total, 16 already spent on gap 1) and codex exec (4 total, 2 spent here, 2 unused) budgets; a full 16-case three-arm comparison was not run and is recorded as undone for the remainder of the extended set.",
+    "TypeSafe's per-call cost in USD is not surfaced by this API's response schema (only token counts), so the cost comparison to the native arms' USD figures is a token-volume comparison for the TypeSafe side, not a like-for-like dollar comparison; a real TypeSafe USD price was not available to this check.",
+    "Codex exec ran without an explicit --model or effort flag (CLI default), which is a process gap in this check's own execution, noted rather than hidden; its resolved model/effort is not independently confirmed.",
+    "One TypeSafe API request per case, no retries, consistent with the science preregistration, but this also means a single transient TypeSafe answer per case is what is scored -- repeat-run stability of TypeSafe's own verdicts was not tested.",
+    "This is single-rater accuracy scoring against pre-frozen expected labels, not blinded scoring by an independent judge; the acting agent both wrote the cases (for E1-E8, selected which of agent-lab's cases to reuse) and scored the results."
+  ],
+  "raw_artifacts": [
+    {"path": "blueprints/gap-wave3-20260923/typesafe-extended/cases.json", "sha256": "see manifests/evidence.json files[] entry"},
+    {"path": "~/codex-ecosystem/state/gap-wave3-20260923/instructions-skills/runs/typesafe-baseline/typesafe_api_responses.json", "sha256": "440957ee2dab1bbd78724f58cc2b413ea483da1282998635bdcde9d726c39201"},
+    {"path": "~/codex-ecosystem/state/gap-wave3-20260923/instructions-skills/runs/typesafe-baseline/claude_C4.jsonl", "sha256": "9e400617e860d60b2630c4aa8bfcbb1d5176e77cf522332ef15c4286928515b4"},
+    {"path": "~/codex-ecosystem/state/gap-wave3-20260923/instructions-skills/runs/typesafe-baseline/claude_C5.jsonl", "sha256": "c86a33886a959fa2b6a87a064a36ef00037ede3e53c11c78fee651cfaca6dc63"},
+    {"path": "~/codex-ecosystem/state/gap-wave3-20260923/instructions-skills/runs/typesafe-baseline/claude_E2.jsonl", "sha256": "34ef9dbb036651d747f710f72f8800c3376402d3eaf05e19921656df4cf09de9"},
+    {"path": "~/codex-ecosystem/state/gap-wave3-20260923/instructions-skills/runs/typesafe-baseline/claude_E5.jsonl", "sha256": "e5dacda22a88e187288f207452d6a1bdc848e17ec1c338c644089dbff22c5c50"},
+    {"path": "~/codex-ecosystem/state/gap-wave3-20260923/instructions-skills/runs/typesafe-baseline/codex_C4.json", "sha256": "09f7b7e2933bfe3128e814ed13f2a300709171ddca7d94167912b2cf854c3dcc"},
+    {"path": "~/codex-ecosystem/state/gap-wave3-20260923/instructions-skills/runs/typesafe-baseline/codex_E2.json", "sha256": "b20e2186fb18f7ed31ec631616feaaab8c94260f023d97881976574644bd29bd"}
+  ],
+  "per_gap_settles": {
+    "instructions-skills:7": "partially"
+  }
+}

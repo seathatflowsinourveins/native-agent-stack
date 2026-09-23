@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "id": "forced-skill-arm-ab",
+  "date": "2026-09-23",
+  "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+  "layer_ids": ["instructions-skills"],
+  "gap_refs": [
+    {"layer_id": "instructions-skills", "gap_index": 1}
+  ],
+  "purpose": "Wave 3, gap 1: no winner (ECC, OpenAI skills, TypeSafe) has a measured improvement in task quality or provider cost versus no-skill. Wave 2's frozen-skill-arm-ab receipt found the Skill tool was never invoked in any of 12 trials, including all 6 with_skill trials where it was allowed, so no with-skill arm was actually measured; this unit forces invocation instead of merely allowing it, narrowed per this unit's own instructions to TypeSafe (typesafe-ai) and one ECC skill whose trigger matches the frozen cases (security-best-practices, matching wave 2's C3/C4). 8 cases (C3-C6 reused verbatim from wave 2's frozen 6-case set, C7-C10 new, frozen in blueprints/gap-wave3-20260923/forced-skill-ab/cases.json before any wave-3 arm ran), N=1 per case per arm, order counterbalanced by case index to remove wave 2's with-skill-always-first confound.",
+  "preregistered": "Recorded in blueprints/gap-wave3-20260923/forced-skill-ab/cases.json BEFORE any arm ran: 8 cases, each with a 2-point rubric frozen before running (C9/C10 add clean, uncontestable labels; C7/C8 use less-obvious vulnerability classes than wave 2's C3/C4 to leave headroom). with_skill_forced arm's prompt explicitly instructs the model to invoke the Skill tool for the case's named skill before answering, with Skill allowed; without_skill arm explicitly disallows Skill. An arm is recorded as invalid for a case unless the transcript shows BOTH a Skill tool_use event naming the case's skill AND a subsequent message containing the literal marker 'Base directory for this skill:' (the actual SKILL.md body being injected into context, not just a tool_use stub) -- this distinguishes 'the model was told it could use the skill' from 'the skill's body was actually loaded', which wave 2 could not distinguish because invocation never happened. Order counterbalanced: even-indexed cases (C3, C5, C7, C9) ran without_skill first; odd-indexed cases (C4, C6, C8, C10) ran with_skill_forced first (recorded before running, not reconstructed from timestamps as in wave 2).",
+  "commands": [
+    {
+      "cmd": "16x: flock ~/codex-ecosystem/state/gap-wave3-20260923/claude.lock claude -p \"<forced-skill or plain prompt per case/arm>\" --output-format stream-json --verbose --effort medium --allowedTools <arm-specific> --disallowedTools <arm-specific>; sleep 20 s after each call. Driver script (not committed; scratch helper) ran all 8 cases sequentially per the preregistered per-case order.",
+      "exit": 0,
+      "duration_s": 495.0,
+      "output_excerpt": "All 16 calls exited 0 (verified: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]). No 429/rate-limit/overloaded error occurred; no call was retried.",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "Mechanical check (not judgment) over all 16 retained transcripts: for each with_skill_forced transcript, search for a tool_use block with name=='Skill' and input.skill matching the case's skill, AND a subsequent user-role text block containing 'Base directory for this skill:'.",
+      "exit": 0,
+      "duration_s": 0.4,
+      "output_excerpt": "8/8 with_skill_forced transcripts (C3,C4,C5,C6,C7,C8,C9,C10) show a Skill tool_use naming the correct skill (security-best-practices for C3/C4/C7/C8, typesafe-ai for C5/C6/C9/C10) AND the 'Base directory for this skill:' body-load marker with the full SKILL.md content following it. All 8 with_skill_forced arms are valid under the preregistered test; none is recorded as invalid. This is the opposite finding from wave 2, where 0/6 with_skill arms invoked Skill at all.",
+      "output_sha256": "n/a"
+    },
+    {
+      "cmd": "python3 sums each transcript's final stream-json 'result' event (authoritative per-run usage/cost, not intermediate per-turn snapshots), and this receipt's author scores each transcript's final answer 0-2 against the frozen rubric in cases.json.",
+      "exit": 0,
+      "duration_s": 0.3,
+      "output_excerpt": "Recorded in blueprints/gap-wave3-20260923/forced-skill-ab/scored-results.json: totals with_skill_forced 14/16, without_skill 14/16, difference 0. Usage: with_skill_forced (8 calls) input 48, output 6508, cache_creation 192274, cache_read 595675, cost $1.787679; without_skill (8 calls) input 16, output 3579, cache_creation 106930, cache_read 121520, cost $0.951388.",
+      "output_sha256": "n/a"
+    }
+  ],
+  "tool_versions": {"claude": "2.1.280 (claude-opus-5-5)"},
+  "installs": [],
+  "model_calls": [
+    {"client": "claude", "model": "claude-opus-5-5", "effort": "medium (flag passed on all 16 calls)", "count": 8, "arm": "with_skill_forced", "input_tokens": 48, "output_tokens": 6508, "cache_creation_input_tokens": 192274, "cache_read_input_tokens": 595675, "total_cost_usd": 1.787679},
+    {"client": "claude", "model": "claude-opus-5-5", "effort": "medium (flag passed on all 16 calls)", "count": 8, "arm": "without_skill", "input_tokens": 16, "output_tokens": 3579, "cache_creation_input_tokens": 106930, "cache_read_input_tokens": 121520, "total_cost_usd": 0.951388}
+  ],
+  "result": "With the skill genuinely forced -- Skill tool invoked AND its SKILL.md body actually injected into context in 8/8 with_skill_forced runs, mechanically verified rather than assumed -- the observed quality difference is still zero: with_skill_forced scored 14/16, without_skill scored 14/16 across the 8 cases (2-point rubric each). Per case: C3 (SQLi), C4 (command injection), C7 (unsafe deserialization/RCE), C8 (SSRF), C9 (numeric contradiction) and C10 (entity mismatch) each hit the 2/2 ceiling in BOTH arms -- claude-opus-5-5 already names the correct vulnerability class and a materially correct fix or verdict without the skill loaded, so these six cases have no room to show a with-skill advantage even though the ceiling problem from wave 2 (C1-C4 hitting ceiling) is only partly reduced (4 of the new/reused 8 still ceiling, though with more difficult vulnerability classes than wave 2's C3/C4 alone). C5/C6 (typesafe-ai, frozen label 'supported') score 1/2 in BOTH arms: the model answers 'insufficient' rather than 'supported' in every run regardless of skill, with materially identical reasoning quality between arms; for C5, the with_skill_forced transcript shows the model explicitly reading the typesafe-ai SKILL.md (confirming genuine load) and then reasoning in its own text that the skill 'is for building that check into code, not for answering one case', and answering directly instead of treating itself as the judgment engine -- a specific, legible reason the skill produced no score change here, not silent non-use. This is a decisive, unconfounded null result for the quality half of gap 1 on this 8-case set: unlike wave 2, the comparison is now valid (skill genuinely loaded in every with-skill trial), and it still shows no quality improvement. On cost: with_skill_forced cost $1.787679 across 8 calls versus without_skill's $0.951388, an 88% increase, driven mechanically by loading each skill's full SKILL.md body into context every time (cache_creation_input_tokens 192274 vs 106930, cache_read 595675 vs 121520). Because order was counterbalanced this wave (not always with-skill-first as in wave 2), this cost difference is attributable to the skill option itself rather than a run-order/cache-warmth artifact, closing that specific confound from wave 2 -- though a single N=1-per-arm run still cannot separate 'loading the skill body costs more' (true by construction) from any offsetting benefit the skill might provide on a case genuinely requiring its guidance, which none of these 8 cases exercised.",
+  "settles_gap": "partially",
+  "verdict_impact": {
+    "could_change_verdict": false,
+    "direction": "against_skill_use_for_these_task_types",
+    "explanation": "Gap 1 asked whether any winner skill has a measured quality or cost improvement over no-skill. For TypeSafe (typesafe-ai) and security-best-practices on this 8-case set, with genuine forced invocation (the methodological gap wave 2 flagged), quality is measured as unchanged (14/16 both arms) and cost is measured as ~88% higher with the skill loaded, now without wave 2's order confound. This does not settle gap 1 fully: it is one 8-case diagnostic scored by a single non-blinded rater, on cases chosen by the same agent running the check, and it says nothing about ECC's other two skills (search-first, iterative-retrieval, out of scope this wave per instruction) or about tasks genuinely inside typesafe-ai's intended 'build a repeatable check into code' use, which C5's own transcript suggests is where the skill is meant to add value rather than in one-off ad hoc judgments like these cases. The existing foundation-closure retain decision for these skills is not contradicted (their value proposition was never that they win a single zero-shot Q&A task), but the specific sub-claim 'a winner skill measurably improves quality or cost on a matched task' is now measured as false for these two skills on these cases' task shape, not merely 'untested' as gap 1 originally stated."
+  },
+  "evidence_class": "native_proven",
+  "limitations": [
+    "N=1 per case per arm; single-rater (this receipt's author) diagnostic scoring against a rubric frozen before running, not blinded or independently adjudicated.",
+    "8 cases, narrowed from wave 2's framing (which covered 4 skills) to 2 skills per this unit's own instruction; search-first and iterative-retrieval are not re-tested this wave.",
+    "4 of 8 cases (C3, C4, C7, C8) still hit a 2/2 ceiling in both arms despite deliberately choosing less-obvious vulnerability classes than wave 2 for C7/C8; claude-opus-5-5's own security knowledge is strong enough that these particular tasks cannot discriminate a with-skill effect. A harder or more novel case class was not attempted due to budget.",
+    "C5/C6's frozen 'supported' label remains contestable on reflection (carried over from wave 2, not silently rescored); both arms agreeing on 'insufficient' could reflect either a genuinely ambiguous case or a model tendency independent of the skill, and this check cannot distinguish those.",
+    "The cost comparison isolates 'loading the skill body' as the cost driver, which is real and now unconfounded by run order, but this receipt did not test a case where the skill's guidance changed the final answer, so it cannot show whether that cost is ever offset by a quality gain on a task that actually needs the skill.",
+    "The 'Base directory for this skill:' marker is specific to this Claude Code version's Skill-tool implementation; a future version could change the injection format, which would require updating this check's verification logic, not just rerunning it.",
+    "All 16 calls used --effort medium as instructed; stream-json does not expose a provider-confirmed resolved effort level, so 'medium' reflects the flag passed, not independently verified.",
+    "Shares the unit's overall 20-call claude -p budget with gap 7's native-baseline arm (4 of the 20 calls); a codex exec arm on these same 8 cases was not run due to that shared budget, and is recorded as undone."
+  ],
+  "raw_artifacts": [
+    {"path": "blueprints/gap-wave3-20260923/forced-skill-ab/cases.json", "sha256": "see manifests/evidence.json files[] entry"},
+    {"path": "blueprints/gap-wave3-20260923/forced-skill-ab/scored-results.json", "sha256": "see manifests/evidence.json files[] entry"},
+    {"path": "~/codex-ecosystem/state/gap-wave3-20260923/instructions-skills/runs/forced-ab/C3_with_skill_forced.jsonl", "sha256": "eb6c0250cadaec2b792d1c65f4cc4554a404b09c25f072e3097009daa4969d6b"},
+    {"path": "~/codex-ecosystem/state/gap-wave3-20260923/instructions-skills/runs/forced-ab/C3_without_skill.jsonl", "sha256": "aa045dd20c5c546517a00f7a1ca5f6d4b2d27282070125d56974ab87664f5f58"},
+    {"path": "~/codex-ecosystem/state/gap-wave3-20260923/instructions-skills/runs/forced-ab/C4_with_skill_forced.jsonl", "sha256": "cdac955c825cf4709dd81f3db6d9f5eeeb0a8bbe8330d827ff3e6c204e8899c9"},
+    {"path": "~/codex-ecosystem/state/gap-wave3-20260923/instructions-skills/runs/forced-ab/C4_without_skill.jsonl", "sha256": "9a03d4a67dce88ea6b97babd03edc494da952799bf372f3fd1ebe82ee0b5e54b"},
+    {"path": "~/codex-ecosystem/state/gap-wave3-20260923/instructions-skills/runs/forced-ab/C5_with_skill_forced.jsonl", "sha256": "dc2de1ef31396d11b4046cf3e7e94979256386036f41cef82ca3779f96bbce8d"},
+    {"path": "~/codex-ecosystem/state/gap-wave3-20260923/instructions-skills/runs/forced-ab/C5_without_skill.jsonl", "sha256": "96b67d4c620977e7d8e3cda42bd06aef03dad9d35af6e2c95050a46300591785"},
+    {"path": "~/codex-ecosystem/state/gap-wave3-20260923/instructions-skills/runs/forced-ab/C6_with_skill_forced.jsonl", "sha256": "11549aacfc99fa72dfc7afb50351bd9bff5a246a69c4952c03b860224360ecb6"},
+    {"path": "~/codex-ecosystem/state/gap-wave3-20260923/instructions-skills/runs/forced-ab/C6_without_skill.jsonl", "sha256": "9426c324b40a33f1a4e7731dceca2708018d9a58109d5ddb78d65b991c343818"},
+    {"path": "~/codex-ecosystem/state/gap-wave3-20260923/instructions-skills/runs/forced-ab/C7_with_skill_forced.jsonl", "sha256": "1290973807966463eba70c64d6d0aaa2134fd7a46b16a387fd7dbe8b1582c250"},
+    {"path": "~/codex-ecosystem/state/gap-wave3-20260923/instructions-skills/runs/forced-ab/C7_without_skill.jsonl", "sha256": "c57e35ad14c7bb2ec23e8453a8e8af396915130eb35828740932d2d26d2d54c6"},
+    {"path": "~/codex-ecosystem/state/gap-wave3-20260923/instructions-skills/runs/forced-ab/C8_with_skill_forced.jsonl", "sha256": "68ca346841cef6e4219b607bc4bfeca1345cdde0622f7c6aea59d7af8d0f015e"},
+    {"path": "~/codex-ecosystem/state/gap-wave3-20260923/instructions-skills/runs/forced-ab/C8_without_skill.jsonl", "sha256": "d503db7731c63dc5e126e0350bd660188129395c0888de0b1479c44916dfb5f2"},
+    {"path": "~/codex-ecosystem/state/gap-wave3-20260923/instructions-skills/runs/forced-ab/C9_with_skill_forced.jsonl", "sha256": "fc74068041d952718d32dc9d275c94f0b3c03ed88638df9ffe4e874d23c595bf"},
+    {"path": "~/codex-ecosystem/state/gap-wave3-20260923/instructions-skills/runs/forced-ab/C9_without_skill.jsonl", "sha256": "94861e3c96abcf47d3b739ab18401afb72a5aadf74140222b8c8d459ddb398bb"},
+    {"path": "~/codex-ecosystem/state/gap-wave3-20260923/instructions-skills/runs/forced-ab/C10_with_skill_forced.jsonl", "sha256": "da9d83c5df9ca3b008a3ca0326ebba9c18f9780b02fa108290a872de456e3fac"},
+    {"path": "~/codex-ecosystem/state/gap-wave3-20260923/instructions-skills/runs/forced-ab/C10_without_skill.jsonl", "sha256": "ef76ef152c26f6e049765c9269b8f0a23f883cbf1968d843cddd93b851b20f21"}
+  ],
+  "per_gap_settles": {
+    "instructions-skills:1": "partially"
+  }
+}

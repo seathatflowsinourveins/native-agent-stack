@@ -5908,6 +5908,21 @@
       "bytes": 236
     },
     {
+      "path": "blueprints/gap-wave3-20260923/forced-skill-ab/cases.json",
+      "sha256": "b40d720fc5831deae3035829eaeab7e59f22c8744a1bb521c6d4011ce5a579a0",
+      "bytes": 9193
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/forced-skill-ab/scored-results.json",
+      "sha256": "5b0a039f1e9ae729c20aebda428c0bf1b17a494b3dd4e22e8444aa5c4d917726",
+      "bytes": 2440
+    },
+    {
+      "path": "blueprints/gap-wave3-20260923/typesafe-extended/cases.json",
+      "sha256": "3982ee7129e46300bcf8b44407d73aaf42254a100079c42e5bfe5a208b6d85e2",
+      "bytes": 13435
+    },
+    {
       "path": "blueprints/memory-lifecycle-probe/README.md",
       "sha256": "c50ba6b05cba66095a357f1185429761b251462b9b91d1d23a51532b317bc042",
       "bytes": 9126
@@ -10091,6 +10106,16 @@
       "path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/watcher-kill-restart-recovery.json",
       "sha256": "1702356a6e2ee2db38b4bf38daa8a7caf14df71efb802635153616a8d7e2e120",
       "bytes": 19163
+    },
+    {
+      "path": "evidence/artifacts/gap-wave3-20260923/instructions-skills/forced-skill-arm-ab.json",
+      "sha256": "135406a38c2ecbe39f7310ec0be70071c5882f3c213f0977e67a0e71825e545d",
+      "bytes": 14872
+    },
+    {
+      "path": "evidence/artifacts/gap-wave3-20260923/instructions-skills/typesafe-extended-label-set.json",
+      "sha256": "37f82fd0163a8805452986339e61c7242f5ae62fba2534de01dd1e49eda2c83b",
+      "bytes": 13612
     },
     {
       "path": "evidence/artifacts/harness-rules-convergence-20260922/codex-agent-roles-source.json",
