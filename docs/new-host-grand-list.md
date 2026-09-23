@@ -28,7 +28,7 @@ Layers: 20 foundation, 12 trading. Winners: 66 layer-winner pairs (55 distinct c
 | Host | Evidence | Generation tier | Semantic-RAG tier | Concurrency cap |
 | --- | --- | --- | --- | --- |
 | This host (measured) | native_proven | large-32b-q4 | standard | 16 |
-| 128 GB WSL workstation (labelled projection) | labelled_projection | large-32b-q4 | headroom | 16 |
+| 128 GB WSL workstation (labelled projection) | labelled_projection | large-32b-q4 | headroom | 60) |
 | macOS arm64, 48 GB unified memory (labelled projection) | labelled_projection | large-32b-q4 | full | 10 |
 | macOS arm64, 64 GB unified memory (labelled projection) | labelled_projection | large-32b-q4 | full | 12 |
 | GitHub-hosted macos-15 arm64 runner | native_proven | — | — | — |
