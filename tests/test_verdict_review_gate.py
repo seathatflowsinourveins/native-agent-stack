@@ -20,6 +20,7 @@ import unittest
 from unittest import mock
 from pathlib import Path
 
+from scripts import landscape
 from scripts import verdict_review_gate as gate
 
 MANIFEST = "catalogs/landscape/manifest.json"
@@ -33,7 +34,7 @@ PACKET = {"catalog": "foundation", "layer_id": "beta", "candidates": [
     {"key": "c1", "component_id": "comp-one", "repository": "https://github.com/example/one", "adopted": True,
      "pin": "1.0"},
     {"key": "c2", "component_id": "comp-two", "repository": "https://github.com/example/two", "adopted": True},
-]}
+], "withheld": landscape.withhold_policy_labels(None)}  # a --withhold-labels packet lists every policy label
 COMPONENTS = {"c1": "comp-one", "c2": "comp-two"}
 DECISION = "docs/decisions/2026-09-23-single-lane.md"
 INDEX = "catalogs/us-equities/decision-index.json"
@@ -973,7 +974,31 @@ class ToolingAlignmentTests(GateFixture):
     def test_packet_own_checked_at_is_not_withheld(self):
         self.record(packet={**PACKET, "checked_at": "2026-09-23"})
         self.assertPasses(self.report())
-        self.assertEqual(gate.withheld_packet_keys({"checked_at": "x", "c": [{"checked_at": "y"}]}), ["c[].checked_at"])
+        labels = landscape.withhold_policy_labels(None)
+        self.assertEqual(gate.withheld_packet_keys({"checked_at": "x", "c": [{"checked_at": "y"}], "withheld": labels}),
+                         ["c[].checked_at"])
+
+    def test_the_gate_applies_the_landscape_validators_withheld_policy(self):
+        # 2026-09-23: the gate kept its own copy of the policy, which lacked the top-level, disposition
+        # and withheld[] checks; it now imports the base's scripts/landscape.withheld_packet_keys, so a
+        # key the tooling owner adds (TOP_LEVEL_WITHHELD_KEYS) is enforced here without a gate change.
+        self.assertIs(gate.withheld_packet_keys, landscape.withheld_packet_keys)
+        missing = [label for label in PACKET["withheld"] if label != "candidates[].upstream.stars"]
+        first = {**PACKET["candidates"][0]}
+        for layer_id, packet, fragment in (
+                ("decision", {**PACKET, "decision": "comp-one"}, "carries withheld keys ['decision']"),
+                ("rationale", {**PACKET, "rationale": "why"}, "carries withheld keys ['rationale']"),
+                ("choice", {**PACKET, "current_choice": "comp-one"}, "carries withheld keys ['current_choice']"),
+                ("disposition", {**PACKET, "candidates": [{**first, "disposition": "adopted"}, PACKET["candidates"][1]]},
+                 "carries withheld keys ['candidates[].disposition']"),
+                ("review", {**PACKET, "candidates": [{**first, "review_status": "accepted"}, PACKET["candidates"][1]]},
+                 "carries withheld keys ['candidates[].review_status']"),
+                ("unlabelled", {**PACKET, "withheld": missing},
+                 "carries withheld keys ['withheld[] lacks candidates[].upstream.stars']")):
+            with self.subTest(layer_id):
+                self.setUp()
+                self.record(packet=packet)
+                self.assertFails(self.report(), fragment)
 
     def test_missing_run_manifest_sha256_fails(self):
         self.record()
@@ -1020,12 +1045,6 @@ class ToolingAlignmentTests(GateFixture):
     # 99-126), pinned so the comparison asserts something before #124 merges.
     TOOLING_OWNER_NAMES_238C754 = {
         "RETAINED_PACKETS_DIR": "packets",
-        "POPULARITY_RECENCY_FIELDS": ("stars", "forks", "watchers", "pushed_at", "released_at"),
-        "POPULARITY_TOKENS": ("star", "fork", "watcher", "subscriber", "download", "popular", "trending"),
-        "UPSTREAM_RELEASE_FIELDS": ("latest", "prerelease", "latest_flag"),
-        "COPY_WITHHELD_FIELDS": ("pin_behind_upstream", "newcomer", "note"),
-        "WITHHELD_KEY_TOKENS": ("latest", "release", "newcomer", "pin_behind"),
-        "PACKET_OWN_KEYS": ("checked_at",),
         "SINGLE_LANE_DECISION_DIR": "docs/decisions/",
     }
 

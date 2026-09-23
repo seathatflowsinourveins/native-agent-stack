@@ -1,0 +1,6 @@
+# Append under scrape_configs in the ecosystem Prometheus config.
+  - job_name: adaptive-paper-live
+    scrape_interval: 5s
+    scrape_timeout: 2s
+    static_configs:
+      - targets: ['127.0.0.1:17610']
