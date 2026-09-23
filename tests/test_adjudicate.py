@@ -881,8 +881,9 @@ class RootDepthTests(AdjudicateFixture):
             self.assertIsNone(adjudicate.root_issue(good), good)
 
     def test_every_entry_point_refuses_a_shallow_root_with_exit_2(self):
-        shallow = self.base / "export"
-        shallow.mkdir()
+        # The depth check is textual; a fixed two-component path stays shallow on every host (macOS temp
+        # directories sit under /private/var/folders/..., deep enough to pass as <tmp>/export).
+        shallow = Path("/srv/blind-export")
         code, err = self.inputs(shallow)
         self.assertEqual(code, 2)
         self.assertIn("path components", err)
