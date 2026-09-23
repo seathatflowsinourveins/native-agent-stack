@@ -35,6 +35,13 @@
       "duration_s": 0.01,
       "output_excerpt": "16:# Build with TypeSafe; 23-24: 'Code owns the workflow; the model / supplies programmable common sense where ordinary code needs semantic understanding.' (quotes match verbatim across the line break)",
       "output_sha256": "n/a-short-console-capture"
+    },
+    {
+      "cmd": "python3 scan of the two children's native session transcripts (Claude Code subagent JSONL): count tool_use blocks; find messages containing the skill command marker and the SKILL.md body; compare the whitespace-normalized body (frontmatter stripped) with the injected text",
+      "exit": 0,
+      "duration_s": 0.2,
+      "output_excerpt": "declared: 13 records, 0 tool_use blocks, 2 messages carrying <command-name>typesafe-ai</command-name>, full SKILL.md body (9,301 chars, whitespace-normalized) contained in the injected message; control: 12 records, 0 tool_use blocks, no skill marker, no body",
+      "output_sha256": "n/a-short-console-capture"
     }
   ],
   "tool_versions": {
@@ -62,7 +69,7 @@
       "output_tokens": null
     }
   ],
-  "result": "The child whose definition declares `skills: [typesafe-ai]` received the full SKILL.md body at start without any tool use: it quoted the first heading and a body sentence that match the installed file verbatim, and reported the body was injected with the user-installed copy's base directory (~/.claude/skills/typesafe-ai), not the project copy (.agents/skills/typesafe-ai). It saw no skills-list section. The control child with no declared skill had no skill listing or body. Worker-level preloading of declared skills is established for this Claude Code version on this host.",
+  "result": "Settled from the native session transcripts, not only from the children's self-reports (Codex review of PR #111 asked for this). The declared child's transcript (agent definition declares skills: [typesafe-ai]) contains, before any tool use, a message carrying the typesafe-ai skill marker with the complete SKILL.md body (whitespace-normalized body of 9,301 characters, frontmatter stripped, fully contained), and the child made 0 tool calls. The control child's transcript (no declared skill) has no skill marker and no body. The declared child also quoted the heading and a body sentence that match the installed file verbatim. So a lean child whose definition declares a skill gets the full skill body preloaded; the loaded copy is the user-installed one, currently byte-identical to the project copy.",
   "settles_gap": true,
   "verdict_impact": {
     "could_change_verdict": false,
@@ -73,7 +80,8 @@
   "limitations": [
     "Self-reported context introspection by the child models: the quoted text is checkable against the file (it matches), but the mechanism description is the model's reading of its own context.",
     "One declared/control pair on Claude Code 2.1.280; Codex workers are not covered.",
-    "The loaded copy is the user-installed skill. At probe time it is byte-identical to the project copy (.agents/skills/typesafe-ai/SKILL.md, sha256 71ea90d7…), so no drift; if they diverge, the worker gets the user copy."
+    "The loaded copy is the user-installed skill. At probe time it is byte-identical to the project copy (.agents/skills/typesafe-ai/SKILL.md, sha256 71ea90d7…), so no drift; if they diverge, the worker gets the user copy.",
+    "The control differs from the declared arm in more than the skills declaration (agent type source-scout vs semantic-evidence-reviewer, model, omitClaudeMd), so the transcripts show the declared child received the body, but the control does not isolate the declaration as the only difference."
   ],
   "raw_artifacts": [
     {
@@ -83,6 +91,16 @@
     {
       "path": "~/codex-ecosystem/state/gap-wave3-20260923/probe/control.json",
       "sha256": "ecb53f3bf67f65ab5124285b3df6682f75880e798296b3e4e15b743a7fe65b95"
+    },
+    {
+      "path": "~/codex-ecosystem/state/gap-wave3-20260923/probe/declared-transcript.jsonl",
+      "sha256": "8f9623de9cb55d472b778a43ae4ea78971adda1c542aac8c48de98a61e6d3bad",
+      "note": "native subagent transcript; kept on the host only (contains session context)"
+    },
+    {
+      "path": "~/codex-ecosystem/state/gap-wave3-20260923/probe/control-transcript.jsonl",
+      "sha256": "6e4ab9868169ba506511c8869650290d6d4e7aeb9ab7207b8771492454ea71a4",
+      "note": "native subagent transcript; kept on the host only (contains session context)"
     }
   ]
 }

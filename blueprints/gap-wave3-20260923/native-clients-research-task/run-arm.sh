@@ -33,4 +33,4 @@ else
   exit 2
 fi
 echo "ARM=$ARM LABEL=$LABEL EXIT=$EXIT OUT=$OUT"
-exit 0
+exit "$EXIT"

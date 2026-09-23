@@ -88,7 +88,8 @@
     "The blind judge is itself a single claude -p call per output (not cross-checked by a second independent judge or human rater); a judge systematically biased toward or against a particular writing style could affect all 6 scores in the same direction without being detected by this design, though the ceiling effect here makes that concern moot for this run.",
     "Order was counterbalanced but not fully Latin-square balanced across all 6! possible orderings; a single seeded-random order was used, recorded and followed exactly, but residual cache-state or time-of-day effects across the ~3-minute run window cannot be fully ruled out.",
     "This receipt reports the sum of the 3-run research-arm usage per client in model_calls; the 6 individual blind-judge calls' usage is not summed into a combined total (to avoid conflating judge-call cost with research-call cost) and is only available per-call in the out-of-repo raw artifacts referenced below.",
-    "The codex exec model_calls entry names 'gpt-6-astra' from this host's ~/.codex/config.toml default, not from a per-call model field in the --json event stream (the stream does not echo one); the actual resolved model for these 3 calls is read from config, not independently confirmed per call."
+    "The codex exec model_calls entry names 'gpt-6-astra' from this host's ~/.codex/config.toml default, not from a per-call model field in the --json event stream (the stream does not echo one); the actual resolved model for these 3 calls is read from config, not independently confirmed per call.",
+    "Coordinator correction after the Codex review of PR #111: file modification times cannot establish that the rubric, run order or prompt were frozen before the runs; the evidence was committed after execution and the research prompt bytes were overwritten, so pre-run freezing is asserted, not demonstrated."
   ],
   "raw_artifacts": [
     {

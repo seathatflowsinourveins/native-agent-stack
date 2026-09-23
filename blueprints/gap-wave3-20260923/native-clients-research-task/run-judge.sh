@@ -13,3 +13,4 @@ flock "$STATE/claude.lock" claude -p "$(cat "$PROMPT_FILE")" \
 EXIT=$?
 sleep 20
 echo "LABEL=$LABEL EXIT=$EXIT OUT=$OUT"
+exit "$EXIT"

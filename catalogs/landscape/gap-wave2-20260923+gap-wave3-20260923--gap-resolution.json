@@ -1800,7 +1800,7 @@
     "hosting-services:3": "partially",
     "hosting-services:10": "partially"
    },
-   "direction": "supports_incumbent",
+   "direction": "inconclusive",
    "evidence_class": "local_integration",
    "model_calls": 0
   },
@@ -1823,7 +1823,7 @@
     "hosting-services:3": "partially",
     "hosting-services:10": "partially"
    },
-   "direction": "supports_incumbent",
+   "direction": "inconclusive",
    "evidence_class": "local_integration",
    "model_calls": 0
   },
@@ -1841,7 +1841,7 @@
    "per_gap_settles": {
     "instructions-skills:1": "partially"
    },
-   "direction": "against_skill_use_for_these_task_types",
+   "direction": "inconclusive",
    "evidence_class": "native_proven",
    "model_calls": 16
   },
@@ -1859,7 +1859,7 @@
    "per_gap_settles": {
     "instructions-skills:7": "partially"
    },
-   "direction": "toward_typesafe_reliability_on_this_case_shape",
+   "direction": "inconclusive",
    "evidence_class": "native_proven",
    "model_calls": 22
   },

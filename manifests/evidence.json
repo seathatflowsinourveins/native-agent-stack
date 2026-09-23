@@ -6024,13 +6024,13 @@
     },
     {
       "path": "blueprints/gap-wave3-20260923/native-clients-research-task/run-arm.sh",
-      "sha256": "dd27995e562a73ac33615fec907211f33648ec578f00c75766c8f7d38be5d317",
-      "bytes": 1068
+      "sha256": "f132fe8fe36f41f04bfd386dc3cc1247c99f71928066e2b9d62f2dcb28b81e15",
+      "bytes": 1074
     },
     {
       "path": "blueprints/gap-wave3-20260923/native-clients-research-task/run-judge.sh",
-      "sha256": "da21d88ad8096c97c5fd6e6bf07e46026c127739b370dbf8332a274ec94389dd",
-      "bytes": 501
+      "sha256": "a5e3a43aa37f627449749aee9e15bdab0738e9f9dcfcd2ae71aef94a485d579a",
+      "bytes": 514
     },
     {
       "path": "blueprints/gap-wave3-20260923/native-clients-research-task/run-order.json",
@@ -8169,8 +8169,8 @@
     },
     {
       "path": "catalogs/landscape/gap-wave2-20260923+gap-wave3-20260923--gap-resolution.json",
-      "sha256": "6b01959e259fdc2d84fd8d69f0f2f274f5730e0a9defbb2821f78493ba7d68dd",
-      "bytes": 75111
+      "sha256": "73938516243619fc0ae548562cc1e743d1125492bd63a827b72b6492be11fe2d",
+      "bytes": 75039
     },
     {
       "path": "catalogs/landscape/gap-wave2-20260923--gap-resolution.json",
@@ -10319,33 +10319,33 @@
     },
     {
       "path": "evidence/artifacts/gap-wave3-20260923/hosting-services/container-build-start-resource-vs-native.json",
-      "sha256": "64b2f0dca71129522931e5a089c9835887168f39a93899db7fb1fe8d0e7c5fcd",
-      "bytes": 18309
+      "sha256": "4351c9149427d3170585991a4fb2bedfa1fd7765864105861347881f8766365d",
+      "bytes": 19511
     },
     {
       "path": "evidence/artifacts/gap-wave3-20260923/hosting-services/container-recovery-isolation-cpu-mem-vs-native.json",
-      "sha256": "cc5594ad3fea355fb5913d8f30fb263747d273ce0fcc5d500ba69b0edcb9c6d2",
-      "bytes": 15515
+      "sha256": "f987aab25c2e8ab955da021e950c134e4f55f7a421064a7ddc5b59e932e47502",
+      "bytes": 17082
     },
     {
       "path": "evidence/artifacts/gap-wave3-20260923/instructions-skills/forced-skill-arm-ab.json",
-      "sha256": "f2408f7025ac80f3d68da1dd566f4cdcff04173966157eac8e57783be1619067",
-      "bytes": 18847
+      "sha256": "10e860eab27c0834e111597efde76c1a9089259943d394594eca416c77385eb7",
+      "bytes": 19935
     },
     {
       "path": "evidence/artifacts/gap-wave3-20260923/instructions-skills/typesafe-extended-label-set.json",
-      "sha256": "54df68836b6e3aa5aacc5016fb309bc0b382317fb4825c1c137b322cb4928678",
-      "bytes": 22286
+      "sha256": "fb5429623046a121bf7bb8e709ea07d695a8e4b4fa759c0384d7964528dbc21d",
+      "bytes": 23471
     },
     {
       "path": "evidence/artifacts/gap-wave3-20260923/instructions-skills/worker-skill-preload-probe.json",
-      "sha256": "2d9b5f889fb0adbe37e1c0956293c676f3855ce62307b803d410ac74b7fbc80c",
-      "bytes": 5097
+      "sha256": "5766a209f68ae045c650026e9074157330a618526879900c2265528c4f5e5002",
+      "bytes": 6867
     },
     {
       "path": "evidence/artifacts/gap-wave3-20260923/native-clients/arm-comparison-research-task.json",
-      "sha256": "deec6936987a8ea658bc915678f15ce37fcbe87de6209de4214773af0fe3d4a5",
-      "bytes": 21975
+      "sha256": "f2121385ec5a2e742d51b9a2f1cac07099294bf6216dad07e0f46cc8d585863a",
+      "bytes": 22289
     },
     {
       "path": "evidence/artifacts/gap-wave3-20260923/native-clients/sdk-vs-cli-resume-comparison.json",
