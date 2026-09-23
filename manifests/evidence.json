@@ -2958,6 +2958,21 @@
         "socraticode is the profile's documented unpinned skip and was not installed."
       ],
       "path": "evidence/receipts/adoption-macos-hosted-smoke-20260922.json"
+    },
+    {
+      "id": "catalog-freshness-20260923",
+      "kind": "upstream_provenance",
+      "component_ids": [
+        "codex"
+      ],
+      "claim": "Scheduled catalog-freshness run (https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/35822476248) rebuilt the SOTA-convergence manifest and found 2 component(s) with pin/upstream drift against the currently published manifest. This receipt, and the branch/PR it is registered from, are report-only: no catalogs/sota-convergence/*, catalogs/landscape/*.json, manifests/stack.json, or layer-verdicts* file was selected, evaluated, or changed by this run. A pin bump requires its own separately qualified receipt under evidence/artifacts/*/, produced by the existing SOTA-convergence lane review, not by this automation.",
+      "limitations": [
+        "This is drift detection only: it reports that a pin or upstream 'latest' value differs from the published manifest; it does not evaluate, select, or adopt any candidate, and it changes no catalog selection file.",
+        "component_ids lists only this run's drifted rows whose id is also a manifests/stack.json component; it is not a claim that every drifted id in the full drift report was reviewed.",
+        "Components with no reliable upstream data this run (an unfinished/bounded fetch, or a releases/tags/commit fetch problem for that repository) have their upstream comparison excluded; a pin change on such a row is still reported as drift (the pin comes from the local catalogs), with its fresh upstream fields empty. A component fetched successfully but with no GitHub release or tag at all is also not counted as drift.",
+        "The rebuilt manifest and drift table are read from this run's own catalog-freshness workflow artifact; this receipt does not independently re-fetch upstream sources."
+      ],
+      "path": "evidence/receipts/catalog-freshness-20260923.json"
     }
   ],
   "files": [
@@ -8958,6 +8973,16 @@
       "bytes": 10228
     },
     {
+      "path": "evidence/artifacts/catalog-freshness-20260923/drift.md",
+      "sha256": "ba8563ad05c077cf5403822314efe246a408edc279c800279bb8d1960cd6c282",
+      "bytes": 5789
+    },
+    {
+      "path": "evidence/artifacts/catalog-freshness-20260923/manifest-20260923.json",
+      "sha256": "24be193752ce980c04aa2f70ce4f1200263532015da8742367eb4376f307e267",
+      "bytes": 165458
+    },
+    {
       "path": "evidence/artifacts/catalog-models.full.txt",
       "sha256": "37310d0ba7b66eb2caf6825e155bca4a3abf2186dda4ab69751b22750b068227",
       "bytes": 22440
@@ -12851,6 +12876,11 @@
       "path": "evidence/receipts/catalog-clean-install-20260921.json",
       "sha256": "9ef05c095fa7b15d59709de71c135e80981ba62a1a8ef910cda1f9da5d60f7b8",
       "bytes": 1382
+    },
+    {
+      "path": "evidence/receipts/catalog-freshness-20260923.json",
+      "sha256": "b952a45d650cffda3fe5eb0967d9adda29d2d420b00224a0852bb3540d5961a5",
+      "bytes": 1996
     },
     {
       "path": "evidence/receipts/catalog-runtime-review-20260921.json",
