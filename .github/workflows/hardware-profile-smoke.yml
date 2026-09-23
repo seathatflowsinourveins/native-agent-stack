@@ -87,6 +87,8 @@ jobs:
           "$RUNNER_TEMP/uv/uv" --version
           echo "UV=$RUNNER_TEMP/uv/uv" >> "$GITHUB_ENV"
       - name: Verify the hash-locked mlx-lm requirements resolve for this platform
+        env:
+          MACOSX_DEPLOYMENT_TARGET: '14.0'
         run: |
           "$UV" pip compile tools/mlx-smoke/requirements.in \
             --python-platform aarch64-apple-darwin --python-version 3.12 --generate-hashes \
