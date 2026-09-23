@@ -1157,7 +1157,9 @@ class SealedWinnerBindingTests(GateFixture):
         report = self.report()
         self.assertFails(report, "changed to 'accepted' but scripts/platform_status.py derives 'not_established'")
         self.assertIn("the sealed pin 'unpinned'", self.messages(report))
-        self.assertNotIn("pin '9.9' is not", self.messages(report))
+        # Sixth review: the fallback pin now comes from the base row's candidates, so a
+        # candidates-only pin addition also fails the pin check and must land in its own PR.
+        self.assertIn("pin '9.9' is not the one record_verdicts.py writes", self.messages(report))
 
     def test_pin_the_base_candidates_already_carry_binds_its_receipt(self):
         candidates = [{"repository": PACKET["candidates"][1]["repository"], "source_pin": "9.9"}]
@@ -1169,6 +1171,49 @@ class SealedWinnerBindingTests(GateFixture):
                           winners=[winner("comp-two", linux="accepted", pin="9.9")])
         row["candidates"] = candidates
         self.assertPasses(self.report())
+
+    def test_candidates_pin_change_with_a_same_pr_receipt_keeping_the_status_fails(self):
+        # Sixth review: the base row is accepted at pin 9.9 (a base receipt). The PR moves the head
+        # row's candidates and winner to 9.10, adds a 9.10 receipt in the same PR and leaves the
+        # declared status 'accepted' unchanged. The fallback pin comes from the base candidates, and
+        # an unchanged status is re-derived because its pin changed.
+        candidates = [{"repository": PACKET["candidates"][1]["repository"], "source_pin": "9.9"}]
+        self.ledger["foundation"][0]["candidates"] = candidates
+        self.with_receipt("comp-two", "9.9")
+        self.rebase()
+        del self.ledger["foundation"][0]
+        row = self.record("alpha", claude_keys=("c2",), codex_keys=("c2",),
+                          winners=[winner("comp-two", linux="accepted", pin="9.9")])
+        row["candidates"] = candidates
+        self.rebase()
+        row["candidates"] = [{"repository": PACKET["candidates"][1]["repository"], "source_pin": "9.10"}]
+        row["winners"][0].update(pin="9.10")
+        self.with_receipt("comp-two", "9.10")
+        report = self.report()
+        self.assertEqual(report["status"], "failed", self.messages(report))
+        self.assertIn("pin '9.10' is not", self.messages(report))
+
+    def test_resealed_pin_behind_an_unchanged_accepted_status_is_rederived(self):
+        # Sixth review: a re-recorded newest-wave row whose sealed packet moves comp-one from 1.0 to
+        # 2.0 keeps the declared 'accepted' that a 1.0 receipt supported. The status is unchanged,
+        # but its pin is not, so it is re-derived: no receipt is bound to 2.0.
+        self.with_receipt("comp-one", "1.0")
+        row = self.record(winners=[winner("comp-one", linux="accepted")])
+        self.rebase()
+        self.ledger["foundation"] = [r for r in self.ledger["foundation"] if r is not row]
+        packet = {**PACKET, "candidates": [dict(PACKET["candidates"][0], pin="2.0"), PACKET["candidates"][1]]}
+        self.record(packet=packet, winners=[winner("comp-one", linux="accepted", pin="2.0")])
+        report = self.report()
+        self.assertEqual(report["status"], "failed", self.messages(report))
+        self.assertIn("derives 'not_established'", self.messages(report))
+        self.assertIn("the sealed pin '2.0'", self.messages(report))
+
+    def test_unchanged_status_with_changed_evidence_refs_is_rederived(self):
+        row = self.record()
+        self.rebase()
+        row["winners"][0]["evidence_refs"] = list(row["winners"][0].get("evidence_refs") or []) + ["evidence/forged.json"]
+        report = self.report()
+        self.assertEqual(report["status"], "failed", self.messages(report))
 
     def test_pin_changed_to_one_matching_an_unrelated_receipt_fails(self):
         self.with_receipt("comp-one", "3.0")

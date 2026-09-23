@@ -724,7 +724,11 @@ class RowCheck:
         ledger_path = LEDGER_FILES.get(self.key[0])
         try:
             expected = sanitize_value(build_winners(sealed_return, candidates, ledger_path,
-                                                    index_v1_candidates_by_repository(self.row), self.head.root,
+                                                    # The no-packet-pin fallback comes from the BASE row's
+                                                    # candidates (sixth review): a candidates-only pin change
+                                                    # then fails the pin check and must land in its own PR.
+                                                    index_v1_candidates_by_repository(self.base_row or self.row),
+                                                    self.head.root,
                                                     [], status_context=None))
         except (KeyError, TypeError, ValueError) as error:
             self.fail(f"the {lane} lane return's winners cannot be built as record_verdicts.py does ({error!r})")
@@ -1094,11 +1098,16 @@ def platform_status_violations(key, old, new, context, sealed_bindings, trust=No
     for winner in new.get("winners") or []:
         if not isinstance(winner, dict):
             continue
-        before = (old_winners.get(winner.get("component_id")) or {}).get("platform_status") or {}
+        old_winner = old_winners.get(winner.get("component_id")) or {}
+        before = old_winner.get("platform_status") or {}
         declared = winner.get("platform_status") if isinstance(winner.get("platform_status"), dict) else {}
         sealed = {**winner, **sealed_bindings.get(winner.get("component_id"), UNBOUND_WINNER)}
+        # An unchanged value is skipped only when what it is derived from is unchanged too (sixth
+        # review): a new pin or new evidence behind the same declared status must be re-derived.
+        binding_changed = not old_winner or any(winner.get(field) != old_winner.get(field)
+                                                for field in ("pin", "evidence_refs", "evidence_class"))
         for platform in platform_evidence.PLATFORMS:
-            if declared.get(platform) == before.get(platform):
+            if declared.get(platform) == before.get(platform) and not binding_changed:
                 continue
             derived = platform_evidence.platform_status(platform, sealed, context)
             if declared.get(platform) != derived.status:

@@ -899,6 +899,24 @@ Hosted and live results after merge. Evidence class: hosted runs and GitHub API 
   As in the fourth round, the CLI exits 1 on every run, the control included. The cause is that
   `scripts/landscape.py` and `build_verdicts.py --check` reject the constructed wave. Only the
   gate's own violation list is evidence here.
+- **Sixth review (2026-09-23, coordinator-applied).**
+  - *Fixed, medium:* a pin change behind an unchanged declared status. The no-packet-pin fallback
+    now comes from the base row's candidates, so a candidates-only pin change fails the pin check
+    and has to land in its own PR. An unchanged platform value is now skipped only when the
+    winner's `pin`, `evidence_refs` and `evidence_class` are unchanged too; otherwise it is
+    re-derived.
+    - Negative controls: a candidates pin moved to 9.10 with a same-PR 9.10 receipt; changed
+      evidence_refs behind an unchanged status; a re-sealed pin 1.0 to 2.0 behind an unchanged
+      `accepted`.
+    - Each is mutation-checked: reverting either half of the fix makes its test fail.
+  - *Recorded, low: grandfathered rows.* A changed row of the grandfathered 20260922 wave gets no
+    row check of its own. Only `build_verdicts.py --check`'s frozen projection covers it. That wave
+    is superseded at the 20260923 re-record, which is when this residual ends.
+  - *Recorded, low: single-lane authorization scope.* An authorization line
+    `single-lane-authorization: <catalog>/<layer_id>` is not scoped to a wave. Once it is at the
+    base, it also authorizes a later wave's `codex_absent` row for that layer.
+    - Proposed fix for the tooling owner: include the run id in the line, as
+      `<catalog>/<layer_id>@<run-id>`, and have landscape.py and this gate require it.
 - **Accepted residual: sealed lane returns are self-attested (fifth review, 2026-09-23).** The
   gate checks consistency, not provenance. A sealed lane return must match the row's
   `sealed_sha256` and be registered in the head's `manifests/evidence.json`, which the PR can
