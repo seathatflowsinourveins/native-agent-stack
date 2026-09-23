@@ -7629,8 +7629,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "d4c30d0a63d29292bbb200c96fd031f225f4aeeb556131286e709816b68c9e2c",
-      "bytes": 12918618
+      "sha256": "a95df8b58a6a95f45bbd3bbc5be7fecbf3eda1a04c687c6f12955b0aaa89711d",
+      "bytes": 12922828
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -7704,8 +7704,8 @@
     },
     {
       "path": "docs/grand-catalog-handbook.md",
-      "sha256": "676be8056c875c0775f6de08c91509942cbac93a9aa28485656ff54c97d05586",
-      "bytes": 418783
+      "sha256": "c98c9ac0c764b48c23faa3b60c2c3ac44bcebff8a32a92f71738637aef7f15da",
+      "bytes": 422929
     },
     {
       "path": "docs/harness-defaults.md",
@@ -10398,11 +10398,6 @@
       "bytes": 54005
     },
     {
-      "path": "evidence/artifacts/sdk-runtime-coverage-20260922/gated-items-20260923.json",
-      "sha256": "89bee2253800096417fbb03b0352cd1f701b49d2f28feb0ce015aaeeee75c160",
-      "bytes": 13895
-    },
-    {
       "path": "evidence/artifacts/sdk-runtime-coverage-20260922/protocol-sdks.json",
       "sha256": "6b539232a2d6e8758b844db46c0d032b0183310212d47c342e2e196d4a0e30e8",
       "bytes": 279038
@@ -12019,8 +12014,8 @@
     },
     {
       "path": "tests/test_workflow_security_coverage.py",
-      "sha256": "a99c55ea13b955fbde3caf00c70ed82067bfbefdb3d490044e091accb5bbb3f6",
-      "bytes": 3482
+      "sha256": "671d9df9688e979d259d74fd9ec68e6e649ae7584e3685eef20b110b07b85786",
+      "bytes": 4088
     },
     {
       "path": "tests/test_wsl_memory_maintenance.py",
@@ -13086,6 +13081,266 @@
       "path": "tests/test_delisting_coverage.py",
       "sha256": "c33b6dd7b33691dcac0ec84db6c600f8777abb06f6fce6d992b7f5fa2d277af5",
       "bytes": 24344
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-mem/README.md",
+      "sha256": "451eeb8f421ed98e92b3369ed92f0482e60bc5a25a2226115180caf6b446e0a0",
+      "bytes": 11563
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-mem/markitdown.json",
+      "sha256": "719469a6809de442b1872ee3580e35ee1533771e039dc2179bf8ca78583dcca4",
+      "bytes": 5539
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-mem/pageindex.json",
+      "sha256": "d7bd5530e8e3c141ec8aab64eebaac26d1e3860230630de77fb00895c6eb4764",
+      "bytes": 5148
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-mem/repomix.json",
+      "sha256": "6daa8ac2054b323740b0aaea014bb96491f6c2889e801611a2bec9c168fa1efb",
+      "bytes": 4498
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-mem/ai-memory.json",
+      "sha256": "a524ed359611ef76a7723917334e15aa6c30b8ac76e66466218efa44f95a0c21",
+      "bytes": 16896
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-mem/mteb.json",
+      "sha256": "d3ff2011dafc09060ca4dd15abc4cf6469a77f9eedfb27d255eb2aaa0208cc47",
+      "bytes": 4375
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-tools/README.md",
+      "sha256": "3135ca53779d7a91765e1396052c641b65a3b241ce2462f938e1125716ccad52",
+      "bytes": 19449
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-tools/opensandbox.json",
+      "sha256": "c8e1e63617f2b8bede9e83726f7e3a8cdf05ea7322345dae618750ca8ccda74b",
+      "bytes": 12727
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-tools/langgraph.json",
+      "sha256": "06565faf2510fa688880d13621ee66381afc611759a1f210db996c1b83ed8b72",
+      "bytes": 8311
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-tools/openresearch.json",
+      "sha256": "86229c561be482bc99fe7b65099cb4c16a451b361d82b14fedeea4aaa1a59213",
+      "bytes": 7712
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-tools/mcporter.json",
+      "sha256": "4a169ece1806fef3791dabd1beb2e75a504c44156b470fddcb761e3c34dec368",
+      "bytes": 6846
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-tools/agentsview.json",
+      "sha256": "57389f254e79420fd1df0d13bc461a3a832e9c1ac7c18457d84d261bc7e25a7d",
+      "bytes": 6685
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-tools/langgraph-smoke-test/out_1.2.11.txt",
+      "sha256": "690dce58adc41574ac3735d894891a0d2ea832bb5c2c6692ebb3399669a6fbba",
+      "bytes": 378
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-tools/langgraph-smoke-test/out_1.2.12.txt",
+      "sha256": "5125183a0bbebe954be3ec87606460c7d155eb93ed1e7dd6e67d1c71dc8605b7",
+      "bytes": 400
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-tools/langgraph-smoke-test/smoke_test.py",
+      "sha256": "94ffdf4c915fe0b724a35404ca5678a09c6c29a0a5a4f063d9fa0814c6bc3240",
+      "bytes": 4553
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-tools/raw/orx_old_help.txt",
+      "sha256": "009d4649e88a9060951715928c8e1a2588a2759ffe40a843c497ac1bc8845301",
+      "bytes": 2564
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-tools/raw/mp_new_help.txt",
+      "sha256": "1746701a12d9a2bd1d11d6cf396afbde1571236276e8c2ef6cfdfbefde406856",
+      "bytes": 2642
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-tools/raw/orx_old_discover.txt",
+      "sha256": "c89fec1a98c25f17a1478793424c416965e074fb3a235923081caab14e004cf5",
+      "bytes": 586
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-tools/raw/av_new_help.txt",
+      "sha256": "c2c7d42049d5097c8615765add6b9590cebc280cd6e42a7de6a3f5d1c5847e5e",
+      "bytes": 9973
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-tools/raw/mp_old_help.txt",
+      "sha256": "1746701a12d9a2bd1d11d6cf396afbde1571236276e8c2ef6cfdfbefde406856",
+      "bytes": 2642
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-tools/raw/mp_old_list_rerun.txt",
+      "sha256": "252298224a773476cbb4f358a5fc0dd951d037f362183cc66440305f02abf39a",
+      "bytes": 324
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-tools/raw/mp_new_list.txt",
+      "sha256": "ca11ef8243dbe7cc83224d5adcd6803d8410eab60431fbe803c721238be66031",
+      "bytes": 323
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-tools/raw/orx_new_discover.txt",
+      "sha256": "c89fec1a98c25f17a1478793424c416965e074fb3a235923081caab14e004cf5",
+      "bytes": 586
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-tools/raw/av_old_help.txt",
+      "sha256": "34e1ece9fd92f99d355eaba761796140fc7f0e672bc764600078448033561380",
+      "bytes": 9173
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-tools/raw/orx_new_help.txt",
+      "sha256": "009d4649e88a9060951715928c8e1a2588a2759ffe40a843c497ac1bc8845301",
+      "bytes": 2564
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-runtime/README.md",
+      "sha256": "bff8a812408f99885b336c10af837fd32b0128b47abf6166ce999e0012fd35c5",
+      "bytes": 7941
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-runtime/dagu.json",
+      "sha256": "246f4b7ca3e672efd6bdbd86780bd093c39257b8afe2d8ef91bdf3e8947bbb8b",
+      "bytes": 15820
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-runtime/skfolio.json",
+      "sha256": "ca4b22a6e450d4960a31407aec68cb27fb4cc83155fa3a4707a6f49ebe49f457",
+      "bytes": 9490
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-runtime/clickhouse.json",
+      "sha256": "ab969677284b0f27b10ce153718cfe805db7256c5a28d361d7b657cb5a54cb1a",
+      "bytes": 8193
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-runtime/patched-harnesses/skfolio-run-optimizer-130.py",
+      "sha256": "9a1810dbe75d3baa077fbc5d805e29fe52ee8daf19e2983ee4a1d4b186815d8a",
+      "bytes": 6323
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-runtime/patched-harnesses/dagu-job-recovery-run-2170.py",
+      "sha256": "cc86cdff72b36ef571274caea73ad33815aab4a122132ef689248feb933bd307",
+      "bytes": 9790
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-runtime/patched-harnesses/dagu-job-recovery-run-2170.diff",
+      "sha256": "4d8acf4adc13fbfb0b9bff0acf766d3777e3a65f48d7b1b8ddcf916f0652a977",
+      "bytes": 2876
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-runtime/patched-harnesses/dagu-inflight-resume-after-kill-fixture-v2.diff",
+      "sha256": "1b2e84ee54f8deae69d20cc3cfba02bcad10fd7d186eed90abf2bfd7dfdad5da",
+      "bytes": 2652
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-runtime/patched-harnesses/dagu-inflight-resume-after-kill-fixture-v2.py",
+      "sha256": "1d5aeeff13e19a86b1d8086b941cdb3d24384b39bb3659e59cc3dc17aba049aa",
+      "bytes": 7864
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-runtime/patched-harnesses/skfolio-run-optimizer-130.diff",
+      "sha256": "7c6762730c2cbe0b95278393407a7b97926df1b13e5a6bb4ced7cab26134d8f9",
+      "bytes": 825
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/obs-compare/README.md",
+      "sha256": "7ad30ecf39eb37d644a37d9cd36160109843dd2a068f05a118c8cb5073978177",
+      "bytes": 15054
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/obs-compare/observability-hosting-comparison.json",
+      "sha256": "3baa597c122ed91bf95f4c16d00a01f7f048119e439ae024972b595511b0a1bf",
+      "bytes": 36369
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/obs-compare/fixround-preregistration.md",
+      "sha256": "20cbe6c6fe1a44ed7440cf51e7166611f7330c4ff1ca72fec5bb5c53479a9465",
+      "bytes": 3053
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/obs-compare/logs-fixround/egress-default-firstattempt-raced.log",
+      "sha256": "7a1954b351d1014a5678c20644972f2f78b605d48f0e5f6f08de26bf49d9097a",
+      "bytes": 4384
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/obs-compare/logs-fixround/egress-allowlisted.log",
+      "sha256": "19ba0ae0e2d5463fd9488dc64535bfe9e82f7493ed59720383e6476de8ed58bf",
+      "bytes": 5774
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/obs-compare/logs-fixround/egress-default-retry.log",
+      "sha256": "e6b96f1f0a010432d5084f47356d18de5db09f5ddd77667f102e95fc2cca4120",
+      "bytes": 4501
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/obs-compare/logs-fixround/egress-allowlisted-otherhost-denied.log",
+      "sha256": "cadcbf90c7303f28c406bab26a124c89b1794a9626a14b487201d945d29a2a7f",
+      "bytes": 5895
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/hw-profiles/README.md",
+      "sha256": "d0c84eaa61e72c7b5f69b0867f34628050cf0694b37703ad372b26cc29689d57",
+      "bytes": 9201
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json",
+      "sha256": "3a6a9a83e4e43eca8b95e70f41dafe15cceb3c6a759b8092ce3553b0e37f4cb6",
+      "bytes": 2344
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/hw-profiles/mlx-lm-hash-lock.json",
+      "sha256": "8d1583c5c2a0817d6747b3c8742028bd262e7620e2591e439c9cb4752469d5d2",
+      "bytes": 8093
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/hw-profiles/hardware-profile-tool.json",
+      "sha256": "66d3e5cf6da09d0c0fc3f1707f12eb31162732b54d7288280df05c5b3156ac1d",
+      "bytes": 5174
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/hw-profiles/review-findings-response.json",
+      "sha256": "c3a254b07e14dc1f1ffe60f8e7884549cd57aa9bd5a46a9f470e84618e91ac4c",
+      "bytes": 8316
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/hw-profiles/review-findings-response-round2.json",
+      "sha256": "5a27f214812ff65b880ee53678efb8902595ca3f35ae446e9204f0c4de32b3ff",
+      "bytes": 4315
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/hw-profiles/hosted-run-35808320867/macos-15.json",
+      "sha256": "58bd75c92b4101c730575839ba6b3d09c3ea9fc97d53dd29b6e0ec788e52150b",
+      "bytes": 1673
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/hw-profiles/hosted-run-35808320867/ubuntu-24.04.json",
+      "sha256": "43e5e61a2440ba31c7f41cb33060f53ee74472a23bb46cdbf87637e967122595",
+      "bytes": 1905
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/hw-profiles/hosted-run-35808320867/mlx-smoke-macos-15.json",
+      "sha256": "ff8fe53101eee030b01d7e6124ff92949d82b42a6c7fa5f53b1e7ea1fa47f727",
+      "bytes": 541
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-coverage-20260922/gated-items-20260923.json",
+      "sha256": "89bee2253800096417fbb03b0352cd1f701b49d2f28feb0ce015aaeeee75c160",
+      "bytes": 13895
     }
   ],
   "convergence_records": [

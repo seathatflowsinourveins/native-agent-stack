@@ -1,0 +1,8 @@
+langgraph version: unknown
+RESULT: {'count': 11, 'log': ['a', 'b']}
+STREAM_EVENTS: 2
+CHECKPOINT_PAUSED: {'total': 0, 'steps': [], '__interrupt__': [Interrupt(value={'question': 'how much to add?'}, id='b3649e62d23be16af6fa8cbfa5034f4d')]}
+CHECKPOINT_RESUMED: {'total': 5, 'steps': [5]}
+CHECKPOINT_GET_STATE: {'total': 5, 'steps': [5]}
+CHECKPOINT_HISTORY_LEN: 3
+SMOKE_TEST: PASS

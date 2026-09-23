@@ -1,0 +1,122 @@
+name: Hardware profile smoke
+
+on:
+  pull_request:
+    paths:
+      - scripts/hardware_profile.py
+      - tests/test_hardware_profile.py
+      - adoption/hardware-profiles.json
+      - tools/mlx-smoke/requirements.in
+      - tools/mlx-smoke/requirements.lock.txt
+      - tools/mlx-smoke/run_smoke.py
+      - .github/workflows/hardware-profile-smoke.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  linux-profile:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Harden the runner (audit-only network egress)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.13'
+          check-latest: false
+      - name: Run the hardware profile script (measured, native_proven for this runner)
+        run: |
+          mkdir -p "$RUNNER_TEMP/hw-profile"
+          python3 scripts/hardware_profile.py --out "$RUNNER_TEMP/hw-profile/ubuntu-24.04.json"
+          cat "$RUNNER_TEMP/hw-profile/ubuntu-24.04.json"
+      - name: Run the unit tests for the script
+        run: python3 -m unittest tests.test_hardware_profile -v
+      - name: Upload the measured Linux profile
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: hardware-profile-ubuntu-24.04-${{ github.run_id }}
+          path: ${{ runner.temp }}/hw-profile/ubuntu-24.04.json
+          if-no-files-found: error
+          retention-days: 30
+
+  macos-profile:
+    runs-on: macos-15
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.12'
+          check-latest: false
+      - name: Run the hardware profile script (measured, native_proven for this runner)
+        run: |
+          mkdir -p "$RUNNER_TEMP/hw-profile"
+          python3 scripts/hardware_profile.py --out "$RUNNER_TEMP/hw-profile/macos-15.json"
+          cat "$RUNNER_TEMP/hw-profile/macos-15.json"
+      - name: Run the unit tests for the script
+        run: python3 -m unittest tests.test_hardware_profile -v
+      - name: Install uv (verified download, isolated prefix, no PATH replacement)
+        env:
+          UV_VERSION: '0.12.17'
+          # https://github.com/astral-sh/uv/releases/download/0.12.17/uv-aarch64-apple-darwin.tar.gz.sha256
+          UV_SHA256: 85f00cbdc6dd3e97eba4c31b4d014375a9fdfe8f570023b84e5102fc3456896b
+        run: |
+          mkdir -p "$RUNNER_TEMP/uv"
+          curl --fail --silent --show-error --location --retry 3 \
+            "https://github.com/astral-sh/uv/releases/download/${UV_VERSION}/uv-aarch64-apple-darwin.tar.gz" \
+            --output "$RUNNER_TEMP/uv/archive.tar.gz"
+          printf '%s  %s\n' "$UV_SHA256" "$RUNNER_TEMP/uv/archive.tar.gz" | shasum -a 256 --check
+          tar -xzf "$RUNNER_TEMP/uv/archive.tar.gz" -C "$RUNNER_TEMP/uv" --strip-components=1
+          "$RUNNER_TEMP/uv/uv" --version
+          echo "UV=$RUNNER_TEMP/uv/uv" >> "$GITHUB_ENV"
+      - name: Verify the hash-locked mlx-lm requirements resolve for this platform
+        run: |
+          "$UV" pip compile tools/mlx-smoke/requirements.in \
+            --python-platform aarch64-apple-darwin --python-version 3.12 --generate-hashes \
+            --no-header --exclude-newer 2026-09-23T00:00:00Z \
+            -o "$RUNNER_TEMP/hw-profile/requirements.lock.check.txt"
+          diff -u tools/mlx-smoke/requirements.lock.txt "$RUNNER_TEMP/hw-profile/requirements.lock.check.txt"
+      - name: Create an isolated virtual environment for the smoke test
+        run: |
+          "$UV" venv --python 3.12 "$RUNNER_TEMP/mlx-smoke-venv"
+      - name: Install the hash-locked mlx-lm requirements into the isolated venv
+        run: |
+          "$UV" pip install --python "$RUNNER_TEMP/mlx-smoke-venv/bin/python3" \
+            --require-hashes -r tools/mlx-smoke/requirements.lock.txt
+      - name: Run the tiny MLX generation smoke test (pinned model revision)
+        env:
+          MLX_MODEL: mlx-community/Qwen2.5-0.5B-Instruct-4bit
+          MLX_MODEL_REVISION: a5339a4131f135d0fdc6a5c8b5bbed2753bbe0f3
+        run: |
+          mkdir -p "$RUNNER_TEMP/hw-profile"
+          "$RUNNER_TEMP/mlx-smoke-venv/bin/python3" tools/mlx-smoke/run_smoke.py \
+            --model "$MLX_MODEL" --revision "$MLX_MODEL_REVISION" \
+            --prompt "Say hello in five words." --max-tokens 32 \
+            --out "$RUNNER_TEMP/hw-profile/mlx-smoke-macos-15.json"
+          cat "$RUNNER_TEMP/hw-profile/mlx-smoke-macos-15.json"
+      - name: Upload the measured macOS profile and MLX smoke result
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: hardware-profile-macos-15-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/hw-profile/macos-15.json
+            ${{ runner.temp }}/hw-profile/mlx-smoke-macos-15.json
+          if-no-files-found: error
+          retention-days: 30

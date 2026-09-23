@@ -1,0 +1,49 @@
+diff --git a/tmp/pr81_fixture.py b/tmp/session-scratchpad/inflight_fixture_v2.py
+index 13ab004..2967efd 100644
+--- a/tmp/pr81_fixture.py
++++ b/tmp/session-scratchpad/inflight_fixture_v2.py
+@@ -16,6 +16,8 @@ import subprocess
+ import sys
+ import time
+ import uuid
++
++HOLD_SECONDS = 120
+ from datetime import datetime, timezone
+ from pathlib import Path
+ 
+@@ -106,7 +108,25 @@ def run(dagu, work, sleep_s=20, label="inflight"):
+     result["ps_after_kill_exit"] = ps_code
+     result["ps_after_kill_raw"] = ps_out[:2000]
+ 
+-    # Phase 2a: does re-issuing `start` with the SAME run-id automatically resume?
++    # Immediate check (~1-2s after kill, matching the earlier inconclusive run) is
++    # already captured above via history_after_kill_raw/ps_after_kill_raw. No
++    # separate probe DAG-run is issued here: an earlier version of this fixture tried
++    # a same-DAG noop probe under a different run-id, but that probe itself started a
++    # fresh 20s longstep in the foreground and timed out its own 10s subprocess call,
++    # so it is removed rather than fixed with a longer timeout that would just delay
++    # the hold below.
++
++    # Hold past both documented thresholds (30s lock-stale, 90s heartbeat-stale) before the real recovery attempt.
++    hold_s = HOLD_SECONDS
++    result["hold_seconds_before_recovery_attempt"] = hold_s
++    result["hold_started_utc"] = datetime.now(timezone.utc).isoformat()
++    time.sleep(hold_s)
++    result["hold_ended_utc"] = datetime.now(timezone.utc).isoformat()
++
++    hist_posthold_code, hist_posthold_out, _ = sh(base + ["history", "--run-id", run_id, "--format", "json"], work, env)
++    result["history_after_hold_raw"] = hist_posthold_out[:4000]
++
++    # Phase 2a: does re-issuing `start` with the SAME run-id automatically resume, now past both thresholds?
+     restart_same_id_code, restart_same_id_out, restart_same_id_err = sh(
+         base + ["start", "--run-id", run_id, str(dag_path)], work, env, timeout=40)
+     result["restart_same_run_id_exit"] = restart_same_id_code
+@@ -115,7 +135,7 @@ def run(dagu, work, sleep_s=20, label="inflight"):
+     result["started_marker_value_after_restart_attempt"] = read_marker(started_marker)
+     result["finished_marker_present_after_restart_attempt"] = finished_marker.exists()
+ 
+-    # Phase 2b: the documented mechanism -- `dagu retry --run-id`.
++    # Phase 2b: the documented mechanism -- `dagu retry --run-id`, also past both thresholds.
+     retry_code, retry_out, retry_err = sh(base + ["retry", "--run-id", run_id, str(dag_path)], work, env, timeout=40)
+     result["retry_exit"] = retry_code
+     result["retry_stdout"] = retry_out[:2000]
