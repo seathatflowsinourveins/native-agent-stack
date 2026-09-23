@@ -104,6 +104,23 @@ class Normalization(unittest.TestCase):
         with self.assertRaises(t.TransportError):
             t.timestamp_ns("2026-09-21T15:00:00")
 
+    def test_crossed_and_one_sided_quotes_are_untradable_not_corrupt(self):
+        base = {"S": "SPY", "bp": "100.01", "ap": "100.02", "bs": 1, "as": 1, "t": "2026-09-23T15:00:00.000000001Z"}
+        self.assertEqual(t.normalize_quote(base)["bid"], "100.01")
+        self.assertEqual(t.normalize_quote({**base, "bp": "100.02"})["ask"], "100.02")  # locked is tradable
+        for changes, reason in (({"bp": "336.23", "ap": "336.21"}, "crossed"), ({"bp": 0}, "one_sided"),
+                                ({"ap": "0.00"}, "one_sided")):
+            with self.subTest(changes=changes), self.assertRaises(t.InvalidQuote) as caught:
+                t.normalize_quote({**base, **changes})
+            self.assertEqual(caught.exception.reason, reason)
+        # Malformed data, or an untradable quote that is also malformed or halt-flagged, fails closed.
+        for changes in ({"bp": "-1"}, {"t": None}, {"bs": -1}, {"ap": "NaN"}, {"bp": 0, "t": None},
+                        {"bp": 0, "bs": -1}, {"bp": "101", "c": ["H"]}, {"ap": 0, "halted": True},
+                        {"S": None}):
+            with self.subTest(changes=changes), self.assertRaises(t.TransportError) as caught:
+                t.normalize_quote({**base, **changes})
+            self.assertNotIsInstance(caught.exception, t.InvalidQuote)
+
     def test_cumulative_fill_cannot_exceed_order(self):
         with self.assertRaises(t.TransportError):
             t.normalize_order(order(filled_qty="2"))
@@ -429,6 +446,87 @@ class AsyncTransport(unittest.IsolatedAsyncioTestCase):
         with self.assertRaises(t.TransportError):
             self.port.mark_reconciled()
 
+    def _stream_quote(self, **changes):
+        stamp = time.strftime("%Y-%m-%dT%H:%M:%S", time.gmtime()) + ".000000000Z"
+        return {"S": "SPY", "bp": "100.01", "ap": "100.02", "bs": 1, "as": 1, "t": stamp, **changes}
+
+    async def _drain(self):
+        task = asyncio.create_task(self.port._consume_events())
+        for _ in range(100):
+            if self.port._events.empty():
+                break
+            await asyncio.sleep(0.01)
+        await asyncio.sleep(0.02)
+        task.cancel()
+        await asyncio.gather(task, return_exceptions=True)
+
+    async def test_crossed_streamed_quote_is_dropped_and_counted_not_fatal(self):
+        seen = []
+        self.port._on_quote = seen.append
+        self.port._enqueue("quote", self._stream_quote(bp="100.03", ap="100.02"))
+        self.port._enqueue("quote", self._stream_quote(bp=0))
+        self.port._enqueue("quote", self._stream_quote())
+        await self._drain()
+        self.assertEqual(self.port.health["reasons"], [])
+        self.assertEqual(self.port.health["dropped_quotes"], {"crossed": 1, "one_sided": 1})
+        self.assertEqual([q["bid"] for q in seen], ["100.01"])
+        self.assertTrue(self.port.ready)
+
+    async def test_dropped_quote_keeps_the_last_valid_quote_and_its_age(self):
+        self.port._on_quote = lambda quote: None
+        self.port._enqueue("quote", self._stream_quote())
+        await self._drain()
+        seen_at = self.port._quote_seen["SPY"]
+        self.port._enqueue("quote", self._stream_quote(bp="100.05", ap="100.04"))
+        await self._drain()
+        self.assertEqual(self.port._quote_values["SPY"]["bid"], "100.01")
+        self.assertEqual(self.port._quote_seen["SPY"], seen_at)
+        self.assertEqual(self.port.health["dropped_quotes_by_symbol"], {"SPY": 1})
+        # Only crossed quotes after that: freshness still expires and the watchdog marks it stale.
+        self.port._quote_seen["SPY"] = time.monotonic() - self.port.quote_timeout - 1
+        self.port._ever_ready = True
+        self.port._enqueue("quote", self._stream_quote(bp="100.05", ap="100.04"))
+        await self._drain()
+        task = asyncio.create_task(self.port._watchdog())
+        await asyncio.sleep(0.02)
+        task.cancel()
+        await asyncio.gather(task, return_exceptions=True)
+        self.assertIn("quote_stale", self.port.health["reasons"])
+        self.assertFalse(self.port.ready)
+
+    async def test_halted_or_unsubscribed_invalid_quote_fails_closed(self):
+        for changes in ({"bp": "100.05", "ap": "100.04", "c": ["H"]}, {"S": "TSLA", "bp": "100.05", "ap": "100.04"}):
+            with self.subTest(changes=changes):
+                self.port._reasons.clear()
+                self.port._on_quote = lambda quote: None
+                self.port._enqueue("quote", self._stream_quote(**changes))
+                await self._drain()
+                self.assertIn("callback_failure", self.port.health["reasons"])
+
+    async def test_routine_acknowledgement_keeps_pending_order_update_timers(self):
+        self.port._pending_stream["trial-1"] = time.monotonic()
+        self.port.freeze_health("quote_stale")
+        self.port.mark_reconciled()
+        self.assertIn("trial-1", self.port._pending_stream)
+        self.assertEqual(self.port.health["reasons"], [])
+        self.port.freeze_health("orders_disconnected")
+        self.port.mark_reconciled()
+        self.assertNotIn("trial-1", self.port._pending_stream)
+
+    async def test_queued_quotes_do_not_block_reconciliation_but_order_events_do(self):
+        self.port._enqueue("quote", self._stream_quote())
+        self.port._enqueue("quote", self._stream_quote())
+        self.port.mark_reconciled()
+        self.port._enqueue("order", {"event": "new", "order": {}})
+        with self.assertRaises(t.TransportError):
+            self.port.mark_reconciled()
+
+    async def test_malformed_streamed_quote_still_fails_the_transport(self):
+        self.port._on_quote = lambda quote: None
+        self.port._enqueue("quote", self._stream_quote(bs=-1))
+        await self._drain()
+        self.assertIn("callback_failure", self.port.health["reasons"])
+
     async def test_missing_order_update_freezes(self):
         self.port._pending_stream["trial-1"] = time.monotonic() - 20
         task = asyncio.create_task(self.port._watchdog())
@@ -634,6 +732,19 @@ class LeverageNormalizeAccountTests(unittest.TestCase):
               "regt_buying_power": "20000", "daytrade_count": 0}
         raw.update(overrides)
         return raw
+
+    def test_current_alpaca_schema_normalizes_without_legacy_fields(self):
+        # Alpaca dropped daytrading_buying_power, pattern_day_trader and daytrade_count on 2026-07-06.
+        raw = {"cash": "10000", "equity": "10000", "buying_power": "40000", "status": "ACTIVE", "currency": "USD",
+               "trading_blocked": False, "account_blocked": False, "trade_suspended_by_user": False,
+               "shorting_enabled": True, "multiplier": "4", "regt_buying_power": "20000",
+               "maintenance_margin": "0", "initial_margin": "0"}
+        result = t.normalize_account(raw, include_margin=True)
+        for key in ("multiplier", "regt_buying_power", "maintenance_margin", "initial_margin", "buying_power"):
+            self.assertIn(key, result)
+        for key in ("daytrading_buying_power", "pattern_day_trader", "daytrade_count"):
+            self.assertNotIn(key, result)
+        self.assertNotIn("maintenance_margin", t.normalize_account(raw))
 
     def test_default_returns_exact_pre_change_key_set(self):
         result = t.normalize_account(self.raw_account())

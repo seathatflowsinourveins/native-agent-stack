@@ -1,0 +1,606 @@
+{
+  "accounting": {
+    "cash_delta_usd": "0",
+    "cumulative_realized_loss_usd": "0",
+    "drawdown_usd": "0",
+    "gross_exposure_usd": "0",
+    "gross_loss_usd": "0",
+    "halted_reason": null,
+    "held_symbols": 0,
+    "outstanding_orders": 0,
+    "peak_pnl_usd": "0",
+    "pending_buy_notional_usd": "0",
+    "realized_pnl_usd": "0",
+    "unrealized_pnl_usd": "0"
+  },
+  "adapter_errors": [],
+  "boundary_receipts": [],
+  "config_sha256": "3587653104e68fdfc9bbb9170825c611abcf7e2e1be1004327a056031c34555a",
+  "decision_exit": {
+    "cleanup_deadline_reached": false,
+    "duration_completed": false,
+    "elapsed_seconds": 25.861124372997438,
+    "reason": "transport_gap",
+    "transport_health": {
+      "authenticated": {
+        "orders": true,
+        "quotes": true
+      },
+      "callback_failure": {
+        "exception_type": "TransportError",
+        "stage": "quote_normalization"
+      },
+      "fresh_quotes": true,
+      "frozen": true,
+      "ready": false,
+      "reasons": [
+        "callback_failure"
+      ],
+      "subscriptions": {
+        "orders": true,
+        "quotes": true
+      }
+    }
+  },
+  "elapsed_seconds": 26.23483202600619,
+  "engine": "NautilusTrader LiveNode 2.0.0rc5",
+  "events": [
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790177261.1082728,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790177263.1915746,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790177265.2582858,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790177267.332574,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790177269.4083395,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790177271.4807723,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790177273.5401406,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790177275.602964,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790177277.674519,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790177279.752911,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790177281.8104696,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790177283.8961923,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790177285.9355838,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790177286.4592588,
+      "type": "decision"
+    }
+  ],
+  "feed": "sip",
+  "flat": true,
+  "mode": "adaptive_paper",
+  "native_fill_events": 0,
+  "native_quotes": 25153,
+  "native_rejections": 0,
+  "policy_selections": {
+    "defensive_cash": 0,
+    "mean_reversion": 0,
+    "range_breakout": 0,
+    "relative_strength": 0,
+    "trend_momentum": 0
+  },
+  "preflight": {
+    "account_status": "ACTIVE",
+    "asset_count": 24,
+    "capital_available": true,
+    "clock": {
+      "is_open": true,
+      "next_close_ns": 1790193600000000000,
+      "next_open_ns": 1790256600000000000,
+      "received_at_ns": 1790177259853645989,
+      "timestamp_ns": 1790177259752391168
+    },
+    "config_sha256": "3587653104e68fdfc9bbb9170825c611abcf7e2e1be1004327a056031c34555a",
+    "endpoint": "https://paper-api.alpaca.markets",
+    "feed": "sip",
+    "http": [
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790177260"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790177260"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790177260"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790177260"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790177261"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "195",
+          "x-ratelimit-reset": "1790177261"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "194",
+          "x-ratelimit-reset": "1790177261"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "193",
+          "x-ratelimit-reset": "1790177261"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "192",
+          "x-ratelimit-reset": "1790177262"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "191",
+          "x-ratelimit-reset": "1790177262"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "190",
+          "x-ratelimit-reset": "1790177262"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "189",
+          "x-ratelimit-reset": "1790177263"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "188",
+          "x-ratelimit-reset": "1790177263"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "187",
+          "x-ratelimit-reset": "1790177263"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "186",
+          "x-ratelimit-reset": "1790177264"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "185",
+          "x-ratelimit-reset": "1790177264"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "184",
+          "x-ratelimit-reset": "1790177264"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "184",
+          "x-ratelimit-reset": "1790177264"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "183",
+          "x-ratelimit-reset": "1790177265"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "182",
+          "x-ratelimit-reset": "1790177265"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "181",
+          "x-ratelimit-reset": "1790177265"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "180",
+          "x-ratelimit-reset": "1790177266"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "179",
+          "x-ratelimit-reset": "1790177266"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "178",
+          "x-ratelimit-reset": "1790177266"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "177",
+          "x-ratelimit-reset": "1790177267"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "176",
+          "x-ratelimit-reset": "1790177267"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "175",
+          "x-ratelimit-reset": "1790177267"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "174",
+          "x-ratelimit-reset": "1790177268"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "10000",
+          "x-ratelimit-remaining": "9999",
+          "x-ratelimit-reset": "1790177260"
+        },
+        "kind": "data_read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "175",
+          "x-ratelimit-reset": "1790177268"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "174",
+          "x-ratelimit-reset": "1790177268"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "173",
+          "x-ratelimit-reset": "1790177269"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "172",
+          "x-ratelimit-reset": "1790177269"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790177286"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790177287"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790177287"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790177287"
+        },
+        "kind": "read",
+        "status": 200
+      }
+    ],
+    "observed_at": "2026-09-23T15:27:40.420901+00:00",
+    "open_order_count": 0,
+    "orders_submitted": 0,
+    "position_count": 0,
+    "quote_count": 24,
+    "quote_errors": {}
+  },
+  "reconciliation": {
+    "cash_delta_usd": "0.00",
+    "cash_match": true,
+    "open_orders": 0,
+    "positions": 0,
+    "positions_match": true
+  },
+  "requests": [
+    {
+      "kind": "read",
+      "timestamp": 1790177260.9343379
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790177261.020596
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790177261.040685
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790177261.0695074
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790177286.4626293
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790177286.4936464
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790177286.5164182
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790177286.5382125
+    }
+  ],
+  "session_policy": {
+    "extended_hours": false,
+    "overnight_holds": false
+  },
+  "shutdown_failure": null,
+  "startup_reconciliation": null,
+  "status": "needs_attention"
+}

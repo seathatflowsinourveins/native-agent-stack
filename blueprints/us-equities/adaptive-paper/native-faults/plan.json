@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "kind": "native_fault_behaviour_plan",
+  "gate": "native-fault-behaviour",
+  "broker": "alpaca",
+  "endpoint": "paper",
+  "symbol": "SPY",
+  "qty": "1",
+  "side": "buy",
+  "time_in_force": "day",
+  "extended_hours": false,
+  "max_posts": 4,
+  "max_price_ratio": "0.5",
+  "c04_price_ratio": "0.4",
+  "c04_sub_penny_increment": "0.0001",
+  "cancel_settle_seconds": 10,
+  "price_reference": "engine_stream_quote_bid",
+  "cases": [
+    {"id": "C01", "name": "accept_resting_buy",
+     "pass": "broker accepts the non-marketable limit and the engine ledger records it submitted with a broker id and an open status"},
+    {"id": "C02", "name": "cancel_resting",
+     "pass": "engine ledger records canceled with zero fill and a fresh broker snapshot shows the order canceled"},
+    {"id": "C05", "name": "cancel_again",
+     "pass": "second engine cancel raises nothing, adds no transport freeze reason and leaves the ledger intent, fills and positions unchanged; whether a DELETE was sent and refused is recorded, not assumed; without a DELETE the evidence class is engine_short_circuit"},
+    {"id": "C04", "name": "definitive_rejection",
+     "pass": "a sub-penny limit reaches the broker, is refused with a definitive 401/403/404, and the engine ledger records broker_refused with no position or cash effect; unobserved when the engine refuses or rounds before any request reaches the broker"}
+  ],
+  "stop_rule": "stop after the first failed or errored case; never retry a write",
+  "cleanup": "cancel every non-terminal ledger intent carrying this run's client-id prefix on the same started transport, then prove flat and zero open orders with runner.reconcile over a fresh transport snapshot; otherwise write CLEANUP_REQUIRED",
+  "pass_status": "native_faults_passed requires every case passed with native_paper evidence and a proven flat cleanup"
+}

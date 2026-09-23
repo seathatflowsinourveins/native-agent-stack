@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Drafted, not run: no launchd agent from this directory has been
+  bootstrapped, kickstarted or booted out on any Mac (adoption/platforms/
+  macos-arm64.md, "What a hosted run proves"). Render with
+  tools/adoption/render_launchd.py before use; lint with
+  adoption/launchd/launchd-agents.sh lint before ever bootstrapping it.
+
+  Mirrors this profile's Linux/WSL2 ai-memory serve unit, given a transport
+  flag of http and a bind flag of AI_MEMORY_URL (recipes/README.md,
+  docs/foundation-stack.md), invoking the same bin/ai-memory symlink
+  adoption/bootstrap-macos.sh places on PATH. Hooks install, MCP
+  registration and any managed run remain separate macOS steps with no
+  receipt yet (adoption/pins-macos-arm64.json, ai-memory install_note).
+  Round 3j (Codex P2 thread 5): the workspace flag (local) and project
+  flag (native-agent-stack) below match the exact selected native
+  recipe's own serve invocation, quoting recipes/README.md:244: ai-memory
+  serve with a transport flag of http, an enable-web flag, a bind flag of
+  127.0.0.1:49374, a workspace flag of local and a project flag of
+  native-agent-stack (docs/foundation-stack.md:51-52 documents the same
+  workspace/project scope). Without these two flags, this agent would
+  serve with no workspace or project scope at all, unlike every other
+  documented ai-memory invocation in this project: write-page, search and
+  read-page all pass this same workspace/project pair too
+  (recipes/README.md:263-267).
+-->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.native-stack.ai-memory</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>${ECO_ROOT}/bin/ai-memory</string>
+        <string>--data-dir</string>
+        <string>${HOME}/.local/share/ai-memory</string>
+        <string>serve</string>
+        <string>--transport</string>
+        <string>http</string>
+        <string>--bind</string>
+        <string>${AI_MEMORY_URL}</string>
+        <string>--workspace</string>
+        <string>local</string>
+        <string>--project</string>
+        <string>native-agent-stack</string>
+    </array>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/opt/homebrew/bin:${ECO_ROOT}/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+    </dict>
+    <key>StandardOutPath</key>
+    <string>${ECO_ROOT}/state/logs/com.native-stack.ai-memory.out.log</string>
+    <key>StandardErrorPath</key>
+    <string>${ECO_ROOT}/state/logs/com.native-stack.ai-memory.err.log</string>
+</dict>
+</plist>

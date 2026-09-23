@@ -185,6 +185,27 @@ def platform_receipt_info(receipts_summary: dict, component_id: str, platform_ke
     }
 
 
+def platform_qualified_models(receipts_summary: dict, component_id: str, platform_key: str) -> list[dict]:
+    """Local model weights this component's (a runtime's) receipts on ``platform_key``
+    declared qualified (``scripts/host_receipts.py record --qualified-model``), each with
+    the recording receipt's host and path attached. Informational only: never read by the
+    platform-status flip rule, and it never marks anything accepted on its own."""
+    component_bucket = receipts_summary.get("components", {}).get(component_id, {})
+    platform_bucket = component_bucket.get("platforms", {}).get(platform_key) or {}
+    out = []
+    for entry in platform_bucket.get("receipts", []) or []:
+        if not isinstance(entry, dict):
+            continue
+        for qm in entry.get("qualified_models") or []:
+            out.append({
+                "model_id": qm.get("model_id"), "revision": qm.get("revision"), "runtime": qm.get("runtime"),
+                "runtime_version": qm.get("runtime_version"), "bars": qm.get("bars"), "result": qm.get("result"),
+                "host_id": entry.get("host_id"), "receipt_path": entry.get("path"),
+            })
+    out.sort(key=lambda qm: (qm.get("model_id") or "", qm.get("host_id") or "", qm.get("receipt_path") or ""))
+    return out
+
+
 def build_winner(winner: dict, decisions: dict[str, list[dict]], receipts_summary: dict,
                  status_context: platform_evidence.StatusContext):
     """Per-platform catalog status, the status the evidence derives (scripts/platform_status.py),
@@ -204,6 +225,7 @@ def build_winner(winner: dict, decisions: dict[str, list[dict]], receipts_summar
             "derived_reason": derived.reason,
             "host_receipts": platform_receipt_info(receipts_summary, component_id, platform_key),
             "e2e_state": "host_verified" if host_verified else catalog_status,
+            "qualified_models": platform_qualified_models(receipts_summary, component_id, platform_key),
         }
         if platform_key in ENFORCED_PLATFORMS:
             error = platform_evidence.declared_status_error(platform_key, catalog_status, winner, status_context)

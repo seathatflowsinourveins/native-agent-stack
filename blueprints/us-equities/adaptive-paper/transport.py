@@ -34,6 +34,15 @@ class TransportError(RuntimeError):
     """Sanitized transport failure; never includes provider response bodies."""
 
 
+class InvalidQuote(TransportError):
+    """A streamed quote that is a legitimate but untradable market state (a crossed
+    book or a one-sided zero price). It is dropped and counted, never fatal."""
+
+    def __init__(self, reason):
+        super().__init__("invalid quote: " + reason)
+        self.reason = reason
+
+
 class AmbiguousSubmission(TransportError):
     pass
 
@@ -128,16 +137,24 @@ QUOTE_HALT_CONDITION_CODES = frozenset({"H"})
 
 def normalize_quote(raw, symbol=None):
     conditions = raw.get("c") or raw.get("cond") or raw.get("conditions") or []
-    result = {"symbol": symbol or raw.get("S") or raw.get("symbol"),
-              "bid": decimal_string(raw.get("bp", raw.get("bid")), positive=True),
-              "ask": decimal_string(raw.get("ap", raw.get("ask")), positive=True),
+    halted = bool(raw.get("halted")) or bool(QUOTE_HALT_CONDITION_CODES & set(conditions))
+    bid = decimal_string(raw.get("bp", raw.get("bid")))
+    ask = decimal_string(raw.get("ap", raw.get("ask")))
+    result = {"symbol": symbol or raw.get("S") or raw.get("symbol"), "bid": bid, "ask": ask,
               "bid_size": decimal_string(raw.get("bs", raw.get("bid_size", 0))),
               "ask_size": decimal_string(raw.get("as", raw.get("ask_size", 0))),
-              "ts_ns": timestamp_ns(raw.get("t", raw.get("timestamp"))),
-              "halted": bool(raw.get("halted")) or bool(QUOTE_HALT_CONDITION_CODES & set(conditions))}
-    if (Decimal(result["bid"]) > Decimal(result["ask"]) or result["ts_ns"] <= 0
+              "ts_ns": timestamp_ns(raw.get("t", raw.get("timestamp"))), "halted": halted}
+    if (not result["symbol"] or result["ts_ns"] <= 0 or min(Decimal(bid), Decimal(ask)) < 0
             or min(Decimal(result["bid_size"]), Decimal(result["ask_size"])) < 0):
         raise TransportError("invalid quote")
+    # Well-formed but untradable market states: a one-sided zero price or a crossed book
+    # (SIP publishes brief crossed books; see adaptive-paper/trials/20260923b-needs-attention).
+    # A halt-flagged quote is never dropped, so its halt signal cannot be lost: fail closed.
+    zero = Decimal(bid) == 0 or Decimal(ask) == 0
+    if zero or Decimal(bid) > Decimal(ask):
+        if halted:
+            raise TransportError("invalid halted quote")
+        raise InvalidQuote("one_sided" if zero else "crossed")
     return result
 
 
@@ -172,7 +189,7 @@ def normalize_account(raw, *, include_margin=False):
     # validated _leverage_policy). False (every default call site) keeps
     # this function's return keys byte-identical to before G-e.
     if include_margin:
-        for key in ("multiplier", "daytrading_buying_power", "regt_buying_power"):
+        for key in ("multiplier", "daytrading_buying_power", "regt_buying_power", "maintenance_margin", "initial_margin"):
             if key in raw:
                 result[key] = decimal_string(raw[key])
         if "daytrade_count" in raw:
@@ -464,6 +481,8 @@ class AlpacaPaperTransport:
         self._events = queue.Queue(maxsize=queue_size)
         self._state_lock = threading.RLock()
         self._reasons = set()
+        self._dropped_quotes = {}
+        self._dropped_by_symbol = {}
         self._auth = {"orders": False, "quotes": False}
         self._acks = dict(self._auth)
         self._ever_acks = dict(self._auth)
@@ -511,7 +530,8 @@ class AlpacaPaperTransport:
                     "frozen": bool(self._reasons), "reasons": sorted(self._reasons),
                     "authenticated": dict(self._auth), "subscriptions": dict(self._acks),
                     "fresh_quotes": fresh, "required_quote_symbols": list(self.required_quote_symbols),
-                    "queue_size": self._events.qsize()}
+                    "queue_size": self._events.qsize(), "dropped_quotes": dict(self._dropped_quotes),
+                    "dropped_quotes_by_symbol": dict(self._dropped_by_symbol)}
 
     @property
     def ready(self):
@@ -525,12 +545,22 @@ class AlpacaPaperTransport:
         """Caller must first validate positions, owned fills and a fresh snapshot."""
         with self._state_lock:
             if (not all(self._auth.values()) or not all(self._acks.values())
-                    or not self.health["fresh_quotes"] or not self._events.empty()):
+                    or not self.health["fresh_quotes"] or self._order_events_pending()):
                 raise TransportError("streams are not ready for reconciliation acknowledgement")
             if "queue_overflow" in self._reasons or "callback_failure" in self._reasons:
                 raise TransportError("event loss requires a new transport and durable recovery")
+            # Pending order-update timers survive a routine acknowledgement; they are
+            # cleared only when the orders stream actually dropped, since only then can
+            # those stream events never arrive (the REST snapshot then stands in for them).
+            if any(str(reason).startswith("orders_") for reason in self._reasons):
+                self._pending_stream.clear()
             self._reasons.clear()
-            self._pending_stream.clear()
+
+    def _order_events_pending(self):
+        """True while an order event is still queued. Queued quotes do not block a
+        reconciliation acknowledgement: on SIP the quote queue is rarely empty."""
+        with self._events.mutex:
+            return any(kind != "quote" for kind, _ in self._events.queue)
 
     def _connection(self, channel, connected):
         with self._state_lock:
@@ -635,7 +665,19 @@ class AlpacaPaperTransport:
                 continue
             try:
                 if kind == "quote":
-                    quote = normalize_quote(raw)
+                    try:
+                        quote = normalize_quote(raw)
+                    except InvalidQuote as exc:
+                        # Untradable, not corrupt: drop it without touching the stored quote or
+                        # its freshness, so the last valid quote only ages toward quote_stale.
+                        # Malformed data and unsubscribed symbols still fail the transport.
+                        dropped = raw.get("S") or raw.get("symbol")
+                        if dropped not in self.symbols:
+                            raise TransportError("unexpected quote symbol") from None
+                        with self._state_lock:
+                            self._dropped_quotes[exc.reason] = self._dropped_quotes.get(exc.reason, 0) + 1
+                            self._dropped_by_symbol[dropped] = self._dropped_by_symbol.get(dropped, 0) + 1
+                        continue
                     if quote["symbol"] not in self.symbols:
                         raise TransportError("unexpected quote symbol")
                     age = (time.time_ns() - quote["ts_ns"]) / 1e9

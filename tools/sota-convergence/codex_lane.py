@@ -29,12 +29,13 @@ pattern) -- ``model.effort`` is ``--effort``, and ``model.family`` is
 record_verdicts.py's family pattern). ``provenance`` is also runner-owned:
 ``{codex_lane_py_sha256, prompt_sha256}`` -- the sha256 of this script file and
 of the prompt template it filled. The strict schema copy passed to ``codex
-exec`` omits ``provenance`` and ``model.family``, since Codex strict output
-requires every listed property; whatever ``model`` the response carries is
-replaced. A failing attempt
+exec`` omits ``provenance``, ``model.family`` and the Claude lane's
+``refutation``, since Codex strict output requires every listed property;
+whatever ``model`` the response carries is replaced. A failing attempt
 (non-zero exit, timeout, missing or unparseable ``out.tmp``) is retried
-exactly once before the layer is recorded as failed and left for the next
-run (resumable). Nothing here validates the full lane-return JSON Schema --
+exactly once before the layer is recorded as failed (with its last reason in
+``<work-dir>/codex/failures.json``, which record_verdicts.py turns into a
+``failed`` run-manifest outcome) and left for the next run (resumable). Nothing here validates the full lane-return JSON Schema --
 that is ``record_verdicts.py``'s job; this runner only fills the three
 fields the contract assigns to it.
 
@@ -49,6 +50,7 @@ import argparse
 import hashlib
 import json
 import shlex
+import shutil
 import subprocess
 import sys
 import threading
@@ -99,8 +101,12 @@ def strict_output_schema(schema):
     return strict
 
 
-# Written by this runner, never asked of the model: (object path, property).
-RUNNER_OWNED_PROPERTIES = ((), "provenance"), (("model",), "family")
+# Written by a runner, never asked of the model: (object path, property). refutation is the Claude
+# lane's refutation summary (written by claude_lane.py), never a Codex field.
+RUNNER_OWNED_PROPERTIES = ((), "provenance"), (("model",), "family"), ((), "refutation")
+# The layers this run tried and could not produce a return for, with the reason, for
+# record_verdicts.py's run manifest (outcome "failed" instead of a bare "missing").
+FAILURES_NAME = "failures.json"
 
 
 def without_runner_owned(schema):
@@ -405,6 +411,12 @@ def main(argv=None) -> int:
             print(shlex.join(cmd))
         return 0
 
+    if pending and shutil.which("codex") is None:
+        # A missing CLI is a setup error, not a lane failure: say so instead of a traceback.
+        print("codex_lane: the codex CLI is not on PATH; install it and sign in natively "
+              "(see adoption/) before running the Codex lane", file=sys.stderr)
+        return 2
+
     events_dir.mkdir(parents=True, exist_ok=True)
     strict_schema_path = write_strict_schema(schema_path, codex_dir)
     provenance = lane_provenance(prompt_path)
@@ -421,6 +433,7 @@ def main(argv=None) -> int:
 
         succeeded = False
         last_model_name = None
+        last_failure = "no attempt ran"
         for attempt in (1, 2):
             # Clear any stale out.tmp left by a killed prior run (SIGKILL,
             # Ctrl-C, OOM) before launching this attempt, so a codex exec
@@ -448,16 +461,20 @@ def main(argv=None) -> int:
                 handle.write(json.dumps(usage_row, sort_keys=True) + "\n")
 
             if result["timed_out"] or result["exit_code"] != 0:
+                last_failure = "timed out" if result["timed_out"] else f"codex exec exited {result['exit_code']}"
                 tmp_out.unlink(missing_ok=True)
                 continue
             if not tmp_out.exists():
+                last_failure = "codex exec wrote no output file"
                 continue
             try:
                 data = load_json(tmp_out)
             except (json.JSONDecodeError, UnicodeDecodeError):
+                last_failure = "the output file was not valid JSON"
                 tmp_out.unlink(missing_ok=True)
                 continue
             if not isinstance(data, dict):
+                last_failure = "the output was not a JSON object"
                 tmp_out.unlink(missing_ok=True)
                 continue
 
@@ -469,7 +486,10 @@ def main(argv=None) -> int:
             break
 
         if not succeeded:
-            failures.append((catalog, layer_id))
+            # A stale return (e.g. one rejected for an older packet hash) must
+            # not survive, so record_verdicts.py records this `failed` reason.
+            out_path.unlink(missing_ok=True)
+            failures.append((catalog, layer_id, f"failed after retry: {last_failure}"))
 
     if args.jobs > 1:
         with ThreadPoolExecutor(max_workers=args.jobs) as executor:
@@ -478,10 +498,15 @@ def main(argv=None) -> int:
         for item in pending:
             process(item)
 
+    failures_path = codex_dir / FAILURES_NAME
     if failures:
-        for catalog, layer_id in sorted(failures):
+        failures_path.write_text(json.dumps({"lane": LANE, "failures": [
+            {"catalog": catalog, "layer_id": layer_id, "reason": reason}
+            for catalog, layer_id, reason in sorted(failures)]}, indent=1, sort_keys=True) + "\n", encoding="utf-8")
+        for catalog, layer_id, _reason in sorted(failures):
             print(f"codex_lane: {catalog}__{layer_id} failed after retry", file=sys.stderr)
         return 1
+    failures_path.unlink(missing_ok=True)
     return 0
 
 

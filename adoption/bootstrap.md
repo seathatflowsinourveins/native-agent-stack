@@ -12,9 +12,10 @@ git clone https://github.com/seathatflowsinourveins/native-agent-stack.git
 cd native-agent-stack
 git checkout "$(python3 -c "import json;print(json.load(open('adoption/manifest.json'))['source']['release_tag'])")"
 ```
-This checks out `adoption/manifest.json` `source.release_tag`
-(`v2026.09.23`, or a later tag) at `source.release_commit`
-(`bdd04ca50eb781f8366c955f481479b7a7f57cbd`), published with SLSA build
+This checks out `adoption/manifest.json` `source.release_tag` (or a later
+tag) at the commit that tag names — read `source.release_commit` from the
+manifest you actually cloned rather than trusting a commit pasted into this
+prose, which a later re-pin would leave stale — published with SLSA build
 provenance by `.github/workflows/publish-catalog.yml`. Do **not** check out
 `source.baseline_commit`: that field records the parent publication
 immediately *before* this `adoption/` directory (and `tools/adoption/`) were
@@ -130,7 +131,22 @@ nothing on that page has been executed on a Mac; see
    `id`, `kind`, `component_ids`, `observed_at_utc`, `status`, `claim`, `scope`,
    `data`. Distinguish `native_cli_e2e` (an actual command ran on this host)
    from `source_review` (documented, not executed) and from a candidate that
-   has neither.
+   has neither. `scripts/host_receipts.py` (this same step's own recording
+   tool, plus `scripts/component_matrix.py`, `scripts/new_host_grand_list.py`,
+   `tools/sota-convergence/build_verdicts.py`,
+   `scripts/validate_convergence.py` and `scripts/release_due.py`) needs
+   **Python 3.9 or newer**: every one of those scripts parses under the
+   Python 3.9 grammar and uses `from __future__ import annotations`, and this
+   is exercised directly, not merely declared -- a macOS CI job runs the
+   recording smoke below against both the manifest-pinned Python line and the
+   host's own system `/usr/bin/python3` (macOS ships 3.9.6 there by default,
+   the same floor this bullet declares; see
+   [the macOS page](platforms/macos-arm64.md#recording-and-verdict-scripts)).
+   Linux/WSL2 hosts use the manifest-pinned line (`python@3.13` on macOS,
+   already required by step 1's prerequisites); this floor exists so a host
+   that has not yet installed the pinned line -- or one recording a receipt
+   with only the OS-bundled interpreter -- still has a working
+   `host_receipts.py`.
 
 Every step above is guidance; running or validating this page does not itself
 execute anything (`adoption/lifecycle.md`, "This guide supplies future-host

@@ -44,6 +44,8 @@ RESULTS = {"pass", "fail", "partial", "not_runnable"}
 EVIDENCE_CLASSES = {"native_proven", "local_integration", "synthetic"}
 REVIEW_KINDS = {"self", "independent_session", "codex_lane", "human"}
 REVIEW_VERDICTS = {"agree", "disagree", "needs_changes"}
+QUALIFIED_MODEL_REQUIRED = ["model_id", "revision", "runtime", "runtime_version", "bars", "result"]
+QUALIFIED_MODEL_RESULTS = {"pass", "fail"}
 
 # Identity of whoever records or reviews a receipt, stored only as a domain-separated sha256
 # (a fixed public prefix, not a secret salt: a guessable --identity can be recovered by
@@ -552,6 +554,52 @@ def cmd_record(args: argparse.Namespace) -> int:
               "written, or --allow-unbound-version to record it anyway")
         return 2
 
+    qualified_models: list[dict] = []
+    for raw in args.qualified_model:
+        try:
+            parsed = json.loads(raw)
+        except json.JSONDecodeError as error:
+            print(f"error: --qualified-model is not valid JSON ({error})")
+            return 2
+        if not isinstance(parsed, dict):
+            print("error: --qualified-model must be a JSON object")
+            return 2
+        qualified_models.append(parsed)
+    if args.qualified_models_file:
+        models_path = Path(args.qualified_models_file)
+        if not models_path.is_absolute():
+            models_path = root / models_path
+        try:
+            payload = json.loads(models_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as error:
+            print(f"error: --qualified-models-file could not be read as JSON ({error})")
+            return 2
+        if not isinstance(payload, list):
+            print("error: --qualified-models-file must contain a JSON array")
+            return 2
+        for entry in payload:
+            if not isinstance(entry, dict):
+                print("error: --qualified-models-file entries must be JSON objects")
+                return 2
+            qualified_models.append(entry)
+    if qualified_models:
+        # Full schema validation (every constraint: required keys, type, enum, maxLength, ...)
+        # against the qualified_models[] item subschema, before anything below runs a single
+        # command. A hand-rolled subset check here previously let a too-long `bars` (or any
+        # other constraint this list did not name) through to run the commands and fail only
+        # afterward at the pre-write validate_receipt_shape() call; validating up front with
+        # the same schema-driven validator used everywhere else in this module means no
+        # constraint can be missed twice, and nothing executes for a malformed entry.
+        qualified_model_schema = (load_receipt_schema(root).get("properties", {})
+                                  .get("qualified_models", {}).get("items", {}))
+        for index, entry in enumerate(qualified_models):
+            entry_errors: list[str] = []
+            validate_against_schema(entry, qualified_model_schema, f"qualified_models[{index}]", entry_errors)
+            if entry_errors:
+                print("error: --qualified-model entry would not validate (checked before running any command): "
+                      + "; ".join(entry_errors))
+                return 2
+
     commands_to_run: list[str] = []
     if args.from_stack_commands:
         stack_commands = stack_component_string_commands(root, args.component_id)
@@ -621,6 +669,8 @@ def cmd_record(args: argparse.Namespace) -> int:
              "reviewer": dict(recorded_by)},
         ],
     }
+    if qualified_models:
+        receipt["qualified_models"] = qualified_models
     if args.hardware_profile_ref:
         receipt["host"]["hardware_profile_ref"] = args.hardware_profile_ref
 
@@ -990,7 +1040,10 @@ def build_summary(root: Path) -> dict:
     ``validate_receipt_shape`` (a fabricated or malformed receipt cannot enter
     this stricter list even though it may still appear in the looser
     per-stage pass/fail counts above). "Independently reviewed" is
-    ``review_state(receipt) == "agree"``. Those counts ignore pins; the
+    ``review_state(receipt) == "agree"``. Each per-receipt entry also carries the receipt's
+    own ``qualified_models`` (empty unless the receipt both declares some and is shape-valid),
+    for callers such as ``scripts/component_matrix.py`` to surface per platform; this never
+    feeds review or e2e-state computation. Those counts ignore pins; the
     per-receipt ``receipts`` entries carry what ``scripts/platform_status.py``
     needs to bind a receipt to a winner's current pin, and that module is the
     one rule for platform status and the macOS flip. This function does not re-run the full
@@ -1044,6 +1097,8 @@ def build_summary(root: Path) -> dict:
         validate_receipt_shape(root, receipt, relative, shape_errors)
         tool_versions = receipt.get("tool_versions") if isinstance(receipt.get("tool_versions"), dict) else {}
         component_version = tool_versions.get(component_id)
+        qualified_models = [entry for entry in (receipt.get("qualified_models") or [])
+                            if isinstance(entry, dict)] if not shape_errors else []
         platform_bucket["receipts"].append({
             "path": relative,
             "host_id": host.get("host_id") if isinstance(host.get("host_id"), str) else None,
@@ -1056,6 +1111,7 @@ def build_summary(root: Path) -> dict:
             "second_physical_machine": second_physical_machine,
             "platform_identity_ok": platform_identity_ok,
             "shape_ok": not shape_errors,
+            "qualified_models": qualified_models,
         })
         if state == "dissent":
             platform_bucket["dissented"] += 1
@@ -1152,6 +1208,11 @@ def build_parser() -> argparse.ArgumentParser:
                                help="Version this host ran; defaults to the landscape pin or the stack version")
     record_parser.add_argument("--allow-unbound-version", action="store_true",
                                help="Record a --component-version that matches no current winner pin (never counts)")
+    record_parser.add_argument("--qualified-model", action="append", default=[],
+                               help='JSON object {model_id, revision, runtime, runtime_version, bars, result}; '
+                                    'repeatable. Local model weights qualified on this host\'s runtime.')
+    record_parser.add_argument("--qualified-models-file", default=None,
+                               help="Path to a JSON array of qualified-model objects, merged after --qualified-model")
     record_parser.set_defaults(func=cmd_record)
 
     review_parser = subparsers.add_parser("review", help="Append an independent review to an existing receipt")

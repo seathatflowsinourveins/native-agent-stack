@@ -60,6 +60,12 @@ from build_manifest import assert_no_leak, github_repo_slug, sanitize_value  # n
 # DISPOSITIONS/WINNER_EVIDENCE_CLASSES are reused (not reimplemented) from
 # scripts/landscape.py, the single owner of these enums.
 from scripts.landscape import DISPOSITIONS, WINNER_EVIDENCE_CLASSES  # noqa: E402
+# The withheld-key policy is shared with scripts/landscape.py, which re-checks every packet a new
+# wave retains (evidence/artifacts/layer-verdicts-<run-id>/packets/) against it in CI.
+from scripts.landscape import (  # noqa: E402
+    COPY_WITHHELD_FIELDS, POPULARITY_TOKENS, REQUIREMENT_GATED_FIELDS, is_withheld_packet_key,
+    requirement_names, withhold_policy_labels,
+)
 from scripts.catalog_decisions import InvalidDecisionIndex, safe_file  # noqa: E402
 
 LEDGER_FILES = {
@@ -112,69 +118,62 @@ WITHHELD_DECISION_FIELDS = ("selection", "review_status")
 # candidates by attention rather than by the retained evidence). The explicit keys are the ones
 # build_manifest.upstream_record() and the GitHub API emit; any other key naming a count of stars,
 # forks, watchers or downloads, or a timestamp (``*_at``), is stripped the same way.
-POPULARITY_RECENCY_FIELDS = ("stars", "forks", "watchers", "pushed_at", "released_at")
 # The latest upstream release is withheld entirely (re-review 2026-09-23): a date-based tag such as
 # inspect_ai's "release/2025-11-28" carries a release date. Withholding it always is the stricter
 # of the two options considered (the other stripped it only when date-shaped) and no packet
 # requirement names releases, versions or maintenance. prerelease describes that same release, and
 # pin_behind_upstream is derived by comparing the pin with it, so both go with it.
-UPSTREAM_RELEASE_FIELDS = ("latest", "prerelease")
 # newcomer marks a candidate as recently discovered, a recency signal of the same kind (final
-# verification, 2026-09-23), so it is withheld with them.
-COPY_RELEASE_FIELDS = ("pin_behind_upstream", "newcomer")
-_POPULARITY_TOKENS = ("star", "fork", "watcher", "subscriber", "download", "popular", "trending")
-# Kept only when the packet's requirement text names them (a requirement about licensing or
-# maintenance status makes them evidence rather than a popularity proxy).
-REQUIREMENT_GATED_FIELDS = {"archived": ("archiv", "maintained", "maintenance"), "license": ("licen",)}
+# verification, 2026-09-23), so it is withheld with them. The candidate-only note (a newcomer's
+# demonstrated_gap or a keep-but-compare entry's overturn comparison) exists only on non-adopted
+# candidates, so it hints at their status too and is withheld as well (review of #122, finding 9).
+COPY_RELEASE_FIELDS = COPY_WITHHELD_FIELDS
+_POPULARITY_TOKENS = POPULARITY_TOKENS
+# archived/license are kept only when the packet's requirement text names them (a requirement about
+# licensing or maintenance status makes them evidence rather than a popularity proxy):
+# scripts/landscape.py REQUIREMENT_GATED_FIELDS and requirement_names.
+# The review of the #122 fix round made the strip recursive, sharing scripts/landscape.py
+# is_withheld_packet_key with the CI check: a withheld key is removed at any depth of a copy (for
+# example upstream.latest_flag, whose tag-listing fallback can be date-shaped such as
+# "release/2025-11-28", or a nested evidence.stars), not only on the copy and its upstream record.
 # The packet copies of upstream metadata: each candidate's and each unclaimed sota component's.
 UPSTREAM_COPIES = ("candidates", "sota_components_not_in_candidates")
 
 
-def is_popularity_or_recency_key(key: str) -> bool:
-    lowered = key.lower()
-    return (lowered in POPULARITY_RECENCY_FIELDS or lowered.endswith("_at")
-            or any(token in lowered for token in _POPULARITY_TOKENS))
-
-
-def requirement_names(field: str, requirement) -> bool:
-    text = requirement.lower() if isinstance(requirement, str) else ""
-    return any(token in text for token in REQUIREMENT_GATED_FIELDS[field])
-
-
 def withhold_popularity(packet: dict) -> dict:
-    """Strip popularity and recency fields and the latest upstream release (and archived/license
-    unless the requirement names them) from every candidate and sota-component copy in a built
-    packet, and list each stripped field in ``withheld``. The canonical fields are always listed, so a reader can tell the
-    packet was built under this policy even when no copy carried upstream metadata."""
+    """Strip popularity and recency fields, the latest upstream release and what is derived from it
+    (and archived/license unless the requirement names them) at any depth of every candidate and
+    sota-component copy in a built packet, and list each stripped field in ``withheld``. The
+    canonical fields are always listed, so a reader can tell the packet was built under this policy
+    even when no copy carried upstream metadata."""
     requirement = packet.get("requirement")
-    gated = [field for field in REQUIREMENT_GATED_FIELDS if not requirement_names(field, requirement)]
-    # Labels are relative to one copy: "upstream.<key>" inside the upstream record, "<key>" on the copy itself.
-    policy = ({f"upstream.{field}" for field in list(POPULARITY_RECENCY_FIELDS) + list(UPSTREAM_RELEASE_FIELDS)
-               + gated} | set(COPY_RELEASE_FIELDS))
-    stripped = {collection: set(policy) for collection in UPSTREAM_COPIES}
+    kept_gated = {field for field in REQUIREMENT_GATED_FIELDS if requirement_names(field, requirement)}
+    labels = set(withhold_policy_labels(requirement))
+
+    def strip(value, label):
+        # Rebuild rather than delete in place: build_candidate and the unclaimed list share the loaded
+        # manifest's upstream record across packets, so an earlier packet must not remove a field a
+        # later packet's requirement keeps.
+        if isinstance(value, dict):
+            kept = {}
+            for key, item in value.items():
+                if is_withheld_packet_key(key, kept_gated):
+                    labels.add(f"{label}.{key}")
+                else:
+                    kept[key] = strip(item, f"{label}.{key}")
+            return kept
+        if isinstance(value, list):
+            return [strip(item, label) for item in value]
+        return value
+
     for collection in UPSTREAM_COPIES:
-        for item in packet.get(collection) or []:
-            if not isinstance(item, dict):
-                continue
-            for key in [key for key in item if key != "upstream" and (
-                    is_popularity_or_recency_key(key) or key in COPY_RELEASE_FIELDS)]:
-                del item[key]
-                stripped[collection].add(key)
-            upstream = item.get("upstream")
-            if isinstance(upstream, dict):
-                # build_candidate and the unclaimed list copy a reference to the loaded manifest's
-                # upstream record, shared by every packet naming that component: strip a private
-                # copy, so an earlier packet cannot remove a field a later packet's requirement keeps.
-                upstream = item["upstream"] = dict(upstream)
-                for key in [key for key in upstream if is_popularity_or_recency_key(key) or key in gated
-                            or key in UPSTREAM_RELEASE_FIELDS]:
-                    del upstream[key]
-                    stripped[collection].add(f"upstream.{key}")
+        if isinstance(packet.get(collection), list):
+            packet[collection] = [strip(item, f"{collection}[]") if isinstance(item, dict) else item
+                                  for item in packet[collection]]
     withheld = list(packet.get("withheld", []))
-    for collection in UPSTREAM_COPIES:
-        for label in sorted(f"{collection}[].{key}" for key in stripped[collection]):
-            if label not in withheld:
-                withheld.append(label)
+    for label in sorted(labels):
+        if label not in withheld:
+            withheld.append(label)
     packet["withheld"] = withheld
     return packet
 
@@ -527,7 +526,8 @@ def parse_args(argv=None):
                              "selection and review_status) from every ledger-built packet, and popularity/recency "
                              "fields (stars, forks, watchers, pushed_at, released_at, any *_at; archived and "
                              "license unless the requirement names them; always upstream.latest, upstream.prerelease, "
-                             "pin_behind_upstream and the newcomer flag) from every candidate and component copy "
+                             "upstream.latest_flag, pin_behind_upstream, the newcomer flag, the candidate-only note "
+                             "and any key naming a release) at any depth of every candidate and component copy "
                              "of every packet; each stripped field is listed in the packet's withheld list. Off by "
                              "default so the 2026-09-22 packets reproduce.")
     parser.add_argument("--trading-candidates", choices=("ledger", "manifest"), default="ledger",

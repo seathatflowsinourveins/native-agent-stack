@@ -1,0 +1,82 @@
+{
+  "kind": "broker_order_readback",
+  "endpoint": "paper",
+  "source": "alpaca-py TradingClient.get_orders and get_all_positions, read-only",
+  "window_utc": [
+    "2026-09-23T16:46:00Z",
+    "2026-09-23T16:53:00Z"
+  ],
+  "orders": [
+    {
+      "client_order_id": "adp-adaptive-20260923g-0000001",
+      "symbol": "INTC",
+      "side": "buy",
+      "type": "limit",
+      "time_in_force": "day",
+      "qty": "1",
+      "limit_price": "120.6",
+      "status": "filled",
+      "filled_qty": "1",
+      "filled_avg_price": "120.57",
+      "submitted_at": "2026-09-23T16:47:36.955177+00:00",
+      "filled_at": "2026-09-23T16:47:37.632753+00:00"
+    },
+    {
+      "client_order_id": "adp-adaptive-20260923g-0000002",
+      "symbol": "INTC",
+      "side": "sell",
+      "type": "limit",
+      "time_in_force": "day",
+      "qty": "1",
+      "limit_price": "120.52",
+      "status": "filled",
+      "filled_qty": "1",
+      "filled_avg_price": "120.55",
+      "submitted_at": "2026-09-23T16:47:43.144353+00:00",
+      "filled_at": "2026-09-23T16:47:43.962040+00:00"
+    },
+    {
+      "client_order_id": "adp-adaptive-20260923g-0000003",
+      "symbol": "GOOGL",
+      "side": "buy",
+      "type": "limit",
+      "time_in_force": "day",
+      "qty": "1",
+      "limit_price": "338.64",
+      "status": "filled",
+      "filled_qty": "1",
+      "filled_avg_price": "338.61",
+      "submitted_at": "2026-09-23T16:50:58.549846+00:00",
+      "filled_at": "2026-09-23T16:50:59.643745+00:00"
+    },
+    {
+      "client_order_id": "adp-adaptive-20260923g-0000004",
+      "symbol": "GOOGL",
+      "side": "sell",
+      "type": "limit",
+      "time_in_force": "day",
+      "qty": "1",
+      "limit_price": "338.42",
+      "status": "canceled",
+      "filled_qty": "0",
+      "filled_avg_price": "None",
+      "submitted_at": "2026-09-23T16:51:06.688616+00:00",
+      "filled_at": null
+    },
+    {
+      "client_order_id": "adp-adaptive-20260923g-0000005",
+      "symbol": "GOOGL",
+      "side": "sell",
+      "type": "limit",
+      "time_in_force": "day",
+      "qty": "1",
+      "limit_price": "338.33",
+      "status": "filled",
+      "filled_qty": "1",
+      "filled_avg_price": "338.35",
+      "submitted_at": "2026-09-23T16:51:16.936126+00:00",
+      "filled_at": "2026-09-23T16:51:17.583866+00:00"
+    }
+  ],
+  "positions_at_readback": []
+}

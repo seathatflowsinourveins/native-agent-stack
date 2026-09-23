@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "recorded_at_utc": "2026-09-22T08:05:00Z",
+  "recorded_at_utc": "2026-09-23T17:20:00Z",
   "meaning": "Recorded checkpoint combining preserved paper/simulation records with current foundation source review and separate Workflow/context-policy records. Linked receipts retain their own dates and acceptance scopes; emitter freshness is separate from task acceptance.",
   "lanes": [
     {
@@ -14,7 +14,7 @@
       "kind": "lane",
       "id": "paper",
       "title": "Dedicated Alpaca paper account",
-      "state": "1SPY smoke retained / adaptive engine wired / new trial waits for regular session / account flat",
+      "state": "adaptive 1x broker trial passed 2026-09-23 (main 843dc8f) / leverage rungs pending / account flat",
       "evidence_ref": "blueprints/us-equities/adaptive-paper/receipt.json"
     },
     {
@@ -30,7 +30,7 @@
       "kind": "gate",
       "id": "alpaca-paper-operational",
       "title": "Alpaca bounded paper lifecycle",
-      "state": "smoke passed / native broker fault and throughput qualification pending",
+      "state": "smoke passed / adaptive 1x broker trial passed 2026-09-23 / native fault behaviour partial (C01 C02 native)",
       "evidence_ref": "blueprints/us-equities/paper-e2e-20260921/paper-receipt.json"
     },
     {
