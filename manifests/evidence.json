@@ -3103,8 +3103,8 @@
     },
     {
       "path": "README.md",
-      "sha256": "0f5f1f53b515cea04adab0d6f2b7aa56864e831634720fbe7ada47adc3200238",
-      "bytes": 21875
+      "sha256": "32aa91b40225b9663a9ecdff2a434036c547accde3b15c7b1783a1d63dc70711",
+      "bytes": 21873
     },
     {
       "path": "SECURITY.md",
@@ -3128,8 +3128,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "9720a7c6b8886ff2129f27eef3dca2240d58ad9f51af101caa5f14e83d3b2748",
-      "bytes": 8343
+      "sha256": "f111297e0e34fff084cb0399fd04c9183f841d835d848c241a5357f46dc939a5",
+      "bytes": 8341
     },
     {
       "path": "adoption/host-receipt.schema.json",
@@ -3178,8 +3178,8 @@
     },
     {
       "path": "adoption/manifest.json",
-      "sha256": "cfdcffc32b5c512a24b6836aee64093da1a21bce0cf52bed5ca8ed101255456c",
-      "bytes": 18192
+      "sha256": "f15170e3376a66bc98425489ac6b2c2b1bc0213b9692ccba810849e0bfa908e6",
+      "bytes": 18190
     },
     {
       "path": "adoption/paired/README.md",
@@ -3223,8 +3223,8 @@
     },
     {
       "path": "adoption/platforms/linux-wsl2.md",
-      "sha256": "807a025fa6a46ce5e78fddedc6f4664f5291558fd7a231bcbe8240169a22835b",
-      "bytes": 4881
+      "sha256": "502d5172b3a91d871c8372258579bb1fc6e992c084bcec98db76aefbdcc3ea95",
+      "bytes": 4879
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
