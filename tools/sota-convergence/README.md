@@ -704,11 +704,15 @@ lane. With the flag:
   `alternatives_keep_but_compare` whose repository is not already a candidate. They are shuffled together
   with the ledger candidates, so a key's position does not tell them apart.
 - **Refuted discoveries are left out.** In both catalogs, a repository with a `refuted_*` disposition in any
-  of its entries is left out, even where another list repeats it.
+  of its entries is left out, even where another list repeats it. The refutation is of the discovery
+  proposal, not of the repository: the 2026-09-23 refutations of ledger repositories say "not new to the
+  catalog" or "already conditional". So it withholds only a newcomer addition, never a ledger candidate.
 - **Registered evidence is attached.** A newcomer's `evidence_refs` hold each `evidence[]` string that is
   exactly a repository-relative `evidence/` path, is listed in `manifests/evidence.json` `files[]`, and still
   has its listed sha256. Command/result prose, a path with a suffix, and an unregistered or edited file are
-  not attached. Under `--withhold-labels`, a path that names a selection role is not attached either.
+  not attached. Under `--withhold-labels`, a path that names a selection role or a manifest disposition (for
+  example `keep-but-compare`, `refuted`, `targeted-candidate` or `newcomer`) is not attached either; the same
+  wider vocabulary applies to registered receipts.
 
 The flag is off by default, so the 2026-09-22 packets reproduce. With `manifest-20260923.json`, the flag adds
 29 foundation newcomers and removes 9 refuted trading newcomers across the 32 blind packets (306 candidates).

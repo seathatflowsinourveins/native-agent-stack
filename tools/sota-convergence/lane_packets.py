@@ -398,6 +398,10 @@ def manifest_newcomers(layer: dict, seen: set, evidence_files: dict = None, root
     a refuted discovery is left out and the registered evidence files are attached."""
     newcomers = []
     items = list(layer.get("candidates", [])) + list(layer.get("alternatives_keep_but_compare", []))
+    # A refuted_* disposition is the outcome of a discovery proposal, not a judgment of the repository: the
+    # 2026-09-23 refutations of ledger candidates say "not new to the catalog" or "already conditional"
+    # (anthropics/skills, inspect_ai, mise, claude-agent-sdk-python). So it only withholds a newcomer
+    # addition; a ledger candidate (``seen``) keeps its place and its own evidence (Codex review of #151).
     # A repository refuted in any of its entries is left out entirely, even where another list repeats it
     # without a disposition.
     refuted = {github_repo_slug(item["repository"]) for item in items if item.get("repository")
@@ -574,8 +578,13 @@ def receipts_for(item: dict, component_id, index: dict, withhold: bool = False) 
 
 
 # A receipt id or file name that names a selection role (for example native-session-defaults-20260920,
-# adoption/receipt.json) repeats the incumbent label the blind packet withholds.
-LABEL_BEARING_RECEIPT = re.compile(r"default|adopt|select|winner|incumbent|chosen|retain", re.I)
+# adoption/receipt.json) repeats the incumbent label the blind packet withholds. The manifest disposition
+# vocabulary counts too (Codex review of #151): a path such as keep-but-compare.json or
+# refuted-targeted-candidate.json names the label as plainly. "candidate" alone is not a label: every packet
+# entry is one. None of the 142 receipts registered on 2026-09-23 matches the added terms.
+LABEL_BEARING_RECEIPT = re.compile(r"default|adopt|select|winner|incumbent|chosen|retain|refut"
+                                   r"|keep[-_ ]?but[-_ ]?compare|targeted[-_ ]?candidate|newcomer|discovered"
+                                   r"|reject|demot|disposition", re.I)
 
 
 def label_bearing_receipt(entry: dict) -> bool:
@@ -610,7 +619,8 @@ def attach_registered_receipts(packet: dict, index: dict, withhold: bool = False
     if withhold:
         withheld = list(packet.get("withheld", []))
         withheld.extend(label for label in WITHHELD_RECEIPT_ID_LABELS if label not in withheld)
-        label = "registered_receipts[] whose id or path names a selection role (default, adopt, select, winner)"
+        label = ("registered_receipts[] whose id or path names a selection role or disposition (default, adopt, "
+                 "select, winner, refuted, keep_but_compare, targeted_candidate)")
         if label not in withheld:
             withheld.append(label)
         packet["withheld"] = withheld

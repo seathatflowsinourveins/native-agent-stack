@@ -1035,6 +1035,21 @@ class ManifestNewcomersTests(LanePacketsFixture):
             self.assertNotIn("note", candidate)
         self.assertEqual(withheld_packet_keys(packet), [])
 
+    def test_a_refuted_discovery_proposal_never_removes_a_ledger_candidate(self):
+        # Codex review of #151: the refutation is of the proposal ("not new to the catalog"), not the repository.
+        manifest = self.read(lane_packets.SOTA_MANIFEST_PATH)
+        manifest["foundation"][0]["candidates"][2]["disposition"] = "refuted_keep_but_compare"
+        self.write(lane_packets.SOTA_MANIFEST_PATH, manifest)
+        _, by_repository = self.candidates(manifest_newcomers_on=True, withhold=True)
+        self.assertTrue(by_repository["https://github.com/acme/widget-one"]["adopted"])
+
+    def test_disposition_named_evidence_paths_are_withheld_from_a_blind_build(self):
+        # Codex review of #151: the disposition vocabulary names the withheld label as plainly as "default".
+        for name in ("keep-but-compare.json", "refuted-targeted-candidate.json", "newcomer-x.json"):
+            self.assertTrue(lane_packets.label_bearing_receipt({"path": f"{self.SWEEP}/{name}"}), name)
+        for name in ("candidate-3.json", "new-alpha.json", "owner-repo.json"):
+            self.assertFalse(lane_packets.label_bearing_receipt({"path": f"{self.SWEEP}/{name}"}), name)
+
     def test_the_cli_flag_reaches_the_packets(self):
         with contextlib.redirect_stdout(io.StringIO()):
             self.assertEqual(lane_packets.main(["--root", str(self.root), "--out", str(self.out),
