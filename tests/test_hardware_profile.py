@@ -464,6 +464,73 @@ class RecordHostTests(unittest.TestCase):
         for _description, pattern in hp.PRIVATE_CONTENT:
             self.assertIsNone(pattern.search(text))
 
+    def _seed_unrelated_host(self, entry: dict) -> None:
+        """Add a hosts[] entry that --record-host is not touching, so a test can assert it
+        comes out byte-identical (Codex review finding: sanitize() must scope to the new
+        entry, never run over the whole document)."""
+        path = self.root / "adoption" / "hardware-profiles.json"
+        profiles = json.loads(path.read_text(encoding="utf-8"))
+        profiles.setdefault("hosts", []).append(entry)
+        path.write_text(json.dumps(profiles, indent=2, ensure_ascii=False), encoding="utf-8")
+
+    def test_current_user_string_does_not_corrupt_unrelated_hosts_entries(self):
+        # A whole-document sanitize() would replace every occurrence of $USER, and $USER is
+        # often a short common word ("runner", "mac") that legitimately appears inside an
+        # unrelated entry's id/label/note -- exactly the shipped
+        # github-macos-15-arm64-runner entry's own id.
+        unrelated = {
+            "id": "github-macos-15-arm64-runner", "label": "GitHub-hosted macos-15 arm64 runner",
+            "evidence_class": "native_proven",
+            "evidence": "GitHub Actions run 1 (some workflow): a citation, not a file path.",
+        }
+        # "ram" and "max" (Codex review finding against 48471ea): both are substrings of real
+        # keys in this very document's own `layers.ecosystem_bounded_run`
+        # (max_fraction_of_ram, default_max_gb, ceiling_max_gb, high_to_max_ratio) -- a
+        # whole-document sanitize() renamed the key itself, so the *next* recommend() call
+        # raised KeyError instead of merely showing a cosmetic corruption.
+        for fake_user in ("runner", "mac", "ram", "max"):
+            with self.subTest(user=fake_user):
+                self.setUp()
+                self._seed_unrelated_host(dict(unrelated))
+                before = json.loads((self.root / "adoption" / "hardware-profiles.json").read_text(encoding="utf-8"))
+                before_entry = next(h for h in before["hosts"] if h["id"] == "github-macos-15-arm64-runner")
+
+                with mock.patch.dict("os.environ", {"USER": fake_user}, clear=False):
+                    exit_code, output = self._record()
+                self.assertEqual(exit_code, 0, output)
+
+                after = json.loads((self.root / "adoption" / "hardware-profiles.json").read_text(encoding="utf-8"))
+                after_entry = next(h for h in after["hosts"] if h["id"] == "github-macos-15-arm64-runner")
+                self.assertEqual(after_entry, before_entry, f"USER={fake_user} corrupted an unrelated hosts[] entry")
+
+                # The layers config itself (keys, not just the unrelated host entry) survives
+                # byte-for-byte, and a subsequent recommend() call over the on-disk document
+                # does not raise KeyError.
+                self.assertEqual(after["layers"], SYNTHETIC_PROFILES["layers"],
+                                 f"USER={fake_user} corrupted the layers config")
+                hp.recommend({"cores": 8, "effective_ram_gb": 32.0, "gpu": None}, after)
+
+    def test_validates_before_any_write_so_a_preexisting_bad_entry_blocks_cleanly(self):
+        # A structural error in a hosts[] entry this call never touches must still fail the
+        # whole record (validate_hosts checks the whole array) -- and must do so before any
+        # I/O, leaving no evidence file, no manifest registration and no changed
+        # hardware-profiles.json.
+        self._seed_unrelated_host({"id": "already-broken", "label": "x"})  # missing evidence_class
+
+        before_profiles_text = (self.root / "adoption" / "hardware-profiles.json").read_text(encoding="utf-8")
+        before_evidence_text = (self.root / "manifests" / "evidence.json").read_text(encoding="utf-8")
+
+        exit_code, output = self._record()
+        self.assertEqual(exit_code, 1, output)
+        self.assertIn("would not validate", output)
+
+        evidence_path = self.root / "evidence" / "artifacts" / "hw-profiles" / "widget-laptop-20260101" / "profile.json"
+        self.assertFalse(evidence_path.exists(), "a failed validation must not have written the evidence file")
+        self.assertEqual(
+            (self.root / "adoption" / "hardware-profiles.json").read_text(encoding="utf-8"), before_profiles_text)
+        self.assertEqual(
+            (self.root / "manifests" / "evidence.json").read_text(encoding="utf-8"), before_evidence_text)
+
 
 if __name__ == "__main__":
     unittest.main()

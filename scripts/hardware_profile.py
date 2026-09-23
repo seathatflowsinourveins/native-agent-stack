@@ -415,7 +415,10 @@ def cmd_record_host(args: argparse.Namespace) -> int:
     ``manifests/evidence.json`` and add or update a ``native_proven`` entry for it in
     ``adoption/hardware-profiles.json`` ``hosts[]`` (existing entry fields are kept, only
     ``id``/``label``/``evidence_class``/``evidence``/``note`` are set). This is the one
-    thing this otherwise read-only module writes."""
+    thing this otherwise read-only module writes. Validates the whole hosts[] array
+    (``validate_hosts``) before writing anything, so a failure (this entry or any pre-existing
+    one) leaves no evidence file, no manifest registration and no changed
+    ``hardware-profiles.json`` behind."""
     root = args.root.resolve()
     host_id = args.record_host
     if not MEASURED_HOST_ID_PATTERN.fullmatch(host_id):
@@ -430,10 +433,6 @@ def cmd_record_host(args: argparse.Namespace) -> int:
     assert_no_private_content(report_text, f"measured report for {host_id}")
 
     relative_evidence = f"{HW_PROFILE_EVIDENCE_DIR}/{host_id}/profile.json"
-    evidence_path = root / relative_evidence
-    evidence_path.parent.mkdir(parents=True, exist_ok=True)
-    evidence_path.write_text(report_text, encoding="utf-8")
-    host_receipts.register_file(root, relative_evidence)
 
     hosts = profiles.setdefault("hosts", [])
     existing_index = next((i for i, h in enumerate(hosts) if isinstance(h, dict) and h.get("id") == host_id), None)
@@ -446,17 +445,35 @@ def cmd_record_host(args: argparse.Namespace) -> int:
         "note": entry.get("note") or ("Actual scripts/hardware_profile.py output for this host, "
                                        "written by scripts/hardware_profile.py --record-host."),
     })
+    # Sanitize only this one entry's own serialized text (the fields this call sets: id,
+    # label, evidence, note), never the whole document. host_receipts.sanitize() replaces
+    # every occurrence of $USER in the text it is given, and $USER is often a short, common
+    # word ("mac", "runner", ...) that legitimately appears inside unrelated pre-existing
+    # hosts[] entries (for example "github-macos-15-arm64-runner"); sanitizing the whole
+    # document would corrupt those instead of just redacting anything personal in the new one.
+    entry = json.loads(host_receipts.sanitize(json.dumps(entry, ensure_ascii=False)))
     if existing_index is not None:
         hosts[existing_index] = entry
     else:
         hosts.append(entry)
 
-    profiles_text = host_receipts.sanitize(json.dumps(profiles, indent=2, ensure_ascii=False) + "\n")
-    assert_no_private_content(profiles_text, "adoption/hardware-profiles.json")
-    hosts_errors = validate_hosts(json.loads(profiles_text), root)
-    if hosts_errors:
-        print("error: hosts[] would not validate after recording:\n" + "\n".join(f"- {e}" for e in hosts_errors))
+    # Validate before writing anything: root=None skips the evidence-file-exists check (that
+    # file does not exist yet), but every other structural rule -- required keys, a known
+    # evidence_class, no duplicate id, the id conventions -- is checked here, over the whole
+    # hosts[] array (so a pre-existing malformed entry elsewhere also blocks the write,
+    # before this call's own evidence file or manifest registration exist to roll back).
+    structural_errors = validate_hosts(profiles, root=None)
+    if structural_errors:
+        print("error: hosts[] would not validate:\n" + "\n".join(f"- {e}" for e in structural_errors))
         return 1
+
+    profiles_text = json.dumps(profiles, indent=2, ensure_ascii=False) + "\n"
+    assert_no_private_content(profiles_text, "adoption/hardware-profiles.json")
+
+    evidence_path = root / relative_evidence
+    evidence_path.parent.mkdir(parents=True, exist_ok=True)
+    evidence_path.write_text(report_text, encoding="utf-8")
+    host_receipts.register_file(root, relative_evidence)
     profiles_path.write_text(profiles_text, encoding="utf-8")
 
     print(json.dumps({"status": "recorded", "host_id": host_id, "evidence": relative_evidence}, sort_keys=True))
