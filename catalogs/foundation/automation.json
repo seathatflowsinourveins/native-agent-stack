@@ -184,7 +184,7 @@
       "binary_sha256": "ca69b3d3cd08f889a49dc0a383122f71cc528b83803671df5fd874d97485b108",
       "source": "https://github.com/google/osv-scanner/releases/download/v2.6.0/osv-scanner_SHA256SUMS",
       "command": "osv-scanner scan source --config .github/osv-scanner.toml --no-resolve --lockfile=<parser>:<path> ... (every entry in .github/osv-scanner-lockfiles.json)",
-      "selection": "Required PR check (security-scan.yml osv-scanner job) over all 37 tracked lockfiles/manifests; fails on any vulnerability not in .github/osv-scanner.toml [[IgnoredVulns]] (id, reason, ignoreUntil <= 90 days; none on 2026-09-22). Push/schedule/dispatch also upload SARIF (category osv-scanner). tests/test_osv_lockfile_coverage.py fails when a tracked lockfile is missing from the inventory.",
+      "selection": "PR check (security-scan.yml osv-scanner job), required in the target main ruleset once applied, over the 37 lockfiles listed in .github/osv-scanner-lockfiles.json; 2 manifests are covered by their sibling locks and one reasoned test-fixture exclusion is listed; fails on any vulnerability not in .github/osv-scanner.toml [[IgnoredVulns]] (id, reason, ignoreUntil <= 90 days; none on 2026-09-22). Push/schedule/dispatch also upload SARIF (category osv-scanner). tests/test_osv_lockfile_coverage.py fails when a tracked lockfile is missing from the inventory.",
       "workflow": ".github/workflows/security-scan.yml#osv-scanner"
     },
     {
@@ -367,7 +367,7 @@
     {
       "repository": "GitHub merge queue",
       "source": "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/managing-a-merge-queue",
-      "decision": "Unavailable: merge queues need an organization-owned public repository (or Enterprise Cloud private); this is a personal repository. Strict required checks plus auto-merge cover the up-to-date requirement."
+      "decision": "Unavailable: merge queues need an organization-owned public repository (or Enterprise Cloud private); this is a personal repository. Without a queue, strict up-to-date checks stay off (docs/decisions/2026-09-22-github-automation-closure.md section 10); every required check still runs on each PR and on push to main. Overturn: a main failure traced to two PRs merging close together."
     },
     {
       "repository": "GitHub secret scanning non-provider patterns and validity checks",

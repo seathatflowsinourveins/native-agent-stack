@@ -100,9 +100,10 @@ locally with `GH_TOKEN` set and no `--offline`, using
   including `security-scan.yml`, also return 0 online findings at `regular`.
 - **Decision.** Keep CodeQL default setup, plus the target ruleset's
   `code_scanning` rule (`tool: CodeQL`, `security_alerts_threshold:
-  high_or_higher`, `alerts_threshold: errors`), and keep zizmor. The 10 open
-  alerts are triage work for their owners. This unit does not dismiss or fix
-  them.
+  high_or_higher`, `alerts_threshold: errors`), and keep zizmor. The 10
+  first-analysis alerts were triaged and resolved in #104
+  ([codeql-first-analysis](2026-09-22-codeql-first-analysis.md)); this unit
+  neither dismissed nor fixed them.
 - **Alternatives.** Advanced setup through a pinned `codeql-action/analyze`
   workflow (pins the action, not the bundle; adds a job with
   `security-events: write`). zizmor only (sees no source code).

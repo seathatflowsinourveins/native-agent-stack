@@ -7909,8 +7909,8 @@
     },
     {
       "path": "catalogs/foundation/automation.json",
-      "sha256": "7c741ea93598961b9bd5164f177189e68da7cfb6040662b992471bcc8e4392b9",
-      "bytes": 31651
+      "sha256": "f26e1da357e8ef10226e91cf81265cf5ec56d9b60311b5c34c6fee230246538a",
+      "bytes": 31996
     },
     {
       "path": "catalogs/foundation/community-practice-20260920.json",
@@ -8479,8 +8479,8 @@
     },
     {
       "path": "docs/decisions/2026-09-22-github-automation-closure.md",
-      "sha256": "8904c64d64618582c0aa30645f2bb74c0940f8abd7d6a15c2f3954775f38226e",
-      "bytes": 27915
+      "sha256": "d3937ff39c741e1b9a2d27c79678c741120090c96c9426b935e186fa08ec2183",
+      "bytes": 27995
     },
     {
       "path": "docs/direct-results.md",
