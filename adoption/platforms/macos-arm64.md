@@ -227,13 +227,17 @@ This run's bounded claim is still hosted-runner evidence,
   a throwaway checkout copy all passed -- **on both `actions/setup-python`
   3.13.15 and the runner's own system `/usr/bin/python3` 3.9.6**, the
   exact two-interpreter claim "Recording and verdict scripts" above
-  describes. The non-gating full `python3 -m unittest` ran 2929 tests
-  with 29 failures and 95 errors (recorded as an artifact, not claimed as
-  passing); most trace to macOS's symlinked temp directories
-  (`/var/folders`, `/tmp` resolving to `/private/...`) tripping
-  repository path-containment checks written against Linux's own
-  symlink layout, plus Linux-only tests not yet skipped on macOS -- a
-  tracked follow-up, not a claim these pass on macOS today.
+  describes. On that run the full `python3 -m unittest`, then non-gating,
+  ran 2929 tests with 29 failures and 95 errors. Most came from macOS's
+  symlinked temp directories (`/var/folders`, `/tmp` resolving to
+  `/private/...`) tripping repository path-containment checks, plus
+  Linux-only tests not skipped on macOS. PR #126 fixed them: a shared
+  `scripts/path_safety.py` tolerates only root-owned links directly under
+  `/`, and platform-specific tests are skipped where they do not apply.
+  Hosted run 35898879109 then passed the full suite on macos-15 (3156
+  tests, `OK`, skipped=435), and the full suite is now a **gating** step
+  of `validate-macos`. This is still hosted-runner evidence, not a Mac
+  workstation.
 
 Still bounded, exactly as before:
 

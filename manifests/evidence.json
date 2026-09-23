@@ -3039,8 +3039,8 @@
     },
     {
       "path": ".github/workflows/adoption-bootstrap.yml",
-      "sha256": "6943e9be5b85f83eed08dcef0fabf2e25f3a4dde385af86be454d9acf7dfbf9e",
-      "bytes": 31324
+      "sha256": "9c55d841ef987adb9891464966c090d43f315296ee58e8e49e7f2c28ec0dca34",
+      "bytes": 31496
     },
     {
       "path": ".github/workflows/catalog-freshness.yml",
@@ -3249,8 +3249,8 @@
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
-      "sha256": "f01728afc16ae7e2c8a0ee64918bac7f93794025eeef9a91eaddf2c1fb9c535c",
-      "bytes": 32991
+      "sha256": "25c247311f56e35bad1aeb39290381e5fd08c14eec01bb6d2c1d8d6fcdf74cd2",
+      "bytes": 33252
     },
     {
       "path": "adoption/pre-login-observation.json",
