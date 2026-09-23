@@ -1,0 +1,121 @@
+name: Dependency and workflow security scan
+
+# osv-scanner checks every tracked lockfile and manifest named in
+# .github/osv-scanner-lockfiles.json (tests/test_osv_lockfile_coverage.py fails
+# when a tracked one is missing) and fails on any vulnerability not ignored in
+# .github/osv-scanner.toml; its pull_request run is a required check. On push,
+# schedule and dispatch it also uploads SARIF to code scanning, and
+# zizmor-online adds zizmor's online audits as SARIF (validate.yml keeps the
+# offline zizmor PR gate). See docs/decisions/2026-09-22-github-automation-closure.md.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '37 5 * * 3' # Weekly Wednesday 05:37 UTC, between the Monday lanes
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  osv-scanner:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      security-events: write # upload the OSV-Scanner SARIF on push/schedule/dispatch; this job only
+    steps:
+      - name: Harden the runner (audit-only network egress)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install checksum-verified pinned OSV-Scanner
+        env:
+          OSV_SCANNER_VERSION: '2.6.0'
+          # https://github.com/google/osv-scanner/releases/download/v2.6.0/osv-scanner_SHA256SUMS (fetched 2026-09-22, latest release at that date)
+          OSV_SCANNER_SHA256: ca69b3d3cd08f889a49dc0a383122f71cc528b83803671df5fd874d97485b108
+        run: |
+          mkdir -p "$RUNNER_TEMP/osv-scanner"
+          curl --fail --silent --show-error --location --retry 3 \
+            "https://github.com/google/osv-scanner/releases/download/v${OSV_SCANNER_VERSION}/osv-scanner_linux_amd64" \
+            --output "$RUNNER_TEMP/osv-scanner/osv-scanner"
+          printf '%s  %s\n' "$OSV_SCANNER_SHA256" "$RUNNER_TEMP/osv-scanner/osv-scanner" | sha256sum --check
+          chmod 0755 "$RUNNER_TEMP/osv-scanner/osv-scanner"
+          "$RUNNER_TEMP/osv-scanner/osv-scanner" --version
+      - name: Scan every listed lockfile and manifest (fails on any unignored vulnerability)
+        shell: bash
+        env:
+          WRITE_SARIF: ${{ github.event_name != 'pull_request' }}
+        run: |
+          set -uo pipefail
+          inventory=.github/osv-scanner-lockfiles.json
+          # An entry without a parser lets OSV-Scanner infer it from the file name (":<path>").
+          mapfile -t lockfiles < <(jq -r '.lockfiles[] | "--lockfile=\(.parser // ""):\(.path)"' "$inventory")
+          test "${#lockfiles[@]}" -gt 0 || exit 1
+          test "${#lockfiles[@]}" -eq "$(jq '.lockfiles | length' "$inventory")" || exit 1
+          # --no-resolve: scan the versions each file pins. Transitive resolution of the
+          # unlocked manifests reported versions no lockfile installs (decision record).
+          scan=("$RUNNER_TEMP/osv-scanner/osv-scanner" scan source --config .github/osv-scanner.toml
+            --no-resolve "${lockfiles[@]}")
+          "${scan[@]}"
+          status=$?
+          if [ "$WRITE_SARIF" = true ]; then
+            "${scan[@]}" --format sarif --output-file "$RUNNER_TEMP/osv-scanner/osv-scanner.sarif"
+            sarif_status=$?
+            # 0: no vulnerabilities; 1: vulnerabilities (already reported above); other codes are scanner errors.
+            if [ "$sarif_status" -gt 1 ]; then
+              exit "$sarif_status"
+            fi
+          fi
+          exit "$status"
+      - name: Upload OSV-Scanner SARIF to code scanning
+        if: ${{ !cancelled() && github.event_name != 'pull_request' }}
+        uses: github/codeql-action/upload-sarif@1c5b675653bb5c22dbe9b12b556ec555138e09fd # v4.38.1
+        with:
+          sarif_file: ${{ runner.temp }}/osv-scanner/osv-scanner.sarif
+          category: osv-scanner
+
+  zizmor-online:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      security-events: write # upload the zizmor SARIF to code scanning; this job only
+    steps:
+      - name: Harden the runner (audit-only network egress)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install checksum-locked CI analyzer
+        run: >-
+          python3 -m pip install --disable-pip-version-check --no-input
+          --only-binary=:all: --require-hashes
+          --index-url https://pypi.org/simple
+          -r .github/requirements-ci.lock
+      - name: Audit GitHub workflows with zizmor's online audits (findings do not fail this job)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # --no-exit-codes: findings exit 0 and land in the SARIF; any non-zero exit is an analyzer failure.
+          zizmor --no-config --no-ignores --no-exit-codes --persona regular --strict-collection \
+            --format sarif .github/workflows > "$RUNNER_TEMP/zizmor.sarif"
+      - name: Upload zizmor SARIF to code scanning
+        uses: github/codeql-action/upload-sarif@1c5b675653bb5c22dbe9b12b556ec555138e09fd # v4.38.1
+        with:
+          sarif_file: ${{ runner.temp }}/zizmor.sarif
+          category: zizmor

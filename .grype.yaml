@@ -1,0 +1,14 @@
+# Reviewed grype configuration for .github/workflows/supply-chain.yml, whose
+# sbom-vuln job scans the reproduced nautilus_trader venv with
+# `grype --config .grype.yaml --fail-on high`.
+#
+# Ignore policy: add a rule only for a reviewed High/Critical match, scoped by
+# `vulnerability` plus `package.name`/`package.version`, with a `reason` naming
+# the evidence and a re-review date; list it in
+# docs/decisions/2026-09-22-github-automation-closure.md.
+#
+# Reviewed 2026-09-22 against supply-chain run 35799579095 (grype 0.119.0, DB
+# v6.1.9 built 2026-09-22T06:30:41Z) and a local re-scan of its SBOM: 0
+# Critical, 0 High, 5 Medium, 1 Low, all in the venv's seeded pip 25.0.1. They
+# are below the gate, so no rule is needed. Re-review by 2026-12-21.
+ignore: []

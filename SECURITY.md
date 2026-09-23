@@ -12,12 +12,12 @@ with elevated permissions beyond a documented job.
 
 ## Reporting a vulnerability
 
-Prefer GitHub's private vulnerability reporting once it is enabled for this
-repository (Security tab -> "Report a vulnerability"). Until then, open a
-public issue without secret detail: describe the affected file/workflow, the
-exact commit and the risk, but do not paste tokens, keys or other credential
-material into the issue body. Do not open a pull request that demonstrates a
-working exploit against a hosted secret.
+Use GitHub's private vulnerability reporting, which is enabled for this
+repository: [report a vulnerability](https://github.com/seathatflowsinourveins/native-agent-stack/security/advisories/new)
+(Security tab -> "Report a vulnerability"). Describe the affected
+file/workflow, the exact commit and the risk. Do not paste tokens, keys or
+other credential material into a public issue, and do not open a pull request
+that demonstrates a working exploit against a hosted secret.
 
 ## Supported versions
 
@@ -27,12 +27,25 @@ not backported.
 
 ## Verifying releases
 
-Published artifacts from this repository carry [GitHub artifact
-attestations](docs/catalog-provenance.md). Verify a downloaded release or
-catalog artifact with:
+Each `v*` tag push runs `publish-catalog.yml`: its `publish` job builds the
+catalog archive (`native-agent-stack-<sha>.tar.gz`) and an SPDX SBOM
+(`native-agent-stack-<sha>.spdx.json`), creates a [GitHub artifact
+attestation](docs/catalog-provenance.md) for each and verifies both in-run.
+Its `release` job then re-checks both files against the digests that job
+attested and creates the tag's GitHub Release with both files attached at
+creation. Releases here are immutable once published: their assets and tag
+cannot be changed. The release notes list both digests and these commands:
 
 ```sh
-gh attestation verify <artifact-path> --repo seathatflowsinourveins/native-agent-stack
+gh attestation verify native-agent-stack-<sha>.tar.gz \
+  --repo seathatflowsinourveins/native-agent-stack \
+  --signer-workflow seathatflowsinourveins/native-agent-stack/.github/workflows/publish-catalog.yml \
+  --source-ref refs/tags/<tag> --source-digest <sha>
+gh attestation verify native-agent-stack-<sha>.spdx.json \
+  --repo seathatflowsinourveins/native-agent-stack \
+  --signer-workflow seathatflowsinourveins/native-agent-stack/.github/workflows/publish-catalog.yml \
+  --source-digest <sha> --predicate-type https://spdx.dev/Document
+gh release verify-asset <tag> native-agent-stack-<sha>.tar.gz --repo seathatflowsinourveins/native-agent-stack
 ```
 
 A successful verification proves provenance (which workflow, revision and

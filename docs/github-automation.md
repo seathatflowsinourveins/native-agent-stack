@@ -58,8 +58,14 @@ on Monday at 09:00 UTC, groups minor/patch updates and limits simultaneous versi
 update PRs to two. Major versions remain separate. The initial scans succeeded
 after integration and opened PRs #29 and #30. Their integrity failures identified
 unreviewed workflow hashes; the coordinated resolution retains those failures.
-The weekly time and a nonempty minor/patch group remain unobserved. This does not enable repository-level security-update
-settings or auto-merge, and it does not update every version in the grand catalog.
+The weekly schedule is now observed: run 35583086998 (Monday 2026-09-21, 09:24
+UTC) succeeded and opened no PR, so a nonempty minor/patch group remains
+unobserved. A 7-day `cooldown` (`default-days: 7`, as in agent-lab) delays each
+version-update PR until the release is a week old; security updates are exempt.
+Repository-level Dependabot security updates were enabled separately on
+2026-09-22 (see "Automation closure, 2026-09-22" below). Repository auto-merge is
+allowed, but no Dependabot PR is auto-merged, and this configuration does not
+update every version in the grand catalog.
 
 Retain full commit-SHA action pins and their release comments. Dependabot supports
 updating these references. Review release/source changes, run the affected upstream
@@ -175,21 +181,25 @@ rule (`required_approving_review_count: 0`, `dismiss_stale_reviews_on_push: true
 It adds no human approval count or strict up-to-date requirement, and no bypass
 actor. Native path-filtered and manually dispatched checks are not global
 requirements. Require native acceptance separately when its capability changes.
-No merge queue is enabled; add `merge_group` support before adopting one. A
-separate [tag ruleset](https://github.com/seathatflowsinourveins/native-agent-stack/rules/23829417)
+No merge queue is enabled; add `merge_group` support before adopting one.
+Merge queues are not available for this personal repository (see "Automation
+closure, 2026-09-22"). A separate [tag ruleset](https://github.com/seathatflowsinourveins/native-agent-stack/rules/23829417)
 (id 23829417, created 2026-09-22T11:08:53-04:00) is also active.
 
-The committed [main-ruleset.json](../.github/main-ruleset.json) and
-[tag-ruleset.json](../.github/tag-ruleset.json) now describe this applied
-state, matching the 2026-09-23 dated GET field by field (see "Ruleset
-upgrade, 2026-09-22" below for the full comparison and application record).
-Both were applied on 2026-09-22; there is no pending, not-yet-applied
-configuration as of this writing.
+The committed [main-ruleset.json](../.github/main-ruleset.json) is the reviewed
+*target*, not this applied state: it adds `dependency-review` and `osv-scanner`
+to the required checks, turns on the strict up-to-date policy, and adds
+`required_signatures`, a CodeQL `code_scanning` rule and squash-only merges
+(see "Automation closure, 2026-09-22" below). The coordinator applies it after
+the change that adds `security-scan.yml` merges; until then the GET above is
+the ground truth. [tag-ruleset.json](../.github/tag-ruleset.json) (ruleset
+23829417) and [tag-creation-ruleset.json](../.github/tag-creation-ruleset.json)
+(ruleset 23859358) match their live rulesets field by field.
 
 The prior state had no rulesets and returned `Branch not protected` for main.
 After applying the configuration, a separate `GET /repos/OWNER/REPO/rules/branches/main`
 confirmed both required contexts and their expected app. A dated re-check on
-2026-09-23 (`gh api repos/seathatflowsinourveins/native-agent-stack/rulesets`
+2026-09-23 (`gh api repos/seathatflowsinourveins/native-agent-stack/rulesets/23739774`
 and `.../rules/branches/main`, both exit 0) reconfirmed the same live state.
 This verifies settings, not an experimentally attempted blocked merge.
 GitHub's [rules REST interface](https://docs.github.com/en/rest/repos/rules)
@@ -306,8 +316,10 @@ wheel set into an isolated venv (no bwrap sandbox -- this job only needs an
 installed environment to scan, not to execute the engine), generates an SPDX
 and a CycloneDX SBOM with syft 1.52.0, scans both with grype (see pin below),
 and writes `summary.json` (versions, `grype db status`, package count,
-findings by severity). It never passes `--fail-on`; nothing blocks a merge on
-a vulnerability finding, and no threshold has been decided yet (see below).
+findings by severity). Since 2026-09-22 it runs grype with `--config .grype.yaml
+--fail-on high`, so a High or Critical match fails the job; the job is
+path-filtered, so it is not a required check (see "Automation closure,
+2026-09-22").
 
 ## Secret and supply-chain scanning, 2026-09-22
 
@@ -345,12 +357,13 @@ exempts its own version pin from freshness tracking.
 Receipts land as workflow artifacts only: `secret-scan-<run_id>` (30-day
 retention) and `supply-chain-<run_id>` (90-day retention, matching the SBOM's
 longer useful life). Neither report is committed to the repository.
-`sbom-vuln` is report-only by design -- it never passes `--fail-on`, so a
-grype finding of any severity never fails that job, and the threshold
-decision (whether one ever should) is explicitly **pending**; a human reads
-the artifact. `secret-scan` already fails its own job on any detection (see
-above); "report-only" describes `sbom-vuln`'s vulnerability findings, not
-`secret-scan`'s.
+The earlier report-only `sbom-vuln` policy and its **pending** threshold
+decision are superseded (2026-09-22): the job now fails on a High or Critical
+grype match not ignored in the reviewed `.grype.yaml`, and reports lower
+severities in `summary.json` only. The latest run before the change
+(35799579095) had 0 Critical, 0 High, 5 Medium and 1 Low, all in the venv's
+seeded pip 25.0.1, so the gate passes with no ignore. `secret-scan` fails its
+own job on any detection (see above).
 
 `native-foundation-e2e.yml`'s package set has no dedicated lock file (its
 pins live inline in the workflow's `packages=(...)` array); the task that
@@ -363,10 +376,11 @@ so the filter instead watches the workflow file itself.
 as the default owner and again for `.github/` and `adoption/` (the built
 adoption-bootstrap lane's own directory).
 [`SECURITY.md`](../SECURITY.md) documents scope (a catalog, not a deployed
-service), the private-vulnerability-reporting path (falling back to a public
-issue without secret detail while private reporting is not yet enabled),
-supported refs (`main` and the latest `v*` tag) and `gh attestation verify`
-for released artifacts. [`.github/pull_request_template.md`](../.github/pull_request_template.md)
+service), the private vulnerability reporting link (enabled;
+`gh api repos/seathatflowsinourveins/native-agent-stack/private-vulnerability-reporting`
+returned `{"enabled":true}` on 2026-09-23), supported refs (`main` and the
+latest `v*` tag) and the `gh attestation verify` and `gh release verify-asset`
+commands for the immutable tag releases. [`.github/pull_request_template.md`](../.github/pull_request_template.md)
 requires scope, base commit, a per-claim evidence-class table, exact local
 commands run, a decision-record path and a checklist covering SHA pins,
 `contents: read`, no secrets, no paid hosting and preserved peer-owned
@@ -405,9 +419,22 @@ gh api --method POST repos/seathatflowsinourveins/native-agent-stack/rulesets --
 gh api repos/seathatflowsinourveins/native-agent-stack/rules/branches/main
 ```
 
+On 2026-09-22 the tag ruleset was split: 23829417 ("Native foundation tag
+protection") now carries `deletion`, `non_fast_forward` and `update` with no
+bypass, and 23859358 ("Native foundation tag creation") carries `creation`
+with the repository admin role (`RepositoryRole` 5) as an `always` bypass, so
+only an admin can create a `v*` tag. Both committed files match the live GETs.
+Edit them in place:
+
+```sh
+gh api --method PUT repos/seathatflowsinourveins/native-agent-stack/rulesets/23829417 --input .github/tag-ruleset.json
+gh api --method PUT repos/seathatflowsinourveins/native-agent-stack/rulesets/23859358 --input .github/tag-creation-ruleset.json
+```
+
 ## Recorded decisions, 2026-09-22
 
-**Dependabot's `pip` ecosystem is NOT activated.** Dependabot's `pip`
+**Dependabot's `pip` ecosystem is NOT activated** (re-affirmed 2026-09-22 with
+the measured security-update PRs below). Dependabot's `pip`
 ecosystem discovers ordinary requirements/lock files by name; the checksum
 lock actually used here is `.github/requirements-ci.lock`, a name Dependabot
 does not recognize as a Python dependency file, and four of the five pinned
@@ -422,8 +449,20 @@ rather than by Dependabot.
 Precondition to revisit: rename `.github/requirements-ci.lock` to a
 Dependabot-discoverable name (e.g. `requirements-ci.txt` with a
 `--require-hashes` format Dependabot's pip ecosystem parses) and re-evaluate.
+Security updates, enabled 2026-09-22, did open pip PRs: #97 (mlx 0.29.3 ->
+0.29.4) and #98 (transformers 5.0.0rc1 -> 5.10.1) against
+`tools/mlx-smoke/requirements.lock.txt`. `gh pr checks 97` and `98` show every
+check passing except `macos-profile` (runs 35815152321 and 35815162857): that
+lock is uv-compiled with hashes and an `--exclude-newer` cutoff from
+`requirements.in`, and `hardware-profile-smoke.yml` recompiles and diffs it, so
+a single-package bump fails. The advisories were fixed by a reviewed relock
+(#99) instead. A pip version-update entry would repeat that failure for every
+uv-compiled lock.
 
-**CodeQL is NOT activated.** GitHub's default CodeQL setup needs
+**Superseded 2026-09-22: CodeQL default setup is now configured** (see
+"Automation closure, 2026-09-22" and the closure decision record). The original
+2026-09-22 decision is kept below for its reasoning. **CodeQL is NOT
+activated.** GitHub's default CodeQL setup needs
 `security-events: write` (this repository's workflows are `contents: read`
 only) and pins no exact CodeQL bundle version by default (violates the "no
 floating pin" rule every other lane here follows). The scannable surface is
@@ -439,7 +478,8 @@ gitleaks, syft, grype, and workflow-declared package pins like
 `nautilus_trader`) and repository rulesets. Dependabot owns only GitHub
 Actions references (`.github/dependabot.yml`, unchanged by this batch) --
 it does not, and per the decision above still does not, own any Python or
-binary pin.
+binary pin. (2026-09-22: repository-level security updates may now propose a
+fix for an alerted lock; a maintainer still owns the reviewed relock.)
 
 Each decision above names its evidence (the exact filename/permission gap
 checked), the alternative considered (activate now) and the exact
@@ -452,13 +492,28 @@ existing `workflow_dispatch`, and its job condition is
 `startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main'` so a
 pushed release tag or the trusted-main dispatch path both qualify; any other
 ref still short-circuits. Creating and pushing a `v*` tag is a coordinator-only
-action: the ruleset above protects `main`, and only a maintainer with push
+action: the ruleset above protects `main`, the tag creation ruleset (23859358,
+2026-09-22) lets only the admin role create a tag, and only a maintainer with push
 access to tag refs can trigger this path — a fork or an unprivileged
 contributor cannot cause a publication run by opening a pull request. Treat a
 tag push the same as the manual dispatch it extends: it still requires
 `github.repository == 'seathatflowsinourveins/native-agent-stack'` and the
 job's `contents: read`, `id-token: write`, `attestations: write` permissions
 are unchanged.
+
+A separate `release` job runs only for `refs/tags/v*` (after `publish`; job
+permissions `contents: write` only). It downloads the archive and SBOM
+artifacts by the IDs the `publish` job output, re-checks both with
+`sha256sum --check --strict` against the digests that job attested, and runs
+`gh release create <tag> <archive> <sbom> --verify-tag`. In gh 2.101.0
+(`pkg/cmd/release/create/create.go`), a create with files and no `--draft`
+makes a draft, uploads the files and then publishes, deleting the draft if an
+upload fails. Immutable releases (enabled 2026-09-22) forbid adding assets
+after publication, so both files are attached before the release is published.
+The job then checks `gh release view --json isDraft,isImmutable,assets`:
+published, immutable, exactly those two assets with the attested digests. The
+release notes carry the `gh attestation verify` and `gh release verify-asset`
+commands. No hosted tag run of this job exists yet.
 
 The job now produces two attested artifacts per run, not one. After the
 existing archive-and-hash step, a SHA-256-checked download of syft 1.52.0
@@ -573,15 +628,18 @@ weekly schedule, `workflow_dispatch`, and push to `main`. `publish_results`
 is `false` -- results are never published to the public `api.scorecard.dev`
 dataset or badge -- and the job requests only `contents: read`; it does not
 use GitHub Advanced Security or `security-events: write`. The SARIF report is
-retained only as a workflow artifact (`scorecard-results-<run_id>`, 5-day
-retention), never uploaded to the Security tab.
+retained as a workflow artifact (`scorecard-results-<run_id>`, 5-day
+retention). Since 2026-09-22 it is also uploaded to code scanning with
+`github/codeql-action/upload-sarif` v4.38.1; only the `analysis` job holds
+`security-events: write`.
 
 **`harden-runner` (step-security).** `step-security/harden-runner`, pinned to
 the full commit SHA of its latest release `v2.21.1`
 (`e14015d583714f6e62063499dc959a02595150a1`, from
 `gh api repos/step-security/harden-runner/releases/latest`), runs as the
 *first* step, before checkout, with `egress-policy: audit` (never `block`),
-on 14 of the 18 `ubuntu-24.04` jobs. The four exempt jobs are those whose
+on 18 of the 22 `ubuntu-24.04` jobs (2026-09-22, after `security-scan.yml`'s two
+jobs and `publish-catalog.yml`'s `release` job were added). The four exempt jobs are those whose
 workflows are byte-pinned by retained evidence: `source` and `destination`
 (`native-offhost-app-state.yml`, pinned in
 `blueprints/convergence-practice/offhost-app-state/plan.json`'s
@@ -604,8 +662,9 @@ no existing pass/fail behavior.
 the full commit SHA of its latest release `v5.0.0`
 (`a1d282b36b6f3519aa1f3fc636f609c47dddb294`, from
 `gh api repos/actions/dependency-review-action/releases/latest`), runs on
-`pull_request` only with `warn-only: true` and `contents: read`; it is not
-in `required_status_checks` and never blocks a PR. This repository is
+`pull_request` only with `contents: read`. The warn-only phase ended
+2026-09-22: it now uses `fail-on-severity: high` and is a required check in
+the target `main-ruleset.json`. This repository is
 public (`gh api repos/seathatflowsinourveins/native-agent-stack --jq
 .visibility` returns `public`) and needs no GitHub Advanced Security, but
 its dependency graph was not on automatically: the first hosted run failed
@@ -833,3 +892,43 @@ recording `native_proven`/`local_integration` host-acceptance receipts,
 opening its own PR, and requesting independent review remains the primary
 way this catalog gains evidence; read that chapter for the full flow.
 
+
+## Automation closure, 2026-09-22
+
+The closure record
+[`docs/decisions/2026-09-22-github-automation-closure.md`](decisions/2026-09-22-github-automation-closure.md)
+holds the evidence, alternatives and overturn comparison for each item.
+
+- **Repository settings (applied by the coordinator, before/after GETs in the
+  record).** CodeQL default setup configured (actions, C#, JavaScript/TypeScript,
+  Python; weekly plus push/PR; first run 35815088202); Dependabot security
+  updates on; Actions `sha_pinning_required: true`; squash-only merges with
+  auto-merge allowed and branches deleted on merge; immutable releases on;
+  private vulnerability reporting on.
+- **`security-scan.yml`.** The `osv-scanner` job (OSV-Scanner 2.6.0,
+  checksum-verified) scans every lockfile and manifest listed in
+  `.github/osv-scanner-lockfiles.json` with `--no-resolve` and fails on any
+  vulnerability not ignored in `.github/osv-scanner.toml`; it runs on every PR
+  (a required check in the target ruleset) and uploads SARIF (category
+  `osv-scanner`) off PRs. `tests/test_osv_lockfile_coverage.py` fails when a
+  tracked lockfile is missing from the list. The `zizmor-online` job
+  (push/schedule/dispatch) reuses the hash-locked zizmor with its online
+  audits and uploads SARIF (category `zizmor`); findings do not fail it. The
+  offline zizmor PR gate in `validate.yml` is unchanged.
+- **Gates.** `dependency-review.yml` fails on high advisories;
+  `supply-chain.yml`'s grype scan fails at `--fail-on high` with the reviewed
+  `.grype.yaml`; Scorecard SARIF goes to code scanning.
+- **Target main ruleset.** `.github/main-ruleset.json` adds `dependency-review`
+  and `osv-scanner`, `strict_required_status_checks_policy: true`,
+  `required_signatures` (the last 10 `main` commits are GitHub-signed squash
+  merges), a `code_scanning` rule for CodeQL (`security_alerts_threshold:
+  high_or_higher`, `alerts_threshold: errors`) and `allowed_merge_methods:
+  ["squash"]`. The coordinator applies it with the PUT above after this change
+  merges.
+- **Releases.** `publish-catalog.yml`'s tag-only `release` job (see
+  "Publication on tags") creates an immutable release with the attested
+  archive and SBOM attached at creation.
+- **Kept as is.** harden-runner stays in audit mode; Renovate stays deferred;
+  gitleaks stays the required secret gate because non-provider patterns and
+  validity checks are not free here; the Socket Security app's PR checks are
+  advisory and not required; no paid or SaaS service is needed.

@@ -168,7 +168,10 @@ this unit.
 - **CodeQL default setup as a substitute for Scorecard.** Out of scope for
   this decision and already rejected in this same document's "Recorded
   decisions, 2026-09-22" section (`security-events: write` requirement, no
-  served application surface); not revisited here.
+  served application surface); not revisited here. **Superseded later on
+  2026-09-22** by [`2026-09-22-github-automation-closure.md`](2026-09-22-github-automation-closure.md):
+  CodeQL default setup is now configured, dependency review fails on high
+  severity and is a target required check, and Scorecard SARIF is uploaded.
 
 ## Evidence that would overturn this decision
 

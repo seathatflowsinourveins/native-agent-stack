@@ -1,4 +1,7 @@
 version: 2
+# github-actions only. Security updates for the pip lock files are a repository
+# setting (on since 2026-09-22), not a version-update entry here; pip version
+# updates stay off (docs/decisions/2026-09-22-github-automation-closure.md).
 updates:
   - package-ecosystem: github-actions
     directory: /
@@ -14,3 +17,7 @@ updates:
         update-types: [minor, patch]
     commit-message:
       prefix: ci
+    # Minimum release age before a version-update PR opens (Dependabot's cooldown
+    # option; security updates are exempt). Matches agent-lab's setting.
+    cooldown:
+      default-days: 7

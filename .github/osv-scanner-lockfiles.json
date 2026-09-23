@@ -1,0 +1,137 @@
+{
+  "description": "Every tracked dependency lockfile or manifest that security-scan.yml's osv-scanner job scans. A lockfile entry without a parser lets OSV-Scanner infer it from the file name; parser names the OSV-Scanner v2 extractor for names it cannot infer (--lockfile=<parser>:<path>). A covered_by_lockfile entry is a manifest OSV-Scanner v2.6.0 has no source extractor for; its sibling lockfile is scanned instead. tests/test_osv_lockfile_coverage.py fails when a tracked lockfile or manifest is missing here.",
+  "lockfiles": [
+    {
+      "path": ".github/requirements-ci.lock",
+      "parser": "requirements.txt"
+    },
+    {
+      "path": "adoption/sdk/accepted-constraints.txt",
+      "parser": "requirements.txt"
+    },
+    {
+      "path": "adoption/sdk/requirements-linux-x86_64-py313.lock",
+      "parser": "requirements.txt"
+    },
+    {
+      "path": "blueprints/convergence-practice/application-delivery/pnpm-lock.yaml"
+    },
+    {
+      "path": "blueprints/convergence-practice/application-delivery/uv.lock"
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/requirements.txt"
+    },
+    {
+      "path": "blueprints/us-equities/catalyst-provenance/requirements.lock",
+      "parser": "requirements.txt"
+    },
+    {
+      "path": "blueprints/us-equities/data/requirements.in",
+      "parser": "requirements.txt"
+    },
+    {
+      "path": "blueprints/us-equities/data/requirements.lock",
+      "parser": "requirements.txt"
+    },
+    {
+      "path": "blueprints/us-equities/engine/patches/alpaca.packages.lock.json",
+      "parser": "packages.lock.json"
+    },
+    {
+      "path": "blueprints/us-equities/engine/patches/lean-locks/Algorithm.CSharp/packages.lock.json"
+    },
+    {
+      "path": "blueprints/us-equities/engine/patches/lean-locks/Algorithm.Framework/packages.lock.json"
+    },
+    {
+      "path": "blueprints/us-equities/engine/patches/lean-locks/Algorithm/packages.lock.json"
+    },
+    {
+      "path": "blueprints/us-equities/engine/patches/lean-locks/AlgorithmFactory/packages.lock.json"
+    },
+    {
+      "path": "blueprints/us-equities/engine/patches/lean-locks/Api/packages.lock.json"
+    },
+    {
+      "path": "blueprints/us-equities/engine/patches/lean-locks/Brokerages/packages.lock.json"
+    },
+    {
+      "path": "blueprints/us-equities/engine/patches/lean-locks/Common/packages.lock.json"
+    },
+    {
+      "path": "blueprints/us-equities/engine/patches/lean-locks/Compression/packages.lock.json"
+    },
+    {
+      "path": "blueprints/us-equities/engine/patches/lean-locks/Configuration/packages.lock.json"
+    },
+    {
+      "path": "blueprints/us-equities/engine/patches/lean-locks/DownloaderDataProvider/packages.lock.json"
+    },
+    {
+      "path": "blueprints/us-equities/engine/patches/lean-locks/Engine/packages.lock.json"
+    },
+    {
+      "path": "blueprints/us-equities/engine/patches/lean-locks/Indicators/packages.lock.json"
+    },
+    {
+      "path": "blueprints/us-equities/engine/patches/lean-locks/Launcher/packages.lock.json"
+    },
+    {
+      "path": "blueprints/us-equities/engine/patches/lean-locks/Logging/packages.lock.json"
+    },
+    {
+      "path": "blueprints/us-equities/engine/patches/lean-locks/Messaging/packages.lock.json"
+    },
+    {
+      "path": "blueprints/us-equities/engine/patches/lean-locks/Optimizer.Launcher/packages.lock.json"
+    },
+    {
+      "path": "blueprints/us-equities/engine/patches/lean-locks/Optimizer/packages.lock.json"
+    },
+    {
+      "path": "blueprints/us-equities/engine/patches/lean-locks/Queues/packages.lock.json"
+    },
+    {
+      "path": "blueprints/us-equities/engine/patches/lean-locks/Report/packages.lock.json"
+    },
+    {
+      "path": "blueprints/us-equities/engine/patches/lean-locks/Research/packages.lock.json"
+    },
+    {
+      "path": "blueprints/us-equities/engine/patches/lean-locks/Tests/packages.lock.json"
+    },
+    {
+      "path": "blueprints/us-equities/engine/patches/lean-locks/ToolBox/packages.lock.json"
+    },
+    {
+      "path": "blueprints/us-equities/research-evaluation/requirements.in",
+      "parser": "requirements.txt"
+    },
+    {
+      "path": "blueprints/us-equities/research-evaluation/requirements.lock",
+      "parser": "requirements.txt"
+    },
+    {
+      "path": "blueprints/us-equities/workers/requirements.txt"
+    },
+    {
+      "path": "tools/mlx-smoke/requirements.in",
+      "parser": "requirements.txt"
+    },
+    {
+      "path": "tools/mlx-smoke/requirements.lock.txt",
+      "parser": "requirements.txt"
+    }
+  ],
+  "covered_by_lockfile": [
+    {
+      "path": "blueprints/convergence-practice/application-delivery/package.json",
+      "lockfile": "blueprints/convergence-practice/application-delivery/pnpm-lock.yaml"
+    },
+    {
+      "path": "blueprints/convergence-practice/application-delivery/pyproject.toml",
+      "lockfile": "blueprints/convergence-practice/application-delivery/uv.lock"
+    }
+  ]
+}

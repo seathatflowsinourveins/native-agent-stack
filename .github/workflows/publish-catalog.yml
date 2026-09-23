@@ -18,6 +18,12 @@ jobs:
       contents: read
       id-token: write # OIDC token for keyless signing of the archive attestation; this job only
       attestations: write # store the build-provenance attestation for the published archive
+    outputs:
+      # The attested files' SHA-256 and their artifact IDs, for the tag-only release job.
+      archive-sha256: ${{ steps.archive-digest.outputs.sha256 }}
+      archive-artifact-id: ${{ steps.archive.outputs.artifact-id }}
+      sbom-sha256: ${{ steps.sbom-digest.outputs.sha256 }}
+      sbom-artifact-id: ${{ steps.sbom-upload.outputs.artifact-id }}
     steps:
       - name: Harden the runner (audit-only network egress)
         uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
@@ -195,6 +201,7 @@ jobs:
           if-no-files-found: error
           retention-days: 7
       - name: Match the uploaded digest to the attested file
+        id: archive-digest
         env:
           UPLOADED_DIGEST: ${{ steps.archive.outputs.artifact-digest }}
           ARTIFACT_ID: ${{ steps.archive.outputs.artifact-id }}
@@ -206,6 +213,7 @@ jobs:
           printf 'expected_sha256=%s\nuploaded_sha256=%s\nartifact_id=%s\nartifact_url=%s\n' \
             "$expected" "$UPLOADED_DIGEST" "$ARTIFACT_ID" "$ARTIFACT_URL" | tee "$PUBLICATION_DIR/upload.log"
           test "$UPLOADED_DIGEST" = "$expected"
+          printf 'sha256=%s\n' "$expected" >> "$GITHUB_OUTPUT"
       - name: Upload the SBOM next to the archive
         id: sbom-upload
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
@@ -216,6 +224,7 @@ jobs:
           if-no-files-found: error
           retention-days: 7
       - name: Match the uploaded SBOM digest to the attested file
+        id: sbom-digest
         env:
           UPLOADED_DIGEST: ${{ steps.sbom-upload.outputs.artifact-digest }}
         shell: bash
@@ -225,6 +234,7 @@ jobs:
           printf 'expected_sbom_sha256=%s\nuploaded_sbom_sha256=%s\n' \
             "$expected" "$UPLOADED_DIGEST" | tee "$PUBLICATION_DIR/sbom-upload.log"
           test "$UPLOADED_DIGEST" = "$expected"
+          printf 'sha256=%s\n' "$expected" >> "$GITHUB_OUTPUT"
       - name: Attest the public explorer
         id: attest-explorer
         uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
@@ -263,3 +273,80 @@ jobs:
             ${{ runner.temp }}/catalog-publication/*.sha256
           if-no-files-found: error
           retention-days: 7
+
+  release:
+    # Tag pushes only: a main dispatch still attests and uploads artifacts but creates no release.
+    if: github.repository == 'seathatflowsinourveins/native-agent-stack' && startsWith(github.ref, 'refs/tags/v')
+    needs: publish
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write # create this tag's GitHub Release with both attested files attached; this job only
+    steps:
+      - name: Harden the runner (audit-only network egress)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+      - name: Download the attested archive and SBOM by artifact ID
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          artifact-ids: ${{ needs.publish.outputs.archive-artifact-id }},${{ needs.publish.outputs.sbom-artifact-id }}
+          path: ${{ runner.temp }}/release
+          merge-multiple: true
+          digest-mismatch: error
+      - name: Re-check both files against the digests the publish job attested
+        env:
+          ARCHIVE_SHA256: ${{ needs.publish.outputs.archive-sha256 }}
+          SBOM_SHA256: ${{ needs.publish.outputs.sbom-sha256 }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP/release"
+          test -n "$ARCHIVE_SHA256" && test -n "$SBOM_SHA256"
+          printf '%s  %s\n' "$ARCHIVE_SHA256" "native-agent-stack-${GITHUB_SHA}.tar.gz" \
+            "$SBOM_SHA256" "native-agent-stack-${GITHUB_SHA}.spdx.json" | sha256sum --check --strict
+      - name: Create the release with both files attached at creation
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ARCHIVE_SHA256: ${{ needs.publish.outputs.archive-sha256 }}
+          SBOM_SHA256: ${{ needs.publish.outputs.sbom-sha256 }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh --version
+          cd "$RUNNER_TEMP/release"
+          archive="native-agent-stack-${GITHUB_SHA}.tar.gz"
+          sbom="native-agent-stack-${GITHUB_SHA}.spdx.json"
+          {
+            printf "Catalog archive and SPDX SBOM for \`%s\` (commit \`%s\`), built and attested by\n" "$GITHUB_REF_NAME" "$GITHUB_SHA"
+            printf '[publish-catalog.yml run %s](%s/%s/actions/runs/%s).\n\n' "$GITHUB_RUN_ID" "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID"
+            printf -- "- \`%s\` sha256 \`%s\`\n- \`%s\` sha256 \`%s\`\n\n" "$archive" "$ARCHIVE_SHA256" "$sbom" "$SBOM_SHA256"
+            printf 'Verify a downloaded file (provenance, not correctness; see SECURITY.md):\n\n```sh\n'
+            printf 'gh attestation verify %s --repo %s \\\n  --signer-workflow %s/.github/workflows/publish-catalog.yml \\\n  --source-ref %s --source-digest %s\n' \
+              "$archive" "$GITHUB_REPOSITORY" "$GITHUB_REPOSITORY" "$GITHUB_REF" "$GITHUB_SHA"
+            printf 'gh attestation verify %s --repo %s \\\n  --signer-workflow %s/.github/workflows/publish-catalog.yml \\\n  --source-digest %s --predicate-type https://spdx.dev/Document\n' \
+              "$sbom" "$GITHUB_REPOSITORY" "$GITHUB_REPOSITORY" "$GITHUB_SHA"
+            printf 'gh release verify-asset %s %s --repo %s\n```\n' "$GITHUB_REF_NAME" "$archive" "$GITHUB_REPOSITORY"
+          } > notes.md
+          # With files and no --draft, gh release create makes a draft, uploads both files, then
+          # publishes (deleting the draft if an upload fails), so the immutable release is
+          # published with its assets; --verify-tag refuses to create a missing tag.
+          gh release create "$GITHUB_REF_NAME" "$archive" "$sbom" \
+            --repo "$GITHUB_REPOSITORY" --verify-tag \
+            --title "$GITHUB_REF_NAME" --notes-file notes.md
+      - name: Confirm the published release is immutable and carries the attested digests
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ARCHIVE_SHA256: ${{ needs.publish.outputs.archive-sha256 }}
+          SBOM_SHA256: ${{ needs.publish.outputs.sbom-sha256 }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" \
+            --json isDraft,isImmutable,assets > "$RUNNER_TEMP/release/release.json"
+          jq -e --arg archive "native-agent-stack-${GITHUB_SHA}.tar.gz" --arg sbom "native-agent-stack-${GITHUB_SHA}.spdx.json" \
+            --arg archive_digest "sha256:$ARCHIVE_SHA256" --arg sbom_digest "sha256:$SBOM_SHA256" '
+            .isDraft == false and .isImmutable == true and (.assets | length) == 2
+            and ([.assets[] | select(.name == $archive and .digest == $archive_digest)] | length) == 1
+            and ([.assets[] | select(.name == $sbom and .digest == $sbom_digest)] | length) == 1
+          ' "$RUNNER_TEMP/release/release.json"
