@@ -7767,5 +7767,54 @@
     "effect": "stays targeted_candidate with a recorded credential-import finding: any further run needs a separate HOME/CODEX_HOME and must treat its data directory as holding credentials"
    }
   ]
+ },
+ "gated_items": {
+  "artifact": "evidence/artifacts/sdk-runtime-coverage-20260922/gated-items-20260923.json",
+  "date": "2026-09-23",
+  "evidence_class": "local_integration on one WSL2 x86_64 host; preregistered and hash-locked; each unit independently verified against raw logs (partially_confirmed with corrections carried in the artifact)",
+  "rows": [
+   {
+    "slug": "anthropics/claude-code-action",
+    "category": "coding-harnesses",
+    "result": "CI arm: smoke OK, settings-level deny rule produced 1 permission denial with no file content, allow control 0 denials; local arm OK; routine arm blocked on user consent (no GitHub connection on the Claude account)",
+    "effect": "no disposition change"
+   },
+   {
+    "slug": "swe-agent/mini-swe-agent",
+    "category": "workers",
+    "result": "key-free local endpoint qualified: Qwen/Qwen3-8B-AWQ on vLLM 0.29.0 with the hermes parser, 20/20 tool calls and 4/5 tasks (bars 19 and 4), client inside srt with loopback-only egress; the 7B models of the prior round and Qwen3-4B-Instruct-2507 (3/5) did not qualify",
+    "effect": "the model-endpoint gate is closed on this host; no disposition change"
+   },
+   {
+    "slug": "awslabs/cli-agent-orchestrator",
+    "category": "coding-harnesses",
+    "result": "hook-free worker without host settings changes: 9, 9 and 0 hook executions for the plain worker, a PATH-shadow wrapper (defeated by the tmux login shell) and a project-local disableAllHooks settings file in the worker's working directory",
+    "effect": "stays targeted_candidate; the host-hook defect has a verified workaround"
+   },
+   {
+    "slug": "anthropics/claude-agent-sdk-typescript",
+    "category": "agent-sdks",
+    "result": "disableBundledSkills plus telemetry/nonessential-traffic variables: skills 18 to 1 (doctor, unreachable), agents 5 to 3 (unreachable with tools Read/Write), plugins 0; only an Anthropic-registered external destination",
+    "effect": "stays keep_but_compare; the listed doctor skill fails the locked no-skills bar"
+   },
+   {
+    "slug": "anthropics/claude-agent-sdk-python",
+    "category": "agent-sdks",
+    "result": "0.2.157 ran query() on the native login with the API-key variables unset (apiKeySource none)",
+    "effect": "contradicts the gap-resolution ledger's paid-API blocker for the agent-sdks layer"
+   },
+   {
+    "slug": "trailofbits/coop",
+    "category": "sandbox-worker-runtimes",
+    "result": "compared with the incumbent srt on a preregistered fixture: srt denied 8 of 8 probes vs 5 of 8, median 0.45 s vs 10.9 s; persistence after a WSL restart armed, not yet run",
+    "effect": "srt retained by the preregistered rule; coop not adopted"
+   },
+   {
+    "slug": "snyk/agent-scan",
+    "category": "security-scanning",
+    "result": "local offline arm: no findings on 14 skills and two controls; Snyk-connected arm blocked three times by the public tier's daily limit, one timed retry scheduled",
+    "effect": "no disposition change"
+   }
+  ]
  }
 }
