@@ -10329,8 +10329,8 @@
     },
     {
       "path": "evidence/artifacts/gap-wave3-20260923/instructions-skills/forced-skill-arm-ab.json",
-      "sha256": "10e860eab27c0834e111597efde76c1a9089259943d394594eca416c77385eb7",
-      "bytes": 19935
+      "sha256": "81f3b123cac3b9e9a8130e0cf7cdc90cc29c53c118c5b871567c87cf3fa88df6",
+      "bytes": 19994
     },
     {
       "path": "evidence/artifacts/gap-wave3-20260923/instructions-skills/typesafe-extended-label-set.json",
@@ -10344,13 +10344,13 @@
     },
     {
       "path": "evidence/artifacts/gap-wave3-20260923/native-clients/arm-comparison-research-task.json",
-      "sha256": "f2121385ec5a2e742d51b9a2f1cac07099294bf6216dad07e0f46cc8d585863a",
-      "bytes": 22289
+      "sha256": "e63a2fd34d5003bc68d0a28d4d5d4c45e6f7b02f8bb8f959d3cc3768205672f7",
+      "bytes": 22636
     },
     {
       "path": "evidence/artifacts/gap-wave3-20260923/native-clients/sdk-vs-cli-resume-comparison.json",
-      "sha256": "a0bb04f3c0e5de439994051ba8f55613a306d8a3d873e9c7d47cb9aaf6e05099",
-      "bytes": 22524
+      "sha256": "c51d516dd0ff1e3438d2a9371b089e647c621c749a723e488b57190b4034d5c5",
+      "bytes": 22807
     },
     {
       "path": "evidence/artifacts/harness-rules-convergence-20260922/codex-agent-roles-source.json",
