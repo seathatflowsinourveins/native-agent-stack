@@ -193,6 +193,33 @@ class SecurityScanTests(unittest.TestCase):
             self.assertIn("persist-credentials: false", job, job_id)
             self.assertRegex(job, r"timeout-minutes: \d+", job_id)
 
+    def test_failure_path_semantics_keep_findings_uploadable(self):
+        # (a) The OSV SARIF upload step must still run when the scan step failed
+        # (a findings exit) so code scanning still receives the report; only a
+        # cancelled run should skip it.
+        osv_job = jobs(self.text)["osv-scanner"]
+        osv_upload_if = osv_job.split("Upload OSV-Scanner SARIF", 1)[1].split("\n", 2)[1]
+        self.assertRegex(osv_upload_if, r"!\s*cancelled\(\)|always\(\)",
+                          "the OSV SARIF upload step's if: must keep !cancelled() or always() "
+                          "so a findings exit (the scan step failing) does not skip the upload")
+
+        # (b) The zizmor artifact-upload step must have no if: that would let it
+        # (and, downstream, the upload job) run after the analyzer step failed.
+        zizmor_online = jobs(self.text)["zizmor-online"]
+        keep_step = zizmor_online.split("Keep the zizmor SARIF for the upload job", 1)[1]
+        keep_step = keep_step.split("\n      - name:", 1)[0]
+        self.assertNotRegex(keep_step, r"(?m)^\s*if:.*\b(always|cancelled|failure)\s*\(\)",
+                             "the artifact-upload step must not force a run after the analyzer "
+                             "step failed; its default (skip-on-failure) behavior is required")
+
+        # (c) The zizmor-sarif-upload job's own if: must not force it to run after a
+        # cancelled or failed zizmor-online run either (it only skips on pull_request).
+        upload_job_text = self.text.split("\njobs:\n", 1)[1].split("\n  zizmor-sarif-upload:", 1)[1]
+        job_if = upload_job_text.split("\n    if:", 1)[1].split("\n", 1)[0]
+        self.assertNotRegex(job_if, r"\b(always|cancelled)\s*\(\)",
+                             "zizmor-sarif-upload's if: must not add always()/!cancelled(); it "
+                             "should only run after zizmor-online actually produced an artifact")
+
 
 class PublishReleaseTests(unittest.TestCase):
     text = (WORKFLOWS / "publish-catalog.yml").read_text(encoding="utf-8")

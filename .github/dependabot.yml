@@ -1,7 +1,11 @@
 version: 2
-# github-actions only. Security updates for the pip lock files are a repository
-# setting (on since 2026-09-22), not a version-update entry here; pip version
-# updates stay off (docs/decisions/2026-09-22-github-automation-closure.md).
+# github-actions version updates, plus one ignored pip entry below for a
+# deliberately vulnerable fixture (open-pull-requests-limit: 0, so it never
+# opens a PR; it only keeps that pin's alert visible for
+# tests/test_grype_known_cve_fixture.py). Security updates for the real pip
+# lock files are a repository setting (on since 2026-09-22), not a
+# version-update entry here; pip version updates for those locks stay off
+# (docs/decisions/2026-09-22-github-automation-closure.md).
 updates:
   - package-ecosystem: github-actions
     directory: /

@@ -2988,8 +2988,8 @@
     },
     {
       "path": ".github/dependabot.yml",
-      "sha256": "1a504bb975f17f5af05f43a17df9d0e90b7ae3177f87d0ae7a6b99f68caf6b73",
-      "bytes": 1292
+      "sha256": "d9c19e9828038aef64c82ab12a08c6eacddcce4a2bc0022d3f54b831aaed7711",
+      "bytes": 1540
     },
     {
       "path": ".github/main-ruleset.json",
@@ -8154,8 +8154,8 @@
     },
     {
       "path": "catalogs/landscape/foundation.json",
-      "sha256": "c2ee606f29d43519e407f34f7c1f8aa81329f4649dee4215f7b99c941036eb77",
-      "bytes": 468999
+      "sha256": "121da0fab62f34b1229dd80565fbef312547dce993e55497297b78425749982e",
+      "bytes": 469228
     },
     {
       "path": "catalogs/landscape/gap-crosswalk-92bb279.json",
@@ -8224,8 +8224,8 @@
     },
     {
       "path": "catalogs/sota-convergence/layer-verdicts-20260922.json",
-      "sha256": "2fef6da7468a8e97a319fdc6f75f73374cd34b412bf93de90fd0c2a7504159de",
-      "bytes": 609126
+      "sha256": "33e8c4d6da9d9174d3adbdc7fa3474795fc0b38aa996e17ba6fb5bab6d363c5f",
+      "bytes": 609355
     },
     {
       "path": "catalogs/sota-convergence/manifest-20260922.json",
@@ -8679,8 +8679,8 @@
     },
     {
       "path": "docs/decisions/2026-09-22-github-automation-closure.md",
-      "sha256": "68742b9b91af2b9ae8d6daa036f0f166db39a5b3ea8669a31393a438ba08854c",
-      "bytes": 32406
+      "sha256": "2271d0911513547098efa2e72f80ba512a45244f1531ebc46f1ab8471a725a70",
+      "bytes": 38865
     },
     {
       "path": "docs/direct-results.md",
@@ -8789,13 +8789,13 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "0291d8ebdb209f293896bae915ca74a25ae024c6d239a6d5cd90a3cac009f5fc",
-      "bytes": 63228
+      "sha256": "3a4003df346ef3a76477051b0446cb3fdea4ab1259ee19f69c44b78f4b18c82d",
+      "bytes": 63959
     },
     {
       "path": "docs/grand-catalog-handbook.md",
-      "sha256": "e7aa905f082b1cdd43897b8f7651061bba4e8d9beff9e093db0a0b6bdf9d468e",
-      "bytes": 425236
+      "sha256": "790f705a45ca8a8e98ab0026ea2d638df615a7dc4de153505647598764433fd6",
+      "bytes": 425465
     },
     {
       "path": "docs/harness-defaults.md",
@@ -9111,6 +9111,51 @@
       "path": "evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger.json",
       "sha256": "5f989503c33774e3086287d6183ff10e51d5756958fe880d204be3fc0bf5b84e",
       "bytes": 590235
+    },
+    {
+      "path": "evidence/artifacts/blind-comparison-20260923/PREREGISTRATION.md",
+      "sha256": "6ef62ccf8c72c2f7405ea6af872693efb0f2af6b3f55307b248444f0e257749b",
+      "bytes": 4067
+    },
+    {
+      "path": "evidence/artifacts/blind-comparison-20260923/README.md",
+      "sha256": "7dbc89575c3405f1c277cbd8dad430fe71c90e4c7d17f20dd951094c168945e3",
+      "bytes": 1590
+    },
+    {
+      "path": "evidence/artifacts/blind-comparison-20260923/battery_catalog.py",
+      "sha256": "84c2ae1c0f7aa5eb21e9b16c501fcdc6217fdbd08b2a8360b60e94922fe96145",
+      "bytes": 9515
+    },
+    {
+      "path": "evidence/artifacts/blind-comparison-20260923/closure-cmp-a-20260923.json",
+      "sha256": "0c5ce0ce49aa9a2dc6d718e74f21518bd00c3b31bb309f33f3a72e35c42a2fcf",
+      "bytes": 671
+    },
+    {
+      "path": "evidence/artifacts/blind-comparison-20260923/judgments-cmp-a-20260923.redacted.json",
+      "sha256": "c04116e7879e83767caccc34201c72f3f4a99786877ed1ba52539708fcf9b7b7",
+      "bytes": 8398
+    },
+    {
+      "path": "evidence/artifacts/blind-comparison-20260923/packet-cmp-a-20260923.json",
+      "sha256": "43a48b2ef0f3b86c55bd65ddca48aebe91c51ff0e84367ddfc8a61a6f195a91f",
+      "bytes": 12730
+    },
+    {
+      "path": "evidence/artifacts/blind-comparison-20260923/protocol-cmp-a.json",
+      "sha256": "804349c9de90426727afcbf32a7899c588db55efe6cdc59f0be0bae8e8a5b246",
+      "bytes": 866
+    },
+    {
+      "path": "evidence/artifacts/blind-comparison-20260923/spec-catalog.md",
+      "sha256": "7d70f7a6e36b6ef252946317c7e8b3a3b7e0906a17cae9f2bbb4bf69469f259b",
+      "bytes": 3879
+    },
+    {
+      "path": "evidence/artifacts/blind-comparison-20260923/wfemu.py",
+      "sha256": "4765600792da23c3e9c3efe598a2052a7e0fa27ff9da4a2b2dbbb45f8d6b7719",
+      "bytes": 11363
     },
     {
       "path": "evidence/artifacts/catalog-clean-install-20260921/04-locked-sdk-sync.log",

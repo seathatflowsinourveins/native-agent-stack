@@ -1,0 +1,23 @@
+{
+ "protocol_id": "cmp-a-20260923",
+ "kind": "overturn_comparison",
+ "status": "retain",
+ "reasons": [
+  "defect_weight: arm-b94c07e5=10 < 5 -> false",
+  "battery_pass_rate: arm-b94c07e5=0.9231 >= 1 -> false",
+  "requirements_met_rate: arm-b94c07e5=0.8333 >= 0.9 -> false",
+  "own_suite_pass: arm-b94c07e5=1 >= 1 -> true"
+ ],
+ "publication_gate": {
+  "refuters_reported": 3,
+  "valid_refuters": 3,
+  "invalid_refuters": 0,
+  "leak_votes": 0,
+  "judge_leak": false,
+  "not_refuted": 3,
+  "blocks_publication": false,
+  "reasons": [],
+  "note": "publication gate only; closure status above is independent of refuter votes"
+ },
+ "computed_by": "tools/compare/closure.mjs"
+}

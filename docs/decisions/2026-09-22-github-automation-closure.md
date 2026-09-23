@@ -173,12 +173,24 @@ locally with `GH_TOKEN` set and no `--offline`, using
   check. Off PRs, the same scan writes SARIF, uploaded by
   `github/codeql-action/upload-sarif@1c5b675653bb5c22dbe9b12b556ec555138e09fd`
   (v4.38.1, annotated tag `c23de5a8…` dereferenced) with category
-  `osv-scanner`. Only that job holds `security-events: write`. CodeQL Action
+  `osv-scanner`. At the time this job was added, it was the only job holding
+  `security-events: write`; **stale as of section 4's 2026-09-23 token
+  split**, `zizmor-sarif-upload` also holds it now, so two jobs in
+  `security-scan.yml` hold `security-events: write`. CodeQL Action
   v3 is deprecated in December 2026
   ([changelog](https://github.blog/changelog/2025-10-28-upcoming-deprecation-of-codeql-action-v3/)).
 - **Alternatives.** Dependency review only (sees only a PR's changes). grype
   over every lock (it needs SBOMs per ecosystem). A separate upload job, which
-  keeps `security-events: write` off the PR run but scans twice.
+  keeps `security-events: write` off the PR run but scans twice -- **this
+  rationale does not describe the design actually chosen.** The `osv-scanner`
+  job itself invokes `osv-scanner scan source` twice on non-PR events (once
+  for the exit-code table, again with `--format sarif` for the upload), so
+  the in-job design does not avoid a second scan either. Section 4's later
+  `zizmor-sarif-upload` job is a separate write-scoped job that avoids a
+  second scan by downloading the first job's SARIF artifact instead of
+  re-running the analyzer; that pattern was not applied here because
+  OSV-Scanner has no cheaper way to produce SARIF than a second invocation
+  with `--format sarif`, not because a separate job would need one.
 - **Overturn.** OSV-Scanner fixes its version ordering, so resolved results
   match a pip resolution of the same manifest (then drop `--no-resolve`). Or
   30 days of PR runs produce only findings that another required check also
@@ -210,22 +222,60 @@ locally with `GH_TOKEN` set and no `--offline`, using
   with `bash --noprofile --norc -eo pipefail -c 'set -uo pipefail; false; echo reached'`
   (prints nothing) and guarded by a test assertion that fails if the old line returns.
 - **Result.** 0 online findings on `168a3a8` and on this branch.
+- **Alternatives.** Give `zizmor-online` the write scope directly (rejected:
+  hands a pip-installed analyzer's token the power to dismiss CodeQL alerts,
+  see "Token split" above). Run zizmor online as a PR gate (rejected: online
+  audits need network egress and a token on every PR, and 0 findings on
+  `168a3a8` give no evidence yet that it would not be noisy). Drop online
+  zizmor and keep only `validate.yml`'s offline `regular` gate (rejected:
+  offline analysis covers no online advisory, secrets or provenance class).
+- **Decision.** Keep the two-job split: `zizmor-online` (`contents: read`,
+  push/schedule/dispatch only) produces the SARIF artifact, and
+  `zizmor-sarif-upload` (`security-events: write`, no shell step or
+  installed tool) uploads it, per the "Token split" evidence above.
 - **Overturn.** An online-only finding class (impostor commit, known-vulnerable
   action, ref-version mismatch) appears. Then it becomes a PR gate.
 
 ## 5. Scorecard SARIF
 
-`scorecard.yml` keeps `publish_results: false` and the 5-day artifact. It now
-also uploads `results.sarif` through the same `upload-sarif` SHA. Only the
-`analysis` job has `security-events: write`. Scorecard v5.5.0 and
-scorecard-action v2.4.4 are the latest releases. **Overturn:** duplicate or
-noisy alerts that nobody triages for 30 days.
+- **Evidence.** `scorecard.yml`'s `analysis` job runs
+  `ossf/scorecard-action@2d1146689b8cda280b9bc96326124645441f03bc` (v2.4.4,
+  the latest release; Scorecard itself is at v5.5.0) with `results_format:
+  sarif` and `publish_results: false`, then uploads `results.sarif` both as a
+  5-day workflow artifact and, in the same job, through
+  `github/codeql-action/upload-sarif@1c5b675653bb5c22dbe9b12b556ec555138e09fd`
+  (v4.38.1). The upload step and its job-scoped `security-events: write` were
+  added on `main` in commit `4970ba0` (PR #108, 2026-09-22); that commit's
+  `scorecard.yml` diff adds the "Upload Scorecard SARIF to code scanning"
+  step directly after the existing artifact-upload step, matching
+  `ossf/scorecard-action`'s own documented layout (`results_file`/
+  `results_format` feed a local SARIF file that the caller uploads itself;
+  the action does not upload to code scanning on its own). `analysis` is the
+  only job in the workflow, and it is the only one with `security-events:
+  write` (`tests/test_workflow_hardening.py` `ScorecardTests`).
+- **Alternatives.** Set `publish_results: true` (rejected: publishes to the
+  public `api.scorecard.dev` dataset and badge, which this unit's scope
+  keeps off). Keep the artifact only, with no code-scanning upload (rejected:
+  findings would sit in a 5-day artifact nobody is required to open, instead
+  of surfacing next to CodeQL/OSV/zizmor alerts).
+- **Decision.** Keep `publish_results: false` and the 5-day artifact, and add
+  the code-scanning upload in the same job that already ran Scorecard so no
+  second run or separate job is needed.
+- **Overturn.** Duplicate or noisy alerts that nobody triages for 30 days.
 
 ## 6. Dependency review gate
 
 - **Evidence.** `warn-only: true` "overrid[es] `fail-on-severity`" (`action.yml`
   at `a1d282b3`). The graph has been on since the PR #78 correction. It passed
   on #97 and #98 (12-17 s).
+- **Alternatives.** Keep `warn-only: true` and report-only status (rejected:
+  the graph correction removed the only blocker to gating, and a report-only
+  advisory scan that nobody must act on does not close the gap). Gate at
+  `critical` instead of `high` (rejected: leaves high-severity advisories
+  with a fix available unblocked, and #97/#98 show high-severity PRs pass in
+  seconds when there is nothing to flag). Gate at `moderate` (rejected,
+  keep-but-compare: no measured 30-day run at `moderate` exists yet to show
+  its false-positive rate on this repository's dependency set).
 - **Decision.** `fail-on-severity: high`, `warn-only` removed, and
   `dependency-review` is a required check in the target ruleset.
 - **Overturn.** A high-severity block with no fix path that needs an
@@ -377,9 +427,14 @@ noisy alerts that nobody triages for 30 days.
   Request Alerts" checks passed on #97 and #98. It is not required.
   **Overturn:** remove it if its PR alerts add nothing beyond
   dependency-review across the next 10 PRs.
-- **harden-runner stays audit** on 18 of 22 ubuntu jobs; the other 4 are
-  hash-frozen exemptions. Block mode needs a per-job allow-list backed by
-  audit runs.
+- **harden-runner stays audit** on 20 of 24 ubuntu jobs (measured 2026-09-23
+  at HEAD, counting every job across `.github/workflows/*.yml` whose
+  `runs-on` is a literal `ubuntu-` label with `tests/test_workflow_hardening.py`'s
+  own job/first-step parser); the other 4 are hash-frozen exemptions
+  (`native-offhost-app-state.yml`'s `source` and `destination`,
+  `native-offhost-restore.yml`'s `synthetic-restore`, and
+  `native-token-e2e.yml`'s `native-token-tools`). Block mode needs a per-job
+  allow-list backed by audit runs.
 - **Renovate stays deferred.** No custom-manager gap is shown; Mend's hosted
   app is free, but it would duplicate Dependabot's ownership
   ([comparison](https://docs.renovatebot.com/bot-comparison/)).
@@ -487,3 +542,41 @@ Hosted and live results after merge. Evidence class: hosted runs and GitHub API 
 
 - **Related setting, owned elsewhere.** `can_approve_pull_request_reviews` was set to true by
   the bot-PR live test (#95, recorded in #110). It is not part of this change's target.
+
+## Blind comparison (2026-09-23)
+
+- **Why.** Two independent implementations of the same approved
+  GitHub-automation plan existed per repository (the merged one above and an
+  unmerged one built in parallel by a side agent of the same session). The
+  user asked for a blind comparison and to merge the winner.
+- **Protocol.** Preregistered before evaluation (`PREREGISTRATION.md`, with
+  Amendment 1 recorded after the first run and before re-judging: neutral
+  protocol ids after a repository-name leak, two harness defects fixed,
+  frozen per-command results added; metrics, thresholds and closure rule
+  unchanged). Arms had opaque labels; the key stayed sealed. Metrics:
+  `defect_weight` (10/3/1 per confirmed high/medium/low; confirmed = single-arm
+  reviewer claim not refuted by an independent source-reading refuter),
+  `battery_pass_rate` (identical fixed battery emulating the workflows with
+  fake scanners; the agent-lab hermetic check ran under bubblewrap with host
+  paths hidden), `requirements_met_rate` (shared requirement list), and
+  `own_suite_pass`. Closure by `tools/compare/closure.mjs`: the challenger
+  overturns only if better on defects AND not worse on the other three.
+- **Harness validation.** Positive controls reproduced known outcomes (the
+  pre-fix commit's findings-path report loss; the hermetic failure a hosted
+  run had shown).
+- **Results (run `wf_40347d59-2e8`, second pass).** Catalog `cmp-a`:
+  incumbent `defect_weight` 5, battery 1.0 (13/13), requirements 0.90, own
+  suite 1; challenger 10, 0.9231 (fails the analyzer-crash check), 0.8333,
+  1 -> closure "retain". agent-lab `cmp-b`: incumbent 10, 1.0 (8/8),
+  requirements 0.90, own suite 1; challenger 7, 1.0, 0.80, 1 -> closure
+  "retain" (challenger better on defects only). Publication gate passed for
+  both: 3 of 3 blind refuters did not refute, 0 leak votes, judge leak false.
+- **Outcome.** The merged implementation is the winner in both repositories,
+  so nothing is replaced; the winner's confirmed defects are fixed in this
+  change (the preregistered graft rule).
+- **Limitations.** The battery was authored by the coordinator, who had seen
+  earlier review findings on both arms; the challenger branches were built on
+  older bases; one incumbent acceptance-command result was dropped when the
+  packet was built (the battery file shows all 10 commands exit 0, so
+  `own_suite_pass` is unaffected); the completeness critic ran before closure
+  files existed.
