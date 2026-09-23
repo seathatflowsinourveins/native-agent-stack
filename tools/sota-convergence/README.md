@@ -67,13 +67,20 @@ default reconciliation file. No step here calls a model.
    reconciliations file (default:
    [`reconciliations-20260922.json`](reconciliations-20260922.json), the
    three reconciliations already published in the 2026-09-22 manifest).
-   Output has the exact key layout of `manifest-20260922.json`: `schema_version,
+   Output has the key layout of `manifest-20260922.json`: `schema_version,
    id, checked_at, scope, method, taxonomy, foundation, trading,
    lane_groupings, citation_review, critic, lane_calls, lane_limits,
-   reconciliations, counts`. `lane_groupings` carries, verbatim, any
+   reconciliations, counts`, plus `unmatched_lane_items` after
+   `lane_groupings`. `lane_groupings` carries, verbatim, any
    review-lane layer id outside the foundation/taxonomy baseline (e.g. a
    "beyond" lane's own grouping like `awesome-list-convergence`) that would
    otherwise not match `trading[].layer`'s exact-taxonomy contract.
+   `unmatched_lane_items` publishes every lane `selected[]` item at a
+   foundation/trading layer that no card row took (`reason`
+   `no_card_with_repository_in_layer` or `catalog_id_names_no_card`; with
+   `lane, layer, repository, catalog_id, status, survives, verified,
+   evidence, note, lane_item`), counted in `counts.unmatched_lane_items[_by_lane]`;
+   such items were previously dropped without trace.
    `citation_review` (optional `--citation-review PATH`) overlays an
    independent citation review's findings onto the rows they name -- data
    only, see "Citation-review overlay, data only" below; always present,
@@ -158,7 +165,18 @@ default reconciliation file. No step here calls a model.
   `counts.pins_not_compared[_by_reason]` totals them. A lane's
   `pin_behind_upstream` status on an OS-package pin (systemd) is published as
   `distro_managed` (the `_unverified` suffix kept), the lane's status noted in
-  the row evidence. A tag-only upstream whose listed tag is not
+  the row evidence. Any other lane pin claim that contradicts the row's
+  computed pin fields -- `pin_behind_upstream` on a row whose
+  `pin_behind_upstream` is false or null, or a lane-returned `confirmed_*`
+  (or a refuted-pin `confirmed_pin`) on a row whose `pin_behind_upstream` is
+  true -- is published as `pin_status_disputed` (suffix kept), on the row and
+  in `other_lane_reviews`, with the lane's claim in `disputed_lane_status` and
+  a row-evidence note (`reconcile_status_with_pin`). A refuted demotion's
+  `confirmed_*` makes no pin claim and is left alone.
+  `counts.pins_behind_upstream_by_review_status`,
+  `review_status_pin_behind_upstream`, `pin_status_disputed[_by_lane_status]`
+  and `other_lane_reviews_pin_status_disputed` reconcile the computed and
+  lane-claimed pin counts. A tag-only upstream whose listed tag is not
   version-shaped (`release-6-3` for the postgres mirror, `show` for kafka) is
   moved to `upstream.latest_flag` and `upstream.latest` is null: the
   freshness step reads the first tag in GitHub's name order, not the newest
