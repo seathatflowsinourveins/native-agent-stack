@@ -18,7 +18,10 @@ see [`contributing-evidence.md`'s "The new-host loop, in one place"](contributin
 
 The workstation and macOS tiers are labelled projections in
 [`adoption/hardware-profiles.json`](../adoption/hardware-profiles.json) until
-`python3 scripts/hardware_profile.py` runs on each host and replaces them.
+`python3 scripts/hardware_profile.py --record-host <host-id>` runs on each host. It adds a
+dated, `native_proven` measured entry next to the projection -- it does not remove or
+overwrite the projection entry itself -- so once a host has a measured entry, prefer that one
+and treat the projection as superseded guidance rather than looking for it to have vanished.
 
 ## Workstation (WSL2) next steps
 
