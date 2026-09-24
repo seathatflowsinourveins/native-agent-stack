@@ -236,12 +236,18 @@ class CorporateActionMonitor:
         # with no ordering guard). `_generation` is bumped, under `_lock`,
         # at the START of every `refresh()` attempt; only the write from
         # the CURRENT (latest-started) generation is ever applied --
-        # `_apply_success`/`_apply_failure` drop a write from any earlier,
+        # `complete_attempt`/`fail_attempt` reject a write from any earlier,
         # superseded generation even if it happens to complete later.
-        # `refresh_timed_out()` (called by the async scheduler when its own
-        # wait_for gives up on a still-running attempt) also bumps the
-        # generation, so that attempt's eventual write -- success or
-        # failure, whenever the thread actually finishes -- is dropped too.
+        # `refresh_timed_out()`/`invalidate_attempt()` (called by the async
+        # scheduler when its own wait_for gives up, or cancels, a still-
+        # running attempt) also bump the generation, so that attempt's
+        # eventual write -- success or failure, whenever the thread actually
+        # finishes -- is dropped too. HIGH finding (fix round 5): the
+        # generation for THAT attempt is now allocated by `begin_attempt`
+        # BEFORE the worker thread is even launched, not lazily inside
+        # `refresh()`/`run_attempt()` once the thread happens to start
+        # running -- closing a window where a launched-but-not-yet-running
+        # thread was invisible to a concurrent shutdown-time invalidation.
         self._lock = threading.Lock()
         self._generation = 0
         # NIT finding 9 (fix round 4): the generation that most recently
@@ -259,16 +265,79 @@ class CorporateActionMonitor:
         self._committed_generation = 0
 
     def refresh(self, symbols, *, start: date, end: date, now=None):
-        """Idempotent within `refresh_seconds` for a symbol set already
-        covered by the last successful fetch AND fetched for this same
-        (start, end) window; always safe to call every tick, including
-        concurrently from multiple threads (finding 1) -- every state
-        mutation is generation-checked under `self._lock`. Never raises,
-        and never overwrites a previously successful result with
+        """The ordinary, synchronous convenience path (used directly by
+        every offline test and by any caller that does not need its own
+        worker thread) -- built on the two-phase begin_attempt/
+        complete_attempt/fail_attempt primitives below, so it shares
+        exactly their generation-safety guarantees. Never raises, and
+        never overwrites a previously successful result with
         `LOOKUP_FAILED` (finding 3) -- a fetch failure only marks every
         requested symbol DEGRADED (see `_mark_degraded`); `evaluate()`
         preserves the last known good result for a degraded symbol while
         still surfacing `needs_attention`."""
+        now = self._clock() if now is None else now
+        generation = self.begin_attempt(symbols, start=start, end=end, now=now)
+        if generation is None:
+            return  # throttled -- an equivalent fresh result is already cached
+        symbols = set(symbols)
+        try:
+            result = self.source.fetch(sorted(symbols), start, end)
+        except CorporateActionLookupError:
+            self.fail_attempt(symbols, generation)
+            return
+        except Exception:
+            # Fail closed (degraded, not overwritten) on any unexpected
+            # error too -- never guess.
+            self.fail_attempt(symbols, generation)
+            return
+        fetched, ambiguous = self._normalize_fetch_result(result)
+        self.complete_attempt(symbols, generation, now, fetched, ambiguous)
+
+    def run_attempt(self, symbols, generation, *, start: date, end: date, now):
+        """The two-phase counterpart of `refresh()`'s own fetch-and-apply
+        body, for a caller (runner.py's `_schedule_corporate_action_refresh`
+        worker thread) that already called `begin_attempt` itself -- on the
+        CALLING thread/coroutine, before launching the worker -- and is now
+        running the actual blocking `source.fetch()` call, and applying its
+        result, on a SEPARATE worker thread under the pre-allocated
+        `generation`. Never raises."""
+        symbols = set(symbols)
+        try:
+            result = self.source.fetch(sorted(symbols), start, end)
+        except CorporateActionLookupError:
+            self.fail_attempt(symbols, generation)
+            return
+        except Exception:
+            self.fail_attempt(symbols, generation)
+            return
+        fetched, ambiguous = self._normalize_fetch_result(result)
+        self.complete_attempt(symbols, generation, now, fetched, ambiguous)
+
+    def begin_attempt(self, symbols, *, start: date, end: date, now=None):
+        """HIGH finding (fix round 5): allocate THIS attempt's generation
+        and run the throttle check SYNCHRONOUSLY, before any blocking I/O
+        -- a caller that will run the actual fetch on a separate worker
+        thread (runner.py's `_schedule_corporate_action_refresh`) MUST call
+        this first, on the CALLING thread/coroutine, before launching that
+        worker, and use the returned generation for `complete_attempt`/
+        `fail_attempt`/`invalidate_attempt`/`refresh_timed_out`.
+
+        Reproduced by an independent review: the OLD design bumped the
+        generation lazily, inside `refresh()` itself -- which only ran once
+        the worker thread actually started executing. A worker thread that
+        had been launched (`Thread.start()` called) but was still merely
+        QUEUED by the OS -- not yet running `refresh()`, so `_generation`
+        was still unchanged -- could be invisible to a shutdown-time
+        cancellation check: `_committed_generation == _generation` looked
+        "already committed / nothing in flight" (neither had moved yet),
+        so cancellation did nothing, and the delayed worker went on to
+        commit a stale result AFTER shutdown had already decided the run
+        was done. Allocating the generation here, before the thread is
+        even created, closes that window entirely.
+
+        Returns None if throttled (an equivalent fresh result, for this
+        exact symbol set and window, is already cached) -- the caller must
+        not launch a worker in that case."""
         now = self._clock() if now is None else now
         symbols = set(symbols)
         window = (start, end)
@@ -281,56 +350,108 @@ class CorporateActionMonitor:
             interval = self.retry_seconds if self._last_attempt_failed else self.refresh_seconds
             if (self._last_attempt is not None and now - self._last_attempt < interval
                     and symbols.issubset(self._results.keys()) and self._last_window == window):
-                return
+                return None
             self._last_attempt = now
             self._last_window = window
             self._generation += 1
-            my_generation = self._generation
-        try:
-            fetched = self.source.fetch(sorted(symbols), start, end)
-        except CorporateActionLookupError:
-            self._apply_failure(symbols, my_generation)
-            return
-        except Exception:
-            # Fail closed (degraded, not overwritten) on any unexpected
-            # error too -- never guess.
-            self._apply_failure(symbols, my_generation)
-            return
-        self._apply_success(symbols, fetched, now, my_generation)
+            return self._generation
 
-    def refresh_timed_out(self, symbols):
-        """HIGH finding 1: called by the async scheduler (runner.py's
-        `_schedule_corporate_action_refresh`) when ITS OWN wait_for gives up
-        on a `refresh()` call still running in a worker thread. The thread
+    @staticmethod
+    def _normalize_fetch_result(result):
+        """A source's `fetch()` may return either the original plain
+        `dict[symbol, list[ActionRecord] | LOOKUP_FAILED | LOOKUP_AMBIGUOUS]`
+        (every existing offline-test fake, and any simple source that never
+        needs to report "confirmed records AND residual uncertainty" for
+        the same symbol at once), or HIGH finding (fix round 5)'s richer
+        `(dict[symbol, list[ActionRecord]], ambiguous_symbols: set[str])`
+        2-tuple -- AlpacaCorporateActionsSource.fetch() now always returns
+        the latter, so a symbol's confirmed records are never discarded
+        just because SOME OTHER row for that same symbol was also
+        ambiguous (records and uncertainty are tracked separately, not
+        collapsed into one sentinel-or-list value per symbol)."""
+        if isinstance(result, tuple) and len(result) == 2:
+            fetched, ambiguous = result
+            return fetched, set(ambiguous)
+        return result, set()
+
+    def refresh_timed_out(self, generation, symbols):
+        """HIGH finding (fix round 5): called by the async scheduler on a
+        GENUINE `wait_for` timeout (not a cancellation -- see
+        `invalidate_attempt` for that) for the SPECIFIC pre-allocated
+        `generation` (from `begin_attempt`) that timed out. The thread
         keeps running (Python cannot forcibly kill it), so this both (a)
-        bumps the generation counter, invalidating that in-flight attempt --
-        whenever it does eventually finish, `_apply_success`/`_apply_failure`
-        will see a stale generation and drop the write -- and (b) treats the
-        timeout itself as an ordinary failure right now (degraded, short
-        `retry_seconds` retry interval), exactly as if `fetch()` had raised,
-        rather than silently leaving the cache in its last (possibly clear)
-        state until the abandoned attempt happens to resolve on its own.
+        invalidates exactly that attempt -- bumping `_generation` past it
+        only if it is STILL the current one (a newer attempt may already
+        have superseded it, in which case there is nothing to invalidate)
+        -- so its eventual late write, whenever the thread finishes, is
+        dropped, and (b) treats the timeout itself as an ordinary failure
+        right now (degraded, short `retry_seconds` retry interval), exactly
+        as if `fetch()` had raised, rather than silently leaving the cache
+        in its last (possibly clear) state until the abandoned attempt
+        happens to resolve on its own.
 
-        NIT finding 9 (fix round 4): a no-op if the current generation has
-        ALREADY committed (see `_committed_generation`) -- this timeout
-        handler firing just after the same attempt's own success/failure
-        already landed must never re-degrade an already-fresh result."""
+        NIT finding 9 (fix round 4, preserved through round 5's generation
+        pre-allocation): a no-op if THIS SAME generation has ALREADY
+        committed (see `_committed_generation`) -- this timeout handler
+        firing just after this exact attempt's own success/failure already
+        landed must never re-degrade an already-fresh result."""
         with self._lock:
-            if self._committed_generation == self._generation:
-                return
+            if generation != self._generation or generation == self._committed_generation:
+                return  # already superseded, or already committed -- nothing to invalidate
             self._generation += 1
             self._last_attempt_failed = True
             self._mark_degraded(symbols)
 
-    def _apply_failure(self, symbols, generation):
+    def invalidate_attempt(self, generation):
+        """HIGH finding (fix round 5)/LOW (Claude): called on an ordinary
+        CANCELLATION (not a timeout -- shutdown cancelling a still-routine
+        in-flight refresh) for the SPECIFIC pre-allocated `generation`.
+        Cancellation alone is not evidence the data is wrong -- only
+        invalidates that attempt (its eventual late write, if any, is
+        dropped as superseded, exactly like `refresh_timed_out`) WITHOUT
+        degrading anything. The monitor's last committed result stands,
+        subject only to the ordinary `max_age_seconds` staleness rule.
+        Reproduced by an independent review's own probe: the previous
+        design routed cancellation through the SAME handler as a timeout,
+        so a perfectly routine periodic refresh still in flight at
+        shutdown (nothing wrong with the cached data at all) forced the
+        cached result to needs_attention -- which could force a liquidation
+        of an otherwise clean, reconciled overnight hold."""
         with self._lock:
             if generation != self._generation:
-                return  # superseded by a later attempt (or a timeout) -- drop
+                return  # already superseded -- nothing to invalidate
+            self._generation += 1
+
+    def fail_attempt(self, symbols, generation):
+        """The two-phase counterpart of the old `_apply_failure` -- applies
+        an ordinary fetch FAILURE (the source's own `fetch()` raised) for a
+        pre-allocated `generation`."""
+        with self._lock:
+            if generation != self._generation:
+                return  # superseded by a later attempt (or a timeout/cancellation) -- drop
             self._committed_generation = generation
             self._last_attempt_failed = True
             self._mark_degraded(symbols)
 
-    def _apply_success(self, symbols, fetched, now, generation):
+    def complete_attempt(self, symbols, generation, now, fetched, ambiguous=frozenset()):
+        """The two-phase counterpart of the old `_apply_success` -- applies
+        a successful fetch result for a pre-allocated `generation`.
+
+        HIGH finding (fix round 5): `fetched` and `ambiguous` are tracked
+        SEPARATELY -- a symbol's valid records (possibly empty) are always
+        written to `_results` (never discarded), and `ambiguous` only ever
+        ADDS that symbol to `_degraded` (never overwrites `_results`) when
+        there is residual uncertainty about it (an undated/unmapped/
+        symbol-less row) -- even when that same symbol ALSO has confirmed,
+        in-range records. The pre-fix design collapsed a symbol's whole
+        answer into either "a list of records" OR "LOOKUP_AMBIGUOUS",
+        picking the ambiguous sentinel (discarding any records already
+        collected) whenever ANY row was uncertain -- which meant a
+        confirmed split ALONGSIDE an unrelated undated dividend for the
+        same symbol, or a benchmark symbol with its routine quarterly
+        dividend already dated (SPY/QQQ/IWM/DIA in the shipped universe
+        virtually always have one somewhere in the 97-day window) alongside
+        an unmapped/symbol-less row, silently read as fully clear."""
         with self._lock:
             if generation != self._generation:
                 return  # superseded -- an older result must never overwrite a newer one
@@ -349,20 +470,24 @@ class CorporateActionMonitor:
                     continue
                 new_value = fetched[symbol]
                 if new_value in (LOOKUP_FAILED, LOOKUP_AMBIGUOUS):
-                    # HIGH finding 1 (fix round 4): a sentinel result (the
-                    # symbol had no valid record of its own this fetch --
-                    # see AlpacaCorporateActionsSource.fetch(), which now
-                    # only ever returns a sentinel for a symbol with ZERO
-                    # valid records) must NEVER overwrite a previously
-                    # confirmed (already non-empty) result -- degrade
-                    # instead, preserving the confirmed action. Reproduced
-                    # by the review's own Q2a probe: a confirmed split
-                    # followed by a later per-symbol LOOKUP_AMBIGUOUS used
-                    # to silently turn must_flatten back off.
+                    # Backward-compat path for a source using the OLD
+                    # single-value-per-symbol contract (see
+                    # _normalize_fetch_result): the sentinel must never
+                    # overwrite a previously confirmed (already non-empty)
+                    # result -- degrade instead, preserving the confirmed
+                    # action.
                     self._mark_degraded((symbol,))
                     continue
                 self._results[symbol] = new_value
-                self._degraded.discard(symbol)
+                if symbol in ambiguous:
+                    # HIGH finding (fix round 5): keep the (possibly
+                    # confirmed, possibly empty) records, but flag this
+                    # symbol degraded anyway -- there is residual
+                    # uncertainty about it this fetch even though it also
+                    # has a valid answer.
+                    self._degraded.add(symbol)
+                else:
+                    self._degraded.discard(symbol)
 
     def _mark_degraded(self, symbols):
         """finding 3: only ever ADD to `_degraded` and, for a symbol never
@@ -522,14 +647,16 @@ class AlpacaCorporateActionsSource:
         return [value for key, value in item.items() if key.endswith("symbol") and value]
 
     def fetch(self, symbols, start: date, end: date) -> dict:
-        """Returns `{symbol: [ActionRecord, ...] | LOOKUP_AMBIGUOUS}` for
-        exactly the requested `symbols` (every requested symbol is present:
-        either its resolved list of valid records, possibly empty, or
-        LOOKUP_AMBIGUOUS -- ONLY for a symbol with ZERO valid records of its
-        own in this response; HIGH finding 1, fix round 4: a symbol with at
-        least one valid record NEVER has that record discarded or replaced
-        by ambiguity, regardless of how many other unparseable rows also
-        name it). Raises `CorporateActionLookupError` -- never a raw
+        """Returns `(out, ambiguous_symbols)` -- HIGH finding (fix round 5):
+        `out` is `{symbol: [ActionRecord, ...]}` for exactly the requested
+        `symbols` (every requested symbol present, its own resolved list of
+        valid records, possibly empty) and `ambiguous_symbols` is the
+        INDEPENDENT `set[str]` of requested symbols with at least one
+        unresolved row this response (undated, unmapped-bucket, or
+        symbol-less) -- a symbol can be in both `out` (with real records)
+        and `ambiguous_symbols` (uncertainty about some OTHER row) at once;
+        neither ever silently overwrites the other. Raises
+        `CorporateActionLookupError` -- never a raw
         alpaca-py/HTTP exception -- on any request/transport failure or a
         result at the page/limit cap, so a caller never needs to know
         alpaca-py's own exception types and never silently treats an
@@ -612,7 +739,14 @@ class AlpacaCorporateActionsSource:
                 if total_items >= self._REQUEST_LIMIT:
                     raise CorporateActionLookupError("result_at_page_or_limit_cap")
                 page_token = response.get("next_page_token")
-                if page_token is None:
+                # LOW finding (fix round 5): an empty-string token is not a
+                # continuation -- Alpaca's own envelope uses an ABSENT or
+                # null `next_page_token` to mean "no more pages", but
+                # nothing guarantees it never sends `""` for the same
+                # meaning; treating any falsy token (None or "") as "stop"
+                # avoids sending a bogus `page_token=""` on a request that
+                # should have been the last one.
+                if not page_token:
                     break
             else:
                 # LOW finding 4: exhausted _MAX_PAGES while a continuation
@@ -662,15 +796,26 @@ class AlpacaCorporateActionsSource:
                         out[symbol].append(ActionRecord(
                             symbol=symbol, action_type=canonical_type, action_date=action_date,
                             source_id=str(item.get("cusip") or type_key)))
-            for symbol in ambiguous_symbols:
-                # HIGH finding 1 (fix round 4): never let ambiguity replace
-                # an already-confirmed (non-empty) record list for this
-                # SAME response -- only fall back to the sentinel when the
-                # symbol has NO valid record of its own here.
-                if not out[symbol]:
-                    out[symbol] = LOOKUP_AMBIGUOUS
         except CorporateActionLookupError:
             raise
         except Exception as error:
             raise CorporateActionLookupError(type(error).__name__) from error
-        return out
+        # HIGH finding (fix round 5): records and uncertainty are returned
+        # SEPARATELY -- `out[symbol]` is always that symbol's own valid,
+        # in-window records (possibly empty), NEVER replaced or collapsed
+        # into a sentinel, and `ambiguous_symbols` independently lists every
+        # symbol with at least one unresolved row (undated, unmapped-bucket,
+        # or symbol-less) THIS fetch. The pre-fix design overwrote `out
+        # [symbol]` with the single sentinel `LOOKUP_AMBIGUOUS` whenever the
+        # symbol had zero valid records of its own -- which read as fully
+        # clear the moment a symbol ALSO had any unrelated valid record,
+        # e.g. a benchmark symbol's routine quarterly dividend already dated
+        # somewhere in the window (SPY/QQQ/IWM/DIA virtually always have
+        # one) sitting alongside an unmapped/undated/symbol-less row for
+        # that same symbol. `CorporateActionMonitor.complete_attempt` (via
+        # `_normalize_fetch_result`) now keeps `out[symbol]`'s records AND
+        # separately marks the symbol degraded when it is also in
+        # `ambiguous_symbols` -- a confirmed action still flattens the
+        # guard, and residual uncertainty still raises needs_attention,
+        # simultaneously, rather than one silently hiding the other.
+        return out, ambiguous_symbols

@@ -9,11 +9,12 @@ field mapping was verified against the installed alpaca-py==0.44.0
 package instead).
 """
 from dataclasses import dataclass
-from datetime import date
+from datetime import date, timedelta
 from decimal import Decimal as D
 import importlib.util
 import json
 from pathlib import Path
+import socket
 import sys
 import unittest
 
@@ -23,6 +24,34 @@ sys.path.insert(0, str(SOURCE))
 
 import corporate_actions as CA  # noqa: E402 (path inserted above)
 import sessions  # noqa: E402
+
+# MEDIUM finding (fix round 5): a module-level real-network guard --
+# AlpacaCorporateActionsSourceTests below is supposed to exercise
+# AlpacaCorporateActionsSource entirely against a patched
+# `requests.Session.request`; an independent review's own run found that
+# constructing the source BEFORE the patch context (see the fixed
+# test_exhausting_max_pages_with_a_token_still_present_fails_closed) let
+# ~58 real GETs reach data.alpaca.markets with fake-key strings, and the
+# test still passed on the resulting 401s without ever noticing. This
+# blocks any real (non-loopback) TCP connect attempt for the lifetime of
+# this test module, so a similarly-unpatched real network call fails loudly
+# (OSError) instead of silently "passing" on an HTTP error response.
+_ORIGINAL_SOCKET_CONNECT = socket.socket.connect
+
+
+def _blocked_connect(self, address):
+    host = address[0] if isinstance(address, tuple) else address
+    if self.family in (socket.AF_INET, socket.AF_INET6) and host not in ("127.0.0.1", "::1", "localhost"):
+        raise OSError(f"real network access blocked in this test module (attempted: {address!r})")
+    return _ORIGINAL_SOCKET_CONNECT(self, address)
+
+
+def setUpModule():
+    socket.socket.connect = _blocked_connect
+
+
+def tearDownModule():
+    socket.socket.connect = _ORIGINAL_SOCKET_CONNECT
 
 NATIVE = importlib.util.find_spec("nautilus_trader") is not None
 if NATIVE:
@@ -362,12 +391,12 @@ class CorporateActionMonitorTests(unittest.TestCase):
         # confirmed an action.
         old_generation = 1
         monitor._generation = 2
-        monitor._apply_success({"AAPL"}, {"AAPL": [action("AAPL", "forward_split", TODAY)]}, 1030.0, 2)
+        monitor.complete_attempt({"AAPL"}, 2, 1030.0, {"AAPL": [action("AAPL", "forward_split", TODAY)]})
         confirmed = monitor.evaluate(today=TODAY, next_session_date=NEXT_SESSION, held_symbols={"AAPL"},
                                      candidate_symbols=set(), now=1030.0)["AAPL"]
         self.assertTrue(confirmed.must_flatten)
         # The OLD (generation 1) attempt now finally fails -- must be dropped.
-        monitor._apply_failure({"AAPL"}, old_generation)
+        monitor.fail_attempt({"AAPL"}, old_generation)
         after = monitor.evaluate(today=TODAY, next_session_date=NEXT_SESSION, held_symbols={"AAPL"},
                                  candidate_symbols=set(), now=1030.0)["AAPL"]
         self.assertTrue(after.must_flatten, "a superseded (older-generation) failure must not re-degrade "
@@ -384,13 +413,13 @@ class CorporateActionMonitorTests(unittest.TestCase):
         monitor._last_attempt = 1000.0
         monitor._generation = 1
         abandoned_generation = monitor._generation
-        monitor.refresh_timed_out({"AAPL"})
+        monitor.refresh_timed_out(abandoned_generation, {"AAPL"})
         self.assertTrue(monitor._last_attempt_failed)
         self.assertIn("AAPL", monitor._degraded)
         # The abandoned attempt's thread finally finishes and tries to
         # write a stale success under its OLD (now-superseded) generation.
-        monitor._apply_success({"AAPL"}, {"AAPL": [action("AAPL", "forward_split", TODAY)]},
-                               1000.0, abandoned_generation)
+        monitor.complete_attempt({"AAPL"}, abandoned_generation,
+                               1000.0, {"AAPL": [action("AAPL", "forward_split", TODAY)]})
         after = monitor.evaluate(today=TODAY, next_session_date=NEXT_SESSION, held_symbols={"AAPL"},
                                  candidate_symbols=set(), now=1000.0)["AAPL"]
         self.assertTrue(after.needs_attention, "the abandoned attempt's late write must be dropped, "
@@ -421,6 +450,26 @@ class CorporateActionMonitorTests(unittest.TestCase):
                                             "cancel an already-confirmed action")
         self.assertTrue(after.needs_attention)
 
+    def test_monitor_keeps_confirmed_records_and_flags_attention_from_the_tuple_contract(self):
+        """HIGH finding (fix round 5): exercises the monitor's own handling
+        of the NEW `(records, ambiguous_symbols)` tuple contract a source's
+        `fetch()` may return (AlpacaCorporateActionsSource.fetch() always
+        does) -- a symbol with BOTH a confirmed, in-range record AND
+        residual uncertainty (flagged via the SECOND tuple element) must
+        end up must_flatten=True (the record) AND needs_attention=True (the
+        uncertainty) SIMULTANEOUSLY -- neither one silently cancelling the
+        other, unlike the pre-round-5 single sentinel-or-list contract."""
+        class Src:
+            def fetch(self, symbols, start, end):
+                return ({"NVDA": [action("NVDA", "forward_split", NEXT_SESSION)]}, {"NVDA"})
+
+        monitor = CA.CorporateActionMonitor(Src(), clock=lambda: 1000.0)
+        monitor.refresh({"NVDA"}, start=TODAY, end=NEXT_SESSION, now=1000.0)
+        decision = monitor.evaluate(today=TODAY, next_session_date=NEXT_SESSION, held_symbols={"NVDA"},
+                                    candidate_symbols=set(), now=1000.0)["NVDA"]
+        self.assertTrue(decision.must_flatten, "the confirmed record must still flatten the position")
+        self.assertTrue(decision.needs_attention, "the independent ambiguity flag must still raise attention")
+
     def test_timeout_processed_just_after_a_committed_success_is_ignored(self):
         """NIT finding 9 (fix round 4): reproduces the review's own Q5
         probe -- refresh_timed_out() firing for the CURRENT generation
@@ -431,7 +480,9 @@ class CorporateActionMonitorTests(unittest.TestCase):
         monitor = CA.CorporateActionMonitor(source, clock=lambda: 1000.0)
         monitor.refresh({"AAPL"}, start=TODAY, end=NEXT_SESSION, now=1000.0)
         self.assertFalse(monitor._last_attempt_failed)
-        monitor.refresh_timed_out({"AAPL"})  # wait_for fired just after the thread finished
+        # wait_for fired just after the thread finished, for the same
+        # (already-committed) generation.
+        monitor.refresh_timed_out(monitor._generation, {"AAPL"})
         d = monitor.evaluate(today=TODAY, next_session_date=NEXT_SESSION, held_symbols={"AAPL"},
                              candidate_symbols=set(), now=1001.0)["AAPL"]
         self.assertFalse(d.needs_attention, "a timeout for an already-committed generation must be ignored")
@@ -616,10 +667,11 @@ class AlpacaCorporateActionsSourceTests(unittest.TestCase):
         patcher, _ = self._mock_http({"cash_dividends": [{"symbol": "AAPL", "ex_date": TODAY.isoformat()}]})
         with patcher:
             src = self.source()
-            out = src.fetch(["AAPL"], TODAY, NEXT_SESSION)
+            out, ambiguous = src.fetch(["AAPL"], TODAY, NEXT_SESSION)
         self.assertEqual(len(out["AAPL"]), 1)
         self.assertEqual(out["AAPL"][0].action_type, "cash_dividend")
         self.assertEqual(out["AAPL"][0].action_date, TODAY)
+        self.assertEqual(ambiguous, set())
 
     def test_unmapped_type_key_degrades_only_the_symbols_it_names(self):
         # LOW finding 5 (fix round 4): `reorganizations` is a real,
@@ -635,9 +687,11 @@ class AlpacaCorporateActionsSourceTests(unittest.TestCase):
                                       "cash_dividends": [{"symbol": "MSFT", "ex_date": TODAY.isoformat()}]})
         with patcher:
             src = self.source()
-            out = src.fetch(["AAPL", "MSFT"], TODAY, NEXT_SESSION)
-        self.assertEqual(out["AAPL"], CA.LOOKUP_AMBIGUOUS)
+            out, ambiguous = src.fetch(["AAPL", "MSFT"], TODAY, NEXT_SESSION)
+        self.assertEqual(out["AAPL"], [])
+        self.assertIn("AAPL", ambiguous)
         self.assertEqual(len(out["MSFT"]), 1, "an unmapped bucket must never affect an unrelated symbol")
+        self.assertNotIn("MSFT", ambiguous)
 
     def test_unmapped_type_row_with_no_symbol_degrades_every_requested_symbol(self):
         # MEDIUM finding 2 (fix round 4) applied to an unmapped bucket: a
@@ -646,9 +700,10 @@ class AlpacaCorporateActionsSourceTests(unittest.TestCase):
         patcher, _ = self._mock_http({"reorganizations": [{"ex_date": TODAY.isoformat()}]})
         with patcher:
             src = self.source()
-            out = src.fetch(["AAPL", "MSFT"], TODAY, NEXT_SESSION)
-        self.assertEqual(out["AAPL"], CA.LOOKUP_AMBIGUOUS)
-        self.assertEqual(out["MSFT"], CA.LOOKUP_AMBIGUOUS)
+            out, ambiguous = src.fetch(["AAPL", "MSFT"], TODAY, NEXT_SESSION)
+        self.assertEqual(out["AAPL"], [])
+        self.assertEqual(out["MSFT"], [])
+        self.assertEqual(ambiguous, {"AAPL", "MSFT"})
 
     def test_unmapped_type_with_a_thousand_records_still_fails_closed(self):
         # finding 2 (round 3): 1000 records of an unmapped type used to
@@ -670,23 +725,29 @@ class AlpacaCorporateActionsSourceTests(unittest.TestCase):
         patcher, _ = self._mock_http({"cash_dividends": [{"ex_date": TODAY.isoformat()}]})
         with patcher:
             src = self.source()
-            out = src.fetch(["AAPL"], TODAY, NEXT_SESSION)
-        self.assertEqual(out["AAPL"], CA.LOOKUP_AMBIGUOUS)
+            out, ambiguous = src.fetch(["AAPL"], TODAY, NEXT_SESSION)
+        self.assertEqual(out["AAPL"], [])
+        self.assertIn("AAPL", ambiguous)
 
     def test_ambiguity_never_replaces_a_confirmed_record_in_the_same_response(self):
-        # HIGH finding 1 (fix round 4): the SAME response carries a valid,
-        # in-range AAPL split AND an AAPL cash dividend missing its ex_date
-        # -- the confirmed split must survive, not be discarded/replaced by
-        # LOOKUP_AMBIGUOUS.
+        # HIGH finding 1 (fix round 4, refined round 5): the SAME response
+        # carries a valid, in-range AAPL split AND an AAPL cash dividend
+        # missing its ex_date -- the confirmed split must survive in
+        # `out["AAPL"]` (never discarded/replaced by a sentinel), AND
+        # (fix round 5) the residual uncertainty from the undated dividend
+        # must still be surfaced, independently, via `ambiguous` -- records
+        # and uncertainty are tracked separately, neither silently erasing
+        # the other.
         patcher, _ = self._mock_http({
             "forward_splits": [{"symbol": "AAPL", "ex_date": TODAY.isoformat()}],
             "cash_dividends": [{"symbol": "AAPL"}]})  # no ex_date at all
         with patcher:
             src = self.source()
-            out = src.fetch(["AAPL"], TODAY, NEXT_SESSION)
-        self.assertNotEqual(out["AAPL"], CA.LOOKUP_AMBIGUOUS)
+            out, ambiguous = src.fetch(["AAPL"], TODAY, NEXT_SESSION)
         self.assertEqual(len(out["AAPL"]), 1)
         self.assertEqual(out["AAPL"][0].action_type, "forward_split")
+        self.assertIn("AAPL", ambiguous, "the undated dividend row must still be surfaced as uncertainty, "
+                                          "separately from the confirmed split")
 
     def test_pagination_follows_a_real_continuation_token_across_pages(self):
         # LOW finding 4 (fix round 4): a real (non-null) next_page_token
@@ -698,12 +759,44 @@ class AlpacaCorporateActionsSourceTests(unittest.TestCase):
         patcher, calls = self._mock_http_pages(pages)
         with patcher:
             src = self.source()
-            out = src.fetch(["AAPL"], TODAY, NEXT_SESSION)
+            out, ambiguous = src.fetch(["AAPL"], TODAY, NEXT_SESSION)
         self.assertEqual(len(calls), 2, "both pages must actually be requested")
         self.assertNotIn("page_token", calls[0]["params"])
         self.assertEqual(calls[1]["params"].get("page_token"), "page-2-token",
                          "the second request must carry the first page's own continuation token")
         self.assertEqual(len(out["AAPL"]), 2, "records from both pages must be combined")
+        self.assertEqual(ambiguous, set())
+
+    def test_region_us_sent_on_every_page(self):
+        """LOW finding (fix round 5): `region=us` (and `data_quality=all`)
+        must be sent on EVERY page request, not just the first -- a per-page
+        `page_params = dict(params)` copy is what makes this true; a bug
+        that built `page_params` only once outside the loop, or rebuilt it
+        without the base `params`, would drop these on later pages."""
+        pages = [
+            ({"cash_dividends": []}, "page-2-token"),
+            ({"cash_dividends": []}, None),
+        ]
+        patcher, calls = self._mock_http_pages(pages)
+        with patcher:
+            src = self.source()
+            src.fetch(["AAPL"], TODAY, NEXT_SESSION)
+        self.assertEqual(len(calls), 2)
+        for call in calls:
+            self.assertEqual(call["params"].get("region"), "us")
+            self.assertEqual(call["params"].get("data_quality"), "all")
+
+    def test_empty_string_page_token_is_not_a_continuation(self):
+        """LOW finding (fix round 5): an empty-string `next_page_token`
+        must be treated as "no more pages", exactly like an absent/null
+        token -- not followed as a real continuation."""
+        pages = [({"cash_dividends": [{"symbol": "AAPL", "ex_date": TODAY.isoformat()}]}, "")]
+        patcher, calls = self._mock_http_pages(pages)
+        with patcher:
+            src = self.source()
+            out, ambiguous = src.fetch(["AAPL"], TODAY, NEXT_SESSION)
+        self.assertEqual(len(calls), 1, "an empty-string token must not trigger a second request")
+        self.assertEqual(len(out["AAPL"]), 1)
 
     def test_cap_is_enforced_across_pages_not_just_within_one(self):
         # LOW finding 4 (fix round 4): 600 + 600 items across two pages
@@ -721,12 +814,28 @@ class AlpacaCorporateActionsSourceTests(unittest.TestCase):
     def test_exhausting_max_pages_with_a_token_still_present_fails_closed(self):
         # LOW finding 4 (fix round 4): a still-present continuation token
         # after _MAX_PAGES pages must never be silently truncated.
-        src = self.source()
-        pages = [({"cash_dividends": []}, f"tok-{i}") for i in range(src._MAX_PAGES)]
-        patcher, _ = self._mock_http_pages(pages)
+        #
+        # MEDIUM finding (fix round 5): the source MUST be constructed
+        # INSIDE the patch context -- constructing it beforehand captures
+        # the REAL bound `requests.Session.request` method as this
+        # wrapper's `original_request` (see AlpacaCorporateActionsSource.
+        # __init__'s `_bounded_request` closure), so every one of this
+        # wrapper's own page requests would silently go out over the real
+        # network to data.alpaca.markets with fake-key strings instead of
+        # ever reaching the scripted fixture -- reproduced by an
+        # independent review's own run: ~58 real GETs, all 401s, the test
+        # passing on the resulting exception with the fixture never served
+        # at all. Asserting the exact page count actually served (matching
+        # `_MAX_PAGES`, no more) proves the scripted fixture -- not a real
+        # network response -- is what this test actually exercises.
+        pages = [({"cash_dividends": []}, f"tok-{i}") for i in range(CA.AlpacaCorporateActionsSource._MAX_PAGES)]
+        patcher, calls = self._mock_http_pages(pages)
         with patcher:
+            src = self.source()
             with self.assertRaises(CA.CorporateActionLookupError):
                 src.fetch(["AAPL"], TODAY, NEXT_SESSION)
+        self.assertEqual(len(calls), CA.AlpacaCorporateActionsSource._MAX_PAGES,
+                         "must serve exactly _MAX_PAGES scripted pages -- not fall through to a real request")
 
     def test_unit_split_alternate_symbol_is_mapped(self):
         body = {"unit_splits": [{"old_symbol": "OLD", "new_symbol": "NEW", "alternate_symbol": "ALT",
@@ -734,24 +843,72 @@ class AlpacaCorporateActionsSourceTests(unittest.TestCase):
         patcher, _ = self._mock_http(body)
         with patcher:
             src = self.source()
-            out = src.fetch(["OLD", "NEW", "ALT"], TODAY, NEXT_SESSION)
+            out, ambiguous = src.fetch(["OLD", "NEW", "ALT"], TODAY, NEXT_SESSION)
         for symbol in ("OLD", "NEW", "ALT"):
             self.assertEqual(len(out[symbol]), 1, f"{symbol} must be mapped from a unit_split")
+        self.assertEqual(ambiguous, set())
 
     def test_record_missing_governing_date_is_ambiguous_for_its_own_symbol_only(self):
         """HIGH finding 3 (fix round 3): a record missing (or carrying an
         unparseable) governing date -- e.g. an incomplete record surfaced
         by data_quality=all -- must mark ONLY the symbol(s) that record
-        names as LOOKUP_AMBIGUOUS, never fail the whole fetch, and never
-        affect an unrelated symbol's own clean result."""
+        names as ambiguous, never fail the whole fetch, and never affect an
+        unrelated symbol's own clean result."""
         body = {"cash_dividends": [{"symbol": "AAPL"},  # no ex_date at all
                                    {"symbol": "MSFT", "ex_date": TODAY.isoformat()}]}
         patcher, _ = self._mock_http(body)
         with patcher:
             src = self.source()
-            out = src.fetch(["AAPL", "MSFT"], TODAY, NEXT_SESSION)
-        self.assertEqual(out["AAPL"], CA.LOOKUP_AMBIGUOUS)
+            out, ambiguous = src.fetch(["AAPL", "MSFT"], TODAY, NEXT_SESSION)
+        self.assertEqual(out["AAPL"], [])
+        self.assertIn("AAPL", ambiguous)
         self.assertEqual(len(out["MSFT"]), 1)
+        self.assertNotIn("MSFT", ambiguous)
+
+    def test_confirmed_split_plus_historical_action_plus_undated_dividend_stays_uncertain(self):
+        """MEDIUM (Claude/Codex round-5 review, scenario a): a confirmed
+        upcoming split, a historical (out-of-window) action, and an undated
+        dividend for the SAME symbol -- must read as BOTH confirmed
+        (records include the split) AND uncertain (the undated dividend
+        still raises `ambiguous`), never fully clear."""
+        body = {"forward_splits": [{"symbol": "NVDA", "ex_date": NEXT_SESSION.isoformat()}],
+                "cash_mergers": [{"acquirer_symbol": "NVDA", "acquiree_symbol": "X",
+                                  "effective_date": (TODAY - timedelta(days=400)).isoformat()}],
+                "cash_dividends": [{"symbol": "NVDA"}]}  # undated
+        patcher, _ = self._mock_http(body)
+        with patcher:
+            src = self.source()
+            out, ambiguous = src.fetch(["NVDA"], TODAY, NEXT_SESSION)
+        self.assertTrue(any(r.action_type == "forward_split" for r in out["NVDA"]))
+        self.assertIn("NVDA", ambiguous)
+
+    def test_dated_dividend_plus_unmapped_reorganization_tomorrow_stays_uncertain(self):
+        """MEDIUM (Claude/Codex round-5 review, scenario b): SPY has a
+        dated dividend far in the window AND an unmapped `reorganizations`
+        row effective tomorrow -- must not read fully clear."""
+        body = {"cash_dividends": [{"symbol": "SPY", "ex_date": NEXT_SESSION.isoformat()}],
+                "reorganizations": [{"symbol": "SPY", "effective_date": (TODAY + timedelta(days=1)).isoformat()}]}
+        patcher, _ = self._mock_http(body)
+        with patcher:
+            src = self.source()
+            out, ambiguous = src.fetch(["SPY"], TODAY, NEXT_SESSION)
+        self.assertEqual(len(out["SPY"]), 1)
+        self.assertIn("SPY", ambiguous)
+
+    def test_capital_gains_row_tomorrow_plus_far_future_dividend_stays_uncertain(self):
+        """MEDIUM (Claude/Codex round-5 review, scenario c): QQQ has an
+        unmapped `capital_gains_distributions` row effective tomorrow
+        alongside a far-future dated dividend -- must not read fully
+        clear."""
+        body = {"cash_dividends": [{"symbol": "QQQ", "ex_date": (TODAY + timedelta(days=95)).isoformat()}],
+                "capital_gains_distributions": [{"symbol": "QQQ",
+                                                 "ex_date": (TODAY + timedelta(days=1)).isoformat()}]}
+        patcher, _ = self._mock_http(body)
+        with patcher:
+            src = self.source()
+            out, ambiguous = src.fetch(["QQQ"], TODAY, NEXT_SESSION)
+        self.assertEqual(len(out["QQQ"]), 1)
+        self.assertIn("QQQ", ambiguous)
 
 
 @unittest.skipUnless(NATIVE, "requires pinned Nautilus 2.0.0rc5 runtime")

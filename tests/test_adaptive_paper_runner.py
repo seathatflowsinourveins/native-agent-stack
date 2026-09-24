@@ -2952,6 +2952,160 @@ class CorporateActionGuardRunnerWiringTests(unittest.TestCase):
         self.assertIn("AAPL", outcome["corporate_action_guard"]["pending_must_flatten"])
 
     @unittest.skipUnless(NATIVE, "requires pinned combined native runtime")
+    def test_run_native_shutdown_cleanup_hook_fires_before_return(self):
+        """MEDIUM finding (fix round 5, Codex 4a): the shutdown test above
+        (and the pre-existing G6 test) only asserted the END STATE after
+        `asyncio.run()` already returned -- which `asyncio.run()`'s own
+        `Runner.close()` guarantees regardless of run_native's OWN explicit
+        cleanup call (it cancels every outstanding Task itself). This
+        proves run_native's `finally` block ACTUALLY calls
+        `_shutdown_corporate_action_tasks` itself, by patching that exact
+        module-level function with a recording wrapper and confirming it
+        was invoked -- `asyncio.run()`'s own internal `_cancel_all_tasks()`
+        never calls this named Python function at all, so only run_native's
+        own explicit call site can make this hook fire."""
+        import runner as runner_module
+        from simulation import SimulatedPort
+        config, _, _ = load_config(SOURCE / "config.json")
+        config.update(duration_seconds=1, cleanup_seconds=1, order_timeout_seconds=1)
+        config["sessions"] = {"extended_hours": True, "overnight_holds": True,
+                              "overnight_gross_multiple": "1.0"}
+        config["regular_session_only"] = False
+        config["extended_hours_enabled"] = True
+
+        class QuickGuard:
+            def refresh(self, symbols, *, start, end, now):
+                pass
+
+            def evaluate(self, *, today, next_session_date, held_symbols, candidate_symbols, now):
+                return {}
+
+        config["_corporate_action_guard"] = QuickGuard()
+        calls = []
+        original = runner_module._shutdown_corporate_action_tasks
+
+        async def recording_shutdown(ca_refresh_state):
+            calls.append(1)
+            return await original(ca_refresh_state)
+
+        with tempfile.TemporaryDirectory() as root:
+            ledger = Ledger(Path(root) / "journal.db", RiskLimits(trial_seconds=1, cleanup_seconds=1))
+            ledger.start_trial(time.time())
+            controller = Controller(ledger, time.time() + 3600, market_open=True)
+            policy = PolicyConfig(symbols=("SPY", "QQQ", "IWM", "DIA"), max_positions=4, warmup_samples=4,
+                                  warmup_seconds=.06, sample_seconds=.02, rebalance_seconds=.02,
+                                  min_hold_seconds=.05, max_hold_seconds=.4, cooldown_seconds=.05)
+            port = SimulatedPort(controller, policy.symbols, price=lambda symbol, tick: Decimal("100"))
+            controller.port = port
+            with patch.object(runner_module, "_shutdown_corporate_action_tasks", recording_shutdown):
+                asyncio.run(run_native(controller, policy, [{"symbol": s} for s in policy.symbols],
+                                       "fixture", config, "100000"))
+            ledger.close()
+        self.assertGreaterEqual(len(calls), 1,
+                                "run_native's own finally block must call _shutdown_corporate_action_tasks "
+                                "directly, not merely rely on asyncio.run()'s own task cancellation")
+
+    @unittest.skipUnless(NATIVE, "requires pinned combined native runtime")
+    def test_run_native_refuses_the_hold_when_a_refresh_degrades_after_the_final_rebalance(self):
+        """HIGH finding (fix round 5, Codex 4b): the existing hold/summary
+        tests pass even when run_native's summary is (in memory) reverted
+        to the strategy's own stale per-tick snapshot, because they either
+        call `_final_corporate_action_guard_summary` directly (a unit test
+        of the seam, not of run_native's actual wiring) or use a guard whose
+        `evaluate()` answer never actually changes after the last tick.
+        This drives the REAL `run_native` tick loop with a guard whose
+        `evaluate()` answer flips from clear to `needs_attention` at a wall-
+        clock threshold set to land AFTER the trial's own rebalancing has
+        stopped (during cleanup/shutdown) -- reproducing "a refresh that
+        completes/fails after the final rebalance tick" -- and asserts the
+        REAL returned `outcome` both reports the held symbol under
+        `pending_needs_attention_held` and REFUSES to report
+        `held_overnight`."""
+        import corporate_actions as CA
+        from simulation import SimulatedPort
+        config, _, _ = load_config(SOURCE / "config.json")
+        config.update(duration_seconds=1, cleanup_seconds=2, order_timeout_seconds=1)
+        config["sessions"] = {"extended_hours": True, "overnight_holds": True,
+                              "overnight_gross_multiple": "1.0"}
+        config["regular_session_only"] = False
+        config["extended_hours_enabled"] = True
+
+        class LateDegradingGuard:
+            """Clear for every evaluate() call up through the end of the
+            configured trial duration; any call after that (i.e., during
+            cleanup/shutdown, or the outcome's own final recompute) reports
+            needs_attention for AAPL instead -- simulating a background
+            refresh that only degrades the cached result AFTER the last
+            rebalance tick already ran."""
+            def __init__(self, start_time, duration_seconds):
+                self.start_time = start_time
+                self.duration_seconds = duration_seconds
+
+            def refresh(self, symbols, *, start, end, now):
+                pass
+
+            def evaluate(self, *, today, next_session_date, held_symbols, candidate_symbols, now):
+                if "AAPL" not in held_symbols:
+                    return {}
+                import time as time_module
+                if time_module.time() < self.start_time + self.duration_seconds:
+                    return {"AAPL": CA.GuardDecision(symbol="AAPL", block_entry=False, must_flatten=False,
+                                                     needs_attention=False, reason=None)}
+                return {"AAPL": CA.GuardDecision(symbol="AAPL", block_entry=True, must_flatten=False,
+                                                 needs_attention=True,
+                                                 reason="corporate_action_lookup_failed")}
+
+        started_at = time.time()
+        config["_corporate_action_guard"] = LateDegradingGuard(started_at, config["duration_seconds"])
+        with tempfile.TemporaryDirectory() as root:
+            ledger = Ledger(Path(root) / "journal.db", RiskLimits(trial_seconds=1, cleanup_seconds=2))
+            ledger.start_trial(time.time())
+            controller = Controller(ledger, time.time() + 3600, market_open=True)
+            policy = PolicyConfig(symbols=("SPY", "QQQ", "IWM", "DIA", "AAPL"), max_positions=5, warmup_samples=4,
+                                  warmup_seconds=.06, sample_seconds=.02, rebalance_seconds=.02,
+                                  min_hold_seconds=.05, max_hold_seconds=.4, cooldown_seconds=.05)
+
+            def price(symbol, tick):
+                slope = Decimal(".03") if symbol in policy.benchmarks else Decimal(".10")
+                return Decimal("100") + min(tick, 70) * slope
+
+            port = SimulatedPort(controller, policy.symbols, price=price)
+            original_submit = port.submit
+
+            async def submit_buys_only(payload):
+                # Keep AAPL genuinely held through to the outcome (a sell
+                # here rests, never fills) -- an ordinary rebalance-driven
+                # sell (min_hold/max_hold/cooldown are all short) would
+                # otherwise flatten AAPL well before the trial ends,
+                # regardless of this guard, so held_symbols_now at outcome
+                # time would already be empty for reasons unrelated to what
+                # this test is proving.
+                if payload.get("side") == "sell":
+                    import inspect as inspect_module
+                    import time as time_module
+                    controller.before_submit(payload)
+                    await controller.before_request("submit", client_id=payload["client_order_id"])
+                    order = dict(payload, id=f"sim-resting-{payload['client_order_id']}", status="new",
+                                filled_qty="0", filled_avg_price="0", updated_at_ns=time_module.time_ns())
+                    port.orders[payload["client_order_id"]] = order
+                    controller.observe(order)
+                    result = port.on_order(dict(order))
+                    if inspect_module.isawaitable(result):
+                        await result
+                    return dict(order)
+                return await original_submit(payload)
+
+            port.submit = submit_buys_only
+            controller.port = port
+            outcome = asyncio.run(run_native(controller, policy, [{"symbol": s} for s in policy.symbols],
+                                             "fixture", config, "100000"))
+            ledger.close()
+        self.assertIn("AAPL", outcome["corporate_action_guard"]["pending_needs_attention_held"],
+                      "the REAL outcome must reflect the guard's post-rebalance degraded state")
+        self.assertNotEqual(outcome["status"], "held_overnight",
+                            "a run with a pending needs_attention symbol must never report held_overnight")
+
+    @unittest.skipUnless(NATIVE, "requires pinned combined native runtime")
     def test_final_summary_uses_the_guards_current_state_not_a_stale_strategy_snapshot(self):
         """MEDIUM finding 3 (fix round 4): reproduces the independent
         review's own probe scenario directly against
@@ -2990,6 +3144,33 @@ class CorporateActionGuardRunnerWiringTests(unittest.TestCase):
                       "the recomputed summary must reflect the guard's CURRENT state, not the "
                       "strategy's stale (empty) _ca_ever_flagged snapshot")
         self.assertIn("AAPL", summary["ever_flagged_symbols"])
+
+    def test_final_summary_fails_closed_when_the_calendar_itself_cannot_classify_now(self):
+        """finding 6 (round 3)/H11 (fix round 5): when `session_at(now)`
+        itself raises ValueError (the instant falls outside the frozen
+        session calendar), the final summary must fail CLOSED -- every held
+        symbol reported under `pending_needs_attention_held` -- never
+        silently "clear" just because the calendar failed to classify this
+        instant. A calendar failure is itself a reason for attention, not
+        evidence of safety."""
+        import runner as runner_module
+
+        class UnusedGuard:
+            def evaluate(self, *, today, next_session_date, held_symbols, candidate_symbols, now):
+                raise AssertionError("evaluate() must never be reached once the calendar itself fails")
+
+        class Strategy:
+            def __init__(self, guard):
+                self.corporate_action_guard = guard
+                self._ca_ever_flagged = set()
+
+        # Far outside the frozen session calendar's supported year range.
+        out_of_range_now = datetime(2099, 1, 1, tzinfo=timezone.utc).timestamp()
+        summary = runner_module._final_corporate_action_guard_summary(
+            Strategy(UnusedGuard()), {"AAPL"}, out_of_range_now)
+        self.assertEqual(summary["pending_needs_attention_held"], ["AAPL"],
+                         "a calendar failure must fail closed for every held symbol, not report clear")
+        self.assertEqual(summary["pending_must_flatten"], [])
 
     def test_final_summary_is_clear_when_the_guard_is_actually_clear(self):
         """The mirror case: a guard reporting a genuinely clear state for
@@ -3141,6 +3322,239 @@ class CorporateActionGuardRunnerWiringTests(unittest.TestCase):
         self.assertTrue(decisions_after_a["NVDA"].must_flatten,
                         "A's late, superseded write must NOT cancel B's already-applied confirmed action")
 
+    def test_scheduler_calls_begin_attempt_before_launching_the_worker_thread(self):
+        """HIGH finding (fix round 5): `_schedule_corporate_action_refresh`
+        itself -- not merely the monitor's own primitives -- must call
+        `guard.begin_attempt(...)` on the calling coroutine BEFORE
+        `threading.Thread(...).start()` is ever reached, for any guard that
+        exposes the two-phase API. Proven directly by recording the ORDER
+        `begin_attempt` and the worker's own `run_attempt` are invoked in a
+        shared list from a fake two-phase guard -- `begin_attempt` must
+        appear first, and (since it happens on the calling coroutine, not
+        the worker thread) it must have already run by the time this
+        function RETURNS the created task, before that task's own worker
+        thread has necessarily done any work at all."""
+        import asyncio
+        from datetime import date
+        import runner as runner_module
+
+        order = []
+
+        class TwoPhaseGuard:
+            def begin_attempt(self, symbols, *, start, end, now):
+                order.append("begin_attempt")
+                return 1
+
+            def run_attempt(self, symbols, generation, *, start, end, now):
+                order.append("run_attempt")
+
+            def refresh_timed_out(self, generation, symbols):
+                order.append("refresh_timed_out")
+
+            def invalidate_attempt(self, generation):
+                order.append("invalidate_attempt")
+
+        async def scenario():
+            state = {"in_flight": False}
+            task = await runner_module._schedule_corporate_action_refresh(
+                TwoPhaseGuard(), {"AAPL"}, date(2026, 9, 17), date(2026, 12, 24), 1000.0, state)
+            # begin_attempt must ALREADY have happened -- it runs
+            # synchronously on this calling coroutine before the task
+            # (whose own worker thread does the rest) is even created.
+            self.assertEqual(order, ["begin_attempt"],
+                             "begin_attempt must run before the worker thread is launched, "
+                             "not lazily inside the worker itself")
+            await task
+            self.assertEqual(order, ["begin_attempt", "run_attempt"])
+
+        asyncio.run(scenario())
+
+    def test_begin_attempt_generation_survives_a_shutdown_before_the_worker_even_runs(self):
+        """HIGH finding (fix round 5): reproduces an independent review's
+        own probe (R1's synchronized scenario) directly against the
+        two-phase API -- the generation for an attempt must be allocated
+        (via begin_attempt) and invalidated (via invalidate_attempt) BEFORE
+        the actual fetch ever runs, and that invalidation must still work
+        even though the fetch itself never observed it (Python cannot
+        forcibly kill a thread). Simulates a worker thread launched, then
+        delayed by the OS before it starts running -- a shutdown-time
+        cancellation fires and invalidates the pre-allocated generation --
+        and only THEN does the delayed worker finally run and try to write
+        a confirmed action; that write must be dropped as superseded."""
+        from datetime import date
+        import corporate_actions as CA
+
+        class Src:
+            def fetch(self, symbols, start, end):
+                return {s: [CA.ActionRecord(symbol=s, action_type="forward_split",
+                                            action_date=date(2026, 9, 25))] for s in symbols}
+
+        monitor = CA.CorporateActionMonitor(Src(), clock=lambda: 1000.0)
+        generation = monitor.begin_attempt({"NVDA"}, start=date(2026, 9, 17), end=date(2026, 12, 24), now=1000.0)
+        self.assertIsNotNone(generation)
+        # Shutdown fires HERE -- before the worker thread (which has not
+        # even started running `fetch()` yet, simulating an OS-scheduling
+        # delay after Thread.start() was already called) has done any work.
+        monitor.invalidate_attempt(generation)
+        # The delayed worker now finally runs and tries to commit its
+        # (stale, since-invalidated) result.
+        monitor.run_attempt({"NVDA"}, generation, start=date(2026, 9, 17), end=date(2026, 12, 24), now=1000.5)
+        decisions = monitor.evaluate(today=date(2026, 9, 24), next_session_date=date(2026, 9, 25),
+                                     held_symbols={"NVDA"}, candidate_symbols=set(), now=1000.5)
+        self.assertFalse(decisions["NVDA"].must_flatten,
+                         "an attempt invalidated before it ever ran must never commit its late write")
+
+    def test_cancellation_of_a_routine_refresh_does_not_degrade_a_clean_cached_result(self):
+        """LOW finding (fix round 5, Claude's review): cancellation (an
+        ordinary shutdown interrupting an otherwise routine, still-in-
+        flight refresh) must NOT force the cached result to needs_attention
+        -- only a genuine timeout should. A perfectly clean, still-fresh
+        cached result must stand after a cancellation, unlike after a
+        `refresh_timed_out`."""
+        from datetime import date
+        import corporate_actions as CA
+
+        class Src:
+            def fetch(self, symbols, start, end):
+                return {s: [] for s in symbols}
+
+        monitor = CA.CorporateActionMonitor(Src(), clock=lambda: 1000.0)
+        # A clean, confirmed-clear, fresh result is already cached.
+        monitor.refresh({"SPY"}, start=date(2026, 9, 17), end=date(2026, 12, 24), now=1000.0)
+        clean = monitor.evaluate(today=date(2026, 9, 24), next_session_date=date(2026, 9, 25),
+                                 held_symbols={"SPY"}, candidate_symbols=set(), now=1000.0)
+        self.assertFalse(clean["SPY"].needs_attention)
+        # A routine periodic refresh is now in flight (generation
+        # allocated) when shutdown cancels it.
+        generation = monitor.begin_attempt({"SPY"}, start=date(2026, 9, 17), end=date(2026, 12, 24), now=1900.0)
+        monitor.invalidate_attempt(generation)
+        after_cancel = monitor.evaluate(today=date(2026, 9, 24), next_session_date=date(2026, 9, 25),
+                                        held_symbols={"SPY"}, candidate_symbols=set(), now=1900.0)
+        self.assertFalse(after_cancel["SPY"].needs_attention,
+                         "cancelling a routine in-flight refresh must not degrade an already-clean result")
+        # Contrast: a genuine TIMEOUT for the same kind of attempt DOES degrade.
+        generation2 = monitor.begin_attempt({"SPY"}, start=date(2026, 9, 17), end=date(2026, 12, 24), now=2800.0)
+        monitor.refresh_timed_out(generation2, {"SPY"})
+        after_timeout = monitor.evaluate(today=date(2026, 9, 24), next_session_date=date(2026, 9, 25),
+                                         held_symbols={"SPY"}, candidate_symbols=set(), now=2800.0)
+        self.assertTrue(after_timeout["SPY"].needs_attention,
+                        "a genuine timeout, unlike a cancellation, must degrade")
+
+    def test_scheduled_refresh_cancellation_invalidates_not_degrades_with_the_real_monitor(self):
+        """HIGH/LOW finding (fix round 5): end-to-end through
+        `_schedule_corporate_action_refresh` and `_shutdown_corporate_
+        action_tasks` with the REAL `CorporateActionMonitor` -- a routine
+        refresh still in flight when shutdown cancels it must leave an
+        already-clean cached result clean (not needs_attention), while a
+        delayed worker's late write (released only after shutdown) must
+        still be dropped as superseded."""
+        import asyncio
+        import threading
+        from datetime import date
+        import corporate_actions as CA
+        import runner as runner_module
+
+        release = threading.Event()
+
+        class Src:
+            def __init__(self):
+                self.calls = 0
+
+            def fetch(self, symbols, start, end):
+                self.calls += 1
+                if self.calls > 1:
+                    release.wait(3)  # the routine periodic refresh is still in flight at shutdown
+                return {s: [] for s in symbols}
+
+        async def scenario():
+            monitor = CA.CorporateActionMonitor(Src(), clock=lambda: 1000.0)
+            monitor.refresh({"SPY"}, start=date(2026, 9, 17), end=date(2026, 12, 24), now=1000.0)
+            state = {"in_flight": False}
+            await runner_module._schedule_corporate_action_refresh(
+                monitor, {"SPY"}, date(2026, 9, 17), date(2026, 12, 24), 1900.0, state)
+            await asyncio.sleep(0.1)  # let the worker actually enter fetch() and block on `release`
+            await runner_module._shutdown_corporate_action_tasks(state)
+            decisions = monitor.evaluate(today=date(2026, 9, 24), next_session_date=date(2026, 9, 25),
+                                         held_symbols={"SPY"}, candidate_symbols=set(), now=1900.0)
+            self.assertFalse(decisions["SPY"].needs_attention,
+                             "cancelling a routine in-flight refresh at shutdown must not force needs_attention")
+            release.set()  # let the delayed worker finally finish, after shutdown
+
+        asyncio.run(scenario())
+
+    def test_in_flight_is_reset_even_if_starting_the_worker_thread_itself_raises(self):
+        """LOW finding (fix round 5): `Thread.start()` must sit INSIDE the
+        try/finally that resets `state["in_flight"]` -- if starting the
+        thread itself ever raised (e.g. a resource-exhaustion OSError), the
+        old placement (outside the try) would leave `in_flight` stuck True
+        forever, permanently locking out every future refresh attempt."""
+        import asyncio
+        import threading
+        from datetime import date
+        import runner as runner_module
+
+        class ExplodingThread:
+            def __init__(self, *args, **kwargs):
+                pass
+
+            def start(self):
+                raise RuntimeError("simulated resource exhaustion starting the worker thread")
+
+        class QuickGuard:
+            def refresh(self, symbols, *, start, end, now):
+                pass
+
+        async def scenario():
+            state = {"in_flight": False}
+            with patch.object(threading, "Thread", ExplodingThread):
+                task = await runner_module._schedule_corporate_action_refresh(
+                    QuickGuard(), {"AAPL"}, date(2026, 9, 17), date(2026, 12, 24), 1000.0, state)
+                # The patch must still be active when the created task
+                # actually RUNS -- asyncio.create_task only SCHEDULES the
+                # coroutine; it does not execute until the next loop
+                # iteration.
+                await asyncio.sleep(0)
+            with self.assertRaises(RuntimeError):
+                await task
+            self.assertFalse(state["in_flight"], "in_flight must be reset even when Thread.start() itself raises")
+
+        asyncio.run(scenario())
+
+    def test_worker_thread_is_a_daemon(self):
+        """LOW finding (fix round 5): the worker thread that runs the
+        blocking fetch must be a DAEMON thread -- not provable by the
+        exit-timing test alone (a slow-but-not-infinite hang could still
+        happen to let the process exit in time even on a non-daemon
+        thread, or vice versa be flaky under load) -- capture the actual
+        `threading.Thread` object via a patched constructor and assert
+        `daemon=True` was passed directly."""
+        import asyncio
+        import threading
+        from datetime import date
+        import runner as runner_module
+
+        captured = {}
+        original_thread = threading.Thread
+
+        def capturing_thread(*args, **kwargs):
+            t = original_thread(*args, **kwargs)
+            captured["daemon"] = kwargs.get("daemon")
+            return t
+
+        class QuickGuard:
+            def refresh(self, symbols, *, start, end, now):
+                pass
+
+        async def scenario():
+            state = {"in_flight": False}
+            with patch.object(threading, "Thread", capturing_thread):
+                task = await runner_module._schedule_corporate_action_refresh(
+                    QuickGuard(), {"AAPL"}, date(2026, 9, 17), date(2026, 12, 24), 1000.0, state)
+                await task
+
+        asyncio.run(scenario())
+        self.assertTrue(captured.get("daemon"), "the refresh worker thread must be created with daemon=True")
+
     def test_shutdown_cancels_and_joins_pending_corporate_action_tasks(self):
         """HIGH finding 1 (fix round 3, 'keep the task and join or cancel it
         at shutdown'): directly exercises the extracted
@@ -3173,6 +3587,160 @@ class CorporateActionGuardRunnerWiringTests(unittest.TestCase):
             await runner_module._shutdown_corporate_action_tasks({"in_flight": False, "tasks": []})
 
         asyncio.run(scenario())
+
+    @unittest.skipUnless(NATIVE, "requires pinned combined native runtime")
+    def test_shutdown_cleanup_still_runs_when_port_stop_raises(self):
+        """LOW finding 7 (fix round 4)/H13 (fix round 5): `_shutdown_
+        corporate_action_tasks` must still run, and actually cancel a
+        still-hanging refresh task, even when `port.stop()` itself raises
+        -- the nested `finally` around it, not merely the outer one, is
+        what guarantees this. Patches `port.stop` to raise after
+        construction, so run_native's own exception path (not a happy
+        path) is what this test drives."""
+        from simulation import SimulatedPort
+        config, _, _ = load_config(SOURCE / "config.json")
+        config.update(duration_seconds=1, cleanup_seconds=1, order_timeout_seconds=1)
+        config["sessions"] = {"extended_hours": True, "overnight_holds": True,
+                              "overnight_gross_multiple": "1.0"}
+        config["regular_session_only"] = False
+        config["extended_hours_enabled"] = True
+
+        class HangingGuard:
+            def refresh(self, symbols, *, start, end, now):
+                import time as time_module
+                time_module.sleep(30)  # outlives the trial + cleanup + shutdown entirely
+
+            def evaluate(self, *, today, next_session_date, held_symbols, candidate_symbols, now):
+                return {}
+
+        config["_corporate_action_guard"] = HangingGuard()
+        ca_refresh_state = {"in_flight": False}
+        # MEDIUM finding (fix round 5): asyncio.run()'s own Runner.close()
+        # cancels every outstanding Task regardless of run_native's OWN
+        # explicit cleanup call (the same redundancy documented for G6) --
+        # so merely checking the end state of ca_refresh_state["tasks"]
+        # after asyncio.run() returns cannot distinguish "run_native's own
+        # nested finally called _shutdown_corporate_action_tasks despite
+        # port.stop() raising" from "asyncio.run()'s unrelated auto-cancel
+        # produced the same end state anyway". A recording wrapper around
+        # the exact named function proves the EXPLICIT call site fired.
+        calls = []
+        original_shutdown = runner_module._shutdown_corporate_action_tasks
+
+        async def recording_shutdown(state):
+            calls.append(1)
+            return await original_shutdown(state)
+
+        with tempfile.TemporaryDirectory() as root:
+            ledger = Ledger(Path(root) / "journal.db", RiskLimits(trial_seconds=1, cleanup_seconds=1))
+            ledger.start_trial(time.time())
+            controller = Controller(ledger, time.time() + 3600, market_open=True)
+            policy = PolicyConfig(symbols=("SPY", "QQQ", "IWM", "DIA"), max_positions=4, warmup_samples=4,
+                                  warmup_seconds=.06, sample_seconds=.02, rebalance_seconds=.02,
+                                  min_hold_seconds=.05, max_hold_seconds=.4, cooldown_seconds=.05)
+            port = SimulatedPort(controller, policy.symbols, price=lambda symbol, tick: Decimal("100"))
+
+            async def raising_stop():
+                raise RuntimeError("port.stop() itself fails")
+
+            port.stop = raising_stop
+            controller.port = port
+            with patch.object(runner_module, "_shutdown_corporate_action_tasks", recording_shutdown):
+                with self.assertRaises(RuntimeError):
+                    asyncio.run(run_native(controller, policy, [{"symbol": s} for s in policy.symbols],
+                                           "fixture", config, "100000", ca_refresh_state=ca_refresh_state))
+            ledger.close()
+        self.assertGreaterEqual(len(calls), 1,
+                                "the nested finally must call _shutdown_corporate_action_tasks directly "
+                                "even when port.stop() itself raises, not rely on asyncio.run()'s own "
+                                "unrelated task-cancellation cleanup")
+        pending = [t for t in ca_refresh_state.get("tasks", []) if not t.done()]
+        self.assertEqual(pending, [], "the refresh task must still be cancelled even though port.stop() raised")
+        self.assertTrue(any(t.cancelled() for t in ca_refresh_state.get("tasks", [])),
+                        "at least one task must have been genuinely cancelled despite the port.stop() error")
+
+    def test_resolve_does_not_crash_when_the_future_is_already_cancelled(self):
+        """H14 (fix round 5): `asyncio.wait_for` cancels the future it is
+        waiting on when its OWN caller is cancelled (here, shutdown
+        cancelling the task while the worker thread is still blocked in
+        `fetch()`) -- the worker's own late `_resolve()` callback (run via
+        `loop.call_soon_threadsafe` once `fetch()` finally returns, well
+        after that cancellation) must check `fut.done()` before calling
+        `set_result` on it, or it raises `InvalidStateError` inside that
+        scheduled callback, which the loop's own exception handler would
+        otherwise have to swallow."""
+        import threading
+        from datetime import date
+        import corporate_actions as CA
+        import runner as runner_module
+
+        release = threading.Event()
+        loop_exceptions = []
+
+        class Src:
+            def fetch(self, symbols, start, end):
+                release.wait(3)  # still running when shutdown cancels the waiting task
+                return {s: [] for s in symbols}
+
+        async def scenario():
+            loop = asyncio.get_running_loop()
+            loop.set_exception_handler(lambda loop, context: loop_exceptions.append(context))
+            monitor = CA.CorporateActionMonitor(Src(), clock=lambda: 1000.0)
+            state = {"in_flight": False}
+            await runner_module._schedule_corporate_action_refresh(
+                monitor, {"AAPL"}, date(2026, 9, 17), date(2026, 12, 24), 1000.0, state)
+            await asyncio.sleep(0.05)  # let the worker actually start and block on `release`
+            await runner_module._shutdown_corporate_action_tasks(state)  # cancels the still-waiting task
+            release.set()  # let the worker's fetch() finally return, well after cancellation
+            await asyncio.sleep(0.2)  # give _resolve()'s call_soon_threadsafe callback a chance to run
+
+        asyncio.run(scenario())
+        self.assertEqual(loop_exceptions, [], "the worker's late _resolve() must not raise on an "
+                                              "already-cancelled future")
+
+    @unittest.skipUnless(NATIVE, "requires pinned combined native runtime")
+    def test_worker_swallows_runtimeerror_when_the_loop_is_already_closed(self):
+        """LOW finding 5 (fix round 4)/H15 (fix round 5): once asyncio.run()
+        closes the loop, a still-running worker thread's own `loop.
+        call_soon_threadsafe` back to that now-closed loop raises
+        RuntimeError -- the worker must swallow exactly that (the late
+        result is simply dropped), never crash its own daemon thread with
+        an unhandled exception."""
+        import threading
+        import time as time_module
+        from datetime import date
+
+        release = threading.Event()
+        excepthook_calls = []
+        original_hook = threading.excepthook
+
+        def recording_hook(args):
+            excepthook_calls.append(args)
+
+        class HangingGuard:
+            def refresh(self, symbols, *, start, end, now):
+                release.wait(5)  # still running well after asyncio.run() itself returns
+
+        async def scenario():
+            state = {"in_flight": False}
+            original_timeout = runner_module.CORPORATE_ACTION_REFRESH_TIMEOUT_SECONDS
+            runner_module.CORPORATE_ACTION_REFRESH_TIMEOUT_SECONDS = 0.05
+            try:
+                await runner_module._schedule_corporate_action_refresh(
+                    HangingGuard(), {"AAPL"}, date(2026, 9, 17), date(2026, 12, 24), 1000.0, state)
+                await asyncio.sleep(0.1)  # let the timeout fire; the worker itself is still running
+            finally:
+                runner_module.CORPORATE_ACTION_REFRESH_TIMEOUT_SECONDS = original_timeout
+
+        threading.excepthook = recording_hook
+        try:
+            asyncio.run(scenario())  # returns/closes its own loop while the worker is still hanging
+            release.set()  # let the worker finish now that the loop is already closed
+            time_module.sleep(0.3)  # give the worker's own finally a moment to run against the closed loop
+        finally:
+            threading.excepthook = original_hook
+        self.assertEqual(excepthook_calls, [], "the worker must swallow RuntimeError from a closed loop, "
+                                              "not crash its own daemon thread")
 
     @unittest.skipUnless(NATIVE, "requires pinned combined native runtime")
     def test_run_native_actually_cancels_a_hanging_refresh_at_its_own_shutdown(self):

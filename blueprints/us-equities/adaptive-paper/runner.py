@@ -1012,20 +1012,47 @@ async def _schedule_corporate_action_refresh(guard, watch, start, end, now, stat
     reproduced by an independent review: the thread kept running past the
     timeout and later wrote a stale result over a newer one. LOW finding 1
     (fix round 4, wording): refreshes are never overlapped only because
-    `CorporateActionMonitor`'s own generation check (under its lock) drops
-    any write from a superseded attempt -- this scheduling layer's
+    `CorporateActionMonitor`'s own generation check (under its lock) rejects
+    any write from a superseded (stale) attempt -- this scheduling layer's
     `state["in_flight"]` check is a best-effort scheduling optimization
     (avoid spinning up a redundant thread most of the time), not itself a
     correctness guarantee; a timed-out worker can still overlap a later one
     at the OS-thread level, and the generation check is what makes that
     harmless. Defenses in place:
-      1. `guard.refresh_timed_out(watch)` (if the guard exposes it -- the
-         real CorporateActionMonitor does) is called on timeout, which
-         bumps that monitor's internal generation counter so the abandoned
-         attempt's eventual write (whenever the thread actually finishes)
-         is dropped as superseded, AND marks the requested symbols
-         degraded/failed right now (the short `retry_seconds` interval
-         applies to the next attempt, not the full `refresh_seconds`).
+      1. HIGH finding (fix round 5): for a guard exposing the two-phase
+         `begin_attempt`/`run_attempt`/`invalidate_attempt` API (the real
+         CorporateActionMonitor does), the generation is allocated by
+         `guard.begin_attempt(...)` HERE, synchronously, on the calling
+         coroutine, BEFORE the worker thread is even created -- not lazily,
+         inside the worker, once it happens to start running. Reproduced by
+         an independent review's own probe: allocating the generation
+         lazily left a window where a worker thread had been *launched*
+         (`Thread.start()` already called) but was still merely queued by
+         the OS, not yet actually running -- `_generation` hadn't moved yet
+         -- so a shutdown-time cancellation landing in that window saw
+         "nothing in flight" and did nothing, and the delayed worker later
+         committed a stale result AFTER shutdown had already decided the
+         run was done. Allocating up front closes that window: cancellation
+         always has a concrete generation to invalidate, however early it
+         happens.
+           - On CANCELLATION specifically (shutdown cancelling an otherwise
+             routine in-flight refresh), `guard.invalidate_attempt(
+             generation)` is called -- NOT `refresh_timed_out` -- so a
+             perfectly clean, still-fresh cached result is never forced
+             into `needs_attention` just because the routine periodic
+             refresh checking it happened to still be in flight at
+             shutdown (LOW finding, Claude's review: the old code routed
+             cancellation through the SAME degrading path as a genuine
+             timeout).
+           - On a genuine TIMEOUT (`wait_for` itself gives up, not a
+             cancellation), `guard.refresh_timed_out(generation, watch)` is
+             still called, which DOES degrade -- a timeout is itself
+             evidence something may be wrong (unlike an ordinary shutdown).
+         For a simpler guard (most existing test fakes) that does not
+         expose `begin_attempt`, this falls back to the OLD single-call
+         convention (`guard.refresh(...)` inside the worker,
+         `guard.refresh_timed_out(watch)` on timeout OR cancellation) to
+         avoid breaking any test built against that simpler contract.
       2. The created task is retained in `state["tasks"]` (pruned of
          already-done entries on every call) so a caller (run_native's own
          `finally` block) can cancel and join every still-pending
@@ -1046,10 +1073,22 @@ async def _schedule_corporate_action_refresh(guard, watch, start, end, now, stat
     A no-op if a refresh is already in flight; callers check
     `state["in_flight"]` before calling this so a throttled (no-op)
     `refresh()` call never even spins up a thread. Returns the created
-    task so a caller that needs the result now (the preflight fetch) can
-    `await` it directly -- `_run()` below never raises (its own
-    `asyncio.wait_for` swallows the timeout), so awaiting the returned task
-    is itself already bounded by `CORPORATE_ACTION_REFRESH_TIMEOUT_SECONDS`."""
+    task (or None if the two-phase `begin_attempt` itself reports a
+    throttled no-op, in which case no worker is launched at all) so a
+    caller that needs the result now (the preflight fetch) can `await` it
+    directly -- `_run()` below never raises (its own `asyncio.wait_for`
+    swallows the timeout), so awaiting the returned task is itself already
+    bounded by `CORPORATE_ACTION_REFRESH_TIMEOUT_SECONDS`."""
+    two_phase = hasattr(guard, "begin_attempt")
+    generation = None
+    if two_phase:
+        generation = guard.begin_attempt(watch, start=start, end=end, now=now)
+        if generation is None:
+            # Throttled: an equivalent fresh result is already cached for
+            # this exact symbol set/window -- no attempt to invalidate, no
+            # worker to launch.
+            return None
+
     state["in_flight"] = True
 
     async def _run():
@@ -1058,9 +1097,12 @@ async def _schedule_corporate_action_refresh(guard, watch, start, end, now, stat
 
         def worker():
             try:
-                guard.refresh(watch, start=start, end=end, now=now)
+                if two_phase:
+                    guard.run_attempt(watch, generation, start=start, end=end, now=now)
+                else:
+                    guard.refresh(watch, start=start, end=end, now=now)
             except Exception:
-                pass  # CorporateActionMonitor.refresh() never raises; defensive only
+                pass  # never raises in the well-behaved case; defensive only
             finally:
                 def _resolve():
                     if not fut.done():
@@ -1070,16 +1112,26 @@ async def _schedule_corporate_action_refresh(guard, watch, start, end, now, stat
                 except RuntimeError:
                     pass  # the loop is already closed -- the late result is simply dropped
 
-        threading.Thread(target=worker, daemon=True, name="ca-refresh").start()
+        # LOW finding (fix round 5): `Thread.start()` moved INSIDE this
+        # try/finally -- if starting the thread itself ever raised (e.g. a
+        # resource-exhaustion OSError), `state["in_flight"]` must still be
+        # reset so the NEXT tick is not permanently locked out believing a
+        # refresh that never actually started is still running.
         try:
-            await asyncio.wait_for(fut, timeout=CORPORATE_ACTION_REFRESH_TIMEOUT_SECONDS)
-        except asyncio.TimeoutError:
-            if hasattr(guard, "refresh_timed_out"):
-                guard.refresh_timed_out(watch)
-        except asyncio.CancelledError:
-            if hasattr(guard, "refresh_timed_out"):
-                guard.refresh_timed_out(watch)
-            raise
+            threading.Thread(target=worker, daemon=True, name="ca-refresh").start()
+            try:
+                await asyncio.wait_for(fut, timeout=CORPORATE_ACTION_REFRESH_TIMEOUT_SECONDS)
+            except asyncio.TimeoutError:
+                if two_phase:
+                    guard.refresh_timed_out(generation, watch)
+                elif hasattr(guard, "refresh_timed_out"):
+                    guard.refresh_timed_out(watch)
+            except asyncio.CancelledError:
+                if two_phase:
+                    guard.invalidate_attempt(generation)
+                elif hasattr(guard, "refresh_timed_out"):
+                    guard.refresh_timed_out(watch)
+                raise
         finally:
             state["in_flight"] = False
 
