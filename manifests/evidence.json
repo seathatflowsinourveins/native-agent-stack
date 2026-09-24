@@ -3205,8 +3205,8 @@
     },
     {
       "path": "adoption/credential-inventory.json",
-      "sha256": "78effc097dfbf1e3e09ee1d81f25d0f6cf67e6335cd1208a26403992a391c8d7",
-      "bytes": 11573
+      "sha256": "8db576481cf38ecd51aae0129432408992fa0ae4e85f84c81add379bf0820e1e",
+      "bytes": 12818
     },
     {
       "path": "adoption/host-receipt.schema.json",
@@ -10126,8 +10126,8 @@
     },
     {
       "path": "docs/secret-storage.md",
-      "sha256": "3a984c5d785b7bd849842250fa924822a4af8425407bcde37452e09557991b70",
-      "bytes": 24231
+      "sha256": "d000760d4c2ee07ca6625880430ce069ac0153240bc1053d6802e2f236b79386",
+      "bytes": 27228
     },
     {
       "path": "docs/stack.md",
