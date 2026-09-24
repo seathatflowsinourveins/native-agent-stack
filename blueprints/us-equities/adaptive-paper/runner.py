@@ -846,7 +846,8 @@ class Controller:
                     if getattr(exc, "not_sent", False) is True:
                         self.ledger.mark_not_sent(intent.client_id, "transport_proven_not_sent")
                     elif isinstance(exc, RejectedSubmission):
-                        self.ledger.mark_broker_refused(intent.client_id, exc.status_code)
+                        self.ledger.mark_broker_refused(intent.client_id, exc.status_code,
+                                                        getattr(exc, "refusal", None))
                         self.stop = True
                 raise
         port.submit = observed_submit

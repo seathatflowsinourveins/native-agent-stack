@@ -7,11 +7,23 @@ first live receipt `receipt.json`. The offline suite
 `tests/test_native_faults_min.py` is a local synthetic fixture with a fake
 transport; it drives the real `runner.Controller` and `safety.Ledger`.
 
-**With the current engine a live run cannot reach `native_faults_passed`.**
-C04 is refused by the Ledger before any POST is sent, and C05 short-circuits
-on a client-id lookup without sending a DELETE. A live run therefore yields
-partial native evidence only (C01 and C02), with the best status
-`native_faults_incomplete`.
+**Engine change of 2026-09-24 (offline only; no paper run since).** The two
+gaps that held the 2026-09-23 run at `native_faults_incomplete` are closed in
+the engine and harness, so a live run can now reach `native_faults_passed`:
+
+- C05: `AlpacaPaperTransport.cancel` now sends the DELETE for every owned order
+  to its known broker id instead of returning early when a client-id lookup
+  shows it terminal. Alpaca's answer is data. A 404 or 422 is accepted without a
+  freeze when the follow-up lookup shows the order terminal. The repeated terminal
+  observation changes no ledger state.
+- C04: the one documented definitive 422 is recognised. See "C04 choice" below.
+  The harness's `FaultLedger` lets only the C04 client id past the pre-send
+  `invalid_price_increment` check, so Alpaca itself answers the fault.
+
+This is offline evidence only: unit tests with a fake broker and mocked HTTP.
+`receipt.json` is still the 2026-09-23 run. It is bound to the old plan, harness
+and engine hashes and stays `native_faults_incomplete` until a new paper run
+replaces it.
 
 The one live run (2026-09-23 14:20:24Z, from a read-only `git archive` of the
 harness commit) went exactly that way. The plan and engine source hashes in
@@ -65,8 +77,8 @@ transport:
 | --- | --- | --- |
 | C01 accept_resting_buy | SPY qty-1 DAY limit at 50% of the streamed bid, rounded down to the cent | Broker accepts; ledger shows submitted, broker id recorded, open, zero filled |
 | C02 cancel_resting | Engine cancel | Ledger `canceled`, zero filled; a fresh broker snapshot shows `canceled` |
-| C05 cancel_again | Engine cancel again | No exception, no new transport freeze reason, ledger and effect unchanged. Receipt records `delete_sent` and `broker_refusal_observed` |
-| C04 definitive_rejection | SPY qty-1 limit at 40% of the bid plus $0.0001 (at least $1) | Every submit status is one of the engine's definitive refusals (401, 403, 404) and the ledger shows `broker_refused` with no position or cash effect. Any other status (400, 422, 429, 5xx) fails. If the Ledger refuses before send, the case is `unobserved` with reason `engine_refused_before_send: invalid_price_increment` |
+| C05 cancel_again | Engine cancel of the already-canceled order | The DELETE is sent and answered 204, 404 or 422. No exception, no new transport freeze reason, ledger and effect unchanged. Receipt records `delete_sent`, `cancel_http_statuses` and `broker_refusal_observed` |
+| C04 definitive_rejection | SPY qty-1 limit at 40% of the bid plus $0.0001 (at least $1), sent by the only client id `FaultLedger` exempts | Either the ledger records `broker_refused` for the documented sub-penny 422 with refusal `sub_penny_minimum_price_variance`, or every submit status is 401, 403 or 404. The client-id lookup returns 404, and there is no position or cash effect. Any other 400, 422, 429 or 5xx fails. If the engine still refuses before send, the case is `unobserved` with reason `engine_refused_before_send: ...` |
 
 The plan's `c04_sub_penny_increment` must be strictly between 0 and 0.01.
 
@@ -108,8 +120,11 @@ Bounds:
 
 - A case is marked `native_paper` only when the transport's request observer
   recorded a broker HTTP response within that case. For C05 the response must
-  come from the DELETE itself. A C05 whose only request was the client-id GET is
-  marked `engine_short_circuit` with `delete_sent: false`.
+  come from the DELETE itself. A C05 with no DELETE (the engine as run on
+  2026-09-23) is marked `engine_short_circuit` with `delete_sent: false`.
+- For C04 the receipt records `ledger_refusal`, the ledger's own durable
+  `broker_refused` event (HTTP status and refusal). It also records
+  `c04_pre_send_exemption`, the one client id that `FaultLedger` exempts.
 - Unobserved and not-run cases are marked `none`.
 - `status` becomes `native_faults_passed` only when all four cases pass with
   `native_paper` evidence and cleanup proves flat.
@@ -119,17 +134,80 @@ Bounds:
 - The price reference is the engine's streamed quote bid. The engine transport
   has no last-trade read.
 
-## Expected outcome from source reading (confirmed by the 2026-09-23 run)
+## C04 choice: the documented sub-penny 422
 
-- **C04 will be `unobserved`.** `Ledger.reserve_intent` refuses any price of
-  at least $1 that is not on a whole cent (`invalid_price_increment`), so no
-  POST is sent. The offline suite shows this path with the real Ledger. If the
-  request were sent, the transport maps Alpaca's 422 to `AmbiguousSubmission`,
-  and `Ledger.mark_broker_refused` accepts only 401, 403 and 404. So this
-  engine cannot record a 422 as a definitive refusal.
-- **C05 will not provoke Alpaca's 422.** `AlpacaPaperTransport.cancel` looks
-  the order up by client id and returns it without a DELETE once it is
-  terminal. The receipt records this as evidence class `engine_short_circuit`,
-  `delete_sent: false` and `broker_refusal_observed: false`.
-- For these reasons one run of this harness cannot flip the gate on its own. A
-  `native_faults_incomplete` receipt is the honest expected result.
+The alternative was a fault Alpaca answers with 401, 403 or 404, keeping the
+pre-send check for every client id. Within this plan's bounds no such fault is
+reachable:
+
+- The create-order reference
+  (https://docs.alpaca.markets/us/reference/postorder.md) documents only two
+  refusals: 403 "Buying power or shares is not sufficient." and 422 "Input
+  parameters are not recognized."
+- A 403 needs a buy larger than buying power, or a sell of unheld shares. The
+  Ledger refuses both before send: a $1,000 order cap on a qty-1 buy, and
+  `sell_exceeds_owned_unreserved_position`.
+- A 401 needs other credentials, so a second client, which is out of bounds.
+- No 404 is documented for this endpoint.
+- A non-existent or non-tradable symbol has no streamed quote, so the engine
+  refuses it before send (`no_current_quote`, quote-freshness wire guard). Its
+  status is also undocumented and would be a 422 at best.
+
+So C04 takes the reclassification the gate text allows: the engine counts a
+broker 422 on an invalid price as a definitive refusal. This applies only where
+the documentation proves it definitive. The orders guide
+(https://docs.alpaca.markets/us/docs/orders-at-alpaca.md, "Sub-penny
+increments") says limit prices at or above $1.00 take at most two decimals, and
+four below. It says "Orders received in excess of the minimum price variance
+will be rejected", and gives the body `{"code": 42210000, "message": "invalid
+limit_price 290.123. sub-penny increment does not fulfill minimum pricing
+criteria"}`.
+
+422 is not definitive in general. Alpaca also returns it for "client_order_id
+must be unique"
+(https://alpaca.markets/learn/how-to-fix-common-trading-api-errors-at-alpaca),
+which proves that an order exists. The transport therefore requires all of the
+following before it raises `RejectedSubmission(422,
+"sub_penny_minimum_price_variance")`:
+
+- the documented code and message;
+- a limit price that really violates the documented increment;
+- the first POST of this client id (SDK retries are disabled);
+- a client-id lookup that returns 404.
+
+`Ledger.mark_broker_refused` then accepts 422 only with that refusal, and only
+for an intent whose durable price violates the increment. Timeout, 400, 422,
+429 and 5xx otherwise stay ambiguous, as README-safety.md states.
+
+The pre-send check stays for the engine. The only exemption is the harness's
+`FaultLedger`, for its single `<prefix>c04` client id. No engine path can send a
+sub-penny price.
+
+## What the next native run must show
+
+A receipt can flip the gate only when it shows all of the following, bound to
+this tree's plan, harness and engine hashes:
+
+- Status `native_faults_passed`, exit 0, `posts_reserved` 2 of 4, one transport
+  build and no stop error.
+- C01 and C02 as before: submit 200 and an open status, then cancel 204 and
+  `canceled` in the ledger and in a fresh broker snapshot.
+- C05 with evidence `native_paper`, `delete_sent: true` and requests `cancel`
+  then `read`. The DELETE status is expected to be 422, since Alpaca documents
+  "The order status is not cancelable"; 204 or 404 is also accepted as data.
+  `new_transport_freeze_reasons` must be empty and `ledger_before` must equal
+  `ledger_after`, both `canceled` with zero filled.
+- C04 with evidence `native_paper` and requests `submit` 422 then `read` 404.
+  The ledger shows `broker_refused` with `ledger_refusal` `{"http_status": 422,
+  "refusal": "sub_penny_minimum_price_variance"}`, and `effect_before` equals
+  `effect_after`.
+- If Alpaca answers the sub-penny POST with another code or message, C04 fails
+  as ambiguous and the run ends `cleanup_required`. It never passes. The harness
+  cannot prove an ambiguous submission flat, so its client id must then be
+  resolved by hand. An order accepted despite the sub-penny price (submit 200)
+  also fails C04; cleanup then cancels it.
+- Cleanup proves flat with `runner.reconcile` and zero open orders, and the
+  `IN_FLIGHT` marker is removed.
+
+A run that shows anything else stays partial or failed evidence, and the gate
+stays `not_established`.

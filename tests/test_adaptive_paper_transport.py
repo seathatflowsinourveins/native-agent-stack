@@ -397,11 +397,115 @@ class AsyncTransport(unittest.IsolatedAsyncioTestCase):
         await self.port._observe(t.normalize_order(order(filled_qty="0.25", status="partially_filled")))
         missing = response({"code": 404, "message": "not found"}, 404)
         with patch.object(self.port._client._session._session, "request",
-                          side_effect=[missing, response(None, 204), missing]) as request:
+                          side_effect=[response(None, 204), missing]) as request:
             result = await self.port.cancel("trial-1")
         self.assertIsNone(result)
-        self.assertEqual([c.args[0] for c in request.call_args_list], ["GET", "DELETE", "GET"])
+        # The known broker id is cancelled directly; no pre-DELETE lookup decides for the caller.
+        self.assertEqual([c.args[0] for c in request.call_args_list], ["DELETE", "GET"])
+        self.assertTrue(request.call_args_list[0].args[1].endswith("/v2/orders/" + ID))
         self.assertIn("cancel_finality_unobserved", self.port.health["reasons"])
+
+    async def test_cancel_again_sends_delete_and_takes_422_as_data(self):
+        # C05: the order is already canceled; the second cancel still reaches the
+        # broker, whose documented 422 "not cancelable" is data, not a freeze.
+        self.port.adopt_intents([intent()])
+        canceled = order(status="canceled", updated_at="2026-09-21T15:00:01Z")
+        await self.port._observe(t.normalize_order(canceled))
+        observed = len(self.observations)
+        with patch.object(self.port._client._session._session, "request", side_effect=[
+                response({"code": 42210000, "message": "order is already in \"canceled\" state"}, 422),
+                response(canceled)]) as request:
+            result = await self.port.cancel("trial-1")
+        self.assertEqual(result["status"], "canceled")
+        self.assertEqual([c.args[0] for c in request.call_args_list], ["DELETE", "GET"])
+        self.assertEqual([b[0] for b in self.budgets], ["cancel", "read"])
+        self.assertEqual(self.port.health["reasons"], [])
+        # The follow-up observation repeats the known terminal state exactly.
+        self.assertTrue(all(o["status"] == "canceled" and o["filled_qty"] == "0"
+                            for o in self.observations[observed:]))
+
+    async def test_cancel_404_with_terminal_final_is_data(self):
+        self.port.adopt_intents([intent()])
+        await self.port._observe(t.normalize_order(order()))
+        with patch.object(self.port._client._session._session, "request", side_effect=[
+                response({"code": 40410000, "message": "order not found"}, 404),
+                response(order(status="canceled", updated_at="2026-09-21T15:00:01Z"))]):
+            result = await self.port.cancel("trial-1")
+        self.assertEqual(result["status"], "canceled")
+        self.assertEqual(self.port.health["reasons"], [])
+
+    async def test_cancel_refusal_for_still_working_order_freezes(self):
+        self.port.adopt_intents([intent()])
+        await self.port._observe(t.normalize_order(order()))
+        with patch.object(self.port._client._session._session, "request", side_effect=[
+                response({"code": 42210000, "message": "not cancelable"}, 422),
+                response(order(status="pending_cancel", updated_at="2026-09-21T15:00:01Z"))]):
+            result = await self.port.cancel("trial-1")
+        self.assertEqual(result["status"], "pending_cancel")
+        self.assertIn("cancellation_unresolved", self.port.health["reasons"])
+
+    async def test_cancel_server_error_stays_unresolved(self):
+        self.port.adopt_intents([intent()])
+        await self.port._observe(t.normalize_order(order()))
+        with patch.object(self.port._client._session._session, "request", side_effect=[
+                response({"code": 50010000, "message": "internal"}, 500),
+                response(order(status="canceled", updated_at="2026-09-21T15:00:01Z"))]):
+            await self.port.cancel("trial-1")
+        self.assertIn("cancellation_unresolved", self.port.health["reasons"])
+
+    async def test_documented_sub_penny_422_is_definitive_once_absent(self):
+        # C04: Alpaca documents this body for a price beyond the minimum price variance.
+        body = {"code": 42210000,
+                "message": "invalid limit_price 100.0101. sub-penny increment does not fulfill minimum pricing criteria"}
+        missing = response({"code": 40410000, "message": "not found"}, 404)
+        with patch.object(self.port._client._session._session, "request",
+                          side_effect=[response(body, 422), missing]) as request:
+            with self.assertRaises(t.RejectedSubmission) as caught:
+                await self.port.submit(intent(limit_price="100.0101"))
+            with self.assertRaises(t.RejectedSubmission) as replay:
+                await self.port.submit(intent(limit_price="100.0101"))
+        self.assertEqual((caught.exception.status_code, caught.exception.refusal), (422, t.SUB_PENNY_REFUSAL))
+        self.assertEqual((replay.exception.status_code, replay.exception.refusal), (422, t.SUB_PENNY_REFUSAL))
+        self.assertTrue(caught.exception.definitive_rejection)
+        self.assertEqual([c.args[0] for c in request.call_args_list], ["POST", "GET"])  # no retry, no replay POST
+        self.assertEqual(self.port.health["reasons"], [])
+        self.assertNotIn("invalid limit_price", str(caught.exception))  # provider text never raised
+
+    async def test_other_422_stays_ambiguous(self):
+        missing = response({"code": 40410000, "message": "not found"}, 404)
+        cases = [
+            # The documented sub-penny body for a price that is on the increment contradicts itself.
+            ("valid-price", "100.01", {"code": 42210000, "message":
+                                       "sub-penny increment does not fulfill minimum pricing criteria"}),
+            # A duplicate client id proves that an order exists.
+            ("duplicate", "100.0101", {"code": 40010001, "message": "client_order_id must be unique"}),
+            ("other-code", "100.0101", {"code": 40010001, "message":
+                                        "sub-penny increment does not fulfill minimum pricing criteria"}),
+            ("no-json", "100.0101", None),
+        ]
+        for index, (label, price, body) in enumerate(cases):
+            with self.subTest(label=label):
+                self.port._reasons.clear()
+                with patch.object(self.port._client._session._session, "request",
+                                  side_effect=[response(body, 422), missing]):
+                    with self.assertRaises(t.AmbiguousSubmission):
+                        await self.port.submit(intent(client_order_id="amb-%d" % index, limit_price=price))
+                self.assertIn("submission_ambiguous", self.port.health["reasons"])
+
+    async def test_sub_penny_422_with_visible_order_is_not_a_refusal(self):
+        body = {"code": 42210000, "message": "sub-penny increment does not fulfill minimum pricing criteria"}
+        with patch.object(self.port._client._session._session, "request",
+                          side_effect=[response(body, 422), response(order(limit_price="100.0101"))]):
+            found = await self.port.submit(intent(limit_price="100.0101"))
+        self.assertEqual(found["id"], ID)
+        self.assertIn("submission_ambiguous", self.port.health["reasons"])
+
+    def test_minimum_price_variance_matches_the_ledger(self):
+        import safety
+        self.assertEqual(t.SUB_PENNY_REFUSAL, safety.SUB_PENNY_REFUSAL)
+        for price in ("1", "1.01", "0.9999", "0.5", "100.0101", "1.001", "0.99991", "307.6601"):
+            self.assertEqual(t.violates_minimum_price_variance(price),
+                             not safety.price_increment_valid(__import__("decimal").Decimal(price)), price)
 
     async def test_proven_not_sent_intent_does_not_break_flat_snapshot(self):
         self.port.adopt_intents([intent()])

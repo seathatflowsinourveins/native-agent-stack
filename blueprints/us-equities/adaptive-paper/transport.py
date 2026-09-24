@@ -48,10 +48,43 @@ class AmbiguousSubmission(TransportError):
 
 
 class RejectedSubmission(TransportError):
-    def __init__(self, status_code):
+    def __init__(self, status_code, refusal=None):
         self.status_code = status_code
+        self.refusal = refusal
         self.definitive_rejection = True
-        super().__init__("broker definitively rejected submission (HTTP %d)" % status_code)
+        super().__init__("broker definitively rejected submission (HTTP %d%s)"
+                         % (status_code, "" if refusal is None else ": " + refusal))
+
+
+# Documented definitive refusals for POST /v2/orders. 401/403/404 as before. A 422 is
+# ambiguous (it also carries "client_order_id must be unique", which proves an order
+# exists) except the one Alpaca documents as a rejection: a limit price in excess of
+# the minimum price variance, body code 42210000 with the message below
+# (https://docs.alpaca.markets/us/docs/orders-at-alpaca.md, "Sub-penny increments";
+# POST /v2/orders 422 "Input parameters are not recognized",
+# https://docs.alpaca.markets/us/reference/postorder.md). The body is only compared
+# with these constants; it is never retained or raised.
+SUB_PENNY_REFUSAL = "sub_penny_minimum_price_variance"
+SUB_PENNY_CODE = 42210000
+SUB_PENNY_MESSAGE = "sub-penny increment does not fulfill minimum pricing criteria"
+
+
+def violates_minimum_price_variance(limit_price):
+    price = Decimal(str(limit_price))
+    return price != price.quantize(Decimal("0.01") if price >= 1 else Decimal("0.0001"))
+
+
+def documented_refusal(exc, status, intent):
+    """Classify a failed POST as a documented definitive 422, or return None."""
+    if status != 422 or not violates_minimum_price_variance(intent["limit_price"]):
+        return None
+    try:
+        code, message = exc.code, exc.message
+    except Exception:
+        return None
+    if type(code) is not int or code != SUB_PENNY_CODE or not isinstance(message, str):
+        return None
+    return SUB_PENNY_REFUSAL if SUB_PENNY_MESSAGE in message else None
 
 
 class SubmissionNotSent(TransportError):
@@ -786,7 +819,7 @@ class AlpacaPaperTransport:
                 if key in self._not_sent:
                     raise SubmissionNotSent("this frozen intent was already prevented before HTTP")
                 if key in self._rejected:
-                    raise RejectedSubmission(self._rejected[key])
+                    raise RejectedSubmission(*self._rejected[key])
                 found = await self._lookup(key)
                 if found is None:
                     self.freeze_health("replay_unresolved")
@@ -814,10 +847,14 @@ class AlpacaPaperTransport:
                     raise AmbiguousSubmission("submission lookup unavailable; no automatic retry") from None
                 if observed is None:
                     # A 422/400 may report a duplicate client ID whose prior order
-                    # is not visible yet. Neither is proof that the intent failed.
-                    if status in {401, 403, 404}:
-                        self._rejected[key] = status
-                        raise RejectedSubmission(status) from None
+                    # is not visible yet. Neither is proof that the intent failed,
+                    # except the documented sub-penny 422 for a price that really
+                    # violates the minimum price variance (this was the first POST
+                    # of this client ID; SDK retries are disabled).
+                    refusal = documented_refusal(exc, status, intent)
+                    if status in {401, 403, 404} or refusal is not None:
+                        self._rejected[key] = (status, refusal)
+                        raise RejectedSubmission(status, refusal) from None
                     self.freeze_health("submission_ambiguous")
                     raise AmbiguousSubmission("submission unresolved; no automatic retry") from None
                 self.freeze_health("submission_ambiguous")
@@ -827,26 +864,43 @@ class AlpacaPaperTransport:
             return await self._observe(observed)
 
     async def cancel(self, client_order_id):
+        """Send the broker DELETE for an owned order and return its queried final state.
+
+        The caller asks to cancel an order it believes open or whose state is
+        ambiguous; the transport does not overrule that with a cached or freshly
+        read status. The DELETE goes to the known broker ID (the transport's own
+        observation, or a client-ID lookup when it has none). The broker's answer is
+        data: 204 is only an acknowledgement; 422 ("The order status is not
+        cancelable", https://docs.alpaca.markets/us/reference/deleteorderbyorderid-1.md)
+        or 404 is accepted without freezing only when the follow-up lookup shows the
+        order terminal. Any other failure (timeout, 429, 5xx) freezes admissions as
+        before. The follow-up observation is idempotent, so a second cancel of an
+        already-canceled order changes no ledger state.
+        """
         async with self._operation_lock:
             if client_order_id not in self._intents:
                 raise TransportError("cancellation requires an owned durable intent")
-            order = await self._lookup(client_order_id)
+            order = self._observed.get(client_order_id)
             if order is None:
-                order = self._observed.get(client_order_id)
+                order = await self._lookup(client_order_id)
                 if order is None:
                     self.freeze_health("cancel_identity_unobserved")
                     return None
-            if order["status"] in TERMINAL:
-                return order
             self._assert_matches(order, self._intents[client_order_id])
+            answer = 204
             try:
                 await asyncio.to_thread(self._client.cancel_order_by_id, order["id"])
-            except Exception:
-                self.freeze_health("cancellation_unresolved")
+            except Exception as exc:
+                answer = getattr(exc, "status_code", None)
+                if answer not in (404, 422):
+                    self.freeze_health("cancellation_unresolved")
             # A successful DELETE is only an acknowledgement; query cumulative state.
             final = await self._lookup(client_order_id)
             if final is None:
                 self.freeze_health("cancel_finality_unobserved")
+            elif answer in (404, 422) and final["status"] not in TERMINAL:
+                # A refusal for an order that is still working is not resolved data.
+                self.freeze_health("cancellation_unresolved")
             return final
 
     def _pages(self, status, *, after=None):

@@ -40,10 +40,28 @@ the caller's recovered durable intents. A repeated ID is looked up, never posted
 again. Broker 401/403/404 refusals with a confirming absent-ID lookup, and a
 locally prevented request, expose `definitive_rejection=True`. A 400 or 422 may
 mean a duplicate ID whose earlier order is not visible yet; it remains ambiguous
-unless lookup resolves the frozen intent. Ambiguous errors retain unresolved
-state, freeze admission, and perform at most one lookup without resubmission.
-Cancellation acknowledgements are followed by a lookup, not treated as fills or
-terminal cancellations. All observations contain cumulative quantities; stream
+unless lookup resolves the frozen intent. The one exception is Alpaca's documented
+minimum-price-variance refusal: a 422 whose body code is 42210000 and whose message
+contains "sub-penny increment does not fulfill minimum pricing criteria", for a
+first POST whose limit price really has more than two decimals at or above $1.00
+(four below), followed by an absent-ID lookup. Alpaca states such orders "will be
+rejected" (https://docs.alpaca.markets/us/docs/orders-at-alpaca.md); the transport
+raises `RejectedSubmission(422, "sub_penny_minimum_price_variance")` and compares
+the body with those constants only, never retaining or raising it. The engine's
+own Ledger refuses such prices before send, so only the native-fault harness,
+which exempts its single C04 client ID, can reach this path. Ambiguous errors
+retain unresolved state, freeze admission, and perform at most one lookup without
+resubmission. `cancel()` sends the DELETE for every owned order: to the broker ID
+it already observed, or, with no observation, to the ID a client-ID lookup
+returns. It does not skip the DELETE because a cached or freshly read status is
+terminal; the caller asked because it believes the order open or ambiguous. The
+answer is data: 204 is only an acknowledgement; 404 or 422 ("The order status is
+not cancelable",
+https://docs.alpaca.markets/us/reference/deleteorderbyorderid-1.md) is accepted
+without a freeze when the follow-up lookup shows the order terminal, and freezes
+`cancellation_unresolved` otherwise; a timeout, 429 or 5xx freezes as before. Every
+DELETE is followed by a lookup, never treated as a fill or terminal cancellation,
+and repeating a known terminal observation changes no ledger state. All observations contain cumulative quantities; stream
 observations additionally retain available execution IDs and individual event
 quantity/price. Consumers must deduplicate executions and never manufacture
 individual fills from a cumulative REST snapshot.

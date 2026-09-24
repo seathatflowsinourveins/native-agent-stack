@@ -37,6 +37,21 @@ RANK = {"reserved": 0, "pending_new": 1, "accepted": 2, "new": 2,
         "pending_cancel": 4, "done_for_day": 4,
         "filled": 5, "canceled": 5, "expired": 5, "rejected": 5, "not_sent": 5, "broker_refused": 5}
 DEFAULT_STOP = Path.home() / ".local/state/native-agent-stack/alpaca-paper/STOP"
+DEFINITIVE_REFUSAL_STATUSES = (401, 403, 404)
+# The one documented 422 that is a definitive refusal: Alpaca states that orders in
+# excess of the minimum price variance "will be rejected" and documents the body
+# code 42210000 with "sub-penny increment does not fulfill minimum pricing criteria".
+# Every other 422 (for example "client_order_id must be unique", which proves an
+# order exists) stays ambiguous.
+SUB_PENNY_REFUSAL = "sub_penny_minimum_price_variance"
+
+
+def price_increment_valid(price):
+    """True when ``price`` (a Decimal) meets Alpaca's minimum price variance for limit
+    prices: two decimals at or above $1.00, four below
+    (https://docs.alpaca.markets/us/docs/orders-at-alpaca.md, "Sub-penny increments").
+    reserve_intent refuses any other price before send."""
+    return price == price.quantize(D("0.01") if price >= 1 else D("0.0001"))
 
 
 class SafetyError(RuntimeError):
@@ -711,6 +726,13 @@ class Ledger:
             self._event("risk_halt", reason=reason)
         return self._state()
 
+    def _check_price_increment(self, client_id, price):
+        """Pre-send refusal of a price outside the documented minimum price variance.
+        A method so that the native-fault harness alone can exempt its single C04
+        client id (native-faults/harness.py FaultLedger); the engine never does."""
+        if not price_increment_valid(price):
+            raise SafetyError("invalid_price_increment")
+
     def reserve_intent(self, client_id, symbol, side, qty, limit_price, *, quote,
                        now, market_open, session_close, stop_file=None):
         if type(client_id) is not str or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_-]{0,47}", client_id):
@@ -719,8 +741,7 @@ class Ledger:
         if side not in ("buy", "sell"):
             raise SafetyError("invalid_order_side")
         qty, price, now, close = decimal(qty), decimal(limit_price), instant(now), instant(session_close)
-        if price != price.quantize(D("0.01") if price >= 1 else D("0.0001")):
-            raise SafetyError("invalid_price_increment")
+        self._check_price_increment(client_id, price)
         with self._transaction(keep_observations_on_refusal=True):
             previous = self.db.execute("SELECT * FROM intents WHERE client_id=?", (client_id,)).fetchone()
             if previous:
@@ -868,14 +889,22 @@ class Ledger:
             self._event("intent_not_sent", client_id, reason=reason)
             return True
 
-    def mark_broker_refused(self, client_id, http_status):
+    def mark_broker_refused(self, client_id, http_status, refusal=None):
         """Retire a proven HTTP refusal after transport's client-ID absence check.
 
         Only 401/403/404 plus a subsequent broker client-ID lookup returning 404
         qualify at the transport seam. Caller owns that evidence; this API never
-        infers refusal from absence alone. Timeout/400/422/429/5xx stay ambiguous.
+        infers refusal from absence alone. Timeout/400/422/429/5xx stay ambiguous,
+        with one documented exception: a 422 whose transport-classified ``refusal``
+        is SUB_PENNY_REFUSAL, for an intent whose own durable limit price really is
+        outside the minimum price variance.
         """
-        if type(http_status) is not int or http_status not in (401, 403, 404):
+        if type(http_status) is not int or type(http_status) is bool:
+            raise SafetyError("unsupported_broker_refusal_status")
+        if http_status == 422:
+            if refusal != SUB_PENNY_REFUSAL:
+                raise SafetyError("unsupported_broker_refusal_status")
+        elif http_status not in DEFINITIVE_REFUSAL_STATUSES or refusal is not None:
             raise SafetyError("unsupported_broker_refusal_status")
         with self._transaction():
             row = self.db.execute("SELECT * FROM intents WHERE client_id=?", (client_id,)).fetchone()
@@ -887,9 +916,12 @@ class Ledger:
             if (intent.status != "reserved" or not intent.submit_attempted
                     or intent.broker_id is not None or intent.filled_qty):
                 raise SafetyError("cannot_mark_order_broker_refused")
+            if refusal == SUB_PENNY_REFUSAL and price_increment_valid(intent.limit_price):
+                raise SafetyError("refusal_contradicts_intent_price")
             self.db.execute("UPDATE intents SET status='broker_refused' WHERE client_id=?", (client_id,))
+            extra = {} if refusal is None else {"refusal": refusal}
             self._event("broker_refused", client_id, http_status=http_status,
-                        evidence_required="submission_http_refusal_then_client_id_404")
+                        evidence_required="submission_http_refusal_then_client_id_404", **extra)
             return True
 
     def record_order(self, client_id, broker_id, status, cumulative_qty, average_price, *, timestamp=None):
