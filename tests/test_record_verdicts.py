@@ -22,8 +22,8 @@ from unittest import mock
 from pathlib import Path
 
 from scripts.landscape import (
-    SEALED_CANDIDATE_FIELDS, build_landscape, lane_winner_components, packet_keys_entry_sha256, sealed_candidate_labels,
-    verify_sealed_waves, withheld_candidate_label_labels, withhold_policy_labels,
+    SEALED_CANDIDATE_FIELDS, SEALED_COMMITMENT_KEY, build_landscape, lane_winner_components, sealed_candidate_labels,
+    sealed_candidates_sha256, verify_sealed_waves, withheld_candidate_label_labels, withhold_policy_labels,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -170,6 +170,7 @@ class PacketWriter:
             packet["withheld"] = list(packet.get("withheld") or []) + [
                 label for label in sealed_candidate_labels() + withheld_candidate_label_labels()
                 if label not in (packet.get("withheld") or [])]
+            packet[SEALED_COMMITMENT_KEY] = sealed_candidates_sha256(sealed)
         text = json.dumps(packet, sort_keys=True, indent=1) + "\n"
         (self.packets_dir / filename).write_text(text, encoding="utf-8")
         digest = hashlib.sha256(text.encode("utf-8")).hexdigest()
@@ -186,12 +187,6 @@ class PacketWriter:
 
 
 def write_lane(work_dir: Path, lane: str, catalog: str, layer_id: str, data: dict):
-    # A runner stamps the digest of the packet's keys entry into the return's provenance (round 5, INT-R5-1).
-    keys_path = work_dir / "sealed-keys" / "packet-keys.json"
-    entry = (json.loads(keys_path.read_text(encoding="utf-8")).get("packets") or {}).get(f"{catalog}__{layer_id}.json") \
-        if keys_path.is_file() else None
-    if entry is not None and isinstance(data.get("provenance"), dict) and "packet_keys_sha256" not in data["provenance"]:
-        data = dict(data, provenance=dict(data["provenance"], packet_keys_sha256=packet_keys_entry_sha256(entry)))
     lane_dir = work_dir / lane
     lane_dir.mkdir(parents=True, exist_ok=True)
     (lane_dir / f"{catalog}__{layer_id}.json").write_text(json.dumps(data, indent=1), encoding="utf-8")
@@ -1567,10 +1562,7 @@ class NewWaveLaneIdentityTests(NewWaveFixture):
         sealed = json.loads((self.root / NEW_SEALED_BASE / "codex" / f"{catalog}-wave-same-layer-{NEW_RUN}.json")
                             .read_text(encoding="utf-8"))
         self.assertEqual(sealed["model"]["family"], "openai")
-        # The runner-bound digest of the packet's keys entry travels with the sealed return (round 5, INT-R5-1).
-        self.assertEqual(sealed["provenance"], dict(lane_provenance("codex"), packet_keys_sha256=packet_keys_entry_sha256(
-            json.loads((self.work_dir / "sealed-keys" / "packet-keys.json").read_text(encoding="utf-8"))["packets"][
-                f"{catalog}__wave-same-layer.json"])))
+        self.assertEqual(sealed["provenance"], lane_provenance("codex"))
         build_landscape(self.root)
 
     def test_a_lane_without_model_family_is_rejected(self):
@@ -2418,16 +2410,17 @@ class SealedPacketKeysTests(NewWaveFixture):
             self.run_wave()
         self.assertFalse(self.sealed_base().exists())
 
-    def test_a_return_that_does_not_bind_the_keys_entry_is_rejected(self):
-        # Round 5, INT-R5-1: the restored component ids are bound to what the lane judged.
-        catalog = self.both_lanes("wave-same-layer")
-        path = self.work_dir / "codex" / f"{catalog}__wave-same-layer.json"
-        data = json.loads(path.read_text(encoding="utf-8"))
-        data["provenance"]["packet_keys_sha256"] = "0" * 64
-        path.write_text(json.dumps(data), encoding="utf-8")
-        code, output = self.run_wave()
-        self.assertEqual(code, 1)
-        self.assertIn("[codex]: provenance.packet_keys_sha256", output)
+    def test_a_keys_document_with_other_sealed_values_is_refused(self):
+        # Codex review of #145 at a516c477: a stale or edited document whose candidate keys match could restore
+        # other component ids or pins; the packet commits to the sealed values (round 5, INT-R5-1).
+        self.both_lanes("wave-same-layer")
+        path = self.work_dir / "sealed-keys" / "packet-keys.json"
+        keys = json.loads(path.read_text(encoding="utf-8"))
+        keys["packets"]["foundation__wave-same-layer.json"]["candidates"]["c1"]["component_id"] = "other"
+        path.write_text(json.dumps(keys), encoding="utf-8")
+        with self.assertRaisesRegex(SystemExit, "is not the sealed values the packet commits to"):
+            self.run_wave()
+        self.assertFalse(self.sealed_base().exists())
 
     def test_a_malformed_retained_entry_or_keys_file_is_refused_before_writing(self):
         # Round 5, INT-R5-4 and R5-REG-8.

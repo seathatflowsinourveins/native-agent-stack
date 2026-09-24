@@ -27,7 +27,7 @@ adjudicate = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(adjudicate)
 # adjudicate put the repo root on sys.path.
 from scripts.landscape import (  # noqa: E402
-    SEALED_CANDIDATE_FIELDS, judge_adjudication, sealed_candidate_labels)
+    SEALED_CANDIDATE_FIELDS, judge_adjudication, sealed_candidate_labels, sealed_candidates_sha256)
 
 NAME = "foundation__native-clients"
 WHY = "A cites evidence/receipt.json, which records a native execution; B cites only a README claim."
@@ -1649,6 +1649,7 @@ class SealedPacketKeysTests(AdjudicateFixture):
         sealed = {candidate["key"]: {field: candidate.pop(field) for field in SEALED_CANDIDATE_FIELDS if field in candidate}
                   for candidate in packet["candidates"]}
         packet["withheld"] = sealed_candidate_labels()
+        packet["sealed_candidates_sha256"] = sealed_candidates_sha256(sealed)
         path = self.work / "packets" / f"{NAME}.json"
         path.write_text(json.dumps(packet), encoding="utf-8")
         self.sha = hashlib.sha256(path.read_bytes()).hexdigest()
@@ -1830,6 +1831,9 @@ class ScrubRound5Tests(unittest.TestCase):
             f"{root}/docs/a.md,/home/example/b.json,docs/c.md": "docs/a.md,<outside-path>,docs/c.md",
             "source=https://example.com|/home/example/private/notes.md": "source=https://example.com|<outside-path>",
             "/home/example,private/result.json": "<outside-path>",
+            # Codex review at a516c477: a final segment glued on without a later separator.
+            "/home/example,private.json": "<outside-path>",
+            "C:\\Users\\example,private.json": "<outside-path>",
         }
         for text, expected in cases.items():
             with self.subTest(text):

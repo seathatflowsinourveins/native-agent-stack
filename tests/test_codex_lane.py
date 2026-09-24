@@ -673,7 +673,12 @@ class BlindIsolationTests(CodexLaneFixture):
         ]) + "\n" + CANNED_EVENTS, encoding="utf-8")
         err = io.StringIO()
         with contextlib.redirect_stderr(err):
-            self.assertEqual(self.run_lane(), 0)
+            # A flagged blind layer is void (Codex review of #145 at a516c477): exit 1, return set aside.
+            self.assertEqual(self.run_lane(), 1)
+        self.assertFalse((self.work_dir / "codex" / "foundation__native-clients.json").exists())
+        self.assertTrue((self.work_dir / "codex" / "foundation__native-clients.json.audit-flagged").exists())
+        failures = json.loads((self.work_dir / "codex" / "failures.json").read_text(encoding="utf-8"))["failures"]
+        self.assertIn("blind audit flagged", failures[0]["reason"])
         audit = json.loads((self.work_dir / "codex" / "blind-audit.json").read_text(encoding="utf-8"))
         entry = audit["layers"]["foundation__native-clients"]
         self.assertEqual((entry["web_search"], entry["mcp_tool_calls"], entry["commands"]), (1, 1, 9))
@@ -952,24 +957,6 @@ class IsolatedCodexHomeTests(CodexLaneFixture):
             self.assertNotIn("CODEX_API_KEY", codex_lane.child_env(home))
             (home / "auth.json").unlink()
             self.assertEqual(codex_lane.child_env(home)["CODEX_API_KEY"], "k")
-
-    def test_a_sealing_packet_needs_its_keys_and_binds_them(self):
-        # Round 5, INT-R5-1: the runner stamps the digest of the packet's keys entry into the return provenance.
-        from scripts import landscape
-        self.assertEqual(list(codex_lane.SEALED_PACKET_LABELS), landscape.sealed_candidate_labels())
-        packet = {"schema_version": 1, "catalog": "foundation", "layer_id": "native-clients",
-                  "withheld": landscape.sealed_candidate_labels(), "candidates": [{"key": "c1"}]}
-        path = self.write_packet("foundation", "native-clients", packet)
-        with contextlib.redirect_stderr(io.StringIO()) as err:
-            self.assertEqual(self.run_lane(), 2)
-        self.assertIn("pass --packet-keys", err.getvalue())
-        entry = {"packet_sha256": codex_lane.sha256_file(path), "candidates": {"c1": {"component_id": "x"}}}
-        self.assertEqual(codex_lane.packet_keys_entry_sha256(entry), landscape.packet_keys_entry_sha256(entry))
-        keys = self.work_dir.parent / "keys.json"
-        keys.write_text(json.dumps({"schema_version": 1, "packets": {path.name: entry}}), encoding="utf-8")
-        self.assertEqual(self.run_lane(["--packet-keys", str(keys)]), 0)
-        written = json.loads((self.work_dir / "codex" / path.name).read_text(encoding="utf-8"))
-        self.assertEqual(written["provenance"]["packet_keys_sha256"], landscape.packet_keys_entry_sha256(entry))
 
     def test_a_work_dir_inside_a_repository_is_refused(self):
         # Independent review of #145, round 4, OPS-6: the recipe's rule, enforced.

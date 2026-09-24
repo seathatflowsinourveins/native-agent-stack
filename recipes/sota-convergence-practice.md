@@ -79,13 +79,21 @@ lane's `winner_evidence_class`.
 CATALOG=$(pwd -P)
 
 # 1. Packets, blind: labels, popularity and recency withheld, registered receipts attached, and the candidates'
-#    manifest-only fields (component_id, pin, upstream, recipe_ref, decisions) sealed into KEYS_DIR, which steps
-#    5 and 6 restore from. Never pass --gap-receipts in a blind wave (it names the previous winner; refused with
-#    --withhold-labels).
-python3 tools/sota-convergence/lane_packets.py --root . --out "$WORK_DIR" \
-  --manifest catalogs/sota-convergence/manifest-YYYYMMDD.json --trading-candidates manifest \
-  --withhold-labels --keys-out "$KEYS_DIR/packet-keys.json" --registered-receipts \
-  --checked-at "$(date +%Y-%m-%d)" --seed "$(date +%Y%m%d)"
+#    manifest-only fields (component_id, pin, upstream, recipe_ref, decisions) sealed into a packet-keys document
+#    that each packet commits to (sealed_candidates_sha256). Never pass --gap-receipts in a blind wave (it names
+#    the previous winner; refused with --withhold-labels). A model worker runs as this user and can read any file
+#    it names, so the keys document never exists while one runs: it is deleted here, and rebuilt (the build is
+#    deterministic) and checked against these packets for the trusted steps 5 and 6.
+PACKETS_ARGS=(--root . --manifest catalogs/sota-convergence/manifest-YYYYMMDD.json --trading-candidates manifest
+  --withhold-labels --registered-receipts --checked-at "$(date +%Y-%m-%d)" --seed "$(date +%Y%m%d)")
+python3 tools/sota-convergence/lane_packets.py "${PACKETS_ARGS[@]}" --out "$WORK_DIR" \
+  --keys-out "$KEYS_DIR/packet-keys.json"
+rm "$KEYS_DIR/packet-keys.json"
+keys() {  # rebuild the keys document for these packets; refuse if the rebuilt packets differ
+  rm -rf "$KEYS_DIR/rebuild" && python3 tools/sota-convergence/lane_packets.py "${PACKETS_ARGS[@]}" \
+    --out "$KEYS_DIR/rebuild" --keys-out "$KEYS_DIR/packet-keys.json" >/dev/null \
+    && cmp "$KEYS_DIR/rebuild/packets/SHA256SUMS" "$WORK_DIR/packets/SHA256SUMS"
+}
 
 # 2. Blind export: only what the packets reference, labels stripped, no .git.
 #    Both lanes and the adjudication read this one export; record_verdicts.py refuses lanes on two trees.
@@ -111,21 +119,21 @@ python3 -c 'import json,sys; d=json.load(open(sys.argv[1])); json.dump(d.get("re
   "$WORK_DIR/claude-workflow-output.json" "$WORK_DIR/claude-result.json"
 python3 tools/sota-convergence/claude_lane.py --result "$WORK_DIR/claude-result.json" --work-dir "$WORK_DIR" \
   --agentlab-root "$AL" --agent-file ~/.claude/agents/blind-lane-reviewer.md --repo "$BLIND_DIR/export" \
-  --packet-keys "$KEYS_DIR/packet-keys.json" --resolved-model claude-opus-5-5
+  --resolved-model claude-opus-5-5
 #    The resolved child model, read from the session the lane ran in:
 #    (cd "$BLIND_DIR/export" && node "$AL/.claude/workflows/child-usage.mjs" --latest)
 
 # 4. Codex lane on the same export (a separate account/quota, resumable; codex_lane.py refuses a --repo below
 #    any .git). A deliberately non-blind run passes --allow-git-history --repo . instead.
 python3 tools/sota-convergence/codex_lane.py --work-dir "$WORK_DIR" --repo "$BLIND_DIR/export" \
-  --packet-keys "$KEYS_DIR/packet-keys.json" \
   --model <openai model> --effort high --jobs 2
 
 # 5. Two-family adjudication of the layers whose lanes disagree (README "Two-family adjudication"). inputs exits
 #    1 whenever it skips a layer (listed on stderr, for example a missing lane return); when it indexes no
 #    disagreeing layer, the rest of this step has nothing to judge and can be skipped.
-python3 tools/sota-convergence/adjudicate.py inputs --work-dir "$WORK_DIR" --lane-repo-root "$BLIND_DIR/export" \
-  --packet-keys "$KEYS_DIR/packet-keys.json"
+keys && python3 tools/sota-convergence/adjudicate.py inputs --work-dir "$WORK_DIR" \
+  --lane-repo-root "$BLIND_DIR/export" --packet-keys "$KEYS_DIR/packet-keys.json"
+rm "$KEYS_DIR/packet-keys.json"   # before any judge runs
 python3 tools/sota-convergence/adjudicate.py codex --work-dir "$WORK_DIR" --repo "$BLIND_DIR/export" \
   --model <openai model> --jobs 2
 python3 tools/sota-convergence/adjudicate.py claude-args --work-dir "$WORK_DIR" --repo "$BLIND_DIR/export" \
@@ -141,7 +149,9 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir "$WORK_DIR" --o
 #    run), seal the accepted ones and the adjudications, and write the ledger rows. Pass the same
 #    --adjudications to --check. --run-id is required; the grandfathered 20260922 wave is never re-recorded.
 #    --lane-repo-root must name the export adjudicate inputs got: the adjudication binds the sealed form of
-#    each return, whose sources_read are relativized against it.
+#    each return, whose sources_read are relativized against it. Every worker has finished, so the rebuilt keys
+#    document may stay; the wave retains it as packet-keys.json.
+keys
 python3 tools/sota-convergence/record_verdicts.py --root . --work-dir "$WORK_DIR" --lane-repo-root "$BLIND_DIR/export" \
   --checked-at "$(date +%Y-%m-%d)" --run-id "$(date +%Y%m%d)" --adjudications "$WORK_DIR/adjudications" \
   --packet-keys "$KEYS_DIR/packet-keys.json" --write

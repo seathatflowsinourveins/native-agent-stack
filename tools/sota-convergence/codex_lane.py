@@ -719,46 +719,6 @@ def lane_provenance(prompt_path: Path, repo: Path = None, allow_escaping_links: 
     return provenance
 
 
-# The withheld labels of a packet whose candidates' manifest fields are sealed (scripts/landscape.py
-# sealed_candidate_labels; tests/test_codex_lane.py checks both agree), and the digest a return's provenance names
-# for the sealing packet-keys entry (landscape.packet_keys_entry_sha256): stdlib only, as this runner is.
-SEALED_PACKET_LABELS = ("candidates[].component_id", "candidates[].pin", "candidates[].upstream",
-                        "candidates[].recipe_ref", "candidates[].decisions")
-
-
-def packet_seals_candidates(packet) -> bool:
-    listed = packet.get("withheld") if isinstance(packet, dict) else None
-    return isinstance(listed, list) and all(label in listed for label in SEALED_PACKET_LABELS)
-
-
-def packet_keys_entry_sha256(entry) -> str:
-    return hashlib.sha256(json.dumps(entry, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
-
-
-def packet_provenances(packets, provenance: dict, keys_path) -> dict:
-    """packet file name -> the return provenance of a packet that seals its candidates: ``provenance`` plus
-    packet_keys_sha256, the digest of its --packet-keys entry, which binds the restored component ids to what the
-    lane judged (independent review of #145, round 5, INT-R5-1). Raises ValueError when a sealing packet has no
-    entry for its bytes."""
-    keys = None
-    if keys_path is not None:
-        document = json.loads(Path(keys_path).read_text(encoding="utf-8"))
-        keys = document.get("packets") if isinstance(document, dict) else None
-        if not isinstance(keys, dict):
-            raise ValueError(f"--packet-keys {keys_path} is not a packet-keys document")
-    bound = {}
-    for _catalog, _layer_id, packet_path in packets:
-        packet = json.loads(packet_path.read_text(encoding="utf-8"))
-        if not packet_seals_candidates(packet):
-            continue
-        entry = (keys or {}).get(packet_path.name)
-        if not isinstance(entry, dict) or entry.get("packet_sha256") != sha256_file(packet_path):
-            raise ValueError(f"{packet_path.name} seals its candidates' manifest fields; pass --packet-keys (the "
-                             "lane_packets.py --keys-out file) with an entry for its bytes")
-        bound[packet_path.name] = dict(provenance, packet_keys_sha256=packet_keys_entry_sha256(entry))
-    return bound
-
-
 def finalize_lane_return(data: dict, catalog: str, layer_id: str, packet_sha256: str,
                           event_model_name, effort: str, provenance: dict = None,
                           configured_model: str = None) -> dict:
@@ -779,9 +739,6 @@ def parse_args(argv=None):
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[2] if len(__doc__.splitlines()) > 2 else __doc__)
     parser.add_argument("--work-dir", required=True, type=Path)
     parser.add_argument("--repo", required=True, type=Path)
-    parser.add_argument("--packet-keys", type=Path, default=None,
-                        help="The lane_packets.py --keys-out file: required when the packets seal their candidates' "
-                             "manifest fields; each return's provenance names its entry's digest.")
     parser.add_argument("--layers", default=None,
                          help="Comma-separated layer ids to run (matched across every catalog); default: all.")
     parser.add_argument("--effort", default=DEFAULT_EFFORT, help="model_reasoning_effort passed via -c.")
@@ -860,17 +817,11 @@ def main(argv=None) -> int:
     except ValueError as error:  # an escaping symlink: not a blind export
         print(f"codex_lane: {error}", file=sys.stderr)
         return 2
-    try:
-        bound = packet_provenances(packets, provenance, args.packet_keys)
-    except (OSError, ValueError) as error:
-        print(f"codex_lane: {error}", file=sys.stderr)
-        return 2
     pending = []
     for catalog, layer_id, packet_path in packets:
         packet_sha256 = sha256_file(packet_path)
         out_path = codex_dir / f"{catalog}__{layer_id}.json"
-        if existing_output_is_valid(out_path, catalog, layer_id, packet_sha256,
-                                    bound.get(packet_path.name, provenance), args.model,
+        if existing_output_is_valid(out_path, catalog, layer_id, packet_sha256, provenance, args.model,
                                     args.effort):
             continue
         pending.append((catalog, layer_id, packet_path, packet_sha256, out_path))
@@ -916,14 +867,14 @@ def main(argv=None) -> int:
                 return 2
         try:
             return run_pending(args, work_dir, repo, template, schema_path, codex_dir, events_dir, usage_path,
-                               pending, provenance, bound)
+                               pending, provenance)
         finally:
             remove_codex_home_link(CHILD_CODEX_HOME)
             CHILD_CODEX_HOME = None
 
 
 def run_pending(args, work_dir, repo, template, schema_path, codex_dir, events_dir, usage_path, pending,
-                provenance, bound=None) -> int:
+                provenance) -> int:
     events_dir.mkdir(parents=True, exist_ok=True)
     strict_schema_path = write_strict_schema(schema_path, codex_dir)
     usage_lock = threading.Lock()
@@ -986,7 +937,7 @@ def run_pending(args, work_dir, repo, template, schema_path, codex_dir, events_d
                 continue
 
             final = finalize_lane_return(data, catalog, layer_id, packet_sha256, last_model_name, args.effort,
-                                         (bound or {}).get(packet_path.name, provenance), configured_model=args.model)
+                                         provenance, configured_model=args.model)
             out_path.write_text(json.dumps(final, indent=1, sort_keys=True) + "\n", encoding="utf-8")
             tmp_out.unlink(missing_ok=True)
             succeeded = True
@@ -1033,6 +984,20 @@ def run_pending(args, work_dir, repo, template, schema_path, codex_dir, events_d
     if flagged:
         print(f"codex_lane: blind audit flags {len(flagged)} layer(s) for review in {audit_path}: "
               + ", ".join(flagged), file=sys.stderr)
+    if not args.allow_git_history:
+        # In a blind run a flagged layer (a read outside the export and packets, web search or an MCP tool) is void,
+        # as an adjudication judgment is: it may have read the packet keys or another lane's return (Codex review of
+        # #145). Its return is set aside and the layer is recorded as failed.
+        this_run = {f"{catalog}__{layer_id}": out_path for catalog, layer_id, _p, _s, out_path in pending}
+        for name in flagged:
+            out_path = this_run.get(name)
+            if out_path is None:
+                continue
+            if out_path.is_file():
+                out_path.replace(out_path.with_name(out_path.name + ".audit-flagged"))
+            catalog, _, layer_id = name.partition("__")
+            failures.append((catalog, layer_id, "the blind audit flagged this layer's calls (web, MCP or a read "
+                                                 "outside the export and packets)"))
 
     failures_path = codex_dir / FAILURES_NAME
     if failures:

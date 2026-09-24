@@ -38,6 +38,7 @@ PACKET = {"catalog": "foundation", "layer_id": "beta", "candidates": [
 ], "withheld": landscape.withhold_policy_labels(None) + landscape.sealed_candidate_labels()
     + landscape.withheld_candidate_label_labels()}
 KEYS = {"c1": {"component_id": "comp-one", "pin": "1.0"}, "c2": {"component_id": "comp-two"}}
+PACKET["sealed_candidates_sha256"] = landscape.sealed_candidates_sha256(KEYS)  # the packet commits to its keys
 COMPONENTS = {"c1": "comp-one", "c2": "comp-two"}
 DECISION = "docs/decisions/2026-09-23-single-lane.md"
 INDEX = "catalogs/us-equities/decision-index.json"
@@ -198,6 +199,11 @@ class GateFixture(unittest.TestCase):
                evidence_class="source_review", evidence_refs=(), linux="not_established", keys=None):
         """Seal a new-wave (20260923) row the way record_verdicts.py would, then add it to the ledger."""
         self.new_wave = True
+        if keys is not None:
+            # Other sealed values are another build's packet, which commits to them.
+            packet = dict(packet if packet is not None else PACKET, sealed_candidates_sha256=landscape.sealed_candidates_sha256(
+                {candidate["key"]: keys.get(candidate["key"], {})
+                 for candidate in (packet if packet is not None else PACKET)["candidates"]}))
         packet_bytes = dump(packet if packet is not None else PACKET)
         packet_name = f"foundation__{layer_id}.json"
         self.retained[packet_name] = sha(packet_bytes)
@@ -979,11 +985,10 @@ class ToolingAlignmentTests(GateFixture):
         self.manifest_overrides["packet_keys_sha256"] = "0" * 64
         self.assertFails(self.report(), "packet-keys.json is not the run manifest's packet_keys_sha256")
         del self.manifest_overrides["packet_keys_sha256"]
-        # Bound, but naming another component for the winning key: the row's winner no longer matches.
+        # Bound by the manifest, but naming another component for the winning key: not the sealed values the packet
+        # commits to (Codex review of #145 at a516c477).
         self.keys["foundation__beta.json"]["candidates"]["c1"] = {"component_id": "comp-forged", "pin": "1.0"}
-        report = self.report()
-        self.assertEqual(report["status"], "failed", self.messages(report))
-        self.assertIn("comp-forged", self.messages(report))
+        self.assertFails(self.report(), "is not the sealed values the packet commits to")
 
     def test_sha256sums_other_than_the_run_manifest_text_fails(self):
         self.record()

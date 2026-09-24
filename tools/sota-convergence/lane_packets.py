@@ -64,7 +64,8 @@ from scripts.landscape import DISPOSITIONS, WINNER_EVIDENCE_CLASSES  # noqa: E40
 # wave retains (evidence/artifacts/layer-verdicts-<run-id>/packets/) against it in CI.
 from scripts.landscape import (  # noqa: E402
     COPY_WITHHELD_FIELDS, PACKET_KEYS_SCHEMA_VERSION, POPULARITY_TOKENS, REQUIREMENT_GATED_FIELDS,
-    SEALED_CANDIDATE_FIELDS, WITHHELD_CANDIDATE_LABELS, is_withheld_packet_key, requirement_names,
+    SEALED_CANDIDATE_FIELDS, SEALED_COMMITMENT_KEY, WITHHELD_CANDIDATE_LABELS, is_withheld_packet_key,
+    requirement_names, sealed_candidates_sha256,
     sealed_candidate_labels, withheld_candidate_label_labels, withheld_packet_keys, withhold_policy_labels,
 )
 from scripts.catalog_decisions import InvalidDecisionIndex, safe_file  # noqa: E402
@@ -621,8 +622,16 @@ GENERIC_NAME_PARTS = frozenset({"python", "server", "client", "engine", "trader"
 # "select" or "default" verb is not one; "selected pages" or "Keep the receipt" name no choice).
 CHOICE_PHRASE = re.compile(r"\b(?:incumbents?|winners?|current (?:choice|selection|destination|default)|"
                            r"(?:selected|chosen|retained|adopted) (?:destination|choice|stack|engine|runtime|path|"
-                           r"component|candidate|default|layer))\b", re.I)
+                           r"component|candidate|default|layer)|implementation choice|"
+                           r"prior (?:\S+ )?(?:oracle|choice|default|selection|engine|winner)|"
+                           # Adoption lifecycle status ("use stage is partial_acceptance", "not a newly qualified
+                           # component").
+                           r"use stage|lifecycle stage|partial_acceptance|qualified component|adoption (?:stage|status)|"
+                           # Catalog membership status (Codex review of #145 at a516c477: "gh CLI has no separate
+                           # manifests/stack.json inventory entry").
+                           r"stack\.json|inventory entry|stack (?:entry|inventory|membership))", re.I)
 CANDIDATE_PLACEHOLDER = "<candidate>"
+CHOICE_WINDOW = 25
 # Short names that are ordinary words are never terms ("one" as a component id is not the word "one").
 COMMON_SHORT_WORDS = frozenset({"one", "two", "six", "ten", "all", "any", "and", "the", "for", "new", "run", "use",
                                 "set", "get", "not", "yes", "off", "on", "in", "at", "to", "by", "of", "is", "it",
@@ -638,6 +647,9 @@ class CandidateMatcher:
     names such as gh, uv or RTK as whole case-sensitive tokens (round 5, N2; review of 52344da8)."""
 
     def __init__(self, long_terms, short_terms):
+        # A selection word is never a name term, even when a candidate's name holds it (round 5, N2).
+        long_terms = {term for term in long_terms if not SELECTION_WORD.fullmatch(term.strip())}
+        short_terms = {term for term in short_terms if not SELECTION_WORD.fullmatch(term.strip())}
         self.long = re.compile(r"(?<![A-Za-z0-9])(?:" + "|".join(re.escape(t) for t in sorted(long_terms, key=len, reverse=True))
                                + r")(?![A-Za-z0-9])", re.I) if long_terms else None
         self.short = re.compile(r"(?<![A-Za-z0-9])(?:" + "|".join(re.escape(t) for t in sorted(short_terms, key=len, reverse=True))
@@ -645,6 +657,10 @@ class CandidateMatcher:
 
     def search(self, text: str) -> bool:
         return bool((self.long and self.long.search(text)) or (self.short and self.short.search(text)))
+
+    def spans(self, text: str) -> list:
+        return [match.span() for pattern in (self.long, self.short) if pattern is not None
+                for match in pattern.finditer(text)]
 
     def sub(self, replacement: str, text: str) -> str:
         for pattern in (self.long, self.short):
@@ -658,26 +674,44 @@ def _variants(value: str) -> set:
     return {lowered, re.sub(r"[-_ ]", "-", lowered), re.sub(r"[-_ ]", "_", lowered), re.sub(r"[-_ ]", " ", lowered)}
 
 
-def candidate_matcher(candidates, layer_words=()) -> CandidateMatcher:
+def _name_terms(candidate: dict, long_terms: set, short_terms: set) -> None:
+    """Add a candidate's whole-name terms: name, repository name, component id, and each parenthesized alias of the
+    name ("GitHub CLI (gh)" gives gh; Codex review of #145 at a516c477)."""
+    repository = (candidate.get("repository") or "").rstrip("/")
+    name = candidate.get("name") if isinstance(candidate.get("name"), str) else ""
+    component = re.sub(r"^(?:candidate:|foundation-|data-)", "", str(candidate.get("component_id") or ""))
+    aliases = re.findall(r"\(([^()]+)\)", name)
+    for value in (re.sub(r"\s*\([^()]*\)", "", name), name, repository.split("/")[-1], component, *aliases):
+        if not isinstance(value, str) or not value.strip():
+            continue
+        if len(value.strip()) >= 4:
+            long_terms |= _variants(value)
+        elif len(value.strip()) >= 2 and value.strip().lower() not in COMMON_SHORT_WORDS:
+            short_terms.add(value.strip())
+
+
+def candidate_matcher(candidates, layer_words=(), catalog_candidates=()) -> CandidateMatcher:
     """The CandidateMatcher of ``candidates`` (name, repository and component_id each); a name part or owner counts
-    only when one candidate has it and the layer's own title and scope words (``layer_words``) do not."""
+    only when one candidate has it and the layer's own title and scope words (``layer_words``) do not.
+    ``catalog_candidates`` (every layer's) add their whole names, so a packet does not name another layer's incumbent
+    either (Codex review of #145 at a516c477: a factor layer's prose named Nautilus, LEAN and Alpaca)."""
     long_terms, short_terms = set(), set()
     owned_parts: dict = {}
     layer = {word.lower() for word in layer_words}
+    for candidate in catalog_candidates or ():
+        if isinstance(candidate, dict):
+            _name_terms(candidate, long_terms, short_terms)
+            for value in (candidate.get("name"), (candidate.get("repository") or "").rstrip("/").split("/")[-1]):
+                for part in re.split(r"[^A-Za-z0-9]+|(?<=[a-z0-9])(?=[A-Z])", value or ""):
+                    if len(part) >= 5 and part.lower() not in GENERIC_NAME_PARTS and part.lower() not in layer:
+                        long_terms.add(part.lower())
     for index, candidate in enumerate(candidates or []):
         if not isinstance(candidate, dict):
             continue
         repository = (candidate.get("repository") or "").rstrip("/")
         pieces = repository.split("/")
         basename, owner = pieces[-1], (pieces[-2] if len(pieces) >= 2 else "")
-        component = re.sub(r"^(?:candidate:|foundation-|data-)", "", str(candidate.get("component_id") or ""))
-        for value in (candidate.get("name"), basename, component):
-            if not isinstance(value, str) or not value.strip():
-                continue
-            if len(value.strip()) >= 4:
-                long_terms |= _variants(value)
-            elif len(value.strip()) >= 2 and value.strip().lower() not in COMMON_SHORT_WORDS:
-                short_terms.add(value.strip())
+        _name_terms(candidate, long_terms, short_terms)
         for value in (candidate.get("name"), basename):
             for part in re.split(r"[^A-Za-z0-9]+|(?<=[a-z0-9])(?=[A-Z])", value or ""):
                 if len(part) >= 5 and part.lower() not in GENERIC_NAME_PARTS:
@@ -689,8 +723,18 @@ def candidate_matcher(candidates, layer_words=()) -> CandidateMatcher:
 
 
 def states_choice(sentence: str, matcher: CandidateMatcher) -> bool:
-    """Whether a sentence states the catalog's choice: a choice phrase, or a selection word with a candidate."""
-    return bool(CHOICE_PHRASE.search(sentence) or (SELECTION_WORD.search(sentence) and matcher.search(sentence)))
+    """Whether a sentence states the catalog's choice: a choice phrase, or a selection word next to a candidate name
+    (within CHOICE_WINDOW characters: "the selected NautilusTrader destination", "Nautilus stays the default").
+    A selection verb elsewhere in the sentence ("Keep ... across Claude and Codex sessions") is not one (round 5,
+    N1)."""
+    if CHOICE_PHRASE.search(sentence):
+        return True
+    selections = [match.span() for match in SELECTION_WORD.finditer(sentence)]
+    if not selections:
+        return False
+    names = matcher.spans(sentence)
+    return any(max(0, max(s_start, n_start) - min(s_end, n_end)) <= CHOICE_WINDOW
+               for s_start, s_end in selections for n_start, n_end in names)
 
 
 def reduce_prose(text: str, matcher: CandidateMatcher, about_candidate: bool = False) -> str:
@@ -705,10 +749,10 @@ def reduce_prose(text: str, matcher: CandidateMatcher, about_candidate: bool = F
     return " ".join(kept)
 
 
-def withhold_prose(packet: dict) -> dict:
+def withhold_prose(packet: dict, catalog_candidates=()) -> dict:
     layer_words = re.findall(r"[A-Za-z0-9]+", str(packet.get("title") or "")) + [
         word for term in packet.get("layer_scope_terms") or [] for word in re.findall(r"[A-Za-z0-9]+", str(term))]
-    matcher = candidate_matcher(packet.get("candidates") or [], layer_words)
+    matcher = candidate_matcher(packet.get("candidates") or [], layer_words, catalog_candidates)
     reduced = []
     for field in PROSE_FIELDS:
         value = packet.get(field)
@@ -818,6 +862,9 @@ def seal_candidate_fields(packet: dict) -> tuple:
     sealed = {}
     for candidate in packet.get("candidates") or []:
         sealed[candidate["key"]] = {field: candidate.pop(field) for field in SEALED_CANDIDATE_FIELDS if field in candidate}
+    # The packet commits to the sealed values (scripts/landscape.py sealed_candidates_sha256), so only this
+    # build's document restores them and every return, bound to the packet's bytes, is bound to them too.
+    packet[SEALED_COMMITMENT_KEY] = sealed_candidates_sha256(sealed)
     withheld = list(packet.get("withheld", []))
     withheld.extend(label for label in sealed_candidate_labels() if label not in withheld)
     packet["withheld"] = withheld
@@ -853,6 +900,16 @@ def build_all_packets(root: Path, *, catalogs: list, seed: str, checked_at: str,
                          "previous winner")
     gap_index = gap_receipts_index(root) if gap_receipts else None
 
+    # Every catalog candidate's name, so no packet's prose names another layer's incumbent.
+    catalog_candidates = [candidate for relative in LEDGER_FILES.values()
+                          for row in load_json(root / relative).get("layers", [])
+                          for candidate in row.get("candidates") or [] if isinstance(candidate, dict)]
+    catalog_candidates += [{"name": entry.get("id"), "repository": entry.get("repository"), "component_id": entry.get("id")}
+                           for layer in trading_layers.values() for entry in layer.get("entries", [])
+                           if isinstance(entry, dict)]
+    catalog_candidates += [{"repository": item.get("repository"), "component_id": item.get("id")}
+                           for rows in (sota_doc.get("foundation") or [],) for row in rows if isinstance(row, dict)
+                           for item in row.get("components") or [] if isinstance(item, dict)]
     packets = {}
     for catalog in catalogs:
         ledger = load_json(root / LEDGER_FILES[catalog])
@@ -878,7 +935,7 @@ def build_all_packets(root: Path, *, catalogs: list, seed: str, checked_at: str,
                 # Every packet, manifest-mode trading packets included, loses popularity and
                 # recency signals; the default (no --withhold-labels) build is unchanged. Prose first, so
                 # the archived/license gating reads the requirement the lanes see (round 5, N4).
-                packet = withhold_prose(packet)
+                packet = withhold_prose(packet, catalog_candidates)
                 packet = withhold_popularity(packet)
             if gap_index is not None:
                 packet["gap_receipts"] = gap_index.get((catalog, row["layer_id"]), [])

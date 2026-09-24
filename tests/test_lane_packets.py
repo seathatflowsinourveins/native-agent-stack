@@ -648,7 +648,7 @@ class WithholdWithManifestModeTests(ManifestTradingCandidatesTests):
         plain = json.loads(self.build(trading_candidates="manifest")["us-equities__layer-b.json"])
         withheld = json.loads(self.build(trading_candidates="manifest", withhold=True)["us-equities__layer-b.json"])
         for key in set(plain) | set(withheld):
-            if key != "withheld":
+            if key not in ("withheld", "sealed_candidates_sha256"):  # the commitment to the sealed values
                 expected = scrub_popularity(plain[key])
                 if key == "candidates":
                     # Sealed fields and the withheld evidence_kind label (round 5, N5) leave the packet.
@@ -897,7 +897,8 @@ class WithheldProseTests(unittest.TestCase):
         # Round 5, N1: a sentence naming a candidate without stating the choice keeps its content with the name
         # redacted; a bare "Keep" names no choice and stays.
         self.assertEqual(out["limitations"], ["<candidate> 2.0.0rc5 is a prerelease.", "Fills are synthetic."])
-        self.assertEqual(out["existing_overturn_when"], "Reopen if a parity check fails. Keep the prior oracle.")
+        # "the prior oracle" names an earlier choice (Codex review of #145 at a516c477).
+        self.assertEqual(out["existing_overturn_when"], "Reopen if a parity check fails.")
         self.assertTrue(any("state the current choice" in label for label in out["withheld"]))
 
     def test_short_names_owners_variants_and_candidate_prose_are_covered(self):
@@ -920,6 +921,20 @@ class WithheldProseTests(unittest.TestCase):
         self.assertTrue(matcher.search("see nautechsystems releases"))  # an owner unique to one candidate
         self.assertFalse(matcher.search("the ghost of rtkx"))  # whole tokens only
         self.assertFalse(lane_packets.candidate_matcher([{"component_id": "one"}]).search("only one run"))
+
+    def test_aliases_catalog_names_and_membership_status_are_withheld(self):
+        # Codex review of #145 at a516c477: "gh CLI has no separate manifests/stack.json inventory entry" survived,
+        # and a factor layer's prose named Nautilus, LEAN and Alpaca, candidates of other layers.
+        packet = {"candidates": [{"name": "GitHub CLI (gh)", "repository": "https://github.com/cli/cli"},
+                                 {"name": "Qlib", "repository": "https://github.com/microsoft/qlib"}],
+                  "requirement": "Automate with gh. Compare factors against Nautilus fills.",
+                  "limitations": ["gh CLI has no separate manifests/stack.json inventory entry.",
+                                  "Reopen the implementation choice if Alpaca cannot fill."], "withheld": []}
+        others = [{"name": "Nautilus Trader", "repository": "https://github.com/nautechsystems/nautilus_trader"},
+                  {"name": "Alpaca", "repository": "https://github.com/alpacahq/alpaca-py"}]
+        out = lane_packets.withhold_prose(packet, others)
+        self.assertEqual(out["requirement"], "Automate with <candidate>. Compare factors against <candidate> fills.")
+        self.assertEqual(out["limitations"], [])
 
     def test_a_neutral_requirement_is_kept(self):
         packet = {"candidates": [{"name": "Widget One", "repository": "https://github.com/acme/widget-one"}],

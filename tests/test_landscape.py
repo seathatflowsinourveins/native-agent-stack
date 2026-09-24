@@ -9,8 +9,8 @@ import tempfile
 import unittest
 
 from scripts.landscape import (MANIFEST, SEALED_CANDIDATE_FIELDS, build_landscape, judge_adjudication,
-                               packet_keys_entry_sha256, sealed_candidate_labels, verify_sealed_waves,
-                               withheld_candidate_label_labels, withhold_policy_labels)
+                               SEALED_COMMITMENT_KEY, sealed_candidate_labels, sealed_candidates_sha256,
+                               verify_sealed_waves, withheld_candidate_label_labels, withhold_policy_labels)
 from scripts import platform_status
 
 
@@ -472,13 +472,14 @@ class LayerVerdictSchemaV2Tests(LandscapeTests):
                   "withheld": withhold_policy_labels("Find the source") + sealed_candidate_labels()
                               + withheld_candidate_label_labels(),
                   **(packet_extra or {})}
+        restore = {candidate["key"]: {**sealed.get(candidate["key"], {}),
+                                      **{field: candidate[field] for field in SEALED_CANDIDATE_FIELDS if field in candidate}}
+                   for candidate in packet["candidates"]}
+        packet.setdefault(SEALED_COMMITMENT_KEY, sealed_candidates_sha256(restore))
         name = f"foundation__{layer_id}.json"
         self.write(f"{NEW_WAVE_BASE}/packets/{name}", packet)
         packet_sha256 = hashlib.sha256(json.dumps(packet).encode("utf-8")).hexdigest()
-        keys = {"schema_version": 1, "packets": {name: {"packet_sha256": packet_sha256, "candidates": {
-            candidate["key"]: {**sealed.get(candidate["key"], {}),
-                               **{field: candidate[field] for field in SEALED_CANDIDATE_FIELDS if field in candidate}}
-            for candidate in packet["candidates"]}}}}
+        keys = {"schema_version": 1, "packets": {name: {"packet_sha256": packet_sha256, "candidates": restore}}}
         self.write(f"{NEW_WAVE_BASE}/packet-keys.json", keys)
         sums = f"{packet_sha256}  {name}\n"
         (self.root / NEW_WAVE_BASE / "packets" / "SHA256SUMS").write_text(sums, encoding="utf-8")
@@ -490,9 +491,7 @@ class LayerVerdictSchemaV2Tests(LandscapeTests):
             sealed = {"lane": lane, "model": models[lane], "packet_sha256": packet_sha256,
                       "winner_keys": ["c1"] if lane == "claude" else [codex_winner]}
             if provenance.get(lane) is not None:
-                # The runner binds the packet's keys entry into the provenance (round 5, INT-R5-1).
-                sealed["provenance"] = dict(provenance[lane],
-                                            packet_keys_sha256=packet_keys_entry_sha256(keys["packets"][name]))
+                sealed["provenance"] = provenance[lane]
             if lane == "claude":
                 sealed["refutation"] = copy.deepcopy(NEW_WAVE_REFUTATION if refutation is None else refutation)
             self.write(f"{NEW_WAVE_BASE}/{lane}/{run_id}.json", sealed)
@@ -1153,9 +1152,9 @@ class LayerVerdictSchemaV2Tests(LandscapeTests):
         digest = hashlib.sha256(json.dumps(keys).encode("utf-8")).hexdigest()
         lanes = self.edit_manifest(lanes, lambda manifest: manifest.update(packet_keys_sha256=digest))
         self.layer.update(self.recorded_fields(lanes=lanes))
-        # Re-bound in the manifest, the changed entry no longer matches the digest each sealed return names
-        # (round 5, INT-R5-1), so the relabelled component is refused.
-        with self.assertRaisesRegex(ValueError, "is not the digest .* of the packet-keys entry sealing its packet"):
+        # Re-bound in the manifest, the changed entry is not the sealed values the packet commits to (round 5,
+        # INT-R5-1), so the relabelled component is refused.
+        with self.assertRaisesRegex(ValueError, "is not the sealed values the packet commits to"):
             self.build()
         (self.root / NEW_WAVE_BASE / "packet-keys.json").unlink()
         with self.assertRaisesRegex(ValueError, "packet-keys.json"):

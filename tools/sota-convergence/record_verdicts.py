@@ -99,7 +99,7 @@ from scripts.landscape import (  # noqa: E402
     lane_provenance_registry_issue, registered_provenance_entry, claude_refutation_issue,
     packet_component_id, parse_retained_sha256sums, single_lane_authorizes, single_lane_decision_path_issue,
     withheld_packet_keys, adjudication_binding_issue, PACKET_KEYS_NAME, PACKET_KEYS_SCHEMA_VERSION,
-    packet_keys_binding_issue, packet_keys_issue, packet_seals_candidates, unseal_packet,
+    packet_keys_issue, packet_seals_candidates, unseal_packet,
 )
 # One platform-status rule for every caller (2026-09-23 peer audit, item 6): scripts/platform_status.py
 # (catalog PR #117) derives each platform's status from the host receipts and registered evidence;
@@ -729,7 +729,6 @@ def process_row(row: dict, root: Path, catalog: str, layer_id: str, work_dir: Pa
     packet_path = work_dir / "packets" / packet_filename
     packet = load_packet(packet_path)
     packet_mismatch = None
-    keys_entry = None
     if packet is not None:
         actual = hashlib.sha256(packet_path.read_bytes()).hexdigest()
         if packet_filename not in sha256sums:
@@ -742,7 +741,6 @@ def process_row(row: dict, root: Path, catalog: str, layer_id: str, work_dir: Pa
                                else "the packet seals its candidates' manifest fields: pass --packet-keys "
                                     "(the lane_packets.py --keys-out file of this run)")
             if packet_mismatch is None:
-                keys_entry = packet_keys["packets"][packet_filename]
                 packet = unseal_packet(packet, packet_keys, packet_filename)
     candidates_by_key = {c["key"]: c for c in packet.get("candidates", [])} if packet else {}
     v1_candidates_by_repository = index_v1_candidates_by_repository(row)
@@ -782,13 +780,6 @@ def process_row(row: dict, root: Path, catalog: str, layer_id: str, work_dir: Pa
                              f"{valid['codex']['provenance'].get('repo_tree_sha256')}, not the claude lane's "
                              f"{valid['claude']['provenance'].get('repo_tree_sha256')}; rerun it on the same export")
         del valid["codex"]
-    if keys_entry is not None and not grandfathered:
-        # The restored component ids are bound to what each lane judged (round 5, INT-R5-1).
-        for lane in list(valid):
-            issue = packet_keys_binding_issue(valid[lane].get("provenance"), keys_entry)
-            if issue:
-                reject_lane(lane, issue)
-                del valid[lane]
     if not grandfathered and lane_root_trees:
         # Each --lane-repo-root must hold the tree the lanes read (independent review of #145, BIND-R4-9): sources
         # under another checkout would be relativized as if they were the export's.

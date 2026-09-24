@@ -995,7 +995,7 @@ re-applied by `scripts/landscape.py` in CI to the sealed files):
   python3 tools/sota-convergence/claude_lane.py --result /path/to/lane-result.json \
     --work-dir /path/to/work-dir --agentlab-root /path/to/agent-lab \
     --agent-file ~/.claude/agents/blind-lane-reviewer.md --repo /path/to/state/blind/export \
-    --packet-keys /path/to/keys/packet-keys.json --resolved-model claude-opus-5-5
+    --resolved-model claude-opus-5-5
   ```
 
 **Two-family adjudication is keep-but-compare** (decision
@@ -1700,19 +1700,33 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
     `codex-cli 0.155.1`: a child with only `CODEX_HOME`, `HOME`, `LANG`, `PATH` and `TERM` signed in, listed
     only the CLI's bundled skills and received no AGENTS.md; the native credential was intact and the link was
     removed after.
-  - **Keys bound to the returns (INT-R5-1).** A return of a packet that seals its candidates names the digest of
-    its packet-keys entry (`provenance.packet_keys_sha256`, stamped by `codex_lane.py --packet-keys` and
-    `claude_lane.py --packet-keys`). `record_verdicts.py` rejects a lane whose digest differs, and
-    `scripts/landscape.py` refuses a sealed return whose digest is not that of the retained entry, so a later
-    edit of `packet-keys.json` cannot swap or relabel a recorded winner's component. `record_verdicts.py --write`
-    also refuses a retained entry that does not seal exactly its packet's candidates (INT-R5-4), and a bad
-    `--packet-keys` file is a clean refusal (R5-REG-8).
-  - **Packet prose (N1, N2, N4).** A sentence is dropped only when it states the catalog's choice: a choice phrase
-    ("current choice", "selected destination", "incumbent") or a selection word with a candidate. Other candidate
-    names are written `<candidate>`. Terms cover full names, repository names, component ids, owners and name
-    parts unique to one candidate (outside the layer's own title and scope words) with `-`/`_`/space variants, and
-    short names such as `gh`, `uv` or `RTK` as whole case-sensitive tokens. On the 2026-09-23 packets, 1
-    requirement is emptied (13 before) and 55 names are written `<candidate>`. A packet without `layer_scope_terms`
+  - **Sealed values committed in the packet (INT-R5-1; Codex review at a516c477).** A blind packet carries
+    `sealed_candidates_sha256`, the digest of its candidates' sealed values. `packet_keys_issue` (used by
+    `record_verdicts.py`, `adjudicate.py inputs`, `scripts/landscape.py` and `scripts/verdict_review_gate.py`)
+    refuses an entry that does not hash to it. A stale, edited or other build's document therefore cannot restore
+    other component ids or pins, and every lane return, bound to the packet's sha256, is bound to the values too.
+    The lane runners need no keys. The commitment is deterministic; recovering the values from it would mean
+    guessing every candidate's exact pins, upstream records and decision prose, none of which a blind export
+    holds. `record_verdicts.py --write` also refuses a retained entry that does not seal exactly its packet's
+    candidates (INT-R5-4), and a bad `--packet-keys` file is a clean refusal (R5-REG-8).
+  - **No keys document while a worker runs (Codex review at a516c477).** A model worker runs as the operator's
+    user and can read any file it names, so a keys document placed outside `--out` was still reachable. The recipe
+    deletes it right after building the packets. For `adjudicate.py inputs` and `record_verdicts.py`, the only
+    steps that need it, it rebuilds it (the build is deterministic) and checks the rebuilt packets are
+    byte-identical. It deletes it again before the judges run. A blind `codex_lane` layer whose audit is flagged
+    (a read outside the export and packets, web search or an MCP tool) is now void, its return set aside, as a
+    flagged adjudication judgment already was.
+  - **Packet prose (N1, N2, N4; Codex review at a516c477).** A sentence is dropped only when it states the
+    catalog's choice: a choice phrase ("current choice", "selected destination", "implementation choice", "prior
+    LEAN oracle", "incumbent"), catalog membership or lifecycle status ("stack.json", "inventory entry", "use
+    stage", "qualified component"), or a selection word within 25 characters of a candidate name. Other names
+    are written `<candidate>`. Terms cover full names, parenthesized aliases ("GitHub CLI (gh)" gives `gh`),
+    repository names, component ids, owners and name parts unique to one candidate (outside the layer's own title
+    and scope words), with `-`/`_`/space variants. Short names such as `gh`, `uv` or `RTK` match as whole
+    case-sensitive tokens. Since the Codex review, every catalog candidate's whole names and distinctive parts
+    count in every packet, so a factor layer's prose no longer names Nautilus, LEAN or Alpaca. A selection word is
+    never a term. On the 2026-09-23 packets, 4 requirements are emptied (13 before), all us-equities layers
+    sharing the group requirement that names the selected destination, and 362 names are written `<candidate>`. A packet without `layer_scope_terms`
     is no longer pointed at them. Candidates' `role` and `card_limitations` are reduced too (any selection word
     there goes, since the text is about that candidate). Prose runs before the popularity strip, so the
     archived/license gating reads the requirement the lanes see, and every blind packet is checked with
