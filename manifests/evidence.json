@@ -6523,8 +6523,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/native-faults/README.md",
-      "sha256": "8041b0522afd915ec9a2bc643d66997c0f8d75e443cd14fb5426ab5a4bac2f90",
-      "bytes": 18739
+      "sha256": "7bf3ae0204913c3e01b10973cfdc3bbc034778cbde239e2137574033060502a0",
+      "bytes": 19732
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/native-faults/harness.py",

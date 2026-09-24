@@ -4,7 +4,8 @@ Gate: `native-fault-behaviour` in `catalogs/us-equities/gates-20260922.json`
 (receipt path `blueprints/us-equities/adaptive-paper/native-faults/receipt.json`).
 This directory holds the harness, its frozen `plan.json`, this note, the current
 live receipt `receipt.json` (the 2026-09-24 run) and the retained receipt of the
-earlier incomplete run, `receipt-20260923.json`. The offline suite
+earlier incomplete run, `receipt-20260923.json`, and under `evidence/` the
+independent observation of the 2026-09-24 run's broker orders. The offline suite
 `tests/test_native_faults_min.py` is a local synthetic fixture with a fake
 transport; it drives the real `runner.Controller` and `safety.Ledger`.
 
@@ -63,20 +64,37 @@ definitive in general. The comments in `safety.py` and `transport.py` still
 describe the 422 as inferred. They are left as they are because editing them
 would change the engine hashes this receipt binds.
 
-**Gate status.** `scripts/trading_gates.py` now lists `native-fault-behaviour`
-as a flip candidate (`/status == "native_faults_passed"` holds). The gate's own
-rule still keeps it `not_established` in this change. The ladder allows a
+**Gate status.** `scripts/trading_gates.py` lists `native-fault-behaviour`
+as a flip candidate (`/status == "native_faults_passed"` holds). The ladder allows a
 status change "only by a dated commit after the checker lists the gate as a flip
 candidate". The gate note adds that "native (non-synthetic) faults were actually
 exercised ... is qualified manually before the dated commit that flips this
 gate". `docs/acceptance-evidence-policy.md` says "Parsing a wrapper's own
-`passed` field is not independent confirmation". The qualification therefore
-needs an independent observation that has not been made yet, for example an
-order listing by a separate method (not the harness or the engine transport)
-for prefix `nf-20260924t143905-29d7ec-`. It would show the C01 order `canceled`
-with zero filled, no broker order for the C04 client id, and zero open orders
-and positions. The order-throughput `independent-observation-20260924.json` is
-the pattern to follow.
+`passed` field is not independent confirmation", so the qualification uses the
+independent observation below. The flip itself is a separate dated commit.
+
+## Independent observation of 2026-09-24
+
+`evidence/independent-observation-20260924.json` records a listing made by the
+workflow coordinator at 2026-09-24 15:01:47Z by a separate method: an alpaca-py
+0.44.0 script (`evidence/observe-native-faults-20260924.py`, sha256
+6f4b1c19...) on Python 3.12.3, not `harness.py` and not the engine transport.
+Its stdout is retained byte-identical as
+`evidence/observe-native-faults-20260924.stdout.json` (sha256 420d762c...);
+stderr was empty and the exit code 0.
+
+For prefix `nf-20260924t143905-29d7ec-` since the receipt's `started_at` it saw
+one broker order, `c01`, `canceled` with filled quantity 0. The client-id lookup
+for `c01` returned the same. The lookup for `c04` returned 404, so no broker
+order exists for it. There were 0 open orders and 0 positions. These counts
+match the receipt: one accepted submit (C01, later canceled), one submit
+refused with 422 that created no order (C04), cleanup flat.
+
+The observation uses the same broker API and account, so it is independent of
+the harness and engine code, not of the broker. It confirms only these
+broker-side facts. It does not observe the run's own HTTP statuses (C04's 422
+body, C05's 204 DELETE answer), ledger contents, or the engine's handling of a
+422 cancel refusal, which remains offline-tested only.
 
 ## Retained history: the incomplete run of 2026-09-23
 
