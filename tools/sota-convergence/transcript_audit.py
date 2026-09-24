@@ -75,12 +75,18 @@ def run_issue(directory, files, result=None):
         return "the workflow run record is unreadable"
     if not isinstance(record, dict) or record.get("status") != "completed":
         return "the workflow run did not complete"
-    agents = {entry.get("agentId") for entry in record.get("workflowProgress") or []
-              if isinstance(entry, dict) and entry.get("type") == "workflow_agent"}
+    entries = [entry for entry in record.get("workflowProgress") or []
+               if isinstance(entry, dict) and entry.get("type") == "workflow_agent"]
+    agents = {entry.get("agentId") for entry in entries}
     present = {path.name[len("agent-"):-len(".jsonl")] for path in files}
-    if not agents or agents != present:
-        return (f"the transcripts ({len(present)}) are not exactly the run's agents ({len(agents)}): missing "
-                f"{sorted(agents - present)[:3]}, extra {sorted(present - agents)[:3]}")
+    # The record lists each agent's final attempt; an earlier attempt of a retried agent (attempt n > 1) leaves its
+    # own transcript, which is audited like any other (measured on real runs retried after a usage limit).
+    retries = sum(max(0, entry.get("attempt") - 1) for entry in entries
+                  if isinstance(entry.get("attempt"), int) and not isinstance(entry.get("attempt"), bool))
+    missing, extra = agents - present, present - agents
+    if not agents or missing or len(extra) > retries:
+        return (f"the transcripts ({len(present)}) are not the run's agents ({len(agents)}, {retries} earlier "
+                f"attempt(s)): missing {sorted(missing)[:3]}, extra {sorted(extra)[:3]}")
     if result is not None:
         returned = record.get("result")
         candidates = [result] + ([result["result"]] if isinstance(result, dict) and "result" in result else [])

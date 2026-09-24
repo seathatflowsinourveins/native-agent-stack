@@ -149,6 +149,19 @@ class TranscriptAuditTests(unittest.TestCase):
                 report = transcript_audit.audit(self.run, self.items, export=self.export, result=RESULT)
                 self.assertEqual(report["flagged_items"], ["foundation__layer"])
                 self.assertIn(reason, report["run_issue"])
+        # An earlier attempt of a retried agent leaves its own transcript; the record counts it (attempt 2).
+        self.record()
+        (self.run / "agent-z0.jsonl").write_text((self.run / "agent-a.jsonl").read_text(encoding="utf-8"),
+                                                 encoding="utf-8")
+        self.assertIn("extra", transcript_audit.audit(self.run, self.items)["run_issue"])
+        self.record(workflowProgress=[{"type": "workflow_agent", "agentId": "a", "attempt": 2}])
+        self.assertIsNone(transcript_audit.audit(self.run, self.items, export=self.export, result=RESULT)["run_issue"])
+        (self.run / "agent-z0.jsonl").write_text(json.dumps({"type": "user", "cwd": str(self.export), "message": {
+            "content": f"Read the packet at {self.packet}"}}) + "\n" + json.dumps({"type": "assistant", "cwd": str(
+            self.export), "message": {"content": [{"type": "tool_use", "name": "Read", "input": {
+            "file_path": "/etc/hostname"}}]}}) + "\n", encoding="utf-8")
+        self.assertEqual(self.flagged(), ["foundation__layer"], "an earlier attempt's reads are audited too")
+        (self.run / "agent-z0.jsonl").unlink()
         self.record()
         # A nested agent transcript the run record does not list.
         nested = self.run / "nested"
