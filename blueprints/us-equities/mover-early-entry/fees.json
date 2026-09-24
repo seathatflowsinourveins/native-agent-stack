@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "id": "mover-early-entry-fees-20260924",
+  "purpose": "Regulatory sell-side fees and the IBKR Pro tiered commission used by protocol.json costs.fees, taken from primary sources and dated. Rates apply on the trade date (the SEC text uses charge dates; the difference of a settlement cycle at a boundary is ignored and recorded here). Brokers round each fee up to the cent per trade; this model does not round.",
+  "retrieved_at": "2026-09-24T03:40:00Z",
+  "sec_section31_usd_per_million_of_sales": [
+    {"from": "2020-01-01", "to": "2021-02-24", "rate": 22.10, "source": "https://www.sec.gov/newsroom/press-releases/2021-8", "quote": "each SRO will continue to pay the Commission a rate of $22.10 per million for covered sales occurring on charge dates through February 24, 2021, and a rate of $5.10 per million for covered sales occurring on charge dates on or after February 25, 2021."},
+    {"from": "2021-02-25", "to": "2022-05-13", "rate": 5.10, "source": "https://www.sec.gov/newsroom/press-releases/2022-60", "quote": "each SRO will continue to pay the Commission a rate of $5.10 per million for covered sales occurring on charge dates through May 13, 2022, and a rate of $22.90 per million for covered sales occurring on charge dates on or after May 14, 2022."},
+    {"from": "2022-05-14", "to": "2023-02-26", "rate": 22.90, "source": "https://www.sec.gov/newsroom/press-releases/2023-15", "quote": "each self-regulatory organization will continue to pay the Commission a rate of $22.90 per million dollars for covered sales occurring on charge dates through February 26, 2023, and a rate of $8.00 per million dollars for covered sales occurring on charge dates on or after February 27, 2023."},
+    {"from": "2023-02-27", "to": "2024-05-21", "rate": 8.00, "source": "https://www.sec.gov/newsroom/press-releases/2024-47", "quote": "each self-regulatory organization will continue to pay the Commission a rate of $8 per million for covered sales occurring on charge dates through May 21, 2024, and a rate of $27.80 per million for covered sales occurring on charge dates on or after May 22, 2024."},
+    {"from": "2024-05-22", "to": "2025-05-13", "rate": 27.80, "source": "https://www.sec.gov/rules-regulations/fee-rate-advisories/2025-2", "quote": "each SRO will continue to pay the Commission a rate of $27.80 per million for covered sales occurring on charge dates through May 13, 2025, and a rate of $0.00 per million for covered sales occurring on charge dates on or after May 14, 2025."},
+    {"from": "2025-05-14", "to": "2026-04-03", "rate": 0.00, "source": "https://www.sec.gov/rules-regulations/fee-rate-advisories/2026-2", "quote": "each SRO will continue to pay the Commission a rate of $0.00 per million for covered sales occurring on charge dates through April 3, 2026, and a rate of $20.60 per million for covered sales occurring on charge dates on or after April 4, 2026."},
+    {"from": "2026-04-04", "to": "2026-12-31", "rate": 20.60, "source": "https://www.sec.gov/rules-regulations/fee-rate-advisories/2026-2", "quote": "starting on April 4, 2026, the fee rates applicable to most securities transactions will be set at $20.60 per million dollars."}
+  ],
+  "finra_taf_covered_equity_sales": [
+    {"from": "2012-07-01", "to": "2021-12-31", "usd_per_share": 0.000119, "max_per_trade": 5.95, "source": "https://www.finra.org/sites/default/files/2020-10/SR-FINRA-2020-032.pdf", "quote": "[$0.000119] $0.000130 per share for each sale of a covered equity security, with a maximum charge of [$5.95] $6.49 per trade (the bracketed rate is the one replaced on January 1, 2022)"},
+    {"from": "2022-01-01", "to": "2022-12-31", "usd_per_share": 0.000130, "max_per_trade": 6.49, "source": "https://www.finra.org/sites/default/files/2020-10/SR-FINRA-2020-032.pdf", "quote": "[$0.000119] $0.000130 per share for each sale of a covered equity security, with a maximum charge of [$5.95] $6.49 per trade"},
+    {"from": "2023-01-01", "to": "2023-12-31", "usd_per_share": 0.000145, "max_per_trade": 7.27, "source": "https://www.finra.org/sites/default/files/2020-10/SR-FINRA-2020-032.pdf", "quote": "[$0.000130] $0.000145 per share for each sale of a covered equity security, with a maximum charge of [$6.49] $7.27 per trade"},
+    {"from": "2024-01-01", "to": "2025-12-31", "usd_per_share": 0.000166, "max_per_trade": 8.30, "source": "https://www.finra.org/rules-guidance/rule-filings/sr-finra-2024-019/fee-adjustment-schedule", "quote": "Covered Equity Security | $0.000166 per share (up to $8.30 max per trade) | $0.000166 per share (up to $8.30 max per trade) [2024, 2025 (no change)]"},
+    {"from": "2026-01-01", "to": "2026-12-31", "usd_per_share": 0.000195, "max_per_trade": 9.79, "source": "https://www.finra.org/rules-guidance/rule-filings/sr-finra-2024-019/fee-adjustment-schedule", "quote": "$0.000195 per share (up to $9.79 max per trade) [2026]"}
+  ],
+  "ibkr_pro_tiered_us_stocks": {
+    "usd_per_share": 0.0035, "min_per_order": 0.35, "max_fraction_of_trade_value": 0.01,
+    "tier_note": "the <= 300,000 shares per month tier; exchange, clearing and pass-through fees are not modelled",
+    "source": "https://www.interactivebrokers.com/en/pricing/commissions-stocks.php",
+    "quote": "<= 300,000 | USD 0.0035 ... Minimum per order (shares) | USD 0.35 ... Maximum per order | 1% of Trade Value"
+  },
+  "alpaca": {"commission": 0.0, "note": "commission-free; the SEC fee and FINRA TAF are passed through on sells"},
+  "source_sha256_at_retrieval": {
+    "https://www.sec.gov/newsroom/press-releases/2021-8": "417c2c26938344e1f148984d80573348278729f9b6105f6ae33aa27a04aa1861",
+    "https://www.sec.gov/newsroom/press-releases/2022-60": "c384d99a1297266f5afdd00722acdf83c39c2bd25d87e21bd5437623eb5d50cd",
+    "https://www.sec.gov/newsroom/press-releases/2023-15": "423bdb81cc9db2a00934b3f0f3e1f0fa463ee898139f7d15a5f7577af424deb6",
+    "https://www.sec.gov/newsroom/press-releases/2024-47": "a05e7620347a92d70f486ecd2c0828dfed3835abd78ef5ce300bfca1844f3989",
+    "https://www.sec.gov/rules-regulations/fee-rate-advisories/2025-2": "2d88493bfbe2c73e181a1d3007ad2ad7f95f2c88ab1e19b8ba22d8ff8098e1a6",
+    "https://www.sec.gov/rules-regulations/fee-rate-advisories/2026-2": "9a478bbd81fff37193db98a18d95fb51a1a8f3dd76efb6ec6405f6674fe9c86d",
+    "https://www.finra.org/sites/default/files/2020-10/SR-FINRA-2020-032.pdf": "ddac2be95898c8d7fd43c02e5e1d92fd953c2ccb0a5bf312bd5cc4342bd13cd0",
+    "https://www.finra.org/rules-guidance/rule-filings/sr-finra-2024-019/fee-adjustment-schedule": "29a424e3faed5ce37e102ec7745015b951d4584d6c3b36c7ca3e6b4c60c3fa3c",
+    "https://www.interactivebrokers.com/en/pricing/commissions-stocks.php": "163f528304a0308e63c80d6c07067ea0b0c16a21daf5f3af319d83a33d2df615"
+  },
+  "limitations": [
+    "web pages change, so the retrieval hashes identify what was read, not a stable artifact",
+    "the 2012-07-01 start of the $0.000119 TAF is from FINRA Regulatory Notice 12-31 as summarised by search, not re-read here; only 2021 onward is used",
+    "the SEC 2020 rate row starts on 2020-01-01 for lookup convenience; only 2021-01-04 onward is used"
+  ]
+}

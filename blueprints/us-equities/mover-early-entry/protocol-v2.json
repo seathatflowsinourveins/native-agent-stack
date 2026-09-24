@@ -1,0 +1,133 @@
+{
+  "schema_version": 1,
+  "id": "mover-followup-v2-20260924",
+  "kind": "preregistered_event_study_protocol",
+  "frozen_before_outcomes": true,
+  "frozen_note": "Written and committed before any outcome of protocol v1 (mover-early-entry-v1-20260924) or of this protocol was computed. It reuses v1's collections, definitions (rules.py), cost table and statistics, and v1's deviations D1-D3 and clarifications C1-C23 apply unless restated here.",
+  "prior_exposure_disclosed": "Before this freeze the author had seen v1's development cost table (half-spreads about 20-75 bps per side), the counts of fired development entries (24,127 under v1's loosest rule), the D3 finding that 19% of pre-market-active candidate days trade above their regular-session high before the open, and the research package's chapter headlines and Wave H summary. No post-entry return of any rule has been computed.",
+  "question": "Do entries earlier than v1's fixed clock times, the common follow-up setups on mover days, or pre-positioning at the previous close select US-equity symbol-days with positive returns net of realistic costs, and how much of each degree of eventual move do they capture?",
+  "user_scope": "2026-09-24 user instructions: pre-position or enter extreme movers at an early stage with auto leverage; strategies end to end on historical data, simulation and paper; follow-up strategies; use the Alpaca Elite data rate. Leverage stays a preregistered schedule; deterministic risk stays in code.",
+  "direction": "long only",
+  "inputs": {
+    "intraday": "v1's candidate list plus the D3 pre-market supplement and their asof 2026-09-21 collections (bars 04:00-20:00, auctions, news)",
+    "daily": "the broad-universe daily dataset (sha256 f7584f24519367e03e0a4ac0fc57f9b410c047991b001bb0259ebdfc09b31105): regular-session bars; close = official close on 92% of sampled days (v1 D3)",
+    "cost_table": "v1's quote-measured development cost table, as committed for v1 (its sha256 is recorded in v1's results)"
+  },
+  "families": {
+    "E_first_cross": {
+      "idea": "earliest-stage entry: enter at the first minute a mover condition becomes true, instead of at a fixed clock time",
+      "rule": "for window W and thresholds (G, V): the first 1-minute bar k starting in W such that, using bars starting before bar k's start, gain_at >= G, dollar_volume_at >= V and price_at >= $1; enter at bar k's open (a bar starting at or after 09:30 when k is the first regular-session bar; in the pre-market, bar k must start before 09:30)",
+      "windows_et": [
+        [
+          "04:00",
+          "09:30"
+        ],
+        [
+          "04:00",
+          "11:00"
+        ],
+        [
+          "09:30",
+          "11:00"
+        ]
+      ],
+      "gain_thresholds": [
+        0.2,
+        0.3,
+        0.5
+      ],
+      "min_dollar_volume": [
+        250000,
+        1000000,
+        5000000
+      ],
+      "news_variants": [
+        "any",
+        "news_before_t"
+      ],
+      "exits": [
+        "X1",
+        "X2",
+        "X3",
+        "X4"
+      ],
+      "count": 216,
+      "completeness": "every G >= 0.20 condition holds only on a v1 candidate or D3 supplement day (the superset argument of v1 and D3)",
+      "live_mapping": "a full-market snapshot scan every 10 s (about 20 snapshot requests per scan, ~120 per minute at 8,000 symbols) plus minute bars for the prefiltered names; well inside the Elite 10,000-per-minute data limit"
+    },
+    "F_followup_setups": {
+      "idea": "common practitioner setups on a mover day, entered after the open",
+      "universe": "symbol-days whose official open is at least 1.20 x ref (gap-up movers; ref as v1), price >= $1, dollar volume before 09:30 >= $250,000",
+      "setups": {
+        "F1_orb5": "opening-range breakout: range = high and low of bars starting 09:30-09:34; enter at the open of the first bar starting 09:35-10:59 whose high exceeds the range high, at max(bar open, range high); initial stop = range low",
+        "F2_orb15": "as F1 with the 09:30-09:44 range and entries 09:45-10:59",
+        "F3_premarket_high_break": "enter at max(bar open, pre-market high) in the first bar starting 09:30-10:59 whose high exceeds the high of bars starting 04:00-09:29; initial stop = the official open x 0.90",
+        "F4_vwap_reclaim": "session VWAP from 04:00 (vwap x volume / volume, cumulative); after the first bar starting at or after 09:35 that closes below VWAP, enter at the open of the next bar after a bar that closes back above VWAP, starting before 11:00; initial stop = the lowest low since 09:30"
+      },
+      "exits": {
+        "Y1_close": "the official close",
+        "Y2_stop_or_close": "the setup's initial stop (fill min(stop, bar open) for gaps), else the official close",
+        "Y3_stop_trail": "the initial stop until the running high reaches 1.10 x entry, then a 10% trail off the running high through the previous bar, else the official close",
+        "Y4_stop_2r": "the initial stop, or a target of entry + 2 x (entry - stop) (the stop is assumed first in a bar reaching both), else the official close"
+      },
+      "count": 16,
+      "costs": "v1 per-side costs by bucket; entries are bar fills (1.25 x half-spread), exits as v1"
+    },
+    "P_preposition": {
+      "idea": "pre-position at the previous session's official close in names likely to be the next session's extreme movers, and day-2 continuation",
+      "universe": "every daily-dataset symbol-day (less likely warrants, units and rights) with close >= $1 and dollar volume >= $1,000,000 on the entry day d",
+      "scores": {
+        "S1_day2_runner": "day d's close / day d-1's close - 1 >= 0.30 and close >= 0.90 x day d's high",
+        "S2_volume_breakout": "day d's volume >= 5 x the median volume of days d-20..d-1, close >= the 20-day high, and day d's return >= +10%",
+        "S3_compression_expansion": "day d's range is the narrowest of the last 7 days (NR7) and its volume >= 3 x the 20-day median",
+        "S4_gap_and_hold": "day d's open >= 1.20 x day d-1's close and day d's close >= day d's open"
+      },
+      "ranking": "within a score's qualifying set, rank by day d's dollar volume descending, then symbol; at most 5 entries per session",
+      "entry": "day d's daily-bar close as the proxy for the official close (the closing auction); v1 D3 measured the daily close equal to the official closing print on 92% of sampled days",
+      "exits": {
+        "Z1_next_open": "day d+1's daily-bar open as the proxy for the official open (78% agreement in v1 D3)",
+        "Z2_next_close": "day d+1's daily-bar close",
+        "Z3_open_stop_close": "exit at day d+1's open if it is below day d's close x 0.95, else at day d+1's close"
+      },
+      "count": 12,
+      "costs": "each auction side pays 0.5 x the v1 half-spread of its bucket (09:30-10:00 for the open, 10:00-16:00 for the close) with the tier of that side's price and day d's dollar volume; fees as v1",
+      "capture": "the share of day d+1's degree-tier movers (v1 tiers on day d+1's close over day d's close) that a score selected, against the tier's base rate among the universe",
+      "overnight": "held overnight; leverage capped at 2 (Reg T) and the drawdown factor as v1",
+      "proxy_note": "all P prices come from the daily dataset for every symbol; auction prints are fetched only for traded names in the paper step"
+    }
+  },
+  "definitions_shared": "ref, split factor, tiers, the halt flag, fills with gaps (min(level, bar open) for stops; max(level, bar open) for breakout entries), windows ending at the last bar starting before 16:00, fees and C6/C7 net-return formulas all as v1",
+  "statistics": "as v1: circular session block bootstrap (5-session blocks, B = 20,000; seed = the first 8 bytes of sha256('mover-followup-v2-20260924'), big-endian); one-sided p = (1 + #{mean_b <= 0}) / (B + 1); quantised sums; sensitivities BY, two-way clustering",
+  "selection_and_pass_criteria": {
+    "families_separately": "each family (E, F, P) is its own family for multiple testing",
+    "development": "a rule-exit passes with >= 200 trades (P: >= 100) and p <= 0.05 on the mean net return",
+    "validation": "confirmed with >= 100 trades (P: >= 50), BH-adjusted p <= 0.10 across the family's development passes, and positive winsorised, without-top-5-sessions and per-session means",
+    "holdout": "at most 3 validated rule-exits per family, lowest validation p; Holm-adjusted p <= 0.05 with >= 50 trades (P: >= 30); holdout sessions are not read before this step",
+    "no_pass": "if nothing passes, that is the result for that family"
+  },
+  "portfolio_and_leverage": "as v1 (start $100,000; 5 positions; rungs 1/2/4 x regime x drawdown factors, cooldown, capacity 1% of the decision-time dollar volume and 10% of the entry bar's; sub-$5 names at 1x), with family P capped at 2x overnight",
+  "splits": {
+    "development": [
+      "2021-01-04",
+      "2023-12-29"
+    ],
+    "validation": [
+      "2024-01-02",
+      "2025-12-31"
+    ],
+    "holdout": [
+      "2026-01-02",
+      "2026-09-18"
+    ]
+  },
+  "paper_and_sim": "Each validated rule-exit gets (1) a simulation run through the adaptive engine's synthetic path with the same fills, and (2) a paper trial through the engine's mover mode on an account no other user trades during the trial. Family E maps to a continuous scanner; F to regular-hours entries; P to a closing-auction entry (MOC/LOC before the broker cutoff) and an opening or closing exit. A family with no validated rule-exit gets a labelled mechanics-only trial of its most-traded development rule-exit.",
+  "not_tested": [
+    "short selling and borrow",
+    "after-hours entries (16:00-20:00)",
+    "news semantics",
+    "float and short interest",
+    "options"
+  ],
+  "reproduction": "deterministic given the inputs; re-runs must reproduce the result files byte for byte",
+  "overturn": "a byte-level reproduction failure, or an independent quote sample showing the cost table off by more than 2x, overturns any headline result"
+}
