@@ -1,0 +1,2188 @@
+{
+  "accounting": {
+    "cash_delta_usd": "1.200001",
+    "cumulative_realized_loss_usd": "0.25",
+    "drawdown_usd": "0.019999",
+    "gross_exposure_usd": "0",
+    "gross_loss_usd": "0.25",
+    "halted_reason": null,
+    "held_symbols": 0,
+    "outstanding_orders": 0,
+    "peak_pnl_usd": "1.22",
+    "pending_buy_notional_usd": "0",
+    "realized_pnl_usd": "1.200001",
+    "unrealized_pnl_usd": "0"
+  },
+  "adapter_errors": [
+    "order_cumulative_fill_precision_requires_reconciliation"
+  ],
+  "boundary_receipts": [],
+  "config_sha256": "2138f6f7ec12be4969c2309f808d5333bc050becf8ad33b343485f3d817b2218",
+  "dropped_quotes": {
+    "by_reason": {
+      "crossed": 37
+    },
+    "by_symbol": {
+      "AMD": 1,
+      "GOOGL": 9,
+      "INTC": 1,
+      "IWM": 25,
+      "MU": 1
+    }
+  },
+  "elapsed_seconds": 189.9629142979975,
+  "engine": "NautilusTrader LiveNode 2.0.0rc5",
+  "events": [
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 0.0,
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278055.266137,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 0.0,
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278057.3125432,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 0.0,
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278059.359211,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 0.0,
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278061.3873866,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 0.0,
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278063.4120626,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 0.0,
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278065.4415433,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 0.0,
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278067.4815416,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 0.0,
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278069.5199423,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 0.0,
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278071.5403235,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 0.0,
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278073.587024,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 0.0,
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278075.6507077,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 0.0,
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278077.705456,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 0.0,
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278079.7496116,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 0.0,
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278081.7637796,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 0.0,
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278083.7702925,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 0.0,
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278085.8737054,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 0.0,
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278087.8765824,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 0.0,
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278089.9418197,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 0.0,
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278091.9623828,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 0.0,
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278093.980883,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 0.0,
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278096.0065672,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 0.0,
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278098.0278864,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 0.0,
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278100.0495603,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 0.0,
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278102.095059,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 0.0,
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278104.1605508,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 0.0,
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278106.2086592,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 0.0,
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278108.2427962,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 1.0,
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278110.2846456,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 1.0,
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278112.3472846,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 1.0,
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278114.4182847,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 1.0,
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278116.482754,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 0.0,
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278118.5153291,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 0.0,
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278120.55415,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 1.0,
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278122.6102378,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 0.0,
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278124.6660807,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 1.0,
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278126.6958477,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 1.0,
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278128.7327604,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 1.0,
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278130.7819285,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 1.0,
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278132.8026774,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 0.0,
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278134.8116014,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 1.0,
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278136.8178685,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 0.0,
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278138.8580413,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 1.0,
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278140.9070854,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 0.0,
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278142.9167554,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 0.0,
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278144.950551,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 0.0,
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278146.987051,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 0.0,
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278149.047707,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 0.0,
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278151.13399,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 0.0,
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278153.2081897,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 0.0,
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278155.283233,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 0.0,
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278157.3589585,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 0.0,
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278159.4387915,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 0.0,
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278161.516643,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 0.0,
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278163.5990841,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 0.0,
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278165.6783535,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 1.0,
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278167.758809,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 0.0,
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278169.835101,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 1.0,
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278171.9188962,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 0.0,
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278174.0089822,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 0.0,
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278176.0426261,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 0.0,
+      "regime": "unavailable",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278178.0553625,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 1.0,
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278180.1486351,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 1.0,
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278182.2450454,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 1.0,
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278184.3471065,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 1.0,
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278186.4478745,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 1.0,
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278188.5505497,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 1.0,
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278190.640466,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 1.0,
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278192.7247517,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 1.0,
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278194.7258022,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 1.0,
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278196.8068,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 1.0,
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278198.8991046,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 1.0,
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278200.9839118,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 1.0,
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278203.0839002,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 1.0,
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278205.1833928,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.088277,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 1.0,
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 10.39056695047641,
+          "family": "relative_strength",
+          "score": 7.546598004525515,
+          "symbol": "INTC"
+        }
+      ],
+      "targets": {
+        "INTC": 7
+      },
+      "timestamp": 1790278207.2440317,
+      "type": "decision"
+    },
+    {
+      "client_id": "adp-ladder-1x-20260924a-0000001",
+      "reason": "relative_strength",
+      "side": "buy",
+      "strategy": "ADAPTIVE-001-A",
+      "symbol": "INTC",
+      "type": "intent"
+    },
+    {
+      "effective_leverage": 0.088361,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 1.0,
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 18.575799460874286,
+          "family": "relative_strength",
+          "score": 9.876241432278595,
+          "symbol": "INTC"
+        }
+      ],
+      "targets": {
+        "INTC": "7"
+      },
+      "timestamp": 1790278209.3456292,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.1511,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 1.0,
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 20.694231060028045,
+          "family": "relative_strength",
+          "score": 10.648919013228005,
+          "symbol": "INTC"
+        },
+        {
+          "edge_bps": 8.686363642043393,
+          "family": "relative_strength",
+          "score": 8.686363642043393,
+          "symbol": "AMD"
+        }
+      ],
+      "targets": {
+        "AMD": 1,
+        "INTC": "7"
+      },
+      "timestamp": 1790278211.448576,
+      "type": "decision"
+    },
+    {
+      "client_id": "adp-ladder-1x-20260924a-0000002",
+      "reason": "relative_strength",
+      "side": "buy",
+      "strategy": "ADAPTIVE-001-A",
+      "symbol": "AMD",
+      "type": "intent"
+    },
+    {
+      "effective_leverage": 0.23953000000000002,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 1.0,
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 21.290946102783813,
+          "family": "relative_strength",
+          "score": 10.685423773604134,
+          "symbol": "INTC"
+        }
+      ],
+      "targets": {
+        "AMD": "1",
+        "INTC": 7
+      },
+      "timestamp": 1790278213.5335727,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.239488,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 1.0,
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 18.20264511166736,
+          "family": "relative_strength",
+          "score": 8.907620882733365,
+          "symbol": "INTC"
+        }
+      ],
+      "targets": {
+        "AMD": "1",
+        "INTC": 7
+      },
+      "timestamp": 1790278215.6170304,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.23951400000000003,
+      "exits": {
+        "AMD": "portfolio_rotation"
+      },
+      "gap_bps": {},
+      "leverage_ceiling": 1.0,
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 18.942744448578463,
+          "family": "relative_strength",
+          "score": 9.163095408144084,
+          "symbol": "INTC"
+        }
+      ],
+      "targets": {
+        "INTC": 7
+      },
+      "timestamp": 1790278217.7173343,
+      "type": "decision"
+    },
+    {
+      "client_id": "adp-ladder-1x-20260924a-0000003",
+      "reason": "portfolio_rotation",
+      "side": "sell",
+      "strategy": "ADAPTIVE-001-A",
+      "symbol": "AMD",
+      "type": "intent"
+    },
+    {
+      "effective_leverage": 0.17682,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 1.0,
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 18.646975223116367,
+          "family": "relative_strength",
+          "score": 9.051991666591208,
+          "symbol": "INTC"
+        },
+        {
+          "edge_bps": 10.140883503041154,
+          "family": "relative_strength",
+          "score": 8.459759539713872,
+          "symbol": "AMD"
+        }
+      ],
+      "targets": {
+        "INTC": 7
+      },
+      "timestamp": 1790278219.7181087,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.17683400000000002,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 1.0,
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 21.0771128304893,
+          "family": "relative_strength",
+          "score": 10.522715822566298,
+          "symbol": "INTC"
+        }
+      ],
+      "targets": {
+        "INTC": 7
+      },
+      "timestamp": 1790278221.7207162,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.176792,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 1.0,
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 18.3015328775013,
+          "family": "relative_strength",
+          "score": 9.012110783872211,
+          "symbol": "INTC"
+        }
+      ],
+      "targets": {
+        "INTC": 7
+      },
+      "timestamp": 1790278223.7275546,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.176778,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 1.0,
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 17.57381299753752,
+          "family": "relative_strength",
+          "score": 8.633448394464931,
+          "symbol": "INTC"
+        }
+      ],
+      "targets": {
+        "INTC": 7
+      },
+      "timestamp": 1790278225.825007,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.17680600000000002,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 1.0,
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 19.66845339232498,
+          "family": "relative_strength",
+          "score": 9.593553600572822,
+          "symbol": "INTC"
+        }
+      ],
+      "targets": {
+        "INTC": 7
+      },
+      "timestamp": 1790278227.9077396,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.176848,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 1.0,
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 21.944630121450704,
+          "family": "relative_strength",
+          "score": 10.608770155573069,
+          "symbol": "INTC"
+        }
+      ],
+      "targets": {
+        "INTC": 7
+      },
+      "timestamp": 1790278229.9948597,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.17680600000000002,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 1.0,
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 17.68381869008906,
+          "family": "relative_strength",
+          "score": 8.479369355877706,
+          "symbol": "INTC"
+        }
+      ],
+      "targets": {
+        "INTC": 7
+      },
+      "timestamp": 1790278232.0826802,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.176862,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 1.0,
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 18.973904151993736,
+          "family": "relative_strength",
+          "score": 9.03725831336495,
+          "symbol": "INTC"
+        }
+      ],
+      "targets": {
+        "INTC": 7
+      },
+      "timestamp": 1790278234.1672974,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.088424,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 1.0,
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 19.08576554041863,
+          "family": "relative_strength",
+          "score": 9.529152565896855,
+          "symbol": "INTC"
+        }
+      ],
+      "targets": {
+        "INTC": "7"
+      },
+      "timestamp": 1790278236.2585914,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.17680600000000002,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 1.0,
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 15.237998619752613,
+          "family": "relative_strength",
+          "score": 7.55659775439571,
+          "symbol": "INTC"
+        }
+      ],
+      "targets": {
+        "INTC": 7
+      },
+      "timestamp": 1790278238.3379483,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.176848,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 1.0,
+      "regime": "range",
+      "signals": [
+        {
+          "edge_bps": 7.458830997935372,
+          "family": "relative_strength",
+          "score": 5.240107130972721,
+          "symbol": "INTC"
+        }
+      ],
+      "targets": {
+        "INTC": 7
+      },
+      "timestamp": 1790278240.4423778,
+      "type": "decision"
+    },
+    {
+      "effective_leverage": 0.088438,
+      "exits": {
+        "INTC": "portfolio_rotation"
+      },
+      "gap_bps": {},
+      "leverage_ceiling": 1.0,
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278242.5408454,
+      "type": "decision"
+    },
+    {
+      "client_id": "adp-ladder-1x-20260924a-0000004",
+      "reason": "portfolio_rotation",
+      "side": "sell",
+      "strategy": "ADAPTIVE-001-A",
+      "symbol": "INTC",
+      "type": "intent"
+    },
+    {
+      "effective_leverage": 0.0,
+      "exits": {},
+      "gap_bps": {},
+      "leverage_ceiling": 1.0,
+      "regime": "range",
+      "signals": [],
+      "targets": {},
+      "timestamp": 1790278244.4304008,
+      "type": "decision"
+    }
+  ],
+  "feed": "sip",
+  "flat": true,
+  "leverage": {
+    "account_multiplier": "4",
+    "broker_cash_at_start": "900987.75",
+    "broker_margin_used": false,
+    "ceiling_at_peak_achieved_leverage": "1.0",
+    "ceiling_changes": [
+      {
+        "ceiling": "0.0",
+        "drawdown_fraction": "0",
+        "regime": "unavailable",
+        "session": "RTH",
+        "t": 1790278055.266137
+      },
+      {
+        "ceiling": "1.0",
+        "drawdown_fraction": "0",
+        "regime": "range",
+        "session": "RTH",
+        "t": 1790278110.2846456
+      },
+      {
+        "ceiling": "0.0",
+        "drawdown_fraction": "0",
+        "regime": "unavailable",
+        "session": "RTH",
+        "t": 1790278118.5153291
+      },
+      {
+        "ceiling": "1.0",
+        "drawdown_fraction": "0",
+        "regime": "range",
+        "session": "RTH",
+        "t": 1790278122.6102378
+      },
+      {
+        "ceiling": "0.0",
+        "drawdown_fraction": "0",
+        "regime": "unavailable",
+        "session": "RTH",
+        "t": 1790278124.6660807
+      },
+      {
+        "ceiling": "1.0",
+        "drawdown_fraction": "0",
+        "regime": "range",
+        "session": "RTH",
+        "t": 1790278126.6958477
+      },
+      {
+        "ceiling": "0.0",
+        "drawdown_fraction": "0",
+        "regime": "unavailable",
+        "session": "RTH",
+        "t": 1790278134.8116014
+      },
+      {
+        "ceiling": "1.0",
+        "drawdown_fraction": "0",
+        "regime": "range",
+        "session": "RTH",
+        "t": 1790278136.8178685
+      },
+      {
+        "ceiling": "0.0",
+        "drawdown_fraction": "0",
+        "regime": "unavailable",
+        "session": "RTH",
+        "t": 1790278138.8580413
+      },
+      {
+        "ceiling": "1.0",
+        "drawdown_fraction": "0",
+        "regime": "range",
+        "session": "RTH",
+        "t": 1790278140.9070854
+      },
+      {
+        "ceiling": "0.0",
+        "drawdown_fraction": "0",
+        "regime": "unavailable",
+        "session": "RTH",
+        "t": 1790278142.9167554
+      },
+      {
+        "ceiling": "1.0",
+        "drawdown_fraction": "0",
+        "regime": "range",
+        "session": "RTH",
+        "t": 1790278167.758809
+      },
+      {
+        "ceiling": "0.0",
+        "drawdown_fraction": "0",
+        "regime": "unavailable",
+        "session": "RTH",
+        "t": 1790278169.835101
+      },
+      {
+        "ceiling": "1.0",
+        "drawdown_fraction": "0",
+        "regime": "range",
+        "session": "RTH",
+        "t": 1790278171.9188962
+      },
+      {
+        "ceiling": "0.0",
+        "drawdown_fraction": "0",
+        "regime": "unavailable",
+        "session": "RTH",
+        "t": 1790278174.0089822
+      },
+      {
+        "ceiling": "1.0",
+        "drawdown_fraction": "0",
+        "regime": "range",
+        "session": "RTH",
+        "t": 1790278180.1486351
+      }
+    ],
+    "config_max_leverage": "1",
+    "next_lower_rung_ceiling": "0.5",
+    "peak_achieved_leverage": "0.1511227944573210118248884605",
+    "peak_effective_leverage": "0.151137",
+    "peak_gross_exposure_usd": "1511.37",
+    "peak_pending_buy_notional_usd": "882.91",
+    "policy_version": "leverage-schedule-v1-20260922",
+    "seconds_above_next_lower_rung_ceiling": 0.0
+  },
+  "live_event_write_errors": 0,
+  "mode": "adaptive_paper",
+  "native_fill_events": 4,
+  "native_quotes": 151748,
+  "native_rejections": 0,
+  "policy_selections": {
+    "defensive_cash": 0,
+    "mean_reversion": 0,
+    "range_breakout": 0,
+    "relative_strength": 15,
+    "trend_momentum": 0
+  },
+  "preflight": {
+    "account_status": "ACTIVE",
+    "asset_count": 24,
+    "capital_available": true,
+    "clock": {
+      "is_open": true,
+      "next_close_ns": 1790280000000000000,
+      "next_open_ns": 1790343000000000000,
+      "received_at_ns": 1790278053893132593,
+      "timestamp_ns": 1790278053886012249
+    },
+    "config_sha256": "2138f6f7ec12be4969c2309f808d5333bc050becf8ad33b343485f3d817b2218",
+    "endpoint": "https://paper-api.alpaca.markets",
+    "feed": "sip",
+    "http": [
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790278054"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790278054"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790278054"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790278054"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790278055"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "195",
+          "x-ratelimit-reset": "1790278055"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "194",
+          "x-ratelimit-reset": "1790278055"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "193",
+          "x-ratelimit-reset": "1790278056"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "192",
+          "x-ratelimit-reset": "1790278056"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "191",
+          "x-ratelimit-reset": "1790278056"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "190",
+          "x-ratelimit-reset": "1790278057"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "189",
+          "x-ratelimit-reset": "1790278057"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "188",
+          "x-ratelimit-reset": "1790278057"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "187",
+          "x-ratelimit-reset": "1790278057"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "186",
+          "x-ratelimit-reset": "1790278058"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "185",
+          "x-ratelimit-reset": "1790278058"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "184",
+          "x-ratelimit-reset": "1790278058"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "183",
+          "x-ratelimit-reset": "1790278059"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "183",
+          "x-ratelimit-reset": "1790278059"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "182",
+          "x-ratelimit-reset": "1790278059"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "181",
+          "x-ratelimit-reset": "1790278059"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "180",
+          "x-ratelimit-reset": "1790278060"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "179",
+          "x-ratelimit-reset": "1790278060"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "178",
+          "x-ratelimit-reset": "1790278060"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "177",
+          "x-ratelimit-reset": "1790278061"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "176",
+          "x-ratelimit-reset": "1790278061"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "175",
+          "x-ratelimit-reset": "1790278061"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "174",
+          "x-ratelimit-reset": "1790278062"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "10000",
+          "x-ratelimit-remaining": "9999",
+          "x-ratelimit-reset": "1790278054"
+        },
+        "kind": "data_read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "176",
+          "x-ratelimit-reset": "1790278062"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "175",
+          "x-ratelimit-reset": "1790278062"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "174",
+          "x-ratelimit-reset": "1790278063"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "173",
+          "x-ratelimit-reset": "1790278063"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790278085"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790278085"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790278085"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790278086"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790278115"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790278115"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790278115"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790278116"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790278145"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790278145"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790278146"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790278146"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790278175"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790278176"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790278176"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790278176"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790278206"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790278206"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790278206"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790278207"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790278207"
+        },
+        "kind": "submit",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790278211"
+        },
+        "kind": "submit",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790278218"
+        },
+        "kind": "submit",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790278236"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790278236"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790278237"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790278237"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790278242"
+        },
+        "kind": "submit",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790278244"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790278245"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790278245"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790278245"
+        },
+        "kind": "read",
+        "status": 200
+      }
+    ],
+    "margin": {
+      "intraday_buying_power": "3603951",
+      "intraday_buying_power_field": "buying_power",
+      "multiplier": "4",
+      "policy_version": "leverage-schedule-v1-20260922",
+      "regt_buying_power": "1801975.5",
+      "requested_max_leverage": "1"
+    },
+    "observed_at": "2026-09-24T19:27:34.398344+00:00",
+    "open_order_count": 0,
+    "order_contract": {
+      "active": true,
+      "contract_sha256": "57405f752fc933a6f09a5b2f0eb46482f94a780aa818dd0b73d7149a1fe58025",
+      "sentinels_accepted": 2,
+      "sentinels_refused": 9,
+      "symbols_checked": 24
+    },
+    "orders_submitted": 0,
+    "position_count": 0,
+    "quote_count": 24,
+    "quote_errors": {}
+  },
+  "reconciliation": {
+    "cash_delta_usd": "1.20",
+    "cash_match": true,
+    "open_orders": 0,
+    "positions": 0,
+    "positions_match": true
+  },
+  "requests": [
+    {
+      "kind": "read",
+      "timestamp": 1790278055.1067762
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790278055.1851957
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790278055.209048
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790278055.2353282
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790278084.8326542
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790278084.8559215
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790278084.879587
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790278084.9045255
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790278114.9811115
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790278115.005648
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790278115.0302978
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790278115.055766
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790278145.1793628
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790278145.2049568
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790278145.2280831
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790278145.2562335
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790278175.3816547
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790278175.5387704
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790278175.5583088
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790278175.5996392
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790278205.7219052
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790278205.767956
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790278205.8087227
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790278206.1784737
+    },
+    {
+      "kind": "submit",
+      "timestamp": 1790278207.2696974
+    },
+    {
+      "kind": "submit",
+      "timestamp": 1790278211.4683902
+    },
+    {
+      "kind": "submit",
+      "timestamp": 1790278217.7344103
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790278236.2641916
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790278236.285892
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790278236.305675
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790278236.3287325
+    },
+    {
+      "kind": "submit",
+      "timestamp": 1790278242.5582197
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790278244.4393096
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790278244.4610078
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790278244.4854138
+    },
+    {
+      "kind": "read",
+      "timestamp": 1790278244.509238
+    }
+  ],
+  "session_policy": {
+    "extended_hours": false,
+    "overnight_holds": false
+  },
+  "startup_reconciliation": null,
+  "status": "needs_attention"
+}
