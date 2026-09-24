@@ -59,6 +59,28 @@ EXPECTED_TASKS_MAX = "256"
 
 RUNTIME_BUS = Path(f"/run/user/{os.getuid()}/bus")
 
+# The default CPU quota, (online CPUs - 2) x 100% with a floor of 100%, as the
+# kernel reports it in cpu.max: N% is N ms of CPU time per 100 ms period.
+EXPECTED_CPU_MAX = f"{max(1, os.sysconf('SC_NPROCESSORS_ONLN') - 2) * 100 * 1000} 100000"
+
+
+def _cpu_delegated():
+    """True when the user manager hands the cpu controller to its units.
+
+    systemd's user@.service delegates cpu by default only from v252; before
+    that the runner skips the default quota and refuses an explicit one.
+    """
+    try:
+        shown = subprocess.run(
+            ["systemctl", "--user", "show", "--property=ControlGroup", "--value"],
+            stdin=subprocess.DEVNULL, capture_output=True, text=True, timeout=20, check=False)
+        manager = shown.stdout.strip()
+        if shown.returncode != 0 or not manager.startswith("/") or manager == "/":
+            return False
+        return "cpu" in Path(f"/sys/fs/cgroup{manager}/cgroup.controllers").read_text().split()
+    except (OSError, subprocess.SubprocessError):
+        return False
+
 
 def _user_scope_available():
     """True when this host can actually place a job in a systemd user scope.
@@ -89,6 +111,7 @@ def _user_scope_available():
 
 
 CONTAINMENT_AVAILABLE = _user_scope_available()
+CPU_DELEGATED = CONTAINMENT_AVAILABLE and _cpu_delegated()
 
 
 def _run(argv, **kwargs):
@@ -185,12 +208,14 @@ class GuardedRunnerStructureTests(unittest.TestCase):
         guarded = GITLEAKS_GUARDED.read_text(encoding="utf-8")
         for token in ("ECOSYSTEM_JOB_MEMORY_HIGH:-4G", "ECOSYSTEM_JOB_MEMORY_MAX:-6G",
                       "ECOSYSTEM_JOB_SWAP_MAX:-0", "ECOSYSTEM_JOB_SECONDS:-600",
-                      "ECOSYSTEM_JOB_TASKS_MAX:-256", "exit 64", "exit 78",
+                      "ECOSYSTEM_JOB_TASKS_MAX:-256", "ECOSYSTEM_JOB_CPU_QUOTA:-",
+                      "--property=\"CPUQuota=$job_cpu\"", "exit 64", "exit 78",
                       "/usr/bin/systemd-run", "/usr/bin/systemctl", "/usr/bin/timeout"):
             with self.subTest(token=token):
                 self.assertIn(token, bounded)
         for token in ("/usr/bin/flock", "--conflict-exit-code 75", "exit 78",
-                      "ECOSYSTEM_JOB_MEMORY_HIGH=4G", "ECOSYSTEM_JOB_MEMORY_MAX=6G"):
+                      "ECOSYSTEM_JOB_MEMORY_HIGH=4G", "ECOSYSTEM_JOB_MEMORY_MAX=6G",
+                      "unset ECOSYSTEM_JOB_CPU_QUOTA"):
             with self.subTest(token=token):
                 self.assertIn(token, guarded)
 
@@ -489,6 +514,18 @@ class BoundedRunContainmentTests(unittest.TestCase):
 
 
 
+def _instrumented_copy(tmp, replacements):
+    """A scratch copy of the runner with each exact source string replaced once."""
+    text = BOUNDED_RUN.read_text(encoding="utf-8")
+    for old, new in replacements.items():
+        assert text.count(old) == 1, f"expected exactly one {old!r}"
+        text = text.replace(old, new)
+    runner = tmp / "ecosystem-bounded-run"
+    runner.write_text(text, encoding="utf-8")
+    runner.chmod(0o755)
+    return runner
+
+
 def _instrumented_runner(tmp, launcher_body):
     """A copy of the runner whose only change is the systemd-run it calls.
 
@@ -498,13 +535,7 @@ def _instrumented_runner(tmp, launcher_body):
     launcher = tmp / "systemd-run-stand-in"
     launcher.write_text("#!/usr/bin/env bash\n" + launcher_body, encoding="utf-8")
     launcher.chmod(0o755)
-    text = BOUNDED_RUN.read_text(encoding="utf-8")
-    assert text.count("/usr/bin/systemd-run") == 1, "expected exactly one launcher path"
-    runner = tmp / "ecosystem-bounded-run"
-    runner.write_text(text.replace("/usr/bin/systemd-run", str(launcher)),
-                      encoding="utf-8")
-    runner.chmod(0o755)
-    return runner
+    return _instrumented_copy(tmp, {"/usr/bin/systemd-run": str(launcher)})
 
 
 # Passes every argument through to the real launcher except the four resource
@@ -519,6 +550,25 @@ _DROP_LIMITS = (
     "--property=MemorySwapMax=*|--property=TasksMax=*) ;;\n"
     "    *) args+=(\"$arg\") ;;\n"
     "  esac\n"
+    "done\n"
+    "exec /usr/bin/systemd-run \"${args[@]}\"\n"
+)
+# A real scope whose CPU quota is missing (what systemd leaves when an ancestor
+# does not enable the cpu controller) or differs from the requested one. The
+# dropped variant runs in a fresh slice that no CPUQuota unit has touched, so
+# cpu is never enabled there and cpu.max is absent whatever else is running.
+_DROP_CPU = (
+    "args=(--slice=ecosystem-check-nocpu-$$.slice)\n"
+    "for arg in \"$@\"; do\n"
+    "  case $arg in --property=CPUQuota=*) ;; *) args+=(\"$arg\") ;; esac\n"
+    "done\n"
+    "exec /usr/bin/systemd-run \"${args[@]}\"\n"
+)
+_ALTER_CPU = (
+    "args=()\n"
+    "for arg in \"$@\"; do\n"
+    "  case $arg in --property=CPUQuota=*) args+=(--property=CPUQuota=37%) ;;"
+    " *) args+=(\"$arg\") ;; esac\n"
     "done\n"
     "exec /usr/bin/systemd-run \"${args[@]}\"\n"
 )
@@ -621,6 +671,94 @@ class BoundedRunSetupRefusalTests(unittest.TestCase):
             page = os.sysconf("SC_PAGE_SIZE")
             self.assertEqual(oracle.read_text(encoding="utf-8").split(),
                              [str(1000001 * 1024 // page * page), "64"])
+
+
+class BoundedRunCpuQuotaTests(unittest.TestCase):
+    """Local integration check of the CPU quota and its delegation boundary."""
+
+    CPU_ORACLE = ('p=$(cut -d: -f3 /proc/self/cgroup); '
+                  'if [ -e "/sys/fs/cgroup$p/cpu.max" ]; then cat "/sys/fs/cgroup$p/cpu.max"; '
+                  'else echo absent; fi > "$ORACLE"')
+
+    def _environment(self, **overrides):
+        environment = {k: v for k, v in os.environ.items()
+                       if not k.startswith("ECOSYSTEM_JOB_")}
+        environment.update(overrides)
+        return environment
+
+    @unittest.skipUnless(CPU_DELEGATED, "needs a user manager that delegates cpu (systemd 252+)")
+    def test_default_and_explicit_quotas_reach_the_kernel(self):
+        for quota, expected in ((None, EXPECTED_CPU_MAX), ("50%", "50000 100000")):
+            with self.subTest(quota=quota), tempfile.TemporaryDirectory() as tmp:
+                oracle = Path(tmp) / "cpu.max"
+                extra = {"ECOSYSTEM_JOB_CPU_QUOTA": quota} if quota else {}
+                result = _run([str(BOUNDED_RUN), "sh", "-c", self.CPU_ORACLE],
+                              env=self._environment(ORACLE=str(oracle), **extra))
+                self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+                self.assertEqual(oracle.read_text(encoding="utf-8").strip(), expected)
+
+    @unittest.skipUnless(CPU_DELEGATED, "needs a user manager that delegates cpu (systemd 252+)")
+    def test_scope_with_a_dropped_or_altered_cpu_quota_is_refused_with_78(self):
+        for name, launcher, reason in (("dropped", _DROP_CPU, "cpu.max is not enforced"),
+                                       ("altered", _ALTER_CPU, "cpu.max is 37000 100000, not")):
+            with self.subTest(launcher=name), tempfile.TemporaryDirectory() as tmp:
+                tmp = Path(tmp)
+                runner = _instrumented_runner(tmp, launcher)
+                oracle = tmp / "command-ran"
+                result = _run([str(runner), "sh", "-c", f"touch {oracle}"],
+                              env=self._environment())
+                self.assertEqual(result.returncode, 78, result.stdout + result.stderr)
+                self.assertIn(reason, result.stderr)
+                self.assertIn("was not started", result.stderr)
+                self.assertFalse(oracle.exists(), "the command ran although it was refused")
+
+    @unittest.skipUnless(CONTAINMENT_AVAILABLE, "needs a native systemd --user scope")
+    def test_without_cpu_delegation_the_default_is_skipped_and_an_explicit_quota_refused(self):
+        # The controllers file the runner reads is swapped for one without cpu,
+        # which is what a systemd before 252 user manager exposes.
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp = Path(tmp)
+            controllers = tmp / "controllers-without-cpu"
+            controllers.write_text("memory pids\n", encoding="utf-8")
+            runner = _instrumented_copy(
+                tmp, {'"/sys/fs/cgroup$job_manager/cgroup.controllers"': f'"{controllers}"'})
+            oracle = tmp / "cpu.max"
+            result = _run([str(runner), "sh", "-c", self.CPU_ORACLE],
+                          env=self._environment(ORACLE=str(oracle)))
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("no CPU quota", result.stderr)
+            self.assertNotEqual(oracle.read_text(encoding="utf-8").strip(), EXPECTED_CPU_MAX)
+
+            refused = tmp / "command-ran"
+            result = _run([str(runner), "sh", "-c", f"touch {refused}"],
+                          env=self._environment(ECOSYSTEM_JOB_CPU_QUOTA="50%"))
+            self.assertEqual(result.returncode, 78, result.stdout + result.stderr)
+            self.assertIn("needs the cpu controller", result.stderr)
+            self.assertFalse(refused.exists(), "an unenforceable quota still ran the command")
+
+    @unittest.skipUnless(CONTAINMENT_AVAILABLE, "needs a native systemd --user scope")
+    def test_unreadable_manager_controllers_are_refused_with_78(self):
+        # A failed read means a wrong manager path, never "cpu is not delegated".
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp = Path(tmp)
+            runner = _instrumented_copy(
+                tmp, {'"/sys/fs/cgroup$job_manager/cgroup.controllers"': f'"{tmp}/no-such-file"'})
+            oracle = tmp / "command-ran"
+            result = _run([str(runner), "sh", "-c", f"touch {oracle}"], env=self._environment())
+            self.assertEqual(result.returncode, 78, result.stdout + result.stderr)
+            self.assertIn("cannot read the user manager", result.stderr)
+            self.assertFalse(oracle.exists(), "the command ran without a known cpu state")
+
+    @unittest.skipUnless(CONTAINMENT_AVAILABLE, "needs a native systemd --user scope")
+    def test_invalid_quotas_are_refused_with_78(self):
+        for quota in ("0%", "max", "150", "1000000%", "-5%"):
+            with self.subTest(quota=quota), tempfile.TemporaryDirectory() as tmp:
+                oracle = Path(tmp) / "command-ran"
+                result = _run([str(BOUNDED_RUN), "sh", "-c", f"touch {oracle}"],
+                              env=self._environment(ECOSYSTEM_JOB_CPU_QUOTA=quota))
+                self.assertEqual(result.returncode, 78, result.stdout + result.stderr)
+                self.assertIn("CPU quota must be a positive percentage", result.stderr)
+                self.assertFalse(oracle.exists())
 
 
 class LiveTaskQueryTests(unittest.TestCase):
