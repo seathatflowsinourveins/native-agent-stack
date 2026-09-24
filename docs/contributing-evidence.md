@@ -285,8 +285,11 @@ Every receipt also names one `stage`. Two decide a platform status:
       has a retained command and its output. A claim with no retained
       command is unbacked.
    4. **Bound to the winner.** The receipt's `component_id` is the layer
-      winner's id, and its `tool_versions` equal the winner's pin. A receipt
-      recorded under another id binds to nothing.
+      winner's id, and its `tool_versions` match the winner's pin as
+      `scripts/host_receipts.py` `pin_matches` compares them. That comparison
+      normalises first (`v1.5.5` matches `1.5.5`), and it accepts an
+      abbreviation of a full commit id that is 7 or more hex characters
+      long. A receipt recorded under another id binds to nothing.
 
    A help or version call, including one wrapped in a shell, `&&` or a
    subcommand (`sh -c 'x --version'`, `true && x -V`, `x help sub`), is not
