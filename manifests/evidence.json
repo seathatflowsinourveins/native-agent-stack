@@ -3332,18 +3332,18 @@
     },
     {
       "path": "adoption/tools/README.md",
-      "sha256": "f905ea9c5c90a5493679ff6b79a2fdabc1f44fb4998db68337c2dd175e93583d",
-      "bytes": 16611
+      "sha256": "1b65bcdc3f9424c053f00eda03c38d97e0767e1a11ed91efa93543deb46239c3",
+      "bytes": 21822
     },
     {
       "path": "adoption/tools/ecosystem-bounded-run",
-      "sha256": "77c47d2dfea465a64ec7c7af8c80fe932d4bc43047d7608eee45ef13f6838a70",
-      "bytes": 5949
+      "sha256": "cde3374b1a6146d89a768fbe99d80ef934c150e0bad1a50e53bc73d3bc3c9c0e",
+      "bytes": 8312
     },
     {
       "path": "adoption/tools/gitleaks-guarded",
-      "sha256": "61e87881841a346fc0c4d2ec514b283696311ce033fd7b27397973fc2429a655",
-      "bytes": 1938
+      "sha256": "7ead675d3a539b964e6d432427e5564cc9fa228e9196e715731d51c916a3acc9",
+      "bytes": 1968
     },
     {
       "path": "adoption/update.md",
@@ -9713,8 +9713,8 @@
     },
     {
       "path": "docs/next-host-stages.md",
-      "sha256": "6bc157c9a92b98e6a3b05399c7ff09e35ea6d33dbd64f8d3f35dba24a7fcdeec",
-      "bytes": 7666
+      "sha256": "84a0dc27cba7f857a0a3a3fa96c30eeb68abb6d4b9ed7edd9fe79d22f74f0e3a",
+      "bytes": 8472
     },
     {
       "path": "docs/paper-lane-policy.md",
@@ -28418,8 +28418,8 @@
     },
     {
       "path": "tests/test_adoption_guarded_runners.py",
-      "sha256": "bf515ac2b8cd6900809cfa16ffb4da9f09a495fd1e10ed30e273e37a4292e66d",
-      "bytes": 30901
+      "sha256": "3764227feeb48844f7f51052ea9bb5747f564354975835a9980b0f77944564ff",
+      "bytes": 40864
     },
     {
       "path": "tests/test_adoption_launchd.py",
