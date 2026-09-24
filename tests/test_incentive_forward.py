@@ -137,3 +137,24 @@ class EngineAcceptsTheScan(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class MonitorBinding(unittest.TestCase):
+    def test_board_from_other_monitor_code_is_refused(self):
+        import tempfile
+        from unittest import mock
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp = Path(tmp)
+            board = tmp / "board.json"
+            board.write_text(json.dumps({"at": datetime.now(timezone.utc).isoformat(), "board": [], "monitor": {"code_sha256": "0" * 64}}))
+            out = tmp / "scan.json"
+            out.write_text("stale scan from an earlier decision")
+            at = B.PROTOCOL["decision_times_et"][0]
+            pin = B.PROTOCOL["execution"]["configs"][at]["path"]
+            with mock.patch.object(B, "timing_refusal", lambda now, at: None):
+                rc = B.main(["--env-file", str(tmp / "none.env"), "--board", str(board), "--at-et", at, "--config", str(ROOT / pin),
+                             "--engine-dir", str(ROOT / "blueprints/us-equities/adaptive-paper"), "--records", str(tmp / "ledger"), "--out", str(out)])
+            self.assertEqual(rc, 4)
+            self.assertFalse(out.exists())
+            (refusal,) = list((tmp / "ledger").glob("*-refused-*.json"))
+            self.assertEqual(json.loads(refusal.read_text())["reason"], "monitor_code_mismatch")

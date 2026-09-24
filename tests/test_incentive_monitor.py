@@ -205,6 +205,21 @@ class Restart(unittest.TestCase):
             self.assertEqual(dict(state.options.day["R"]), {"C_volume": 10, "C_premium": 1000.0, "C_premium_0_7": 1000.0, "P_volume": 1, "P_premium": 50.0, "large_prints": 1})
 
 
+class HaltRestore(unittest.TestCase):
+    def test_todays_halts_are_restored_once_and_earlier_days_ignored(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            day = Path(tmp)
+            state = M.State()
+            state.today = date(2026, 9, 24)
+            rows = [{"IssueSymbol": "PMAX", "HaltDate": "09/24/2026", "HaltTime": "10:08:56.356", "ReasonCode": "T1", "received_at": "a"},
+                    {"IssueSymbol": "PMAX", "HaltDate": "09/24/2026", "HaltTime": "10:08:56.356", "ReasonCode": "T1", "ResumptionTradeTime": "10:20:00", "received_at": "b"},
+                    {"IssueSymbol": "OLD", "HaltDate": "09/23/2026", "HaltTime": "15:00:00", "ReasonCode": "T1", "received_at": "c"}]
+            (day / "halts.jsonl").write_text("".join(json.dumps(r) + "\n" for r in rows))
+            counts = M.restore(state, day)
+            self.assertEqual((counts["halts"], len(state.halts["PMAX"]), "OLD" in state.halts), (2, 1, False))
+            self.assertEqual(state.halt_rows[("PMAX", "09/24/2026", "10:08:56.356")]["ResumptionTradeTime"], "10:20:00")
+
+
 class Halts(unittest.TestCase):
     def test_only_today_and_changes_are_kept(self):
         class FakeHttp:

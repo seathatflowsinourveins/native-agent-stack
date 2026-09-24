@@ -54,7 +54,8 @@ from the same gain bucket, writes a selection record with the sha256 of the code
 ([config-forward-1030.json](config-forward-1030.json), [config-forward-1330.json](config-forward-1330.json)) and scan,
 and then the engine's mover scan. Selection and controls are limited to operating companies (SEC company tickers, less
 registered funds and fund-like asset names); a session's two decisions never share a control; the ledger holds one
-exclusive record per decision (no re-rolls) and a record for every refusal (`HH:MM|G0|V1000000|any`, exit X2, 200 USD per entry, 1x). The analysis runs once,
+exclusive record per decision (no re-rolls) and a record for every refusal. The scan uses the rule `HH:MM|G0|V1000000|any`,
+exit X2, 200 USD per entry and 1x. The analysis runs once,
 after the first trading day with at least 20 sessions and 100 round trips. It is paper forward evidence only: the live gate also needs a historical holdout,
 which this study cannot supply for its history-less components.
 

@@ -171,10 +171,17 @@ def main(argv=None) -> int:
     local = now.astimezone(M.ET)
     session, stamp = local.date().isoformat(), a.at_et.replace(":", "")
     decision_path = a.records / f"{session}-{stamp}.json"
-    record = {"protocol": PROTOCOL["id"], "session": session, "decision_et": a.at_et, "decided_at": now.isoformat(),
-              "hashes": {"protocol": sha(PROTOCOL_PATH), "board_scan.py": sha(HERE / "board_scan.py"), "monitor.py": sha(HERE / "monitor.py"),
-                         "config": sha(a.config) if a.config.exists() else None,
-                         "engine": {f: (sha(a.engine_dir / f) if (a.engine_dir / f).exists() else None) for f in ENGINE_FILES}}}
+    if a.out.exists():
+        a.out.unlink()  # never leave an earlier decision's scan where the engine could pick it up
+    record = {"protocol": PROTOCOL["id"], "session": session, "decision_et": a.at_et, "decided_at": now.isoformat()}
+
+    def file_sha(path):
+        try:
+            return sha(path)
+        except OSError:
+            return None
+    record["hashes"] = {"protocol": sha(PROTOCOL_PATH), "board_scan.py": sha(HERE / "board_scan.py"), "monitor.py": sha(HERE / "monitor.py"),
+                        "config": file_sha(a.config), "engine": {f: file_sha(a.engine_dir / f) for f in ENGINE_FILES}}
 
     def refuse(reason, **extra):
         path = a.records / f"{session}-{stamp}-refused-{datetime.now(timezone.utc).strftime('%H%M%S%f')}.json"
@@ -201,6 +208,8 @@ def main(argv=None) -> int:
     record.update({"board_sha256": sha(raw), "board_age_seconds": round(age, 1), "monitor": board.get("monitor")})
     if age > PROTOCOL["selection"]["board_max_age_seconds"]:
         return refuse("board_stale")
+    if (board.get("monitor") or {}).get("code_sha256") != record["hashes"]["monitor.py"]:
+        return refuse("monitor_code_mismatch")  # the board must come from the monitor code this record binds
     try:
         key, secret = M.credentials(a.env_file)
         http = M.Http({"APCA-API-KEY-ID": key, "APCA-API-SECRET-KEY": secret}, M.sec_identity())
