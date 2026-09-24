@@ -1416,14 +1416,15 @@ REPO_TREE_SHA256 = "7" * 64  # the evidence tree both fixture lanes read (not re
 # The fixture's registered adjudication code (lane-provenance.json "adjudication").
 ADJUDICATION_CODE = {key: "f" * 64 for key in ("adjudicate_py_sha256", "codex_lane_py_sha256", "prompt_sha256",
                                                "judge_schema_sha256", "refute_schema_sha256", "workflow_sha256",
-                                               "adjudicator_role_sha256")}
+                                               "adjudicator_role_sha256", "transcript_audit_py_sha256")}
+TRANSCRIPT_AUDIT_SHA256 = "9" * 64  # the fixture's registered transcript_audit.py hash
 
 
 def lane_provenance(lane):
     if lane == "claude":
         return {"workflow_path": SOURCE_WORKFLOW, "workflow_sha256": WORKFLOW_SHA256, "agentlab_commit": "b" * 40,
                 "agent_sha256": AGENT_SHA256, "prompt_sha256": hashlib.sha256(LANE_PROMPT_BYTES).hexdigest(),
-                "repo_tree_sha256": REPO_TREE_SHA256}
+                "transcript_audit_py_sha256": TRANSCRIPT_AUDIT_SHA256, "repo_tree_sha256": REPO_TREE_SHA256}
     return {"codex_lane_py_sha256": hashlib.sha256(CODEX_LANE_BYTES).hexdigest(),
             "prompt_sha256": hashlib.sha256(LANE_PROMPT_BYTES).hexdigest(), "repo_tree_sha256": REPO_TREE_SHA256}
 
@@ -1486,7 +1487,8 @@ def prepare_new_wave_root(fixture):
         "schema_version": 1,
         "claude": [{"workflow_path": SOURCE_WORKFLOW, "vendored_path": VENDORED_WORKFLOW,
                     "workflow_sha256": WORKFLOW_SHA256, "agent_sha256": AGENT_SHA256,
-                    "prompt_sha256": hashlib.sha256(LANE_PROMPT_BYTES).hexdigest()}],
+                    "prompt_sha256": hashlib.sha256(LANE_PROMPT_BYTES).hexdigest(),
+                    "transcript_audit_py_sha256": TRANSCRIPT_AUDIT_SHA256}],
         "codex": [{key: value for key, value in lane_provenance("codex").items() if key != "repo_tree_sha256"}],
         "adjudication": [dict(ADJUDICATION_CODE)]})
     fixture.write("evidence/receipt.json", {"exit_code": 0, "scope": "A registered local fixture receipt"})

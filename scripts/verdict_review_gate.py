@@ -165,6 +165,8 @@ TRUST_PATHS = (
     "tools/sota-convergence/codex_lane.py",
     # record_verdicts.py measures a new wave's prose exposure with these (round 7, BL7-2).
     "tools/sota-convergence/export_isolation_check.py", "tools/sota-convergence/blind_checkout.py",
+    # The Claude family's read-boundary audit (round 9, BR9-1).
+    "tools/sota-convergence/transcript_audit.py",
     "tools/sota-convergence/lane-return.schema.json", "tools/sota-convergence/lane-provenance.json",
     "adoption/host-receipt.schema.json", ".github/workflows/validate.yml",
 )

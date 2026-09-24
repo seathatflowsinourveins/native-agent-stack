@@ -149,7 +149,17 @@ def _call_reads(name, inputs, cwd) -> tuple:
         return [], [f"{name} call without an input object"]
     paths, reasons = [], []
 
+    def expands(value):
+        # Claude Code expands a leading '~' in a Glob or Grep path when it runs the tool, while the transcript keeps
+        # the raw text (round 9, F1); a '~' or '$' spelling is never checked as written, it flags.
+        if value.startswith("~") or "$" in value:
+            reasons.append(f"{name} path {value!r} names a home or variable the transcript does not resolve")
+            return True
+        return False
+
     def resolve(value):
+        if expands(value):
+            return
         if os.path.isabs(value):
             paths.append(value)
         elif cwd:
@@ -158,7 +168,7 @@ def _call_reads(name, inputs, cwd) -> tuple:
             reasons.append(f"{name} relative path {value!r} without a recorded working directory")
 
     def pattern_check(label, value):
-        if not isinstance(value, str) or not value:
+        if not isinstance(value, str) or not value or expands(value):
             return
         if ".." in Path(value).parts:
             reasons.append(f"{name} {label} climbs with ..: {value}")
@@ -274,7 +284,14 @@ def workflow_transcript_dir(cwd, session_id: str, projects_root=None) -> Path:
     session holds no workflow run or more than one."""
     if not isinstance(session_id, str) or not re.fullmatch(r"[A-Za-z0-9-]+", session_id):
         raise ValueError(f"not a session id: {session_id!r}")
-    base = Path(projects_root or Path.home() / ".claude" / "projects") / project_slug(cwd) / session_id
+    projects = Path(projects_root or Path.home() / ".claude" / "projects")
+    base = projects / project_slug(cwd) / session_id
+    if not base.is_dir():
+        # Claude Code shortens a long project directory name (round 9, REG9-7); a session id is unique, so find it.
+        found = sorted(path for path in projects.glob(f"*/{session_id}") if path.is_dir())
+        if len(found) != 1:
+            raise ValueError(f"no single session directory {session_id} under {projects} (found {len(found)})")
+        base = found[0]
     runs = sorted(path for path in (base / "subagents" / "workflows").glob("*") if path.is_dir())
     if len(runs) != 1:
         raise ValueError(f"expected one workflow run under {base}/subagents/workflows, found {len(runs)}")

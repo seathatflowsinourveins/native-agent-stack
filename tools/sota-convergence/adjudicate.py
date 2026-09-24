@@ -1583,7 +1583,9 @@ def adjudication_provenance(prompt_path: Path = PROMPT_PATH, repo: Path = None) 
                   "prompt_sha256": sha256_file(Path(prompt_path)),
                   "judge_schema_sha256": sha256_file(JUDGE_SCHEMA), "refute_schema_sha256": sha256_file(REFUTE_SCHEMA),
                   "workflow_sha256": sha256_file(WORKFLOW_PATH),
-                  "adjudicator_role_sha256": sha256_file(VENDORED_ADJUDICATOR)}
+                  "adjudicator_role_sha256": sha256_file(VENDORED_ADJUDICATOR),
+                  # The code that audits the Claude judges' reads (round 9, BR9-1).
+                  "transcript_audit_py_sha256": sha256_file(Path(transcript_audit.__file__).resolve())}
     if repo is not None:
         provenance["repo_tree_sha256"] = tree_sha256(Path(repo))
     return provenance

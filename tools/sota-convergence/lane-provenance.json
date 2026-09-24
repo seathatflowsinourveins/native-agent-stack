@@ -1,14 +1,15 @@
 {
  "adjudication": [
   {
-   "adjudicate_py_sha256": "ea79735f8a75218abfa5ec4413a9123476dece549630cd15a63079a3f818d675",
+   "adjudicate_py_sha256": "62b0cd7960b2d2752fc7e900e770707de7fa51c716b3b22b2897bf2bd0644504",
    "adjudicator_role_sha256": "f6f68e3a672c94612ebf89efcfc8b5d8f9688e8783b01170a300d8f40bbfb18e",
    "codex_lane_py_sha256": "b48bb785f37c4ef89f601aa2b2e6ce1994565fa92a32ef127c2b26a7e923b5a4",
    "judge_schema_sha256": "b7279c9e70070c525144390c67e7f3eb7358b173675fae4e7efe3b798e1f5014",
    "prompt_sha256": "b49555a51f0aebbea80b63c8e7bc843139ad1e973601e81686eeb4bbd14825cf",
    "refute_schema_sha256": "b70af9cca33eec7c47d5ae02819bebbc76820d33a13f537ee7c375d4e6f2c736",
    "registered_at": "2026-09-24",
-   "workflow_sha256": "7caa3411bc5d715c5fcd6371a3c45fd729570a1b62c3f98b1a26bcb1ebfb3464"
+   "workflow_sha256": "7caa3411bc5d715c5fcd6371a3c45fd729570a1b62c3f98b1a26bcb1ebfb3464",
+   "transcript_audit_py_sha256": "717d44c98aed0afb28a85e7e8c2b632220d8277598dec5f6bfe6efef12797ece"
   }
  ],
  "claude": [
@@ -54,7 +55,8 @@
    "registered_at": "2026-09-24",
    "vendored_path": "examples/claude-native/workflows/layer-verdict-lane.js",
    "workflow_path": ".claude/workflows/layer-verdict-lane.js",
-   "workflow_sha256": "fd77b74945e9d2bd0b26b7822aabcde00e7e650c327da16d852fdbfd5984c0d6"
+   "workflow_sha256": "fd77b74945e9d2bd0b26b7822aabcde00e7e650c327da16d852fdbfd5984c0d6",
+   "transcript_audit_py_sha256": "717d44c98aed0afb28a85e7e8c2b632220d8277598dec5f6bfe6efef12797ece"
   },
   {
    "agent_sha256": "a87a9883618b320c8b97a442a43c471c0994fb70ea9bb64ce0b5f513ba31500c",
@@ -62,7 +64,8 @@
    "registered_at": "2026-09-24",
    "vendored_path": "examples/claude-native/workflows/layer-verdict-lane.js",
    "workflow_path": "examples/claude-native/workflows/layer-verdict-lane.js",
-   "workflow_sha256": "fd77b74945e9d2bd0b26b7822aabcde00e7e650c327da16d852fdbfd5984c0d6"
+   "workflow_sha256": "fd77b74945e9d2bd0b26b7822aabcde00e7e650c327da16d852fdbfd5984c0d6",
+   "transcript_audit_py_sha256": "717d44c98aed0afb28a85e7e8c2b632220d8277598dec5f6bfe6efef12797ece"
   }
  ],
  "codex": [

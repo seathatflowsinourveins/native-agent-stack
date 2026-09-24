@@ -109,6 +109,16 @@ class TranscriptAuditTests(unittest.TestCase):
         if not os.path.exists(upper):  # a case-sensitive filesystem: a case variant is another path
             self.assert_flags([("Read", {"file_path": upper + "/evidence/receipt.json"})])
 
+    def test_home_and_variable_spellings_flag(self):
+        # Round 9, F1: Claude Code expands '~' in a Glob or Grep path; the transcript keeps it raw.
+        for call in [("Glob", {"path": "~/.claude/projects", "pattern": "**/*.jsonl"}),
+                     ("Grep", {"pattern": "winner", "path": "~/code/native-agent-stack"}),
+                     ("Glob", {"pattern": "~/**/*.json"}), ("Grep", {"pattern": "x", "glob": "~/*"}),
+                     ("Read", {"file_path": "~/.codex/auth.json"}), ("Read", {"file_path": "$HOME/x.json"}),
+                     ("Grep", {"pattern": "x", "path": "${HOME}"})]:
+            with self.subTest(call=call):
+                self.assert_flags([call])
+
     def test_tools_and_calls_the_audit_does_not_model_flag(self):
         for calls in [[("Bash", {"command": "ls"})], [("mcp__memory__query", {"q": "winner"})],
                       [("WebFetch", {"url": "https://example.invalid"})], [("Agent", {"prompt": "x"})],
@@ -234,7 +244,13 @@ class TranscriptAuditTests(unittest.TestCase):
             transcript_audit.workflow_transcript_dir(self.export, "s1", projects)
         with self.assertRaisesRegex(ValueError, "not a session id"):
             transcript_audit.workflow_transcript_dir(self.export, "../s1", projects)
-        self.assertEqual(transcript_audit.project_slug("/home/example/code/agent-lab"), "-home-example-code-agent-lab")
+        # The slug is of the resolved directory (on macOS /home resolves under /System/Volumes/Data; round 9, REG9-1).
+        self.assertEqual(transcript_audit.project_slug(self.export),
+                         "".join(char if char.isalnum() else "-" for char in str(self.export.resolve())))
+        # A shortened project directory is found by its unique session id (round 9, REG9-7).
+        short = projects / "-shortened" / "s2" / "subagents" / "workflows" / "wf_9"
+        short.mkdir(parents=True)
+        self.assertEqual(transcript_audit.workflow_transcript_dir(self.export, "s2", projects), short)
 
 
 if __name__ == "__main__":

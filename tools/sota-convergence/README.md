@@ -1719,6 +1719,22 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
     `lost` loses any earlier return and is listed as a failure.
   - **Scrubbing.** A URL ends at `;` or `,`, and a path segment glued to a delimiter ("/home/example,private/y") is
     absorbed with its path.
+- **Independent round-9 review of 014d046f (transcript audit, binding and resume, regressions and operability):**
+  - **Home and variable spellings (F1, high).** Claude Code expands a leading `~` in a Glob or Grep path when it
+    runs the tool, while the transcript keeps the raw text; `~/...` joined onto the working directory looked
+    inside the export. Any path, pattern or glob that starts with `~` or holds `$` now flags.
+  - **The audit's code is bound (BR9-1).** `transcript_audit.py` is a verdict-review-gate trust path, and its
+    sha256 is in the Claude lane's provenance (`transcript_audit_py_sha256`, registered in `lane-provenance.json`)
+    and in the adjudication provenance, as `codex_lane.py` and `adjudicate.py` are.
+  - **Retried agents (REG9-2).** The run record lists each agent's final attempt; an earlier attempt's transcript
+    must map to the item of an agent retried at least that often (at most attempt − 1 per item) and is audited
+    against that item's boundary. An extra on a non-retried item, beyond an item's retries, or naming no item
+    fails the run. Measured on a real run retried after a usage limit: each earlier attempt carries its final
+    attempt's prompt.
+  - **macOS and long project names (REG9-1, REG9-7).** The locate test derives the slug from the resolved path
+    (macOS resolves `/home` elsewhere), and `locate` finds a shortened project directory by the session's unique id.
+  - **Recorded, not read:** each exposure measure's `ledgers_sha256` names the ledger it was measured against; a
+    later check cannot recompute it, since the ledger then holds the wave's rows (BR9-2, disclosed).
 - **Independent round-8 review of 68e74f2c (regressions, binding and resume, operability, disclosure), and the
   transcript-audit hardening ahead of round 9:**
   - **Audit reads the raw command text again (REG8-1, REG8-3).** Round 7's reading of which spans bash expands

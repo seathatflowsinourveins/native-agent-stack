@@ -33,18 +33,19 @@ NEW_WAVE_MODELS = {"claude": {"name": "claude-opus-5-5", "effort": "high", "fami
 NEW_WAVE_PROVENANCE = {
     "claude": {"workflow_path": "examples/claude-native/workflows/layer-verdict-lane.js",
                "workflow_sha256": "a" * 64, "agentlab_commit": "b" * 40, "agent_sha256": "e" * 64,
-               "prompt_sha256": "d" * 64, "repo_tree_sha256": "7" * 64},
+               "prompt_sha256": "d" * 64, "transcript_audit_py_sha256": "9" * 64, "repo_tree_sha256": "7" * 64},
     "codex": {"codex_lane_py_sha256": "c" * 64, "prompt_sha256": "d" * 64, "repo_tree_sha256": "7" * 64},
 }
 # The fixture's tools/sota-convergence/lane-provenance.json: the lane code above is registered.
 NEW_WAVE_REGISTRY = {
     "claude": [{"workflow_path": "examples/claude-native/workflows/layer-verdict-lane.js",
                 "vendored_path": "examples/claude-native/workflows/layer-verdict-lane.js",
-                "workflow_sha256": "a" * 64, "agent_sha256": "e" * 64, "prompt_sha256": "d" * 64}],
+                "workflow_sha256": "a" * 64, "agent_sha256": "e" * 64, "prompt_sha256": "d" * 64,
+                "transcript_audit_py_sha256": "9" * 64}],
     "codex": [{"codex_lane_py_sha256": "c" * 64, "prompt_sha256": "d" * 64}],
     "adjudication": [{key: "f" * 64 for key in ("adjudicate_py_sha256", "codex_lane_py_sha256", "prompt_sha256",
                                                 "judge_schema_sha256", "refute_schema_sha256", "workflow_sha256",
-                                                "adjudicator_role_sha256")}],
+                                                "adjudicator_role_sha256", "transcript_audit_py_sha256")}],
 }
 
 class AdjudicationBindingTests(unittest.TestCase):

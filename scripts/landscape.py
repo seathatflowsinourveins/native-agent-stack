@@ -82,8 +82,9 @@ FAMILY_MODEL_PATTERNS = {
 SHA256_TEXT = re.compile(r"[a-f0-9]{64}")
 GIT_COMMIT_TEXT = re.compile(r"[a-f0-9]{40}")
 LANE_PROVENANCE_FIELDS = {
+    # transcript_audit_py_sha256: the code that audited the lane's agents' reads (round 9, BR9-1).
     "claude": ("workflow_path", "workflow_sha256", "agentlab_commit", "agent_sha256", "prompt_sha256",
-               "repo_tree_sha256"),
+               "transcript_audit_py_sha256", "repo_tree_sha256"),
     "codex": ("codex_lane_py_sha256", "prompt_sha256", "repo_tree_sha256"),
 }
 RUN_MANIFEST_NAME = "run-manifest.json"
@@ -141,7 +142,8 @@ REFUTATION_STATUSES = ("unrefuted", "refuted", "unknown")
 # prompt_sha256). tests/test_verdict_lane_vendoring.py keeps it covering the current
 # codex_lane.py, lane-prompt.md and vendored workflow bytes.
 LANE_PROVENANCE_REGISTRY = "tools/sota-convergence/lane-provenance.json"
-LANE_PROVENANCE_KEYS = {"claude": ("workflow_path", "workflow_sha256", "agent_sha256", "prompt_sha256"),
+LANE_PROVENANCE_KEYS = {"claude": ("workflow_path", "workflow_sha256", "agent_sha256", "prompt_sha256",
+                                   "transcript_audit_py_sha256"),
                         "codex": ("codex_lane_py_sha256", "prompt_sha256")}
 
 
@@ -441,7 +443,8 @@ def load_lane_provenance_registry(root):
 # which varies per run): a new-wave adjudication must name code, prompt, schemas, workflow and role that
 # lane-provenance.json registers (independent review of #145, M2).
 ADJUDICATION_PROVENANCE_KEYS = ("adjudicate_py_sha256", "codex_lane_py_sha256", "prompt_sha256", "judge_schema_sha256",
-                                "refute_schema_sha256", "workflow_sha256", "adjudicator_role_sha256")
+                                "refute_schema_sha256", "workflow_sha256", "adjudicator_role_sha256",
+                                "transcript_audit_py_sha256")
 
 
 def adjudication_provenance_issue(provenance, registry):

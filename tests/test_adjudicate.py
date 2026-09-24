@@ -440,7 +440,8 @@ class AssembleTests(AdjudicateFixture):
                     "judge_schema_sha256": TOOL_DIR / "adjudication-judge.schema.json",
                     "refute_schema_sha256": TOOL_DIR / "adjudication-refute.schema.json",
                     "workflow_sha256": TOOL_DIR / "adjudication-lane.js",
-                    "adjudicator_role_sha256": adjudicate.VENDORED_ADJUDICATOR}
+                    "adjudicator_role_sha256": adjudicate.VENDORED_ADJUDICATOR,
+                    "transcript_audit_py_sha256": TOOL_DIR / "transcript_audit.py"}
         self.assertEqual(record["provenance"], {**{key: hashlib.sha256(path.read_bytes()).hexdigest()
                                                    for key, path in expected.items()},
                                                 "repo_tree_sha256": adjudicate.tree_sha256(self.repo)})

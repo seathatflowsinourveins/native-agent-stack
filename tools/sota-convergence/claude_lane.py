@@ -144,8 +144,10 @@ def lane_provenance(agentlab_root: Path, workflow: str, sums: dict, agent_file: 
     if project_role.is_file() and project_role.read_bytes() != Path(agent_file).read_bytes():
         # A lane run from the agent-lab checkout loads this copy, not the one named.
         raise ProvenanceError(f"{project_role} differs from {agent_file}; name the definition the lane loaded")
+    # The code that audits the lane's agents' reads is bound too (round 9, BR9-1).
     return {"workflow_path": workflow, "workflow_sha256": digest, "agentlab_commit": head.stdout.strip(),
-            "agent_sha256": role_sha256}
+            "agent_sha256": role_sha256,
+            "transcript_audit_py_sha256": hashlib.sha256((HERE / "transcript_audit.py").read_bytes()).hexdigest()}
 
 
 def lane_return(layer: dict, provenance: dict, resolved_model=None) -> dict:
