@@ -10,7 +10,7 @@ archive):
 ```sh
 git clone https://github.com/seathatflowsinourveins/native-agent-stack.git
 cd native-agent-stack
-python3 scripts/release_due.py   # on the default branch (added after v2026.09.23): steps main documents that the pinned release lacks
+python3 scripts/release_due.py   # on the default branch: steps main documents that the pinned release lacks
 tag="$(python3 -c "import json;print(json.load(open('adoption/manifest.json'))['source']['release_tag'])")"
 commit="$(python3 -c "import json;print(json.load(open('adoption/manifest.json'))['source']['release_commit'])")"
 git checkout "$tag"
@@ -21,9 +21,7 @@ That checkout target is `adoption/manifest.json` `source.release_tag` (or a
 later tag), confirmed at `source.release_commit` and published with SLSA
 build provenance by `.github/workflows/publish-catalog.yml`. Read both values
 before the checkout, as above: the release's own manifest names the release
-before it. `scripts/release_due.py` itself was added after `v2026.09.23`, so
-it runs on the default branch; nothing else on this page needs a newer
-release. Do
+before it, so `scripts/release_due.py` runs on the default branch. Do
 **not** check out `source.baseline_commit`: that field predates `adoption/`
 and `tools/adoption/` entirely and is never a checkout target (Codex
 cross-family review finding, `codex-review-72`; `codex-review-64` is the
@@ -78,10 +76,6 @@ itself evidence the WSL UVA gap closed.
 
 1. Follow [`adoption/bootstrap.md`](../bootstrap.md) steps 1–3 (prerequisites,
    `bootstrap-linux.sh --profile <id>`, native sign-in).
-   `adoption/bootstrap-linux.sh` and its pins changed after `v2026.09.23`
-   (native `claude-code` pin, uv-tool `markitdown`/`tavily-cli`,
-   `--configure-claude-user-profile`); at `v2026.09.23` the script installs
-   the npm `claude-code` 2.1.278 pin and has no profile step.
 2. Recreate the SDK only for the `research-runtime` profile using
    [`adoption/sdk/README.md`](../sdk/README.md)'s transitive lock; retain the
    same exact-match and uncached-reinstall checks as
