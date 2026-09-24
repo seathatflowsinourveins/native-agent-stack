@@ -161,18 +161,24 @@ VENDORED_WORKFLOW_DIR = "examples/claude-native/workflows/"
 # The Codex lane code a new-wave return's provenance must hash to, in the checkout being recorded.
 CODEX_LANE_FILES = {"codex_lane_py_sha256": "tools/sota-convergence/codex_lane.py",
                     "prompt_sha256": "tools/sota-convergence/lane-prompt.md"}
+# The transcript audit a new-wave Claude return's provenance must hash to, in the checkout being recorded.
+CLAUDE_LANE_FILES = {"transcript_audit_py_sha256": "tools/sota-convergence/transcript_audit.py"}
+
+
+def current_hashes(root: Path, files: dict) -> dict:
+    return {field: hashlib.sha256((root / relative).read_bytes()).hexdigest()
+            if (root / relative).is_file() else None for field, relative in files.items()}
 
 
 def load_lane_code(root: Path) -> dict:
     """What a new-wave return's provenance is checked against at record time: the registered
     lane code (scripts/landscape.py LANE_PROVENANCE_REGISTRY, which CI re-checks), the vendored
-    workflow SHA256SUMS and this checkout's current codex_lane.py / lane-prompt.md hashes."""
-    current = {}
-    for field, relative in CODEX_LANE_FILES.items():
-        path = root / relative
-        current[field] = hashlib.sha256(path.read_bytes()).hexdigest() if path.is_file() else None
+    workflow SHA256SUMS and this checkout's current codex_lane.py / lane-prompt.md and
+    transcript_audit.py hashes."""
     return {"registry": load_lane_provenance_registry(root),
-            "vendored_sums": parse_sha256sums(root / VENDORED_WORKFLOW_SUMS), "codex_current": current}
+            "vendored_sums": parse_sha256sums(root / VENDORED_WORKFLOW_SUMS),
+            "codex_current": current_hashes(root, CODEX_LANE_FILES),
+            "claude_current": current_hashes(root, CLAUDE_LANE_FILES)}
 
 
 def _schema_properties():
@@ -315,7 +321,7 @@ def validate_lane_return(path: Path, *, lane, catalog, layer_id, candidates_by_k
         provenance = data.get("provenance")
         issue = lane_provenance_issue(lane, provenance)
         require_lane(issue is None, str(issue))
-        code = lane_code or {"registry": {}, "vendored_sums": {}, "codex_current": {}}
+        code = lane_code or {"registry": {}, "vendored_sums": {}, "codex_current": {}, "claude_current": {}}
         issue = lane_provenance_registry_issue(lane, provenance, code["registry"])
         require_lane(issue is None, str(issue))
         if lane == "claude":
@@ -327,11 +333,12 @@ def validate_lane_return(path: Path, *, lane, catalog, layer_id, candidates_by_k
                          f"provenance.workflow_sha256 is not the {VENDORED_WORKFLOW_SUMS} entry of the vendored "
                          f"copy the registry names for {provenance['workflow_path']}: the lane must run the "
                          "currently vendored workflow bytes")
-        else:
-            for field, relative in CODEX_LANE_FILES.items():
-                require_lane(code["codex_current"].get(field) == provenance[field],
-                             f"provenance.{field} is not the sha256 of this checkout's {relative}: the return "
-                             "was produced by other codex lane code")
+        current, files = ((code.get("claude_current", {}), CLAUDE_LANE_FILES) if lane == "claude"
+                          else (code["codex_current"], CODEX_LANE_FILES))
+        for field, relative in files.items():
+            require_lane(current.get(field) == provenance[field],
+                         f"provenance.{field} is not the sha256 of this checkout's {relative}: the return "
+                         f"was produced by other {lane} lane code")
         if lane == "claude":
             # The lane seals only a final both lenses left unrefuted (layer-verdict-lane.js); a
             # return whose summary shows a refuted or unknown final, or none, is never recorded.

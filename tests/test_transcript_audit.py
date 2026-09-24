@@ -115,9 +115,22 @@ class TranscriptAuditTests(unittest.TestCase):
                      ("Grep", {"pattern": "winner", "path": "~/code/native-agent-stack"}),
                      ("Glob", {"pattern": "~/**/*.json"}), ("Grep", {"pattern": "x", "glob": "~/*"}),
                      ("Read", {"file_path": "~/.codex/auth.json"}), ("Read", {"file_path": "$HOME/x.json"}),
-                     ("Grep", {"pattern": "x", "path": "${HOME}"})]:
+                     ("Grep", {"pattern": "x", "path": "${HOME}"}),
+                     # A bare '~', '~user' and a '$' anywhere (round 10, TA10-4: M1, M20).
+                     ("Grep", {"pattern": "x", "path": "~"}), ("Grep", {"pattern": "x", "path": "~root/x"}),
+                     ("Read", {"file_path": "evidence/$HOME/x.json"})]:
             with self.subTest(call=call):
                 self.assert_flags([call])
+
+    def test_whitespace_the_runtime_trims_flags(self):
+        # Round 10, TA10-1: Claude Code trims a path (JavaScript trim(): ECMA-262 whitespace and line terminators)
+        # before it expands '~'; the transcript keeps the raw value.
+        outside = str(self.base / "work")
+        for value in (" ~/.claude/projects", "\t~/.codex", "\n~", "\ufeff~/x", "\u3000~/x", "\u00a0~/x",
+                      " " + outside, str(self.export) + "/.. ", str(self.packet) + "/.. ", "evidence/receipt.json\u2028"):
+            for tool, key in (("Read", "file_path"), ("Glob", "path"), ("Grep", "path")):
+                with self.subTest(value=value, tool=tool):
+                    self.assert_flags([(tool, {key: value, "pattern": "*"})])
 
     def test_tools_and_calls_the_audit_does_not_model_flag(self):
         for calls in [[("Bash", {"command": "ls"})], [("mcp__memory__query", {"q": "winner"})],
@@ -212,12 +225,47 @@ class TranscriptAuditTests(unittest.TestCase):
         self.assertIsNone(issue(), "one earlier attempt of the retried item")
         extra("x2", f"Read the packet at {self.packet}")
         self.assertIn("x2", issue(), "more extras than the item's attempt - 1")
+        # From here the retried item's allowance is unused, so each case below tests its own rule.
         (self.run / "agent-x2.jsonl").unlink()
+        (self.run / "agent-x1.jsonl").unlink()
+        self.assertIsNone(issue())
         extra("x3", f"Read the packet at {other}")
         self.assertIn("x3", issue(), "an extra on an item that was not retried")
         (self.run / "agent-x3.jsonl").unlink()
         extra("x4", "an unrelated task")
         self.assertIn("x4", issue(), "an extra that names no item")
+        (self.run / "agent-x4.jsonl").unlink()
+        # An extra naming both items, and one under a marker_prefix without the prefix text (round 10, TA10-4: M15,
+        # M18), are unaccounted.
+        extra("x5", f"{self.packet} and {other}")
+        self.assertIn("x5", issue())
+        (self.run / "agent-x5.jsonl").unlink()
+        extra("x6", "an unrelated task")
+        self.assertIn("x6", transcript_audit.audit(self.run, items, marker_prefix="Input file: ", export=self.export,
+                                                   result=RESULT)["run_issue"])
+        (self.run / "agent-x6.jsonl").unlink()
+        # A retried agent whose final transcript names two items grants no allowance (M6).
+        self.agent("a", [("Read", {"file_path": str(self.packet)})], prompt=f"{self.packet} and {other}")
+        self.record(workflowProgress=entries)
+        extra("x7", f"Read the packet at {self.packet}")
+        self.assertIn("x7", issue())
+        (self.run / "agent-x7.jsonl").unlink()
+        self.agent("a", [("Read", {"file_path": str(self.packet)})])
+        # A string or bool attempt counts as one attempt (M14).
+        for attempt in ("2", True):
+            self.record(workflowProgress=[dict(entries[0], attempt=attempt), entries[1]])
+            extra("x8", f"Read the packet at {self.packet}")
+            self.assertIn("x8", issue(), repr(attempt))
+            (self.run / "agent-x8.jsonl").unlink()
+
+    def test_entries_without_an_agent_id_name_no_transcript(self):
+        # Round 10, TA10-3: an errored attempt's entry has no agentId; with a missing transcript it used to crash.
+        self.agent("a", [("Read", {"file_path": str(self.packet)})])
+        progress = [{"type": "workflow_agent", "agentId": "a"}, {"type": "workflow_agent", "state": "error"}]
+        self.record(workflowProgress=progress)
+        self.assertEqual(self.flagged(), [])
+        self.record(workflowProgress=progress + [{"type": "workflow_agent", "agentId": "gone"}])
+        self.assertIn("gone", transcript_audit.audit(self.run, self.items)["run_issue"])
 
     def test_an_agent_naming_another_audits_item_is_skipped_only_with_its_prefix(self):
         self.agent("a", [("Read", {"file_path": str(self.packet)})])
@@ -247,10 +295,29 @@ class TranscriptAuditTests(unittest.TestCase):
         # The slug is of the resolved directory (on macOS /home resolves under /System/Volumes/Data; round 9, REG9-1).
         self.assertEqual(transcript_audit.project_slug(self.export),
                          "".join(char if char.isalnum() else "-" for char in str(self.export.resolve())))
-        # A shortened project directory is found by its unique session id (round 9, REG9-7).
+        # A shortened project directory is found by its unique session id (round 9, REG9-7) ...
         short = projects / "-shortened" / "s2" / "subagents" / "workflows" / "wf_9"
         short.mkdir(parents=True)
         self.assertEqual(transcript_audit.workflow_transcript_dir(self.export, "s2", projects), short)
+        # ... found in exactly one project directory, and only as a directory (round 10, TA10-4: M11, M12) ...
+        (projects / "-other" / "s2").mkdir(parents=True)
+        with self.assertRaisesRegex(ValueError, "found 2"):
+            transcript_audit.workflow_transcript_dir(self.export, "s2", projects)
+        (projects / "-file-only").mkdir()
+        (projects / "-file-only" / "s3").write_text("", encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "no single session directory s3"):
+            transcript_audit.workflow_transcript_dir(self.export, "s3", projects)
+        # ... while the exact project directory wins when it exists (M17) ...
+        exact = projects / transcript_audit.project_slug(self.export) / "s4" / "subagents" / "workflows" / "wf_a"
+        exact.mkdir(parents=True)
+        (projects / "-elsewhere" / "s4" / "subagents" / "workflows" / "wf_b").mkdir(parents=True)
+        self.assertEqual(transcript_audit.workflow_transcript_dir(self.export, "s4", projects), exact)
+        # ... and a working directory whose name is past NAME_MAX falls back too (round 10, TA10-2).
+        deep = self.base / ("d" * 250) / ("e" * 30)
+        deep.mkdir(parents=True)
+        long_run = projects / "-long" / "s5" / "subagents" / "workflows" / "wf_c"
+        long_run.mkdir(parents=True)
+        self.assertEqual(transcript_audit.workflow_transcript_dir(deep, "s5", projects), long_run)
 
 
 if __name__ == "__main__":

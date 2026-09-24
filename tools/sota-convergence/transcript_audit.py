@@ -8,9 +8,10 @@ Claude Code keeps a headless session's workflow run as
 ran) and each agent's transcript as ``.../<session id>/subagents/workflows/<run id>/agent-<agent id>.jsonl``, where
 every tool call names what it read.
 
-The audit is bound to one run: the run record must exist and be completed, name exactly the agents whose transcripts
-are present, and (when the caller passes it) hold the very result being collected; each agent must have run from
-the export. An agent is mapped to the item its prompt names (an adjudication input's "Input file: <path>" line, a
+The audit is bound to one run: the run record must exist and be completed, list each agent's final attempt, whose
+transcript must be present, and (when the caller passes it) hold the very result being collected; any other
+transcript must be an earlier attempt of a retried agent's item (at most attempt - 1 per item), audited against that
+item's boundary; each agent must have run from the export. An agent is mapped to the item its prompt names (an adjudication input's "Input file: <path>" line, a
 lane packet's path). Its Read, Glob and Grep calls must stay under that item's allowed roots (the export and the
 item's own input and packet, compared as resolved paths), and it may use no other tool except the structured
 return. It fails closed: an unreadable transcript line, a tool call it does not model, a relative path without a
@@ -30,6 +31,9 @@ import re
 from pathlib import Path
 
 READ_TOOLS = frozenset({"Read", "Glob", "Grep"})
+# ECMA-262 WhiteSpace and LineTerminator: what JavaScript's trim() removes. Claude Code trims a Read, Glob or Grep
+# path before expanding it, while the transcript keeps the raw value (round 10, TA10-1).
+JS_TRIM = "\t\n\v\f\r \u00a0\u1680" + "".join(chr(code) for code in range(0x2000, 0x200B)) + "\u2028\u2029\u202f\u205f\u3000\ufeff"
 QUIET_TOOLS = frozenset({"StructuredOutput"})
 _GLOB_CHARS = re.compile(r"[*?\[{]")
 
@@ -81,8 +85,11 @@ def run_agents(directory) -> dict:
     except (OSError, ValueError):
         record = None
     entries = record.get("workflowProgress") if isinstance(record, dict) else None
-    return {entry.get("agentId"): _attempt(entry) for entry in entries or []
-            if isinstance(entry, dict) and entry.get("type") == "workflow_agent"}
+    # An entry without an agent id (an errored or blocked attempt) names no transcript (round 10, TA10-3); its item,
+    # if no other agent served it, is flagged as unserved.
+    return {entry["agentId"]: _attempt(entry) for entry in entries or []
+            if isinstance(entry, dict) and entry.get("type") == "workflow_agent"
+            and isinstance(entry.get("agentId"), str) and entry["agentId"]}
 
 
 def run_issue(directory, files, result=None):
@@ -100,7 +107,7 @@ def run_issue(directory, files, result=None):
     agents = set(run_agents(directory))
     missing = agents - {_agent_id(path) for path in files}
     if not agents or missing:
-        return f"the run's agents ({len(agents)}) have no transcript: missing {sorted(missing)[:3]}"
+        return f"the run's agents ({len(agents)}) have no transcript: missing {sorted(missing, key=str)[:3]}"
     if result is not None:
         returned = record.get("result")
         candidates = [result] + ([result["result"]] if isinstance(result, dict) and "result" in result else [])
@@ -150,10 +157,12 @@ def _call_reads(name, inputs, cwd) -> tuple:
     paths, reasons = [], []
 
     def expands(value):
-        # Claude Code expands a leading '~' in a Glob or Grep path when it runs the tool, while the transcript keeps
-        # the raw text (round 9, F1); a '~' or '$' spelling is never checked as written, it flags.
-        if value.startswith("~") or "$" in value:
-            reasons.append(f"{name} path {value!r} names a home or variable the transcript does not resolve")
+        # Claude Code trims a path, then expands a leading '~', while the transcript keeps the raw text (round 9, F1;
+        # round 10, TA10-1): a value trim() would change, one starting with '~' or one holding '$' is never checked
+        # as written, it flags.
+        if value.strip(JS_TRIM) != value or value.startswith("~") or "$" in value:
+            reasons.append(f"{name} path {value!r} is changed by the runtime (whitespace, home or variable) "
+                           "before it opens it")
             return True
         return False
 
@@ -286,7 +295,11 @@ def workflow_transcript_dir(cwd, session_id: str, projects_root=None) -> Path:
         raise ValueError(f"not a session id: {session_id!r}")
     projects = Path(projects_root or Path.home() / ".claude" / "projects")
     base = projects / project_slug(cwd) / session_id
-    if not base.is_dir():
+    try:
+        exact = base.is_dir()
+    except OSError:  # a slug past NAME_MAX; Claude Code shortened it (round 10, TA10-2)
+        exact = False
+    if not exact:
         # Claude Code shortens a long project directory name (round 9, REG9-7); a session id is unique, so find it.
         found = sorted(path for path in projects.glob(f"*/{session_id}") if path.is_dir())
         if len(found) != 1:

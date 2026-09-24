@@ -1391,8 +1391,10 @@ What remains and how it is handled:
   limit, so `transcript_audit.py` audits what they opened in the workflow run's transcripts, which Claude Code
   keeps at `~/.claude/projects/<export slug>/<session>/subagents/workflows/<run id>/agent-*.jsonl` (`transcript_audit.py
   locate` finds the one run of a session). The audit is bound to that run: its record
-  (`<session>/workflows/<run id>.json`) must be completed, list exactly the agents whose transcripts are present
-  and hold the very result being collected, and every agent must have run from the export; the recorded digest
+  (`<session>/workflows/<run id>.json`) must be completed, list each agent's final attempt (whose transcript must
+  be present) and hold the very result being collected; any other transcript must be an earlier attempt of a
+  retried agent's item (at most attempt − 1 per item), audited against that item's boundary; every agent must
+  have run from the export; the recorded digest
   covers the transcripts and the record. Each agent is mapped to the item its prompt names: a lane packet's path,
   or an adjudication input's "Input file:" line. Its reads, compared as resolved paths, must stay under the export
   and that item's packet (and input), and it may use no other tool, server-side and MCP tools included. An
@@ -1719,6 +1721,25 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
     `lost` loses any earlier return and is listed as a failure.
   - **Scrubbing.** A URL ends at `;` or `,`, and a path segment glued to a delimiter ("/home/example,private/y") is
     absorbed with its path.
+- **Independent round-10 review of 821c23cc (transcript audit and its binding), and its fixes:**
+  - **Whitespace around a path (TA10-1 = BR10-1, high).** Claude Code trims a Read, Glob or Grep path with
+    JavaScript's `trim()` before expanding a leading `~`, while the transcript keeps the raw value; " ~/.codex"
+    or "<export>/.. " audited clean and opened a path outside the export. Any path, pattern or glob that `trim()`
+    would change (the ECMA-262 WhiteSpace and LineTerminator set) now flags, before the `~` and `$` test. Across
+    3,075 real path values in a 113-agent run, none carries such whitespace, a leading `~` or a `$`.
+  - **Mutation coverage (TA10-4).** Tests now cover each whitespace class, a bare `~` and `~user`, a mid-value
+    `$`, every per-item retry case and `locate`'s fallbacks; 13 of 13 targeted mutants are killed.
+  - **`locate` on a long project name (TA10-2)** treats an unreadable exact path (ENAMETOOLONG) as absent and falls
+    back to the session's unique id. **Record entries without an `agentId` (TA10-3)** are ignored, and a missing
+    agent list sorts safely.
+  - **Registration guard (TA10-5 = BR10-2).** A test requires the current `transcript_audit.py` hash in the
+    registry's current Claude entries, so an audit change cannot pass CI unregistered. **Record time (BR10-3)**
+    also requires a new-wave Claude return's `transcript_audit_py_sha256` to be this checkout's
+    `transcript_audit.py`, as the Codex lane's code is; `claude_lane.py` itself stays unbound (disclosed low).
+  - **Return schema (BR10-4).** `lane-return.schema.json`'s provenance lists `transcript_audit_py_sha256`, and a
+    test requires every lane's registered provenance fields to be in it. Nothing validated provenance against the
+    schema, so no return was rejected: `codex_lane.py` drops the runner-owned provenance from the copy it passes to
+    `codex exec --output-schema`, and record time checks provenance keys against the lane's provenance fields.
 - **Independent round-9 review of 014d046f (transcript audit, binding and resume, regressions and operability):**
   - **Home and variable spellings (F1, high).** Claude Code expands a leading `~` in a Glob or Grep path when it
     runs the tool, while the transcript keeps the raw text; `~/...` joined onto the working directory looked

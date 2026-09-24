@@ -74,6 +74,26 @@ class LaneProvenanceRegistryTests(unittest.TestCase):
         self.assertIn("prompt must be the lane-prompt.md text when packets are given", source)
         self.assertIn("launch must be an object whose repo equals repo", source)
 
+    def test_the_current_transcript_audit_code_is_registered_for_the_claude_lane(self):
+        """Round 10, TA10-5/BR10-2: a Claude return names the transcript_audit.py that audited its agents, and
+        record_verdicts.py and scripts/landscape.py refuse one whose code is not listed, so the current bytes must be,
+        with the current vendored workflow."""
+        current = sha256(TOOLS / "transcript_audit.py")
+        workflow = sha256(ROOT / "examples" / "claude-native" / "workflows" / "layer-verdict-lane.js")
+        listed = [entry for entry in self.registry()["claude"]
+                  if entry.get("transcript_audit_py_sha256") == current and entry.get("workflow_sha256") == workflow]
+        self.assertTrue(listed, "register the current transcript_audit.py hash in tools/sota-convergence/"
+                                "lane-provenance.json's claude entries")
+
+    def test_the_lane_return_schema_admits_every_provenance_field(self):
+        """Round 10, BR10-4: the provenance object sets additionalProperties false, so it must list every field a
+        new-wave return carries."""
+        schema = json.loads((TOOLS / "lane-return.schema.json").read_text(encoding="utf-8"))
+        properties = set(schema["properties"]["provenance"]["properties"])
+        from scripts.landscape import LANE_PROVENANCE_FIELDS
+        for lane, fields in LANE_PROVENANCE_FIELDS.items():
+            self.assertLessEqual(set(fields), properties, lane)
+
     def test_the_current_adjudication_code_is_registered(self):
         """Independent review of #145, M2: record_verdicts.py and scripts/landscape.py refuse a new-wave
         adjudication whose code is not listed, so the current adjudicate.py, prompt, schemas, workflow and

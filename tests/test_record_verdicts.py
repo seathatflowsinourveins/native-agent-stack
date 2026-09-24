@@ -263,6 +263,7 @@ FOUNDATION_LAYERS = [
     "wave-badworkflow-layer", "wave-onefamily-layer", "wave-crossfamily-layer", "wave-nojudge-layer",
     "wave-rejected-layer", "wave-missing-layer", "wave-unregistered-layer", "wave-registered-layer",
     "wave-basename-layer", "wave-stalevendor-layer", "wave-forgedcodex-layer", "wave-stalecodex-layer",
+    "wave-staleaudit-layer",
     "wave-otherpacket-layer", "frozen-wave-layer", "wave-artifact-layer", "wave-mac-layer",
     "wave-refuted-layer", "wave-failed-layer", "wave-append-layer", "wave-withheld-layer",
 ]
@@ -1417,7 +1418,9 @@ REPO_TREE_SHA256 = "7" * 64  # the evidence tree both fixture lanes read (not re
 ADJUDICATION_CODE = {key: "f" * 64 for key in ("adjudicate_py_sha256", "codex_lane_py_sha256", "prompt_sha256",
                                                "judge_schema_sha256", "refute_schema_sha256", "workflow_sha256",
                                                "adjudicator_role_sha256", "transcript_audit_py_sha256")}
-TRANSCRIPT_AUDIT_SHA256 = "9" * 64  # the fixture's registered transcript_audit.py hash
+# The fixture root's own transcript_audit.py: a Claude return's provenance must hash to it.
+TRANSCRIPT_AUDIT_BYTES = b"# fixture transcript_audit.py\n"
+TRANSCRIPT_AUDIT_SHA256 = hashlib.sha256(TRANSCRIPT_AUDIT_BYTES).hexdigest()
 
 
 def lane_provenance(lane):
@@ -1483,6 +1486,7 @@ def prepare_new_wave_root(fixture):
     tools.mkdir(parents=True, exist_ok=True)
     (tools / "codex_lane.py").write_bytes(CODEX_LANE_BYTES)
     (tools / "lane-prompt.md").write_bytes(LANE_PROMPT_BYTES)
+    (tools / "transcript_audit.py").write_bytes(TRANSCRIPT_AUDIT_BYTES)
     fixture.write("tools/sota-convergence/lane-provenance.json", {
         "schema_version": 1,
         "claude": [{"workflow_path": SOURCE_WORKFLOW, "vendored_path": VENDORED_WORKFLOW,
@@ -1976,6 +1980,16 @@ class NewWaveProvenanceTests(NewWaveFixture):
         self.assertIn("foundation__wave-stalecodex-layer [codex]", output)
         self.assertIn("tools/sota-convergence/codex_lane.py", output)
         self.assertEqual(self.load_row(catalog, "wave-stalecodex-layer")["verdict_status"], "pending_lanes")
+
+    def test_registered_but_superseded_transcript_audit_is_rejected_at_record_time(self):
+        # Round-10 BR10-3: a Claude return naming a registered but superseded audit was recorded.
+        (self.root / "tools/sota-convergence/transcript_audit.py").write_bytes(b"# edited after the lane ran\n")
+        catalog = self.both_lanes("wave-staleaudit-layer")
+        code, output = self.run_wave()
+        self.assertEqual(code, 1, output)
+        self.assertIn("foundation__wave-staleaudit-layer [claude]", output)
+        self.assertIn("tools/sota-convergence/transcript_audit.py", output)
+        self.assertEqual(self.load_row(catalog, "wave-staleaudit-layer")["verdict_status"], "pending_lanes")
 
     def test_a_judgment_must_name_the_layers_sealed_packet(self):
         # Before: stripped_packet_sha256 was format-checked only.
