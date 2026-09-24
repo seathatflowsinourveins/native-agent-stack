@@ -345,27 +345,29 @@ Use [runtime-target.json](../catalogs/us-equities/runtime-target.json) for the
 destination's exact contracts.
 
 The path from simulation to paper to live is tracked as a
-[gate ladder](../catalogs/us-equities/gates-20260922.json) of 20 gates, each
+[gate ladder](../catalogs/us-equities/gates-20260922.json) of 22 gates, each
 naming its owner, evidence class, receipt and machine-checkable flip condition,
 with one explicit exception: the `live-go` gate's status is `user_decision`
 (evidence class `none`, `flip_condition: null`) because it records the user's
 own authorization after every required paper and live gate is established, not
 a condition any checker can evaluate. `python3 scripts/trading_gates.py --check`
-verifies the other 19 gates' ladder arithmetically; a status changes only
+verifies the other 21 gates' ladder arithmetically; a status changes only
 through a dated commit after the checker lists the gate as a flip candidate,
-except `live-go`, which only the user can flip. On September 23 (the checker's
+except `live-go`, which only the user can flip. On September 24 (the checker's
 `rung_ready` and `blocking` fields are the current source):
 
 | Rung | Established | Open |
 | --- | --- | --- |
 | Simulation | Offline equity replay, SPY/LEAN parity (qualifying parity v2 replay), dividend module, rc5 supply-chain scan, fail-closed snapshot gate (synthetic), exchange_calendars in the stack | Not required for the rung: pre-2020 delisting, dated security identity, point-in-time news and filings, paid data arm |
-| Paper | Alpaca paper smoke, broker-path alert rules (synthetic), credential handling | Adaptive-paper broker trial |
-| Live | None | Leverage ladder 1x/2x/4x, native fault behaviour, IBKR local acceptance, explicit live go |
+| Paper | Alpaca paper smoke, adaptive-paper broker trial (engine order flow at 1x, not strategy edge), broker-path alert rules (synthetic), credential handling | None |
+| Live | None | Strategy out-of-sample holdout (a frozen historical holdout or a preregistered prospective paper study), then strategy paper performance over a separate, later paper period (both added September 24, criteria in the gate notes), leverage ladder 1x/2x/4x, native fault behaviour, IBKR local acceptance, explicit live go |
 
-The simulation rung is ready by the checker's arithmetic (every required sim
-gate established); paper and live are not, blocked on the adaptive-paper
-broker trial and the live gates. Catalog inclusion does not authorize live
-configuration, paid data or hosting, or orders.
+The simulation and paper rungs are ready by the checker's arithmetic (every
+required gate of those rungs established); live is not. The live lane is ready
+for the user's decision when the checker's `blocking.live` equals
+`["live-go"]`; automation never flips `live-go` or places live orders.
+Catalog inclusion does not authorize live configuration, paid data or
+hosting, or orders.
 
 ## Hardware profiles
 

@@ -218,6 +218,35 @@ class GatePointerContentTests(unittest.TestCase):
             "status": "passed",
             "broker": "ibkr",
         },
+        # The two strategy gates share one receipt file (preregistered in their
+        # notes); each section carries the same strategy_id, protocol_sha256 and
+        # config_sha256, but the checker verifies only the status strings.
+        "strategy-out-of-sample-holdout": {
+            "schema_version": 1,
+            "out_of_sample": {
+                "status": "passed",
+                "route": "historical_holdout",
+                "strategy_id": "example-strategy-v1",
+                "protocol_sha256": "0" * 64,
+                "config_sha256": "1" * 64,
+            },
+        },
+        "strategy-paper-performance": {
+            "schema_version": 1,
+            "out_of_sample": {
+                "status": "passed",
+                "route": "prospective_paper",
+                "strategy_id": "example-strategy-v1",
+                "protocol_sha256": "0" * 64,
+                "config_sha256": "1" * 64,
+            },
+            "paper_performance": {
+                "status": "passed",
+                "strategy_id": "example-strategy-v1",
+                "protocol_sha256": "0" * 64,
+                "config_sha256": "1" * 64,
+            },
+        },
     }
 
     # Gate id -> a well-formed receipt payload (same shape as GOOD_RECEIPTS)
@@ -232,6 +261,14 @@ class GatePointerContentTests(unittest.TestCase):
         "databento-arm-b": {**GOOD_RECEIPTS["databento-arm-b"], "status": "not_executed"},
         "native-fault-behaviour": {**GOOD_RECEIPTS["native-fault-behaviour"], "status": "bounded_alpaca_synthetic_cases_passed_native_faults_pending"},
         "ibkr-local-acceptance": {**GOOD_RECEIPTS["ibkr-local-acceptance"], "status": "failed"},
+        "strategy-out-of-sample-holdout": {
+            **GOOD_RECEIPTS["strategy-out-of-sample-holdout"],
+            "out_of_sample": {**GOOD_RECEIPTS["strategy-out-of-sample-holdout"]["out_of_sample"], "status": "failed"},
+        },
+        "strategy-paper-performance": {
+            **GOOD_RECEIPTS["strategy-paper-performance"],
+            "paper_performance": {**GOOD_RECEIPTS["strategy-paper-performance"]["paper_performance"], "status": "failed"},
+        },
     }
 
     @classmethod
@@ -307,8 +344,26 @@ class GatePointerContentTests(unittest.TestCase):
                 holds, detail = trading_gates.condition_holds(self.root, gate)
                 self.assertFalse(holds, f"{gate_id}: well-formed failing receipt unexpectedly holds ({detail})")
 
+    def test_out_of_sample_only_receipt_flips_only_that_gate(self):
+        # The strategy gates share one receipt file: a receipt that holds only
+        # the out_of_sample section must make only the out-of-sample gate a flip
+        # candidate, never the paper-performance gate.
+        oos_id, paper_id = "strategy-out-of-sample-holdout", "strategy-paper-performance"
+        oos = {**self.gates_by_id[oos_id], "status": "not_established", "evidence_class": "none"}
+        paper = {**self.gates_by_id[paper_id], "status": "not_established", "evidence_class": "none"}
+        self.assertEqual(oos["receipt_path"], paper["receipt_path"])
+
+        self.write(oos["receipt_path"], json.dumps(self.GOOD_RECEIPTS[oos_id]))
+        result = trading_gates.check(self.root, self.write("gates.json", json.dumps(document(oos, paper))))
+        self.assertEqual(result["errors"], [])
+        self.assertEqual([c["id"] for c in result["flip_candidates"]], [oos_id])
+        self.assertTrue(trading_gates.condition_holds(self.root, oos)[0])
+        holds, detail = trading_gates.condition_holds(self.root, paper)
+        self.assertFalse(holds)
+        self.assertEqual(detail, "pointer absent: /paper_performance/status")
+
     def test_no_non_established_gate_in_the_repository_ladder_uses_presence_only_exists(self):
-        # Generic guard (not limited to GOOD_RECEIPTS' seven ids): any gate
+        # Generic guard (not limited to GOOD_RECEIPTS' nine ids): any gate
         # that is not yet established must not rely on a presence-only
         # 'exists' flip condition, which an empty placeholder file satisfies.
         for gate_id, gate in self.gates_by_id.items():

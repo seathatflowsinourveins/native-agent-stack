@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "id": "us-equities-gate-ladder-20260922",
-  "checked_at": "2026-09-23",
+  "checked_at": "2026-09-24",
   "scope": "The sim -> paper -> live gate ladder for the selected destination (NautilusTrader 2.0.0rc5 with IBKR primary and a separate Alpaca paper adapter; LEAN 985ef30 frozen oracle). Each gate names the receipt that establishes it and the machine-checkable condition that flips it. scripts/trading_gates.py --check verifies the ladder arithmetically; a status changes only by a dated commit after the checker lists the gate as a flip candidate; an exists condition proves only that a non-empty file is present, so gates using it carry a presence-only limitation in their note. Rung readiness = every required gate of that rung and every earlier rung established. Nothing here authorizes live configuration, paid hosting or orders.",
   "rungs": [
     "sim",
@@ -11,7 +11,7 @@
   "rung_meaning": {
     "sim": "historical simulation qualified on the destination engine against the frozen oracle and clean data",
     "paper": "paper operation qualified: broker path exercised, alerts wired, credentials handled, snapshots gated",
-    "live": "live entry prerequisites: paper leverage ladder, native fault behaviour, IBKR acceptance, explicit go"
+    "live": "live entry prerequisites: a strategy that passed an out-of-sample holdout and then a separate, later paper performance period, paper leverage ladder, native fault behaviour, IBKR acceptance, explicit go"
   },
   "gates": [
     {
@@ -336,6 +336,40 @@
       "note": "Paper orders through NautilusTrader's own IB execution engine, 2026-09-23 (status unchanged): blueprints/us-equities/engine-nautilus/ibkr-paper-orders/evidence/receipt-20260923-passed.json, NautilusTrader 1.231.0 Python IB adapter on the official ibapi 10.45.1, paper Gateway 10.50.1e. C1 resting SPY buy accepted, C2 canceled, C3 marketable buy filled 768.56, C4 flatten filled 768.50, net -2.08 USD after 2.02 USD commissions, 3 of 6 orders, independent official-ibapi flat proof 0 positions and 0 open orders. An earlier run refused while the Gateway API was Read-Only (IB 321). Not flipped: reconnect with an open order, restart reconciliation and the step-4 kill switch are not yet run, and 1.231.0 is not the pinned 2.0.0rc5 destination (whose stock orders are blocked by nautilus_trader#4983; PR #5041 open), so a flip needs those cases plus a dated version-selection record. Partial evidence, 2026-09-23 (status unchanged): evidence/receipts/ibkr-readonly-acceptance-20260923.json. Acceptance-plan section 5 step 1 (read-only, execution disabled) passed on a signed-in paper IB Gateway 10.50 with both the official ibapi 10.45.1 client (paper DU account check, every request complete, 0 positions, 0 open orders, SPY conId 756733 ARCA, REALTIME quote within the 900 s age limit, bars) and the NautilusTrader 2.0.0rc5 native HistoricalInteractiveBrokersClient (SPY.ARCA resolved, 5 daily and 390 five-minute bars). Steps 2-4 (client-id ownership, bounded paper orders, reconnect/restart reconciliation) are not run: native stock orders are denied locally by nautilus_trader#4983 (open). rc5's Rust ibapi =3.3.0 classifies IB notice 2188 as fatal (source-verified, rust-ibapi#764, fixed in v4.0.0; nautilus_trader PR #5041 pins =4.1.0); one pre-market native bar failure was observed. runtime-target.json next_acceptance separate-paper-adapters: bounded_alpaca_paper_smoke_passed_ibkr_pending. Execution and steps 2-4 remain unexercised. Required receipt schema, preregistered here (no receipt exists yet at receipt_path ibkr-acceptance/receipt.json or of kind native_ibkr_local_acceptance; the step-1 probes refuse to write there): {\"schema_version\": 1, \"kind\": \"native_ibkr_local_acceptance\", \"status\": \"passed\", \"broker\": \"ibkr\"}. The checker only verifies /status == \"passed\"; /kind names the receipt type but is not itself a result, so it is not the flip condition. That a signed-in TWS or IB Gateway actually accepted the adapter locally is qualified manually before the dated commit that flips this gate. After-hours paper orders, 2026-09-23 (status unchanged): blueprints/us-equities/engine-nautilus/ibkr-paper-orders/evidence/receipt-20260923-post-incomplete.json, plan-post.json (outsideRth), 18:58 ET: resting buy accepted and cancelled, marketable buy filled 768.01, flatten timed out at 45 s and cleanup filled 767.96, realized -2.07 USD with commission, flat proof passed; status incomplete on the C4 step timeout."
     },
     {
+      "id": "strategy-out-of-sample-holdout",
+      "rung": "live",
+      "layer": "evaluation-experiments",
+      "title": "One strategy passes an out-of-sample holdout net of pinned costs: its frozen historical holdout or a preregistered prospective paper study",
+      "status": "not_established",
+      "owner": "peer:sota-workflow-resolution",
+      "evidence_class": "none",
+      "required": true,
+      "receipt_path": "blueprints/us-equities/strategy-performance/receipt.json",
+      "flip_condition": {
+        "type": "equals",
+        "pointer": "/out_of_sample/status",
+        "equals": "passed"
+      },
+      "note": "Added 2026-09-24 and revised the same day, before merge, after an independent review (it replaces strategy-historical-holdout); criteria fixed before any strategy qualifies. Established by ONE of two routes. (i) Historical holdout: the strategy's frozen protocol passes its own holdout rule, including that protocol's minimum trades and multiple-testing adjustment, and any lower bound is computed at the family-wise adjusted level (for Holm, at the step's adjusted alpha, not a per-test 5%). For mover-early-entry v1 (blueprints/us-equities/mover-early-entry/protocol.json, selection_and_pass_criteria.holdout): at most 5 validated rule-exits are evaluated once on the untouched holdout, each with at least 50 trades, and a pass is a Holm-adjusted one-sided p value <= 0.05; the candidate carried to paper is the one its paper_e2e rule names (the validated rule-exit with the highest holdout lower bound). (ii) Preregistered prospective paper holdout: a forward paper study whose protocol, configs and code were pinned by sha256 before its first order, analysed exactly once at its preregistered analysis point, passes its own preregistered test (for the shape, see blueprints/us-equities/incentive-monitor/forward-protocol-v1.json, proposed on branch claude/incentive-monitor-20260924 and not yet on main). Both routes: at least 100 round trips and at least 20 sessions, or the protocol's larger minimums; returns net of costs from a cost table and a fee schedule, each pinned by sha256 (current instances: blueprints/us-equities/mover-early-entry/evidence/cost-table-run-v1.json sha256 be50cbdfd75c5c4b0a66286bf9edb40c9ce49add719b6b5e1b0cdf93064eaa13 and blueprints/us-equities/mover-early-entry/fees.json sha256 fa1f468b80f78dc0c050948123116f577e38ae9f8c03f9fb360d11042a3fed3d), where the cost per side is the table's quoted half-spread for the side's bucket plus the protocol's slippage rule (mover-early-entry v1: plus 0.25 x that half-spread; an opening-auction entry carries no spread and 0.5 x the half-spread as slippage); and inputs that are recorded market data or real Alpaca paper fills, each pinned by sha256. Synthetic, offline or fixture evidence never counts. Receipt schema, preregistered here (the file is shared with strategy-paper-performance; no receipt exists yet): {\"schema_version\": 1, \"out_of_sample\": {\"status\": \"passed\", \"route\": \"historical_holdout\" | \"prospective_paper\", \"strategy_id\", \"protocol_sha256\", \"config_sha256\", \"cost_table_sha256\", \"fees_sha256\", \"inputs_sha256\", \"analysis_commit\", \"analysis_point\", \"sessions\", \"round_trips\", \"adjusted_p_value\" or \"lower_bound\", \"leverage_rung\"}, \"paper_performance\": {...}}. Both sections must carry the same strategy_id, protocol_sha256 and config_sha256. The checker only verifies the status string /out_of_sample/status == \"passed\"; a reviewer verifies the rest before the dated commit that flips this gate. Status on 2026-09-24: no strategy qualifies; mover-early-entry v1 (768 rule-exits) and v2 (244 rule-exits, including pre-positioning at the prior close) produced no development pass (native-agent-stack #162)."
+    },
+    {
+      "id": "strategy-paper-performance",
+      "rung": "live",
+      "layer": "evaluation-experiments",
+      "title": "The same strategy is net positive over a separate, later paper period, analysed once",
+      "status": "not_established",
+      "owner": "peer:sota-workflow-resolution",
+      "evidence_class": "none",
+      "required": true,
+      "receipt_path": "blueprints/us-equities/strategy-performance/receipt.json",
+      "flip_condition": {
+        "type": "equals",
+        "pointer": "/paper_performance/status",
+        "equals": "passed"
+      },
+      "note": "Added 2026-09-24 and revised the same day, before merge, after an independent review; criteria fixed before any paper session counts. Passed means all of: (1) a separate, later paper period: the same strategy and the same frozen configs as strategy-out-of-sample-holdout, pinned by sha256, run on an Alpaca paper account through the engine and starting after that gate's analysis point; no session counts toward both gates, and earlier mechanics trials (mover-20260924 and similar) are execution evidence, not performance; (2) a session is a scheduled trading day of the strategy, and scheduled days without trades count; (3) a single preregistered analysis point, the end of the first session at which at least 20 sessions and at least 100 round trips exist, analysed once, with no interim or repeated testing; (4) the estimator is the pooled mean net return per round trip from the actual paper fills, less fees from the pinned fee schedule (currently blueprints/us-equities/mover-early-entry/fees.json sha256 fa1f468b80f78dc0c050948123116f577e38ae9f8c03f9fb360d11042a3fed3d; Alpaca paper charges no commission and the spread is in the fills); (5) the one-sided 95% circular 5-session block bootstrap lower bound of that estimator is > 0; (6) the maximum drawdown of the strategy's paper equity is <= 20%; (7) zero needs_attention receipts over the period; (8) adverse slippage, defined per side in bps as entry (fill / model - 1) x 10000 and exit (model / fill - 1) x 10000 for a long position (a short position mirrors both), has a median per side that does not exceed the per-side cost assumption from the pinned cost table (half-spread for the fill's bucket plus the protocol's slippage rule); with a bucketed table the test is that the median of each fill's adverse slippage less its own bucket's assumption is <= 0. Model prices come from the strategy's own paper-vs-model comparator named in its protocol (mover-early-entry: paper_compare.py, for protocol paper_e2e; its exit_diff_bps is fill / model - 1, so the adverse exit value is recomputed from its model and fill prices, not copied); (9) leverage above 1x counts only at an established ladder rung (leverage-ladder-2x or leverage-ladder-4x). Receipt section /paper_performance, in the file and schema shared with strategy-out-of-sample-holdout, preregistered here: {\"status\": \"passed\", \"strategy_id\", \"protocol_sha256\", \"config_sha256\", \"fees_sha256\", \"cost_table_sha256\", \"first_session\", \"analysis_point\", \"sessions\", \"round_trips\", \"lower_bound\", \"max_drawdown\", \"needs_attention\", \"median_adverse_slippage_bps\": {\"entry\", \"exit\"}, \"leverage_rung\", \"trial_ids\"}. It must carry the same strategy_id, protocol_sha256 and config_sha256 as /out_of_sample. The checker only verifies the status string /paper_performance/status == \"passed\"; a reviewer verifies the rest, including that first_session falls after the out-of-sample analysis point, before the dated commit that flips this gate."
+    },
+    {
       "id": "live-go",
       "rung": "live",
       "layer": "cross-layer",
@@ -346,7 +380,7 @@
       "required": true,
       "receipt_path": "docs/decisions/live-go.md",
       "flip_condition": null,
-      "note": "Never flipped by automation; catalog inclusion does not authorize live configuration, paid hosting or orders."
+      "note": "Never flipped by automation; catalog inclusion does not authorize live configuration, paid hosting or orders. 2026-09-24 standing user instruction (recorded, not a go): paper and simulation are not subject to human approval steps (their recorded rung gates still apply). The live lane is ready for the user's decision when the checker's blocking.live equals [\"live-go\"], that is, when every other required gate through the live rung is established, including strategy-out-of-sample-holdout and strategy-paper-performance. The user stores the live key and gives the explicit go; automation never flips live-go or places live orders."
     }
   ]
 }

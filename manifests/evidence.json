@@ -9378,8 +9378,8 @@
     },
     {
       "path": "catalogs/us-equities/gates-20260922.json",
-      "sha256": "5cfa39ba0f927505497b06a2777be7a7c001ac655b96a58095905dc7fd382cfe",
-      "bytes": 36072
+      "sha256": "6a66232f0be76e8eeb224dc92a432477898bf5c42f1d676c23c1b012a3e2e6e3",
+      "bytes": 44078
     },
     {
       "path": "catalogs/us-equities/hosting-source-review.json",
@@ -9758,8 +9758,8 @@
     },
     {
       "path": "docs/grand-catalog-handbook.md",
-      "sha256": "0a6e88cc5c4776c433eb4af0414e30b970388204bb9e1d36ac73ce22f3db6eec",
-      "bytes": 426080
+      "sha256": "1a18c4bb85e7e0a745c9c8d426472544e66327a112e58341bf19576caaae1949",
+      "bytes": 426468
     },
     {
       "path": "docs/harness-defaults.md",
@@ -29063,8 +29063,8 @@
     },
     {
       "path": "tests/test_trading_gates.py",
-      "sha256": "b6087fb4a690e42d146ba48f7c03f3077a280366b837bee83dfea981da7bb10d",
-      "bytes": 16185
+      "sha256": "66d3dce3d207410bc20fea419f860da98080d770f88877c69c06731ccdce0f4d",
+      "bytes": 19047
     },
     {
       "path": "tests/test_validate.py",
