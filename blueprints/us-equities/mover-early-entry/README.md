@@ -25,6 +25,20 @@ Coverage of the research package's verified +20% events is 83.8% (labelled survi
 gain with the eventual gain 0.26 (package: 0.04). The >= 10x degree tier is mostly price-basis artifacts (62 days, 16
 clean; D6), so its capture numbers are reported with and without those rows.
 
+## Result (v2, development and validation)
+
+`evidence/summary-v2-dev-val-run-v1.json` (results sha256 `3334962f...`, two independent runs byte-identical): **no
+rule-exit passes development in any family**, so nothing validates and no holdout is read.
+
+- **E, first-cross (earliest-stage) entries**: all 216 rule-exits have negative mean net returns (median -3.1%); none
+  is positive even before costs. Entering at the first minute a mover qualifies does not help: the average qualifier
+  fades from there.
+- **F, follow-up setups**: all 16 negative net; the best is the 15-minute opening-range breakout with its range-low
+  stop (Y2), -0.34% net, +0.31% before costs.
+- **P, pre-positioning at the previous close**: all 12 negative net (best -1.0%). The volume-breakout score's
+  qualifying set holds 11.7% of the next day's >= +100% movers against a 0.004% base rate: it locates where extreme
+  movers come from, but the average selected name still loses after costs.
+
 ## Pipeline and how to reproduce
 
 Runtime pinned by the protocol: Python 3.12.3, duckdb 1.5.5, numpy 2.5.3 (the adaptive-paper tools environment on this
