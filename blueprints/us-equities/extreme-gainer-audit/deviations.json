@@ -37,13 +37,38 @@
       "what": "Verdict naming for Status OK rows without a computed gain",
       "v1_implementation": "10 Status OK rows have a blank Computed_Gain_Pct; 7 of them were named recovered_* although the package did have prices",
       "v2_rule": "those rows are package_uncomputed_match or package_uncomputed_mismatch",
-      "effect": "recovered rows go from 274 to 267 plus 7 package_uncomputed rows"
+      "effect": "recovered rows go from 274 to 267 plus 7 package_uncomputed rows",
+      "detail": "The plan's question counts 271 rows without computed prices: 265 NO_DATA plus 6 EVENT_BAR_MISSING. v1's 274 recovered rows also include 7 Status OK rows whose Computed_Gain_Pct is blank."
     },
     {
       "id": "D5",
       "what": "plan.json frozen_at_utc is wrong",
       "detail": "The field says 2026-09-24T03:05:00Z, a time typed ahead. The plan was committed and published at 02:51:57Z (4cb31878), before the fetch at 02:52:04Z; the git order is the evidence of preregistration. The field is left unedited because plan.json's sha256 binds the snapshot and the results.",
       "effect": "none on results"
+    },
+    {
+      "id": "D6",
+      "what": "T+N forward returns on the market calendar",
+      "v1_implementation": "T+N counted the symbol's own bar dates, so a halted or suspended session shifted T+N later",
+      "v2_rule": "T+N is the N-th market session (sessions observed across all fetched windows); a session without a bar for the symbol is reported missing, not shifted",
+      "effect": "no change on this run: T+1 659/673, T+5 653/662, T+20 631/646 under both calendars"
+    },
+    {
+      "id": "D7",
+      "what": "Acquisition failures are not 'no data'",
+      "v2_rule": "an event without event-date data whose responses include an HTTP 400/404/422 error dict is fetch_error, not no_source_data",
+      "effect": "none on this run: 2,871 of 2,871 fetch responses and 3 of 3 supplement responses were HTTP 200"
+    },
+    {
+      "id": "D8",
+      "what": "Post-hoc price-leg comparison",
+      "v2_rule": "a package close counts as the same as Alpaca's when it is within a cent (or 0.5%) of the split-adjusted OR the raw bar close, because the package may carry raw prices",
+      "effect": "v2 post-hoc mismatch classes: closes_match_bar_not_official 67 (was 66), both_closes_differ 3 (was 4)"
+    },
+    {
+      "id": "D9",
+      "what": "Fetch and output hardening (no effect on recorded results)",
+      "detail": "pagination refuses a repeated or unbounded page_token; private outputs (snapshot, supplement, results, post-hoc) are created mode 0600 with no world-readable window; v1 output bytes are unchanged"
     }
   ]
 }

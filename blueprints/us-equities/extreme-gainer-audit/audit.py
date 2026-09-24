@@ -44,6 +44,19 @@ def sha256_file(path) -> str:
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
+def write_private(path: Path, text: str) -> None:
+    """Create or replace a file readable by this user only, with no world-readable window."""
+    fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+    try:
+        os.fchmod(fd, 0o600)
+        with os.fdopen(fd, "w") as f:
+            fd = None
+            f.write(text)
+    finally:
+        if fd is not None:
+            os.close(fd)
+
+
 def check_inputs(package_dir: Path) -> None:
     """Refuse to run on inputs other than the ones the plan was frozen against."""
     for key, rel in (("forward_returns_csv", FORWARD_CSV), ("alias_map_csv", ALIAS_CSV)):
@@ -177,7 +190,22 @@ def split_factor(raw_bar, split_bar):
     return None
 
 
-def forward_returns(event_date: str, split_bars: dict) -> dict:
+def forward_returns(event_date: str, split_bars: dict, sessions: list | None = None) -> dict:
+    """T+N from the symbol's own bar dates (v1), or from the market session calendar (v2,
+    deviations.json D6) so a halted or suspended session is not skipped; a T+N session without a
+    bar for the symbol is reported missing instead of shifting to a later session."""
+    if sessions is not None:
+        if event_date not in split_bars or event_date not in sessions:
+            return {}
+        i = sessions.index(event_date)
+        base = split_bars[event_date]["c"]
+        out = {}
+        for n in HORIZONS:
+            if i + n < len(sessions) and base:
+                day = sessions[i + n]
+                out[n] = ({"date": day, "ret_pct": round((split_bars[day]["c"] / base - 1) * 100, 4)} if day in split_bars
+                          else {"date": day, "missing_session_bar": True})
+        return out
     days = sorted(split_bars)
     if event_date not in split_bars:
         return {}
@@ -235,8 +263,12 @@ class Client:
         self.gap, self.last, self.log = 1.0 / per_second, 0.0, []
 
     def get(self, path: str, **params) -> dict:
-        items, token = [], None
+        items, token, seen = [], None, set()
         while True:
+            if token in seen or len(seen) > 1000:
+                raise RuntimeError(f"pagination did not terminate for {path}: repeated or unbounded page_token")
+            if token:
+                seen.add(token)
             q = dict(params, **({"page_token": token} if token else {}))
             url = DATA_URL + path + "?" + urllib.parse.urlencode(q)
             for attempt in range(4):
@@ -299,8 +331,7 @@ def supplement(args) -> int:
             out["events"].setdefault(ev["id"], []).append(resp)
             if has_event_data(resp, ev["date"]):
                 break
-    args.out.write_text(json.dumps(out, sort_keys=True) + "\n")
-    os.chmod(args.out, 0o600)
+    write_private(args.out, json.dumps(out, sort_keys=True) + "\n")
     print(json.dumps({"supplement_events": len(out["events"]), "requests": len(client.log),
                       "sha256": sha256_file(args.out)}))
     return 0
@@ -334,8 +365,7 @@ def fetch(args) -> int:
             print(json.dumps({"progress": n, "of": len(events), "requests": len(client.log)}), flush=True)
     args.out_dir.mkdir(parents=True, exist_ok=True, mode=0o700)
     snap_path = args.out_dir / "snapshot.json"
-    snap_path.write_text(json.dumps(snapshot, sort_keys=True) + "\n")
-    os.chmod(snap_path, 0o600)
+    write_private(snap_path, json.dumps(snapshot, sort_keys=True) + "\n")
     log = {"snapshot_sha256": sha256_file(snap_path), "requests": len(client.log),
            "status_counts": {str(s): sum(1 for e in client.log if e["status"] == s) for s in sorted({e["status"] for e in client.log})},
            "fetched_at_utc": snapshot["fetched_at_utc"]}
@@ -360,6 +390,13 @@ def compare(args) -> int:
             raise SystemExit("supplement was fetched against a different snapshot")
     results, counts = [], {}
     fwd_counts = {n: {"match": 0, "mismatch": 0, "compared": 0} for n in HORIZONS}
+    sessions = None
+    if rules == "v2":
+        # The market session calendar observed across every fetched window (a session present for
+        # any symbol); each session in 2021-2026 falls inside dozens of events' 57-day windows.
+        found = {d for tried in snapshot["events"].values() for resp in tried
+                 for d in by_date((resp.get("bars_split") or {}).get("bars"))}
+        sessions = sorted(found)
     for ev in events:
         tried = list(snapshot["events"].get(ev["id"]) or [])
         if supplement_doc:
@@ -373,6 +410,8 @@ def compare(args) -> int:
                 result, used = r, resp
                 break
         verdict, ref, field = verdict_for(ev, result, rules)
+        if rules == "v2" and verdict == "no_source_data" and fetch_errors:
+            verdict = "fetch_error"  # deviations.json D7: an acquisition failure is not "no data"
         counts[verdict] = counts.get(verdict, 0) + 1
         row = {"id": ev["id"], "date": ev["date"], "ticker": ev["ticker"], "symbol_used": used["symbol"] if used else None,
                "package_status": ev["status"], "package_reference_field": field, "package_gain_pct": ref,
@@ -381,11 +420,11 @@ def compare(args) -> int:
                "verdict": verdict, **({"fetch_errors": fetch_errors} if fetch_errors else {})}
         row.update({k: v for k, v in result.items() if k not in ("gain_pct", "reason")})
         if used and "gain_pct" in result:
-            fr = forward_returns(ev["date"], by_date(used["bars_split"].get("bars")))
+            fr = forward_returns(ev["date"], by_date(used["bars_split"].get("bars")), sessions)
             row["forward"] = {}
             for n in HORIZONS:
                 pkg = ev["fwd"][n]
-                if n in fr and pkg is not None:
+                if n in fr and pkg is not None and "ret_pct" in fr[n]:
                     ok = agrees(fr[n]["ret_pct"], pkg, PLAN["tolerance"]["forward_returns"])
                     fwd_counts[n]["compared"] += 1
                     fwd_counts[n]["match" if ok else "mismatch"] += 1
@@ -413,8 +452,7 @@ def compare(args) -> int:
            "inputs": {k: PLAN["inputs"][k]["sha256"] for k in ("forward_returns_csv", "alias_map_csv")},
            "snapshot_sha256": sha256_file(args.snapshot), "snapshot_fetched_at_utc": snapshot["fetched_at_utc"],
            "summary": summary, "events": results}
-    args.out.write_text(json.dumps(out, indent=1, sort_keys=True) + "\n")
-    os.chmod(args.out, 0o600)  # per-event results are private
+    write_private(args.out, json.dumps(out, indent=1, sort_keys=True) + "\n")  # per-event results are private
     print(json.dumps(summary))
     return 0
 

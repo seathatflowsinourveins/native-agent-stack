@@ -24,10 +24,15 @@ from pathlib import Path
 import audit as A
 
 
-def leg(pkg, alp):
+def leg(pkg, alp, alt=None):
+    """same when the package close is within a cent (or 0.5%) of the split-adjusted bar close, or,
+    under v2 (deviations.json D8), of the raw bar close, since the package may carry raw prices."""
     if pkg is None or alp is None:
         return "missing"
-    return "same" if abs(pkg - alp) <= max(0.011, 0.005 * alp) else "differs"
+    for ref in (alp,) + ((alt,) if alt is not None else ()):
+        if abs(pkg - ref) <= max(0.011, 0.005 * ref):
+            return "same"
+    return "differs"
 
 
 def main(argv=None) -> int:
@@ -51,6 +56,7 @@ def main(argv=None) -> int:
             snap["events"][eid] = list(snap["events"].get(eid) or []) + tried
     rows = list(csv.DictReader((a.package_dir / A.FORWARD_CSV).open(newline="")))
     res = {e["id"]: e for e in results["events"]}
+    v2 = results.get("rules") == "v2"
     tol = A.PLAN["tolerance"]["event_gain"]
     basis = collections.Counter()
     gaps, legs, leg_examples = [], collections.Counter(), collections.defaultdict(list)
@@ -74,8 +80,9 @@ def main(argv=None) -> int:
             bar_gain = (sb[e["date"]]["c"] / sb[e["prev_date"]]["c"] - 1) * 100
             basis[(A.agrees(e["alpaca_gain_pct"], pkg, tol), A.agrees(bar_gain, pkg, tol))] += 1
         if e["verdict"] == "mismatch":
-            lp = leg(A.num(r["Prev_Close"]), sb.get(e["prev_date"], {}).get("c"))
-            le = leg(A.num(r["Ev_Close"]), sb.get(e["date"], {}).get("c"))
+            rb = A.by_date(resp["bars_raw"].get("bars")) if v2 else {}
+            lp = leg(A.num(r["Prev_Close"]), sb.get(e["prev_date"], {}).get("c"), rb.get(e["prev_date"], {}).get("c") if v2 else None)
+            le = leg(A.num(r["Ev_Close"]), sb.get(e["date"], {}).get("c"), rb.get(e["date"], {}).get("c") if v2 else None)
             cat = ("split_between" if e.get("split_between") else
                    "closes_match_bar_not_official" if (lp, le) == ("same", "same") else
                    "both_closes_differ" if (lp, le) == ("differs", "differs") else
@@ -86,7 +93,7 @@ def main(argv=None) -> int:
     q = statistics.quantiles(gaps, n=20) if len(gaps) > 20 else []
     out = {"kind": "extreme_gainer_price_audit_posthoc", "preregistered": False,
            **({"rules": results["rules"]} if "rules" in results else {}),
-           "note": ("Explains the preregistered (v1) mismatches; the plan.json verdicts and overturn stand." if results.get("rules", "v1") == "v1"
+           "note": ("Explains the preregistered mismatches; the plan.json verdicts and overturn stand." if results.get("rules", "v1") == "v1"
                     else "Explains the v2 (deviations.json) mismatches; the preregistered v1 verdicts and overturn stand."),
            "snapshot_sha256": results["snapshot_sha256"], "results_sha256": A.sha256_file(a.results),
            "unflagged_ok_rows_compared": n,
@@ -98,9 +105,7 @@ def main(argv=None) -> int:
                                        "share_over_0_5": round(sum(x > 0.5 for x in gaps) / len(gaps), 4) if gaps else None},
            "mismatch_leg_classes": dict(legs.most_common()),
            "mismatch_leg_examples": {k: v[:12] for k, v in sorted(leg_examples.items())}}
-    a.out.write_text(json.dumps(out, indent=1, sort_keys=True) + "\n")
-    import os
-    os.chmod(a.out, 0o600)
+    A.write_private(a.out, json.dumps(out, indent=1, sort_keys=True) + "\n")
     print(json.dumps({k: out[k] for k in ("unflagged_ok_rows_compared", "agree_official_close_gain", "agree_bar_close_gain",
                                           "agree_bar_only", "agree_neither", "mismatch_leg_classes")}))
     return 0

@@ -65,6 +65,46 @@ class OfficialCloseV2(unittest.TestCase):
             self.assertEqual(A.load_events(pkg)[0]["symbols"], ["EEEE", "DDDD", "FFFF"])
 
 
+class HardeningV2(unittest.TestCase):
+    def test_forward_returns_use_the_market_calendar_and_report_a_missing_session(self):
+        days = ["2020-03-02", "2020-03-03", "2020-03-04", "2020-03-05", "2020-03-06", "2020-03-09", "2020-03-10"]
+        split = A.by_date([bar(d, 10 + i) for i, d in enumerate(days) if d != "2020-03-03"])  # halted on 03-03
+        v1 = A.forward_returns("2020-03-02", split)
+        self.assertEqual(v1[1]["date"], "2020-03-04")  # v1 shifts past the halt
+        v2 = A.forward_returns("2020-03-02", split, days)
+        self.assertEqual(v2[1], {"date": "2020-03-03", "missing_session_bar": True})
+        self.assertEqual((v2[5]["date"], v2[5]["ret_pct"]), ("2020-03-09", 50.0))
+
+    def test_private_outputs_are_created_owner_only(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "r.json"
+            path.write_text("old")
+            path.chmod(0o644)
+            A.write_private(path, "new")
+            self.assertEqual((path.read_text(), path.stat().st_mode & 0o777), ("new", 0o600))
+
+    def test_repeated_page_token_is_refused(self):
+        client = A.Client("k", "s", per_second=1000)
+        pages = iter([{"bars": [1], "next_page_token": "t1"}, {"bars": [2], "next_page_token": "t1"}])
+
+        class Resp:
+            status = 200
+            def __init__(self, body): self.body = body
+            def __enter__(self): return self
+            def __exit__(self, *a): return False
+            def read(self): return json.dumps(self.body).encode()
+
+        original = A.urllib.request.urlopen
+        A.urllib.request.urlopen = lambda req, timeout=30: Resp(next(pages))
+        original_load = A.json.load
+        A.json.load = lambda r: json.loads(r.read())
+        try:
+            with self.assertRaises(RuntimeError):
+                client.get("/v2/stocks/AAAA/bars")
+        finally:
+            A.urllib.request.urlopen, A.json.load = original, original_load
+
+
 class EventGain(unittest.TestCase):
     def test_gain_from_official_closes_and_previous_trading_day(self):
         auctions = A.by_date([auction("2020-02-07", [{"c": "6", "p": 2.00, "x": "T"}]), auction("2020-02-10", [{"c": "6", "p": 6.40, "x": "T"}])])

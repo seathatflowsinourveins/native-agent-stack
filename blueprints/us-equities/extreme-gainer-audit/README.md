@@ -55,7 +55,8 @@ their bytes.
 Independent review found an implementation defect: with several condition-6 closing prints on a day, v1 took the
 first print from any exchange, not the listing exchange's (D1). The review also found three smaller issues: the
 split tolerance fired on adjustment rounding (D2), the original `Ticker` was never tried (D3), and seven rows were
-misnamed "recovered" (D4). Under v2:
+misnamed "recovered" (D4). A later bot review added D6-D9: the market-calendar T+N, `fetch_error` verdicts, raw-or-split
+price legs, and pagination and private-file hardening. Under v2:
 
 | Verdict | Rows |
 |---|---|
