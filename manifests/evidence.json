@@ -9129,6 +9129,21 @@
       "bytes": 377
     },
     {
+      "path": "blueprints/us-equities/sim-paper-compare/README.md",
+      "sha256": "5b6065ba0fe6b143a34221e2678a4cd18abca4d855224be1059cd05571e67570",
+      "bytes": 35911
+    },
+    {
+      "path": "blueprints/us-equities/sim-paper-compare/receipts/20260923g-main-passed.json",
+      "sha256": "e87278b1e0fe062f2d665e3db63ad9eb71bc48814662b24e73cb012938122f75",
+      "bytes": 55327
+    },
+    {
+      "path": "blueprints/us-equities/sim-paper-compare/replay_compare.py",
+      "sha256": "fab6a7c490828527f9dc67f0fcb7543ae34e73f2be844f92624576cbfe376037",
+      "bytes": 69113
+    },
+    {
       "path": "blueprints/us-equities/simulation-research/README.md",
       "sha256": "7cbb07d3cfe5e5785485ede029ed32f82d3ce83e75dbf1adb8911dcf133b2b21",
       "bytes": 5100
@@ -28810,8 +28825,8 @@
     },
     {
       "path": "recipes/sota-convergence-practice.md",
-      "sha256": "661010a4fe4d3408fc3a4cf51a429890cb934254862ab0c54df9968701640301",
-      "bytes": 25161
+      "sha256": "da4982920c74778a547769b8b99803fd8b28cd11d82cef7746920fd2d6436d68",
+      "bytes": 25562
     },
     {
       "path": "recipes/tavily.md",
@@ -29479,6 +29494,11 @@
       "bytes": 14063
     },
     {
+      "path": "tests/test_sim_paper_compare.py",
+      "sha256": "8202b8f9524b26d1d6ced7bd6cae36477cc4801c8cc0ca14d403242e52ef9247",
+      "bytes": 97855
+    },
+    {
       "path": "tests/test_sota_convergence.py",
       "sha256": "cb197ddbe88b82bfc110bcf77da80ab59197f371407c93674643718b8469dcf1",
       "bytes": 163940
@@ -29570,8 +29590,8 @@
     },
     {
       "path": "tools/sota-convergence/README.md",
-      "sha256": "1fdccc64dfa48a007a2a6264ece64f852c9563021cc5f467d1daf503f4829ee3",
-      "bytes": 171127
+      "sha256": "ab01c9cdb40b57dcfa92b8eb579d4c78c7cce867523f9af4d026bd2f267581f3",
+      "bytes": 175949
     },
     {
       "path": "tools/sota-convergence/build_manifest.py",
