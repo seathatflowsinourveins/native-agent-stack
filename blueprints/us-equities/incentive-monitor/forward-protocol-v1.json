@@ -97,5 +97,6 @@
     "controls are matched on the gain bucket only, not on relative volume, which selection favours"
   ],
   "universe": "operating companies only, for selection and controls: an Alpaca active tradable US equity whose symbol is in SEC company_tickers.json (dashes read as dots), is not in SEC company_tickers_mf.json (registered funds, including most ETFs), and whose Alpaca asset name has no ETF, ETN, ETP, Fund or Trust word (grantor-trust ETPs such as SPY or GLD, closed-end funds; some REITs named Trust are excluded too)",
-  "records": "an append-only ledger directory: one decision record <session>-<HHMM>.json per session and decision time, created exclusively; every refusal gets its own <session>-<HHMM>-refused-<time>.json"
+  "records": "an append-only ledger directory: one decision record <session>-<HHMM>.json per session and decision time, created exclusively; every refusal gets its own <session>-<HHMM>-refused-<time>.json",
+  "schedule": "decisions run only on Alpaca calendar trading days; a decision time later than that day's close minus 90 minutes is not scheduled (13:30 on early-close days), so it creates no session and no record"
 }
