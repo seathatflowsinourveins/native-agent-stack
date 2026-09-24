@@ -40,8 +40,11 @@ five symbols, and any row that fails its own rule.
 ```
 
 - Rule `HH:MM|G<gain>|V<dollar volume>|<any|news_before_t>`. G is in percent points and
-  V in USD; V may use a K, M or B suffix. `dollar_volume_at_t` must reach V. When
-  `gain_pct_at_t` is supplied it must reach G, and `news_before_t` rules need `"news_before_t": true`.
+  V in USD; V may use a K, M or B suffix. `price_at_t` must be at least the protocol's
+  1.00 USD minimum (`scan_symbol_below_min_price`), and `dollar_volume_at_t` must reach V.
+  When `gain_pct_at_t` is supplied it must reach G less 1e-7 percent points: the scanner
+  fires at a ratio gain of G - 1e-9 (clarification C25) and writes percent points to nine
+  decimals. `news_before_t` rules need `"news_before_t": true`.
 - `entry_bar_dollar_volume` is required but may be `null`. `regime` is optional.
   With the four inputs, the factor is recomputed: 1 when the previous close is above the
   20-session mean and 20-session realised volatility is below its 252-session median,
@@ -66,7 +69,9 @@ A symbol whose price times the allowance exceeds the entry cap is skipped
 per-order cap because the ledger's cap bounds every order, exit sells included; see
 *Two caps* below. Rungs come from `rung_schedule` (sessions 1-20 at rung 1 in the
 example); a session beyond the schedule is refused. A rung above 1 needs the canonical
-`leverage_policy` block, whose PRE and POST cells cap the ledger at 1x. The config must
+`leverage_policy` block, whose PRE and POST cells cap the ledger at 1x. Entries are sized
+at the full rung, so `max_leverage` must be positive (`unqualified_lane_configuration`)
+and at least the highest scheduled rung (`mover_rung_exceeds_max_leverage`). The config must
 set `max_order_qty_mode: "notional"` (`mover_requires_notional_order_qty_mode`
 otherwise): only then is the ledger's per-order share cap, which also sizes recovery's
 exits, `floor(max_order_notional_usd / bid)` whole shares.
@@ -176,6 +181,10 @@ $PY mover_runner.py recover --env-file "$PAPER_ENV_FILE" --output "$PRIVATE_OUTP
 $PY mover_runner.py synthetic --scan "$SCAN" --output out.json [--allow-stale-scan] [--hold-seconds 4]
 ```
 
+`check --assume-fresh` and `synthetic --allow-stale-scan` evaluate the scan as of its own
+`scan_time`. Every other check still applies, and a malformed file is refused with its
+reason (`scan_invalid_json`, `scan_time_invalid`, ...) rather than raised.
+
 `paper` refuses before reading credentials when the scan is stale, empty or invalid.
 A pre-market-only config also refuses outside PRE. State lives in
 `<state-root>/<account fingerprint>/mover/` (`ledger.sqlite3`, `trial.json`), under the
@@ -191,7 +200,11 @@ next one until `recover` passes. Exit codes follow the engine: 0 passed or no si
 - the exit reason, the exit budget state and realized P&L.
 
 A native loop that handed its residual to recovery records `handoff_to_recovery`, and a
-position no engine order could sell is listed under `unsellable_positions`. The
+position no engine order could sell is listed under `unsellable_positions`. An exception
+inside the native loop (for example a periodic reconciliation that finds an order this
+ledger does not own) stops the node like any other end. The receipt still lists every
+leg's orders, fills and events, adds `error_type`, `error_reason` and a `mover_loop_error`
+event, and ends `needs_attention`; the forced recovery handles any residual. The
 `sizing` block records the entry cap, the ledger's per-order cap and the exit
 headroom factor.
 
@@ -219,7 +232,12 @@ credential.
 - **Hold length.** `trial_seconds` is at most 3600 and `cleanup_seconds` at most 600,
   so no hold exceeds about 70 minutes. X1 is only reachable for entries within that
   window of 15:58, and pre-market X2 fires before the 09:25 flatten only when the first
-  fill is at or before 08:25, which means a rule time before about 08:24.
+  fill is at or before 08:25, which means a rule time before about 08:24. An X1 config
+  is refused when X1 could never fire: a trial end at or before 15:58
+  (`mover_x1_preempted_by_trial_end`), or a session-close latch at or before it
+  (`mover_x1_preempted_by_session_close`). The native loop latches `session_close`
+  `cleanup_seconds` before the controller close, which is 16:00 without extended hours
+  (20:00 with them), so a regular-session X1 config needs `cleanup_seconds` below 120.
 - **Pre-market data.** `quote_max_age_seconds` is at most 3 s. The 2026-09-23 after-hours
   trial stopped on the stream's 3 s data timeout (`trials/20260923-post-extended-hours`).
   `stream_quote_timeout_seconds` can lengthen that transport timeout while the ledger

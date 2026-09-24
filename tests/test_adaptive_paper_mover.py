@@ -1,8 +1,10 @@
 """Mover trial mode, pure logic: config, scan, sizing, pricing, exits and the order state
 machine. Synthetic fixtures only (evidence class SYN); no broker, network or credentials."""
+import contextlib
 from datetime import datetime, time as dtime, timezone
 from decimal import Decimal as D
 import hashlib
+import io
 import json
 from pathlib import Path
 import re
@@ -174,6 +176,59 @@ class RuleAndConfig(unittest.TestCase):
         self.assertEqual(limits.leverage.envelope(session="PRE", drawdown_fraction=D(0)), D(1))
         self.assertEqual(limits.leverage.envelope(session="RTH", drawdown_fraction=D(0)), D(2))
 
+    def test_max_leverage_must_be_positive_and_cover_the_top_rung(self):
+        # Sizing uses the full scheduled rung (L = rung x regime x drawdown), so without a
+        # leverage_policy block a maximum of 0, below 0 or below the top rung would size entries
+        # above the configured bound.
+        for value in ("0", "0.0", "-1"):
+            data = config_data()
+            data["max_leverage"] = value
+            with self.subTest(max_leverage=value), \
+                    self.assertRaisesRegex(ValueError, "^unqualified_lane_configuration$"):
+                load(data)
+        data = config_data()
+        data["max_leverage"] = "0.5"                              # the example schedule is rung 1 throughout
+        with self.assertRaisesRegex(ValueError, "^mover_rung_exceeds_max_leverage$"):
+            load(data)
+        data["mover"]["rung_schedule"] = [{"from_session": 1, "to_session": 10, "rung": "0.25"},
+                                          {"from_session": 11, "to_session": 20, "rung": "0.75"}]
+        with self.assertRaisesRegex(ValueError, "^mover_rung_exceeds_max_leverage$"):
+            load(data)                                            # the highest rung, not the first, is checked
+        data["mover"]["rung_schedule"][1]["rung"] = "0.5"
+        _, _, settings = load(data)
+        top = max(rung for _, _, rung in settings.rung_schedule)
+        self.assertEqual(top, D("0.5"))
+        self.assertLessEqual(mover.leverage_multiple(top, mover.REGIME_ON_FACTOR, D(1)), D("0.5"))
+
+    def test_an_x1_exit_must_not_be_preempted_by_the_session_close_cleanup_or_the_trial_end(self):
+        # Regular session only, the controller closes at 16:00 and run_mover latches
+        # session_close cleanup_seconds before it: 15:50 with the example's 600 s, before X1's 15:58.
+        def x1(extended_hours, **changes):
+            data = config_data()
+            if not extended_hours:
+                data.update(regular_session_only=True, extended_hours_enabled=False)
+                data["sessions"]["extended_hours"] = False
+            data["mover"].update(session_scope="any_session", exit="X1", trial_end_et="16:00",
+                                 rule="14:50|G20|V1000000|any")
+            data.update(changes)
+            return data
+
+        for cleanup in (600, 120):                                # 120 s would latch at 15:58 itself
+            with self.subTest(cleanup_seconds=cleanup), \
+                    self.assertRaisesRegex(ValueError, "^mover_x1_preempted_by_session_close$"):
+                load(x1(False, cleanup_seconds=cleanup))
+        _, limits, settings = load(x1(False, cleanup_seconds=119))   # latches at 15:58:01, after X1
+        self.assertEqual((settings.exit_rule, limits.cleanup_seconds), ("X1", 119))
+        # With extended hours the controller closes at 20:00, so the example's 600 s leaves X1 reachable.
+        self.assertEqual(load(x1(True))[2].exit_rule, "X1")
+        # A trial end at or before 15:58 hard-flattens every leg before X1 could fire.
+        data = x1(True)
+        data["mover"]["trial_end_et"] = "15:58"
+        with self.assertRaisesRegex(ValueError, "^mover_x1_preempted_by_trial_end$"):
+            load(data)
+        data["mover"]["trial_end_et"] = "15:59"
+        self.assertEqual(load(data)[2].trial_end_et, dtime(15, 59))
+
 
 class ScanValidation(unittest.TestCase):
     def setUp(self):
@@ -226,6 +281,29 @@ class ScanValidation(unittest.TestCase):
                      scan_bytes(symbols=[dict(row, dollar_volume_at_t="999999.99")]))
         self.refused("scan_symbol_below_rule_gain", scan_bytes(symbols=[dict(row, gain_pct_at_t="19.9")]))
         self.assertEqual(self.scan(scan_bytes(symbols=[dict(row, price_at_t=3.21)])).symbols[0].price_at_t, D("3.21"))
+
+    def test_rows_below_the_protocol_minimum_price_are_refused(self):
+        # The scanner fires only at price_at_t >= 1.00 (protocol min_price, rules.MIN_PRICE); a
+        # sub-dollar row would trade a candidate the frozen rule never selects.
+        row = scan_dict()["symbols"][0]
+        for price in ("0.99", "0.9999", "0.000000001", 0.5):
+            with self.subTest(price=price):
+                self.refused("scan_symbol_below_min_price", scan_bytes(symbols=[dict(row, price_at_t=price)]))
+        for price in ("1", "1.00", 1.0, "1.000000001"):
+            with self.subTest(price=price):
+                self.assertGreaterEqual(self.scan(scan_bytes(symbols=[dict(row, price_at_t=price)])).symbols[0]
+                                        .price_at_t, D(1))
+
+    def test_a_gain_at_the_scanners_firing_boundary_is_accepted(self):
+        # The scanner fires at gain >= G - 1e-9 as a ratio (rules.GAIN_EPS, clarification C25) and
+        # writes the percentage to nine decimals (mover_scan.engine_scan), so a candidate at its
+        # firing boundary arrives 1e-7 percentage points below G.
+        boundary = f"{(0.20 - 1e-9) * 100:.9f}".rstrip("0").rstrip(".")
+        self.assertEqual(boundary, "19.9999999")
+        row = scan_dict()["symbols"][0]
+        scan = self.scan(scan_bytes(symbols=[dict(row, gain_pct_at_t=boundary)]))
+        self.assertEqual(scan.symbols[0].gain_pct_at_t, D("19.9999999"))
+        self.refused("scan_symbol_below_rule_gain", scan_bytes(symbols=[dict(row, gain_pct_at_t="19.99999989")]))
 
     def test_news_rule_requires_the_news_flag(self):
         data = config_data()
@@ -1150,6 +1228,39 @@ class ReceiptAndCommands(unittest.TestCase):
         self.assertEqual((sizing["gross_budget_usd"], sizing["max_entry_notional_usd"],
                           sizing["ledger_max_order_notional_usd"], sizing["exit_headroom_factor"]),
                          ("1000.00", "200", "2000", "10"))
+
+    MALFORMED_SCANS = ((b"{not json", "scan_invalid_json"), (b"[]", "scan_schema_invalid"),
+                       (scan_bytes(scan_time=None), "scan_time_invalid"),
+                       (scan_bytes(scan_time="not-a-time"), "scan_time_invalid"),
+                       (scan_bytes(scan_time="0001-01-01T00:00:00+14:00"), "scan_time_invalid"))
+
+    def test_check_refuses_a_malformed_scan_with_or_without_assume_fresh(self):
+        # --assume-fresh evaluates the scan as of its own scan_time; that time comes from
+        # load_scan's guarded parser, so a malformed file is refused (exit 2), never raised.
+        with tempfile.TemporaryDirectory() as root:
+            scan_path = Path(root) / "scan.json"
+            for raw, reason in self.MALFORMED_SCANS:
+                for extra in (["--assume-fresh"], []):
+                    with self.subTest(scan=raw[:48], flags=extra):
+                        scan_path.write_bytes(raw)
+                        printed = io.StringIO()
+                        with contextlib.redirect_stdout(printed):
+                            code = mover_runner.main(["check", "--scan", str(scan_path), *extra])
+                        self.assertEqual((code, json.loads(printed.getvalue())),
+                                         (2, {"status": "refused", "reason": reason}))
+
+    def test_synthetic_allow_stale_scan_refuses_a_malformed_scan_with_a_bounded_reason(self):
+        with tempfile.TemporaryDirectory() as root:
+            scan_path, out = Path(root) / "scan.json", Path(root) / "out.json"
+            for raw, reason in self.MALFORMED_SCANS:
+                with self.subTest(scan=raw[:48]):
+                    scan_path.write_bytes(raw)
+                    with patch("builtins.print"):
+                        code = mover_runner.main(["synthetic", "--scan", str(scan_path), "--output", str(out),
+                                                  "--allow-stale-scan"])
+                    result = json.loads(out.read_text())
+                    self.assertEqual((code, result["status"], result["reason"], result["orders_submitted"]),
+                                     (2, "not_started", reason, 0))
 
 
 if __name__ == "__main__":

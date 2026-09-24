@@ -66,6 +66,11 @@ DRAWDOWN_PAUSE_SESSIONS = 10
 
 MAX_SCAN_AGE_SECONDS = 300
 CLOCK_TOLERANCE_SECONDS = 0.25
+# The scanner's own firing rule (mover-early-entry rules.fires: protocol min_price and clarification
+# C25): price_at_t >= 1.00 USD and gain >= G - 1e-9 as a ratio. mover_scan.engine_scan writes the gain
+# in percentage points to nine decimals, so the same tolerance here is 1e-7 percentage points.
+SCAN_MIN_PRICE_USD = D("1.00")
+SCAN_GAIN_TOLERANCE_PCT = D("0.0000001")
 
 X1_FLATTEN_AT_ET = dtime(15, 58)
 X2_HOLD_SECONDS = 3600
@@ -158,6 +163,10 @@ def parse_hhmm(value, reason):
 def et_epoch(session_date, at):
     """POSIX seconds for wall-clock ``at`` (America/New_York) on ``session_date``."""
     return datetime.combine(session_date, at, NY).timestamp()
+
+
+def _seconds_of_day(at):
+    return at.hour * 3600 + at.minute * 60 + at.second
 
 
 def et_datetime(epoch):
@@ -293,9 +302,13 @@ def load_mover_config(path):
     trial adds ``symbols`` from the scan (see ``engine_config``). The same lane gates
     as ``runner.load_config`` apply: paper endpoint only, catalysts off, leverage above
     1x only under a validated ``leverage_policy`` block, and the consolidated session
-    policy. The universe must not be fixed in config. ``mover.max_entry_notional_usd`` is
-    required, and the ledger's ``max_order_notional_usd`` (which also bounds every exit
-    sell) must be at least ``EXIT_HEADROOM_FACTOR`` times it.
+    policy. ``max_leverage`` must also be positive and at least the highest scheduled
+    rung, because entries are sized at the full rung. The universe must not be fixed in
+    config. ``mover.max_entry_notional_usd`` is required, and the ledger's
+    ``max_order_notional_usd`` (which also bounds every exit sell) must be at least
+    ``EXIT_HEADROOM_FACTOR`` times it. An X1 exit must be able to fire: a trial end at
+    or before 15:58, or a session-close latch (the controller close less
+    ``cleanup_seconds``, see ``mover_runner.run_mover``) at or before it, is refused.
     """
     try:
         config = json.loads(Path(path).read_text())
@@ -312,7 +325,7 @@ def load_mover_config(path):
     leverage_block = "leverage_policy" in config
     max_leverage = parse_decimal(str(_require_key(config, "max_leverage")))
     if (config.get("endpoint") != PAPER_ENDPOINT or config.get("catalyst_orders_enabled") is not False
-            or max_leverage is None or (max_leverage > 1 and not leverage_block)):
+            or max_leverage is None or max_leverage <= 0 or (max_leverage > 1 and not leverage_block)):
         raise ValueError("unqualified_lane_configuration")
     session_policy = validate_session_policy(config)
     if session_policy["overnight_holds"]:
@@ -382,6 +395,14 @@ def load_mover_config(path):
         latest = POST_CLOSE_ET if session_policy["extended_hours"] else RTH_CLOSE_ET
         if not PRE_MARKET_OPEN_ET < trial_end <= latest:
             raise ValueError("mover_trial_end_outside_session")
+        if exit_rule == "X1":
+            # Otherwise the hard flatten at trial_end_et, or run_mover's session_close latch at the
+            # controller close (16:00, or 20:00 with extended hours) less cleanup_seconds, flattens
+            # every leg at or before 15:58 and X1 can never fire.
+            if trial_end <= X1_FLATTEN_AT_ET:
+                raise ValueError("mover_x1_preempted_by_trial_end")
+            if _seconds_of_day(latest) - _seconds_of_day(X1_FLATTEN_AT_ET) <= limits.cleanup_seconds:
+                raise ValueError("mover_x1_preempted_by_session_close")
     entry = block.get("entry", {})
     exits = block.get("exit_orders", {})
     if not isinstance(entry, dict) or not isinstance(exits, dict) or set(entry) - {
@@ -415,6 +436,10 @@ def load_mover_config(path):
     top_rung = max(rung for _, _, rung in settings.rung_schedule)
     if top_rung > 1 and (leverage is None or leverage.max_leverage < top_rung):
         raise ValueError("mover_rung_requires_leverage_policy")
+    if top_rung > max_leverage:
+        # build_plan sizes entries at the full rung; without a leverage_policy block nothing else
+        # holds them to a max_leverage below 1.
+        raise ValueError("mover_rung_exceeds_max_leverage")
     if settings.flatten_reserve_seconds >= config["duration_seconds"] + config["cleanup_seconds"]:
         raise ValueError("invalid_mover_setting:flatten_reserve_seconds")
     return config, limits, settings
@@ -481,6 +506,11 @@ def _parse_scan_time(value):
         raise MoverRefusal("scan_time_invalid") from None
     if moment.tzinfo is None:
         raise MoverRefusal("scan_time_invalid")
+    try:
+        moment.timestamp()
+        moment.astimezone(NY)  # an offset at the edge of the datetime range overflows here
+    except (OverflowError, ValueError):
+        raise MoverRefusal("scan_time_invalid") from None
     return moment
 
 
@@ -522,8 +552,12 @@ def load_scan(raw, settings, *, now):
     Refuses (``MoverRefusal``) a scan older than ``settings.max_scan_age_seconds``
     (at most five minutes) or stamped in the future, a scan taken before the rule's
     HH:MM, a rule other than the configured one, more than ``max_symbols`` symbols,
-    and any row that does not meet its own rule (dollar volume below V, a supplied
-    gain below G, or missing news when the rule requires it)."""
+    and any row the scanner's frozen rule would not fire: a price below the protocol's
+    1.00 USD minimum, a dollar volume below V, a supplied gain below G (less the
+    scanner's own tolerance, ``SCAN_GAIN_TOLERANCE_PCT``), or missing news when the rule
+    requires it. ``now=None`` evaluates the scan as of its own ``scan_time``: every
+    check but the two age bounds, for ``check --assume-fresh`` and ``synthetic
+    --allow-stale-scan``."""
     if not isinstance(raw, (bytes, bytearray)):
         raise MoverRefusal("scan_unreadable")
     digest = hashlib.sha256(raw).hexdigest()
@@ -539,7 +573,7 @@ def load_scan(raw, settings, *, now):
         raise MoverRefusal("scan_rule_differs_from_config")
     moment = _parse_scan_time(data.get("scan_time"))
     scan_time = moment.timestamp()
-    age = now - scan_time
+    age = 0.0 if now is None else now - scan_time
     if age < -CLOCK_TOLERANCE_SECONDS:
         raise MoverRefusal("scan_from_future")
     if age > settings.max_scan_age_seconds:
@@ -578,9 +612,11 @@ def load_scan(raw, settings, *, now):
         news = row.get("news_before_t")
         if news is not None and type(news) is not bool:
             raise MoverRefusal("scan_news_flag_invalid")
+        if price < SCAN_MIN_PRICE_USD:
+            raise MoverRefusal("scan_symbol_below_min_price")
         if volume < settings.rule.min_dollar_volume:
             raise MoverRefusal("scan_symbol_below_rule_dollar_volume")
-        if gain is not None and gain < settings.rule.min_gain_pct:
+        if gain is not None and gain < settings.rule.min_gain_pct - SCAN_GAIN_TOLERANCE_PCT:
             raise MoverRefusal("scan_symbol_below_rule_gain")
         if settings.rule.news == "news_before_t" and news is not True:
             raise MoverRefusal("scan_symbol_without_required_news")

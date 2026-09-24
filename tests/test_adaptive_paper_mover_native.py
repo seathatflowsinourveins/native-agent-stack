@@ -229,7 +229,8 @@ class MoverNativeEndToEnd(unittest.TestCase):
         self.assertLess(receipt["native"]["elapsed_seconds"], 15)
 
     def test_extended_hours_orders_carry_the_flag_and_meet_the_transport_contract(self):
-        rows = [row("AAA", 1, "10.00"), row("PNY", 2, "0.8123")]
+        # PNY is scanned at the protocol's 1.00 minimum price and quoted below it at entry.
+        rows = [row("AAA", 1, "10.00"), row("PNY", 2, "1.00")]
         points = {"AAA": flat("10.00"), "PNY": flat("0.8123", "0.0010")}
         real = order_extended_hours_flag
         with patch.object(native_adapter, "order_extended_hours_flag", lambda ts, policy: real(PRE_TS, policy)):
@@ -608,6 +609,53 @@ class MoverPaperCommandWiring(unittest.TestCase):
             self.assertEqual(self.trial_json(root)["phase"], "finished")
             code, receipt = self.run_paper(root, "lane-3", config=config)
             self.assertEqual((code, receipt["status"]), (0, "passed"))
+
+    def test_a_native_loop_exception_after_fills_keeps_the_order_journal(self):
+        # An order this ledger does not own appears on the account while the mover holds its
+        # entry, so the periodic reconciliation raises external_order_detected inside run_mover.
+        # The receipt keeps the leg's entry, fills and events (a replacement outcome reported zero
+        # symbols and entries), the trial stays needs_attention, and the forced recovery flattens
+        # the lane once the external order has been withdrawn.
+        real_snapshot = MoverSimulatedPort.snapshot
+        external = {}
+
+        async def snapshot(port):
+            if external or not any(port.positions.values()):
+                return await real_snapshot(port)
+            external["order"] = port.orders["adp-other-0000001"] = {
+                "client_order_id": "adp-other-0000001", "id": "ext-1", "symbol": "AAA", "side": "buy", "qty": "1",
+                "limit_price": "1.00", "status": "new", "filled_qty": "0", "filled_avg_price": None,
+                "updated_at_ns": time.time_ns()}
+            try:
+                return await real_snapshot(port)
+            finally:
+                external["order"]["status"] = "canceled"          # withdrawn before the recovery's snapshot
+
+        with tempfile.TemporaryDirectory() as root:
+            config, scan = self.fast_config(root), Path(root) / "scan.json"
+            scan.write_bytes(scan_raw([row("AAA", 1, "10.00")]))
+            with patch.object(MoverSimulatedPort, "snapshot", snapshot), \
+                 patch.object(mover_runner, "RECONCILE_EVERY_SECONDS", 0.2):
+                code, receipt = self.run_paper(root, "err-1", config=config)
+            trial = self.trial_json(root)
+        self.assertTrue(external)
+        self.assertEqual((code, receipt["status"], receipt["error_type"], receipt["error_reason"]),
+                         (3, "needs_attention", "SafetyError", "external_order_detected"))
+        totals = receipt["totals"]
+        self.assertEqual((totals["symbols"], totals["entries_submitted"], totals["entries_filled"]), (1, 1, 1))
+        leg = receipt["symbols"][0]
+        self.assertEqual((leg["symbol"], leg["entry"]["status"], leg["entry"]["ledger_status"]),
+                         ("AAA", "filled", "filled"))
+        self.assertTrue(leg["entry"]["fills"])
+        self.assertEqual([order["ledger_status"] for order in leg["recovery_exits"]], ["filled"])
+        events = [event["type"] for event in receipt["events"]]
+        self.assertIn("mover_entry_submitted", events)
+        self.assertIn("mover_loop_error", events)
+        self.assertGreaterEqual(receipt["native"]["native_fill_events"], 1)
+        self.assertIsNone(receipt["reconciliation"]["end"])           # the trial's own end proof never ran
+        self.assertEqual((receipt["flat"], receipt["reconciliation"]["recovery"]["status"]), (True, "passed"))
+        self.assertTrue(totals["pnl_consistent"], totals)
+        self.assertEqual((trial["phase"], trial["status"]), ("needs_attention", "needs_attention"))
 
     def test_recover_sells_a_position_whose_share_rose_above_the_entry_cap(self):
         # Two shares bought near 90 rise to 250 while every sell rests (the trial's port and the

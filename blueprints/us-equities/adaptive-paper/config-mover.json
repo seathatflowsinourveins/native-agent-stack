@@ -32,7 +32,7 @@
   "min_entry_close_seconds": 600,
   "order_timeout_seconds": 10,
   "mover": {
-    "rule": "08:00|G20|V250000|any",
+    "rule": "08:00|G20|V1000000|any",
     "session_scope": "pre_market_only",
     "trial_end_et": "09:25",
     "exit": "X2",

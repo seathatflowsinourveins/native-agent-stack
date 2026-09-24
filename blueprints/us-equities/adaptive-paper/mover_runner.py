@@ -229,7 +229,14 @@ async def run_mover(controller, plan, config, baseline_cash, *, account_fingerpr
     recovery (MoverBook.handoff_reason: after a force, every held leg's exits blocked or
     no exit fill for mover.HANDOFF_EXIT_TIMEOUTS exit timeouts), or at the ledger's sell
     window end, then takes a final reconciliation when no order is unresolved. The
-    caller runs recovery for any residual."""
+    caller runs recovery for any residual.
+
+    An exception once the node task exists (for example a periodic reconciliation that
+    finds an order this ledger does not own, or the node itself failing) stops the node
+    as any other end does and does not discard the trial: the outcome still carries the
+    book's legs and orders, the events and the native counts, with status
+    needs_attention, no end reconciliation and the bounded error_type/error_reason (and
+    a ``mover_loop_error`` event)."""
     from native_adapter import build_node
     from mover_strategy import MoverStrategy
     ledger = controller.ledger
@@ -258,86 +265,93 @@ async def run_mover(controller, plan, config, baseline_cash, *, account_fingerpr
     reconciliation = None
     force_reason = None
     handoff = None
+    failure = None
     stop_path = Path(stop_file) if stop_file is not None else None
     try:
-        while True:
-            now = time.time()
-            if task.done() or now >= plan.timing.sell_window_end:
-                break
-            state = ledger.accounting()
-            health = getattr(port, "health", {})
-            serious_gap = any("stale" not in str(reason) for reason in health.get("reasons", []))
-            reason = None
-            if (stop_path or safety.DEFAULT_STOP).exists():
-                reason = "kill_switch"
-            elif controller.stop:
-                reason = "controller_stop"
-            elif session.errors:
-                reason = "adapter_error"
-            elif state.halted_reason:
-                reason = "risk_halt"
-            elif strategy.started and serious_gap:
-                controller.stop = True
-                reason = "transport_gap"
-            elif controller.close - now <= config["cleanup_seconds"]:
-                reason = "session_close"
-            if reason is not None and force_reason is None:
-                force_reason = reason
-            strategy.enabled = (strategy.started and port.ready and force_reason is None
-                                and now >= controller.defer_until)
-            fresh_quotes = [q for q in controller.quotes.values()
-                            if -.25 <= now - q.timestamp <= config["quote_max_age_seconds"]]
-            try:
-                ledger.mark_to_market(fresh_quotes, now)
-            except SafetyError as exc:
-                strategy.enabled = False
-                if str(exc) != "held_position_mark_stale":
-                    controller.stop = True
-                    force_reason = force_reason or "mark_to_market_failure"
-            if (strategy.started and force_reason is None
-                    and time.monotonic() - last_reconciliation >= RECONCILE_EVERY_SECONDS
-                    and not ledger.unresolved() and not strategy.pending):
-                strategy.enabled = False
-                strategy.suspended = True  # no quote-driven order while the snapshot is in flight
-                try:
-                    snapshot = await port.snapshot()
-                    mover_reconcile(ledger, snapshot, baseline_cash)
-                finally:
-                    strategy.suspended = False
-                health = getattr(port, "health", {})
-                if any("stale" not in str(item) for item in health.get("reasons", [])):
-                    controller.stop = True
-                elif health.get("fresh_quotes") and hasattr(port, "mark_reconciled"):
-                    port.mark_reconciled()
-                last_reconciliation = time.monotonic()
-            if strategy.started:
-                strategy.tick(now, force_reason=force_reason)
-                if book.complete() and not ledger.unresolved() and not ledger.positions():
-                    break
-                reason = book.handoff_reason(now)
-                if reason is not None:
-                    handoff = {"reason": reason, "at": _iso(now), "force_reason": book.force_reason,
-                               "seconds_after_force": round(now - book.force_at, 3)}
-                    controller.events.append({"type": "mover_handoff_to_recovery", "reason": reason, "at": now})
-                    break
-            await asyncio.sleep(.1)
-        strategy.enabled = False
-        strategy.suspended = True
-        controller.stop = True
-        if not ledger.unresolved() and not strategy.pending:
-            snapshot = await port.snapshot()
-            reconciliation = mover_reconcile(ledger, snapshot, baseline_cash)
-    finally:
-        strategy.enabled = False
-        strategy.suspended = True
-        controller.stop = True
-        session.stop()
         try:
-            await asyncio.wait_for(task, 20)
-        except (asyncio.TimeoutError, asyncio.CancelledError):
-            task.cancel()
-            await asyncio.gather(task, return_exceptions=True)
-        await port.stop()
+            while True:
+                now = time.time()
+                if task.done() or now >= plan.timing.sell_window_end:
+                    break
+                state = ledger.accounting()
+                health = getattr(port, "health", {})
+                serious_gap = any("stale" not in str(reason) for reason in health.get("reasons", []))
+                reason = None
+                if (stop_path or safety.DEFAULT_STOP).exists():
+                    reason = "kill_switch"
+                elif controller.stop:
+                    reason = "controller_stop"
+                elif session.errors:
+                    reason = "adapter_error"
+                elif state.halted_reason:
+                    reason = "risk_halt"
+                elif strategy.started and serious_gap:
+                    controller.stop = True
+                    reason = "transport_gap"
+                elif controller.close - now <= config["cleanup_seconds"]:
+                    # mover.load_mover_config refuses an X1 config for which this latches at or before 15:58.
+                    reason = "session_close"
+                if reason is not None and force_reason is None:
+                    force_reason = reason
+                strategy.enabled = (strategy.started and port.ready and force_reason is None
+                                    and now >= controller.defer_until)
+                fresh_quotes = [q for q in controller.quotes.values()
+                                if -.25 <= now - q.timestamp <= config["quote_max_age_seconds"]]
+                try:
+                    ledger.mark_to_market(fresh_quotes, now)
+                except SafetyError as exc:
+                    strategy.enabled = False
+                    if str(exc) != "held_position_mark_stale":
+                        controller.stop = True
+                        force_reason = force_reason or "mark_to_market_failure"
+                if (strategy.started and force_reason is None
+                        and time.monotonic() - last_reconciliation >= RECONCILE_EVERY_SECONDS
+                        and not ledger.unresolved() and not strategy.pending):
+                    strategy.enabled = False
+                    strategy.suspended = True  # no quote-driven order while the snapshot is in flight
+                    try:
+                        snapshot = await port.snapshot()
+                        mover_reconcile(ledger, snapshot, baseline_cash)
+                    finally:
+                        strategy.suspended = False
+                    health = getattr(port, "health", {})
+                    if any("stale" not in str(item) for item in health.get("reasons", [])):
+                        controller.stop = True
+                    elif health.get("fresh_quotes") and hasattr(port, "mark_reconciled"):
+                        port.mark_reconciled()
+                    last_reconciliation = time.monotonic()
+                if strategy.started:
+                    strategy.tick(now, force_reason=force_reason)
+                    if book.complete() and not ledger.unresolved() and not ledger.positions():
+                        break
+                    reason = book.handoff_reason(now)
+                    if reason is not None:
+                        handoff = {"reason": reason, "at": _iso(now), "force_reason": book.force_reason,
+                                   "seconds_after_force": round(now - book.force_at, 3)}
+                        controller.events.append({"type": "mover_handoff_to_recovery", "reason": reason, "at": now})
+                        break
+                await asyncio.sleep(.1)
+            strategy.enabled = False
+            strategy.suspended = True
+            controller.stop = True
+            if not ledger.unresolved() and not strategy.pending:
+                snapshot = await port.snapshot()
+                reconciliation = mover_reconcile(ledger, snapshot, baseline_cash)
+        finally:
+            strategy.enabled = False
+            strategy.suspended = True
+            controller.stop = True
+            session.stop()
+            try:
+                await asyncio.wait_for(task, 20)
+            except (asyncio.TimeoutError, asyncio.CancelledError):
+                task.cancel()
+                await asyncio.gather(task, return_exceptions=True)
+            await port.stop()
+    except Exception as exc:
+        failure = exc
+        controller.events.append({"type": "mover_loop_error", "error_type": type(exc).__name__,
+                                  "reason": _bounded_reason(exc), "at": time.time()})
     port_health = getattr(port, "health", {})
     outcome = {"engine": "NautilusTrader LiveNode 2.0.0rc5", "native_quotes": strategy.received_quotes,
                "native_fill_events": strategy.native_fills, "native_rejections": strategy.native_rejections,
@@ -355,8 +369,12 @@ async def run_mover(controller, plan, config, baseline_cash, *, account_fingerpr
                "session_policy": {"extended_hours": session_policy["extended_hours"],
                                   "overnight_holds": session_policy["overnight_holds"]},
                "elapsed_seconds": time.monotonic() - started}
-    outcome["status"] = _run_native_status(reconciliation, session.errors, strategy.native_fills, outcome,
-                                           session_policy, time.time())
+    if failure is None:
+        outcome["status"] = _run_native_status(reconciliation, session.errors, strategy.native_fills, outcome,
+                                               session_policy, time.time())
+    else:
+        outcome.update(status="needs_attention", error_type=type(failure).__name__,
+                       error_reason=_bounded_reason(failure))
     return outcome
 
 
@@ -537,15 +555,16 @@ def _preflight_observer(attempts):
 def command_check(args):
     config, limits, settings = load_mover_config(args.config)
     raw = args.scan.read_bytes()
-    now = time.time()
-    if args.assume_fresh:
-        probe = json.loads(raw)
-        now = datetime.fromisoformat(str(probe.get("scan_time", "")).replace("Z", "+00:00")).timestamp()
+    # --assume-fresh: load_scan evaluates the scan as of its own scan_time (now=None), so that
+    # time comes from the same guarded parser and a malformed file is refused, not raised.
+    now = None if args.assume_fresh else time.time()
     try:
         scan = load_scan(raw, settings, now=now)
     except MoverRefusal as exc:
         print(json.dumps({"status": "refused", "reason": str(exc)}))
         return 2
+    if now is None:
+        now = scan.scan_time
     try:
         session_plan = plan_session(None, equity=limits.capital_usd, rung_schedule=settings.rung_schedule)
         plan = build_plan(settings, limits, scan, session_plan, trial_id="check", evidence_class="SYN", t0=now,
@@ -725,6 +744,8 @@ def command_paper(args):
                                               account_fingerprint=fingerprint,
                                               log_directory=None if args.live_dir is None else args.live_dir / "nautilus")
                 except Exception as exc:
+                    # run_mover keeps its own outcome, order journal included, for a failure once its
+                    # node task exists; this is a failure before that, when no order can have been sent.
                     outcome = {"status": "needs_attention", "flat": False, "native_fill_events": 0,
                                "error_type": type(exc).__name__, "error_reason": _bounded_reason(exc)}
                 if ledger.positions() or ledger.unresolved():
@@ -857,12 +878,9 @@ def command_synthetic(args):
     raw = args.scan.read_bytes()
     now = time.time()
     try:
-        probe_now = now
-        if args.allow_stale_scan:
-            probe = json.loads(raw)
-            probe_now = datetime.fromisoformat(str(probe.get("scan_time", "")).replace("Z", "+00:00")).timestamp()
-        scan = load_scan(raw, settings, now=probe_now)
-    except (MoverRefusal, ValueError) as exc:
+        # --allow-stale-scan: as of the scan's own scan_time, through load_scan's guarded parser.
+        scan = load_scan(raw, settings, now=None if args.allow_stale_scan else now)
+    except MoverRefusal as exc:
         return not_started(args.output, evidence_class="SYN", reason=str(exc), config_sha256=config_sha,
                            scan_sha256=_sha256(raw))
     if not scan.symbols:
