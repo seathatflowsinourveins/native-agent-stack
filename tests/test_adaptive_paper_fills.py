@@ -88,12 +88,5 @@ class ResolveExecutionTests(unittest.TestCase):
             self.assertEqual(resolve(11, "165", 12, "15.000008", FOUR)[0], D("15.0001"))
 
 
-class IncrementalBoundTests(unittest.TestCase):
-    def test_bound_adds_both_reports_and_ignores_empty_ones(self):
-        self.assertEqual(f.incremental_notional_bound(D(3), D("100.006667"), D(1), D("100")), D("0.000004"))
-        self.assertEqual(f.incremental_notional_bound(D(3), D("100.01"), D(0), None), D("0.000003"))
-        self.assertEqual(f.incremental_notional_bound(D(0), None, D(0), None), D(0))
-
-
 if __name__ == "__main__":
     unittest.main()

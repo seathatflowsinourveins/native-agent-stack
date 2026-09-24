@@ -116,21 +116,6 @@ class SafetyTests(unittest.TestCase):
                 "session_close": self.now + 3600, "stop_file": self.root / "STOP"}
         return ledger, args
 
-    def test_rounded_cumulative_averages_at_the_limit_are_not_limit_violations(self):
-        # Alpaca rounds cumulative averages to six decimals. A buy of 1 x 100.00 then 2 x 100.01 at a
-        # 100.01 limit reports 100.006667, which derives 100.0100005 per new share; a sell of
-        # 1 x 100.01 then 2 x 100.00 at a 100.00 limit reports 100.003333, deriving 99.9999995.
-        ledger, args = self.three_share_ledger()
-        ledger.reserve_intent("buy-3", "SPY", "buy", "3", "100.01", **args)
-        ledger.record_order("buy-3", "broker-buy-3", "partially_filled", "1", "100")
-        self.assertTrue(ledger.record_order("buy-3", "broker-buy-3", "filled", "3", "100.006667"))
-        self.assertEqual(ledger.positions()["SPY"].qty, 3)
-        ledger.reserve_intent("sell-3", "SPY", "sell", "3", "100.00", **args)
-        ledger.record_order("sell-3", "broker-sell-3", "partially_filled", "1", "100.01")
-        self.assertTrue(ledger.record_order("sell-3", "broker-sell-3", "filled", "3", "100.003333"))
-        self.assertNotIn("SPY", {k: v for k, v in ledger.positions().items() if v.qty})
-        self.assertIsNone(ledger._get("halted_reason"))
-
     def test_a_certain_limit_violation_still_halts(self):
         ledger, args = self.three_share_ledger("buy-violation")
         ledger.reserve_intent("buy-3", "SPY", "buy", "3", "100.01", **args)

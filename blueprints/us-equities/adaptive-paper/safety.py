@@ -28,7 +28,6 @@ if _HERE not in sys.path:
     sys.path.insert(0, _HERE)
 from sessions import SessionKind, session_at as _session_at  # noqa: E402
 from leverage import LeveragePolicy  # noqa: E402
-from fills import incremental_notional_bound  # noqa: E402
 
 D = Decimal
 ZERO = D(0)
@@ -964,14 +963,10 @@ class Ledger:
             old_notional = old.filled_qty * (old.average_price or ZERO)
             delta_notional = filled * (average or ZERO) - old_notional
             if delta:
-                # Both averages are rounded (fills.report_unit), so the new shares' true notional
-                # lies strictly within `bound` of delta_notional; refuse only a certain violation
-                # (1 x 100.00 then 2 x 100.01 at a 100.01 limit reports 100.006667, which derives
-                # 100.0100005 per share).
-                bound = incremental_notional_bound(filled, average, old.filled_qty, old.average_price)
-                if (delta_notional + bound <= 0 or
-                        (old.side == "buy" and delta_notional - bound >= delta * old.limit_price) or
-                        (old.side == "sell" and delta_notional + bound <= delta * old.limit_price)):
+                incremental_price = delta_notional / delta
+                if (incremental_price <= 0 or
+                        (old.side == "buy" and incremental_price > old.limit_price) or
+                        (old.side == "sell" and incremental_price < old.limit_price)):
                     raise SafetyError("incremental_fill_violates_limit")
                 position = self._positions().get(old.symbol, Position(old.symbol, ZERO, ZERO))
                 realized = ZERO

@@ -283,8 +283,11 @@ credential.
     bound, and it must divide into an on-grid price per share.
   - Anything else, including several execution prices in one report and an ambiguous
     notional, still stops the native adapter (`cumulative_fill_precision_requires_reconciliation`).
-  - The ledger's limit check (`incremental_fill_violates_limit`) now halts only when a violation
-    is certain within the same bound, so a rounded average at the limit no longer halts it.
+  - The ledger's limit check (`incremental_fill_violates_limit`) is unchanged. It compares the
+    price derived from two rounded averages with the limit, so fills exactly at the limit, in
+    parts at different prices, can halt it falsely (1 x 100.00 then 2 x 100.01 at a 100.01 limit
+    derives 100.0100005). Mover orders are marketable limits 50 bps beyond the quote, so their
+    fills do not land on the limit. The fix is tracked separately.
 
   A 4-decimal instrument carries fills to 0.0001.
 - **Evidence.** Everything here is SYN until an actual broker run: unit tests, the

@@ -67,12 +67,3 @@ def resolve_execution(prior_qty: Decimal, prior_notional: Decimal, filled: Decim
             raise ValueError(UNRESOLVED)
         return price.quantize(tick), prior_notional + notional
 
-
-def incremental_notional_bound(filled: Decimal, avg: Decimal | None, prior_qty: Decimal,
-                               prior_avg: Decimal | None) -> Decimal:
-    """Strict bound on the error of ``filled * avg - prior_qty * prior_avg``, the new shares'
-    notional derived from two rounded cumulative averages."""
-    bound = filled * report_unit(avg) if filled and avg is not None else Decimal(0)
-    if prior_qty and prior_avg is not None:
-        bound += prior_qty * report_unit(prior_avg)
-    return bound

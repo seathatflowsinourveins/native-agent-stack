@@ -80,10 +80,11 @@ precondition required this trial to end `passed` or `completed_no_signals`.
 - Otherwise, the one whole-tick notional within the average's reporting bound, divided into an on-grid price per share.
 - Anything else still stops the adapter.
 
-The ledger's limit check now halts only on a violation that is certain within the same bound. An independent
-pre-merge review from a different model family found the first version of this fix too narrow, and its cases are now
-tests (`tests/test_adaptive_paper_fills.py`, `tests/test_adaptive_paper_safety.py`). The native tests reproduce this
-run's arithmetic and fail on the previous adapter (`tests/test_adaptive_paper_native.py`).
+An independent pre-merge review from a different model family found the first version of this fix too narrow, and
+its cases are now tests (`tests/test_adaptive_paper_fills.py`). The native tests reproduce this run's arithmetic and
+fail on the previous adapter (`tests/test_adaptive_paper_native.py`). The same review found that the ledger's limit
+check can halt falsely on rounded averages exactly at the limit. That check is unchanged here and tracked separately:
+loosening it by the rounding bound would let a real one-tick violation pass on large orders.
 
 ## Records and their limits
 
