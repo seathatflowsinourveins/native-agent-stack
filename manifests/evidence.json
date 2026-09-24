@@ -3177,8 +3177,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "0876763145d602e64623090848de62c7e3b12e4170758ef36e66748b6cd6e5f5",
-      "bytes": 18246
+      "sha256": "3e7a7012830915b1def9c803f2ffa9d7a39cffeb113ba1bab83d29e40af5633f",
+      "bytes": 19046
     },
     {
       "path": "adoption/host-receipt.schema.json",
@@ -9403,8 +9403,8 @@
     },
     {
       "path": "docs/community-native-practice.md",
-      "sha256": "4b81a1222e96d117f86605313b6badfa629ad4e021e31a27c162fabec271c263",
-      "bytes": 33565
+      "sha256": "34ac90f688defa26c775f18e7decba368d5f839eef80d557be6ca0ba54a24438",
+      "bytes": 36701
     },
     {
       "path": "docs/comparison-progress-20260922.md",
@@ -9798,8 +9798,8 @@
     },
     {
       "path": "docs/token-efficiency-stack.json",
-      "sha256": "47f0f8c2957a7b7906210766e7ce5eced81c019202ccb24f85249ea33bfb4539",
-      "bytes": 157126
+      "sha256": "a351cca93e2eb079d52a92d8fb270c527d8ae92d6058f21928e4019b897331ed",
+      "bytes": 157375
     },
     {
       "path": "docs/token-efficiency-stack.md",
@@ -9818,8 +9818,8 @@
     },
     {
       "path": "docs/token-session-handbook.md",
-      "sha256": "3529b37f86b01619c718282c0d5208160bb25cb7f9120cc87b50eca9bc18dfee",
-      "bytes": 34723
+      "sha256": "b4c1cbc0a978361c959e938781c579e6e0a0766e3e488c93098dabb70a037850",
+      "bytes": 35942
     },
     {
       "path": "docs/ultracode-token-routing-20260921.md",
@@ -10215,6 +10215,11 @@
       "path": "evidence/artifacts/claude-upstream-checks-20260921/token-savings-manifest-page-20260921.png",
       "sha256": "787f3d49cedc86489e6e7446810d992bda880071d0bbf22d7c0fef67d8120b2a",
       "bytes": 85934
+    },
+    {
+      "path": "evidence/artifacts/community-sweep-20260924/plugin-marketplace-refs.json",
+      "sha256": "28126926ceded78069556007c47379ab2f3568d6eb9ae2a44734671e0f171a59",
+      "bytes": 17599
     },
     {
       "path": "evidence/artifacts/comparison-progress-20260922/summary.json",
@@ -28168,8 +28173,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "1831e2d9937faa197d95135af533d4c810deabc6488867a1a3d03d613c6cc3b0",
-      "bytes": 59229
+      "sha256": "e592060d0ab43d680eb2f9771cf2b89dd5a8d1b5809a50ec31603842704fe40e",
+      "bytes": 59537
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
@@ -28183,8 +28188,8 @@
     },
     {
       "path": "recipes/claude-native-profile.md",
-      "sha256": "3795b9001f6511ffd08ba7b5dbf5d6fb85df722d6fbb14ea91aaae13c9d6ec3b",
-      "bytes": 16654
+      "sha256": "8edc71e983a2d42ee50cc717530b5750bc5b80b2b621c9cd8feb1c31c59795f3",
+      "bytes": 16871
     },
     {
       "path": "recipes/claude-native-ultracode.md",
@@ -28533,8 +28538,8 @@
     },
     {
       "path": "tests/test_effort_default_guard.py",
-      "sha256": "c8f1493c6c6b28b69d8a74c44883b3c2bfe21247a9687864b019b3af725bbcb1",
-      "bytes": 16274
+      "sha256": "8cfeabec43231741e1f0669e3582fa8b7a111d3b1630924b7b34924d01a481f8",
+      "bytes": 27141
     },
     {
       "path": "tests/test_execution_realism.py",

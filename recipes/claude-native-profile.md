@@ -172,9 +172,12 @@ at `SessionStart` when the resolved effort for the active model is below
 save when the session ran below `xhigh` only because no level was ever saved
 for that model anywhere -- it never overwrites a level someone (or a prior
 run) deliberately saved, even a low one. Claude Code discards `SessionEnd`
-hook output, so a self-heal also appends a one-line notice to
-`~/.claude/effort-default-guard.notice`; the next `SessionStart` that reports
-its model shows it once and deletes it.
+hook output, so a self-heal also leaves a one-line notice file in
+`~/.claude/effort-default-guard.notices/`. The next `SessionStart` that
+reports its model resolves its own warning first, then claims each notice with
+an atomic rename, prints it once and deletes it only after printing; a start
+that loses the claim prints nothing for that notice, and notices older than 7
+days are deleted unseen.
 
 Saved effort defaults apply to fresh sessions. Already-open sessions can retain
 their previous selection; Claude supports `/effort` for the current session.

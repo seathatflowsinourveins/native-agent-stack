@@ -220,23 +220,37 @@ GitHub-hosted macOS runner; see
    tag, merge the rendered settings by hand.
 
    **Plugin revision check** (added after `v2026.09.23.1`; it reads only this
-   host's plugin registry, so it runs the same from any checkout). The
-   template's `extraKnownMarketplaces` holds `claude-hud` and `openai-codex` to
-   a tag, but a Claude marketplace source takes a branch or tag and never a
-   commit ([plugin marketplaces](https://code.claude.com/docs/en/plugin-marketplaces)),
-   so `context-mode` has no ref and installs whatever its default branch holds.
-   Once the three plugins are installed (their
-   [recipe rows](../recipes/README.md#component-catalog-install-and-check) give
-   the commands), compare what landed with the reviewed revisions in those rows:
+   host's plugin registry, so it runs the same from any checkout). A Claude
+   marketplace source takes a branch or tag and never a commit
+   ([plugin marketplaces](https://code.claude.com/docs/en/plugin-marketplaces)):
+   an `owner/repo@<commit>` source fails to add (measured on Claude Code
+   2.1.281, [recipe](../recipes/README.md#native-context-mode-and-hooks)). The
+   template's `extraKnownMarketplaces` and the commands below therefore hold
+   `claude-hud` and `openai-codex` to a tag and give `context-mode` no ref, so
+   `context-mode` installs whatever its default branch holds. Install the three
+   plugins with their [recipe rows'](../recipes/README.md#component-catalog-install-and-check)
+   commands:
+   ```sh
+   claude plugin marketplace add mksglu/context-mode --scope user
+   claude plugin install context-mode@context-mode --scope user --json
+   claude plugin marketplace add jarrodwatts/claude-hud@v0.8.0 --scope user
+   claude plugin install claude-hud@claude-hud --scope user --json
+   claude plugin marketplace add openai/codex-plugin-cc@v1.0.6 --scope user
+   claude plugin install codex@openai-codex --scope user --json
+   ```
+   Then compare the `gitCommitSha` that landed with the reviewed revisions in
+   those rows (the check reads `$CLAUDE_CONFIG_DIR` when it is set, as Claude
+   Code does):
    ```sh
    python3 - <<'EOF'
-   import json, pathlib
+   import json, os, pathlib
    reviewed = {  # recipes/README.md rows: context-mode, claude-hud (tag v0.8.0), codex-for-claude
        "context-mode@context-mode": "6f0cc6841c687e754059f36714a11233fda1a02b",
        "claude-hud@claude-hud": "ef5f1c8b167572ad1443c70629763ea8780af96b",
        "codex@openai-codex": "db52e28f4d9ded852ab3942cea316258ae4ef346",
    }
-   registry = json.loads((pathlib.Path.home() / ".claude/plugins/installed_plugins.json").read_text())
+   config = pathlib.Path(os.environ.get("CLAUDE_CONFIG_DIR") or pathlib.Path.home() / ".claude")
+   registry = json.loads((config / "plugins/installed_plugins.json").read_text())
    for key, sha in reviewed.items():
        found = [entry.get("gitCommitSha") for entry in registry.get("plugins", {}).get(key, [])]
        print("ok" if found and set(found) == {sha} else "MISMATCH", key, found or "not installed")

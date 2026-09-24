@@ -1,8 +1,10 @@
 # Decision: community-practice sweep dispositions (2026-09-24)
 
 **Decided by:** unit `community-adoptions`, branch `claude/community-adoptions-20260924`
-(base `origin/main@e2f014fd`), from the coordinator's verified adoption list for the
-community sweep dated 2026-09-24 UTC (2026-09-23 on this host's clock).
+(built on `origin/main@e2f014fd`, rebased onto `7c211add`), from the coordinator's verified
+adoption list for the community sweep dated 2026-09-24 UTC (2026-09-23 on this host's clock).
+A second commit resolves the independent review of the first one and records the
+[follow-up sweep](#follow-up-sweep-2026-09-24).
 
 **Scope:** twelve community and Anthropic repositories at the pins in
 [the 2026-09-24 review](../community-native-practice.md#2026-09-24-review), 69 items:
@@ -10,28 +12,30 @@ community sweep dated 2026-09-24 UTC (2026-09-23 on this host's clock).
 code.claude.com documentation and against the default-branch heads of this catalog
 (`e2f014fd`) and of the adopted project, agent-lab (`a458886`). This change applies the
 catalog adoptions A6, A12 and A15. A14's catalog half is left to the owner of the file it
-touches, and every other item is listed with where it applies or why it was not taken.
+touches, and every other item is listed with where it applies or why it was not taken. Each
+deferred item has a named owner under [Deferred work and owners](#deferred-work-and-owners).
+The agent-lab adoptions are on an unmerged agent-lab branch, so none of them is in effect yet.
 Nothing here installs a repository, edits live settings or calls a model.
 
 ## Adoptions
 
 | ID | Source | Change | Where it applies | Status in this change |
 | --- | --- | --- | --- | --- |
-| A1 | anthropics/claude-code-action (item 11) | Stop exporting broker and Hugging Face credentials into every shell (PS-6). First give the three `os.environ` consumers (`alpaca-paper/paper_runner.py`, `alpaca-historical/collect.py`, `security-identity/probe.py`) the `--env-file` loading that `adaptive-paper/runner.py` already uses, then delete the exports from the shell start-up files. | `blueprints/us-equities/` and the host's dotfiles | Not applied: pending its owner. Another session owns `blueprints/`, and the dotfiles are host state. |
-| A2 | karanb192/claude-code-hooks | Project-level override for the built-in Explore subagent (Sonnet at effort max, source-scout-shaped body), a routing row, and an explicit decision for Plan. All 31 measured Explore children ran on Opus. | agent-lab | Not applied here (agent-lab). |
-| A3 | wshobson/agents (#6) | `child-usage.mjs` flags content-classifier fallback with a version-aware rule, with fixtures. | agent-lab, then re-vendored to this catalog | Not applied here. |
-| A4 | wshobson/agents (#19, part 1) | The contract suite requires a non-empty agent `description`, with a mutation case. | agent-lab | Not applied here. |
-| A5 | wshobson/agents (#19, part 2) | The e2e `claude plugin validate` step fails on warnings, and a `.claude/skills` step is added. | agent-lab | Not applied here. |
-| A6 | karanb192/claude-code-hooks | The effort guard stops relying on SessionEnd output: a self-heal leaves a one-line notice that the next SessionStart shows once and deletes. | `adoption/hooks/claude/effort-default-guard.py`, `adoption/hooks/claude/SHA256SUMS`, `tests/test_effort_default_guard.py`, `recipes/claude-native-profile.md` | Applied. The host copy in `~/.claude/hooks/` follows after merge (`python3 tools/adoption/install_claude_profile.py --only guard`); until then `test_shipped_guard_is_verbatim` fails on a host that still has the old copy. |
-| A7 | hesreallyhim/awesome-claude-code | Point the acceptance-policy link at agent-lab `AGENTS.md:8` to a path that resolves from worktree checkouts. | agent-lab | Not applied here. |
-| A8 | addyosmani/agent-skills (#72); Yeachan-Heo/oh-my-claudecode | The integrating coordinator stages explicit paths only and never runs `git add -A`, `git add .` or `git commit -a`. | agent-lab `AGENTS.md` | Not applied here. |
-| A9 | Yeachan-Heo/oh-my-claudecode | Root-anchored ignores for two stray root artifacts, and a per-path decision for the compare outputs. | agent-lab `.gitignore` | Not applied here. |
-| A10 | addyosmani/agent-skills (#77) | Guard `run-arms.mjs`'s recursive delete: one path component, strictly under its index root. | agent-lab | Not applied here. |
+| A1 | anthropics/claude-code-action (item 11) | Stop exporting broker and Hugging Face credentials into every shell (PS-6). First give the three `os.environ` consumers (`alpaca-paper/paper_runner.py`, `alpaca-historical/collect.py`, `security-identity/probe.py`) the `--env-file` loading that `adaptive-paper/runner.py` already uses, then delete the exports from the shell start-up files. | `blueprints/us-equities/` and the host's dotfiles | Not applied. The consumer change belongs to the Codex lane that owns those runners, and the dotfiles are host state ([owners](#deferred-work-and-owners)). |
+| A2 | karanb192/claude-code-hooks | Project-level override for the built-in Explore subagent (Sonnet at effort max, source-scout-shaped body), a routing row, and an explicit decision for Plan. All 31 measured Explore children ran on Opus. | agent-lab | On agent-lab branch `claude/community-adoptions-20260924` (`6a297c7`), pending review and merge. |
+| A3 | wshobson/agents (#6) | `child-usage.mjs` flags content-classifier fallback with a version-aware rule, with fixtures. | agent-lab, then re-vendored to this catalog | On agent-lab branch `claude/community-adoptions-20260924` (`6a297c7`), pending review and merge. The catalog re-vendor follows that merge. |
+| A4 | wshobson/agents (#19, part 1) | The contract suite requires a non-empty agent `description`, with a mutation case. | agent-lab | On agent-lab branch `claude/community-adoptions-20260924` (`6a297c7`), pending review and merge. |
+| A5 | wshobson/agents (#19, part 2) | The e2e `claude plugin validate` step fails on warnings, and a `.claude/skills` step is added. | agent-lab | On agent-lab branch `claude/community-adoptions-20260924` (`6a297c7`), pending review and merge. |
+| A6 | karanb192/claude-code-hooks | The effort guard stops relying on SessionEnd output: a self-heal leaves a one-line notice that the next SessionStart shows once and deletes. | `adoption/hooks/claude/effort-default-guard.py`, `adoption/hooks/claude/SHA256SUMS`, `tests/test_effort_default_guard.py`, `recipes/claude-native-profile.md` | Applied, then hardened after review (fail-safe order, one file per notice, 7-day expiry). The host copy in `~/.claude/hooks/` follows after merge (`python3 tools/adoption/install_claude_profile.py --only guard`); until then `test_shipped_guard_is_verbatim` fails on a host that still has the old copy. It skips in CI and on a host without the guard. |
+| A7 | hesreallyhim/awesome-claude-code | Point the acceptance-policy link at agent-lab `AGENTS.md:8` to a path that resolves from worktree checkouts. | agent-lab | On agent-lab branch `claude/community-adoptions-20260924` (`6a297c7`), pending review and merge. |
+| A8 | addyosmani/agent-skills (#72); Yeachan-Heo/oh-my-claudecode | The integrating coordinator stages explicit paths only and never runs `git add -A`, `git add .` or `git commit -a`. | agent-lab `AGENTS.md` | On agent-lab branch `claude/community-adoptions-20260924` (`6a297c7`), pending review and merge. |
+| A9 | Yeachan-Heo/oh-my-claudecode | Root-anchored ignores for two stray root artifacts, and a per-path decision for the compare outputs. | agent-lab `.gitignore` | On agent-lab branch `claude/community-adoptions-20260924` (`6a297c7`), pending review and merge. |
+| A10 | addyosmani/agent-skills (#77) | Guard `run-arms.mjs`'s recursive delete: one path component, strictly under its index root. | agent-lab | On agent-lab branch `claude/community-adoptions-20260924` (`6a297c7`), pending review and merge. |
 | A11 | anthropics/skills (drift under the marketplace gap) | Re-sync two stale user-level agents, merge this catalog's branch `claude/max-effort-default-20260923`, and decide whether `adoption/agents/claude/` ships all seven agents. | user-level agents; this catalog's max-effort branch | Not applied here: owned by the max-effort change. |
-| A12 | shanraisshan/claude-code-best-practice | Correct records that credit sandbox configuration that does not exist. | [The devcontainer row](../community-native-practice.md#2026-09-23-review) of the community practice page; agent-lab `README.md:9` | Applied here (catalog half). |
-| A13 | shanraisshan/claude-code-best-practice | Record-only notes under PS-1 (an opt-in, skill-scoped PreToolUse deny hook is the first response if its overturn fires) and MI-7 (count a future budget in bytes or tokens). | agent-lab harness-rules record | Not applied here. |
-| A14 | shanraisshan/claude-code-best-practice (record gap) | Add review-changes.js as an arm of the planned seeded-defect review comparison, beside native /code-review, the /codex:review lanes and OCR, at equal quota. | `catalogs/sota-convergence/manifest-20260923.json` (the alibaba/open-code-review overturn text) and an agent-lab keep-but-compare row | Not applied: outside this change's listed scope. The manifest is registered evidence last changed by the landscape-sweep lane (#153), so its owner adds the arm. |
-| A15 | anthropics/claude-plugins-official (item 1, record half) | The context-mode commit is a reviewed revision, not an enforced pin, and the new-PC bootstrap checks `installed_plugins.json` against the recipe table. | `recipes/README.md`, `adoption/bootstrap.md` step 4a, `tests/test_adoption_docs_consistency.py` | Applied. |
+| A12 | shanraisshan/claude-code-best-practice | Correct records that credit sandbox configuration that does not exist. | [The devcontainer row](../community-native-practice.md#2026-09-23-review) of the community practice page; agent-lab `README.md:9` | Applied here (catalog half). The agent-lab half is on agent-lab branch `claude/community-adoptions-20260924` (`6a297c7`), pending review and merge. |
+| A13 | shanraisshan/claude-code-best-practice | Record-only notes under PS-1 (an opt-in, skill-scoped PreToolUse deny hook is the first response if its overturn fires) and MI-7 (count a future budget in bytes or tokens). | agent-lab harness-rules record | On agent-lab branch `claude/community-adoptions-20260924` (`6a297c7`), pending review and merge. |
+| A14 | shanraisshan/claude-code-best-practice (record gap) | Add review-changes.js as an arm of the planned seeded-defect review comparison, beside native /code-review, the /codex:review lanes and OCR, at equal quota. | `catalogs/sota-convergence/manifest-20260923.json` (the alibaba/open-code-review overturn text) and an agent-lab keep-but-compare row | Not applied here. The verified list places the catalog half in this catalog's manifest, but the coordinator's work list for this unit named only A6, A12 and A15. The manifest is registered evidence that the landscape-sweep lane added to in #153 and last changed in #154 (`0465141a`), so that lane adds the arm. The agent-lab RG-5 row is on agent-lab branch `claude/community-adoptions-20260924` (`6a297c7`), pending review and merge. |
+| A15 | anthropics/claude-plugins-official (item 1, record half) | The context-mode commit is a reviewed revision, not an enforced pin, and the new-PC bootstrap checks `installed_plugins.json` against the recipe table. | `recipes/README.md`, `adoption/bootstrap.md` step 4a, `docs/token-session-handbook.md`, `docs/token-efficiency-stack.json`, `tests/test_adoption_docs_consistency.py` | Applied. The raw native runs are retained in [plugin-marketplace-refs.json](../../evidence/artifacts/community-sweep-20260924/plugin-marketplace-refs.json). |
 
 ### A6: effort-guard notice handoff
 
@@ -42,23 +46,43 @@ such as `systemMessage`". The guard's SessionEnd self-heal therefore saved
 "says so".
 
 - **SessionEnd:** every precedence rule is unchanged. After a successful save, the guard also
-  appends one line to `~/.claude/effort-default-guard.notice` (created `0600`, opened with
-  `O_NOFOLLOW`). It still prints its previous `systemMessage`, which Claude Code discards.
-- **SessionStart:** when the event carries `model`, the guard claims the notice with an atomic
-  rename, so exactly one of several simultaneous starts shows it. It then shows the notice
-  through the existing `systemMessage` plus `additionalContext` output and deletes it. A
-  predictive warning in the same event shares that one JSON object. The same reference says
-  `model` "can be omitted, for example after `/clear` or when a session is restored through
-  conversation recovery"; such an event leaves the notice for the next start that reports a
-  model. The template registers the guard for `startup` and `resume` only.
-- **Fail-safe:** the guard still exits 0 and never blocks. If the notice path cannot be
-  written (for example, it is a directory), the notice is skipped and the save still happens.
+  leaves a one-line notice file in `~/.claude/effort-default-guard.notices/` (directory `0700`,
+  file `0600`). It writes the file under a temporary name and renames it into place, so a start
+  never reads half a notice and nothing appends to a file that a start has claimed. It still
+  prints its previous `systemMessage`, which Claude Code discards.
+- **SessionStart:** when the event carries `model`, the guard first resolves its own predictive
+  warning; a settings file it cannot parse costs that warning, never a notice. It then claims
+  each notice with an atomic rename and prints the notices and any warning as one JSON object
+  (`systemMessage` plus `additionalContext`). It deletes the claimed files only after that
+  write succeeds, and renames them back for a later start if it fails. A start that loses the
+  rename race to another start prints nothing for that notice, so simultaneous starts show
+  each notice once. Notices, claimed files and temporary files older than 7 days are deleted
+  unseen. The same reference says `model` "can be omitted, for example after `/clear` or when
+  a session is restored through conversation recovery"; such an event leaves the notices for
+  the next start that reports a model. The template registers the guard for `startup` and
+  `resume` only.
+- **Fail-safe:** the guard still exits 0 and never blocks. If the notices path cannot be
+  written (for example, it is a regular file), the notice is skipped and the save still
+  happens. A symlinked notice is claimed and removed but never read.
+- **Tests.** `tests/test_effort_default_guard.py` drives the shipped guard under a temporary
+  HOME through each path: a lost claim race and a notice written during a claim (injected by
+  patching `os.rename` in a driver process that imports the guard), eight simultaneous starts,
+  a failed stdout write, malformed settings, stale files and a symlinked notice. Each new test
+  also failed against a targeted mutant of the guard: the old claim-first order, delete before
+  print, no expiry, claims by read-and-delete, appends to a pending notice, a followed symlink,
+  and one fixed notice name.
 - **Known limits.** Delivery is best effort; the saved setting never depends on it.
   - The same reference says a `/clear` or conversation switch while SessionStart hooks are
-    still running discards what they return. A notice claimed by that start is lost.
-  - The docs do not say whether headless `claude -p` starts carry `model`; the guard's
-    docstring records that they omit it. A headless start that does carry it would consume
-    the notice where no one reads it.
+    still running discards what they return. A notice printed to that start is lost.
+  - A start killed between its claim and its write leaves a claimed file that no start shows;
+    it is deleted after 7 days.
+  - The docs do not say whether headless `claude -p` starts carry `model`, and the guard's
+    docstring no longer claims they omit it. A headless start that does carry it would consume
+    a notice where no one reads it.
+  - The save is an unlocked read-modify-write of `~/.claude/settings.json`, as it was before
+    this change. A concurrent SessionEnd, or Claude Code's own settings write, can replace the
+    saved level, and the notice then reports a save that no longer holds. A lock would not help,
+    because Claude Code's writes do not take it.
 
 ### A12: sandbox record correction
 
@@ -76,21 +100,63 @@ Enabling the built-in Bash sandbox stays M1.
   (fetched 2026-09-24): "Git-based marketplace sources support `ref` (branch/tag) but not
   `sha`". `marketplace add` pins "a branch or tag" with `@ref`, and third-party marketplaces
   have auto-update off by default ([discover plugins](https://code.claude.com/docs/en/discover-plugins)).
-- **Measured on this host**, Claude Code 2.1.281 with a scratch `CLAUDE_CONFIG_DIR`:
-  - `claude plugin marketplace add mksglu/context-mode@6f0cc68…` exited 1 with a failed clone.
-    Claude Code's SSH fallback then failed host-key verification here.
-  - Plain `git clone --branch 6f0cc68…` fails with "Remote branch … not found".
-  - The same command without a ref succeeded, recorded `{"source": "github", "repo":
-    "mksglu/context-mode"}` with no ref, and checked out `5a92b7c`. That head is six commits
+- **Measured on this host** on 2026-09-24 (04:23 UTC), with Claude Code 2.1.281 and codex-cli
+  0.155.1, each in an empty scratch configuration directory. The argv, times, exit codes and
+  output of every run are retained in [plugin-marketplace-refs.json](../../evidence/artifacts/community-sweep-20260924/plugin-marketplace-refs.json), and the live
+  `~/.claude` and `~/.codex` files the runs could touch hashed the same before and after.
+  - `claude plugin marketplace add mksglu/context-mode@6f0cc68…` exited 1 with a failed clone,
+    whose final error is an SSH host-key failure. The same repository with the tag
+    `@v1.0.169` exited 0 and checked out `589d821`, so only the ref type differs. Why the CLI
+    takes the SSH path for a commit is not established.
+  - Plain `git clone --branch 6f0cc68…` exits 128 with "Remote branch … not found".
+  - The same command without a ref exited 0 and recorded `{"source": "github", "repo":
+    "mksglu/context-mode"}` with no ref. `claude plugin install` then recorded `gitCommitSha`
+    `5a92b7c` in `$CLAUDE_CONFIG_DIR/plugins/installed_plugins.json`. That head is six commits
     past `6f0cc68`, and the six change only `stats.json` (`gh api` compare).
+  - `codex plugin marketplace add mksglu/context-mode --ref 6f0cc68…` exited 0 and checked out
+    `6f0cc68`, so the Codex half of the recipe holds the reviewed commit when it adds the
+    marketplace.
 - **Recipe changes.** The recipe now installs with the documented no-ref form and calls
   `6f0cc68` a reviewed revision. The claude-hud row gains `ef5f1c8…`, the commit that its
   annotated tag `v0.8.0` dereferences to (`gh api`). codex-for-claude's `db52e28…` is tag
-  `v1.0.6`'s commit.
-- **Bootstrap check.** Step 4a compares `installed_plugins.json` `gitCommitSha` with those
-  three commits. On this host it printed `ok` for all three. Against a synthetic registry
-  holding `5a92b7c` it printed `MISMATCH`, and it reported a missing plugin as not installed.
-  `PluginRevisionCheckTests` binds the step's copy of the commits to the recipe rows.
+  `v1.0.6`'s commit. The handbook (`docs/token-session-handbook.md`) and the explorer's token
+  topic (`docs/token-efficiency-stack.json`) still carried the `@<sha>` command and the "pinned"
+  wording after the first commit. Both now use the no-ref form and call `6f0cc68` a reviewed
+  revision, and the handbook adds the `gitCommitSha` check.
+- **Bootstrap check.** Step 4a now lists the recipe's install commands and compares
+  `installed_plugins.json` `gitCommitSha` with those three commits. It reads
+  `$CLAUDE_CONFIG_DIR` when that is set, which is where the scratch install put its registry.
+  Against that install it printed `MISMATCH` for `5a92b7c` and reported the two absent plugins
+  as not installed; on this host's registry it printed `ok` for all three.
+  `PluginRevisionCheckTests` binds the step's commits and commands to the recipe, with each
+  mutant run through the same checker as the real test. `MarketplaceCommitRefTests` fails any
+  tracked document outside the dated records and retained evidence that gives
+  `claude plugin marketplace add` a commit.
+- **Left as it is.** The context-mode `install_note` in `adoption/pins-linux-x86_64.json` still
+  calls `6f0cc68` "the native plugin pin". That file is byte-identical to the pinned release
+  `v2026.09.23.1`, and the bootstrap script prints `install_note` only for a pin with no
+  sha256, which this entry has. Editing it would make it a changed install input, so the
+  docs-consistency test would require "changed after" notes on the bootstrap and macOS pages
+  for wording that no bootstrap prints. The wording is corrected with the next change to that
+  file.
+
+### Deferred work and owners
+
+"The community-sweep coordinator" is the agent-lab session that dispatched this unit and
+integrates both branches.
+
+| Item | What remains | Owner | When |
+| --- | --- | --- | --- |
+| A1 | `--env-file` loading for `alpaca-paper/paper_runner.py`, `alpaca-historical/collect.py` and `security-identity/probe.py` under `blueprints/us-equities/` | The Codex us-equities lane that owns those runners (branches `codex/alpaca-paper-runner`, `codex/alpaca-historical-20260920`, `codex/security-identity-20260920`) | Its next change to them |
+| A1 | Delete the credential exports from this host's shell start-up files | The community-sweep coordinator (host state) | After the consumer change merges |
+| A2-A5, A7-A10, A13, agent-lab halves of A12 and A14 | Review, then merge agent-lab branch `claude/community-adoptions-20260924` (`6a297c7`) into `codex/native-expansion` | The community-sweep coordinator | Now |
+| A3 | Re-vendor the new `child-usage.mjs` and its test into `examples/claude-native/workflows/`, as `3e6e846d` did | The community-sweep coordinator | After that agent-lab merge |
+| A6 | Install the guard on this host (`python3 tools/adoption/install_claude_profile.py --only guard`), re-run `test_shipped_guard_is_verbatim`, and observe one live SessionEnd-to-SessionStart handoff | The community-sweep coordinator | After this branch merges |
+| A11 | Re-sync the two user-level agents, merge `claude/max-effort-default-20260923`, and decide the shipped agent set | The max-effort session (worktree `nas-wt-max-effort`) | With that branch |
+| A14 | Add review-changes.js as an arm in the alibaba/open-code-review overturn text of `catalogs/sota-convergence/manifest-20260923.json` | The landscape-sweep lane that owns that manifest (#153, #154) | Its next manifest revision |
+| Star-audit rows | Point the `catalogs/us-equities/star-audit.json` rows for addyosmani/agent-skills, Yeachan-Heo/oh-my-claudecode, obra/superpowers and ruvnet/ruflo, which stay at README depth, at this record | The grand-catalog lane that last changed that file (PR-4, `445bc83c`) | Its next star-audit refresh |
+| Pin-file note | Reword the context-mode `install_note` in `adoption/pins-linux-x86_64.json` | The session that next changes that pin file | With that change |
+| Follow-up sweep | The three agent-lab proposals under [Follow-up sweep](#follow-up-sweep-2026-09-24) | The community-sweep coordinator | Each as proposed there |
 
 ## Keep-but-compare
 
@@ -171,16 +237,18 @@ The verifier's completeness pass named these gaps; nothing above covers them.
   2.3.2, Serena, SocratiCode 1.14.0, jCodeMunch, QMD, Beads, Headroom, TOON, ccusage,
   sandbox-runtime 0.0.77, MCP Inspector, skills-ref, zizmor 1.30.1, gitleaks 8.30.1 and
   OSV-Scanner 2.6.0. Only context-mode and claude-hud were re-checked.
-- Anthropic primary sources beyond the code.claude.com pages: the engineering posts (Claude
-  Code best practices, context engineering, writing tools for agents, the multi-agent research
-  system, sandboxing, Agent Skills), the Agent SDK documentation and repositories,
-  anthropics/claude-code-security-review and anthropics/claude-cookbooks.
-- Absent community repositories: obra/superpowers, ruvnet/claude-flow,
-  davila7/claude-code-templates, SuperClaude-Org/SuperClaude_Framework,
+- Anthropic primary sources beyond the code.claude.com pages: the engineering posts on the
+  multi-agent research system, sandboxing, Agent Skills, advanced tool use, code execution with
+  MCP, harnesses for long-running agents and harness design, the Agent SDK documentation and
+  repositories, anthropics/claude-code-security-review and anthropics/claude-cookbooks. (The
+  best-practices, context-engineering and writing-tools posts are covered by the
+  [follow-up sweep](#follow-up-sweep-2026-09-24).)
+- Absent community repositories: davila7/claude-code-templates, SuperClaude-Org/SuperClaude_Framework,
   disler/claude-code-hooks-mastery, disler/claude-code-hooks-multi-agent-observability,
   zilliztech/claude-context, musistudio/claude-code-router, smtg-ai/claude-squad and
   Piebald-AI/claude-code-system-prompts. VoltAgent/awesome-claude-code-subagents and
-  punkpeye/awesome-mcp-servers are due for re-review.
+  punkpeye/awesome-mcp-servers are due for re-review. (obra/superpowers and
+  ruvnet/claude-flow are covered by the follow-up sweep.)
 - The evaluation layer: no maintained framework (promptfoo, inspect_ai) was compared with the
   custom comparison chain, and `claude plugin eval` is named in M9 but not qualified.
 - Forward compatibility: the headless docs say `--bare` will become the default for `-p`. On
@@ -201,12 +269,30 @@ The verifier's completeness pass named these gaps; nothing above covers them.
 - The trading north-star layer was out of scope, although A1 and R27 touch its paper-execution
   path.
 
+## Follow-up sweep (2026-09-24)
+
+Three follow-up reads closed part of the gaps above. Each read its sources as untrusted data,
+compared them with agent-lab's default branch (`e070125`) and ran nothing from upstream. The two
+repository pins were re-checked on 2026-09-24: `git ls-remote` shows each pin as its tag's commit
+and the default-branch head, and `gh api` returns each commit. Nothing in this catalog changes
+beyond this record and the [community practice page](../community-native-practice.md#follow-up-reads).
+Every proposed change is in agent-lab and is not applied; the owner is the community-sweep
+coordinator.
+
+| Source | Pin | Disposition | Proposed change | Overturn |
+| --- | --- | --- | --- | --- |
+| [obra/superpowers](https://github.com/obra/superpowers/tree/5bf4e78011075bcfc0dc295f0724994cd123ee71) | `5bf4e78011075bcfc0dc295f0724994cd123ee71` (tag v6.4.1; the star-audit row's pin, which read only README and LICENSE) | Keep the catalog's `alternative` disposition: no plugin, SessionStart bootstrap or skill copy. Of 26 practices, 12 are covered, 5 have a better native alternative, 2 do not apply, and 5 contradict evidence or standing rules: the forced bootstrap, the brainstorming approval gates, deleting code written before its test, reviewers who do not re-run tests, and all-caps persuasion text in skills. The other 2 share one gap: tests that cannot fail, and untested empty, zero or non-finite inputs. Five dated incidents on 2026-09-22 and 09-23 show it, each caught only at independent review. | Keep-but-compare: the isolated-builder return gets one required entry per test it adds or changes. The entry names the break the test catches and shows a failing run against that break beside the passing run. | A preregistered micro-test (at least 5 runs with the rule and 5 without, judged blind) shows no benefit; builder usage rises with no fewer review defects; or vacuous-test defects continue at the same rate over the next five builder review rounds. |
+| [ruvnet/claude-flow](https://github.com/ruvnet/ruflo/tree/0a96fb8857dabd343d71d76c3ca703100a2923bc) (now ruvnet/ruflo) | `0a96fb8857dabd343d71d76c3ca703100a2923bc` (tag v3.44.0; the star-audit row read `e558f0c0`, README and LICENSE only) | Keep-but-compare, nothing adopted. This is consistent with ORCH-10 in [the harness rules convergence](../harness-rules-convergence-20260922.md). Upstream has no measured case against native: its multi-agent benchmark is a mock with no model calls. Each coordination practice maps to a native feature in use. Some practices conflict with primary sources: a PreToolUse guard that exits 1 and so never blocks, a Haiku tier that DS-4 refutes, a cli.js compaction patch that rewrites cached prefixes and cannot apply to the native binary, and unpinned `@latest` MCP servers. The 23 practices: 8 covered, 6 better native alternatives, 5 not applicable, 3 contradicted and 1 gap. | Native git only: a check run in a dirty worktree records HEAD plus a temporary-index `git write-tree` id, and its evidence is reusable only while that id still matches (agent-lab `docs/validation.md`). | A preregistered same-packet comparison in which pinned ruflo either completes a work-list that native Workflow fails or matches native quality at materially lower complete usage; or an upstream non-mock benchmark against native subagents with raw usage. |
+| Anthropic primary sources: Claude Code best practices (the engineering URL redirects there), effective context engineering, writing tools for agents | Fetched 2026-09-24T03:09Z; sha256 prefixes `5cefadb4c345bb60`, `c4d37ccd8ef6002c` and `4651e3fd6c76642d` | No repository, skill, agent or runtime is adopted. Of 28 practices, 22 are covered, 3 do not apply and 3 are gaps. | (1) `child-usage.mjs` reports each child's tool calls, tool errors and StructuredOutput schema retries, and the contract says whether a recovered retry counts as incomplete: 251 of about 3,270 children had a schema error. (2) Turn off the unused claude.ai "Claude Docs" connector for agent-lab with `/mcp`: 0 calls in 3,859 transcripts. (3) Run `/skill-doctor` once, for the skillOverrides keep-but-compare. | A re-fetch that no longer matches and changes the guidance; native telemetry that attributes tool errors to each child (then drop change 1); a task that needs Claude Docs, or no first-prompt reduction (then revert change 2); `/skill-doctor` unavailable or disagreeing with `/context`. |
+
 ## Alternatives considered
 
 - **A6.** The minimal variant, correcting the docstring and test to say the SessionEnd save is
   silent, was rejected: the user would never learn that a setting changed. A Stop hook cannot
-  see the model, because it runs before the turn's assistant row is written. A notice file per
-  session id is unnecessary: one file with an atomic claim covers simultaneous starts.
+  see the model, because it runs before the turn's assistant row is written. The first commit's
+  single notice file with appended lines was replaced by one file per notice: an append could
+  land in a file that a start had already claimed and read, and was then deleted unseen. A lock
+  would add a second mechanism for the same guarantee.
 - **A15.** Keeping the `@<sha>` form was rejected: it is undocumented and failed on 2.1.281.
   Catalog-owned sha-pinned manifests are M8. anthropics/claude-plugins-community as a source
   was rejected, because it pins context-mode at `37dc25b9` rather than the reviewed `6f0cc68`,
@@ -229,8 +315,10 @@ The verifier's completeness pass named these gaps; nothing above covers them.
 - **A6** is `local_integration`. `tests/test_effort_default_guard.py` drives the shipped guard
   with synthetic SessionEnd and SessionStart events under a temporary HOME. No live Claude
   Code session has run the new guard.
-- **A15** combines native CLI runs in a scratch `CLAUDE_CONFIG_DIR` (marketplace add only, no
-  plugin install and no model call), `gh api` reads, and the documented check run read-only
-  against this host's plugin registry and a synthetic drifted one.
+- **A15** combines native CLI runs in empty scratch configuration directories (Claude
+  marketplace adds with a commit, a tag and no ref, one scratch plugin install, and the Codex
+  `--ref` add; no model call, and no plugin hook ran) with `gh api` and `git ls-remote` reads.
+  The documented check ran against that scratch install and read-only against this host's
+  plugin registry. The raw runs are in [plugin-marketplace-refs.json](../../evidence/artifacts/community-sweep-20260924/plugin-marketplace-refs.json).
 - **A12 and the M and R rows** are documentation and settings inspection, as the verifier
   reported them; they were not re-measured here.
