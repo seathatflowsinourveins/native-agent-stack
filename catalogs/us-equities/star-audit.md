@@ -53,6 +53,8 @@ The review also listed `owner()` as missing. It exists, as the getter of `addres
 
 **Current totals (357 entries).** Decisions: 158 alternative, 57 outside the north star, 55 already covered, 52 overlaps established, 16 obsolete or ineligible, 13 targeted candidates, 1 security rejection and 5 single-entry decisions from the simulation/data follow-up. Review levels: 306 source reviews and 51 prior-evidence links. Depths: 280 README/license overviews, 26 selected primary-file reviews and 51 prior-evidence links.
 
+## 2026-09-19 audit
+
 Checked **2026-09-19**. The 2026-09-20 native GitHub listing contained **342 public repositories**, five additions since the earlier 337-row snapshot. The public endpoint does not inventory private stars. The 2026-09-24 refresh above brings the audit to 357 repositories, and every star has an explicit disposition in [star-audit.json](star-audit.json).
 
 The [simulation/data follow-up](simulation-data-review.md) records the five new

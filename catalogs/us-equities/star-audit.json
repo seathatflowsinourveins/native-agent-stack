@@ -13320,7 +13320,7 @@
         "platform",
         "browser-and-ui"
       ],
-      "rationale": "No US-equity trading role. The foundation-lane record (agent-ecosystem PR #30, merged 2026-09-24) moves trycua/cua from rejected to trial in the platform layer for Lume only: MIT-licensed throwaway macOS VMs, preferred over tart (deferred; FSL-1.1-ALv2, not OSI-approved), with the pin unset and the earlier duplicate-coverage (R-DUP) reason kept for the rest of the stack. The 2026-09-21 NAS landscape review at 9bbfa7dd already holds Cua Driver as a conditional targeted candidate. At this commit the README still describes Lume as local macOS and Linux VMs on Apple Silicon through Apple's Virtualization.Framework, and the root license is plain MIT.",
+      "rationale": "No US-equity trading role. The foundation-lane record (PR #30 in the private agent-ecosystem repository, merged 2026-09-24; not linked) moves trycua/cua from rejected to trial in the platform layer for Lume only: MIT-licensed throwaway macOS VMs, preferred over tart (deferred; FSL-1.1-ALv2, not OSI-approved), with the pin unset and the earlier duplicate-coverage (R-DUP) reason kept for the rest of the stack. The 2026-09-21 NAS landscape review at 9bbfa7dd already holds Cua Driver as a conditional targeted candidate. At this commit the README still describes Lume as local macOS and Linux VMs on Apple Silicon through Apple's Virtualization.Framework, and the root license is plain MIT.",
       "license": "MIT",
       "license_classifier": "MIT",
       "sources": [
@@ -13337,7 +13337,6 @@
       ],
       "evidence_refs": [
         "catalogs/landscape/upstream-snapshot.json",
-        "https://github.com/seathatflowsinourveins/agent-ecosystem/pull/30",
         "catalogs/us-equities/star-refresh-20260924.json"
       ],
       "catalog_entry_ids": [],
