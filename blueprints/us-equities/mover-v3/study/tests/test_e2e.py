@@ -84,6 +84,40 @@ class EndToEnd(unittest.TestCase):
         self.assertEqual(self.results["labels"]["H1-D"], "underpowered")
         self.assertEqual(self.results["counts"]["h3c_by_status"]["complete"], 5)
 
+    def test_least_exposed_slice_beside_every_validation_result(self):
+        """Review round 10, F3: the same statistic on the least-exposed slice for every item, H1-D and H3-c included,
+        and the H3-a / b_lane entry overlap (arms.a_intraday)."""
+        from core import evaluate as EV
+        items = self.results["items"]
+        for i in ("H1-D", "H1-D-b_lane-low", "H3-a", "H3-b", "H3-c"):
+            sens = items[i]["sensitivities"]
+            self.assertIn("least_exposed_slice", sens, i)
+            self.assertIn("without_paper_exposed", sens, i)
+            self.assertIn("two_way_clustered", items[i], i)
+        self.assertIn("c2.0", items["H1-D"]["sensitivities"])
+        self.assertNotIn("c2.0", items["H3-c"]["sensitivities"])
+        events, _, _, _ = ST.d_events(self.spec, self.store)
+        ctx = self.spec.ctx("read")
+        h3c = [EV.h3c_event(ev, ctx) for ev in events if EV.in_stage(ctx, ev, set(self.spec.stage_sessions()))]
+        done = [e for e in h3c if e["status"] == "complete"]
+        self.assertTrue(done and all(e["least_exposed"] is not None for e in done))
+        slice_ = [e["value"] for e in done if e["least_exposed"]]
+        want = sum(slice_) / len(slice_) if slice_ else None
+        got = items["H3-c"]["sensitivities"]["least_exposed_slice"]
+        self.assertEqual(got is None, want is None)
+        if want is not None:
+            self.assertAlmostEqual(got, want)
+        self.assertEqual(items["H3-c"]["sensitivities"]["least_exposed_slice_n"], len(slice_))
+        # H1-D: the high-minus-low difference on the slice (no tercile is assigned here, so it is undefined)
+        self.assertIsNone(items["H1-D"]["sensitivities"]["least_exposed_slice"])
+        rows = [{"group": g, "value": v, "rec": {"least_exposed": le}} for g, v, le in
+                (("high", 0.3, True), ("high", 0.1, False), ("low", 0.05, True), ("low", 0.4, False))]
+        self.assertAlmostEqual(EV.sensitivities("H1-D", [dict(r, rec=dict(r["rec"], nets={m: r["value"] for m in
+                                                                                         EV.SENSITIVITY_MODES}))
+                                                       for r in rows])["least_exposed_slice"], 0.3 - 0.05)
+        overlap = self.results["counts"]["a_intraday_b_lane_entry_overlap"]
+        self.assertEqual(overlap, {"a_intraday_filled": 7, "also_b_lane_filled": 6})
+
     def test_delisted_and_censored_b_lane_trades_stay_in_the_arm(self):
         ev_trades = self.results["counts"]["trades_by_arm_status"]
         self.assertEqual(ev_trades["b_lane:filled"], 6)

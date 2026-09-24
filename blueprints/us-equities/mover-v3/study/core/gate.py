@@ -26,6 +26,22 @@ def validated_items(validation_results: dict) -> list:
     return [i for i in ITEM_IDS if validation_results["labels"].get(i) == "screened"]
 
 
+def validation_complete(validation_results) -> bool:
+    """multiple_testing.procedure (review round 10, F5): the validation results file holds all 5 validation p-values
+    keyed by item_ids, each a number in [0, 1], and a label for each."""
+    if not isinstance(validation_results, dict):
+        return False
+    items, labels = validation_results.get("items"), validation_results.get("labels")
+    if not isinstance(items, dict) or set(items) != set(ITEM_IDS) or not isinstance(labels, dict) or \
+            set(labels) != set(ITEM_IDS):
+        return False
+    for i in ITEM_IDS:
+        p = (items[i] or {}).get("p_stage") if isinstance(items[i], dict) else None
+        if isinstance(p, bool) or not isinstance(p, (int, float)) or not 0.0 <= p <= 1.0:
+            return False
+    return True
+
+
 def classify_activity(kind: str) -> str:
     """chronology.holdout.holdout_read: only computing a v3-defined outcome from holdout data is a read."""
     not_reads = {"collection", "batch_sha256", "paper_decision", "paper_order", "dashboard_metadata",
@@ -97,7 +113,13 @@ def evaluator_refusals(ctx: dict) -> list:
     validation_committed_sha256, validation_reachable_before_n0, validation_run_tree, validation_run_protocol_sha256,
     frozen_tree, running_tree, fetch_only_deviation_passed, runtime_ok, data_files_ok, amendment_refusals,
     validated_items, requested_items, access_log (records), accrual_logs_complete, purpose, count_due,
-    same_snapshot, before_deadline, retry_of."""
+    same_snapshot, before_deadline, retry_of; and (review round 10) validation_complete (F5), validation_void and
+    holdout_void (F4).
+
+    Refusals raised before this function runs (core.runner.context: the study tree, the logs on origin/main, the
+    runtime, the data files and the amendment lines) stop the command before any authorization record is written,
+    so they are not logged as 'refused' records: the committed state such a record would cite is not established
+    (review round 10, F10). runtime_ok, data_files_ok and amendment_refusals are therefore always clean here."""
     out = []
     purpose = ctx["purpose"]
     if ctx["protocol_status"] != "frozen" or ctx["protocol_sha256"] != ctx["frozen_protocol_sha256"]:
@@ -113,6 +135,13 @@ def evaluator_refusals(ctx: dict) -> list:
                    "reachable from origin/main before 09:30 ET on N0")
     if ctx["validation_run_tree"] != ctx["frozen_tree"] or ctx["validation_run_protocol_sha256"] != ctx["frozen_protocol_sha256"]:
         out.append("the validation results file is not from the governing validation run (tree or protocol sha256)")
+    if ctx["validation_present"] and not ctx.get("validation_complete", False):
+        out.append("the validation results file does not hold all 5 validation p-values keyed by item_ids")
+    if ctx.get("validation_void"):
+        out.append("validation is void: a recorded pre-freeze read (exposure_registry.update_rule)")
+    if ctx.get("holdout_void"):
+        out.append("the holdout is void: a recorded read in the holdout window before the gate opened "
+                   "(exposure_registry.update_rule)")
     if ctx["running_tree"] != ctx["frozen_tree"] and not ctx["fetch_only_deviation_passed"]:
         out.append("the holdout action runs from a study tree other than the frozen tree or a passing transport deviation")
     if not ctx["runtime_ok"]:

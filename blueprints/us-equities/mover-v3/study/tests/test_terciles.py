@@ -30,6 +30,23 @@ class Terciles(unittest.TestCase):
         by[pool[59]] = [2.0]
         self.assertIsNotNone(TC.breakpoints(pool, by, pool[60]))
 
+    def test_minimum_counts_prior_events_with_a_defined_max21(self):
+        # review round 10, F7: 59 prior events with a defined MAX21 and 30 with an undefined one are fewer than 60
+        # (tercile_rule.minimum counts D events with a defined MAX21), both in breakpoints and in assign_terciles
+        from core import evaluate as EV
+        pool = self.cal.range("2020-01-02", "2020-12-31")
+        by = {d: [1.0 + i % 7] for i, d in enumerate(pool[:59])}
+        for d in pool[:30]:
+            by[d].append(None)
+        self.assertIsNone(TC.breakpoints(pool, by, pool[89]))
+        events = [{"symbol": f"S{i}", "t": d, "max21": m} for i, d in enumerate(pool[:59]) for m in by[d]]
+        events.append({"symbol": "LATE", "t": pool[89], "max21": 3.0})
+        terc = EV.assign_terciles(events, pool, lambda ev: ev["symbol"] == "LATE")
+        self.assertIsNone(terc[("LATE", pool[89])])
+        events.append({"symbol": "S60", "t": pool[60], "max21": 2.0})
+        terc = EV.assign_terciles(events, pool, lambda ev: ev["symbol"] == "LATE")
+        self.assertIsNotNone(terc[("LATE", pool[89])])
+
     def test_window_is_252_kept_sessions(self):
         pool = self.cal.range("2019-01-02", "2020-12-31")
         s = pool[300]

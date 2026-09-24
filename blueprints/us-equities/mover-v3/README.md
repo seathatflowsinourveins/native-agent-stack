@@ -141,7 +141,8 @@ family's Holm thresholds after results are seen.
 
 **Exposure and chronology.** Development is 2017-2019 and validation 2020. The holdout is 252 sessions (early closes
 included) starting at the 40th session after the freeze. The freeze commit is the first commit on `main` whose
-protocol status is frozen (pull requests are squash-merged), timed by its committer timestamp in New York. If the
+protocol status is frozen (pull requests are squash-merged), timed by its committer timestamp in New York, which the
+code accepts only from a commit signed by GitHub's web-flow key. If the
 validation results commit is not on `main` before 09:30 ET on that 40th session, the holdout of this protocol version
 is void. There is no deferral, so its start cannot be chosen after the results are seen. Every holdout trade enters
 the primary statistic. Paper orders in holdout symbol-sessions are logged at order time and removed only in a
@@ -481,12 +482,20 @@ study tree: the holdout path is now wired end to end through `run.py` (authoriza
 merged per symbol and session, counts with the extension decision, the read of the carried items only and the
 not-read label), a run refuses unless its log and amendment lines are on origin/main and the protocol is the freeze
 commit's blob, a transport deviation governs only when committed and passing, each stage is fetched and evaluated
-once into a fixed results file, and the count-only run has its own committed command. The next steps are an
+once into a fixed results file, and the count-only run has its own committed command. Review round 10 resolved a
+second review of the study tree (23 findings; 19 fixed, the rest fixed in part or recorded as limitations): a
+transport deviation now governs only with the hashed output of a logged `run.py transport-check` run, and the
+transport runs in a child process, so a change under `study/fetch/` cannot patch evaluation code; a holdout count or
+read fetches and seals in one committed step and evaluates in a second, so discarding an unpushed run gives no second
+draw of provider data; every reach and freeze time must come from a commit signed by GitHub's pinned web-flow key,
+the local `origin/main` must equal the remote's, and the logs must be append-only across `main`'s history; calendar
+and fee amendments need their `amend` access-log records; recorded pre-freeze reads void validation or the holdout;
+and every item reports the least-exposed slice. The next steps are an
 independent review of the draft and its study tree from a different model family, then the other preconditions, then
 the freeze. Until then every fetch and evaluation command refuses to run.
 
 H6 has its own preconditions in `h6-execution-parity-draft.json`. Review rounds 2-4 of the full draft are recorded in
-`protocol-draft.json` (`review_record`); rounds 5-9 (the restructure into the core, its two review rounds, the code-first round and the study-tree review) are in
+`protocol-draft.json` (`review_record`); rounds 5-10 (the restructure into the core, its two review rounds, the code-first round and the two study-tree reviews) are in
 `protocol-core-draft.json`.
 
 Until all of that is done, this is a plan, and no window it names may be read for outcomes.

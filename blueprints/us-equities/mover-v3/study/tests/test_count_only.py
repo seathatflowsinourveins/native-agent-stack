@@ -9,7 +9,7 @@ from pathlib import Path
 from unittest import mock
 
 from core import count_only as CO
-from core import coverage_rule, driver
+from core import coverage_rule, driver, plan
 from core.store import Store
 from tests import synth
 from tests.test_identity import fixed_clock, issuer_data, transports
@@ -183,9 +183,12 @@ class Round9(unittest.TestCase):
         from core import logs, runner
         from core.canon import sha256_file
         from core.params import COUNT_ONLY_OUTPUT, RUN_LOG
+        from core import transport_proc
+        from core.params import PROTOCOL_PATH
         from fetch.transport import TRADING_HOST
         from tests import fixture_repo as FR
-        self.assertEqual(run.transports()["trading"].host, TRADING_HOST)
+        self.assertEqual(transport_proc.worker_apis()["trading"].host, TRADING_HOST)
+        self.assertEqual(sorted(run.transports()), ["data", "trading"])
         self.assertTrue(all(r["api"] == "trading" for r in CO.part0_requests("2026-09-25") if r["kind"] == "assets"))
         cal = synth.calendar()
         m = synth.FakeMarket(cal)
@@ -198,13 +201,23 @@ class Round9(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             fx = FR.build(tmp, frozen=False)
             repo, root = fx["repo"], str(Path(tmp) / "snap")
-            argv = ["count-only", "--snapshot-root", root, "--rate-per-minute", "10000", "--rate-source", "synthetic"]
+            argv = ["count-only", "--snapshot-root", root]
             with FR.isolated_bytecode(), mock.patch.object(run, "REPO", repo), \
                     mock.patch.object(run, "transports", lambda: transports(m)), \
                     mock.patch.object(run, "clock", fixed_clock), \
                     mock.patch.object(CO, "PART1_RANGE", ("2020-06-01", "2020-06-05")):
                 (repo / COUNT_ONLY_OUTPUT).unlink()                # the fixture's placeholder output
                 FR.commit_push(repo, "2026-09-25T12:00:00+00:00")
+                with self.assertRaisesRegex(ValueError, "rate_limit"):   # review round 10, L1: pinned before the run
+                    run.main(argv)
+                proto = json.loads((repo / PROTOCOL_PATH).read_text())
+                proto["exposure_registry"]["pre_freeze_access_path"]["rate_limit"].update(
+                    {"per_minute": 10000, "source": "synthetic"})
+                FR.write(repo / PROTOCOL_PATH, json.dumps(proto, indent=1) + "\n")
+                FR.sh(repo, "commit", "-q", "-am", "pin the rate", when="2026-09-25T12:10:00+00:00")
+                with self.assertRaises(runner.guards.Refused):     # committed, not on origin/main
+                    run.main(argv)
+                FR.push(repo)
                 logs.append_line(repo / RUN_LOG, {"stage": "pre_freeze", "purpose": "note"})
                 with self.assertRaises(runner.guards.Refused):     # a run log that differs from HEAD
                     run.main(argv)
@@ -215,6 +228,7 @@ class Round9(unittest.TestCase):
                 self.assertEqual((line["purpose"], line["status"]), ("count_only", "complete"))
                 self.assertEqual(line["results_sha256"], sha256_file(repo / COUNT_ONLY_OUTPUT))
                 self.assertEqual(line["coverage_rule_sha256"], coverage_rule.rule_sha256(PROTOCOL))
+                self.assertEqual(out["rate_limit"], {"per_minute": 10000.0, "source": "synthetic"})
                 self.assertEqual((out["study_tree"], out["code_revision"]), (fx["tree"], FR.sh(repo, "rev-parse", "HEAD")))
                 self.assertEqual(set(out["snapshots"]), {"part0", "part1", "part3"})
                 self.assertEqual(out["part0"]["enumeration_sha256"], sha256_file(Path(root) / "enumeration.json"))
@@ -254,9 +268,6 @@ class Probe(unittest.TestCase):
                                   "reuse_cases": 1, "reuse_differ": 1})
 
 
-if __name__ == "__main__":
-    unittest.main()
-
 
 class DryRun(unittest.TestCase):
     def test_dry_run_emits_counts_only(self):
@@ -278,3 +289,44 @@ class DryRun(unittest.TestCase):
         text = json.dumps(out)
         self.assertNotIn("7.2", text)
         self.assertNotIn("AAA", text)
+        # review round 10, F6: every forward exit window is planned: W0 with the prevailing lookback (15:55 + 300 s
+        # reaches the close, so there is no W1) and the search windows E+1 .. E+5
+        e, stamp, _ = plan.planned_exit(cal, s, "b_lane", cal.offset(s, 10))
+        self.assertEqual(len(plan.exit_windows(cal, e, stamp)), 6)
+        self.assertEqual(out["quote_exit"]["requests"], 2 * 6)
+
+    def test_dry_run_command_writes_counts_once_from_an_exposed_window(self):
+        import run
+        from core import logs, runner
+        from core.canon import sha256_file
+        from core.params import DRY_RUN_OUTPUT, RUN_LOG
+        from tests import fixture_repo as FR
+        cal = synth.calendar("2022-06-01", "2023-12-29")
+        s = "2023-03-01"
+        daily, prints = issuer_data(cal, cal.offset(s, -60), cal.offset(s, 12), lambda d: 7.25)
+        m = synth.FakeMarket(cal)
+        m.add("a", [("2015-01-01", "AAA")], daily=daily, auctions=prints)
+        with tempfile.TemporaryDirectory() as tmp:
+            fx = FR.build(tmp, frozen=False)
+            repo, root = fx["repo"], str(Path(tmp) / "snap")
+            with FR.isolated_bytecode(), mock.patch.object(run, "REPO", repo), \
+                    mock.patch.object(run, "transports", lambda: transports(m)), \
+                    mock.patch.object(run, "clock", fixed_clock):
+                with self.assertRaises(ValueError):                  # a v3 validation session
+                    run.main(["dry-run", "--sessions", "2020-06-01", "--symbols", "AAA", "--snapshot-root", root])
+                with self.assertRaises(ValueError):                  # its search windows reach 2024-11-01
+                    run.main(["dry-run", "--sessions", "2024-10-25", "--symbols", "AAA", "--snapshot-root", root])
+                self.assertEqual(run.main(["dry-run", "--sessions", s, "--symbols", "AAA,ZZZ", "--snapshot-root", root]), 0)
+                out = json.loads((repo / DRY_RUN_OUTPUT).read_text())
+                line = logs.read_lines(repo / RUN_LOG)[-1]
+                self.assertEqual((line["purpose"], line["status"], line["results_sha256"]),
+                                 ("dry_run", "complete", sha256_file(repo / DRY_RUN_OUTPUT)))
+                self.assertEqual(out["counts"]["event_minute"]["empty"], 2)
+                self.assertNotIn("AAA", json.dumps(out))
+                FR.commit_push(repo, "2026-09-26T12:00:00+00:00")
+                with self.assertRaises(runner.RunRefused):          # it runs once
+                    run.main(["dry-run", "--sessions", s, "--symbols", "AAA", "--snapshot-root", root])
+
+
+if __name__ == "__main__":
+    unittest.main()

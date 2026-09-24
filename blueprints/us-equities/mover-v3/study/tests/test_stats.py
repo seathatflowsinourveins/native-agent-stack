@@ -111,6 +111,15 @@ class Robustness(unittest.TestCase):
         self.assertAlmostEqual(ST.mean_of_session_means(trades), np.mean([0.04, 0.03, 0.01, 0.02, -0.01, 0.02, 0.04]))
         self.assertFalse(ST.robustness(trades)["all_positive"])
 
+    def test_top_session_tie_straddling_rank_five(self):
+        # review round 10, F12: session sums s1 .09, s2 .08, s3 .07, s4 .06, then s5 and s6 tie at .05 across ranks
+        # 5 and 6. s5 holds one trade (.05) and s6 two (.10 and -.05), so the two tie-breaks give different means:
+        # dropping the earlier session (s5) keeps s6 and s7 -> (.10 - .05 - .03) / 3; dropping s6 would give .01
+        trades = [{"session": s, "value": v} for s, v in (("s1", 0.09), ("s2", 0.08), ("s3", 0.07), ("s4", 0.06),
+                                                          ("s6", 0.10), ("s6", -0.05), ("s5", 0.05), ("s7", -0.03))]
+        self.assertAlmostEqual(ST.mean_without_top_sessions(trades), (0.10 - 0.05 - 0.03) / 3)
+        self.assertNotAlmostEqual(ST.mean_without_top_sessions(trades), (0.05 - 0.03) / 2)
+
 
 class MDE(unittest.TestCase):
     def test_matches_the_protocol_tables(self):
@@ -192,11 +201,24 @@ class Labels(unittest.TestCase):
         labels.update({"H1-D": "not carried", "H1-D-b_lane-low": "not carried", "H3-b": "not carried"})
         v = ST.hypothesis_verdict("holdout", labels)
         self.assertEqual(v["H3"]["verdict"], "not supported (holdout not read)")
+        # review round 10, F8: at the holdout a hypothesis with no carried item gets no verdict
+        self.assertNotIn("H1", v)
+
+    def test_a_contaminated_pass_is_inconclusive(self):
+        # review round 10, F1: 'screened (contaminated holdout)' met the pass rule, so rule (2) cannot apply
+        contaminated = "screened (contaminated holdout)"
+        labels = {"H1-D": "not_supported_mde_excluded", "H1-D-b_lane-low": contaminated, "H3-a": "not carried",
+                  "H3-b": "not carried", "H3-c": "not carried"}
+        v = ST.hypothesis_verdict("holdout", labels)
         self.assertEqual(v["H1"]["verdict"], "inconclusive")
-
-
-if __name__ == "__main__":
-    unittest.main()
+        labels["H1-D-b_lane-low"] = "underpowered"
+        self.assertEqual(ST.hypothesis_verdict("holdout", labels)["H1"]["verdict"], "not supported")
+        for passing in ("H3-a", "H3-b"):
+            labels = {"H1-D": "not carried", "H1-D-b_lane-low": "not carried", "H3-a": "underpowered",
+                      "H3-b": "underpowered", "H3-c": "not_supported_mde_excluded"}
+            self.assertEqual(ST.hypothesis_verdict("holdout", labels)["H3"]["verdict"], "not supported")
+            labels[passing] = contaminated
+            self.assertEqual(ST.hypothesis_verdict("holdout", labels)["H3"]["verdict"], "inconclusive", passing)
 
 
 class Diagnostics(unittest.TestCase):
@@ -229,3 +251,7 @@ class Diagnostics(unittest.TestCase):
                                0.0, places=6)
         loser = {"nets": {"primary": -1.0}, "primary_parts": None}
         self.assertIsNone(ST.break_even_multiple([loser], f))
+
+
+if __name__ == "__main__":
+    unittest.main()

@@ -162,6 +162,18 @@ class Enumeration(unittest.TestCase):
         self.assertEqual(out["symbols"], ["AAPL", "BRK.B", "FB", "META", "TWTR", "TWTRQ", "X"])
         self.assertEqual(out["counts"]["asset_master_placeholders_removed"], 1)
 
+    def test_every_kept_symbol_field_is_enumerated(self):
+        # review round 10, F11: spin-off and unit-split records name source_symbol, target_symbol and new_symbol_2;
+        # a placeholder in any field is filtered as in broad-universe's supplement list
+        actions = [{"type": "spin_off", "source_symbol": "SRC", "new_symbol": "SPUN", "date": "2019-05-01"},
+                   {"type": "unit_split", "old_symbol": "UNIT", "new_symbol": "UNW", "new_symbol_2": "UNR",
+                    "date": "2019-06-03"},
+                   {"type": "stock_merger", "target_symbol": "TGT", "acquirer_symbol": "ACQ", "date": "2019-07-01"},
+                   {"type": "name_change", "old_symbol": "12345Z", "new_symbol": "OK", "date": "2019-08-01"}]
+        out = identity.enumerate_symbols([], actions)
+        self.assertEqual(out["symbols"], ["ACQ", "OK", "SPUN", "SRC", "TGT", "UNIT", "UNR", "UNW"])
+        self.assertEqual(out["counts"]["corporate_actions"], 8)
+
     def test_corporate_action_date_fields(self):
         body = {"corporate_actions": {
             "name_changes": [{"old_symbol": "A", "new_symbol": "B", "process_date": "2020-01-10", "ex_date": "2020-01-09"}],

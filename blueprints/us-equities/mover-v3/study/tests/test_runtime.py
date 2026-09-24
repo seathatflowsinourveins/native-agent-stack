@@ -32,6 +32,20 @@ class Runtime(unittest.TestCase):
         with self.assertRaises(guards.Refused):
             guards.check_runtime(LOCK, v)
 
+    def test_every_locked_package_and_its_record_are_checked(self):
+        # review round 10, L3: every locked package's version, and its installed dist-info RECORD digest
+        v = guards.runtime_versions(LOCK)
+        self.assertEqual(set(v), {"python", *LOCK["packages"]})
+        v["tzdata"] = "2000.1"
+        with self.assertRaises(guards.Refused):
+            guards.check_runtime(LOCK, v)
+        self.assertEqual(set(LOCK["record_sha256s"]), set(LOCK["packages"]))
+        rec = guards.record_digests(LOCK)
+        self.assertEqual(rec, LOCK["record_sha256s"])
+        with self.assertRaises(guards.Refused):
+            guards.check_runtime(LOCK, records={**rec, "six": "0" * 64})
+        self.assertRegex(guards.environment_digest(LOCK), "^[0-9a-f]{64}$")
+
     def test_protocol_names_the_lock_and_test_command(self):
         proto = json.loads((STUDY.parent / "protocol-core-draft.json").read_text())
         sc = proto["run_discipline"]["study_code"]

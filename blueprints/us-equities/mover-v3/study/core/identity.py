@@ -20,14 +20,18 @@ class AsofRefused(Exception):
 
 def enumerate_symbols(assets: list[dict], actions: list[dict]) -> dict:
     """The union of (a) asset-master symbols (active and inactive, us_equity, every exchange) that pass
-    DATA_SYMBOL and (b) every old and new symbol named by a corporate-action record (renamed-away tickers kept).
+    DATA_SYMBOL and (b) every symbol named by a corporate-action record, in any field core.records keeps
+    (records.SYMBOL_FIELDS: symbol, old/new, acquirer/acquiree, target, source and new_symbol_2; review round 10,
+    F11), renamed-away tickers kept. DATA_SYMBOL filters (b) too, as broad-universe's collect_daily.py at aa6fc79
+    filtered its supplement list (a placeholder the bars API rejects would only fail its requests).
     Returns {"symbols": sorted list, "counts": per-source counts}."""
+    from core.records import SYMBOL_FIELDS
     master = {a["symbol"] for a in assets if a.get("symbol") and (a.get("class") in (None, "us_equity"))}
     placeholders = {s for s in master if not DATA_SYMBOL.match(s)}
     master_ok = master - placeholders
     from_actions = set()
     for rec in actions:
-        for f in ("symbol", "old_symbol", "new_symbol", "acquirer_symbol", "acquiree_symbol"):
+        for f in SYMBOL_FIELDS:
             s = rec.get(f)
             if s and DATA_SYMBOL.match(s):
                 from_actions.add(s)

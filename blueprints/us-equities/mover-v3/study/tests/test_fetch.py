@@ -2,6 +2,8 @@
 R8-1: the transport derives nothing, and the reproduction check regenerates the plan and re-parses every page."""
 import ast
 import json
+import subprocess
+import sys
 import tempfile
 import unittest
 from collections import Counter
@@ -68,6 +70,51 @@ class TransportIsTransportOnly(unittest.TestCase):
                 if isinstance(node, ast.Constant) and isinstance(node.value, str):
                     for word in ("asof", "adjustment", "timeframe", "quotes", "bars", "auctions"):
                         self.assertNotEqual(node.value, word, f"{path.name} names request field {word}")
+
+
+class TransportProcess(unittest.TestCase):
+    """Review round 10, H1: the transport runs in a child process and only raw pages cross the boundary."""
+
+    def _worker(self, tmp, body):
+        path = Path(tmp) / "worker.py"
+        path.write_text(f"import sys\nsys.path.insert(0, {str(FETCH_DIR.parent)!r})\n" + body)
+        return [sys.executable, "-I", "-B", str(path)]
+
+    def test_pages_round_trip_through_the_child_process(self):
+        from core import transport_proc
+        body = ("from core.transport_proc import serve\n"
+                "class T:\n"
+                "    def __init__(self, tag): self.tag = tag\n"
+                "    def get(self, endpoint, params):\n"
+                "        return {'pages': [self.tag.encode() + endpoint.encode(), bytes(range(256))], 'complete': True,"
+                " 'error': None}\n"
+                "serve({'data': T('d'), 'trading': T('t')}, sys.stdin, sys.stdout)\n")
+        with tempfile.TemporaryDirectory() as tmp:
+            tr = transport_proc.transports(self._worker(tmp, body))
+            res = tr["trading"].get("/v2/assets", {"status": "active"})
+            self.assertEqual(res, {"pages": [b"t/v2/assets", bytes(range(256))], "complete": True, "error": None})
+            self.assertEqual(tr["data"].get("/x", {})["pages"][0], b"d/x")
+            tr["data"].proc.close()
+
+    def test_a_malformed_reply_is_an_incomplete_request_and_a_dead_child_stops_the_run(self):
+        from core import transport_proc as TP
+        for bad in ("not json", '{"pages": [1], "complete": true, "error": null}',
+                    '{"pages": [], "complete": "yes", "error": null}',
+                    '{"pages": [], "complete": true, "error": null, "patch": "core.stats"}',
+                    '{"pages": ["***"], "complete": true, "error": null}'):
+            self.assertEqual(TP.decode(bad)["complete"], False, bad)
+        with tempfile.TemporaryDirectory() as tmp:
+            tr = TP.transports(self._worker(tmp, "raise SystemExit(0)\n"))
+            with self.assertRaises(TP.TransportProcessEnded):
+                tr["data"].get("/x", {})
+            tr["data"].proc.close()
+
+    def test_run_py_never_imports_the_fetch_directory(self):
+        code = ("import sys; sys.dont_write_bytecode = True; sys.path.insert(0, %r); import run; t = run.transports(); "
+                "import core.runner, core.holdout, core.stage; "
+                "print(sorted(m for m in sys.modules if m == 'fetch' or m.startswith('fetch.')))" % str(FETCH_DIR.parent))
+        out = subprocess.run([sys.executable, "-I", "-B", "-c", code], capture_output=True, text=True, check=True)
+        self.assertEqual(out.stdout.strip(), "[]")
 
 
 def _universe(cal, sess):

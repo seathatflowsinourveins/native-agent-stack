@@ -106,6 +106,46 @@ def bh_diagnostics(item: str, rows: list) -> dict:
     return {k: {"n": len(splits[k]), "mean": _mean(splits[k]), "p": pvals[k], "bh_rejected": rejected[k]} for k in pvals}
 
 
+def statistic(item: str, rows: list, value=None):
+    """The item's statistic on a subset of its rows: the high-minus-low difference of trade-level means for H1-D,
+    the mean otherwise (the H3-c mean leg difference, or a cell's trade-level mean)."""
+    value = value or (lambda r: r["value"])
+    if item == "H1-D":
+        hi = [value(r) for r in rows if r["group"] == "high"]
+        lo = [value(r) for r in rows if r["group"] == "low"]
+        return (_mean(hi) - _mean(lo)) if hi and lo else None
+    return _mean([value(r) for r in rows])
+
+
+def _rebooked(r):
+    rec = r["rec"]
+    if rec.get("exit") in ("terminal_zero", "censored_terminal") and rec.get("terminal_rebooked_at_last_bid") is not None:
+        return rec["terminal_rebooked_at_last_bid"]
+    return r["value"]
+
+
+def sensitivities(item: str, rows: list) -> dict:
+    """statistics.sensitivities for one item, each the item's own statistic (review round 10, F3). Every item gets
+    the least-exposed slice (exposure_registry.consequence) and the holdout without paper-exposed trades; the
+    trade-based items (H1-D and the cells) also get the cost, terminal-rebooking, ratio-rule and censoring
+    sensitivities. H3-c has no cost, no terminal booking and no censored leg (an event whose legs cross the segment
+    end is excluded), so those do not apply to it."""
+    out = {}
+    if item != "H3-c":
+        for m in SENSITIVITY_MODES:
+            out[m] = statistic(item, rows, lambda r, m=m: r["rec"]["nets"][m])
+        # a trade whose backward window is fetch-incomplete (and has no merger record) leaves this sensitivity only
+        # (populations.fetch_failures; review round 9, L-1)
+        out["terminal_zero_rebooked_at_last_bid"] = statistic(
+            item, [r for r in rows if not r["rec"].get("backward_incomplete")], _rebooked)
+        out["ratio_rule_holds_removed"] = statistic(item, [r for r in rows if not r["rec"].get("ratio_rule_in_hold")])
+        out["censored_removed"] = statistic(item, [r for r in rows if not r["rec"].get("censored")])
+    out["least_exposed_slice"] = statistic(item, [r for r in rows if r["rec"].get("least_exposed")])
+    out["least_exposed_slice_n"] = sum(1 for r in rows if r["rec"].get("least_exposed"))
+    out["without_paper_exposed"] = statistic(item, [r for r in rows if not r["rec"].get("paper_exposed")])
+    return out
+
+
 def item_result(item: str, stage: str, rows: list, sessions: list, protocol_id: str, B: int | None = None,
                 fees=None) -> dict:
     alt = ALTERNATIVE[item]
@@ -136,27 +176,20 @@ def item_result(item: str, stage: str, rows: list, sessions: list, protocol_id: 
            "p": p, "p_normal_tail": p_n, "mde": mde_v, "mde_excluded": ST.mde_excluded(item, boot, mde_v),
            "n_ok": ST.minimum_met(item, stage, n, n_hi, n_lo),
            "lineage_confirmed": ST.lineage_confirmed(p, p_n)}
+    res["sensitivities"] = sensitivities(item, rows)
+    if item == "H1-D":
+        res["two_way_clustered"] = ST.two_way_cluster_difference(
+            [r["value"] for r in rows], [r["group"] for r in rows], [r["session"] for r in rows],
+            [r["rec"]["symbol"] for r in rows])
+    else:
+        res["two_way_clustered"] = ST.two_way_cluster([r["value"] for r in rows], [r["session"] for r in rows],
+                                                      [r["rec"]["symbol"] for r in rows])
     if item in TRADABLE:
         rob = ST.robustness([{"session": r["session"], "value": r["value"]} for r in rows]) if rows else \
             {"all_positive": False}
         res["robustness"] = rob
-        res["sensitivities"] = {m: _mean([r["rec"]["nets"][m] for r in rows]) for m in SENSITIVITY_MODES}
-        # a trade whose backward window is fetch-incomplete (and has no merger record) leaves this sensitivity only
-        # (populations.fetch_failures; review round 9, L-1)
-        res["sensitivities"]["terminal_zero_rebooked_at_last_bid"] = _mean(
-            [r["rec"].get("terminal_rebooked_at_last_bid", r["value"]) if r["rec"].get("exit") in
-             ("terminal_zero", "censored_terminal") and r["rec"].get("terminal_rebooked_at_last_bid") is not None
-             else r["value"] for r in rows if not r["rec"].get("backward_incomplete")])
-        res["sensitivities"]["ratio_rule_holds_removed"] = _mean(
-            [r["value"] for r in rows if not r["rec"].get("ratio_rule_in_hold")])
-        res["sensitivities"]["censored_removed"] = _mean([r["value"] for r in rows if not r["rec"].get("censored")])
-        res["sensitivities"]["least_exposed_slice"] = _mean([r["value"] for r in rows if r["rec"].get("least_exposed")])
-        res["sensitivities"]["without_paper_exposed"] = _mean(
-            [r["value"] for r in rows if not r["rec"].get("paper_exposed")])
         res["exits"] = dict(Counter(r["rec"]["exit"] for r in rows))
         res["break_even_cost_multiple"] = ST.break_even_multiple([r["rec"] for r in rows], fees) if rows and fees else None
-        res["two_way_clustered"] = ST.two_way_cluster([r["value"] for r in rows], [r["session"] for r in rows],
-                                                      [r["rec"]["symbol"] for r in rows])
         res["bh_diagnostics"] = bh_diagnostics(item, rows)
     if item == "H1-D":
         # terminal_exits.in_statistics: exit counts for every item; H1-D's are per group (review round 9, L-4)
@@ -164,6 +197,15 @@ def item_result(item: str, stage: str, rows: list, sessions: list, protocol_id: 
                                  for g in ("high", "low")}
     res["paper_exposed_fraction"] = (sum(1 for r in rows if r["rec"].get("paper_exposed")) / len(rows)) if rows else 0.0
     return res
+
+
+def a_b_overlap(trades: list) -> dict:
+    """Events whose H3-a (a_intraday) trade and b_lane trade were both filled, so they share the entry fill, out of
+    the filled H3-a trades."""
+    filled = {arm: {(t["symbol"], t["t"]) for t in trades if t["arm"] == arm and t.get("status") == "filled"}
+              for arm in ("a_intraday", "b_lane")}
+    return {"a_intraday_filled": len(filled["a_intraday"]),
+            "also_b_lane_filled": len(filled["a_intraday"] & filled["b_lane"])}
 
 
 def terminal_by_arm_year(trades: list) -> dict:
@@ -208,7 +250,9 @@ def evaluate(stage: str, events: list, ctx, store, *, protocol_id: str, stage_se
               # terminal_exits.booking (E9): whether an eligible quote exists under the new symbol
               "rename_sensitivity": dict(Counter(f"{t['arm']}:{t['rename_sensitivity']['status']}"
                                                  for t in trades if t.get("rename_sensitivity"))),
-              "backward_incomplete": sum(1 for t in trades if t.get("backward_incomplete"))}
+              "backward_incomplete": sum(1 for t in trades if t.get("backward_incomplete")),
+              # arms.a_intraday: H3-a's entries are the b_lane entries; the overlap is reported (review round 10, F13)
+              "a_intraday_b_lane_entry_overlap": a_b_overlap(trades)}
     is_void = bool(void and void.get("void"))
     items = {}
     for item in ITEM_IDS:

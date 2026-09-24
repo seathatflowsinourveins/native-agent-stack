@@ -26,7 +26,8 @@ def ctx(**over):
          "frozen_tree": FROZEN, "running_tree": FROZEN, "fetch_only_deviation_passed": False, "runtime_ok": True,
          "data_files_ok": True, "amendment_refusals": [], "validated_items": ["H3-a", "H3-c"], "requested_items": ["H3-a"],
          "access_log": [], "accrual_logs_complete": True, "count_due": True, "same_snapshot": True,
-         "before_deadline": True, "retry_of": None, "study_code_tree": FROZEN}
+         "before_deadline": True, "retry_of": None, "study_code_tree": FROZEN, "validation_complete": True,
+         "validation_void": False, "holdout_void": False}
     c.update(over)
     return c
 
@@ -38,6 +39,19 @@ class Gate(unittest.TestCase):
         self.assertEqual(gate.validated_items(v), ["H1-D-b_lane-low", "H3-a", "H3-b"])
         v["labels"]["H3-b"] = "underpowered"  # a tradable cell that failed a robustness statistic is not screened
         self.assertNotIn("H3-b", gate.validated_items(v))
+
+    def test_validation_file_must_hold_every_item_p_value(self):
+        # review round 10, F5: multiple_testing.procedure; the evaluator refuses an incomplete file
+        from core.params import ITEM_IDS
+        full = {"labels": {i: "underpowered" for i in ITEM_IDS}, "items": {i: {"p_stage": 1.0} for i in ITEM_IDS}}
+        self.assertTrue(gate.validation_complete(full))
+        for bad in ({**full, "items": {i: {"p_stage": 1.0} for i in ITEM_IDS[:4]}},
+                    {**full, "items": {**full["items"], "H3-a": {"p_stage": None}}},
+                    {**full, "items": {**full["items"], "H3-a": {"p_stage": True}}},
+                    {**full, "items": {**full["items"], "H3-a": {"p_stage": 1.5}}},
+                    {**full, "items": {**full["items"], "H9": {"p_stage": 0.1}}},
+                    {"labels": full["labels"]}, None):
+            self.assertFalse(gate.validation_complete(bad), bad)
 
     def test_read_classification(self):
         for k in ("collection", "batch_sha256", "paper_decision", "paper_order", "dashboard_metadata", "membership_only"):
@@ -119,6 +133,10 @@ class Refusals(unittest.TestCase):
             "validated_items": ([], "validated items"),
             "requested_items": (["H1-D"], "validated items"),
             "accrual_logs_complete": (False, "accrual log"),
+            # review round 10, F5 and F4
+            "validation_complete": (False, "all 5 validation p-values"),
+            "validation_void": (True, "validation is void"),
+            "holdout_void": (True, "the holdout is void"),
         }
         self.assertEqual(gate.evaluator_refusals(ctx()), [])
         for key, (value, text) in cases.items():

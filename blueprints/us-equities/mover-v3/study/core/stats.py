@@ -253,12 +253,21 @@ def qualifiers(stage: str, label: str, lineage_ok: bool, stage_qualifiers=()) ->
     return out
 
 
+CONTAMINATED = "screened (contaminated holdout)"
+
+
 def hypothesis_verdict(stage: str, labels: dict, item_qualifiers: dict | None = None) -> dict:
     """outcome_reporting.hypothesis_verdict for H1 (H1-D, H1-D-b_lane-low) and H3 (H3-a, H3-b, H3-c). A pass
-    verdict carries the qualifiers of its passing items."""
+    verdict carries the qualifiers of its passing items. A holdout item labelled 'screened (contaminated holdout)'
+    met the pass rule, so rule (2)'s 'does not pass' excludes it and the verdict is 'inconclusive' (review round 10,
+    F1). At the holdout a hypothesis with no carried item gets no verdict (F8)."""
     out = {}
     item_qualifiers = item_qualifiers or {}
     groups = {"H1": ("H1-D", "H1-D-b_lane-low"), "H3": ("H3-a", "H3-b", "H3-c")}
+
+    def met_pass_rule(i):
+        return labels.get(i) in (PASS_NAME[stage], CONTAMINATED)
+
     for h, items in groups.items():
         passing = [i for i in items if labels.get(i) == PASS_NAME[stage]]
         if passing:
@@ -267,13 +276,16 @@ def hypothesis_verdict(stage: str, labels: dict, item_qualifiers: dict | None = 
             continue
         if stage == "holdout":
             carried = [i for i in items if labels.get(i) not in (None, "not carried")]
-            if carried and all(labels[i] == "not supported (holdout not read)" for i in carried):
+            if not carried:
+                continue
+            if all(labels[i] == "not supported (holdout not read)" for i in carried):
                 out[h] = {"verdict": "not supported (holdout not read)", "items": carried}
                 continue
         if h == "H1":
-            ns = labels.get("H1-D") == "not_supported_mde_excluded"
+            ns = labels.get("H1-D") == "not_supported_mde_excluded" and not met_pass_rule("H1-D-b_lane-low")
         else:
-            ns = labels.get("H3-c") == "not_supported_mde_excluded"
+            ns = labels.get("H3-c") == "not_supported_mde_excluded" and not any(
+                met_pass_rule(i) for i in ("H3-a", "H3-b"))
         out[h] = {"verdict": "not supported" if ns else "inconclusive", "items": list(items)}
     return out
 
@@ -311,6 +323,18 @@ def break_even_multiple(trades: list, fees, hi: float = 64.0, tol: float = 1e-6)
     return (lo + up) / 2.0
 
 
+def _cgm_se(influence, sessions, symbols) -> float:
+    """Cameron-Gelbach-Miller two-way cluster-robust standard error from each observation's influence on the
+    estimate: V = V_session + V_symbol - V_session x symbol, floored at the larger one-way V."""
+    def v(keys):
+        sums = {}
+        for k, e in zip(keys, influence):
+            sums[k] = sums.get(k, 0.0) + e
+        return sum(s * s for s in sums.values())
+    vs, vy, vb = v(sessions), v(symbols), v(list(zip(sessions, symbols)))
+    return math.sqrt(max(vs + vy - vb, vs, vy))
+
+
 def two_way_cluster(values, sessions, symbols) -> dict:
     """The sensitivity 'two-way (session, symbol) clustering': the mean with a Cameron-Gelbach-Miller two-way
     cluster-robust standard error, V = V_session + V_symbol - V_session x symbol (floored at the larger one-way V)."""
@@ -318,16 +342,22 @@ def two_way_cluster(values, sessions, symbols) -> dict:
     n = len(x)
     if n < 2:
         return {"mean": float(x.mean()) if n else None, "se": None}
-    u = x - x.mean()
+    return {"mean": float(x.mean()), "se": _cgm_se((x - x.mean()) / n, sessions, symbols)}
 
-    def v(keys):
-        sums = {}
-        for k, e in zip(keys, u):
-            sums[k] = sums.get(k, 0.0) + e
-        return sum(s * s for s in sums.values()) / (n * n)
-    vs, vy, vb = v(sessions), v(symbols), v(list(zip(sessions, symbols)))
-    var = max(vs + vy - vb, vs, vy)
-    return {"mean": float(x.mean()), "se": math.sqrt(var)}
+
+def two_way_cluster_difference(values, groups, sessions, symbols) -> dict:
+    """The same sensitivity for H1-D (review round 10, F3): the high-minus-low difference of trade-level means, with
+    each trade's influence (x - mean_high) / n_high or -(x - mean_low) / n_low."""
+    x = np.asarray(values, dtype=float)
+    hi, lo = np.array([g == "high" for g in groups]), np.array([g == "low" for g in groups])
+    n_hi, n_lo = int(hi.sum()), int(lo.sum())
+    if n_hi == 0 or n_lo == 0:
+        return {"difference": None, "se": None}
+    m_hi, m_lo = float(x[hi].mean()), float(x[lo].mean())
+    if n_hi + n_lo < 3:
+        return {"difference": m_hi - m_lo, "se": None}
+    infl = np.where(hi, (x - m_hi) / n_hi, np.where(lo, -(x - m_lo) / n_lo, 0.0))
+    return {"difference": m_hi - m_lo, "se": _cgm_se(infl, sessions, symbols)}
 
 
 def benjamini_hochberg(pvals: dict, q: float = 0.10) -> dict:

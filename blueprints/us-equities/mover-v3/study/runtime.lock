@@ -14,9 +14,25 @@
   "toolz": "1.1.0",
   "tzdata": "2026.4"
  },
+ "record_sha256s": {
+  "duckdb": "dc38e08d30add13f3f206fe5e1fd569644fb84664ebe741535cae8dfce7c3c7e",
+  "exchange_calendars": "6f07d9a6733672c1e93132d70e95770abf32b181298e4954c4d78ddff1ed971d",
+  "korean_lunar_calendar": "a9cfe5cad80584809091426c853cf32e3075774d85f1cd4cceb1be348b3eecff",
+  "numpy": "3939f87b8e15fb08f145045ddc8eb7aa3b72d4635fdc05d4fa258df88dc80fb8",
+  "pandas": "98695ccf37f78ee7a4f58fbf1e328380607451ff880f0243169a889e27f8a815",
+  "pyluach": "8508076a26ea8a0bc99d1a8aee19ef4c7af8a2515fcbb5c20ad964f1f0ad33c0",
+  "python-dateutil": "e15e868a50b9c4e71df17b31369843617780146ac5adb1bbfdcced0ebe501824",
+  "six": "d16e50f347969b1e1919fb0c88bac4b9c644f5305bcfcfb00f72b646dbd4065d",
+  "toolz": "06fd72cd10b829a6ebd564af8fe63779a9a3eec9f989c26593a72170b6be77cc",
+  "tzdata": "3e243ae23e21e1dc472850f65f7e07238fc16ef20397efb7105b12acf8f55d61"
+ },
  "requirements_file": "runtime-requirements.txt",
  "test_command": "uv run --no-project --managed-python --python 3.13.15 --with-requirements blueprints/us-equities/mover-v3/study/runtime-requirements.txt python -m unittest discover -s blueprints/us-equities/mover-v3/study/tests -t blueprints/us-equities/mover-v3/study",
  "run_command": "uv run --no-project --managed-python --python 3.13.15 --with-requirements blueprints/us-equities/mover-v3/study/runtime-requirements.txt python -I -B blueprints/us-equities/mover-v3/study/run.py",
- "resolved_by": "uv 0.12.17 on 2026-09-24 (linux x86_64); the evaluator refuses a run whose Python, numpy, pandas, exchange_calendars or duckdb version differs",
- "verified": "2026-09-24, review round 9: uv 0.12.17 with uv-managed CPython 3.13.15 (cpython-3.13.15-linux-x86_64-gnu) and exactly the packages above from runtime-requirements.txt, run by test_command: 216 tests, 0 failures, 0 errors, 0 skips"
+ "resolved_by": "uv 0.12.17 on 2026-09-24 (linux x86_64); the evaluator refuses a run whose Python or any locked package version differs, or whose installed dist-info RECORD differs from record_sha256s (review round 10, L3)",
+ "verified": "2026-09-24, review round 10: uv 0.12.17 with uv-managed CPython 3.13.15 (cpython-3.13.15-linux-x86_64-gnu) and exactly the packages above from runtime-requirements.txt (their RECORD digests equal to record_sha256s), git 2.43.0 and GnuPG 2.4.4, run by test_command: 233 tests, 0 failures, 0 errors, 0 skips",
+ "system_tools": {
+  "git": "2.43.0 or later (verify-commit --raw, ls-remote)",
+  "gpg": "GnuPG 2.4.4 (verifies the pinned merge key, core/guards.py verified_merge; the synthetic suite also generates a throwaway key with it)"
+ }
 }

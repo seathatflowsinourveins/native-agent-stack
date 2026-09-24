@@ -270,7 +270,7 @@ def h3c_event(ev: dict, ctx: Ctx) -> dict:
     intraday k = 2..5 (open to close of t+k). Missing any leg excludes the event (counted)."""
     cal, t = ctx.cal, ev["t"]
     d = [cal.offset(t, k) for k in range(0, 6)]
-    out = {"symbol": ev["symbol"], "t": t, "entry_session": d[1]}
+    out = {"symbol": ev["symbol"], "t": t, "entry_session": d[1], "least_exposed": ev.get("least_exposed")}
     seg = segment_of(ctx.segs, d[1]) if d[1] else None
     if seg is None:
         return {**out, "status": "dropped_no_segment"}

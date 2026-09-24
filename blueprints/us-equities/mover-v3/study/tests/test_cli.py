@@ -11,7 +11,7 @@ from pathlib import Path
 from unittest import mock
 
 import run
-from core import canon, guards, logs, runner
+from core import canon, gate, guards, logs, runner
 from core import stage as ST
 from core.params import ACCESS_LOG, DATA_DIR, DEVIATIONS, PROTOCOL_PATH, RESULTS_DIR, RUN_LOG, STUDY_PATH
 from tests import fixture_repo as FR
@@ -121,6 +121,21 @@ class StageRunsOnce(unittest.TestCase):
                 self.assertTrue(all(r["qualifiers"] == [] for r in body["items"].values()))
 
 
+def amend_main(repo, now, *argv):
+    with FR.isolated_bytecode(), mock.patch.object(run, "REPO", repo), mock.patch.object(run, "now", lambda: now):
+        return run.main(list(argv))
+
+
+def log_amendment(repo, file, line, t):
+    """run.py authorize --purpose amend, push, run.py amend, push (review round 10, F2)."""
+    amend_main(repo, t, "authorize", "--purpose", "amend")
+    aid = logs.read_lines(repo / ACCESS_LOG)[-1]["authorization_id"]
+    FR.commit_push(repo, FR.git_date(t + 60))
+    amend_main(repo, t + 120, "amend", "--authorization", aid, "--file", file, "--line", str(line))
+    FR.commit_push(repo, FR.git_date(t + 180))
+    return aid
+
+
 class ContextRefusals(unittest.TestCase):
     def ctx(self, repo):
         with FR.isolated_bytecode():
@@ -148,10 +163,60 @@ class ContextRefusals(unittest.TestCase):
             FR.sh(repo, "commit", "-q", "-m", "log", when="2026-10-03T00:00:00+00:00")
             with self.assertRaises(guards.Refused):      # committed, not pushed
                 self.ctx(repo)
+            # review round 10, H2: a locally moved tracking ref is not a push (git ls-remote disagrees)
+            pushed = FR.sh(repo, "rev-parse", "origin/main")
             FR.sh(repo, "update-ref", "refs/remotes/origin/main", "HEAD")
+            with self.assertRaisesRegex(guards.Refused, "remote's main"):
+                self.ctx(repo)
+            FR.sh(repo, "update-ref", "refs/remotes/origin/main", pushed)
+            FR.push(repo)
             self.ctx(repo)
             (repo / ACCESS_LOG).write_text("")            # a truncated log is refused the same way
             with self.assertRaises(guards.Refused):
+                self.ctx(repo)
+
+    def test_append_only_history_on_main(self):
+        # review round 10, M1: a pushed commit that removes a line (and the next that restores the current bytes)
+        # still leaves an edited version in origin/main's history, which is refused
+        with tempfile.TemporaryDirectory() as tmp:
+            repo = FR.build(tmp)["repo"]
+            logs.append_line(repo / RUN_LOG, {"stage": "development", "purpose": "fetch", "status": "failed"})
+            logs.append_line(repo / RUN_LOG, {"stage": "development", "purpose": "evaluate", "status": "complete"})
+            FR.commit_push(repo, "2026-10-03T00:00:00+00:00")
+            self.ctx(repo)
+            first = (repo / RUN_LOG).read_text().splitlines(keepends=True)[0]
+            (repo / RUN_LOG).write_text(first)
+            FR.commit_push(repo, "2026-10-03T01:00:00+00:00")
+            with self.assertRaisesRegex(guards.Refused, "edited, not appended"):
+                self.ctx(repo)
+        with tempfile.TemporaryDirectory() as tmp:
+            repo = FR.build(tmp)["repo"]
+            dev = {"number": 1, "kind": "ordinary", "cause": "synthetic"}
+            FR.write(repo / DEVIATIONS, json.dumps({"deviations": [dev]}))
+            FR.commit_push(repo, "2026-10-03T00:00:00+00:00")
+            FR.write(repo / DEVIATIONS, json.dumps({"deviations": [dev, {**dev, "number": 2}]}, indent=1))
+            FR.commit_push(repo, "2026-10-03T01:00:00+00:00")
+            self.ctx(repo)                                # the list grew; its bytes need not
+            FR.write(repo / DEVIATIONS, json.dumps({"deviations": [{**dev, "number": 2}]}))
+            FR.commit_push(repo, "2026-10-03T02:00:00+00:00")
+            with self.assertRaisesRegex(guards.Refused, "edited, not appended"):
+                self.ctx(repo)
+
+    def test_reach_times_come_from_signed_merge_commits(self):
+        # review round 10, M3: an amendment line whose first commit is not signed by the merge key has no recorded
+        # reach time, even if its committer date is early
+        with tempfile.TemporaryDirectory() as tmp:
+            repo = FR.build(tmp)["repo"]
+            ctx = self.ctx(repo)
+            s = ctx["cal"].offset(ctx["n0_pinned"], 10)
+            logs.append_line(repo / DATA_DIR / "session-calendar-amendments.jsonl",
+                             {"kind": "remove_session", "session": s, "source": "notice"})
+            FR.commit_push(repo, "2026-11-20T00:00:00+00:00", sign=False)
+            with self.assertRaisesRegex(guards.Refused, "not a merge commit signed"):
+                self.ctx(repo)
+        with tempfile.TemporaryDirectory() as tmp:
+            repo = FR.build(tmp, freeze_sign=False)["repo"]
+            with self.assertRaisesRegex(guards.Refused, "the freeze commit"):
                 self.ctx(repo)
 
     def test_the_protocol_that_runs_is_the_freeze_blob(self):
@@ -186,6 +251,19 @@ class ContextRefusals(unittest.TestCase):
             logs.append_line(cal_amend, {"kind": "remove_session", "session": n0, "source": "notice"})
             logs.append_line(cal_amend, {"kind": "remove_session", "session": removed, "source": "notice"})
             FR.commit_push(repo, "2026-11-20T00:00:00+00:00")   # before 09:30 ET of both sessions
+            # review round 10, F2: each line must also be logged in the access log under purpose 'amend'
+            with self.assertRaisesRegex(guards.Refused, "not logged in the access log under purpose 'amend'"):
+                self.ctx(repo)
+            t = logs.parse_utc("2026-11-20T01:00:00Z")
+            with self.assertRaises(gate.NoAuthorization):    # an 'amend' record runs only under its authorization
+                amend_main(repo, t, "amend", "--authorization", "amend-001", "--file", "calendar", "--line", "0")
+            log_amendment(repo, "calendar", 0, t)
+            with self.assertRaisesRegex(guards.Refused, "line 1: not logged"):
+                self.ctx(repo)
+            log_amendment(repo, "calendar", 1, t + 600)
+            rec = logs.read_lines(repo / ACCESS_LOG)[-1]
+            self.assertEqual((rec["amendment"]["file"], rec["amendment"]["line"], rec["amendment"]["source"]),
+                             ("session-calendar-amendments.jsonl", 1, "notice"))
             c2 = self.ctx(repo)
             self.assertFalse(c2["cal"].is_session(removed))
             self.assertEqual(c2["n0_pinned"], n0)                    # M-5: N0 keeps its freeze-time date
@@ -194,6 +272,16 @@ class ContextRefusals(unittest.TestCase):
             logs.append_line(cal_amend, {"kind": "remove_session", "session": late, "source": "notice"})
             FR.commit_push(repo, FR.git_date(ctx["cal"].at(late, "10:00")))   # after 09:30 ET of its session
             with self.assertRaises(guards.Refused):
+                self.ctx(repo)
+        with tempfile.TemporaryDirectory() as tmp:
+            # a line pushed in time whose 'amend' record reached origin/main after 09:30 ET of its session
+            repo = FR.build(tmp)["repo"]
+            s = ctx["cal"].offset(n0, 5)
+            logs.append_line(repo / DATA_DIR / "session-calendar-amendments.jsonl",
+                             {"kind": "remove_session", "session": s, "source": "notice"})
+            FR.commit_push(repo, "2026-11-20T00:00:00+00:00")
+            log_amendment(repo, "calendar", 0, ctx["cal"].at(s, "09:40"))
+            with self.assertRaisesRegex(guards.Refused, "'amend' record reached origin/main at or after"):
                 self.ctx(repo)
         with tempfile.TemporaryDirectory() as tmp:
             repo = FR.build(tmp)["repo"]
@@ -223,39 +311,121 @@ class ContextRefusals(unittest.TestCase):
             with self.assertRaises(guards.Refused):          # no pinned output
                 self.ctx(repo)
 
-    def test_transport_deviation_governs_only_when_committed_and_passing(self):
+    def test_transport_deviation_governs_only_with_its_logged_reproduction_check(self):
+        """Review round 10, H1 and F6: a transport deviation governs only when it cites the committed output of a
+        logged run.py transport-check run from its tree; a self-declared passes: true is refused."""
+        cal = synth.calendar()
+        market, symbols = build_market(cal)
+        enum = {"symbols": symbols, "actions": [], "active": symbols, "counts": {}}
         with tempfile.TemporaryDirectory() as tmp:
-            fx = FR.build(tmp)
-            repo = fx["repo"]
-            FR.write(repo / STUDY_PATH / "fetch" / "transport.py", "HOST = 'fixture-v2'\n")
+            fx = FR.build(tmp, enumeration=enum)
+            repo, snap = fx["repo"], str(Path(tmp) / "snap")
+
+            def main(*argv):
+                with FR.isolated_bytecode(), mock.patch.object(run, "REPO", repo), \
+                        mock.patch.object(run, "transports", lambda: transports(market)), \
+                        mock.patch.object(run, "clock", fixed_clock):
+                    return run.main(list(argv))
+            main("fetch", "--stage", "validation", "--enumeration", str(fx["enumeration"]), "--snapshot", snap)
+            sha = logs.read_lines(repo / RUN_LOG)[0]["input_snapshot_sha256s"][0]
             FR.commit_push(repo, "2027-01-04T00:00:00+00:00")
+            check = ["transport-check", "--stage", "validation", "--enumeration", str(fx["enumeration"]),
+                     "--snapshot", snap, "--sha", sha]
+            with self.assertRaises(guards.Refused):           # the pinned tree has nothing to check
+                main(*check)
+            FR.write(repo / STUDY_PATH / "fetch" / "transport.py", "HOST = 'fixture-v2'\n")
+            FR.commit_push(repo, "2027-01-04T01:00:00+00:00")
             with self.assertRaises(guards.Refused):
                 self.ctx(repo)
             new_tree = FR.sh(repo, "rev-parse", f"HEAD:{STUDY_PATH}")
             new_fetch = FR.sh(repo, "rev-parse", f"HEAD:{STUDY_PATH}/fetch")
-            dev = {"number": 1, "kind": "transport", "cause": "synthetic host change", "diff_reference": "HEAD",
-                   "new_tree": new_tree, "new_fetch_tree": new_fetch, "affected_stages": ["holdout"],
-                   "transport_check": {"passes": False}}
-            FR.write(repo / DEVIATIONS, json.dumps({"deviations": [dev]}))
-            FR.commit_push(repo, "2027-01-04T01:00:00+00:00")
-            with self.assertRaises(guards.Refused):           # its reproduction check did not pass
+            forged = {"number": 1, "kind": "transport", "cause": "synthetic host change", "diff_reference": "HEAD",
+                      "new_tree": new_tree, "new_fetch_tree": new_fetch, "affected_stages": ["holdout"],
+                      "transport_check": {"passes": True}}
+            FR.write(repo / DEVIATIONS, json.dumps({"deviations": [forged]}))
+            FR.commit_push(repo, "2027-01-04T02:00:00+00:00")
+            with self.assertRaises(guards.Refused):           # a self-declared pass without its logged output
                 self.ctx(repo)
-            dev["transport_check"] = {"passes": True}
-            FR.write(repo / DEVIATIONS, json.dumps({"deviations": [dev]}))
+            self.assertEqual(main(*check), 0)
+            rel = f"{RESULTS_DIR}/transport-check-{new_tree[:12]}.json"
+            body = json.loads((repo / rel).read_text())
+            self.assertTrue(body["passes"], body)
+            self.assertEqual((body["new_tree"], body["changed_paths"]), (new_tree, ["fetch/transport.py"]))
+            line = logs.read_lines(repo / RUN_LOG)[-1]
+            self.assertEqual((line["purpose"], line["study_tree"], line["results_sha256"]),
+                             ("transport_check", new_tree, canon.sha256_file(repo / rel)))
+            FR.commit_push(repo, "2027-01-04T03:00:00+00:00")
+            with self.assertRaises(runner.RunRefused):         # a tree's check runs once
+                main(*check)
+            wrong = {**forged, "number": 2, "transport_check": {"passes": True, "output_path": rel,
+                                                                 "output_sha256": "0" * 64}}
+            good = {**forged, "number": 3, "transport_check": {"passes": True, "output_path": rel,
+                                                                "output_sha256": canon.sha256_file(repo / rel)}}
+            FR.write(repo / DEVIATIONS, json.dumps({"deviations": [forged, wrong]}))
+            FR.commit_push(repo, "2027-01-04T04:00:00+00:00")
+            with self.assertRaises(guards.Refused):           # the output's sha256 differs
+                self.ctx(repo)
+            FR.write(repo / DEVIATIONS, json.dumps({"deviations": [forged, wrong, good]}))
             with self.assertRaises(guards.Refused):           # not yet committed and pushed
                 self.ctx(repo)
-            FR.commit_push(repo, "2027-01-04T02:00:00+00:00")
+            FR.commit_push(repo, "2027-01-04T05:00:00+00:00")
             ctx = self.ctx(repo)
-            self.assertEqual(ctx["transport_deviation"]["number"], 1)
+            self.assertEqual(ctx["transport_deviation"]["number"], 3)
             self.assertTrue(runner.transport_qualified(ctx, []))
             FR.write(repo / STUDY_PATH / "core" / "__init__.py", "# changed evaluation code\n")
-            FR.commit_push(repo, "2027-01-04T03:00:00+00:00")
+            FR.commit_push(repo, "2027-01-04T06:00:00+00:00")
             tree2 = FR.sh(repo, "rev-parse", f"HEAD:{STUDY_PATH}")
-            FR.write(repo / DEVIATIONS, json.dumps({"deviations": [dev, {**dev, "number": 2, "new_tree": tree2}]}))
-            FR.commit_push(repo, "2027-01-04T04:00:00+00:00")
+            FR.write(repo / DEVIATIONS, json.dumps({"deviations": [forged, wrong, good, {**good, "number": 4,
+                                                                                          "new_tree": tree2}]}))
+            FR.commit_push(repo, "2027-01-04T07:00:00+00:00")
             with self.assertRaises(guards.Refused):           # a change outside study/fetch/ is an ordinary deviation
                 self.ctx(repo)
 
+    def test_a_void_deviation_scores_validation_p_one(self):
+        """Review round 10, F4: a committed void deviation (a recorded pre-freeze read) makes every validation item
+        score p = 1, and the holdout gate refuses; a malformed void record is refused."""
+        cal = synth.calendar()
+        market, symbols = build_market(cal)
+        enum = {"symbols": symbols, "actions": [], "active": symbols, "counts": {}}
+        with tempfile.TemporaryDirectory() as tmp:
+            fx = FR.build(tmp, enumeration=enum)
+            repo, snap = fx["repo"], str(Path(tmp) / "snap")
+            FR.write(repo / DEVIATIONS, json.dumps({"deviations": [{"number": 1, "kind": "void", "scope": "later"}]}))
+            FR.commit_push(repo, "2026-11-01T00:00:00+00:00")
+            with self.assertRaisesRegex(guards.Refused, "void deviation"):
+                self.ctx(repo)
+            FR.write(repo / DEVIATIONS, json.dumps({"deviations": [
+                {"number": 1, "kind": "void", "scope": "later"},
+                {"number": 2, "kind": "void", "scope": "tests", "cause": "a synthetic pre-freeze read"}]}))
+            FR.commit_push(repo, "2026-11-01T01:00:00+00:00")
+            with self.assertRaisesRegex(guards.Refused, "void deviation"):    # the malformed record stays refused
+                self.ctx(repo)
+        with tempfile.TemporaryDirectory() as tmp:
+            fx = FR.build(tmp, enumeration=enum)
+            repo, snap = fx["repo"], str(Path(tmp) / "snap")
+            FR.write(repo / DEVIATIONS, json.dumps({"deviations": [
+                {"number": 1, "kind": "void", "scope": "tests", "cause": "a synthetic pre-freeze read"}]}))
+            FR.commit_push(repo, "2026-11-01T00:00:00+00:00")
+            self.assertEqual(self.ctx(repo)["voids"], frozenset({"tests"}))
+            fast = functools.partial(ST.evaluate_stage, B=200)
+            with FR.isolated_bytecode(), mock.patch.object(run, "REPO", repo), \
+                    mock.patch.object(run, "transports", lambda: transports(market)), \
+                    mock.patch.object(run, "clock", fixed_clock), \
+                    mock.patch.object(ST, "evaluate_stage", lambda *a, **k: fast(*a, **k)):
+                run.main(["fetch", "--stage", "validation", "--enumeration", str(fx["enumeration"]), "--snapshot", snap])
+                sha = logs.read_lines(repo / RUN_LOG)[0]["input_snapshot_sha256s"][0]
+                FR.commit_push(repo, "2026-12-01T01:00:00+00:00")
+                run.main(["evaluate", "--stage", "validation", "--enumeration", str(fx["enumeration"]), "--snapshot",
+                          snap, "--sha", sha])
+            body = json.loads((repo / RESULTS_DIR / "validation.json").read_text())
+            self.assertEqual(body["void"]["void_deviations"], ["tests"])
+            self.assertTrue(all(r["p_stage"] == 1.0 for r in body["items"].values()))
+            self.assertTrue(all(v == "underpowered" for v in body["labels"].values()))
+            FR.commit_push(repo, "2026-12-01T02:00:00+00:00")
+            from core import holdout
+            ctx = self.ctx(repo)
+            g = holdout.gate_context(ctx, "count", ctx["cal"].at("2027-12-10", "20:00"))
+            self.assertTrue(any("validation is void" in r for r in gate.evaluator_refusals(g)))
 
 if __name__ == "__main__":
     unittest.main()

@@ -5,6 +5,7 @@ to the real run log. Every date and number is synthetic.
 """
 from __future__ import annotations
 
+import atexit
 import contextlib
 import io
 import json
@@ -30,13 +31,46 @@ FEES_FIXTURE = {"sec_section31_usd_per_million_of_sales": [
     {"from": "2016-01-01", "to": "2028-12-31", "usd_per_share": 0.000119, "max_per_trade": 5.95, "source": "synthetic"}]}
 
 
-def sh(repo, *args, when: str | None = None) -> str:
-    env = {"GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@example.invalid", "GIT_COMMITTER_NAME": "t",
-           "GIT_COMMITTER_EMAIL": "t@example.invalid", "PATH": os.environ.get("PATH", "/usr/bin:/bin"),
-           "HOME": str(repo)}
+# Review round 10, M3: a synthetic merge key stands in for GitHub's web-flow key. It is generated once per test
+# process in a temporary keyring, and core.guards.MERGE_KEY points at it for every test that imports this module;
+# tests/test_guards.py verifies a real origin/main commit against the pinned key (guards.REAL_MERGE_KEY).
+_KEY: dict = {}
+PATH_ENV = os.environ.get("PATH", "/usr/bin:/bin")
+
+
+def merge_key() -> dict:
+    if not _KEY:
+        from core import guards
+        home = tempfile.mkdtemp(prefix="mover-v3-test-gnupg-")
+        os.chmod(home, 0o700)
+        (Path(home) / "gpg.conf").write_text("quiet\nno-greeting\ntrust-model always\n")
+        env = {"GNUPGHOME": home, "PATH": PATH_ENV}
+        subprocess.run(["gpg", "--batch", "--passphrase", "", "--quick-gen-key", "GitHub <noreply@github.com>",
+                        "ed25519", "sign", "never"], env=env, check=True, capture_output=True)
+        rows = subprocess.check_output(["gpg", "--batch", "--with-colons", "--list-secret-keys"], env=env, text=True)
+        fpr = next(line.split(":")[9] for line in rows.splitlines() if line.startswith("fpr:"))
+        pub = Path(home) / "merge-key.asc"
+        pub.write_bytes(subprocess.check_output(["gpg", "--batch", "--armor", "--export", fpr], env=env))
+        _KEY.update({"home": home, "fingerprint": fpr, "path": str(pub)})
+        atexit.register(_drop_keyring, home)
+        guards.MERGE_KEY = {"fingerprint": fpr, "committer_email": "noreply@github.com", "path": str(pub)}
+    return _KEY
+
+
+def _drop_keyring(home: str) -> None:
+    subprocess.run(["gpgconf", "--homedir", home, "--kill", "all"], capture_output=True)
+    shutil.rmtree(home, ignore_errors=True)
+
+
+def sh(repo, *args, when: str | None = None, sign: bool = True, committer=("GitHub", "noreply@github.com")) -> str:
+    key = merge_key()
+    env = {"GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@example.invalid", "GIT_COMMITTER_NAME": committer[0],
+           "GIT_COMMITTER_EMAIL": committer[1], "PATH": PATH_ENV, "HOME": str(repo), "GNUPGHOME": key["home"]}
     if when:
         env.update({"GIT_COMMITTER_DATE": when, "GIT_AUTHOR_DATE": when})
-    return subprocess.check_output(["git", "-C", str(repo), *args], text=True, env=env).strip()
+    pre = ["-c", "gpg.program=gpg", "-c", f"user.signingkey={key['fingerprint']}",
+           "-c", f"commit.gpgsign={'true' if sign else 'false'}"]
+    return subprocess.check_output(["git", "-C", str(repo), *pre, *args], text=True, env=env).strip()
 
 
 def git_date(epoch: float) -> str:
@@ -44,13 +78,29 @@ def git_date(epoch: float) -> str:
     return datetime.fromtimestamp(epoch, timezone.utc).isoformat()
 
 
-def commit_push(repo, when: str, message: str = "run") -> str:
-    """Commit everything and move origin/main to it (a push that reached main at `when`)."""
+def push(repo) -> str:
+    """Push HEAD to the fixture's bare origin and fetch it back, so origin/main and the remote's main agree."""
+    sh(repo, "push", "-q", "origin", "HEAD:main")
+    sh(repo, "fetch", "-q", "origin")
+    return sh(repo, "rev-parse", "HEAD")
+
+
+def commit_push(repo, when: str, message: str = "run", sign: bool = True) -> str:
+    """Commit everything, signed by the synthetic merge key, and push it (a merge that reached main at `when`)."""
     sh(repo, "add", "-A")
     if sh(repo, "status", "--porcelain"):
-        sh(repo, "commit", "-q", "-m", message, when=when)
-    sh(repo, "update-ref", "refs/remotes/origin/main", "HEAD")
-    return sh(repo, "rev-parse", "HEAD")
+        sh(repo, "commit", "-q", "-m", message, when=when, sign=sign)
+    return push(repo)
+
+
+def init_repo(repo: Path) -> Path:
+    """An empty repository with a bare origin beside it."""
+    repo.mkdir(parents=True)
+    origin = repo.parent / (repo.name + "-origin.git")
+    subprocess.run(["git", "init", "-q", "--bare", "-b", "main", str(origin)], check=True)
+    sh(repo, "init", "-q", "-b", "main")
+    sh(repo, "remote", "add", "origin", str(origin))
+    return repo
 
 
 @contextlib.contextmanager
@@ -77,11 +127,9 @@ def count_only_output(protocol: dict, enumeration_sha256: str, dropped=(), teste
 
 def build(tmp, *, enumeration: dict | None = None, freeze_when: str = "2026-10-02T21:30:00+00:00",
           cal_first: str = "2015-09-01", cal_last: str = "2028-12-29", frozen: bool = True,
-          coverage_decision=None, output_overrides: dict | None = None) -> dict:
+          coverage_decision=None, output_overrides: dict | None = None, freeze_sign: bool = True) -> dict:
     """Returns {"repo", "enumeration" (path), "protocol" (parsed frozen), "tree"}."""
-    repo = Path(tmp) / "repo"
-    repo.mkdir()
-    sh(repo, "init", "-q", "-b", "main")
+    repo = init_repo(Path(tmp) / "repo")
     write(repo / ".gitignore", (REAL / ".gitignore").read_text())
     study = repo / STUDY_PATH
     write(study / "core" / "__init__.py", "# fixture\n")
@@ -115,7 +163,10 @@ def build(tmp, *, enumeration: dict | None = None, freeze_when: str = "2026-10-0
             "dropped_years": [], "items_tested": True, "count_only_output": COUNT_ONLY_OUTPUT,
             "count_only_output_sha256": sha256_file(repo / COUNT_ONLY_OUTPUT)}
         write(repo / PROTOCOL_PATH, json.dumps(protocol, indent=1) + "\n")
-        commit_push(repo, freeze_when, "freeze")
+        commit_push(repo, freeze_when, "freeze", sign=freeze_sign)
     (repo / RESULTS_DIR).mkdir(parents=True, exist_ok=True)
     return {"repo": repo, "enumeration": enum_path, "protocol": protocol, "tree": tree,
             "protocol_sha256": sha256_bytes((repo / PROTOCOL_PATH).read_bytes())}
+
+
+merge_key()

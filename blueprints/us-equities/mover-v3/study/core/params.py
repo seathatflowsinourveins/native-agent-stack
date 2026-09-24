@@ -18,6 +18,7 @@ DEVIATIONS = "blueprints/us-equities/mover-v3/deviations.json"
 # refused by the atomic write itself (run_discipline.once; review round 9, F1 and F10).
 RESULTS_DIR = "blueprints/us-equities/mover-v3/results"
 COUNT_ONLY_OUTPUT = "blueprints/us-equities/mover-v3/results/count-only-output.json"
+DRY_RUN_OUTPUT = "blueprints/us-equities/mover-v3/results/dry-run-output.json"
 
 PARAMETERS = {
     "item_ids": ["H1-D", "H1-D-b_lane-low", "H3-a", "H3-b", "H3-c"],

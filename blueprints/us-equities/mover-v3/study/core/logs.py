@@ -6,7 +6,10 @@ Review round 8, R8-10: an amendment line must reach origin/main (the GitHub-reco
 session it concerns (a calendar line), or before the first holdout count or read that used its dates (a fee line).
 Review round 9, M-3 and F5: core.runner.context applies both checks before every run. A line's reach time is the
 committer time of the first first-parent commit of origin/main whose version of the file holds it (line_reach); the
-repository squash-merges, and GitHub sets a squash commit's committer time when it merges the pull request.
+repository squash-merges, and GitHub sets and signs a squash commit's committer time when it merges the pull request.
+Review round 10, M3: line_reach refuses a commit whose signature does not verify against the pinned web-flow key, so
+a client-set (backdated) committer time never counts. F2: every amendment line also needs an 'amend' access-log
+record that reached origin/main before the line's deadline (check_amend_logged).
 """
 from __future__ import annotations
 
@@ -116,17 +119,26 @@ def results_attempts(run_log: list, stage: str, purpose: str = "evaluate") -> li
 
 def line_reach(repo, path: str, ref: str = "origin/main") -> list:
     """[(commit, committer epoch)] per line of the append-only file at ref: the first first-parent commit of ref
-    whose version of the file holds that line."""
-    from core.guards import committed_bytes, git
+    whose version of the file holds that line. Each such commit must be a merge commit signed by the pinned merge
+    key, so the epoch is GitHub's recorded time (review round 10, M3)."""
+    from core.guards import committed_bytes, git, require_verified
     rows = git(repo, "log", "--first-parent", "--reverse", "--format=%H %ct", ref, "--", path).splitlines()
     out = []
     for row in rows:
         commit, ct = row.split()
         data = committed_bytes(repo, commit, path) or b""
         n = len([x for x in data.decode("utf-8").splitlines() if x.strip()])
+        if len(out) < n:
+            require_verified(repo, commit, f"a line of {path}")
         while len(out) < n:
             out.append((commit, int(ct)))
     return out
+
+
+def line_reach_of(repo, path: str, index: int, ref: str = "origin/main"):
+    """The committer epoch at which line `index` of the file first reached origin/main, or None."""
+    reach = line_reach(repo, path, ref)
+    return reach[index][1] if 0 <= index < len(reach) else None
 
 
 def fee_first_use(lines: list, run_log: list) -> dict:
@@ -142,3 +154,50 @@ def fee_first_use(lines: list, run_log: list) -> dict:
                 t = parse_utc(x["utc_start"])
                 out[i] = min(out.get(i, t), t)
     return out
+
+
+# ---------------------------------------------------------------- 'amend' records (review round 10, F2)
+
+def raw_lines(path) -> list:
+    """The non-empty lines of an append-only JSON-lines file, as bytes (the unit an 'amend' record cites)."""
+    p = Path(path)
+    if not p.exists():
+        return []
+    return [x for x in p.read_bytes().splitlines() if x.strip()]
+
+
+def amend_records(access_log: list) -> dict:
+    """{(amendment file name, line index): (access-log index, amendment)} for every complete completion of a granted
+    'amend' authorization (the first one per line)."""
+    granted = {r.get("authorization_id") for r in access_log if r.get("record_kind") == "authorization"
+               and r.get("decision") == "granted" and r.get("purpose") == "amend"}
+    out = {}
+    for i, r in enumerate(access_log):
+        a = r.get("amendment")
+        if r.get("record_kind") != "completion" or r.get("authorization_id") not in granted or \
+                r.get("status") != "complete" or not isinstance(a, dict):
+            continue
+        out.setdefault((a.get("file"), a.get("line")), (i, a))
+    return out
+
+
+def check_amend_logged(name: str, lines: list, raws: list, records: dict, access_reach: dict, deadlines: dict,
+                       pending_ok: bool = False) -> list:
+    """Every amendment line is logged in the access log under purpose 'amend' (session_calendar, cost_model.fees):
+    a completion that cites the file, the line index, the line's sha256 and its primary source, and whose record
+    reached origin/main before the line's deadline (deadlines: {line index: epoch or None}). pending_ok lets the
+    'amend' path itself run while a line awaits its record."""
+    refusals = []
+    for i, rec in enumerate(lines):
+        got = records.get((name, i))
+        if got is None:
+            if not pending_ok:
+                refusals.append(f"{name} line {i}: not logged in the access log under purpose 'amend'")
+            continue
+        idx, a = got
+        if a.get("line_sha256") != sha256_bytes(raws[i]) or a.get("source") != rec.get("source") or not a.get("source"):
+            refusals.append(f"{name} line {i}: its 'amend' record cites other bytes or another source")
+        t, deadline = access_reach.get(idx), deadlines.get(i)
+        if deadline is not None and (t is None or t >= deadline):
+            refusals.append(f"{name} line {i}: its 'amend' record reached origin/main at or after the line's deadline")
+    return refusals

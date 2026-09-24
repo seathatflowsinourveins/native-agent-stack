@@ -11,7 +11,10 @@ deviation of it (R8-4, H-2); the parameters equal the code's (R8-2); the runtime
 files equal their frozen sha256; the amendment files only grew, and every amendment line concerns a date on or after
 the freeze session and reached origin/main in time (R8-10, M-3, F5); coverage_decision agrees with the committed
 count-only output (F7). A stage is fetched once (with its single re-fetch) and evaluated into one results file at a
-fixed path, and a retry uses the same sealed snapshot (F1, M-4, F10).
+fixed path, and a retry uses the same sealed snapshot (F1, M-4, F10). Review round 10 adds the remote-main check
+(H2), the append-only history check (M1), signed reach times (M3), 'amend' records for amendment lines (F2), void
+deviations (F4), a bound transport-check output (H1) and the full runtime check (L3); check_clock refuses a holdout
+action whose local clock is earlier than origin/main's tip (M2).
 """
 from __future__ import annotations
 
@@ -70,23 +73,37 @@ def check_coverage_decision(repo, protocol: dict) -> dict:
                 "enumeration_sha256")}
 
 
-def context(repo, *, versions=None) -> dict:
+def context(repo, *, versions=None, amend_pending_ok: bool = False, transport_check: bool = False) -> dict:
+    """amend_pending_ok: the 'amend' authorization and record path, which runs while an amendment line awaits its
+    access-log record (review round 10, F2). transport_check: run.py transport-check, which runs from a tree that
+    differs from the pinned tree only under study/fetch/ before its deviation exists (H1, F6)."""
     repo = Path(repo)
     guards.check_bytecode_isolated()
     tree = guards.running_tree(repo)
+    guards.require_remote_main(repo)                   # review round 10, H2
     guards.require_on_main(repo, APPEND_ONLY)
+    guards.check_append_only_history(repo, APPEND_ONLY)   # review round 10, M1
     freeze_commit, freeze_ts = guards.freeze_commit(repo)
     pbytes, protocol = guards.frozen_protocol(repo, freeze_commit)
     guards.require_frozen(protocol)
-    deviation = guards.check_study_tree(repo, protocol, tree)
+    run_log = logs.read_lines(repo / RUN_LOG)
+    access_log = logs.read_lines(repo / ACCESS_LOG)
+    pinned_tree = protocol["run_discipline"]["study_code"]["tree"]
+    if transport_check:
+        if tree == pinned_tree or not guards.fetch_only_diff(repo, pinned_tree, tree):
+            raise guards.Refused("transport-check runs from a tree that differs from the pinned tree only under fetch/")
+        deviation = None
+    else:
+        deviation = guards.check_study_tree(repo, protocol, tree, run_log)
+    void_scopes = guards.voids(repo)                   # review round 10, F4
     guards.check_parameters(protocol)
     lock_path = repo / STUDY_PATH / "runtime.lock"
-    guards.check_runtime(guards.load_lock(lock_path), versions)
+    lock = guards.load_lock(lock_path)
+    guards.check_runtime(lock, versions)
     data = {name: sha256_file(repo / DATA_DIR / name) for name in DATA_FILES if (repo / DATA_DIR / name).exists()}
     frozen = (protocol.get("run_discipline", {}).get("study_code") or {}).get("data_file_sha256s") or {}
     if data != frozen:
         raise guards.Refused("a data file differs from its frozen sha256")
-    run_log = logs.read_lines(repo / RUN_LOG)
     amend = {n: repo / DATA_DIR / n for n in AMENDMENT_FILES}
     refusals = logs.check_amendment_files(amend, run_log)
     cal_path, fee_path = repo / DATA_DIR / DATA_FILES[0], repo / DATA_DIR / DATA_FILES[1]
@@ -96,43 +113,71 @@ def context(repo, *, versions=None) -> dict:
         raise guards.Refused("the pinned calendar has no session after the freeze commit")
     cal_lines, fee_lines = read_amendments(amend[AMENDMENT_FILES[0]]), read_amendments(amend[AMENDMENT_FILES[1]])
     reach = {n: {i: t for i, (_, t) in enumerate(logs.line_reach(repo, f"{DATA_DIR}/{n}"))} for n in AMENDMENT_FILES}
+    first_use = logs.fee_first_use(fee_lines, run_log)
     refusals += logs.check_calendar_amendments(cal_lines, reach[AMENDMENT_FILES[0]], pinned, freeze_session)
-    refusals += logs.check_fee_amendments(fee_lines, reach[AMENDMENT_FILES[1]], logs.fee_first_use(fee_lines, run_log),
-                                          freeze_session)
+    refusals += logs.check_fee_amendments(fee_lines, reach[AMENDMENT_FILES[1]], first_use, freeze_session)
+    # review round 10, F2: every amendment line is logged under purpose 'amend' before its deadline
+    records = logs.amend_records(access_log)
+    access_reach = {i: t for i, (_, t) in enumerate(logs.line_reach(repo, ACCESS_LOG))} if records else {}
+    deadlines = {AMENDMENT_FILES[0]: {i: (pinned.at(r["session"], "09:30") if r.get("session") and
+                                          pinned.is_session(r["session"]) else None) for i, r in enumerate(cal_lines)},
+                 AMENDMENT_FILES[1]: {i: first_use.get(i) for i in range(len(fee_lines))}}
+    for n, lines in ((AMENDMENT_FILES[0], cal_lines), (AMENDMENT_FILES[1], fee_lines)):
+        refusals += logs.check_amend_logged(n, lines, logs.raw_lines(amend[n]), records, access_reach, deadlines[n],
+                                            pending_ok=amend_pending_ok)
     if refusals:
         raise guards.Refused("; ".join(refusals))
     cal = Calendar.from_files(cal_path, amend[AMENDMENT_FILES[0]], freeze_session=freeze_session)
     fees = Fees.from_files(fee_path, amend[AMENDMENT_FILES[1]], freeze_session=freeze_session)
     coverage = check_coverage_decision(repo, protocol)
+    tip = guards.git(repo, "rev-parse", guards.MAIN)
     from datetime import datetime, timezone
     return {"repo": repo, "protocol": protocol, "protocol_sha256": sha256_bytes(pbytes), "tree": tree,
-            "pinned_tree": protocol["run_discipline"]["study_code"]["tree"], "transport_deviation": deviation,
+            "pinned_tree": pinned_tree, "transport_deviation": deviation, "voids": void_scopes,
             "commit": guards.git(repo, "rev-parse", "HEAD"), "freeze_commit": freeze_commit, "freeze_ts": freeze_ts,
             "freeze_utc": datetime.fromtimestamp(freeze_ts, timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
             "freeze_session": freeze_session, "n0_pinned": CH.n0(pinned, freeze_ts), "pinned_cal": pinned,
             "cal": cal, "fees": fees, "cells": monotone(load_table(repo / COST_TABLE["path"])), "coverage": coverage,
-            "runtime_lock_sha256": sha256_file(lock_path), "data_file_sha256s": data,
+            "runtime_lock_sha256": sha256_file(lock_path), "runtime_environment_sha256": guards.environment_digest(lock),
+            "data_file_sha256s": data,
             "amendment_files": {n: logs.file_state(p) for n, p in amend.items()}, "run_log": run_log,
-            "access_log": logs.read_lines(repo / ACCESS_LOG)}
+            "access_log": access_log,
+            "main_tip_time": guards.commit_time(repo, tip) if guards.verified_merge(repo, tip) else None}
+
+
+def check_clock(ctx: dict, now: float) -> None:
+    """Review round 10, M2: a holdout decision never uses a local time earlier than the GitHub-recorded time of
+    origin/main's tip (a signed merge commit), so setting the clock back below the last push is refused."""
+    t = ctx.get("main_tip_time")
+    if t is None:
+        raise guards.Refused("origin/main's tip is not a signed merge commit: no recorded time bounds the clock")
+    if now < t:
+        raise guards.Refused("the local clock is earlier than origin/main's tip commit time")
 
 
 def count_only_context(repo, *, versions=None) -> dict:
-    """The pre-freeze count-only path: a committed, clean study tree, the pinned runtime, and a protocol and run log
-    that equal HEAD. The protocol is still a draft here, so require_frozen does not apply; the coverage_rule hash is
-    checked by the count-only code before any fetch or read (coverage_rule.decided_by_code)."""
+    """The pre-freeze count-only and dry-run path: a committed, clean study tree reachable from origin/main, the
+    pinned runtime, and a protocol and run log that equal origin/main (review round 10, L1: not only HEAD), with the
+    remote's main checked by git ls-remote. The protocol is still a draft here, so require_frozen does not apply;
+    the coverage_rule hash is checked by the count-only code before any fetch or read
+    (coverage_rule.decided_by_code)."""
     repo = Path(repo)
     guards.check_bytecode_isolated()
     tree = guards.running_tree(repo)
+    guards.require_remote_main(repo)
+    guards.require_on_main(repo, (PROTOCOL_PATH, RUN_LOG))
+    guards.check_append_only_history(repo, (RUN_LOG,))
     for p in (PROTOCOL_PATH, RUN_LOG):
         local = repo / p
         if (local.read_bytes() if local.exists() else None) != guards.committed_bytes(repo, "HEAD", p):
             raise guards.Refused(f"{p} differs from HEAD: the count-only code runs from committed files")
     lock_path = repo / STUDY_PATH / "runtime.lock"
-    guards.check_runtime(guards.load_lock(lock_path), versions)
+    lock = guards.load_lock(lock_path)
+    guards.check_runtime(lock, versions)
     pbytes = (repo / PROTOCOL_PATH).read_bytes()
     return {"repo": repo, "protocol": json.loads(pbytes), "protocol_sha256": sha256_bytes(pbytes), "tree": tree,
             "commit": guards.git(repo, "rev-parse", "HEAD"), "runtime_lock_sha256": sha256_file(lock_path),
-            "run_log": logs.read_lines(repo / RUN_LOG)}
+            "runtime_environment_sha256": guards.environment_digest(lock), "run_log": logs.read_lines(repo / RUN_LOG)}
 
 
 # ---------------------------------------------------------------- run-log lines
@@ -151,7 +196,8 @@ def run_line(ctx: dict, *, stage, purpose, commit, utc_start, utc_end, snapshots
             "study_tree": ctx["tree"], "runtime_lock_sha256": ctx["runtime_lock_sha256"],
             "protocol_sha256": ctx["protocol_sha256"], "data_file_sha256s": ctx.get("data_file_sha256s", {}),
             "amendment_files": ctx.get("amendment_files", {}), "input_snapshot_sha256s": list(snapshots),
-            "status": status, "results_sha256": results_sha256}
+            "status": status, "results_sha256": results_sha256,
+            "runtime_environment_sha256": ctx.get("runtime_environment_sha256")}
     line.update(extra or {})
     return line
 

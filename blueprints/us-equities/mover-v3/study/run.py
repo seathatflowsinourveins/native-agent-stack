@@ -3,17 +3,21 @@
 core.runner.context (after the freeze) or core.runner.count_only_context (the pre-freeze count-only run).
 
   run.py build-calendar --first 2015-09-01 --last YYYY-MM-DD --out data/session-calendar.json
-  run.py count-only --snapshot-root DIR --rate-per-minute N --rate-source TEXT          (pre-freeze, runs once)
+  run.py count-only --snapshot-root DIR          (pre-freeze, runs once; the rate limit is the protocol's)
+  run.py dry-run --sessions D1,D2 --symbols A,B --snapshot-root DIR     (pre-freeze native dry run, runs once)
   run.py fetch --stage development|validation --enumeration ENUM.json --snapshot DIR    (once per stage)
   run.py evaluate --stage development|validation --enumeration ENUM.json --snapshot DIR --sha SHA
-  run.py authorize --purpose collect|count|read [--retry-of ID]          (appends the authorization record)
+  run.py transport-check --stage development|validation --enumeration ENUM.json --snapshot DIR --sha SHA
+  run.py authorize --purpose collect|amend|count|read [--retry-of ID]   (appends the authorization record)
+  run.py amend --authorization ID --file calendar|fees --line N          (logs one amendment line)
   run.py collect --authorization ID --last YYYY-MM-DD --accrual-log FILE --snapshot-root DIR
-  run.py count --authorization ID --snapshot-root DIR                    (holdout count, integers only)
-  run.py read --authorization ID --snapshot-root DIR                     (the single holdout read)
+  run.py count --authorization ID --snapshot-root DIR     (holdout count: first run fetches, second counts)
+  run.py read --authorization ID --snapshot-root DIR      (the single holdout read: first run fetches, second reads)
 
 Results files have fixed paths under blueprints/us-equities/mover-v3/results/. Every run appends its run-log line
 (and a holdout action its completion record); the next run refuses until those lines are committed and pushed.
 Run it as `python -I -B run.py` (study/runtime.lock run_command): the script reads no bytecode cache from the tree.
+The fetch transport runs in a child process (core/transport_proc.py); this process never imports study/fetch/.
 """
 from __future__ import annotations
 
@@ -36,9 +40,10 @@ REPO = HERE.parents[3]
 
 
 def transports() -> dict:
-    """The data and trading hosts (the asset master is a trading-API endpoint)."""
-    from fetch.transport import TRADING_HOST, Transport
-    return {"data": Transport(), "trading": Transport(host=TRADING_HOST)}
+    """The data and trading hosts (the asset master is a trading-API endpoint), served by a child process that alone
+    imports study/fetch/ (review round 10, H1)."""
+    from core import transport_proc
+    return transport_proc.transports()
 
 
 def now() -> float:
@@ -78,6 +83,7 @@ def cmd_count_only(a) -> int:
     from core.params import COUNT_ONLY_OUTPUT, DATA_DIR, RUN_LOG
     ctx = runner.count_only_context(REPO)
     checked_thresholds(ctx["protocol"])       # before any fetch or read
+    rate = count_only.pinned_rate_limit(ctx["protocol"])   # review round 10, L1: pinned before the run
     if any(x.get("purpose") == "count_only" and x.get("status") == "complete" for x in ctx["run_log"]):
         raise runner.RunRefused("the count-only code runs once; a rerun follows only a failed or incomplete run")
     out_path = REPO / COUNT_ONLY_OUTPUT
@@ -86,10 +92,9 @@ def cmd_count_only(a) -> int:
     cal = CAL.Calendar.from_files(REPO / DATA_DIR / "session-calendar.json")
     start, status, digest, out = clock(), "failed", None, None
     try:
-        out = count_only.run(ctx["protocol"], cal, transports(), a.snapshot_root, start[:10], a.rate_per_minute,
+        out = count_only.run(ctx["protocol"], cal, transports(), a.snapshot_root, start[:10], rate["per_minute"],
                              clock=clock)
-        out.update({"study_tree": ctx["tree"], "code_revision": ctx["commit"],
-                    "rate_limit": {"per_minute": a.rate_per_minute, "source": a.rate_source}})
+        out.update({"study_tree": ctx["tree"], "code_revision": ctx["commit"], "rate_limit": rate})
         digest = atomic_write_results(out_path, out)
         status = "complete"
     finally:
@@ -100,6 +105,74 @@ def cmd_count_only(a) -> int:
             snapshots=list((out or {}).get("snapshots", {}).values()), status=status, results_sha256=digest,
             extra={"coverage_rule_sha256": rule_sha256(ctx["protocol"]), "output_path": COUNT_ONLY_OUTPUT}))
     print(json.dumps({"output_sha256": digest, "item_rule": out["item_rule"]}, sort_keys=True))
+    return 0
+
+
+def cmd_dry_run(a) -> int:
+    """freeze_preconditions: the native dry run of the fetch plumbing on an already exposed window outside every v3
+    window, counts only, into results/dry-run-output.json with its run-log line (review round 10, F6)."""
+    from core import count_only, logs, runner
+    from core import calendar as CAL
+    from core.canon import atomic_write_results, sha256_file
+    from core.params import DATA_DIR, DRY_RUN_OUTPUT, RUN_LOG
+    ctx = runner.count_only_context(REPO)
+    sessions, symbols = a.sessions.split(","), a.symbols.split(",")
+    count_only.check_dry_run_window(sessions)
+    out_path = REPO / DRY_RUN_OUTPUT
+    if out_path.exists() or any(x.get("purpose") == "dry_run" and x.get("status") == "complete" for x in ctx["run_log"]):
+        raise runner.RunRefused("the native dry run has its output; it runs once")
+    cal = CAL.Calendar.from_files(REPO / DATA_DIR / "session-calendar.json")
+    start, status, digest, out = clock(), "failed", None, None
+    try:
+        out = count_only.dry_run(cal, sessions, symbols, transports(), a.snapshot_root, start[:10], clock=clock)
+        out.update({"study_tree": ctx["tree"], "code_revision": ctx["commit"]})
+        digest = atomic_write_results(out_path, out)
+        status = "complete"
+    finally:
+        if digest is None and out_path.exists():
+            status, digest = "complete", sha256_file(out_path)
+        logs.append_line(REPO / RUN_LOG, runner.run_line(
+            ctx, stage="pre_freeze", purpose="dry_run", commit=ctx["commit"], utc_start=start, utc_end=clock(),
+            snapshots=[out["snapshot_sha256"]] if out else [], status=status, results_sha256=digest,
+            extra={"output_path": DRY_RUN_OUTPUT, "sessions": sessions, "symbols_count": len(symbols)}))
+    print(json.dumps({"output_sha256": digest}, sort_keys=True))
+    return 0
+
+
+def cmd_transport_check(a) -> int:
+    """run_discipline.transport_deviations: the reproduction check of a tree that differs from the pinned tree only
+    under study/fetch/, against a stage's sealed snapshot, into results/transport-check-<tree>.json with its run-log
+    line. A transport deviation governs only when it cites this output by path and sha256 (review round 10, H1)."""
+    from core import guards, logs, runner, stage as ST, transport_check
+    from core.canon import atomic_write_results, sha256_file
+    from core.params import RESULTS_DIR, RUN_LOG
+    from core.store import Store
+    ctx = runner.context(REPO, transport_check=True)
+    spec = _spec(ctx, a.stage, a.enumeration)
+    line = runner.fetch_line_for(ctx["run_log"], a.stage, a.sha)
+    if line is None or line.get("status") != "complete":
+        raise runner.RunRefused(f"{a.sha} is not the snapshot sealed by {a.stage}'s logged fetch")
+    rel = f"{RESULTS_DIR}/transport-check-{ctx['tree'][:12]}.json"
+    out_path = REPO / rel
+    if out_path.exists():
+        raise runner.RunRefused(f"{rel} exists: a tree's reproduction check runs once")
+    store = Store.read(a.snapshot, a.sha)
+    changed = guards.git(REPO, "diff-tree", "-r", "--name-only", ctx["pinned_tree"], ctx["tree"]).splitlines()
+    start, status, digest = clock(), "failed", None
+    try:
+        res = transport_check.reproduction_check(ST.planner(spec), store, transports(), changed, "fetch")
+        res.update({"kind": "mover_v3_transport_check", "new_tree": ctx["tree"], "pinned_tree": ctx["pinned_tree"],
+                    "new_fetch_tree": guards.git(REPO, "rev-parse", f"HEAD:{guards.STUDY_PATH}/fetch"),
+                    "stage": a.stage, "snapshot_sha256": a.sha, "changed_paths": changed})
+        digest = atomic_write_results(out_path, res)
+        status = "complete"
+    finally:
+        if digest is None and out_path.exists():
+            status, digest = "complete", sha256_file(out_path)
+        logs.append_line(REPO / RUN_LOG, runner.run_line(
+            ctx, stage=a.stage, purpose="transport_check", commit=ctx["commit"], utc_start=start, utc_end=clock(),
+            snapshots=[a.sha], status=status, results_sha256=digest, extra={"output_path": rel}))
+    print(json.dumps({"output_path": rel, "output_sha256": digest, "passes": res.get("passes")}, sort_keys=True))
     return 0
 
 
@@ -119,12 +192,14 @@ def cmd_evaluate(a) -> int:
     cov = ctx["coverage"]
     ident = {"rate": cov["identity_unreached_rate_2020"]} if (a.stage == "validation"
                                                                and cov["validation_identity_limited"]) else None
+    # review round 10, F4: a committed void deviation (a recorded pre-freeze read) scores every validation item p = 1
+    voided = sorted(ctx["voids"] & {"tests", "validation"}) if a.stage == "validation" else []
 
     def compute_for(store, fetch_line):
         quals = ("transport-deviation",) if runner.transport_qualified(ctx, [fetch_line]) else ()
         return ST.evaluate_stage(spec, store, ctx["protocol"]["id"], tested=cov["items_tested"],
-                                 void={"void": bool(fetch_line.get("stage_void")),
-                                       "rate": fetch_line.get("fetch_incomplete_rate")},
+                                 void={"void": bool(fetch_line.get("stage_void")) or bool(voided),
+                                       "rate": fetch_line.get("fetch_incomplete_rate"), "void_deviations": voided},
                                  qualifiers=quals, identity_limited=ident)
     out = runner.evaluate_run(ctx, a.stage, a.snapshot, a.sha, compute_for, clock)
     print(json.dumps(out, sort_keys=True))
@@ -133,7 +208,14 @@ def cmd_evaluate(a) -> int:
 
 def cmd_authorize(a) -> int:
     from core import holdout, runner
-    rec = holdout.authorize(runner.context(REPO), a.purpose, now(), a.retry_of)
+    rec = holdout.authorize(runner.context(REPO, amend_pending_ok=a.purpose == "amend"), a.purpose, now(), a.retry_of)
+    print(json.dumps(rec, sort_keys=True))
+    return 0
+
+
+def cmd_amend(a) -> int:
+    from core import holdout, runner
+    rec = holdout.amend(runner.context(REPO, amend_pending_ok=True), a.authorization, a.file, a.line, now())
     print(json.dumps(rec, sort_keys=True))
     return 0
 
@@ -170,18 +252,24 @@ def main(argv=None) -> int:
     b.add_argument("--out", required=True)
     c = sub.add_parser("count-only")
     c.add_argument("--snapshot-root", required=True)
-    c.add_argument("--rate-per-minute", type=float, required=True)
-    c.add_argument("--rate-source", required=True)
-    for name in ("fetch", "evaluate"):
+    d = sub.add_parser("dry-run")
+    d.add_argument("--sessions", required=True)
+    d.add_argument("--symbols", required=True)
+    d.add_argument("--snapshot-root", required=True)
+    for name in ("fetch", "evaluate", "transport-check"):
         p = sub.add_parser(name)
         p.add_argument("--stage", choices=("development", "validation"), required=True)
         p.add_argument("--enumeration", required=True)
         p.add_argument("--snapshot", required=True)
-        if name == "evaluate":
+        if name in ("evaluate", "transport-check"):
             p.add_argument("--sha", required=True)
     z = sub.add_parser("authorize")
-    z.add_argument("--purpose", choices=("collect", "count", "read"), required=True)
+    z.add_argument("--purpose", choices=("collect", "amend", "count", "read"), required=True)
     z.add_argument("--retry-of", default=None)
+    m = sub.add_parser("amend")
+    m.add_argument("--authorization", required=True)
+    m.add_argument("--file", choices=("calendar", "fees"), required=True)
+    m.add_argument("--line", type=int, required=True)
     for name in ("collect", "count", "read"):
         p = sub.add_parser(name)
         p.add_argument("--authorization", required=True)
@@ -190,8 +278,9 @@ def main(argv=None) -> int:
             p.add_argument("--last", required=True)
             p.add_argument("--accrual-log", required=True)
     a = ap.parse_args(argv)
-    return {"build-calendar": cmd_build_calendar, "count-only": cmd_count_only, "fetch": cmd_fetch,
-            "evaluate": cmd_evaluate, "authorize": cmd_authorize, "collect": cmd_collect, "count": cmd_count,
+    return {"build-calendar": cmd_build_calendar, "count-only": cmd_count_only, "dry-run": cmd_dry_run,
+            "fetch": cmd_fetch, "evaluate": cmd_evaluate, "transport-check": cmd_transport_check,
+            "authorize": cmd_authorize, "amend": cmd_amend, "collect": cmd_collect, "count": cmd_count,
             "read": cmd_read}[a.cmd](a)
 
 

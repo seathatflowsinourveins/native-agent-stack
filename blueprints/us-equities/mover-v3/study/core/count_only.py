@@ -169,26 +169,31 @@ def part1_counts(store, cal, sessions: list, symbols: list, actions: list) -> di
                         c[y]["_unreached:" + x] = 1
                 if not b:
                     continue
-                c[y]["with_daily_bar"] += 1
-                c[y][f"with_daily_bar:{ex}"] += 1
+                # every part-1 output is counted per year and, as '<name>:<listing exchange>', per exchange
+                # (pre_freeze_access_path.outputs; review round 10, F9)
+
+                def tally(name, ex=ex, y=y):
+                    c[y][name] += 1
+                    c[y][f"{name}:{ex}"] += 1
+                tally("with_daily_bar")
                 f_t = FM.share_factor(raw.get(x, {}), split.get(x, {}), prev, s)
                 prev_b = raw.get(x, {}).get(prev)
                 suspected = FM.suspected_unadjusted_split(b["c"], prev_b["c"] if prev_b else None, f_t)
                 # the candidate count applies D's floor to the accepted official close only, never to the raw daily
                 # close, so a pair with raw close < $1 and official close >= $1 still counts (review round 9, L-3)
                 if not suspected and _sampled_candidate(x, s, prev, pr, f_t):
-                    c[y]["sampled_candidates"] += 1
+                    tally("sampled_candidates")
                 if b["c"] < 1.0:
                     continue
-                c[y]["with_bar_close_ge_1"] += 1
+                tally("with_bar_close_ge_1")
                 label_c = FM.close_label(pr.get(s))
                 label_o = official_price(pr.get(s), "o")[1] or "no_print"
-                c[y][f"close_label:{label_c}"] += 1
-                c[y][f"open_label:{label_o}"] += 1
+                tally(f"close_label:{label_c}")
+                tally(f"open_label:{label_o}")
                 if FM.official_close(pr.get(s)) is not None:
-                    c[y]["accepted_official_close"] += 1
+                    tally("accepted_official_close")
                 if suspected:
-                    c[y]["suspected_unadjusted_split"] += 1
+                    tally("suspected_unadjusted_split")
     return c
 
 
@@ -309,9 +314,22 @@ def probe_counts(store, cal, probes: dict) -> dict:
 
 # ---------------------------------------------------------------- native dry run (freeze_preconditions, E4)
 
+DRY_RUN_WINDOW = ("2021-01-04", "2024-10-31")   # after validation, before the holdout breakpoint screen
+
+
+def check_dry_run_window(sessions: list) -> None:
+    """The dry run reads only an already exposed window outside every v3 stage: 2021-01-04 .. 2024-10-31 (the
+    holdout breakpoint screen starts 2024-11-01), including the E+5 search window of its last session."""
+    bad = [s for s in sessions if not DRY_RUN_WINDOW[0] <= s <= "2024-10-17"]
+    if not sessions or bad:
+        raise ValueError(f"dry-run sessions must lie in {DRY_RUN_WINDOW[0]} .. 2024-10-17 (so every window ends "
+                         f"before {DRY_RUN_WINDOW[1]}): {bad[:5]}")
+
+
 def dry_run_requests(cal, sessions: list, symbols: list) -> list:
     """The plumbing check on an already exposed window: the screen of each session, and for each (symbol, session)
-    the per-event requests and the b_lane entry and first exit windows, with asof = the session."""
+    the per-event requests, the b_lane entry window and every forward exit window (W0 with the prevailing-quote
+    lookback, W1 and the search windows E+1 .. E+5; review round 10, F6), with asof = the session."""
     out = []
     for s in sessions:
         out.extend(plan.screen_requests(cal, s, symbols))
@@ -320,9 +338,24 @@ def dry_run_requests(cal, sessions: list, symbols: list) -> list:
             out.extend(plan.event_requests(cal, x, s, end))
             out.append(plan.entry_window(cal, x, s, "b_lane"))
             e, stamp, _ = plan.planned_exit(cal, s, "b_lane", end)
-            w = plan.exit_windows(cal, e, stamp)[0]
-            out.append(plan.quote_request("quote_exit", x, s, w[0], w[1]))
+            for w in plan.exit_windows(cal, e, stamp):
+                out.append(plan.quote_request("quote_exit", x, s, w[0], w[1]))
     return sorted({r["key"]: r for r in out}.values(), key=lambda r: r["key"])
+
+
+def dry_run(cal, sessions: list, symbols: list, transports: dict, snapshot_root, fetch_date: str,
+            clock=driver.utc_now) -> dict:
+    """freeze_preconditions: the native dry run through core/driver.py and the transport, sealed, re-read from the
+    seal and counted (counts only; run.py dry-run writes the output with its run-log line)."""
+    check_dry_run_window(sessions)
+    store = Store()
+    root = Path(snapshot_root) / "dry-run"
+    res = driver.stage_fetch(lambda st: dry_run_requests(cal, sessions, symbols), transports, store, fetch_date,
+                             clock=clock)
+    sha = store.write(root)
+    return {"kind": "mover_v3_dry_run_output", "snapshot_sha256": sha, "sessions": list(sessions),
+            "symbols_count": len(symbols), "counts": dry_run_counts(Store.read(root, sha)),
+            "incomplete_by_kind": res["incomplete_by_kind"]}
 
 
 def dry_run_counts(store) -> dict:
@@ -390,6 +423,18 @@ def part1_planner(cal, sessions: list, symbols: list):
                 reqs += part1_phase2(cal, s, [x for x in batch if (raw.get(x, {}).get(s) or {}).get("c", 0) >= 1.0])
         return reqs
     return requests
+
+
+def pinned_rate_limit(protocol: dict) -> dict:
+    """exposure_registry.pre_freeze_access_path.rate_limit: the provider's documented rate limit and its source,
+    committed in the protocol before the count-only run (review round 10, L1). It decides fetch_margin, so it is not a
+    command-line input."""
+    rl = ((protocol.get("exposure_registry") or {}).get("pre_freeze_access_path") or {}).get("rate_limit") or {}
+    per, src = rl.get("per_minute"), rl.get("source")
+    if isinstance(per, bool) or not isinstance(per, (int, float)) or per <= 0 or not isinstance(src, str) or not src:
+        raise ValueError("pre_freeze_access_path.rate_limit needs a positive per_minute and its source before the "
+                         "count-only run")
+    return {"per_minute": float(per), "source": src}
 
 
 def fetch_estimate(cal, n_symbols: int, k_by_year: dict, rate_per_minute: float) -> dict:
