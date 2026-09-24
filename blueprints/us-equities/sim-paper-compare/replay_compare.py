@@ -29,38 +29,41 @@ Two behaviors of the pinned engine (nautilus_trader==2.0.0rc5) materially affect
 the latency sweep's numbers must be read; both are disclosed rather than hidden:
 
 1. **StaticLatencyModel does not guarantee matching at exactly submit + latency,
-   and the eligible settlement events are not limited to that instrument's own
-   quotes -- but not just any event on another instrument counts, specifically.**
-   The pinned engine's `advance_time_impl` processes each due *timer* (an order
-   command's own scheduled decision/settlement, e.g. another order's submit or
-   cancel being applied) as a settlement event for *all* instruments' outstanding
-   deferred commands, not only the timer's own instrument (see
-   `crates/backtest/src/engine.rs` L1559-1585 for timer collection across the
-   whole engine and L1716-1747 for command processing at that point, commit
+   and there are exactly two kinds of eligible settlement event -- not just any
+   event on another instrument.** A deferred (latency-delayed) command settles at
+   the first of: (a) an event on *that order's own instrument* (its own next
+   quote -- this is what a sparse-quote symbol falls back to), or (b) *any* due
+   clock timer processed by the engine, from *any* source, including one with no
+   order effect at all -- the pinned engine's `advance_time_impl` collects every
+   due timer at each processed event and settles *all* instruments' outstanding
+   deferred commands together at that point (see `crates/backtest/src/engine.rs`
+   L1559-1585 for timer collection across the whole engine and L1716-1747 for
+   command processing at that point, commit
    1b0a49d2792a9432a3aca3fcb617ce7a630d905e of
-   https://github.com/nautechsystems/nautilus_trader). **A plain market-data quote
-   for a different instrument does not do this** -- it is not a timer and does not
-   trigger cross-instrument settlement. Concretely (both verified on the pinned
-   runtime): order A (quotes at 0ms/100ms) submitted at 10ms with 20ms latency
-   (modeled arrival 30ms) fills at **100ms** (its own next quote) if order B (a
-   different instrument) merely *has a quote* at 50ms with no order of its own;
-   it instead fills at **50ms**, against its existing book, if order B is
-   *submitted* at 50ms -- B's own decision timer, not B's quote, is what processes
-   A's already-due deferred command, well before A's own next quote at 100ms and
-   without needing an A-specific event anywhere near 30ms. Matching happens at the
-   first settlement event *at or after* submit + latency for that order, which can
-   be triggered by another order's timer specifically, not only that order's own
-   next quote and not any market-data event on another instrument -- and always
-   against the book as of that settlement instant, not a book frozen at exactly
-   submit + latency. When quotes for a symbol are sparse and no other order's
-   timer intervenes, the actual match can land well after the modeled arrival
-   instant purely from that symbol's own quotes (order 3 in the retained receipt
-   fills 266.9ms after its modeled 5ms arrival, and 466.4ms after its modeled
-   650ms arrival). One consequence: the
-   fill-price/fill-time columns at a given sweep latency are not a clean function
-   of that latency alone. This is disclosed here rather than worked around with
-   synthetic arrival-time wakeups, which would need their own validation against
-   sparse-quote symbols and multi-instrument settlement interaction.
+   https://github.com/nautechsystems/nautilus_trader). Concretely (all verified
+   on the pinned runtime): order A (quotes at 0ms/100ms) submitted at 10ms with
+   20ms latency (modeled arrival 30ms) fills at **100ms** (its own next quote,
+   trigger (a)) if order B (a different instrument) merely *has a quote* at 50ms
+   with no order of its own -- **a plain market-data quote for a different
+   instrument, alone, does not settle A**, since it is neither A's own instrument
+   nor a timer. It instead fills at **50ms** if order B is *submitted* at 50ms
+   (B's own decision timer, trigger (b)), and fills at **50ms** even with no
+   order B at all, given only a bare no-op clock timer scheduled at 50ms with no
+   order effect whatsoever -- confirming (b) is genuinely "any due timer," not
+   specifically an order-command one. Matching happens at the first settlement
+   event *at or after* submit + latency for that order, whichever trigger reaches
+   it first, and always against the book as of that settlement instant, not a
+   book frozen at exactly submit + latency. When quotes for a symbol are sparse
+   and no timer intervenes first, the actual match can land well after the
+   modeled arrival instant purely from that symbol's own quotes -- trigger (a) --
+   which is exactly what produces order 3's lag in the retained receipt: it fills
+   266.9ms after its modeled 5ms arrival, and 466.4ms after its modeled 650ms
+   arrival, because no earlier timer happened to intervene and no GOOGL quote
+   arrived any sooner. One consequence: the fill-price/fill-time columns at a
+   given sweep latency are not a clean function of that latency alone. This is
+   disclosed here rather than worked around with synthetic arrival-time wakeups,
+   which would need their own validation against sparse-quote symbols and
+   multi-instrument settlement interaction.
 2. **The declared per-order marketable-window boundary (e.g. "order 4 stops being
    marketable at submit + 69.273ms", derived directly from the fetched SIP quotes) is
    corroborating evidence, not the reported flip point.** The receipt's
@@ -665,7 +668,8 @@ def summarize_sim_order(order) -> dict:
 
 
 def run_replay(paper_orders: list[dict], quotes_by_symbol: dict[str, list[dict]], *, out_dir: Path,
-                cancel_resolution: dict | None = None, latency_ns: int = 0, queue_position: bool = False) -> dict:
+                cancel_resolution: dict | None = None, latency_ns: int = 0, queue_position: bool = False,
+                extra_timers_ns: tuple[int, ...] = ()) -> dict:
     from nautilus_trader.backtest import BacktestEngine
     from nautilus_trader.common import LogLevel
     from nautilus_trader.config import BacktestEngineConfig, LoggerConfig, StrategyConfig
@@ -715,6 +719,13 @@ def run_replay(paper_orders: list[dict], quotes_by_symbol: dict[str, list[dict]]
             # to the decision itself rather than to the polling granularity).
             for i, d in enumerate(self.decisions):
                 self.clock.set_time_alert_ns(f"decision-{i}", d["ts_ns"], lambda event, d=d: self._apply(d))
+            # Test-only hook (empty by default in normal use): schedules bare
+            # no-op timers with no order effect, to directly verify the module
+            # docstring's claim that *any* due clock timer -- not specifically an
+            # order-command one -- settles all instruments' outstanding deferred
+            # commands. See tests.test_sim_paper_compare.PinnedRuntimeTests.
+            for i, ts_ns in enumerate(extra_timers_ns):
+                self.clock.set_time_alert_ns(f"noop-timer-{i}", ts_ns, lambda event: None)
 
         def on_stop(self):
             for order in list(self.cache.orders_open()):
@@ -1059,6 +1070,10 @@ def main(argv=None) -> int:
     # print() appends a trailing newline; stdout_sha256 must hash exactly the bytes
     # actually written to stdout, not the pre-newline JSON string.
     stdout_bytes = (json.dumps(summary, indent=2) + "\n").encode()
+    # Computed once, used identically for both stdout_sha256_basis (below) and the
+    # actual write (further below) -- see the comment at stdout_sha256_basis for
+    # why `hasattr(sys.stdout, "buffer")` alone would be the wrong check.
+    stdout_buffer = getattr(sys.stdout, "buffer", None)
     completed_utc = datetime.now(UTC).isoformat()
 
     receipt = {
@@ -1112,12 +1127,14 @@ def main(argv=None) -> int:
                               {"class": "StaticLatencyModel", "base_latency_nanos": replay_result["engine"]["latency_ns"]},
             "latency_model_semantics": "the pinned engine processes a deferred (latency-delayed) command at "
                                         "the first settlement event at or after submit + latency, not "
-                                        "necessarily exactly at that instant; a settlement event is a due "
-                                        "order-command timer (any order's submit/cancel being applied), which "
-                                        "settles all instruments' outstanding deferred commands together, not "
-                                        "only that timer's own instrument -- a plain market-data quote for "
-                                        "another instrument is not a timer and does not trigger this; see "
-                                        "module docstring.",
+                                        "necessarily exactly at that instant; a settlement event is either "
+                                        "(a) the next event on that order's own instrument (its own next "
+                                        "quote), or (b) any due clock timer the engine processes -- from any "
+                                        "source, including one with no order effect at all -- which settles "
+                                        "all instruments' outstanding deferred commands together, not only "
+                                        "that timer's own instrument; a plain market-data quote for a "
+                                        "*different* instrument is neither of these and does not by itself "
+                                        "trigger settlement; see module docstring.",
             "reports": replay_result["reports"],
         },
         "results": comparison,
@@ -1141,23 +1158,27 @@ def main(argv=None) -> int:
         "completed_utc": completed_utc,
         "argv": redact_args(args),
         "stdout_sha256": digest_bytes(stdout_bytes),
-        # When stdout exposes a binary `.buffer` (the normal case for a real
-        # process), that buffer is written to directly and stdout_sha256 hashes
-        # exactly those bytes -- no encoding or newline translation can intervene.
-        # When it does not (e.g. unittest's `-b` output-capture StringIO, which has
-        # no `.buffer` at all), text-mode `.write()` is used instead, and
-        # stdout_sha256 is only a hash of the UTF-8, LF-normalized text -- it is
-        # not a guarantee about the exact bytes some other text stream (e.g. one
-        # opened with `newline="\r\n"`) would actually emit.
-        "stdout_sha256_basis": "exact_bytes_written" if hasattr(sys.stdout, "buffer") else
-                                "utf8_lf_normalized_text",
+        # When stdout exposes a binary `.buffer` that is actually not None (the
+        # normal case for a real process), that buffer is written to directly and
+        # stdout_sha256 hashes exactly those bytes -- no encoding or newline
+        # translation can intervene. `hasattr(sys.stdout, "buffer")` alone is not
+        # the right check here: a wrapper can have a `.buffer` attribute that is
+        # itself None, in which case the write path below falls through to
+        # text-mode `.write()` -- the exact same condition (`stdout_buffer is not
+        # None`, computed once) must gate both the basis recorded here and the
+        # write below, or the two could disagree about which path was taken. When
+        # there is no usable buffer (e.g. unittest's `-b` output-capture StringIO,
+        # which has no `.buffer` attribute at all), stdout_sha256 is only a hash
+        # of the UTF-8, LF-normalized text -- it is not a guarantee about the
+        # exact bytes some other text stream (e.g. one opened with
+        # `newline="\r\n"`) would actually emit.
+        "stdout_sha256_basis": "exact_bytes_written" if stdout_buffer is not None else "utf8_lf_normalized_text",
         "runner_sha256": digest_path(Path(__file__)),
     }
     # The receipt is saved before stdout is written: it is the durable evidence
     # artifact, and a stdout write failure downstream (e.g. a closed pipe) should
     # not be allowed to leave a successful run with no receipt on disk.
     save(args.receipt, receipt)
-    stdout_buffer = getattr(sys.stdout, "buffer", None)
     if stdout_buffer is not None:
         stdout_buffer.write(stdout_bytes)
     else:

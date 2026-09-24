@@ -128,37 +128,41 @@ not depend on it (see below).
 
 The pinned engine (nautilus_trader==2.0.0rc5) does **not** guarantee that a
 `StaticLatencyModel`-delayed command is processed at exactly `submit +
-latency`, and the eligible settlement events are **not limited to that
-order's own instrument's quotes -- but specifically to due order-command
-timers, not to any event on another instrument**. Per the engine's own source
-(`crates/backtest/src/engine.rs` L1559-1585 for timer collection across the
-whole engine and L1716-1747 for command processing at that point, commit
+latency`. There are exactly **two** kinds of eligible settlement event -- not
+just any event on another instrument: **(a)** the next event on that order's
+*own instrument* (its own next quote -- what a sparse-quote symbol falls back
+to), or **(b)** *any* due clock timer the engine processes, from *any*
+source, including one with no order effect at all. Per the engine's own
+source (`crates/backtest/src/engine.rs` L1559-1585 for timer collection
+across the whole engine and L1716-1747 for command processing at that point,
+commit
 [1b0a49d2792a9432a3aca3fcb617ce7a630d905e](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/backtest/src/engine.rs#L1559-L1747)),
-`advance_time_impl` processes each due timer (another order's own submit or
-cancel command being applied) as a settlement point for *all* instruments'
-outstanding deferred commands, not only that timer's own instrument. **A plain
-market-data quote for a different instrument, with no order of its own, does
-not do this.** Concretely (both verified on the pinned runtime, see
+`advance_time_impl` collects every due timer at each processed event and
+settles *all* instruments' outstanding deferred commands together at that
+point -- not only that timer's own instrument, and not only timers tied to an
+order command. **A plain market-data quote for a *different* instrument,
+alone, does not do this** -- it is neither trigger (a) nor (b). Concretely
+(all verified on the pinned runtime, see
 `tests.test_sim_paper_compare.PinnedRuntimeTests`): order A (quotes at
-0ms/100ms) submitted at 10ms with 20ms latency (modeled arrival 30ms) fills at
-**100ms** (its own next quote) if order B (a *different* instrument) merely
-*has a quote* at 50ms with no order of its own -- a foreign quote alone does
-not settle A. It instead fills at **50ms**, against its existing book, if
-order B is *submitted* at 50ms -- B's own decision timer, not B's quote, is
-what processes A's already-due deferred command, well before A's own next
-quote at 100ms and without needing any A-specific event anywhere near 30ms.
+0ms/100ms) submitted at 10ms with 20ms latency (modeled arrival 30ms) fills
+at **100ms** (its own next quote, trigger (a)) if order B (a *different*
+instrument) merely *has a quote* at 50ms with no order of its own -- a
+foreign quote alone does not settle A. It instead fills at **50ms** if order
+B is *submitted* at 50ms (B's own decision timer, trigger (b)) -- and fills
+at **50ms** even with *no order B at all*, given only a bare no-op clock
+timer scheduled at 50ms with no order effect whatsoever, confirming trigger
+(b) is genuinely "any due timer," not specifically an order-command one.
 Matching happens at the first settlement event *at or after* submit +
-latency, which can be triggered by another order's timer specifically, not
-only that order's own next quote and not any market-data event on another
-instrument -- and always against the book as of that settlement instant, not
-a book frozen at exactly `submit + latency`.
+latency for that order, whichever trigger reaches it first, and always
+against the book as of that settlement instant, not a book frozen at exactly
+`submit + latency`.
 
-When quotes for a symbol are sparse (with no other order's timer to bring
-settlement forward), the actual processing instant can land well after the
-modeled arrival instant purely from that symbol's own quotes: in this
-receipt, order 3 (GOOGL) fills **266.9ms** after its modeled 5ms arrival, and
-**466.4ms** after its modeled 650ms arrival, because no GOOGL quote arrived
-any sooner and no other order's timer intervened. At the 100ms sweep point,
+When quotes for a symbol are sparse and no timer intervenes first, the actual
+processing instant can land well after the modeled arrival instant purely
+from that symbol's own quotes (trigger (a)): in this receipt, order 3
+(GOOGL) fills **266.9ms** after its modeled 5ms arrival, and **466.4ms**
+after its modeled 650ms arrival, because no earlier timer happened to
+intervene and no GOOGL quote arrived any sooner. At the 100ms sweep point,
 order 2 (INTC) fills at 120.54, while the book *at exactly submit + 100ms*
 (16:47:43.244353Z) was still bid 120.55/ask 120.57 (the same book as at the
 neighboring 70ms and 250ms sweep points, where order 2 fills at 120.55) --
@@ -280,7 +284,7 @@ numbers that look like measurements but pair unrelated events -- as large as
 **Cancel-request matching is by open-order uniqueness across the whole trial,
 not positional and not limited to canceled orders.** `requests[]` has no
 `client_order_id` and no symbol, so a cancel request cannot be attributed to
-a specific order directly. `resolve_cancel_timestamps()` uses a sound rule
+a specific order directly. `resolve_cancel_timestamps()` uses this rule
 instead of a chronological-order heuristic: a cancel request at time T is
 attributed to order O only if O is the *unique* order that is open (submitted
 by T, and not yet terminal -- a filled order is terminal at its reported
@@ -297,10 +301,52 @@ the tied-input-order case, where two same-symbol orders are both open at T
 and the correct answer, "ambiguous," must not depend on which one happens to
 sort first; the previous rule's positional tie-break did). Any failed
 validation falls back to `submit + order_timeout_seconds` for *all* canceled
-orders in the trial,
-rather than guessing. `clock_provenance()`'s submit-timestamp pairing is
-similarly count-checked (`counts_match` in the receipt) before any offsets
-are reported.
+orders in the trial, rather than guessing. `clock_provenance()`'s
+submit-timestamp pairing is similarly count-checked (`counts_match` in the
+receipt) before any offsets are reported.
+
+**This rule is not unconditionally correct -- it is sound only under three
+assumptions**, none of which is checked by the code: (1) each canceled order
+has *exactly one* cancel-request log entry (not zero, not more than one); (2)
+no order is canceled broker-side *without* a corresponding logged request
+(e.g. a risk halt, a session close, or any other non-request-driven
+cancellation the runner doesn't log as a `"cancel"` request); and (3) the
+host and broker clocks are aligned within whatever tolerance separates two
+genuinely-open orders' windows -- see "Clock sources and provenance" above
+for this trial's measured (lower-bound) offset. Two constructed
+counterexamples show why each assumption matters, not just in the abstract:
+
+- **(a) A repeated DELETE, paired with the wrong order.** Order X is
+  submitted, a cancel is requested for it at 10s, and (for whatever reason --
+  a retry, a stale UI action) a *second* cancel request for X is logged at
+  12s. Meanwhile order W, submitted at 11s, is canceled broker-side with *no*
+  logged request at all (assumption (2) violated). At the 12s request, W is
+  the *only* order that looks open (X, per this algorithm, was already
+  resolved by the 10s request and is now terminal) -- so the 12s DELETE gets
+  paired with W, not with its actual (second) request for X. This is a
+  repeated-DELETE case (assumption (1) violated) compounding a broker-side,
+  unlogged cancellation (assumption (2)).
+- **(b) A DELETE that loses the race to a fill, inside the clock-offset
+  window.** A cancel request is logged (host clock) for an order that
+  actually fills a few milliseconds later (broker clock). If that fill lands
+  within the measured **≥41ms** host-clock lead documented above, the
+  fill-vs-cancel ordering as seen through the two different clocks can
+  disagree, and a request that (on the broker's clock) arrived *after* the
+  fill could still look, on the host clock, like it preceded it -- letting a
+  request meant for a now-filled order masquerade as available for a
+  different, genuinely-canceled one.
+
+Both failure modes trace back to the same root cause: `requests[]` records
+neither `client_order_id` nor symbol. Logging `client_order_id` on cancel
+requests (`adaptive-paper/transport.py:502` calls `self.before_request(kind)`
+with no order identifier at all) would remove this heuristic entirely and
+let cancels be paired directly, with no assumptions needed. **This retained
+receipt is unaffected by either counterexample**: order 4 is the *only* open
+order at its cancel-request time in this trial (verified, not assumed --
+there is no other order, of any symbol, open at that instant), so neither a
+repeated-DELETE nor a race-lost-fill scenario is even reachable here. A
+future trial with overlapping open orders near a cancel boundary could hit
+either one, and should not assume this rule's soundness without checking.
 
 ## Reuse and methodology
 
@@ -361,7 +407,9 @@ are reported.
   (`resolve_cancel_timestamps()`) when the number of recorded cancel requests
   matches the number of canceled orders *and* every request maps to a unique
   open order across the whole trial that is a canceled order (see "Clock
-  sources and provenance" above); falls back to `submitted_at + order_timeout_seconds`
+  sources and provenance" above -- including the three assumptions this rule
+  depends on and is not checked against, and the two constructed
+  counterexamples that show why); falls back to `submitted_at + order_timeout_seconds`
   (the runner's own cancel-on-timeout rule, with `order_timeout_seconds` read
   from the config file whose sha256 matches this trial's `ingest-receipt.json`)
   whenever that doesn't hold. Neither branch infers a cancel time from a
@@ -432,12 +480,14 @@ repository, and the run refuses to write into one that already has files in
 it. **Do not point `--receipt` at the committed path to "reproduce" it** --
 that overwrites the evidence you're trying to check. Instead point `--receipt`
 at a scratch path (as above) and diff it against the committed receipt,
-ignoring only the run-local `started_utc`/`completed_utc`/`argv`/`stdout_sha256`
-fields (which necessarily differ between runs/hosts). Pass the scratch
-receipt's path as an argument, rather than interpolating an environment
-variable inside a quoted heredoc (which a shell will not expand and Python
-will not read automatically -- either read it from the environment inside
-Python, or pass it as `argv`, as below):
+ignoring only the run-local `started_utc`/`completed_utc`/`argv`/`stdout_sha256`/
+`stdout_sha256_basis` fields (which necessarily differ between runs/hosts --
+`stdout_sha256` differs because the receipt path itself is part of the hashed
+summary, and `stdout_sha256_basis` depends on the invoking process's own stdout,
+not on this script). Pass the scratch receipt's path as an argument, rather
+than interpolating an environment variable inside a quoted heredoc (which a
+shell will not expand and Python will not read automatically -- either read it
+from the environment inside Python, or pass it as `argv`, as below):
 
 ```sh
 python3 - "$PRIVATE_CACHE_DIR/scratch-receipt.json" <<'PY'
@@ -445,7 +495,7 @@ import json
 import sys
 a = json.load(open("blueprints/us-equities/sim-paper-compare/receipts/20260923g-main-passed.json"))
 b = json.load(open(sys.argv[1]))
-for k in ("started_utc", "completed_utc", "argv", "stdout_sha256"):
+for k in ("started_utc", "completed_utc", "argv", "stdout_sha256", "stdout_sha256_basis"):
     a.pop(k, None); b.pop(k, None)
 print("EQUAL" if a == b else "DIFFER")
 PY

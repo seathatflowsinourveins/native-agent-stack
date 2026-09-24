@@ -189,15 +189,14 @@ class CancelTimestampResolutionTests(unittest.TestCase):
         self.assertEqual(resolved["b"]["cancel_ts_ns"], 5_500_000_000)
 
     def test_two_requests_matching_the_same_order_leave_another_order_unmatched_and_are_refused(self):
-        # X (submitted 1s) is the only order open at both request times (2s, 3s);
-        # Y is not submitted until 10s, so neither request could plausibly be for
-        # Y. Both requests therefore uniquely match X (individually valid, per
-        # request), but that leaves Y with no match at all -- count(canceled)=2
-        # still equals count(cancel_reqs)=2, so this can only be caught by
-        # checking the *accumulated* pairing against every canceled order, not by
-        # any single request's own uniqueness check. Must refuse (and must not
-        # raise -- a missing key would otherwise surface as an exception, not a
-        # graceful, observable fallback).
+        # X (submitted 1s) is open at the first request (2s) and uniquely matches
+        # it; Y is not submitted until 10s. Once X is resolved by that first match,
+        # X is terminal for the *second* request (3s) too -- and Y still isn't
+        # open yet -- so the second request actually finds *zero* open orders and
+        # is refused by the primary per-request uniqueness check, not by the
+        # accumulated-pairing check (count(canceled)=2 never even gets compared
+        # against a completed pairing here, since the loop breaks on the second
+        # request). Must refuse (and must not raise).
         base = {"symbol": "AAPL", "side": "BUY", "qty": 1, "limit_price": "1", "time_in_force": "DAY",
                 "filled_qty": 0, "filled_avg_price": None, "filled_at_ns": None}
         orders = [
@@ -1233,6 +1232,29 @@ class PinnedRuntimeTests(unittest.TestCase):
         self.assertEqual(sim_a["status"], "FILLED")
         self.assertEqual(sim_a["fill_ts_ns"], t0 + 100_000_000)  # A's own next quote, not BBBB's 50ms quote
 
+    def test_a_bare_no_op_timer_alone_settles_a_pending_order(self):
+        # Same A as the two tests above (quotes 0ms/100ms, submitted at 10ms, 20ms
+        # latency, modeled arrival 30ms; fills at 100ms with no other trigger), but
+        # with no order B at all -- just a bare no-op clock timer scheduled at
+        # 50ms via run_replay's extra_timers_ns test hook, with no order effect
+        # whatsoever. This confirms trigger (b) in the module docstring is
+        # genuinely "any due timer the engine processes," not specifically an
+        # order-command timer: A's fill moves from 100ms to 50ms purely because
+        # the engine collected and processed the no-op timer.
+        t0 = 7_600_000_000_000
+        quotes = {"AAAA": [
+            {"symbol": "AAAA", "ts_ns": t0, "bid": "9.90", "ask": "10.00", "bid_size": 100, "ask_size": 100},
+            {"symbol": "AAAA", "ts_ns": t0 + 100_000_000, "bid": "9.90", "ask": "10.00", "bid_size": 100, "ask_size": 100},
+        ]}
+        order_a = {"client_order_id": "a-03", "symbol": "AAAA", "side": "BUY", "qty": 1, "limit_price": "10.00",
+                   "time_in_force": "DAY", "status": "filled", "filled_qty": 1, "filled_avg_price": None,
+                   "submitted_at_ns": t0 + 10_000_000, "filled_at_ns": None}
+        result = C.run_replay([order_a], quotes, out_dir=self.tmp / "noop-timer", latency_ns=20_000_000,
+                               extra_timers_ns=(t0 + 50_000_000,))
+        sim_a = result["sim_by_id"]["a-03"]
+        self.assertEqual(sim_a["status"], "FILLED")
+        self.assertEqual(sim_a["fill_ts_ns"], t0 + 50_000_000)  # the no-op timer, not A's own 100ms quote
+
     def test_latency_lower_bounds_the_fill_time_and_settles_at_the_first_eligible_event(self):
         # Magnitude test: a fill must not happen before submit + configured latency,
         # and (with no other order's timer to bring settlement forward) must happen
@@ -1494,6 +1516,46 @@ class MainReplayNoCredentialTests(unittest.TestCase):
         self.assertEqual(hashlib.sha256(written).hexdigest(), receipt["stdout_sha256"])
         self.assertEqual(receipt["stdout_sha256_basis"], "exact_bytes_written")
         self.assertNotIn(b"\r\n", written)  # proves .buffer.write() was used, not the mangling .write()
+
+    def test_stdout_sha256_basis_is_text_when_buffer_attribute_exists_but_is_none(self):
+        # Regression for `hasattr(sys.stdout, "buffer")` alone: a wrapper can have
+        # a `.buffer` attribute that is present but set to None (unlike a real
+        # stdout or io.StringIO, which either has a working buffer or lacks the
+        # attribute entirely). `hasattr(...)` would wrongly report True here and
+        # claim "exact_bytes_written" while main() actually falls through to
+        # text-mode `.write()` -- the recorded basis and the actual write path
+        # must agree.
+        import hashlib
+
+        class FakeStdoutBufferIsNone:
+            buffer = None
+
+            def __init__(self):
+                self.written = []
+
+            def write(self, s):
+                self.written.append(s)
+
+        tmp = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, tmp, ignore_errors=True)
+        real_pages = Path.home() / ".local/state/native-agent-stack/sim-paper/pages"
+        if not real_pages.exists():
+            self.skipTest("retained page cache not present on this host")
+        argv = ["--trial", str(TRIAL), "--pages", str(real_pages), "--out", str(tmp / "out"),
+                "--replay", "--receipt", str(tmp / "receipt.json")]
+        fake_stdout = FakeStdoutBufferIsNone()
+        self.assertTrue(hasattr(fake_stdout, "buffer"))  # the misleading check this test guards against
+        real_stdout = sys.stdout
+        sys.stdout = fake_stdout
+        try:
+            rc = C.main(argv)
+        finally:
+            sys.stdout = real_stdout
+        self.assertEqual(rc, 0)
+        receipt = json.loads((tmp / "receipt.json").read_text())
+        written = "".join(fake_stdout.written).encode()
+        self.assertEqual(hashlib.sha256(written).hexdigest(), receipt["stdout_sha256"])
+        self.assertEqual(receipt["stdout_sha256_basis"], "utf8_lf_normalized_text")
 
     def test_umask_is_restored_after_main_returns(self):
         tmp = Path(tempfile.mkdtemp())
