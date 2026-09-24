@@ -158,9 +158,11 @@ def _call_reads(name, inputs, cwd) -> tuple:
 
     def expands(value):
         # Claude Code trims a path, then expands a leading '~', while the transcript keeps the raw text (round 9, F1;
-        # round 10, TA10-1): a value trim() would change, one starting with '~' or one holding '$' is never checked
-        # as written, it flags.
-        if value.strip(JS_TRIM) != value or value.startswith("~") or "$" in value:
+        # round 10, TA10-1). Glob also trims an absolute pattern's base, the text up to its first wildcard's last
+        # '/', so '<export>/.. /*' lists the export's parent (round 11, NORM11-1). A value with a '/'-separated
+        # component trim() would change (which covers the whole value's ends), one starting with '~' or one
+        # holding '$' is never checked as written, it flags.
+        if any(part.strip(JS_TRIM) != part for part in value.split("/")) or value.startswith("~") or "$" in value:
             reasons.append(f"{name} path {value!r} is changed by the runtime (whitespace, home or variable) "
                            "before it opens it")
             return True

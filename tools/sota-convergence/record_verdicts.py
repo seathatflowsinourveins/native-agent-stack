@@ -163,6 +163,16 @@ CODEX_LANE_FILES = {"codex_lane_py_sha256": "tools/sota-convergence/codex_lane.p
                     "prompt_sha256": "tools/sota-convergence/lane-prompt.md"}
 # The transcript audit a new-wave Claude return's provenance must hash to, in the checkout being recorded.
 CLAUDE_LANE_FILES = {"transcript_audit_py_sha256": "tools/sota-convergence/transcript_audit.py"}
+# The adjudication code a new-wave adjudication's provenance must hash to, in the checkout being recorded
+# (adjudicate.adjudication_provenance's files; round 11, RR11-3).
+ADJUDICATION_FILES = {"adjudicate_py_sha256": "tools/sota-convergence/adjudicate.py",
+                      "codex_lane_py_sha256": "tools/sota-convergence/codex_lane.py",
+                      "prompt_sha256": "tools/sota-convergence/adjudication-prompt.md",
+                      "judge_schema_sha256": "tools/sota-convergence/adjudication-judge.schema.json",
+                      "refute_schema_sha256": "tools/sota-convergence/adjudication-refute.schema.json",
+                      "workflow_sha256": "tools/sota-convergence/adjudication-lane.js",
+                      "adjudicator_role_sha256": "examples/claude-native/agents/blind-adjudicator.md",
+                      "transcript_audit_py_sha256": "tools/sota-convergence/transcript_audit.py"}
 
 
 def current_hashes(root: Path, files: dict) -> dict:
@@ -173,12 +183,13 @@ def current_hashes(root: Path, files: dict) -> dict:
 def load_lane_code(root: Path) -> dict:
     """What a new-wave return's provenance is checked against at record time: the registered
     lane code (scripts/landscape.py LANE_PROVENANCE_REGISTRY, which CI re-checks), the vendored
-    workflow SHA256SUMS and this checkout's current codex_lane.py / lane-prompt.md and
-    transcript_audit.py hashes."""
+    workflow SHA256SUMS and this checkout's current codex_lane.py / lane-prompt.md,
+    transcript_audit.py and adjudication code hashes."""
     return {"registry": load_lane_provenance_registry(root),
             "vendored_sums": parse_sha256sums(root / VENDORED_WORKFLOW_SUMS),
             "codex_current": current_hashes(root, CODEX_LANE_FILES),
-            "claude_current": current_hashes(root, CLAUDE_LANE_FILES)}
+            "claude_current": current_hashes(root, CLAUDE_LANE_FILES),
+            "adjudication_current": current_hashes(root, ADJUDICATION_FILES)}
 
 
 def _schema_properties():
@@ -919,6 +930,18 @@ def process_row(row: dict, root: Path, catalog: str, layer_id: str, work_dir: Pa
                 rejections.append({"catalog": catalog, "layer_id": layer_id, "lane": "adjudication",
                                    "reason": f"the adjudication {binding}"})
                 adjudication = None
+            else:
+                # Registered history stays valid for CI; a new record comes from this checkout's code (RR11-3).
+                provenance = adjudication["raw"].get("provenance") or {}
+                current_code = (lane_code or {}).get("adjudication_current", {})
+                stale = [relative for field, relative in ADJUDICATION_FILES.items()
+                         if current_code.get(field) != provenance.get(field)]
+                if stale:
+                    rejections.append({"catalog": catalog, "layer_id": layer_id, "lane": "adjudication",
+                                       "reason": "the adjudication's provenance is not the sha256 of this "
+                                                 f"checkout's {', '.join(stale)}: it was produced by other "
+                                                 "adjudication code"})
+                    adjudication = None
         if adjudication is not None:
             try:
                 adjudication_text = sealed_text(adjudication["raw"])

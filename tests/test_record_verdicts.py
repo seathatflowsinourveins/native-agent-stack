@@ -1414,13 +1414,17 @@ VENDORED_WORKFLOW = "examples/claude-native/workflows/layer-verdict-lane.js"
 SOURCE_WORKFLOW = ".claude/workflows/layer-verdict-lane.js"
 AGENT_SHA256 = "e" * 64  # the fixture's registered blind-lane-reviewer definition hash
 REPO_TREE_SHA256 = "7" * 64  # the evidence tree both fixture lanes read (not registered: it varies per run)
-# The fixture's registered adjudication code (lane-provenance.json "adjudication").
-ADJUDICATION_CODE = {key: "f" * 64 for key in ("adjudicate_py_sha256", "codex_lane_py_sha256", "prompt_sha256",
-                                               "judge_schema_sha256", "refute_schema_sha256", "workflow_sha256",
-                                               "adjudicator_role_sha256", "transcript_audit_py_sha256")}
 # The fixture root's own transcript_audit.py: a Claude return's provenance must hash to it.
 TRANSCRIPT_AUDIT_BYTES = b"# fixture transcript_audit.py\n"
 TRANSCRIPT_AUDIT_SHA256 = hashlib.sha256(TRANSCRIPT_AUDIT_BYTES).hexdigest()
+# The fixture root's own adjudication code, registered as lane-provenance.json "adjudication": an adjudication's
+# provenance must hash to these files at record time (round 11, RR11-3).
+ADJUDICATION_BYTES = {relative: {"tools/sota-convergence/codex_lane.py": CODEX_LANE_BYTES,
+                                 "tools/sota-convergence/transcript_audit.py": TRANSCRIPT_AUDIT_BYTES}.get(
+                                     relative, f"# fixture {relative}\n".encode("utf-8"))
+                      for relative in record_verdicts.ADJUDICATION_FILES.values()}
+ADJUDICATION_CODE = {field: hashlib.sha256(ADJUDICATION_BYTES[relative]).hexdigest()
+                     for field, relative in record_verdicts.ADJUDICATION_FILES.items()}
 
 
 def lane_provenance(lane):
@@ -1487,6 +1491,9 @@ def prepare_new_wave_root(fixture):
     (tools / "codex_lane.py").write_bytes(CODEX_LANE_BYTES)
     (tools / "lane-prompt.md").write_bytes(LANE_PROMPT_BYTES)
     (tools / "transcript_audit.py").write_bytes(TRANSCRIPT_AUDIT_BYTES)
+    for relative, data in ADJUDICATION_BYTES.items():
+        (fixture.root / relative).parent.mkdir(parents=True, exist_ok=True)
+        (fixture.root / relative).write_bytes(data)
     fixture.write("tools/sota-convergence/lane-provenance.json", {
         "schema_version": 1,
         "claude": [{"workflow_path": SOURCE_WORKFLOW, "vendored_path": VENDORED_WORKFLOW,
@@ -1835,6 +1842,18 @@ class NewWaveLaneIdentityTests(NewWaveFixture):
         code, output = self.run_wave(adjudications=adjudications)
         self.assertEqual(code, 1, output)
         self.assertIn("adjudication code not listed", output)
+
+    def test_an_adjudication_from_registered_but_superseded_code_is_rejected(self):
+        # Round 11, RR11-3: registered history stays valid for CI, but a new record comes from the current code.
+        (self.root / "tools/sota-convergence/adjudication-prompt.md").write_bytes(b"# edited after the judges ran\n")
+        catalog = self.both_lanes("wave-crossfamily-layer", codex_winner="c2")
+        adjudications = self.work_dir / "adjudications"
+        write_adjudication(adjudications, catalog, "wave-crossfamily-layer", cross_family("claude", self.digest))
+        code, output = self.run_wave(adjudications=adjudications)
+        self.assertEqual(code, 1, output)
+        self.assertIn("foundation__wave-crossfamily-layer [adjudication]", output)
+        self.assertIn("tools/sota-convergence/adjudication-prompt.md", output)
+        self.assertNotEqual(self.load_row(catalog, "wave-crossfamily-layer")["verdict_status"], "recorded")
 
     def test_a_lane_return_with_a_byte_order_mark_is_rejected(self):
         # Independent review of #145, L2: lane returns are UTF-8 without a BOM, as load_json reads them.

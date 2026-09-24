@@ -976,7 +976,11 @@ re-applied by `scripts/landscape.py` in CI to the sealed files):
   entry of the vendored copy the registry entry names (the lane workflow is
   vendored there, pinned in `vendored-lanes.json`), and the Codex hashes this
   checkout's `codex_lane.py` and `lane-prompt.md`. When any of those files
-  changes, append an entry (never edit one);
+  changes, append an entry (never edit one merged to `main`; one added inside
+  an unmerged PR may be amended before merge, since the verdict-review gate
+  fails a PR that changes this registry with a sealed verdict, so nothing
+  sealed names it yet, and `scripts/landscape.py` fails CI on any sealed
+  return an edit would orphan);
   `tests/test_verdict_lane_vendoring.py` fails until the current bytes are
   listed. `codex_lane.py` writes its provenance and the whole `model` field
   itself: `model.name` is the `--model` it passed to `codex exec -m`, else the
@@ -1721,12 +1725,31 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
     `lost` loses any earlier return and is listed as a failure.
   - **Scrubbing.** A URL ends at `;` or `,`, and a path segment glued to a delimiter ("/home/example,private/y") is
     absorbed with its path.
+- **Independent round-11 review of ca89c0d8 (audit normalization, registry and regressions), and its fixes:**
+  - **A padded component inside a pattern (NORM11-1, medium).** Glob takes an absolute pattern's base (the text
+    before its first `*?[{`, cut at the last `/`) through the same trimming path helper, so `<export>/.. /*` listed
+    the export's parent while the whole value, starting with `/` and ending with `*`, was unchanged by `trim()` and
+    its `.. ` part was not `..`. Any `/`-separated component `trim()` would change now flags, in every Read path
+    and Glob or Grep path, pattern and glob. The review found no such component among 28,601 values in 289 real
+    workflow runs on this host. File-name listings only were exposed; contents stayed closed.
+  - **Each trimmed character is pinned (NORM11-2).** A test lists the 25 ECMA-262 code points independently and
+    requires each to flag, and three that `trim()` keeps (U+200B, U+200D, U+0085) not to; 18 of 18 targeted mutants
+    are killed.
+  - **Registry guards (RR11-1, RR11-2).** The registration test requires the current audit hash for both workflow
+    paths the lane may name, and the adjudication test requires every registered adjudication key. The Claude
+    uniqueness key includes `transcript_audit_py_sha256`, and adjudication entries are unique too, so an appended
+    registration that changes only the audit is accepted.
+  - **Adjudication code at record time (RR11-3).** A new-wave adjudication's provenance must hash to this
+    checkout's adjudication code (`record_verdicts.ADJUDICATION_FILES`, which a test pins to exactly what
+    `adjudicate.adjudication_provenance` hashes), as the Codex and Claude lanes' code must.
+  - **Registry edits (the local Codex review's P2).** Entries added inside an unmerged PR may be amended before
+    merge; the append-only rule above binds entries merged to `main`. Catalog issue #175 tracks enforcing it in CI.
 - **Independent round-10 review of 821c23cc (transcript audit and its binding), and its fixes:**
   - **Whitespace around a path (TA10-1 = BR10-1, high).** Claude Code trims a Read, Glob or Grep path with
     JavaScript's `trim()` before expanding a leading `~`, while the transcript keeps the raw value; " ~/.codex"
-    or "<export>/.. " audited clean and opened a path outside the export. Any path, pattern or glob that `trim()`
-    would change (the ECMA-262 WhiteSpace and LineTerminator set) now flags, before the `~` and `$` test. Across
-    3,075 real path values in a 113-agent run, none carries such whitespace, a leading `~` or a `$`.
+    or "<export>/.. " audited clean and opened a path outside the export. A path, pattern or glob that `trim()`
+    would change (the ECMA-262 WhiteSpace and LineTerminator set) flags, before the `~` and `$` test; since round
+    11 (below) the test applies to each `/`-separated component, not only the whole value.
   - **Mutation coverage (TA10-4).** Tests now cover each whitespace class, a bare `~` and `~user`, a mid-value
     `$`, every per-item retry case and `locate`'s fallbacks; 13 of 13 targeted mutants are killed.
   - **`locate` on a long project name (TA10-2)** treats an unreadable exact path (ENAMETOOLONG) as absent and falls

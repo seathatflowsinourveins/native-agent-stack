@@ -132,6 +132,32 @@ class TranscriptAuditTests(unittest.TestCase):
                 with self.subTest(value=value, tool=tool):
                     self.assert_flags([(tool, {key: value, "pattern": "*"})])
 
+    def test_a_trimmed_component_inside_a_value_flags(self):
+        # Round 11, NORM11-1: Glob trims an absolute pattern's base (up to its first wildcard's last '/'), so a
+        # padded '..' there climbs while the whole value starts with '/' and ends with a wildcard.
+        export, packet = str(self.export), str(self.packet)
+        for tool, key, value in (("Glob", "pattern", export + "/.. /*"), ("Glob", "pattern", packet + "/..\t/*.json"),
+                                 ("Grep", "glob", export + "/.. /*"), ("Read", "file_path", export + "/..\ufeff/x.json"),
+                                 ("Glob", "path", export + "/..\u3000/x"), ("Glob", "pattern", "..\u00a0/*")):
+            with self.subTest(tool=tool, value=value):
+                self.assert_flags([(tool, {key: value, **({"pattern": "*"} if key != "pattern" else {})})])
+
+    def test_every_character_trim_removes_flags_and_no_other(self):
+        # Round 11, NORM11-2: ECMA-262 WhiteSpace and LineTerminator, the set String.prototype.trim() removes.
+        trimmed = [0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x20, 0xA0, 0x1680, *range(0x2000, 0x200B), 0x2028, 0x2029, 0x202F,
+                   0x205F, 0x3000, 0xFEFF]
+        self.assertEqual(len(trimmed), 25)
+        for code in trimmed:
+            with self.subTest(code=hex(code)):
+                self.assert_flags([("Glob", {"pattern": str(self.export) + "/.." + chr(code) + "/*"})])
+                self.assert_flags([("Read", {"file_path": chr(code) + str(self.packet)})])
+        # Characters trim() keeps (zero-width space, joiner, NEL) name a literal directory inside the export.
+        for code in (0x200B, 0x200D, 0x85):
+            with self.subTest(kept=hex(code)):
+                self.fresh()
+                self.agent("a", [("Read", {"file_path": str(self.export) + "/a" + chr(code) + "/x.json"})])
+                self.assertEqual(self.flagged(), [])
+
     def test_tools_and_calls_the_audit_does_not_model_flag(self):
         for calls in [[("Bash", {"command": "ls"})], [("mcp__memory__query", {"q": "winner"})],
                       [("WebFetch", {"url": "https://example.invalid"})], [("Agent", {"prompt": "x"})],
