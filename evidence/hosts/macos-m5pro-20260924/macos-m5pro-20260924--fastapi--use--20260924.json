@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "id": "macos-m5pro-20260924--fastapi--use--20260924",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "macos-m5pro-20260924",
+    "platform_id": "macos-arm64",
+    "os": "macos",
+    "architecture": "arm64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "macos-m5pro-20260924"
+  },
+  "catalog_revision": "3699012eb6ad3d970727b5098eb3cc7303680281",
+  "recorded_by": {
+    "identity_sha256": "2cd2306a3c00a3848abe008ef0b36269a2f2dc918b5c948b4d79fd7e93d9b99f",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "fastapi",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "cd blueprints/convergence-practice/application-delivery && uv run --frozen python -c \"import fastapi, pydantic; print('fastapi', fastapi.__version__, 'pydantic', pydantic.VERSION)\"",
+      "exit": 0,
+      "duration_s": 0.122,
+      "output_sha256": "2c880d54f23789c7aab54e03937eee8ac1dc13d8bacaa040da48380128b3c4fa",
+      "output_excerpt": "fastapi 0.141.1 pydantic 2.13.5\n"
+    },
+    {
+      "cmd": "cd blueprints/convergence-practice/application-delivery && DATABASE_URL=postgresql://postgres@127.0.0.1:15432/ledger_test uv run --frozen pytest -q",
+      "exit": 0,
+      "duration_s": 0.325,
+      "output_sha256": "027b8a834ea4f0a6ca5e18fee07ee69e900ec218a605aef697f09191b0ec2cbf",
+      "output_excerpt": "............                                                             [100%]\n=============================== warnings summary ===============================\n.venv/lib/python3.14/site-packages/starlette/testclient.py:53\n  /private/tmp/claude-501/nas-rec/blueprints/convergence-practice/application-delivery/.venv/lib/python3.14/site-packages/starlette/testclient.py:53: DeprecationWarning: The any"
+    },
+    {
+      "cmd": "cd blueprints/convergence-practice/application-delivery && uv run --frozen python verify_schema.py",
+      "exit": 0,
+      "duration_s": 0.626,
+      "output_sha256": "b9ed81cee882c9b4a160dc43ee8fb99d30844e7557392a3b7668640f83727419",
+      "output_excerpt": "\u2728 openapi-typescript 7.13.0\n\ud83d\ude80 openapi.json \u2192 /private/tmp/claude-501/nas-rec/blueprints/convergence-practice/application-delivery/.runtime/schema-arftggd2/api.generated.ts [12.4ms]\nNative API schema and generated TypeScript agree.\n"
+    }
+  ],
+  "tool_versions": {
+    "fastapi": "0.141.1"
+  },
+  "observed_at_utc": "2026-09-24T16:38:24Z",
+  "result": "pass",
+  "claim": "On host macos-m5pro-20260924 (Apple M5 Pro, 18 cores, 24 GB, macOS arm64), FastAPI 0.141.1 (the catalog pin) with Pydantic 2.13.5 served the blueprint's typed API in its locked environment: 12 API tests against the dedicated ledger_test PostgreSQL database passed (invalid and extra fields rejected before writes, run and history written in one transaction, stale revision 409, injected history failure rolled back), and the exported OpenAPI schema and generated TypeScript types agree (all commands exit 0).",
+  "limitations": [
+    "Exercised through the committed typed run-ledger blueprint (blueprints/convergence-practice/application-delivery) with synthetic data: no authentication, production deployment, load, pagination beyond 100 rows or backup/restore qualification.",
+    "PostgreSQL is the blueprint's own source build under .runtime (no ICU, readline, zlib or TLS; loopback TCP, trust authentication), not a production database installation.",
+    "The single pytest warning is the upstream Starlette/AnyIO BlockingPortal alias deprecation.",
+    "Recorded outside Claude Code's Seatbelt sandbox: on this host the sandbox blocks PostgreSQL shared memory, loopback database connections and pnpm 12 network and store operations (evidence/artifacts/macos-application-20260924/run-summary.json). Recorded from a detached checkout of main 3699012 (adoption/update.md). adoption/manifest.json keeps macos-arm64 at drafted_not_accepted, and this receipt changes no platform_status. Supports conditional now; accepted needs an independent review."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-24T16:38:24Z",
+      "reviewer": {
+        "identity_sha256": "2cd2306a3c00a3848abe008ef0b36269a2f2dc918b5c948b4d79fd7e93d9b99f",
+        "model": "claude-opus-5-5"
+      }
+    }
+  ]
+}

@@ -27565,6 +27565,16 @@
       "bytes": 8721
     },
     {
+      "path": "evidence/hosts/macos-m5pro-20260924/macos-m5pro-20260924--duckdb--use--20260924.json",
+      "sha256": "669079352c7d6e812036a6a75b06ddccbee7c0d2b08ca0fadb7c4f6aa166e414",
+      "bytes": 3717
+    },
+    {
+      "path": "evidence/hosts/macos-m5pro-20260924/macos-m5pro-20260924--fastapi--use--20260924.json",
+      "sha256": "3626262fe08c269d871617ab9c61edbf0d9c4e71e23ebbf272a08660705cd46e",
+      "bytes": 4360
+    },
+    {
       "path": "evidence/hosts/macos-m5pro-20260924/macos-m5pro-20260924--gitleaks--use--20260924.json",
       "sha256": "842219f23e3d68e4974a3d7f03661b7854aa042d2e459f0eaff1fdde6b5bead0",
       "bytes": 9319
@@ -27573,6 +27583,31 @@
       "path": "evidence/hosts/macos-m5pro-20260924/macos-m5pro-20260924--nautilus-trader--use--20260924.json",
       "sha256": "b90aa27b31398d1ee5319f134ac2468cafa2c6576cd2475db3287489e610ebb8",
       "bytes": 9533
+    },
+    {
+      "path": "evidence/hosts/macos-m5pro-20260924/macos-m5pro-20260924--nextjs--use--20260924.json",
+      "sha256": "ce8f9f128947c772bd33b20ec89810ecec758be6d9f93184cac35fcaa62f74ec",
+      "bytes": 3953
+    },
+    {
+      "path": "evidence/hosts/macos-m5pro-20260924/macos-m5pro-20260924--playwright-cli--use--20260924.json",
+      "sha256": "b8e25dcf4cdc294a339afa3da89b1a2185a35b84bc8e09cce633d18d5546d49d",
+      "bytes": 4181
+    },
+    {
+      "path": "evidence/hosts/macos-m5pro-20260924/macos-m5pro-20260924--playwright-test--use--20260924.json",
+      "sha256": "f168c2ea7d2b335b058cd5785f8a1307c04d76e68aa368151fc07bc76b75584e",
+      "bytes": 3396
+    },
+    {
+      "path": "evidence/hosts/macos-m5pro-20260924/macos-m5pro-20260924--postgresql--use--20260924.json",
+      "sha256": "73b89c1bfeda2dd04b086d5c98340b36ecf998d5f85b76c956c8f3108ded5f57",
+      "bytes": 4932
+    },
+    {
+      "path": "evidence/hosts/macos-m5pro-20260924/macos-m5pro-20260924--react--use--20260924.json",
+      "sha256": "883ff01c46b1d6838adf4af1381e86e32e79552381e0b14ca8590d1612002255",
+      "bytes": 4247
     },
     {
       "path": "evidence/hosts/macos-m5pro-20260924/macos-m5pro-20260924--rtk--use--20260924.json",

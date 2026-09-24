@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "id": "macos-m5pro-20260924--playwright-cli--use--20260924",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "macos-m5pro-20260924",
+    "platform_id": "macos-arm64",
+    "os": "macos",
+    "architecture": "arm64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "macos-m5pro-20260924"
+  },
+  "catalog_revision": "3699012eb6ad3d970727b5098eb3cc7303680281",
+  "recorded_by": {
+    "identity_sha256": "2cd2306a3c00a3848abe008ef0b36269a2f2dc918b5c948b4d79fd7e93d9b99f",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "playwright-cli",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "playwright-cli --version",
+      "exit": 0,
+      "duration_s": 0.128,
+      "output_sha256": "b436859fb641d04afbc4796b5df155639d6685280c4a0e8fe8791363d977f222",
+      "output_excerpt": "0.1.21\n"
+    },
+    {
+      "cmd": "cd blueprints/convergence-practice/application-delivery || exit 2; python3 serve.py > .runtime/serve-receipt.log 2>&1 & pid=$!; for i in $(seq 1 60); do curl -fs -o /dev/null http://127.0.0.1:18080 && break; sleep 0.5; done; s=receipt$(date +%s); t=\"Receipt probe $(date +%s)\"; cd \"${TMPDIR:?}\" || exit 2; playwright-cli -s=$s open http://127.0.0.1:18080 --browser=chrome > /dev/null && snap=$(playwright-cli -s=$s snapshot) && box=$(printf '%s\\n' \"$snap\" | grep 'textbox \"Run title\"' | grep -o 'ref=e[0-9]*' | cut -d= -f2) && btn=$(printf '%s\\n' \"$snap\" | grep 'button \"Create run\"' | grep -o 'ref=e[0-9]*' | cut -d= -f2) && playwright-cli -s=$s fill $box \"$t\" > /dev/null && playwright-cli -s=$s click $btn > /dev/null && sleep 1 && playwright-cli -s=$s snapshot | grep -A1 \"heading \\\"$t\\\"\" | tail -1 && playwright-cli -s=$s console | grep 'Total messages' && playwright-cli -s=$s close > /dev/null; rc=$?; kill $pid; wait $pid 2>/dev/null; if curl -fs -o /dev/null http://127.0.0.1:18080; then echo 'server still up'; exit 1; fi; echo 'servers stopped'; exit $rc",
+      "exit": 0,
+      "duration_s": 4.267,
+      "output_sha256": "5d018dbd9fe7b834df813ae326a494d76d59d022d2eb5bb6e10a3fbdfa19645b",
+      "output_excerpt": "            - paragraph [ref=e60]: Revision 1 \u00b7 1 recorded changes\nTotal messages: 0 (Errors: 0, Warnings: 0)\nservers stopped\n"
+    }
+  ],
+  "tool_versions": {
+    "playwright-cli": "0.1.21; Playwright 1.64.0-alpha-1789764292000"
+  },
+  "observed_at_utc": "2026-09-24T16:38:33Z",
+  "result": "pass",
+  "claim": "On host macos-m5pro-20260924 (Apple M5 Pro, 18 cores, 24 GB, macOS arm64), playwright-cli 0.1.21 opened the served blueprint in an isolated in-memory Chrome session, read the page snapshot to find the title field and Create button, filled a unique title, created the run, saw it listed at revision 1 with one recorded change, reported zero console errors and warnings, and closed the session; the command then stopped the servers it started (all commands exit 0).",
+  "limitations": [
+    "Exercised through the committed typed run-ledger blueprint (blueprints/convergence-practice/application-delivery) with synthetic data: no authentication, production deployment, load, pagination beyond 100 rows or backup/restore qualification.",
+    "The command starts and stops the blueprint's own loopback servers; one create action in one session, no status update or file upload.",
+    "Recorded outside Claude Code's Seatbelt sandbox: on this host the sandbox blocks PostgreSQL shared memory, loopback database connections and pnpm 12 network and store operations (evidence/artifacts/macos-application-20260924/run-summary.json). Recorded from a detached checkout of main 3699012 (adoption/update.md). adoption/manifest.json keeps macos-arm64 at drafted_not_accepted, and this receipt changes no platform_status. Supports conditional now; accepted needs an independent review."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-24T16:38:33Z",
+      "reviewer": {
+        "identity_sha256": "2cd2306a3c00a3848abe008ef0b36269a2f2dc918b5c948b4d79fd7e93d9b99f",
+        "model": "claude-opus-5-5"
+      }
+    }
+  ]
+}

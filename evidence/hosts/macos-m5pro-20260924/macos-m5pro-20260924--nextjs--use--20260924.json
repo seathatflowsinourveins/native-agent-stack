@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "id": "macos-m5pro-20260924--nextjs--use--20260924",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "macos-m5pro-20260924",
+    "platform_id": "macos-arm64",
+    "os": "macos",
+    "architecture": "arm64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "macos-m5pro-20260924"
+  },
+  "catalog_revision": "3699012eb6ad3d970727b5098eb3cc7303680281",
+  "recorded_by": {
+    "identity_sha256": "2cd2306a3c00a3848abe008ef0b36269a2f2dc918b5c948b4d79fd7e93d9b99f",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "nextjs",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "cd blueprints/convergence-practice/application-delivery && pnpm exec next --version",
+      "exit": 0,
+      "duration_s": 0.092,
+      "output_sha256": "f96c0e3938a1a0def80aaaabc9ba34c0a188739ed2c4977bf0369399cdb3d304",
+      "output_excerpt": "Next.js v16.3.5\n"
+    },
+    {
+      "cmd": "cd blueprints/convergence-practice/application-delivery && pnpm typecheck",
+      "exit": 0,
+      "duration_s": 0.556,
+      "output_sha256": "bf86be0258521d54fb657d34c8c2638963e77f4487cc3dbd52f4bb649bdbf508",
+      "output_excerpt": "Generating route types...\n\u2713 Types generated successfully\n$ next typegen && tsc --noEmit\n"
+    },
+    {
+      "cmd": "cd blueprints/convergence-practice/application-delivery && NEXT_TELEMETRY_DISABLED=1 pnpm build",
+      "exit": 0,
+      "duration_s": 1.355,
+      "output_sha256": "e452c8989e1257e29d31d6d149c7ca81d9311f78744588863aa9925b8f5c0cb6",
+      "output_excerpt": "\u25b2 Next.js 16.3.5 (Turbopack)\n\u2713 Running next.config.ts took 9ms\n\n  Creating an optimized production build ...\n\u2713 Compiled successfully in 72ms\n  Running TypeScript ...\n  Finished TypeScript in 420ms ...\n  Collecting page data using 5 workers ...\n  Generating static pages using 5 workers (0/4) ...\n  Generating static pages using 5 workers (1/4) \n  Generating static pages using 5 workers (2/4) \n  Gene"
+    }
+  ],
+  "tool_versions": {
+    "nextjs": "16.3.5"
+  },
+  "observed_at_utc": "2026-09-24T16:38:25Z",
+  "result": "pass",
+  "claim": "On host macos-m5pro-20260924 (Apple M5 Pro, 18 cores, 24 GB, macOS arm64), Next.js 16.3.5 (the catalog pin) generated route types, passed the TypeScript check and built the blueprint's production application, compiling and statically generating its pages (all commands exit 0).",
+  "limitations": [
+    "Exercised through the committed typed run-ledger blueprint (blueprints/convergence-practice/application-delivery) with synthetic data: no authentication, production deployment, load, pagination beyond 100 rows or backup/restore qualification.",
+    "The committed blueprint pins packageManager pnpm@12.4.2, so its pnpm commands ran pnpm 12.4.2 through pnpm's own version management although the host's global pnpm is 12.6.0. The pnpm 12.6.0 variant run is recorded in blueprints/convergence-practice/application-delivery/experiment-macos-20260924.json.",
+    "Build only in this receipt; serving and browser interaction are in the playwright-test and playwright-cli receipts.",
+    "Recorded outside Claude Code's Seatbelt sandbox: on this host the sandbox blocks PostgreSQL shared memory, loopback database connections and pnpm 12 network and store operations (evidence/artifacts/macos-application-20260924/run-summary.json). Recorded from a detached checkout of main 3699012 (adoption/update.md). adoption/manifest.json keeps macos-arm64 at drafted_not_accepted, and this receipt changes no platform_status. Supports conditional now; accepted needs an independent review."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-24T16:38:25Z",
+      "reviewer": {
+        "identity_sha256": "2cd2306a3c00a3848abe008ef0b36269a2f2dc918b5c948b4d79fd7e93d9b99f",
+        "model": "claude-opus-5-5"
+      }
+    }
+  ]
+}
