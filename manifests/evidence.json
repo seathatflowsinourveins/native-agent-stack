@@ -9383,8 +9383,8 @@
     },
     {
       "path": "catalogs/us-equities/gates-20260922.json",
-      "sha256": "59e69640fe65040ac7a44ebbdadeaccc615128d611a9a796a2a6b8f0bb1b5b68",
-      "bytes": 40954
+      "sha256": "8c27800fd27821dec706a8cced1eff1cc688396fb9b87fe13e50f4572d3774a2",
+      "bytes": 41396
     },
     {
       "path": "catalogs/us-equities/hosting-source-review.json",
@@ -9458,8 +9458,8 @@
     },
     {
       "path": "catalogs/us-equities/runtime-target.json",
-      "sha256": "f215f4bca97beee3fbce03a102957b0ac435c4b3de3238e786ec34dbf2f81ba4",
-      "bytes": 12508
+      "sha256": "f21f52bc1fc539e89a2569e329f840291ffc90f0692731cafc057d17da34f137",
+      "bytes": 12804
     },
     {
       "path": "catalogs/us-equities/security-identity-review.json",
