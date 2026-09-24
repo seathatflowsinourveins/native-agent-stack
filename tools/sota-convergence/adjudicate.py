@@ -809,6 +809,9 @@ def run_codex_call(repo, schema, out_tmp, effort, prompt, model, timeout, events
         event_model = found_model or event_model
         if result["timed_out"] or result["exit_code"] != 0:
             failure = "timed out" if result["timed_out"] else f"codex exec exited {result['exit_code']}"
+            detail = codex_lane.child_failure_detail(result)
+            if detail:
+                print(f"adjudicate: {failure}: {detail}", file=sys.stderr)
             continue
         try:
             data = load_json(out_tmp)
@@ -887,7 +890,8 @@ def run_codex(args) -> int:
         return 2
     with contextlib.ExitStack() as stack:
         if pending:
-            issue = codex_lane.codex_home_issue(work_dir, repo) or codex_lane.blind_path_issue()
+            issue = (codex_lane.codex_home_issue(work_dir, repo) or codex_lane.blind_path_issue()
+                     or codex_lane.codex_launch_issue())
             if issue:
                 print(f"adjudicate: {issue}", file=sys.stderr)
                 return 2

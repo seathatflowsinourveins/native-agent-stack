@@ -1414,8 +1414,9 @@ What remains and how it is handled:
   when they are missing or flagged (round 7, REG7-1). The audit counts web searches and MCP tool calls, and flags
   commands that do any of the following:
   - name an absolute path outside the repository and the packets directory. A `/` right after `)` or `]`
-    (Python's `Path.cwd()/ref`) starts no path, and neither does the `//` of a network URL (`https://host`,
-    `ssh://`), though `file:///` and `https:///` do. A network URL reaches nothing from a blind child: measured
+    (Python's `Path.cwd()/ref`) starts no path, and neither does a URL's `//` authority (`https://host`,
+    `ssh://`, `qmd://`, `s3://`), though `file://`, `jar:file://` and `https:///` do. A URL reaches nothing from a
+    blind child without the network or a CLI it cannot resolve. Measured
     2026-09-24 (codex-cli 0.155.1, `--sandbox read-only`), its Python connection to a local listener the caller
     had just reached, and to 127.0.0.1:6333 (Qdrant's port), failed with `PermissionError: [Errno 1] Operation
     not permitted`, and the listener accepted nothing. The root rule skips a quoted `'/'` joined with `+` between
@@ -1443,6 +1444,16 @@ What remains and how it is handled:
       (Codex runs commands with `bash -lc`; /etc/profile.d adds `/snap/bin` here, and macOS path_helper adds
       /etc/paths), the default a shell sets when a command drops PATH (`/usr/local/bin` included), and
       `os.defpath`.
+
+    **New hosts.** A host that installs one of them where a child's PATH reaches it is refused, and the refusal
+    names each directory. For example, Intel Homebrew or npm globals put them in `/usr/local/bin`, which macOS
+    path_helper and a PATH-less shell both add. On a Mac, zsh started with an empty environment takes HOME from
+    passwd and reads the real `~/.zshenv`, so a Homebrew PATH set there counts too. The refusal is correct, since a
+    child's `zsh -c` would get the same PATH, but zsh, fish, ksh and tcsh are untested here. Install the CLIs
+    elsewhere (`~/.local/bin`) to run blind lanes there. A shell-script codex launcher (pnpm's cmd-shim, which runs
+    node by name) is refused up front, and a failed child's last stderr lines go to the console, not the record.
+    A probe that fails is named in the refusal (`PathUnmeasured`), and non-UTF-8 profile output is read leniently
+    (R2-4). The unit suites pin the measured PATH, so they do not depend on the host's (R2-3).
 
     So their names alone are not flagged in a blind run, since they are also candidates a lane must search for; a
     non-blind run still flags them. Measured 2026-09-24 with a real blind child: every one of them, and node, npx
