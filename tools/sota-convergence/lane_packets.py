@@ -700,7 +700,13 @@ GENERIC_NAME_PARTS = frozenset({"python", "server", "client", "engine", "trader"
                                 "research", "context", "adapter", "retrieval", "memory", "search", "browser",
                                 "workflow", "workflows", "runner", "index", "cache", "proxy", "gateway", "bridge",
                                 "monitor", "trading", "market", "data", "service", "services", "runtime", "worker",
-                                "workers", "review", "reviews", "skills", "plugin", "plugins", "config", "manager"})
+                                "workers", "review", "reviews", "skills", "plugin", "plugins", "config", "manager",
+                                # Capability and format words in manifest newcomers' names (Codex review of #151 at
+                                # cf82e689: Granite-embedding's "embedding" redacted the semantic-rag requirement's
+                                # "compatible embedding service"); a URL-named newcomer's "https" is no name either.
+                                "embedding", "embeddings", "embed", "reranker", "rerankers", "rerank", "multilingual",
+                                "bench", "benchmark", "benchmarks", "https", "http", "typescript", "javascript",
+                                "parallel", "orchestrator", "group", "brokerage", "brokerages"})
 
 
 # A phrase that states the catalog's own choice without naming a candidate (round 5, N1: a bare "keep", "retain",

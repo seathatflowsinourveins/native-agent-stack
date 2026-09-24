@@ -720,6 +720,15 @@ Hugging Face model, is identified by its lowercased URL rather than dropped. Wit
 flag adds 35 foundation newcomers, 6 of them Hugging Face models, and removes 9 refuted trading newcomers
 across the 32 blind packets (312 candidates).
 
+A newcomer's name must not redact the packet's shared prose (Codex review of #151 at `cf82e689`). A name part
+unique to one candidate is a redaction term, so granite-embedding's "embedding" had turned semantic-rag's
+requirement "a compatible embedding service" into "a compatible <candidate> service". Capability and format words
+seen in newcomer names (`embedding`, `embed`, `reranker`, `multilingual`, `bench`, `https`, `typescript`,
+`parallel`, `orchestrator`, `group`, `brokerage` and their variants) are now generic name parts, as `retrieval` and
+`memory` already were. A test builds the real 2026-09-24 packets and requires that newcomers add no placeholder
+to any packet's requirement, limitations or overturn text. The same list restores "Brokerage model defaults ..."
+in LEAN's own card limitation in execution-broker, the only default-build packet it changes.
+
 A newcomer is never adopted, and the lane contract forbids a non-adopted winner
 (`scripts/landscape.py lane_winner_components`). A lane can prefer one as its challenger
 (`challenger_preferred`) with an overturn protocol. Promoting it takes the measured comparison that protocol

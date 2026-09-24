@@ -1285,6 +1285,36 @@ class RegisteredReceiptsTests(LanePacketsFixture):
             self.assertNotIn("registered_receipts[].id", json.dumps(json.loads(text)["withheld"]))
 
 
+class RealNewcomerPacketTests(unittest.TestCase):
+    """Codex review of #151 at cf82e689, on the real 2026-09-23 manifest with --manifest-newcomers: a newcomer's
+    generic capability word ("embedding" in granite-embedding) is not a candidate term, so shared prose keeps it."""
+
+    @classmethod
+    def setUpClass(cls):
+        packets = lane_packets.build_all_packets(
+            ROOT, catalogs=["foundation", "us-equities"], seed="20260924", checked_at="2026-09-24",
+            trading_candidates="manifest", withhold=True, manifest="catalogs/sota-convergence/manifest-20260923.json",
+            registered_receipts=True, manifest_newcomers_on=True, sealed_keys={})
+        cls.packets = {name: json.loads(text) for name, text in packets.items()}
+
+    def test_a_newcomers_capability_word_stays_in_the_requirement(self):
+        packet = self.packets["foundation__semantic-rag.json"]
+        self.assertTrue(any("granite-embedding" in str(c.get("repository")) for c in packet["candidates"]))
+        self.assertIn("a compatible embedding service", packet["requirement"])
+
+    def test_newcomers_add_no_placeholder_to_shared_prose(self):
+        default = lane_packets.build_all_packets(
+            ROOT, catalogs=["foundation", "us-equities"], seed="20260924", checked_at="2026-09-24",
+            trading_candidates="manifest", withhold=True, manifest="catalogs/sota-convergence/manifest-20260923.json",
+            registered_receipts=True, sealed_keys={})
+        for name, text in default.items():
+            before = json.loads(text)
+            for field in ("requirement", "limitations", "existing_overturn_when"):
+                with self.subTest(packet=name, field=field):
+                    self.assertEqual(json.dumps(self.packets[name].get(field)).count(lane_packets.CANDIDATE_PLACEHOLDER),
+                                     json.dumps(before.get(field)).count(lane_packets.CANDIDATE_PLACEHOLDER))
+
+
 class RealPacketProseTests(unittest.TestCase):
     """Independent review of #145, round 7, on the real 2026-09-23 blind packets: ordinary words are not candidate
     terms (BL7-3), status-free limitations and evidence stay (BL7-4), and status statements go (BL7-4, BL7-5)."""
