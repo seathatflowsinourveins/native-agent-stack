@@ -82,7 +82,7 @@
     "platform_profiles_sha256": {"$ref": "#/$defs/sha256", "description": "sha256 of canonical adoption/manifest.json#/platform_profiles at append time."},
     "votes": {"enum": ["retained", "not_retained", "not_returned"]},
     "votes_note": {"type": "string", "minLength": 1},
-    "discovery_ref": {"type": "string", "minLength": 1, "pattern": "#/", "description": "The sweep's returns_ref file with a pointer to this layer's retained discovery return: {catalog, layer_id, proposed[]}."},
+    "discovery_ref": {"type": "string", "minLength": 1, "pattern": "#/", "description": "The sweep's returns_ref file with a pointer to this layer's retained discovery return: {catalog, layer_id, proposed[], requirement_sha256, platform_profiles_sha256}, the last two frozen before the run."},
     "calls": {"oneOf": [{"type": "null"}, {"type": "object", "additionalProperties": {"type": "integer", "minimum": 0}}]},
     "proposed": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/repo"}},
     "known": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/repo"}},

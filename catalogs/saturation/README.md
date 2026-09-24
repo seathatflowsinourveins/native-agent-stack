@@ -39,9 +39,12 @@ Each layer entry holds these fields:
 - `requirement_sha256`: the sha256 of the canonical JSON `{next_action, decision_ref}` from the
   layer's `research-state.json` row
 - `platform_profiles_sha256`: the sha256 of the canonical `adoption/manifest.json#/platform_profiles`
+
+  Both are the scope frozen before the run (`--scope`) when the layer cites a discovery return,
+  which retains them; otherwise `--append` computes them from that day's files.
 - `votes`: `retained`, `not_retained` or `not_returned`, with a `votes_note` unless `retained`
 - `discovery_ref`, required with `votes: retained`: `returns_ref#/pointer` to the layer's
-  discovery return, `{catalog, layer_id, proposed[]}`
+  discovery return, `{catalog, layer_id, proposed[], requirement_sha256, platform_profiles_sha256}`
 - `calls`
 - `proposed`, `known` and `new`
 - `survived[]` and `refuted[]`: each entry names a `repo` and its two votes. With retained
@@ -52,8 +55,9 @@ Each layer entry holds these fields:
 - `reopen[]` of `{trigger, ref}`
 
 `known` lists the proposals that the manifest layer already names outside this lane, or that an
-earlier sweep already put through both refuters. `new` lists the rest. A proposal from a stopped
-run was never adjudicated, so it stays `new`.
+earlier sweep already put through both refuters. `new` lists the rest. A proposal that a stopped
+run never adjudicated stays `new`; an entry it did record carries both votes bound to evidence, so
+it is known. `known` and `new` are reported, not counted: the clean count never reads them.
 
 The sha256 values use canonical JSON: sorted keys, no whitespace, UTF-8. The first record chains
 to `{schema_version, policy}`, so changing `policy` also breaks the chain.
@@ -67,19 +71,28 @@ to `{schema_version, policy}`, so changing `policy` also breaks the chain.
 - `manifest_ref`, `usage_ref`, `returns_ref`, `record_ref`, every `source_review` and every vote
   and discovery `ref` file must be registered in `manifests/evidence.json` with a matching sha256.
 - A retained layer needs a `discovery_ref` whose `proposed` equals the layer's `proposed`, so an
-  empty layer is evidence only through its retained discovery return. Every vote and discovery
+  empty layer is evidence only through its retained discovery return. The discovery return's
+  frozen `requirement_sha256` and `platform_profiles_sha256` must equal the layer's, so a scope
+  change during the sweep stands as a current trigger rather than being recorded as tested. Every vote and discovery
   `ref` needs a JSON pointer: a retained vote must resolve in `returns_ref` (not the manifest, the
   usage output or the run record) to an object with the same role and repository, and a lens vote
   must resolve to that lens in this layer's lane row for the same repository.
-- Each `lost_workers` label must be a child of `usage_ref` that never completed.
-- A completed sweep needs `child_usage.status == complete` and `lower_bound_usage: false`. A
-  stopped sweep needs `lower_bound_usage: true`.
+- `lost_workers` must be exactly the children of `usage_ref` that never completed; leaving one out
+  fails, and an absent list means none.
+- `workflow_run` must be the run `usage_ref` measured (the last segment of
+  `child_usage.transcript_dir`). No two records share a `workflow_run`, usage output or returns
+  file (by path or sha256), and no two completed sweeps share a manifest lane (by path or sha256).
+  A stopped run may name the manifest it used only as its known/new baseline.
+- A completed sweep needs `child_usage.status == complete`, `lower_bound_usage: false`, and a
+  completed child for each layer's discovery worker (`discover:<layer>`) and, for a layer with
+  proposals, both refuters (`refute-facts:<layer>`, `refute-fit:<layer>`). Its `date` must equal
+  the `manifest_ref`'s `checked_at`. A stopped sweep needs `lower_bound_usage: true`.
 - Each refuted or survived entry needs both votes. Survival is recomputed: the entry survives only
   when neither vote refutes it. Each vote must agree with the object its `ref` points to.
 - A completed sweep must adjudicate every proposal, and its proposals must equal the manifest's
   rows for its `lane` in that layer, with the same survival.
 - Every survivor must match a surviving lane row and have a source review of the same repository
-  that names the layer.
+  whose `layers` list names the layer.
 - `known` and `new` are recomputed.
 
 ### Where append-only is enforced

@@ -23,7 +23,11 @@ python3 scripts/saturation_ledger.py --report --staleness "$WORK_DIR/receipt-sta
 
 The due layers are every layer that is not a saturation candidate. A layer with a current reopen
 trigger is always due. Freeze the scope, meaning the layer list and each layer's
-`research-state.json` row, before starting.
+`research-state.json` row, before starting, and keep its hashes:
+
+```sh
+python3 scripts/saturation_ledger.py --scope > "$WORK_DIR/scope.json"
+```
 
 ## 2. Run the lane
 
@@ -31,7 +35,9 @@ Run the landscape-sweep lane in an agent-lab coordinator session: one discovery 
 due layer, then a facts refuter and a fit refuter per layer, a completeness critic, and at most
 one bounded follow-up round. These are the same limits as `lane_limits["landscape-sweep-20260923"]`
 in `catalogs/sota-convergence/manifest-20260923.json`. Set each worker's model and effort
-explicitly. A candidate survives only when neither refuter refutes it.
+explicitly. A candidate survives only when neither refuter refutes it. Label the workers
+`discover:<layer>`, `refute-facts:<layer>` and `refute-fit:<layer>`, as the 2026-09-23 run did:
+`--check` reconciles those labels in the usage output with the recorded layers.
 
 Merge the lane into a dated SOTA manifest with
 [the six commands](sota-convergence-practice.md#the-six-commands-in-order), under a new lane
@@ -49,8 +55,9 @@ Retain each of these under `evidence/artifacts/<lane>/` and `<lane>-attempts/`:
 - a stopped or superseded run as its own record, with its usage marked as a lower bound;
 - lost workers, per-layer call counts and critic follow-ups;
 - **the retained lane returns**, one JSON file per sweep (the record's `returns_ref`): each
-  layer's discovery return as `{catalog, layer_id, proposed[]}`, and each candidate's facts and
-  fit votes as `{role, repository, refuted, ...}` with their cited references. A layer's
+  layer's discovery return as `{catalog, layer_id, proposed[], requirement_sha256,
+  platform_profiles_sha256}` (the two hashes copied from the frozen `scope.json`), and each
+  candidate's facts and fit votes as `{role, repository, refuted, ...}` with their cited references. A layer's
   `discovery_ref` and each vote `ref` point into it (`path#/json/pointer`). Without these returns,
   a layer is recorded as `votes: not_retained` and never counts as clean. A retained layer with no
   proposals still needs its discovery return;
@@ -69,7 +76,9 @@ python3 scripts/validate.py
 
 Write `RESULT.json`. Leave out every computed field: `prev_sha256`, `manifest_sha256`,
 `usage_sha256`, `returns_sha256`, `requirement_sha256`, `platform_profiles_sha256`, `known` and `new`. `--append`
-computes them from today's files.
+computes them: the requirement and platform-profile hashes from each cited discovery return's
+frozen scope (otherwise today's files), the rest from today's files. `date` is the lane manifest's
+`checked_at`, and `workflow_run` is the run the usage output measured.
 
 ```json
 {
@@ -105,7 +114,7 @@ The pull request that adds the record runs the same append-only comparison in `v
 against the merge base with the target branch.
 
 Record a stopped run the same way: set `"status": "stopped"` and `"lower_bound_usage": true`,
-give each layer `votes: not_returned` with a `votes_note`, and list the children that never
+give each layer `votes: not_returned` with a `votes_note`, and list every child that never
 returned in `lost_workers`. A stopped run neither counts nor resets.
 
 Add a `reopen` entry, `{trigger, ref}`, when the sweep finds any of these:

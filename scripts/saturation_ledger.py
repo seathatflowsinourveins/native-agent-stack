@@ -31,6 +31,7 @@ script never writes that file or anything under ``catalogs/landscape/`` or
   python3 scripts/saturation_ledger.py --check --base origin/main  # also: base ledger is a prefix
   python3 scripts/saturation_ledger.py --report [--json] [--staleness receipt-staleness.json] \\
       [--freshness-manifest manifest-YYYYMMDD.json --freshness-status github-freshness.json]
+  python3 scripts/saturation_ledger.py --scope                  # scope hashes to freeze before a sweep
   python3 scripts/saturation_ledger.py --append RESULT.json     # append one sweep (see README)
   python3 scripts/saturation_ledger.py --derive-seed            # print the 2026-09-23 seed results
 
@@ -81,6 +82,8 @@ LAYER_FIELDS = ("catalog", "layer_id", "requirement_sha256", "platform_profiles_
 # A manifest lens-vote pointer: /<section>/<layer index>/candidates/<row>/adversarial_verification/votes/<k>
 LENS_POINTER = re.compile(r"/(foundation|trading)/(\d+)/candidates/(\d+)/adversarial_verification/votes/(\d+)")
 COMPUTED_LAYER_FIELDS = ("requirement_sha256", "platform_profiles_sha256", "known", "new")
+# Scope hashes a retained discovery return carries, frozen before the run (--scope).
+FROZEN_SCOPE_FIELDS = ("requirement_sha256", "platform_profiles_sha256")
 
 # The 2026-09-23 seed: every value --derive-seed emits is read from these files.
 SEED = {
@@ -363,6 +366,8 @@ class Checker:
         previous = genesis_sha256(ledger)
         seen_ids, last_date = set(), None
         proposals_so_far: dict = {}
+        # Per-run evidence a replayed record would reuse under a new sweep_id.
+        seen_evidence: dict = {}
         for index, sweep in enumerate(sweeps):
             label = f"sweeps[{index}]"
             if not isinstance(sweep, dict):
@@ -386,10 +391,53 @@ class Checker:
                 if last_date is not None and sweep_date < last_date:
                     self.error(f"{label}: dates must not go backwards")
                 last_date = sweep_date
+            self.check_not_replayed(sweep, label, seen_evidence)
             self.check_sweep(sweep, label, proposals_so_far)
         if ledger.get("head_sha256") != previous:
             self.error("ledger: head_sha256 does not match the last record (a record was removed or edited)")
         return self.errors
+
+    def check_not_replayed(self, sweep: dict, label: str, seen: dict) -> None:
+        """One record per run: its workflow run, usage output and lane returns are never reused by
+        another record, and a completed sweep's manifest lane is counted once. A stopped run may
+        share the manifest it used only as its known/new baseline."""
+        keys = [("workflow_run", sweep.get("workflow_run")), ("usage_ref", sweep.get("usage_ref")),
+                ("usage_sha256", sweep.get("usage_sha256")), ("returns_ref", sweep.get("returns_ref")),
+                ("returns_sha256", sweep.get("returns_sha256"))]
+        if sweep.get("status") == "completed":
+            keys += [("manifest_ref+lane", (sweep.get("manifest_ref"), sweep.get("lane"))),
+                     ("manifest_sha256+lane", (sweep.get("manifest_sha256"), sweep.get("lane")))]
+        for field, value in keys:
+            if value is None or (isinstance(value, tuple) and None in value):
+                continue
+            key = (field, json.dumps(value))
+            if key in seen:
+                self.error(f"{label}: {field} {value} is already recorded by {seen[key]}; one record per run")
+            else:
+                seen[key] = sweep.get("sweep_id")
+
+    def check_run_binding(self, sweep: dict, usage, label: str) -> None:
+        """workflow_run is the run whose transcripts the usage output measured."""
+        transcript_dir = (usage.get("child_usage") or {}).get("transcript_dir") if isinstance(usage, dict) else None
+        if not isinstance(transcript_dir, str) or transcript_dir.rstrip("/").rsplit("/", 1)[-1] != sweep.get("workflow_run"):
+            self.error(f"{label}: workflow_run {sweep.get('workflow_run')} is not the run {sweep.get('usage_ref')} "
+                       f"measured (child_usage.transcript_dir {transcript_dir!r})")
+
+    def check_worker_coverage(self, sweep: dict, usage, label: str) -> None:
+        """A completed sweep launched and completed each layer's discovery worker, and both refuters
+        of every layer with proposals (child labels ``discover:<layer>``, ``refute-facts:<layer>``
+        and ``refute-fit:<layer>``, as child-usage.mjs reports them)."""
+        children = ((usage.get("child_usage") or {}).get("children") or []) if isinstance(usage, dict) else []
+        completed = [child.get("label") for child in children
+                     if isinstance(child, dict) and child.get("complete") is True and isinstance(child.get("label"), str)]
+        for layer in sweep.get("layers") or []:
+            if not isinstance(layer, dict) or not isinstance(layer.get("layer_id"), str):
+                continue
+            roles = ["discover"] + (["refute-facts", "refute-fit"] if layer.get("proposed") else [])
+            for role in roles:
+                prefix = f"{role}:{layer['layer_id']}"
+                if not any(item == prefix or item.startswith(prefix + ":") for item in completed):
+                    self.error(f"{label}: a completed sweep needs a completed {prefix} child in {sweep.get('usage_ref')}")
 
     def check_sweep(self, sweep: dict, label: str, proposals_so_far: dict) -> None:
         extra = set(sweep) - set(SWEEP_FIELDS)
@@ -422,6 +470,8 @@ class Checker:
                     self.error(f"{label}: a completed sweep's usage must not be a lower bound")
                 if usage_status != "complete":
                     self.error(f"{label}: a completed sweep needs complete usage (child_usage.status is {usage_status!r})")
+                self.check_worker_coverage(sweep, usage, label)
+            self.check_run_binding(sweep, usage, label)
             self.check_lost_workers(sweep, usage, label)
         elif sweep.get("lost_workers") is not None:
             self.error(f"{label}: lost_workers needs a readable usage_ref to bind to")
@@ -454,6 +504,12 @@ class Checker:
                 self.error(f"{label}: manifest_sha256 required with manifest_ref")
             elif self.registered(manifest_ref, f"{label}.manifest_ref", sweep["manifest_sha256"]):
                 manifest = self.document(manifest_ref)
+                # A completed sweep is dated by the manifest its lane was merged into, so the date
+                # that spaces counted sweeps is bound to registered evidence, not typed by hand.
+                checked_at = manifest.get("checked_at") if isinstance(manifest, dict) else None
+                if status == "completed" and sweep.get("date") != checked_at:
+                    self.error(f"{label}: a completed sweep's date {sweep.get('date')} must equal "
+                               f"{manifest_ref}#/checked_at ({checked_at!r})")
         elif status == "completed":
             self.error(f"{label}: a completed sweep needs a manifest_ref")
         lane = sweep.get("lane")
@@ -477,20 +533,24 @@ class Checker:
             proposals_so_far.setdefault(key, set()).update(adjudicated_repos(layer))
 
     def check_lost_workers(self, sweep: dict, usage, label: str) -> None:
-        """Each lost worker names a child of the usage output that never returned."""
+        """lost_workers is exactly the usage output's incomplete children: each listed label never
+        returned, and no child that never returned is left out (an absent list means none)."""
         lost = sweep.get("lost_workers")
         if lost is None:
-            return
-        if not (isinstance(lost, list) and all(isinstance(item, str) and item for item in lost)
-                and len(set(lost)) == len(lost)):
+            lost = []
+        elif not (isinstance(lost, list) and all(isinstance(item, str) and item for item in lost)
+                  and len(set(lost)) == len(lost)):
             self.error(f"{label}: lost_workers must be a list of unique child labels")
             return
         children = ((usage.get("child_usage") or {}).get("children") or []) if isinstance(usage, dict) else []
         incomplete = {child.get("label") for child in children
-                      if isinstance(child, dict) and child.get("complete") is False}
+                      if isinstance(child, dict) and child.get("complete") is not True}
         for item in lost:
             if item not in incomplete:
                 self.error(f"{label}: lost worker {item} is not an incomplete child in {sweep.get('usage_ref')}")
+        omitted = sorted(str(item) for item in incomplete - set(lost))
+        if omitted:
+            self.error(f"{label}: lost_workers omits incomplete children of {sweep.get('usage_ref')}: {omitted}")
 
     def check_layer(self, sweep, layer, label, manifest, lane, earlier) -> None:
         extra = set(layer) - set(LAYER_FIELDS)
@@ -589,6 +649,12 @@ class Checker:
             self.error(f"{label}: {ref} has no proposed list")
         elif {norm_repo(repo) for repo in returned} != {norm_repo(repo) for repo in proposed}:
             self.error(f"{label}: proposed does not equal the retained discovery return {ref}")
+        # The scope the workers evaluated: the hashes frozen before the run (--scope) are retained
+        # with the discovery return, and the record carries exactly those.
+        for field in FROZEN_SCOPE_FIELDS:
+            if target.get(field) != layer.get(field):
+                self.error(f"{label}: {field} differs from the frozen scope in {ref} "
+                           f"({target.get(field)!r}); the scope changed after the sweep froze it")
 
     def check_votes(self, layer, entry, label, located, lane, sweep) -> None:
         votes = layer.get("votes")
@@ -647,8 +713,8 @@ class Checker:
             review = self.document(source_review)
             if not isinstance(review, dict) or norm_repo(str(review.get("repository", ""))) != norm_repo(entry["repo"]):
                 self.error(f"{label}: {source_review} reviews a different repository")
-            elif isinstance(review.get("layers"), list) and layer_id not in review["layers"]:
-                self.error(f"{label}: {source_review} does not name layer {layer_id}")
+            elif not isinstance(review.get("layers"), list) or layer_id not in review["layers"]:
+                self.error(f"{label}: {source_review} does not name layer {layer_id} in its layers list")
 
 
 def check_ledger(root: Path, ledger) -> list[str]:
@@ -819,6 +885,14 @@ def external_triggers(baseline: dict | None, staleness: dict | None, freshness: 
                 if changes:
                     triggers.setdefault(key, []).append(
                         {"trigger": "selection_changed", "ref": f"catalog-freshness:{component_id} ({', '.join(changes)})"})
+        # The rebuilt manifest carries every catalog selection whether or not its upstream was
+        # fetched, so a baseline placement it lacks was removed from (or moved out of) that layer.
+        for component_id, placements in mapping.items():
+            now = {key for key, _ in fresh.get(component_id, [])}
+            for key, _ in placements:
+                if key not in now:
+                    triggers.setdefault(key, []).append(
+                        {"trigger": "selection_changed", "ref": f"catalog-freshness:{component_id} (removed from layer)"})
     return triggers, notes
 
 
@@ -919,6 +993,33 @@ def render_markdown(report: dict) -> str:
 # --------------------------------------------------------------------------- append
 
 
+def scope_hashes(root: Path) -> dict:
+    """The scope to freeze before a sweep: each layer's requirement hash and the platform-profile
+    hash, which the sweep retains in every discovery return it cites."""
+    rows = research_rows(root)
+    return {"platform_profiles_sha256": platform_profiles_sha256(load_json(root, ADOPTION)),
+            "requirement_sha256": {f"{catalog}/{layer_id}": requirement_sha256(row)
+                                   for (catalog, layer_id), row in rows.items()}}
+
+
+def frozen_scope(root: Path, returns_ref, discovery_ref) -> dict | None:
+    """The frozen scope hashes a retained discovery return carries, or None when the layer cites no
+    readable discovery return (--check then reports what is missing)."""
+    if not (isinstance(returns_ref, str) and isinstance(discovery_ref, str)):
+        return None
+    path, _, pointer = discovery_ref.partition("#")
+    if path != returns_ref or not pointer:
+        return None
+    try:
+        target = resolve_pointer(load_json(root, path), pointer)
+    except LedgerError:
+        return None
+    if not isinstance(target, dict):
+        return None
+    return {field: target[field] for field in FROZEN_SCOPE_FIELDS
+            if isinstance(target.get(field), str) and HEX64.fullmatch(target[field])}
+
+
 def complete_result(root: Path, ledger: dict, result: dict) -> dict:
     """Turn a sweep result into a ledger record: add the computed hashes and known/new."""
     if not isinstance(result, dict):
@@ -960,6 +1061,11 @@ def complete_result(root: Path, ledger: dict, result: dict) -> dict:
         ordered = {"catalog": key[0], "layer_id": key[1],
                    "requirement_sha256": requirement_sha256(rows[key]),
                    "platform_profiles_sha256": profiles}
+        frozen = frozen_scope(root, record.get("returns_ref"), layer.get("discovery_ref"))
+        if frozen is not None:
+            # The workers evaluated the scope frozen before the run, not today's files: record that
+            # scope, so a change during the sweep stands as a current requirement or platform trigger.
+            ordered.update(frozen)
         for field in ("votes", "votes_note", "discovery_ref", "calls", "proposed"):
             if field in layer:
                 ordered[field] = layer[field]
@@ -1139,6 +1245,8 @@ def main(argv=None) -> int:
     mode.add_argument("--report", action="store_true")
     mode.add_argument("--append", type=Path, metavar="RESULT.json")
     mode.add_argument("--derive-seed", action="store_true")
+    mode.add_argument("--scope", action="store_true",
+                      help="print the scope hashes to freeze before a sweep (retained in each discovery return)")
     parser.add_argument("--base", help="with --check: the ledger at this git ref must be an unchanged prefix")
     parser.add_argument("--json", action="store_true", help="with --report: print JSON")
     parser.add_argument("--staleness", type=Path, help="with --report: scripts/receipt_staleness.py --json output")
@@ -1152,6 +1260,9 @@ def main(argv=None) -> int:
     try:
         if args.derive_seed:
             print(json.dumps(derive_seed(root), indent=1, ensure_ascii=False))
+            return 0
+        if args.scope:
+            print(json.dumps(scope_hashes(root), indent=1, sort_keys=True))
             return 0
         ledger = json.loads(ledger_path.read_text(encoding="utf-8"), object_pairs_hook=_unique)
         if args.check:
