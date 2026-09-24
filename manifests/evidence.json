@@ -3017,6 +3017,24 @@
         "Source currency remains September 20; offline completion and review do not refresh releases or native execution. Whole-task provider usage is unknown and no savings claim is made."
       ],
       "path": "evidence/receipts/wsl-retrieval-20260920.json"
+    },
+    {
+      "id": "gitleaks-macos-memory-bound-20260924",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "gitleaks"
+      ],
+      "claim": "On one MacBook Pro (Apple M5 Pro, 24 GB, macOS 26.5.1) with gitleaks 8.30.1, the 2026-09-24 09:45 Jetsam events were reproduced: a staged generated explorer (one 12,889,851-byte line, 2,335 findings) drives the global pre-commit hook's `gitleaks git --pre-commit --staged --redact` past 6 GiB in about 17 s, and the recipe's all-refs `gitleaks git --redact=100` past 8 GiB in 36 s, because upstream redaction copies the whole line for every finding. Through adoption/tools/gitleaks-guarded-macos the same scans stop at the 6 GiB footprint cap with exit 137 (the hook then blocks the commit), concurrent scans run one at a time under the per-user lock, and dir scans, the CI-scope history scan and small hook scans keep their upstream results and exit codes.",
+      "limitations": [
+        "One host and one repository state (source 5af3581); a different history, staged content or Gitleaks release can change every peak.",
+        "The guard is a user-space watchdog that samples the process tree's physical footprint every 50 ms, not a kernel limit: measured overshoot was 0.04-0.20 GiB above the 6 GiB cap across the development and final passes, and a scan keeps running unwatched if the guard itself is SIGKILLed (it still holds the lock).",
+        "Measured with the lock at a scratch path (ECOSYSTEM_GITLEAKS_LOCK); the default per-user lock file, installation on PATH and the global hook change were not installed on this host by this unit and remain the agent-ecosystem owner's step.",
+        "No CPU or task cap on macOS: the killed history scan used about 16 cores for 37 s.",
+        "Scans that exceed the cap produce no result (exit 137). This is fail-closed, not coverage: the all-refs history of this repository still has no complete redacted Gitleaks pass on macOS.",
+        "The incident attribution (a test scratch commit through the global hook, before #181 made the tests hermetic) is inferred from process ages, coalitions and session records; the Jetsam reports carry no argv.",
+        "Raw stderr, reports and the Jetsam files stay on the host; published values are sanitized (paths replaced by placeholders, no process or session identifiers)."
+      ],
+      "path": "evidence/receipts/gitleaks-macos-memory-bound-20260924.json"
     }
   ],
   "files": [
@@ -3332,8 +3350,8 @@
     },
     {
       "path": "adoption/tools/README.md",
-      "sha256": "1b65bcdc3f9424c053f00eda03c38d97e0767e1a11ed91efa93543deb46239c3",
-      "bytes": 21822
+      "sha256": "d3f22f9e886bf99b032dc0b9e02b2c4c183e30836446efaa7db8c9e4157b9d04",
+      "bytes": 27484
     },
     {
       "path": "adoption/tools/ecosystem-bounded-run",
@@ -3346,9 +3364,14 @@
       "bytes": 1968
     },
     {
+      "path": "adoption/tools/gitleaks-guarded-macos",
+      "sha256": "fc76d3a11d076b02ad9878b2cc7cfd078058e84a86df285cf53da1ca82fd6ce5",
+      "bytes": 9628
+    },
+    {
       "path": "adoption/update.md",
-      "sha256": "bbf6953c9c72a2fec61727a44a13d8d0ff96097f4ba044241a3cfd5ef0025dbf",
-      "bytes": 17042
+      "sha256": "7a1cae2502167096ebc666e9e6dace7cf1c7d6a96440a7628240638bdcbc6120",
+      "bytes": 17264
     },
     {
       "path": "blueprints/blind-catalog-convergence/README.md",
@@ -24262,6 +24285,11 @@
       "bytes": 22807
     },
     {
+      "path": "evidence/artifacts/gitleaks-macos-memory-bound-20260924/measure.py",
+      "sha256": "619afdd1e30773633498215af9a0c881b1ab24632172879ef65421586ec749ab",
+      "bytes": 5904
+    },
+    {
       "path": "evidence/artifacts/harness-rules-convergence-20260922/codex-agent-roles-source.json",
       "sha256": "79e8f86b6c36d0afff4e5174f491937c7c257cebc4fc2cbb3f88adf6efb90e94",
       "bytes": 3576
@@ -27522,6 +27550,11 @@
       "bytes": 5836
     },
     {
+      "path": "evidence/receipts/gitleaks-macos-memory-bound-20260924.json",
+      "sha256": "d368ccd2e8ff264b4ee7033e851983632822911d7cf8ed746669e1557def5be0",
+      "bytes": 43255
+    },
+    {
       "path": "evidence/receipts/hf-memory-models-20260921.json",
       "sha256": "aed4f45ee65ac469ad7ecabf2ed7e1c2bcb028d0a6011f7f81dffdd4a00a17aa",
       "bytes": 3678
@@ -28138,8 +28171,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "01844b9d85491a09e5b002acfcb93ec3ba1b2a2edb93bd88bccaeb9c409c4163",
-      "bytes": 87705
+      "sha256": "da34251ae5759ac60d6c915b024bde99664bcd49660ac9f9a980bff06671f397",
+      "bytes": 87753
     },
     {
       "path": "observability/README.md",
@@ -28383,8 +28416,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "72ec65d971f2ecb3fe6f8e624994f48157290540a7e6adac6b909e31b600f2f8",
-      "bytes": 59773
+      "sha256": "dd50ed2e69b074d5cd07795bd4230acafe37b31956877dc06d9db2c94202691a",
+      "bytes": 60035
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
@@ -28800,6 +28833,11 @@
       "path": "tests/test_gitleaks_config.py",
       "sha256": "7ae277702e707230df21041df67d9fb212463bf8c560b3a018c617863d9a185f",
       "bytes": 37816
+    },
+    {
+      "path": "tests/test_gitleaks_guarded_macos.py",
+      "sha256": "6bf6ed16c7bbb7e8f3f58454628139e5ffb57b505733c987adf40b6ab9c65c98",
+      "bytes": 13339
     },
     {
       "path": "tests/test_gpu_inference.py",
