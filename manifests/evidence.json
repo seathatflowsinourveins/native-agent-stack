@@ -9728,8 +9728,8 @@
     },
     {
       "path": "docs/landscape-continuation.md",
-      "sha256": "228ea6046e4980b4f9d65e72738b08996bbc3ab2632e99b5811884cf96da72a5",
-      "bytes": 6272
+      "sha256": "73b0fb9cbdbcbcda1920efcd01411e31cccc813f721a0ef7a1b1409c49f5f3ef",
+      "bytes": 6818
     },
     {
       "path": "docs/landscape-domain-notes.md",
@@ -28293,8 +28293,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "e592060d0ab43d680eb2f9771cf2b89dd5a8d1b5809a50ec31603842704fe40e",
-      "bytes": 59537
+      "sha256": "72ec65d971f2ecb3fe6f8e624994f48157290540a7e6adac6b909e31b600f2f8",
+      "bytes": 59773
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
@@ -28323,8 +28323,8 @@
     },
     {
       "path": "recipes/sota-convergence-practice.md",
-      "sha256": "806ee98ab02eb699e3e869016942f58c3130d7a24629fb70e113b17b40996d00",
-      "bytes": 10466
+      "sha256": "900853f08b4ae9629aa3d6d80548c9f338422c07d31a3cb1fe4622898e1f1117",
+      "bytes": 10681
     },
     {
       "path": "recipes/tavily.md",
@@ -28988,8 +28988,8 @@
     },
     {
       "path": "tests/test_workflow_security_coverage.py",
-      "sha256": "b3f3d37bb6ab9bd63293b69da40e1b3ab901fe48979decca0f2971536c8c5723",
-      "bytes": 4158
+      "sha256": "c675855277d15f6ebcf656aeef5de2560cf392e13a5ec4171b8eca7f6cb57648",
+      "bytes": 4755
     },
     {
       "path": "tests/test_wsl_memory_maintenance.py",
