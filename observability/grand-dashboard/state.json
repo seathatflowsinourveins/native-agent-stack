@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "recorded_at_utc": "2026-09-23T23:25:00Z",
+  "recorded_at_utc": "2026-09-23T23:45:00Z",
   "meaning": "Recorded checkpoint combining preserved paper/simulation records with current foundation source review and separate Workflow/context-policy records. Linked receipts retain their own dates and acceptance scopes; emitter freshness is separate from task acceptance.",
   "lanes": [
     {
@@ -46,6 +46,13 @@
       "title": "Alpaca extended-hours paper session",
       "state": "not qualified 2026-09-23 / 10.9 s run 0 orders flat / 4 benchmarks fresh together in 3 of 8 snapshots",
       "evidence_ref": "blueprints/us-equities/adaptive-paper/trials/20260923-post-extended-hours/README.md"
+    },
+    {
+      "kind": "gate",
+      "id": "ibkr-paper-orders",
+      "title": "IBKR paper orders (NautilusTrader 1.231.0 IB engine)",
+      "state": "regular session passed 2026-09-23 / after hours incomplete (flatten step timeout) flat / acceptance gate not established",
+      "evidence_ref": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders/README.md"
     },
     {
       "kind": "gate",
