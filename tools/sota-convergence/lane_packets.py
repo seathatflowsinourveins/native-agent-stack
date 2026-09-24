@@ -385,12 +385,15 @@ def registered_evidence_files(root: Path) -> dict:
 
 
 def newcomer_evidence_refs(item: dict, evidence_files: dict, root: Path, withhold: bool) -> list:
-    """The evidence[] strings that are exactly a registered, unchanged evidence/ file. Command/result prose,
-    a path with a suffix such as "(lines 1-9)", an unregistered or edited file, and (under ``withhold``) a
-    path naming a selection role are left out."""
+    """The registered, unchanged evidence/ files that evidence[] entries lead with (a locator such as
+    "items[3]" or "(lines 1-9)" after the path is dropped). Command/result prose, an unregistered or edited
+    file, and (under ``withhold``) a path naming a selection role or disposition are left out."""
     refs = []
-    for value in item.get("evidence") or []:
-        if (not isinstance(value, str) or not value.startswith("evidence/") or posixpath.normpath(value) != value
+    for entry in item.get("evidence") or []:
+        # The leading path token of an entry (Codex review of #151): the manifest writes locators after the path
+        # ("evidence/x.json items[3]", "evidence/x.json (lines 1-9)"); only the path is carried, never the note.
+        value = entry.strip().split(None, 1)[0].rstrip(",;:)") if isinstance(entry, str) and entry.strip() else ""
+        if (not value.startswith("evidence/") or posixpath.normpath(value) != value
                 or value in refs or value not in evidence_files):
             continue
         path = root / value

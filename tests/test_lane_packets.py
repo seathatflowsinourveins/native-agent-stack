@@ -1065,6 +1065,16 @@ class ManifestNewcomersTests(LanePacketsFixture):
         _, default = self.candidates()
         self.assertNotIn("https://huggingface.co/Org/Embed-Model", default)
 
+    def test_a_path_with_a_locator_attaches_the_path_only(self):
+        # Codex review of #151: the manifest writes locators after a path ("<path> items[claude-x].corrections[0]").
+        manifest = self.read(lane_packets.SOTA_MANIFEST_PATH)
+        manifest["foundation"][0]["candidates"][0]["evidence"] = [
+            f"{self.SWEEP}/new-alpha.json items[claude-x].corrections[0]"]
+        self.write(lane_packets.SOTA_MANIFEST_PATH, manifest)
+        packet, by_repository = self.candidates(manifest_newcomers_on=True, withhold=True)
+        self.assertEqual(by_repository["https://github.com/new/alpha"]["evidence_refs"], [f"{self.SWEEP}/new-alpha.json"])
+        self.assertNotIn("items[claude-x]", json.dumps(packet))
+
     def test_the_cli_flag_reaches_the_packets(self):
         with contextlib.redirect_stdout(io.StringIO()):
             self.assertEqual(lane_packets.main(["--root", str(self.root), "--out", str(self.out),

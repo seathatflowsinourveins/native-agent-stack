@@ -707,10 +707,11 @@ lane. With the flag:
   of its entries is left out, even where another list repeats it. The refutation is of the discovery
   proposal, not of the repository: the 2026-09-23 refutations of ledger repositories say "not new to the
   catalog" or "already conditional". So it withholds only a newcomer addition, never a ledger candidate.
-- **Registered evidence is attached.** A newcomer's `evidence_refs` hold each `evidence[]` string that is
-  exactly a repository-relative `evidence/` path, is listed in `manifests/evidence.json` `files[]`, and still
-  has its listed sha256. Command/result prose, a path with a suffix, and an unregistered or edited file are
-  not attached. Under `--withhold-labels`, a path that names a selection role or a manifest disposition (for
+- **Registered evidence is attached.** A newcomer's `evidence_refs` hold the repository-relative
+  `evidence/` path each `evidence[]` entry leads with, when that path is listed in `manifests/evidence.json`
+  `files[]` and still has its listed sha256. A locator after the path (`items[3]`, `(lines 1-9)`) is dropped.
+  Command/result prose and an unregistered or edited file are not attached. The 2026-09-23 manifest names one
+  such file; the landscape-sweep source-review receipts supply the rest. Under `--withhold-labels`, a path that names a selection role or a manifest disposition (for
   example `keep-but-compare`, `refuted`, `targeted-candidate` or `newcomer`) is not attached either; the same
   wider vocabulary applies to registered receipts.
 
