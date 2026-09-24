@@ -7,6 +7,8 @@ run here is offline_fixture.
 import contextlib
 from datetime import datetime, timezone
 from decimal import Decimal
+import hashlib
+import importlib.util
 import io
 import json
 import os
@@ -15,7 +17,9 @@ import re
 import signal
 import sys
 import tempfile
+import time
 import unittest
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "blueprints/us-equities/order-throughput"
@@ -1238,6 +1242,714 @@ class PullRequestReviewTests(unittest.TestCase):
         rejected = broker.call_log[24]["t"]
         self.assertGreaterEqual(broker.call_log[25]["t"] - rejected, 90.0 - 0.05)
         self.assertTrue(receipt["cleanup"]["verified_zero_open"])
+
+
+# -- live mode (synthetic port only: no credentials, no network, no broker) --------------
+
+HAS_ALPACA_SDK = importlib.util.find_spec("alpaca") is not None
+HAS_REQUESTS = importlib.util.find_spec("requests") is not None
+
+
+def iso(wall):
+    return datetime.fromtimestamp(wall, timezone.utc).isoformat().replace("+00:00", "Z")
+
+
+class LiveFakeBroker(fx.FakeBroker):
+    """The offline fake broker plus the broker clock the live preflight reads and a
+    fill price on fills. Its evidence class stays offline_fixture."""
+
+    def __init__(self, clock, *, market_open=True, **kwargs):
+        super().__init__(clock, **kwargs)
+        self.market_open = market_open
+
+    def preflight(self):
+        return dict(super().preflight(), market_open=self.market_open)
+
+    def _emit(self, event, order):
+        if event in ("fill", "partial_fill"):
+            order["filled_avg_price"] = order["limit_price"]
+        super()._emit(event, order)
+
+
+class LiveCapacityTests(unittest.TestCase):
+    """Every live gate, the caps and the fill rule, against the fake broker only."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.root = Path(self.tmp.name)
+        self.env = self.root / "alpaca-live-capacity.env"  # judged by name; never read by these runs
+        self.written = 0
+
+    def go(self, at=fx.DEFAULT_WALL_START, mode=0o600, raw=None, **fields):
+        """A temporary go file as the user would write it (never the real one)."""
+        data = {"live_capacity_go": True, "issued_at": iso(at - 600), "expires_at": iso(at + 6 * 3600),
+                "max_order_actions": 2000, "max_open_notional_usd": 2000, "note": "capacity probes; user go"}
+        data.update(fields)
+        self.written += 1
+        path = self.root / ("go-%d.json" % self.written)
+        path.write_text(raw if raw is not None else json.dumps(data))
+        os.chmod(path, mode)
+        return path
+
+    def live(self, *, go=None, broker=None, clock=None, env=None, **config):
+        clock = clock or fx.FakeClock()
+        broker = broker or LiveFakeBroker(clock)
+        broker.clock = clock
+        cfg = c.LiveCapacityConfig(**dict({"max_duration_seconds": 130.0, "required_windows": 2,
+                                          "live_orders_acknowledged": True}, **config))
+        harness = c.LiveCapacityRun(broker, cfg, clock=clock, executor=c.InlineExecutor(),
+                                    stop_file=self.root / "STOP",
+                                    live_stop_file=self.root / "alpaca-live" / "STOP",
+                                    go_file=go or self.go(at=clock.time()), env_file=env or self.env)
+        return harness.run(), harness, broker
+
+    def assert_refused_before_any_request(self, receipt, broker, reason):
+        self.assertEqual((receipt["status"], receipt["refusal_reason"]), ("refused", reason))
+        self.assertEqual(broker.call_log, [])
+        self.assertEqual(receipt["orders"]["submit_attempts"], 0)
+
+    def test_live_run_reuses_the_engine_and_reports_native_live_evidence(self):
+        class NativeLabel(LiveFakeBroker):
+            evidence_class = "native_live"  # labels the fixture ONLY to exercise the receipt logic
+
+        clock = fx.FakeClock()
+        go = self.go(at=clock.time())
+        broker = NativeLabel(clock)
+        receipt, _, _ = self.live(go=go, broker=broker, clock=clock, max_duration_seconds=330.0,
+                                  required_windows=5)
+        self.assertEqual(receipt["status"], "completed")
+        self.assertEqual(receipt["evidence_class"], "native_live")
+        self.assertIs(receipt["counts_as_strategy_trades"], False)
+        self.assertEqual(receipt["strategy_trades"], 0)
+        self.assertEqual(receipt["config"]["base_url"], "https://api.alpaca.markets")
+        self.assertEqual(receipt["session_kind"], "RTH")
+        self.assertFalse(receipt["extended_hours_orders"])
+        self.assertEqual(broker.extended_hours_flags, {False})
+        # Budget = floor(min(--cap 1000, observed limit 200) * 0.9).
+        self.assertEqual((receipt["rate"]["configured_cap_per_minute"], receipt["rate"]["budget_per_minute"]),
+                         (1000, 180))
+        self.assertEqual(receipt["probe_plan"]["limit_price"], "475.00")  # 500 bps below the 500.00 bid
+        self.assertEqual(receipt["probe_plan"]["time_in_force"], "day")
+        live = receipt["live"]
+        self.assertEqual((live["user_go"]["required"], live["user_go"]["verified"], live["user_go"]["sha256"]),
+                         (True, True, hashlib.sha256(go.read_bytes()).hexdigest()))
+        self.assertGreater(live["user_go"]["rechecks"]["performed"], 0)
+        self.assertIsNone(live["user_go"]["rechecks"]["stopped_by"])
+        self.assertTrue(live["order_actions"]["within_cap"])
+        self.assertEqual((live["fills"], live["filled_qty_total"], live["auto_sell"]), ([], "0", False))
+        self.assertGreater(live["position_checks"]["completed"], 0)
+        self.assertEqual(live["position_checks"]["changes_detected"], 0)
+        self.assertTrue(receipt["acceptance"]["evidence_class_qualifies"])
+        self.assertTrue(receipt["acceptance"]["capacity_criteria_met"])
+        self.assertEqual(receipt["acceptance"]["passed_blockers"], [])
+        self.assertEqual(broker.cancel_all_calls, 0)
+        self.assertEqual(broker.open_orders_with_prefix(receipt["probe_plan"]["client_order_id_prefix"]), [])
+        text = json.dumps(receipt)
+        self.assertIsNone(UUID_TEXT.search(text))  # no broker order ids
+        self.assertNotIn(fx.hashlib.sha256(b"fixture-account").hexdigest(), text)  # no account identity
+        self.assertNotIn("capacity probes; user go", text)  # the go file's content never reaches the receipt
+        # The fixture itself never qualifies.
+        receipt, _, _ = self.live()
+        self.assertIn("evidence_class_not_native_live", receipt["acceptance"]["passed_blockers"])
+
+    def test_go_file_gate_refuses_before_any_request(self):
+        wall = fx.DEFAULT_WALL_START
+        link = self.root / "go-link.json"
+        link.symlink_to(self.go())
+        expired = self.go(issued_at=iso(wall - 3600), expires_at=iso(wall - 1))
+        cases = [
+            (self.root / "absent.json", "live_go_file_missing"),
+            (expired, "live_go_file_expired"),
+            (self.go(mode=0o644), "live_go_file_mode_not_0600"),
+            (self.go(mode=0o400), "live_go_file_mode_not_0600"),
+            (link, "live_go_file_not_regular"),
+            (self.go(live_capacity_go=False), "live_go_false"),
+            (self.go(raw="{not json"), "live_go_file_malformed"),
+            (self.go(issued_at=iso(wall - 3600), expires_at=iso(wall - 3600 + 24 * 3600 + 1)),
+             "live_go_validity_exceeds_24h"),
+            (self.go(issued_at=iso(wall + 3600), expires_at=iso(wall + 7200)), "live_go_not_yet_valid"),
+        ]
+        for path, reason in cases:
+            with self.subTest(reason=reason, path=path.name):
+                receipt, _, broker = self.live(go=path)
+                self.assert_refused_before_any_request(receipt, broker, reason)
+                self.assertIsNone(receipt["live"]["caps_used"])
+                self.assertFalse(receipt["live"]["user_go"]["verified"])
+        receipt, _, _ = self.live(go=expired)
+        self.assertEqual(receipt["live"]["user_go"]["sha256"], hashlib.sha256(expired.read_bytes()).hexdigest())
+        receipt, _, _ = self.live(go=self.root / "absent.json")
+        self.assertIsNone(receipt["live"]["user_go"]["sha256"])
+        with mock.patch.object(c.os, "getuid", return_value=os.getuid() + 1):
+            receipt, _, broker = self.live(go=self.go())
+        self.assert_refused_before_any_request(receipt, broker, "live_go_file_not_owned_by_user")
+
+    def test_go_file_is_read_but_never_written(self):
+        go = self.go()
+        before = (go.read_bytes(), go.stat().st_mode, go.stat().st_mtime_ns)
+        receipt, _, _ = self.live(go=go)
+        self.assertEqual(receipt["status"], "completed")
+        self.assertEqual((go.read_bytes(), go.stat().st_mode, go.stat().st_mtime_ns), before)
+        self.assertEqual(sorted(p.name for p in self.root.iterdir()), [go.name])
+
+    def test_go_file_content_rules(self):
+        now = fx.DEFAULT_WALL_START
+        good = {"live_capacity_go": True, "issued_at": iso(now - 60), "expires_at": iso(now + 3600),
+                "max_order_actions": 400, "max_open_notional_usd": 1500.5, "note": "probe capacity"}
+
+        def parse(raw=None, **changes):
+            return c.parse_live_go(raw if raw is not None else json.dumps(dict(good, **changes)).encode(), now)
+
+        go = parse()
+        self.assertEqual((go.max_order_actions, go.max_open_notional_usd), (400, Decimal("1500.5")))
+        parse(issued_at=iso(now - 60), expires_at=iso(now - 60 + 24 * 3600))  # exactly 24 h is allowed
+        parse(issued_at="2026-09-24T09:59:00-04:00")  # any explicit offset
+        malformed = [{"live_capacity_go": 1}, {"live_capacity_go": "true"}, {"max_order_actions": True},
+                     {"max_order_actions": 2.5}, {"max_order_actions": 0}, {"max_open_notional_usd": "1500"},
+                     {"max_open_notional_usd": 0}, {"max_open_notional_usd": -5}, {"note": ""}, {"note": 7},
+                     {"issued_at": "2026-09-24T13:59:00"}, {"expires_at": "tomorrow"},
+                     {"expires_at": iso(now - 120)}, {"extra": 1}]
+        for changes in malformed:
+            with self.subTest(changes=changes):
+                with self.assertRaises(c.HarnessRefusal) as raised:
+                    parse(**changes)
+                self.assertEqual(str(raised.exception), "live_go_file_malformed")
+        missing_note = {key: value for key, value in good.items() if key != "note"}
+        for raw in (json.dumps(missing_note).encode(), b"[]", b"\xff",
+                    json.dumps(good).replace("1500.5", "NaN").encode(),
+                    b'{"note": "a", "note": "b"}'):
+            with self.assertRaises(c.HarnessRefusal) as raised:
+                parse(raw=raw)
+            self.assertEqual(str(raised.exception), "live_go_file_malformed")
+        with self.assertRaises(c.HarnessRefusal) as raised:
+            parse(raw=b'{"live_capacity_go": false}')
+        self.assertEqual(str(raised.exception), "live_go_false")  # a revoked go needs no other field
+
+    def test_explicit_acknowledgement_comes_before_reading_the_go_file(self):
+        receipt, _, broker = self.live(go=self.root / "absent.json", live_orders_acknowledged=False)
+        self.assert_refused_before_any_request(receipt, broker, "live_orders_not_acknowledged")
+        self.assertIsNone(receipt["live"]["user_go"]["sha256"])  # the go file was not even read
+
+    def test_env_file_gate_by_name(self):
+        target = self.root / "alpaca-paper-agentlab.env"
+        target.write_text("")
+        link = self.root / "alpaca-live-link.env"
+        link.symlink_to(target)
+        cases = [(self.root / "alpaca-paper-capacity.env", "paper_env_file_in_live_mode"),
+                 (self.root / "paper.env", "paper_env_file_in_live_mode"),
+                 (link, "paper_env_file_in_live_mode"),  # a live name that resolves to a paper file
+                 (self.root / "credentials.env", "live_env_file_name_required"),
+                 (self.root / "alpaca-live.env", "live_env_file_name_required")]
+        for env, reason in cases:
+            with self.subTest(env=env.name):
+                receipt, _, broker = self.live(env=env)
+                self.assert_refused_before_any_request(receipt, broker, reason)
+        self.assertEqual(c.live_base_url_refusal("https://paper-api.alpaca.markets/"), "paper_base_url_in_live_env")
+        self.assertEqual(c.live_base_url_refusal("https://example.invalid"), "non_live_base_url")
+        self.assertIsNone(c.live_base_url_refusal("https://api.alpaca.markets/"))
+        self.assertIsNone(c.live_base_url_refusal(None))
+        self.assertEqual(c.paper_env_refusal(self.env), "live_env_file_in_paper_mode")
+        self.assertIsNone(c.paper_env_refusal(self.root / "alpaca-paper-capacity.env"))
+        self.assertIsNone(c.paper_env_refusal(self.root / "paper.env"))
+
+    def test_live_env_base_url_is_checked_before_the_live_port_is_built(self):
+        """The CLI's port factory: credentials (temporary fixture file), then the base URL."""
+        with tempfile.TemporaryDirectory(dir="/tmp") as private:
+            env = Path(private) / "alpaca-live-capacity.env"
+            env.write_text("APCA_API_KEY_ID=fixturekey\nAPCA_API_SECRET_KEY=fixturesecret\n"
+                           "APCA_API_BASE_URL=https://paper-api.alpaca.markets\n")
+            os.chmod(env, 0o600)
+            args = c.build_parser().parse_args(["live", "--env-file", str(env), "--output", "x.json"])
+            harness = c.LiveCapacityRun(LiveFakeBroker(fx.FakeClock()), c.LiveCapacityConfig())
+            with mock.patch("alpaca_capacity_port.AlpacaLiveCapacityPort",
+                            side_effect=AssertionError("live port built")):
+                with self.assertRaises(c.HarnessRefusal) as raised:
+                    c._live_port_factory(args, harness)()
+                self.assertEqual(str(raised.exception), "paper_base_url_in_live_env")
+                os.chmod(env, 0o644)  # runner.credentials refuses it; nothing is echoed
+                with self.assertRaises(c.HarnessRefusal) as raised:
+                    c._live_port_factory(args, harness)()
+                self.assertEqual(str(raised.exception), "live_env_file_rejected")
+
+    def test_regular_trading_hours_only(self):
+        cases = [(datetime(2026, 9, 24, 11, 0, tzinfo=timezone.utc), "PRE"),     # 07:00 ET
+                 (datetime(2026, 9, 24, 21, 0, tzinfo=timezone.utc), "POST"),    # 17:00 ET
+                 (datetime(2026, 9, 26, 15, 0, tzinfo=timezone.utc), "CLOSED"),  # Saturday
+                 (datetime(2026, 11, 26, 16, 0, tzinfo=timezone.utc), "CLOSED"),  # Thanksgiving
+                 (datetime(2026, 11, 27, 18, 30, tzinfo=timezone.utc), "POST")]  # 13:30 ET, after the early close
+        for when, kind in cases:
+            with self.subTest(when=when.isoformat()):
+                clock = fx.FakeClock(when.timestamp())
+                receipt, _, broker = self.live(clock=clock, broker=LiveFakeBroker(clock))
+                self.assert_refused_before_any_request(receipt, broker, "live_outside_regular_trading_hours")
+                self.assertEqual(receipt["session_kind"], kind)
+        # 13:30 ET on a full day is regular hours.
+        clock = fx.FakeClock(datetime(2026, 9, 24, 17, 30, tzinfo=timezone.utc).timestamp())
+        receipt, _, _ = self.live(clock=clock, broker=LiveFakeBroker(clock))
+        self.assertEqual((receipt["status"], receipt["session_kind"]), ("completed", "RTH"))
+        # Early close: the run must finish, cleanup included, before 13:00 ET.
+        clock = fx.FakeClock(datetime(2026, 11, 27, 17, 56, tzinfo=timezone.utc).timestamp())  # 12:56 ET
+        receipt, _, _ = self.live(clock=clock, broker=LiveFakeBroker(clock))
+        self.assertEqual(receipt["refusal_reason"], "session_ends_too_soon")
+        # The broker's own clock must agree that the market is open.
+        clock = fx.FakeClock()
+        broker = LiveFakeBroker(clock, market_open=False)
+        receipt, _, _ = self.live(clock=clock, broker=broker)
+        self.assertEqual(receipt["refusal_reason"], "live_broker_reports_market_closed")
+        self.assertEqual(broker.submit_count, 0)
+
+    def test_open_orders_at_preflight_refuse_and_cancel_all_stays_disabled(self):
+        clock = fx.FakeClock()
+        broker = LiveFakeBroker(clock, foreign_open_orders=1)
+        receipt, _, _ = self.live(broker=broker, clock=clock)
+        self.assertEqual(receipt["refusal_reason"], "live_account_has_open_orders")
+        self.assertEqual((broker.submit_count, broker.cancel_all_calls), (0, 0))
+        self.assertEqual(broker.orders["strategy-foreign-0"]["status"], "new")  # untouched
+        receipt, _, broker = self.live(acknowledged_open_orders=1)
+        self.assert_refused_before_any_request(receipt, broker, "live_requires_zero_open_orders")
+        receipt, _, broker = self.live(allow_cancel_all=True)
+        self.assert_refused_before_any_request(receipt, broker, "live_cancel_all_disabled")
+        # Probes still open at cleanup are cancelled individually, never with cancel-all.
+        clock = fx.FakeClock()
+        broker = LiveFakeBroker(clock, drop_events={"new"})
+        receipt, _, _ = self.live(broker=broker, clock=clock)
+        self.assertEqual(broker.cancel_all_calls, 0)
+        self.assertEqual(receipt["cleanup"]["cancel_all_decision"], "not_enabled")
+        self.assertGreater(receipt["cleanup"]["individual_cancels"], 0)
+        self.assertTrue(receipt["cleanup"]["verified_zero_open"])
+
+    def test_band_below_500_bps_refuses(self):
+        for band in (499, 100):
+            with self.subTest(band=band):
+                receipt, _, broker = self.live(band_bps=band)
+                self.assert_refused_before_any_request(receipt, broker, "live_band_bps_below_500")
+        c.CapacityConfig(band_bps=100).validate()  # paper bounds are unchanged
+        receipt, _, _ = self.live(band_bps=1000)
+        self.assertEqual(receipt["probe_plan"]["limit_price"], "450.00")
+
+    def test_caps_are_the_minimum_of_cli_go_file_and_live_ceilings(self):
+        clock = fx.FakeClock()
+        go = self.go(at=clock.time(), max_order_actions=120, max_open_notional_usd=900)
+        broker = LiveFakeBroker(clock, drop_events={"new"})  # probes stay open, so the open cap binds
+        receipt, _, _ = self.live(go=go, broker=broker, clock=clock, max_order_actions=80,
+                                  max_open_notional_usd="10000")
+        caps, binding = receipt["live"]["caps_used"], receipt["live"]["cap_binding"]
+        self.assertEqual((caps["max_order_actions"], binding["max_order_actions"]), (80, ["cli"]))
+        self.assertEqual((caps["max_open_notional_usd"], binding["max_open_notional_usd"]), ("900", ["go_file"]))
+        self.assertEqual((caps["max_order_notional_usd"], binding["max_order_notional_usd"]), ("900", ["go_file"]))
+        self.assertEqual(receipt["config"]["max_order_actions"], 80)
+        self.assertEqual(broker.submit_count, 1)  # 475 open; a second probe (950) would exceed 900
+        # The go file's lower action cap binds when the CLI asks for more.
+        receipt, _, _ = self.live(go=self.go(max_order_actions=60), max_order_actions=5000)
+        self.assertEqual(receipt["live"]["caps_used"]["max_order_actions"], 60)
+        self.assertEqual(receipt["live"]["cap_binding"]["max_order_actions"], ["go_file"])
+        # A go file above the live ceilings is clipped to 2000 open and 1000 per order.
+        receipt, _, _ = self.live(go=self.go(max_order_actions=50, max_open_notional_usd=5000),
+                                  max_open_notional_usd="10000", max_order_notional_usd="5000")
+        caps, binding = receipt["live"]["caps_used"], receipt["live"]["cap_binding"]
+        self.assertEqual((caps["max_open_notional_usd"], caps["max_order_notional_usd"]), ("2000", "1000"))
+        self.assertEqual((binding["max_open_notional_usd"], binding["max_order_notional_usd"]),
+                         (["live_ceiling"], ["live_ceiling"]))
+        # The per-order cap follows the go file's cap too: a 475 probe cannot fit under 400.
+        receipt, _, broker = self.live(go=self.go(max_open_notional_usd=400))
+        self.assertEqual(receipt["refusal_reason"], "order_notional_cap_exceeded")
+        self.assertEqual(broker.submit_count, 0)
+        # A cap too small for one probe and its worst-case cancels refuses before any request.
+        receipt, _, broker = self.live(go=self.go(max_order_actions=6))
+        self.assert_refused_before_any_request(receipt, broker, "live_order_action_cap_below_one_probe")
+
+    def order_actions_at_broker(self, broker):
+        return sum(1 for row in broker.call_log if row["kind"] in ("submit", "cancel"))
+
+    def test_total_order_actions_never_exceed_the_cap(self):
+        clock = fx.FakeClock()
+        receipt, _, broker = self.live(go=self.go(at=clock.time(), max_order_actions=40), clock=clock)
+        sent = self.order_actions_at_broker(broker)
+        self.assertLessEqual(sent, 40)
+        self.assertEqual(receipt["live"]["order_actions"]["sent"], sent)
+        self.assertEqual(receipt["stop_reason"], "order_action_cap_reached")
+        self.assertTrue(receipt["cleanup"]["verified_zero_open"])
+
+    def test_cleanup_cancels_fit_the_cap_in_the_worst_case(self):
+        """The first probe's cancel is refused (429) five times, so it uses every
+        reserved cancel: three individual attempts, then one prefix-sweep cancel in
+        each of the three cleanup verification rounds. The cap still holds."""
+
+        class StubbornCancel(LiveFakeBroker):
+            refused = 0
+
+            def cancel(self, order_id):
+                first = next(iter(self.orders.values()))["id"]
+                if order_id == first and self.refused < 5:
+                    self.refused += 1
+                    self.clock.advance(self.cancel_latency)
+                    self.call_log.append({"t": self.clock.monotonic(), "kind": "cancel"})
+                    return c.Response(429, {"retry-after": "1"})
+                return super().cancel(order_id)
+
+        clock = fx.FakeClock()
+        broker = StubbornCancel(clock)
+        receipt, harness, _ = self.live(go=self.go(at=clock.time(), max_order_actions=30), broker=broker,
+                                        clock=clock, max_http_429=10)
+        first = min(harness.probes.values(), key=lambda probe: probe.seq)
+        self.assertEqual(first.cancel_attempts, c.CANCELS_RESERVED_PER_PROBE)  # 6
+        self.assertEqual(broker.refused, 5)
+        sent = self.order_actions_at_broker(broker)
+        self.assertLessEqual(sent, 30)
+        self.assertEqual(receipt["live"]["order_actions"]["sent"], sent)
+        self.assertTrue(receipt["live"]["order_actions"]["within_cap"])
+        self.assertNotIn("order_action_cap_exhausted", receipt["health_freezes"])
+        self.assertTrue(receipt["cleanup"]["verified_zero_open"])
+        self.assertEqual(broker.open_orders_with_prefix(receipt["probe_plan"]["client_order_id_prefix"]), [])
+        self.assertEqual(receipt["http_429"]["total"], 5)
+
+    def test_fill_stops_submissions_cancels_open_probes_and_never_sells(self):
+        class FillsThird(LiveFakeBroker):
+            def _emit(self, event, order):
+                if event == "new" and order["client_order_id"][-6:] in ("000001", "000002"):
+                    return  # not acknowledged yet, so still open when the third probe fills
+                super()._emit(event, order)
+
+        clock = fx.FakeClock()
+        broker = FillsThird(clock, fill_submit_seqs={3})
+        receipt, _, _ = self.live(broker=broker, clock=clock)
+        prefix = receipt["probe_plan"]["client_order_id_prefix"]
+        self.assertEqual(receipt["status"], "needs_attention")
+        self.assertEqual(receipt["stop_reason"], "frozen:unexpected_fill")
+        self.assertEqual(broker.submit_count, 3)  # nothing submitted after the fill
+        self.assertEqual(broker.open_orders_with_prefix(prefix), [])  # probes 1 and 2 were cancelled
+        self.assertGreaterEqual(receipt["cleanup"]["individual_cancels"], 2)
+        self.assertEqual(len(broker.orders), 3)
+        self.assertEqual({order["side"] for order in broker.orders.values()}, {"buy"})  # no sell order
+        held, _ = broker.positions()
+        self.assertEqual(held, [{"symbol": "SPY", "qty": "1"}])  # the fill is left for the user
+        live = receipt["live"]
+        self.assertEqual(live["fills"], [{
+            "seq": 3,
+            "stream": {"filled_qty": "1", "filled_avg_price": "475.00", "event": "fill"},
+            "broker": {"filled_qty": "1", "filled_avg_price": "475.00", "status": "filled"}}])
+        self.assertEqual((live["filled_qty_total"], live["auto_sell"]), ("1", False))
+        self.assertEqual(receipt["orders"]["unexpected_fill_qty"], "1")
+        self.assertEqual(receipt["reconciliation"]["filled_probes"], [3])
+        self.assertFalse(receipt["acceptance"]["capacity_criteria_met"])
+
+    def test_foreign_fill_or_position_change_stops_the_run(self):
+        class ForeignFill(LiveFakeBroker):
+            def submit(self, *args):
+                response = super().submit(*args)
+                if self.submit_count == 5:
+                    self.callback({"stream": "trade_updates", "data": {"event": "fill", "order": {
+                        "client_order_id": "manual-1", "id": "m-1", "status": "filled", "filled_qty": "2"}}})
+                return response
+
+        clock = fx.FakeClock()
+        receipt, _, broker = self.live(broker=ForeignFill(clock), clock=clock)
+        self.assertEqual(receipt["stop_reason"], "frozen:live_position_change")
+        self.assertEqual(receipt["live"]["foreign_fill_events"], 1)
+        self.assertEqual(receipt["status"], "needs_attention")
+        self.assertEqual(broker.submit_count, 5)
+        self.assertTrue(receipt["cleanup"]["verified_zero_open"])
+
+        clock = fx.FakeClock()
+        start = clock.time()
+
+        class Drift(LiveFakeBroker):
+            """A position change with no trade update (e.g. a transfer): found by the position check."""
+            def positions(self):
+                held, responses = super().positions()
+                if self.clock.time() - start > 30:
+                    held = held + [{"symbol": "MSFT", "qty": "3"}]
+                return held, responses
+
+        receipt, _, broker = self.live(broker=Drift(clock), clock=clock)
+        self.assertEqual(receipt["stop_reason"], "frozen:live_position_change")
+        self.assertEqual(receipt["live"]["position_checks"]["changes_detected"], 1)
+        self.assertEqual(receipt["status"], "needs_attention")
+        self.assertLess(receipt["throughput"]["submission_phase_seconds"], 45.0)
+        self.assertTrue(receipt["cleanup"]["verified_zero_open"])
+
+        class Garbled(LiveFakeBroker):
+            def submit(self, *args):
+                response = super().submit(*args)
+                if self.submit_count == 4:
+                    self.callback({"stream": "trade_updates", "data": {"event": "fill"}})
+                return response
+
+        clock = fx.FakeClock()
+        receipt, _, broker = self.live(broker=Garbled(clock), clock=clock)
+        self.assertIn("live_malformed_stream_event", receipt["health_freezes"])
+        self.assertEqual((receipt["status"], broker.submit_count), ("needs_attention", 4))
+
+    def test_host_and_live_stop_files_are_honoured(self):
+        live_stop = self.root / "alpaca-live" / "STOP"
+        live_stop.parent.mkdir()
+        live_stop.write_text("")
+        receipt, _, broker = self.live()
+        self.assert_refused_before_any_request(receipt, broker, "stop_file_present")
+        self.assertEqual(receipt["live"]["stop_files_seen"], ["live"])
+        live_stop.unlink()
+        (self.root / "STOP").write_text("")
+        receipt, _, broker = self.live()
+        self.assert_refused_before_any_request(receipt, broker, "stop_file_present")
+        self.assertEqual(receipt["live"]["stop_files_seen"], ["host"])
+        (self.root / "STOP").unlink()
+
+        class LiveStopAt20(LiveFakeBroker):
+            def submit(self, *args):
+                response = super().submit(*args)
+                if self.submit_count == 20:
+                    live_stop.write_text("")
+                return response
+
+        clock = fx.FakeClock()
+        receipt, _, broker = self.live(broker=LiveStopAt20(clock), clock=clock)
+        self.assertEqual(receipt["stop_reason"], "stop_file_present")
+        self.assertEqual(broker.submit_count, 20)
+        self.assertTrue(receipt["cleanup"]["verified_zero_open"])
+
+    def test_revoking_or_changing_the_go_mid_run_stops_submissions(self):
+        def edits(go, change):
+            class EditsAt10(LiveFakeBroker):
+                def submit(self, *args):
+                    response = super().submit(*args)
+                    if self.submit_count == 10:
+                        change(go)  # the user edits their own go file mid-run
+                    return response
+            return EditsAt10
+
+        def revoke(path):
+            path.write_text(json.dumps(dict(json.loads(path.read_text()), live_capacity_go=False)))
+
+        def lower(path):
+            path.write_text(json.dumps(dict(json.loads(path.read_text()), max_order_actions=100)))
+
+        for change, freeze, stopped_by in ((revoke, "live_go_revoked", "live_go_false"),
+                                           (lambda path: path.unlink(), "live_go_revoked", "live_go_file_missing"),
+                                           (lower, "live_go_changed", "live_go_file_changed")):
+            with self.subTest(freeze=freeze, stopped_by=stopped_by):
+                clock = fx.FakeClock()
+                go = self.go(at=clock.time())
+                receipt, _, broker = self.live(go=go, broker=edits(go, change)(clock), clock=clock)
+                self.assertEqual(receipt["stop_reason"], "frozen:" + freeze)
+                self.assertEqual(receipt["live"]["user_go"]["rechecks"]["stopped_by"], stopped_by)
+                self.assertLess(receipt["throughput"]["submission_phase_seconds"], 25.0)
+                self.assertTrue(receipt["cleanup"]["verified_zero_open"])
+                self.assertEqual(broker.open_orders_with_prefix(receipt["probe_plan"]["client_order_id_prefix"]), [])
+
+    def test_go_expiry_mid_run_stops_submissions(self):
+        clock = fx.FakeClock()
+        go = self.go(issued_at=iso(clock.time() - 3600), expires_at=iso(clock.time() + 40))
+        receipt, _, _ = self.live(go=go, clock=clock)
+        self.assertEqual(receipt["stop_reason"], "live_go_expired")
+        self.assertLess(receipt["throughput"]["submission_phase_seconds"], 45.0)
+        self.assertTrue(receipt["cleanup"]["verified_zero_open"])
+
+    def test_paper_and_offline_paths_are_unchanged(self):
+        receipt, _, _ = run(self.tmp.name)
+        self.assertNotIn("live", receipt)
+        self.assertEqual(receipt["config"]["configured_cap_per_minute"], 200)
+        with self.assertRaises(c.HarnessRefusal) as raised:
+            c.CapacityConfig(base_url=c.LIVE_URL).validate()
+        self.assertEqual(str(raised.exception), "non_paper_base_url")  # paper-only validation as before
+        # The paper engine never drives a live-origin port, and the live engine never a paper one.
+
+        class LiveOrigin(fx.FakeBroker):
+            trading_origin = "https://api.alpaca.markets"
+
+        clock = fx.FakeClock()
+        broker = LiveOrigin(clock)
+        receipt = c.CapacityRun(broker, c.CapacityConfig(), clock=clock, executor=c.InlineExecutor(),
+                                stop_file=stop_path(self.tmp.name)).run()
+        self.assert_refused_before_any_request(receipt, broker, "port_trading_origin_mismatch")
+
+        class PaperOrigin(LiveFakeBroker):
+            trading_origin = "https://paper-api.alpaca.markets"
+
+        clock = fx.FakeClock()
+        receipt, _, broker = self.live(broker=PaperOrigin(clock), clock=clock)
+        self.assert_refused_before_any_request(receipt, broker, "port_trading_origin_mismatch")
+
+    def cli(self, argv):
+        """c.main with every credential read and native port construction forbidden."""
+        out = self.root / ("receipt-%d.json" % len(list(self.root.glob("receipt-*.json"))))
+        handlers = {sig: signal.getsignal(sig) for sig in (signal.SIGINT, signal.SIGTERM)}
+        forbidden = AssertionError("must not be reached")
+        try:
+            with mock.patch("runner.credentials", side_effect=forbidden), \
+                    mock.patch("alpaca_capacity_port.AlpacaCapacityPort", side_effect=forbidden), \
+                    mock.patch("alpaca_capacity_port.AlpacaLiveCapacityPort", side_effect=forbidden), \
+                    contextlib.redirect_stdout(io.StringIO()):
+                code = c.main(list(argv) + ["--output", str(out)])
+        finally:
+            for sig, handler in handlers.items():
+                signal.signal(sig, handler)
+        return code, json.loads(out.read_text())
+
+    def test_cli_live_gates_refuse_before_reading_credentials(self):
+        go_now = str(self.go(at=time.time()))  # the CLI uses the host clock
+        base = ["live", "--env-file", str(self.env), "--live-go-file", go_now]
+        code, receipt = self.cli(base)
+        self.assertEqual((code, receipt["refusal_reason"]), (2, "live_orders_not_acknowledged"))
+        self.assertEqual(receipt["evidence_class"], "native_live")
+        self.assertEqual(receipt["provenance"]["argv"][:5], ["live", "--env-file", "<path>", "--live-go-file",
+                                                             "<path>"])
+        self.assertNotIn(self.tmp.name, json.dumps(receipt))
+        paper_env = str(self.root / "alpaca-paper-capacity.env")
+        for extra, reason in (
+                (["--env-file", paper_env], "paper_env_file_in_live_mode"),
+                (["--band-bps", "400"], "live_band_bps_below_500"),
+                (["--allow-cancel-all"], "live_cancel_all_disabled"),
+                (["--acknowledge-open-orders", "1"], "live_requires_zero_open_orders"),
+                (["--live-go-file", str(self.go(at=time.time(), mode=0o640))], "live_go_file_mode_not_0600")):
+            with self.subTest(reason=reason):
+                code, receipt = self.cli(base + ["--i-understand-live-orders"] + extra)
+                self.assertEqual((code, receipt["status"], receipt["refusal_reason"]), (2, "refused", reason))
+                self.assertEqual(receipt["orders"]["submit_attempts"], 0)
+                self.assertEqual(list(self.root.glob("*.journal.jsonl")), [])  # refused before the journal
+
+    def test_cli_paper_side_commands_refuse_a_live_env_file(self):
+        journal = str(self.root / "run.journal.jsonl")
+        for argv in (["paper", "--env-file", str(self.env)],
+                     ["recover", "--env-file", str(self.env), "--journal", journal],
+                     ["audit", "--env-file", str(self.env), "--journal", journal]):
+            with self.subTest(command=argv[0]):
+                code, receipt = self.cli(argv)
+                self.assertEqual((code, receipt["refusal_reason"]), (2, "live_env_file_in_paper_mode"))
+                self.assertEqual(receipt["evidence_class"], "native_paper")
+                self.assertNotIn("live", receipt)
+        for argv in (["paper", "--env-file", "p.env", "--i-understand-live-orders"],
+                     ["offline", "--live-go-file", "go.json"], ["offline", "--max-order-actions", "10"],
+                     ["live", "--env-file", str(self.env), "--stop-file", "STOP"]):
+            with self.subTest(argv=argv), self.assertRaises(SystemExit), \
+                    contextlib.redirect_stderr(io.StringIO()):
+                c.main(argv + ["--output", str(self.root / "unused.json")])
+        self.assertFalse((self.root / "unused.json").exists())
+
+    def test_offline_cli_default_cap_is_unchanged(self):
+        code, receipt = self.cli(["offline", "--duration", "70", "--required-windows", "1"])
+        self.assertEqual(code, 0)
+        self.assertEqual(receipt["config"]["configured_cap_per_minute"], 200)
+        self.assertEqual(receipt["evidence_class"], "offline_fixture")
+        self.assertNotIn("live", receipt)
+
+
+class LivePortTests(unittest.TestCase):
+    """The native live port's own logic; no request leaves the process."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.stops = (Path(self.tmp.name) / "STOP", Path(self.tmp.name) / "alpaca-live" / "STOP")
+
+    def go(self, expires_in=3600.0):
+        now = time.time()
+        return c.LiveGo(now - 60.0, now + expires_in, 100, Decimal("2000"))
+
+    def test_live_port_identity_and_final_boundary(self):
+        import alpaca_capacity_port as native
+        self.assertEqual(native.AlpacaLiveCapacityPort.evidence_class, "native_live")
+        self.assertFalse(native.AlpacaLiveCapacityPort.supports_cancel_all)
+        self.assertEqual(native.AlpacaLiveCapacityPort.trading_origin, "https://api.alpaca.markets")
+        self.assertEqual(native.AlpacaCapacityPort.trading_origin, "https://paper-api.alpaca.markets")
+        self.assertEqual(c.LIVE_WS, "wss://api.alpaca.markets/stream")
+        for go in (None, self.go(expires_in=-1.0)):
+            with self.assertRaises(native.transport.TransportError):
+                native.AlpacaLiveCapacityPort("k", "s", "SPY", go=go, stop_files=self.stops)
+        with self.assertRaises(native.transport.TransportError):
+            native.AlpacaLiveCapacityPort("k", "s", "SPY", go=self.go(), stop_files=self.stops[:1])
+        port = native.AlpacaLiveCapacityPort("k", "s", "SPY", go=self.go(), stop_files=self.stops)
+        self.assertIsNone(port._before_request("submit", client_id="x"))
+        self.stops[1].parent.mkdir()
+        self.stops[1].write_text("")
+        with self.assertRaises(native.SafetyError):
+            port._before_request("submit", client_id="x")
+        self.assertIsNone(port._before_request("cancel"))  # cancels stay allowed under STOP
+        self.stops[1].unlink()
+        port.go = self.go(expires_in=-1.0)
+        with self.assertRaises(native.SafetyError):
+            port._before_request("submit", client_id="x")  # the go expired: no further submit
+        with self.assertRaises(native.transport.TransportError):
+            port.recovery_preflight()
+        with self.assertRaises(Exception):
+            port.cancel_all()
+
+    @unittest.skipUnless(HAS_REQUESTS, "requests is not installed in this interpreter")
+    def test_each_guarded_session_admits_one_origin(self):
+        import alpaca_capacity_port as native
+        transport = native.transport
+        live = transport.GuardedSession(origin=c.LIVE_URL, before_request=lambda kind, **_: None)
+        paper = transport.GuardedSession(origin=transport.PAPER_URL, before_request=lambda kind, **_: None)
+        try:
+            for session, url in ((live, transport.PAPER_URL + "/v2/account"),
+                                 (paper, c.LIVE_URL + "/v2/account"),
+                                 (live, c.LIVE_URL + "/v2/orders")):
+                method = "DELETE" if url.endswith("/v2/orders") else "GET"
+                with self.subTest(origin=session.origin, method=method, url=url):
+                    with self.assertRaises(transport.TransportError):
+                        session.request(method, url)  # refused before any network I/O
+        finally:
+            live.close()
+            paper.close()
+
+    @unittest.skipUnless(HAS_ALPACA_SDK, "alpaca-py is not installed in this interpreter")
+    def test_sdk_clients_and_stream_target_only_their_own_origin(self):
+        import alpaca_capacity_port as native
+        port = native.AlpacaLiveCapacityPort("k", "s", "SPY", go=self.go(), stop_files=self.stops)
+        paper = native.AlpacaCapacityPort("k", "s", "SPY")
+        for owner, origin, stream in ((port, c.LIVE_URL, c.LIVE_WS),
+                                      (paper, native.transport.PAPER_URL, native.transport.PAPER_WS)):
+            client = owner._trading_client(lambda kind, **_: None, None)
+            try:
+                self.assertEqual((client._session.origin, str(client._base_url), client._retry), (origin, origin, 0))
+            finally:
+                client._session.close()
+            self.assertEqual(owner._orders_stream({"ping_interval": 10})._endpoint, stream)
+
+    @unittest.skipUnless(HAS_ALPACA_SDK, "alpaca-py is not installed in this interpreter")
+    def test_live_preflight_returns_identity_hash_and_no_balance(self):
+        import alpaca_capacity_port as native
+
+        class Session:
+            def close(self):
+                return None
+
+        class Trading:
+            _session = Session()
+
+            def get_account(self):
+                return {"id": "acct-1", "cash": "123456.78", "equity": "234567.89"}
+
+            def get_clock(self):
+                return {"is_open": True}
+
+            def get_all_positions(self):
+                return [{"symbol": "AAPL", "qty": "5"}]
+
+            def get(self, path, params):
+                return []
+
+            def get_asset(self, symbol):
+                return {"symbol": symbol, "tradable": True, "status": "active"}
+
+        class Data:
+            _session = Session()
+
+            def get_stock_latest_quote(self, request):
+                return {"SPY": {"bp": "500", "ap": "500.02", "bs": 1, "as": 1, "t": "2026-09-24T14:00:00Z"}}
+
+        port = native.AlpacaLiveCapacityPort("k", "s", "SPY", go=self.go(), stop_files=self.stops)
+        port._trading_client = lambda *args, **kwargs: Trading()
+        port._ensure_pool = lambda: None
+        with mock.patch.object(native.transport, "_sdk_client", lambda *args, **kwargs: Data()):
+            pre = port.preflight()
+        self.assertEqual(pre["account_identity_sha256"], hashlib.sha256(b"acct-1").hexdigest())
+        self.assertIs(pre["market_open"], True)
+        self.assertEqual((pre["open_orders"], pre["open_orders_complete"], pre["asset_tradable"]), ([], True, True))
+        quote_ns = int(datetime(2026, 9, 24, 14, 0, tzinfo=timezone.utc).timestamp()) * 1_000_000_000
+        self.assertEqual(pre["quote"], {"bid": "500", "ask": "500.02", "ts_ns": quote_ns, "halted": False})
+        text = json.dumps(pre)
+        for private in ("acct-1", "123456.78", "234567.89"):
+            self.assertNotIn(private, text)
 
 
 if __name__ == "__main__":

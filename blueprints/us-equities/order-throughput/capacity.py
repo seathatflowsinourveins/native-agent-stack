@@ -1,4 +1,4 @@
-"""Paper-only execution-capacity qualification for Alpaca order actions.
+"""Execution-capacity qualification for Alpaca order actions (paper; user-gated live).
 
 This harness measures how many order actions (REST submits and cancels) one
 paper account sustains per 60 seconds under the broker's rate limit, with
@@ -11,6 +11,13 @@ The adaptive-paper engine is reused read-only: paper endpoint pins, the
 guarded HTTP session (no retries, no redirects, no cancel-all path), the
 ``trade_updates`` stream class, credential loading, atomic receipt writes,
 the host STOP kill switch and the account-writer lock. See README.md.
+
+The ``paper`` command stays paper-only. The separate ``live`` command
+(``LiveCapacityRun``) runs the same engine against https://api.alpaca.markets
+only after every live gate passes: the user's own go file, a live env file,
+``--i-understand-live-orders``, regular trading hours, an account with no open
+orders, and no STOP file. Live probes are capacity probes only; a fill stops
+the run and is left to the user (the harness never sells). See README "Live".
 """
 from __future__ import annotations
 
@@ -32,6 +39,7 @@ import re
 import secrets
 import shlex
 import signal
+import stat
 import subprocess
 import sys
 import time
@@ -73,7 +81,8 @@ QUOTE_FUTURE_TOLERANCE_SECONDS = 1.0
 # values below these stay exploratory: acceptance.passed is then false.
 FROZEN_REQUIRED_WINDOWS = 5
 FROZEN_TARGET_ACTIONS_RATIO = 0.85
-PATH_OPTIONS = frozenset({"--env-file", "--output", "--journal", "--adaptive-state-root", "--stop-file"})
+PATH_OPTIONS = frozenset({"--env-file", "--output", "--journal", "--adaptive-state-root", "--stop-file",
+                          "--live-go-file"})
 SOURCE_FILES = ("capacity.py", "rate_governor.py", "alpaca_capacity_port.py", "capacity_fixture.py")
 ADAPTIVE_SOURCE_FILES = ("transport.py", "safety.py", "sessions.py", "runner.py")
 
@@ -124,6 +133,10 @@ class CapacityConfig:
     def validate(self):
         if self.base_url != PAPER_URL:
             raise HarnessRefusal("non_paper_base_url")
+        self._validate_bounds()
+
+    def _validate_bounds(self):
+        """The bounds shared by every mode; the base URL is checked by ``validate``."""
         if not isinstance(self.symbol, str) or not SYMBOL.fullmatch(self.symbol):
             raise HarnessRefusal("invalid_symbol")
         bounds = {"qty": (1, 10), "band_bps": (100, 5000), "configured_cap_per_minute": (1, 2000),
@@ -405,7 +418,15 @@ class CapacityRun:
     -> dict with ``account_identity_sha256`` and trading-origin ``observations``
     only (no asset or quote read, so recovery never depends on market data);
     ``start_stream(callback, timeout)``, ``stream_health()`` and ``stop_stream()``.
+    A port may declare ``trading_origin``; it must then equal ``TRADING_ORIGIN``,
+    so this (paper) engine never drives a live-origin port.
     """
+
+    # The evidence class a qualifying receipt must carry, the one trading origin
+    # a port may declare, and REST workers beyond ``inflight`` (the quote refresh).
+    QUALIFYING_EVIDENCE_CLASS = "native_paper"
+    TRADING_ORIGIN = PAPER_URL
+    EXTRA_WORKERS = 1
 
     def __init__(self, port, config, *, clock=None, executor=None, stop_file=None,
                  account_scope=None, prefix=None, journal_path=None, argv=None):
@@ -820,6 +841,10 @@ class CapacityRun:
         if self.clock.monotonic() - self.quote_at >= self.config.requote_seconds:
             self._quote_future = self.executor.submit(self._timed, self.port.latest_quote)
 
+    def _periodic_checks(self):
+        """Per-iteration background checks after the requote; none in paper and offline."""
+        return None
+
     def _stop_condition(self, deadline):
         if self._stop_reason:
             return self._stop_reason
@@ -897,6 +922,7 @@ class CapacityRun:
                 self._stop_reason = self._stop_reason or reason
                 return reason
             self._requote()
+            self._periodic_checks()
             progressed = False
             if self._cancel_queue:
                 # Cancels always take priority over new submits.
@@ -1115,11 +1141,27 @@ class CapacityRun:
                                "changed_position_symbols": changed_positions, "clean": clean}
 
     # -- entry point ------------------------------------------------------------
+    def _validate(self):
+        """Every gate decided before any request: the configuration bounds, and a
+        port that declares a trading origin must declare this engine's."""
+        self.config.validate()
+        if getattr(self.port, "trading_origin", self.TRADING_ORIGIN) != self.TRADING_ORIGIN:
+            raise HarnessRefusal("port_trading_origin_mismatch")
+
+    def refuse(self, reason):
+        """Record a refusal decided before this run touched the port (e.g. by the CLI)."""
+        self.started_wall = self.clock.time()
+        self.stage = "config"
+        self.refusal = str(reason)
+        self.status = "refused"
+        self.receipt = self._build_receipt()
+        return self.receipt
+
     def run(self):
         self.started_wall = self.clock.time()
         self.stage = "config"
         try:
-            self.config.validate()
+            self._validate()
             if self._stop_present():
                 raise HarnessRefusal("stop_file_present")
             self.stage = "preflight"
@@ -1139,8 +1181,8 @@ class CapacityRun:
                 if not self.port.stream_health().get("ready"):
                     raise HarnessRefusal("trade_updates_stream_not_ready")
                 if self.executor is None:
-                    # One extra worker for the off-loop quote refresh.
-                    self.executor = ThreadPoolExecutor(max_workers=self.config.inflight + 1,
+                    # Extra workers for the off-loop quote refresh (and the live position check).
+                    self.executor = ThreadPoolExecutor(max_workers=self.config.inflight + self.EXTRA_WORKERS,
                                                        thread_name_prefix="capacity-rest")
                 self.stage = "running"
                 self.t0 = self.clock.monotonic()
@@ -1388,7 +1430,7 @@ class CapacityRun:
             "cleanup_verified_zero_open": bool(self.cleanup.get("verified_zero_open")),
             "no_unexpected_fills": self.unexpected_fill_qty == 0,
             "no_health_freezes": not self._health,
-            "evidence_class_qualifies": getattr(self.port, "evidence_class", None) == "native_paper",
+            "evidence_class_qualifies": getattr(self.port, "evidence_class", None) == self.QUALIFYING_EVIDENCE_CLASS,
             "frozen_criteria": {"required_windows_min": FROZEN_REQUIRED_WINDOWS,
                                 "target_actions_ratio_min": FROZEN_TARGET_ACTIONS_RATIO,
                                 "configured_at_or_above": frozen_met}}
@@ -1403,7 +1445,7 @@ class CapacityRun:
         if not frozen_met:
             blockers.append("criteria_below_frozen_minimum")
         if not acceptance["evidence_class_qualifies"]:
-            blockers.append("evidence_class_not_native_paper")
+            blockers.append("evidence_class_not_" + self.QUALIFYING_EVIDENCE_CLASS)
         acceptance["passed"] = not blockers
         acceptance["passed_blockers"] = blockers
         acceptance["passed_is_self_reported"] = True
@@ -1476,6 +1518,598 @@ class CapacityRun:
         }
 
 
+# -- live mode ----------------------------------------------------------------------
+# Capacity probes on the user's live account, never strategy trades. Every gate
+# below is decided before any request; the live credentials are read only after
+# the flag, go-file, env-file-name, configuration, regular-hours and STOP gates.
+
+LIVE_URL = "https://api.alpaca.markets"
+LIVE_WS = "wss://api.alpaca.markets/stream"
+LIVE_STATE = DEFAULT_STOP.parent.parent / "alpaca-live"
+DEFAULT_LIVE_STOP = LIVE_STATE / "STOP"
+DEFAULT_LIVE_GO = Path.home() / ".config" / "codex-ecosystem" / "secrets" / "alpaca-live-go.json"
+LIVE_DEFAULT_CAP = 1000
+LIVE_MIN_BAND_BPS = 500
+LIVE_MAX_ORDER_NOTIONAL = Decimal("1000")
+LIVE_MAX_OPEN_NOTIONAL = Decimal("2000")
+LIVE_MAX_ORDER_ACTIONS = 100000
+LIVE_GO_KEYS = frozenset({"live_capacity_go", "issued_at", "expires_at", "max_order_actions",
+                          "max_open_notional_usd", "note"})
+LIVE_GO_MAX_BYTES = 65536
+LIVE_GO_MAX_VALIDITY_SECONDS = 24 * 3600.0
+LIVE_GO_CLOCK_SKEW_SECONDS = 60.0
+# The most cancels one open probe can still need: MAX_CANCEL_ATTEMPTS individual
+# cancels plus one prefix-sweep cancel in each cleanup verification round. A new
+# probe is submitted only while its submit plus this many cancels, for it and for
+# every open probe, fit the order-action cap, so cleanup cancels always fit too.
+CANCELS_RESERVED_PER_PROBE = MAX_CANCEL_ATTEMPTS + CLEANUP_VERIFY_ROUNDS
+ORDER_ACTION_KINDS = frozenset({"submit", "cancel", "cancel_all"})
+# Freezes that end a live run as needs_attention for the user to decide.
+LIVE_ATTENTION_FREEZES = frozenset({"unexpected_fill", "live_position_change", "live_position_check_failed",
+                                    "live_malformed_stream_event", "order_action_cap_exhausted"})
+LIVE_ENV_NAME = re.compile(r"alpaca-live-[A-Za-z0-9._-]+\.env\Z")
+
+
+def _env_names(path):
+    """The given and the symlink-resolved names of an env file (checked by name only)."""
+    path = Path(path)
+    names = [path.name]
+    try:
+        resolved = path.resolve().name
+    except (OSError, RuntimeError):
+        resolved = ""
+    if resolved and resolved not in names:
+        names.append(resolved)
+    return names
+
+
+def paper_env_refusal(path):
+    """Paper-side commands refuse a live env file (``alpaca-live*``) before reading it."""
+    if path is not None and any(name.lower().startswith("alpaca-live") for name in _env_names(path)):
+        return "live_env_file_in_paper_mode"
+    return None
+
+
+def live_env_refusal(path):
+    """Live mode accepts only an ``alpaca-live-<label>.env`` file, never a paper one
+    (``alpaca-paper-*.env`` or any name containing "paper"), judged by its given
+    and resolved names, so a live-named symlink to a paper file is refused too."""
+    if path is None:
+        return "live_env_file_required"
+    names = _env_names(path)
+    if any("paper" in name.lower() for name in names):
+        return "paper_env_file_in_live_mode"
+    if not all(LIVE_ENV_NAME.fullmatch(name) for name in names):
+        return "live_env_file_name_required"
+    return None
+
+
+def live_base_url_refusal(base):
+    """A live env file may leave APCA_API_BASE_URL unset or name the live origin only."""
+    if base is None:
+        return None
+    value = str(base).rstrip("/")
+    if value == PAPER_URL or "paper" in value.lower():
+        return "paper_base_url_in_live_env"
+    if value != LIVE_URL:
+        return "non_live_base_url"
+    return None
+
+
+@dataclass(frozen=True)
+class LiveGo:
+    """A verified user go. A receipt carries the go file's sha256 and the caps used, never its content."""
+    issued_at: float
+    expires_at: float
+    max_order_actions: int
+    max_open_notional_usd: Decimal
+
+
+def read_live_go_bytes(path):
+    """Read the user-written go file. The harness never creates, writes or edits it.
+
+    Refused unless it is a regular file (not a symlink) owned by this user with
+    mode exactly 0600; the checks apply to the descriptor that is read."""
+    path = Path(path)
+    try:
+        info = os.lstat(path)
+    except FileNotFoundError:
+        raise HarnessRefusal("live_go_file_missing") from None
+    except OSError:
+        raise HarnessRefusal("live_go_file_unreadable") from None
+    if not stat.S_ISREG(info.st_mode):
+        raise HarnessRefusal("live_go_file_not_regular")
+    try:
+        fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | getattr(os, "O_NOCTTY", 0))
+    except FileNotFoundError:
+        raise HarnessRefusal("live_go_file_missing") from None
+    except OSError:
+        raise HarnessRefusal("live_go_file_unreadable") from None
+    try:
+        info = os.fstat(fd)
+        if not stat.S_ISREG(info.st_mode):
+            raise HarnessRefusal("live_go_file_not_regular")
+        if info.st_uid != os.getuid():
+            raise HarnessRefusal("live_go_file_not_owned_by_user")
+        if stat.S_IMODE(info.st_mode) != 0o600:
+            raise HarnessRefusal("live_go_file_mode_not_0600")
+        chunks, size = [], 0
+        while True:
+            chunk = os.read(fd, 16384)
+            if not chunk:
+                break
+            size += len(chunk)
+            if size > LIVE_GO_MAX_BYTES:
+                raise HarnessRefusal("live_go_file_malformed")
+            chunks.append(chunk)
+    finally:
+        os.close(fd)
+    return b"".join(chunks)
+
+
+def _unique_json_object(pairs):
+    result = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError("duplicate key")
+        result[key] = value
+    return result
+
+
+def _reject_json_constant(_name):
+    raise ValueError("non-finite number")
+
+
+def _go_time(value):
+    """An ISO 8601 time with an explicit offset (``Z`` or ``+00:00``) as Unix seconds."""
+    if not isinstance(value, str) or not 0 < len(value) <= 64:
+        raise HarnessRefusal("live_go_file_malformed")
+    try:
+        when = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        raise HarnessRefusal("live_go_file_malformed") from None
+    if when.tzinfo is None or when.utcoffset() is None:
+        raise HarnessRefusal("live_go_file_malformed")
+    return when.timestamp()
+
+
+def parse_live_go(raw, now_wall):
+    """Validate the go file's content at ``now_wall`` (Unix seconds).
+
+    Exactly these keys: ``live_capacity_go`` (true), ``issued_at`` and
+    ``expires_at`` (ISO times, at most 24 h apart), ``max_order_actions`` (int),
+    ``max_open_notional_usd`` (number) and ``note`` (text)."""
+    try:
+        data = json.loads(raw.decode("utf-8"), object_pairs_hook=_unique_json_object,
+                          parse_constant=_reject_json_constant)
+    except (UnicodeDecodeError, ValueError, RecursionError):
+        raise HarnessRefusal("live_go_file_malformed") from None
+    if not isinstance(data, dict):
+        raise HarnessRefusal("live_go_file_malformed")
+    if data.get("live_capacity_go") is False:
+        raise HarnessRefusal("live_go_false")
+    if set(data) != LIVE_GO_KEYS or data["live_capacity_go"] is not True:
+        raise HarnessRefusal("live_go_file_malformed")
+    issued, expires = _go_time(data["issued_at"]), _go_time(data["expires_at"])
+    if expires <= issued:
+        raise HarnessRefusal("live_go_file_malformed")
+    if expires - issued > LIVE_GO_MAX_VALIDITY_SECONDS:
+        raise HarnessRefusal("live_go_validity_exceeds_24h")
+    if now_wall >= expires:
+        raise HarnessRefusal("live_go_file_expired")
+    if now_wall < issued - LIVE_GO_CLOCK_SKEW_SECONDS:
+        raise HarnessRefusal("live_go_not_yet_valid")
+    actions = data["max_order_actions"]
+    if type(actions) is not int or not 1 <= actions <= LIVE_MAX_ORDER_ACTIONS:
+        raise HarnessRefusal("live_go_file_malformed")
+    notional = data["max_open_notional_usd"]
+    if type(notional) not in (int, float):
+        raise HarnessRefusal("live_go_file_malformed")
+    notional = Decimal(str(notional))
+    if not notional.is_finite() or notional <= 0:
+        raise HarnessRefusal("live_go_file_malformed")
+    note = data["note"]
+    if not isinstance(note, str) or not note.strip() or len(note) > 2000:
+        raise HarnessRefusal("live_go_file_malformed")
+    return LiveGo(issued, expires, actions, notional)
+
+
+def apply_live_caps(config, go):
+    """Set each live cap to the minimum of the CLI value, the go file's cap and the
+    fixed live ceiling (per-order 1000 USD, open 2000 USD), and report which bound."""
+    cli_actions = config.max_order_actions
+    if cli_actions is not None and (type(cli_actions) is not int or cli_actions < 1):
+        raise HarnessRefusal("max_order_actions_out_of_bounds")
+    sources = {
+        "max_order_actions": {"cli": cli_actions, "go_file": go.max_order_actions},
+        "max_open_notional_usd": {"cli": _positive_decimal(config.max_open_notional_usd, "max_open_notional_usd"),
+                                  "go_file": go.max_open_notional_usd, "live_ceiling": LIVE_MAX_OPEN_NOTIONAL},
+        "max_order_notional_usd": {"cli": _positive_decimal(config.max_order_notional_usd,
+                                                            "max_order_notional_usd"),
+                                   "go_file": go.max_open_notional_usd, "live_ceiling": LIVE_MAX_ORDER_NOTIONAL},
+    }
+    used, binding = {}, {}
+    for name, candidates in sources.items():
+        present = {source: value for source, value in candidates.items() if value is not None}
+        used[name] = min(present.values())
+        binding[name] = sorted(source for source, value in present.items() if value == used[name])
+    config.max_order_actions = used["max_order_actions"]
+    config.max_open_notional_usd = str(used["max_open_notional_usd"])
+    config.max_order_notional_usd = str(used["max_order_notional_usd"])
+    return {"binding": binding}
+
+
+def _decimal_text(value):
+    """A finite, non-negative broker number as text; None when absent or invalid."""
+    if value is None:
+        return None
+    try:
+        number = Decimal(str(value))
+    except (InvalidOperation, ValueError):
+        return None
+    return str(number) if number.is_finite() and number >= 0 else None
+
+
+@dataclass
+class LiveCapacityConfig(CapacityConfig):
+    """Live configuration with its own validation; ``CapacityConfig.validate`` stays paper-only."""
+    configured_cap_per_minute: int = LIVE_DEFAULT_CAP
+    max_open_notional_usd: str = str(LIVE_MAX_OPEN_NOTIONAL)
+    allow_extended_hours: bool = False
+    base_url: str = LIVE_URL
+    max_order_actions: int | None = None
+    live_orders_acknowledged: bool = False
+    position_check_seconds: float = 10.0
+
+    def validate(self):
+        if self.base_url != LIVE_URL:
+            raise HarnessRefusal("non_live_base_url")
+        if self.live_orders_acknowledged is not True:
+            raise HarnessRefusal("live_orders_not_acknowledged")
+        if type(self.band_bps) is int and self.band_bps < LIVE_MIN_BAND_BPS:
+            raise HarnessRefusal("live_band_bps_below_500")
+        if type(self.qty) is not int or self.qty != 1:
+            raise HarnessRefusal("live_qty_must_be_1")
+        if self.allow_cancel_all is not False:
+            raise HarnessRefusal("live_cancel_all_disabled")
+        if self.allow_extended_hours is not False:
+            raise HarnessRefusal("live_extended_hours_disabled")
+        if self.acknowledged_open_orders != 0:
+            raise HarnessRefusal("live_requires_zero_open_orders")
+        actions = self.max_order_actions
+        if type(actions) is not int or actions > LIVE_MAX_ORDER_ACTIONS:
+            raise HarnessRefusal("live_order_action_cap_out_of_bounds")
+        if actions < 1 + CANCELS_RESERVED_PER_PROBE:
+            raise HarnessRefusal("live_order_action_cap_below_one_probe")
+        seconds = self.position_check_seconds
+        if type(seconds) not in (int, float) or not math.isfinite(seconds) or not 2.0 <= seconds <= 60.0:
+            raise HarnessRefusal("position_check_seconds_out_of_bounds")
+        self._validate_bounds()
+        if Decimal(self.max_order_notional_usd) > LIVE_MAX_ORDER_NOTIONAL:
+            raise HarnessRefusal("live_order_notional_cap_exceeds_1000")
+        if Decimal(self.max_open_notional_usd) > LIVE_MAX_OPEN_NOTIONAL:
+            raise HarnessRefusal("live_open_notional_cap_exceeds_2000")
+
+
+class LiveCapacityRun(CapacityRun):
+    """The capacity engine against the live origin, behind the live gates.
+
+    Reuses CapacityRun's loop, RateGovernor, trade_updates observation, cleanup,
+    journal and reconciliation unchanged. Adds, in order before any request: the
+    ``--i-understand-live-orders`` flag, the user's go file (read, never written;
+    caps = min(CLI, go file, live ceilings)), the live env-file name, the live
+    configuration bounds and regular trading hours; then both STOP files, and at
+    preflight an account with zero open orders and a broker clock that is open.
+    While running: a total order-action cap that always leaves room for cleanup
+    cancels, the go file's expiry, a periodic re-read of the go file (revoked,
+    invalid or changed stops submissions) and a governed periodic position check.
+    Any fill or position change stops submissions; cleanup cancels this run's open
+    probes individually; nothing is ever sold, and the run ends needs_attention
+    with the filled quantity and price in the receipt for the user to decide."""
+
+    QUALIFYING_EVIDENCE_CLASS = "native_live"
+    TRADING_ORIGIN = LIVE_URL
+    EXTRA_WORKERS = 2  # the quote refresh and the position check
+
+    def __init__(self, port, config, *, go_file=None, env_file=None, live_stop_file=None, **kwargs):
+        super().__init__(port, config, **kwargs)
+        self.go_file = Path(go_file) if go_file is not None else DEFAULT_LIVE_GO
+        self.env_file = None if env_file is None else Path(env_file)
+        self.live_stop_file = Path(live_stop_file) if live_stop_file is not None else DEFAULT_LIVE_STOP
+        self.go = None
+        self.go_sha256 = None
+        self.caps = None
+        self.stop_files_seen = set()
+        self.fills = {}
+        self.foreign_fill_events = 0
+        self.position_checks = {"sent": 0, "completed": 0, "failed": 0, "changes_detected": 0}
+        self.go_rechecks = {"performed": 0, "stopped_by": None}
+        self._position_future = None
+        self._position_action = None
+        self._last_position_check = None
+        self._last_go_check = None
+        self._order_actions = 0
+        self._actions_counted = 0
+        self._reconciliation_orders = None
+
+    # -- gates before any request ------------------------------------------------
+    def _validate(self):
+        config = self.config
+        # The explicit flag first: without it nothing, not even the go file, is read.
+        if config.live_orders_acknowledged is not True:
+            raise HarnessRefusal("live_orders_not_acknowledged")
+        raw = read_live_go_bytes(self.go_file)
+        self.go_sha256 = hashlib.sha256(raw).hexdigest()
+        self.go = parse_live_go(raw, self.clock.time())
+        self.caps = apply_live_caps(config, self.go)
+        reason = live_env_refusal(self.env_file)
+        if reason:
+            raise HarnessRefusal(reason)
+        super()._validate()  # LiveCapacityConfig.validate and the port's trading origin
+        self._regular_session()
+
+    def _stop_present(self):
+        seen = [label for label, path in (("host", self.stop_file), ("live", self.live_stop_file))
+                if path.exists()]
+        self.stop_files_seen.update(seen)
+        return bool(seen)
+
+    def _regular_session(self):
+        now = datetime.fromtimestamp(self.clock.time(), timezone.utc)
+        try:
+            info = session_at(now)
+        except ValueError:
+            raise HarnessRefusal("session_calendar_unsupported") from None
+        self.session_kind = info.kind.value
+        if info.kind != SessionKind.RTH:
+            raise HarnessRefusal("live_outside_regular_trading_hours")
+        return info
+
+    def _session(self):
+        """Regular trading hours only (early closes from the session calendar)."""
+        self._regular_session()
+        return super()._session()
+
+    def _preflight(self):
+        try:
+            pre = super()._preflight()
+        except HarnessRefusal as exc:
+            if str(exc) == "unacknowledged_open_orders":
+                # Zero open orders, so no cancel of this run can touch another client's order.
+                raise HarnessRefusal("live_account_has_open_orders") from None
+            raise
+        if pre.get("market_open") is not True:
+            raise HarnessRefusal("live_broker_reports_market_closed")
+        return pre
+
+    def _price(self, quote):
+        if isinstance(quote, dict) and quote.get("halted"):
+            raise HarnessRefusal("quote_halted")
+        super()._price(quote)
+
+    # -- total order-action cap ----------------------------------------------------
+    def _order_actions_sent(self):
+        """Submits and cancels sent so far (every attempt counts, sent or refused)."""
+        for action in self.actions[self._actions_counted:]:
+            if action["kind"] in ORDER_ACTION_KINDS:
+                self._order_actions += 1
+        self._actions_counted = len(self.actions)
+        return self._order_actions
+
+    def _reserved_cancels(self):
+        return sum(max(0, CANCELS_RESERVED_PER_PROBE - probe.cancel_attempts) for probe in self._live.values())
+
+    def _fits_new_probe(self):
+        return (self._order_actions_sent() + self._reserved_cancels() + 1 + CANCELS_RESERVED_PER_PROBE
+                <= self.config.max_order_actions)
+
+    def _action_cap_exhausted(self):
+        return self._order_actions_sent() >= self.config.max_order_actions
+
+    def _may_submit(self):
+        return super()._may_submit() and self._fits_new_probe()
+
+    # The reservation keeps every cancel inside the cap; these backstops keep the
+    # cap absolute even if an unexpected path needed more cancels than reserved.
+    def _schedule_cancel(self, probe):
+        if self._action_cap_exhausted():
+            self._freeze("order_action_cap_exhausted")
+            return
+        super()._schedule_cancel(probe)
+
+    def _cancel_one(self):
+        if self._action_cap_exhausted():
+            self.probes[self._cancel_queue.pop(0)].cancel_state = None
+            self._freeze("order_action_cap_exhausted")
+            return False
+        return super()._cancel_one()
+
+    def _sync(self, kind, deadline, fn, *args, phase):
+        if kind in ("cancel", "cancel_all") and self._action_cap_exhausted():
+            self._freeze("order_action_cap_exhausted")
+            return None
+        return super()._sync(kind, deadline, fn, *args, phase=phase)
+
+    def _stop_condition(self, deadline):
+        reason = super()._stop_condition(deadline)
+        if reason:
+            return reason
+        if self.clock.time() >= self.go.expires_at:
+            return "live_go_expired"
+        if not self._live and not self._inflight and not self._fits_new_probe():
+            return "order_action_cap_reached"
+        return None
+
+    # -- fills and positions ---------------------------------------------------------
+    def _handle_event(self, raw, at=None):
+        malformed = self.stream_stats["malformed_events"]
+        super()._handle_event(raw, at)
+        if self.stream_stats["malformed_events"] > malformed:
+            # An unreadable trade update could hide a fill: fail closed.
+            self._freeze("live_malformed_stream_event")
+            return
+        payload = raw.get("data", raw)
+        order = payload["order"]
+        cid = str(order.get("client_order_id") or "")
+        event = str(payload.get("event") or "")
+        filled = Decimal(str(order.get("filled_qty") or "0"))
+        if event not in FILL_EVENTS and filled <= 0:
+            return
+        probe = self.probes.get(cid) if self.prefix and cid.startswith(self.prefix) else None
+        if probe is None:
+            # A fill of any order this run did not submit changes a position on the account.
+            self.foreign_fill_events += 1
+            self._freeze("live_position_change")
+            return
+        self.fills.setdefault(probe.seq, {})["stream"] = {
+            "filled_qty": _decimal_text(filled), "filled_avg_price": _decimal_text(order.get("filled_avg_price")),
+            "event": event or str(order.get("status") or "")}
+
+    def _positions_changed(self, rows):
+        """True/False against the preflight snapshot; None if the rows are unreadable."""
+        try:
+            after = {str(row["symbol"]): Decimal(str(row["qty"])) for row in rows
+                     if Decimal(str(row.get("qty", "0"))) != 0}
+        except (AttributeError, KeyError, TypeError, ValueError, InvalidOperation):
+            return None
+        before = {name: Decimal(qty) for name, qty in self._preflight_positions.items()}
+        return after != before
+
+    def _recheck_go(self):
+        """The user may revoke the go mid-run: a go file that is now missing, invalid,
+        false or expired, or whose bytes changed at all, stops submissions."""
+        self.go_rechecks["performed"] += 1
+        try:
+            raw = read_live_go_bytes(self.go_file)
+            parse_live_go(raw, self.clock.time())
+        except HarnessRefusal as exc:
+            self.go_rechecks["stopped_by"] = str(exc)
+            self._freeze("live_go_revoked")
+            return
+        if hashlib.sha256(raw).hexdigest() != self.go_sha256:
+            self.go_rechecks["stopped_by"] = "live_go_file_changed"
+            self._freeze("live_go_changed")
+
+    def _periodic_checks(self):
+        """Every ``position_check_seconds``: re-read the go file (a local read), and
+        a governed positions read on a worker. Any change from the preflight snapshot
+        freezes submissions. A finished read is handled in the same pass, before the
+        next submit decision. A 429 or 5xx is retried at the next interval; an
+        exception or unreadable rows fail closed."""
+        now = self.clock.monotonic()
+        if self._last_go_check is None:
+            self._last_go_check = now
+        elif not self._health and now - self._last_go_check >= self.config.position_check_seconds:
+            self._last_go_check = now
+            self._recheck_go()
+        if self._position_future is None:
+            if self._last_position_check is None:
+                self._last_position_check = now
+            elif (not self._health and now - self._last_position_check >= self.config.position_check_seconds
+                  and self.governor.try_acquire("read")):
+                self._last_position_check = now
+                self._position_action = {"t": now, "kind": "read", "ok": None}
+                self.actions.append(self._position_action)
+                self.position_checks["sent"] += 1
+                self._position_future = self.executor.submit(self._timed, self.port.positions)
+        future = self._position_future
+        if future is None or not future.done():
+            return
+        self._position_future = None
+        action = self._position_action
+        try:
+            (rows, responses), _ = future.result()
+        except Exception:
+            action["ok"] = False
+            self.position_checks["failed"] += 1
+            self._freeze("live_position_check_failed")
+            return
+        for response in responses:
+            self._record("read", response, "run")
+        action["ok"] = bool(responses) and all(self._ok(response) for response in responses)
+        if not action["ok"]:
+            self.position_checks["failed"] += 1
+            return
+        changed = self._positions_changed(rows)
+        if changed is None:
+            self.position_checks["failed"] += 1
+            self._freeze("live_position_check_failed")
+            return
+        self.position_checks["completed"] += 1
+        if changed:
+            self.position_checks["changes_detected"] += 1
+            self._freeze("live_position_change")
+
+    def _list(self, status, after_wall, deadline, phase):
+        result = super()._list(status, after_wall, deadline, phase)
+        if phase == "reconciliation" and result is not None:
+            self._reconciliation_orders = list(result[0])
+        return result
+
+    def _reconcile(self):
+        super()._reconcile()
+        for row in self._reconciliation_orders or []:
+            cid = str(row.get("client_order_id") or "")
+            probe = self.probes.get(cid) if self.prefix and cid.startswith(self.prefix) else None
+            filled = _decimal_text(row.get("filled_qty"))
+            if probe is None or filled is None or Decimal(filled) <= 0:
+                continue
+            self.fills.setdefault(probe.seq, {})["broker"] = {
+                "filled_qty": filled, "filled_avg_price": _decimal_text(row.get("filled_avg_price")),
+                "status": str(row.get("status") or "")}
+
+    def recover(self, journal_path, *, cancel=True):
+        raise NotImplementedError("live recover is not implemented; see README 'Live'")
+
+    # -- receipt -------------------------------------------------------------------------
+    def _build_receipt(self):
+        if self.status == "completed" and (self._health & LIVE_ATTENTION_FREEZES or self.fills):
+            self.status = "needs_attention"
+        receipt = super()._build_receipt()
+        receipt["live"] = self._live_summary()
+        return receipt
+
+    def _live_summary(self):
+        config = self.config
+        fills, total = [], Decimal(0)
+        for seq in sorted(self.fills):
+            entry = dict(self.fills[seq], seq=seq)
+            quantities = [Decimal(side["filled_qty"]) for side in (entry.get("stream"), entry.get("broker"))
+                          if side and side.get("filled_qty")]
+            total += max(quantities, default=Decimal(0))
+            fills.append(entry)
+        sent = self._order_actions_sent()
+        cap = config.max_order_actions if self.caps is not None else None
+        return {
+            "mode": "live",
+            "trading_origin": LIVE_URL,
+            "stream_origin": LIVE_WS,
+            "user_go": {"required": True, "sha256": self.go_sha256, "verified": self.go is not None,
+                        "rechecks": dict(self.go_rechecks)},
+            "caps_used": None if self.caps is None else {
+                "max_order_actions": config.max_order_actions,
+                "max_order_notional_usd": config.max_order_notional_usd,
+                "max_open_notional_usd": config.max_open_notional_usd,
+                "max_orders": config.max_orders, "max_open_orders": config.max_open_orders,
+                "configured_cap_per_minute": config.configured_cap_per_minute, "headroom": config.headroom,
+                "band_bps_below_bid": config.band_bps, "qty": config.qty},
+            "cap_binding": None if self.caps is None else self.caps["binding"],
+            "live_ceilings": {"max_order_notional_usd": str(LIVE_MAX_ORDER_NOTIONAL),
+                              "max_open_notional_usd": str(LIVE_MAX_OPEN_NOTIONAL),
+                              "min_band_bps_below_bid": LIVE_MIN_BAND_BPS},
+            "order_actions": {"sent": sent, "cap": cap, "within_cap": None if cap is None else sent <= cap,
+                              "reserved_cancels_per_open_probe": CANCELS_RESERVED_PER_PROBE},
+            "fills": fills,
+            "filled_qty_total": str(total),
+            "auto_sell": False,
+            "position_checks": dict(self.position_checks),
+            "foreign_fill_events": self.foreign_fill_events,
+            "stop_files_seen": sorted(self.stop_files_seen),
+            "rules": {"regular_trading_hours_only": True, "zero_open_orders_at_preflight": True,
+                      "cancel_all": "disabled", "explicit_flag": "--i-understand-live-orders"},
+        }
+
+
 # -- CLI --------------------------------------------------------------------------
 
 def _paper_scope(state_root, accept_conflict):
@@ -1502,16 +2136,19 @@ def _paper_scope(state_root, accept_conflict):
 
 def build_parser():
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
-    parser.add_argument("command", choices=["offline", "paper", "recover", "audit"],
-                        help="recover: cancel every open order with a crashed run's journal prefix; "
-                             "audit: list that prefix's orders read-only")
+    parser.add_argument("command", choices=["offline", "paper", "live", "recover", "audit"],
+                        help="live: capacity probes on the live account, only with the user's go file "
+                             "(README 'Live'); recover: cancel every open order with a crashed paper run's "
+                             "journal prefix; audit: list that prefix's orders read-only")
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--journal", type=Path, default=None,
-                        help="run journal (paper default: <output>.journal.jsonl); required by recover/audit")
-    parser.add_argument("--env-file", type=Path, help="0600 paper credential file outside any Git worktree")
+                        help="run journal (paper and live default: <output>.journal.jsonl); "
+                             "required by recover/audit")
+    parser.add_argument("--env-file", type=Path,
+                        help="0600 credential file outside any Git worktree (live: alpaca-live-<label>.env)")
     parser.add_argument("--symbol", default="SPY")
-    parser.add_argument("--band-bps", type=int, default=500)
-    parser.add_argument("--cap", type=int, default=200, help="configured calls/min cap")
+    parser.add_argument("--band-bps", type=int, default=500, help="probe price below the bid (live: at least 500)")
+    parser.add_argument("--cap", type=int, default=None, help="configured calls/min cap (default 200; live 1000)")
     parser.add_argument("--headroom", type=float, default=0.9)
     parser.add_argument("--max-orders", type=int, default=600)
     parser.add_argument("--duration", type=float, default=330.0)
@@ -1531,7 +2168,15 @@ def build_parser():
     parser.add_argument("--adaptive-state-root", type=Path, default=DEFAULT_STOP.parent)
     parser.add_argument("--accept-adaptive-lane-conflict", action="store_true")
     parser.add_argument("--limit-header", type=int, default=200, help="offline: simulated x-ratelimit-limit")
-    parser.add_argument("--stop-file", type=Path, default=None, help="offline only; paper uses the host STOP")
+    parser.add_argument("--stop-file", type=Path, default=None,
+                        help="offline only; paper uses the host STOP, live the host and alpaca-live STOP")
+    parser.add_argument("--live-go-file", type=Path, default=None,
+                        help="live: the user's go file (default ~/.config/codex-ecosystem/secrets/"
+                             "alpaca-live-go.json); read, never written")
+    parser.add_argument("--i-understand-live-orders", action="store_true",
+                        help="live: required acknowledgement that real orders are sent to the live account")
+    parser.add_argument("--max-order-actions", type=int, default=None,
+                        help="live: cap on submits plus cancels; the go file's cap applies when lower")
     return parser
 
 
@@ -1548,6 +2193,67 @@ def config_from_args(args):
                           required_windows=args.required_windows)
 
 
+def live_config_from_args(args):
+    """CLI caps only; LiveCapacityRun lowers them to the go file's caps and the live ceilings."""
+    return LiveCapacityConfig(symbol=args.symbol, band_bps=args.band_bps, configured_cap_per_minute=args.cap,
+                              headroom=args.headroom, max_orders=args.max_orders,
+                              max_duration_seconds=args.duration, max_open_orders=args.max_open_orders,
+                              max_order_notional_usd=args.max_order_notional,
+                              max_open_notional_usd=args.max_open_notional, inflight=args.inflight,
+                              allow_cancel_all=args.allow_cancel_all,
+                              acknowledged_positions=args.acknowledge_positions,
+                              acknowledged_open_orders=args.acknowledge_open_orders,
+                              required_windows=args.required_windows,
+                              max_order_actions=args.max_order_actions,
+                              live_orders_acknowledged=args.i_understand_live_orders)
+
+
+class DeferredLivePort:
+    """The native live port, built (reading the live credentials) on first use.
+
+    ``LiveCapacityRun.run`` decides every pre-request gate before its first port
+    call, so a refused live run never reads the live env file's content."""
+    evidence_class = "native_live"
+    supports_cancel_all = False
+    trading_origin = LIVE_URL
+
+    def __init__(self, factory=None):
+        self.factory = factory
+        self._port = None
+
+    def __getattr__(self, name):
+        if name.startswith("_"):
+            raise AttributeError(name)
+        if self._port is None:
+            if self.factory is None:
+                raise HarnessRefusal("live_port_unavailable")
+            self._port = self.factory()
+        return getattr(self._port, name)
+
+
+def _live_port_factory(args, run):
+    def build():
+        from runner import credentials  # adaptive-paper: 0600, owner, outside-Git checks
+        try:
+            key, secret = credentials(args.env_file)
+            base = env_base_url(args.env_file)
+        except Exception:  # never echo the file's content or path
+            raise HarnessRefusal("live_env_file_rejected") from None
+        reason = live_base_url_refusal(base)
+        if reason:
+            raise HarnessRefusal(reason)
+        from alpaca_capacity_port import AlpacaLiveCapacityPort
+        return AlpacaLiveCapacityPort(key, secret, run.config.symbol, go=run.go, feed=args.feed,
+                                      workers=run.config.inflight + 1,
+                                      stop_files=(run.stop_file, run.live_stop_file))
+    return build
+
+
+class _UnbuiltPaperPort:
+    """Stands in for the paper port when the CLI refuses before building one."""
+    evidence_class = "native_paper"
+
+
 def exit_code_for(receipt):
     if receipt["status"] == "refused":
         return 2
@@ -1562,8 +2268,17 @@ def main(argv=None):
     parser = build_parser()
     raw_argv = list(sys.argv[1:] if argv is None else argv)
     args = parser.parse_args(raw_argv)
-    config = config_from_args(args)
+    live = args.command == "live"
+    if not live:
+        for flag, value in (("--i-understand-live-orders", args.i_understand_live_orders),
+                            ("--live-go-file", args.live_go_file), ("--max-order-actions", args.max_order_actions)):
+            if value not in (None, False):
+                parser.error("%s is for live only" % flag)
+    if args.cap is None:
+        args.cap = LIVE_DEFAULT_CAP if live else 200
+    config = live_config_from_args(args) if live else config_from_args(args)
     from runner import save  # adaptive-paper: atomic 0600 JSON write
+    receipt = None
     if args.command == "offline":
         if args.journal is not None:
             parser.error("--journal is for paper, recover and audit")
@@ -1572,6 +2287,18 @@ def main(argv=None):
         port = FakeBroker(clock, limit=args.limit_header, symbol=args.symbol)
         run = CapacityRun(port, config, clock=clock, executor=InlineExecutor(),
                           stop_file=args.stop_file or (HERE / "offline-stop-file-not-used"), argv=raw_argv)
+    elif live:
+        if args.stop_file is not None:
+            parser.error("--stop-file is offline only; live honours the host and alpaca-live STOP files")
+        if args.env_file is None:
+            parser.error("live requires --env-file")
+        port = DeferredLivePort()
+        run = LiveCapacityRun(port, config, go_file=args.live_go_file or DEFAULT_LIVE_GO, env_file=args.env_file,
+                              account_scope=_paper_scope(args.adaptive_state_root,
+                                                         args.accept_adaptive_lane_conflict),
+                              journal_path=args.journal or args.output.with_suffix(".journal.jsonl"),
+                              argv=raw_argv)
+        port.factory = _live_port_factory(args, run)
     else:
         if args.stop_file is not None:
             parser.error("--stop-file is offline only; paper honours the host STOP file")
@@ -1579,25 +2306,32 @@ def main(argv=None):
             parser.error("%s requires --env-file" % args.command)
         if args.command in ("recover", "audit") and args.journal is None:
             parser.error("%s requires --journal" % args.command)
-        from runner import credentials  # adaptive-paper: 0600, owner, outside-Git checks
-        key, secret = credentials(args.env_file)
-        base = env_base_url(args.env_file)
-        if base is not None and base.rstrip("/") != PAPER_URL:
-            config.base_url = base  # CapacityConfig.validate refuses it before any request
-        from alpaca_capacity_port import AlpacaCapacityPort
-        port = AlpacaCapacityPort(key, secret, config.symbol, feed=args.feed, workers=config.inflight)
-        journal = args.journal
-        if args.command == "paper" and journal is None:
-            journal = args.output.with_suffix(".journal.jsonl")
-        run = CapacityRun(port, config, account_scope=_paper_scope(args.adaptive_state_root,
-                                                                   args.accept_adaptive_lane_conflict),
-                          journal_path=journal if args.command == "paper" else None, argv=raw_argv)
-    for sig in (signal.SIGINT, signal.SIGTERM):
-        signal.signal(sig, lambda *_: run.request_stop("signal"))
-    if args.command in ("recover", "audit"):
-        receipt = run.recover(args.journal, cancel=args.command == "recover")
-    else:
-        receipt = run.run()
+        refusal = paper_env_refusal(args.env_file)
+        if refusal is not None:
+            # A live env file is refused here, before any credential is read.
+            run = CapacityRun(_UnbuiltPaperPort(), config, argv=raw_argv)
+            receipt = run.refuse(refusal)
+        else:
+            from runner import credentials  # adaptive-paper: 0600, owner, outside-Git checks
+            key, secret = credentials(args.env_file)
+            base = env_base_url(args.env_file)
+            if base is not None and base.rstrip("/") != PAPER_URL:
+                config.base_url = base  # CapacityConfig.validate refuses it before any request
+            from alpaca_capacity_port import AlpacaCapacityPort
+            port = AlpacaCapacityPort(key, secret, config.symbol, feed=args.feed, workers=config.inflight)
+            journal = args.journal
+            if args.command == "paper" and journal is None:
+                journal = args.output.with_suffix(".journal.jsonl")
+            run = CapacityRun(port, config, account_scope=_paper_scope(args.adaptive_state_root,
+                                                                       args.accept_adaptive_lane_conflict),
+                              journal_path=journal if args.command == "paper" else None, argv=raw_argv)
+    if receipt is None:
+        for sig in (signal.SIGINT, signal.SIGTERM):
+            signal.signal(sig, lambda *_: run.request_stop("signal"))
+        if args.command in ("recover", "audit"):
+            receipt = run.recover(args.journal, cancel=args.command == "recover")
+        else:
+            receipt = run.run()
     code = exit_code_for(receipt)
     receipt["provenance"]["exit_code"] = run.exit_code = code
     save(args.output, receipt)
@@ -1609,6 +2343,8 @@ def main(argv=None):
                        passed=receipt["acceptance"]["passed"])
     else:
         summary.update(mode=receipt["mode"], by_status=receipt["broker_orders_with_prefix"]["by_status"])
+    if "live" in receipt:
+        summary.update(filled_qty_total=receipt["live"]["filled_qty_total"])
     print(json.dumps(summary))
     return code
 

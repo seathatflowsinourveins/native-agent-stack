@@ -21,6 +21,15 @@ Each REST worker owns its own client (and lock) so calls can overlap; the
 harness's RateGovernor admits every call before it reaches this module. The
 host STOP file is re-checked at the final transport boundary before a POST.
 This module has not been exercised against Alpaca in this change.
+
+``AlpacaLiveCapacityPort`` (evidence class ``native_live``) is the only place a
+``GuardedSession`` is built for the live origin https://api.alpaca.markets, and
+its ``trade_updates`` stream is pinned to wss://api.alpaca.markets/stream. It
+keeps the same method/path allowlist (no cancel-all path), is constructed only
+with a verified, unexpired ``capacity.LiveGo``, and re-checks the host and
+alpaca-live STOP files and the go file's expiry before every POST. The paper
+port above never admits the live origin. The live port has not been run
+against Alpaca or its network endpoints.
 """
 from __future__ import annotations
 
@@ -39,7 +48,7 @@ for _path in (str(HERE), str(ADAPTIVE)):
     if _path not in sys.path:
         sys.path.insert(0, _path)
 
-from capacity import Response  # noqa: E402
+from capacity import LIVE_URL, LIVE_WS, LiveGo, Response  # noqa: E402
 from safety import DEFAULT_STOP, SafetyError  # noqa: E402
 import transport  # noqa: E402
 
@@ -47,13 +56,16 @@ ORDER_FIELDS = ("client_order_id", "id", "status", "symbol", "side", "filled_qty
 MAX_PAGES = 20
 
 
-def _order_view(raw):
-    return {name: str(raw.get(name) or "") for name in ORDER_FIELDS}
+def _order_view(raw, fields=ORDER_FIELDS):
+    return {name: str(raw.get(name) or "") for name in fields}
 
 
 class AlpacaCapacityPort:
     evidence_class = "native_paper"
     supports_cancel_all = False
+    trading_origin = transport.PAPER_URL
+    order_fields = ORDER_FIELDS
+    quote_fields = ("bid", "ask", "ts_ns")
 
     def __init__(self, api_key, secret_key, symbol, *, feed="iex", workers=4, stop_file=None):
         if not api_key or not secret_key:
@@ -84,12 +96,16 @@ class AlpacaCapacityPort:
     def _observe(self, observation):
         self._local.observation = observation
 
+    def _trading_client(self, before_request, observer, *, read_only=False, lock=None):
+        """A pinned SDK trading client whose GuardedSession admits the paper origin only."""
+        return transport._sdk_client(self._key, self._secret, before_request, observer,
+                                     read_only=read_only, lock=lock)
+
     def _ensure_pool(self):
         if self._pool is None:
             self._pool = queue.Queue()
             for _ in range(self.workers):
-                client = transport._sdk_client(self._key, self._secret, self._before_request,
-                                               self._observe, lock=threading.Lock())
+                client = self._trading_client(self._before_request, self._observe, lock=threading.Lock())
                 self._clients.append(client)
                 self._pool.put(client)
         return self._pool
@@ -172,7 +188,7 @@ class AlpacaCapacityPort:
         quotes = self._data.get_stock_latest_quote(
             StockLatestQuoteRequest(symbol_or_symbols=[self.symbol], feed=DataFeed(self.feed)))
         quote = transport.normalize_quote(quotes[self.symbol], self.symbol)
-        return {"bid": quote["bid"], "ask": quote["ask"], "ts_ns": quote["ts_ns"]}
+        return {key: quote[key] for key in self.quote_fields}
 
     def submit(self, client_order_id, symbol, qty, limit_price, extended_hours):
         from alpaca.trading.requests import LimitOrderRequest
@@ -181,7 +197,7 @@ class AlpacaCapacityPort:
                                     extended_hours=bool(extended_hours))
         response, raw = self._call(lambda client: client.submit_order(request))
         if raw is not None and response.status is not None and 200 <= response.status < 300:
-            response.order = _order_view(raw)
+            response.order = _order_view(raw, self.order_fields)
         return response
 
     def cancel(self, order_id):
@@ -200,22 +216,26 @@ class AlpacaCapacityPort:
         if after_wall is not None:
             params["after"] = datetime.fromtimestamp(after_wall, timezone.utc).isoformat()
         orders, responses, seen = [], [], set()
+
+        def views():
+            return [_order_view(o, self.order_fields) for o in orders]
+
         for index in range(MAX_PAGES):
             if index and admit is not None and not admit():
-                return [_order_view(o) for o in orders], False, responses
+                return views(), False, responses
             response, page = self._call(lambda client: client.get("/orders", dict(params)))
             responses.append(response)
             if response.error or not isinstance(page, list) or len(page) > 500:
-                return [_order_view(o) for o in orders], False, responses
+                return views(), False, responses
             if any(str(o.get("id")) in seen for o in page):
-                return [_order_view(o) for o in orders], False, responses
+                return views(), False, responses
             orders.extend(page)
             seen.update(str(o.get("id")) for o in page)
             if len(page) < 500:
-                return [_order_view(o) for o in orders], True, responses
+                return views(), True, responses
             params.pop("after", None)  # timestamp and ID cursors are mutually exclusive
             params["after_order_id"] = str(page[-1]["id"])
-        return [_order_view(o) for o in orders], False, responses
+        return views(), False, responses
 
     def positions(self):
         response, rows = self._call(lambda client: client.get_all_positions())
@@ -260,13 +280,17 @@ class AlpacaCapacityPort:
             if not self._stopping:
                 self.freeze_health("orders_thread_stopped")
 
-    def start_stream(self, callback, timeout):
+    def _orders_stream(self, parameters):
+        """The trade_updates stream pinned to the paper endpoint."""
         Orders, _ = transport._stream_classes(transport.data_stream_url(self.feed))
+        return Orders(self._key, self._secret, paper=True, raw_data=True, url_override=transport.PAPER_WS,
+                      websocket_params=dict(parameters,
+                                            create_protocol=transport._protocol_factory(transport.PAPER_WS)))
+
+    def start_stream(self, callback, timeout):
         parameters = {"ping_interval": 10, "ping_timeout": 10, "max_queue": 4096,
-                      "open_timeout": 5, "close_timeout": 2,
-                      "create_protocol": transport._protocol_factory(transport.PAPER_WS)}
-        self._stream = Orders(self._key, self._secret, paper=True, raw_data=True,
-                              url_override=transport.PAPER_WS, websocket_params=parameters)
+                      "open_timeout": 5, "close_timeout": 2}
+        self._stream = self._orders_stream(parameters)
         self._stream.owner = self
 
         async def on_update(data):
@@ -303,3 +327,138 @@ class AlpacaCapacityPort:
         finally:
             for client in self._clients + ([self._data] if self._data is not None else []):
                 client._session.close()
+
+
+def _live_orders_class():
+    """TradingStream pinned to the live trade_updates endpoint. It mirrors the
+    owner-health hooks of the paper ``transport._stream_classes`` Orders class,
+    which only admits the paper endpoint."""
+    from alpaca.trading.stream import TradingStream
+
+    class LiveOrders(TradingStream):
+        async def _connect(self):
+            self.owner._connection("orders", False)
+            if str(self._endpoint) != LIVE_WS:
+                raise transport.TransportError("live websocket endpoint rejected")
+            await super()._connect()
+
+        async def _auth(self):
+            await super()._auth()
+            self.owner._authorized("orders")
+
+        async def _dispatch(self, msg):
+            if msg.get("stream") == "listening":
+                self.owner._ack("orders", "trade_updates" in msg.get("data", {}).get("streams", []))
+            elif msg.get("stream") in {"error", "authorization"}:
+                self.owner.freeze_health("orders_control_error")
+            await super()._dispatch(msg)
+
+        async def close(self):
+            self.owner._connection("orders", False)
+            await super().close()
+
+    return LiveOrders
+
+
+class AlpacaLiveCapacityPort(AlpacaCapacityPort):
+    """Native live port (evidence class ``native_live``) for user-gated capacity probes.
+
+    Built by ``capacity.py live`` only after every pre-request gate passed. The
+    trading origin is https://api.alpaca.markets behind adaptive-paper's
+    GuardedSession (same allowlist: GET reads, POST /v2/orders, DELETE
+    /v2/orders/{uuid}; no cancel-all), the stream is wss://api.alpaca.markets/stream,
+    and market data stays on the shared data origin."""
+
+    evidence_class = "native_live"
+    supports_cancel_all = False
+    trading_origin = LIVE_URL
+    order_fields = ORDER_FIELDS + ("filled_avg_price",)
+    quote_fields = ("bid", "ask", "ts_ns", "halted")
+
+    def __init__(self, api_key, secret_key, symbol, *, go, feed="iex", workers=4, stop_files=()):
+        if not isinstance(go, LiveGo) or not go.expires_at > time.time():
+            raise transport.TransportError("live port requires a verified, unexpired user go")
+        stop_files = tuple(Path(path) for path in stop_files)
+        if len(stop_files) < 2:
+            raise transport.TransportError("live port requires the host and alpaca-live STOP files")
+        super().__init__(api_key, secret_key, symbol, feed=feed, workers=workers, stop_file=stop_files[0])
+        self.go = go
+        self.stop_files = stop_files
+
+    def _before_request(self, kind, client_id=None):
+        # Final boundary: GuardedSession turns this refusal into SubmissionNotSent.
+        if kind == "submit":
+            if any(path.exists() for path in self.stop_files):
+                raise SafetyError("stop_blocks_entry")
+            if time.time() >= self.go.expires_at:
+                raise SafetyError("live_go_expired")
+        return None
+
+    def _trading_client(self, before_request, observer, *, read_only=False, lock=None):
+        """The pinned SDK's live TradingClient behind a GuardedSession for the live origin."""
+        from importlib.metadata import version
+        if version("alpaca-py") != transport.SDK_VERSION:
+            raise transport.TransportError("alpaca-py version differs from reviewed pin")
+        from alpaca.trading.client import TradingClient
+        client = TradingClient(self._key, self._secret, paper=False, raw_data=True, url_override=LIVE_URL)
+        client._retry = 0  # the reviewed SDK constructor does not accept zero as a retry override
+        client._session.close()
+        client._session = transport.GuardedSession(origin=LIVE_URL, before_request=before_request,
+                                                   observer=observer, read_only=read_only, lock=lock)
+        return client
+
+    def _orders_stream(self, parameters):
+        Orders = _live_orders_class()
+        return Orders(self._key, self._secret, paper=False, raw_data=True, url_override=LIVE_WS,
+                      websocket_params=dict(parameters, create_protocol=transport._protocol_factory(LIVE_WS)))
+
+    def preflight(self):
+        """Read-only live preflight: account (identity hash only), clock, positions,
+        open orders, asset and latest quote. No account id or balance is returned."""
+        from alpaca.data.enums import DataFeed
+        from alpaca.data.requests import StockLatestQuoteRequest
+        observations, attempts = [], []
+
+        def before(kind, **_):
+            attempts.append(kind)
+            if len(attempts) > 50:
+                raise SafetyError("preflight_request_bound")
+
+        def observer(observation):
+            origin = "data" if observation["kind"] == "data_read" else "trading"
+            observations.append(dict(observation, origin=origin))
+
+        lock = threading.Lock()
+        trading = self._trading_client(before, observer, read_only=True, lock=lock)
+        data = transport._sdk_client(self._key, self._secret, before, observer, data=True, read_only=True,
+                                     lock=lock)
+        try:
+            raw_account = trading.get_account()
+            identity = hashlib.sha256(str(raw_account["id"]).encode()).hexdigest()
+            market_open = trading.get_clock().get("is_open") is True
+            positions = [{"symbol": str(row["symbol"]), "qty": transport.decimal_string(row["qty"])}
+                         for row in trading.get_all_positions()]
+            raw_orders = trading.get("/orders", {"status": "open", "limit": 500, "nested": False})
+            asset = trading.get_asset(self.symbol)
+            quotes = data.get_stock_latest_quote(
+                StockLatestQuoteRequest(symbol_or_symbols=[self.symbol], feed=DataFeed(self.feed)))
+        finally:
+            trading._session.close()
+            data._session.close()
+        quote = None
+        if self.symbol in quotes:
+            try:
+                normalized = transport.normalize_quote(quotes[self.symbol], self.symbol)
+                quote = {key: normalized[key] for key in self.quote_fields}
+            except (transport.TransportError, TypeError, ValueError, AttributeError, KeyError):
+                quote = None
+        orders = raw_orders if isinstance(raw_orders, list) else []
+        self._ensure_pool()  # SDK pin and credentials fail here, before any order
+        return {"account_identity_sha256": identity, "positions": positions,
+                "open_orders": [_order_view(o, self.order_fields) for o in orders],
+                "open_orders_complete": isinstance(raw_orders, list) and len(raw_orders) < 500,
+                "asset_tradable": bool(asset.get("tradable")) and asset.get("status") == "active",
+                "market_open": market_open, "quote": quote, "observations": observations}
+
+    def recovery_preflight(self):
+        raise transport.TransportError("live recovery is not implemented")
