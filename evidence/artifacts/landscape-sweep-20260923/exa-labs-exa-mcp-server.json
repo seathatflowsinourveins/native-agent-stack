@@ -1,0 +1,32 @@
+{
+ "schema_version": 1,
+ "id": "source-review-exa-labs-exa-mcp-server",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/exa-labs/exa-mcp-server",
+ "reviewed_commit": "f3d71fb6b0ff4b4683f108f05bc2bae61a9f7e97",
+ "readme_path": "README.md",
+ "license": "MIT",
+ "layers": [
+  "web-research"
+ ],
+ "claim": "Source and documentation review of exa-labs/exa-mcp-server at commit f3d71fb6b0ff4b4683f108f05bc2bae61a9f7e97 (license MIT), read from README.md at that commit. Repository description: \"Exa MCP for web search and web crawling!\".",
+ "documentation_excerpts": [
+  {
+   "source": "README.md@f3d71fb6b0ff4b4683f108f05bc2bae61a9f7e97",
+   "text": "Connect AI agents to Exa for web search, content fetching, and multi-step research."
+  },
+  {
+   "source": "README.md@f3d71fb6b0ff4b4683f108f05bc2bae61a9f7e97",
+   "text": "Most clients can be configured manually with the standard mcpServers shape:"
+  }
+ ],
+ "limitations": [
+  "Source and documentation review at the pinned commit only: not installed, executed, benchmarked or compared with any other component.",
+  "The description and excerpts are the upstream project's own words at that commit, filtered to drop popularity, recency, status and comparison sentences; they are upstream claims, not measured results."
+ ],
+ "sources": [
+  "https://github.com/exa-labs/exa-mcp-server/tree/f3d71fb6b0ff4b4683f108f05bc2bae61a9f7e97",
+  "https://github.com/exa-labs/exa-mcp-server/blob/f3d71fb6b0ff4b4683f108f05bc2bae61a9f7e97/README.md"
+ ]
+}

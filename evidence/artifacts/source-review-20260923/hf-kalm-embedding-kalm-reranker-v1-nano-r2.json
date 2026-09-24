@@ -1,0 +1,40 @@
+{
+ "schema_version": 1,
+ "id": "source-review-hf-kalm-embedding-kalm-reranker-v1-nano-r2",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://huggingface.co/KaLM-Embedding/KaLM-Reranker-V1-Nano-R2",
+ "reviewed_commit": "32b242bb7fd7ad6fd404154c09560d249ffe017f",
+ "readme_path": "README.md",
+ "license": "apache-2.0",
+ "layers": [
+  "document-retrieval"
+ ],
+ "claim": "Source and documentation review of the model repository KaLM-Embedding/KaLM-Reranker-V1-Nano-R2 at sha 32b242bb7fd7ad6fd404154c09560d249ffe017f (license apache-2.0), read from README.md at that revision.",
+ "documentation_excerpts": [
+  {
+   "source": "README.md@32b242bb7fd7ad6fd404154c09560d249ffe017f",
+   "text": "KaLM-Reranker-V1: Fast but Not Late Interaction for Compressed Document Reranking"
+  },
+  {
+   "source": "README.md@32b242bb7fd7ad6fd404154c09560d249ffe017f",
+   "text": "KaLM-Reranker-V1-R2 is a substantially improved checkpoint release of KaLM-Reranker-V1. It keeps the same fast-but-not-late-interaction (FBNL) architecture and inference interface as the original release, while introducing a stronger multi-stage training recipe for three practical goals:"
+  },
+  {
+   "source": "README.md@32b242bb7fd7ad6fd404154c09560d249ffe017f",
+   "text": "Stronger compression robustness. R2 supports Matryoshka embedding pooling (MEP) from 1x to 128x, extending the maximum validated compression ratio from 32x to 128x."
+  },
+  {
+   "source": "README.md@32b242bb7fd7ad6fd404154c09560d249ffe017f",
+   "text": "Adjustable test-time compute scaling. A single KaLM-Reranker-V1-R2 checkpoint can trade compute for quality by changing the compression ratio. It can also use a coarse-to-fine cascade: cheaply screen all candidates with heavily compressed document representations, then spend more compute only on the most promising candidates."
+  }
+ ],
+ "limitations": [
+  "Source and documentation review at the pinned revision only: not installed, executed, benchmarked or compared with any other component.",
+  "The description and excerpts are the upstream project's own words at that revision, filtered to drop popularity, recency, status and comparison sentences; they are upstream claims, not measured results."
+ ],
+ "sources": [
+  "https://huggingface.co/KaLM-Embedding/KaLM-Reranker-V1-Nano-R2/tree/32b242bb7fd7ad6fd404154c09560d249ffe017f",
+  "https://huggingface.co/KaLM-Embedding/KaLM-Reranker-V1-Nano-R2/blob/32b242bb7fd7ad6fd404154c09560d249ffe017f/README.md"
+ ]
+}

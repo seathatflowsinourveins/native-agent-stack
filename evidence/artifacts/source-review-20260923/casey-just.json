@@ -1,0 +1,32 @@
+{
+ "schema_version": 1,
+ "id": "source-review-casey-just",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/casey/just",
+ "reviewed_commit": "6119e6aff518b6550d9030955f905b01051b5772",
+ "readme_path": "README.md",
+ "license": "CC0-1.0",
+ "layers": [
+  "recovery-portability"
+ ],
+ "claim": "Source and documentation review of the repository casey/just at commit 6119e6aff518b6550d9030955f905b01051b5772 (license CC0-1.0), read from README.md at that revision. Repository description: \"\\ud83e\\udd16 Just a command runner\".",
+ "documentation_excerpts": [
+  {
+   "source": "README.md@6119e6aff518b6550d9030955f905b01051b5772",
+   "text": "just is a handy way to save and run project-specific commands."
+  },
+  {
+   "source": "README.md@6119e6aff518b6550d9030955f905b01051b5772",
+   "text": "Commands, called recipes, are stored in a file called justfile with syntax inspired by make:"
+  }
+ ],
+ "limitations": [
+  "Source and documentation review at the pinned revision only: not installed, executed, benchmarked or compared with any other component.",
+  "The description and excerpts are the upstream project's own words at that revision, filtered to drop popularity, recency, status and comparison sentences; they are upstream claims, not measured results."
+ ],
+ "sources": [
+  "https://github.com/casey/just/tree/6119e6aff518b6550d9030955f905b01051b5772",
+  "https://github.com/casey/just/blob/6119e6aff518b6550d9030955f905b01051b5772/README.md"
+ ]
+}

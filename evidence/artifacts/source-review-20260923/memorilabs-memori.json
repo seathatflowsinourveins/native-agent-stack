@@ -1,0 +1,32 @@
+{
+ "schema_version": 1,
+ "id": "source-review-memorilabs-memori",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/MemoriLabs/Memori",
+ "reviewed_commit": "574b1ea3e876f100ef82c37817d603eb7e258e59",
+ "readme_path": "README.md",
+ "license": null,
+ "layers": [
+  "durable-memory"
+ ],
+ "claim": "Source and documentation review of the repository MemoriLabs/Memori at commit 574b1ea3e876f100ef82c37817d603eb7e258e59, read from README.md at that revision. Repository description: \"Memori is agent-native memory infrastructure. A LLM-agnostic layer that turns agent execution and conversation into structured, persistent state for production systems.\".",
+ "documentation_excerpts": [
+  {
+   "source": "README.md@574b1ea3e876f100ef82c37817d603eb7e258e59",
+   "text": "Memori plugs into the software and infrastructure you already use. It is LLM, datastore and framework agnostic and seamlessly integrates into the architecture you've already designed."
+  },
+  {
+   "source": "README.md@574b1ea3e876f100ef82c37817d603eb7e258e59",
+   "text": "\u2192 Memori Cloud \u2014 Zero config. Get an API key and start building in minutes."
+  }
+ ],
+ "limitations": [
+  "Source and documentation review at the pinned revision only: not installed, executed, benchmarked or compared with any other component.",
+  "The description and excerpts are the upstream project's own words at that revision, filtered to drop popularity, recency, status and comparison sentences; they are upstream claims, not measured results."
+ ],
+ "sources": [
+  "https://github.com/MemoriLabs/Memori/tree/574b1ea3e876f100ef82c37817d603eb7e258e59",
+  "https://github.com/MemoriLabs/Memori/blob/574b1ea3e876f100ef82c37817d603eb7e258e59/README.md"
+ ]
+}

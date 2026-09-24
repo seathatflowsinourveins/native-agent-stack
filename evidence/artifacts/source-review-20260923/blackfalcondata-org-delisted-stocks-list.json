@@ -1,0 +1,32 @@
+{
+ "schema_version": 1,
+ "id": "source-review-blackfalcondata-org-delisted-stocks-list",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/BlackFalconData-org/delisted-stocks-list",
+ "reviewed_commit": "93cb3f914bc964f126bc9e60e318d264c86c478b",
+ "readme_path": "README.md",
+ "license": null,
+ "layers": [
+  "identity-provenance"
+ ],
+ "claim": "Source and documentation review of the repository BlackFalconData-org/delisted-stocks-list at commit 93cb3f914bc964f126bc9e60e318d264c86c478b, read from README.md at that revision. Repository description: \"Complete list of 36,000+ delisted stocks from NYSE, NASDAQ, and OTC exchanges.\".",
+ "documentation_excerpts": [
+  {
+   "source": "README.md@93cb3f914bc964f126bc9e60e318d264c86c478b",
+   "text": "Every stock delisting (Form 25) and voluntary deregistration (Form 15), with ticker symbols, CIK, filing dates, exchange, and direct links to SEC filings."
+  },
+  {
+   "source": "README.md@93cb3f914bc964f126bc9e60e318d264c86c478b",
+   "text": "36,000+ delisted securities - Covers NYSE, NASDAQ, NYSE American, NYSE Arca, CBOE, and OTC. Common stocks, ETFs, bonds, warrants, and preferred shares."
+  }
+ ],
+ "limitations": [
+  "Source and documentation review at the pinned revision only: not installed, executed, benchmarked or compared with any other component.",
+  "The description and excerpts are the upstream project's own words at that revision, filtered to drop popularity, recency, status and comparison sentences; they are upstream claims, not measured results."
+ ],
+ "sources": [
+  "https://github.com/BlackFalconData-org/delisted-stocks-list/tree/93cb3f914bc964f126bc9e60e318d264c86c478b",
+  "https://github.com/BlackFalconData-org/delisted-stocks-list/blob/93cb3f914bc964f126bc9e60e318d264c86c478b/README.md"
+ ]
+}

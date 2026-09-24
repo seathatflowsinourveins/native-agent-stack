@@ -1,0 +1,32 @@
+{
+ "schema_version": 1,
+ "id": "source-review-nexting-ai-nexting",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/Nexting-ai/nexting",
+ "reviewed_commit": "a4b75f0429d3b1bf35eef68a296b2e72aa9c7483",
+ "readme_path": "README.md",
+ "license": "MIT",
+ "layers": [
+  "mcp-surfaces"
+ ],
+ "claim": "Source and documentation review of the repository Nexting-ai/nexting at commit a4b75f0429d3b1bf35eef68a296b2e72aa9c7483 (license MIT), read from README.md at that revision. Repository description: \"Remote control for Claude Code, Codex, Grok, and Cursor on Mac or PC. View sessions, send tasks, and drive them remotely from your phone, PIN, or Ring. OpenClaw supported.\".",
+ "documentation_excerpts": [
+  {
+   "source": "README.md@a4b75f0429d3b1bf35eef68a296b2e72aa9c7483",
+   "text": "Remote control for your own AI agents. Connect to Claude Code, Codex, Grok, and Cursor on your Mac or Windows PC. View sessions, send tasks, and drive them remotely from your phone, PIN, or Ring."
+  },
+  {
+   "source": "README.md@a4b75f0429d3b1bf35eef68a296b2e72aa9c7483",
+   "text": "You already have powerful agents \u2014 Claude Code, Codex, Grok, Cursor, OpenClaw \u2014 running on your computer. Nexting connects you to them remotely: view live sessions, send tasks, and drive Claude Code, Codex, Grok, or Cursor from your phone, PIN, or Ring, wherever you are. When you only need to send an idea, speak once and let your own agent work in the background."
+  }
+ ],
+ "limitations": [
+  "Source and documentation review at the pinned revision only: not installed, executed, benchmarked or compared with any other component.",
+  "The description and excerpts are the upstream project's own words at that revision, filtered to drop popularity, recency, status and comparison sentences; they are upstream claims, not measured results."
+ ],
+ "sources": [
+  "https://github.com/Nexting-ai/nexting/tree/a4b75f0429d3b1bf35eef68a296b2e72aa9c7483",
+  "https://github.com/Nexting-ai/nexting/blob/a4b75f0429d3b1bf35eef68a296b2e72aa9c7483/README.md"
+ ]
+}

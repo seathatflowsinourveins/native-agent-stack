@@ -1,0 +1,32 @@
+{
+ "schema_version": 1,
+ "id": "source-review-restatedev-restate",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/restatedev/restate",
+ "reviewed_commit": "54e1e0a2d88af4cdefe297087c61531bd427c91d",
+ "readme_path": "README.md",
+ "license": null,
+ "layers": [
+  "workers"
+ ],
+ "claim": "Source and documentation review of the repository restatedev/restate at commit 54e1e0a2d88af4cdefe297087c61531bd427c91d, read from README.md at that revision. Repository description: \"Restate is the platform for building resilient applications that tolerate all infrastructure faults w/o the need for a PhD.\".",
+ "documentation_excerpts": [
+  {
+   "source": "README.md@54e1e0a2d88af4cdefe297087c61531bd427c91d",
+   "text": "The basic primitives Restate offers to simplify application development are the following:"
+  },
+  {
+   "source": "README.md@54e1e0a2d88af4cdefe297087c61531bd427c91d",
+   "text": "You can safely upgrade from a Restate x.y to x.(y+1) release without performing any manual data migration, as Restate performs an automatic data migration for you."
+  }
+ ],
+ "limitations": [
+  "Source and documentation review at the pinned revision only: not installed, executed, benchmarked or compared with any other component.",
+  "The description and excerpts are the upstream project's own words at that revision, filtered to drop popularity, recency, status and comparison sentences; they are upstream claims, not measured results."
+ ],
+ "sources": [
+  "https://github.com/restatedev/restate/tree/54e1e0a2d88af4cdefe297087c61531bd427c91d",
+  "https://github.com/restatedev/restate/blob/54e1e0a2d88af4cdefe297087c61531bd427c91d/README.md"
+ ]
+}

@@ -1,0 +1,32 @@
+{
+ "schema_version": 1,
+ "id": "source-review-betterleaks-betterleaks",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/betterleaks/betterleaks",
+ "reviewed_commit": "2a387a5bad4290a84b9a1eb679bffe70611218cc",
+ "readme_path": "README.md",
+ "license": "MIT",
+ "layers": [
+  "secrets-credentials"
+ ],
+ "claim": "Source and documentation review of betterleaks/betterleaks at commit 2a387a5bad4290a84b9a1eb679bffe70611218cc (license MIT), read from README.md at that commit. Repository description: \"Find leaked secrets everywhere.\".",
+ "documentation_excerpts": [
+  {
+   "source": "README.md@2a387a5bad4290a84b9a1eb679bffe70611218cc",
+   "text": "Betterleaks is a configurable, fast, and thorough secrets scanner. [\u2026] Check out this series of blog posts to learn how the detection engine works: 1. Regex is all you need, 2. Rare Not Random, 3. Express YourCELf, 4. Better generic secrets detection."
+  },
+  {
+   "source": "README.md@2a387a5bad4290a84b9a1eb679bffe70611218cc",
+   "text": "Betterleaks' strength comes from its expressive configuration. Filtering and validation logic are defined as Expr. Previously this logic was implemented in CEL; existing CEL-shaped configs are still accepted for compatibility, but new configs should use Expr. prefilters run before any regex matching occurs and only have access to the attributes map. attributes describe a resource like a git patch."
+  }
+ ],
+ "limitations": [
+  "Source and documentation review at the pinned commit only: not installed, executed, benchmarked or compared with any other component.",
+  "The description and excerpts are the upstream project's own words at that commit, filtered to drop popularity, recency, status and comparison sentences; they are upstream claims, not measured results."
+ ],
+ "sources": [
+  "https://github.com/betterleaks/betterleaks/tree/2a387a5bad4290a84b9a1eb679bffe70611218cc",
+  "https://github.com/betterleaks/betterleaks/blob/2a387a5bad4290a84b9a1eb679bffe70611218cc/README.md"
+ ]
+}

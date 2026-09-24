@@ -1,0 +1,32 @@
+{
+ "schema_version": 1,
+ "id": "source-review-untrivial-ai-agent-orchestrator",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/Untrivial-ai/agent-orchestrator",
+ "reviewed_commit": "1fed2868baaea0b434c7f30583dd0f0a80894443",
+ "readme_path": "README.md",
+ "license": "Apache-2.0",
+ "layers": [
+  "workers"
+ ],
+ "claim": "Source and documentation review of the repository Untrivial-ai/agent-orchestrator at commit 1fed2868baaea0b434c7f30583dd0f0a80894443 (license Apache-2.0), read from README.md at that revision. Repository description: \"Run and supervise teams of coding agents from planning to merge. Any harness (Claude code, codex, +25 more). Desktop, web, mobile, and cloud agents.\".",
+ "documentation_excerpts": [
+  {
+   "source": "README.md@1fed2868baaea0b434c7f30583dd0f0a80894443",
+   "text": "Give every coding task its own agent, workspace, and feedback loop. Plan and delegate larger outcomes with a project-aware orchestrator. Follow every worker, pull request, CI run, and review in a live Kanban."
+  },
+  {
+   "source": "README.md@1fed2868baaea0b434c7f30583dd0f0a80894443",
+   "text": "A worker is AO's unit of execution: one task, one coding agent, and one isolated workspace. Use New task when the work is already clear. Describe the outcome, choose an agent and model, attach relevant files, and work with the agent in structured Chat or its native terminal UI."
+  }
+ ],
+ "limitations": [
+  "Source and documentation review at the pinned revision only: not installed, executed, benchmarked or compared with any other component.",
+  "The description and excerpts are the upstream project's own words at that revision, filtered to drop popularity, recency, status and comparison sentences; they are upstream claims, not measured results."
+ ],
+ "sources": [
+  "https://github.com/Untrivial-ai/agent-orchestrator/tree/1fed2868baaea0b434c7f30583dd0f0a80894443",
+  "https://github.com/Untrivial-ai/agent-orchestrator/blob/1fed2868baaea0b434c7f30583dd0f0a80894443/README.md"
+ ]
+}

@@ -1,0 +1,32 @@
+{
+ "schema_version": 1,
+ "id": "source-review-generalaction-emdash",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/generalaction/emdash",
+ "reviewed_commit": "51dd12d94fc89b445b866d24f46db2f165320d8d",
+ "readme_path": "README.md",
+ "license": "Apache-2.0",
+ "layers": [
+  "workers"
+ ],
+ "claim": "Source and documentation review of the repository generalaction/emdash at commit 51dd12d94fc89b445b866d24f46db2f165320d8d (license Apache-2.0), read from README.md at that revision. Repository description: \"Emdash is the Open-Source Agentic Development Environment (\\ud83e\\udde1 YC W26). Run multiple coding agents in parallel. Use any provider.\".",
+ "documentation_excerpts": [
+  {
+   "source": "README.md@51dd12d94fc89b445b866d24f46db2f165320d8d",
+   "text": "Emdash is a desktop app for running AI coding agents in parallel. Each task runs in its own Git worktree, so you can explore multiple fixes or features at once, review the diffs, and merge what works."
+  },
+  {
+   "source": "README.md@51dd12d94fc89b445b866d24f46db2f165320d8d",
+   "text": "It works with local projects and remote machines over SSH. Bring the CLI agents you already use: Claude Code, Codex, OpenCode, Amp, and more."
+  }
+ ],
+ "limitations": [
+  "Source and documentation review at the pinned revision only: not installed, executed, benchmarked or compared with any other component.",
+  "The description and excerpts are the upstream project's own words at that revision, filtered to drop popularity, recency, status and comparison sentences; they are upstream claims, not measured results."
+ ],
+ "sources": [
+  "https://github.com/generalaction/emdash/tree/51dd12d94fc89b445b866d24f46db2f165320d8d",
+  "https://github.com/generalaction/emdash/blob/51dd12d94fc89b445b866d24f46db2f165320d8d/README.md"
+ ]
+}

@@ -1,0 +1,32 @@
+{
+ "schema_version": 1,
+ "id": "source-review-hf-nvidia-nemotron-3-embed-1b-nvfp4",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-NVFP4",
+ "reviewed_commit": "f630128278eb245579d3ea022b4f659fbd614318",
+ "readme_path": "README.md",
+ "license": "other",
+ "layers": [
+  "semantic-rag"
+ ],
+ "claim": "Source and documentation review of the model repository nvidia/Nemotron-3-Embed-1B-NVFP4 at sha f630128278eb245579d3ea022b4f659fbd614318 (license other), read from README.md at that revision.",
+ "documentation_excerpts": [
+  {
+   "source": "README.md@f630128278eb245579d3ea022b4f659fbd614318",
+   "text": "Generally Nemotron-3-Embed-1B-BF16 and Nemotron-3-Embed-1B-NVFP4 models share the embedding space and can be used interchangeably, but we recommend validating retrieval quality on a representative sample before switching the models."
+  },
+  {
+   "source": "README.md@f630128278eb245579d3ea022b4f659fbd614318",
+   "text": "The Nemotron-3-Embed-1B-NVFP4 is the quantized version of the Nemotron-3-Embed-1B-BF16, which is a transformer-based text embedding model trained with bidirectional attention masking, where the final embedding vector is obtained by applying average pooling to the transformer\u2019s token-level representations. It encodes each input text into a dense embedding vector of dimension 2048."
+  }
+ ],
+ "limitations": [
+  "Source and documentation review at the pinned revision only: not installed, executed, benchmarked or compared with any other component.",
+  "The description and excerpts are the upstream project's own words at that revision, filtered to drop popularity, recency, status and comparison sentences; they are upstream claims, not measured results."
+ ],
+ "sources": [
+  "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-NVFP4/tree/f630128278eb245579d3ea022b4f659fbd614318",
+  "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-NVFP4/blob/f630128278eb245579d3ea022b4f659fbd614318/README.md"
+ ]
+}

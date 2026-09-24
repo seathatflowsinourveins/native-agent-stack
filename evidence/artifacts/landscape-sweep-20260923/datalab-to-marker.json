@@ -1,0 +1,37 @@
+{
+ "schema_version": 1,
+ "id": "source-review-datalab-to-marker",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/datalab-to/marker",
+ "reviewed_commit": "8a1d2344de25d7ec4c5209133aed7af565874ff0",
+ "readme_path": "README.md",
+ "license": "Apache-2.0",
+ "layers": [
+  "document-retrieval"
+ ],
+ "claim": "Source and documentation review of datalab-to/marker at commit 8a1d2344de25d7ec4c5209133aed7af565874ff0 (code license Apache-2.0; model weights under separate terms, see model_weights_license), read from README.md at that commit. Repository description: \"Convert PDF to markdown + JSON quickly with high accuracy\".",
+ "model_weights_license": {
+  "name": "modified AI Pubs Open Rail-M",
+  "text": "Our model weights use a modified AI Pubs Open Rail-M license (free for research, personal use, and startups under $5M funding/revenue). For commercial use of the model weights beyond that, visit our pricing page here.",
+  "source": "README.md@8a1d2344de25d7ec4c5209133aed7af565874ff0"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@8a1d2344de25d7ec4c5209133aed7af565874ff0",
+   "text": "Marker converts documents to markdown, JSON, chunks, and HTML quickly and accurately."
+  },
+  {
+   "source": "README.md@8a1d2344de25d7ec4c5209133aed7af565874ff0",
+   "text": "For the highest accuracy, pass the --use_llm flag to use an LLM alongside marker. This will do things like merge tables across pages, handle inline math, format tables properly, and extract values from forms. It works with Gemini, Claude, OpenAI-compatible, Azure, Vertex, OpenRouter, or Ollama models. By default, it uses gemini-3.5-flash. See below for details."
+  }
+ ],
+ "limitations": [
+  "Source and documentation review at the pinned commit only: not installed, executed, benchmarked or compared with any other component.",
+  "The description and excerpts are the upstream project's own words at that commit, filtered to drop popularity, recency, status and comparison sentences; they are upstream claims, not measured results."
+ ],
+ "sources": [
+  "https://github.com/datalab-to/marker/tree/8a1d2344de25d7ec4c5209133aed7af565874ff0",
+  "https://github.com/datalab-to/marker/blob/8a1d2344de25d7ec4c5209133aed7af565874ff0/README.md"
+ ]
+}
