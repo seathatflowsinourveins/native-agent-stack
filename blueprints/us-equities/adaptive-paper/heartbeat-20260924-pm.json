@@ -1,0 +1,138 @@
+{
+  "schema_version": 1,
+  "date": "2026-09-24",
+  "phase": "afternoon",
+  "kind": "native_readiness_and_research_observation",
+  "status": "blocked_authentication_and_unimported_history",
+  "base_commit": "504c7ef4ffefb2cb265d6e935fec5aa0d107f8ba",
+  "reviewed_execution_commit": "93493e7d4d2f00ac1371756368f6f540bed9a83a",
+  "config_sha256": "77244c396c407d20f7b21f0e9e8ad9a2c4803ad663247ac210076a47ebbc7eb3",
+  "account_scope": "Original Alpaca paper credential scope and consolidated ledger; no alternate key/account/root selected.",
+  "risk": {
+    "capital_usd": "10000",
+    "gross_usd": "5000",
+    "order_usd": "1000",
+    "order_shares": "1",
+    "loss_usd": "25",
+    "drawdown_usd": "25",
+    "leverage": "1",
+    "rest_per_minute": 200,
+    "all_submissions_per_minute": 180,
+    "duration_seconds": 300,
+    "cleanup_seconds": 120,
+    "quote_max_age_seconds": 3
+  },
+  "source_qualification": {
+    "frozen_pins_matched": 38,
+    "source_changed": false,
+    "passing_evidence_reused": "September23 final95focused checks, independent Claude/Codex review and300.87second native paper trial. No new engine/strategy behavior or source adoption."
+  },
+  "preflight": {
+    "status": "failed",
+    "exit_code": 3,
+    "error_type": "APIError",
+    "broker_http_status": "not preserved by this runner receipt",
+    "fresh_account_identity": "not established",
+    "regular_session_open": "not established",
+    "reconciliation": "not established",
+    "private_receipt_sha256": "6eb7fe7a4771d2698c7ea5e3e9b859fb1a1f6e3060248e12eb9fbaca12a45f60",
+    "limitation": "Failure occurs before account identity/ledger admission. The failure receipt is retained outside the original ledger; do not report a fresh cash or position match."
+  },
+  "research": {
+    "status": "partial_or_failed_shadow",
+    "request_as_of": "2026-09-24T17:46:24.080319Z",
+    "requested_start": "2026-09-23T17:46:24.080319Z",
+    "finished_at": "2026-09-24T17:46:24.490217Z",
+    "feed": "iex",
+    "max_news_items": 50,
+    "symbols_requested": 24,
+    "items": 0,
+    "market_snapshots": 0,
+    "http_observations": [
+      {
+        "kind": "news",
+        "observed_at": "2026-09-24T17:46:24.475619Z",
+        "status": 401
+      },
+      {
+        "kind": "snapshot",
+        "observed_at": "2026-09-24T17:46:24.490167Z",
+        "status": 401
+      }
+    ],
+    "errors": [
+      {
+        "stage": "news",
+        "code": "http_401"
+      },
+      {
+        "stage": "snapshot",
+        "code": "http_401"
+      }
+    ],
+    "engine_eligible": false,
+    "private_receipt_sha256": "08c08c4ce94a2e059742e4df5617f164fc5d633728a2399fce1e482cfc0b0643",
+    "times": "Request/response observation times retained. No current articles or snapshots were returned, so no new publication/update times or market changes can be established.",
+    "strategy_comparison": "No fresh evidence supports changes to trend momentum, range breakout, mean reversion, relative strength or defensive cash. Prior observations remain dated, not current signals.",
+    "catalyst_rankings": "advisory only; no new ranking from failed collection"
+  },
+  "attempts": [],
+  "orders_submitted_this_heartbeat": 0,
+  "filled_orders_this_heartbeat": 0,
+  "fill_increments_this_heartbeat": 0,
+  "roundtrips_this_heartbeat": 0,
+  "costs_this_heartbeat": "No order execution; account fees and fresh cash changes unavailable without authentication.",
+  "continuity": {
+    "audit_at": "2026-09-24T17:46:43Z",
+    "original": {
+      "phase": "finished",
+      "status": "passed",
+      "trial": "adaptive-20260923-pm2",
+      "requests": 1055,
+      "trials": 19,
+      "intents": 40,
+      "filled_intents": 38,
+      "canceled_intents": 2,
+      "positions": 0,
+      "cash_delta_usd": "-1.010",
+      "cumulative_realized_loss_usd": "1.49",
+      "observation_scope": "Local retained ledger only; not a fresh broker reconciliation."
+    },
+    "config_limits_baseline_preserved": true,
+    "prior_external_sources_unchanged": 14,
+    "new_root_scope": {
+      "same_account_fingerprint_directory": true,
+      "imported": false,
+      "trial": "adaptive-20260923-post",
+      "phase": "finished",
+      "status": "completed_no_signals",
+      "requests": 16,
+      "trials": 1,
+      "intents": 0,
+      "positions": 0,
+      "local_cash_delta_usd": "0",
+      "limitation": "Local history identifies a new same-account root absent from original consolidation provenance. Its flat/cash-zero state is not a current broker proof. Existing consolidation deliberately refuses a second different plan; do not rerun it or reset original history."
+    },
+    "stop_present": false,
+    "active_order_writer_observed": false,
+    "other_scheduled_lanes": "Other capacity/mover/incentive launchers reference a different private credential path; this is configured path scope only, not verified account identity or permission to switch this lane."
+  },
+  "prior_acceptance": {
+    "receipt": "blueprints/us-equities/adaptive-paper/heartbeat-20260923-pm.json",
+    "trial": "adaptive-20260923-pm2",
+    "elapsed_seconds": 300.86859399901005,
+    "submitted_orders": 10,
+    "filled_orders": 10,
+    "roundtrips": 5,
+    "incremental_paper_pnl_usd": "0.09",
+    "peak_submissions_per_minute": 4,
+    "scope": "Dated September23 native acceptance; remains valid historical evidence, not present readiness."
+  },
+  "next_action": "Restore valid credentials for the same original paper account in its existing private scope. Re-establish account identity and fresh broker proof, then qualify an append-only repair for the newly discovered16request/one-trial history under the original lock without resetting baselines or invoking an unsupported second consolidation plan. Only then run the next authorized five-minute trial.",
+  "limitations": [
+    "No entry trial was launched and no source/strategy/numeric limits were changed.",
+    "No fresh market or account conclusion is available from the failed authenticated reads.",
+    "Historical bounded paper acceptance remains; high-throughput, profitability, all-family broker execution and live readiness remain unqualified.",
+    "No live trading, paid features, additional leverage, alternate account or catalyst-order signals enabled."
+  ]
+}

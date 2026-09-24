@@ -17,12 +17,12 @@
     "max_total_requests_per_minute": 200,
     "max_submission_requests_per_minute": 180,
     "native_synthetic_capacity": "180 fills / 90 roundtrips in60.4282seconds;178.7246submissions/minute;flat;zero broker connections",
-    "broker_status": "September23 reviewed frozen93493e7d completed300.87s in the original ledger/config:10submitted/filled orders,5roundtrips,+0.09USD incremental executed-price PnL; flat and cash matched. Peak4submissions/min. Only relative strength selected; profitability and near200/min remain unqualified.",
-    "market_research": "September23 19:07UTC bounded50news/24IEX snapshots;8new articles since17:38, breadth6positive18negative; all24quotes fresh. Publication/update/observation times retained; advisory only.",
+    "broker_status": "September24 preflight failedAPIError; research endpoints401. No new trial or fresh reconciliation. Original history unchanged, but later same-account zero-order trial16requests is unimported. September23 five-minute acceptance remains historical.",
+    "market_research": "September24 17:46UTC bounded news and24IEX snapshot refresh failed401;0items/quotes returned. No fresh market inference or strategy changes; publication/update times unavailable.",
     "selection": "Reuse selected native engine and official SDK; no replacement justified by repository recency",
     "overturning_comparison": "A maintained alternative must demonstrate better operational acceptance and cost-adjusted out-of-sample strategy results on the same frozen data/risk contract",
-    "latest_receipt": "blueprints/us-equities/adaptive-paper/heartbeat-20260923-pm.json",
-    "latest_report": "blueprints/us-equities/adaptive-paper/heartbeat-20260923-pm.md"
+    "latest_receipt": "blueprints/us-equities/adaptive-paper/heartbeat-20260924-pm.json",
+    "latest_report": "blueprints/us-equities/adaptive-paper/heartbeat-20260924-pm.md"
   },
   "foundation_catalog": "catalogs/foundation/manifest.json",
   "north_star": "blueprints/us-equities/north-star.md",

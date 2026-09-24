@@ -2,6 +2,23 @@
   "schema_version": 1,
   "receipts": [
     {
+      "id": "adaptive-paper-heartbeat-20260924-pm",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "nautilus-trader",
+        "alpaca-py",
+        "codex"
+      ],
+      "claim": "Native preflight failed before account reconciliation; bounded news and snapshot reads returnedHTTP401 and no entry trial ran. Independent local audit found unchanged original history plus an unimported same-account zero-order trial with16requests.",
+      "limitations": [
+        "This is a failed readiness observation, not a new successful paper E2E or fresh broker cash/position proof.",
+        "No news or snapshots were returned; no current market/strategy inference was made.",
+        "Original history and numeric limits remain intact. New16request/one-trial history needs a qualified append-only repair after same-account credentials are restored.",
+        "September23 bounded paper acceptance remains historical; profitability, all-family broker execution, high throughput and live readiness remain unqualified."
+      ],
+      "path": "evidence/receipts/adaptive-paper-heartbeat-20260924-pm.json"
+    },
+    {
       "id": "memory-lifecycle-probe-20260921",
       "kind": "native_cli_e2e",
       "component_ids": [
@@ -3000,6 +3017,21 @@
   ],
   "files": [
     {
+      "path": "blueprints/us-equities/adaptive-paper/heartbeat-20260924-pm.json",
+      "sha256": "85b41146672aadc6aeb7f4d737ae738d6a082881b9088c5dee4bf28cf278db13",
+      "bytes": 6235
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/heartbeat-20260924-pm.md",
+      "sha256": "3c66a3c11d171ffe40ec2467738cf4feac5f4b2f1c38d473ac4c57213e8c5745",
+      "bytes": 3185
+    },
+    {
+      "path": "evidence/receipts/adaptive-paper-heartbeat-20260924-pm.json",
+      "sha256": "f8d4701a4869e0764c9b05329ad080104b30d75c1aa09ddc850f342cf7a17445",
+      "bytes": 1179
+    },
+    {
       "path": ".gitattributes",
       "sha256": "b3ffd27e5ca28d7fd987dc7c594601e4532660ddfeb4992ae92b3916ecb45e9f",
       "bytes": 467
@@ -5467,8 +5499,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/README.md",
-      "sha256": "83cda39f06d0088595884de9eef3c0c0a453204f6f2492d2efb83dc6f96c7695",
-      "bytes": 19838
+      "sha256": "4cca74fb7c3aa4aadb84b9d6f0a956a58f678f66a9ff3e9a9847dbfc24fae30b",
+      "bytes": 19843
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/adaptive_policy_v1.receipt.json",
@@ -7482,8 +7514,8 @@
     },
     {
       "path": "catalogs/us-equities/runtime-target.json",
-      "sha256": "8236fbf855301e924fbe844009ff3e63edbe79c8fa37c6860548786b4cf5e861",
-      "bytes": 9553
+      "sha256": "1e0a8ba287773c39d014f45ca5ff09aff3b81d3e9df633d6354d8858746cd921",
+      "bytes": 9503
     },
     {
       "path": "catalogs/us-equities/security-identity-review.json",
@@ -7667,8 +7699,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "e75f140841bb34bded91bad545ce0de4fe0b45864d026c336ea9d1b4decccdf7",
-      "bytes": 12922636
+      "sha256": "ffb6abc2f9943a1307c5c8aae7d2d355f23552bac95947e788e7853f8bb43dab",
+      "bytes": 12922591
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -11507,8 +11539,8 @@
     },
     {
       "path": "observability/grand-dashboard/state.json",
-      "sha256": "1b8ca584b0e318114c1d5d21acf88679ec4e033f3264aa3262a81e0b14720c85",
-      "bytes": 10474
+      "sha256": "abe959887b8773db390584c678d50052704374af8f8a83e9074135744aed59e9",
+      "bytes": 10479
     },
     {
       "path": "observability/native-data/README.md",

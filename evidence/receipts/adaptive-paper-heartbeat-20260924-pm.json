@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "id": "adaptive-paper-heartbeat-20260924-pm",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "nautilus-trader",
+    "alpaca-py",
+    "codex"
+  ],
+  "claim": "Native preflight failed before account reconciliation; bounded news and snapshot reads returnedHTTP401 and no entry trial ran. Independent local audit found unchanged original history plus an unimported same-account zero-order trial with16requests.",
+  "limitations": [
+    "This is a failed readiness observation, not a new successful paper E2E or fresh broker cash/position proof.",
+    "No news or snapshots were returned; no current market/strategy inference was made.",
+    "Original history and numeric limits remain intact. New16request/one-trial history needs a qualified append-only repair after same-account credentials are restored.",
+    "September23 bounded paper acceptance remains historical; profitability, all-family broker execution, high throughput and live readiness remain unqualified."
+  ],
+  "native_evidence": "blueprints/us-equities/adaptive-paper/heartbeat-20260924-pm.json",
+  "source_review": "blueprints/us-equities/adaptive-paper/heartbeat-20260924-pm.md"
+}
