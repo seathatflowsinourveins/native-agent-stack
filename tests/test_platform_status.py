@@ -179,6 +179,19 @@ class PlatformStatusTests(unittest.TestCase):
         self.r.receipt(result="not_runnable", host="mac-a", observed_at="2026-09-23T02:00:00Z")
         self.assertEqual(self.r.status().status, "conditional")
 
+    def test_a_reviewed_install_pass_alone_is_conditional_on_either_platform(self):
+        # 2026-09-24 decision: a version-only install receipt proves the binary resolves, not that the component
+        # works; accepted needs a reviewed use-stage pass.
+        for platform_id in ("macos-arm64", "linux-wsl2-x86_64"):
+            with self.subTest(platform_id):
+                self.setUp()
+                self.r.receipt(platform_id, stage="install", host="box-a")
+                derived = self.r.status(platform_id)
+                self.assertEqual(derived.status, "conditional")
+                self.assertIn("use-stage pass", derived.reason)
+                self.r.receipt(platform_id, stage="use", host="box-b")
+                self.assertEqual(self.r.status(platform_id).status, "accepted")
+
     def test_a_use_fail_is_not_hidden_by_a_later_install_pass(self):
         self.r.receipt(result="fail", stage="use", host="mac-a", observed_at="2026-09-23T01:00:00Z")
         self.r.receipt(stage="install", host="mac-a", observed_at="2026-09-23T02:00:00Z")

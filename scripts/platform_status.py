@@ -51,7 +51,12 @@ except ImportError:  # running as a plain script, not a package
 
 PLATFORMS = ("linux-wsl2-x86_64", "macos-arm64")
 STATUS_RANK = {"untested": 0, "not_established": 0, "conditional": 1, "accepted": 2}
+# Stages whose latest native_proven fail blocks acceptance.
 QUALIFYING_STAGES = frozenset({"install", "use"})
+# Stages whose independently reviewed pass can make a winner accepted: a functional use only. An install pass (a
+# version call proves the binary resolves, not that the component does its layer's job) supports conditional at
+# most (docs/decisions/2026-09-24-accepted-needs-use-stage.md).
+ACCEPTING_STAGES = frozenset({"use"})
 NATIVE_CLASSES = frozenset({"native_proven", "measured_comparison"})
 CONDITIONAL_CLASSES = frozenset({"local_integration", "synthetic"})
 
@@ -127,9 +132,11 @@ def platform_status(platform_id: str, winner: dict, context: StatusContext) -> P
             latest_per_host_stage[key] = (rank, entry)
     blocking = sorted(entry["path"] for _rank, entry in latest_per_host_stage.values()
                       if entry.get("result") == "fail")
-    qualifying = sorted(entry["path"] for entry in native_stage
-                        if entry.get("result") == "pass" and entry.get("second_physical_machine") is True
-                        and entry.get("review_state") == "agree")
+    reviewed = [entry for entry in native_stage
+                if entry.get("result") == "pass" and entry.get("second_physical_machine") is True
+                and entry.get("review_state") == "agree"]
+    qualifying = sorted(entry["path"] for entry in reviewed if entry.get("stage") in ACCEPTING_STAGES)
+    install_only = sorted(entry["path"] for entry in reviewed if entry.get("stage") not in ACCEPTING_STAGES)
     passes = [entry for entry in bound if entry.get("result") == "pass"
               and entry.get("review_state") != "dissent" and entry.get("evidence_class") != "synthetic"]
     if platform_id == "macos-arm64":
@@ -140,6 +147,11 @@ def platform_status(platform_id: str, winner: dict, context: StatusContext) -> P
     if qualifying and not blocking:
         return PlatformStatus("accepted", "independently reviewed native_proven pass at the current pin",
                               tuple(qualifying))
+
+    if install_only and not qualifying and not blocking:
+        # A reviewed install pass alone supports conditional on either platform, never accepted.
+        return PlatformStatus("conditional", "independently reviewed install-stage pass; accepted needs a reviewed "
+                              "use-stage pass", tuple(install_only))
 
     if platform_id == "macos-arm64":
         if passes:

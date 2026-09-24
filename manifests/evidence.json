@@ -9418,8 +9418,8 @@
     },
     {
       "path": "docs/contributing-evidence.md",
-      "sha256": "6bad12ace4a3ce63b0543073dd9e42f25359f5dffb81c7db6bc8611d01111258",
-      "bytes": 23755
+      "sha256": "ef76b3551da1fe4644076e85de722b91431debf5f0acd9b23610159e462a104c",
+      "bytes": 23994
     },
     {
       "path": "docs/convergence-architecture.md",
@@ -28253,8 +28253,8 @@
     },
     {
       "path": "scripts/platform_status.py",
-      "sha256": "6cd39c921358cc0c14865610ee07442aebcf76f5cecf8ef84af7363fd1baeec0",
-      "bytes": 9906
+      "sha256": "de9ff065bacedc86502b793175cf2fdf713c47b9616d6ab7d9141b743f377a53",
+      "bytes": 10814
     },
     {
       "path": "scripts/recount-tokens.cjs",
@@ -28743,8 +28743,8 @@
     },
     {
       "path": "tests/test_platform_status.py",
-      "sha256": "efea1b7d21275f595ad492043d3ff5cc76f360b9f6be1f735c960b878543dbf4",
-      "bytes": 15658
+      "sha256": "70b4d61b4e2c55744f5c94947519583b05334fa92e193930be72b5a4594ffea1",
+      "bytes": 16460
     },
     {
       "path": "tests/test_point_in_time.py",

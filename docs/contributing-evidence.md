@@ -354,11 +354,14 @@ for running them.
   not-yet-re-recorded status is allowed.
 
   A *qualifying* receipt, on either platform, is one for that `component_id`
-  that is `result: pass`, `evidence_class: native_proven`, stage `use` or
-  `install`, bound to the winner's current pin, independently reviewed (step
-  8) with no standing dissent, declares `host.second_physical_machine: true`,
-  and has `host.os`/`host.architecture` consistent with
-  `adoption/manifest.json`'s `platform_profiles[]` entry for that platform id.
+  that is `result: pass`, `evidence_class: native_proven`, stage `use`, bound
+  to the winner's current pin, independently reviewed (step 8) with no
+  standing dissent, declares `host.second_physical_machine: true`, and has
+  `host.os`/`host.architecture` consistent with `adoption/manifest.json`'s
+  `platform_profiles[]` entry for that platform id. The same receipt at stage
+  `install` (for example a version call) supports `conditional` at most: it
+  shows the binary resolves, not that the component does its layer's job
+  ([decision 2026-09-24](decisions/2026-09-24-accepted-needs-use-stage.md)).
   A `native_proven` fail at `use` or `install` that is the latest receipt for
   its host and stage is *blocking*, whatever its review, until that host
   records a later pass. The two platforms then differ:
