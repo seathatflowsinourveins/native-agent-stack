@@ -386,6 +386,21 @@ class CompareOrdersTests(unittest.TestCase):
         self.assertAlmostEqual(row["paper_slippage_vs_limit_bps"], 0.0, places=6)
         self.assertAlmostEqual(row["sim_slippage_vs_limit_bps"], 2.0, places=1)  # SELL receiving less than limit: positive
 
+    def test_paper_side_slippage_sign_for_buy_and_sell(self):
+        # Both prior BUY/SELL slippage tests used a paper fixture whose fill price
+        # equals its own limit price, so paper_slippage_vs_limit_bps was always 0.0
+        # regardless of which side was passed to signed_slippage_bps -- reversing
+        # the side at the paper_slippage_vs_limit_bps call site specifically (not
+        # the shared signed_slippage_bps function) would not have been caught.
+        # Use a paper fill price that actually differs from the limit on both sides.
+        paper_buy = [self.paper(side="BUY", limit_price="100.00", filled_avg_price="100.02")]
+        out = C.compare_orders(paper_buy, {})
+        self.assertAlmostEqual(out["rows"][0]["paper_slippage_vs_limit_bps"], 2.0, places=1)  # BUY paying more: positive
+
+        paper_sell = [self.paper(side="SELL", limit_price="100.00", filled_avg_price="99.98")]
+        out = C.compare_orders(paper_sell, {})
+        self.assertAlmostEqual(out["rows"][0]["paper_slippage_vs_limit_bps"], 2.0, places=1)  # SELL receiving less: positive
+
     def test_aggregates_over_mixed_synthetic_orders(self):
         paper = [self.paper(client_order_id="a"), self.paper(client_order_id="b", limit_price="120.62"),
                  self.paper(client_order_id="c", status="canceled", filled_qty=0, filled_avg_price=None, filled_at_ns=None)]
@@ -399,6 +414,82 @@ class CompareOrdersTests(unittest.TestCase):
         self.assertAlmostEqual(agg["fill_agreement_rate"], 2 / 3)
         self.assertEqual(agg["both_filled"], 1)
         self.assertAlmostEqual(agg["abs_fill_price_delta_bps_mean"], 0.0)
+
+
+# Module-level (not nested) so type(ev).__name__ is exactly "OrderFilled" etc.,
+# matching the real NautilusTrader event class names that summarize_sim_order
+# dispatches on -- a nested or aliased class would report a different __name__.
+class OrderFilled:
+    def __init__(self, ts_event):
+        self.ts_event = ts_event
+
+
+class OrderCanceled:
+    def __init__(self, ts_event):
+        self.ts_event = ts_event
+
+
+class OrderRejected:
+    def __init__(self, ts_event, reason):
+        self.ts_event = ts_event
+        self.reason = reason
+
+
+class _FakeOrder:
+    def __init__(self, status, filled_qty, avg_px, ts_last, events):
+        self.client_order_id = "fake-01"
+        self.status = status
+        self.filled_qty = filled_qty
+        self.avg_px = avg_px
+        self.ts_last = ts_last
+        self._events = events
+
+    def events(self):
+        return self._events
+
+
+class SummarizeSimOrderTests(unittest.TestCase):
+    """Direct, native-runtime-independent tests of summarize_sim_order's event
+    extraction, using minimal fake order/event objects (matched by class name, the
+    same way summarize_sim_order itself dispatches on `type(ev).__name__`). This is
+    the authoritative test for the fill_ts_ns-vs-ts_last distinction: the current
+    engine configuration cannot produce a native partial-fill-then-cancel case (see
+    PinnedRuntimeTests.test_current_no_partial_fill_configuration_ignores_quoted_size),
+    so this test exercises the same extraction function directly instead, and runs
+    on system python3 (no pinned runtime needed)."""
+
+    def test_partial_fill_then_later_cancel_uses_the_fill_events_timestamp_not_ts_last(self):
+        fill_ns, cancel_ns = 1_000_000_000, 10_000_000_000
+        order = _FakeOrder(status="CANCELED", filled_qty=1, avg_px="10.00", ts_last=cancel_ns,
+                            events=[OrderFilled(fill_ns), OrderCanceled(cancel_ns)])
+        summary = C.summarize_sim_order(order)
+        self.assertEqual(summary["status"], "CANCELED")
+        self.assertEqual(summary["filled_qty"], 1)
+        self.assertEqual(summary["ts_last"], cancel_ns)
+        # The actual assertion this test exists for: fill_ts_ns must be the fill
+        # event's own timestamp, not ts_last (which is the cancel's timestamp
+        # here). A revert to `fill_ts_ns = int(order.ts_last)` fails this directly.
+        self.assertEqual(summary["fill_ts_ns"], fill_ns)
+        self.assertNotEqual(summary["fill_ts_ns"], summary["ts_last"])
+
+    def test_full_fill_with_no_later_event(self):
+        order = _FakeOrder(status="FILLED", filled_qty=1, avg_px="10.00", ts_last=5_000_000_000,
+                            events=[OrderFilled(5_000_000_000)])
+        summary = C.summarize_sim_order(order)
+        self.assertEqual(summary["fill_ts_ns"], 5_000_000_000)
+
+    def test_rejected_order_captures_reason_and_has_no_fill_timestamp(self):
+        order = _FakeOrder(status="REJECTED", filled_qty=0, avg_px=None, ts_last=2_000_000_000,
+                            events=[OrderRejected(2_000_000_000, "Short selling not permitted")])
+        summary = C.summarize_sim_order(order)
+        self.assertIsNone(summary["fill_ts_ns"])
+        self.assertEqual(summary["reject_reason"], "Short selling not permitted")
+
+    def test_two_partial_fills_use_the_last_fill_events_timestamp(self):
+        order = _FakeOrder(status="FILLED", filled_qty=2, avg_px="10.01", ts_last=3_000_000_000,
+                            events=[OrderFilled(1_000_000_000), OrderFilled(3_000_000_000)])
+        summary = C.summarize_sim_order(order)
+        self.assertEqual(summary["fill_ts_ns"], 3_000_000_000)
 
 
 class RedactArgsTests(unittest.TestCase):
@@ -430,6 +521,26 @@ class RedactArgsTests(unittest.TestCase):
         ap.add_argument("--pages", type=C.Path)
         args = ap.parse_args(["--pages=/private/pages"])
         self.assertEqual(C.redact_args(args), ["--pages", "<redacted>"])
+
+    def test_trial_and_receipt_paths_are_trimmed_not_recorded_verbatim(self):
+        # --trial/--receipt are not secret, but an absolute path for either still
+        # carries the invoking user's home directory (e.g. /home/example/...); trim
+        # to repo-relative (inside the repo) or basename (outside it).
+        ap = C.argparse.ArgumentParser(allow_abbrev=False)
+        ap.add_argument("--trial", type=C.Path)
+        ap.add_argument("--receipt", type=C.Path)
+        args = ap.parse_args([
+            "--trial", str(TRIAL),
+            "--receipt", "/some/private/prefix/scratch/receipt.json",
+        ])
+        redacted = C.redact_args(args)
+        trial_value = redacted[redacted.index("--trial") + 1]
+        receipt_value = redacted[redacted.index("--receipt") + 1]
+        self.assertFalse(Path(trial_value).is_absolute())
+        self.assertNotIn(str(Path.home()), trial_value)
+        self.assertEqual(receipt_value, "receipt.json")  # outside the repo -> basename only
+        self.assertNotIn("private", receipt_value)
+        self.assertNotIn("prefix", receipt_value)
 
 
 class PageFetcherTests(unittest.TestCase):
@@ -548,16 +659,69 @@ class ReceiptConsistencyTests(unittest.TestCase):
         self.assertEqual(zero["fill_agreements"], 3)
         self.assertEqual(seventy["fill_agreements"], 5)
 
-    def test_flip_bisections_are_present_and_resolved_to_1us(self):
+    def test_sweep_points_carry_full_per_order_rows_not_only_aggregates(self):
+        # Every per-order figure cited in the README's "Latency model semantics"
+        # prose (e.g. order 3's lag from its modeled arrival, order 1's price delta
+        # at 100ms) must be traceable to data actually stored in the receipt.
+        sweep = self.receipt["latency_sensitivity_sweep"]["points"]
+        five_ms = next(p for p in sweep if p["latency_ms"] == 5)
+        self.assertIn("rows", five_ms)
+        row3 = next(r for r in five_ms["rows"] if r["client_order_id"].endswith("0000003"))
+        self.assertIsNotNone(row3["sim_fill_ts"])
+        self.assertIsNotNone(row3["fill_time_delta_s"])
+        hundred_ms = next(p for p in sweep if p["latency_ms"] == 100)
+        row1 = next(r for r in hundred_ms["rows"] if r["client_order_id"].endswith("0000001"))
+        row2 = next(r for r in hundred_ms["rows"] if r["client_order_id"].endswith("0000002"))
+        # Order 1 moved from its zero-latency price delta (0.0) to +0.829bps at
+        # 100ms; order 2 stayed at its zero-latency value (-0.8295bps) -- order 1
+        # accounts for the 100ms sweep point's 0.489bps mean, not order 2.
+        self.assertAlmostEqual(row1["fill_price_delta_bps"], 0.829, places=2)
+        self.assertAlmostEqual(row2["fill_price_delta_bps"], -0.8295, places=3)
+
+    def test_flip_bisections_record_the_actual_agreement_direction_not_an_assumed_one(self):
+        # Bisection-direction regression guard: for this trial, agreement is FALSE
+        # at the lower latency endpoint and TRUE at the higher one (a lower-latency
+        # sim fills an order paper did not) -- the opposite of "agrees below,
+        # disagrees above." This must be readable from explicit per-endpoint fields,
+        # not assumed from key names, and must match what the sweep points
+        # themselves say about the same orders at the bracket's endpoints.
         bisections = self.receipt["latency_sensitivity_sweep"]["flip_bisections"]
         self.assertTrue(bisections)
+        sweep_by_ms = {p["latency_ms"]: p for p in self.receipt["latency_sensitivity_sweep"]["points"]}
         for b in bisections:
-            self.assertLessEqual(b["disagrees_at_or_above_latency_ns"] - b["agrees_at_or_below_latency_ns"], b["resolution_ns"])
+            self.assertIn("lo", b)
+            self.assertIn("hi", b)
+            self.assertLessEqual(b["hi"]["latency_ns"] - b["lo"]["latency_ns"], b["resolution_ns"])
             self.assertLessEqual(b["resolution_ns"], 1000)
+            self.assertNotEqual(b["lo"]["agrees"], b["hi"]["agrees"])
+            # Cross-check against the coarse sweep points bracketing this bisection:
+            # the sweep point at the lower bracket latency must show this order
+            # disagreeing exactly when the bisection says lo["agrees"] is False.
+            lo_bracket_point = sweep_by_ms[b["bracket_ms"][0]]
+            hi_bracket_point = sweep_by_ms[b["bracket_ms"][1]]
+            lo_disagrees_in_sweep = b["client_order_id"] in lo_bracket_point["disagreeing_client_order_ids"]
+            hi_disagrees_in_sweep = b["client_order_id"] in hi_bracket_point["disagreeing_client_order_ids"]
+            self.assertEqual(b["lo"]["agrees"], not lo_disagrees_in_sweep)
+            self.assertEqual(b["hi"]["agrees"], not hi_disagrees_in_sweep)
+        # For this specific trial: disagrees at the lower endpoint, agrees at the
+        # higher one, for every recorded bisection.
+        self.assertTrue(all(b["lo"]["agrees"] is False and b["hi"]["agrees"] is True for b in bisections))
+
+    def test_order_5s_flip_is_dependent_on_order_4_not_independent(self):
+        bisections = {b["client_order_id"][-7:]: b for b in self.receipt["latency_sensitivity_sweep"]["flip_bisections"]}
+        self.assertIn("0000004", bisections)
+        self.assertIn("0000005", bisections)
+        self.assertTrue(bisections["0000004"]["independent_flip"])
+        self.assertEqual(bisections["0000004"]["depends_on_client_order_ids"], [])
+        self.assertFalse(bisections["0000005"]["independent_flip"])
+        self.assertTrue(any(c.endswith("0000004") for c in bisections["0000005"]["depends_on_client_order_ids"]))
 
     def test_clock_provenance_and_exit_code_fields(self):
         self.assertIn("clock_provenance", self.receipt)
-        self.assertIn("host_minus_broker_submit_offset_ms_range", self.receipt["clock_provenance"])
+        prov = self.receipt["clock_provenance"]
+        self.assertIn("host_minus_broker_submit_offset_ms_range", prov)
+        self.assertTrue(prov.get("counts_match"))
+        self.assertTrue(prov.get("host_minus_broker_submit_offset_is_lower_bound"))
         # exit_code was removed rather than kept as a misleading constant 0 (a
         # failed run raises before a receipt is ever written).
         self.assertNotIn("exit_code", self.receipt)
@@ -565,6 +729,15 @@ class ReceiptConsistencyTests(unittest.TestCase):
     def test_alpaca_py_version_is_environment_metadata_not_data_provenance(self):
         self.assertNotIn("alpaca_py_version", self.receipt.get("data_provenance", {}))
         self.assertIn("alpaca_py_installed_version", self.receipt.get("runtime_environment", {}))
+
+    def test_argv_trims_trial_and_receipt_paths(self):
+        argv = self.receipt["argv"]
+        for value in argv:
+            self.assertNotIn(str(Path.home()), value)
+        # --trial's value (whatever immediately follows it) must not be an absolute
+        # path outside the repo; for this receipt it is repo-relative.
+        trial_value = argv[argv.index("--trial") + 1]
+        self.assertFalse(Path(trial_value).is_absolute())
 
 
 class ReadmeReceiptConsistencyTests(unittest.TestCase):
@@ -601,10 +774,37 @@ class ReadmeReceiptConsistencyTests(unittest.TestCase):
         self.assertIn(f"max {agg['abs_fill_time_delta_s_max']:.2f} s", self.readme)
         self.assertIn(f"{agg['fill_agreements']}/{agg['orders']}", self.readme)
 
-    def test_bisected_flip_values_appear_and_quote_derived_boundary_is_not_presented_as_the_flip(self):
+    def test_four_fill_range_includes_order_5_not_just_0_68(self):
+        # README:103 previously said "0.68-1.09s" excluding order 5's 0.648s.
+        rows = self.receipt["results"]["aggregates"]
+        both_filled_deltas = [abs(r["fill_time_delta_s"]) for r in self.receipt["results"]["rows"]
+                               if r["fill_time_delta_s"] is not None]
+        lo = min(both_filled_deltas)
+        self.assertLess(lo, 0.68)  # order 5's 0.648s must be the low end, not order 1's 0.68s
+        self.assertIn("0.65-1.09s", " ".join(self.readme.split()))
+
+    def test_bisected_flip_values_appear_with_explicit_direction_not_just_the_number(self):
         bisections = self.receipt["latency_sensitivity_sweep"]["flip_bisections"]
-        lo_ms = min(b["agrees_at_or_below_latency_ns"] for b in bisections) / 1e6
-        self.assertIn(f"{lo_ms:.6f}ms", self.readme)
+        lo_ns = min(b["lo"]["latency_ns"] for b in bisections)
+        hi_ns = min(b["hi"]["latency_ns"] for b in bisections)
+        self.assertTrue(all(b["lo"]["agrees"] is False for b in bisections))
+        self.assertTrue(all(b["hi"]["agrees"] is True for b in bisections))
+        lo_ms_str = f"{lo_ns / 1e6:.6f}ms"
+        hi_ms_str = f"{hi_ns / 1e6:.6f}ms"
+        self.assertIn(lo_ms_str, self.readme)
+        self.assertIn(hi_ms_str, self.readme)
+        # The direction must be stated explicitly in prose near the numbers, not
+        # left to be inferred from key names alone (the bug this round's finding
+        # was about): searching only for the bare number, as the previous version
+        # of this test did, would not have caught the labels being reversed.
+        normalized = " ".join(self.readme.split())
+        self.assertIn("disagreeing at 69.216918ms to agreeing at 69.217529ms", normalized)
+
+    def test_order_5_is_documented_as_dependent_on_order_4_not_an_independent_flip(self):
+        normalized = " ".join(self.readme.split())
+        self.assertIn("not an independent second flip", normalized)
+        self.assertIn("exactly one flip in this trial", normalized)
+        self.assertIn("independent_flip: false", normalized)
 
     def test_withdrawn_wrong_direction_explanation_is_not_present(self):
         # The second (also-wrong) version of the H1 explanation claimed the order
@@ -615,6 +815,30 @@ class ReadmeReceiptConsistencyTests(unittest.TestCase):
         self.assertNotIn("become marketable the instant real SIP quotes cross it", normalized)
         self.assertIn("already marketable at submit", normalized)
         self.assertIn("stops being marketable", normalized)
+
+    def test_no_unmeasured_cancel_before_fill_claim(self):
+        # README previously said Alpaca "processed the cancel before a fill" as if
+        # measured; the cancel came 10.09s after submit and no fill-vs-cancel race
+        # for order 4 was directly measured. The corrected wording must say so.
+        normalized = " ".join(self.readme.split())
+        self.assertNotIn("enough real latency for Alpaca to have processed the cancel before a fill", normalized)
+        self.assertIn("no fill-vs-cancel race for order 4 was directly measured", normalized)
+
+    def test_decision_to_fill_wording_replaced_with_broker_submission_to_fill(self):
+        normalized = " ".join(self.readme.split())
+        self.assertNotIn("decision-to-fill latency", normalized)
+        self.assertIn("broker submission-to-fill interval", normalized)
+
+    def test_clock_offset_stated_as_a_lower_bound_not_an_upper_one(self):
+        normalized = " ".join(self.readme.split())
+        self.assertNotIn("up to ~41ms", normalized)
+        self.assertIn("at least +27.994 to +40.769ms", normalized)
+        self.assertIn("lower bound", normalized.lower())
+
+    def test_cancel_pairing_validated_against_every_order_not_only_canceled_ones(self):
+        normalized = " ".join(self.readme.split())
+        self.assertNotIn("validated, not positional.", normalized)
+        self.assertIn("validated against every order, not positional", normalized)
 
     def test_hypothesis_framing_and_clock_provenance_section_present(self):
         self.assertIn("hypothesis", self.readme.lower())
@@ -718,9 +942,24 @@ class PinnedRuntimeTests(unittest.TestCase):
         self.assertEqual(sim["status"], "CANCELED")
         self.assertEqual(sim["filled_qty"], 0)
 
-    def test_partial_fill_then_cancel_reports_the_fill_events_time_not_the_cancel_time(self):
-        # Native counterpart to CompareOrdersTests' synthetic version: qty=2 with
-        # only enough top-of-book size for 1 share, then a cancel of the remainder.
+    def test_current_no_partial_fill_configuration_ignores_quoted_size(self):
+        # This documents, rather than assumes, a real boundary of the declared
+        # baseline configuration (module docstring / README "Reuse and
+        # methodology": no synthetic slippage or partial-fill draw,
+        # liquidity_consumption=False): matching disregards quoted size entirely,
+        # so a quote with ask_size smaller than the order quantity still fills the
+        # order in full, immediately -- it does NOT produce a partial fill followed
+        # by a cancel of the remainder. Verified directly (not assumed) so this test
+        # fails loudly if a future engine/config change makes partial fills
+        # possible here, at which point this test (and the module's "no
+        # partial-fill draw" claim) need revisiting together.
+        #
+        # Because this configuration cannot produce a native partial-fill-then-
+        # cancel case, the extraction logic that matters for that case
+        # (summarize_sim_order's fill_ts_ns, which must come from the actual
+        # OrderFilled event rather than order.ts_last) is instead tested directly
+        # against constructed events in SummarizeSimOrderTests below, independent
+        # of this native boundary.
         t0 = 4_000_000_000_000
         submit_ns = t0 + 222_222
         cancel_ns = t0 + 30_000_000
@@ -732,11 +971,70 @@ class PinnedRuntimeTests(unittest.TestCase):
         cancel_resolution = {"t-partial-01": {"cancel_ts_ns": cancel_ns, "source": "recorded_cancel_request"}}
         result = C.run_replay(paper_orders, quotes, out_dir=self.tmp / "partial-cancel", cancel_resolution=cancel_resolution)
         sim = result["sim_by_id"]["t-partial-01"]
-        if sim["filled_qty"] == 0:
-            self.skipTest("fixture's ask_size=1 did not produce a partial fill under the native fill model")
-        self.assertIsNotNone(sim["fill_ts_ns"])
-        # The fill event's timestamp must be well before the cancel, not at/after it.
-        self.assertLess(sim["fill_ts_ns"], cancel_ns)
+        self.assertEqual(sim["status"], "FILLED")
+        self.assertEqual(sim["filled_qty"], 2)  # full quantity despite ask_size=1
+
+    def test_a_pending_orders_deferred_command_settles_on_another_orders_decision_timer(self):
+        # Reproduces the reviewer-reported scenario exactly: order A (quotes at
+        # 0ms/100ms) submitted at 10ms with 20ms latency (modeled arrival 30ms)
+        # fills at 50ms -- against its existing book -- when order B (a different
+        # instrument) is submitted at 50ms. B's own decision timer is a settlement
+        # event that processes A's already-due deferred command well before A's own
+        # next quote at 100ms and without any A-specific event anywhere near 30ms.
+        # This is the `advance_time_impl` behavior the module docstring describes:
+        # eligible settlement events are not limited to "the next event for that
+        # instrument."
+        t0 = 7_000_000_000_000
+        quotes = {
+            "AAAA": [
+                {"symbol": "AAAA", "ts_ns": t0, "bid": "9.90", "ask": "10.00", "bid_size": 100, "ask_size": 100},
+                {"symbol": "AAAA", "ts_ns": t0 + 100_000_000, "bid": "9.90", "ask": "10.00", "bid_size": 100, "ask_size": 100},
+            ],
+            "BBBB": [
+                {"symbol": "BBBB", "ts_ns": t0, "bid": "19.90", "ask": "20.00", "bid_size": 100, "ask_size": 100},
+                {"symbol": "BBBB", "ts_ns": t0 + 50_000_000, "bid": "19.90", "ask": "20.00", "bid_size": 100, "ask_size": 100},
+            ],
+        }
+        order_a = {"client_order_id": "a-01", "symbol": "AAAA", "side": "BUY", "qty": 1, "limit_price": "10.00",
+                   "time_in_force": "DAY", "status": "filled", "filled_qty": 1, "filled_avg_price": None,
+                   "submitted_at_ns": t0 + 10_000_000, "filled_at_ns": None}
+        order_b = {"client_order_id": "b-01", "symbol": "BBBB", "side": "BUY", "qty": 1, "limit_price": "20.00",
+                   "time_in_force": "DAY", "status": "filled", "filled_qty": 1, "filled_avg_price": None,
+                   "submitted_at_ns": t0 + 50_000_000, "filled_at_ns": None}
+        result = C.run_replay([order_a, order_b], quotes, out_dir=self.tmp / "ab-settlement", latency_ns=20_000_000)
+        sim_a = result["sim_by_id"]["a-01"]
+        self.assertEqual(sim_a["status"], "FILLED")
+        self.assertEqual(sim_a["fill_ts_ns"], t0 + 50_000_000)  # B's timer, not A's own 30ms modeled arrival or 100ms quote
+
+    def test_latency_lower_bounds_the_fill_time_and_settles_at_the_first_eligible_event(self):
+        # Magnitude test: a fill must not happen before submit + configured latency,
+        # and (with no other order's timer to bring settlement forward) must happen
+        # at the first quote event at or after that instant -- and specifically NOT
+        # at whatever quote a smaller (e.g. halved) latency would have picked. Two
+        # marketable quotes (15ms, 30ms) straddle the candidate arrival instants for
+        # the full (20ms) and halved (10ms) latency: submit+20ms=22ms lands between
+        # them (first eligible settlement is the 30ms quote); submit+10ms=12ms lands
+        # before the 15ms quote (first eligible settlement would be the 15ms quote
+        # instead). A mutation that halves the configured latency therefore changes
+        # both the fill instant and the fill price, which this test asserts exactly.
+        t0 = 6_000_000_000_000
+        submit_ns = t0 + 2_000_000  # +2ms
+        latency_ns = 20_000_000  # 20ms -> arrival at submit+20ms = t0+22ms
+        quotes = {"ZZZZ": [
+            {"symbol": "ZZZZ", "ts_ns": t0, "bid": "9.90", "ask": "10.10", "bid_size": 100, "ask_size": 100},
+            {"symbol": "ZZZZ", "ts_ns": t0 + 15_000_000, "bid": "9.94", "ask": "9.97", "bid_size": 100, "ask_size": 100},
+            {"symbol": "ZZZZ", "ts_ns": t0 + 30_000_000, "bid": "9.92", "ask": "9.95", "bid_size": 100, "ask_size": 100},
+            {"symbol": "ZZZZ", "ts_ns": t0 + 90_000_000, "bid": "9.90", "ask": "10.10", "bid_size": 100, "ask_size": 100},
+        ]}
+        order = self._order("t-mag-01", "BUY", submit_ns, "10.00")
+        result = C.run_replay([order], quotes, out_dir=self.tmp / "magnitude", latency_ns=latency_ns)
+        sim = result["sim_by_id"]["t-mag-01"]
+        self.assertEqual(sim["status"], "FILLED")
+        self.assertGreaterEqual(sim["fill_ts_ns"], submit_ns + latency_ns)
+        # Must settle at the 30ms quote (@9.95), not the 15ms one (@9.97) that a
+        # halved latency would incorrectly reach.
+        self.assertEqual(sim["fill_ts_ns"], t0 + 30_000_000)
+        self.assertEqual(sim["avg_px"], "9.95")
 
     def test_report_hashes_reproduce_across_independent_reruns_from_the_same_pages(self):
         if not RECEIPT_PATH.exists():
@@ -759,6 +1057,32 @@ class PinnedRuntimeTests(unittest.TestCase):
                           receipt["engine"]["reports"]["fills"]["sha256_excluding_init_id"])
         self.assertEqual(result["reports"]["orders"]["sha256_excluding_init_id"],
                           receipt["engine"]["reports"]["orders"]["sha256_excluding_init_id"])
+
+    def test_bisection_direction_computed_live_matches_the_known_direction_for_order_4(self):
+        # Unlike the receipt-based bisection-direction tests (which read the
+        # committed, already-generated JSON and so cannot detect a mutation in
+        # bisect_fill_agreement_flip itself), this test calls the function live
+        # against the retained trial and checks the actual returned lo/hi agree
+        # values -- this is what actually exercises, and can fail on, the bisection
+        # code path. For this trial's order 4: disagrees at 50ms, agrees at 70ms.
+        pages = Path.home() / ".local/state/native-agent-stack/sim-paper/pages"
+        if not pages.exists():
+            self.skipTest("retained page cache not present on this host")
+        paper = C.load_paper_orders(json.loads((TRIAL / "broker-orders.json").read_text()))
+        paper_output = json.loads((TRIAL / "paper-output.json").read_text())
+        ingest_receipt = json.loads((TRIAL / "ingest-receipt.json").read_text())
+        timeout, _ = C.resolve_order_timeout_seconds(ingest_receipt)
+        cancel_resolution = C.resolve_cancel_timestamps(paper, paper_output, timeout)
+        fetcher = C.PageFetcher(pages, headers=None, replay=True)
+        start_ns, end_ns = C.fetch_window(paper)
+        quotes, _ = C.normalize_quote_rows(C.fetch_quotes(fetcher, sorted({o["symbol"] for o in paper}), start_ns,
+                                                            end_ns, C.ns_to_iso(paper[0]["submitted_at_ns"])[:10]))
+        bisection = C.bisect_fill_agreement_flip(paper, quotes, cancel_resolution, self.tmp / "bisect-live",
+                                                   "adp-adaptive-20260923g-0000004", 50 * 10**6, 70 * 10**6)
+        self.assertIsNotNone(bisection)
+        self.assertFalse(bisection["lo"]["agrees"])
+        self.assertTrue(bisection["hi"]["agrees"])
+        self.assertLess(bisection["lo"]["latency_ns"], bisection["hi"]["latency_ns"])
 
 
 @unittest.skipUnless(_pinned_runtime_active(), "requires the pinned nautilus_trader==2.0.0rc5 runtime")
@@ -807,6 +1131,35 @@ class MainReplayNoCredentialTests(unittest.TestCase):
             else:
                 del sys.modules["runner"]
 
+    def test_stdout_write_works_when_stdout_has_no_buffer_attribute(self):
+        # unittest's -b flag (output capture) replaces sys.stdout with an io.StringIO,
+        # which has no `.buffer` attribute; `sys.stdout.buffer.write(...)` raises
+        # AttributeError there, *after* the receipt has already been saved. Confirm
+        # main() writes via plain text-mode `.write()` instead and completes cleanly
+        # under a StringIO stdout, and that the written text hashes to the receipt's
+        # own stdout_sha256 (i.e. the hash is still of the exact bytes written).
+        import hashlib
+        import io
+        tmp = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, tmp, ignore_errors=True)
+        real_pages = Path.home() / ".local/state/native-agent-stack/sim-paper/pages"
+        if not real_pages.exists():
+            self.skipTest("retained page cache not present on this host")
+        argv = ["--trial", str(TRIAL), "--pages", str(real_pages), "--out", str(tmp / "out"),
+                "--replay", "--receipt", str(tmp / "receipt.json")]
+        fake_stdout = io.StringIO()  # no .buffer attribute, like unittest -b's capture
+        real_stdout = sys.stdout
+        sys.stdout = fake_stdout
+        try:
+            rc = C.main(argv)
+        finally:
+            sys.stdout = real_stdout
+        self.assertEqual(rc, 0)
+        receipt = json.loads((tmp / "receipt.json").read_text())
+        written = fake_stdout.getvalue().encode()
+        self.assertEqual(hashlib.sha256(written).hexdigest(), receipt["stdout_sha256"])
+        self.assertTrue(written.endswith(b"\n"))
+
     def test_umask_is_restored_after_main_returns(self):
         tmp = Path(tempfile.mkdtemp())
         self.addCleanup(shutil.rmtree, tmp, ignore_errors=True)
@@ -814,14 +1167,27 @@ class MainReplayNoCredentialTests(unittest.TestCase):
         if not real_pages.exists():
             self.skipTest("retained page cache not present on this host")
         import os
-        before = os.umask(0o022)
-        os.umask(before)  # restore immediately; `before` is what we compare against
-        argv = ["--trial", str(TRIAL), "--pages", str(real_pages), "--out", str(tmp / "out"),
-                "--replay", "--receipt", str(tmp / "receipt.json")]
-        C.main(argv)
-        after = os.umask(0o022)
-        os.umask(after)
-        self.assertEqual(before, after)
+        # A *known, distinctive* umask set immediately before calling main(), not
+        # "whatever the ambient process umask happens to be": main() internally sets
+        # 0o077, so if an earlier test's main() call left the process umask at
+        # 0o077 without restoring it (the bug this test exists to catch), and this
+        # test instead compared against the ambient (already-0o077) value, the
+        # comparison would trivially pass regardless of whether *this* main() call
+        # restores correctly -- a real test-order-dependence failure mode. Using an
+        # explicit, deliberately-different value (0o007) for both "before" and the
+        # expected "after" makes the assertion depend only on this call's own
+        # restore behavior, not on what ran earlier in the suite.
+        KNOWN_UMASK = 0o007
+        assert KNOWN_UMASK != 0o077
+        original = os.umask(KNOWN_UMASK)
+        try:
+            argv = ["--trial", str(TRIAL), "--pages", str(real_pages), "--out", str(tmp / "out"),
+                    "--replay", "--receipt", str(tmp / "receipt.json")]
+            C.main(argv)
+            after = os.umask(KNOWN_UMASK)
+            self.assertEqual(after, KNOWN_UMASK)
+        finally:
+            os.umask(original)
 
 
 class RetainedTrialFixtureTests(unittest.TestCase):

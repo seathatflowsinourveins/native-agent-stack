@@ -50,8 +50,9 @@ which fails if this table stops matching the receipt):
 Aggregates: 5 orders, **3/5 fill agreement (60%)**, 3 orders filled in both;
 mean absolute fill-price delta **0.375 bps** (median 0.295, max 0.83 bps); mean
 absolute fill-time delta **0.86 s** (median 0.82, max 1.09 s -- order 3's row
-above; see "What the time delta actually measures" below for what this column
-is and is not evidence of).
+above; **range across the four filled orders: 0.65-1.09s**, order 5 at
+0.648s is the low end, not order 1's 0.68s -- see "What the time delta
+actually measures" below for what this column is and is not evidence of).
 
 ### Why orders 4 and 5 disagree
 
@@ -86,47 +87,76 @@ marketable window is still open, so it fills. Enough modeled broker/network
 latency delays that processing until *after* the window has closed at
 `submit + ~69.2ms`, so the sim order is not filled by the time it's
 canceled -- matching paper. The exact bisected boundary (see the sweep table
-below) is **69.216918-69.217529ms**, close to but not identical to the raw
+below) is **69.216918ms (still fills -> disagrees with paper) to 69.217529ms
+(does not fill -> agrees with paper)**, close to but not identical to the raw
 69.273ms quote-window boundary; the difference is a consequence of how the
 pinned engine's latency model actually schedules processing (see "Latency
-model semantics" below) and the bisected value, not the quote-derived one, is
+model semantics" below), and the bisected value, not the quote-derived one, is
 the number that should be cited for "where the outcome changes."
 
 That fill then consumes the simulated GOOGL position, so order 5 (a second
 SELL) is correctly rejected by the engine as a `CASH`-account short ("Short
 selling not permitted on a CASH account..." -- the sim order's actual recorded
 reject reason, see the receipt), while the paper broker (which had genuinely
-canceled order 4 first) filled order 5 normally.
+canceled order 4 first) filled order 5 normally. **Order 5 is not an
+independent second flip** -- with order 4 removed from the replay entirely,
+order 5 agrees with paper at every latency in the declared sweep (verified,
+not assumed: the receipt's `latency_sensitivity_sweep.flip_bisections` entry
+for order 5 carries `independent_flip: false` and
+`depends_on_client_order_ids: ["...0000004"]`, computed by re-running the
+replay with order 4 removed and confirming order 5 no longer flips on its
+own). There is exactly one flip in this trial (order 4); order 5's
+apparent flip is a downstream consequence of it.
 
 **This causal chain is a hypothesis consistent with the retained data, not a
-demonstrated broker-side mechanism.** The paper broker's own order-to-fill
-latency on the four *filled* orders in this trial (0.68-1.09s, see the results
-table) is *consistent with* "enough real latency for Alpaca to have processed
-the cancel before a fill" -- but that is inferred from other orders' latency,
-not measured directly for order 4's actual cancel-vs-fill race, and clock
-provenance matters here (see "Clock sources and provenance" below): the
-cancel-request timestamp itself is host-clock, not broker-clock, so "close to
-the boundary" claims about order 4 specifically carry that uncertainty even
-though this particular receipt's outcome does not depend on it (see below).
+demonstrated broker-side mechanism.** The paper broker's own broker
+submission-to-fill interval on the four *filled* orders in this trial
+(0.65-1.09s, see the results table) does not by itself show that Alpaca
+processed order 4's cancel before a fill would otherwise have happened --
+**no fill-vs-cancel race for order 4 was directly measured**; the recorded
+cancel came 10.09s after order 4's submit, an order of magnitude longer than
+any of the four measured submission-to-fill intervals, so "consistent with"
+is as far as this evidence goes. Clock provenance matters here too (see
+"Clock sources and provenance" below): the cancel-request timestamp itself is
+host-clock, not broker-clock, so any claim about order 4's specific timing
+carries that uncertainty, even though this particular receipt's outcome does
+not depend on it (see below).
 
 ### Latency model semantics (read before citing exact-latency numbers)
 
 The pinned engine (nautilus_trader==2.0.0rc5) does **not** guarantee that a
 `StaticLatencyModel`-delayed command is processed at exactly `submit +
-latency`. Per the engine's own source
+latency`, and the eligible settlement events are **not limited to that
+order's own instrument's quotes**. Per the engine's own source
 (`crates/backtest/src/engine.rs` around L883, commit
 [1b0a49d2792a9432a3aca3fcb617ce7a630d905e](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/backtest/src/engine.rs#L883)),
-a deferred command is processed at the next event for that instrument *at or
-after* the modeled arrival instant, matched against the book as of that later
-event -- not a book frozen at exactly `submit + latency`. When quotes for a
-symbol are sparse, the actual processing instant can land well after the
-modeled arrival: in this receipt, order 3 (GOOGL) fills **266.9ms** after its
-modeled 5ms arrival, and **466.4ms** after its modeled 650ms arrival, because
-no GOOGL quote arrived any sooner. At the 100ms sweep point, order 2 (INTC)
-fills at 120.54 while the *book at exactly submit + 100ms* was 120.55 -- the
-book had already moved by the time the next actual quote event let the engine
-process the order, which alone accounts for that row's 0.489bps price delta
-(the outlier in the sweep table below).
+`advance_time_impl` settles *all* instruments' due timers/deferred commands
+together at each processed event, not just the arriving event's own
+instrument. Concretely (verified on the pinned runtime, see
+`tests.test_sim_paper_compare.PinnedRuntimeTests`): order A (quotes at
+0ms/100ms) submitted at 10ms with 20ms latency (modeled arrival 30ms) fills at
+**50ms**, against its existing book, when order B (a *different* instrument)
+is submitted at 50ms -- B's own decision timer is a settlement event that
+processes A's already-due deferred command, well before A's own next quote at
+100ms and without needing any A-specific event anywhere near 30ms. Matching
+happens at the first settlement event *at or after* submit + latency, which
+can be triggered by another order's timer, not only that order's own next
+quote -- and always against the book as of that settlement instant, not a
+book frozen at exactly `submit + latency`.
+
+When quotes for a symbol are sparse (with no other order's timer to bring
+settlement forward), the actual processing instant can land well after the
+modeled arrival instant purely from that symbol's own quotes: in this
+receipt, order 3 (GOOGL) fills **266.9ms** after its modeled 5ms arrival, and
+**466.4ms** after its modeled 650ms arrival, because no GOOGL quote arrived
+any sooner and no other order's timer intervened. At the 100ms sweep point,
+order 1 (INTC) fills at 120.58 (vs. 120.57 at zero latency, its exact paper
+fill price) -- the book moved between submit and the settlement instant that
+actually let the engine process the order (arriving ~0.44ms after the modeled
+100ms arrival, per the receipt's per-order rows), not at a book frozen exactly
+at submit + 100ms. Order 2 is unchanged from its zero-latency price at this
+sweep point; order 1 moving alone accounts for the 100ms row's 0.489bps mean
+price delta (the outlier in the sweep table below).
 
 **Consequence: the sweep's time/price columns are not a pure function of the
 configured latency alone**, and a quote-derived "marketable window" boundary
@@ -134,10 +164,16 @@ configured latency alone**, and a quote-derived "marketable window" boundary
 authoritative flip point. The receipt's `latency_sensitivity_sweep.flip_bisections`
 re-runs the replay at bisected latencies (to 1us resolution) to find the actual
 fill/no-fill boundary for each order whose agreement changes across the
-declared sweep, and that bisected value (69.216918-69.217529ms for orders 4
-and 5 in this receipt) is what's cited above. This behavior is disclosed here
-rather than worked around with synthetic arrival-time wakeups, which would
-need their own validation against sparse-quote symbols before being trusted.
+declared sweep, recording each endpoint's *actual measured* agreement
+explicitly (`lo`/`hi`, each `{"latency_ns": ..., "agrees": bool}`) rather than
+assuming a direction -- for this trial, agreement is **False at the lower
+latency endpoint and True at the higher one** (a lower-latency sim fills an
+order paper did not), the opposite of "agrees below, disagrees above." That
+bisected value (69.216918ms disagrees / 69.217529ms agrees, for orders 4 and 5
+in this receipt) is what's cited above. This behavior is disclosed here rather
+than worked around with synthetic arrival-time wakeups, which would need their
+own validation against sparse-quote symbols and multi-instrument settlement
+interaction before being trusted.
 
 ### Latency-sensitivity sweep (not a calibration)
 
@@ -152,14 +188,22 @@ need their own validation against sparse-quote symbols before being trusted.
 | 650 ms | 5/5 | 4 | none | 0.281 | 0.066 |
 | 1000 ms | 5/5 | 4 | none | 0.281 | 0.284 |
 
+Every cell above is stored per-order (not only as this table's aggregates) in
+the receipt's `latency_sensitivity_sweep.points[*].rows`, so any of these
+figures can be traced back to a specific order's comparison row at that
+latency, not just recomputed from an aggregate.
+
 Bisected flip (`latency_sensitivity_sweep.flip_bisections` in the receipt, not
-the raw quote-window boundary -- see above): both orders 4 and 5 flip between
-**69.216918ms** (still agrees) and **69.217529ms** (disagrees), a 1us-resolution
-bisection between the 50ms and 70ms sweep points. **This is a sensitivity
-check on one order's marketable-window boundary, not a calibrated latency
-estimate** -- it does not claim Alpaca's real latency is any specific value in
-this range, only that the disagreement is latency-sensitive and concentrated
-at that boundary, subject to the "Latency model semantics" caveat above.
+the raw quote-window boundary -- see above): both orders 4 and 5 flip **from
+disagreeing at 69.216918ms to agreeing at 69.217529ms**, a 1us-resolution
+bisection between the 50ms and 70ms sweep points. Order 4's flip is
+independent (`independent_flip: true`); order 5's is not
+(`independent_flip: false`, `depends_on_client_order_ids` names order 4) --
+see "Why orders 4 and 5 disagree" above. **This is a sensitivity check on one
+order's marketable-window boundary, not a calibrated latency estimate** -- it
+does not claim Alpaca's real latency is any specific value in this range, only
+that the disagreement is latency-sensitive and concentrated at that boundary,
+subject to the "Latency model semantics" caveat above.
 
 ### What the time delta actually measures
 
@@ -168,10 +212,15 @@ exact recorded broker timestamp (not "whenever the next quote of any symbol
 arrives" -- see "Known gaps" for what that change fixed), and at the
 zero-latency default the fed SIP quotes were already crossing the limit at
 that instant for every filled order in this trial. So the `fill_time_delta_s`
-column at zero latency mostly measures the **paper broker's own
-decision-to-fill latency** (0.68-1.09s across this trial's real fills, per the
-results table), not a property of the replay -- subject to the same "next
-event, not exact instant" caveat above once latency is added to the sweep.
+column at zero latency mostly measures the **paper broker's own broker
+submission-to-fill interval** (0.65-1.09s across this trial's four real
+fills, per the results table) -- not a property of the replay, and not a
+measure of "how long the paper strategy took to decide": both the
+submission timestamp and the fill timestamp it is measured against are
+broker-reported, so this interval reflects Alpaca's own processing/matching
+time, not any client-side decision delay. This is subject to the same "next
+eligible settlement event, not exact instant" caveat above once latency is
+added to the sweep.
 
 ### Clock sources and provenance
 
@@ -188,27 +237,42 @@ established** by this replay:
   see below).
 - **SIP quote timestamps** are a third, Alpaca-feed clock.
 
-Measured for this trial: the host clock read **+27.994 to +40.769ms ahead** of
-the broker's own submit timestamps (`clock_provenance.host_minus_broker_submit_offset_ms`
-in the receipt) -- i.e. up to ~41ms of clock-source disagreement between just
-two of the three clocks. **This receipt's outcome is not sensitive to that
-offset**: there is no marketable order-4 quote in the interval from
-submit+80ms to the recorded cancel time + 1.1s, so moving the cancel instant
-within the plausible clock-offset range does not change which side of the
+Measured for this trial: the host clock read **at least +27.994 to +40.769ms
+ahead** of the broker's own submit timestamps
+(`clock_provenance.host_minus_broker_submit_offset_ms` in the receipt). This
+is a **lower bound**, not an upper one: the host timestamp is captured
+*before* the request is sent over the network, while the broker timestamp is
+captured *after* Alpaca receives it, so the true clock-source offset is at
+least this measured gap and could be larger by however much
+network/processing time separates those two capture points
+(`clock_provenance.host_minus_broker_submit_offset_is_lower_bound: true` in
+the receipt). **This receipt's outcome is not sensitive to that uncertainty**:
+there is no marketable order-4 quote in the interval from submit+80ms to the
+recorded cancel time + 1.1s, so moving the cancel instant later within the
+plausible clock-offset range does not change which side of the
 marketable-window boundary it falls on. A future trial with a marketable quote
 near a cancel boundary could flip on this offset, and SIP-vs-broker clock
 agreement specifically is not established at all -- treat per-trial clock
 provenance as something to check, not assume.
 
-**Cancel-request matching is validated, not positional.** `requests[]` has no
-`client_order_id`, so pairing a cancel request to a specific canceled order
-can only use chronological order -- but `resolve_cancel_timestamps()` now
-validates every candidate pairing (each cancel request must fall strictly
-after its paired order's submit and strictly before the next canceled order's
-submit, if any) before trusting it, and falls back to the
-`submit + order_timeout_seconds` rule for *all* canceled orders in the trial
-if any pairing fails that check, rather than silently accepting an ambiguous
-match.
+**Cancel-request matching is validated against every order, not positional
+and not limited to canceled orders.** `requests[]` has no `client_order_id`,
+so pairing a cancel request to a specific canceled order can only use
+chronological order -- `resolve_cancel_timestamps()` validates every
+candidate pairing against *all* paper orders (filled and canceled alike),
+requiring that (a) the cancel request falls strictly after its paired order's
+submit and strictly before the next canceled order's submit, and (b) the
+most-recently-submitted order as of the cancel request's timestamp, considering
+every order in the trial, is the same order the pairing assigned it to. (b)
+specifically catches a cancel request that lost its race to a fill (Alpaca
+filled the order before the cancel took effect, so its final status is
+"filled" even though a genuine cancel request exists for it in the log) from
+silently being absorbed by a *different*, actually-canceled order whose
+counts happen to line up. Any failed validation falls back to
+`submit + order_timeout_seconds` for *all* canceled orders in the trial,
+rather than guessing. `clock_provenance()`'s submit-timestamp pairing is
+similarly count-checked (`counts_match` in the receipt) before any offsets
+are reported.
 
 ## Reuse and methodology
 
@@ -268,11 +332,12 @@ match.
 - **Cancel timestamp**: resolved from `paper-output.json`'s own `requests` log
   (`resolve_cancel_timestamps()`) when the number of recorded cancel requests
   matches the number of canceled orders *and* the chronological pairing passes
-  validation (see "Clock sources and provenance" above); falls back to
-  `submitted_at + order_timeout_seconds` (the runner's own cancel-on-timeout
-  rule, with `order_timeout_seconds` read from the config file whose sha256
-  matches this trial's `ingest-receipt.json`) whenever that doesn't hold.
-  Neither branch infers a cancel time from a successor order.
+  validation against every order in the trial (see "Clock sources and
+  provenance" above); falls back to `submitted_at + order_timeout_seconds`
+  (the runner's own cancel-on-timeout rule, with `order_timeout_seconds` read
+  from the config file whose sha256 matches this trial's `ingest-receipt.json`)
+  whenever that doesn't hold. Neither branch infers a cancel time from a
+  successor order.
 - **Unlimited liquidity, no queue position**: matching against L1 top-of-book
   quotes assumes full depth at the quoted price/size; `liquidity_consumption`
   and `queue_position` are both explicitly set to their engine defaults
@@ -280,11 +345,19 @@ match.
   described in prose. This is the same boundary `execution-realism` and
   `equity-replay` declare for their fill models, and it applies here too. No
   partial fills, spread dynamics beyond L1, halts or auction behavior are
-  modeled.
+  modeled. Concretely: with `liquidity_consumption=False`, quoted size is
+  ignored entirely, so a marketable order always fills in full at the first
+  eligible settlement event regardless of quoted size (verified, not assumed
+  -- see `tests.test_sim_paper_compare.PinnedRuntimeTests.test_current_no_partial_fill_configuration_ignores_quoted_size`).
+  This engine configuration therefore cannot natively produce a partial-fill-
+  then-cancel case; the `fill_ts_ns` extraction logic that matters for that
+  case (see below) is instead tested directly against constructed events in
+  `tests.test_sim_paper_compare.SummarizeSimOrderTests`.
 - **Latency**: the zero-latency default and the declared sensitivity sweep
   (above) are the only latency treatments; neither claims to know Alpaca's
   actual paper-broker latency distribution, and the "Latency model semantics"
-  caveat above applies to every sweep point.
+  caveat above (including cross-instrument settlement) applies to every
+  sweep point.
 - **Five orders, one trial**: this run cannot estimate a fill rate, size a
   slippage distribution or detect regime dependence. A calibration would need
   many trials across sessions, symbols and regimes with independently recorded
@@ -299,11 +372,12 @@ match.
   `data_provenance.quote_drop_counts`. Locked quotes (`bid == ask`) are valid
   market data and are kept.
 - **Partial-fill timestamps**: a partial fill's reported `sim_fill_ts` comes
-  from the actual `OrderFilled` event(s), not `order.ts_last` (which reflects
-  the order's *last event of any kind* -- so a partial fill followed by a
-  later cancel would otherwise report the cancel's timestamp as the fill
-  time). Covered by `tests/test_sim_paper_compare.py`'s partial-fill-then-cancel
-  test.
+  from `summarize_sim_order()`'s extraction of the actual `OrderFilled`
+  event(s), not `order.ts_last` (which reflects the order's *last event of
+  any kind* -- so a partial fill followed by a later cancel would otherwise
+  report the cancel's timestamp as the fill time). As noted above, this is
+  tested directly against constructed events (`SummarizeSimOrderTests`),
+  since the current engine configuration cannot natively exercise the case.
 - **`alpaca_py_installed_version`** in the receipt's `runtime_environment` is
   environment metadata, not data provenance: this script fetches with
   `urllib.request` directly, and `--replay` makes no request at all.
@@ -352,11 +426,15 @@ PY
 `--pages` and `--out` must be private paths outside the repository (e.g. under
 `~/.local/state/native-agent-stack/sim-paper/`); only the receipt's hashes and
 results are committed, never the fetched SIP quote pages or engine report
-CSVs. The report hashes in the receipt (`engine.reports.*.sha256_excluding_init_id`)
-are computed over the fills/orders rows with the random per-order `init_id`
-field stripped first, since `init_id` is a fresh UUID on every run and would
-otherwise make the hash non-reproducible for reasons that have nothing to do
-with the run's actual results.
+CSVs. `--trial`/`--receipt` are trimmed in the committed `argv` to a
+repo-relative path (or basename if given outside the repo) rather than
+recorded verbatim, since an absolute path for either would still carry the
+invoking user's home directory. The report hashes in the receipt
+(`engine.reports.*.sha256_excluding_init_id`) are computed over the
+fills/orders rows with the random per-order `init_id` field stripped first,
+since `init_id` is a fresh UUID on every run and would otherwise make the
+hash non-reproducible for reasons that have nothing to do with the run's
+actual results.
 
 ```sh
 python3 -m unittest tests.test_sim_paper_compare -v
@@ -365,23 +443,36 @@ python3 -m unittest tests.test_sim_paper_compare -v
 The offline suite exercises timestamp parsing, paper-order normalization
 (including refusing a non-DAY time-in-force and a fractional quantity),
 cancel-timestamp resolution (recorded request vs. timeout fallback vs. refused
-ambiguous match), clock provenance, decision building, the fetch window,
-quote-row filtering (including crossed and locked quotes), `PageFetcher`
-(replay, hash-mismatch, pagination), the comparison/aggregation logic
-(including partial fills and BUY/SELL slippage sign), argv redaction
-(including that an abbreviated flag is now rejected outright, not silently
-accepted and leaked), and receipt/README consistency checks (aggregates,
-`inputs_sha256`, `runner_sha256`, and that the results table above matches the
-committed receipt) -- all against synthetic fixtures and the retained trial's
-real `broker-orders.json`/`paper-output.json`. A separate, explicitly gated
-class runs `run_replay` and the CLI's `--replay` path against tiny synthetic
-fixtures on the pinned Nautilus runtime -- including a cancel-boundary case (a
-canceled order must not fill on a later marketable quote), an off-quote-timed
-submit (catching decision timing that silently falls back to "next quote of
-any symbol" instead of the exact scheduled instant), a partial-fill-then-cancel
-case, and confirmation that report hashes reproduce across independent reruns
-from the same retained pages -- plus a check that the credential loader
-(`runner.credentials`) is never imported or called in `--replay` mode. It is
-skipped automatically when the pinned runtime is not the active interpreter.
-These are local integration checks, not unchanged upstream tests -- see
-`docs/acceptance-evidence-policy.md`.
+ambiguous match, validated against every order in the trial), clock
+provenance (including the count check and lower-bound framing), decision
+building, the fetch window, quote-row filtering (including crossed and locked
+quotes), `PageFetcher` (replay, hash-mismatch, pagination), the
+comparison/aggregation logic (including partial fills and BUY/SELL slippage
+sign on both the paper and sim sides), `summarize_sim_order`'s event
+extraction against constructed order/event objects (the authoritative
+fill_ts_ns-vs-ts_last test, independent of whether the current engine
+configuration can produce a native partial-fill-then-cancel case), argv
+redaction (including that an abbreviated flag is now rejected outright, not
+silently accepted and leaked, and that `--trial`/`--receipt` are trimmed), and
+receipt/README consistency checks (aggregates, `inputs_sha256`,
+`runner_sha256`, the results table, the per-order sweep rows, and the
+bisection direction/dependence fields) -- all against synthetic fixtures and
+the retained trial's real `broker-orders.json`/`paper-output.json`. A
+separate, explicitly gated class runs `run_replay` and the CLI's `--replay`
+path against tiny synthetic fixtures on the pinned Nautilus runtime --
+including a cancel-boundary case (a canceled order must not fill on a later
+marketable quote), an off-quote-timed submit (catching decision timing that
+silently falls back to "next quote of any symbol" instead of the exact
+scheduled instant), a cross-instrument settlement-timer case (reproducing the
+"Latency model semantics" A/B example above), a latency-magnitude lower-bound
+case, confirmation that report hashes reproduce across independent reruns
+from the same retained pages, that stdout is written correctly even when
+`sys.stdout` has no `.buffer` attribute (as under `python -m unittest -b`),
+and that a distinctly-valued umask set immediately before the call is
+restored exactly (not compared against whatever the ambient process umask
+happened to be, which would pass even without a restore if an earlier test's
+`main()` call had already left it changed) -- plus a check that the
+credential loader (`runner.credentials`) is never imported or called in
+`--replay` mode. It is skipped automatically when the pinned runtime is not
+the active interpreter. These are local integration checks, not unchanged
+upstream tests -- see `docs/acceptance-evidence-policy.md`.
