@@ -32,15 +32,15 @@ done
 
 safe_path='^[A-Za-z0-9._/-]+$'
 state="${XDG_STATE_HOME:-$HOME/.local/state}/native-agent-stack"
-install -d -m 700 "$state" "$state/credential-sessions"
-find "$state/credential-sessions" -maxdepth 1 -name 'session-*.sh' -mmin +1440 -delete 2>/dev/null || true
 stamp="$(date -u +%Y%m%dT%H%M%SZ)"
 session="$state/credential-sessions/session-$stamp-$$.sh"
 result=""
 if [ "$probe" -eq 1 ]; then result="$state/rate-limit/paper-$stamp.json"; fi
-for p in "$root" "$session" ${result:+"$result"}; do
+for p in "$root" "$state" "$session" ${result:+"$result"}; do
   [[ "$p" =~ $safe_path ]] || { echo "refused: path has characters a launcher cannot pass safely: $p" >&2; exit 2; }
 done
+install -d -m 700 "$state" "$state/credential-sessions"
+find "$state/credential-sessions" -maxdepth 1 -name 'session-*.sh' -mmin +1440 -delete 2>/dev/null || true
 
 umask 077
 {
@@ -56,6 +56,9 @@ umask 077
   echo '    echo "refused: the credential tools have uncommitted changes in this checkout."'
   echo '    read -r -p "Press Enter to close this window. " _; exit 1'
   echo '  fi'
+  echo 'else'
+  echo '  echo "warning: not a git checkout, so these tools cannot be checked for local edits."'
+  echo '  echo "Prefer running from a clone of the default branch."'
   echo 'fi'
   echo 'echo'
   echo "python3 -I tools/credentials/set_credential.py $entry"
@@ -111,12 +114,19 @@ manual() { echo "Run this in your own terminal instead:"; echo "  bash $session"
 if [ ${#launch[@]} -eq 0 ]; then
   echo "No desktop terminal found."; manual; exit 0
 fi
+confirmed=1
 case "${launch[0]}" in
-  gnome-terminal|x-terminal-emulator|konsole|xterm) (cd "$launch_dir" && "${launch[@]}") >/dev/null 2>&1 & disown; rc=0 ;;
+  gnome-terminal|x-terminal-emulator|konsole|xterm)
+    # X terminals block until closed, so they run in the background and cannot be confirmed here.
+    (cd "$launch_dir" && "${launch[@]}") >/dev/null 2>&1 & disown; rc=0; confirmed=0 ;;
   *) set +e; (cd "$launch_dir" && "${launch[@]}") >/dev/null 2>&1; rc=$?; set -e ;;
 esac
 if [ "$rc" -ne 0 ]; then
   echo "Could not open a terminal window (exit $rc)."; manual; exit 1
 fi
-echo "Opened a terminal window. Type the values there; nothing is shown here."
+if [ "$confirmed" -eq 1 ]; then
+  echo "Opened a terminal window. Type the values there; nothing is shown here."
+else
+  echo "Asked the desktop to open a terminal window. If none appears:"; manual
+fi
 [ -z "$result" ] || echo "The non-secret probe result will be written to: $result"

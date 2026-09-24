@@ -12,18 +12,24 @@ of scope for this repository (docs/secret-storage.md).
 """
 from __future__ import annotations
 
-import argparse
-import http.client
-import json
 import os
-import re
-import stat
 import sys
-import tempfile
-import urllib.error
-import urllib.request
-from datetime import datetime, timezone
-from pathlib import Path
+
+if __name__ == "__main__" and not sys.flags.isolated:
+    # Re-run isolated (-I): ignore PYTHONPATH, PYTHONSTARTUP and user site-packages, so a
+    # poisoned environment cannot shadow urllib or any other module this tool imports.
+    os.execv(sys.executable, [sys.executable, "-I", os.path.abspath(__file__), *sys.argv[1:]])
+
+import argparse  # noqa: E402
+import http.client  # noqa: E402
+import json  # noqa: E402
+import re  # noqa: E402
+import stat  # noqa: E402
+import tempfile  # noqa: E402
+import urllib.error  # noqa: E402
+import urllib.request  # noqa: E402
+from datetime import datetime, timezone  # noqa: E402
+from pathlib import Path  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts"))

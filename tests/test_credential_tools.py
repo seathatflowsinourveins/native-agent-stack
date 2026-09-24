@@ -334,6 +334,24 @@ class ProbeCliTests(unittest.TestCase):
         self.assertEqual(json.loads(out.read_text())["interpretation"], "200 calls/min: standard tier")
 
 
+class IsolationTests(unittest.TestCase):
+    def test_direct_runs_ignore_a_poisoned_pythonpath(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            poison, marker = Path(tmp) / "poison", Path(tmp) / "imported"
+            poison.mkdir()
+            for module in ("getpass", "argparse"):
+                (poison / f"{module}.py").write_text(f"open({str(marker)!r}, 'a').write({module!r})\n")
+            env = {"PATH": os.environ.get("PATH", ""), "HOME": tmp, "XDG_CONFIG_HOME": str(Path(tmp) / "cfg"),
+                   "PYTHONPATH": str(poison)}
+            for args in ([str(TOOLS / "set_credential.py"), "alpaca-paper"],
+                         [str(TOOLS / "alpaca_rate_limit_probe.py"), "--env-file", str(Path(tmp) / "none.env")]):
+                with self.subTest(tool=Path(args[0]).name):
+                    result = subprocess.run([sys.executable, *args], stdin=subprocess.DEVNULL, env=env,
+                                            capture_output=True, text=True, timeout=60)
+                    self.assertEqual(result.returncode, 2, result.stderr)
+            self.assertFalse(marker.exists(), "a PYTHONPATH module was imported")
+
+
 class LauncherTests(unittest.TestCase):
     def run_launcher(self, *args, state):
         env = {"PATH": os.environ.get("PATH", ""), "HOME": os.environ.get("HOME", "/tmp"),

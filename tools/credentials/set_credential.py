@@ -14,15 +14,21 @@ Live broker keys are deliberately not a stored entry (docs/secret-storage.md).
 """
 from __future__ import annotations
 
-import argparse
-import getpass
-import json
 import os
-import re
-import stat
 import sys
-import warnings
-from pathlib import Path
+
+if __name__ == "__main__" and not sys.flags.isolated:
+    # Re-run isolated (-I): ignore PYTHONPATH, PYTHONSTARTUP and user site-packages, so a
+    # poisoned environment cannot shadow getpass or any other module this tool imports.
+    os.execv(sys.executable, [sys.executable, "-I", os.path.abspath(__file__), *sys.argv[1:]])
+
+import argparse  # noqa: E402
+import getpass  # noqa: E402
+import json  # noqa: E402
+import re  # noqa: E402
+import stat  # noqa: E402
+import warnings  # noqa: E402
+from pathlib import Path  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts"))
