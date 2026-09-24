@@ -5,9 +5,9 @@
 #   tools/credentials/open_credential_terminal.sh <entry-id>        # store or rotate a stored key
 #   tools/credentials/open_credential_terminal.sh alpaca-paper --probe
 #                                   # store the paper pair, then probe its rate limit
-#   tools/credentials/open_credential_terminal.sh --live-rate-limit
-#                                   # type the LIVE pair (never stored) for one read-only probe
 #   ... --dry-run                   # print the plan and the generated session script; open nothing
+#
+# Live broker keys are out of scope for this repository and are never handled here.
 #
 # The window runs a generated session script that holds commands only, never values. The
 # script lives in the private state directory (mode 0700) and deletes itself on exit. Before
@@ -15,25 +15,20 @@
 # uncommitted changes, so the code you type into is the committed code.
 set -euo pipefail
 
-usage="usage: open_credential_terminal.sh (<entry-id> [--probe] | --live-rate-limit) [--dry-run]"
+usage="usage: open_credential_terminal.sh <entry-id> [--probe] [--dry-run]"
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 root="$(cd "$here/../.." && pwd)"
-entry=""; probe=0; live=0; dry_run=0
+entry=""; probe=0; dry_run=0
 while [ $# -gt 0 ]; do
   case "$1" in
     --probe) probe=1; shift ;;
-    --live-rate-limit) live=1; shift ;;
     --dry-run) dry_run=1; shift ;;
     -*) echo "$usage" >&2; exit 2 ;;
     *) [ -z "$entry" ] || { echo "$usage" >&2; exit 2; }; entry="$1"; shift ;;
   esac
 done
-if [ "$live" -eq 1 ]; then
-  [ -z "$entry" ] && [ "$probe" -eq 0 ] || { echo "--live-rate-limit takes no entry id or --probe" >&2; exit 2; }
-else
-  [[ "$entry" =~ ^[a-z0-9-]+$ ]] || { echo "$usage" >&2; exit 2; }
-  [ "$probe" -eq 0 ] || [ "$entry" = alpaca-paper ] || { echo "--probe applies only to alpaca-paper" >&2; exit 2; }
-fi
+[[ "$entry" =~ ^[a-z0-9-]+$ ]] || { echo "$usage" >&2; exit 2; }
+[ "$probe" -eq 0 ] || [ "$entry" = alpaca-paper ] || { echo "--probe applies only to alpaca-paper" >&2; exit 2; }
 
 safe_path='^[A-Za-z0-9._/-]+$'
 state="${XDG_STATE_HOME:-$HOME/.local/state}/native-agent-stack"
@@ -42,7 +37,6 @@ find "$state/credential-sessions" -maxdepth 1 -name 'session-*.sh' -mmin +1440 -
 stamp="$(date -u +%Y%m%dT%H%M%SZ)"
 session="$state/credential-sessions/session-$stamp-$$.sh"
 result=""
-if [ "$live" -eq 1 ]; then result="$state/rate-limit/live-$stamp.json"; fi
 if [ "$probe" -eq 1 ]; then result="$state/rate-limit/paper-$stamp.json"; fi
 for p in "$root" "$session" ${result:+"$result"}; do
   [[ "$p" =~ $safe_path ]] || { echo "refused: path has characters a launcher cannot pass safely: $p" >&2; exit 2; }
@@ -64,18 +58,12 @@ umask 077
   echo '  fi'
   echo 'fi'
   echo 'echo'
-  if [ "$live" -eq 1 ]; then
-    echo 'echo "LIVE account: type the key pair below (hidden). It is used for one read-only"'
-    echo 'echo "GET /v2/account, then discarded. Nothing is stored and no order is sent."'
-    echo "python3 -I tools/credentials/alpaca_rate_limit_probe.py --account live --out $result"
-  else
-    echo "python3 -I tools/credentials/set_credential.py $entry"
-    if [ "$probe" -eq 1 ]; then
-      echo 'if [ $? -eq 0 ]; then'
-      echo '  echo; echo "Read-only rate-limit probe (one GET /v2/account; no orders):"'
-      echo "  python3 -I tools/credentials/alpaca_rate_limit_probe.py --account paper --out $result"
-      echo 'fi'
-    fi
+  echo "python3 -I tools/credentials/set_credential.py $entry"
+  if [ "$probe" -eq 1 ]; then
+    echo 'if [ $? -eq 0 ]; then'
+    echo '  echo; echo "Read-only paper rate-limit probe (one GET /v2/account; no orders):"'
+    echo "  python3 -I tools/credentials/alpaca_rate_limit_probe.py --out $result"
+    echo 'fi'
   fi
   echo 'echo'
   echo 'read -r -p "Done. Press Enter to close this window. " _'
@@ -109,7 +97,7 @@ elif [ -n "${DISPLAY:-}${WAYLAND_DISPLAY:-}" ]; then
 fi
 
 if [ "$dry_run" -eq 1 ]; then
-  echo "mode: $([ "$live" -eq 1 ] && echo live-rate-limit || echo "store $entry")"
+  echo "mode: store $entry$([ "$probe" -eq 1 ] && echo ' + paper rate-limit probe')"
   echo "session script: $session"
   [ -z "$result" ] || echo "probe result: $result"
   if [ ${#launch[@]} -gt 0 ]; then printf 'would launch:'; printf ' %q' "${launch[@]}"; echo; else echo "would print: bash $session"; fi

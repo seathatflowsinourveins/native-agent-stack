@@ -211,15 +211,15 @@ class ProbeRequestTests(unittest.TestCase):
                 return _Response(200, headers(x_ratelimit_limit="1000", x_ratelimit_remaining="999",
                                               x_ratelimit_reset="1790260000", x_request_id="rid"))
 
-        val_a, val_b = fake_token("AK"), fake_token()
-        result = probe_mod.probe("live", val_a, val_b, opener=Opener())
+        val_a, val_b = fake_token("PK"), fake_token()
+        result = probe_mod.probe(val_a, val_b, opener=Opener())
         self.assertEqual(len(seen), 1)
         self.assertEqual(seen[0].get_method(), "GET")
-        self.assertEqual(seen[0].full_url, "https://api.alpaca.markets/v2/account")
+        self.assertEqual(seen[0].full_url, "https://paper-api.alpaca.markets/v2/account")
         self.assertEqual(result["http_status"], 200)
         self.assertEqual(sorted(result["rate_limit_headers"]),
                          ["x-ratelimit-limit", "x-ratelimit-remaining", "x-ratelimit-reset"])
-        self.assertIn("higher tier", result["interpretation"])
+        self.assertEqual(result["interpretation"], "1000 calls/min")
         rendered = json.dumps(result)
         for value in (val_a, val_b):
             self.assertNotIn(value, rendered)
@@ -230,7 +230,7 @@ class ProbeRequestTests(unittest.TestCase):
                 raise urllib.error.HTTPError(request.full_url, 401, "Unauthorized",
                                              headers(x_ratelimit_limit="200"), None)
 
-        result = probe_mod.probe("paper", "a", "b", opener=Opener())
+        result = probe_mod.probe("a", "b", opener=Opener())
         self.assertEqual(result["http_status"], 401)
         self.assertEqual(result["rate_limit_headers"], {"x-ratelimit-limit": "200"})
         self.assertIn("HTTP 401", result["interpretation"])
@@ -242,7 +242,7 @@ class ProbeRequestTests(unittest.TestCase):
                     raise _error
 
             with self.subTest(error=type(error).__name__):
-                result = probe_mod.probe("live", "a", "b", opener=Opener())
+                result = probe_mod.probe("a", "b", opener=Opener())
                 self.assertIsNone(result["http_status"])
                 self.assertEqual(result["error"], type(error).__name__)
 
@@ -284,9 +284,8 @@ class ProbeRequestTests(unittest.TestCase):
                 server.shutdown()
                 server.server_close()
 
-    def test_unknown_account_is_refused(self):
-        with self.assertRaises(probe_mod.Refused):
-            probe_mod.probe("other", "a", "b", opener=object())
+    def test_only_the_fixed_paper_host(self):
+        self.assertEqual(probe_mod.HOST, "https://paper-api.alpaca.markets")
 
 
 class ProbeCliTests(unittest.TestCase):
@@ -299,16 +298,11 @@ class ProbeCliTests(unittest.TestCase):
     def tearDown(self):
         self.tmp.cleanup()
 
-    def test_live_never_reads_a_file_and_needs_a_terminal(self):
-        path = self.dir / "live.env"
-        path.write_text(f"APCA_API_KEY_ID={fake_token('AK')}\nAPCA_API_SECRET_KEY={fake_token()}\n")
-        os.chmod(path, 0o600)
+    def test_there_is_no_live_option(self):
         stderr = io.StringIO()
-        with mock.patch("sys.stderr", stderr):
-            self.assertEqual(probe_mod.main(["--account", "live", "--env-file", str(path)]), 2)
-            self.assertEqual(probe_mod.main(["--account", "live"]), 2)  # stdin is not a terminal here
-        self.assertIn("never read from a file", stderr.getvalue())
-        self.assertIn("interactive terminal", stderr.getvalue())
+        with mock.patch("sys.stderr", stderr), self.assertRaises(SystemExit) as caught:
+            probe_mod.main(["--account", "live"])
+        self.assertEqual(caught.exception.code, 2)
 
     def test_paper_file_writes_private_result_without_following_symlinks(self):
         val_a, val_b = fake_token("PK"), fake_token()
@@ -329,7 +323,7 @@ class ProbeCliTests(unittest.TestCase):
         stdout = io.StringIO()
         with mock.patch.object(probe_mod.urllib.request, "build_opener", return_value=Opener()), \
                 mock.patch("sys.stdout", stdout):
-            code = probe_mod.main(["--account", "paper", "--env-file", str(path), "--out", str(out)])
+            code = probe_mod.main(["--env-file", str(path), "--out", str(out)])
         self.assertEqual(code, 0)
         self.assertEqual(victim.read_text(), "untouched")
         self.assertFalse(out.is_symlink())
@@ -355,24 +349,17 @@ class LauncherTests(unittest.TestCase):
             self.assertEqual(result.returncode, 0, result.stderr)
             out = result.stdout
             self.assertIn("python3 -I tools/credentials/set_credential.py alpaca-paper", out)
-            self.assertIn("alpaca_rate_limit_probe.py --account paper --out", out)
+            self.assertIn("alpaca_rate_limit_probe.py --out", out)
             self.assertIn("git status --porcelain -- tools/credentials", out)
             self.assertIn("unset PYTHONPATH", out)
             sessions = Path(tmp) / "native-agent-stack" / "credential-sessions"
             self.assertEqual(stat.S_IMODE(os.lstat(sessions).st_mode), 0o700)
             self.assertEqual(list(sessions.iterdir()), [])
 
-    def test_live_mode_dry_run_never_stores(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            result = self.run_launcher("--live-rate-limit", "--dry-run", state=Path(tmp))
-            self.assertEqual(result.returncode, 0, result.stderr)
-            self.assertIn("alpaca_rate_limit_probe.py --account live --out", result.stdout)
-            self.assertNotIn("set_credential.py", result.stdout)
-
     def test_rejects_bad_arguments_and_unsafe_paths(self):
         with tempfile.TemporaryDirectory() as tmp:
-            for args in (("../etc",), ("alpaca-live", "--probe"), ("typesafe", "--probe"),
-                         ("--live-rate-limit", "alpaca-paper"), ("alpaca-paper", "--bogus"), ()):
+            for args in (("../etc",), ("typesafe", "--probe"), ("--live-rate-limit",),
+                         ("alpaca-paper", "--bogus"), ("alpaca-paper", "typesafe"), ()):
                 with self.subTest(args=args):
                     self.assertEqual(self.run_launcher(*args, state=Path(tmp)).returncode, 2)
             unsafe = Path(tmp) / "has space"

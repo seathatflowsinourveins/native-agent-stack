@@ -14,7 +14,6 @@ against it.
 | Inventory id | What it is | Status | Where it lives | Variable names |
 | --- | --- | --- | --- | --- |
 | `alpaca-paper` | Alpaca paper broker key pair | required now | `<store>/alpaca-paper.env` | `APCA_API_KEY_ID`, `APCA_API_SECRET_KEY` (optional, not secret: `APCA_API_BASE_URL`) |
-| `alpaca-live` | Alpaca **live** broker key pair (real money). **Never stored.** You type it, hidden, for each read-only rate-limit probe, and it is discarded afterwards | typed per probe | nowhere | `APCA_API_KEY_ID`, `APCA_API_SECRET_KEY` |
 | `sec-contact` | SEC/EDGAR contact string. This is private personal data, not an auth secret | required now | `<store>/sec-contact.env` | `SEC_USER_AGENT` (optional: `EDGAR_IDENTITY`) |
 | `databento` | Databento API key | only when you buy it | `<store>/databento.env` | `DATABENTO_API_KEY` |
 | `typesafe` | Typesafe key, for the live-judge mode of `gap_crosswalk.py` only | only when you pay for it | `<store>/typesafe.env` | `TYPESAFE_API_KEY` |
@@ -60,18 +59,15 @@ Never paste a key into a chat, an issue, a prompt or a command line. Run:
 ```sh
 tools/credentials/open_credential_terminal.sh <inventory-id>              # store or rotate a stored key
 tools/credentials/open_credential_terminal.sh alpaca-paper --probe       # ...then probe the paper rate limit
-tools/credentials/open_credential_terminal.sh --live-rate-limit          # LIVE: typed, used once, never stored
 ```
 
 The command opens a new terminal window: Windows Terminal on WSL2 (or a console window if Windows Terminal is missing), Terminal.app on macOS, or an X terminal on a Linux desktop. If it cannot open one, it prints the one command to run yourself. An agent may open the window, but it never sees what you type.
 
 - **Before anything is typed**, the window prints the checkout's commit. It refuses if `tools/credentials/`, `scripts/credential_status.py` or `adoption/credential-inventory.json` has uncommitted changes, so you only ever type into committed code. It clears `PYTHONPATH`, `LD_PRELOAD` and similar variables, and runs Python with `-I`.
 - **Stored keys:** `tools/credentials/set_credential.py <inventory-id>` accepts only operator-supplied entries (required, optional or paid) whose file sits directly in the store. It asks for each variable with hidden input, and refuses if the terminal cannot hide input. It writes `export NAME=value` lines atomically: a `0600` file in the `0700` store, outside Git, written through a directory handle opened without following symlinks. To replace an existing file you type `replace`, also hidden.
-- **Rate limits:** `tools/credentials/alpaca_rate_limit_probe.py` sends one read-only `GET /v2/account` to the fixed live or paper host. It follows no redirect, reads no response body and places no order. It saves only the HTTP status and the `x-ratelimit-*` headers, under `${XDG_STATE_HOME:-$HOME/.local/state}/native-agent-stack/rate-limit/`, where a later session can read them. `x-ratelimit-limit` is Alpaca's own per-account calls-per-minute figure: 200 on the standard tier, 1000 on Elite or a non-retail account. Measuring it never needs order traffic.
+- **Paper rate limit:** `tools/credentials/alpaca_rate_limit_probe.py` sends one read-only `GET /v2/account` to the fixed paper host. It follows no redirect, reads no response body and places no order. It saves only the HTTP status and the `x-ratelimit-*` headers, under `${XDG_STATE_HOME:-$HOME/.local/state}/native-agent-stack/rate-limit/`, where a later session can read them. `x-ratelimit-limit` is Alpaca's own per-account calls-per-minute figure (200 on the standard tier), so measuring it never needs order traffic. Agents may run it with `--env-file "$PAPER_ENV_FILE"`.
 
-### Live keys
-
-Live broker keys are **never stored** on a host: no file, no pointer variable, no shell export and no loader an agent could run. `--live-rate-limit` asks for the pair with hidden input and uses it for the one probe request. When the process exits, the pair is gone. The probe refuses `--env-file` for live and refuses to run without an interactive terminal. No harness in this repository accepts a live endpoint. Storing a live key for live trading needs its own dated decision when live-go is decided, for example an OS keychain or a passphrase-encrypted file.
+Live broker keys are out of scope for this repository. Live trading is handled outside it, and no tool here accepts a live endpoint.
 
 ## Picking up in a new session
 
