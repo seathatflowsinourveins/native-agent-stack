@@ -302,6 +302,16 @@ def check_study_tree(repo, protocol: dict, tree: str, run_log: list | None = Non
                   "deviation of it")
 
 
+def first_commit_with_tree(repo, tree: str, path: str = STUDY_PATH):
+    """The id of the first first-parent commit of origin/main whose `path` tree is `tree`, or None (review round 11,
+    F3: the transport-check sample seed)."""
+    for commit in git(repo, "log", "--first-parent", "--reverse", "--format=%H", MAIN, "--", path).splitlines():
+        if git_ok(repo, "rev-parse", "-q", "--verify", f"{commit}:{path}") and \
+                git(repo, "rev-parse", f"{commit}:{path}") == tree:
+            return commit
+    return None
+
+
 def check_parameters(protocol: dict) -> None:
     got = (protocol.get("run_discipline", {}).get("study_code") or {}).get("parameters")
     if got != PARAMETERS:

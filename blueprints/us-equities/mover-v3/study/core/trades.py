@@ -54,8 +54,9 @@ def _window_req(kind, symbol, asof, w):
     return plan.quote_request(kind, symbol, asof, w[0], w[1])
 
 
-def _forward(ctx, store, kind, symbol, asof, windows, x, deadline_of_last):
-    """Walk exit windows in order: ('needs', req) | ('incomplete', None) | ('fill', (ts, q)) | ('none', None)."""
+def _forward(ctx, store, kind, symbol, asof, windows, x, deadline_of_last, empties=None):
+    """Walk exit windows in order: ('needs', req) | ('incomplete', None) | ('fill', (ts, q)) | ('none', None).
+    empties, when a list, receives every consulted window answered with no row (review round 11, C6)."""
     got = []
     for i, w in enumerate(windows):
         req = _window_req(kind, symbol, asof, w)
@@ -64,6 +65,8 @@ def _forward(ctx, store, kind, symbol, asof, windows, x, deadline_of_last):
             return "needs", req
         if st == "incomplete":
             return "incomplete", None
+        if empties is not None and store.empty(req["key"], symbol):
+            empties.append(w)
         got.extend(qs)
         got.sort(key=lambda q: q["t"])
         hit = fills.fill_at(ctx.cal, got, x, w[1])
@@ -145,9 +148,14 @@ def trade(ev: dict, arm: str, ctx: Ctx, store) -> dict:
     ts_in, quote_in, _ = fill_in
     out.update({"censored": censored, "planned_exit_session": e_session, "entry_fill_t": ts_in})
     windows = plan.exit_windows(cal, e_session, x_stamp)
-    kind, hit = _forward(ctx, store, "quote_exit", sym, t, windows, x_stamp, None)
+    empties = []
+    kind, hit = _forward(ctx, store, "quote_exit", sym, t, windows, x_stamp, None, empties)
     if kind == "needs":
         return {"needs": [hit]}
+    # universe_and_identity.empty_responses, per item: empty exit windows (on the planned exit session) and empty
+    # search windows (E+1 .. E+5), each a terminal-exit consequence (review round 11, C6)
+    out["exit_windows_empty"] = sum(1 for w in empties if w[1] <= cal.close(e_session))
+    out["search_windows_empty"] = len(empties) - out["exit_windows_empty"]
     if kind == "incomplete":
         return {**out, "status": "fetch_incomplete", "incomplete": ["quote_exit"]}
     search_last = cal.offset(e_session, T["search_sessions"])

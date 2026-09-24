@@ -490,12 +490,18 @@ read fetches and seals in one committed step and evaluates in a second, so disca
 draw of provider data; every reach and freeze time must come from a commit signed by GitHub's pinned web-flow key,
 the local `origin/main` must equal the remote's, and the logs must be append-only across `main`'s history; calendar
 and fee amendments need their `amend` access-log records; recorded pre-freeze reads void validation or the holdout;
-and every item reports the least-exposed slice. The next steps are an
+and every item reports the least-exposed slice. Review round 11 resolved a third review of the study tree (22
+findings; 18 fixed, 3 fixed in part (C15 and F5, one finding, and F6), 1 rejected as already fixed, with limitations recorded): the dry run is bounded by
+every request's lookback, not only its sessions; whether the holdout is read no longer depends on its outcome (a sealed
+read is always evaluated, and a refused authorization cannot be held back and spent later); the transport is paced at
+the pinned rate limit; late collection is judged per session and holdout due times by signed reach times; every
+pre-freeze and stage fetch needs a pushed start line; and the transport check covers holdout snapshots with a seeded
+sample. The next steps are an
 independent review of the draft and its study tree from a different model family, then the other preconditions, then
 the freeze. Until then every fetch and evaluation command refuses to run.
 
 H6 has its own preconditions in `h6-execution-parity-draft.json`. Review rounds 2-4 of the full draft are recorded in
-`protocol-draft.json` (`review_record`); rounds 5-10 (the restructure into the core, its two review rounds, the code-first round and the two study-tree reviews) are in
+`protocol-draft.json` (`review_record`); rounds 5-11 (the restructure into the core, its two review rounds, the code-first round and the three study-tree reviews) are in
 `protocol-core-draft.json`.
 
 Until all of that is done, this is a plan, and no window it names may be read for outcomes.

@@ -8,6 +8,7 @@ core.runner.context (after the freeze) or core.runner.count_only_context (the pr
   run.py fetch --stage development|validation --enumeration ENUM.json --snapshot DIR    (once per stage)
   run.py evaluate --stage development|validation --enumeration ENUM.json --snapshot DIR --sha SHA
   run.py transport-check --stage development|validation --enumeration ENUM.json --snapshot DIR --sha SHA
+                  [--holdout-root DIR]   (required once a holdout snapshot is sealed)
   run.py authorize --purpose collect|amend|count|read [--retry-of ID]   (appends the authorization record)
   run.py amend --authorization ID --file calendar|fees --line N          (logs one amendment line)
   run.py collect --authorization ID --last YYYY-MM-DD --accrual-log FILE --snapshot-root DIR
@@ -39,11 +40,12 @@ sys.path.insert(0, str(HERE))
 REPO = HERE.parents[3]
 
 
-def transports() -> dict:
+def transports(protocol: dict) -> dict:
     """The data and trading hosts (the asset master is a trading-API endpoint), served by a child process that alone
-    imports study/fetch/ (review round 10, H1)."""
-    from core import transport_proc
-    return transport_proc.transports()
+    imports study/fetch/ (review round 10, H1), paced at the protocol's pinned rate limit (review round 11, C2; the
+    command refuses while it is not pinned)."""
+    from core import count_only, transport_proc
+    return transport_proc.transports(per_minute=count_only.pinned_rate_limit(protocol)["per_minute"])
 
 
 def now() -> float:
@@ -90,9 +92,15 @@ def cmd_count_only(a) -> int:
     if out_path.exists():
         raise runner.RunRefused(f"{COUNT_ONLY_OUTPUT} exists")
     cal = CAL.Calendar.from_files(REPO / DATA_DIR / "session-calendar.json")
+    tr = transports(ctx["protocol"])
+    si = runner.begin_or_resume(ctx, "pre_freeze", "count_only",
+                                {"coverage_rule_sha256": rule_sha256(ctx["protocol"])}, clock)   # review round 11, F4
+    if si is None:
+        print(json.dumps({"started": True, "next": "commit and push the start line, then run again"}))
+        return 0
     start, status, digest, out = clock(), "failed", None, None
     try:
-        out = count_only.run(ctx["protocol"], cal, transports(), a.snapshot_root, start[:10], rate["per_minute"],
+        out = count_only.run(ctx["protocol"], cal, tr, a.snapshot_root, start[:10], rate["per_minute"],
                              clock=clock)
         out.update({"study_tree": ctx["tree"], "code_revision": ctx["commit"], "rate_limit": rate})
         digest = atomic_write_results(out_path, out)
@@ -103,7 +111,8 @@ def cmd_count_only(a) -> int:
         logs.append_line(REPO / RUN_LOG, runner.run_line(
             ctx, stage="pre_freeze", purpose="count_only", commit=ctx["commit"], utc_start=start, utc_end=clock(),
             snapshots=list((out or {}).get("snapshots", {}).values()), status=status, results_sha256=digest,
-            extra={"coverage_rule_sha256": rule_sha256(ctx["protocol"]), "output_path": COUNT_ONLY_OUTPUT}))
+            extra={"coverage_rule_sha256": rule_sha256(ctx["protocol"]), "output_path": COUNT_ONLY_OUTPUT,
+                   "start_index": si}))
     print(json.dumps({"output_sha256": digest, "item_rule": out["item_rule"]}, sort_keys=True))
     return 0
 
@@ -122,9 +131,17 @@ def cmd_dry_run(a) -> int:
     if out_path.exists() or any(x.get("purpose") == "dry_run" and x.get("status") == "complete" for x in ctx["run_log"]):
         raise runner.RunRefused("the native dry run has its output; it runs once")
     cal = CAL.Calendar.from_files(REPO / DATA_DIR / "session-calendar.json")
+    count_only.dry_run_requests(cal, sessions, symbols)   # every request's reach, before any fetch or log line (C1)
+    tr = transports(ctx["protocol"])                     # the pinned rate limit, before any fetch (C2)
+    from core.canon import sha256_obj
+    si = runner.begin_or_resume(ctx, "pre_freeze", "dry_run", {"sessions": sessions,
+                                                               "symbols_sha256": sha256_obj(symbols)}, clock)  # F4
+    if si is None:
+        print(json.dumps({"started": True, "next": "commit and push the start line, then run again"}))
+        return 0
     start, status, digest, out = clock(), "failed", None, None
     try:
-        out = count_only.dry_run(cal, sessions, symbols, transports(), a.snapshot_root, start[:10], clock=clock)
+        out = count_only.dry_run(cal, sessions, symbols, tr, a.snapshot_root, start[:10], clock=clock)
         out.update({"study_tree": ctx["tree"], "code_revision": ctx["commit"]})
         digest = atomic_write_results(out_path, out)
         status = "complete"
@@ -134,7 +151,8 @@ def cmd_dry_run(a) -> int:
         logs.append_line(REPO / RUN_LOG, runner.run_line(
             ctx, stage="pre_freeze", purpose="dry_run", commit=ctx["commit"], utc_start=start, utc_end=clock(),
             snapshots=[out["snapshot_sha256"]] if out else [], status=status, results_sha256=digest,
-            extra={"output_path": DRY_RUN_OUTPUT, "sessions": sessions, "symbols_count": len(symbols)}))
+            extra={"output_path": DRY_RUN_OUTPUT, "sessions": sessions, "symbols_count": len(symbols),
+                   "start_index": si}))
     print(json.dumps({"output_sha256": digest}, sort_keys=True))
     return 0
 
@@ -158,9 +176,23 @@ def cmd_transport_check(a) -> int:
         raise runner.RunRefused(f"{rel} exists: a tree's reproduction check runs once")
     store = Store.read(a.snapshot, a.sha)
     changed = guards.git(REPO, "diff-tree", "-r", "--name-only", ctx["pinned_tree"], ctx["tree"]).splitlines()
+    # review round 11, F3: every sealed holdout snapshot is checked too, and the live sample is seeded by the first
+    # origin/main commit that holds the new tree (a signed merge made after the transport was written)
+    from core import holdout
+    named = bool([r for r in ctx["access_log"] if r.get("record_kind") == "completion" and r.get("snapshot_sha256")]
+                 or [x for x in ctx["run_log"] if x.get("stage") == "holdout" and x.get("purpose") in
+                     ("count_fetch", "read_fetch") and x.get("input_snapshot_sha256s")])
+    if named and not a.holdout_root:
+        raise runner.RunRefused("sealed holdout snapshots exist: transport-check needs --holdout-root to check them")
+    hstores = holdout.sealed_holdout_snapshots(ctx, a.holdout_root) if a.holdout_root else []
+    seed = guards.first_commit_with_tree(REPO, ctx["tree"])
+    if seed is None:
+        raise runner.RunRefused("the new tree is not yet on origin/main: its first commit there seeds the sample")
+    tr = transports(ctx["protocol"])
     start, status, digest = clock(), "failed", None
     try:
-        res = transport_check.reproduction_check(ST.planner(spec), store, transports(), changed, "fetch")
+        res = transport_check.reproduction_check(ST.planner(spec), store, tr, changed, "fetch", seed=seed,
+                                                 holdout_stores=hstores)
         res.update({"kind": "mover_v3_transport_check", "new_tree": ctx["tree"], "pinned_tree": ctx["pinned_tree"],
                     "new_fetch_tree": guards.git(REPO, "rev-parse", f"HEAD:{guards.STUDY_PATH}/fetch"),
                     "stage": a.stage, "snapshot_sha256": a.sha, "changed_paths": changed})
@@ -180,7 +212,7 @@ def cmd_fetch(a) -> int:
     from core import runner, stage as ST
     ctx = runner.context(REPO)
     spec = _spec(ctx, a.stage, a.enumeration)
-    out = runner.stage_fetch_run(ctx, a.stage, a.snapshot, ST.planner(spec), transports(), clock)
+    out = runner.stage_fetch_run(ctx, a.stage, a.snapshot, ST.planner(spec), transports(ctx["protocol"]), clock)
     print(json.dumps(out, sort_keys=True))
     return 0
 
@@ -195,12 +227,17 @@ def cmd_evaluate(a) -> int:
     # review round 10, F4: a committed void deviation (a recorded pre-freeze read) scores every validation item p = 1
     voided = sorted(ctx["voids"] & {"tests", "validation"}) if a.stage == "validation" else []
 
+    testing = runner.stage_testing(a.stage, cov)     # review round 11, C9: development is not gated by 2020
+
     def compute_for(store, fetch_line):
         quals = ("transport-deviation",) if runner.transport_qualified(ctx, [fetch_line]) else ()
-        return ST.evaluate_stage(spec, store, ctx["protocol"]["id"], tested=cov["items_tested"],
-                                 void={"void": bool(fetch_line.get("stage_void")) or bool(voided),
-                                       "rate": fetch_line.get("fetch_incomplete_rate"), "void_deviations": voided},
-                                 qualifiers=quals, identity_limited=ident)
+        res = ST.evaluate_stage(spec, store, ctx["protocol"]["id"], tested=testing["tested"],
+                                void={"void": bool(fetch_line.get("stage_void")) or bool(voided),
+                                      "rate": fetch_line.get("fetch_incomplete_rate"), "void_deviations": voided},
+                                qualifiers=quals, identity_limited=ident)
+        if "development_computed" in testing:
+            res["development_computed"] = testing["development_computed"]
+        return res
     out = runner.evaluate_run(ctx, a.stage, a.snapshot, a.sha, compute_for, clock)
     print(json.dumps(out, sort_keys=True))
     return 0
@@ -224,21 +261,24 @@ def cmd_collect(a) -> int:
     from core import holdout, runner
     ctx = runner.context(REPO)
     accrual = json.loads(Path(a.accrual_log).read_text())
-    out = holdout.collect(ctx, a.authorization, a.last, accrual, a.snapshot_root, transports(), now(), clock)
+    out = holdout.collect(ctx, a.authorization, a.last, accrual, a.snapshot_root, transports(ctx["protocol"]), now(),
+                          clock)
     print(json.dumps(out, sort_keys=True))
     return 0
 
 
 def cmd_count(a) -> int:
     from core import holdout, runner
-    out = holdout.count(runner.context(REPO), a.authorization, a.snapshot_root, transports(), now(), clock)
+    ctx = runner.context(REPO)
+    out = holdout.count(ctx, a.authorization, a.snapshot_root, transports(ctx["protocol"]), now(), clock)
     print(json.dumps(out, sort_keys=True))
     return 0
 
 
 def cmd_read(a) -> int:
     from core import holdout, runner
-    out = holdout.read(runner.context(REPO), a.authorization, a.snapshot_root, transports(), now(), clock)
+    ctx = runner.context(REPO)
+    out = holdout.read(ctx, a.authorization, a.snapshot_root, transports(ctx["protocol"]), now(), clock)
     print(json.dumps(out, sort_keys=True))
     return 0
 
@@ -263,6 +303,8 @@ def main(argv=None) -> int:
         p.add_argument("--snapshot", required=True)
         if name in ("evaluate", "transport-check"):
             p.add_argument("--sha", required=True)
+        if name == "transport-check":
+            p.add_argument("--holdout-root", default=None)
     z = sub.add_parser("authorize")
     z.add_argument("--purpose", choices=("collect", "amend", "count", "read"), required=True)
     z.add_argument("--retry-of", default=None)

@@ -108,6 +108,9 @@ class AccessLog(unittest.TestCase):
         ok = [auth("c1", "count"), done("c1", "complete")]
         self.assertTrue(gate.evaluator_refusals(ctx(purpose="count", count_due=False, access_log=ok, retry_of="c1")))
         self.assertTrue(gate.evaluator_refusals(ctx(purpose="count", count_outputs=["H3-a", "H3-a:mean"])))
+        # review round 11, F1: a void count is known before the read is authorized, so the read is refused then
+        self.assertEqual(gate.evaluator_refusals(ctx()), [])
+        self.assertTrue(any("count was void" in r for r in gate.evaluator_refusals(ctx(count_void=True))))
 
     def test_authorization_record_is_granted_or_refused_by_rule(self):
         rec = gate.authorization(ctx(), "a9", "2027-01-01T00:00:00Z", {"protocol_id": "p"})

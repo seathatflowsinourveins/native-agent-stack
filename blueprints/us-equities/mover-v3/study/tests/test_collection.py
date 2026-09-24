@@ -56,8 +56,11 @@ class Collection(unittest.TestCase):
         b1 = {"sessions": cal.range("2026-10-05", "2026-10-09"), "reachable": cal.at("2026-10-12", "09:00")}
         b2 = {"sessions": cal.range("2026-10-12", "2026-10-16"), "reachable": cal.at("2026-10-19", "09:30")}
         b3 = {"sessions": cal.range("2026-10-19", "2026-10-23"), "reachable": None}
-        late = plan.late_collected(cal, [b1, b2, b3])
-        self.assertEqual(late, b2["sessions"] + b3["sessions"])
+        one = [{"sessions": [d], "reachable": cal.at(cal.offset(d, 1), "09:00")} for d in cal.range("2026-10-26", "2026-10-28")]
+        late = plan.late_collected(cal, [b1, b2, b3, *one])
+        # review round 11, C3: per session. b1 reached main before the session after its last session, but its
+        # Monday .. Thursday accrual logs were committed days after those sessions' next opens
+        self.assertEqual(late, b1["sessions"][:-1] + b2["sessions"] + b3["sessions"])
 
 
 if __name__ == "__main__":

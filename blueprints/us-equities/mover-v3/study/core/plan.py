@@ -225,11 +225,14 @@ def collection_requests(cal, sessions: list, symbols: list, previous_renames: li
 
 
 def late_collected(cal, batches: list) -> list:
-    """Sessions whose batch was not timely: a batch is timely if its accrual log became reachable from origin/main
-    before 09:30 ET of the session after its last session. batches: [{"sessions": [...], "reachable": epoch s}]."""
+    """Late-collected sessions, judged per session (review round 11, C3): session s is timely only if the batch
+    holding it, with its accrual log, became reachable from origin/main before 09:30 ET of the session after s. A
+    batch spanning several sessions therefore leaves every session but its last late unless it reached main within
+    a session. batches: [{"sessions": [...], "reachable": epoch s}]."""
     late = []
     for b in batches:
-        nxt = cal.offset(b["sessions"][-1], 1)
-        if b.get("reachable") is None or nxt is None or b["reachable"] >= cal.at(nxt, "09:30"):
-            late.extend(b["sessions"])
+        for s in b["sessions"]:
+            nxt = cal.offset(s, 1)
+            if b.get("reachable") is None or nxt is None or b["reachable"] >= cal.at(nxt, "09:30"):
+                late.append(s)
     return sorted(late)

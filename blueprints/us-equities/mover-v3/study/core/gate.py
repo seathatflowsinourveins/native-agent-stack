@@ -157,6 +157,8 @@ def evaluator_refusals(ctx: dict) -> list:
     if not ctx["accrual_logs_complete"]:
         out.append("a collection batch lacks its committed accrual log")
     prior = [a for a in seq["granted"].values() if a["purpose"] == purpose]
+    if purpose == "read" and ctx.get("count_void"):
+        out.append("a holdout count was void (populations.fetch_failures), so the holdout is not read")
     if purpose == "read" and prior:
         last = prior[-1]
         if not retry_allowed(last, seq["completions"].get(last["authorization_id"]), ctx,

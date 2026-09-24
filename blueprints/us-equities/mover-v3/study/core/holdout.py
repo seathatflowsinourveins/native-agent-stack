@@ -151,6 +151,30 @@ def sealed_stores(ctx: dict, snapshot_root, purposes=("collect", "count")) -> li
     return out
 
 
+def sealed_holdout_snapshots(ctx: dict, snapshot_root) -> list:
+    """Review round 11, F3: every sealed holdout snapshot the committed logs name, as [(label, store)]: each granted
+    collection batch's completion snapshot and each count or read '_fetch' line's snapshot, read from
+    <root>/<dir> and checked against its sha256."""
+    out, seen = [], set()
+    granted = {a["authorization_id"]: a for a in ctx["access_log"]
+               if a.get("record_kind") == "authorization" and a.get("decision") == "granted"}
+    for rec in ctx["access_log"]:
+        a = granted.get(rec.get("authorization_id"))
+        sha = rec.get("snapshot_sha256")
+        if rec.get("record_kind") == "completion" and a is not None and a["purpose"] == "collect" and sha \
+                and sha not in seen:
+            seen.add(sha)
+            d = f"collect-{a['authorization_id']}"
+            out.append((d, Store.read(Path(snapshot_root) / d, sha)))
+    for x in ctx["run_log"]:
+        shas = x.get("input_snapshot_sha256s") or []
+        if x.get("stage") == "holdout" and x.get("purpose") in ("count_fetch", "read_fetch") and shas and \
+                x.get("snapshot_dir") and shas[0] not in seen:
+            seen.add(shas[0])
+            out.append((x["snapshot_dir"], Store.read(Path(snapshot_root) / x["snapshot_dir"], shas[0])))
+    return out
+
+
 def enumeration(stores: list) -> dict:
     """The union of every enumeration response held (collection batches refresh it; the first count adds the
     breakpoint screen's), with the latest asset-master response deciding the active set."""
@@ -202,14 +226,38 @@ def gate_context(ctx: dict, purpose: str, now: float, retry_of=None) -> dict:
               "validated_items": validated, "requested_items": validated,
               "accrual_logs_complete": all(aid in seq["completions"] for aid, a in seq["granted"].items()
                                            if a["purpose"] == "collect"),
-              "count_due": count_due(ctx, now), "same_snapshot": True,   # a retry reuses the sealed snapshot
-              "before_deadline": now < read_deadline(ctx, last), "count_outputs": list(CU.KEYS)})
+              "count_due": count_due(ctx, now), "same_snapshot": same_snapshot(ctx, purpose, retry_of),
+              "before_deadline": now < read_deadline(ctx, last),
+              # review round 11, F1: a void count is known before the read is authorized, so it refuses the read
+              "count_void": any(x.get("void") for x in count_lines(ctx["run_log"]))})
+    # review round 11, C15/F5: 'count_outputs' is not an input. A count writes only count_unit by construction
+    # (count() writes STG.count_stage's counts and CU.extension_decision, and the 'count' mode books no exit price),
+    # so evaluator_refusals item 11 is enforced structurally, not by a request field.
     return g
+
+
+def same_snapshot(ctx: dict, purpose: str, retry_of) -> bool:
+    """Review round 11, C15/F5: computed from committed state. Along the retry chain that starts at retry_of, the
+    '<purpose>_fetch' lines sealed at most one snapshot, so the retry evaluates the same input (fetch_line_of
+    follows the chain to it); two different sealed snapshots in one chain refuse the retry."""
+    if not retry_of or purpose not in ("count", "read"):
+        return True
+    by_id = {r.get("authorization_id"): r for r in ctx["access_log"] if r.get("record_kind") == "authorization"}
+    shas, a, seen = set(), by_id.get(retry_of), set()
+    while a is not None and a["authorization_id"] not in seen:
+        seen.add(a["authorization_id"])
+        for x in ctx["run_log"]:
+            if x.get("stage") == "holdout" and x.get("purpose") == f"{purpose}_fetch" and \
+                    x.get("authorization_id") == a["authorization_id"]:
+                shas.update(x.get("input_snapshot_sha256s") or ())
+        a = by_id.get(a.get("retry_of")) if a.get("retry_of") else None
+    return len(shas) <= 1
 
 
 def authorize(ctx: dict, purpose: str, now: float, retry_of=None) -> dict:
     from core.runner import check_clock
     check_clock(ctx, now)
+    check_record_times(ctx)
     if purpose == "read" and not read_due(ctx, now):
         _, last = window(ctx, blocks_done(ctx["run_log"]))
         if now < read_deadline(ctx, last):
@@ -241,6 +289,38 @@ def authorization_reach(ctx: dict, authorization_id: str):
         if r.get("record_kind") == "authorization" and r.get("authorization_id") == authorization_id:
             return reach[i][1] if i < len(reach) else None
     return None
+
+
+def check_record_times(ctx: dict) -> None:
+    """Review round 11, F2: no holdout record carries a time later than the GitHub-recorded time of the commit that
+    first held it on origin/main (a clock set forward writes such a time). Access-log 'utc' and holdout run-log
+    'utc_start' and 'utc_end' are checked; a field that is not a timestamp is not a time and is skipped."""
+    from core.calendar import parse_utc
+    for path, records, fields in ((ACCESS_LOG, ctx["access_log"], ("utc",)),
+                                  (RUN_LOG, ctx["run_log"], ("utc_start", "utc_end"))):
+        reach = None
+        for i, r in enumerate(records):
+            if path == RUN_LOG and r.get("stage") != "holdout":
+                continue
+            for f in fields:
+                try:
+                    t = parse_utc(r[f])
+                except (KeyError, TypeError, ValueError):
+                    continue
+                if reach is None:
+                    reach = logs.line_reach(ctx["repo"], path)
+                if i >= len(reach) or t > reach[i][1]:
+                    raise guards.Refused(f"{path} record {i} has {f} {r[f]}, later than the recorded time its "
+                                         "commit reached origin/main: the clock was set forward")
+
+
+def require_reached_after(ctx: dict, authorization_id: str, when: float, what: str) -> None:
+    """Review round 11, F2: a holdout action's due time is judged by the signed time its authorization record
+    reached origin/main, never by the local clock alone."""
+    reach = authorization_reach(ctx, authorization_id)
+    if reach is None or reach < when:
+        raise HoldoutRefused(f"{authorization_id} reached origin/main before {what} (recorded time "
+                             f"{iso_utc(reach) if reach is not None else 'none'}): it is not due")
 
 
 def rows_in(store) -> int:
@@ -308,6 +388,8 @@ def collect(ctx: dict, authorization_id: str, last: str, accrual: list, snapshot
     first = cal.offset(prev[-1]["sessions"][1], 1) if prev else cal.next_on_or_after(ctx["freeze_session"])
     if not cal.is_session(last) or last < first or cal.close(last) > now:
         raise HoldoutRefused(f"a batch collects closed sessions from {first}; {last} is not one")
+    check_record_times(ctx)
+    require_reached_after(ctx, authorization_id, cal.close(last) + 1, f"the close of {last}")   # F2
     prev_sessions = set(cal.range(*prev[-1]["sessions"])) if prev else set()
     bases = sealed_stores(ctx, snapshot_root, ("collect",))
     fetch_date = iso_utc(now)[:10]
@@ -354,16 +436,19 @@ def _setup(ctx: dict, purpose: str, authorization_id: str, snapshot_root):
 
 
 def fetch_line_of(ctx: dict, purpose: str, auth: dict):
-    """The committed '<purpose>_fetch' run-log line that sealed this action's snapshot: its own, or, for a retry,
-    the one of the authorization it retries (followed back along retry_of). None if no snapshot was sealed."""
+    """The committed '<purpose>_fetch' run-log line that sealed this action's snapshot (whatever its status): its own,
+    or, for a retry, the one of the authorization it retries (followed back along retry_of). None if no snapshot was
+    sealed."""
     by_id = {r.get("authorization_id"): r for r in ctx["access_log"] if r.get("record_kind") == "authorization"}
     a, seen = auth, set()
     while a is not None and a["authorization_id"] not in seen:
         seen.add(a["authorization_id"])
         for x in ctx["run_log"]:
+            # review round 11, C15: a line that sealed a snapshot is reused even if a step after the seal failed,
+            # so a retry never draws provider data again
             if x.get("stage") == "holdout" and x.get("purpose") == f"{purpose}_fetch" and \
-                    x.get("authorization_id") == a["authorization_id"] and x.get("status") == "complete" and \
-                    x.get("input_snapshot_sha256s"):
+                    x.get("authorization_id") == a["authorization_id"] and x.get("input_snapshot_sha256s") and \
+                    x.get("snapshot_dir"):
                 return x
         a = by_id.get(a.get("retry_of")) if a.get("retry_of") else None
     return None
@@ -446,6 +531,11 @@ def count(ctx: dict, authorization_id: str, snapshot_root, transports, now: floa
     pushed) counts over the sealed snapshot."""
     from core.runner import check_clock
     check_clock(ctx, now)
+    check_record_times(ctx)
+    auth = gate.require_granted(ctx["access_log"], authorization_id, "count")
+    if fetch_line_of(ctx, "count", auth) is None:
+        _, due_last = window(ctx, blocks_done(ctx["run_log"]))
+        require_reached_after(ctx, authorization_id, ctx["cal"].close(due_last), f"the close of {due_last}")   # F2
     auth, blocks, n0, last, late, exposed, bases, enum_date = _setup(ctx, "count", authorization_id, snapshot_root)
     carried = tuple(auth["requested_items"])
     enum_date = enum_date or iso_utc(now)[:10]
@@ -498,19 +588,104 @@ def not_read_results(ctx: dict, carried, reason: str) -> dict:
     return {**base, "labels": labels, "verdicts": ST.hypothesis_verdict("holdout", labels)}
 
 
+def holdout_label(ctx: dict, items: dict) -> object:
+    """chronology.labels.holdout (review round 11, C8): 'untouched', or the list of its failed conditions, from the
+    committed state: the validation results reachable from origin/main before 09:30 ET on N0; no recorded read
+    before a granted entry (no 'holdout' void deviation); every holdout count and read from the pinned tree or the
+    new tree of a committed transport deviation; every granted collection batch with its completion (accrual log);
+    and no carried item paper-exposed above the protocol's fraction."""
+    failed = []
+    if not validation_state(ctx)["reachable_before_n0"]:
+        failed.append("the validation results were not reachable from origin/main before 09:30 ET on N0")
+    if "holdout" in (ctx.get("voids") or ()):
+        failed.append("a recorded holdout read preceded a committed granted entry")
+    allowed = {ctx["pinned_tree"]} | {d.get("new_tree") for d in guards.load_deviations(ctx["repo"])
+                                      if d.get("kind") == "transport"}
+    if any(x.get("study_tree") not in allowed for x in ctx["run_log"]
+           if x.get("stage") == "holdout" and x.get("purpose") in ("count", "count_fetch", "read", "read_fetch")):
+        failed.append("a holdout count or read ran from a tree other than the frozen tree or a transport deviation")
+    seq = gate.sequence(ctx["access_log"])
+    if not all(aid in seq["completions"] for aid, a in seq["granted"].items() if a["purpose"] == "collect"):
+        failed.append("a collection batch lacks its committed accrual log")
+    over = sorted(i for i, r in items.items() if r.get("carried", True) is not False and
+                  (r.get("paper_exposed_fraction") or 0.0) > CHRONO["paper_exposed_max_fraction"])
+    if over:
+        failed.append(f"paper-exposed fraction above {CHRONO['paper_exposed_max_fraction']}: {', '.join(over)}")
+    return "untouched" if not failed else failed
+
+
+def sealed_read_lines(ctx: dict) -> list:
+    """Every committed 'read_fetch' run-log line that sealed a snapshot (review round 11, F1)."""
+    return [x for x in ctx["run_log"] if x.get("stage") == "holdout" and x.get("purpose") == "read_fetch"
+            and x.get("input_snapshot_sha256s")]
+
+
+def deadline_passed(ctx: dict, now: float, deadline: float) -> bool:
+    """The read deadline has passed by the local clock and by a GitHub-recorded time: origin/main's tip is a signed
+    commit made at or after it (review round 11, F1), so a clock set forward cannot pass it early."""
+    tip = ctx.get("main_tip_time")
+    return now >= deadline and tip is not None and tip >= deadline
+
+
+def _spend_refused(ctx: dict, auth: dict, now: float, deadline: float) -> str:
+    """Review round 11, F1: when a refused 'read' authorization may write the not-read labels. A refusal is a failed
+    attempt, not a decision the operator can hold back: it is spent only (1) after the read deadline has passed by
+    a signed time, when no later read can be timely, (2) when no read has sealed a snapshot, since a sealed read is
+    only ever evaluated, (3) when it is the latest 'read' authorization in the committed access log, and (4) when no
+    granted 'read' authorization is open (that one is spent instead). Every refused authorization is committed
+    before it is spent (core.runner.context), so the spend is fully logged and pre-committed. Returns the reason."""
+    if sealed_read_lines(ctx):
+        raise HoldoutRefused("a granted read sealed its snapshot: only that read's evaluation is allowed, and a "
+                             "refused authorization cannot be spent")
+    reads = [r for r in ctx["access_log"] if r.get("record_kind") == "authorization" and r.get("purpose") == "read"]
+    if reads[-1]["authorization_id"] != auth["authorization_id"]:
+        raise HoldoutRefused(f"{auth['authorization_id']} is not the latest 'read' authorization; a held-back "
+                             "refusal cannot be spent")
+    seq = gate.sequence(ctx["access_log"])
+    if any(a["purpose"] == "read" and aid not in seq["completions"] for aid, a in seq["granted"].items()):
+        raise HoldoutRefused("a granted 'read' authorization is open: it, not a refusal, decides the read")
+    if not deadline_passed(ctx, now, deadline):
+        raise HoldoutRefused("a refused 'read' authorization writes the not-read labels only after the read deadline "
+                             "has passed by a signed commit on origin/main; before it, request the read again")
+    return f"refused: {auth.get('refusal')}"
+
+
+def _write_not_read(ctx, auth, authorization_id, carried, reason, now) -> dict:
+    path = Path(ctx["repo"]) / RESULTS_DIR / "holdout-read.json"
+    if auth.get("decision") == "granted":
+        gate.require_granted(ctx["access_log"], authorization_id, "read")
+    start = iso_utc(now)
+    digest = atomic_write_results(path, not_read_results(ctx, carried, reason))
+    from core.runner import run_line
+    logs.append_line(Path(ctx["repo"]) / RUN_LOG, run_line(
+        ctx, stage="holdout", purpose="read", commit=ctx["commit"], utc_start=start, utc_end=iso_utc(now),
+        snapshots=[], status="complete", results_sha256=digest,
+        extra={"authorization_id": authorization_id, "not_read": reason, "decision": auth.get("decision")}))
+    if auth.get("decision") == "granted":
+        logs.append_line(Path(ctx["repo"]) / ACCESS_LOG,
+                         gate.completion(authorization_id, iso_utc(now), "complete", None, 0, digest, []))
+    return {"results_sha256": digest, "read": False, "reason": reason}
+
+
 def read(ctx: dict, authorization_id: str, snapshot_root, transports, now: float, clock=driver.utc_now,
          B: int | None = None) -> dict:
-    """The single holdout read into results/holdout-read.json, or the not-read labels when its authorization was
-    refused, a count or the read's own fetch is void, or the deadline has passed. Two committed steps (review round
-    10, H2): the first run fetches and seals the read's snapshot and logs its line; the second, once that line is on
-    origin/main, evaluates over that snapshot only. The deadline is judged by recorded times too (M2): the
-    authorization and the fetch line must have reached origin/main before it, and the clock may not be earlier than
-    origin/main's tip."""
+    """The single holdout read into results/holdout-read.json. Two committed steps (review round 10, H2): the first
+    run fetches and seals the read's snapshot and logs its line; the second, once that line is on origin/main,
+    evaluates over that snapshot only.
+
+    Review round 11, F1: whether the holdout is read never depends on its outcome. Once any read has a committed
+    'read_fetch' line, the only allowed result is that read's evaluation over its sealed snapshot, whatever the
+    time; a read whose fetch line or evaluation came after the deadline carries the qualifier 'late-read' and its
+    labels stand. A granted read whose authorization reached origin/main before the deadline is always carried
+    out (a late fetch included). The not-read labels are written only for a granted read that has sealed nothing
+    when its authorization reached origin/main at or after the deadline, no final count exists, a count is void or
+    the holdout is void; and for a refused authorization only under _spend_refused."""
     from core.runner import check_clock
     check_clock(ctx, now)
     auth = _authorization(ctx, authorization_id)
     if auth.get("purpose") != "read":
         raise gate.NoAuthorization(f"{authorization_id} is not a 'read' authorization")
+    check_record_times(ctx)
     path = Path(ctx["repo"]) / RESULTS_DIR / "holdout-read.json"
     if path.exists():
         raise HoldoutRefused("the holdout read results file exists: the holdout is read once")
@@ -518,37 +693,29 @@ def read(ctx: dict, authorization_id: str, snapshot_root, transports, now: float
     _, last = window(ctx, blocks_done(ctx["run_log"]))
     deadline = read_deadline(ctx, last)
     no_final = final_count(ctx["run_log"]) is None
-    if no_final and now < deadline:
+    if no_final and not deadline_passed(ctx, now, deadline):
         raise HoldoutRefused("the read comes after the final count")
-    fl = fetch_line_of(ctx, "read", auth) if auth.get("decision") == "granted" else None
-    auth_reach = authorization_reach(ctx, authorization_id)
-    reason = None
     if auth.get("decision") != "granted":
-        reason = f"refused: {auth.get('refusal')}"
-    elif no_final:
-        reason = "no final holdout count by 15 sessions after the last holdout session (the holdout is void)"
-    elif now >= deadline or auth_reach is None or auth_reach >= deadline:
-        reason = "not completed by 15 sessions after the last holdout session"
-    elif fl is not None and (logs.line_reach_of(ctx["repo"], RUN_LOG, ctx["run_log"].index(fl)) or deadline) >= deadline:
-        reason = "the read's fetch reached origin/main after 15 sessions after the last holdout session"
-    elif any(x.get("void") for x in count_lines(ctx["run_log"])):
-        reason = "a holdout count was void (populations.fetch_failures)"
-    elif "holdout" in (ctx.get("voids") or ()):
-        reason = "the holdout is void (exposure_registry.update_rule)"
+        return _write_not_read(ctx, auth, authorization_id, carried, _spend_refused(ctx, auth, now, deadline), now)
+    gate.require_granted(ctx["access_log"], authorization_id, "read")
+    fl = fetch_line_of(ctx, "read", auth)
+    if fl is None:
+        auth_reach = authorization_reach(ctx, authorization_id)
+        reason = None
+        if no_final:
+            reason = "no final holdout count by 15 sessions after the last holdout session (the holdout is void)"
+        elif auth_reach is None or auth_reach >= deadline:
+            reason = "the read authorization reached origin/main at or after 15 sessions after the last holdout session"
+        elif any(x.get("void") for x in count_lines(ctx["run_log"])):
+            reason = "a holdout count was void (populations.fetch_failures)"
+        elif "holdout" in (ctx.get("voids") or ()):
+            reason = "the holdout is void (exposure_registry.update_rule)"
+        if reason is not None:
+            return _write_not_read(ctx, auth, authorization_id, carried, reason, now)
+        end = ctx["cal"].offset(last, T["search_sessions"])
+        require_reached_after(ctx, authorization_id, ctx["cal"].close(end) if end else float("inf"),
+                              "the last terminal-search window ended")                  # F2
     start, status, sha, digest = iso_utc(now), "failed", None, None
-    if reason is not None:
-        if auth.get("decision") == "granted":
-            gate.require_granted(ctx["access_log"], authorization_id, "read")
-        digest = atomic_write_results(path, not_read_results(ctx, carried, reason))
-        from core.runner import run_line
-        logs.append_line(Path(ctx["repo"]) / RUN_LOG, run_line(
-            ctx, stage="holdout", purpose="read", commit=ctx["commit"], utc_start=start, utc_end=iso_utc(now),
-            snapshots=[], status="complete", results_sha256=digest,
-            extra={"authorization_id": authorization_id, "not_read": reason}))
-        if auth.get("decision") == "granted":
-            logs.append_line(Path(ctx["repo"]) / ACCESS_LOG,
-                             gate.completion(authorization_id, iso_utc(now), "complete", None, 0, digest, []))
-        return {"results_sha256": digest, "read": False, "reason": reason}
     auth, blocks, n0, last, late, exposed, bases, enum_date = _setup(ctx, "read", authorization_id, snapshot_root)
     spec_for = _spec_factory(ctx, n0, last, late, exposed, carried)
     if fl is None:
@@ -558,6 +725,12 @@ def read(ctx: dict, authorization_id: str, snapshot_root, transports, now: float
     signs = {"H3-c": ((val or {}).get("items", {}).get("H3-c") or {}).get("estimate")}
     deviated = ctx["transport_deviation"] is not None or any(
         x.get("study_tree") != ctx["pinned_tree"] for x in ctx["run_log"] if x.get("stage") == "holdout")
+    fl_reach = logs.line_reach_of(ctx["repo"], RUN_LOG, ctx["run_log"].index(fl))
+    late_read = now >= deadline or fl_reach is None or fl_reach >= deadline
+    quals = (("transport-deviation",) if deviated else ()) + (("late-read",) if late_read else ())
+    # conditions that would have refused the read before its seal are reported, never turned into a not-read label
+    after_seal = ([f"void count (block {x.get('block')})" for x in count_lines(ctx["run_log"]) if x.get("void")]
+                  + (["holdout void (exposure_registry.update_rule)"] if "holdout" in (ctx.get("voids") or ()) else []))
     sha, rows = fl["input_snapshot_sha256s"][0], 0
     try:
         sealed, sha = _sealed(ctx, fl, bases, snapshot_root)
@@ -567,9 +740,10 @@ def read(ctx: dict, authorization_id: str, snapshot_root, transports, now: float
             res = not_read_results(ctx, carried, f"the read's fetch is void (rate {rate['rate']})")
         else:
             res = STG.evaluate_stage(spec_for(sealed), sealed, ctx["protocol"]["id"], carried=carried,
-                                     validation_signs=signs, B=B,
-                                     qualifiers=("transport-deviation",) if deviated else ())
-            res.update({"kind": "mover_v3_holdout_read", "read": True, "window": [n0, last]})
+                                     validation_signs=signs, B=B, qualifiers=quals)
+            res.update({"kind": "mover_v3_holdout_read", "read": True, "window": [n0, last],
+                        "late_read": late_read, "void_after_seal": after_seal,
+                        "holdout_label": holdout_label(ctx, res["items"])})
         res.update({"protocol_sha256": ctx["protocol_sha256"], "study_tree": ctx["tree"],
                     "runtime_lock_sha256": ctx["runtime_lock_sha256"], "input_snapshot_sha256": sha,
                     "fetch_incomplete_rate": rate["rate"]})

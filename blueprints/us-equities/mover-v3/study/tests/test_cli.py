@@ -14,6 +14,7 @@ import run
 from core import canon, gate, guards, logs, runner
 from core import stage as ST
 from core.params import ACCESS_LOG, DATA_DIR, DEVIATIONS, PROTOCOL_PATH, RESULTS_DIR, RUN_LOG, STUDY_PATH
+from core.store import Store
 from tests import fixture_repo as FR
 from tests import synth
 from tests.test_e2e import build_market
@@ -68,11 +69,20 @@ class StageRunsOnce(unittest.TestCase):
             fetch = ["fetch", "--stage", "validation", "--enumeration", str(fx["enumeration"]), "--snapshot", snap]
             fast = functools.partial(ST.evaluate_stage, B=200)
             with FR.isolated_bytecode(), mock.patch.object(run, "REPO", repo), \
-                    mock.patch.object(run, "transports", lambda: transports(market)), \
+                    mock.patch.object(run, "transports", lambda *_: transports(market)), \
                     mock.patch.object(run, "clock", fixed_clock), \
                     mock.patch.object(ST, "evaluate_stage", lambda *a, **k: fast(*a, **k)):
+                # review round 11, F4: the first run appends only its start line; nothing is fetched before it is
+                # committed and pushed
                 self.assertEqual(run.main(fetch), 0)
-                line = logs.read_lines(repo / RUN_LOG)[0]
+                self.assertEqual(logs.read_lines(repo / RUN_LOG)[0]["purpose"], "fetch_start")
+                self.assertEqual(market.calls, [])
+                with self.assertRaises(guards.Refused):
+                    run.main(fetch)
+                FR.commit_push(repo, "2026-11-30T01:00:00+00:00")
+                self.assertEqual(run.main(fetch), 0)
+                line = logs.read_lines(repo / RUN_LOG)[-1]
+                self.assertEqual(line["start_index"], 0)
                 self.assertEqual((line["purpose"], line["status"], line["study_tree"]), ("fetch", "complete", fx["tree"]))
                 sha = line["input_snapshot_sha256s"][0]
                 # F2: the next run refuses until the fetch line is committed and pushed
@@ -119,6 +129,32 @@ class StageRunsOnce(unittest.TestCase):
                 body = json.loads(results.read_text())
                 self.assertEqual(body["stage_labels"], [])
                 self.assertTrue(all(r["qualifiers"] == [] for r in body["items"].values()))
+
+
+class StageOrder(unittest.TestCase):
+    def test_development_is_evaluated_only_after_the_validation_fetch(self):
+        """Review round 11, F3: no development outcome exists before validation's snapshot is sealed and logged."""
+        line = {"stage": "development", "purpose": "fetch", "status": "complete", "input_snapshot_sha256s": ["a" * 64],
+                "fetch_incomplete_rate": 0.0}
+        with tempfile.TemporaryDirectory() as tmp:
+            ctx = {"repo": Path(tmp), "run_log": [line]}
+            with self.assertRaisesRegex(runner.RunRefused, "validation's complete fetch"):
+                runner.evaluate_run(ctx, "development", Path(tmp) / "snap", "a" * 64, None, None)
+            ctx["run_log"].append(dict(line, stage="validation", input_snapshot_sha256s=["b" * 64]))
+            with self.assertRaises(FileNotFoundError):      # past the order check, to the sealed snapshot
+                runner.evaluate_run(ctx, "development", Path(tmp) / "snap", "a" * 64, None, None)
+
+
+class StageTesting(unittest.TestCase):
+    def test_a_dropped_2020_does_not_untest_development(self):
+        """Review round 11, C9 (coverage_rule.item_rule): dropping 2020 sets p = 1 at validation only; development
+        is computed unless every development year is dropped, and says so."""
+        cov = {"items_tested": False, "dropped_years": frozenset({2020})}
+        self.assertEqual(runner.stage_testing("validation", cov), {"tested": False})
+        self.assertEqual(runner.stage_testing("development", cov), {"tested": True, "development_computed": True})
+        cov = {"items_tested": True, "dropped_years": frozenset({2017, 2018, 2019})}
+        self.assertEqual(runner.stage_testing("development", cov), {"tested": False, "development_computed": False})
+        self.assertEqual(runner.stage_testing("validation", cov), {"tested": True})
 
 
 def amend_main(repo, now, *argv):
@@ -323,11 +359,13 @@ class ContextRefusals(unittest.TestCase):
 
             def main(*argv):
                 with FR.isolated_bytecode(), mock.patch.object(run, "REPO", repo), \
-                        mock.patch.object(run, "transports", lambda: transports(market)), \
+                        mock.patch.object(run, "transports", lambda *_: transports(market)), \
                         mock.patch.object(run, "clock", fixed_clock):
                     return run.main(list(argv))
             main("fetch", "--stage", "validation", "--enumeration", str(fx["enumeration"]), "--snapshot", snap)
-            sha = logs.read_lines(repo / RUN_LOG)[0]["input_snapshot_sha256s"][0]
+            FR.commit_push(repo, "2027-01-03T00:00:00+00:00")                # the start line (F4)
+            main("fetch", "--stage", "validation", "--enumeration", str(fx["enumeration"]), "--snapshot", snap)
+            sha = logs.read_lines(repo / RUN_LOG)[-1]["input_snapshot_sha256s"][0]
             FR.commit_push(repo, "2027-01-04T00:00:00+00:00")
             check = ["transport-check", "--stage", "validation", "--enumeration", str(fx["enumeration"]),
                      "--snapshot", snap, "--sha", sha]
@@ -346,17 +384,35 @@ class ContextRefusals(unittest.TestCase):
             FR.commit_push(repo, "2027-01-04T02:00:00+00:00")
             with self.assertRaises(guards.Refused):           # a self-declared pass without its logged output
                 self.ctx(repo)
-            self.assertEqual(main(*check), 0)
+            # review round 11, F3: a sealed holdout snapshot is checked too (here a copy of the validation snapshot
+            # sealed as a collection batch), so the check needs --holdout-root
+            hroot = Path(tmp) / "holdout"
+            self.assertEqual(Store.read(snap, sha).write(hroot / "collect-collect-001"), sha)
+            logs.append_line(repo / ACCESS_LOG, {"utc": "x", "record_kind": "authorization",
+                                                 "authorization_id": "collect-001", "purpose": "collect",
+                                                 "decision": "granted", "refusal": None, "requested_items": [],
+                                                 "retry_of": None})
+            logs.append_line(repo / ACCESS_LOG, gate.completion("collect-001", "x", "complete", sha, 0, None, []))
+            FR.commit_push(repo, "2027-01-04T02:30:00+00:00")
+            with self.assertRaisesRegex(runner.RunRefused, "holdout-root"):
+                main(*check)
+            self.assertEqual(main(*check, "--holdout-root", str(hroot)), 0)
             rel = f"{RESULTS_DIR}/transport-check-{new_tree[:12]}.json"
             body = json.loads((repo / rel).read_text())
             self.assertTrue(body["passes"], body)
+            self.assertEqual(list(body["holdout"]), ["collect-collect-001"])
+            self.assertTrue(body["holdout"]["collect-collect-001"]["live"]["passes"])
+            # the live sample's seed is the first origin/main commit holding the new tree
+            first = FR.sh(repo, "log", "--first-parent", "--reverse", "--format=%H", "origin/main", "--",
+                          STUDY_PATH).splitlines()[-1]
+            self.assertEqual(body["live"]["seed"], first)
             self.assertEqual((body["new_tree"], body["changed_paths"]), (new_tree, ["fetch/transport.py"]))
             line = logs.read_lines(repo / RUN_LOG)[-1]
             self.assertEqual((line["purpose"], line["study_tree"], line["results_sha256"]),
                              ("transport_check", new_tree, canon.sha256_file(repo / rel)))
             FR.commit_push(repo, "2027-01-04T03:00:00+00:00")
             with self.assertRaises(runner.RunRefused):         # a tree's check runs once
-                main(*check)
+                main(*check, "--holdout-root", str(hroot))
             wrong = {**forged, "number": 2, "transport_check": {"passes": True, "output_path": rel,
                                                                  "output_sha256": "0" * 64}}
             good = {**forged, "number": 3, "transport_check": {"passes": True, "output_path": rel,
@@ -409,11 +465,14 @@ class ContextRefusals(unittest.TestCase):
             self.assertEqual(self.ctx(repo)["voids"], frozenset({"tests"}))
             fast = functools.partial(ST.evaluate_stage, B=200)
             with FR.isolated_bytecode(), mock.patch.object(run, "REPO", repo), \
-                    mock.patch.object(run, "transports", lambda: transports(market)), \
+                    mock.patch.object(run, "transports", lambda *_: transports(market)), \
                     mock.patch.object(run, "clock", fixed_clock), \
                     mock.patch.object(ST, "evaluate_stage", lambda *a, **k: fast(*a, **k)):
-                run.main(["fetch", "--stage", "validation", "--enumeration", str(fx["enumeration"]), "--snapshot", snap])
-                sha = logs.read_lines(repo / RUN_LOG)[0]["input_snapshot_sha256s"][0]
+                fetch = ["fetch", "--stage", "validation", "--enumeration", str(fx["enumeration"]), "--snapshot", snap]
+                run.main(fetch)
+                FR.commit_push(repo, "2026-11-30T00:00:00+00:00")            # the start line (F4)
+                run.main(fetch)
+                sha = logs.read_lines(repo / RUN_LOG)[-1]["input_snapshot_sha256s"][0]
                 FR.commit_push(repo, "2026-12-01T01:00:00+00:00")
                 run.main(["evaluate", "--stage", "validation", "--enumeration", str(fx["enumeration"]), "--snapshot",
                           snap, "--sha", sha])

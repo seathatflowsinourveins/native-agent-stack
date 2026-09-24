@@ -116,6 +116,38 @@ class Arms(unittest.TestCase):
         self.assertEqual(tr["exit"], "terminal_zero")
         empties = [k for k, r in store.req.items() if r["kind"] == "quote_exit" and store.empty(k, "MOVR")]
         self.assertEqual(len(empties), 6)  # W0 (15:55 + 300 s is the close, so no W1) and E+1 .. E+5
+        # review round 11, C6: the empty windows are carried on the trade and counted per item
+        self.assertEqual((tr["exit_windows_empty"], tr["search_windows_empty"]), (1, 5))
+        no_quote = resolve(self.ev, "b_lane", ctx_for(cal), Store(), {})
+        self.assertEqual((no_quote["status"], no_quote.get("entry_window_empty")), ("no_entry", True))
+        tr["tercile"], no_quote["tercile"] = "low", "low"
+        ev = dict(self.ev, data={"empty": ["event_auctions"]})
+        h3c = [{"symbol": "MOVR", "t": self.t, "status": "complete"}]
+        got = EV.empty_by_item(("H1-D-b_lane-low", "H3-a", "H3-c"), [tr, no_quote], h3c, [ev])
+        self.assertEqual(got["H1-D-b_lane-low"], {"entry_window": 1, "event_request:event_auctions": 2,
+                                                  "exit_windows": 1, "search_windows": 5})
+        self.assertEqual(got["H3-a"], {})
+        self.assertEqual(got["H3-c"], {"event_request:event_auctions": 1})
+
+    def test_per_event_close_differences_never_change_membership(self):
+        """Review round 11, C7 (universe_and_identity.request_shapes): the screen close governs membership; a
+        per-event official close of t or t-1 that differs from the screen's is counted, and the event stands."""
+        from collections import Counter
+        from core import events as EVS
+        from core import formulas as FM
+        cal, t, ev = self.cal, self.t, self.ev
+        data = {"incomplete": [], "empty": [], "daily": {"raw": ev["raw"], "split": ev["split"], "all": ev["all"]},
+                "minute": ev["minute"], "prints": ev["prints"]}
+        close_t, prev = FM.official_close(ev["prints"][t]), FM.official_close(ev["prints"][cal.offset(t, -1)])
+        same, differs = Counter(), Counter()
+        a = EVS.build_event(cal, {"symbol": "MOVR", "t": t, "close_t": close_t, "prev_close": prev}, data, same)
+        b = EVS.build_event(cal, {"symbol": "MOVR", "t": t, "close_t": close_t + 0.5, "prev_close": prev - 0.25},
+                            data, differs)
+        self.assertEqual(same["per_event_close_differs_from_screen"], 0)
+        self.assertEqual(differs["per_event_close_differs_from_screen"], 2)
+        self.assertIsNotNone(a)
+        self.assertIsNotNone(b)
+        self.assertEqual({k: v for k, v in a.items() if k != "data"}, {k: v for k, v in b.items() if k != "data"})
 
     def test_cash_merger_inside_the_hold_books_the_last_eligible_bid(self):
         cal, d = self.cal, self.d

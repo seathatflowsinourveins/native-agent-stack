@@ -6,10 +6,14 @@ snapshot of each request kind (or the pre-freeze native dry run's snapshot, free
       equal the sealed request records byte for byte;
   (b) reparse: every sealed raw page, re-parsed offline by the new tree, gives byte-identical normalized records
       (the sealed normalized_sha256 of every page, not a sample);
-  (c) live: the new transport re-requests the first 200 requests of each kind, in sha256 order of their request
-      records, and their normalized records (every field; the vintage is not part of them) equal the sealed ones.
+  (c) live: the new transport re-requests 200 requests of each kind, the first in sha256 order of the seed
+      followed by their request records, and their normalized records (every field; the vintage is not part of
+      them) equal the sealed ones. Review round 11, F3: the seed is the id of the first origin/main commit holding
+      the new tree, a signed merge made after the transport was written, so the sample cannot be known when the
+      transport is written; with no seed the order is the plain sha256 order of the records.
 Parsing and planning are evaluation code outside study/fetch/, so (a) and (b) can fail only if the tree changed
-outside study/fetch/; they are kept as mechanical evidence of that.
+outside study/fetch/; they are kept as mechanical evidence of that. (b) and (c) also run against every sealed
+holdout snapshot (collection batches, count and read snapshots; run.py transport-check --holdout-root).
 """
 from __future__ import annotations
 
@@ -52,14 +56,18 @@ def _merged(req, pages) -> str:
     return dumps(tmp.parsed(req["key"]))
 
 
-def check_live(store, transports, per_kind: int = 200) -> dict:
+def sample_order(req: dict, seed: str | None = None) -> str:
+    return hashlib.sha256(((seed + "\n") if seed else "").encode() + record(req).encode()).hexdigest()
+
+
+def check_live(store, transports, per_kind: int = 200, seed: str | None = None) -> dict:
     by_kind = {}
     for key, req in store.req.items():
         if store.status(key) == "complete":
             by_kind.setdefault(req["kind"], []).append(req)
     results, bad = {}, []
     for kind, reqs in sorted(by_kind.items()):
-        reqs = sorted(reqs, key=lambda r: hashlib.sha256(record(r).encode()).hexdigest())[:per_kind]
+        reqs = sorted(reqs, key=lambda r: sample_order(r, seed))[:per_kind]
         ok = 0
         for req in reqs:
             res = transports[req["api"]].get(req["endpoint"], req["params"])
@@ -68,10 +76,13 @@ def check_live(store, transports, per_kind: int = 200) -> dict:
             else:
                 bad.append(req["key"])
         results[kind] = {"requested": len(reqs), "equal": ok}
-    return {"passes": not bad, "by_kind": results, "mismatches": bad}
+    return {"passes": not bad, "by_kind": results, "mismatches": bad, "seed": seed}
 
 
-def reproduction_check(planner, store, transports, changed_paths: list, fetch_prefix: str) -> dict:
+def reproduction_check(planner, store, transports, changed_paths: list, fetch_prefix: str, seed: str | None = None,
+                       holdout_stores: tuple = ()) -> dict:
+    """holdout_stores: [(label, sealed store)] of every sealed holdout snapshot (review round 11, F3), each checked
+    by (b) and (c); (a) needs the holdout planners and is a deterministic function of unchanged code."""
     only_fetch = tree_diff_only_under_fetch(changed_paths, fetch_prefix)
     out = {"only_fetch_changed": only_fetch}
     if not only_fetch:
@@ -79,6 +90,10 @@ def reproduction_check(planner, store, transports, changed_paths: list, fetch_pr
         return out
     out["plan"] = check_plan(planner, store)
     out["reparse"] = check_reparse(store)
-    out["live"] = check_live(store, transports)
-    out["passes"] = out["plan"]["passes"] and out["reparse"]["passes"] and out["live"]["passes"]
+    out["live"] = check_live(store, transports, seed=seed)
+    out["holdout"] = {}
+    for label, st in holdout_stores:
+        out["holdout"][label] = {"reparse": check_reparse(st), "live": check_live(st, transports, seed=seed)}
+    out["passes"] = out["plan"]["passes"] and out["reparse"]["passes"] and out["live"]["passes"] and all(
+        h["reparse"]["passes"] and h["live"]["passes"] for h in out["holdout"].values())
     return out

@@ -175,7 +175,10 @@ def item_result(item: str, stage: str, rows: list, sessions: list, protocol_id: 
            "median": float(np.median([r["value"] for r in rows])) if rows else None,
            "p": p, "p_normal_tail": p_n, "mde": mde_v, "mde_excluded": ST.mde_excluded(item, boot, mde_v),
            "n_ok": ST.minimum_met(item, stage, n, n_hi, n_lo),
-           "lineage_confirmed": ST.lineage_confirmed(p, p_n)}
+           "lineage_confirmed": ST.lineage_confirmed(p, p_n),
+           # outcome_reporting.rule (review round 11, C12): the 95% percentile interval of the estimate, reported
+           # with the opposite_direction flag set by evaluate()
+           "interval_95": [ST.bound(boot, 0.025), ST.bound(boot, 0.975)]}
     res["sensitivities"] = sensitivities(item, rows)
     if item == "H1-D":
         res["two_way_clustered"] = ST.two_way_cluster_difference(
@@ -197,6 +200,50 @@ def item_result(item: str, stage: str, rows: list, sessions: list, protocol_id: 
                                  for g in ("high", "low")}
     res["paper_exposed_fraction"] = (sum(1 for r in rows if r["rec"].get("paper_exposed")) / len(rows)) if rows else 0.0
     return res
+
+
+def opposite_direction(item: str, stage: str, estimate, validation_sign=None) -> bool:
+    """outcome_reporting.rule (review round 11, C12): an estimate in the direction opposite to a one-sided
+    alternative, or for H3-c at the holdout opposite to the validation sign, is reported descriptively with its
+    estimate and interval_95 and supports no claim of an effect in that direction. Its label is unchanged: it never
+    passes, and it may be 'not_supported_mde_excluded', because its interval then excludes the alternative's size."""
+    if estimate is None or estimate == 0:
+        return False
+    alt = ALTERNATIVE[item]
+    if alt == "greater":
+        return estimate < 0
+    if alt == "less":
+        return estimate > 0
+    return stage == "holdout" and validation_sign is not None and validation_sign != 0 and \
+        np.sign(estimate) != np.sign(validation_sign)
+
+
+def empty_by_item(computed: tuple, trades: list, h3c: list, events: list) -> dict:
+    """universe_and_identity.empty_responses per item (review round 11, C6): over the item's trades of every status
+    (H3-c: its events), the per-event requests answered with no row by kind, and the entry, exit and search quote
+    windows answered with no row."""
+    by_event = {(ev["symbol"], ev["t"]): ev for ev in events}
+    out = {}
+    for item in computed:
+        if item == "H3-c":
+            recs = h3c
+        else:
+            recs = [tr for tr in trades if tr["arm"] == ARM_OF[item]]
+            if item == "H1-D":
+                recs = [tr for tr in recs if tr.get("tercile") in ("high", "low")]
+            elif item == "H1-D-b_lane-low":
+                recs = [tr for tr in recs if tr.get("tercile") == "low"]
+        row = Counter()
+        for r in recs:
+            ev = by_event.get((r.get("symbol"), r.get("t"))) or {}
+            for k in (ev.get("data") or {}).get("empty", ()):
+                row[f"event_request:{k}"] += 1
+            if item != "H3-c":
+                row["entry_window"] += bool(r.get("entry_window_empty"))
+                row["exit_windows"] += r.get("exit_windows_empty", 0)
+                row["search_windows"] += r.get("search_windows_empty", 0)
+        out[item] = dict(sorted(row.items()))
+    return out
 
 
 def a_b_overlap(trades: list) -> dict:
@@ -252,7 +299,8 @@ def evaluate(stage: str, events: list, ctx, store, *, protocol_id: str, stage_se
                                                  for t in trades if t.get("rename_sensitivity"))),
               "backward_incomplete": sum(1 for t in trades if t.get("backward_incomplete")),
               # arms.a_intraday: H3-a's entries are the b_lane entries; the overlap is reported (review round 10, F13)
-              "a_intraday_b_lane_entry_overlap": a_b_overlap(trades)}
+              "a_intraday_b_lane_entry_overlap": a_b_overlap(trades),
+              "empty_by_item": empty_by_item(computed, trades, h3c, events)}
     is_void = bool(void and void.get("void"))
     items = {}
     for item in ITEM_IDS:
@@ -298,6 +346,7 @@ def evaluate(stage: str, events: list, ctx, store, *, protocol_id: str, stage_se
         r["p_stage"] = p_stage[i]
         r["label"] = labels[i]
         r["qualifiers"] = ST.qualifiers(stage, labels[i], r["lineage_confirmed"], qualifiers)
+        r["opposite_direction"] = opposite_direction(i, stage, r["estimate"], (validation_signs or {}).get("H3-c"))
     return {"stage": stage, "tested": tested, "void": void, "items": items, "labels": labels,
             "stage_labels": stage_labels,
             "verdicts": ST.hypothesis_verdict(stage, labels, {i: items[i]["qualifiers"] for i in ITEM_IDS}),

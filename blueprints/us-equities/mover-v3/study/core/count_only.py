@@ -160,12 +160,14 @@ def part1_counts(store, cal, sessions: list, symbols: list, actions: list) -> di
                 b = raw.get(x, {}).get(s)
                 pr = prints.get(x, {})
                 ex = FM.listing_exchange(pr.get(s)) or "none"
-                # identity diagnostic
+                # identity diagnostic, per year and per listing exchange (review round 11, C5)
                 db = draw.get(x, {}).get(s)
                 if db and db["c"] >= 1.0:
                     c[y]["default_asof_pairs_close_ge_1"] += 1
+                    c[y][f"default_asof_pairs_close_ge_1:{ex}"] += 1
                     if (b is None or _ohlcv(db) != _ohlcv(b)) and x not in new_symbols:
                         c[y]["identity_unreached_pairs"] += 1
+                        c[y][f"identity_unreached_pairs:{ex}"] += 1
                         c[y]["_unreached:" + x] = 1
                 if not b:
                     continue
@@ -215,27 +217,34 @@ def phase2_counts(store, cal, sessions: list, symbols: list, c: dict) -> None:
             if store.status(reqs["screen_daily_raw"]["key"]) != "complete":
                 continue
             raw = store.parsed(reqs["screen_daily_raw"]["key"])
+            prints = store.parsed(reqs["screen_auctions"]["key"]) \
+                if store.status(reqs["screen_auctions"]["key"]) == "complete" else {}
             with_bar = [x for x in batch if (raw.get(x, {}).get(s) or {}).get("c", 0) >= 1.0]
             for req in part1_phase2(cal, s, with_bar):
                 x = req["params"]["symbols"]
                 st = store.status(req["key"])
+                ex = FM.listing_exchange(prints.get(x, {}).get(s)) or "none"
+
+                def tally(name, ex=ex, y=y):       # per year and per listing exchange (review round 11, C5)
+                    c[y][name] += 1
+                    c[y][f"{name}:{ex}"] += 1
                 if req["kind"] == "count_coverage_quotes":
                     stamp = plan_stamp(req)
                     if st != "complete":
-                        c[y]["coverage_stamps_fetch_incomplete"] += 1
+                        tally("coverage_stamps_fetch_incomplete")
                         continue
                     qs = store.parsed(req["key"]).get(x, [])
-                    c[y]["coverage_stamps_with_eligible" if stamp_has_eligible(cal, qs, stamp)
-                         else "coverage_stamps_without_eligible"] += 1
+                    tally("coverage_stamps_with_eligible" if stamp_has_eligible(cal, qs, stamp)
+                          else "coverage_stamps_without_eligible")
                 else:
                     if (raw.get(x, {}).get(s) or {}).get("v", 0) <= 0:
                         continue
                     if st != "complete":
-                        c[y]["minute_pairs_fetch_incomplete"] += 1
+                        tally("minute_pairs_fetch_incomplete")
                         continue
                     rows = store.parsed(req["key"]).get(x, [])
                     have = any(cal.open(s) <= b["t"] < cal.close(s) for b in rows)
-                    c[y]["minute_pairs_with_regular_bar" if have else "minute_pairs_without_regular_bar"] += 1
+                    tally("minute_pairs_with_regular_bar" if have else "minute_pairs_without_regular_bar")
 
 
 def plan_stamp(req) -> float:
@@ -318,18 +327,40 @@ DRY_RUN_WINDOW = ("2021-01-04", "2024-10-31")   # after validation, before the h
 
 
 def check_dry_run_window(sessions: list) -> None:
-    """The dry run reads only an already exposed window outside every v3 stage: 2021-01-04 .. 2024-10-31 (the
-    holdout breakpoint screen starts 2024-11-01), including the E+5 search window of its last session."""
+    """A first, calendar-free bound on the sessions: 2021-01-04 .. 2024-10-17 (the holdout breakpoint screen starts
+    2024-11-01, and E+5 of the last session must end before it). It is necessary, not sufficient: the lookbacks of
+    a session reach further back (review round 11, C1), so check_dry_run_reach bounds every planned request."""
     bad = [s for s in sessions if not DRY_RUN_WINDOW[0] <= s <= "2024-10-17"]
     if not sessions or bad:
         raise ValueError(f"dry-run sessions must lie in {DRY_RUN_WINDOW[0]} .. 2024-10-17 (so every window ends "
                          f"before {DRY_RUN_WINDOW[1]}): {bad[:5]}")
 
 
+def check_dry_run_reach(reqs: list) -> None:
+    """Review round 11, C1: every planned dry-run request, not only its session, lies inside the already exposed
+    window: its start (a date, or the UTC date of a timestamp: a minute-bar start at 04:00 ET or a quote-window
+    start) is on or after 2021-01-04 and its end on or before 2024-10-31. The per-event daily bars reach t-60, the
+    auctions t-22, the minute bars 04:00 ET of t-19 and the screen s-1, so a session earlier than about
+    cal.offset('2021-01-04', 60) is refused. Any earlier request would read v3 validation data before the freeze,
+    which exposure_registry.update_rule forbids."""
+    bad = []
+    for r in reqs:
+        p = r.get("params") or {}
+        start, end = p.get("start"), p.get("end")
+        if not isinstance(start, str) or not isinstance(end, str) or start[:10] < DRY_RUN_WINDOW[0] \
+                or end[:10] > DRY_RUN_WINDOW[1]:
+            bad.append((r["kind"], start, end))
+    if not reqs or bad:
+        raise ValueError(f"dry-run requests must reach only {DRY_RUN_WINDOW[0]} .. {DRY_RUN_WINDOW[1]}; "
+                         f"{len(bad)} do not, for example {sorted(bad)[:3]}")
+
+
 def dry_run_requests(cal, sessions: list, symbols: list) -> list:
     """The plumbing check on an already exposed window: the screen of each session, and for each (symbol, session)
     the per-event requests, the b_lane entry window and every forward exit window (W0 with the prevailing-quote
-    lookback, W1 and the search windows E+1 .. E+5; review round 10, F6), with asof = the session."""
+    lookback, W1 and the search windows E+1 .. E+5; review round 10, F6), with asof = the session. It refuses a plan
+    with any request outside the exposed window (check_dry_run_reach; review round 11, C1)."""
+    check_dry_run_window(sessions)
     out = []
     for s in sessions:
         out.extend(plan.screen_requests(cal, s, symbols))
@@ -340,14 +371,16 @@ def dry_run_requests(cal, sessions: list, symbols: list) -> list:
             e, stamp, _ = plan.planned_exit(cal, s, "b_lane", end)
             for w in plan.exit_windows(cal, e, stamp):
                 out.append(plan.quote_request("quote_exit", x, s, w[0], w[1]))
-    return sorted({r["key"]: r for r in out}.values(), key=lambda r: r["key"])
+    out = sorted({r["key"]: r for r in out}.values(), key=lambda r: r["key"])
+    check_dry_run_reach(out)
+    return out
 
 
 def dry_run(cal, sessions: list, symbols: list, transports: dict, snapshot_root, fetch_date: str,
             clock=driver.utc_now) -> dict:
     """freeze_preconditions: the native dry run through core/driver.py and the transport, sealed, re-read from the
     seal and counted (counts only; run.py dry-run writes the output with its run-log line)."""
-    check_dry_run_window(sessions)
+    dry_run_requests(cal, sessions, symbols)            # refuses before any fetch (review round 11, C1)
     store = Store()
     root = Path(snapshot_root) / "dry-run"
     res = driver.stage_fetch(lambda st: dry_run_requests(cal, sessions, symbols), transports, store, fetch_date,

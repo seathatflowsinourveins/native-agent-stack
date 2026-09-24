@@ -57,6 +57,58 @@ class TransportRetry(unittest.TestCase):
         self.assertEqual(len(res["pages"]), 11)
 
 
+RATED = {"exposure_registry": {"pre_freeze_access_path": {"rate_limit": {"per_minute": 200, "source": "synthetic"}}}}
+
+
+class TransportPacing(unittest.TestCase):
+    """Review round 11, C2: the child's transport paces every page request, retries included, at the pinned
+    per-minute rate with one pacer for both hosts, and an HTTP 429 waits a full rate window before its retry."""
+
+    def test_requests_are_paced_at_the_pinned_rate_across_hosts(self):
+        from core import transport_proc
+        from fetch.transport import Pacer
+        clock, slept = {"t": 1000.0}, []
+
+        def sleep(s):
+            slept.append(round(s, 6))
+            clock["t"] += s
+        pacer = Pacer(120, sleep=sleep, monotonic=lambda: clock["t"])
+        cal = synth.calendar()
+        m = synth.FakeMarket(cal)
+        a = Transport(opener=m.opener, headers={}, sleep=sleep, pacer=pacer)
+        b = Transport(opener=m.opener, headers={}, sleep=sleep, host="https://trading.example", pacer=pacer)
+        for t in (a, b, a, b):
+            t.get("/v2/stocks/auctions", {"symbols": "A", "start": "2020-01-02", "end": "2020-01-02"})
+        self.assertEqual(slept, [0.5, 0.5, 0.5])            # 120 per minute: one slot every 0.5 s, shared
+        apis = transport_proc.worker_apis(90)
+        self.assertIs(apis["data"].pacer, apis["trading"].pacer)
+        self.assertAlmostEqual(apis["data"].pacer.gap, 60 / 90)
+        self.assertEqual(transport_proc.worker_apis()["data"].pacer.gap, 0.0)
+        self.assertEqual(transport_proc.per_minute_arg(["--per-minute", "200.0"]), 200.0)
+        tr = transport_proc.transports(per_minute=200)
+        self.assertEqual(tr["data"].proc.cmd[-2:], ["--per-minute", "200.0"])
+
+    def test_http_429_waits_a_full_rate_window(self):
+        from fetch.transport import RATE_WINDOW_S
+        cal = synth.calendar()
+        m = synth.FakeMarket(cal)
+        calls = []
+
+        def opener(url, headers, timeout):
+            calls.append(url)
+            return (429, b"{}") if len(calls) <= 2 else m.opener(url, headers, timeout)
+        slept = []
+        res = Transport(opener=opener, headers={}, sleep=slept.append).get(
+            "/v2/stocks/auctions", {"symbols": "A", "start": "2020-01-02", "end": "2020-01-02"})
+        self.assertTrue(res["complete"])
+        self.assertEqual(slept, [RATE_WINDOW_S, RATE_WINDOW_S])
+
+    def test_run_py_refuses_a_fetch_without_the_pinned_rate(self):
+        import run
+        with self.assertRaisesRegex(ValueError, "rate_limit"):
+            run.transports({"exposure_registry": {"pre_freeze_access_path": {"rate_limit": {"per_minute": None}}}})
+
+
 class TransportIsTransportOnly(unittest.TestCase):
     def test_fetch_directory_imports_no_evaluation_code_and_derives_nothing(self):
         for path in FETCH_DIR.glob("*.py"):
@@ -110,9 +162,9 @@ class TransportProcess(unittest.TestCase):
             tr["data"].proc.close()
 
     def test_run_py_never_imports_the_fetch_directory(self):
-        code = ("import sys; sys.dont_write_bytecode = True; sys.path.insert(0, %r); import run; t = run.transports(); "
+        code = ("import sys; sys.dont_write_bytecode = True; sys.path.insert(0, %r); import run; t = run.transports(%r); "
                 "import core.runner, core.holdout, core.stage; "
-                "print(sorted(m for m in sys.modules if m == 'fetch' or m.startswith('fetch.')))" % str(FETCH_DIR.parent))
+                "print(sorted(m for m in sys.modules if m == 'fetch' or m.startswith('fetch.')))" % (str(FETCH_DIR.parent), RATED))
         out = subprocess.run([sys.executable, "-I", "-B", "-c", code], capture_output=True, text=True, check=True)
         self.assertEqual(out.stdout.strip(), "[]")
 

@@ -79,7 +79,7 @@ class HoldoutPath(unittest.TestCase):
 
             def main(*argv):
                 with FR.isolated_bytecode(), mock.patch.object(run, "REPO", repo), \
-                        mock.patch.object(run, "transports", lambda: transports(m)), \
+                        mock.patch.object(run, "transports", lambda *_: transports(m)), \
                         mock.patch.object(run, "now", lambda: clock_now["t"]), \
                         mock.patch.object(run, "clock", lambda: FR.git_date(clock_now["t"])[:19] + "Z"):
                     return run.main(list(argv))
@@ -213,6 +213,9 @@ class HoldoutPath(unittest.TestCase):
             self.assertNotIn("H1", res["verdicts"])        # review round 10, F8: no carried H1 item, no H1 verdict
             self.assertEqual(res["items"]["H3-a"]["n"], 1)
             self.assertEqual(res["items"]["H3-a"]["paper_exposed_fraction"], 1.0)    # the accrual log's order
+            # review round 11, C8: the holdout's untouched status names its failed condition
+            self.assertEqual(res["holdout_label"], ["paper-exposed fraction above 0.05: H3-a, H3-c"])
+            self.assertEqual((res["late_read"], res["void_after_seal"]), (False, []))     # F1
             self.assertEqual(res["labels"]["H3-a"], "underpowered")
             self.assertNotIn("b_lane:filled", res["counts"]["trades_by_arm_status"])
             self.assertEqual(access()[-1]["record_kind"], "completion")
@@ -244,10 +247,11 @@ class NotRead(unittest.TestCase):
             logs.append_line(repo / ACCESS_LOG, {"utc": "x", "record_kind": "authorization", "authorization_id":
                                                  "read-001", "purpose": "read", "decision": "granted", "refusal": None,
                                                  "requested_items": ["H3-a"], "retry_of": None})
-            FR.commit_push(repo, "2027-12-20T00:00:00+00:00")
-            ctx = runner_ctx(repo)
+            # review round 11, F1: an authorization that reached main after the deadline and sealed nothing
             late = ctx["cal"].close(ctx["cal"].offset(last, 16))
-            out = holdout.read(ctx, "read-001", str(Path(tmp) / "snap"), {}, late)
+            FR.commit_push(repo, FR.git_date(late))
+            ctx = runner_ctx(repo)
+            out = holdout.read(ctx, "read-001", str(Path(tmp) / "snap"), {}, late + 60)
             self.assertFalse(out["read"])
             body = json.loads((repo / RESULTS_DIR / "holdout-read.json").read_text())
             self.assertEqual(body["labels"]["H3-a"], "not supported (holdout not read)")
@@ -317,7 +321,140 @@ class NotRead(unittest.TestCase):
                 holdout.read(runner_ctx(repo), "read-001", str(Path(tmp) / "snap"), {}, deadline - 3600)
             out = holdout.read(runner_ctx(repo), "read-001", str(Path(tmp) / "snap"), {}, deadline + 120)
             self.assertFalse(out["read"])
-            self.assertTrue(out["reason"].startswith("not completed"))
+            self.assertTrue(out["reason"].startswith("the read authorization reached origin/main at or after"))
+
+
+FINAL_COUNT = {"utc_start": "2027-12-10T00:00:00Z", "stage": "holdout", "purpose": "count", "status": "complete",
+               "results_sha256": "c" * 64, "block": 0,
+               "extension": {"extend": False, "below_minimum": [], "underpowered": []}, "void": False}
+
+
+def auth_rec(aid, purpose, decision, refusal=None, retry_of=None):
+    return {"utc": "x", "record_kind": "authorization", "authorization_id": aid, "purpose": purpose,
+            "decision": decision, "refusal": refusal, "requested_items": ["H3-a"], "retry_of": retry_of}
+
+
+class ReadDecidedBeforeOutcome(unittest.TestCase):
+    """Review round 11, F1: whether the holdout is read never depends on its outcome. A refused 'read' authorization
+    cannot be held back and spent once a later granted read has sealed its snapshot (the exit quotes), and a sealed
+    read is evaluated even when its evaluation comes after the deadline."""
+
+    def test_a_held_back_refusal_cannot_be_spent_after_a_granted_read_sealed(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            fx = FR.build(tmp)
+            repo, root = fx["repo"], str(Path(tmp) / "snap")
+            ctx = runner_ctx(repo)
+            _, last = holdout.window(ctx, 0)
+            deadline = holdout.read_deadline(ctx, last)
+            logs.append_line(repo / RUN_LOG, {**FINAL_COUNT, "sessions": [ctx["n0_pinned"], last]})
+            FR.commit_push(repo, FR.git_date(deadline - 10 * 86400))
+            # the manufactured refusal: a 'read' requested while a granted collect has no completion
+            logs.append_line(repo / ACCESS_LOG, auth_rec("collect-001", "collect", "granted"))
+            logs.append_line(repo / ACCESS_LOG, auth_rec(
+                "read-002", "read", "refused", "an earlier granted authorization has no committed completion record"))
+            logs.append_line(repo / ACCESS_LOG, gate.completion("collect-001", "x", "complete", "b" * 64, 0, None, []))
+            logs.append_line(repo / ACCESS_LOG, auth_rec("read-004", "read", "granted"))
+            FR.commit_push(repo, FR.git_date(deadline - 6 * 86400))
+            # step 1 of the granted read sealed its snapshot and its line is on origin/main
+            logs.append_line(repo / RUN_LOG, {"utc_start": "x", "stage": "holdout", "purpose": "read_fetch",
+                                              "status": "complete", "authorization_id": "read-004",
+                                              "input_snapshot_sha256s": ["a" * 64], "snapshot_dir": "read-read-004",
+                                              "enumeration_fetch_date": "2027-12-20", "results_sha256": None})
+            FR.commit_push(repo, FR.git_date(deadline - 5 * 86400))
+            with self.assertRaisesRegex(holdout.HoldoutRefused, "sealed its snapshot"):
+                holdout.read(runner_ctx(repo), "read-002", root, {}, deadline - 4 * 86400)
+            FR.write(repo / "marker.txt", "after the deadline\n")
+            FR.commit_push(repo, FR.git_date(deadline + 60))
+            with self.assertRaisesRegex(holdout.HoldoutRefused, "sealed its snapshot"):
+                holdout.read(runner_ctx(repo), "read-002", root, {}, deadline + 120)
+            self.assertFalse((repo / RESULTS_DIR / "holdout-read.json").exists())
+            # after the deadline the sealed read goes on to its evaluation (here it stops at the missing collection
+            # batches of this bare fixture), never to the not-read label
+            with self.assertRaisesRegex(holdout.HoldoutRefused, "collection batch"):
+                holdout.read(runner_ctx(repo), "read-004", root, {}, deadline + 120)
+            self.assertFalse((repo / RESULTS_DIR / "holdout-read.json").exists())
+
+    def test_a_refusal_is_spent_only_when_latest_after_a_signed_deadline_and_no_granted_read_is_open(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            fx = FR.build(tmp)
+            repo, root = fx["repo"], str(Path(tmp) / "snap")
+            ctx = runner_ctx(repo)
+            _, last = holdout.window(ctx, 0)
+            deadline = holdout.read_deadline(ctx, last)
+            logs.append_line(repo / RUN_LOG, {**FINAL_COUNT, "sessions": [ctx["n0_pinned"], last]})
+            logs.append_line(repo / ACCESS_LOG, auth_rec("read-001", "read", "refused", "x"))
+            FR.commit_push(repo, FR.git_date(deadline - 6 * 86400))
+            # before the deadline a refusal is a failed attempt, not a label
+            with self.assertRaisesRegex(holdout.HoldoutRefused, "only after the read deadline"):
+                holdout.read(runner_ctx(repo), "read-001", root, {}, deadline - 5 * 86400)
+            # a clock set forward past the deadline is not enough: no signed commit is at or after it
+            with self.assertRaisesRegex(holdout.HoldoutRefused, "only after the read deadline"):
+                holdout.read(runner_ctx(repo), "read-001", root, {}, deadline + 3600)
+            # a granted read that is open decides the read; the earlier refusal is not the latest
+            logs.append_line(repo / ACCESS_LOG, auth_rec("read-002", "read", "granted"))
+            FR.commit_push(repo, FR.git_date(deadline - 4 * 86400))
+            FR.write(repo / "marker.txt", "after the deadline\n")
+            FR.commit_push(repo, FR.git_date(deadline + 60))
+            with self.assertRaisesRegex(holdout.HoldoutRefused, "not the latest"):
+                holdout.read(runner_ctx(repo), "read-001", root, {}, deadline + 120)
+            self.assertFalse((repo / RESULTS_DIR / "holdout-read.json").exists())
+
+
+class SignedDueTimes(unittest.TestCase):
+    """Review round 11, F2: due times are judged by the signed time the authorization reached origin/main, and a
+    record whose time is later than its commit's recorded time (a clock set forward) is refused."""
+
+    def test_an_early_read_or_count_authorization_is_not_due(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            fx = FR.build(tmp)
+            repo, root = fx["repo"], str(Path(tmp) / "snap")
+            ctx = runner_ctx(repo)
+            cal = ctx["cal"]
+            _, last = holdout.window(ctx, 0)
+            logs.append_line(repo / ACCESS_LOG, auth_rec("count-001", "count", "granted"))
+            FR.commit_push(repo, FR.git_date(cal.close(last) - 3600))
+            with self.assertRaisesRegex(holdout.HoldoutRefused, "not due"):
+                holdout.count(runner_ctx(repo), "count-001", root, {}, cal.close(last) + 7200)
+            logs.append_line(repo / ACCESS_LOG, gate.completion("count-001", "x", "failed", None, 0, None, []))
+            logs.append_line(repo / RUN_LOG, {**FINAL_COUNT, "utc_start": FR.git_date(cal.close(last) + 600)[:19] + "Z",
+                                              "sessions": [ctx["n0_pinned"], last]})
+            logs.append_line(repo / ACCESS_LOG, auth_rec("read-002", "read", "granted"))
+            FR.commit_push(repo, FR.git_date(cal.close(cal.offset(last, 2))))
+            # a local clock set to after the terminal-search windows does not make the read due
+            with self.assertRaisesRegex(holdout.HoldoutRefused, "not due"):
+                holdout.read(runner_ctx(repo), "read-002", root, {}, cal.close(cal.offset(last, 6)))
+            self.assertFalse((repo / RESULTS_DIR / "holdout-read.json").exists())
+
+    def test_a_record_later_than_its_commit_is_refused(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            fx = FR.build(tmp)
+            repo = fx["repo"]
+            ctx = runner_ctx(repo)
+            _, last = holdout.window(ctx, 0)
+            t = ctx["cal"].close(last)
+            rec = dict(auth_rec("count-001", "count", "refused", "x"), utc=FR.git_date(t + 86400)[:19] + "Z")
+            logs.append_line(repo / ACCESS_LOG, rec)
+            FR.commit_push(repo, FR.git_date(t))
+            with self.assertRaisesRegex(guards.Refused, "clock was set forward"):
+                holdout.authorize(runner_ctx(repo), "count", t + 60)
+
+
+class RetrySnapshot(unittest.TestCase):
+    def test_same_snapshot_is_computed_from_the_retry_chain(self):
+        """Review round 11, C15/F5: same_snapshot comes from the committed '_fetch' lines along retry_of, and a line
+        that sealed a snapshot is reused by the retry even when its status is failed."""
+        access = [auth_rec("count-001", "count", "granted"), auth_rec("count-002", "count", "granted", retry_of="count-001"),
+                  auth_rec("count-003", "count", "granted", retry_of="count-002")]
+        line = {"stage": "holdout", "purpose": "count_fetch", "status": "failed", "authorization_id": "count-001",
+                "input_snapshot_sha256s": ["a" * 64], "snapshot_dir": "count-count-001"}
+        ctx = {"access_log": access, "run_log": [line]}
+        self.assertTrue(holdout.same_snapshot(ctx, "count", "count-002"))
+        self.assertIs(holdout.fetch_line_of(ctx, "count", access[2]), line)
+        other = dict(line, authorization_id="count-002", input_snapshot_sha256s=["b" * 64],
+                     snapshot_dir="count-count-002")
+        ctx["run_log"].append(other)
+        self.assertFalse(holdout.same_snapshot(ctx, "count", "count-002"))
+        self.assertTrue(holdout.same_snapshot(ctx, "count", None))
 
 
 class Collection(unittest.TestCase):

@@ -145,6 +145,19 @@ def context(repo, *, versions=None, amend_pending_ok: bool = False, transport_ch
             "main_tip_time": guards.commit_time(repo, tip) if guards.verified_merge(repo, tip) else None}
 
 
+DEVELOPMENT_YEARS = (2017, 2018, 2019)     # coverage_rule.item_rule: development_computed (2016 is warm-up)
+
+
+def stage_testing(stage: str, coverage: dict) -> dict:
+    """coverage_rule.item_rule (review round 11, C9): 'no item is tested' when 2020 is dropped binds validation (and
+    the holdout) only; development years do not condition testing, because development is descriptive. Development is
+    'not computed' (every item underpowered there) only when every development year is dropped."""
+    if stage != "development":
+        return {"tested": coverage["items_tested"]}
+    computed = any(y not in coverage["dropped_years"] for y in DEVELOPMENT_YEARS)
+    return {"tested": computed, "development_computed": computed}
+
+
 def check_clock(ctx: dict, now: float) -> None:
     """Review round 10, M2: a holdout decision never uses a local time earlier than the GitHub-recorded time of
     origin/main's tip (a signed merge commit), so setting the clock back below the last push is refused."""
@@ -175,6 +188,7 @@ def count_only_context(repo, *, versions=None) -> dict:
     lock = guards.load_lock(lock_path)
     guards.check_runtime(lock, versions)
     pbytes = (repo / PROTOCOL_PATH).read_bytes()
+    guards.check_parameters(json.loads(pbytes))        # review round 11, C4: study_code.rule, before any fetch
     return {"repo": repo, "protocol": json.loads(pbytes), "protocol_sha256": sha256_bytes(pbytes), "tree": tree,
             "commit": guards.git(repo, "rev-parse", "HEAD"), "runtime_lock_sha256": sha256_file(lock_path),
             "runtime_environment_sha256": guards.environment_digest(lock), "run_log": logs.read_lines(repo / RUN_LOG)}
@@ -202,6 +216,39 @@ def run_line(ctx: dict, *, stage, purpose, commit, utc_start, utc_end, snapshots
     return line
 
 
+def open_start(run_log: list, stage: str, purpose: str):
+    """(index, line) of the latest '<purpose>_start' line of this stage that no end line (purpose, start_index)
+    cites, or None (review round 11, F4)."""
+    ended = {x.get("start_index") for x in run_log if x.get("stage") == stage and x.get("purpose") == purpose}
+    starts = [(i, x) for i, x in enumerate(run_log) if x.get("stage") == stage and x.get("purpose") == f"{purpose}_start"
+              and i not in ended]
+    return starts[-1] if starts else None
+
+
+def begin_or_resume(ctx: dict, stage: str, purpose: str, identity: dict, clock):
+    """Review round 11, F4: a fetching run (count-only, dry-run, a stage fetch) runs in two committed steps, like a
+    holdout count or read. The first call appends a '<purpose>_start' line naming the protocol sha256, the study
+    tree and `identity` (for count-only the coverage_rule sha256) and returns None: nothing is fetched until that
+    line is on origin/main (the caller's context refuses a run log that differs from it). The next call runs under
+    that open start and returns its index, which the end line cites. While a start has no end line, a run whose
+    protocol, tree or identity differs is refused, so a discarded local attempt cannot be followed by a changed
+    rule without a pushed end line, and every start is a logged exposure."""
+    ob = open_start(ctx["run_log"], stage, purpose)
+    if ob is None:
+        t = clock()
+        logs.append_line(Path(ctx["repo"]) / RUN_LOG, run_line(
+            ctx, stage=stage, purpose=f"{purpose}_start", commit=ctx["commit"], utc_start=t, utc_end=t, snapshots=[],
+            status="started", results_sha256=None, extra=dict(identity)))
+        return None
+    i, line = ob
+    now = {"study_tree": ctx["tree"], "protocol_sha256": ctx["protocol_sha256"], **identity}
+    diff = sorted(k for k, v in now.items() if line.get(k) != v)
+    if diff:
+        raise RunRefused(f"run-log line {i} started a {purpose} run with other {', '.join(diff)} and has no end "
+                         "line; a new start is refused until it ends")
+    return i
+
+
 def results_path(ctx: dict, name: str) -> Path:
     return Path(ctx["repo"]) / RESULTS_DIR / f"{name}.json"
 
@@ -224,6 +271,9 @@ def stage_fetch_run(ctx: dict, stage: str, snapshot_dir, planner, transports, cl
     if any(x.get("status") != "failed" or x.get("input_snapshot_sha256s") for x in prior):
         raise RunRefused(f"{stage} already has a fetch in the run log; a stage is fetched once, with its single "
                          "re-fetch inside that run")
+    si = begin_or_resume(ctx, stage, "fetch", {}, clock)          # review round 11, F4
+    if si is None:
+        return {"started": True, "next": "commit and push the start line, then run the fetch again"}
     start, status, sha, rate = clock(), "failed", None, None
     try:
         store = Store()
@@ -234,6 +284,7 @@ def stage_fetch_run(ctx: dict, stage: str, snapshot_dir, planner, transports, cl
     finally:
         extra = {"fetch_incomplete_rate": rate["rate"], "fetch_incomplete_by_kind": rate["by_kind"],
                  "stage_void": rate["void"]} if rate else {}
+        extra["start_index"] = si
         logs.append_line(ctx["repo"] / RUN_LOG, run_line(
             ctx, stage=stage, purpose="fetch", commit=ctx["commit"], utc_start=start, utc_end=clock(),
             snapshots=[sha] if sha else [], status=status, results_sha256=None, extra=extra))
@@ -273,6 +324,12 @@ def evaluate_run(ctx: dict, stage: str, snapshot_dir, snapshot_sha256: str, comp
     fetch_line = fetch_line_for(ctx["run_log"], stage, snapshot_sha256)
     if fetch_line is None or fetch_line.get("status") != "complete":
         raise RunRefused(f"{snapshot_sha256} is not the snapshot sealed by {stage}'s logged fetch")
+    # review round 11, F3: validation is fetched and sealed before any development outcome exists, so no transport
+    # deviation can be written after the development results are seen and before the validation fetch
+    if stage == "development" and not any(x.get("stage") == "validation" and x.get("purpose") in ("fetch", "refetch")
+                                          and x.get("status") == "complete" and x.get("input_snapshot_sha256s")
+                                          for x in ctx["run_log"]):
+        raise RunRefused("development is evaluated only after validation's complete fetch line is on origin/main")
     earlier = logs.results_attempts(ctx["run_log"], stage)
     if any(x.get("input_snapshot_sha256s") != [snapshot_sha256] for x in earlier):
         raise RunRefused("an earlier attempt of this stage used another snapshot; a retry uses the same sealed inputs")

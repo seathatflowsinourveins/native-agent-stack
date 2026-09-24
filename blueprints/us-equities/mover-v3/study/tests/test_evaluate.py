@@ -59,6 +59,27 @@ class Sensitivities(unittest.TestCase):
         self.assertEqual(by["b_overnight"]["2019"]["merger_without_bid"], 1)
 
 
+class OppositeDirection(unittest.TestCase):
+    def test_opposite_direction_is_flagged_with_its_interval(self):
+        """Review round 11, C12: a result opposite a one-sided alternative, or H3-c at the holdout opposite the
+        validation sign, is flagged and carries its estimate and 95% interval; it never passes."""
+        self.assertTrue(EV.opposite_direction("H3-a", "validation", -0.02))
+        self.assertFalse(EV.opposite_direction("H3-a", "validation", 0.02))
+        self.assertTrue(EV.opposite_direction("H1-D", "validation", 0.01))          # alternative 'less'
+        self.assertFalse(EV.opposite_direction("H3-c", "validation", -0.01, 0.004))  # two-sided before the holdout
+        self.assertTrue(EV.opposite_direction("H3-c", "holdout", -0.01, 0.004))
+        self.assertFalse(EV.opposite_direction("H3-c", "holdout", 0.01, 0.004))
+        recs = [rec(i, -0.05 - 0.001 * (i % 3)) for i in range(40)]
+        res = EV.item_result("H3-a", "validation", rows(recs), SESSIONS, PID, B=200)
+        lo, hi = res["interval_95"]
+        self.assertLess(hi, 0.0)
+        self.assertLessEqual(lo, res["estimate"])
+        self.assertGreater(res["p"], 0.5)
+        label = ST.item_label("validation", "H3-a", p_stage=res["p"], n_ok=True, robust_ok=False,
+                              mde_ok=res["mde_excluded"])
+        self.assertNotEqual(label, "screened")
+
+
 class Contamination(unittest.TestCase):
     def test_paper_exposed_fraction_above_5_percent_contaminates_a_holdout_item(self):
         seen = {}

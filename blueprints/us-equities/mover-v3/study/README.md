@@ -41,6 +41,17 @@ authorization record. Freeze and reach times come only from commits signed by th
 fetch transport runs in a child process; the process that plans, parses and evaluates never imports `fetch/`.
 Results files have fixed paths under `../results/`.
 
+Review round 11: `count-only`, `dry-run` and `fetch` also run twice. The first run appends only a start line (protocol
+sha256, study tree and, for count-only, the coverage_rule sha256); nothing is fetched until that line is pushed, and
+while it has no end line a run with another protocol, tree or rule is refused. Every fetch is paced by the child
+process at the protocol's pinned rate limit (`exposure_registry.pre_freeze_access_path.rate_limit`), and every
+fetching command refuses while that limit is not pinned. The dry run refuses any planned request that reaches before
+2021-01-04 or after 2024-10-31, not only a session outside that window. Development is evaluated only after the
+validation fetch line is on origin/main. `transport-check` needs `--holdout-root` once a holdout snapshot is sealed,
+and seeds its live sample with the first origin/main commit that holds the new tree. A held-back refused `read`
+authorization cannot be spent. A read that sealed its snapshot is always evaluated, and one evaluated after the
+deadline carries `late-read`. Holdout due times are judged by the signed time the authorization reached origin/main.
+
 ## Tests
 
 From the repository root:

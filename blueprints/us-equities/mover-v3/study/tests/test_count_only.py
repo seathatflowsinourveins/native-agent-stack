@@ -139,6 +139,15 @@ class Pipeline(unittest.TestCase):
         self.assertEqual(stamps % 2, 0)
         unreached = sum(CO.sampled("S001", s) for s in sess)
         self.assertEqual(cy["identity_unreached_pairs"], unreached)
+        # review round 11, C5: the identity-diagnostic, coverage-stamp and minute-bar counts are also split by
+        # listing exchange, and each split sums to its per-year count
+        for name in ("identity_unreached_pairs", "default_asof_pairs_close_ge_1", "coverage_stamps_with_eligible",
+                     "coverage_stamps_without_eligible", "minute_pairs_with_regular_bar",
+                     "minute_pairs_without_regular_bar", "with_daily_bar"):
+            split = {k: v for k, v in cy.items() if k.startswith(name + ":")}
+            self.assertEqual(sum(split.values()), cy[name], name)
+            if cy[name]:
+                self.assertTrue(split, name)
         out = CO.outputs(PROTOCOL, c, {"rename_probes": 0, "bars_match": 0, "auctions_match": 0, "quotes_match": 0,
                                        "reuse_cases": 0, "reuse_differ": 0}, {"counts": {"union": 120}}, 1000.0)
         text = json.dumps(out)
@@ -188,7 +197,8 @@ class Round9(unittest.TestCase):
         from fetch.transport import TRADING_HOST
         from tests import fixture_repo as FR
         self.assertEqual(transport_proc.worker_apis()["trading"].host, TRADING_HOST)
-        self.assertEqual(sorted(run.transports()), ["data", "trading"])
+        self.assertEqual(sorted(run.transports({"exposure_registry": {"pre_freeze_access_path": {"rate_limit": {
+            "per_minute": 200, "source": "synthetic"}}}})), ["data", "trading"])
         self.assertTrue(all(r["api"] == "trading" for r in CO.part0_requests("2026-09-25") if r["kind"] == "assets"))
         cal = synth.calendar()
         m = synth.FakeMarket(cal)
@@ -203,7 +213,7 @@ class Round9(unittest.TestCase):
             repo, root = fx["repo"], str(Path(tmp) / "snap")
             argv = ["count-only", "--snapshot-root", root]
             with FR.isolated_bytecode(), mock.patch.object(run, "REPO", repo), \
-                    mock.patch.object(run, "transports", lambda: transports(m)), \
+                    mock.patch.object(run, "transports", lambda *_: transports(m)), \
                     mock.patch.object(run, "clock", fixed_clock), \
                     mock.patch.object(CO, "PART1_RANGE", ("2020-06-01", "2020-06-05")):
                 (repo / COUNT_ONLY_OUTPUT).unlink()                # the fixture's placeholder output
@@ -213,6 +223,15 @@ class Round9(unittest.TestCase):
                 proto = json.loads((repo / PROTOCOL_PATH).read_text())
                 proto["exposure_registry"]["pre_freeze_access_path"]["rate_limit"].update(
                     {"per_minute": 10000, "source": "synthetic"})
+                # review round 11, C4: a committed parameters mismatch stops the run before any fetch
+                bad = json.loads(json.dumps(proto))
+                bad["run_discipline"]["study_code"]["parameters"]["sampling"] = {"changed": True}
+                FR.write(repo / PROTOCOL_PATH, json.dumps(bad, indent=1) + "\n")
+                FR.commit_push(repo, "2026-09-25T12:05:00+00:00")
+                calls = len(m.calls)
+                with self.assertRaisesRegex(runner.guards.Refused, "parameters"):
+                    run.main(argv)
+                self.assertEqual(len(m.calls), calls)
                 FR.write(repo / PROTOCOL_PATH, json.dumps(proto, indent=1) + "\n")
                 FR.sh(repo, "commit", "-q", "-am", "pin the rate", when="2026-09-25T12:10:00+00:00")
                 with self.assertRaises(runner.guards.Refused):     # committed, not on origin/main
@@ -222,11 +241,27 @@ class Round9(unittest.TestCase):
                 with self.assertRaises(runner.guards.Refused):     # a run log that differs from HEAD
                     run.main(argv)
                 FR.sh(repo, "checkout", "--", RUN_LOG)
+                # review round 11, F4: the first run appends its start line (with the coverage_rule sha256) only
+                self.assertEqual(run.main(argv), 0)
+                started = logs.read_lines(repo / RUN_LOG)[-1]
+                self.assertEqual((started["purpose"], started["coverage_rule_sha256"]),
+                                 ("count_only_start", coverage_rule.rule_sha256(PROTOCOL)))
+                self.assertFalse((repo / COUNT_ONLY_OUTPUT).exists())
+                FR.commit_push(repo, "2026-09-25T12:20:00+00:00")
+                # while that start has no end line, a changed protocol cannot start again
+                FR.write(repo / PROTOCOL_PATH, json.dumps({**proto, "note": "changed after a discarded run"}, indent=1)
+                         + "\n")
+                FR.commit_push(repo, "2026-09-25T12:25:00+00:00")
+                with self.assertRaisesRegex(runner.RunRefused, "has no end line"):
+                    run.main(argv)
+                FR.write(repo / PROTOCOL_PATH, json.dumps(proto, indent=1) + "\n")
+                FR.commit_push(repo, "2026-09-25T12:30:00+00:00")
                 self.assertEqual(run.main(argv), 0)
                 out = json.loads((repo / COUNT_ONLY_OUTPUT).read_text())
                 line = logs.read_lines(repo / RUN_LOG)[-1]
                 self.assertEqual((line["purpose"], line["status"]), ("count_only", "complete"))
                 self.assertEqual(line["results_sha256"], sha256_file(repo / COUNT_ONLY_OUTPUT))
+                self.assertEqual(logs.read_lines(repo / RUN_LOG)[line["start_index"]]["purpose"], "count_only_start")
                 self.assertEqual(line["coverage_rule_sha256"], coverage_rule.rule_sha256(PROTOCOL))
                 self.assertEqual(out["rate_limit"], {"per_minute": 10000.0, "source": "synthetic"})
                 self.assertEqual((out["study_tree"], out["code_revision"]), (fx["tree"], FR.sh(repo, "rev-parse", "HEAD")))
@@ -295,6 +330,22 @@ class DryRun(unittest.TestCase):
         self.assertEqual(len(plan.exit_windows(cal, e, stamp)), 6)
         self.assertEqual(out["quote_exit"]["requests"], 2 * 6)
 
+    def test_dry_run_bounds_every_request_reach_not_only_sessions(self):
+        """Review round 11, C1: a session inside 2021-01-04 .. 2024-10-17 whose lookbacks (daily t-60, auctions t-22,
+        minute bars 04:00 ET of t-19, screen s-1) reach 2020 is refused; the first session whose t-60 is 2021-01-04
+        is accepted, and every planned request then starts on or after 2021-01-04."""
+        cal = synth.calendar("2020-01-02", "2021-12-31")
+        for s in ("2021-01-04", "2021-03-01", cal.offset("2021-01-04", 59)):
+            with self.assertRaises(ValueError):
+                CO.dry_run_requests(cal, [s], ["AAA"])
+        first = cal.offset("2021-01-04", 60)
+        reqs = CO.dry_run_requests(cal, [first], ["AAA"])
+        self.assertEqual(min(r["params"]["start"][:10] for r in reqs), "2021-01-04")
+        with self.assertRaises(ValueError):                          # a mixed list is refused as a whole
+            CO.dry_run_requests(cal, [first, "2021-02-01"], ["AAA"])
+        with self.assertRaises(ValueError):                          # dry_run refuses before any fetch
+            CO.dry_run(cal, ["2021-01-04"], ["AAA"], None, "/nonexistent", "2026-09-25", clock=fixed_clock)
+
     def test_dry_run_command_writes_counts_once_from_an_exposed_window(self):
         import run
         from core import logs, runner
@@ -310,13 +361,21 @@ class DryRun(unittest.TestCase):
             fx = FR.build(tmp, frozen=False)
             repo, root = fx["repo"], str(Path(tmp) / "snap")
             with FR.isolated_bytecode(), mock.patch.object(run, "REPO", repo), \
-                    mock.patch.object(run, "transports", lambda: transports(m)), \
+                    mock.patch.object(run, "transports", lambda *_: transports(m)), \
                     mock.patch.object(run, "clock", fixed_clock):
                 with self.assertRaises(ValueError):                  # a v3 validation session
                     run.main(["dry-run", "--sessions", "2020-06-01", "--symbols", "AAA", "--snapshot-root", root])
                 with self.assertRaises(ValueError):                  # its search windows reach 2024-11-01
                     run.main(["dry-run", "--sessions", "2024-10-25", "--symbols", "AAA", "--snapshot-root", root])
-                self.assertEqual(run.main(["dry-run", "--sessions", s, "--symbols", "AAA,ZZZ", "--snapshot-root", root]), 0)
+                for early in ("2021-01-04", "2021-03-01"):             # review round 11, C1: lookbacks reach 2020
+                    with self.assertRaises(ValueError):
+                        run.main(["dry-run", "--sessions", early, "--symbols", "AAA", "--snapshot-root", root])
+                self.assertFalse((repo / RUN_LOG).exists() and logs.read_lines(repo / RUN_LOG))
+                dry = ["dry-run", "--sessions", s, "--symbols", "AAA,ZZZ", "--snapshot-root", root]
+                self.assertEqual(run.main(dry), 0)                     # review round 11, F4: the start line
+                self.assertEqual(logs.read_lines(repo / RUN_LOG)[-1]["purpose"], "dry_run_start")
+                FR.commit_push(repo, "2026-09-26T11:00:00+00:00")
+                self.assertEqual(run.main(dry), 0)
                 out = json.loads((repo / DRY_RUN_OUTPUT).read_text())
                 line = logs.read_lines(repo / RUN_LOG)[-1]
                 self.assertEqual((line["purpose"], line["status"], line["results_sha256"]),
