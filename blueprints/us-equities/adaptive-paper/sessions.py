@@ -221,6 +221,19 @@ def previous_trading_day(d: date) -> date:
     return _prev_trading_day(d)
 
 
+def next_trading_day(d: date) -> date:
+    """The trading day immediately after ``d`` (skipping weekends/holidays),
+    public for the same reason ``previous_trading_day`` is: the corporate-
+    action guard's overnight hold horizon (corporate_actions.py, consulted
+    from native_strategy.py) is "today's session, extended through the
+    next trading session", and needs this without reaching into this
+    module's private ``_next_trading_day``. Raises ``ValueError`` on a date
+    outside the frozen session calendar, exactly like
+    ``previous_trading_day``; callers must fail closed on that, never guess
+    a horizon."""
+    return _next_trading_day(d)
+
+
 # ---------------------------------------------------------------------------
 # Session policy: a single consolidated gate for the extended-hours and
 # overnight-holds decisions that previously existed as four separate ad-hoc

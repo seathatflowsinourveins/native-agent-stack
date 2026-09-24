@@ -20,10 +20,11 @@ import shlex
 import signal
 import time
 
+from corporate_actions import AlpacaCorporateActionsSource, CorporateActionMonitor
 from leverage import LeveragePolicyError, next_lower_rung_ceiling, validate_leverage_policy
 from safety import Ledger, Quote, RiskLimits, SafetyError, account_lock_fingerprint, DEFAULT_STOP
 from sessions import (DEFAULT_SESSION_POLICY, SessionKind, boundary_receipt, extended_session_close,
-                     must_end_flat, session_at, validate_session_policy)
+                     must_end_flat, next_trading_day, session_at, validate_session_policy)
 from strategies import AdaptivePolicy, PolicyConfig, RegimeSelector, SelectorConfig, limit_price
 from transport import AlpacaPaperTransport, DATA_FEEDS, TransportError, RejectedSubmission, preflight
 
@@ -922,7 +923,8 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
     policy = AdaptivePolicy(policy_config, strategy_pool=pool, selector=selector, leverage_policy=leverage_policy)
     strategy = AdaptiveStrategy(policy, controller.ledger, trial_id,
                                 event_sink=controller.events.append, transport=controller.port,
-                                account_multiplier=config.get("_account_multiplier"))
+                                account_multiplier=config.get("_account_multiplier"),
+                                corporate_action_guard=config.get("_corporate_action_guard"))
     # Capture actual streaming quotes before native conversion. Every native
     # strategy event still arrives through the data engine's ordinary path.
     port = controller.port
@@ -1057,6 +1059,26 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
                         open_orders=len(controller.ledger.unresolved()), reconciled_at_boundary=True))
                 last_session_kind = now_kind
             if strategy.started:
+                # Trading-lane audit gap #8: refresh the corporate-action
+                # cache before this tick's rebalance() consults it.
+                # CorporateActionMonitor.refresh is internally rate-limited
+                # (refresh_seconds), so calling it every tick is safe -- most
+                # calls are a no-op cache-hit check, not a request. A session
+                # this tick's clock cannot classify skips the refresh
+                # entirely; rebalance()'s own guard call still fails closed
+                # independently on the same ValueError (see
+                # native_strategy._corporate_action_guard_symbols).
+                if strategy.corporate_action_guard is not None:
+                    try:
+                        ca_session = session_at(datetime.fromtimestamp(now, timezone.utc))
+                        ca_horizon_end = next_trading_day(ca_session.session_date)
+                    except ValueError:
+                        pass
+                    else:
+                        ca_watch = set(config["symbols"]) | {
+                            p.symbol for p in controller.ledger.positions().values() if p.qty}
+                        strategy.corporate_action_guard.refresh(
+                            ca_watch, start=ca_session.session_date, end=ca_horizon_end, now=now)
                 strategy.cancel_expired(now, config["order_timeout_seconds"], all_entries=force_exit)
                 strategy.rebalance(now, force_exit=force_exit)
                 if leverage_policy is not None:
@@ -1400,6 +1422,14 @@ def main():
     config, limits, policy_config = load_config(args.config)
     session_policy = validate_session_policy(config)
     key, secret = credentials(args.env_file)
+    # Trading-lane audit gap #8: constructed unconditionally (object
+    # construction only, no network call -- see AlpacaCorporateActionsSource's
+    # docstring) so it is available to run_native's AdaptiveStrategy below
+    # for both `paper` and a future recovery-time consultation; inert until
+    # its first evaluate()/refresh() call. Never logs or stores key/secret
+    # beyond the client object; the same env-file credential path every
+    # other broker call in this file already uses.
+    config["_corporate_action_guard"] = CorporateActionMonitor(AlpacaCorporateActionsSource(key, secret))
     attempts, responses = [], []
     def observe_request(kind, **kwargs):
         attempts.append({"timestamp": time.time(), "kind": kind})

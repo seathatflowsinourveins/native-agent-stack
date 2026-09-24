@@ -12,7 +12,7 @@ from nautilus_trader.model import (ClientOrderId, InstrumentId, OrderSide, Price
 from exits import REASON_PRICE_RULE
 from leverage import LeverageInputs
 from safety import DEFAULT_STOP, SafetyError, evaluate_gap_risk
-from sessions import SessionKind, previous_trading_day, session_at
+from sessions import SessionKind, next_trading_day, previous_trading_day, session_at
 from strategies import AdaptivePolicy, OperationalStatus, QUOTE_FUTURE_TOLERANCE_SECONDS, limit_price
 
 
@@ -22,13 +22,23 @@ class AdaptiveStrategy(Strategy):
                                 order_id_tag="A", log_events=False, log_commands=False, manage_stop=False))
 
     def __init__(self, policy: AdaptivePolicy, ledger, trial_id: str, *, event_sink=None,
-                 transport=None, stop_file=None, clock=time.time, account_multiplier=None):
+                 transport=None, stop_file=None, clock=time.time, account_multiplier=None,
+                 corporate_action_guard=None):
         self.policy = policy
         self.ledger = ledger
         self.trial_id = trial_id
         self.event_sink = event_sink or (lambda event: None)
         self.transport = transport
         self.stop_file = stop_file
+        # Trading-lane audit gap #8: opt-in corporate-action guard (see
+        # corporate_actions.py's module docstring for the full precedence
+        # contract against gap_risk_stop/exits.py/force_exit). None
+        # (default) leaves rebalance() byte-identical to before this
+        # control existed -- _corporate_action_guard_symbols returns
+        # immediately without a session lookup or event. runner.py's
+        # `paper` command threads a real corporate_actions.CorporateActionMonitor
+        # here; tests inject a fake with the same `.evaluate(...)` shape.
+        self.corporate_action_guard = corporate_action_guard
         # G-e: the broker-proven margin multiplier (runner.py's config
         # "_account_multiplier", only ever set after preflight has checked
         # multiplier >= requested leverage -- see runner._check_margin_
@@ -330,6 +340,57 @@ class AdaptiveStrategy(Strategy):
     def positions(self):
         return {p.symbol: {"qty": str(p.qty), "avg_entry_price": str(p.average_cost)}
                 for p in self.ledger.positions().values() if p.qty}
+
+    def _corporate_action_guard_symbols(self, now, held, candidate_symbols):
+        """Trading-lane audit gap #8: consult the injected corporate-action
+        guard (`self.corporate_action_guard`, see corporate_actions.py) for
+        (a) the set of held symbols that must be flattened before this
+        session's close, and (b) the set of symbols -- held or candidate --
+        whose entries (new or added-to) must be blocked this tick.
+
+        Opt-in: `self.corporate_action_guard is None` (the default) returns
+        immediately, with no session lookup and no event -- byte-identical
+        to before this control existed, the same pattern
+        `PolicyConfig.gap_stop_enabled` uses for `_gap_risk_stop_symbols`.
+
+        Fail-closed on an unclassifiable session: a `now` outside the
+        frozen session calendar (`session_at`/`next_trading_day` raising
+        `ValueError`) cannot even compute "today" or "the next session", so
+        every held-or-candidate symbol this tick is treated exactly like a
+        failed lookup -- blocked from entry, and any held quantity added to
+        the forced-flatten set -- rather than silently skipping the guard
+        for that tick.
+        """
+        if self.corporate_action_guard is None:
+            return set(), set()
+        held_symbols = {symbol for symbol, qty in held.items() if qty > 0}
+        try:
+            info = session_at(datetime.fromtimestamp(now, timezone.utc))
+            next_session_date = next_trading_day(info.session_date)
+        except ValueError:
+            relevant = held_symbols | set(candidate_symbols)
+            for symbol in relevant:
+                self.event_sink({"type": "corporate_action_guard", "symbol": symbol,
+                                 "block_entry": True, "must_flatten": symbol in held_symbols,
+                                 "needs_attention": True, "reason": "corporate_action_session_unknown",
+                                 "action_type": None, "action_date": None})
+            return relevant, held_symbols
+        decisions = self.corporate_action_guard.evaluate(
+            today=info.session_date, next_session_date=next_session_date,
+            held_symbols=held_symbols, candidate_symbols=set(candidate_symbols), now=now)
+        block_entry, must_flatten = set(), set()
+        for symbol, decision in decisions.items():
+            if decision.block_entry:
+                block_entry.add(symbol)
+            if decision.must_flatten:
+                must_flatten.add(symbol)
+            if decision.block_entry or decision.must_flatten or decision.needs_attention:
+                self.event_sink({"type": "corporate_action_guard", "symbol": symbol,
+                                 "block_entry": decision.block_entry, "must_flatten": decision.must_flatten,
+                                 "needs_attention": decision.needs_attention, "reason": decision.reason,
+                                 "action_type": decision.action_type,
+                                 "action_date": decision.action_date.isoformat() if decision.action_date else None})
+        return block_entry, must_flatten
 
     def _gap_risk_stop_symbols(self, now, held):
         """D5: on the first RTH bar after an overnight hold, evaluate
@@ -707,12 +768,21 @@ class AdaptiveStrategy(Strategy):
         # or not -- can be included in that same event below, instead of
         # needing a separate event type.
         gap_stop_symbols = self._gap_risk_stop_symbols(now, held)
+        # Trading-lane audit gap #8: evaluated after gap risk (whose own
+        # arming/capture state is independent of it) but consumed first,
+        # below -- see corporate_actions.py's module docstring for the full
+        # precedence contract. `candidate_symbols` is this tick's targets,
+        # the only symbols a fresh/added entry could apply to.
+        ca_block_entry, ca_must_flatten = self._corporate_action_guard_symbols(
+            now, held, decision.targets.keys())
         decision_event = {"type": "decision", "timestamp": now, "regime": decision.regime,
                           "targets": decision.targets, "exits": decision.exits,
                           "effective_leverage": decision.effective_leverage,
                           "signals": [{"symbol": s.symbol, "family": s.family,
                                        "edge_bps": s.edge_bps, "score": s.score} for s in decision.signals],
-                          "gap_bps": {symbol: str(bps) for symbol, bps in self._gap_bps.items()}}
+                          "gap_bps": {symbol: str(bps) for symbol, bps in self._gap_bps.items()},
+                          "corporate_action_block_entry": sorted(ca_block_entry),
+                          "corporate_action_must_flatten": sorted(ca_must_flatten)}
         if getattr(self.policy, "leverage_policy", None) is not None:
             decision_event["leverage_ceiling"] = self.policy.last_leverage_ceiling
         self.event_sink(decision_event)
@@ -734,7 +804,7 @@ class AdaptiveStrategy(Strategy):
         actions = []
         for s, qty in held.items():
             target = decision.targets.get(s, 0)
-            if qty <= target or s in gap_stop_symbols:
+            if qty <= target or s in gap_stop_symbols or s in ca_must_flatten:
                 continue
             delta = qty - target
             reason = decision.exits.get(s, "rebalance")
@@ -747,11 +817,20 @@ class AdaptiveStrategy(Strategy):
             else:
                 sell_qty = delta
             actions.append((s, "sell", sell_qty, reason))
+        # Trading-lane audit gap #8: a confirmed-or-fail-closed corporate
+        # action forces a full exit through this same engine-layer forced-
+        # sell path, ranked ahead of gap_risk_stop (see corporate_actions.py's
+        # module docstring for why); it is not mutually exclusive with
+        # gap_stop_symbols in principle, but `ca_must_flatten` was already
+        # excluded from the ordinary rebalance-delta loop above so a symbol
+        # never gets two competing sell actions from this method.
+        actions += [(s, "sell", held[s], "corporate_action_flatten") for s in ca_must_flatten if held.get(s, 0) > 0]
         actions += [(s, "sell", held[s], "gap_risk_stop") for s in gap_stop_symbols if held.get(s, 0) > 0]
         if self.enabled and not force_exit:
             actions += [(s, "buy", qty - held.get(s, 0),
                          next((x.family for x in decision.signals if x.symbol == s), "rebalance"))
-                        for s, qty in decision.targets.items() if qty > held.get(s, 0)]
+                        for s, qty in decision.targets.items()
+                        if qty > held.get(s, 0) and s not in ca_block_entry]
         for symbol, side, quantity, reason in actions:
             quote = self.policy.latest.get(symbol)
             if not quote or now - quote.timestamp > self.policy.config.quote_age_seconds \
