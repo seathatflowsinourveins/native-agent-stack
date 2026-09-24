@@ -271,11 +271,36 @@ Every receipt also names one `stage`. Two decide a platform status:
 8. **Independent review.** Someone other than the recorder — another agent
    session, the Codex review lane, or a human — reviews the receipt (reads
    the commands and output excerpt, and if practical reproduces at least one
-   command) and appends a review. For a `use` receipt, the reviewer checks
-   that the commands make the component do its job. A help or version call,
-   including one wrapped in a shell, `&&` or a subcommand (`sh -c 'x
-   --version'`, `true && x -V`, `x help sub`), is not use: record
-   `--verdict needs_changes`, which withholds `accepted` (Section 5).
+   command) and appends a review. For a `use` receipt, an `agree` needs all
+   four of these points. #185's receipts met them:
+
+   1. **Layer role.** The commands make the component do the job its layer
+      names, not just run. A server is observed serving, through a query or
+      a request. A build's output is served or used. A verifier's verdict is
+      read.
+   2. **Positive control.** Where a clean result proves nothing (a scanner,
+      a test runner, a linter, a gate), the receipt also shows the component
+      failing on a deliberate fault, as #185's gitleaks fixture does.
+   3. **Backed claims.** Every install, version and pin claim in the receipt
+      has a retained command and its output. A claim with no retained
+      command is unbacked.
+   4. **Bound to the winner.** The receipt's `component_id` is the layer
+      winner's id, and its `tool_versions` equal the winner's pin. A receipt
+      recorded under another id binds to nothing.
+
+   A help or version call, including one wrapped in a shell, `&&` or a
+   subcommand (`sh -c 'x --version'`, `true && x -V`, `x help sub`), is not
+   use. Re-running the commands shows that they reproduce, not that they meet
+   the four points, so a reproduce-only check is not an `agree`. When any
+   point fails, record `--verdict needs_changes`, which withholds `accepted`
+   (Section 5), and name the missing point. State in `--ref` what the review
+   itself did:
+   - which commands you re-ran (reproduce-only);
+   - which of the four points you checked (adequacy-checked).
+
+   A later reader can then tell the two apart. #201's seven receipts were
+   agreed after reproduction alone, and were then held at `needs_changes`
+   against these four points (#209).
 
    ```sh
    python3 scripts/host_receipts.py review \
