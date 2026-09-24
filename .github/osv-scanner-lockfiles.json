@@ -20,6 +20,9 @@
       "path": "blueprints/convergence-practice/application-delivery/uv.lock"
     },
     {
+      "path": "blueprints/convergence-practice/wsl-retrieval/package-lock.json"
+    },
+    {
       "path": "blueprints/us-equities/adaptive-paper/requirements.txt"
     },
     {
@@ -136,6 +139,10 @@
     {
       "path": "blueprints/convergence-practice/application-delivery/pyproject.toml",
       "lockfile": "blueprints/convergence-practice/application-delivery/uv.lock"
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/package.json",
+      "lockfile": "blueprints/convergence-practice/wsl-retrieval/package-lock.json"
     },
     {
       "path": "blueprints/gap-wave2-20260923/us-equities__portfolio-risk/requirements-libs.in",

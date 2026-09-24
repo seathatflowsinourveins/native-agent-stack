@@ -1067,6 +1067,11 @@
             "id": "claude-repository-evidence-20260921",
             "path": "evidence/receipts/claude-repository-evidence-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "wsl-retrieval-20260920",
+            "path": "evidence/receipts/wsl-retrieval-20260920.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -6831,6 +6836,11 @@
           {
             "id": "claude-repository-evidence-20260921",
             "path": "evidence/receipts/claude-repository-evidence-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "wsl-retrieval-20260920",
+            "path": "evidence/receipts/wsl-retrieval-20260920.json",
             "kind": "native_cli_e2e"
           }
         ],
