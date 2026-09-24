@@ -206,11 +206,21 @@ def run_mutation(name: str, mutation: list[tuple[str, str, str, int]], test_ids:
         # -- nothing was actually exercised for that id, so nothing was
         # actually proven, and that must not be conflated with "survived"
         # (which specifically means the mutated code really did run and
-        # really did pass).
+        # really did pass). Round 6 (Codex, low): every named test id can
+        # report "ok" while the *process* still exits non-zero -- a
+        # tearDownClass() (or other class-scoped fixture) failure is
+        # reported by unittest as a separate pseudo-test-id (e.g.
+        # "tearDownClass (module.Class)"), which never matches anything in
+        # `test_ids` and so never shows up in `collected` at all; ignoring
+        # `mutated["returncode"]` here let that silently report "survived"
+        # even though the run, taken as a whole, did not cleanly succeed.
+        # A non-zero exit that none of the named ids explain is therefore
+        # also "inconclusive", not "survived".
         verdict = ("killed" if killed_by else
                    "not_collected" if uncollected else
                    "inconclusive" if skipped else
                    "error_not_fail" if any(status == "ERROR" for status in collected.values()) else
+                   "inconclusive" if mutated["returncode"] != 0 else
                    "survived")
         killed = bool(killed_by) and verdict == "killed"
         return {"mutation": name, "test_ids": test_ids, "killed": killed, "timed_out": False,

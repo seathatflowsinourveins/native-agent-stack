@@ -374,18 +374,45 @@ class NoPathLeakInErrors(unittest.TestCase):
         self.assertRegex(str(ctx.exception), "credential_file_permissions:missing")
 
     def test_surrogate_in_an_ancestor_directory_component_never_leaks(self):
-        # Same fix, the other escaping exception type: a lone surrogate (as
-        # os.fsdecode's surrogateescape error handler would produce from an
-        # invalid byte) raises UnicodeEncodeError when re-encoded for the
-        # stat() syscall, whose `.object` attribute holds the string that
-        # contains the ancestor's own name.
-        bad = str(self.root) + "/tell\udcfftale-dir/paper.env"
-        with self.assertRaises(cg.CredentialGuardError) as ctx:
+        # Same fix, the other escaping exception type -- round 6: U+DCFF
+        # (the earlier fixture) is in surrogateescape's *low*-surrogate
+        # range (U+DC80-U+DCFF), which round-trips straight back to a
+        # plain byte (0xFF) on encode, so `os.fsencode()` never raised at
+        # all there; that fixture exercised only the plain OSError from the
+        # resulting FileNotFoundError-shaped lookup and passed even with
+        # the pre-fix, OSError-only handler restored (i.e. it did not
+        # actually exercise this fix). U+D800 is a lone *high* surrogate,
+        # which has no such round-trip and always raises
+        # UnicodeEncodeError on encode -- verified directly, with the
+        # pre-fix handler restored, that it escapes uncaught with `.object`
+        # containing the ancestor's own name.
+        # Not a plain `assertRaises(cg.CredentialGuardError)`: with the
+        # pre-round-5 handler, the UnicodeEncodeError escapes *uncaught*,
+        # which `assertRaises` would report as an "ERROR", not a "FAIL" --
+        # and the real mutation driver (tests/_credential_mutation_driver.py)
+        # only ever counts a "FAIL" as a kill. Catching broadly and calling
+        # `self.fail(...)` explicitly on the wrong exception type is what
+        # makes this test actually register as killing that reverted
+        # exception-handler mutation.
+        bad = str(self.root) + "/tell\ud800tale-dir/paper.env"
+        try:
             cg.open_verified(bad, follow_symlinks=False)
-        self._assert_clean(ctx, "tell", "tale-dir")
-        self.assertRegex(str(ctx.exception), "credential_file_permissions:missing")
+        except cg.CredentialGuardError as error:
+            caught = error
+        except Exception as error:
+            self.fail(f"a non-CredentialGuardError escaped uncaught: {type(error).__name__}: {error!r}")
+            return
+        else:
+            self.fail("CredentialGuardError was not raised")
+            return
+        text = str(caught)
+        for tell_tale in ("tell", "tale-dir"):
+            self.assertNotIn(tell_tale, text)
+        self.assertIsNone(caught.__context__)
+        self.assertIsNone(caught.__cause__)
+        self.assertRegex(text, "credential_file_permissions:missing")
         for attr in ("object", "args"):
-            self.assertNotIn("tale-dir", repr(getattr(ctx.exception, attr, None)))
+            self.assertNotIn("tale-dir", repr(getattr(caught, attr, None)))
 
 
 class DotDotIsRejected(unittest.TestCase):
@@ -493,53 +520,80 @@ class FdOpenFailureCleanup(unittest.TestCase):
         self.assertEqual(before, after, "the verified descriptor leaked when io.FileIO() itself failed")
 
     def test_wrap_failure_does_not_double_close_a_reused_fd(self):
-        # Round-5 item 4: the fix under test is *specifically* that the
-        # cleanup path closes the already-constructed `raw` object (whose
-        # own bookkeeping then knows it is closed), not a bare
-        # os.close(file_fd) that bypasses that bookkeeping. Reverting to
-        # the bare os.close() leaves `raw` (an io.FileIO with
-        # closefd=True) believing it still owns file_fd; when `raw` is
-        # later garbage-collected, its own finalizer closes that fd number
-        # *again* -- by which point the OS may have already reused it for
-        # something else entirely, silently closing that unrelated file
-        # out from under its owner. Patching cg.io.BufferedReader (as the
-        # sibling leak test above does) only proves no *leak*; it does not
-        # by itself distinguish a clean close from a bypassed one, since
-        # both leave the fd count unchanged -- `raw.closed` is what must be
-        # examined afterward, since `io.FileIO.close()` is implemented in C
-        # and never goes through `os.close()` at all (so patching or
-        # counting `os.close()` calls would not observe it either).
+        # Round-5 item 4 / round-6 item 2: the fix under test is
+        # *specifically* that the cleanup path closes the already-
+        # constructed `raw` object (whose own bookkeeping then knows it is
+        # closed) exactly once, not a bare extra os.close(file_fd) after
+        # (or instead of) raw.close(). A round-5 draft of this test only
+        # checked `raw.closed` under a bare `assertRaises(OSError)` -- a
+        # mutant that does `raw.close(); os.close(file_fd)` (a *second*,
+        # extra close bypassing raw's bookkeeping) still leaves raw.closed
+        # True and still raises *an* OSError (EBADF, from the redundant
+        # close), so that draft did not actually distinguish "the
+        # simulated wrapping failure propagated" from "some other OSError,
+        # from a real double-close, propagated instead and masked it".
+        # Fixed by (a) asserting the propagated exception is exactly the
+        # simulated one (identity), and (b) deterministically forcing the
+        # OS to reuse the exact freed fd number and confirming that file
+        # is still open and readable afterward -- not merely hoping the
+        # very next unrelated open() happens to reuse it.
         path = _write_env(self.root)
         captured_raw = []
+        captured_fd = []
+        simulated = OSError("simulated wrapping failure")
 
         def _capture_and_fail(raw, *args, **kwargs):
             captured_raw.append(raw)
-            raise OSError("simulated wrapping failure")
+            captured_fd.append(raw.fileno())  # raw is still open here; capture the fd before it closes
+            raise simulated
 
         with patch.object(cg.io, "BufferedReader", side_effect=_capture_and_fail):
-            with self.assertRaises(OSError):
+            with self.assertRaises(OSError) as ctx:
                 cg.open_verified(path, follow_symlinks=True)
+        self.assertIs(ctx.exception, simulated,
+                      "a different OSError propagated instead of the simulated wrapping failure -- "
+                      "likely a real double-close's EBADF masking it")
         self.assertEqual(len(captured_raw), 1)
         raw = captured_raw[0]
+        target_fd = captured_fd[0]
         self.assertTrue(
             raw.closed,
             "the cleanup path did not close `raw` itself (bypassed via a bare os.close(file_fd)?) -- "
             "raw's own finalizer would then attempt a second, real close of whatever fd number the OS "
             "has since reused for something else entirely, the double-close this fix prevents")
+        del raw, captured_raw
+        gc.collect()  # a no-op finalizer if raw was correctly closed already
 
-        # Belt-and-suspenders best-effort corroboration (not the primary
-        # assertion, since fd-number reuse timing is not guaranteed): a
-        # fresh file opened right after a *correctly* closed `raw` is free
-        # to receive the same low fd number, and forcing raw's finalizer to
-        # run again (a no-op once already closed) must not disturb it.
-        reused = tempfile.TemporaryFile()
+        # Deterministically force the OS to hand back exactly target_fd,
+        # rather than hoping the very next open() happens to: open files
+        # one at a time (keeping each one open) until one of them receives
+        # that exact fd number, bounded so a leak elsewhere cannot hang
+        # this test.
+        opened = []
+        reused_path = None
         try:
-            del raw, captured_raw
-            gc.collect()
-            reused.write(b"still usable")
+            reused = None
+            for index in range(4096):
+                candidate_path = self.root / f"reuse-probe-{index}.env"
+                candidate = open(candidate_path, "wb")  # noqa: SIM115 -- kept open deliberately
+                if candidate.fileno() == target_fd:
+                    reused, reused_path = candidate, candidate_path
+                    break
+                opened.append(candidate)
+            self.assertIsNotNone(reused, f"fd {target_fd} was never reused within the bound; "
+                                         "cannot confirm no double-close happened")
+            # If a mutant double-closed target_fd for real (a second,
+            # bypassing os.close(file_fd) after raw.close() already freed
+            # it), that second close would have silently closed *this*
+            # file's fd instead once the OS handed it back -- write/read
+            # would then fail with EBADF.
+            reused.write(b"still usable after the guard returned\n")
             reused.flush()
-        finally:
             reused.close()
+            self.assertEqual(reused_path.read_bytes(), b"still usable after the guard returned\n")
+        finally:
+            for handle in opened:
+                handle.close()
 
 
 class FdLeakOnRefusal(unittest.TestCase):
@@ -642,17 +696,31 @@ class ImmediateParentStrictRule(unittest.TestCase):
         self.tmp.cleanup()
 
     def test_file_directly_in_real_tmp_is_refused(self):
-        # A real, compliant-looking 0600 file placed directly in the real
-        # /tmp (not a subdirectory): a strict parent rule with no sticky
-        # exception refuses it because /tmp itself is not owned by exactly
-        # getuid() (root ownership does not excuse a *parent*, only a
-        # container ancestor); the generic ancestor rule, by contrast,
-        # would accept /tmp as an ancestor outright (sticky exception), so
-        # this specific case only fails under the strict parent rule.
-        path = Path(tempfile.gettempdir()) / f"round5-parent-rule-tell-tale-{os.getpid()}.env"
-        path.write_text("APCA_API_KEY_ID=fixture-key\nAPCA_API_SECRET_KEY=fixture-secret\n")
-        os.chmod(path, 0o600)
+        # A real, compliant-looking 0600 file placed directly in the
+        # literal /tmp (not a subdirectory, and never tempfile.gettempdir()
+        # -- round 6: gettempdir() honors TMPDIR, which macOS sets to a
+        # private, per-user directory by default, so this test would
+        # otherwise silently exercise a *different*, already-private parent
+        # there and never reach the code path it means to test): a strict
+        # parent rule with no sticky exception refuses it because /tmp
+        # itself is not owned by exactly getuid() (root ownership does not
+        # excuse a *parent*, only a container ancestor); the generic
+        # ancestor rule, by contrast, would accept /tmp as an ancestor
+        # outright (sticky exception), so this specific case only fails
+        # under the strict parent rule.
+        real_tmp = Path("/tmp")
+        if not real_tmp.is_dir():
+            self.skipTest("/tmp does not exist on this host")
+        tmp_info = real_tmp.stat()
+        if (stat.S_IMODE(tmp_info.st_mode) & 0o1000) == 0 or (stat.S_IMODE(tmp_info.st_mode) & 0o002) == 0:
+            self.skipTest("/tmp is not sticky and world-writable on this host; "
+                          "this test assumes the conventional shared /tmp")
+        fd, name = tempfile.mkstemp(dir="/tmp", prefix="round6-parent-rule-tell-tale-")
+        path = Path(name)
         try:
+            os.write(fd, b"APCA_API_KEY_ID=fixture-key\nAPCA_API_SECRET_KEY=fixture-secret\n")
+            os.fchmod(fd, 0o600)
+            os.close(fd)
             with self.assertRaisesRegex(cg.CredentialGuardError, "credential_file_permissions:parent_"):
                 cg.open_verified(path, follow_symlinks=True)
         finally:
@@ -984,6 +1052,18 @@ MUTATIONS = {
                      "test_dotdot_through_a_symlinked_component_is_refused_not_normalized_away"],
         "extra_test_files": ["tests/test_adaptive_paper_credential_race.py", "tests/_credential_mutation_driver.py"],
     },
+    "narrow_symlink_component_exception_handler": {
+        # Round-6 item 3: reverts _is_symlink_component()'s exception clause
+        # to the pre-round-5 OSError-only shape, proving the surrogate test
+        # actually exercises this fix (U+D800, a lone high surrogate with
+        # no surrogateescape round-trip, is what distinguishes this from
+        # the earlier U+DCFF fixture, which never raised at all here).
+        "mutation": [(CG, "    except (OSError, ValueError, UnicodeError):\n        return False\n",
+                          "    except OSError:\n        return False\n", 1)],
+        "test_ids": ["tests.test_adaptive_paper_credential_race.NoPathLeakInErrors."
+                     "test_surrogate_in_an_ancestor_directory_component_never_leaks"],
+        "extra_test_files": ["tests/test_adaptive_paper_credential_race.py", "tests/_credential_mutation_driver.py"],
+    },
     "disable_root_ancestor_check": {
         "mutation": [(CG, "        if dir_names:\n"
                           "            _check_ancestor_directory(os.fstat(current_fd), reason_owner=REASON_ANCESTOR,\n"
@@ -1043,6 +1123,23 @@ MUTATIONS = {
                           "        raw.close()\n        raise\n",
                           "    try:\n        return io.BufferedReader(raw)\n    except BaseException:\n"
                           "        os.close(file_fd)\n        raise\n", 1)],
+        "test_ids": ["tests.test_adaptive_paper_credential_race.FdOpenFailureCleanup."
+                     "test_wrap_failure_does_not_double_close_a_reused_fd"],
+        "extra_test_files": ["tests/test_adaptive_paper_credential_race.py", "tests/_credential_mutation_driver.py"],
+    },
+    "extra_close_after_raw_close": {
+        # Round-6 item 2: a subtler double-close -- keeps the correct
+        # `raw.close()` but adds a redundant `os.close(file_fd)` right
+        # after it. `raw.closed` alone (the round-5 assertion) is still
+        # True under this mutant, so it survived the round-5 test; the
+        # extra close's EBADF is *an* OSError, which a bare
+        # `assertRaises(OSError)` also silently accepted. The round-6 fix
+        # -- asserting the propagated exception is exactly the simulated
+        # one, by identity -- is what this specifically proves catches.
+        "mutation": [(CG, "    try:\n        return io.BufferedReader(raw)\n    except BaseException:\n"
+                          "        raw.close()\n        raise\n",
+                          "    try:\n        return io.BufferedReader(raw)\n    except BaseException:\n"
+                          "        raw.close()\n        os.close(file_fd)\n        raise\n", 1)],
         "test_ids": ["tests.test_adaptive_paper_credential_race.FdOpenFailureCleanup."
                      "test_wrap_failure_does_not_double_close_a_reused_fd"],
         "extra_test_files": ["tests/test_adaptive_paper_credential_race.py", "tests/_credential_mutation_driver.py"],
@@ -1114,6 +1211,36 @@ class MutationDriverSelfTests(unittest.TestCase):
             ["tests/test_adaptive_paper_runner.py"])
         self.assertFalse(result["killed"], result)
         self.assertEqual(result.get("verdict"), "inconclusive", result)
+
+    def test_teardownclass_error_is_inconclusive_not_survived(self):
+        # Round-6 item 4 (Codex, low): a tearDownClass() failure is
+        # reported by unittest as its own pseudo-test-id (e.g.
+        # "tearDownClass (module.Class)"), never matching anything in
+        # `test_ids` -- so every *named* test id can report "ok" while the
+        # process as a whole still exits non-zero. Ignoring the process
+        # exit code in that case let it silently report "survived" (a
+        # non-zero mutant exit was ignored whenever the named methods
+        # reported ok). Injects a real, always-raising `tearDownClass`
+        # into the target class and confirms the driver now reports
+        # "inconclusive" instead.
+        result = driver.run_mutation(
+            "selftest-teardownclass-error",
+            [("tests/test_adaptive_paper_runner.py",
+              "class CredentialFilePermissions(unittest.TestCase):\n"
+              "    \"\"\"runner.credentials() fails closed on env-file mode, ownership, and\n"
+              "    Git-worktree location before any line of the file is parsed.\"\"\"\n",
+              "class CredentialFilePermissions(unittest.TestCase):\n"
+              "    \"\"\"runner.credentials() fails closed on env-file mode, ownership, and\n"
+              "    Git-worktree location before any line of the file is parsed.\"\"\"\n"
+              "\n"
+              "    @classmethod\n"
+              "    def tearDownClass(cls):\n"
+              "        raise RuntimeError(\"round6 driver self-test: simulated tearDownClass failure\")\n", 1)],
+            ["tests.test_adaptive_paper_runner.CredentialFilePermissions.test_hard_link_is_rejected"],
+            ["tests/test_adaptive_paper_runner.py"])
+        self.assertFalse(result["killed"], result)
+        self.assertEqual(result.get("verdict"), "inconclusive", result)
+        self.assertNotEqual(result.get("returncode"), 0, result)
 
 
 class RealMutationKills(unittest.TestCase):
