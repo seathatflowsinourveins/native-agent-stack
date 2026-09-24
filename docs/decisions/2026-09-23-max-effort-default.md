@@ -244,3 +244,21 @@ Revisit this record when any of these happens:
   (pinned at agent-lab `e070125`), not by this change; the pre-merge `915e73e` pin on an
   earlier revision of this branch never reached main. The review and readiness scripts and
   the `child-usage.mjs` mirror here are byte-identical to agent-lab `b31f640`.
+
+## Reviews
+
+- **Pre-rebase rounds.** Two independent Opus review rounds covered this change before the rebase. Their findings were resolved in the commits that became `4140e88c` and `961c7826`.
+- **Rebase review.** One independent Opus reviewer read `ff2ac50a...cad8d255`. It found four issues, all fixed in `152cfa42`:
+  1. blocking: this record named the old pin and called `.claude/settings.json` new;
+  2. medium: the macOS #94 cleanup was only half applied;
+  3. low: the test docstring left out the secret-path guard;
+  4. note: four example agents had drifted from agent-lab.
+- **Post-merge review of `152cfa42`.** An independent review by the github-automation session found nothing. It covered:
+  - squash `2d86d55b`, which equals the clean three-way merge;
+  - #94 being in `v2026.09.24.1`;
+  - the tag's agent set;
+  - the secret-guard hash coverage;
+  - byte identity with agent-lab `b31f640`;
+  - the settings key diff;
+  - main's push CI, green at `2d86d55b`.
+- Agent-lab keeps the full record: `docs/tasks/2026-09-23-max-effort-default.md`, "Catalog landing".
