@@ -146,9 +146,13 @@ def context(repo, *, versions=None, amend_pending_ok: bool = False, transport_ch
     coverage = check_coverage_decision(repo, protocol)
     tip = guards.git(repo, "rev-parse", guards.MAIN)
     from datetime import datetime, timezone
-    late = guards.late_voids(repo, f"{RESULTS_DIR}/validation.json", void_scopes) if void_scopes else []
+    # review round 13, F1: a committed void applies only if it reached origin/main before the outcome it would void
+    # could have been computed; a later one is reported, never applied
+    effect = void_effect(repo, run_log, access_log, freeze_ts) if void_scopes else \
+        {"effective": frozenset(), "late": [], "after_freeze": []}
     return {"repo": repo, "protocol": protocol, "protocol_sha256": sha256_bytes(pbytes), "tree": tree,
-            "pinned_tree": pinned_tree, "transport_deviation": deviation, "voids": void_scopes, "late_voids": late,
+            "pinned_tree": pinned_tree, "transport_deviation": deviation, "voids": effect["effective"],
+            "voids_late": effect["late"], "voids_after_freeze": effect["after_freeze"],
             "commit": guards.git(repo, "rev-parse", "HEAD"), "freeze_commit": freeze_commit, "freeze_ts": freeze_ts,
             "freeze_utc": datetime.fromtimestamp(freeze_ts, timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
             "freeze_session": freeze_session, "n0_pinned": CH.n0(pinned, freeze_ts), "pinned_cal": pinned,
@@ -158,6 +162,71 @@ def context(repo, *, versions=None, amend_pending_ok: bool = False, transport_ch
             "amendment_files": {n: logs.file_state(p) for n, p in amend.items()}, "run_log": run_log,
             "access_log": access_log,
             "main_tip_time": guards.commit_time(repo, tip) if guards.verified_merge(repo, tip) else None}
+
+
+def gate_opened(repo, access_log: list):
+    """The signed time the holdout gate opened: when the first granted 'count' or 'read' authorization reached
+    origin/main, or None (exposure_registry.update_rule, review round 13, F1)."""
+    idx = [i for i, r in enumerate(access_log) if r.get("record_kind") == "authorization"
+           and r.get("decision") == "granted" and r.get("purpose") in ("count", "read")]
+    if not idx:
+        return None
+    reach = logs.line_reach(repo, ACCESS_LOG)
+    return reach[idx[0]][1] if idx[0] < len(reach) else None
+
+
+def validation_started(repo, run_log: list):
+    """The signed time the first 'evaluate_start' (or, failing one, 'evaluate') line of the validation stage reached
+    origin/main, or None: from then on a validation outcome may have been computed (review round 13, F1)."""
+    idx = [i for i, x in enumerate(run_log) if x.get("stage") == "validation"
+           and x.get("purpose") in ("evaluate_start", "evaluate")]
+    if not idx:
+        return None
+    reach = logs.line_reach(repo, RUN_LOG)
+    return reach[idx[0]][1] if idx[0] < len(reach) else None
+
+
+def void_effect(repo, run_log: list, access_log: list, freeze_ts: int) -> dict:
+    """exposure_registry.update_rule (review round 13, F1). Which committed void deviations apply, by signed reach
+    times, so that no void can be chosen after the outcome it would void was computable:
+      'tests' and 'validation' apply (every validation p = 1, so nothing is carried and the holdout never opens) only
+      if they reached origin/main before the validation stage's first 'evaluate_start' line did;
+      'holdout' applies (count and read authorizations are refused and a read that sealed nothing writes the
+      not-read label) only if it reached origin/main before the holdout gate opened (the first granted 'count' or
+      'read' authorization reached it) and the read it records (read_utc) is no later than the record and before
+      the gate opened.
+    A void that does not apply is 'late': it is reported (in results/validation.json if that is written after it,
+    in the holdout read's voids_late and in its holdout_label), never applied. An applied 'tests' or 'validation'
+    void that reached origin/main after the freeze commit (the rule wants it recorded before the freeze) is named
+    in after_freeze. Returns {"effective": frozenset of scopes, "late": [...], "after_freeze": [...]}."""
+    from core.calendar import iso_utc, parse_utc
+    recs = guards.void_records(repo)
+    if not recs:
+        return {"effective": frozenset(), "late": [], "after_freeze": []}
+    started, opened = validation_started(repo, run_log), gate_opened(repo, access_log)
+    effective, late, after_freeze = set(), [], []
+    for dev, t in recs:
+        scope = dev["scope"]
+        entry = {"number": dev.get("number"), "scope": scope, "reach_utc": iso_utc(t)}
+        reason = None
+        if scope in ("tests", "validation"):
+            if started is not None and t >= started:
+                reason = "reached origin/main at or after the validation evaluation's start line"
+        else:
+            read_t = parse_utc(dev["read_utc"])
+            if opened is not None and t >= opened:
+                reason = "reached origin/main at or after the holdout gate opened"
+            elif opened is not None and read_t >= opened:
+                reason = "cites a read at or after the holdout gate opened"
+            elif read_t > t:
+                reason = "cites a read later than its own record"
+        if reason is None:
+            effective.add(scope)
+            if scope != "holdout" and t > freeze_ts:
+                after_freeze.append(dict(entry, note="recorded after the freeze commit; the rule wants it before"))
+        else:
+            late.append(dict(entry, reason=reason))
+    return {"effective": frozenset(effective), "late": late, "after_freeze": after_freeze}
 
 
 DEVELOPMENT_YEARS = (2017, 2018, 2019)     # coverage_rule.item_rule: development_computed (2016 is warm-up)
@@ -331,7 +400,8 @@ def evaluate_run(ctx: dict, stage: str, snapshot_dir, snapshot_sha256: str, comp
     """One logged evaluation of a development or validation stage into results/<stage>.json. Refused when the stage
     already has a results file or a results line, when the snapshot is not the one its fetch line sealed, or when
     an earlier failed attempt used another snapshot (review round 9, F1 and M-4). If the run is interrupted after the
-    results file is written, the line records that file's sha256 as complete (F10)."""
+    results file is written, the line records that file's sha256 as complete (F10). Two committed steps (review
+    round 13, F1): an 'evaluate_start' line first, then the evaluation under it."""
     from core.store import Store
     path = results_path(ctx, stage)
     if logs.results_lines(ctx["run_log"], stage) or path.exists():
@@ -349,6 +419,12 @@ def evaluate_run(ctx: dict, stage: str, snapshot_dir, snapshot_sha256: str, comp
     if any(x.get("input_snapshot_sha256s") != [snapshot_sha256] for x in earlier):
         raise RunRefused("an earlier attempt of this stage used another snapshot; a retry uses the same sealed inputs")
     store = Store.read(snapshot_dir, snapshot_sha256)
+    # review round 13, F1: an evaluation runs in two committed steps, like a fetch. The first call appends an
+    # 'evaluate_start' line and computes nothing; the evaluation runs only once that line is on origin/main, so every
+    # attempt that could have computed an outcome is a logged exposure with a signed time (void_effect)
+    si = begin_or_resume(ctx, stage, "evaluate", {"snapshot_sha256": snapshot_sha256}, clock)
+    if si is None:
+        return {"started": True, "next": "commit and push the start line, then run the evaluation again"}
     start, status, digest = clock(), "failed", None
     try:
         out = evaluate_and_write(ctx, stage=stage, snapshot_sha256=snapshot_sha256, vintages=store.vintages(),
@@ -361,7 +437,7 @@ def evaluate_run(ctx: dict, stage: str, snapshot_dir, snapshot_sha256: str, comp
         logs.append_line(ctx["repo"] / RUN_LOG, run_line(
             ctx, stage=stage, purpose="evaluate", commit=ctx["commit"], utc_start=start, utc_end=clock(),
             snapshots=[snapshot_sha256], status=status, results_sha256=digest,
-            extra={"results_path": str(Path(RESULTS_DIR) / path.name)}))
+            extra={"results_path": str(Path(RESULTS_DIR) / path.name), "start_index": si}))
     return {"results_sha256": digest}
 
 

@@ -62,8 +62,10 @@ def screen_rows(store, cal, sessions: list, symbols: list):
     return rows, counts, unknown
 
 
-def candidates(store, cal, sessions: list, symbols: list, renames: set, active: frozenset = frozenset()):
+def candidates(store, cal, sessions: list, symbols: list, renames):
     """Pass 2, then identity dedup of the candidates as of each candidate's session, then the same-session guard.
+    renames: the dated name_change records (core.identity.rename_records); each decision as of t uses only those
+    effective on or before t, and no active status (review round 13, F2).
     Returns (candidates, counts, dedupe report). Counts are per stage, by reason and year; the per-reason counts are
     over the screen rows before dedup."""
     rows, counts, unknown = screen_rows(store, cal, sessions, symbols)
@@ -118,10 +120,10 @@ def candidates(store, cal, sessions: list, symbols: list, renames: set, active: 
                               "ohlcv_prev": (bp.get("o"), bp.get("h"), bp.get("l"), bp.get("c"), bp.get("v") or 0)})
     # identity dedup as of each candidate's own session: rows after t never decide membership at t (review round
     # 12, Codex P1; universe_and_identity.dedup)
-    dd = identity.dedupe_asof(rows, renames, active, [(c["symbol"], c["session"]) for c in found])
+    dd = identity.dedupe_asof(rows, renames, [(c["symbol"], c["session"]) for c in found])
     counts["dedupe_candidates_removed"] = len(dd["removed"])
     found = [c for c in found if (c["symbol"], c["session"]) not in dd["removed"]]
-    kept, dropped = identity.same_session_guard(found, renames, active)
+    kept, dropped = identity.same_session_guard(found, renames)
     counts["same_session_guard_removed"] = len(dropped)
     counts["candidates"] = len(kept)
     return [{"symbol": c["symbol"], "t": c["session"], "close_t": c["close_t"], "prev_close": c["prev_close"]}

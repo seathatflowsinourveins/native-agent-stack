@@ -7,6 +7,7 @@ core.runner.context (after the freeze) or core.runner.count_only_context (the pr
   run.py dry-run --sessions D1,D2 --symbols A,B --snapshot-root DIR     (pre-freeze native dry run, runs once)
   run.py fetch --stage development|validation --enumeration ENUM.json --snapshot DIR    (once per stage)
   run.py evaluate --stage development|validation --enumeration ENUM.json --snapshot DIR --sha SHA
+                  (first run: the start line; after it is pushed, the evaluation)
   run.py transport-check --stage development|validation --enumeration ENUM.json --snapshot DIR --sha SHA
                   [--holdout-root DIR]   (required once a holdout snapshot is sealed)
   run.py authorize --purpose collect|amend|count|read [--retry-of ID]   (appends the authorization record)
@@ -233,8 +234,13 @@ def cmd_evaluate(a) -> int:
     cov = ctx["coverage"]
     ident = {"rate": cov["identity_unreached_rate_2020"]} if (a.stage == "validation"
                                                                and cov["validation_identity_limited"]) else None
-    # review round 10, F4: a committed void deviation (a recorded pre-freeze read) scores every validation item p = 1
+    # review round 10, F4: a committed void deviation (a recorded pre-freeze read) scores every validation item p = 1.
+    # Review round 13, F1: only a void that reached origin/main before this stage's evaluate_start line applies
+    # (runner.void_effect); one recorded after the freeze is named, and a later one is reported, never applied
     voided = sorted(ctx["voids"] & {"tests", "validation"}) if a.stage == "validation" else []
+    void_notes = {"void_deviations_after_freeze": [e for e in ctx["voids_after_freeze"]],
+                  "void_deviations_late": [e for e in ctx["voids_late"] if e["scope"] in ("tests", "validation")]} \
+        if a.stage == "validation" else {}
 
     testing = runner.stage_testing(a.stage, cov)     # review round 11, C9: development is not gated by 2020
 
@@ -242,7 +248,8 @@ def cmd_evaluate(a) -> int:
         quals = ("transport-deviation",) if runner.transport_qualified(ctx, [fetch_line]) else ()
         res = ST.evaluate_stage(spec, store, ctx["protocol"]["id"], tested=testing["tested"],
                                 void={"void": bool(fetch_line.get("stage_void")) or bool(voided),
-                                      "rate": fetch_line.get("fetch_incomplete_rate"), "void_deviations": voided},
+                                      "rate": fetch_line.get("fetch_incomplete_rate"), "void_deviations": voided,
+                                      **void_notes},
                                 qualifiers=quals, identity_limited=ident)
         if "development_computed" in testing:
             res["development_computed"] = testing["development_computed"]

@@ -18,7 +18,7 @@ from core import events as EVS
 from core import plan, screen
 from core import terciles as TC
 from core.calendar import year_of
-from core.identity import rename_pairs
+from core.identity import rename_records
 from core.trades import Ctx, trade
 
 
@@ -101,7 +101,7 @@ def d_events(spec, store, strict: bool = True):
     the candidates require (the plan), needs the ones not yet sealed."""
     counts = Counter()
     cands, sc, report = screen.candidates(store, spec.cal, spec.screen_sessions(), spec.symbols,
-                                          rename_pairs(spec.actions), spec.active)
+                                          rename_records(spec.actions))
     counts.update(sc)
     events, needs, used = [], [], []
     segs = spec.segs

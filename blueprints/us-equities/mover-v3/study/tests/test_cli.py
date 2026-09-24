@@ -100,14 +100,26 @@ class StageRunsOnce(unittest.TestCase):
                 other.write_text(json.dumps(enum))
                 with self.assertRaises(guards.Refused):        # an enumeration other than the sealed one
                     run.main(evaluate[:4] + [str(other)] + evaluate[5:])
+                # review round 13, F1: the first evaluate run appends only its start line and computes nothing
+                with mock.patch.object(ST, "evaluate_stage", side_effect=AssertionError("computed before the start")):
+                    self.assertEqual(run.main(evaluate), 0)
+                start = logs.read_lines(repo / RUN_LOG)[-1]
+                self.assertEqual((start["purpose"], start["snapshot_sha256"]), ("evaluate_start", sha))
+                results = repo / RESULTS_DIR / "validation.json"
+                self.assertFalse(results.exists())
+                with self.assertRaises(guards.Refused):        # nothing runs until the start line is pushed
+                    run.main(evaluate)
+                FR.commit_push(repo, "2026-12-01T01:30:00+00:00")
                 # a run that fails before its write leaves no results file and a failed line; the retry may follow
                 with mock.patch.object(ST, "evaluate_stage", side_effect=RuntimeError("killed")):
                     with self.assertRaises(RuntimeError):
                         run.main(evaluate)
-                results = repo / RESULTS_DIR / "validation.json"
                 self.assertFalse(results.exists())
                 self.assertEqual(logs.read_lines(repo / RUN_LOG)[-1]["status"], "failed")
+                self.assertEqual(logs.read_lines(repo / RUN_LOG)[-1]["start_index"], 2)
                 FR.commit_push(repo, "2026-12-01T02:00:00+00:00")
+                self.assertEqual(run.main(evaluate), 0)        # the retry's own start line
+                FR.commit_push(repo, "2026-12-01T02:30:00+00:00")
                 # F10: killed after the atomic write: the line records the file's sha256 as complete
                 real_write = runner.atomic_write_results
 
@@ -488,30 +500,100 @@ class ContextRefusals(unittest.TestCase):
                 run.main(fetch)
                 sha = logs.read_lines(repo / RUN_LOG)[-1]["input_snapshot_sha256s"][0]
                 FR.commit_push(repo, "2026-12-01T01:00:00+00:00")
-                run.main(["evaluate", "--stage", "validation", "--enumeration", str(fx["enumeration"]), "--snapshot",
-                          snap, "--sha", sha])
+                evaluate = ["evaluate", "--stage", "validation", "--enumeration", str(fx["enumeration"]), "--snapshot",
+                            snap, "--sha", sha]
+                run.main(evaluate)
+                FR.commit_push(repo, "2026-12-01T01:30:00+00:00")          # the evaluate start line (round 13)
+                run.main(evaluate)
             body = json.loads((repo / RESULTS_DIR / "validation.json").read_text())
             self.assertEqual(body["void"]["void_deviations"], ["tests"])
             self.assertTrue(all(r["p_stage"] == 1.0 for r in body["items"].values()))
             self.assertTrue(all(v == "underpowered" for v in body["labels"].values()))
+            # review round 13, F1: the void reached origin/main after the freeze commit (2026-10-02); it applies,
+            # because it came before the evaluation's start line, and it is named as recorded after the freeze
+            self.assertEqual([(e["number"], e["scope"]) for e in body["void"]["void_deviations_after_freeze"]],
+                             [(1, "tests")])
+            self.assertEqual(body["void"]["void_deviations_late"], [])
             FR.commit_push(repo, "2026-12-01T02:00:00+00:00")
             from core import holdout
             ctx = self.ctx(repo)
             g = holdout.gate_context(ctx, "count", ctx["cal"].at("2027-12-10", "20:00"))
             self.assertTrue(any("validation is void" in r for r in gate.evaluator_refusals(g)))
-            # review round 12, F6: the void above reached origin/main before the validation results; a void recorded
-            # after them is named as late in the refusal
-            self.assertEqual(ctx["late_voids"], [])
-            self.assertFalse(any("recorded after the validation results" in r for r in gate.evaluator_refusals(g)))
+            self.assertEqual(ctx["voids_late"], [])
+            # a void recorded after the validation results is reported as late, never applied
             FR.write(repo / DEVIATIONS, json.dumps({"deviations": [
                 {"number": 1, "kind": "void", "scope": "tests", "cause": "a synthetic pre-freeze read"},
                 {"number": 2, "kind": "void", "scope": "validation", "cause": "a read found after the outcome"}]}))
             FR.commit_push(repo, "2026-12-02T00:00:00+00:00")
             ctx = self.ctx(repo)
-            self.assertEqual(ctx["late_voids"], ["validation"])
-            g = holdout.gate_context(ctx, "read", ctx["cal"].at("2027-12-10", "20:00"))
-            self.assertTrue(any("(validation) was recorded after the validation results" in r
-                                for r in gate.evaluator_refusals(g)))
+            self.assertEqual(ctx["voids"], frozenset({"tests"}))
+            self.assertEqual([(e["number"], e["scope"]) for e in ctx["voids_late"]], [(2, "validation")])
+
+    def test_a_void_recorded_after_the_evaluation_started_is_reported_not_applied(self):
+        """Review round 13, F1: the validation evaluation runs under a pushed start line. A 'validation' void that
+        reaches origin/main after that line (when the outcome could have been computed locally and discarded) is
+        reported in results/validation.json and never applied. Before the fix every committed void set p = 1."""
+        cal = synth.calendar()
+        market, symbols = build_market(cal)
+        enum = {"symbols": symbols, "actions": [], "active": symbols, "counts": {}}
+        with tempfile.TemporaryDirectory() as tmp:
+            fx = FR.build(tmp, enumeration=enum)
+            repo, snap = fx["repo"], str(Path(tmp) / "snap")
+            fast = functools.partial(ST.evaluate_stage, B=200)
+            with FR.isolated_bytecode(), mock.patch.object(run, "REPO", repo), \
+                    mock.patch.object(run, "transports", lambda *_: transports(market)), \
+                    mock.patch.object(run, "clock", fixed_clock), \
+                    mock.patch.object(ST, "evaluate_stage", lambda *a, **k: fast(*a, **k)):
+                fetch = ["fetch", "--stage", "validation", "--enumeration", str(fx["enumeration"]), "--snapshot", snap]
+                run.main(fetch)
+                FR.commit_push(repo, "2026-11-30T00:00:00+00:00")
+                run.main(fetch)
+                sha = logs.read_lines(repo / RUN_LOG)[-1]["input_snapshot_sha256s"][0]
+                FR.commit_push(repo, "2026-12-01T01:00:00+00:00")
+                evaluate = ["evaluate", "--stage", "validation", "--enumeration", str(fx["enumeration"]), "--snapshot",
+                            snap, "--sha", sha]
+                run.main(evaluate)
+                FR.commit_push(repo, "2026-12-01T01:30:00+00:00")          # the start line
+                FR.write(repo / DEVIATIONS, json.dumps({"deviations": [
+                    {"number": 1, "kind": "void", "scope": "validation", "cause": "recorded after the start"}]}))
+                FR.commit_push(repo, "2026-12-01T02:00:00+00:00")
+                run.main(evaluate)
+            body = json.loads((repo / RESULTS_DIR / "validation.json").read_text())
+            self.assertEqual((body["void"]["void"], body["void"]["void_deviations"]), (False, []))
+            self.assertEqual([(e["number"], e["scope"]) for e in body["void"]["void_deviations_late"]],
+                             [(1, "validation")])
+            self.assertIn("start line", body["void"]["void_deviations_late"][0]["reason"])
+
+    def test_a_holdout_void_applies_only_before_the_gate_opened(self):
+        """Review round 13, F1: a 'holdout' void cites its read (read_utc) and applies only if it reached origin/main
+        before the first granted 'count' or 'read' authorization did; a later one (after paper results, say) is
+        reported, never a refusal and never the not-read label."""
+        with tempfile.TemporaryDirectory() as tmp:
+            repo = FR.build(tmp)["repo"]
+            FR.write(repo / DEVIATIONS, json.dumps({"deviations": [
+                {"number": 1, "kind": "void", "scope": "holdout", "cause": "no read time"}]}))
+            FR.commit_push(repo, "2027-01-04T00:00:00+00:00")
+            with self.assertRaisesRegex(guards.Refused, "read_utc"):
+                self.ctx(repo)
+        with tempfile.TemporaryDirectory() as tmp:
+            repo = FR.build(tmp)["repo"]
+            early = {"number": 1, "kind": "void", "scope": "holdout", "cause": "a read before the gate",
+                     "read_utc": "2027-01-03T00:00:00Z"}
+            FR.write(repo / DEVIATIONS, json.dumps({"deviations": [early]}))
+            FR.commit_push(repo, "2027-01-04T00:00:00+00:00")
+            self.assertEqual(self.ctx(repo)["voids"], frozenset({"holdout"}))
+        with tempfile.TemporaryDirectory() as tmp:
+            repo = FR.build(tmp)["repo"]
+            logs.append_line(repo / ACCESS_LOG, {"record_kind": "authorization", "authorization_id": "count-001",
+                                                 "purpose": "count", "decision": "granted"})
+            FR.commit_push(repo, "2027-01-02T00:00:00+00:00")                # the gate opens
+            FR.write(repo / DEVIATIONS, json.dumps({"deviations": [early]}))
+            FR.commit_push(repo, "2027-01-04T00:00:00+00:00")
+            ctx = self.ctx(repo)
+            self.assertEqual(ctx["voids"], frozenset())
+            self.assertEqual([(e["number"], e["scope"]) for e in ctx["voids_late"]], [(1, "holdout")])
+            self.assertIn("gate opened", ctx["voids_late"][0]["reason"])
+
 
 if __name__ == "__main__":
     unittest.main()

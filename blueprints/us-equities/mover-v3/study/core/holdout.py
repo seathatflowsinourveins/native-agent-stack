@@ -136,10 +136,17 @@ def batches(ctx: dict) -> list:
 
 def sealed_refs(ctx: dict, purposes=("collect", "count")) -> list:
     """[(directory, sha256)] of every sealed snapshot named by a completion of a granted action of these purposes, in
-    access-log order: <purpose>-<authorization_id> of the action that sealed it (a retry that reused a failed
-    attempt's snapshot names the same sha256, which is listed once)."""
+    access-log order (a retry that reused a failed attempt's snapshot names the same sha256, which is listed once).
+    The directory is the one the snapshot was sealed into: for a count, the snapshot_dir of the 'count_fetch' line
+    that sealed that sha256, which is the first attempt's directory when a retry completed over it (review round 13,
+    Codex P2); for a collection batch, collect-<authorization_id>."""
     granted = {a["authorization_id"]: a for a in ctx["access_log"]
                if a.get("record_kind") == "authorization" and a.get("decision") == "granted"}
+    sealed_in = {}
+    for x in ctx["run_log"]:
+        shas = x.get("input_snapshot_sha256s") or []
+        if x.get("stage") == "holdout" and x.get("purpose") == "count_fetch" and shas and x.get("snapshot_dir"):
+            sealed_in.setdefault(shas[0], x["snapshot_dir"])
     out, seen = [], set()
     for rec in ctx["access_log"]:
         a = granted.get(rec.get("authorization_id"))
@@ -147,7 +154,8 @@ def sealed_refs(ctx: dict, purposes=("collect", "count")) -> list:
         if rec.get("record_kind") != "completion" or a is None or a["purpose"] not in purposes or not sha or sha in seen:
             continue
         seen.add(sha)
-        out.append((f"{a['purpose']}-{a['authorization_id']}", sha))
+        d = sealed_in.get(sha) if a["purpose"] == "count" else None
+        out.append((d or f"{a['purpose']}-{a['authorization_id']}", sha))
     return out
 
 
@@ -227,8 +235,9 @@ def gate_context(ctx: dict, purpose: str, now: float, retry_of=None) -> dict:
               "validation_run_protocol_sha256": val["run_protocol_sha256"], "frozen_tree": ctx["pinned_tree"],
               "running_tree": ctx["tree"], "fetch_only_deviation_passed": ctx["transport_deviation"] is not None,
               "runtime_ok": True, "data_files_ok": True, "amendment_refusals": [],   # runner.context refused otherwise
+              # review round 13, F1: ctx["voids"] holds only the voids that apply by their signed reach times
+              # (core.runner.void_effect); a late void is reported by the read, never a refusal
               "validation_void": bool(voids & {"tests", "validation"}), "holdout_void": "holdout" in voids,
-              "validation_void_late": list(ctx.get("late_voids") or ()),                    # review round 12, F6
               "validated_items": validated, "requested_items": validated,
               "accrual_logs_complete": all(aid in seq["completions"] for aid, a in seq["granted"].items()
                                            if a["purpose"] == "collect"),
@@ -622,13 +631,21 @@ def count(ctx: dict, authorization_id: str, snapshot_root, transports, now: floa
     return {"results_sha256": digest, "extension": ext, "window": [n0, last]}
 
 
+def fee_span(ctx: dict, n0: str, last: str) -> list:
+    """The sessions whose fee rows a read can use (cost_model.fees; review round 13, Codex P2): a trade exits, and
+    pays its sale fees, from N0 through the end of the last terminal-search window, 5 sessions after the last
+    session. core.logs.fee_first_use takes a fee amendment line's first use from this span."""
+    end = ctx["cal"].offset(last, T["search_sessions"])
+    return [n0, end or last]
+
+
 def not_read_results(ctx: dict, carried, reason: str) -> dict:
     """chronology.holdout.read_timing and outcome_reporting.rule: the fixed label for every carried item. With no
     carried item (nothing validated) the holdout is never labelled or read (holdout_gate.no_pass): the record holds
     no label and no verdict (review round 10, F8)."""
     base = {"kind": "mover_v3_holdout_read", "stage": "holdout", "read": False, "reason": reason,
             "carried": list(carried), "protocol_sha256": ctx["protocol_sha256"], "study_tree": ctx["tree"],
-            "runtime_lock_sha256": ctx["runtime_lock_sha256"]}
+            "runtime_lock_sha256": ctx["runtime_lock_sha256"], "voids_late": list(ctx.get("voids_late") or ())}
     if not carried:
         return {**base, "no_holdout": "nothing validated: the holdout is never labelled or read (holdout_gate.no_pass)"}
     labels = {i: ("not supported (holdout not read)" if i in carried else "not carried") for i in ITEM_IDS}
@@ -646,6 +663,10 @@ def holdout_label(ctx: dict, items: dict) -> object:
         failed.append("the validation results were not reachable from origin/main before 09:30 ET on N0")
     if "holdout" in (ctx.get("voids") or ()):
         failed.append("a recorded holdout read preceded a committed granted entry")
+    # review round 13, F1 and Codex P2: a void recorded after the point where it could apply is reported, not applied;
+    # the read goes ahead and its label names it
+    for v in ctx.get("voids_late") or ():
+        failed.append(f"void deviation {v.get('number')} ({v.get('scope')}) {v.get('reason')}: reported, not applied")
     allowed = {ctx["pinned_tree"]} | {d.get("new_tree") for d in guards.load_deviations(ctx["repo"])
                                       if d.get("kind") == "transport"}
     if any(x.get("study_tree") not in allowed for x in ctx["run_log"]
@@ -755,8 +776,10 @@ def read(ctx: dict, authorization_id: str, snapshot_root, transports, now: float
             reason = "the read authorization reached origin/main at or after 15 sessions after the last holdout session"
         elif any(x.get("void") for x in count_lines(ctx["run_log"])):
             reason = "a holdout count was void (populations.fetch_failures)"
-        elif "holdout" in (ctx.get("voids") or ()):
-            reason = "the holdout is void (exposure_registry.update_rule)"
+        elif ctx.get("voids"):
+            # review round 13, Codex P2 and F1: every void that applies by its signed reach time, of any scope (a
+            # 'tests' or 'validation' void applies only before validation was evaluated, so it left nothing carried)
+            reason = f"the holdout is void (exposure_registry.update_rule): {', '.join(sorted(ctx['voids']))}"
         if reason is not None:
             return _write_not_read(ctx, auth, authorization_id, carried, reason, now)
         end = ctx["cal"].offset(last, T["search_sessions"])
@@ -778,7 +801,7 @@ def read(ctx: dict, authorization_id: str, snapshot_root, transports, now: float
     quals = (("transport-deviation",) if deviated else ()) + (("late-read",) if late_read else ())
     # conditions that would have refused the read before its seal are reported, never turned into a not-read label
     after_seal = ([f"void count (block {x.get('block')})" for x in count_lines(ctx["run_log"]) if x.get("void")]
-                  + (["holdout void (exposure_registry.update_rule)"] if "holdout" in (ctx.get("voids") or ()) else []))
+                  + [f"{v} void (exposure_registry.update_rule)" for v in sorted(ctx.get("voids") or ())])
     sha, rows = fl["input_snapshot_sha256s"][0], 0
     try:
         sealed, sha = _sealed(ctx, fl, bases, snapshot_root)
@@ -791,6 +814,7 @@ def read(ctx: dict, authorization_id: str, snapshot_root, transports, now: float
                                      validation_signs=signs, B=B, qualifiers=quals)
             res.update({"kind": "mover_v3_holdout_read", "read": True, "window": [n0, last],
                         "late_read": late_read, "void_after_seal": after_seal,
+                        "voids_late": list(ctx.get("voids_late") or ()),
                         "holdout_label": holdout_label(ctx, res["items"])})
         res.update({"protocol_sha256": ctx["protocol_sha256"], "study_tree": ctx["tree"],
                     "runtime_lock_sha256": ctx["runtime_lock_sha256"], "input_snapshot_sha256": sha,
@@ -801,6 +825,6 @@ def read(ctx: dict, authorization_id: str, snapshot_root, transports, now: float
         if digest is None and path.exists():
             status, digest = "complete", sha256_file(path)
         _finish(ctx, authorization_id, start, now, status, sha, rows, digest, [],
-                {"purpose": "read", "sessions": [n0, last],
+                {"purpose": "read", "sessions": [n0, last], "fee_span": fee_span(ctx, n0, last),
                  "validation_results_reach_utc": _validation_reach_utc(ctx)}, [sha])
     return {"results_sha256": digest, "read": True}

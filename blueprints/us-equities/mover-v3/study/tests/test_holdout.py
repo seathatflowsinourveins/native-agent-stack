@@ -12,7 +12,7 @@ from unittest import mock
 import run
 from core import gate, guards, holdout, logs, plan, runner
 from core.canon import sha256_file
-from core.params import ACCESS_LOG, RESULTS_DIR, RUN_LOG
+from core.params import ACCESS_LOG, DEVIATIONS, RESULTS_DIR, RUN_LOG
 from core.store import Store
 from tests import fixture_repo as FR
 from tests import synth
@@ -199,7 +199,17 @@ class HoldoutPath(unittest.TestCase):
             main("authorize", "--purpose", "read")
             rid = access()[-1]["authorization_id"]
             push()
+            # review round 13, F1 and Codex P2: void deviations recorded after the gate opened (a holdout-window read
+            # found late, as after watching paper results, and a validation read) cannot cancel the read; before the
+            # fix the 'holdout' one turned it into the not-read label and the 'validation' one was ignored
+            from core.calendar import iso_utc
+            FR.write(repo / DEVIATIONS, json.dumps({"deviations": [
+                {"number": 1, "kind": "void", "scope": "holdout", "cause": "synthetic: a read found late",
+                 "read_utc": iso_utc(cal.at(n0, "12:00"))},
+                {"number": 2, "kind": "void", "scope": "validation", "cause": "synthetic: a read found late"}]}))
+            push()
             pinned_ctx = runner_ctx(repo)
+            self.assertEqual(pinned_ctx["voids"], frozenset())
             main("read", "--authorization", rid, "--snapshot-root", root)     # step 1: fetch and seal
             self.assertFalse((repo / RESULTS_DIR / "holdout-read.json").exists())
             fetch_line = logs.read_lines(repo / RUN_LOG)[-1]
@@ -247,8 +257,14 @@ class HoldoutPath(unittest.TestCase):
             self.assertNotIn("H1", res["verdicts"])        # review round 10, F8: no carried H1 item, no H1 verdict
             self.assertEqual(res["items"]["H3-a"]["n"], 1)
             self.assertEqual(res["items"]["H3-a"]["paper_exposed_fraction"], 1.0)    # the accrual log's order
-            # review round 11, C8: the holdout's untouched status names its failed condition
-            self.assertEqual(res["holdout_label"], ["paper-exposed fraction above 0.05: H3-a, H3-c"])
+            # review round 11, C8: the holdout's untouched status names its failed conditions; round 13: the late voids
+            self.assertEqual(res["holdout_label"][-1], "paper-exposed fraction above 0.05: H3-a, H3-c")
+            self.assertEqual(len(res["holdout_label"]), 3)
+            self.assertTrue(all("reported, not applied" in x for x in res["holdout_label"][:2]))
+            self.assertEqual([(v["number"], v["scope"]) for v in res["voids_late"]], [(1, "holdout"), (2, "validation")])
+            # Codex P2 (round 13): the read's line records the sessions whose fee rows its exits can use
+            reads = [x for x in logs.read_lines(repo / RUN_LOG) if x.get("purpose") == "read"]
+            self.assertEqual([x["fee_span"] for x in reads], [[n0, cal.offset(last2, 5)]] * 2)
             self.assertEqual((res["late_read"], res["void_after_seal"]), (True, []))     # F1; late: the retry
             self.assertEqual(res["labels"]["H3-a"], "underpowered")
             self.assertNotIn("b_lane:filled", res["counts"]["trades_by_arm_status"])
@@ -533,6 +549,21 @@ class RetrySnapshot(unittest.TestCase):
         ctx["run_log"].append(other)
         self.assertFalse(holdout.same_snapshot(ctx, "count", "count-002"))
         self.assertTrue(holdout.same_snapshot(ctx, "count", None))
+
+    def test_a_retry_that_completes_over_a_first_attempts_seal_reads_that_directory(self):
+        """Review round 13, Codex P2: count-001 sealed its snapshot into count-count-001 and failed in _rate() (its
+        failed completion names no snapshot); retry count-002 completed over the same snapshot. The base snapshot
+        is read from the directory it was sealed into, not from count-<completing authorization>."""
+        access = [auth_rec("collect-001", "collect", "granted"),
+                  gate.completion("collect-001", "2027-01-01T00:00:00Z", "complete", "c" * 64, 0, None, []),
+                  auth_rec("count-002", "count", "granted"),
+                  gate.completion("count-002", "2027-01-02T00:00:00Z", "failed", None, 0, None, []),
+                  auth_rec("count-003", "count", "granted", retry_of="count-002"),
+                  gate.completion("count-003", "2027-01-03T00:00:00Z", "complete", "a" * 64, 5, "r" * 64, [])]
+        line = {"stage": "holdout", "purpose": "count_fetch", "status": "failed", "authorization_id": "count-002",
+                "input_snapshot_sha256s": ["a" * 64], "snapshot_dir": "count-count-002"}
+        ctx = {"access_log": access, "run_log": [line]}
+        self.assertEqual(holdout.sealed_refs(ctx), [("collect-collect-001", "c" * 64), ("count-count-002", "a" * 64)])
 
 
 class Collection(unittest.TestCase):

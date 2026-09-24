@@ -138,10 +138,7 @@ def evaluator_refusals(ctx: dict) -> list:
     if ctx["validation_present"] and not ctx.get("validation_complete", False):
         out.append("the validation results file does not hold all 5 validation p-values keyed by item_ids")
     if ctx.get("validation_void"):
-        late = ctx.get("validation_void_late")
-        out.append("validation is void: a recorded pre-freeze read (exposure_registry.update_rule)"
-                   + (f"; the void ({', '.join(late)}) was recorded after the validation results reached origin/main, "
-                      "so the committed validation labels predate it" if late else ""))
+        out.append("validation is void: a recorded pre-freeze read (exposure_registry.update_rule)")
     if ctx.get("holdout_void"):
         out.append("the holdout is void: a recorded read in the holdout window before the gate opened "
                    "(exposure_registry.update_rule)")
@@ -169,11 +166,19 @@ def evaluator_refusals(ctx: dict) -> list:
             out.append("a previous granted 'read' exists and this is not a permitted retry")
     if purpose == "count":
         last = prior[-1] if prior else None
+        last_done = seq["completions"].get(last["authorization_id"]) if last is not None else None
         retry = last is not None and ctx.get("retry_of") == last["authorization_id"]
-        if retry:
-            if not retry_allowed(last, seq["completions"].get(last["authorization_id"]), ctx,
+        if last is not None and failed_without_results(last_done) and not retry:
+            # review round 13, Codex P2: after a failed count the block's count is still due, so a fresh request
+            # without retry_of would bypass the retry rule (same tree, same sealed snapshot, deadline); the next
+            # count of that block is the failed count's retry
+            out.append("a 'count' after a failed count is its retry: it names retry_of and meets the retry rule")
+        elif retry:
+            if not retry_allowed(last, last_done, ctx,
                                  same_snapshot=ctx["same_snapshot"], before_deadline=ctx["before_deadline"]):
                 out.append("a 'count' retry that the retry rule does not permit")
+        elif ctx.get("retry_of"):
+            out.append("a 'count' retry that the retry rule does not permit")
         elif not ctx["count_due"]:
             out.append("a 'count' other than once at the end of the 252 sessions and once at the end of each block")
         if set(ctx.get("count_outputs", ())) - {"H1-D:high", "H1-D:low", "H1-D-b_lane-low", "H3-a", "H3-b", "H3-c"}:

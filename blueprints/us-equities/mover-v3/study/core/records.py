@@ -114,17 +114,23 @@ def quotes(body: dict) -> dict:
     return out
 
 
+def _quote_key(q) -> tuple:
+    return (q["ns"], q["bp"], q["ap"], q["bs"], q["as"])
+
+
 def merge_quotes(chunks: list[list[dict]]) -> list[dict]:
     """Pages in order, stably sorted by the exact nanosecond stamp: updates keep the provider's sequence, and a
     price never decides which of two updates is later (review round 12, Codex P2). A repeat of one update across a
-    page boundary is kept once."""
-    seen, out = set(), []
-    for q in sorted((q for chunk in chunks for q in chunk), key=lambda q: q["ns"]):
-        key = (q["ns"], q["bp"], q["ap"], q["bs"], q["as"])
-        if key not in seen:
-            seen.add(key)
-            out.append(q)
-    return out
+    page boundary (the next page's first update identical to the previous page's last) is kept once. Identical
+    updates inside a page are all kept in the provider's order (review round 13, Codex P2: dropping every repeat of
+    a stamp and quote turned [eligible A, locked B, eligible A] into [A, B], so the locked B prevailed)."""
+    seq = []
+    for chunk in chunks:
+        chunk = list(chunk)
+        if seq and chunk and _quote_key(chunk[0]) == _quote_key(seq[-1]):
+            chunk = chunk[1:]
+        seq.extend(chunk)
+    return sorted(seq, key=lambda q: q["ns"])
 
 
 def corporate_actions(body: dict) -> list[dict]:

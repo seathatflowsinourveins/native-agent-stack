@@ -501,12 +501,17 @@ and one Claude (18 findings), with none rejected: identity dedup is decided as o
 inside a candidate's own hold cannot remove it; a holdout evaluation reads only the base snapshots its seal pinned;
 quotes are ordered by exact nanosecond stamps; the diagnostic splits cluster by session; an undefined rebooking is
 excluded, not booked at -1; a sealed read may be retried after the deadline; the carried items are rechecked at the
-count and the read; and the freeze needs a passing identity probe and fetch margin at the pinned rate. The next steps are an
+count and the read; and the freeze needs a passing identity probe and fetch margin at the pinned rate. Review round 13
+resolved a second Claude review (2 findings) and a second Codex review (5 P2), rejecting one part of one finding: a
+void deviation applies only if it reached origin/main before the outcome it would void could be computed, and a later
+one is reported, never applied, so no void can cancel the holdout read; evaluations run under pushed start lines;
+identity survivors come from rename records effective by t; and the count retry, retried-count snapshot, quote-merge
+and fee first-use gaps are closed. The next steps are an
 independent review of the draft and its study tree from a different model family, then the other preconditions, then
 the freeze. Until then every fetch and evaluation command refuses to run.
 
 H6 has its own preconditions in `h6-execution-parity-draft.json`. Review rounds 2-4 of the full draft are recorded in
-`protocol-draft.json` (`review_record`); rounds 5-12 (the restructure into the core, its two review rounds, the code-first round and the four study-tree reviews) are in
+`protocol-draft.json` (`review_record`); rounds 5-13 (the restructure into the core, its two review rounds, the code-first round and the five study-tree reviews) are in
 `protocol-core-draft.json`.
 
 Until all of that is done, this is a plan, and no window it names may be read for outcomes.

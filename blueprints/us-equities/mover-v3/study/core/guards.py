@@ -240,22 +240,34 @@ def voids(repo) -> frozenset:
     """exposure_registry.update_rule (review round 10, F4): the scopes of every committed 'void' deviation. 'tests'
     (a recorded pre-freeze read of v3-window data) and 'validation' (a pre-freeze read of a validation-window outcome)
     give every item p = 1 in the validation Holm run; 'holdout' (a holdout-window read before the gate opened) voids
-    the holdout."""
+    the holdout. Review round 13, F1: a 'holdout' void also cites the time of the read it records (read_utc). Whether
+    a committed void applies is decided by its signed reach time (core.runner.void_effect)."""
+    from core.calendar import parse_utc
     out = set()
     for dev in load_deviations(repo):
         if dev.get("kind") != "void":
             continue
         if dev.get("scope") not in VOID_SCOPES or not dev.get("cause"):
             raise Refused(f"a void deviation needs a scope in {VOID_SCOPES} and a cause: {dev.get('number')}")
+        if dev["scope"] == "holdout":
+            read_utc = dev.get("read_utc")
+            try:
+                if not isinstance(read_utc, str) or not read_utc.endswith("Z"):
+                    raise ValueError(read_utc)
+                parse_utc(read_utc)
+            except ValueError:
+                raise Refused(f"a 'holdout' void deviation cites the time of the read it records (read_utc): "
+                              f"{dev.get('number')}") from None
         out.add(dev["scope"])
     return frozenset(out)
 
 
-def void_reach(repo, ref: str = None) -> dict:
-    """Review round 12, F6 (second review): {scope: the signed time the first 'void' deviation of that scope reached
-    origin/main} (the committer time of the first first-parent commit whose deviations.json holds it)."""
+def void_records(repo, ref: str = None) -> list:
+    """Review round 13, F1: [(deviation, signed reach epoch)] for every 'void' deviation on origin/main, in order:
+    the committer time of the first first-parent commit whose deviations.json holds a void record with that number
+    (the file is append-only, check_append_only_history)."""
     ref = ref or MAIN
-    out = {}
+    out, seen = [], set()
     for row in git(repo, "log", "--first-parent", "--reverse", "--format=%H %ct", ref, "--", DEVIATIONS).splitlines():
         commit, ct = row.split()
         raw = committed_bytes(repo, commit, DEVIATIONS)
@@ -263,10 +275,13 @@ def void_reach(repo, ref: str = None) -> dict:
             devs = json.loads(raw).get("deviations", []) if raw else []
         except ValueError:
             continue
-        new = {d.get("scope") for d in devs if d.get("kind") == "void" and d.get("scope") in VOID_SCOPES} - set(out)
+        new = [d for d in devs if d.get("kind") == "void" and d.get("scope") in VOID_SCOPES
+               and json.dumps(d.get("number")) not in seen]
         if new:
             require_verified(repo, commit, "the first commit holding a void deviation")
-            out.update({scope: int(ct) for scope in new})
+            for d in new:
+                seen.add(json.dumps(d.get("number")))
+                out.append((d, int(ct)))
     return out
 
 
@@ -278,17 +293,6 @@ def first_reach(repo, path: str, ref: str = None):
             require_verified(repo, commit, f"the first commit holding {path}")
             return int(ct)
     return None
-
-
-def late_voids(repo, validation_path: str, scopes) -> list:
-    """The 'tests' and 'validation' void scopes whose first record reached origin/main after the validation results
-    did. exposure_registry.update_rule wants such a read recorded before the freeze; one recorded after the validation
-    outcome still voids the holdout, and it is named as late wherever the void is reported."""
-    val = first_reach(repo, validation_path)
-    if val is None:
-        return []
-    reach = void_reach(repo)
-    return sorted(s for s in scopes if s in ("tests", "validation") and reach.get(s) is not None and reach[s] > val)
 
 
 def fetch_only_diff(repo, pinned: str, tree: str) -> bool:

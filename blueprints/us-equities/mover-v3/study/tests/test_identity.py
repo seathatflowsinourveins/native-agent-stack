@@ -37,7 +37,7 @@ class FbMeta(unittest.TestCase):
         store = Store()
         reqs = [r for s in sess for r in plan.screen_requests(cal, s, ["FB", "META"])]
         driver.to_fixpoint(lambda st: reqs, transports(m), store, "2026-12-01", clock=fixed_clock)
-        renames = {("FB", "META")}
+        renames = [("FB", "META", sess[0])]       # a dated record, effective before every candidate session
         cands, counts, report = screen.candidates(store, cal, sess, ["FB", "META"], renames)
         self.assertEqual([(c["symbol"], c["t"]) for c in cands], [("META", jump)])
         self.assertEqual(report["by_rule"], {"rename_record": 1})
@@ -61,7 +61,7 @@ class FbMeta(unittest.TestCase):
             store = Store()
             reqs = [r for s in sess for r in plan.screen_requests(cal, s, ["AAA", "BBB"])]
             driver.to_fixpoint(lambda st: reqs, transports(m), store, "2026-12-01", clock=fixed_clock)
-            cands, counts, _ = screen.candidates(store, cal, sess, ["AAA", "BBB"], set(), frozenset({"BBB"}))
+            cands, counts, _ = screen.candidates(store, cal, sess, ["AAA", "BBB"], [])
             found[world] = [(c["symbol"], c["t"]) for c in cands]
         self.assertEqual(found["agree_after_t"], [("AAA", t)])
         self.assertEqual(found["agree_after_t"], found["differ_after_t"])
@@ -72,12 +72,39 @@ class FbMeta(unittest.TestCase):
         rows = [{"symbol": sym, "session": s, "o": 1 + i, "h": 2 + i, "l": 0.5, "c": 1.5 + i, "v": 100}
                 for i, s in enumerate(sess) for sym in ("AAA", "BBB")]
         late = [r for r in rows if not (r["symbol"] == "BBB" and r["session"] > sess[40])]
-        early = identity.dedupe_asof(rows, set(), frozenset({"BBB"}), [("AAA", sess[30]), ("AAA", sess[10])])
+        renamed = [("AAA", "BBB", sess[0])]
+        early = identity.dedupe_asof(rows, renamed, [("AAA", sess[30]), ("AAA", sess[10])])
         # 31 identical sessions as of sess[30]: AAA is the non-survivor; 11 as of sess[10]: no qualified pair
         self.assertEqual(early["removed"], {("AAA", sess[30])})
-        self.assertEqual(identity.dedupe_asof(late, set(), frozenset({"BBB"}), [("AAA", sess[30])])["removed"],
-                         {("AAA", sess[30])})
-        self.assertEqual(identity.dedupe_asof(rows, set(), frozenset(), [("CCC", sess[30])])["removed"], set())
+        self.assertEqual(identity.dedupe_asof(late, renamed, [("AAA", sess[30])])["removed"], {("AAA", sess[30])})
+        self.assertEqual(identity.dedupe_asof(rows, [], [("CCC", sess[30])])["removed"], set())
+
+    def test_a_later_rename_never_picks_the_survivor_at_t(self):
+        """Review round 13, F2: the survivor of two duplicate tickers at t books the trade's forward quotes, so it
+        is decided by the rename records effective on or before t only (and no active status, which is today's).
+        Before the fix a rename recorded after t (and today's active set) made BBB the survivor at t."""
+        cal = synth.calendar()
+        sess = cal.range("2020-01-02", "2020-04-30")
+        rows = [{"symbol": sym, "session": s, "o": 1 + i, "h": 2 + i, "l": 0.5, "c": 1.5 + i, "v": 100}
+                for i, s in enumerate(sess) for sym in ("AAA", "BBB")]
+        t = sess[30]
+        q = [("AAA", t), ("BBB", t)]
+        none = identity.dedupe_asof(rows, [], q)["removed"]
+        later = identity.dedupe_asof(rows, [("AAA", "BBB", sess[50])], q)["removed"]
+        self.assertEqual(none, {("BBB", t)})           # lexicographic survivor: AAA
+        self.assertEqual(later, none)                  # the rename after t changes nothing at t
+        self.assertEqual(identity.dedupe_asof(rows, [("AAA", "BBB", t)], q)["removed"], {("AAA", t)})
+        self.assertEqual(identity.dedupe_asof(rows, [("AAA", "BBB", None)], q)["removed"], none)   # undated
+        c = [{"symbol": "XX", "session": "2020-03-02", "ohlcv": (1, 2, 1, 2, 10), "ohlcv_prev": (1, 1, 1, 1, 5)},
+             {"symbol": "YY", "session": "2020-03-02", "ohlcv": (1, 2, 1, 2, 10), "ohlcv_prev": (1, 1, 1, 1, 5)}]
+        kept, _ = identity.same_session_guard(c, [("XX", "YY", "2020-03-03")])
+        self.assertEqual([k["symbol"] for k in kept], ["XX"])
+        kept, _ = identity.same_session_guard(c, [("XX", "YY", "2020-03-02")])
+        self.assertEqual([k["symbol"] for k in kept], ["YY"])
+        records = identity.rename_records([{"type": "name_change", "old_symbol": "XX", "new_symbol": "YY",
+                                            "date": "2020-03-03"}, {"type": "cash_merger", "date": "2020-01-02"}])
+        self.assertEqual(records, [("XX", "YY", "2020-03-03")])
+        self.assertEqual(identity.pairs_asof(records, "2020-03-02"), set())
 
     def test_dedupe_without_rename_record_and_same_session_guard(self):
         rows = []
@@ -91,7 +118,7 @@ class FbMeta(unittest.TestCase):
         c = [{"symbol": "XX", "session": "2020-03-02", "ohlcv": (1, 2, 1, 2, 10), "ohlcv_prev": (1, 1, 1, 1, 5)},
              {"symbol": "YY", "session": "2020-03-02", "ohlcv": (1, 2, 1, 2, 10), "ohlcv_prev": (1, 1, 1, 1, 5)},
              {"symbol": "ZZ", "session": "2020-03-02", "ohlcv": (1, 2, 1, 2, 10), "ohlcv_prev": (1, 1, 1, 1, 6)}]
-        kept, removed = identity.same_session_guard(c, {("XX", "YY")})
+        kept, removed = identity.same_session_guard(c, [("XX", "YY", "2020-03-02")])
         self.assertEqual([k["symbol"] for k in kept], ["YY", "ZZ"])
         self.assertEqual([r["symbol"] for r in removed], ["XX"])
 

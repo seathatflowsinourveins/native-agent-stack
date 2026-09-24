@@ -78,5 +78,24 @@ class NanosecondOrder(unittest.TestCase):
         # a repeat of one update across a page boundary is kept once
         self.assertEqual(len(records.merge_quotes([qs, qs[1:]])), 2)
 
+    def test_identical_updates_inside_a_page_keep_the_provider_order(self):
+        """Review round 13, Codex P2: [eligible A, locked B, eligible A] on one nanosecond stamp. The provider's
+        last update (A) prevails; before the fix every repeat of (stamp, quote) was dropped, the locked B
+        prevailed and the fill was lost."""
+        import json
+        from core import records
+        cal = synth.calendar()
+        a = {"t": "2020-03-10T13:35:00.000000005Z", "bp": 10.0, "ap": 10.2, "bs": 1, "as": 1}
+        b = {"t": "2020-03-10T13:35:00.000000005Z", "bp": 9.0, "ap": 9.0, "bs": 1, "as": 1}
+        page = records.PARSERS["quotes"](json.loads(json.dumps({"quotes": {"AAA": [a, b, a]}})))["AAA"]
+        qs = records.merge_quotes([page])
+        self.assertEqual([q["bp"] for q in qs], [10.0, 9.0, 10.0])
+        x = cal.at("2020-03-10", "09:35") + 0.5
+        got = fills.fill_at(cal, qs, x, x + 300)
+        self.assertIsNotNone(got)
+        self.assertEqual((got[2], got[1]["bp"]), ("prevailing", 10.0))
+        # across a page boundary the repeated last update is still kept once, and the page's own order stands
+        self.assertEqual([q["bp"] for q in records.merge_quotes([page, page[2:]])], [10.0, 9.0, 10.0])
+
 if __name__ == "__main__":
     unittest.main()

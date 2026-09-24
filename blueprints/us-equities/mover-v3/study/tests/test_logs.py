@@ -43,6 +43,21 @@ class Amendments(unittest.TestCase):
         self.assertTrue(logs.check_fee_amendments(nocap, {0: 100.0}, {}, "2026-10-01"))
 
 
+    def test_a_read_uses_the_fee_rows_of_its_terminal_search_windows(self):
+        """Review round 13, Codex P2: a read's trades exit, and pay sale fees, through 5 sessions after the window's
+        last session. Its line's fee_span covers them, so a fee line for those dates has a first-use deadline;
+        before the fix only [N0, last] counted and a line appended after a failed read was accepted on its retry."""
+        fee = [{"kind": "finra_taf", "from": "2028-01-04", "to": "2028-01-06", "usd_per_share": 0.0002,
+                "max_per_trade": 10.0}]
+        read = {"stage": "holdout", "purpose": "read", "utc_start": "2028-01-20T21:00:00Z",
+                "sessions": ["2027-01-04", "2027-12-31"], "fee_span": ["2027-01-04", "2028-01-07"]}
+        use = logs.fee_first_use(fee, [read])
+        self.assertIn(0, use)
+        self.assertTrue(logs.check_fee_amendments(fee, {0: use[0] + 60}, use, "2026-10-01"))
+        # a line without a fee_span (a count) is judged by its sessions
+        self.assertEqual(logs.fee_first_use(fee, [dict(read, purpose="count", fee_span=None)]), {})
+
+
 class RunLog(unittest.TestCase):
     def test_required_fields_include_protocol_sha256(self):
         self.assertIn("protocol_sha256", logs.RUN_LOG_FIELDS)

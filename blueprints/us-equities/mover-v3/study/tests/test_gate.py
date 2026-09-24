@@ -108,6 +108,14 @@ class AccessLog(unittest.TestCase):
         ok = [auth("c1", "count"), done("c1", "complete")]
         self.assertTrue(gate.evaluator_refusals(ctx(purpose="count", count_due=False, access_log=ok, retry_of="c1")))
         self.assertTrue(gate.evaluator_refusals(ctx(purpose="count", count_outputs=["H3-a", "H3-a:mean"])))
+        # review round 13, Codex P2: after a failed count the block's count stays due, and a fresh request without
+        # retry_of would bypass the retry rule (a late or cross-snapshot retry refused by rule was granted this way)
+        for over in ({}, {"before_deadline": False}, {"same_snapshot": False}):
+            refs = gate.evaluator_refusals(ctx(purpose="count", count_due=True, access_log=log, retry_of=None, **over))
+            self.assertTrue(any("after a failed count is its retry" in r for r in refs), over)
+        self.assertTrue(gate.evaluator_refusals(ctx(purpose="count", count_due=True, access_log=log, retry_of="c0")))
+        # after a count that completed, the next scheduled count needs no retry_of
+        self.assertEqual(gate.evaluator_refusals(ctx(purpose="count", count_due=True, access_log=ok)), [])
         # review round 11, F1: a void count is known before the read is authorized, so the read is refused then
         self.assertEqual(gate.evaluator_refusals(ctx()), [])
         self.assertTrue(any("count was void" in r for r in gate.evaluator_refusals(ctx(count_void=True))))

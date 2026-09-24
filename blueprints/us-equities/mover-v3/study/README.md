@@ -59,6 +59,15 @@ step reads only those; a read whose retry chain sealed a snapshot may be retried
 record is malformed. Every command refuses a frozen protocol whose count-only output lacks a passing identity probe
 and fetch margin at the pinned rate limit. A failed `count-only` or `dry-run` logs every part it sealed.
 
+Review round 13: a void deviation applies only if it reached origin/main before the outcome it would void could be
+computed: a `tests` or `validation` void before the validation evaluation's first start line, a `holdout` void (which
+cites its `read_utc`) before the first granted count or read authorization. A later void is reported
+(`void_deviations_late`, `voids_late`, `holdout_label`), never applied (`core/runner.py` `void_effect`). `evaluate` runs
+in two committed steps: its first run appends an `evaluate_start` line and computes nothing. Identity dedup and the
+same-session guard use only rename records effective by t and no active status. A count after a failed count must
+be its retry; retried counts read their first attempt's snapshot directory; identical quote updates inside a page are
+kept in provider order; and read lines record `fee_span` for fee first use.
+
 ## Tests
 
 From the repository root:

@@ -143,11 +143,13 @@ def line_reach_of(repo, path: str, index: int, ref: str = "origin/main"):
 
 def fee_first_use(lines: list, run_log: list) -> dict:
     """{line index: epoch of the first holdout count or read (run-log utc_start) whose sessions overlap the line's
-    from .. to}."""
+    from .. to}. A read's sessions are its fee_span when its line records one: its trades exit, and pay sale fees,
+    through the end of the last terminal-search window, 5 sessions after the window's last session (review round 13,
+    Codex P2), so a fee line for those dates has a first-use deadline too."""
     out = {}
     for i, rec in enumerate(lines):
         for x in run_log:
-            span = x.get("sessions")
+            span = x.get("fee_span") or x.get("sessions")
             if x.get("purpose") not in ("count", "read") or not span:
                 continue
             if span[0] <= rec.get("to", "") and rec.get("from", "") <= span[1]:

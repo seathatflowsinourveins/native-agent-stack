@@ -42,9 +42,17 @@ def enumerate_symbols(assets: list[dict], actions: list[dict]) -> dict:
                        "union": len(symbols)}}
 
 
-def rename_pairs(actions: list[dict]) -> set:
-    return {(r["old_symbol"], r["new_symbol"]) for r in actions
-            if r.get("type") == "name_change" and r.get("old_symbol") and r.get("new_symbol")}
+def rename_records(actions: list[dict]) -> list:
+    """Sorted (old_symbol, new_symbol, effective date) of every name_change record (review round 13, F2): identity
+    decisions as of t use only the records effective on or before t (pairs_asof)."""
+    return sorted({(r["old_symbol"], r["new_symbol"], r.get("date") or "") for r in actions
+                   if r.get("type") == "name_change" and r.get("old_symbol") and r.get("new_symbol")})
+
+
+def pairs_asof(records, t: str) -> set:
+    """The rename pairs of records effective (process_date) on or before session t; a record with no date is never
+    known as of t. A later rename cannot decide which of two duplicate tickers survives at t (review round 13, F2)."""
+    return {(o, n) for o, n, d in records if d and d <= t}
 
 
 def check_asof(request: dict) -> None:
@@ -89,10 +97,13 @@ def dedupe_screen(rows: list[dict], renames: set, active: frozenset = frozenset(
     return {"kept": after, "removed": before - after, "report": report}
 
 
-def dedupe_asof(rows: list[dict], renames: set, active: frozenset, queries: list) -> dict:
+def dedupe_asof(rows: list[dict], renames, queries: list) -> dict:
     """Identity dedup decided as of each candidate session (review round 12, Codex P1). For a query (symbol, t),
     the pinned dedupe_identity runs on the screen rows of sessions <= t only, so no row after t (a hold-window
     close, a later rename or a later last trading day) can change whether the candidate at t is a member.
+    Review round 13, F2: its survivor ranking gets only the rename records effective on or before t (renames: the
+    dated records of rename_records) and no active status (the asset master is today's, not as of t), so neither a
+    later rename nor today's listing status can decide which duplicate ticker books the trade's outcomes.
 
     It runs on the rows of the symbols linked to `symbol` by a byte-identical raw OHLCV row (volume > 0) on some
     session <= t. That is exact: dedupe_identity decides each component of qualified pairs from the rows of its
@@ -130,7 +141,7 @@ def dedupe_asof(rows: list[dict], renames: set, active: frozenset, queries: list
         ck = (t, members)
         if ck not in cache:
             part = [r for r in rows if r["symbol"] in members and r["session"] <= t]
-            cache[ck] = dedupe_screen(part, renames, active)
+            cache[ck] = dedupe_screen(part, pairs_asof(renames, t), frozenset())
             runs += 1
             for rule, n in cache[ck]["report"]["by_rule"].items():
                 by_rule[rule] = by_rule.get(rule, 0) + n
@@ -139,22 +150,25 @@ def dedupe_asof(rows: list[dict], renames: set, active: frozenset, queries: list
     return {"removed": removed, "report": {"runs": runs, "by_rule": by_rule}}
 
 
-def rank_key(symbol: str, other: str, renames: set, active: frozenset):
-    """Survivor order for the same-session guard: the rename terminus, then active status, then lexicographic."""
-    term = _rename_terminus([symbol, other], renames)
-    return (0 if term == symbol else 1, 0 if symbol in active else 1, symbol)
+def rank_key(symbol: str, other: str, pairs: set):
+    """Survivor order for the same-session guard: the rename terminus (of the rename records effective on or before
+    the session), then lexicographic. Review round 13, F2: active status is not used; the asset master is today's."""
+    term = _rename_terminus([symbol, other], pairs)
+    return (0 if term == symbol else 1, symbol)
 
 
-def same_session_guard(candidates: list[dict], renames: set, active: frozenset = frozenset()):
+def same_session_guard(candidates: list[dict], renames):
     """Two candidates on one session whose raw daily OHLCV (volume > 0) is identical on both s-1 and s are one
-    event, kept under the higher-ranked symbol. candidates: {"symbol","session","ohlcv_prev","ohlcv"}.
-    Returns (kept list, removed list)."""
+    event, kept under the higher-ranked symbol. candidates: {"symbol","session","ohlcv_prev","ohlcv"}; renames: the
+    dated records of rename_records, of which only those effective on or before the session count (review round 13,
+    F2). Returns (kept list, removed list)."""
     by_session = {}
     for c in candidates:
         by_session.setdefault(c["session"], []).append(c)
     kept, removed = [], []
     for s, cs in sorted(by_session.items()):
         cs = sorted(cs, key=lambda c: c["symbol"])
+        pairs = pairs_asof(renames, s)
         dropped = set()
         for i, a in enumerate(cs):
             for b in cs[i + 1:]:
@@ -163,8 +177,8 @@ def same_session_guard(candidates: list[dict], renames: set, active: frozenset =
                 same = (a["ohlcv_prev"] == b["ohlcv_prev"] and a["ohlcv"] == b["ohlcv"]
                         and a["ohlcv"][4] > 0 and a["ohlcv_prev"][4] > 0)
                 if same:
-                    ka = rank_key(a["symbol"], b["symbol"], renames, active)
-                    kb = rank_key(b["symbol"], a["symbol"], renames, active)
+                    ka = rank_key(a["symbol"], b["symbol"], pairs)
+                    kb = rank_key(b["symbol"], a["symbol"], pairs)
                     dropped.add(b["symbol"] if ka < kb else a["symbol"])
         for c in cs:
             (removed if c["symbol"] in dropped else kept).append(c)
