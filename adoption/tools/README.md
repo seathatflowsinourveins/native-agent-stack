@@ -241,15 +241,25 @@ and prints which containment branch it took.
   and the altered one reaches the mismatch refusal. An unreadable controllers
   file must also be refused with 78. A controllers file
   without `cpu` must skip the default with the note and refuse an explicit
-  quota with 78. `0%`, `max`, `150`, `1000000%` and `-5%` must be refused
-  with 78. Checked by mutation on 2026-09-24, with each of these runner edits
+  quota with 78, and a `cpuset`-only list counts as no delegation. Instrumented
+  CPU counts of 1, 2 and 3 must give the one-CPU floor (`100000 100000`) and 4
+  must give `200000 100000`. A manager query that stalls must be refused with
+  78 within the 5 s timeout. `0%`, `max`, `150`, `1000000%` and `-5%` must be
+  refused with 78. Checked by mutation on 2026-09-24, with each of these runner edits
   failing at least one of these tests:
   - removing the in-scope `cpu.max` check;
+  - tolerating a missing `cpu.max`;
   - not refusing an explicit quota without delegation;
   - dropping the `CPUQuota` property;
   - changing the default to CPUs − 1;
   - opening the quota regex;
-  - treating an unreadable controllers file as "no cpu".
+  - treating an unreadable controllers file as "no cpu";
+  - matching `cpuset` as `cpu`;
+  - lowering the small-host floor to `CPUs > 1`;
+  - removing the 5 s timeout on the manager query.
+  GitHub-hosted runners have no `systemd --user` manager, so there the
+  containment and CPU-quota tests take their skip or refusal branches. The
+  executed evidence for them comes from a host with a user manager.
   `LiveTaskQueryTests` stubs `systemctl` and requires that a failed query, or a
   missing count for a cgroup that still exists, is an error and never "no
   tasks". Checked by mutation on 2026-09-22: a stand-in runner that

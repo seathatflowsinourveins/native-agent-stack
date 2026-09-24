@@ -716,25 +716,59 @@ class BoundedRunCpuQuotaTests(unittest.TestCase):
     def test_without_cpu_delegation_the_default_is_skipped_and_an_explicit_quota_refused(self):
         # The controllers file the runner reads is swapped for one without cpu,
         # which is what a systemd before 252 user manager exposes.
+        # "cpuset" alone is not the cpu controller, so it must not count as delegation.
+        for listed in ("memory pids", "cpuset memory pids"):
+            with self.subTest(controllers=listed), tempfile.TemporaryDirectory() as tmp:
+                tmp = Path(tmp)
+                controllers = tmp / "controllers-without-cpu"
+                controllers.write_text(listed + "\n", encoding="utf-8")
+                runner = _instrumented_copy(
+                    tmp, {'"/sys/fs/cgroup$job_manager/cgroup.controllers"': f'"{controllers}"'})
+                oracle = tmp / "cpu.max"
+                result = _run([str(runner), "sh", "-c", self.CPU_ORACLE],
+                              env=self._environment(ORACLE=str(oracle)))
+                self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+                self.assertIn("no CPU quota", result.stderr)
+                self.assertNotEqual(oracle.read_text(encoding="utf-8").strip(), EXPECTED_CPU_MAX)
+
+                refused = tmp / "command-ran"
+                result = _run([str(runner), "sh", "-c", f"touch {refused}"],
+                              env=self._environment(ECOSYSTEM_JOB_CPU_QUOTA="50%"))
+                self.assertEqual(result.returncode, 78, result.stdout + result.stderr)
+                self.assertIn("needs the cpu controller", result.stderr)
+                self.assertFalse(refused.exists(), "an unenforceable quota still ran the command")
+
+    @unittest.skipUnless(CPU_DELEGATED, "needs a user manager that delegates cpu (systemd 252+)")
+    def test_small_hosts_get_the_one_cpu_floor(self):
+        for cpus, expected in (("1", "100000 100000"), ("2", "100000 100000"),
+                               ("3", "100000 100000"), ("4", "200000 100000")):
+            with self.subTest(cpus=cpus), tempfile.TemporaryDirectory() as tmp:
+                tmp = Path(tmp)
+                runner = _instrumented_copy(tmp, {"/usr/bin/getconf _NPROCESSORS_ONLN": f"/bin/echo {cpus}"})
+                oracle = tmp / "cpu.max"
+                result = _run([str(runner), "sh", "-c", self.CPU_ORACLE],
+                              env=self._environment(ORACLE=str(oracle)))
+                self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+                self.assertEqual(oracle.read_text(encoding="utf-8").strip(), expected)
+
+    @unittest.skipUnless(CONTAINMENT_AVAILABLE, "needs a native systemd --user scope")
+    def test_a_stalled_manager_query_is_refused_with_78_after_the_timeout(self):
         with tempfile.TemporaryDirectory() as tmp:
             tmp = Path(tmp)
-            controllers = tmp / "controllers-without-cpu"
-            controllers.write_text("memory pids\n", encoding="utf-8")
-            runner = _instrumented_copy(
-                tmp, {'"/sys/fs/cgroup$job_manager/cgroup.controllers"': f'"{controllers}"'})
-            oracle = tmp / "cpu.max"
-            result = _run([str(runner), "sh", "-c", self.CPU_ORACLE],
-                          env=self._environment(ORACLE=str(oracle)))
-            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-            self.assertIn("no CPU quota", result.stderr)
-            self.assertNotEqual(oracle.read_text(encoding="utf-8").strip(), EXPECTED_CPU_MAX)
-
-            refused = tmp / "command-ran"
-            result = _run([str(runner), "sh", "-c", f"touch {refused}"],
-                          env=self._environment(ECOSYSTEM_JOB_CPU_QUOTA="50%"))
+            stalled = tmp / "systemctl-stalled"
+            stalled.write_text("#!/usr/bin/env bash\nsleep 30\n", encoding="utf-8")
+            stalled.chmod(0o755)
+            runner = _instrumented_copy(tmp, {
+                "/usr/bin/timeout 5s /usr/bin/systemctl --user show":
+                f"/usr/bin/timeout 5s {stalled} --user show"})
+            oracle = tmp / "command-ran"
+            started = time.monotonic()
+            result = _run([str(runner), "sh", "-c", f"touch {oracle}"], env=self._environment())
+            elapsed = time.monotonic() - started
             self.assertEqual(result.returncode, 78, result.stdout + result.stderr)
-            self.assertIn("needs the cpu controller", result.stderr)
-            self.assertFalse(refused.exists(), "an unenforceable quota still ran the command")
+            self.assertIn("cannot read the user manager cgroup", result.stderr)
+            self.assertLess(elapsed, 15, f"the manager query was not bounded ({elapsed:.1f}s)")
+            self.assertFalse(oracle.exists())
 
     @unittest.skipUnless(CONTAINMENT_AVAILABLE, "needs a native systemd --user scope")
     def test_unreadable_manager_controllers_are_refused_with_78(self):
