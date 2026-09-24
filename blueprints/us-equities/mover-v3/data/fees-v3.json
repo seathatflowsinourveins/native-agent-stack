@@ -1,0 +1,906 @@
+{
+  "schema_version": 1,
+  "id": "mover-v3-fees",
+  "protocol_field": "blueprints/us-equities/mover-v3/protocol-core-draft.json#/cost_model/fees",
+  "purpose": "SEC Section 31 fee rates and FINRA Trading Activity Fee rates for covered equity sales, in force from 2017-01-01 through retrieval on 2026-09-24, plus the rates already adopted for later dates, each row with its primary sources and verbatim quotes. #162's blueprints/us-equities/mover-early-entry/fees.json is not used.",
+  "retrieved_at": "2026-09-24",
+  "coverage": {
+    "from": "2017-01-01",
+    "through_retrieval": "2026-09-24"
+  },
+  "unverified_periods": [],
+  "amendments_file": "blueprints/us-equities/mover-v3/data/fees-v3-amendments.jsonl",
+  "quote_verification": "Each quote is a verbatim substring of the retrieved document after removing markup, unescaping entities and collapsing whitespace (retrieved_format says how the text was read); blueprints/us-equities/mover-v3/data-tools/verify_fee_sources.py re-fetches and checks them. The one sec.gov quote could not be byte-checked (verification_note).",
+  "sec_section31": {
+    "unit": "US dollars per million dollars of covered sales",
+    "applies_to": "covered sales (Exchange Act Section 31(b) and (c)); brokers commonly pass the fee through on sell orders",
+    "date_basis": "charge date: for a covered sale reported from clearing-agency data this is the settlement date, not the trade date (17 CFR 240.31(a)(3)(i)); for other covered sales it is the trade date",
+    "date_basis_source": {
+      "document": "17 CFR 240.31(a)(3), eCFR (Title 17 up to date as of 2026-09-22)",
+      "url": "https://www.ecfr.gov/api/versioner/v1/full/2026-09-22/title-17.xml?part=240&section=240.31",
+      "retrieved_from": "https://www.ecfr.gov/api/versioner/v1/full/2026-09-22/title-17.xml?part=240&section=240.31",
+      "retrieved_format": "ecfr_xml",
+      "retrieved_at": "2026-09-24",
+      "quotes": [
+        "(3) Charge date means the date on which a covered sale or covered round turn transaction occurs for purposes of determining the liability of a covered SRO pursuant to section 31 of the Act (15 U.S.C. 78ee). The charge date is: (i) The settlement date, with respect to any covered sale (other than a covered sale resulting from the exercise of an option settled by physical delivery or from the maturation of a security future settled by physical delivery) or covered round turn transaction that a covered SRO is required to report to the Commission based on data that the covered SRO receives from a designated clearing agency;",
+        "(iv) The trade date, with respect to all other covered sales and covered round turn transactions."
+      ]
+    },
+    "rows": [
+      {
+        "from": "2016-02-16",
+        "to": "2017-07-03",
+        "usd_per_million": 21.8,
+        "fiscal_year": 2016,
+        "status_at_retrieval": "ended",
+        "sources": [
+          {
+            "document": "SEC Release No. 34-76848, Order Making Fiscal Year 2016 Annual Adjustments to Transaction Fee Rates",
+            "citation": "81 FR 1458",
+            "url": "https://www.federalregister.gov/documents/2016/01/12/2016-00406/order-making-fiscal-year-2016-annual-adjustments-to-transaction-fee-rates",
+            "retrieved_from": "https://www.federalregister.gov/documents/full_text/text/2016/01/12/2016-00406.txt",
+            "retrieved_format": "federalregister_text",
+            "retrieved_at": "2026-09-24",
+            "supports": "rate and first charge date",
+            "quotes": [
+              "It is hereby ordered that the fee rates applicable under Sections 31(b) and (c) of the Exchange Act shall be $21.80 per $1,000,000 effective on February 16, 2016."
+            ]
+          },
+          {
+            "document": "SEC Release No. 34-80816, Order Making Fiscal Year 2017 Annual Adjustments to Transaction Fee Rates",
+            "citation": "82 FR 25895",
+            "url": "https://www.federalregister.gov/documents/2017/06/05/2017-11555/order-making-fiscal-year-2017-annual-adjustments-to-transaction-fee-rates",
+            "retrieved_from": "https://www.federalregister.gov/documents/full_text/text/2017/06/05/2017-11555.txt",
+            "retrieved_format": "federalregister_text",
+            "retrieved_at": "2026-09-24",
+            "supports": "last charge date at this rate (the next order's current rate and period)",
+            "quotes": [
+              "Use Table A to estimate fees collected for the period October 1, 2016 through July 3, 2017.",
+              "Actual and projected fee collections at the current fee rate of $21.80 per million are $1,189,634,934."
+            ]
+          }
+        ]
+      },
+      {
+        "from": "2017-07-04",
+        "to": "2018-05-21",
+        "usd_per_million": 23.1,
+        "fiscal_year": 2017,
+        "status_at_retrieval": "ended",
+        "sources": [
+          {
+            "document": "SEC Release No. 34-80816, Order Making Fiscal Year 2017 Annual Adjustments to Transaction Fee Rates",
+            "citation": "82 FR 25895",
+            "url": "https://www.federalregister.gov/documents/2017/06/05/2017-11555/order-making-fiscal-year-2017-annual-adjustments-to-transaction-fee-rates",
+            "retrieved_from": "https://www.federalregister.gov/documents/full_text/text/2017/06/05/2017-11555.txt",
+            "retrieved_format": "federalregister_text",
+            "retrieved_at": "2026-09-24",
+            "supports": "rate and first charge date",
+            "quotes": [
+              "It is hereby ordered that the fee rates applicable under Sections 31(b) and (c) of the Exchange Act shall be $23.10 per $1,000,000 effective on July 4, 2017."
+            ]
+          },
+          {
+            "document": "SEC Release No. 34-83057, Order Making Fiscal Year 2018 Annual Adjustments to Transaction Fee Rates",
+            "citation": "83 FR 17577",
+            "url": "https://www.federalregister.gov/documents/2018/04/20/2018-08339/order-making-fiscal-year-2018-annual-adjustments-to-transaction-fee-rates",
+            "retrieved_from": "https://www.federalregister.gov/documents/full_text/text/2018/04/20/2018-08339.txt",
+            "retrieved_format": "federalregister_text",
+            "retrieved_at": "2026-09-24",
+            "supports": "last charge date at this rate (the next order's current rate and period)",
+            "quotes": [
+              "Use Table A to estimate fees collected for the period October 1, 2017 through May 21, 2018.",
+              "Actual and projected fee collections at the current fee rate of $23.10 per million are $1,387,201,997."
+            ]
+          }
+        ]
+      },
+      {
+        "from": "2018-05-22",
+        "to": "2019-04-15",
+        "usd_per_million": 13.0,
+        "fiscal_year": 2018,
+        "status_at_retrieval": "ended",
+        "sources": [
+          {
+            "document": "SEC Release No. 34-83057, Order Making Fiscal Year 2018 Annual Adjustments to Transaction Fee Rates",
+            "citation": "83 FR 17577",
+            "url": "https://www.federalregister.gov/documents/2018/04/20/2018-08339/order-making-fiscal-year-2018-annual-adjustments-to-transaction-fee-rates",
+            "retrieved_from": "https://www.federalregister.gov/documents/full_text/text/2018/04/20/2018-08339.txt",
+            "retrieved_format": "federalregister_text",
+            "retrieved_at": "2026-09-24",
+            "supports": "rate and first charge date",
+            "quotes": [
+              "it is hereby ordered that the fee rates applicable under Sections 31(b) and (c) of the Exchange Act shall be $13.00 per $1,000,000 effective on May 22, 2018."
+            ]
+          },
+          {
+            "document": "SEC Release No. 34-85287, Order Making Fiscal Year 2019 Annual Adjustments to Transaction Fee Rates",
+            "citation": "84 FR 9576",
+            "url": "https://www.federalregister.gov/documents/2019/03/15/2019-04800/order-making-fiscal-year-2019-annual-adjustments-to-transaction-fee-rates",
+            "retrieved_from": "https://www.federalregister.gov/documents/full_text/text/2019/03/15/2019-04800.txt",
+            "retrieved_format": "federalregister_text",
+            "retrieved_at": "2026-09-24",
+            "supports": "last charge date at this rate (the next order's current rate and period)",
+            "quotes": [
+              "Use Table A to estimate fees collected for the period October 1, 2018 through April 15, 2019.",
+              "Actual and projected fee collections at the current fee rate of $13.00 per million are $740,970,262."
+            ]
+          }
+        ]
+      },
+      {
+        "from": "2019-04-16",
+        "to": "2020-02-17",
+        "usd_per_million": 20.7,
+        "fiscal_year": 2019,
+        "status_at_retrieval": "ended",
+        "sources": [
+          {
+            "document": "SEC Release No. 34-85287, Order Making Fiscal Year 2019 Annual Adjustments to Transaction Fee Rates",
+            "citation": "84 FR 9576",
+            "url": "https://www.federalregister.gov/documents/2019/03/15/2019-04800/order-making-fiscal-year-2019-annual-adjustments-to-transaction-fee-rates",
+            "retrieved_from": "https://www.federalregister.gov/documents/full_text/text/2019/03/15/2019-04800.txt",
+            "retrieved_format": "federalregister_text",
+            "retrieved_at": "2026-09-24",
+            "supports": "rate and first charge date",
+            "quotes": [
+              "It is hereby ordered that the fee rates applicable under Sections 31(b) and (c) of the Exchange Act shall be $20.70 per $1,000,000 effective on April 16, 2019."
+            ]
+          },
+          {
+            "document": "SEC Release No. 34-87918, Order Making Fiscal Year 2020 Annual Adjustments to Transaction Fee Rates",
+            "citation": "85 FR 2218",
+            "url": "https://www.federalregister.gov/documents/2020/01/14/2020-00423/order-making-fiscal-year-2020-annual-adjustments-to-transaction-fee-rates",
+            "retrieved_from": "https://www.federalregister.gov/documents/full_text/text/2020/01/14/2020-00423.txt",
+            "retrieved_format": "federalregister_text",
+            "retrieved_at": "2026-09-24",
+            "supports": "last charge date at this rate (the next order's current rate and period)",
+            "quotes": [
+              "Use Table A to estimate fees collected for the period September 1, 2019 through February 17, 2020.",
+              "Actual and projected fee collections at the current fee rate of $20.70 per million are $798,679,778."
+            ]
+          }
+        ]
+      },
+      {
+        "from": "2020-02-18",
+        "to": "2021-02-24",
+        "usd_per_million": 22.1,
+        "fiscal_year": 2020,
+        "status_at_retrieval": "ended",
+        "sources": [
+          {
+            "document": "SEC Release No. 34-87918, Order Making Fiscal Year 2020 Annual Adjustments to Transaction Fee Rates",
+            "citation": "85 FR 2218",
+            "url": "https://www.federalregister.gov/documents/2020/01/14/2020-00423/order-making-fiscal-year-2020-annual-adjustments-to-transaction-fee-rates",
+            "retrieved_from": "https://www.federalregister.gov/documents/full_text/text/2020/01/14/2020-00423.txt",
+            "retrieved_format": "federalregister_text",
+            "retrieved_at": "2026-09-24",
+            "supports": "rate and first charge date",
+            "quotes": [
+              "It is hereby ordered that the fee rates applicable under Sections 31(b) and (c) of the Exchange Act shall be $22.10 per $1,000,000 effective on February 18, 2020."
+            ]
+          },
+          {
+            "document": "SEC Release No. 34-90932, Order Making Fiscal Year 2021 Annual Adjustments to Transaction Fee Rates",
+            "citation": "86 FR 6694",
+            "url": "https://www.federalregister.gov/documents/2021/01/22/2021-01341/order-making-fiscal-year-2021-annual-adjustments-to-transaction-fee-rates",
+            "retrieved_from": "https://www.federalregister.gov/documents/full_text/text/2021/01/22/2021-01341.txt",
+            "retrieved_format": "federalregister_text",
+            "retrieved_at": "2026-09-24",
+            "supports": "last charge date at this rate (the next order's current rate and period)",
+            "quotes": [
+              "Use Table A to estimate fees collected for the period September 1, 2020 through February 24, 2021.",
+              "Actual and projected fee collections at the current fee rate of $22.10 per million are $1,514,646,590."
+            ]
+          }
+        ]
+      },
+      {
+        "from": "2021-02-25",
+        "to": "2022-05-13",
+        "usd_per_million": 5.1,
+        "fiscal_year": 2021,
+        "status_at_retrieval": "ended",
+        "sources": [
+          {
+            "document": "SEC Release No. 34-90932, Order Making Fiscal Year 2021 Annual Adjustments to Transaction Fee Rates",
+            "citation": "86 FR 6694",
+            "url": "https://www.federalregister.gov/documents/2021/01/22/2021-01341/order-making-fiscal-year-2021-annual-adjustments-to-transaction-fee-rates",
+            "retrieved_from": "https://www.federalregister.gov/documents/full_text/text/2021/01/22/2021-01341.txt",
+            "retrieved_format": "federalregister_text",
+            "retrieved_at": "2026-09-24",
+            "supports": "rate and first charge date",
+            "quotes": [
+              "It is hereby ordered that the fee rates applicable under Sections 31(b) and (c) of the Exchange Act shall be $5.10 per $1,000,000 effective on February 25, 2021."
+            ]
+          },
+          {
+            "document": "SEC Release No. 34-94644, Order Making Fiscal Year 2022 Annual Adjustments to Transaction Fee Rates",
+            "citation": "87 FR 21931",
+            "url": "https://www.federalregister.gov/documents/2022/04/13/2022-07881/order-making-fiscal-year-2022-annual-adjustments-to-transaction-fee-rates",
+            "retrieved_from": "https://www.federalregister.gov/documents/full_text/text/2022/04/13/2022-07881.txt",
+            "retrieved_format": "federalregister_text",
+            "retrieved_at": "2026-09-24",
+            "supports": "last charge date at this rate (the next order's current rate and period)",
+            "quotes": [
+              "Use Table A to estimate fees collected for the period September 1, 2021 through May 13, 2022.",
+              "Actual and projected fee collections at the current fee rate of $5.10 per million are $643,763,663."
+            ]
+          }
+        ]
+      },
+      {
+        "from": "2022-05-14",
+        "to": "2023-02-26",
+        "usd_per_million": 22.9,
+        "fiscal_year": 2022,
+        "status_at_retrieval": "ended",
+        "sources": [
+          {
+            "document": "SEC Release No. 34-94644, Order Making Fiscal Year 2022 Annual Adjustments to Transaction Fee Rates",
+            "citation": "87 FR 21931",
+            "url": "https://www.federalregister.gov/documents/2022/04/13/2022-07881/order-making-fiscal-year-2022-annual-adjustments-to-transaction-fee-rates",
+            "retrieved_from": "https://www.federalregister.gov/documents/full_text/text/2022/04/13/2022-07881.txt",
+            "retrieved_format": "federalregister_text",
+            "retrieved_at": "2026-09-24",
+            "supports": "rate and first charge date",
+            "quotes": [
+              "It is hereby ordered that the fee rates applicable under sections 31(b) and (c) of the Exchange Act shall be $22.90 per $1,000,000 effective on May 14, 2022."
+            ]
+          },
+          {
+            "document": "SEC Release No. 34-96724, Order Making Fiscal Year 2023 Annual Adjustments to Transaction Fee Rates",
+            "citation": "88 FR 5051",
+            "url": "https://www.federalregister.gov/documents/2023/01/26/2023-01578/order-making-fiscal-year-2023-annual-adjustments-to-transaction-fee-rates",
+            "retrieved_from": "https://www.federalregister.gov/documents/full_text/text/2023/01/26/2023-01578.txt",
+            "retrieved_format": "federalregister_text",
+            "retrieved_at": "2026-09-24",
+            "supports": "last charge date at this rate (the next order's current rate and period)",
+            "quotes": [
+              "Use Table A to estimate fees collected for the period September 1, 2022 through February 26, 2023.",
+              "Actual and projected fee collections at the current fee rate of $22.90 per million are $1,601,107,658."
+            ]
+          }
+        ]
+      },
+      {
+        "from": "2023-02-27",
+        "to": "2024-05-21",
+        "usd_per_million": 8.0,
+        "fiscal_year": 2023,
+        "status_at_retrieval": "ended",
+        "sources": [
+          {
+            "document": "SEC Release No. 34-96724, Order Making Fiscal Year 2023 Annual Adjustments to Transaction Fee Rates",
+            "citation": "88 FR 5051",
+            "url": "https://www.federalregister.gov/documents/2023/01/26/2023-01578/order-making-fiscal-year-2023-annual-adjustments-to-transaction-fee-rates",
+            "retrieved_from": "https://www.federalregister.gov/documents/full_text/text/2023/01/26/2023-01578.txt",
+            "retrieved_format": "federalregister_text",
+            "retrieved_at": "2026-09-24",
+            "supports": "rate and first charge date",
+            "quotes": [
+              "It is hereby ordered that the fee rates applicable under Sections 31(b) and (c) of the Exchange Act shall be $8.00 per $1,000,000 effective on February 27, 2023."
+            ]
+          },
+          {
+            "document": "SEC Release No. 34-99973, Order Making Fiscal Year 2024 Annual Adjustments to Transaction Fee Rates",
+            "citation": "89 FR 29402",
+            "url": "https://www.federalregister.gov/documents/2024/04/22/2024-08512/order-making-fiscal-year-2024-annual-adjustments-to-transaction-fee-rates",
+            "retrieved_from": "https://www.federalregister.gov/documents/full_text/text/2024/04/22/2024-08512.txt",
+            "retrieved_format": "federalregister_text",
+            "retrieved_at": "2026-09-24",
+            "supports": "last charge date at this rate (the next order's current rate and period)",
+            "quotes": [
+              "Use Table A to estimate fees collected for the period September 1, 2023, through May 21, 2024.",
+              "Actual and projected fee collections at the current fee rate of $8.00 per million are $913,739,887."
+            ]
+          }
+        ]
+      },
+      {
+        "from": "2024-05-22",
+        "to": "2025-05-13",
+        "usd_per_million": 27.8,
+        "fiscal_year": 2024,
+        "status_at_retrieval": "ended",
+        "sources": [
+          {
+            "document": "SEC Release No. 34-99973, Order Making Fiscal Year 2024 Annual Adjustments to Transaction Fee Rates",
+            "citation": "89 FR 29402",
+            "url": "https://www.federalregister.gov/documents/2024/04/22/2024-08512/order-making-fiscal-year-2024-annual-adjustments-to-transaction-fee-rates",
+            "retrieved_from": "https://www.federalregister.gov/documents/full_text/text/2024/04/22/2024-08512.txt",
+            "retrieved_format": "federalregister_text",
+            "retrieved_at": "2026-09-24",
+            "supports": "rate and first charge date",
+            "quotes": [
+              "It is hereby ordered that the fee rates applicable under Sections 31(b) and (c) of the Exchange Act shall be $27.80 per $1,000,000 effective on May 22, 2024."
+            ]
+          },
+          {
+            "document": "SEC Release No. 34-102779, Order Making Fiscal Year 2025 Annual Adjustments to Transaction Fee Rates",
+            "citation": "90 FR 15492",
+            "url": "https://www.federalregister.gov/documents/2025/04/11/2025-06214/order-making-fiscal-year-2025-annual-adjustments-to-transaction-fee-rates",
+            "retrieved_from": "https://www.federalregister.gov/documents/full_text/text/2025/04/11/2025-06214.txt",
+            "retrieved_format": "federalregister_text",
+            "retrieved_at": "2026-09-24",
+            "supports": "last charge date at this rate (the next order's current rate and period)",
+            "quotes": [
+              "Use Table A to estimate fees collected for the period September 1, 2024, through May 13, 2025.",
+              "Actual and projected fee collections at the current fee rate of $27.80 per million are $3,523,193,571."
+            ]
+          }
+        ]
+      },
+      {
+        "from": "2025-05-14",
+        "to": "2026-04-03",
+        "usd_per_million": 0.0,
+        "fiscal_year": 2025,
+        "status_at_retrieval": "ended",
+        "sources": [
+          {
+            "document": "SEC Release No. 34-102779, Order Making Fiscal Year 2025 Annual Adjustments to Transaction Fee Rates",
+            "citation": "90 FR 15492",
+            "url": "https://www.federalregister.gov/documents/2025/04/11/2025-06214/order-making-fiscal-year-2025-annual-adjustments-to-transaction-fee-rates",
+            "retrieved_from": "https://www.federalregister.gov/documents/full_text/text/2025/04/11/2025-06214.txt",
+            "retrieved_format": "federalregister_text",
+            "retrieved_at": "2026-09-24",
+            "supports": "rate and first charge date",
+            "quotes": [
+              "It is hereby ordered that the fee rates applicable under sections 31(b) and (c) of the Exchange Act shall be $0.00 per $1,000,000 effective on May 14, 2025."
+            ]
+          },
+          {
+            "document": "SEC Release No. 34-104909, Order Making Fiscal Year 2026 Annual Adjustments to Transaction Fee Rates",
+            "citation": "91 FR 10643",
+            "url": "https://www.federalregister.gov/documents/2026/03/04/2026-04233/order-making-fiscal-year-2026-annual-adjustments-to-transaction-fee-rates",
+            "retrieved_from": "https://www.federalregister.gov/documents/full_text/text/2026/03/04/2026-04233.txt",
+            "retrieved_format": "federalregister_text",
+            "retrieved_at": "2026-09-24",
+            "supports": "last charge date at this rate (the next order's current rate and period)",
+            "quotes": [
+              "Use Table A to estimate fees collected for the period September 1, 2025, through April 3, 2026.",
+              "Actual and projected fee collections at the current fee rate of $0.00 per million are $0."
+            ]
+          }
+        ]
+      },
+      {
+        "from": "2026-04-04",
+        "to": null,
+        "usd_per_million": 20.6,
+        "fiscal_year": 2026,
+        "status_at_retrieval": "in_force",
+        "sources": [
+          {
+            "document": "SEC Release No. 34-104909, Order Making Fiscal Year 2026 Annual Adjustments to Transaction Fee Rates",
+            "citation": "91 FR 10643",
+            "url": "https://www.federalregister.gov/documents/2026/03/04/2026-04233/order-making-fiscal-year-2026-annual-adjustments-to-transaction-fee-rates",
+            "retrieved_from": "https://www.federalregister.gov/documents/full_text/text/2026/03/04/2026-04233.txt",
+            "retrieved_format": "federalregister_text",
+            "retrieved_at": "2026-09-24",
+            "supports": "rate and first charge date",
+            "quotes": [
+              "It is hereby ordered that the fee rates applicable under Sections 31(b) and (c) of the Exchange Act shall be $20.60 per $1,000,000 effective on April 4, 2026."
+            ]
+          },
+          {
+            "document": "SEC Release No. 34-104909A, Order Making Fiscal Year 2026 Annual Adjustments to Transaction Fee Rates; Correction",
+            "citation": "91 FR 24948",
+            "url": "https://www.federalregister.gov/documents/2026/05/07/2026-09078/order-making-fiscal-year-2026-annual-adjustments-to-transaction-fee-rates-correction",
+            "retrieved_from": "https://www.federalregister.gov/documents/full_text/text/2026/05/07/2026-09078.txt",
+            "retrieved_format": "federalregister_text",
+            "retrieved_at": "2026-09-24",
+            "supports": "the correction changes only a typographical sign in Appendix A, not the rate or its date",
+            "quotes": [
+              "In the Federal Register of March 4, 2026, FR Doc. 2026-04233, on page 10645, third column, 20th line, in item 5 of Appendix A, Section B., correct",
+              "``-$20.60 per million'' to read ``$20.60 per million."
+            ]
+          },
+          {
+            "document": "SEC Section 31 Transaction Fee Rate Advisory for Fiscal Year 2026 (Feb. 27, 2026)",
+            "url": "https://www.sec.gov/rules-regulations/fee-rate-advisories/2026-2",
+            "retrieved_from": "https://www.sec.gov/rules-regulations/fee-rate-advisories/2026-2",
+            "retrieved_format": "sec_html_read_by_web_fetch_tool",
+            "retrieved_at": "2026-09-24",
+            "supports": "open end: the rate stays until the fiscal year 2027 adjustment takes effect",
+            "quotes": [
+              "This fee rate will remain in effect until 60 calendar days after legislation is enacted that sets the amount of the Commission's fiscal year 2027 appropriation."
+            ],
+            "verification_note": "sec.gov answers scripted requests with HTTP 403, so this quote was read through a web-fetch tool and could not be byte-checked; the rate and date it concerns are byte-checked in the Federal Register order above."
+          }
+        ],
+        "open_end": "No fiscal year 2027 Section 31 order or advisory existed at retrieval (Federal Register search and the sec.gov fee-rate-advisories list, whose only FY2027 entry is the Section 6(b) advisory 2027-1 of Aug. 21, 2026). A rate announced before the freeze is added here; one announced after it goes to fees-v3-amendments.jsonl."
+      }
+    ]
+  },
+  "finra_taf_covered_equity": {
+    "unit": "US dollars per share sold, capped per trade",
+    "applies_to": "each sale of a covered equity security by a FINRA member (By-Laws Schedule A, Section 1(b)); brokers commonly pass it through on sell orders",
+    "date_basis": "transaction (trade) date: SR-FINRA-2026-021 applies the pause 'for transactions from October 1, 2026 through December 31, 2026' and resumes rates 'Beginning with January 2027 transactions' (quoted in the rows below)",
+    "rows": [
+      {
+        "from": "2012-07-01",
+        "to": "2021-12-31",
+        "usd_per_share": 0.000119,
+        "max_usd_per_trade": 5.95,
+        "status_at_retrieval": "ended",
+        "sources": [
+          {
+            "document": "FINRA By-Laws Schedule A, Section 1 (Member Regulatory Fees), FINRA rulebook version Jul 01, 2012 - Sep 30, 2012",
+            "url": "https://www.finra.org/rules-guidance/rulebooks/corporate-organization/section-1-member-regulatory-fees?version=524541",
+            "retrieved_from": "https://www.finra.org/rev/524541",
+            "retrieved_format": "finra_revision_json",
+            "version_id": "524541",
+            "version_label": "Jul 01, 2012 - Sep 30, 2012",
+            "retrieved_at": "2026-09-24",
+            "supports": "rate from July 1, 2012",
+            "quotes": [
+              "Each member shall pay to FINRA $0.000119 per share for each sale of a covered equity security, with a maximum charge of $5.95 per trade",
+              "Amended by SR-FINRA-2012-023 eff. July 1, 2012."
+            ]
+          },
+          {
+            "document": "SEC Release No. 34-67242, order granting approval of SR-FINRA-2012-023 (TAF Rate for Transactions in Covered Equity Securities)",
+            "citation": "77 FR 38690",
+            "url": "https://www.federalregister.gov/documents/2012/06/28/2012-15806/self-regulatory-organizations-financial-industry-regulatory-authority-inc-order-granting-approval-of",
+            "retrieved_from": "https://www.federalregister.gov/documents/full_text/text/2012/06/28/2012-15806.txt",
+            "retrieved_format": "federalregister_text",
+            "retrieved_at": "2026-09-24",
+            "supports": "rate change and its intended date",
+            "quotes": [
+              "Under the current proposal, FINRA would increase the TAF rate by an additional $0.000024 per share, from $0.000095 per share to $0.000119 per share, while the per-transaction cap for transactions in Covered Securities that are equity securities would increase by $1.20, from $4.75 to $5.95.",
+              "FINRA intends to make the proposal effective on July 1, 2012."
+            ]
+          },
+          {
+            "document": "FINRA By-Laws Schedule A, Section 1 (Member Regulatory Fees), FINRA rulebook version Oct 01, 2012 - Dec 31, 2014",
+            "url": "https://www.finra.org/rules-guidance/rulebooks/corporate-organization/section-1-member-regulatory-fees?version=524546",
+            "retrieved_from": "https://www.finra.org/rev/524546",
+            "retrieved_format": "finra_revision_json",
+            "version_id": "524546",
+            "version_label": "Oct 01, 2012 - Dec 31, 2014",
+            "retrieved_at": "2026-09-24",
+            "supports": "unchanged rate",
+            "quotes": [
+              "(1) $0.000119 per share for each sale of a covered equity security, with a maximum charge of $5.95 per trade"
+            ]
+          },
+          {
+            "document": "FINRA By-Laws Schedule A, Section 1 (Member Regulatory Fees), FINRA rulebook version Jan 01, 2015 - Jul 09, 2017",
+            "url": "https://www.finra.org/rules-guidance/rulebooks/corporate-organization/section-1-member-regulatory-fees?version=524551",
+            "retrieved_from": "https://www.finra.org/rev/524551",
+            "retrieved_format": "finra_revision_json",
+            "version_id": "524551",
+            "version_label": "Jan 01, 2015 - Jul 09, 2017",
+            "retrieved_at": "2026-09-24",
+            "supports": "unchanged rate on 2017-01-01",
+            "quotes": [
+              "(1) $0.000119 per share for each sale of a covered equity security, with a maximum charge of $5.95 per trade"
+            ]
+          },
+          {
+            "document": "FINRA By-Laws Schedule A, Section 1 (Member Regulatory Fees), FINRA rulebook version Jul 10, 2017 - Dec 31, 2021",
+            "url": "https://www.finra.org/rules-guidance/rulebooks/corporate-organization/section-1-member-regulatory-fees?version=1207221",
+            "retrieved_from": "https://www.finra.org/rev/1207221",
+            "retrieved_format": "finra_revision_json",
+            "version_id": "1207221",
+            "version_label": "Jul 10, 2017 - Dec 31, 2021",
+            "retrieved_at": "2026-09-24",
+            "supports": "unchanged rate",
+            "quotes": [
+              "(1) $0.000119 per share for each sale of a covered equity security, with a maximum charge of $5.95 per trade",
+              "Amended by SR-FINRA-2016-027 eff. July 10, 2017."
+            ]
+          },
+          {
+            "document": "SEC Release No. 34-90176, notice of filing and immediate effectiveness of SR-FINRA-2020-032 (Adjust FINRA Fees To Provide Sustainable Funding for FINRA's Regulatory Mission)",
+            "citation": "85 FR 66592",
+            "url": "https://www.federalregister.gov/documents/2020/10/20/2020-23141/self-regulatory-organizations-financial-industry-regulatory-authority-inc-notice-of-filing-and",
+            "retrieved_from": "https://www.federalregister.gov/documents/full_text/text/2020/10/20/2020-23141.txt",
+            "retrieved_format": "federalregister_text",
+            "retrieved_at": "2026-09-24",
+            "supports": "rate current in 2020 and unchanged in 2021; increases begin January 1, 2022",
+            "quotes": [
+              "(1) $0.000119 per share for each sale of a covered equity security, with a maximum charge of $5.95 per trade;",
+              "While FINRA has filed the proposed rule change for immediate effectiveness, implementation of the proposed rule change will not begin until January 1, 2022.",
+              "Security type 2020 (current) 2021 (no change) 2022 2023 2024",
+              "Covered Equity Security............ $0.000119 per share $0.000119 per share $0.000130 per share $0.000145 per share $0.000166 per share (up to $5.95 max per (up to $5.95 max per (up to $6.49 max per (up to $7.27 max per (up to $8.30 max per trade). trade). trade). trade). trade)."
+            ]
+          }
+        ],
+        "note": "SR-FINRA-2016-027 (SEC Release No. 34-78359, eff. July 10, 2017) excluded transactions in U.S. Treasury Securities from the TAF; the covered-equity rate did not change."
+      },
+      {
+        "from": "2022-01-01",
+        "to": "2022-12-31",
+        "usd_per_share": 0.00013,
+        "max_usd_per_trade": 6.49,
+        "status_at_retrieval": "ended",
+        "sources": [
+          {
+            "document": "FINRA By-Laws Schedule A, Section 1 (Member Regulatory Fees), FINRA rulebook version Jan 01, 2022 - Dec 31, 2022",
+            "url": "https://www.finra.org/rules-guidance/rulebooks/corporate-organization/section-1-member-regulatory-fees?version=1207251",
+            "retrieved_from": "https://www.finra.org/rev/1207251",
+            "retrieved_format": "finra_revision_json",
+            "version_id": "1207251",
+            "version_label": "Jan 01, 2022 - Dec 31, 2022",
+            "retrieved_at": "2026-09-24",
+            "supports": "rate",
+            "quotes": [
+              "(1) $0.000130 per share for each sale of a covered equity security, with a maximum charge of $6.49 per trade",
+              "Amended by SR-FINRA-2020-032 eff. Jan. 1, 2022."
+            ]
+          },
+          {
+            "document": "SEC Release No. 34-90176, notice of filing and immediate effectiveness of SR-FINRA-2020-032 (Adjust FINRA Fees To Provide Sustainable Funding for FINRA's Regulatory Mission)",
+            "citation": "85 FR 66592",
+            "url": "https://www.federalregister.gov/documents/2020/10/20/2020-23141/self-regulatory-organizations-financial-industry-regulatory-authority-inc-notice-of-filing-and",
+            "retrieved_from": "https://www.federalregister.gov/documents/full_text/text/2020/10/20/2020-23141.txt",
+            "retrieved_format": "federalregister_text",
+            "retrieved_at": "2026-09-24",
+            "supports": "2022 step",
+            "quotes": [
+              "Security type 2020 (current) 2021 (no change) 2022 2023 2024",
+              "Covered Equity Security............ $0.000119 per share $0.000119 per share $0.000130 per share $0.000145 per share $0.000166 per share (up to $5.95 max per (up to $5.95 max per (up to $6.49 max per (up to $7.27 max per (up to $8.30 max per trade). trade). trade). trade). trade)."
+            ]
+          }
+        ]
+      },
+      {
+        "from": "2023-01-01",
+        "to": "2023-12-31",
+        "usd_per_share": 0.000145,
+        "max_usd_per_trade": 7.27,
+        "status_at_retrieval": "ended",
+        "sources": [
+          {
+            "document": "FINRA By-Laws Schedule A, Section 1 (Member Regulatory Fees), FINRA rulebook version Jan 01, 2023 - Nov 05, 2023",
+            "url": "https://www.finra.org/rules-guidance/rulebooks/corporate-organization/section-1-member-regulatory-fees?version=1803996",
+            "retrieved_from": "https://www.finra.org/rev/1803996",
+            "retrieved_format": "finra_revision_json",
+            "version_id": "1803996",
+            "version_label": "Jan 01, 2023 - Nov 05, 2023",
+            "retrieved_at": "2026-09-24",
+            "supports": "rate",
+            "quotes": [
+              "(1) $0.000145 per share for each sale of a covered equity security, with a maximum charge of $7.27 per trade",
+              "Amended by SR-FINRA-2020-032 eff. Jan. 1, 2023."
+            ]
+          },
+          {
+            "document": "FINRA By-Laws Schedule A, Section 1 (Member Regulatory Fees), FINRA rulebook version Nov 06, 2023 - Dec 31, 2023",
+            "url": "https://www.finra.org/rules-guidance/rulebooks/corporate-organization/section-1-member-regulatory-fees?version=1803986",
+            "retrieved_from": "https://www.finra.org/rev/1803986",
+            "retrieved_format": "finra_revision_json",
+            "version_id": "1803986",
+            "version_label": "Nov 06, 2023 - Dec 31, 2023",
+            "retrieved_at": "2026-09-24",
+            "supports": "unchanged rate",
+            "quotes": [
+              "(1) $0.000145 per share for each sale of a covered equity security, with a maximum charge of $7.27 per trade",
+              "Amended by SR-FINRA-2023-009 eff. Nov. 6, 2023."
+            ]
+          },
+          {
+            "document": "SEC Release No. 34-90176, notice of filing and immediate effectiveness of SR-FINRA-2020-032 (Adjust FINRA Fees To Provide Sustainable Funding for FINRA's Regulatory Mission)",
+            "citation": "85 FR 66592",
+            "url": "https://www.federalregister.gov/documents/2020/10/20/2020-23141/self-regulatory-organizations-financial-industry-regulatory-authority-inc-notice-of-filing-and",
+            "retrieved_from": "https://www.federalregister.gov/documents/full_text/text/2020/10/20/2020-23141.txt",
+            "retrieved_format": "federalregister_text",
+            "retrieved_at": "2026-09-24",
+            "supports": "2023 step",
+            "quotes": [
+              "Security type 2020 (current) 2021 (no change) 2022 2023 2024",
+              "Covered Equity Security............ $0.000119 per share $0.000119 per share $0.000130 per share $0.000145 per share $0.000166 per share (up to $5.95 max per (up to $5.95 max per (up to $6.49 max per (up to $7.27 max per (up to $8.30 max per trade). trade). trade). trade). trade)."
+            ]
+          }
+        ],
+        "note": "SR-FINRA-2023-009 (eff. Nov. 6, 2023) added an exemption for a proprietary trading firm's transactions on an exchange of which it is a member; the rate did not change."
+      },
+      {
+        "from": "2024-01-01",
+        "to": "2025-12-31",
+        "usd_per_share": 0.000166,
+        "max_usd_per_trade": 8.3,
+        "status_at_retrieval": "ended",
+        "sources": [
+          {
+            "document": "FINRA By-Laws Schedule A, Section 1 (Member Regulatory Fees), FINRA rulebook version Jan 01, 2024 - Dec 31, 2025",
+            "url": "https://www.finra.org/rules-guidance/rulebooks/corporate-organization/section-1-member-regulatory-fees?version=1880951",
+            "retrieved_from": "https://www.finra.org/rev/1880951",
+            "retrieved_format": "finra_revision_json",
+            "version_id": "1880951",
+            "version_label": "Jan 01, 2024 - Dec 31, 2025",
+            "retrieved_at": "2026-09-24",
+            "supports": "rate",
+            "quotes": [
+              "(1) $0.000166 per share for each sale of a covered equity security, with a maximum charge of $8.30 per trade",
+              "Amended by SR-FINRA-2020-032 eff. Jan. 1, 2024."
+            ]
+          },
+          {
+            "document": "SEC Release No. 34-90176, notice of filing and immediate effectiveness of SR-FINRA-2020-032 (Adjust FINRA Fees To Provide Sustainable Funding for FINRA's Regulatory Mission)",
+            "citation": "85 FR 66592",
+            "url": "https://www.federalregister.gov/documents/2020/10/20/2020-23141/self-regulatory-organizations-financial-industry-regulatory-authority-inc-notice-of-filing-and",
+            "retrieved_from": "https://www.federalregister.gov/documents/full_text/text/2020/10/20/2020-23141.txt",
+            "retrieved_format": "federalregister_text",
+            "retrieved_at": "2026-09-24",
+            "supports": "2024 step",
+            "quotes": [
+              "Security type 2020 (current) 2021 (no change) 2022 2023 2024",
+              "Covered Equity Security............ $0.000119 per share $0.000119 per share $0.000130 per share $0.000145 per share $0.000166 per share (up to $5.95 max per (up to $5.95 max per (up to $6.49 max per (up to $7.27 max per (up to $8.30 max per trade). trade). trade). trade). trade)."
+            ]
+          },
+          {
+            "document": "SEC Release No. 34-101696, notice of filing and immediate effectiveness of SR-FINRA-2024-019 (Adjust FINRA Fees To Provide Sustainable Funding for FINRA's Regulatory Mission)",
+            "citation": "89 FR 93709",
+            "url": "https://www.federalregister.gov/documents/2024/11/27/2024-27764/self-regulatory-organizations-financial-industry-regulatory-authority-inc-notice-of-filing-and",
+            "retrieved_from": "https://www.federalregister.gov/documents/full_text/text/2024/11/27/2024-27764.txt",
+            "retrieved_format": "federalregister_text",
+            "retrieved_at": "2026-09-24",
+            "supports": "rate current in 2024 and unchanged in 2025",
+            "quotes": [
+              "Security type 2024 (current) 2025 (no change) 2026 2027 2028 2029",
+              "Covered Equity Security......... $0.000166 per $0.000166 per $0.000195 per $0.000232 per $0.000240 per $0.000249 per share (up to share (up to share (up to share (up to share (up to share (up to $8.30 max per $8.30 max per $9.79 max per $11.61 max per $12.05 max per $12.50 max per trade). trade). trade). trade). trade). trade).",
+              "Implementation of the proposed rule change will be phased in gradually over a five-year period beginning on January 1, 2025, with full implementation of all proposed fee changes by 2029."
+            ]
+          }
+        ]
+      },
+      {
+        "from": "2026-01-01",
+        "to": "2026-09-30",
+        "usd_per_share": 0.000195,
+        "max_usd_per_trade": 9.79,
+        "status_at_retrieval": "in_force",
+        "sources": [
+          {
+            "document": "FINRA By-Laws Schedule A, Section 1 (Member Regulatory Fees), FINRA rulebook version Jan 01, 2026 - Sep 30, 2026",
+            "url": "https://www.finra.org/rules-guidance/rulebooks/corporate-organization/section-1-member-regulatory-fees?version=2009531",
+            "retrieved_from": "https://www.finra.org/rev/2009531",
+            "retrieved_format": "finra_revision_json",
+            "version_id": "2009531",
+            "version_label": "Jan 01, 2026 - Sep 30, 2026",
+            "retrieved_at": "2026-09-24",
+            "supports": "rate",
+            "quotes": [
+              "(1) $0.000195 per share for each sale of a covered equity security, with a maximum charge of $9.79 per trade",
+              "Amended by SR-FINRA-2024-019 eff. Jan. 1, 2026."
+            ]
+          },
+          {
+            "document": "SEC Release No. 34-101696, notice of filing and immediate effectiveness of SR-FINRA-2024-019 (Adjust FINRA Fees To Provide Sustainable Funding for FINRA's Regulatory Mission)",
+            "citation": "89 FR 93709",
+            "url": "https://www.federalregister.gov/documents/2024/11/27/2024-27764/self-regulatory-organizations-financial-industry-regulatory-authority-inc-notice-of-filing-and",
+            "retrieved_from": "https://www.federalregister.gov/documents/full_text/text/2024/11/27/2024-27764.txt",
+            "retrieved_format": "federalregister_text",
+            "retrieved_at": "2026-09-24",
+            "supports": "2026 step",
+            "quotes": [
+              "Security type 2024 (current) 2025 (no change) 2026 2027 2028 2029",
+              "Covered Equity Security......... $0.000166 per $0.000166 per $0.000195 per $0.000232 per $0.000240 per $0.000249 per share (up to share (up to share (up to share (up to share (up to share (up to $8.30 max per $8.30 max per $9.79 max per $11.61 max per $12.05 max per $12.50 max per trade). trade). trade). trade). trade). trade)."
+            ]
+          },
+          {
+            "document": "SEC Release No. 34-106410, notice of filing and immediate effectiveness of SR-FINRA-2026-020 (Modify the Implementation Schedule of Amendments To Schedule A Adopted in SR-FINRA-2024-019 as Modified in SR-FINRA-2025-007)",
+            "citation": "91 FR 60427",
+            "url": "https://www.federalregister.gov/documents/2026/09/23/2026-19393/self-regulatory-organizations-financial-industry-regulatory-authority-inc-notice-of-filing-and",
+            "retrieved_from": "https://www.federalregister.gov/documents/full_text/text/2026/09/23/2026-19393.txt",
+            "retrieved_format": "federalregister_text",
+            "retrieved_at": "2026-09-24",
+            "supports": "rate current in 2026",
+            "quotes": [
+              "Security Type 2026 (current) 2027 (no change) 2028 (no change) 2029 2030 2031",
+              "Covered Equity Security......... $0.000195 per $0.000195 per $0.000195 per $0.000232 per $0.000240 per $0.000249 per share (up to share (up to share (up to share (up to share (up to share (up to $9.79 max per $9.79 max per $9.79 max per $11.61 max per $12.05 max per $12.50 max per trade). trade). trade). trade). trade). trade)."
+            ]
+          }
+        ]
+      },
+      {
+        "from": "2026-10-01",
+        "to": "2026-12-31",
+        "usd_per_share": 0.0,
+        "max_usd_per_trade": 0.0,
+        "status_at_retrieval": "scheduled",
+        "sources": [
+          {
+            "document": "FINRA By-Laws Schedule A, Section 1 (Member Regulatory Fees), FINRA rulebook version Oct 01, 2026 - Dec 31, 2026",
+            "url": "https://www.finra.org/rules-guidance/rulebooks/corporate-organization/section-1-member-regulatory-fees?version=2009541",
+            "retrieved_from": "https://www.finra.org/rev/2009541",
+            "retrieved_format": "finra_revision_json",
+            "version_id": "2009541",
+            "version_label": "Oct 01, 2026 - Dec 31, 2026",
+            "retrieved_at": "2026-09-24",
+            "supports": "rate",
+            "quotes": [
+              "(1) $0.00 per share for each sale of a covered equity security, with a maximum charge of $0.00 per trade",
+              "Amended by SR-FINRA-2026-021 eff. Oct. 1, 2026."
+            ]
+          },
+          {
+            "document": "SEC Release No. 34-106409, notice of filing and immediate effectiveness of SR-FINRA-2026-021 (Temporarily Pause Assessment of the Trading Activity Fee)",
+            "citation": "91 FR 60435",
+            "url": "https://www.federalregister.gov/documents/2026/09/23/2026-19392/self-regulatory-organizations-financial-industry-regulatory-authority-inc-notice-of-filing-and",
+            "retrieved_from": "https://www.federalregister.gov/documents/full_text/text/2026/09/23/2026-19392.txt",
+            "retrieved_format": "federalregister_text",
+            "retrieved_at": "2026-09-24",
+            "supports": "pause for October-December 2026 transactions",
+            "quotes": [
+              "FINRA is proposing to temporarily pause assessment of the Trading Activity Fee (``TAF'') for three months, for transactions from October 1, 2026 through December 31, 2026.",
+              "For transactions during the three-month period of October, November, and December 2026, the TAF rates set forth in Section 1 of Schedule A to the FINRA By-Laws would temporarily be set at $0.00 and monthly invoices would reflect a $0.00 TAF assessment.",
+              "FINRA has filed the proposed rule change for immediate effectiveness. The effective date and the implementation date will be the date of filing."
+            ]
+          }
+        ],
+        "note": "Filed September 15, 2026 and effective on filing; published in the Federal Register on September 23, 2026."
+      },
+      {
+        "from": "2027-01-01",
+        "to": "2028-12-31",
+        "usd_per_share": 0.000195,
+        "max_usd_per_trade": 9.79,
+        "status_at_retrieval": "scheduled",
+        "sources": [
+          {
+            "document": "FINRA By-Laws Schedule A, Section 1 (Member Regulatory Fees), FINRA rulebook version Jan 01, 2027 - Dec 31, 2028",
+            "url": "https://www.finra.org/rules-guidance/rulebooks/corporate-organization/section-1-member-regulatory-fees?version=2009881",
+            "retrieved_from": "https://www.finra.org/rev/2009881",
+            "retrieved_format": "finra_revision_json",
+            "version_id": "2009881",
+            "version_label": "Jan 01, 2027 - Dec 31, 2028",
+            "retrieved_at": "2026-09-24",
+            "supports": "rate",
+            "quotes": [
+              "(1) $0.000195 per share for each sale of a covered equity security, with a maximum charge of $9.79 per trade"
+            ]
+          },
+          {
+            "document": "SEC Release No. 34-106410, notice of filing and immediate effectiveness of SR-FINRA-2026-020 (Modify the Implementation Schedule of Amendments To Schedule A Adopted in SR-FINRA-2024-019 as Modified in SR-FINRA-2025-007)",
+            "citation": "91 FR 60427",
+            "url": "https://www.federalregister.gov/documents/2026/09/23/2026-19393/self-regulatory-organizations-financial-industry-regulatory-authority-inc-notice-of-filing-and",
+            "retrieved_from": "https://www.federalregister.gov/documents/full_text/text/2026/09/23/2026-19393.txt",
+            "retrieved_format": "federalregister_text",
+            "retrieved_at": "2026-09-24",
+            "supports": "2026 rates kept for 2027 and 2028",
+            "quotes": [
+              "Security Type 2026 (current) 2027 (no change) 2028 (no change) 2029 2030 2031",
+              "Covered Equity Security......... $0.000195 per $0.000195 per $0.000195 per $0.000232 per $0.000240 per $0.000249 per share (up to share (up to share (up to share (up to share (up to share (up to $9.79 max per $9.79 max per $9.79 max per $11.61 max per $12.05 max per $12.50 max per trade). trade). trade). trade). trade). trade).",
+              "The proposed rule change would modify the previously adopted fee implementation schedule as follows: from January 1, 2027 through December 31, 2028, fees would remain at 2026 rates; implementation of fees scheduled to begin on January 1, 2027 would instead commence on January 1, 2029; implementation of fees scheduled to begin on January 1, 2028 would instead commence on January 1, 2030; and implementation of fees scheduled to begin on January 1, 2029 would instead commence on January 1, 2031."
+            ]
+          },
+          {
+            "document": "SEC Release No. 34-106409, notice of filing and immediate effectiveness of SR-FINRA-2026-021 (Temporarily Pause Assessment of the Trading Activity Fee)",
+            "citation": "91 FR 60435",
+            "url": "https://www.federalregister.gov/documents/2026/09/23/2026-19392/self-regulatory-organizations-financial-industry-regulatory-authority-inc-notice-of-filing-and",
+            "retrieved_from": "https://www.federalregister.gov/documents/full_text/text/2026/09/23/2026-19392.txt",
+            "retrieved_format": "federalregister_text",
+            "retrieved_at": "2026-09-24",
+            "supports": "rates resume with January 2027 transactions",
+            "quotes": [
+              "Beginning with January 2027 transactions, the previous TAF fee rates will resume, with normal invoicing commencing in February 2027 (for January transactions)."
+            ]
+          }
+        ]
+      },
+      {
+        "from": "2029-01-01",
+        "to": "2029-12-31",
+        "usd_per_share": 0.000232,
+        "max_usd_per_trade": 11.61,
+        "status_at_retrieval": "scheduled",
+        "sources": [
+          {
+            "document": "FINRA By-Laws Schedule A, Section 1 (Member Regulatory Fees), FINRA rulebook version Jan 01, 2029 - Dec 31, 2029",
+            "url": "https://www.finra.org/rules-guidance/rulebooks/corporate-organization/section-1-member-regulatory-fees?version=2010041",
+            "retrieved_from": "https://www.finra.org/rev/2010041",
+            "retrieved_format": "finra_revision_json",
+            "version_id": "2010041",
+            "version_label": "Jan 01, 2029 - Dec 31, 2029",
+            "retrieved_at": "2026-09-24",
+            "supports": "rate",
+            "quotes": [
+              "(1) $0.000232 per share for each sale of a covered equity security, with a maximum charge of $11.61 per trade",
+              "Amended by SR-FINRA-2026-020 eff. Jan. 1, 2029."
+            ]
+          },
+          {
+            "document": "SEC Release No. 34-106410, notice of filing and immediate effectiveness of SR-FINRA-2026-020 (Modify the Implementation Schedule of Amendments To Schedule A Adopted in SR-FINRA-2024-019 as Modified in SR-FINRA-2025-007)",
+            "citation": "91 FR 60427",
+            "url": "https://www.federalregister.gov/documents/2026/09/23/2026-19393/self-regulatory-organizations-financial-industry-regulatory-authority-inc-notice-of-filing-and",
+            "retrieved_from": "https://www.federalregister.gov/documents/full_text/text/2026/09/23/2026-19393.txt",
+            "retrieved_format": "federalregister_text",
+            "retrieved_at": "2026-09-24",
+            "supports": "2029 step",
+            "quotes": [
+              "Security Type 2026 (current) 2027 (no change) 2028 (no change) 2029 2030 2031",
+              "Covered Equity Security......... $0.000195 per $0.000195 per $0.000195 per $0.000232 per $0.000240 per $0.000249 per share (up to share (up to share (up to share (up to share (up to share (up to $9.79 max per $9.79 max per $9.79 max per $11.61 max per $12.05 max per $12.50 max per trade). trade). trade). trade). trade). trade).",
+              "The proposed rule change would modify the previously adopted fee implementation schedule as follows: from January 1, 2027 through December 31, 2028, fees would remain at 2026 rates; implementation of fees scheduled to begin on January 1, 2027 would instead commence on January 1, 2029; implementation of fees scheduled to begin on January 1, 2028 would instead commence on January 1, 2030; and implementation of fees scheduled to begin on January 1, 2029 would instead commence on January 1, 2031."
+            ]
+          }
+        ]
+      },
+      {
+        "from": "2030-01-01",
+        "to": "2030-12-31",
+        "usd_per_share": 0.00024,
+        "max_usd_per_trade": 12.05,
+        "status_at_retrieval": "scheduled",
+        "sources": [
+          {
+            "document": "FINRA By-Laws Schedule A, Section 1 (Member Regulatory Fees), FINRA rulebook version Jan 01, 2030 - Dec 31, 2030",
+            "url": "https://www.finra.org/rules-guidance/rulebooks/corporate-organization/section-1-member-regulatory-fees?version=2010031",
+            "retrieved_from": "https://www.finra.org/rev/2010031",
+            "retrieved_format": "finra_revision_json",
+            "version_id": "2010031",
+            "version_label": "Jan 01, 2030 - Dec 31, 2030",
+            "retrieved_at": "2026-09-24",
+            "supports": "rate",
+            "quotes": [
+              "(1) $0.000240 per share for each sale of a covered equity security, with a maximum charge of $12.05 per trade",
+              "Amended by SR-FINRA-2026-020 eff. Jan. 1, 2030."
+            ]
+          },
+          {
+            "document": "SEC Release No. 34-106410, notice of filing and immediate effectiveness of SR-FINRA-2026-020 (Modify the Implementation Schedule of Amendments To Schedule A Adopted in SR-FINRA-2024-019 as Modified in SR-FINRA-2025-007)",
+            "citation": "91 FR 60427",
+            "url": "https://www.federalregister.gov/documents/2026/09/23/2026-19393/self-regulatory-organizations-financial-industry-regulatory-authority-inc-notice-of-filing-and",
+            "retrieved_from": "https://www.federalregister.gov/documents/full_text/text/2026/09/23/2026-19393.txt",
+            "retrieved_format": "federalregister_text",
+            "retrieved_at": "2026-09-24",
+            "supports": "2030 step",
+            "quotes": [
+              "Security Type 2026 (current) 2027 (no change) 2028 (no change) 2029 2030 2031",
+              "Covered Equity Security......... $0.000195 per $0.000195 per $0.000195 per $0.000232 per $0.000240 per $0.000249 per share (up to share (up to share (up to share (up to share (up to share (up to $9.79 max per $9.79 max per $9.79 max per $11.61 max per $12.05 max per $12.50 max per trade). trade). trade). trade). trade). trade).",
+              "The proposed rule change would modify the previously adopted fee implementation schedule as follows: from January 1, 2027 through December 31, 2028, fees would remain at 2026 rates; implementation of fees scheduled to begin on January 1, 2027 would instead commence on January 1, 2029; implementation of fees scheduled to begin on January 1, 2028 would instead commence on January 1, 2030; and implementation of fees scheduled to begin on January 1, 2029 would instead commence on January 1, 2031."
+            ]
+          }
+        ]
+      },
+      {
+        "from": "2031-01-01",
+        "to": null,
+        "usd_per_share": 0.000249,
+        "max_usd_per_trade": 12.5,
+        "status_at_retrieval": "scheduled",
+        "sources": [
+          {
+            "document": "FINRA By-Laws Schedule A, Section 1 (Member Regulatory Fees), FINRA rulebook version Jan 01, 2031 onwards",
+            "url": "https://www.finra.org/rules-guidance/rulebooks/corporate-organization/section-1-member-regulatory-fees?version=2010021",
+            "retrieved_from": "https://www.finra.org/rev/2010021",
+            "retrieved_format": "finra_revision_json",
+            "version_id": "2010021",
+            "version_label": "Jan 01, 2031 onwards",
+            "retrieved_at": "2026-09-24",
+            "supports": "rate",
+            "quotes": [
+              "(1) $0.000249 per share for each sale of a covered equity security, with a maximum charge of $12.50 per trade",
+              "Amended by SR-FINRA-2026-020 eff. Jan. 1, 2031."
+            ]
+          },
+          {
+            "document": "SEC Release No. 34-106410, notice of filing and immediate effectiveness of SR-FINRA-2026-020 (Modify the Implementation Schedule of Amendments To Schedule A Adopted in SR-FINRA-2024-019 as Modified in SR-FINRA-2025-007)",
+            "citation": "91 FR 60427",
+            "url": "https://www.federalregister.gov/documents/2026/09/23/2026-19393/self-regulatory-organizations-financial-industry-regulatory-authority-inc-notice-of-filing-and",
+            "retrieved_from": "https://www.federalregister.gov/documents/full_text/text/2026/09/23/2026-19393.txt",
+            "retrieved_format": "federalregister_text",
+            "retrieved_at": "2026-09-24",
+            "supports": "2031 step",
+            "quotes": [
+              "Security Type 2026 (current) 2027 (no change) 2028 (no change) 2029 2030 2031",
+              "Covered Equity Security......... $0.000195 per $0.000195 per $0.000195 per $0.000232 per $0.000240 per $0.000249 per share (up to share (up to share (up to share (up to share (up to share (up to $9.79 max per $9.79 max per $9.79 max per $11.61 max per $12.05 max per $12.50 max per trade). trade). trade). trade). trade). trade).",
+              "The proposed rule change would modify the previously adopted fee implementation schedule as follows: from January 1, 2027 through December 31, 2028, fees would remain at 2026 rates; implementation of fees scheduled to begin on January 1, 2027 would instead commence on January 1, 2029; implementation of fees scheduled to begin on January 1, 2028 would instead commence on January 1, 2030; and implementation of fees scheduled to begin on January 1, 2029 would instead commence on January 1, 2031."
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "not_modelled": [
+    "Broker rounding of passed-through fees (commonly up to the cent per trade) and broker-specific pass-through practice.",
+    "TAF exemptions and the rule that no TAF is assessed when the execution price is below the per-share rate.",
+    "Section 31 assessments on security futures and any fee other than the two tables above. Alpaca commission is 0 (protocol cost_model.fees)."
+  ]
+}
