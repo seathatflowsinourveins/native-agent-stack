@@ -1693,9 +1693,17 @@ class CredentialFilePermissions(unittest.TestCase):
     def test_fifo_is_rejected_and_does_not_hang(self):
         fifo = self.root / "fifo.env"
         os.mkfifo(fifo, mode=0o600)
-        with _deadline(10):
-            with self.assertRaisesRegex(SafetyErrorAlways, "credential_file_permissions"):
-                credentials(fifo)
+        try:
+            with _deadline(10):
+                with self.assertRaisesRegex(SafetyErrorAlways, "credential_file_permissions"):
+                    credentials(fifo)
+        except _DeadlineExceeded:
+            # A genuine assertion failure (self.fail), not an uncaught
+            # exception: unittest -- and the real mutation driver in
+            # tests/_credential_mutation_driver.py, which only counts a
+            # "FAIL", never an "ERROR", as a kill -- must see this as the
+            # test actively catching the regression, not merely erroring.
+            self.fail("credentials(fifo) hung past the 10s deadline instead of raising")
 
     def test_hard_link_is_rejected(self):
         # G-fix-round item 2: a second name for the same inode (e.g. one outside a
@@ -1759,7 +1767,38 @@ class CredentialFilePermissions(unittest.TestCase):
         path = self.root / "paper.env"
         path.write_bytes("APCA_API_KEY_ID=fixturé-key\nAPCA_API_SECRET_KEY=fixture-secret\n".encode("utf-8"))
         os.chmod(path, 0o600)
-        with self.assertRaisesRegex(SafetyErrorAlways, "credential_file_permissions:encoding"):
+        with self.assertRaisesRegex(SafetyErrorAlways, "credential_file_permissions:encoding") as ctx:
+            credentials(path)
+        # G-round-4 item 1: `raw.isascii()` is checked before any `.decode()`
+        # call, so no UnicodeDecodeError (whose `.object` attribute holds the
+        # *entire* input, secret included) is ever constructed at all --
+        # confirmed here on the exception itself, not only on its message.
+        error = ctx.exception
+        self.assertIsNone(error.__context__)
+        self.assertIsNone(error.__cause__)
+        for attr in ("object", "args"):
+            value = repr(getattr(error, attr, None))
+            self.assertNotIn("fixtur", value)
+            self.assertNotIn("fixture-secret", value)
+
+    def test_oversized_file_is_rejected_not_silently_truncated_and_accepted(self):
+        # G-round-4 item 4: proves the size check itself is what rejects an
+        # over-cap file, not merely that some other check happens to reject
+        # it too. Both real KEY/SECRET lines sit well inside the first
+        # MAX_CREDENTIAL_BYTES + 1 bytes, followed by a huge trailing
+        # comment line that pushes the file itself past the cap; a
+        # truncated *comment* still starts with "#" and parses as a no-op,
+        # so if the size check were ever removed, the bounded read alone
+        # would silently hand back a "valid"-looking (but truncated-file)
+        # credential pair instead of raising -- that specific failure mode
+        # (a clean pass, not merely a different exception) is what this
+        # test's assertRaisesRegex would then correctly flag as a FAIL.
+        path = self.root / "paper.env"
+        filler = "k" * 70000  # far past runner_module.MAX_CREDENTIAL_BYTES (64 KiB)
+        path.write_text(f"APCA_API_KEY_ID=shortkey\nAPCA_API_SECRET_KEY=shortsecret\n# {filler}\n")
+        os.chmod(path, 0o600)
+        self.assertGreater(len(path.read_bytes()), runner_module.MAX_CREDENTIAL_BYTES)
+        with self.assertRaisesRegex(SafetyErrorAlways, "credential_file_permissions:size"):
             credentials(path)
 
 

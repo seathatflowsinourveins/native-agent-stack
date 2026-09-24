@@ -81,10 +81,16 @@ def credentials(path):
         raise SafetyError(str(error)) from None
     if len(raw) > MAX_CREDENTIAL_BYTES:
         raise SafetyError(REASON_SIZE)
-    try:
-        text = raw.decode("ascii")
-    except UnicodeDecodeError:
-        raise SafetyError(REASON_ENCODING) from None
+    # Checked before decoding, never inside a `except UnicodeDecodeError`
+    # handler: that handler's exception carries `.object` (the *entire*
+    # input bytes, secret included) as an attribute, and raising from
+    # inside it -- even with `from None` -- still leaves that exception
+    # reachable via `__context__`, which `from None` does not clear (see
+    # credential_guard's module docstring for the same reasoning applied
+    # to its own exceptions).
+    if not raw.isascii():
+        raise SafetyError(REASON_ENCODING)
+    text = raw.decode("ascii")
     result = {}
     for line in text.splitlines():
         line = line.strip()

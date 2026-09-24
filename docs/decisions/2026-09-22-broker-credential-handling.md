@@ -7,59 +7,91 @@ does not change; this decision only tightens the precondition on the env file th
 it is opened. No broker call, no live credentials file, and no new secret store are introduced.
 
 `market_research.py` (same directory) has its own, differently implemented `credentials(path)` that also
-reads an Alpaca env file named by its own `--env-file` flag. **Closed 2026-09-24, hardened across two
-same-day fix rounds** after independent Codex security review and an independent Claude real-mutation/attack
-run (see `catalogs/us-equities/gates-20260922.json`'s `credential-handling` gate note for the current,
-qualified guarantee): both loaders now call a shared
+reads an Alpaca env file named by its own `--env-file` flag. **Closed 2026-09-24, hardened across four
+same-day fix rounds** after independent, repeated Codex security review and an independent Claude
+real-mutation/attack run (268 attack cases plus a live rename-exchange race with roughly 600k swaps, neither
+finding an access-rule bypass; see `catalogs/us-equities/gates-20260922.json`'s `credential-handling` gate
+note for the current, qualified guarantee): both loaders now call a shared
 `blueprints/us-equities/adaptive-paper/credential_guard.open_verified()` for the ownership, mode (exactly
-`0600` for the file), hard-link-count (exactly 1 for the file), whole-ancestor-chain
-ownership/writability (root or `os.getuid()`; group/other-writable only if sticky, the OpenSSH
-`safe_path`/`secure_filename` model), and outside-any-Git-worktree rules. These are bound to a
-`dir_fd`-chained traversal from `/` (`O_DIRECTORY|O_NOFOLLOW` per ancestor,
-`O_RDONLY|O_NOFOLLOW|O_NONBLOCK|O_NOCTTY` for the file) so a symlink substituted at any position -- an
-ancestor directory, not only the final file -- fails closed with `ELOOP`/`ENOTDIR`. Renaming an
-already-checked, victim-owned directory underneath an attacker-writable, non-sticky ancestor (the round-2
-Codex finding) no longer bypasses anything, because that ancestor itself is refused the moment it is opened,
-independent of what gets renamed into it afterward or when. `market_research.py` keeps its original
-`O_NOFOLLOW` symlink-refusal behavior (`follow_symlinks=False`, applied per-ancestor-component, not only the
-final file, and a lexical `..` component is refused outright rather than silently collapsed -- collapsing it
-could skip inspecting an intermediate symlink); `runner.py` keeps its original symlink-resolving behavior
-(`follow_symlinks=True`) so this runner's asserted `credential_file_permissions` error-string prefix is
-unchanged. Every rejection raises one of a small, fixed set of path-free `credential_file_permissions:<code>`
-reason codes (`credential_guard.REASON_*`, e.g. `:owner`, `:mode`, `:hardlink`, `:worktree`, `:ancestor`,
-`:parent_owner`, `:parent_mode`, `:symlink`, `:not_regular`, `:missing`, `:encoding`, `:size`) -- never a
-path, a basename, or upstream `OSError`/`RuntimeError` text; a circular-symlink `RuntimeError` (which
-`Path.resolve(strict=True)` raises, not `OSError`, on the native Python 3.12 runtime) and an embedded-NUL
-`ValueError` are both caught and normalized the same way. Every such exception is also built and raised from
-code that is no longer inside the `except` block that caught the original failure, specifically so Python
-never attaches that original (potentially path-bearing) exception as `__context__`; `from None` alone does
-not achieve this, since the interpreter re-populates `__context__` at the `raise` statement itself if one is
-still executing inside a handler. The verified descriptor is closed on every failure path, including an
-`fdopen()` failure after every other check has already passed. Covered by
-`tests.test_adaptive_paper_runner.CredentialFilePermissions` (existing, still passing, plus symlink,
-hard-link, FIFO-does-not-hang, and non-ASCII cases, each FIFO case now under a `signal.alarm` deadline), the
-existing `tests.test_adaptive_paper_runner.SharedCredentialGuardParity`, the existing
+`0600` for the file), hard-link-count (exactly 1 for the file), ancestor-chain ownership/writability, and
+outside-any-Git-worktree rules. These are bound to a `dir_fd`-chained traversal from `/`
+(`O_DIRECTORY|O_NOFOLLOW` per ancestor, `O_RDONLY|O_NOFOLLOW|O_NONBLOCK|O_NOCTTY` for the file) so a symlink
+substituted at any position -- an ancestor directory, not only the final file -- fails closed, normally with
+`ELOOP` (final component) or `ENOTDIR` (a symlinked *directory* component, which is refined to the `symlink`
+reason code via one extra, failure-path-only `lstat`, added in round 4, rather than left in the generic
+`missing` bucket). Renaming an already-checked, victim-owned directory underneath an attacker-writable,
+non-sticky ancestor (the round-2 Codex finding) no longer bypasses anything, because that ancestor itself is
+refused the moment it is opened, independent of what gets renamed into it afterward or when -- every ancestor
+up to but not including the immediate parent uses the OpenSSH `safe_path`/`secure_filename` model (owned by
+root or `os.getuid()`; group/other-writable only if sticky), while the immediate parent (round-4: tightened
+after round 3 accidentally let a bare `/tmp/file` load) uses a *stricter*, non-excusable rule -- owned by
+exactly `os.getuid()` (root does not excuse it here) and never group/other-writable, no sticky exception --
+so a private directory *under* `/tmp` still passes but `/tmp/file` and `/file` do not. `market_research.py`
+keeps its original `O_NOFOLLOW` symlink-refusal behavior (`follow_symlinks=False`, applied per-ancestor-
+component, not only the final file, and a lexical `..` component is refused outright rather than silently
+collapsed -- collapsing it could skip inspecting an intermediate symlink); `runner.py` keeps its original
+symlink-resolving behavior (`follow_symlinks=True`) so this runner's asserted `credential_file_permissions`
+error-string prefix is unchanged. Every rejection raises one of a small, fixed set of path-free
+`credential_file_permissions:<code>` reason codes (`credential_guard.REASON_*`, e.g. `:owner`, `:mode`,
+`:hardlink`, `:worktree`, `:ancestor`, `:parent_owner`, `:parent_mode`, `:symlink`, `:not_regular`,
+`:missing`, `:encoding`, `:size`) -- never a path, a basename, or upstream `OSError`/`RuntimeError` text; a
+circular-symlink `RuntimeError` (which `Path.resolve(strict=True)` raises, not `OSError`, on the native
+Python 3.12 runtime) and an embedded-NUL `ValueError` are both caught and normalized the same way. Round 4
+also closed the one remaining reason-code inconsistency: an oversized `market_research.py` file now raises
+`credential_file_permissions:size`, the same code `runner.py` already used, instead of the older
+`invalid_credential_file`. Every such exception is also built and raised from code that is no longer inside
+the `except` block that caught the original failure, specifically so Python never attaches that original
+(potentially path-bearing) exception as `__context__`; `from None` alone does not achieve this, since the
+interpreter re-populates `__context__` at the `raise` statement itself if one is still executing inside a
+handler -- round 4 applied this same discipline to the ASCII check itself: both loaders now check
+`raw.isascii()` on the *bytes* before ever calling `.decode("ascii")`, so the `UnicodeDecodeError` that
+Python's decoder would otherwise raise (whose `.object` attribute holds the *entire* input, secret included)
+is never constructed at all, rather than being raised-from-inside-its-own-handler with `from None` (which
+does not clear `__context__.object`). The verified descriptor is closed on every failure path, including a
+failure while wrapping it for reading: round 4 replaced a single `os.fdopen(file_fd, "rb")` call (whose
+failure path risked a double-close -- if `io.FileIO`'s own constructor is what fails after accepting
+ownership of the fd, CPython has already closed it, and a second `os.close()` either raises `EBADF` or
+closes an unrelated, since-reused fd) with building `io.FileIO(file_fd, "rb", closefd=True)` first and only
+closing that already-constructed *object* (never the bare integer) if wrapping it in a `BufferedReader`
+subsequently fails. Covered by `tests.test_adaptive_paper_runner.CredentialFilePermissions` (existing, still
+passing, plus symlink, hard-link, FIFO-does-not-hang, oversized-file, and non-ASCII cases -- the last two now
+also asserting `__context__`/`__cause__` are `None`, and each FIFO case under a `signal.alarm` deadline that
+itself fails via `self.fail(...)`, a genuine assertion failure, rather than letting the deadline's exception
+escape uncaught), the existing `tests.test_adaptive_paper_runner.SharedCredentialGuardParity`, the existing
 `tests.test_adaptive_market_research.MarketResearchCredentialFilePermissions` (wrong mode, wrong owner,
 symlink, hard link, inside a Git worktree, missing file, a deadline-bounded FIFO, and a valid file), and
 `tests/test_adaptive_paper_credential_race.py` -- note the real filename; an earlier round of this document
 named a nonexistent `tests/test_credential_guard_race.py`. That file's `HookInjectedRaces`,
-`AncestorRenameResistance`, `NoPathLeakInErrors`, `DotDotIsRejected`, `FdOpenFailureCleanup`,
-`FdLeakOnRefusal`, `RootMarkerIsChecked`, `ForeignFileOwnerAloneIsRejected`, `FstatNotPathnameStat`, and
-`BoundedReadIsActuallyBounded` classes exercise the round-2 findings specifically (a hook-injected mid-walk
-worktree marker, simulated foreign ownership via per-fd `fstat` faking rather than a process-wide
-`os.getuid()` patch, error-content assertions that also check `__context__`/`__cause__` are `None`, a real
-`os.listdir("/proc/<pid>/fd")` fd-count check around both success and every refusal path, and a
-call-contract assertion on the exact `read()` size argument each loader uses -- not only the outcome, since a
-static oversized fixture rejects identically whether the read is bounded or not). Its `RealMutationKills`
-class replaces an earlier `MUTATION_KILLS` meta-test that only patched in-process Python objects and asserted
-a hardcoded string-to-test-name mapping without ever running those tests -- flagged by the round-2 Codex
-review as not establishing what it claimed to. `RealMutationKills` instead copies the actual source tree to a
-private temporary directory (via `tests/_credential_mutation_driver.py`), applies one real, exact-count
-textual mutation to a real `.py` file in that copy, and runs the actually-named test(s) against the mutated
-copy in a subprocess; a mutation counts as "killed" only if that subprocess genuinely exits non-zero. All
-twelve mutations currently declared there are killed this way (see that test's printed report for the
-current list); "does not hang" is asserted the same way -- the `O_NONBLOCK`-removal mutation is confirmed to
-make the FIFO test's own `signal.alarm` deadline fire and fail fast, not to hang the mutation run itself.
+`AncestorRenameResistance`, `RootDirectoryOwnershipIsChecked`, `NoPathLeakInErrors`, `DotDotIsRejected`,
+`FdOpenFailureCleanup`, `FdLeakOnRefusal`, `RootMarkerIsChecked`, `ForeignFileOwnerAloneIsRejected`,
+`FstatNotPathnameStat`, and `BoundedReadIsActuallyBounded` classes exercise the round-2 and round-4 findings
+specifically (a hook-injected mid-walk worktree marker, simulated foreign file/root/ancestor ownership via
+per-fd `fstat`/`os.open` faking rather than a process-wide `os.getuid()` patch -- which would also fail the
+parent-owner check and mask what is actually being tested -- error-content assertions that also check
+`__context__`/`__cause__` are `None`, a real `os.listdir("/proc/<pid>/fd")` fd-count check around both
+success and every refusal path, and a call-contract assertion on the exact `read()` size argument each
+loader uses -- not only the outcome, since a static oversized fixture rejects identically whether the read
+is bounded or not). Its `RealMutationKills` class replaces an earlier `MUTATION_KILLS` meta-test that only
+patched in-process Python objects and asserted a hardcoded string-to-test-name mapping without ever running
+those tests -- flagged by the round-2 Codex review as not establishing what it claimed to.
+
+Round 4 (both reviewers, MEDIUM) found `RealMutationKills`'s *driver* itself, `tests/
+_credential_mutation_driver.py`, over-counted kills: it treated any non-zero subprocess exit as a kill, so
+`disable_worktree_check`'s named test -- which itself asserts `(repo_root / ".git").exists()` as a
+precondition -- reported KILLED against a completely unmutated copy, because that copy (at the time) had no
+`.git` at all. The driver now: runs `git init -q` in every copy; runs the named test id(s) on the **pristine,
+unmutated** copy first and requires every one to report a plain "ok" (otherwise the spec itself, not the
+mutation, is what is broken, and no kill/survive verdict is drawn); only then applies the mutation and
+re-runs; and counts a kill only when a named test transitions to a genuine `unittest` "FAIL" (an
+`assert*`-raised failure) -- never an "ERROR" (an exception escaping the test body, e.g. an import failure)
+and never merely "the process exited non-zero", which the earlier version conflated. `tests/
+test_adaptive_paper_credential_race.py`'s `MutationDriverSelfTests` class asserts this directly: an empty
+mutation, an unrelated-import-breaking mutation, and a mistyped test id must each report "not killed" against
+the driver's own logic. All fourteen mutations currently declared in `RealMutationKills.MUTATIONS` are killed
+this way (see that test's printed report for the current list, generated fresh on every run, never a static
+copy-pasted table); "does not hang" is asserted the same way -- the `O_NONBLOCK`-removal mutation makes the
+FIFO test's own `signal.alarm` deadline fire, and that test converts the resulting timeout into an explicit
+`self.fail(...)` so it registers as a real "FAIL", not an "ERROR" the stricter kill rule would then ignore.
 
 ## Decision
 
@@ -74,29 +106,47 @@ file in code before any line is read:
 3. **Exactly one hard link.** A second name for the same inode (e.g. hard-linked from inside a worktree
    while the checked name lives outside one) is rejected, since the guarantee below only inspects the name
    that was opened.
-4. **Every ancestor directory from `/` down through the immediate parent -- not only the immediate
-   parent -- owned by root or by you, and group-/other-writable only if it also carries the sticky bit.**
-   This is the OpenSSH `safe_path`/`secure_filename` model. It is what makes a private, caller-owned
-   directory under `/tmp` (sticky, world-writable) pass while an ordinary attacker-writable shared
-   directory is refused outright, *regardless of what it contains or what gets renamed into it
-   afterward* -- closing a round-2 finding where only the immediate parent's ownership/mode were checked,
-   letting an attacker who can write to an ancestor two or more levels up rename an already-checked,
-   victim-owned directory into a location a `.git` ancestor would otherwise catch.
-5. **Outside any Git worktree it is possible to detect from the file's own location.** `credentials()` walks
-   the opened directory chain -- including `/` itself, not starting only at the first named component -- for
-   a `.git` entry (directory in an ordinary clone, file in a linked worktree) and rejects the file if one is
-   found at any ancestor, checked at the moment each ancestor's own descriptor is opened (not from a
-   pathname list computed once before any traversal happens, which a later rename could evade). This is a
-   real, useful check, not a proof: a worktree configured purely through `GIT_DIR`/`GIT_WORK_TREE`
-   environment variables or `core.worktree`, with no `.git` entry anywhere in the file's own ancestor chain,
-   is undetectable by a file-local check and is **not** caught -- markerless worktrees of that shape remain
-   fully out of scope. Likewise, a bind mount that makes a repository subdirectory appear at a path with no
-   `.git` ancestor in its own mount namespace is invisible to this check; that requires mount authority (or
-   an existing mount) to set up, and metadata checks do not categorically exclude virtual filesystems either.
-   "Outside any Git worktree" here means "outside every worktree whose `.git` entry is an ancestor of this
-   path, in this process's own mount namespace" -- it is not a claim that the file can never be committed,
-   diffed, or swept up by every possible repository-wide scan.
-6. **For `follow_symlinks=False` (`market_research.credentials()`), no `..` path component, ever.**
+4. **Every ancestor directory from `/` down through -- but not including -- the immediate parent, owned by
+   root or by you, and group-/other-writable only if it also carries the sticky bit.** This is the OpenSSH
+   `safe_path`/`secure_filename` model, applied to each ancestor as a *container*. It is what makes `/tmp`
+   itself (sticky, world-writable) passable as an ancestor while an ordinary attacker-writable shared
+   directory is refused outright, *regardless of what it contains or what gets renamed into it afterward* --
+   closing a round-2 finding where only the immediate parent's ownership/mode were checked, letting an
+   attacker who can write to an ancestor two or more levels up rename an already-checked, victim-owned
+   directory into a location a `.git` ancestor would otherwise catch.
+5. **The immediate parent -- the directory the file's own name lives in -- held to a stricter, non-excusable
+   rule instead: owned by exactly `os.getuid()` (root ownership does not excuse it here) and never
+   group-/other-writable, with no sticky-bit exception.** Round 3 relaxed this to the same rule as rule 4
+   above, which meant a file sitting directly in `/tmp` (an acceptable *ancestor*, but never an acceptable
+   *parent*) would load; round 4 tightened it back. This is why a private, caller-owned directory *under*
+   `/tmp` still passes (it is independently checked by this rule, one level below `/tmp` itself) while
+   `/tmp/file` and bare `/file` do not.
+6. **Outside any Git worktree it is possible to detect from the file's own location, at the moment each
+   ancestor is inspected.** `credentials()` walks the opened directory chain -- including `/` itself, not
+   starting only at the first named component -- for a `.git` entry (directory in an ordinary clone, file in
+   a linked worktree) and rejects the file if one is found at any ancestor, checked when that ancestor's own
+   descriptor is opened (not from a pathname list computed once before any traversal happens, which a later
+   rename could evade). This is a real, useful check, **not an atomic, held-for-the-duration guarantee about
+   the location.** Two limits, not one:
+   - A worktree configured purely through `GIT_DIR`/`GIT_WORK_TREE` environment variables or `core.worktree`,
+     with no `.git` entry anywhere in the file's own ancestor chain, is undetectable by a file-local check
+     and is **not** caught -- markerless worktrees of that shape remain fully out of scope. Likewise, a bind
+     mount that makes a repository subdirectory appear at a path with no `.git` ancestor in its own mount
+     namespace is invisible to this check; that requires mount authority (or an existing mount) to set up,
+     and metadata checks do not categorically exclude virtual filesystems either.
+   - Even for an ordinary `.git`-marked worktree, the check is a snapshot at each ancestor's own inspection
+     time, not a lock held afterward. Another uid permitted to create entries in a sticky, world-writable
+     ancestor (e.g. `/tmp`) can create a *new* `.git` entry there after that ancestor was already inspected
+     and passed -- sticky permissions only stop that other uid from renaming or deleting an existing entry,
+     not from adding a new one. This does not let that other uid bypass any file's own ownership/mode/
+     hard-link checks, or relocate an already-opened, already-verified descriptor; it only means "outside any
+     Git worktree" is a fact checked once per ancestor, at that ancestor's own inspection time, not a
+     continuously-held property of the path as a whole.
+
+   "Outside any Git worktree" here means "outside every worktree whose `.git` entry was an ancestor of this
+   path at the time that ancestor was inspected, in this process's own mount namespace" -- it is not a claim
+   that the file can never be committed, diffed, or swept up by every possible repository-wide scan.
+7. **For `follow_symlinks=False` (`market_research.credentials()`), no `..` path component, ever.**
    Lexically collapsing `..` (the way `os.path.normpath` would) can select a different file through an
    intermediate symlinked component without ever refusing that symlink -- contradicting "a symlinked
    component is always refused". A `..` component is refused outright instead of normalized away.
@@ -156,6 +206,9 @@ check and mask what is actually being tested); asserts `__context__`/`__cause__`
 path-free-message check; counts open file descriptors (`/proc/<pid>/fd`) before and after both the success
 path and every refusal path; and asserts the exact `read()` size argument each loader's bounded read passes.
 Its `RealMutationKills` class applies real textual source mutations to a private temporary copy of the whole
-source tree and runs the actually-named tests against that copy in a subprocess (`python -m unittest
-<test-id>`), reporting a genuine kill/survive result per mutation rather than an in-process claim. No broker
-call is made and no live credentials file is read or referenced.
+source tree and runs the actually-named tests against that copy in a subprocess (`python -m unittest -v
+<test-id>`) -- first on the unmutated copy, requiring every named test to pass, then on the mutated copy,
+counting a kill only for a genuine `unittest` "FAIL" (never an "ERROR", never merely a non-zero exit) --
+reporting a genuine kill/survive result per mutation rather than an in-process claim. `MutationDriverSelfTests`
+exercises the driver itself: an empty mutation, an unrelated-import-breaking mutation, and a mistyped test id
+must each report "not killed". No broker call is made and no live credentials file is read or referenced.

@@ -40,6 +40,7 @@ import _credential_mutation_driver as driver  # noqa: E402
 
 CG = "blueprints/us-equities/adaptive-paper/credential_guard.py"
 MR = "blueprints/us-equities/adaptive-paper/market_research.py"
+RUNNER = "blueprints/us-equities/adaptive-paper/runner.py"
 
 
 class DeadlineExceeded(Exception):
@@ -406,14 +407,21 @@ class FdOpenFailureCleanup(unittest.TestCase):
     def tearDown(self):
         self.tmp.cleanup()
 
-    def test_fd_is_closed_when_fdopen_raises(self):
+    def test_fd_is_closed_when_wrapping_the_verified_descriptor_raises(self):
+        # open_verified() builds io.FileIO(file_fd, ...) first (closefd=True,
+        # so it now owns file_fd), then wraps that object in a
+        # BufferedReader; simulate the wrapping step failing (e.g. an audit
+        # hook) and confirm the already-constructed FileIO *object* is
+        # closed -- never a bare os.close(file_fd), which risks a
+        # double-close/EBADF or closing an unrelated, since-reused fd if
+        # FileIO's own constructor is what fails instead.
         path = _write_env(self.root)
         before = _open_fd_count()
-        with patch.object(cg.os, "fdopen", side_effect=OSError("simulated fdopen failure")):
+        with patch.object(cg.io, "BufferedReader", side_effect=OSError("simulated wrapping failure")):
             with self.assertRaises(OSError):
                 cg.open_verified(path, follow_symlinks=True)
         after = _open_fd_count()
-        self.assertEqual(before, after, "the verified descriptor leaked when fdopen() failed")
+        self.assertEqual(before, after, "the verified descriptor leaked when wrapping it failed")
 
 
 class FdLeakOnRefusal(unittest.TestCase):
@@ -485,6 +493,19 @@ class RootMarkerIsChecked(unittest.TestCase):
         # case starting only at the first named component.
         root_info = os.stat(os.sep, follow_symlinks=False)
         self.assertEqual((root_info.st_dev, root_info.st_ino), (calls[0].st_dev, calls[0].st_ino))
+
+
+class RootDirectoryOwnershipIsChecked(unittest.TestCase):
+    """Fix-round-4 item 4: root's own ownership/mode check must actually be
+    enforced, not merely invoked -- a simulated foreign-owned, world-writable
+    "/" (via per-fd fstat faking, not a process-wide os.getuid() patch) must
+    be rejected."""
+
+    def test_foreign_owned_world_writable_root_is_rejected(self):
+        path = _write_env(tempfile.mkdtemp())
+        with _FakeFstat(os.sep, uid=os.getuid() + 1, mode=stat.S_IFDIR | 0o777):
+            with self.assertRaisesRegex(cg.CredentialGuardError, "credential_file_permissions:ancestor"):
+                cg.open_verified(path, follow_symlinks=True)
 
 
 class ForeignFileOwnerAloneIsRejected(unittest.TestCase):
@@ -702,16 +723,19 @@ MUTATIONS = {
         "timeout": 30,
     },
     "disable_parent_directory_check": {
-        # Genuinely skips the ownership/writable-sticky check *only* for the
-        # immediate parent (the non-parent ancestor branch is untouched), so
-        # this isolates the parent-specific check from the generic ancestor
-        # check the coordinator's earlier "if False: ... else:" attempt
-        # accidentally left running (both branches called the same
-        # underlying rule, so that draft mutation was never actually
-        # disabling anything -- it was reported SURVIVED before this fix).
-        "mutation": [(CG, "                _check_ancestor_directory(os.fstat(current_fd), reason_owner=REASON_PARENT_OWNER,\n"
-                          "                                           reason_writable=REASON_PARENT_MODE)\n",
-                          "                pass\n", 1)],
+        # Genuinely skips the strict, non-sticky-excused parent check *only*
+        # for the immediate parent (the non-parent ancestor branch, and the
+        # root-is-parent branch, are untouched); "pass" rather than falling
+        # into a shared branch that would also run the (looser, sticky-
+        # excused) generic ancestor check, which for a world-writable,
+        # non-sticky directory would still reject it for an unrelated
+        # reason and mask whether the parent-specific rule was disabled.
+        "mutation": [(CG, "            if is_immediate_parent:\n"
+                          "                _check_parent_directory(os.fstat(current_fd))\n"
+                          "            else:\n",
+                          "            if is_immediate_parent:\n"
+                          "                pass\n"
+                          "            else:\n", 1)],
         "test_ids": ["tests.test_adaptive_paper_runner.CredentialFilePermissions.test_world_writable_parent_directory_is_rejected"],
         "extra_test_files": ["tests/test_adaptive_paper_runner.py"],
     },
@@ -723,12 +747,13 @@ MUTATIONS = {
         "extra_test_files": ["tests/test_adaptive_paper_runner.py"],
     },
     "worktree_final_path_by_name": {
+        # Removes only the loop-level (per-descendant-ancestor) fd-bound
+        # worktree check, leaving the root-level one untouched -- simulates
+        # a design that only scanned once, by name, before any traversal,
+        # rather than at each opened ancestor's own inspection time. The
+        # test's injected marker lands on a nested "sub" directory, only
+        # reachable through the loop-level check this removes.
         "mutation": [
-            (CG, "        current_fd = root_fd\n        _check_ancestor_directory(os.fstat(current_fd), reason_owner=REASON_ANCESTOR,\n"
-                 "                                   reason_writable=REASON_ANCESTOR)\n        if _ancestor_has_git_entry(current_fd):\n"
-                 "            raise CredentialGuardError(REASON_WORKTREE)\n",
-                 "        current_fd = root_fd\n        _check_ancestor_directory(os.fstat(current_fd), reason_owner=REASON_ANCESTOR,\n"
-                 "                                   reason_writable=REASON_ANCESTOR)\n", 1),
             (CG, "            if _ancestor_has_git_entry(current_fd):\n                raise CredentialGuardError(REASON_WORKTREE)\n",
                  "", 1)],
         "test_ids": ["tests.test_adaptive_paper_credential_race.HookInjectedRaces."
@@ -775,19 +800,92 @@ MUTATIONS = {
         "extra_test_files": ["tests/test_adaptive_paper_credential_race.py", "tests/_credential_mutation_driver.py"],
     },
     "leak_fd_on_fdopen_failure": {
-        "mutation": [(CG, "    try:\n        return os.fdopen(file_fd, \"rb\")\n    except BaseException:\n"
-                          "        os.close(file_fd)\n        raise\n",
-                          "    return os.fdopen(file_fd, \"rb\")\n", 1)],
-        "test_ids": ["tests.test_adaptive_paper_credential_race.FdOpenFailureCleanup.test_fd_is_closed_when_fdopen_raises"],
+        "mutation": [(CG, "    raw = io.FileIO(file_fd, \"rb\", closefd=True)\n    try:\n"
+                          "        return io.BufferedReader(raw)\n    except BaseException:\n"
+                          "        raw.close()\n        raise\n",
+                          "    raw = io.FileIO(file_fd, \"rb\", closefd=True)\n    return io.BufferedReader(raw)\n", 1)],
+        "test_ids": ["tests.test_adaptive_paper_credential_race.FdOpenFailureCleanup."
+                     "test_fd_is_closed_when_wrapping_the_verified_descriptor_raises"],
         "extra_test_files": ["tests/test_adaptive_paper_credential_race.py", "tests/_credential_mutation_driver.py"],
+    },
+    "disable_root_ancestor_check": {
+        "mutation": [(CG, "        if dir_names:\n"
+                          "            _check_ancestor_directory(os.fstat(current_fd), reason_owner=REASON_ANCESTOR,\n"
+                          "                                       reason_writable=REASON_ANCESTOR)\n"
+                          "        else:\n"
+                          "            # The file sits directly in \"/\" -- root is the immediate parent,\n"
+                          "            # not merely a container ancestor, so the strict (not\n"
+                          "            # sticky-excused) parent rule applies here too: this rejects\n"
+                          "            # \"/file\" the same way it rejects \"/tmp/file\".\n"
+                          "            _check_parent_directory(os.fstat(current_fd))\n",
+                          "        pass\n", 1)],
+        "test_ids": ["tests.test_adaptive_paper_credential_race.RootDirectoryOwnershipIsChecked."
+                     "test_foreign_owned_world_writable_root_is_rejected"],
+        "extra_test_files": ["tests/test_adaptive_paper_credential_race.py", "tests/_credential_mutation_driver.py"],
+    },
+    "disable_runner_size_check": {
+        "mutation": [(RUNNER, "    if len(raw) > MAX_CREDENTIAL_BYTES:\n        raise SafetyError(REASON_SIZE)\n",
+                             "", 1)],
+        "test_ids": ["tests.test_adaptive_paper_runner.CredentialFilePermissions."
+                     "test_oversized_file_is_rejected_not_silently_truncated_and_accepted"],
+        "extra_test_files": ["tests/test_adaptive_paper_runner.py"],
     },
 }
 
 
+class MutationDriverSelfTests(unittest.TestCase):
+    """Fix-round-4 item 2: the driver itself must not report a false kill.
+    An empty mutation (no change at all) and a mutation that only breaks
+    an unrelated import (never touching the rule under test) must both be
+    reported "not killed" -- a sound driver requires a real "FAIL" on the
+    named test id, not merely a non-zero subprocess exit."""
+
+    def test_empty_mutation_is_not_a_kill(self):
+        result = driver.run_mutation(
+            "selftest-empty",
+            [],
+            ["tests.test_adaptive_paper_runner.CredentialFilePermissions.test_hard_link_is_rejected"],
+            ["tests/test_adaptive_paper_runner.py"])
+        self.assertFalse(result["killed"], result)
+
+    def test_import_error_mutation_is_not_a_kill(self):
+        result = driver.run_mutation(
+            "selftest-import-error",
+            [(CG, "import errno\n", "import errno_does_not_exist_at_all\n", 1)],
+            ["tests.test_adaptive_paper_runner.CredentialFilePermissions.test_hard_link_is_rejected"],
+            ["tests/test_adaptive_paper_runner.py"])
+        self.assertFalse(result["killed"], result)
+        self.assertIn(result["verdict"], ("not_collected", "error_not_fail"))
+
+    def test_mistyped_test_id_is_not_a_kill(self):
+        result = driver.run_mutation(
+            "selftest-typo",
+            [],
+            ["tests.test_adaptive_paper_runner.CredentialFilePermissions.test_hard_link_is_rejectedd"],
+            ["tests/test_adaptive_paper_runner.py"])
+        self.assertFalse(result["killed"], result)
+
+    def test_pristine_worktree_precondition_holds_in_the_copy(self):
+        # The false kill fix-round 4 closed: disable_worktree_check's target
+        # test asserts `(repo_root / ".git").exists()` as its own
+        # precondition. Before `git init`-ing the copy, that assertion
+        # failed on completely unmutated code, which the old "any non-zero
+        # exit counts" rule miscounted as a kill.
+        result = driver.run_mutation(
+            "selftest-worktree-precondition",
+            [],
+            ["tests.test_adaptive_paper_runner.CredentialFilePermissions.test_inside_git_worktree_is_rejected"],
+            ["tests/test_adaptive_paper_runner.py"])
+        self.assertFalse(result["killed"], result)
+        self.assertNotEqual(result.get("verdict"), "pristine_baseline_failed", result)
+
+
 class RealMutationKills(unittest.TestCase):
     """Applies each mutation in MUTATIONS to a real temporary source copy
-    and actually runs the named test(s) against it via subprocess. A
-    mutation is only "killed" if that subprocess genuinely exits non-zero."""
+    and actually runs the named test(s) against it via subprocess: first on
+    the pristine copy (must pass), then on the mutated copy. A mutation is
+    only "killed" if a named test transitions to a genuine "FAIL" (never
+    merely a non-zero exit, and never an "ERROR")."""
 
     @classmethod
     def setUpClass(cls):
@@ -800,15 +898,16 @@ class RealMutationKills(unittest.TestCase):
     def test_every_mutation_is_really_killed_by_the_named_test(self):
         not_killed = {name: r for name, r in self.report.items() if not r["killed"]}
         self.assertEqual(not_killed, {},
-                         f"mutations NOT killed by their named test (subprocess exit 0 or timeout): {not_killed}")
+                         f"mutations NOT killed by their named test (a real FAIL, confirmed against a "
+                         f"passing pristine baseline first): {not_killed}")
 
     def test_report_covers_every_declared_mutation(self):
         self.assertEqual(set(self.report), set(MUTATIONS))
 
     def test_mutation_report_is_printable_for_the_handoff(self):
-        print("\nreal mutation-kill report (subprocess-executed):")
+        print("\nreal mutation-kill report (subprocess-executed, pristine-baseline-verified):")
         for name, result in sorted(self.report.items()):
-            status = "KILLED" if result["killed"] else ("TIMEOUT" if result["timed_out"] else "SURVIVED")
+            status = "KILLED" if result["killed"] else result.get("verdict", "SURVIVED").upper()
             print(f"  {name}: {status} (test_ids={result['test_ids']}, returncode={result['returncode']}, "
                  f"diff_lines={result['diff_lines']})")
 

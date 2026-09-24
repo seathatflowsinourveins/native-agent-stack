@@ -232,9 +232,17 @@ class MarketResearchCredentialFilePermissions(unittest.TestCase):
     def test_fifo_is_rejected_and_does_not_hang(self):
         fifo = self.root / "fifo.env"
         os.mkfifo(fifo, mode=0o600)
-        with _deadline(10):
-            with self.assertRaisesRegex(m.ResearchError, "credential_file_permissions"):
-                m.credentials(fifo)
+        try:
+            with _deadline(10):
+                with self.assertRaisesRegex(m.ResearchError, "credential_file_permissions"):
+                    m.credentials(fifo)
+        except _DeadlineExceeded:
+            # A genuine assertion failure (self.fail), not an uncaught
+            # exception: unittest -- and the real mutation driver in
+            # tests/_credential_mutation_driver.py, which only counts a
+            # "FAIL", never an "ERROR", as a kill -- must see this as the
+            # test actively catching the regression, not merely erroring.
+            self.fail("credentials(fifo) hung past the 10s deadline instead of raising")
 
     def test_hard_link_is_rejected(self):
         target = self._write_env(self.root, name="real.env")
@@ -279,7 +287,7 @@ class MarketResearchCredentialFilePermissions(unittest.TestCase):
         oversized = "APCA_API_KEY_ID=" + ("k" * (m.MAX_CREDENTIAL_BYTES + 64)) + "\nAPCA_API_SECRET_KEY=s\n"
         path.write_text(oversized)
         os.chmod(path, 0o600)
-        with self.assertRaisesRegex(m.ResearchError, "invalid_credential_file"):
+        with self.assertRaisesRegex(m.ResearchError, "credential_file_permissions:size"):
             m.credentials(path)
 
     def test_content_at_the_size_cap_is_accepted(self):
@@ -294,8 +302,19 @@ class MarketResearchCredentialFilePermissions(unittest.TestCase):
         path = self.root / "paper.env"
         path.write_bytes("APCA_API_KEY_ID=fixturé-key\nAPCA_API_SECRET_KEY=fixture-secret\n".encode("utf-8"))
         os.chmod(path, 0o600)
-        with self.assertRaisesRegex(m.ResearchError, "credential_file_permissions:encoding"):
+        with self.assertRaisesRegex(m.ResearchError, "credential_file_permissions:encoding") as ctx:
             m.credentials(path)
+        # G-round-4 item 1: `raw.isascii()` is checked before any `.decode()`
+        # call, so no UnicodeDecodeError (whose `.object` attribute holds the
+        # *entire* input, secret included) is ever constructed at all --
+        # confirmed here on the exception itself, not only on its message.
+        error = ctx.exception
+        self.assertIsNone(error.__context__)
+        self.assertIsNone(error.__cause__)
+        for attr in ("object", "args"):
+            value = repr(getattr(error, attr, None))
+            self.assertNotIn("fixtur", value)
+            self.assertNotIn("fixture-secret", value)
 
     def test_passing_case_outside_worktree_mode_0600_own_uid_returns_credentials(self):
         path = self._write_env(self.root)

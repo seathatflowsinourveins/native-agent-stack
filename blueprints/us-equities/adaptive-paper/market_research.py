@@ -16,7 +16,7 @@ import sys
 from urllib.parse import urlsplit
 
 from credential_guard import (CredentialGuardError, MAX_CREDENTIAL_BYTES as GUARD_MAX_CREDENTIAL_BYTES,
-                              REASON_ENCODING, open_verified)
+                              REASON_ENCODING, REASON_SIZE, open_verified)
 from feeds import DATA_FEEDS, is_qualified_feed
 
 SDK_VERSION = "0.44.0"
@@ -384,11 +384,17 @@ def credentials(path):
     except CredentialGuardError as error:
         raise ResearchError(str(error)) from None
     if len(raw) > MAX_CREDENTIAL_BYTES:
-        raise ResearchError("invalid_credential_file")
-    try:
-        lines = raw.decode("ascii").splitlines()
-    except UnicodeDecodeError:
-        raise ResearchError(REASON_ENCODING) from None
+        raise ResearchError(REASON_SIZE)
+    # Checked before decoding, never inside a `except UnicodeDecodeError`
+    # handler: that handler's exception carries `.object` (the *entire*
+    # input bytes, secret included) as an attribute, and raising from
+    # inside it -- even with `from None` -- still leaves that exception
+    # reachable via `__context__`, which `from None` does not clear (see
+    # credential_guard's module docstring for the same reasoning applied
+    # to its own exceptions).
+    if not raw.isascii():
+        raise ResearchError(REASON_ENCODING)
+    lines = raw.decode("ascii").splitlines()
     found = {}
     for line in lines:
         name, separator, value = line.strip().removeprefix("export ").partition("=")

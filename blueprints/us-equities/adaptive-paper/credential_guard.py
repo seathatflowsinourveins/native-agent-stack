@@ -10,7 +10,7 @@ basename, or any exception text that could carry a path -- so no failure
 mode can leak filesystem layout, and an operator can still tell *which*
 rule was violated without that leak.
 
-Only stdlib imports (`os`, `stat`, `errno`, `pathlib`) so importing it never
+Only stdlib imports (`os`, `stat`, `errno`, `io`, `pathlib`) so importing it never
 pulls heavier modules (sqlite3, fcntl, threading, ...) into either caller.
 
 What is (and is not) guaranteed
@@ -25,21 +25,37 @@ substituted at *any* position after the one-time initial resolution --
 including an ancestor directory, not only the final file -- makes the
 matching `dir_fd`-relative open fail with `ELOOP` or `ENOTDIR`.
 
-Every ancestor directory from `/` down through the immediate parent -- not
-only the immediate parent -- is checked (the OpenSSH `safe_path`/
-`secure_filename` model): it must be owned by root or by the caller, and if
-it is group- or world-writable it must also carry the sticky bit (`S_ISVTX`,
-e.g. a `1777 /tmp`). A writable, non-sticky ancestor anywhere in the chain
-is refused outright, regardless of what it contains -- this is what stops
-an attacker who can write to `/shared` from renaming a victim-owned
+Every ancestor directory from `/` down through -- but not including -- the
+immediate parent is checked with the OpenSSH `safe_path`/`secure_filename`
+model as a *container*: it must be owned by root or by the caller, and if it
+is group- or world-writable it must also carry the sticky bit (`S_ISVTX`,
+e.g. a `1777 /tmp`). A writable, non-sticky ancestor anywhere in that chain
+is refused outright, regardless of what it contains -- this is what stops an
+attacker who can write to `/shared` from renaming a victim-owned
 `/shared/private` (already opened and checked) into `/shared/repo` (which
 has a `.git`): `/shared` itself fails the ancestor check the moment it is
 opened, before the file is ever reached, and does not depend on where the
-attacker later moves anything. The sticky-bit exception is why a private,
-caller-owned directory under `/tmp` still passes: `/tmp` is trusted only as
-a *container* (its own writability is excused by the sticky bit); whatever
-is directly inside it is independently checked in the next loop iteration,
-by the same rule.
+attacker later moves anything.
+
+The immediate parent -- the directory the file's own name lives in -- is
+held to a *stricter*, non-excusable rule instead: owned by exactly the
+caller (root ownership does not excuse it here) and never group- or
+other-writable, with no sticky-bit exception. This is why a private,
+caller-owned directory *under* `/tmp` still passes (it is independently
+checked by this stricter rule, one level down from `/tmp` itself, which is
+only ever a passed-through container) while `/tmp/file` and `/file` do not:
+`/tmp` and `/` are acceptable ancestors, never acceptable parents.
+
+Each ancestor's `.git` check (and each ancestor's own ownership/writability
+check) runs once, at the moment that ancestor's own descriptor is opened --
+not continuously, and not as a property of the path as a whole. Another uid
+permitted to create entries in a sticky, world-writable ancestor (e.g.
+`/tmp`) can still create a new `.git` entry there *after* that ancestor was
+already inspected and passed; this is not an atomic, held-for-the-duration
+guarantee about the location, only a check performed at each ancestor's own
+inspection time. It does not let that other uid bypass any file's own
+ownership/mode/hard-link checks, nor relocate an already-opened, already-
+verified descriptor.
 
 What is explicitly NOT guaranteed:
   - **External Git worktrees.** Worktree detection only recognizes an
@@ -86,6 +102,7 @@ inside a handler.
 from __future__ import annotations
 
 import errno
+import io
 import os
 import stat
 from pathlib import Path
@@ -161,6 +178,22 @@ def _try(func, *args, **kwargs):
         return None, REASON_MISSING
 
 
+def _is_symlink_component(dir_fd, name) -> bool:
+    """Best-effort refinement used only on an already-failed directory-open:
+    on Linux, opening a *symlinked* directory component with
+    `O_DIRECTORY | O_NOFOLLOW` surfaces as `ENOTDIR`, not `ELOOP` (unlike
+    the final, non-`O_DIRECTORY` component, which does get `ELOOP` and so
+    is already reported as `REASON_SYMLINK` by `_try`). Without this, such
+    a component would fall into the generic `REASON_MISSING` bucket even
+    though it is specifically a symlink. One extra `lstat`, only on this
+    failure path (never the common success path), tells the two apart."""
+    try:
+        info = os.stat(name, dir_fd=dir_fd, follow_symlinks=False)
+    except OSError:
+        return False
+    return stat.S_ISLNK(info.st_mode)
+
+
 def _ancestor_has_git_entry(dir_fd) -> bool:
     """True if `dir_fd` (an already-open directory descriptor) itself
     contains a `.git` entry (directory or file, never followed) -- i.e.
@@ -192,6 +225,24 @@ def _check_ancestor_directory(info, *, reason_owner, reason_writable) -> None:
     mode = stat.S_IMODE(info.st_mode)
     if (mode & _WRITABLE_BITS) != 0 and not (mode & stat.S_ISVTX):
         raise CredentialGuardError(reason_writable)
+
+
+def _check_parent_directory(info) -> None:
+    """The credential file's own containing directory must be private, not
+    merely an acceptable *container*: owned by exactly the caller (root
+    ownership does not excuse it here the way it excuses a container
+    ancestor -- this is the directory the file's own name lives in), and
+    never group- or other-writable, with no sticky-bit exception. This is
+    what makes `/tmp` itself an acceptable ancestor to pass through but
+    never an acceptable parent: a private, caller-owned subdirectory of
+    `/tmp` still passes (it is independently checked by this same rule),
+    but `/tmp/file` and `/file` do not."""
+    if not stat.S_ISDIR(info.st_mode):
+        raise CredentialGuardError(REASON_PARENT_OWNER)
+    if info.st_uid != os.getuid():
+        raise CredentialGuardError(REASON_PARENT_OWNER)
+    if (stat.S_IMODE(info.st_mode) & _WRITABLE_BITS) != 0:
+        raise CredentialGuardError(REASON_PARENT_MODE)
 
 
 def _check_file_metadata(info) -> None:
@@ -254,11 +305,14 @@ def open_verified(path, *, follow_symlinks: bool):
     with one of the fixed `REASON_*` codes, strictly before any byte of
     file content is read:
       1. every ancestor directory from `/` down opens as a real directory,
-         never a symlink (`O_DIRECTORY | O_NOFOLLOW`); is checked for an
-         ancestor `.git` entry; and must be owned by root or the caller,
-         group/other-writable only if sticky (the immediate parent uses
-         its own, more specific `parent_owner`/`parent_mode` codes; every
-         other ancestor uses the generic `ancestor` code);
+         never a symlink (`O_DIRECTORY | O_NOFOLLOW`; a symlinked directory
+         component is reported as `symlink`, not `missing`); is checked for
+         an ancestor `.git` entry (`worktree`); every ancestor up to but not
+         including the immediate parent must be owned by root or the
+         caller, group/other-writable only if sticky (`ancestor`); the
+         immediate parent must be owned by exactly the caller and never
+         group/other-writable, with no sticky exception (`parent_owner`/
+         `parent_mode`);
       2. the final component opens as a regular file, never a symlink
          (`O_NOFOLLOW`), never blocking on a FIFO or special file
          (`O_NONBLOCK`), never becoming a controlling terminal
@@ -283,8 +337,15 @@ def open_verified(path, *, follow_symlinks: bool):
     opened = [root_fd]
     try:
         current_fd = root_fd
-        _check_ancestor_directory(os.fstat(current_fd), reason_owner=REASON_ANCESTOR,
-                                   reason_writable=REASON_ANCESTOR)
+        if dir_names:
+            _check_ancestor_directory(os.fstat(current_fd), reason_owner=REASON_ANCESTOR,
+                                       reason_writable=REASON_ANCESTOR)
+        else:
+            # The file sits directly in "/" -- root is the immediate parent,
+            # not merely a container ancestor, so the strict (not
+            # sticky-excused) parent rule applies here too: this rejects
+            # "/file" the same way it rejects "/tmp/file".
+            _check_parent_directory(os.fstat(current_fd))
         if _ancestor_has_git_entry(current_fd):
             raise CredentialGuardError(REASON_WORKTREE)
         for index, name in enumerate(dir_names):
@@ -292,12 +353,17 @@ def open_verified(path, *, follow_symlinks: bool):
             _hook("pre_dir_open", name)
             next_fd, reason = _try(os.open, name, os.O_DIRECTORY | os.O_NOFOLLOW | os.O_RDONLY, dir_fd=current_fd)
             if reason:
+                # A symlinked directory component surfaces as ENOTDIR here
+                # (unlike the final, non-O_DIRECTORY component, which gets
+                # ELOOP and so is already REASON_SYMLINK) -- refine the
+                # generic code on this failure path only.
+                if reason == REASON_MISSING and _is_symlink_component(current_fd, name):
+                    reason = REASON_SYMLINK
                 raise CredentialGuardError(reason)
             opened.append(next_fd)
             current_fd = next_fd
             if is_immediate_parent:
-                _check_ancestor_directory(os.fstat(current_fd), reason_owner=REASON_PARENT_OWNER,
-                                           reason_writable=REASON_PARENT_MODE)
+                _check_parent_directory(os.fstat(current_fd))
             else:
                 _check_ancestor_directory(os.fstat(current_fd), reason_owner=REASON_ANCESTOR,
                                            reason_writable=REASON_ANCESTOR)
@@ -324,8 +390,19 @@ def open_verified(path, *, follow_symlinks: bool):
     # defines no effect on a regular file (already enforced by
     # _check_file_metadata above), so the read the caller does through this
     # object is an ordinary blocking read.
+    #
+    # Built in two steps rather than one `os.fdopen(file_fd, "rb")` call, to
+    # avoid a double-close: if `io.FileIO.__init__` itself fails after
+    # accepting ownership of `file_fd` (`closefd=True`), CPython already
+    # closes that fd as part of its own failure cleanup -- a second
+    # `os.close(file_fd)` here would then either raise EBADF (masking the
+    # real error) or, worse, close an unrelated fd the OS has since reused
+    # for something else. Only the already-successfully-constructed `raw`
+    # *object* is closed on a later failure (wrapping it in a
+    # `BufferedReader`), never the bare integer.
+    raw = io.FileIO(file_fd, "rb", closefd=True)
     try:
-        return os.fdopen(file_fd, "rb")
+        return io.BufferedReader(raw)
     except BaseException:
-        os.close(file_fd)
+        raw.close()
         raise
