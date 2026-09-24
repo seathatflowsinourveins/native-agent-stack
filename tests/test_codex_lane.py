@@ -787,7 +787,7 @@ class EvidenceTreeProvenanceTests(CodexLaneFixture):
     def test_a_tree_changed_during_the_run_sets_the_returns_aside(self):
         self.write_packet("foundation", "native-clients")
         trees = iter(["a" * 64, "b" * 64])
-        with mock.patch.object(codex_lane, "tree_sha256", side_effect=lambda repo: next(trees)), \
+        with mock.patch.object(codex_lane, "tree_sha256", side_effect=lambda repo, *rest, **named: next(trees)), \
                 contextlib.redirect_stderr(io.StringIO()) as err:
             self.assertEqual(self.run_lane(), 1)
         out_path = self.out_path("foundation", "native-clients")
@@ -810,6 +810,18 @@ class EscapingSymlinkTreeTests(CodexLaneFixture):
         with contextlib.redirect_stderr(io.StringIO()) as err:
             self.assertEqual(self.run_lane(), 2)
         self.assertIn("symlink leaving it", err.getvalue())
+        # A deliberately non-blind run (--allow-git-history) hashes such a link's text instead (re-review L2).
+        self.assertIsInstance(codex_lane.tree_sha256(self.repo, allow_escaping_links=True), str)
+        (self.repo / "outside-link").unlink()
+        os.symlink("loop-b", self.repo / "loop-a")
+        os.symlink("loop-a", self.repo / "loop-b")
+        with self.assertRaises(ValueError):
+            codex_lane.tree_sha256(self.repo)
+        (self.repo / "loop-a").unlink()
+        (self.repo / "loop-b").unlink()
+        os.mkfifo(self.repo / "pipe")
+        with self.assertRaisesRegex(ValueError, "non-regular entry"):
+            codex_lane.tree_sha256(self.repo)
 
 
 class ExactProvenanceResumeTests(CodexLaneFixture):

@@ -1273,7 +1273,10 @@ def main(argv=None) -> int:
                 continue
             sealed_writes.extend(process_row(
                 row, root, catalog, row["layer_id"], work_dir, checked_at, args.adjudications,
-                identities, aliases, sha256sums, rejections, tuple(args.lane_repo_root),
+                identities, aliases, sha256sums, rejections,
+                # Resolved, as adjudicate records them (re-review L1): a symlinked or relative export must
+                # relativize the same way on both sides of the lane_returns_sha256 binding.
+                tuple(str(Path(root).resolve()) for root in args.lane_repo_root),
                 run_date=run_date, sealed_base=sealed_base, outcomes=outcomes,
                 single_lane_decision=single_lane_decision, status_context=status_context,
                 lane_code=lane_code, failures=failures))

@@ -506,7 +506,7 @@ def root_issue(path) -> str:
     return None
 
 
-def tree_sha256(repo: Path) -> str:
+def tree_sha256(repo: Path, allow_escaping_links: bool = False) -> str:
     """A digest of the evidence repository's content: every regular file's relative path and sha256, sorted,
     and each retained symlink's text. The packet names evidence paths, not their bytes, so a return (and an
     adjudication judgment) is bound to the tree it read."""
@@ -520,8 +520,12 @@ def tree_sha256(repo: Path) -> str:
         relative = path.relative_to(repo).as_posix()
         if path.is_symlink():
             target = os.readlink(path)
-            resolved = (path.parent / target).resolve()
-            if os.path.isabs(target) or not (resolved == root or root in resolved.parents):
+            try:
+                resolved = (path.parent / target).resolve(strict=False)
+            except (OSError, RuntimeError) as error:  # a link loop
+                raise ValueError(f"evidence repository {repo} has an unresolvable symlink: {relative} ({error})")
+            if not allow_escaping_links and (os.path.isabs(target)
+                                             or not (resolved == root or root in resolved.parents)):
                 # Content behind an escaping link could change under an unchanged digest (Codex review of #145);
                 # blind_checkout --export removes such links, so one here means the tree is not a blind export.
                 raise ValueError(f"evidence repository {repo} has a symlink leaving it: {relative} -> {target}")
@@ -529,17 +533,21 @@ def tree_sha256(repo: Path) -> str:
             digest.update(f"{relative}\0->{target}\n".encode("utf-8"))
         elif path.is_file():
             digest.update(f"{relative}\0{sha256_file(path)}\n".encode("utf-8"))
+        elif not path.is_dir():
+            # A FIFO, socket or device is not evidence and would otherwise be skipped silently (cross-family
+            # review of #145).
+            raise ValueError(f"evidence repository {repo} has a non-regular entry: {relative}")
     return digest.hexdigest()
 
 
-def lane_provenance(prompt_path: Path, repo: Path = None) -> dict:
+def lane_provenance(prompt_path: Path, repo: Path = None, allow_escaping_links: bool = False) -> dict:
     """What produced a return: this runner file's and the filled prompt template's sha256, and (given
     ``repo``) the digest of the evidence tree the lane read, so a resume against another export reruns
     (Codex review of #145)."""
     provenance = {"codex_lane_py_sha256": sha256_file(Path(__file__).resolve()),
                   "prompt_sha256": sha256_file(Path(prompt_path))}
     if repo is not None:
-        provenance["repo_tree_sha256"] = tree_sha256(Path(repo))
+        provenance["repo_tree_sha256"] = tree_sha256(Path(repo), allow_escaping_links)
     return provenance
 
 
@@ -627,7 +635,9 @@ def main(argv=None) -> int:
     usage_path = codex_dir / "usage.jsonl"
 
     try:
-        provenance = lane_provenance(prompt_path, repo)
+        # A deliberately non-blind run (--allow-git-history) may read a checkout whose ignored .venv links leave
+        # it (re-review L2); a blind export never has such links.
+        provenance = lane_provenance(prompt_path, repo, allow_escaping_links=args.allow_git_history)
     except ValueError as error:  # an escaping symlink: not a blind export
         print(f"codex_lane: {error}", file=sys.stderr)
         return 2
@@ -738,7 +748,7 @@ def main(argv=None) -> int:
             process(item)
 
     try:
-        tree_after = tree_sha256(repo)
+        tree_after = tree_sha256(repo, allow_escaping_links=args.allow_git_history)
     except ValueError:
         tree_after = None
     if pending and tree_after != provenance["repo_tree_sha256"]:

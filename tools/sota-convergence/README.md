@@ -1499,7 +1499,8 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
   refuses an input or packet file inside the root. `inputs` (each `--lane-repo-root`), `claude-args` and
   `codex` (`--repo`) apply the same rule first and exit 2 with the reason, so the Claude family never refuses
   alone while the Codex family judges. `claude-args` and `codex` also refuse a work dir inside `--repo`.
-- **`assemble`:** writes one record per layer. `claude_position` follows the order, `refuting_votes` is 1 when
+- **`assemble`:** writes one record per layer. `claude_position` is the position the input contents show for
+  the Claude return (checked against the index's per-layer map), `refuting_votes` is 1 when
   the refuter refuted, and `judge` is `{model, family}`. `stripped_packet_sha256` is the layer's sealed lane
   packet. Each record is validated with `judge_adjudication` before it is written. A missing family gives a
   split record naming it. A judgment whose model does not match its family's pattern (for example
@@ -1590,14 +1591,16 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
   - Leak records keep input basenames only.
 - **Independent review of #145 (four Opus lenses: blindness, binding, regressions, operability):**
   - **Family position is a secret (F3).** `inputs` draws, per layer, which position (A or B) shows the Claude
-    return in `AB`, and `BA` shows the complement. The map is kept only in `<work-dir>/adjudication-index.json`,
+    return in `AB`, and `BA` shows the complement. The map is kept only in the adjudication index (outside the
+    work dir since the a2434e2e review; see below),
     outside `adjudication-inputs/`. Each Codex judge call's audit allows only the repository, its own input file
     and its packet snapshot.
   - **Judgments are bound to this index (M3).** A judgment counts only when its layer, input path and input
     sha256 are the index entry's.
   - **`claude-args --run-dir` is required (M4),** so the project-level role in the directory the workflow runs
     from is always checked. In the blind flow this is the export root.
-  - **Prompt binding for the Claude lane (M1).** The layer-verdict workflow (agent-lab #45) refuses a real run
+  - **Prompt binding for the Claude lane (M1).** The layer-verdict workflow (agent-lab #45; vendored here as #47's
+    merge e070125, sha256 fd77b749, which adds the per-layer packet path) refuses a real run
     without `args.prompt` and echoes it. `claude_lane.py` requires the echoed prompt to be this catalog's
     `lane-prompt.md` and records `prompt_sha256`, which `scripts/landscape.py` now requires and the registry keys.
   - **Adjudication code is registered (M2).** `lane-provenance.json` has an `adjudication` list. A new-wave
@@ -1617,13 +1620,21 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
     winner or incumbent keys are stripped under `catalogs/`. Ledger candidates are sorted by (repository, name):
     the checked-in order listed the incumbent first on every row. Every exported path gets mtime 0.
 
-    On the 2026-09-23 packets the export holds 902 files with 0 missing references, against the whole
+    On the 2026-09-23 packets the export holds 697 files (re-measured after the whole-tree export was dropped;
+    902 with tests/, tools/ and scripts/) with 0 missing references, against the whole
     repository before.
 
     **Disclosed limit:** a packet's own evidence references name 23 `docs/`, 12 `catalogs/`, 5 `recipes/`,
     3 `adoption/` files and `manifests/stack.json`, whose prose can call the current choice "selected". They
     are kept because leaving an incumbent's cited evidence out of the export would bias lanes against it; the
     lane prompt and role forbid looking for the current choice.
+
+    **Disclosed trade-off (re-review L3):** `lane-prompt.md` and the vendored lane's evidence lens still accept an
+    `overturn_when` naming a `tests/` path or a runnable command, and neither `tests/` nor `tools/` is exported
+    unless a packet references it. So a lane that cites such a path can be refuted as naming a missing file (9 of
+    the 30 current `verdict_overturn_when` rows cite `tests.` commands). The re-record measures how many
+    refutations cite a missing tests/ or tools/ path. Rewording the prompt and lens waits for their next
+    registered revision, because both are hash-bound.
 - **Codex review at a2434e2e and the Codex cross-family review:**
   - **No whole trees in the allowlisted export.** `tests/`, `tools/` and `scripts/` carry selection-bearing data
     and assertions (the reconciliations file, `tests/test_catalogs.py`), so a file there is exported only when a
