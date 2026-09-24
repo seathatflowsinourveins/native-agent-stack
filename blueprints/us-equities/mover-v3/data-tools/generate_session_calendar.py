@@ -2,7 +2,8 @@
 """Generate ../data/session-calendar.json from exchange_calendars 4.13.2 XNYS.
 
 protocol-core-draft.json populations.session_calendar: every scheduled XNYS
-session (early closes included) from 2016-01-01 through the end of the last
+session (early closes included) from 2015-09-01 (the t-60 lookbacks of the first
+2016 sessions) through the end of the last
 possible holdout extension, with each session's scheduled open and close. The
 output is deterministic: it has no timestamp or host detail, the rows are in
 session order, and the time zone database is the pinned tzdata package (the
@@ -39,7 +40,7 @@ OUTPUT = HERE.parent / "data" / "session-calendar.json"
 REQUIREMENTS = HERE / "requirements.in"
 CALENDAR = "XNYS"
 EXCHANGE_CALENDARS_VERSION = "4.13.2"
-START = "2016-01-01"
+START = "2015-09-01"
 END = "2030-12-31"
 ET = "America/New_York"
 REGULAR_OPEN = time(9, 30)
