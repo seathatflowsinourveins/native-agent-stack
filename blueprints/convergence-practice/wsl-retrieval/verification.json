@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "checked_on": "2026-09-23",
+  "source_revision_before_edits": "6f74bc503ccecaaf6ccebd53677b23aedab50921",
+  "scope": "Offline retained-evidence completion; no native retrieval, installation, service, client or model invocation.",
+  "checks": [
+    {
+      "command": "python3 blueprints/convergence-practice/wsl-retrieval/audit.py",
+      "exit_code": 0,
+      "stdout_sha256": "1fbdc20901e2be17582c4f69c952bfa5fe3158a419e2c7e9b7174073c7ef3649",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "python3 -m unittest tests.test_wsl_retrieval -v",
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "14f02df287a500f8aedd673b6940f8265bfdfaa69709ffde02616c0d0c773d98",
+      "tests": 18
+    },
+    {
+      "command": "python3 scripts/validate_convergence.py blueprints/convergence-practice/wsl-retrieval/experiment.json --root . --json",
+      "exit_code": 0,
+      "stdout_sha256": "dcdb47cff4818f471788207f7f4568382271fd2f478e1c030638c86121a07e1e",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "observations": 3,
+      "artifact_bindings": 19
+    },
+    {
+      "command": "python3 scripts/validate.py",
+      "exit_code": 0,
+      "stdout_sha256": "f8d428655cae46975806ccfc4f2eaab3e87c23de066b11d48dea6863a436b69e",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "ruff check --isolated --select E9,F blueprints/convergence-practice/wsl-retrieval/audit.py blueprints/convergence-practice/wsl-retrieval/run.py tests/test_wsl_retrieval.py",
+      "exit_code": 0,
+      "stdout_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "git diff --cached --check",
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "historical_native_attempts": {
+    "source_passed": 1,
+    "qmd_failed": 1,
+    "qmd_passed": 1
+  },
+  "historical_native_checks": {
+    "source_passed": 22,
+    "qmd_passed": 70
+  },
+  "historical_native_commands": {
+    "accepted_attempts": 23,
+    "failed_attempt": 5
+  },
+  "retained_failures": [
+    {
+      "receipt": "qmd-attempt-1.json",
+      "failed_check": "qmd-positive-0_paths",
+      "runner": "run-initial.py.txt",
+      "native_commands": 5,
+      "native_command_exits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "result": "Initial URI-format checker assumption rejected the correct returned document. The corrected runner passed attempt 2; both executed versions remain hash-bound."
+    }
+  ],
+  "limits": [
+    "Full new offline stdout/stderr and exit records are retained outside the checkout; their digests are recorded per check.",
+    "Original native raw logs were reported retained by the original worker. Exact private subdirectory locators were unavailable locally and those logs were not reopened; selected command facts and output digests are preserved in the receipts.",
+    "Official-source currency is dated September 20; September 23 completion does not assert a new latest-release check.",
+    "Shared catalog, global evidence-manifest and explorer registration are coordinator-owned and were not edited.",
+    "Syntax/name diagnostics E9,F were checked; no claim that historical executed runners satisfy every optional style rule.",
+    "No native-client integration, semantic RAG, model, OS-confinement, performance or token-saving claim."
+  ],
+  "whole_task_provider_usage": null
+}

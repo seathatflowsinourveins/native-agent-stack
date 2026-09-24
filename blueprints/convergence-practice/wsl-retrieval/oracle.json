@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "source_revision": "6f74bc503ccecaaf6ccebd53677b23aedab50921",
+  "source_path": "blueprints/convergence-practice/native-worker/accepted/planner.py",
+  "source_sha256": "3a33c48346221e2a103d4fb89d5675d2edaa97e651b7f08cf3a79b7ce0b8d7ef",
+  "source_literal": "raise ValueError",
+  "source_negative_marker": "__wsl_retrieval_absent_20260920__",
+  "source_expected_line_numbers": [
+    22,
+    49
+  ],
+  "source_ast_pattern": "raise ValueError($$$ARGS)",
+  "source_ast_spans": [
+    {
+      "start_line": 22,
+      "start_column": 12,
+      "end_line": 26,
+      "end_column": 13
+    },
+    {
+      "start_line": 49,
+      "start_column": 8,
+      "end_line": 53,
+      "end_column": 9
+    }
+  ],
+  "corpus": {
+    "primary/recovery.md": "# Recovery contract\nCobaltcheckpoint must execute exactly once after restart.\nThe receipt preserves the checkpoint hash.\n",
+    "primary/scope.md": "# Scope boundary\nAmberproject decisions belong only to the selected project.\nNo automatic transcript capture is permitted.\n",
+    "primary/notes/aéé.md": "# Unicode note\nWillowunicode keeps café text and source provenance.\nThe five-byte directory example is aéé.\n",
+    "decoy/other.md": "# Deliberate decoy\nBoundarydecoy is outside the primary collection.\nCobaltcheckpoint here must not leak into primary results.\n"
+  },
+  "queries": [
+    {
+      "query": "Cobaltcheckpoint",
+      "file": "recovery.md"
+    },
+    {
+      "query": "Amberproject",
+      "file": "scope.md"
+    },
+    {
+      "query": "Willowunicode",
+      "file": "notes/aéé.md"
+    },
+    {
+      "query": "restart Cobaltcheckpoint",
+      "file": "recovery.md"
+    },
+    {
+      "query": "café Willowunicode",
+      "file": "notes/aéé.md"
+    }
+  ],
+  "negative_queries": [
+    "__wsl_retrieval_absent_20260920__",
+    "Boundarydecoy"
+  ],
+  "qmd_collection": "wsl-primary",
+  "qmd_decoy_collection": "wsl-decoy",
+  "qmd_index": "wsl-retrieval-fixture",
+  "updated_recovery": "# Recovery contract\nCedarreplacement records the updated recovery decision.\nThe old marker has been retired.\n",
+  "after_update_marker": "Cedarreplacement",
+  "deleted_path": "scope.md",
+  "qmd_expected_initial_active_documents": 4,
+  "no_model_files_suffixes": [
+    ".gguf",
+    ".safetensors",
+    ".onnx"
+  ]
+}

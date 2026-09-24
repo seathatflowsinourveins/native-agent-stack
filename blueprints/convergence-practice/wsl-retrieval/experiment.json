@@ -1,0 +1,231 @@
+{
+  "schema_version": 1,
+  "kind": "convergence_experiment",
+  "status": "observed",
+  "lane": "retrieval",
+  "task_and_failure": "Audit the incomplete historical September 20 WSL fixture reference offline. Missing per-command argv/cwd, unavailable raw-log locations and unsupported blanket lifecycle-script suppression prevent native E2E or adoption acceptance.",
+  "primary_sources_and_pins": [
+    {
+      "url": "https://github.com/BurntSushi/ripgrep/releases/tag/15.2.0",
+      "revision": "e89fff89ac9af12e8d4ce9d5fd07beb408ca730f"
+    },
+    {
+      "url": "https://github.com/ast-grep/ast-grep/releases/tag/0.45.3",
+      "revision": "979c143639e3588c31f563091e69398683ed34f0"
+    },
+    {
+      "url": "https://github.com/tobi/qmd/releases/tag/v2.8.3",
+      "revision": "facd35e01359e59d938bc9418e93fb9318addee3"
+    },
+    {
+      "url": "https://github.com/giancarloerra/SocratiCode/releases/tag/v1.14.0",
+      "revision": "2218f25153d0f3f4a76ee240a5643dbc873e80be"
+    }
+  ],
+  "discovery_provenance": [
+    "Existing selected ripgrep, ast-grep and QMD components; bounded official-source preflight dated September 20. No discovery-list installation or fresh currency claim during offline completion."
+  ],
+  "license_and_compatibility": "Dated pins and tagged license identities are preserved: ripgrep MIT OR Unlicense; ast-grep and QMD MIT. The retained Linux x86_64 fixture reports Node 24.21.0, QMD 2.8.3, better-sqlite3 13.0.3 and sqlite-vec 0.1.9. Historical npm --ignore-scripts installation is not a supported fresh-host recipe; native dependency setup is not qualified.",
+  "baseline_and_candidate": {
+    "baseline": "Frozen Python string/AST oracles and explicit source bodies; no performance or model baseline run.",
+    "candidate": "Offline consistency audit of selected facts from incomplete historical receipts; no independently verified native invocation."
+  },
+  "frozen_inputs": {
+    "base_revision": "6f74bc503ccecaaf6ccebd53677b23aedab50921",
+    "tasks": [
+      "historical-reference-audit"
+    ],
+    "roles": [
+      "offline-auditor"
+    ],
+    "sources": [
+      {
+        "path": "blueprints/convergence-practice/wsl-retrieval/run-initial.py.txt",
+        "sha256": "50012822197f88a736b1eddfa7f3b81a425a86af183051cc3da06bc0514cb2f0"
+      },
+      {
+        "path": "blueprints/convergence-practice/wsl-retrieval/run-qmd-attempt-2.py.txt",
+        "sha256": "4cbcceac02158629ca78262aaa826c995c21bbe45fa83481f7c139f16a6c52d2"
+      },
+      {
+        "path": "blueprints/convergence-practice/wsl-retrieval/seed/planner.py",
+        "sha256": "3a33c48346221e2a103d4fb89d5675d2edaa97e651b7f08cf3a79b7ce0b8d7ef"
+      }
+    ],
+    "inputs": [
+      {
+        "path": "blueprints/convergence-practice/wsl-retrieval/pins.json",
+        "sha256": "19572d05638badc6a79abf392924261836e08b19bd01231372e2f764502d393d"
+      },
+      {
+        "path": "blueprints/convergence-practice/wsl-retrieval/package.json",
+        "sha256": "7bbf63c5eafd347ae5ae56c684be06ef2589d38f2aab580ca7986ca4122bc6a8"
+      },
+      {
+        "path": "blueprints/convergence-practice/wsl-retrieval/package-lock.json",
+        "sha256": "5c51ee65cc477f2c1488a38ff5cad1c0a737f81a5b61bbd70d5edc4d15bfc3bb"
+      },
+      {
+        "path": "blueprints/convergence-practice/wsl-retrieval/install-receipt.json",
+        "sha256": "8a3f343e92aa6b0b4ce814ed1b21b56851a37e26f88488cc5ae1119f83063654"
+      },
+      {
+        "path": "blueprints/convergence-practice/wsl-retrieval/install-inventory.json",
+        "sha256": "e2a082ad9b9ada2f2382a9293718f36f2ce48d02a6acca506d5651c70d287742"
+      },
+      {
+        "path": "blueprints/convergence-practice/wsl-retrieval/source-review.json",
+        "sha256": "9ecd2bf01d7c19248b848dcbd0b77f286b4f1aee775068d7778fabf37721d423"
+      },
+      {
+        "path": "blueprints/convergence-practice/wsl-retrieval/seed/corpus/decoy/other.md",
+        "sha256": "84ecfac576f7486f15b9b601727244055bdaa92cbb9c3387655ee3f6546e7136"
+      },
+      {
+        "path": "blueprints/convergence-practice/wsl-retrieval/seed/corpus/primary/notes/a\u00e9\u00e9.md",
+        "sha256": "cb36cd06858449475efbfaddaedfd78d20a2b7b4f30993bca02cd1cb360e0cb3"
+      },
+      {
+        "path": "blueprints/convergence-practice/wsl-retrieval/seed/corpus/primary/recovery.md",
+        "sha256": "01e6feb3822b8501747ed2607103b1b29baa7e2ef7b503328a3bf86ddea81a1c"
+      },
+      {
+        "path": "blueprints/convergence-practice/wsl-retrieval/seed/corpus/primary/scope.md",
+        "sha256": "983ff5cc0bbfbf3a23f9ff698c1ecf1d909943ec59df8350dcb571daea477b67"
+      }
+    ],
+    "evaluation": [
+      {
+        "path": "blueprints/convergence-practice/wsl-retrieval/oracle.json",
+        "sha256": "5b06f3253cad052efcc60798a19c4084ac3104f7c30d429394b31af7d569de0c"
+      },
+      {
+        "path": "blueprints/convergence-practice/wsl-retrieval/audit.py",
+        "sha256": "46cbcaecafe6d4bba3b09a26aa9770667eefbc26d7bbb806d4f0ab98078e86fd"
+      },
+      {
+        "path": "tests/test_wsl_retrieval.py",
+        "sha256": "83353f3ccaa8bc01518f529846bf92167f7e21023e430ef8523af3e129afd903"
+      },
+      {
+        "path": "blueprints/convergence-practice/wsl-retrieval/run.py",
+        "sha256": "be852ce99501f5bc4567b846b90fb0e91d91de77b0eafbd3b72bb4484a2f7d12"
+      }
+    ]
+  },
+  "predeclared_metrics": {
+    "quality_rule": "Retrospective offline audit requires exact frozen-input and check-name sets, byte identities, source spans, QMD bodies, URI scope and retained failure. Consistency cannot establish the missing argv/cwd or independently certify historical execution. Native acceptance remains incomplete.",
+    "usage_rule": "The offline audit invokes no model. Historical per-fixture zero-usage declarations are retained as reported, not independently verified; whole-task parent/child/retry/cache accounting is unknown. No savings claim."
+  },
+  "runtime_and_platform": {
+    "platform": "Historical receipts report September 20 WSL2 Linux x86_64 / Python 3.12.3. Current assessment is offline only; no native host requalification.",
+    "tools": [
+      {
+        "name": "python",
+        "version": "3.12.3"
+      },
+      {
+        "name": "ripgrep",
+        "version": "15.2.0"
+      },
+      {
+        "name": "ast-grep",
+        "version": "0.45.3"
+      },
+      {
+        "name": "node",
+        "version": "24.21.0"
+      },
+      {
+        "name": "qmd",
+        "version": "2.8.3"
+      },
+      {
+        "name": "better-sqlite3",
+        "version": "13.0.3"
+      },
+      {
+        "name": "sqlite-vec",
+        "version": "0.1.9"
+      }
+    ],
+    "isolation": "Historical runner source describes owned fixture state and scoped configuration. Missing command argv/cwd and unrecovered raw logs prevent verifying its actual invocation; no confinement, client or service acceptance."
+  },
+  "commands": [
+    "python3 blueprints/convergence-practice/wsl-retrieval/audit.py"
+  ],
+  "observations": [
+    {
+      "id": "historical-reference-audit",
+      "task": "historical-reference-audit",
+      "role": "offline-auditor",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 0,
+      "evidence_class": "offline_artifact_check",
+      "scope": "Offline consistency of incomplete historical fixture reference",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "blueprints/convergence-practice/wsl-retrieval/source-receipt.json",
+          "sha256": "34e5537e8d39a282d165618b461293f2dcfa08fd8a6f49974775267ed9985c01"
+        },
+        {
+          "path": "blueprints/convergence-practice/wsl-retrieval/qmd-attempt-1.json",
+          "sha256": "452901227a56f61229b249a56c8b4233faeb3763058610856d399149f81655e6"
+        },
+        {
+          "path": "blueprints/convergence-practice/wsl-retrieval/qmd-receipt.json",
+          "sha256": "cad5b3dc802323e5aad8fcdb4ca98f7d1c3e92749b8e891dc32149c70d3f9527"
+        },
+        {
+          "path": "blueprints/convergence-practice/wsl-retrieval/verification.json",
+          "sha256": "1cb605f4574a662272194625d75689ab5cdcae3e3dbb3ba35afbbd827a474cbe"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    }
+  ],
+  "failures_and_skips": [
+    {
+      "run_id": "historical-reference-audit",
+      "reason": "The consistency checker exits 0 but native acceptance fails: command argv/cwd were never retained, raw log locations are unavailable, and blanket npm lifecycle-script suppression is unsupported for fresh QMD installation. No native command was rerun. The original QMD URI-checker failure and five command facts remain unchanged in qmd-attempt-1.json."
+    }
+  ],
+  "limitations": [
+    "Incomplete historical fixture reference only; no native E2E or adoption acceptance. Receipt-declared source success (22 checks/six commands), QMD attempt-2 success (70 checks/17 commands), and failed QMD attempt 1 (five commands) are preserved without inventing missing invocation details.",
+    "Exact frozen-input/check-name sets and selected result bytes can be audited offline. Historical argv/cwd are absent; original raw-log locations cannot be verified, so output digests do not prove which native command produced them.",
+    "Original install-receipt.json still records npm --ignore-scripts --omit=optional. This historical action is not a recommended installation recipe; future setup follows recipes/README.md and docs/native-token-ci.md with NODE_LLAMA_CPP_SKIP_DOWNLOAD=true and required dependency lifecycle scripts enabled.",
+    "Both historical runner versions remain byte-identical. The new run.py records sanitized argv/cwd and is a future recording aid, not evidence of a new execution or a repair of historical receipts.",
+    "The first QMD attempt failed its bare-URI comparison while returning the expected body. The second runner corrected named-index URI parsing. Both receipts and all reported command counts remain preserved.",
+    "Local synthetic fixtures do not qualify upstream suites, semantic RAG, production corpora, native clients, services, inference, OS confinement or resource performance.",
+    "Historical verification.json records the earlier 18-test offline completion and its then-current assessment; it is not refreshed acceptance. Review changes supersede its acceptance wording without altering historical bytes.",
+    "Whole-task provider usage remains unknown. No savings claim, model/global change or automatic history capture."
+  ],
+  "decision_and_scope": {
+    "decision": "defer",
+    "scope": "Incomplete historical fixture reference; native acceptance unavailable",
+    "qualification_run_ids": []
+  },
+  "rollback": "No production or global deployment. Retain required evidence, then retire only the owned private fixture/index/package prefix if no longer needed; never remove or stop unrelated state or processes.",
+  "next_decision_changing_test": "Recover and verify the original raw logs and actual invocation provenance, or authorize a separate reachable-host native trial using the supported QMD installation recipe and complete command capture. Neither is performed by this offline repair.",
+  "usage_assessment": {
+    "claim": "none",
+    "coverage": "partial",
+    "expected_run_ids": [],
+    "coverage_artifact": null
+  }
+}

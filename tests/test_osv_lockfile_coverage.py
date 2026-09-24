@@ -32,7 +32,8 @@ TRACKED = re.compile(
     r")$"
 )
 # File names OSV-Scanner infers without a parser prefix, and the parsers this inventory uses.
-INFERRED = {"requirements.txt", "uv.lock", "pnpm-lock.yaml", "packages.lock.json"}
+# package-lock.json is listed in the pinned v2.6.0 supported-lockfiles documentation.
+INFERRED = {"requirements.txt", "uv.lock", "package-lock.json", "pnpm-lock.yaml", "packages.lock.json"}
 PARSERS = {"requirements.txt", "packages.lock.json"}
 
 

@@ -2999,6 +2999,24 @@
         "The non-gating full python3 -m unittest on this runner ran 2929 tests with 29 failures and 95 errors, recorded as an artifact. Most failures come from macOS's symlinked temp directories (/var/folders and /tmp resolve to /private/...) tripping repository path-containment checks, plus Linux-only tests not skipped on macOS. They are tracked as a follow-up and not claimed as passing."
       ],
       "path": "evidence/receipts/adoption-macos-hosted-smoke-20260923.json"
+    },
+    {
+      "id": "wsl-retrieval-20260920",
+      "kind": "historical_inventory",
+      "component_ids": [
+        "ast-grep",
+        "qmd"
+      ],
+      "claim": "Incomplete historical WSL fixture reference: selected receipts report 22 source checks/six commands and 70 QMD lexical checks/17 commands. Offline byte and result consistency can be checked, but missing command argv/cwd, unrecovered raw logs and unsupported historical QMD installation prevent native E2E or adoption acceptance.",
+      "limitations": [
+        "Historical reference only; not live verification, native E2E acceptance or adoption evidence. No new host/native/client acceptance follows from these artifacts.",
+        "Historical command facts omit argv and cwd. Exact raw-log locations are unavailable; no invocation was reconstructed or represented as observed.",
+        "The unchanged historical install receipt records npm --ignore-scripts --omit=optional. Future installation must use the current supported recipe with NODE_LLAMA_CPP_SKIP_DOWNLOAD=true and required dependency scripts enabled.",
+        "Both executed runner versions and the initial URI-checker failure are retained byte-for-byte. The future runner adds command provenance capture without changing past evidence.",
+        "Receipt-reported 22/70 checks and 6/17 commands describe selected local/synthetic fixtures. Five failed-attempt commands remain separate; no upstream-suite, semantic RAG, production, client or service acceptance.",
+        "Source currency remains September 20; offline completion and review do not refresh releases or native execution. Whole-task provider usage is unknown and no savings claim is made."
+      ],
+      "path": "evidence/receipts/wsl-retrieval-20260920.json"
     }
   ],
   "files": [
@@ -3021,6 +3039,11 @@
       "path": ".github/main-ruleset.json",
       "sha256": "fedbe641236d9089c6d5e5f417efc8f63af7409a579458d41c98f87e00776b8f",
       "bytes": 1633
+    },
+    {
+      "path": ".github/osv-scanner-lockfiles.json",
+      "sha256": "17e278caa3aebadd81ca5d67a494253f6482ea487b87e8839545e51b1efdabb7",
+      "bytes": 8378
     },
     {
       "path": ".github/pull_request_template.md",
@@ -4000,8 +4023,8 @@
     },
     {
       "path": "blueprints/convergence-practice/layer-acceptance.md",
-      "sha256": "0c630a8bce5202fe21986e5d1eed30654a07bfc28ec9fdb475b568d2f1ff9d76",
-      "bytes": 4949
+      "sha256": "19fd6c29d75ddb583d5612054e43b4379b3d9c6a3f4dbe76e3241bead7c063d5",
+      "bytes": 5308
     },
     {
       "path": "blueprints/convergence-practice/local-fixture/corpus-manifest.json",
@@ -5292,6 +5315,116 @@
       "path": "blueprints/convergence-practice/wsl-restore/validation.json",
       "sha256": "558b43769f30e3e7924d7a7ed789670fb063b330feed207e4dfba39d093e1438",
       "bytes": 2429
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/README.md",
+      "sha256": "e15a193803dfee256bd81d303ff1b309820b42ca16b2af9252f66d7137a494b3",
+      "bytes": 6575
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/audit.py",
+      "sha256": "46cbcaecafe6d4bba3b09a26aa9770667eefbc26d7bbb806d4f0ab98078e86fd",
+      "bytes": 11713
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/experiment.json",
+      "sha256": "a029dc2d8de56dd387202e5bffc341ad9d0a163e93f7bc01954b932f4ecf0244",
+      "bytes": 11528
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/install-inventory.json",
+      "sha256": "e2a082ad9b9ada2f2382a9293718f36f2ce48d02a6acca506d5651c70d287742",
+      "bytes": 617
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/install-receipt.json",
+      "sha256": "8a3f343e92aa6b0b4ce814ed1b21b56851a37e26f88488cc5ae1119f83063654",
+      "bytes": 699
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/oracle.json",
+      "sha256": "5b06f3253cad052efcc60798a19c4084ac3104f7c30d429394b31af7d569de0c",
+      "bytes": 2300
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/package-lock.json",
+      "sha256": "5c51ee65cc477f2c1488a38ff5cad1c0a737f81a5b61bbd70d5edc4d15bfc3bb",
+      "bytes": 82463
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/package.json",
+      "sha256": "7bbf63c5eafd347ae5ae56c684be06ef2589d38f2aab580ca7986ca4122bc6a8",
+      "bytes": 174
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/pins.json",
+      "sha256": "19572d05638badc6a79abf392924261836e08b19bd01231372e2f764502d393d",
+      "bytes": 1877
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/qmd-attempt-1.json",
+      "sha256": "452901227a56f61229b249a56c8b4233faeb3763058610856d399149f81655e6",
+      "bytes": 4158
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/qmd-receipt.json",
+      "sha256": "cad5b3dc802323e5aad8fcdb4ca98f7d1c3e92749b8e891dc32149c70d3f9527",
+      "bytes": 12226
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/run-initial.py.txt",
+      "sha256": "50012822197f88a736b1eddfa7f3b81a425a86af183051cc3da06bc0514cb2f0",
+      "bytes": 14888
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/run-qmd-attempt-2.py.txt",
+      "sha256": "4cbcceac02158629ca78262aaa826c995c21bbe45fa83481f7c139f16a6c52d2",
+      "bytes": 15192
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/run.py",
+      "sha256": "be852ce99501f5bc4567b846b90fb0e91d91de77b0eafbd3b72bb4484a2f7d12",
+      "bytes": 16427
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/seed/corpus/decoy/other.md",
+      "sha256": "84ecfac576f7486f15b9b601727244055bdaa92cbb9c3387655ee3f6546e7136",
+      "bytes": 126
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/seed/corpus/primary/notes/a\u00e9\u00e9.md",
+      "sha256": "cb36cd06858449475efbfaddaedfd78d20a2b7b4f30993bca02cd1cb360e0cb3",
+      "bytes": 111
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/seed/corpus/primary/recovery.md",
+      "sha256": "01e6feb3822b8501747ed2607103b1b29baa7e2ef7b503328a3bf86ddea81a1c",
+      "bytes": 121
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/seed/corpus/primary/scope.md",
+      "sha256": "983ff5cc0bbfbf3a23f9ff698c1ecf1d909943ec59df8350dcb571daea477b67",
+      "bytes": 123
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/seed/planner.py",
+      "sha256": "3a33c48346221e2a103d4fb89d5675d2edaa97e651b7f08cf3a79b7ce0b8d7ef",
+      "bytes": 1972
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/source-receipt.json",
+      "sha256": "34e5537e8d39a282d165618b461293f2dcfa08fd8a6f49974775267ed9985c01",
+      "bytes": 6253
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/source-review.json",
+      "sha256": "9ecd2bf01d7c19248b848dcbd0b77f286b4f1aee775068d7778fabf37721d423",
+      "bytes": 6338
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-retrieval/verification.json",
+      "sha256": "1cb605f4574a662272194625d75689ab5cdcae3e3dbb3ba35afbbd827a474cbe",
+      "bytes": 3872
     },
     {
       "path": "blueprints/convergence-practice/wsl-transport-recovery/README.md",
@@ -9320,8 +9453,8 @@
     },
     {
       "path": "docs/ecosystem/manifest.json",
-      "sha256": "0db04ef8bb14b8ed8d2d37c2fad7b0753c730df09d5b284b1947bc16b3fc9935",
-      "bytes": 40857
+      "sha256": "0885a5ef19e36623e41104fd8d32286ad875bcf1f1e49fcf8a8313db09600fa5",
+      "bytes": 41473
     },
     {
       "path": "docs/ecosystem/readiness-observation.json",
@@ -27494,6 +27627,11 @@
       "bytes": 891
     },
     {
+      "path": "evidence/receipts/wsl-retrieval-20260920.json",
+      "sha256": "02fc96b030e8e8d48c977809a80f1a5d0409523cffb12a79aa0c9f4a9de8a56c",
+      "bytes": 2455
+    },
+    {
       "path": "evidence/receipts/wsl-transport-recovery-20260920.json",
       "sha256": "150c1d59848e227df6886863473838a032cd17b9e28303dedf8dcb2e4f1112d4",
       "bytes": 1013
@@ -28539,6 +28677,11 @@
       "bytes": 6602
     },
     {
+      "path": "tests/test_osv_lockfile_coverage.py",
+      "sha256": "102a785b580beb023f0d2c7ea7713058c074d613c74ae2453593d319f1aa85a7",
+      "bytes": 7346
+    },
+    {
       "path": "tests/test_path_safety.py",
       "sha256": "3ef5408df71c98eca31ddfd8e065594ee0bb09d61b37108df9d73c8e66c4acaf",
       "bytes": 7047
@@ -28669,6 +28812,11 @@
       "bytes": 4442
     },
     {
+      "path": "tests/test_wsl_retrieval.py",
+      "sha256": "83353f3ccaa8bc01518f529846bf92167f7e21023e430ef8523af3e129afd903",
+      "bytes": 12720
+    },
+    {
       "path": "tests/test_zizmor_negative_control.py",
       "sha256": "fa0bcd820eb59cfb7b806d440fa5c1abaa4b576062fdcc9190f4ed3f427ee4a3",
       "bytes": 7469
@@ -28770,10 +28918,9 @@
     }
   ],
   "convergence_records": [
-    "blueprints/blind-catalog-convergence/memory-experiment.json",
     "blueprints/blind-catalog-convergence/experiment.json",
+    "blueprints/blind-catalog-convergence/memory-experiment.json",
     "blueprints/catalog-runtime-review/experiment.json",
-    "evidence/artifacts/native-workflow-writing-recovery-20260921/experiment.json",
     "blueprints/convergence-practice/application-delivery/experiment.json",
     "blueprints/convergence-practice/ci-security/experiment.json",
     "blueprints/convergence-practice/document-ingestion/experiment.json",
@@ -28786,6 +28933,8 @@
     "blueprints/convergence-practice/native-worker/experiment.json",
     "blueprints/convergence-practice/wsl-memory-maintenance/experiment.json",
     "blueprints/convergence-practice/wsl-native-tools/experiment-wsl.json",
-    "blueprints/convergence-practice/wsl-transport-recovery/experiment.json"
+    "blueprints/convergence-practice/wsl-retrieval/experiment.json",
+    "blueprints/convergence-practice/wsl-transport-recovery/experiment.json",
+    "evidence/artifacts/native-workflow-writing-recovery-20260921/experiment.json"
   ]
 }

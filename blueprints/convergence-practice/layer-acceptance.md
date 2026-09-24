@@ -15,6 +15,7 @@ and deployment remain distinct.
 | [WSL transport](wsl-transport-recovery/README.md) | Fresh reconnect found the same detached Dagu job running; one durable checkpoint, native completion without retry, original12-test oracle before/after | Controlled owned SSH-client termination; failed first harness attempt retained. No real network outage, host restart or general model-session claim. |
 | [WSL documents](wsl-document-ingestion/README.md) | Native Poppler26.09.0 build passed the unchanged3-page/24-cell/12-query protocol; all four output artifacts match Mac hashes | Task-only source build and verified dependency extraction. Designed corpus and exact lexical retrieval only. |
 | [WSL memory](wsl-memory-maintenance/README.md) |65 native checks and39 MCP calls; scoped restart, upstream HTTP backup and native restore, four owned processes exit0 | Fresh synthetic store with capture and embeddings off. Production service and native-client activation are separate. |
+| [Historical WSL retrieval reference](wsl-retrieval/README.md) | Retained receipts report 22 source and 70 QMD checks; offline consistency only | Incomplete invocation provenance: argv/cwd absent and raw logs unavailable. Historical blanket npm script suppression is unsupported. Initial URI-checker failure retained; no native E2E or adoption acceptance. |
 
 [WSL native quality tools](wsl-native-tools/README.md) add verified gitleaks8.30.1
 and Worktrunk0.78.0 with clean/secret controls, dirty-worktree refusal, exact pin
