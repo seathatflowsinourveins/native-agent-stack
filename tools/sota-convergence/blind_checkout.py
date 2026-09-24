@@ -885,6 +885,19 @@ def export_tree(dest: Path, export: Path, allow_from_packets: Path = None) -> di
     result = {"replaced_instruction_files": sorted(replaced), "removed_instruction_dirs": sorted(removed_dirs),
               "removed_escaping_symlinks": sorted(removed_links)}
     if allowlist is not None:
+        # A packet reference that names a symlink is exported as the link alone: an internal target nobody else
+        # references is absent and an escaping one was removed above, so re-check every reference against the
+        # finished export (Codex review of #145 at a4dfd99e).
+        unopenable = set(allowlist["missing_refs"])
+        export_root = export.resolve()
+        for raw in packet_references(allow_from_packets):
+            relative = bare_reference(raw)
+            if relative is None or relative in unopenable:
+                continue
+            path = export / relative
+            if not os.path.exists(path) or not (path.resolve() == export_root or export_root in path.resolve().parents):
+                unopenable.add(relative)
+        allowlist["missing_refs"] = sorted(unopenable)
         result.update({"allowlisted_files": len(allowed_files), "missing_refs": allowlist["missing_refs"],
                        "transitive_refs": len(allowlist["transitive_refs"]),
                        "aligned_prose_entries": aligned})

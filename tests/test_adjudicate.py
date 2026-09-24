@@ -1755,6 +1755,15 @@ class CallBindingRound4Tests(AdjudicateFixture):
         self.assertEqual(code, 2)
         self.assertIn("another run holds", err)
 
+    def test_a_work_dir_inside_a_repository_is_refused(self):
+        # Codex review of #145 at a4dfd99e: the judges would see an unsanitized checkout through the input paths.
+        repo_parent = Path(tempfile.mkdtemp()).resolve()
+        self.addCleanup(shutil.rmtree, repo_parent)
+        (repo_parent / ".git").mkdir()
+        issue = adjudicate.refuse_work_dir_inside(repo_parent / "state" / "work", self.repo)
+        self.assertIn("inside the git repository", issue)
+        self.assertIsNone(adjudicate.refuse_work_dir_inside(self.work, self.repo))
+
     def test_a_second_run_with_another_homes_base_is_refused(self):
         # Round 7, REG7-2/ISO-R7-4: the work dir's own lock, whatever NAS_CODEX_HOME_DIR says.
         self.inputs()

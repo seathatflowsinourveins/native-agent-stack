@@ -708,6 +708,24 @@ class AllowlistExportTests(BlindCheckoutFixture):
         self.assertEqual(row["winners"], [])
         self.assertNotIn("current_choice", row)
 
+    def test_a_reference_to_a_symlink_whose_target_is_not_exported_is_missing(self):
+        # Codex review of #145 at a4dfd99e: the link alone was exported, dangling or removed as escaping, while
+        # missing_refs stayed empty.
+        scratch = Path(tempfile.mkdtemp()).resolve()
+        self.addCleanup(shutil.rmtree, scratch)
+        dest, export, packets = scratch / "dest", scratch / "hosts" / "blind" / "export", scratch / "packets"
+        (dest / "evidence").mkdir(parents=True)
+        packets.mkdir()
+        (dest / "evidence" / "target.md").write_text("target\n", encoding="utf-8")
+        (dest / "evidence" / "link.md").symlink_to("target.md")
+        (dest / "evidence" / "escape.md").symlink_to(scratch / "outside.md")
+        (scratch / "outside.md").write_text("outside\n", encoding="utf-8")
+        (dest / "evidence" / "plain.md").write_text("plain\n", encoding="utf-8")
+        (packets / "foundation__layer.json").write_text(json.dumps({"candidates": [{"key": "c1", "evidence_refs": [
+            "evidence/link.md", "evidence/escape.md", "evidence/plain.md"]}]}), encoding="utf-8")
+        result = blind_checkout.export_tree(dest, export, allow_from_packets=packets)
+        self.assertEqual(result["missing_refs"], ["evidence/escape.md", "evidence/link.md"])
+
     def test_counts_and_missing_references_are_reported(self):
         printed = json.loads(self.out.getvalue())
         self.assertEqual(printed["export_missing_refs"], ["evidence/missing.md"])

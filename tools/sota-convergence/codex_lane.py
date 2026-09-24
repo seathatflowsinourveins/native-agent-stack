@@ -1214,15 +1214,28 @@ def run_pending(args, work_dir, repo, template, schema_path, codex_dir, events_d
               + ", ".join(flagged), file=sys.stderr)
 
     failures_path = codex_dir / FAILURES_NAME
-    if failures:
+    # A --layers rerun keeps the recorded failures of the layers it did not select, so record_verdicts still seals
+    # their reasons (Codex review of #145 at a4dfd99e).
+    kept = []
+    if args.layers and failures_path.is_file():
+        selected = {item.strip() for item in args.layers.split(",") if item.strip()}
+        try:
+            earlier = json.loads(failures_path.read_text(encoding="utf-8")).get("failures") or []
+        except (ValueError, AttributeError):
+            earlier = []
+        kept = [(entry.get("catalog"), entry.get("layer_id"), entry.get("reason")) for entry in earlier
+                if isinstance(entry, dict) and entry.get("layer_id") not in selected
+                and f"{entry.get('catalog')}__{entry.get('layer_id')}" not in selected]
+    recorded = sorted(set(failures) | set(kept))
+    if recorded:
         failures_path.write_text(json.dumps({"lane": LANE, "failures": [
             {"catalog": catalog, "layer_id": layer_id, "reason": reason}
-            for catalog, layer_id, reason in sorted(failures)]}, indent=1, sort_keys=True) + "\n", encoding="utf-8")
-        for catalog, layer_id, reason in sorted(failures):
-            print(f"codex_lane: {catalog}__{layer_id}: {reason}", file=sys.stderr)
-        return 1
-    failures_path.unlink(missing_ok=True)
-    return 0
+            for catalog, layer_id, reason in recorded]}, indent=1, sort_keys=True) + "\n", encoding="utf-8")
+    else:
+        failures_path.unlink(missing_ok=True)
+    for catalog, layer_id, reason in sorted(failures):
+        print(f"codex_lane: {catalog}__{layer_id}: {reason}", file=sys.stderr)
+    return 1 if failures else 0
 
 
 if __name__ == "__main__":

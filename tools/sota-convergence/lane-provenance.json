@@ -1,9 +1,9 @@
 {
  "adjudication": [
   {
-   "adjudicate_py_sha256": "43d7be0c2a73a3fa1519d130d688e8c2890a57cb95f37ffe17bef34257255172",
+   "adjudicate_py_sha256": "11fc9bec3d72bf90345f6e86644c061f607e8329a1722c2d54887f39ad2c5e8c",
    "adjudicator_role_sha256": "f6f68e3a672c94612ebf89efcfc8b5d8f9688e8783b01170a300d8f40bbfb18e",
-   "codex_lane_py_sha256": "0054b88584a08809fbab3c9d9f0009afbc57c8491dcca68b1c457cb5e6805d36",
+   "codex_lane_py_sha256": "121d36787c86fe2c70533669b42306ecc0a5e841289fc47f50e36954d1e4e8aa",
    "judge_schema_sha256": "b7279c9e70070c525144390c67e7f3eb7358b173675fae4e7efe3b798e1f5014",
    "prompt_sha256": "b49555a51f0aebbea80b63c8e7bc843139ad1e973601e81686eeb4bbd14825cf",
    "refute_schema_sha256": "b70af9cca33eec7c47d5ae02819bebbc76820d33a13f537ee7c375d4e6f2c736",
@@ -97,7 +97,7 @@
    "registered_at": "2026-09-23"
   },
   {
-   "codex_lane_py_sha256": "0054b88584a08809fbab3c9d9f0009afbc57c8491dcca68b1c457cb5e6805d36",
+   "codex_lane_py_sha256": "121d36787c86fe2c70533669b42306ecc0a5e841289fc47f50e36954d1e4e8aa",
    "prompt_sha256": "9b8a8364f13ff3fcb9fc690198c4ca8849c29cc12b81e8526121a46114517f54",
    "registered_at": "2026-09-24"
   }

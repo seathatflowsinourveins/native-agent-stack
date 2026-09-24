@@ -388,6 +388,21 @@ class CodexLaneTests(CodexLaneFixture):
         self.assertEqual(failures["failures"], [{"catalog": "foundation", "layer_id": "native-clients",
                                                  "reason": "failed after retry: codex exec exited 7"}])
 
+    def test_a_layers_rerun_keeps_the_failures_of_unselected_layers(self):
+        # Codex review of #145 at a4dfd99e: a --layers rerun replaced failures.json with its own subset.
+        self.write_packet("foundation", "native-clients")
+        self.write_packet("foundation", "workers")
+        codex_dir = self.work_dir / "codex"
+        codex_dir.mkdir()
+        (codex_dir / "failures.json").write_text(json.dumps({"lane": "codex", "failures": [
+            {"catalog": "foundation", "layer_id": "workers", "reason": "failed after retry: timed out"},
+            {"catalog": "foundation", "layer_id": "native-clients", "reason": "failed after retry: timed out"}]}),
+            encoding="utf-8")
+        self.assertEqual(self.run_lane(["--layers", "native-clients"]), 0)
+        failures = json.loads((codex_dir / "failures.json").read_text(encoding="utf-8"))["failures"]
+        self.assertEqual(failures, [{"catalog": "foundation", "layer_id": "workers",
+                                     "reason": "failed after retry: timed out"}])
+
     def test_timed_out_attempt_keeps_its_partial_event_stream(self):
         self.write_packet("foundation", "native-clients")
         os.environ["CODEX_FAKE_SLEEP_SECONDS"] = "3"

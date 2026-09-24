@@ -410,6 +410,13 @@ def refuse_work_dir_inside(work_dir: Path, repo: Path) -> str:
     if work == root or work.startswith(root + "/"):
         return (f"adjudicate: the work dir {work} is inside the repository root {root}; blind-adjudicator refuses an "
                 "input or packet file inside the repository root")
+    # Nor inside any git checkout: the labelled input and packet paths would show the judges an unsanitized
+    # catalog, its selection files and .git (Codex review of #145 at a4dfd99e; the rule codex_lane and
+    # claude_lane_args apply).
+    repository = next((str(path) for path in (Path(work), *Path(work).parents) if (path / ".git").exists()), None)
+    if repository:
+        return (f"adjudicate: the work dir {work} is inside the git repository {repository}; place it outside every "
+                "repository")
     return None
 
 
