@@ -236,6 +236,40 @@
         }
       },
       "sizing_arithmetic": null
+    },
+    {
+      "id": "threadripper4090-nativestack-20260924",
+      "label": "NativeStack-Threadripper-4090",
+      "evidence_class": "native_proven",
+      "assumptions": null,
+      "measured_tiers": {
+        "concurrent_use_warning": null,
+        "ecosystem_job_memory_high_gb": 17.1,
+        "ecosystem_job_memory_max_gb": 25.6,
+        "embedding_semantic_rag_tier": "headroom",
+        "local_generation_model_tier": "large-32b-q4",
+        "workflow_concurrency_cap": 16
+      },
+      "measured": {
+        "cores": 48,
+        "cpu_brand": "AMD Ryzen Threadripper PRO 5975WX 32-Cores",
+        "effective_ram_gb": 102.2,
+        "effective_ram_gb_source": "proc_meminfo",
+        "evidence_class": "native_proven",
+        "gpu": {
+          "evidence_class": "native_proven",
+          "name": "NVIDIA GeForce RTX 4090",
+          "vram_gb": 24.0
+        },
+        "is_wsl": true,
+        "platform": "wsl",
+        "ram_gb_proc_meminfo": 102.2,
+        "wslconfig_memory_gb": 104.0,
+        "wslconfig_memory_gb_evidence_class": "source_review",
+        "wslconfig_other_candidates": [],
+        "wslconfig_source": "/mnt/c/Users/<user>/.wslconfig"
+      },
+      "sizing_arithmetic": null
     }
   ],
   "layers": [
@@ -2243,6 +2277,20 @@
       "result": "pass",
       "revision": "c0c9fea93ea424587517f2c59e20db9f1d6bf615",
       "runtime": "vllm",
+      "runtime_version": "0.25.0"
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "semantic-rag",
+      "component_id": "vllm",
+      "platform": "linux-wsl2-x86_64",
+      "bars": "Finite 2048-dimensional embeddings and real repository fixture semantic search passed.",
+      "host_id": "threadripper4090-nativestack-20260924",
+      "model_id": "nvidia/Nemotron-3-Embed-1B-BF16",
+      "receipt_path": "evidence/hosts/threadripper4090-nativestack-20260924/threadripper4090-nativestack-20260924--vllm--use--20260924.json",
+      "result": "pass",
+      "revision": "c0c9fea93ea424587517f2c59e20db9f1d6bf615",
+      "runtime": "vllm CUDA; 4096 context; 2048 dimensions",
       "runtime_version": "0.25.0"
     }
   ],

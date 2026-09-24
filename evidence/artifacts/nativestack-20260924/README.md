@@ -1,0 +1,42 @@
+# NativeStack workstation evidence — 2026-09-24
+
+This is a new Windows/WSL2 physical workstation running an independently installed Ubuntu24.04.5 distribution. Installation used catalog **v2026.09.23.1 / 40828dfea7bca910032e93b966bbdfdd729f9f44**. Evidence is contributed from a separate current-main clone. No winner, platform status, credentials, other distribution, or broker configuration is changed by this contribution.
+
+The host has ThreadripperPRO5975WX,128GB physical RAM and an RTX4090 with24GB VRAM. Existing shared WSL limits were preserved:104GB memory,48processors and24GB swap. All six selected profiles completed their bootstrap sequence and prerequisite report. Recipe-managed components outside bootstrap's hash set remain explicitly unpinned at that boundary, even where an exact source commit or package version was independently selected.
+
+## Evidence boundaries
+
+- `checks.py` executes bounded native version, retrieval and endpoint checks. Version invocation is installation evidence only. Source snippets, dimensions, local-store state and native model output have separate assertions.
+- `retained-checks.py` verifies **historical metadata only**, with `evidence_class: local_integration`. It does not rerun LEAN, the restore drills, native clients, or other components. Their original commands, observed times, actual exits and raw-stream digests remain in `execution-ledger.json`; exact unsanitized argv and raw streams are retained privately on this host.
+- Known model prompts and memory-page bodies, plus long or multiline argv values, are withheld; user paths and native session identifiers are sanitized. Public-content and targeted contribution scans are separate publication checks. Raw streams and exact argv remain private. It includes failed commands and expected negative checks. Outer exit0 is not a claim that every nested operation, test, artifact, quality comparison or billing measurement passed.
+- The new formal receipts include one **failing** calendar test, reproduced with the installed SDK lock. That failure is not counted as acceptance. Installation and use receipts, including the scoped successes, remain separate.
+- Independent review is requested in the PR. These receipts do not declare a new independent reviewer merely by generating another identity. No platform-status promotion is made.
+
+## Observed acceptance
+
+Native Codex0.155.1 used selected `gpt-6-astra`; native Claude2.1.280 used selected Opus[1m]/xhigh and resolved `claude-opus-5-5`. Native sign-ins remained in their original clients. Codex's native `/hooks` review activated all13 reviewed definitions, and a fresh session produced ContextMode lifecycle events. Claude used RTK filtering and real ContextMode/SocratiCode tools. The SDK example used an actual ContextMode call and completed in20916ms with63679input/51968cached-input/397output tokens. This is native usage, not a whole-task bill.
+
+QMD returned the adoption source. Serena and jcodemunch returned the real fixture symbol. SocratiCode indexed the fixture directory (8chunks), returned source, and followed an owned added/deleted file. This is not whole-repository indexing. Nemotron-3-Embed-1B-BF16 produced2048finite embedding values in vLLM0.25.0. Headroom restored its retained log artifact including a critical503line; no compressor estimate is presented as billed savings.
+
+The local text generation candidate is [Qwen3.8-27B](https://huggingface.co/Qwen/Qwen3.8-27B), using [Unsloth UD-Q4_K_M GGUF](https://huggingface.co/unsloth/Qwen3.8-27B-GGUF) at revision`4ca720788d1e01f1bff70c033e0d0028fd02e502`. Weight SHA256 is`322e194ff79741c7baa497c240f677f54b201b0efab44ca8e50f122b39123482`. Official llama.cpp CUDA12.8 build b11146 serves one8192-token slot with36GPU layers and supported xhigh effort. Three designed structured-output/reasoning/tool-call fixtures passed, with4.98–5.60generated tokens/s. Shared GPU use requires CPU offload; there is no comparative quality, long-context, vision, or universal-best claim. The model is an optional local endpoint and does not replace the selected cloud clients.
+
+The monitoring stack received actual native client telemetry with message bodies omitted. Prometheus native Codex counters reconciled with its matching native session, and both clients reached Loki. Backend restart persistence passed. All ten user services were active after a target-only NativeStack restart; nine HTTP probes passed and the native memory client retrieved the retained page. Qdrant retained eight fixture points. User lingering is enabled. The initial health probe incorrectly used an unsupported memory /health endpoint; its failure and corrected native-client probe are both retained. ccusage's offline local-log report omits the ephemeral SDK worker and cannot price the new Opus model; it is not a complete usage or billing total.
+
+Research, recovery and additional tool details are in the adjacent handoffs. LEAN's bundled backtest,20-fold skfolio study,Edgar offline provenance,Nautilus isolated engine and Dagu pipeline passed their bounded checks. Restic encrypted same-host restores passed for public references and an ai-memory native archive. A separate Qdrant fixture snapshot restored all8point/vector/payload values in an owned temporary server. None establishes off-host disaster recovery or live trading readiness.
+
+## Open evidence and update decisions
+
+- The full SDK environment suite ran3501tests:1failure,203skips. The failing test assumes optional `exchange_calendars` is absent; the selected lock installs4.13.2. Source/test bytes were not patched to hide it. The current-main contribution suite, using the standard managed Python environment, passed: 3640 tests, 423 skips, exit 0, in 241.020 seconds. This does not convert the SDK environment failure into a pass.
+- An upstream catalog Gitleaks directory scan reported218redacted untriaged findings; its full-history scan was interrupted. A clean scan of this contribution, if obtained, does not erase those baseline findings.
+- WSL2.7.13 intermittently returned `Wsl/Service/E_UNEXPECTED` for new launches. Subsequent serialized launches succeeded; causality is not proven. Old distributions and the global WSL service were not stopped. WSL2.7.14 is a maintenance update to reconsider with a shared-host restart window.
+- ai-memory2.3.2 remains the accepted store after scoped retrieval and isolated restore. [2.4.0](https://github.com/akitaonrails/ai-memory/releases/tag/v2.4.0) is newer. [Basic Memory](https://github.com/basicmachines-co/basic-memory) and [Hindsight](https://github.com/vectorize-io/hindsight) are current candidates, but no matched same-host/task/model comparison here establishes that either supersedes it. Recheck after a migration/API review and grounded recall, abstention, supersession, isolation, deletion and restore tests with complete latency/usage evidence.
+- Retain catalog pins below latest where applicable: Codex0.155.1, vLLM0.25.0, Dagu2.16.6, skfolio1.2.9 and Inspector2.7.0. Recheck upstream compatibility and native acceptance before promoting an update. Claude's original native updater remains active. The newly qualified Qwen/llama.cpp pair is explicitly newer than the catalog runtime pin and does not count as pin-bound acceptance.
+- Current-main guarded-runner CPU improvements landed during installation. The install checkout remains at the attested release; a future release migration must follow `adoption/update.md`, including config diffs and fresh applicable checks.
+
+Selection preference: use the latest **qualified suitable** model, keep the last proven version available for rollback, and record source revisions and check results at each upgrade. Publication recency and an upstream leaderboard alone do not establish a better workstation outcome.
+
+## Publication validation
+
+`python3 scripts/host_receipts.py validate`, `python3 scripts/validate.py`, and both generated-report checks passed. The contribution suite passed as described above. Independent host review remains requested, not completed.
+
+The retained prepublication snapshot contains 271 commands with 36 nonzero exits, including expected negative checks and corrected attempts; 66 new formal host receipts contain 65 passes and the one retained calendar failure. The targeted 83-file contribution Gitleaks scan returned zero findings after two public source-commit false positives were resolved with explicit upstream links. No scanner rule was suppressed. The older 218-finding baseline remains open.

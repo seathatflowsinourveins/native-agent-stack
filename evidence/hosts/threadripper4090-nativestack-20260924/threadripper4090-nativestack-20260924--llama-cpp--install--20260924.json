@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "id": "threadripper4090-nativestack-20260924--llama-cpp--install--20260924",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "threadripper4090-nativestack-20260924",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "threadripper4090-nativestack-20260924"
+  },
+  "catalog_revision": "7c211addc2b53b0532f64de8910730601b2fde7a",
+  "recorded_by": {
+    "identity_sha256": "46d4a459eea6422b216a62e713ba1421b09f023efc6b1f68c3cefd4e282ad08e"
+  },
+  "component_id": "llama-cpp",
+  "stage": "install",
+  "commands": [
+    {
+      "cmd": "python3 evidence/artifacts/nativestack-20260924/checks.py llama-cpp --version-only",
+      "exit": 0,
+      "duration_s": 0.435,
+      "output_sha256": "add87268d659029a5ede3cebd07fbb7c4683b9df943cff788690300bfd894c2f",
+      "output_excerpt": "0.00.000.459 I srv  llama_server: initializing ...\nversion: 0.5.0-dev (build 11146, commit 7fe450e19)\nbuilt with GNU 13.3.0 for Linux x86_64\n\n"
+    }
+  ],
+  "tool_versions": {
+    "llama-cpp": "b11146 (0.5.0-dev)"
+  },
+  "observed_at_utc": "2026-09-24T04:27:52Z",
+  "result": "pass",
+  "claim": "Native llama.cpp version captured from its actual stderr channel.",
+  "limitations": [
+    "A version or metadata check does not establish functional acceptance. Separate native command evidence and failures are retained."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-24T04:27:52Z",
+      "reviewer": {
+        "identity_sha256": "46d4a459eea6422b216a62e713ba1421b09f023efc6b1f68c3cefd4e282ad08e"
+      }
+    }
+  ]
+}

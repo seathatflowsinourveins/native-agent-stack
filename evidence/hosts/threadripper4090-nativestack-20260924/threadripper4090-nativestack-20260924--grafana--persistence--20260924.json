@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "id": "threadripper4090-nativestack-20260924--grafana--persistence--20260924",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "threadripper4090-nativestack-20260924",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "threadripper4090-nativestack-20260924"
+  },
+  "catalog_revision": "8eacd8b60f1d8b1369065415d4a4c5edf30f2eb1",
+  "recorded_by": {
+    "identity_sha256": "46d4a459eea6422b216a62e713ba1421b09f023efc6b1f68c3cefd4e282ad08e"
+  },
+  "component_id": "grafana",
+  "stage": "persistence",
+  "commands": [
+    {
+      "cmd": "python3 evidence/artifacts/nativestack-20260924/retained-checks.py grafana",
+      "exit": 0,
+      "duration_s": 0.027,
+      "output_sha256": "2c9115aaa8f574fc5cce7ae4d8d1250f830b2b7f9203871af8f6c2d311ee7044",
+      "output_excerpt": "{\"component\": \"grafana\", \"metadata_checked\": 1, \"scope\": \"Real backend restart/persistence check across installed monitoring services.\", \"native_execution_repeated\": false}\n"
+    }
+  ],
+  "tool_versions": {
+    "grafana": "13.2.2"
+  },
+  "observed_at_utc": "2026-09-24T04:21:58Z",
+  "result": "pass",
+  "claim": "Validated the retained native command metadata for: Real backend restart/persistence check across installed monitoring services.",
+  "limitations": [
+    "Retained metadata validation is not a fresh execution of the underlying component. Original commands, times, exits and stream digests are in execution-ledger.json; raw streams remain private. Prior failures and scope limitations remain."
+  ],
+  "evidence_class": "local_integration",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-24T04:21:58Z",
+      "reviewer": {
+        "identity_sha256": "46d4a459eea6422b216a62e713ba1421b09f023efc6b1f68c3cefd4e282ad08e"
+      }
+    }
+  ]
+}

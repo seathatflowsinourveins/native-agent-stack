@@ -182,6 +182,13 @@
           "peak_memory_gb": 0.288
         }
       }
+    },
+    {
+      "id": "threadripper4090-nativestack-20260924",
+      "label": "NativeStack-Threadripper-4090",
+      "evidence_class": "native_proven",
+      "evidence": "evidence/artifacts/hw-profiles/threadripper4090-nativestack-20260924/profile.json",
+      "note": "Actual scripts/hardware_profile.py output for this host, written by scripts/hardware_profile.py --record-host."
     }
   ]
 }
