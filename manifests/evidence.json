@@ -9413,8 +9413,8 @@
     },
     {
       "path": "docs/component-evidence-matrix.md",
-      "sha256": "a91a6c459f84085ed54e4cfcfe1198b53da01cce1492e52ff9d881e8df2001e8",
-      "bytes": 18618
+      "sha256": "2ce1d8e7950a6cb087bf91cc108a39cf98727978ec79414341dab7df8ebb23aa",
+      "bytes": 18656
     },
     {
       "path": "docs/contributing-evidence.md",
@@ -28228,8 +28228,8 @@
     },
     {
       "path": "scripts/component_matrix.py",
-      "sha256": "d34deba5a38d94f537cfff480a5fc2f2b30c025eb1303ed880168eaf76b187af",
-      "bytes": 26109
+      "sha256": "f2c838745c96dd9d35462e4aa12e16bfdc652ef34cf56a1ac211f1add95072d3",
+      "bytes": 26158
     },
     {
       "path": "scripts/host_receipts.py",
@@ -28253,8 +28253,8 @@
     },
     {
       "path": "scripts/platform_status.py",
-      "sha256": "de9ff065bacedc86502b793175cf2fdf713c47b9616d6ab7d9141b743f377a53",
-      "bytes": 10814
+      "sha256": "69a9d3846060ff46c67db3aba8ce5e4ed49cd0b20fbeb8c50389087810a97ac6",
+      "bytes": 11247
     },
     {
       "path": "scripts/recount-tokens.cjs",
@@ -28743,8 +28743,8 @@
     },
     {
       "path": "tests/test_platform_status.py",
-      "sha256": "70b4d61b4e2c55744f5c94947519583b05334fa92e193930be72b5a4594ffea1",
-      "bytes": 16460
+      "sha256": "6a3344efd10af2d446ff70f90c1a1606b13dcbbfe6f79e50fc10a6e8d9f82b74",
+      "bytes": 17508
     },
     {
       "path": "tests/test_point_in_time.py",

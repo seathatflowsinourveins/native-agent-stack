@@ -12,9 +12,11 @@ reaches it on its next re-record. The inputs are the host receipts under ``evide
 A receipt is *bound* when it is schema-valid, its ``host.os``/``host.architecture`` match the
 platform profile, and its ``tool_versions[component_id]`` equals the winner's current ``pin``
 after ``normalize_pin`` (the whole string, so a multi-part pin must match in full). A
-*qualifying* receipt is a bound ``native_proven`` pass at stage ``install`` or ``use``, on a
-declared second physical machine, independently reviewed (``host_receipts.review_state`` is
-``agree``: a reviewer identity other than the recorder's agrees and nothing dissents). A
+*qualifying* receipt is a bound ``native_proven`` pass at stage ``use``, on a declared second
+physical machine, independently reviewed (``host_receipts.review_state`` is ``agree``: a reviewer
+identity other than the recorder's agrees and nothing dissents); the same receipt at stage
+``install`` supports ``conditional`` at most, through the receipt route only
+(docs/decisions/2026-09-24-accepted-needs-use-stage.md). A
 *blocking* fail is a bound ``native_proven`` fail at ``install`` or ``use`` that is the latest
 receipt for its host and stage, whatever its review; it withholds ``accepted`` until that host
 records a later pass for that stage.
@@ -148,12 +150,15 @@ def platform_status(platform_id: str, winner: dict, context: StatusContext) -> P
         return PlatformStatus("accepted", "independently reviewed native_proven pass at the current pin",
                               tuple(qualifying))
 
-    if install_only and not qualifying and not blocking:
-        # A reviewed install pass alone supports conditional on either platform, never accepted.
-        return PlatformStatus("conditional", "independently reviewed install-stage pass; accepted needs a reviewed "
-                              "use-stage pass", tuple(install_only))
+    # A reviewed install pass alone supports conditional through the receipt route, never accepted. It is checked
+    # inside each platform's receipt route, never ahead of the Linux winner-level route: added evidence must not
+    # lower a status (review of #164).
+    install_only_status = PlatformStatus("conditional", "independently reviewed install-stage pass; accepted needs "
+                                         "a reviewed use-stage pass", tuple(install_only))
 
     if platform_id == "macos-arm64":
+        if install_only and not blocking:
+            return install_only_status
         if passes:
             return PlatformStatus("conditional", "pin-bound passing host receipt(s) without the full "
                                   "acceptance conditions" + fail_note, pass_refs)
@@ -172,6 +177,8 @@ def platform_status(platform_id: str, winner: dict, context: StatusContext) -> P
         return PlatformStatus("conditional", reason, registered + pass_refs)
     if evidence_class in CONDITIONAL_CLASSES:
         return PlatformStatus("conditional", f"{evidence_class} winner" + fail_note, registered + pass_refs)
+    if install_only and not blocking:
+        return install_only_status
     if passes:
         return PlatformStatus("conditional", "pin-bound passing host receipt(s)" + fail_note, pass_refs)
     return PlatformStatus("not_established", f"{evidence_class or 'unknown'} winner with no passing host receipt",

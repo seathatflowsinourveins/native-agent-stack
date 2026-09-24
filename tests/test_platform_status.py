@@ -182,15 +182,28 @@ class PlatformStatusTests(unittest.TestCase):
     def test_a_reviewed_install_pass_alone_is_conditional_on_either_platform(self):
         # 2026-09-24 decision: a version-only install receipt proves the binary resolves, not that the component
         # works; accepted needs a reviewed use-stage pass.
-        for platform_id in ("macos-arm64", "linux-wsl2-x86_64"):
+        # On Linux a source_review winner reaches the receipt route (a native winner has its own routes).
+        for platform_id, winner in (("macos-arm64", {}), ("linux-wsl2-x86_64", {"evidence_class": "source_review"})):
             with self.subTest(platform_id):
                 self.setUp()
                 self.r.receipt(platform_id, stage="install", host="box-a")
-                derived = self.r.status(platform_id)
+                derived = self.r.status(platform_id, **winner)
                 self.assertEqual(derived.status, "conditional")
                 self.assertIn("use-stage pass", derived.reason)
                 self.r.receipt(platform_id, stage="use", host="box-b")
-                self.assertEqual(self.r.status(platform_id).status, "accepted")
+                self.assertEqual(self.r.status(platform_id, **winner).status, "accepted")
+
+    def test_a_reviewed_install_pass_never_lowers_a_winner_accepted_by_registered_evidence(self):
+        # Review of #164: the install-only cap ran ahead of the Linux winner-level route and demoted it, for both
+        # native classes (Codex cross-family lane).
+        for evidence_class in ("native_proven", "measured_comparison"):
+            with self.subTest(evidence_class):
+                self.setUp()
+                self.r.register("evidence/receipts/widget.json")
+                winner = {"evidence_refs": ["evidence/receipts/widget.json"], "evidence_class": evidence_class}
+                self.assertEqual(self.r.status("linux-wsl2-x86_64", **winner).status, "accepted")
+                self.r.receipt("linux-wsl2-x86_64", stage="install", host="box-a")
+                self.assertEqual(self.r.status("linux-wsl2-x86_64", **winner).status, "accepted")
 
     def test_a_use_fail_is_not_hidden_by_a_later_install_pass(self):
         self.r.receipt(result="fail", stage="use", host="mac-a", observed_at="2026-09-23T01:00:00Z")
