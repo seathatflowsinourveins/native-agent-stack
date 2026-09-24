@@ -79,6 +79,52 @@ def shares(value):
     return Quantity.from_int(int(value))
 
 
+# Alpaca rounds a cumulative filled_avg_price to at most six decimals: on 2026-09-24 a paper
+# sell filled 11 shares at 15.00 and then 1 at 15.01, reported as 15.000833.
+AVG_PRICE_REPORT_UNIT = Decimal("0.000001")
+FILL_EVENTS = frozenset({"fill", "partial_fill"})
+
+
+def avg_price_unit(avg):
+    """The most a reported average can differ from the true one: one unit in its last
+    reported decimal, and never less than AVG_PRICE_REPORT_UNIT."""
+    return max(Decimal(1).scaleb(avg.as_tuple().exponent), AVG_PRICE_REPORT_UNIT)
+
+
+def execution_price(prior_qty, prior_value, filled, avg, precision, *, event_qty=None, event_price=None):
+    """The price of the shares filled since the prior observation, at the instrument's precision.
+
+    ``prior_value`` is the exact value of the earlier fills at their own prices. The broker's
+    rounded average makes ``filled * avg`` differ from the true value by at most ``filled * unit``
+    (``avg_price_unit``), so a candidate price is consistent when ``prior_value + delta * price``
+    lies within that bound. Candidates, in order: the trade-update event's own execution price
+    when its quantity is exactly the new shares; the price derived from the cumulative snapshot
+    when it is already on the precision; that derived price rounded to the precision when the
+    bound is below half a price unit, so the nearest price is the only consistent one. Anything
+    else still needs reconciliation.
+    """
+    delta = filled - prior_qty
+    tick = Decimal(1).scaleb(-precision)
+    tolerance = filled * avg_price_unit(avg)
+    reported = filled * avg
+
+    def consistent(price):
+        return price > 0 and price == price.quantize(tick) and abs(prior_value + delta * price - reported) <= tolerance
+
+    if event_qty is not None and event_price is not None:
+        qty, price = dec(event_qty), dec(event_price)
+        if qty == delta and consistent(price):
+            return price
+    derived = (reported - prior_value) / delta
+    if derived > 0 and derived == derived.quantize(tick):
+        return derived
+    if 2 * tolerance < delta * tick:
+        rounded = derived.quantize(tick)
+        if consistent(rounded):
+            return rounded
+    raise ValueError("cumulative_fill_precision_requires_reconciliation")
+
+
 def instrument(metadata):
     symbol = metadata["symbol"]
     if metadata.get("currency", "USD") != "USD" or not isinstance(symbol, str) or not symbol:
@@ -303,8 +349,9 @@ class AlpacaExecutionClient(ExecutionClient):
             raise ValueError("broker_order_identity_changed")
         if filled < prior["qty"]:
             return  # A delayed cumulative snapshot must never roll back fills.
-        value = filled * avg
-        if filled == prior["qty"] and value != prior["value"]:
+        # prior["value"] is the exact value of the fills reported so far at their own prices;
+        # the broker's average is rounded, so compare within its reporting precision.
+        if filled == prior["qty"] and abs(filled * avg - prior["value"]) > filled * avg_price_unit(avg):
             raise ValueError("same_quantity_fill_correction_requires_reconciliation")
         if prior["terminal"] and filled > prior["qty"]:
             raise ValueError("post_terminal_fill_requires_reconciliation")
@@ -314,13 +361,14 @@ class AlpacaExecutionClient(ExecutionClient):
             prior["accepted"] = True
         if filled > prior["qty"]:
             delta = filled - prior["qty"]
-            last_px = (value - prior["value"]) / delta
-            if last_px <= 0 or last_px != last_px.quantize(Decimal(1).scaleb(-ins.price_precision)):
-                raise ValueError("cumulative_fill_precision_requires_reconciliation")
+            fill_event = row.get("event") in FILL_EVENTS
+            last_px = execution_price(prior["qty"], prior["value"], filled, avg, ins.price_precision,
+                                      event_qty=row.get("event_qty") if fill_event else None,
+                                      event_price=row.get("event_price") if fill_event else None)
             self.generate_order_filled(order, broker_id, None,
                 fill_trade_id(row["id"], filled), shares(delta), Price.from_str(str(last_px)),
                 USD, Money(0, USD), LiquiditySide.NO_LIQUIDITY_SIDE, stamp)
-            prior["qty"], prior["value"] = filled, value
+            prior["qty"], prior["value"] = filled, prior["value"] + delta * last_px
         if not prior["terminal"]:
             if status == "canceled":
                 self.generate_order_canceled(order, broker_id, stamp)

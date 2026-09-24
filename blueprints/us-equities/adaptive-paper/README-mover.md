@@ -270,9 +270,17 @@ credential.
   retry are code constants (`mover.HANDOFF_EXIT_TIMEOUTS`, `PRE_WIRE_RETRY_SECONDS`)
   chosen without a paper measurement; a broker run that shows slower fills is the
   comparison that would change them.
-- **Sub-penny fills.** A 4-decimal instrument carries fills to 0.0001. A cumulative
-  average finer than that (several partial fills at different prices) still stops the
-  native adapter, as it does for the adaptive lane.
+- **Partial fills at different prices.** Alpaca reports the cumulative average rounded to
+  six decimals, so partial fills a cent apart give a repeating average. The first paper
+  run (`trials/mac-2026-09-24-mover-a/`) stopped on this: 11 shares at 15.00 and then 1 at
+  15.01, reported as 15.000833, derived as 15.009996. The native adapter now takes each
+  fill's price from the trade-update event when that event's quantity is exactly the new
+  shares and its price agrees with the reported average. Otherwise it rounds the derived
+  price to the instrument's precision, but only when the average's reporting bound
+  (filled shares x 0.000001, or the reported decimal if coarser) is under half a price
+  unit, so exactly one price is consistent (`native_adapter.execution_price`). Anything
+  else still stops the native adapter (`cumulative_fill_precision_requires_reconciliation`),
+  as before, for both lanes. A 4-decimal instrument carries fills to 0.0001.
 - **Evidence.** Everything here is SYN until an actual broker run: unit tests, the
   native end-to-end tests with `mover_simulation.py` and `synthetic`. Alpaca paper
   fills are the broker's simulation, not exchange executions.
