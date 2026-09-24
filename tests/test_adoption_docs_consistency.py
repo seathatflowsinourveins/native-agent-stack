@@ -23,7 +23,9 @@ cover. Each test below names the drift it stops:
 - a new-host page that mentions an install input (bootstrap script or pin file) whose content
   differs between the pinned release and HEAD says "changed after `<release_tag>`" in a unit
   that mentions it. release_due.py only reports missing paths, so this is the check that sees
-  a changed script.
+  a changed script;
+- bootstrap.md's plugin revision check quotes the same commits as the recipes/README.md rows
+  it names (nothing else binds that copy, and a marketplace source cannot enforce a commit).
 
 The markers name the release they were written against, so they stay true in every later
 checkout: at a newer release they are history, and a re-pin needs no documentation edit for
@@ -485,6 +487,36 @@ class UnreleasedStepMarkerTests(unittest.TestCase):
         disclosed = text.replace("prints the pins.", "prints the pins (changed after `v2000.01.01`).")
         self.assertEqual(self.unmarked_changes(disclosed, changed, "ok", "v2000.01.01"), [])
         self.assertEqual(self.unmarked_changes("## Other\n\nNo mention.\n", changed, "ok", "v2000.01.01"), [])
+
+
+class PluginRevisionCheckTests(unittest.TestCase):
+    """bootstrap.md's plugin revision check compares installed_plugins.json with a copy of the
+    recipe table's reviewed commits; the copy must not drift from the table."""
+
+    RECIPE_ROWS = {"context-mode@context-mode": "context-mode", "claude-hud@claude-hud": "claude-hud",
+                   "codex@openai-codex": "codex-for-claude"}
+    QUOTED_RE = re.compile(r'"([\w.-]+@[\w.-]+)": "([0-9a-f]{40})"')
+
+    def recipe_commits(self) -> dict[str, str | None]:
+        lines = (ROOT / "recipes/README.md").read_text(encoding="utf-8").splitlines()
+        commits = {}
+        for key, row in self.RECIPE_ROWS.items():
+            line = next((line for line in lines if line.startswith(f"| `{row}` · ")), "")
+            match = HASH_RE.search(line)
+            commits[key] = match.group(0) if match else None
+        return commits
+
+    def test_the_bootstrap_check_quotes_the_recipe_rows(self):
+        recipe = self.recipe_commits()
+        self.assertNotIn(None, recipe.values(), "every named recipe row carries a 40-hex commit")
+        bootstrap = dict(self.QUOTED_RE.findall((ROOT / "adoption/bootstrap.md").read_text(encoding="utf-8")))
+        self.assertEqual(bootstrap, recipe)
+
+    def test_the_check_rejects_a_drifted_commit(self):
+        text = (ROOT / "adoption/bootstrap.md").read_text(encoding="utf-8")
+        quoted = dict(self.QUOTED_RE.findall(text))
+        drifted = text.replace(quoted["context-mode@context-mode"], "0" * 40)
+        self.assertNotEqual(dict(self.QUOTED_RE.findall(drifted)), self.recipe_commits())
 
 
 if __name__ == "__main__":

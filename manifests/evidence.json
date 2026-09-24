@@ -3177,8 +3177,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "795403e602aa2f0638790629e5d10b10377e4a004bb3afe3be2f7c94de2fe4be",
-      "bytes": 16600
+      "sha256": "0876763145d602e64623090848de62c7e3b12e4170758ef36e66748b6cd6e5f5",
+      "bytes": 18246
     },
     {
       "path": "adoption/host-receipt.schema.json",
@@ -9403,8 +9403,8 @@
     },
     {
       "path": "docs/community-native-practice.md",
-      "sha256": "9f2187980fb7d8619f711d00771e591038d7685fcbbd3230914648e73b1020c0",
-      "bytes": 19528
+      "sha256": "4b81a1222e96d117f86605313b6badfa629ad4e021e31a27c162fabec271c263",
+      "bytes": 33565
     },
     {
       "path": "docs/comparison-progress-20260922.md",
@@ -28168,8 +28168,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "64a91a01eeaf500aa5eff8e51738e91d29faf60fd28e913cecc4eac9dd69f20b",
-      "bytes": 58202
+      "sha256": "1831e2d9937faa197d95135af533d4c810deabc6488867a1a3d03d613c6cc3b0",
+      "bytes": 59229
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
@@ -28183,8 +28183,8 @@
     },
     {
       "path": "recipes/claude-native-profile.md",
-      "sha256": "b494154dddde7c415711c03b4ed4d44e5fde95f0a02d1b1349f65b5859095856",
-      "bytes": 16440
+      "sha256": "3795b9001f6511ffd08ba7b5dbf5d6fb85df722d6fbb14ea91aaae13c9d6ec3b",
+      "bytes": 16654
     },
     {
       "path": "recipes/claude-native-ultracode.md",
@@ -28533,8 +28533,8 @@
     },
     {
       "path": "tests/test_effort_default_guard.py",
-      "sha256": "b8a63c2cca3304c730c96b9185bd9dce580eef97fb8949481fb0f4febf896fb3",
-      "bytes": 10546
+      "sha256": "c8f1493c6c6b28b69d8a74c44883b3c2bfe21247a9687864b019b3af725bbcb1",
+      "bytes": 16274
     },
     {
       "path": "tests/test_execution_realism.py",
