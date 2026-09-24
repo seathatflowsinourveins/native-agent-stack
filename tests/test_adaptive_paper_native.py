@@ -325,36 +325,6 @@ class NativeIntegration(unittest.TestCase):
                 session.node.dispose()
             self.assertEqual(port.submissions, [])
 
-    def test_execution_price_recovers_the_paper_grml_exit(self):
-        # Paper trial mover-mac-20260924a: 11 shares at 15.00, then 1 and 1 at 15.01, reported as
-        # cumulative averages 15.000833 and 15.001538 on a 4-decimal mover instrument. Before this
-        # the adapter derived 15.009996 and stopped the trial with adapter_error.
-        D, price = Decimal, ADAPTER.execution_price
-        self.assertEqual(price(D(11), D(165), D(12), D("15.000833"), 4), D("15.0100"))
-        self.assertEqual(price(D(12), D("180.01"), D(13), D("15.001538"), 4), D("15.0100"))
-        # The stream's own execution price is taken when it is consistent with the average.
-        self.assertEqual(price(D(11), D(165), D(12), D("15.000833"), 4, event_qty="1", event_price="15.01"), D("15.01"))
-
-    def test_execution_price_keeps_refusing_what_it_cannot_determine(self):
-        D, price = Decimal, ADAPTER.execution_price
-        # An exact derivation is unchanged; so is a sub-dollar one at 4 decimals.
-        self.assertEqual(price(D(1), D("10.00"), D(2), D("10.005"), 2), D("10.01"))
-        self.assertEqual(price(D(2), D("1.8708"), D(3), D("0.935433"), 4), D("0.9355"))
-        # An event price inconsistent with the average, or for other shares, is ignored.
-        self.assertEqual(price(D(11), D(165), D(12), D("15.000833"), 4, event_qty="1", event_price="15.02"), D("15.0100"))
-        self.assertEqual(price(D(11), D(165), D(12), D("15.000833"), 4, event_qty="2", event_price="15.01"), D("15.0100"))
-        # When the average's rounding bound reaches half a price unit, the nearest price is not
-        # unique: 6,000 shares x 0.000001 = 0.006 for one new share on a 2-decimal instrument
-        # (true 15.01, derived 15.012). An average implying a non-positive price is refused too.
-        with self.assertRaisesRegex(ValueError, "cumulative_fill_precision_requires_reconciliation"):
-            price(D(5999), D("89985.00"), D(6000), D("15.000002"), 2)
-        with self.assertRaisesRegex(ValueError, "cumulative_fill_precision_requires_reconciliation"):
-            price(D(1), D("15.00"), D(2), D("7"), 2)
-        # The bound comes from the reported decimals, never finer than six.
-        self.assertEqual(ADAPTER.avg_price_unit(D("15.000833")), D("0.000001"))
-        self.assertEqual(ADAPTER.avg_price_unit(D("15.000833333")), D("0.000001"))
-        self.assertEqual(ADAPTER.avg_price_unit(D("15.01")), D("0.01"))
-
     def test_native_equity_model_does_not_claim_fractional_precision(self):
         ins = ADAPTER.instrument({"symbol": "SPY", "lot_size": "1"})
         self.assertEqual(ins.size_precision, 0)

@@ -74,11 +74,16 @@ precondition required this trial to end `passed` or `completed_no_signals`.
 
 ## Change that follows
 
-`native_adapter.execution_price` now takes each fill's own execution price from the trade-update event when the
-event's quantity equals the new shares and the price agrees with the reported average. Otherwise it rounds the derived
-price to the instrument's precision only when the average's reporting bound is under half a price unit, so exactly
-one price is consistent. Anything else still stops the adapter. The native tests reproduce this run's arithmetic and
-fail on the previous adapter (`tests/test_adaptive_paper_native.py`).
+`fills.resolve_execution` now gives the native adapter each fill's price:
+- The trade-update event's own execution price, when the event's quantity equals the new shares. It must be on the
+  grid and agree with the reported average.
+- Otherwise, the one whole-tick notional within the average's reporting bound, divided into an on-grid price per share.
+- Anything else still stops the adapter.
+
+The ledger's limit check now halts only on a violation that is certain within the same bound. An independent
+pre-merge review from a different model family found the first version of this fix too narrow, and its cases are now
+tests (`tests/test_adaptive_paper_fills.py`, `tests/test_adaptive_paper_safety.py`). The native tests reproduce this
+run's arithmetic and fail on the previous adapter (`tests/test_adaptive_paper_native.py`).
 
 ## Records and their limits
 
