@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "kind": "native_read_only_check",
+  "evidence_class": "native_network",
+  "observed_on": "2026-09-24",
+  "subject": "blueprints/us-equities/adaptive-paper/corporate_actions.py AlpacaCorporateActionsSource.fetch",
+  "method": "Coordinator ran the source's fetch() against Alpaca's corporate-actions data endpoint with the host's dedicated paper account keys (loaded through adaptive-paper runner.credentials from the alpaca-paper inventory entry; never printed). Read-only market-data requests; no orders.",
+  "runtime": "alpaca-py 0.44.0, Python 3.12.3 (pinned adaptive-paper runtime)",
+  "queries": [
+    {"symbols": ["NVDA"], "start": "2024-06-01", "end": "2024-06-15",
+     "observed": [{"symbol": "NVDA", "action_type": "forward_split", "action_date": "2024-06-10"}],
+     "expected": "NVDA 10-for-1 forward split, ex-date 2024-06-10", "match": true},
+    {"symbols": ["AAPL"], "start": "2024-08-05", "end": "2024-08-16",
+     "observed": [{"symbol": "AAPL", "action_type": "cash_dividend", "action_date": "2024-08-12"}],
+     "expected": "AAPL quarterly cash dividend, ex-date 2024-08-12", "match": true},
+    {"symbols": ["TSLA"], "start": "2024-06-01", "end": "2024-06-15",
+     "observed": [],
+     "expected": "no corporate action in the window", "match": true}
+  ],
+  "claim_boundary": "Confirms that the live Alpaca source returns and normalizes these three historical windows correctly (type and governing date). It does not exercise the guard inside a running paper trial, a multi-day overnight resume, the refresh cadence against the endpoint's rate limits, or action types other than forward split and cash dividend.",
+  "not_retained": "The raw API responses and the exact command line were not retained; the observed values above are the complete normalized output."
+}
