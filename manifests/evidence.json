@@ -3224,8 +3224,8 @@
     },
     {
       "path": "adoption/credential-inventory.json",
-      "sha256": "78effc097dfbf1e3e09ee1d81f25d0f6cf67e6335cd1208a26403992a391c8d7",
-      "bytes": 11573
+      "sha256": "a164c072941274ed5f158d32437bb630550a7d582188971658780669ec244639",
+      "bytes": 11605
     },
     {
       "path": "adoption/host-receipt.schema.json",
@@ -10160,8 +10160,8 @@
     },
     {
       "path": "docs/secret-storage.md",
-      "sha256": "3a984c5d785b7bd849842250fa924822a4af8425407bcde37452e09557991b70",
-      "bytes": 24231
+      "sha256": "3791e7d42de764b8a991b14a158e2ae855586a30cbab3b703ccb657c4e8a2177",
+      "bytes": 26445
     },
     {
       "path": "docs/stack.md",
@@ -28785,8 +28785,8 @@
     },
     {
       "path": "scripts/credential_status.py",
-      "sha256": "be18cbce171d3fe0a83f19307260340f3a3abe2e7046d237a105004a8b629b82",
-      "bytes": 19706
+      "sha256": "689960fc56fe48ada78a880464b271b045a7c626875108ed586f64b9f294c237",
+      "bytes": 19904
     },
     {
       "path": "scripts/git-hooks/pre-commit",
@@ -29100,8 +29100,8 @@
     },
     {
       "path": "tests/test_credential_status.py",
-      "sha256": "264c6931ca3d0ddd94c143b89ea9b05e901cc5c839dc88486957dfd89c383821",
-      "bytes": 15723
+      "sha256": "2041c9d2718be6857e0a0741ea978294bb658053b83b085350413d57ec13a6be",
+      "bytes": 16410
     },
     {
       "path": "tests/test_delisting_coverage.py",
