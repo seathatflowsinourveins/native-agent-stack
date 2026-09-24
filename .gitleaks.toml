@@ -207,6 +207,7 @@ condition = "AND"
 paths = [
   '''^blueprints/convergence-practice/service-reboot/attempt-1/freeze\.json$''',
   '''^blueprints/convergence-practice/service-reboot/attempt-2/freeze\.json$''',
+  '''^blueprints/us-equities/adaptive-paper/source-hashes\.json$''',
   '''^blueprints/us-equities/execution-realism/inputs\.json$''',
   '''^evidence/artifacts/catalog-clean-install-20260921/source-manifest\.json$''',
   '''^evidence/artifacts/full-stack-convergence-20260921/native-token-workflow\.json$''',

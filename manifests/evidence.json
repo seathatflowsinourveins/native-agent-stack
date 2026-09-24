@@ -3169,8 +3169,8 @@
     },
     {
       "path": ".gitleaks.toml",
-      "sha256": "35a3e985b43c6a869718cb2d7373de5b977913fc18812a33a9bbc282f2aa2e69",
-      "bytes": 25402
+      "sha256": "3fb9db3cf3e48d0fb76606dfaef6a968b39bdddee5c6d2edbb749165ac9baff4",
+      "bytes": 25471
     },
     {
       "path": ".gitleaksignore",
