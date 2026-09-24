@@ -60,6 +60,17 @@ class AdaptiveStrategy(Strategy):
         # flagged for a forced flatten (finding 5).
         self._ca_ever_flagged = set()
         self._ca_last_must_flatten = set()
+        # MEDIUM finding 4 (2026-09-24 fix round 3): the CURRENT (this
+        # tick's) set of HELD symbols the guard flagged needs_attention --
+        # lookup failed, ambiguous, degraded, or a calendar/session-unknown
+        # fallback -- regardless of must_flatten. runner.py's
+        # _honest_overnight_hold reads this so a held position whose
+        # corporate-action status was never positively verified clear for
+        # the next session cannot end the run as a successful
+        # "held_overnight" (exit 0) just because nothing forced a flatten;
+        # block-and-flag is the documented policy, declaring the run a
+        # clean success is not.
+        self._ca_last_needs_attention_held = set()
         # G-e: the broker-proven margin multiplier (runner.py's config
         # "_account_multiplier", only ever set after preflight has checked
         # multiplier >= requested leverage -- see runner._check_margin_
@@ -401,16 +412,21 @@ class AdaptiveStrategy(Strategy):
                                               block_entry=True, must_flatten=False, needs_attention=True,
                                               action_type=None, action_date=None)
             self._ca_last_must_flatten = set()
+            # MEDIUM finding 4: every held symbol is needs_attention in this
+            # fallback (the calendar itself could not be classified).
+            self._ca_last_needs_attention_held = set(held_symbols)
             return relevant, set()
         decisions = self.corporate_action_guard.evaluate(
             today=info.session_date, next_session_date=next_session_date,
             held_symbols=held_symbols, candidate_symbols=set(candidate_symbols), now=now)
-        block_entry, must_flatten = set(), set()
+        block_entry, must_flatten, needs_attention_held = set(), set(), set()
         for symbol, decision in decisions.items():
             if decision.block_entry:
                 block_entry.add(symbol)
             if decision.must_flatten:
                 must_flatten.add(symbol)
+            if decision.needs_attention and symbol in held_symbols:
+                needs_attention_held.add(symbol)
             if decision.block_entry or decision.must_flatten or decision.needs_attention:
                 self._emit_ca_event_on_change(
                     symbol, decision.reason, block_entry=decision.block_entry,
@@ -418,12 +434,33 @@ class AdaptiveStrategy(Strategy):
                     action_type=decision.action_type,
                     action_date=decision.action_date.isoformat() if decision.action_date else None)
             else:
-                # Symbol has gone clear (no block/flatten/attention this
-                # tick) -- drop any tracked prior state so a FUTURE
-                # re-block is treated as a change and re-emitted, not
-                # suppressed as "unchanged from a stale clear tick".
+                # NIT finding 9 (fix round 3): symbol has gone clear (no
+                # block/flatten/attention this tick). If it was PREVIOUSLY
+                # flagged (an entry exists in `_ca_last_emitted`), emit one
+                # explicit "cleared" event so the resolution itself is
+                # visible in the event log, not just its silence -- an
+                # operator reading the stream should be able to see a
+                # symbol's corporate-action status resolve, not only infer
+                # it from the absence of further events. A symbol that was
+                # never flagged in the first place (the common case, every
+                # tick, for the vast majority of symbols) gets no event at
+                # all, exactly as before. Drop the tracked prior state
+                # regardless, so a FUTURE re-block is treated as a change
+                # and re-emitted, not suppressed as "unchanged from a stale
+                # clear tick".
+                if symbol in self._ca_last_emitted:
+                    self.event_sink({"type": "corporate_action_guard", "symbol": symbol,
+                                     "block_entry": False, "must_flatten": False,
+                                     "needs_attention": False, "reason": "corporate_action_cleared",
+                                     "action_type": None, "action_date": None})
                 self._ca_last_emitted.pop(symbol, None)
         self._ca_last_must_flatten = set(must_flatten)
+        # MEDIUM finding 4: a held symbol absent from `decisions` entirely
+        # (should not happen -- evaluate_guard decides every held|candidate
+        # symbol -- but this method does not trust that blindly) is treated
+        # the same fail-closed way as everywhere else in this guard: not
+        # positively verified clear, so it stays in the attention set.
+        self._ca_last_needs_attention_held = needs_attention_held | (held_symbols - set(decisions))
         return block_entry, must_flatten
 
     def _emit_ca_event_on_change(self, symbol, reason, *, block_entry, must_flatten, needs_attention,
@@ -821,10 +858,19 @@ class AdaptiveStrategy(Strategy):
         # Trading-lane audit gap #8: evaluated after gap risk (whose own
         # arming/capture state is independent of it) but consumed first,
         # below -- see corporate_actions.py's module docstring for the full
-        # precedence contract. `candidate_symbols` is this tick's targets,
-        # the only symbols a fresh/added entry could apply to.
+        # precedence contract. `candidate_symbols` is this tick's targets
+        # PLUS every symbol with a still-resting (not yet cancel-requested)
+        # pending BUY order (MEDIUM finding 5, fix round 3): a symbol whose
+        # signal disappeared from decision.targets THIS tick -- its resting
+        # buy from a PRIOR tick is still live -- must still be evaluated by
+        # the guard; evaluating only decision.targets.keys() meant a
+        # corporate action discovered after the signal vanished never
+        # entered ca_block_entry, so the cancel_expired(...symbols=ca_block_
+        # entry) call below never saw that resting buy at all.
+        pending_buy_symbols = {info["symbol"] for info in self.pending.values()
+                               if info.get("side") == "buy" and not info.get("cancel_requested")}
         ca_block_entry, ca_must_flatten = self._corporate_action_guard_symbols(
-            now, held, decision.targets.keys())
+            now, held, decision.targets.keys() | pending_buy_symbols)
         # finding 10 (2026-09-24 fix round): a resting BUY order for a
         # symbol newly blocked this tick must not be left to fill after the
         # block was decided -- cancel it immediately, the same treatment

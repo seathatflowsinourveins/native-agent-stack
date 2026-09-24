@@ -4,7 +4,7 @@
   "evidence_class": "native_network",
   "observed_on": "2026-09-24",
   "subject": "blueprints/us-equities/adaptive-paper/corporate_actions.py AlpacaCorporateActionsSource.fetch",
-  "method": "Coordinator ran the source's fetch() against Alpaca's corporate-actions data endpoint with the host's dedicated paper account keys (loaded through adaptive-paper runner.credentials from the alpaca-paper inventory entry; never printed). Read-only market-data requests; no orders.",
+  "method": "Coordinator ran the source's fetch() (and, for the raw-lag row below, the private _get_marketdata it now calls directly for data_quality=all) against Alpaca's corporate-actions data endpoint with the host's dedicated paper account keys (loaded through adaptive-paper runner.credentials from the alpaca-paper inventory entry; never printed). Read-only market-data requests; no orders.",
   "runtime": "alpaca-py 0.44.0, Python 3.12.3 (pinned adaptive-paper runtime)",
   "queries": [
     {"symbols": ["NVDA"], "start": "2024-06-01", "end": "2024-06-15",
@@ -18,13 +18,38 @@
      "expected": "no corporate action in the window", "match": true},
     {"symbols": ["AAPL"], "start": "2024-08-09", "end": "2024-08-12",
      "observed": [],
-     "expected": "CRITICAL finding 1 (fix round, 2026-09-24): this is the guard's actual PRE-FIX production window -- today..next_session around the real 2024-08-12 ex-date -- proving the endpoint filters by process date (a cash dividend's payable date, typically 1-3 weeks after ex_date), not ex_date, so a narrow window systematically misses a real dividend it should have caught",
+     "expected": "CRITICAL finding 1 (fix round 2, 2026-09-24): this is the guard's actual PRE-FIX production window -- today..next_session around the real 2024-08-12 ex-date -- demonstrating the endpoint's server-side filtering misses a real dividend from a narrow window",
      "match": true, "note": "negative result -- confirms the bug, not a mismatch against an expected action"},
-    {"symbols": ["AAPL"], "start": "2024-08-05", "end": "2024-11-10",
+    {"symbols": ["AAPL"], "start": "2024-08-05", "end": "2024-11-10", "anchor": "2024-08-12",
      "observed": [{"symbol": "AAPL", "action_type": "cash_dividend", "action_date": "2024-08-12"}],
-     "expected": "AAPL quarterly cash dividend, ex-date 2024-08-12 -- re-check with the FIXED window logic (runner._corporate_action_fetch_window: anchor-7d .. anchor+90d, matching CORPORATE_ACTION_FETCH_WINDOW_PAST_DAYS/FUTURE_DAYS), which recovers the same dividend the narrow window above missed",
+     "expected": "AAPL quarterly cash dividend, ex-date 2024-08-12 -- fix round 3, item 8: this window is a MANUAL 2024 approximation of runner._corporate_action_fetch_window's own arithmetic (anchor - CORPORATE_ACTION_FETCH_WINDOW_PAST_DAYS(7) .. anchor + CORPORATE_ACTION_FETCH_WINDOW_FUTURE_DAYS(90)), substituting the anchor date directly for next_trading_day(anchor) because sessions.py's frozen calendar does not cover 2024 at all (next_trading_day(anchor) would raise session_calendar_out_of_range) -- it is NOT the function's own literal output for this date. See the next row for the function's real output on a date it can actually classify.",
+     "match": true},
+    {"symbols": [], "kind": "fetch_window_function_on_a_classifiable_anchor",
+     "anchor": "2026-09-24", "next_session_date": "2026-09-25", "start": "2026-09-17", "end": "2026-12-24",
+     "expected": "fix round 3, item 8: runner._corporate_action_fetch_window(date(2026, 9, 24))'s own real, unmodified output (2026 is the only year the frozen sessions.py calendar covers) -- confirms the -7/+90 padding around the ACTUAL next_trading_day, not a hand-substituted anchor",
+     "match": true, "note": "no source query -- a pure local function call, listed here to make the 2024 approximation above verifiably distinct from the function's real behaviour"},
+    {"symbols": ["AAPL"], "start": "2024-08-01", "end": "2024-08-20", "kind": "raw_record_lag",
+     "observed": [{"symbol": "AAPL", "ex_date": "2024-08-12", "payable_date": "2024-08-15",
+                   "process_date": "2024-08-15", "record_date": "2024-08-12", "rate": 0.25,
+                   "cusip": "037833100"}],
+     "expected": "fix round 3, item 6/item 8: the RAW record (queried with data_quality=all via the private _get_marketdata the fixed fetch() now calls directly -- this wrapper's own ActionRecord normalization discards process_date/payable_date, so this row queries the raw response to observe them) shows a 3-DAY governing(ex_date)-to-process(process_date/payable_date) lag for this specific dividend (2024-08-12 -> 2024-08-15) -- matching Apple's own published dividend history (https://investor.apple.com/dividend-history/: ex-date August 12 2024, payment date August 15 2024). This CORRECTS the earlier '1-3 weeks' claim in this same file's prior claim_boundary, which was never measured against this record's own raw fields.",
      "match": true}
   ],
-  "claim_boundary": "Confirms that the live Alpaca source returns and normalizes these historical windows correctly (type and governing date), AND that the guard's original today..next_session fetch window was too narrow to reliably observe a real dividend (Alpaca's endpoint filters by process/payable date, not the ex_date this guard's evaluate_guard logic checks against) -- see corporate-actions-native-check-20260924's negative_query row above and blueprints/us-equities/alpaca-historical/README.md:35-36/collect.py:202-204 for the documented endpoint behaviour this reflects. The 2026-09-24 fix round widens the fetch window to anchor-7d..anchor+90d (runner.py's CORPORATE_ACTION_FETCH_WINDOW_PAST_DAYS/FUTURE_DAYS) and filters locally on the governing date in evaluate_guard, which the wide-window re-check row above confirms recovers the dividend. This check still does not exercise the guard inside a running paper trial end-to-end, a multi-day overnight resume against the live endpoint, the refresh cadence against the endpoint's rate limits, or action types other than forward split and cash dividend -- and a single historical dividend's 1-3-week process-date lag is not proof that every action type's process-date lag fits within the fixed 90-day forward pad.",
-  "not_retained": "The raw API responses and the exact command line were not retained; the observed values above are the complete normalized output."
+  "lag_observations": {
+    "purpose": "fix round 3, item 6: record the concrete governing-date/process-date lag observations behind the 90-day forward pad (CORPORATE_ACTION_FETCH_WINDOW_FUTURE_DAYS), each with its source, so the pad is traceable evidence rather than an unqualified round number.",
+    "observations": [
+      {"source": "this file's own raw_record_lag query above (native, 2026-09-24)",
+       "symbol": "AAPL", "action_type": "cash_dividend", "ex_date": "2024-08-12",
+       "process_date": "2024-08-15", "lag_days": 3},
+      {"source": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/1-alpaca-corporateactions-docs.excerpt.json (components.schemas.cash_dividend example, retained from https://docs.alpaca.markets/us/reference/corporateactions-1)",
+       "symbol": "FCF", "action_type": "cash_dividend", "ex_date": "2023-05-04",
+       "process_date": "2023-05-19", "payable_date": "2023-05-19", "lag_days": 15},
+      {"source": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/1-alpaca-corporateactions-docs.excerpt.json (sse_example.CashDividend, retained from https://docs.alpaca.markets/us/reference/corporateactions-1)",
+       "symbol": "AAPL", "action_type": "cash_dividend", "ex_date": "2026-05-09",
+       "process_date": "2026-05-15", "payable_date": "2026-05-15", "lag_days": 6}
+    ],
+    "assumption": "fix round 3, item 6 (unresolved): these three observed lags (3, 6, 15 days) all fit comfortably within the 90-day forward pad, and none of the three or four documented action types checked here has ever been observed to exceed it. This is NOT proof that every action type's governing-to-process lag stays under 90 days -- no dividend or other action exceeding 90 days has been found OR searched for exhaustively, and Alpaca's own documentation does not state a maximum lag or guarantee upcoming-action announcement availability at all (an empty response cannot establish comprehensive absence of an upcoming action). The 90-day pad remains a documented, evidence-backed but unproven assumption, not an established bound."
+  },
+  "claim_boundary": "Confirms that the live Alpaca source returns and normalizes these historical windows correctly (type and governing date), that the guard's original today..next_session fetch window was too narrow to reliably observe a real dividend (Alpaca's endpoint filters by process/payable date, not the ex_date this guard's evaluate_guard logic checks against), and the exact 3-day governing-to-process lag for this specific AAPL dividend (see raw_record_lag row and lag_observations above -- corrects this file's own earlier, unmeasured '1-3 weeks' claim). It does NOT establish a maximum lag bound for any action type (see lag_observations.assumption), does not exercise the guard inside a running paper trial end-to-end, a multi-day overnight resume against the live endpoint, the refresh cadence against the endpoint's rate limits, the raw_data=True/data_quality=all/unmapped-bucket-type parsing path introduced in fix round 3 (covered instead by tests/test_adaptive_paper_corporate_actions.py's faked-HTTP-response tests, not this native check), or action types other than forward split and cash dividend.",
+  "not_retained": "The raw API responses beyond what is quoted above, and the exact command line, were not retained; the observed values above are the complete normalized/raw output actually read."
 }

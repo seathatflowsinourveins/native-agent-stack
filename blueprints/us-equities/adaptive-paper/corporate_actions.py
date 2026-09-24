@@ -62,6 +62,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import date
+import threading
 import time as _time
 from typing import Mapping
 
@@ -225,11 +226,31 @@ class CorporateActionMonitor:
         # overwrites (and thereby silently cancels) a previously confirmed
         # in-range corporate action.
         self._degraded: set = set()
+        # HIGH finding 1 (2026-09-24 fix round 3): `refresh()` runs in a
+        # caller-owned worker thread (runner.py's asyncio.to_thread) bounded
+        # by a wait_for timeout on the CALLER side -- the timeout only stops
+        # the caller from waiting, it cannot stop the thread itself
+        # (reproduced: an older, slower attempt finishing after a newer one
+        # already wrote a confirmed must_flatten silently turned it back
+        # off, because both attempts wrote into `_results` unconditionally
+        # with no ordering guard). `_generation` is bumped, under `_lock`,
+        # at the START of every `refresh()` attempt; only the write from
+        # the CURRENT (latest-started) generation is ever applied --
+        # `_apply_success`/`_apply_failure` drop a write from any earlier,
+        # superseded generation even if it happens to complete later.
+        # `refresh_timed_out()` (called by the async scheduler when its own
+        # wait_for gives up on a still-running attempt) also bumps the
+        # generation, so that attempt's eventual write -- success or
+        # failure, whenever the thread actually finishes -- is dropped too.
+        self._lock = threading.Lock()
+        self._generation = 0
 
     def refresh(self, symbols, *, start: date, end: date, now=None):
         """Idempotent within `refresh_seconds` for a symbol set already
         covered by the last successful fetch AND fetched for this same
-        (start, end) window; always safe to call every tick. Never raises,
+        (start, end) window; always safe to call every tick, including
+        concurrently from multiple threads (finding 1) -- every state
+        mutation is generation-checked under `self._lock`. Never raises,
         and never overwrites a previously successful result with
         `LOOKUP_FAILED` (finding 3) -- a fetch failure only marks every
         requested symbol DEGRADED (see `_mark_degraded`); `evaluate()`
@@ -238,45 +259,81 @@ class CorporateActionMonitor:
         now = self._clock() if now is None else now
         symbols = set(symbols)
         window = (start, end)
-        # finding 8: a throttle interval of `retry_seconds` (short) rather
-        # than `refresh_seconds` (long) whenever the LAST attempt failed --
-        # a transient failure gets retried again in about a minute instead
-        # of waiting out the full ordinary interval.
-        interval = self.retry_seconds if self._last_attempt_failed else self.refresh_seconds
-        if (self._last_attempt is not None and now - self._last_attempt < interval
-                and symbols.issubset(self._results.keys()) and self._last_window == window):
-            return
-        self._last_attempt = now
-        self._last_window = window
+        with self._lock:
+            # finding 8: a throttle interval of `retry_seconds` (short)
+            # rather than `refresh_seconds` (long) whenever the LAST
+            # attempt failed -- a transient failure gets retried again in
+            # about a minute instead of waiting out the full ordinary
+            # interval.
+            interval = self.retry_seconds if self._last_attempt_failed else self.refresh_seconds
+            if (self._last_attempt is not None and now - self._last_attempt < interval
+                    and symbols.issubset(self._results.keys()) and self._last_window == window):
+                return
+            self._last_attempt = now
+            self._last_window = window
+            self._generation += 1
+            my_generation = self._generation
         try:
             fetched = self.source.fetch(sorted(symbols), start, end)
         except CorporateActionLookupError:
-            self._last_attempt_failed = True
-            self._mark_degraded(symbols)
+            self._apply_failure(symbols, my_generation)
             return
         except Exception:
             # Fail closed (degraded, not overwritten) on any unexpected
             # error too -- never guess.
+            self._apply_failure(symbols, my_generation)
+            return
+        self._apply_success(symbols, fetched, now, my_generation)
+
+    def refresh_timed_out(self, symbols):
+        """HIGH finding 1: called by the async scheduler (runner.py's
+        `_schedule_corporate_action_refresh`) when ITS OWN wait_for gives up
+        on a `refresh()` call still running in a worker thread. The thread
+        keeps running (Python cannot forcibly kill it), so this both (a)
+        bumps the generation counter, invalidating that in-flight attempt --
+        whenever it does eventually finish, `_apply_success`/`_apply_failure`
+        will see a stale generation and drop the write -- and (b) treats the
+        timeout itself as an ordinary failure right now (degraded, short
+        `retry_seconds` retry interval), exactly as if `fetch()` had raised,
+        rather than silently leaving the cache in its last (possibly clear)
+        state until the abandoned attempt happens to resolve on its own."""
+        with self._lock:
+            self._generation += 1
             self._last_attempt_failed = True
             self._mark_degraded(symbols)
-            return
-        self._last_attempt_failed = False
-        self._last_success = now
-        for symbol in symbols:
-            # finding 7a: a symbol the source's fetch() silently omits from
-            # its returned dict (never true of AlpacaCorporateActionsSource,
-            # which always returns every requested symbol, but not
-            # guaranteed of an injected test/fake source) must fail closed,
-            # never be read as "no action".
-            self._results[symbol] = fetched.get(symbol, LOOKUP_FAILED)
-            self._degraded.discard(symbol)
+
+    def _apply_failure(self, symbols, generation):
+        with self._lock:
+            if generation != self._generation:
+                return  # superseded by a later attempt (or a timeout) -- drop
+            self._last_attempt_failed = True
+            self._mark_degraded(symbols)
+
+    def _apply_success(self, symbols, fetched, now, generation):
+        with self._lock:
+            if generation != self._generation:
+                return  # superseded -- an older result must never overwrite a newer one
+            self._last_attempt_failed = False
+            self._last_success = now
+            for symbol in symbols:
+                if symbol in fetched:
+                    self._results[symbol] = fetched[symbol]
+                    self._degraded.discard(symbol)
+                else:
+                    # LOW finding 7 (fix round 3): a symbol omitted from an
+                    # OTHERWISE successful fetch (most other symbols
+                    # resolved fine) must not erase its own previously
+                    # confirmed record -- treat exactly like a per-symbol
+                    # failure (degraded, last good record preserved), never
+                    # overwrite with LOOKUP_FAILED.
+                    self._mark_degraded((symbol,))
 
     def _mark_degraded(self, symbols):
         """finding 3: only ever ADD to `_degraded` and, for a symbol never
         previously fetched at all, seed a `LOOKUP_FAILED` baseline via
         `setdefault` -- never touch an existing `_results` entry, so a
         previously confirmed corporate action survives a later failed
-        refresh untouched."""
+        refresh untouched. Callers hold `self._lock`."""
         for symbol in symbols:
             self._degraded.add(symbol)
             self._results.setdefault(symbol, LOOKUP_FAILED)
@@ -292,9 +349,10 @@ class CorporateActionMonitor:
         # last known good ActionRecord list (if any) is still read below,
         # so a confirmed in-range action is preserved (with needs_attention
         # added) rather than silently cancelled by staleness alone.
-        stale = self._last_success is None or now - self._last_success > self.max_age_seconds
-        results = {symbol: self._results.get(symbol, LOOKUP_FAILED) for symbol in relevant}
-        degraded = (relevant if stale else set()) | (self._degraded & relevant)
+        with self._lock:
+            stale = self._last_success is None or now - self._last_success > self.max_age_seconds
+            results = {symbol: self._results.get(symbol, LOOKUP_FAILED) for symbol in relevant}
+            degraded = (relevant if stale else set()) | (self._degraded & relevant)
         return evaluate_guard(today=today, next_session_date=next_session_date,
                               held_symbols=held_symbols, candidate_symbols=candidate_symbols,
                               lookup_results=results, degraded_symbols=degraded)
@@ -335,17 +393,36 @@ class AlpacaCorporateActionsSource:
     key/secret runner.credentials() already returns; never logs, stores, or
     raises them in any exception message."""
 
-    # HIGH finding 2: request cap -- installed alpaca-py==0.44.0's
-    # CorporateActionsRequest defaults `limit` to 1000 and its
-    # `CorporateActionsClient._get_marketdata` call never exposes this
-    # wrapper's own pagination beyond that single page. A result at or past
-    # this cap cannot be trusted as complete (finding 1's ambiguous-count
-    # requirement below).
+    # HIGH finding 2 (fix round 3): request cap -- alpaca-py==0.44.0's
+    # CorporateActionsRequest defaults `limit` to 1000, and its
+    # `RESTClient._get_marketdata` (verified via `inspect.getsource` against
+    # the installed package) DOES auto-paginate across `next_page_token`,
+    # accumulating items from every page up to this `limit` -- so a result
+    # at or past this cap means more matching rows may exist beyond what was
+    # requested, not that pagination silently stopped after one page (an
+    # earlier round of this comment was wrong about that).
     _REQUEST_LIMIT = 1000
 
     def __init__(self, api_key, secret_key):
         from alpaca.data.historical.corporate_actions import CorporateActionsClient
-        self._client = CorporateActionsClient(api_key, secret_key)
+        # HIGH finding 2 (fix round 3): raw_data=True makes get_corporate_
+        # actions() (and the private _get_marketdata() this wrapper calls
+        # directly below) return the plain parsed-JSON dict instead of a
+        # CorporateActionsSet. This is required, not cosmetic:
+        # CorporateActionsSet.__init__ (verified via inspect.getsource
+        # against the installed alpaca-py==0.44.0 package) is a chain of 13
+        # `elif corporate_action_type == "..."` branches with NO else/
+        # default clause -- any bucket key it does not recognize (the
+        # Alpaca API reference documents `reorganizations`, `partial_calls`
+        # and `capital_gains_distributions` in addition to the 13 this
+        # wrapper's own _TYPE_FIELD_MAP models) is silently dropped by the
+        # SDK before this wrapper ever sees it, turning a real corporate
+        # action into an apparently-clear "no action" result, and its rows
+        # also never reach the cap check below. Parsing the raw dict
+        # ourselves (see fetch()) means an unmapped bucket key is visible to
+        # this wrapper's own _TYPE_FIELD_MAP.get(...) is None fail-closed
+        # path instead of vanishing inside the SDK first.
+        self._client = CorporateActionsClient(api_key, secret_key, raw_data=True)
         # HIGH finding 2: alpaca-py's RESTClient (verified against the
         # installed alpaca-py==0.44.0 RESTClient.__init__/_request) sets no
         # per-request HTTP timeout at all, and sleeps `_retry_wait` (default
@@ -353,8 +430,17 @@ class AlpacaCorporateActionsSource:
         # unbounded and slow by default. Pin a bounded connect/read timeout
         # directly onto the underlying requests.Session (mirroring
         # transport.py's own HTTP-boundary `timeout=(5, 5)` convention) and
-        # cut retries to the bare minimum, so one fetch() call is itself
-        # bounded even before runner.py's own asyncio wait_for() around it.
+        # cut retries to the bare minimum. NIT finding 9 (fix round 3): a
+        # `requests` timeout bounds each individual connect/read, not the
+        # call's total wall-clock duration -- a paginated multi-page fetch
+        # (`_get_marketdata` above) issues one HTTP request per page, and a
+        # slow-but-not-hung server could still make the overall fetch() call
+        # run for `pages * timeout`. The actual outer bound on one fetch()
+        # call is runner.py's own asyncio wait_for()
+        # (CORPORATE_ACTION_REFRESH_TIMEOUT_SECONDS) around the whole
+        # refresh() call this fetch() runs inside, not this per-request
+        # timeout alone; this timeout only prevents a single HTTP request
+        # from hanging indefinitely with no data ever arriving.
         session = self._client._session
         original_request = session.request
 
@@ -366,57 +452,108 @@ class AlpacaCorporateActionsSource:
         self._client._retry = 1
         self._client._retry_wait = 1
 
-    def fetch(self, symbols, start: date, end: date) -> dict:
-        """Returns `{symbol: [ActionRecord, ...]}` for exactly the
-        requested `symbols` (every requested symbol is present, possibly
-        with an empty list). Raises `CorporateActionLookupError` -- never a
-        raw alpaca-py/HTTP exception -- on any request or response-shape
-        failure, or on an unmapped/ambiguous result, so a caller never
-        needs to know alpaca-py's own exception types and never silently
-        treats an incomplete or unparseable response as "no action"."""
-        from alpaca.data.requests import CorporateActionsRequest
-        symbols = list(symbols)
+    @staticmethod
+    def _parse_date(value):
+        """A raw response field is an ISO date string (or absent/null) once
+        parsed from JSON -- never already a `datetime.date` (that only
+        happens through the SDK's own pydantic models, which this wrapper
+        no longer uses; see raw_data=True above). Returns None for
+        anything that is not a valid ISO date, rather than raising --
+        callers treat a missing/unparseable governing date as ambiguous for
+        that record's symbol(s), not as a whole-fetch failure."""
+        if not isinstance(value, str) or not value:
+            return None
         try:
-            request = CorporateActionsRequest(symbols=symbols, start=start, end=end,
-                                              limit=self._REQUEST_LIMIT)
-            response = self._client.get_corporate_actions(request)
+            return date.fromisoformat(value[:10])
+        except ValueError:
+            return None
+
+    def fetch(self, symbols, start: date, end: date) -> dict:
+        """Returns `{symbol: [ActionRecord, ...] | LOOKUP_AMBIGUOUS}` for
+        exactly the requested `symbols` (every requested symbol is present:
+        either its resolved list, possibly empty, or LOOKUP_AMBIGUOUS for a
+        symbol whose own record(s) could not be fully parsed -- MEDIUM
+        finding 3, fix round 3). Raises `CorporateActionLookupError` --
+        never a raw alpaca-py/HTTP exception -- on any request/transport
+        failure, a result at the page/limit cap, or an unmapped action-type
+        bucket, so a caller never needs to know alpaca-py's own exception
+        types and never silently treats an incomplete or unparseable
+        response as "no action" for every requested symbol.
+
+        HIGH finding 3 (fix round 3): requests `data_quality=all` --
+        Alpaca's documented default (`data_quality=complete`) excludes
+        records the provider itself considers incomplete (e.g. missing a
+        CUSIP/ISIN), which could otherwise make a real, known-symbol,
+        known-date upcoming action invisible to this guard with no
+        signal at all. `all` is not exposed as a typed field on the
+        installed alpaca-py==0.44.0 CorporateActionsRequest model (verified:
+        the field is silently dropped by its own to_request_fields(), a
+        pydantic extra="ignore" default), so this calls the client's own
+        private `_get_marketdata` directly with a hand-built params dict --
+        the same private method `get_corporate_actions()` itself calls --
+        instead of going through the typed request object for this one
+        parameter."""
+        symbols = list(symbols)
+        params = {"symbols": ",".join(symbols), "start": start.isoformat(), "end": end.isoformat(),
+                  "limit": self._REQUEST_LIMIT, "sort": "asc", "data_quality": "all"}
+        try:
+            raw = self._client._get_marketdata(path="/corporate-actions", params=params,
+                                               page_limit=1000, page_size=1000)
         except CorporateActionLookupError:
             raise
         except Exception as error:
             raise CorporateActionLookupError(type(error).__name__) from error
         out = {symbol: [] for symbol in symbols}
+        ambiguous_symbols = set()
         try:
-            raw = dict(getattr(response, "data", {}) or {})
+            raw = dict(raw or {})
             # finding 1 (result-count-at-cap is ambiguous): a response whose
-            # total item count reaches the request's own `limit` may have
-            # been truncated server-side with no signal to this wrapper
-            # about which symbol's records were cut off -- fail closed for
-            # this whole fetch rather than trust a possibly-partial result.
+            # total RAW item count (every bucket, including one this
+            # wrapper does not model -- see raw_data=True above) reaches the
+            # request's own `limit` may have been truncated server-side
+            # with no signal to this wrapper about which symbol's records
+            # were cut off -- fail closed for this whole fetch rather than
+            # trust a possibly-partial result.
             total_items = sum(len(items) for items in raw.values())
             if total_items >= self._REQUEST_LIMIT:
                 raise CorporateActionLookupError("result_at_page_or_limit_cap")
             for type_key, items in raw.items():
                 spec = _TYPE_FIELD_MAP.get(type_key)
                 if spec is None:
-                    # finding 7c: alpaca-py's own CorporateActionsSet
-                    # silently drops any type_key it does not model, and an
-                    # unmapped type_key here has no known governing-date or
-                    # symbol field this wrapper can trust to parse -- fail
-                    # closed (ambiguous) for the whole fetch rather than
-                    # silently skip an action type this guard does not yet
-                    # recognize.
+                    # finding 7c/finding 2 (fix round 3): an unmapped bucket
+                    # key (e.g. Alpaca's documented `reorganizations`,
+                    # `partial_calls`, `capital_gains_distributions`, or any
+                    # future type this guard's _TYPE_FIELD_MAP does not yet
+                    # know) has no known governing-date or symbol field this
+                    # wrapper can trust to parse -- fail closed (ambiguous)
+                    # for the whole fetch rather than silently skip an
+                    # action type this guard does not yet recognize. Now
+                    # actually reachable (raw_data=True, fix round 3): the
+                    # SDK's own CorporateActionsSet used to drop these
+                    # bucket keys before this wrapper ever saw them.
                     raise CorporateActionLookupError(f"unmapped_corporate_action_type:{type_key}")
                 symbol_fields, date_field, canonical_type = spec
                 for item in items:
-                    action_date = getattr(item, date_field, None)
+                    if not isinstance(item, dict):
+                        raise CorporateActionLookupError("malformed_corporate_action_item")
+                    action_date = self._parse_date(item.get(date_field))
+                    matched_symbols = [item.get(field) for field in symbol_fields
+                                      if item.get(field) and item.get(field) in out]
                     if action_date is None:
+                        # HIGH finding 3 (fix round 3): a record missing (or
+                        # carrying an unparseable) governing date -- e.g.
+                        # excluded-by-default incomplete data now included
+                        # via data_quality=all -- becomes ambiguous for
+                        # EVERY requested symbol it names, rather than being
+                        # silently skipped as if it never existed.
+                        ambiguous_symbols.update(matched_symbols)
                         continue
-                    for field in symbol_fields:
-                        symbol = getattr(item, field, None)
-                        if symbol and symbol in out:
-                            out[symbol].append(ActionRecord(
-                                symbol=symbol, action_type=canonical_type, action_date=action_date,
-                                source_id=str(getattr(item, "cusip", "") or type_key)))
+                    for symbol in matched_symbols:
+                        out[symbol].append(ActionRecord(
+                            symbol=symbol, action_type=canonical_type, action_date=action_date,
+                            source_id=str(item.get("cusip") or type_key)))
+            for symbol in ambiguous_symbols:
+                out[symbol] = LOOKUP_AMBIGUOUS
         except CorporateActionLookupError:
             raise
         except Exception as error:

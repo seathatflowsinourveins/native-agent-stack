@@ -807,6 +807,32 @@ class IntegratedRunner(unittest.TestCase):
         no_guard = {k: v for k, v in clean_outcome.items() if k != "corporate_action_guard"}
         self.assertTrue(_honest_overnight_hold(no_guard, session_policy, post_ts))
 
+    def test_honest_overnight_hold_false_when_a_held_symbol_was_never_verified_clear(self):
+        """MEDIUM finding 4 (fix round 3): a held symbol whose
+        corporate-action lookup failed/was ambiguous/went stale for the
+        whole run (needs_attention, but never a confirmed must_flatten --
+        the guard never even learned enough to know whether to flatten)
+        must ALSO refuse a "held_overnight" success. The documented policy
+        is block-and-flag: not flattening an unverified holding is correct,
+        but declaring the run a clean success while the attention flag is
+        still live is not."""
+        from datetime import datetime, timezone
+        from zoneinfo import ZoneInfo
+        ny = ZoneInfo("America/New_York")
+        post_ts = datetime(2026, 3, 10, 18, 0, tzinfo=ny).astimezone(timezone.utc).timestamp()
+        session_policy = {"overnight_holds": True, "extended_hours": True}
+        clean_outcome = {"reconciliation": {"positions": 1, "open_orders": 0},
+                         "adapter_errors": [], "accounting": {"halted_reason": None},
+                         "corporate_action_guard": {"enabled": True, "ever_flagged_symbols": ["AAPL"],
+                                                    "pending_must_flatten": [],
+                                                    "pending_needs_attention_held": ["AAPL"]}}
+        self.assertFalse(_honest_overnight_hold(clean_outcome, session_policy, post_ts))
+        # Once positively verified clear (empty), a genuine hold is allowed.
+        cleared = {**clean_outcome, "corporate_action_guard": {
+            "enabled": True, "ever_flagged_symbols": ["AAPL"],
+            "pending_must_flatten": [], "pending_needs_attention_held": []}}
+        self.assertTrue(_honest_overnight_hold(cleared, session_policy, post_ts))
+
     def test_run_native_status_mid_rth_non_flat_end_is_needs_attention_not_held_overnight(self):
         """D1: run_native's own status computation used to set
         "held_overnight" purely from `overnight_holds and reconciled and
@@ -2576,9 +2602,70 @@ class CorporateActionGuardRunnerWiringTests(unittest.TestCase):
 
     def test_scheduled_refresh_runs_off_the_event_loop_and_clears_in_flight(self):
         """HIGH finding 2: the fetch runs in a worker thread (never blocks
-        the event loop -- proven by a concurrent loop-tick counter still
-        advancing while the fetch thread sleeps), and the in-flight flag is
-        set immediately and cleared once the background task completes."""
+        the event loop), and the in-flight flag is set immediately and
+        cleared once the background task completes.
+
+        fix round 3: the concurrency proof now measures ticks that occur
+        STRICTLY BEFORE the fetch itself finishes (`guard.finished`, set
+        only inside refresh() after its blocking sleep returns) rather than
+        ticks counted after awaiting to completion -- a prior version's
+        `tick_counter()` looped until its OWN exit condition (ticks >= 3)
+        was satisfied, which is trivially true regardless of whether the
+        event loop was actually free to run concurrently or was fully
+        blocked by a synchronous (non-threaded) refresh() call for the
+        whole 0.2s; that version did not actually distinguish threaded from
+        synchronous execution (F2a in the review's mutation table)."""
+        import asyncio
+        import time as time_module
+        from datetime import date
+        import runner as runner_module
+
+        class SlowGuard:
+            def __init__(self):
+                self.calls = []
+                self.finished = False
+
+            def refresh(self, symbols, *, start, end, now):
+                self.calls.append((tuple(sorted(symbols)), start, end, now))
+                time_module.sleep(0.2)  # a blocking call, run inside asyncio.to_thread
+                self.finished = True
+
+        async def scenario():
+            guard = SlowGuard()
+            state = {"in_flight": False}
+            ticks_before_finished = {"count": 0}
+
+            async def tick_counter():
+                while not guard.finished:
+                    ticks_before_finished["count"] += 1
+                    await asyncio.sleep(0.02)
+
+            task = await runner_module._schedule_corporate_action_refresh(
+                guard, {"AAPL"}, date(2026, 9, 17), date(2026, 12, 24), 1000.0, state)
+            self.assertTrue(state["in_flight"], "in_flight must be set immediately, before the thread finishes")
+            await tick_counter()
+            await task
+            self.assertFalse(state["in_flight"], "in_flight must clear once the background refresh completes")
+            self.assertEqual(len(guard.calls), 1)
+            self.assertEqual(guard.calls[0], (("AAPL",), date(2026, 9, 17), date(2026, 12, 24), 1000.0))
+            self.assertGreaterEqual(ticks_before_finished["count"], 3,
+                                    "the event loop must keep ticking WHILE the fetch is still running -- "
+                                    "a synchronous (non-threaded) refresh() would block the loop entirely "
+                                    "until it finished, so this counter would stay at 0 or 1")
+
+        asyncio.run(scenario())
+
+    def test_scheduled_refresh_no_op_when_already_in_flight(self):
+        """HIGH finding 2 (mutation F2c: the tick-loop in_flight check
+        removed). This tests the CALLER-SIDE contract callers rely on: the
+        tick loop only calls `_schedule_corporate_action_refresh` when
+        `not state["in_flight"]`. Verify that contract directly against the
+        real tick-loop condition by simulating two consecutive tick-loop
+        iterations exactly as run_native's own `if strategy.corporate_
+        action_guard is not None and not ca_refresh_state["in_flight"]:`
+        guards it -- the second iteration must be skipped while the first
+        refresh is still running, so only ONE refresh() call happens even
+        though two ticks elapsed."""
         import asyncio
         import time as time_module
         from datetime import date
@@ -2589,27 +2676,25 @@ class CorporateActionGuardRunnerWiringTests(unittest.TestCase):
                 self.calls = []
 
             def refresh(self, symbols, *, start, end, now):
-                self.calls.append((tuple(sorted(symbols)), start, end, now))
-                time_module.sleep(0.2)  # a blocking call, run inside asyncio.to_thread
+                self.calls.append(now)
+                time_module.sleep(0.15)
 
         async def scenario():
             guard = SlowGuard()
             state = {"in_flight": False}
-            ticks = {"count": 0}
-
-            async def tick_counter():
-                while state["in_flight"] or ticks["count"] < 3:
-                    ticks["count"] += 1
-                    await asyncio.sleep(0.02)
-
-            await runner_module._schedule_corporate_action_refresh(
-                guard, {"AAPL"}, date(2026, 9, 17), date(2026, 12, 24), 1000.0, state)
-            self.assertTrue(state["in_flight"], "in_flight must be set immediately, before the thread finishes")
-            await tick_counter()
-            self.assertFalse(state["in_flight"], "in_flight must clear once the background refresh completes")
-            self.assertEqual(len(guard.calls), 1)
-            self.assertEqual(guard.calls[0], (("AAPL",), date(2026, 9, 17), date(2026, 12, 24), 1000.0))
-            self.assertGreaterEqual(ticks["count"], 3, "the event loop must keep ticking while the fetch runs")
+            for tick_now in (1.0, 2.0, 3.0):
+                # The exact condition run_native's tick loop uses.
+                if guard is not None and not state["in_flight"]:
+                    await runner_module._schedule_corporate_action_refresh(
+                        guard, {"AAPL"}, date(2026, 9, 17), date(2026, 12, 24), tick_now, state)
+                await asyncio.sleep(0.02)
+            # Drain until the (single) in-flight refresh finishes.
+            for _ in range(50):
+                if not state["in_flight"]:
+                    break
+                await asyncio.sleep(0.02)
+            self.assertEqual(len(guard.calls), 1, "only the first tick's refresh must actually run "
+                                                   "while it is still in flight")
 
         asyncio.run(scenario())
 
@@ -2660,36 +2745,290 @@ class CorporateActionGuardRunnerWiringTests(unittest.TestCase):
         symbols, start, end, _ = guard.refresh_calls[0]
         self.assertIn("SPY", symbols)
         self.assertLess(start, end)
+        # fix round 3 (mutation F1a): the tick-loop call site must use the
+        # WIDE fetch window, not a narrow today..next_session one -- a
+        # narrow window would also satisfy `start < end` but span only 1-2
+        # days, not the ~97-day wide window this guard actually needs.
+        self.assertGreaterEqual((end - start).days, 90,
+                                "the tick-loop refresh window must be wide, not the narrow today..next_session span")
+
+    @unittest.skipUnless(NATIVE, "requires pinned combined native runtime")
+    def test_tick_loop_never_overlaps_refresh_calls(self):
+        """HIGH finding 2 (fix round 3, mutation F2c: the tick-loop
+        in_flight check removed). Drives run_native's REAL tick loop (not
+        a simulated caller-side condition) with a guard whose refresh()
+        takes longer than one tick (~0.1s) and records the maximum number
+        of CONCURRENT refresh() invocations -- must never exceed 1, proving
+        the tick loop's own `not ca_refresh_state["in_flight"]` check is
+        actually in effect at the real call site, not just replicated in a
+        test's own mimicked condition."""
+        import threading
+        from simulation import SimulatedPort
+        config, _, _ = load_config(SOURCE / "config.json")
+        config.update(duration_seconds=2, cleanup_seconds=1, order_timeout_seconds=1)
+        config["sessions"] = {"extended_hours": True, "overnight_holds": True,
+                              "overnight_gross_multiple": "1.0"}
+        config["regular_session_only"] = False
+        config["extended_hours_enabled"] = True
+
+        class SlowGuard:
+            def __init__(self):
+                self.lock = threading.Lock()
+                self.live = 0
+                self.max_live = 0
+                self.calls = 0
+
+            def refresh(self, symbols, *, start, end, now):
+                import time as time_module
+                with self.lock:
+                    self.live += 1
+                    self.max_live = max(self.max_live, self.live)
+                    self.calls += 1
+                time_module.sleep(0.3)  # well past one 0.1s tick
+                with self.lock:
+                    self.live -= 1
+
+            def evaluate(self, *, today, next_session_date, held_symbols, candidate_symbols, now):
+                return {}
+
+        guard = SlowGuard()
+        config["_corporate_action_guard"] = guard
+        with tempfile.TemporaryDirectory() as root:
+            ledger = Ledger(Path(root) / "journal.db", RiskLimits(trial_seconds=2, cleanup_seconds=1))
+            ledger.start_trial(time.time())
+            controller = Controller(ledger, time.time() + 3600, market_open=True)
+            policy = PolicyConfig(symbols=("SPY", "QQQ", "IWM", "DIA"), max_positions=4, warmup_samples=4,
+                                  warmup_seconds=.06, sample_seconds=.02, rebalance_seconds=.02,
+                                  min_hold_seconds=.05, max_hold_seconds=.4, cooldown_seconds=.05)
+            port = SimulatedPort(controller, policy.symbols, price=lambda symbol, tick: Decimal("100"))
+            controller.port = port
+            asyncio.run(run_native(controller, policy, [{"symbol": s} for s in policy.symbols],
+                                   "fixture", config, "100000"))
+            ledger.close()
+        self.assertGreaterEqual(guard.calls, 2, "the run must have been long enough for more than one tick "
+                                                "to attempt a refresh")
+        self.assertEqual(guard.max_live, 1, "the tick loop must never launch a second refresh while one "
+                                            "is still in flight")
+
+    def test_preflight_corporate_action_refresh_uses_the_wide_window(self):
+        """HIGH finding 2 (fix round 3, mutation F1b: 'preflight call site
+        fetches a one-day window'). Directly exercises the extracted
+        `_preflight_corporate_action_refresh` seam (no need to drive all of
+        main())."""
+        import asyncio
+        from datetime import date, timedelta
+        import runner as runner_module
+
+        class FakeGuard:
+            def __init__(self):
+                self.calls = []
+
+            def refresh(self, symbols, *, start, end, now):
+                self.calls.append((tuple(sorted(symbols)), start, end, now))
+
+        class FakeLedger:
+            def positions(self):
+                return {}
+
+        guard = FakeGuard()
+        config = {"symbols": ["SPY", "QQQ"], "_corporate_action_guard": guard}
+        session_policy = {"overnight_holds": True, "extended_hours": True}
+        state = {"in_flight": False}
+        asyncio.run(runner_module._preflight_corporate_action_refresh(
+            config, session_policy, FakeLedger(), state))
+        self.assertEqual(len(guard.calls), 1)
+        symbols, start, end, now = guard.calls[0]
+        self.assertIn("SPY", symbols)
+        self.assertGreaterEqual((end - start).days, 90,
+                                "the preflight refresh window must be wide, not a narrow one-day span")
+
+    def test_preflight_corporate_action_refresh_is_a_noop_when_guard_not_wired(self):
+        """finding 8: the preflight fetch must never even attempt a call
+        when the guard is not wired in (overnight_holds disabled)."""
+        import asyncio
+        import runner as runner_module
+
+        class FakeGuard:
+            def refresh(self, symbols, *, start, end, now):
+                raise AssertionError("must not be called when overnight_holds is disabled")
+
+        class FakeLedger:
+            def positions(self):
+                return {}
+
+        config = {"symbols": ["SPY"], "_corporate_action_guard": FakeGuard()}
+        state = {"in_flight": False}
+        asyncio.run(runner_module._preflight_corporate_action_refresh(
+            config, {"overnight_holds": False}, FakeLedger(), state))
+        self.assertFalse(state["in_flight"])
+
+    @unittest.skipUnless(NATIVE, "requires pinned combined native runtime")
+    def test_outcome_pending_must_flatten_reflects_the_strategys_own_state(self):
+        """fix round 3 (mutations F5a 'outcome never reports pending_must_
+        flatten' and F5b 'strategy never records this tick's must_flatten').
+        A guard that unconditionally reports a confirmed must_flatten for
+        SPY must make run_native's own returned outcome carry SPY in
+        outcome["corporate_action_guard"]["pending_must_flatten"] -- this
+        exercises BOTH the strategy actually recording it
+        (_ca_last_must_flatten, F5b) AND run_native's outcome construction
+        actually reading that real attribute rather than a hardcoded
+        empty list (F5a)."""
+        import corporate_actions as CA
+        from simulation import SimulatedPort
+        config, _, _ = load_config(SOURCE / "config.json")
+        config.update(duration_seconds=1, cleanup_seconds=2, order_timeout_seconds=1)
+        config["sessions"] = {"extended_hours": True, "overnight_holds": True,
+                              "overnight_gross_multiple": "1.0"}
+        config["regular_session_only"] = False
+        config["extended_hours_enabled"] = True
+
+        class AlwaysFlattenGuard:
+            def refresh(self, symbols, *, start, end, now):
+                pass
+
+            def evaluate(self, *, today, next_session_date, held_symbols, candidate_symbols, now):
+                return {"SPY": CA.GuardDecision(symbol="SPY", block_entry=True, must_flatten=True,
+                                                needs_attention=False, reason="corporate_action_cash_dividend",
+                                                action_type="cash_dividend", action_date=today)}
+
+        config["_corporate_action_guard"] = AlwaysFlattenGuard()
+        with tempfile.TemporaryDirectory() as root:
+            ledger = Ledger(Path(root) / "journal.db", RiskLimits(trial_seconds=1, cleanup_seconds=2))
+            ledger.start_trial(time.time())
+            controller = Controller(ledger, time.time() + 3600, market_open=True)
+            policy = PolicyConfig(symbols=("SPY", "QQQ", "IWM", "DIA"), max_positions=4, warmup_samples=4,
+                                  warmup_seconds=.06, sample_seconds=.02, rebalance_seconds=.02,
+                                  min_hold_seconds=.05, max_hold_seconds=.4, cooldown_seconds=.05)
+            port = SimulatedPort(controller, policy.symbols, price=lambda symbol, tick: Decimal("100"))
+            controller.port = port
+            outcome = asyncio.run(run_native(controller, policy, [{"symbol": s} for s in policy.symbols],
+                                             "fixture", config, "100000"))
+            ledger.close()
+        self.assertIn("SPY", outcome["corporate_action_guard"]["pending_must_flatten"])
 
     def test_scheduled_refresh_times_out_and_still_clears_in_flight(self):
-        """HIGH finding 2: a refresh() call that runs longer than
-        CORPORATE_ACTION_REFRESH_TIMEOUT_SECONDS is abandoned (wait_for
-        gives up) but the in-flight flag is still cleared, so a later tick
-        is not permanently locked out from ever refreshing again."""
+        """HIGH finding 1/2 (fix round 3): a refresh() call that runs
+        longer than CORPORATE_ACTION_REFRESH_TIMEOUT_SECONDS is abandoned
+        (wait_for gives up) but the in-flight flag is still cleared, so a
+        later tick is not permanently locked out from ever refreshing
+        again -- AND the guard's own `refresh_timed_out()` is called (if it
+        exposes one), treating the timeout as an immediate failure rather
+        than silently leaving the cache in whatever state it was in until
+        the abandoned thread happens to resolve on its own."""
         import asyncio
         import time as time_module
         from datetime import date
         import runner as runner_module
 
         class HangingGuard:
+            def __init__(self):
+                self.timed_out_calls = []
+
             def refresh(self, symbols, *, start, end, now):
                 time_module.sleep(runner_module.CORPORATE_ACTION_REFRESH_TIMEOUT_SECONDS + 5)
 
+            def refresh_timed_out(self, symbols):
+                self.timed_out_calls.append(tuple(sorted(symbols)))
+
         async def scenario():
             state = {"in_flight": False}
+            guard = HangingGuard()
             original_timeout = runner_module.CORPORATE_ACTION_REFRESH_TIMEOUT_SECONDS
             runner_module.CORPORATE_ACTION_REFRESH_TIMEOUT_SECONDS = 0.05
             try:
                 await runner_module._schedule_corporate_action_refresh(
-                    HangingGuard(), {"AAPL"}, date(2026, 9, 17), date(2026, 12, 24), 1000.0, state)
+                    guard, {"AAPL"}, date(2026, 9, 17), date(2026, 12, 24), 1000.0, state)
                 self.assertTrue(state["in_flight"])
                 for _ in range(50):
                     if not state["in_flight"]:
                         break
                     await asyncio.sleep(0.02)
                 self.assertFalse(state["in_flight"], "a timed-out refresh must still clear in_flight")
+                self.assertEqual(guard.timed_out_calls, [("AAPL",)],
+                                 "a timeout must be reported to the guard as a failure")
             finally:
                 runner_module.CORPORATE_ACTION_REFRESH_TIMEOUT_SECONDS = original_timeout
+
+        asyncio.run(scenario())
+
+    def test_real_monitor_generation_drops_a_superseded_late_write(self):
+        """HIGH finding 1 (fix round 3): reproduces the reviewer's own
+        finding against the REAL CorporateActionMonitor (not a fake) --
+        an older, slower refresh() attempt that finishes AFTER a newer one
+        has already written a confirmed action must not overwrite it.
+        Simulated directly at the monitor level (two threads racing
+        CorporateActionMonitor.refresh with a real threading.Lock/gate),
+        exactly as the independent review's own P2 probe did."""
+        import threading
+        from datetime import date
+        import corporate_actions as CA
+
+        gate = threading.Event()
+
+        class Src:
+            def fetch(self, symbols, start, end):
+                if threading.current_thread().name == "A-slow":
+                    gate.wait(5)
+                    return {s: [] for s in symbols}  # stale: server state before the action existed
+                return {s: [CA.ActionRecord(symbol=s, action_type="forward_split",
+                                            action_date=date(2026, 9, 25))] for s in symbols}
+
+        monitor = CA.CorporateActionMonitor(Src(), refresh_seconds=900, retry_seconds=60, max_age_seconds=3600)
+        window = dict(start=date(2026, 9, 17), end=date(2026, 12, 24))
+        # A starts first (slow, blocked on `gate`) with an OLDER `now` --
+        # but the generation counter, not the `now` timestamp, is what
+        # determines supersession: A started its attempt (bumped the
+        # generation) before B did, so B's later-generation write must win
+        # regardless of which `now` value either call carried.
+        a = threading.Thread(target=monitor.refresh, args=({"NVDA"},), kwargs=dict(**window, now=1000.0), name="A-slow")
+        a.start()
+        # Ensure A has actually entered refresh() (bumped the generation
+        # and is now blocked inside Src.fetch on `gate`) before B starts.
+        import time as time_module
+        time_module.sleep(0.05)
+        b = threading.Thread(target=monitor.refresh, args=({"NVDA"},), kwargs=dict(**window, now=1030.0), name="B-fast")
+        b.start()
+        b.join(5)
+        decisions = monitor.evaluate(today=date(2026, 9, 24), next_session_date=date(2026, 9, 25),
+                                     held_symbols={"NVDA"}, candidate_symbols=set(), now=1030.0)
+        self.assertTrue(decisions["NVDA"].must_flatten, "B's confirmed action must be visible before A resolves")
+        gate.set()  # release A
+        a.join(5)
+        decisions_after_a = monitor.evaluate(today=date(2026, 9, 24), next_session_date=date(2026, 9, 25),
+                                             held_symbols={"NVDA"}, candidate_symbols=set(), now=1030.0)
+        self.assertTrue(decisions_after_a["NVDA"].must_flatten,
+                        "A's late, superseded write must NOT cancel B's already-applied confirmed action")
+
+    def test_shutdown_cancels_and_joins_pending_corporate_action_tasks(self):
+        """HIGH finding 1 (fix round 3, 'keep the task and join or cancel it
+        at shutdown'): directly exercises the extracted
+        `_shutdown_corporate_action_tasks` seam -- a still-pending task
+        (here, a plain asyncio.sleep()-based fake standing in for a
+        background refresh task, so this test itself completes quickly
+        rather than needing to wait out a real hanging OS thread) must be
+        cancelled and joined, not left running past the call."""
+        import asyncio
+        import runner as runner_module
+
+        async def scenario():
+            long_sleep_task = asyncio.create_task(asyncio.sleep(600))
+            already_done_task = asyncio.create_task(asyncio.sleep(0))
+            await already_done_task
+            state = {"in_flight": False, "tasks": [long_sleep_task, already_done_task]}
+            await runner_module._shutdown_corporate_action_tasks(state)
+            self.assertTrue(long_sleep_task.done(), "a still-pending task must be cancelled, not left running")
+            self.assertTrue(long_sleep_task.cancelled())
+            self.assertTrue(already_done_task.done())
+
+        asyncio.run(scenario())
+
+    def test_shutdown_is_a_noop_with_no_tasks(self):
+        import asyncio
+        import runner as runner_module
+
+        async def scenario():
+            await runner_module._shutdown_corporate_action_tasks({"in_flight": False})
+            await runner_module._shutdown_corporate_action_tasks({"in_flight": False, "tasks": []})
 
         asyncio.run(scenario())
 

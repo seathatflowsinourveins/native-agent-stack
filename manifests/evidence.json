@@ -6519,6 +6519,11 @@
       "bytes": 2556
     },
     {
+      "path": "blueprints/us-equities/adaptive-paper/corporate-actions-native-check-20260924.json",
+      "sha256": "7883cd188c6449d290f92cacda621f12f3de223dfb0e080663150ed36289afb9",
+      "bytes": 7934
+    },
+    {
       "path": "blueprints/us-equities/adaptive-paper/evidence-hashes.json",
       "sha256": "a38097f52aa89d7509e848bc244bc796bd6d96ad3314635e4b6f8b7cca6df5bf",
       "bytes": 869
@@ -6615,8 +6620,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/native_strategy.py",
-      "sha256": "feffae29a0d333114a50ca5aa5726d31f41402f78041a8bfc4ed5b24ccd9f1c0",
-      "bytes": 73971
+      "sha256": "1486a34e68ef4105046d19c7da7901acadfbdf1620e0f6c843b673b99f70ff56",
+      "bytes": 77351
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/receipt.json",
@@ -6645,8 +6650,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/runner.py",
-      "sha256": "19efa96158df3aa105c50b9262ffb9c349e8f3a66f454196a9ae66e5f8282e29",
-      "bytes": 111667
+      "sha256": "d9dd13161fe1ae418b254f5046039441ddd01b3161b613624cb65a1536190ca9",
+      "bytes": 118532
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/safety.py",
@@ -6670,7 +6675,7 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "a665741f11ed6bd087ae22d3baaefde99f4ceda0280c0764adfc09baeaaa777f",
+      "sha256": "10bb8dbdd5f83436096a36bf31866ef8285d7d71e3525a7c96bdb0f5171658b3",
       "bytes": 6122
     },
     {
@@ -29010,8 +29015,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_runner.py",
-      "sha256": "c9d9ce3d6c2ee61de4afd842000e792a1b59685aaa3ab8d35a48257c5454735b",
-      "bytes": 158125
+      "sha256": "ae8e10dbac16551bfe4451259373ab0120e5d2b62be0b6813dbe99328de2c7ba",
+      "bytes": 176985
     },
     {
       "path": "tests/test_adaptive_paper_safety.py",
@@ -29020,8 +29025,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_sessions.py",
-      "sha256": "09a4aaf68b3d8857bdceddae91ea11d1575e000eeeda85496e1dbeb321d8495d",
-      "bytes": 96318
+      "sha256": "680060ac7ec147b93ed6ba2607631ad1ec38702f1a44e51260c792c537b1fab6",
+      "bytes": 96452
     },
     {
       "path": "tests/test_adaptive_paper_strategies.py",

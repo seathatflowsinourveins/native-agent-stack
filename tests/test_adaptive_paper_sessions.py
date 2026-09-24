@@ -158,8 +158,10 @@ class SessionClockTests(unittest.TestCase):
         # D7/finding-6 (2026-09-24 fix round): dates outside the frozen
         # table's year(s) must not be silently classified against another
         # year's table. The exchange_calendars fallback is disabled here so
-        # the result does not depend on whether that package is installed
-        # (CI installs it from blueprints/us-equities/data/requirements.lock).
+        # the result does not depend on whether exchange_calendars is
+        # installed (fix round 3, item 10: CI only installs the lockfile
+        # into the separate promotion-gate venv, not this test interpreter,
+        # so that package is not reliably present here either way).
         # 2027 is covered by HOLIDAYS_2027 (see test_2027_calendar_covered
         # below); 2025 and 2028 are not.
         with mock.patch.object(sess, "_exchange_calendars_day", return_value=None):

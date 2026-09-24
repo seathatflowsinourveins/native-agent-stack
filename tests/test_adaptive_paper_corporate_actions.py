@@ -12,6 +12,7 @@ from dataclasses import dataclass
 from datetime import date
 from decimal import Decimal as D
 import importlib.util
+import json
 from pathlib import Path
 import sys
 import unittest
@@ -331,28 +332,151 @@ class CorporateActionMonitorTests(unittest.TestCase):
         monitor.refresh({"AAPL"}, start=TODAY, end=NEXT_SESSION, now=1200.0)
         self.assertEqual(len(source.calls), 2, "a successful attempt must revert to the ordinary refresh_seconds throttle")
 
+    def test_successful_refresh_clears_degraded_state(self):
+        # fix round 3 (mutation F3b): a symbol degraded by a prior failure
+        # must go back to non-degraded (needs_attention False) once a
+        # SUBSEQUENT refresh actually succeeds for it -- degraded must not
+        # be sticky forever.
+        source = self.FakeSource(error=CA.CorporateActionLookupError("boom"))
+        monitor = CA.CorporateActionMonitor(source, refresh_seconds=900, retry_seconds=60, clock=lambda: 1000.0)
+        monitor.refresh({"AAPL"}, start=TODAY, end=NEXT_SESSION, now=1000.0)
+        degraded = monitor.evaluate(today=TODAY, next_session_date=NEXT_SESSION, held_symbols={"AAPL"},
+                                    candidate_symbols=set(), now=1000.0)["AAPL"]
+        self.assertTrue(degraded.needs_attention)
+        source.error = None
+        source.result = {"AAPL": []}
+        monitor.refresh({"AAPL"}, start=TODAY, end=NEXT_SESSION, now=1070.0)
+        recovered = monitor.evaluate(today=TODAY, next_session_date=NEXT_SESSION, held_symbols={"AAPL"},
+                                     candidate_symbols=set(), now=1070.0)["AAPL"]
+        self.assertFalse(recovered.needs_attention, "a successful refresh must clear the degraded state")
+        self.assertFalse(recovered.block_entry)
+
+    def test_superseded_failure_does_not_re_degrade_a_newer_confirmed_action(self):
+        """HIGH finding 1 (fix round 3): a FAILURE from a superseded
+        (older-generation) attempt must be dropped exactly like a
+        superseded SUCCESS -- an older attempt that eventually raises must
+        not re-degrade a symbol a newer attempt already confirmed."""
+        monitor = CA.CorporateActionMonitor(self.FakeSource(), clock=lambda: 1000.0)
+        # Simulate: generation 1 was an old attempt (now superseded);
+        # generation 2 is the newer attempt that already succeeded and
+        # confirmed an action.
+        old_generation = 1
+        monitor._generation = 2
+        monitor._apply_success({"AAPL"}, {"AAPL": [action("AAPL", "forward_split", TODAY)]}, 1030.0, 2)
+        confirmed = monitor.evaluate(today=TODAY, next_session_date=NEXT_SESSION, held_symbols={"AAPL"},
+                                     candidate_symbols=set(), now=1030.0)["AAPL"]
+        self.assertTrue(confirmed.must_flatten)
+        # The OLD (generation 1) attempt now finally fails -- must be dropped.
+        monitor._apply_failure({"AAPL"}, old_generation)
+        after = monitor.evaluate(today=TODAY, next_session_date=NEXT_SESSION, held_symbols={"AAPL"},
+                                 candidate_symbols=set(), now=1030.0)["AAPL"]
+        self.assertTrue(after.must_flatten, "a superseded (older-generation) failure must not re-degrade "
+                                            "a newer confirmed action")
+        self.assertFalse(after.needs_attention)
+
+    def test_refresh_timed_out_invalidates_the_in_flight_generation(self):
+        """HIGH finding 1 (fix round 3): refresh_timed_out() must bump the
+        generation counter so a subsequent LATE write from the abandoned
+        attempt (identified by the generation it captured before the
+        timeout) is dropped as superseded, exactly like an ordinary
+        superseded success/failure."""
+        monitor = CA.CorporateActionMonitor(self.FakeSource(), clock=lambda: 1000.0)
+        monitor._last_attempt = 1000.0
+        monitor._generation = 1
+        abandoned_generation = monitor._generation
+        monitor.refresh_timed_out({"AAPL"})
+        self.assertTrue(monitor._last_attempt_failed)
+        self.assertIn("AAPL", monitor._degraded)
+        # The abandoned attempt's thread finally finishes and tries to
+        # write a stale success under its OLD (now-superseded) generation.
+        monitor._apply_success({"AAPL"}, {"AAPL": [action("AAPL", "forward_split", TODAY)]},
+                               1000.0, abandoned_generation)
+        after = monitor.evaluate(today=TODAY, next_session_date=NEXT_SESSION, held_symbols={"AAPL"},
+                                 candidate_symbols=set(), now=1000.0)["AAPL"]
+        self.assertTrue(after.needs_attention, "the abandoned attempt's late write must be dropped, "
+                                               "leaving the symbol degraded from the timeout")
+        self.assertFalse(after.must_flatten)
+
+    def test_omission_after_a_prior_success_preserves_the_confirmed_action(self):
+        """LOW finding 7 (fix round 3): a symbol omitted from an OTHERWISE
+        successful fetch (most requested symbols resolved fine, this one
+        did not come back at all) must not erase its own previously
+        confirmed action -- treated exactly like a per-symbol failure."""
+        class OmitsOneSymbol:
+            def __init__(self):
+                self.omit_aapl = False
+
+            def fetch(self, symbols, start, end):
+                out = {s: [action(s, "forward_split", TODAY)] for s in symbols}
+                if self.omit_aapl:
+                    out.pop("AAPL", None)
+                return out
+
+        source = OmitsOneSymbol()
+        monitor = CA.CorporateActionMonitor(source, refresh_seconds=900, clock=lambda: 1000.0)
+        monitor.refresh({"AAPL", "MSFT"}, start=TODAY, end=NEXT_SESSION, now=1000.0)
+        before = monitor.evaluate(today=TODAY, next_session_date=NEXT_SESSION, held_symbols={"AAPL"},
+                                  candidate_symbols=set(), now=1000.0)["AAPL"]
+        self.assertTrue(before.must_flatten)
+        source.omit_aapl = True
+        monitor.refresh({"AAPL", "MSFT"}, start=TODAY, end=NEXT_SESSION, now=1901.0)
+        after = monitor.evaluate(today=TODAY, next_session_date=NEXT_SESSION, held_symbols={"AAPL"},
+                                 candidate_symbols=set(), now=1901.0)["AAPL"]
+        self.assertTrue(after.must_flatten, "an omission after a prior success must preserve the "
+                                            "confirmed action, not erase it")
+        self.assertTrue(after.needs_attention)
+
 
 ALPACA = importlib.util.find_spec("alpaca") is not None
 
 
 @unittest.skipUnless(ALPACA, "requires the pinned alpaca-py package")
 class AlpacaCorporateActionsSourceTests(unittest.TestCase):
-    """Exercises AlpacaCorporateActionsSource.fetch()'s response-parsing
-    logic with a fake alpaca-py response object (no network, no real
-    credentials -- construction never calls the network; see
-    AlpacaCorporateActionsSource's own docstring), plus its constructor-time
-    request-timeout/retry hardening (finding 2)."""
-
-    class _Item:
-        def __init__(self, **fields):
-            self.__dict__.update(fields)
-
-    class _Response:
-        def __init__(self, data):
-            self.data = data
+    """Exercises AlpacaCorporateActionsSource.fetch() through the REAL
+    alpaca-py 0.44.0 request/response pipeline (raw_data=True,
+    RESTClient._get_marketdata, its pagination) with only the underlying
+    HTTP transport faked (requests.Session.request patched to return a
+    canned JSON body) -- no network, no real credentials, but the actual
+    installed SDK code this wrapper depends on DOES run, so a change to
+    that SDK's own parsing/pagination/type-branch behaviour would be
+    caught here (fix round 3, finding 2: earlier tests injected an
+    already-parsed `.data`-style response, bypassing exactly the SDK
+    behaviour that turned out to be broken)."""
 
     def source(self):
         return CA.AlpacaCorporateActionsSource("fake-key", "fake-secret")
+
+    @staticmethod
+    def _fake_http_response(body, status_code=200):
+        import requests
+        resp = requests.Response()
+        resp.status_code = status_code
+        resp._content = json.dumps(body).encode()
+        resp.headers["Content-Type"] = "application/json"
+        return resp
+
+    def _mock_http(self, body):
+        """A context manager patching requests.Session.request (BEFORE
+        AlpacaCorporateActionsSource construction, so its `_bounded_request`
+        wrapper's captured `original_request` is this mock) to return a
+        fake HTTP 200 response carrying `body` as JSON, wrapped in the
+        top-level "corporate_actions" key alpaca-py's own
+        `_get_marketdata_entries` (verified via inspect.getsource against
+        the installed package) requires -- exercising the real
+        RESTClient._request/_one_request/_get_marketdata call chain,
+        including its own page-loop. Returns (patcher, captured) where
+        `captured` collects the actual outgoing request's method/url/kwargs
+        for assertion."""
+        import unittest.mock as mock
+        import requests
+        captured = {}
+        envelope = {"corporate_actions": body, "next_page_token": None}
+
+        def fake_request(self_session, method, url, **kwargs):
+            captured["method"], captured["url"], captured["kwargs"] = method, url, kwargs
+            return self._fake_http_response(envelope)
+
+        return mock.patch.object(requests.Session, "request", fake_request), captured
 
     def test_construction_cuts_retries(self):
         # finding 2: alpaca-py's RESTClient retries up to 3 times, sleeping
@@ -361,6 +485,14 @@ class AlpacaCorporateActionsSourceTests(unittest.TestCase):
         src = self.source()
         self.assertEqual(src._client._retry, 1)
         self.assertEqual(src._client._retry_wait, 1)
+
+    def test_construction_requests_raw_data(self):
+        # HIGH finding 2 (fix round 3): raw_data=True is required so an
+        # unmapped bucket type reaches this wrapper's own fail-closed path
+        # instead of being silently dropped by the SDK's CorporateActionsSet
+        # parser first.
+        src = self.source()
+        self.assertTrue(src._client._use_raw_data)
 
     def test_construction_bounds_the_underlying_session_request_timeout(self):
         # finding 2: alpaca-py's RESTClient sets NO per-request timeout at
@@ -383,38 +515,101 @@ class AlpacaCorporateActionsSourceTests(unittest.TestCase):
                 src._client._session.request("GET", "https://example.invalid")
         self.assertEqual(captured.get("timeout"), (5, 15))
 
-    def test_result_at_the_page_limit_cap_is_ambiguous_fails_closed(self):
-        src = self.source()
-        # 1000 items across (one bucket) at the configured request cap.
-        items = [self._Item(symbol="AAPL", ex_date=TODAY) for _ in range(src._REQUEST_LIMIT)]
-        src._client.get_corporate_actions = lambda request: self._Response({"cash_dividends": items})
-        with self.assertRaises(CA.CorporateActionLookupError):
+    def test_fetch_requests_data_quality_all(self):
+        """HIGH finding 3 (fix round 3): the request must ask for
+        data_quality=all -- the documented Alpaca default (`complete`)
+        excludes records the provider considers incomplete."""
+        patcher, captured = self._mock_http({"cash_dividends": []})
+        with patcher:
+            src = self.source()
             src.fetch(["AAPL"], TODAY, NEXT_SESSION)
+        self.assertEqual(captured["kwargs"].get("params", {}).get("data_quality"), "all")
+
+    def test_result_at_the_page_limit_cap_is_ambiguous_fails_closed(self):
+        items = [{"symbol": "AAPL", "ex_date": TODAY.isoformat()} for _ in range(1000)]
+        patcher, _ = self._mock_http({"cash_dividends": items})
+        with patcher:
+            src = self.source()
+            with self.assertRaises(CA.CorporateActionLookupError):
+                src.fetch(["AAPL"], TODAY, NEXT_SESSION)
+
+    def test_cap_counts_the_total_across_all_buckets_not_the_largest_bucket(self):
+        # fix round 3 (mutation F1c): 600 + 600 = 1200 >= 1000 across TWO
+        # buckets, each individually under the cap. Summing across buckets
+        # must still fail closed; a max()-of-one-bucket implementation
+        # would wrongly trust this as "under the cap".
+        items_a = [{"symbol": "AAPL", "ex_date": TODAY.isoformat()} for _ in range(600)]
+        items_b = [{"old_symbol": "OLD", "new_symbol": "NEW", "alternate_symbol": "ALT",
+                   "effective_date": TODAY.isoformat()} for _ in range(600)]
+        patcher, _ = self._mock_http({"cash_dividends": items_a, "unit_splits": items_b})
+        with patcher:
+            src = self.source()
+            with self.assertRaises(CA.CorporateActionLookupError):
+                src.fetch(["AAPL"], TODAY, NEXT_SESSION)
 
     def test_result_under_the_cap_is_trusted(self):
-        src = self.source()
-        items = [self._Item(symbol="AAPL", ex_date=TODAY)]
-        src._client.get_corporate_actions = lambda request: self._Response({"cash_dividends": items})
-        out = src.fetch(["AAPL"], TODAY, NEXT_SESSION)
+        patcher, _ = self._mock_http({"cash_dividends": [{"symbol": "AAPL", "ex_date": TODAY.isoformat()}]})
+        with patcher:
+            src = self.source()
+            out = src.fetch(["AAPL"], TODAY, NEXT_SESSION)
         self.assertEqual(len(out["AAPL"]), 1)
         self.assertEqual(out["AAPL"][0].action_type, "cash_dividend")
         self.assertEqual(out["AAPL"][0].action_date, TODAY)
 
     def test_unmapped_type_key_fails_closed_instead_of_being_silently_dropped(self):
-        src = self.source()
-        items = [self._Item(symbol="AAPL", ex_date=TODAY)]
-        src._client.get_corporate_actions = lambda request: self._Response({"some_future_action_type": items})
-        with self.assertRaises(CA.CorporateActionLookupError):
-            src.fetch(["AAPL"], TODAY, NEXT_SESSION)
+        # HIGH finding 2 (fix round 3): `reorganizations` is a real,
+        # Alpaca-documented bucket type this guard's _TYPE_FIELD_MAP does
+        # not (yet) model. With raw_data=True this reaches this wrapper's
+        # own fail-closed path directly -- the pre-fix code went through
+        # the SDK's CorporateActionsSet, whose 13-branch parser (verified
+        # via inspect.getsource against the installed package) has no
+        # else/default clause and silently drops any bucket it does not
+        # recognize, turning this exact case into an apparently-clear
+        # {'AAPL': []} instead of raising.
+        patcher, _ = self._mock_http({"reorganizations": [{"symbol": "AAPL", "ex_date": TODAY.isoformat()}]})
+        with patcher:
+            src = self.source()
+            with self.assertRaises(CA.CorporateActionLookupError):
+                src.fetch(["AAPL"], TODAY, NEXT_SESSION)
+
+    def test_unmapped_type_with_a_thousand_records_still_fails_closed(self):
+        # finding 2: 1000 records of an unmapped type used to become a
+        # silently-clear result AND evade the cap check (the SDK dropped
+        # the bucket before either check ever saw it). Both this wrapper's
+        # cap check and its unmapped-type check now see the raw bucket;
+        # either failing closed is acceptable, but a clear/successful
+        # result is not.
+        items = [{"symbol": "AAPL", "ex_date": TODAY.isoformat()} for _ in range(1000)]
+        patcher, _ = self._mock_http({"reorganizations": items})
+        with patcher:
+            src = self.source()
+            with self.assertRaises(CA.CorporateActionLookupError):
+                src.fetch(["AAPL"], TODAY, NEXT_SESSION)
 
     def test_unit_split_alternate_symbol_is_mapped(self):
-        src = self.source()
-        item = self._Item(old_symbol="OLD", new_symbol="NEW", alternate_symbol="ALT",
-                          effective_date=TODAY)
-        src._client.get_corporate_actions = lambda request: self._Response({"unit_splits": [item]})
-        out = src.fetch(["OLD", "NEW", "ALT"], TODAY, NEXT_SESSION)
+        body = {"unit_splits": [{"old_symbol": "OLD", "new_symbol": "NEW", "alternate_symbol": "ALT",
+                                 "effective_date": TODAY.isoformat()}]}
+        patcher, _ = self._mock_http(body)
+        with patcher:
+            src = self.source()
+            out = src.fetch(["OLD", "NEW", "ALT"], TODAY, NEXT_SESSION)
         for symbol in ("OLD", "NEW", "ALT"):
             self.assertEqual(len(out[symbol]), 1, f"{symbol} must be mapped from a unit_split")
+
+    def test_record_missing_governing_date_is_ambiguous_for_its_own_symbol_only(self):
+        """HIGH finding 3 (fix round 3): a record missing (or carrying an
+        unparseable) governing date -- e.g. an incomplete record surfaced
+        by data_quality=all -- must mark ONLY the symbol(s) that record
+        names as LOOKUP_AMBIGUOUS, never fail the whole fetch, and never
+        affect an unrelated symbol's own clean result."""
+        body = {"cash_dividends": [{"symbol": "AAPL"},  # no ex_date at all
+                                   {"symbol": "MSFT", "ex_date": TODAY.isoformat()}]}
+        patcher, _ = self._mock_http(body)
+        with patcher:
+            src = self.source()
+            out = src.fetch(["AAPL", "MSFT"], TODAY, NEXT_SESSION)
+        self.assertEqual(out["AAPL"], CA.LOOKUP_AMBIGUOUS)
+        self.assertEqual(len(out["MSFT"]), 1)
 
 
 @unittest.skipUnless(NATIVE, "requires pinned Nautilus 2.0.0rc5 runtime")
@@ -481,9 +676,16 @@ class RebalanceCorporateActionGuardTests(unittest.TestCase):
             return self._positions
 
     class _FakeGuard:
-        """Scripted guard: returns exactly the decisions it was constructed
-        with (keyed by symbol), regardless of the arguments rebalance()
-        passes -- the args themselves are recorded for assertion."""
+        """Scripted guard: returns the decisions it was constructed with
+        (keyed by symbol), FILTERED to exactly the symbols actually
+        requested (held_symbols | candidate_symbols) -- fix round 3: a
+        prior version returned every scripted decision unconditionally,
+        which masked the production bug where a symbol whose signal
+        disappeared (and whose resting buy order therefore never made it
+        into candidate_symbols) was silently never evaluated at all; this
+        fake would still have reported its scripted decision anyway. The
+        real corporate_actions.evaluate_guard performs exactly this same
+        held|candidate filter."""
 
         def __init__(self, decisions):
             self.decisions = decisions
@@ -492,7 +694,8 @@ class RebalanceCorporateActionGuardTests(unittest.TestCase):
         def evaluate(self, *, today, next_session_date, held_symbols, candidate_symbols, now):
             self.calls.append({"today": today, "next_session_date": next_session_date,
                                "held_symbols": set(held_symbols), "candidate_symbols": set(candidate_symbols)})
-            return self.decisions
+            relevant = set(held_symbols) | set(candidate_symbols)
+            return {symbol: decision for symbol, decision in self.decisions.items() if symbol in relevant}
 
     def strategy(self, *, held=None, targets=None, guard_decisions=None, clock=lambda: 1790256600.0):
         # 2026-09-24 09:30:00 America/New_York in epoch seconds (RTH open) --
@@ -568,6 +771,10 @@ class RebalanceCorporateActionGuardTests(unittest.TestCase):
         self.assertEqual(call["side"], OrderSide.SELL)
         self.assertEqual(call["quantity"], "3")
         self.assertIn("reason=corporate_action_flatten", call["tags"])
+        # fix round 3 (mutation F5b): the strategy must actually RECORD
+        # this tick's must_flatten set on itself -- runner.py's outcome
+        # construction reads this attribute directly.
+        self.assertEqual(strategy._ca_last_must_flatten, {"AAPL"})
 
     def test_flatten_still_forced_even_when_decide_would_have_kept_the_position(self):
         """Unlike an ordinary rebalance-delta sell, the forced flatten fires
@@ -600,6 +807,11 @@ class RebalanceCorporateActionGuardTests(unittest.TestCase):
         self.assertEqual(len(events), 1)
         self.assertTrue(events[0]["needs_attention"])
         self.assertFalse(events[0]["must_flatten"])
+        # MEDIUM finding 4 (fix round 3): the strategy must record this
+        # held symbol into its own attention-tracking attribute --
+        # runner.py's outcome construction reads this directly so
+        # _honest_overnight_hold can refuse a false "held_overnight".
+        self.assertEqual(strategy._ca_last_needs_attention_held, {"AAPL"})
 
     def test_flatten_event_carries_no_credential_value_only_bounded_fields(self):
         guard_decisions = {"AAPL": self.decision_for("AAPL", block_entry=True, must_flatten=True,
@@ -645,6 +857,22 @@ class RebalanceCorporateActionGuardTests(unittest.TestCase):
         self.assertTrue(events[0]["needs_attention"])
         self.assertEqual(events[0]["reason"], "corporate_action_session_unknown")
 
+    # -- fix round 3 (mutation F4a): the guard's own hold horizon must be
+    # the NEXT TRADING DAY (skipping weekends/holidays), not a raw
+    # calendar-day-plus-one -- proven with a Friday tick, whose "next
+    # session" is the following Monday, not Saturday.
+    def test_friday_horizon_is_the_following_monday_not_saturday(self):
+        # 2026-09-25 10:00 ET is a Friday (RTH open) under the frozen 2026
+        # calendar.
+        friday_clock = lambda: 1790344800.0
+        strategy = self.strategy(held={"AAPL": 1}, targets={"AAPL": 1}, guard_decisions={}, clock=friday_clock)
+        strategy.rebalance()
+        self.assertEqual(len(strategy.corporate_action_guard.calls), 1)
+        call = strategy.corporate_action_guard.calls[0]
+        self.assertEqual(call["today"], date(2026, 9, 25))
+        self.assertEqual(call["next_session_date"], date(2026, 9, 28),
+                         "the horizon must skip the weekend to the following Monday, not land on Saturday")
+
     # -- finding 9: a symbol flagged by BOTH the corporate-action guard
     # (must_flatten) and the gap-risk stop must get exactly ONE sell
     # action, not two competing ones.
@@ -672,6 +900,29 @@ class RebalanceCorporateActionGuardTests(unittest.TestCase):
         strategy.rebalance()
         self.assertIn("resting-buy-1", strategy.cancelled)
         self.assertTrue(strategy.pending["resting-buy-1"]["cancel_requested"])
+
+    # -- MEDIUM finding 5 (fix round 3): a symbol whose signal disappeared
+    # (no longer in decision.targets) but whose buy from a PRIOR tick is
+    # still resting must still be evaluated by the guard -- a corporate
+    # action discovered on this now-untargeted symbol must still cancel
+    # that resting buy, not leave it silently eligible to fill.
+    def test_resting_buy_is_cancelled_when_its_signal_disappears_while_it_rests(self):
+        guard_decisions = {"AAPL": self.decision_for("AAPL", block_entry=True, needs_attention=True,
+                                                      reason="corporate_action_lookup_failed")}
+        # targets={} -- AAPL's signal is gone this tick, unlike the test
+        # above where it is still targeted.
+        strategy = self.strategy(held={}, targets={}, guard_decisions=guard_decisions)
+        strategy.cancelled = []
+        strategy.cancel_order = lambda cid: strategy.cancelled.append(str(cid))
+        strategy.pending["resting-buy-1"] = {"symbol": "AAPL", "side": "buy", "created": 0.0}
+        strategy.rebalance()
+        self.assertIn("resting-buy-1", strategy.cancelled,
+                      "a resting buy must be cancelled even after its own signal disappeared")
+        self.assertTrue(strategy.pending["resting-buy-1"]["cancel_requested"])
+        # The guard's own evaluate() call must have actually been asked
+        # about AAPL as a candidate (via the pending-buy symbol union),
+        # not silently skipped.
+        self.assertIn("AAPL", strategy.corporate_action_guard.calls[-1]["candidate_symbols"])
 
     # -- finding 11 (byte-identical claim): with the guard off (None,
     # default), the decision event must carry neither
@@ -709,6 +960,29 @@ class RebalanceCorporateActionGuardTests(unittest.TestCase):
         strategy.rebalance()
         events = [e for e in strategy.events if e.get("type") == "corporate_action_guard"]
         self.assertEqual(len(events), 2, "a changed decision must be re-emitted")
+
+    # -- NIT finding 9 (fix round 3): a symbol that was previously flagged
+    # and then goes fully clear must emit one explicit "cleared" event.
+    def test_guard_emits_a_cleared_event_when_a_flagged_symbol_resolves(self):
+        guard = self._FakeGuard({"AAPL": self.decision_for("AAPL", block_entry=True, needs_attention=True,
+                                                            reason="corporate_action_lookup_failed")})
+        strategy = self.strategy(held={"AAPL": 1}, targets={"AAPL": 1})
+        strategy.corporate_action_guard = guard
+        strategy.rebalance()
+        guard.decisions = {"AAPL": self.decision_for("AAPL")}  # fully clear now
+        strategy.rebalance()
+        events = [e for e in strategy.events if e.get("type") == "corporate_action_guard"]
+        self.assertEqual(len(events), 2)
+        self.assertEqual(events[1]["reason"], "corporate_action_cleared")
+        self.assertFalse(events[1]["block_entry"])
+        self.assertFalse(events[1]["must_flatten"])
+        self.assertFalse(events[1]["needs_attention"])
+        # A symbol never flagged in the first place gets no clear event.
+        guard2 = self._FakeGuard({"MSFT": self.decision_for("MSFT")})
+        strategy2 = self.strategy(held={"MSFT": 1}, targets={"MSFT": 1})
+        strategy2.corporate_action_guard = guard2
+        strategy2.rebalance()
+        self.assertEqual([e for e in strategy2.events if e.get("type") == "corporate_action_guard"], [])
 
 
 if __name__ == "__main__":

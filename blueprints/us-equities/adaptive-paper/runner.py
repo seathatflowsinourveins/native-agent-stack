@@ -924,26 +924,41 @@ RECONCILE_EVERY_SECONDS = 30  # periodic broker snapshot and reconciliation duri
 
 # CRITICAL finding 1 (2026-09-24 fix round): Alpaca's `/v1/corporate-actions`
 # endpoint filters by PROCESS date, which for a cash dividend is the payable
-# date -- typically 1-3 weeks AFTER the ex_date this guard actually reasons
-# about (blueprints/us-equities/alpaca-historical/README.md's own documented
+# date -- AFTER the ex_date this guard actually reasons about
+# (blueprints/us-equities/alpaca-historical/README.md's own documented
 # behaviour; independently confirmed by a native read-only check recorded in
 # corporate-actions-native-check-20260924.json: fetch(['AAPL'],
-# 2024-08-09, 2024-08-12) -- a narrow window around the real 2024-08-12
-# ex-date -- returned []; fetch(['AAPL'], 2024-08-12, 2024-08-16) returned
-# the cash_dividend). A narrow today..next_session request window therefore
-# systematically misses real dividends. Request a WIDE window from the
-# source and let evaluate_guard's own narrow date check (today..
-# next_session_date, inclusive -- finding 4) do the actual filtering
-# locally, exactly as corporate_actions.py's module docstring already
-# describes this split of responsibilities.
+# 2024-08-09, 2024-08-12) -- the guard's actual pre-fix production window
+# around the real 2024-08-12 ex-date -- returned []). A narrow today..
+# next_session request window therefore systematically misses real
+# dividends. Request a WIDE window from the source and let evaluate_guard's
+# own narrow date check (today..next_session_date, inclusive -- finding 4)
+# do the actual filtering locally, exactly as corporate_actions.py's module
+# docstring already describes this split of responsibilities.
+#
+# MEDIUM finding 6 (fix round 3): the forward pad below is sized from three
+# observed governing-to-process lags, each recorded with its source in
+# corporate-actions-native-check-20260924.json's lag_observations -- a
+# native AAPL dividend (3 days), and two Alpaca-documented examples (6 and
+# 15 days). This is NOT a proven maximum: no exceeding case has been found
+# or exhaustively searched for, and Alpaca does not guarantee upcoming-
+# action announcement availability at all. Treat 90 days as an evidence-
+# backed assumption, not an established bound.
 CORPORATE_ACTION_FETCH_WINDOW_PAST_DAYS = 7
 CORPORATE_ACTION_FETCH_WINDOW_FUTURE_DAYS = 90
-# HIGH finding 2: the hard ceiling on how long the corporate-action guard's
-# background refresh thread (see _schedule_corporate_action_refresh below)
-# is allowed to run before this coroutine gives up waiting on it (the
-# thread itself may still be blocked in alpaca-py past this point -- the
-# in-flight flag it clears in its `finally` prevents a second overlapping
-# thread from being started meanwhile, see the tick-loop call site).
+# HIGH finding 2/finding 1 (fix round 3): the hard ceiling on how long this
+# coroutine waits for the corporate-action guard's background refresh
+# thread (see _schedule_corporate_action_refresh below) before giving up.
+# The thread itself is NOT stopped by this timeout -- Python cannot
+# forcibly kill a running thread -- it may still be blocked in alpaca-py
+# past this point and could finish much later. `_schedule_corporate_
+# action_refresh` accounts for that: on timeout it calls the guard's own
+# `refresh_timed_out()` (generation-bumping the monitor so the eventual
+# late write is dropped as superseded, and treating the timeout as a
+# failure right now), clears `state["in_flight"]` so the NEXT tick's
+# refresh is not permanently locked out, and retains the task in
+# `state["tasks"]` so run_native's own shutdown path can still cancel/join
+# it rather than leaving it fully untracked.
 CORPORATE_ACTION_REFRESH_TIMEOUT_SECONDS = 20.0
 
 
@@ -977,14 +992,40 @@ def _corporate_action_fetch_window(session_date):
 
 
 async def _schedule_corporate_action_refresh(guard, watch, start, end, now, state):
-    """HIGH finding 2: run `guard.refresh()` (a blocking network call) off
-    the asyncio event loop in a worker thread, bounded by a hard
-    `asyncio.wait_for` timeout, and guarded by `state["in_flight"]` so a
-    still-running previous refresh thread is never overlapped by a second
-    concurrent one -- `CorporateActionMonitor.refresh` is not proven safe
-    for concurrent invocation. A no-op if a refresh is already in flight;
-    callers check `state["in_flight"]` before calling this so a throttled
-    (no-op) `refresh()` call never even spins up a thread."""
+    """HIGH finding 1/2 (fix round 3): run `guard.refresh()` (a blocking
+    network call) off the asyncio event loop in a worker thread, bounded by
+    a hard `asyncio.wait_for` timeout, and guarded by `state["in_flight"]`
+    so a still-running previous refresh thread is never overlapped by a
+    second concurrent one -- `state` is a plain dict callers own and can
+    share across call sites (the tick loop AND the preflight fetch both
+    pass the SAME dict, fix round 3, so an in-flight preflight thread is
+    visible to the tick loop's first check too).
+
+    `wait_for`'s timeout only stops THIS coroutine from waiting; it cannot
+    stop the worker thread itself (Python cannot forcibly kill a thread) --
+    reproduced by an independent review: the thread kept running past the
+    timeout and later wrote a stale result over a newer one. Two defenses,
+    both now in place:
+      1. `guard.refresh_timed_out(watch)` (if the guard exposes it -- the
+         real CorporateActionMonitor does) is called on timeout, which
+         bumps that monitor's internal generation counter so the abandoned
+         attempt's eventual write (whenever the thread actually finishes)
+         is dropped as superseded, AND marks the requested symbols
+         degraded/failed right now (the short `retry_seconds` interval
+         applies to the next attempt, not the full `refresh_seconds`).
+      2. The created task is retained in `state["tasks"]` (pruned of
+         already-done entries on every call) so a caller (run_native's own
+         `finally` block) can cancel and join every still-pending
+         corporate-action refresh task at shutdown, instead of leaving
+         them as untracked, unaccounted-for background work.
+
+    A no-op if a refresh is already in flight; callers check
+    `state["in_flight"]` before calling this so a throttled (no-op)
+    `refresh()` call never even spins up a thread. Returns the created
+    task so a caller that needs the result now (the preflight fetch) can
+    `await` it directly -- `_run()` below never raises (its own
+    `asyncio.wait_for` swallows the timeout), so awaiting the returned task
+    is itself already bounded by `CORPORATE_ACTION_REFRESH_TIMEOUT_SECONDS`."""
     state["in_flight"] = True
 
     async def _run():
@@ -993,15 +1034,86 @@ async def _schedule_corporate_action_refresh(guard, watch, start, end, now, stat
                 asyncio.to_thread(guard.refresh, watch, start=start, end=end, now=now),
                 timeout=CORPORATE_ACTION_REFRESH_TIMEOUT_SECONDS)
         except asyncio.TimeoutError:
-            pass
+            if hasattr(guard, "refresh_timed_out"):
+                guard.refresh_timed_out(watch)
+        except asyncio.CancelledError:
+            if hasattr(guard, "refresh_timed_out"):
+                guard.refresh_timed_out(watch)
+            raise
         finally:
             state["in_flight"] = False
 
-    asyncio.create_task(_run())
+    task = asyncio.create_task(_run())
+    tasks = state.setdefault("tasks", [])
+    tasks[:] = [t for t in tasks if not t.done()]
+    tasks.append(task)
+    return task
+
+
+async def _shutdown_corporate_action_tasks(ca_refresh_state):
+    """HIGH finding 1 (fix round 3, 'keep the task and join or cancel it at
+    shutdown'): cancel and join every still-pending corporate-action
+    refresh task tracked in `ca_refresh_state["tasks"]` -- a background
+    task run_native itself spawned (via _schedule_corporate_action_refresh)
+    must never be left running, unaccounted for, past run_native's own
+    return. An ordinary function, not inlined into run_native's `finally`
+    block, specifically so it is independently unit-testable (a fully
+    hanging worker thread cannot itself be joined quickly in a test --
+    `asyncio.run()`'s own cleanup joins the default thread-pool executor
+    regardless of any Task cancellation, since Python cannot forcibly kill
+    a thread -- but a plain asyncio.sleep()-based fake task CAN be, and
+    exercises the same cancel/gather logic).
+
+    Cancelling the task only stops THIS process from waiting on the worker
+    thread further; the thread's own eventual completion (whenever it
+    happens) is still safely a no-op via the monitor's generation check
+    (see refresh_timed_out/CancelledError handling in
+    _schedule_corporate_action_refresh)."""
+    pending_ca_tasks = [t for t in ca_refresh_state.get("tasks", []) if not t.done()]
+    for t in pending_ca_tasks:
+        t.cancel()
+    if pending_ca_tasks:
+        await asyncio.gather(*pending_ca_tasks, return_exceptions=True)
+
+
+async def _preflight_corporate_action_refresh(config, session_policy, ledger, ca_refresh_state):
+    """HIGH finding 2 ("do the first fetch in preflight")/finding 1 (fix
+    round 3, "share that state with the preflight"): only meaningful (and
+    only ever attempted) when overnight_holds is enabled -- see
+    run_native's own gating of the guard (finding 8) -- so the guard's
+    cache is already warm before run_native's tick loop starts its first
+    refresh, instead of every trial's very first tick paying for a cold
+    background fetch. Uses the SAME `_schedule_corporate_action_refresh`
+    helper (and the SAME `ca_refresh_state` dict the caller also passes
+    into run_native) the tick loop uses -- an ordinary function, not an
+    inline closure inside main()'s execute(), specifically so it is
+    independently unit-testable without driving all of main() (fix round
+    3, mutation F1b: "preflight call site fetches a one-day window" --
+    only directly testable once this was its own seam). Uses the SAME wide
+    `_corporate_action_fetch_window` the tick loop uses, never a narrower
+    one-day window."""
+    guard = _corporate_action_guard_for_strategy(config, session_policy)
+    if guard is None:
+        return
+    try:
+        preflight_now = time.time()
+        preflight_session = session_at(datetime.fromtimestamp(preflight_now, timezone.utc))
+        _, preflight_start, preflight_end = _corporate_action_fetch_window(preflight_session.session_date)
+    except ValueError:
+        return
+    preflight_watch = set(config["symbols"]) | {p.symbol for p in ledger.positions().values() if p.qty}
+    preflight_task = await _schedule_corporate_action_refresh(
+        guard, preflight_watch, preflight_start, preflight_end, preflight_now, ca_refresh_state)
+    # _run() inside _schedule_corporate_action_refresh never raises (its
+    # own wait_for already swallows the timeout) -- awaiting the task it
+    # returned is itself already bounded, so the preflight still blocks (as
+    # intended -- "do the first fetch in preflight") until the fetch
+    # resolves or times out, never longer.
+    await preflight_task
 
 
 async def run_native(controller, policy_config, assets, trial_id, config, baseline_cash, *, account_fingerprint="simulation",
-                     log_directory=None):
+                     log_directory=None, ca_refresh_state=None):
     from native_adapter import build_node
     from native_strategy import AdaptiveStrategy
     # R5: use the same registry entries load_config already validated (and
@@ -1032,10 +1144,18 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
                                 account_multiplier=config.get("_account_multiplier"),
                                 corporate_action_guard=_corporate_action_guard_for_strategy(
                                     config, session_policy))
-    # HIGH finding 2: a per-run state dict (not a strategy/monitor
-    # attribute) tracking whether a background refresh thread is currently
-    # in flight -- see _schedule_corporate_action_refresh.
-    ca_refresh_state = {"in_flight": False}
+    # HIGH finding 2/finding 1 (fix round 3): a per-run state dict (not a
+    # strategy/monitor attribute) tracking whether a background refresh
+    # thread is currently in flight, and the still-pending refresh tasks
+    # themselves -- see _schedule_corporate_action_refresh. A caller
+    # (main()'s execute(), for its own preflight fetch) can pass in an
+    # already-existing dict here so the SAME in-flight/task state is shared
+    # across the preflight fetch and this tick loop -- a preflight fetch
+    # thread still running when the tick loop starts must be visible to the
+    # tick loop's own in_flight check, not invisible because each used its
+    # own separate dict.
+    if ca_refresh_state is None:
+        ca_refresh_state = {"in_flight": False}
     # Capture actual streaming quotes before native conversion. Every native
     # strategy event still arrives through the data engine's ordinary path.
     port = controller.port
@@ -1261,6 +1381,7 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
             task.cancel()
             await asyncio.gather(task, return_exceptions=True)
         await port.stop()
+        await _shutdown_corporate_action_tasks(ca_refresh_state)
     state = asdict(controller.ledger.accounting())
     is_flat = not controller.ledger.positions() and not controller.ledger.unresolved()
     port_health = getattr(port, "health", {})
@@ -1285,7 +1406,12 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
               "corporate_action_guard": {
                   "enabled": strategy.corporate_action_guard is not None,
                   "ever_flagged_symbols": sorted(strategy._ca_ever_flagged),
-                  "pending_must_flatten": sorted(strategy._ca_last_must_flatten)}}
+                  "pending_must_flatten": sorted(strategy._ca_last_must_flatten),
+                  # MEDIUM finding 4 (fix round 3): every currently HELD
+                  # symbol not positively verified clear as of the run's
+                  # last tick (lookup failed/ambiguous/degraded/session-
+                  # unknown) -- read by _honest_overnight_hold below.
+                  "pending_needs_attention_held": sorted(strategy._ca_last_needs_attention_held)}}
     if leverage_policy is not None:
         capital = Decimal(config["capital_usd"])
         peak_effective_leverage = (peak_gross_exposure_usd / capital) if capital else Decimal("0")
@@ -1388,6 +1514,17 @@ def _honest_overnight_hold(outcome, session_policy, now):
         engine-layer forced-sell path caught up); that is a genuine
         failure, not an intentional overnight hold, and must instead take
         the recovery path below.
+      - MEDIUM finding 4 (fix round 3): the same guard summary carries no
+        ``pending_needs_attention_held`` symbol -- a held symbol whose
+        corporate-action lookup failed, was ambiguous, went stale, or fell
+        outside a classifiable session for the ENTIRE run was never
+        positively verified clear for the next session. This guard's own
+        documented contract is block-and-flag, not "assume clear on
+        silence" -- not force-flattening an unverified holding is correct
+        (this module never guesses at a corporate action from partial
+        data), but reporting the run a clean "held_overnight" success
+        (exit 0) is not: it silently drops the exact needs_attention state
+        that same tick's own corporate_action_guard event already raised.
 
     Any other non-flat end must stay "needs_attention" (routed through the
     force-flat/recover path below) so a genuine failure is never silently
@@ -1400,7 +1537,9 @@ def _honest_overnight_hold(outcome, session_policy, now):
     except ValueError:
         return False
     boundary_reached = kind in (SessionKind.POST, SessionKind.CLOSED)
-    guard_clear = not (outcome.get("corporate_action_guard") or {}).get("pending_must_flatten")
+    guard_summary = outcome.get("corporate_action_guard") or {}
+    guard_clear = (not guard_summary.get("pending_must_flatten")
+                  and not guard_summary.get("pending_needs_attention_held"))
     return (boundary_reached and outcome.get("reconciliation") is not None
             and not outcome.get("adapter_errors")
             and not (outcome.get("accounting") or {}).get("halted_reason")
@@ -1760,39 +1899,13 @@ def main():
                     controller.port = fresh_port(True)
                     return await recover(controller, metadata, config)
                 controller.port = fresh_port()
-                # HIGH finding 2 ("do the first fetch in preflight"): only
-                # meaningful (and only ever attempted) when overnight_holds
-                # is enabled -- see run_native's own gating of the guard
-                # (finding 8) -- so the guard's cache is already warm
-                # before run_native's tick loop starts its first refresh,
-                # instead of every trial's very first tick paying for a
-                # cold background fetch. Bounded exactly like the tick-loop
-                # refresh (finding 2): a worker thread with a wait_for
-                # timeout; never raises, and a failure here is simply left
-                # for the first in-loop refresh to retry.
-                guard = _corporate_action_guard_for_strategy(config, session_policy)
-                if guard is not None:
-                    try:
-                        preflight_now = time.time()
-                        preflight_session = session_at(datetime.fromtimestamp(preflight_now, timezone.utc))
-                        _, preflight_start, preflight_end = _corporate_action_fetch_window(
-                            preflight_session.session_date)
-                    except ValueError:
-                        pass
-                    else:
-                        preflight_watch = set(config["symbols"]) | {
-                            p.symbol for p in ledger.positions().values() if p.qty}
-                        try:
-                            await asyncio.wait_for(
-                                asyncio.to_thread(guard.refresh, preflight_watch, start=preflight_start,
-                                                  end=preflight_end, now=preflight_now),
-                                timeout=CORPORATE_ACTION_REFRESH_TIMEOUT_SECONDS)
-                        except asyncio.TimeoutError:
-                            pass
+                ca_refresh_state = {"in_flight": False}
+                await _preflight_corporate_action_refresh(config, session_policy, ledger, ca_refresh_state)
                 try:
                     outcome = await run_native(controller, policy_config, observation["assets"], args.trial,
                                                config, metadata["baseline_cash"], account_fingerprint=fingerprint,
-                                               log_directory=None if args.live_dir is None else args.live_dir / "nautilus")
+                                               log_directory=None if args.live_dir is None else args.live_dir / "nautilus",
+                                               ca_refresh_state=ca_refresh_state)
                 except Exception as exc:
                     outcome = {"status": "needs_attention", "flat": False, "native_fill_events": 0,
                                "error_type": type(exc).__name__}
