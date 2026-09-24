@@ -211,10 +211,13 @@ async def recover_mover(controller, metadata, config):
 
 
 def make_book(plan, controller):
+    """The mover book on the controller's quotes. Its exits (and exit re-pricing) wait on
+    Controller.is_halted, the status stream and unexpired startup seed; its entries also
+    wait on the quote's own condition flag (the stored quote's halted)."""
     ledger = controller.ledger
-    return MoverBook(plan, positions=ledger.positions, quote=controller.quotes.get, limits=ledger.limits,
+    return MoverBook(plan, positions=ledger.positions, quote=controller.current_quote, limits=ledger.limits,
                      trial_id=plan.trial_id, existing_client_ids=[i.client_id for i in ledger.intents()],
-                     event_sink=controller.events.append)
+                     event_sink=controller.events.append, halted=controller.is_halted)
 
 
 async def run_mover(controller, plan, config, baseline_cash, *, account_fingerprint="simulation",
@@ -365,6 +368,7 @@ async def run_mover(controller, plan, config, baseline_cash, *, account_fingerpr
                "orders_submitted": strategy.submitted, "reconciliation": reconciliation,
                "startup_reconciliation": session.reconciliation, "adapter_errors": list(session.errors),
                "execution_stats": dict(session.execution_stats),
+               "native_assertions": session.native_assertions(),
                "average_invariant_mismatches": list(session.average_invariant_mismatches),
                "callback_faults": list(strategy.callback_faults),
                "halts": controller.halt_summary() if hasattr(controller, "halt_summary") else None,
@@ -509,6 +513,8 @@ def build_receipt(*, plan, outcome, config_sha256, scan, ledger, ledger_before, 
         "error_reason": outcome.get("error_reason"),
         "callback_faults": outcome.get("callback_faults", []),
         "execution_stats": outcome.get("execution_stats"),
+        # E2's native assertions; a false one is named in its overturn_signals.
+        "native_assertions": outcome.get("native_assertions"),
         "average_invariant_mismatches": outcome.get("average_invariant_mismatches", []),
         "halts": outcome.get("halts"),
         "foreign_terminal_orders_ignored": outcome.get("foreign_terminal_orders_ignored", 0),

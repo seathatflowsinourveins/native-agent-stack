@@ -9,6 +9,8 @@ carries event_qty, event_price and execution_id is booked as exactly that execut
 (TradeId from the execution id, last_px the execution price). A cumulative quantity no
 booked execution explains is a fill gap, closed from the stream or from the broker's
 FILL activities for that order; a price is never derived from a cumulative average.
+Once the broker reports an order canceled or expired (even before its fills are
+booked), no execution may end above the cumulative quantity it reported then.
 """
 from __future__ import annotations
 
@@ -21,6 +23,7 @@ import importlib.metadata
 from pathlib import Path
 import re
 import sys
+import time
 import traceback
 from typing import Protocol, Callable
 
@@ -66,6 +69,12 @@ FILL_GAP_GRACE_SECONDS = 2.0   # a stream fill normally lands well inside this a
 # within 0.5e-6 per share of the executions' notional. Recorded, never a freeze.
 AVERAGE_ROUNDING = Decimal("0.0000005")
 CALLBACK_FAULT_REASON = re.compile(r"[a-z][a-z0-9_]{0,79}")
+# E2's overturn condition (convergence record 2026-09-24, E2; critic U4/B2) as named receipt
+# signals: a stream fill event without its execution_id, qty or price, and a fill gap the
+# activities had not closed when the session stopped (also the adapter error below).
+OVERTURN_SIGNALS = {"fill_events_carry_execution_fields": "e2_fill_event_without_execution_fields",
+                    "no_fill_gap_open_at_stop": "e2_fill_gap_open_at_stop"}
+FILL_GAP_OPEN_AT_STOP = "fill_gap_open_at_stop"
 
 
 def error_code(error):
@@ -225,6 +234,16 @@ class NativeSession:
         if self.handle is not None and self.handle.is_running:
             self.handle.stop()
 
+    def native_assertions(self):
+        """E2's native assertions for the receipt, read after the session stopped: every
+        stream fill event carried its execution fields, and no fill gap was still open at
+        stop. Each false assertion is named in ``overturn_signals`` (an open gap is also
+        the adapter error fill_gap_open_at_stop, so that run ends needs_attention)."""
+        stats = self.execution_stats
+        held = {"fill_events_carry_execution_fields": stats["fill_events_missing_execution_fields"] == 0,
+                "no_fill_gap_open_at_stop": stats["open_fill_gaps_at_stop"] == 0}
+        return {**held, "overturn_signals": [OVERTURN_SIGNALS[name] for name, ok in held.items() if not ok]}
+
     async def start(self):
         if self._start_lock is None:
             self._start_lock = asyncio.Lock()
@@ -321,6 +340,10 @@ class AlpacaExecutionClient(ExecutionClient):
                          oms_type=OmsType.NETTING, base_currency=USD, **kwargs)
         self.session = session
         self.orders, self.seen = {}, {}
+        # Adopted open orders' executions up to their startup filled quantity (one FILL
+        # activities read each, at connect), shared by the startup order and fill reports.
+        self.startup_executions = {}
+        self.reported_fills = set()
         session.execution = self
 
     async def _connect(self):
@@ -349,6 +372,12 @@ class AlpacaExecutionClient(ExecutionClient):
             self.session.snapshot_state = {**snapshot,
                                            "orders": [row for row in snapshot["orders"]
                                                      if row["status"] not in TERMINAL]}
+            # An adopted order's executions are read here, before native reconciliation
+            # asks for its order and fill reports (rc5 requests both concurrently): the
+            # order report's acceptance time must not follow its first execution.
+            for row in self.session.snapshot_state["orders"]:
+                if dec(row.get("filled_qty") or "0"):
+                    await self._adopted_executions(row)
         else:
             if any(dec(row["qty"], signed=True) != 0 for row in snapshot["positions"]):
                 raise ValueError("startup_requires_flat_account_use_external_recovery")
@@ -398,10 +427,30 @@ class AlpacaExecutionClient(ExecutionClient):
     @staticmethod
     def _new_state(broker_id):
         """Per-order booking state: executions keyed by the cumulative quantity after
-        them (the join key shared by stream fills and FILL activities)."""
+        them (the join key shared by stream fills and FILL activities). pending_terminal
+        is (status, stamp, the broker's filled quantity then); gap_opened maps each
+        cumulative quantity a booked execution did not yet explain to the monotonic time
+        it was first reported."""
         return {"id": broker_id, "accepted": False, "terminal": None, "pending_terminal": None,
                 "broker_filled": Decimal(0), "booked": Decimal(0), "averages": {}, "executions": {},
-                "trade_ids": {}, "checked": set(), "gap_task": None}
+                "trade_ids": {}, "checked": set(), "gap_task": None, "gap_opened": {}}
+
+    @staticmethod
+    def _terminal_limit(prior):
+        """The cumulative quantity no execution may end above, or None while the order
+        works: the broker's filled quantity once the order is terminal natively, or when
+        the broker reported the cancel or expiry that is still waiting for its fills."""
+        if prior["terminal"]:
+            return prior["broker_filled"]
+        if prior["pending_terminal"] is not None:
+            return prior["pending_terminal"][2]
+        return None
+
+    @staticmethod
+    def _covered(prior, target):
+        """How much of the cumulative range (0, target] booked executions cover (booked
+        executions never overlap, so this equals target exactly when none is missing)."""
+        return sum((row["qty"] for cum, row in prior["executions"].items() if cum <= target), Decimal(0))
 
     @staticmethod
     def _price(ins, price):
@@ -430,8 +479,9 @@ class AlpacaExecutionClient(ExecutionClient):
     def _book(self, order, prior, execution, broker_id, stamp):
         """Book one execution natively, exactly as the broker reported it, unless it is
         already booked (same execution id, or same cumulative quantity with the same qty
-        and price from the other source). A conflicting or overlapping execution, or a
-        new one after the native terminal event, fails closed."""
+        and price from the other source). A conflicting or overlapping execution, a new
+        one after the native terminal event, or one ending above the filled quantity of
+        a cancel or expiry the broker already reported, fails closed."""
         cum, qty, price, trade_id = execution["cum"], execution["qty"], execution["price"], execution["trade_id"]
         if prior["trade_ids"].get(trade_id, cum) != cum:
             raise ValueError("execution_conflict_requires_reconciliation")
@@ -442,7 +492,8 @@ class AlpacaExecutionClient(ExecutionClient):
             prior["trade_ids"].setdefault(trade_id, cum)
             self.session.execution_stats["duplicate_executions"] += 1
             return False
-        if prior["terminal"]:
+        limit = self._terminal_limit(prior)
+        if prior["terminal"] or (limit is not None and cum > limit):
             raise ValueError("post_terminal_fill_requires_reconciliation")
         if cum > dec(str(order.quantity)):
             raise ValueError("execution_exceeds_order_quantity")
@@ -453,7 +504,8 @@ class AlpacaExecutionClient(ExecutionClient):
         self.generate_order_filled(order, broker_id, None, execution_trade_id(trade_id), shares(qty),
                                    self._price(ins, price), USD, Money(0, USD), LiquiditySide.NO_LIQUIDITY_SIDE,
                                    stamp)
-        prior["executions"][cum] = {"qty": qty, "price": price, "trade_id": trade_id, "source": execution["source"]}
+        prior["executions"][cum] = {"qty": qty, "price": price, "trade_id": trade_id, "source": execution["source"],
+                                    "ts": stamp}
         prior["trade_ids"][trade_id] = cum
         prior["booked"] += qty
         self.session.execution_stats["executions_booked"] += 1
@@ -469,7 +521,7 @@ class AlpacaExecutionClient(ExecutionClient):
             return
         if prior["pending_terminal"] is None:
             return
-        status, stamp = prior["pending_terminal"]
+        status, stamp, _ = prior["pending_terminal"]
         if status == "canceled":
             self.generate_order_canceled(order, broker_id, stamp)
         else:
@@ -519,7 +571,10 @@ class AlpacaExecutionClient(ExecutionClient):
         reported = prior["averages"].get(filled)
         if reported is not None and reported != avg:
             raise ValueError("same_quantity_fill_correction_requires_reconciliation")
-        if prior["terminal"] and filled > prior["broker_filled"]:
+        limit = self._terminal_limit(prior)
+        if limit is not None and filled > limit:
+            # Above the filled quantity of the native terminal event, or of a cancel or
+            # expiry the broker already reported while its fills were still unbooked.
             raise ValueError("post_terminal_fill_requires_reconciliation")
         execution = self._stream_execution(row, ins, filled) if kind == "execution" else None
         if execution is None and filled < prior["broker_filled"]:
@@ -537,7 +592,7 @@ class AlpacaExecutionClient(ExecutionClient):
             self._book(order, prior, execution, broker_id, stamp)
         if not prior["terminal"]:
             if status in ("canceled", "expired") and prior["pending_terminal"] is None:
-                prior["pending_terminal"] = (status, stamp)
+                prior["pending_terminal"] = (status, stamp, filled)
             elif status == "rejected":
                 if prior["broker_filled"] or prior["booked"]:
                     raise ValueError("rejected_order_with_fills_requires_reconciliation")
@@ -546,25 +601,44 @@ class AlpacaExecutionClient(ExecutionClient):
         self._settle(order, prior, broker_id)
         self._check_average(prior, cid, filled, avg)
         if prior["booked"] < prior["broker_filled"]:
+            prior["gap_opened"].setdefault(prior["broker_filled"], time.monotonic())
             self._schedule_fill_gap(cid)
         self.session.observations.append({"client_order_id": cid, "status": status, "filled_qty": str(filled)})
 
     def _schedule_fill_gap(self, cid):
         prior = self.seen[cid]
         if prior["gap_task"] is not None or self.session.stopped:
-            return
+            return  # a running gap task picks up every newer gap, each with its own grace
         try:
             loop = asyncio.get_running_loop()
         except RuntimeError:
             return  # no owner loop (a direct call): reconcile_fills() stays available
         prior["gap_task"] = loop.create_task(self._fill_gap(cid))
 
+    def _open_gaps(self, prior):
+        """The gap targets (cumulative quantities reported but not yet explained by booked
+        executions), oldest quantity first; closed ones are dropped."""
+        for target in [t for t in prior["gap_opened"] if self._covered(prior, t) >= t]:
+            del prior["gap_opened"][target]
+        return sorted(prior["gap_opened"])
+
     async def _fill_gap(self, cid):
+        """Close each fill gap of one order once it is fill_gap_grace_seconds old: the
+        stream normally books the missing execution first; otherwise one FILL activities
+        read books it. A gap opened while another was pending gets its own full grace,
+        and a quantity reported during the read is a new gap, not a failure of this one."""
         prior = self.seen[cid]
         try:
-            await asyncio.sleep(self.session.fill_gap_grace_seconds)
-            if prior["booked"] < prior["broker_filled"] and not self.session.stopped:
-                await self.reconcile_fills(cid)
+            while not self.session.stopped and not self.session.errors:
+                targets = self._open_gaps(prior)
+                if not targets:
+                    return
+                target = targets[0]
+                wait = prior["gap_opened"][target] + self.session.fill_gap_grace_seconds - time.monotonic()
+                if wait > 0:
+                    await asyncio.sleep(wait)
+                    continue
+                await self.reconcile_fills(cid, target)
         except asyncio.CancelledError:
             raise
         except Exception as error:
@@ -574,20 +648,28 @@ class AlpacaExecutionClient(ExecutionClient):
             prior["gap_task"] = None
 
     def cancel_fill_gap_tasks(self):
-        """At shutdown: count gaps still open (receipt) and cancel their pending reads."""
-        self.session.execution_stats["open_fill_gaps_at_stop"] = sum(
-            1 for prior in self.seen.values() if prior["booked"] < prior["broker_filled"])
+        """At shutdown: count gaps still open and cancel their pending reads. An open gap
+        is an execution the native side never booked, so it is also the named adapter
+        error fill_gap_open_at_stop (the run ends needs_attention), not only a counter."""
+        open_gaps = sum(1 for prior in self.seen.values() if prior["booked"] < prior["broker_filled"])
+        self.session.execution_stats["open_fill_gaps_at_stop"] = open_gaps
+        if open_gaps and FILL_GAP_OPEN_AT_STOP not in self.session.errors:
+            self.session.errors.append(FILL_GAP_OPEN_AT_STOP)
         for prior in self.seen.values():
             task = prior.get("gap_task")
             if task is not None and not task.done():
                 task.cancel()
 
-    async def reconcile_fills(self, cid):
+    async def reconcile_fills(self, cid, target=None):
         """Close a fill gap from the broker's FILL activities for the order: book every
         execution not yet booked (TradeId from the activity id's UUID, last_px its price;
         deduplicated by cumulative quantity against stream fills), then emit a deferred
-        terminal event. One port read; never derives a price from an average."""
+        terminal event. One port read; never derives a price from an average. It fails
+        only when the activities leave (0, target] (default: the broker's cumulative
+        quantity at the call) uncovered, or when an activity ends above the filled
+        quantity of a cancel or expiry the broker already reported."""
         prior = self.seen[cid]
+        target = prior["broker_filled"] if target is None else target
         fetch = getattr(self.session.port, "fill_activities", None)
         if fetch is None:
             raise ValueError("fill_gap_unresolved_without_activities")
@@ -596,23 +678,38 @@ class AlpacaExecutionClient(ExecutionClient):
         order = self.orders.get(cid) or self.cache.order(ClientOrderId(cid))
         ins = self.session.instruments[str(order.instrument_id.symbol)]
         broker_id = VenueOrderId(prior["id"])
+        executions = []
         for activity in activities:
             if (activity["symbol"], activity["side"]) != (str(order.instrument_id.symbol), str(order.side).lower()):
                 raise ValueError("fill_activity_does_not_match_order")
-            execution = self._checked_execution(ins, activity["trade_id"], activity["qty"], activity["price"],
-                                                activity["cum_qty"], "activity")
-            if self._book(order, prior, execution, broker_id, activity["transaction_time_ns"]):
+            executions.append((self._checked_execution(ins, activity["trade_id"], activity["qty"], activity["price"],
+                                                       activity["cum_qty"], "activity"),
+                               activity["transaction_time_ns"]))
+        limit = self._terminal_limit(prior)
+        if limit is not None and any(execution["cum"] > limit for execution, _ in executions):
+            raise ValueError("post_terminal_fill_requires_reconciliation")
+        for execution, stamp in executions:
+            if self._book(order, prior, execution, broker_id, stamp):
                 self.session.execution_stats["activity_executions_booked"] += 1
             prior["broker_filled"] = max(prior["broker_filled"], execution["cum"])
-        if prior["booked"] < prior["broker_filled"]:
+        if self._covered(prior, target) < target:
             raise ValueError("fill_gap_unresolved_after_activities")
         self._settle(order, prior, broker_id)
 
     def order_report(self, row):
         ins, qty, filled, avg = self._normalized(row)
+        accepted = row["updated_at_ns"]
+        executions = self.startup_executions.get(row["client_order_id"])
+        if executions:
+            # rc5 applies startup reconciliation events in ts_event order: an acceptance
+            # stamped at the order's last update (after its fills) would come after them,
+            # and the fills would be dropped as invalid transitions on a still-initialized
+            # order (then rc5 synthesizes a separate order for the position instead). The
+            # order was accepted no later than its first execution.
+            accepted = min(accepted, min(execution["ts"] for execution in executions))
         return OrderStatusReport(self.account_id, ins.id, VenueOrderId(row["id"]),
             OrderSide.BUY if row["side"] == "buy" else OrderSide.SELL, OrderType.LIMIT, TimeInForce.DAY,
-            STATUSES[row["status"]], shares(qty), shares(filled), row["updated_at_ns"], row["updated_at_ns"],
+            STATUSES[row["status"]], shares(qty), shares(filled), accepted, row["updated_at_ns"],
             self.clock.timestamp_ns(), client_order_id=ClientOrderId(row["client_order_id"]),
             price=Price.from_str(str(row["limit_price"])), avg_px=avg if filled else None)
 
@@ -697,46 +794,75 @@ class AlpacaExecutionClient(ExecutionClient):
     async def _generate_order_status_reports(self, command):
         return [self.order_report(row) for row in self.session.snapshot_state["orders"]]
 
+    async def _adopted_executions(self, row):
+        """The executions of one adopted open order up to its startup filled quantity,
+        from one read of the broker's FILL activities (cached per order). They must tile
+        that quantity exactly from zero; a later one reaches the order through the stream
+        or a fill gap. Nonzero startup fills are never fabricated from an average."""
+        cid = row["client_order_id"]
+        if cid in self.startup_executions:
+            return self.startup_executions[cid]
+        fetch = getattr(self.session.port, "fill_activities", None)
+        if fetch is None:
+            raise ValueError("historical_fill_ledger_not_supplied_by_port")
+        ins, qty, filled, avg = self._normalized(row)
+        executions, covered = [], Decimal(0)
+        for activity in await fetch(row["id"]):
+            execution = self._checked_execution(ins, activity["trade_id"], activity["qty"], activity["price"],
+                                                activity["cum_qty"], "activity")
+            if execution["cum"] > filled:
+                continue
+            if ((activity["symbol"], activity["side"]) != (row["symbol"], row["side"])
+                    or execution["cum"] - execution["qty"] != covered):
+                raise ValueError("historical_fill_ledger_incomplete")
+            covered = execution["cum"]
+            executions.append(dict(execution, ts=activity["transaction_time_ns"]))
+        if covered != filled:
+            raise ValueError("historical_fill_ledger_incomplete")
+        self.startup_executions[cid] = executions
+        return executions
+
     async def _generate_fill_reports(self, command):
         """One FillReport per execution of every adopted open order with fills (only an
-        overnight-holds start adopts open orders), from the broker's FILL activities.
-        The executions up to the snapshot's filled quantity must tile it exactly; a
-        later one reaches the order through the stream or a fill gap. Nonzero startup
-        fills are never fabricated from a cumulative average."""
+        overnight-holds start adopts open orders), honouring the command's venue_order_id
+        and instrument_id filters (start and end are not applied: an adopted order's
+        report always carries its whole execution history). An order's booking state is
+        seeded from its FILL activities only the first time; a later call reports the
+        executions booked natively since (their own trade ids), never rolls them back and
+        reads nothing."""
+        venue_order_id = getattr(command, "venue_order_id", None)
+        instrument_id = getattr(command, "instrument_id", None)
         reports = []
         for row in self.session.snapshot_state["orders"]:
             if not dec(row["filled_qty"]):
                 continue
-            fetch = getattr(self.session.port, "fill_activities", None)
-            if fetch is None:
-                raise ValueError("historical_fill_ledger_not_supplied_by_port")
-            ins, qty, filled, avg = self._normalized(row)
-            prior, covered = self._new_state(row["id"]), Decimal(0)
+            ins = self.session.instruments[row["symbol"]]
+            if ((venue_order_id is not None and str(venue_order_id) != row["id"])
+                    or (instrument_id is not None and instrument_id != ins.id)):
+                continue
+            cid = row["client_order_id"]
+            prior = self.seen.get(cid)
+            if prior is None:
+                ins, qty, filled, avg = self._normalized(row)
+                prior = self._new_state(row["id"])
+                for execution in await self._adopted_executions(row):
+                    prior["executions"][execution["cum"]] = {"qty": execution["qty"], "price": execution["price"],
+                                                             "trade_id": execution["trade_id"], "source": "activity",
+                                                             "ts": execution["ts"]}
+                    prior["trade_ids"][execution["trade_id"]] = execution["cum"]
+                    prior["booked"] += execution["qty"]
+                prior["accepted"], prior["broker_filled"] = True, filled
+                prior["averages"][filled] = avg
+                self.seen[cid] = prior
             side = OrderSide.BUY if row["side"] == "buy" else OrderSide.SELL
-            for activity in await fetch(row["id"]):
-                execution = self._checked_execution(ins, activity["trade_id"], activity["qty"], activity["price"],
-                                                    activity["cum_qty"], "activity")
-                if execution["cum"] > filled:
-                    continue
-                if ((activity["symbol"], activity["side"]) != (row["symbol"], row["side"])
-                        or execution["cum"] - execution["qty"] != covered):
-                    raise ValueError("historical_fill_ledger_incomplete")
-                covered = execution["cum"]
+            for cum in sorted(prior["executions"]):
+                execution = prior["executions"][cum]
                 reports.append(FillReport(self.account_id, ins.id, VenueOrderId(row["id"]),
                     execution_trade_id(execution["trade_id"]), side, shares(execution["qty"]),
                     self._price(ins, execution["price"]), Money(0, USD), LiquiditySide.NO_LIQUIDITY_SIDE,
-                    activity["transaction_time_ns"], self.clock.timestamp_ns(),
-                    client_order_id=ClientOrderId(row["client_order_id"])))
-                prior["executions"][execution["cum"]] = {"qty": execution["qty"], "price": execution["price"],
-                                                         "trade_id": execution["trade_id"], "source": "activity"}
-                prior["trade_ids"][execution["trade_id"]] = execution["cum"]
-                prior["booked"] += execution["qty"]
-            if covered != filled:
-                raise ValueError("historical_fill_ledger_incomplete")
-            prior["accepted"], prior["broker_filled"] = True, filled
-            prior["averages"][filled] = avg
-            self.seen[row["client_order_id"]] = prior
-        self.session.execution_stats["startup_fill_reports"] = len(reports)
+                    execution["ts"], self.clock.timestamp_ns(), client_order_id=ClientOrderId(cid)))
+                self.reported_fills.add((cid, execution["trade_id"]))
+        self.session.execution_stats["startup_fill_reports"] = len(self.reported_fills)
         return reports
 
     async def _generate_position_status_reports(self, command):

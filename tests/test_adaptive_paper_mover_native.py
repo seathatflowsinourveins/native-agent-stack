@@ -149,6 +149,9 @@ class MoverNativeEndToEnd(unittest.TestCase):
         self.assertEqual((held, unresolved), ({}, 0))
         self.assertEqual(receipt["evidence_class"], "SYN")
         self.assertEqual(receipt["adapter_errors"], [])
+        # E2's native assertions: every fill event carried its execution fields, no gap at stop.
+        self.assertEqual(receipt["native_assertions"], {"fill_events_carry_execution_fields": True,
+                                                        "no_fill_gap_open_at_stop": True, "overturn_signals": []})
         self.assertTrue(receipt["totals"]["pnl_consistent"], receipt["totals"])
         self.assertIsNone(UUID.search(json.dumps(receipt)))
 
@@ -367,7 +370,7 @@ class MoverNativeEndToEnd(unittest.TestCase):
         # Scanned at 1.10, the symbol falls to a sub-penny bid near 0.935, where X4's stop
         # fires. On a 2-decimal instrument the sell either rested above the bid (a limit
         # rounded up to 0.94) or, once marketable, filled at a price the native adapter
-        # refuses (cumulative_fill_precision_requires_reconciliation). Every mover
+        # refuses (execution_price_precision_requires_reconciliation). Every mover
         # instrument is therefore registered at 4 decimals.
         rows = [row("AAA", 1, "1.10")]
         points = {"AAA": [(0, D("1.10"), D("0.01")), (2.0, D("1.10"), D("0.01")), (2.5, D("0.9354"), D("0.001"))]}
@@ -406,6 +409,30 @@ class MoverNativeEndToEnd(unittest.TestCase):
         strategy.on_quote(object())
         book.evaluate.assert_not_called()
         self.assertEqual(strategy.received_quotes, 1)
+
+    def test_a_faulted_strategy_no_longer_evaluates_the_book(self):
+        # B8: after a guarded order callback raised, quotes and ticks must not keep the book
+        # deciding: it would register orders, charge exit budget and log submissions that
+        # nothing sends. The force reason is still latched and terminal states still synced.
+        from types import SimpleNamespace
+        from unittest.mock import Mock
+        from mover_strategy import MoverStrategy
+        book = Mock()
+        book.legs = {"AAA": SimpleNamespace(state="holding")}
+        book.open_orders.return_value = []
+        book.evaluate.return_value = []
+        strategy = MoverStrategy(book, None)
+        strategy.started = True
+        strategy.faulted = True
+        strategy.on_quote(SimpleNamespace(instrument_id="AAA.ALPACA"))
+        strategy.tick(time.time(), force_reason="adapter_error")
+        book.evaluate.assert_not_called()
+        book.set_force.assert_called_once()
+        self.assertEqual(strategy.received_quotes, 1)
+        strategy.faulted = False                   # the same calls evaluate an unfaulted book
+        strategy.on_quote(SimpleNamespace(instrument_id="AAA.ALPACA"))
+        strategy.tick(time.time())
+        self.assertEqual(book.evaluate.call_count, 2)
 
     def test_an_order_callback_exception_freezes_stops_the_node_and_recovery_cleans_up(self):
         # E3, nautilus_trader#5039: rc5's LiveNode discards an exception raised in on_order_filled.

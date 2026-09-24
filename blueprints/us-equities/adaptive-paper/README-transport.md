@@ -106,16 +106,24 @@ reopening after a halt; `6` (trading range indication, "a security that is not T
 Halted"), `E` (short-sale restriction), `F` (LULD limit state) and the imbalance codes
 change nothing; UTP `H`, `Q` (quotation only) and `P` (volatility pause) halt and `T`
 resumes. Market-wide circuit-breaker reasons (`1`-`3`, `MWC0`-`MWC3`) are labelled; an
-unknown or cross-tape code halts until a documented resume. Statuses go to
+unknown or cross-tape code halts until a documented resume. A message whose tape is
+missing or not one of `A`, `B`, `C`, `O` reads its code from both tables (they share
+no code), so a documented resume still resumes it. Statuses go to
 `sink_status` on the owner loop; LULD bands are kept only for receipts
 (`health.luld_bands`), and a malformed band is counted, never a freeze. On `iex`
 neither channel is subscribed (their availability there is unverified and a refused
 channel would block readiness), so halt state then comes only from the quote-condition
-fallback. The stream sends no snapshot at subscribe time: `nasdaq_halt_seed(symbols)`
-reads Nasdaq Trader's trade halts RSS once (one https URL, no redirects, a 5 s deadline,
-a 4 MB bound; the feed's own TTL is one minute) and returns the symbols whose latest
-halt has no resumption trade time or one still ahead. A reconnect loses the status
-messages sent during the gap; the next message restores the state.
+fallback, which blocks entries only: on `iex` no exit waits on a halt. The stream
+sends no snapshot at subscribe time: `nasdaq_halt_seed(symbols)` reads Nasdaq Trader's
+trade halts RSS once (one https URL, no redirects, an uncompressed body of at most
+4 MB; the feed's own TTL is one minute) and returns the symbols whose latest halt has
+no resumption trade time or one still ahead. requests' 5 s timeout bounds each socket
+read, not the body, so the body is read one socket read at a time (urllib3 `read1`)
+with the 5 s total deadline checked before each: the read ends at most one 5 s read
+timeout after the deadline. The runner expires a halt only the seed asserts (at its
+resumption trade time, or 12 minutes after a LULD pause began) and skips a seed row
+already past that on arrival. A reconnect loses the status messages sent during the
+gap; the next message restores the state.
 Reconnect, stale quotes, missing initial order updates, malformed callbacks and
 overflow stop new exposure. After inspecting and reconciling a fresh complete
 snapshot, the caller may explicitly call `mark_reconciled()`. Queue loss or

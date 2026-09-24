@@ -544,7 +544,8 @@ class ExitRules(unittest.TestCase):
 class BookHarness:
     """A MoverBook over mutable fake positions and quotes, with the example config's caps."""
 
-    def __init__(self, test, *, exit_rule="X2", symbols=None, timing=None, regime=None, exit_orders=None):
+    def __init__(self, test, *, exit_rule="X2", symbols=None, timing=None, regime=None, exit_orders=None,
+                 halted=None):
         data = config_data()
         data["mover"]["exit"] = exit_rule
         data["mover"]["exit_orders"].update(exit_orders or {})
@@ -561,7 +562,7 @@ class BookHarness:
                                      evidence_class="SYN", t0=self.t0, equity=D(10000), timing=self.timing)
         self.positions, self.quotes, self.events = {}, {}, []
         self.book = mover.MoverBook(self.plan, positions=lambda: dict(self.positions), quote=self.quotes.get,
-                                    limits=self.limits, trial_id="t1", event_sink=self.events.append)
+                                    limits=self.limits, trial_id="t1", event_sink=self.events.append, halted=halted)
 
     def quote(self, symbol, bid, ask, at, halted=False):
         self.quotes[symbol] = Quote(symbol, str(bid), str(ask), at, halted=halted)
@@ -806,9 +807,10 @@ class BookStateMachine(unittest.TestCase):
 class ExitBudgetAndHandoff(unittest.TestCase):
     """What an exit may cost, and when the runner hands a residual to recovery.recover."""
 
-    def exit_due(self, max_orders):
+    def exit_due(self, max_orders, halted=None):
         """ABCD held (61 shares at 3.22) with its X2 exit due at the returned time."""
-        h = BookHarness(self, symbols=scan_dict()["symbols"][:1], exit_orders={"max_orders_per_symbol": max_orders})
+        h = BookHarness(self, symbols=scan_dict()["symbols"][:1], exit_orders={"max_orders_per_symbol": max_orders},
+                        halted=halted)
         now = h.t0 + 1
         h.quote("ABCD", "3.21", "3.22", now)
         buy = submits(h.evaluate(now), "buy")[0]
@@ -848,6 +850,28 @@ class ExitBudgetAndHandoff(unittest.TestCase):
         h.book.on_terminal(sell.client_id, "canceled")
         again = submits(h.evaluate(at + 610.5), "sell")[0]
         self.assertEqual((again.qty, again.limit_price), (D(61), D("3.14")))
+
+    def test_with_the_runners_halt_state_the_quote_flag_waits_entries_but_never_exits(self):
+        # B6: the runner gives the book Controller.is_halted (status stream and startup seed).
+        # A quote carrying only the best-effort condition flag then holds neither an exit nor
+        # its re-pricing back, while it still holds an entry; a status halt holds both.
+        status_halted = set()
+        h, at = self.exit_due(20, halted=lambda symbol: symbol in status_halted)
+        h.quote("ABCD", "3.20", "3.21", at, halted=True)
+        sell = submits(h.evaluate(at), "sell")[0]                    # the flag does not wait the exit
+        self.assertEqual(h.book.legs["ABCD"].exit_wait_reason, None)
+        h.quote("ABCD", "3.20", "3.21", at + 10, halted=True)
+        self.assertEqual(cancels(h.evaluate(at + 10)), [sell.client_id])   # nor its re-pricing
+        h.book.on_terminal(sell.client_id, "canceled")
+        status_halted.add("ABCD")                                     # a status halt waits both
+        h.quote("ABCD", "3.20", "3.21", at + 11)
+        self.assertEqual(submits(h.evaluate(at + 11)), [])
+        self.assertEqual(h.book.legs["ABCD"].exit_wait_reason, "quote_halted")
+        entry = BookHarness(self, symbols=scan_dict()["symbols"][:1], halted=lambda symbol: False)
+        now = entry.t0 + 1
+        entry.quote("ABCD", "3.21", "3.22", now, halted=True)
+        self.assertEqual(submits(entry.evaluate(now)), [])            # the flag still waits the entry
+        self.assertEqual(entry.book.legs["ABCD"].wait_reason, "quote_halted")
 
     def test_a_halt_through_the_hard_flatten_rests_the_exit_and_hands_off(self):
         # B3: the hard flatten (or the close) falls inside a halt. Nothing is re-priced or re-sent

@@ -319,8 +319,10 @@ def normalize_trading_status(raw):
     code that must never change the halt state (CTA 6 trading range indication, CTA E
     short-sale restriction, CTA F LULD limit state, CTA imbalance indicators 7-D). A
     code outside both documented tables, or a code of the other tape's table, is
-    ``unknown_status`` and halts (fails closed) until a documented resume. CTA 2 with
-    reason M is a LULD pause. Raises TransportError for a malformed message.
+    ``unknown_status`` and halts (fails closed) until a documented resume. A missing or
+    unrecognized tape (anything but A, B, C or O) reads the code from both tables (they
+    share no code), so a documented resume still resumes the symbol. CTA 2 with reason M
+    is a LULD pause. Raises TransportError for a malformed message.
     """
     symbol = raw.get("S")
     status_code = raw.get("sc")
@@ -336,10 +338,10 @@ def normalize_trading_status(raw):
     tape = raw.get("z")
     reason = raw.get("rc")
     reason = reason if isinstance(reason, str) else ""
-    state, halted = STATUS_CODES.get(status_code, ("unknown_status", True))
-    table = CTA_STATUS_CODES if tape in CTA_TAPES else UTP_STATUS_CODES if tape in UTP_TAPES else None
-    if tape is not None and (table is None or status_code not in table):
-        state, halted = "unknown_status", True
+    named = tape if isinstance(tape, str) else None
+    table = (CTA_STATUS_CODES if named in CTA_TAPES else UTP_STATUS_CODES if named in UTP_TAPES
+             else STATUS_CODES)
+    state, halted = table.get(status_code, ("unknown_status", True))
     if halted and status_code == "2" and reason == CTA_LULD_PAUSE_REASON:
         state = "luld_pause"
     if halted and reason in MARKET_WIDE_REASONS:
@@ -379,6 +381,7 @@ HALT_ROW_FIELDS = ("HaltDate", "HaltTime", "IssueSymbol", "Market", "ReasonCode"
                    "ResumptionQuoteTime", "ResumptionTradeTime")
 HALT_FEED_MAX_BYTES = 4_000_000
 HALT_FEED_SECONDS = 5.0
+HALT_FEED_READ_BYTES = 65536   # the most one read may return; each read is one socket read
 EASTERN = ZoneInfo("America/New_York")
 _HALT_DATE = re.compile(r"(\d{2})/(\d{2})/(\d{4})")
 _HALT_TIME = re.compile(r"(\d{2}):(\d{2}):(\d{2})(?:\.(\d{1,6}))?")
@@ -441,8 +444,13 @@ def active_halts(rows, symbols, now_ns):
 
 
 def fetch_nasdaq_halts(*, get=None, seconds=HALT_FEED_SECONDS, max_bytes=HALT_FEED_MAX_BYTES):
-    """One GET of the trade halts RSS: that one https URL, no redirects, a total deadline
-    and a bounded body. Returns the body bytes; raises TransportError otherwise."""
+    """One GET of the trade halts RSS: that one https URL, no redirects, an uncompressed
+    and bounded body, and a total deadline on the body. requests' timeout bounds each
+    socket read, not the body, and one iter_content chunk may span many reads of a
+    slowly dripping server; so the body is read with urllib3's read1 (at most one socket
+    read per call) and the deadline is checked before every read: reading ends at most
+    one read timeout (``seconds``) after the deadline. Returns the body bytes; raises
+    TransportError otherwise."""
     if get is None:
         import requests
         get = requests.get
@@ -450,20 +458,25 @@ def fetch_nasdaq_halts(*, get=None, seconds=HALT_FEED_SECONDS, max_bytes=HALT_FE
     try:
         response = get(NASDAQ_HALTS_RSS, timeout=(seconds, seconds), allow_redirects=False, stream=True,
                        headers={"User-Agent": "Mozilla/5.0 (compatible; adaptive-paper)",
-                                "Accept": "application/rss+xml, application/xml"})
+                                "Accept": "application/rss+xml, application/xml",
+                                "Accept-Encoding": "identity"})
     except Exception:
         raise TransportError("halts feed unavailable") from None
     try:
         if response.status_code != 200:
             raise TransportError("halts feed unavailable")
+        if str(response.headers.get("Content-Encoding") or "identity").strip().lower() != "identity":
+            raise TransportError("halts feed unavailable")   # decoding could chain reads past the deadline
         body = bytearray()
-        for chunk in response.iter_content(65536):
+        while True:
+            if time.monotonic() > deadline:
+                raise TransportError("halts feed unavailable")
+            chunk = response.raw.read1(HALT_FEED_READ_BYTES, decode_content=False)
+            if not chunk:
+                return bytes(body)
             body += chunk
             if len(body) > max_bytes:
                 raise TransportError("halts feed too large")
-            if time.monotonic() > deadline:
-                raise TransportError("halts feed unavailable")
-        return bytes(body)
     except TransportError:
         raise
     except Exception:

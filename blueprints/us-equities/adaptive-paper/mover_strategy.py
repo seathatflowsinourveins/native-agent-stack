@@ -53,7 +53,9 @@ class MoverStrategy(Strategy):
 
     def on_quote(self, quote):
         self.received_quotes += 1
-        if not self.started or self.suspended:
+        if not self.started or self.suspended or self.faulted:
+            # E3: after an order callback raised, the book no longer evaluates: it would
+            # register orders, charge exit budget and log submissions nothing sends.
             return
         symbol = str(quote.instrument_id).rsplit(".", 1)[0]
         leg = self.book.legs.get(symbol)
@@ -68,6 +70,8 @@ class MoverStrategy(Strategy):
         if force_reason:
             self.book.set_force(force_reason, now)
         self._sync_terminal()
+        if self.faulted:
+            return  # E3: a faulted strategy decides nothing more; recovery takes the residual
         self._execute(self.book.evaluate(now, entries_enabled=self.enabled))
 
     @property

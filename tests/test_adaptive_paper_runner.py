@@ -124,6 +124,9 @@ class IntegratedRunner(unittest.TestCase):
             self.assertEqual(result["status"], "passed", result)
             self.assertTrue(result["flat"])
             self.assertGreater(result["native_fill_events"], 0, result)
+            # E2's native assertions ride the outcome (a receipt field, not only counters).
+            self.assertEqual(result["native_assertions"], {"fill_events_carry_execution_fields": True,
+                                                           "no_fill_gap_open_at_stop": True, "overturn_signals": []})
             self.assertTrue(any(e["type"] == "intent" for e in controller.events))
             self.assertEqual(len(ledger.unresolved()), 0)
             self.assertEqual(port.started, 1)
@@ -672,6 +675,99 @@ class IntegratedRunner(unittest.TestCase):
             self.assertEqual(len(submitted), 1)
             self.assertIn("reason=rotation_flatten", strategy._fake_order_factory.calls[0]["tags"])
             self.assertIn("adp-fixture-0000098", [str(c) for c in cancelled])  # re-pricing resumes
+            ledger.close()
+
+    def test_a_stale_seed_on_a_held_symbol_blocks_its_exit_only_until_the_seed_expires(self):
+        """A3 and B6 through the adaptive strategy and a real Controller: the startup seed says
+        AAPL and IBM are in a LULD pause that in fact resumed before the engine subscribed (no
+        status message follows), and their quotes carry the best-effort condition flag. While
+        the seed counts, AAPL's flatten waits and IBM's resting exit is not cancelled for
+        re-pricing; at the seed's 12-minute expiry both go ahead, and the quote flag, still
+        set, holds neither exit back."""
+        from native_strategy import AdaptiveStrategy
+        from strategies import AdaptivePolicy, SelectorConfig
+        from selector import ACTIVE, FLATTEN_BEFORE_SWITCH, SelectionDecision
+
+        class V1Spec:
+            id = "adaptive_policy_v1"
+            receipt_sha256 = "0" * 64
+            sessions = ("regular",)
+            regime_affinity = ()
+
+            def propose(self, decision_inputs):
+                return {}
+
+        class FakeSelector:
+            def __init__(self, decision):
+                self.decision = decision
+                self.config = SelectorConfig(portfolio_transition_policy=FLATTEN_BEFORE_SWITCH)
+
+            def decide(self, decision_inputs):
+                return self.decision
+
+        class FakeOrderFactory:
+            def __init__(self):
+                self.calls = []
+
+            def limit(self, instrument_id, side, quantity, price, *, time_in_force, client_order_id, tags):
+                self.calls.append({"instrument_id": str(instrument_id), "tags": list(tags)})
+                return self.calls[-1]
+
+        class FakeStrategy(AdaptiveStrategy):
+            @property
+            def order_factory(self):
+                return self._fake_order_factory
+
+        now = time.time()
+        clock = [now]
+        with tempfile.TemporaryDirectory() as root:
+            ledger = Ledger(Path(root) / "journal.db")
+            ledger.start_trial(now)
+            ledger.reserve_intent("buy-1", "AAPL", "buy", "1", "100.01", quote=Quote("AAPL", "100", "100.01", now),
+                                  now=now, market_open=True, session_close=now + 3600)
+            ledger.record_order("buy-1", "broker-buy-1", "filled", "1", "100", timestamp=now)
+            controller = Controller(ledger, now + 3600, market_open=True, clock=lambda: clock[0])
+            halted_at = int((now - 12 * 60 + .02) * 1e9)          # the seed expires at now + 0.02 s
+            pause = {"halted_at_ns": halted_at, "resumption_trade_ns": None, "reason_code": "LUDP", "market": "NASDAQ"}
+            controller.apply_halt_seed({"source": "nasdaq_trade_halts_rss", "fetched_at_ns": int(now * 1e9),
+                                        "sha256": "0" * 64, "bytes": 1, "items": 2,
+                                        "halts": {"AAPL": dict(pause), "IBM": dict(pause)}})
+            for symbol in ("AAPL", "IBM"):
+                controller.quote({"symbol": symbol, "bid": "100.99", "ask": "101.01", "ts_ns": int(now * 1e9),
+                                  "halted": True})
+            _, _, policy_config = load_config(SOURCE / "config.json")
+            decision = SelectionDecision(timestamp=now, prior_state=ACTIVE, new_state=ACTIVE, regime="trend",
+                                         confidence=1.0, advantage_bps=50.0, incumbent_id="adaptive_policy_v1",
+                                         candidate_id="adaptive_policy_v1", reason_codes=("switched",),
+                                         blocked_by=(), liquidate=True)
+            policy = AdaptivePolicy(policy_config, strategy_pool=(V1Spec(),), selector=FakeSelector(decision))
+            strategy = FakeStrategy(policy, ledger, "fixture", halted=controller.is_halted)
+            strategy._fake_order_factory = FakeOrderFactory()
+            submitted, cancelled = [], []
+            strategy.submit_order = submitted.append
+            strategy.cancel_order = cancelled.append
+            strategy.started = strategy.enabled = True
+            policy.observe("AAPL", 100.995, 101.005, now)
+            strategy.pending["adp-fixture-0000098"] = {"symbol": "IBM", "side": "sell", "created": now - 60}
+
+            clock[0] = now + .01
+            strategy.rebalance(now + .01)
+            strategy.cancel_expired(now + .01, 10)
+            self.assertEqual((submitted, cancelled), ([], []))                  # the seed still counts
+            self.assertEqual(controller.halt_summary()["halted_now"], ["AAPL", "IBM"])
+
+            clock[0] = now + .03                                                # past the seed's expiry
+            policy.observe("AAPL", 100.995, 101.005, now + .03)
+            policy.last_decision = 0
+            strategy.rebalance(now + .03)
+            strategy.cancel_expired(now + .03, 10)
+            self.assertEqual(len(submitted), 1)
+            self.assertIn("reason=rotation_flatten", strategy._fake_order_factory.calls[0]["tags"])
+            self.assertEqual([str(c) for c in cancelled], ["adp-fixture-0000098"])   # re-pricing resumes
+            self.assertTrue(controller.quotes["AAPL"].halted)                   # the flag alone: entries only
+            self.assertEqual(controller.halt_summary()["halted_now"], [])
+            self.assertEqual(sorted(e["symbol"] for e in controller.events if e.get("effect") == "seed_expired"),
+                             ["AAPL", "IBM"])
             ledger.close()
 
     def test_an_order_callback_exception_ends_the_run_needs_attention_and_routes_to_recovery(self):

@@ -113,13 +113,16 @@ exits, `floor(max_order_notional_usd / bid)` whole shares.
   about a twentyfold rise. A sell is never sent while that symbol's buy is open, because a
   wash-trade refusal would stop the run.
 - **Exit budget.** Each leg may send `exit_orders.max_orders_per_symbol` exits, counted
-  from the latest grant. No exit is sent on a halted quote (it could not fill; the leg
-  waits), and a resting exit is not cancelled for re-pricing while its quote is halted
-  (a trading halt, LULD pause or quotation-only period, from the SIP status stream or
-  the startup halt seed): one re-price per exit timeout would spend the 20-order budget
-  in about 200 s against 5-10 minute pauses. It rests, and re-pricing resumes once the
-  symbol trades; a force reason or hard flatten inside a halt hands the leg to recovery
-  after the no-progress bound. A sell refused before any broker request (the ledger or NautilusTrader
+  from the latest grant. No exit is sent while the symbol is halted (a trading halt,
+  LULD pause or quotation-only period, from the SIP status stream or an unexpired
+  startup halt seed; `Controller.is_halted`): it could not fill, so the leg waits. A
+  resting exit is not cancelled for re-pricing then either: one re-price per exit
+  timeout would spend the 20-order budget in about 200 s against 5-10 minute pauses. It
+  rests, and re-pricing resumes once the symbol trades; a force reason or hard flatten
+  inside a halt hands the leg to recovery after the no-progress bound. The quote's own
+  best-effort condition flag waits entries only, never an exit, and a halt only the
+  seed asserts expires (at its resumption time, or 12 minutes after a LULD pause
+  began). A sell refused before any broker request (the ledger or NautilusTrader
   refused it, so the ledger holds no sent intent) is not charged; it is retried after
   1 s and has its own bound of the same size. A latched force reason grants each leg one
   fresh budget. A leg that exhausts its budget before any force latches the book-wide

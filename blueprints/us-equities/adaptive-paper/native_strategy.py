@@ -30,8 +30,10 @@ class AdaptiveStrategy(Strategy):
         self.event_sink = event_sink or (lambda event: None)
         self.transport = transport
         self.stop_file = stop_file
-        # E4: a symbol halted, paused or quotation-only (runner.Controller.is_halted)
-        # gets no new order and its resting exit is not re-priced until it resumes.
+        # E4: a symbol halted, paused or quotation-only per the status stream or an
+        # unexpired startup seed (runner.Controller.is_halted) gets no new order, entry or
+        # exit, and its resting exit is not re-priced until it resumes. The quote's own
+        # condition flag is not part of this: it blocks entries only (the ledger).
         self._halted = halted or (lambda symbol: False)
         # E3: native_adapter.guarded_callback records an order/position callback
         # exception here, latches `faulted` (no further submits) and calls fault_sink
@@ -773,9 +775,10 @@ class AdaptiveStrategy(Strategy):
                         for s, qty in decision.targets.items() if qty > held.get(s, 0)]
         for symbol, side, quantity, reason in actions:
             if self._halted(symbol):
-                # E4: halted, paused or quotation-only: no entry, and a resting exit is
-                # neither replaced nor joined by a new one (a limit sell cannot fill in
-                # a halt); the next tick after the resume acts again. A gap_risk_stop
+                # E4: halted, paused or quotation-only (status stream or unexpired seed):
+                # no entry and no new exit, and a resting exit is neither replaced nor
+                # joined by a new one (a limit sell cannot fill in a halt); the next tick
+                # after the resume, or the seed's expiry, acts again. A gap_risk_stop
                 # stays armed (fire-once is only marked on submit).
                 continue
             quote = self.policy.latest.get(symbol)

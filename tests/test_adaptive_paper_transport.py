@@ -1073,7 +1073,7 @@ class TradingStatusParsing(unittest.TestCase):
         self.assertEqual((resume["state"], resume["halted"]), ("trading", False))
 
     def test_unknown_or_cross_tape_codes_fail_closed_and_malformed_messages_raise(self):
-        for code, tape in (("X", "C"), ("H", "A"), ("2", "C"), ("Z", None), ("T", "Q")):
+        for code, tape in (("X", "C"), ("H", "A"), ("2", "C"), ("Z", None), ("Z", "Q"), ("T", "A"), ("3", "C")):
             with self.subTest(code=code, tape=tape):
                 status = t.normalize_trading_status(self.status(code, z=tape))
                 self.assertEqual((status["state"], status["halted"]), ("unknown_status", True))
@@ -1083,6 +1083,18 @@ class TradingStatusParsing(unittest.TestCase):
                         {"t": "2026-09-24T15:40:40"}):
             with self.subTest(changes=changes), self.assertRaises(t.TransportError):
                 t.normalize_trading_status({**self.status("H"), **changes})
+
+    def test_an_unrecognized_tape_reads_both_tables_so_a_documented_resume_still_resumes(self):
+        # B7: a tape outside A, B, C and O (for example an empty string) used to turn every code
+        # into unknown_status, so the symbol could never resume in-session.
+        for tape in ("", "Q", "X", 7, None):
+            for code, state, halted in (("H", "halted", True), ("T", "trading", False), ("2", "halted", True),
+                                        ("3", "trading", False), ("6", "trading_range_indication", None),
+                                        ("P", "volatility_pause", True), ("X", "unknown_status", True)):
+                with self.subTest(tape=tape, code=code):
+                    status = t.normalize_trading_status(self.status(code, z=tape))
+                    self.assertEqual((status["state"], status["halted"]), (state, halted))
+        self.assertIsNone(t.normalize_trading_status(self.status("T", z=7))["tape"])
 
     def test_documented_luld_band_parses_and_malformed_bands_raise(self):
         band = t.normalize_luld({"T": "l", "S": "IONM", "u": 3.24, "d": 2.65, "i": "B",
@@ -1112,12 +1124,34 @@ def halt_feed(*items):
 
 
 class FakeFeedResponse:
-    def __init__(self, status=200, body=b"", chunk=65536):
+    """A streamed requests.Response of the halts feed. Each socket read returns at most
+    ``chunk`` bytes and advances the fake ``clock`` by ``per_read`` seconds. ``raw.read1``
+    is one socket read (urllib3 HTTPResponse.read1); ``iter_content(size)`` keeps reading
+    until it has ``size`` bytes, as urllib3's read(amt) does."""
+
+    def __init__(self, status=200, body=b"", chunk=65536, headers=None, clock=None, per_read=0.0):
         self.status_code, self.body, self.chunk, self.closed = status, body, chunk, False
+        self.headers = dict(headers or {})
+        self.clock, self.per_read, self.offset, self.socket_reads = clock, per_read, 0, 0
+        self.raw = self
+
+    def _socket_read(self, size):
+        self.socket_reads += 1
+        if self.clock is not None:
+            self.clock[0] += self.per_read
+        data = self.body[self.offset:self.offset + min(size, self.chunk)]
+        self.offset += len(data)
+        return data
+
+    def read1(self, amt, decode_content=None):
+        return self._socket_read(amt)
 
     def iter_content(self, size):
-        for start in range(0, len(self.body), self.chunk):
-            yield self.body[start:start + self.chunk]
+        while self.offset < len(self.body):
+            data = b""
+            while len(data) < size and self.offset < len(self.body):
+                data += self._socket_read(size - len(data))
+            yield data
 
     def close(self):
         self.closed = True
@@ -1185,6 +1219,70 @@ class HaltFeedSeed(unittest.TestCase):
         for label, fake in refused.items():
             with self.subTest(label=label), self.assertRaises(t.TransportError):
                 t.fetch_nasdaq_halts(get=fake, max_bytes=1024)
+
+    def test_a_dripping_server_cannot_hold_the_read_past_its_deadline(self):
+        # A6: requests' timeout bounds each socket read, not the body. A server sending one
+        # byte every 4 s (inside the 5 s read timeout) kept one 64 KB iter_content chunk open
+        # for len(body) x 4 s before any deadline check; each read1 is one socket read and the
+        # deadline is checked before every read.
+        clock = [1000.0]
+        response = FakeFeedResponse(body=self.FEED, chunk=1, clock=clock, per_read=4.0)
+        with patch.object(t.time, "monotonic", lambda: clock[0]), self.assertRaises(t.TransportError):
+            t.fetch_nasdaq_halts(get=lambda url, **kwargs: response, seconds=5.0)
+        self.assertLessEqual(clock[0] - 1000.0, 5.0 + 4.0)          # at most one read past the deadline
+        self.assertLessEqual(response.socket_reads, 3)
+        self.assertTrue(response.closed)
+
+    @unittest.skipUnless(importlib.util.find_spec("requests"), "requests is not installed")
+    def test_a_dripping_loopback_server_is_cut_off_at_the_deadline_by_the_real_http_stack(self):
+        # A6, local integration with the installed requests/urllib3 (loopback only): a server
+        # that sends its 40-byte body one byte every 0.3 s stays inside the 1 s per-read
+        # timeout, so reading the whole body takes 12 s; the fetch must end near its 1 s
+        # deadline (one read past it at most) and never return a partial body.
+        import http.server
+        import requests
+
+        class Drip(http.server.BaseHTTPRequestHandler):
+            def do_GET(self):
+                self.send_response(200)
+                self.send_header("Content-Type", "application/rss+xml")
+                self.send_header("Content-Length", "40")
+                self.end_headers()
+                try:
+                    for _ in range(40):
+                        self.wfile.write(b"x")
+                        self.wfile.flush()
+                        time.sleep(0.3)
+                except (BrokenPipeError, ConnectionResetError):
+                    pass
+
+            def log_message(self, *args):
+                pass
+
+        server = http.server.ThreadingHTTPServer(("127.0.0.1", 0), Drip)
+        server.daemon_threads = True
+        thread = threading.Thread(target=server.serve_forever, daemon=True)
+        thread.start()
+        url = "http://127.0.0.1:%d/" % server.server_address[1]
+        try:
+            started = time.monotonic()
+            with self.assertRaises(t.TransportError):
+                t.fetch_nasdaq_halts(get=lambda _, **kwargs: requests.get(url, **kwargs), seconds=1.0)
+            self.assertLess(time.monotonic() - started, 3.0)
+        finally:
+            server.shutdown()
+            server.server_close()
+
+    def test_the_feed_is_requested_uncompressed_and_an_encoded_body_is_refused(self):
+        calls = []
+        def get(url, **kwargs):
+            calls.append(kwargs)
+            return FakeFeedResponse(body=self.FEED, headers={"Content-Encoding": "gzip"})
+        with self.assertRaises(t.TransportError):
+            t.fetch_nasdaq_halts(get=get)
+        self.assertEqual(calls[0]["headers"]["Accept-Encoding"], "identity")
+        plain = FakeFeedResponse(body=self.FEED, headers={"Content-Encoding": "identity"})
+        self.assertEqual(t.fetch_nasdaq_halts(get=lambda url, **kwargs: plain), self.FEED)
 
     def test_the_seed_records_its_source_digest_and_active_halts(self):
         seed = t.nasdaq_halt_seed(["AAA", "BBB", "SPY"], now_ns=self.NOW, fetch=lambda: self.FEED)

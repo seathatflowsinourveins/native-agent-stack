@@ -15,7 +15,7 @@ import unittest
 NATIVE = importlib.util.find_spec("nautilus_trader") is not None
 if NATIVE:
     from nautilus_trader.config import StrategyConfig
-    from nautilus_trader.model import InstrumentId, OrderSide, Price, Quantity, TimeInForce
+    from nautilus_trader.model import ClientOrderId, InstrumentId, OrderSide, Price, Quantity, TimeInForce
     from nautilus_trader.trading import Strategy
     PATH = Path(__file__).resolve().parents[1] / "blueprints/us-equities/adaptive-paper/native_adapter.py"
     SPEC = importlib.util.spec_from_file_location("adaptive_native", PATH)
@@ -478,12 +478,18 @@ class ScriptedPort:
     script. Stream rows are delivered after the REST answer, as on the wire."""
 
     def __init__(self, *, symbol="APUS", bid="5.61", ask="5.62", sell_rows=None, cancel=None, activities=None,
-                 snapshot_orders=(), snapshot_positions=()):
+                 snapshot_orders=(), snapshot_positions=(), after_sell_rows=None, activity_delay=0.0,
+                 during_activity_read=()):
         self.symbol, self.bid, self.ask = symbol, bid, ask
         self.sell_rows, self.cancel_script, self.activities = sell_rows, cancel, activities
         self.snapshot_orders, self.snapshot_positions = list(snapshot_orders), list(snapshot_positions)
         self.orders, self.tasks, self.activity_reads, self.cancels = {}, [], [], []
         self.started = self.stopped = 0
+        # Test hooks: called once the sell's scripted rows are delivered; an activities read
+        # that takes activity_delay seconds and delivers during_activity_read(order) rows
+        # (e.g. a REST row that got ahead) while it is in flight.
+        self.after_sell_rows, self.activity_delay = after_sell_rows, activity_delay
+        self.during_activity_read = during_activity_read
 
     async def start(self, on_quote, on_order):
         self.started += 1
@@ -501,12 +507,22 @@ class ScriptedPort:
         return {"account": {"cash": "10000", "buying_power": "10000", "equity": "10000"},
                 "orders": list(self.snapshot_orders), "positions": list(self.snapshot_positions)}
 
-    def later(self, rows, delay=0.0):
+    def deliver(self, rows, delay=0.0):
+        """Deliver stream rows of an adopted order from inside the running node."""
+        self.later(rows, delay)
+
+    def later(self, rows, delay=0.0, then=None):
+        """Deliver ``rows`` in order after ``delay``; a number among them is a pause (s)."""
         async def emit():
             await asyncio.sleep(delay)
             for row in rows:
+                if isinstance(row, (int, float)):
+                    await asyncio.sleep(row)
+                    continue
                 self.on_order(dict(row))
                 await asyncio.sleep(0)
+            if then is not None:
+                then()
         self.tasks.append(asyncio.get_running_loop().create_task(emit()))
 
     async def submit(self, payload):
@@ -518,7 +534,8 @@ class ScriptedPort:
                           updated_at_ns=time.time_ns())
             self.later([dict(order), execution(filled, payload["qty"], self.ask)])
         else:
-            self.later([dict(order)] + list(self.sell_rows(order) if self.sell_rows else []))
+            self.later([dict(order)] + list(self.sell_rows(order) if self.sell_rows else []),
+                       then=self.after_sell_rows)
         return dict(order)
 
     async def cancel(self, cid):
@@ -530,7 +547,17 @@ class ScriptedPort:
     async def fill_activities(self, order_id):
         self.activity_reads.append(order_id)
         rows = self.activities(order_id) if self.activities else []
+        order = next((o for o in self.orders.values() if o["id"] == order_id), None)
+        for row in (self.during_activity_read(order) if callable(self.during_activity_read) else ()):
+            self.on_order(dict(row))
+        if self.activity_delay:
+            await asyncio.sleep(self.activity_delay)
         return TRANSPORT.tiled_executions([TRANSPORT.normalize_fill_activity(row, order_id) for row in rows])
+
+
+def rest_row(row):
+    """The order state of a trade_updates row as a REST read returns it (no event fields)."""
+    return {key: value for key, value in row.items() if key not in ("event", "execution_id", "event_qty", "event_price")}
 
 
 if NATIVE:
@@ -578,6 +605,36 @@ if NATIVE:
             if self.stop_on_cancel:
                 self.shutdown_system("script sell canceled")
 
+    class AdoptedOrderWatcher(Strategy):
+        """Claims the adopted APUS order (rc5 external_order_instrument_ids), records the
+        native order and positions at start, has the port stream the next fills, and stops
+        once the order is filled."""
+
+        def __new__(cls, *args, **kwargs):
+            return super().__new__(cls, StrategyConfig(
+                log_events=False, log_commands=False,
+                external_order_instrument_ids=[InstrumentId.from_str("APUS.ALPACA")]))
+
+        def __init__(self, port, cid, stream_rows):
+            self.port, self.cid, self.stream_rows = port, cid, stream_rows
+            self.fills, self.start_state, self.end_state = [], None, None
+
+        def order_state(self):
+            order = self.cache.order(ClientOrderId(self.cid))
+            return (str(order.filled_qty), str(order.status), [str(t) for t in order.trade_ids],
+                    len(self.cache.orders()),
+                    [(str(p.instrument_id), str(p.quantity)) for p in self.cache.positions_open()])
+
+        def on_start(self):
+            self.start_state = self.order_state()
+            self.port.deliver(self.stream_rows, delay=0.05)
+
+        def on_order_filled(self, event):
+            self.fills.append((str(event.last_qty), str(event.last_px), str(event.trade_id)))
+            if str(self.cache.order(event.client_order_id).filled_qty) == "29":
+                self.end_state = self.order_state()
+                self.shutdown_system("adopted order filled")
+
 
 @unittest.skipUnless(NATIVE, "requires pinned Nautilus 2.0.0rc5 runtime")
 class PerExecutionBooking(unittest.TestCase):
@@ -613,6 +670,8 @@ class PerExecutionBooking(unittest.TestCase):
         self.assertEqual((stats["executions_booked"], stats["duplicate_executions"],
                           stats["average_invariant_mismatches"], stats["fill_events_missing_execution_fields"]),
                          (4, 0, 0, 0))
+        self.assertEqual(session.native_assertions(), {"fill_events_carry_execution_fields": True,
+                                                       "no_fill_gap_open_at_stop": True, "overturn_signals": []})
         # The old derivation from Alpaca's rounded averages: 28 x 5.619286 - 26 x 5.62 = 11.220008 for 2
         # shares, 5.610004, off the cent grid (the 2026-09-24 freeze). Nothing here derives it.
         self.assertEqual((28 * Decimal("5.619286") - 26 * Decimal("5.62")) / 2, Decimal("5.610004"))
@@ -653,6 +712,10 @@ class PerExecutionBooking(unittest.TestCase):
         self.assertEqual(session.execution_stats["fill_events_missing_execution_fields"], 3)
         self.assertEqual(session.execution_stats["activity_executions_booked"], 3)
         self.assertEqual(len(port.activity_reads), 1)
+        # E2's overturn condition is a named receipt assertion, not only a counter.
+        self.assertEqual(session.native_assertions(),
+                         {"fill_events_carry_execution_fields": False, "no_fill_gap_open_at_stop": True,
+                          "overturn_signals": ["e2_fill_event_without_execution_fields"]})
 
     def test_rest_cancel_before_the_stream_fill_defers_the_cancel_until_the_fill(self):
         stream = {}
@@ -695,6 +758,130 @@ class PerExecutionBooking(unittest.TestCase):
         self.assertEqual(session.errors, ["order_post_terminal_fill_requires_reconciliation"])
         self.assertEqual([(q, p) for q, p, _ in self.sells(strategy)], [("2", "5.61")])
         self.assertEqual(len(strategy.canceled), 1)
+
+    def rest_cancel_at_two(self, order, later):
+        """The REST read after DELETE reports the sell canceled with 2 filled before any of
+        its fills is booked; ``later(filled)`` gives the rows that follow on the wire."""
+        filled = dict(order, filled_qty="2", filled_avg_price="5.61", updated_at_ns=time.time_ns())
+        return dict(filled, status="canceled"), later(filled)
+
+    def test_a_stream_execution_above_a_rest_cancel_freezes_before_the_cancels_fills_are_booked(self):
+        # The cancel waits for its fills, but it fixed the order's final quantity at 2: an
+        # execution ending at 3 is post-terminal even though it arrives before the cum-2 fill.
+        stream = {}
+        def later(filled):
+            stream["late"] = execution(dict(filled, filled_qty="3", filled_avg_price="5.61",
+                                            status="partially_filled", updated_at_ns=time.time_ns()), "1", "5.61")
+            return [stream["late"], execution(dict(filled, status="partially_filled"), "2", "5.61")]
+        port = ScriptedPort(cancel=lambda order: self.rest_cancel_at_two(order, later))
+        strategy = ExecutionScript(cancel_sell=True, stop_on_cancel=False)
+        session = self.run_script(port, strategy, grace=2.0)
+        self.assertEqual(session.errors[0], "order_post_terminal_fill_requires_reconciliation")
+        # The cum-2 fill that follows may still be booked before the node stops (it is the
+        # cancel's own fill); nothing ending above 2 ever is.
+        self.assertLessEqual(set(session.errors), {"order_post_terminal_fill_requires_reconciliation",
+                                                   "fill_gap_open_at_stop"})
+        self.assertNotIn(stream["late"]["execution_id"], [t for _, _, t in self.sells(strategy)])
+        self.assertLessEqual(sum(int(q) for q, _, _ in self.sells(strategy)), 2)
+        state = session.execution.seen[str(strategy.sell.client_order_id)]
+        self.assertTrue(all(cum <= 2 for cum in state["executions"]))
+        self.assertEqual(port.activity_reads, [])
+
+    def test_activities_above_a_rest_cancel_freeze(self):
+        # The stream fill never arrives, and the FILL activities show an execution ending at 3
+        # past the cancel's filled quantity 2: the gap read freezes instead of booking it.
+        port = ScriptedPort(cancel=lambda order: self.rest_cancel_at_two(order, lambda filled: []),
+                            activities=lambda order_id: [fill_activity(order_id, 2, 2, "5.61", index=0),
+                                                         fill_activity(order_id, 3, 1, "5.61", index=1)])
+        strategy = ExecutionScript(cancel_sell=True, stop_on_cancel=False)
+        session = self.run_script(port, strategy)
+        # The read failed closed and the gap it was closing is still open when the node stops.
+        self.assertEqual(session.errors, ["fill_gap_post_terminal_fill_requires_reconciliation", "fill_gap_open_at_stop"])
+        self.assertEqual(self.sells(strategy), [])
+        self.assertEqual(strategy.canceled, [])
+        self.assertEqual(len(port.activity_reads), 1)
+
+    def gap_rows(self, order):
+        """The first APUS execution arrives without its execution fields (a cumulative report
+        only): a gap at 26 that only the activities can close."""
+        rows = apus_stream_rows(order, execution_fields=False)
+        return [rows[0]]
+
+    def test_a_gap_the_activities_leave_open_freezes(self):
+        port = ScriptedPort(sell_rows=self.gap_rows, activities=lambda order_id: [])
+        session = self.run_script(port, ExecutionScript())
+        self.assertEqual(session.errors, ["fill_gap_unresolved_after_activities", "fill_gap_open_at_stop"])
+        self.assertEqual(len(port.activity_reads), 1)
+
+    def test_a_failing_activities_read_freezes_with_its_error(self):
+        class Failing(ScriptedPort):
+            async def fill_activities(self, order_id):
+                self.activity_reads.append(order_id)
+                raise TRANSPORT.TransportError("fill activity lookup failed")
+        port = Failing(sell_rows=self.gap_rows)
+        session = self.run_script(port, ExecutionScript())
+        self.assertEqual(session.errors, ["fill_gap_TransportError", "fill_gap_open_at_stop"])
+        self.assertEqual(len(port.activity_reads), 1)
+
+    def test_a_gap_on_a_port_without_activities_freezes(self):
+        class NoActivities(ScriptedPort):
+            fill_activities = None
+        session = self.run_script(NoActivities(sell_rows=self.gap_rows), ExecutionScript())
+        self.assertEqual(session.errors, ["fill_gap_unresolved_without_activities", "fill_gap_open_at_stop"])
+
+    def test_a_gap_still_open_when_the_session_stops_is_a_named_adapter_error(self):
+        # B3: the node stops inside the grace period (for example the run ended right after a
+        # REST read revealed a fill); the native side never booked that execution.
+        port = ScriptedPort(sell_rows=self.gap_rows, activities=apus_activities)
+        session = ADAPTER.build_node(port, [{"symbol": "APUS"}], [ExecutionScript()])
+        session.fill_gap_grace_seconds = 30.0
+        port.after_sell_rows = session.stop
+        async def exercise():
+            await asyncio.wait_for(session.run_async(), timeout=8)
+        asyncio.run(exercise())
+        self.assertEqual(session.errors, ["fill_gap_open_at_stop"])
+        self.assertEqual(session.execution_stats["open_fill_gaps_at_stop"], 1)
+        self.assertEqual(port.activity_reads, [])
+        self.assertEqual(session.native_assertions(),
+                         {"fill_events_carry_execution_fields": False, "no_fill_gap_open_at_stop": False,
+                          "overturn_signals": ["e2_fill_event_without_execution_fields",
+                                               "e2_fill_gap_open_at_stop"]})
+
+    def test_a_gap_opened_during_another_gaps_grace_gets_its_own_grace(self):
+        # A2/B2: a gap at 26 opens at t=0; at 0.4 s a REST read reports 28 while the stream
+        # fills for 28 and 29 are still behind (they land at 0.8 s). The one activities read
+        # at 0.6 s closes 26 (the activity for 28 is not visible yet) and must not fail the
+        # younger gap at 28, which the stream closes inside its own grace (until 1.0 s).
+        def sell_rows(order):
+            bare = apus_stream_rows(order, execution_fields=False)
+            full = apus_stream_rows(order)
+            return [bare[0], 0.4, rest_row(bare[1]), 0.4, full[1], full[2]]
+        port = ScriptedPort(sell_rows=sell_rows, activities=lambda order_id: apus_activities(order_id)[:1])
+        strategy = ExecutionScript()
+        session = self.run_script(port, strategy, grace=0.6)
+        self.assertEqual(session.errors, [])
+        self.assertEqual([(q, p) for q, p, _ in self.sells(strategy)], [("26", "5.62"), ("2", "5.61"), ("1", "5.61")])
+        self.assertEqual(len(port.activity_reads), 1)
+        self.assertEqual(session.execution_stats["activity_executions_booked"], 1)
+        self.assertEqual(session.native_assertions()["overturn_signals"], ["e2_fill_event_without_execution_fields"])
+
+    def test_a_quantity_reported_during_the_activities_read_is_a_new_gap_not_a_failure(self):
+        # A2: while the read for the gap at 26 is in flight (at 0.4 s), a REST read reports 29
+        # (its stream fills are behind; they land at 0.6 s). The read books 26; 29 then has
+        # its own grace (until 0.8 s) and the stream closes it.
+        script = {}
+        def sell_rows(order):
+            bare = apus_stream_rows(order, execution_fields=False)
+            full = apus_stream_rows(order)
+            script["ahead"] = rest_row(bare[2])
+            return [bare[0], 0.6, full[1], full[2]]
+        port = ScriptedPort(sell_rows=sell_rows, activities=lambda order_id: apus_activities(order_id)[:1],
+                            activity_delay=0.05, during_activity_read=lambda order: [script["ahead"]])
+        strategy = ExecutionScript()
+        session = self.run_script(port, strategy, grace=0.4)
+        self.assertEqual(session.errors, [])
+        self.assertEqual([(q, p) for q, p, _ in self.sells(strategy)], [("26", "5.62"), ("2", "5.61"), ("1", "5.61")])
+        self.assertEqual(len(port.activity_reads), 1)
 
     def test_a_cumulative_average_that_disagrees_with_the_executions_is_recorded_not_frozen(self):
         port = ScriptedPort(sell_rows=lambda order: apus_stream_rows(order, averages={2: "5.62"}))
@@ -797,6 +984,57 @@ class StartupFillReports(unittest.TestCase):
             fill_activities = None
         with self.assertRaisesRegex(ValueError, "historical_fill_ledger_not_supplied_by_port"):
             self.reports(NoActivities(), row)
+
+    def test_an_adopted_partly_filled_order_books_one_native_fill_per_execution_through_rc5_startup(self):
+        # A4, local integration: rc5's own startup reconciliation (not a direct call) of an
+        # adopted buy at 26 of 29 (two executions), then the next two stream fills. rc5 applies
+        # reconciliation events in timestamp order: with the acceptance stamped at the order's
+        # last update (after its fills) it dropped the real fills as invalid transitions, left
+        # the order ACCEPTED with nothing filled and synthesized a second order for the position.
+        from types import SimpleNamespace
+        order_id, cid = str(uuid.uuid4()), "adp-t1-0000009"
+        row = {"client_order_id": cid, "id": order_id, "symbol": "APUS", "side": "buy", "qty": "29",
+               "filled_qty": "26", "filled_avg_price": "5.62", "status": "partially_filled", "limit_price": "5.63",
+               "updated_at_ns": time.time_ns()}
+        activities = [fill_activity(order_id, 20, 20, "5.62", side="buy", index=0),
+                      fill_activity(order_id, 26, 6, "5.62", side="buy", index=1)]
+        stream = [execution(dict(row, filled_qty="28", filled_avg_price="5.619286", updated_at_ns=time.time_ns()),
+                            "2", "5.61"),
+                  execution(dict(row, filled_qty="29", filled_avg_price="5.618966", status="filled",
+                                 updated_at_ns=time.time_ns() + 1), "1", "5.61")]
+        port = ScriptedPort(activities=lambda oid: activities, snapshot_orders=[row],
+                            snapshot_positions=[{"symbol": "APUS", "qty": "26", "avg_entry_price": "5.62"}])
+        strategy = AdoptedOrderWatcher(port, cid, stream)
+        policy = {"extended_hours": True, "overnight_holds": True, "overnight_gross_multiple": Decimal("1.0")}
+        session = ADAPTER.build_node(port, [{"symbol": "APUS"}], [strategy], session_policy=policy)
+        async def exercise():
+            await asyncio.wait_for(session.run_async(), timeout=8)
+        asyncio.run(exercise())
+        startup = [activity["id"].split("::")[1] for activity in activities]
+        streamed = [r["execution_id"] for r in stream]
+        self.assertEqual(session.errors, [])
+        self.assertEqual(port.activity_reads, [order_id])            # one read, at connect
+        # The startup fills landed on the adopted order itself; no synthetic order was made.
+        self.assertEqual(strategy.start_state, ("26", "PARTIALLY_FILLED", startup, 1, [("APUS.ALPACA", "26")]))
+        self.assertEqual(strategy.fills, [("2", "5.61", streamed[0]), ("1", "5.61", streamed[1])])
+        self.assertEqual(strategy.end_state, ("29", "FILLED", startup + streamed, 1, [("APUS.ALPACA", "29")]))
+        self.assertEqual((session.execution_stats["startup_fill_reports"], session.execution_stats["executions_booked"]),
+                         (2, 2))
+        # A later fill-report request reports what is booked natively, never resets it or reads again,
+        # and honours the command's filters.
+        execution_client = session.execution
+        everything = SimpleNamespace(venue_order_id=None, instrument_id=None)
+        reports = asyncio.run(execution_client._generate_fill_reports(everything))
+        self.assertEqual([str(r.trade_id) for r in reports], startup + streamed)
+        self.assertEqual(execution_client.seen[cid]["booked"], Decimal(29))
+        self.assertEqual(port.activity_reads, [order_id])
+        other = SimpleNamespace(venue_order_id=ADAPTER.VenueOrderId(str(uuid.uuid4())), instrument_id=None)
+        self.assertEqual(asyncio.run(execution_client._generate_fill_reports(other)), [])
+        this = SimpleNamespace(venue_order_id=ADAPTER.VenueOrderId(order_id),
+                               instrument_id=ADAPTER.InstrumentId.from_str("APUS.ALPACA"))
+        self.assertEqual(len(asyncio.run(execution_client._generate_fill_reports(this))), 4)
+        elsewhere = SimpleNamespace(venue_order_id=None, instrument_id=ADAPTER.InstrumentId.from_str("SPY.ALPACA"))
+        self.assertEqual(asyncio.run(execution_client._generate_fill_reports(elsewhere)), [])
 
 
 GUARDED_MODULES = ("native_strategy.py", "mover_strategy.py", "benchmark.py")

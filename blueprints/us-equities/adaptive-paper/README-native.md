@@ -49,22 +49,35 @@ cumulative booking the 2026-09-24 APUS sell (26 @ 5.62, 2 @ 5.61, 1 @ 5.61; aver
 Executions are keyed by the order's cumulative quantity after them, so a repeated,
 reordered or REST-overtaken delivery never books twice; a conflicting or overlapping
 execution freezes. A cumulative quantity that no booked execution explains is a fill
-gap. If it is still open after `fill_gap_grace_seconds` (2 s), the adapter reads the
-order's executions once through the port's `fill_activities` (`GET
-/v2/account/activities/FILL?order_id=`) and books the missing ones, joined on
-cumulative quantity: that an activity id's UUID equals the stream `execution_id` is
-not documented. A cancel or expiry reported before its fills (for example by the REST
-read after a cancel) waits for them. These still freeze for reconciliation: an
-execution after the native terminal event, a changed average at an unchanged
-cumulative quantity, a gap the activities cannot close, a replace event, the rare
-`done_for_day`, `calculated`, `stopped`, `suspended` and `restated` events, and any
-undocumented event string. Trade corrections and busts are not `trade_updates`
-events (Alpaca documents them only as activities, `/v2beta1/events/activities`,
-which this release does not consume). The executions' notional is compared with
-`filled_qty x filled_avg_price` within Alpaca's rounding and a difference is recorded
-(`average_invariant_mismatches`), never a freeze. Receipts carry `execution_stats`;
-its `fill_events_missing_execution_fields` is E2's overturn metric and must stay 0
-on paper.
+gap. Each gap gets its own grace: once it has been open for `fill_gap_grace_seconds`
+(2 s) the adapter reads the order's executions once through the port's
+`fill_activities` (`GET /v2/account/activities/FILL?order_id=`) and books the missing
+ones, joined on cumulative quantity: that an activity id's UUID equals the stream
+`execution_id` is not documented. A read fails only if it leaves that gap open; a
+larger cumulative quantity reported during the grace or the read is a new gap with a
+full grace of its own. A cancel or expiry reported before its fills (for example by
+the REST read after a cancel) waits for them, and fixes the order's final quantity: an
+execution (stream or activity) or any row ending above the filled quantity that cancel
+or expiry reported freezes (`post_terminal_fill_requires_reconciliation`), as does an
+execution after the native terminal event. These also freeze for reconciliation: a
+changed average at an unchanged cumulative quantity, a gap the activities cannot close
+(`fill_gap_unresolved_after_activities`), a failed activities read (`fill_gap_` plus
+the error, for example `fill_gap_TransportError`), a port without `fill_activities`
+(`fill_gap_unresolved_without_activities`), a replace event, the rare `done_for_day`,
+`calculated`, `stopped`, `suspended` and `restated` events, and any undocumented event
+string. A gap still open when the session stops is the adapter error
+`fill_gap_open_at_stop` (the run ends `needs_attention`): the native side never booked
+that execution. Trade corrections and busts are not `trade_updates` events (Alpaca
+documents them only as activities, `/v2beta1/events/activities`, which this release
+does not consume). The executions' notional is compared with `filled_qty x
+filled_avg_price` within Alpaca's rounding and a difference is recorded
+(`average_invariant_mismatches`), never a freeze. Receipts carry `execution_stats` and
+`native_assertions`: `fill_events_carry_execution_fields` (no stream fill event lacked
+its `execution_id`, `qty` or `price`; E2's overturn condition) and
+`no_fill_gap_open_at_stop`, each false one named in `overturn_signals`
+(`e2_fill_event_without_execution_fields`, `e2_fill_gap_open_at_stop`). Both must hold
+on paper; a run that books its fills from the activities because the events lack those
+fields still reconciles, but its receipt carries the overturn signal.
 
 Only exceptions with `definitive_rejection=True` become native order rejections.
 `NativeOrderRejected` is provided for a refusal known to occur before acceptance.
@@ -80,11 +93,17 @@ new native fills. Non-flat recovery is reconciliation/liquidation outside this
 new native session; resumed native strategy entry is not qualified. Initial
 reconciliation uses explicit empty order/fill/position reports only after checking
 that snapshot. With `overnight_holds` an adopted open order that has fills reports one
-`FillReport` per execution from its FILL activities, which must tile the snapshot's
-filled quantity (`historical_fill_ledger_incomplete` otherwise); a port without
-`fill_activities` still refuses (`historical_fill_ledger_not_supplied_by_port`). Unknown
-stream orders are sent as native status reports, never assigned to a strategy by
-guessing an intent.
+`FillReport` per execution from its FILL activities, read once at connect, which must
+tile the snapshot's filled quantity (`historical_fill_ledger_incomplete` otherwise); a
+port without `fill_activities` still refuses
+(`historical_fill_ledger_not_supplied_by_port`). Its order report is stamped accepted
+no later than its first execution: rc5 applies startup reconciliation events in
+timestamp order, and an acceptance stamped at the order's last update (after its fills)
+made rc5 drop the real fills as invalid transitions and synthesize a separate order for
+the position (reproduced on a real rc5 `LiveNode`). Fill reports honour the command's
+`venue_order_id` and `instrument_id`; a later request reports what is booked natively
+and never resets it. Unknown stream orders are sent as native status reports, never
+assigned to a strategy by guessing an intent.
 
 The native v2 `Equity` model has size precision 0 and size increment 1 even when
 given a fractional lot size. A fractional broker fill therefore **freezes this
@@ -112,13 +131,31 @@ own bookkeeping is lost. Every `on_order_*` and `on_position_*` handler of
 `AdaptiveStrategy`, `MoverStrategy` and `CapacityProbe` is therefore wrapped by
 `guarded_callback`. On an exception the guard records the callback name, exception
 type and a traceback SHA-256 (`callback_faults`), latches `faulted` (no further submit;
-cancels still go out), freezes the ledger with
+the adaptive runner's timeout cancels still go out, while the mover book stops
+evaluating on quotes and ticks, so it registers no order, charges no exit budget and
+logs no submission that nothing sends), freezes the ledger with
 `strategy_callback_exception_<handler>`, calls the runner's `fault_sink`
 (`NativeSession.fail`: the node stops and the adapter denies every submit) and
 re-raises. The run ends `needs_attention` and any residual goes to recovery. An AST
 test fails on any unwrapped handler. Overturn: a released version that surfaces the
 exception or stops the node fails the characterization test, and the guard can then
-shrink to record and freeze.
+shrink to record and freeze. The same characterization, outside the adapter, is
+`blueprints/us-equities/engine-nautilus/probes/repro_5039.py` (a `BacktestEngine`
+strategy whose `on_order_filled` raises: rc5 keeps processing bars and `run()` raises
+nothing; it exits 0 while the loss reproduces).
+
+## Halts (E4)
+
+On SIP, a symbol the status stream or an unexpired startup seed marks halted, paused
+or quotation-only (`runner.Controller.is_halted`) gets no order from either lane: no
+entry and no new exit (a stop, trailing, gap-risk or forced exit waits for the
+resume), and its resting exit is not cancelled or re-priced. The quote's own
+best-effort condition flag (`H`, unverified against Alpaca's condition tables) is not
+part of that state: it blocks entries only (the ledger's `quote_halted` refusal and the
+mover's entry wait), never an exit. A halt only the seed asserts expires at its
+resumption trade time, or 12 minutes after a LULD pause began (`LUDP`, `LUDS`, `M`), so
+a stale seed cannot block a held symbol's exits for the session; other seeded halts
+without a resumption time last until a status message arrives.
 
 ## Verification
 

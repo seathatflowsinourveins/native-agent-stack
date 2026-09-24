@@ -20,11 +20,17 @@ host path is recorded. The raw stdout stays private (231 bytes, sha256
 wrote `receipt.json` in place, replacing the 2026-09-23 receipt, which is kept
 byte-for-byte as `receipt-20260923.json`.
 
-The receipt binds this tree. Its `harness_sha256` (3f01fb31...), `plan_sha256`
-(f276b26c...) and `engine_sources_sha256` for runner.py (a6101294...), safety.py
-(ad520fc4...) and transport.py (b92e8752...) equal the SHA-256 of those files
-here and the engine entries in `../source-hashes.json`. The later merge of
-origin/main changed none of these five files.
+The receipt binds the tree it ran on. Its `harness_sha256` (3f01fb31...),
+`plan_sha256` (f276b26c...) and `engine_sources_sha256` for runner.py
+(a6101294...), safety.py (ad520fc4...) and transport.py (b92e8752...) equalled the
+SHA-256 of those files and the engine entries in `../source-hashes.json` up to
+cbbd5894; the later merge of origin/main changed none of these five files.
+Amendment, 2026-09-24: the adaptive-paper engine release of that day (0b492619 and
+its review follow-up) changed runner.py, safety.py and transport.py, including the
+REST observation path, `Ledger.record_order` and the `GuardedSession` read allowlist
+this receipt exercised, so the receipt now qualifies the engine before that release.
+Before the `native-fault-behaviour` gate is cited for the released engine, this plan
+(C01, C02, C05, C04) must run again on it and bind its source hashes.
 
 | Case | Outcome | Evidence class | Broker requests |
 |---|---|---|---|

@@ -121,10 +121,14 @@ record): each broker execution is booked at its own quantity and price, with fil
 closed from the order's FILL activities (README-native.md, README-safety.md); every
 strategy order and position callback is guarded, because rc5 discards an exception
 raised there (README-native.md); and on SIP the engine tracks per-symbol trading halts,
-LULD pauses and quotation-only periods from the status stream plus a startup seed, with
-no entries and no exit re-pricing while a symbol is halted (README-transport.md,
-README-mover.md). The evidence is synthetic fixtures and local integration against the
-real rc5 `LiveNode`; no paper session has run this release yet. It changes engine files
+LULD pauses and quotation-only periods from the status stream plus a startup seed, and
+while a symbol is halted neither lane sends it an entry or a new exit (stop, trailing,
+gap-risk and forced exits wait for the resume) nor re-prices its resting exit
+(README-native.md, README-transport.md, README-mover.md). The quote's own condition
+flag blocks entries only, and a halt only the startup seed asserts expires (at its
+resumption time, or 12 minutes after a LULD pause began). The evidence is synthetic
+fixtures and local integration against the real rc5 `LiveNode`; no paper session has
+run this release yet. It changes engine files
 that a forward protocol pins, so such a protocol needs a new version before it counts
 sessions run on this release.
 

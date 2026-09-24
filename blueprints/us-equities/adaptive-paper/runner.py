@@ -34,6 +34,17 @@ LAST_OUTPUT = None
 # E4: how long entries wait at startup for the halt seed read (one halts feed request run
 # while the node connects) before the stream alone decides.
 HALT_SEED_WAIT_SECONDS = 3.0
+# A halt only the startup seed asserts (no status message has confirmed or cleared it)
+# expires, because the stream sends changes only and the feed lags (about 65 s p50), so a
+# pause that ended just before the read would otherwise hold its symbol all session: at
+# its resumption trade time when the feed gives one, or, for a LULD trading pause, 12
+# minutes after it began. LULD Plan Amendment 12 (Cboe fact sheet): a pause's first 5-
+# minute halt segment, and a second one when it is extended, run in full, so a pause still
+# closed after 10 minutes is exceptional; 2 minutes are a margin. A longer pause then counts
+# as trading until the stream reports it. Other seeded halts without a resumption time stay
+# until a status message arrives.
+SEEDED_LULD_PAUSE_SECONDS = 12 * 60
+LULD_PAUSE_REASON_CODES = frozenset({"LUDP", "LUDS", "M"})
 
 
 def _seed_failure(exc):
@@ -737,6 +748,12 @@ class Controller:
         self.last_status_ts = {}
         self.halt_states = {}      # symbol -> last applied trading status (receipts)
         self.status_messages = 0
+        # E4: halts only the startup seed asserts, with their expiry ({"expires_ns",
+        # "basis"}); a streamed status for the symbol replaces the seed's say.
+        self.seeded_halts = {}
+        # The quote's own best-effort condition flag (transport.normalize_quote), per
+        # symbol: it blocks entries through the stored quote, never exits.
+        self.quote_condition_halted = {}
         # E4 startup state: a blocking callable (symbols) -> transport.nasdaq_halt_seed
         # result, set by the paper entry points on a feed that streams statuses; None
         # (simulations, tests, other feeds) seeds nothing.
@@ -798,22 +815,41 @@ class Controller:
                                  execution=execution_from_observation(order))
 
     def quote(self, quote):
-        # halted merges the per-quote signal (transport.normalize_quote's
-        # best-effort condition-code mapping) with any standing halt recorded
-        # from a trading_status message (see trading_status() below); either
-        # source marks the symbol halted until trading_status clears it.
-        halted = bool(quote.get("halted", False)) or quote["symbol"] in self.halted_symbols
+        # The stored quote's halted flag merges the per-quote signal
+        # (transport.normalize_quote's best-effort condition-code mapping) with any
+        # standing halt from a trading_status message or the startup seed; it gates
+        # entries (reserve_intent, the mover's entry). Exits and exit re-pricing read
+        # is_halted(), the status and seed state alone.
+        self._expire_seeded_halts()
+        flagged = bool(quote.get("halted", False))
+        halted = flagged or quote["symbol"] in self.halted_symbols
         q = Quote(quote["symbol"], quote["bid"], quote["ask"], quote["ts_ns"] / 1e9, halted=halted)
         old = self.quotes.get(q.symbol)
         if old is None or q.timestamp > old.timestamp:
             self.quotes[q.symbol] = q
+            self.quote_condition_halted[q.symbol] = flagged
+
+    def current_quote(self, symbol):
+        """The stored quote of ``symbol`` after any expired seeded halt is cleared (the
+        mover book's quote source)."""
+        self._expire_seeded_halts()
+        return self.quotes.get(symbol)
+
+    def _restamp(self, symbol):
+        """Re-stamp the stored quote's halted flag in place (D6: a halt or resume takes
+        effect at once, not at the next newer quote)."""
+        stored = self.quotes.get(symbol)
+        halted = self.quote_condition_halted.get(symbol, False) or symbol in self.halted_symbols
+        if stored is not None and stored.halted != halted:
+            self.quotes[symbol] = replace(stored, halted=halted)
 
     def trading_status(self, status):
         """Consume a transport.normalize_trading_status(...) result: the transport's
         ``sink_status`` delivers every trading status message of a subscribed symbol
         (statuses ride the quote connection). ``halted`` True halts the symbol (no
-        entries: its stored quote is marked halted, which reserve_intent refuses; no
-        exit re-pricing: the strategies read is_halted), False resumes it, None (CTA 6
+        entries: its stored quote is marked halted, which reserve_intent refuses; no new
+        exit and no exit re-pricing: the strategies read is_halted), False resumes it (an
+        applied halt or resume replaces the startup seed's say for the symbol), None (CTA 6
         trading range indication, E short-sale restriction, F LULD limit state, imbalance
         indicators) never changes it and does not move the per-symbol ordering guard, so
         a late genuine halt is still applied. A halt and a resume with the same timestamp resolve to halted.
@@ -853,6 +889,7 @@ class Controller:
             self.events.append({"type": "trading_status_ignored", "symbol": symbol,
                                "reason": "missing_or_invalid_ts_ns"})
             return
+        self._expire_seeded_halts()
         self.status_messages += 1
         detail = {key: status.get(key) for key in ("state", "status_code", "reason_code", "tape")}
         halted = status.get("halted")
@@ -875,14 +912,42 @@ class Controller:
             self.halted_symbols.add(symbol)
         else:
             self.halted_symbols.discard(symbol)
+        if source == "stream":
+            self.seeded_halts.pop(symbol, None)   # a streamed status confirms or clears the seed
         self.halt_states[symbol] = {"halted": halted, "ts_ns": ts_ns, "source": source, **detail}
         self.events.append({"type": "trading_status", "symbol": symbol,
                             "effect": "halted" if halted else "resumed", "ts_ns": ts_ns, "source": source,
                             **detail})
-        stored = self.quotes.get(symbol)
-        if stored is not None and stored.halted != halted:
-            self.quotes[symbol] = replace(stored, halted=halted)
+        self._restamp(symbol)
         return True
+
+    @staticmethod
+    def _seed_expiry(halt):
+        """When a halt only the startup seed asserts stops counting (epoch ns), and why:
+        its resumption trade time when the feed gives one; else, for a LULD trading pause,
+        SEEDED_LULD_PAUSE_SECONDS after its halt time; else never (None)."""
+        if halt.get("resumption_trade_ns") is not None:
+            return int(halt["resumption_trade_ns"]), "resumption_trade_time"
+        if halt.get("reason_code") in LULD_PAUSE_REASON_CODES:
+            return int(halt["halted_at_ns"]) + SEEDED_LULD_PAUSE_SECONDS * 1_000_000_000, "luld_pause_bound"
+        return None, None
+
+    def _expire_seeded_halts(self):
+        """Clear each seeded halt whose expiry has passed and that no streamed status has
+        replaced (a stale seed cannot block a symbol for the rest of the session)."""
+        if not self.seeded_halts:
+            return
+        now_ns = int(self.clock() * 1_000_000_000)
+        for symbol, seed in list(self.seeded_halts.items()):
+            if seed["expires_ns"] is None or now_ns < seed["expires_ns"]:
+                continue
+            del self.seeded_halts[symbol]
+            self.halted_symbols.discard(symbol)
+            self.halt_states[symbol] = {**self.halt_states.get(symbol, {}), "halted": False,
+                                        "state": "seed_expired", "expired_at_ns": now_ns}
+            self.events.append({"type": "trading_status", "symbol": symbol, "effect": "seed_expired",
+                                "ts_ns": seed["expires_ns"], "basis": seed["basis"], "source": "seed_expiry"})
+            self._restamp(symbol)
 
     def start_halt_seed(self, symbols, *, wait_seconds=HALT_SEED_WAIT_SECONDS):
         """E4 startup state, called on the owner loop as the node starts: run
@@ -920,19 +985,31 @@ class Controller:
     def apply_halt_seed(self, seed):
         """Mark each seeded symbol halted from its halt time (state ``seeded_halt``). A
         stream status newer than that time wins, so a resume streamed before the seed
-        returned is not undone, and a later streamed resume clears the seeded halt."""
+        returned is not undone, and a later streamed resume clears the seeded halt. A
+        seeded halt no status has replaced expires (_seed_expiry); a seed already past its
+        expiry (for example a prior day's pause whose row kept no resumption time) is not
+        applied. Each applied symbol's expiry is recorded in the seed summary."""
         halts = seed.get("halts") or {}
-        applied = [symbol for symbol, halt in sorted(halts.items())
-                   if self._apply_halt(symbol, int(halt["halted_at_ns"]), True,
-                                       {"state": "seeded_halt", "status_code": None,
-                                        "reason_code": halt.get("reason_code"), "tape": None},
-                                       source=str(seed.get("source")))]
+        now_ns = int(self.clock() * 1_000_000_000)
+        applied, expiry, expired = [], {}, []
+        for symbol, halt in sorted(halts.items()):
+            expires_ns, basis = self._seed_expiry(halt)
+            if expires_ns is not None and expires_ns <= now_ns:
+                expired.append(symbol)
+                continue
+            detail = {"state": "seeded_halt", "status_code": None, "reason_code": halt.get("reason_code"),
+                      "tape": None, "expires_ns": expires_ns}
+            if self._apply_halt(symbol, int(halt["halted_at_ns"]), True, detail, source=str(seed.get("source"))):
+                applied.append(symbol)
+                self.seeded_halts[symbol] = {"expires_ns": expires_ns, "basis": basis}
+                expiry[symbol] = {"expires_ns": expires_ns, "basis": basis}
         self.halt_seed = {**self.halt_seed, "status": "seeded",
                           **{key: seed.get(key) for key in ("source", "url", "fetched_at_ns", "sha256", "bytes",
                                                             "items")},
-                          "halted": sorted(halts), "applied": applied}
+                          "halted": sorted(halts), "applied": applied, "expired_on_arrival": expired,
+                          "expiry": expiry}
         self.events.append({"type": "halt_seed", "status": "seeded", "halted": sorted(halts), "applied": applied,
-                            "sha256": seed.get("sha256")})
+                            "expired_on_arrival": expired, "sha256": seed.get("sha256")})
 
     async def stop_halt_seed(self):
         """Cancel a seed read still in flight (the run is over)."""
@@ -942,13 +1019,19 @@ class Controller:
             await asyncio.gather(task, return_exceptions=True)
 
     def is_halted(self, symbol):
-        """True while a trading status or the quote's own condition marks ``symbol``
-        halted, paused or quotation-only: no entry and no exit re-pricing then."""
-        return symbol in self.halted_symbols or bool(getattr(self.quotes.get(symbol), "halted", False))
+        """True while a trading status, or a startup seed that has not expired, marks
+        ``symbol`` halted, paused or quotation-only: the strategies then send it no order
+        (no entry, no new exit) and do not re-price its resting exit. The quote's own
+        best-effort condition flag is not read here: it blocks entries only, through the
+        stored quote, and never an exit."""
+        self._expire_seeded_halts()
+        return symbol in self.halted_symbols
 
     def halt_summary(self):
+        self._expire_seeded_halts()
         return {"status_messages": self.status_messages, "halted_now": sorted(self.halted_symbols),
                 "last_status": {symbol: dict(state) for symbol, state in sorted(self.halt_states.items())},
+                "seeded_only": {symbol: dict(seed) for symbol, seed in sorted(self.seeded_halts.items())},
                 "seed": dict(self.halt_seed)}
 
     def bind(self, port):
@@ -1261,6 +1344,8 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
               "reconciliation": reconciliation, "startup_reconciliation": session.reconciliation,
               "adapter_errors": list(session.errors), "flat": is_flat,
               "execution_stats": dict(session.execution_stats),
+              # E2's overturn condition as named receipt assertions (overturn_signals).
+              "native_assertions": session.native_assertions(),
               "average_invariant_mismatches": list(session.average_invariant_mismatches),
               "callback_faults": list(strategy.callback_faults), "halts": controller.halt_summary(),
               "requests": controller.requests, "events": controller.events,
