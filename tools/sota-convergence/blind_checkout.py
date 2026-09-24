@@ -182,6 +182,7 @@ REMOVE_GLOBS = (
     "manifests/stack.json",
     "catalogs/landscape/upstream-snapshot.json",
     "catalogs/us-equities/star-audit.json",
+    "catalogs/foundation/automation.json",
     "blueprints/token-native-focus/saturation-audit.json",
     "evidence/artifacts/claude-repository-evidence-*",
     "evidence/artifacts/blind-catalog-convergence-*",
