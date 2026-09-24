@@ -6445,8 +6445,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/README-mover.md",
-      "sha256": "9593aff0b19170abc0dbf8ff737c3566a15265e18f30d0f9f6f5e07357886c31",
-      "bytes": 19876
+      "sha256": "2bb6ad24bfe060f3ec26d8fe73fbc04d543b84284af947756fd494dfb5279f52",
+      "bytes": 20617
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/README-native.md",
@@ -6605,8 +6605,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/native_adapter.py",
-      "sha256": "3e9cf2d93980b0f59b781dc3771f176c4e90d6af921b61c1022017cf85e64e0f",
-      "bytes": 25014
+      "sha256": "89ebd446c27cbe1df53e61d37bb6694c0b7ed0431dc378cbaf29237f7e25f2ac",
+      "bytes": 27613
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/native_strategy.py",
@@ -6665,7 +6665,7 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "3e4db253db3bf18d51dd219e5f6345a93cb435f80de847ae03297bef22d4a689",
+      "sha256": "2794099397f2f7b098ed5f132fbc0d36b19497c8f5bc5fc70135a83f73ae4989",
       "bytes": 5870
     },
     {
@@ -7122,6 +7122,86 @@
       "path": "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-b-stop-drill/stop_drill.py",
       "sha256": "e3856af86ebb9e311cda030f61530434300f6f6d80c529fdfa50ef7ec7c23675",
       "bytes": 3871
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-mover-a/FREEZE.md",
+      "sha256": "65843e887918da2f16ba4cc586e90b91345454ddcad3e71a075b41d9372e4510",
+      "bytes": 4058
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-mover-a/README.md",
+      "sha256": "62e1e34450ad2ddc896f406005c1de980dc42e2c7ed421a72c639c70a98a976d",
+      "bytes": 6677
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-mover-a/check.json",
+      "sha256": "7292b4644dbb97de79d95285ba9ea29a09252171d29c9fe70b89fe3b9aac4480",
+      "bytes": 3750
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-mover-a/config-mover-mac-20260924a.json",
+      "sha256": "13688ae0ada8c3d44d77af5392216318bf69b3df590558210d8fd28540e7aadc",
+      "bytes": 2237
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-mover-a/events.jsonl",
+      "sha256": "379696ddbaa21236fd370027c33b4b8cdb9c9c0feafe298c32d4798b67bb750b",
+      "bytes": 3978
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-mover-a/frozen-3699012.SHA256SUMS",
+      "sha256": "08587b84bcb0caa0743a39a9dc69a79c1bdbeb91916ab84ff155619fe5777460",
+      "bytes": 76260
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-mover-a/ledger-readback.json",
+      "sha256": "499a1362b7a5b3b605377d175b991f39f79e86bfd881f829da0a785b2fc250e3",
+      "bytes": 12611
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-mover-a/mover-paper.json",
+      "sha256": "ae468da7ba00943a50353f4ce86a98c74af226b8e9547308a7ef06211ef3fc9c",
+      "bytes": 139861
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-mover-a/mover-recovery.json",
+      "sha256": "baa406ad7711acaef0fc693fc648cc737a2d72c42e2b073a24cab3dea0a70593",
+      "bytes": 783
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-mover-a/mover_ledger_readback.py",
+      "sha256": "c619a256ba79ccd161b7c1c42542a0aa4fd36b3031079d12c7a756714e90ac43",
+      "bytes": 6996
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-mover-a/paper.log",
+      "sha256": "31ce2d40f1b7b45585d1b10757089afcb08214d11fb20d374a76a6c9706093bb",
+      "bytes": 263
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-mover-a/recover.log",
+      "sha256": "8e855fdae4360951076437b4415b2838a93b62d152e819548520ba804f86eb27",
+      "bytes": 131
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-mover-a/run-trial.sh",
+      "sha256": "50c46ac0c8e1a231b4c62d71633b9d091cceea6bca9f9c9d3e7182977737cb4e",
+      "bytes": 1409
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-mover-a/scan.log",
+      "sha256": "91eb17da64b4d80d108016ecfd1390adaf4ba405ae1e2506bb53f1210272d266",
+      "bytes": 230
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-mover-a/scan.sha256",
+      "sha256": "85dcf9d318829930240fd36878e27de736bc1ed1cad5a565a47cd69c2e939975",
+      "bytes": 157
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-mover-a/verify_mover_trial.py",
+      "sha256": "72b88394c91c4d01285c02493dab26a839ed96cc63452dcb92647c4bf1996149",
+      "bytes": 4165
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-native-faults/README.md",
@@ -28945,8 +29025,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_native.py",
-      "sha256": "7c97707a5c19b704be9a603bbde396d9cb952dad39ca0d5b434ae1f8ebbd1f81",
-      "bytes": 19874
+      "sha256": "a7375345f5f6fb1b6a170074261db8c6d63b1e9be1d7a2e0ea706b5b3ed17505",
+      "bytes": 25586
     },
     {
       "path": "tests/test_adaptive_paper_recovery.py",
