@@ -95,3 +95,16 @@
 # the default all-refs acceptance command reach 0 findings without editing
 # .gitleaks.toml (owned by another PR) or that sibling branch.
 34fc51beaf24114fe266f73b2e36ae8176c8a521:tests/test_lane_packets.py:generic-api-key:255
+
+# 2026-09-24, PR #217 (sim-paper-compare). Commit 1461732b recorded the
+# receipt's per-page cache entries under a JSON field named "key". Their values
+# are 32-hex request digests: the first 32 hex characters of
+# sha256(request path + "?" + sorted JSON params), from replay_compare.py
+# req_key(). They identify cached Alpaca market-data pages, not credentials.
+# gitleaks' generic-api-key rule matched the two higher-entropy ones. Later
+# commits on that branch rename the field to "request_digest", which the rule
+# no longer matches. These two exact fingerprints cover only that historical
+# commit; any later commit touching the same lines has a different fingerprint
+# and is still scanned.
+1461732b807175cc34e8f2386ceaf12ba7ff1353:blueprints/us-equities/sim-paper-compare/receipts/20260923g-main-passed.json:generic-api-key:36
+1461732b807175cc34e8f2386ceaf12ba7ff1353:blueprints/us-equities/sim-paper-compare/receipts/20260923g-main-passed.json:generic-api-key:40
