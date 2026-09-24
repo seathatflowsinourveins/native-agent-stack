@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "id": "ibkr-nautilus-alpaca-20260920",
-  "reviewed_at": "2026-09-21",
+  "reviewed_at": "2026-09-24",
   "scope": "User-selected destination, bounded native equity replay and Alpaca paper smoke acceptance, plus native adaptive-engine integration and dated shadow market research. New adaptive broker execution and strategy merit remain separate gates.",
   "adaptive_practice": {
     "source": "blueprints/us-equities/adaptive-paper/README.md",
@@ -47,6 +47,30 @@
       "selected_path": "Nautilus native IBKR socket adapter with signed-in TWS or IB Gateway",
       "upstream_supported": true,
       "local_broker_acceptance": "not_established",
+      "local_broker_acceptance_scope": "For the selected 2.0.0rc5 destination. The 1.231.0 Python-adapter paper receipt below does not establish it: reconnect with an open order, restart reconciliation and the kill switch are not run, and no dated version-selection record accepts 1.231.0 for this gate.",
+      "python_adapter_paper_evidence": {
+        "status": "passed",
+        "receipt": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders/evidence/receipt-20260923-passed.json",
+        "evidence_class": "native_paper",
+        "engine": "NautilusTrader 1.231.0 Python Interactive Brokers adapter on the official ibapi 10.45.1, paper IB Gateway port 4002",
+        "observed": "2026-09-23 regular session: C1 resting SPY limit buy accepted, C2 canceled, C3 marketable buy filled 768.56, C4 flatten sold 768.50; 3 of 6 orders, net -2.08 USD after 2.02 USD commissions; independent official-ibapi flat proof 0 positions and 0 open orders.",
+        "not_established": "The pinned 2.0.0rc5 Rust adapter path, reconnect/restart reconciliation, the kill switch, and the after-hours run (receipt-20260923-post-incomplete.json, incomplete on the C4 step timeout).",
+        "source": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders/README.md"
+      },
+      "rc5_blockers": [
+        {
+          "ref": "https://github.com/nautechsystems/nautilus_trader/issues/4983",
+          "state": "open",
+          "state_checked_at": "2026-09-24",
+          "effect": "The rc5 Rust adapter's execution client venue IB never matches the SMART instrument venue, so every stock order is denied locally."
+        }
+      ],
+      "upstream_ibapi_pin": {
+        "state_checked_at": "2026-09-24",
+        "rc5_pin": "Rust ibapi =3.3.0 (Cargo.toml at tag v2.0.0rc5)",
+        "notice_2188_issue": "wboayue/rust-ibapi#764 closed 2026-08-27 by merged PR #765 (in v4.0.0); not listed as a blocker",
+        "pin_update": "nautechsystems/nautilus_trader PR #5041 (open) changes the pin to =4.1.0"
+      },
       "paper_socket_defaults": {
         "tws": 7497,
         "gateway": 4002
@@ -59,10 +83,13 @@
         "risk/universe/session contract"
       ],
       "limitations": [
-        "Adapter installation does not establish socket access, paper order behavior, cancellation races or reconnect reconciliation."
+        "Adapter installation does not establish socket access, paper order behavior, cancellation races or reconnect reconciliation.",
+        "The passed paper receipt is on NautilusTrader 1.231.0's Python adapter, not the pinned 2.0.0rc5 destination; it covers accept, cancel, fill and flatten only."
       ],
       "sources": [
-        "https://nautilustrader.io/docs/latest/integrations/interactive_brokers/"
+        "https://nautilustrader.io/docs/latest/integrations/interactive_brokers/",
+        "https://github.com/nautechsystems/nautilus_trader/issues/4983",
+        "https://github.com/nautechsystems/nautilus_trader/pull/5041"
       ]
     },
     {
@@ -122,12 +149,14 @@
     },
     {
       "id": "separate-paper-adapters",
-      "status": "bounded_alpaca_paper_smoke_passed_ibkr_pending",
-      "scope": "Alpaca1SPY long-flat trial passed with2actual writes, -0.08USD cash-matched gross PnL, no positions/open orders, and completed-trial recovery with0additional writes. Five unchanged upstream read-only tests passed. Continuous operation, native broker faults, Elite throughput and IBKR remain separate."
+      "status": "bounded_alpaca_paper_smoke_passed_ibkr_1231_python_paper_passed_rc5_pending",
+      "scope": "Alpaca1SPY long-flat trial passed with2actual writes, -0.08USD cash-matched gross PnL, no positions/open orders, and completed-trial recovery with0additional writes. Five unchanged upstream read-only tests passed. IBKR: a bounded 2026-09-23 paper run through NautilusTrader 1.231.0's Python IB adapter passed (accept, cancel, fill, flatten; net -2.08 USD; flat), which is not rc5 destination acceptance; rc5 stock orders remain blocked by nautilus_trader#4983 (open). Continuous operation, native broker faults, Elite throughput and IBKR reconnect/restart reconciliation remain separate.",
+      "executed_evidence_ref": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders/evidence/receipt-20260923-passed.json",
+      "rc5_blocker": "https://github.com/nautechsystems/nautilus_trader/issues/4983"
     }
   ],
   "limitations": [
-    "September21 paper GETs observed200Trading requests/minute; advertised Elite1000/minute activation and IBKR account access remain unestablished.",
+    "September21 paper GETs observed200Trading requests/minute; advertised Elite1000/minute activation remains unestablished. IBKR paper account access and bounded paper orders were observed 2026-09-23 through NautilusTrader 1.231.0; IBKR acceptance on the rc5 destination remains unestablished.",
     "Native AAPL replay is a retrospective scheduled diagnostic with synthetic fills; it does not establish a profitable strategy, historical universe or SPY/LEAN parity.",
     "Paper fills omit market impact, realistic queue position and some costs; they cannot establish deployable profitability or execution capacity.",
     "No broker orders, paid hosting, purchases or live trading are authorized by catalog inclusion."
