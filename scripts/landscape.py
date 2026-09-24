@@ -394,8 +394,8 @@ def load_lane_provenance_registry(root):
 # What produced an adjudication (tools/sota-convergence/adjudicate.py adjudication_provenance, less the evidence tree,
 # which varies per run): a new-wave adjudication must name code, prompt, schemas, workflow and role that
 # lane-provenance.json registers (independent review of #145, M2).
-ADJUDICATION_PROVENANCE_KEYS = ("adjudicate_py_sha256", "prompt_sha256", "judge_schema_sha256", "refute_schema_sha256",
-                                "workflow_sha256", "adjudicator_role_sha256")
+ADJUDICATION_PROVENANCE_KEYS = ("adjudicate_py_sha256", "codex_lane_py_sha256", "prompt_sha256", "judge_schema_sha256",
+                                "refute_schema_sha256", "workflow_sha256", "adjudicator_role_sha256")
 
 
 def adjudication_provenance_issue(provenance, registry):

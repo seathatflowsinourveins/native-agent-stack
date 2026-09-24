@@ -54,6 +54,21 @@ def lane_return(lane, winner, packet_sha256, **extra):
     return row
 
 
+def writes_events(stub, events=None):
+    """A run_codex_call stand-in that, like the real call, always leaves its events file (a stage that ran without
+    one is flagged: independent review of #145, BIND-R4-3). ``events`` maps an events file name to what that call
+    leaves in it (empty otherwise)."""
+    def call(*args, **kwargs):
+        path = Path(args[7])
+        path.write_text((events or {}).get(path.name, ""), encoding="utf-8")
+        return stub(*args, **kwargs)
+    return call
+
+
+def read_command_event(command):
+    return json.dumps({"type": "item.completed", "item": {"type": "command_execution", "command": command}}) + "\n"
+
+
 def quiet(function, *args):
     with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()) as err:
         code = function(*args)
@@ -66,7 +81,13 @@ class AdjudicateFixture(unittest.TestCase):
         self.addCleanup(temporary.cleanup)
         self.base = Path(temporary.name).resolve()
         # The position index lives outside the work dir, under this state directory (never the real one in tests).
-        state = mock.patch.dict(os.environ, {adjudicate.STATE_DIR_ENV: str(self.base / "state")})
+        # Never the developer's credential or state (independent review of #145, R4-REG-7): a fixture native Codex
+        # home with a dummy auth.json, and run-scoped Codex homes under the fixture.
+        (self.base / "native-codex").mkdir()
+        (self.base / "native-codex" / "auth.json").write_text("{}", encoding="utf-8")
+        state = mock.patch.dict(os.environ, {adjudicate.STATE_DIR_ENV: str(self.base / "state"),
+                                             "CODEX_HOME": str(self.base / "native-codex"),
+                                             adjudicate.codex_lane.CODEX_HOME_BASE_ENV: str(self.base / "codex-homes")})
         state.start()
         self.addCleanup(state.stop)
         self.work = self.base / "work"
@@ -81,7 +102,14 @@ class AdjudicateFixture(unittest.TestCase):
         self.write_return("claude", "c1", refutation={"status": "unrefuted"}, final_source="proposal")
         self.write_return("codex", "c2")
 
+    def rewrite_returns(self):
+        """setUp's two returns again, recording the repository's current tree."""
+        self.write_return("claude", "c1", refutation={"status": "unrefuted"}, final_source="proposal")
+        self.write_return("codex", "c2")
+
     def write_return(self, lane, winner, name=NAME, sha=None, **extra):
+        # A lane records the evidence tree it read; inputs binds each lane root to it (BIND-R4-9).
+        extra.setdefault("provenance", {"x": "y", "repo_tree_sha256": adjudicate.tree_sha256(self.repo)})
         path = self.work / lane / f"{name}.json"
         path.write_text(json.dumps(lane_return(lane, winner, sha or self.sha, **extra)), encoding="utf-8")
 
@@ -107,6 +135,14 @@ class AdjudicateFixture(unittest.TestCase):
             provenance=adjudicate.adjudication_provenance(repo=self.repo))
         if lane == "codex":
             record["audit_clean"] = True  # the Codex runner records its calls' clean blind audit
+            # ... and the events files it audited, by digest (independent review of #145, BIND-R4-6).
+            events = self.work / "adjudication-judgments" / "codex" / "events"
+            events.mkdir(parents=True, exist_ok=True)
+            record["events"] = {}
+            for stage in ("judge", "refute"):
+                path = events / f"{NAME}.{order}.{stage}.jsonl"
+                path.write_text("", encoding="utf-8")
+                record["events"][stage] = {"path": str(path), "sha256": adjudicate.sha256_file(path)}
         adjudicate.write_json(self.work / "adjudication-judgments" / lane / f"{NAME}.{order}.json", record)
 
     def input_body(self, order="AB"):
@@ -184,6 +220,7 @@ class InputsTests(AdjudicateFixture):
         """Round-2 review: Claude sources_read entries carried notes ("path (lines 60-104, prior round)")
         while Codex entries were bare paths, so the notes told the judge which lane wrote A."""
         claude_repo = self.base / "hosts" / "claude" / "export"
+        claude_repo.mkdir(parents=True, exist_ok=True)  # the same (empty) tree as self.repo: both roots hold it
         self.write_return(
             "claude", "c1", refutation={"status": "unrefuted"},
             sources_read=["evidence/receipt.json (lines 60-104, prior round)", f"{claude_repo}/docs/a.md#setup",
@@ -342,6 +379,7 @@ class AssembleTests(AdjudicateFixture):
                 self.judgment(lane, order, "codex")
         _code, _err, record = self.assemble()
         expected = {"adjudicate_py_sha256": TOOL_DIR / "adjudicate.py",
+                    "codex_lane_py_sha256": TOOL_DIR / "codex_lane.py",
                     "prompt_sha256": TOOL_DIR / "adjudication-prompt.md",
                     "judge_schema_sha256": TOOL_DIR / "adjudication-judge.schema.json",
                     "refute_schema_sha256": TOOL_DIR / "adjudication-refute.schema.json",
@@ -999,7 +1037,7 @@ class EighthRereviewOf145Tests(AdjudicateFixture):
         call = mock.Mock(side_effect=[(judge, "gpt-6-astra", [0], None, None),
                                       (refute, "gpt-6-astra", [0], None, None)])
         with mock.patch.object(adjudicate, "packets_changed", side_effect=changed_after_first_check), \
-                mock.patch.object(adjudicate, "run_codex_call", call), \
+                mock.patch.object(adjudicate, "run_codex_call", writes_events(call)), \
                 mock.patch.object(adjudicate.shutil, "which", return_value="/usr/bin/codex"):
             code, _ = quiet(adjudicate.main, ["codex", "--work-dir", str(self.work), "--repo", str(self.repo),
                                               "--model", "gpt-6-astra", "--jobs", "1"])
@@ -1040,12 +1078,14 @@ class NinthRereviewOf145Tests(AdjudicateFixture):
     REFUTE = {"refuted": False, "reason": "The cited receipt exists and shows the run.", "evidence_refs": [],
               "leak": False, "leak_text": ""}
 
-    def run_codex(self, tree_values):
-        trees = iter(tree_values)
+    def run_codex(self, tree_values, events=None):
+        # The launch digest, then the digest every later check sees (after each call and at the end of the run).
+        launch, later = tree_values
+        trees = iter([launch])
         call = mock.Mock(side_effect=[(self.JUDGE, "gpt-6-astra", [0], None, None),
                                       (self.REFUTE, "gpt-6-astra", [0], None, None)] * 2)
-        with mock.patch.object(adjudicate, "tree_sha256", side_effect=lambda repo: next(trees)), \
-                mock.patch.object(adjudicate, "run_codex_call", call), \
+        with mock.patch.object(adjudicate, "tree_sha256", side_effect=lambda repo: next(trees, later)), \
+                mock.patch.object(adjudicate, "run_codex_call", writes_events(call, events)), \
                 mock.patch.object(adjudicate.shutil, "which", return_value="/usr/bin/codex"):
             return quiet(adjudicate.main, ["codex", "--work-dir", str(self.work), "--repo", str(self.repo),
                                            "--model", "gpt-6-astra"])
@@ -1079,6 +1119,7 @@ class NinthRereviewOf145Tests(AdjudicateFixture):
     def test_claude_collect_refuses_judgments_when_the_tree_changed_after_claude_args(self):
         (self.repo / "evidence").mkdir()
         (self.repo / "evidence" / "receipt.json").write_text("{}", encoding="utf-8")
+        self.rewrite_returns()  # the lanes read the tree with the receipt (BIND-R4-9)
         self.inputs()
         args = adjudicate.claude_args(self.work, self.repo)
         result = {"snapshot_id": args["snapshot_id"],
@@ -1143,7 +1184,7 @@ class TenthRereviewOf145Tests(AdjudicateFixture):
             return real(index, stems) if value is None else ([stems[0]] if value else [])
 
         with mock.patch.object(adjudicate, "inputs_changed", side_effect=inputs_changed), \
-                mock.patch.object(adjudicate, "run_codex_call", call), \
+                mock.patch.object(adjudicate, "run_codex_call", writes_events(call)), \
                 mock.patch.object(adjudicate.shutil, "which", return_value="/usr/bin/codex"):
             code, err = quiet(adjudicate.main, ["codex", "--work-dir", str(self.work), "--repo", str(self.repo),
                                                 "--model", "gpt-6-astra", "--jobs", "1"])
@@ -1275,8 +1316,11 @@ class ThirteenthRereviewOf145Tests(AdjudicateFixture):
                                (r"at C:\Users\example user\private key, then", "at <outside-path>, then"),
                                ("see /home/example user/private.json. Next sentence.",
                                 "see <outside-path>. Next sentence."),
-                               ("/srv/x/y is missing. c2 wins because docs/b.md shows it.",
-                                "<outside-path>. c2 wins because docs/b.md shows it.")):
+                               # A next sentence holding a / separator may continue a spaced path, so it goes too
+                               # (independent review of #145, round 4, R4-REG-5): privacy over prose.
+                               ("/srv/x/y is missing. c2 wins because docs/b.md shows it.", "<outside-path>."),
+                               ("/srv/x/y is missing. c2 wins on the receipt.",
+                                "<outside-path>. c2 wins on the receipt.")):
             self.assertEqual(adjudicate.scrub_text(text, packets), expected, text)
             self.assertEqual(adjudicate.redact_leak_text(text), expected, text)
         self.assertEqual(adjudicate.scrub_text("evidence/a.json and plain words", packets),
@@ -1318,6 +1362,7 @@ class FourteenthRereviewOf145Tests(AdjudicateFixture):
     def test_a_leak_from_an_invalidated_run_is_not_recorded(self):
         (self.repo / "evidence").mkdir()
         (self.repo / "evidence" / "receipt.json").write_text("{}", encoding="utf-8")
+        self.rewrite_returns()  # the lanes read the tree with the receipt (BIND-R4-9)
         self.inputs()
         result = self.result(judge=None, refuter=None, leak={"stage": "judge", "text": "provenance: x"})
         (self.repo / "evidence" / "receipt.json").write_text('{"changed": true}', encoding="utf-8")
@@ -1431,13 +1476,12 @@ class SixteenthRereviewOf145Tests(AdjudicateFixture):
         self.inputs()
         events = self.work / "adjudication-judgments" / "codex" / "events"
         events.mkdir(parents=True, exist_ok=True)
-        (events / f"{NAME}.AB.judge.jsonl").write_text(json.dumps({"type": "item.completed", "item": {
-            "type": "command_execution", "command": f"cat {adjudicate.index_path(self.work)}"}}) + "\n", encoding="utf-8")
         leak_answer = (None, "gpt-6-astra", [0], None, "provenance: codex_lane_py_sha256")
         clean = [(self.JUDGE, "gpt-6-astra", [0], None, None), (self.REFUTE, "gpt-6-astra", [0], None, None)]
         call = mock.Mock(side_effect=[leak_answer] + clean)
+        flagged = {f"{NAME}.AB.judge.jsonl": read_command_event(f"cat {adjudicate.index_path(self.work)}")}
         with mock.patch.object(adjudicate, "tree_sha256", return_value="a" * 64), \
-                mock.patch.object(adjudicate, "run_codex_call", call), \
+                mock.patch.object(adjudicate, "run_codex_call", writes_events(call, flagged)), \
                 mock.patch.object(adjudicate.shutil, "which", return_value="/usr/bin/codex"):
             quiet(adjudicate.main, ["codex", "--work-dir", str(self.work), "--repo", str(self.repo),
                                     "--model", "gpt-6-astra", "--jobs", "1"])
@@ -1459,8 +1503,8 @@ class SixteenthRereviewOf145Tests(AdjudicateFixture):
 
         with mock.patch.object(adjudicate, "inputs_changed", side_effect=inputs_changed), \
                 mock.patch.object(adjudicate, "tree_sha256", return_value="a" * 64), \
-                mock.patch.object(adjudicate, "run_codex_call", mock.Mock(side_effect=[
-                    (self.JUDGE, "gpt-6-astra", [0], None, None), (self.REFUTE, "gpt-6-astra", [0], None, None)] * 2)), \
+                mock.patch.object(adjudicate, "run_codex_call", writes_events(mock.Mock(side_effect=[
+                    (self.JUDGE, "gpt-6-astra", [0], None, None), (self.REFUTE, "gpt-6-astra", [0], None, None)] * 2))), \
                 mock.patch.object(adjudicate.shutil, "which", return_value="/usr/bin/codex"):
             code, err = quiet(adjudicate.main, ["codex", "--work-dir", str(self.work), "--repo", str(self.repo),
                                                 "--model", "gpt-6-astra", "--jobs", "1"])
@@ -1488,9 +1532,8 @@ class SixteenthRereviewOf145Tests(AdjudicateFixture):
         events = self.work / "adjudication-judgments" / "codex" / "events"
         events.mkdir(parents=True, exist_ok=True)
         index_file = adjudicate.index_path(self.work)
-        (events / f"{NAME}.AB.judge.jsonl").write_text(json.dumps({"type": "item.completed", "item": {
-            "type": "command_execution", "command": f"cat {index_file}"}}) + "\n", encoding="utf-8")
-        code, err = NinthRereviewOf145Tests.run_codex(self, ["a" * 64, "a" * 64])
+        code, err = NinthRereviewOf145Tests.run_codex(
+            self, ["a" * 64, "a" * 64], {f"{NAME}.AB.judge.jsonl": read_command_event(f"cat {index_file}")})
         self.assertEqual(code, 1)
         self.assertIn(adjudicate.AUDIT_FLAGGED, err)
         record = json.loads((self.work / "adjudication-judgments" / "codex" / f"{NAME}.AB.json").read_text(encoding="utf-8"))
@@ -1562,7 +1605,7 @@ class CodexLeakTests(AdjudicateFixture):
     def test_a_codex_refuter_leak_drops_the_judgment(self):
         judge = {"preferred": "B", "why": WHY, "evidence_refs": ["evidence/receipt.json"]}
         answers = iter([(judge, "gpt-6-astra", [0], None, None), (None, "gpt-6-astra", [0], "leak", "gpt-6")] * 2)
-        with mock.patch.object(adjudicate, "run_codex_call", side_effect=lambda *a, **k: next(answers)), \
+        with mock.patch.object(adjudicate, "run_codex_call", writes_events(lambda *a, **k: next(answers))), \
                 mock.patch.object(adjudicate.shutil, "which", return_value="/bin/codex"):
             code, _err = self.run_codex()
         self.assertEqual(code, 1)
@@ -1645,6 +1688,124 @@ class SealedPacketKeysTests(AdjudicateFixture):
         quiet(adjudicate.main, ["inputs", "--work-dir", str(self.work), "--lane-repo-root", str(self.repo),
                                 "--packet-keys", str(keys)])
         self.assertIn("names packet_sha256", self.index()["skipped"][0]["reason"])
+
+
+class CallBindingRound4Tests(AdjudicateFixture):
+    """Independent review of #145, round 4: each Codex call is audited on its own stages only (BIND-R4-3) and a
+    clean call's leak is persisted when the call ends, so an interrupted run keeps it (BIND-R4-4)."""
+
+    LEAK = (None, "gpt-6-astra", [0], None, "provenance: codex_lane_py_sha256")
+    JUDGE = NinthRereviewOf145Tests.JUDGE
+    REFUTE = NinthRereviewOf145Tests.REFUTE
+
+    def run_judges(self, answers, events=None, jobs="1"):
+        with mock.patch.object(adjudicate, "tree_sha256", return_value="a" * 64), \
+                mock.patch.object(adjudicate, "run_codex_call", writes_events(mock.Mock(side_effect=answers), events)), \
+                mock.patch.object(adjudicate.shutil, "which", return_value="/usr/bin/codex"):
+            return quiet(adjudicate.main, ["codex", "--work-dir", str(self.work), "--repo", str(self.repo),
+                                           "--model", "gpt-6-astra", "--jobs", jobs])
+
+    def test_a_stale_refuter_events_file_does_not_void_a_clean_judge_leak(self):
+        self.inputs()
+        events = self.work / "adjudication-judgments" / "codex" / "events"
+        events.mkdir(parents=True)
+        # An earlier run's refuter read the index; this run's judge reports a leak, so no refuter runs.
+        (events / f"{NAME}.AB.refute.jsonl").write_text(read_command_event(f"cat {adjudicate.index_path(self.work)}"),
+                                                         encoding="utf-8")
+        self.run_judges([self.LEAK, self.LEAK])
+        self.assertFalse((events / f"{NAME}.AB.refute.jsonl").exists())
+        record = json.loads((self.work / "adjudication-judgments" / "codex" / f"{NAME}.AB.json").read_text(encoding="utf-8"))
+        self.assertTrue(record["audit_clean"])
+        self.assertEqual(record["failure"], adjudicate.LEAK)
+        self.assertIn(f"{NAME}.AB.json", {name for name, _sha in adjudicate.recorded_leaks(self.work)})
+
+    def test_an_interrupted_run_keeps_the_leak_of_a_finished_call(self):
+        self.inputs()
+        with self.assertRaises(RuntimeError):
+            self.run_judges([self.LEAK, RuntimeError("killed")])
+        self.assertIn(f"{NAME}.AB.json", {name for name, _sha in adjudicate.recorded_leaks(self.work)})
+
+    def test_a_tree_change_seen_after_a_call_voids_it_at_once(self):
+        self.inputs()
+        trees = iter(["a" * 64])
+        with mock.patch.object(adjudicate, "tree_sha256", side_effect=lambda repo: next(trees, "b" * 64)), \
+                mock.patch.object(adjudicate, "run_codex_call", writes_events(mock.Mock(side_effect=[
+                    (self.JUDGE, "gpt-6-astra", [0], None, None), (self.REFUTE, "gpt-6-astra", [0], None, None),
+                    RuntimeError("killed")]))), \
+                mock.patch.object(adjudicate.shutil, "which", return_value="/usr/bin/codex"):
+            with self.assertRaises(RuntimeError):
+                quiet(adjudicate.main, ["codex", "--work-dir", str(self.work), "--repo", str(self.repo),
+                                        "--model", "gpt-6-astra", "--jobs", "1"])
+        record = json.loads((self.work / "adjudication-judgments" / "codex" / f"{NAME}.AB.json").read_text(encoding="utf-8"))
+        self.assertEqual(record["failure"], adjudicate.TREE_CHANGED)
+        self.assertIsNone(record["judge"])
+
+    def test_a_second_run_on_the_same_work_dir_is_refused(self):
+        # BIND-R4-5: two runs would recreate each other's Codex home and interleave events files.
+        self.inputs()
+        lock = self.work / "adjudication-judgments" / "codex" / adjudicate.codex_lane.RUN_LOCK_NAME
+        with adjudicate.codex_lane.exclusive_run_lock(lock):
+            code, err = self.run_judges([(self.JUDGE, "gpt-6-astra", [0], None, None)])
+        self.assertEqual(code, 2)
+        self.assertIn("another run holds", err)
+
+    def test_an_edited_record_over_flagged_events_does_not_count(self):
+        # BIND-R4-6: audit_clean is re-checked against the recorded events, so editing a record cannot count a
+        # judgment whose calls read outside their input.
+        self.inputs()
+        for lane in ("claude", "codex"):
+            for order in adjudicate.ORDERS:
+                self.judgment(lane, order, "claude")
+        events = self.work / "adjudication-judgments" / "codex" / "events" / f"{NAME}.AB.judge.jsonl"
+        events.write_text(read_command_event(f"cat {adjudicate.index_path(self.work)}"), encoding="utf-8")
+        record_path = self.work / "adjudication-judgments" / "codex" / f"{NAME}.AB.json"
+        record = json.loads(record_path.read_text(encoding="utf-8"))
+        record["events"]["judge"]["sha256"] = adjudicate.sha256_file(events)
+        adjudicate.write_json(record_path, record)
+        entry = next(e for e in adjudicate.load_index(self.work)["layers"] if e["layer"] == NAME)
+        self.assertEqual(adjudicate.usable_judgment(record, "openai", "AB", self.sha, entry=entry),
+                         adjudicate.AUDIT_FLAGGED)
+        record["events"]["judge"]["sha256"] = "0" * 64
+        self.assertIn("missing or changed", adjudicate.usable_judgment(record, "openai", "AB", self.sha, entry=entry))
+
+    def test_inputs_bind_each_lane_root_to_the_returns_tree(self):
+        # BIND-R4-9: another checkout named as a lane root would have its paths relativized as the export's.
+        other = self.base / "hosts" / "blind" / "other"
+        other.mkdir(parents=True)
+        (other / "x.json").write_text("{}", encoding="utf-8")
+        code, _err = self.inputs(self.repo, other)
+        self.assertEqual(code, 1)
+        skipped = json.loads(adjudicate.index_path(self.work).read_text(encoding="utf-8"))["skipped"]
+        self.assertIn("does not hold", skipped[0]["reason"])
+        code, err = quiet(adjudicate.main, ["inputs", "--work-dir", str(self.work), "--lane-repo-root",
+                                            str(other / ".." / "repo")])
+        self.assertEqual(code, 2)
+        self.assertIn("contains ..", err)
+
+    def test_the_run_provenance_names_codex_lane(self):
+        # BIND-R4-2: codex_lane.py builds, isolates and audits the Codex judges.
+        provenance = adjudicate.adjudication_provenance()
+        self.assertEqual(provenance["codex_lane_py_sha256"],
+                         hashlib.sha256((TOOL_DIR / "codex_lane.py").read_bytes()).hexdigest())
+
+
+class ScrubRound4Tests(unittest.TestCase):
+    """Independent review of #145, round 4, R4-REG-5: a sentence end inside a spaced host path, and a name glued by
+    a comma, left words of the path."""
+
+    def test_no_path_word_survives(self):
+        cases = {
+            "read /srv/Acme Inc. Secret Project/plan.md for the numbers": "read <outside-path>",
+            "/Users/example/Docs/Q3 plan: acquisition target Foo/notes.txt then decide": "<outside-path>",
+            "C:\\Users\\Example User\\Board deck v2. Layoffs list\\a.pptx is cited": "<outside-path>",
+            "see /home/example/private,key.json now": "see <outside-path>",
+            "cite /home/example/a.json, then b": "cite <outside-path>, then b",
+            "read /srv/x/plan.md now. The next sentence stays.": "read <outside-path>. The next sentence stays.",
+        }
+        for text, expected in cases.items():
+            with self.subTest(text):
+                self.assertEqual(adjudicate.redact_leak_text(text), expected)
+                self.assertEqual(adjudicate.unscrubbed_paths([adjudicate.redact_leak_text(text)]), [])
 
 
 if __name__ == "__main__":

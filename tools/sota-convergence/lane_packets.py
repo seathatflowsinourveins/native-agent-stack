@@ -681,6 +681,43 @@ def withhold_labels(packet: dict) -> dict:
     return packet
 
 
+# Packet references to files blind_checkout.py removes from every blind export (membership lists, selection
+# records and earlier verdicts): a lane pointed at one finds nothing (independent review of #145, F4/OPS-1: 5 such
+# references on the 2026-09-23 packets). The label is listed on every blind packet, dropped reference or not.
+REMOVED_REFS_LABEL = ("candidates[].evidence_refs[] and registered_receipts[] naming a file the blind export removes "
+                      "(membership, selection or earlier-verdict records)")
+
+
+def removed_reference(reference) -> bool:
+    from blind_checkout import bare_reference, removed_from_blind_export
+    bare = bare_reference(reference)
+    return bare is not None and removed_from_blind_export(bare)
+
+
+def withhold_removed_refs(packet: dict) -> tuple:
+    """(packet, dropped count): every candidate's evidence_refs and every registered receipt that names a file the
+    blind export removes are dropped, and REMOVED_REFS_LABEL is listed in the packet's withheld list."""
+    dropped = 0
+    for collection in ("candidates", "sota_components_not_in_candidates"):
+        for item in packet.get(collection) or []:
+            if not isinstance(item, dict):
+                continue
+            if collection == "candidates" and item.get("evidence_refs"):
+                kept = [reference for reference in item["evidence_refs"] if not removed_reference(reference)]
+                dropped += len(item["evidence_refs"]) - len(kept)
+                item["evidence_refs"] = kept
+            if item.get("registered_receipts"):
+                kept = [receipt for receipt in item["registered_receipts"]
+                        if not (isinstance(receipt, dict) and removed_reference(receipt.get("path")))]
+                dropped += len(item["registered_receipts"]) - len(kept)
+                item["registered_receipts"] = kept
+    withheld = list(packet.get("withheld", []))
+    if REMOVED_REFS_LABEL not in withheld:
+        withheld.append(REMOVED_REFS_LABEL)
+    packet["withheld"] = withheld
+    return packet, dropped
+
+
 def seal_candidate_fields(packet: dict) -> tuple:
     """(packet, {candidate key: {field: value}}): every candidate's SEALED_CANDIDATE_FIELDS moved out of a
     --withhold-labels packet and listed in its withheld list. Their presence alone marks a sota-manifest
@@ -699,14 +736,15 @@ def seal_candidate_fields(packet: dict) -> tuple:
 def build_all_packets(root: Path, *, catalogs: list, seed: str, checked_at: str,
                       trading_candidates: str = "ledger", withhold: bool = False,
                       manifest: str = None, registered_receipts: bool = False,
-                      gap_receipts: bool = False, sealed_keys: dict = None) -> dict:
+                      gap_receipts: bool = False, sealed_keys: dict = None, removed_refs: dict = None) -> dict:
     """Returns {filename: serialized packet text}, fully built and leak-
     checked in memory before any file is written. ``manifest`` overrides the
     dated sota manifest joined in (default reproduces the 2026-09-22
     packets); pass the same value used for build_verdicts.py's --manifest so
     the packets and the verdict catalog agree on the pins. Under ``withhold``,
     each packet's sealed candidate fields (seal_candidate_fields) go to
-    ``sealed_keys`` ({filename: {packet_sha256, candidates}}) when it is given."""
+    ``sealed_keys`` ({filename: {packet_sha256, candidates}}) when it is given, and the number of references to
+    files the blind export removes that each packet dropped (withhold_removed_refs) to ``removed_refs``."""
     rules = load_rules()
     sota_doc = load_json(root / (manifest or SOTA_MANIFEST_PATH))
     sota_index = sota_layer_index(sota_doc)
@@ -758,6 +796,9 @@ def build_all_packets(root: Path, *, catalogs: list, seed: str, checked_at: str,
             name = packet_filename(catalog, row["layer_id"])
             sealed = None
             if withhold:
+                packet, dropped = withhold_removed_refs(packet)
+                if removed_refs is not None and dropped:
+                    removed_refs[name] = dropped
                 # Last, after receipts were matched by component id.
                 packet, sealed = seal_candidate_fields(packet)
             packets[name] = serialize(packet)
@@ -837,12 +878,12 @@ def main(argv=None) -> int:
         if keys_out == out or out in keys_out.parents:
             print("lane_packets: --keys-out must be outside --out, where lanes read packets", file=sys.stderr)
             return 2
-    sealed_keys = {}
+    sealed_keys, removed_refs = {}, {}
     packets = build_all_packets(root, catalogs=catalogs, seed=str(args.seed), checked_at=args.checked_at,
                                 trading_candidates=args.trading_candidates, withhold=args.withhold_labels,
                                 manifest=str(args.manifest) if args.manifest else None,
                                 registered_receipts=args.registered_receipts, gap_receipts=args.gap_receipts,
-                                sealed_keys=sealed_keys)
+                                sealed_keys=sealed_keys, removed_refs=removed_refs)
 
     out_dir = args.out / "packets"
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -867,7 +908,7 @@ def main(argv=None) -> int:
     # leak marker never reaches stdout either.
     print(json.dumps({
         "status": "written", "packet_count": len(packets), "out_dir": sanitize_value(str(out_dir)),
-        "unmatched_sota_components": unmatched_counts,
+        "unmatched_sota_components": unmatched_counts, "dropped_removed_file_refs": removed_refs,
     }))
     return 0
 

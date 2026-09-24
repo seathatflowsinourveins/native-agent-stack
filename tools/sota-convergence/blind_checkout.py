@@ -189,6 +189,14 @@ REMOVE_GLOBS = (
     "evidence/artifacts/claude-upstream-checks-*/results.json",
     "evidence/artifacts/full-stack-convergence-*/component-coverage.json",
     "evidence/artifacts/full-stack-convergence-*/selected-upstream-releases.json",
+    # Selection and membership records an id-aware check found isolating winners (independent review of #145,
+    # round 4, F1 and F3): the adoption profiles and recipe map (the installed stack), the foundation decision
+    # index, the selected us-equities runtime target and the north-star "Selected path" table it points to.
+    # lane_packets.py --withhold-labels drops packet references to every removed path (removed_from_blind_export).
+    "adoption/manifest.json",
+    "catalogs/foundation/decisions.json",
+    "catalogs/us-equities/runtime-target.json",
+    "blueprints/us-equities/north-star.md",
     "tests/test_catalogs.py",
     "tests/test_new_host_grand_list.py",
     "tests/test_handbook_summary.py",
@@ -333,7 +341,7 @@ def _walk_strip(node, path_prefix: str, stripped: list, keys: frozenset, *, only
         for key in list(node.keys()):
             pointer = f"{path_prefix}/{key}"
             value = node[key]
-            named = nonempty_keys(key) if callable(nonempty_keys) else key in nonempty_keys
+            named = nonempty_keys(key, value) if callable(nonempty_keys) else key in nonempty_keys
             if (key in keys and (not only_labels or is_label_value(value))) or \
                     (named and not _is_empty_value(value)):
                 stripped.append({"path": pointer, "old_sha256": hmac_sha256_of(value, hmac_key)})
@@ -350,10 +358,20 @@ def _walk_strip(node, path_prefix: str, stripped: list, keys: frozenset, *, only
 # Keys that record a role rather than evidence (2026-09-24 blindness re-review N1, measured with a per-layer
 # subtraction check): a selection, retention, challenger or default label, a rationale or recommendation, or an
 # earlier run's verdict. Stripped wherever their value is non-empty, under catalogs/ and adoption/.
-ROLE_KEY = re.compile(r"^(selected|retained?|chosen|incumbents?|winners?|challengers?|default_profile)(_|$)"
+# The selected_/retained_/coordinator_ prefixes are no longer patterns (independent review of #145, R4-REG-1 and
+# F7): they also removed retrieval data (selected_sources, selected_primary_files, retained_failure) and exercised
+# checks (retained_helper_check, coordinator_owned_qualification). The label keys among them, measured on the
+# 2026-09-23 export, are listed instead.
+ROLE_LABEL_KEYS = frozenset({
+    "default_profile", "selected_path", "selected_skills", "selected_component", "selected_components",
+    "retained_comparison_engine", "retained_choice", "chosen", "coordinator_disposition", "coordinator_selection",
+    "coordinator_verdict"})
+ROLE_KEY = re.compile(r"^(chosen|incumbents?|winners?|challengers?)(_|$)"
                       r"|challenger|why_not_default|why_selected|why_primary|adoption_recommendation|^rationale$"
                       r"|disposition|sota_verdict|primary_stack|case_for_challenger|would_change_choice"
-                      r"|current_selection|^coordinator_|final_disposition|dual_lane_same_winner")
+                      r"|current_selection|final_disposition|dual_lane_same_winner|^selected_component")
+# An object that records an observed run is evidence, whatever its key (R4-REG-1).
+EVIDENCE_OBJECT_KEYS = frozenset({"observed_at", "reported_on", "exit_code", "sha256", "source_sha256"})
 # Under evidence/, only an earlier run's verdict fields go: receipts use selected_* for data (selected files).
 EVIDENCE_VERDICT_KEYS = frozenset({
     "sota_verdict", "primary_stack", "strongest_challengers", "why_primary_for_requirement",
@@ -361,8 +379,18 @@ EVIDENCE_VERDICT_KEYS = frozenset({
     "claude_final_disposition", "why_selected", "winners", "incumbents", "challenger_repositories"})
 
 
-def _role_key(key) -> bool:
-    return isinstance(key, str) and (key in CATALOGS_NONEMPTY_KEYS or bool(ROLE_KEY.search(key)))
+def _is_evidence_object(value) -> bool:
+    return isinstance(value, dict) and bool(EVIDENCE_OBJECT_KEYS & set(value))
+
+
+def _role_key(key, value=None) -> bool:
+    return (isinstance(key, str) and not _is_evidence_object(value)
+            and (key in CATALOGS_NONEMPTY_KEYS or key in ROLE_LABEL_KEYS or bool(ROLE_KEY.search(key))))
+
+
+def _evidence_verdict_key(key, value=None) -> bool:
+    # A crosswalk of selected components (claude-upstream-checks provenance.json) names the winners by id (F1).
+    return isinstance(key, str) and (key in EVIDENCE_VERDICT_KEYS or key.startswith("selected_component"))
 
 
 def strip_catalog_unconditional(document, relative_path: str, stripped: list, hmac_key: bytes) -> None:
@@ -377,7 +405,7 @@ def strip_adoption_roles(document, relative_path: str, stripped: list, hmac_key:
 
 def strip_evidence_verdicts(document, relative_path: str, stripped: list, hmac_key: bytes) -> None:
     _walk_strip(document, relative_path, stripped, frozenset(), only_labels=False, hmac_key=hmac_key,
-                nonempty_keys=EVIDENCE_VERDICT_KEYS)
+                nonempty_keys=_evidence_verdict_key)
 
 
 def strip_blueprint_labels(document, relative_path: str, stripped: list, hmac_key: bytes) -> None:
@@ -402,6 +430,21 @@ def create_worktree(source: Path, resolved_rev: str, dest: Path) -> None:
         raise SystemExit(f"--dest already exists: {dest}")
     dest.parent.mkdir(parents=True, exist_ok=True)
     git(["worktree", "add", "--detach", str(dest), resolved_rev], cwd=source)
+
+
+def _glob_regex(pattern: str):
+    # A REMOVE_GLOBS pattern as Path.glob reads it: "*" never crosses "/".
+    return re.compile("".join("[^/]*" if part == "*" else re.escape(part) for part in re.split(r"(\*)", pattern)))
+
+
+REMOVE_REGEXES = tuple(_glob_regex(pattern) for pattern in REMOVE_GLOBS)
+
+
+def removed_from_blind_export(relative: str) -> bool:
+    """Whether the repository-relative path ``relative`` (or a directory above it) is one REMOVE_GLOBS removes."""
+    parts = relative.split("/")
+    prefixes = ["/".join(parts[:depth]) for depth in range(1, len(parts) + 1)]
+    return any(regex.fullmatch(prefix) for regex in REMOVE_REGEXES for prefix in prefixes)
 
 
 def remove_paths(root: Path, removed: list) -> None:
@@ -664,6 +707,85 @@ def build_allowlist(dest: Path, packets_dir: Path) -> dict:
     return {"files": files, "missing_refs": sorted(missing), "transitive_refs": sorted(transitive)}
 
 
+PROSE_SUFFIXES = (".md", ".markdown", ".txt", ".rst")
+
+
+def redact_selection_prose(export: Path, packets_dir: Path) -> dict:
+    """Drop, from every exported prose file (outside fenced code), each sentence that uses a selection word and
+    names a candidate of any packet: "Serena is the selected navigation layer" states the current choice before a
+    lane reads the evidence (independent review of #145, round 4, F3: such a sentence reached 24 of the 30 scored
+    layers through a directly cited or one-level transitive file). The term set is the union over all packets, so
+    what is dropped does not depend on which candidate won. Returns {export-relative file: sentences dropped}."""
+    here = str(Path(__file__).resolve().parent)
+    if here not in sys.path:
+        sys.path.insert(0, here)
+    from lane_packets import SELECTION_WORD, candidate_terms
+    terms = set()
+    for packet_file in sorted(Path(packets_dir).glob("*__*.json")):
+        terms |= set(candidate_terms(json.loads(packet_file.read_text(encoding="utf-8"))))
+    if not terms:
+        return {}
+    term = re.compile(r"(?<![\w-])(?:" + "|".join(re.escape(t) for t in sorted(terms, key=len, reverse=True))
+                      + r")(?![\w-])", re.I)
+    redacted = {}
+    for path in sorted(export.rglob("*")):
+        if path.is_symlink() or not path.is_file() or path.suffix.lower() not in PROSE_SUFFIXES \
+                or path.name in INSTRUCTION_FILE_NAMES:
+            continue
+        text = path.read_text(encoding="utf-8", errors="replace")
+        lines, dropped = _redact_blocks(text.split("\n"), SELECTION_WORD, term)
+        if dropped:
+            path.write_text("\n".join(lines), encoding="utf-8")
+            redacted[path.relative_to(export).as_posix()] = dropped
+    return redacted
+
+
+# A Markdown line that starts its own block: a list item, heading, table row or quote.
+_BLOCK_START = re.compile(r"^(\s*(?:[-*+]\s+|\d+[.)]\s+|#{1,6}\s+|>\s*|\|))")
+
+
+def _redact_blocks(lines: list, selection_word, term) -> tuple:
+    """(lines, sentences dropped): each prose block (a paragraph or list item with its wrapped continuation
+    lines; a table row alone) is read as one text, so a sentence wrapped over two lines is still one sentence.
+    A block that loses a sentence is written back on one line; fenced code is kept as it is."""
+    out, dropped, fenced, block = [], 0, False, []
+
+    def flush():
+        nonlocal dropped
+        if not block:
+            return
+        match = _BLOCK_START.match(block[0])
+        prefix = match.group(1) if match else block[0][:len(block[0]) - len(block[0].lstrip())]
+        content = " ".join([block[0][len(prefix):].strip()] + [line.strip() for line in block[1:]])
+        sentences = re.split(r"(?<=[.!?;])\s+", content)
+        kept = [sentence for sentence in sentences if not (selection_word.search(sentence) and term.search(sentence))]
+        if len(kept) == len(sentences):
+            out.extend(block)
+        else:
+            dropped += len(sentences) - len(kept)
+            if kept:
+                out.append(prefix + " ".join(kept))
+        block.clear()
+
+    for line in lines:
+        fence = line.lstrip().startswith("```")
+        if fenced or fence:
+            flush()
+            out.append(line)
+            if fence:
+                fenced = not fenced
+            continue
+        if not line.strip():
+            flush()
+            out.append(line)
+            continue
+        if _BLOCK_START.match(line) or not block or block[0].lstrip().startswith("|"):
+            flush()
+        block.append(line)
+    flush()
+    return out, dropped
+
+
 def export_tree(dest: Path, export: Path, allow_from_packets: Path = None) -> dict:
     """Copy the stripped worktree to ``export`` without ``.git`` or ``BLIND-MANIFEST.json``: the worktree's
     ``.git`` reaches the source repository's history, where ``git show <rev>:<path>`` recovers every
@@ -750,6 +872,7 @@ def export_tree(dest: Path, export: Path, allow_from_packets: Path = None) -> di
             root_file.write_text(EXPORT_INSTRUCTION_STUB, encoding="utf-8")
             if name not in replaced:
                 replaced.append(name)
+    redacted = redact_selection_prose(export, allow_from_packets) if allow_from_packets is not None else {}
     # A stripped (rewritten) file would otherwise carry a newer mtime than an untouched one.
     for directory, dirs, files in os.walk(export, topdown=False, followlinks=False):
         for name in files + dirs:
@@ -764,7 +887,8 @@ def export_tree(dest: Path, export: Path, allow_from_packets: Path = None) -> di
               "removed_escaping_symlinks": sorted(removed_links)}
     if allowlist is not None:
         result.update({"allowlisted_files": len(allowed_files), "missing_refs": allowlist["missing_refs"],
-                       "transitive_refs": len(allowlist["transitive_refs"])})
+                       "transitive_refs": len(allowlist["transitive_refs"]),
+                       "redacted_prose_sentences": sum(redacted.values()), "redacted_prose_files": len(redacted)})
     return result
 
 
@@ -776,6 +900,8 @@ def parse_args(argv=None):
     parser.add_argument("--export", type=Path,
                         help="Also copy the stripped tree here without .git or BLIND-MANIFEST.json (must not exist); "
                              "hand this copy, not the worktree, to the lanes.")
+    parser.add_argument("--allow-missing-refs", action="store_true",
+                        help="Keep an export although the packets reference paths it lacks (refused by default).")
     parser.add_argument("--allow-from-packets", type=Path, metavar="PACKETS_DIR",
                         help="With --export: export only the paths the lane packets PACKETS_DIR/*__*.json reference, "
                              "one level of evidence/ and blueprints/ paths named in included JSON files, and the root "
@@ -809,10 +935,22 @@ def main(argv=None) -> int:
             if (ancestor / ".git").exists():
                 raise SystemExit(f"--export {export} is inside the git repository {ancestor}; place it outside every "
                                  "repository")
+    if export is not None:
+        # The export must not overlap the worktree or the source (R4-REG-8).
+        for label, other in (("--dest", dest), ("--source", source)):
+            if export == other or other in export.parents or export in other.parents:
+                raise SystemExit(f"--export {export} overlaps {label} {other}; place it elsewhere")
     if packets is not None:
         packet_references(packets)  # refuses a directory without packets before the worktree is created
     manifest = run_blind_checkout(source, args.rev, dest)
     sanitized = export_tree(dest, export, allow_from_packets=packets) if export is not None else None
+    if sanitized is not None and sanitized.get("missing_refs") and not args.allow_missing_refs:
+        # A packet pointing a lane at a file the export lacks (independent review of #145, F4/OPS-1): build the
+        # packets with lane_packets.py --withhold-labels, which drops references to removed files.
+        missing = sanitized["missing_refs"]
+        shutil.rmtree(export)
+        raise SystemExit(f"the packets reference {len(missing)} path(s) the export lacks ({', '.join(missing[:10])}); "
+                         "rebuild them with lane_packets.py --withhold-labels, or pass --allow-missing-refs")
     key_path = dest.parent / f"{dest.name}.hmac-key"
     # Owner-only, created exclusively: the key reverses the keyed hashes over a small
     # vocabulary, so no lane that can read the parent directory may read it.
@@ -828,7 +966,8 @@ def main(argv=None) -> int:
                        "export_escaping_symlinks_removed": sanitized["removed_escaping_symlinks"] if sanitized else None,
                        "export_allowlisted_files": sanitized.get("allowlisted_files") if sanitized else None,
                        "export_missing_refs": sanitized.get("missing_refs") if sanitized else None,
-                       "export_transitive_refs": sanitized.get("transitive_refs") if sanitized else None},
+                       "export_transitive_refs": sanitized.get("transitive_refs") if sanitized else None,
+                       "export_redacted_prose_sentences": sanitized.get("redacted_prose_sentences") if sanitized else None},
                       sort_keys=True))
     return 0
 

@@ -1387,8 +1387,9 @@ SOURCE_WORKFLOW = ".claude/workflows/layer-verdict-lane.js"
 AGENT_SHA256 = "e" * 64  # the fixture's registered blind-lane-reviewer definition hash
 REPO_TREE_SHA256 = "7" * 64  # the evidence tree both fixture lanes read (not registered: it varies per run)
 # The fixture's registered adjudication code (lane-provenance.json "adjudication").
-ADJUDICATION_CODE = {key: "f" * 64 for key in ("adjudicate_py_sha256", "prompt_sha256", "judge_schema_sha256",
-                                               "refute_schema_sha256", "workflow_sha256", "adjudicator_role_sha256")}
+ADJUDICATION_CODE = {key: "f" * 64 for key in ("adjudicate_py_sha256", "codex_lane_py_sha256", "prompt_sha256",
+                                               "judge_schema_sha256", "refute_schema_sha256", "workflow_sha256",
+                                               "adjudicator_role_sha256")}
 
 
 def lane_provenance(lane):
@@ -1733,7 +1734,9 @@ class NewWaveLaneIdentityTests(NewWaveFixture):
         adjudications = self.work_dir / "adjudications"
         write_adjudication(adjudications, catalog, "wave-crossfamily-layer",
                            dict(cross_family("claude", self.digest), lane_returns_sha256=relativized))
-        code, output = self.run_wave(adjudications=adjudications, lane_roots=(lane_root,))
+        # The fixture lanes read REPO_TREE_SHA256; the root stands for that export (BIND-R4-9).
+        with mock.patch.object(record_verdicts, "lane_root_tree", return_value=REPO_TREE_SHA256):
+            code, output = self.run_wave(adjudications=adjudications, lane_roots=(lane_root,))
         self.assertEqual(code, 0, output)
         self.assertEqual(self.load_row(catalog, "wave-crossfamily-layer")["verdict_status"], "recorded")
         build_landscape(self.root)
@@ -1759,9 +1762,25 @@ class NewWaveLaneIdentityTests(NewWaveFixture):
         adjudications = self.work_dir / "adjudications"
         write_adjudication(adjudications, catalog, "wave-crossfamily-layer",
                            dict(cross_family("claude", self.digest), lane_returns_sha256=bound))
-        code, output = self.run_wave(adjudications=adjudications, lane_roots=(str(link),))
+        with mock.patch.object(record_verdicts, "lane_root_tree", return_value=REPO_TREE_SHA256):
+            code, output = self.run_wave(adjudications=adjudications, lane_roots=(str(link),))
         self.assertEqual(code, 0, output)
         self.assertEqual(self.load_row(catalog, "wave-crossfamily-layer")["verdict_status"], "recorded")
+
+    def test_a_lane_root_that_does_not_hold_the_lanes_tree_rejects_them(self):
+        # Independent review of #145, round 4, BIND-R4-9: another checkout named as the root would have its paths
+        # relativized as the export's.
+        scratch = Path(tempfile.mkdtemp()).resolve()
+        self.addCleanup(shutil.rmtree, scratch)
+        other = scratch / "hosts" / "blind" / "other"
+        other.mkdir(parents=True)
+        (other / "x.json").write_text("{}", encoding="utf-8")
+        self.both_lanes("wave-same-layer")
+        with self.assertRaisesRegex(SystemExit, "contains \\.\\."):
+            self.run_wave(lane_roots=(str(other / ".." / "other"),))
+        code, output = self.run_wave(lane_roots=(str(other),))
+        self.assertEqual(code, 1)
+        self.assertIn("does not hold the evidence tree", output)
 
     def test_judgments_without_judge_identity_are_rejected(self):
         catalog = self.both_lanes("wave-nojudge-layer", codex_winner="c2")

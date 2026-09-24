@@ -37,6 +37,7 @@ a valid object: a lost refuter is never read as "unrefuted". Stdlib only.
 from __future__ import annotations
 
 import argparse
+import contextlib
 import hashlib
 import json
 import os
@@ -220,15 +221,30 @@ _OUTSIDE_CONTINUATION = re.compile(r"<outside-path>((?:[ \t]+[^\s'\"|;&<>()`,]+)
 # A path segment glued to a delimiter the scrubber stops at ("/home/example,private/result.json") continues the
 # path when a / or \ follows: absorbed whole (Codex review of #145).
 _OUTSIDE_GLUED = re.compile(r"<outside-path>[,;()'\"`|&]+[^\s<>]*[/\\][^\s<>]*")
+# A segment glued to the path by "," or ";" with no space after it ("/home/example/private,key.json") is part of
+# the path's name even without a separator; prose puts a space after the comma (independent review of #145,
+# round 4, R4-REG-5).
+_OUTSIDE_GLUED_TOKEN = re.compile(r"<outside-path>(?:[,;][^\s<>]+)+")
 
 
 def _absorb_clause(match) -> str:
     """Absorb the tokens after an outside path up to and including the first that ends a sentence (keeping its
-    punctuation); the text after that sentence end is kept (delta review of #145)."""
+    punctuation); the text after that sentence end is kept (delta review of #145). A sentence end inside a spaced
+    path ("/srv/Acme Inc. Secret Project/plan.md") is not one: when the next sentence, up to its own end, holds a
+    / or \\ separator, it continues the path and is absorbed too (independent review of #145, round 4, R4-REG-5)."""
     text = match.group(1)
-    for token in re.finditer(r"[^ \t]+", text):
-        if token.group(0)[-1] in ".!?:":
-            return OUTSIDE + token.group(0)[-1] + text[token.end():]
+    tokens = list(re.finditer(r"[^ \t]+", text))
+    for index, token in enumerate(tokens):
+        if token.group(0)[-1] not in ".!?:":
+            continue
+        following = []
+        for later in tokens[index + 1:]:
+            following.append(later.group(0))
+            if later.group(0)[-1] in ".!?:":
+                break
+        if any("/" in word or "\\" in word for word in following):
+            continue
+        return OUTSIDE + token.group(0)[-1] + text[token.end():]
     return OUTSIDE
 PACKET_TOKEN = "PACKET"
 # What must never remain in an input after scrubbing (checked by ``unscrubbed_paths``): an absolute path, a
@@ -299,6 +315,7 @@ def _scrub_segment(text: str, packets_dir: str, repo_roots) -> str:
     text = PARENT_TEXT_PATH.sub(outside, text)
     text = ABSOLUTE_TEXT_PATH.sub(absolute, text)
     text = _OUTSIDE_GLUED.sub(OUTSIDE, text)
+    text = _OUTSIDE_GLUED_TOKEN.sub(OUTSIDE, text)
     return _OUTSIDE_CONTINUATION.sub(_absorb_clause, text)
 
 
@@ -392,6 +409,13 @@ def build_inputs(work_dir: Path, layers=None, repo_roots=(), packet_keys=None) -
     out_dir = work_dir / INPUTS_DIR
     packets_dir = str((work_dir / "packets").resolve())
     index = {"schema_version": 2, "layers": [], "skipped": []}
+    # Each lane root must hold the tree the returns were read from (independent review of #145, BIND-R4-9).
+    root_trees = {}
+    for root in dict.fromkeys(str(Path(root).resolve()) for root in repo_roots):
+        try:
+            root_trees[root] = tree_sha256(Path(root))
+        except (OSError, ValueError):
+            root_trees[root] = None
     for packet_path in sorted((work_dir / "packets").glob("*.json")):
         name = packet_path.stem
         if "__" not in name or (layers and name.split("__", 1)[1] not in layers and name not in layers):
@@ -434,6 +458,12 @@ def build_inputs(work_dir: Path, layers=None, repo_roots=(), packet_keys=None) -
                                f"{packet_sha256}")
             else:
                 returns[lane] = data
+        for lane, data in returns.items():
+            tree = (data.get("provenance") or {}).get("repo_tree_sha256")
+            others = sorted(root for root, digest in root_trees.items() if digest != tree)
+            if others:
+                reasons.append(f"{lane} return read evidence tree {tree}, which --lane-repo-root {', '.join(others)} "
+                               "does not hold")
         components = {}
         for lane, data in returns.items():
             issue, found = lane_winner_components(data, resolved_packet)
@@ -656,10 +686,36 @@ def usable_judgment(data, family, order, packet_sha256, leaked_inputs=None, entr
     if family == "openai" and data.get("audit_clean") is not True:
         # A Codex judgment counts only when its own calls' blind audit was clean (binding re-review N2).
         return data.get("failure") or "no clean blind audit recorded for this judgment"
+    if family == "openai":
+        issue = codex_events_issue(data, entry)
+        if issue:
+            return issue
     if valid_judge(data.get("judge")) is None:
         return data.get("failure") or "no valid judge object"
     if valid_refuter(data.get("refuter")) is None:
         return data.get("failure") or "no valid refuter object"
+    return None
+
+
+def codex_events_issue(data: dict, entry=None):
+    """None when every stage a counted Codex judgment ran left the events file its record names, unchanged, and
+    those events still audit clean against the call's repository, input and packet snapshot (independent review
+    of #145, BIND-R4-6)."""
+    events = data.get("events")
+    if not isinstance(events, dict):
+        return "no audited events recorded for this judgment"
+    roots = [str(data["repo"])] if isinstance(data.get("repo"), str) else []
+    if isinstance(data.get("input_path"), str):
+        roots.append(str(Path(data["input_path"]).resolve()))
+    if isinstance((entry or {}).get("packet_path"), str):
+        roots.append(str(Path(entry["packet_path"]).resolve()))
+    for stage in ("judge", "refute"):
+        item = events.get(stage)
+        path = Path(item["path"]) if isinstance(item, dict) and isinstance(item.get("path"), str) else None
+        if path is None or not path.is_file() or sha256_file(path) != item.get("sha256"):
+            return f"the {stage} call's audited events are missing or changed"
+        if audit_flagged(codex_lane.blind_audit(path, roots)):
+            return AUDIT_FLAGGED
     return None
 
 
@@ -748,8 +804,6 @@ def run_codex(args) -> int:
     entries_by_layer = {entry["layer"]: entry for entry in index.get("layers") or []}
     out_dir = work_dir / JUDGMENTS_DIR / "codex"
     # The code, prompt and evidence tree this run judges with, captured at launch (Codex review of #145).
-    # Codex judges never load the user's global Codex instructions (codex_lane.isolated_codex_home).
-    codex_lane.CHILD_CODEX_HOME = codex_lane.isolated_codex_home(work_dir)
     try:
         run_provenance = adjudication_provenance(args.prompt, repo)
     except ValueError as error:  # an escaping symlink: not a blind export
@@ -784,6 +838,31 @@ def run_codex(args) -> int:
     if pending and shutil.which("codex") is None:
         print("adjudicate: the codex CLI is not on PATH", file=sys.stderr)
         return 2
+    with contextlib.ExitStack() as stack:
+        if pending:
+            try:
+                # One Codex run per work dir (independent review of #145, BIND-R4-5).
+                stack.enter_context(codex_lane.exclusive_run_lock(out_dir / codex_lane.RUN_LOCK_NAME))
+            except codex_lane.RunLocked as error:
+                print(f"adjudicate: {error}", file=sys.stderr)
+                return 2
+            # Codex judges never load the user's global Codex instructions or user skills
+            # (codex_lane.isolated_codex_home), set up only when something is to run (R4-REG-3).
+            try:
+                codex_lane.CHILD_CODEX_HOME = codex_lane.isolated_codex_home(work_dir, repo)
+            except codex_lane.CodexHomeRefused as error:
+                print(f"adjudicate: {error}", file=sys.stderr)
+                return 2
+        try:
+            return judge_pending(args, work_dir, repo, index, packets, items, pending, failures, out_dir,
+                                 run_provenance, judge_template, refute_template)
+        finally:
+            codex_lane.remove_codex_home_link(codex_lane.CHILD_CODEX_HOME)
+            codex_lane.CHILD_CODEX_HOME = None
+
+
+def judge_pending(args, work_dir, repo, index, packets, items, pending, failures, out_dir, run_provenance,
+                  judge_template, refute_template) -> int:
     events_dir = out_dir / "events"
     events_dir.mkdir(parents=True, exist_ok=True)
     schemas = {}
@@ -791,7 +870,7 @@ def run_codex(args) -> int:
         schemas[label] = out_dir / f"adjudication-{label}.codex-strict.schema.json"
         schemas[label].write_text(json.dumps(codex_lane.strict_output_schema(load_json(source)), indent=1,
                                              sort_keys=True) + "\n", encoding="utf-8")
-    leaks, lock = [], threading.Lock()
+    lock = threading.Lock()
 
     def process(item):
         name, order, input_path, packet_sha256, out_path = item
@@ -811,6 +890,11 @@ def run_codex(args) -> int:
             return
         # Both orders' content before the call: a leak suppresses both, bound to what was judged.
         both_sha256 = layer_input_hashes(index, name)
+        # An earlier run's events for this input are not this call's (independent review of #145, BIND-R4-3): a
+        # stale refuter file would void a clean judge call that reported a leak.
+        for stage in ("judge", "refute"):
+            (events_dir / f"{stem}.{stage}.jsonl").unlink(missing_ok=True)
+        ran = ["judge"]
         judge, judge_model, judge_codes, failure, judge_leak = run_codex_call(
             repo, schemas["judge"], out_dir / f"{stem}.judge.out.tmp", args.effort,
             fill(judge_template, input_path, repo, packet_path=packets.get(name, "")), args.model, args.timeout,
@@ -819,6 +903,7 @@ def run_codex(args) -> int:
         if judge_leak is not None:
             leak = {"stage": "judge", "text": redact_leak_text(judge_leak)}
         elif judge is not None:
+            ran.append("refute")
             refuter, refute_model, refute_codes, failure, refute_leak = run_codex_call(
                 repo, schemas["refute"], out_dir / f"{stem}.refute.out.tmp", args.effort,
                 fill(refute_template, input_path, repo, judge, packets.get(name, "")), args.model, args.timeout,
@@ -837,21 +922,26 @@ def run_codex(args) -> int:
         elif inputs_changed(index, [stem]):
             # The input changed while the judges read it (Codex review of #145).
             judge, refuter, leak, failure = None, None, None, "the input changed during the call; rerun inputs"
+        elif not tree_unchanged(repo, run_provenance):
+            # Checked after each call (independent review of #145, BIND-R4-4), so an interrupted run never leaves a
+            # judgment of a changed tree for resume.
+            judge, refuter, leak, failure = None, None, None, TREE_CHANGED
         # This call's own audit, before its record is written (binding re-review N2): a flagged call is void even if
         # the run is interrupted before the end-of-run audit, and a resume never counts it.
         call_roots = [str(repo), str(Path(input_path).resolve()), str(Path(packets.get(name, "")).resolve())]
-        flagged_calls = [stage for stage in ("judge", "refute")
-                         if (events_dir / f"{stem}.{stage}.jsonl").is_file()
-                         and audit_flagged(codex_lane.blind_audit(events_dir / f"{stem}.{stage}.jsonl", call_roots))]
+        # Only the stages this call ran are audited; a stage that ran but left no events file is flagged.
+        flagged_calls = [stage for stage in ran
+                         if not (events_dir / f"{stem}.{stage}.jsonl").is_file()
+                         or audit_flagged(codex_lane.blind_audit(events_dir / f"{stem}.{stage}.jsonl", call_roots))]
         audit_clean = not flagged_calls
         if flagged_calls:
             judge, refuter, leak, failure = None, None, None, AUDIT_FLAGGED
         if leak:
-            # Held until the run's tree and audit checks pass (Codex review of #145): a leak from a voided call is
-            # not persisted, so it cannot suppress later valid runs.
-            with lock:
-                leaks.append((name, order, input_path, {**leak, "family": "openai", "input_sha256": judged_sha256,
-                                                        "inputs_sha256": both_sha256}))
+            # Persisted now, once this call's own tree and audit checks passed (independent review of #145,
+            # BIND-R4-4): an interrupted run keeps its leaks with its judgments. A leak from a voided call is never
+            # persisted, so it cannot suppress later valid runs.
+            record_leaks(out_dir / LEAKS_NAME, index, [(name, order, input_path, {
+                **leak, "family": "openai", "input_sha256": judged_sha256, "inputs_sha256": both_sha256})])
         # The configured --model first, as codex_lane.py records it; the event stream only reports.
         model = args.model or judge_model or "unknown"
         record = judgment_record(
@@ -859,6 +949,11 @@ def run_codex(args) -> int:
             refuter, failure, {"judge": judge_codes, "refuter": refute_codes}, leak, judged_sha256, args.effort,
             run_provenance)
         record["audit_clean"] = audit_clean
+        # The audited events each stage left, by digest (independent review of #145, BIND-R4-6): usable_judgment
+        # re-audits them, so audit_clean is not an unbound boolean.
+        record["events"] = {stage: {"path": str(events_dir / f"{stem}.{stage}.jsonl"),
+                                    "sha256": sha256_file(events_dir / f"{stem}.{stage}.jsonl")}
+                            for stage in ran if (events_dir / f"{stem}.{stage}.jsonl").is_file()}
         write_json(out_path, record)
         if refute_model and refute_model != judge_model:
             print(f"adjudicate: {stem} judge model {judge_model!r} and refuter model {refute_model!r} differ",
@@ -875,7 +970,7 @@ def run_codex(args) -> int:
             process(item)
     try:
         provenance_after = adjudication_provenance(args.prompt, repo)
-    except ValueError:  # an escaping link, loop or FIFO appeared: not the tree the judges were bound to
+    except (OSError, ValueError):  # an escaping link, loop, FIFO or vanished file: not the tree the judges read
         provenance_after = None
     if pending and provenance_after != run_provenance:
         # The evidence tree (or the code, prompt or schemas) changed while the judges read it (Codex review of
@@ -895,9 +990,12 @@ def run_codex(args) -> int:
     call_files = {f"{name}.{order}": [input_path, packets.get(name, "")]
                   for name, order, input_path, _packet_sha256 in items}
     audit, roots_by_call = {}, {}
+    this_run = {f"{name}.{order}" for name, order, _input, _sha, _out in pending}
     for events in sorted(events_dir.glob("*.jsonl")):
         call = events.name[:-len(".jsonl")]
         stem = call.rsplit(".", 1)[0]
+        if stem not in this_run:
+            continue  # only this run's calls (BIND-R4-3); earlier runs' judgments carry their own audit_clean
         roots_by_call[call] = [str(repo)] + [str(Path(path).resolve()) for path in call_files.get(stem, []) if path]
         audit[call] = codex_lane.blind_audit(events, roots_by_call[call])
     write_json(out_dir / "blind-audit.json", {"schema_version": 2, "allowed_roots": roots_by_call, "calls": audit})
@@ -907,7 +1005,6 @@ def run_codex(args) -> int:
         print(f"adjudicate: blind audit flags {len(flagged)} call(s): {', '.join(flagged)}", file=sys.stderr)
     # A flagged call (web search, an MCP tool, or a command reaching outside the repository, its input and its
     # packet) voids that judgment (Codex review of #145): it may have read the index or other inputs.
-    this_run = {f"{name}.{order}" for name, order, _input, _sha, _out in pending}
     for stem in sorted({call.rsplit(".", 1)[0] for call in flagged} & this_run):
         record_path = out_dir / f"{stem}.json"
         try:
@@ -917,8 +1014,6 @@ def run_codex(args) -> int:
         record.update({"judge": None, "refuter": None, "leak": None, "failure": AUDIT_FLAGGED})
         write_json(record_path, record)
         failures.append((stem, AUDIT_FLAGGED))
-    voided = {stem for stem, failure in failures if failure in (TREE_CHANGED, AUDIT_FLAGGED)}
-    record_leaks(out_dir / LEAKS_NAME, index, [leak for leak in leaks if f"{leak[0]}.{leak[1]}" not in voided])
     for stem, failure in sorted(failures):
         print(f"adjudicate: codex {stem}: {failure}", file=sys.stderr)
     return 1 if failures else 0
@@ -944,6 +1039,7 @@ def redact_leak_text(text):
                     *RESIDUAL_PATTERNS):
         text = pattern.sub(OUTSIDE, text)
     text = _OUTSIDE_GLUED.sub(OUTSIDE, text)
+    text = _OUTSIDE_GLUED_TOKEN.sub(OUTSIDE, text)
     text = _OUTSIDE_CONTINUATION.sub(_absorb_clause, text)
     return text[:LEAK_TEXT_LIMIT]
 
@@ -1336,12 +1432,22 @@ DEFAULT_ADJUDICATOR_FILE = Path.home() / ".claude" / "agents" / f"{ADJUDICATOR_R
 tree_sha256 = codex_lane.tree_sha256
 
 
+def tree_unchanged(repo: Path, run_provenance: dict) -> bool:
+    """Whether the evidence tree still has the digest this run launched with (False when it cannot be hashed)."""
+    try:
+        return tree_sha256(Path(repo)) == run_provenance.get("repo_tree_sha256")
+    except (OSError, ValueError):
+        return False
+
+
 def adjudication_provenance(prompt_path: Path = PROMPT_PATH, repo: Path = None) -> dict:
-    """What produced a judgment: this script, the prompt actually used, both judgment schemas, the Claude
+    """What produced a judgment: this script, codex_lane.py (which builds, isolates and audits the Codex judges;
+    independent review of #145, BIND-R4-2), the prompt actually used, both judgment schemas, the Claude
     family's workflow, the vendored blind-adjudicator role it runs as (claude-args refuses an installed role
     other than this), and the evidence tree it judged against (Codex review of #145). Both families' counted
     judgments must carry the same provenance for a layer to be assembled."""
     provenance = {"adjudicate_py_sha256": sha256_file(Path(__file__).resolve()),
+                  "codex_lane_py_sha256": sha256_file(Path(codex_lane.__file__).resolve()),
                   "prompt_sha256": sha256_file(Path(prompt_path)),
                   "judge_schema_sha256": sha256_file(JUDGE_SCHEMA), "refute_schema_sha256": sha256_file(REFUTE_SCHEMA),
                   "workflow_sha256": sha256_file(WORKFLOW_PATH),
@@ -1490,6 +1596,11 @@ def main(argv=None) -> int:
     if args.command == "inputs":
         # Each root in both spellings, as given (absolutized) and resolved: a lane records the paths it opened in
         # whichever spelling it was given, and on macOS /tmp resolves to /private/tmp (validate-macos, #145).
+        dotted = [str(root) for root in args.lane_repo_root if ".." in Path(root).parts]
+        if dotted:
+            # abspath would resolve ".." lexically, not physically (BIND-R4-9).
+            print(f"adjudicate: --lane-repo-root {dotted[0]} contains ..; name the export directly", file=sys.stderr)
+            return 2
         roots = list(dict.fromkeys(spelling for root in args.lane_repo_root
                                    for spelling in (os.path.abspath(root), str(root.resolve()))))
         refusal = refuse_roots("--lane-repo-root", roots)

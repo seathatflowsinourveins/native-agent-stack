@@ -660,10 +660,30 @@ class AllowlistExportTests(BlindCheckoutFixture):
         self.export = self.dest.parent / "hosts" / "blind" / "export"
         self.out = io.StringIO()
         with contextlib.redirect_stdout(self.out):
+            # The fixture references a missing file on purpose, to test its reporting (refused by default).
             self.assertEqual(blind_checkout.main(["--source", str(self.source), "--rev", "HEAD",
                                                   "--dest", str(self.dest), "--export", str(self.export),
-                                                  "--allow-from-packets", str(self.packets)]), 0)
+                                                  "--allow-from-packets", str(self.packets),
+                                                  "--allow-missing-refs"]), 0)
         self.addCleanup(lambda: git(["worktree", "remove", "--force", str(self.dest)], self.source))
+
+    def test_missing_references_are_refused_by_default(self):
+        # Independent review of #145, round 4, F4/OPS-1: a lane must not be pointed at a file the export lacks.
+        dest = self.dest.parent / "second-checkout"
+        export = self.dest.parent / "hosts" / "blind" / "export-2"
+        with self.assertRaisesRegex(SystemExit, "reference 1 path\\(s\\) the export lacks \\(evidence/missing.md\\)"):
+            blind_checkout.main(["--source", str(self.source), "--rev", "HEAD", "--dest", str(dest),
+                                 "--export", str(export), "--allow-from-packets", str(self.packets)])
+        self.addCleanup(lambda: git(["worktree", "remove", "--force", str(dest)], self.source))
+        self.assertFalse(export.exists())
+
+    def test_an_export_inside_the_worktree_is_refused(self):
+        # Round 4, R4-REG-8.
+        dest = self.dest.parent / "third-checkout"
+        with self.assertRaisesRegex(SystemExit, "overlaps --dest"):
+            blind_checkout.main(["--source", str(self.source), "--rev", "HEAD", "--dest", str(dest),
+                                 "--export", str(dest / "hosts" / "blind" / "export")])
+        self.assertFalse(dest.exists())
 
     def test_export_holds_only_referenced_and_transitive_paths(self):
         exported = sorted(p.relative_to(self.export).as_posix() for p in self.export.rglob("*") if p.is_file())
@@ -705,10 +725,6 @@ class AllowlistExportTests(BlindCheckoutFixture):
             self.assertIsNone(reduce(rejected), rejected)
 
 
-if __name__ == "__main__":
-    unittest.main()
-
-
 class RealExportIsolationTests(unittest.TestCase):
     """Independent re-review of #145, blindness N1: on this repository's real 2026-09-23 packets, no list in the
     allowlisted blind export isolates a layer's winner among its adopted candidates under a non-evidence key
@@ -724,10 +740,11 @@ class RealExportIsolationTests(unittest.TestCase):
         self.addCleanup(shutil.rmtree, scratch)
         packets_dir = scratch / "work" / "packets"
         packets_dir.mkdir(parents=True)
+        sealed = {}
         packets = lane_packets.build_all_packets(
             ROOT, catalogs=["foundation", "us-equities"], seed="20260923", checked_at="2026-09-23",
             trading_candidates="manifest", withhold=True,
-            manifest="catalogs/sota-convergence/manifest-20260923.json", registered_receipts=True)
+            manifest="catalogs/sota-convergence/manifest-20260923.json", registered_receipts=True, sealed_keys=sealed)
         for name, text in packets.items():
             (packets_dir / name).write_text(text, encoding="utf-8")
         dest = scratch / "hosts" / "blind" / "checkout"
@@ -739,10 +756,21 @@ class RealExportIsolationTests(unittest.TestCase):
                 shutil.copyfile(source, target)
         blind_checkout.strip_worktree(dest, b"k" * 32)
         export = scratch / "hosts" / "blind" / "export"
-        blind_checkout.export_tree(dest, export, allow_from_packets=packets_dir)
-        report = isolation.isolation_hits(export, packets_dir, isolation.ledger_winners(ROOT))
+        result = blind_checkout.export_tree(dest, export, allow_from_packets=packets_dir)
+        # Every packet reference resolves in the export (independent review of #145, round 4, F4/OPS-1).
+        self.assertEqual(result["missing_refs"], [])
+        # Id-aware (round 4, F1): component ids come from the sealed keys, as a lane never sees them.
+        report = isolation.isolation_hits(export, packets_dir, isolation.ledger_winners(ROOT),
+                                          {"schema_version": 1, "packets": sealed})
         self.assertGreaterEqual(len(report), 25)
         self.assertEqual(isolation.role_label_hits(report), [])
+        # Exercised checks survive role-key stripping (round 4, R4-REG-1).
+        practice = json.loads((export / "catalogs/landscape/native-practice.json").read_text(encoding="utf-8"))
+        self.assertIn("coordinator_owned_qualification", practice)
+        self.assertTrue(any("retained_helper_check" in skill for skill in practice.get("skills") or []))
+        for removed in ("adoption/manifest.json", "catalogs/foundation/decisions.json",
+                        "catalogs/us-equities/runtime-target.json", "blueprints/us-equities/north-star.md"):
+            self.assertFalse((export / removed).exists(), removed)
         # Review of #145 (F5): no packet field but evidence is present on exactly a layer's winners.
         fields = isolation.packet_field_hits(packets_dir, isolation.ledger_winners(ROOT))
         self.assertGreaterEqual(len(fields), 25)
@@ -758,6 +786,55 @@ class RealExportIsolationTests(unittest.TestCase):
                        "registered_receipts": []},
                       {"key": "c3", "repository": "https://github.com/acme/new", "adopted": False, "pin": "2.0"}]
         (scratch / "foundation__layer.json").write_text(json.dumps({"candidates": candidates}), encoding="utf-8")
-        fields = isolation.packet_field_hits(scratch, {"foundation::layer": {"github.com/acme/win"}})
+        fields = isolation.packet_field_hits(scratch, {"foundation::layer": [("github.com/acme/win", "")]})
         self.assertEqual(fields, {"foundation::layer": ["pin", "registered_receipts"]})
         self.assertEqual(isolation.packet_role_label_hits(fields), [{"layer": "foundation::layer", "field": "pin"}])
+
+    def test_selection_sentences_naming_a_candidate_are_redacted_by_block(self):
+        # Round 4, F3: a sentence wrapped over two Markdown lines is one sentence; fenced commands and table rows
+        # without a selection statement are kept.
+        lane_packets = load_module("lane_packets_for_redaction", "lane_packets.py")
+        term = re.compile(r"(?<![\w-])(?:serena|nautilus)(?![\w-])", re.I)
+        text = ("# Title\n\nSerena is the\nselected navigation layer. It indexes code.\n"
+                "- Nautilus stays the default engine. It runs replay.\n- Other item\n"
+                "| Layer | Pick |\n| nav | Serena selected |\n```\nserena --select x\n```\nPlain text.")
+        lines, dropped = blind_checkout._redact_blocks(text.split("\n"), lane_packets.SELECTION_WORD, term)
+        self.assertEqual(dropped, 3)
+        self.assertEqual("\n".join(lines), "# Title\n\nIt indexes code.\n- It runs replay.\n- Other item\n"
+                                            "| Layer | Pick |\n```\nserena --select x\n```\nPlain text.")
+
+    def test_id_keyed_containers_are_matched_and_classified(self):
+        # Round 4, F1 and F6: an id-keyed list or key set naming the winner alone outside an evidence record is a
+        # role label; the same under evidence/ or in a receipt is evidence; a complement list fails under any key.
+        isolation = load_module("export_isolation_check", "export_isolation_check.py")
+        scratch = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, scratch)
+        packets, export = scratch / "packets", scratch / "export"
+        packets.mkdir()
+        (packets / "foundation__layer.json").write_text(json.dumps({"candidates": [
+            {"key": "c1", "repository": "https://github.com/acme/win", "adopted": True},
+            {"key": "c2", "repository": "https://github.com/acme/other", "adopted": True},
+            {"key": "c3", "repository": "https://github.com/acme/third", "adopted": True}]}), encoding="utf-8")
+        keys = {"packets": {"foundation__layer.json": {"candidates": {
+            "c1": {"component_id": "data-win-tool"}, "c2": {"component_id": "other"}, "c3": {"component_id": "third"}}}}}
+        documents = {"adoption/profiles.json": {"recipe_map": {"win_tool": "recipes/x.md"}},
+                     "evidence/run/receipt.json": {"component_ids": ["win-tool"]},
+                     "catalogs/cards.json": {"entries": [{"sources": ["https://github.com/acme/other",
+                                                                      "https://github.com/acme/third"]}]}}
+        for relative, document in documents.items():
+            (export / relative).parent.mkdir(parents=True, exist_ok=True)
+            (export / relative).write_text(json.dumps(document), encoding="utf-8")
+        winners = {"foundation::layer": [("github.com/acme/win", "win-tool")]}
+        report = isolation.isolation_hits(export, packets, winners, keys)
+        self.assertEqual({(hit["file"], hit["mode"]) for hit in report["foundation::layer"]},
+                         {("adoption/profiles.json", "names_alone"), ("evidence/run/receipt.json", "names_alone"),
+                          ("catalogs/cards.json", "complement")})
+        self.assertEqual({hit["file"] for hit in isolation.role_label_hits(report)},
+                         {"adoption/profiles.json", "catalogs/cards.json"})
+        # Without the sealed ids, the id-keyed map is invisible: why the checker takes the packet keys.
+        self.assertNotIn("adoption/profiles.json",
+                         {hit["file"] for hit in isolation.isolation_hits(export, packets, winners)["foundation::layer"]})
+
+
+if __name__ == "__main__":
+    unittest.main()

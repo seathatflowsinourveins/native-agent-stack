@@ -13,6 +13,7 @@ import shutil
 import subprocess
 import tempfile
 import unittest
+from unittest import mock
 from pathlib import Path
 
 from scripts.landscape import lane_model_issue, lane_provenance_issue
@@ -47,6 +48,12 @@ class ClaudeLaneWriterTests(unittest.TestCase):
         git(self.agentlab, "init", "-q")
         git(self.agentlab, "add", ".")
         git(self.agentlab, "-c", "user.name=t", "-c", "user.email=t@example.invalid", "commit", "-qm", "lane")
+        # The fixture checkout stands for the vendored agent-lab commit (BIND-R4-8 binds HEAD to descend from it).
+        head = subprocess.run(["git", "-C", str(self.agentlab), "rev-parse", "HEAD"], capture_output=True, text=True,
+                              check=True).stdout.strip()
+        vendored = mock.patch.object(claude_lane, "vendored_agentlab_commit", return_value=head)
+        vendored.start()
+        self.addCleanup(vendored.stop)
         self.work = self.tmp / "work"
         # The blind export the lane read, and its digest taken before launch (Codex review of #145).
         self.export = self.tmp / "hosts" / "blind" / "export"
@@ -152,6 +159,10 @@ class ClaudeLaneWriterTests(unittest.TestCase):
         spec = importlib.util.spec_from_file_location("claude_lane_args", claude_lane.HERE / "claude_lane_args.py")
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
+        vendored = mock.patch.object(module.claude_lane, "vendored_agentlab_commit",
+                                     side_effect=claude_lane.vendored_agentlab_commit)
+        vendored.start()
+        self.addCleanup(vendored.stop)
         args = module.lane_args(self.work, self.export, claude_lane.VENDORED_AGENT, self.agentlab)
         self.assertEqual(args["launch"], {"repo": str(self.export.resolve()), "repo_tree_sha256": self.tree,
                                           "agent_sha256": self.role})
@@ -167,6 +178,8 @@ class ClaudeLaneWriterTests(unittest.TestCase):
         role_dir.mkdir(parents=True, exist_ok=True)
         (role_dir / "blind-lane-reviewer.md").write_text("---\nname: blind-lane-reviewer\neffort: high\n---\n",
                                                           encoding="utf-8")
+        git(self.agentlab, "add", ".")
+        git(self.agentlab, "-c", "user.name=t", "-c", "user.email=t@example.invalid", "commit", "-qm", "role")
         with self.assertRaisesRegex(module.claude_lane.ProvenanceError, "name the definition the lane loaded"):
             module.lane_args(self.work, self.export, claude_lane.VENDORED_AGENT, self.agentlab)
 
@@ -214,6 +227,8 @@ class ClaudeLaneWriterTests(unittest.TestCase):
         role_dir = self.agentlab / ".claude" / "agents"
         role_dir.mkdir(parents=True, exist_ok=True)
         (role_dir / "blind-lane-reviewer.md").write_bytes(claude_lane.VENDORED_AGENT.read_bytes())
+        git(self.agentlab, "add", ".")
+        git(self.agentlab, "-c", "user.name=t", "-c", "user.email=t@example.invalid", "commit", "-qm", "role")
         with contextlib.redirect_stderr(io.StringIO()) as err:
             code = claude_lane.main(["--result", str(self.result), "--work-dir", str(self.work),
                                      "--agentlab-root", str(self.agentlab), "--repo", str(self.export),
@@ -230,7 +245,45 @@ class ClaudeLaneWriterTests(unittest.TestCase):
                                                           encoding="utf-8")
         with contextlib.redirect_stderr(io.StringIO()) as err:
             self.assertEqual(self.run_main(), 2)
+        self.assertIn("uncommitted .claude/", err.getvalue())  # BIND-R4-8: refused before the comparison
+        git(self.agentlab, "add", ".")
+        git(self.agentlab, "-c", "user.name=t", "-c", "user.email=t@example.invalid", "commit", "-qm", "role")
+        with contextlib.redirect_stderr(io.StringIO()) as err:
+            self.assertEqual(self.run_main(), 2)
         self.assertIn("name the definition the lane loaded", err.getvalue())
+
+    def test_the_agentlab_checkout_must_be_clean_tracked_and_at_the_vendored_commit(self):
+        # Independent review of #145, round 4, BIND-R4-8.
+        settings = self.agentlab / ".claude" / "settings.local.json"
+        settings.write_text("{}", encoding="utf-8")
+        with contextlib.redirect_stderr(io.StringIO()) as err:
+            self.assertEqual(self.run_main(), 2)
+        self.assertIn("uncommitted .claude/", err.getvalue())
+        settings.unlink()
+        git(self.agentlab, "rm", "-q", "--cached", str(self.workflow.relative_to(self.agentlab)))
+        with contextlib.redirect_stderr(io.StringIO()) as err:
+            self.assertEqual(self.run_main(), 2)
+        self.assertIn("is not tracked", err.getvalue())
+        git(self.agentlab, "add", ".")
+        with mock.patch.object(claude_lane, "vendored_agentlab_commit", return_value="e070125dae03b4e44484ccb78d2d65057ad38f40"):
+            with contextlib.redirect_stderr(io.StringIO()) as err:
+                self.assertEqual(self.run_main(), 2)
+        self.assertIn("does not descend from the vendored agent-lab commit", err.getvalue())
+
+    def test_lane_args_refuse_a_work_dir_inside_a_repository(self):
+        # Independent review of #145, round 4, OPS-6.
+        spec = importlib.util.spec_from_file_location("claude_lane_args", claude_lane.HERE / "claude_lane_args.py")
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        (self.work / ".git").mkdir(parents=True, exist_ok=True)
+        with self.assertRaisesRegex(module.claude_lane.ProvenanceError, "is inside the git repository"):
+            module.lane_args(self.work, self.export, claude_lane.VENDORED_AGENT)
+
+    def test_the_vendored_commit_is_read_from_the_manifest(self):
+        self.addCleanup(mock.patch.stopall)
+        mock.patch.stopall()
+        self.assertEqual(claude_lane.vendored_agentlab_commit(claude_lane.DEFAULT_WORKFLOW),
+                         "e070125dae03b4e44484ccb78d2d65057ad38f40")
 
     def test_a_role_definition_other_than_the_vendored_one_is_refused(self):
         # Codex review of #145: a stale or edited same-named role could load labels or broader tools.

@@ -49,6 +49,7 @@ a landscape-schema validator, so it does not import scripts/landscape.py.
 from __future__ import annotations
 
 import argparse
+import contextlib
 import hashlib
 import errno
 import json
@@ -265,9 +266,11 @@ def build_command(repo_root: Path, schema_path: Path, out_tmp: Path, effort: str
 # - Lifecycle hooks are off (``features.hooks``, ``features.plugin_hooks``).
 # - Native web search is off (``web_search="disabled"``): without it a probe child ran a web search, with
 #   it the child reported no web search tool.
-# Not denied: shell reads under ``--sandbox read-only`` (any host path, and CLIs such as ai-memory on PATH)
-# and ``$CODEX_HOME/AGENTS.md``, which a probe child still quoted. Those rest on lane-prompt.md rule 1,
-# a repository without ``.git`` (refused unless --allow-git-history) and the post-run blind audit below.
+# - A blind child runs with a run-scoped CODEX_HOME and an empty HOME (isolated_codex_home): the flags do not skip
+#   ``$CODEX_HOME/AGENTS.md`` or user skills under ``~/.agents/skills``, which probe children loaded otherwise.
+# Not denied: shell reads under ``--sandbox read-only`` (any host path, and CLIs such as ai-memory on PATH).
+# Those rest on lane-prompt.md rule 1, a repository without ``.git`` (refused unless --allow-git-history) and the
+# post-run blind audit below. A non-blind --allow-git-history run inherits the native Codex home.
 # Per-server ``mcp_servers.<name>.enabled=false`` overrides are not used: codex rejects them as a partial
 # table ("invalid transport") when the loaded config does not define that server.
 ISOLATION_ARGS = ("--ignore-user-config", "-c", "features.hooks=false", "-c", "features.plugin_hooks=false",
@@ -282,6 +285,7 @@ HOME_PATH = re.compile(r"(?:~|\$HOME|\$\{HOME\})(?:/[^\s'\"|;&<>()`]*)?")
 # Any other environment variable used as a path (``$CODEX_HOME/AGENTS.md``, ``${XDG_DATA_HOME}/x``) can point
 # outside the repository; only its value, which the event does not show, says where (round-2 review).
 VARIABLE_PATH = re.compile(r"\$(?:\{(?!HOME\})[A-Za-z_]\w*\}|(?!HOME\b)[A-Za-z_]\w*)/[^\s'\"|;&<>()`]*")
+PARAMETER_EXPANSION = re.compile(r"\$\{[^}]*\}")
 # A ``cd`` that leaves the working directory for somewhere the command does not name: bare ``cd`` (home),
 # ``cd -``, ``cd ~`` and ``cd $OLDPWD`` / ``cd "${OLDPWD}"`` (the previous directory), or any other bare variable.
 CD_TARGET = re.compile(r"(?:^|[;&|\n(]|\b(?:ba|z|da)?sh\s+-l?c\s+['\"])\s*cd(?=$|[\s;&|)'\"])([^;&|\n)]*)")
@@ -364,6 +368,9 @@ def blind_audit(events_path: Path, allowed_roots) -> dict:
             reasons += ["names the filesystem root /"] if ROOT_PATH.search(command) else []
             reasons += [f"home-relative path: {path}" for path in HOME_PATH.findall(command)]
             reasons += [f"variable path: {path}" for path in VARIABLE_PATH.findall(command)]
+            # Parameter expansion (${CODEX_HOME%/*}, ${X:-/path}) builds a path the event does not show
+            # (independent review of #145, BIND-R4-7).
+            reasons += [f"parameter expansion: {match}" for match in PARAMETER_EXPANSION.findall(command)]
             reasons += [f"cd leaves for an unnamed directory: cd {target}" for target in unnamed_cd_targets(command)]
             reasons += [f"path climbs out of the working directory: {path}" for path in PARENT_PATH.findall(command)]
             words = set(re.findall(r"[A-Za-z][\w.-]*", command))
@@ -375,35 +382,119 @@ def blind_audit(events_path: Path, allowed_roots) -> dict:
 
 # The CODEX_HOME every blind child runs with (isolated_codex_home), or None to inherit the caller's.
 CHILD_CODEX_HOME = None
+# Where run-scoped Codex homes live: one per work dir, outside the work dir (which holds both lanes' returns) and
+# outside the adjudication state dir (the position index), so no path a child derives from $CODEX_HOME reaches
+# either (independent review of #145, BIND-R4-7).
+CODEX_HOME_BASE_ENV = "NAS_CODEX_HOME_DIR"
+DEFAULT_CODEX_HOME_BASE = Path("~/.local/state/native-agent-stack/codex-home")
 
 
-def isolated_codex_home(work_dir: Path) -> Path:
-    """A run-scoped CODEX_HOME (``<work-dir>/codex-home``, mode 0700) holding only a symlink to the native
-    ``auth.json`` (never a copy). ``--ignore-user-config`` skips config.toml but not ``$CODEX_HOME/AGENTS.md``,
-    the user's global instructions, which name adopted tools (measured 2026-09-24: a child quoted its
-    "# AGENTS.md instructions" block; with this home it answered "none"). Sessions and logs the child writes stay
-    in the work dir. A missing native auth.json is left for the CLI to report.
+class CodexHomeRefused(ValueError):
+    """The run-scoped Codex home cannot be set up without touching a credential or a lane input."""
+
+
+def codex_home_for(work_dir: Path) -> Path:
+    """The run-scoped CODEX_HOME of ``work_dir``: ``$NAS_CODEX_HOME_DIR`` (or
+    ``~/.local/state/native-agent-stack/codex-home``) / sha256(resolved work dir)[:16]."""
+    base = Path(os.environ.get(CODEX_HOME_BASE_ENV) or DEFAULT_CODEX_HOME_BASE).expanduser().absolute()
+    return base / hashlib.sha256(str(Path(work_dir).resolve()).encode("utf-8")).hexdigest()[:16]
+
+
+def native_auth_path() -> Path:
+    """The native Codex credential: ``$CODEX_HOME/auth.json`` (else ``~/.codex/auth.json``), absolutized."""
+    return (Path(os.environ.get("CODEX_HOME") or Path.home() / ".codex").expanduser().absolute() / "auth.json")
+
+
+def _contains(outer: Path, inner: Path) -> bool:
+    return inner == outer or outer in inner.parents
+
+
+def isolated_codex_home(work_dir: Path, repo: Path = None) -> Path:
+    """Create the run-scoped CODEX_HOME (codex_home_for, mode 0700) holding only a symlink to the native
+    ``auth.json`` (never a copy) and the child's empty HOME. ``--ignore-user-config`` skips config.toml but not
+    ``$CODEX_HOME/AGENTS.md``, the user's global instructions, which name adopted tools (measured 2026-09-24: a
+    child quoted its "# AGENTS.md instructions" block; with this home it answered "none"). The home is recreated
+    on every blind run (Codex review of #145), so a leftover AGENTS.md or config is never loaded, and the caller
+    removes the credential link when the run ends (remove_codex_home_link).
 
     The child's HOME is the empty ``<codex-home>/home`` (child_home): Codex also discovers user Agent Skills
     under ``$HOME/.agents/skills``, whose names are adopted tools (review of #145, measured 2026-09-24: a child
     with this CODEX_HOME but the caller's HOME listed qmd, tavily-* and typesafe-ai; with the empty HOME it
-    listed only the CLI's bundled skills)."""
-    home = Path(work_dir).resolve() / "codex-home"
-    if home.is_symlink() or home.is_file():
-        home.unlink()
-    elif home.exists():
-        # Recreated on every blind run (Codex review of #145): a leftover AGENTS.md or config from an interrupted
-        # or hand-prepared run would otherwise be loaded.
+    listed only the CLI's bundled skills).
+
+    Raises CodexHomeRefused, removing nothing (independent review of #145, BIND-R4-1 and R4-REG-9), when the home
+    is a symlink or not a directory, when it holds a regular auth.json, when the native credential or its target
+    lies inside it, when it lies inside the work dir or ``repo``, or when there is neither a native auth.json nor
+    CODEX_API_KEY/OPENAI_API_KEY."""
+    home = codex_home_for(work_dir)
+    native = native_auth_path()
+    native_targets = {native, Path(os.path.realpath(native))}
+    for place in (Path(work_dir).resolve(), *([Path(repo).resolve()] if repo is not None else [])):
+        if _contains(place, home) or _contains(place, Path(os.path.realpath(home))):
+            raise CodexHomeRefused(f"the run-scoped Codex home {home} lies inside {place}; set {CODEX_HOME_BASE_ENV} "
+                                   "to a directory outside the work dir and the export")
+    if home.is_symlink():
+        raise CodexHomeRefused(f"the run-scoped Codex home {home} is a symlink; remove it by hand")
+    for spelling in {home, Path(os.path.realpath(home))}:
+        if any(_contains(spelling, target) for target in native_targets):
+            raise CodexHomeRefused(f"the native Codex credential {native} lies inside the run-scoped home {home}; "
+                                   f"point CODEX_HOME at the native home or set {CODEX_HOME_BASE_ENV} elsewhere")
+    if home.exists():
+        link = home / "auth.json"
+        if not home.is_dir() or (link.exists() and not link.is_symlink()):
+            raise CodexHomeRefused(f"{home} is not a run-scoped Codex home (not a directory, or it holds a regular "
+                                   "auth.json); refusing to remove it")
         shutil.rmtree(home)
-    home.mkdir(parents=True)
+    if not native.is_file() and not (os.environ.get("CODEX_API_KEY") or os.environ.get("OPENAI_API_KEY")):
+        raise CodexHomeRefused(f"no native Codex credential at {native} and no CODEX_API_KEY or OPENAI_API_KEY; sign "
+                               "in natively with `codex login`")
+    home.mkdir(parents=True, mode=0o700)
     home.chmod(0o700)
     child_home(home).mkdir(mode=0o700)
-    native = Path(os.environ.get("CODEX_HOME") or Path.home() / ".codex") / "auth.json"
-    link = home / "auth.json"
-    if native.is_file() and not link.is_symlink():
-        link.unlink(missing_ok=True)
-        link.symlink_to(native)
+    if native.is_file():
+        (home / "auth.json").symlink_to(native)
     return home
+
+
+def remove_codex_home_link(home) -> None:
+    """Remove the run-scoped home's credential link at the end of a run (independent review of #145, OPS-4); the
+    child's sessions and logs stay for inspection. Only a symlink is ever removed."""
+    if home is None:
+        return
+    link = Path(home) / "auth.json"
+    if link.is_symlink():
+        link.unlink()
+
+
+RUN_LOCK_NAME = ".run.lock"
+
+
+class RunLocked(RuntimeError):
+    """Another run holds this work dir's lock."""
+
+
+@contextlib.contextmanager
+def exclusive_run_lock(path: Path):
+    """Hold an exclusive, non-blocking flock on ``path`` for the run (independent review of #145, BIND-R4-5): two
+    runs on one work dir would recreate each other's Codex home and interleave each other's events files."""
+    import fcntl
+    path.parent.mkdir(parents=True, exist_ok=True)
+    handle = open(path, "a", encoding="utf-8")
+    try:
+        fcntl.flock(handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except BlockingIOError:
+        handle.close()
+        raise RunLocked(f"another run holds {path}; wait for it to finish") from None
+    try:
+        yield
+    finally:
+        fcntl.flock(handle, fcntl.LOCK_UN)
+        handle.close()
+
+
+def child_env(codex_home: Path) -> dict:
+    """The environment overrides of a blind child (CODEX_HOME and its empty HOME)."""
+    return {"CODEX_HOME": str(codex_home), "HOME": str(child_home(codex_home))}
 
 
 def child_home(codex_home: Path) -> Path:
@@ -413,8 +504,7 @@ def child_home(codex_home: Path) -> Path:
 
 def run_attempt(cmd: list, timeout: float) -> dict:
     started = time.monotonic()
-    env = (dict(os.environ, CODEX_HOME=str(CHILD_CODEX_HOME), HOME=str(child_home(CHILD_CODEX_HOME)))
-           if CHILD_CODEX_HOME is not None else None)
+    env = dict(os.environ, **child_env(CHILD_CODEX_HOME)) if CHILD_CODEX_HOME is not None else None
     try:
         completed = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout, env=env)
         return {
@@ -566,8 +656,13 @@ def tree_sha256(repo: Path, allow_escaping_links: bool = False) -> str:
                 # (delta review of #145). A dangling internal link (ENOENT) is hashed by its text.
                 os.stat(path)
             except OSError as error:
-                if error.errno == errno.ELOOP and not allow_escaping_links:
-                    raise ValueError(f"evidence repository {repo} has a symlink loop: {relative}")
+                if error.errno == errno.ELOOP:
+                    if not allow_escaping_links:
+                        raise ValueError(f"evidence repository {repo} has a symlink loop: {relative}")
+                    # A non-blind run hashes a looping link by its text without resolving it: 3.12's resolve()
+                    # raises RuntimeError on a loop (independent review of #145, R4-REG-4).
+                    digest.update(f"{relative}\0->{target}\n".encode("utf-8"))
+                    continue
             resolved = (path.parent / target).resolve(strict=False)
             if not allow_escaping_links and (os.path.isabs(target)
                                              or not (resolved == root or root in resolved.parents)):
@@ -659,8 +754,8 @@ def main(argv=None) -> int:
         for candidate in (Path(os.path.abspath(args.repo)), repo):
             issue = root_issue(candidate)
             if issue:
-                print(f"codex_lane: --repo {issue}; place the blind export at least four directories deep, outside "
-                      "home, /tmp and every repository", file=sys.stderr)
+                print(f"codex_lane: --repo {issue}; place the blind export at least four directories deep (not /, "
+                      "/home, /tmp or a home directory itself) and outside every repository", file=sys.stderr)
                 return 2
     git_dirs = [str(path) for path in (repo, *repo.parents) if (path / ".git").exists()]
     if git_dirs and not args.allow_git_history:
@@ -668,6 +763,13 @@ def main(argv=None) -> int:
         print(f"codex_lane: {git_dirs[0]} has .git, whose history a child can read from {repo}; run the lane on a "
               "blind_checkout.py --export copy placed outside every repository, or pass --allow-git-history "
               "outside a blind wave", file=sys.stderr)
+        return 2
+
+    work_repos = [str(path) for path in (work_dir, *work_dir.parents) if (path / ".git").exists()]
+    if work_repos and not args.allow_git_history:
+        # WORK_DIR sits outside every repository, as the recipe says (independent review of #145, round 4, OPS-6).
+        print(f"codex_lane: --work-dir {work_dir} is inside the git repository {work_repos[0]}; place it outside "
+              "every repository", file=sys.stderr)
         return 2
 
     layers_filter = None
@@ -696,18 +798,18 @@ def main(argv=None) -> int:
             continue
         pending.append((catalog, layer_id, packet_path, packet_sha256, out_path))
 
-    if not args.dry_run and not args.allow_git_history:
-        # Blind children never load the user's global Codex instructions (isolated_codex_home); a dry run writes
-        # nothing, so it creates no home either (Codex review of #145).
-        CHILD_CODEX_HOME = isolated_codex_home(work_dir)
+    blind = not args.allow_git_history
     if args.dry_run:
         strict_display = codex_dir / "lane-return.codex-strict.schema.json"
         print(f"# --dry-run writes nothing; a real run first writes {strict_display}", file=sys.stderr)
+        # A blind child's environment is printed with its command; the dry run creates no home (OPS-4).
+        env_prefix = ["env", *(f"{key}={value}" for key, value in child_env(codex_home_for(work_dir)).items())] \
+            if blind else []
         for catalog, layer_id, packet_path, packet_sha256, out_path in pending:
             prompt_text = fill_prompt(template, packet_path.resolve(), repo)
             tmp_out = codex_dir / f"{catalog}__{layer_id}.out.tmp"
             cmd = build_command(repo, strict_display, tmp_out, args.effort, prompt_text, args.model, ISOLATION_ARGS)
-            print(shlex.join(cmd))
+            print(shlex.join(env_prefix + cmd))
         return 0
 
     if pending and shutil.which("codex") is None:
@@ -715,7 +817,31 @@ def main(argv=None) -> int:
         print("codex_lane: the codex CLI is not on PATH; install it and sign in natively "
               "(see adoption/) before running the Codex lane", file=sys.stderr)
         return 2
+    with contextlib.ExitStack() as stack:
+        if pending:
+            try:
+                stack.enter_context(exclusive_run_lock(codex_dir / RUN_LOCK_NAME))
+            except RunLocked as error:
+                print(f"codex_lane: {error}", file=sys.stderr)
+                return 2
+        if pending and blind:
+            # Blind children never load the user's global Codex instructions or user skills (isolated_codex_home),
+            # set up only once every refusal has passed, the run holds its lock and something is to run (R4-REG-3).
+            try:
+                CHILD_CODEX_HOME = isolated_codex_home(work_dir, repo)
+            except CodexHomeRefused as error:
+                print(f"codex_lane: {error}", file=sys.stderr)
+                return 2
+        try:
+            return run_pending(args, work_dir, repo, template, schema_path, codex_dir, events_dir, usage_path,
+                               pending, provenance)
+        finally:
+            remove_codex_home_link(CHILD_CODEX_HOME)
+            CHILD_CODEX_HOME = None
 
+
+def run_pending(args, work_dir, repo, template, schema_path, codex_dir, events_dir, usage_path, pending,
+                provenance) -> int:
     events_dir.mkdir(parents=True, exist_ok=True)
     strict_schema_path = write_strict_schema(schema_path, codex_dir)
     usage_lock = threading.Lock()

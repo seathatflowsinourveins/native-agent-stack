@@ -103,6 +103,14 @@ class CodexLaneFixture(unittest.TestCase):
         os.environ["CODEX_FAKE_RETURN_FILE"] = str(self.return_file)
         self.events_file.write_text(CANNED_EVENTS, encoding="utf-8")
         self.return_file.write_text(json.dumps(canned_return()), encoding="utf-8")
+        # Never the developer's credential or state (independent review of #145, R4-REG-7): a fixture native
+        # Codex home with a dummy auth.json, and run-scoped homes under the fixture.
+        self.native_codex = base / "native-codex"
+        self.native_codex.mkdir()
+        (self.native_codex / "auth.json").write_text("{}", encoding="utf-8")
+        os.environ["CODEX_HOME"] = str(self.native_codex)
+        os.environ[codex_lane.CODEX_HOME_BASE_ENV] = str(base / "codex-homes")
+        self.addCleanup(setattr, codex_lane, "CHILD_CODEX_HOME", None)
 
     def write_packet(self, catalog: str, layer_id: str, content=None) -> Path:
         path = self.work_dir / "packets" / f"{catalog}__{layer_id}.json"
@@ -818,6 +826,8 @@ class EscapingSymlinkTreeTests(CodexLaneFixture):
         os.symlink("loop-a", self.repo / "loop-b")
         with self.assertRaisesRegex(ValueError, "symlink loop"):  # on 3.12 and 3.13 alike (delta review D1)
             codex_lane.tree_sha256(self.repo)
+        # A non-blind run hashes a loop by its link text on 3.12 too, where resolve() raises (round 4, R4-REG-4).
+        self.assertIsInstance(codex_lane.tree_sha256(self.repo, allow_escaping_links=True), str)
         os.symlink("missing-target", self.repo / "dangling")
         (self.repo / "loop-a").unlink()
         (self.repo / "loop-b").unlink()
@@ -836,17 +846,19 @@ class EscapingSymlinkTreeTests(CodexLaneFixture):
 
 class IsolatedCodexHomeTests(CodexLaneFixture):
     """2026-09-24 blindness: --ignore-user-config does not skip $CODEX_HOME/AGENTS.md, so blind children run
-    with a run-scoped CODEX_HOME that links, never copies, the native auth.json."""
+    with a run-scoped CODEX_HOME that links, never copies, the native auth.json, and an empty HOME."""
+
+    def home(self):
+        return codex_lane.codex_home_for(self.work_dir)
 
     def test_the_home_links_the_native_auth_and_children_get_it(self):
-        native = self.work_dir.parent / "native-codex"
-        native.mkdir()
-        (native / "auth.json").write_text("{}", encoding="utf-8")
-        (native / "AGENTS.md").write_text("# global instructions naming tools", encoding="utf-8")
-        with mock.patch.dict(os.environ, {"CODEX_HOME": str(native)}):
-            home = codex_lane.isolated_codex_home(self.work_dir)
+        (self.native_codex / "AGENTS.md").write_text("# global instructions naming tools", encoding="utf-8")
+        home = codex_lane.isolated_codex_home(self.work_dir, self.repo)
+        self.assertEqual(home, self.home())
+        # Outside the work dir, which holds both lanes' returns (BIND-R4-7).
+        self.assertNotIn(self.work_dir.resolve(), home.parents)
         self.assertTrue((home / "auth.json").is_symlink())
-        self.assertEqual(os.readlink(home / "auth.json"), str(native / "auth.json"))
+        self.assertEqual(os.readlink(home / "auth.json"), str(self.native_codex / "auth.json"))
         self.assertFalse((home / "AGENTS.md").exists())
         self.assertEqual(oct(home.stat().st_mode & 0o777), "0o700")
         seen = {}
@@ -865,24 +877,85 @@ class IsolatedCodexHomeTests(CodexLaneFixture):
         self.assertEqual(oct((home / "home").stat().st_mode & 0o777), "0o700")
 
     def test_the_home_is_recreated_without_leftovers_and_a_dry_run_writes_none(self):
-        # Codex review of #145: a leftover AGENTS.md in codex-home would be loaded; a dry run writes nothing.
-        home = self.work_dir / "codex-home"
-        home.mkdir()
+        # Codex review of #145: a leftover AGENTS.md in the home would be loaded; a dry run writes nothing but
+        # prints each child's environment (OPS-4).
+        home = self.home()
+        home.mkdir(parents=True)
         (home / "AGENTS.md").write_text("# leftover instructions", encoding="utf-8")
-        codex_lane.isolated_codex_home(self.work_dir)
+        codex_lane.isolated_codex_home(self.work_dir, self.repo)
         self.assertFalse((home / "AGENTS.md").exists())
         shutil.rmtree(home)
         self.write_packet("foundation", "native-clients")
-        with mock.patch.object(codex_lane, "CHILD_CODEX_HOME", None), \
-                contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
-            self.run_lane(["--dry-run"])
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(io.StringIO()):
+            self.assertEqual(self.run_lane(["--dry-run"]), 0)
         self.assertFalse(home.exists())
+        self.assertIn(f"CODEX_HOME={home}", out.getvalue())
+        self.assertIn(f"HOME={home / 'home'}", out.getvalue())
 
-    def test_a_blind_run_sets_the_isolated_home(self):
+    def test_a_blind_run_uses_the_home_and_removes_the_credential_link_after(self):
+        env_log = self.work_dir.parent / "env.jsonl"
+        os.environ["CODEX_FAKE_ENV_LOG"] = str(env_log)
         self.write_packet("foundation", "native-clients")
-        with mock.patch.object(codex_lane, "CHILD_CODEX_HOME", None):
-            self.assertEqual(self.run_lane(), 0)
-            self.assertEqual(codex_lane.CHILD_CODEX_HOME, self.work_dir.resolve() / "codex-home")
+        self.assertEqual(self.run_lane(), 0)
+        seen = [json.loads(line) for line in env_log.read_text(encoding="utf-8").splitlines()]
+        self.assertEqual(seen, [{"CODEX_HOME": str(self.home()), "HOME": str(self.home() / "home"), "auth_link": True}])
+        self.assertFalse((self.home() / "auth.json").is_symlink())
+        self.assertIsNone(codex_lane.CHILD_CODEX_HOME)
+
+    def test_nothing_that_resolves_to_the_native_credential_is_removed(self):
+        # Independent review of #145, BIND-R4-1: with CODEX_HOME pointing at the run-scoped home, recreating it
+        # would delete the real credential.
+        home = self.home()
+        home.mkdir(parents=True)
+        (home / "auth.json").write_text('{"token": "real"}', encoding="utf-8")
+        with mock.patch.dict(os.environ, {"CODEX_HOME": str(home)}):
+            with self.assertRaisesRegex(codex_lane.CodexHomeRefused, "lies inside the run-scoped home"):
+                codex_lane.isolated_codex_home(self.work_dir, self.repo)
+        self.assertEqual((home / "auth.json").read_text(encoding="utf-8"), '{"token": "real"}')
+        # A regular auth.json in the home is never removed, whatever CODEX_HOME says.
+        with self.assertRaisesRegex(codex_lane.CodexHomeRefused, "holds a regular auth.json"):
+            codex_lane.isolated_codex_home(self.work_dir, self.repo)
+        self.assertTrue((home / "auth.json").is_file())
+        shutil.rmtree(home)
+        home.parent.mkdir(parents=True, exist_ok=True)
+        home.symlink_to(self.native_codex)
+        with self.assertRaisesRegex(codex_lane.CodexHomeRefused, "is a symlink"):
+            codex_lane.isolated_codex_home(self.work_dir, self.repo)
+        self.assertTrue((self.native_codex / "auth.json").is_file())
+
+    def test_a_home_inside_the_work_dir_or_without_a_credential_is_refused(self):
+        with mock.patch.dict(os.environ, {codex_lane.CODEX_HOME_BASE_ENV: str(self.work_dir / "homes")}):
+            with self.assertRaisesRegex(codex_lane.CodexHomeRefused, "lies inside"):
+                codex_lane.isolated_codex_home(self.work_dir, self.repo)
+        (self.native_codex / "auth.json").unlink()
+        for key in ("CODEX_API_KEY", "OPENAI_API_KEY"):
+            os.environ.pop(key, None)
+        with self.assertRaisesRegex(codex_lane.CodexHomeRefused, "no native Codex credential"):
+            codex_lane.isolated_codex_home(self.work_dir, self.repo)
+        self.write_packet("foundation", "native-clients")
+        with contextlib.redirect_stderr(io.StringIO()) as err:
+            self.assertEqual(self.run_lane(), 2)
+        self.assertIn("codex login", err.getvalue())
+        self.assertFalse((self.work_dir / "codex" / "foundation__native-clients.json").exists())
+
+    def test_a_work_dir_inside_a_repository_is_refused(self):
+        # Independent review of #145, round 4, OPS-6: the recipe's rule, enforced.
+        (self.work_dir / ".git").mkdir()
+        self.write_packet("foundation", "native-clients")
+        with contextlib.redirect_stderr(io.StringIO()) as err:
+            self.assertEqual(self.run_lane(), 2)
+        self.assertIn("is inside the git repository", err.getvalue())
+
+    def test_parameter_expansion_is_flagged(self):
+        # Independent review of #145, BIND-R4-7: ${...} builds a path the event does not show.
+        events = self.work_dir / "expansion.jsonl"
+        events.write_text(json.dumps({"type": "item.completed", "item": {
+            "type": "command_execution", "command": "bash -lc 'cat \"${CODEX_HOME%/*}/x.json\"'"}}) + "\n",
+            encoding="utf-8")
+        report = codex_lane.blind_audit(events, [str(self.repo)])
+        self.assertTrue(any("parameter expansion" in reason for item in report["flagged_commands"]
+                            for reason in item["reasons"]), report)
 
 
 class ExactProvenanceResumeTests(CodexLaneFixture):

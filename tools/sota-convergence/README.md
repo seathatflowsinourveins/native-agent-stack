@@ -653,7 +653,8 @@ for this component.
 
 Measured on the 2026-09-23 tree (round-2 review, rebuilt with
 `lane_packets.py --root . --out <dir> --manifest catalogs/sota-convergence/manifest-20260923.json
---trading-candidates manifest --withhold-labels --registered-receipts`):
+--trading-candidates manifest --withhold-labels --registered-receipts`; since the round-4 review a blind build
+also needs `--keys-out <file outside --out>` and no longer writes `matched_by`):
 - 93 of 286 candidates carry at least one receipt.
 - Candidate entries by `matched_by`: `component_id` 1028, `alias` 32, `repository` 0, after label-bearing receipts are left out.
 - The alias entries: `data-edgartools` 14, `data-duckdb` 11, `nautilustrader` 6 and `data-exchange-calendars` 1.
@@ -1156,22 +1157,20 @@ On the 2026-09-23 tree this covers `AGENTS.md`, `CLAUDE.md`,
 prints both lists (`export_instruction_files_replaced`, `export_instruction_dirs_removed`).
 
 **Remaining limits: what the export still carries.** The export strips the JSON label fields under
-`catalogs/` and `blueprints/` (below) and the instruction files. It does not strip:
-- **Markdown prose.** It is copied unchanged and still names selections, for example `README.md` ("selected
-  components"), `docs/foundation-stack.md`, `docs/landscape-continuation.md`,
-  `blueprints/us-equities/north-star.md`, `blueprints/us-equities/engine-nautilus/`, `adoption/`, `recipes/`
-  and the `catalogs/**/*.md` narratives. (`docs/grand-catalog-handbook.md` is removed outright.)
-- **Prior evidence artifacts.** JSON under `evidence/artifacts/` other than `layer-verdicts-*` is kept,
-  because packets cite prior artifacts as evidence. On the 2026-09-23 tree, "selected" (case-insensitive)
-  occurs 1,799 times in 121 JSON files across 35 of those directories. The largest are
-  `blind-catalog-convergence-20260921/` (541 in 9 files; `claude-final-layers.json` alone has 158),
-  `full-stack-convergence-20260921/` (220), `claude-repository-evidence-20260921/` (152),
-  `sdk-runtime-coverage-20260922/` (139) and `catalog-runtime-review-20260921/` (133).
-  `catalog-reconciliation-20260922/claude-return.json` also records a prior lane's selections.
+`catalogs/`, `adoption/` and `blueprints/` (below), the instruction files, and, in an allowlisted export, every
+prose sentence that names a candidate with a selection word (round 4, below). Measured on the allowlisted
+2026-09-23 export (604 files), it still carries:
+- **Evidence prose in JSON.** String values are not redacted. Sentences naming a winner with a selection word
+  remain in 65 JSON files (82 matches under `evidence/`, 20 under `blueprints/`, 12 under `catalogs/`, 3 under
+  `observability/`). Most use the words in their technical sense ("selected-step retry", "retained checkpoint").
+- **Prior evidence artifacts.** JSON under `evidence/artifacts/` that a packet cites is kept, because packets
+  cite prior artifacts as evidence; earlier verdict fields are stripped from it. In the export, "selected"
+  (case-insensitive) occurs 387 times in 58 of those JSON files across 20 directories.
 - **Instruction files outside the export.** The export cannot neutralize instructions a client loads from
-  elsewhere: a parent directory's `AGENTS.md` or `CLAUDE.md`, `~/.claude/CLAUDE.md` and `~/.codex/AGENTS.md`
-  (`$CODEX_HOME/AGENTS.md`). A probe Codex child quoted `~/.codex/AGENTS.md`, so it is known to load for
-  Codex children. The Claude lane's `blind-lane-reviewer` agents run with `omitClaudeMd`.
+  elsewhere: a parent directory's `AGENTS.md` or `CLAUDE.md` and the user-level files. Blind Codex children run
+  with a run-scoped `CODEX_HOME` and an empty `HOME` (below), so `~/.codex/AGENTS.md` and `~/.agents/skills` do
+  not load for them; a non-blind `codex_lane --allow-git-history` run inherits the native home. The Claude
+  lane's `blind-lane-reviewer` agents run with `omitClaudeMd`.
 
 None of these is stripped wholesale, because a lane also reads them as evidence. The controls are lane-prompt
 rule 1, placing the export outside every repository, and the post-run blind audit (a lower bound). A
@@ -1342,7 +1341,10 @@ Measured with codex-cli 0.155.1:
 What remains and how it is handled:
 - **Shell reads:** `--sandbox read-only` still lets a child read any host path and run CLIs such as
   ai-memory from `PATH`. Rule 1 of `lane-prompt.md` forbids it, and so does the Claude lane's blind rule.
-- **Global instructions:** a probe child quoted `$CODEX_HOME/AGENTS.md`, so that file still loads.
+- **Global instructions and user skills:** blind runs (`codex_lane` without `--allow-git-history`, `adjudicate
+  codex`) run each child with a run-scoped `CODEX_HOME` and an empty `HOME`, so neither `$CODEX_HOME/AGENTS.md`
+  nor `~/.agents/skills` loads (probe-measured, round 4). A non-blind `--allow-git-history` run inherits the
+  native home and both.
 - **Git history:** `codex_lane.py` refuses a `--repo` when it or any parent directory has `.git`, because git
   walks up from a subdirectory. Pass `--allow-git-history` only outside a blind wave. Run the lanes on a
   `blind_checkout.py --export` copy placed outside every repository.
@@ -1469,7 +1471,8 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
   ahead of the event-stream model name, the same order `codex_lane.py` uses. Resume skips a judgment only when
   it is usable and was made with this `--model`.
 - **`adjudication-lane.js`:** the Claude family's judge and refuter, one pair per input. Both run as the
-  `blind-adjudicator` role (agent-lab PR #40, under review; the agent file is vendored separately).
+  `blind-adjudicator` role, vendored from agent-lab e070125 as `examples/claude-native/agents/blind-adjudicator.md`
+  and installed with `tools/adoption/install_claude_profile.py --only agents`.
   `claude-collect` records its return; a lost judge or refuter makes that judgment missing, never unrefuted.
 - **Prompt and leak check (both families, round-2 review):**
   - Every judge and refuter task starts with three labelled lines: `Input file: <path>`, `Packet file: <path>`
@@ -1527,8 +1530,8 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
   for a leak or for validation, so `record_verdicts.py --adjudications` never reads a stale winner.
 - **Paths:** a repository root or work dir containing whitespace is refused, because path scrubbing
   tokenizes on whitespace.
-- **Resume:** a Codex judgment is reused only at the same `--model` and `--effort`. The Claude lane's
-  effort is fixed at `high` by `adjudication-lane.js`.
+- **Resume:** a Codex judgment is reused only at the same `--model` and `--effort`. The Claude family's
+  effort is fixed at `max` by `adjudication-lane.js` (`CLAUDE_LANE_EFFORT` in `adjudicate.py`).
 - **Snapshot scope:** `claude-collect` touches only the items in the `claude-args` snapshot. It discards a
   leak reported on an input rebuilt since that snapshot, so the stale leak cannot mark the new content.
 - **Assembly:** `assemble` first removes the earlier record of every layer `inputs` indexed or skipped.
@@ -1627,9 +1630,9 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
     winner or incumbent keys are stripped under `catalogs/`. Ledger candidates are sorted by (repository, name):
     the checked-in order listed the incumbent first on every row. Every exported path gets mtime 0.
 
-    On the 2026-09-23 packets the export now holds 666 files. Earlier counts were 902 with the tests/, tools/ and
-    scripts/ trees, and 697 before the role-label removal below. Before the allowlist it held the whole
-    repository.
+    On the 2026-09-23 packets the export holds 604 files after the round-4 removals below (666 before them, 902
+    with the tests/, tools/ and scripts/ trees, 697 before the role-label removal). Before the allowlist it held the
+    whole repository.
 
     **Role labels removed (final-round blindness review).** A per-layer subtraction check
     (`tools/sota-convergence/export_isolation_check.py`, adapted from the reviewer's script) tests every
@@ -1638,30 +1641,29 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
     - removes membership lists and earlier verdict records: `manifests/stack.json`, the upstream snapshot,
       star audit, automation interfaces and saturation audit, and the 2026-09-21 repository-evidence,
       blind-catalog-convergence, upstream-check and full-stack coverage records;
-    - strips role keys (`selected_*`, `retained*`, `challenger*`, `rationale`, `disposition`, `why_not_default`,
-      `default_profile` and the like) under `catalogs/` and `adoption/`;
+    - strips role keys under `catalogs/` and `adoption/`: since round 4 an explicit list (`selected_path`,
+      `selected_skills`, `default_profile`, `retained_comparison_engine`, ...) plus `challenger*`, `rationale`,
+      `disposition`, `why_not_default` and the like, never an object that records an observed run
+      (`observed_at`, `exit_code`, `sha256`); the earlier `selected_*`/`retained*`/`coordinator_*` prefixes also
+      removed retrieval data and exercised checks (round 4, R4-REG-1);
     - strips earlier verdict fields (`sota_verdict`, `primary_stack`, `strongest_challengers`, ...) under
       `evidence/`.
 
     `tests/test_blind_checkout.py::RealExportIsolationTests` rebuilds the real export and fails on any isolating
-    list under a key that does not cite evidence. Isolating lists that remain all sit under evidence keys (a
-    receipt's `references` or `sources`) in 7 layers. That is evidence-volume asymmetry: what was exercised is
-    cited, and that is evidence, not a label.
+    container that is not evidence. Since round 4 the check is id-aware (below). The isolating containers that
+    remain sit in evidence records (receipts, experiments, `evidence/` artifacts) or under evidence keys in 13
+    layers: evidence-volume asymmetry, since what was exercised is cited, which is evidence, not a label.
 
-    **Disclosed limit: prose in cited files.** A packet's own evidence references name `docs/`, `catalogs/`,
-    `recipes/` and `adoption/` files whose prose can call the current choice "selected" or "retain". The reviewer
-    measured this for 10 of 32 layers. For 6 of those, nothing else in the packet signals the winner:
-    document-retrieval, instructions-skills, native-clients, semantic-rag, web-research and workers. A wave's
-    task record lists these layers as exposed to that prose. The files are kept, because leaving an incumbent's cited
-    evidence out of the export would bias lanes against it, and the lane prompt and role forbid looking for the
-    current choice.
+    **Prose in cited files.** A packet's evidence references name `docs/`, `catalogs/`, `recipes/` and `adoption/`
+    files whose prose called the current choice "selected" or "retain". This round's review measured 10 of 32
+    layers; round 4 found the disclosure understated (F3), and the round-4 export redacts such sentences (below).
 
     **Codex global instructions.** `--ignore-user-config` skips `config.toml` but not `$CODEX_HOME/AGENTS.md`.
     This host's global Codex instructions name nine catalog components (serena, jcodemunch, rtk, qmd, headroom,
     beads, typesafe, zizmor, mcporter). So every blind Codex child, in `codex_lane` without `--allow-git-history`
-    and in `adjudicate codex`, runs with `CODEX_HOME=<work-dir>/codex-home`. That run-scoped home, mode 0700,
-    holds only a symlink to the native `auth.json`, never a copy. Measured 2026-09-24: a probe child without it
-    quoted its `# AGENTS.md instructions` block, and with it answered "none".
+    and in `adjudicate codex`, runs with a run-scoped `CODEX_HOME` (since round 4 outside the work dir, see below).
+    That home, mode 0700, holds only a symlink to the native `auth.json`, never a copy. Measured 2026-09-24: a probe
+    child without it quoted its `# AGENTS.md instructions` block, and with it answered "none".
 
     **Disclosed trade-off (re-review L3):** `lane-prompt.md` and the vendored lane's evidence lens still accept an
     `overturn_when` naming a `tests/` path or a runnable command, and neither `tests/` nor `tools/` is exported
@@ -1682,7 +1684,34 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
     `lost` loses any earlier return and is listed as a failure.
   - **Scrubbing.** A URL ends at `;` or `,`, and a path segment glued to a delimiter ("/home/example,private/y") is
     absorbed with its path.
-- **Independent round-4 review of 2a2ffb8d (blindness lens):**
+- **Independent round-4 review of 2a2ffb8d (blindness, binding, regressions and operability lenses):**
+  - **Id-aware isolation check and removed selection records (F1).** `export_isolation_check.py` read only
+    github.com/huggingface.co URLs, so id-keyed lists passed. It now matches every list (its strings and its
+    objects' id fields) and every object's key set against each adopted candidate's slug, repository name,
+    component id and name, normalized (`data-`/`foundation-`/`candidate:` prefixes, `_` as `-`). The sealed ids
+    come from `--packet-keys`. A hit is evidence when it sits in an evidence record (under `evidence/`,
+    `blueprints/`, `observability/` or a `*receipt*.json`), in a names-alone list under an evidence key, or at a
+    reviewed position (`REVIEWED_EVIDENCE_PATHS`). A complement list elsewhere fails whatever its key (F6). The
+    first real run found `adoption/manifest.json` (profile `component_ids` and `recipe_map`, exact for 10
+    layers) and `catalogs/foundation/decisions.json` (decision `component_ids`, 6 layers). Both are now
+    removed from every blind export, with `catalogs/us-equities/runtime-target.json` (the selected destination,
+    F3) and `blueprints/us-equities/north-star.md` (its "Selected path" table). A `selected_component*` key
+    (the upstream-check provenance crosswalk) is stripped under `evidence/`. On the 2026-09-23 export, 0
+    role-label hits remain and evidence-record hits remain in 13 layers.
+  - **References to removed files (F4, OPS-1, R4-REG-2).** Under `--withhold-labels`, `lane_packets.py` drops
+    every evidence reference and registered receipt that names a file the blind export removes
+    (`blind_checkout.removed_from_blind_export`), and lists the drop in each packet's `withheld`: 57 references
+    in 21 packets. One adopted candidate is left with no evidence: web-research Crawl4AI, whose only reference
+    was a removed membership file. `blind_checkout.py --export` now refuses, and removes the export, when a
+    packet references a path the export lacks, unless `--allow-missing-refs` is passed. The real-export test
+    asserts none.
+  - **Selection prose redacted (F3).** The export drops, from every exported Markdown or text file outside fenced
+    code, each sentence that uses a selection word and names a candidate of any packet. The unit is a paragraph,
+    list item or table row, so a sentence wrapped over lines is matched whole. The term set is the union over all
+    packets, so what is dropped does not depend on which candidate won. Measured independently (winner names,
+    component ids and repository names, word-bounded, against directly cited and one-level transitive files):
+    20 of 30 scored layers were exposed before and 0 after. The redaction changed 58 of the 85 exported prose
+    files and removed 6,246 words. JSON string prose is not redacted (see "Remaining limits").
   - **Sealed manifest fields (F5).** Only a sota-manifest component carries `component_id`, `pin`, `upstream`,
     `recipe_ref` and `decisions`, so their presence alone marked membership. On the 2026-09-23 packets they
     were present on exactly the recorded winners among the adopted candidates in 6 layers (8 against the v1
@@ -1701,6 +1730,36 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
     of mode 0700. Measured 2026-09-24 with `codex-cli 0.155.1`: with the isolated `CODEX_HOME` and the
     caller's `HOME`, a probe child listed qmd, tavily-* and typesafe-ai among its skills. With the empty
     `HOME`, it listed only the CLI's bundled skills.
+  - **Codex home safety (BIND-R4-1, R4-REG-3, R4-REG-9, BIND-R4-7, OPS-4).** The run-scoped home now lives at
+    `$NAS_CODEX_HOME_DIR` (default `~/.local/state/native-agent-stack/codex-home`) `/<sha256(work dir)[:16]>`,
+    outside the work dir and the adjudication state dir. `isolated_codex_home` refuses, removing nothing, when
+    the home is a symlink or not a directory, holds a regular `auth.json`, contains the native credential or
+    its target, or lies inside the work dir or export, and when there is neither a native `auth.json` nor
+    `CODEX_API_KEY`/`OPENAI_API_KEY`. The home is created only after every refusal and the dry-run branch, and
+    only when something is pending. A dry run prints each child's `env CODEX_HOME=... HOME=...`. The credential
+    link is removed when the run ends. The blind audit also flags `${...}` parameter expansion.
+  - **Run lock and bound audits (BIND-R4-5, BIND-R4-6).** `codex_lane` and `adjudicate codex` hold an exclusive
+    `flock` on the work dir's `.run.lock` for the run, so two runs cannot recreate each other's home or
+    interleave events files. A Codex judgment records each stage's events file and sha256, and
+    `usable_judgment` re-audits them, so an edited `audit_clean` does not count.
+  - **Per-call binding (BIND-R4-3, BIND-R4-4, BIND-R4-2).** A call deletes its input's stale events first and is
+    audited on the stages it ran. A stage that ran but left no events is flagged. The evidence tree is checked
+    after each call, and a changed tree voids the judgment at once. A clean call's leak is recorded when the
+    call ends, so an interrupted run keeps it. The run-end tree check also catches `OSError`. The adjudication
+    provenance and registry now name `codex_lane.py`.
+  - **Bindings to the lanes' inputs (BIND-R4-8, BIND-R4-9, OPS-6).** `claude_lane.py` requires the agent-lab
+    workflow to be tracked, no uncommitted `.claude/`, `CLAUDE.md` or `AGENTS.md` changes, and HEAD at or
+    after the `vendored-lanes.json` commit. Each `--lane-repo-root` given to `record_verdicts.py` and
+    `adjudicate inputs` must hold the evidence tree the lanes read and must not contain `..`. `codex_lane` and
+    `claude_lane_args` refuse a work dir inside a git repository, and the refusal messages state the root
+    rule as `codex_lane.root_issue` applies it.
+  - **Smaller fixes.** A non-blind run hashes a looping symlink by its text on Python 3.12 (R4-REG-4).
+    Scrubbing absorbs a sentence after a spaced host path when that sentence holds a path separator, and a
+    name glued on by `,` or `;` (R4-REG-5); a following sentence citing a repository path is lost, by design.
+    `--export` may not overlap `--dest` or `--source` (R4-REG-8). The lane fixtures use a dummy credential
+    and fixture homes (R4-REG-7). `RealExportIsolationTests` sits above the `__main__` guard (F8, R4-REG-10).
+    The recipe registers and rehashes evidence after `build_verdicts --write`, and runs the isolation check
+    before the PR (OPS-2, OPS-3). It also names the agent-lab commit and the role install (OPS-7).
 - **Codex review at a2434e2e and the Codex cross-family review:**
   - **No whole trees in the allowlisted export.** `tests/`, `tools/` and `scripts/` carry selection-bearing data
     and assertions (the reconciliations file, `tests/test_catalogs.py`), so a file there is exported only when a
@@ -1785,7 +1844,7 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
   surviving host path refuses the layer.
 - **Role installation:** both blind roles are in `adoption/agents/claude/`, so
   `tools/adoption/install_claude_profile.py --only agents` installs them in `~/.claude/agents/`.
-- **Run directory:** `claude-args --run-dir`, which defaults to `--repo`, also checks a project-level
+- **Run directory:** `claude-args --run-dir`, which is required, also checks a project-level
   `blind-adjudicator.md` in the directory the workflow runs from.
 - **`--agent-file`:** pass the `blind-lane-reviewer` file the lane loaded. That is the user-level copy when
   the lane runs from the blind export, which has no `.claude/`.

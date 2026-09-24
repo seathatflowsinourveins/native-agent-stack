@@ -82,8 +82,8 @@ class LaneProvenanceRegistryTests(unittest.TestCase):
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
         provenance = module.adjudication_provenance()
-        keys = ("adjudicate_py_sha256", "prompt_sha256", "judge_schema_sha256", "refute_schema_sha256",
-                "workflow_sha256", "adjudicator_role_sha256")
+        keys = ("adjudicate_py_sha256", "codex_lane_py_sha256", "prompt_sha256", "judge_schema_sha256",
+                "refute_schema_sha256", "workflow_sha256", "adjudicator_role_sha256")
         self.assertTrue(any(all(entry.get(key) == provenance[key] for key in keys)
                             for entry in self.registry().get("adjudication") or []),
                         "append the current adjudication provenance to tools/sota-convergence/lane-provenance.json")

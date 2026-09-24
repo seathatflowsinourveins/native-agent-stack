@@ -47,6 +47,12 @@ def lane_args(work_dir: Path, repo: Path, agent_file: Path, agentlab_root: Path 
         # vendored, and its project-level role, if any, is the vendored one.
         claude_lane.lane_provenance(Path(agentlab_root).resolve(), claude_lane.DEFAULT_WORKFLOW,
                                     claude_lane.vendored_sums(), agent_file)
+    work_repos = [str(path) for path in (Path(work_dir).resolve(), *Path(work_dir).resolve().parents)
+                  if (path / ".git").exists()]
+    if work_repos:
+        # WORK_DIR sits outside every repository, as the recipe says (independent review of #145, round 4, OPS-6).
+        raise claude_lane.ProvenanceError(f"--work-dir {work_dir} is inside the git repository {work_repos[0]}; place "
+                                          "it outside every repository")
     packets = []
     for path in sorted((Path(work_dir).resolve() / "packets").glob("*__*.json")):
         catalog, layer_id = path.stem.split("__", 1)

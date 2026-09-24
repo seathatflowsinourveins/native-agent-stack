@@ -41,8 +41,9 @@ NEW_WAVE_REGISTRY = {
                 "vendored_path": "examples/claude-native/workflows/layer-verdict-lane.js",
                 "workflow_sha256": "a" * 64, "agent_sha256": "e" * 64, "prompt_sha256": "d" * 64}],
     "codex": [{"codex_lane_py_sha256": "c" * 64, "prompt_sha256": "d" * 64}],
-    "adjudication": [{key: "f" * 64 for key in ("adjudicate_py_sha256", "prompt_sha256", "judge_schema_sha256",
-                                                "refute_schema_sha256", "workflow_sha256", "adjudicator_role_sha256")}],
+    "adjudication": [{key: "f" * 64 for key in ("adjudicate_py_sha256", "codex_lane_py_sha256", "prompt_sha256",
+                                                "judge_schema_sha256", "refute_schema_sha256", "workflow_sha256",
+                                                "adjudicator_role_sha256")}],
 }
 
 class AdjudicationBindingTests(unittest.TestCase):

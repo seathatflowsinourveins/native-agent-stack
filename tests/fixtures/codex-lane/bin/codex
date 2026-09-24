@@ -10,6 +10,7 @@ what codex_lane.py passes there.
 All behavior is env-var driven so a single script fixture serves every test:
 
   CODEX_FAKE_ARGV_LOG        path; each invocation appends one JSON array
+  CODEX_FAKE_ENV_LOG         path; each invocation appends {CODEX_HOME, HOME, auth_link}
                               (sys.argv) as a line. Optional.
   CODEX_FAKE_COUNTER_FILE    path; holds an integer attempt counter for this
                               test's invocations of this script, incremented
@@ -62,6 +63,15 @@ def main() -> int:
     if argv_log:
         with open(argv_log, "a", encoding="utf-8") as handle:
             handle.write(json.dumps(sys.argv) + "\n")
+
+    env_log = os.environ.get("CODEX_FAKE_ENV_LOG")
+    if env_log:
+        # The child's Codex and user homes as the runner set them, and whether the credential link was present.
+        codex_home = os.environ.get("CODEX_HOME")
+        with open(env_log, "a", encoding="utf-8") as handle:
+            handle.write(json.dumps({"CODEX_HOME": codex_home, "HOME": os.environ.get("HOME"),
+                                     "auth_link": bool(codex_home) and os.path.islink(os.path.join(codex_home, "auth.json"))})
+                         + "\n")
 
     attempt = 1
     counter_file = os.environ.get("CODEX_FAKE_COUNTER_FILE")

@@ -70,18 +70,22 @@ verdicts" section; the same evidence-class distinctions above apply to every
 lane's `winner_evidence_class`.
 
 ```sh
-# Layout: WORK_DIR and BLIND_DIR sit outside every repository, and BLIND_DIR/export is at least four
+# Layout: WORK_DIR, BLIND_DIR and KEYS_DIR sit outside every repository, KEYS_DIR outside WORK_DIR and
+# BLIND_DIR (no lane may read it), and BLIND_DIR/export is at least four
 # directories deep (not /, /home, /tmp or a home directory itself). Every blind tool below refuses otherwise (the
 # shared root rule in tools/sota-convergence/codex_lane.py). CATALOG is this checkout; AL is a clean agent-lab
 # checkout whose .claude/workflows/layer-verdict-lane.js and .claude/agents/blind-*.md are the vendored
 # examples/claude-native/ copies, installed as ~/.claude/agents/blind-*.md.
 CATALOG=$(pwd -P)
 
-# 1. Packets, blind: labels, popularity and recency withheld, registered receipts attached. Never pass
-#    --gap-receipts in a blind wave (it names the previous winner; refused with --withhold-labels).
+# 1. Packets, blind: labels, popularity and recency withheld, registered receipts attached, and the candidates'
+#    manifest-only fields (component_id, pin, upstream, recipe_ref, decisions) sealed into KEYS_DIR, which steps
+#    5 and 6 restore from. Never pass --gap-receipts in a blind wave (it names the previous winner; refused with
+#    --withhold-labels).
 python3 tools/sota-convergence/lane_packets.py --root . --out "$WORK_DIR" \
   --manifest catalogs/sota-convergence/manifest-YYYYMMDD.json --trading-candidates manifest \
-  --withhold-labels --registered-receipts --checked-at "$(date +%Y-%m-%d)" --seed "$(date +%Y%m%d)"
+  --withhold-labels --keys-out "$KEYS_DIR/packet-keys.json" --registered-receipts \
+  --checked-at "$(date +%Y-%m-%d)" --seed "$(date +%Y%m%d)"
 
 # 2. Blind export: only what the packets reference, labels stripped, no .git.
 #    Both lanes and the adjudication read this one export; record_verdicts.py refuses lanes on two trees.
@@ -89,7 +93,12 @@ python3 tools/sota-convergence/blind_checkout.py --source . --rev HEAD \
   --dest "$BLIND_DIR/checkout" --export "$BLIND_DIR/export" --allow-from-packets "$WORK_DIR/packets"
 git worktree remove --force "$BLIND_DIR/checkout"
 
-# 3. Claude lane: args carry the launch identity {repo, repo_tree_sha256, agent_sha256} and lane-prompt.md,
+# 3. Claude lane. $AL must be a clean agent-lab checkout at, or descending from, the commit
+#    examples/claude-native/workflows/vendored-lanes.json names (agentlab_commit, e070125 for the current workflow),
+#    with no uncommitted .claude/, CLAUDE.md or AGENTS.md changes; claude_lane.py refuses anything else. Install the
+#    vendored blind roles (blind-lane-reviewer, blind-adjudicator) user-level from this catalog first:
+python3 tools/adoption/install_claude_profile.py --only agents
+#    Args carry the launch identity {repo, repo_tree_sha256, agent_sha256} and lane-prompt.md,
 #    which the workflow echoes; run it headless from the export root with hooks disabled (every stage runs as
 #    blind-lane-reviewer), then collect. claude_lane.py refuses a result whose launch or prompt does not match.
 python3 tools/sota-convergence/claude_lane_args.py --work-dir "$WORK_DIR" --repo "$BLIND_DIR/export" \
@@ -114,7 +123,8 @@ python3 tools/sota-convergence/codex_lane.py --work-dir "$WORK_DIR" --repo "$BLI
 # 5. Two-family adjudication of the layers whose lanes disagree (README "Two-family adjudication"). inputs exits
 #    1 whenever it skips a layer (listed on stderr, for example a missing lane return); when it indexes no
 #    disagreeing layer, the rest of this step has nothing to judge and can be skipped.
-python3 tools/sota-convergence/adjudicate.py inputs --work-dir "$WORK_DIR" --lane-repo-root "$BLIND_DIR/export"
+python3 tools/sota-convergence/adjudicate.py inputs --work-dir "$WORK_DIR" --lane-repo-root "$BLIND_DIR/export" \
+  --packet-keys "$KEYS_DIR/packet-keys.json"
 python3 tools/sota-convergence/adjudicate.py codex --work-dir "$WORK_DIR" --repo "$BLIND_DIR/export" \
   --model <openai model> --jobs 2
 python3 tools/sota-convergence/adjudicate.py claude-args --work-dir "$WORK_DIR" --repo "$BLIND_DIR/export" \
@@ -132,27 +142,41 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir "$WORK_DIR" --o
 #    --lane-repo-root must name the export adjudicate inputs got: the adjudication binds the sealed form of
 #    each return, whose sources_read are relativized against it.
 python3 tools/sota-convergence/record_verdicts.py --root . --work-dir "$WORK_DIR" --lane-repo-root "$BLIND_DIR/export" \
-  --checked-at "$(date +%Y-%m-%d)" --run-id "$(date +%Y%m%d)" --adjudications "$WORK_DIR/adjudications" --write
+  --checked-at "$(date +%Y-%m-%d)" --run-id "$(date +%Y%m%d)" --adjudications "$WORK_DIR/adjudications" \
+  --packet-keys "$KEYS_DIR/packet-keys.json" --write
 python3 tools/sota-convergence/record_verdicts.py --root . --work-dir "$WORK_DIR" --lane-repo-root "$BLIND_DIR/export" \
-  --checked-at "$(date +%Y-%m-%d)" --run-id "$(date +%Y%m%d)" --adjudications "$WORK_DIR/adjudications" --check
+  --checked-at "$(date +%Y-%m-%d)" --run-id "$(date +%Y%m%d)" --adjudications "$WORK_DIR/adjudications" \
+  --packet-keys "$KEYS_DIR/packet-keys.json" --check
 
-# 7. Register the new wave document and the newly sealed files, refresh the derived catalogs and narrative, and
-#    rerun the standing checks. A changed winner also needs scripts/component_matrix.py --write and any
-#    handbook display entry for a new component id.
+# 7. Refresh the derived catalogs and narrative, then register the newly sealed files and rehash every listed
+#    file the wave rewrote (both ledgers, the handbook) -- after build_verdicts.py --write, or scripts/validate.py
+#    fails on their stale hashes (independent review of #145, round 4, OPS-2). A changed winner also needs
+#    scripts/component_matrix.py --write, the handbook's "Foundation selection by layer" table and any handbook
+#    display entry for a new component id (tests/test_handbook_summary.py checks them).
+python3 scripts/component_matrix.py --write
+python3 tools/sota-convergence/build_verdicts.py --write --root . --run-id "$(date +%Y%m%d)" \
+  --checked-at "$(date +%Y-%m-%d)" --manifest catalogs/sota-convergence/manifest-YYYYMMDD.json
 python3 - <<'EOF'
 import hashlib, json, pathlib
 path = pathlib.Path("manifests/evidence.json"); doc = json.loads(path.read_text(encoding="utf-8"))
 listed = {entry["path"] for entry in doc["files"]}
-for file in sorted(pathlib.Path("evidence/artifacts").rglob("*")):
+for entry in doc["files"]:  # every listed file the wave rewrote
+    file = pathlib.Path(entry["path"])
+    if file.is_file():
+        data = file.read_bytes(); entry["sha256"] = hashlib.sha256(data).hexdigest(); entry["bytes"] = len(data)
+for file in sorted(pathlib.Path("evidence/artifacts").rglob("*")):  # the newly sealed files
     if file.is_file() and file.as_posix() not in listed:
         data = file.read_bytes()
         doc["files"].append({"path": file.as_posix(), "sha256": hashlib.sha256(data).hexdigest(), "bytes": len(data)})
 path.write_text(json.dumps(doc, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 EOF
 python3 scripts/evidence_manifest.py --write
-python3 scripts/component_matrix.py --write
-python3 tools/sota-convergence/build_verdicts.py --write --root . --run-id "$(date +%Y%m%d)" \
-  --checked-at "$(date +%Y-%m-%d)" --manifest catalogs/sota-convergence/manifest-YYYYMMDD.json
+#    The recorded winners are the next wave's incumbents: check the export against them before opening the PR
+#    (round 4, OPS-3). A role-label hit (exit 1) is fixed in blind_checkout.py (REMOVE_GLOBS or the role keys) and
+#    the export rebuilt; an evidence-record hit is reported and kept. tests/test_blind_checkout.py runs the same
+#    check on the committed tree in CI.
+python3 tools/sota-convergence/export_isolation_check.py "$BLIND_DIR/export" "$WORK_DIR/packets" . \
+  --packet-keys "$KEYS_DIR/packet-keys.json"
 python3 scripts/landscape.py --root .
 python3 scripts/validate.py
 python3 -m unittest

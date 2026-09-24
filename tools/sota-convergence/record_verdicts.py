@@ -655,6 +655,12 @@ def load_adjudication(adjudications_dir, catalog, layer_id, issues: list = None,
     return {"raw": raw, **result}
 
 
+def lane_root_tree(root: str) -> str:
+    """The evidence-tree digest of a --lane-repo-root, as the lanes recorded theirs (codex_lane.tree_sha256)."""
+    from codex_lane import tree_sha256
+    return tree_sha256(Path(root).resolve())
+
+
 def relativize_source(entry: str, root: Path, lane_roots=()) -> str:
     """A lane records the absolute paths it opened. Only a path under one of the
     checkouts the lane was given as its repository root (``--lane-repo-root``) is
@@ -696,7 +702,7 @@ def process_row(row: dict, root: Path, catalog: str, layer_id: str, work_dir: Pa
                  adjudications_dir, identities: set, aliases: dict, sha256sums: dict, rejections: list,
                  lane_roots=(), run_date: str = VERDICT_DATE, sealed_base: str = SEALED_BASE,
                  outcomes: dict = None, single_lane_decision: str = None, status_context=None,
-                 lane_code=None, failures: dict = None, packet_keys: dict = None) -> list:
+                 lane_code=None, failures: dict = None, packet_keys: dict = None, lane_root_trees=None) -> list:
     """Mutate ``row`` in place with whatever the valid lane returns for this
     layer establish; return the list of (absolute path, text) sealed/
     adjudication files this row's processing needs written. Returns an empty
@@ -774,6 +780,16 @@ def process_row(row: dict, root: Path, catalog: str, layer_id: str, work_dir: Pa
                              f"{valid['codex']['provenance'].get('repo_tree_sha256')}, not the claude lane's "
                              f"{valid['claude']['provenance'].get('repo_tree_sha256')}; rerun it on the same export")
         del valid["codex"]
+    if not grandfathered and lane_root_trees:
+        # Each --lane-repo-root must hold the tree the lanes read (independent review of #145, BIND-R4-9): sources
+        # under another checkout would be relativized as if they were the export's.
+        for lane in list(valid):
+            tree = valid[lane]["provenance"].get("repo_tree_sha256")
+            others = sorted(root for root, digest in lane_root_trees.items() if digest != tree)
+            if others:
+                reject_lane(lane, f"--lane-repo-root {', '.join(others)} does not hold the evidence tree {tree} this "
+                                  "lane read; name the export the lanes were given")
+                del valid[lane]
 
     if not valid:
         return []
@@ -1285,6 +1301,16 @@ def main(argv=None) -> int:
     lane_code = load_lane_code(root)
     failures = load_lane_failures(work_dir)
     packet_keys = json.loads(args.packet_keys.read_text(encoding="utf-8")) if args.packet_keys else None
+    lane_root_trees = {}
+    if not grandfathered:
+        for lane_root in args.lane_repo_root:
+            if ".." in Path(lane_root).parts:
+                # abspath would resolve it lexically, not physically (BIND-R4-9).
+                raise SystemExit(f"--lane-repo-root {lane_root} contains ..; name the export directly")
+            try:
+                lane_root_trees[str(lane_root)] = lane_root_tree(lane_root)
+            except (OSError, ValueError) as error:
+                raise SystemExit(f"--lane-repo-root {lane_root}: {error}")
 
     rejections: list = []
     sealed_writes: list = []
@@ -1314,7 +1340,7 @@ def main(argv=None) -> int:
                                     for spelling in (os.path.abspath(root), str(Path(root).resolve())))),
                 run_date=run_date, sealed_base=sealed_base, outcomes=outcomes,
                 single_lane_decision=single_lane_decision, status_context=status_context,
-                lane_code=lane_code, failures=failures, packet_keys=packet_keys))
+                lane_code=lane_code, failures=failures, packet_keys=packet_keys, lane_root_trees=lane_root_trees))
 
     # Survivorship: every packet of the run and each lane's outcome (sealed, rejected with its
     # reasons, failed with its runner's reason, or missing) is sealed next to the returns, with the

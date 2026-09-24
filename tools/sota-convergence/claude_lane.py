@@ -53,6 +53,7 @@ CATALOG_ROOT = HERE.parent.parent
 sys.path.insert(0, str(HERE))
 from codex_lane import root_issue, tree_sha256  # noqa: E402  (one root rule and tree digest for both lanes)
 VENDORED_SUMS = CATALOG_ROOT / "examples" / "claude-native" / "workflows" / "SHA256SUMS"
+VENDORED_LANES = CATALOG_ROOT / "examples" / "claude-native" / "workflows" / "vendored-lanes.json"
 # The role every lane stage runs as (layer-verdict-lane.js agentType); its definition carries the blinding
 # (Read/Glob/Grep, no skills, omitClaudeMd), so a return names the role bytes it ran with (Codex review of #145).
 LANE_AGENT = "blind-lane-reviewer"
@@ -96,6 +97,18 @@ def agent_sha256(agent_file: Path, vendored: Path = VENDORED_AGENT) -> str:
     return digest
 
 
+def vendored_agentlab_commit(workflow: str):
+    """The agent-lab commit vendored-lanes.json verified ``workflow`` identical at, or None."""
+    try:
+        files = json.loads(VENDORED_LANES.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError):
+        return None
+    for entry in files:
+        if isinstance(entry, dict) and entry.get("source_path") == workflow:
+            return entry.get("verified_identical_at_agentlab_commit") or entry.get("agentlab_commit")
+    return None
+
+
 def lane_provenance(agentlab_root: Path, workflow: str, sums: dict, agent_file: Path = DEFAULT_AGENT_FILE) -> dict:
     """{workflow_path, workflow_sha256, agentlab_commit, agent_sha256} for committed, vendored workflow bytes and
     the vendored role definition the lane ran as."""
@@ -110,8 +123,21 @@ def lane_provenance(agentlab_root: Path, workflow: str, sums: dict, agent_file: 
     head = git(agentlab_root, "rev-parse", "HEAD")
     if head.returncode != 0:
         raise ProvenanceError(f"{agentlab_root} is not a git checkout: {head.stderr.strip()}")
+    if git(agentlab_root, "ls-files", "--error-unmatch", "--", workflow).returncode != 0:
+        # Untracked bytes are not committed ones, whatever `git diff` says (independent review of #145, BIND-R4-8).
+        raise ProvenanceError(f"{workflow} is not tracked in {agentlab_root}; commit it before recording")
     if git(agentlab_root, "diff", "--quiet", "HEAD", "--", workflow).returncode != 0:
         raise ProvenanceError(f"{workflow} differs from HEAD in {agentlab_root}; commit it before recording")
+    dirty = git(agentlab_root, "status", "--porcelain", "--", ".claude", "CLAUDE.md", "AGENTS.md")
+    if dirty.returncode != 0 or dirty.stdout.strip():
+        # An edited role, instruction file or local settings would shape the lane without a trace (BIND-R4-8).
+        raise ProvenanceError(f"{agentlab_root} has uncommitted .claude/, CLAUDE.md or AGENTS.md changes; commit or "
+                              "remove them before running the lane")
+    vendored = vendored_agentlab_commit(workflow)
+    if vendored is None or git(agentlab_root, "merge-base", "--is-ancestor", vendored, "HEAD").returncode != 0:
+        # The checkout must hold the agent-lab commit the workflow was vendored from, or a descendant (BIND-R4-8).
+        raise ProvenanceError(f"{agentlab_root} HEAD does not descend from the vendored agent-lab commit {vendored} "
+                              "(examples/claude-native/workflows/vendored-lanes.json); check that commit out")
     role_sha256 = agent_sha256(agent_file)  # a missing or unvendored file is a ProvenanceError first
     project_role = agentlab_root / ".claude" / "agents" / f"{LANE_AGENT}.md"
     if project_role.is_file() and project_role.read_bytes() != Path(agent_file).read_bytes():
@@ -185,7 +211,9 @@ def repo_issue(repo: Path):
     adjudicator's root rule and sit outside every git repository, whose history recovers every stripped label."""
     issue = root_issue(repo)
     if issue:
-        return f"--repo {issue}; place the blind export at least four directories deep, outside home and /tmp"
+        # The rule as codex_lane.root_issue applies it (independent review of #145, round 4, OPS-6).
+        return (f"--repo {issue}; place the blind export at least four directories deep (not /, /home, /tmp or a home "
+                "directory itself) and outside every repository")
     for path in (repo, *repo.parents):
         if (path / ".git").exists():
             return f"--repo {repo} is inside the git repository {path}; the Claude lane must read a blind export"

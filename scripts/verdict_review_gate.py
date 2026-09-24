@@ -162,6 +162,7 @@ TRUST_PATHS = (
     "scripts/catalog_decisions.py", "scripts/host_receipts.py", "scripts/validate.py",
     "tools/sota-convergence/build_verdicts.py", "tools/sota-convergence/record_verdicts.py",
     "tools/sota-convergence/build_manifest.py", "tools/sota-convergence/lane_packets.py",
+    "tools/sota-convergence/codex_lane.py",
     "tools/sota-convergence/lane-return.schema.json", "tools/sota-convergence/lane-provenance.json",
     "adoption/host-receipt.schema.json", ".github/workflows/validate.yml",
 )
