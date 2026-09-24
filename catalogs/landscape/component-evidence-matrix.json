@@ -708,15 +708,15 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
-              "derived_reason": "host receipts at pin '0.79.0' but none passes without a standing dissent",
-              "derived_status": "not_established",
+              "derived_reason": "pin-bound passing host receipt(s) without the full acceptance conditions",
+              "derived_status": "conditional",
               "e2e_state": "untested",
               "host_receipts": {
-                "dissented": 1,
+                "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": "2026-09-24T14:20:45Z",
+                "latest": "2026-09-24T14:53:37Z",
                 "pass": 1
               },
               "qualified_models": []
@@ -1319,15 +1319,15 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
-              "derived_reason": "host receipts at pin '0.79.0' but none passes without a standing dissent",
-              "derived_status": "not_established",
+              "derived_reason": "pin-bound passing host receipt(s) without the full acceptance conditions",
+              "derived_status": "conditional",
               "e2e_state": "untested",
               "host_receipts": {
-                "dissented": 1,
+                "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": "2026-09-24T14:20:45Z",
+                "latest": "2026-09-24T14:53:37Z",
                 "pass": 1
               },
               "qualified_models": []
@@ -3132,15 +3132,15 @@
             },
             "macos-arm64": {
               "catalog_status": "untested",
-              "derived_reason": "host receipts at pin '0.79.0' but none passes without a standing dissent",
-              "derived_status": "not_established",
+              "derived_reason": "pin-bound passing host receipt(s) without the full acceptance conditions",
+              "derived_status": "conditional",
               "e2e_state": "untested",
               "host_receipts": {
-                "dissented": 1,
+                "dissented": 0,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": "2026-09-24T14:20:45Z",
+                "latest": "2026-09-24T14:53:37Z",
                 "pass": 1
               },
               "qualified_models": []
