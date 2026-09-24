@@ -59,9 +59,11 @@ does not reopen install-stage acceptance for other components.
 - No status is derived from command text. be09a5e2 had `validate` reject help-only `use` receipts and the
   receipt summary count them as `install`. The Codex re-check showed that classification was neither sound
   nor complete. `sh -c 'rtk --version'`, `true && rtk -V` and `rtk help gain` passed as `use`, while
-  `du -h /dev/null` was refused. Worse, counting a misread functional `use` fail as `install` let a later
-  install pass stop it blocking, which promoted `conditional` to `accepted` in 44 of 82,944 synthetic
-  comparisons. Both were removed. `record` keeps a narrow lint: it refuses `--stage use` only when every
+  `du -h /dev/null` was refused. Against 76d8282f, 88 of 82,944 synthetic comparisons changed status, all of
+  them demotions: 44 intended and 44 unintended. Separately, in paired-receipt cases, counting a misread
+  functional `use` fail as `install` let a later install pass on the same host stop it blocking. With another
+  reviewed use pass present, that promoted `conditional` to `accepted` on both platforms. Both mechanisms were
+  removed. `record` keeps a narrow lint: it refuses `--stage use` only when every
   command is exactly a program and one of `--help`, `--version`, `-V`, `help` or `version`. `-h` is left
   out because `df -h` and `du -h` are functional. The lint is a documented convenience, not a control.
 - The documented recording examples pass a functional `--cmd`, because the stack.json commands for
