@@ -13,9 +13,9 @@
     "repository_entries": 154,
     "unique_catalog_repositories": 148,
     "models": 20,
-    "public_stars": 342,
-    "starred_catalog_repositories": 42,
-    "beyond_star_catalog_repositories": 106
+    "public_stars": 357,
+    "starred_catalog_repositories": 46,
+    "beyond_star_catalog_repositories": 102
   },
   "scope": "Decisions and source review are not installation or E2E. native_proven is bounded by referenced receipts; defaults can still require implementation.",
   "evidence_files": [
@@ -51,13 +51,14 @@
     "blueprints/convergence-practice/native-recovery/receipt.json",
     "blueprints/convergence-practice/gpu-inference/receipt.json",
     "blueprints/convergence-practice/native-recovery/claude/receipt.json",
-    "catalogs/us-equities/gates-20260922.json"
+    "catalogs/us-equities/gates-20260922.json",
+    "catalogs/us-equities/star-refresh-20260924.json"
   ],
   "north_star": "blueprints/us-equities/north-star.md",
   "harness_contract": "blueprints/us-equities/harness-contract.json",
   "broader_reference_union": 171,
   "star_audit_file": "catalogs/us-equities/star-audit.json",
-  "grand_index_repositories": 844,
-  "grand_index_beyond_stars": 502,
+  "grand_index_repositories": 850,
+  "grand_index_beyond_stars": 493,
   "decision_index_file": "catalogs/us-equities/decision-index.json"
 }

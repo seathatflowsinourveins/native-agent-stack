@@ -10,7 +10,9 @@ from concurrent.futures import TimeoutError as FutureTimeout
 from datetime import datetime, timezone
 from decimal import Decimal, InvalidOperation
 import hashlib
+import importlib.util
 import inspect
+from pathlib import Path
 import queue
 import re
 import threading
@@ -41,6 +43,19 @@ ACTIVITY_PAGE_SIZE = 100
 # trade_updates events that carry one execution's own qty, price and execution_id.
 EXECUTION_EVENTS = frozenset({"fill", "partial_fill"})
 EXECUTION_FIELDS = ("event", "execution_id", "event_qty", "event_price")
+# The pre-submission boundary (blueprints/us-equities/order-contract). Loaded by
+# path at import, so a missing or broken contract fails transport import closed.
+ORDER_CONTRACT_PATH = Path(__file__).resolve().parent.parent / "order-contract" / "order_contract.py"
+
+
+def _load_order_contract():
+    spec = importlib.util.spec_from_file_location("adaptive_paper_order_contract", ORDER_CONTRACT_PATH)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+order_contract = _load_order_contract()
 
 
 class TransportError(RuntimeError):
@@ -106,6 +121,158 @@ def documented_refusal(exc, status, intent):
 class SubmissionNotSent(TransportError):
     definitive_rejection = True
     not_sent = True
+
+
+class OrderContractRefused(SubmissionNotSent):
+    """Local refusal by the order-contract boundary before any HTTP request.
+
+    No broker answered, so it is never a RejectedSubmission (a broker's definitive
+    HTTP refusal). ``refusal`` is the contract's value-free reason; a controller
+    records the intent as ``not_sent`` with ``not_sent_reason``.
+    """
+    local_refusal = "order_contract"
+    not_sent_reason = "order_contract_refused"
+
+    def __init__(self, reason):
+        self.refusal = str(reason)
+        super().__init__("order contract refused submission before HTTP: " + self.refusal)
+
+
+def order_envelope(intent, *, extended_hours_allowed=False):
+    """Validate the exact SDK-bound projection of a normalized intent.
+
+    Only the fields the SDK request receives are validated (attribution metadata
+    never reaches the wire). Fractional sells keep the engine's exact residual
+    exits; every other rule is the contract's own. Raises OrderContractRefused.
+    """
+    try:
+        fields = {key: intent[key] for key in ("symbol", "qty", "side", "client_order_id", "limit_price")}
+        fields.update(type="limit", time_in_force="day", extended_hours=intent.get("extended_hours", False))
+        return order_contract.build_envelope(fields, fractional_sell_qty=True,
+                                             extended_hours_allowed=bool(extended_hours_allowed))
+    except order_contract.ContractError as exc:
+        raise OrderContractRefused(str(exc)) from None
+    except (KeyError, TypeError, AttributeError):
+        raise OrderContractRefused("intent: missing required field") from None
+
+
+def limit_order_request(envelope):
+    """The alpaca-py request built only from a validated envelope's intent."""
+    from alpaca.trading.requests import LimitOrderRequest
+    intent = envelope["intent"]
+    try:
+        return LimitOrderRequest(symbol=intent["symbol"], qty=intent["qty"], side=intent["side"],
+                                 type="limit", time_in_force="day", limit_price=intent["limit_price"],
+                                 client_order_id=intent["client_order_id"],
+                                 extended_hours=intent["extended_hours"])
+    except Exception:
+        raise OrderContractRefused("sdk request model refused the envelope") from None
+
+
+_WIRE_TEXT = ("symbol", "side", "type", "time_in_force", "client_order_id")
+_WIRE_KEYS = frozenset(_WIRE_TEXT + ("qty", "limit_price", "extended_hours"))
+
+
+def wire_matches_envelope(body, envelope):
+    """True only when the serialized POST body carries exactly the validated intent.
+
+    alpaca-py serializes qty/limit_price as floats; a value whose float text no
+    longer equals the exact envelope decimal, a dropped or added field, or any
+    changed value is silent field loss and is refused before the request.
+    """
+    intent = envelope["intent"]
+    if not isinstance(body, dict) or set(body) - {"order_class"} != _WIRE_KEYS:
+        return False
+    if "order_class" in body and body["order_class"] != "simple":
+        return False
+    if any(not isinstance(body[key], str) or body[key] != intent[key] for key in _WIRE_TEXT):
+        return False
+    if type(body["extended_hours"]) is not bool or body["extended_hours"] is not intent["extended_hours"]:
+        return False
+    for key in ("qty", "limit_price"):
+        value = body[key]
+        if type(value) not in (int, float, str):
+            return False
+        try:
+            if Decimal(str(value)) != Decimal(intent[key]):
+                return False
+        except (InvalidOperation, ValueError):
+            return False
+    return True
+
+
+def check_wire_submission(envelopes, body):
+    """GuardedSession's POST gate: every order body needs its validated envelope."""
+    client_id = body.get("client_order_id") if isinstance(body, dict) else None
+    envelope = envelopes.get(client_id) if isinstance(client_id, str) else None
+    if envelope is None:
+        raise OrderContractRefused("no validated envelope for this submission")
+    if not wire_matches_envelope(body, envelope):
+        raise OrderContractRefused("serialized request differs from the validated envelope")
+    return envelope
+
+
+def submit_enveloped(client, envelope, request):
+    """Submit one validated request; its envelope is admitted only for this call."""
+    session = client._session
+    client_id = envelope["intent"]["client_order_id"]
+    session.expect_submission(envelope)
+    try:
+        return client.submit_order(request)
+    finally:
+        session.withdraw_submission(client_id)
+
+
+def order_contract_status(symbols=()):
+    """SDK-free, network-free proof that the pre-submission boundary is active.
+
+    Checks the pinned contract path, one accepted and several refused sentinels,
+    the POST gate's envelope requirement, and that every configured symbol is
+    admissible. Raises TransportError naming the first failed check.
+    """
+    def fail(reason):
+        raise TransportError("order_contract_boundary_inactive:" + reason)
+    if (Path(getattr(order_contract, "__file__", "") or "").resolve() != ORDER_CONTRACT_PATH
+            or not callable(getattr(order_contract, "build_envelope", None))):
+        fail("contract_module_not_loaded")
+    sentinel = {"client_order_id": "contract-selftest-1", "symbol": "SPY", "side": "buy", "qty": "1",
+                "limit_price": "100.01", "extended_hours": False}
+    try:
+        envelope = order_envelope(sentinel)
+    except OrderContractRefused:
+        fail("valid_sentinel_refused")
+    refused = 0
+    for change in ({"limit_price": "100.001"}, {"qty": "0.5"}, {"client_order_id": "_leading"},
+                   {"extended_hours": True}, {"symbol": "SPY1"}, {"side": "sell", "qty": "0.0000000001"}):
+        try:
+            order_envelope(dict(sentinel, **change))
+        except OrderContractRefused:
+            refused += 1
+        else:
+            fail("invalid_sentinel_accepted")
+    wire = {"symbol": "SPY", "qty": 1.0, "side": "buy", "type": "limit", "time_in_force": "day",
+            "extended_hours": False, "client_order_id": "contract-selftest-1", "limit_price": 100.01}
+    try:
+        check_wire_submission({"contract-selftest-1": envelope}, wire)
+    except OrderContractRefused:
+        fail("valid_wire_refused")
+    for envelopes, body in (({}, wire), ({"contract-selftest-1": envelope}, dict(wire, limit_price=100.0)),
+                            ({"contract-selftest-1": envelope}, {k: v for k, v in wire.items() if k != "qty"})):
+        try:
+            check_wire_submission(envelopes, body)
+        except OrderContractRefused:
+            refused += 1
+        else:
+            fail("unvalidated_wire_admitted")
+    checked = 0
+    for symbol in symbols:
+        try:
+            order_envelope(dict(sentinel, symbol=symbol))
+        except OrderContractRefused:
+            fail("configured_symbol_outside_contract")
+        checked += 1
+    return {"active": True, "contract_sha256": hashlib.sha256(ORDER_CONTRACT_PATH.read_bytes()).hexdigest(),
+            "sentinels_accepted": 2, "sentinels_refused": refused, "symbols_checked": checked}
 
 
 class UnsupportedDataFeed(TransportError):
@@ -567,6 +734,15 @@ class GuardedSession:
         self.read_only = read_only
         self.lock = lock or threading.Lock()
         self.before_send = before_send
+        # Every order POST must carry a body equal to an envelope registered by
+        # submit_enveloped for that client id (order-contract boundary).
+        self._envelopes = {}
+
+    def expect_submission(self, envelope):
+        self._envelopes[envelope["intent"]["client_order_id"]] = envelope
+
+    def withdraw_submission(self, client_id):
+        self._envelopes.pop(client_id, None)
 
     def request(self, method, url, **kwargs):
         method = method.upper()
@@ -591,6 +767,9 @@ class GuardedSession:
             kind = "submit" if method == "POST" else "cancel" if method == "DELETE" else "read"
         if not allowed:
             raise TransportError("HTTP method/path rejected")
+        if kind == "submit":
+            # Before the budget or the lock: an unvalidated body is refused locally.
+            check_wire_submission(self._envelopes, kwargs.get("json"))
         with self.lock:
             if kind == "submit":
                 try:
@@ -1161,13 +1340,18 @@ class AlpacaPaperTransport:
             raise TransportError("order lookup failed") from None
         return await self._observe(normalize_order(raw))
 
+    def _validated_request(self, intent):
+        """The pre-submission boundary: an envelope and the SDK request built from it.
+
+        Overridable only by the native-fault harness (its single C04 client id).
+        Raises OrderContractRefused before any network call.
+        """
+        envelope = order_envelope(intent, extended_hours_allowed=self.extended_hours_allowed)
+        return envelope, limit_order_request(envelope)
+
     async def submit(self, order):
-        from alpaca.trading.requests import LimitOrderRequest
         intent = normalize_intent(order, self.symbols, allow_extended_hours=self.extended_hours_allowed)
         key = intent["client_order_id"]
-        request = LimitOrderRequest(**{k: v for k, v in intent.items()
-                                       if k not in {"tags", "strategy", "reason", "extended_hours"}},
-                                    time_in_force="day", extended_hours=intent["extended_hours"])
         async with self._operation_lock:
             if key in self._intents:
                 if self._intents[key] != intent:
@@ -1189,7 +1373,12 @@ class AlpacaPaperTransport:
                 raise SubmissionNotSent("intent was not authorized by risk callback")
             self._intents[key] = dict(intent)
             try:
-                raw = await asyncio.to_thread(self._client.submit_order, request)
+                envelope, request = self._validated_request(intent)
+            except OrderContractRefused:
+                self._not_sent.add(key)
+                raise
+            try:
+                raw = await asyncio.to_thread(submit_enveloped, self._client, envelope, request)
                 observed = normalize_order(raw)
             except SubmissionNotSent:
                 self._not_sent.add(key)

@@ -1,19 +1,19 @@
 {
   "broker": "alpaca",
-  "c04_pre_send_exemption": "FaultLedger exempts only client id nf-20260924t143905-29d7ec-c04 from invalid_price_increment",
+  "c04_pre_send_exemption": "FaultLedger exempts only client id nf-20260924t185811-6ddd39-c04 from invalid_price_increment; FaultTransport exempts only its limit price increment from the order-contract boundary",
   "cases": [
     {
       "detail": {
         "broker_status": "pending_new",
-        "client_order_id": "nf-20260924t143905-29d7ec-c01",
+        "client_order_id": "nf-20260924t185811-6ddd39-c01",
         "ledger": {
           "broker_id_recorded": true,
           "filled_qty": "0",
           "status": "pending_new",
           "submit_attempted": true
         },
-        "limit_price": "382.96",
-        "reference_bid": "765.92"
+        "limit_price": "384.06",
+        "reference_bid": "768.12"
       },
       "evidence_class": "native_paper",
       "id": "C01",
@@ -30,7 +30,7 @@
       "detail": {
         "broker_snapshot_status": "canceled",
         "cancel_result_status": "canceled",
-        "client_order_id": "nf-20260924t143905-29d7ec-c01",
+        "client_order_id": "nf-20260924t185811-6ddd39-c01",
         "ledger": {
           "broker_id_recorded": true,
           "filled_qty": "0",
@@ -76,7 +76,7 @@
           204
         ],
         "cancel_result_status": "canceled",
-        "client_order_id": "nf-20260924t143905-29d7ec-c01",
+        "client_order_id": "nf-20260924t185811-6ddd39-c01",
         "delete_sent": true,
         "error": null,
         "ledger_after": {
@@ -110,7 +110,7 @@
     },
     {
       "detail": {
-        "client_order_id": "nf-20260924t143905-29d7ec-c04",
+        "client_order_id": "nf-20260924t185811-6ddd39-c04",
         "effect_after": {
           "cash_delta_usd": "0",
           "positions": {}
@@ -133,8 +133,8 @@
           "http_status": 422,
           "refusal": "sub_penny_minimum_price_variance"
         },
-        "limit_price": "306.3601",
-        "reference_bid": "765.92",
+        "limit_price": "307.2601",
+        "reference_bid": "768.15",
         "submit_http_statuses": [
           422
         ]
@@ -158,7 +158,7 @@
   "cleanup": {
     "broker_open_orders": 0,
     "cancels": [],
-    "client_id_prefix": "nf-20260924t143905-29d7ec-",
+    "client_id_prefix": "nf-20260924t185811-6ddd39-",
     "flat": true,
     "proof": "runner.reconcile over transport.snapshot",
     "reconcile": {
@@ -169,18 +169,19 @@
       "positions_match": true
     }
   },
-  "client_id_prefix": "nf-20260924t143905-29d7ec-",
+  "client_id_prefix": "nf-20260924t185811-6ddd39-",
   "endpoint": "paper",
   "engine_sources_sha256": {
-    "runner.py": "a61012948d92eddef959ba91c5fdadc24170944239c02c20190e68c52d717245",
+    "../order-contract/order_contract.py": "57405f752fc933a6f09a5b2f0eb46482f94a780aa818dd0b73d7149a1fe58025",
+    "runner.py": "8bb8d577d1c62dedb0dc68c996e1e41ed0aa5036a3071de801bbc6c9e013f240",
     "safety.py": "ad520fc4d84ce10e4d7b5cc956ba769a4f94eef49464ce382746d57f0cd76420",
-    "transport.py": "b92e87524ccffd168b67b4f80418653e5309250fa23968af0988e2f016e0ed1e"
+    "transport.py": "34e6c4e604179585e3141c4e07066bbc36a655c3eb7052a007354fbe6b2835a6"
   },
   "error": null,
   "evidence_note": "native_paper marks a case only when the engine transport's request observer recorded a broker HTTP response inside that case and, for C05, only when the DELETE itself was sent; C05 without a DELETE is engine_short_circuit. unobserved and not_run cases made no qualifying broker request. Price reference is the engine's streamed quote bid, not a last-trade read. No credential, account id or account fingerprint is recorded.",
-  "finished_at": "2026-09-24T14:39:06.592395+00:00",
+  "finished_at": "2026-09-24T18:58:12.827084+00:00",
   "gate": "native-fault-behaviour",
-  "harness_sha256": "3f01fb317cedeaf75e36b5d4a72738cd3fc8a6cbdc01c9590646b10fa3996d52",
+  "harness_sha256": "19d0a9b97ec54aa0404defd28ceac28fc235d9467b5793b249185c982606bbee",
   "in_flight_marker_present": false,
   "interrupted": null,
   "kind": "native_fault_behaviour_receipt",
@@ -188,7 +189,7 @@
   "plan_sha256": "f276b26c16256b91de3a4f6fdf566b28a14a255f1210baa478537990dada6818",
   "posts_reserved": 2,
   "schema_version": 1,
-  "started_at": "2026-09-24T14:39:05.193024+00:00",
+  "started_at": "2026-09-24T18:58:11.489117+00:00",
   "status": "native_faults_passed",
   "stop_error": null,
   "submit_responses": 2,

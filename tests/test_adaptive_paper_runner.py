@@ -1,5 +1,6 @@
 """Local cross-module tests: native engine, controller, ledger, synthetic port."""
 import asyncio
+import contextlib
 from dataclasses import replace
 from datetime import datetime, timezone
 from decimal import Decimal
@@ -338,6 +339,59 @@ class IntegratedRunner(unittest.TestCase):
             self.assertEqual((intent.status, intent.limit_price), ("broker_refused", Decimal("40.0001")))
             self.assertTrue(controller.stop)
             proof = reconcile(ledger, {"complete": True, "orders": [], "positions": [], "account": {"cash": "100000"}}, "100000")
+            self.assertEqual((proof["open_orders"], proof["positions"]), (0, 0))
+            ledger.close()
+
+    def test_order_contract_refusal_is_local_not_sent_and_never_reaches_the_fake_broker(self):
+        """Controller.bind over the real AlpacaPaperTransport: a symbol the ledger and
+        the transport accept but the order contract does not (BRK-B, not BRK.B)
+        is refused before any HTTP request and recorded as local not_sent."""
+        from unittest.mock import Mock
+        import transport as engine_transport
+        now = time.time()
+
+        async def scenario(ledger, controller):
+            port = engine_transport.AlpacaPaperTransport(
+                "fixture-key", "fixture-secret", ["SPY", "BRK-B"], before_request=controller.before_request,
+                before_submit=controller.before_submit, sink_observation=controller.observe)
+            port._loop = asyncio.get_running_loop()
+            port._started = True
+            for channel in ("quotes", "orders"):
+                port._authorized(channel)
+                port._ack(channel, True)
+            for symbol in ("SPY", "BRK-B"):
+                port._quote_seen[symbol] = time.monotonic()
+                port._quote_values[symbol] = {"ts_ns": time.time_ns()}
+                controller.quote({"symbol": symbol, "bid": "100", "ask": "100.01", "ts_ns": time.time_ns()})
+            controller.port = controller.bind(port)
+            broker = Mock()
+            payload = {"client_order_id": "contract-test", "symbol": "BRK-B", "side": "buy", "qty": "1",
+                       "limit_price": "100.03", "type": "limit", "time_in_force": "day", "extended_hours": False}
+            try:
+                with patch.object(port._client._session._session, "request", broker):
+                    with self.assertRaises(engine_transport.OrderContractRefused) as caught:
+                        await controller.port.submit(payload)
+            finally:
+                await port.stop()
+            broker.assert_not_called()
+            return caught.exception
+
+        with tempfile.TemporaryDirectory() as root:
+            ledger = Ledger(Path(root) / "journal.db")
+            ledger.start_trial(now)
+            controller = Controller(ledger, now + 3600, market_open=True)
+            error = asyncio.run(scenario(ledger, controller))
+            self.assertNotIsInstance(error, engine_transport.RejectedSubmission)
+            intent = ledger.intents()[0]
+            self.assertEqual((intent.client_id, intent.status, intent.submit_attempted),
+                             ("contract-test", "not_sent", False))
+            reason = ledger.db.execute("SELECT payload FROM events WHERE kind='intent_not_sent' AND client_id=?",
+                                       ("contract-test",)).fetchone()[0]
+            self.assertEqual(json.loads(reason), {"reason": "order_contract_refused"})
+            self.assertFalse(ledger.db.execute("SELECT 1 FROM events WHERE kind='broker_refused'").fetchone())
+            self.assertFalse(controller.stop)  # a local refusal is not a broker refusal stop
+            proof = reconcile(ledger, {"complete": True, "orders": [], "positions": [],
+                                       "account": {"cash": "100000"}}, "100000")
             self.assertEqual((proof["open_orders"], proof["positions"]), (0, 0))
             ledger.close()
 
@@ -1248,6 +1302,74 @@ def _full_gate_result(*, status="pass", row_count=1, checks_status="pass", input
         "versions": {"pandera": "0.33.1"},
         "checked_at": "2026-09-22T00:00:00+00:00",
     }
+
+
+class OrderContractPreflight(unittest.TestCase):
+    """The runner refuses to start unless the transport's pre-submission
+    order-contract boundary is active. Local; no pinned runtime or network."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self.tmp.name)
+        self.env_file = self.root / "paper.env"
+        self.env_file.write_text("APCA_API_KEY_ID=fixture-key\nAPCA_API_SECRET_KEY=fixture-secret\n")
+        os.chmod(self.env_file, 0o600)
+        self.config_file = self.root / "config.json"
+        self.config_file.write_text("{}")
+        self.output = self.root / "output.json"
+        self.observation = _paper_ready_observation(time.time_ns())
+        self.observation["account_identity_sha256"] = "fixture-account"
+        self.config = _paper_ready_config()
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def _main(self, command, status_error=None):
+        from unittest.mock import Mock
+        network, creds = Mock(return_value=self.observation), Mock(return_value=("fixture-key", "fixture-secret"))
+        argv = ["runner.py", command, "--env-file", str(self.env_file), "--config", str(self.config_file),
+                "--output", str(self.output), "--state-root", str(self.root / "state")]
+        patches = [patch.object(sys, "argv", argv),
+                   patch.object(runner_module, "load_config", return_value=(self.config, None, None)),
+                   patch.object(runner_module, "credentials", creds),
+                   patch.object(runner_module, "preflight", network)]
+        if status_error is not None:
+            patches.append(patch.object(runner_module, "order_contract_status", side_effect=status_error))
+        with contextlib.ExitStack() as stack:
+            for item in patches:
+                stack.enter_context(item)
+            code = runner_module.main()
+        return code, json.loads(self.output.read_text()), network, creds
+
+    def test_active_boundary_is_checked_and_recorded_in_the_preflight_summary(self):
+        status = runner_module.check_order_contract_boundary(["SPY", "BRK.B"])
+        self.assertTrue(status["active"])
+        self.assertEqual(status["symbols_checked"], 2)
+        code, summary, network, _ = self._main("preflight")
+        self.assertEqual((code, summary["status"]), (0, "ready"))
+        self.assertTrue(summary["order_contract"]["active"])
+        self.assertEqual(summary["order_contract"]["symbols_checked"], 1)
+        network.assert_called_once()
+
+    def test_inactive_boundary_refuses_before_credentials_or_any_request(self):
+        error = runner_module.TransportError("order_contract_boundary_inactive:invalid_sentinel_accepted")
+        for command in ("preflight", "paper", "recover"):
+            with self.subTest(command=command):
+                code, result, network, creds = self._main(command, status_error=error)
+                self.assertEqual(code, 2)
+                self.assertEqual(result, {"status": "not_started", "stage": "order_contract", "orders_submitted": 0,
+                                          "reason": "order_contract_boundary_inactive:invalid_sentinel_accepted"})
+                network.assert_not_called()
+                creds.assert_not_called()
+
+    def test_validate_preflight_requires_the_boundary_and_admissible_symbols(self):
+        validate_preflight_always(self.observation, self.config, require_open=True)
+        with self.assertRaisesRegex(SafetyErrorAlways, "^order_contract_boundary_inactive:configured_symbol"):
+            validate_preflight_always(self.observation, _paper_ready_config(("SPY", "BRK-B")), require_open=True)
+        error = runner_module.TransportError("order_contract_boundary_inactive:contract_module_not_loaded")
+        with patch.object(runner_module, "order_contract_status", side_effect=error):
+            with self.assertRaisesRegex(SafetyErrorAlways, "contract_module_not_loaded"):
+                validate_preflight_always(self.observation, self.config, require_open=True, allow_existing=True)
 
 
 class PromotionGatePreflight(unittest.TestCase):

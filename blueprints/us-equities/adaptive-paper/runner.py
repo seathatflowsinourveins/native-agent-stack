@@ -26,8 +26,8 @@ from safety import (Ledger, Quote, RiskLimits, SafetyError, account_lock_fingerp
 from sessions import (DEFAULT_SESSION_POLICY, SessionKind, boundary_receipt, extended_session_close,
                      must_end_flat, session_at, validate_session_policy)
 from strategies import AdaptivePolicy, PolicyConfig, RegimeSelector, SelectorConfig, limit_price
-from transport import (AlpacaPaperTransport, DATA_FEEDS, TransportError, RejectedSubmission, preflight,
-                       halt_statuses_supported, nasdaq_halt_seed)
+from transport import (AlpacaPaperTransport, DATA_FEEDS, TransportError, RejectedSubmission, order_contract_status,
+                       preflight, halt_statuses_supported, nasdaq_halt_seed)
 
 SOURCE = Path(__file__).resolve().parent
 LAST_OUTPUT = None
@@ -576,6 +576,19 @@ def _check_margin_entitlement(account, config, lev, session_policy):
     return mult
 
 
+def check_order_contract_boundary(symbols):
+    """Preflight: the transport's pre-submission order-contract boundary is active.
+
+    Local and network-free: the pinned contract loads, accepts a valid sentinel,
+    refuses invalid ones, the POST gate requires a validated envelope, and every
+    configured symbol is admissible. Returns the status recorded in the summary.
+    """
+    try:
+        return order_contract_status(tuple(symbols))
+    except TransportError as exc:
+        raise SafetyError(str(exc)) from None
+
+
 def validate_preflight(observation, config, *, require_open, allow_existing=False,
                        allow_existing_positions=None, session_policy=None,
                        mode=None, gate_result_path=None, snapshot_path=None):
@@ -592,6 +605,7 @@ def validate_preflight(observation, config, *, require_open, allow_existing=Fals
     ``held_overnight`` while overnight_holds is enabled), leaving the other
     four guards enforced exactly as for a normal fresh start. Defaults to ``allow_existing`` when not given, so recovery's
     existing behaviour is unchanged."""
+    check_order_contract_boundary(config.get("symbols", ()))
     if mode == "paper":
         _check_promotion_gate(gate_result_path, snapshot_path)
     if allow_existing_positions is None:
@@ -1044,7 +1058,10 @@ class Controller:
                 intent = next((i for i in self.ledger.intents() if i.client_id == order["client_order_id"]), None)
                 if intent and intent.status == "reserved" and intent.broker_id is None and not intent.filled_qty:
                     if getattr(exc, "not_sent", False) is True:
-                        self.ledger.mark_not_sent(intent.client_id, "transport_proven_not_sent")
+                        # A local order-contract refusal keeps its own reason code;
+                        # it is never recorded as a broker refusal.
+                        self.ledger.mark_not_sent(intent.client_id,
+                                                  getattr(exc, "not_sent_reason", "transport_proven_not_sent"))
                     elif isinstance(exc, RejectedSubmission):
                         self.ledger.mark_broker_refused(intent.client_id, exc.status_code,
                                                         getattr(exc, "refusal", None))
@@ -1613,6 +1630,14 @@ def main():
         raise ValueError("invalid_trial_id")
     config, limits, policy_config = load_config(args.config)
     session_policy = validate_session_policy(config)
+    try:
+        # Before credentials or any request: no order path without the boundary.
+        contract_status = check_order_contract_boundary(config["symbols"])
+    except SafetyError as exc:
+        result = {"status": "not_started", "stage": "order_contract", "reason": str(exc), "orders_submitted": 0}
+        save(args.output, result)
+        print(json.dumps(result))
+        return 2
     key, secret = credentials(args.env_file)
     attempts, responses = [], []
     def observe_request(kind, **kwargs):
@@ -1636,6 +1661,7 @@ def main():
         return 2
     summary = public_preflight(observation, config)
     summary["http"] = responses
+    summary["order_contract"] = contract_status
     summary["config_sha256"] = hashlib.sha256(args.config.read_bytes()).hexdigest()
     if args.command == "preflight":
         try:
