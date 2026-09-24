@@ -7964,6 +7964,36 @@
       "bytes": 8993
     },
     {
+      "path": "blueprints/us-equities/extreme-gainer-audit/README.md",
+      "sha256": "44f34a6c2e03fba5f809787e4bea009a479dc4aeb9d577d34d6491c9f858b5b6",
+      "bytes": 4036
+    },
+    {
+      "path": "blueprints/us-equities/extreme-gainer-audit/audit.py",
+      "sha256": "152f415bb12f1b5c413cad3c022ac7aee756b7ed4c39b2e746781d0100e740df",
+      "bytes": 16469
+    },
+    {
+      "path": "blueprints/us-equities/extreme-gainer-audit/evidence/fetch-log-run-20260924a.json",
+      "sha256": "e828bbdef6c53d6c630e4c2c751df46afe653c402b7361b3a07a0578ad1aef24",
+      "bytes": 198
+    },
+    {
+      "path": "blueprints/us-equities/extreme-gainer-audit/evidence/summary-run-20260924a.json",
+      "sha256": "70e506fe1774f0413dd775a102aabe6913d14d2509952a6d836d693f24bd8232",
+      "bytes": 2137
+    },
+    {
+      "path": "blueprints/us-equities/extreme-gainer-audit/plan.json",
+      "sha256": "b93946867e703705dded9e140dab086afb4a3298b0bfea4084cb2394e83ee2d2",
+      "bytes": 5076
+    },
+    {
+      "path": "blueprints/us-equities/extreme-gainer-audit/posthoc.py",
+      "sha256": "ca6aec7795aa263e56172d43d73d3fd16debf0b47319452b0c532d0295c8464b",
+      "bytes": 5263
+    },
+    {
       "path": "blueprints/us-equities/financial-data/README.md",
       "sha256": "4bc6c3bec788aad0f05e1eedc1887cf51e1856794c53c86a7b3b6e1510ef9aed",
       "bytes": 8176
@@ -28362,6 +28392,11 @@
       "path": "tests/test_execution_realism.py",
       "sha256": "556bcaecd191d5ec52674b882905f3d7d1a147e3614b6a0a65c1dd9d7327129f",
       "bytes": 3691
+    },
+    {
+      "path": "tests/test_extreme_gainer_audit.py",
+      "sha256": "177ec71512a19062e691a3efe354bcac3c2c7ed5074fb2c1d605afc21423273c",
+      "bytes": 11225
     },
     {
       "path": "tests/test_financial_data.py",

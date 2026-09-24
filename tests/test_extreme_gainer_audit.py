@@ -123,6 +123,47 @@ class CompareEndToEnd(unittest.TestCase):
             self.assertFalse(r["summary"]["overturn_triggered"])
             self.assertNotIn("18.83", json.dumps(r["events"]))  # no raw prices in the committed results
 
+    def test_posthoc_separates_basis_difference_from_real_mismatch(self):
+        sys_path = str(A.HERE)
+        import sys
+        if sys_path not in sys.path:
+            sys.path.insert(0, sys_path)
+        spec = importlib.util.spec_from_file_location("gainer_posthoc", A.HERE / "posthoc.py")
+        sys.modules["audit"] = A
+        P = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(P)
+        with tempfile.TemporaryDirectory() as tmp:
+            pkg = Path(tmp) / "pkg"; (pkg / "datasets").mkdir(parents=True)
+            fields = ["Date", "Ticker", "Ticker_Used", "Status", "Prev_Close", "Ev_Close", "Computed_Gain_Pct", "Gain_Pct_Dataset",
+                      "Ret_T1_Pct", "Ret_T5_Pct", "Ret_T20_Pct", "Discrepancy_Flag"]
+            with (pkg / A.FORWARD_CSV).open("w", newline="") as f:
+                w = csv.DictWriter(f, fieldnames=fields); w.writeheader()
+                # Package close 2.10 is the after-hours last trade; the official close is 2.00.
+                w.writerow({"Date": "2024-05-02", "Ticker": "AAA", "Ticker_Used": "AAA", "Status": "OK", "Prev_Close": "1.00",
+                            "Ev_Close": "2.10", "Computed_Gain_Pct": "110.0", "Gain_Pct_Dataset": "110.0"})
+            (pkg / A.ALIAS_CSV).write_text("Date,Ticker,Outcome_Type,Alias_Symbol\n")
+            ev = A.load_events(pkg)[0]
+            resp = {"symbol": "AAA", "auctions": {"auctions": [auction("2024-05-01", [{"c": "6", "p": 1.00, "x": "Q"}]),
+                                                               auction("2024-05-02", [{"c": "6", "p": 2.00, "x": "Q"}])]},
+                    "bars_raw": {"bars": [bar("2024-05-01", 1.00), bar("2024-05-02", 2.10)]},
+                    "bars_split": {"bars": [bar("2024-05-01", 1.00), bar("2024-05-02", 2.10)]}}
+            snap = Path(tmp) / "snapshot.json"
+            snap.write_text(json.dumps({"plan_sha256": A.sha256_file(A.HERE / "plan.json"), "fetched_at_utc": "x",
+                                        "events": {ev["id"]: [resp]}}))
+            original = A.check_inputs
+            A.check_inputs = lambda d: None
+            try:
+                A.compare(SimpleNamespace(snapshot=snap, package_dir=pkg, out=Path(tmp) / "r.json"))
+                P.main(["--snapshot", str(snap), "--package-dir", str(pkg), "--results", str(Path(tmp) / "r.json"),
+                        "--out", str(Path(tmp) / "p.json")])
+            finally:
+                A.check_inputs = original
+            r = json.loads((Path(tmp) / "r.json").read_text()); p = json.loads((Path(tmp) / "p.json").read_text())
+            self.assertEqual(r["summary"]["verdicts"], {"mismatch": 1})  # official close says +100%
+            self.assertEqual((p["agree_official_close_gain"], p["agree_bar_close_gain"], p["agree_bar_only"]), (0, 1, 1))
+            self.assertEqual(p["mismatch_leg_classes"], {"closes_match_bar_not_official": 1})
+            self.assertFalse(p["preregistered"])
+
     def test_inputs_are_checked_against_the_plan(self):
         with tempfile.TemporaryDirectory() as tmp:
             pkg = Path(tmp); (pkg / "datasets").mkdir()
