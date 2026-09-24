@@ -10,7 +10,7 @@
     "second_physical_machine": true,
     "hardware_profile_ref": "macos-m5pro-20260924"
   },
-  "catalog_revision": "6f7a77c65c6d905244152be42b0ba5acccf25abe",
+  "catalog_revision": "cef7a741c72641a30c082e69f8e99ec36d13e1f7",
   "recorded_by": {
     "identity_sha256": "47810733f354852d9cd152ec24113b032506e8fe4aaa1b2bc2f5e95c3e72732e",
     "model": "claude-opus-5-5"
@@ -21,26 +21,71 @@
     {
       "cmd": "wt --version",
       "exit": 0,
-      "duration_s": 0.008,
+      "duration_s": 0.007,
       "output_sha256": "9512ab58c08960cc92ea5a7e78533c3552339031950dc49f9674eeb7b15d20a2",
       "output_excerpt": "wt v0.79.0\n"
     },
     {
-      "cmd": "wt list",
+      "cmd": "mkdir \"${TMPDIR:?}/wt-probe\" && git init -q -b main \"$TMPDIR/wt-probe/repo\" && cd \"$TMPDIR/wt-probe/repo\" && printf \"worktrunk probe\\n\" > README.md && git add README.md && git -c core.hooksPath=/dev/null -c commit.gpgsign=false -c user.name=wt-probe -c user.email=wt-probe@example.invalid commit -q -m \"probe: initial commit\" && git log --oneline && git worktree list",
       "exit": 0,
-      "duration_s": 0.153,
-      "output_sha256": "d16c4cf0d4a04fd1febd628b0bc3697bef5b57bea2cb9e381d064e4bd23e962e",
-      "output_excerpt": "  Branch                            Status      HEAD\u00b1     main\u2195    main\u2026\u00b1    Remote\u21c5  Path  Commit    Age  Message\n@ evidence/macos-m5pro-20260924-f\u2026   !?\u2691^|    +106                              |     .     6f7a77c   12m  Make tests hermetic against global and system git config (#181)\n\n\u25cb Showing 1 worktree, 1 with changes\n"
+      "duration_s": 0.045,
+      "output_sha256": "cbc8a925c6a5480e9994c9013362bfa3e63eda03a2a23f89b80fc3a92b13deab",
+      "output_excerpt": "031a8a8 probe: initial commit\n/private/tmp/claude-501/wt-probe/repo  031a8a8 [main]\n"
+    },
+    {
+      "cmd": "cd \"${TMPDIR:?}/wt-probe/repo\" && wt switch --create wt-probe </dev/null",
+      "exit": 0,
+      "duration_s": 0.114,
+      "output_sha256": "b7018398c3e0b92afa9063c4ba9066c58d41c33db848d04ee8670401d582359a",
+      "output_excerpt": "\u2713 Created branch wt-probe from main and worktree @ /tmp/claude-501/wt-probe/repo.wt-probe\n\u21b3 To customize worktree locations, run wt config create\n\u25b2 Cannot change directory \u2014 shell integration installed but not active\n\u21b3 A shell restart usually activates shell integration; if it doesn't, ask an agent to debug with the docs @ https://worktrunk.dev/llms.txt\n"
+    },
+    {
+      "cmd": "cd \"${TMPDIR:?}/wt-probe/repo\" && wt list </dev/null",
+      "exit": 0,
+      "duration_s": 0.078,
+      "output_sha256": "66848204659cc46cd510b9fe99f158784c58925361dbadbb4b6562ee6cb7174a",
+      "output_excerpt": "  Branch    Status      HEAD\u00b1     main\u2195    main\u2026\u00b1    Remote\u21c5  Path              Commit    Age  Message\n@ main          ^                                             .                 031a8a8   now  probe: initial commit\n+ wt-probe      _                                             ../repo.wt-probe  031a8a8   now  probe: initial commit\n\n\u25cb Showing 2 worktrees\n"
+    },
+    {
+      "cmd": "cd \"${TMPDIR:?}/wt-probe/repo\" && wt remove --foreground wt-probe </dev/null",
+      "exit": 0,
+      "duration_s": 0.124,
+      "output_sha256": "b65946691e8333c83f7a61aed9c861bf6ce971c3d2c01c0ffa0d738d33cda934",
+      "output_excerpt": "\u25ce Removing wt-probe worktree...\n\u2713 Removed wt-probe worktree & branch (same commit as main, _) (2 files \u00b7 91 B)\n"
+    },
+    {
+      "cmd": "cd \"${TMPDIR:?}/wt-probe/repo\" && wt list </dev/null",
+      "exit": 0,
+      "duration_s": 0.053,
+      "output_sha256": "a6f52ded30dac6fbe6cc4775cee224e7f038b11b7c377e3e92d54c6af97e50f0",
+      "output_excerpt": "  Branch  Status      HEAD\u00b1     main\u2195    main\u2026\u00b1    Remote\u21c5  Path  Commit    Age  Message\n@ main        ^                                             .     031a8a8   now  probe: initial commit\n\n\u25cb Showing 1 worktree\n"
+    },
+    {
+      "cmd": "cd \"${TMPDIR:?}/wt-probe/repo\" && git worktree list && git branch --list && ls \"$TMPDIR/wt-probe\"",
+      "exit": 0,
+      "duration_s": 0.017,
+      "output_sha256": "e495d41bb9449451e94758bced63df7a2f5bed8dc1e8b26167f43d1040b3e921",
+      "output_excerpt": "/private/tmp/claude-501/wt-probe/repo  031a8a8 [main]\n* main\nrepo\n"
+    },
+    {
+      "cmd": "rm -rf \"${TMPDIR:?}/wt-probe\" && test ! -e \"$TMPDIR/wt-probe\" && echo \"throwaway probe directory removed\"",
+      "exit": 0,
+      "duration_s": 0.008,
+      "output_sha256": "1cb6ed90a8a9c13b1532f0441d3bf2acc3495ef6c14a1766644122bba5a2c271",
+      "output_excerpt": "throwaway probe directory removed\n"
     }
   ],
   "tool_versions": {
     "worktrunk": "0.79.0"
   },
-  "observed_at_utc": "2026-09-24T14:20:45Z",
+  "observed_at_utc": "2026-09-24T14:53:37Z",
   "result": "pass",
-  "claim": "On host macos-m5pro-20260924 (Apple M5 Pro, 18 cores, 24 GB unified memory, macOS arm64), worktrunk 0.79.0 (wt, the catalog pin) reported its version, then listed the worktrees of a scratch clone of this repository's main branch with branch, working-tree status, ahead/behind, path, commit, age and message columns (both commands exit 0). rtk, worktrunk and gitleaks on this host are installed and version-pinned by the host's own control plane, outside this repository.",
+  "claim": "On host macos-m5pro-20260924 (Apple M5 Pro, 18 cores, 24 GB unified memory, macOS arm64), worktrunk 0.79.0 (wt, the catalog pin) ran a full worktree lifecycle in a throwaway one-commit git repository created under $TMPDIR. wt switch --create wt-probe created the branch and a sibling worktree, and wt list showed both worktrees. wt remove --foreground wt-probe then removed the worktree and deleted the branch (same commit as main). A second wt list, git worktree list, git branch --list and a directory listing showed only the main worktree left, and the probe directory was then deleted (all 8 commands exit 0). rtk, worktrunk and gitleaks on this host are installed and version-pinned by the host's own control plane, outside this repository.",
   "limitations": [
-    "List-only use of a single worktree: no worktree was created, switched, merged or removed, and worktrunk hooks, generated commit messages and CI-status columns were not exercised.",
+    "Hooks were inspected before any wt command ran. wt config show and the file system found no worktrunk user config (~/.config/worktrunk/config.toml absent), so there were no user hooks, no approvals file, and the default worktree-path template applied. There was also no system config, no WORKTRUNK_* or XDG_CONFIG_* override, and no project .config/wt.toml in the throwaway repository or in this repository. Every wt command ran with stdin from /dev/null and without --yes or --no-hooks, so a hook approval prompt would have failed closed; none appeared. worktrunk's Claude Code plugin registers only Claude Code event hooks (status markers and Claude's own WorktreeCreate/WorktreeRemove), which a wt CLI run does not trigger.",
+    "Scope: one create/list/remove cycle of a branch at the same commit as main, in a repository with no remote. wt ran from a non-interactive /bin/sh without active shell integration, so wt switch created the worktree but could not change the calling shell's directory, as its output says. wt remove ran with --foreground so that the next wt list saw the finished removal. Not exercised: the default background removal, wt merge, hooks, generated commit messages, CI-status columns and remote branches.",
+    "The throwaway repository's one commit used a fixed probe identity, commit.gpgsign=false and core.hooksPath=/dev/null, so the host's global git hooks and commit signing did not touch that setup commit. The wt commands ran with the host's normal git configuration. TMPDIR pointed at this session's temporary directory. A dry run of the same sequence just before this recording created no worktrunk state directory under the home directory and left the global git config files unmodified.",
+    "This receipt replaces an earlier recording from the same day under the same id; the recorder derives the id from host, component, stage and UTC date. That earlier version ran only wt --version and the read-only wt list. An independent review marked it needs_changes, and it is preserved with that review at commit cef7a74 on PR #185.",
     "Recorded outside Claude Code's Seatbelt sandbox, in a scratch clone of the default branch (adoption/update.md), not in the host's pinned install checkout. adoption/manifest.json keeps macos-arm64 at drafted_not_accepted: this receipt changes no platform_status and counts toward one only after an independent host_receipts.py review by a different session."
   ],
   "evidence_class": "native_proven",
@@ -49,19 +94,9 @@
       "kind": "self",
       "ref": "scripts/host_receipts.py record",
       "verdict": "agree",
-      "at_utc": "2026-09-24T14:20:45Z",
+      "at_utc": "2026-09-24T14:53:37Z",
       "reviewer": {
         "identity_sha256": "47810733f354852d9cd152ec24113b032506e8fe4aaa1b2bc2f5e95c3e72732e",
-        "model": "claude-opus-5-5"
-      }
-    },
-    {
-      "kind": "independent_session",
-      "ref": "native-agent-stack#185 independent review: commands reproduced on the same host at head bc8cee5; reasons in the PR review; worktrunk: wt list is read-only, no create/switch/remove",
-      "verdict": "needs_changes",
-      "at_utc": "2026-09-24T14:45:15Z",
-      "reviewer": {
-        "identity_sha256": "2cd2306a3c00a3848abe008ef0b36269a2f2dc918b5c948b4d79fd7e93d9b99f",
         "model": "claude-opus-5-5"
       }
     }
