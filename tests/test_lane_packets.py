@@ -812,6 +812,29 @@ class RecursiveWithheldKeyTests(unittest.TestCase):
         self.assertEqual(withheld_packet_keys(packet), [])
 
 
+class WithheldProseTests(unittest.TestCase):
+    """Codex review of #145: the ledger's shared prose named the incumbent ("Use the selected NautilusTrader
+    destination...") before a blind lane read any evidence."""
+
+    def test_sentences_naming_a_candidate_or_a_selection_are_withheld(self):
+        packet = {"candidates": [{"name": "NautilusTrader", "repository": "https://github.com/nautechsystems/nautilus_trader"},
+                                 {"name": "LEAN", "repository": "https://github.com/QuantConnect/Lean"}],
+                  "requirement": "Use the selected NautilusTrader destination with numeric risk.",
+                  "limitations": ["Nautilus 2.0.0rc5 is a prerelease.", "Fills are synthetic. The LEAN default stays."],
+                  "existing_overturn_when": "Reopen if a parity check fails. Keep the prior oracle.",
+                  "withheld": []}
+        out = lane_packets.withhold_prose(packet)
+        self.assertEqual(out["requirement"], lane_packets.NEUTRAL_REQUIREMENT)
+        self.assertEqual(out["limitations"], ["Fills are synthetic."])
+        self.assertEqual(out["existing_overturn_when"], "Reopen if a parity check fails.")
+        self.assertTrue(any("selection word" in label for label in out["withheld"]))
+
+    def test_a_neutral_requirement_is_kept(self):
+        packet = {"candidates": [{"name": "Widget One", "repository": "https://github.com/acme/widget-one"}],
+                  "requirement": "Reproduce the ledger with deterministic fills.", "withheld": []}
+        self.assertEqual(lane_packets.withhold_prose(packet)["requirement"], "Reproduce the ledger with deterministic fills.")
+
+
 class GapReceiptsTests(LanePacketsFixture):
     """2026-09-23 re-record: --gap-receipts gives each packet the receipt paths the gap-wave owner ledgers list
     for its layer, and never the gap text (it derives from the previous verdict's open_gaps)."""

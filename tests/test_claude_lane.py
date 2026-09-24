@@ -170,6 +170,17 @@ class ClaudeLaneWriterTests(unittest.TestCase):
         with self.assertRaisesRegex(module.claude_lane.ProvenanceError, "name the definition the lane loaded"):
             module.lane_args(self.work, self.export, claude_lane.VENDORED_AGENT, self.agentlab)
 
+    def test_a_packet_missing_from_the_result_loses_its_earlier_return(self):
+        # Codex review of #145: a packet dropped from the args before launch is in neither layers nor lost.
+        (self.work / "packets" / "foundation__l9.json").write_text("{}", encoding="utf-8")
+        stale = self.work / "claude" / "foundation__l9.json"
+        stale.parent.mkdir(parents=True, exist_ok=True)
+        stale.write_text("{}", encoding="utf-8")
+        self.assertEqual(self.run_main(), 0)
+        self.assertFalse(stale.exists())
+        failures = json.loads((self.work / "claude" / "failures.json").read_text(encoding="utf-8"))["failures"]
+        self.assertIn(("foundation", "l9"), [(item["catalog"], item["layer_id"]) for item in failures])
+
     def test_a_layer_run_on_another_packet_path_is_refused(self):
         # Codex review of #145: edited args could run another packet under the same hash.
         data = json.loads(self.result.read_text(encoding="utf-8"))

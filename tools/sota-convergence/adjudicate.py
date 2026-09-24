@@ -193,7 +193,9 @@ _PATH_START = r"(?:^|(?<=[\s'\"(=:\[{,`>]))"
 # Unicode included (/évidence/x), or a dot; any other legal character (/-private/x, /@host/x) only when a
 # later "/" shows a path, so prose such as "+/-" is not taken for one.
 _SEGMENT_START = r"(?:[\w.]|(?!/)" + _PATH_CHARS + r"(?=" + _PATH_CHARS + r"*/))"
-URL = re.compile(r"https?://[^\s<>\"'`)\]]+")
+# A URL ends at a field separator too (Codex review of #145): "source=https://x;local=/home/..." must not exempt the
+# host path after the semicolon.
+URL = re.compile(r"https?://[^\s<>\"'`)\];,]+")
 ABSOLUTE_TEXT_PATH = re.compile(_PATH_START + r"/+" + _SEGMENT_START + _PATH_CHARS + "*")
 HOME_TEXT_PATH = re.compile(r"(?:~|\$HOME\b|\$\{HOME\})(?:/" + _PATH_CHARS + r"*)?(?![\w])")
 HOST_PLACEHOLDER = re.compile(r"<host-path>(?:/" + _PATH_CHARS + "*)?")
@@ -212,6 +214,11 @@ OUTSIDE = "<outside-path>"
 # (,;()"'`|&<>), a line end, or a token ending a sentence (. ! ? :), whose punctuation is kept (Codex review of
 # #145). Prose after a host path is lost; a private basename never survives.
 _OUTSIDE_CONTINUATION = re.compile(r"<outside-path>((?:[ \t]+[^\s'\"|;&<>()`,]+)+)")
+
+
+# A path segment glued to a delimiter the scrubber stops at ("/home/example,private/result.json") continues the
+# path when a / or \ follows: absorbed whole (Codex review of #145).
+_OUTSIDE_GLUED = re.compile(r"<outside-path>[,;()'\"`|&]+[^\s<>]*[/\\][^\s<>]*")
 
 
 def _absorb_clause(match) -> str:
@@ -290,6 +297,7 @@ def _scrub_segment(text: str, packets_dir: str, repo_roots) -> str:
     text = HOME_TEXT_PATH.sub(outside, text)
     text = PARENT_TEXT_PATH.sub(outside, text)
     text = ABSOLUTE_TEXT_PATH.sub(absolute, text)
+    text = _OUTSIDE_GLUED.sub(OUTSIDE, text)
     return _OUTSIDE_CONTINUATION.sub(_absorb_clause, text)
 
 
@@ -923,6 +931,7 @@ def redact_leak_text(text):
     for pattern in (WINDOWS_TEXT_PATH, HOST_PLACEHOLDER, HOME_TEXT_PATH, ABSOLUTE_TEXT_PATH, PARENT_TEXT_PATH,
                     *RESIDUAL_PATTERNS):
         text = pattern.sub(OUTSIDE, text)
+    text = _OUTSIDE_GLUED.sub(OUTSIDE, text)
     text = _OUTSIDE_CONTINUATION.sub(_absorb_clause, text)
     return text[:LEAK_TEXT_LIMIT]
 

@@ -1667,6 +1667,19 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
     the 30 current `verdict_overturn_when` rows cite `tests.` commands). The re-record measures how many
     refutations cite a missing tests/ or tools/ path. Rewording the prompt and lens waits for their next
     registered revision, because both are hash-bound.
+- **Codex review at 2a2ffb8d:**
+  - **Packet prose.** Under `--withhold-labels`, `requirement`, `limitations` and `existing_overturn_when` keep only
+    sentences that name no packet candidate and use no selection word. Candidate names count as their name and
+    repository name plus distinctive parts, so "NautilusTrader" also matches "Nautilus". A requirement left empty
+    becomes a neutral pointer to the layer title and `layer_scope_terms`. The shared ledger prose named the
+    incumbent ("Use the selected NautilusTrader destination…"). On the 2026-09-23 packets, none of the 32 keeps
+    such a sentence, and 13 requirements are fully withheld.
+  - **Codex home.** The run-scoped Codex home is recreated on every blind run, so a leftover `AGENTS.md` is never
+    loaded. A dry run creates none.
+  - **Claude lane accounting.** `claude_lane.py` accounts for every work-dir packet. One in neither `layers` nor
+    `lost` loses any earlier return and is listed as a failure.
+  - **Scrubbing.** A URL ends at `;` or `,`, and a path segment glued to a delimiter ("/home/example,private/y") is
+    absorbed with its path.
 - **Codex review at a2434e2e and the Codex cross-family review:**
   - **No whole trees in the allowlisted export.** `tests/`, `tools/` and `scripts/` carry selection-bearing data
     and assertions (the reconciliations file, `tests/test_catalogs.py`), so a file there is exported only when a

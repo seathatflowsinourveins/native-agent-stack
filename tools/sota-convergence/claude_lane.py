@@ -272,6 +272,16 @@ def main(argv=None) -> int:
             (out_dir / f"{catalog}__{layer_id}.json").unlink(missing_ok=True)
             failures.append({"catalog": catalog, "layer_id": layer_id,
                              "reason": "lost: the workflow returned no result for this packet"})
+    # Every packet of the work dir must be in layers or lost (Codex review of #145): one dropped from the args before
+    # launch is in neither, and its earlier return must not survive to be sealed with this wave.
+    accounted = {f"{layer['catalog']}__{layer['layer_id']}" for layer in result.get("layers") or []}
+    accounted |= {str(lost).replace("/", "__", 1) for lost in result.get("lost") or []}
+    for packet in sorted((args.work_dir / "packets").glob("*__*.json")):
+        if packet.stem not in accounted:
+            (out_dir / f"{packet.stem}.json").unlink(missing_ok=True)
+            catalog, _, layer_id = packet.stem.partition("__")
+            failures.append({"catalog": catalog, "layer_id": layer_id,
+                             "reason": "missing: the workflow result names this packet in neither layers nor lost"})
     failures_path = out_dir / FAILURES_NAME
     if failures:
         failures_path.write_text(json.dumps({"lane": "claude", "failures": failures}, indent=1, sort_keys=True)

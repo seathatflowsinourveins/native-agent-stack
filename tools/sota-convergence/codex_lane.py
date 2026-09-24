@@ -384,7 +384,13 @@ def isolated_codex_home(work_dir: Path) -> Path:
     "# AGENTS.md instructions" block; with this home it answered "none"). Sessions and logs the child writes stay
     in the work dir. A missing native auth.json is left for the CLI to report."""
     home = Path(work_dir).resolve() / "codex-home"
-    home.mkdir(parents=True, exist_ok=True)
+    if home.is_symlink() or home.is_file():
+        home.unlink()
+    elif home.exists():
+        # Recreated on every blind run (Codex review of #145): a leftover AGENTS.md or config from an interrupted
+        # or hand-prepared run would otherwise be loaded.
+        shutil.rmtree(home)
+    home.mkdir(parents=True)
     home.chmod(0o700)
     native = Path(os.environ.get("CODEX_HOME") or Path.home() / ".codex") / "auth.json"
     link = home / "auth.json"
@@ -662,9 +668,6 @@ def main(argv=None) -> int:
     usage_path = codex_dir / "usage.jsonl"
 
     global CHILD_CODEX_HOME
-    if not args.allow_git_history:
-        # Blind children never load the user's global Codex instructions (isolated_codex_home).
-        CHILD_CODEX_HOME = isolated_codex_home(work_dir)
     try:
         # A deliberately non-blind run (--allow-git-history) may read a checkout whose ignored .venv links leave
         # it (re-review L2); a blind export never has such links.
@@ -681,6 +684,10 @@ def main(argv=None) -> int:
             continue
         pending.append((catalog, layer_id, packet_path, packet_sha256, out_path))
 
+    if not args.dry_run and not args.allow_git_history:
+        # Blind children never load the user's global Codex instructions (isolated_codex_home); a dry run writes
+        # nothing, so it creates no home either (Codex review of #145).
+        CHILD_CODEX_HOME = isolated_codex_home(work_dir)
     if args.dry_run:
         strict_display = codex_dir / "lane-return.codex-strict.schema.json"
         print(f"# --dry-run writes nothing; a real run first writes {strict_display}", file=sys.stderr)

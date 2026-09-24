@@ -1254,6 +1254,15 @@ class ThirteenthRereviewOf145Tests(AdjudicateFixture):
     """Round-13 review of #145: whitespace-bearing host paths are scrubbed whole, and an edited claude-args
     snapshot is refused."""
 
+    def test_glued_segments_and_url_fields_do_not_carry_host_paths(self):
+        # Codex review of #145: "/home/example,private/x" and "https://x;local=/home/..." kept private suffixes.
+        packets = str(self.work / "packets")
+        self.assertEqual(adjudicate.scrub_text("see /home/example,private/result.json", packets), "see <outside-path>")
+        scrubbed = adjudicate.scrub_text("source=https://example.com;local=/home/example/private.json", packets)
+        self.assertNotIn("private.json", scrubbed)
+        self.assertIn("https://example.com", scrubbed)
+        self.assertNotIn("example,private", adjudicate.redact_leak_text("at /home/example,private/result.json"))
+
     def test_host_paths_with_spaces_leave_no_suffix(self):
         packets = str(self.work / "packets")
         for text, expected in (("see /home/example user/private.json now", "see <outside-path>"),

@@ -588,6 +588,72 @@ def packet_filename(catalog: str, layer_id: str) -> str:
     return f"{catalog}__{layer_id}.json"
 
 
+# Under --withhold-labels, the ledger's shared prose (requirement, limitations, existing_overturn_when) keeps only
+# sentences that name no packet candidate and use no selection word (Codex review of #145): "Use the selected
+# NautilusTrader destination..." names the incumbent before the lane reads any evidence.
+PROSE_FIELDS = ("requirement", "limitations", "existing_overturn_when")
+SELECTION_WORD = re.compile(r"\b(selected|select|default|defaults|retain(?:ed|s)?|incumbents?|chosen|choose|winners?"
+                            r"|adopt(?:ed|s)?|keep|kept|current (?:choice|selection|destination))\b", re.I)
+NEUTRAL_REQUIREMENT = "Judge fit against the layer title and layer_scope_terms; the ledger's requirement text is withheld."
+
+
+# Parts of a candidate name too generic to identify it on their own.
+GENERIC_NAME_PARTS = frozenset({"python", "server", "client", "engine", "trader", "tools", "agent", "agents",
+                                "stack", "local", "cloud", "native", "model", "models", "store", "check", "checks"})
+
+
+def candidate_terms(packet: dict) -> list:
+    """Words that identify a packet candidate: its name and repository name (four characters or longer), and their
+    distinctive parts ("NautilusTrader" and "nautilus_trader" give "nautilus")."""
+    terms = set()
+    for candidate in packet.get("candidates") or []:
+        for value in (candidate.get("name"), (candidate.get("repository") or "").rstrip("/").split("/")[-1]):
+            if not isinstance(value, str) or len(value.strip()) < 4:
+                continue
+            terms.add(value.strip().lower())
+            for part in re.split(r"[^A-Za-z0-9]+|(?<=[a-z0-9])(?=[A-Z])", value):
+                if len(part) >= 5 and part.lower() not in GENERIC_NAME_PARTS:
+                    terms.add(part.lower())
+    return sorted(terms, key=len, reverse=True)
+
+
+def neutral_sentences(text: str, terms: list) -> str:
+    kept = []
+    for sentence in re.split(r"(?<=[.!?;])\s+", text.strip()):
+        lowered = sentence.lower()
+        if not sentence or SELECTION_WORD.search(sentence) or any(
+                re.search(r"(?<![\w-])" + re.escape(term) + r"(?![\w-])", lowered) for term in terms):
+            continue
+        kept.append(sentence)
+    return " ".join(kept)
+
+
+def withhold_prose(packet: dict) -> dict:
+    terms = candidate_terms(packet)
+    reduced = []
+    for field in PROSE_FIELDS:
+        value = packet.get(field)
+        if isinstance(value, str):
+            kept = neutral_sentences(value, terms)
+        elif isinstance(value, list):
+            kept = [item for item in (neutral_sentences(str(entry), terms) for entry in value) if item]
+        else:
+            continue
+        if kept != value:
+            reduced.append(field)
+        packet[field] = kept
+    if not packet.get("requirement"):
+        packet["requirement"] = NEUTRAL_REQUIREMENT
+    if reduced:
+        withheld = list(packet.get("withheld", []))
+        label = ("sentences of requirement, limitations and existing_overturn_when that name a candidate or use a "
+                 "selection word")
+        if label not in withheld:
+            withheld.append(label)
+        packet["withheld"] = withheld
+    return packet
+
+
 def withhold_labels(packet: dict) -> dict:
     """Drop decision-bearing labels from a built packet (candidate review_status and the
     attached decisions' selection and review_status) and record what was withheld."""
@@ -657,6 +723,7 @@ def build_all_packets(root: Path, *, catalogs: list, seed: str, checked_at: str,
                 # Every packet, manifest-mode trading packets included, loses popularity and
                 # recency signals; the default (no --withhold-labels) build is unchanged.
                 packet = withhold_popularity(packet)
+                packet = withhold_prose(packet)
             if gap_index is not None:
                 packet["gap_receipts"] = gap_index.get((catalog, row["layer_id"]), [])
                 packet["gap_receipts_note"] = GAP_RECEIPTS_NOTE

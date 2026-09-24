@@ -17,6 +17,7 @@ import json
 import os
 import re
 import shlex
+import shutil
 import tempfile
 import unittest
 from pathlib import Path
@@ -858,6 +859,20 @@ class IsolatedCodexHomeTests(CodexLaneFixture):
                 mock.patch.object(codex_lane.subprocess, "run", side_effect=fake_run):
             codex_lane.run_attempt(["codex", "exec"], 5)
         self.assertEqual(seen["env"]["CODEX_HOME"], str(home))
+
+    def test_the_home_is_recreated_without_leftovers_and_a_dry_run_writes_none(self):
+        # Codex review of #145: a leftover AGENTS.md in codex-home would be loaded; a dry run writes nothing.
+        home = self.work_dir / "codex-home"
+        home.mkdir()
+        (home / "AGENTS.md").write_text("# leftover instructions", encoding="utf-8")
+        codex_lane.isolated_codex_home(self.work_dir)
+        self.assertFalse((home / "AGENTS.md").exists())
+        shutil.rmtree(home)
+        self.write_packet("foundation", "native-clients")
+        with mock.patch.object(codex_lane, "CHILD_CODEX_HOME", None), \
+                contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+            self.run_lane(["--dry-run"])
+        self.assertFalse(home.exists())
 
     def test_a_blind_run_sets_the_isolated_home(self):
         self.write_packet("foundation", "native-clients")

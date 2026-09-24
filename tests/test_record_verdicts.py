@@ -1720,7 +1720,7 @@ class NewWaveLaneIdentityTests(NewWaveFixture):
 
     def test_a_symlinked_lane_root_binds_like_its_resolved_path(self):
         # Re-review L1: record_verdicts resolves --lane-repo-root as adjudicate records it.
-        scratch = Path(tempfile.mkdtemp())
+        scratch = Path(tempfile.mkdtemp()).resolve()  # macOS: /var/folders resolves to /private/var/folders
         self.addCleanup(shutil.rmtree, scratch)
         real = scratch / "hosts" / "blind" / "export"
         real.mkdir(parents=True)
