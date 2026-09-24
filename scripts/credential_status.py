@@ -295,7 +295,8 @@ def claude_guard_booleans(claude_dir: Path) -> dict | None:
             "claude_telemetry_logs_content": telemetry["logs_content"],
             "claude_telemetry_content_flags": telemetry["flags"],
         }
-    except (OSError, ValueError, AttributeError):
+    except (OSError, ValueError, AttributeError, TypeError):
+        # TypeError: well-formed JSON whose fields have the wrong type (e.g. deny = 3).
         return None
 
 

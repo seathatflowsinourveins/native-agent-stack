@@ -236,12 +236,26 @@ class CredentialStatusTests(unittest.TestCase):
         for args in ((), ("--json",), ("--client-guards",), ("--json", "--client-guards")):
             with self.subTest(args=args), patch.dict(self.env, exported):
                 result = self.run_cli(*args)  # run_cli asserts both fake values are absent
-                self.assertIn(result.returncode, (0, 1), result.stderr)
+                # The store is safe (0600 in 0700), so the verdict is 0; the exported
+                # must-not-be-set name is reported by name, never by value.
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertNotIn("Traceback", result.stderr)
+                self.assertIn("APCA_API_KEY_ID", result.stdout)
+                if "--json" not in args:
+                    self.assertIn("result: ", result.stdout)
+                    if "--client-guards" in args:
+                        self.assertIn("client guards: ", result.stdout)
                 if "--json" in args:
                     report = json.loads(result.stdout)
                     if "--client-guards" in args:
                         self.assertTrue(cs.only_booleans(report["client_guards"]))
                         self.assertTrue(report["client_guards"]["claude_telemetry_logs_content"])
+
+    def test_wrong_type_settings_fields_do_not_crash(self):
+        claude = self.home / ".claude"
+        claude.mkdir(exist_ok=True)
+        (claude / "settings.json").write_text(json.dumps({"permissions": {"deny": 3}, "hooks": {"PreToolUse": 7}}))
+        self.assertIsNone(cs.claude_guard_booleans(claude))
 
     def test_settings_env_is_reduced_to_key_names(self):
         present, enabled = cs.enabled_names({"SOME_PROVIDER_VALUE": self.fake_a, "OFF": "0", 3: "x"})
