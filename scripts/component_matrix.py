@@ -249,8 +249,11 @@ def build_alternative(alternative: dict, repo_to_component: dict[str, str], rece
     if isinstance(component_id, str):
         component_bucket = receipts_summary.get("components", {}).get(component_id)
         if component_bucket:
+            # Only a reviewed use-stage pass verifies an alternative on a host, as it alone supports accepted for
+            # a winner (platform_status.ACCEPTING_STAGES; #164 review, item 2); an install-only pass is recorded.
             any_reviewed = any(
-                (platform_bucket or {}).get("independently_reviewed_native_proven_pass_stages")
+                platform_evidence.ACCEPTING_STAGES.intersection(
+                    (platform_bucket or {}).get("independently_reviewed_native_proven_pass_stages") or ())
                 for platform_bucket in component_bucket.get("platforms", {}).values()
             )
             e2e_state = "host_verified" if any_reviewed else "receipts_recorded"

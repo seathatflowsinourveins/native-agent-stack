@@ -9418,8 +9418,8 @@
     },
     {
       "path": "docs/contributing-evidence.md",
-      "sha256": "ef76b3551da1fe4644076e85de722b91431debf5f0acd9b23610159e462a104c",
-      "bytes": 23994
+      "sha256": "e5f7334b8be666b2be4c9374fa460d487a9e2f26c2dd56d7841ae5760dcf2ffe",
+      "bytes": 24922
     },
     {
       "path": "docs/convergence-architecture.md",
@@ -28228,13 +28228,13 @@
     },
     {
       "path": "scripts/component_matrix.py",
-      "sha256": "f2c838745c96dd9d35462e4aa12e16bfdc652ef34cf56a1ac211f1add95072d3",
-      "bytes": 26158
+      "sha256": "b1fa0f762d2bc39a062b23eb93c88ff1a650f0d2bbc9f85cfa2feaa718c66c4b",
+      "bytes": 26462
     },
     {
       "path": "scripts/host_receipts.py",
-      "sha256": "907c8c37a0918bad890647cf4ce450250c9823b816c50e62122f45f320f729ce",
-      "bytes": 61199
+      "sha256": "fe501e7cb51a7740493dc809eaa273577a6fba7c6890877305b3290468f39f9b",
+      "bytes": 63892
     },
     {
       "path": "scripts/landscape.py",
@@ -28253,8 +28253,8 @@
     },
     {
       "path": "scripts/platform_status.py",
-      "sha256": "69a9d3846060ff46c67db3aba8ce5e4ed49cd0b20fbeb8c50389087810a97ac6",
-      "bytes": 11247
+      "sha256": "b45a62e4babb37d0ef8e1ab9b8e5759e08d38ba6e7bc491bb70939fe00fe6d04",
+      "bytes": 11399
     },
     {
       "path": "scripts/recount-tokens.cjs",
@@ -28508,8 +28508,8 @@
     },
     {
       "path": "tests/test_component_matrix.py",
-      "sha256": "552c45bc589eee7937c231602eafcea181340b05864f70efecf8cbe5ff3ef05b",
-      "bytes": 24271
+      "sha256": "c2bdbacd7e48f268adbf9b6df3fe24811ca6a085dd7f01d846ffc0cb994bb12e",
+      "bytes": 25175
     },
     {
       "path": "tests/test_convergence_contract.py",
@@ -28608,8 +28608,8 @@
     },
     {
       "path": "tests/test_host_receipts.py",
-      "sha256": "99cea6e3a7aea9be0c8e65bd51d7956e5779870681bb742460ea6e3004d10c4a",
-      "bytes": 69997
+      "sha256": "d42c02a93e3eab16d4bf5226535c2c42b16ebc9ff62fbd15763dd67bc73f0ded",
+      "bytes": 72942
     },
     {
       "path": "tests/test_ibkr_acceptance.py",
@@ -28633,8 +28633,8 @@
     },
     {
       "path": "tests/test_landscape.py",
-      "sha256": "23c920916e72deb0143d76058507cd50b2b800d031f508508360cb7d578a5d18",
-      "bytes": 77628
+      "sha256": "bbb15581188b795aadd6823374d2bd406a93291454c3147776a4f5a52b1a0fc0",
+      "bytes": 77642
     },
     {
       "path": "tests/test_layer_verdicts.py",
@@ -28743,8 +28743,8 @@
     },
     {
       "path": "tests/test_platform_status.py",
-      "sha256": "6a3344efd10af2d446ff70f90c1a1606b13dcbbfe6f79e50fc10a6e8d9f82b74",
-      "bytes": 17508
+      "sha256": "52bdf487d1a407df0cf36037cac3fca4005bdbf1efb2a1cd7915c404b95e08e5",
+      "bytes": 19891
     },
     {
       "path": "tests/test_point_in_time.py",

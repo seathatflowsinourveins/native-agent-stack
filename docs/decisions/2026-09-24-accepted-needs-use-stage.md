@@ -4,7 +4,9 @@
 the #145 independent reviewer; branch `claude/platform-status-use-stage-20260924` (base `origin/main@4a4c8a28`).
 
 **Scope:** `scripts/platform_status.py` (the one function every derived `platform_status` goes through),
-`docs/contributing-evidence.md` §5, `tests/test_platform_status.py`. No verdict data changes here.
+`scripts/host_receipts.py` (what a `use` receipt must run), `scripts/component_matrix.py`,
+`scripts/verdict_flip_candidates.py`, `docs/contributing-evidence.md` §2, §3 and §5, and their tests. No
+verdict data changes here.
 
 ## Decision
 
@@ -37,10 +39,27 @@ fail at either stage still blocks, as before.
 
 ## Comparison that would overturn it
 
-A component whose `use` stage cannot be exercised headlessly on a platform, where a reviewed install
-receipt is the strongest honest evidence available. Such a component stays `conditional` with this reason
-recorded; if the catalog needs it `accepted`, a dated record naming that component and the headless
-limitation reopens this rule for it.
+A measured comparison showing that install evidence predicts use would overturn the rule. It needs at
+least 10 winners, each with a reviewed install pass and a reviewed functional use receipt recorded on a
+second physical machine, and no use receipt failing after its install passed. That result would show the
+use stage adds no information and would restore install-stage acceptance. A single use fail after a
+reviewed install pass keeps the rule.
+
+For a component whose `use` stage cannot run headlessly on a platform, where a reviewed install receipt is
+the strongest honest evidence, the comparison is per component. A dated record names the component, the
+headless limitation, and a manual or scripted functional check whose reviewed pass stands in for `use`. It
+does not reopen install-stage acceptance for other components.
+
+## Follow-up (2026-09-24, #164 review items 1-5)
+
+- `use` is defined in `docs/contributing-evidence.md` §2 as the component doing its job. A help or version
+  call is never `use`: `host_receipts.py record` refuses `--stage use` when every command is one, `validate`
+  rejects such a receipt, and the receipt summary counts one as `install`, so its pass supports
+  `conditional` at most and its fail still blocks. The documented recording examples pass a functional
+  `--cmd`, because the stack.json commands for `ccusage` and `agentsview` are `--help` calls.
+- `component_matrix.build_alternative` marks an alternative `host_verified` only on a reviewed use pass.
+- `QUALIFYING_STAGES` is renamed `BLOCKING_STAGES`, and `verdict_flip_candidates.py` reports
+  `supporting_receipts`.
 
 ## Limits
 

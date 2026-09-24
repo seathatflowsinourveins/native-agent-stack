@@ -1207,6 +1207,57 @@ class QualifiedModelSchemaSyncTests(unittest.TestCase):
         self.assertNotIn("qualified_models", self.schema["required"])
 
 
+class UseStageMeansFunctionTests(unittest.TestCase):
+    """#164 review, item 1: a ``use`` receipt exercises the component's function; help and version calls are an
+    install check, so they can never make a reviewed use pass (the route to ``accepted``)."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.root = Path(self.tmp.name)
+        _init_support_tree(self.root)
+
+    def _record(self, stage: str, commands: list[str]) -> tuple[int, str]:
+        buffer = io.StringIO()
+        with contextlib.redirect_stdout(buffer):
+            exit_code = _run_cli([
+                "record", "--root", str(self.root), "--host-id", "test-host-20260101",
+                "--platform-id", "linux-wsl2-x86_64", "--os", "linux", "--architecture", "x86_64",
+                "--component-id", "widget", "--stage", stage, "--evidence-class", "synthetic",
+                *[argument for command in commands for argument in ("--cmd", command)]])
+        return exit_code, buffer.getvalue()
+
+    def test_the_classifier(self):
+        for command in ("ccusage --help", "agentsview --help", "gh --version", "uv version", "git help",
+                        "ccusage --help | head -5", "X=1 codex --version && rtk --version"):
+            self.assertTrue(hr.informational_command(command), command)
+        for command in ("ccusage daily --json", "rg -n foo .", "python3 -m pytest -q", "cat x | jq .",
+                        "echo hi", "codex --version && codex exec 'say ok'"):
+            self.assertFalse(hr.informational_command(command), command)
+
+    def test_record_refuses_a_use_stage_of_only_help_and_version_calls(self):
+        marker = self.root / "ran.marker"
+        exit_code, output = self._record("use", ["true --help", f"touch {marker} --version"])
+        self.assertEqual(exit_code, 2, output)
+        self.assertIn("help or version", output)
+        self.assertFalse(marker.exists(), "a command ran before the refusal")
+        self.assertEqual(list((self.root / "evidence" / "hosts").rglob("*.json")), [])
+
+    def test_help_calls_record_as_install_and_a_functional_command_as_use(self):
+        self.assertEqual(self._record("install", ["true --help"])[0], 0)
+        self.assertEqual(self._record("use", ["true --version", "echo hi"])[0], 0)
+
+    def test_validate_rejects_a_hand_written_help_only_use_receipt(self):
+        self.assertEqual(self._record("use", ["echo hi"])[0], 0)
+        path = next((self.root / "evidence" / "hosts").rglob("*.json"))
+        receipt = json.loads(path.read_text(encoding="utf-8"))
+        receipt["commands"][0]["cmd"] = "widget --help"
+        errors: list[str] = []
+        hr.validate_receipt_cross_references(self.root, path.parent.name, path, receipt, errors, set(), set(), set(),
+                                             {})
+        self.assertTrue(any("help or version" in error for error in errors), errors)
+
+
 class QualifiedModelRecordTests(unittest.TestCase):
     """scripts/host_receipts.py record --qualified-model / --qualified-models-file."""
 

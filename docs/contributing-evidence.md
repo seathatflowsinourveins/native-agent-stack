@@ -97,6 +97,18 @@ does not, by itself, move a platform from `drafted_not_accepted` to
 `accepted` — that requires a receipt recorded on a real second physical
 machine (`host.second_physical_machine: true`), independently reviewed.
 
+Every receipt also names one `stage`. Two decide a platform status:
+
+- **`install`** shows the component is present and starts: a `--help` or
+  `--version` call, a package query or a first launch. On its own, a
+  reviewed install pass supports `conditional` at most.
+- **`use`** shows the component doing its job on this host: it reads or
+  writes real input, answers a query, runs a workload or serves a request.
+  A help or version call is never `use`: `host_receipts.py record` refuses
+  `--stage use` when every command is one, and `validate` rejects such a
+  receipt. Among receipts, only a reviewed `use` pass supports
+  `accepted` (Section 5).
+
 ## 3. The flow
 
 1. **Bootstrap, then work on current `main`.** Follow
@@ -129,7 +141,7 @@ machine (`host.second_physical_machine: true`), independently reviewed.
      --component-id <a manifests/stack.json component id> \
      --stage use \
      --evidence-class native_proven \
-     --from-stack-commands
+     --cmd "<a command that makes the component do its job>"
    ```
 
    From a Codex session, a human shell or CI (generate the token once per
@@ -144,7 +156,7 @@ machine (`host.second_physical_machine: true`), independently reviewed.
      --stage use \
      --evidence-class native_proven \
      --identity "$identity" \
-     --from-stack-commands
+     --cmd "<a command that makes the component do its job>"
    ```
 
    `--host-id` must match `^[a-z0-9-]+-[0-9]{8}$` (lowercase, digits,
@@ -160,7 +172,10 @@ machine (`host.second_physical_machine: true`), independently reviewed.
    filesystem path segment cannot contain. `--from-stack-commands` reuses the
    component's own documented command(s) from `manifests/stack.json`; add
    explicit `--cmd "<shell command>"` flags (repeatable) instead or in
-   addition when you need a different check. Pass `--second-physical-machine`
+   addition when you need a different check. Those documented commands are
+   often only `--help` or `--version` checks (for example `ccusage --help`):
+   record them as `--stage install`, and pass a functional `--cmd` for
+   `--stage use` (Section 2). Pass `--second-physical-machine`
    only when this really is a second physical machine, not a fresh prefix or
    container on the catalog's existing authoring host — a receipt recorded
    without this flag can never satisfy the `component_matrix.py` macOS flip

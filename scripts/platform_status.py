@@ -53,8 +53,9 @@ except ImportError:  # running as a plain script, not a package
 
 PLATFORMS = ("linux-wsl2-x86_64", "macos-arm64")
 STATUS_RANK = {"untested": 0, "not_established": 0, "conditional": 1, "accepted": 2}
-# Stages whose latest native_proven fail blocks acceptance.
-QUALIFYING_STAGES = frozenset({"install", "use"})
+# Stages whose latest native_proven fail blocks acceptance; their reviewed passes support accepted only at an
+# ACCEPTING_STAGES stage and conditional otherwise (renamed from QUALIFYING_STAGES, #164 review, item 4).
+BLOCKING_STAGES = frozenset({"install", "use"})
 # Stages whose independently reviewed pass can make a winner accepted: a functional use only. An install pass (a
 # version call proves the binary resolves, not that the component does its layer's job) supports conditional at
 # most (docs/decisions/2026-09-24-accepted-needs-use-stage.md).
@@ -121,7 +122,7 @@ def platform_status(platform_id: str, winner: dict, context: StatusContext) -> P
              if entry.get("shape_ok") and entry.get("platform_identity_ok")
              and pin_matches(entry.get("component_version"), pin)]
     native_stage = [entry for entry in bound
-                    if entry.get("evidence_class") == "native_proven" and entry.get("stage") in QUALIFYING_STAGES]
+                    if entry.get("evidence_class") == "native_proven" and entry.get("stage") in BLOCKING_STAGES]
     latest_per_host_stage: dict[tuple, tuple] = {}
     # Only pass and fail decide; a later partial or not_runnable receipt neither clears a fail nor
     # withdraws a pass.
