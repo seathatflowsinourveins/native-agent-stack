@@ -1,0 +1,33 @@
+{
+ "schema_version": 1,
+ "id": "source-review-microsoft-rd-agent",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/microsoft/RD-Agent",
+ "reviewed_commit": "484776c211e4fbbeef03e0ec00d6bbee7362a4f4",
+ "readme_path": "README.md",
+ "license": "MIT",
+ "layers": [
+  "research-factors-ml"
+ ],
+ "claim": "Source and documentation review of microsoft/RD-Agent at commit 484776c211e4fbbeef03e0ec00d6bbee7362a4f4 (license MIT), read from README.md at that commit. Repository description: \"Research and development (R&D) is crucial for the enhancement of industrial productivity, especially in the AI era, where the core aspects of R&D are mainly focused on data and models. We are committed to automating these high-value generic R&D processes through R&D-Agent, which lets AI drive data-driven AI. \\ud83d\\udd17https://aka.ms/RD-Agent-Tech-Report\". Reviewer summary of the upstream documentation: Microsoft's official multi-agent framework for automating research-and-development loops; its RD-Agent(Q) scenario is described in its own README as 'the first data-centric, multi-agent framework designed to automate the full-stack research and development of quantitative strategies via coordinated factor-model co-optimization,' built directly on top of Qlib, with dedicated commands (fin_quant, fin_factor, fin_model, fin_factor_report).",
+ "documentation_excerpts": [
+  {
+   "source": "README.md@484776c211e4fbbeef03e0ec00d6bbee7362a4f4",
+   "text": "Agent\u00b2 RL-Bench evaluates whether LLM agents can autonomously engineer end-to-end post-training pipelines, spanning static optimization and stateful online RL."
+  },
+  {
+   "source": "README.md@484776c211e4fbbeef03e0ec00d6bbee7362a4f4",
+   "text": "MLE-bench is a comprehensive benchmark evaluating the performance of AI agents on machine learning engineering tasks. Utilizing datasets from 75 Kaggle competitions, MLE-bench provides robust assessments of AI systems' capabilities in real-world ML engineering scenarios."
+  }
+ ],
+ "limitations": [
+  "Source and documentation review at the pinned commit only: not installed, executed, benchmarked or compared with any other component.",
+  "The description and excerpts are the upstream project's own words at that commit; the reviewer summary was written by a research agent and checked by an independent fit review. Both are upstream claims, not measured results."
+ ],
+ "sources": [
+  "https://github.com/microsoft/RD-Agent/tree/484776c211e4fbbeef03e0ec00d6bbee7362a4f4",
+  "https://github.com/microsoft/RD-Agent/blob/484776c211e4fbbeef03e0ec00d6bbee7362a4f4/README.md",
+  "https://github.com/microsoft/RD-Agent"
+ ]
+}

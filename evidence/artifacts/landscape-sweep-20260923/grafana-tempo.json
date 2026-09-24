@@ -1,0 +1,35 @@
+{
+ "schema_version": 1,
+ "id": "source-review-grafana-tempo",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/grafana/tempo",
+ "reviewed_commit": "e2c16d6e4d7e03120b31f56ccb0ed3d5788db91f",
+ "readme_path": "README.md",
+ "license": "AGPL-3.0",
+ "layers": [
+  "observation-inference"
+ ],
+ "claim": "Source and documentation review of grafana/tempo at commit e2c16d6e4d7e03120b31f56ccb0ed3d5788db91f (license AGPL-3.0), read from README.md at that commit. Repository description: \"Grafana Tempo is a high volume, minimal dependency distributed tracing backend.\". Reviewer summary of the upstream documentation: Grafana Labs' open-source, object-storage-backed distributed tracing backend. Requirement part it addresses (observation-inference): Requirement: 'Observe real native usage/service outcomes through one privacy-filtered local pipeline...'. Tempo is the trace-signal component of that pipeline;",
+ "documentation_excerpts": [
+  {
+   "source": "README.md@e2c16d6e4d7e03120b31f56ccb0ed3d5788db91f",
+   "text": "Grafana Tempo is an open source, easy-to-use, and high-scale distributed tracing backend."
+  },
+  {
+   "source": "README.md@e2c16d6e4d7e03120b31f56ccb0ed3d5788db91f",
+   "text": "Distributed tracing helps teams quickly pinpoint performance issues and understand the flow of requests across services. The Traces Drilldown UI simplifies this process by offering a user-friendly interface to view and analyze trace data, making it easier to identify and resolve issues without needing to write complex queries."
+  }
+ ],
+ "limitations": [
+  "Source and documentation review at the pinned commit only: not installed, executed, benchmarked or compared with any other component.",
+  "The description and excerpts are the upstream project's own words at that commit; the reviewer summary was written by a research agent and checked by an independent fit review. Both are upstream claims, not measured results."
+ ],
+ "sources": [
+  "https://github.com/grafana/tempo/tree/e2c16d6e4d7e03120b31f56ccb0ed3d5788db91f",
+  "https://github.com/grafana/tempo/blob/e2c16d6e4d7e03120b31f56ccb0ed3d5788db91f/README.md",
+  "https://grafana.com/oss/tempo/",
+  "https://signoz.io/blog/jaeger-vs-tempo/",
+  "https://www.dash0.com/comparisons/open-source-distributed-tracing-tools"
+ ]
+}

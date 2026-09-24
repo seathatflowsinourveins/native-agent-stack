@@ -1,0 +1,33 @@
+{
+ "schema_version": 1,
+ "id": "source-review-lightgbm-org-lightgbm",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/lightgbm-org/LightGBM",
+ "reviewed_commit": "9149cae965332053e82c8d85afe71374662a3185",
+ "readme_path": "README.md",
+ "license": "MIT",
+ "layers": [
+  "research-factors-ml"
+ ],
+ "claim": "Source and documentation review of lightgbm-org/LightGBM at commit 9149cae965332053e82c8d85afe71374662a3185 (license MIT), read from README.md at that commit. Repository description: \"A fast, distributed, high performance gradient boosting (GBT, GBDT, GBRT, GBM or MART) framework based on decision tree algorithms, used for ranking, classification and many other machine learning tasks.\". Requirement part it addresses (research-factors-ml): Requirement text: \"...qualify any strategy with causal data, costs and independent reconciliation.\" LightGBM is the concrete model-fitting engine the layer's own known repositories run against the causal, point-in-time factor panel before a strategy can be qualified: Qlib's default benchmark baseline (LGBModel, and the DoubleEnsemble baseline whose base model is LGBM) and stefan-jansen/machine-learning-for-trading's ML-factor chapters both depend on it directly.",
+ "documentation_excerpts": [
+  {
+   "source": "README.md@9149cae965332053e82c8d85afe71374662a3185",
+   "text": "Light Gradient Boosting Machine ==============================="
+  },
+  {
+   "source": "README.md@9149cae965332053e82c8d85afe71374662a3185",
+   "text": "LightGBM is a gradient boosting framework that uses tree based learning algorithms. It is designed to be distributed and efficient with the following advantages:"
+  }
+ ],
+ "limitations": [
+  "Source and documentation review at the pinned commit only: not installed, executed, benchmarked or compared with any other component.",
+  "The description and excerpts are the upstream project's own words at that commit; the reviewer summary was written by a research agent and checked by an independent fit review. Both are upstream claims, not measured results."
+ ],
+ "sources": [
+  "https://github.com/lightgbm-org/LightGBM/tree/9149cae965332053e82c8d85afe71374662a3185",
+  "https://github.com/lightgbm-org/LightGBM/blob/9149cae965332053e82c8d85afe71374662a3185/README.md",
+  "https://github.com/lightgbm-org/LightGBM"
+ ]
+}

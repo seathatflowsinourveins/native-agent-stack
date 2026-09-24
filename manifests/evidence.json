@@ -8845,8 +8845,8 @@
     },
     {
       "path": "catalogs/sota-convergence/manifest-20260923.json",
-      "sha256": "af508c44366d965993bf8269d9f3152394ae53552455fb3616dd4599f67ec448",
-      "bytes": 747906
+      "sha256": "e02687288e2c122887b334014291fade4bdb3db799656e7a4a9556cc142480aa",
+      "bytes": 1072229
     },
     {
       "path": "catalogs/sota-convergence/sdk-runtime-coverage-20260922.json",
@@ -23947,6 +23947,61 @@
       "path": "evidence/artifacts/host-upgrade-20260923/upgrade-evidence.json",
       "sha256": "746b8bac3212d2a1df220db6c25b203de44208a37ea4741d352fa599d4ab884c",
       "bytes": 7401
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260923/datalab-to-marker.json",
+      "sha256": "4aa078e6e3e4d3e3332b95fd1d58aa63442edda2207e6b539c6eddab711391fb",
+      "bytes": 2383
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260923/exa-labs-exa-mcp-server.json",
+      "sha256": "1f7a4866ca45dd9d12ff19339eac627a0d9e07cf765db54db1ebd3ec0fa9aebe",
+      "bytes": 2145
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260923/github-gh-aw.json",
+      "sha256": "b92d05fb96cf8376dab347182274911346dfa51514a34376a0d576a25cf6e93b",
+      "bytes": 1748
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260923/google-osv-scanner.json",
+      "sha256": "5ba83a051383ebdc83dee26e99b960525cfcfb34d1f44d884a8d914f61638227",
+      "bytes": 1948
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260923/grafana-tempo.json",
+      "sha256": "ad0458b68275d1fdbcb4645ba16b6b8a20fb31a641e22bd840c5f6bdafc5b6cf",
+      "bytes": 2333
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260923/lightgbm-org-lightgbm.json",
+      "sha256": "d8a1a10c941678730717652074529f7ec0cb0572820362f08f12bf6c3ff1a1d7",
+      "bytes": 2361
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260923/microsoft-rd-agent.json",
+      "sha256": "198b6fd93adad5f64deb4be5278ce60f7f08aa3bdb353198b9d92dd45048ade2",
+      "bytes": 2677
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260923/opendatalab-mineru.json",
+      "sha256": "5685f37ec035c4731f15022b3fed238801634f00f790ce6558ab28e8e50c43a1",
+      "bytes": 2204
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260923/ossf-scorecard.json",
+      "sha256": "c665cbdd566b629b8eca9d6862758c2bdf08a77b14248f2218ee55d93f39ad47",
+      "bytes": 2948
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260923/renovatebot-renovate.json",
+      "sha256": "cdb7d31adb612cfa2d94db5362fa71b88d59ce7913bb99404e318243ed9ee2b8",
+      "bytes": 2989
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260923/trufflesecurity-trufflehog.json",
+      "sha256": "0850142cb2705dea092cae9812458fa4f10d5ba42b7e78df76d79b5b914a290d",
+      "bytes": 2890
     },
     {
       "path": "evidence/artifacts/layer-verdicts-20260922/adjudication-inputs/adjudication-key.json",
