@@ -6962,6 +6962,126 @@
       "bytes": 642
     },
     {
+      "path": "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-a-passed/README.md",
+      "sha256": "780618de4c11f5879c4996843a6552824a0803ec00c549346fbf474f84ea9705",
+      "bytes": 5713
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-a-passed/frozen-6f7a77c.SHA256SUMS",
+      "sha256": "80b3d1651a0ea8a4d189cdad7cca2796291c98f6ee5693f1c95baf84299dd033",
+      "bytes": 70663
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-a-passed/gate-result.json",
+      "sha256": "f1848442f2b84090eba5343369eb39fc4fadc0f5850b21fd2cdb8a36f50eab4a",
+      "bytes": 1479
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-a-passed/ingest-receipt.json",
+      "sha256": "ce9ba580593db24b4dd2c88ee046f3d139a03c5bbcb865520b50b7b271a6b043",
+      "bytes": 630
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-a-passed/ledger-readback.json",
+      "sha256": "30bcab3f4367535c42f8655921119f4bd91a40c5f7099d8c27776da1a3d96940",
+      "bytes": 28520
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-a-passed/ledger_readback.py",
+      "sha256": "af420b01b00ac4c11f6b02ca5c9d82b60a11a5ed9c63c7f42e00400b5895ec1a",
+      "bytes": 5769
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-a-passed/macos_timeout.py",
+      "sha256": "65dc7fc714b8f24466408ee30edc184623cf2e4b2d33fc4d276655f2c1a4a8cf",
+      "bytes": 1001
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-a-passed/paper-output.json",
+      "sha256": "fefb99c179ff30442a8a0425f3011f27b498f797ccf4e764186fccae1ada53bf",
+      "bytes": 90432
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-a-passed/preflight.json",
+      "sha256": "42c4bd86cb5efb08f9858c541f1999405fb319ff5556ca7b0a2a5afbc3500255",
+      "bytes": 6485
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-a-passed/scheduled-trial.log",
+      "sha256": "d3bd8789828d04fbf45fc1ced3e240e9a39d8fcbf030abde7162adedfb251062",
+      "bytes": 536
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-a-passed/verify_artifacts.py",
+      "sha256": "6b1a09762119fa622e5e554306d774b399f4f9dbfabac1e4f5aa489855c5b1d2",
+      "bytes": 7474
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-b-stop-drill/README.md",
+      "sha256": "13d2510c21c4171e149046791c3654f7de6a55793fffe52556da3940acb53309",
+      "bytes": 3562
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-b-stop-drill/events.jsonl",
+      "sha256": "076e3792f280398f47d343d6e7792c4901945faf9838694e21103d56aa6f72aa",
+      "bytes": 5502
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-b-stop-drill/gate-result.json",
+      "sha256": "6d5662bc5891942b12fed5be800a7e9236aa9b5062b997f676781bf0dd99249e",
+      "bytes": 1479
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-b-stop-drill/ingest-receipt.json",
+      "sha256": "569ba0d109d94ccd7b0f52657412f991ba2be0aa968721dbbc6e969f2fb6531f",
+      "bytes": 630
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-b-stop-drill/ledger-readback.json",
+      "sha256": "d8a3d601aa553f7aa100fc93501f78093ab06bfe7f89dccc0edd836245ff6502",
+      "bytes": 1396
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-b-stop-drill/paper-output.json",
+      "sha256": "9d18c6fa3cb9e015e7ed8bb529c5f0a33d69dfce9888127c222ded50c4abc939",
+      "bytes": 19729
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-b-stop-drill/recover-output.json",
+      "sha256": "26914126559aad8a50aa466b8df76cf379bb017fc5f726020c3c196ef3ceb052",
+      "bytes": 9386
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-b-stop-drill/scheduled-trial.log",
+      "sha256": "bc94a39d8a48a44ecc3800b297aca8e55f19f6faf4271ae0f3db2d75fa157b36",
+      "bytes": 554
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-b-stop-drill/stop-drill-trigger.json",
+      "sha256": "3ba327c2b2fa4b7c8af33ff1df85ca1095f591927ccce53b9e841b194ba76f11",
+      "bytes": 743
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-b-stop-drill/stop-release.json",
+      "sha256": "febd9747833f008afbf92a335a2264d684c425ffdc9a158db632ef1e11a08647",
+      "bytes": 674
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-b-stop-drill/stop_drill.py",
+      "sha256": "e3856af86ebb9e311cda030f61530434300f6f6d80c529fdfa50ef7ec7c23675",
+      "bytes": 3871
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-native-faults/README.md",
+      "sha256": "51b44f362e66f1351ec03dccd63fc836ef90490187d29baba40ffdf76485b5fd",
+      "bytes": 2106
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-native-faults/receipt.json",
+      "sha256": "c89d4a839bb6e9601ab29510474ef021f62b1522a60bf341a6031f5ae8b12978",
+      "bytes": 5186
+    },
+    {
       "path": "blueprints/us-equities/alpaca-historical/README.md",
       "sha256": "09d916f81d869a242e9c6d174f55d651deb7812e2e9d8cd6d108b00c6834576e",
       "bytes": 9126
@@ -27355,6 +27475,11 @@
       "path": "evidence/artifacts/usage-report.source.txt",
       "sha256": "e5ba2fc9e397b97888a4929069434321e4ea17ea298a536ae20360638a304d50",
       "bytes": 11763
+    },
+    {
+      "path": "evidence/hosts/macos-m5pro-20260924/macos-m5pro-20260924--alpaca-py--use--20260924.json",
+      "sha256": "2a4e6642e9d1d6f08cc0f062fea291e218bfccb8ccc2b2c020078dc9fc933e8c",
+      "bytes": 8721
     },
     {
       "path": "evidence/hosts/macos-m5pro-20260924/macos-m5pro-20260924--nautilus-trader--use--20260924.json",
