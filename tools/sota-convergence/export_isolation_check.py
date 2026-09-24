@@ -371,6 +371,9 @@ def packet_role_label_hits(report: dict) -> list:
 
 
 PROSE_SUFFIXES = (".md", ".markdown", ".txt", ".rst")
+# JSON string values are prose a lane reads too: a receipt's "claim" stated that the selected components included a
+# winner while the measure read only Markdown (Codex review of #145 at 68e74f2c, P1).
+JSON_SUFFIXES = (".json", ".jsonl")
 _BLOCK_START = re.compile(r"^\s*(?:[-*+]\s|\d+[.)]\s|#{1,6}\s|>|\|)")
 # A table header cell that states a selection makes each body row a selection statement (round 7, BL7-1:
 # "| Layer | Selected native practice |" over "| Web research | Tavily, ..., OpenResearch |").
@@ -420,6 +423,24 @@ def prose_statements(text: str):
                 yield sentence, False
 
 
+def json_prose_statements(text: str, suffix: str):
+    """prose_statements over every string value of a JSON document (or of each JSON Lines record); a document that
+    does not parse is read as prose."""
+    here = str(Path(__file__).resolve().parent)
+    if here not in sys.path:
+        sys.path.insert(0, here)
+    from blind_checkout import _string_values
+    try:
+        documents = ([json.loads(line) for line in text.splitlines() if line.strip()] if suffix == ".jsonl"
+                     else [json.loads(text)])
+    except ValueError:
+        yield from prose_statements(text)
+        return
+    for document in documents:
+        for value in _string_values(document):
+            yield from prose_statements(value)
+
+
 # An imperative choice right before a winner's name ("Retain skfolio 1.2.9", "Keep Serena for symbols").
 IMPERATIVE_CHOICE = re.compile(r"(?:^|[|.;:]\s*)\s*(?:retain|keep|select|choose|adopt|prefer)\s+(?:the\s+)?", re.I)
 IMPERATIVE_REACH = 30
@@ -453,7 +474,8 @@ def _statement_exposes(statement: str, choice_headed: bool, winners, others) -> 
 
 
 def prose_exposure(export_dir: Path, packets_dir: Path, winners: dict, packet_keys: dict = None) -> dict:
-    """layer -> {"scored", "cited_files", "export_files"}: the exported prose files holding a statement that tells
+    """layer -> {"scored", "cited_files", "export_files"}: the exported prose and JSON files (their string values,
+    json_prose_statements) holding a statement that tells
     the layer's winners apart from its adopted non-winners (_statement_exposes), among the files its packet cites
     (directly or through a cited JSON file) and across the whole export, which a lane may also search. A layer
     whose winners are not among its adopted candidates is not scored. Exported prose is never rewritten (round 6,
@@ -466,8 +488,13 @@ def prose_exposure(export_dir: Path, packets_dir: Path, winners: dict, packet_ke
     export_dir = Path(export_dir)
     statements = {}
     for path in sorted(export_dir.rglob("*")):
-        if path.is_file() and path.suffix.lower() in PROSE_SUFFIXES:
+        if not path.is_file():
+            continue
+        suffix = path.suffix.lower()
+        if suffix in PROSE_SUFFIXES:
             statements[path] = list(prose_statements(path.read_text(encoding="utf-8", errors="replace")))
+        elif suffix in JSON_SUFFIXES:
+            statements[path] = list(json_prose_statements(path.read_text(encoding="utf-8", errors="replace"), suffix))
     packets = {}
     for packet_file in sorted(Path(packets_dir).glob("*__*.json")):
         packets[packet_file.stem.replace("__", "::", 1)] = json.loads(packet_file.read_text(encoding="utf-8"))

@@ -882,6 +882,37 @@ class RealExportIsolationTests(unittest.TestCase):
                                                        "export_files": ["docs/a.md", "docs/c.md"]})
         self.assertFalse(isolation.prose_exposure(export, packets, {})["foundation::layer"]["scored"])
 
+    def test_prose_exposure_reads_json_string_values(self):
+        # Codex review of #145 at 68e74f2c (P1): a receipt's "claim" said the selected components included a winner,
+        # and the measure read only Markdown. JSON and JSON Lines string values are statements too; keys are not,
+        # and a document that does not parse is read as prose.
+        isolation = load_module("export_isolation_check", "export_isolation_check.py")
+        scratch = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, scratch)
+        packets, export = scratch / "packets", scratch / "export"
+        (export / "evidence").mkdir(parents=True)
+        packets.mkdir()
+        (packets / "foundation__layer.json").write_text(json.dumps({"candidates": [
+            {"key": "c1", "name": "Worktrunk", "repository": "https://github.com/acme/worktrunk", "adopted": True,
+             "evidence_refs": ["evidence/receipt.json"]},
+            {"key": "c2", "name": "Absorb", "repository": "https://github.com/acme/absorb", "adopted": True}]}),
+            encoding="utf-8")
+        winners = {"foundation::layer": [("github.com/acme/worktrunk", "")]}
+        claim = ("Previously executed native functional operations are now linked to selected components: "
+                 "Worktrunk disposable worktree lifecycle and a local guard.")
+        (export / "evidence" / "receipt.json").write_text(json.dumps({"exit_code": 0, "claim": claim}),
+                                                          encoding="utf-8")
+        (export / "evidence" / "log.jsonl").write_text(json.dumps({"n": 1}) + "\n" + json.dumps({"note": claim})
+                                                       + "\n", encoding="utf-8")
+        (export / "evidence" / "broken.json").write_text("{ not json: " + claim, encoding="utf-8")
+        (export / "evidence" / "keys.json").write_text(json.dumps({claim: 1, "tool": "Worktrunk"}), encoding="utf-8")
+        (export / "evidence" / "keys.jsonl").write_text(json.dumps({"n": 1}) + "\n" + json.dumps({claim: 2}) + "\n",
+                                                        encoding="utf-8")
+        report = isolation.prose_exposure(export, packets, winners)
+        self.assertEqual(report["foundation::layer"], {
+            "scored": True, "cited_files": ["evidence/receipt.json"],
+            "export_files": ["evidence/broken.json", "evidence/log.jsonl", "evidence/receipt.json"]})
+
     def test_an_exact_component_id_picks_one_of_two_candidates_of_one_repository(self):
         # Codex review of #145 at 68e74f2c: alpaca-py and data-alpaca-py share alpacahq/alpaca-py, and normalizing
         # both to alpaca-py made a verdict for one match both.

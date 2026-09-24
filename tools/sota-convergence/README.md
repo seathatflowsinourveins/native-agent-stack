@@ -1164,7 +1164,12 @@ per layer (round 6, below). Measured on the allowlisted 2026-09-23 export (633 f
 source) at round 7, it still carries:
 - **Choice prose.** Counting only statements that tell a layer's winners apart from its adopted non-winners
   (round 7, BL7-1), 13 cited prose files expose 18 of the 30 scored layers (`prose_exposed_layers`), and across
-  the whole export, which a lane may also search, 28 of the 30 are reachable (`prose_reachable_layers`).
+  the whole export, which a lane may also search, 28 of the 30 are reachable (`prose_reachable_layers`). Since
+  the Codex review of 68e74f2c (P1) the measure also reads JSON and JSON Lines string values (a receipt's
+  `claim` named a git-github-automation winner among "selected components"). On a 2026-09-24 export of this
+  branch (639 files, 429 of them JSON) that raises the cited count to 19 files exposing 21 of the 30 layers
+  (git-github-automation, portfolio-risk and research-factors-ml added); 28 of 30 stay reachable, through 29
+  files instead of 20.
   execution-broker and observability-hosting are not scored: their recorded winners are not among their adopted
   candidates. `record_verdicts.py --write` seals each wave's own measure as `prose-exposure.json` and stamps
   every row's `lanes.prose_exposed` (round 7, BL7-2).
